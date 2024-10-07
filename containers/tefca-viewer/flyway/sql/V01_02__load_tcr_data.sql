@@ -1,4 +1,3 @@
-BEGIN;
 
 INSERT INTO valuesets VALUES('2.16.840.1.113762.1.4.1146.6_20230602','2.16.840.1.113762.1.4.1146.6','20230602','Diphtheria (Disorders) (SNOMED)','CSTE Steward','dxtc');
 INSERT INTO valuesets VALUES('2.16.840.1.113762.1.4.1146.2030_20230125','2.16.840.1.113762.1.4.1146.2030','20230125','Bartonella henselae infection (Disorders) (SNOMED)','CSTE Steward','dxtc');
@@ -175313,8 +175312,3 @@ INSERT INTO icd_crosswalk VALUES('81590','Z993','V463','00000');
 INSERT INTO icd_crosswalk VALUES('81591','Z9981','V462','00000');
 INSERT INTO icd_crosswalk VALUES('81592','Z9989','V468','10000');
 INSERT INTO icd_crosswalk VALUES('81593','Z9989','V469','10000');
-COMMIT;
-
-
-
-
