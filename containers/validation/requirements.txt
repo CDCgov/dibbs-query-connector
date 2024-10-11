@@ -1,7 +1,0 @@
-../dibbs
-hl7
-httpx==0.27.0
-jsonschema
-lxml
-pyyaml
-typing_extensions==4.8.0
