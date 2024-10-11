@@ -119,7 +119,6 @@ const SearchForm: React.FC<SearchFormProps> = ({
     window.scrollTo(0, 0);
   }, []);
 
-  console.log("fhir server: ", fhirServer);
   return (
     <>
       <form className="content-container-smaller-width" onSubmit={HandleSubmit}>
