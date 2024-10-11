@@ -1,11 +1,12 @@
 // @ts-check
 
 import { test, expect } from "@playwright/test";
+import { TEST_URL } from "../playwright-setup";
 
 test.describe("querying with the TryTEFCA viewer", () => {
   test.beforeEach(async ({ page }) => {
     // Start every test on our main landing page
-    await page.goto("http://localhost:3000/tefca-viewer");
+    await page.goto(TEST_URL);
   });
 
   test("landing page loads", async ({ page }) => {
@@ -86,6 +87,12 @@ test.describe("querying with the TryTEFCA viewer", () => {
     await page.getByLabel("Medical Record Number").fill("18091");
     await page.getByLabel("Phone Number").fill("5555555555");
     await page.getByRole("button", { name: "Search for patient" }).click();
+
+    await page.getByRole("link", { name: "Select patient" }).click();
+    await expect(
+      page.getByRole("heading", { name: "Select a query" }),
+    ).toBeVisible();
+    await page.getByRole("button", { name: "Submit" }).click();
 
     // Make sure we have a results page with a single patient
     // Non-interactive 'div' elements in the table should be located by text
