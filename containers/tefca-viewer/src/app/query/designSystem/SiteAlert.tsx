@@ -31,7 +31,7 @@ type SiteAlertProps = {
 
 const PageModeToSiteAlertMap: { [page in Mode]?: React.ReactNode } = {
   search: piiDisclaimer,
-  "customize-queries": piiDisclaimer,
+  "select-query": piiDisclaimer,
   results: contactUsDisclaimer,
 };
 

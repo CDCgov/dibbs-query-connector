@@ -1,13 +1,17 @@
 "use client";
-import React, { Suspense, useState } from "react";
-import { UseCaseQueryResponse, UseCaseQueryRequest } from "../../query-service";
-
-// Add a comment to suppress the TypeScript error
-// @ts-ignore
+import React, { useState } from "react";
+import { UseCaseQueryResponse } from "../../query-service";
 import ResultsView from "../components/ResultsView";
 import PatientSearchResults from "../components/PatientSearchResults";
 import SearchForm from "../components/searchForm/SearchForm";
-import { Mode, USE_CASES, ValueSetItem } from "../../constants";
+import SelectQuery from "../components/SelectQuery";
+import { FHIR_SERVERS, Mode, USE_CASES } from "../../constants";
+import LoadingView from "../components/LoadingView";
+import { ToastContainer } from "react-toastify";
+
+import "react-toastify/dist/ReactToastify.min.css";
+import SiteAlert from "../designSystem/SiteAlert";
+import { Patient } from "fhir/r4";
 
 /**
  * Parent component for the query page. Based on the mode, it will display the search
@@ -18,63 +22,79 @@ const Query: React.FC = () => {
   const [useCase, setUseCase] = useState<USE_CASES>("" as USE_CASES);
   const [mode, setMode] = useState<Mode>("search");
   const [loading, setLoading] = useState<boolean>(false);
-  const [useCaseQueryResponse, setUseCaseQueryResponse] =
-    useState<UseCaseQueryResponse>();
-  const [originalRequest, setOriginalRequest] = useState<UseCaseQueryRequest>();
+  const [fhirServer, setFhirServer] = useState<FHIR_SERVERS>(
+    "Public HAPI: eHealthExchange",
+  );
 
-  // Just some dummy variables to placate typescript until we delete this page
-  const [queryValueSets, _] = useState<ValueSetItem[]>([]);
+  const [patientDiscoveryQueryResponse, setPatientDiscoveryQueryResponse] =
+    useState<UseCaseQueryResponse>({});
+  const [patientForQuery, setPatientForQueryResponse] = useState<Patient>();
+  const [resultsQueryResponse, setResultsQueryResponse] =
+    useState<UseCaseQueryResponse>({});
 
   return (
-    <div>
-      {mode === "search" && (
-        <Suspense fallback="...Loading">
+    <>
+      <SiteAlert page={mode} />
+      <div className="main-container">
+        {mode === "search" && (
           <SearchForm
             useCase={useCase}
-            queryValueSets={queryValueSets}
             setUseCase={setUseCase}
             setMode={setMode}
             setLoading={setLoading}
-            setUseCaseQueryResponse={setUseCaseQueryResponse}
-            setOriginalRequest={setOriginalRequest}
-            setQueryType={() => {}}
+            setPatientDiscoveryQueryResponse={setPatientDiscoveryQueryResponse}
+            fhirServer={fhirServer}
+            setFhirServer={setFhirServer}
           />
-        </Suspense>
-      )}
+        )}
 
-      {/* Switch the mode to view to show the results of the query */}
-      {mode === "results" && (
-        <>
-          {useCaseQueryResponse && (
-            <ResultsView
-              useCaseQueryResponse={useCaseQueryResponse}
+        {mode === "patient-results" && (
+          <>
+            <PatientSearchResults
+              patients={patientDiscoveryQueryResponse?.Patient ?? []}
               goBack={() => setMode("search")}
-              queryName={useCase}
+              setMode={setMode}
+              setPatientForQueryResponse={setPatientForQueryResponse}
             />
-          )}
-        </>
-      )}
+          </>
+        )}
 
-      {/* Show the multiple patients view if there are multiple patients */}
-      {mode === "patient-results" && originalRequest && (
-        <>
-          <PatientSearchResults
-            patients={useCaseQueryResponse?.Patient ?? []}
-            originalRequest={originalRequest}
-            queryValueSets={queryValueSets}
-            setLoading={setLoading}
-            goBack={() => setMode("search")}
-            setMode={setMode}
-            setUseCaseQueryResponse={setUseCaseQueryResponse}
+        {mode === "select-query" && (
+          <SelectQuery
+            goBack={() => setMode("patient-results")}
+            onSubmit={() => setMode("results")}
+            selectedQuery={useCase}
+            setSelectedQuery={setUseCase}
+            patientForQuery={patientForQuery}
+            resultsQueryResponse={resultsQueryResponse}
+            setResultsQueryResponse={setResultsQueryResponse}
+            fhirServer={fhirServer}
+            setFhirServer={setFhirServer}
           />
-        </>
-      )}
-      {loading && (
-        <div className="overlay">
-          <div className="spinner"></div>
-        </div>
-      )}
-    </div>
+        )}
+
+        {mode === "results" && (
+          <>
+            {resultsQueryResponse && (
+              <ResultsView
+                selectedQuery={useCase}
+                useCaseQueryResponse={resultsQueryResponse}
+                goBack={() => {
+                  setMode("select-query");
+                }}
+                goToBeginning={() => {
+                  setMode("search");
+                }}
+              />
+            )}
+          </>
+        )}
+        <LoadingView loading={loading} />
+
+        <ToastContainer icon={false} />
+      </div>
+    </>
   );
 };
+
 export default Query;
