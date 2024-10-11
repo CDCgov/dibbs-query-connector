@@ -122,7 +122,6 @@ test.describe("querying with the TryTEFCA viewer", () => {
   test("query using form-fillable demo patient by phone number", async ({
     page,
   }) => {
-    test.slow();
     await page.getByRole("button", { name: "Go to the demo" }).click();
 
     await page.getByLabel("Query", { exact: true }).selectOption("syphilis");
@@ -137,6 +136,7 @@ test.describe("querying with the TryTEFCA viewer", () => {
 
     // Among verification, make sure phone number is right
     await page.getByRole("button", { name: "Search for patient" }).click();
+    await expect(page.getByText("Loading")).toHaveCount(0);
     await expect(
       page.getByRole("heading", { name: "Patient Record" }),
     ).toBeVisible();
@@ -151,7 +151,6 @@ test.describe("querying with the TryTEFCA viewer", () => {
   test("social determinants query with generalized function", async ({
     page,
   }) => {
-    test.slow();
     await page.getByRole("button", { name: "Go to the demo" }).click();
     await page
       .getByLabel("Query", { exact: true })
@@ -169,8 +168,9 @@ test.describe("querying with the TryTEFCA viewer", () => {
     await page.getByRole("button", { name: "Go to the demo" }).click();
     await page.getByLabel("Query", { exact: true }).selectOption("chlamydia");
     await page.getByRole("button", { name: "Fill fields" }).click();
-    // await page.getByLabel("Phone Number").fill("");
     await page.getByRole("button", { name: "Search for patient" }).click();
+    await expect(page.getByText("Loading")).toHaveCount(0);
+
     await expect(
       page.getByRole("heading", { name: "Patient Record" }),
     ).toBeVisible();
