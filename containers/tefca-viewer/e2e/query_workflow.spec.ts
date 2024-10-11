@@ -87,12 +87,7 @@ test.describe("querying with the TryTEFCA viewer", () => {
     await page.getByLabel("Medical Record Number").fill("18091");
     await page.getByLabel("Phone Number").fill("5555555555");
     await page.getByRole("button", { name: "Search for patient" }).click();
-
-    await page.getByRole("link", { name: "Select patient" }).click();
-    await expect(
-      page.getByRole("heading", { name: "Select a query" }),
-    ).toBeVisible();
-    await page.getByRole("button", { name: "Submit" }).click();
+    await expect(page.getByText("Loading")).toHaveCount(0, { timeout: 10000 });
 
     // Make sure we have a results page with a single patient
     // Non-interactive 'div' elements in the table should be located by text
