@@ -5,6 +5,9 @@
 export const TEST_URL =
   process.env.TEST_ENV ?? "http://localhost:3000/tefca-viewer";
 
+/**
+ *
+ */
 async function globalSetup() {
   const maxRetries = 300; // Maximum number of retries
   const delay = 1000; // Delay between retries in milliseconds
