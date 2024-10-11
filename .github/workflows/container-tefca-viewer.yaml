@@ -109,4 +109,4 @@ jobs:
         if: ${{ !cancelled() }}
         with:
           name: test-results
-          path: ./containers/test-results/
+          path: ./containers/${{env.CONTAINER}}/test-results/
