@@ -143,7 +143,7 @@ test.describe("querying with the TryTEFCA viewer", () => {
 
     // Among verification, make sure phone number is right
     await page.getByRole("button", { name: "Search for patient" }).click();
-    await expect(page.getByText("Loading")).toHaveCount(0);
+    await expect(page.getByText("Loading")).toHaveCount(0, { timeout: 10000 });
     await expect(
       page.getByRole("heading", { name: "Patient Record" }),
     ).toBeVisible();
@@ -176,7 +176,7 @@ test.describe("querying with the TryTEFCA viewer", () => {
     await page.getByLabel("Query", { exact: true }).selectOption("chlamydia");
     await page.getByRole("button", { name: "Fill fields" }).click();
     await page.getByRole("button", { name: "Search for patient" }).click();
-    await expect(page.getByText("Loading")).toHaveCount(0);
+    await expect(page.getByText("Loading")).toHaveCount(0, { timeout: 10000 });
 
     await expect(
       page.getByRole("heading", { name: "Patient Record" }),
