@@ -47,8 +47,8 @@ ENV HOSTNAME="0.0.0.0"
 # Copy necessary app files
 COPY --from=installer /app/next.config.js .
 COPY --from=installer /app/package.json .
-COPY --from=installer /app/flyway/conf/flyway.conf ./flyway/conf/flyway.conf
-COPY --from=installer /app/flyway/sql ./flyway/sql
+COPY --from=installer /app/flyway/conf/flyway.conf ../flyway/conf/flyway.conf
+COPY --from=installer /app/flyway/sql ../flyway/sql
 
 # Automatically leverage output traces to reduce image size
 COPY --from=installer --chown=nextjs:nodejs /app/.next/standalone ./
@@ -63,4 +63,4 @@ ENV JAVA_HOME=/usr/lib/jvm/default-jvm
 # Add the OpenJDK to the PATH so the java command is available for Flways
 ENV PATH=$JAVA_HOME/bin:$PATH
 
-CMD ["sh", "-c","flyway -configFiles=./flyway/conf/flyway.conf -schemas=public -connectRetries=60 migrate && echo done with flyway && node server.js"]
+CMD ["sh", "-c","flyway -configFiles=../flyway/conf/flyway.conf -schemas=public -connectRetries=60 migrate && echo done with flyway && node server.js"]
