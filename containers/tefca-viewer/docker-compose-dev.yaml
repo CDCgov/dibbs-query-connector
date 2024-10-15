@@ -22,6 +22,7 @@ services:
   flyway:
     image: flyway/flyway:10.16-alpine
     command: -configFiles=/flyway/conf/flyway.conf -schemas=public -connectRetries=60 migrate
+    platform: linux/amd64
     volumes:
       - ./flyway/sql:/flyway/sql
       - ./flyway/conf/flyway.conf:/flyway/conf/flyway.conf
