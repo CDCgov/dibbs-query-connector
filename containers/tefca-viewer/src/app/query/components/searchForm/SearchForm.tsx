@@ -127,11 +127,8 @@ const SearchForm: React.FC<SearchFormProps> = ({
     const queryResponse = await UseCaseQuery(originalRequest, queryValueSets);
     setUseCaseQueryResponse(queryResponse);
 
-    if (queryResponse.Patient && queryResponse.Patient.length === 1) {
-      setMode("results");
-    } else {
-      setMode("patient-results");
-    }
+    // regardless of 0, 1, or 2+ patients, direct to patient-results component
+    setMode("patient-results");
     setLoading(false);
   }
   useEffect(() => {
@@ -158,7 +155,7 @@ const SearchForm: React.FC<SearchFormProps> = ({
               queries that you can make with the TEFCA Viewer. Select a query
               use case, a sample patient, and then click “fill fields” below.
             </Label>
-            <div className={`${styles.demoQueryDropdownContainer}`}>
+            {/* <div className={`${styles.demoQueryDropdownContainer}`}>
               <div>
                 <Label htmlFor="query">Query</Label>
                 <div className="display-flex flex-align-start query-page-wrapper">
@@ -204,11 +201,11 @@ const SearchForm: React.FC<SearchFormProps> = ({
                   </select>
                 </div>
               </div>
-            </div>
+            </div> */}
 
             <div className={`${styles.searchCallToActionContainer}`}>
               <Button
-                className={`"usa-button" ${styles.searchCallToActionButton}`}
+                className={`usa-button--outline bg-white ${styles.searchCallToActionButton}`}
                 type="button"
                 onClick={() => {
                   fillFields(patientOption as PatientType, false);
@@ -216,13 +213,13 @@ const SearchForm: React.FC<SearchFormProps> = ({
               >
                 Fill fields
               </Button>
-              <Button
+              {/* <Button
                 type="button"
                 className={`usa-button--outline bg-white ${styles.searchCallToActionButton}`}
                 onClick={() => handleClick()}
               >
                 Customize query
-              </Button>
+              </Button> */}
               <Button
                 className={`usa-button--unstyled margin-left-auto ${styles.searchCallToActionButton}`}
                 type="button"

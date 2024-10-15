@@ -14,8 +14,8 @@ type StepStatus = "current" | "complete" | "incomplete";
 
 export const CUSTOMIZE_QUERY_STEPS: { [mode: string]: string } = {
   search: "Enter patient info",
+  "patient-results": "Select patient",
   "select-query": "Select query",
-  "multiple-patients-results": "Select patient",
   results: "View patient record",
 };
 

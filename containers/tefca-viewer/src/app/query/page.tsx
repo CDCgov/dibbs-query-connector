@@ -73,6 +73,7 @@ const Query: React.FC = () => {
         <StepIndicator headingLevel="h4" curStep={mode} />
       )}
       <div className="main-container">
+        {/* Step 1 */}
         {mode === "search" && (
           <>
             <Suspense fallback="...Loading">
@@ -90,32 +91,7 @@ const Query: React.FC = () => {
           </>
         )}
 
-        {/* Render SelectQuery component when the mode is "select-query" */}
-        {mode === "select-query" && (
-          <SelectQuery
-            setQueryType={setQueryType}
-            setHCO={() => {}}
-            setMode={setMode}
-            goBack={() => setMode("patient-results")}
-            onSubmit={() => setMode("results")}
-          />
-        )}
-
-        {/* Switch the mode to view to show the results of the query */}
-        {mode === "results" && (
-          <>
-            {useCaseQueryResponse && (
-              <ResultsView
-                useCaseQueryResponse={useCaseQueryResponse}
-                goBack={() => {
-                  setMode("search");
-                }}
-                queryName={queryType}
-              />
-            )}
-          </>
-        )}
-
+        {/* Step 2 */}
         {/* Show the patients results view if there are multiple patients */}
         {mode === "patient-results" && originalRequest && (
           <>
@@ -131,9 +107,19 @@ const Query: React.FC = () => {
           </>
         )}
 
-        {/* Use LoadingView component for loading state */}
-        <LoadingView loading={loading} />
+        {/* Step 3 */}
+        {/* Render SelectQuery component when the mode is "select-query" */}
+        {mode === "select-query" && (
+          <SelectQuery
+            setQueryType={setQueryType}
+            setHCO={() => {}}
+            setMode={setMode}
+            goBack={() => setMode("patient-results")}
+            onSubmit={() => setMode("results")}
+          />
+        )}
 
+        {/* Step 3 substep */}
         {/* Show the customize query view to select and change what is returned in results */}
         {mode === "customize-queries" && (
           <>
@@ -143,11 +129,31 @@ const Query: React.FC = () => {
               queryValuesets={queryValuesets}
               setQueryValuesets={setQueryValuesets}
               goBack={() => {
-                setMode("search");
+                setMode("select-query");
               }}
             />
           </>
         )}
+
+        {/* Step 4 */}
+        {/* Switch the mode to view to show the results of the query */}
+        {mode === "results" && (
+          <>
+            {useCaseQueryResponse && (
+              <ResultsView
+                useCaseQueryResponse={useCaseQueryResponse}
+                goBack={() => {
+                  setMode("search");
+                }}
+                queryName={queryType}
+              />
+            )}
+          </>
+        )}
+
+        {/* Use LoadingView component for loading state */}
+        <LoadingView loading={loading} />
+
         <ToastContainer icon={false} />
       </div>
     </>

@@ -66,7 +66,7 @@ const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({
           },
         );
         setUseCaseQueryResponse(queryResponse);
-        setMode("results");
+        setMode("select-query");
         setLoading(false);
       }
     };
