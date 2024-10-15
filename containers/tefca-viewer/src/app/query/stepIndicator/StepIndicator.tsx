@@ -20,10 +20,12 @@ export const CUSTOMIZE_QUERY_STEPS: { [mode: string]: string } = {
 };
 
 /**
- *
- * @param root0
- * @param root0.headingLevel
- * @param root0.curStep
+ * Step indicator for the query process
+ * 
+ * @param root0 - The props for the StepIndicator component.
+ * @param root0.headingLevel - The heading level for the step indicator.
+ * @param root0.curStep - The current step in the query process.
+ * @returns The step indicator component showing the current progress.
  */
 const StepIndicator: React.FC<StepIndicatorProps> = ({
   headingLevel,
