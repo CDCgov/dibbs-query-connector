@@ -1,5 +1,3 @@
-import * as dq from "./demoQueries";
-
 /**
  * The use cases that can be used in the app
  */
@@ -22,17 +20,6 @@ export const UseCaseToQueryName: {
   gonorrhea: "Gonorrhea (disorder)",
   chlamydia: "Chlamydia trachomatis infection (disorder)",
   cancer: "Cancer (Leukemia)",
-};
-
-export const UseCaseToStructMap: {
-  [key in USE_CASES]: dq.QueryStruct;
-} = {
-  "social-determinants": dq.SOCIAL_DETERMINANTS_QUERY,
-  "newborn-screening": dq.NEWBORN_SCREENING_QUERY,
-  syphilis: dq.SYPHILIS_QUERY,
-  gonorrhea: dq.GONORRHEA_QUERY,
-  chlamydia: dq.CHLAMYDIA_QUERY,
-  cancer: dq.CANCER_QUERY,
 };
 
 /**
@@ -74,7 +61,7 @@ export const FhirServers = [
   "HELIOS Meld: eHealthExchange",
   "JMC Meld: Direct",
   "JMC Meld: eHealthExchange",
-  "Public HAPI: eHealthExchange",
+  "Public HAPI: Direct",
   "OpenEpic: eHealthExchange",
   "CernerHelios: eHealthExchange",
   "OPHDST Meld: Direct",
@@ -104,36 +91,45 @@ export type PatientType =
   | "sti-syphilis-positive";
 
 /*
+ * Common "Hyper Unlucky" patient data used for all non-newborn screening use cases
+ */
+const hyperUnluckyPatient: DemoDataFields = {
+  FirstName: "Hyper",
+  LastName: "Unlucky",
+  DOB: "1975-12-06",
+  MRN: "8692756",
+  Phone: "517-425-1398",
+  FhirServer: "Public HAPI: Direct",
+  UseCase: "cancer", // UseCase will be updated per case
+};
+
+/*
 Demo patient data used to populate the form fields with each value being a type of DemoDataFields
 */
 export const demoData: Record<PatientType, DemoDataFields> = {
-  cancer: {
-    FirstName: "Lee",
-    LastName: "Shaw",
-    DOB: "1975-12-06",
-    MRN: "8692756",
-    Phone: "517-425-1398",
-    FhirServer: "HELIOS Meld: Direct",
-    UseCase: "cancer",
+  cancer: { ...hyperUnluckyPatient, UseCase: "cancer" },
+  "sti-chlamydia-positive": { ...hyperUnluckyPatient, UseCase: "chlamydia" },
+  "sti-gonorrhea-positive": { ...hyperUnluckyPatient, UseCase: "gonorrhea" },
+  "social-determinants": {
+    ...hyperUnluckyPatient,
+    UseCase: "social-determinants",
   },
-  "sti-chlamydia-positive": {
-    FirstName: "Chlamydia",
-    LastName: "JMC",
-    DOB: "2001-05-07",
-    MRN: "b50z-wayszq-ofib",
-    Phone: "",
-    FhirServer: "JMC Meld: Direct",
-    UseCase: "chlamydia",
-  },
-  "sti-gonorrhea-positive": {
-    FirstName: "GC",
-    LastName: "JMC",
-    DOB: "1998-05-31",
-    MRN: "JMC-1002",
-    Phone: "",
-    FhirServer: "JMC Meld: Direct",
-    UseCase: "gonorrhea",
-  },
+  "sti-syphilis-positive": { ...hyperUnluckyPatient, UseCase: "syphilis" },
+
+  // Newborn screening data remains unchanged
+  // We need to figure how to display specific cases for specific referral, fail, pass
+  // "newborn-screening-technical-fail": {
+  //   ...hyperUnluckyPatient,
+  // UseCase: "newborn-screening",
+  // },
+  // "newborn-screening-referral": {
+  //   ...hyperUnluckyPatient,
+  //   UseCase: "newborn-screening",
+  // },
+  // "newborn-screening-pass": {
+  //   ...hyperUnluckyPatient,
+  //   UseCase: "newborn-screening",
+  // },
   "newborn-screening-technical-fail": {
     FirstName: "Mango",
     LastName: "Smith",
@@ -161,26 +157,9 @@ export const demoData: Record<PatientType, DemoDataFields> = {
     FhirServer: "CernerHelios: eHealthExchange",
     UseCase: "newborn-screening",
   },
-  "social-determinants": {
-    FirstName: "Veronica",
-    LastName: "Blackstone",
-    DOB: "1998-06-18",
-    MRN: "34972316",
-    Phone: "937-379-3497",
-    FhirServer: "HELIOS Meld: Direct",
-    UseCase: "social-determinants",
-  },
-  "sti-syphilis-positive": {
-    FirstName: "Veronica",
-    LastName: "Blackstone",
-    DOB: "1998-06-18",
-    MRN: "34972316",
-    Phone: "937-379-3497",
-    FhirServer: "HELIOS Meld: Direct",
-    UseCase: "syphilis",
-  },
 };
 
+// Define Option type
 type Option = {
   value: string;
   label: string;

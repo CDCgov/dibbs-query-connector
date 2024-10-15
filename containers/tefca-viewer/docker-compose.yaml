@@ -18,14 +18,16 @@ services:
   tefca-viewer:
     platform: linux/amd64
     build:
-      context: ../../
-      dockerfile: ./containers/tefca-viewer/Dockerfile
+      context: .
+      dockerfile: Dockerfile
     tty: true
     ports:
       - "3000:3000"
     environment:
       - NODE_ENV=production
       - DATABASE_URL=postgres://postgres:pw@db:5432/tefca_db
+      # Note: you must have a local .env file with the ERSD_API_KEY set to a key
+      # obtained from the ERSD API at https://ersd.aimsplatform.org/#/api-keys
     depends_on:
       db:
         condition: service_healthy

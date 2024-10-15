@@ -28,6 +28,7 @@ export default defineConfig({
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: "on-first-retry",
+    video: "on-first-retry",
   },
 
   /* Configure projects for major browsers */
@@ -68,8 +69,8 @@ export default defineConfig({
     // },
   ],
 
-  /* Hook to ensure Docker is shut down after tests or on error */
-  globalTeardown: "./playwright-teardown",
   /* Hook to ensure DB is started & migrations have run before tests start*/
   globalSetup: "./playwright-setup",
+  /* Hook to ensure Docker is shut down after tests or on error */
+  globalTeardown: "./playwright-teardown",
 });

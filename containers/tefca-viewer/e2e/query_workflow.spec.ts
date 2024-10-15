@@ -1,11 +1,12 @@
 // @ts-check
 
 import { test, expect } from "@playwright/test";
+import { TEST_URL } from "../playwright-setup";
 
 test.describe("querying with the TryTEFCA viewer", () => {
   test.beforeEach(async ({ page }) => {
     // Start every test on our main landing page
-    await page.goto("http://localhost:3000/tefca-viewer");
+    await page.goto(TEST_URL);
   });
 
   test("landing page loads", async ({ page }) => {
@@ -20,7 +21,7 @@ test.describe("querying with the TryTEFCA viewer", () => {
       page.getByRole("heading", { name: "How does it work?" }),
     ).toBeVisible();
 
-    // Check that interactable elements are present (TEFCA header and Get Started)
+    // Check that interactable elements are present (header and Get Started)
     await expect(
       page.getByRole("link", { name: "TEFCA Viewer" }),
     ).toBeVisible();
@@ -29,30 +30,33 @@ test.describe("querying with the TryTEFCA viewer", () => {
     ).toBeVisible();
   });
 
-  //TODO: Add this test back in once you no longer have to click to select the query from the dropdown
-  // test("unsuccessful user query: no patients", async ({ page }) => {
-  //   await page.getByRole("button", { name: "Go to the demo" }).click();
-  //   await page
-  //     .getByLabel("Query", { exact: true })
-  //     .selectOption("social-determinants");
-  //   await page.getByRole("button", { name: "Fill fields" }).click();
+  test("unsuccessful user query: no patients", async ({ page }) => {
+    await page.getByRole("button", { name: "Go to the demo" }).click();
+    await page
+      .getByLabel("Query", { exact: true })
+      .selectOption("social-determinants");
+    await page.getByRole("button", { name: "Advanced" }).click();
+    await page
+      .getByLabel("FHIR Server (QHIN)", { exact: true })
+      .selectOption("HELIOS Meld: Direct");
 
-  //   await page.getByLabel("First Name").fill("Ellie");
-  //   await page.getByLabel("Last Name").fill("Williams");
-  //   await page.getByLabel("Phone Number").fill("5555555555");
-  //   await page.getByLabel("Medical Record Number").fill("TLOU1TLOU2");
-  //   await page.getByRole("button", { name: "Search for patient" }).click();
+    await page.getByLabel("First Name").fill("Ellie");
+    await page.getByLabel("Last Name").fill("Williams");
+    await page.getByLabel("Phone Number").fill("5555555555");
+    await page.getByLabel("Medical Record Number").fill("TLOU1TLOU2");
+    await page.getByRole("button", { name: "Search for patient" }).click();
 
-  //   // Better luck next time, user!
-  //   await expect(
-  //     page.getByRole("heading", { name: "No Patients Found" })
-  //   ).toBeVisible();
-  //   await expect(page.getByText("There are no patient records")).toBeVisible();
-  //   await page.getByRole("link", { name: "Search for a new patient" }).click();
-  //   await expect(
-  //     page.getByRole("heading", { name: "Search for a Patient", exact: true })
-  //   ).toBeVisible();
-  // });
+    // Better luck next time, user!
+    await expect(
+      page.getByRole("heading", { name: "No Records Found" }),
+    ).toBeVisible();
+    await expect(
+      page.getByText("No records were found for your search"),
+    ).toBeVisible();
+    await page
+      .getByRole("link", { name: "Revise your patient search" })
+      .click();
+  });
 
   test("successful demo user query: the quest for watermelon mcgee", async ({
     page,
@@ -83,6 +87,7 @@ test.describe("querying with the TryTEFCA viewer", () => {
     await page.getByLabel("Medical Record Number").fill("18091");
     await page.getByLabel("Phone Number").fill("5555555555");
     await page.getByRole("button", { name: "Search for patient" }).click();
+    await expect(page.getByText("Loading")).toHaveCount(0, { timeout: 10000 });
 
     // Make sure we have a results page with a single patient
     // Non-interactive 'div' elements in the table should be located by text
@@ -133,15 +138,16 @@ test.describe("querying with the TryTEFCA viewer", () => {
 
     // Among verification, make sure phone number is right
     await page.getByRole("button", { name: "Search for patient" }).click();
+    await expect(page.getByText("Loading")).toHaveCount(0, { timeout: 10000 });
     await expect(
       page.getByRole("heading", { name: "Patient Record" }),
     ).toBeVisible();
     await expect(page.getByText("Patient Name")).toBeVisible();
-    await expect(page.getByText("Veronica Anne Blackstone")).toBeVisible();
+    await expect(page.getByText("Hyper A. Unlucky")).toBeVisible();
     await expect(page.getByText("Contact")).toBeVisible();
-    await expect(page.getByText("937-379-3497")).toBeVisible();
+    await expect(page.getByText("517-425-1398")).toBeVisible();
     await expect(page.getByText("Patient Identifiers")).toBeVisible();
-    await expect(page.getByText("34972316")).toBeVisible();
+    await expect(page.getByText("8692756")).toBeVisible();
   });
 
   test("social determinants query with generalized function", async ({
@@ -164,8 +170,9 @@ test.describe("querying with the TryTEFCA viewer", () => {
     await page.getByRole("button", { name: "Go to the demo" }).click();
     await page.getByLabel("Query", { exact: true }).selectOption("chlamydia");
     await page.getByRole("button", { name: "Fill fields" }).click();
-    await page.getByLabel("Phone Number").fill("");
     await page.getByRole("button", { name: "Search for patient" }).click();
+    await expect(page.getByText("Loading")).toHaveCount(0, { timeout: 10000 });
+
     await expect(
       page.getByRole("heading", { name: "Patient Record" }),
     ).toBeVisible();
