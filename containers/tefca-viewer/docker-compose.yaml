@@ -18,8 +18,8 @@ services:
   tefca-viewer:
     platform: linux/amd64
     build:
-      context: ../../
-      dockerfile: ./containers/tefca-viewer/Dockerfile
+      context: .
+      dockerfile: Dockerfile
     tty: true
     ports:
       - "3000:3000"
