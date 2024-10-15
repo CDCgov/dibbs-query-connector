@@ -1,6 +1,7 @@
 import fetch, { RequestInit, HeaderInit, Response } from "node-fetch";
 import { v4 as uuidv4 } from "uuid";
 import { FHIR_SERVERS } from "./constants";
+import https from "https";
 /**
  * Defines the model for a FHIR server configuration
  */
@@ -53,6 +54,10 @@ function configureEHX(xdestination: string): FHIR_SERVER_CONFIG {
       prefer: "return=representation",
       "Cache-Control": "no-cache",
     } as HeaderInit,
+    // Trust eHealth Exchange's self-signed certificate
+    agent: new https.Agent({
+      rejectUnauthorized: false,
+    }),
   };
   if (xdestination === "CernerHelios" && init.headers) {
     (init.headers as Record<string, string>)["OAUTHSCOPES"] =
