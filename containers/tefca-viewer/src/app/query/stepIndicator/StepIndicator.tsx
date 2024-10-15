@@ -19,6 +19,12 @@ export const CUSTOMIZE_QUERY_STEPS: { [mode: string]: string } = {
   results: "View patient record",
 };
 
+/**
+ *
+ * @param root0
+ * @param root0.headingLevel
+ * @param root0.curStep
+ */
 const StepIndicator: React.FC<StepIndicatorProps> = ({
   headingLevel,
   curStep,
