@@ -67,6 +67,7 @@ const SearchForm: React.FC<SearchFormProps> = ({
   const [firstName, setFirstName] = useState<string>("");
   const [lastName, setLastName] = useState<string>("");
   const [fhirServer, setFhirServer] = useState<FHIR_SERVERS>();
+  // "Public HAPI: Direct",
   const [phone, setPhone] = useState<string>("");
   const [dob, setDOB] = useState<string>("");
   const [mrn, setMRN] = useState<string>("");
@@ -248,6 +249,7 @@ const SearchForm: React.FC<SearchFormProps> = ({
                     name="fhir_server"
                     value={fhirServer}
                     defaultValue={""}
+                    // defaultValue={"Public HAPI: Direct"}
                     onChange={(event) => {
                       setFhirServer(event.target.value as FHIR_SERVERS);
                     }}
