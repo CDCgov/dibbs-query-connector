@@ -62,7 +62,6 @@ test.describe("querying with the Query Connector", () => {
       page.getByRole("heading", { name: "Select a query" }),
     ).toBeVisible();
     await page.getByTestId("Select").selectOption("chlamydia");
-
     await page.getByRole("button", { name: "Customize Query" }).click();
     await expect(
       page.getByRole("heading", { name: "Customize Query" }),
@@ -79,7 +78,8 @@ test.describe("querying with the Query Connector", () => {
       page.getByText("0 labs found, 0 medications found, 0 conditions found."),
     ).not.toBeVisible();
 
-    await page.getByText(RETURN_TO_STEP_TWO_COPY).click();
+    await page.getByText("Return to Select query").click();
+
     await page.getByRole("button", { name: "Submit" }).click();
     await expect(page.getByText("Loading")).toHaveCount(0, { timeout: 10000 });
 
