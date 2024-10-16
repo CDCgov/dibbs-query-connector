@@ -33,7 +33,7 @@ INSERT INTO concepts VALUES('1_30312-3','30312-3','http://loinc.org','3-Hydroxyo
 INSERT INTO concepts VALUES('1_30534-2','30534-2','http://loinc.org','Linoleoylcarnitine (C18:2) [Moles/volume]] in Serum or Plasma','305342','2024-10');
 INSERT INTO concepts VALUES('1_30237-2','30237-2','http://loinc.org','3-Hydroxylinoleoylcarnitine (C18:2-OH) [Moles/volume] in Serum or Plasma','302372','2024-10');
 INSERT INTO concepts VALUES('1_53718-3','53718-3','http://loinc.org','Acylglycines [Interpretation] in Urine Narrative','537183','2024-10');
-INSERT INTO concepts VALUES('1_2161-8','2161-8','http://loinc.org','Creatinine [Mass/volume] in Urine','21618',,'2024-10');
+INSERT INTO concepts VALUES('1_2161-8','2161-8','http://loinc.org','Creatinine [Mass/volume] in Urine','21618','2024-10');
 INSERT INTO concepts VALUES('1_24442-6','24442-6','http://loinc.org','Propionylglycine/Creatinine [Molar ratio]] in Urine','244426','2024-10');
 INSERT INTO concepts VALUES('1_24437-6','24437-6','http://loinc.org','Butyrylglycine/Creatinine [Molar ratio] iin Urine','244376','2024-10');
 INSERT INTO concepts VALUES('1_24438-4','24438-4','http://loinc.org','Hexanoylglycine/Creatinine [Molar ratio]  in Urine','244384','2024-10');
@@ -385,3 +385,25 @@ INSERT INTO valueset_to_concept VALUES('45503','16_20241015','1_9557-0');
 INSERT INTO valueset_to_concept VALUES('45504','16_20241015','1_49857-6');
 INSERT INTO valueset_to_concept VALUES('45505','16_20241015','1_35462-1');
 INSERT INTO valueset_to_concept VALUES('45506','16_20241015','1_54449-4');
+
+-- Insert relevant query data
+-- Map the new valueset to the Newborn Screening query & get the newly created id
+WITH inserted AS (
+    INSERT INTO query_to_valueset (id, query_id, valueset_id, valueset_oid)
+    VALUES (
+        uuid_generate_v4(), 
+        (SELECT id FROM query WHERE query_name = 'Newborn Screening'), 
+        '16_20241015', 
+        '16'
+    )
+    RETURNING id
+)
+-- Insert the concepts from the valueset into the query_included_concepts table
+INSERT INTO query_included_concepts (id, query_by_valueset_id, concept_id, include)
+SELECT 
+    uuid_generate_v4(), 
+    (SELECT id FROM inserted), 
+    concept_id, 
+    true
+FROM valueset_to_concept
+WHERE valueset_id = '16_20241015';
