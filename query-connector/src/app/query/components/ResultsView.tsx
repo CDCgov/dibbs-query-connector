@@ -12,11 +12,7 @@ import EncounterTable from "./resultsView/tableComponents/EncounterTable";
 import MedicationRequestTable from "./resultsView/tableComponents/MedicationRequestTable";
 import ObservationTable from "./resultsView/tableComponents/ObservationTable";
 import Backlink from "./backLink/Backlink";
-import {
-  USE_CASES,
-  UseCaseToQueryName,
-  demoQueryValToLabelMap,
-} from "@/app/constants";
+import { USE_CASES, demoQueryValToLabelMap } from "@/app/constants";
 
 type ResultsViewProps = {
   useCaseQueryResponse: UseCaseQueryResponse;
