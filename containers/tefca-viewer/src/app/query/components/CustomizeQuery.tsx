@@ -2,7 +2,12 @@
 
 import React, { useState, useEffect } from "react";
 import { Button } from "@trussworks/react-uswds";
-import { ValueSetType, ValueSetItem } from "../../constants";
+import {
+  ValueSetType,
+  ValueSetItem,
+  USE_CASES,
+  demoQueryValToLabelMap,
+} from "../../constants";
 import { UseCaseQueryResponse } from "@/app/query-service";
 import LoadingView from "./LoadingView";
 import { showRedirectConfirmation } from "../designSystem/redirectToast/RedirectToast";
@@ -16,7 +21,7 @@ import Backlink from "./backLink/Backlink";
 
 interface CustomizeQueryProps {
   useCaseQueryResponse: UseCaseQueryResponse;
-  queryType: string;
+  queryType: USE_CASES;
   queryValuesets: ValueSetItem[];
   setQueryValuesets: (queryVS: ValueSetItem[]) => void;
   goBack: () => void;
@@ -125,11 +130,7 @@ const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
   const handleApplyChanges = () => {
     const selectedItems = Object.keys(valueSetOptions).reduce((acc, key) => {
       const items = valueSetOptions[key as ValueSetType];
-      acc = acc.concat(
-        Object.values(items)
-          .flatMap((dict) => dict.items)
-          .filter((item) => item.include),
-      );
+      acc = acc.concat(Object.values(items).flatMap((dict) => dict.items));
       return acc;
     }, [] as ValueSetItem[]);
     setQueryValuesets(selectedItems);
@@ -165,7 +166,7 @@ const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
         Customize query
       </h1>
       <div className="font-sans-lg text-light padding-bottom-0 padding-top-05">
-        Query: {queryType}
+        Query: {demoQueryValToLabelMap[queryType]}
       </div>
       <div className="font-sans-sm text-light padding-bottom-0 padding-top-05">
         {countLabs} labs found, {countMedications} medications found,{" "}

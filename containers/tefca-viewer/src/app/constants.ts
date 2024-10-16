@@ -37,6 +37,14 @@ export const demoQueryOptions = [
   { value: "syphilis", label: "Syphilis case investigation" },
 ];
 
+type DemoQueryOptionValue = (typeof demoQueryLabels)[number];
+export const demoQueryValToLabelMap = demoQueryOptions.reduce(
+  (acc, curVal) => {
+    acc[curVal.value as DemoQueryOptionValue] = curVal.label;
+    return acc;
+  },
+  {} as Record<DemoQueryOptionValue, string>,
+);
 /*
  * Map between the queryType property used to define a demo use case's options,
  * and the name of that query for purposes of searching the DB.
@@ -90,16 +98,17 @@ export type PatientType =
   | "social-determinants"
   | "sti-syphilis-positive";
 
+export const DEFAULT_DEMO_FHIR_SERVER = "Public HAPI: Direct";
 /*
  * Common "Hyper Unlucky" patient data used for all non-newborn screening use cases
  */
-const hyperUnluckyPatient: DemoDataFields = {
+export const hyperUnluckyPatient: DemoDataFields = {
   FirstName: "Hyper",
   LastName: "Unlucky",
   DOB: "1975-12-06",
   MRN: "8692756",
   Phone: "517-425-1398",
-  FhirServer: "Public HAPI: Direct",
+  FhirServer: DEFAULT_DEMO_FHIR_SERVER,
   UseCase: "cancer", // UseCase will be updated per case
 };
 
@@ -276,12 +285,7 @@ export const stateOptions = [
 ];
 
 /* Mode that pages can be in; determines what is displayed to the user */
-export type Mode =
-  | "search"
-  | "results"
-  | "customize-queries"
-  | "select-query"
-  | "patient-results";
+export type Mode = "search" | "results" | "select-query" | "patient-results";
 
 /*Type to specify the expected components for each item in a value set that will be 
 displayed in the CustomizeQuery component*/

@@ -1,12 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { Patient } from "fhir/r4";
 
-import {
-  UseCaseQueryResponse,
-  UseCaseQuery,
-  UseCaseQueryRequest,
-} from "../../query-service";
-import { Mode, ValueSetItem } from "@/app/constants";
+import { Mode } from "@/app/constants";
 import Backlink from "./backLink/Backlink";
 import PatientSearchResultsTable from "./patientSearchResults/PatientSearchResultsTable";
 import NoPatientsFound from "./patientSearchResults/NoPatientsFound";
@@ -16,94 +11,58 @@ import NoPatientsFound from "./patientSearchResults/NoPatientsFound";
  */
 export interface PatientSearchResultsProps {
   patients: Patient[];
-  originalRequest: UseCaseQueryRequest;
-  queryValueSets: ValueSetItem[];
-  setLoading: (loading: boolean) => void;
   goBack: () => void;
   setMode: (mode: Mode) => void;
-  setUseCaseQueryResponse: (UseCaseQueryResponse: UseCaseQueryResponse) => void;
+  setPatientForQueryResponse: (patient: Patient) => void;
 }
 
 /**
  * Displays multiple patient search results in a table.
  * @param root0 - PatientSearchResults props.
  * @param root0.patients - The array of Patient resources.
- * @param root0.originalRequest - The original request object.
- * @param root0.queryValueSets - The stateful collection of value sets to include
- * in the query.
- * @param root0.setLoading - The function to set the loading state.
  * @param root0.goBack - The function to go back to the previous page.
- * @param root0.setUseCaseQueryResponse - State update function to pass the
- * data needed for the results view back up to the parent component
  * @param root0.setMode - Redirect function to handle results view routing
+ * @param root0.setPatientForQueryResponse - Callback function to update the
+ * patient being searched for
  * @returns - The PatientSearchResults component.
  */
 const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({
   patients,
-  originalRequest,
-  queryValueSets,
-  setLoading,
   goBack,
-  setUseCaseQueryResponse,
+  setPatientForQueryResponse,
   setMode,
 }) => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
-  const [patientForQuery, setPatientForQueryResponse] = useState<Patient>();
 
-  useEffect(() => {
-    let isSubscribed = true;
-
-    const fetchQuery = async () => {
-      if (patientForQuery && isSubscribed) {
-        setLoading(true);
-        const queryResponse = await UseCaseQuery(
-          originalRequest,
-          queryValueSets,
-          {
-            Patient: [patientForQuery],
-          },
-        );
-        setUseCaseQueryResponse(queryResponse);
-        setMode("results");
-        setLoading(false);
-      }
-    };
-
-    fetchQuery().catch(console.error);
-
-    // Destructor hook to prevent future state updates
-    return () => {
-      isSubscribed = false;
-    };
-  }, [patientForQuery]);
+  function handlePatientSelect(patient: Patient) {
+    setPatientForQueryResponse(patient);
+    setMode("select-query");
+  }
 
   return (
     <>
-      <Backlink onClick={goBack} label={RETURN_TO_STEP_ONE_LABEL} />
       {patients.length === 0 && (
         <>
           <NoPatientsFound />
-          <a href="#" className="usa-link" onClick={goBack}>
+          <a
+            href="#"
+            className="usa-link unchanged-color-on-visit"
+            onClick={goBack}
+          >
             Revise your patient search
           </a>
         </>
       )}
       {patients.length > 0 && (
         <>
+          <Backlink onClick={goBack} label={RETURN_TO_STEP_ONE_LABEL} />
+
           <PatientSearchResultsTable
             patients={patients}
-            setPatientForQueryResponse={setPatientForQueryResponse}
+            handlePatientSelect={handlePatientSelect}
           />
-
-          <h3 className="margin-top-5 margin-bottom-1">
-            Not seeing what you're looking for?
-          </h3>
-
-          <a href="#" className="usa-link" onClick={goBack}>
-            Return to patient search
-          </a>
         </>
       )}
     </>
