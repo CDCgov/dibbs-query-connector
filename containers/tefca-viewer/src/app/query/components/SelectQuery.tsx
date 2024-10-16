@@ -89,7 +89,6 @@ const SelectQuery: React.FC<SelectQueryProps> = ({
     }).catch(console.error);
     goForward();
   }
-  console.log(loadingQueryValueSets, queryValueSets);
 
   const displayLoading = loadingResultResponse || loadingQueryValueSets;
   return (
