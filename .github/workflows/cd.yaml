@@ -40,4 +40,4 @@ jobs:
         with:
           context: ./query-connector
           push: true
-          tags: ghcr.io/${{ github.repository }}/query-connector:main, ghcr.io/${{ github.repository }}/query-connector:latest
+          tags: ghcr.io/cdcgov/dibbs-query-connector/query-connector:main, ghcr.io/cdcgov/dibbs-query-connector/query-connector:latest
