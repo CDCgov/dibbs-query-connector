@@ -1,7 +1,12 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { Button, Select } from "@trussworks/react-uswds";
-import { demoQueryOptions, USE_CASES, Mode, patientOptions } from "../../../constants";
+import {
+  demoQueryOptions,
+  USE_CASES,
+  Mode,
+  patientOptions,
+} from "../../../constants";
 import Backlink from "../backLink/Backlink";
 import styles from "./selectQuery.module.css";
 
@@ -62,8 +67,8 @@ const SelectQuery: React.FC<SelectQueryProps> = ({
   };
 
   // const handleHCOChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    // setSelectedHCO(event.target.value);
-    // setHCO(event.target.value as FHIR_SERVERS); // Update parent component state
+  // setSelectedHCO(event.target.value);
+  // setHCO(event.target.value as FHIR_SERVERS); // Update parent component state
   // };
 
   // Link to go to customize-queries page
@@ -75,7 +80,7 @@ const SelectQuery: React.FC<SelectQueryProps> = ({
   // Submit and go to results; if no custom query selected, add alert
   const handleSubmit = () => {
     if (selectedQuery) {
-      handleDemoQueryChange(selectedQuery); 
+      handleDemoQueryChange(selectedQuery);
       onSubmit();
     } else {
       alert("Please select a query.");
