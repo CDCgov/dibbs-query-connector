@@ -16,6 +16,7 @@ import {
   stateOptions,
   Mode,
   ValueSetItem,
+  hyperUnluckyPatient,
 } from "../../../constants";
 import {
   UseCaseQueryResponse,
@@ -65,8 +66,8 @@ const SearchForm: React.FC<SearchFormProps> = ({
   );
   const [firstName, setFirstName] = useState<string>("");
   const [lastName, setLastName] = useState<string>("");
-  const [fhirServer, setFhirServer] = useState<FHIR_SERVERS>();
-  // "Public HAPI: Direct",
+  const [fhirServer, setFhirServer] = useState<FHIR_SERVERS>(
+  "Public HAPI: Direct",);
   const [phone, setPhone] = useState<string>("");
   const [dob, setDOB] = useState<string>("");
   const [mrn, setMRN] = useState<string>("");
@@ -77,7 +78,8 @@ const SearchForm: React.FC<SearchFormProps> = ({
   // Fills fields with sample data based on the selected patientOption
   const fillFields = useCallback(
     (patientOption: PatientType, highlightAutofilled = true) => {
-      const data = demoData[patientOption];
+      // const data = demoData[patientOption];
+      const data = hyperUnluckyPatient; 
       if (data) {
         setFirstName(data.FirstName);
         setLastName(data.LastName);
@@ -85,7 +87,7 @@ const SearchForm: React.FC<SearchFormProps> = ({
         setMRN(data.MRN);
         setPhone(data.Phone);
         setFhirServer(data.FhirServer as FHIR_SERVERS);
-        setUseCase(data.UseCase as USE_CASES);
+        // setUseCase(data.UseCase as USE_CASES);
         setAutofilled(highlightAutofilled);
       }
     },
@@ -108,8 +110,8 @@ const SearchForm: React.FC<SearchFormProps> = ({
 
   async function HandleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!useCase || !fhirServer) {
-      console.error("Use case and FHIR server are required.");
+    if (!fhirServer) {
+      console.error("FHIR server is required.");
       return;
     }
     setLoading(true);
@@ -156,7 +158,7 @@ const SearchForm: React.FC<SearchFormProps> = ({
               sample patient, click “fill fields” below.
             </Label>
             <div className={`${styles.demoQueryDropdownContainer}`}>
-              <div>
+              {/* <div>
                 <Label htmlFor="query">Query</Label>
                 <div className="display-flex flex-align-start query-page-wrapper">
                   <select
@@ -180,7 +182,7 @@ const SearchForm: React.FC<SearchFormProps> = ({
                     ))}
                   </select>
                 </div>
-              </div>
+              </div> 
               <div>
                 <Label htmlFor="patient">Patient</Label>
                 <div className="display-flex flex-align-start query-page-wrapper">
@@ -200,7 +202,7 @@ const SearchForm: React.FC<SearchFormProps> = ({
                     ))}
                   </select>
                 </div>
-              </div>
+              </div>*/}
             </div>
             <div className={`${styles.searchCallToActionContainer}`}>
               <Button

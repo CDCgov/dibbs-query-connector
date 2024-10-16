@@ -93,7 +93,7 @@ export type PatientType =
 /*
  * Common "Hyper Unlucky" patient data used for all non-newborn screening use cases
  */
-const hyperUnluckyPatient: DemoDataFields = {
+export const hyperUnluckyPatient: DemoDataFields = {
   FirstName: "Hyper",
   LastName: "Unlucky",
   DOB: "1975-12-06",

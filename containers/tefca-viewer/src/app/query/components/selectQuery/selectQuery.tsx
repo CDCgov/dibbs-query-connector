@@ -32,8 +32,8 @@ const SelectQuery: React.FC<SelectQueryProps> = ({
   goBack,
 }) => {
   const [selectedQuery, setSelectedQuery] = useState<string>("");
-  const [selectedHCO, setSelectedHCO] = useState<string>(""); // Keep this as string for HCO selection
-  const [showAdvanced, setShowAdvanced] = useState(false);
+  // const [selectedHCO, setSelectedHCO] = useState<string>(""); // Keep this as string for HCO selection
+  // const [showAdvanced, setShowAdvanced] = useState(false);
 
   // When query changes, update the parent component state
   useEffect(() => {
@@ -45,8 +45,8 @@ const SelectQuery: React.FC<SelectQueryProps> = ({
   };
 
   const handleHCOChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedHCO(event.target.value);
-    setHCO(event.target.value as FHIR_SERVERS); // Update parent component state
+    // setSelectedHCO(event.target.value);
+    // setHCO(event.target.value as FHIR_SERVERS); // Update parent component state
   };
 
   // Link to go to customize-queries page
@@ -66,7 +66,7 @@ const SelectQuery: React.FC<SelectQueryProps> = ({
   return (
     <form className="content-container-smaller-width">
       {/* Back button */}
-      <div className="text-bold">
+      <div>
         <Backlink onClick={goBack} label={RETURN_TO_STEP_ONE_LABEL} />
       </div>
       <h1 className={`${styles.selectQueryHeaderText}`}>
@@ -111,7 +111,7 @@ const SelectQuery: React.FC<SelectQueryProps> = ({
       </div>
 
       {/* Show Advanced options only when `showAdvanced` is true */}
-      {showAdvanced && (
+      {/* {showAdvanced && (
         <div>
           <h3 className="margin-bottom-3">Health Care Organization (HCO)</h3>
           <Select
@@ -132,11 +132,11 @@ const SelectQuery: React.FC<SelectQueryProps> = ({
               </option>
             ))}
           </Select>
-        </div>
-      )}
+        </div> 
+      )} */}
 
       {/* Only show the "Advanced" button if `showAdvanced` is false */}
-      {!showAdvanced && (
+      {/* {!showAdvanced && (
         <div>
           <Button
             className={`usa-button--unstyled margin-left-auto ${styles.searchCallToActionButton}`}
@@ -146,7 +146,7 @@ const SelectQuery: React.FC<SelectQueryProps> = ({
             Advanced...
           </Button>
         </div>
-      )}
+      )} */}
 
       {/* Submit Button */}
       <div className="padding-top-6">

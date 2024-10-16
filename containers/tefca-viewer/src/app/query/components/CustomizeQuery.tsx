@@ -158,7 +158,7 @@ const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
   return (
     <div>
       <div className="padding-top-3">
-        <Backlink onClick={goBack} label="Return to patient search" />
+        <Backlink onClick={goBack} label="Return to Select query" />
       </div>
       <LoadingView loading={!useCaseQueryResponse} />
       <h1 className="font-sans-2xl text-bold margin-top-205">
