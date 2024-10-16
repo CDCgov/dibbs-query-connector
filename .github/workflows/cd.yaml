@@ -37,7 +37,7 @@ jobs:
 
       - name: Build and push
         uses: docker/build-push-action@v3
-        working-directory: ./query-connector
         with:
+          context: ./query-connector
           push: true
-          tags: [main, latest]
+          tags: ghcr.io/${{ github.repository }}/query-connector:main, ghcr.io/${{ github.repository }}/query-connector:latest
