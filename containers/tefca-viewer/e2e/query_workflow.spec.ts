@@ -60,6 +60,7 @@ test.describe("querying with the Query Connector", () => {
     await expect(
       page.getByRole("heading", { name: "Select a query" }),
     ).toBeVisible();
+    await page.getByTestId("Select").selectOption("chlamydia");
 
     await page.getByRole("button", { name: "Customize Query" }).click();
     await expect(
