@@ -12,11 +12,11 @@ import {
   demoData,
   stateOptions,
   Mode,
-} from "../../../constants";
-import { UseCaseQueryResponse, UseCaseQuery } from "../../../query-service";
-import { fhirServers } from "../../../fhir-servers";
+} from "@/app/constants";
+import { UseCaseQueryResponse, UseCaseQuery } from "@/app/query-service";
+import { fhirServers } from "@/app/fhir-servers";
 import styles from "./searchForm.module.css";
-import { FormatPhoneAsDigits } from "../../../format-service";
+import { FormatPhoneAsDigits } from "@/app/format-service";
 
 interface SearchFormProps {
   useCase: USE_CASES;
