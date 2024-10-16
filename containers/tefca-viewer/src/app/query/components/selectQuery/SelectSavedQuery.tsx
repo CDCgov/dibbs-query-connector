@@ -32,6 +32,7 @@ type SelectSavedQueryProps = {
  * @param root0.handleSubmit - submit handler
  * @param root0.fhirServer - fhir server to apply a query against
  * @param root0.setFhirServer - function to update the fhir server
+ * @param root0.loadingQueryValueSets
  * @returns SelectedSavedQuery component
  */
 const SelectSavedQuery: React.FC<SelectSavedQueryProps> = ({
