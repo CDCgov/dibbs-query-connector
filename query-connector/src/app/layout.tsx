@@ -3,11 +3,6 @@ import Header from "./query/components/header/header";
 import Footer from "./footer";
 import { DataProvider } from "./utils";
 
-export const metadata = {
-  title: "TEFCA Viewer",
-  description: "Try out TEFCA with queries for public health use cases.",
-};
-
 /**
  * Establishes the layout for the application.
  * @param props - Props for the component.

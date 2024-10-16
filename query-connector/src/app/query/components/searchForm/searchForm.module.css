@@ -5,12 +5,9 @@
   margin-top: 2rem;
 }
 
-.searchCallToActionButton {
-  height: 2.5rem;
-}
-
 .searchFormContainer {
-  width: 31.25rem;
+  margin-top: 1.25rem;
+  padding: 1.5rem;
 }
 
 .demoQueryFiller {
@@ -28,4 +25,12 @@
 .demoQueryDropdownContainer {
   display: flex;
   gap: 2rem;
+}
+
+.searchFormSectionLabel {
+  width: 100%;
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+  font-size: 1.375rem;
+  font-weight: 700;
 }
