@@ -8,6 +8,7 @@ import {
   CONTACT_US_DISCLAIMER_TEXT,
 } from "@/app/query/designSystem/SiteAlert";
 import { TEST_PATIENT, TEST_PATIENT_NAME } from "./constants";
+import { RETURN_TO_STEP_TWO_COPY } from "@/app/query/components/CustomizeQuery";
 
 test.describe("querying with the Query Connector", () => {
   test.beforeEach(async ({ page }) => {
@@ -78,8 +79,7 @@ test.describe("querying with the Query Connector", () => {
       page.getByText("0 labs found, 0 medications found, 0 conditions found."),
     ).not.toBeVisible();
 
-    await page.getByText("Return to patient search").click();
-
+    await page.getByText(RETURN_TO_STEP_TWO_COPY).click();
     await page.getByRole("button", { name: "Submit" }).click();
     await expect(page.getByText("Loading")).toHaveCount(0, { timeout: 10000 });
 

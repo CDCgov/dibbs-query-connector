@@ -159,7 +159,7 @@ const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
   return (
     <div>
       <div className="padding-top-3">
-        <Backlink onClick={goBack} label="Return to Select query" />
+        <Backlink onClick={goBack} label="RETURN_TO_STEP_TWO_COPY" />
       </div>
       <LoadingView loading={!useCaseQueryResponse} />
       <h1 className="font-sans-2xl text-bold margin-top-205">
@@ -218,7 +218,7 @@ const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
 };
 
 export default CustomizeQuery;
-
+export const RETURN_TO_STEP_TWO_COPY = "RETURN_TO_STEP_TWO_COPY";
 export const QUERY_CUSTOMIZATION_CONFIRMATION_HEADER =
   "Query Customization Successful!";
 export const QUERY_CUSTOMIZATION_CONFIRMATION_BODY =
