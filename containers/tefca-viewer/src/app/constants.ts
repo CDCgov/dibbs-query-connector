@@ -314,3 +314,8 @@ export const valueSetTypeToClincalServiceTypeMap = {
   medications: ["mrtc"],
   conditions: ["dxtc", "sdtc"],
 };
+
+export const metadata = {
+  title: "Query Connector",
+  description: "Try out TEFCA with queries for public health use cases.",
+};

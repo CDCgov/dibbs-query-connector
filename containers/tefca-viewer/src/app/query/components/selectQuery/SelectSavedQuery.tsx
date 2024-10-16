@@ -10,12 +10,13 @@ import styles from "./selectQuery.module.css";
 import { useState } from "react";
 
 type SelectSavedQueryProps = {
+  selectedQuery: string;
+  fhirServer: FHIR_SERVERS;
+  loadingQueryValueSets: boolean;
   goBack: () => void;
   setSelectedQuery: (selectedQuery: USE_CASES) => void;
-  selectedQuery: string;
   setShowCustomizedQuery: (showCustomize: boolean) => void;
   handleSubmit: () => void;
-  fhirServer: FHIR_SERVERS;
   setFhirServer: React.Dispatch<React.SetStateAction<FHIR_SERVERS>>;
 };
 
@@ -36,6 +37,7 @@ type SelectSavedQueryProps = {
 const SelectSavedQuery: React.FC<SelectSavedQueryProps> = ({
   selectedQuery,
   fhirServer,
+  loadingQueryValueSets,
   goBack,
   setSelectedQuery,
   setShowCustomizedQuery,
@@ -122,7 +124,7 @@ const SelectSavedQuery: React.FC<SelectSavedQueryProps> = ({
       <div className="padding-top-6">
         <Button
           type="button"
-          disabled={!selectedQuery}
+          disabled={!selectedQuery && !loadingQueryValueSets}
           className={selectedQuery ? "usa-button" : "usa-button disabled"}
           onClick={() => handleSubmit()}
         >

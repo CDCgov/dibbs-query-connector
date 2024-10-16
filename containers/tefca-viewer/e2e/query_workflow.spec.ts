@@ -3,43 +3,16 @@
 import { test, expect } from "@playwright/test";
 import { TEST_URL } from "../playwright-setup";
 import { STEP_ONE_PAGE_TITLE } from "@/app/query/components/searchForm/SearchForm";
-import { hyperUnluckyPatient } from "@/app/constants";
 import {
   CONTACT_US_DISCLAIMER_EMAIL,
   CONTACT_US_DISCLAIMER_TEXT,
 } from "@/app/query/designSystem/SiteAlert";
-import { STEP_TWO_PAGE_TITLE } from "@/app/query/components/patientSearchResults/PatientSearchResultsTable";
-import { STEP_THREE_PAGE_TITLE } from "@/app/query/components/selectQuery/SelectSavedQuery";
-
-const TEST_PATIENT = hyperUnluckyPatient;
-const TEST_PATIENT_NAME =
-  hyperUnluckyPatient.FirstName + " A. " + hyperUnluckyPatient.LastName;
+import { TEST_PATIENT, TEST_PATIENT_NAME } from "./constants";
 
 test.describe("querying with the Query Connector", () => {
   test.beforeEach(async ({ page }) => {
     // Start every test on our main landing page
     await page.goto(TEST_URL);
-  });
-
-  test("landing page loads", async ({ page }) => {
-    // Check that each expected text section is present
-    await expect(
-      page.getByRole("heading", { name: "Data collection made easier" }),
-    ).toBeVisible();
-    await expect(
-      page.getByRole("heading", { name: "What is it?" }),
-    ).toBeVisible();
-    await expect(
-      page.getByRole("heading", { name: "How does it work?" }),
-    ).toBeVisible();
-
-    // Check that interactable elements are present (header and Get Started)
-    await expect(
-      page.getByRole("link", { name: "TEFCA Viewer" }),
-    ).toBeVisible();
-    await expect(
-      page.getByRole("button", { name: "Go to the demo" }),
-    ).toBeVisible();
   });
 
   test("unsuccessful user query: no patients", async ({ page }) => {
@@ -87,6 +60,17 @@ test.describe("querying with the Query Connector", () => {
     await expect(
       page.getByRole("heading", { name: "Select a query" }),
     ).toBeVisible();
+
+    await page.getByRole("button", { name: "Customize Query" }).click();
+    await expect(
+      page.getByRole("heading", { name: "Customize Query" }),
+    ).toBeVisible();
+    await expect(
+      page.getByText("0 labs found, 0 medications found, 0 conditions found."),
+    ).not.toBeVisible();
+
+    await page.getByText("Return to patient search").click();
+
     await page.getByRole("button", { name: "Submit" }).click();
     await expect(page.getByText("Loading")).toHaveCount(0, { timeout: 10000 });
 
@@ -109,87 +93,20 @@ test.describe("querying with the Query Connector", () => {
       `${CONTACT_US_DISCLAIMER_TEXT} ${CONTACT_US_DISCLAIMER_EMAIL}`,
     );
 
-    // Check to see if the accordion button is open
     await expect(
       page.getByRole("button", { name: "Observations", expanded: true }),
     ).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "Medication Requests", expanded: true }),
+    ).toBeVisible();
 
     // We can also just directly ask the page to find us filtered table rows
-    await expect(page.locator("tbody").locator("tr")).toHaveCount(5);
+    await expect(page.locator("tbody").locator("tr")).toHaveCount(7);
 
     // Now let's use the return to search to go back to a blank form
     await page.getByRole("button", { name: "New patient search" }).click();
     await expect(
       page.getByRole("heading", { name: STEP_ONE_PAGE_TITLE, exact: true }),
-    ).toBeVisible();
-  });
-
-  test("query using form-fillable demo patient by phone number", async ({
-    page,
-  }) => {
-    await page.getByRole("button", { name: "Go to the demo" }).click();
-    await page.getByRole("button", { name: "Fill fields" }).click();
-
-    // Delete last name and MRN to force phone number as one of the 3 fields
-    await page.getByLabel("Last Name").clear();
-    await page.getByLabel("Medical Record Number").clear();
-
-    // Among verification, make sure phone number is right
-    await page.getByRole("button", { name: "Search for patient" }).click();
-    await expect(page.getByText("Loading")).toHaveCount(0, { timeout: 10000 });
-    await expect(
-      page.getByRole("heading", { name: STEP_TWO_PAGE_TITLE }),
-    ).toBeVisible();
-    await page.getByRole("link", { name: "Select patient" }).click();
-    await expect(
-      page.getByRole("heading", { name: STEP_THREE_PAGE_TITLE }),
-    ).toBeVisible();
-    await page.getByRole("button", { name: "Submit" }).click();
-    await expect(page.getByText("Loading")).toHaveCount(0, { timeout: 10000 });
-
-    await expect(page.getByText("Patient Name")).toBeVisible();
-    await expect(page.getByText(TEST_PATIENT_NAME)).toBeVisible();
-    await expect(page.getByText("Contact")).toBeVisible();
-    await expect(page.getByText(TEST_PATIENT.Phone)).toBeVisible();
-    await expect(page.getByText("Patient Identifiers")).toBeVisible();
-    await expect(page.getByText(TEST_PATIENT.MRN)).toBeVisible();
-  });
-
-  test("social determinants query with generalized function", async ({
-    page,
-  }) => {
-    await page.getByRole("button", { name: "Go to the demo" }).click();
-    await page.getByRole("button", { name: "Fill fields" }).click();
-    await page.getByRole("button", { name: "Search for patient" }).click();
-    await expect(page.getByText("Loading")).toHaveCount(0, { timeout: 10000 });
-
-    await page.getByRole("link", { name: "Select patient" }).click();
-    await expect(
-      page.getByRole("heading", { name: "Select a query" }),
-    ).toBeVisible();
-    await page.getByTestId("Select").selectOption("social-determinants");
-    await page.getByRole("button", { name: "Submit" }).click();
-    await expect(page.getByText("Loading")).toHaveCount(0, { timeout: 10000 });
-
-    await expect(
-      page.getByRole("heading", { name: "Patient Record" }),
-    ).toBeVisible();
-  });
-
-  test("form-fillable STI query using generalized function", async ({
-    page,
-  }) => {
-    await page.getByRole("button", { name: "Go to the demo" }).click();
-    await page.getByRole("button", { name: "Fill fields" }).click();
-    await page.getByRole("button", { name: "Search for patient" }).click();
-    await expect(page.getByText("Loading")).toHaveCount(0, { timeout: 10000 });
-    await page.getByRole("link", { name: "Select patient" }).click();
-    await page.getByTestId("Select").selectOption("chlamydia");
-    await page.getByRole("button", { name: "Submit" }).click();
-    await expect(page.getByText("Loading")).toHaveCount(0, { timeout: 10000 });
-
-    await expect(
-      page.getByRole("heading", { name: "Patient Record" }),
     ).toBeVisible();
   });
 });

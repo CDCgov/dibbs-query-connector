@@ -89,9 +89,13 @@ const SelectQuery: React.FC<SelectQueryProps> = ({
     }).catch(console.error);
     goForward();
   }
+  console.log(loadingQueryValueSets, queryValueSets);
 
+  const displayLoading = loadingResultResponse || loadingQueryValueSets;
   return (
     <>
+      {displayLoading && <LoadingView loading={loadingResultResponse} />}
+
       {showCustomizeQuery ? (
         <CustomizeQuery
           useCaseQueryResponse={resultsQueryResponse}
@@ -102,16 +106,16 @@ const SelectQuery: React.FC<SelectQueryProps> = ({
         ></CustomizeQuery>
       ) : (
         <SelectSavedQuery
-          goBack={goBack}
           selectedQuery={selectedQuery}
+          fhirServer={fhirServer}
+          loadingQueryValueSets={loadingQueryValueSets}
+          goBack={goBack}
           setSelectedQuery={setSelectedQuery}
           setShowCustomizedQuery={setShowCustomizedQuery}
           handleSubmit={onSubmit}
-          fhirServer={fhirServer}
           setFhirServer={setFhirServer}
         ></SelectSavedQuery>
       )}
-      {loadingResultResponse && <LoadingView loading={loadingResultResponse} />}
     </>
   );
 };

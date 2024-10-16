@@ -19,18 +19,18 @@ type SetStateCallback<T> = React.Dispatch<React.SetStateAction<T>>;
  * @param selectedQuery - Query use case that's been selected
  * @param valueSetStateCallback - state update function to set the valuesets
  * @param isSubscribed - state destructor hook to prevent race conditions
- * @param setLoadingQuery - update function to control loading UI
+ * @param setIsLoading - update function to control loading UI
  */
 export async function fetchUseCaseValueSets(
   selectedQuery: USE_CASES,
   valueSetStateCallback: SetStateCallback<ValueSetItem[]>,
   isSubscribed: boolean,
-  setLoadingQuery: (isLoading: boolean) => void,
+  setIsLoading: (isLoading: boolean) => void,
 ) {
   if (selectedQuery) {
     const queryName = UseCaseToQueryName[selectedQuery as USE_CASES];
 
-    setLoadingQuery(true);
+    setIsLoading(true);
     const queryResults = await getSavedQueryByName(queryName);
     const vsItems = await mapQueryRowsToValueSetItems(queryResults);
 
@@ -38,7 +38,7 @@ export async function fetchUseCaseValueSets(
     if (isSubscribed) {
       valueSetStateCallback(vsItems);
     }
-    setLoadingQuery(false);
+    setIsLoading(false);
   }
 }
 
