@@ -1,23 +1,16 @@
 repos:
-  - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.6.9
-    hooks:
-      # Run the linter.
-      - id: ruff
-        args: [--fix]
-      # Run the formatter.
-      - id: ruff-format
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0
     hooks:
       - id: pretty-format-json
+        name: Pretty Format JSON
         args: [--autofix, --no-sort-keys]
   - repo: https://github.com/pre-commit/mirrors-eslint
     rev: "v9.12.0"
     hooks:
       - id: eslint
-        name: ESLint for ECR Viewer
-        files: ^containers/ecr-viewer/.*\.[jt]sx?$ # *.js, *.jsx, *.ts and *.tsx in containers/ecr-viewer
+        name: ESLint
+        files: ^query-connector/.*\.[jt]sx?$ # *.js, *.jsx, *.ts and *.tsx
         types: [file]
         additional_dependencies:
           - eslint@8.56.0
@@ -29,39 +22,13 @@ repos:
           - "@next/eslint-plugin-next"
           - eslint-plugin-unused-imports
           - eslint-plugin-jsdoc
-        args: ["--config=./containers/ecr-viewer/.eslintrc.json", "--fix"]
-      - id: eslint
-        name: ESLint for TEFCA Viewer
-        files: ^containers/tefca-viewer/.*\.[jt]sx?$ # *.js, *.jsx, *.ts and *.tsx
-        types: [file]
-        additional_dependencies:
-          - eslint@8.56.0
-          - eslint-config-next
-          - eslint-config-prettier
-          - "@typescript-eslint/parser"
-          - "@typescript-eslint/eslint-plugin"
-          - typescript
-          - "@next/eslint-plugin-next"
-          - eslint-plugin-unused-imports
-          - eslint-plugin-jsdoc
-        args: ["--config=./containers/tefca-viewer/.eslintrc.json", "--fix"]
+        args: ["--config=./query-connector/.eslintrc.json", "--fix"]
   - repo: https://github.com/pre-commit/mirrors-prettier
     rev: v4.0.0-alpha.8
     hooks:
       - id: prettier
+        name: Prettier
         types_or: [css, javascript, tsx, ts, yaml]
-  - repo: local
-    hooks:
-      # run `terraform fmt` if tf files are modified and terraform is installed
-      # when terraform is not installed, this check will succeed even if tf files
-      # would not pass the format check
-      - id: terraform-fmt
-        name: terraform-fmt
-        entry: bash -c 'if command -v terraform >/dev/null 2>&1; then terraform fmt -recursive -check operations; else exit 0; fi'
-        language: system
-        types:
-          - terraform
-        pass_filenames: false
 ci:
   autofix_commit_msg: |
     [pre-commit.ci] auto fixes from pre-commit hooks
@@ -69,5 +36,5 @@ ci:
   autoupdate_branch: ""
   autoupdate_commit_msg: "[pre-commit.ci] pre-commit autoupdate"
   autoupdate_schedule: weekly
-  skip: [pretty-format-json, terraform-fmt]
+  skip: [pretty-format-json]
   submodules: false
