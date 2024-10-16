@@ -102,7 +102,7 @@ test.describe("querying with the Query Connector", () => {
     ).toBeVisible();
 
     // We can also just directly ask the page to find us filtered table rows
-    await expect(page.locator("tbody").locator("tr")).toHaveCount(7);
+    await expect(page.locator("tbody").locator("tr")).toHaveCount(32);
 
     // Now let's use the return to search to go back to a blank form
     await page.getByRole("button", { name: "New patient search" }).click();
