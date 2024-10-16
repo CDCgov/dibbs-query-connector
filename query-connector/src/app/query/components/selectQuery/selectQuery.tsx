@@ -1,12 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { Button, Select } from "@trussworks/react-uswds";
-import {
-  demoQueryOptions,
-  USE_CASES,
-  Mode,
-  patientOptions,
-} from "../../../constants";
+import { demoQueryOptions, USE_CASES, Mode } from "../../../constants";
 import Backlink from "../backLink/Backlink";
 import styles from "./selectQuery.module.css";
 
@@ -28,6 +23,8 @@ interface SelectQueryProps {
  * @param root0.setMode - Callback to switch mode
  * @param root0.onSubmit - Callback for submit action
  * @param root0.goBack - back button
+ * @param root0.setHCO
+ * @param root0.useCase
  * @returns - The selectQuery component.
  */
 const SelectQuery: React.FC<SelectQueryProps> = ({

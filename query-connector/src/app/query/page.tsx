@@ -1,5 +1,5 @@
 "use client";
-import React, { Suspense, use, useEffect, useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import { UseCaseQueryResponse, UseCaseQueryRequest } from "../query-service";
 import ResultsView from "./components/ResultsView";
 import PatientSearchResults from "./components/PatientSearchResults";
