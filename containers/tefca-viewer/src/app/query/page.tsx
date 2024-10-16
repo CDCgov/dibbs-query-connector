@@ -1,5 +1,5 @@
 "use client";
-import React, { Suspense, useEffect, useState } from "react";
+import React, { Suspense, use, useEffect, useState } from "react";
 import { UseCaseQueryResponse, UseCaseQueryRequest } from "../query-service";
 import ResultsView from "./components/ResultsView";
 import PatientSearchResults from "./components/PatientSearchResults";
@@ -116,6 +116,8 @@ const Query: React.FC = () => {
             setMode={setMode}
             goBack={() => setMode("patient-results")}
             onSubmit={() => setMode("results")}
+            useCase={useCase}
+            setUseCase={setUseCase}
           />
         )}
 

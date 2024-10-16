@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { Button, Select } from "@trussworks/react-uswds";
-import { demoQueryOptions, Mode } from "../../../constants";
+import { demoQueryOptions, USE_CASES, Mode, patientOptions } from "../../../constants";
 import Backlink from "../backLink/Backlink";
 import styles from "./selectQuery.module.css";
 
@@ -11,13 +11,15 @@ interface SelectQueryProps {
   setMode: (mode: Mode) => void;
   onSubmit: () => void; // Callback when the user submits the query
   goBack: () => void;
+  setUseCase: (useCase: USE_CASES) => void; // Pass useCase to parent
+  useCase: USE_CASES; // Receive the useCase from parent
 }
 
 /**
  *
  * @param root0 - SelectQueryProps
  * @param root0.setQueryType - Callback to update the query type
- * @param root0.setHCO - Callback to update selected Health Care Organization (HCO)
+ * @param root0.setUseCase - Callback to update selected Use Case (useCase)
  * @param root0.setMode - Callback to switch mode
  * @param root0.onSubmit - Callback for submit action
  * @param root0.goBack - back button
@@ -29,33 +31,51 @@ const SelectQuery: React.FC<SelectQueryProps> = ({
   setMode,
   onSubmit,
   goBack,
+  setUseCase,
+  useCase,
 }) => {
   const [selectedQuery, setSelectedQuery] = useState<string>("");
   // const [selectedHCO, setSelectedHCO] = useState<string>(""); // Keep this as string for HCO selection
   // const [showAdvanced, setShowAdvanced] = useState(false);
 
-  // When query changes, update the parent component state
+  // Logic to handle demo query change and update selected query and use case
+  const handleDemoQueryChange = (selectedDemoOption: string) => {
+    setQueryType(
+      demoQueryOptions.find((dqo) => dqo.value === selectedDemoOption)?.label ||
+        "",
+    );
+    setUseCase(selectedDemoOption as USE_CASES);
+  };
+
+  // Persist the selected query and update the parent component
   useEffect(() => {
-    setQueryType(selectedQuery);
-  }, [selectedQuery, setQueryType]);
+    if (useCase) {
+      const defaultQuery =
+        demoQueryOptions.find((opt) => opt.value === useCase)?.label || "";
+      setSelectedQuery(defaultQuery);
+      setQueryType(defaultQuery);
+    }
+  }, [useCase, setQueryType]);
 
   const handleQueryChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedQuery(event.target.value);
   };
 
-  const handleHCOChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+  // const handleHCOChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     // setSelectedHCO(event.target.value);
     // setHCO(event.target.value as FHIR_SERVERS); // Update parent component state
-  };
+  // };
 
   // Link to go to customize-queries page
   const handleClick = () => {
+    handleDemoQueryChange(selectedQuery);
     setMode("customize-queries");
   };
 
   // Submit and go to results; if no custom query selected, add alert
   const handleSubmit = () => {
     if (selectedQuery) {
+      handleDemoQueryChange(selectedQuery); 
       onSubmit();
     } else {
       alert("Please select a query.");

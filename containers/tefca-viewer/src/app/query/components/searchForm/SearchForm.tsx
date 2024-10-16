@@ -10,7 +10,7 @@ import {
   USE_CASES,
   FHIR_SERVERS,
   PatientType,
-  demoQueryOptions,
+  // demoQueryOptions,
   patientOptions,
   stateOptions,
   Mode,
@@ -96,17 +96,17 @@ const SearchForm: React.FC<SearchFormProps> = ({
 
   // Change the selectedDemoOption in the dropdown and update the
   // query type (which governs the DB fetch) accordingly
-  const handleDemoQueryChange = (selectedDemoOption: string) => {
-    setPatientOption(patientOptions[selectedDemoOption][0].value);
-    setQueryType(
-      demoQueryOptions.find((dqo) => dqo.value == selectedDemoOption)?.label ||
-        "",
-    );
-  };
+  // const handleDemoQueryChange = (selectedDemoOption: string) => {
+  //   setPatientOption(patientOptions[selectedDemoOption][0].value);
+  //   setQueryType(
+  //     demoQueryOptions.find((dqo) => dqo.value == selectedDemoOption)?.label ||
+  //       "",
+  //   );
+  // };
 
-  const handleClick = () => {
-    setMode("customize-queries");
-  };
+  // const handleClick = () => {
+  //   setMode("customize-queries");
+  // };
 
   async function HandleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
