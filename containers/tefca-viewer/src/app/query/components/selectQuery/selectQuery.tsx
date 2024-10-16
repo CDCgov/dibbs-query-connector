@@ -1,9 +1,8 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { Button, Select } from "@trussworks/react-uswds";
-import { demoQueryOptions, FHIR_SERVERS, Mode } from "../../../constants";
+import { demoQueryOptions, Mode } from "../../../constants";
 import Backlink from "../backLink/Backlink";
-import { fhirServers } from "../../../fhir-servers";
 import styles from "./selectQuery.module.css";
 
 interface SelectQueryProps {

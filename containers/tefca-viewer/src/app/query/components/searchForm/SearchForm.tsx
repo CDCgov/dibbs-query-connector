@@ -9,7 +9,6 @@ import {
 import {
   USE_CASES,
   FHIR_SERVERS,
-  demoData,
   PatientType,
   demoQueryOptions,
   patientOptions,
@@ -67,7 +66,8 @@ const SearchForm: React.FC<SearchFormProps> = ({
   const [firstName, setFirstName] = useState<string>("");
   const [lastName, setLastName] = useState<string>("");
   const [fhirServer, setFhirServer] = useState<FHIR_SERVERS>(
-  "Public HAPI: Direct",);
+    "Public HAPI: Direct",
+  );
   const [phone, setPhone] = useState<string>("");
   const [dob, setDOB] = useState<string>("");
   const [mrn, setMRN] = useState<string>("");
@@ -79,7 +79,7 @@ const SearchForm: React.FC<SearchFormProps> = ({
   const fillFields = useCallback(
     (patientOption: PatientType, highlightAutofilled = true) => {
       // const data = demoData[patientOption];
-      const data = hyperUnluckyPatient; 
+      const data = hyperUnluckyPatient;
       if (data) {
         setFirstName(data.FirstName);
         setLastName(data.LastName);
