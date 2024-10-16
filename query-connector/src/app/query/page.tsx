@@ -60,6 +60,7 @@ const Query: React.FC = () => {
           />
         )}
 
+        {/* Step 2 */}
         {mode === "patient-results" && (
           <>
             <PatientSearchResults
@@ -71,6 +72,7 @@ const Query: React.FC = () => {
           </>
         )}
 
+        {/* Step 3 */}
         {mode === "select-query" && (
           <SelectQuery
             goBack={() => setMode("patient-results")}
@@ -86,6 +88,7 @@ const Query: React.FC = () => {
           />
         )}
 
+        {/* Step 4 */}
         {mode === "results" && (
           <>
             {resultsQueryResponse && (
