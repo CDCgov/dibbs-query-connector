@@ -21,7 +21,6 @@ export const CUSTOMIZE_QUERY_STEPS: { [mode: string]: string } = {
 
 /**
  * Step indicator for the query process
- * 
  * @param root0 - The props for the StepIndicator component.
  * @param root0.headingLevel - The heading level for the step indicator.
  * @param root0.curStep - The current step in the query process.
