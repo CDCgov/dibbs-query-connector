@@ -151,11 +151,9 @@ const SearchForm: React.FC<SearchFormProps> = ({
               className="no-margin-top-important maxw-full font-sans text-normal"
               htmlFor="query"
             >
-              The demo site uses synthetic data to provide examples of possible
-              queries that you can make with the TEFCA Viewer. Select a query
-              use case, a sample patient, and then click “fill fields” below.
+          The demo site uses synthetic data to provide examples of possible queries that you can make with the Try-TEFCA Viewer. To load a sample patient, click “fill fields” below.
             </Label>
-            {/* <div className={`${styles.demoQueryDropdownContainer}`}>
+            <div className={`${styles.demoQueryDropdownContainer}`}>
               <div>
                 <Label htmlFor="query">Query</Label>
                 <div className="display-flex flex-align-start query-page-wrapper">
@@ -201,8 +199,7 @@ const SearchForm: React.FC<SearchFormProps> = ({
                   </select>
                 </div>
               </div>
-            </div> */}
-
+            </div>
             <div className={`${styles.searchCallToActionContainer}`}>
               <Button
                 className={`usa-button--outline bg-white ${styles.searchCallToActionButton}`}
