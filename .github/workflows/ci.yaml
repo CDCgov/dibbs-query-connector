@@ -1,4 +1,4 @@
-name: Test tefca-viewer Container
+name: CI
 
 on:
   pull_request:
@@ -10,8 +10,6 @@ on:
   push:
     branches:
       - main
-    paths-ignore:
-      - pyproject.toml
   workflow_dispatch:
 
 concurrency:
@@ -19,22 +17,20 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  TEST_RUNNER_PYTHON_VERSION: 3.10.12
-  CONTAINER: tefca-viewer
   NODE_VERSION: 18 # Adjust the Node.js version as needed
 
 jobs:
-  javascript-linting:
+  lint:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Lint javascript for ${{env.CONTAINER}}
-        working-directory: ./containers/${{env.CONTAINER}}
+      - name: Run linting
+        working-directory: ./query-connector
         run: |
           npm ci
           npm run lint
 
-  test-node-containers:
+  unit-tests:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -44,13 +40,13 @@ jobs:
         with:
           node-version: ${{env.NODE_VERSION}}
       - name: Install dependencies
-        working-directory: ./containers/${{env.CONTAINER}} # Navigate to your Node.js app directory
+        working-directory: ./query-connector
         run: npm install
       - name: Run tests
-        working-directory: ./containers/${{env.CONTAINER}} # Navigate to your Node.js app directory
+        working-directory: ./query-connector
         run: npm test
 
-  playwright-tests:
+  end-to-end-tests:
     timeout-minutes: 10
     runs-on: ubuntu-latest
     steps:
@@ -61,16 +57,16 @@ jobs:
         with:
           node-version: ${{env.NODE_VERSION}}
       - name: Install dependencies
-        working-directory: ./containers/${{env.CONTAINER}}
+        working-directory: ./query-connector
         run: npm ci
       - name: Install Playwright Browsers
-        working-directory: ./containers/${{env.CONTAINER}}
+        working-directory: ./query-connector
         run: npx playwright install --with-deps
       - name: Build Query Connector
-        working-directory: ./containers/${{env.CONTAINER}}
+        working-directory: ./query-connector
         run: docker compose build --no-cache
       - name: Run Query Connector
-        working-directory: ./containers/${{env.CONTAINER}}
+        working-directory: ./query-connector
         run: docker compose up -d
       - name: Poll until Query Connector is ready
         run: |
@@ -79,10 +75,10 @@ jobs:
             sleep 5
           done
       - name: Playwright Tests
-        working-directory: ./containers/${{env.CONTAINER}}
+        working-directory: ./query-connector
         run: npx playwright test e2e --reporter=list --config playwright.config.ts
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
           name: test-results
-          path: ./containers/${{env.CONTAINER}}/test-results/
+          path: ./query-connector/test-results/
