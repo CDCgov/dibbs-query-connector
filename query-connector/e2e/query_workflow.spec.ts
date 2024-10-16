@@ -78,7 +78,7 @@ test.describe("querying with the Query Connector", () => {
       page.getByText("0 labs found, 0 medications found, 0 conditions found."),
     ).not.toBeVisible();
 
-    await page.getByText("Return to patient search").click();
+    await page.getByText("Return to Select query").click();
 
     await page.getByRole("button", { name: "Submit" }).click();
     await expect(page.getByText("Loading")).toHaveCount(0, { timeout: 10000 });
