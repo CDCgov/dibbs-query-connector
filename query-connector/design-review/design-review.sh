@@ -46,7 +46,7 @@ fi
 
 # Clone the repository if it doesn't exist, otherwise pull the latest changes
 REPO_URL="https://github.com/CDCgov/dibbs-query-connector.git"
-REPO_DIR="phdi"
+REPO_DIR="dibbs-query-connector"
 
 if [ ! -d "$REPO_DIR" ]; then
     git clone $REPO_URL
