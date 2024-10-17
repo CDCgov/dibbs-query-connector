@@ -137,7 +137,7 @@ const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
     goBack();
     showRedirectConfirmation({
       heading: QUERY_CUSTOMIZATION_CONFIRMATION_HEADER,
-      body: QUERY_CUSTOMIZATION_CONFIRMATION_BODY,
+      body: "",
       headingLevel: "h4",
     });
   };
@@ -221,5 +221,3 @@ export default CustomizeQuery;
 
 export const QUERY_CUSTOMIZATION_CONFIRMATION_HEADER =
   "Query Customization Successful!";
-export const QUERY_CUSTOMIZATION_CONFIRMATION_BODY =
-  "You've successfully customized your query. Once you're done adding patient details, submit your completed query to get results";

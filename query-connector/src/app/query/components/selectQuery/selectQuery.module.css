@@ -20,15 +20,10 @@
 .queryRow {
   display: flex;
   align-items: center;
-  padding-bottom: 1.5rem;
-}
-
-.customizeButton {
-  margin-left: 1.25rem;
-  margin-top: 0.5rem;
 }
 
 .queryDropDown {
+  margin-top: 0;
   display: flex;
   width: 20rem;
   flex-direction: column;

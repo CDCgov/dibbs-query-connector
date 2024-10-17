@@ -17,37 +17,23 @@
   border-top: 8px solid #edeff0;
 }
 
-h1 {
-  margin-bottom: 0.25rem;
-}
-
-h2 {
-  font-size: 40px;
-}
-
-h3 {
-  font-size: 22px;
-  margin-top: 0;
-  margin-bottom: 20px;
-}
-
-h4 {
-  font-size: 16px;
-  margin: 0;
-}
-
 .maxw7 {
   max-width: 70%;
 }
 
 .page-title {
-  font-size: 32px;
-  color: white;
-  background-color: #162e51;
-  padding-top: 28px;
-  padding-bottom: 28px;
-  padding-left: 32px;
-  margin-top: 0px;
+  margin: 0.75rem 0rem;
+  font-weight: 700;
+  font-size: 2.66rem;
+}
+
+.page-explainer {
+  margin: 0.75rem 0rem 2.5rem 0rem;
+  font-family: family("sans");
+  font-size: 1.375rem;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%;
 }
 
 .data-title {
@@ -469,10 +455,17 @@ hr.custom-hr {
   padding: 0rem;
 }
 
-.no-margin-top-important {
+.margin-top-0-important {
   margin-top: 0 !important;
 }
 
+.margin-bottom-0-important {
+  margin-bottom: 0 !important;
+}
+
+.margin-bottom-3-important {
+  margin-bottom: 1.5rem !important;
+}
 .resultsViewSideNav .usa-sidenav,
 .resultsViewSideNav .usa-sidenav__item {
   border: none !important;
