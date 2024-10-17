@@ -6,9 +6,12 @@ const createJestConfig = nextJest({
 });
 
 // Add any custom config to be passed to Jest
+// Note the test environment: this is required to provide the jest dom testing environment
+// with access to the node global TextEncoder when using Request/Response
+// See https://mswjs.io/docs/migrations/1.x-to-2.x#requestresponsetextencoder-is-not-defined-jest
 const customJestConfig = {
   setupFilesAfterEnv: ["<rootDir>/jest.setup.ts"],
-  testEnvironment: "jest-environment-jsdom",
+  testEnvironment: "jest-fixed-jsdom",
 };
 
 // createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async
