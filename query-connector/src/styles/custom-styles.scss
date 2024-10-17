@@ -453,11 +453,12 @@ hr.custom-hr {
 
 .custom-query-step-indicator .usa-step-indicator__header {
   display: none !important;
-  .customize-accordion .usa-accordion__button[aria-expanded="true"],
-  .customize-accordion .usa-accordion__button[aria-expanded="false"] {
-    background-size: 16px 10px;
-    background-position: top 24px right 20px;
-  }
+ }
+.customize-accordion .usa-accordion__button[aria-expanded="true"],
+.customize-accordion .usa-accordion__button[aria-expanded="false"] {
+  background-size: 16px 10px;
+  background-position: top 24px right 20px;
+}
 
   .customize-accordion .usa-accordion__button[aria-expanded="true"] {
     background-image: url("./assets/expandUp.svg");
