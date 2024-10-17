@@ -110,7 +110,7 @@ const SearchForm: React.FC<SearchFormProps> = ({
 
   return (
     <>
-      <form className="main-container" onSubmit={HandleSubmit}>
+      <form onSubmit={HandleSubmit}>
         <h1 className="page-title">{STEP_ONE_PAGE_TITLE}</h1>
         <h2 className="page-explainer">
           Enter patient information below to search for a patient. We will query

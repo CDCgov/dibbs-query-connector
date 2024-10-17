@@ -49,7 +49,7 @@ const SelectSavedQuery: React.FC<SelectSavedQueryProps> = ({
   const [showAdvanced, setShowAdvanced] = useState(false);
 
   return (
-    <form className="main-container">
+    <form>
       {/* Back button */}
       <Backlink onClick={goBack} label={"Return to select a patient"} />
       <h1 className="page-title">{STEP_THREE_PAGE_TITLE}</h1>

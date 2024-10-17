@@ -40,47 +40,53 @@ const Query: React.FC = () => {
   return (
     <>
       <SiteAlert page={mode} />
-      <div className="main-container">
+      <div>
         {mode === "search" && (
-          <SearchForm
-            useCase={useCase}
-            setUseCase={setUseCase}
-            setMode={setMode}
-            setLoading={setLoading}
-            setPatientDiscoveryQueryResponse={setPatientDiscoveryQueryResponse}
-            fhirServer={fhirServer}
-            setFhirServer={setFhirServer}
-          />
+          <div className="main-container">
+            <SearchForm
+              useCase={useCase}
+              setUseCase={setUseCase}
+              setMode={setMode}
+              setLoading={setLoading}
+              setPatientDiscoveryQueryResponse={
+                setPatientDiscoveryQueryResponse
+              }
+              fhirServer={fhirServer}
+              setFhirServer={setFhirServer}
+            />
+          </div>
         )}
 
         {mode === "patient-results" && (
-          <>
+          <div className="main-container__wide">
             <PatientSearchResults
               patients={patientDiscoveryQueryResponse?.Patient ?? []}
               goBack={() => setMode("search")}
               setMode={setMode}
               setPatientForQueryResponse={setPatientForQueryResponse}
             />
-          </>
+          </div>
         )}
 
         {mode === "select-query" && (
-          <SelectQuery
-            goBack={() => setMode("patient-results")}
-            goForward={() => setMode("results")}
-            selectedQuery={useCase}
-            setSelectedQuery={setUseCase}
-            patientForQuery={patientForQuery}
-            resultsQueryResponse={resultsQueryResponse}
-            setResultsQueryResponse={setResultsQueryResponse}
-            fhirServer={fhirServer}
-            setFhirServer={setFhirServer}
-            setLoading={setLoading}
-          />
+          <div className="main-container">
+            <SelectQuery
+              goBack={() => setMode("patient-results")}
+              goForward={() => setMode("results")}
+              selectedQuery={useCase}
+              setSelectedQuery={setUseCase}
+              patientForQuery={patientForQuery}
+              resultsQueryResponse={resultsQueryResponse}
+              setResultsQueryResponse={setResultsQueryResponse}
+              fhirServer={fhirServer}
+              setFhirServer={setFhirServer}
+              setLoading={setLoading}
+            />
+          </div>
         )}
 
         {mode === "results" && (
-          <>
+          <div className="main-container__wide">
             {resultsQueryResponse && (
               <ResultsView
                 selectedQuery={useCase}
@@ -93,7 +99,7 @@ const Query: React.FC = () => {
                 }}
               />
             )}
-          </>
+          </div>
         )}
         {loading && <LoadingView loading={loading} />}
 

@@ -328,11 +328,6 @@ html {
   background-color: white;
 }
 
-.margin-top-1 {
-  margin-top: 0.5rem;
-  width: 360px;
-}
-
 .custom-alert {
   color: #2e6276;
   width: 100%;
@@ -434,7 +429,7 @@ hr.custom-hr {
 }
 
 .Toastify__toast-container {
-  width: calc($tefca-viewer-max-width * 0.4) !important;
+  width: calc($query-connector-max-width * 0.4) !important;
 }
 
 .customize-accordion .usa-accordion__button[aria-expanded="true"],
