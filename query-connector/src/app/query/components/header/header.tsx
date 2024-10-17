@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { Modal, ModalButton } from "../../designSystem/Modal";
 import { ModalRef } from "@trussworks/react-uswds";
 import styles from "./header.module.css";
+import { metadata } from "@/app/constants";
 /**
  * Produces the header.
  * @returns The HeaderComponent component.
@@ -33,9 +34,9 @@ export default function HeaderComponent() {
                 <a
                   className="text-base-lightest font-sans-xl text-bold"
                   href="/tefca-viewer"
-                  title="TEFCA Viewer"
+                  title={metadata.title}
                 >
-                  TEFCA Viewer
+                  {metadata.title}
                 </a>
               </em>
             </div>

@@ -57,5 +57,5 @@ export default ResultsViewTable;
  * @returns - A hyphenated id that can be linked as an anchor tag
  */
 export function formatIdForAnchorTag(title: string) {
-  return title.toLocaleLowerCase().replace(" ", "-");
+  return title?.toLocaleLowerCase().replace(" ", "-");
 }

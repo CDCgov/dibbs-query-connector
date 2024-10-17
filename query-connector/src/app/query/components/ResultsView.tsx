@@ -11,11 +11,14 @@ import DiagnosticReportTable from "./resultsView/tableComponents/DiagnosticRepor
 import EncounterTable from "./resultsView/tableComponents/EncounterTable";
 import MedicationRequestTable from "./resultsView/tableComponents/MedicationRequestTable";
 import ObservationTable from "./resultsView/tableComponents/ObservationTable";
+import Backlink from "./backLink/Backlink";
+import { USE_CASES, demoQueryValToLabelMap } from "@/app/constants";
 
 type ResultsViewProps = {
   useCaseQueryResponse: UseCaseQueryResponse;
+  selectedQuery: USE_CASES;
   goBack: () => void;
-  queryName: string;
+  goToBeginning: () => void;
 };
 
 export type ResultsViewAccordionItem = {
@@ -29,13 +32,15 @@ export type ResultsViewAccordionItem = {
  * @param props - The props for the QueryView component.
  * @param props.useCaseQueryResponse - The response from the query service.
  * @param props.goBack - The function to go back to the previous page.
- * @param props.queryName - The name of the saved query to display to the user
+ * @param props.goToBeginning - Function to return to patient discover
+ * @param props.selectedQuery - query that's been selected to view for results
  * @returns The QueryView component.
  */
 const ResultsView: React.FC<ResultsViewProps> = ({
   useCaseQueryResponse,
+  selectedQuery,
   goBack,
-  queryName,
+  goToBeginning,
 }) => {
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -56,9 +61,13 @@ const ResultsView: React.FC<ResultsViewProps> = ({
     <>
       <div className="results-banner">
         <div className={`${styles.resultsBannerContent}`}>
+          <Backlink
+            onClick={() => goBack()}
+            label={"Return to query selection"}
+          />
           <button
             className="usa-button usa-button--outline margin-left-auto"
-            onClick={() => goBack()}
+            onClick={() => goToBeginning()}
           >
             New patient search
           </button>
@@ -70,7 +79,9 @@ const ResultsView: React.FC<ResultsViewProps> = ({
         </h2>
         <h3>
           Query:{" "}
-          <span className="text-normal display-inline-block"> {queryName}</span>
+          <span className="text-normal display-inline-block">
+            {demoQueryValToLabelMap[selectedQuery]}
+          </span>
         </h3>
       </div>
 
