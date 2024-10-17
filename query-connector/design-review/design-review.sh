@@ -45,7 +45,7 @@ if ! command_exists docker-compose; then
 fi
 
 # Clone the repository if it doesn't exist, otherwise pull the latest changes
-REPO_URL="https://github.com/CDCgov/phdi.git"
+REPO_URL="https://github.com/CDCgov/dibbs-query-connector.git"
 REPO_DIR="phdi"
 
 if [ ! -d "$REPO_DIR" ]; then
@@ -56,7 +56,7 @@ else
     git pull
 fi
 
-cd ./containers/tefca-viewer
+cd ./query-connector
 
 # Checkout the specified branch
 git checkout $BRANCH_NAME
