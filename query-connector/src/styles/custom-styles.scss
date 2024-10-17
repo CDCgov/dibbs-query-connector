@@ -238,7 +238,7 @@ body {
 }
 
 .header-footer-content {
-  max-width: 98rem !important;
+  max-width: 100% !important;
 }
 
 .usa-logo {
@@ -337,7 +337,7 @@ html {
   color: #2e6276;
   width: 100%;
   box-sizing: border-box;
-  padding-left: 0;
+  padding-left: 1rem;
 }
 
 .custom-alert .usa-alert__text {
