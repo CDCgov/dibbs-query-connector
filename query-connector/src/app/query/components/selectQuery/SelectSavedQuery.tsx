@@ -74,6 +74,9 @@ const SelectSavedQuery: React.FC<SelectSavedQueryProps> = ({
           className={`${styles.queryDropDown}`}
           required
         >
+          <option value="" disabled>
+            Select query
+          </option>
           {demoQueryOptions.map((option) => (
             <option key={option.value} value={option.value}>
               {option.label}
