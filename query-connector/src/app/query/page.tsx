@@ -15,6 +15,9 @@ import LoadingView from "./components/LoadingView";
 import { ToastContainer } from "react-toastify";
 
 import "react-toastify/dist/ReactToastify.min.css";
+import StepIndicator, {
+  CUSTOMIZE_QUERY_STEPS,
+} from "./stepIndicator/StepIndicator";
 import SiteAlert from "./designSystem/SiteAlert";
 import { Patient } from "fhir/r4";
 
@@ -40,7 +43,11 @@ const Query: React.FC = () => {
   return (
     <>
       <SiteAlert page={mode} />
+      {Object.keys(CUSTOMIZE_QUERY_STEPS).includes(mode) && (
+        <StepIndicator headingLevel="h4" curStep={mode} />
+      )}
       <div className="main-container">
+        {/* Step 1 */}
         {mode === "search" && (
           <SearchForm
             useCase={useCase}
@@ -53,6 +60,7 @@ const Query: React.FC = () => {
           />
         )}
 
+        {/* Step 2 */}
         {mode === "patient-results" && (
           <>
             <PatientSearchResults
@@ -64,6 +72,7 @@ const Query: React.FC = () => {
           </>
         )}
 
+        {/* Step 3 */}
         {mode === "select-query" && (
           <SelectQuery
             goBack={() => setMode("patient-results")}
@@ -79,6 +88,7 @@ const Query: React.FC = () => {
           />
         )}
 
+        {/* Step 4 */}
         {mode === "results" && (
           <>
             {resultsQueryResponse && (

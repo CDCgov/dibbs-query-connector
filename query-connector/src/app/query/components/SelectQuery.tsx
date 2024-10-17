@@ -120,4 +120,3 @@ const SelectQuery: React.FC<SelectQueryProps> = ({
 };
 
 export default SelectQuery;
-export const RETURN_TO_STEP_ONE_LABEL = "Return to Select patient";
