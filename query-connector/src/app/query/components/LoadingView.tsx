@@ -17,7 +17,7 @@ const LoadingView: React.FC<LoadingViewProps> = ({ loading }) => {
     return (
       <div className="overlay">
         <div className="spinner"></div>
-        <h2>Loading...</h2>
+        <h1 className="margin-left-1">Loading...</h1>
       </div>
     );
   } else {

@@ -7,17 +7,17 @@ import {
   ValueSetItem,
   USE_CASES,
   demoQueryValToLabelMap,
-} from "../../constants";
+} from "../../../constants";
 import { UseCaseQueryResponse } from "@/app/query-service";
-import LoadingView from "./LoadingView";
-import { showRedirectConfirmation } from "../designSystem/redirectToast/RedirectToast";
-import styles from "./customizeQuery/customizeQuery.module.css";
-import CustomizeQueryAccordionHeader from "./customizeQuery/CustomizeQueryAccordionHeader";
-import CustomizeQueryAccordionBody from "./customizeQuery/CustomizeQueryAccordionBody";
-import Accordion from "../designSystem/Accordion";
-import CustomizeQueryNav from "./customizeQuery/CustomizeQueryNav";
-import { mapValueSetItemsToValueSetTypes } from "./customizeQuery/customizeQueryUtils";
-import Backlink from "./backLink/Backlink";
+import LoadingView from "../LoadingView";
+import { showRedirectConfirmation } from "../../designSystem/redirectToast/RedirectToast";
+import styles from "./customizeQuery.module.css";
+import CustomizeQueryAccordionHeader from "./CustomizeQueryAccordionHeader";
+import CustomizeQueryAccordionBody from "./CustomizeQueryAccordionBody";
+import Accordion from "../../designSystem/Accordion";
+import CustomizeQueryNav from "./CustomizeQueryNav";
+import { mapValueSetItemsToValueSetTypes } from "./customizeQueryUtils";
+import Backlink from "../backLink/Backlink";
 
 interface CustomizeQueryProps {
   useCaseQueryResponse: UseCaseQueryResponse;
@@ -158,20 +158,18 @@ const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
 
   return (
     <div>
-      <div className="padding-top-3">
+      <div className="margin-bottom-3">
         <Backlink onClick={goBack} label="Return to Select query" />
       </div>
       <LoadingView loading={!useCaseQueryResponse} />
-      <h1 className="font-sans-2xl text-bold margin-top-205">
-        Customize query
-      </h1>
-      <div className="font-sans-lg text-light padding-bottom-0 padding-top-05">
+      <h1 className="page-title margin-bottom-05-important">Customize query</h1>
+      <h2 className="page-explainer margin-x-0-important">
         Query: {demoQueryValToLabelMap[queryType]}
-      </div>
-      <div className="font-sans-sm text-light padding-bottom-0 padding-top-05">
+      </h2>
+      <h3 className="margin-x-0-important font-sans-sm text-light padding-bottom-0 padding-top-05">
         {countLabs} labs found, {countMedications} medications found,{" "}
         {countConditions} conditions found.
-      </div>
+      </h3>
 
       <CustomizeQueryNav
         activeTab={activeTab}

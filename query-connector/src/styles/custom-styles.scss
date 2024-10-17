@@ -32,7 +32,7 @@
   font-family: family("sans");
   font-size: 1.375rem;
   font-style: normal;
-  font-weight: 400;
+  font-weight: 300;
   line-height: 150%;
 }
 
@@ -461,6 +461,15 @@ hr.custom-hr {
 
 .margin-bottom-0-important {
   margin-bottom: 0 !important;
+}
+
+.margin-x-0-important {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+.margin-bottom-05-important {
+  margin-bottom: 0.25rem !important;
 }
 
 .margin-bottom-3-important {

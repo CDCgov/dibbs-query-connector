@@ -20,7 +20,7 @@ const EncounterTable: React.FC<EncounterTableProps> = ({
   encounters: encounters,
 }) => {
   return (
-    <Table>
+    <Table className="margin-top-0-important">
       <thead>
         <tr>
           <th>Visit Reason</th>

@@ -18,7 +18,7 @@ export interface ConditionTableProps {
  */
 const ConditionsTable: React.FC<ConditionTableProps> = ({ conditions }) => {
   return (
-    <Table>
+    <Table className="margin-top-0-important">
       <thead>
         <tr>
           <th>Condition</th>

@@ -1,16 +1,13 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { FHIR_SERVERS, USE_CASES, ValueSetItem } from "../../constants";
-import CustomizeQuery from "./CustomizeQuery";
-import SelectSavedQuery from "./selectQuery/SelectSavedQuery";
+import { FHIR_SERVERS, USE_CASES, ValueSetItem } from "../../../constants";
+import CustomizeQuery from "../customizeQuery/CustomizeQuery";
+import SelectSavedQuery from "./SelectSavedQuery";
 
 import { QueryResponse } from "@/app/query-service";
 import { Patient } from "fhir/r4";
-import {
-  fetchQueryResponse,
-  fetchUseCaseValueSets,
-} from "./selectQuery/queryHooks";
-import LoadingView from "./LoadingView";
+import { fetchQueryResponse, fetchUseCaseValueSets } from "./queryHooks";
+import LoadingView from "../LoadingView";
 
 interface SelectQueryProps {
   goForward: () => void;

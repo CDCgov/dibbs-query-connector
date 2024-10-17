@@ -1,10 +1,10 @@
 "use client";
 import React, { useState } from "react";
 import { UseCaseQueryResponse } from "../query-service";
-import ResultsView from "./components/ResultsView";
-import PatientSearchResults from "./components/PatientSearchResults";
+import ResultsView from "./components/resultsView/ResultsView";
+import PatientSearchResults from "./components/patientSearchResults/PatientSearchResults";
 import SearchForm from "./components/searchForm/SearchForm";
-import SelectQuery from "./components/SelectQuery";
+import SelectQuery from "./components/selectQuery/SelectQuery";
 import {
   DEFAULT_DEMO_FHIR_SERVER,
   FHIR_SERVERS,

@@ -1,4 +1,4 @@
-import styles from "./resultsTable.module.css";
+import styles from "./resultsView.module.css";
 
 type ResultsViewAccordionBodyProps = {
   title: string;

@@ -1,8 +1,8 @@
 import React from "react";
 import Accordion from "../../designSystem/Accordion";
-import styles from "./resultsTable.module.css";
+import styles from "./resultsView.module.css";
 import ResultsViewAccordionBody from "./ResultsViewAccordionBody";
-import { ResultsViewAccordionItem } from "../ResultsView";
+import { ResultsViewAccordionItem } from "./ResultsView";
 
 type ResultsViewTable = {
   accordionItems: ResultsViewAccordionItem[];

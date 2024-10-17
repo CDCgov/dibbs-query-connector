@@ -1,17 +1,15 @@
-import { UseCaseQueryResponse } from "../../query-service";
-import ResultsViewSideNav, {
-  NavSection,
-} from "./resultsView/ResultsViewSideNav";
+import { UseCaseQueryResponse } from "../../../query-service";
+import ResultsViewSideNav, { NavSection } from "./ResultsViewSideNav";
 import React, { useEffect } from "react";
-import ResultsViewTable from "./resultsView/ResultsViewTable";
-import styles from "../page.module.css";
-import ConditionsTable from "./resultsView/tableComponents/ConditionsTable";
-import Demographics from "./resultsView/tableComponents/Demographics";
-import DiagnosticReportTable from "./resultsView/tableComponents/DiagnosticReportTable";
-import EncounterTable from "./resultsView/tableComponents/EncounterTable";
-import MedicationRequestTable from "./resultsView/tableComponents/MedicationRequestTable";
-import ObservationTable from "./resultsView/tableComponents/ObservationTable";
-import Backlink from "./backLink/Backlink";
+import ResultsViewTable from "./ResultsViewTable";
+import styles from "./resultsView.module.css";
+import ConditionsTable from "./tableComponents/ConditionsTable";
+import Demographics from "./tableComponents/Demographics";
+import DiagnosticReportTable from "./tableComponents/DiagnosticReportTable";
+import EncounterTable from "./tableComponents/EncounterTable";
+import MedicationRequestTable from "./tableComponents/MedicationRequestTable";
+import ObservationTable from "./tableComponents/ObservationTable";
+import Backlink from "../backLink/Backlink";
 import { USE_CASES, demoQueryValToLabelMap } from "@/app/constants";
 
 type ResultsViewProps = {
