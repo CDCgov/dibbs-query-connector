@@ -17,6 +17,7 @@ import { UseCaseQueryResponse, UseCaseQuery } from "@/app/query-service";
 import { fhirServers } from "@/app/fhir-servers";
 import styles from "./searchForm.module.css";
 import { FormatPhoneAsDigits } from "@/app/format-service";
+import { PAGE_TITLES } from "@/app/query/stepIndicator/StepIndicator";
 
 interface SearchFormProps {
   useCase: USE_CASES;
@@ -110,7 +111,7 @@ const SearchForm: React.FC<SearchFormProps> = ({
     <>
       <form className="content-container-smaller-width" onSubmit={HandleSubmit}>
         <h1 className="font-sans-2xl text-bold margin-bottom-105">
-          {STEP_ONE_PAGE_TITLE}
+          {PAGE_TITLES["search"]}
         </h1>
         <h2 className="font-sans-lg text-normal margin-top-0 margin-bottom-105">
           Enter patient information below to search for a patient. We will query
@@ -378,4 +379,3 @@ const SearchForm: React.FC<SearchFormProps> = ({
 export default SearchForm;
 
 const autofillColor = "#faf3d1";
-export const STEP_ONE_PAGE_TITLE = "Step 1: Enter patient information";

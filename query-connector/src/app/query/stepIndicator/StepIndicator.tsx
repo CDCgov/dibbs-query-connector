@@ -12,11 +12,20 @@ type StepIndicatorProps = {
 };
 type StepStatus = "current" | "complete" | "incomplete";
 
+// Steps in the step indicator
 export const CUSTOMIZE_QUERY_STEPS: { [mode: string]: string } = {
   search: "Enter patient info",
   "patient-results": "Select patient",
   "select-query": "Select query",
   results: "View patient record",
+};
+
+// Steps in the header level title
+export const PAGE_TITLES: { [mode: string]: string } = {
+  search: "Step 1: Enter patient information",
+  "patient-results": "Step 2: Select a patient",
+  "select-query": "Step 3: Select a query",
+  results: "Patient Record",
 };
 
 /**

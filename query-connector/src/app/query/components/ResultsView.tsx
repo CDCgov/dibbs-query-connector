@@ -13,6 +13,7 @@ import MedicationRequestTable from "./resultsView/tableComponents/MedicationRequ
 import ObservationTable from "./resultsView/tableComponents/ObservationTable";
 import Backlink from "./backLink/Backlink";
 import { USE_CASES, demoQueryValToLabelMap } from "@/app/constants";
+import { PAGE_TITLES } from "@/app/query/stepIndicator/StepIndicator";
 
 type ResultsViewProps = {
   useCaseQueryResponse: UseCaseQueryResponse;
@@ -75,7 +76,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({
       </div>
       <div className="margin-bottom-3">
         <h2 className="margin-0" id="ecr-summary">
-          Patient Record
+          {PAGE_TITLES["results"]}
         </h2>
         <h3>
           Query:{" "}

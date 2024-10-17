@@ -8,6 +8,7 @@ import { Select, Button } from "@trussworks/react-uswds";
 import Backlink from "../backLink/Backlink";
 import styles from "./selectQuery.module.css";
 import { useState } from "react";
+import { PAGE_TITLES } from "@/app/query/stepIndicator/StepIndicator";
 
 type SelectSavedQueryProps = {
   selectedQuery: string;
@@ -53,7 +54,7 @@ const SelectSavedQuery: React.FC<SelectSavedQueryProps> = ({
       {/* Back button */}
       <Backlink onClick={goBack} label={"Return to select a patient"} />
       <h1 className={`${styles.selectQueryHeaderText}`}>
-        {STEP_THREE_PAGE_TITLE}
+        {PAGE_TITLES["select-query"]}
       </h1>
       <div
         className={`font-sans-md text-light ${styles.selectQueryExplanationText}`}
@@ -141,4 +142,3 @@ const SelectSavedQuery: React.FC<SelectSavedQueryProps> = ({
 };
 
 export default SelectSavedQuery;
-export const STEP_THREE_PAGE_TITLE = "Step 3: Select a query";
