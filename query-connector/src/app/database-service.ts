@@ -101,7 +101,7 @@ type ErsdOrVsacResponse = Bundle | OperationOutcome;
  * @returns The eRSD Specification as a FHIR Bundle or an OperationOutcome if an error occurs.
  */
 export async function getERSD(
-  eRSDVersion: number = 2,
+  eRSDVersion: number = 3,
 ): Promise<ErsdOrVsacResponse> {
   const ERSD_API_KEY = process.env.ERSD_API_KEY;
   const eRSDUrl = `https://ersd.aimsplatform.org/api/ersd/v${eRSDVersion}specification?format=json&api-key=${ERSD_API_KEY}`;
