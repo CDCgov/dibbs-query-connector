@@ -1,10 +1,14 @@
 import { Mode } from "@/app/constants";
 import { Alert } from "@trussworks/react-uswds";
 
+export const CONTACT_US_DISCLAIMER_TEXT =
+  "Interested in learning more about using the TEFCA Query Connector for your jurisdiction?";
+
+export const CONTACT_US_DISCLAIMER_EMAIL = "dibbs@cdc.gov";
+
 const contactUsDisclaimer = (
   <Alert type="info" headingLevel="h4" slim className="custom-alert">
-    Interested in learning more about using the TEFCA Query Connector for your
-    jurisdiction? Send us an email at{" "}
+    {CONTACT_US_DISCLAIMER_TEXT}{" "}
     <a
       href="mailto:dibbs@cdc.gov"
       style={{
@@ -13,7 +17,7 @@ const contactUsDisclaimer = (
         textDecoration: "underline",
       }}
     >
-      dibbs@cdc.gov
+      {CONTACT_US_DISCLAIMER_EMAIL}
     </a>
   </Alert>
 );
@@ -31,7 +35,7 @@ type SiteAlertProps = {
 
 const PageModeToSiteAlertMap: { [page in Mode]?: React.ReactNode } = {
   search: piiDisclaimer,
-  "customize-queries": piiDisclaimer,
+  "select-query": piiDisclaimer,
   results: contactUsDisclaimer,
 };
 
