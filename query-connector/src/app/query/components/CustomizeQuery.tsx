@@ -18,6 +18,7 @@ import Accordion from "../designSystem/Accordion";
 import CustomizeQueryNav from "./customizeQuery/CustomizeQueryNav";
 import { mapValueSetItemsToValueSetTypes } from "./customizeQuery/customizeQueryUtils";
 import Backlink from "./backLink/Backlink";
+import { RETURN_LABEL } from "../stepIndicator/StepIndicator";
 
 interface CustomizeQueryProps {
   useCaseQueryResponse: UseCaseQueryResponse;
@@ -159,7 +160,7 @@ const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
   return (
     <div>
       <div className="padding-top-3">
-        <Backlink onClick={goBack} label={RETURN_TO_STEP_TWO_COPY} />
+        <Backlink onClick={goBack} label={RETURN_LABEL["results"]} />
       </div>
       <LoadingView loading={!useCaseQueryResponse} />
       <h1 className="font-sans-2xl text-bold margin-top-205">
@@ -218,7 +219,6 @@ const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
 };
 
 export default CustomizeQuery;
-export const RETURN_TO_STEP_TWO_COPY = "Return to Select query";
 export const QUERY_CUSTOMIZATION_CONFIRMATION_HEADER =
   "Query Customization Successful!";
 export const QUERY_CUSTOMIZATION_CONFIRMATION_BODY =

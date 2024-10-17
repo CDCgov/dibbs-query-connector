@@ -28,6 +28,13 @@ export const PAGE_TITLES: { [mode: string]: string } = {
   results: "Patient Record",
 };
 
+// Steps in the return to previous page
+export const RETURN_LABEL: { [mode: string]: string } = {
+  "patient-results": "Return to Enter patient info",
+  "select-query": "Return to Select patient",
+  results: "Return to Select query",
+};
+
 /**
  * Step indicator for the query process
  * @param root0 - The props for the StepIndicator component.

@@ -8,7 +8,10 @@ import { Select, Button } from "@trussworks/react-uswds";
 import Backlink from "../backLink/Backlink";
 import styles from "./selectQuery.module.css";
 import { useState } from "react";
-import { PAGE_TITLES } from "@/app/query/stepIndicator/StepIndicator";
+import {
+  PAGE_TITLES,
+  RETURN_LABEL,
+} from "@/app/query/stepIndicator/StepIndicator";
 
 type SelectSavedQueryProps = {
   selectedQuery: string;
@@ -52,7 +55,7 @@ const SelectSavedQuery: React.FC<SelectSavedQueryProps> = ({
   return (
     <form className="content-container-smaller-width">
       {/* Back button */}
-      <Backlink onClick={goBack} label={"Return to select a patient"} />
+      <Backlink onClick={goBack} label={RETURN_LABEL["select-query"]} />
       <h1 className={`${styles.selectQueryHeaderText}`}>
         {PAGE_TITLES["select-query"]}
       </h1>

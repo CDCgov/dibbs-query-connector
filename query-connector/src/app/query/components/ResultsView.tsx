@@ -13,7 +13,10 @@ import MedicationRequestTable from "./resultsView/tableComponents/MedicationRequ
 import ObservationTable from "./resultsView/tableComponents/ObservationTable";
 import Backlink from "./backLink/Backlink";
 import { USE_CASES, demoQueryValToLabelMap } from "@/app/constants";
-import { PAGE_TITLES } from "@/app/query/stepIndicator/StepIndicator";
+import {
+  PAGE_TITLES,
+  RETURN_LABEL,
+} from "@/app/query/stepIndicator/StepIndicator";
 
 type ResultsViewProps = {
   useCaseQueryResponse: UseCaseQueryResponse;
@@ -62,10 +65,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({
     <>
       <div className="results-banner">
         <div className={`${styles.resultsBannerContent}`}>
-          <Backlink
-            onClick={() => goBack()}
-            label={"Return to query selection"}
-          />
+          <Backlink onClick={() => goBack()} label={RETURN_LABEL["results"]} />
           <button
             className="usa-button usa-button--outline margin-left-auto"
             onClick={() => goToBeginning()}
