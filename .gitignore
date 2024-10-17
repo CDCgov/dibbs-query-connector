@@ -78,15 +78,9 @@ persistent_storage/
 *.egg-info
 build/
 
-## ECR Viewer Seed data
-/containers/ecr-viewer/seed-scripts/fhir_data/
+## query-connector playwright tests
+/test-results/
 
-.turbo
-out
-tsconfig.tsbuildinfo
 
 .env
 .local.env 
-
-## Make local config file
-/containers/local-config.env
