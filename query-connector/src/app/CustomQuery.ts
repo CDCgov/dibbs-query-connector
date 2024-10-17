@@ -75,7 +75,7 @@ export class CustomQuery {
         : "";
     this.medicationRequestQuery =
       rxnormFilter !== ""
-        ? `/MedicationRequest?subject=${patientId}&code=${rxnormFilter}&_include=MedicationRequest:medication&_include=MedicationRequest:medication.administration`
+        ? `/MedicationRequest?subject=${patientId}&code=${rxnormFilter}&_include=MedicationRequest:medication&_include=MedicationRequest:intended-performer`
         : "";
     this.socialHistoryQuery = `/Observation?subject=${patientId}&category=social-history`;
     this.encounterQuery =
