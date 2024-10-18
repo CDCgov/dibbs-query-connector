@@ -22,13 +22,13 @@
 }
 
 .page-title {
-  margin: 0.75rem 0rem;
+  margin: $margin-within-group 0rem;
   font-weight: 700;
   font-size: 2.66rem;
 }
 
 .page-explainer {
-  margin: 0.75rem 0rem 2.5rem 0rem;
+  margin: $margin-within-group 0rem $margin-between-group 0rem;
   font-family: family("sans");
   font-size: 1.375rem;
   font-style: normal;

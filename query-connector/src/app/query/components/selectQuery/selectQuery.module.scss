@@ -1,3 +1,5 @@
+@use "_variables" as *;
+
 .searchCallToActionButton {
   height: 2.5rem;
 }
@@ -9,7 +11,7 @@
 }
 
 .selectQueryExplanationText {
-  padding-top: 0.75rem;
+  padding-top: $margin-within-group;
   padding-bottom: 1.5rem;
   line-height: 2.0625rem;
   word-wrap: break-word;
