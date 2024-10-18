@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { TEST_URL } from "../playwright-setup";
-import { STEP_TWO_PAGE_TITLE } from "@/app/query/components/patientSearchResults/PatientSearchResultsTable";
-import { STEP_THREE_PAGE_TITLE } from "@/app/query/components/selectQuery/SelectSavedQuery";
+import { PAGE_TITLES } from "@/app/query/stepIndicator/StepIndicator";
+
 import { TEST_PATIENT, TEST_PATIENT_NAME } from "./constants";
 
 test.describe("alternate queries with the Query Connector", () => {
@@ -24,11 +24,11 @@ test.describe("alternate queries with the Query Connector", () => {
     await page.getByRole("button", { name: "Search for patient" }).click();
     await expect(page.getByText("Loading")).toHaveCount(0, { timeout: 10000 });
     await expect(
-      page.getByRole("heading", { name: STEP_TWO_PAGE_TITLE }),
+      page.getByRole("heading", { name: PAGE_TITLES["patient-results"] }),
     ).toBeVisible();
     await page.getByRole("link", { name: "Select patient" }).click();
     await expect(
-      page.getByRole("heading", { name: STEP_THREE_PAGE_TITLE }),
+      page.getByRole("heading", { name: PAGE_TITLES["select-query"] }),
     ).toBeVisible();
     await page.getByRole("button", { name: "Submit" }).click();
     await expect(page.getByText("Loading")).toHaveCount(0, { timeout: 10000 });
