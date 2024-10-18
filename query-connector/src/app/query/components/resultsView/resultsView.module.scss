@@ -1,3 +1,9 @@
+@use "../../../../styles/_variables" as *;
+
+.accordionInstance {
+  margin-bottom: $margin-between-group;
+}
+
 .accordionWrapper > h3 {
   font-size: 32px;
   color: white !important;
