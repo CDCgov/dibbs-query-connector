@@ -75,3 +75,4 @@ const PatientSearchResultsTable: React.FC<PatientSeacrchResultsTableProps> = ({
 };
 
 export default PatientSearchResultsTable;
+export const STEP_TWO_PAGE_TITLE = "Step 2: Select a patient";

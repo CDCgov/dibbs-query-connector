@@ -2,6 +2,7 @@
 import { Pool, PoolConfig, QueryResultRow } from "pg";
 import { Bundle, OperationOutcome } from "fhir/r4";
 import { ValueSetItem, valueSetTypeToClincalServiceTypeMap } from "./constants";
+import { encode } from "base-64";
 
 const getQuerybyNameSQL = `
 select q.query_name, q.id, qtv.valueset_id, vs.name as valueset_name, vs.author as author, vs.type, qic.concept_id, qic.include, c.code, c.code_system, c.display 
@@ -89,9 +90,9 @@ export const mapQueryRowsToValueSetItems = async (rows: QueryResultRow[]) => {
 };
 
 /*
- * The expected return type from the eRSD API.
+ * The expected return type from both the eRSD API and the VSAC FHIR API.
  */
-type ErsdResponse = Bundle | OperationOutcome;
+type ErsdOrVsacResponse = Bundle | OperationOutcome;
 
 /**
  * Fetches the eRSD Specification from the eRSD API. This function requires an API key
@@ -99,7 +100,9 @@ type ErsdResponse = Bundle | OperationOutcome;
  * @param eRSDVersion - The version of the eRSD specification to retrieve. Defaults to v2.
  * @returns The eRSD Specification as a FHIR Bundle or an OperationOutcome if an error occurs.
  */
-export async function getERSD(eRSDVersion: number = 2): Promise<ErsdResponse> {
+export async function getERSD(
+  eRSDVersion: number = 3,
+): Promise<ErsdOrVsacResponse> {
   const ERSD_API_KEY = process.env.ERSD_API_KEY;
   const eRSDUrl = `https://ersd.aimsplatform.org/api/ersd/v${eRSDVersion}specification?format=json&api-key=${ERSD_API_KEY}`;
   const response = await fetch(eRSDUrl);
@@ -114,6 +117,47 @@ export async function getERSD(eRSDVersion: number = 2): Promise<ErsdResponse> {
           severity: "error",
           code: "processing",
           diagnostics: `Failed to retrieve data from eRSD: ${response.status} ${response.statusText}`,
+        },
+      ],
+    } as OperationOutcome;
+  }
+}
+
+/**
+ * Fetches the VSAC Value Sets and supporting code systems information for a given OID
+ * as a FHIR bundle. This function requires a UMLS API Key which must be obtained as a
+ * Metathesaurus License. See https://www.nlm.nih.gov/vsac/support/usingvsac/vsacfhirapi.html
+ * for authentication instructions.
+ * @param oid The OID whose value sets to retrieve.
+ * @returns The value sets as a FHIR bundle, or an Operation Outcome if there is an error.
+ */
+export async function getVSACValueSet(
+  oid: string,
+): Promise<ErsdOrVsacResponse> {
+  const username: string = "apikey";
+  const umlsKey: string = process.env.UMLS_API_KEY || "";
+  const vsacUrl: string = `https://cts.nlm.nih.gov/fhir/ValueSet/${oid}`;
+  const response = await fetch(vsacUrl, {
+    method: "get",
+    headers: new Headers({
+      Authorization: "Basic " + encode(username + ":" + umlsKey),
+      "Content-Type": "application/fhir+json",
+    }),
+  });
+  if (response.status === 200) {
+    const data = (await response.json()) as Bundle;
+    return data;
+  } else {
+    const diagnosticIssue = await response
+      .json()
+      .then((r) => r.issue[0].diagnostics);
+    return {
+      resourceType: "OperationOutcome",
+      issue: [
+        {
+          severity: "error",
+          code: "processing",
+          diagnostics: `${response.status}: ${diagnosticIssue}`,
         },
       ],
     } as OperationOutcome;

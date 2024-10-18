@@ -73,7 +73,6 @@ const SearchForm: React.FC<SearchFormProps> = ({
         setMRN(data.MRN);
         setPhone(data.Phone);
         setFhirServer(data.FhirServer as FHIR_SERVERS);
-        // setUseCase(data.UseCase as USE_CASES);
         setAutofilled(highlightAutofilled);
       }
     },
@@ -379,3 +378,4 @@ const SearchForm: React.FC<SearchFormProps> = ({
 export default SearchForm;
 
 const autofillColor = "#faf3d1";
+export const STEP_ONE_PAGE_TITLE = "Step 1: Enter patient information";
