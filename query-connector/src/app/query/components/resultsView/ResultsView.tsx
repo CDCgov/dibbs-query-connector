@@ -2,7 +2,7 @@ import { UseCaseQueryResponse } from "../../../query-service";
 import ResultsViewSideNav, { NavSection } from "./ResultsViewSideNav";
 import React, { useEffect } from "react";
 import ResultsViewTable from "./ResultsViewTable";
-import styles from "./resultsView.module.css";
+import styles from "./resultsView.module.scss";
 import ConditionsTable from "./tableComponents/ConditionsTable";
 import Demographics from "./tableComponents/Demographics";
 import DiagnosticReportTable from "./tableComponents/DiagnosticReportTable";
