@@ -13,7 +13,7 @@ type StepIndicatorProps = {
 type StepStatus = "current" | "complete" | "incomplete";
 
 // Steps in the step indicator
-export const CUSTOMIZE_QUERY_STEPS: { [mode: string]: string } = {
+export const CUSTOMIZE_QUERY_STEPS: { [mode in Mode]: string } = {
   search: "Enter patient info",
   "patient-results": "Select patient",
   "select-query": "Select query",
@@ -29,10 +29,11 @@ export const PAGE_TITLES: { [mode in Mode]: string } = {
 };
 
 // Steps in the return to previous page
-export const RETURN_LABEL: { [mode in Mode]?: string } = {
+export const RETURN_LABEL: { [mode in Mode]: string } = {
   "patient-results": "Return to Enter patient info",
   "select-query": "Return to Select patient",
   results: "Return to Select query",
+  search: "",
 };
 
 /**
