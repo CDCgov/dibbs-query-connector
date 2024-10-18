@@ -2,10 +2,7 @@ import React from "react";
 import Table from "@/app/query/designSystem/Table";
 import { Condition } from "fhir/r4";
 import { formatCodeableConcept, formatDate } from "../../../../format-service";
-import {
-  checkIfSomeElementWithLengthPropertyExists,
-  checkIfSomeElementWithPropertyExists,
-} from "./utils";
+import { checkIfSomeElementWithPropertyExists } from "./utils";
 
 /**
  * The props for the ConditionTable component.
@@ -21,7 +18,7 @@ export interface ConditionTableProps {
  * @returns - The ConditionTable component.
  */
 const ConditionsTable: React.FC<ConditionTableProps> = ({ conditions }) => {
-  const anyResolution = checkIfSomeElementWithLengthPropertyExists(
+  const anyResolution = checkIfSomeElementWithPropertyExists(
     conditions,
     "abatementDateTime",
   );
@@ -31,7 +28,7 @@ const ConditionsTable: React.FC<ConditionTableProps> = ({ conditions }) => {
     "clinicalStatus",
   );
 
-  const anyOnset = checkIfSomeElementWithLengthPropertyExists(
+  const anyOnset = checkIfSomeElementWithPropertyExists(
     conditions,
     "onsetDateTime",
   );

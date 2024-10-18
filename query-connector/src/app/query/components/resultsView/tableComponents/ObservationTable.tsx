@@ -2,7 +2,7 @@ import React from "react";
 import Table from "@/app/query/designSystem/Table";
 import { Observation } from "fhir/r4";
 import { formatCodeableConcept, formatDate } from "../../../../format-service";
-import { checkIfSomeElementWithLengthPropertyExists } from "./utils";
+import { checkIfSomeElementWithPropertyExists } from "./utils";
 /**
  * The props for the ObservationTable component.
  */
@@ -19,11 +19,11 @@ export interface ObservationTableProps {
 const ObservationTable: React.FC<ObservationTableProps> = ({
   observations,
 }) => {
-  const anyObsInterpretation = checkIfSomeElementWithLengthPropertyExists(
+  const anyObsInterpretation = checkIfSomeElementWithPropertyExists(
     observations,
     "interpretation",
   );
-  const anyRefrenceRange = checkIfSomeElementWithLengthPropertyExists(
+  const anyRefrenceRange = checkIfSomeElementWithPropertyExists(
     observations,
     "referenceRange",
   );

@@ -2,7 +2,7 @@ import React from "react";
 import Table from "@/app/query/designSystem/Table";
 import { MedicationRequest } from "fhir/r4";
 import { formatCodeableConcept, formatDate } from "../../../../format-service";
-import { checkIfSomeElementWithLengthPropertyExists } from "./utils";
+import { checkIfSomeElementWithPropertyExists } from "./utils";
 
 /**
  * The props for the MedicationRequestTable component.
@@ -20,7 +20,7 @@ export interface MedicationRequestTableProps {
 const MedicationRequestTable: React.FC<MedicationRequestTableProps> = ({
   medicationRequests,
 }) => {
-  const anyReasonCode = checkIfSomeElementWithLengthPropertyExists(
+  const anyReasonCode = checkIfSomeElementWithPropertyExists(
     medicationRequests,
     "reasonCode",
   );
