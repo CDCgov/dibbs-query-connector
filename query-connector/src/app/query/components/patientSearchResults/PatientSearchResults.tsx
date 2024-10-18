@@ -2,9 +2,9 @@ import React, { useEffect } from "react";
 import { Patient } from "fhir/r4";
 
 import { Mode } from "@/app/constants";
-import Backlink from "./backLink/Backlink";
-import PatientSearchResultsTable from "./patientSearchResults/PatientSearchResultsTable";
-import NoPatientsFound from "./patientSearchResults/NoPatientsFound";
+import Backlink from "../backLink/Backlink";
+import PatientSearchResultsTable from "./PatientSearchResultsTable";
+import NoPatientsFound from "./NoPatientsFound";
 
 /**
  * The props for the PatientSearchResults component.

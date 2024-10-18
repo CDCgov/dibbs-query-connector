@@ -1,7 +1,6 @@
 import { Alert, HeadingLevel } from "@trussworks/react-uswds";
 import { toast } from "react-toastify";
-
-import styles from "./redirectToast.module.css";
+import classNames from "classnames";
 
 export type AlertType = "info" | "success" | "warning" | "error";
 
@@ -45,8 +44,8 @@ const options = {
   position: "bottom-left" as const,
   closeOnClick: true,
   closeButton: false,
-  className: styles.noPaddingImportant,
-  bodyClassName: styles.noPaddingImportant,
+  className: classNames("padding-0-important", "margin-top-0-important"),
+  bodyClassName: classNames("padding-0-important", "margin-top-0-important"),
   pauseOnFocusLoss: false,
 };
 
