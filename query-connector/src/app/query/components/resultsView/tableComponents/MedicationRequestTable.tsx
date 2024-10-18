@@ -2,6 +2,7 @@ import React from "react";
 import Table from "@/app/query/designSystem/Table";
 import { MedicationRequest } from "fhir/r4";
 import { formatCodeableConcept, formatDate } from "../../../../format-service";
+import { checkIfSomeElementWithLengthPropertyExists } from "./utils";
 
 /**
  * The props for the MedicationRequestTable component.
@@ -19,13 +20,18 @@ export interface MedicationRequestTableProps {
 const MedicationRequestTable: React.FC<MedicationRequestTableProps> = ({
   medicationRequests,
 }) => {
+  const anyReasonCode = checkIfSomeElementWithLengthPropertyExists(
+    medicationRequests,
+    "reasonCode",
+  );
+
   return (
     <Table className="margin-top-0-important">
       <thead>
         <tr>
           <th>Order Date</th>
           <th>Medication</th>
-          <th>Reason Code</th>
+          {anyReasonCode && <th>Reason Code</th>}
           <th>Status</th>
         </tr>
       </thead>
@@ -38,7 +44,11 @@ const MedicationRequestTable: React.FC<MedicationRequestTableProps> = ({
                 medicationRequest.medicationCodeableConcept,
               )}
             </td>
-            <td>{formatCodeableConcept(medicationRequest?.reasonCode?.[0])}</td>
+            {anyReasonCode && (
+              <td>
+                {formatCodeableConcept(medicationRequest?.reasonCode?.[0])}
+              </td>
+            )}
             <td>{medicationRequest.status}</td>
           </tr>
         ))}
