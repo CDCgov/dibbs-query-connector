@@ -2,7 +2,7 @@
 
 import { test, expect } from "@playwright/test";
 import { TEST_URL } from "../playwright-setup";
-import { STEP_ONE_PAGE_TITLE } from "@/app/query/components/searchForm/SearchForm";
+import { PAGE_TITLES } from "@/app/query/stepIndicator/StepIndicator";
 import {
   CONTACT_US_DISCLAIMER_EMAIL,
   CONTACT_US_DISCLAIMER_TEXT,
@@ -44,7 +44,7 @@ test.describe("querying with the Query Connector", () => {
       "This site is for demo purposes only. Please do not enter PII on this website.",
     );
     await expect(
-      page.getByRole("heading", { name: STEP_ONE_PAGE_TITLE, exact: true }),
+      page.getByRole("heading", { name: PAGE_TITLES["search"], exact: true }),
     ).toBeVisible();
 
     await page.getByRole("button", { name: "Fill fields" }).click();
@@ -115,7 +115,7 @@ test.describe("querying with the Query Connector", () => {
     // Now let's use the return to search to go back to a blank form
     await page.getByRole("button", { name: "New patient search" }).click();
     await expect(
-      page.getByRole("heading", { name: STEP_ONE_PAGE_TITLE, exact: true }),
+      page.getByRole("heading", { name: PAGE_TITLES["search"], exact: true }),
     ).toBeVisible();
   });
 });
