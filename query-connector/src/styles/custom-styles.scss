@@ -429,7 +429,8 @@ hr.custom-hr {
 }
 
 .Toastify__toast-container {
-  width: calc($query-connector-max-width * 0.4) !important;
+  width: calc($query-connector-wide-max-width * 0.4) !important;
+  padding-top: 0 !important;
 }
 
 .customize-accordion .usa-accordion__button[aria-expanded="true"],
@@ -450,6 +451,7 @@ hr.custom-hr {
   padding: 0rem;
 }
 
+// Overrides
 .margin-top-0-important {
   margin-top: 0 !important;
 }
@@ -473,6 +475,10 @@ hr.custom-hr {
 
 .margin-left-1-important {
   margin-left: 0.5rem !important;
+}
+
+.padding-0-important {
+  padding: 0 !important;
 }
 
 .resultsViewSideNav .usa-sidenav,

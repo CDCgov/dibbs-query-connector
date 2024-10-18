@@ -37,6 +37,7 @@ const Query: React.FC = () => {
   const [resultsQueryResponse, setResultsQueryResponse] =
     useState<UseCaseQueryResponse>({});
 
+  const [showCustomizeQuery, setShowCustomizeQuery] = useState(false);
   return (
     <>
       <SiteAlert page={mode} />
@@ -69,7 +70,11 @@ const Query: React.FC = () => {
         )}
 
         {mode === "select-query" && (
-          <div className="main-container">
+          <div
+            className={
+              showCustomizeQuery ? "main-container__wide" : "main-container"
+            }
+          >
             <SelectQuery
               goBack={() => setMode("patient-results")}
               goForward={() => setMode("results")}
@@ -77,7 +82,9 @@ const Query: React.FC = () => {
               setSelectedQuery={setUseCase}
               patientForQuery={patientForQuery}
               resultsQueryResponse={resultsQueryResponse}
+              showCustomizeQuery={showCustomizeQuery}
               setResultsQueryResponse={setResultsQueryResponse}
+              setShowCustomizeQuery={setShowCustomizeQuery}
               fhirServer={fhirServer}
               setFhirServer={setFhirServer}
               setLoading={setLoading}

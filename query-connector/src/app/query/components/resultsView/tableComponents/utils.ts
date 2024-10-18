@@ -3,7 +3,7 @@ type Lengthwise = {
 };
 
 function isLengthwise(thing: any): thing is Lengthwise {
-  return "length" in thing;
+  return thing?.length !== undefined;
 }
 
 /**
