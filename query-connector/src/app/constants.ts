@@ -287,6 +287,14 @@ export const stateOptions = [
 /* Mode that pages can be in; determines what is displayed to the user */
 export type Mode = "search" | "results" | "select-query" | "patient-results";
 
+export const metadata = {
+  title: "Query Connector",
+  description: "Try out TEFCA with queries for public health use cases.",
+};
+
+// TODO: Remove ValueSetItem, ValueSet, and valueSetTypeToClincalServiceTypeMap once
+// ticket #2789 is resolved
+
 /*Type to specify the expected components for each item in a value set that will be 
 displayed in the CustomizeQuery component*/
 export interface ValueSetItem {
@@ -314,8 +322,37 @@ export const valueSetTypeToClincalServiceTypeMap = {
   medications: ["mrtc"],
   conditions: ["dxtc", "sdtc"],
 };
+/// TODO: Remove the above once ticket #2789 is resolved
 
-export const metadata = {
-  title: "Query Connector",
-  description: "Try out TEFCA with queries for public health use cases.",
-};
+/*
+ * The expected type of a ValueSet concept.
+ */
+export interface Concept {
+  code: string;
+  display: string;
+  include: boolean;
+}
+
+/*
+ * The expected type of a ValueSet.
+ */
+// export interface ValueSet {
+//   valueset_id: string;
+//   valueset_version: string;
+//   valueset_name: string;
+//   author: string;
+//   system: string;
+//   ersdConceptType?: string;
+//   dibbsConceptType: string;
+//   includeValueSet: boolean;
+//   concepts: Concept[];
+// }
+
+/*
+ * The expected type of ValueSets grouped by dibbsConceptType for the purpose of display.
+ */
+export interface ValueSetDisplay {
+  labs: ValueSet[];
+  medications: ValueSet[];
+  conditions: ValueSet[];
+}
