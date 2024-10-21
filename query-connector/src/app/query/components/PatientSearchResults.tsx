@@ -5,6 +5,7 @@ import { Mode } from "@/app/constants";
 import Backlink from "./backLink/Backlink";
 import PatientSearchResultsTable from "./patientSearchResults/PatientSearchResultsTable";
 import NoPatientsFound from "./patientSearchResults/NoPatientsFound";
+import { RETURN_LABEL } from "@/app/query/stepIndicator/StepIndicator";
 
 /**
  * The props for the PatientSearchResults component.
@@ -57,7 +58,7 @@ const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({
       )}
       {patients.length > 0 && (
         <>
-          <Backlink onClick={goBack} label={RETURN_TO_STEP_ONE_LABEL} />
+          <Backlink onClick={goBack} label={RETURN_LABEL["patient-results"]} />
 
           <PatientSearchResultsTable
             patients={patients}
@@ -70,4 +71,3 @@ const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({
 };
 
 export default PatientSearchResults;
-export const RETURN_TO_STEP_ONE_LABEL = "Return to Enter patient info";

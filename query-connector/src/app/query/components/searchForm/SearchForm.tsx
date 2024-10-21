@@ -12,12 +12,12 @@ import {
   demoData,
   stateOptions,
   Mode,
-} from "../../../constants";
-import { UseCaseQueryResponse, UseCaseQuery } from "../../../query-service";
-import { fhirServers } from "../../../fhir-servers";
+} from "@/app/constants";
+import { UseCaseQueryResponse, UseCaseQuery } from "@/app/query-service";
+import { fhirServers } from "@/app/fhir-servers";
 import styles from "./searchForm.module.css";
-
 import { FormatPhoneAsDigits } from "@/app/format-service";
+import { PAGE_TITLES } from "@/app/query/stepIndicator/StepIndicator";
 
 interface SearchFormProps {
   useCase: USE_CASES;
@@ -55,7 +55,6 @@ const SearchForm: React.FC<SearchFormProps> = ({
   //Set the patient options based on the demoOption
   const [firstName, setFirstName] = useState<string>("");
   const [lastName, setLastName] = useState<string>("");
-
   const [phone, setPhone] = useState<string>("");
   const [dob, setDOB] = useState<string>("");
   const [mrn, setMRN] = useState<string>("");
@@ -74,7 +73,6 @@ const SearchForm: React.FC<SearchFormProps> = ({
         setMRN(data.MRN);
         setPhone(data.Phone);
         setFhirServer(data.FhirServer as FHIR_SERVERS);
-        setUseCase(data.UseCase as USE_CASES);
         setAutofilled(highlightAutofilled);
       }
     },
@@ -83,8 +81,8 @@ const SearchForm: React.FC<SearchFormProps> = ({
 
   async function HandleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!useCase || !fhirServer) {
-      console.error("Use case and FHIR server are required.");
+    if (!fhirServer) {
+      console.error("FHIR server is required.");
       return;
     }
     setLoading(true);
@@ -112,7 +110,7 @@ const SearchForm: React.FC<SearchFormProps> = ({
     <>
       <form className="content-container-smaller-width" onSubmit={HandleSubmit}>
         <h1 className="font-sans-2xl text-bold margin-bottom-105">
-          {STEP_ONE_PAGE_TITLE}
+          {PAGE_TITLES["search"]}
         </h1>
         <h2 className="font-sans-lg text-normal margin-top-0 margin-bottom-105">
           Enter patient information below to search for a patient. We will query
