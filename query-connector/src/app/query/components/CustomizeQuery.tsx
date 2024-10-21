@@ -138,7 +138,7 @@ const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
     goBack();
     showRedirectConfirmation({
       heading: QUERY_CUSTOMIZATION_CONFIRMATION_HEADER,
-      body: QUERY_CUSTOMIZATION_CONFIRMATION_BODY,
+      body: "",
       headingLevel: "h4",
     });
   };
@@ -163,16 +163,14 @@ const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
         <Backlink onClick={goBack} label={RETURN_LABEL["results"]} />
       </div>
       <LoadingView loading={!useCaseQueryResponse} />
-      <h1 className="font-sans-2xl text-bold margin-top-205">
-        Customize query
-      </h1>
-      <div className="font-sans-lg text-light padding-bottom-0 padding-top-05">
+      <h1 className="page-title margin-bottom-05-important">Customize query</h1>
+      <h2 className="page-explainer margin-x-0-important">
         Query: {demoQueryValToLabelMap[queryType]}
-      </div>
-      <div className="font-sans-sm text-light padding-bottom-0 padding-top-05">
+      </h2>
+      <h3 className="margin-x-0-important font-sans-sm text-light padding-bottom-0 padding-top-05">
         {countLabs} labs found, {countMedications} medications found,{" "}
         {countConditions} conditions found.
-      </div>
+      </h3>
 
       <CustomizeQueryNav
         activeTab={activeTab}
@@ -221,5 +219,3 @@ const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
 export default CustomizeQuery;
 export const QUERY_CUSTOMIZATION_CONFIRMATION_HEADER =
   "Query Customization Successful!";
-export const QUERY_CUSTOMIZATION_CONFIRMATION_BODY =
-  "You've successfully customized your query. Once you're done adding patient details, submit your completed query to get results";

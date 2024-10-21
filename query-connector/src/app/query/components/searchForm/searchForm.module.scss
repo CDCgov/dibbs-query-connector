@@ -1,3 +1,5 @@
+@use "../../../../styles/_variables" as *;
+
 .searchCallToActionContainer {
   display: flex;
   width: 100%;
@@ -6,7 +8,7 @@
 }
 
 .searchFormContainer {
-  margin-top: 1.25rem;
+  margin-top: $margin-within-group;
   padding: 1.5rem;
 }
 
