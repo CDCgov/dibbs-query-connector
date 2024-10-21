@@ -1,5 +1,10 @@
 .container > ol {
-  justify-content: center;
+  justify-content: space-between;
   background-color: rgba(247, 249, 250, 1);
   padding: 1.5rem 0;
+  padding-bottom: 2.25rem;
+}
+
+.container {
+  margin-bottom: 0;
 }

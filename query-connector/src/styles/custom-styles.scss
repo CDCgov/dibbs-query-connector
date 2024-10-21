@@ -190,7 +190,6 @@ body {
   display: grid;
   grid-template-columns: 1fr; // Defines a single column
   justify-content: center; // Centers the column in the container
-  row-gap: 0.1em; // Adjusts the gap between rows/items
   background-color: rgba(247, 249, 250, 1);
 }
 
@@ -436,6 +435,20 @@ hr.custom-hr {
 .custom-query-step-indicator .usa-step-indicator__header {
   display: none !important;
 }
+
+.usa-step-indicator__segment:before {
+  box-shadow:
+    0 0 0 0.25rem #919191,
+    0 0 0 0 white !important;
+}
+
+.usa-step-indicator__segment--current:before,
+.usa-step-indicator__segment--complete:before {
+  box-shadow:
+    inset 0 0 0 0 #919191,
+    0 0 0 0.25rem white !important;
+}
+
 .customize-accordion .usa-accordion__button[aria-expanded="true"],
 .customize-accordion .usa-accordion__button[aria-expanded="false"] {
   background-size: 16px 10px;
@@ -468,7 +481,8 @@ hr.custom-hr {
   cursor: pointer;
 }
 
-// Overrides
+// Overrides - numbers correspond to the USWDS spacing classes
+// https://designsystem.digital.gov/utilities/margin-and-padding/
 .margin-top-0-important {
   margin-top: 0 !important;
 }

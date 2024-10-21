@@ -54,9 +54,10 @@ const Query: React.FC = () => {
     <>
       <SiteAlert page={mode} />
       <div className={modeToCssContainerMap[mode]}>
-        {Object.keys(CUSTOMIZE_QUERY_STEPS).includes(mode) && (
-          <StepIndicator headingLevel="h4" curStep={mode} />
-        )}
+        {Object.keys(CUSTOMIZE_QUERY_STEPS).includes(mode) &&
+          !showCustomizeQuery && (
+            <StepIndicator headingLevel="h4" curStep={mode} />
+          )}
         {/* Step 1 */}
         {mode === "search" && (
           <SearchForm
