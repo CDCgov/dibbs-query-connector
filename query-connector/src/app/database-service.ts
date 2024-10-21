@@ -171,13 +171,19 @@ export async function getVSACValueSet(
   }
 }
 
+/**
+ * Translates a VSAC FHIR bundle to our internal ValueSet struct
+ * @param fhirValueset - The FHIR ValueSet response from VSAC
+ * @param ersdConceptType - The associated clinical concept type from ERSD
+ * @returns An object of type InternalValueSet
+ */
 export function translateVSACToInternalValueSet(
   fhirValueset: ValueSet,
   ersdConceptType: ErsdConceptType,
 ) {
   const id = fhirValueset.id;
-  // does this need any interpolation? ie example "version": "20230602",
-  // needs to be maped to v2 or v3?
+  // does this need any interpolation?
+  // ie example "version": "20230602" needs to be maped to v2 or v3?
   const version = fhirValueset.version;
 
   // would we prefer this over the less readable "name?"
