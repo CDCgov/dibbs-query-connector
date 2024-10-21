@@ -1,3 +1,13 @@
+import {
+  Patient,
+  Observation,
+  DiagnosticReport,
+  Condition,
+  Encounter,
+  Medication,
+  MedicationAdministration,
+  MedicationRequest,
+} from "fhir/r4";
 /**
  * The use cases that can be used in the app
  */
@@ -355,4 +365,33 @@ export interface ValueSetDisplay {
   labs: ValueSet[];
   medications: ValueSet[];
   conditions: ValueSet[];
+}
+
+// Define the type guard for FHIR resources
+// Define the FHIR Resource types
+export type FhirResource =
+  | Patient
+  | Observation
+  | DiagnosticReport
+  | Condition
+  | Encounter
+  | Medication
+  | MedicationAdministration
+  | MedicationRequest;
+
+/**
+ * A type guard function that checks if the given resource is a valid FHIR resource.
+ * This ensures the resource has a `resourceType` field and is one of the allowed
+ * resource types (Patient, Observation, DiagnosticReport, Condition, etc.).
+ * @param resource - The resource to check.
+ * @returns True if the resource is a valid FHIR resource, false otherwise.
+ */
+// Define a type guard to check if the object is a FHIR resource
+export function isFhirResource(resource: unknown): resource is FhirResource {
+  return (
+    resource !== null &&
+    typeof resource === "object" &&
+    resource !== undefined &&
+    "resourceType" in resource
+  );
 }

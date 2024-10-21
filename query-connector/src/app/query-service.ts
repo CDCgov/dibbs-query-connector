@@ -13,7 +13,12 @@ import {
 } from "fhir/r4";
 
 import FHIRClient from "./fhir-servers";
-import { USE_CASES, FHIR_SERVERS, ValueSetItem } from "./constants";
+import {
+  USE_CASES,
+  FHIR_SERVERS,
+  ValueSetItem,
+  isFhirResource,
+} from "./constants";
 import { CustomQuery } from "./CustomQuery";
 import { GetPhoneQueryFormats } from "./format-service";
 import { formatValueSetItemsAsQuerySpec } from "./format-service";
@@ -220,35 +225,6 @@ async function generalizedQuery(
     queryResponse = await queryEncounters(patientId, fhirClient, queryResponse);
     return queryResponse;
   }
-}
-
-// Define the type guard for FHIR resources
-// Define the FHIR Resource types
-type FhirResource =
-  | Patient
-  | Observation
-  | DiagnosticReport
-  | Condition
-  | Encounter
-  | Medication
-  | MedicationAdministration
-  | MedicationRequest;
-
-/**
- * A type guard function that checks if the given resource is a valid FHIR resource.
- * This ensures the resource has a `resourceType` field and is one of the allowed
- * resource types (Patient, Observation, DiagnosticReport, Condition, etc.).
- * @param resource - The resource to check.
- * @returns True if the resource is a valid FHIR resource, false otherwise.
- */
-// Define a type guard to check if the object is a FHIR resource
-function isFhirResource(resource: unknown): resource is FhirResource {
-  return (
-    resource !== null &&
-    typeof resource === "object" &&
-    resource !== undefined &&
-    "resourceType" in resource
-  );
 }
 
 /**
