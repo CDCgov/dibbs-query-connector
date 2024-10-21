@@ -177,7 +177,7 @@ export async function getVSACValueSet(
  * @param ersdConceptType - The associated clinical concept type from ERSD
  * @returns An object of type InternalValueSet
  */
-export function translateVSACToInternalValueSet(
+export async function translateVSACToInternalValueSet(
   fhirValueset: ValueSet,
   ersdConceptType: ErsdConceptType,
 ) {
