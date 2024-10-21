@@ -41,85 +41,77 @@ const Query: React.FC = () => {
     useState<UseCaseQueryResponse>({});
 
   const [showCustomizeQuery, setShowCustomizeQuery] = useState(false);
+
+  const modeToCssContainerMap: { [mode in Mode]: string } = {
+    search: "main-container",
+    "patient-results": "main-container__wide",
+    "select-query": showCustomizeQuery
+      ? "main-container__wide"
+      : "main-container",
+    results: "main-container__wide",
+  };
   return (
     <>
       <SiteAlert page={mode} />
-      {Object.keys(CUSTOMIZE_QUERY_STEPS).includes(mode) && (
-        <StepIndicator headingLevel="h4" curStep={mode} />
-      )}
-      <div className="main-container">
+      <div className={modeToCssContainerMap[mode]}>
+        {Object.keys(CUSTOMIZE_QUERY_STEPS).includes(mode) && (
+          <StepIndicator headingLevel="h4" curStep={mode} />
+        )}
         {/* Step 1 */}
         {mode === "search" && (
-          <div className="main-container">
-            <SearchForm
-              useCase={useCase}
-              setUseCase={setUseCase}
-              setMode={setMode}
-              setLoading={setLoading}
-              setPatientDiscoveryQueryResponse={
-                setPatientDiscoveryQueryResponse
-              }
-              fhirServer={fhirServer}
-              setFhirServer={setFhirServer}
-            />
-          </div>
+          <SearchForm
+            useCase={useCase}
+            setUseCase={setUseCase}
+            setMode={setMode}
+            setLoading={setLoading}
+            setPatientDiscoveryQueryResponse={setPatientDiscoveryQueryResponse}
+            fhirServer={fhirServer}
+            setFhirServer={setFhirServer}
+          />
         )}
 
         {/* Step 2 */}
         {mode === "patient-results" && (
-          <div className="main-container__wide">
-            <PatientSearchResults
-              patients={patientDiscoveryQueryResponse?.Patient ?? []}
-              goBack={() => setMode("search")}
-              setMode={setMode}
-              setPatientForQueryResponse={setPatientForQueryResponse}
-            />
-          </div>
+          <PatientSearchResults
+            patients={patientDiscoveryQueryResponse?.Patient ?? []}
+            goBack={() => setMode("search")}
+            setMode={setMode}
+            setPatientForQueryResponse={setPatientForQueryResponse}
+          />
         )}
 
         {/* Step 3 */}
         {mode === "select-query" && (
-          <div
-            className={
-              showCustomizeQuery ? "main-container__wide" : "main-container"
-            }
-          >
-            <SelectQuery
-              goBack={() => setMode("patient-results")}
-              goForward={() => setMode("results")}
-              selectedQuery={useCase}
-              setSelectedQuery={setUseCase}
-              patientForQuery={patientForQuery}
-              resultsQueryResponse={resultsQueryResponse}
-              showCustomizeQuery={showCustomizeQuery}
-              setResultsQueryResponse={setResultsQueryResponse}
-              setShowCustomizeQuery={setShowCustomizeQuery}
-              fhirServer={fhirServer}
-              setFhirServer={setFhirServer}
-              setLoading={setLoading}
-            />
-          </div>
+          <SelectQuery
+            goBack={() => setMode("patient-results")}
+            goForward={() => setMode("results")}
+            selectedQuery={useCase}
+            setSelectedQuery={setUseCase}
+            patientForQuery={patientForQuery}
+            resultsQueryResponse={resultsQueryResponse}
+            showCustomizeQuery={showCustomizeQuery}
+            setResultsQueryResponse={setResultsQueryResponse}
+            setShowCustomizeQuery={setShowCustomizeQuery}
+            fhirServer={fhirServer}
+            setFhirServer={setFhirServer}
+            setLoading={setLoading}
+          />
         )}
 
         {/* Step 4 */}
-        {mode === "results" && (
-          <div className="main-container__wide">
-            {resultsQueryResponse && (
-              <ResultsView
-                selectedQuery={useCase}
-                useCaseQueryResponse={resultsQueryResponse}
-                goBack={() => {
-                  setMode("select-query");
-                }}
-                goToBeginning={() => {
-                  setMode("search");
-                }}
-              />
-            )}
-          </div>
+        {mode === "results" && resultsQueryResponse && (
+          <ResultsView
+            selectedQuery={useCase}
+            useCaseQueryResponse={resultsQueryResponse}
+            goBack={() => {
+              setMode("select-query");
+            }}
+            goToBeginning={() => {
+              setMode("search");
+            }}
+          />
         )}
         {loading && <LoadingView loading={loading} />}
-
         <ToastContainer icon={false} />
       </div>
     </>
