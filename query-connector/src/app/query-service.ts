@@ -222,6 +222,35 @@ async function generalizedQuery(
   }
 }
 
+// Define the type guard for FHIR resources
+// Define the FHIR Resource types
+type FhirResource =
+  | Patient
+  | Observation
+  | DiagnosticReport
+  | Condition
+  | Encounter
+  | Medication
+  | MedicationAdministration
+  | MedicationRequest;
+
+/**
+ * A type guard function that checks if the given resource is a valid FHIR resource.
+ * This ensures the resource has a `resourceType` field and is one of the allowed
+ * resource types (Patient, Observation, DiagnosticReport, Condition, etc.).
+ * @param resource - The resource to check.
+ * @returns True if the resource is a valid FHIR resource, false otherwise.
+ */
+// Define a type guard to check if the object is a FHIR resource
+function isFhirResource(resource: unknown): resource is FhirResource {
+  return (
+    resource !== null &&
+    typeof resource === "object" &&
+    resource !== undefined &&
+    "resourceType" in resource
+  );
+}
+
 /**
  * Parse the response from a FHIR search query. If the response is successful and
  * contains data, return an array of parsed resources.
@@ -233,24 +262,54 @@ export async function parseFhirSearch(
   response: fetch.Response | Array<fetch.Response>,
   queryResponse: QueryResponse = {},
 ): Promise<QueryResponse> {
-  let resourceArray: any[] = [];
+  let resourceArray: unknown[] = [];
 
-  // Process the responses
+  // Process the responses and flatten them
   if (Array.isArray(response)) {
-    for (const r of response) {
-      resourceArray = resourceArray.concat(await processResponse(r));
-    }
+    resourceArray = (await Promise.all(response.map(processResponse))).flat();
   } else {
     resourceArray = await processResponse(response);
   }
 
   // Add resources to queryResponse
   for (const resource of resourceArray) {
-    const resourceType = resource.resourceType as keyof QueryResponse;
-    if (!queryResponse[resourceType]) {
-      queryResponse[resourceType] = [resource];
-    } else {
-      queryResponse[resourceType]!.push(resource);
+    if (isFhirResource(resource)) {
+      switch (resource.resourceType) {
+        case "Patient":
+          queryResponse.Patient = queryResponse.Patient ?? [];
+          queryResponse.Patient.push(resource);
+          break;
+        case "Observation":
+          queryResponse.Observation = queryResponse.Observation ?? [];
+          queryResponse.Observation.push(resource);
+          break;
+        case "DiagnosticReport":
+          queryResponse.DiagnosticReport = queryResponse.DiagnosticReport ?? [];
+          queryResponse.DiagnosticReport.push(resource);
+          break;
+        case "Condition":
+          queryResponse.Condition = queryResponse.Condition ?? [];
+          queryResponse.Condition.push(resource);
+          break;
+        case "Encounter":
+          queryResponse.Encounter = queryResponse.Encounter ?? [];
+          queryResponse.Encounter.push(resource);
+          break;
+        case "Medication":
+          queryResponse.Medication = queryResponse.Medication ?? [];
+          queryResponse.Medication.push(resource);
+          break;
+        case "MedicationAdministration":
+          queryResponse.MedicationAdministration =
+            queryResponse.MedicationAdministration ?? [];
+          queryResponse.MedicationAdministration.push(resource);
+          break;
+        case "MedicationRequest":
+          queryResponse.MedicationRequest =
+            queryResponse.MedicationRequest ?? [];
+          queryResponse.MedicationRequest.push(resource);
+          break;
+      }
     }
   }
   return queryResponse;
@@ -264,8 +323,8 @@ export async function parseFhirSearch(
  */
 export async function processResponse(
   response: fetch.Response,
-): Promise<any[]> {
-  let resourceArray: any[] = [];
+): Promise<unknown[]> {
+  let resourceArray: unknown[] = [];
   if (response.status === 200) {
     const body = await response.json();
     if (body.entry) {

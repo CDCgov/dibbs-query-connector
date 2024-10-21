@@ -49,8 +49,11 @@ export async function POST(request: NextRequest) {
       const OperationOutcome = await handleRequestError(diagnostics_message);
       return NextResponse.json(OperationOutcome);
     }
-  } catch (error: any) {
-    const diagnostics_message = `${error.message}`;
+  } catch (error: unknown) {
+    let diagnostics_message = "An error occurred.";
+    if (error instanceof Error) {
+      diagnostics_message = `${error.message}`;
+    }
     const OperationOutcome = await handleRequestError(diagnostics_message);
     return NextResponse.json(OperationOutcome);
   }
