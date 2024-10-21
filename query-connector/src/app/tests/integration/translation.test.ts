@@ -18,8 +18,8 @@ const EXPECTED_INTERNAL_VALUESET: InternalValueSet = {
 };
 
 describe("VSAC FHIR response to internal application type", () => {
-  it("translate to expected fixture", () => {
-    const translationResult = translateVSACToInternalValueSet(
+  it("translate to expected fixture", async () => {
+    const translationResult = await translateVSACToInternalValueSet(
       ExampleVsacValueSet as ValueSet,
       "ostc",
     );
