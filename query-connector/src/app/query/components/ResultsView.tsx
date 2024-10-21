@@ -1,16 +1,22 @@
-import { UseCaseQueryResponse } from "../../../query-service";
-import ResultsViewSideNav, { NavSection } from "./ResultsViewSideNav";
+import { UseCaseQueryResponse } from "../../query-service";
+import ResultsViewSideNav, {
+  NavSection,
+} from "./resultsView/ResultsViewSideNav";
 import React, { useEffect } from "react";
-import ResultsViewTable from "./ResultsViewTable";
+import ResultsViewTable from "./resultsView/ResultsViewTable";
 import styles from "./resultsView.module.scss";
-import ConditionsTable from "./tableComponents/ConditionsTable";
-import Demographics from "./tableComponents/Demographics";
-import DiagnosticReportTable from "./tableComponents/DiagnosticReportTable";
-import EncounterTable from "./tableComponents/EncounterTable";
-import MedicationRequestTable from "./tableComponents/MedicationRequestTable";
-import ObservationTable from "./tableComponents/ObservationTable";
-import Backlink from "../backLink/Backlink";
+import ConditionsTable from "./resultsView/tableComponents/ConditionsTable";
+import Demographics from "./resultsView/tableComponents/Demographics";
+import DiagnosticReportTable from "./resultsView/tableComponents/DiagnosticReportTable";
+import EncounterTable from "./resultsView/tableComponents/EncounterTable";
+import MedicationRequestTable from "./resultsView/tableComponents/MedicationRequestTable";
+import ObservationTable from "./resultsView/tableComponents/ObservationTable";
+import Backlink from "./backLink/Backlink";
 import { USE_CASES, demoQueryValToLabelMap } from "@/app/constants";
+import {
+  PAGE_TITLES,
+  RETURN_LABEL,
+} from "@/app/query/stepIndicator/StepIndicator";
 
 type ResultsViewProps = {
   useCaseQueryResponse: UseCaseQueryResponse;
@@ -58,10 +64,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({
   return (
     <>
       <div className={`${styles.resultsBannerContent}`}>
-        <Backlink
-          onClick={() => goBack()}
-          label={"Return to query selection"}
-        />
+        <Backlink onClick={() => goBack()} label={RETURN_LABEL["results"]} />
         <button
           className="usa-button usa-button--outline margin-left-auto"
           onClick={() => goToBeginning()}
@@ -69,7 +72,9 @@ const ResultsView: React.FC<ResultsViewProps> = ({
           New patient search
         </button>
       </div>
-      <h1 className="page-title margin-bottom-0-important">Patient Record</h1>
+      <h1 className="page-title margin-bottom-0-important">
+        {PAGE_TITLES["results"]}
+      </h1>
       <h2 className="page-explainer margin-bottom-3-important margin-top-0-important">
         <strong>Query: </strong>
         <span className="text-normal display-inline-block">

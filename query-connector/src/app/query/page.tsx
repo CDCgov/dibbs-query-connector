@@ -1,10 +1,10 @@
 "use client";
 import React, { useState } from "react";
 import { UseCaseQueryResponse } from "../query-service";
-import ResultsView from "./components/resultsView/ResultsView";
-import PatientSearchResults from "./components/patientSearchResults/PatientSearchResults";
-import SearchForm from "./components/searchForm/SearchForm";
-import SelectQuery from "./components/selectQuery/SelectQuery";
+import ResultsView from "./components/ResultsView";
+import PatientSearchResults from "./components/PatientSearchResults";
+import SearchForm from "./components/SearchForm";
+import SelectQuery from "./SelectQuery";
 import {
   DEFAULT_DEMO_FHIR_SERVER,
   FHIR_SERVERS,
@@ -15,6 +15,9 @@ import LoadingView from "./components/LoadingView";
 import { ToastContainer } from "react-toastify";
 
 import "react-toastify/dist/ReactToastify.min.css";
+import StepIndicator, {
+  CUSTOMIZE_QUERY_STEPS,
+} from "./stepIndicator/StepIndicator";
 import SiteAlert from "./designSystem/SiteAlert";
 import { Patient } from "fhir/r4";
 
@@ -41,7 +44,11 @@ const Query: React.FC = () => {
   return (
     <>
       <SiteAlert page={mode} />
-      <div>
+      {Object.keys(CUSTOMIZE_QUERY_STEPS).includes(mode) && (
+        <StepIndicator headingLevel="h4" curStep={mode} />
+      )}
+      <div className="main-container">
+        {/* Step 1 */}
         {mode === "search" && (
           <div className="main-container">
             <SearchForm
@@ -58,6 +65,7 @@ const Query: React.FC = () => {
           </div>
         )}
 
+        {/* Step 2 */}
         {mode === "patient-results" && (
           <div className="main-container__wide">
             <PatientSearchResults
@@ -69,6 +77,7 @@ const Query: React.FC = () => {
           </div>
         )}
 
+        {/* Step 3 */}
         {mode === "select-query" && (
           <div
             className={
@@ -92,6 +101,7 @@ const Query: React.FC = () => {
           </div>
         )}
 
+        {/* Step 4 */}
         {mode === "results" && (
           <div className="main-container__wide">
             {resultsQueryResponse && (

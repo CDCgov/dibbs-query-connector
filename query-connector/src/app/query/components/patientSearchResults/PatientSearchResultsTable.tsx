@@ -6,6 +6,7 @@ import {
   formatMRN,
   formatName,
 } from "@/app/format-service";
+import { PAGE_TITLES } from "@/app/query/stepIndicator/StepIndicator";
 
 type PatientSeacrchResultsTableProps = {
   patients: Patient[];
@@ -27,7 +28,7 @@ const PatientSearchResultsTable: React.FC<PatientSeacrchResultsTableProps> = ({
 }) => {
   return (
     <>
-      <h1 className="page-title">{STEP_TWO_PAGE_TITLE}</h1>
+      <h1 className="page-title">{PAGE_TITLES["patient-results"]}</h1>
       <p className="page-explainer">
         The following records match your search. Select a patient to continue.
       </p>
@@ -72,4 +73,3 @@ const PatientSearchResultsTable: React.FC<PatientSeacrchResultsTableProps> = ({
 };
 
 export default PatientSearchResultsTable;
-export const STEP_TWO_PAGE_TITLE = "Step 2: Select a patient";

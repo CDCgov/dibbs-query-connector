@@ -8,6 +8,10 @@ import { Select, Button } from "@trussworks/react-uswds";
 import Backlink from "../backLink/Backlink";
 import styles from "./selectQuery.module.scss";
 import { useState } from "react";
+import {
+  PAGE_TITLES,
+  RETURN_LABEL,
+} from "@/app/query/stepIndicator/StepIndicator";
 
 type SelectSavedQueryProps = {
   selectedQuery: string;
@@ -51,8 +55,9 @@ const SelectSavedQuery: React.FC<SelectSavedQueryProps> = ({
   return (
     <form>
       {/* Back button */}
-      <Backlink onClick={goBack} label={"Return to select a patient"} />
-      <h1 className="page-title">{STEP_THREE_PAGE_TITLE}</h1>
+
+      <Backlink onClick={goBack} label={RETURN_LABEL["select-query"]} />
+      <h1 className="page-title">{PAGE_TITLES["select-query"]}</h1>
       <h2 className="page-explainer">
         We will request all data related to your selected patient and query. By
         only showing relevant data for your query, we decrease the burden on our
@@ -70,6 +75,9 @@ const SelectSavedQuery: React.FC<SelectSavedQueryProps> = ({
           className={`${styles.queryDropDown}`}
           required
         >
+          <option value="" disabled>
+            Select query
+          </option>
           {demoQueryOptions.map((option) => (
             <option key={option.value} value={option.value}>
               {option.label}
@@ -134,4 +142,3 @@ const SelectSavedQuery: React.FC<SelectSavedQueryProps> = ({
 };
 
 export default SelectSavedQuery;
-export const STEP_THREE_PAGE_TITLE = "Step 3: Select a query";

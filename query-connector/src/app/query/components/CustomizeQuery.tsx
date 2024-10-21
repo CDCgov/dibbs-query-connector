@@ -7,17 +7,18 @@ import {
   ValueSetItem,
   USE_CASES,
   demoQueryValToLabelMap,
-} from "../../../constants";
+} from "../../constants";
 import { UseCaseQueryResponse } from "@/app/query-service";
-import LoadingView from "../LoadingView";
-import { showRedirectConfirmation } from "../../designSystem/redirectToast/RedirectToast";
-import styles from "./customizeQuery.module.css";
-import CustomizeQueryAccordionHeader from "./CustomizeQueryAccordionHeader";
-import CustomizeQueryAccordionBody from "./CustomizeQueryAccordionBody";
-import Accordion from "../../designSystem/Accordion";
-import CustomizeQueryNav from "./CustomizeQueryNav";
-import { mapValueSetItemsToValueSetTypes } from "./customizeQueryUtils";
-import Backlink from "../backLink/Backlink";
+import LoadingView from "./LoadingView";
+import { showRedirectConfirmation } from "../designSystem/redirectToast/RedirectToast";
+import styles from "./customizeQuery/customizeQuery.module.css";
+import CustomizeQueryAccordionHeader from "./customizeQuery/CustomizeQueryAccordionHeader";
+import CustomizeQueryAccordionBody from "./customizeQuery/CustomizeQueryAccordionBody";
+import Accordion from "../designSystem/Accordion";
+import CustomizeQueryNav from "./customizeQuery/CustomizeQueryNav";
+import { mapValueSetItemsToValueSetTypes } from "./customizeQuery/customizeQueryUtils";
+import Backlink from "./backLink/Backlink";
+import { RETURN_LABEL } from "../stepIndicator/StepIndicator";
 
 interface CustomizeQueryProps {
   useCaseQueryResponse: UseCaseQueryResponse;
@@ -158,8 +159,8 @@ const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
 
   return (
     <div>
-      <div className="margin-bottom-3">
-        <Backlink onClick={goBack} label="Return to Select query" />
+      <div className="padding-top-3">
+        <Backlink onClick={goBack} label={RETURN_LABEL["results"]} />
       </div>
       <LoadingView loading={!useCaseQueryResponse} />
       <h1 className="page-title margin-bottom-05-important">Customize query</h1>
@@ -216,6 +217,5 @@ const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
 };
 
 export default CustomizeQuery;
-
 export const QUERY_CUSTOMIZATION_CONFIRMATION_HEADER =
   "Query Customization Successful!";
