@@ -4,7 +4,7 @@ import {
   StepIndicatorStep,
   HeadingLevel,
 } from "@trussworks/react-uswds";
-import styles from "./stepIndicator.module.css";
+import styles from "./stepIndicator.module.scss";
 import classNames from "classnames";
 
 type StepIndicatorProps = {
