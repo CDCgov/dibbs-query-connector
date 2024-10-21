@@ -1,7 +1,14 @@
 "use server";
 import { Pool, PoolConfig, QueryResultRow } from "pg";
-import { Bundle, OperationOutcome } from "fhir/r4";
-import { ValueSetItem, valueSetTypeToClincalServiceTypeMap } from "./constants";
+import { Bundle, OperationOutcome, ValueSet } from "fhir/r4";
+import {
+  Concept,
+  ErsdConceptType,
+  InternalValueSet,
+  ValueSetItem,
+  ersdToDibbsConceptMap,
+  valueSetTypeToClincalServiceTypeMap,
+} from "./constants";
 import { encode } from "base-64";
 
 const getQuerybyNameSQL = `
@@ -162,4 +169,38 @@ export async function getVSACValueSet(
       ],
     } as OperationOutcome;
   }
+}
+
+export function translateVSACToInternalValueSet(
+  fhirValueset: ValueSet,
+  ersdConceptType: ErsdConceptType,
+) {
+  const id = fhirValueset.id;
+  // does this need any interpolation? ie example "version": "20230602",
+  // needs to be maped to v2 or v3?
+  const version = fhirValueset.version;
+
+  // would we prefer this over the less readable "name?"
+  // ie "name": "ChlamydiaTrachomatisInfectionOrganismOrSubstanceInLabResults",
+  // "title": "Chlamydia trachomatis Infection (Organism or Substance in Lab Results)",
+  const name = fhirValueset.title;
+  const author = fhirValueset.publisher;
+
+  const bundleConceptData = fhirValueset?.compose?.include[0];
+  const system = bundleConceptData?.system;
+  const concepts = bundleConceptData?.concept?.map((fhirConcept) => {
+    return { ...fhirConcept, include: false } as Concept;
+  });
+
+  return {
+    valueset_id: id,
+    valueset_version: version,
+    valueset_name: name,
+    author: author,
+    system: system,
+    ersdConceptType: ersdConceptType,
+    dibbsConceptType: ersdToDibbsConceptMap[ersdConceptType],
+    includeValueSet: false,
+    concepts: concepts,
+  } as InternalValueSet;
 }

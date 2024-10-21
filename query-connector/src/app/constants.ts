@@ -324,6 +324,26 @@ export const valueSetTypeToClincalServiceTypeMap = {
 };
 /// TODO: Remove the above once ticket #2789 is resolved
 
+type DibbsConceptType = "labs" | "medications" | "conditions";
+export type ErsdConceptType =
+  | "ostc"
+  | "lotc"
+  | "lrtc"
+  | "mrtc"
+  | "dxtc"
+  | "sdtc";
+
+export const ersdToDibbsConceptMap: {
+  [k in ErsdConceptType]: DibbsConceptType;
+} = {
+  ostc: "labs",
+  lotc: "labs",
+  lrtc: "labs",
+  mrtc: "medications",
+  dxtc: "conditions",
+  sdtc: "conditions",
+};
+
 /*
  * The expected type of a ValueSet concept.
  */
@@ -336,17 +356,17 @@ export interface Concept {
 /*
  * The expected type of a ValueSet.
  */
-// export interface ValueSet {
-//   valueset_id: string;
-//   valueset_version: string;
-//   valueset_name: string;
-//   author: string;
-//   system: string;
-//   ersdConceptType?: string;
-//   dibbsConceptType: string;
-//   includeValueSet: boolean;
-//   concepts: Concept[];
-// }
+export interface InternalValueSet {
+  valueset_id: string;
+  valueset_version: string;
+  valueset_name: string;
+  author: string;
+  system: string;
+  ersdConceptType?: string;
+  dibbsConceptType: string;
+  includeValueSet: boolean;
+  concepts: Concept[];
+}
 
 /*
  * The expected type of ValueSets grouped by dibbsConceptType for the purpose of display.
