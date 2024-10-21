@@ -17,37 +17,23 @@
   border-top: 8px solid #edeff0;
 }
 
-h1 {
-  margin-bottom: 0.25rem;
-}
-
-h2 {
-  font-size: 40px;
-}
-
-h3 {
-  font-size: 22px;
-  margin-top: 0;
-  margin-bottom: 20px;
-}
-
-h4 {
-  font-size: 16px;
-  margin: 0;
-}
-
 .maxw7 {
   max-width: 70%;
 }
 
 .page-title {
-  font-size: 32px;
-  color: white;
-  background-color: #162e51;
-  padding-top: 28px;
-  padding-bottom: 28px;
-  padding-left: 32px;
-  margin-top: 0px;
+  margin: $margin-within-group 0rem;
+  font-weight: 700;
+  font-size: 2.66rem;
+}
+
+.page-explainer {
+  margin: $margin-within-group 0rem $margin-between-group 0rem;
+  font-family: family("sans");
+  font-size: 1.375rem;
+  font-style: normal;
+  font-weight: 300;
+  line-height: 150%;
 }
 
 .data-title {
@@ -204,7 +190,6 @@ body {
   display: grid;
   grid-template-columns: 1fr; // Defines a single column
   justify-content: center; // Centers the column in the container
-  row-gap: 0.1em; // Adjusts the gap between rows/items
   background-color: rgba(247, 249, 250, 1);
 }
 
@@ -252,7 +237,7 @@ body {
 }
 
 .header-footer-content {
-  max-width: 98rem !important;
+  max-width: 100% !important;
 }
 
 .usa-logo {
@@ -342,16 +327,11 @@ html {
   background-color: white;
 }
 
-.margin-top-1 {
-  margin-top: 0.5rem;
-  width: 360px;
-}
-
 .custom-alert {
   color: #2e6276;
   width: 100%;
   box-sizing: border-box;
-  padding-left: 0;
+  padding-left: 1rem;
 }
 
 .custom-alert .usa-alert__text {
@@ -448,44 +428,86 @@ hr.custom-hr {
 }
 
 .Toastify__toast-container {
-  width: calc($tefca-viewer-max-width * 0.4) !important;
+  width: calc($query-connector-wide-max-width * 0.4) !important;
+  padding-top: 0 !important;
 }
 
 .custom-query-step-indicator .usa-step-indicator__header {
   display: none !important;
- }
+}
+
+.usa-step-indicator__segment:before {
+  box-shadow:
+    0 0 0 0.25rem #919191,
+    0 0 0 0 white !important;
+}
+
+.usa-step-indicator__segment--current:before,
+.usa-step-indicator__segment--complete:before {
+  box-shadow:
+    inset 0 0 0 0 #919191,
+    0 0 0 0.25rem white !important;
+}
+
 .customize-accordion .usa-accordion__button[aria-expanded="true"],
 .customize-accordion .usa-accordion__button[aria-expanded="false"] {
   background-size: 16px 10px;
   background-position: top 24px right 20px;
 }
 
-  .customize-accordion .usa-accordion__button[aria-expanded="true"] {
-    background-image: url("./assets/expandUp.svg");
-  }
+.customize-accordion .usa-accordion__button[aria-expanded="true"] {
+  background-image: url("./assets/expandUp.svg");
+}
 
-  .customize-accordion .usa-accordion__button[aria-expanded="false"] {
-    background-image: url("./assets/expandDown.svg");
-  }
+.customize-accordion .usa-accordion__button[aria-expanded="false"] {
+  background-image: url("./assets/expandDown.svg");
+}
 
-  .customize-accordion .usa-accordion__content {
-    padding: 0rem;
-  }
+.customize-accordion .usa-accordion__content {
+  padding: 0rem;
+}
 
-  .no-margin-top-important {
-    margin-top: 0 !important;
-  }
+.resultsViewSideNav .usa-sidenav,
+.resultsViewSideNav .usa-sidenav__item {
+  border: none !important;
+}
 
-  .resultsViewSideNav .usa-sidenav,
-  .resultsViewSideNav .usa-sidenav__item {
-    border: none !important;
-  }
+.tableRowWithHover:hover td {
+  background-color: $background-hover-color;
+}
 
-  .tableRowWithHover:hover td {
-    background-color: $background-hover-color;
-  }
+.tableRowWithHover_clickable,
+.tableRowWithHover_clickable td {
+  cursor: pointer;
+}
 
-  .tableRowWithHover_clickable,
-  .tableRowWithHover_clickable td {
-    cursor: pointer;
-  }
+// Overrides - numbers correspond to the USWDS spacing classes
+// https://designsystem.digital.gov/utilities/margin-and-padding/
+.margin-top-0-important {
+  margin-top: 0 !important;
+}
+
+.margin-bottom-0-important {
+  margin-bottom: 0 !important;
+}
+
+.margin-x-0-important {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+.margin-bottom-05-important {
+  margin-bottom: 0.25rem !important;
+}
+
+.margin-bottom-3-important {
+  margin-bottom: 1.5rem !important;
+}
+
+.margin-left-1-important {
+  margin-left: 0.5rem !important;
+}
+
+.padding-0-important {
+  padding: 0 !important;
+}

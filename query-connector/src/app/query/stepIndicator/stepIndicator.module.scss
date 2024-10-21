@@ -1,0 +1,11 @@
+@use "../../../styles/_variables" as *;
+
+.container > ol {
+  justify-content: space-between;
+  background-color: rgba(247, 249, 250, 1);
+  padding: 0;
+}
+
+.container {
+  margin-bottom: $margin-between-group;
+}

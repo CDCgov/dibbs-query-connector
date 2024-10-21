@@ -31,7 +31,7 @@ const Demographics: React.FC<DemographicsProps> = ({ patient }) => {
   const demographicData = formatDemographics(patient);
 
   return (
-    <div>
+    <div className="margin-top-0-important">
       {demographicData.map((item) => (
         <DataDisplay item={item} key={item.title} />
       ))}

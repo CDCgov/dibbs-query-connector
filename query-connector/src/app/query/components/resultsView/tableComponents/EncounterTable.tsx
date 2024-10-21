@@ -2,6 +2,7 @@ import React from "react";
 import Table from "@/app/query/designSystem/Table";
 import { Encounter } from "fhir/r4";
 import { formatCodeableConcept, formatDate } from "../../../../format-service";
+import { checkIfSomeElementWithPropertyExists } from "./utils";
 
 /**
  * The props for the EncounterTable component.
@@ -19,13 +20,22 @@ export interface EncounterTableProps {
 const EncounterTable: React.FC<EncounterTableProps> = ({
   encounters: encounters,
 }) => {
+  const anyClinicType =
+    checkIfSomeElementWithPropertyExists(encounters, "class") ||
+    checkIfSomeElementWithPropertyExists(encounters, "serviceType");
+
+  const anyServiceType = checkIfSomeElementWithPropertyExists(
+    encounters,
+    "serviceProvider",
+  );
+  encounters.forEach((e) => console.log(e?.class));
   return (
-    <Table>
+    <Table className="margin-top-0-important">
       <thead>
         <tr>
           <th>Visit Reason</th>
-          <th>Clinic Type</th>
-          <th>Service Provider</th>
+          {anyClinicType && <th>Clinic Type</th>}
+          {anyServiceType && <th>Service Provider</th>}
           <th>Encounter Status</th>
           <th>Encounter Start</th>
           <th>Encounter End</th>
@@ -35,13 +45,15 @@ const EncounterTable: React.FC<EncounterTableProps> = ({
         {encounters.map((encounter) => (
           <tr key={encounter.id}>
             <td>{formatCodeableConcept(encounter?.reasonCode?.[0])} </td>
-            <td>
-              {formatCodeableConcept(encounter?.class)} <br></br>
-              {encounter?.serviceType
-                ? formatCodeableConcept(encounter.serviceType)
-                : ""}
-            </td>
-            <td>{encounter?.serviceProvider?.display}</td>
+            {anyClinicType && (
+              <td>
+                {formatCodeableConcept(encounter?.class)} <br></br>
+                {encounter?.serviceType
+                  ? formatCodeableConcept(encounter.serviceType)
+                  : ""}
+              </td>
+            )}
+            {anyServiceType && <td>{encounter?.serviceProvider?.display}</td>}
             <td>{encounter?.status}</td>
             <td>{formatDate(encounter?.period?.start)}</td>
             <td>{formatDate(encounter?.period?.end)}</td>

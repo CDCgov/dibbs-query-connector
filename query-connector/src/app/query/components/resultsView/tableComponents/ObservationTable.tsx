@@ -2,6 +2,7 @@ import React from "react";
 import Table from "@/app/query/designSystem/Table";
 import { Observation } from "fhir/r4";
 import { formatCodeableConcept, formatDate } from "../../../../format-service";
+import { checkIfSomeElementWithPropertyExists } from "./utils";
 /**
  * The props for the ObservationTable component.
  */
@@ -18,15 +19,23 @@ export interface ObservationTableProps {
 const ObservationTable: React.FC<ObservationTableProps> = ({
   observations,
 }) => {
+  const anyObsInterpretation = checkIfSomeElementWithPropertyExists(
+    observations,
+    "interpretation",
+  );
+  const anyReferenceRange = checkIfSomeElementWithPropertyExists(
+    observations,
+    "referenceRange",
+  );
   return (
-    <Table>
+    <Table className="margin-top-0-important">
       <thead>
         <tr>
           <th>Date</th>
           <th>Type</th>
-          <th>Interpretation</th>
+          {anyObsInterpretation && <th>Interpretation</th>}
           <th>Value</th>
-          <th>Reference Range</th>
+          {anyReferenceRange && <th>Reference Range</th>}
         </tr>
       </thead>
       <tbody>
@@ -34,13 +43,15 @@ const ObservationTable: React.FC<ObservationTableProps> = ({
           <tr key={obs.id}>
             <td>{formatDate(obs?.issued || obs?.effectiveDateTime)}</td>
             <td>{formatCodeableConcept(obs.code)}</td>
-            <td>
-              {obs?.interpretation && obs.interpretation.length > 0
-                ? formatCodeableConcept(obs.interpretation[0])
-                : ""}
-            </td>
+            {anyObsInterpretation && (
+              <td>
+                {obs?.interpretation && obs.interpretation.length > 0
+                  ? formatCodeableConcept(obs.interpretation[0])
+                  : ""}
+              </td>
+            )}
             <td>{formatValue(obs)}</td>
-            <td>{formatReferenceRange(obs)}</td>
+            {anyReferenceRange && <td>{formatReferenceRange(obs)}</td>}
           </tr>
         ))}
       </tbody>

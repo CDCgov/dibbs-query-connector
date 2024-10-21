@@ -4,11 +4,13 @@ import {
   StepIndicatorStep,
   HeadingLevel,
 } from "@trussworks/react-uswds";
-import styles from "./stepIndicator.module.css";
+import styles from "./stepIndicator.module.scss";
+import classNames from "classnames";
 
 type StepIndicatorProps = {
   headingLevel: HeadingLevel;
   curStep: Mode;
+  className?: string;
 };
 type StepStatus = "current" | "complete" | "incomplete";
 
@@ -41,11 +43,13 @@ export const RETURN_LABEL: { [mode in Mode]: string } = {
  * @param root0 - The props for the StepIndicator component.
  * @param root0.headingLevel - The heading level for the step indicator.
  * @param root0.curStep - The current step in the query process.
+ * @param root0.className - Custom styles for the container
  * @returns The step indicator component showing the current progress.
  */
 const StepIndicator: React.FC<StepIndicatorProps> = ({
   headingLevel,
   curStep,
+  className,
 }) => {
   const stepArray = Object.keys(CUSTOMIZE_QUERY_STEPS).map((key, index) => {
     return { [key]: index };
@@ -56,7 +60,11 @@ const StepIndicator: React.FC<StepIndicatorProps> = ({
     <TrussStepIndicator
       headingLevel={headingLevel}
       counters="default"
-      className={`custom-query-step-indicator ${styles.container}`}
+      className={classNames(
+        "custom-query-step-indicator",
+        styles.container,
+        className,
+      )}
     >
       {Object.values(CUSTOMIZE_QUERY_STEPS).map((label, index) => {
         let status = "incomplete";
