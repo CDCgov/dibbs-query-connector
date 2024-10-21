@@ -23,7 +23,7 @@ const ObservationTable: React.FC<ObservationTableProps> = ({
     observations,
     "interpretation",
   );
-  const anyRefrenceRange = checkIfSomeElementWithPropertyExists(
+  const anyReferenceRange = checkIfSomeElementWithPropertyExists(
     observations,
     "referenceRange",
   );
@@ -35,7 +35,7 @@ const ObservationTable: React.FC<ObservationTableProps> = ({
           <th>Type</th>
           {anyObsInterpretation && <th>Interpretation</th>}
           <th>Value</th>
-          {anyRefrenceRange && <th>Reference Range</th>}
+          {anyReferenceRange && <th>Reference Range</th>}
         </tr>
       </thead>
       <tbody>
@@ -51,7 +51,7 @@ const ObservationTable: React.FC<ObservationTableProps> = ({
               </td>
             )}
             <td>{formatValue(obs)}</td>
-            {anyRefrenceRange && <td>{formatReferenceRange(obs)}</td>}
+            {anyReferenceRange && <td>{formatReferenceRange(obs)}</td>}
           </tr>
         ))}
       </tbody>

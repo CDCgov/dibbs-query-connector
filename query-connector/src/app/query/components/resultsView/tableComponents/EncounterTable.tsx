@@ -20,7 +20,7 @@ export interface EncounterTableProps {
 const EncounterTable: React.FC<EncounterTableProps> = ({
   encounters: encounters,
 }) => {
-  const anyClincType =
+  const anyClinicType =
     checkIfSomeElementWithPropertyExists(encounters, "class") ||
     checkIfSomeElementWithPropertyExists(encounters, "serviceType");
 
@@ -34,7 +34,7 @@ const EncounterTable: React.FC<EncounterTableProps> = ({
       <thead>
         <tr>
           <th>Visit Reason</th>
-          {anyClincType && <th>Clinic Type</th>}
+          {anyClinicType && <th>Clinic Type</th>}
           {anyServiceType && <th>Service Provider</th>}
           <th>Encounter Status</th>
           <th>Encounter Start</th>
@@ -45,7 +45,7 @@ const EncounterTable: React.FC<EncounterTableProps> = ({
         {encounters.map((encounter) => (
           <tr key={encounter.id}>
             <td>{formatCodeableConcept(encounter?.reasonCode?.[0])} </td>
-            {anyClincType && (
+            {anyClinicType && (
               <td>
                 {formatCodeableConcept(encounter?.class)} <br></br>
                 {encounter?.serviceType
