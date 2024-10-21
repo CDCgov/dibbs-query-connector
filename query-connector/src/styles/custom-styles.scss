@@ -451,38 +451,41 @@ hr.custom-hr {
   width: calc($tefca-viewer-max-width * 0.4) !important;
 }
 
+.custom-query-step-indicator .usa-step-indicator__header {
+  display: none !important;
+ }
 .customize-accordion .usa-accordion__button[aria-expanded="true"],
 .customize-accordion .usa-accordion__button[aria-expanded="false"] {
   background-size: 16px 10px;
   background-position: top 24px right 20px;
 }
 
-.customize-accordion .usa-accordion__button[aria-expanded="true"] {
-  background-image: url("./assets/expandUp.svg");
-}
+  .customize-accordion .usa-accordion__button[aria-expanded="true"] {
+    background-image: url("./assets/expandUp.svg");
+  }
 
-.customize-accordion .usa-accordion__button[aria-expanded="false"] {
-  background-image: url("./assets/expandDown.svg");
-}
+  .customize-accordion .usa-accordion__button[aria-expanded="false"] {
+    background-image: url("./assets/expandDown.svg");
+  }
 
-.customize-accordion .usa-accordion__content {
-  padding: 0rem;
-}
+  .customize-accordion .usa-accordion__content {
+    padding: 0rem;
+  }
 
-.no-margin-top-important {
-  margin-top: 0 !important;
-}
+  .no-margin-top-important {
+    margin-top: 0 !important;
+  }
 
-.resultsViewSideNav .usa-sidenav,
-.resultsViewSideNav .usa-sidenav__item {
-  border: none !important;
-}
+  .resultsViewSideNav .usa-sidenav,
+  .resultsViewSideNav .usa-sidenav__item {
+    border: none !important;
+  }
 
-.tableRowWithHover:hover td {
-  background-color: $background-hover-color;
-}
+  .tableRowWithHover:hover td {
+    background-color: $background-hover-color;
+  }
 
-.tableRowWithHover_clickable,
-.tableRowWithHover_clickable td {
-  cursor: pointer;
-}
+  .tableRowWithHover_clickable,
+  .tableRowWithHover_clickable td {
+    cursor: pointer;
+  }
