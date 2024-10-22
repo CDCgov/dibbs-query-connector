@@ -2,8 +2,8 @@ type Lengthwise = {
   length: number;
 };
 
-function isLengthwise(thing: unknown): thing is Lengthwise {
-  return typeof thing === "object" && thing !== null && "length" in thing;
+function isLengthwise(thing: any): thing is Lengthwise {
+  return thing?.length !== undefined;
 }
 
 /**
