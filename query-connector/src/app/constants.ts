@@ -7,7 +7,6 @@ import {
   Medication,
   MedicationAdministration,
   MedicationRequest,
-  DomainResource,
 } from "fhir/r4";
 /**
  * The use cases that can be used in the app
@@ -371,7 +370,6 @@ export interface ValueSetDisplay {
 // Define the type guard for FHIR resources
 // Define the FHIR Resource types
 export type FhirResource =
-  | DomainResource
   | Patient
   | Observation
   | DiagnosticReport

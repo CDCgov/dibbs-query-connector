@@ -21,13 +21,10 @@ export type QueryResponse = {
   [R in FhirResource as R["resourceType"]]?: R[];
 };
 
-// workaround to make Typescript happy
-type FilteredQueryResponse = {
-  [K in keyof QueryResponse as QueryResponse[K] extends
-    | DomainResource[]
-    | undefined
-    ? never
-    : K]: QueryResponse[K];
+// workaround types to get around a typescript compilation issue
+type SuperSetFhirResource = DomainResource | FhirResource;
+type SuperSetQueryResponse = {
+  [R in SuperSetFhirResource as R["resourceType"]]?: R[];
 };
 
 export type APIQueryResponse = Bundle;
@@ -229,9 +226,9 @@ async function generalizedQuery(
  */
 export async function parseFhirSearch(
   response: fetch.Response | Array<fetch.Response>,
-  queryResponse: QueryResponse = {},
+  queryResponse: SuperSetQueryResponse = {},
 ): Promise<QueryResponse> {
-  let resourceArray: FhirResource[] = [];
+  let resourceArray: SuperSetFhirResource[] = [];
 
   // Process the responses and flatten them
   if (Array.isArray(response)) {
@@ -286,7 +283,7 @@ export async function processFhirResponse(
  * @returns - The FHIR Bundle of queried data.
  */
 export async function createBundle(
-  queryResponse: FilteredQueryResponse,
+  queryResponse: QueryResponse,
 ): Promise<APIQueryResponse> {
   const bundle: Bundle = {
     resourceType: "Bundle",
