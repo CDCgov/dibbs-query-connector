@@ -14,22 +14,20 @@ import { CustomQuery } from "./CustomQuery";
 import { GetPhoneQueryFormats } from "./format-service";
 import { formatValueSetItemsAsQuerySpec } from "./format-service";
 
-type SuperSetQueryResponse = {
-  [R in FhirResource as R["resourceType"]]?: R[];
-};
-
 /**
  * The query response when the request source is from the Viewer UI.
  */
-
-// Had a TypeScript compilation issue that requires us to do some extra filtering
-// below.
 export type QueryResponse = {
-  [K in keyof SuperSetQueryResponse as SuperSetQueryResponse[K] extends
+  [R in FhirResource as R["resourceType"]]?: R[];
+};
+
+// workaround to make Typescript happy
+type FilteredQueryResponse = {
+  [K in keyof QueryResponse as QueryResponse[K] extends
     | DomainResource[]
     | undefined
     ? never
-    : K]: SuperSetQueryResponse[K];
+    : K]: QueryResponse[K];
 };
 
 export type APIQueryResponse = Bundle;
@@ -73,8 +71,8 @@ export type UseCaseQueryResponse = Awaited<ReturnType<typeof UseCaseQuery>>;
 async function queryEncounters(
   patientId: string,
   fhirClient: FHIRClient,
-  queryResponse: SuperSetQueryResponse,
-): Promise<SuperSetQueryResponse> {
+  queryResponse: QueryResponse,
+): Promise<QueryResponse> {
   if (queryResponse.Condition && queryResponse.Condition.length > 0) {
     const conditionId = queryResponse.Condition[0].id;
     const encounterQuery = `/Encounter?subject=${patientId}&reason-reference=${conditionId}`;
@@ -95,7 +93,7 @@ async function queryEncounters(
 async function patientQuery(
   request: UseCaseQueryRequest,
   fhirClient: FHIRClient,
-  queryResponse: SuperSetQueryResponse,
+  queryResponse: QueryResponse,
 ): Promise<void> {
   // Query for patient
   let query = "/Patient?";
@@ -152,8 +150,8 @@ async function patientQuery(
 export async function UseCaseQuery(
   request: UseCaseQueryRequest,
   queryValueSets: ValueSetItem[],
-  queryResponse: SuperSetQueryResponse = {},
-): Promise<SuperSetQueryResponse> {
+  queryResponse: QueryResponse = {},
+): Promise<QueryResponse> {
   const fhirClient = new FHIRClient(request.fhir_server);
 
   if (!queryResponse.Patient || queryResponse.Patient.length === 0) {
@@ -195,8 +193,8 @@ async function generalizedQuery(
   queryValueSets: ValueSetItem[],
   patientId: string,
   fhirClient: FHIRClient,
-  queryResponse: SuperSetQueryResponse,
-): Promise<SuperSetQueryResponse> {
+  queryResponse: QueryResponse,
+): Promise<QueryResponse> {
   const querySpec = await formatValueSetItemsAsQuerySpec(
     useCase,
     queryValueSets,
@@ -231,8 +229,8 @@ async function generalizedQuery(
  */
 export async function parseFhirSearch(
   response: fetch.Response | Array<fetch.Response>,
-  queryResponse: SuperSetQueryResponse = {},
-): Promise<SuperSetQueryResponse> {
+  queryResponse: QueryResponse = {},
+): Promise<QueryResponse> {
   let resourceArray: FhirResource[] = [];
 
   // Process the responses and flatten them
@@ -288,7 +286,7 @@ export async function processFhirResponse(
  * @returns - The FHIR Bundle of queried data.
  */
 export async function createBundle(
-  queryResponse: QueryResponse,
+  queryResponse: FilteredQueryResponse,
 ): Promise<APIQueryResponse> {
   const bundle: Bundle = {
     resourceType: "Bundle",
