@@ -1,16 +1,6 @@
 "use server";
 import fetch from "node-fetch";
-import {
-  Patient,
-  Observation,
-  DiagnosticReport,
-  Condition,
-  Encounter,
-  Medication,
-  MedicationAdministration,
-  MedicationRequest,
-  Bundle,
-} from "fhir/r4";
+import { Bundle, DomainResource } from "fhir/r4";
 
 import FHIRClient from "./fhir-servers";
 import {
@@ -18,23 +8,28 @@ import {
   FHIR_SERVERS,
   ValueSetItem,
   isFhirResource,
+  FhirResource,
 } from "./constants";
 import { CustomQuery } from "./CustomQuery";
 import { GetPhoneQueryFormats } from "./format-service";
 import { formatValueSetItemsAsQuerySpec } from "./format-service";
 
+type SuperSetQueryResponse = {
+  [R in FhirResource as R["resourceType"]]?: R[];
+};
+
 /**
  * The query response when the request source is from the Viewer UI.
  */
+
+// Had a TypeScript compilation issue that requires us to do some extra filtering
+// below.
 export type QueryResponse = {
-  Patient?: Patient[];
-  Observation?: Observation[];
-  DiagnosticReport?: DiagnosticReport[];
-  Condition?: Condition[];
-  Encounter?: Encounter[];
-  Medication?: Medication[];
-  MedicationAdministration?: MedicationAdministration[];
-  MedicationRequest?: MedicationRequest[];
+  [K in keyof SuperSetQueryResponse as SuperSetQueryResponse[K] extends
+    | DomainResource[]
+    | undefined
+    ? never
+    : K]: SuperSetQueryResponse[K];
 };
 
 export type APIQueryResponse = Bundle;
@@ -78,8 +73,8 @@ export type UseCaseQueryResponse = Awaited<ReturnType<typeof UseCaseQuery>>;
 async function queryEncounters(
   patientId: string,
   fhirClient: FHIRClient,
-  queryResponse: QueryResponse,
-): Promise<QueryResponse> {
+  queryResponse: SuperSetQueryResponse,
+): Promise<SuperSetQueryResponse> {
   if (queryResponse.Condition && queryResponse.Condition.length > 0) {
     const conditionId = queryResponse.Condition[0].id;
     const encounterQuery = `/Encounter?subject=${patientId}&reason-reference=${conditionId}`;
@@ -100,7 +95,7 @@ async function queryEncounters(
 async function patientQuery(
   request: UseCaseQueryRequest,
   fhirClient: FHIRClient,
-  queryResponse: QueryResponse,
+  queryResponse: SuperSetQueryResponse,
 ): Promise<void> {
   // Query for patient
   let query = "/Patient?";
@@ -157,8 +152,8 @@ async function patientQuery(
 export async function UseCaseQuery(
   request: UseCaseQueryRequest,
   queryValueSets: ValueSetItem[],
-  queryResponse: QueryResponse = {},
-): Promise<QueryResponse> {
+  queryResponse: SuperSetQueryResponse = {},
+): Promise<SuperSetQueryResponse> {
   const fhirClient = new FHIRClient(request.fhir_server);
 
   if (!queryResponse.Patient || queryResponse.Patient.length === 0) {
@@ -200,8 +195,8 @@ async function generalizedQuery(
   queryValueSets: ValueSetItem[],
   patientId: string,
   fhirClient: FHIRClient,
-  queryResponse: QueryResponse,
-): Promise<QueryResponse> {
+  queryResponse: SuperSetQueryResponse,
+): Promise<SuperSetQueryResponse> {
   const querySpec = await formatValueSetItemsAsQuerySpec(
     useCase,
     queryValueSets,
@@ -236,56 +231,26 @@ async function generalizedQuery(
  */
 export async function parseFhirSearch(
   response: fetch.Response | Array<fetch.Response>,
-  queryResponse: QueryResponse = {},
-): Promise<QueryResponse> {
-  let resourceArray: unknown[] = [];
+  queryResponse: SuperSetQueryResponse = {},
+): Promise<SuperSetQueryResponse> {
+  let resourceArray: FhirResource[] = [];
 
   // Process the responses and flatten them
   if (Array.isArray(response)) {
-    resourceArray = (await Promise.all(response.map(processResponse))).flat();
+    resourceArray = (
+      await Promise.all(response.map(processFhirResponse))
+    ).flat();
   } else {
-    resourceArray = await processResponse(response);
+    resourceArray = await processFhirResponse(response);
   }
 
   // Add resources to queryResponse
   for (const resource of resourceArray) {
-    if (isFhirResource(resource)) {
-      switch (resource.resourceType) {
-        case "Patient":
-          queryResponse.Patient = queryResponse.Patient ?? [];
-          queryResponse.Patient.push(resource);
-          break;
-        case "Observation":
-          queryResponse.Observation = queryResponse.Observation ?? [];
-          queryResponse.Observation.push(resource);
-          break;
-        case "DiagnosticReport":
-          queryResponse.DiagnosticReport = queryResponse.DiagnosticReport ?? [];
-          queryResponse.DiagnosticReport.push(resource);
-          break;
-        case "Condition":
-          queryResponse.Condition = queryResponse.Condition ?? [];
-          queryResponse.Condition.push(resource);
-          break;
-        case "Encounter":
-          queryResponse.Encounter = queryResponse.Encounter ?? [];
-          queryResponse.Encounter.push(resource);
-          break;
-        case "Medication":
-          queryResponse.Medication = queryResponse.Medication ?? [];
-          queryResponse.Medication.push(resource);
-          break;
-        case "MedicationAdministration":
-          queryResponse.MedicationAdministration =
-            queryResponse.MedicationAdministration ?? [];
-          queryResponse.MedicationAdministration.push(resource);
-          break;
-        case "MedicationRequest":
-          queryResponse.MedicationRequest =
-            queryResponse.MedicationRequest ?? [];
-          queryResponse.MedicationRequest.push(resource);
-          break;
-      }
+    const resourceType = resource.resourceType;
+    if (!(resourceType in queryResponse)) {
+      queryResponse[resourceType] = [resource];
+    } else {
+      queryResponse[resourceType]!.push(resource);
     }
   }
   return queryResponse;
@@ -297,14 +262,19 @@ export async function parseFhirSearch(
  * @param response - The response from the FHIR server.
  * @returns - The array of resources from the response.
  */
-export async function processResponse(
+export async function processFhirResponse(
   response: fetch.Response,
-): Promise<unknown[]> {
-  let resourceArray: unknown[] = [];
+): Promise<FhirResource[]> {
+  let resourceArray: FhirResource[] = [];
   if (response.status === 200) {
     const body = await response.json();
     if (body.entry) {
       for (const entry of body.entry) {
+        if (!isFhirResource(entry.resource)) {
+          console.error(
+            "Entry in FHIR resource response parsing was of unexpected shape",
+          );
+        }
         resourceArray.push(entry.resource);
       }
     }
