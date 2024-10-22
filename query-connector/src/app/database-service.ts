@@ -1,8 +1,14 @@
 "use server";
 import { Pool, PoolConfig, QueryResultRow } from "pg";
-import { Bundle, OperationOutcome } from "fhir/r4";
+import { Bundle, OperationOutcome, ValueSet as FhirValueSet } from "fhir/r4";
+import {
+  Concept,
+  DEFAULT_ERSD_VERSION,
+  ErsdConceptType,
+  ValueSet,
+  ersdToDibbsConceptMap,
+} from "./constants";
 import { encode } from "base-64";
-import { ValueSet } from "./constants";
 
 const getQuerybyNameSQL = `
 select q.query_name, q.id, qtv.valueset_id, vs.name as valueset_name, vs.version, vs.author as author, vs.type, vs.dibbs_concept_type as dibbs_concept_type, qic.concept_id, qic.include, c.code, c.code_system, c.display 
@@ -165,4 +171,39 @@ export async function getVSACValueSet(
       ],
     } as OperationOutcome;
   }
+}
+
+/**
+ * Translates a VSAC FHIR bundle to our internal ValueSet struct
+ * @param fhirValueset - The FHIR ValueSet response from VSAC
+ * @param ersdConceptType - The associated clinical concept type from ERSD
+ * @returns An object of type InternalValueSet
+ */
+export async function translateVSACToInternalValueSet(
+  fhirValueset: FhirValueSet,
+  ersdConceptType: ErsdConceptType,
+) {
+  const id = fhirValueset.id;
+  const version = DEFAULT_ERSD_VERSION;
+
+  const name = fhirValueset.title;
+  const author = fhirValueset.publisher;
+
+  const bundleConceptData = fhirValueset?.compose?.include[0];
+  const system = bundleConceptData?.system;
+  const concepts = bundleConceptData?.concept?.map((fhirConcept) => {
+    return { ...fhirConcept, include: false } as Concept;
+  });
+
+  return {
+    valueSetId: id,
+    valueSetVersion: version,
+    valueSetName: name,
+    author: author,
+    system: system,
+    ersdConceptType: ersdConceptType,
+    dibbsConceptType: ersdToDibbsConceptMap[ersdConceptType],
+    includeValueSet: false,
+    concepts: concepts,
+  } as ValueSet;
 }
