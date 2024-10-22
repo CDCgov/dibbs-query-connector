@@ -326,6 +326,28 @@ export interface ValueSet {
   concepts: Concept[];
 }
 
+export const DEFAULT_ERSD_VERSION = "3";
+
+type DibbsConceptType = "labs" | "medications" | "conditions";
+export type ErsdConceptType =
+  | "ostc"
+  | "lotc"
+  | "lrtc"
+  | "mrtc"
+  | "dxtc"
+  | "sdtc";
+
+export const ersdToDibbsConceptMap: {
+  [k in ErsdConceptType]: DibbsConceptType;
+} = {
+  ostc: "labs",
+  lotc: "labs",
+  lrtc: "labs",
+  mrtc: "medications",
+  dxtc: "conditions",
+  sdtc: "conditions",
+};
+
 /*
  * The expected type of ValueSets grouped by dibbsConceptType for the purpose of display.
  */
