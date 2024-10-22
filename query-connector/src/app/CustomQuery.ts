@@ -1,3 +1,11 @@
+interface CustomQuerySpec {
+  labCodes?: string[];
+  snomedCodes?: string[];
+  rxnormCodes?: string[];
+  classTypeCodes?: string[];
+  hasSecondEncounterQuery?: boolean;
+}
+
 /**
  * A Data Class designed to store and manipulate various code values used
  * to create a fully customized FHIR query. The class holds instance variables
@@ -35,7 +43,7 @@ export class CustomQuery {
    * @param jsonSpec A JSON Object containing four code fields to load.
    * @param patientId The ID of the patient to build into query strings.
    */
-  constructor(jsonSpec: any, patientId: string) {
+  constructor(jsonSpec: CustomQuerySpec, patientId: string) {
     try {
       this.labCodes = jsonSpec?.labCodes || [];
       this.snomedCodes = jsonSpec?.snomedCodes || [];

@@ -43,8 +43,8 @@ export const DataDisplay: React.FC<{
 };
 
 interface DataContextValue {
-  data: any; // You can define a specific data type here
-  setData: (data: any) => void;
+  data: unknown; // You can define a specific data type here
+  setData: (data: unknown) => void;
 }
 
 const DataContext = createContext<DataContextValue | undefined>(undefined);
@@ -56,7 +56,7 @@ const DataContext = createContext<DataContextValue | undefined>(undefined);
  * @returns - The data provider component.
  */
 export function DataProvider({ children }: { children: ReactNode }) {
-  const [data, setData] = useState<any | null>(null);
+  const [data, setData] = useState<unknown | null>(null);
 
   return (
     <DataContext.Provider value={{ data, setData }}>
