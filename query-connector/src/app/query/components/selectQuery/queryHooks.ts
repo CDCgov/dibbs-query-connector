@@ -82,14 +82,21 @@ export async function fetchQueryResponse(p: {
       use_case: p.selectedQuery,
     };
 
+    // Need to also filter down by concepts to only display desired info
+    const filteredValueSets = p.queryValueSets
+      .filter((item) => item.includeValueSet)
+      .map((fvs) => {
+        const conceptFilteredVS: ValueSet = {
+          ...fvs,
+          concepts: fvs.concepts.filter((c) => c.include),
+        };
+        return conceptFilteredVS;
+      });
+
     p.setIsLoading(true);
-    const queryResponse = await UseCaseQuery(
-      newRequest,
-      p.queryValueSets.filter((item) => item.includeValueSet),
-      {
-        Patient: [p.patientForQuery],
-      },
-    );
+    const queryResponse = await UseCaseQuery(newRequest, filteredValueSets, {
+      Patient: [p.patientForQuery],
+    });
     p.queryResponseStateCallback(queryResponse);
     p.setIsLoading(false);
   }
