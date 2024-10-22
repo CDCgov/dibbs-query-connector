@@ -13,10 +13,10 @@ import {
 } from "fhir/r4";
 
 import FHIRClient from "./fhir-servers";
-import { USE_CASES, FHIR_SERVERS, ValueSetItem } from "./constants";
+import { USE_CASES, FHIR_SERVERS, ValueSet } from "./constants";
 import { CustomQuery } from "./CustomQuery";
 import { GetPhoneQueryFormats } from "./format-service";
-import { formatValueSetItemsAsQuerySpec } from "./format-service";
+import { formatValueSetsAsQuerySpec } from "./format-service";
 
 /**
  * The query response when the request source is from the Viewer UI.
@@ -151,7 +151,7 @@ async function patientQuery(
  */
 export async function UseCaseQuery(
   request: UseCaseQueryRequest,
-  queryValueSets: ValueSetItem[],
+  queryValueSets: ValueSet[],
   queryResponse: QueryResponse = {},
 ): Promise<QueryResponse> {
   const fhirClient = new FHIRClient(request.fhir_server);
@@ -192,15 +192,12 @@ export async function UseCaseQuery(
  */
 async function generalizedQuery(
   useCase: USE_CASES,
-  queryValueSets: ValueSetItem[],
+  queryValueSets: ValueSet[],
   patientId: string,
   fhirClient: FHIRClient,
   queryResponse: QueryResponse,
 ): Promise<QueryResponse> {
-  const querySpec = await formatValueSetItemsAsQuerySpec(
-    useCase,
-    queryValueSets,
-  );
+  const querySpec = await formatValueSetsAsQuerySpec(useCase, queryValueSets);
   const builtQuery = new CustomQuery(querySpec, patientId);
   let response: fetch.Response | fetch.Response[];
 

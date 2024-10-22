@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { FHIR_SERVERS, USE_CASES, ValueSetItem } from "../constants";
+import { FHIR_SERVERS, USE_CASES, ValueSet } from "../constants";
 import CustomizeQuery from "./components/CustomizeQuery";
 import SelectSavedQuery from "./components/selectQuery/SelectSavedQuery";
 
@@ -57,8 +57,8 @@ const SelectQuery: React.FC<SelectQueryProps> = ({
   setFhirServer,
   setShowCustomizeQuery,
 }) => {
-  const [queryValueSets, setQueryValueSets] = useState<ValueSetItem[]>(
-    [] as ValueSetItem[],
+  const [queryValueSets, setQueryValueSets] = useState<ValueSet[]>(
+    [] as ValueSet[],
   );
   const [loadingQueryValueSets, setLoadingQueryValueSets] =
     useState<boolean>(false);
@@ -97,6 +97,7 @@ const SelectQuery: React.FC<SelectQueryProps> = ({
   }
 
   const displayLoading = loadingResultResponse || loadingQueryValueSets;
+
   return (
     <div>
       {displayLoading && <LoadingView loading={loadingResultResponse} />}
