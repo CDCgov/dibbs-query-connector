@@ -22,8 +22,15 @@ const CustomizeQueryAccordionHeader: React.FC<CustomizeQueryAccordionProps> = ({
   groupIndex,
   group,
 }) => {
-  const selectedTotal = group.items.length;
-  const selectedCount = group.items.filter((item) => item.include).length;
+  const selectedTotal = group.items.reduce((sum, vs) => {
+    sum += vs.concepts.length;
+    return sum;
+  }, 0);
+  const selectedCount = group.items.reduce((sum, vs) => {
+    const includedConcepts = vs.concepts.filter((c) => c.include);
+    sum += includedConcepts.length;
+    return sum;
+  }, 0);
 
   return (
     <div
@@ -34,13 +41,10 @@ const CustomizeQueryAccordionHeader: React.FC<CustomizeQueryAccordionProps> = ({
         className={`hide-checkbox-label ${styles.customizeQueryCheckbox}`}
         onClick={(e) => {
           e.stopPropagation();
-          handleSelectAllChange(
-            groupIndex,
-            selectedCount !== group.items.length,
-          );
+          handleSelectAllChange(groupIndex, selectedCount !== selectedTotal);
         }}
       >
-        {selectedCount === group.items.length && (
+        {selectedCount === selectedTotal && (
           <Icon.Check
             className="usa-icon bg-base-lightest"
             size={4}
@@ -48,7 +52,7 @@ const CustomizeQueryAccordionHeader: React.FC<CustomizeQueryAccordionProps> = ({
             aria-label="Checkmark icon indicating addition"
           />
         )}
-        {selectedCount > 0 && selectedCount < group.items.length && (
+        {selectedCount > 0 && selectedCount < selectedTotal && (
           <Icon.Remove
             className="usa-icon bg-base-lightest"
             size={4}
