@@ -316,6 +316,8 @@ export interface ValueSet {
   concepts: Concept[];
 }
 
+export const DEFAULT_ERSD_VERSION = "3";
+
 type DibbsConceptType = "labs" | "medications" | "conditions";
 export type ErsdConceptType =
   | "ostc"

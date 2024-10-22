@@ -3,6 +3,7 @@ import { Pool, PoolConfig, QueryResultRow } from "pg";
 import { Bundle, OperationOutcome, ValueSet as FhirValueSet } from "fhir/r4";
 import {
   Concept,
+  DEFAULT_ERSD_VERSION,
   ErsdConceptType,
   ValueSet,
   ersdToDibbsConceptMap,
@@ -183,13 +184,8 @@ export async function translateVSACToInternalValueSet(
   ersdConceptType: ErsdConceptType,
 ) {
   const id = fhirValueset.id;
-  // does this need any interpolation?
-  // ie example "version": "20230602" needs to be maped to v2 or v3?
-  const version = fhirValueset.version;
+  const version = DEFAULT_ERSD_VERSION;
 
-  // would we prefer this over the less readable "name?"
-  // ie "name": "ChlamydiaTrachomatisInfectionOrganismOrSubstanceInLabResults",
-  // "title": "Chlamydia trachomatis Infection (Organism or Substance in Lab Results)",
   const name = fhirValueset.title;
   const author = fhirValueset.publisher;
 
