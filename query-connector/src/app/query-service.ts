@@ -239,7 +239,7 @@ export async function parseFhirSearch(
     resourceArray = await processFhirResponse(response);
   }
 
-  // Add resources to queryResponse
+  // Add resources to SupersetqueryResponse
   for (const resource of resourceArray) {
     const resourceType = resource.resourceType;
     if (!(resourceType in queryResponse)) {
