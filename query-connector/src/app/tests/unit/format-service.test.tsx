@@ -36,16 +36,16 @@ describe("formatDate", () => {
   });
 
   it("should return N/A if provided date is undefined", () => {
-    const inputDate = undefined;
+    const inputDate: string | undefined = undefined;
 
-    const result = formatDate(inputDate as any);
+    const result = formatDate(inputDate);
     expect(result).toBeUndefined();
   });
 
   it("should return N/A if provided date is null", () => {
-    const inputDate = null;
+    const inputDate: string | null = null;
 
-    const result = formatDate(inputDate as any);
+    const result = formatDate(inputDate);
     expect(result).toBeUndefined();
   });
 });
