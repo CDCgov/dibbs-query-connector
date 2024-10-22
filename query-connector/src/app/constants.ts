@@ -371,6 +371,10 @@ export interface ValueSetDisplay {
 // Define the type guard for FHIR resources
 // Define the FHIR Resource types
 export type FhirResource =
+  // We have to include the generic DomainResponse here to get around some
+  // Typescript linting issues. In the exported QueryResponse type, we filter this
+  // out so that the extra inclusion is only a point of concern within the
+  // query service
   | DomainResource
   | Patient
   | Observation

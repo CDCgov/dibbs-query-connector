@@ -14,23 +14,23 @@ import { CustomQuery } from "./CustomQuery";
 import { GetPhoneQueryFormats } from "./format-service";
 import { formatValueSetItemsAsQuerySpec } from "./format-service";
 
+// workaround to make Typescript happy
+type SupersetQueryResponse = {
+  [R in FhirResource as R["resourceType"]]?: R[];
+};
+
 /**
  * The query response when the request source is from the Viewer UI.
  */
 export type QueryResponse = {
-  [R in FhirResource as R["resourceType"]]?: R[];
-};
-
-// workaround to make Typescript happy
-type FilteredQueryResponse = {
-  [K in keyof QueryResponse as QueryResponse[K] extends
+  [K in keyof SupersetQueryResponse as SupersetQueryResponse[K] extends
     | DomainResource[]
     | undefined
     ? never
-    : K]: QueryResponse[K];
+    : K]: SupersetQueryResponse[K];
 };
 
-export type APIQueryResponse = Bundle;
+export type APISupersetQueryResponse = Bundle;
 
 export type UseCaseQueryRequest = {
   use_case: USE_CASES;
@@ -65,35 +65,41 @@ export type UseCaseQueryResponse = Awaited<ReturnType<typeof UseCaseQuery>>;
  * that remaining subset, after other queries have already returned.
  * @param patientId The ID of the patient being queried for.
  * @param fhirClient The FHIR client to use for the queries.
- * @param queryResponse The data structure to store the accumulated results.
+ * @param SupersetqueryResponse The data structure to store the accumulated results.
  * @returns The updated query response with encounter information.
  */
 async function queryEncounters(
   patientId: string,
   fhirClient: FHIRClient,
-  queryResponse: QueryResponse,
-): Promise<QueryResponse> {
-  if (queryResponse.Condition && queryResponse.Condition.length > 0) {
-    const conditionId = queryResponse.Condition[0].id;
+  SupersetqueryResponse: SupersetQueryResponse,
+): Promise<SupersetQueryResponse> {
+  if (
+    SupersetqueryResponse.Condition &&
+    SupersetqueryResponse.Condition.length > 0
+  ) {
+    const conditionId = SupersetqueryResponse.Condition[0].id;
     const encounterQuery = `/Encounter?subject=${patientId}&reason-reference=${conditionId}`;
     const encounterResponse = await fhirClient.get(encounterQuery);
-    queryResponse = await parseFhirSearch(encounterResponse, queryResponse);
+    SupersetqueryResponse = await parseFhirSearch(
+      encounterResponse,
+      SupersetqueryResponse,
+    );
   }
-  return queryResponse;
+  return SupersetqueryResponse;
 }
 
 /**
  * Query a FHIR server for a patient based on demographics provided in the request. If
- * a patient is found, store in the queryResponse object.
+ * a patient is found, store in the SupersetqueryResponse object.
  * @param request - The request object containing the patient demographics.
  * @param fhirClient - The client to query the FHIR server.
- * @param queryResponse - The response object to store the patient.
+ * @param SupersetqueryResponse - The response object to store the patient.
  * @returns - The response body from the FHIR server.
  */
 async function patientQuery(
   request: UseCaseQueryRequest,
   fhirClient: FHIRClient,
-  queryResponse: QueryResponse,
+  SupersetqueryResponse: SupersetQueryResponse,
 ): Promise<void> {
   // Query for patient
   let query = "/Patient?";
@@ -136,43 +142,52 @@ async function patientQuery(
       } \n Headers: ${JSON.stringify(response.headers.raw())}`,
     );
   }
-  queryResponse = await parseFhirSearch(response, queryResponse);
+  SupersetqueryResponse = await parseFhirSearch(
+    response,
+    SupersetqueryResponse,
+  );
 }
 
 /**
  * Query a FHIR API for a public health use case based on patient demographics provided
- * in the request. If data is found, return in a queryResponse object.
+ * in the request. If data is found, return in a SupersetqueryResponse object.
  * @param request - UseCaseQueryRequest object containing the patient demographics and use case.
  * @param queryValueSets - The value sets to be included in query filtering.
- * @param queryResponse - The response object to store the query results.
+ * @param SupersetqueryResponse - The response object to store the query results.
  * @returns - The response object containing the query results.
  */
 export async function UseCaseQuery(
   request: UseCaseQueryRequest,
   queryValueSets: ValueSetItem[],
-  queryResponse: QueryResponse = {},
-): Promise<QueryResponse> {
+  SupersetqueryResponse: SupersetQueryResponse = {},
+): Promise<SupersetQueryResponse> {
   const fhirClient = new FHIRClient(request.fhir_server);
 
-  if (!queryResponse.Patient || queryResponse.Patient.length === 0) {
-    await patientQuery(request, fhirClient, queryResponse);
+  if (
+    !SupersetqueryResponse.Patient ||
+    SupersetqueryResponse.Patient.length === 0
+  ) {
+    await patientQuery(request, fhirClient, SupersetqueryResponse);
   }
 
-  if (!queryResponse.Patient || queryResponse.Patient.length !== 1) {
-    return queryResponse;
+  if (
+    !SupersetqueryResponse.Patient ||
+    SupersetqueryResponse.Patient.length !== 1
+  ) {
+    return SupersetqueryResponse;
   }
 
-  const patientId = queryResponse.Patient[0].id ?? "";
+  const patientId = SupersetqueryResponse.Patient[0].id ?? "";
 
   await generalizedQuery(
     request.use_case,
     queryValueSets,
     patientId,
     fhirClient,
-    queryResponse,
+    SupersetqueryResponse,
   );
 
-  return queryResponse;
+  return SupersetqueryResponse;
 }
 
 /**
@@ -185,7 +200,7 @@ export async function UseCaseQuery(
  * data.
  * @param patientId The ID of the patient for whom to search.
  * @param fhirClient The client used to communicate with the FHIR server.
- * @param queryResponse The response object for the query results.
+ * @param SupersetqueryResponse The response object for the query results.
  * @returns A promise for an updated query response.
  */
 async function generalizedQuery(
@@ -193,8 +208,8 @@ async function generalizedQuery(
   queryValueSets: ValueSetItem[],
   patientId: string,
   fhirClient: FHIRClient,
-  queryResponse: QueryResponse,
-): Promise<QueryResponse> {
+  SupersetqueryResponse: SupersetQueryResponse,
+): Promise<SupersetQueryResponse> {
   const querySpec = await formatValueSetItemsAsQuerySpec(
     useCase,
     queryValueSets,
@@ -211,12 +226,19 @@ async function generalizedQuery(
     const queryRequests: string[] = builtQuery.getAllQueries();
     response = await fhirClient.getBatch(queryRequests);
   }
-  queryResponse = await parseFhirSearch(response, queryResponse);
+  SupersetqueryResponse = await parseFhirSearch(
+    response,
+    SupersetqueryResponse,
+  );
   if (!querySpec.hasSecondEncounterQuery) {
-    return queryResponse;
+    return SupersetqueryResponse;
   } else {
-    queryResponse = await queryEncounters(patientId, fhirClient, queryResponse);
-    return queryResponse;
+    SupersetqueryResponse = await queryEncounters(
+      patientId,
+      fhirClient,
+      SupersetqueryResponse,
+    );
+    return SupersetqueryResponse;
   }
 }
 
@@ -224,13 +246,13 @@ async function generalizedQuery(
  * Parse the response from a FHIR search query. If the response is successful and
  * contains data, return an array of parsed resources.
  * @param response - The response from the FHIR server.
- * @param queryResponse - The response object to store the results.
+ * @param SupersetqueryResponse - The response object to store the results.
  * @returns - The parsed response.
  */
 export async function parseFhirSearch(
   response: fetch.Response | Array<fetch.Response>,
-  queryResponse: QueryResponse = {},
-): Promise<QueryResponse> {
+  SupersetqueryResponse: SupersetQueryResponse = {},
+): Promise<SupersetQueryResponse> {
   let resourceArray: FhirResource[] = [];
 
   // Process the responses and flatten them
@@ -242,16 +264,16 @@ export async function parseFhirSearch(
     resourceArray = await processFhirResponse(response);
   }
 
-  // Add resources to queryResponse
+  // Add resources to SupersetqueryResponse
   for (const resource of resourceArray) {
     const resourceType = resource.resourceType;
-    if (!(resourceType in queryResponse)) {
-      queryResponse[resourceType] = [resource];
+    if (!(resourceType in SupersetqueryResponse)) {
+      SupersetqueryResponse[resourceType] = [resource];
     } else {
-      queryResponse[resourceType]!.push(resource);
+      SupersetqueryResponse[resourceType]!.push(resource);
     }
   }
-  return queryResponse;
+  return SupersetqueryResponse;
 }
 
 /**
@@ -282,12 +304,12 @@ export async function processFhirResponse(
 
 /**
  * Create a FHIR Bundle from the query response.
- * @param queryResponse - The response object to store the results.
+ * @param SupersetqueryResponse - The response object to store the results.
  * @returns - The FHIR Bundle of queried data.
  */
 export async function createBundle(
-  queryResponse: FilteredQueryResponse,
-): Promise<APIQueryResponse> {
+  SupersetqueryResponse: QueryResponse,
+): Promise<APISupersetQueryResponse> {
   const bundle: Bundle = {
     resourceType: "Bundle",
     type: "searchset",
@@ -295,7 +317,7 @@ export async function createBundle(
     entry: [],
   };
 
-  Object.entries(queryResponse).forEach(([_, resources]) => {
+  Object.entries(SupersetqueryResponse).forEach(([_, resources]) => {
     if (Array.isArray(resources)) {
       resources.forEach((resource) => {
         bundle.entry?.push({ resource });
