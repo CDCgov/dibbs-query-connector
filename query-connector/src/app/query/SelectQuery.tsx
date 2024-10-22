@@ -1,16 +1,16 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { FHIR_SERVERS, USE_CASES, ValueSetItem } from "../../constants";
-import CustomizeQuery from "./CustomizeQuery";
-import SelectSavedQuery from "./selectQuery/SelectSavedQuery";
+import { FHIR_SERVERS, USE_CASES, ValueSetItem } from "../constants";
+import CustomizeQuery from "./components/CustomizeQuery";
+import SelectSavedQuery from "./components/selectQuery/SelectSavedQuery";
 
 import { QueryResponse } from "@/app/query-service";
 import { Patient } from "fhir/r4";
 import {
   fetchQueryResponse,
   fetchUseCaseValueSets,
-} from "./selectQuery/queryHooks";
-import LoadingView from "./LoadingView";
+} from "./components/selectQuery/queryHooks";
+import LoadingView from "./components/LoadingView";
 
 interface SelectQueryProps {
   goForward: () => void;
@@ -23,6 +23,8 @@ interface SelectQueryProps {
   fhirServer: FHIR_SERVERS;
   setFhirServer: React.Dispatch<React.SetStateAction<FHIR_SERVERS>>;
   setLoading: (isLoading: boolean) => void;
+  showCustomizeQuery: boolean;
+  setShowCustomizeQuery: (showCustomizeQuery: boolean) => void;
 }
 
 /**
@@ -30,11 +32,14 @@ interface SelectQueryProps {
  * @param root0.goBack - Callback to return to previous page
  * @param root0.goForward - Callback to go to the next page
  * @param root0.selectedQuery - query we chose for further customization
+ * @param root0.showCustomizeQuery - toggle to navigate to show customize query
  * @param root0.setSelectedQuery - callback function to update the selected query
  * @param root0.patientForQuery - patient to apply a particular query for
  * @param root0.resultsQueryResponse - Response of selected query
  * @param root0.setResultsQueryResponse - Callback function to update selected
  * query
+ * @param root0.setShowCustomizeQuery - state function to update location of
+ * show customize query
  * @param root0.fhirServer - the FHIR server that we're running the query against
  * @param root0.setFhirServer - callback function to update the FHIR server
  * @returns - The selectQuery component.
@@ -44,13 +49,14 @@ const SelectQuery: React.FC<SelectQueryProps> = ({
   patientForQuery,
   resultsQueryResponse,
   fhirServer,
+  showCustomizeQuery,
   goForward,
   goBack,
   setSelectedQuery,
   setResultsQueryResponse,
   setFhirServer,
+  setShowCustomizeQuery,
 }) => {
-  const [showCustomizeQuery, setShowCustomizedQuery] = useState(false);
   const [queryValueSets, setQueryValueSets] = useState<ValueSetItem[]>(
     [] as ValueSetItem[],
   );
@@ -92,7 +98,7 @@ const SelectQuery: React.FC<SelectQueryProps> = ({
 
   const displayLoading = loadingResultResponse || loadingQueryValueSets;
   return (
-    <>
+    <div>
       {displayLoading && <LoadingView loading={loadingResultResponse} />}
 
       {showCustomizeQuery ? (
@@ -101,7 +107,7 @@ const SelectQuery: React.FC<SelectQueryProps> = ({
           queryType={selectedQuery}
           queryValuesets={queryValueSets}
           setQueryValuesets={setQueryValueSets}
-          goBack={() => setShowCustomizedQuery(false)}
+          goBack={() => setShowCustomizeQuery(false)}
         ></CustomizeQuery>
       ) : (
         <SelectSavedQuery
@@ -110,12 +116,12 @@ const SelectQuery: React.FC<SelectQueryProps> = ({
           loadingQueryValueSets={loadingQueryValueSets}
           goBack={goBack}
           setSelectedQuery={setSelectedQuery}
-          setShowCustomizedQuery={setShowCustomizedQuery}
+          setShowCustomizedQuery={setShowCustomizeQuery}
           handleSubmit={onSubmit}
           setFhirServer={setFhirServer}
         ></SelectSavedQuery>
       )}
-    </>
+    </div>
   );
 };
 

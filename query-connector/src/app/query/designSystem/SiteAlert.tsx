@@ -7,7 +7,7 @@ export const CONTACT_US_DISCLAIMER_TEXT =
 export const CONTACT_US_DISCLAIMER_EMAIL = "dibbs@cdc.gov";
 
 const contactUsDisclaimer = (
-  <Alert type="info" headingLevel="h4" slim className="custom-alert">
+  <>
     {CONTACT_US_DISCLAIMER_TEXT}{" "}
     <a
       href="mailto:dibbs@cdc.gov"
@@ -19,14 +19,13 @@ const contactUsDisclaimer = (
     >
       {CONTACT_US_DISCLAIMER_EMAIL}
     </a>
-  </Alert>
+  </>
 );
-
 const piiDisclaimer = (
-  <Alert type="info" headingLevel="h4" slim className="custom-alert">
+  <>
     This site is for demo purposes only. Please do not enter PII on this
     website.
-  </Alert>
+  </>
 );
 
 type SiteAlertProps = {
@@ -35,6 +34,7 @@ type SiteAlertProps = {
 
 const PageModeToSiteAlertMap: { [page in Mode]?: React.ReactNode } = {
   search: piiDisclaimer,
+  "patient-results": piiDisclaimer,
   "select-query": piiDisclaimer,
   results: contactUsDisclaimer,
 };
@@ -47,7 +47,11 @@ const PageModeToSiteAlertMap: { [page in Mode]?: React.ReactNode } = {
  * semantic context
  */
 const SiteAlert: React.FC<SiteAlertProps> = ({ page }) => {
-  return <>{PageModeToSiteAlertMap[page]}</>;
+  return (
+    <Alert type="info" headingLevel="h4" slim className="custom-alert">
+      {PageModeToSiteAlertMap[page]}{" "}
+    </Alert>
+  );
 };
 
 export default SiteAlert;

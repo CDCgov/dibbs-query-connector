@@ -4,6 +4,7 @@ type Lengthwise = {
 
 function isLengthwise(thing: unknown): thing is Lengthwise {
   return typeof thing === "object" && thing !== null && "length" in thing;
+
 }
 
 /**
