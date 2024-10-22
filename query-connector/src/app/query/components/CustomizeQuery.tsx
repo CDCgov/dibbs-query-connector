@@ -3,9 +3,9 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "@trussworks/react-uswds";
 import {
-  ValueSetType,
-  ValueSetItem,
+  DibbsValueSetType,
   USE_CASES,
+  ValueSet,
   demoQueryValToLabelMap,
 } from "../../constants";
 import { UseCaseQueryResponse } from "@/app/query-service";
@@ -16,15 +16,15 @@ import CustomizeQueryAccordionHeader from "./customizeQuery/CustomizeQueryAccord
 import CustomizeQueryAccordionBody from "./customizeQuery/CustomizeQueryAccordionBody";
 import Accordion from "../designSystem/Accordion";
 import CustomizeQueryNav from "./customizeQuery/CustomizeQueryNav";
-import { mapValueSetItemsToValueSetTypes } from "./customizeQuery/customizeQueryUtils";
+import { mapValueSetsToValueSetTypes } from "./customizeQuery/customizeQueryUtils";
 import Backlink from "./backLink/Backlink";
 import { RETURN_LABEL } from "../stepIndicator/StepIndicator";
 
 interface CustomizeQueryProps {
   useCaseQueryResponse: UseCaseQueryResponse;
   queryType: USE_CASES;
-  queryValuesets: ValueSetItem[];
-  setQueryValuesets: (queryVS: ValueSetItem[]) => void;
+  queryValuesets: ValueSet[];
+  setQueryValuesets: (queryVS: ValueSet[]) => void;
   goBack: () => void;
 }
 
@@ -45,9 +45,9 @@ const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
   setQueryValuesets,
   goBack,
 }) => {
-  const [activeTab, setActiveTab] = useState<ValueSetType>("labs");
+  const [activeTab, setActiveTab] = useState<DibbsValueSetType>("labs");
   const { labs, conditions, medications } =
-    mapValueSetItemsToValueSetTypes(queryValuesets);
+    mapValueSetsToValueSetTypes(queryValuesets);
   const [valueSetOptions, setValueSetOptions] = useState({
     labs: labs,
     conditions: conditions,
@@ -55,33 +55,64 @@ const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
   });
 
   // Compute counts of each tab-type
-  const countLabs = Object.values(valueSetOptions.labs).flatMap(
-    (group) => group.items,
-  ).length;
-  const countConditions = Object.values(valueSetOptions.conditions).flatMap(
-    (group) => group.items,
-  ).length;
-  const countMedications = Object.values(valueSetOptions.medications).flatMap(
-    (group) => group.items,
-  ).length;
+  const countLabs = Object.values(valueSetOptions.labs).reduce(
+    (runningSum, gvs) => {
+      gvs.items.forEach((vs) => {
+        runningSum += vs.concepts.length;
+      });
+      return runningSum;
+    },
+    0,
+  );
+  const countConditions = Object.values(valueSetOptions.conditions).reduce(
+    (runningSum, gvs) => {
+      gvs.items.forEach((vs) => {
+        runningSum += vs.concepts.length;
+      });
+      return runningSum;
+    },
+    0,
+  );
+  const countMedications = Object.values(valueSetOptions.medications).reduce(
+    (runningSum, gvs) => {
+      gvs.items.forEach((vs) => {
+        runningSum += vs.concepts.length;
+      });
+      return runningSum;
+    },
+    0,
+  );
 
   // Keeps track of which side nav tab to display to users
-  const handleTabChange = (tab: ValueSetType) => {
+  const handleTabChange = (tab: DibbsValueSetType) => {
     setActiveTab(tab);
   };
 
-  // Handles the toggle of the 'include' state for individual items
-  const toggleInclude = (groupIndex: string, itemIndex: number) => {
+  // Handles the toggle of the 'include' state for individual concepts in
+  // the accordion
+  const toggleInclude = (
+    groupIndex: string,
+    valueSetIndex: number,
+    conceptIndex: number,
+  ) => {
     const updatedGroups = valueSetOptions[activeTab];
-    const updatedItems = [...updatedGroups[groupIndex].items]; // Clone the current group items
-    updatedItems[itemIndex] = {
-      ...updatedItems[itemIndex],
-      include: !updatedItems[itemIndex].include, // Toggle the include state
+    const updatedValueSets = [...updatedGroups[groupIndex].items]; // Clone the current group items
+    const updatedConceptsInIndexedValueSet = [
+      ...updatedValueSets[valueSetIndex].concepts,
+    ];
+    updatedConceptsInIndexedValueSet[conceptIndex] = {
+      ...updatedConceptsInIndexedValueSet[conceptIndex],
+      include: !updatedConceptsInIndexedValueSet[conceptIndex].include, // Toggle the include for the clicked concept
+    };
+
+    updatedValueSets[valueSetIndex] = {
+      ...updatedValueSets[valueSetIndex],
+      concepts: updatedConceptsInIndexedValueSet, // Update the concepts in the accessed value set
     };
 
     updatedGroups[groupIndex] = {
       ...updatedGroups[groupIndex],
-      items: updatedItems, // Update the group's items
+      items: updatedValueSets, // Update the whole group's items
     };
 
     setValueSetOptions((prevState) => ({
@@ -98,7 +129,10 @@ const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
     updatedGroups[groupIndex].items = updatedGroups[groupIndex].items.map(
       (item) => ({
         ...item,
-        include: checked, // Set all items in this group to checked or unchecked
+        includeValueSet: checked, // Set all items in this group to checked or unchecked
+        concepts: item.concepts.map((ic) => {
+          return { ...ic, include: checked };
+        }),
       }),
     );
 
@@ -115,7 +149,10 @@ const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
         ...group,
         items: group.items.map((item) => ({
           ...item,
-          include: checked, // Set all items in this group to checked or unchecked
+          includeValueSet: checked, // Set all items in this group to checked or unchecked
+          concepts: item.concepts.map((ic) => {
+            return { ...ic, include: checked };
+          }),
         })),
       }),
     );
@@ -130,10 +167,10 @@ const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
   // by the entire query branch of the app
   const handleApplyChanges = () => {
     const selectedItems = Object.keys(valueSetOptions).reduce((acc, key) => {
-      const items = valueSetOptions[key as ValueSetType];
+      const items = valueSetOptions[key as DibbsValueSetType];
       acc = acc.concat(Object.values(items).flatMap((dict) => dict.items));
       return acc;
-    }, [] as ValueSetItem[]);
+    }, [] as ValueSet[]);
     setQueryValuesets(selectedItems);
     goBack();
     showRedirectConfirmation({
@@ -147,7 +184,7 @@ const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
     const items = Object.values(valueSetOptions[activeTab]).flatMap(
       (group) => group.items,
     );
-    const selectedCount = items.filter((item) => item.include).length;
+    const selectedCount = items.filter((item) => item.includeValueSet).length;
     const topCheckbox = document.getElementById(
       "select-all",
     ) as HTMLInputElement;

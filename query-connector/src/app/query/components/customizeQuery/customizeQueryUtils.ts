@@ -1,14 +1,10 @@
-import {
-  ValueSetItem,
-  ValueSetType,
-  valueSetTypeToClincalServiceTypeMap,
-} from "@/app/constants";
+import { DibbsValueSetType, ValueSet } from "@/app/constants";
 
 export type GroupedValueSet = {
   valueSetName: string;
   author: string;
   system: string;
-  items: ValueSetItem[];
+  items: ValueSet[];
 };
 
 /**
@@ -21,7 +17,7 @@ export type GroupedValueSet = {
  * of valueSetName:author:system and the values are all the value set items that
  * share those identifiers in common, structed as a GroupedValueSet
  */
-function groupValueSetsByNameAuthorSystem(valueSetsToGroup: ValueSetItem[]) {
+function groupValueSetsByNameAuthorSystem(valueSetsToGroup: ValueSet[]) {
   const results = valueSetsToGroup.reduce(
     (acc, row) => {
       // Check if both author and code_system are defined
@@ -30,7 +26,7 @@ function groupValueSetsByNameAuthorSystem(valueSetsToGroup: ValueSetItem[]) {
       const valueSetName = row?.valueSetName;
       if (!author || !system || !valueSetName) {
         console.warn(
-          `Skipping malformed row: Missing author (${author}) or system (${system}) for code (${row?.code})`,
+          `Skipping malformed row: Missing author (${author}) or system (${system}) for ValueSet (${row?.valueSetId})`,
         );
         return acc;
       }
@@ -45,13 +41,17 @@ function groupValueSetsByNameAuthorSystem(valueSetsToGroup: ValueSetItem[]) {
         };
       }
       acc[groupKey].items.push({
-        code: row["code"],
-        display: row["display"],
-        system: row["system"],
-        include: row["include"],
-        author: row["author"],
-        valueSetName: row["valueSetName"],
-        clinicalServiceType: row["clinicalServiceType"],
+        valueSetId: row.valueSetId,
+        valueSetVersion: row.valueSetVersion,
+        valueSetName: row.valueSetName,
+        author: row.author,
+        system: row.system,
+        ersdConceptType: row.ersdConceptType,
+        dibbsConceptType: row.dibbsConceptType,
+        includeValueSet: row.includeValueSet,
+        concepts: row.concepts.map((c) => {
+          return { ...c };
+        }),
       });
       return acc;
     },
@@ -62,7 +62,7 @@ function groupValueSetsByNameAuthorSystem(valueSetsToGroup: ValueSetItem[]) {
 }
 
 export type TypeIndexedGroupedValueSetDictionary = {
-  [valueSetType in ValueSetType]: {
+  [valueSetType in DibbsValueSetType]: {
     [vsNameAuthorSystem: string]: GroupedValueSet;
   };
 };
@@ -74,17 +74,18 @@ export type TypeIndexedGroupedValueSetDictionary = {
  * object, with index of labs, conditions, medications that we display on the
  * customize query page, where each dictionary is a separate accordion grouping
  * of ValueSetItems that users can select to filter their custom queries with
- * @param  vsItemArray - an array of ValueSetItems to group
+ * @param  vsArray - an array of ValueSets to group
  * @returns A dictionary of
  * dictionaries, where the first index is the ValueSetType, which indexes a
  * dictionary of GroupedValueSets. The subdictionary is indexed by
  * valueSetName:author:system
  */
-export function mapValueSetItemsToValueSetTypes(vsItemArray: ValueSetItem[]) {
-  const valueSetsByNameAuthorSystem =
-    groupValueSetsByNameAuthorSystem(vsItemArray);
+export function mapValueSetsToValueSetTypes(vsArray: ValueSet[]) {
+  const valueSetsByNameAuthorSystem = groupValueSetsByNameAuthorSystem(vsArray);
   const results: {
-    [vsType in ValueSetType]: { [vsNameAuthorSystem: string]: GroupedValueSet };
+    [vsType in DibbsValueSetType]: {
+      [vsNameAuthorSystem: string]: GroupedValueSet;
+    };
   } = {
     labs: {},
     conditions: {},
@@ -102,7 +103,7 @@ export function mapValueSetItemsToValueSetTypes(vsItemArray: ValueSetItem[]) {
         // GroupedValueSets (ie the groupings on the other tabs) that we don't
         // want to display, so we should filter those out.
         if (items.length > 0) {
-          results[valueSetTypeKey as ValueSetType][nameAuthorSystem] = {
+          results[valueSetTypeKey as DibbsValueSetType][nameAuthorSystem] = {
             ...groupedValueSet,
             items: items,
           };
@@ -115,26 +116,22 @@ export function mapValueSetItemsToValueSetTypes(vsItemArray: ValueSetItem[]) {
 }
 
 /**
- * Helper function to map an array of value set items into their lab, medication,
+ * Helper function to map an array of value sets into their lab, medication,
  * condition buckets to be displayed on the customize query page
- * @param vsItems A list of value sets mapped from DB rows.
+ * @param valueSets - A list of value sets mapped from DB rows.
  * @returns Dict of list of rows containing only the predicate service type
  * mapped to one of "labs", "medications", or "conditions".
  */
-export const mapValueSetsToValueSetType = (vsItems: ValueSetItem[]) => {
-  const results: { [vsType in ValueSetType]: ValueSetItem[] } = {
+export const mapValueSetsToValueSetType = (valueSets: ValueSet[]) => {
+  const results: { [vsType in DibbsValueSetType]: ValueSet[] } = {
     labs: [],
     medications: [],
     conditions: [],
   };
-  (
-    Object.keys(valueSetTypeToClincalServiceTypeMap) as Array<ValueSetType>
-  ).forEach((vsType) => {
-    const itemsToInclude = vsItems.filter((vs) => {
-      return valueSetTypeToClincalServiceTypeMap[vsType].includes(
-        vs.clinicalServiceType,
-      );
-    });
+  (Object.keys(results) as Array<DibbsValueSetType>).forEach((vsType) => {
+    const itemsToInclude = valueSets.filter(
+      (vs) => vs.dibbsConceptType === vsType,
+    );
     results[vsType] = itemsToInclude;
   });
 

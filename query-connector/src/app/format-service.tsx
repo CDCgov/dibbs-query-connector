@@ -6,7 +6,7 @@ import {
   ContactPoint,
   Identifier,
 } from "fhir/r4";
-import { ValueSetItem } from "./constants";
+import { ValueSet } from "./constants";
 import { QueryStruct } from "./query-service";
 
 /**
@@ -261,29 +261,38 @@ export async function GetPhoneQueryFormats(phone: string) {
 }
 
 /**
- * Formats a statefully updated list of value set items into a JSON structure
+ * Formats a statefully updated list of value sets into a JSON structure
  * used for executing custom queries.
  * @param useCase The base use case being queried for.
- * @param vsItems The list of value set items the user wants included.
+ * @param valueSets The list of value sets the user wants included.
  * @returns A structured specification of a query that can be executed.
  */
-export const formatValueSetItemsAsQuerySpec = async (
+export const formatValueSetsAsQuerySpec = async (
   useCase: string,
-  vsItems: ValueSetItem[],
+  valueSets: ValueSet[],
 ) => {
   let secondEncounter: boolean = false;
   if (["cancer", "chlamydia", "gonorrhea", "syphilis"].includes(useCase)) {
     secondEncounter = true;
   }
-  const labCodes: string[] = vsItems
+  const labCodes: string[] = valueSets
     .filter((vs) => vs.system === "http://loinc.org")
-    .map((vs) => vs.code);
-  const snomedCodes: string[] = vsItems
+    .reduce((acc, vs) => {
+      vs.concepts.forEach((concept) => acc.push(concept.code));
+      return acc;
+    }, [] as string[]);
+  const snomedCodes: string[] = valueSets
     .filter((vs) => vs.system === "http://snomed.info/sct")
-    .map((vs) => vs.code);
-  const rxnormCodes: string[] = vsItems
+    .reduce((acc, vs) => {
+      vs.concepts.forEach((concept) => acc.push(concept.code));
+      return acc;
+    }, [] as string[]);
+  const rxnormCodes: string[] = valueSets
     .filter((vs) => vs.system === "http://www.nlm.nih.gov/research/umls/rxnorm")
-    .map((vs) => vs.code);
+    .reduce((acc, vs) => {
+      vs.concepts.forEach((concept) => acc.push(concept.code));
+      return acc;
+    }, [] as string[]);
 
   const spec: QueryStruct = {
     labCodes: labCodes,

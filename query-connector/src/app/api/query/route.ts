@@ -18,7 +18,7 @@ import {
 import { handleRequestError } from "./error-handling-service";
 import {
   getSavedQueryByName,
-  mapQueryRowsToValueSetItems,
+  mapQueryRowsToConceptValueSets,
 } from "@/app/database-service";
 
 /**
@@ -89,7 +89,7 @@ export async function POST(request: NextRequest) {
   // Lookup default parameters for particular use-case search
   const queryName = UseCaseToQueryName[use_case as USE_CASES];
   const queryResults = await getSavedQueryByName(queryName);
-  const vsItems = await mapQueryRowsToValueSetItems(queryResults);
+  const valueSets = await mapQueryRowsToConceptValueSets(queryResults);
 
   // Add params & patient identifiers to UseCaseRequest
   const UseCaseRequest: UseCaseQueryRequest = {
@@ -108,7 +108,7 @@ export async function POST(request: NextRequest) {
 
   const UseCaseQueryResponse: QueryResponse = await UseCaseQuery(
     UseCaseRequest,
-    vsItems,
+    valueSets,
   );
 
   // Bundle data
