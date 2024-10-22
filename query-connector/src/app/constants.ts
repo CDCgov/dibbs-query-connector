@@ -336,7 +336,6 @@ export interface ValueSetDisplay {
 }
 export type DibbsValueSetType = keyof ValueSetDisplay;
 
-
 // Define the type guard for FHIR resources
 // Define the FHIR Resource types
 export type FhirResource =
