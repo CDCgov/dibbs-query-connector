@@ -2,12 +2,12 @@ import {
   FHIR_SERVERS,
   USE_CASES,
   UseCaseToQueryName,
-  ValueSetItem,
+  ValueSet,
   hyperUnluckyPatient,
 } from "@/app/constants";
 import {
   getSavedQueryByName,
-  mapQueryRowsToValueSetItems,
+  mapQueryRowsToConceptValueSets,
 } from "@/app/database-service";
 import { UseCaseQuery, UseCaseQueryResponse } from "@/app/query-service";
 import { Patient } from "fhir/r4";
@@ -23,7 +23,7 @@ type SetStateCallback<T> = React.Dispatch<React.SetStateAction<T>>;
  */
 export async function fetchUseCaseValueSets(
   selectedQuery: USE_CASES,
-  valueSetStateCallback: SetStateCallback<ValueSetItem[]>,
+  valueSetStateCallback: SetStateCallback<ValueSet[]>,
   isSubscribed: boolean,
   setIsLoading: (isLoading: boolean) => void,
 ) {
@@ -32,11 +32,11 @@ export async function fetchUseCaseValueSets(
 
     setIsLoading(true);
     const queryResults = await getSavedQueryByName(queryName);
-    const vsItems = await mapQueryRowsToValueSetItems(queryResults);
+    const valueSets = await mapQueryRowsToConceptValueSets(queryResults);
 
     // Only update if the fetch hasn't altered state yet
     if (isSubscribed) {
-      valueSetStateCallback(vsItems);
+      valueSetStateCallback(valueSets);
     }
     setIsLoading(false);
   }
@@ -56,7 +56,7 @@ export async function fetchUseCaseValueSets(
 export async function fetchQueryResponse(p: {
   patientForQuery: Patient | undefined;
   selectedQuery: USE_CASES;
-  queryValueSets: ValueSetItem[];
+  queryValueSets: ValueSet[];
   fhirServer: FHIR_SERVERS;
   queryResponseStateCallback: SetStateCallback<UseCaseQueryResponse>;
   setIsLoading: (isLoading: boolean) => void;
@@ -85,7 +85,7 @@ export async function fetchQueryResponse(p: {
     p.setIsLoading(true);
     const queryResponse = await UseCaseQuery(
       newRequest,
-      p.queryValueSets.filter((item) => item.include),
+      p.queryValueSets.filter((item) => item.includeValueSet),
       {
         Patient: [p.patientForQuery],
       },

@@ -1,11 +1,11 @@
 "use server";
 import { Pool, PoolConfig, QueryResultRow } from "pg";
 import { Bundle, OperationOutcome } from "fhir/r4";
-import { ValueSetItem, valueSetTypeToClincalServiceTypeMap } from "./constants";
 import { encode } from "base-64";
+import { ValueSet } from "./constants";
 
 const getQuerybyNameSQL = `
-select q.query_name, q.id, qtv.valueset_id, vs.name as valueset_name, vs.author as author, vs.type, qic.concept_id, qic.include, c.code, c.code_system, c.display 
+select q.query_name, q.id, qtv.valueset_id, vs.name as valueset_name, vs.version, vs.author as author, vs.type, vs.dibbs_concept_type as dibbs_concept_type, qic.concept_id, qic.include, c.code, c.code_system, c.display 
   from query q 
   left join query_to_valueset qtv on q.id = qtv.query_id 
   left join valuesets vs on qtv.valueset_id = vs.id
@@ -48,45 +48,48 @@ export const getSavedQueryByName = async (name: string) => {
 };
 
 /**
- * Helper function to filter the valueset-mapped rows of results returned from
- * the DB for particular types of related clinical services.
- * @param vsItems A list of value sets mapped from DB rows.
- * @param type One of "labs", "medications", or "conditions".
- * @returns A list of rows containing only the predicate service type.
+ * Maps the results returned from the DIBBs value set and coding system database
+ * into a collection of value sets, each containing one or more Concepts build out
+ * of the coding information in the DB.
+ * @param rows The Rows returned from the DB Query.
+ * @returns A list of ValueSets, which hold the Concepts pulled from the DB.
  */
-export const filterValueSets = async (
-  vsItems: ValueSetItem[],
-  type: "labs" | "medications" | "conditions",
+export const mapQueryRowsToConceptValueSets = async (
+  rows: QueryResultRow[],
 ) => {
-  // Assign clinical code type based on desired filter
-  // Mapping is established in TCR, so follow that convention
-  let valuesetFilters = valueSetTypeToClincalServiceTypeMap[type];
-  const results = vsItems.filter((vs) =>
-    valuesetFilters.includes(vs.clinicalServiceType),
-  );
-  return results;
-};
+  // Create groupings of rows (each of which is a single Concept) by their ValueSet ID
+  const vsIdGroupedRows = rows.reduce((conceptsByVSId, r) => {
+    if (!conceptsByVSId[r["valueset_id"]]) {
+      conceptsByVSId[r["valueset_id"]] = [];
+    }
+    conceptsByVSId[r["valueset_id"]].push(r);
+    return conceptsByVSId;
+  }, {});
 
-/**
- * Helper function that transforms and groups a set of database rows into a list of
- * ValueSet items grouped by author and code_system for display on the CustomizeQuery page.
- * @param rows The rows returned from the DB.
- * @returns A list of ValueSetItems grouped by author and system.
- */
-export const mapQueryRowsToValueSetItems = async (rows: QueryResultRow[]) => {
-  const vsItems = rows.map((r) => {
-    const vsTranslation: ValueSetItem = {
-      code: r["code"],
-      display: r["display"],
-      system: r["code_system"],
-      include: r["include"],
-      author: r["author"],
-      valueSetName: r["valueset_name"],
-      clinicalServiceType: r["type"],
+  // Each "prop" of the struct is now a ValueSet ID
+  // Iterate over them to create formal Concept Groups attached to a formal VS
+  const valueSets = Object.keys(vsIdGroupedRows).map((vsID) => {
+    const conceptGroup: QueryResultRow[] = vsIdGroupedRows[vsID];
+    const valueSet: ValueSet = {
+      valueSetId: conceptGroup[0]["valueset_id"],
+      valueSetVersion: conceptGroup[0]["version"],
+      valueSetName: conceptGroup[0]["valueset_name"],
+      author: conceptGroup[0]["author"],
+      system: conceptGroup[0]["code_system"],
+      ersdConceptType: conceptGroup[0]["type"],
+      dibbsConceptType: conceptGroup[0]["dibbs_concept_type"],
+      includeValueSet: conceptGroup.find((c) => c["include"]) ? true : false,
+      concepts: conceptGroup.map((c) => {
+        return {
+          code: c["code"],
+          display: c["display"],
+          include: c["include"],
+        };
+      }),
     };
-    return vsTranslation;
+    return valueSet;
   });
-  return vsItems;
+  return valueSets;
 };
 
 /*
