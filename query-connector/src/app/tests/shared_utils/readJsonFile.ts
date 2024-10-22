@@ -9,7 +9,7 @@ import * as fs from "fs";
  * @param filePath The relative string path to the file.
  * @returns A JSON object of the string representation of the file.
  */
-export function readJsonFile(filePath: string): any {
+export function readJsonFile(filePath: string): unknown {
   try {
     const data = fs.readFileSync(filePath, "utf-8");
     return JSON.parse(data);

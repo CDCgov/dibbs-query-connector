@@ -1,19 +1,16 @@
 "use server";
 import fetch from "node-fetch";
-import {
-  Patient,
-  Observation,
-  DiagnosticReport,
-  Condition,
-  Encounter,
-  Medication,
-  MedicationAdministration,
-  MedicationRequest,
-  Bundle,
-} from "fhir/r4";
+import { Bundle, DomainResource } from "fhir/r4";
 
 import FHIRClient from "./fhir-servers";
-import { USE_CASES, FHIR_SERVERS, ValueSet } from "./constants";
+import {
+  USE_CASES,
+  FHIR_SERVERS,
+  ValueSet,
+  isFhirResource,
+  FhirResource,
+} from "./constants";
+
 import { CustomQuery } from "./CustomQuery";
 import { GetPhoneQueryFormats } from "./format-service";
 import { formatValueSetsAsQuerySpec } from "./format-service";
@@ -22,14 +19,13 @@ import { formatValueSetsAsQuerySpec } from "./format-service";
  * The query response when the request source is from the Viewer UI.
  */
 export type QueryResponse = {
-  Patient?: Patient[];
-  Observation?: Observation[];
-  DiagnosticReport?: DiagnosticReport[];
-  Condition?: Condition[];
-  Encounter?: Encounter[];
-  Medication?: Medication[];
-  MedicationAdministration?: MedicationAdministration[];
-  MedicationRequest?: MedicationRequest[];
+  [R in FhirResource as R["resourceType"]]?: R[];
+};
+
+// workaround types to get around a typescript compilation issue
+type SuperSetFhirResource = DomainResource | FhirResource;
+type SuperSetQueryResponse = {
+  [R in SuperSetFhirResource as R["resourceType"]]?: R[];
 };
 
 export type APIQueryResponse = Bundle;
@@ -228,23 +224,23 @@ async function generalizedQuery(
  */
 export async function parseFhirSearch(
   response: fetch.Response | Array<fetch.Response>,
-  queryResponse: QueryResponse = {},
+  queryResponse: SuperSetQueryResponse = {},
 ): Promise<QueryResponse> {
-  let resourceArray: any[] = [];
+  let resourceArray: SuperSetFhirResource[] = [];
 
-  // Process the responses
+  // Process the responses and flatten them
   if (Array.isArray(response)) {
-    for (const r of response) {
-      resourceArray = resourceArray.concat(await processResponse(r));
-    }
+    resourceArray = (
+      await Promise.all(response.map(processFhirResponse))
+    ).flat();
   } else {
-    resourceArray = await processResponse(response);
+    resourceArray = await processFhirResponse(response);
   }
 
   // Add resources to queryResponse
   for (const resource of resourceArray) {
-    const resourceType = resource.resourceType as keyof QueryResponse;
-    if (!queryResponse[resourceType]) {
+    const resourceType = resource.resourceType;
+    if (!(resourceType in queryResponse)) {
       queryResponse[resourceType] = [resource];
     } else {
       queryResponse[resourceType]!.push(resource);
@@ -259,14 +255,19 @@ export async function parseFhirSearch(
  * @param response - The response from the FHIR server.
  * @returns - The array of resources from the response.
  */
-export async function processResponse(
+export async function processFhirResponse(
   response: fetch.Response,
-): Promise<any[]> {
-  let resourceArray: any[] = [];
+): Promise<FhirResource[]> {
+  let resourceArray: FhirResource[] = [];
   if (response.status === 200) {
     const body = await response.json();
     if (body.entry) {
       for (const entry of body.entry) {
+        if (!isFhirResource(entry.resource)) {
+          console.error(
+            "Entry in FHIR resource response parsing was of unexpected shape",
+          );
+        }
         resourceArray.push(entry.resource);
       }
     }

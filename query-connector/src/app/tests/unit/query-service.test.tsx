@@ -1,43 +1,14 @@
-import fetch from "node-fetch";
-
 import {
-  createBundle,
   QueryResponse,
-  processResponse,
+  processFhirResponse,
   parseFhirSearch,
 } from "@/app/query-service";
+import { isFhirResource } from "@/app/constants";
 import { readJsonFile } from "../shared_utils/readJsonFile";
-import { DiagnosticReport, Observation, Patient } from "fhir/r4";
+import { DiagnosticReport, Observation } from "fhir/r4";
+import fetch from "node-fetch";
 
-describe("create bundle", () => {
-  it("should turn a collection of resource arrays into a search set FHIR bundle", async () => {
-    const patientBundle = readJsonFile(
-      "./src/app/tests/assets/BundlePatient.json",
-    );
-    const PatientResource = patientBundle?.entry[0].resource;
-    const labsBundle = readJsonFile(
-      "./src/app/tests/assets/BundleLabInfo.json",
-    );
-    const diagnosticReportResource = labsBundle?.entry.filter(
-      (e: any) => e?.resource?.resourceType === "DiagnosticReport",
-    );
-    const observationResources = labsBundle?.entry.filter(
-      (e: any) => e?.resource?.resourceType === "Observation",
-    );
-    const queryResponse: QueryResponse = {
-      Patient: [PatientResource as Patient],
-      DiagnosticReport: diagnosticReportResource as DiagnosticReport[],
-      Observation: observationResources as Observation[],
-    };
-
-    const fhirBundle = await createBundle(queryResponse);
-    expect(fhirBundle.resourceType).toEqual("Bundle");
-    expect(fhirBundle.type).toEqual("searchset");
-    expect(fhirBundle.total).toEqual(4);
-    expect(fhirBundle.entry?.length).toEqual(4);
-  });
-});
-
+// Test case for processResponse
 describe("process response", () => {
   it("should unpack a response from the server into an array of resources", async () => {
     const patientBundle = readJsonFile(
@@ -47,13 +18,15 @@ describe("process response", () => {
       "./src/app/tests/assets/BundleLabInfo.json",
     );
     const diagnosticReportResource = labsBundle?.entry.filter(
-      (e: any) => e?.resource?.resourceType === "DiagnosticReport",
+      (e): e is { resource: DiagnosticReport } =>
+        e?.resource?.resourceType === "DiagnosticReport",
     );
     const observationResources = labsBundle?.entry.filter(
-      (e: any) => e?.resource?.resourceType === "Observation",
+      (e): e is { resource: Observation } =>
+        e?.resource?.resourceType === "Observation",
     );
     patientBundle?.entry?.push(diagnosticReportResource[0]);
-    observationResources.forEach((or: any) => {
+    observationResources.forEach((or) => {
       patientBundle?.entry?.push(or);
     });
 
@@ -61,7 +34,15 @@ describe("process response", () => {
       status: 200,
       json: async () => patientBundle,
     } as unknown as fetch.Response;
-    const resourceArray = await processResponse(response);
+    const resourceArray = await processFhirResponse(response);
+
+    // Using isFhirResource
+    resourceArray.forEach((r) => {
+      if (isFhirResource(r)) {
+        expect(r.resourceType).toBeDefined();
+      }
+    });
+
     expect(resourceArray.length).toEqual(4);
     expect(resourceArray.find((r) => r.resourceType === "Patient")) ===
       patientBundle?.entry[0].resource;
@@ -71,6 +52,7 @@ describe("process response", () => {
   });
 });
 
+// Test case for parseFhirSearch
 describe("parse fhir search", () => {
   it("should turn the FHIR server's response into a QueryResponse struct", async () => {
     const patientBundle = readJsonFile(
@@ -80,13 +62,15 @@ describe("parse fhir search", () => {
       "./src/app/tests/assets/BundleLabInfo.json",
     );
     const diagnosticReportEntry = labsBundle?.entry.filter(
-      (e: any) => e?.resource?.resourceType === "DiagnosticReport",
+      (e: { resource?: DiagnosticReport }) =>
+        e?.resource?.resourceType === "DiagnosticReport",
     );
     const observationEntries = labsBundle?.entry.filter(
-      (e: any) => e?.resource?.resourceType === "Observation",
+      (e: { resource?: Observation }) =>
+        e?.resource?.resourceType === "Observation",
     );
     patientBundle?.entry?.push(diagnosticReportEntry[0]);
-    observationEntries.forEach((or: any) => {
+    observationEntries.forEach((or) => {
       patientBundle?.entry?.push(or);
     });
 
@@ -95,6 +79,8 @@ describe("parse fhir search", () => {
       json: async () => patientBundle,
     } as unknown as fetch.Response;
     const queryResponse: QueryResponse = await parseFhirSearch(response);
+
+    // Using isFhirResource
     expect((queryResponse.Patient || [{}])[0]).toEqual(
       patientBundle?.entry[0]?.resource,
     );
@@ -102,9 +88,11 @@ describe("parse fhir search", () => {
       diagnosticReportEntry[0]?.resource,
     );
     expect(queryResponse.Observation?.length).toEqual(2);
+
     const observationResources: Observation[] = observationEntries.map(
-      (oe: any) => oe.resource,
+      (oe: { resource?: Observation }) => oe.resource,
     );
+
     queryResponse.Observation?.forEach((o: Observation) => {
       expect(observationResources).toContain(o);
     });

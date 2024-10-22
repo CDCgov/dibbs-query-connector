@@ -188,7 +188,7 @@ export function formatMRN(identifier: Identifier[]): JSX.Element {
  * @param dateString - The date string to be formatted. formatDate will also be able to take 'yyyymmdd' as input.
  * @returns - The formatted date string, "" if input date was invalid, or undefined if the input date is falsy.
  */
-export const formatDate = (dateString?: string): string | undefined => {
+export const formatDate = (dateString?: string | null): string | undefined => {
   if (dateString) {
     let date = new Date(dateString);
 
