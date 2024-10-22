@@ -302,38 +302,6 @@ export const metadata = {
   description: "Try out TEFCA with queries for public health use cases.",
 };
 
-// TODO: Remove ValueSetItem, ValueSet, and valueSetTypeToClincalServiceTypeMap once
-// ticket #2789 is resolved
-
-/*Type to specify the expected components for each item in a value set that will be 
-displayed in the CustomizeQuery component*/
-export interface ValueSetItem {
-  code: string;
-  display: string;
-  system: string;
-  include: boolean;
-  author: string;
-  clinicalServiceType: string;
-  valueSetName: string;
-}
-
-/*Type to specify the expected expected types of valueset items that will be displayed 
-as separate tabs in the CusomizeQuery component*/
-export interface ValueSet {
-  labs: ValueSetItem[];
-  medications: ValueSetItem[];
-  conditions: ValueSetItem[];
-}
-
-export type ValueSetType = keyof ValueSet;
-
-export const valueSetTypeToClincalServiceTypeMap = {
-  labs: ["ostc", "lotc", "lrtc"],
-  medications: ["mrtc"],
-  conditions: ["dxtc", "sdtc"],
-};
-/// TODO: Remove the above once ticket #2789 is resolved
-
 /*
  * The expected type of a ValueSet concept.
  */
@@ -346,17 +314,17 @@ export interface Concept {
 /*
  * The expected type of a ValueSet.
  */
-// export interface ValueSet {
-//   valueset_id: string;
-//   valueset_version: string;
-//   valueset_name: string;
-//   author: string;
-//   system: string;
-//   ersdConceptType?: string;
-//   dibbsConceptType: string;
-//   includeValueSet: boolean;
-//   concepts: Concept[];
-// }
+export interface ValueSet {
+  valueSetId: string;
+  valueSetVersion: string;
+  valueSetName: string;
+  author: string;
+  system: string;
+  ersdConceptType?: string;
+  dibbsConceptType: string;
+  includeValueSet: boolean;
+  concepts: Concept[];
+}
 
 /*
  * The expected type of ValueSets grouped by dibbsConceptType for the purpose of display.
@@ -366,6 +334,8 @@ export interface ValueSetDisplay {
   medications: ValueSet[];
   conditions: ValueSet[];
 }
+export type DibbsValueSetType = keyof ValueSetDisplay;
+
 
 // Define the type guard for FHIR resources
 // Define the FHIR Resource types

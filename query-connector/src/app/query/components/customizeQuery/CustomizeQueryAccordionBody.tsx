@@ -5,8 +5,19 @@ import Table from "../../designSystem/Table";
 
 type CustomizeQueryAccordionBodyProps = {
   group: GroupedValueSet;
-  toggleInclude: (groupIndex: string, itemIndex: number) => void;
+  toggleInclude: (
+    groupIndex: string,
+    valueSetIndex: number,
+    conceptIndex: number,
+  ) => void;
   groupIndex: string;
+};
+
+type ValueSetIndexedConcept = {
+  vsIndex: number;
+  code: string;
+  display: string;
+  include: boolean;
 };
 
 /**
@@ -14,7 +25,7 @@ type CustomizeQueryAccordionBodyProps = {
  * @param param0 - props for rendering
  * @param param0.group - Matched concept associated with the query that
  * contains valuesets to filter query on
- * @param param0.toggleInclude - Listener event to handle a valueset inclusion/
+ * @param param0.toggleInclude - Listener event to handle a concept inclusion/
  * exclusion check
  * @param param0.groupIndex - Index corresponding to group
  * @returns JSX Fragment for the accordion body
@@ -32,32 +43,39 @@ const CustomizeQueryAccordionBody: React.FC<
         </tr>
       </thead>
       <tbody className="display-flex flex-column">
-        {group.items.map((item, index) => (
-          <tr className={`${styles.customizeQueryGridRow}`} key={item.code}>
-            <td
-              className={`${styles.customizeQueryCheckbox}`}
-              onClick={(e) => {
-                e.stopPropagation();
-                toggleInclude(groupIndex, index);
-              }}
-            >
-              {item.include && (
-                <Icon.Check
-                  className="usa-icon"
-                  style={{ backgroundColor: "white" }}
-                  size={4}
-                  color="#005EA2"
-                />
-              )}
-            </td>
-            <td className={styles.noBorderNoBackgroundNoPadding}>
-              {item.code}
-            </td>
-            <td className={styles.noBorderNoBackgroundNoPadding}>
-              {item.display}
-            </td>
-          </tr>
-        ))}
+        {group.items
+          .reduce((acc, vs, vsIndex) => {
+            vs.concepts.forEach((c) => {
+              acc.push({ ...c, vsIndex: vsIndex });
+            });
+            return acc;
+          }, [] as ValueSetIndexedConcept[])
+          .map((item, conceptIndex) => (
+            <tr className={`${styles.customizeQueryGridRow}`} key={item.code}>
+              <td
+                className={`${styles.customizeQueryCheckbox}`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleInclude(groupIndex, item.vsIndex, conceptIndex);
+                }}
+              >
+                {item.include && (
+                  <Icon.Check
+                    className="usa-icon"
+                    style={{ backgroundColor: "white" }}
+                    size={4}
+                    color="#005EA2"
+                  />
+                )}
+              </td>
+              <td className={styles.noBorderNoBackgroundNoPadding}>
+                {item.code}
+              </td>
+              <td className={styles.noBorderNoBackgroundNoPadding}>
+                {item.display}
+              </td>
+            </tr>
+          ))}
       </tbody>
     </Table>
   );

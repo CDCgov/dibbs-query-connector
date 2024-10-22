@@ -1,14 +1,16 @@
-import { ValueSetType } from "@/app/constants";
+import { DibbsValueSetType } from "@/app/constants";
 import styles from "./customizeQuery.module.css";
 import CustomizeQueryBulkSelect from "./CustomizeQueryBulkSelect";
 import { GroupedValueSet } from "./customizeQueryUtils";
 
 type CustomizeQueryNavProps = {
-  activeTab: ValueSetType;
-  handleTabChange: (tabName: ValueSetType) => void;
+  activeTab: DibbsValueSetType;
+  handleTabChange: (tabName: DibbsValueSetType) => void;
   handleSelectAllForTab: (checked: boolean) => void;
   valueSetOptions: {
-    [key in ValueSetType]: { [vsNameAuthorSystem: string]: GroupedValueSet };
+    [key in DibbsValueSetType]: {
+      [vsNameAuthorSystem: string]: GroupedValueSet;
+    };
   };
 };
 
@@ -32,11 +34,15 @@ const CustomizeQueryNav: React.FC<CustomizeQueryNavProps> = ({
     (group) => group.items.length > 0,
   );
   const allItemsDeselected = Object.values(valueSetOptions[activeTab])
-    .flatMap((groupedValSets) => groupedValSets.items.flatMap((i) => i.include))
+    .flatMap((groupedValSets) =>
+      groupedValSets.items.flatMap((i) => i.includeValueSet),
+    )
     .every((p) => !p);
 
   const allItemsSelected = Object.values(valueSetOptions[activeTab])
-    .flatMap((groupedValSets) => groupedValSets.items.flatMap((i) => i.include))
+    .flatMap((groupedValSets) =>
+      groupedValSets.items.flatMap((i) => i.includeValueSet),
+    )
     .every((p) => p);
 
   return (
