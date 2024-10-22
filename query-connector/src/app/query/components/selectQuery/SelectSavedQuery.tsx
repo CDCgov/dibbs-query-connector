@@ -6,8 +6,12 @@ import {
 } from "@/app/constants";
 import { Select, Button } from "@trussworks/react-uswds";
 import Backlink from "../backLink/Backlink";
-import styles from "./selectQuery.module.css";
+import styles from "./selectQuery.module.scss";
 import { useState } from "react";
+import {
+  PAGE_TITLES,
+  RETURN_LABEL,
+} from "@/app/query/stepIndicator/StepIndicator";
 
 type SelectSavedQueryProps = {
   selectedQuery: string;
@@ -49,21 +53,18 @@ const SelectSavedQuery: React.FC<SelectSavedQueryProps> = ({
   const [showAdvanced, setShowAdvanced] = useState(false);
 
   return (
-    <form className="content-container-smaller-width">
+    <form>
       {/* Back button */}
-      <Backlink onClick={goBack} label={"Return to select a patient"} />
-      <h1 className={`${styles.selectQueryHeaderText}`}>
-        {STEP_THREE_PAGE_TITLE}
-      </h1>
-      <div
-        className={`font-sans-md text-light ${styles.selectQueryExplanationText}`}
-      >
+
+      <Backlink onClick={goBack} label={RETURN_LABEL["select-query"]} />
+      <h1 className="page-title">{PAGE_TITLES["select-query"]}</h1>
+      <h2 className="page-explainer">
         We will request all data related to your selected patient and query. By
         only showing relevant data for your query, we decrease the burden on our
         systems and protect patient privacy. If you would like to customize the
         query response, click on the "customize query" button.
-      </div>
-      <h3 className="margin-bottom-3">Query</h3>
+      </h2>
+      <h3 className="margin-bottom-105">Query</h3>
       <div className={styles.queryRow}>
         {/* Select a query drop down */}
         <Select
@@ -74,6 +75,9 @@ const SelectSavedQuery: React.FC<SelectSavedQueryProps> = ({
           className={`${styles.queryDropDown}`}
           required
         >
+          <option value="" disabled>
+            Select query
+          </option>
           {demoQueryOptions.map((option) => (
             <option key={option.value} value={option.value}>
               {option.label}
@@ -82,7 +86,7 @@ const SelectSavedQuery: React.FC<SelectSavedQueryProps> = ({
         </Select>
         <Button
           type="button"
-          className={`usa-button--outline bg-white ${styles.customizeButton}`}
+          className="usa-button--outline bg-white margin-left-205"
           onClick={() => setShowCustomizedQuery(true)}
         >
           Customize query
@@ -91,7 +95,7 @@ const SelectSavedQuery: React.FC<SelectSavedQueryProps> = ({
 
       {showAdvanced && (
         <div>
-          <h3 className="margin-bottom-3">Health Care Organization (HCO)</h3>
+          <h3 className="margin-bottom-105">Health Care Organization (HCO)</h3>
           <Select
             id="fhir_server"
             name="fhir_server"
@@ -123,7 +127,7 @@ const SelectSavedQuery: React.FC<SelectSavedQueryProps> = ({
       )}
 
       {/* Submit Button */}
-      <div className="padding-top-6">
+      <div className="margin-top-5">
         <Button
           type="button"
           disabled={!selectedQuery && !loadingQueryValueSets}
@@ -138,4 +142,3 @@ const SelectSavedQuery: React.FC<SelectSavedQueryProps> = ({
 };
 
 export default SelectSavedQuery;
-export const STEP_THREE_PAGE_TITLE = "Step 3: Select a query";

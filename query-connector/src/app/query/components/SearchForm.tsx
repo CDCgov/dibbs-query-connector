@@ -12,12 +12,12 @@ import {
   demoData,
   stateOptions,
   Mode,
-} from "../../../constants";
-import { UseCaseQueryResponse, UseCaseQuery } from "../../../query-service";
-import { fhirServers } from "../../../fhir-servers";
-import styles from "./searchForm.module.css";
-
+} from "@/app/constants";
+import { UseCaseQueryResponse, UseCaseQuery } from "@/app/query-service";
+import { fhirServers } from "@/app/fhir-servers";
+import styles from "./searchForm/searchForm.module.scss";
 import { FormatPhoneAsDigits } from "@/app/format-service";
+import { PAGE_TITLES } from "@/app/query/stepIndicator/StepIndicator";
 
 interface SearchFormProps {
   useCase: USE_CASES;
@@ -55,7 +55,6 @@ const SearchForm: React.FC<SearchFormProps> = ({
   //Set the patient options based on the demoOption
   const [firstName, setFirstName] = useState<string>("");
   const [lastName, setLastName] = useState<string>("");
-
   const [phone, setPhone] = useState<string>("");
   const [dob, setDOB] = useState<string>("");
   const [mrn, setMRN] = useState<string>("");
@@ -74,7 +73,6 @@ const SearchForm: React.FC<SearchFormProps> = ({
         setMRN(data.MRN);
         setPhone(data.Phone);
         setFhirServer(data.FhirServer as FHIR_SERVERS);
-        setUseCase(data.UseCase as USE_CASES);
         setAutofilled(highlightAutofilled);
       }
     },
@@ -83,8 +81,8 @@ const SearchForm: React.FC<SearchFormProps> = ({
 
   async function HandleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!useCase || !fhirServer) {
-      console.error("Use case and FHIR server are required.");
+    if (!fhirServer) {
+      console.error("FHIR server is required.");
       return;
     }
     setLoading(true);
@@ -110,18 +108,16 @@ const SearchForm: React.FC<SearchFormProps> = ({
 
   return (
     <>
-      <form className="content-container-smaller-width" onSubmit={HandleSubmit}>
-        <h1 className="font-sans-2xl text-bold margin-bottom-105">
-          {STEP_ONE_PAGE_TITLE}
-        </h1>
-        <h2 className="font-sans-lg text-normal margin-top-0 margin-bottom-105">
+      <form onSubmit={HandleSubmit}>
+        <h1 className="page-title">{PAGE_TITLES["search"]}</h1>
+        <h2 className="page-explainer">
           Enter patient information below to search for a patient. We will query
           the connected network to find matching records.{" "}
         </h2>
         {
           <div className={`usa-summary-box ${styles.demoQueryFiller}`}>
             <Label
-              className="no-margin-top-important maxw-full font-sans text-normal"
+              className="margin-top-0-important maxw-full font-sans text-normal"
               htmlFor="query"
             >
               The demo site uses synthetic data to provide examples of possible
@@ -159,7 +155,7 @@ const SearchForm: React.FC<SearchFormProps> = ({
               </h3>
               <Label
                 htmlFor="fhir_server"
-                className="no-margin-top-important width-full"
+                className="margin-top-0-important width-full"
               >
                 FHIR Server (QHIN)
               </Label>
@@ -190,7 +186,7 @@ const SearchForm: React.FC<SearchFormProps> = ({
               Name
             </h3>
             <div className="tablet:grid-col-6">
-              <Label htmlFor="firstName" className="no-margin-top-important">
+              <Label htmlFor="firstName" className="margin-top-0-important">
                 First Name
               </Label>
               <TextInput
@@ -209,7 +205,7 @@ const SearchForm: React.FC<SearchFormProps> = ({
               />
             </div>
             <div className="tablet:grid-col-6">
-              <Label htmlFor="lastName" className="no-margin-top-important">
+              <Label htmlFor="lastName" className="margin-top-0-important">
                 Last Name
               </Label>
               <TextInput
@@ -233,7 +229,7 @@ const SearchForm: React.FC<SearchFormProps> = ({
               Phone Number
             </h3>
             <div className="grid-col-6">
-              <Label htmlFor="phone" className="no-margin-top-important">
+              <Label htmlFor="phone" className="margin-top-0-important">
                 Phone Number
               </Label>
               <TextInput
@@ -256,7 +252,7 @@ const SearchForm: React.FC<SearchFormProps> = ({
               Date of Birth
             </h3>
             <div className="grid-col-6">
-              <Label htmlFor="dob" className="no-margin-top-important">
+              <Label htmlFor="dob" className="margin-top-0-important">
                 Date of Birth
               </Label>
               <div className="usa-date-picker">
@@ -284,7 +280,7 @@ const SearchForm: React.FC<SearchFormProps> = ({
             <div className="grid-col">
               <Label
                 htmlFor="street_address_1"
-                className="no-margin-top-important"
+                className="margin-top-0-important"
               >
                 Street address
               </Label>
@@ -299,7 +295,7 @@ const SearchForm: React.FC<SearchFormProps> = ({
             <div className="grid-col">
               <Label
                 htmlFor="street_address_2"
-                className="no-margin-top-important"
+                className="margin-top-0-important"
               >
                 Address Line 2
               </Label>
@@ -312,13 +308,13 @@ const SearchForm: React.FC<SearchFormProps> = ({
           </div>
           <div className="grid-row grid-gap margin-bottom-4">
             <div className="tablet:grid-col-5">
-              <Label htmlFor="city" className="no-margin-top-important">
+              <Label htmlFor="city" className="margin-top-0-important">
                 City
               </Label>
               <TextInput id="city" name="city" type="text" />
             </div>
             <div className="tablet:grid-col-3">
-              <Label htmlFor="state" className="no-margin-top-important">
+              <Label htmlFor="state" className="margin-top-0-important">
                 State
               </Label>
               <Select id="state" name="state" defaultValue="">
@@ -333,7 +329,7 @@ const SearchForm: React.FC<SearchFormProps> = ({
               </Select>
             </div>
             <div className="tablet:grid-col-4">
-              <Label htmlFor="zip" className="no-margin-top-important">
+              <Label htmlFor="zip" className="margin-top-0-important">
                 ZIP code
               </Label>
               <TextInput
@@ -350,7 +346,7 @@ const SearchForm: React.FC<SearchFormProps> = ({
               Medical Record Number (MRN)
             </h3>
             <div className="grid-col-6">
-              <Label htmlFor="mrn" className="no-margin-top-important">
+              <Label htmlFor="mrn" className="margin-top-0-important">
                 Medical Record Number
               </Label>
               <TextInput

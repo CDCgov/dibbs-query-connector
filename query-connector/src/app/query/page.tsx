@@ -3,8 +3,8 @@ import React, { useState } from "react";
 import { UseCaseQueryResponse } from "../query-service";
 import ResultsView from "./components/ResultsView";
 import PatientSearchResults from "./components/PatientSearchResults";
-import SearchForm from "./components/searchForm/SearchForm";
-import SelectQuery from "./components/SelectQuery";
+import SearchForm from "./components/SearchForm";
+import SelectQuery from "./SelectQuery";
 import {
   DEFAULT_DEMO_FHIR_SERVER,
   FHIR_SERVERS,
@@ -15,6 +15,9 @@ import LoadingView from "./components/LoadingView";
 import { ToastContainer } from "react-toastify";
 
 import "react-toastify/dist/ReactToastify.min.css";
+import StepIndicator, {
+  CUSTOMIZE_QUERY_STEPS,
+} from "./stepIndicator/StepIndicator";
 import SiteAlert from "./designSystem/SiteAlert";
 import { Patient } from "fhir/r4";
 
@@ -37,10 +40,25 @@ const Query: React.FC = () => {
   const [resultsQueryResponse, setResultsQueryResponse] =
     useState<UseCaseQueryResponse>({});
 
+  const [showCustomizeQuery, setShowCustomizeQuery] = useState(false);
+
+  const modeToCssContainerMap: { [mode in Mode]: string } = {
+    search: "main-container",
+    "patient-results": "main-container__wide",
+    "select-query": showCustomizeQuery
+      ? "main-container__wide"
+      : "main-container",
+    results: "main-container__wide",
+  };
   return (
     <>
       <SiteAlert page={mode} />
-      <div className="main-container">
+      <div className={modeToCssContainerMap[mode]}>
+        {Object.keys(CUSTOMIZE_QUERY_STEPS).includes(mode) &&
+          !showCustomizeQuery && (
+            <StepIndicator headingLevel="h4" curStep={mode} />
+          )}
+        {/* Step 1 */}
         {mode === "search" && (
           <SearchForm
             useCase={useCase}
@@ -53,17 +71,17 @@ const Query: React.FC = () => {
           />
         )}
 
+        {/* Step 2 */}
         {mode === "patient-results" && (
-          <>
-            <PatientSearchResults
-              patients={patientDiscoveryQueryResponse?.Patient ?? []}
-              goBack={() => setMode("search")}
-              setMode={setMode}
-              setPatientForQueryResponse={setPatientForQueryResponse}
-            />
-          </>
+          <PatientSearchResults
+            patients={patientDiscoveryQueryResponse?.Patient ?? []}
+            goBack={() => setMode("search")}
+            setMode={setMode}
+            setPatientForQueryResponse={setPatientForQueryResponse}
+          />
         )}
 
+        {/* Step 3 */}
         {mode === "select-query" && (
           <SelectQuery
             goBack={() => setMode("patient-results")}
@@ -72,31 +90,29 @@ const Query: React.FC = () => {
             setSelectedQuery={setUseCase}
             patientForQuery={patientForQuery}
             resultsQueryResponse={resultsQueryResponse}
+            showCustomizeQuery={showCustomizeQuery}
             setResultsQueryResponse={setResultsQueryResponse}
+            setShowCustomizeQuery={setShowCustomizeQuery}
             fhirServer={fhirServer}
             setFhirServer={setFhirServer}
             setLoading={setLoading}
           />
         )}
 
-        {mode === "results" && (
-          <>
-            {resultsQueryResponse && (
-              <ResultsView
-                selectedQuery={useCase}
-                useCaseQueryResponse={resultsQueryResponse}
-                goBack={() => {
-                  setMode("select-query");
-                }}
-                goToBeginning={() => {
-                  setMode("search");
-                }}
-              />
-            )}
-          </>
+        {/* Step 4 */}
+        {mode === "results" && resultsQueryResponse && (
+          <ResultsView
+            selectedQuery={useCase}
+            useCaseQueryResponse={resultsQueryResponse}
+            goBack={() => {
+              setMode("select-query");
+            }}
+            goToBeginning={() => {
+              setMode("search");
+            }}
+          />
         )}
         {loading && <LoadingView loading={loading} />}
-
         <ToastContainer icon={false} />
       </div>
     </>

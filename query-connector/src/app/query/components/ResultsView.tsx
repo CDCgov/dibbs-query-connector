@@ -4,7 +4,7 @@ import ResultsViewSideNav, {
 } from "./resultsView/ResultsViewSideNav";
 import React, { useEffect } from "react";
 import ResultsViewTable from "./resultsView/ResultsViewTable";
-import styles from "../page.module.css";
+import styles from "./resultsView/resultsView.module.scss";
 import ConditionsTable from "./resultsView/tableComponents/ConditionsTable";
 import Demographics from "./resultsView/tableComponents/Demographics";
 import DiagnosticReportTable from "./resultsView/tableComponents/DiagnosticReportTable";
@@ -13,6 +13,10 @@ import MedicationRequestTable from "./resultsView/tableComponents/MedicationRequ
 import ObservationTable from "./resultsView/tableComponents/ObservationTable";
 import Backlink from "./backLink/Backlink";
 import { USE_CASES, demoQueryValToLabelMap } from "@/app/constants";
+import {
+  PAGE_TITLES,
+  RETURN_LABEL,
+} from "@/app/query/stepIndicator/StepIndicator";
 
 type ResultsViewProps = {
   useCaseQueryResponse: UseCaseQueryResponse;
@@ -59,31 +63,24 @@ const ResultsView: React.FC<ResultsViewProps> = ({
 
   return (
     <>
-      <div className="results-banner">
-        <div className={`${styles.resultsBannerContent}`}>
-          <Backlink
-            onClick={() => goBack()}
-            label={"Return to query selection"}
-          />
-          <button
-            className="usa-button usa-button--outline margin-left-auto"
-            onClick={() => goToBeginning()}
-          >
-            New patient search
-          </button>
-        </div>
+      <div className={`${styles.resultsBannerContent}`}>
+        <Backlink onClick={() => goBack()} label={RETURN_LABEL["results"]} />
+        <button
+          className="usa-button usa-button--outline margin-left-auto"
+          onClick={() => goToBeginning()}
+        >
+          New patient search
+        </button>
       </div>
-      <div className="margin-bottom-3">
-        <h2 className="margin-0" id="ecr-summary">
-          Patient Record
-        </h2>
-        <h3>
-          Query:{" "}
-          <span className="text-normal display-inline-block">
-            {demoQueryValToLabelMap[selectedQuery]}
-          </span>
-        </h3>
-      </div>
+      <h1 className="page-title margin-bottom-0-important">
+        {PAGE_TITLES["results"]}
+      </h1>
+      <h2 className="page-explainer margin-bottom-3-important margin-top-0-important">
+        <strong>Query: </strong>
+        <span className="text-normal display-inline-block">
+          {demoQueryValToLabelMap[selectedQuery]}
+        </span>
+      </h2>
 
       <div className=" grid-container grid-row grid-gap-md padding-0 ">
         <div className="tablet:grid-col-3">
