@@ -1,6 +1,6 @@
 import {
   QueryResponse,
-  processResponse,
+  processFhirResponse,
   parseFhirSearch,
 } from "@/app/query-service";
 import { isFhirResource } from "@/app/constants";
@@ -34,7 +34,7 @@ describe("process response", () => {
       status: 200,
       json: async () => patientBundle,
     } as unknown as fetch.Response;
-    const resourceArray = await processResponse(response);
+    const resourceArray = await processFhirResponse(response);
 
     // Using isFhirResource
     resourceArray.forEach((r) => {
