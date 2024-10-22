@@ -59,7 +59,7 @@ export const mapQueryRowsToConceptValueSets = async (
 ) => {
   // Create groupings of rows (each of which is a single Concept) by their ValueSet ID
   const vsIdGroupedRows = rows.reduce((conceptsByVSId, r) => {
-    if (!conceptsByVSId[r["valueset_id"]]) {
+    if (!(r["valueset_id"] in conceptsByVSId)) {
       conceptsByVSId[r["valueset_id"]] = [];
     }
     conceptsByVSId[r["valueset_id"]].push(r);

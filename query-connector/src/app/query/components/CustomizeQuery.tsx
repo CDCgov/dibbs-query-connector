@@ -55,15 +55,33 @@ const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
   });
 
   // Compute counts of each tab-type
-  const countLabs = Object.values(valueSetOptions.labs).flatMap(
-    (group) => group.items,
-  ).length;
-  const countConditions = Object.values(valueSetOptions.conditions).flatMap(
-    (group) => group.items,
-  ).length;
-  const countMedications = Object.values(valueSetOptions.medications).flatMap(
-    (group) => group.items,
-  ).length;
+  const countLabs = Object.values(valueSetOptions.labs).reduce(
+    (runningSum, gvs) => {
+      gvs.items.forEach((vs) => {
+        runningSum += vs.concepts.length;
+      });
+      return runningSum;
+    },
+    0,
+  );
+  const countConditions = Object.values(valueSetOptions.conditions).reduce(
+    (runningSum, gvs) => {
+      gvs.items.forEach((vs) => {
+        runningSum += vs.concepts.length;
+      });
+      return runningSum;
+    },
+    0,
+  );
+  const countMedications = Object.values(valueSetOptions.medications).reduce(
+    (runningSum, gvs) => {
+      gvs.items.forEach((vs) => {
+        runningSum += vs.concepts.length;
+      });
+      return runningSum;
+    },
+    0,
+  );
 
   // Keeps track of which side nav tab to display to users
   const handleTabChange = (tab: DibbsValueSetType) => {
@@ -111,7 +129,7 @@ const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
     updatedGroups[groupIndex].items = updatedGroups[groupIndex].items.map(
       (item) => ({
         ...item,
-        include: checked, // Set all items in this group to checked or unchecked
+        includeValueSet: checked, // Set all items in this group to checked or unchecked
         concepts: item.concepts.map((ic) => {
           return { ...ic, include: checked };
         }),
@@ -131,7 +149,7 @@ const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
         ...group,
         items: group.items.map((item) => ({
           ...item,
-          include: checked, // Set all items in this group to checked or unchecked
+          includeValueSet: checked, // Set all items in this group to checked or unchecked
           concepts: item.concepts.map((ic) => {
             return { ...ic, include: checked };
           }),
