@@ -1,12 +1,12 @@
-import { InternalValueSet } from "@/app/constants";
+import { DEFAULT_ERSD_VERSION, ValueSet } from "@/app/constants";
 import ExampleVsacValueSet from "../assets/VSACValueSet.json";
 import { translateVSACToInternalValueSet } from "../../database-service";
-import { ValueSet } from "fhir/r4";
+import { ValueSet as FhirValueSet } from "fhir/r4";
 
-const EXPECTED_INTERNAL_VALUESET: InternalValueSet = {
-  valueset_id: ExampleVsacValueSet.id,
-  valueset_version: ExampleVsacValueSet.version,
-  valueset_name: ExampleVsacValueSet.title,
+const EXPECTED_INTERNAL_VALUESET: ValueSet = {
+  valueSetId: ExampleVsacValueSet.id,
+  valueSetVersion: DEFAULT_ERSD_VERSION,
+  valueSetName: ExampleVsacValueSet.title,
   author: ExampleVsacValueSet.publisher,
   system: ExampleVsacValueSet.compose.include[0].system,
   ersdConceptType: "ostc",
@@ -20,7 +20,7 @@ const EXPECTED_INTERNAL_VALUESET: InternalValueSet = {
 describe("VSAC FHIR response to internal application type", () => {
   it("translate to expected fixture", async () => {
     const translationResult = await translateVSACToInternalValueSet(
-      ExampleVsacValueSet as ValueSet,
+      ExampleVsacValueSet as FhirValueSet,
       "ostc",
     );
 
