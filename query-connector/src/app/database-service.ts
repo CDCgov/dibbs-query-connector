@@ -229,12 +229,14 @@ export async function insertValueSet(vs: ValueSet) {
 
   return { success: false, error: failedInserts };
 }
+
 function generateValueSetSqlStatement(vs: ValueSet) {
   const valueSetOid = vs.valueSetId;
   const valueSetUniqueId = `${valueSetOid}_${vs.valueSetVersion}`;
   const insertValueSetSql = `INSERT INTO valuesets VALUES('${valueSetUniqueId}','${valueSetOid}','${vs.valueSetVersion}','${vs.valueSetName}','${vs.author}','${vs.ersdConceptType}');`;
   return insertValueSetSql;
 }
+
 function generateConceptSqlStatements(vs: ValueSet) {
   const valueSetOid = vs.valueSetId;
   const valueSetUniqueId = `${valueSetOid}_${vs.valueSetVersion}`;
