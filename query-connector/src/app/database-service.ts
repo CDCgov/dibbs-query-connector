@@ -242,10 +242,12 @@ function generateConceptSqlStatements(vs: ValueSet) {
   const valueSetUniqueId = `${valueSetOid}_${vs.valueSetVersion}`;
 
   const insertConceptsSqlArray = vs.concepts.map((concept) => {
-    const conceptUniqueId = `${valueSetOid}_${concept.code}`;
+    // TODO: strip any non-loinc/snomed strings
+    const conceptUniqueId = `${vs.system}_${concept.code}`;
     // what's the value of the gem_formated_code // concept version? Do we prefer
     // nulls?
-    const insertConceptSql = `INSERT INTO concepts VALUES('${conceptUniqueId}','${concept.code}','${vs.system}','${concept.display}','${concept.code}','${vs.valueSetVersion}');`;
+    // TODO: ticket to clean up gem_formatted_code // version?
+    const insertConceptSql = `INSERT INTO concepts VALUES('${conceptUniqueId}','${concept.code}','${vs.system}','${concept.display}','${""}','${vs.valueSetVersion}');`;
 
     const primaryKey = randomUUID();
     const insertJoinSql = `INSERT INTO valueset_to_concept VALUES('${primaryKey}','${valueSetUniqueId}','${conceptUniqueId}');`;
