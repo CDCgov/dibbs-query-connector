@@ -7,6 +7,7 @@ import {
 } from "@trussworks/react-uswds";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { testInsertion } from "./test-insertion";
 
 /**
  * The landing page for the TEFCA Viewer.
@@ -18,6 +19,10 @@ export default function LandingPage() {
   const handleClick = () => {
     router.push(`/query`);
   };
+
+  async function insert() {
+    await testInsertion();
+  }
 
   return (
     <div>
@@ -100,6 +105,15 @@ export default function LandingPage() {
               onClick={() => handleClick()}
             >
               Go to the demo
+            </Button>
+
+            <Button
+              className="next-button"
+              type="button"
+              id="next-button"
+              onClick={() => insert()}
+            >
+              Test Insertion
             </Button>
           </div>
         </div>
