@@ -3,12 +3,12 @@ import { Pool, PoolConfig, QueryResultRow } from "pg";
 import { Bundle, OperationOutcome, ValueSet as FhirValueSet } from "fhir/r4";
 import {
   Concept,
-  DEFAULT_ERSD_VERSION,
   ErsdConceptType,
   ValueSet,
   ersdToDibbsConceptMap,
 } from "./constants";
 import { encode } from "base-64";
+import { randomUUID } from "crypto";
 
 const getQuerybyNameSQL = `
 select q.query_name, q.id, qtv.valueset_id, vs.name as valueset_name, vs.version, vs.author as author, vs.type, vs.dibbs_concept_type as dibbs_concept_type, qic.concept_id, qic.include, c.code, c.code_system, c.display 
@@ -184,7 +184,7 @@ export async function translateVSACToInternalValueSet(
   ersdConceptType: ErsdConceptType,
 ) {
   const id = fhirValueset.id;
-  const version = DEFAULT_ERSD_VERSION;
+  const version = fhirValueset.version;
 
   const name = fhirValueset.title;
   const author = fhirValueset.publisher;
@@ -206,4 +206,41 @@ export async function translateVSACToInternalValueSet(
     includeValueSet: false,
     concepts: concepts,
   } as ValueSet;
+}
+
+export async function insertValueSet(vs: ValueSet) {
+  const valueSetOid = vs.valueSetId;
+  const valueSetUniqueId = `${valueSetOid}_${vs.valueSetVersion}`;
+  const insertValueSetSql = `INSERT INTO valuesets VALUES('${valueSetUniqueId}','${valueSetOid}','${vs.valueSetVersion}','${vs.valueSetName}','${vs.author}','${vs.ersdConceptType}');`;
+
+  try {
+    await dbClient.query(insertValueSetSql);
+  } catch (e) {
+    // handle error somehow
+    console.error(e);
+  }
+
+  // insert concepts
+  // what's the value of the gem_formated_code // concept version? Do we prefer
+  // nulls?
+  const insertConceptsSql = vs.concepts.map((concept) => {
+    const conceptUniqueId = `${valueSetOid}_${concept.code}`;
+    const insertConceptSql = `INSERT INTO concepts VALUES('${conceptUniqueId}','${concept.code}','${vs.system}','${concept.display}','${concept.code}','${vs.valueSetVersion}');`;
+
+    const primaryKey = randomUUID();
+    const insertJoinSql = `INSERT INTO valueset_to_concept VALUES('${primaryKey}','${valueSetUniqueId}','${conceptUniqueId}');`;
+
+    const sequentialInsertPromise = new Promise(async () => {
+      try {
+        await dbClient.query(insertConceptSql);
+        await dbClient.query(insertJoinSql);
+      } catch (e) {
+        console.error(e);
+      }
+    });
+
+    return sequentialInsertPromise;
+  });
+
+  await Promise.allSettled(insertConceptsSql);
 }
