@@ -12,6 +12,7 @@ import {
   PAGE_TITLES,
   RETURN_LABEL,
 } from "@/app/query/stepIndicator/StepIndicator";
+import LoadingView from "@/app/query/components/LoadingView";
 
 type SelectSavedQueryProps = {
   selectedQuery: string;
@@ -84,14 +85,20 @@ const SelectSavedQuery: React.FC<SelectSavedQueryProps> = ({
             </option>
           ))}
         </Select>
+
+        {/* Customize Query Button with LoadingView */}
         <Button
           type="button"
           className="usa-button--outline bg-white margin-left-205"
           onClick={() => setShowCustomizedQuery(true)}
+          disabled={loadingQueryValueSets}
         >
           Customize query
         </Button>
       </div>
+
+      {/* Loading View */}
+      <LoadingView loading={loadingQueryValueSets} />
 
       {showAdvanced && (
         <div>
