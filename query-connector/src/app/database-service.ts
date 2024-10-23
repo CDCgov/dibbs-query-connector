@@ -209,8 +209,9 @@ export async function translateVSACToInternalValueSet(
 }
 
 /**
- *
- * @param vs
+ * Function call to insert a new ValueSet into the database.
+ * @param vs - a ValueSet in of the shape of our internal data model to insert
+ * @returns success / failure information, as well as errors as appropriate
  */
 export async function insertValueSet(vs: ValueSet) {
   const insertValueSetSql = generateValueSetSqlStatement(vs);
@@ -234,6 +235,11 @@ export async function insertValueSet(vs: ValueSet) {
   return { success: false, error: failedInserts };
 }
 
+/**
+ * Helper function to generate the SQL needed for valueset insertion.
+ * @param vs - The ValueSet in of the shape of our internal data model to insert
+ * @returns The SQL statement for insertion
+ */
 function generateValueSetSqlStatement(vs: ValueSet) {
   const valueSetOid = vs.valueSetId;
   const valueSetUniqueId = `${valueSetOid}_${vs.valueSetVersion}`;
@@ -241,6 +247,12 @@ function generateValueSetSqlStatement(vs: ValueSet) {
   return insertValueSetSql;
 }
 
+/**
+ * Helper function to generate the SQL needed for concept / valueset join insertion
+ * needed during valueset creation.
+ * @param vs - The ValueSet in of the shape of our internal data model to insert
+ * @returns The SQL statement array for all concepts for insertion
+ */
 function generateConceptSqlStatements(vs: ValueSet) {
   const valueSetOid = vs.valueSetId;
   const valueSetUniqueId = `${valueSetOid}_${vs.valueSetVersion}`;
