@@ -85,12 +85,12 @@ const SelectSavedQuery: React.FC<SelectSavedQueryProps> = ({
           ))}
         </Select>
 
-        {/* Customize Query Button with LoadingView */}
+        {/* Customize Query Button */}
         <Button
           type="button"
           className="usa-button--outline bg-white margin-left-205"
           onClick={() => setShowCustomizedQuery(true)}
-          disabled={loadingQueryValueSets || !selectedQuery} // Disable based on loading state and query selection
+          disabled={loadingQueryValueSets || !selectedQuery}
         >
           Customize query
         </Button>
