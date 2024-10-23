@@ -1,4 +1,4 @@
-import { DEFAULT_ERSD_VERSION, ValueSet } from "@/app/constants";
+import { ValueSet } from "@/app/constants";
 import ExampleVsacValueSet from "../assets/VSACValueSet.json";
 import { translateVSACToInternalValueSet } from "../../database-service";
 import { ValueSet as FhirValueSet } from "fhir/r4";
