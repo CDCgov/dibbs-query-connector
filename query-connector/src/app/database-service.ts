@@ -209,22 +209,40 @@ export async function translateVSACToInternalValueSet(
 }
 
 export async function insertValueSet(vs: ValueSet) {
-  const valueSetOid = vs.valueSetId;
-  const valueSetUniqueId = `${valueSetOid}_${vs.valueSetVersion}`;
-  const insertValueSetSql = `INSERT INTO valuesets VALUES('${valueSetUniqueId}','${valueSetOid}','${vs.valueSetVersion}','${vs.valueSetName}','${vs.author}','${vs.ersdConceptType}');`;
-
+  const insertValueSetSql = generateValueSetSqlStatement(vs);
   try {
     await dbClient.query(insertValueSetSql);
   } catch (e) {
     // handle error somehow
     console.error(e);
+    return { success: false, error: e };
   }
 
-  // insert concepts
-  // what's the value of the gem_formated_code // concept version? Do we prefer
-  // nulls?
-  const insertConceptsSql = vs.concepts.map((concept) => {
+  const insertConceptsSqlArray = generateConceptSqlStatements(vs);
+  const results = await Promise.allSettled(insertConceptsSqlArray);
+  const allSucceeded = results.every((r) => r.status === "fulfilled");
+  if (allSucceeded) return { success: true };
+
+  const failedInserts = results
+    .filter((r): r is PromiseRejectedResult => r.status === "rejected")
+    .map((r) => r.reason);
+
+  return { success: false, error: failedInserts };
+}
+function generateValueSetSqlStatement(vs: ValueSet) {
+  const valueSetOid = vs.valueSetId;
+  const valueSetUniqueId = `${valueSetOid}_${vs.valueSetVersion}`;
+  const insertValueSetSql = `INSERT INTO valuesets VALUES('${valueSetUniqueId}','${valueSetOid}','${vs.valueSetVersion}','${vs.valueSetName}','${vs.author}','${vs.ersdConceptType}');`;
+  return insertValueSetSql;
+}
+function generateConceptSqlStatements(vs: ValueSet) {
+  const valueSetOid = vs.valueSetId;
+  const valueSetUniqueId = `${valueSetOid}_${vs.valueSetVersion}`;
+
+  const insertConceptsSqlArray = vs.concepts.map((concept) => {
     const conceptUniqueId = `${valueSetOid}_${concept.code}`;
+    // what's the value of the gem_formated_code // concept version? Do we prefer
+    // nulls?
     const insertConceptSql = `INSERT INTO concepts VALUES('${conceptUniqueId}','${concept.code}','${vs.system}','${concept.display}','${concept.code}','${vs.valueSetVersion}');`;
 
     const primaryKey = randomUUID();
@@ -235,6 +253,7 @@ export async function insertValueSet(vs: ValueSet) {
         await dbClient.query(insertConceptSql);
         await dbClient.query(insertJoinSql);
       } catch (e) {
+        // what error do we want to output?
         console.error(e);
       }
     });
@@ -242,5 +261,5 @@ export async function insertValueSet(vs: ValueSet) {
     return sequentialInsertPromise;
   });
 
-  await Promise.allSettled(insertConceptsSql);
+  return insertConceptsSqlArray;
 }
