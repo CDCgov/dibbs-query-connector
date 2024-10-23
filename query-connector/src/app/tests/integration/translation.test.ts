@@ -5,7 +5,7 @@ import { ValueSet as FhirValueSet } from "fhir/r4";
 
 const EXPECTED_INTERNAL_VALUESET: ValueSet = {
   valueSetId: ExampleVsacValueSet.id,
-  valueSetVersion: DEFAULT_ERSD_VERSION,
+  valueSetVersion: ExampleVsacValueSet.version,
   valueSetName: ExampleVsacValueSet.title,
   author: ExampleVsacValueSet.publisher,
   system: ExampleVsacValueSet.compose.include[0].system,

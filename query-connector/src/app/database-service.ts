@@ -257,6 +257,8 @@ function generateConceptSqlStatements(vs: ValueSet) {
   const valueSetOid = vs.valueSetId;
   const valueSetUniqueId = `${valueSetOid}_${vs.valueSetVersion}`;
 
+  // fhirValueset.expansion?.contains?.forEach(e => e?.version)
+
   const insertConceptsSqlArray = vs.concepts.map((concept) => {
     const conceptUniqueId = `${valueSetOid}_${concept.code}`;
     // what's the value of the gem_formated_code // concept version? Do we prefer
