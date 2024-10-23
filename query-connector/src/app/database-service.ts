@@ -208,6 +208,10 @@ export async function translateVSACToInternalValueSet(
   } as ValueSet;
 }
 
+/**
+ *
+ * @param vs
+ */
 export async function insertValueSet(vs: ValueSet) {
   const insertValueSetSql = generateValueSetSqlStatement(vs);
   try {
