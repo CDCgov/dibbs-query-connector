@@ -84,10 +84,13 @@ const SelectSavedQuery: React.FC<SelectSavedQueryProps> = ({
             </option>
           ))}
         </Select>
+
+        {/* Customize Query Button */}
         <Button
           type="button"
           className="usa-button--outline bg-white margin-left-205"
           onClick={() => setShowCustomizedQuery(true)}
+          disabled={loadingQueryValueSets || !selectedQuery}
         >
           Customize query
         </Button>
