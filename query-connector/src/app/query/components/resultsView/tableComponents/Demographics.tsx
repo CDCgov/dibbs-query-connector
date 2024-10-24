@@ -28,7 +28,7 @@ export interface DemographicsProps {
  * @returns The Demographics component.
  */
 const Demographics: React.FC<DemographicsProps> = ({ patient }) => {
-  const demographicData = formatDemographics(patient);
+  const demographicData = formatDemographics(patient).filter((e) => Boolean(e));
 
   return (
     <div className="margin-top-0-important">
