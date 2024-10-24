@@ -74,7 +74,11 @@ const StepIndicator: React.FC<StepIndicatorProps> = ({
           status = "complete";
         }
         return (
-          <StepIndicatorStep label={label} status={status as StepStatus} />
+          <StepIndicatorStep
+            key={label}
+            label={label}
+            status={status as StepStatus}
+          />
         );
       })}
     </TrussStepIndicator>
