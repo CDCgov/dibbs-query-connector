@@ -216,17 +216,12 @@ export async function translateVSACToInternalValueSet(
  * @returns success / failure information, as well as errors as appropriate
  */
 export async function insertValueSet(vs: ValueSet) {
-  const insertValuesetPromise = generateValueSetSqlPromise(vs);
-  try {
-    await insertValuesetPromise;
-  } catch (e) {
-    // handle error somehow
-    console.error(e);
-    return { success: false, error: e };
-  }
+  const insertValueSetPromise = generateValueSetSqlPromise(vs);
+  const inserValueSetResult = await insertValueSetPromise;
 
   const insertConceptsPromiseArray = generateConceptSqlPromises(vs);
   const results = await Promise.allSettled(insertConceptsPromiseArray);
+
   const allSucceeded = results.every((r) => r.status === "fulfilled");
   if (allSucceeded) return { success: true };
 
@@ -257,7 +252,13 @@ function generateValueSetSqlPromise(vs: ValueSet) {
     vs.ersdConceptType,
   ];
 
-  return dbClient.query(insertValueSetSql, valuesArray, function (err) {});
+  return new Promise(async () => {
+    try {
+      await dbClient.query(insertValueSetSql, valuesArray);
+    } catch (e) {
+      console.error(e);
+    }
+  });
 }
 
 /**
@@ -292,7 +293,6 @@ function generateConceptSqlPromises(vs: ValueSet) {
           conceptUniqueId,
         ]);
       } catch (e) {
-        // what error do we want to output?
         console.error(e);
       }
     });
