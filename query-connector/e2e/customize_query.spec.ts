@@ -104,9 +104,6 @@ test.describe("querying with the Query Connector", () => {
   test("customize query select / deselect all filters whole DibbsConceptType, across tabs", async ({
     page,
   }) => {
-    // await expect(
-    //   page.getByText("249 labs found, 4 medications found, 104 conditions found."),
-    // ).toBeVisible();
     await page.getByRole("link", { name: "Labs" }).click();
     await page.getByRole("button", { name: "Deselect all labs" }).click();
 
@@ -177,7 +174,6 @@ test.describe("querying with the Query Connector", () => {
     for (let i = 1; i < 6; i++) {
       const row = obsRows.nth(i);
       const typeText = await row.locator("td").nth(1).textContent();
-      console.log(typeText);
       const presentKey = acceptableSdohKeywords.find((key) =>
         typeText?.toLowerCase().includes(key),
       );
