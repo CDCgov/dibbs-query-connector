@@ -396,7 +396,8 @@ export function isFhirResource(resource: unknown): resource is FhirResource {
 // leaving this blank until we can clean up the migration schema to drop these columns
 export const INTENTIONAL_EMPTY_STRING_FOR_CONCEPT_VERSION = "";
 
-// This version string was set up to maintain backwards compatibility with the
-// ICD-9 codes that the team is deciding call out-of-scope for this DB migration.
-// Leaving these in until we can clean these up in the migration schema
+// Originally, the column in the concept table was set up to maintain backwards e
+//compatibility with the ICD-9 codes that the team is deciding not to support after
+// we clean up the DB migration. Leaving these in until we can clean these up
+// in the migration schema
 export const INTENTIONAL_EMPTY_STRING_FOR_GEM_CODE = "";
