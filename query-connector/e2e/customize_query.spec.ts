@@ -23,11 +23,6 @@ test.describe("querying with the Query Connector", () => {
     ).toBeVisible();
 
     await page.getByRole("button", { name: "Fill fields" }).click();
-    await page.getByLabel("First Name").fill(TEST_PATIENT.FirstName);
-    await page.getByLabel("Last Name").fill(TEST_PATIENT.LastName);
-    await page.getByLabel("Date of Birth").fill(TEST_PATIENT.DOB);
-    await page.getByLabel("Medical Record Number").fill(TEST_PATIENT.MRN);
-    await page.getByLabel("Phone Number").fill(TEST_PATIENT.Phone);
     await page.getByRole("button", { name: "Search for patient" }).click();
     await expect(page.getByText("Loading")).toHaveCount(0, { timeout: 10000 });
 
