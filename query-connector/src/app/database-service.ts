@@ -217,7 +217,7 @@ export async function translateVSACToInternalValueSet(
  */
 export async function insertValueSet(vs: ValueSet) {
   const insertValueSetPromise = generateValueSetSqlPromise(vs);
-  const inserValueSetResult = await insertValueSetPromise;
+  await insertValueSetPromise;
 
   const insertConceptsPromiseArray = generateConceptSqlPromises(vs);
   const results = await Promise.allSettled(insertConceptsPromiseArray);
@@ -240,9 +240,9 @@ export async function insertValueSet(vs: ValueSet) {
 function generateValueSetSqlPromise(vs: ValueSet) {
   const valueSetOid = vs.valueSetId;
 
-  const valueSetUniqueId = `${vs.system}_${vs.valueSetVersion}`;
+  const valueSetUniqueId = `${valueSetOid}_${vs.valueSetVersion}`;
   const insertValueSetSql =
-    "INSERT INTO valuesets VALUES('$1','$2','$3','$4','$5','$6') RETURNING id;";
+    "INSERT INTO valuesets VALUES($1,$2,$3,$4,$5,$6) RETURNING id;";
   const valuesArray = [
     valueSetUniqueId,
     valueSetOid,
@@ -252,13 +252,7 @@ function generateValueSetSqlPromise(vs: ValueSet) {
     vs.ersdConceptType,
   ];
 
-  return new Promise(async () => {
-    try {
-      await dbClient.query(insertValueSetSql, valuesArray);
-    } catch (e) {
-      console.error(e);
-    }
-  });
+  return dbClient.query(insertValueSetSql, valuesArray);
 }
 
 /**
@@ -272,10 +266,10 @@ function generateConceptSqlPromises(vs: ValueSet) {
   const valueSetUniqueId = `${valueSetOid}_${vs.valueSetVersion}`;
 
   const insertConceptsSqlArray = vs.concepts.map((concept) => {
-    const systemPrefix = stripProtocolAndHostnameFromSystemUrl(vs.system);
+    const systemPrefix = stripProtocolAndTLDFromSystemUrl(vs.system);
     const conceptUniqueId = `${systemPrefix}_${concept.code}`;
-    const insertConceptSql = `INSERT INTO concepts VALUES('$1','$2','$3','$4','$5','$6') RETURNING id;`;
-    const insertJoinSql = `INSERT INTO valueset_to_concept (valueset_id, concept_id) VALUES('$1','$2') RETURNING valueset_id, concept_id;`;
+    const insertConceptSql = `INSERT INTO concepts VALUES($1,$2,$3,$4,$5,$6) RETURNING id;`;
+    const insertJoinSql = `INSERT INTO valueset_to_concept VALUES($1,$2, $3) RETURNING valueset_id, concept_id;`;
 
     const sequentialInsertPromise = new Promise(async () => {
       try {
@@ -289,6 +283,7 @@ function generateConceptSqlPromises(vs: ValueSet) {
           INTENTIONAL_EMPTY_STRING_FOR_CONCEPT_VERSION,
         ]);
         await dbClient.query(insertJoinSql, [
+          `${valueSetUniqueId}_${conceptUniqueId}`,
           valueSetUniqueId,
           conceptUniqueId,
         ]);
@@ -303,8 +298,7 @@ function generateConceptSqlPromises(vs: ValueSet) {
   return insertConceptsSqlArray;
 }
 
-function stripProtocolAndHostnameFromSystemUrl(systemURL: string) {
-  const reg = new RegExp("(?<=https?://)[^/]+");
-  const formatedSystem = reg.exec(systemURL);
-  return formatedSystem ? formatedSystem[0] : systemURL;
+function stripProtocolAndTLDFromSystemUrl(systemURL: string) {
+  const match = systemURL.match(/https?:\/\/([^\.]+)/);
+  return match ? match[1] : systemURL;
 }
