@@ -216,18 +216,60 @@ export async function translateVSACToInternalValueSet(
  */
 export async function insertValueSet(vs: ValueSet) {
   const insertValueSetPromise = generateValueSetSqlPromise(vs);
-  await insertValueSetPromise;
+
+  try {
+    await insertValueSetPromise;
+  } catch (e) {
+    console.error(
+      `ValueSet insertion for ${vs.valueSetId}_${vs.valueSetVersion} failed`,
+    );
+    console.error(e);
+    return { success: false, error: "Error occured in valuset insertion" };
+  }
 
   const insertConceptsPromiseArray = generateConceptSqlPromises(vs);
-  const results = await Promise.allSettled(insertConceptsPromiseArray);
-  const allSucceeded = results.every((r) => r.status === "fulfilled");
-  if (allSucceeded) return { success: true };
+  const conceptInsertResults = await Promise.allSettled(
+    insertConceptsPromiseArray,
+  );
 
-  const failedInserts = results
+  const allConceptInsertsSucceed = conceptInsertResults.every(
+    (r) => r.status === "fulfilled",
+  );
+
+  const failedConceptInserts = conceptInsertResults
     .filter((r): r is PromiseRejectedResult => r.status === "rejected")
-    .map((r) => r.reason);
+    .map((r) => {
+      console.error("Concept insertion failed");
+      console.error(r.reason);
+      return r.reason;
+    });
 
-  return { success: false, error: failedInserts };
+  const joinInsertsPromiseArray = generateValuesetConceptJoinSqlPromises(vs);
+  const joinInsertResults = await Promise.allSettled(joinInsertsPromiseArray);
+
+  const allJoinInsertsSucceed = joinInsertResults.every(
+    (r) => r.status === "fulfilled",
+  );
+  const failedJoinInserts = joinInsertResults
+    .filter((r): r is PromiseRejectedResult => r.status === "rejected")
+    .map((r) => {
+      console.error("ValueSet to Concept join insertion failed");
+      console.error(r.reason);
+      return r.reason;
+    });
+
+  if (allConceptInsertsSucceed && allJoinInsertsSucceed) {
+    return { success: true };
+  }
+  let errorArray: string[] = [];
+  if (failedConceptInserts.length > 0) {
+    errorArray.push("Error occured in concept seeding");
+  }
+  if (failedJoinInserts.length > 0) {
+    errorArray.push("Error occured in ValueSet <> concept join seeding");
+  }
+
+  return { success: false, error: errorArray.join(",") };
 }
 
 /**
@@ -260,38 +302,39 @@ function generateValueSetSqlPromise(vs: ValueSet) {
  * @returns The SQL statement array for all concepts for insertion
  */
 function generateConceptSqlPromises(vs: ValueSet) {
-  const valueSetOid = vs.valueSetId;
-  const valueSetUniqueId = `${valueSetOid}_${vs.valueSetVersion}`;
-
   const insertConceptsSqlArray = vs.concepts.map((concept) => {
     const systemPrefix = stripProtocolAndTLDFromSystemUrl(vs.system);
     const conceptUniqueId = `${systemPrefix}_${concept.code}`;
     const insertConceptSql = `INSERT INTO concepts VALUES($1,$2,$3,$4,$5,$6) RETURNING id;`;
+    const conceptInsertPromise = dbClient.query(insertConceptSql, [
+      conceptUniqueId,
+      concept.code,
+      vs.system,
+      concept.display,
+      // see notes in constants file for the intentional empty strings
+      INTENTIONAL_EMPTY_STRING_FOR_GEM_CODE,
+      INTENTIONAL_EMPTY_STRING_FOR_CONCEPT_VERSION,
+    ]);
+
+    return conceptInsertPromise;
+  });
+
+  return insertConceptsSqlArray;
+}
+
+function generateValuesetConceptJoinSqlPromises(vs: ValueSet) {
+  const valueSetUniqueId = `${vs.valueSetId}_${vs.valueSetVersion}`;
+  const insertConceptsSqlArray = vs.concepts.map((concept) => {
+    const systemPrefix = stripProtocolAndTLDFromSystemUrl(vs.system);
+    const conceptUniqueId = `${systemPrefix}_${concept.code}`;
     const insertJoinSql = `INSERT INTO valueset_to_concept VALUES($1,$2, $3) RETURNING valueset_id, concept_id;`;
+    const conceptInsertPromise = dbClient.query(insertJoinSql, [
+      `${valueSetUniqueId}_${conceptUniqueId}`,
+      valueSetUniqueId,
+      conceptUniqueId,
+    ]);
 
-    const sequentialInsertPromise = new Promise(async () => {
-      try {
-        await dbClient.query(insertConceptSql, [
-          conceptUniqueId,
-          concept.code,
-          vs.system,
-          concept.display,
-          // see notes in constants file for the intentional empty strings
-          INTENTIONAL_EMPTY_STRING_FOR_GEM_CODE,
-          INTENTIONAL_EMPTY_STRING_FOR_CONCEPT_VERSION,
-        ]);
-        await dbClient.query(insertJoinSql, [
-          `${valueSetUniqueId}_${conceptUniqueId}`,
-          valueSetUniqueId,
-          conceptUniqueId,
-        ]);
-      } catch (e) {
-        // what error do we want to output?
-        console.error(e);
-      }
-    });
-
-    return sequentialInsertPromise;
+    return conceptInsertPromise;
   });
 
   return insertConceptsSqlArray;
