@@ -20,7 +20,8 @@ const Backlink: React.FC<BacklinkProps> = ({ onClick, label }) => {
       className="back-link unchanged-color-on-visit"
       aria-label="Back arrow indicating ability to navigate back a page if clicked"
     >
-      <Icon.ArrowBack /> {label}
+      <Icon.ArrowBack aria-label="Arrow point left indicating return to previous step" />{" "}
+      {label}
     </a>
   );
 };

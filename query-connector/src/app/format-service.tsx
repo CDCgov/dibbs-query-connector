@@ -170,10 +170,10 @@ export function formatMRN(identifier: Identifier[]): JSX.Element {
         });
         if (mrnFlag) {
           return (
-            <>
+            <div key={id.value}>
               {" "}
               {id.value} <br />{" "}
-            </>
+            </div>
           );
         }
 

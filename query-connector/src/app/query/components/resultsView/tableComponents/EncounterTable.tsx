@@ -28,7 +28,6 @@ const EncounterTable: React.FC<EncounterTableProps> = ({
     encounters,
     "serviceProvider",
   );
-  encounters.forEach((e) => console.log(e?.class));
   return (
     <Table className="margin-top-0-important">
       <thead>
