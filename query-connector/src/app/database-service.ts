@@ -10,7 +10,6 @@ import {
   ersdToDibbsConceptMap,
 } from "./constants";
 import { encode } from "base-64";
-import { randomUUID } from "crypto";
 
 const getQuerybyNameSQL = `
 select q.query_name, q.id, qtv.valueset_id, vs.name as valueset_name, vs.version, vs.author as author, vs.type, vs.dibbs_concept_type as dibbs_concept_type, qic.concept_id, qic.include, c.code, c.code_system, c.display 
