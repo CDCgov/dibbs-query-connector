@@ -61,6 +61,7 @@ const CustomizeQueryAccordionBody: React.FC<
               >
                 {item.include && (
                   <Icon.Check
+                    aria-label="Check icon indicating selection"
                     className="usa-icon"
                     style={{ backgroundColor: "white" }}
                     size={4}
