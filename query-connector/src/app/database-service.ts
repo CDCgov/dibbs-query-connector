@@ -4,6 +4,8 @@ import { Bundle, OperationOutcome, ValueSet as FhirValueSet } from "fhir/r4";
 import {
   Concept,
   ErsdConceptType,
+  INTENTIONAL_EMPTY_STRING_FOR_CONCEPT_VERSION,
+  INTENTIONAL_EMPTY_STRING_FOR_GEM_CODE,
   ValueSet,
   ersdToDibbsConceptMap,
 } from "./constants";
@@ -257,16 +259,12 @@ function generateConceptSqlStatements(vs: ValueSet) {
   const valueSetOid = vs.valueSetId;
   const valueSetUniqueId = `${valueSetOid}_${vs.valueSetVersion}`;
 
-  // fhirValueset.expansion?.contains?.forEach(e => e?.version)
-
   const insertConceptsSqlArray = vs.concepts.map((concept) => {
     const conceptUniqueId = `${valueSetOid}_${concept.code}`;
-    // what's the value of the gem_formated_code // concept version? Do we prefer
-    // nulls?
-    const insertConceptSql = `INSERT INTO concepts VALUES('${conceptUniqueId}','${concept.code}','${vs.system}','${concept.display}','${concept.code}','${vs.valueSetVersion}');`;
 
-    const primaryKey = randomUUID();
-    const insertJoinSql = `INSERT INTO valueset_to_concept VALUES('${primaryKey}','${valueSetUniqueId}','${conceptUniqueId}');`;
+    // see notes in constants file for the intentional empty strings
+    const insertConceptSql = `INSERT INTO concepts VALUES('${conceptUniqueId}','${concept.code}','${vs.system}','${concept.display}','${INTENTIONAL_EMPTY_STRING_FOR_GEM_CODE}','${INTENTIONAL_EMPTY_STRING_FOR_CONCEPT_VERSION}');`;
+    const insertJoinSql = `INSERT INTO valueset_to_concept (valueset_id, concept_id) VALUES('${valueSetUniqueId}','${conceptUniqueId}');`;
 
     const sequentialInsertPromise = new Promise(async () => {
       try {
