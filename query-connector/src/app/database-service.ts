@@ -216,17 +216,17 @@ export async function translateVSACToInternalValueSet(
  * @returns success / failure information, as well as errors as appropriate
  */
 export async function insertValueSet(vs: ValueSet) {
-  const insertValueSetSql = generateValueSetSqlStatement(vs);
+  const insertValuesetPromise = generateValueSetSqlPromise(vs);
   try {
-    await dbClient.query(insertValueSetSql);
+    await insertValuesetPromise;
   } catch (e) {
     // handle error somehow
     console.error(e);
     return { success: false, error: e };
   }
 
-  const insertConceptsSqlArray = generateConceptSqlStatements(vs);
-  const results = await Promise.allSettled(insertConceptsSqlArray);
+  const insertConceptsPromiseArray = generateConceptSqlPromises(vs);
+  const results = await Promise.allSettled(insertConceptsPromiseArray);
   const allSucceeded = results.every((r) => r.status === "fulfilled");
   if (allSucceeded) return { success: true };
 
@@ -242,11 +242,21 @@ export async function insertValueSet(vs: ValueSet) {
  * @param vs - The ValueSet in of the shape of our internal data model to insert
  * @returns The SQL statement for insertion
  */
-function generateValueSetSqlStatement(vs: ValueSet) {
+function generateValueSetSqlPromise(vs: ValueSet) {
   const valueSetOid = vs.valueSetId;
   const valueSetUniqueId = `${valueSetOid}_${vs.valueSetVersion}`;
-  const insertValueSetSql = `INSERT INTO valuesets VALUES('${valueSetUniqueId}','${valueSetOid}','${vs.valueSetVersion}','${vs.valueSetName}','${vs.author}','${vs.ersdConceptType}');`;
-  return insertValueSetSql;
+  const insertValueSetSql =
+    "INSERT INTO valuesets VALUES('$1','$2','$3','$4','$5','$6') RETURNING id;";
+  const valuesArray = [
+    valueSetUniqueId,
+    valueSetOid,
+    vs.valueSetVersion,
+    vs.valueSetName,
+    vs.author,
+    vs.ersdConceptType,
+  ];
+
+  return dbClient.query(insertValueSetSql, valuesArray, function (err) {});
 }
 
 /**
@@ -255,21 +265,30 @@ function generateValueSetSqlStatement(vs: ValueSet) {
  * @param vs - The ValueSet in of the shape of our internal data model to insert
  * @returns The SQL statement array for all concepts for insertion
  */
-function generateConceptSqlStatements(vs: ValueSet) {
+function generateConceptSqlPromises(vs: ValueSet) {
   const valueSetOid = vs.valueSetId;
   const valueSetUniqueId = `${valueSetOid}_${vs.valueSetVersion}`;
 
   const insertConceptsSqlArray = vs.concepts.map((concept) => {
     const conceptUniqueId = `${valueSetOid}_${concept.code}`;
-
-    // see notes in constants file for the intentional empty strings
-    const insertConceptSql = `INSERT INTO concepts VALUES('${conceptUniqueId}','${concept.code}','${vs.system}','${concept.display}','${INTENTIONAL_EMPTY_STRING_FOR_GEM_CODE}','${INTENTIONAL_EMPTY_STRING_FOR_CONCEPT_VERSION}');`;
-    const insertJoinSql = `INSERT INTO valueset_to_concept (valueset_id, concept_id) VALUES('${valueSetUniqueId}','${conceptUniqueId}');`;
+    const insertConceptSql = `INSERT INTO concepts VALUES('$1','$2','$3','$4','$5','$6') RETURNING id;`;
+    const insertJoinSql = `INSERT INTO valueset_to_concept (valueset_id, concept_id) VALUES('$1','$2') RETURNING valueset_id, concept_id;`;
 
     const sequentialInsertPromise = new Promise(async () => {
       try {
-        await dbClient.query(insertConceptSql);
-        await dbClient.query(insertJoinSql);
+        await dbClient.query(insertConceptSql, [
+          conceptUniqueId,
+          concept.code,
+          vs.system,
+          concept.display,
+          // see notes in constants file for the intentional empty strings
+          INTENTIONAL_EMPTY_STRING_FOR_GEM_CODE,
+          INTENTIONAL_EMPTY_STRING_FOR_CONCEPT_VERSION,
+        ]);
+        await dbClient.query(insertJoinSql, [
+          valueSetUniqueId,
+          conceptUniqueId,
+        ]);
       } catch (e) {
         // what error do we want to output?
         console.error(e);
