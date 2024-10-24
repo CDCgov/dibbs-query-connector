@@ -215,8 +215,9 @@ export async function translateVSACToInternalValueSet(
  * @returns success / failure information, as well as errors as appropriate
  */
 export async function insertValueSet(vs: ValueSet) {
-  const insertValueSetPromise = generateValueSetSqlPromise(vs);
+  let errorArray: string[] = [];
 
+  const insertValueSetPromise = generateValueSetSqlPromise(vs);
   try {
     await insertValueSetPromise;
   } catch (e) {
@@ -224,7 +225,7 @@ export async function insertValueSet(vs: ValueSet) {
       `ValueSet insertion for ${vs.valueSetId}_${vs.valueSetVersion} failed`,
     );
     console.error(e);
-    return { success: false, error: "Error occured in valuset insertion" };
+    errorArray.push("Error occured in valuset insertion");
   }
 
   const insertConceptsPromiseArray = generateConceptSqlPromises(vs);
@@ -236,13 +237,10 @@ export async function insertValueSet(vs: ValueSet) {
     (r) => r.status === "fulfilled",
   );
 
-  const failedConceptInserts = conceptInsertResults
-    .filter((r): r is PromiseRejectedResult => r.status === "rejected")
-    .map((r) => {
-      console.error("Concept insertion failed");
-      console.error(r.reason);
-      return r.reason;
-    });
+  if (!allConceptInsertsSucceed) {
+    logRejectedPromiseReasons(conceptInsertResults, "Concept insertion failed");
+    errorArray.push("Error occured in concept insertion");
+  }
 
   const joinInsertsPromiseArray = generateValuesetConceptJoinSqlPromises(vs);
   const joinInsertResults = await Promise.allSettled(joinInsertsPromiseArray);
@@ -250,25 +248,16 @@ export async function insertValueSet(vs: ValueSet) {
   const allJoinInsertsSucceed = joinInsertResults.every(
     (r) => r.status === "fulfilled",
   );
-  const failedJoinInserts = joinInsertResults
-    .filter((r): r is PromiseRejectedResult => r.status === "rejected")
-    .map((r) => {
-      console.error("ValueSet to Concept join insertion failed");
-      console.error(r.reason);
-      return r.reason;
-    });
 
-  if (allConceptInsertsSucceed && allJoinInsertsSucceed) {
-    return { success: true };
-  }
-  let errorArray: string[] = [];
-  if (failedConceptInserts.length > 0) {
-    errorArray.push("Error occured in concept seeding");
-  }
-  if (failedJoinInserts.length > 0) {
+  if (!allJoinInsertsSucceed) {
+    logRejectedPromiseReasons(
+      joinInsertResults,
+      "ValueSet <> concept join insert failed",
+    );
     errorArray.push("Error occured in ValueSet <> concept join seeding");
   }
 
+  if (errorArray.length === 0) return { success: true };
   return { success: false, error: errorArray.join(",") };
 }
 
@@ -343,4 +332,17 @@ function generateValuesetConceptJoinSqlPromises(vs: ValueSet) {
 function stripProtocolAndTLDFromSystemUrl(systemURL: string) {
   const match = systemURL.match(/https?:\/\/([^\.]+)/);
   return match ? match[1] : systemURL;
+}
+
+function logRejectedPromiseReasons<T>(
+  resultsArray: PromiseSettledResult<T>[],
+  errorMessageString: string,
+) {
+  return resultsArray
+    .filter((r): r is PromiseRejectedResult => r.status === "rejected")
+    .map((r) => {
+      console.error(errorMessageString);
+      console.error(r.reason);
+      return r.reason;
+    });
 }
