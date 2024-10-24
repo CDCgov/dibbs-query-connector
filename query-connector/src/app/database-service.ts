@@ -4,6 +4,8 @@ import { Bundle, OperationOutcome, ValueSet as FhirValueSet } from "fhir/r4";
 import {
   Concept,
   ErsdConceptType,
+  INTENTIONAL_EMPTY_STRING_FOR_CONCEPT_VERSION,
+  INTENTIONAL_EMPTY_STRING_FOR_GEM_CODE,
   ValueSet,
   ersdToDibbsConceptMap,
 } from "./constants";
@@ -208,18 +210,23 @@ export async function translateVSACToInternalValueSet(
   } as ValueSet;
 }
 
+/**
+ * Function call to insert a new ValueSet into the database.
+ * @param vs - a ValueSet in of the shape of our internal data model to insert
+ * @returns success / failure information, as well as errors as appropriate
+ */
 export async function insertValueSet(vs: ValueSet) {
-  const insertValueSetSql = generateValueSetSqlStatement(vs);
+  const insertValuesetPromise = generateValueSetSqlPromise(vs);
   try {
-    await dbClient.query(insertValueSetSql);
+    await insertValuesetPromise;
   } catch (e) {
     // handle error somehow
     console.error(e);
     return { success: false, error: e };
   }
 
-  const insertConceptsSqlArray = generateConceptSqlStatements(vs);
-  const results = await Promise.allSettled(insertConceptsSqlArray);
+  const insertConceptsPromiseArray = generateConceptSqlPromises(vs);
+  const results = await Promise.allSettled(insertConceptsPromiseArray);
   const allSucceeded = results.every((r) => r.status === "fulfilled");
   if (allSucceeded) return { success: true };
 
@@ -230,32 +237,60 @@ export async function insertValueSet(vs: ValueSet) {
   return { success: false, error: failedInserts };
 }
 
-function generateValueSetSqlStatement(vs: ValueSet) {
+/**
+ * Helper function to generate the SQL needed for valueset insertion.
+ * @param vs - The ValueSet in of the shape of our internal data model to insert
+ * @returns The SQL statement for insertion
+ */
+function generateValueSetSqlPromise(vs: ValueSet) {
   const valueSetOid = vs.valueSetId;
-  const valueSetUniqueId = `${valueSetOid}_${vs.valueSetVersion}`;
-  const insertValueSetSql = `INSERT INTO valuesets VALUES('${valueSetUniqueId}','${valueSetOid}','${vs.valueSetVersion}','${vs.valueSetName}','${vs.author}','${vs.ersdConceptType}');`;
-  return insertValueSetSql;
+
+  const valueSetUniqueId = `${vs.system}_${vs.valueSetVersion}`;
+  const insertValueSetSql =
+    "INSERT INTO valuesets VALUES('$1','$2','$3','$4','$5','$6') RETURNING id;";
+  const valuesArray = [
+    valueSetUniqueId,
+    valueSetOid,
+    vs.valueSetVersion,
+    vs.valueSetName,
+    vs.author,
+    vs.ersdConceptType,
+  ];
+
+  return dbClient.query(insertValueSetSql, valuesArray, function (err) {});
 }
 
-function generateConceptSqlStatements(vs: ValueSet) {
+/**
+ * Helper function to generate the SQL needed for concept / valueset join insertion
+ * needed during valueset creation.
+ * @param vs - The ValueSet in of the shape of our internal data model to insert
+ * @returns The SQL statement array for all concepts for insertion
+ */
+function generateConceptSqlPromises(vs: ValueSet) {
   const valueSetOid = vs.valueSetId;
   const valueSetUniqueId = `${valueSetOid}_${vs.valueSetVersion}`;
 
   const insertConceptsSqlArray = vs.concepts.map((concept) => {
-    // TODO: strip any non-loinc/snomed strings
-    const conceptUniqueId = `${vs.system}_${concept.code}`;
-    // what's the value of the gem_formated_code // concept version? Do we prefer
-    // nulls?
-    // TODO: ticket to clean up gem_formatted_code // version?
-    const insertConceptSql = `INSERT INTO concepts VALUES('${conceptUniqueId}','${concept.code}','${vs.system}','${concept.display}','${""}','${vs.valueSetVersion}');`;
-
-    const primaryKey = randomUUID();
-    const insertJoinSql = `INSERT INTO valueset_to_concept VALUES('${primaryKey}','${valueSetUniqueId}','${conceptUniqueId}');`;
+    const systemPrefix = stripProtocolAndHostnameFromSystemUrl(vs.system);
+    const conceptUniqueId = `${systemPrefix}_${concept.code}`;
+    const insertConceptSql = `INSERT INTO concepts VALUES('$1','$2','$3','$4','$5','$6') RETURNING id;`;
+    const insertJoinSql = `INSERT INTO valueset_to_concept (valueset_id, concept_id) VALUES('$1','$2') RETURNING valueset_id, concept_id;`;
 
     const sequentialInsertPromise = new Promise(async () => {
       try {
-        await dbClient.query(insertConceptSql);
-        await dbClient.query(insertJoinSql);
+        await dbClient.query(insertConceptSql, [
+          conceptUniqueId,
+          concept.code,
+          vs.system,
+          concept.display,
+          // see notes in constants file for the intentional empty strings
+          INTENTIONAL_EMPTY_STRING_FOR_GEM_CODE,
+          INTENTIONAL_EMPTY_STRING_FOR_CONCEPT_VERSION,
+        ]);
+        await dbClient.query(insertJoinSql, [
+          valueSetUniqueId,
+          conceptUniqueId,
+        ]);
       } catch (e) {
         // what error do we want to output?
         console.error(e);
@@ -266,4 +301,10 @@ function generateConceptSqlStatements(vs: ValueSet) {
   });
 
   return insertConceptsSqlArray;
+}
+
+function stripProtocolAndHostnameFromSystemUrl(systemURL: string) {
+  const reg = new RegExp("(?<=https?://)[^/]+");
+  const formatedSystem = reg.exec(systemURL);
+  return formatedSystem ? formatedSystem[0] : systemURL;
 }

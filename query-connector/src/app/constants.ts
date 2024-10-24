@@ -386,3 +386,17 @@ export function isFhirResource(resource: unknown): resource is FhirResource {
     "resourceType" in resource
   );
 }
+
+// The value for "concept version" (sometimes) exists under "expansion" in the VSAC FHIR
+// response. This is similar, but different in some subtle ways from the "compose.include"
+// path that we're currently using to grab concept information. Although we could
+// grab and parse this information from the FHIR response, it would involve
+// changing our data model to store information that we think is a "nice to
+// have", which is only available sometimes. As a result, we're purposefully
+// leaving this blank until we can clean up the migration schema to drop these columns
+export const INTENTIONAL_EMPTY_STRING_FOR_CONCEPT_VERSION = "";
+
+// This version string was set up to maintain backwards compatibility with the
+// ICD-9 codes that the team is deciding call out-of-scope for this DB migration.
+// Leaving these in until we can clean these up in the migration schema
+export const INTENTIONAL_EMPTY_STRING_FOR_GEM_CODE = "";
