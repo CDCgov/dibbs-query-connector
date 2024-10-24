@@ -244,7 +244,8 @@ export async function insertValueSet(vs: ValueSet) {
  */
 function generateValueSetSqlPromise(vs: ValueSet) {
   const valueSetOid = vs.valueSetId;
-  const valueSetUniqueId = `${valueSetOid}_${vs.valueSetVersion}`;
+
+  const valueSetUniqueId = `${vs.system}_${vs.valueSetVersion}`;
   const insertValueSetSql =
     "INSERT INTO valuesets VALUES('$1','$2','$3','$4','$5','$6') RETURNING id;";
   const valuesArray = [
@@ -270,7 +271,8 @@ function generateConceptSqlPromises(vs: ValueSet) {
   const valueSetUniqueId = `${valueSetOid}_${vs.valueSetVersion}`;
 
   const insertConceptsSqlArray = vs.concepts.map((concept) => {
-    const conceptUniqueId = `${valueSetOid}_${concept.code}`;
+    const systemPrefix = stripProtocolAndHostnameFromSystemUrl(vs.system);
+    const conceptUniqueId = `${systemPrefix}_${concept.code}`;
     const insertConceptSql = `INSERT INTO concepts VALUES('$1','$2','$3','$4','$5','$6') RETURNING id;`;
     const insertJoinSql = `INSERT INTO valueset_to_concept (valueset_id, concept_id) VALUES('$1','$2') RETURNING valueset_id, concept_id;`;
 
@@ -299,4 +301,10 @@ function generateConceptSqlPromises(vs: ValueSet) {
   });
 
   return insertConceptsSqlArray;
+}
+
+function stripProtocolAndHostnameFromSystemUrl(systemURL: string) {
+  const reg = new RegExp("(?<=https?://)[^/]+");
+  const formatedSystem = reg.exec(systemURL);
+  return formatedSystem ? formatedSystem[0] : systemURL;
 }
