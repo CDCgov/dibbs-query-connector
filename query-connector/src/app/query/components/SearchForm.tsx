@@ -79,6 +79,9 @@ const SearchForm: React.FC<SearchFormProps> = ({
     [setUseCase],
   );
 
+  const nameRegex = "^[A-Za-z\ \-\'\.]+$"
+  const nameRuleHint = "Enter a name using only letters, hyphens, apostrophes, spaces, or periods."
+
   async function HandleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!fhirServer) {
@@ -191,9 +194,10 @@ const SearchForm: React.FC<SearchFormProps> = ({
               </Label>
               <TextInput
                 id="firstName"
+                title={nameRuleHint}
                 name="first_name"
                 type="text"
-                pattern="^[A-Za-z ]+$"
+                pattern={nameRegex}
                 value={firstName}
                 onChange={(event) => {
                   setFirstName(event.target.value);
@@ -210,9 +214,10 @@ const SearchForm: React.FC<SearchFormProps> = ({
               </Label>
               <TextInput
                 id="lastName"
+                title={nameRuleHint}
                 name="last_name"
                 type="text"
-                pattern="^[A-Za-z ]+$"
+                pattern={nameRegex}
                 value={lastName}
                 onChange={(event) => {
                   setLastName(event.target.value);
