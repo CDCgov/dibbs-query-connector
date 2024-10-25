@@ -79,7 +79,7 @@ const SearchForm: React.FC<SearchFormProps> = ({
     [setUseCase],
   );
 
-  const nameRegex = "^[A-Za-z\u00C0-\u024F\u1E00-\u1EFF\ \-\'\.]+$"
+  const nameRegex = "^[A-Za-z\u00C0-\u024F\u1E00-\u1EFF\-\'\.\ ]+$"
   const nameRuleHint = "Enter a name using only letters, hyphens, apostrophes, spaces, or periods."
 
   async function HandleSubmit(event: React.FormEvent<HTMLFormElement>) {
