@@ -19,7 +19,7 @@ export default function HeaderComponent() {
   }, []);
 
   const router = useRouter();
-  const path = usePathname()
+  const path = usePathname();
 
   const handleClick = () => {
     router.push(`/signin`);
@@ -41,7 +41,11 @@ export default function HeaderComponent() {
               <em className="usa-logo__text text-base-lightest">
                 <a
                   className="text-base-lightest font-sans-xl text-bold"
-                  href={process.env.NODE_ENV === "production" ? "/tefca-viewer" : "/"}
+                  href={
+                    process.env.NODE_ENV === "production"
+                      ? "/tefca-viewer"
+                      : "/"
+                  }
                   title={metadata.title}
                 >
                   {metadata.title}
@@ -56,7 +60,7 @@ export default function HeaderComponent() {
               marginLeft: "auto",
             }}
           >
-            {(path != '/signin' && isClient) && (
+            {path != "/signin" && isClient && (
               <ModalButton
                 modalRef={modalRef}
                 title={"Data Usage Policy"}
@@ -64,13 +68,13 @@ export default function HeaderComponent() {
               />
             )}
             {/* TODO: Rework show/hide rules based on actual auth status */}
-            {(path != '/signin' && path != '/query') && ( 
-               <Button
-                 className={styles.signinButton}
-                 type="button"
-                 id="signin-button"
-                 title={"Sign in button"}
-                 onClick={() => handleClick()}
+            {path != "/signin" && path != "/query" && (
+              <Button
+                className={styles.signinButton}
+                type="button"
+                id="signin-button"
+                title={"Sign in button"}
+                onClick={() => handleClick()}
               >
                 Sign in
               </Button>
