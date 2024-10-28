@@ -29,3 +29,9 @@ services:
     depends_on:
       db:
         condition: service_started
+
+  # HAPI FHIR Server for running e2e tests
+  hapi-fhir-server:
+    image: "hapiproject/hapi:latest"
+    ports:
+      - "8080:8080"
