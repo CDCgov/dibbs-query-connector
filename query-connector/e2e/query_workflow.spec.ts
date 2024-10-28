@@ -75,14 +75,14 @@ test.describe("querying with the Query Connector", () => {
     // and seems to apply with no rhyme or reason to use case. Commenting this out
     // because it no longer acts as a sanity check but leaving it here as a warning
     // to others.
-    // await page.getByRole("button", { name: "Customize Query" }).click();
-    // await expect(
-    //   page.getByRole("heading", { name: "Customize Query" }),
-    // ).toBeVisible();
-    // await expect(
-    //   page.getByText("0 labs found, 0 medications found, 0 conditions found."),
-    // ).not.toBeVisible();
-    // await page.getByText("Return to Select query").click();
+    await page.getByRole("button", { name: "Customize Query" }).click();
+    await expect(
+      page.getByRole("heading", { name: "Customize Query" }),
+    ).toBeVisible();
+    await expect(
+      page.getByText("0 labs found, 0 medications found, 0 conditions found."),
+    ).not.toBeVisible();
+    await page.getByText("Return to Select query").click();
 
     await page.getByRole("button", { name: "Submit" }).click();
     await expect(page.getByText("Loading")).toHaveCount(0, { timeout: 10000 });
