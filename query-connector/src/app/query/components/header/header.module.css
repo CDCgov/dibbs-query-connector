@@ -5,4 +5,15 @@
   color: white !important;
   padding: 0px !important;
   font: inherit !important;
+  margin-right: 1rem !important;
+}
+
+.signinButton {
+  padding: 0.75rem 1.25rem !important;
+  cursor: pointer;
+  background: none !important;
+  border: 2px solid white !important;
+  border-radius: 4px !important;
+  color: white !important;
+  font: inherit !important;
 }

@@ -1,0 +1,37 @@
+@use "../../styles/_variables" as *;
+
+.column {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.column-left {
+    background: #adcfdc;
+}
+
+.signin-button {
+    margin: 1rem 0rem !important;
+    width: 100%;
+}
+
+.card {
+    min-width: 10rem;
+    max-width: 50%;
+    color: #5c5c5c;
+}
+
+.image {
+    max-width: 60%;
+    max-height: 60%;
+    min-width: 10rem;
+}
+
+.formText {
+    text-align: center;
+}
+
+.formInput {
+    margin: 0.5rem 0rem;
+}
