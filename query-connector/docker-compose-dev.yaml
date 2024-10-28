@@ -35,3 +35,13 @@ services:
     image: "hapiproject/hapi:latest"
     ports:
       - "8080:8080"
+  data-loader:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    volumes:
+      - "./src/app/tests/assets/GoldenSickPatient.json:/etc/GoldenSickPatient.json"
+      - "./post_e2e_data_hapi.sh:/post_e2e_data_hapi.sh"
+    command: ["sh", "post_e2e_data_hapi.sh"]
+    depends_on:
+      - hapi-fhir-server
