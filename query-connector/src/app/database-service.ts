@@ -3,8 +3,9 @@ import { Pool, PoolConfig, QueryResultRow } from "pg";
 import { Bundle, OperationOutcome, ValueSet as FhirValueSet } from "fhir/r4";
 import {
   Concept,
-  DEFAULT_ERSD_VERSION,
   ErsdConceptType,
+  INTENTIONAL_EMPTY_STRING_FOR_CONCEPT_VERSION,
+  INTENTIONAL_EMPTY_STRING_FOR_GEM_CODE,
   ValueSet,
   ersdToDibbsConceptMap,
 } from "./constants";
@@ -184,7 +185,7 @@ export async function translateVSACToInternalValueSet(
   ersdConceptType: ErsdConceptType,
 ) {
   const id = fhirValueset.id;
-  const version = DEFAULT_ERSD_VERSION;
+  const version = fhirValueset.version;
 
   const name = fhirValueset.title;
   const author = fhirValueset.publisher;
@@ -206,4 +207,142 @@ export async function translateVSACToInternalValueSet(
     includeValueSet: false,
     concepts: concepts,
   } as ValueSet;
+}
+
+/**
+ * Function call to insert a new ValueSet into the database.
+ * @param vs - a ValueSet in of the shape of our internal data model to insert
+ * @returns success / failure information, as well as errors as appropriate
+ */
+export async function insertValueSet(vs: ValueSet) {
+  let errorArray: string[] = [];
+
+  const insertValueSetPromise = generateValueSetSqlPromise(vs);
+  try {
+    await insertValueSetPromise;
+  } catch (e) {
+    console.error(
+      `ValueSet insertion for ${vs.valueSetId}_${vs.valueSetVersion} failed`,
+    );
+    console.error(e);
+    errorArray.push("Error occured in valuset insertion");
+  }
+
+  const insertConceptsPromiseArray = generateConceptSqlPromises(vs);
+  const conceptInsertResults = await Promise.allSettled(
+    insertConceptsPromiseArray,
+  );
+
+  const allConceptInsertsSucceed = conceptInsertResults.every(
+    (r) => r.status === "fulfilled",
+  );
+
+  if (!allConceptInsertsSucceed) {
+    logRejectedPromiseReasons(conceptInsertResults, "Concept insertion failed");
+    errorArray.push("Error occured in concept insertion");
+  }
+
+  const joinInsertsPromiseArray = generateValuesetConceptJoinSqlPromises(vs);
+  const joinInsertResults = await Promise.allSettled(joinInsertsPromiseArray);
+
+  const allJoinInsertsSucceed = joinInsertResults.every(
+    (r) => r.status === "fulfilled",
+  );
+
+  if (!allJoinInsertsSucceed) {
+    logRejectedPromiseReasons(
+      joinInsertResults,
+      "ValueSet <> concept join insert failed",
+    );
+    errorArray.push("Error occured in ValueSet <> concept join seeding");
+  }
+
+  if (errorArray.length === 0) return { success: true };
+  return { success: false, error: errorArray.join(",") };
+}
+
+/**
+ * Helper function to generate the SQL needed for valueset insertion.
+ * @param vs - The ValueSet in of the shape of our internal data model to insert
+ * @returns The SQL statement for insertion
+ */
+function generateValueSetSqlPromise(vs: ValueSet) {
+  const valueSetOid = vs.valueSetId;
+
+  const valueSetUniqueId = `${valueSetOid}_${vs.valueSetVersion}`;
+  const insertValueSetSql =
+    "INSERT INTO valuesets VALUES($1,$2,$3,$4,$5,$6) RETURNING id;";
+  const valuesArray = [
+    valueSetUniqueId,
+    valueSetOid,
+    vs.valueSetVersion,
+    vs.valueSetName,
+    vs.author,
+    vs.ersdConceptType,
+  ];
+
+  return dbClient.query(insertValueSetSql, valuesArray);
+}
+
+/**
+ * Helper function to generate the SQL needed for concept / valueset join insertion
+ * needed during valueset creation.
+ * @param vs - The ValueSet in of the shape of our internal data model to insert
+ * @returns The SQL statement array for all concepts for insertion
+ */
+function generateConceptSqlPromises(vs: ValueSet) {
+  const insertConceptsSqlArray = vs.concepts.map((concept) => {
+    const systemPrefix = stripProtocolAndTLDFromSystemUrl(vs.system);
+    const conceptUniqueId = `${systemPrefix}_${concept.code}`;
+    const insertConceptSql = `INSERT INTO concepts VALUES($1,$2,$3,$4,$5,$6) RETURNING id;`;
+    const conceptInsertPromise = dbClient.query(insertConceptSql, [
+      conceptUniqueId,
+      concept.code,
+      vs.system,
+      concept.display,
+      // see notes in constants file for the intentional empty strings
+      INTENTIONAL_EMPTY_STRING_FOR_GEM_CODE,
+      INTENTIONAL_EMPTY_STRING_FOR_CONCEPT_VERSION,
+    ]);
+
+    return conceptInsertPromise;
+  });
+
+  return insertConceptsSqlArray;
+}
+
+function generateValuesetConceptJoinSqlPromises(vs: ValueSet) {
+  const valueSetUniqueId = `${vs.valueSetId}_${vs.valueSetVersion}`;
+  const insertConceptsSqlArray = vs.concepts.map((concept) => {
+    const systemPrefix = stripProtocolAndTLDFromSystemUrl(vs.system);
+    const conceptUniqueId = `${systemPrefix}_${concept.code}`;
+    const insertJoinSql = `INSERT INTO valueset_to_concept VALUES($1,$2, $3) RETURNING valueset_id, concept_id;`;
+    const conceptInsertPromise = dbClient.query(insertJoinSql, [
+      `${valueSetUniqueId}_${conceptUniqueId}`,
+      valueSetUniqueId,
+      conceptUniqueId,
+    ]);
+
+    return conceptInsertPromise;
+  });
+
+  return insertConceptsSqlArray;
+}
+
+function stripProtocolAndTLDFromSystemUrl(systemURL: string) {
+  const match = systemURL.match(/https?:\/\/([^\.]+)/);
+  return match ? match[1] : systemURL;
+}
+
+function logRejectedPromiseReasons<T>(
+  resultsArray: PromiseSettledResult<T>[],
+  errorMessageString: string,
+) {
+  return resultsArray
+    .filter((r): r is PromiseRejectedResult => r.status === "rejected")
+    .map((r) => {
+      console.error(errorMessageString);
+      console.error(r.reason);
+      return r.reason;
+    });
 }
