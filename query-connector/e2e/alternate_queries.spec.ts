@@ -42,9 +42,8 @@ test.describe("alternate queries with the Query Connector", () => {
     await expect(page.getByText(TEST_PATIENT.MRN)).toBeVisible();
   });
 
-  test("social determinants query with generalized function", async ({
-    page,
-  }) => {
+  // test("social determinants query with generalized function", async ({
+  test("cancer query with generalized function", async ({ page }) => {
     await page.getByRole("button", { name: "Go to the demo" }).click();
     await page.getByRole("button", { name: "Fill fields" }).click();
     await page.getByRole("button", { name: "Search for patient" }).click();
@@ -54,7 +53,8 @@ test.describe("alternate queries with the Query Connector", () => {
     await expect(
       page.getByRole("heading", { name: "Select a query" }),
     ).toBeVisible();
-    await page.getByTestId("Select").selectOption("social-determinants");
+    // await page.getByTestId("Select").selectOption("social-determinants");
+    await page.getByTestId("Select").selectOption("cancer");
     await page.getByRole("button", { name: "Submit" }).click();
     await expect(page.getByText("Loading")).toHaveCount(0, { timeout: 10000 });
 
