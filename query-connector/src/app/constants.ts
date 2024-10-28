@@ -40,11 +40,10 @@ export const demoQueryOptions = [
   { value: "chlamydia", label: "Chlamydia case investigation" },
   { value: "gonorrhea", label: "Gonorrhea case investigation" },
   { value: "newborn-screening", label: "Newborn screening follow-up" },
-  // Temporarily remove social determinants
-  // {
-  //   value: "social-determinants",
-  //   label: "Gather social determinants of health",
-  // },
+  {
+    value: "social-determinants",
+    label: "Gather social determinants of health",
+  },
   { value: "syphilis", label: "Syphilis case investigation" },
 ];
 
