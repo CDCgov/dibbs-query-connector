@@ -15,7 +15,7 @@ services:
       retries: 20
 
   # Next.js app with Flyway
-  query-connector:
+  tefca-viewer:
     platform: linux/amd64
     build:
       context: .
