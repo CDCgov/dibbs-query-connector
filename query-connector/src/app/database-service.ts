@@ -270,8 +270,25 @@ function generateValueSetSqlPromise(vs: ValueSet) {
   const valueSetOid = vs.valueSetId;
 
   const valueSetUniqueId = `${valueSetOid}_${vs.valueSetVersion}`;
-  const insertValueSetSql =
-    "INSERT INTO valuesets VALUES($1,$2,$3,$4,$5,$6) RETURNING id;";
+
+  // In the event a duplicate value set by OID + Version is entered, simply
+  // update the existing one to have the new set of information
+  // ValueSets are already uniquely identified by OID + V so this just allows
+  // us to proceed with DB creation in the event a duplicate VS from another
+  // group is pulled and loaded
+  const insertValueSetSql = `
+  INSERT INTO valuesets
+    VALUES($1,$2,$3,$4,$5,$6)
+    ON CONFLICT(id)
+    DO UPDATE SET
+      id = EXCLUDED.id,
+      oid = EXCLUDED.oid,
+      version = EXCLUDED.version,
+      name = EXCLUDED.name,
+      author = EXCLUDED.author,
+      type = EXCLUDED.type
+    RETURNING id;
+  `;
   const valuesArray = [
     valueSetUniqueId,
     valueSetOid,
