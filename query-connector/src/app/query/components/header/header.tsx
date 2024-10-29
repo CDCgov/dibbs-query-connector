@@ -126,7 +126,7 @@ export default function HeaderComponent() {
           <ul id="dropdown-menu" className={`usa-nav__submenu ${styles.menuDropdown}`}>
             <li className={`usa-nav__submenu-item`}>
               <a className={styles.menuItem} href="#">
-                My queries 
+                My queries
               </a>
             </li>
             <li className={`usa-nav__submenu-item`}>
