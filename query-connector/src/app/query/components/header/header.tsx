@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Modal, ModalButton } from "../../designSystem/Modal";
 import { useRouter, usePathname } from "next/navigation";
-import { Button, Icon, ModalRef } from "@trussworks/react-uswds";
+import { Button, ModalRef } from "@trussworks/react-uswds";
 import styles from "./header.module.css";
 import { metadata } from "@/app/constants";
 import classNames from "classnames";
