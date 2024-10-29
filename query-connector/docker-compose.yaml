@@ -14,7 +14,7 @@ services:
       timeout: 5s
       retries: 20
     volumes:
-      - ./data/Conditions_and_Categories_20241024.csv:/tmp/Conditions_and_Categories_20241024.csv
+      - ./db_data/Conditions_and_Categories_20241024.csv:/tmp/Conditions_and_Categories_20241024.csv
 
   # Next.js app with Flyway
   tefca-viewer:
