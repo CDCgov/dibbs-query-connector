@@ -1,6 +1,7 @@
 export const TEST_URL =
   process.env.TEST_ENV ?? "http://localhost:3000/tefca-viewer";
-export const HAPI_SERVER_PATIENT_URL = "http://localhost:8080/fhir/Patient";
+export const HAPI_SERVER_PATIENT_URL =
+  "http://hapi-fhir-server:8080/fhir/Patient";
 
 /**
  *
@@ -18,7 +19,7 @@ async function globalSetup() {
         break; // Proceed to the FHIR server check
       } else {
         console.log(
-          `Failed to connect to ${TEST_URL}, status: ${response.status}. Retrying...`,
+          `Failed to connect to ${TEST_URL}, status: ${response.status}. Error: ${response.text} Retrying...`,
         );
         await new Promise((resolve) => setTimeout(resolve, delay));
       }
@@ -46,7 +47,7 @@ async function globalSetup() {
         }
       } else {
         console.log(
-          `Failed to connect to ${HAPI_SERVER_PATIENT_URL}, status: ${response.status}. Retrying...`,
+          `Failed to connect to ${HAPI_SERVER_PATIENT_URL}, status: ${response.status}. Error: ${response.text} Retrying...`,
         );
       }
       await new Promise((resolve) => setTimeout(resolve, delay));

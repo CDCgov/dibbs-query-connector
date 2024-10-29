@@ -25,9 +25,12 @@ export const fhirServers: Record<FHIR_SERVERS, FHIR_SERVER_CONFIG> = {
   },
   "JMC Meld: eHealthExchange": configureEHX("JMCHelios"),
   "Public HAPI: Direct": {
-    hostname: "http://localhost:8080/fhir",
     // hostname: "https://hapi.fhir.org/baseR4",
-    //hostname: "https://gw.interop.community/HeliosConnectathonSa/open",
+    hostname: "http://hapi-fhir-server:8080/fhir",
+    init: {} as RequestInit,
+  },
+  "Local e2e HAPI Server: Direct": {
+    hostname: "http://127.0.0.1:8080/fhir",
     init: {} as RequestInit,
   },
   "OpenEpic: eHealthExchange": configureEHX("OpenEpic"),
@@ -87,7 +90,13 @@ class FHIRClient {
   }
 
   async get(path: string): Promise<Response> {
-    return fetch(this.hostname + path, this.init);
+    try {
+      console.log("FHIR Server: ", this.hostname);
+      return fetch(this.hostname + path, this.init);
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
   }
 
   async getBatch(paths: Array<string>): Promise<Array<Response>> {
