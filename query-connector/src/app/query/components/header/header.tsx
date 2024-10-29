@@ -84,16 +84,14 @@ export default function HeaderComponent() {
             {path == "/query" && (
               <button
                 onClick={toggleMenuDropdown}
-                className={`${styles.menuButton} usa-accordion__button usa-nav__link usa-current`}
+                className={classNames(
+                  styles.menuButton,
+                  "usa-accordion__button",
+                  "usa-nav__link",
+                  "usa-current",
+                )}
                 aria-expanded="false"
                 aria-controls="dropdown-menu"
-                style={{
-                  background: "transparent",
-                  padding: "0 !important",
-                  height: "1.5rem !important",
-                  width: "1.5rem !important",
-                  margin: "0 1rem 0 0 !important",
-                }}
               >
                 <Icon.Settings
                   className="usa-icon qc-settings"
