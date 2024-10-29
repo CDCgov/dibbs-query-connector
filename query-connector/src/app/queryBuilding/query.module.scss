@@ -1,0 +1,12 @@
+@use "../../styles/variables" as *;
+
+.queryBuildingContainer {
+  display: flex;
+  flex-direction: column;
+  width: 15rem;
+  margin: auto;
+}
+
+.queryBuildingContainer > * {
+  margin-top: $margin-within-group;
+}

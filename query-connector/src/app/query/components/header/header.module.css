@@ -54,3 +54,9 @@
 .menuItem:hover {
   text-decoration: none !important;
 }
+
+.headerContentContainer {
+  display: flex;
+  align-items: center !important;
+  justify-content: space-between;
+}

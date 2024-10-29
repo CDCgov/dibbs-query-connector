@@ -15,7 +15,7 @@ import Image from "next/image";
 export default function LandingPage() {
   const router = useRouter();
 
-  const handleClick = () => {
+  const handleGoToDemo = () => {
     router.push(`/query`);
   };
 
@@ -97,7 +97,7 @@ export default function LandingPage() {
               className="next-button"
               type="button"
               id="next-button"
-              onClick={() => handleClick()}
+              onClick={() => handleGoToDemo()}
             >
               Go to the demo
             </Button>

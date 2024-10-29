@@ -2,10 +2,11 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Modal, ModalButton } from "../../designSystem/Modal";
-import { ModalRef, Button, Icon } from "@trussworks/react-uswds";
+import { useRouter, usePathname } from "next/navigation";
+import { Button, Icon, ModalRef } from "@trussworks/react-uswds";
 import styles from "./header.module.css";
 import { metadata } from "@/app/constants";
-import { useRouter, usePathname } from "next/navigation";
+import classNames from "classnames";
 /**
  * Produces the header.
  * @returns The HeaderComponent component.
@@ -35,16 +36,14 @@ export default function HeaderComponent() {
     <>
       <header className="usa-header usa-header--basic bg-primary-darker">
         <div
-          className="header-footer-content usa-nav-container"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            height: "4.5rem !important",
-          }}
+          className={classNames(
+            "header-footer-content",
+            "usa-nav-container",
+            styles.headerContentContainer,
+          )}
         >
-          <div style={{ display: "flex", alignItems: "center" }}>
-            <div className="usa-logo" style={{ marginLeft: "16px" }}>
+          <div className={classNames("display-flex", "flex-align-center")}>
+            <div className="usa-logo margin-left-1">
               <em className="usa-logo__text text-base-lightest">
                 <a
                   className="text-base-lightest font-sans-xl text-bold"
@@ -57,12 +56,11 @@ export default function HeaderComponent() {
             </div>
           </div>
           <div
-            style={{
-              whiteSpace: "nowrap",
-              textAlign: "right",
-              marginLeft: "auto",
-              display: "flex",
-            }}
+            className={classNames(
+              "margin-left-auto",
+              "display-flex",
+              "flex-align-center",
+            )}
           >
             {path != "/signin" && isClient && (
               <ModalButton
