@@ -21,5 +21,14 @@ SET category = category_data.category
 FROM category_data
 WHERE conditions.id = category_data.condition_code;
 
--- 5. Drop the staging table after the join
+-- 5. Add hardcoded categories from DIBBs-specific additions
+UPDATE conditions
+SET category = 'Birth Defects and Infant Disorders'
+WHERE conditions.name = 'Newborn Screening';
+
+UPDATE conditions
+SET category = 'Cancer'
+WHERE conditions.name = 'Cancer (Leukemia)';
+
+-- 6. Drop the staging table after the join
 DROP TABLE category_data;
