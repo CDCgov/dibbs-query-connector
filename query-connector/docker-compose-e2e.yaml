@@ -23,8 +23,6 @@ services:
     tty: true
     ports:
       - "3000:3000"
-    networks:
-      - fhir-network
     environment:
       - NODE_ENV=production
       - DATABASE_URL=postgres://postgres:pw@db:5432/tefca_db
@@ -39,8 +37,6 @@ services:
     image: "hapiproject/hapi:latest"
     ports:
       - "8080:8080"
-    networks:
-      - fhir-network
   # Loads synthetic data into hapi-fhir-server for e2e tests
   data-loader:
     build:
@@ -52,6 +48,3 @@ services:
     command: ["sh", "post_e2e_data_hapi.sh"]
     depends_on:
       - hapi-fhir-server
-networks:
-  fhir-network:
-    driver: bridge
