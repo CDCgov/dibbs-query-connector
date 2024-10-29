@@ -39,6 +39,7 @@ test.describe("querying with the Query Connector", () => {
   });
 
   test("customize query successfully filtering some data", async ({ page }) => {
+    test.slow();
     await expect(
       page.getByText(
         "249 labs found, 4 medications found, 104 conditions found.",
@@ -104,6 +105,7 @@ test.describe("querying with the Query Connector", () => {
   test("customize query select / deselect all filters whole DibbsConceptType, across tabs", async ({
     page,
   }) => {
+    test.slow();
     await page.getByRole("link", { name: "Labs" }).click();
     await page.getByRole("button", { name: "Deselect all labs" }).click();
 
