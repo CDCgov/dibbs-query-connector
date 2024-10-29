@@ -61,7 +61,7 @@ const SelectQuery: React.FC<SelectQueryProps> = ({
     [] as ValueSet[],
   );
   const [loadingQueryValueSets, setLoadingQueryValueSets] =
-    useState<boolean>(false);
+    useState<boolean>(true);
 
   const [loadingResultResponse, setLoadingResultResponse] =
     useState<boolean>(false);
