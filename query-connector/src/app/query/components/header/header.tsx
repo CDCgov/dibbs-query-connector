@@ -27,8 +27,8 @@ export default function HeaderComponent() {
   };
 
   const toggleMenuDropdown = () => {
-    setShowMenu(!showMenu)
-  }
+    setShowMenu(!showMenu);
+  };
 
   return (
     <>
@@ -64,7 +64,7 @@ export default function HeaderComponent() {
               whiteSpace: "nowrap",
               textAlign: "right",
               marginLeft: "auto",
-              display: "flex"
+              display: "flex",
             }}
           >
             {path != "/signin" && isClient && (
@@ -86,7 +86,7 @@ export default function HeaderComponent() {
                 Sign in
               </Button>
             )}
-            {(path == "/query") && (
+            {path == "/query" && (
               <button
                 onClick={toggleMenuDropdown}
                 className={`${styles.menuButton} usa-accordion__button usa-nav__link usa-current`}
@@ -97,17 +97,17 @@ export default function HeaderComponent() {
                   padding: "0 !important",
                   height: "1.5rem !important",
                   width: "1.5rem !important",
-                  margin: "0 1rem 0 0 !important"
+                  margin: "0 1rem 0 0 !important",
                 }}
               >
-                  <Icon.Settings
-                    className="usa-icon qc-settings"
-                    size={3}
-                    color="#fff"
-                    aria-label="Gear icon indicating settings menu"
-                  />
-            </button>
-          )}
+                <Icon.Settings
+                  className="usa-icon qc-settings"
+                  size={3}
+                  color="#fff"
+                  aria-label="Gear icon indicating settings menu"
+                />
+              </button>
+            )}
           </div>
         </div>
       </header>
@@ -123,7 +123,10 @@ export default function HeaderComponent() {
 
       {showMenu && (
         <div className={styles.menuDropdownContainer}>
-          <ul id="dropdown-menu" className={`usa-nav__submenu ${styles.menuDropdown}`}>
+          <ul
+            id="dropdown-menu"
+            className={`usa-nav__submenu ${styles.menuDropdown}`}
+          >
             <li className={`usa-nav__submenu-item`}>
               <a className={styles.menuItem} href="#">
                 My queries
