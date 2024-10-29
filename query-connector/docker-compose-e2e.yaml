@@ -15,7 +15,7 @@ services:
       retries: 20
 
   # Next.js app with Flyway
-  query-connector:
+  tefca-viewer:
     platform: linux/amd64
     build:
       context: .
@@ -31,3 +31,19 @@ services:
     depends_on:
       db:
         condition: service_healthy
+  # HAPI FHIR Server for running e2e tests
+  hapi-fhir-server:
+    image: "hapiproject/hapi:latest"
+    ports:
+      - "8080:8080"
+  # Loads synthetic data into hapi-fhir-server for e2e tests
+  data-loader:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    volumes:
+      - "./src/app/tests/assets/GoldenSickPatient.json:/etc/GoldenSickPatient.json"
+      - "./post_e2e_data_hapi.sh:/post_e2e_data_hapi.sh"
+    command: ["sh", "post_e2e_data_hapi.sh"]
+    depends_on:
+      - hapi-fhir-server
