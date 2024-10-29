@@ -1,6 +1,6 @@
 -- 1. Add the new 'category' column to the condition table
 ALTER TABLE conditions
-ADD COLUMN category VARCHAR(255);
+ADD COLUMN category TEXT;
 
 -- 2. Create a staging table to hold the CSV data
 CREATE TABLE IF NOT EXISTS category_data (
