@@ -14,8 +14,8 @@ import styles from "./signinPage.module.scss";
 export default function SigninPage() {
   const router = useRouter();
 
-  const [userName, setUserName] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
+  const [_userName, setUserName] = useState<string>("");
+  const [_password, setPassword] = useState<string>("");
 
   const handleSignin = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -53,7 +53,6 @@ export default function SigninPage() {
                 name="username"
                 type="text"
                 className={styles.formInput}
-                value={userName}
                 onChange={(event) => {
                   setUserName(event.target.value);
                 }}
@@ -66,7 +65,6 @@ export default function SigninPage() {
                 name="password"
                 type="password"
                 className={styles.formInput}
-                value={password}
                 onChange={(event) => {
                   setPassword(event.target.value);
                 }}
