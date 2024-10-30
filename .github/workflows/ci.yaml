@@ -83,7 +83,7 @@ jobs:
           done
       - name: Poll until FHIR server has data
         run: |
-          until curl -s http://localhost:8080/fhir/Patient | jq '.entry | length > 0' | grep -q 'true'; do
+          until curl -s http://hapi-fhir-server:8080/fhir/Patient | jq '.entry | length > 0' | grep -q 'true'; do
             echo "Waiting for FHIR server to have data..."
             sleep 5
           done
