@@ -192,7 +192,7 @@ export async function translateVSACToInternalValueSet(
   fhirValueset: FhirValueSet,
   ersdConceptType: ErsdConceptType,
 ) {
-  const id = fhirValueset.id;
+  const oid = fhirValueset.id;
   const version = fhirValueset.version;
 
   const name = fhirValueset.title;
@@ -205,10 +205,10 @@ export async function translateVSACToInternalValueSet(
   });
 
   return {
-    valueSetId: "",
+    valueSetId: `${oid}_${version}`,
     valueSetVersion: version,
     valueSetName: name,
-    valueSetExternalId: id,
+    valueSetExternalId: oid,
     author: author,
     system: system,
     ersdConceptType: ersdConceptType,
