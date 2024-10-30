@@ -76,9 +76,9 @@ jobs:
           done
       - name: Poll until HAPI server is ready
         run: |
-          until [[ "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/fhir/Patient)" -eq 200 ]]; do
+          until [[ "$(curl -s -o /dev/null -w '%{http_code}' http://hapi-fhir-server:8080/fhir/Patient)" -eq 200 ]]; do
             echo "Waiting for HAPI server to be ready before running Playwright..."
-            echo "Response status: $(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/fhir/Patient)"
+            echo "Response status: $(curl -s -o /dev/null -w '%{http_code}' http://hapi-fhir-server:8080/fhir/Patient)"
             sleep 5
           done
       - name: Poll until FHIR server has data
