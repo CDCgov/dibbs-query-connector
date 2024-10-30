@@ -439,11 +439,11 @@ export async function insertQuery(input: UserQueryInput) {
 
   const joinInsertResults = await Promise.allSettled(joinPromises);
 
-  const jointInsertsSucceeded = joinInsertResults.every(
+  const joinInsertsSucceeded = joinInsertResults.every(
     (r) => r.status === "fulfilled",
   );
 
-  if (!jointInsertsSucceeded) {
+  if (!joinInsertsSucceeded) {
     logRejectedPromiseReasons(joinInsertResults, "Concept insertion failed");
     errorArray.push("Error occured in concept insertion");
   }
