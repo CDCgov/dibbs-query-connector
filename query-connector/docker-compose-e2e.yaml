@@ -32,15 +32,11 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    networks:
-      - fhir-network
   # HAPI FHIR Server for running e2e tests
   hapi-fhir-server:
     image: "hapiproject/hapi:latest"
     ports:
       - "8080:8080"
-    networks:
-      - fhir-network
   # Loads synthetic data into hapi-fhir-server for e2e tests
   data-loader:
     build:
@@ -52,8 +48,3 @@ services:
     command: ["sh", "post_e2e_data_hapi.sh"]
     depends_on:
       - hapi-fhir-server
-    networks:
-      - fhir-network
-networks:
-  fhir-network:
-    driver: bridge
