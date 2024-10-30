@@ -20,6 +20,12 @@ test.describe("alternate queries with the Query Connector", () => {
     await page.getByLabel("Last Name").clear();
     await page.getByLabel("Medical Record Number").clear();
 
+    // Select FHIR server from drop down
+    await page.getByRole("button", { name: "Advanced" }).click();
+    await page
+      .getByLabel("FHIR Server (QHIN)")
+      .selectOption("Local e2e HAPI Server: Direct");
+
     // Among verification, make sure phone number is right
     await page.getByRole("button", { name: "Search for patient" }).click();
     await expect(page.getByText("Loading")).toHaveCount(0, { timeout: 10000 });
@@ -46,6 +52,12 @@ test.describe("alternate queries with the Query Connector", () => {
   test("cancer query with generalized function", async ({ page }) => {
     await page.getByRole("button", { name: "Go to the demo" }).click();
     await page.getByRole("button", { name: "Fill fields" }).click();
+    // Select FHIR server from drop down
+    await page.getByRole("button", { name: "Advanced" }).click();
+    await page
+      .getByLabel("FHIR Server (QHIN)")
+      .selectOption("Local e2e HAPI Server: Direct");
+
     await page.getByRole("button", { name: "Search for patient" }).click();
     await expect(page.getByText("Loading")).toHaveCount(0, { timeout: 10000 });
 
@@ -68,6 +80,12 @@ test.describe("alternate queries with the Query Connector", () => {
   }) => {
     await page.getByRole("button", { name: "Go to the demo" }).click();
     await page.getByRole("button", { name: "Fill fields" }).click();
+    // Select FHIR server from drop down
+    await page.getByRole("button", { name: "Advanced" }).click();
+    await page
+      .getByLabel("FHIR Server (QHIN)")
+      .selectOption("Local e2e HAPI Server: Direct");
+
     await page.getByRole("button", { name: "Search for patient" }).click();
     await expect(page.getByText("Loading")).toHaveCount(0, { timeout: 10000 });
     await page.getByRole("link", { name: "Select patient" }).click();
