@@ -12,8 +12,8 @@ import {
 import { encode } from "base-64";
 import {
   UserQueryInput,
-  generateUserQueryInsertionSql,
-  generateUserQueryToValueSetInsertionSql,
+  generateUserDefinedQueryInsertionSql,
+  generateUserDefinedQueryToValueSetInsertionSql,
 } from "./query-building";
 import { UUID } from "crypto";
 
@@ -360,8 +360,8 @@ function logRejectedPromiseReasons<T>(
  * @param input - Values of the shape UserQueryInput needed for query insertion
  * @returns - Success or failure status, with associated error message for frontend
  */
-export async function insertUserQuery(input: UserQueryInput) {
-  const { sql, values } = generateUserQueryInsertionSql(input);
+export async function insertUserDefinedQuery(input: UserQueryInput) {
+  const { sql, values } = generateUserDefinedQueryInsertionSql(input);
   const insertUserQueryPromise = dbClient.query(sql, values);
   const errorArray = [];
 
@@ -379,7 +379,7 @@ export async function insertUserQuery(input: UserQueryInput) {
     return { success: false, error: errorArray.join(",") };
   }
 
-  const insertJoinSqlArray = generateUserQueryToValueSetInsertionSql(
+  const insertJoinSqlArray = generateUserDefinedQueryToValueSetInsertionSql(
     input,
     queryId as UUID,
   );
