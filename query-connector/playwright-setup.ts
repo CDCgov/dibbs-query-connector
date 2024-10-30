@@ -5,7 +5,7 @@ export const TEST_URL =
  */
 async function globalSetup() {
   const maxRetries = 300; // Maximum number of retries
-  const delay = 1000; // Delay between retries in milliseconds
+  const delay = 5000; // Delay between retries in milliseconds
 
   // Check TEST_URL
   for (let attempts = 0; attempts < maxRetries; attempts++) {
