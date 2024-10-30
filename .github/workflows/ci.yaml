@@ -47,7 +47,7 @@ jobs:
         run: npm test
 
   end-to-end-tests:
-    timeout-minutes: 10
+    timeout-minutes: 15
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -67,11 +67,27 @@ jobs:
         run: docker compose build --no-cache
       - name: Run Query Connector
         working-directory: ./query-connector
-        run: docker compose up -d
+        run: docker compose -f ./docker-compose-e2e.yaml up -d
       - name: Poll until Query Connector is ready
         run: |
           until curl -s http://localhost:3000/tefca-viewer; do
             echo "Waiting for Query Connector to be ready before running Playwright..."
+            sleep 5
+          done
+      - name: Poll until HAPI server is ready
+        run: |
+          until response=$(curl -v -s -w "HTTP_STATUS:%{http_code}" http://localhost:8080/fhir/Patient); do
+            # Extract status code from the response
+            http_status=$(echo "$response" | grep "HTTP_STATUS" | awk -F: '{print $2}')
+            echo "Waiting for HAPI server to be ready..."
+            echo "Response code: $http_status"
+            echo "Full response: $response"
+            sleep 5
+          done
+      - name: Poll until FHIR server has data
+        run: |
+          until curl -s http://localhost:8080/fhir/Patient | jq '.entry | length > 0' | grep -q 'true'; do
+            echo "Waiting for FHIR server to have data..."
             sleep 5
           done
       - name: Playwright Tests

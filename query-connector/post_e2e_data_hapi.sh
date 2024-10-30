@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # URL to check
-URL="http://tefca-fhir-server:8080/fhir/"
-TEST_URL="http://tefca-fhir-server:8080/fhir/metadata"
+URL="http://hapi-fhir-server:8080/fhir/"
+TEST_URL="http://hapi-fhir-server:8080/fhir/metadata"
 
 # Maximum number of attempts (120 seconds / 5 seconds = 24 attempts)
 MAX_ATTEMPTS=24
@@ -20,7 +20,7 @@ while [ $attempt -lt $MAX_ATTEMPTS ]; do
         echo "Server is healthy!"
         
         # POST Bundle of synthetic data to spun up server
-        curl -X POST -H "Content-Type: application/json" -d @/etc/BundleHAPIServer.json $URL
+        curl -X POST -H "Content-Type: application/json" -d @/etc/GoldenSickPatient.json $URL
         
         exit 0
     fi

@@ -28,6 +28,10 @@ export const fhirServers: Record<FHIR_SERVERS, FHIR_SERVER_CONFIG> = {
     hostname: "https://hapi.fhir.org/baseR4",
     init: {} as RequestInit,
   },
+  "Local e2e HAPI Server: Direct": {
+    hostname: "http://hapi-fhir-server:8080/fhir",
+    init: {} as RequestInit,
+  },
   "OpenEpic: eHealthExchange": configureEHX("OpenEpic"),
   "CernerHelios: eHealthExchange": configureEHX("CernerHelios"),
   "OPHDST Meld: Direct": {
@@ -85,7 +89,13 @@ class FHIRClient {
   }
 
   async get(path: string): Promise<Response> {
-    return fetch(this.hostname + path, this.init);
+    try {
+      console.log("FHIR Server: ", this.hostname);
+      return fetch(this.hostname + path, this.init);
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
   }
 
   async getBatch(paths: Array<string>): Promise<Array<Response>> {

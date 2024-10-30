@@ -81,6 +81,7 @@ export const FhirServers = [
   "JMC Meld: Direct",
   "JMC Meld: eHealthExchange",
   "Public HAPI: Direct",
+  "Local e2e HAPI Server: Direct",
   "OpenEpic: eHealthExchange",
   "CernerHelios: eHealthExchange",
   "OPHDST Meld: Direct",
