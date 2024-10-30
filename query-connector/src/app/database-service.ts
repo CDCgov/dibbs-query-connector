@@ -278,6 +278,9 @@ export async function insertValueSet(vs: ValueSet) {
 function generateValueSetSqlPromise(vs: ValueSet) {
   const valueSetOid = vs.valueSetExternalId;
 
+  // TODO: based on how non-VSAC valuests are shaped in the future, we may need
+  // to update the ID scheme to have something more generically defined that
+  // don't rely on potentially null external ID values.
   const valueSetUniqueId = `${valueSetOid}_${vs.valueSetVersion}`;
   const insertValueSetSql =
     "INSERT INTO valuesets VALUES($1,$2,$3,$4,$5,$6) RETURNING id;";
