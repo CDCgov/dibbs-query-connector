@@ -205,9 +205,10 @@ export async function translateVSACToInternalValueSet(
   });
 
   return {
-    valueSetId: id,
+    valueSetId: "",
     valueSetVersion: version,
     valueSetName: name,
+    valueSetExternalId: id,
     author: author,
     system: system,
     ersdConceptType: ersdConceptType,
@@ -275,7 +276,7 @@ export async function insertValueSet(vs: ValueSet) {
  * @returns The SQL statement for insertion
  */
 function generateValueSetSqlPromise(vs: ValueSet) {
-  const valueSetOid = vs.valueSetId;
+  const valueSetOid = vs.valueSetExternalId;
 
   const valueSetUniqueId = `${valueSetOid}_${vs.valueSetVersion}`;
   const insertValueSetSql =
