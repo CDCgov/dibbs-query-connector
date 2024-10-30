@@ -67,7 +67,7 @@ jobs:
         run: docker compose build --no-cache
       - name: Run Query Connector
         working-directory: ./query-connector
-        run: docker compose up -d
+        run: docker compose -f ./docker-compose-e2e.yaml up -d
       - name: Poll until Query Connector is ready
         run: |
           until curl -s http://localhost:3000/tefca-viewer; do
