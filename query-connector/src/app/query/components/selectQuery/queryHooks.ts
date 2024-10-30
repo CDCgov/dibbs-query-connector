@@ -1,13 +1,12 @@
 import {
   FHIR_SERVERS,
   USE_CASES,
-  UseCaseToQueryName,
   ValueSet,
   hyperUnluckyPatient,
 } from "@/app/constants";
 import {
   getSavedQueryByName,
-  mapQueryRowsToConceptValueSets,
+  mapQueryRowsToValueSets,
 } from "@/app/database-service";
 import { UseCaseQuery, UseCaseQueryResponse } from "@/app/query-service";
 import { Patient } from "fhir/r4";
@@ -15,31 +14,15 @@ import { Patient } from "fhir/r4";
 type SetStateCallback<T> = React.Dispatch<React.SetStateAction<T>>;
 
 /**
- * Query to grab valuesets based on use case
- * @param selectedQuery - Query use case that's been selected
- * @param valueSetStateCallback - state update function to set the valuesets
- * @param isSubscribed - state destructor hook to prevent race conditions
- * @param setIsLoading - update function to control loading UI
+ * Fetch to grab valuesets based the name of the query
+ * @param queryName - name of the query to grab associated ValueSets for
+ * @returns The valuesets from the specified query name
  */
-export async function fetchUseCaseValueSets(
-  selectedQuery: USE_CASES,
-  valueSetStateCallback: SetStateCallback<ValueSet[]>,
-  isSubscribed: boolean,
-  setIsLoading: (isLoading: boolean) => void,
-) {
-  if (selectedQuery) {
-    const queryName = UseCaseToQueryName[selectedQuery as USE_CASES];
+export async function fetchUseCaseValueSets(queryName: string) {
+  const queryResults = await getSavedQueryByName(queryName);
+  const valueSets = await mapQueryRowsToValueSets(queryResults);
 
-    setIsLoading(true);
-    const queryResults = await getSavedQueryByName(queryName);
-    const valueSets = await mapQueryRowsToConceptValueSets(queryResults);
-
-    // Only update if the fetch hasn't altered state yet
-    if (isSubscribed) {
-      valueSetStateCallback(valueSets);
-    }
-    setIsLoading(false);
-  }
+  return valueSets;
 }
 
 /**
