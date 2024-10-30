@@ -22,7 +22,7 @@ const DEFAULT_TIME_WINDOW = {
  * @param input - Values of the shape UserQueryInput needed for query insertion
  * @returns [sql, values] needed for query building insertion
  */
-export function generateUserDefinedQueryInsertionSql(input: UserQueryInput) {
+export function generateQueryInsertionSql(input: UserQueryInput) {
   const id = randomUUID();
   const dateCreated = new Date().toISOString();
   const dateLastModified = new Date().toISOString();
@@ -51,7 +51,7 @@ export function generateUserDefinedQueryInsertionSql(input: UserQueryInput) {
  * a given valueset
  * @returns An array of {sql, values} to be inserted by the join insertion flow
  */
-export function generateUserDefinedQueryToValueSetInsertionSql(
+export function generateQueryToValueSetInsertionSql(
   input: UserQueryInput,
   queryId: UUID,
 ) {
