@@ -1,5 +1,5 @@
 services:
-  # Postgresql DB
+  # PostgreSQL DB for custom query and value set storage
   db:
     image: "postgres:alpine"
     ports:
@@ -8,33 +8,36 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=pw
       - POSTGRES_DB=tefca_db
-      # Note: you must have a local .env file with the DATABASE_URL set to the following:
-      # DATABASE_URL=postgresql://postgres:pw@localhost:5432/tefca_db
-      # Note: you must have a local .env file with the ERSD_API_KEY set to a key
-      # obtained from the ERSD API at https://ersd.aimsplatform.org/#/api-keys
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 2s
       timeout: 5s
       retries: 20
 
-  # Flyway migrations and DB version control
-  flyway:
-    image: flyway/flyway:10.16-alpine
-    command: -configFiles=/flyway/conf/flyway.conf -schemas=public -connectRetries=60 migrate
+  # Next.js app with Flyway
+  tefca-viewer:
     platform: linux/amd64
-    volumes:
-      - ./flyway/sql:/flyway/sql
-      - ./flyway/conf/flyway.conf:/flyway/conf/flyway.conf
+    build:
+      context: .
+      dockerfile: Dockerfile
+    tty: true
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgres://postgres:pw@db:5432/tefca_db
+      - NEXT_PUBLIC_HAPI_FHIR_URL=http://hapi-fhir-server:8080
+      # Note: you must have a local .env file with the ERSD_API_KEY set to a key
+      # obtained from the ERSD API at https://ersd.aimsplatform.org/#/api-keys
     depends_on:
       db:
-        condition: service_started
-
+        condition: service_healthy
   # HAPI FHIR Server for running e2e tests
   hapi-fhir-server:
     image: "hapiproject/hapi:latest"
     ports:
       - "8080:8080"
+  # Loads synthetic data into hapi-fhir-server for e2e tests
   data-loader:
     build:
       context: .
