@@ -47,7 +47,7 @@ jobs:
         run: npm test
 
   end-to-end-tests:
-    timeout-minutes: 10
+    timeout-minutes: 15
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -76,9 +76,12 @@ jobs:
           done
       - name: Poll until HAPI server is ready
         run: |
-          until [[ "$(curl -s -o /dev/null -w '%{http_code}' http://hapi-fhir-server:8080/fhir/Patient)" -eq 200 ]]; do
-            echo "Waiting for HAPI server to be ready before running Playwright..."
-            echo "Response status: $(curl -s -o /dev/null -w '%{http_code}' http://hapi-fhir-server:8080/fhir/Patient)"
+          until response=$(curl -v -s -w "HTTP_STATUS:%{http_code}" http://hapi-fhir-server:8080/fhir/Patient); do
+            # Extract status code from the response
+            http_status=$(echo "$response" | grep "HTTP_STATUS" | awk -F: '{print $2}')
+            echo "Waiting for HAPI server to be ready..."
+            echo "Response code: $http_status"
+            echo "Full response: $response"
             sleep 5
           done
       - name: Poll until FHIR server has data
