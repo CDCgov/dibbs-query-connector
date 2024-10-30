@@ -74,6 +74,13 @@ jobs:
             echo "Waiting for Query Connector to be ready before running Playwright..."
             sleep 5
           done
+      - name: Poll until HAPI server is ready
+        run: |
+          until [[ "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/fhir/Patient)" -eq 200 ]]; do
+            echo "Waiting for HAPI server to be ready before running Playwright..."
+            echo "Response status: $(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/fhir/Patient)"
+            sleep 5
+          done
       - name: Poll until FHIR server has data
         run: |
           until curl -s http://localhost:8080/fhir/Patient | jq '.entry | length > 0' | grep -q 'true'; do
