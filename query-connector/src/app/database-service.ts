@@ -91,7 +91,9 @@ export const mapQueryRowsToValueSets = async (rows: QueryResultRow[]) => {
         : undefined,
       author: conceptGroup[0]["author"],
       system: conceptGroup[0]["code_system"],
-      ersdConceptType: conceptGroup[0]["type"],
+      ersdConceptType: conceptGroup[0]["type"]
+        ? conceptGroup[0]["type"]
+        : undefined,
       dibbsConceptType: conceptGroup[0]["dibbs_concept_type"],
       includeValueSet: conceptGroup.find((c) => c["include"]) ? true : false,
       concepts: conceptGroup.map((c) => {
@@ -307,7 +309,7 @@ function generateValueSetSqlPromise(vs: ValueSet) {
     vs.valueSetVersion,
     vs.valueSetName,
     vs.author,
-    vs.ersdConceptType,
+    vs.dibbsConceptType,
   ];
 
   return dbClient.query(insertValueSetSql, valuesArray);
