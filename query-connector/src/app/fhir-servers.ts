@@ -25,12 +25,11 @@ export const fhirServers: Record<FHIR_SERVERS, FHIR_SERVER_CONFIG> = {
   },
   "JMC Meld: eHealthExchange": configureEHX("JMCHelios"),
   "Public HAPI: Direct": {
-    // hostname: "https://hapi.fhir.org/baseR4",
-    hostname: "http://hapi-fhir-server:8080/fhir",
+    hostname: "https://hapi.fhir.org/baseR4",
     init: {} as RequestInit,
   },
   "Local e2e HAPI Server: Direct": {
-    hostname: "http://127.0.0.1:8080/fhir",
+    hostname: "http://hapi-fhir-server:8080/fhir",
     init: {} as RequestInit,
   },
   "OpenEpic: eHealthExchange": configureEHX("OpenEpic"),
