@@ -311,7 +311,22 @@ function generateConceptSqlPromises(vs: ValueSet) {
   const insertConceptsSqlArray = vs.concepts.map((concept) => {
     const systemPrefix = stripProtocolAndTLDFromSystemUrl(vs.system);
     const conceptUniqueId = `${systemPrefix}_${concept.code}`;
-    const insertConceptSql = `INSERT INTO concepts VALUES($1,$2,$3,$4,$5,$6) RETURNING id;`;
+
+    // Duplicate value set insertion is likely to percolate to the concept level
+    // Apply the same logic of overwriting if unique keys are the same
+    const insertConceptSql = `
+    INSERT INTO concepts
+      VALUES($1,$2,$3,$4,$5,$6)
+      ON CONFLICT(id)
+      DO UPDATE SET
+        id = EXCLUDED.id,
+        code = EXCLUDED.code,
+        code_system = EXCLUDED.code_system,
+        display = EXCLUDED.display,
+        gem_formatted_code = EXCLUDED.gem_formatted_code,
+        version = EXCLUDED.version
+      RETURNING id;
+    `;
     const conceptInsertPromise = dbClient.query(insertConceptSql, [
       conceptUniqueId,
       concept.code,
@@ -333,7 +348,20 @@ function generateValuesetConceptJoinSqlPromises(vs: ValueSet) {
   const insertConceptsSqlArray = vs.concepts.map((concept) => {
     const systemPrefix = stripProtocolAndTLDFromSystemUrl(vs.system);
     const conceptUniqueId = `${systemPrefix}_${concept.code}`;
-    const insertJoinSql = `INSERT INTO valueset_to_concept VALUES($1,$2, $3) RETURNING valueset_id, concept_id;`;
+
+    // Last place to make an overwriting upsert adjustment
+    // Even if the duplicate entries have the same data, PG will attempt to
+    // insert another row, so just make that upsert the relationship
+    const insertJoinSql = `
+    INSERT INTO valueset_to_concept
+    VALUES($1,$2,$3)
+    ON CONFLICT(id)
+    DO UPDATE SET
+      id = EXCLUDED.id,
+      valueset_id = EXCLUDED.valueset_id,
+      concept_id = EXCLUDED.concept_id
+    RETURNING valueset_id, concept_id;
+    `;
     const conceptInsertPromise = dbClient.query(insertJoinSql, [
       `${valueSetUniqueId}_${conceptUniqueId}`,
       valueSetUniqueId,
