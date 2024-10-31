@@ -1,10 +1,10 @@
 {
   "newborn_screening": [
     {
-      "valueSetId": "1_20241031_16",
+      "valueSetId": "1_20241015_16",
       "valueSetVersion": "1",
       "valueSetName": "Newborn Screening Metabolic Disorder Confirmatory Labs",
-      "valueSetExternalId": "20241031_16",
+      "valueSetExternalId": "20241015_16",
       "author": "Center for Public Health Innovation",
       "system": "http://loinc.org",
       "ersdConceptType": "lrtc",
@@ -954,6 +954,381 @@
         {
           "code": "54449-4",
           "display": "SMN2 gene targeted mutation analysis in Blood or Tissue by Molecular genetics method Narrative",
+          "include": true
+        }
+      ]
+    },
+    {
+      "valueSetId": "1_20240909_1",
+      "valueSetVersion": "1",
+      "valueSetName": "Basic Newborn Screening Panel",
+      "valueSetExternalId": "20240909_1",
+      "author": "DIBBs",
+      "system": "http://loinc.org",
+      "ersdConceptType": "lotc",
+      "dibbsConceptType": "labs",
+      "includeValueSet": true,
+      "concepts": [
+        {
+          "code": "73700-7",
+          "display": "CCHD newborn screening interpretation",
+          "include": true
+        },
+        {
+          "code": "73698-3",
+          "display": "Reason CCHD oxygen saturation screening not performed",
+          "include": true
+        },
+        {
+          "code": "54108-6",
+          "display": "Newborn hearing screen of Ear - left",
+          "include": true
+        },
+        {
+          "code": "54109-4",
+          "display": "Newborn hearing screen of Ear - right",
+          "include": true
+        },
+        {
+          "code": "58232-0",
+          "display": "Hearing loss risk indicators",
+          "include": true
+        },
+        {
+          "code": "57700-7",
+          "display": "Hearing loss newborn screening comment-discussion",
+          "include": true
+        },
+        {
+          "code": "73739-5",
+          "display": "Newborn hearing screen reason not performed of Ear - left",
+          "include": true
+        },
+        {
+          "code": "73742-9",
+          "display": "Newborn hearing screen reason not performed of Ear - right",
+          "include": true
+        },
+        {
+          "code": "2708-6",
+          "display": "Cannabinoids [Presence] in Vitreous fluid",
+          "include": true
+        },
+        {
+          "code": "8336-0",
+          "display": "Body weight [Percentile] Per age",
+          "include": true
+        }
+      ]
+    }
+  ],
+  "cancer": [
+    {
+      "valueSetId": "1_20240909_2",
+      "valueSetVersion": "1",
+      "valueSetName": "Cancer (Leukemia) Diagnosis Problems",
+      "valueSetExternalId": "20240909_2",
+      "author": "DIBBs",
+      "system": "http://snomed.info/sct",
+      "ersdConceptType": "dxtc",
+      "dibbsConceptType": "conditions",
+      "includeValueSet": true,
+      "concepts": [
+        {
+          "code": "2.16.840.1.113762.1.4.1146.1407_92814006",
+          "display": "Chronic lymphoid leukemia, disease (disorder)",
+          "include": true
+        },
+        {
+          "code": "418689008",
+          "display": "Allergy to sulfonamide",
+          "include": true
+        },
+        {
+          "code": "363346000",
+          "display": "Malignant neoplastic disease (disorder)",
+          "include": true
+        }
+      ]
+    },
+    {
+      "valueSetId": "1_20240909_3",
+      "valueSetVersion": "1",
+      "valueSetName": "Cancer (Leukemia) Medications",
+      "valueSetExternalId": "20240909_3",
+      "author": "DIBBs",
+      "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+      "ersdConceptType": "mrtc",
+      "dibbsConceptType": "medications",
+      "includeValueSet": true,
+      "concepts": [
+        {
+          "code": "828265",
+          "display": "1 ML alemtuzumab 30 MG/ML Injection",
+          "include": true
+        }
+      ]
+    },
+    {
+      "valueSetId": "1_20240923_14",
+      "valueSetVersion": "1",
+      "valueSetName": "Cancer (Leukemia) Lab Results",
+      "valueSetExternalId": "20240923_14",
+      "author": "DIBBs",
+      "system": "http://cap.org/eCC",
+      "ersdConceptType": "lrtc",
+      "dibbsConceptType": "labs",
+      "includeValueSet": true,
+      "concepts": [
+        {
+          "code": "30000.100004300",
+          "display": "MSH2 Result",
+          "include": true
+        },
+        {
+          "code": "9484.100004300",
+          "display": "RESULTS",
+          "include": true
+        }
+      ]
+    },
+    {
+      "valueSetId": "1_20240923_15",
+      "valueSetVersion": "1",
+      "valueSetName": "Suspected Cancer (Leukemia) Diagnosis",
+      "valueSetExternalId": "20240923_15",
+      "author": "DIBBs",
+      "system": "http://snomed.info/sct",
+      "ersdConceptType": "sdtc",
+      "dibbsConceptType": "conditions",
+      "includeValueSet": true,
+      "concepts": [
+        {
+          "code": "1255068005",
+          "display": "Presence of DNA mismatch repair protein MSH2 in primary malignant neoplasm of colon by immunohistochemistry (observable entity)",
+          "include": true
+        }
+      ]
+    }
+  ],
+  "syphilis": [
+    {
+      "valueSetId": "1_20240909_4",
+      "valueSetVersion": "1",
+      "valueSetName": "Syphilis Medications",
+      "valueSetExternalId": "20240909_4",
+      "author": "DIBBs",
+      "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+      "ersdConceptType": "mrtc",
+      "dibbsConceptType": "medications",
+      "includeValueSet": true,
+      "concepts": [
+        {
+          "code": "2671695",
+          "display": "penicillin G benzathine 2400000 UNT Injection",
+          "include": true
+        }
+      ]
+    },
+    {
+      "valueSetId": "1_20240909_5",
+      "valueSetVersion": "1",
+      "valueSetName": "Syphilis Diagnosis Problems",
+      "valueSetExternalId": "20240909_5",
+      "author": "DIBBs",
+      "system": "http://snomed.info/sct",
+      "ersdConceptType": "dxtc",
+      "dibbsConceptType": "conditions",
+      "includeValueSet": true,
+      "concepts": [
+        {
+          "code": "76272004",
+          "display": "Syphilis (disorder)",
+          "include": true
+        },
+        {
+          "code": "186647001",
+          "display": "Primary genital syphilis",
+          "include": true
+        }
+      ]
+    }
+  ],
+  "gonorrhea": [
+    {
+      "valueSetId": "1_20240909_7",
+      "valueSetVersion": "1",
+      "valueSetName": "Gonorrhea Medications",
+      "valueSetExternalId": "20240909_7",
+      "author": "DIBBs",
+      "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+      "ersdConceptType": "mrtc",
+      "dibbsConceptType": "medications",
+      "includeValueSet": true,
+      "concepts": [
+        {
+          "code": "434692",
+          "display": "azithromycin 1000 MG",
+          "include": true
+        },
+        {
+          "code": "1665005",
+          "display": "ceftriaxone 500 MG Injection",
+          "include": true
+        }
+      ]
+    },
+    {
+      "valueSetId": "1_20240909_8",
+      "valueSetVersion": "1",
+      "valueSetName": "Gonorrhea Diagnosis Problems",
+      "valueSetExternalId": "20240909_8",
+      "author": "DIBBs",
+      "system": "http://snomed.info/sct",
+      "ersdConceptType": "dxtc",
+      "dibbsConceptType": "conditions",
+      "includeValueSet": true,
+      "concepts": [
+        {
+          "code": "2339001",
+          "display": "Sexual overexposure",
+          "include": true
+        },
+        {
+          "code": "72531000052105",
+          "display": "Counseling for contraception",
+          "include": true
+        }
+      ]
+    },
+    {
+      "valueSetId": "1_20240909_9",
+      "valueSetVersion": "1",
+      "valueSetName": "Gonorrhea Diagnosis Problems",
+      "valueSetExternalId": "20240909_9",
+      "author": "DIBBs",
+      "system": "http://loinc.org",
+      "ersdConceptType": "dxtc",
+      "dibbsConceptType": "conditions",
+      "includeValueSet": true,
+      "concepts": [
+        {
+          "code": "11350-6",
+          "display": "History of Sexual behavior Narrative",
+          "include": true
+        },
+        {
+          "code": "82810-3",
+          "display": "Pregnancy status",
+          "include": true
+        },
+        {
+          "code": "83317-8",
+          "display": "Sexual activity with anonymous partner in the past year",
+          "include": true
+        }
+      ]
+    },
+    {
+      "valueSetId": "1_20240909_10",
+      "valueSetVersion": "1",
+      "valueSetName": "Gonorrhea Labs",
+      "valueSetExternalId": "20240909_10",
+      "author": "DIBBs",
+      "system": "http://loinc.org",
+      "ersdConceptType": "lrtc",
+      "dibbsConceptType": "labs",
+      "includeValueSet": true,
+      "concepts": [
+        {
+          "code": "21613-5",
+          "display": "Chlamydia trachomatis DNA [Presence] in Specimen by NAA with probe detection",
+          "include": true
+        }
+      ]
+    }
+  ],
+  "chlamydia": [
+    {
+      "valueSetId": "1_20240910_11",
+      "valueSetVersion": "1",
+      "valueSetName": "Chlamydia Medications",
+      "valueSetExternalId": "20240910_11",
+      "author": "DIBBs",
+      "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+      "ersdConceptType": "mrtc",
+      "dibbsConceptType": "medications",
+      "includeValueSet": true,
+      "concepts": [
+        {
+          "code": "434692",
+          "display": "azithromycin 1000 MG",
+          "include": true
+        },
+        {
+          "code": "82122",
+          "display": "levofloxacin",
+          "include": true
+        },
+        {
+          "code": "1649987",
+          "display": "doxycycline hyclate 100 MG",
+          "include": true
+        },
+        {
+          "code": "1665005",
+          "display": "ceftriaxone 500 MG Injection",
+          "include": true
+        }
+      ]
+    },
+    {
+      "valueSetId": "1_20240910_12",
+      "valueSetVersion": "1",
+      "valueSetName": "Chlamydia Labs",
+      "valueSetExternalId": "20240910_12",
+      "author": "DIBBs",
+      "system": "http://loinc.org",
+      "ersdConceptType": "ltrc",
+      "dibbsConceptType": "labs",
+      "includeValueSet": true,
+      "concepts": [
+        {
+          "code": "21613-5",
+          "display": "Chlamydia trachomatis DNA [Presence] in Specimen by NAA with probe detection",
+          "include": true
+        },
+        {
+          "code": "24111-7",
+          "display": "Neisseria gonorrhoeae DNA [Presence] in Specimen by NAA with probe detection",
+          "include": true
+        }
+      ]
+    },
+    {
+      "valueSetId": "1_20240910_13",
+      "valueSetVersion": "1",
+      "valueSetName": "Chlamydia Diagnosis Problems",
+      "valueSetExternalId": "20240910_13",
+      "author": "DIBBs",
+      "system": "http://loinc.org",
+      "ersdConceptType": "dxtc",
+      "dibbsConceptType": "conditions",
+      "includeValueSet": true,
+      "concepts": [
+        {
+          "code": "11350-6",
+          "display": "History of Sexual behavior Narrative",
+          "include": true
+        },
+        {
+          "code": "82810-3",
+          "display": "Pregnancy status",
+          "include": true
+        },
+        {
+          "code": "83317-8",
+          "display": "Sexual activity with anonymous partner in the past year",
           "include": true
         }
       ]
