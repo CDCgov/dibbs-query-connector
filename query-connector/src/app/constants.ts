@@ -331,7 +331,7 @@ export interface ValueSet {
 
 export const DEFAULT_ERSD_VERSION = "3";
 
-type DibbsConceptType = "labs" | "medications" | "conditions";
+export type DibbsConceptType = "labs" | "medications" | "conditions";
 export type ErsdConceptType =
   | "ostc"
   | "lotc"
