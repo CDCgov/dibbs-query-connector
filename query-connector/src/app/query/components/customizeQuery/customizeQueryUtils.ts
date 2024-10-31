@@ -44,6 +44,7 @@ function groupValueSetsByNameAuthorSystem(valueSetsToGroup: ValueSet[]) {
         valueSetId: row.valueSetId,
         valueSetVersion: row.valueSetVersion,
         valueSetName: row.valueSetName,
+        valueSetExternalId: row.valueSetExternalId,
         author: row.author,
         system: row.system,
         ersdConceptType: row.ersdConceptType,

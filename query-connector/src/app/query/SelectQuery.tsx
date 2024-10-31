@@ -1,6 +1,11 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { FHIR_SERVERS, USE_CASES, ValueSet } from "../constants";
+import {
+  FHIR_SERVERS,
+  USE_CASES,
+  UseCaseToQueryName,
+  ValueSet,
+} from "../constants";
 import CustomizeQuery from "./components/CustomizeQuery";
 import SelectSavedQuery from "./components/selectQuery/SelectSavedQuery";
 
@@ -71,12 +76,21 @@ const SelectQuery: React.FC<SelectQueryProps> = ({
     // avoid name-change race conditions
     let isSubscribed = true;
 
-    fetchUseCaseValueSets(
-      selectedQuery,
-      setQueryValueSets,
-      isSubscribed,
-      setLoadingQueryValueSets,
-    ).catch(console.error);
+    const fetchDataAndUpdateState = async () => {
+      if (selectedQuery) {
+        const queryName = UseCaseToQueryName[selectedQuery as USE_CASES];
+        const valueSets = await fetchUseCaseValueSets(queryName);
+
+        // Only update if the fetch hasn't altered state yet
+        if (isSubscribed) {
+          setQueryValueSets(valueSets);
+        }
+      }
+    };
+
+    setLoadingQueryValueSets(true);
+    fetchDataAndUpdateState().catch(console.error);
+    setLoadingQueryValueSets(false);
 
     // Destructor hook to prevent future state updates
     return () => {

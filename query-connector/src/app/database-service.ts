@@ -10,9 +10,15 @@ import {
   ersdToDibbsConceptMap,
 } from "./constants";
 import { encode } from "base-64";
+import {
+  UserQueryInput,
+  generateQueryInsertionSql,
+  generateQueryToValueSetInsertionSql,
+} from "./query-building";
+import { UUID } from "crypto";
 
 const getQuerybyNameSQL = `
-select q.query_name, q.id, qtv.valueset_id, vs.name as valueset_name, vs.version, vs.author as author, vs.type, vs.dibbs_concept_type as dibbs_concept_type, qic.concept_id, qic.include, c.code, c.code_system, c.display 
+select q.query_name, q.id, qtv.valueset_id, vs.name as valueset_name, vs.oid as valueset_external_id, vs.version, vs.author as author, vs.type, vs.dibbs_concept_type as dibbs_concept_type, qic.concept_id, qic.include, c.code, c.code_system, c.display 
   from query q 
   left join query_to_valueset qtv on q.id = qtv.query_id 
   left join valuesets vs on qtv.valueset_id = vs.id
@@ -61,9 +67,7 @@ export const getSavedQueryByName = async (name: string) => {
  * @param rows The Rows returned from the DB Query.
  * @returns A list of ValueSets, which hold the Concepts pulled from the DB.
  */
-export const mapQueryRowsToConceptValueSets = async (
-  rows: QueryResultRow[],
-) => {
+export const mapQueryRowsToValueSets = async (rows: QueryResultRow[]) => {
   // Create groupings of rows (each of which is a single Concept) by their ValueSet ID
   const vsIdGroupedRows = rows.reduce((conceptsByVSId, r) => {
     if (!(r["valueset_id"] in conceptsByVSId)) {
@@ -81,9 +85,15 @@ export const mapQueryRowsToConceptValueSets = async (
       valueSetId: conceptGroup[0]["valueset_id"],
       valueSetVersion: conceptGroup[0]["version"],
       valueSetName: conceptGroup[0]["valueset_name"],
+      // External ID might not be defined for user-defined valuesets
+      valueSetExternalId: conceptGroup[0]["valueset_external_id"]
+        ? conceptGroup[0]["valueset_external_id"]
+        : undefined,
       author: conceptGroup[0]["author"],
       system: conceptGroup[0]["code_system"],
-      ersdConceptType: conceptGroup[0]["type"],
+      ersdConceptType: conceptGroup[0]["type"]
+        ? conceptGroup[0]["type"]
+        : undefined,
       dibbsConceptType: conceptGroup[0]["dibbs_concept_type"],
       includeValueSet: conceptGroup.find((c) => c["include"]) ? true : false,
       concepts: conceptGroup.map((c) => {
@@ -184,7 +194,7 @@ export async function translateVSACToInternalValueSet(
   fhirValueset: FhirValueSet,
   ersdConceptType: ErsdConceptType,
 ) {
-  const id = fhirValueset.id;
+  const oid = fhirValueset.id;
   const version = fhirValueset.version;
 
   const name = fhirValueset.title;
@@ -197,9 +207,10 @@ export async function translateVSACToInternalValueSet(
   });
 
   return {
-    valueSetId: id,
+    valueSetId: `${oid}_${version}`,
     valueSetVersion: version,
     valueSetName: name,
+    valueSetExternalId: oid,
     author: author,
     system: system,
     ersdConceptType: ersdConceptType,
@@ -267,8 +278,11 @@ export async function insertValueSet(vs: ValueSet) {
  * @returns The SQL statement for insertion
  */
 function generateValueSetSqlPromise(vs: ValueSet) {
-  const valueSetOid = vs.valueSetId;
+  const valueSetOid = vs.valueSetExternalId;
 
+  // TODO: based on how non-VSAC valuests are shaped in the future, we may need
+  // to update the ID scheme to have something more generically defined that
+  // don't rely on potentially null external ID values.
   const valueSetUniqueId = `${valueSetOid}_${vs.valueSetVersion}`;
 
   // In the event a duplicate value set by OID + Version is entered, simply
@@ -295,7 +309,7 @@ function generateValueSetSqlPromise(vs: ValueSet) {
     vs.valueSetVersion,
     vs.valueSetName,
     vs.author,
-    vs.ersdConceptType,
+    vs.dibbsConceptType,
   ];
 
   return dbClient.query(insertValueSetSql, valuesArray);
@@ -390,4 +404,52 @@ function logRejectedPromiseReasons<T>(
       console.error(r.reason);
       return r.reason;
     });
+}
+
+/**
+ * Function that orchestrates query insertion for the query building flow
+ * @param input - Values of the shape UserQueryInput needed for query insertion
+ * @returns - Success or failure status, with associated error message for frontend
+ */
+export async function insertQuery(input: UserQueryInput) {
+  const { sql, values } = generateQueryInsertionSql(input);
+  const insertUserQueryPromise = dbClient.query(sql, values);
+  const errorArray = [];
+
+  let queryId;
+  try {
+    const results = await insertUserQueryPromise;
+    queryId = results.rows[0].id as unknown as UUID;
+  } catch (e) {
+    console.error(
+      `Error occured in user query insertion: insertion for ${input.queryName} failed`,
+    );
+    console.error(e);
+    errorArray.push("Error occured in user query insertion");
+
+    return { success: false, error: errorArray.join(",") };
+  }
+
+  const insertJoinSqlArray = generateQueryToValueSetInsertionSql(
+    input,
+    queryId as UUID,
+  );
+
+  const joinPromises = insertJoinSqlArray.map((q) => {
+    dbClient.query(q.sql, q.values);
+  });
+
+  const joinInsertResults = await Promise.allSettled(joinPromises);
+
+  const joinInsertsSucceeded = joinInsertResults.every(
+    (r) => r.status === "fulfilled",
+  );
+
+  if (!joinInsertsSucceeded) {
+    logRejectedPromiseReasons(joinInsertResults, "Concept insertion failed");
+    errorArray.push("Error occured in concept insertion");
+  }
+
+  if (errorArray.length === 0) return { success: true };
+  return { success: false, error: errorArray.join(",") };
 }

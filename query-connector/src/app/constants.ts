@@ -320,6 +320,7 @@ export interface ValueSet {
   valueSetId: string;
   valueSetVersion: string;
   valueSetName: string;
+  valueSetExternalId?: string;
   author: string;
   system: string;
   ersdConceptType?: string;
