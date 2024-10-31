@@ -130,10 +130,7 @@ export default function HeaderComponent() {
               </a>
             </li> */}
             <li className={`usa-nav__submenu-item`}>
-              <a
-                className={styles.menuItem}
-                href={backLink}                
-              >
+              <a className={styles.menuItem} href={backLink}>
                 Log out
               </a>
             </li>

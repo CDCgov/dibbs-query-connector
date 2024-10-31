@@ -13,7 +13,7 @@ import styles from "./signinPage.module.scss";
  */
 export default function SigninPage() {
   const router = useRouter();
- 
+
   type Credentials = {
     username: string;
     password: string;
@@ -23,23 +23,23 @@ export default function SigninPage() {
   const [credentials, setCredentials] = useState<Credentials>({
     username: "",
     password: "",
-  })
+  });
 
   const handleInput = (event: React.FormEvent<HTMLInputElement>) => {
     event.preventDefault();
 
-    const attribute = event.currentTarget.getAttribute("name") || ""
+    const attribute = event.currentTarget.getAttribute("name") || "";
     const value = event.currentTarget.value;
-   
+
     // clear error state when entering input text
     if (signinError && value != "") {
-      setSigninError(false)
+      setSigninError(false);
     }
 
     if (attribute != "") {
-      setCredentials({...credentials, [attribute]: value})
+      setCredentials({ ...credentials, [attribute]: value });
     }
-  }
+  };
 
   const handleSignin = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -47,7 +47,7 @@ export default function SigninPage() {
       setSigninError(true);
       return;
     } else {
-      setSigninError(false)
+      setSigninError(false);
     }
     router.push(`/query`);
   };
@@ -66,7 +66,12 @@ export default function SigninPage() {
       </div>
       <div className={styles.column}>
         <div className={styles.card}>
-          <form className={styles.formContainer} onSubmit={handleSignin} action="" method="">
+          <form
+            className={styles.formContainer}
+            onSubmit={handleSignin}
+            action=""
+            method=""
+          >
             <div className={styles.formContent}>
               <div className={styles.formHeader}>
                 <h3>Sign in to Query Connector</h3>
@@ -75,56 +80,66 @@ export default function SigninPage() {
                   account.
                 </p>
               </div>
-                <Fieldset className={styles.formFields}>
+              <Fieldset className={styles.formFields}>
                 <div className={styles.formInputGroup}>
-                <Label htmlFor="Username" className="margin-top-0-important">
-                  Username
-                </Label>
-                <TextInput
-                  id="Username"
-                  name="username"
-                  type="text"
-                  className={signinError ? `${styles.formError}` : `${styles.formInput}`}
-                  onChange={(event) => {
-                    handleInput(event);
-                  }}
-                />
+                  <Label htmlFor="Username" className="margin-top-0-important">
+                    Username
+                  </Label>
+                  <TextInput
+                    id="Username"
+                    name="username"
+                    type="text"
+                    className={
+                      signinError
+                        ? `${styles.formError}`
+                        : `${styles.formInput}`
+                    }
+                    onChange={(event) => {
+                      handleInput(event);
+                    }}
+                  />
                 </div>
                 <div className={styles.formInputGroup}>
-                <Label htmlFor="Password" className="margin-top-0-important">
-                  Password
-                </Label>
-                <TextInput
-                  id="Password"
-                  name="password"
-                  type="password"
-                  className={signinError ? `${styles.formError}` : `${styles.formInput}`}
-                  onChange={(event) => {
-                    handleInput(event);
-                  }}
-                />
+                  <Label htmlFor="Password" className="margin-top-0-important">
+                    Password
+                  </Label>
+                  <TextInput
+                    id="Password"
+                    name="password"
+                    type="password"
+                    className={
+                      signinError
+                        ? `${styles.formError}`
+                        : `${styles.formInput}`
+                    }
+                    onChange={(event) => {
+                      handleInput(event);
+                    }}
+                  />
                 </div>
-                </Fieldset>
+              </Fieldset>
             </div>
             <button
               className={`usa-button ${styles[`signin-button`]}`}
               type="submit"
             >
               Sign in
-            </button>  
+            </button>
           </form>
-          <div className={signinError ? `${styles.inlineError}` : `${styles.hidden}`}>
-              <Icon.Info
-                className="usa-icon qc-info"
-                size={3}
-                color="#E41D3D"
-                aria-label="Information icon indicating a form error"
-                aria-hidden={!signinError}
-              />                 
-              <p>
-                You have entered an invalid username and/or password
-              </p>
-            </div>
+          <div
+            className={
+              signinError ? `${styles.inlineError}` : `${styles.hidden}`
+            }
+          >
+            <Icon.Info
+              className="usa-icon qc-info"
+              size={3}
+              color="#E41D3D"
+              aria-label="Information icon indicating a form error"
+              aria-hidden={!signinError}
+            />
+            <p>You have entered an invalid username and/or password</p>
+          </div>
         </div>
       </div>
     </div>
