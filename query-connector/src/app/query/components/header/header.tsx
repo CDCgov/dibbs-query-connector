@@ -32,6 +32,9 @@ export default function HeaderComponent() {
   };
   const backLink =
     process.env.NODE_ENV === "production" ? "/tefca-viewer" : "/";
+
+  const isProduction = process.env.NODE_ENV === "production";
+
   return (
     <>
       <header className="usa-header usa-header--basic bg-primary-darker">
@@ -120,11 +123,13 @@ export default function HeaderComponent() {
             id="dropdown-menu"
             className={`usa-nav__submenu ${styles.menuDropdown}`}
           >
-            {/* <li className={`usa-nav__submenu-item`}>
-              <a className={styles.menuItem} href="#">
-                My queries
-              </a>
-            </li> */}
+            {!isProduction && (
+              <li className={`usa-nav__submenu-item`}>
+                <a className={styles.menuItem} href={"/queryBuilding"}>
+                  My queries
+                </a>
+              </li>
+            )}
             <li className={`usa-nav__submenu-item`}>
               <a className={styles.menuItem} href={backLink}>
                 Log out

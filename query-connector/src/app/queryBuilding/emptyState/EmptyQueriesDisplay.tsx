@@ -1,6 +1,9 @@
 import { Button, Icon } from "@trussworks/react-uswds";
 import styles from "../query.module.scss";
 
+/**
+ * Empty-state component for query building
+ */
 export const EmptyQueriesDisplay: React.FC = () => {
   return (
     <>
