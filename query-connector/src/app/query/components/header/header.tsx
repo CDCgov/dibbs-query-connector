@@ -70,7 +70,7 @@ export default function HeaderComponent() {
               />
             )}
             {/* TODO: Rework show/hide rules based on actual auth status */}
-            {path != "/signin" && path != "/query" && (
+            {path != "/signin" && !LOGGED_IN_PATHS.includes(path) && (
               <Button
                 className={styles.signinButton}
                 type="button"
@@ -81,7 +81,7 @@ export default function HeaderComponent() {
                 Sign in
               </Button>
             )}
-            {path == "/query" && (
+            {LOGGED_IN_PATHS.includes(path) && (
               <button
                 onClick={toggleMenuDropdown}
                 className={classNames(
@@ -136,3 +136,5 @@ export default function HeaderComponent() {
     </>
   );
 }
+
+const LOGGED_IN_PATHS = ["/query", "/queryBuilding"];

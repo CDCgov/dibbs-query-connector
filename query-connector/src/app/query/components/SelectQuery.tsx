@@ -5,17 +5,17 @@ import {
   USE_CASES,
   UseCaseToQueryName,
   ValueSet,
-} from "../constants";
-import CustomizeQuery from "./components/CustomizeQuery";
-import SelectSavedQuery from "./components/selectQuery/SelectSavedQuery";
+} from "../../constants";
+import CustomizeQuery from "./CustomizeQuery";
+import SelectSavedQuery from "./selectQuery/SelectSavedQuery";
 
 import { QueryResponse } from "@/app/query-service";
 import { Patient } from "fhir/r4";
 import {
   fetchQueryResponse,
   fetchUseCaseValueSets,
-} from "./components/selectQuery/queryHooks";
-import LoadingView from "./components/LoadingView";
+} from "./selectQuery/queryHooks";
+import LoadingView from "./LoadingView";
 
 interface SelectQueryProps {
   goForward: () => void;

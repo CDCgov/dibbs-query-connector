@@ -4,7 +4,7 @@ import { UseCaseQueryResponse } from "../query-service";
 import ResultsView from "./components/ResultsView";
 import PatientSearchResults from "./components/PatientSearchResults";
 import SearchForm from "./components/SearchForm";
-import SelectQuery from "./SelectQuery";
+import SelectQuery from "./components/SelectQuery";
 import {
   DEFAULT_DEMO_FHIR_SERVER,
   FHIR_SERVERS,

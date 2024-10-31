@@ -2,6 +2,7 @@
 import { Button, Fieldset, Label, TextInput } from "@trussworks/react-uswds";
 import { useState } from "react";
 import styles from "./query.module.scss";
+import EmptyQueriesDisplay from "./emptyState/EmptyQueriesDisplay";
 type QueryBuilding = {};
 export const QueryBuilding: React.FC<QueryBuilding> = ({}) => {
   const [queryName, setQueryName] = useState<string>();
@@ -9,22 +10,8 @@ export const QueryBuilding: React.FC<QueryBuilding> = ({}) => {
   function handleSubmit() {}
   return (
     <div className="main-container">
-      <Fieldset className={styles.queryBuildingContainer}>
-        <Label aria-label="queryName" htmlFor={"queryNameInput"}>
-          Query Name:
-        </Label>
-        <TextInput
-          id="queryNameInput"
-          name="queryNameInput"
-          type="text"
-          onChange={(event) => {
-            setQueryName(event.target.value);
-          }}
-        />
-        <Button onClick={handleSubmit} type={"button"}>
-          Submit
-        </Button>
-      </Fieldset>
+      <h1 className={styles.queryTitle}>My queries</h1>
+      <EmptyQueriesDisplay></EmptyQueriesDisplay>
     </div>
   );
 };
