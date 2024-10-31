@@ -1,5 +1,8 @@
 import { GroupedValueSet } from "./customizeQuery/customizeQueryUtils";
 
+/**
+ *
+ */
 export const countDibbsConceptTypeToVsMapItems = (obj: {
   [vsNameAuthorSystem: string]: GroupedValueSet;
 }) => {
