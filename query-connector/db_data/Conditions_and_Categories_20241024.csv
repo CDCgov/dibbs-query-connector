@@ -1,0 +1,227 @@
+Condition Name,Condition Code,Category
+Acanthamoeba,49649001,Waterborne (not enteric)
+Acute Flaccid Myelitis (AFM),897031002,Neurological Diseases
+Agricultural Chemicals (Fertilizer) Poisoning,216809001,Toxic Effects of Non-Medicinal Substances
+Alpha-gal Syndrome,788781001,Vectorborne Diseases
+Amebiasis,388759003,Enteric Diseases
+Anaplasmosis,13906002,Vectorborne Diseases
+Anencephaly,89369001,Birth Defects and Infant Disorders
+Angiostrongyliasis ,61750000,Zoonotic Diseases
+Animal Bite Injury,399907009,"Injuries, NEC"
+Anthrax,409498004,Zoonotic Diseases
+Arboviral Disease [Other],40610006,Vectorborne Diseases
+Arsenic Exposure and Toxicity,767146004,Toxic Effects of Non-Medicinal Substances
+Asbestosis,22607003,Respiratory Conditions (non-infectious)
+Atrioventricular septal defect (Endocardial cushion defect),1237074000,Birth Defects and Infant Disorders
+Babesiosis,21061004,Vectorborne Diseases
+Balamuthia mandrillaris Disease,115635005,Waterborne (not enteric)
+Bartonellosis,266123003,Vectorborne Diseases
+Baylisascariasis,93614002,Zoonotic Diseases
+Blastomycosis,69996000,Respiratory Conditions (Infectious)
+Botulism,398565003,Toxic Effects of Non-Medicinal Substances
+"Botulism, Infant",414488002,Toxic Effects of Non-Medicinal Substances
+Brucellosis,75702008,Zoonotic Diseases
+Byssinosis,85761009,Respiratory Conditions (non-infectious)
+Cadmium Exposure and Toxicity ,3398004,Toxic Effects of Non-Medicinal Substances
+California Serogroup Virus Disease,418182000,Vectorborne Diseases
+Campylobacteriosis,86500004,Enteric Diseases
+Cancer,363346000,Cancer
+Candida auris infection,865929003,Healthcare-Associated Events
+Carbapenem-resistant Acinetobacter baumannii (CRAB),715174007,Healthcare-Associated Events
+Carbapenem-resistant Enterobacteriaceae (CRE),712662001,Healthcare-Associated Events
+Carbapenem-resistant Pseudomonas aeruginosa (CRPA),726492000,Healthcare-Associated Events
+Carbapenemase-Producing Organisms (CPO),734350003,Healthcare-Associated Events
+Carbon Monoxide Poisoning,17383000,Toxic Effects of Non-Medicinal Substances
+Catheter-associated Urinary Tract Infection (CAUTI),700372006,Healthcare-Associated Events
+Central Line-associated Bloodstream Infection (CLABSI),736152001,Healthcare-Associated Events
+Chagas Disease,77506005,Vectorborne Diseases
+Chancroid,266143009,Sexually Transmitted Diseases
+Chemical Pneumonitis,233733000,Respiratory Conditions (non-infectious)
+Chikungunya virus disease ,111864006,Vectorborne Diseases
+Chlamydia trachomatis Infection,240589008,Sexually Transmitted Diseases
+Cholera,63650001,Enteric Diseases
+Cleft Lip Alone,80281008,Birth Defects and Infant Disorders
+Cleft Lip with Cleft Palate,66948001,Birth Defects and Infant Disorders
+Cleft Palate Alone,87979003,Birth Defects and Infant Disorders
+Clostridioides difficile (C. diff) infection,186431008,Enteric Diseases
+Clostridium perfringens Infection,65154009,Enteric Diseases
+Coal Workersâ€™ Pneumoconiosis (CWP),29422001,Respiratory Conditions (non-infectious)
+Coarctation of the Aorta,7305005,Birth Defects and Infant Disorders
+Coccidioidomycosis,60826002,Respiratory Conditions (Infectious)
+Colorado tick fever,6452009,Vectorborne Diseases
+Congenital cytomegalovirus (cCMV) infection and disease,59527008,Birth Defects and Infant Disorders
+Congenital Rubella Syndrome (CRS),1857005,Vaccine Preventable Diseases
+COVID-19,840539006,Respiratory Conditions (Infectious)
+Creutzfeldt-Jakob Disease (CJD) and Variant Creutzfeldt-Jakob Disease (vCJD),792004,Neurological Diseases
+Cryptococcosis,42386007,Respiratory Conditions (Infectious)
+Cryptosporidiosis,240370009,Enteric Diseases
+Cyanobacteria and Cyanotoxin Poisoning,41439009,Toxic Effects of Non-Medicinal Substances
+Cyclosporiasis,240372001,Enteric Diseases
+Cysticercosis ,59051007,Zoonotic Diseases
+Dengue Virus Infection,38362002,Vectorborne Diseases
+Diphtheria,276197005,Vaccine Preventable Diseases
+Diphyllobothriasis,187151009,Zoonotic Diseases
+Double Outlet Right Ventricle (DORV),7484005,Birth Defects and Infant Disorders
+Down Syndrome,41040004,Birth Defects and Infant Disorders
+Drowning and Submersion,212962007,"Injuries, NEC"
+"Drug Overdose and Poisoning, Non-opioid",1149222004,"Injuries, NEC"
+Eastern equine encephalitis virus disease ,416925005,Vectorborne Diseases
+Ebstein Anomaly,204357006,Birth Defects and Infant Disorders
+Echinococcosis,74942003,"Parasitic Diseases, NEC"
+Ehrlichiosis,240626005,Vectorborne Diseases
+Encephalitis,45170000,Neurological Diseases
+Farmerâ€™s Lung,18690003,Respiratory Conditions (non-infectious)
+Gastroschisis,72951007,Birth Defects and Infant Disorders
+Genital Warts,266113007,Sexually Transmitted Diseases
+Giardiasis,58265007,Enteric Diseases
+Glanders,4639008,Zoonotic Diseases
+Gonorrhea,15628003,Sexually Transmitted Diseases
+Granuloma Inguinale (Donovanosis),28867007,Sexually Transmitted Diseases
+Guillain-BarrÃ© Syndrome,40956001,Neurological Diseases
+Gunshot Wound,283545005,"Injuries, NEC"
+Hansenâ€™s disease,81004002,Respiratory Conditions (Infectious)
+Hantavirus Infection,359761005,Zoonotic Diseases
+Head Injury,82271004,"Injuries, NEC"
+Hemolytic uremic syndrome (HUS),111407006,Enteric Diseases
+Hepatitis A Virus Infection,40468003,Enteric Diseases
+Hepatitis B Virus Infection,66071002,Bloodborne Diseases
+"Hepatitis B Virus Infection, Perinatal",60498001,Bloodborne Diseases
+Hepatitis C Virus Infection,50711007,Bloodborne Diseases
+"Hepatitis C Virus Infection, Perinatal",551611000124101,Bloodborne Diseases
+Hepatitis D Virus Infection,707341005,Bloodborne Diseases
+Hepatitis E Virus Infection,7111000119109,Enteric Diseases
+Hepatitis G Virus Infection,397575003,Bloodborne Diseases
+"Herpes, Genital",33839006,Sexually Transmitted Diseases
+"Herpes, Neonatal",91576008,Sexually Transmitted Diseases
+Histoplasmosis,12962009,Respiratory Conditions (Infectious)
+HIV Infection or AIDS,86406008,Sexually Transmitted Diseases
+Hypoplastic Left Heart Syndrome (HLHS),62067003,Birth Defects and Infant Disorders
+Infant Hearing Loss,95821001,Birth Defects and Infant Disorders
+Influenza,43692000,Vaccine Preventable Diseases
+Influenza-Associated Hospitalizations,719590007,Vaccine Preventable Diseases
+Influenza-Associated Mortality,661761000124109,Vaccine Preventable Diseases
+Influenza-associated pediatric mortality,6142004,Vaccine Preventable Diseases
+Influenza-like Illness (ILI),95891005,Respiratory Conditions (Infectious)
+Interrupted Aortic Arch,218728005,Birth Defects and Infant Disorders
+Invasive Cronobacter Infection Among Infants,444664004,Systemic Conditions
+Invasive Haemophilus Influenzae Disease,406583002,Vaccine Preventable Diseases
+Invasive Pneumococcal Disease,406617004,Vaccine Preventable Diseases
+Jamestown Canyon virus disease,41723001,Vectorborne Diseases
+Japanese encephalitis virus (JEV) disease,52947006,Vectorborne Diseases
+Kawasaki Disease,75053002,Systemic Conditions
+Keystone virus disease,404237007,Vectorborne Diseases
+La Crosse virus disease,61094002,Vectorborne Diseases
+Lead in Blood,407152001,Toxic Effects of Non-Medicinal Substances
+Legionellosis,26726000,Respiratory Conditions (Infectious)
+Leishmaniasis,80612004,Vectorborne Diseases
+Leptospirosis,77377001,Zoonotic Diseases
+Limb Reduction,67341007,Birth Defects and Infant Disorders
+Listeriosis,4241002,Enteric Diseases
+Louse-borne relapsing fever (LBRF),14683004,Vectorborne Diseases
+Lyme Disease,23502006,Vectorborne Diseases
+Lymphatic Filariasis,240820001,Vectorborne Diseases
+Lymphocytic Choriomeningitis,721781004,Zoonotic Diseases
+Malaria,61462000,Vectorborne Diseases
+Measles,14189004,Vaccine Preventable Diseases
+Melioidosis,428111003,Waterborne (not enteric)
+Meningitis,7180009,Neurological Diseases
+Meningococcal disease,23511006,Vaccine Preventable Diseases
+Mercury Exposure and Toxicity,767299002,Toxic Effects of Non-Medicinal Substances
+Methemoglobinemia,38959009,Systemic Conditions
+Middle East Respiratory Syndrome (MERS),651000146102,Respiratory Conditions (Infectious)
+Motor Vehicle Injury,407153006,"Injuries, NEC"
+Mpox,359814004,Zoonotic Diseases
+Multisystem Inflammatory Syndrome in Adults (MIS-A),1119306006,Systemic Conditions
+Multisystem Inflammatory Syndrome in Children (MIS-C),895448002,Systemic Conditions
+Mumps,36989005,Vaccine Preventable Diseases
+Naegleria fowleri Primary Amebic Meningoencephalitis,428175000,Waterborne (not enteric)
+Neonatal Abstinence Syndrome,414819007,Birth Defects and Infant Disorders
+Nipah Virus Infection,406597005,Zoonotic Diseases
+Non-pestis Yersiniosis,83436008,Enteric Diseases
+Non-Polio Enterovirus Infection,53648006,Enteric Diseases
+Non-Streptococcal Toxic Shock Syndrome,18504008,Toxic Effects of Non-Medicinal Substances
+Nongonococcal Urethritis,84619001,Sexually Transmitted Diseases
+"Nontuberculous Mycobacteria Infection, Extrapulmonary ",111811007,Waterborne (not enteric)
+"Nontuberculous Mycobacteria Infection, Pulmonary",1731000119106,Respiratory Conditions (Infectious)
+Norovirus infection,721763002,Enteric Diseases
+Novel Influenza A Virus Infection,541131000124102,Vaccine Preventable Diseases
+Ophthalmia Neonatorum,34298002,Sexually Transmitted Diseases
+Opioid Overdose and Poisoning,242253008,Toxic Effects of Non-Medicinal Substances
+Orthopoxvirus Disease,414015000,Vaccine Preventable Diseases
+Parkinson's disease,49049000,Neurological Diseases
+Pelvic Inflammatory Disease,198130006,Sexually Transmitted Diseases
+Pertussis,27836007,Vaccine Preventable Diseases
+Pesticide Related Illness or injury,37131007,Toxic Effects of Non-Medicinal Substances
+Phenylketonuria ,190687004,Birth Defects and Infant Disorders
+Plague,58750007,Zoonotic Diseases
+Poliovirus Infection,398102009,Vaccine Preventable Diseases
+Powassan virus disease ,416707008,Vectorborne Diseases
+Primary Congenital Hypothyroidism,190268003,Birth Defects and Infant Disorders
+Prion Disease (Human) ,20484008,Neurological Diseases
+Psittacosis,75116005,Respiratory Conditions (Infectious)
+Pulmonary Valve Atresia and Stenosis,204339005,Birth Defects and Infant Disorders
+Q Fever,186788009,Zoonotic Diseases
+Rabies (Human),14168008,Zoonotic Diseases
+Respiratory Syncytial Virus (RSV),6415009,Respiratory Conditions (Infectious)
+Respiratory Syncytial Virus (RSV)-Associated Mortality,55735004,Respiratory Conditions (Infectious)
+Reyeâ€™s Syndrome,74351001,Systemic Conditions
+Rheumatic Fever,58718002,Streptococcal Diseases
+Ricin Poisoning,409617000,Toxic Effects of Non-Medicinal Substances
+Rotavirus Disease,18624000,Enteric Diseases
+Rubella,36653000,Vaccine Preventable Diseases
+S. Paratyphi Infection,85904008,Enteric Diseases
+S. Typhi Infection,4834000,Enteric Diseases
+Salmonellosis,302231008,Enteric Diseases
+Scabies,128869009,"Parasitic Diseases, NEC"
+Seafood Poisoning,269275003,Toxic Effects of Non-Medicinal Substances
+Severe Acute Respiratory Syndrome (SARS),398447004,Respiratory Conditions (Infectious)
+Shiga toxin-producing Escherichia coli (STEC) infection,328291000119103,Enteric Diseases
+Shigellosis,36188001,Enteric Diseases
+Silicosis or pneumoconiosis due to dust containing silica,805002,Respiratory Conditions (non-infectious)
+Single Ventricle,45503006,Birth Defects and Infant Disorders
+Smallpox,67924001,Vaccine Preventable Diseases
+Snowshoe hare virus disease,404236003,Vectorborne Diseases
+Spina Bifida,67531005,Birth Defects and Infant Disorders
+Spotted Fever Rickettsiosis,186771002,Vectorborne Diseases
+St. Louis Encephalitis Virus Infection,417192005,Vectorborne Diseases
+Staphylococcal Enterotoxin B Poisoning,419488004,Toxic Effects of Non-Medicinal Substances
+Staphylococcus aureus Infection,406602003,Healthcare-Associated Events
+"Streptococcal disease, invasive, Group A",406614006,Streptococcal Diseases
+"Streptococcal disease, invasive, Group B",406612005,Streptococcal Diseases
+Streptococcal Toxic Shock Syndrome,240451000,Toxic Effects of Non-Medicinal Substances
+Strongyloidiasis,1214006,"Parasitic Diseases, NEC"
+Suicide,44301001,"Injuries, NEC"
+Surgical Site Infection (SSI),433202001,Healthcare-Associated Events
+Syphilis,76272004,Sexually Transmitted Diseases
+"Syphilis, Congenital",35742006,Sexually Transmitted Diseases
+Taeniasis,76172008,Zoonotic Diseases
+Tetanus,76902006,Vaccine Preventable Diseases
+Tetralogy of Fallot (TOF),86299006,Birth Defects and Infant Disorders
+Tick Paralysis,74225001,Vectorborne Diseases
+Tickborne relapsing feverÂ (TBRF),10301003,Vectorborne Diseases
+Total Anomalous Pulmonary Venous Connection (TAPVC),111323005,Birth Defects and Infant Disorders
+Toxoplasmosis,187192000,Zoonotic Diseases
+Transposition of the Great Arteries (TGA),204296002,Birth Defects and Infant Disorders
+Trichinellosis,709018004,Zoonotic Diseases
+Tricuspid Valve Atresia and Stenosis,4374004,Birth Defects and Infant Disorders
+Trivittatus virus disease,240507007,Vectorborne Diseases
+Truncus Arteriosus (Common Truncus),61959006,Birth Defects and Infant Disorders
+Tuberculosis,56717001,Respiratory Conditions (Infectious)
+"Tuberculosis, Latent Infection (LTBI)",11999007,Respiratory Conditions (Infectious)
+Tularemia,19265001,Vectorborne Diseases
+Typhus Fever,240613006,Vectorborne Diseases
+Vaccine Adverse Event,293104008,Healthcare-Associated Events
+Vaccinia Disease or Adverse Event,409636005,Healthcare-Associated Events
+Vancomycin-intermediate Staphylococcus aureus (VISA),406604002,Healthcare-Associated Events
+Vancomycin-resistant Enterococci (VRE) Infection,406575008,Healthcare-Associated Events
+Vancomycin-resistant Staphylococcus aureus (VRSA),404681006,Healthcare-Associated Events
+Varicella,38907003,Vaccine Preventable Diseases
+Ventilator-associated Event (VAE),71695001,Healthcare-Associated Events
+Vesicular Stomatitis ,36921006,Zoonotic Diseases
+Vibriosis,398557001,Enteric Diseases
+Viral Hemorrhagic Fever (VHF),240523007,Zoonotic Diseases
+West Nile Virus Infection,417093003,Vectorborne Diseases
+Western equine encephalitis virus disease ,47523006,Vectorborne Diseases
+Work-related Asthma (WRA),57607007,Respiratory Conditions (non-infectious)
+Yellow Fever,16541001,Vectorborne Diseases
+Zika Virus Disease,3928002,Vectorborne Diseases
