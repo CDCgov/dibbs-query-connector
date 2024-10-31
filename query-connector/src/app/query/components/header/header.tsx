@@ -124,17 +124,15 @@ export default function HeaderComponent() {
             id="dropdown-menu"
             className={`usa-nav__submenu ${styles.menuDropdown}`}
           >
-            <li className={`usa-nav__submenu-item`}>
+            {/* <li className={`usa-nav__submenu-item`}>
               <a className={styles.menuItem} href="#">
                 My queries
               </a>
-            </li>
+            </li> */}
             <li className={`usa-nav__submenu-item`}>
               <a
                 className={styles.menuItem}
-                href={
-                  process.env.NODE_ENV === "production" ? "/tefca-viewer" : "/"
-                }
+                href={backLink}                
               >
                 Log out
               </a>
