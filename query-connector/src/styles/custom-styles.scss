@@ -223,6 +223,12 @@ html {
   }
 }
 
+.data-title {
+  flex: 0 1 auto;
+  width: 190px;
+  font-weight: bold;
+}
+
 .test-query-filler {
   background: #faf3d1;
   border: 1px solid #fee685;
