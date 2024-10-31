@@ -45,7 +45,7 @@ export function generateQueryInsertionSql(input: QueryInput) {
 /**
  * Function that generates SQL for the query_to_valueset join table needed for
  * query building.
- * @param input - Values of the shape UserQueryInput needed for query insertion
+ * @param input - Values of the shape QueryInput needed for query insertion
  * @param queryId - ID of the query that's already been created to associate with
  * a given valueset
  * @returns An array of {sql, values} to be inserted by the join insertion flow

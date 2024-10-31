@@ -408,7 +408,7 @@ function logRejectedPromiseReasons<T>(
 
 /**
  * Function that orchestrates query insertion for the query building flow
- * @param input - Values of the shape UserQueryInput needed for query insertion
+ * @param input - Values of the shape QueryInput needed for query insertion
  * @returns - Success or failure status, with associated error message for frontend
  */
 export async function insertQuery(input: QueryInput) {
