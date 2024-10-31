@@ -371,7 +371,7 @@ const SearchForm: React.FC<SearchFormProps> = ({
             </div>
           </div>
         </Fieldset>
-        <button className="usa-button patient-search-button" type="submit">
+        <button className="usa-button margin-top-between-group" type="submit">
           Search for patient
         </button>
       </form>

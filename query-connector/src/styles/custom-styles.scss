@@ -10,6 +10,9 @@ body {
   font-family: $sans-serif-font;
 }
 
+.margin-top-between-group {
+  margin-top: $margin-between-group;
+}
 .siteTitle {
   font-family: $mono-font;
   color: #e8f5ff !important;
@@ -134,12 +137,6 @@ body {
 
 .usa-label {
   margin-top: 1.5rem;
-}
-
-.patient-search-button {
-  margin-top: 2rem;
-  margin-bottom: 4rem;
-  max-width: 11em;
 }
 
 .text-base-lightest {
