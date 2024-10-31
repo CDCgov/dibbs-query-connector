@@ -23,6 +23,7 @@ import {
 } from "./customizeQuery/customizeQueryUtils";
 import Backlink from "./backLink/Backlink";
 import { RETURN_LABEL } from "../stepIndicator/StepIndicator";
+import { countDibbsConceptTypeToVsMapItems } from "./utils";
 
 interface CustomizeQueryProps {
   useCaseQueryResponse: UseCaseQueryResponse;
@@ -53,7 +54,7 @@ const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
 
   const [valueSetOptions, setValueSetOptions] = useState<{
     [dibbsConceptType in DibbsConceptType]: {
-      [vsAuthorSystemName: string]: GroupedValueSet;
+      [vsNameAuthorSystem: string]: GroupedValueSet;
     };
   }>({
     labs: {},
@@ -62,45 +63,23 @@ const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
   });
 
   useEffect(() => {
-    if (queryValuesets) {
-      const { labs, conditions, medications } =
-        mapValueSetsToValueSetTypes(queryValuesets);
+    const { labs, conditions, medications } =
+      mapValueSetsToValueSetTypes(queryValuesets);
 
-      setValueSetOptions({
-        labs: labs,
-        conditions: conditions,
-        medications: medications,
-      });
-    }
+    setValueSetOptions({
+      labs: labs,
+      conditions: conditions,
+      medications: medications,
+    });
   }, [queryValuesets]);
 
   // Compute counts of each tab-type
-  const countLabs = Object.values(valueSetOptions.labs).reduce(
-    (runningSum, gvs) => {
-      gvs.items.forEach((vs) => {
-        runningSum += vs.concepts.length;
-      });
-      return runningSum;
-    },
-    0,
+  const countLabs = countDibbsConceptTypeToVsMapItems(valueSetOptions.labs);
+  const countConditions = countDibbsConceptTypeToVsMapItems(
+    valueSetOptions.conditions,
   );
-  const countConditions = Object.values(valueSetOptions.conditions).reduce(
-    (runningSum, gvs) => {
-      gvs.items.forEach((vs) => {
-        runningSum += vs.concepts.length;
-      });
-      return runningSum;
-    },
-    0,
-  );
-  const countMedications = Object.values(valueSetOptions.medications).reduce(
-    (runningSum, gvs) => {
-      gvs.items.forEach((vs) => {
-        runningSum += vs.concepts.length;
-      });
-      return runningSum;
-    },
-    0,
+  const countMedications = countDibbsConceptTypeToVsMapItems(
+    valueSetOptions.medications,
   );
 
   // Keeps track of which side nav tab to display to users
