@@ -1,12 +1,20 @@
 @use "uswds-core" as *;
 @use "_variables" as *;
 
-h1 {
-  font-family: family("heading");
+h1,
+h2 {
+  font-family: $serif-font;
 }
 
-h2 {
-  font-family: family("body");
+body {
+  font-family: $sans-serif-font;
+}
+
+.siteTitle {
+  font-family: $mono-font;
+  color: #e8f5ff !important;
+  font-size: 1.5rem;
+  font-weight: 400;
 }
 
 .section__line_gray {
@@ -22,13 +30,13 @@ h2 {
 .page-title {
   margin: $margin-within-group 0rem;
   font-weight: 700;
-  font-size: 2.66rem;
+  font-size: 2rem;
 }
 
 .page-explainer {
   margin: $margin-within-group 0rem $margin-between-group 0rem;
   font-weight: 300;
-  font-size: 1.375rem;
+  font-size: 1.125rem;
   line-height: 150%;
 }
 

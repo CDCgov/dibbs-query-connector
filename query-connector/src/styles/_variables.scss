@@ -1,3 +1,5 @@
+@use "uswds-core" as *;
+
 // taken as values from Figma
 $query-connector-max-width: 45rem;
 $query-connector-wide-max-width: 90rem;
@@ -8,3 +10,7 @@ $margin-between-group: 2.5rem;
 
 $background-hover-color: #d9e8f680;
 $gray-cool-20: #c6cace;
+
+$serif-font: family("heading");
+$sans-serif-font: "Public Sans Web", family("body");
+$mono-font: "Consolas", family("mono");
