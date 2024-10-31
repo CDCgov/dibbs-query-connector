@@ -23,7 +23,7 @@ import {
   countDibbsConceptTypeToVsMapItems,
 } from "./customizeQuery/customizeQueryUtils";
 import Backlink from "./backLink/Backlink";
-import { RETURN_LABEL } from "../stepIndicator/StepIndicator";
+import { RETURN_LABEL } from "./stepIndicator/StepIndicator";
 
 interface CustomizeQueryProps {
   useCaseQueryResponse: UseCaseQueryResponse;

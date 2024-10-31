@@ -17,7 +17,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.min.css";
 import StepIndicator, {
   CUSTOMIZE_QUERY_STEPS,
-} from "./stepIndicator/StepIndicator";
+} from "./components/stepIndicator/StepIndicator";
 import SiteAlert from "./designSystem/SiteAlert";
 import { Patient } from "fhir/r4";
 

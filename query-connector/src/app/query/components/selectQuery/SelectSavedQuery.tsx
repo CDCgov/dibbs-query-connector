@@ -11,7 +11,7 @@ import { useState } from "react";
 import {
   PAGE_TITLES,
   RETURN_LABEL,
-} from "@/app/query/stepIndicator/StepIndicator";
+} from "@/app/query/components/stepIndicator/StepIndicator";
 
 type SelectSavedQueryProps = {
   selectedQuery: string;

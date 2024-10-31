@@ -6,7 +6,7 @@ import {
   formatMRN,
   formatName,
 } from "@/app/format-service";
-import { PAGE_TITLES } from "@/app/query/stepIndicator/StepIndicator";
+import { PAGE_TITLES } from "@/app/query/components/stepIndicator/StepIndicator";
 
 type PatientSeacrchResultsTableProps = {
   patients: Patient[];

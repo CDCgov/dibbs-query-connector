@@ -17,7 +17,7 @@ import { UseCaseQueryResponse, UseCaseQuery } from "@/app/query-service";
 import { fhirServers } from "@/app/fhir-servers";
 import styles from "./searchForm/searchForm.module.scss";
 import { FormatPhoneAsDigits } from "@/app/format-service";
-import { PAGE_TITLES } from "@/app/query/stepIndicator/StepIndicator";
+import { PAGE_TITLES } from "@/app/query/components/stepIndicator/StepIndicator";
 
 interface SearchFormProps {
   useCase: USE_CASES;
