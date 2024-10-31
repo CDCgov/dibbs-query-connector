@@ -3,7 +3,7 @@ import { ValueSet } from "./constants";
 
 // TODO: Potentially merge this / infer this from the type created via the
 // database creation workstream
-export type UserQueryInput = {
+export type QueryInput = {
   queryName: string;
   author: string;
   valueSets: ValueSet[];
@@ -21,7 +21,7 @@ const DEFAULT_TIME_WINDOW = {
  * @param input - Values of the shape UserQueryInput needed for query insertion
  * @returns [sql, values] needed for query building insertion
  */
-export function generateQueryInsertionSql(input: UserQueryInput) {
+export function generateQueryInsertionSql(input: QueryInput) {
   const id = randomUUID();
   const dateCreated = new Date().toISOString();
   const dateLastModified = new Date().toISOString();
@@ -51,7 +51,7 @@ export function generateQueryInsertionSql(input: UserQueryInput) {
  * @returns An array of {sql, values} to be inserted by the join insertion flow
  */
 export function generateQueryToValueSetInsertionSql(
-  input: UserQueryInput,
+  input: QueryInput,
   queryId: UUID,
 ) {
   const joinInsertionSqlArray = input.valueSets.map((v) => {
