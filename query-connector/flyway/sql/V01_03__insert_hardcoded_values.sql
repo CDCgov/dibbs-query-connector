@@ -1,6 +1,6 @@
 INSERT INTO conditions VALUES('1','DIBBs Local Code System','Newborn Screening','20240909');
 INSERT INTO conditions VALUES('2','DIBBs Local Code System','Cancer (Leukemia)','20240909');
-INSERT INTO conditions VALUES('3','DIBBs Local Code System','Social Determinants of Health','20240909'); -- has no valuesets
+-- INSERT INTO conditions VALUES('3','DIBBs Local Code System','Social Determinants of Health','20240909'); -- has no valuesets
 
 -- Newborn Screening valueset(s)
 INSERT INTO valuesets VALUES('1_20240909','1','20240909','Newborn Screening','DIBBs','lotc');
