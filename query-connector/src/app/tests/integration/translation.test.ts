@@ -4,9 +4,10 @@ import { translateVSACToInternalValueSet } from "../../database-service";
 import { ValueSet as FhirValueSet } from "fhir/r4";
 
 const EXPECTED_INTERNAL_VALUESET: ValueSet = {
-  valueSetId: ExampleVsacValueSet.id,
+  valueSetId: `${ExampleVsacValueSet.id}_${ExampleVsacValueSet.version}`,
   valueSetVersion: ExampleVsacValueSet.version,
   valueSetName: ExampleVsacValueSet.title,
+  valueSetExternalId: ExampleVsacValueSet.id,
   author: ExampleVsacValueSet.publisher,
   system: ExampleVsacValueSet.compose.include[0].system,
   ersdConceptType: "ostc",
