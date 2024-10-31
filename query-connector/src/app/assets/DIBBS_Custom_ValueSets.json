@@ -1,5 +1,5 @@
 {
-  "newborn_screening": [
+  "Newborn Screening": [
     {
       "valueSetId": "1_20241015_16",
       "valueSetVersion": "1",
@@ -1022,7 +1022,7 @@
       ]
     }
   ],
-  "cancer": [
+  "Cancer (Leukemia)": [
     {
       "valueSetId": "1_20240909_2",
       "valueSetVersion": "1",
@@ -1111,7 +1111,7 @@
       ]
     }
   ],
-  "syphilis": [
+  "Syphilis (disorder)": [
     {
       "valueSetId": "1_20240909_4",
       "valueSetVersion": "1",
@@ -1154,7 +1154,7 @@
       ]
     }
   ],
-  "gonorrhea": [
+  "Gonorrhea (disorder)": [
     {
       "valueSetId": "1_20240909_7",
       "valueSetVersion": "1",
@@ -1248,7 +1248,7 @@
       ]
     }
   ],
-  "chlamydia": [
+  "Chlamydia trachomatis infection (disorder)": [
     {
       "valueSetId": "1_20240910_11",
       "valueSetVersion": "1",
