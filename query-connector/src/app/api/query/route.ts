@@ -18,7 +18,7 @@ import {
 import { handleRequestError } from "./error-handling-service";
 import {
   getSavedQueryByName,
-  mapQueryRowsToConceptValueSets,
+  mapQueryRowsToValueSets,
 } from "@/app/database-service";
 
 /**
@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
   // Lookup default parameters for particular use-case search
   const queryName = UseCaseToQueryName[use_case as USE_CASES];
   const queryResults = await getSavedQueryByName(queryName);
-  const valueSets = await mapQueryRowsToConceptValueSets(queryResults);
+  const valueSets = await mapQueryRowsToValueSets(queryResults);
 
   // Add params & patient identifiers to UseCaseRequest
   const UseCaseRequest: UseCaseQueryRequest = {
