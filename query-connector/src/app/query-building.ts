@@ -1,5 +1,5 @@
 import { UUID, randomUUID } from "crypto";
-import { Concept, ValueSet } from "./constants";
+import { ValueSet } from "./constants";
 
 // TODO: Potentially merge this / infer this from the type created via the
 // database creation workstream
@@ -7,7 +7,6 @@ export type UserQueryInput = {
   queryName: string;
   author: string;
   valueSets: ValueSet[];
-  concepts?: Concept[];
   timeWindowUnit?: string; // TODO: should probably type this more strongly
   timeWindowNumber?: Number;
 };
