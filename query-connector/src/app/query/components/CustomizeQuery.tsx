@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "@trussworks/react-uswds";
 import {
+  DibbsConceptType,
   DibbsValueSetType,
   USE_CASES,
   ValueSet,
@@ -16,7 +17,10 @@ import CustomizeQueryAccordionHeader from "./customizeQuery/CustomizeQueryAccord
 import CustomizeQueryAccordionBody from "./customizeQuery/CustomizeQueryAccordionBody";
 import Accordion from "../designSystem/Accordion";
 import CustomizeQueryNav from "./customizeQuery/CustomizeQueryNav";
-import { mapValueSetsToValueSetTypes } from "./customizeQuery/customizeQueryUtils";
+import {
+  GroupedValueSet,
+  mapValueSetsToValueSetTypes,
+} from "./customizeQuery/customizeQueryUtils";
 import Backlink from "./backLink/Backlink";
 import { RETURN_LABEL } from "../stepIndicator/StepIndicator";
 
@@ -46,13 +50,29 @@ const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
   goBack,
 }) => {
   const [activeTab, setActiveTab] = useState<DibbsValueSetType>("labs");
-  const { labs, conditions, medications } =
-    mapValueSetsToValueSetTypes(queryValuesets);
-  const [valueSetOptions, setValueSetOptions] = useState({
-    labs: labs,
-    conditions: conditions,
-    medications: medications,
+
+  const [valueSetOptions, setValueSetOptions] = useState<{
+    [dibbsConceptType in DibbsConceptType]: {
+      [vsAuthorSystemName: string]: GroupedValueSet;
+    };
+  }>({
+    labs: {},
+    conditions: {},
+    medications: {},
   });
+
+  useEffect(() => {
+    if (queryValuesets) {
+      const { labs, conditions, medications } =
+        mapValueSetsToValueSetTypes(queryValuesets);
+
+      setValueSetOptions({
+        labs: labs,
+        conditions: conditions,
+        medications: medications,
+      });
+    }
+  }, [queryValuesets]);
 
   // Compute counts of each tab-type
   const countLabs = Object.values(valueSetOptions.labs).reduce(
