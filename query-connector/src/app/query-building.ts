@@ -18,7 +18,7 @@ const DEFAULT_TIME_WINDOW = {
 
 /**
  * Function that generates SQL needed for the query building flow
- * @param input - Values of the shape UserQueryInput needed for query insertion
+ * @param input - Values of the shape QueryInput needed for query insertion
  * @returns [sql, values] needed for query building insertion
  */
 export function generateQueryInsertionSql(input: QueryInput) {
