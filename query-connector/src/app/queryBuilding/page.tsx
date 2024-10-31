@@ -1,12 +1,11 @@
 "use client";
 import styles from "./query.module.scss";
 import EmptyQueriesDisplay from "./emptyState/EmptyQueriesDisplay";
-type QueryBuilding = {};
 /**
  * Component for Query Building Flow
  * @returns The Query Building component flow
  */
-export const QueryBuilding: React.FC<QueryBuilding> = ({}) => {
+export const QueryBuilding: React.FC = ({}) => {
   return (
     <div className="main-container">
       <h1 className={styles.queryTitle}>My queries</h1>
