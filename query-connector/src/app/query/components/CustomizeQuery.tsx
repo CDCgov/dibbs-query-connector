@@ -28,7 +28,7 @@ import { countDibbsConceptTypeToVsMapItems } from "./utils";
 interface CustomizeQueryProps {
   useCaseQueryResponse: UseCaseQueryResponse;
   queryType: USE_CASES;
-  queryValuesets: ValueSet[];
+  queryValueSets: ValueSet[];
   setQueryValuesets: (queryVS: ValueSet[]) => void;
   goBack: () => void;
 }
@@ -38,7 +38,7 @@ interface CustomizeQueryProps {
  * @param root0 - The properties object.
  * @param root0.useCaseQueryResponse - The response from the query service.
  * @param root0.queryType - The type of the query.
- * @param root0.queryValuesets - The pre-fetched value sets from the DB.
+ * @param root0.queryValueSets - The pre-fetched value sets from the DB.
  * @param root0.setQueryValuesets - Function to update tracked custom query state.
  * @param root0.goBack - Back button to go from "customize-queries" to "search" component.
  * @returns The CustomizeQuery component.
@@ -46,7 +46,7 @@ interface CustomizeQueryProps {
 const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
   useCaseQueryResponse,
   queryType,
-  queryValuesets,
+  queryValueSets: queryValueSets,
   setQueryValuesets,
   goBack,
 }) => {
@@ -64,14 +64,14 @@ const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
 
   useEffect(() => {
     const { labs, conditions, medications } =
-      mapValueSetsToValueSetTypes(queryValuesets);
+      mapValueSetsToValueSetTypes(queryValueSets);
 
     setValueSetOptions({
       labs: labs,
       conditions: conditions,
       medications: medications,
     });
-  }, [queryValuesets]);
+  }, [queryValueSets]);
 
   // Compute counts of each tab-type
   const countLabs = countDibbsConceptTypeToVsMapItems(valueSetOptions.labs);
