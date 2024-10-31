@@ -29,7 +29,8 @@ export default function HeaderComponent() {
   const toggleMenuDropdown = () => {
     setShowMenu(!showMenu);
   };
-
+  const backLink =
+    process.env.NODE_ENV === "production" ? "/tefca-viewer" : "/";
   return (
     <>
       <header className="usa-header usa-header--basic bg-primary-darker">
@@ -47,11 +48,7 @@ export default function HeaderComponent() {
               <em className="usa-logo__text text-base-lightest">
                 <a
                   className="text-base-lightest font-sans-xl text-bold"
-                  href={
-                    process.env.NODE_ENV === "production"
-                      ? "/tefca-viewer"
-                      : "/"
-                  }
+                  href={backLink}
                   title={metadata.title}
                 >
                   {metadata.title}
@@ -133,7 +130,12 @@ export default function HeaderComponent() {
               </a>
             </li>
             <li className={`usa-nav__submenu-item`}>
-              <a className={styles.menuItem} href="/">
+              <a
+                className={styles.menuItem}
+                href={
+                  process.env.NODE_ENV === "production" ? "/tefca-viewer" : "/"
+                }
+              >
                 Log out
               </a>
             </li>
