@@ -6,9 +6,7 @@ type QueryBuilding = {};
 export const QueryBuilding: React.FC<QueryBuilding> = ({}) => {
   const [queryName, setQueryName] = useState<string>();
 
-  function handleSubmit() {
-    console.log(queryName);
-  }
+  function handleSubmit() {}
   return (
     <div className="main-container">
       <Fieldset className={styles.queryBuildingContainer}>
