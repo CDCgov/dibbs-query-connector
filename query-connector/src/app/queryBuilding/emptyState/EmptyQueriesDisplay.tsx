@@ -3,6 +3,7 @@ import styles from "../query.module.scss";
 
 /**
  * Empty-state component for query building
+ * @returns the EmptyQueriesDisplay to render the empty state status
  */
 export const EmptyQueriesDisplay: React.FC = () => {
   return (
