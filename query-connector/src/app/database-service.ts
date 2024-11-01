@@ -358,7 +358,6 @@ function generateConceptSqlPromises(vs: ValueSet) {
 }
 
 function generateValuesetConceptJoinSqlPromises(vs: ValueSet) {
-  const valueSetUniqueId = `${vs.valueSetId}_${vs.valueSetVersion}`;
   const insertConceptsSqlArray = vs.concepts.map((concept) => {
     const systemPrefix = stripProtocolAndTLDFromSystemUrl(vs.system);
     const conceptUniqueId = `${systemPrefix}_${concept.code}`;
@@ -377,8 +376,8 @@ function generateValuesetConceptJoinSqlPromises(vs: ValueSet) {
     RETURNING valueset_id, concept_id;
     `;
     const conceptInsertPromise = dbClient.query(insertJoinSql, [
-      `${valueSetUniqueId}_${conceptUniqueId}`,
-      valueSetUniqueId,
+      `${vs.valueSetId}_${conceptUniqueId}`,
+      vs.valueSetId,
       conceptUniqueId,
     ]);
 
@@ -483,12 +482,11 @@ export async function checkValueSetInsertion(
   const vsSql = `SELECT * FROM valuesets WHERE oid = $1;`;
   try {
     const result = await dbClient.query(vsSql, [vs.valueSetExternalId]);
-    const foundVS: ValueSet = result.rows[0];
+    const foundVS = result.rows[0];
     if (
-      foundVS.valueSetVersion !== vs.valueSetVersion ||
-      foundVS.valueSetName !== vs.valueSetName ||
-      foundVS.author !== vs.author ||
-      foundVS.dibbsConceptType !== vs.dibbsConceptType
+      foundVS.version !== vs.valueSetVersion ||
+      foundVS.name !== vs.valueSetName ||
+      foundVS.author !== vs.author
     ) {
       console.error(
         "Retrieved value set information differs from given value set",
@@ -535,10 +533,9 @@ export async function checkValueSetInsertion(
   missingData.missingConcepts = brokenConcepts.filter((bc) => bc !== undefined);
 
   // Confirm that valueset_to_concepts contains all relevant FK mappings
-  const valueSetUniqueId = `${vs.valueSetId}_${vs.valueSetVersion}`;
   const mappingSql = `SELECT * FROM valueset_to_concept WHERE valueset_id = $1;`;
   try {
-    const result = await dbClient.query(mappingSql, [valueSetUniqueId]);
+    const result = await dbClient.query(mappingSql, [vs.valueSetId]);
     const rows = result.rows;
     const missingConceptsFromMappings = vs.concepts.map((c) => {
       const systemPrefix = stripProtocolAndTLDFromSystemUrl(vs.system);
