@@ -133,7 +133,7 @@ h1 {
   .container {
     display: flex;
     margin: 0 auto; // Centers the container itself if needed
-    max-width: 640px;
+    max-width: $query-connector-max-width;
     column-gap: 2rem;
   }
 }
@@ -145,7 +145,7 @@ h1 {
 }
 
 .blue-background-container .text-holder {
-  max-width: 640px;
+  max-width: $query-connector-max-width;
   margin: 0 auto;
   text-align: left;
 }
@@ -171,7 +171,7 @@ h1 {
   justify-content: center; // Centers the column in the container
   margin: 0 auto; // Centers the container itself if needed
   row-gap: 0.1em; // Adjusts the gap between rows/items
-  max-width: 640px;
+  max-width: $query-connector-max-width;
 }
 
 .data-title {

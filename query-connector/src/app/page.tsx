@@ -7,7 +7,7 @@ import {
 } from "@trussworks/react-uswds";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-
+import styles from "./page.module.scss";
 /**
  * The landing page for the TEFCA Viewer.
  * @returns The LandingPage component.
@@ -25,10 +25,10 @@ export default function LandingPage() {
         <div className="gradient-blue-background">
           <div className="container">
             <div className="text-holder">
-              <h1 className="font-sans-2xl text-bold">
+              <h1 className={styles.pageSubtitle}>
                 Data collection made easier
               </h1>
-              <h2 className="font-sans-md text-light margin-top-2">
+              <h2 className={styles.pageContent}>
                 The TEFCA Query Connector allows your jurisdiction to query a
                 wide network of healthcare organizations (HCOs) enabled by
                 TEFCA, giving you access to more complete and timely data.
@@ -44,8 +44,8 @@ export default function LandingPage() {
           </div>
         </div>
         <div className="home">
-          <h3 className="font-sans-l text-bold margin-top-5">What is it?</h3>
-          <h2 className="font-sans-md text-light margin-top-0">
+          <h3 className={styles.pageSubtitle}>What is it?</h3>
+          <h2 className={styles.pageContent}>
             The TEFCA Query Connector aims to streamline the collection of
             health data using an intuitive querying process that leverages
             Qualified Health Information Networks (QHINs) within the Trusted
@@ -54,10 +54,8 @@ export default function LandingPage() {
             quickly retrieve patient records and relevant case information from
             HCOs without requiring direct connection and onboarding.
           </h2>
-          <h3 className="font-sans-l text-bold margin-top-5">
-            How does it work?
-          </h3>
-          <h2 className="font-sans-md text-light margin-top-0">
+          <h3 className={styles.pageSubtitle}>How does it work?</h3>
+          <h2 className={styles.pageContent}>
             Public health staff can interact with the TEFCA Query Connector
             manually by entering simple patient details — such as name, date of
             birth, or medical identifiers — along with a query use case, into
