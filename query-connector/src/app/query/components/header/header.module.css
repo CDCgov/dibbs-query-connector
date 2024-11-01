@@ -5,7 +5,8 @@
   color: white !important;
   padding: 0px !important;
   font: inherit !important;
-  margin-right: 1rem !important;
+  margin: 0 0.5rem !important;
+  text-align: left !important;
 }
 
 .signinButton {
@@ -58,8 +59,10 @@
 }
 
 .headerContentContainer {
+  display: flex;
   align-items: center !important;
   margin: 0 !important;
   padding: 0 !important;
   height: 4.5rem;
+  max-width: 100% !important;
 }

@@ -43,7 +43,7 @@ export default function HeaderComponent() {
           )}
         >
           <div className={classNames("display-flex", "flex-align-center")}>
-            <div className="usa-logo">
+            <div className="usa-logo" style={{marginLeft: "0"}}>
               <em className="usa-logo__text text-base-lightest">
                 <a className="siteTitle" href={backLink} title={metadata.title}>
                   {metadata.title}
