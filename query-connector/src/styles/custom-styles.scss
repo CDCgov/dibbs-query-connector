@@ -191,6 +191,7 @@ body {
   grid-template-columns: 1fr; // Defines a single column
   justify-content: center; // Centers the column in the container
   background-color: rgba(247, 249, 250, 1);
+  flex: auto; // Sizes main-body to fill space between header and footer
 }
 
 .home {
