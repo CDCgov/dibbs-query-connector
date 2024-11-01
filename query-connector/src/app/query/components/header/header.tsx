@@ -30,17 +30,20 @@ export default function HeaderComponent() {
   const toggleMenuDropdown = () => {
     setShowMenu(!showMenu);
   };
-  const backLink =
-    process.env.NODE_ENV === "production" ? "/tefca-viewer" : "/";
-
   const isProduction = process.env.NODE_ENV === "production";
+  const backLink = isProduction ? "/tefca-viewer" : "/";
 
   return (
     <>
       <header className="usa-header usa-header--basic bg-primary-darker">
-        <div className={styles.headerContentContainer}>
+        <div
+          className={classNames(
+            "usa-nav-container",
+            styles.headerContentContainer,
+          )}
+        >
           <div className={classNames("display-flex", "flex-align-center")}>
-            <div className="usa-logo margin-left-1">
+            <div className="usa-logo">
               <em className="usa-logo__text text-base-lightest">
                 <a className="siteTitle" href={backLink} title={metadata.title}>
                   {metadata.title}
