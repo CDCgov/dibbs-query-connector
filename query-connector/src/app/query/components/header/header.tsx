@@ -13,7 +13,7 @@ import classNames from "classnames";
  */
 export default function HeaderComponent() {
   const modalRef = useRef<ModalRef>(null);
-  const menuRef = useRef<HTMLDivElement>(null)
+  const menuRef = useRef<HTMLDivElement>(null);
 
   const [isClient, setIsClient] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
@@ -21,7 +21,7 @@ export default function HeaderComponent() {
   const outsideMenuClick = (event: MouseEvent) => {
     if (
       showMenu &&
-      menuRef.current && 
+      menuRef.current &&
       !menuRef.current.contains(event.target as Node)
     ) {
       setShowMenu(false);
@@ -32,11 +32,10 @@ export default function HeaderComponent() {
     setIsClient(true);
 
     document.addEventListener("mousedown", outsideMenuClick);
-   
+
     return () => {
       document.removeEventListener("mousedown", outsideMenuClick);
     };
-
   }, [showMenu]);
 
   const router = useRouter();
@@ -62,7 +61,7 @@ export default function HeaderComponent() {
           )}
         >
           <div className={classNames("display-flex", "flex-align-center")}>
-            <div className="usa-logo" style={{marginLeft: "0"}}>
+            <div className="usa-logo" style={{ marginLeft: "0" }}>
               <em className="usa-logo__text text-base-lightest">
                 <a className="siteTitle" href={backLink} title={metadata.title}>
                   {metadata.title}
@@ -130,9 +129,7 @@ export default function HeaderComponent() {
       )}
 
       {showMenu && (
-        <div 
-        ref={menuRef}
-        className={styles.menuDropdownContainer}>
+        <div ref={menuRef} className={styles.menuDropdownContainer}>
           <ul
             id="dropdown-menu"
             className={`usa-nav__submenu ${styles.menuDropdown}`}
