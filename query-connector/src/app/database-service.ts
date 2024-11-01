@@ -465,8 +465,7 @@ export async function insertQuery(input: QueryInput) {
  * @returns A data structure reporting on missing concepts or value set links.
  */
 export async function checkValueSetInsertion(vs: ValueSet) {
-  // Translate to our internal representation and begin accumulating
-  // missing data
+  // Begin accumulating missing data
   const missingData = {
     missingValueSet: false,
     missingConcepts: [] as Array<String>,
