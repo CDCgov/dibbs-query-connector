@@ -1,0 +1,24 @@
+@use "../../../../styles/_variables" as *;
+
+.footerContainer {
+  height: 5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: $primary-darker;
+}
+
+.footerContainer > div {
+  flex-grow: 1;
+}
+
+.cdcLogoContainer {
+  display: flex;
+  align-items: center;
+  gap: $margin--8px;
+}
+
+.contactUsContainer {
+  display: flex;
+  justify-content: end;
+}
