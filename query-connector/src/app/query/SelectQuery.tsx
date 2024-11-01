@@ -120,7 +120,7 @@ const SelectQuery: React.FC<SelectQueryProps> = ({
         <CustomizeQuery
           useCaseQueryResponse={resultsQueryResponse}
           queryType={selectedQuery}
-          queryValuesets={queryValueSets}
+          queryValueSets={queryValueSets}
           setQueryValuesets={setQueryValueSets}
           goBack={() => setShowCustomizeQuery(false)}
         ></CustomizeQuery>
