@@ -117,13 +117,13 @@ export default function HeaderComponent() {
             className={`usa-nav__submenu ${styles.menuDropdown}`}
           >
             {!isProduction && (
-              <li className={`usa-nav__submenu-item`}>
+              <li className={styles.subMenuItem}>
                 <a className={styles.menuItem} href={"/queryBuilding"}>
                   My queries
                 </a>
               </li>
             )}
-            <li className={`usa-nav__submenu-item`}>
+            <li className={styles.subMenuItem}>
               <a className={styles.menuItem} href={backLink}>
                 Log out
               </a>
