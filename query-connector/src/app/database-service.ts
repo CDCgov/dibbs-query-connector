@@ -461,17 +461,12 @@ export async function insertQuery(input: QueryInput) {
  *   2. Whether each concept included in that value set bundle was inserted
  *   3. Whether these concepts are now mapped to this value set via foreign key
  * If any data is found to be missing, it is collected and logged to the user.
- * @param setToCheck The FHIR formatted value set to check.
- * @param ersdConcept The eRSD concept this value set belongs to.
+ * @param vs The DIBBs internal representation of the value set to check.
  * @returns A data structure reporting on missing concepts or value set links.
  */
-export async function checkValueSetInsertion(
-  setToCheck: FhirValueSet,
-  ersdConcept: ErsdConceptType,
-) {
+export async function checkValueSetInsertion(vs: ValueSet) {
   // Translate to our internal representation and begin accumulating
   // missing data
-  const vs = await translateVSACToInternalValueSet(setToCheck, ersdConcept);
   const missingData = {
     missingValueSet: false,
     missingConcepts: [] as Array<String>,
