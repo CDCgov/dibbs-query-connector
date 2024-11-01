@@ -13,12 +13,31 @@ import classNames from "classnames";
  */
 export default function HeaderComponent() {
   const modalRef = useRef<ModalRef>(null);
+  const menuRef = useRef<HTMLDivElement>(null)
+
   const [isClient, setIsClient] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
 
+  const outsideMenuClick = (event: MouseEvent) => {
+    if (
+      showMenu &&
+      menuRef.current && 
+      !menuRef.current.contains(event.target as Node)
+    ) {
+      setShowMenu(false);
+    }
+  };
+
   useEffect(() => {
     setIsClient(true);
-  }, []);
+
+    document.addEventListener("mousedown", outsideMenuClick);
+   
+    return () => {
+      document.removeEventListener("mousedown", outsideMenuClick);
+    };
+
+  }, [showMenu]);
 
   const router = useRouter();
   const path = usePathname();
@@ -111,7 +130,9 @@ export default function HeaderComponent() {
       )}
 
       {showMenu && (
-        <div className={styles.menuDropdownContainer}>
+        <div 
+        ref={menuRef}
+        className={styles.menuDropdownContainer}>
           <ul
             id="dropdown-menu"
             className={`usa-nav__submenu ${styles.menuDropdown}`}
