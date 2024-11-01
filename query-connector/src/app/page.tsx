@@ -44,9 +44,7 @@ export default function LandingPage() {
           </div>
         </div>
         <div className="home">
-          <h3 className="font-sans-l text-bold margin-top--40px">
-            What is it?
-          </h3>
+          <h3 className="font-sans-l text-bold margin-top-5">What is it?</h3>
           <h2 className="font-sans-md text-light margin-top-0">
             The TEFCA Query Connector aims to streamline the collection of
             health data using an intuitive querying process that leverages
@@ -56,7 +54,7 @@ export default function LandingPage() {
             quickly retrieve patient records and relevant case information from
             HCOs without requiring direct connection and onboarding.
           </h2>
-          <h3 className="font-sans-l text-bold margin-top--40px">
+          <h3 className="font-sans-l text-bold margin-top-5">
             How does it work?
           </h3>
           <h2 className="font-sans-md text-light margin-top-0">

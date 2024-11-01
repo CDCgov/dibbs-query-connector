@@ -132,7 +132,7 @@ const SelectSavedQuery: React.FC<SelectSavedQueryProps> = ({
       )}
 
       {/* Submit Button */}
-      <div className="margin-top--40px">
+      <div className="margin-top-5">
         <Button
           type="button"
           disabled={!selectedQuery || loadingQueryValueSets}

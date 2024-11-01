@@ -200,9 +200,9 @@ const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
       </div>
       <LoadingView loading={!useCaseQueryResponse} />
       <h1 className="page-title margin-bottom-05-important">Customize query</h1>
-      <p className="page-explainer margin-x-0-important">
+      <h2 className="page-explainer margin-x-0-important">
         Query: {demoQueryValToLabelMap[queryType]}
-      </p>
+      </h2>
       <h3 className="margin-x-0-important font-sans-sm text-light padding-bottom-0 padding-top-05">
         {countLabs} labs found, {countMedications} medications found,{" "}
         {countConditions} conditions found.

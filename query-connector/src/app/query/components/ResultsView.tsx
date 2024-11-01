@@ -75,12 +75,12 @@ const ResultsView: React.FC<ResultsViewProps> = ({
       <h1 className="page-title margin-bottom-0-important">
         {PAGE_TITLES["results"]}
       </h1>
-      <p className="page-explainer margin-bottom-3-important margin-top-0-important">
+      <h2 className="page-explainer margin-bottom-3-important margin-top-0-important">
         <strong>Query: </strong>
         <span className="text-normal display-inline-block">
           {demoQueryValToLabelMap[selectedQuery]}
         </span>
-      </p>
+      </h2>
 
       <div className=" grid-container grid-row grid-gap-md padding-0 ">
         <div className="tablet:grid-col-3">
