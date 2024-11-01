@@ -1,6 +1,6 @@
 import "../styles/styles.scss";
 import Header from "./query/components/header/header";
-import Footer from "./footer";
+import Footer from "./query/components/footer/footer";
 import { DataProvider } from "./utils";
 
 /**

@@ -32,7 +32,7 @@ const PatientSearchResultsTable: React.FC<PatientSeacrchResultsTableProps> = ({
       <h2 className="page-explainer">
         The following records match your search. Select a patient to continue.
       </h2>
-      <Table className="margin-top-5">
+      <Table className="margin-top--32px">
         <thead>
           <tr>
             <th>Name</th>

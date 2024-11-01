@@ -38,13 +38,7 @@ export default function HeaderComponent() {
   return (
     <>
       <header className="usa-header usa-header--basic bg-primary-darker">
-        <div
-          className={classNames(
-            "header-footer-content",
-            "usa-nav-container",
-            styles.headerContentContainer,
-          )}
-        >
+        <div className={styles.headerContentContainer}>
           <div className={classNames("display-flex", "flex-align-center")}>
             <div className="usa-logo margin-left-1">
               <em className="usa-logo__text text-base-lightest">

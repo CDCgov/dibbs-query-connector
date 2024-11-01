@@ -4,11 +4,11 @@
   display: flex;
   width: 100%;
   align-items: center;
-  margin-top: 2rem;
+  margin-top: $margin--32px;
 }
 
 .searchFormContainer {
-  margin-top: $margin-within-group;
+  margin-top: $margin--16px;
   padding: 1.5rem;
 }
 

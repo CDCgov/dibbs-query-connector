@@ -64,7 +64,7 @@ const SelectSavedQuery: React.FC<SelectSavedQueryProps> = ({
         systems and protect patient privacy. If you would like to customize the
         query response, click on the "customize query" button.
       </h2>
-      <h3 className="margin-bottom-105">Query</h3>
+      <h3 className={styles.queryDropdownLabel}>Query</h3>
       <div className={styles.queryRow}>
         {/* Select a query drop down */}
         <Select
@@ -98,7 +98,9 @@ const SelectSavedQuery: React.FC<SelectSavedQueryProps> = ({
 
       {showAdvanced && (
         <div>
-          <h3 className="margin-bottom-105">Health Care Organization (HCO)</h3>
+          <h3 className={styles.queryDropdownLabel}>
+            Health Care Organization (HCO)
+          </h3>
           <Select
             id="fhir_server"
             name="fhir_server"
@@ -130,7 +132,7 @@ const SelectSavedQuery: React.FC<SelectSavedQueryProps> = ({
       )}
 
       {/* Submit Button */}
-      <div className="margin-top-5">
+      <div className="margin-top--40px">
         <Button
           type="button"
           disabled={!selectedQuery || loadingQueryValueSets}
