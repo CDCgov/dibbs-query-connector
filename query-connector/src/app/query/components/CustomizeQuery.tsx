@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "@trussworks/react-uswds";
 import {
+  DibbsConceptType,
   DibbsValueSetType,
   USE_CASES,
   ValueSet,
@@ -16,14 +17,18 @@ import CustomizeQueryAccordionHeader from "./customizeQuery/CustomizeQueryAccord
 import CustomizeQueryAccordionBody from "./customizeQuery/CustomizeQueryAccordionBody";
 import Accordion from "../designSystem/Accordion";
 import CustomizeQueryNav from "./customizeQuery/CustomizeQueryNav";
-import { mapValueSetsToValueSetTypes } from "./customizeQuery/customizeQueryUtils";
+import {
+  GroupedValueSet,
+  mapValueSetsToValueSetTypes,
+} from "./customizeQuery/customizeQueryUtils";
 import Backlink from "./backLink/Backlink";
 import { RETURN_LABEL } from "../stepIndicator/StepIndicator";
+import { countDibbsConceptTypeToVsMapItems } from "./utils";
 
 interface CustomizeQueryProps {
   useCaseQueryResponse: UseCaseQueryResponse;
   queryType: USE_CASES;
-  queryValuesets: ValueSet[];
+  queryValueSets: ValueSet[];
   setQueryValuesets: (queryVS: ValueSet[]) => void;
   goBack: () => void;
 }
@@ -33,7 +38,7 @@ interface CustomizeQueryProps {
  * @param root0 - The properties object.
  * @param root0.useCaseQueryResponse - The response from the query service.
  * @param root0.queryType - The type of the query.
- * @param root0.queryValuesets - The pre-fetched value sets from the DB.
+ * @param root0.queryValueSets - The pre-fetched value sets from the DB.
  * @param root0.setQueryValuesets - Function to update tracked custom query state.
  * @param root0.goBack - Back button to go from "customize-queries" to "search" component.
  * @returns The CustomizeQuery component.
@@ -41,46 +46,40 @@ interface CustomizeQueryProps {
 const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
   useCaseQueryResponse,
   queryType,
-  queryValuesets,
+  queryValueSets: queryValueSets,
   setQueryValuesets,
   goBack,
 }) => {
   const [activeTab, setActiveTab] = useState<DibbsValueSetType>("labs");
-  const { labs, conditions, medications } =
-    mapValueSetsToValueSetTypes(queryValuesets);
-  const [valueSetOptions, setValueSetOptions] = useState({
-    labs: labs,
-    conditions: conditions,
-    medications: medications,
+
+  const [valueSetOptions, setValueSetOptions] = useState<{
+    [dibbsConceptType in DibbsConceptType]: {
+      [vsNameAuthorSystem: string]: GroupedValueSet;
+    };
+  }>({
+    labs: {},
+    conditions: {},
+    medications: {},
   });
 
+  useEffect(() => {
+    const { labs, conditions, medications } =
+      mapValueSetsToValueSetTypes(queryValueSets);
+
+    setValueSetOptions({
+      labs: labs,
+      conditions: conditions,
+      medications: medications,
+    });
+  }, [queryValueSets]);
+
   // Compute counts of each tab-type
-  const countLabs = Object.values(valueSetOptions.labs).reduce(
-    (runningSum, gvs) => {
-      gvs.items.forEach((vs) => {
-        runningSum += vs.concepts.length;
-      });
-      return runningSum;
-    },
-    0,
+  const countLabs = countDibbsConceptTypeToVsMapItems(valueSetOptions.labs);
+  const countConditions = countDibbsConceptTypeToVsMapItems(
+    valueSetOptions.conditions,
   );
-  const countConditions = Object.values(valueSetOptions.conditions).reduce(
-    (runningSum, gvs) => {
-      gvs.items.forEach((vs) => {
-        runningSum += vs.concepts.length;
-      });
-      return runningSum;
-    },
-    0,
-  );
-  const countMedications = Object.values(valueSetOptions.medications).reduce(
-    (runningSum, gvs) => {
-      gvs.items.forEach((vs) => {
-        runningSum += vs.concepts.length;
-      });
-      return runningSum;
-    },
-    0,
+  const countMedications = countDibbsConceptTypeToVsMapItems(
+    valueSetOptions.medications,
   );
 
   // Keeps track of which side nav tab to display to users

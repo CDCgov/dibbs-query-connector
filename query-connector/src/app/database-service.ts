@@ -11,7 +11,7 @@ import {
 } from "./constants";
 import { encode } from "base-64";
 import {
-  UserQueryInput,
+  QueryInput,
   generateQueryInsertionSql,
   generateQueryToValueSetInsertionSql,
 } from "./query-building";
@@ -407,10 +407,10 @@ function logRejectedPromiseReasons<T>(
 
 /**
  * Function that orchestrates query insertion for the query building flow
- * @param input - Values of the shape UserQueryInput needed for query insertion
+ * @param input - Values of the shape QueryInput needed for query insertion
  * @returns - Success or failure status, with associated error message for frontend
  */
-export async function insertQuery(input: UserQueryInput) {
+export async function insertQuery(input: QueryInput) {
   const { sql, values } = generateQueryInsertionSql(input);
   const insertUserQueryPromise = dbClient.query(sql, values);
   const errorArray = [];
