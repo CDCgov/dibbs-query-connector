@@ -7,7 +7,7 @@ import {
 } from "@trussworks/react-uswds";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import styles from "./page.module.scss"
+import styles from "./page.module.scss";
 /**
  * The landing page for the TEFCA Viewer.
  * @returns The LandingPage component.
@@ -54,9 +54,7 @@ export default function LandingPage() {
             quickly retrieve patient records and relevant case information from
             HCOs without requiring direct connection and onboarding.
           </h2>
-          <h3 className={styles.pageSubtitle}>
-            How does it work?
-          </h3>
+          <h3 className={styles.pageSubtitle}>How does it work?</h3>
           <h2 className={styles.pageContent}>
             Public health staff can interact with the TEFCA Query Connector
             manually by entering simple patient details — such as name, date of
