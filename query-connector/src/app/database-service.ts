@@ -358,7 +358,6 @@ function generateConceptSqlPromises(vs: ValueSet) {
 }
 
 function generateValuesetConceptJoinSqlPromises(vs: ValueSet) {
-  const valueSetUniqueId = `${vs.valueSetId}_${vs.valueSetVersion}`;
   const insertConceptsSqlArray = vs.concepts.map((concept) => {
     const systemPrefix = stripProtocolAndTLDFromSystemUrl(vs.system);
     const conceptUniqueId = `${systemPrefix}_${concept.code}`;
@@ -377,8 +376,8 @@ function generateValuesetConceptJoinSqlPromises(vs: ValueSet) {
     RETURNING valueset_id, concept_id;
     `;
     const conceptInsertPromise = dbClient.query(insertJoinSql, [
-      `${valueSetUniqueId}_${conceptUniqueId}`,
-      valueSetUniqueId,
+      `${vs.valueSetId}_${conceptUniqueId}`,
+      vs.valueSetId,
       conceptUniqueId,
     ]);
 
@@ -466,4 +465,112 @@ export async function getConditionsData() {
   const query = "SELECT * FROM conditions";
   const result = await dbClient.query(query);
   return result.rows;
+  
+ /**
+ * Function that verifies that a particular value set and all its affiliated
+ * concepts were successfully inserted into the DB. Given a FHIR formatted
+ * value set, the function checks three things:
+ *   1. Whether the value set itself was inserted
+ *   2. Whether each concept included in that value set bundle was inserted
+ *   3. Whether these concepts are now mapped to this value set via foreign key
+ * If any data is found to be missing, it is collected and logged to the user.
+ * @param vs The DIBBs internal representation of the value set to check.
+ * @returns A data structure reporting on missing concepts or value set links.
+ */
+export async function checkValueSetInsertion(vs: ValueSet) {
+  // Begin accumulating missing data
+  const missingData = {
+    missingValueSet: false,
+    missingConcepts: [] as Array<String>,
+    missingMappings: [] as Array<String>,
+  };
+
+  // Check that the value set itself was inserted
+  const vsSql = `SELECT * FROM valuesets WHERE oid = $1;`;
+  try {
+    const result = await dbClient.query(vsSql, [vs.valueSetExternalId]);
+    const foundVS = result.rows[0];
+    if (
+      foundVS.version !== vs.valueSetVersion ||
+      foundVS.name !== vs.valueSetName ||
+      foundVS.author !== vs.author
+    ) {
+      console.error(
+        "Retrieved value set information differs from given value set",
+      );
+      missingData.missingValueSet = true;
+    }
+  } catch (error) {
+    console.error("Couldn't fetch inserted value set from DB: ", error);
+    missingData.missingValueSet = true;
+  }
+
+  // Check that all concepts under the value set's umbrella were inserted
+  const brokenConcepts = await Promise.all(
+    vs.concepts.map(async (c) => {
+      const systemPrefix = stripProtocolAndTLDFromSystemUrl(vs.system);
+      const conceptId = `${systemPrefix}_${c.code}`;
+      const conceptSql = `SELECT * FROM concepts WHERE id = $1;`;
+
+      try {
+        const result = await dbClient.query(conceptSql, [conceptId]);
+        const foundConcept: Concept = result.rows[0];
+
+        // We accumulate the unique DIBBs concept IDs of anything that's missing
+        if (
+          foundConcept.code !== c.code ||
+          foundConcept.display !== c.display
+        ) {
+          console.error(
+            "Retrieved concept " +
+              conceptId +
+              " has different values than given concept",
+          );
+          return conceptId;
+        }
+      } catch (error) {
+        console.error(
+          "Couldn't fetch concept with ID " + conceptId + ": ",
+          error,
+        );
+        return conceptId;
+      }
+    }),
+  );
+  missingData.missingConcepts = brokenConcepts.filter((bc) => bc !== undefined);
+
+  // Confirm that valueset_to_concepts contains all relevant FK mappings
+  const mappingSql = `SELECT * FROM valueset_to_concept WHERE valueset_id = $1;`;
+  try {
+    const result = await dbClient.query(mappingSql, [vs.valueSetId]);
+    const rows = result.rows;
+    const missingConceptsFromMappings = vs.concepts.map((c) => {
+      const systemPrefix = stripProtocolAndTLDFromSystemUrl(vs.system);
+      const conceptUniqueId = `${systemPrefix}_${c.code}`;
+
+      // Accumulate unique IDs of any concept we can't find among query rows
+      const fIdx = rows.findIndex((r) => r["concept_id"] === conceptUniqueId);
+      if (fIdx === -1) {
+        console.error(
+          "Couldn't locate concept " + conceptUniqueId + " in fetched mappings",
+        );
+        return conceptUniqueId;
+      }
+    });
+    missingData.missingMappings = missingConceptsFromMappings.filter(
+      (item) => item !== undefined,
+    );
+  } catch (error) {
+    console.error(
+      "Couldn't fetch value set to concept mappings for this valueset: ",
+      error,
+    );
+    const systemPrefix = stripProtocolAndTLDFromSystemUrl(vs.system);
+    vs.concepts.forEach((c) => {
+      const conceptUniqueId = `${systemPrefix}_${c.code}`;
+      missingData.missingMappings.push(conceptUniqueId);
+    });
+  }
+
+  return missingData;
 }
