@@ -4,21 +4,32 @@
   height: 5rem;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   background-color: $primary-darker;
-}
-
-.footerContainer > div {
-  flex-grow: 1;
+  overflow: scroll !important;
 }
 
 .cdcLogoContainer {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  margin-right: 0.5rem;
 }
 
-.contactUsContainer {
+.cdcFooterTextContainer {
   display: flex;
-  justify-content: end;
+  justify-content: space-between;
+  width: 100%;
+
+  p {
+    white-space: nowrap;
+    margin: 0;
+    overflow: scroll;
+  }
+}
+
+@media (max-width: 64em) {
+  .cdcFooterTextContainer {
+    flex-direction: column;
+    justify-content: flex-start;
+  }
 }
