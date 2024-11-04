@@ -27,7 +27,10 @@ export default function FooterComponent() {
         <div>
           <p className="text-base-lightest-important">
             For more information about this solution, send us an email at{" "}
-            <a className="text-base-lightest-important" href="mailto:dibbs@cdc.gov">
+            <a
+              className="text-base-lightest-important"
+              href="mailto:dibbs@cdc.gov"
+            >
               dibbs@cdc.gov
             </a>
           </p>
