@@ -46,7 +46,7 @@ export default function HeaderComponent() {
             <div className="usa-logo">
               <em className="usa-logo__text text-base-lightest-important">
                 <a
-                  className="font-mono-lg text-white-important"
+                  className="font-mono-lg text-base-lightest-important"
                   href={backLink}
                   title={metadata.title}
                 >
