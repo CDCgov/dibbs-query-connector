@@ -561,3 +561,17 @@ export async function checkValueSetInsertion(vs: ValueSet) {
 
   return missingData;
 }
+
+/**
+ * Retrieves all records from the conditions table in the database.
+ * This function queries the database to fetch condition data, including
+ * condition name, code, and category.
+ * @returns results.rows A promise that resolves to an array of rows,
+ * each representing a condition with its associated fields (e.g., id, condition name,
+ * condition code, category). If no records are found, an empty array is returned.
+ */
+export async function getConditionsData() {
+  const query = "SELECT * FROM conditions";
+  const result = await dbClient.query(query);
+  return result.rows;
+}
