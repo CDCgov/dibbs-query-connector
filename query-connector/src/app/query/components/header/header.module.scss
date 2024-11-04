@@ -1,3 +1,5 @@
+@use "../../../../styles/_variables" as *;
+
 .dataUsagePolicyButton {
   cursor: pointer;
   background: none !important;
@@ -70,7 +72,7 @@
   align-items: center !important;
   margin: 0 !important;
   padding: 0 !important;
-  height: 4.5rem;
+  height: $header-content-height;
   max-width: 100% !important;
 }
 
