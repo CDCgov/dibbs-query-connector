@@ -26,7 +26,7 @@ h1 {
 
 .main-body {
   background-color: rgba(247, 249, 250, 1);
-  flex: auto;
+  flex: auto; // Sizes main-body to fill space between header and footer
 }
 
 .page-title {
