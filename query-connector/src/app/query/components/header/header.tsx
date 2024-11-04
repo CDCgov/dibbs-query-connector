@@ -2,10 +2,11 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Modal, ModalButton } from "../../designSystem/Modal";
-import { ModalRef, Button, Icon } from "@trussworks/react-uswds";
+import { useRouter, usePathname } from "next/navigation";
+import { Button, Icon, ModalRef } from "@trussworks/react-uswds";
 import styles from "./header.module.css";
 import { metadata } from "@/app/constants";
-import { useRouter, usePathname } from "next/navigation";
+import classNames from "classnames";
 /**
  * Produces the header.
  * @returns The HeaderComponent component.
@@ -29,25 +30,23 @@ export default function HeaderComponent() {
   const toggleMenuDropdown = () => {
     setShowMenu(!showMenu);
   };
-  const backLink =
-    process.env.NODE_ENV === "production" ? "/tefca-viewer" : "/";
+  const isProduction = process.env.NODE_ENV === "production";
+  const backLink = isProduction ? "/tefca-viewer" : "/";
+
   return (
     <>
       <header className="usa-header usa-header--basic bg-primary-darker">
         <div
-          className="header-footer-content usa-nav-container"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            height: "4.5rem !important",
-          }}
+          className={classNames(
+            "usa-nav-container",
+            styles.headerContentContainer,
+          )}
         >
-          <div style={{ display: "flex", alignItems: "center" }}>
-            <div className="usa-logo" style={{ marginLeft: "16px" }}>
-              <em className="usa-logo__text text-base-lightest">
+          <div className={classNames("display-flex", "flex-align-center")}>
+            <div className="usa-logo">
+              <em className="usa-logo__text text-base-lightest-important">
                 <a
-                  className="text-base-lightest font-sans-xl text-bold"
+                  className="font-mono-lg text-base-lightest-important font-weight-normal-important"
                   href={backLink}
                   title={metadata.title}
                 >
@@ -57,12 +56,11 @@ export default function HeaderComponent() {
             </div>
           </div>
           <div
-            style={{
-              whiteSpace: "nowrap",
-              textAlign: "right",
-              marginLeft: "auto",
-              display: "flex",
-            }}
+            className={classNames(
+              "margin-left-auto",
+              "display-flex",
+              "flex-align-center",
+            )}
           >
             {path != "/signin" && isClient && (
               <ModalButton
@@ -72,7 +70,7 @@ export default function HeaderComponent() {
               />
             )}
             {/* TODO: Rework show/hide rules based on actual auth status */}
-            {path != "/signin" && path != "/query" && (
+            {path != "/signin" && !LOGGED_IN_PATHS.includes(path) && (
               <Button
                 className={styles.signinButton}
                 type="button"
@@ -83,19 +81,17 @@ export default function HeaderComponent() {
                 Sign in
               </Button>
             )}
-            {path == "/query" && (
+            {LOGGED_IN_PATHS.includes(path) && (
               <button
                 onClick={toggleMenuDropdown}
-                className={`${styles.menuButton} usa-accordion__button usa-nav__link usa-current`}
+                className={classNames(
+                  styles.menuButton,
+                  "usa-accordion__button",
+                  "usa-nav__link",
+                  "usa-current",
+                )}
                 aria-expanded="false"
                 aria-controls="dropdown-menu"
-                style={{
-                  background: "transparent",
-                  padding: "0 !important",
-                  height: "1.5rem !important",
-                  width: "1.5rem !important",
-                  margin: "0 1rem 0 0 !important",
-                }}
               >
                 <Icon.Settings
                   className="usa-icon qc-settings"
@@ -124,11 +120,13 @@ export default function HeaderComponent() {
             id="dropdown-menu"
             className={`usa-nav__submenu ${styles.menuDropdown}`}
           >
-            {/* <li className={`usa-nav__submenu-item`}>
-              <a className={styles.menuItem} href="#">
-                My queries
-              </a>
-            </li> */}
+            {!isProduction && (
+              <li className={`usa-nav__submenu-item`}>
+                <a className={styles.menuItem} href={"/queryBuilding"}>
+                  My queries
+                </a>
+              </li>
+            )}
             <li className={`usa-nav__submenu-item`}>
               <a className={styles.menuItem} href={backLink}>
                 Log out
@@ -140,3 +138,5 @@ export default function HeaderComponent() {
     </>
   );
 }
+
+const LOGGED_IN_PATHS = ["/query", "/queryBuilding"];

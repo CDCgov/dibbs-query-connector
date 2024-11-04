@@ -11,7 +11,7 @@
 }
 
 .selectQueryExplanationText {
-  padding-top: $margin-within-group;
+  padding-top: 1rem;
   padding-bottom: 1.5rem;
   line-height: 2.0625rem;
   word-wrap: break-word;
@@ -31,4 +31,9 @@
   flex-direction: column;
   align-items: flex-start;
   gap: 0.5rem;
+}
+
+.queryDropdownLabel {
+  margin-top: 2rem;
+  margin-bottom: 0.5rem;
 }

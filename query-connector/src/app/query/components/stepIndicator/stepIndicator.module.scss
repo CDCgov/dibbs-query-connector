@@ -1,4 +1,4 @@
-@use "../../../styles/_variables" as *;
+@use "../../../../styles/_variables" as *;
 
 .container > ol {
   justify-content: space-between;
@@ -7,5 +7,5 @@
 }
 
 .container {
-  margin-bottom: $margin-between-group;
+  margin-bottom: 2rem;
 }
