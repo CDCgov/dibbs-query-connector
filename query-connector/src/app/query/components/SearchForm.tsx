@@ -17,7 +17,7 @@ import { UseCaseQueryResponse, UseCaseQuery } from "@/app/query-service";
 import { fhirServers } from "@/app/fhir-servers";
 import styles from "./searchForm/searchForm.module.scss";
 import { FormatPhoneAsDigits } from "@/app/format-service";
-import { PAGE_TITLES } from "@/app/query/stepIndicator/StepIndicator";
+import { PAGE_TITLES } from "@/app/query/components/stepIndicator/StepIndicator";
 
 interface SearchFormProps {
   useCase: USE_CASES;
@@ -371,7 +371,7 @@ const SearchForm: React.FC<SearchFormProps> = ({
             </div>
           </div>
         </Fieldset>
-        <button className="usa-button patient-search-button" type="submit">
+        <button className="usa-button margin-top-5" type="submit">
           Search for patient
         </button>
       </form>

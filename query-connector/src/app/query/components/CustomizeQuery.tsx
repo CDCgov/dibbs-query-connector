@@ -20,10 +20,10 @@ import CustomizeQueryNav from "./customizeQuery/CustomizeQueryNav";
 import {
   GroupedValueSet,
   mapValueSetsToValueSetTypes,
+  countDibbsConceptTypeToVsMapItems,
 } from "./customizeQuery/customizeQueryUtils";
 import Backlink from "./backLink/Backlink";
-import { RETURN_LABEL } from "../stepIndicator/StepIndicator";
-import { countDibbsConceptTypeToVsMapItems } from "./utils";
+import { RETURN_LABEL } from "./stepIndicator/StepIndicator";
 
 interface CustomizeQueryProps {
   useCaseQueryResponse: UseCaseQueryResponse;

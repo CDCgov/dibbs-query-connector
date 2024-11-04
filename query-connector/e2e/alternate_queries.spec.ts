@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { TEST_URL } from "../playwright-setup";
-import { PAGE_TITLES } from "@/app/query/stepIndicator/StepIndicator";
+import { PAGE_TITLES } from "@/app/query/components/stepIndicator/StepIndicator";
 
 import { TEST_PATIENT, TEST_PATIENT_NAME } from "./constants";
 

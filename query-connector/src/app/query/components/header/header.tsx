@@ -2,9 +2,11 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Modal, ModalButton } from "../../designSystem/Modal";
-import { ModalRef } from "@trussworks/react-uswds";
+import { useRouter, usePathname } from "next/navigation";
+import { Button, Icon, ModalRef } from "@trussworks/react-uswds";
 import styles from "./header.module.css";
 import { metadata } from "@/app/constants";
+import classNames from "classnames";
 /**
  * Produces the header.
  * @returns The HeaderComponent component.
@@ -12,28 +14,40 @@ import { metadata } from "@/app/constants";
 export default function HeaderComponent() {
   const modalRef = useRef<ModalRef>(null);
   const [isClient, setIsClient] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
   }, []);
 
+  const router = useRouter();
+  const path = usePathname();
+
+  const handleClick = () => {
+    router.push(`/signin`);
+  };
+
+  const toggleMenuDropdown = () => {
+    setShowMenu(!showMenu);
+  };
+  const isProduction = process.env.NODE_ENV === "production";
+  const backLink = isProduction ? "/tefca-viewer" : "/";
+
   return (
     <>
       <header className="usa-header usa-header--basic bg-primary-darker">
         <div
-          className="header-footer-content usa-nav-container"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
+          className={classNames(
+            "usa-nav-container",
+            styles.headerContentContainer,
+          )}
         >
-          <div style={{ display: "flex", alignItems: "center" }}>
-            <div className="usa-logo" style={{ marginLeft: "16px" }}>
-              <em className="usa-logo__text text-base-lightest">
+          <div className={classNames("display-flex", "flex-align-center")}>
+            <div className="usa-logo">
+              <em className="usa-logo__text text-base-lightest-important">
                 <a
-                  className="text-base-lightest font-sans-xl text-bold"
-                  href="/tefca-viewer"
+                  className="font-mono-lg text-base-lightest-important font-weight-normal-important"
+                  href={backLink}
                   title={metadata.title}
                 >
                   {metadata.title}
@@ -42,18 +56,50 @@ export default function HeaderComponent() {
             </div>
           </div>
           <div
-            style={{
-              whiteSpace: "nowrap",
-              textAlign: "right",
-              marginLeft: "auto",
-            }}
+            className={classNames(
+              "margin-left-auto",
+              "display-flex",
+              "flex-align-center",
+            )}
           >
-            {isClient && (
+            {path != "/signin" && isClient && (
               <ModalButton
                 modalRef={modalRef}
                 title={"Data Usage Policy"}
                 className={styles.dataUsagePolicyButton}
               />
+            )}
+            {/* TODO: Rework show/hide rules based on actual auth status */}
+            {path != "/signin" && !LOGGED_IN_PATHS.includes(path) && (
+              <Button
+                className={styles.signinButton}
+                type="button"
+                id="signin-button"
+                title={"Sign in button"}
+                onClick={() => handleClick()}
+              >
+                Sign in
+              </Button>
+            )}
+            {LOGGED_IN_PATHS.includes(path) && (
+              <button
+                onClick={toggleMenuDropdown}
+                className={classNames(
+                  styles.menuButton,
+                  "usa-accordion__button",
+                  "usa-nav__link",
+                  "usa-current",
+                )}
+                aria-expanded="false"
+                aria-controls="dropdown-menu"
+              >
+                <Icon.Settings
+                  className="usa-icon qc-settings"
+                  size={3}
+                  color="#fff"
+                  aria-label="Gear icon indicating settings menu"
+                />
+              </button>
             )}
           </div>
         </div>
@@ -67,6 +113,30 @@ export default function HeaderComponent() {
           description="It's not! Data inputted into the TEFCA Query Connector is not persisted or stored anywhere."
         ></Modal>
       )}
+
+      {showMenu && (
+        <div className={styles.menuDropdownContainer}>
+          <ul
+            id="dropdown-menu"
+            className={`usa-nav__submenu ${styles.menuDropdown}`}
+          >
+            {!isProduction && (
+              <li className={`usa-nav__submenu-item`}>
+                <a className={styles.menuItem} href={"/queryBuilding"}>
+                  My queries
+                </a>
+              </li>
+            )}
+            <li className={`usa-nav__submenu-item`}>
+              <a className={styles.menuItem} href={backLink}>
+                Log out
+              </a>
+            </li>
+          </ul>
+        </div>
+      )}
     </>
   );
 }
+
+const LOGGED_IN_PATHS = ["/query", "/queryBuilding"];

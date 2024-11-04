@@ -4,7 +4,7 @@ import { UseCaseQueryResponse } from "../query-service";
 import ResultsView from "./components/ResultsView";
 import PatientSearchResults from "./components/PatientSearchResults";
 import SearchForm from "./components/SearchForm";
-import SelectQuery from "./SelectQuery";
+import SelectQuery from "./components/SelectQuery";
 import {
   DEFAULT_DEMO_FHIR_SERVER,
   FHIR_SERVERS,
@@ -17,7 +17,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.min.css";
 import StepIndicator, {
   CUSTOMIZE_QUERY_STEPS,
-} from "./stepIndicator/StepIndicator";
+} from "./components/stepIndicator/StepIndicator";
 import SiteAlert from "./designSystem/SiteAlert";
 import { Patient } from "fhir/r4";
 
