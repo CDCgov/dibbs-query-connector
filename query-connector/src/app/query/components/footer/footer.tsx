@@ -20,16 +20,19 @@ export default function FooterComponent() {
           />
         </div>
         <div>
-          <p className="text-base-lightest">
+          <p className="text-base-lightest-important">
             Centers for Disease Control and Prevention
           </p>
         </div>
       </div>
       <div className={styles.contactUsContainer}>
         <div className="width-fit-content">
-          <p className="text-base-lightest">
+          <p className="text-base-lightest-important">
             For more information about this solution, send us an email at{" "}
-            <a className="text-base-lightest" href="mailto:dibbs@cdc.gov">
+            <a
+              className="text-base-lightest-important"
+              href="mailto:dibbs@cdc.gov"
+            >
               dibbs@cdc.gov
             </a>
           </p>

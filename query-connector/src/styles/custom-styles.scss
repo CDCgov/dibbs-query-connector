@@ -29,13 +29,6 @@ h1 {
   flex: auto; // Sizes main-body to fill space between header and footer
 }
 
-.siteTitle {
-  font-family: $mono-font;
-  color: #e8f5ff !important;
-  font-size: 1.5rem;
-  font-weight: 400;
-}
-
 .page-title {
   margin-bottom: 0.5rem;
   font-weight: 700;
@@ -85,6 +78,14 @@ h1 {
   padding: 0 !important;
 }
 
+.text-white-important {
+  color: #fff !important;
+}
+
+.text-base-lightest-important {
+  color: #f0f0f0 !important;
+}
+
 .maxw7 {
   max-width: 70%;
 }
@@ -109,10 +110,6 @@ h1 {
   border-top: 1px solid #dfe1e2;
   margin-top: 0.5rem;
   margin-bottom: 0.5rem;
-}
-
-.text-base-lightest {
-  color: #f0f0f0 !important;
 }
 
 .gradient-blue-background {
