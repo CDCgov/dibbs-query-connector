@@ -1,9 +1,20 @@
+@use "uswds-core" as *;
+
 // taken as values from Figma
 $query-connector-max-width: 45rem;
 $query-connector-wide-max-width: 90rem;
 $query-connector-content-margins: 13.75rem;
 
-$margin-within-group: 0.75rem;
-$margin-between-group: 2.5rem;
+// Pulled from the Design System Figma
+// https://www.figma.com/design/9Aa7G6xMt06JZUrSAxfiZv/CDC%2FSkylight-Design-System?node-id=1177-2479&node-type=rounded_rectangle&m=dev
+$text-base-lightest: #f0f0f0;
+$primary-primary: #005ea2;
+$primary-darker: #162e51;
 
+$gray-cool-20: #c6cace;
+$base-lighter: #dfe1e2;
 $background-hover-color: #d9e8f680;
+
+$serif-font: family("heading");
+$sans-serif-font: "Public Sans Web", family("body");
+$mono-font: "Consolas", family("mono");

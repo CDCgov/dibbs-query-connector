@@ -5,7 +5,7 @@ import { Mode } from "@/app/constants";
 import Backlink from "./backLink/Backlink";
 import PatientSearchResultsTable from "./patientSearchResults/PatientSearchResultsTable";
 import NoPatientsFound from "./patientSearchResults/NoPatientsFound";
-import { RETURN_LABEL } from "@/app/query/stepIndicator/StepIndicator";
+import { RETURN_LABEL } from "@/app/query/components/stepIndicator/StepIndicator";
 
 /**
  * The props for the PatientSearchResults component.
