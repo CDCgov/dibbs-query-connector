@@ -566,12 +566,39 @@ export async function checkValueSetInsertion(vs: ValueSet) {
  * Retrieves all records from the conditions table in the database.
  * This function queries the database to fetch condition data, including
  * condition name, code, and category.
- * @returns results.rows A promise that resolves to an array of rows,
- * each representing a condition with its associated fields (e.g., id, condition name,
- * condition code, category). If no records are found, an empty array is returned.
+ * @returns An object containing:
+ * - `conditionCatergories`: a JSON object grouped by category with id:name pairs,
+ * to display on build-query page
+ * - `conditionLookup`: a JSON object with id as the key and name as the value in
+ * order to make a call to the DB with the necessary ID(s) to get the valuesets
+ * on subsequent pages.
  */
 export async function getConditionsData() {
   const query = "SELECT * FROM conditions";
   const result = await dbClient.query(query);
-  return result.rows;
+  const rows = result.rows;
+
+  // 1. Grouped by category with id:name pairs
+  const conditionCatergories = rows.reduce(
+    (acc, row) => {
+      const { category, id, name } = row;
+      if (!acc[category]) {
+        acc[category] = [];
+      }
+      acc[category].push({ [id]: name });
+      return acc;
+    },
+    {} as Record<string, Array<Record<string, string>>>,
+  );
+
+  // 2. ID-Name mapping
+  const conditionLookup = rows.reduce(
+    (acc, row) => {
+      acc[row.id] = row.name;
+      return acc;
+    },
+    {} as Record<string, string>,
+  );
+
+  return { conditionCatergories, conditionLookup };
 }
