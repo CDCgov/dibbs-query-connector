@@ -1,7 +1,7 @@
 @use "../../../../styles/_variables" as *;
 
 .footerContainer {
-  height: 5rem;
+  height: $footer-content-height;
   display: flex;
   align-items: center;
   justify-content: flex-start;
