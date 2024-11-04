@@ -11,12 +11,14 @@
 
 .signinButton {
   padding: 0.5rem 1.25rem !important;
+  margin: 0 !important;
   cursor: pointer;
   background: none !important;
   border: 2px solid white !important;
   border-radius: 4px !important;
   color: white !important;
   font: inherit !important;
+  white-space: nowrap;
 }
 
 .menuButton {
