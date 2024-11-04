@@ -62,8 +62,12 @@ export default function HeaderComponent() {
         >
           <div className={classNames("display-flex", "flex-align-center")}>
             <div className="usa-logo" style={{ marginLeft: "0" }}>
-              <em className="usa-logo__text text-base-lightest">
-                <a className="siteTitle" href={backLink} title={metadata.title}>
+              <em className="usa-logo__text text-base-lightest-important">
+                <a 
+                  className="font-mono-lg text-base-lightest-important font-weight-normal-important" 
+                  href={backLink} 
+                  title={metadata.title}
+                >
                   {metadata.title}
                 </a>
               </em>
@@ -136,6 +140,7 @@ export default function HeaderComponent() {
           >
             {!isProduction && (
               <li className={styles.subMenuItem}>
+
                 <a className={styles.menuItem} href={"/queryBuilding"}>
                   My queries
                 </a>

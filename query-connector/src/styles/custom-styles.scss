@@ -88,6 +88,14 @@ h1 {
   padding: 0 !important;
 }
 
+.text-base-lightest-important {
+  color: $text-base-lightest !important;
+}
+
+.font-weight-normal-important {
+  font-weight: 400 !important;
+}
+
 .maxw7 {
   max-width: 70%;
 }
@@ -97,7 +105,7 @@ h1 {
 }
 
 .unchanged-color-on-visit:visited {
-  color: #005ea2;
+  color: $primary-primary;
 }
 
 .content-hidden {
@@ -109,13 +117,9 @@ h1 {
 }
 
 .section__line_gray {
-  border-top: 1px solid #dfe1e2;
+  border-top: 1px solid $base-lighter;
   margin-top: 0.5rem;
   margin-bottom: 0.5rem;
-}
-
-.text-base-lightest {
-  color: #f0f0f0 !important;
 }
 
 .gradient-blue-background {
@@ -352,6 +356,7 @@ ul.usa-sidenav
   width: 100%;
   box-sizing: border-box;
   padding-left: 1rem;
+  height: 2.5rem;
 }
 
 .custom-alert .usa-alert__text {
