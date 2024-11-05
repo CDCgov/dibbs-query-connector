@@ -100,7 +100,7 @@ published through the [CDC web site](http://www.cdc.gov).
 
 - [Open Practices](docs/open_practices.md)
 - [Rules of Behavior](docs/rules_of_behavior.md)
-- [Disclaimer](docs/DISCLAIMER.md)
+- [Disclaimer](docs/DISCLAIMER.md)g
 - [Contribution Notice](docs/CONTRIBUTING.md)
 - [Code of Conduct](docs/code-of-conduct.md)
 
