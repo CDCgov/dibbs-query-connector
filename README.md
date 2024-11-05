@@ -11,7 +11,7 @@
 
 This repository is a part of the CDC/USDS [PHDI project](https://cdcgov.github.io/phdi-site/) and seeks to build the DIBBs Query Connector.
 
-The DIBBs Query Connector app offers a REST API for searching for a patient and viewing information tied to your case investigation.
+The DIBBs Query Connector app offers a REST API and comprehensive UI for searching for a patient and viewing information tied to your case investigation and is fully customizable to meet the specific needs of public health investigators.
 
 ### Problem Scope
 
