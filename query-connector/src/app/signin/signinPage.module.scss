@@ -1,5 +1,12 @@
 @use "../../styles/_variables" as *;
 
+.signInContainer {
+  position: absolute;
+  top: $header-content-height;
+  bottom: $footer-content-height;
+  width: 100%;
+}
+
 .column {
   width: 100%;
   display: flex;

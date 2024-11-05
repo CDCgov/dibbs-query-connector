@@ -21,7 +21,7 @@ jobs:
           repo_owner="REPOSITORY OWNER" 
           repo_name="REPOSITORY NAME"  
           event_type="trigger-workflow" 
-          service=${{ github.event.inputs.target_service }}"
+          service="${{ github.event.inputs.target_service }}"
           version="${{ github.event.inputs.target_version }}"
            
           curl -L \
