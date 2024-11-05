@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { Modal, ModalButton } from "../../designSystem/Modal";
 import { useRouter, usePathname } from "next/navigation";
 import { Button, Icon, ModalRef } from "@trussworks/react-uswds";
-import styles from "./header.module.css";
+import styles from "./header.module.scss";
 import { metadata } from "@/app/constants";
 import classNames from "classnames";
 /**
@@ -13,12 +13,30 @@ import classNames from "classnames";
  */
 export default function HeaderComponent() {
   const modalRef = useRef<ModalRef>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+
   const [isClient, setIsClient] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
 
+  const outsideMenuClick = (event: MouseEvent) => {
+    if (
+      showMenu &&
+      menuRef.current &&
+      !menuRef.current.contains(event.target as Node)
+    ) {
+      setShowMenu(false);
+    }
+  };
+
   useEffect(() => {
     setIsClient(true);
-  }, []);
+
+    document.addEventListener("mousedown", outsideMenuClick);
+
+    return () => {
+      document.removeEventListener("mousedown", outsideMenuClick);
+    };
+  }, [showMenu]);
 
   const router = useRouter();
   const path = usePathname();
@@ -43,7 +61,7 @@ export default function HeaderComponent() {
           )}
         >
           <div className={classNames("display-flex", "flex-align-center")}>
-            <div className="usa-logo">
+            <div className="usa-logo" style={{ marginLeft: "0" }}>
               <em className="usa-logo__text text-base-lightest-important">
                 <a
                   className="font-mono-lg text-base-lightest-important font-weight-normal-important"
@@ -115,19 +133,19 @@ export default function HeaderComponent() {
       )}
 
       {showMenu && (
-        <div className={styles.menuDropdownContainer}>
+        <div ref={menuRef} className={styles.menuDropdownContainer}>
           <ul
             id="dropdown-menu"
             className={`usa-nav__submenu ${styles.menuDropdown}`}
           >
             {!isProduction && (
-              <li className={`usa-nav__submenu-item`}>
+              <li className={styles.subMenuItem}>
                 <a className={styles.menuItem} href={"/queryBuilding"}>
                   My queries
                 </a>
               </li>
             )}
-            <li className={`usa-nav__submenu-item`}>
+            <li className={styles.subMenuItem}>
               <a className={styles.menuItem} href={backLink}>
                 Log out
               </a>
