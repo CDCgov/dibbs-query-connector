@@ -19,6 +19,8 @@ The Query Connector is a tool for public health practitioners to quickly retriev
 
 Current public health systems that digest, analyze, and respond to data are siloed. Lacking access to actionable data, our national, as well as state, local, and territorial infrastructure, isn’t pandemic-ready. Our objective is to help the CDC best support PHAs in moving towards a modern public health data infrastructure. See our [public website](https://cdcgov.github.io/dibbs-site/) for more details.
 
+The current methods that public health jurisdictions use to collect data from HCOs can be time-consuming and cumbersome, often involving manual interventions like phone calls and faxes. The Query Connector aims to streamline the collection of health data using an intuitive querying process that can leverage QHINs within TEFCA or direct connections, thereby enabling data exchange from multiple HCOs for a variety of public health use cases such as newborn screening or STI case investigation. 
+
 DIBBs Query Connector is a sibling project to
 
 * [PHDI](https://github.com/CDCgov/phdi) to further help display, access, and interpret publich health data;
