@@ -1,0 +1,42 @@
+@use "../../styles/variables" as *;
+
+.queryBuildingContainer {
+  display: flex;
+  flex-direction: column;
+  width: 15rem;
+  margin: auto;
+}
+
+.queryTitle {
+  font-size: 2rem;
+  margin-top: 1rem;
+  margin-bottom: 2rem;
+}
+.queryBuildingContainer > * {
+  margin-top: 1rem;
+}
+
+.emptyStateQueryContainer {
+  background-color: #edeff0;
+  height: 27.75rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.emptyQueryTitle {
+  width: fit-content;
+  margin: 0.5rem 0 1.5rem 0;
+  font-family: $sans-serif-font;
+}
+
+.emptyQueryIcon {
+  width: 7.5rem;
+  height: 7.5rem;
+  color: $gray-cool-20;
+}
+
+.createQueryButton {
+  width: fit-content;
+  padding: 1rem !important;
+}

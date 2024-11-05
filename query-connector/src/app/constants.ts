@@ -81,6 +81,7 @@ export const FhirServers = [
   "JMC Meld: Direct",
   "JMC Meld: eHealthExchange",
   "Public HAPI: Direct",
+  "Local e2e HAPI Server: Direct",
   "OpenEpic: eHealthExchange",
   "CernerHelios: eHealthExchange",
   "OPHDST Meld: Direct",
@@ -319,6 +320,7 @@ export interface ValueSet {
   valueSetId: string;
   valueSetVersion: string;
   valueSetName: string;
+  valueSetExternalId?: string;
   author: string;
   system: string;
   ersdConceptType?: string;
@@ -329,7 +331,7 @@ export interface ValueSet {
 
 export const DEFAULT_ERSD_VERSION = "3";
 
-type DibbsConceptType = "labs" | "medications" | "conditions";
+export type DibbsConceptType = "labs" | "medications" | "conditions";
 export type ErsdConceptType =
   | "ostc"
   | "lotc"

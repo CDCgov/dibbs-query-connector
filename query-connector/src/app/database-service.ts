@@ -10,9 +10,15 @@ import {
   ersdToDibbsConceptMap,
 } from "./constants";
 import { encode } from "base-64";
+import {
+  QueryInput,
+  generateQueryInsertionSql,
+  generateQueryToValueSetInsertionSql,
+} from "./query-building";
+import { UUID } from "crypto";
 
 const getQuerybyNameSQL = `
-select q.query_name, q.id, qtv.valueset_id, vs.name as valueset_name, vs.version, vs.author as author, vs.type, vs.dibbs_concept_type as dibbs_concept_type, qic.concept_id, qic.include, c.code, c.code_system, c.display 
+select q.query_name, q.id, qtv.valueset_id, vs.name as valueset_name, vs.oid as valueset_external_id, vs.version, vs.author as author, vs.type, vs.dibbs_concept_type as dibbs_concept_type, qic.concept_id, qic.include, c.code, c.code_system, c.display 
   from query q 
   left join query_to_valueset qtv on q.id = qtv.query_id 
   left join valuesets vs on qtv.valueset_id = vs.id
@@ -61,9 +67,7 @@ export const getSavedQueryByName = async (name: string) => {
  * @param rows The Rows returned from the DB Query.
  * @returns A list of ValueSets, which hold the Concepts pulled from the DB.
  */
-export const mapQueryRowsToConceptValueSets = async (
-  rows: QueryResultRow[],
-) => {
+export const mapQueryRowsToValueSets = async (rows: QueryResultRow[]) => {
   // Create groupings of rows (each of which is a single Concept) by their ValueSet ID
   const vsIdGroupedRows = rows.reduce((conceptsByVSId, r) => {
     if (!(r["valueset_id"] in conceptsByVSId)) {
@@ -81,9 +85,15 @@ export const mapQueryRowsToConceptValueSets = async (
       valueSetId: conceptGroup[0]["valueset_id"],
       valueSetVersion: conceptGroup[0]["version"],
       valueSetName: conceptGroup[0]["valueset_name"],
+      // External ID might not be defined for user-defined valuesets
+      valueSetExternalId: conceptGroup[0]["valueset_external_id"]
+        ? conceptGroup[0]["valueset_external_id"]
+        : undefined,
       author: conceptGroup[0]["author"],
       system: conceptGroup[0]["code_system"],
-      ersdConceptType: conceptGroup[0]["type"],
+      ersdConceptType: conceptGroup[0]["type"]
+        ? conceptGroup[0]["type"]
+        : undefined,
       dibbsConceptType: conceptGroup[0]["dibbs_concept_type"],
       includeValueSet: conceptGroup.find((c) => c["include"]) ? true : false,
       concepts: conceptGroup.map((c) => {
@@ -184,7 +194,7 @@ export async function translateVSACToInternalValueSet(
   fhirValueset: FhirValueSet,
   ersdConceptType: ErsdConceptType,
 ) {
-  const id = fhirValueset.id;
+  const oid = fhirValueset.id;
   const version = fhirValueset.version;
 
   const name = fhirValueset.title;
@@ -197,9 +207,10 @@ export async function translateVSACToInternalValueSet(
   });
 
   return {
-    valueSetId: id,
+    valueSetId: `${oid}_${version}`,
     valueSetVersion: version,
     valueSetName: name,
+    valueSetExternalId: oid,
     author: author,
     system: system,
     ersdConceptType: ersdConceptType,
@@ -267,18 +278,38 @@ export async function insertValueSet(vs: ValueSet) {
  * @returns The SQL statement for insertion
  */
 function generateValueSetSqlPromise(vs: ValueSet) {
-  const valueSetOid = vs.valueSetId;
+  const valueSetOid = vs.valueSetExternalId;
 
+  // TODO: based on how non-VSAC valuests are shaped in the future, we may need
+  // to update the ID scheme to have something more generically defined that
+  // don't rely on potentially null external ID values.
   const valueSetUniqueId = `${valueSetOid}_${vs.valueSetVersion}`;
-  const insertValueSetSql =
-    "INSERT INTO valuesets VALUES($1,$2,$3,$4,$5,$6) RETURNING id;";
+
+  // In the event a duplicate value set by OID + Version is entered, simply
+  // update the existing one to have the new set of information
+  // ValueSets are already uniquely identified by OID + V so this just allows
+  // us to proceed with DB creation in the event a duplicate VS from another
+  // group is pulled and loaded
+  const insertValueSetSql = `
+  INSERT INTO valuesets
+    VALUES($1,$2,$3,$4,$5,$6)
+    ON CONFLICT(id)
+    DO UPDATE SET
+      id = EXCLUDED.id,
+      oid = EXCLUDED.oid,
+      version = EXCLUDED.version,
+      name = EXCLUDED.name,
+      author = EXCLUDED.author,
+      type = EXCLUDED.type
+    RETURNING id;
+  `;
   const valuesArray = [
     valueSetUniqueId,
     valueSetOid,
     vs.valueSetVersion,
     vs.valueSetName,
     vs.author,
-    vs.ersdConceptType,
+    vs.dibbsConceptType,
   ];
 
   return dbClient.query(insertValueSetSql, valuesArray);
@@ -294,7 +325,22 @@ function generateConceptSqlPromises(vs: ValueSet) {
   const insertConceptsSqlArray = vs.concepts.map((concept) => {
     const systemPrefix = stripProtocolAndTLDFromSystemUrl(vs.system);
     const conceptUniqueId = `${systemPrefix}_${concept.code}`;
-    const insertConceptSql = `INSERT INTO concepts VALUES($1,$2,$3,$4,$5,$6) RETURNING id;`;
+
+    // Duplicate value set insertion is likely to percolate to the concept level
+    // Apply the same logic of overwriting if unique keys are the same
+    const insertConceptSql = `
+    INSERT INTO concepts
+      VALUES($1,$2,$3,$4,$5,$6)
+      ON CONFLICT(id)
+      DO UPDATE SET
+        id = EXCLUDED.id,
+        code = EXCLUDED.code,
+        code_system = EXCLUDED.code_system,
+        display = EXCLUDED.display,
+        gem_formatted_code = EXCLUDED.gem_formatted_code,
+        version = EXCLUDED.version
+      RETURNING id;
+    `;
     const conceptInsertPromise = dbClient.query(insertConceptSql, [
       conceptUniqueId,
       concept.code,
@@ -312,14 +358,26 @@ function generateConceptSqlPromises(vs: ValueSet) {
 }
 
 function generateValuesetConceptJoinSqlPromises(vs: ValueSet) {
-  const valueSetUniqueId = `${vs.valueSetId}_${vs.valueSetVersion}`;
   const insertConceptsSqlArray = vs.concepts.map((concept) => {
     const systemPrefix = stripProtocolAndTLDFromSystemUrl(vs.system);
     const conceptUniqueId = `${systemPrefix}_${concept.code}`;
-    const insertJoinSql = `INSERT INTO valueset_to_concept VALUES($1,$2, $3) RETURNING valueset_id, concept_id;`;
+
+    // Last place to make an overwriting upsert adjustment
+    // Even if the duplicate entries have the same data, PG will attempt to
+    // insert another row, so just make that upsert the relationship
+    const insertJoinSql = `
+    INSERT INTO valueset_to_concept
+    VALUES($1,$2,$3)
+    ON CONFLICT(id)
+    DO UPDATE SET
+      id = EXCLUDED.id,
+      valueset_id = EXCLUDED.valueset_id,
+      concept_id = EXCLUDED.concept_id
+    RETURNING valueset_id, concept_id;
+    `;
     const conceptInsertPromise = dbClient.query(insertJoinSql, [
-      `${valueSetUniqueId}_${conceptUniqueId}`,
-      valueSetUniqueId,
+      `${vs.valueSetId}_${conceptUniqueId}`,
+      vs.valueSetId,
       conceptUniqueId,
     ]);
 
@@ -345,4 +403,202 @@ function logRejectedPromiseReasons<T>(
       console.error(r.reason);
       return r.reason;
     });
+}
+
+/**
+ * Function that orchestrates query insertion for the query building flow
+ * @param input - Values of the shape QueryInput needed for query insertion
+ * @returns - Success or failure status, with associated error message for frontend
+ */
+export async function insertQuery(input: QueryInput) {
+  const { sql, values } = generateQueryInsertionSql(input);
+  const insertUserQueryPromise = dbClient.query(sql, values);
+  const errorArray = [];
+
+  let queryId;
+  try {
+    const results = await insertUserQueryPromise;
+    queryId = results.rows[0].id as unknown as UUID;
+  } catch (e) {
+    console.error(
+      `Error occured in user query insertion: insertion for ${input.queryName} failed`,
+    );
+    console.error(e);
+    errorArray.push("Error occured in user query insertion");
+
+    return { success: false, error: errorArray.join(",") };
+  }
+
+  const insertJoinSqlArray = generateQueryToValueSetInsertionSql(
+    input,
+    queryId as UUID,
+  );
+
+  const joinPromises = insertJoinSqlArray.map((q) => {
+    dbClient.query(q.sql, q.values);
+  });
+
+  const joinInsertResults = await Promise.allSettled(joinPromises);
+
+  const joinInsertsSucceeded = joinInsertResults.every(
+    (r) => r.status === "fulfilled",
+  );
+
+  if (!joinInsertsSucceeded) {
+    logRejectedPromiseReasons(joinInsertResults, "Concept insertion failed");
+    errorArray.push("Error occured in concept insertion");
+  }
+
+  if (errorArray.length === 0) return { success: true };
+  return { success: false, error: errorArray.join(",") };
+}
+
+/**
+ * Function that verifies that a particular value set and all its affiliated
+ * concepts were successfully inserted into the DB. Given a FHIR formatted
+ * value set, the function checks three things:
+ *   1. Whether the value set itself was inserted
+ *   2. Whether each concept included in that value set bundle was inserted
+ *   3. Whether these concepts are now mapped to this value set via foreign key
+ * If any data is found to be missing, it is collected and logged to the user.
+ * @param vs The DIBBs internal representation of the value set to check.
+ * @returns A data structure reporting on missing concepts or value set links.
+ */
+export async function checkValueSetInsertion(vs: ValueSet) {
+  // Begin accumulating missing data
+  const missingData = {
+    missingValueSet: false,
+    missingConcepts: [] as Array<String>,
+    missingMappings: [] as Array<String>,
+  };
+
+  // Check that the value set itself was inserted
+  const vsSql = `SELECT * FROM valuesets WHERE oid = $1;`;
+  try {
+    const result = await dbClient.query(vsSql, [vs.valueSetExternalId]);
+    const foundVS = result.rows[0];
+    if (
+      foundVS.version !== vs.valueSetVersion ||
+      foundVS.name !== vs.valueSetName ||
+      foundVS.author !== vs.author
+    ) {
+      console.error(
+        "Retrieved value set information differs from given value set",
+      );
+      missingData.missingValueSet = true;
+    }
+  } catch (error) {
+    console.error("Couldn't fetch inserted value set from DB: ", error);
+    missingData.missingValueSet = true;
+  }
+
+  // Check that all concepts under the value set's umbrella were inserted
+  const brokenConcepts = await Promise.all(
+    vs.concepts.map(async (c) => {
+      const systemPrefix = stripProtocolAndTLDFromSystemUrl(vs.system);
+      const conceptId = `${systemPrefix}_${c.code}`;
+      const conceptSql = `SELECT * FROM concepts WHERE id = $1;`;
+
+      try {
+        const result = await dbClient.query(conceptSql, [conceptId]);
+        const foundConcept: Concept = result.rows[0];
+
+        // We accumulate the unique DIBBs concept IDs of anything that's missing
+        if (
+          foundConcept.code !== c.code ||
+          foundConcept.display !== c.display
+        ) {
+          console.error(
+            "Retrieved concept " +
+              conceptId +
+              " has different values than given concept",
+          );
+          return conceptId;
+        }
+      } catch (error) {
+        console.error(
+          "Couldn't fetch concept with ID " + conceptId + ": ",
+          error,
+        );
+        return conceptId;
+      }
+    }),
+  );
+  missingData.missingConcepts = brokenConcepts.filter((bc) => bc !== undefined);
+
+  // Confirm that valueset_to_concepts contains all relevant FK mappings
+  const mappingSql = `SELECT * FROM valueset_to_concept WHERE valueset_id = $1;`;
+  try {
+    const result = await dbClient.query(mappingSql, [vs.valueSetId]);
+    const rows = result.rows;
+    const missingConceptsFromMappings = vs.concepts.map((c) => {
+      const systemPrefix = stripProtocolAndTLDFromSystemUrl(vs.system);
+      const conceptUniqueId = `${systemPrefix}_${c.code}`;
+
+      // Accumulate unique IDs of any concept we can't find among query rows
+      const fIdx = rows.findIndex((r) => r["concept_id"] === conceptUniqueId);
+      if (fIdx === -1) {
+        console.error(
+          "Couldn't locate concept " + conceptUniqueId + " in fetched mappings",
+        );
+        return conceptUniqueId;
+      }
+    });
+    missingData.missingMappings = missingConceptsFromMappings.filter(
+      (item) => item !== undefined,
+    );
+  } catch (error) {
+    console.error(
+      "Couldn't fetch value set to concept mappings for this valueset: ",
+      error,
+    );
+    const systemPrefix = stripProtocolAndTLDFromSystemUrl(vs.system);
+    vs.concepts.forEach((c) => {
+      const conceptUniqueId = `${systemPrefix}_${c.code}`;
+      missingData.missingMappings.push(conceptUniqueId);
+    });
+  }
+
+  return missingData;
+}
+
+/**
+ * Retrieves all records from the conditions table in the database.
+ * This function queries the database to fetch condition data, including
+ * condition name, code, and category.
+ * @returns An object containing:
+ * - `conditionCatergories`: a JSON object grouped by category with id:name pairs,
+ * to display on build-query page
+ * - `conditionLookup`: a JSON object with id as the key and name as the value in
+ * order to make a call to the DB with the necessary ID(s) to get the valuesets
+ * on subsequent pages.
+ */
+export async function getConditionsData() {
+  const query = "SELECT * FROM conditions";
+  const result = await dbClient.query(query);
+  const rows = result.rows;
+
+  // 1. Grouped by category with id:name pairs
+  const conditionCatergories = rows.reduce(
+    (acc, row) => {
+      const { category, id, name } = row;
+      if (!acc[category]) {
+        acc[category] = [];
+      }
+      acc[category].push({ [id]: name });
+      return acc;
+    },
+    {} as Record<string, Array<Record<string, string>>>,
+  );
+
+  // 2. ID-Name mapping
+  const conditionLookup = rows.reduce(
+    (acc, row) => {
+      acc[row.id] = row.name;
+      return acc;
+    },
+    {} as Record<string, string>,
+  );
+
+  return { conditionCatergories, conditionLookup };
 }

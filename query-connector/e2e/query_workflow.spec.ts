@@ -2,7 +2,7 @@
 
 import { test, expect } from "@playwright/test";
 import { TEST_URL } from "../playwright-setup";
-import { PAGE_TITLES } from "@/app/query/stepIndicator/StepIndicator";
+import { PAGE_TITLES } from "@/app/query/components/stepIndicator/StepIndicator";
 import {
   CONTACT_US_DISCLAIMER_EMAIL,
   CONTACT_US_DISCLAIMER_TEXT,
@@ -20,6 +20,12 @@ test.describe("querying with the Query Connector", () => {
     await page.getByRole("button", { name: "Fill fields" }).click();
     await page.getByLabel("First Name").fill("Shouldnt");
     await page.getByLabel("Last Name").fill("Findanyone");
+    // Select FHIR server from drop down
+    await page.getByRole("button", { name: "Advanced" }).click();
+    await page
+      .getByLabel("FHIR Server (QHIN)")
+      .selectOption("Local e2e HAPI Server: Direct");
+
     await page.getByRole("button", { name: "Search for patient" }).click();
 
     // Better luck next time, user!
@@ -48,11 +54,12 @@ test.describe("querying with the Query Connector", () => {
     ).toBeVisible();
 
     await page.getByRole("button", { name: "Fill fields" }).click();
-    await page.getByLabel("First Name").fill(TEST_PATIENT.FirstName);
-    await page.getByLabel("Last Name").fill(TEST_PATIENT.LastName);
-    await page.getByLabel("Date of Birth").fill(TEST_PATIENT.DOB);
-    await page.getByLabel("Medical Record Number").fill(TEST_PATIENT.MRN);
-    await page.getByLabel("Phone Number").fill(TEST_PATIENT.Phone);
+    // Select FHIR server from drop down
+    await page.getByRole("button", { name: "Advanced" }).click();
+    await page
+      .getByLabel("FHIR Server (QHIN)")
+      .selectOption("Local e2e HAPI Server: Direct");
+
     await page.getByRole("button", { name: "Search for patient" }).click();
     await expect(page.getByText("Loading")).toHaveCount(0, { timeout: 10000 });
 
@@ -68,21 +75,14 @@ test.describe("querying with the Query Connector", () => {
     // Switching to chlymdia seemed to solve the issue, but leaving this check
     // in just in case something similar happens in the future so the unlucky
     // dev can have a note to help debug.
-    // Update as the unlucky dev: Chromium now has issues with this check present
-    // for chlamydia, as well as issues in another test checking for non-zero values.
-    // Other browsers have no problem navigating both checks as they stand.
-    // Update to the update: the connection issue has broadened to include webkit
-    // and seems to apply with no rhyme or reason to use case. Commenting this out
-    // because it no longer acts as a sanity check but leaving it here as a warning
-    // to others.
-    // await page.getByRole("button", { name: "Customize Query" }).click();
-    // await expect(
-    //   page.getByRole("heading", { name: "Customize Query" }),
-    // ).toBeVisible();
-    // await expect(
-    //   page.getByText("0 labs found, 0 medications found, 0 conditions found."),
-    // ).not.toBeVisible();
-    // await page.getByText("Return to Select query").click();
+    await page.getByRole("button", { name: "Customize Query" }).click();
+    await expect(
+      page.getByRole("heading", { name: "Customize Query" }),
+    ).toBeVisible();
+    await expect(
+      page.getByText("0 labs found, 0 medications found, 0 conditions found."),
+    ).not.toBeVisible();
+    await page.getByText("Return to Select query").click();
 
     await page.getByRole("button", { name: "Submit" }).click();
     await expect(page.getByText("Loading")).toHaveCount(0, { timeout: 10000 });
@@ -113,8 +113,45 @@ test.describe("querying with the Query Connector", () => {
       page.getByRole("button", { name: "Medication Requests", expanded: true }),
     ).toBeVisible();
 
-    // We can also just directly ask the page to find us filtered table rows
-    await expect(page.locator("tbody").locator("tr")).toHaveCount(32);
+    // We can also just directly ask the page to find us the number of rows
+    // in each section of the results page
+    // Observations
+    await expect(
+      page
+        .getByRole("table")
+        .filter({ hasText: "Chlamydia trachomatis DNA" })
+        .getByRole("row"),
+    ).toHaveCount(18);
+    // Encounters
+    await expect(
+      page
+        .getByRole("table")
+        .filter({ hasText: "Sexual overexposure" })
+        .getByRole("row"),
+    ).toHaveCount(5);
+    // Conditions
+    await expect(
+      page
+        .getByRole("table")
+        .filter({ hasText: "Chlamydial infection, unspecified" })
+        .getByRole("row"),
+    ).toHaveCount(3);
+    // Diagnostic Reports
+    await expect(
+      page
+        .getByRole("table")
+        .filter({
+          hasText: "Chlamydia trachomatis and Neisseria gonorrhoeae DNA panel",
+        })
+        .getByRole("row"),
+    ).toHaveCount(4);
+    // Medication Requests
+    await expect(
+      page
+        .getByRole("table")
+        .filter({ hasText: "azithromycin 1000 MG" })
+        .getByRole("row"),
+    ).toHaveCount(7);
 
     // Now let's use the return to search to go back to a blank form
     await page.getByRole("button", { name: "New patient search" }).click();

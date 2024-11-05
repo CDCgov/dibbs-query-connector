@@ -16,7 +16,7 @@ import { USE_CASES, demoQueryValToLabelMap } from "@/app/constants";
 import {
   PAGE_TITLES,
   RETURN_LABEL,
-} from "@/app/query/stepIndicator/StepIndicator";
+} from "@/app/query/components/stepIndicator/StepIndicator";
 
 type ResultsViewProps = {
   useCaseQueryResponse: UseCaseQueryResponse;

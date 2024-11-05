@@ -2,7 +2,7 @@
 
 import { test, expect } from "@playwright/test";
 import { TEST_URL } from "../playwright-setup";
-import { PAGE_TITLES } from "@/app/query/stepIndicator/StepIndicator";
+import { PAGE_TITLES } from "@/app/query/components/stepIndicator/StepIndicator";
 
 import { TEST_PATIENT, TEST_PATIENT_NAME } from "./constants";
 
@@ -23,6 +23,12 @@ test.describe("querying with the Query Connector", () => {
     ).toBeVisible();
 
     await page.getByRole("button", { name: "Fill fields" }).click();
+    // Select FHIR server from drop down
+    await page.getByRole("button", { name: "Advanced" }).click();
+    await page
+      .getByLabel("FHIR Server (QHIN)")
+      .selectOption("Local e2e HAPI Server: Direct");
+
     await page.getByRole("button", { name: "Search for patient" }).click();
     await expect(page.getByText("Loading")).toHaveCount(0, { timeout: 10000 });
 
@@ -39,6 +45,7 @@ test.describe("querying with the Query Connector", () => {
   });
 
   test("customize query successfully filtering some data", async ({ page }) => {
+    test.slow();
     await expect(
       page.getByText(
         "249 labs found, 4 medications found, 104 conditions found.",
@@ -104,6 +111,7 @@ test.describe("querying with the Query Connector", () => {
   test("customize query select / deselect all filters whole DibbsConceptType, across tabs", async ({
     page,
   }) => {
+    test.slow();
     await page.getByRole("link", { name: "Labs" }).click();
     await page.getByRole("button", { name: "Deselect all labs" }).click();
 
