@@ -27,8 +27,8 @@ DIBBs Query Connector is a sibling project to
 
 **Implementation Support** - Resources to help users implement DIBBs Query Connector tools to manage their data.
 
-- **[Examples](https://github.com/CDCgov/phdi/tree/main/examples)** - Forthcoming!
-- **[Tutorials]()** - Forthcoming!
+- **Examples** - Forthcoming!
+- **Tutorials** - Forthcoming!
 
 ## Documentation
 
