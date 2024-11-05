@@ -38,7 +38,7 @@ DIBBs Query Connector is a sibling project to
 
 DIBBs Query Connector documentation, including instructions on how to install dependencies and run locally, is currently hosted within the repository, [here](https://github.com/CDCgov/dibbs-query-connector/blob/main/query-connector/README.md).
 
-Access to the production instance of the DIBBs Query Connector is available at [dibbs.cloud/tefca-viewer]().
+Access to the demo instance of the DIBBs Query Connector is available at [dibbs.cloud/tefca-viewer]().
 
 ## Additional Acknowledgments
 
