@@ -600,7 +600,6 @@ export async function getConditionsData() {
     acc[row.id] = row.name;
     return acc;
   }, {} as ConditionIdToNameMap);
-
   return {
     categoryToConditionArrayMap,
     conditionIdToNameMap,
