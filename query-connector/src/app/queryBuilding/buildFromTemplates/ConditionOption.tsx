@@ -1,5 +1,5 @@
 import Checkbox from "../../query/designSystem/checkbox/Checkbox";
-import { ConditionDetails, formatDiseaseDisplay } from "../utils";
+import { formatDiseaseDisplay } from "../utils";
 
 type ConditionOptionProps = {
   conditionId: string;
@@ -10,8 +10,6 @@ type ConditionOptionProps = {
 /**
  * Display component for a condition on the query building page
  * @param root0 - params
- * @param root0.conditionIdToTemplateMap - the ID: Condition name map that needs to
- * be displayed
  * @param root0.conditionId - ID of the condition to reference
  * @param root0.conditionName - name of condition to display
  * @param root0.handleConditionSelection - listner function for checkbox
