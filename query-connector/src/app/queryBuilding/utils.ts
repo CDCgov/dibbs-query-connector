@@ -18,7 +18,11 @@ export type CategoryNameToConditionDetailsMap = {
 };
 
 /**
- *
+ * Translation function format backend response to something more manageable for the
+ * frontend
+ * @param fetchedData - data returned from the backend function grabbing condition <>
+ * category mapping
+ * @returns - The data in a CategoryNameToConditionDetailsMap shape
  */
 export function mapFetchedDataToFrontendStructure(fetchedData: {
   [categoryName: string]: ConditionIdToNameMap[];
