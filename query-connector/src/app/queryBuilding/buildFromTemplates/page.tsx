@@ -29,11 +29,11 @@ export default function QueryTemplateSelection() {
     let isSubscribed = true;
 
     async function fetchConditionsAndUpdateState() {
-      const { conditionCategoryToIdNameArrayMap } = await getConditionsData();
+      const { categoryToConditionArrayMap } = await getConditionsData();
 
       if (isSubscribed) {
         setFetchedConditions(
-          mapFetchedDataToFrontendStructure(conditionCategoryToIdNameArrayMap),
+          mapFetchedDataToFrontendStructure(categoryToConditionArrayMap),
         );
       }
     }
