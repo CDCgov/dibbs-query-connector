@@ -17,6 +17,9 @@ export type CategoryNameToConditionDetailsMap = {
   [categoryName: string]: ConditionDetailsMap;
 };
 
+/**
+ *
+ */
 export function mapFetchedDataToFrontendStructure(fetchedData: {
   [categoryName: string]: ConditionIdToNameMap[];
 }) {
