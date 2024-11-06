@@ -21,7 +21,11 @@ export const EmptyQueriesDisplay: React.FC = () => {
             <Button className={styles.createQueryButton} type={"button"}>
               Create Query
             </Button>
-            <Button className={styles.createQueryButton} type={"button"}>
+            <Button
+              className={styles.createQueryButton}
+              type={"button"}
+              // onClick={async () => function_for_inserting_data()}
+            >
               Add eRSD Data
             </Button>
           </div>
