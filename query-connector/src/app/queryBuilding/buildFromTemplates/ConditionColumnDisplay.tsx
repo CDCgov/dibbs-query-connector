@@ -20,7 +20,8 @@ type ConditionColumnDisplayProps = {
  * @param root0.fetchedConditions - conditions queried from backend to display
  * @param root0.searchFilter - filter grabbed from search field to filter fetched
  * components against
- * @param root0.setFetchedConditions
+ * @param root0.setFetchedConditions - state function that updates the include /
+ * exclude of the queryset
  * @returns Conditions split out into two columns that will filter themselves
  * at both the category and condition levels if a valid search filter is applied.
  */
@@ -93,7 +94,7 @@ export const ConditionColumnDisplay: React.FC<ConditionColumnDisplayProps> = ({
                           <ConditionOption
                             key={conditionId}
                             conditionId={conditionId}
-                            conditionNameAndInclude={conditionNameAndInclude}
+                            conditionName={conditionNameAndInclude.name}
                             handleConditionSelection={handleConditionSelection}
                           />
                         );

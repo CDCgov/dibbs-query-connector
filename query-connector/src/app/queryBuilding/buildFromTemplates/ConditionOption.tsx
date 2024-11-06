@@ -3,7 +3,7 @@ import { ConditionDetails, formatDiseaseDisplay } from "../utils";
 
 type ConditionOptionProps = {
   conditionId: string;
-  conditionNameAndInclude: ConditionDetails;
+  conditionName: string;
   handleConditionSelection: (conditionId: string) => void;
 };
 
@@ -12,14 +12,15 @@ type ConditionOptionProps = {
  * @param root0 - params
  * @param root0.conditionIdToTemplateMap - the ID: Condition name map that needs to
  * be displayed
- * @param root0.conditionId
- * @param root0.conditionNameAndInclude
- * @param root0.handleConditionSelection
+ * @param root0.conditionId - ID of the condition to reference
+ * @param root0.conditionName - name of condition to display
+ * @param root0.handleConditionSelection - listner function for checkbox
+ * selection
  * @returns A component for display to redner on the query building page
  */
 const ConditionOption: React.FC<ConditionOptionProps> = ({
   conditionId,
-  conditionNameAndInclude,
+  conditionName,
   handleConditionSelection,
 }) => {
   return (
@@ -29,7 +30,7 @@ const ConditionOption: React.FC<ConditionOptionProps> = ({
           handleConditionSelection(conditionId);
         }}
         id={conditionId}
-        label={formatDiseaseDisplay(conditionNameAndInclude.name)}
+        label={formatDiseaseDisplay(conditionName)}
       />
     </div>
   );
