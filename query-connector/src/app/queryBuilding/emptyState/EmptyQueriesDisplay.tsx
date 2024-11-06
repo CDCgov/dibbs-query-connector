@@ -17,10 +17,14 @@ export const EmptyQueriesDisplay: React.FC = () => {
           <h2 className={styles.emptyQueryTitle}>
             No custom queries available
           </h2>
-
-          <Button className={styles.createQueryButton} type={"button"}>
-            Create Query
-          </Button>
+          <div className={styles.buttonContainer}>
+            <Button className={styles.createQueryButton} type={"button"}>
+              Create Query
+            </Button>
+            <Button className={styles.createQueryButton} type={"button"}>
+              Add eRSD Data
+            </Button>
+          </div>
         </div>
       </div>
     </>
