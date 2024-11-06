@@ -16,4 +16,3 @@ export type ConditionDetailsMap = {
 export type CategoryNameToConditionDetailsMap = {
   [categoryName: string]: ConditionDetailsMap;
 };
-
