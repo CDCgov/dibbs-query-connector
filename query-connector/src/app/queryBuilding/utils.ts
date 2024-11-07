@@ -1,20 +1,23 @@
+// The structure of the data that's coming from the backend
 export type ConditionIdToNameMap = {
   [conditionId: string]: string;
 };
-
 export type CategoryToConditionArrayMap = {
   [categoryName: string]: ConditionIdToNameMap[];
 };
-export type ConditionDetails = {
+
+// The transform structs for use on the frontend, which is a grandparent - parent
+// - child mapping from category (indexed by name) - conditions (indexed by condition ID)
+// and - condition option (name and whether to include it in the query we're building).
+export type ConditionOption = {
   name: string;
   include: boolean;
 };
-export type ConditionDetailsMap = {
-  [conditionId: string]: ConditionDetails;
+export type ConditionOptionMap = {
+  [conditionId: string]: ConditionOption;
 };
-
-export type CategoryNameToConditionDetailsMap = {
-  [categoryName: string]: ConditionDetailsMap;
+export type CategoryNameToConditionOptionMap = {
+  [categoryName: string]: ConditionOptionMap;
 };
 
 /**
@@ -22,15 +25,15 @@ export type CategoryNameToConditionDetailsMap = {
  * frontend
  * @param fetchedData - data returned from the backend function grabbing condition <>
  * category mapping
- * @returns - The data in a CategoryNameToConditionDetailsMap shape
+ * @returns - The data in a CategoryNameToConditionOptionMap shape
  */
 export function mapFetchedDataToFrontendStructure(fetchedData: {
   [categoryName: string]: ConditionIdToNameMap[];
 }) {
-  const result: CategoryNameToConditionDetailsMap = {};
+  const result: CategoryNameToConditionOptionMap = {};
   Object.entries(fetchedData).forEach(
     ([categoryName, conditionIdToNameMapArray]) => {
-      const curCategoryMap: ConditionDetailsMap = {};
+      const curCategoryMap: ConditionOptionMap = {};
       conditionIdToNameMapArray.forEach((e) => {
         (curCategoryMap[Object.keys(e)[0]] = {
           name: Object.values(e)[0],
@@ -51,9 +54,9 @@ export function mapFetchedDataToFrontendStructure(fetchedData: {
  */
 export function filterSearchByCategoryAndCondition(
   filterString: string,
-  fetchedConditions: CategoryNameToConditionDetailsMap,
-): CategoryNameToConditionDetailsMap {
-  const result: CategoryNameToConditionDetailsMap = {};
+  fetchedConditions: CategoryNameToConditionOptionMap,
+): CategoryNameToConditionOptionMap {
+  const result: CategoryNameToConditionOptionMap = {};
 
   Object.entries(fetchedConditions).forEach(
     ([categoryName, conditionNameArray]) => {
