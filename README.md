@@ -11,21 +11,21 @@
 
 This repository is a part of the CDC/USDS [PHDI project](https://cdcgov.github.io/phdi-site/) and seeks to build the DIBBs Query Connector.
 
-The DIBBs Query Connector app offers a REST API and comprehensive UI for public health staff to query a wide network of healthcare organizations (HCOs), providing access to more complete and timely data. 
+The DIBBs Query Connector app offers a REST API and comprehensive UI for public health staff to query a wide network of healthcare organizations (HCOs), providing access to more complete and timely data.
 
-The Query Connector is a tool for public health practitioners to quickly retrieve patient records and relevant case information from HCOs. The tool works by connecting to Qualified Health Information Networks (QHINs) within the Trusted Exchange Framework and Common Agreement (TEFCA), ensuring immediate access to essential health data and facilitating timely public health decisions and interventions. Public health staff can interact with the Query Connector manually by entering simple patient details — such as name, date of birth, or medical identifiers — into a web-based search form. The tool also allows for automated queries via integration engines like Rhapsody and Mirth.  
+The Query Connector is a tool for public health practitioners to quickly retrieve patient records and relevant case information from HCOs. The tool works by connecting to Qualified Health Information Networks (QHINs) within the Trusted Exchange Framework and Common Agreement (TEFCA), ensuring immediate access to essential health data and facilitating timely public health decisions and interventions. Public health staff can interact with the Query Connector manually by entering simple patient details — such as name, date of birth, or medical identifiers — into a web-based search form. The tool also allows for automated queries via integration engines like Rhapsody and Mirth.
 
 ### Problem Scope
 
 Current public health systems that digest, analyze, and respond to data are siloed. Lacking access to actionable data, our national, as well as state, local, and territorial infrastructure, isn’t pandemic-ready. Our objective is to help the CDC best support PHAs in moving towards a modern public health data infrastructure. See our [public website](https://cdcgov.github.io/dibbs-site/) for more details.
 
-The current methods that public health jurisdictions use to collect data from HCOs can be time-consuming and cumbersome, often involving manual interventions like phone calls and faxes. The Query Connector aims to streamline the collection of health data using an intuitive querying process that can leverage QHINs within TEFCA or direct connections, thereby enabling data exchange from multiple HCOs for a variety of public health use cases such as newborn screening or STI case investigation. 
+The current methods that public health jurisdictions use to collect data from HCOs can be time-consuming and cumbersome, often involving manual interventions like phone calls and faxes. The Query Connector aims to streamline the collection of health data using an intuitive querying process that can leverage QHINs within TEFCA or direct connections, thereby enabling data exchange from multiple HCOs for a variety of public health use cases such as newborn screening or STI case investigation.
 
 DIBBs Query Connector is a sibling project to
 
-* [PHDI](https://github.com/CDCgov/phdi) to further help display, access, and interpret publich health data;
-* [PRIME ReportStream](https://reportstream.cdc.gov), which focuses on improving the delivery of COVID-19 test data to public health departments; and
-* [PRIME SimpleReport](https://simplereport.gov), which provides a better way for organizations and testing facilities to report COVID-19 rapid tests to public health departments.
+- [PHDI](https://github.com/CDCgov/phdi) to further help display, access, and interpret publich health data;
+- [PRIME ReportStream](https://reportstream.cdc.gov), which focuses on improving the delivery of COVID-19 test data to public health departments; and
+- [PRIME SimpleReport](https://simplereport.gov), which provides a better way for organizations and testing facilities to report COVID-19 rapid tests to public health departments.
 
 ## Implementation
 
@@ -38,17 +38,17 @@ DIBBs Query Connector is a sibling project to
 
 DIBBs Query Connector documentation, including instructions on how to install dependencies and run locally, is currently hosted within the repository, [here](https://github.com/CDCgov/dibbs-query-connector/blob/main/query-connector/README.md).
 
-Access to the demo instance of the DIBBs Query Connector is available at [dibbs.cloud/tefca-viewer]().
+Access to the demo instance of the DIBBs Query Connector is available at [dibbs.cloud/query-connector]().
 
 ## Additional Acknowledgments
 
 We mapped the rootnames of the PHDI database to nicknames produced by the aggregation and synthesis of open source work from a number of projects. While we do not employ the packages and wrappers used by the various projects (merely their open source data), we wish to give credit to their various works building collections of nickname mappings. These projects are:
 
-* [Secure Enterprise Master Patient Index](https://github.com/MrCsabaToth/SOEMPI), based on OpenEMPI, conducted by Vanderbilt University
-* [Curated Nicknames](https://github.com/carltonnorthern/nicknames), scraped from genealogy webpages and run by Old Dominion University Web Science and Digital Libraries Research Group
-* [Simple Public Domain Nickname Mappings](https://github.com/onyxrev/common_nickname_csv), hand collected using various sources
-* [Lingua En Nickname](https://github.com/brianary/Lingua-EN-Nickname), collected from a series of GenWeb projects
-* [diminutives.db](https://github.com/HaJongler/diminutives.db), compiled via a nickname extract using Wikipedia and Wiktionary
+- [Secure Enterprise Master Patient Index](https://github.com/MrCsabaToth/SOEMPI), based on OpenEMPI, conducted by Vanderbilt University
+- [Curated Nicknames](https://github.com/carltonnorthern/nicknames), scraped from genealogy webpages and run by Old Dominion University Web Science and Digital Libraries Research Group
+- [Simple Public Domain Nickname Mappings](https://github.com/onyxrev/common_nickname_csv), hand collected using various sources
+- [Lingua En Nickname](https://github.com/brianary/Lingua-EN-Nickname), collected from a series of GenWeb projects
+- [diminutives.db](https://github.com/HaJongler/diminutives.db), compiled via a nickname extract using Wikipedia and Wiktionary
 
 ## Standard Notices
 
