@@ -31,7 +31,7 @@ export const EmptyQueriesDisplay: React.FC = () => {
           </h2>
 
           <Button
-            // onClick={() => router.push(`/queryBuilding/buildFromTemplates`)}
+            onClick={() => router.push(`/queryBuilding/buildFromTemplates`)}
             className={styles.createQueryButton}
             type={"button"}
           >

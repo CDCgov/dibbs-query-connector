@@ -100,7 +100,7 @@ export default function QueryTemplateSelection() {
             id="conditionTemplateSearch"
             placeholder="Search conditions"
             className={classNames(
-              "maxw-mobile margin-x-auto margin-top-0 margin-bottom-2",
+              "maxw-mobile margin-x-auto margin-top-0 margin-bottom-4",
             )}
             onChange={(e) => {
               e.preventDefault();
