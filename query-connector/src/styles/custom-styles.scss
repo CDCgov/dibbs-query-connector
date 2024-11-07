@@ -86,6 +86,10 @@ h1 {
   font-weight: 400 !important;
 }
 
+.bg-gray-5 {
+  background-color: $gray-cool-5;
+}
+
 .maxw7 {
   max-width: 70%;
 }
@@ -434,4 +438,8 @@ ul.usa-sidenav
 
 .customize-accordion .usa-accordion__content {
   padding: 0rem;
+}
+
+#conditionTemplateSearch > div[data-testid="searchField"] {
+  flex: 1;
 }
