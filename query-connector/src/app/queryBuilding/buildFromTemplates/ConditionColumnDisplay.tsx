@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import {
-  CategoryNameToConditionDetailsMap,
+  CategoryNameToConditionOptionMap,
   filterSearchByCategoryAndCondition,
 } from "../utils";
 import styles from "./buildfromTemplate.module.scss";
@@ -8,10 +8,10 @@ import ConditionOption from "./ConditionOption";
 import classNames from "classnames";
 
 type ConditionColumnDisplayProps = {
-  fetchedConditions: CategoryNameToConditionDetailsMap;
+  fetchedConditions: CategoryNameToConditionOptionMap;
   searchFilter: string | undefined;
   setFetchedConditions: Dispatch<
-    SetStateAction<CategoryNameToConditionDetailsMap | undefined>
+    SetStateAction<CategoryNameToConditionOptionMap | undefined>
   >;
 };
 /**

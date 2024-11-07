@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import classNames from "classnames";
 import { getConditionsData } from "@/app/database-service";
 import {
-  CategoryNameToConditionDetailsMap,
+  CategoryNameToConditionOptionMap,
   mapFetchedDataToFrontendStructure,
 } from "../utils";
 import ConditionColumnDisplay from "./ConditionColumnDisplay";
@@ -23,7 +23,7 @@ export default function QueryTemplateSelection() {
   const [queryName, setQueryName] = useState<string>();
   const [searchFilter, setSearchFilter] = useState<string>();
   const [fetchedConditions, setFetchedConditions] =
-    useState<CategoryNameToConditionDetailsMap>();
+    useState<CategoryNameToConditionOptionMap>();
 
   useEffect(() => {
     let isSubscribed = true;
