@@ -1,0 +1,722 @@
+{
+  "Injuries, NEC": [
+    {
+      "1149222004": "Overdose (disorder)"
+    },
+    {
+      "399907009": "Animal bite wound (disorder)"
+    },
+    {
+      "212962007": "Drowning and non-fatal immersion (disorder)"
+    },
+    {
+      "283545005": "Gunshot wound (disorder)"
+    },
+    {
+      "82271004": "Injury of head (disorder)"
+    },
+    {
+      "407153006": "Injury due to motor vehicle accident (disorder)"
+    },
+    {
+      "44301001": "Suicide (event)"
+    }
+  ],
+  "Waterborne (not enteric)": [
+    {
+      "49649001": "Infection caused by Acanthamoeba (disorder)"
+    },
+    {
+      "115635005": "Balamuthia mandrillaris (organism)"
+    },
+    {
+      "428111003": "Melioidosis (disorder)"
+    },
+    {
+      "428175000": "Primary amebic encephalitis caused by Naegleria fowleri (disorder)"
+    },
+    {
+      "111811007": "Mycobacterial infection (excluding tuberculosis AND leprosy) (disorder)"
+    }
+  ],
+  "Neurological Diseases": [
+    {
+      "897031002": "Acute flaccid myelitis (disorder)"
+    },
+    {
+      "792004": "Jakob-Creutzfeldt disease (disorder)"
+    },
+    {
+      "45170000": "Encephalitis (disorder)"
+    },
+    {
+      "40956001": "Guillain-Barre syndrome (disorder)"
+    },
+    {
+      "7180009": "Meningitis (disorder)"
+    },
+    {
+      "49049000": "Parkinson's disease (disorder)"
+    },
+    {
+      "20484008": "Prion disease (disorder)"
+    }
+  ],
+  "Toxic Effects of Non-Medicinal Substances": [
+    {
+      "216809001": "Accidental poisoning caused by fertilizers (disorder)"
+    },
+    {
+      "767146004": "Toxic effect of arsenic and/or arsenic compound (disorder)"
+    },
+    {
+      "398565003": "Infection caused by Clostridium botulinum (disorder)"
+    },
+    {
+      "414488002": "Infantile botulism (disorder)"
+    },
+    {
+      "3398004": "Cadmium poisoning (disorder)"
+    },
+    {
+      "17383000": "Toxic effect of carbon monoxide (disorder)"
+    },
+    {
+      "41439009": "Microcystis flos-aquae poisoning (disorder)"
+    },
+    {
+      "407152001": "Blood lead level above reference range (finding)"
+    },
+    {
+      "767299002": "Toxic effect of mercury and/or mercury compound (disorder)"
+    },
+    {
+      "18504008": "Toxic shock syndrome (disorder)"
+    },
+    {
+      "242253008": "Overdose of opiate (disorder)"
+    },
+    {
+      "37131007": "Pesticide poisoning (disorder)"
+    },
+    {
+      "409617000": "Ricin poisoning (disorder)"
+    },
+    {
+      "269275003": "Seafood causing toxic effect (disorder)"
+    },
+    {
+      "419488004": "Staphylococcus aureus enterotoxin B (substance)"
+    },
+    {
+      "240451000": "Streptococcal toxic shock syndrome (disorder)"
+    }
+  ],
+  "Vectorborne Diseases": [
+    {
+      "788781001": "Delayed allergy to red meat (finding)"
+    },
+    {
+      "13906002": "Anaplasmosis (disorder)"
+    },
+    {
+      "40610006": "Arbovirus infection (disorder)"
+    },
+    {
+      "21061004": "Babesiosis (disorder)"
+    },
+    {
+      "266123003": "Bartonellosis (disorder)"
+    },
+    {
+      "418182000": "Disease caused by California serogroup virus (disorder)"
+    },
+    {
+      "77506005": "Infection caused by Trypanosoma cruzi (disorder)"
+    },
+    {
+      "111864006": "Chikungunya fever (disorder)"
+    },
+    {
+      "6452009": "Colorado tick fever (disorder)"
+    },
+    {
+      "38362002": "Dengue (disorder)"
+    },
+    {
+      "416925005": "Eastern equine encephalitis virus infection (disorder)"
+    },
+    {
+      "240626005": "Human ehrlichiosis (disorder)"
+    },
+    {
+      "41723001": "Jamestown Canyon virus disease (disorder)"
+    },
+    {
+      "52947006": "Japanese encephalitis virus disease (disorder)"
+    },
+    {
+      "404237007": "Keystone virus encephalitis (disorder)"
+    },
+    {
+      "61094002": "La Crosse encephalitis (disorder)"
+    },
+    {
+      "80612004": "Leishmaniasis (disorder)"
+    },
+    {
+      "14683004": "Relapsing fever caused by Borrelia recurrentis (disorder)"
+    },
+    {
+      "23502006": "Lyme disease (disorder)"
+    },
+    {
+      "240820001": "Lymphatic filariasis (disorder)"
+    },
+    {
+      "61462000": "Malaria (disorder)"
+    },
+    {
+      "416707008": "Powassan encephalitis virus infection (disorder)"
+    },
+    {
+      "404236003": "Snowshoe hare virus encephalitis (disorder)"
+    },
+    {
+      "186771002": "Spotted fever group rickettsial disease (disorder)"
+    },
+    {
+      "417192005": "Saint Louis encephalitis virus infection (disorder)"
+    },
+    {
+      "74225001": "Tick paralysis (disorder)"
+    },
+    {
+      "10301003": "Tick-borne relapsing fever (disorder)"
+    },
+    {
+      "240507007": "Trivittatus fever (disorder)"
+    },
+    {
+      "19265001": "Tularemia (disorder)"
+    },
+    {
+      "240613006": "Typhus group rickettsial disease (disorder)"
+    },
+    {
+      "417093003": "Disease caused by West Nile virus (disorder)"
+    },
+    {
+      "47523006": "Western equine encephalitis (disorder)"
+    },
+    {
+      "16541001": "Yellow fever (disorder)"
+    },
+    {
+      "3928002": "Zika virus disease (disorder)"
+    }
+  ],
+  "Enteric Diseases": [
+    {
+      "388759003": "Infection caused by Entamoeba histolytica (disorder)"
+    },
+    {
+      "86500004": "Campylobacteriosis (disorder)"
+    },
+    {
+      "63650001": "Cholera (disorder)"
+    },
+    {
+      "186431008": "Infection caused by Clostridioides difficile (disorder)"
+    },
+    {
+      "65154009": "Infection caused by Clostridium perfringens (disorder)"
+    },
+    {
+      "240370009": "Cryptosporidiosis (disorder)"
+    },
+    {
+      "240372001": "Cyclosporiasis (disorder)"
+    },
+    {
+      "58265007": "Giardiasis (disorder)"
+    },
+    {
+      "111407006": "Hemolytic uremic syndrome (disorder)"
+    },
+    {
+      "40468003": "Viral hepatitis, type A (disorder)"
+    },
+    {
+      "7111000119109": "Viral hepatitis type E (disorder)"
+    },
+    {
+      "4241002": "Listeriosis (disorder)"
+    },
+    {
+      "83436008": "Yersiniosis (disorder)"
+    },
+    {
+      "53648006": "Disease caused by Enterovirus (disorder)"
+    },
+    {
+      "721763002": "Infection caused by Norovirus (disorder)"
+    },
+    {
+      "18624000": "Disease caused by Rotavirus (disorder)"
+    },
+    {
+      "85904008": "Paratyphoid fever (disorder)"
+    },
+    {
+      "4834000": "Typhoid fever (disorder)"
+    },
+    {
+      "302231008": "Salmonella infection (disorder)"
+    },
+    {
+      "328291000119103": "Infection caused by Shiga toxin producing Escherichia coli (disorder)"
+    },
+    {
+      "36188001": "Shigellosis (disorder)"
+    },
+    {
+      "398557001": "Infection caused by non-cholerae vibrio (disorder)"
+    }
+  ],
+  "Birth Defects and Infant Disorders": [
+    {
+      "89369001": "Anencephalus (disorder)"
+    },
+    {
+      "1237074000": "Congenital atrioventricular septal defect (disorder)"
+    },
+    {
+      "80281008": "Cleft lip (disorder)"
+    },
+    {
+      "66948001": "Cleft palate with cleft lip (disorder)"
+    },
+    {
+      "87979003": "Cleft palate (disorder)"
+    },
+    {
+      "7305005": "Coarctation of aorta (disorder)"
+    },
+    {
+      "59527008": "Congenital cytomegalovirus infection (disorder)"
+    },
+    {
+      "7484005": "Double outlet right ventricle (disorder)"
+    },
+    {
+      "41040004": "Complete trisomy 21 syndrome (disorder)"
+    },
+    {
+      "204357006": "Ebstein's anomaly of tricuspid valve (disorder)"
+    },
+    {
+      "72951007": "Gastroschisis (disorder)"
+    },
+    {
+      "62067003": "Hypoplastic left heart syndrome (disorder)"
+    },
+    {
+      "95821001": "Neonatal hearing loss (disorder)"
+    },
+    {
+      "218728005": "Interrupted aortic arch (disorder)"
+    },
+    {
+      "67341007": "Longitudinal deficiency of limb (disorder)"
+    },
+    {
+      "414819007": "Neonatal abstinence syndrome (disorder)"
+    },
+    {
+      "190687004": "Phenylketonuria (disorder)"
+    },
+    {
+      "190268003": "Congenital hypothyroidism (disorder)"
+    },
+    {
+      "204339005": "Congenital pulmonary valve abnormality (disorder)"
+    },
+    {
+      "45503006": "Common ventricle (disorder)"
+    },
+    {
+      "67531005": "Spina bifida (disorder)"
+    },
+    {
+      "86299006": "Tetralogy of Fallot (disorder)"
+    },
+    {
+      "111323005": "Total anomalous pulmonary venous return (disorder)"
+    },
+    {
+      "204296002": "Discordant ventriculoarterial connection (disorder)"
+    },
+    {
+      "4374004": "Congenital anomaly of tricuspid valve (disorder)"
+    },
+    {
+      "61959006": "Common truncus arteriosus (disorder)"
+    },
+    {
+      "1": "Newborn Screening"
+    }
+  ],
+  "Zoonotic Diseases": [
+    {
+      "61750000": "Infection caused by Angiostrongylus (disorder)"
+    },
+    {
+      "409498004": "Anthrax (disorder)"
+    },
+    {
+      "93614002": "Infection caused by Baylisascaris procyonis (disorder)"
+    },
+    {
+      "75702008": "Brucellosis (disorder)"
+    },
+    {
+      "59051007": "Cysticercosis (disorder)"
+    },
+    {
+      "187151009": "Diphyllobothriasis (disorder)"
+    },
+    {
+      "4639008": "Glanders (disorder)"
+    },
+    {
+      "359761005": "Disease caused by Hantavirus (disorder)"
+    },
+    {
+      "77377001": "Leptospirosis (disorder)"
+    },
+    {
+      "721781004": "Infection caused by Lymphocytic choriomeningitis virus (disorder)"
+    },
+    {
+      "359814004": "Monkeypox (disorder)"
+    },
+    {
+      "406597005": "Infection caused by Nipah virus (disorder)"
+    },
+    {
+      "58750007": "Plague (disorder)"
+    },
+    {
+      "186788009": "Q fever (disorder)"
+    },
+    {
+      "14168008": "Rabies (disorder)"
+    },
+    {
+      "76172008": "Infection caused by Taenia (disorder)"
+    },
+    {
+      "187192000": "Toxoplasmosis (disorder)"
+    },
+    {
+      "709018004": "Infection caused by larvae of Trichinella (disorder)"
+    },
+    {
+      "36921006": "Vesicular stomatitis (disorder)"
+    },
+    {
+      "240523007": "Viral hemorrhagic fever (disorder)"
+    }
+  ],
+  "Respiratory Conditions (non-infectious)": [
+    {
+      "22607003": "Asbestosis (disorder)"
+    },
+    {
+      "85761009": "Byssinosis (disorder)"
+    },
+    {
+      "233733000": "Toxic pneumonitis (disorder)"
+    },
+    {
+      "29422001": "Coal workers' pneumoconiosis (disorder)"
+    },
+    {
+      "18690003": "Farmers' lung (disorder)"
+    },
+    {
+      "805002": "Pneumoconiosis caused by silica (disorder)"
+    },
+    {
+      "57607007": "Occupational asthma (disorder)"
+    }
+  ],
+  "Respiratory Conditions (Infectious)": [
+    {
+      "69996000": "Blastomycosis (disorder)"
+    },
+    {
+      "60826002": "Coccidioidomycosis (disorder)"
+    },
+    {
+      "840539006": "Disease caused by severe acute respiratory syndrome coronavirus 2 (disorder)"
+    },
+    {
+      "42386007": "Cryptococcosis (disorder)"
+    },
+    {
+      "81004002": "Leprosy (disorder)"
+    },
+    {
+      "12962009": "Histoplasmosis (disorder)"
+    },
+    {
+      "95891005": "Influenza-like illness (finding)"
+    },
+    {
+      "26726000": "Legionella infection (disorder)"
+    },
+    {
+      "651000146102": "Middle East respiratory syndrome (disorder)"
+    },
+    {
+      "1731000119106": "Atypical mycobacterial infection of lung (disorder)"
+    },
+    {
+      "75116005": "Ornithosis (disorder)"
+    },
+    {
+      "6415009": "Human respiratory syncytial virus (organism)"
+    },
+    {
+      "55735004": "Respiratory syncytial virus infection (disorder)"
+    },
+    {
+      "398447004": "Severe acute respiratory syndrome (disorder)"
+    },
+    {
+      "56717001": "Tuberculosis (disorder)"
+    },
+    {
+      "11999007": "Inactive tuberculosis (finding)"
+    }
+  ],
+  "Cancer": [
+    {
+      "363346000": "Malignant neoplastic disease (disorder)"
+    },
+    {
+      "2": "Cancer (Leukemia)"
+    }
+  ],
+  "Healthcare-Associated Events": [
+    {
+      "865929003": "Infection caused by Candida auris (disorder)"
+    },
+    {
+      "715174007": "Carbapenem resistant Acinetobacter baumannii (organism)"
+    },
+    {
+      "712662001": "Carbapenem resistant Enterobacteriaceae (organism)"
+    },
+    {
+      "726492000": "Carbapenem resistant Pseudomonas aeruginosa (organism)"
+    },
+    {
+      "734350003": "Carbapenemase-producing bacteria (organism)"
+    },
+    {
+      "700372006": "Urinary tract infection associated with catheter (disorder)"
+    },
+    {
+      "736152001": "Infection of bloodstream co-occurrent and due to central venous catheter in situ (disorder)"
+    },
+    {
+      "406602003": "Infection caused by Staphylococcus aureus (disorder)"
+    },
+    {
+      "433202001": "Surgical site infection (disorder)"
+    },
+    {
+      "293104008": "Adverse reaction to component of vaccine product (disorder)"
+    },
+    {
+      "409636005": "Complication of smallpox vaccination (disorder)"
+    },
+    {
+      "406604002": "Infection caused by vancomycin intermediate Staphylococcus aureus (disorder)"
+    },
+    {
+      "406575008": "Infection caused by vancomycin resistant enterococcus (disorder)"
+    },
+    {
+      "404681006": "Infection caused by vancomycin resistant Staphylococcus aureus (disorder)"
+    },
+    {
+      "71695001": "Complication of ventilation therapy (disorder)"
+    }
+  ],
+  "Sexually Transmitted Diseases": [
+    {
+      "266143009": "Chancroid (disorder)"
+    },
+    {
+      "240589008": "Chlamydia trachomatis infection (disorder)"
+    },
+    {
+      "266113007": "Genital warts (disorder)"
+    },
+    {
+      "15628003": "Gonorrhea (disorder)"
+    },
+    {
+      "28867007": "Granuloma inguinale (disorder)"
+    },
+    {
+      "33839006": "Genital herpes simplex (disorder)"
+    },
+    {
+      "91576008": "Congenital herpes simplex (disorder)"
+    },
+    {
+      "86406008": "Human immunodeficiency virus infection (disorder)"
+    },
+    {
+      "84619001": "Nongonococcal urethritis (disorder)"
+    },
+    {
+      "34298002": "Neonatal conjunctivitis (disorder)"
+    },
+    {
+      "198130006": "Female pelvic inflammatory disease (disorder)"
+    },
+    {
+      "76272004": "Syphilis (disorder)"
+    },
+    {
+      "35742006": "Congenital syphilis (disorder)"
+    }
+  ],
+  "Vaccine Preventable Diseases": [
+    {
+      "1857005": "Congenital rubella syndrome (disorder)"
+    },
+    {
+      "276197005": "Infection caused by Corynebacterium diphtheriae (disorder)"
+    },
+    {
+      "43692000": "Influenzal acute upper respiratory infection (disorder)"
+    },
+    {
+      "719590007": "Influenza caused by seasonal influenza virus (disorder)"
+    },
+    {
+      "661761000124109": "Death associated with influenza (event)"
+    },
+    {
+      "6142004": "Influenza (disorder)"
+    },
+    {
+      "406583002": "Invasive Haemophilus influenzae disease (disorder)"
+    },
+    {
+      "406617004": "Invasive Streptococcus pneumoniae disease (disorder)"
+    },
+    {
+      "14189004": "Measles (disorder)"
+    },
+    {
+      "23511006": "Meningococcal infectious disease (disorder)"
+    },
+    {
+      "36989005": "Mumps (disorder)"
+    },
+    {
+      "541131000124102": "Infection caused by novel Influenza A virus variant (disorder)"
+    },
+    {
+      "414015000": "Disease caused by Orthopoxvirus (disorder)"
+    },
+    {
+      "27836007": "Pertussis (disorder)"
+    },
+    {
+      "398102009": "Acute poliomyelitis (disorder)"
+    },
+    {
+      "36653000": "Rubella (disorder)"
+    },
+    {
+      "67924001": "Smallpox (disorder)"
+    },
+    {
+      "76902006": "Tetanus (disorder)"
+    },
+    {
+      "38907003": "Varicella (disorder)"
+    }
+  ],
+  "Parasitic Diseases, NEC": [
+    {
+      "74942003": "Echinococcosis (disorder)"
+    },
+    {
+      "128869009": "Infestation caused by Sarcoptes scabiei var hominis (disorder)"
+    },
+    {
+      "1214006": "Infection caused by Strongyloides (disorder)"
+    }
+  ],
+  "Bloodborne Diseases": [
+    {
+      "66071002": "Viral hepatitis type B (disorder)"
+    },
+    {
+      "60498001": "Congenital viral hepatitis B infection (disorder)"
+    },
+    {
+      "50711007": "Viral hepatitis type C (disorder)"
+    },
+    {
+      "551611000124101": "Perinatal hepatitis caused by Hepatitis C virus (disorder)"
+    },
+    {
+      "707341005": "Viral hepatitis type D (disorder)"
+    },
+    {
+      "397575003": "Viral hepatitis, type G (disorder)"
+    }
+  ],
+  "Systemic Conditions": [
+    {
+      "444664004": "Genus Cronobacter (organism)"
+    },
+    {
+      "75053002": "Acute febrile mucocutaneous lymph node syndrome (disorder)"
+    },
+    {
+      "38959009": "Methemoglobinemia (disorder)"
+    },
+    {
+      "1119306006": "Multisystem inflammatory syndrome in adults (disorder)"
+    },
+    {
+      "895448002": "Multisystem inflammatory syndrome in children (disorder)"
+    },
+    {
+      "74351001": "Reye's Syndrome (disorder)"
+    }
+  ],
+  "Streptococcal Diseases": [
+    {
+      "58718002": "Rheumatic fever (disorder)"
+    },
+    {
+      "406614006": "Invasive Group A beta-hemolytic streptococcal disease (disorder)"
+    },
+    {
+      "406612005": "Invasive Group B beta-hemolytic streptococcal disease (disorder)"
+    }
+  ]
+}
