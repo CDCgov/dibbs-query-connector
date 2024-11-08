@@ -1,0 +1,45 @@
+@use "../../../styles/variables" as *;
+
+.queryTemplateContainer {
+  padding: 3.5rem 5rem;
+  border-radius: 4px;
+}
+
+.querySelectionForm {
+  background-color: #fff;
+  padding: 2rem;
+}
+
+.querySelectionFormSearch {
+  border: 1px solid #919191;
+  border-radius: 4px;
+  height: 1.5rem;
+  padding: 0.75rem;
+}
+
+#conditionTemplateSearch:first-child {
+  flex: 1;
+}
+
+.categoryHeading {
+  text-transform: uppercase;
+  color: $gray-500;
+  font-weight: 700;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+  margin-top: 0;
+}
+
+.displayCol:first-of-type {
+  border-right: 1px solid $base-lighter;
+}
+
+.displayCol:nth-of-type(2) {
+  padding-left: 2rem;
+}
+.categoryOption {
+  margin: 2rem 0;
+}
+.categoryOption:last-of-type {
+  margin-bottom: 3rem;
+}
