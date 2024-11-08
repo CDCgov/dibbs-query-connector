@@ -6,6 +6,7 @@ import { Fieldset, Icon, Label, TextInput } from "@trussworks/react-uswds";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import styles from "./signinPage.module.scss";
+import classNames from "classnames";
 
 /**
  * The sign-in page for Query Connector.
@@ -53,12 +54,12 @@ export default function SigninPage() {
   };
 
   return (
-    <div className="display-flex">
+    <div className={classNames("display-flex", styles.signInContainer)}>
       <div className={`${styles[`column-left`]} ${styles.column}`}>
         <Image
           alt="Graphic illustrating what TEFCA is"
           className={styles.image}
-          src="/tefca-viewer/tefca-graphic.svg"
+          src="/query-connector/tefca-graphic.svg"
           width={474}
           height={438}
           priority
