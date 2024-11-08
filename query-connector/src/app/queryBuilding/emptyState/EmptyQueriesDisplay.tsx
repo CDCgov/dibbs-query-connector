@@ -40,7 +40,7 @@ export const EmptyQueriesDisplay: React.FC = () => {
           "display-flex",
           "flex-align-center",
           "flex-justify-center",
-          styles.emptyStateQueryContainer
+          styles.emptyStateQueryContainer,
         )}
       >
         <div className="display-flex flex-column flex-align-center">
