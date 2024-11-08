@@ -40,7 +40,7 @@ export const EmptyQueriesDisplay: React.FC = () => {
           "display-flex",
           "flex-align-center",
           "flex-justify-center",
-          styles.emptyStateQueryContainer,
+          styles.emptyStateQueryContainer
         )}
       >
         <div className="display-flex flex-column flex-align-center">
@@ -51,15 +51,13 @@ export const EmptyQueriesDisplay: React.FC = () => {
           <h2 className={styles.emptyQueryTitle}>
             No custom queries available
           </h2>
-          <div className={styles.buttonContainer}>
-            <Button
-              onClick={() => handleClick()}
-              className={styles.createQueryButton}
-              type={"button"}
-            >
-              Create Query
-            </Button>
-          </div>
+          <Button
+            onClick={() => handleClick()}
+            className={styles.createQueryButton}
+            type={"button"}
+          >
+            Create Query
+          </Button>
         </div>
       </div>
     </>
