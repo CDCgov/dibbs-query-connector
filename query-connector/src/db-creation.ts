@@ -40,7 +40,7 @@ async function getOidsFromErsd() {
     console.log("Fetching and parsing eRSD.");
     const ersd = await getERSD();
     const valuesets = (ersd as unknown as Bundle)["entry"]?.filter(
-      (e) => e.resource?.resourceType === "ValueSet",
+      (e) => e.resource?.resourceType === "ValueSet"
     );
 
     // Build up a mapping of OIDs to eRSD clinical types
@@ -65,7 +65,7 @@ async function getOidsFromErsd() {
     // Make sure to take out the umbrella value sets from the ones we try to insert
     let oids = valuesets?.map((vs) => vs.resource?.id);
     oids = oids?.filter(
-      (oid) => !Object.keys(ersdToDibbsConceptMap).includes(oid || ""),
+      (oid) => !Object.keys(ersdToDibbsConceptMap).includes(oid || "")
     );
     return { oids: oids, oidToErsdType: oidToErsdType } as OidData;
   } catch (error) {
@@ -93,14 +93,14 @@ async function fetchBatchValueSetsFromVsac(oidData: OidData, batchSize = 100) {
   console.log(
     "Attempting fetches and inserts for",
     oidData.oids.length,
-    "value sets.",
+    "value sets."
   );
 
   while (startIdx < oidData.oids.length) {
     console.log("Batching IDs", startIdx, "to", lastIdx);
     const oidsToFetch = oidData.oids.slice(
       startIdx,
-      Math.min(lastIdx, oidData.oids.length),
+      Math.min(lastIdx, oidData.oids.length)
     );
 
     let valueSetPromises = await Promise.all(
@@ -109,24 +109,24 @@ async function fetchBatchValueSetsFromVsac(oidData: OidData, batchSize = 100) {
         try {
           const vs = await getVSACValueSet(oid);
           const eRSDType: ErsdConceptType = oidData.oidToErsdType.get(
-            oid,
+            oid
           ) as ErsdConceptType;
           const internalValueSet = await translateVSACToInternalValueSet(
             vs as unknown as ValueSet,
-            eRSDType,
+            eRSDType
           );
           return internalValueSet;
         } catch (error) {
           console.error(error);
         }
-      }),
+      })
     );
 
     // Next, in case we hit a value set that has a `retired` status and
     // a deprecated concept listing, we'll need to filter for only those
     // with defined Concepts
     valueSetPromises = valueSetPromises.filter(
-      (vsp) => vsp?.concepts !== undefined,
+      (vsp) => vsp?.concepts !== undefined
     );
 
     // Then, we'll insert it into our database instance
@@ -135,7 +135,7 @@ async function fetchBatchValueSetsFromVsac(oidData: OidData, batchSize = 100) {
         if (vs) {
           await insertValueSet(vs);
         }
-      }),
+      })
     );
 
     // // Finally, we verify that the insert was performed correctly
@@ -152,7 +152,7 @@ async function fetchBatchValueSetsFromVsac(oidData: OidData, batchSize = 100) {
         ) {
           console.log(
             "Resolving missing values or errors for valueset",
-            vs.valueSetId,
+            vs.valueSetId
           );
           await insertValueSet(vs);
           missingData = await checkValueSetInsertion(vs);
@@ -175,7 +175,7 @@ async function fetchBatchValueSetsFromVsac(oidData: OidData, batchSize = 100) {
  * Overall orchestration function that performs the scripted process of querying
  * the eRSD, extracting OIDs, then inserting valuesets into the DB.
  */
-async function createDibbsDB() {
+export async function createDibbsDB() {
   const ersdOidData = await getOidsFromErsd();
   if (ersdOidData) {
     await fetchBatchValueSetsFromVsac(ersdOidData);
