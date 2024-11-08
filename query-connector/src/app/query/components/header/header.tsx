@@ -57,7 +57,7 @@ export default function HeaderComponent() {
         <div
           className={classNames(
             "usa-nav-container",
-            styles.headerContentContainer,
+            styles.headerContentContainer
           )}
         >
           <div className={classNames("display-flex", "flex-align-center")}>
@@ -77,7 +77,7 @@ export default function HeaderComponent() {
             className={classNames(
               "margin-left-auto",
               "display-flex",
-              "flex-align-center",
+              "flex-align-center"
             )}
           >
             {path != "/signin" && isClient && (
@@ -106,7 +106,7 @@ export default function HeaderComponent() {
                   styles.menuButton,
                   "usa-accordion__button",
                   "usa-nav__link",
-                  "usa-current",
+                  "usa-current"
                 )}
                 aria-expanded="false"
                 aria-controls="dropdown-menu"
@@ -145,14 +145,6 @@ export default function HeaderComponent() {
                 </a>
               </li>
             )}
-            <li className={styles.subMenuItem}>
-              <a
-                className={styles.menuItem}
-                // onClick={function_for_inserting_data()}
-              >
-                Add eRSD value sets (Advanced)
-              </a>
-            </li>
             <li className={styles.subMenuItem}>
               <a className={styles.menuItem} href={backLink}>
                 Log out
