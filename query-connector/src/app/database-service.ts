@@ -128,7 +128,6 @@ export async function getERSD(
   eRSDVersion: number = 3
 ): Promise<ErsdOrVsacResponse> {
   const ERSD_API_KEY = process.env.ERSD_API_KEY;
-  console.log("ERSD_API_KEY: ", ERSD_API_KEY);
   const eRSDUrl = `https://ersd.aimsplatform.org/api/ersd/v${eRSDVersion}specification?format=json&api-key=${ERSD_API_KEY}`;
   const response = await fetch(eRSDUrl);
   if (response.status === 200) {
@@ -159,7 +158,6 @@ export async function getERSD(
 export async function getVSACValueSet(
   oid: string
 ): Promise<ErsdOrVsacResponse> {
-  console.log("UMLS_API_KEY: ", process.env.UMLS_API_KEY);
   const username: string = "apikey";
   const umlsKey: string = process.env.UMLS_API_KEY || "";
   const vsacUrl: string = `https://cts.nlm.nih.gov/fhir/ValueSet/${oid}`;
