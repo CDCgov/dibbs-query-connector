@@ -18,8 +18,8 @@ jobs:
       - name: Trigger Deployment Workflow in PHDI-Playground Repository
         run: |
           # Set the required variables
-          repo_owner="REPOSITORY OWNER" 
-          repo_name="REPOSITORY NAME"  
+          repo_owner="CDCgov" 
+          repo_name="phdi-playground"  
           event_type="trigger-workflow" 
           service="${{ github.event.inputs.target_service }}"
           version="${{ github.event.inputs.target_version }}"
