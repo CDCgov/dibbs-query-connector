@@ -150,7 +150,7 @@ export default function HeaderComponent() {
                 className={styles.menuItem}
                 // onClick={function_for_inserting_data()}
               >
-                Add eRSD value sets (advanced)
+                Add eRSD value sets (Advanced)
               </a>
             </li>
             <li className={styles.subMenuItem}>
