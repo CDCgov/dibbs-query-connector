@@ -1,5 +1,5 @@
 "use client";
-import styles from "./query.module.scss";
+import styles from "./queryBuilding.module.scss";
 import EmptyQueriesDisplay from "./emptyState/EmptyQueriesDisplay";
 /**
  * Component for Query Building Flow

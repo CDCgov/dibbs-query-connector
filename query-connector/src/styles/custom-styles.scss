@@ -53,7 +53,7 @@ h1 {
   margin-bottom: 0 !important;
 }
 
-.margin-x-0-important {
+.margin-y-0-important {
   margin-top: 0 !important;
   margin-bottom: 0 !important;
 }
@@ -84,6 +84,10 @@ h1 {
 
 .font-weight-normal-important {
   font-weight: 400 !important;
+}
+
+.bg-gray-5 {
+  background-color: $gray-cool-5;
 }
 
 .maxw7 {
@@ -434,4 +438,8 @@ ul.usa-sidenav
 
 .customize-accordion .usa-accordion__content {
   padding: 0rem;
+}
+
+#conditionTemplateSearch > div[data-testid="searchField"] {
+  flex: 1;
 }

@@ -17,6 +17,10 @@ import {
   CustomUserQuery,
 } from "./query-building";
 import { UUID } from "crypto";
+import {
+  CategoryToConditionArrayMap,
+  ConditionIdToNameMap,
+} from "./queryBuilding/utils";
 
 const getQuerybyNameSQL = `
 select q.query_name, q.id, qtv.valueset_id, vs.name as valueset_name, vs.oid as valueset_external_id, vs.version, vs.author as author, vs.type, vs.dibbs_concept_type as dibbs_concept_type, qic.concept_id, qic.include, c.code, c.code_system, c.display 
@@ -580,7 +584,7 @@ export async function getConditionsData() {
   const rows = result.rows;
 
   // 1. Grouped by category with id:name pairs
-  const conditionCatergories = rows.reduce(
+  const categoryToConditionArrayMap: CategoryToConditionArrayMap = rows.reduce(
     (acc, row) => {
       const { category, id, name } = row;
       if (!acc[category]) {
@@ -589,19 +593,18 @@ export async function getConditionsData() {
       acc[category].push({ [id]: name });
       return acc;
     },
-    {} as Record<string, Array<Record<string, string>>>,
+    {} as CategoryToConditionArrayMap,
   );
 
   // 2. ID-Name mapping
-  const conditionLookup = rows.reduce(
-    (acc, row) => {
-      acc[row.id] = row.name;
-      return acc;
-    },
-    {} as Record<string, string>,
-  );
-
-  return { conditionCatergories, conditionLookup };
+  const conditionIdToNameMap: ConditionIdToNameMap = rows.reduce((acc, row) => {
+    acc[row.id] = row.name;
+    return acc;
+  }, {} as ConditionIdToNameMap);
+  return {
+    categoryToConditionArrayMap,
+    conditionIdToNameMap,
+  } as const;
 }
 
 /**
