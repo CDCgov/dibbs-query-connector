@@ -175,7 +175,7 @@ async function fetchBatchValueSetsFromVsac(oidData: OidData, batchSize = 100) {
  * Overall orchestration function that performs the scripted process of querying
  * the eRSD, extracting OIDs, then inserting valuesets into the DB.
  */
-async function createDibbsDB() {
+export async function createDibbsDB() {
   const ersdOidData = await getOidsFromErsd();
   if (ersdOidData) {
     await fetchBatchValueSetsFromVsac(ersdOidData);
