@@ -1,5 +1,5 @@
 import { Button, Icon } from "@trussworks/react-uswds";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import styles from "../queryBuilding.module.scss";
 import { useRouter } from "next/navigation";
 import classNames from "classnames";
@@ -20,7 +20,7 @@ export const EmptyQueriesDisplay: React.FC = () => {
     console.log("Creating DB...");
 
     await new Promise((r) => setTimeout(r, 5000)); //remove once DB creation is implemented
-    await createDibbsDB();
+    // await createDibbsDB();
 
     // Stop loading and redirect once function is complete
     setLoading(false);
