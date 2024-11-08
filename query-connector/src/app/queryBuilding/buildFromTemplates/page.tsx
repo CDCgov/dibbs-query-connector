@@ -83,7 +83,7 @@ export default function QueryTemplateSelection() {
             styles.queryTemplateContainer,
           )}
         >
-          <div className="display-flex flex-justify flex-align-center margin-bottom-3 width-full">
+          <div className="display-flex flex-justify flex-align-end margin-bottom-3 width-full">
             <h2 className="margin-y-0-important">Select condition(s)</h2>
             <Button
               className="margin-0"

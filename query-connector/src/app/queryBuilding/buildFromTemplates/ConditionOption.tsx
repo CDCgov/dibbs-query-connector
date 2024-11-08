@@ -1,6 +1,6 @@
 import Checkbox from "../../query/designSystem/checkbox/Checkbox";
 import { formatDiseaseDisplay } from "../utils";
-
+import styles from "./buildfromTemplate.module.scss";
 type ConditionOptionProps = {
   conditionId: string;
   conditionName: string;
@@ -22,7 +22,7 @@ const ConditionOption: React.FC<ConditionOptionProps> = ({
   handleConditionSelection,
 }) => {
   return (
-    <div className="margin-y-4">
+    <div className={styles.categoryOption}>
       <Checkbox
         onClick={() => {
           handleConditionSelection(conditionId);

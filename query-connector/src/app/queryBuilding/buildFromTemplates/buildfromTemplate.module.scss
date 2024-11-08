@@ -27,10 +27,7 @@
   font-weight: 700;
   font-size: 1rem;
   margin-bottom: 1rem;
-}
-
-.categoryHeading:not(first-of-type) {
-  margin-top: 0rem;
+  margin-top: 0;
 }
 
 .displayCol:first-of-type {
@@ -39,4 +36,10 @@
 
 .displayCol:nth-of-type(2) {
   padding-left: 2rem;
+}
+.categoryOption {
+  margin: 2rem 0;
+}
+.categoryOption:last-of-type {
+  margin-bottom: 3rem;
 }
