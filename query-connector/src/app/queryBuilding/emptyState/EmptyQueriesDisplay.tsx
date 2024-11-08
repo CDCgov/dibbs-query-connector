@@ -4,7 +4,6 @@ import styles from "../queryBuilding.module.scss";
 import { useRouter } from "next/navigation";
 import classNames from "classnames";
 import WorkSpaceSetUpView from "../loadingState/WorkspaceSetUp";
-import { createDibbsDB } from "../../../db-creation";
 /**
  * Empty-state component for query building
  * @returns the EmptyQueriesDisplay to render the empty state status
@@ -41,7 +40,7 @@ export const EmptyQueriesDisplay: React.FC = () => {
           "display-flex",
           "flex-align-center",
           "flex-justify-center",
-          styles.emptyStateQueryContainer
+          styles.emptyStateQueryContainer,
         )}
       >
         <div className="display-flex flex-column flex-align-center">
