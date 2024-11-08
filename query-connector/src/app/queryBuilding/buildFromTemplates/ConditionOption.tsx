@@ -22,7 +22,7 @@ const ConditionOption: React.FC<ConditionOptionProps> = ({
   handleConditionSelection,
 }) => {
   return (
-    <div className="margin-y-2">
+    <div className="margin-y-4">
       <Checkbox
         onClick={() => {
           handleConditionSelection(conditionId);

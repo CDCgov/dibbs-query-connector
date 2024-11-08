@@ -61,11 +61,11 @@ export default function QueryTemplateSelection() {
           onClick={() => {
             router.push("/queryBuilding");
           }}
-          label={"Back to My Queries"}
+          label={"Back to My queries"}
         />
         <h1 className={styles.queryTitle}>Custom query</h1>
         <Label htmlFor="queryNameInput" className="margin-top-0-important">
-          Query Name
+          Query name
         </Label>
         <TextInput
           id="queryNameInput"
@@ -83,13 +83,8 @@ export default function QueryTemplateSelection() {
             styles.queryTemplateContainer,
           )}
         >
-          <div
-            className={classNames(
-              styles.querySelectionFormHeader,
-              "display-flex flex-justify flex-align-center margin-bottom-3 ",
-            )}
-          >
-            <h2 className="">Select condition(s)</h2>
+          <div className="display-flex flex-justify flex-align-center margin-bottom-3 width-full">
+            <h2 className="margin-y-0-important">Select condition(s)</h2>
             <Button
               className="margin-0"
               type={"button"}
