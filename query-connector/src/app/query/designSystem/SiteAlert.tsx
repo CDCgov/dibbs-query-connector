@@ -29,7 +29,7 @@ const piiDisclaimer = (
 );
 
 type SiteAlertProps = {
-  page: Mode;
+  page?: Mode;
 };
 
 const PageModeToSiteAlertMap: { [page in Mode]?: React.ReactNode } = {
@@ -49,7 +49,7 @@ const PageModeToSiteAlertMap: { [page in Mode]?: React.ReactNode } = {
 const SiteAlert: React.FC<SiteAlertProps> = ({ page }) => {
   return (
     <Alert type="info" headingLevel="h4" slim className="custom-alert">
-      {PageModeToSiteAlertMap[page]}{" "}
+      {page ? PageModeToSiteAlertMap[page] : piiDisclaimer}
     </Alert>
   );
 };

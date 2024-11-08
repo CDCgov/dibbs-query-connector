@@ -13,6 +13,7 @@ import {
 } from "../utils";
 import ConditionColumnDisplay from "./ConditionColumnDisplay";
 import SearchField from "@/app/query/designSystem/searchField/SearchField";
+import SiteAlert from "@/app/query/designSystem/SiteAlert";
 
 /**
  * The query building page
@@ -53,70 +54,73 @@ export default function QueryTemplateSelection() {
       .some(Boolean);
 
   return (
-    <div className="main-container__wide">
-      <Backlink
-        onClick={() => {
-          router.push("/queryBuilding");
-        }}
-        label={"Back to My Queries"}
-      />
-      <h1 className={styles.queryTitle}>Custom query</h1>
-      <Label htmlFor="queryNameInput" className="margin-top-0-important">
-        Query Name
-      </Label>
-      <TextInput
-        id="queryNameInput"
-        name="queryNameInput"
-        type="text"
-        className="maxw-mobile"
-        onChange={(event) => {
-          setQueryName(event.target.value);
-        }}
-      />
+    <>
+      <SiteAlert />
+      <div className="main-container__wide">
+        <Backlink
+          onClick={() => {
+            router.push("/queryBuilding");
+          }}
+          label={"Back to My Queries"}
+        />
+        <h1 className={styles.queryTitle}>Custom query</h1>
+        <Label htmlFor="queryNameInput" className="margin-top-0-important">
+          Query Name
+        </Label>
+        <TextInput
+          id="queryNameInput"
+          name="queryNameInput"
+          type="text"
+          className="maxw-mobile"
+          onChange={(event) => {
+            setQueryName(event.target.value);
+          }}
+        />
 
-      <div
-        className={classNames(
-          "bg-gray-5 margin-top-4 ",
-          styles.queryTemplateContainer,
-        )}
-      >
         <div
           className={classNames(
-            styles.querySelectionFormHeader,
-            "display-flex flex-justify flex-align-center margin-bottom-3 ",
+            "bg-gray-5 margin-top-4 ",
+            styles.queryTemplateContainer,
           )}
         >
-          <h2 className="">Select condition(s)</h2>
-          <Button
-            className="margin-0"
-            type={"button"}
-            disabled={!noTemplateSelected}
-          >
-            Create query
-          </Button>
-        </div>
-        <div className={classNames(styles.querySelectionForm, "radius-lg")}>
-          <SearchField
-            id="conditionTemplateSearch"
-            placeholder="Search conditions"
+          <div
             className={classNames(
-              "maxw-mobile margin-x-auto margin-top-0 margin-bottom-4",
+              styles.querySelectionFormHeader,
+              "display-flex flex-justify flex-align-center margin-bottom-3 ",
             )}
-            onChange={(e) => {
-              e.preventDefault();
-              setSearchFilter(e.target.value);
-            }}
-          />
-
-          {fetchedConditions && (
-            <ConditionColumnDisplay
-              fetchedConditions={fetchedConditions}
-              searchFilter={searchFilter}
-              setFetchedConditions={setFetchedConditions}
+          >
+            <h2 className="">Select condition(s)</h2>
+            <Button
+              className="margin-0"
+              type={"button"}
+              disabled={!noTemplateSelected}
+            >
+              Create query
+            </Button>
+          </div>
+          <div className={classNames(styles.querySelectionForm, "radius-lg")}>
+            <SearchField
+              id="conditionTemplateSearch"
+              placeholder="Search conditions"
+              className={classNames(
+                "maxw-mobile margin-x-auto margin-top-0 margin-bottom-4",
+              )}
+              onChange={(e) => {
+                e.preventDefault();
+                setSearchFilter(e.target.value);
+              }}
             />
-          )}
+
+            {fetchedConditions && (
+              <ConditionColumnDisplay
+                fetchedConditions={fetchedConditions}
+                searchFilter={searchFilter}
+                setFetchedConditions={setFetchedConditions}
+              />
+            )}
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
