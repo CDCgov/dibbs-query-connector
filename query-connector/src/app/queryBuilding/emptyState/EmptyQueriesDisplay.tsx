@@ -18,7 +18,7 @@ export const EmptyQueriesDisplay: React.FC = () => {
           "display-flex",
           "flex-align-center",
           "flex-justify-center",
-          styles.emptyStateQueryContainer,
+          styles.emptyStateQueryContainer
         )}
       >
         <div className="display-flex flex-column flex-align-center">
@@ -36,13 +36,6 @@ export const EmptyQueriesDisplay: React.FC = () => {
               type={"button"}
             >
               Create Query
-            </Button>
-            <Button
-              className={styles.createQueryButton}
-              type={"button"}
-              // onClick={async () => function_for_inserting_data()}
-            >
-              Add eRSD Data
             </Button>
           </div>
         </div>
