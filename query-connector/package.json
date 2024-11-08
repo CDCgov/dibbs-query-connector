@@ -1,5 +1,5 @@
 {
-  "name": "tefca-viewer",
+  "name": "query-connector",
   "description": "The DIBBs TryTEFCA Viewer is a FHIR client for public health specific queries.",
   "version": "1.0.1",
   "private": true,

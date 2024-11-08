@@ -11,7 +11,7 @@ export default function FooterComponent() {
     <footer className={classNames("usa-footer", styles.footerContainer)}>
       <div className={styles.cdcLogoContainer}>
         <Image
-          src="/tefca-viewer/CDC_logo.png"
+          src="/query-connector/CDC_logo.png"
           alt="CDC logo"
           width={62}
           height={36}

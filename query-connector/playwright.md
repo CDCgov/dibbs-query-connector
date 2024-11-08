@@ -10,7 +10,7 @@ By default, Playwright will look for end to end tests in `/e2e`.
 
 ## Testing Commands and Demos
 
-Playwright provides a number of different ways of executing end to end tests. From the `tefca-viewer/` directory, you can run several commands:
+Playwright provides a number of different ways of executing end to end tests. From the `query-connector/` directory, you can run several commands:
 
 `npx playwright test`
 Runs the end-to-end tests.
@@ -41,4 +41,4 @@ A suite of end to end tests for a sample application called "Todo App" can be fo
 
 ## Github Integration
 
-Playwright is managed by an end-to-end job in the `.github/workflows/container-tefca-viewer.yaml` file of the project root. Since it requires browser installation to effectively test, and since it operates using an independent framework from jest, it is explicitly _not_ included in the basic `npm test` scripts (specified in `package.json`).
+Playwright is managed by an end-to-end job in the `.github/workflows/container-query-connector.yaml` file of the project root. Since it requires browser installation to effectively test, and since it operates using an independent framework from jest, it is explicitly _not_ included in the basic `npm test` scripts (specified in `package.json`).

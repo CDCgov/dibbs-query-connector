@@ -11,12 +11,12 @@ export function middleware(request) {
 
   // Redirect only if the path is exactly '/' or empty
   if (url.pathname === "/" || url.pathname === "") {
-    url.pathname = "/tefca-viewer";
+    url.pathname = "/query-connector";
     return NextResponse.redirect(url);
   }
 
-  // Prevent any further redirects if the path already includes '/tefca-viewer'
-  if (url.pathname === "/tefca-viewer") {
+  // Prevent any further redirects if the path already includes '/query-connector'
+  if (url.pathname === "/query-connector") {
     return NextResponse.next();
   }
 

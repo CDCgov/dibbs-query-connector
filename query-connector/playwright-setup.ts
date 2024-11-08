@@ -1,5 +1,5 @@
 export const TEST_URL =
-  process.env.TEST_ENV ?? "http://localhost:3000/tefca-viewer";
+  process.env.TEST_ENV ?? "http://localhost:3000/query-connector";
 /**
  *
  */
@@ -22,7 +22,9 @@ async function globalSetup() {
       }
     } catch (error) {
       console.log(
-        `Fetch failed for ${TEST_URL}: ${(error as Error).message}. Retrying...`,
+        `Fetch failed for ${TEST_URL}: ${
+          (error as Error).message
+        }. Retrying...`,
       );
       await new Promise((resolve) => setTimeout(resolve, delay));
     }
