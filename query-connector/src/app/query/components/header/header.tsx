@@ -49,7 +49,7 @@ export default function HeaderComponent() {
     setShowMenu(!showMenu);
   };
   const isProduction = process.env.NODE_ENV === "production";
-  const backLink = isProduction ? "/tefca-viewer" : "/";
+  const backLink = isProduction ? "/query-connector" : "/";
 
   return (
     <>
