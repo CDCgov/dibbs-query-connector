@@ -14,6 +14,7 @@ import {
   QueryInput,
   generateQueryInsertionSql,
   generateQueryToValueSetInsertionSql,
+  CustomUserQuery,
 } from "./query-building";
 import { UUID } from "crypto";
 
@@ -601,4 +602,64 @@ export async function getConditionsData() {
   );
 
   return { conditionCatergories, conditionLookup };
+}
+
+/**
+ * Fetches and structures custom user queries from the database.
+ * Executes a SQL query to join query information with related valueset and concept data,
+ * and then structures the result into a nested JSON format. The JSON format groups
+ * valuesets and their nested concepts under each query.
+ * @returns customUserQueriesArray - An array of objects where each object represents a query.
+ * Each query object includes:
+ * - query_id: The unique identifier for the query.
+ * - query_name: The name of the query.
+ * - valuesets: An array of CustomQueryValueSet objects, each containing:
+ *   - valueSetId: The unique identifier for the valueset.
+ *   - concepts: An array of CustomQueryConcept objects, each containing:
+ *     - code: The unique code for the concept.
+ *     - include: A boolean indicating whether the concept is included.
+ */
+export async function getCustomQueries(): Promise<CustomUserQuery[]> {
+  const query = `SELECT
+    q.id AS query_id,
+    q.query_name,
+    qtv.valueset_oid AS valueSetId,
+    qic.concept_id AS code,
+    qic.include 
+  FROM
+    query q
+  LEFT JOIN query_to_valueset qtv ON q.id = qtv.query_id 
+  LEFT JOIN query_included_concepts qic ON qic.query_by_valueset_id = qtv.id;`;
+
+  const results = await dbClient.query(query);
+  const formattedData: { [key: string]: CustomUserQuery } = {};
+
+  results.rows.forEach((row) => {
+    const { query_id, query_name, valueSetId, code, include } = row;
+
+    // Initialize query structure if it doesn't exist
+    if (!formattedData[query_id]) {
+      formattedData[query_id] = {
+        query_id,
+        query_name,
+        valuesets: [],
+      };
+    }
+
+    // Check if the valueSetId already exists in the valuesets array
+    let valueset = formattedData[query_id].valuesets.find(
+      (v) => v.valueSetId === valueSetId,
+    );
+
+    // If valueSetId doesn't exist, add it
+    if (!valueset) {
+      valueset = { valueSetId, concepts: [] };
+      formattedData[query_id].valuesets.push(valueset);
+    }
+
+    // Add concept data to the concepts array
+    valueset.concepts.push({ code, include });
+  });
+  const customUserQueriesArray = Object.values(formattedData);
+  return customUserQueriesArray;
 }
