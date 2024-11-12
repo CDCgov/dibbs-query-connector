@@ -632,7 +632,9 @@ export async function getCustomQueries(): Promise<CustomUserQuery[]> {
   FROM
     query q
   LEFT JOIN query_to_valueset qtv ON q.id = qtv.query_id 
-  LEFT JOIN query_included_concepts qic ON qic.query_by_valueset_id = qtv.id;`;
+  LEFT JOIN query_included_concepts qic ON qic.query_by_valueset_id = qtv.id
+  WHERE q.author = 'DIBBs';`;
+  //TODO: this will eventually need to take into account user permissions and specific authors
 
   const results = await dbClient.query(query);
   const formattedData: { [key: string]: CustomUserQuery } = {};
