@@ -19,7 +19,6 @@ export const EmptyQueriesDisplay: React.FC = () => {
     // DB Creation Function
     console.log("Creating DB...");
 
-    // await new Promise((r) => setTimeout(r, 5000)); //remove once DB creation is implemented
     await createDibbsDB();
 
     // Stop loading and redirect once function is complete
