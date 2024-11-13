@@ -1,3 +1,5 @@
+"use server";
+
 import { ersdToDibbsConceptMap, ErsdConceptType } from "@/app/constants";
 import { Bundle, BundleEntry, ValueSet } from "fhir/r4";
 import {

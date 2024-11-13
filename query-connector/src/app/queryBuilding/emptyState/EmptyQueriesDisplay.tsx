@@ -4,6 +4,7 @@ import styles from "../queryBuilding.module.scss";
 import { useRouter } from "next/navigation";
 import classNames from "classnames";
 import WorkSpaceSetUpView from "../loadingState/WorkspaceSetUp";
+import { createDibbsDB } from "@/db-creation";
 /**
  * Empty-state component for query building
  * @returns the EmptyQueriesDisplay to render the empty state status
@@ -18,14 +19,13 @@ export const EmptyQueriesDisplay: React.FC = () => {
     // DB Creation Function
     console.log("Creating DB...");
 
-    await new Promise((r) => setTimeout(r, 5000)); //remove once DB creation is implemented
-    // await createDibbsDB();
+    await createDibbsDB();
 
     // Stop loading and redirect once function is complete
     setLoading(false);
 
     // Redirect to query building page
-    // router.push("/queryBuilding/buildFromTemplates");
+    router.push("/queryBuilding/buildFromTemplates");
   };
 
   if (loading) {
