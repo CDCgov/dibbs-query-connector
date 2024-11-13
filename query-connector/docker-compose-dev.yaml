@@ -45,3 +45,20 @@ services:
     command: ["sh", "post_e2e_data_hapi.sh"]
     depends_on:
       - hapi-fhir-server
+
+  # Keycloak for authentication
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.0.2
+    ports:
+      - 8080:8080
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+    volumes:
+      - keycloak:/opt/keycloak/data/
+    restart: always
+    command:
+      - "start-dev"
+
+volumes:
+  keycloak:
