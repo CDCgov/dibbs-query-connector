@@ -1,5 +1,5 @@
 import { UUID, randomUUID } from "crypto";
-import { ValueSet } from "./constants";
+import { ValueSet, Concept } from "./constants";
 
 // TODO: Potentially merge this / infer this from the type created via the
 // database creation workstream
@@ -78,11 +78,11 @@ export interface CustomQueryConcept {
 
 export interface CustomQueryValueSet {
   valueSetId: string;
-  concepts: CustomQueryConcept[];
+  concepts: Concept[];
 }
 
 export interface CustomUserQuery {
   query_id: string;
   query_name: string;
-  valuesets: CustomQueryValueSet[];
+  valuesets: ValueSet[];
 }
