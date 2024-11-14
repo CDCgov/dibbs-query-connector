@@ -1,4 +1,4 @@
-FROM node:18-alpine AS base
+FROM node:20-alpine AS base
 
 FROM base AS installer
 
@@ -45,10 +45,10 @@ USER nextjs
 ENV HOSTNAME="0.0.0.0"
 
 # Copy necessary app files
-COPY --from=installer /app/next.config.js .
-COPY --from=installer /app/package.json .
-COPY --from=installer /app/flyway/conf/flyway.conf ../flyway/conf/flyway.conf
-COPY --from=installer /app/flyway/sql ../flyway/sql
+COPY --from=installer --chown=nextjs:nodejs /app/next.config.js .
+COPY --from=installer --chown=nextjs:nodejs /app/package.json .
+COPY --from=installer --chown=nextjs:nodejs /app/flyway/conf/flyway.conf ../flyway/conf/flyway.conf
+COPY --from=installer --chown=nextjs:nodejs /app/flyway/sql ../flyway/sql
 
 # Automatically leverage output traces to reduce image size
 COPY --from=installer --chown=nextjs:nodejs /app/.next/standalone ./
@@ -57,6 +57,7 @@ COPY --from=installer --chown=nextjs:nodejs /app/public ./public
 RUN ls -R
 # Set environment variables for Flyway and Node.js telemetry
 ENV NEXT_TELEMETRY_DISABLED=1
+
 
 # Set JAVA_HOME to the OpenJDK version installed by apk for Flyway
 ENV JAVA_HOME=/usr/lib/jvm/default-jvm
