@@ -29,9 +29,7 @@ const PatientSearchResultsTable: React.FC<PatientSeacrchResultsTableProps> = ({
   return (
     <>
       <h1 className="page-title">{PAGE_TITLES["patient-results"]}</h1>
-      <h2 className="page-explainer">
-        The following record(s) match your search.
-      </h2>
+      <h2 className="page-explainer">The following record(s) match.</h2>
       <Table className="margin-top-4">
         <thead>
           <tr>
