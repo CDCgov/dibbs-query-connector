@@ -27,7 +27,7 @@ type ConditionColumnDisplayProps = {
  * @param root0.fetchedConditions - conditions queried from backend to display
  * @param root0.searchFilter - filter grabbed from search field to filter fetched
  * components against
- * @param root0.selectedConditions - conditions the user has marked to included in
+ * @param root0.selectedConditions - conditions the user has marked as included in
  * their query
  * @param root0.setFetchedConditions - state function that updates the include /
  * exclude of the queryset
