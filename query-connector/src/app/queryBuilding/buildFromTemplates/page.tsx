@@ -4,7 +4,7 @@ import Backlink from "@/app/query/components/backLink/Backlink";
 import styles from "./buildfromTemplate.module.scss";
 import { useRouter } from "next/navigation";
 import { Button, Label, TextInput } from "@trussworks/react-uswds";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import classNames from "classnames";
 import { getConditionsData } from "@/app/database-service";
 import {
@@ -21,13 +21,19 @@ import SiteAlert from "@/app/query/designSystem/SiteAlert";
  */
 export default function QueryTemplateSelection() {
   const router = useRouter();
-  const [queryName, setQueryName] = useState<string>();
+  const focusRef = useRef<HTMLInputElement | null>(null)
+
+  const [queryName, setQueryName] = useState<string>("");
   const [searchFilter, setSearchFilter] = useState<string>();
   const [fetchedConditions, setFetchedConditions] =
     useState<CategoryNameToConditionOptionMap>();
 
   useEffect(() => {
     let isSubscribed = true;
+
+    if (queryName == "" || queryName == undefined)  {
+      focusRef?.current?.focus()
+    }
 
     async function fetchConditionsAndUpdateState() {
       const { categoryToConditionArrayMap } = await getConditionsData();
@@ -46,7 +52,7 @@ export default function QueryTemplateSelection() {
     };
   }, []);
 
-  const noTemplateSelected =
+  const atLeastOneItemSelected =
     fetchedConditions &&
     Object.values(Object.values(fetchedConditions))
       .map((arr) => Object.values(arr).flatMap((e) => e.include))
@@ -65,13 +71,15 @@ export default function QueryTemplateSelection() {
         />
         <h1 className={styles.queryTitle}>Custom query</h1>
         <Label htmlFor="queryNameInput" className="margin-top-0-important">
-          Query name
+          Query name <span style={{color: "#919191"}}>(required)</span>
         </Label>
         <TextInput
+          inputRef={focusRef}
           id="queryNameInput"
           name="queryNameInput"
           type="text"
           className="maxw-mobile"
+          required
           onChange={(event) => {
             setQueryName(event.target.value);
           }}
@@ -88,7 +96,7 @@ export default function QueryTemplateSelection() {
             <Button
               className="margin-0"
               type={"button"}
-              disabled={!noTemplateSelected}
+              disabled={!atLeastOneItemSelected || !queryName}
             >
               Create query
             </Button>
