@@ -667,4 +667,23 @@ export async function getCustomQueries(): Promise<CustomUserQuery[]> {
   });
   const customUserQueriesArray = Object.values(formattedData);
   return customUserQueriesArray;
+
+ /*
+ * Checks the database to see if data has been loaded into the valuesets table by
+ * estmating the number of rows in the table. If the estimated count is greater than
+ * 0, the function returns true, otherwise false.
+ * @returns A boolean indicating whether the valuesets table has data.
+ */
+export async function checkDBForData() {
+  const query = `
+    SELECT reltuples AS estimated_count
+    FROM pg_class
+    WHERE relname = 'valuesets';
+  `;
+  const result = await dbClient.query(query);
+
+  // Return true if the estimated count > 0, otherwise false
+  return (
+    result.rows.length > 0 && parseFloat(result.rows[0].estimated_count) > 0
+  );
 }
