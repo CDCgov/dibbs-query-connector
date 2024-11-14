@@ -30,11 +30,11 @@ test.describe("alternate queries with the Query Connector", () => {
     await page.getByRole("button", { name: "Search for patient" }).click();
     await expect(page.getByText("Loading")).toHaveCount(0, { timeout: 10000 });
     await expect(
-      page.getByRole("heading", { name: PAGE_TITLES["patient-results"] })
+      page.getByRole("heading", { name: PAGE_TITLES["patient-results"] }),
     ).toBeVisible();
     await page.getByRole("link", { name: "Select patient" }).click();
     await expect(
-      page.getByRole("heading", { name: PAGE_TITLES["select-query"] })
+      page.getByRole("heading", { name: PAGE_TITLES["select-query"] }),
     ).toBeVisible();
     await page.getByTestId("Select").selectOption("chlamydia");
     await page.getByRole("button", { name: "Submit" }).click();
@@ -63,7 +63,7 @@ test.describe("alternate queries with the Query Connector", () => {
 
     await page.getByRole("link", { name: "Select patient" }).click();
     await expect(
-      page.getByRole("heading", { name: "Select a query" })
+      page.getByRole("heading", { name: "Select a query" }),
     ).toBeVisible();
     // await page.getByTestId("Select").selectOption("social-determinants");
     await page.getByTestId("Select").selectOption("cancer");
@@ -71,7 +71,7 @@ test.describe("alternate queries with the Query Connector", () => {
     await expect(page.getByText("Loading")).toHaveCount(0, { timeout: 10000 });
 
     await expect(
-      page.getByRole("heading", { name: "Patient Record" })
+      page.getByRole("heading", { name: "Patient Record" }),
     ).toBeVisible();
   });
 
@@ -94,7 +94,7 @@ test.describe("alternate queries with the Query Connector", () => {
     await expect(page.getByText("Loading")).toHaveCount(0, { timeout: 10000 });
 
     await expect(
-      page.getByRole("heading", { name: "Patient Record" })
+      page.getByRole("heading", { name: "Patient Record" }),
     ).toBeVisible();
   });
 });

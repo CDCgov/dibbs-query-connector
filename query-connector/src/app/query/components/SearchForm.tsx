@@ -23,7 +23,7 @@ interface SearchFormProps {
   useCase: USE_CASES;
   setUseCase: (useCase: USE_CASES) => void;
   setPatientDiscoveryQueryResponse: (
-    UseCaseQueryResponse: UseCaseQueryResponse
+    UseCaseQueryResponse: UseCaseQueryResponse,
   ) => void;
   setMode: (mode: Mode) => void;
   setLoading: (loading: boolean) => void;
@@ -76,7 +76,7 @@ const SearchForm: React.FC<SearchFormProps> = ({
         setAutofilled(highlightAutofilled);
       }
     },
-    [setUseCase]
+    [setUseCase],
   );
 
   const nameRegex = "^[A-Za-z\u00C0-\u024F\u1E00-\u1EFF\\-'. ]+$";
