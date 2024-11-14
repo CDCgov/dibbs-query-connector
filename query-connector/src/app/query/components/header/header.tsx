@@ -57,7 +57,7 @@ export default function HeaderComponent() {
         <div
           className={classNames(
             "usa-nav-container",
-            styles.headerContentContainer,
+            styles.headerContentContainer
           )}
         >
           <div className={classNames("display-flex", "flex-align-center")}>
@@ -77,16 +77,10 @@ export default function HeaderComponent() {
             className={classNames(
               "margin-left-auto",
               "display-flex",
-              "flex-align-center",
+              "flex-align-center"
             )}
           >
-            {path != "/signin" && isClient && (
-              <ModalButton
-                modalRef={modalRef}
-                title={"Data Usage Policy"}
-                className={styles.dataUsagePolicyButton}
-              />
-            )}
+            {path != "/signin" && isClient}
             {/* TODO: Rework show/hide rules based on actual auth status */}
             {path != "/signin" && !LOGGED_IN_PATHS.includes(path) && (
               <Button
@@ -106,7 +100,7 @@ export default function HeaderComponent() {
                   styles.menuButton,
                   "usa-accordion__button",
                   "usa-nav__link",
-                  "usa-current",
+                  "usa-current"
                 )}
                 aria-expanded="false"
                 aria-controls="dropdown-menu"
