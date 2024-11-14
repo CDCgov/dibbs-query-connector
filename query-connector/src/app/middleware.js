@@ -23,4 +23,4 @@ export function middleware(request) {
   return NextResponse.next();
 }
 
-export { auth as middleware } from "@/auth"
+export { auth as middleware } from "@/auth";

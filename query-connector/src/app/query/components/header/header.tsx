@@ -7,7 +7,7 @@ import { Button, Icon, ModalRef } from "@trussworks/react-uswds";
 import styles from "./header.module.scss";
 import { metadata } from "@/app/constants";
 import classNames from "classnames";
-import { signIn, useSession } from "next-auth/react"
+import { signIn, useSession } from "next-auth/react";
 /**
  * Produces the header.
  * @returns The HeaderComponent component.
@@ -42,11 +42,11 @@ export default function HeaderComponent() {
   const router = useRouter();
   const path = usePathname();
 
-  const { data: session } = useSession()
-  const isLoggedIn = session?.user != null
+  const { data: session } = useSession();
+  const isLoggedIn = session?.user != null;
 
   const handleSignIn = () => {
-    signIn("keycloak", { redirectTo: "/query" })
+    signIn("keycloak", { redirectTo: "/query" });
   };
 
   const toggleMenuDropdown = () => {
