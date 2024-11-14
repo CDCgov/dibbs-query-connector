@@ -24,11 +24,12 @@ type ConditionColumnDisplayProps = {
  * @param root0.fetchedConditions - conditions queried from backend to display
  * @param root0.searchFilter - filter grabbed from search field to filter fetched
  * components against
- * @param root0.selectedConditions - conditions queried from backend to display
+ * @param root0.selectedConditions - conditions the user has marked to included in 
+ * their query
  * @param root0.setFetchedConditions - state function that updates the include /
  * exclude of the queryset
- * @param root0.setSelectedConditions - state function that updates the include /
- * exclude of the queryset
+ * @param root0.setSelectedConditions - state function that updates the subset of
+ * fetched conditions to be included in the query
  * @returns Conditions split out into two columns that will filter themselves
  * at both the category and condition levels if a valid search filter is applied.
  */

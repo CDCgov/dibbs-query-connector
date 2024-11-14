@@ -57,6 +57,8 @@ export default function QueryTemplateSelection() {
   const submitForm = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault()
 
+    // TODO: do something with selectedConditions on next step/page
+    // will be addressed in https://linear.app/skylight-cdc/issue/QUE-65/create-the-valueset-selection-page
     console.log(selectedConditions)
   }
 
