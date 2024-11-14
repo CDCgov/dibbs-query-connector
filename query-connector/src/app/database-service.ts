@@ -667,8 +667,9 @@ export async function getCustomQueries(): Promise<CustomUserQuery[]> {
   });
   const customUserQueriesArray = Object.values(formattedData);
   return customUserQueriesArray;
+}
 
- /*
+/**
  * Checks the database to see if data has been loaded into the valuesets table by
  * estmating the number of rows in the table. If the estimated count is greater than
  * 0, the function returns true, otherwise false.
