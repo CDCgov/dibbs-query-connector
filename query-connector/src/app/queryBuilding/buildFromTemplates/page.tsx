@@ -28,7 +28,7 @@ export default function QueryTemplateSelection() {
   const [fetchedConditions, setFetchedConditions] =
     useState<CategoryNameToConditionOptionMap>();
   const [selectedConditions, setSelectedConditions] = 
-    useState<CategoryNameToConditionOptionMap>({})
+    useState<CategoryNameToConditionOptionMap>()
 
   useEffect(() => {
     let isSubscribed = true;
@@ -56,26 +56,8 @@ export default function QueryTemplateSelection() {
 
   const submitForm = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault()
-    if (fetchedConditions) {
-      for (const [categoryName, categoryValues] of Object.entries(fetchedConditions)) {
-        const includedConditions = Object.fromEntries(Object.entries(categoryValues).filter(
-          ([_conditionId, conditionNameAndInclude]) =>  !!conditionNameAndInclude.include))
 
-        const hasIncludedConditions = Object.keys(includedConditions).length > 0
-
-        if (hasIncludedConditions) {
-          console.log(hasIncludedConditions, categoryName, includedConditions)
-          let selectedConditionsByCategory: CategoryNameToConditionOptionMap = {}
-          selectedConditionsByCategory[categoryName] = includedConditions 
-
-          setSelectedConditions(prevState => {
-            return {...prevState, ...selectedConditionsByCategory}
-          });
-        }
-      } 
-      return selectedConditions
-    }    
-    // send to db/next page eventually...
+    console.log(selectedConditions)
   }
 
   const atLeastOneItemSelected =
@@ -143,6 +125,8 @@ export default function QueryTemplateSelection() {
 
             {fetchedConditions && (
               <ConditionColumnDisplay
+                selectedConditions={selectedConditions ?? {}}
+                setSelectedConditions={setSelectedConditions}
                 fetchedConditions={fetchedConditions}
                 searchFilter={searchFilter}
                 setFetchedConditions={setFetchedConditions}
