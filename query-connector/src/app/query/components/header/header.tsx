@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Modal, ModalButton } from "../../designSystem/Modal";
 import { useRouter, usePathname } from "next/navigation";
 import { Button, Icon, ModalRef } from "@trussworks/react-uswds";
 import styles from "./header.module.scss";
@@ -12,7 +11,6 @@ import classNames from "classnames";
  * @returns The HeaderComponent component.
  */
 export default function HeaderComponent() {
-  const modalRef = useRef<ModalRef>(null);
   const menuRef = useRef<HTMLDivElement>(null);
 
   const [showMenu, setShowMenu] = useState(false);
