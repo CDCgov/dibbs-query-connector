@@ -23,7 +23,7 @@ interface SearchFormProps {
   useCase: USE_CASES;
   setUseCase: (useCase: USE_CASES) => void;
   setPatientDiscoveryQueryResponse: (
-    UseCaseQueryResponse: UseCaseQueryResponse,
+    UseCaseQueryResponse: UseCaseQueryResponse
   ) => void;
   setMode: (mode: Mode) => void;
   setLoading: (loading: boolean) => void;
@@ -76,7 +76,7 @@ const SearchForm: React.FC<SearchFormProps> = ({
         setAutofilled(highlightAutofilled);
       }
     },
-    [setUseCase],
+    [setUseCase]
   );
 
   const nameRegex = "^[A-Za-z\u00C0-\u024F\u1E00-\u1EFF\\-'. ]+$";
@@ -161,7 +161,7 @@ const SearchForm: React.FC<SearchFormProps> = ({
                 htmlFor="fhir_server"
                 className="margin-top-0-important width-full"
               >
-                FHIR Server (QHIN)
+                Healthcare Organization (HCO)
               </Label>
               <div className="grid-col-6">
                 <div className="usa-combo-box">
@@ -191,7 +191,7 @@ const SearchForm: React.FC<SearchFormProps> = ({
             </h3>
             <div className="tablet:grid-col-6">
               <Label htmlFor="firstName" className="margin-top-0-important">
-                First Name
+                First name
               </Label>
               <TextInput
                 id="firstName"
@@ -211,7 +211,7 @@ const SearchForm: React.FC<SearchFormProps> = ({
             </div>
             <div className="tablet:grid-col-6">
               <Label htmlFor="lastName" className="margin-top-0-important">
-                Last Name
+                Last name
               </Label>
               <TextInput
                 id="lastName"
@@ -232,11 +232,11 @@ const SearchForm: React.FC<SearchFormProps> = ({
           </div>
           <div className="grid-row grid-gap margin-bottom-4">
             <h3 className={`"font-sans-md" ${styles.searchFormSectionLabel}`}>
-              Phone Number
+              Phone number
             </h3>
             <div className="grid-col-6">
               <Label htmlFor="phone" className="margin-top-0-important">
-                Phone Number
+                Phone number
               </Label>
               <TextInput
                 id="phone"
@@ -303,7 +303,7 @@ const SearchForm: React.FC<SearchFormProps> = ({
                 htmlFor="street_address_2"
                 className="margin-top-0-important"
               >
-                Address Line 2
+                Address line 2
               </Label>
               <TextInput
                 id="street_address_2"
@@ -336,7 +336,7 @@ const SearchForm: React.FC<SearchFormProps> = ({
             </div>
             <div className="tablet:grid-col-4">
               <Label htmlFor="zip" className="margin-top-0-important">
-                ZIP code
+                Zip code
               </Label>
               <TextInput
                 className="usa-input usa-input--medium"

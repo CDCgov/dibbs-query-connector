@@ -16,17 +16,17 @@ test.describe("querying with the Query Connector", () => {
     const alert = page.locator(".custom-alert");
     await expect(alert).toBeVisible();
     await expect(alert).toHaveText(
-      "This site is for demo purposes only. Please do not enter PII on this website.",
+      "This site is for demo purposes only. Please do not enter PII on this website."
     );
     await expect(
-      page.getByRole("heading", { name: PAGE_TITLES["search"], exact: true }),
+      page.getByRole("heading", { name: PAGE_TITLES["search"], exact: true })
     ).toBeVisible();
 
     await page.getByRole("button", { name: "Fill fields" }).click();
     // Select FHIR server from drop down
     await page.getByRole("button", { name: "Advanced" }).click();
     await page
-      .getByLabel("FHIR Server (QHIN)")
+      .getByLabel("Healthcare Organization (HCO)")
       .selectOption("Local e2e HAPI Server: Direct");
 
     await page.getByRole("button", { name: "Search for patient" }).click();
@@ -34,13 +34,13 @@ test.describe("querying with the Query Connector", () => {
 
     await page.getByRole("link", { name: "Select patient" }).click();
     await expect(
-      page.getByRole("heading", { name: "Select a query" }),
+      page.getByRole("heading", { name: "Select a query" })
     ).toBeVisible();
     await page.getByTestId("Select").selectOption("chlamydia");
 
     await page.getByRole("button", { name: "Customize Query" }).click();
     await expect(
-      page.getByRole("heading", { name: "Customize Query" }),
+      page.getByRole("heading", { name: "Customize Query" })
     ).toBeVisible();
   });
 
@@ -48,8 +48,8 @@ test.describe("querying with the Query Connector", () => {
     test.slow();
     await expect(
       page.getByText(
-        "249 labs found, 4 medications found, 104 conditions found.",
-      ),
+        "249 labs found, 4 medications found, 104 conditions found."
+      )
     ).toBeVisible();
     await page.getByRole("link", { name: "Medications" }).click();
     await page.getByRole("button", { name: "Chlamydia Medication" }).click();
@@ -67,7 +67,7 @@ test.describe("querying with the Query Connector", () => {
     await expect(page.getByText("2 of 4 selected")).toBeVisible();
     await page.getByRole("button", { name: "Apply changes" }).click();
     await expect(
-      page.getByRole("alert").getByText("Query Customization Successful!"),
+      page.getByRole("alert").getByText("Query Customization Successful!")
     ).toBeVisible();
 
     await page.getByRole("button", { name: "Submit" }).click();
@@ -76,35 +76,35 @@ test.describe("querying with the Query Connector", () => {
     // Make sure we have a results page with a single patient
     // Non-interactive 'div' elements in the table should be located by text
     await expect(
-      page.getByRole("heading", { name: "Patient Record" }),
+      page.getByRole("heading", { name: "Patient Record" })
     ).toBeVisible();
     await expect(page.getByText("Patient Name")).toBeVisible();
     await expect(page.getByText(TEST_PATIENT_NAME)).toBeVisible();
     await expect(page.getByText("Patient Identifiers")).toBeVisible();
     await expect(
-      page.getByText(`Medical Record Number: ${TEST_PATIENT.MRN}`),
+      page.getByText(`Medical Record Number: ${TEST_PATIENT.MRN}`)
     ).toBeVisible();
 
     // Should now just be a single lonely medication request
     // No azithromycin or ceftriaxone should be visible
     await expect(
-      page.getByRole("button", { name: "Medication Requests", expanded: true }),
+      page.getByRole("button", { name: "Medication Requests", expanded: true })
     ).toBeVisible();
     await expect(
-      page.getByRole("row").filter({ hasText: "doxycycline hyclate 100 MG" }),
+      page.getByRole("row").filter({ hasText: "doxycycline hyclate 100 MG" })
     ).toBeVisible();
     await expect(
-      page.getByRole("row").filter({ hasText: "azithromycin 1000 MG" }),
+      page.getByRole("row").filter({ hasText: "azithromycin 1000 MG" })
     ).not.toBeVisible();
     await expect(
-      page.getByRole("row").filter({ hasText: "ceftriaxone 500 MG Injection" }),
+      page.getByRole("row").filter({ hasText: "ceftriaxone 500 MG Injection" })
     ).not.toBeVisible();
     // Count will be 2: the lonely med and the title row
     await expect(
       page
         .getByRole("table")
         .filter({ hasText: "doxycycline hyclate 100 MG" })
-        .getByRole("row"),
+        .getByRole("row")
     ).toHaveCount(2);
   });
 
@@ -130,7 +130,7 @@ test.describe("querying with the Query Connector", () => {
 
     await page.getByRole("button", { name: "Apply changes" }).click();
     await expect(
-      page.getByRole("alert").getByText("Query Customization Successful!"),
+      page.getByRole("alert").getByText("Query Customization Successful!")
     ).toBeVisible();
 
     await page.getByRole("button", { name: "Submit" }).click();
@@ -139,34 +139,34 @@ test.describe("querying with the Query Connector", () => {
     // Make sure we have a results page with a single patient
     // Non-interactive 'div' elements in the table should be located by text
     await expect(
-      page.getByRole("heading", { name: "Patient Record" }),
+      page.getByRole("heading", { name: "Patient Record" })
     ).toBeVisible();
     await expect(page.getByText("Patient Name")).toBeVisible();
     await expect(page.getByText(TEST_PATIENT_NAME)).toBeVisible();
     await expect(page.getByText("Patient Identifiers")).toBeVisible();
     await expect(
-      page.getByText(`Medical Record Number: ${TEST_PATIENT.MRN}`),
+      page.getByText(`Medical Record Number: ${TEST_PATIENT.MRN}`)
     ).toBeVisible();
 
     // Should be no medication requests available
     await expect(
-      page.getByRole("button", { name: "Medication Requests" }),
+      page.getByRole("button", { name: "Medication Requests" })
     ).not.toBeVisible();
 
     // Eliminating all value set labs should also remove diagnostic reports
     await expect(
-      page.getByRole("button", { name: "Diagnostic Reports" }),
+      page.getByRole("button", { name: "Diagnostic Reports" })
     ).not.toBeVisible();
 
     // Observations table should have 5 rows, all of which are SDoH factors rather than lab results
     await expect(
-      page.getByRole("button", { name: "Observations", expanded: true }),
+      page.getByRole("button", { name: "Observations", expanded: true })
     ).toBeVisible();
     await expect(
       page
         .getByRole("table")
         .filter({ hasText: "I do not have housing" })
-        .getByRole("row"),
+        .getByRole("row")
     ).toHaveCount(6);
     const acceptableSdohKeywords = [
       "history",
@@ -182,8 +182,8 @@ test.describe("querying with the Query Connector", () => {
     for (let i = 1; i < 6; i++) {
       const row = obsRows.nth(i);
       const typeText = await row.locator("td").nth(1).textContent();
-      const presentKey = acceptableSdohKeywords.find((key) =>
-        typeText?.toLowerCase().includes(key),
+      const presentKey = acceptableSdohKeywords.find(
+        (key) => typeText?.toLowerCase().includes(key)
       );
       expect(presentKey).toBeDefined();
       expect(typeText?.includes("chlamydia")).toBeFalsy();
