@@ -16,7 +16,7 @@ type ConditionColumnDisplayProps = {
   >;
   setSelectedConditions: Dispatch<
     SetStateAction<CategoryNameToConditionOptionMap | undefined>
->;
+  >;
 };
 /**
  * Column display component for the query building page
@@ -24,7 +24,7 @@ type ConditionColumnDisplayProps = {
  * @param root0.fetchedConditions - conditions queried from backend to display
  * @param root0.searchFilter - filter grabbed from search field to filter fetched
  * components against
- * @param root0.selectedConditions - conditions the user has marked to included in 
+ * @param root0.selectedConditions - conditions the user has marked to included in
  * their query
  * @param root0.setFetchedConditions - state function that updates the include /
  * exclude of the queryset
@@ -66,34 +66,35 @@ export const ConditionColumnDisplay: React.FC<ConditionColumnDisplayProps> = ({
       name: prevValues.name,
       include: !prevValues.include,
     };
-    const shouldRemove = prevFetch[category][conditionId].include == false
-    updateSelectedConditions(shouldRemove, category, conditionId, prevFetch)
+    const shouldRemove = prevFetch[category][conditionId].include == false;
+    updateSelectedConditions(shouldRemove, category, conditionId, prevFetch);
     setFetchedConditions(prevFetch);
   }
 
   const updateSelectedConditions = (
-    shouldRemove:boolean, 
-    category:string, 
-    conditionId:string, 
-    prevFetch:CategoryNameToConditionOptionMap
+    shouldRemove: boolean,
+    category: string,
+    conditionId: string,
+    prevFetch: CategoryNameToConditionOptionMap,
   ) => {
     if (shouldRemove) {
-      delete selectedConditions[category][conditionId]
-     // if there are no more entries for a given category, remove the category
+      delete selectedConditions[category][conditionId];
+      // if there are no more entries for a given category, remove the category
       if (Object.values(selectedConditions[category]).length == 0) {
-        delete selectedConditions[category]
+        delete selectedConditions[category];
       }
-    } else {setSelectedConditions(prevState => {
-      return {   
+    } else {
+      setSelectedConditions((prevState) => {
+        return {
           ...prevState,
           [category]: {
             ...prevState?.[category],
-            [conditionId]: prevFetch[category]?.[conditionId]
-          }
-        }
-    })
-  }
-}
+            [conditionId]: prevFetch[category]?.[conditionId],
+          },
+        };
+      });
+    }
+  };
 
   const columnOneEntries = Object.entries(conditionsToDisplay).filter(
     (_, i) => i % 2 === 0,

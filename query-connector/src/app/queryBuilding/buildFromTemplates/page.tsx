@@ -21,20 +21,20 @@ import SiteAlert from "@/app/query/designSystem/SiteAlert";
  */
 export default function QueryTemplateSelection() {
   const router = useRouter();
-  const focusRef = useRef<HTMLInputElement | null>(null)
+  const focusRef = useRef<HTMLInputElement | null>(null);
 
   const [queryName, setQueryName] = useState<string>("");
   const [searchFilter, setSearchFilter] = useState<string>();
   const [fetchedConditions, setFetchedConditions] =
     useState<CategoryNameToConditionOptionMap>();
-  const [selectedConditions, setSelectedConditions] = 
-    useState<CategoryNameToConditionOptionMap>()
+  const [selectedConditions, setSelectedConditions] =
+    useState<CategoryNameToConditionOptionMap>();
 
   useEffect(() => {
     let isSubscribed = true;
 
-    if (queryName == "" || queryName == undefined)  {
-      focusRef?.current?.focus()
+    if (queryName == "" || queryName == undefined) {
+      focusRef?.current?.focus();
     }
 
     async function fetchConditionsAndUpdateState() {
@@ -55,12 +55,12 @@ export default function QueryTemplateSelection() {
   }, []);
 
   const submitForm = (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault()
+    event.preventDefault();
 
     // TODO: do something with selectedConditions on next step/page
     // will be addressed in https://linear.app/skylight-cdc/issue/QUE-65/create-the-valueset-selection-page
-    console.log(selectedConditions)
-  }
+    console.log(selectedConditions);
+  };
 
   const atLeastOneItemSelected =
     fetchedConditions &&
@@ -81,7 +81,7 @@ export default function QueryTemplateSelection() {
         />
         <h1 className={styles.queryTitle}>Custom query</h1>
         <Label htmlFor="queryNameInput" className="margin-top-0-important">
-          Query name <span style={{color: "#919191"}}>(required)</span>
+          Query name <span style={{ color: "#919191" }}>(required)</span>
         </Label>
         <TextInput
           inputRef={focusRef}

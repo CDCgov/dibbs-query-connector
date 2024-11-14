@@ -22,7 +22,7 @@ const ConditionOption: React.FC<ConditionOptionProps> = ({
   conditionId,
   conditionName,
   handleConditionSelection,
-  checked
+  checked,
 }) => {
   return (
     <div className={styles.categoryOption}>
