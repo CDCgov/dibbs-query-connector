@@ -92,6 +92,7 @@ export const ConditionColumnDisplay: React.FC<ConditionColumnDisplayProps> = ({
                       ([conditionId, conditionNameAndInclude]) => {
                         return (
                           <ConditionOption
+                            checked={conditionNameAndInclude.include}
                             key={conditionId}
                             conditionId={conditionId}
                             conditionName={conditionNameAndInclude.name}

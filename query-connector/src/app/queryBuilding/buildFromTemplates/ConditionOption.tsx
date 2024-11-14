@@ -5,6 +5,7 @@ type ConditionOptionProps = {
   conditionId: string;
   conditionName: string;
   handleConditionSelection: (conditionId: string) => void;
+  checked: boolean;
 };
 
 /**
@@ -14,12 +15,14 @@ type ConditionOptionProps = {
  * @param root0.conditionName - name of condition to display
  * @param root0.handleConditionSelection - listner function for checkbox
  * selection
+ * @param root0.checked - listner function for checkbox
  * @returns A component for display to redner on the query building page
  */
 const ConditionOption: React.FC<ConditionOptionProps> = ({
   conditionId,
   conditionName,
   handleConditionSelection,
+  checked
 }) => {
   return (
     <div className={styles.categoryOption}>
@@ -29,6 +32,7 @@ const ConditionOption: React.FC<ConditionOptionProps> = ({
         }}
         id={conditionId}
         label={formatDiseaseDisplay(conditionName)}
+        checked={checked}
       />
     </div>
   );

@@ -27,6 +27,8 @@ export default function QueryTemplateSelection() {
   const [searchFilter, setSearchFilter] = useState<string>();
   const [fetchedConditions, setFetchedConditions] =
     useState<CategoryNameToConditionOptionMap>();
+  const [selectedConditions, setSelectedConditions] = 
+    useState<CategoryNameToConditionOptionMap>({})
 
   useEffect(() => {
     let isSubscribed = true;
@@ -51,6 +53,30 @@ export default function QueryTemplateSelection() {
       isSubscribed = false;
     };
   }, []);
+
+  const submitForm = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault()
+    if (fetchedConditions) {
+      for (const [categoryName, categoryValues] of Object.entries(fetchedConditions)) {
+        const includedConditions = Object.fromEntries(Object.entries(categoryValues).filter(
+          ([_conditionId, conditionNameAndInclude]) =>  !!conditionNameAndInclude.include))
+
+        const hasIncludedConditions = Object.keys(includedConditions).length > 0
+
+        if (hasIncludedConditions) {
+          console.log(hasIncludedConditions, categoryName, includedConditions)
+          let selectedConditionsByCategory: CategoryNameToConditionOptionMap = {}
+          selectedConditionsByCategory[categoryName] = includedConditions 
+
+          setSelectedConditions(prevState => {
+            return {...prevState, ...selectedConditionsByCategory}
+          });
+        }
+      } 
+      return selectedConditions
+    }    
+    // send to db/next page eventually...
+  }
 
   const atLeastOneItemSelected =
     fetchedConditions &&
@@ -97,6 +123,7 @@ export default function QueryTemplateSelection() {
               className="margin-0"
               type={"button"}
               disabled={!atLeastOneItemSelected || !queryName}
+              onClick={submitForm}
             >
               Create query
             </Button>
