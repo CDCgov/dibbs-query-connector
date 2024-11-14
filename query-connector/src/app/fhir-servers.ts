@@ -90,7 +90,6 @@ class FHIRClient {
 
   async get(path: string): Promise<Response> {
     try {
-      console.log("FHIR Server: ", this.hostname);
       return fetch(this.hostname + path, this.init);
     } catch (error) {
       console.error(error);
