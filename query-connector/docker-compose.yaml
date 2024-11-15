@@ -16,7 +16,6 @@ services:
 
   # Next.js app with Flyway
   query-connector:
-    image: "query-connector-query-connector"
     platform: linux/amd64
     build:
       context: .
