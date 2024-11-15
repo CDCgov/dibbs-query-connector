@@ -616,31 +616,70 @@ export async function getConditionsData() {
  * Each query object includes:
  * - query_id: The unique identifier for the query.
  * - query_name: The name of the query.
- * - valuesets: An array of CustomQueryValueSet objects, each containing:
- *   - valueSetId: The unique identifier for the valueset.
- *   - concepts: An array of CustomQueryConcept objects, each containing:
- *     - code: The unique code for the concept.
- *     - include: A boolean indicating whether the concept is included.
+ * - valuesets: An array of ValueSet objects
+ * - concepts: An array of Concept objects
  */
 export async function getCustomQueries(): Promise<CustomUserQuery[]> {
-  const query = `SELECT
-    q.id AS query_id,
-    q.query_name,
-    qtv.valueset_oid AS valueSetId,
-    qic.concept_id AS code,
-    qic.include 
-  FROM
-    query q
-  LEFT JOIN query_to_valueset qtv ON q.id = qtv.query_id 
-  LEFT JOIN query_included_concepts qic ON qic.query_by_valueset_id = qtv.id
-  WHERE q.author = 'DIBBs';`;
-  //TODO: this will eventually need to take into account user permissions and specific authors
+  const query = `
+    SELECT
+      q.id AS query_id,
+      q.query_name,
+      vc.valueset_id AS valueSetId,
+      vc.version AS valueSetVersion,
+      vc.valueset_name AS valueSetName,
+      vc.author,
+      vc.system,
+      vc.ersd_concept_type AS ersdConceptType,
+      vc.dibbs_concept_type AS dibbsConceptType,
+      vc.valueset_include AS includeValueSet,
+      vc.code,
+      vc.display,
+      qic."include" AS concept_include
+    FROM
+      query q
+    LEFT JOIN query_to_valueset qtv ON q.id = qtv.query_id
+    LEFT JOIN query_included_concepts qic ON qic.query_by_valueset_id = qtv.id
+    LEFT JOIN (
+      SELECT
+        v.id AS valueset_id,
+        v.version,
+        v.name AS valueset_name,
+        v.author,
+        c.code_system AS system,
+        v.type AS ersd_concept_type,
+        v.dibbs_concept_type,
+        true AS valueset_include,
+        c.code,
+        c.display
+      FROM
+        valuesets v
+      LEFT JOIN valueset_to_concept vtc ON vtc.valueset_id = v.id
+      LEFT JOIN concepts c ON c.id = vtc.concept_id
+    ) vc ON vc.valueset_id = qtv.valueset_id
+    WHERE q.author = 'DIBBs';
+  `;
+  // TODO: this will eventually need to take into account user permissions and specific authors
+  // We might also be able to take advantage of the `query_name` var to avoid joining valuesets/conc
 
   const results = await dbClient.query(query);
   const formattedData: { [key: string]: CustomUserQuery } = {};
 
   results.rows.forEach((row) => {
-    const { query_id, query_name, valueSetId, code, include } = row;
+    const {
+      query_id,
+      query_name,
+      valueSetId,
+      valueSetVersion,
+      valueSetName,
+      author,
+      system,
+      ersdConceptType,
+      dibbsConceptType,
+      includeValueSet,
+      code,
+      display,
+      concept_include,
+    } = row;
 
     // Initialize query structure if it doesn't exist
     if (!formattedData[query_id]) {
@@ -658,15 +697,26 @@ export async function getCustomQueries(): Promise<CustomUserQuery[]> {
 
     // If valueSetId doesn't exist, add it
     if (!valueset) {
-      valueset = { valueSetId, concepts: [] };
+      valueset = {
+        valueSetId,
+        valueSetVersion,
+        valueSetName,
+        author,
+        system,
+        ersdConceptType,
+        dibbsConceptType,
+        includeValueSet,
+        concepts: [],
+      };
       formattedData[query_id].valuesets.push(valueset);
     }
 
     // Add concept data to the concepts array
-    valueset.concepts.push({ code, include });
+    const concept: Concept = { code, display, include: concept_include };
+    valueset.concepts.push(concept);
   });
-  const customUserQueriesArray = Object.values(formattedData);
-  return customUserQueriesArray;
+
+  return Object.values(formattedData);
 }
 
 /**
