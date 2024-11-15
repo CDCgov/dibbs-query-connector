@@ -48,8 +48,8 @@ export default function HeaderComponent() {
   const toggleMenuDropdown = () => {
     setShowMenu(!showMenu);
   };
-  const isProduction = process.env.NODE_ENV === "production";
-  const backLink = isProduction ? "/query-connector" : "/";
+  // const isProduction = process.env.NODE_ENV === "production";
+  const backLink = "/";
 
   return (
     <>
@@ -138,7 +138,7 @@ export default function HeaderComponent() {
             id="dropdown-menu"
             className={`usa-nav__submenu ${styles.menuDropdown}`}
           >
-            {!isProduction && (
+            {(
               <li className={styles.subMenuItem}>
                 <a className={styles.menuItem} href={"/queryBuilding"}>
                   My queries
