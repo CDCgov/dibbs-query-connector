@@ -69,3 +69,10 @@ export function generateQueryToValueSetInsertionSql(
   });
   return joinInsertionSqlArray;
 }
+
+// Type definition for CustomUserQueries
+export interface CustomUserQuery {
+  query_id: string;
+  query_name: string;
+  valuesets: ValueSet[];
+}
