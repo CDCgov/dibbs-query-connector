@@ -1,4 +1,4 @@
-FROM node:20-alpine AS base
+FROM node:18-alpine AS base
 
 FROM base AS installer
 
@@ -45,10 +45,10 @@ USER nextjs
 ENV HOSTNAME="0.0.0.0"
 
 # Copy necessary app files
-COPY --from=installer --chown=nextjs:nodejs /app/next.config.js .
-COPY --from=installer --chown=nextjs:nodejs /app/package.json .
-COPY --from=installer --chown=nextjs:nodejs /app/flyway/conf/flyway.conf ../flyway/conf/flyway.conf
-COPY --from=installer --chown=nextjs:nodejs /app/flyway/sql ../flyway/sql
+COPY --from=installer /app/next.config.js .
+COPY --from=installer /app/package.json .
+COPY --from=installer /app/flyway/conf/flyway.conf ../flyway/conf/flyway.conf
+COPY --from=installer /app/flyway/sql ../flyway/sql
 
 # Automatically leverage output traces to reduce image size
 COPY --from=installer --chown=nextjs:nodejs /app/.next/standalone ./
