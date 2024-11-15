@@ -1,6 +1,10 @@
 name: Trigger Deployment Workflow
 
 on:
+  push:
+    branches:
+      - main
+
   workflow_dispatch:
     inputs:
       target_service:
@@ -9,20 +13,55 @@ on:
       target_version:
         description: "Input a version (e.g., v1.0.0)"
         required: true
-
+    
 jobs:
   trigger:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Set target service
+        id: service
+        run: echo "::set-output name=target_service::query-connector"
+
+      - name: Set version for main push
+        if: github.event_name == 'push'
+        id: version
+        run: |
+          # Check if there's an existing version file; if not, start from 1.0.0
+          VERSION_FILE="version.txt"
+          if [ ! -f "$VERSION_FILE" ]; then
+            echo "v1.0.10" > $VERSION_FILE
+          fi
+
+          # Read the current version, increment the patch (third) number
+          CURRENT_VERSION=$(cat $VERSION_FILE)
+          IFS='.' read -r -a VERSION_PARTS <<< "${CURRENT_VERSION#v}"
+          PATCH=$((VERSION_PARTS[2] + 1))
+          NEW_VERSION="v${VERSION_PARTS[0]}.${VERSION_PARTS[1]}.$PATCH"
+
+          # Save the new version back to the file and set as output
+          echo $NEW_VERSION > $VERSION_FILE
+          echo "::set-output name=target_version::$NEW_VERSION"
+
+      - name: Set version for manual dispatch
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          echo "::set-output name=target_version::${{ github.event.inputs.target_version }}"
+          echo "::set-output name=target_service::${{ github.event.inputs.target_service }}"
+
+      - name: Display target service and version
+        run: |
+          echo "Service: ${{ steps.service.outputs.target_service }}"
+          echo "Version: ${{ steps.version.outputs.target_version }}"
+
       - name: Trigger Deployment Workflow in PHDI-Playground Repository
         run: |
           # Set the required variables
           repo_owner="CDCgov" 
           repo_name="phdi-playground"  
           event_type="trigger-workflow" 
-          service="${{ github.event.inputs.target_service }}"
-          version="${{ github.event.inputs.target_version }}"
+          service="${{ steps.service.outputs.target_service }}"
+          version="${{ steps.version.outputs.target_version }}"
            
           curl -L \
             -X POST \
