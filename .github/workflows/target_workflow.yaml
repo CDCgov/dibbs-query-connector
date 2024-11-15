@@ -1,6 +1,10 @@
-name: Trigger Deployment Workflow
+name: Deployment Workflow
 
 on:
+
+  merge_group:
+      types:
+        - checks_requested  
   push:
     branches:
       - main
