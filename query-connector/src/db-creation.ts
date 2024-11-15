@@ -3,6 +3,7 @@
 import { ersdToDibbsConceptMap, ErsdConceptType } from "@/app/constants";
 import { Bundle, BundleEntry, ValueSet } from "fhir/r4";
 import {
+  checkDBForData,
   checkValueSetInsertion,
   getERSD,
   getVSACValueSet,
@@ -178,10 +179,17 @@ async function fetchBatchValueSetsFromVsac(oidData: OidData, batchSize = 100) {
  * the eRSD, extracting OIDs, then inserting valuesets into the DB.
  */
 export async function createDibbsDB() {
-  const ersdOidData = await getOidsFromErsd();
-  if (ersdOidData) {
-    await fetchBatchValueSetsFromVsac(ersdOidData);
+  // Check if the DB already contains valuesets
+  const dbHasData = await checkDBForData();
+
+  if (!dbHasData) {
+    const ersdOidData = await getOidsFromErsd();
+    if (ersdOidData) {
+      await fetchBatchValueSetsFromVsac(ersdOidData);
+    } else {
+      console.error("Could not load eRSD, aborting DIBBs DB creation");
+    }
   } else {
-    console.error("Could not load eRSD, aborting DIBBs DB creation");
+    console.log("Database already has data; skipping DIBBs DB creation.");
   }
 }
