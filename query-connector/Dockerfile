@@ -58,7 +58,6 @@ RUN ls -R
 # Set environment variables for Flyway and Node.js telemetry
 ENV NEXT_TELEMETRY_DISABLED=1
 
-
 # Set JAVA_HOME to the OpenJDK version installed by apk for Flyway
 ENV JAVA_HOME=/usr/lib/jvm/default-jvm
 # Add the OpenJDK to the PATH so the java command is available for Flways
