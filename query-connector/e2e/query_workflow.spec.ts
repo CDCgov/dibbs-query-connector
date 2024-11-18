@@ -18,12 +18,12 @@ test.describe("querying with the Query Connector", () => {
   test("unsuccessful user query: no patients", async ({ page }) => {
     await page.getByRole("button", { name: "Go to the demo" }).click();
     await page.getByRole("button", { name: "Fill fields" }).click();
-    await page.getByLabel("First Name").fill("Shouldnt");
-    await page.getByLabel("Last Name").fill("Findanyone");
+    await page.getByLabel("First name").fill("Shouldnt");
+    await page.getByLabel("Last name").fill("Findanyone");
     // Select FHIR server from drop down
     await page.getByRole("button", { name: "Advanced" }).click();
     await page
-      .getByLabel("FHIR Server (QHIN)")
+      .getByLabel("Healthcare Organization (HCO)")
       .selectOption("Local e2e HAPI Server: Direct");
 
     await page.getByRole("button", { name: "Search for patient" }).click();
@@ -57,7 +57,7 @@ test.describe("querying with the Query Connector", () => {
     // Select FHIR server from drop down
     await page.getByRole("button", { name: "Advanced" }).click();
     await page
-      .getByLabel("FHIR Server (QHIN)")
+      .getByLabel("Healthcare Organization (HCO)")
       .selectOption("Local e2e HAPI Server: Direct");
 
     await page.getByRole("button", { name: "Search for patient" }).click();

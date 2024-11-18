@@ -1,9 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Modal, ModalButton } from "../../designSystem/Modal";
 import { useRouter, usePathname } from "next/navigation";
-import { Button, Icon, ModalRef } from "@trussworks/react-uswds";
+import { Button, Icon } from "@trussworks/react-uswds";
 import styles from "./header.module.scss";
 import { metadata } from "@/app/constants";
 import classNames from "classnames";
@@ -12,10 +11,8 @@ import classNames from "classnames";
  * @returns The HeaderComponent component.
  */
 export default function HeaderComponent() {
-  const modalRef = useRef<ModalRef>(null);
   const menuRef = useRef<HTMLDivElement>(null);
 
-  const [isClient, setIsClient] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
 
   const outsideMenuClick = (event: MouseEvent) => {
@@ -29,8 +26,6 @@ export default function HeaderComponent() {
   };
 
   useEffect(() => {
-    setIsClient(true);
-
     document.addEventListener("mousedown", outsideMenuClick);
 
     return () => {
@@ -80,13 +75,6 @@ export default function HeaderComponent() {
               "flex-align-center",
             )}
           >
-            {path != "/signin" && isClient && (
-              <ModalButton
-                modalRef={modalRef}
-                title={"Data Usage Policy"}
-                className={styles.dataUsagePolicyButton}
-              />
-            )}
             {/* TODO: Rework show/hide rules based on actual auth status */}
             {path != "/signin" && !LOGGED_IN_PATHS.includes(path) && (
               <Button
@@ -122,15 +110,6 @@ export default function HeaderComponent() {
           </div>
         </div>
       </header>
-
-      {isClient && (
-        <Modal
-          modalRef={modalRef}
-          id="data-usage-policy"
-          heading="How is my data stored?"
-          description="It's not! Data inputted into the TEFCA Query Connector is not persisted or stored anywhere."
-        ></Modal>
-      )}
 
       {showMenu && (
         <div ref={menuRef} className={styles.menuDropdownContainer}>

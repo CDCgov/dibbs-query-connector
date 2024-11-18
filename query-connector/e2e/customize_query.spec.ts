@@ -26,7 +26,7 @@ test.describe("querying with the Query Connector", () => {
     // Select FHIR server from drop down
     await page.getByRole("button", { name: "Advanced" }).click();
     await page
-      .getByLabel("FHIR Server (QHIN)")
+      .getByLabel("Healthcare Organization (HCO)")
       .selectOption("Local e2e HAPI Server: Direct");
 
     await page.getByRole("button", { name: "Search for patient" }).click();
