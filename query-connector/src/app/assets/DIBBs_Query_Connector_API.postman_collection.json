@@ -63,7 +63,7 @@
           "raw": "{{base_url}}/api/query?fhir_server=HELIOS Meld: eHealthExchange&use_case=cancer",
           "protocol": "http",
           "host": [
-            "localhost"
+            "{{base_url}}"
           ],
           "port": "3000",
           "path": [
