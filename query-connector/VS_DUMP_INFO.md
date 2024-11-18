@@ -16,4 +16,4 @@ pg_dump -U postgres -f vs_dump.sql -h localhost -p 5432 tefca_db
 
 If the above doesn't work, try replacing `localhost` with `0.0.0.0`.
 4. Enter the DB password when prompted.
-5. The extract file should now be created. It should automatically be located in `/query-connector`, but if itsn't, put it there.
+5. The extract file should now be created. It should automatically be located in `/query-connector`, but if it isn't, put it there.

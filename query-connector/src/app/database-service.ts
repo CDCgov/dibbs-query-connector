@@ -36,7 +36,7 @@ const dbConfig: PoolConfig = {
   connectionString: process.env.DATABASE_URL,
   max: 10, // Maximum # of connections in the pool
   idleTimeoutMillis: 30000, // A client must sit idle this long before being released
-  connectionTimeoutMillis: 2000, // Wait this long before timing out when connecting new client
+  connectionTimeoutMillis: 3000, // Wait this long before timing out when connecting new client
 };
 const dbClient = new Pool(dbConfig);
 

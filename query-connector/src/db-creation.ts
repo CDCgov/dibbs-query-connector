@@ -1,6 +1,10 @@
 "use server";
 
-import { ersdToDibbsConceptMap, ErsdConceptType } from "@/app/constants";
+import {
+  ersdToDibbsConceptMap,
+  ErsdConceptType,
+  ValueSet as DibbsValueSet,
+} from "@/app/constants";
 import { Bundle, BundleEntry, ValueSet } from "fhir/r4";
 import {
   checkValueSetInsertion,
@@ -9,6 +13,9 @@ import {
   insertValueSet,
   translateVSACToInternalValueSet,
 } from "@/app/database-service";
+// import { readJsonFile } from "./app/tests/shared_utils/readJsonFile";
+import * as fs from "fs";
+import path from "path";
 
 const ERSD_TYPED_RESOURCE_URL = "http://ersd.aimsplatform.org/fhir/ValueSet/";
 
@@ -173,6 +180,66 @@ async function fetchBatchValueSetsFromVsac(oidData: OidData, batchSize = 100) {
   }
 }
 
+type DibbsCustomCases = {
+  [key: string]: Array<DibbsValueSet>;
+};
+
+/**
+ * Uses the relative file structure of the next server to read in the
+ * collection of DIBBs custom use case value sets and prepare them
+ * for insertion.
+ * @returns A mapping of use case to collection of value sets, if the
+ * file read is successful, and undefined if it isn't.
+ */
+function readDibbsCustomAssets() {
+  let dibbsCustomCases: DibbsCustomCases;
+  try {
+    // Re-scope file system reads to make sure we use the relative
+    // path via node directory resolution
+    const runtimeServerPath = path.resolve(
+      path.join(
+        __dirname,
+        "/",
+        "..",
+        "/",
+        "assets",
+        "/",
+        "DIBBS_Custom_ValueSets.json",
+      ),
+    );
+    const data = fs.readFileSync(runtimeServerPath, "utf-8");
+    dibbsCustomCases = JSON.parse(data) as {
+      [key: string]: Array<DibbsValueSet>;
+    };
+    return dibbsCustomCases;
+  } catch (error) {
+    console.error("Error reading JSON file:", error);
+    return;
+  }
+}
+
+/**
+ * After parsing in the loaded JSON of DIBBs Custom Value sets, this function
+ * inserts those concepts and value sets using batch promise settling.
+ * @param dibbsCustomCases The JSON parse of the DIBBs custom value sets file.
+ */
+async function insertDibbsCustomValueSets(dibbsCustomCases: DibbsCustomCases) {
+  Object.keys(dibbsCustomCases).map(async (useCase) => {
+    console.log("Processing custom valuesets for", useCase);
+    const dibbsVSStructs = dibbsCustomCases[useCase];
+    const useCaseVSPromises = dibbsVSStructs.map((vs) => {
+      return insertValueSet(vs);
+    });
+    const useCaseResults = await Promise.allSettled(useCaseVSPromises);
+    const allSucceeded = useCaseResults.every((r) => r.status === "fulfilled");
+    if (allSucceeded) {
+      console.log("All valuesets and concepts inserted for", useCase);
+    } else {
+      console.error("Error in value set insertion for use case", useCase);
+    }
+  });
+}
+
 /**
  * Overall orchestration function that performs the scripted process of querying
  * the eRSD, extracting OIDs, then inserting valuesets into the DB.
@@ -183,5 +250,13 @@ export async function createDibbsDB() {
     await fetchBatchValueSetsFromVsac(ersdOidData);
   } else {
     console.error("Could not load eRSD, aborting DIBBs DB creation");
+  }
+  const dibbsCustomVS = readDibbsCustomAssets();
+  if (dibbsCustomVS) {
+    await insertDibbsCustomValueSets(dibbsCustomVS);
+  } else {
+    console.error(
+      "Could not load and insert DIBBs custom value sets, aborting DB creation",
+    );
   }
 }
