@@ -51,7 +51,10 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
   const [searchFilter, setSearchFilter] = useState<string>();
 
   useEffect(() => {
+<<<<<<< HEAD
     console.log(selectedConditions);
+=======
+>>>>>>> 2af1f74d (wip valueset selection page)
     let isSubscribed = true;
 
     if (queryName == "" || queryName == undefined) {
@@ -86,6 +89,16 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
     )
     .flatMap((conditionsByCategory) => conditionsByCategory);
 
+<<<<<<< HEAD
+=======
+  const submitForm = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    // TODO: do something with selectedConditions on next step/page
+    // will be addressed in https://linear.app/skylight-cdc/issue/QUE-65/create-the-valueset-selection-page
+    console.log(selectedConditions);
+  };
+
+>>>>>>> 2af1f74d (wip valueset selection page)
   return (
     <div
       className={classNames(
