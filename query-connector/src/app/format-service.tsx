@@ -227,12 +227,12 @@ export function FormatPhoneAsDigits(givenPhone: string) {
 
 const FORMATS_TO_SEARCH: string[] = [
   "$1$2$3",
-  "$1%2D$2%2D$3",
-  "$1%2B$2%2B$3",
-  "%28$1%29%2B$2%2B$3",
-  "%28$1%29%2D$2%2D$3",
-  "%28$1%29$2%2D$3",
-  "1%28$1%29$2%2D$3",
+  "$1-$2-$3",
+  "$1+$2+$3",
+  "($1)+$2+$3",
+  "($1)-$2-$3",
+  "($1)$2-$3",
+  "1($1)$2-$3",
 ];
 
 /**
@@ -255,7 +255,7 @@ export async function GetPhoneQueryFormats(phone: string) {
   }
   // Map the phone number into each format we want to check
   const possibleFormats: string[] = FORMATS_TO_SEARCH.map((fmt) => {
-    return phone.replace(/(\d{3})(\d{3})(\d{4})/gi, fmt);
+    return encodeURIComponent(phone.replace(/(\d{3})(\d{3})(\d{4})/gi, fmt));
   });
   return possibleFormats;
 }
@@ -269,7 +269,7 @@ export async function GetPhoneQueryFormats(phone: string) {
  */
 export const formatValueSetsAsQuerySpec = async (
   useCase: string,
-  valueSets: ValueSet[],
+  valueSets: ValueSet[]
 ) => {
   let secondEncounter: boolean = false;
   if (["cancer", "chlamydia", "gonorrhea", "syphilis"].includes(useCase)) {
