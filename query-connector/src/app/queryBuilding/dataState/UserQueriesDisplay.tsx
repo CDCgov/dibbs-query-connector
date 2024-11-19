@@ -1,48 +1,31 @@
 import { Button, Icon, Table } from "@trussworks/react-uswds";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import styles from "../queryBuilding.module.scss"; // Use your custom styles
+import styles from "@/app/queryBuilding/queryBuilding.module.scss";
+import { CustomUserQuery } from "@/app/query-building";
+
+interface UserQueriesDisplayProps {
+  queries: CustomUserQuery[];
+}
 
 /**
  * Component for query building when user-generated queries already exist
+ * @param root0 - The props object.
+ * @param root0.queries - Array of user-generated queries to display.
  * @returns the UserQueriesDisplay to render the queries with edit/delete options
  */
-export const UserQueriesDisplay: React.FC = () => {
+export const UserQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
+  queries,
+}) => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
   const handleClick = async () => {
     setLoading(true);
 
-    // Simulated delay; replace with actual DB function
-    console.log("Creating DB...");
-    await new Promise((r) => setTimeout(r, 5000));
-    setLoading(false);
-
     // Redirect to query updating/editing page
-    // router.push("/queryBuilding/editCodes");
+    router.push("/queryBuilding/buildFromTemplates");
   };
-
-  // Example data
-  const queries = [
-    {
-      name: "SNHD: Custom Query with an overly elaborate long name to truncate",
-      queryId: "A125",
-      conditions: ["Chlamydia", "HIV"],
-    },
-    {
-      name: "SNHD: Custom Query 2",
-      queryId: "A123901849080294819428013284019 =-4190-6",
-      conditions: [
-        "Chlamydia",
-        "Cancer",
-        "Cancer 1",
-        "Cancer 2",
-        "Cancer 3",
-        "Cancer 4",
-      ],
-    },
-  ];
 
   return (
     <div>
@@ -63,27 +46,27 @@ export const UserQueriesDisplay: React.FC = () => {
           <tr>
             <th scope="col">NAME</th>
             <th scope="col">QUERY ID</th>
-            <th scope="col">CONDITIONS</th>
+            {/* <th scope="col">CONDITIONS</th> TODO: Add back once conditions available*/}
           </tr>
         </thead>
         <tbody>
           {queries.map((query, index) => (
             <tr key={index} className="tableRowWithHover">
-              <td>{query.name}</td>
-              <td>{query.queryId}</td>
-              <td>{query.conditions.join(", ")}</td>
+              <td>{query.query_name}</td>
+              <td>{query.query_id}</td>
+              {/* <td>{query.condition_list.join(", ")}</td> TODO: Replace with conditions_name once available */}
               <td>
                 <Button
                   type="button"
                   className="usa-button--unstyled margin-right-1 text-bold text-no-underline"
-                  onClick={() => console.log("Edit", query.queryId)}
+                  onClick={() => console.log("Edit", query.query_id)}
                 >
                   <Icon.Edit /> Edit
                 </Button>
                 <Button
                   type="button"
                   className="usa-button--unstyled text-bold text-no-underline"
-                  onClick={() => console.log("Delete", query.queryId)}
+                  onClick={() => console.log("Delete", query.query_id)}
                 >
                   <Icon.Delete /> Delete
                 </Button>
