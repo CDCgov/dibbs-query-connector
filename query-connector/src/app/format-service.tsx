@@ -227,12 +227,12 @@ export function FormatPhoneAsDigits(givenPhone: string) {
 
 const FORMATS_TO_SEARCH: string[] = [
   "$1$2$3",
-  "$1-$2-$3",
-  "$1+$2+$3",
-  "($1)+$2+$3",
-  "($1)-$2-$3",
-  "($1)$2-$3",
-  "1($1)$2-$3",
+  "$1%2D$2%2D$3",
+  "$1%2B$2%2B$3",
+  "%28$1%29%2B$2%2B$3",
+  "%28$1%29%2D$2%2D$3",
+  "%28$1%29$2%2D$3",
+  "1%28$1%29$2%2D$3",
 ];
 
 /**
@@ -250,7 +250,7 @@ const FORMATS_TO_SEARCH: string[] = [
 export async function GetPhoneQueryFormats(phone: string) {
   // Digit-only phone numbers will resolve as actual numbers
   if (isNaN(Number(phone)) || phone.length != 10) {
-    const strippedPhone = phone.replace(" ", "+");
+    const strippedPhone = phone.replace(" ", "%2D");
     return [strippedPhone];
   }
   // Map the phone number into each format we want to check
@@ -269,7 +269,7 @@ export async function GetPhoneQueryFormats(phone: string) {
  */
 export const formatValueSetsAsQuerySpec = async (
   useCase: string,
-  valueSets: ValueSet[],
+  valueSets: ValueSet[]
 ) => {
   let secondEncounter: boolean = false;
   if (["cancer", "chlamydia", "gonorrhea", "syphilis"].includes(useCase)) {
