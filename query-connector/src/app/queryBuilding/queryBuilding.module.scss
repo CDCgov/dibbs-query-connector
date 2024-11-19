@@ -36,3 +36,49 @@
   width: fit-content;
   padding: 1rem !important;
 }
+
+.customQueryTable {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+  border: 1px solid #ccc;
+
+  thead tr th {
+    color: var(--gray-500, #919191);
+    background-color: white; 
+    font-family: "Public Sans", sans-serif;
+    font-size: 0.75rem;
+    font-weight: 700;
+    line-height: 150%;
+    text-transform: uppercase;
+    padding-left: 1.5rem;
+    padding-top: 1.5rem;
+    border: none; 
+  }
+
+  tbody td {
+    font-family: "Public Sans", sans-serif;
+    font-size: 0.875rem;
+    color: #000;
+    border-top: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+    padding: 1.5rem;
+    max-width: 12rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  tbody td:hover {
+    overflow: visible;
+    white-space: normal;
+    position: relative;
+    z-index: 10;
+  }
+
+  tbody td:last-child {
+    text-align: right; /* Aligns the last column content to the right */
+    padding-right: 1.5rem; /* Adds consistent padding on the right */
+    white-space: nowrap; /* Keeps the buttons on one line */
+  }
+}

@@ -7,7 +7,7 @@ import UserQueriesDisplay from "./dataState/UserQueriesDisplay";
  */
 const QueryBuilding: React.FC = () => {
   return (
-    <div className="main-container">
+    <div className="main-container__wide">
       {/* Display when no user-generated queries */}
       {/* <h1 className={styles.queryTitle}>My queries</h1>
       <EmptyQueriesDisplay></EmptyQueriesDisplay> */}
