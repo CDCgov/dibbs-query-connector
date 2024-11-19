@@ -269,7 +269,7 @@ export async function GetPhoneQueryFormats(phone: string) {
  */
 export const formatValueSetsAsQuerySpec = async (
   useCase: string,
-  valueSets: ValueSet[]
+  valueSets: ValueSet[],
 ) => {
   let secondEncounter: boolean = false;
   if (["cancer", "chlamydia", "gonorrhea", "syphilis"].includes(useCase)) {
