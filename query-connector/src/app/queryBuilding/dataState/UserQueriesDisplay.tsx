@@ -46,7 +46,7 @@ export const UserQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
           <tr>
             <th scope="col">NAME</th>
             <th scope="col">QUERY ID</th>
-            {/* <th scope="col">CONDITIONS</th> TODO: Add back once conditions available*/}
+            <th scope="col">CONDITIONS</th>
           </tr>
         </thead>
         <tbody>
@@ -54,7 +54,8 @@ export const UserQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
             <tr key={index} className="tableRowWithHover">
               <td>{query.query_name}</td>
               <td>{query.query_id}</td>
-              {/* <td>{query.condition_list.join(", ")}</td> TODO: Replace with conditions_name once available */}
+              <td>{query.query_name}</td>{" "}
+              {/*  TODO: Use conditions_list once available */}
               <td>
                 <Button
                   type="button"
