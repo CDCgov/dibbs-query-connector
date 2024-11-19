@@ -16,6 +16,12 @@
   "condition_to_valueset": {
     "Newborn Screening": [
       {
+        "id": "1529",
+        "condition_id": "1",
+        "valueset_id": "20241015_16_1",
+        "source": "Center for Public Health Innovation"
+      },
+      {
         "id": "1514",
         "condition_id": "1",
         "valueset_id": "20240909_1_1",

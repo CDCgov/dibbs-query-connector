@@ -296,7 +296,7 @@ function generateValueSetSqlPromise(vs: ValueSet) {
   // group is pulled and loaded
   const insertValueSetSql = `
   INSERT INTO valuesets
-    VALUES($1,$2,$3,$4,$5,$6)
+    VALUES($1,$2,$3,$4,$5,$6,$7)
     ON CONFLICT(id)
     DO UPDATE SET
       id = EXCLUDED.id,
@@ -304,7 +304,8 @@ function generateValueSetSqlPromise(vs: ValueSet) {
       version = EXCLUDED.version,
       name = EXCLUDED.name,
       author = EXCLUDED.author,
-      type = EXCLUDED.type
+      type = EXCLUDED.type,
+      dibbs_concept_type = EXCLUDED.dibbs_concept_type
     RETURNING id;
   `;
   const valuesArray = [
@@ -313,6 +314,7 @@ function generateValueSetSqlPromise(vs: ValueSet) {
     vs.valueSetVersion,
     vs.valueSetName,
     vs.author,
+    vs.dibbsConceptType,
     vs.dibbsConceptType,
   ];
 

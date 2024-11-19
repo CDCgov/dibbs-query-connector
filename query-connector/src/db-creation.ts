@@ -301,14 +301,14 @@ export async function createDibbsDB() {
   } else {
     console.error("Could not load eRSD, aborting DIBBs DB creation");
   }
-  const dibbsCustomVS = readDibbsCustomValueSets();
-  if (dibbsCustomVS) {
-    await insertDibbsCustomValueSets(dibbsCustomVS);
-  } else {
-    console.error(
-      "Could not load and insert DIBBs custom value sets, aborting DB creation",
-    );
-  }
-  await readAndInsertInitialConditions();
-  await readAndInsertDibbsCustomConditions();
+  // const dibbsCustomVS = readDibbsCustomValueSets();
+  // if (dibbsCustomVS) {
+  //   await insertDibbsCustomValueSets(dibbsCustomVS);
+  // } else {
+  //   console.error(
+  //     "Could not load and insert DIBBs custom value sets, aborting DB creation",
+  //   );
+  // }
+  // await readAndInsertInitialConditions();
+  // await readAndInsertDibbsCustomConditions();
 }
