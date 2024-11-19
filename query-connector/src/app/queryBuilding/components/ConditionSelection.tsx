@@ -108,7 +108,12 @@ export const ConditionSelection: React.FC<ConditionSelectionProps> = ({
         <Button
           className="margin-0"
           type={"button"}
-          disabled={formError.selectedConditions}
+          disabled={formError.selectedConditions || !queryName}
+          title={
+            formError.selectedConditions || formError.queryName
+              ? "Enter a query name and condition"
+              : "Click to create your query"
+          }
           onClick={handleCreateQueryClick}
         >
           Create query
