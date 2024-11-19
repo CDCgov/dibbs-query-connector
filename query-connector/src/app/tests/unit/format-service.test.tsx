@@ -184,11 +184,11 @@ describe("formatIdentifier", () => {
     // the value across multiple elements
     expect(getByText("999-99-9999", { exact: false })).toBeInTheDocument();
     expect(
-      getByText("Social Security Number", { exact: false }),
+      getByText("Social Security Number", { exact: false })
     ).toBeInTheDocument();
     expect(getByText("0123456789", { exact: false })).toBeInTheDocument();
     expect(
-      getByText("Internal Reference Identifier", { exact: false }),
+      getByText("Internal Reference Identifier", { exact: false })
     ).toBeInTheDocument();
   });
 
@@ -485,12 +485,12 @@ describe("GetPhoneQueryFormats", () => {
     const inputPhone = "1234567890";
     const expectedResult = [
       "1234567890",
-      "123%2D456%2D7890", //123-456-7890
+      "123-456-7890",
       "123%2B456%2B7890", //123+456+7890
-      "%28123%29%2B456%2B7890", //(123)+456+7890
-      "%28123%29%2D456%2D7890", //(123)-456-7890,
-      "%28123%29456%2D7890", //(123)456-7890
-      "1%28123%29456%2D7890", //1(123)456-7890,
+      "(123)%2B456%2B7890", //(123)+456+7890
+      "(123)-456-7890",
+      "(123)456-7890",
+      "1(123)456-7890",
     ];
     expect(await GetPhoneQueryFormats(inputPhone)).toEqual(expectedResult);
   });
