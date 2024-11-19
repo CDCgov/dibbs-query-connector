@@ -1145,7 +1145,20 @@
           "code": "76272004",
           "display": "Syphilis (disorder)",
           "include": true
-        },
+        }
+      ]
+    },
+    {
+      "valueSetId": "20240909_6_1",
+      "valueSetVersion": "1",
+      "valueSetName": "Suspected Syphilis Disorder",
+      "valueSetExternalId": "20240909_6",
+      "author": "DIBBs",
+      "system": "http://snomed.info/sct",
+      "ersdConceptType": "sdtc",
+      "dibbsConceptType": "conditions",
+      "includeValueSet": true,
+      "concepts": [
         {
           "code": "186647001",
           "display": "Primary genital syphilis",

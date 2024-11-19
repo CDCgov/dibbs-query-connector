@@ -1,0 +1,1360 @@
+{
+  "conditions": [
+    {
+      "id": "276197005",
+      "system": "http://snomed.info/sct",
+      "name": "Infection caused by Corynebacterium diphtheriae (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "266123003",
+      "system": "http://snomed.info/sct",
+      "name": "Bartonellosis (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "95821001",
+      "system": "http://snomed.info/sct",
+      "name": "Neonatal hearing loss (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "242253008",
+      "system": "http://snomed.info/sct",
+      "name": "Overdose of opiate (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "414488002",
+      "system": "http://snomed.info/sct",
+      "name": "Infantile botulism (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "398565003",
+      "system": "http://snomed.info/sct",
+      "name": "Infection caused by Clostridium botulinum (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "23511006",
+      "system": "http://snomed.info/sct",
+      "name": "Meningococcal infectious disease (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "81004002",
+      "system": "http://snomed.info/sct",
+      "name": "Leprosy (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "398102009",
+      "system": "http://snomed.info/sct",
+      "name": "Acute poliomyelitis (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "805002",
+      "system": "http://snomed.info/sct",
+      "name": "Pneumoconiosis caused by silica (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "14189004",
+      "system": "http://snomed.info/sct",
+      "name": "Measles (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "186771002",
+      "system": "http://snomed.info/sct",
+      "name": "Spotted fever group rickettsial disease (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "190268003",
+      "system": "http://snomed.info/sct",
+      "name": "Congenital hypothyroidism (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "60498001",
+      "system": "http://snomed.info/sct",
+      "name": "Congenital viral hepatitis B infection (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "66071002",
+      "system": "http://snomed.info/sct",
+      "name": "Viral hepatitis type B (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "3928002",
+      "system": "http://snomed.info/sct",
+      "name": "Zika virus disease (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "61462000",
+      "system": "http://snomed.info/sct",
+      "name": "Malaria (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "76902006",
+      "system": "http://snomed.info/sct",
+      "name": "Tetanus (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "23502006",
+      "system": "http://snomed.info/sct",
+      "name": "Lyme disease (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "13906002",
+      "system": "http://snomed.info/sct",
+      "name": "Anaplasmosis (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "36989005",
+      "system": "http://snomed.info/sct",
+      "name": "Mumps (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "414819007",
+      "system": "http://snomed.info/sct",
+      "name": "Neonatal abstinence syndrome (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "74942003",
+      "system": "http://snomed.info/sct",
+      "name": "Echinococcosis (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "86406008",
+      "system": "http://snomed.info/sct",
+      "name": "Human immunodeficiency virus infection (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "240626005",
+      "system": "http://snomed.info/sct",
+      "name": "Human ehrlichiosis (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "36653000",
+      "system": "http://snomed.info/sct",
+      "name": "Rubella (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "35742006",
+      "system": "http://snomed.info/sct",
+      "name": "Congenital syphilis (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "266113007",
+      "system": "http://snomed.info/sct",
+      "name": "Genital warts (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "187151009",
+      "system": "http://snomed.info/sct",
+      "name": "Diphyllobothriasis (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "56717001",
+      "system": "http://snomed.info/sct",
+      "name": "Tuberculosis (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "240372001",
+      "system": "http://snomed.info/sct",
+      "name": "Cyclosporiasis (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "198130006",
+      "system": "http://snomed.info/sct",
+      "name": "Female pelvic inflammatory disease (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "398447004",
+      "system": "http://snomed.info/sct",
+      "name": "Severe acute respiratory syndrome (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "4241002",
+      "system": "http://snomed.info/sct",
+      "name": "Listeriosis (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "709018004",
+      "system": "http://snomed.info/sct",
+      "name": "Infection caused by larvae of Trichinella (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "37131007",
+      "system": "http://snomed.info/sct",
+      "name": "Pesticide poisoning (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "58265007",
+      "system": "http://snomed.info/sct",
+      "name": "Giardiasis (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "40610006",
+      "system": "http://snomed.info/sct",
+      "name": "Arbovirus infection (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "240370009",
+      "system": "http://snomed.info/sct",
+      "name": "Cryptosporidiosis (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "541131000124102",
+      "system": "http://snomed.info/sct",
+      "name": "Infection caused by novel Influenza A virus variant (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "1857005",
+      "system": "http://snomed.info/sct",
+      "name": "Congenital rubella syndrome (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "84619001",
+      "system": "http://snomed.info/sct",
+      "name": "Nongonococcal urethritis (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "41439009",
+      "system": "http://snomed.info/sct",
+      "name": "Microcystis flos-aquae poisoning (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "40956001",
+      "system": "http://snomed.info/sct",
+      "name": "Guillain-Barre syndrome (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "409498004",
+      "system": "http://snomed.info/sct",
+      "name": "Anthrax (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "7180009",
+      "system": "http://snomed.info/sct",
+      "name": "Meningitis (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "204339005",
+      "system": "http://snomed.info/sct",
+      "name": "Congenital pulmonary valve abnormality (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "416707008",
+      "system": "http://snomed.info/sct",
+      "name": "Powassan encephalitis virus infection (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "3398004",
+      "system": "http://snomed.info/sct",
+      "name": "Cadmium poisoning (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "111407006",
+      "system": "http://snomed.info/sct",
+      "name": "Hemolytic uremic syndrome (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "204357006",
+      "system": "http://snomed.info/sct",
+      "name": "Ebsteins anomaly of tricuspid valve (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "86500004",
+      "system": "http://snomed.info/sct",
+      "name": "Campylobacteriosis (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "399907009",
+      "system": "http://snomed.info/sct",
+      "name": "Animal bite wound (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "7305005",
+      "system": "http://snomed.info/sct",
+      "name": "Coarctation of aorta (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "218728005",
+      "system": "http://snomed.info/sct",
+      "name": "Interrupted aortic arch (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "204296002",
+      "system": "http://snomed.info/sct",
+      "name": "Discordant ventriculoarterial connection (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "409617000",
+      "system": "http://snomed.info/sct",
+      "name": "Ricin poisoning (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "406575008",
+      "system": "http://snomed.info/sct",
+      "name": "Infection caused by vancomycin resistant enterococcus (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "328291000119103",
+      "system": "http://snomed.info/sct",
+      "name": "Infection caused by Shiga toxin producing Escherichia coli (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "86299006",
+      "system": "http://snomed.info/sct",
+      "name": "Tetralogy of Fallot (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "45503006",
+      "system": "http://snomed.info/sct",
+      "name": "Common ventricle (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "58750007",
+      "system": "http://snomed.info/sct",
+      "name": "Plague (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "75116005",
+      "system": "http://snomed.info/sct",
+      "name": "Ornithosis (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "14168008",
+      "system": "http://snomed.info/sct",
+      "name": "Rabies (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "62067003",
+      "system": "http://snomed.info/sct",
+      "name": "Hypoplastic left heart syndrome (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "7111000119109",
+      "system": "http://snomed.info/sct",
+      "name": "Viral hepatitis type E (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "216809001",
+      "system": "http://snomed.info/sct",
+      "name": "Accidental poisoning caused by fertilizers (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "7484005",
+      "system": "http://snomed.info/sct",
+      "name": "Double outlet right ventricle (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "388759003",
+      "system": "http://snomed.info/sct",
+      "name": "Infection caused by Entamoeba histolytica (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "4374004",
+      "system": "http://snomed.info/sct",
+      "name": "Congenital anomaly of tricuspid valve (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "60826002",
+      "system": "http://snomed.info/sct",
+      "name": "Coccidioidomycosis (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "721763002",
+      "system": "http://snomed.info/sct",
+      "name": "Infection caused by Norovirus (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "75702008",
+      "system": "http://snomed.info/sct",
+      "name": "Brucellosis (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "38362002",
+      "system": "http://snomed.info/sct",
+      "name": "Dengue (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "840539006",
+      "system": "http://snomed.info/sct",
+      "name": "Disease caused by severe acute respiratory syndrome coronavirus 2 (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "69996000",
+      "system": "http://snomed.info/sct",
+      "name": "Blastomycosis (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "186431008",
+      "system": "http://snomed.info/sct",
+      "name": "Infection caused by Clostridioides difficile (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "111323005",
+      "system": "http://snomed.info/sct",
+      "name": "Total anomalous pulmonary venous return (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "1237074000",
+      "system": "http://snomed.info/sct",
+      "name": "Congenital atrioventricular septal defect (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "61959006",
+      "system": "http://snomed.info/sct",
+      "name": "Common truncus arteriosus (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "83436008",
+      "system": "http://snomed.info/sct",
+      "name": "Yersiniosis (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "38959009",
+      "system": "http://snomed.info/sct",
+      "name": "Methemoglobinemia (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "49649001",
+      "system": "http://snomed.info/sct",
+      "name": "Infection caused by Acanthamoeba (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "36188001",
+      "system": "http://snomed.info/sct",
+      "name": "Shigellosis (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "40468003",
+      "system": "http://snomed.info/sct",
+      "name": "Viral hepatitis",
+      "version": " type A (disorder)"
+    },
+    {
+      "id": "16541001",
+      "system": "http://snomed.info/sct",
+      "name": "Yellow fever (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "407152001",
+      "system": "http://snomed.info/sct",
+      "name": "Blood lead level above reference range (finding)",
+      "version": "20240301"
+    },
+    {
+      "id": "52947006",
+      "system": "http://snomed.info/sct",
+      "name": "Japanese encephalitis virus disease (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "417093003",
+      "system": "http://snomed.info/sct",
+      "name": "Disease caused by West Nile virus (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "417192005",
+      "system": "http://snomed.info/sct",
+      "name": "Saint Louis encephalitis virus infection (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "85904008",
+      "system": "http://snomed.info/sct",
+      "name": "Paratyphoid fever (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "11999007",
+      "system": "http://snomed.info/sct",
+      "name": "Inactive tuberculosis (finding)",
+      "version": "20240301"
+    },
+    {
+      "id": "269275003",
+      "system": "http://snomed.info/sct",
+      "name": "Seafood causing toxic effect (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "406604002",
+      "system": "http://snomed.info/sct",
+      "name": "Infection caused by vancomycin intermediate Staphylococcus aureus (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "4834000",
+      "system": "http://snomed.info/sct",
+      "name": "Typhoid fever (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "302231008",
+      "system": "http://snomed.info/sct",
+      "name": "Salmonella infection (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "66948001",
+      "system": "http://snomed.info/sct",
+      "name": "Cleft palate with cleft lip (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "87979003",
+      "system": "http://snomed.info/sct",
+      "name": "Cleft palate (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "15628003",
+      "system": "http://snomed.info/sct",
+      "name": "Gonorrhea (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "398557001",
+      "system": "http://snomed.info/sct",
+      "name": "Infection caused by non-cholerae vibrio (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "404681006",
+      "system": "http://snomed.info/sct",
+      "name": "Infection caused by vancomycin resistant Staphylococcus aureus (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "63650001",
+      "system": "http://snomed.info/sct",
+      "name": "Cholera (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "45170000",
+      "system": "http://snomed.info/sct",
+      "name": "Encephalitis (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "17383000",
+      "system": "http://snomed.info/sct",
+      "name": "Toxic effect of carbon monoxide (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "57607007",
+      "system": "http://snomed.info/sct",
+      "name": "Occupational asthma (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "80281008",
+      "system": "http://snomed.info/sct",
+      "name": "Cleft lip (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "897031002",
+      "system": "http://snomed.info/sct",
+      "name": "Acute flaccid myelitis (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "89369001",
+      "system": "http://snomed.info/sct",
+      "name": "Anencephalus (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "59527008",
+      "system": "http://snomed.info/sct",
+      "name": "Congenital cytomegalovirus infection (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "414015000",
+      "system": "http://snomed.info/sct",
+      "name": "Disease caused by Orthopoxvirus (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "359814004",
+      "system": "http://snomed.info/sct",
+      "name": "Monkeypox (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "115635005",
+      "system": "http://snomed.info/sct",
+      "name": "Balamuthia mandrillaris (organism)",
+      "version": "20240301"
+    },
+    {
+      "id": "27836007",
+      "system": "http://snomed.info/sct",
+      "name": "Pertussis (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "26726000",
+      "system": "http://snomed.info/sct",
+      "name": "Legionella infection (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "67924001",
+      "system": "http://snomed.info/sct",
+      "name": "Smallpox (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "77377001",
+      "system": "http://snomed.info/sct",
+      "name": "Leptospirosis (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "266143009",
+      "system": "http://snomed.info/sct",
+      "name": "Chancroid (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "551611000124101",
+      "system": "http://snomed.info/sct",
+      "name": "Perinatal hepatitis caused by Hepatitis C virus (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "50711007",
+      "system": "http://snomed.info/sct",
+      "name": "Viral hepatitis type C (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "76272004",
+      "system": "http://snomed.info/sct",
+      "name": "Syphilis (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "41040004",
+      "system": "http://snomed.info/sct",
+      "name": "Complete trisomy 21 syndrome (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "61750000",
+      "system": "http://snomed.info/sct",
+      "name": "Infection caused by Angiostrongylus (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "47523006",
+      "system": "http://snomed.info/sct",
+      "name": "Western equine encephalitis (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "12962009",
+      "system": "http://snomed.info/sct",
+      "name": "Histoplasmosis (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "67531005",
+      "system": "http://snomed.info/sct",
+      "name": "Spina bifida (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "6452009",
+      "system": "http://snomed.info/sct",
+      "name": "Colorado tick fever (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "721781004",
+      "system": "http://snomed.info/sct",
+      "name": "Infection caused by Lymphocytic choriomeningitis virus (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "416925005",
+      "system": "http://snomed.info/sct",
+      "name": "Eastern equine encephalitis virus infection (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "186788009",
+      "system": "http://snomed.info/sct",
+      "name": "Q fever (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "418182000",
+      "system": "http://snomed.info/sct",
+      "name": "Disease caused by California serogroup virus (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "428175000",
+      "system": "http://snomed.info/sct",
+      "name": "Primary amebic encephalitis caused by Naegleria fowleri (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "406583002",
+      "system": "http://snomed.info/sct",
+      "name": "Invasive Haemophilus influenzae disease (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "111864006",
+      "system": "http://snomed.info/sct",
+      "name": "Chikungunya fever (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "240523007",
+      "system": "http://snomed.info/sct",
+      "name": "Viral hemorrhagic fever (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "38907003",
+      "system": "http://snomed.info/sct",
+      "name": "Varicella (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "49049000",
+      "system": "http://snomed.info/sct",
+      "name": "Parkinsons disease (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "20484008",
+      "system": "http://snomed.info/sct",
+      "name": "Prion disease (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "712662001",
+      "system": "http://snomed.info/sct",
+      "name": "Carbapenem resistant Enterobacteriaceae (organism)",
+      "version": "20240301"
+    },
+    {
+      "id": "734350003",
+      "system": "http://snomed.info/sct",
+      "name": "Carbapenemase-producing bacteria (organism)",
+      "version": "20240301"
+    },
+    {
+      "id": "428111003",
+      "system": "http://snomed.info/sct",
+      "name": "Melioidosis (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "72951007",
+      "system": "http://snomed.info/sct",
+      "name": "Gastroschisis (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "240589008",
+      "system": "http://snomed.info/sct",
+      "name": "Chlamydia trachomatis infection (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "190687004",
+      "system": "http://snomed.info/sct",
+      "name": "Phenylketonuria (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "661761000124109",
+      "system": "http://snomed.info/sct",
+      "name": "Death associated with influenza (event)",
+      "version": "20240301"
+    },
+    {
+      "id": "6142004",
+      "system": "http://snomed.info/sct",
+      "name": "Influenza (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "43692000",
+      "system": "http://snomed.info/sct",
+      "name": "Influenzal acute upper respiratory infection (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "19265001",
+      "system": "http://snomed.info/sct",
+      "name": "Tularemia (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "67341007",
+      "system": "http://snomed.info/sct",
+      "name": "Longitudinal deficiency of limb (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "21061004",
+      "system": "http://snomed.info/sct",
+      "name": "Babesiosis (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "406617004",
+      "system": "http://snomed.info/sct",
+      "name": "Invasive Streptococcus pneumoniae disease (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "74225001",
+      "system": "http://snomed.info/sct",
+      "name": "Tick paralysis (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "233733000",
+      "system": "http://snomed.info/sct",
+      "name": "Toxic pneumonitis (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "767146004",
+      "system": "http://snomed.info/sct",
+      "name": "Toxic effect of arsenic and/or arsenic compound (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "18624000",
+      "system": "http://snomed.info/sct",
+      "name": "Disease caused by Rotavirus (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "76172008",
+      "system": "http://snomed.info/sct",
+      "name": "Infection caused by Taenia (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "82271004",
+      "system": "http://snomed.info/sct",
+      "name": "Injury of head (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "700372006",
+      "system": "http://snomed.info/sct",
+      "name": "Urinary tract infection associated with catheter (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "22607003",
+      "system": "http://snomed.info/sct",
+      "name": "Asbestosis (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "42386007",
+      "system": "http://snomed.info/sct",
+      "name": "Cryptococcosis (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "240613006",
+      "system": "http://snomed.info/sct",
+      "name": "Typhus group rickettsial disease (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "433202001",
+      "system": "http://snomed.info/sct",
+      "name": "Surgical site infection (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "767299002",
+      "system": "http://snomed.info/sct",
+      "name": "Toxic effect of mercury and/or mercury compound (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "419488004",
+      "system": "http://snomed.info/sct",
+      "name": "Staphylococcus aureus enterotoxin B (substance)",
+      "version": "20240301"
+    },
+    {
+      "id": "59051007",
+      "system": "http://snomed.info/sct",
+      "name": "Cysticercosis (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "363346000",
+      "system": "http://snomed.info/sct",
+      "name": "Malignant neoplastic disease (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "4639008",
+      "system": "http://snomed.info/sct",
+      "name": "Glanders (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "18690003",
+      "system": "http://snomed.info/sct",
+      "name": "Farmers lung (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "85761009",
+      "system": "http://snomed.info/sct",
+      "name": "Byssinosis (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "91576008",
+      "system": "http://snomed.info/sct",
+      "name": "Congenital herpes simplex (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "788781001",
+      "system": "http://snomed.info/sct",
+      "name": "Delayed allergy to red meat (finding)",
+      "version": "20240301"
+    },
+    {
+      "id": "1149222004",
+      "system": "http://snomed.info/sct",
+      "name": "Overdose (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "75053002",
+      "system": "http://snomed.info/sct",
+      "name": "Acute febrile mucocutaneous lymph node syndrome (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "406597005",
+      "system": "http://snomed.info/sct",
+      "name": "Infection caused by Nipah virus (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "34298002",
+      "system": "http://snomed.info/sct",
+      "name": "Neonatal conjunctivitis (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "33839006",
+      "system": "http://snomed.info/sct",
+      "name": "Genital herpes simplex (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "95891005",
+      "system": "http://snomed.info/sct",
+      "name": "Influenza-like illness (finding)",
+      "version": "20240301"
+    },
+    {
+      "id": "77506005",
+      "system": "http://snomed.info/sct",
+      "name": "Infection caused by Trypanosoma cruzi (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "736152001",
+      "system": "http://snomed.info/sct",
+      "name": "Infection of bloodstream co-occurrent and due to central venous catheter in situ (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "187192000",
+      "system": "http://snomed.info/sct",
+      "name": "Toxoplasmosis (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "6415009",
+      "system": "http://snomed.info/sct",
+      "name": "Human respiratory syncytial virus (organism)",
+      "version": "20240301"
+    },
+    {
+      "id": "55735004",
+      "system": "http://snomed.info/sct",
+      "name": "Respiratory syncytial virus infection (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "111811007",
+      "system": "http://snomed.info/sct",
+      "name": "Mycobacterial infection (excluding tuberculosis AND leprosy) (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "28867007",
+      "system": "http://snomed.info/sct",
+      "name": "Granuloma inguinale (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "895448002",
+      "system": "http://snomed.info/sct",
+      "name": "Multisystem inflammatory syndrome in children (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "1731000119106",
+      "system": "http://snomed.info/sct",
+      "name": "Atypical mycobacterial infection of lung (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "715174007",
+      "system": "http://snomed.info/sct",
+      "name": "Carbapenem resistant Acinetobacter baumannii (organism)",
+      "version": "20240301"
+    },
+    {
+      "id": "406602003",
+      "system": "http://snomed.info/sct",
+      "name": "Infection caused by Staphylococcus aureus (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "283545005",
+      "system": "http://snomed.info/sct",
+      "name": "Gunshot wound (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "74351001",
+      "system": "http://snomed.info/sct",
+      "name": "Reyes Syndrome (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "397575003",
+      "system": "http://snomed.info/sct",
+      "name": "Viral hepatitis",
+      "version": " type G (disorder)"
+    },
+    {
+      "id": "792004",
+      "system": "http://snomed.info/sct",
+      "name": "Jakob-Creutzfeldt disease (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "865929003",
+      "system": "http://snomed.info/sct",
+      "name": "Infection caused by Candida auris (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "1119306006",
+      "system": "http://snomed.info/sct",
+      "name": "Multisystem inflammatory syndrome in adults (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "406612005",
+      "system": "http://snomed.info/sct",
+      "name": "Invasive Group B beta-hemolytic streptococcal disease (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "44301001",
+      "system": "http://snomed.info/sct",
+      "name": "Suicide (event)",
+      "version": "20240301"
+    },
+    {
+      "id": "406614006",
+      "system": "http://snomed.info/sct",
+      "name": "Invasive Group A beta-hemolytic streptococcal disease (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "359761005",
+      "system": "http://snomed.info/sct",
+      "name": "Disease caused by Hantavirus (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "36921006",
+      "system": "http://snomed.info/sct",
+      "name": "Vesicular stomatitis (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "651000146102",
+      "system": "http://snomed.info/sct",
+      "name": "Middle East respiratory syndrome (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "10301003",
+      "system": "http://snomed.info/sct",
+      "name": "Tick-borne relapsing fever (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "29422001",
+      "system": "http://snomed.info/sct",
+      "name": "Coal workers pneumoconiosis (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "18504008",
+      "system": "http://snomed.info/sct",
+      "name": "Toxic shock syndrome (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "240451000",
+      "system": "http://snomed.info/sct",
+      "name": "Streptococcal toxic shock syndrome (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "1214006",
+      "system": "http://snomed.info/sct",
+      "name": "Infection caused by Strongyloides (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "14683004",
+      "system": "http://snomed.info/sct",
+      "name": "Relapsing fever caused by Borrelia recurrentis (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "128869009",
+      "system": "http://snomed.info/sct",
+      "name": "Infestation caused by Sarcoptes scabiei var hominis (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "58718002",
+      "system": "http://snomed.info/sct",
+      "name": "Rheumatic fever (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "404237007",
+      "system": "http://snomed.info/sct",
+      "name": "Keystone virus encephalitis (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "41723001",
+      "system": "http://snomed.info/sct",
+      "name": "Jamestown Canyon virus disease (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "61094002",
+      "system": "http://snomed.info/sct",
+      "name": "La Crosse encephalitis (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "212962007",
+      "system": "http://snomed.info/sct",
+      "name": "Drowning and non-fatal immersion (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "407153006",
+      "system": "http://snomed.info/sct",
+      "name": "Injury due to motor vehicle accident (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "404236003",
+      "system": "http://snomed.info/sct",
+      "name": "Snowshoe hare virus encephalitis (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "240507007",
+      "system": "http://snomed.info/sct",
+      "name": "Trivittatus fever (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "293104008",
+      "system": "http://snomed.info/sct",
+      "name": "Adverse reaction to component of vaccine product (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "707341005",
+      "system": "http://snomed.info/sct",
+      "name": "Viral hepatitis type D (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "409636005",
+      "system": "http://snomed.info/sct",
+      "name": "Complication of smallpox vaccination (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "65154009",
+      "system": "http://snomed.info/sct",
+      "name": "Infection caused by Clostridium perfringens (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "80612004",
+      "system": "http://snomed.info/sct",
+      "name": "Leishmaniasis (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "53648006",
+      "system": "http://snomed.info/sct",
+      "name": "Disease caused by Enterovirus (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "71695001",
+      "system": "http://snomed.info/sct",
+      "name": "Complication of ventilation therapy (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "240820001",
+      "system": "http://snomed.info/sct",
+      "name": "Lymphatic filariasis (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "93614002",
+      "system": "http://snomed.info/sct",
+      "name": "Infection caused by Baylisascaris procyonis (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "719590007",
+      "system": "http://snomed.info/sct",
+      "name": "Influenza caused by seasonal influenza virus (disorder)",
+      "version": "20240301"
+    },
+    {
+      "id": "726492000",
+      "system": "http://snomed.info/sct",
+      "name": "Carbapenem resistant Pseudomonas aeruginosa (organism)",
+      "version": "20240301"
+    },
+    {
+      "id": "444664004",
+      "system": "http://snomed.info/sct",
+      "name": "Genus Cronobacter (organism)",
+      "version": "20240301"
+    }
+  ]
+}

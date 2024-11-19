@@ -1,0 +1,118 @@
+{
+  "conditions": [
+    {
+      "id": 1,
+      "system": "DIBBs Local Code System",
+      "name": "Newborn Screening",
+      "version": "20240909"
+    },
+    {
+      "id": 2,
+      "system": "DIBBs Local Code System",
+      "name": "Cancer (Leukemia)",
+      "version": "20240909"
+    }
+  ],
+  "condition_to_valueset": {
+    "Newborn Screening": [
+      {
+        "id": "1514",
+        "condition_id": "1",
+        "valueset_id": "20240909_1_1",
+        "source": "DIBBs"
+      }
+    ],
+    "Cancer (Leukemia)": [
+      {
+        "id": "1515",
+        "condition_id": "2",
+        "valueset_id": "20240909_2_1",
+        "source": "DIBBs"
+      },
+      {
+        "id": "1516",
+        "condition_id": "2",
+        "valueset_id": "20240909_3_1",
+        "source": "DIBBs"
+      },
+      {
+        "id": "1527",
+        "condition_id": "2",
+        "valueset_id": "20240923_14_1",
+        "source": "DIBBs"
+      },
+      {
+        "id": "1528",
+        "condition_id": "2",
+        "valueset_id": "20240923_15_1",
+        "source": "DIBBs"
+      }
+    ],
+    "Syphilis": [
+      {
+        "id": "1517",
+        "condition_id": "35742006",
+        "valueset_id": "20240909_4_1",
+        "source": "DIBBs"
+      },
+      {
+        "id": "1518",
+        "condition_id": "35742006",
+        "valueset_id": "20240909_5_1",
+        "source": "DIBBs"
+      },
+      {
+        "id": "1519",
+        "condition_id": "35742006",
+        "valueset_id": "20240909_6_1",
+        "source": "DIBBs"
+      }
+    ],
+    "Gonorhea": [
+      {
+        "id": "1520",
+        "condition_id": "15628003",
+        "valueset_id": "20240909_7_1",
+        "source": "DIBBs"
+      },
+      {
+        "id": "1521",
+        "condition_id": "15628003",
+        "valueset_id": "20240909_8_1",
+        "source": "DIBBs"
+      },
+      {
+        "id": "1522",
+        "condition_id": "15628003",
+        "valueset_id": "20240909_9_1",
+        "source": "DIBBs"
+      },
+      {
+        "id": "1523",
+        "condition_id": "15628003",
+        "valueset_id": "20240909_10_1",
+        "source": "DIBBs"
+      }
+    ],
+    "Chlamydia": [
+      {
+        "id": "1524",
+        "condition_id": "240589008",
+        "valueset_id": "20240910_11_1",
+        "source": "DIBBs"
+      },
+      {
+        "id": "1525",
+        "condition_id": "240589008",
+        "valueset_id": "20240910_12_1",
+        "source": "DIBBs"
+      },
+      {
+        "id": "1526",
+        "condition_id": "240589008",
+        "valueset_id": "20240910_13_1",
+        "source": "DIBBs"
+      }
+    ]
+  }
+}

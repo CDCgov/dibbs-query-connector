@@ -10,7 +10,11 @@ import {
   checkValueSetInsertion,
   getERSD,
   getVSACValueSet,
+  insertConditionsFromJSON,
+  insertConditionToValuesets,
   insertValueSet,
+  ConditionStruct,
+  JsonConditionToValueSet,
   translateVSACToInternalValueSet,
 } from "@/app/database-service";
 // import { readJsonFile } from "./app/tests/shared_utils/readJsonFile";
@@ -185,36 +189,82 @@ type DibbsCustomCases = {
 };
 
 /**
+ * Helper utility to resolve the relative path of a file in the docker filesystem.
+ * @param filename The file to read from. Must be located in the assets folder.
+ * @returns Either the stringified data, or null.
+ */
+function readJsonFromRelativePath(filename: string) {
+  try {
+    // Re-scope file system reads to make sure we use the relative
+    // path via node directory resolution
+    const runtimeServerPath = path.resolve(
+      path.join(__dirname, "/", "..", "/", "assets", "/", filename),
+    );
+    const data = fs.readFileSync(runtimeServerPath, "utf-8");
+    return data;
+  } catch (error) {
+    console.error("Error reading JSON file:", error);
+    return;
+  }
+}
+
+/**
  * Uses the relative file structure of the next server to read in the
  * collection of DIBBs custom use case value sets and prepare them
  * for insertion.
  * @returns A mapping of use case to collection of value sets, if the
  * file read is successful, and undefined if it isn't.
  */
-function readDibbsCustomAssets() {
-  let dibbsCustomCases: DibbsCustomCases;
-  try {
-    // Re-scope file system reads to make sure we use the relative
-    // path via node directory resolution
-    const runtimeServerPath = path.resolve(
-      path.join(
-        __dirname,
-        "/",
-        "..",
-        "/",
-        "assets",
-        "/",
-        "DIBBS_Custom_ValueSets.json",
-      ),
-    );
-    const data = fs.readFileSync(runtimeServerPath, "utf-8");
-    dibbsCustomCases = JSON.parse(data) as {
+function readDibbsCustomValueSets() {
+  const data: string | undefined = readJsonFromRelativePath(
+    "DIBBS_Custom_ValueSets.json",
+  );
+  if (data) {
+    const dibbsCustomCases = JSON.parse(data) as {
       [key: string]: Array<DibbsValueSet>;
     };
     return dibbsCustomCases;
-  } catch (error) {
-    console.error("Error reading JSON file:", error);
-    return;
+  } else {
+    console.error("Could not create DIBBs custom value sets");
+  }
+}
+
+/**
+ * Helper function for inserting the condition dump as part of the dev file.
+ */
+async function readAndInsertInitialConditions() {
+  const data: string | undefined = readJsonFromRelativePath(
+    "DIBBS_Initial_Conditions.json",
+  );
+  if (data) {
+    const parsed = JSON.parse(data) as { conditions: Array<ConditionStruct> };
+    await insertConditionsFromJSON(parsed["conditions"]);
+  } else {
+    console.error("Could not insert initial conditions");
+  }
+}
+
+/**
+ * Helper function for inserting specific DIBBs custom conditions and their
+ * associated value set mappings.
+ */
+async function readAndInsertDibbsCustomConditions() {
+  const data: string | undefined = readJsonFromRelativePath(
+    "DIBBS_Default_Queries_Support.json",
+  );
+  if (data) {
+    const parsed = JSON.parse(data) as {
+      conditions: Array<ConditionStruct>;
+      condition_to_valueset: { [key: string]: Array<JsonConditionToValueSet> };
+    };
+    await insertConditionsFromJSON(parsed["conditions"]);
+    Object.keys(parsed["condition_to_valueset"]).map(async (conditionTag) => {
+      console.log("Processing mappings for ", conditionTag);
+      const dibbsCTVStructs = parsed["condition_to_valueset"][conditionTag];
+      await insertConditionToValuesets(dibbsCTVStructs);
+    });
+  } else {
+    console.error("Could not create DIBBs custom condition insertions");
   }
 }
 
@@ -251,7 +301,7 @@ export async function createDibbsDB() {
   } else {
     console.error("Could not load eRSD, aborting DIBBs DB creation");
   }
-  const dibbsCustomVS = readDibbsCustomAssets();
+  const dibbsCustomVS = readDibbsCustomValueSets();
   if (dibbsCustomVS) {
     await insertDibbsCustomValueSets(dibbsCustomVS);
   } else {
@@ -259,4 +309,6 @@ export async function createDibbsDB() {
       "Could not load and insert DIBBs custom value sets, aborting DB creation",
     );
   }
+  await readAndInsertInitialConditions();
+  await readAndInsertDibbsCustomConditions();
 }

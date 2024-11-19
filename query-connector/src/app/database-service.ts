@@ -605,3 +605,89 @@ export async function getConditionsData() {
     conditionIdToNameMap,
   } as const;
 }
+
+export type ConditionStruct = {
+  id: string;
+  system: string;
+  name: string;
+  version: string;
+};
+
+export type JsonConditionToValueSet = {
+  id: string;
+  condition_id: string;
+  valueset_id: string;
+  source: string;
+};
+
+/**
+ * Function that inserts all of the DIBBs custom condition mappings and their
+ * associated value sets into the DB for extraction to a dev dump file.
+ * @param conditions The JSON parsed array of condition objects to insert.
+ */
+export async function insertConditionsFromJSON(conditions: ConditionStruct[]) {
+  const allConditionsPromises = conditions.map((c) => {
+    const insertConditionSql = `
+    INSERT INTO conditions
+      VALUES($1,$2,$3,$4)
+      ON CONFLICT(id)
+      DO UPDATE SET
+        id = EXCLUDED.id,
+        system = EXCLUDED.system,
+        name = EXCLUDED.name,
+        version = EXCLUDED.version
+      RETURNING id;
+    `;
+    const conditionSqlPromise = dbClient.query(insertConditionSql, [
+      c.id,
+      c.system,
+      c.name,
+      c.version,
+    ]);
+    return conditionSqlPromise;
+  });
+
+  const allConditionsInserted = await Promise.allSettled(allConditionsPromises);
+  if (allConditionsInserted.every((p) => p.status === "fulfilled")) {
+    console.log("All conditions inserted from JSON");
+  } else {
+    console.error("Could not insert conditions from JSON");
+  }
+}
+
+/**
+ * Function that inserts condition to value set mappings after they have been
+ * loaded from a JSON file.
+ * @param ctvs An array of condition to value set mappings.
+ */
+export async function insertConditionToValuesets(
+  ctvs: JsonConditionToValueSet[],
+) {
+  const allConditionsPromises = ctvs.map((c) => {
+    const insertConditionSql = `
+    INSERT INTO condition_to_valueset
+      VALUES($1,$2,$3,$4)
+      ON CONFLICT(id)
+      DO UPDATE SET
+        id = EXCLUDED.id,
+        condition_id = EXCLUDED.condition_id,
+        valueset_id = EXCLUDED.valueset_id,
+        source = EXCLUDED.source
+      RETURNING id;
+    `;
+    const conditionSqlPromise = dbClient.query(insertConditionSql, [
+      c.id,
+      c.condition_id,
+      c.valueset_id,
+      c.source,
+    ]);
+    return conditionSqlPromise;
+  });
+
+  const allConditionsInserted = await Promise.allSettled(allConditionsPromises);
+  if (allConditionsInserted.every((p) => p.status === "fulfilled")) {
+    console.log("All condition-valueset mappings inserted from JSON");
+  } else {
+    console.error("Could not insert condition-valueset mappings from JSON");
+  }
+}
