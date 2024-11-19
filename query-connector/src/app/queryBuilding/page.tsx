@@ -11,53 +11,10 @@ import { getCustomQueries } from "@/app/database-service";
  * @returns The Query Building component flow
  */
 const QueryBuilding: React.FC = () => {
-  // Example data
-  // const queries: CustomUserQuery[] = [
-  //   {
-  //     query_name:
-  //       "SNHD: Custom Query with an overly elaborate long name to truncate",
-  //     query_id: "A125",
-  //     valuesets: [
-  //       {
-  //         valueSetId: "VS123",
-  //         valueSetVersion: "1.0",
-  //         valueSetName: "Chlamydia Value Set",
-  //         author: "Author Name",
-  //         system: "System Name",
-  //         ersdConceptType: "ostc",
-  //         dibbsConceptType: "labs",
-  //         includeValueSet: true,
-  //         concepts: [
-  //           { code: "12345", display: "Chlamydia", include: true },
-  //           { code: "67890", display: "HIV", include: false },
-  //         ],
-  //       },
-  //     ],
-  //   },
-  //   {
-  //     query_name: "SNHD: Custom Query 2",
-  //     query_id: "A123901849080294819428013284019 =-4190-6",
-  //     valuesets: [
-  //       {
-  //         valueSetId: "VS456",
-  //         valueSetVersion: "2.0",
-  //         valueSetName: "Cancer Value Set",
-  //         author: "Another Author",
-  //         system: "Another System",
-  //         ersdConceptType: "dxtc",
-  //         dibbsConceptType: "conditions",
-  //         includeValueSet: false,
-  //         concepts: [
-  //           { code: "11111", display: "Cancer 1", include: true },
-  //           { code: "22222", display: "Cancer 2", include: true },
-  //         ],
-  //       },
-  //     ],
-  //   },
-  // ];
   const [queries, setQueries] = useState<CustomUserQuery[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Check whether custom queries exist in DB
   useEffect(() => {
     const fetchQueries = async () => {
       try {
