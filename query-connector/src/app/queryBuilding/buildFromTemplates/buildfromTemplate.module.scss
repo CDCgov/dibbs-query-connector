@@ -43,3 +43,28 @@
 .categoryOption:last-of-type {
   margin-bottom: 3rem;
 }
+
+.vsSearch {
+  width: 25rem !important;
+  padding: 0.75rem 0.75rem 0.75rem 2.25rem !important;
+  margin: 0 !important;
+  height: 3rem !important;
+}
+
+.vsSearch__container {
+  padding: 0.5rem 0.5rem 0 0.5rem;
+  border-radius: 8px;
+  display: flex;
+  flex: auto; // Sizes main-body to fill space between header and footer
+}
+
+.vsSearch__right {
+  background-color: #fff;
+  width: 88%;
+  border-radius: 8px;
+  margin-left: 0.5rem;
+}
+.vsSearch__section {
+  padding: 1.5rem;
+  border-bottom: 1px #dfe1e2 solid;
+}

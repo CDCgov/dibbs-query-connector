@@ -59,7 +59,7 @@ export const ConditionColumnDisplay: React.FC<ConditionColumnDisplayProps> = ({
     if (searchFilter) {
       const filteredDisplay = filterSearchByCategoryAndCondition(
         searchFilter,
-        fetchedConditions,
+        fetchedConditions
       );
       setConditionsToDisplay(filteredDisplay);
     }
@@ -67,7 +67,7 @@ export const ConditionColumnDisplay: React.FC<ConditionColumnDisplayProps> = ({
 
   async function toggleFetchedConditionSelection(
     category: string,
-    conditionId: string,
+    conditionId: string
   ) {
     const prevSelected = selectedConditions?.[category]?.[conditionId]?.include;
     const prevFetch = structuredClone(fetchedConditions);
@@ -94,7 +94,7 @@ export const ConditionColumnDisplay: React.FC<ConditionColumnDisplayProps> = ({
     shouldRemove: boolean,
     category: string,
     conditionId: string,
-    prevFetch: CategoryNameToConditionOptionMap,
+    prevFetch: CategoryNameToConditionOptionMap
   ) => {
     if (shouldRemove) {
       delete selectedConditions[category][conditionId];
@@ -120,10 +120,10 @@ export const ConditionColumnDisplay: React.FC<ConditionColumnDisplayProps> = ({
   };
 
   const columnOneEntries = Object.entries(conditionsToDisplay).filter(
-    (_, i) => i % 2 === 0,
+    (_, i) => i % 2 === 0
   );
   const columnTwoEntries = Object.entries(conditionsToDisplay).filter(
-    (_, i) => i % 2 === 1,
+    (_, i) => i % 2 === 1
   );
 
   const colsToDisplay = [
@@ -159,7 +159,7 @@ export const ConditionColumnDisplay: React.FC<ConditionColumnDisplayProps> = ({
                             handleConditionSelection={handleConditionSelection}
                           />
                         );
-                      },
+                      }
                     )}
                   </div>
                 );
