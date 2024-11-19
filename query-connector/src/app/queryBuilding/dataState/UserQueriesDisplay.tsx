@@ -30,7 +30,7 @@ export const UserQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
   return (
     <div>
       <div className="display-flex flex-justify-between flex-align-center width-full margin-bottom-3">
-        <h1 className="margin-0">My Queries</h1>
+        <h1 className={styles.queryTitle}>My queries</h1>
         <div className="margin-left-auto">
           <Button
             onClick={handleClick}
@@ -52,7 +52,9 @@ export const UserQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
         <tbody>
           {queries.map((query, index) => (
             <tr key={index} className="tableRowWithHover">
-              <td>{query.query_name}</td>
+              <td>
+                {query.query_name} query for patient data in FHIR Server A
+              </td>
               <td>{query.query_id}</td>
               <td>{query.query_name}</td>{" "}
               {/*  TODO: Use conditions_list once available */}
