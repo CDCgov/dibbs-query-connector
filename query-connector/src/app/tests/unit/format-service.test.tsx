@@ -184,11 +184,11 @@ describe("formatIdentifier", () => {
     // the value across multiple elements
     expect(getByText("999-99-9999", { exact: false })).toBeInTheDocument();
     expect(
-      getByText("Social Security Number", { exact: false })
+      getByText("Social Security Number", { exact: false }),
     ).toBeInTheDocument();
     expect(getByText("0123456789", { exact: false })).toBeInTheDocument();
     expect(
-      getByText("Internal Reference Identifier", { exact: false })
+      getByText("Internal Reference Identifier", { exact: false }),
     ).toBeInTheDocument();
   });
 
