@@ -1,39 +1,45 @@
 "use client";
+import { useContext, useEffect, useState } from "react";
 import UserQueriesDisplay from "./dataState/UserQueriesDisplay";
 import EmptyQueriesDisplay from "./emptyState/EmptyQueriesDisplay";
 import { CustomUserQuery } from "@/app/query-building";
-import styles from "@/app/queryBuilding/queryBuilding.module.scss";
-import { useEffect, useState } from "react";
 import { getCustomQueries } from "@/app/database-service";
+import { DataContext } from "@/app/utils";
+import styles from "@/app/queryBuilding/queryBuilding.module.scss";
 
 /**
  * Component for Query Building Flow
  * @returns The Query Building component flow
  */
 const QueryBuilding: React.FC = () => {
-  const [queries, setQueries] = useState<CustomUserQuery[]>([]);
+  const context = useContext(DataContext);
   const [loading, setLoading] = useState(true);
 
   // Check whether custom queries exist in DB
+  // TODO: We will need to support re-running fetchQueries from DB if/when queries are added/deleted/edited
   useEffect(() => {
-    const fetchQueries = async () => {
-      try {
-        const data = await getCustomQueries();
-        setQueries(data);
-      } catch (error) {
-        console.error("Failed to fetch queries:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchQueries();
-    console.log(queries);
-  }, []);
+    if (context?.data === null) {
+      const fetchQueries = async () => {
+        try {
+          const queries = await getCustomQueries();
+          context.setData(queries);
+        } catch (error) {
+          console.error("Failed to fetch queries:", error);
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchQueries();
+    } else {
+      setLoading(false); // Data already exists, no need to fetch again
+    }
+  }, [context]);
 
   if (loading) {
     return <div>Loading...</div>;
   }
+
+  const queries = (context?.data || []) as CustomUserQuery[];
 
   return (
     <>
