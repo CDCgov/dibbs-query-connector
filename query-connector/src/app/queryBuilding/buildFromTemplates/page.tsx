@@ -63,7 +63,7 @@ export default function QueryTemplateSelection() {
 
       if (isSubscribed) {
         setFetchedConditions(
-          mapFetchedDataToFrontendStructure(categoryToConditionArrayMap),
+          mapFetchedDataToFrontendStructure(categoryToConditionArrayMap)
         );
       }
     }
@@ -144,7 +144,7 @@ export default function QueryTemplateSelection() {
         <div
           className={classNames(
             "bg-gray-5 margin-top-4 ",
-            styles.queryTemplateContainer,
+            styles.queryTemplateContainer
           )}
         >
           <div className="display-flex flex-justify flex-align-end margin-bottom-3 width-full">
@@ -152,13 +152,11 @@ export default function QueryTemplateSelection() {
             <Button
               className="margin-0"
               type={"button"}
-              disabled={formError.selectedConditions}
+              disabled={formError.selectedConditions || !queryName}
               title={
-                formError.selectedConditions
-                  ? "Select at least one condition below"
-                  : !queryName
-                    ? "Enter a query name, then click to create your query"
-                    : "Click to create your query"
+                formError.selectedConditions || formError.queryName
+                  ? "Enter a query name and condition"
+                  : "Click to create your query"
               }
               onClick={handleCreateQueryClick}
             >
@@ -170,7 +168,7 @@ export default function QueryTemplateSelection() {
               id="conditionTemplateSearch"
               placeholder="Search conditions"
               className={classNames(
-                "maxw-mobile margin-x-auto margin-top-0 margin-bottom-4",
+                "maxw-mobile margin-x-auto margin-top-0 margin-bottom-4"
               )}
               onChange={(e) => {
                 e.preventDefault();
