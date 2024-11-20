@@ -59,10 +59,7 @@ const SelectSavedQuery: React.FC<SelectSavedQueryProps> = ({
       <Backlink onClick={goBack} label={RETURN_LABEL["select-query"]} />
       <h1 className="page-title">{PAGE_TITLES["select-query"]}</h1>
       <h2 className="page-explainer">
-        We will request all data related to your selected patient and query. By
-        only showing relevant data for your query, we decrease the burden on our
-        systems and protect patient privacy. If you would like to customize the
-        query response, click on the "customize query" button.
+        We will pull relevant data for your selected patient and query.
       </h2>
       <h3 className={styles.queryDropdownLabel}>Query</h3>
       <div className={styles.queryRow}>
