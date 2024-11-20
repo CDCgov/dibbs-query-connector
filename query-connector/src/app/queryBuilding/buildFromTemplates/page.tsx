@@ -15,6 +15,11 @@ import ConditionColumnDisplay from "./ConditionColumnDisplay";
 import SearchField from "@/app/query/designSystem/searchField/SearchField";
 import SiteAlert from "@/app/query/designSystem/SiteAlert";
 
+export type FormError = {
+  queryName: boolean;
+  selectedConditions: boolean;
+};
+
 /**
  * The query building page
  * @returns the component for the query building page
@@ -29,6 +34,10 @@ export default function QueryTemplateSelection() {
     useState<CategoryNameToConditionOptionMap>();
   const [selectedConditions, setSelectedConditions] =
     useState<CategoryNameToConditionOptionMap>();
+  const [formError, setFormError] = useState<FormError>({
+    queryName: false,
+    selectedConditions: false,
+  });
 
   useEffect(() => {
     let isSubscribed = true;
@@ -37,12 +46,24 @@ export default function QueryTemplateSelection() {
       focusRef?.current?.focus();
     }
 
+    // enables/disables the Create Query button based on selectedConditions
+    if (!selectedConditions || Object.values(selectedConditions).length < 1) {
+      setFormError({ ...formError, ...{ selectedConditions: true } });
+    } else {
+      setFormError({ ...formError, ...{ selectedConditions: false } });
+    }
+
+    // clear the error when the user enters a query name
+    if (formError.queryName && !!queryName) {
+      validateForm();
+    }
+
     async function fetchConditionsAndUpdateState() {
       const { categoryToConditionArrayMap } = await getConditionsData();
 
       if (isSubscribed) {
         setFetchedConditions(
-          mapFetchedDataToFrontendStructure(categoryToConditionArrayMap),
+          mapFetchedDataToFrontendStructure(categoryToConditionArrayMap)
         );
       }
     }
@@ -52,22 +73,36 @@ export default function QueryTemplateSelection() {
     return () => {
       isSubscribed = false;
     };
-  }, []);
+  }, [selectedConditions, queryName]);
 
-  const submitForm = (event: React.MouseEvent<HTMLButtonElement>) => {
+  function handleCreateQueryClick(event: React.MouseEvent<HTMLButtonElement>) {
     event.preventDefault();
 
+    validateForm();
+    if (!!queryName && !formError.queryName && !formError.selectedConditions) {
+      submitForm();
+    }
+  }
+
+  const validateForm = () => {
+    if (!queryName || queryName == "") {
+      focusRef?.current?.focus();
+    }
+
+    return setFormError({
+      ...formError,
+      ...{ queryName: !queryName, selectedConditions: !atLeastOneItemSelected },
+    });
+  };
+
+  const submitForm = () => {
     // TODO: do something with selectedConditions on next step/page
     // will be addressed in https://linear.app/skylight-cdc/issue/QUE-65/create-the-valueset-selection-page
     console.log(selectedConditions);
   };
 
   const atLeastOneItemSelected =
-    fetchedConditions &&
-    Object.values(Object.values(fetchedConditions))
-      .map((arr) => Object.values(arr).flatMap((e) => e.include))
-      .flatMap((e) => e.some(Boolean))
-      .some(Boolean);
+    selectedConditions && Object.values(selectedConditions).length > 0;
 
   return (
     <>
@@ -88,17 +123,28 @@ export default function QueryTemplateSelection() {
           id="queryNameInput"
           name="queryNameInput"
           type="text"
+          style={
+            formError.queryName && !queryName
+              ? { border: "1px solid #E41D3D" }
+              : {}
+          }
           className="maxw-mobile"
           required
           onChange={(event) => {
             setQueryName(event.target.value);
           }}
         />
-
+        <span
+          className="inline-error queryName-error"
+          style={!!queryName ? { display: "none" } : { color: "#E41D3D" }}
+          hidden={formError.queryName == false}
+        >
+          Please enter a query name.
+        </span>
         <div
           className={classNames(
             "bg-gray-5 margin-top-4 ",
-            styles.queryTemplateContainer,
+            styles.queryTemplateContainer
           )}
         >
           <div className="display-flex flex-justify flex-align-end margin-bottom-3 width-full">
@@ -106,8 +152,15 @@ export default function QueryTemplateSelection() {
             <Button
               className="margin-0"
               type={"button"}
-              disabled={!atLeastOneItemSelected || !queryName}
-              onClick={submitForm}
+              disabled={formError.selectedConditions}
+              title={
+                formError.selectedConditions
+                  ? "Select at least one condition below"
+                  : !queryName
+                    ? "Enter a query name, then click to create your query"
+                    : "Click to create your query"
+              }
+              onClick={handleCreateQueryClick}
             >
               Create query
             </Button>
@@ -117,7 +170,7 @@ export default function QueryTemplateSelection() {
               id="conditionTemplateSearch"
               placeholder="Search conditions"
               className={classNames(
-                "maxw-mobile margin-x-auto margin-top-0 margin-bottom-4",
+                "maxw-mobile margin-x-auto margin-top-0 margin-bottom-4"
               )}
               onChange={(e) => {
                 e.preventDefault();
@@ -132,6 +185,8 @@ export default function QueryTemplateSelection() {
                 fetchedConditions={fetchedConditions}
                 searchFilter={searchFilter}
                 setFetchedConditions={setFetchedConditions}
+                setFormError={setFormError}
+                formError={formError}
               />
             )}
           </div>
