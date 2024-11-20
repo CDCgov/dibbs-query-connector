@@ -622,6 +622,30 @@ export type JsonConditionToValueSet = {
   source: string;
 };
 
+export type JsonTableQuery = {
+  id: string;
+  query_name: string;
+  author: string;
+  date_created: Date;
+  date_last_modified: Date;
+  time_window_number: number;
+  time_window_unit: string;
+};
+
+export type JsonQueryToValueset = {
+  id: string;
+  query_id: string;
+  valueset_id: string;
+  valueset_oid: string;
+};
+
+export type JsonQueryIncludedConcepts = {
+  id: string;
+  query_by_valueset_id: string;
+  concept_id: string;
+  include: boolean;
+};
+
 /**
  * Function that inserts all of the DIBBs custom condition mappings and their
  * associated value sets into the DB for extraction to a dev dump file.
@@ -691,5 +715,115 @@ export async function insertConditionToValuesets(
     console.log("All condition-valueset mappings inserted from JSON");
   } else {
     console.error("Could not insert condition-valueset mappings from JSON");
+  }
+}
+
+/**
+ * Helper function to insert JSON-loaded default queries into the DB.
+ * @param queries The JSON parsed default queries to insert.
+ */
+export async function insertDefaultQueries(queries: JsonTableQuery[]) {
+  const allQueryPromises = queries.map((q) => {
+    const insertQuerySql = `
+    INSERT INTO query
+      VALUES($1,$2,$3,$4,$5,$6,$7)
+      ON CONFLICT(id)
+      DO UPDATE SET
+        id = EXCLUDED.id,
+        query_name = EXCLUDED.query_name,
+        author = EXCLUDED.author,
+        date_created = EXCLUDED.date_created,
+        date_last_modified = EXCLUDED.date_last_modified,
+        time_window_number = EXCLUDED.time_window_number,
+        time_window_unit = EXCLUDED.time_window_unit
+      RETURNING id;
+    `;
+    const querySqlPromise = dbClient.query(insertQuerySql, [
+      q.id,
+      q.query_name,
+      q.author,
+      q.date_created,
+      q.date_last_modified,
+      q.time_window_number,
+      q.time_window_unit,
+    ]);
+    return querySqlPromise;
+  });
+
+  const allQueriesInserted = await Promise.allSettled(allQueryPromises);
+  if (allQueriesInserted.every((p) => p.status === "fulfilled")) {
+    console.log("All default queries inserted from JSON");
+  } else {
+    console.error("Could not insert default queries from JSON");
+  }
+}
+
+/**
+ * Helper function to insert JSON loaded query-to-valueset mappings.
+ * @param qtvs The QtVS mappings to insert.
+ */
+export async function inserstQueriesToValueSets(qtvs: JsonQueryToValueset[]) {
+  const allQtVPromises = qtvs.map((q) => {
+    const insertQtVSql = `
+    INSERT INTO query_to_valueset
+      VALUES($1,$2,$3,$4)
+      ON CONFLICT(id)
+      DO UPDATE SET
+        id = EXCLUDED.id,
+        query_id = EXCLUDED.query_id,
+        valueset_id = EXCLUDED.valueset_id,
+        valueset_oid = EXCLUDED.valueset_oid
+      RETURNING id;
+    `;
+    const qtvSqlPromise = dbClient.query(insertQtVSql, [
+      q.id,
+      q.query_id,
+      q.valueset_id,
+      q.valueset_oid,
+    ]);
+    return qtvSqlPromise;
+  });
+
+  const allQtVInserted = await Promise.allSettled(allQtVPromises);
+  if (allQtVInserted.every((p) => p.status === "fulfilled")) {
+    console.log("All query-valueset mappings inserted from JSON");
+  } else {
+    console.error("Could not insert query-valueset mappings from JSON");
+  }
+}
+
+/**
+ * Helper function to insert JSON loaded query included concepts.
+ * @param qics The QICs to insert.
+ */
+export async function insertQueryIncludedConcepts(
+  qics: JsonQueryIncludedConcepts[],
+) {
+  const allQICsPromises = qics.map((ic) => {
+    const insertQICSql = `
+    INSERT INTO query_included_concepts
+      VALUES($1,$2,$3,$4)
+      ON CONFLICT(id)
+      DO UPDATE SET
+        id = EXCLUDED.id,
+        query_by_valueset_id = EXCLUDED.query_by_valueset_id,
+        concept_id = EXCLUDED.concept_id,
+        include = EXCLUDED.include
+      RETURNING id;
+    `;
+    const qicSqlPromise = dbClient.query(insertQICSql, [
+      ic.id,
+      ic.query_by_valueset_id,
+      ic.concept_id,
+      ic.include,
+    ]);
+    return qicSqlPromise;
+  });
+
+  const allQICsInserted = await Promise.allSettled(allQICsPromises);
+  if (allQICsInserted.every((p) => p.status === "fulfilled")) {
+    console.log("All query included concepts inserted from JSON");
+  } else {
+    console.error("Could not insert query included concepts from JSON");
   }
 }

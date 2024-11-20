@@ -1,0 +1,1360 @@
+{
+  "query_included_concepts": [
+    {
+      "id": "937c7e04-9465-462f-91b9-8ee0e8feaead",
+      "query_by_valueset_id": "85b0ab79-3f5d-4c09-8a73-ebac437ad85e",
+      "concept_id": "snomed_1255068005",
+      "include": true
+    },
+    {
+      "id": "4c661114-e5fa-44a6-b534-212bd7bb51f4",
+      "query_by_valueset_id": "4db9bc26-b71b-4695-b31e-78834cbfdb20",
+      "concept_id": "cap_30000.100004300",
+      "include": true
+    },
+    {
+      "id": "99823c28-73ee-4c56-b4ad-a66735bcc6b4",
+      "query_by_valueset_id": "4db9bc26-b71b-4695-b31e-78834cbfdb20",
+      "concept_id": "cap_9484.100004300",
+      "include": true
+    },
+    {
+      "id": "f5e08d56-f7a1-4291-b287-07cad09532d3",
+      "query_by_valueset_id": "26cd4bc6-8ea2-4d39-81f3-c35d2b03db24",
+      "concept_id": "www_828265",
+      "include": true
+    },
+    {
+      "id": "b5428d76-f7d1-45ba-802b-239168b37de3",
+      "query_by_valueset_id": "6051ea3a-2103-4b8b-8a94-6093dc6da0a5",
+      "concept_id": "snomed_2.16.840.1.113762.1.4.1146.1407_92814006",
+      "include": true
+    },
+    {
+      "id": "0dfb17d5-9f96-4d26-93dc-6e091937a203",
+      "query_by_valueset_id": "6051ea3a-2103-4b8b-8a94-6093dc6da0a5",
+      "concept_id": "snomed_418689008",
+      "include": true
+    },
+    {
+      "id": "71538a56-6506-47d9-8a7c-cc54a03addc4",
+      "query_by_valueset_id": "6051ea3a-2103-4b8b-8a94-6093dc6da0a5",
+      "concept_id": "snomed_363346000",
+      "include": true
+    },
+    {
+      "id": "6670bd50-2848-4c08-8341-30d83882f9f5",
+      "query_by_valueset_id": "d101b5eb-5981-4441-89de-b27a58187876",
+      "concept_id": "loinc_21613-5",
+      "include": true
+    },
+    {
+      "id": "68536234-5564-4019-8967-f1efa64fdc0b",
+      "query_by_valueset_id": "89956e90-ee4c-4b0c-9a14-382b73015ad6",
+      "concept_id": "loinc_11350-6",
+      "include": true
+    },
+    {
+      "id": "3a9d1762-7009-4c8a-a4df-1b643ad80ac4",
+      "query_by_valueset_id": "89956e90-ee4c-4b0c-9a14-382b73015ad6",
+      "concept_id": "loinc_82810-3",
+      "include": true
+    },
+    {
+      "id": "b9b60131-1f57-4d5b-9112-8e650c89a11c",
+      "query_by_valueset_id": "89956e90-ee4c-4b0c-9a14-382b73015ad6",
+      "concept_id": "loinc_83317-8",
+      "include": true
+    },
+    {
+      "id": "64378c9e-4da2-44c4-84ff-618ccb732b22",
+      "query_by_valueset_id": "eefdc3ea-0078-492a-a734-fb1f8b7a187f",
+      "concept_id": "snomed_2339001",
+      "include": true
+    },
+    {
+      "id": "05b4693a-dea9-416d-aaf2-89742f0ecc27",
+      "query_by_valueset_id": "eefdc3ea-0078-492a-a734-fb1f8b7a187f",
+      "concept_id": "snomed_72531000052105",
+      "include": true
+    },
+    {
+      "id": "842d22ea-054a-43ec-96b2-3e5a25a83f80",
+      "query_by_valueset_id": "f2fa551a-f558-49d3-a87f-d89c464762a9",
+      "concept_id": "www_434692",
+      "include": true
+    },
+    {
+      "id": "0549172a-7b90-44ff-a9bd-b8f1d20a8f59",
+      "query_by_valueset_id": "f2fa551a-f558-49d3-a87f-d89c464762a9",
+      "concept_id": "www_1665005",
+      "include": true
+    },
+    {
+      "id": "b8469882-d676-424c-b614-edcbc4c2cfac",
+      "query_by_valueset_id": "39a8c3f3-86ab-45f5-932e-451b80a5ef60",
+      "concept_id": "loinc_54108-6",
+      "include": true
+    },
+    {
+      "id": "5b38c762-3bef-4fee-b454-e093472b6a54",
+      "query_by_valueset_id": "39a8c3f3-86ab-45f5-932e-451b80a5ef60",
+      "concept_id": "loinc_73742-9",
+      "include": true
+    },
+    {
+      "id": "7e6ab9bd-b0ae-4268-b03f-d8ccf5c784ce",
+      "query_by_valueset_id": "39a8c3f3-86ab-45f5-932e-451b80a5ef60",
+      "concept_id": "loinc_2708-6",
+      "include": true
+    },
+    {
+      "id": "d92ba04e-0f74-4b42-9345-bddca5f4d2bf",
+      "query_by_valueset_id": "39a8c3f3-86ab-45f5-932e-451b80a5ef60",
+      "concept_id": "loinc_8336-0",
+      "include": true
+    },
+    {
+      "id": "0b7d87db-3971-4633-b9d8-67e32409f6c7",
+      "query_by_valueset_id": "39a8c3f3-86ab-45f5-932e-451b80a5ef60",
+      "concept_id": "loinc_58232-0",
+      "include": true
+    },
+    {
+      "id": "78382341-e20a-440b-a024-9b81881749ae",
+      "query_by_valueset_id": "39a8c3f3-86ab-45f5-932e-451b80a5ef60",
+      "concept_id": "loinc_57700-7",
+      "include": true
+    },
+    {
+      "id": "1606dced-623a-4daf-adea-5fdb2d04eb80",
+      "query_by_valueset_id": "39a8c3f3-86ab-45f5-932e-451b80a5ef60",
+      "concept_id": "loinc_73700-7",
+      "include": true
+    },
+    {
+      "id": "97a0bd36-be85-4969-af81-293e99d2dd33",
+      "query_by_valueset_id": "39a8c3f3-86ab-45f5-932e-451b80a5ef60",
+      "concept_id": "loinc_54109-4",
+      "include": true
+    },
+    {
+      "id": "d57983e9-2380-4c28-af74-99fa8abd0821",
+      "query_by_valueset_id": "39a8c3f3-86ab-45f5-932e-451b80a5ef60",
+      "concept_id": "loinc_73698-3",
+      "include": true
+    },
+    {
+      "id": "74838e32-5af2-4e81-97b2-91ed8f125ab7",
+      "query_by_valueset_id": "39a8c3f3-86ab-45f5-932e-451b80a5ef60",
+      "concept_id": "loinc_73739-5",
+      "include": true
+    },
+    {
+      "id": "6aaf497f-a5f7-4179-9bc0-50dd2f02f271",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_24440-0",
+      "include": true
+    },
+    {
+      "id": "33b4f1f9-b560-4778-a952-148719446d2b",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_19074-4",
+      "include": true
+    },
+    {
+      "id": "3338a486-e492-4859-bd6c-e2d3fb669f30",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_34275-8",
+      "include": true
+    },
+    {
+      "id": "25d08b3d-4e06-4344-9ebb-1525f6e04ba2",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_26600-7",
+      "include": true
+    },
+    {
+      "id": "188143eb-4331-4236-ba79-440ca1cb4390",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_26607-2",
+      "include": true
+    },
+    {
+      "id": "db369ab4-c9ea-4f75-9a79-1e8df0d8ef03",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_20646-6",
+      "include": true
+    },
+    {
+      "id": "695dd75c-aecc-45b0-b46c-ca8a286b49ef",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_20655-7",
+      "include": true
+    },
+    {
+      "id": "2dfe356b-cfd4-435f-a2a5-1138bc4ce23c",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_28596-5",
+      "include": true
+    },
+    {
+      "id": "5fa70fe7-4114-4deb-8739-48f567bf9595",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_28593-2",
+      "include": true
+    },
+    {
+      "id": "d16cda3e-f66f-4202-8454-75742868844a",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_32248-7",
+      "include": true
+    },
+    {
+      "id": "e5d7aa72-2505-41c2-a113-00a993771fd6",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_30048-3",
+      "include": true
+    },
+    {
+      "id": "d1e5d394-cac2-4097-a2b5-ebd6d0df5bc6",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_28595-7",
+      "include": true
+    },
+    {
+      "id": "20127492-fc43-489e-bdd4-c4b57aa1e8c8",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_25112-4",
+      "include": true
+    },
+    {
+      "id": "a5439037-a0d6-451f-991d-c81c531797b4",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_25116-5",
+      "include": true
+    },
+    {
+      "id": "a1dbc15d-941e-4a74-9f81-12f32a18fdfb",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_25085-2",
+      "include": true
+    },
+    {
+      "id": "cbf4f869-4b2d-4362-9385-6d67cb8bef95",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_25089-4",
+      "include": true
+    },
+    {
+      "id": "dc5e819e-155a-4df2-af85-3a628381674b",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_3024-7",
+      "include": true
+    },
+    {
+      "id": "86fbd293-22e5-4ed1-8327-8757b7a6d5b4",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_42941-5",
+      "include": true
+    },
+    {
+      "id": "b99afee9-107e-47e2-8244-bd09d31c469c",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_10970-2",
+      "include": true
+    },
+    {
+      "id": "9e0f2916-f0e0-4fab-87d9-ce03b3a9bd1e",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_32519-1",
+      "include": true
+    },
+    {
+      "id": "1bf803ad-04a4-4751-bc96-93c94652aa70",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_17157-9",
+      "include": true
+    },
+    {
+      "id": "02272e27-b8e5-4e8c-a6f8-c47d0e81164a",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_31113-4",
+      "include": true
+    },
+    {
+      "id": "d219a5c8-9f80-4a8f-aa46-73387d3824e2",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_8123-2",
+      "include": true
+    },
+    {
+      "id": "5a24d18b-d36b-440b-9175-dd9edc4e9736",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_20593-0",
+      "include": true
+    },
+    {
+      "id": "b69c6543-4639-48dc-ac6c-5929e195c9f0",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_8118-2",
+      "include": true
+    },
+    {
+      "id": "7c700f2f-ef6b-486f-a6ef-fcea81ab5db2",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_9557-0",
+      "include": true
+    },
+    {
+      "id": "78620914-ff8b-4dd3-a4ae-4abfd6f2aad4",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_30551-6",
+      "include": true
+    },
+    {
+      "id": "a5f844f1-38bd-4e48-8778-eaef40728aeb",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_30331-3",
+      "include": true
+    },
+    {
+      "id": "6122c249-3073-41f7-891f-fe51e98f3915",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_30565-6",
+      "include": true
+    },
+    {
+      "id": "758658fa-6ed3-4d4f-bc77-ea04b1374675",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_30542-5",
+      "include": true
+    },
+    {
+      "id": "3ad3d416-0bcb-49c0-a155-e40bb3d3ba5b",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_30191-1",
+      "include": true
+    },
+    {
+      "id": "8f2791bc-245a-4544-ade2-2d05cb2c0c12",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_30328-9",
+      "include": true
+    },
+    {
+      "id": "fe3abf19-9016-40cc-af3e-62a5b218fa39",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_30564-9",
+      "include": true
+    },
+    {
+      "id": "9da1ad10-f82c-4833-91de-dce15bc44212",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_35656-8",
+      "include": true
+    },
+    {
+      "id": "7cb5d243-fcaa-49a4-aa91-dc0a7b7f632b",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_24439-2",
+      "include": true
+    },
+    {
+      "id": "5643a0e1-565e-4220-a75f-871b8aa772cf",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_14288-5",
+      "include": true
+    },
+    {
+      "id": "1212482d-3c01-4462-b728-ce6b280ad332",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_34155-2",
+      "include": true
+    },
+    {
+      "id": "b2c369a6-7b37-4cea-8847-2b8deececf5d",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_26609-8",
+      "include": true
+    },
+    {
+      "id": "ddbb05de-31e8-46e1-b40a-c94008df74e2",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_22672-0",
+      "include": true
+    },
+    {
+      "id": "09c71c80-d7b3-41c2-bbff-0b69fb7ce342",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_20650-8",
+      "include": true
+    },
+    {
+      "id": "dfb7e38c-dfdc-448f-90f1-15efe3b98f02",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_20661-5",
+      "include": true
+    },
+    {
+      "id": "11764be6-6904-42ae-9d06-8b8e18bbc534",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_30161-4",
+      "include": true
+    },
+    {
+      "id": "42c25b1a-fc30-4d84-9bca-ee885283f21d",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_30358-6",
+      "include": true
+    },
+    {
+      "id": "2ad46ddf-236c-438e-906e-5a390903e960",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_30235-6",
+      "include": true
+    },
+    {
+      "id": "6eb79c58-fa46-41e0-ac40-1961baad237e",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_24442-6",
+      "include": true
+    },
+    {
+      "id": "d80b69a8-1d4c-4271-b9fc-b9a3213b89d5",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_40869-0",
+      "include": true
+    },
+    {
+      "id": "f6dd8c2a-8ffe-4030-8ee8-eb13fa48974d",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_26604-9",
+      "include": true
+    },
+    {
+      "id": "fe8be437-7b74-4875-889c-ac089b1cea81",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_20634-2",
+      "include": true
+    },
+    {
+      "id": "1fbf2655-3004-4375-8319-514ee40fc6d2",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_20642-5",
+      "include": true
+    },
+    {
+      "id": "8b9de22d-05c2-426e-a5e4-412916ead1a4",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_20652-4",
+      "include": true
+    },
+    {
+      "id": "c5945831-03c6-4759-b61b-1d315b2ff2e1",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_49248-8",
+      "include": true
+    },
+    {
+      "id": "ea7fa89f-c432-4dbc-8f39-cc23ae2180fc",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_28602-1",
+      "include": true
+    },
+    {
+      "id": "c7b8c2ca-3dcf-41d0-87c4-ab9be4a0ae83",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_30050-9",
+      "include": true
+    },
+    {
+      "id": "e5b34ccf-5a7c-4c78-8fcc-5514e9733748",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_30058-2",
+      "include": true
+    },
+    {
+      "id": "d0a14a75-4d49-4cca-a793-d3543a590c7d",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_29509-7",
+      "include": true
+    },
+    {
+      "id": "30c46f1c-14e1-4513-93b5-417b87843c71",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_29519-6",
+      "include": true
+    },
+    {
+      "id": "9c225ce6-36c8-4a78-89a0-2b537feaf5ef",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_30540-9",
+      "include": true
+    },
+    {
+      "id": "b691f327-610e-4fcb-92cd-c5651906b523",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_30357-8",
+      "include": true
+    },
+    {
+      "id": "89bf9080-ffc0-4071-bf85-0f670f195d44",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_2161-8",
+      "include": true
+    },
+    {
+      "id": "2e301f80-775a-4329-a2b4-c0de98cc052c",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_17866-5",
+      "include": true
+    },
+    {
+      "id": "c12e0281-428d-48a9-ad63-127e1abf62d0",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_13500-4",
+      "include": true
+    },
+    {
+      "id": "1c2b44dc-5410-4177-99f3-2b9de20e3560",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_26605-6",
+      "include": true
+    },
+    {
+      "id": "29608c0d-3d35-4634-bfa6-138fae8bda9a",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_20643-3",
+      "include": true
+    },
+    {
+      "id": "82dd6e30-b575-4c92-ab99-48d70d409a9f",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_20651-6",
+      "include": true
+    },
+    {
+      "id": "aff3fb6e-8d6b-4a35-bf3e-02044492daa5",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_28588-2",
+      "include": true
+    },
+    {
+      "id": "449c3844-31b6-405b-bfd1-e0e875c2c24d",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_28599-9",
+      "include": true
+    },
+    {
+      "id": "6ea5e3a3-596d-4e77-bdcf-e30f948b6640",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_30052-5",
+      "include": true
+    },
+    {
+      "id": "dfd54531-90b5-4949-ba29-b5f956a3b7ab",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_30064-0",
+      "include": true
+    },
+    {
+      "id": "addbc53a-6a79-4831-ab69-051f8d8c7a61",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_25083-7",
+      "include": true
+    },
+    {
+      "id": "b7252ccb-0cc1-4cdb-87fb-f23efb1f4fb3",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_1982-8",
+      "include": true
+    },
+    {
+      "id": "543933ff-a1ff-4988-ad10-0f9fd1495adb",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_33617-2",
+      "include": true
+    },
+    {
+      "id": "b87fe279-9c12-4be8-a39f-abd80f268b7a",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_20599-7",
+      "include": true
+    },
+    {
+      "id": "16fe680b-edd2-431c-bfe4-469d83de7085",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_35462-1",
+      "include": true
+    },
+    {
+      "id": "0544175a-41f8-4ace-9c32-ce7b33d562bd",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_39001-3",
+      "include": true
+    },
+    {
+      "id": "ea62fe49-4028-400a-9af0-18bebe5cda2a",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_30356-0",
+      "include": true
+    },
+    {
+      "id": "f8bd5ebd-06d3-4d80-877a-b843b42b2616",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_53718-3",
+      "include": true
+    },
+    {
+      "id": "490647f2-d5d8-4fe9-8b39-e63de1d6b396",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_24436-8",
+      "include": true
+    },
+    {
+      "id": "b013ac4e-22ac-4acf-b66c-85ff62899b01",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_15045-8",
+      "include": true
+    },
+    {
+      "id": "317813cf-e3fc-418c-a9cb-bbe2dfbd5021",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_20637-5",
+      "include": true
+    },
+    {
+      "id": "8a36338b-2144-4d47-a1b3-3e715b39fb0a",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_55876-7",
+      "include": true
+    },
+    {
+      "id": "3a89845a-2161-44de-81b2-d9a208c6d9a4",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_26613-0",
+      "include": true
+    },
+    {
+      "id": "b8165c29-8e1a-427c-8fbf-b4517fe184a4",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_28590-8",
+      "include": true
+    },
+    {
+      "id": "e6a1f8ed-2487-41d4-949a-7874708ccd89",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_30065-7",
+      "include": true
+    },
+    {
+      "id": "5ad1a28b-a976-4ef4-95e9-f69ec60abed1",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_30053-3",
+      "include": true
+    },
+    {
+      "id": "8feda3f4-9a33-4ffb-be78-54fcb1c9294d",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_30054-1",
+      "include": true
+    },
+    {
+      "id": "1affd3b6-f4c6-49b2-83e6-9fc4b39f2cd8",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_25084-5",
+      "include": true
+    },
+    {
+      "id": "76b5cd5c-7c63-45a4-9600-dddcabaf3b44",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_25137-1",
+      "include": true
+    },
+    {
+      "id": "4a300f71-f593-46a5-9ef3-2b3ad038dd00",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_3016-3",
+      "include": true
+    },
+    {
+      "id": "04b6a001-09dc-4c1f-99c6-17affab33f73",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_2312-7",
+      "include": true
+    },
+    {
+      "id": "75e96a8d-4cff-4faf-9994-99397a3ce25a",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_20604-5",
+      "include": true
+    },
+    {
+      "id": "0c81ab69-6bf6-4067-8356-66c9963cd0ea",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_8122-4",
+      "include": true
+    },
+    {
+      "id": "3e5e70a6-f2ee-4585-8f04-91e6e69b9b5f",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_54449-4",
+      "include": true
+    },
+    {
+      "id": "2d7b6bbf-10a0-4ac4-936f-989b6a125551",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_51413-3",
+      "include": true
+    },
+    {
+      "id": "d4572188-4cb2-40e5-9e29-28513f831833",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_30190-3",
+      "include": true
+    },
+    {
+      "id": "47e614ce-9619-4296-ab63-30f6ba4dbc46",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_30534-2",
+      "include": true
+    },
+    {
+      "id": "5481454a-580a-4123-87b0-0366e381eeab",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_24441-8",
+      "include": true
+    },
+    {
+      "id": "a8123b6d-eed2-4ca9-8de9-cd2efa7d051a",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_54442-9",
+      "include": true
+    },
+    {
+      "id": "84a9d83c-3ec3-4e3a-9c47-abdc7e2e3669",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_26599-1",
+      "include": true
+    },
+    {
+      "id": "763eea01-2167-4baa-9bfe-e3a9866aa02f",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_26608-0",
+      "include": true
+    },
+    {
+      "id": "34c1a07e-5832-4e4c-9ec1-a9d429523c78",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_20649-0",
+      "include": true
+    },
+    {
+      "id": "ae42c833-a997-4123-8445-69b3d5c05b70",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_20659-9",
+      "include": true
+    },
+    {
+      "id": "0f2b4fc5-16aa-4666-bfcc-54e7f194756a",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_30061-6",
+      "include": true
+    },
+    {
+      "id": "b384ae19-d269-4891-a0cc-e3a24e8138e5",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_30056-6",
+      "include": true
+    },
+    {
+      "id": "05e762b8-a66e-4fb0-b456-ee77824f9b65",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_28601-3",
+      "include": true
+    },
+    {
+      "id": "8666111a-8ebe-4d1a-87b7-dfb336489157",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_30049-1",
+      "include": true
+    },
+    {
+      "id": "a9b714fa-3bef-4206-bc5b-d6b6093b4639",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_30057-4",
+      "include": true
+    },
+    {
+      "id": "a3213a62-ee1a-4c54-8048-7e051f14fec7",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_25132-2",
+      "include": true
+    },
+    {
+      "id": "721f0737-9cdd-4abc-9406-508834809656",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_29524-6",
+      "include": true
+    },
+    {
+      "id": "95e21479-303d-4315-9793-1b6e081f324d",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_29859-6",
+      "include": true
+    },
+    {
+      "id": "28e24111-0848-4cba-9daa-609efd598f4d",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_1668-3",
+      "include": true
+    },
+    {
+      "id": "42ee75ff-5175-4f33-ace1-1035738dbabc",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_33360-9",
+      "include": true
+    },
+    {
+      "id": "743bb092-c44b-4a9a-a178-e356102fb5b8",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_34475-4",
+      "include": true
+    },
+    {
+      "id": "8551ab0d-d53f-4850-ae37-4437383e7ae8",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_46252-3",
+      "include": true
+    },
+    {
+      "id": "c85b4847-17ce-4fe8-bd1b-0c6e30d8869e",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_30327-1",
+      "include": true
+    },
+    {
+      "id": "b96b002f-decf-48af-a1fe-2e42c7b12c91",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_30233-1",
+      "include": true
+    },
+    {
+      "id": "061ab796-5588-4905-87c3-10d7723e0f39",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_30560-7",
+      "include": true
+    },
+    {
+      "id": "827bd6fe-ceb3-476a-b9ef-6631cfe120f6",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_24438-4",
+      "include": true
+    },
+    {
+      "id": "ad9e024a-bd1b-4918-a822-822a2a22ee97",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_14286-9",
+      "include": true
+    },
+    {
+      "id": "61b5d3ee-ae70-4c40-a751-0c6c35c8602c",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_28589-0",
+      "include": true
+    },
+    {
+      "id": "a7df2f3d-7a93-460a-9c21-0f58ef93e601",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_14683-7",
+      "include": true
+    },
+    {
+      "id": "6a9da774-efc6-407a-8104-74a6848c0bcd",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_22670-4",
+      "include": true
+    },
+    {
+      "id": "1c01f196-af37-424a-9fc6-6e01956ffab7",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_20640-9",
+      "include": true
+    },
+    {
+      "id": "1291a4f7-4919-499c-8eb7-82f872cbd7b6",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_26610-6",
+      "include": true
+    },
+    {
+      "id": "730bf16d-9c41-4edb-8199-5604535cd89b",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_20656-5",
+      "include": true
+    },
+    {
+      "id": "da2034ee-e8e3-4880-9a66-50cffccdd968",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_30062-4",
+      "include": true
+    },
+    {
+      "id": "9f157c58-772b-47a7-9db9-f434233ad1fd",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_30059-0",
+      "include": true
+    },
+    {
+      "id": "23b15f5d-76c5-4a13-8695-e66eba22ae98",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_30055-8",
+      "include": true
+    },
+    {
+      "id": "19ce0f79-0d1e-4a44-8a75-a29899a0ba04",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_28608-8",
+      "include": true
+    },
+    {
+      "id": "85122f11-03d2-447c-ab6f-59609a161882",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_25136-3",
+      "include": true
+    },
+    {
+      "id": "6e81a13c-db1f-4202-9b46-88e12d718651",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_25134-8",
+      "include": true
+    },
+    {
+      "id": "47345fdc-6324-4a71-8b9e-d9228a265a1d",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_2954-6",
+      "include": true
+    },
+    {
+      "id": "00f99a61-efdc-4ff0-b922-c6a32632bff3",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_48767-8",
+      "include": true
+    },
+    {
+      "id": "fb81034c-19df-4caf-b1c2-129a4ffa2101",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_24467-3",
+      "include": true
+    },
+    {
+      "id": "21472e00-da7b-4ec1-a55c-4f1b6314f5c8",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_30349-5",
+      "include": true
+    },
+    {
+      "id": "fa960652-57f9-462e-8a9f-ff0e29863ab7",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_30238-0",
+      "include": true
+    },
+    {
+      "id": "ec9a94b4-5dc0-4bf3-a054-945dbc600e47",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_30237-2",
+      "include": true
+    },
+    {
+      "id": "5ad40a43-2bc0-4632-b13c-621632cc9135",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_24443-4",
+      "include": true
+    },
+    {
+      "id": "c78f4854-448f-4367-9964-3be0b19c4b19",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_33244-5",
+      "include": true
+    },
+    {
+      "id": "4bd3162f-7ae5-4dc9-b441-6e7298fdd474",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_32227-1",
+      "include": true
+    },
+    {
+      "id": "04251f57-49e1-403d-a5d7-6c025dadf468",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_20644-1",
+      "include": true
+    },
+    {
+      "id": "060a238c-f909-447e-808f-80380eab24f0",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_20648-2",
+      "include": true
+    },
+    {
+      "id": "981e8813-210c-4bfb-8423-9ddb3fd9ac13",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_20660-7",
+      "include": true
+    },
+    {
+      "id": "e60a3109-9777-40cb-8ba3-6d40d9b67fa5",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_28603-9",
+      "include": true
+    },
+    {
+      "id": "e5ff29cb-e74b-463e-ae9c-dc91cdd40f2a",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_30047-5",
+      "include": true
+    },
+    {
+      "id": "19ea3ad7-4d58-4cee-9cb8-1a61038e8de9",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_30067-3",
+      "include": true
+    },
+    {
+      "id": "2920b872-8774-4ab0-a4f9-e781d9cdb059",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_25101-7",
+      "include": true
+    },
+    {
+      "id": "a398ec75-8184-431b-a867-c3843982d3d5",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_25135-5",
+      "include": true
+    },
+    {
+      "id": "078f88ab-e6de-48be-a333-1e45a6829d84",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_42940-7",
+      "include": true
+    },
+    {
+      "id": "da263bfa-c507-4a4a-b1de-8142f34414b7",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_26759-1",
+      "include": true
+    },
+    {
+      "id": "6b950655-f7f6-458f-8c7a-c348b17d40b5",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_32518-3",
+      "include": true
+    },
+    {
+      "id": "0ec1984e-de71-4053-ab17-73c36b46d8c9",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_49857-6",
+      "include": true
+    },
+    {
+      "id": "89d724da-17d9-4e67-8a44-579610144fc1",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_30541-7",
+      "include": true
+    },
+    {
+      "id": "96ea90dd-9938-4203-8eb1-c284f12d1b31",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_30332-1",
+      "include": true
+    },
+    {
+      "id": "156c9618-c8d9-4209-9f3d-be864e78f250",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_30234-9",
+      "include": true
+    },
+    {
+      "id": "107715f0-f885-4e3e-ac06-85f3898c7f10",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_24437-6",
+      "include": true
+    },
+    {
+      "id": "6b6f7c0b-98ab-40bd-9222-d8f2bb765850",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_24444-2",
+      "include": true
+    },
+    {
+      "id": "7690d3c4-7d65-4ea1-adea-090fb909b91c",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_17867-3",
+      "include": true
+    },
+    {
+      "id": "55908e68-7457-41b7-9a6d-08a342c3933b",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_79292-9",
+      "include": true
+    },
+    {
+      "id": "7cbbcd9d-a10b-416a-a0ad-484ef71018f2",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_20636-7",
+      "include": true
+    },
+    {
+      "id": "e5f30a04-e88f-4003-a118-25e49d689ab5",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_20639-1",
+      "include": true
+    },
+    {
+      "id": "cbc677e1-8825-499e-97c3-baf2f1c0cfc8",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_20647-4",
+      "include": true
+    },
+    {
+      "id": "b33a323b-85dc-4159-88ce-c6faaabc6f68",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_20658-1",
+      "include": true
+    },
+    {
+      "id": "40af1255-3a8c-4754-afd2-f6e179bac90e",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_28598-1",
+      "include": true
+    },
+    {
+      "id": "a875a21e-f21d-43d0-82af-734d17c48cce",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_28605-4",
+      "include": true
+    },
+    {
+      "id": "9b91a932-e53d-4a92-9687-30886880cb0f",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_30063-2",
+      "include": true
+    },
+    {
+      "id": "bdef2771-f869-4b45-94ec-2867f060a870",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_33477-1",
+      "include": true
+    },
+    {
+      "id": "f9641118-d0ae-4e7c-bdfa-daebf8c5529b",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_25099-3",
+      "include": true
+    },
+    {
+      "id": "fcb462d4-be17-4182-b32a-9ec3b8c283fc",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_54457-7",
+      "include": true
+    },
+    {
+      "id": "c1974aff-c4ca-4309-a53e-ea413d8682bb",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_15195-1",
+      "include": true
+    },
+    {
+      "id": "6da95cde-8a13-4f83-b205-aa9948bc8885",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_14135-8",
+      "include": true
+    },
+    {
+      "id": "bb37a9d6-aa19-4cb7-88bb-ec7562f0b394",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_30531-8",
+      "include": true
+    },
+    {
+      "id": "37f95396-7664-4fc7-bcb8-cc8935cf2c5e",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_30566-4",
+      "include": true
+    },
+    {
+      "id": "7f133ce6-f299-4fff-afd8-292bb3d1844d",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_30312-3",
+      "include": true
+    },
+    {
+      "id": "3f2b661f-5d96-404c-9f59-5a4fe47b8481",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_24435-0",
+      "include": true
+    },
+    {
+      "id": "f7d7a6b2-a2dc-442f-92cd-f66c51ad5adb",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_79291-1",
+      "include": true
+    },
+    {
+      "id": "5b5d7f54-bbbd-4bc3-8aa3-e435ba3eccd9",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_20638-3",
+      "include": true
+    },
+    {
+      "id": "ce3c69ff-ce9f-45a6-b7da-fa104c439d48",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_20645-8",
+      "include": true
+    },
+    {
+      "id": "8fbe23fd-cba0-4ada-a178-6054f6df53e8",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_14875-9",
+      "include": true
+    },
+    {
+      "id": "61c8b83a-95a9-4da6-acdc-4e111984152c",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_20657-3",
+      "include": true
+    },
+    {
+      "id": "095933f5-19da-4d75-9946-f2e50f605872",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_30068-1",
+      "include": true
+    },
+    {
+      "id": "5b352341-aeb5-4762-a366-212d48d7635d",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_32229-7",
+      "include": true
+    },
+    {
+      "id": "14bdf300-4808-48d0-a3da-dde3f42c743e",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_30066-5",
+      "include": true
+    },
+    {
+      "id": "bded4470-9ea0-4308-9630-d52639daff8d",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_28610-4",
+      "include": true
+    },
+    {
+      "id": "74cca8df-6377-4eb6-8004-d8952aef408a",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_29507-1",
+      "include": true
+    },
+    {
+      "id": "e8a3a541-ce51-4678-a854-1a83064b6ddf",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_25088-6",
+      "include": true
+    },
+    {
+      "id": "0ec2d70c-587b-4f04-8704-6180ebe9e1a0",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_2077-6",
+      "include": true
+    },
+    {
+      "id": "88f0952f-132c-4b19-bddd-b45e44f8f2a9",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_38485-9",
+      "include": true
+    },
+    {
+      "id": "15d41254-ef2b-4b50-93f6-c45da1b6c02b",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_41994-5",
+      "include": true
+    },
+    {
+      "id": "4ed42154-710d-4528-94dc-3c49c5f70fab",
+      "query_by_valueset_id": "b23a48d8-00aa-40e3-b19c-e06be9b5a68f",
+      "concept_id": "loinc_54218-3",
+      "include": true
+    },
+    {
+      "id": "38cc97e5-c9a5-4ad7-87cc-b3b74bd4ef7b",
+      "query_by_valueset_id": "f707f6d5-b18d-4edb-bbec-69c2bb879cd3",
+      "concept_id": "snomed_186647001",
+      "include": true
+    },
+    {
+      "id": "458aceed-ff1a-4506-87fb-8a318fc878d1",
+      "query_by_valueset_id": "ca584b6f-b1f2-45e2-8b01-9a2069f1a37a",
+      "concept_id": "snomed_76272004",
+      "include": true
+    },
+    {
+      "id": "7f448de4-3bb1-4f9b-b60f-93e3e342c8cf",
+      "query_by_valueset_id": "a23e1249-5c1b-4669-b28b-8976e0d0d825",
+      "concept_id": "www_2671695",
+      "include": true
+    },
+    {
+      "id": "1e1299ed-86c1-4274-a673-e61a3476b4ec",
+      "query_by_valueset_id": "68bb6a34-cc19-4d17-a436-0f4b675f272e",
+      "concept_id": "loinc_83317-8",
+      "include": true
+    },
+    {
+      "id": "6cb8f2c6-c929-4e5a-bd06-8aacefdf9709",
+      "query_by_valueset_id": "68bb6a34-cc19-4d17-a436-0f4b675f272e",
+      "concept_id": "loinc_11350-6",
+      "include": true
+    },
+    {
+      "id": "644194f7-35d2-44de-906a-1495654b9121",
+      "query_by_valueset_id": "68bb6a34-cc19-4d17-a436-0f4b675f272e",
+      "concept_id": "loinc_82810-3",
+      "include": true
+    },
+    {
+      "id": "2ac718f9-7caf-4bfe-99a9-8ae05f9f5c5a",
+      "query_by_valueset_id": "d399b139-581c-4af7-944b-17e1b98904a9",
+      "concept_id": "loinc_21613-5",
+      "include": true
+    },
+    {
+      "id": "a75943d6-bfef-4e6f-9484-3815ebef148f",
+      "query_by_valueset_id": "d399b139-581c-4af7-944b-17e1b98904a9",
+      "concept_id": "loinc_24111-7",
+      "include": true
+    },
+    {
+      "id": "462d3bda-8991-4338-b085-8ea79e5e7d00",
+      "query_by_valueset_id": "8ffe22a7-4eac-41ec-ad47-e5bb086c929b",
+      "concept_id": "www_434692",
+      "include": true
+    },
+    {
+      "id": "46f1dd37-ae4c-4867-9adc-b2b06957b8bd",
+      "query_by_valueset_id": "8ffe22a7-4eac-41ec-ad47-e5bb086c929b",
+      "concept_id": "www_82122",
+      "include": true
+    },
+    {
+      "id": "0a18ec0d-0c48-4d65-b8cf-01ddb716c6a3",
+      "query_by_valueset_id": "8ffe22a7-4eac-41ec-ad47-e5bb086c929b",
+      "concept_id": "www_1665005",
+      "include": true
+    },
+    {
+      "id": "f168ad80-e5a2-464b-a372-ff7014e3dc3d",
+      "query_by_valueset_id": "8ffe22a7-4eac-41ec-ad47-e5bb086c929b",
+      "concept_id": "www_1649987",
+      "include": true
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "queries": [
+    {
+      "id": "7c63cfa4-a472-48a1-933c-53e0195cb982",
+      "query_name": "Cancer (Leukemia)",
+      "author": "DIBBs",
+      "date_created": "2024-11-19 16:57:56.753",
+      "date_last_modified": "2024-11-19 16:57:56.753",
+      "time_window_number": 1,
+      "time_window_unit": "day"
+    },
+    {
+      "id": "a7b1ed74-f846-4e9a-bbc6-1a9e244ad6d9",
+      "query_name": "Gonorrhea (disorder)",
+      "author": "DIBBs",
+      "date_created": "2024-11-19 16:57:56.753",
+      "date_last_modified": "2024-11-19 16:57:56.753",
+      "time_window_number": 1,
+      "time_window_unit": "day"
+    },
+    {
+      "id": "05ce2a5c-4fbf-4db9-b5c2-8539061a6b4c",
+      "query_name": "Newborn Screening",
+      "author": "DIBBs",
+      "date_created": "2024-11-19 16:57:56.753",
+      "date_last_modified": "2024-11-19 16:57:56.753",
+      "time_window_number": 1,
+      "time_window_unit": "day"
+    },
+    {
+      "id": "18205e8c-901d-453c-b6b4-db53238daa77",
+      "query_name": "Congenital syphilis (disorder)",
+      "author": "DIBBs",
+      "date_created": "2024-11-19 16:57:56.753",
+      "date_last_modified": "2024-11-19 16:57:56.753",
+      "time_window_number": 1,
+      "time_window_unit": "day"
+    },
+    {
+      "id": "2cb970c7-aaf9-4e5d-b0e1-469fc23343ab",
+      "query_name": "Chlamydia trachomatis infection (disorder)",
+      "author": "DIBBs",
+      "date_created": "2024-11-19 16:57:56.753",
+      "date_last_modified": "2024-11-19 16:57:56.753",
+      "time_window_number": 1,
+      "time_window_unit": "day"
+    }
+  ]
+}

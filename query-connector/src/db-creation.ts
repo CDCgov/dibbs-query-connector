@@ -16,6 +16,12 @@ import {
   ConditionStruct,
   JsonConditionToValueSet,
   translateVSACToInternalValueSet,
+  JsonTableQuery,
+  insertDefaultQueries,
+  JsonQueryToValueset,
+  inserstQueriesToValueSets,
+  insertQueryIncludedConcepts,
+  JsonQueryIncludedConcepts,
 } from "@/app/database-service";
 // import { readJsonFile } from "./app/tests/shared_utils/readJsonFile";
 import * as fs from "fs";
@@ -245,6 +251,56 @@ async function readAndInsertInitialConditions() {
 }
 
 /**
+ * Helper function for inserting a dump of default queries.
+ */
+async function readAndInsertDefaultQueries() {
+  const data: string | undefined = readJsonFromRelativePath(
+    "DIBBS_Default_Queries.json",
+  );
+  if (data) {
+    const parsed = JSON.parse(data) as { queries: Array<JsonTableQuery> };
+    await insertDefaultQueries(parsed["queries"]);
+  } else {
+    console.error("Could not insert default queries");
+  }
+}
+
+/**
+ * Helper function for inserting the query to valueset mappings extracted
+ * as part of a dev dump file.
+ */
+async function readAndInsertDefaultQtVs() {
+  const data: string | undefined = readJsonFromRelativePath(
+    "DIBBS_Default_Queries_to_ValueSets.json",
+  );
+  if (data) {
+    const parsed = JSON.parse(data) as {
+      queries_to_valuesets: Array<JsonQueryToValueset>;
+    };
+    await inserstQueriesToValueSets(parsed["queries_to_valuesets"]);
+  } else {
+    console.error("Could not insert QTVs");
+  }
+}
+
+/**
+ * Helper function for inserting query included concepts.
+ */
+async function readAndInsertQueryIncludedConcepts() {
+  const data: string | undefined = readJsonFromRelativePath(
+    "DIBBS_Default_Query_Included_Concepts.json",
+  );
+  if (data) {
+    const parsed = JSON.parse(data) as {
+      query_included_concepts: Array<JsonQueryIncludedConcepts>;
+    };
+    await insertQueryIncludedConcepts(parsed["query_included_concepts"]);
+  } else {
+    console.error("Could not insert initial conditions");
+  }
+}
+
+/**
  * Helper function for inserting specific DIBBs custom conditions and their
  * associated value set mappings.
  */
@@ -301,14 +357,22 @@ export async function createDibbsDB() {
   } else {
     console.error("Could not load eRSD, aborting DIBBs DB creation");
   }
-  const dibbsCustomVS = readDibbsCustomValueSets();
-  if (dibbsCustomVS) {
-    await insertDibbsCustomValueSets(dibbsCustomVS);
-  } else {
-    console.error(
-      "Could not load and insert DIBBs custom value sets, aborting DB creation",
-    );
+
+  // Only run default and custom insertions if we're making the dump
+  // file for dev
+  if (process.env.NODE_ENV !== "production") {
+    const dibbsCustomVS = readDibbsCustomValueSets();
+    if (dibbsCustomVS) {
+      await insertDibbsCustomValueSets(dibbsCustomVS);
+    } else {
+      console.error(
+        "Could not load and insert DIBBs custom value sets, aborting DB creation",
+      );
+    }
+    await readAndInsertInitialConditions();
+    await readAndInsertDibbsCustomConditions();
+    await readAndInsertDefaultQueries();
+    await readAndInsertDefaultQtVs();
+    await readAndInsertQueryIncludedConcepts();
   }
-  await readAndInsertInitialConditions();
-  await readAndInsertDibbsCustomConditions();
 }
