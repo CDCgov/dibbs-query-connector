@@ -16,14 +16,14 @@ test.describe("alternate queries with the Query Connector", () => {
     await page.getByRole("button", { name: "Go to the demo" }).click();
     await page.getByRole("button", { name: "Fill fields" }).click();
 
-    // Delete last name and MRN to force phone number as one of the 3 fields
-    await page.getByLabel("Last Name").clear();
+    // Delete Last name and MRN to force phone number as one of the 3 fields
+    await page.getByLabel("Last name").clear();
     await page.getByLabel("Medical Record Number").clear();
 
     // Select FHIR server from drop down
     await page.getByRole("button", { name: "Advanced" }).click();
     await page
-      .getByLabel("FHIR Server (QHIN)")
+      .getByLabel("Healthcare Organization (HCO)")
       .selectOption("Local e2e HAPI Server: Direct");
 
     // Among verification, make sure phone number is right
@@ -55,7 +55,7 @@ test.describe("alternate queries with the Query Connector", () => {
     // Select FHIR server from drop down
     await page.getByRole("button", { name: "Advanced" }).click();
     await page
-      .getByLabel("FHIR Server (QHIN)")
+      .getByLabel("Healthcare Organization (HCO)")
       .selectOption("Local e2e HAPI Server: Direct");
 
     await page.getByRole("button", { name: "Search for patient" }).click();
@@ -83,7 +83,7 @@ test.describe("alternate queries with the Query Connector", () => {
     // Select FHIR server from drop down
     await page.getByRole("button", { name: "Advanced" }).click();
     await page
-      .getByLabel("FHIR Server (QHIN)")
+      .getByLabel("Healthcare Organization (HCO)")
       .selectOption("Local e2e HAPI Server: Direct");
 
     await page.getByRole("button", { name: "Search for patient" }).click();
