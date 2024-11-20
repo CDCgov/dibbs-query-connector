@@ -26,6 +26,12 @@ Add your API key as an environment variable called `ERSD_API_KEY` in the `.env` 
 docker compose up -f docker-compose-dev.yaml up Keycloak
 ```
 
+To login via Keycloak, use the following credentials:
+
+```
+Username: qc-admin
+Password: QcDev2024!
+```
 
 #### Running with Docker (Recommended)
 
