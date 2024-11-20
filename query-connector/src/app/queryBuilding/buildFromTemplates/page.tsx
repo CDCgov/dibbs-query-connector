@@ -63,7 +63,7 @@ export default function QueryTemplateSelection() {
 
       if (isSubscribed) {
         setFetchedConditions(
-          mapFetchedDataToFrontendStructure(categoryToConditionArrayMap)
+          mapFetchedDataToFrontendStructure(categoryToConditionArrayMap),
         );
       }
     }
@@ -144,7 +144,7 @@ export default function QueryTemplateSelection() {
         <div
           className={classNames(
             "bg-gray-5 margin-top-4 ",
-            styles.queryTemplateContainer
+            styles.queryTemplateContainer,
           )}
         >
           <div className="display-flex flex-justify flex-align-end margin-bottom-3 width-full">
@@ -168,7 +168,7 @@ export default function QueryTemplateSelection() {
               id="conditionTemplateSearch"
               placeholder="Search conditions"
               className={classNames(
-                "maxw-mobile margin-x-auto margin-top-0 margin-bottom-4"
+                "maxw-mobile margin-x-auto margin-top-0 margin-bottom-4",
               )}
               onChange={(e) => {
                 e.preventDefault();
