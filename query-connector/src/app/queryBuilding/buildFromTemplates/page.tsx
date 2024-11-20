@@ -13,14 +13,13 @@ import {
 import { ConditionSelection } from "../components/ConditionSelection";
 import { ValueSetSelection } from "../components/ValueSetSelection";
 import SiteAlert from "@/app/query/designSystem/SiteAlert";
+import { BuildStep } from "../../constants";
 
 export type FormError = {
   queryName: boolean;
   selectedConditions: boolean;
 };
 
-import { BuildStep } from "../../constants";
-// import classNames from "classnames";
 /**
  * The query building page
  * @returns the component for the query building page
@@ -31,10 +30,9 @@ export default function QueryTemplateSelection() {
   const [buildStep, setBuildStep] = useState<BuildStep>("condition");
 
   const [queryName, setQueryName] = useState<string>("");
-  // const [searchFilter, setSearchFilter] = useState<string>();
   const [fetchedConditions, setFetchedConditions] =
     useState<CategoryNameToConditionOptionMap>();
-  const [selectedConditions, _setSelectedConditions] =
+  const [selectedConditions, setSelectedConditions] =
     useState<CategoryNameToConditionOptionMap>();
   const [formError, setFormError] = useState<FormError>({
     queryName: false,
@@ -77,13 +75,28 @@ export default function QueryTemplateSelection() {
     };
   }, [selectedConditions, queryName]);
 
-  function handleCreateQueryClick(event: React.MouseEvent<HTMLButtonElement>) {
-    event.preventDefault();
-
-    validateForm();
-    if (!!queryName && !formError.queryName && !formError.selectedConditions) {
-      submitForm();
-    }
+  // ensures the fetchedConditions' checkbox statuses match
+  // the data in selectedCondtiions
+  function updateFetchedConditionIncludeStatus(
+    selectedConditions: CategoryNameToConditionOptionMap
+  ) {
+    const prevFetch = structuredClone(fetchedConditions);
+    Object.entries(selectedConditions).map(
+      ([category, conditionsByCategory]) => {
+        Object.entries(conditionsByCategory).flatMap(
+          ([conditionId, conditionObj]) => {
+            if (prevFetch) {
+              const prevValues = prevFetch[category][conditionId];
+              prevFetch[category][conditionId] = {
+                name: prevValues.name,
+                include: conditionObj.include,
+              };
+              return setFetchedConditions(prevFetch);
+            }
+          }
+        );
+      }
+    );
   }
 
   const validateForm = () => {
@@ -95,12 +108,6 @@ export default function QueryTemplateSelection() {
       ...formError,
       ...{ queryName: !queryName, selectedConditions: !atLeastOneItemSelected },
     });
-  };
-
-  const submitForm = () => {
-    // TODO: do something with selectedConditions on next step/page
-    // will be addressed in https://linear.app/skylight-cdc/issue/QUE-65/create-the-valueset-selection-page
-    console.log(selectedConditions);
   };
 
   const atLeastOneItemSelected =
@@ -120,9 +127,20 @@ export default function QueryTemplateSelection() {
       >
         <Backlink
           onClick={() => {
-            router.push("/queryBuilding");
+            // TODO: this can be tidied up...
+            if (buildStep == "valueset") {
+              setBuildStep("condition");
+              updateFetchedConditionIncludeStatus(selectedConditions ?? {});
+            } else {
+              router.push("/queryBuilding");
+            }
           }}
-          label={"Back to My queries"}
+          // TODO: tidy this too
+          label={
+            buildStep == "valueset"
+              ? "Back to condition selection"
+              : "Back to My queries"
+          }
         />
         <div className="customQuery__header">
           <h1 className={styles.queryTitle}>Custom query</h1>
@@ -150,7 +168,10 @@ export default function QueryTemplateSelection() {
               fetchedConditions={fetchedConditions ?? {}}
               selectedConditions={selectedConditions ?? {}}
               setFetchedConditions={setFetchedConditions}
-              setSelectedConditions={_setSelectedConditions}
+              setSelectedConditions={setSelectedConditions}
+              setFormError={setFormError}
+              formError={formError}
+              validateForm={validateForm}
             />
           )}
           {/* Step Two: Select Conditions */}
@@ -161,7 +182,7 @@ export default function QueryTemplateSelection() {
               fetchedConditions={fetchedConditions ?? {}}
               selectedConditions={selectedConditions ?? {}}
               setFetchedConditions={setFetchedConditions}
-              setSelectedConditions={_setSelectedConditions}
+              setSelectedConditions={setSelectedConditions}
             />
           )}
         </div>

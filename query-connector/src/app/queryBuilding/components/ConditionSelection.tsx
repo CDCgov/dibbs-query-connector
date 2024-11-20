@@ -12,6 +12,7 @@ import {
 import ConditionColumnDisplay from "../buildFromTemplates/ConditionColumnDisplay";
 import SearchField from "@/app/query/designSystem/searchField/SearchField";
 import { BuildStep } from "@/app/constants";
+import { FormError } from "../buildFromTemplates/page";
 
 type ConditionSelectionProps = {
   fetchedConditions: CategoryNameToConditionOptionMap;
@@ -25,6 +26,9 @@ type ConditionSelectionProps = {
     SetStateAction<CategoryNameToConditionOptionMap | undefined>
   >;
   queryName: string;
+  validateForm: () => void;
+  setFormError: Dispatch<SetStateAction<FormError>>;
+  formError: FormError;
 };
 
 /**
@@ -37,6 +41,11 @@ type ConditionSelectionProps = {
  * selection
  * @param root0.setSelectedConditions - current checkbox selection status
  * @param root0.queryName - current checkbox selection status
+ * @param root0.validateForm - function that checks for a valid query name
+ * and at least one selected condition
+ * @param root0.formError - indicates missing or incorrect form data
+ * @param root0.setFormError - state function that updates the status of the
+ * condition selection form input data
  * @returns A component for display to redner on the query building page
  */
 export const ConditionSelection: React.FC<ConditionSelectionProps> = ({
@@ -46,6 +55,9 @@ export const ConditionSelection: React.FC<ConditionSelectionProps> = ({
   setFetchedConditions,
   setSelectedConditions,
   queryName,
+  validateForm,
+  formError,
+  setFormError,
 }) => {
   const focusRef = useRef<HTMLInputElement | null>(null);
 
@@ -74,17 +86,15 @@ export const ConditionSelection: React.FC<ConditionSelectionProps> = ({
     };
   }, []);
 
-  const submitForm = (event: React.MouseEvent<HTMLButtonElement>) => {
+  function handleCreateQueryClick(event: React.MouseEvent<HTMLButtonElement>) {
     event.preventDefault();
-    setBuildStep("valueset");
-  };
 
-  const atLeastOneItemSelected =
-    fetchedConditions &&
-    Object.values(Object.values(fetchedConditions))
-      .map((arr) => Object.values(arr).flatMap((e) => e.include))
-      .flatMap((e) => e.some(Boolean))
-      .some(Boolean);
+    validateForm();
+    if (!!queryName && !formError.queryName && !formError.selectedConditions) {
+      // continue to next page
+      setBuildStep("valueset");
+    }
+  }
 
   return (
     <div
@@ -97,14 +107,9 @@ export const ConditionSelection: React.FC<ConditionSelectionProps> = ({
         <h2 className="margin-y-0-important">Select condition(s)</h2>
         <Button
           className="margin-0"
-          style={
-            !atLeastOneItemSelected || !queryName ? { display: "none" } : {}
-          }
           type={"button"}
-          hidden={!atLeastOneItemSelected || !queryName}
-          aria-hidden={!atLeastOneItemSelected || !queryName}
-          disabled={!atLeastOneItemSelected || !queryName}
-          onClick={submitForm}
+          disabled={formError.selectedConditions}
+          onClick={handleCreateQueryClick}
         >
           Create query
         </Button>
@@ -129,6 +134,8 @@ export const ConditionSelection: React.FC<ConditionSelectionProps> = ({
             fetchedConditions={fetchedConditions}
             searchFilter={searchFilter}
             setFetchedConditions={setFetchedConditions}
+            formError={formError}
+            setFormError={setFormError}
           />
         )}
       </div>
