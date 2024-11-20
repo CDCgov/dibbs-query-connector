@@ -23,13 +23,8 @@
         },
         "url": {
           "raw": "{{base_url}}/api/query?fhir_server=HELIOS Meld: Direct&use_case=cancer",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "api",
-            "query"
-          ],
+          "host": ["{{base_url}}"],
+          "path": ["api", "query"],
           "query": [
             {
               "key": "fhir_server",
@@ -61,13 +56,8 @@
         },
         "url": {
           "raw": "{{base_url}}/api/query?fhir_server=HELIOS Meld: eHealthExchange&use_case=cancer",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "api",
-            "query"
-          ],
+          "host": ["{{base_url}}"],
+          "path": ["api", "query"],
           "query": [
             {
               "key": "fhir_server",
@@ -99,13 +89,8 @@
         },
         "url": {
           "raw": "{{base_url}}/api/query?fhir_server=JMC Meld: Direct&use_case=chlamydia",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "api",
-            "query"
-          ],
+          "host": ["{{base_url}}"],
+          "path": ["api", "query"],
           "query": [
             {
               "key": "fhir_server",
@@ -137,13 +122,8 @@
         },
         "url": {
           "raw": "{{base_url}}/api/query?fhir_server=JMC Meld: eHealthExchange&use_case=chlamydia",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "api",
-            "query"
-          ],
+          "host": ["{{base_url}}"],
+          "path": ["api", "query"],
           "query": [
             {
               "key": "fhir_server",
@@ -175,13 +155,8 @@
         },
         "url": {
           "raw": "{{base_url}}/api/query?fhir_server=JMC Meld: Direct&use_case=gonorrhea",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "api",
-            "query"
-          ],
+          "host": ["{{base_url}}"],
+          "path": ["api", "query"],
           "query": [
             {
               "key": "fhir_server",
@@ -213,13 +188,8 @@
         },
         "url": {
           "raw": "{{base_url}}/api/query?fhir_server=JMC Meld: eHealthExchange&use_case=gonorrhea",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "api",
-            "query"
-          ],
+          "host": ["{{base_url}}"],
+          "path": ["api", "query"],
           "query": [
             {
               "key": "fhir_server",
@@ -251,13 +221,8 @@
         },
         "url": {
           "raw": "{{base_url}}/api/query?fhir_server=CernerHelios: eHealthExchange&use_case=newborn-screening",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "api",
-            "query"
-          ],
+          "host": ["{{base_url}}"],
+          "path": ["api", "query"],
           "query": [
             {
               "key": "fhir_server",
@@ -289,13 +254,8 @@
         },
         "url": {
           "raw": "{{base_url}}/api/query?fhir_server=Helios Meld: eHealthExchange&use_case=newborn-screening",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "api",
-            "query"
-          ],
+          "host": ["{{base_url}}"],
+          "path": ["api", "query"],
           "query": [
             {
               "key": "fhir_server",
@@ -327,13 +287,8 @@
         },
         "url": {
           "raw": "{{base_url}}/api/query?fhir_server=HELIOS Meld: Direct&use_case=newborn-screening",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "api",
-            "query"
-          ],
+          "host": ["{{base_url}}"],
+          "path": ["api", "query"],
           "query": [
             {
               "key": "fhir_server",
@@ -365,13 +320,8 @@
         },
         "url": {
           "raw": "{{base_url}}/api/query?fhir_server=HELIOS Meld: Direct&use_case=social-determinants",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "api",
-            "query"
-          ],
+          "host": ["{{base_url}}"],
+          "path": ["api", "query"],
           "query": [
             {
               "key": "fhir_server",
@@ -403,13 +353,8 @@
         },
         "url": {
           "raw": "{{base_url}}/api/query?fhir_server=HELIOS Meld: eHealthExchange&use_case=social-determinants",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "api",
-            "query"
-          ],
+          "host": ["{{base_url}}"],
+          "path": ["api", "query"],
           "query": [
             {
               "key": "fhir_server",
@@ -441,13 +386,8 @@
         },
         "url": {
           "raw": "{{base_url}}/api/query?fhir_server=HELIOS Meld: Direct&use_case=syphilis",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "api",
-            "query"
-          ],
+          "host": ["{{base_url}}"],
+          "path": ["api", "query"],
           "query": [
             {
               "key": "fhir_server",
@@ -479,14 +419,8 @@
         },
         "url": {
           "raw": "dibbs.cloud/api/query?fhir_server=HELIOS Meld: eHealthExchange&use_case=syphilis",
-          "host": [
-            "dibbs",
-            "cloud"
-          ],
-          "path": [
-            "api",
-            "query"
-          ],
+          "host": ["dibbs", "cloud"],
+          "path": ["api", "query"],
           "query": [
             {
               "key": "fhir_server",
@@ -509,9 +443,7 @@
       "script": {
         "type": "text/javascript",
         "packages": {},
-        "exec": [
-          ""
-        ]
+        "exec": [""]
       }
     },
     {
@@ -519,16 +451,14 @@
       "script": {
         "type": "text/javascript",
         "packages": {},
-        "exec": [
-          ""
-        ]
+        "exec": [""]
       }
     }
   ],
   "variable": [
     {
       "key": "base_url",
-      "value": "https://dibbs.cloud/tefca-viewer",
+      "value": "https://dibbs.cloud/query-connector",
       "type": "string"
     }
   ]

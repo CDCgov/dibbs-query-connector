@@ -14,8 +14,13 @@ import {
   QueryInput,
   generateQueryInsertionSql,
   generateQueryToValueSetInsertionSql,
+  CustomUserQuery,
 } from "./query-building";
 import { UUID } from "crypto";
+import {
+  CategoryToConditionArrayMap,
+  ConditionIdToNameMap,
+} from "./queryBuilding/utils";
 
 const getQuerybyNameSQL = `
 select q.query_name, q.id, qtv.valueset_id, vs.name as valueset_name, vs.oid as valueset_external_id, vs.version, vs.author as author, vs.type, vs.dibbs_concept_type as dibbs_concept_type, qic.concept_id, qic.include, c.code, c.code_system, c.display 
@@ -579,7 +584,7 @@ export async function getConditionsData() {
   const rows = result.rows;
 
   // 1. Grouped by category with id:name pairs
-  const conditionCatergories = rows.reduce(
+  const categoryToConditionArrayMap: CategoryToConditionArrayMap = rows.reduce(
     (acc, row) => {
       const { category, id, name } = row;
       if (!acc[category]) {
@@ -588,17 +593,148 @@ export async function getConditionsData() {
       acc[category].push({ [id]: name });
       return acc;
     },
-    {} as Record<string, Array<Record<string, string>>>,
+    {} as CategoryToConditionArrayMap,
   );
 
   // 2. ID-Name mapping
-  const conditionLookup = rows.reduce(
-    (acc, row) => {
-      acc[row.id] = row.name;
-      return acc;
-    },
-    {} as Record<string, string>,
-  );
+  const conditionIdToNameMap: ConditionIdToNameMap = rows.reduce((acc, row) => {
+    acc[row.id] = row.name;
+    return acc;
+  }, {} as ConditionIdToNameMap);
+  return {
+    categoryToConditionArrayMap,
+    conditionIdToNameMap,
+  } as const;
+}
 
-  return { conditionCatergories, conditionLookup };
+/**
+ * Fetches and structures custom user queries from the database.
+ * Executes a SQL query to join query information with related valueset and concept data,
+ * and then structures the result into a nested JSON format. The JSON format groups
+ * valuesets and their nested concepts under each query.
+ * @returns customUserQueriesArray - An array of objects where each object represents a query.
+ * Each query object includes:
+ * - query_id: The unique identifier for the query.
+ * - query_name: The name of the query.
+ * - valuesets: An array of ValueSet objects
+ * - concepts: An array of Concept objects
+ */
+export async function getCustomQueries(): Promise<CustomUserQuery[]> {
+  const query = `
+    SELECT
+      q.id AS query_id,
+      q.query_name,
+      vc.valueset_id AS valueSetId,
+      vc.version AS valueSetVersion,
+      vc.valueset_name AS valueSetName,
+      vc.author,
+      vc.system,
+      vc.ersd_concept_type AS ersdConceptType,
+      vc.dibbs_concept_type AS dibbsConceptType,
+      vc.valueset_include AS includeValueSet,
+      vc.code,
+      vc.display,
+      qic."include" AS concept_include
+    FROM
+      query q
+    LEFT JOIN query_to_valueset qtv ON q.id = qtv.query_id
+    LEFT JOIN query_included_concepts qic ON qic.query_by_valueset_id = qtv.id
+    LEFT JOIN (
+      SELECT
+        v.id AS valueset_id,
+        v.version,
+        v.name AS valueset_name,
+        v.author,
+        c.code_system AS system,
+        v.type AS ersd_concept_type,
+        v.dibbs_concept_type,
+        true AS valueset_include,
+        c.code,
+        c.display
+      FROM
+        valuesets v
+      LEFT JOIN valueset_to_concept vtc ON vtc.valueset_id = v.id
+      LEFT JOIN concepts c ON c.id = vtc.concept_id
+    ) vc ON vc.valueset_id = qtv.valueset_id
+    WHERE q.author = 'DIBBs';
+  `;
+  // TODO: this will eventually need to take into account user permissions and specific authors
+  // We might also be able to take advantage of the `query_name` var to avoid joining valuesets/conc
+
+  const results = await dbClient.query(query);
+  const formattedData: { [key: string]: CustomUserQuery } = {};
+
+  results.rows.forEach((row) => {
+    const {
+      query_id,
+      query_name,
+      valueSetId,
+      valueSetVersion,
+      valueSetName,
+      author,
+      system,
+      ersdConceptType,
+      dibbsConceptType,
+      includeValueSet,
+      code,
+      display,
+      concept_include,
+    } = row;
+
+    // Initialize query structure if it doesn't exist
+    if (!formattedData[query_id]) {
+      formattedData[query_id] = {
+        query_id,
+        query_name,
+        valuesets: [],
+      };
+    }
+
+    // Check if the valueSetId already exists in the valuesets array
+    let valueset = formattedData[query_id].valuesets.find(
+      (v) => v.valueSetId === valueSetId,
+    );
+
+    // If valueSetId doesn't exist, add it
+    if (!valueset) {
+      valueset = {
+        valueSetId,
+        valueSetVersion,
+        valueSetName,
+        author,
+        system,
+        ersdConceptType,
+        dibbsConceptType,
+        includeValueSet,
+        concepts: [],
+      };
+      formattedData[query_id].valuesets.push(valueset);
+    }
+
+    // Add concept data to the concepts array
+    const concept: Concept = { code, display, include: concept_include };
+    valueset.concepts.push(concept);
+  });
+
+  return Object.values(formattedData);
+}
+
+/**
+ * Checks the database to see if data has been loaded into the valuesets table by
+ * estmating the number of rows in the table. If the estimated count is greater than
+ * 0, the function returns true, otherwise false.
+ * @returns A boolean indicating whether the valuesets table has data.
+ */
+export async function checkDBForData() {
+  const query = `
+    SELECT reltuples AS estimated_count
+    FROM pg_class
+    WHERE relname = 'valuesets';
+  `;
+  const result = await dbClient.query(query);
+
+  // Return true if the estimated count > 0, otherwise false
+  return (
+    result.rows.length > 0 && parseFloat(result.rows[0].estimated_count) > 0
+  );
 }

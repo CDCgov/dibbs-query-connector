@@ -1,3 +1,5 @@
+@use "../../../../styles/_variables" as *;
+
 .dataUsagePolicyButton {
   cursor: pointer;
   background: none !important;
@@ -5,17 +7,20 @@
   color: white !important;
   padding: 0px !important;
   font: inherit !important;
-  margin-right: 1rem !important;
+  margin: 0 0.5rem !important;
+  text-align: left !important;
 }
 
 .signinButton {
   padding: 0.5rem 1.25rem !important;
+  margin: 0 !important;
   cursor: pointer;
   background: none !important;
   border: 2px solid white !important;
   border-radius: 4px !important;
   color: white !important;
   font: inherit !important;
+  white-space: nowrap;
 }
 
 .menuButton {
@@ -41,7 +46,7 @@
   border-radius: 4px !important;
   padding: 0.5rem !important;
   background: #ffffff !important;
-  margin: 3.5rem 3rem 0rem 0rem !important;
+  margin: 3.5rem 2rem 0rem 0rem !important;
   width: 10rem !important;
   box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, 0.16);
 }
@@ -51,16 +56,29 @@
   text-decoration: none !important;
   padding: 0.5rem 1rem !important;
   cursor: pointer;
+  width: 100%;
 }
 
 .menuItem:hover {
   text-decoration: none !important;
 }
 
+.subMenuItem {
+  display: flex;
+}
+
 .headerContentContainer {
+  display: flex;
   align-items: center !important;
   margin: 0 !important;
   padding: 0 !important;
-  height: 4.5rem;
+  height: $header-content-height;
   max-width: 100% !important;
+}
+
+@media (max-width: 63.99em) {
+  .menuDropdown {
+    z-index: 400 !important;
+    position: absolute;
+  }
 }

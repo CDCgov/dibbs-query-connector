@@ -29,14 +29,14 @@ export default function LandingPage() {
                 Data collection made easier
               </h1>
               <h2 className={styles.pageContent}>
-                The TEFCA Query Connector allows your jurisdiction to query a
-                wide network of healthcare organizations (HCOs) enabled by
-                TEFCA, giving you access to more complete and timely data.
+                The Query Connector allows your jurisdiction to query a wide
+                network of healthcare providers through your existing data use
+                agreements, giving you access to more complete and timely data
               </h2>
             </div>
             <Image
               alt="Graphic illustrating what TEFCA is"
-              src="/tefca-viewer/tefca-graphic.svg"
+              src="/query-connector/tefca-graphic.svg"
               width={250}
               height={300}
               priority
@@ -46,22 +46,23 @@ export default function LandingPage() {
         <div className="home">
           <h3 className={styles.pageSubtitle}>What is it?</h3>
           <h2 className={styles.pageContent}>
-            The TEFCA Query Connector aims to streamline the collection of
-            health data using an intuitive querying process that leverages
-            Qualified Health Information Networks (QHINs) within the Trusted
-            Exchange Framework and Common Agreement (TEFCA). This tool
-            demonstrates how public health jurisdictions can leverage TEFCA to
-            quickly retrieve patient records and relevant case information from
-            HCOs without requiring direct connection and onboarding.
+            The Query Connector is a data collection tool that uses an intuitive
+            querying process to help your staff quickly retrieve patient records
+            and relevant case information from a wide range of healthcare
+            providers — all without the need for a direct connection. It does
+            this by leveraging your jurisdiction's existing data use agreements,
+            like the Data Use and Reciprocal Support Agreement (DURSA), while
+            also supporting innovative standards for data sharing, like the
+            Trusted Exchange Framework and Common Agreement (TEFCA).
           </h2>
           <h3 className={styles.pageSubtitle}>How does it work?</h3>
           <h2 className={styles.pageContent}>
-            Public health staff can interact with the TEFCA Query Connector
-            manually by entering simple patient details — such as name, date of
-            birth, or medical identifiers — along with a query use case, into
-            the TEFCA Viewer. The TEFCA Viewer surfaces patient data relevant to
-            the use case in an easily readable format, making data more usable
-            for case investigation.
+            Public health staff can interact with the Query Connector manually
+            by entering simple patient details — such as name, date of birth, or
+            medical identifiers — along with a query, into the web-based portal.
+            The Query Connector surfaces patient data relevant to the use case
+            in an easily readable format, making data more usable for case
+            investigation.
           </h2>
           <ProcessList className="padding-top-4">
             <ProcessListItem>
@@ -85,11 +86,11 @@ export default function LandingPage() {
         </div>
       </div>
       <div className="blue-background-container">
-        <div className="display-flex flex-justify-center flex-column">
+        <div className="flex-justify-center flex-column">
           <div className="text-holder">
             <h2 className="font-sans-xs text-light margin-top-0">
-              Check out the TEFCA Viewer demo to try out features using sample
-              data. See how the TEFCA Viewer could work for you.
+              Check out the Query Connector demo to try out features using
+              sample data.
             </h2>
             <Button
               className="next-button"

@@ -10,23 +10,21 @@ export default function FooterComponent() {
   return (
     <footer className={classNames("usa-footer", styles.footerContainer)}>
       <div className={styles.cdcLogoContainer}>
-        <div>
-          <Image
-            src="/tefca-viewer/CDC_logo.png"
-            alt="CDC logo"
-            width={62}
-            height={36}
-            className="usa-footer__logo-img"
-          />
-        </div>
+        <Image
+          src="/query-connector/CDC_logo.png"
+          alt="CDC logo"
+          width={62}
+          height={36}
+          className="usa-footer__logo-img"
+        />
+      </div>
+      <div className={styles.cdcFooterTextContainer}>
         <div>
           <p className="text-base-lightest-important">
             Centers for Disease Control and Prevention
           </p>
         </div>
-      </div>
-      <div className={styles.contactUsContainer}>
-        <div className="width-fit-content">
+        <div>
           <p className="text-base-lightest-important">
             For more information about this solution, send us an email at{" "}
             <a
