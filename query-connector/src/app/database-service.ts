@@ -658,7 +658,7 @@ export async function getCustomQueries(): Promise<CustomUserQuery[]> {
     ) vc ON vc.valueset_id = qtv.valueset_id
     WHERE     q.query_name IN ('Gonorrhea (disorder)', 'Newborn Screening');
   `;
-  // q.author = 'DIBBs';
+  // TODO: We will need to refactor this to just pull query_name and conditions_list
   // TODO: this will eventually need to take into account user permissions and specific authors
   // We might also be able to take advantage of the `query_name` var to avoid joining valuesets/conc
 

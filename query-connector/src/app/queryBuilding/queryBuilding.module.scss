@@ -45,7 +45,7 @@
 
   thead tr th {
     color: var(--gray-500, #919191);
-    background-color: white; 
+    background-color: white;
     font-family: "Public Sans", sans-serif;
     font-size: 0.75rem;
     font-weight: 700;
@@ -53,7 +53,15 @@
     text-transform: uppercase;
     padding-left: 1.5rem;
     padding-top: 1.5rem;
-    border: none; 
+    border: none;
+  }
+
+  tbody tr {
+    transition: background-color 0.3s ease;
+  }
+
+  tbody tr:hover {
+    background: rgba(217, 232, 246, 0.50);
   }
 
   tbody td {
@@ -69,7 +77,7 @@
     white-space: nowrap;
   }
 
-  tbody td:hover {
+  tbody tr:hover td {
     overflow: visible;
     white-space: normal;
     position: relative;
@@ -77,8 +85,8 @@
   }
 
   tbody td:last-child {
-    text-align: right; /* Aligns the last column content to the right */
-    padding-right: 1.5rem; /* Adds consistent padding on the right */
-    white-space: nowrap; /* Keeps the buttons on one line */
+    text-align: right;
+    padding-right: 1.5rem;
+    white-space: nowrap;
   }
 }
