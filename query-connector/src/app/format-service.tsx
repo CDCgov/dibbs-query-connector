@@ -250,12 +250,12 @@ const FORMATS_TO_SEARCH: string[] = [
 export async function GetPhoneQueryFormats(phone: string) {
   // Digit-only phone numbers will resolve as actual numbers
   if (isNaN(Number(phone)) || phone.length != 10) {
-    const strippedPhone = phone.replace(" ", "+");
+    const strippedPhone = phone.replace(" ", "%2D");
     return [strippedPhone];
   }
   // Map the phone number into each format we want to check
   const possibleFormats: string[] = FORMATS_TO_SEARCH.map((fmt) => {
-    return phone.replace(/(\d{3})(\d{3})(\d{4})/gi, fmt);
+    return encodeURIComponent(phone.replace(/(\d{3})(\d{3})(\d{4})/gi, fmt));
   });
   return possibleFormats;
 }

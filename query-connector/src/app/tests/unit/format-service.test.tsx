@@ -470,7 +470,7 @@ describe("FormatPhoneAsDigits", () => {
 describe("GetPhoneQueryFormats", () => {
   it("should fail gracefully on partial phone number inputs", async () => {
     const partialPhone = "456 7890";
-    const expectedResult = ["456+7890"];
+    const expectedResult = ["456%2D7890"]; //456+7890
     expect(await GetPhoneQueryFormats(partialPhone)).toEqual(expectedResult);
   });
   it("should fail gracefully on given phones with separators remaining", async () => {
@@ -486,8 +486,8 @@ describe("GetPhoneQueryFormats", () => {
     const expectedResult = [
       "1234567890",
       "123-456-7890",
-      "123+456+7890",
-      "(123)+456+7890",
+      "123%2B456%2B7890", //123+456+7890
+      "(123)%2B456%2B7890", //(123)+456+7890
       "(123)-456-7890",
       "(123)456-7890",
       "1(123)456-7890",
