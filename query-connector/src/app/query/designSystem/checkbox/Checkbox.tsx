@@ -7,6 +7,7 @@ type CheckboxProps = {
   label: string;
   className?: string;
   onClick?: () => void;
+  checked: boolean;
 };
 
 /**
@@ -16,6 +17,7 @@ type CheckboxProps = {
  * @param root0.id HTML id used to reference the checkbox
  * @param root0.className Optional styling classes
  * @param root0.onClick Event listener for checkbox click
+ * @param root0.checked Boolean indicating whether the checkbox is checked
  * @returns A checkbox styled according to our design system
  */
 const Checkbox: React.FC<CheckboxProps> = ({
@@ -23,6 +25,7 @@ const Checkbox: React.FC<CheckboxProps> = ({
   id,
   className,
   onClick,
+  checked,
 }) => {
   return (
     <TrussCheckbox
@@ -31,6 +34,7 @@ const Checkbox: React.FC<CheckboxProps> = ({
       name={id}
       className={classNames(styles.checkbox, className)}
       onClick={onClick}
+      defaultChecked={checked}
     ></TrussCheckbox>
   );
 };
