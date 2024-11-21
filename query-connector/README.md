@@ -33,6 +33,8 @@ Username: qc-admin
 Password: QcDev2024!
 ```
 
+Next, run the app with `npm run dev` or `npm run dev-win`. You should see a sign in button at <http://localhost:3000>. Click it and login with the above credentials, and it should redirect back to <http://localhost:3000/query>!
+
 #### Running with Docker (Recommended)
 
 To run the Query Connector app with Docker, follow these steps.
