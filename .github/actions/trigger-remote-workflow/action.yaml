@@ -1,0 +1,73 @@
+name: Trigger Remote Workflow
+description: This action is used to trigger a workflow in a remote repository
+
+inputs:
+      target_service:
+        description: "Input a service name (e.g., demo-app)"
+        required: true
+      target_version:
+        description: "Input a version (e.g., v1.0.0)"
+        required: true
+      deployment_auth: 
+        description: "PAT used for the workflow"
+
+
+runs:
+   using: composite
+   steps:
+      - name: Set target service
+        shell: bash
+        id: service
+        run: echo "::set-output name=target_service::query-connector"
+
+      - name: Set version for main push
+        shell: bash
+        if: github.event_name == 'push'
+        id: version
+        run: |
+          # Check if there's an existing version file; if not, start from 1.0.0
+          VERSION_FILE="version.txt"
+          if [ ! -f "$VERSION_FILE" ]; then
+            echo "v1.0.10" > $VERSION_FILE
+          fi
+
+          # Read the current version, increment the patch (third) number
+          CURRENT_VERSION=$(cat $VERSION_FILE)
+          IFS='.' read -r -a VERSION_PARTS <<< "${CURRENT_VERSION#v}"
+          PATCH=$((VERSION_PARTS[2] + 1))
+          NEW_VERSION="v${VERSION_PARTS[0]}.${VERSION_PARTS[1]}.$PATCH"
+
+          # Save the new version back to the file and set as output
+          echo $NEW_VERSION > $VERSION_FILE
+          echo "::set-output name=target_version::$NEW_VERSION"
+
+      - name: Set version for manual dispatch
+        shell: bash
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          echo "::set-output name=target_version::${{ github.event.inputs.target_version }}"
+          echo "::set-output name=target_service::${{ github.event.inputs.target_service }}"
+
+      - name: Display target service and version
+        shell: bash
+        run: |
+          echo "Service: ${{ steps.service.outputs.target_service }}"
+          echo "Version: ${{ steps.version.outputs.target_version }}"
+
+      - name: Trigger Deployment Workflow in Remote Repository
+        shell: bash
+        env: 
+         REPO_OWNER: "repo_owner" 
+         REPO_NAME: "repo_name"
+         EVENT_TYPE: "event_type"
+        run: |
+          service="${{ steps.service.outputs.target_service }}"
+          version="${{ steps.version.outputs.target_version }}"
+           
+          curl -L \
+            -X POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${{ inputs.deployment_auth }}" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/dispatches \
+            -d "{\"event_type\": \"$EVENT_TYPE\", \"client_payload\": {\"service\": \"$service\", \"version\": \"$version\", \"unit\": false, \"integration\": true}}"
