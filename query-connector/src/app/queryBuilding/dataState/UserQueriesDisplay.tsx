@@ -30,14 +30,14 @@ export const UserQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
   return (
     <div>
       <div className="display-flex flex-justify-between flex-align-center width-full margin-bottom-3">
-        <h1 className={styles.queryTitle}>My queries</h1>
+        <h1 className="{styles.queryTitle} flex-align-center">My queries</h1>
         <div className="margin-left-auto">
           <Button
             onClick={handleClick}
             className={styles.createQueryButton}
             type="button"
           >
-            Create Query
+            Create query
           </Button>
         </div>
       </div>
@@ -45,34 +45,47 @@ export const UserQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
         <thead>
           <tr>
             <th scope="col">NAME</th>
-            <th scope="col">QUERY ID</th>
             <th scope="col">CONDITIONS</th>
           </tr>
         </thead>
         <tbody>
           {queries.map((query, index) => (
             <tr key={index} className="tableRowWithHover">
-              <td>
+              <td title={query.query_name}>
                 {query.query_name} query for patient data in FHIR Server A
               </td>
-              <td>{query.query_id}</td>
-              <td>{query.query_name}</td>{" "}
+              <td title={query.query_name}>{query.query_name}</td>
               {/*  TODO: Use conditions_list once available */}
-              <td>
-                <Button
-                  type="button"
-                  className="usa-button--unstyled margin-right-1 text-bold text-no-underline"
-                  onClick={() => console.log("Edit", query.query_id)}
-                >
-                  <Icon.Edit /> Edit
-                </Button>
-                <Button
-                  type="button"
-                  className="usa-button--unstyled text-bold text-no-underline"
-                  onClick={() => console.log("Delete", query.query_id)}
-                >
-                  <Icon.Delete /> Delete
-                </Button>
+              <td className="table-cell">
+                <div className="table-cell-buttons">
+                  <Button
+                    type="button"
+                    className="usa-button--unstyled text-bold text-no-underline"
+                    onClick={() => console.log("Edit", query.query_id)}
+                  >
+                    <Icon.Edit className="icon-large" /> Edit
+                  </Button>
+                  <Button
+                    type="button"
+                    className="usa-button--unstyled text-bold text-no-underline"
+                    onClick={() => console.log("Delete", query.query_id)}
+                  >
+                    <Icon.Delete className="icon-large" /> Delete
+                  </Button>
+                  <Button
+                    type="button"
+                    className="usa-button--unstyled text-bold text-no-underline"
+                    onClick={() => {
+                      navigator.clipboard
+                        .writeText(query.query_id)
+                        .catch((error) =>
+                          console.error("Failed to copy text:", error),
+                        );
+                    }}
+                  >
+                    <Icon.ContentCopy className="icon-large" /> Copy ID
+                  </Button>
+                </div>
               </td>
             </tr>
           ))}

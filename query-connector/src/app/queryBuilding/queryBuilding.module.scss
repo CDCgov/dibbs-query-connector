@@ -41,8 +41,9 @@
   width: 100%;
   border-collapse: collapse;
   background-color: white;
-  border: 1px solid #ccc;
-
+  border: 0.25rem solid #DFE1E2;
+  box-shadow: 0 0.125rem 0.1875rem 0 #F3F3F3; /* x = 0, y = 2px (0.125rem), blur = 3px (0.1875rem), spread = 0 */
+  
   thead tr th {
     color: var(--gray-500, #919191);
     background-color: white;
@@ -53,6 +54,7 @@
     text-transform: uppercase;
     padding-left: 1.5rem;
     padding-top: 1.5rem;
+    padding-bottom: 1rem;
     border: none;
   }
 
@@ -74,7 +76,7 @@
     max-width: 12rem;
     overflow: hidden;
     text-overflow: ellipsis;
-    white-space: nowrap;
+    white-space: nowrap; 
   }
 
   tbody tr:hover td {
@@ -89,4 +91,18 @@
     padding-right: 1.5rem;
     white-space: nowrap;
   }
+}
+
+.iconWithText {
+  width: 1.5rem; 
+  height: 1.5rem; 
+  margin-right: 0.25rem;
+  }
+
+.table-cell-buttons {
+  display: none; /* Hide buttons by default */
+}
+
+.table-cell:hover .table-cell-buttons {
+  display: inline-flex; /* Show buttons when hovering over the cell */
 }
