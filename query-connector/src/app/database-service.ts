@@ -685,9 +685,9 @@ export async function insertDBStructArray(
   } else {
     console.error("Problem inserting ", insertType);
   }
+}
 
-  
-/*
+/**
  * Fetches and structures custom user queries from the database.
  * Executes a SQL query to join query information with related valueset and concept data,
  * and then structures the result into a nested JSON format. The JSON format groups
