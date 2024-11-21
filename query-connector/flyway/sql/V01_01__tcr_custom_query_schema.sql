@@ -13,7 +13,8 @@ CREATE TABLE IF NOT EXISTS valuesets (
     version TEXT,
     name TEXT,
     author TEXT,
-    type TEXT
+    type TEXT,
+    dibbs_concept_type TEXT
 );
 
 CREATE TABLE IF NOT EXISTS concepts (

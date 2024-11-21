@@ -1,0 +1,16 @@
+{
+  "conditions": [
+    {
+      "id": "1",
+      "system": "DIBBs Local Code System",
+      "name": "Newborn Screening",
+      "version": "20240909"
+    },
+    {
+      "id": "2",
+      "system": "DIBBs Local Code System",
+      "name": "Cancer (Leukemia)",
+      "version": "20240909"
+    }
+  ]
+}

@@ -1,37 +1,38 @@
 "use server";
 
-import {
-  ersdToDibbsConceptMap,
-  ErsdConceptType,
-  ValueSet as DibbsValueSet,
-} from "@/app/constants";
-import { Bundle, BundleEntry, ValueSet } from "fhir/r4";
+import { ersdToDibbsConceptMap, ErsdConceptType } from "@/app/constants";
+import { Bundle, BundleEntry, Parameters, ValueSet } from "fhir/r4";
 import {
   checkValueSetInsertion,
   getERSD,
   getVSACValueSet,
-  insertConditionsFromJSON,
-  insertConditionToValuesets,
   insertValueSet,
-  ConditionStruct,
-  JsonConditionToValueSet,
   translateVSACToInternalValueSet,
-  JsonTableQuery,
-  insertDefaultQueries,
-  JsonQueryToValueset,
-  inserstQueriesToValueSets,
-  insertQueryIncludedConcepts,
-  JsonQueryIncludedConcepts,
+  insertDBStructArray,
+  executeDefaultQueryCreation,
 } from "@/app/database-service";
-// import { readJsonFile } from "./app/tests/shared_utils/readJsonFile";
 import * as fs from "fs";
 import path from "path";
+import { randomUUID } from "crypto";
+import {
+  ConditionStruct,
+  ConditionToValueSetStruct,
+  dbInsertStruct,
+} from "./app/seedSqlStructs";
 
 const ERSD_TYPED_RESOURCE_URL = "http://ersd.aimsplatform.org/fhir/ValueSet/";
+
+type ersdCondition = {
+  code: string;
+  system: string;
+  text: string;
+  valueset_id: string;
+};
 
 type OidData = {
   oids: Array<string>;
   oidToErsdType: Map<string, string>;
+  conditions: Array<ersdCondition>;
 };
 
 /**
@@ -81,12 +82,49 @@ async function getOidsFromErsd() {
       }, oidToErsdType);
     });
 
+    // Condition-valueset linkages are stored in the "usage context" structure of
+    // the value codeable concept of each resource's base level
+    // We can filter out public health informatics contexts to get only the meaningful
+    // conditions
+    const nonUmbrellaEntries = valuesets?.filter(
+      (vs) =>
+        !Object.keys(ersdToDibbsConceptMap).includes(vs.resource?.id || ""),
+    ) as BundleEntry<ValueSet>[];
+    const nonUmbrellaValueSets: Array<ValueSet> = (
+      nonUmbrellaEntries || []
+    ).map((vs) => {
+      return vs.resource || ({} as ValueSet);
+    });
+    let conditionExtractor: Array<ersdCondition> = [];
+    nonUmbrellaValueSets.reduce((acc: Array<ersdCondition>, vs: ValueSet) => {
+      const conditionSchemes = vs.useContext?.filter(
+        (context) =>
+          !(context.valueCodeableConcept?.coding || [])[0].system?.includes(
+            "us-ph-usage-context",
+          ),
+      );
+      (conditionSchemes || []).forEach((usc) => {
+        const ersdCond: ersdCondition = {
+          code: (usc.valueCodeableConcept?.coding || [])[0].code || "",
+          system: (usc.valueCodeableConcept?.coding || [])[0].system || "",
+          text: usc.valueCodeableConcept?.text || "",
+          valueset_id: vs.id || "",
+        };
+        conditionExtractor.push(ersdCond);
+      });
+      return conditionExtractor;
+    }, conditionExtractor);
+
     // Make sure to take out the umbrella value sets from the ones we try to insert
     let oids = valuesets?.map((vs) => vs.resource?.id);
     oids = oids?.filter(
       (oid) => !Object.keys(ersdToDibbsConceptMap).includes(oid || ""),
     );
-    return { oids: oids, oidToErsdType: oidToErsdType } as OidData;
+    return {
+      oids: oids,
+      oidToErsdType: oidToErsdType,
+      conditions: conditionExtractor,
+    } as OidData;
   } catch (error) {
     console.error("Couldn't query eRSD: ", error);
   }
@@ -108,6 +146,9 @@ async function getOidsFromErsd() {
 async function fetchBatchValueSetsFromVsac(oidData: OidData, batchSize = 100) {
   let startIdx = 0;
   let lastIdx = startIdx + batchSize;
+
+  const oidsToVersion: Map<String, String> = new Map<String, String>();
+  const retiredOids: Set<String> = new Set<String>();
 
   console.log(
     "Attempting fetches and inserts for",
@@ -134,6 +175,12 @@ async function fetchBatchValueSetsFromVsac(oidData: OidData, batchSize = 100) {
             vs as unknown as ValueSet,
             eRSDType,
           );
+          oidsToVersion.set(oid, internalValueSet.valueSetVersion);
+
+          // Found a retired OID, store it so we don't insert condition mappings on it
+          if (internalValueSet.concepts === undefined) {
+            retiredOids.add(internalValueSet.valueSetExternalId || "");
+          }
           return internalValueSet;
         } catch (error) {
           console.error(error);
@@ -188,11 +235,68 @@ async function fetchBatchValueSetsFromVsac(oidData: OidData, batchSize = 100) {
     // free to ensure the pool itself doesn't time out
     await sleep(2000);
   }
-}
 
-type DibbsCustomCases = {
-  [key: string]: Array<DibbsValueSet>;
-};
+  // Once all the value sets are inserted, we need to do conditions
+  // Step one is filtering out duplicates, since we just assembled
+  // condition mappings directly from value sets
+  console.log("Inserting eRSD condition data");
+  const conditionSet = new Set<string>();
+  oidData.conditions.forEach((c) => {
+    const repString = c.code + "*" + c.system + "*" + c.text;
+    conditionSet.add(repString);
+  });
+
+  // Create DB based condition structures
+  let conditionPromises = await Promise.all(
+    Array.from(conditionSet).map(async (cString) => {
+      try {
+        const c = cString.split("*");
+        const vsacCondition: Parameters = (await getVSACValueSet(
+          c[0],
+          "condition",
+          c[1],
+        )) as Parameters;
+        const versionHolder = (vsacCondition.parameter || []).find(
+          (p) => p.name === "version",
+        );
+        const versionArray = (versionHolder?.valueString || "").split("/");
+        const version = versionArray[versionArray.length - 1];
+        const finalCondition: ConditionStruct = {
+          id: c[0],
+          system: c[1],
+          name: c[2],
+          version: version,
+        };
+        return finalCondition;
+      } catch (error) {
+        console.error(error);
+      }
+    }),
+  );
+
+  // Now insert them
+  await insertDBStructArray(
+    conditionPromises as ConditionStruct[],
+    "conditions",
+  );
+
+  // Finally, take care of mapping inserted value sets to inserted conditions
+  // For this part, we do want the full list of conditions we obtained
+  // from the value sets
+  console.log("Inserting condition-to-valueset mappings");
+  let ctvStructs = oidData.conditions.map((c) => {
+    const ctvID = retiredOids.has(c.valueset_id) ? "NONE" : randomUUID();
+    const dbCTV: ConditionToValueSetStruct = {
+      id: ctvID,
+      condition_id: c.code,
+      valueset_id: c.valueset_id + "_" + oidsToVersion.get(c.valueset_id),
+      source: c.system,
+    };
+    return dbCTV;
+  });
+  ctvStructs = ctvStructs.filter((ctvs) => ctvs.id !== "NONE");
+  await insertDBStructArray(ctvStructs, "condition_to_valueset");
+}
 
 /**
  * Helper utility to resolve the relative path of a file in the docker filesystem.
@@ -215,135 +319,25 @@ function readJsonFromRelativePath(filename: string) {
 }
 
 /**
- * Uses the relative file structure of the next server to read in the
- * collection of DIBBs custom use case value sets and prepare them
- * for insertion.
- * @returns A mapping of use case to collection of value sets, if the
- * file read is successful, and undefined if it isn't.
+ * Generalized function for reading JSON data out of a file, parsing it
+ * into an array of database compatibile structures, and using the Connection
+ * Pool to insert them. Files must be located in the mounted /assets
+ * directory.
+ * @param structType The type of structure to be inserted (e.g. valueset,
+ * concept, etc.).
  */
-function readDibbsCustomValueSets() {
+async function insertSeedDbStructs(structType: string) {
   const data: string | undefined = readJsonFromRelativePath(
-    "DIBBS_Custom_ValueSets.json",
+    "dibbs_db_seed_" + structType + ".json",
   );
   if (data) {
-    const dibbsCustomCases = JSON.parse(data) as {
-      [key: string]: Array<DibbsValueSet>;
-    };
-    return dibbsCustomCases;
+    const parsed: {
+      [key: string]: Array<dbInsertStruct>;
+    } = JSON.parse(data);
+    await insertDBStructArray(parsed[structType], structType);
   } else {
-    console.error("Could not create DIBBs custom value sets");
+    console.error("Could not load JSON data for", structType);
   }
-}
-
-/**
- * Helper function for inserting the condition dump as part of the dev file.
- */
-async function readAndInsertInitialConditions() {
-  const data: string | undefined = readJsonFromRelativePath(
-    "DIBBS_Initial_Conditions.json",
-  );
-  if (data) {
-    const parsed = JSON.parse(data) as { conditions: Array<ConditionStruct> };
-    await insertConditionsFromJSON(parsed["conditions"]);
-  } else {
-    console.error("Could not insert initial conditions");
-  }
-}
-
-/**
- * Helper function for inserting a dump of default queries.
- */
-async function readAndInsertDefaultQueries() {
-  const data: string | undefined = readJsonFromRelativePath(
-    "DIBBS_Default_Queries.json",
-  );
-  if (data) {
-    const parsed = JSON.parse(data) as { queries: Array<JsonTableQuery> };
-    await insertDefaultQueries(parsed["queries"]);
-  } else {
-    console.error("Could not insert default queries");
-  }
-}
-
-/**
- * Helper function for inserting the query to valueset mappings extracted
- * as part of a dev dump file.
- */
-async function readAndInsertDefaultQtVs() {
-  const data: string | undefined = readJsonFromRelativePath(
-    "DIBBS_Default_Queries_to_ValueSets.json",
-  );
-  if (data) {
-    const parsed = JSON.parse(data) as {
-      queries_to_valuesets: Array<JsonQueryToValueset>;
-    };
-    await inserstQueriesToValueSets(parsed["queries_to_valuesets"]);
-  } else {
-    console.error("Could not insert QTVs");
-  }
-}
-
-/**
- * Helper function for inserting query included concepts.
- */
-async function readAndInsertQueryIncludedConcepts() {
-  const data: string | undefined = readJsonFromRelativePath(
-    "DIBBS_Default_Query_Included_Concepts.json",
-  );
-  if (data) {
-    const parsed = JSON.parse(data) as {
-      query_included_concepts: Array<JsonQueryIncludedConcepts>;
-    };
-    await insertQueryIncludedConcepts(parsed["query_included_concepts"]);
-  } else {
-    console.error("Could not insert initial conditions");
-  }
-}
-
-/**
- * Helper function for inserting specific DIBBs custom conditions and their
- * associated value set mappings.
- */
-async function readAndInsertDibbsCustomConditions() {
-  const data: string | undefined = readJsonFromRelativePath(
-    "DIBBS_Default_Queries_Support.json",
-  );
-  if (data) {
-    const parsed = JSON.parse(data) as {
-      conditions: Array<ConditionStruct>;
-      condition_to_valueset: { [key: string]: Array<JsonConditionToValueSet> };
-    };
-    await insertConditionsFromJSON(parsed["conditions"]);
-    Object.keys(parsed["condition_to_valueset"]).map(async (conditionTag) => {
-      console.log("Processing mappings for ", conditionTag);
-      const dibbsCTVStructs = parsed["condition_to_valueset"][conditionTag];
-      await insertConditionToValuesets(dibbsCTVStructs);
-    });
-  } else {
-    console.error("Could not create DIBBs custom condition insertions");
-  }
-}
-
-/**
- * After parsing in the loaded JSON of DIBBs Custom Value sets, this function
- * inserts those concepts and value sets using batch promise settling.
- * @param dibbsCustomCases The JSON parse of the DIBBs custom value sets file.
- */
-async function insertDibbsCustomValueSets(dibbsCustomCases: DibbsCustomCases) {
-  Object.keys(dibbsCustomCases).map(async (useCase) => {
-    console.log("Processing custom valuesets for", useCase);
-    const dibbsVSStructs = dibbsCustomCases[useCase];
-    const useCaseVSPromises = dibbsVSStructs.map((vs) => {
-      return insertValueSet(vs);
-    });
-    const useCaseResults = await Promise.allSettled(useCaseVSPromises);
-    const allSucceeded = useCaseResults.every((r) => r.status === "fulfilled");
-    if (allSucceeded) {
-      console.log("All valuesets and concepts inserted for", useCase);
-    } else {
-      console.error("Error in value set insertion for use case", useCase);
-    }
-  });
 }
 
 /**
@@ -361,18 +355,11 @@ export async function createDibbsDB() {
   // Only run default and custom insertions if we're making the dump
   // file for dev
   if (process.env.NODE_ENV !== "production") {
-    const dibbsCustomVS = readDibbsCustomValueSets();
-    if (dibbsCustomVS) {
-      await insertDibbsCustomValueSets(dibbsCustomVS);
-    } else {
-      console.error(
-        "Could not load and insert DIBBs custom value sets, aborting DB creation",
-      );
-    }
-    await readAndInsertInitialConditions();
-    await readAndInsertDibbsCustomConditions();
-    await readAndInsertDefaultQueries();
-    await readAndInsertDefaultQtVs();
-    await readAndInsertQueryIncludedConcepts();
+    await insertSeedDbStructs("valuesets");
+    await insertSeedDbStructs("concepts");
+    await insertSeedDbStructs("valueset_to_concept");
+    await insertSeedDbStructs("conditions");
+    await insertSeedDbStructs("condition_to_valueset");
+    await executeDefaultQueryCreation();
   }
 }

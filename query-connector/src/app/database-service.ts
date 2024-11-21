@@ -1,6 +1,11 @@
 "use server";
 import { Pool, PoolConfig, QueryResultRow } from "pg";
-import { Bundle, OperationOutcome, ValueSet as FhirValueSet } from "fhir/r4";
+import {
+  Bundle,
+  OperationOutcome,
+  ValueSet as FhirValueSet,
+  Parameters,
+} from "fhir/r4";
 import {
   Concept,
   ErsdConceptType,
@@ -20,6 +25,20 @@ import {
   CategoryToConditionArrayMap,
   ConditionIdToNameMap,
 } from "./queryBuilding/utils";
+import {
+  ConceptStruct,
+  ConditionStruct,
+  ConditionToValueSetStruct,
+  dbInsertStruct,
+  insertConceptSql,
+  insertConditionSql,
+  insertConditionToValuesetSql,
+  insertDefaultQueryLogicSql,
+  insertValueSetSql,
+  insertValuesetToConceptSql,
+  ValuesetStruct,
+  ValuesetToConceptStruct,
+} from "./seedSqlStructs";
 
 const getQuerybyNameSQL = `
 select q.query_name, q.id, qtv.valueset_id, vs.name as valueset_name, vs.oid as valueset_external_id, vs.version, vs.author as author, vs.type, vs.dibbs_concept_type as dibbs_concept_type, qic.concept_id, qic.include, c.code, c.code_system, c.display 
@@ -60,6 +79,24 @@ export const getSavedQueryByName = async (name: string) => {
     return result.rows;
   } catch (error) {
     console.error("Error retrieving query:", error);
+    throw error;
+  }
+};
+
+/**
+ * Utility function to execute the insertions into three query tables
+ * programmatically after the database has been seeded with initial
+ * conditions.
+ */
+export const executeDefaultQueryCreation = async () => {
+  try {
+    console.log("Executing default query linking script");
+    await dbClient.query(insertDefaultQueryLogicSql);
+    console.log(
+      "Default queries, queries to conditions, and query included concepts insertion complete",
+    );
+  } catch (error) {
+    console.error("Could not cross-index default queries", error);
     throw error;
   }
 };
@@ -116,7 +153,7 @@ export const mapQueryRowsToValueSets = async (rows: QueryResultRow[]) => {
 /*
  * The expected return type from both the eRSD API and the VSAC FHIR API.
  */
-type ErsdOrVsacResponse = Bundle | OperationOutcome;
+type ErsdOrVsacResponse = Bundle | Parameters | OperationOutcome;
 
 /**
  * Fetches the eRSD Specification from the eRSD API. This function requires an API key
@@ -153,14 +190,22 @@ export async function getERSD(
  * Metathesaurus License. See https://www.nlm.nih.gov/vsac/support/usingvsac/vsacfhirapi.html
  * for authentication instructions.
  * @param oid The OID whose value sets to retrieve.
+ * @param searchStructType Optionally, a flag to identify what type of
+ * search to perform, since VSAC can be used for value sets as well as conditions.
+ * @param codeSystem Optional parameter for use with condition querying.
  * @returns The value sets as a FHIR bundle, or an Operation Outcome if there is an error.
  */
 export async function getVSACValueSet(
   oid: string,
+  searchStructType: string = "valueset",
+  codeSystem?: string,
 ): Promise<ErsdOrVsacResponse> {
   const username: string = "apikey";
   const umlsKey: string = process.env.UMLS_API_KEY || "";
-  const vsacUrl: string = `https://cts.nlm.nih.gov/fhir/ValueSet/${oid}`;
+  const vsacUrl: string =
+    searchStructType === "valueset"
+      ? `https://cts.nlm.nih.gov/fhir/ValueSet/${oid}`
+      : `https://cts.nlm.nih.gov/fhir/CodeSystem/$lookup?system=${codeSystem}&code=${oid}`;
   const response = await fetch(vsacUrl, {
     method: "get",
     headers: new Headers({
@@ -294,20 +339,6 @@ function generateValueSetSqlPromise(vs: ValueSet) {
   // ValueSets are already uniquely identified by OID + V so this just allows
   // us to proceed with DB creation in the event a duplicate VS from another
   // group is pulled and loaded
-  const insertValueSetSql = `
-  INSERT INTO valuesets
-    VALUES($1,$2,$3,$4,$5,$6,$7)
-    ON CONFLICT(id)
-    DO UPDATE SET
-      id = EXCLUDED.id,
-      oid = EXCLUDED.oid,
-      version = EXCLUDED.version,
-      name = EXCLUDED.name,
-      author = EXCLUDED.author,
-      type = EXCLUDED.type,
-      dibbs_concept_type = EXCLUDED.dibbs_concept_type
-    RETURNING id;
-  `;
   const valuesArray = [
     valueSetUniqueId,
     valueSetOid,
@@ -334,19 +365,6 @@ function generateConceptSqlPromises(vs: ValueSet) {
 
     // Duplicate value set insertion is likely to percolate to the concept level
     // Apply the same logic of overwriting if unique keys are the same
-    const insertConceptSql = `
-    INSERT INTO concepts
-      VALUES($1,$2,$3,$4,$5,$6)
-      ON CONFLICT(id)
-      DO UPDATE SET
-        id = EXCLUDED.id,
-        code = EXCLUDED.code,
-        code_system = EXCLUDED.code_system,
-        display = EXCLUDED.display,
-        gem_formatted_code = EXCLUDED.gem_formatted_code,
-        version = EXCLUDED.version
-      RETURNING id;
-    `;
     const conceptInsertPromise = dbClient.query(insertConceptSql, [
       conceptUniqueId,
       concept.code,
@@ -371,17 +389,7 @@ function generateValuesetConceptJoinSqlPromises(vs: ValueSet) {
     // Last place to make an overwriting upsert adjustment
     // Even if the duplicate entries have the same data, PG will attempt to
     // insert another row, so just make that upsert the relationship
-    const insertJoinSql = `
-    INSERT INTO valueset_to_concept
-    VALUES($1,$2,$3)
-    ON CONFLICT(id)
-    DO UPDATE SET
-      id = EXCLUDED.id,
-      valueset_id = EXCLUDED.valueset_id,
-      concept_id = EXCLUDED.concept_id
-    RETURNING valueset_id, concept_id;
-    `;
-    const conceptInsertPromise = dbClient.query(insertJoinSql, [
+    const conceptInsertPromise = dbClient.query(insertValuesetToConceptSql, [
       `${vs.valueSetId}_${conceptUniqueId}`,
       vs.valueSetId,
       conceptUniqueId,
@@ -608,222 +616,72 @@ export async function getConditionsData() {
   } as const;
 }
 
-export type ConditionStruct = {
-  id: string;
-  system: string;
-  name: string;
-  version: string;
-};
-
-export type JsonConditionToValueSet = {
-  id: string;
-  condition_id: string;
-  valueset_id: string;
-  source: string;
-};
-
-export type JsonTableQuery = {
-  id: string;
-  query_name: string;
-  author: string;
-  date_created: Date;
-  date_last_modified: Date;
-  time_window_number: number;
-  time_window_unit: string;
-};
-
-export type JsonQueryToValueset = {
-  id: string;
-  query_id: string;
-  valueset_id: string;
-  valueset_oid: string;
-};
-
-export type JsonQueryIncludedConcepts = {
-  id: string;
-  query_by_valueset_id: string;
-  concept_id: string;
-  include: boolean;
-};
-
 /**
- * Function that inserts all of the DIBBs custom condition mappings and their
- * associated value sets into the DB for extraction to a dev dump file.
- * @param conditions The JSON parsed array of condition objects to insert.
+ * Generic function for inserting a variety of different DB structures
+ * into the databse during seeding.
+ * @param structs An array of structures that's been extracted from a file.
+ * @param insertType The type of structure being inserted.
  */
-export async function insertConditionsFromJSON(conditions: ConditionStruct[]) {
-  const allConditionsPromises = conditions.map((c) => {
-    const insertConditionSql = `
-    INSERT INTO conditions
-      VALUES($1,$2,$3,$4)
-      ON CONFLICT(id)
-      DO UPDATE SET
-        id = EXCLUDED.id,
-        system = EXCLUDED.system,
-        name = EXCLUDED.name,
-        version = EXCLUDED.version
-      RETURNING id;
-    `;
-    const conditionSqlPromise = dbClient.query(insertConditionSql, [
-      c.id,
-      c.system,
-      c.name,
-      c.version,
-    ]);
-    return conditionSqlPromise;
-  });
-
-  const allConditionsInserted = await Promise.allSettled(allConditionsPromises);
-  if (allConditionsInserted.every((p) => p.status === "fulfilled")) {
-    console.log("All conditions inserted from JSON");
-  } else {
-    console.error("Could not insert conditions from JSON");
-  }
-}
-
-/**
- * Function that inserts condition to value set mappings after they have been
- * loaded from a JSON file.
- * @param ctvs An array of condition to value set mappings.
- */
-export async function insertConditionToValuesets(
-  ctvs: JsonConditionToValueSet[],
+export async function insertDBStructArray(
+  structs: dbInsertStruct[],
+  insertType: string,
 ) {
-  const allConditionsPromises = ctvs.map((c) => {
-    const insertConditionSql = `
-    INSERT INTO condition_to_valueset
-      VALUES($1,$2,$3,$4)
-      ON CONFLICT(id)
-      DO UPDATE SET
-        id = EXCLUDED.id,
-        condition_id = EXCLUDED.condition_id,
-        valueset_id = EXCLUDED.valueset_id,
-        source = EXCLUDED.source
-      RETURNING id;
-    `;
-    const conditionSqlPromise = dbClient.query(insertConditionSql, [
-      c.id,
-      c.condition_id,
-      c.valueset_id,
-      c.source,
-    ]);
-    return conditionSqlPromise;
+  const allStructPromises = structs.map((struct) => {
+    let structInsertSql: string = "";
+    let valuesToInsert: string[] = [];
+    if (insertType === "valuesets") {
+      structInsertSql = insertValueSetSql;
+      valuesToInsert = [
+        (struct as ValuesetStruct).id,
+        (struct as ValuesetStruct).oid,
+        (struct as ValuesetStruct).version,
+        (struct as ValuesetStruct).name,
+        (struct as ValuesetStruct).author,
+        (struct as ValuesetStruct).type,
+        (struct as ValuesetStruct).dibbs_concept_type,
+      ];
+    } else if (insertType === "concepts") {
+      structInsertSql = insertConceptSql;
+      valuesToInsert = [
+        (struct as ConceptStruct).id,
+        (struct as ConceptStruct).code,
+        (struct as ConceptStruct).code_system,
+        (struct as ConceptStruct).display,
+        INTENTIONAL_EMPTY_STRING_FOR_GEM_CODE,
+        (struct as ConceptStruct).version,
+      ];
+    } else if (insertType === "valueset_to_concept") {
+      structInsertSql = insertValuesetToConceptSql;
+      valuesToInsert = [
+        (struct as ValuesetToConceptStruct).id,
+        (struct as ValuesetToConceptStruct).valueset_id,
+        (struct as ValuesetToConceptStruct).concept_id,
+      ];
+    } else if (insertType === "conditions") {
+      structInsertSql = insertConditionSql;
+      valuesToInsert = [
+        (struct as ConditionStruct).id,
+        (struct as ConditionStruct).system,
+        (struct as ConditionStruct).name,
+        (struct as ConditionStruct).version,
+      ];
+    } else if (insertType === "condition_to_valueset") {
+      structInsertSql = insertConditionToValuesetSql;
+      valuesToInsert = [
+        (struct as ConditionToValueSetStruct).id,
+        (struct as ConditionToValueSetStruct).condition_id,
+        (struct as ConditionToValueSetStruct).valueset_id,
+        (struct as ConditionToValueSetStruct).source,
+      ];
+    }
+    const insertPromise = dbClient.query(structInsertSql, valuesToInsert);
+    return insertPromise;
   });
 
-  const allConditionsInserted = await Promise.allSettled(allConditionsPromises);
-  if (allConditionsInserted.every((p) => p.status === "fulfilled")) {
-    console.log("All condition-valueset mappings inserted from JSON");
+  const allStructsInserted = await Promise.allSettled(allStructPromises);
+  if (allStructsInserted.every((p) => p.status === "fulfilled")) {
+    console.log("All", insertType, "inserted");
   } else {
-    console.error("Could not insert condition-valueset mappings from JSON");
-  }
-}
-
-/**
- * Helper function to insert JSON-loaded default queries into the DB.
- * @param queries The JSON parsed default queries to insert.
- */
-export async function insertDefaultQueries(queries: JsonTableQuery[]) {
-  const allQueryPromises = queries.map((q) => {
-    const insertQuerySql = `
-    INSERT INTO query
-      VALUES($1,$2,$3,$4,$5,$6,$7)
-      ON CONFLICT(id)
-      DO UPDATE SET
-        id = EXCLUDED.id,
-        query_name = EXCLUDED.query_name,
-        author = EXCLUDED.author,
-        date_created = EXCLUDED.date_created,
-        date_last_modified = EXCLUDED.date_last_modified,
-        time_window_number = EXCLUDED.time_window_number,
-        time_window_unit = EXCLUDED.time_window_unit
-      RETURNING id;
-    `;
-    const querySqlPromise = dbClient.query(insertQuerySql, [
-      q.id,
-      q.query_name,
-      q.author,
-      q.date_created,
-      q.date_last_modified,
-      q.time_window_number,
-      q.time_window_unit,
-    ]);
-    return querySqlPromise;
-  });
-
-  const allQueriesInserted = await Promise.allSettled(allQueryPromises);
-  if (allQueriesInserted.every((p) => p.status === "fulfilled")) {
-    console.log("All default queries inserted from JSON");
-  } else {
-    console.error("Could not insert default queries from JSON");
-  }
-}
-
-/**
- * Helper function to insert JSON loaded query-to-valueset mappings.
- * @param qtvs The QtVS mappings to insert.
- */
-export async function inserstQueriesToValueSets(qtvs: JsonQueryToValueset[]) {
-  const allQtVPromises = qtvs.map((q) => {
-    const insertQtVSql = `
-    INSERT INTO query_to_valueset
-      VALUES($1,$2,$3,$4)
-      ON CONFLICT(id)
-      DO UPDATE SET
-        id = EXCLUDED.id,
-        query_id = EXCLUDED.query_id,
-        valueset_id = EXCLUDED.valueset_id,
-        valueset_oid = EXCLUDED.valueset_oid
-      RETURNING id;
-    `;
-    const qtvSqlPromise = dbClient.query(insertQtVSql, [
-      q.id,
-      q.query_id,
-      q.valueset_id,
-      q.valueset_oid,
-    ]);
-    return qtvSqlPromise;
-  });
-
-  const allQtVInserted = await Promise.allSettled(allQtVPromises);
-  if (allQtVInserted.every((p) => p.status === "fulfilled")) {
-    console.log("All query-valueset mappings inserted from JSON");
-  } else {
-    console.error("Could not insert query-valueset mappings from JSON");
-  }
-}
-
-/**
- * Helper function to insert JSON loaded query included concepts.
- * @param qics The QICs to insert.
- */
-export async function insertQueryIncludedConcepts(
-  qics: JsonQueryIncludedConcepts[],
-) {
-  const allQICsPromises = qics.map((ic) => {
-    const insertQICSql = `
-    INSERT INTO query_included_concepts
-      VALUES($1,$2,$3,$4)
-      ON CONFLICT(id)
-      DO UPDATE SET
-        id = EXCLUDED.id,
-        query_by_valueset_id = EXCLUDED.query_by_valueset_id,
-        concept_id = EXCLUDED.concept_id,
-        include = EXCLUDED.include
-      RETURNING id;
-    `;
-    const qicSqlPromise = dbClient.query(insertQICSql, [
-      ic.id,
-      ic.query_by_valueset_id,
-      ic.concept_id,
-      ic.include,
-    ]);
-    return qicSqlPromise;
-  });
-
-  const allQICsInserted = await Promise.allSettled(allQICsPromises);
-  if (allQICsInserted.every((p) => p.status === "fulfilled")) {
-    console.log("All query included concepts inserted from JSON");
-  } else {
-    console.error("Could not insert query included concepts from JSON");
+    console.error("Problem inserting ", insertType);
   }
 }
