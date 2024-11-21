@@ -12,7 +12,28 @@ The Query Connector app can be run using Docker (or any other OCI container runt
 
 Before running the Query Connector locally, you will need to obtain an API key for the electronic Reporting and Surveillance Distribution (eRSD). With the API key, you have access to 200+ pre-built queries for reportable conditions, e.g., chlamydia, influenza, hepatitis A, etc. These queries can be used and modified in the Query Connector app.
 
-To obtain a free API key, please visit https://ersd.aimsplatform.org/#/api-keys and follow the sign up instructions. Add your API key as an environment variable called `ERSD_API_KEY` in an `.env` file that can be accessed when running the Query Connector app.
+To obtain a free API key, please visit <https://ersd.aimsplatform.org/#/api-keys> and follow the sign up instructions.
+
+Next, set up your `.env` file with the following command: `cp .env.sample .env`
+
+Adjust your `DATABASE_URL` as needed.
+
+Add your API keys as an environment variables called `ERSD_API_KEY` and `UMLS_API_KEY` in the `.env` file so that they can be accessed when running the Query Connector app.
+
+#### Running Keycloak for Authentication
+
+```
+docker compose up -f docker-compose-dev.yaml up keycloak
+```
+
+To login via Keycloak, make sure your `.env` is updated using `cp` command above and use the following credentials to login at `localhost:8080` after spinning up the container:
+
+```
+Username: qc-admin
+Password: QcDev2024!
+```
+
+Next, run the app with `npm run dev` or `npm run dev-win`. You should see a sign in button at <http://localhost:3000>. Click it and login with the above credentials, and it should redirect back to <http://localhost:3000/query>!
 
 #### Running with Docker (Recommended)
 

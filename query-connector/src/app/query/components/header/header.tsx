@@ -6,6 +6,7 @@ import { Button, Icon } from "@trussworks/react-uswds";
 import styles from "./header.module.scss";
 import { metadata } from "@/app/constants";
 import classNames from "classnames";
+import { signIn, useSession } from "next-auth/react";
 /**
  * Produces the header.
  * @returns The HeaderComponent component.
@@ -36,8 +37,11 @@ export default function HeaderComponent() {
   const router = useRouter();
   const path = usePathname();
 
-  const handleClick = () => {
-    router.push(`/signin`);
+  const { data: session } = useSession();
+  const isLoggedIn = session?.user != null;
+
+  const handleSignIn = () => {
+    signIn("keycloak", { redirectTo: "/query" });
   };
 
   const toggleMenuDropdown = () => {
@@ -76,13 +80,13 @@ export default function HeaderComponent() {
             )}
           >
             {/* TODO: Rework show/hide rules based on actual auth status */}
-            {path != "/signin" && !LOGGED_IN_PATHS.includes(path) && (
+            {!isLoggedIn && !LOGGED_IN_PATHS.includes(path) && (
               <Button
                 className={styles.signinButton}
                 type="button"
                 id="signin-button"
                 title={"Sign in button"}
-                onClick={() => handleClick()}
+                onClick={handleSignIn}
               >
                 Sign in
               </Button>
