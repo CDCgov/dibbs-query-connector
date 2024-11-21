@@ -4,56 +4,55 @@ description: This action will wait and poll for the status of workflow
 # on:
 #     repository_dispatch:
 #       types: [trigger-workflow]
-  
+
 # permissions:
 #     id-token: write
 #     contents: read
 #     packages: write
-  
+
 # jobs:
 #     trigger:
 #       runs-on: ubuntu-latest
 runs:
-    using: composite 
-    steps: 
-        - name: Poll for Workflow Status
-          shell: bash
-          env:
-            REPO: "<owner>/<repo>"
-            WORKFLOW_NAME: "<workflow_name.yml>"
-            PAT: ${{ secrets.PAT }}
-          id: poll-workflow
-          run: |
-            # Initial API call to find the workflow run ID
-            RUN_ID=$(curl -s -H "Authorization: Bearer $PAT" \
+  using: composite
+  steps:
+    - name: Poll for Workflow Status
+      shell: bash
+      env:
+        REPO: "<owner>/<repo>"
+        WORKFLOW_NAME: "<workflow_name.yml>"
+        PAT: ${{ secrets.PAT }}
+      id: poll-workflow
+      run: |
+        # Initial API call to find the workflow run ID
+        RUN_ID=$(curl -s -H "Authorization: Bearer $PAT" \
+            -H "Accept: application/vnd.github+json" \
+            https://api.github.com/repos/$REPO/actions/runs \
+            | jq -r ".workflow_runs[] | select(.name == \"$WORKFLOW_NAME\") | .id" | head -n 1)
+
+        if [ -z "$RUN_ID" ]; then
+            echo "Workflow not found."
+            exit 1
+        fi
+
+        # Polling the status
+        while true; do
+            STATUS=$(curl -s -H "Authorization: Bearer $PAT" \
                 -H "Accept: application/vnd.github+json" \
-                https://api.github.com/repos/$REPO/actions/runs \
-                | jq -r ".workflow_runs[] | select(.name == \"$WORKFLOW_NAME\") | .id" | head -n 1)
-        
-            if [ -z "$RUN_ID" ]; then
-                echo "Workflow not found."
-                exit 1
-            fi
-        
-            # Polling the status
-            while true; do
-                STATUS=$(curl -s -H "Authorization: Bearer $PAT" \
+                https://api.github.com/repos/$REPO/actions/runs/$RUN_ID \
+                | jq -r ".status")
+
+            if [ "$STATUS" == "completed" ]; then
+                CONCLUSION=$(curl -s -H "Authorization: Bearer $PAT" \
                     -H "Accept: application/vnd.github+json" \
                     https://api.github.com/repos/$REPO/actions/runs/$RUN_ID \
-                    | jq -r ".status")
-        
-                if [ "$STATUS" == "completed" ]; then
-                    CONCLUSION=$(curl -s -H "Authorization: Bearer $PAT" \
-                        -H "Accept: application/vnd.github+json" \
-                        https://api.github.com/repos/$REPO/actions/runs/$RUN_ID \
-                        | jq -r ".conclusion")
-        
-                    echo "Workflow completed with status: $CONCLUSION"
-                    echo "::set-output name=conclusion::$CONCLUSION"
-                    break
-                fi
-        
-                echo "Workflow still in progress..."
-                sleep 30
-            done
-        
+                    | jq -r ".conclusion")
+
+                echo "Workflow completed with status: $CONCLUSION"
+                echo "::set-output name=conclusion::$CONCLUSION"
+                break
+            fi
+
+            echo "Workflow still in progress..."
+            sleep 30
+        done
