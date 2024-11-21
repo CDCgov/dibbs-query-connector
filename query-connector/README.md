@@ -18,15 +18,15 @@ Next, set up your `.env` file with the following command: `cp .env.sample .env`
 
 Adjust your `DATABASE_URL` as needed.
 
-Add your API key as an environment variable called `ERSD_API_KEY` in the `.env` file so that it can be accessed when running the Query Connector app.
+Add your API keys as an environment variables called `ERSD_API_KEY` and `UMLS_API_KEY` in the `.env` file so that they can be accessed when running the Query Connector app.
 
 #### Running Keycloak for Authentication
 
 ```
-docker compose up -f docker-compose-dev.yaml up Keycloak
+docker compose up -f docker-compose-dev.yaml up keycloak
 ```
 
-To login via Keycloak, use the following credentials:
+To login via Keycloak, make sure your `.env` is updated using `cp` command above and use the following credentials to login at `localhost:8080` after spinning up the container:
 
 ```
 Username: qc-admin
