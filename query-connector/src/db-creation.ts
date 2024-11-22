@@ -356,18 +356,18 @@ export async function createDibbsDB() {
     } else {
       console.error("Could not load eRSD, aborting DIBBs DB creation");
     }
+
+    // Only run default and custom insertions if we're making the dump
+    // file for dev
+    if (process.env.NODE_ENV !== "production") {
+      await insertSeedDbStructs("valuesets");
+      await insertSeedDbStructs("concepts");
+      await insertSeedDbStructs("valueset_to_concept");
+      await insertSeedDbStructs("conditions");
+      await insertSeedDbStructs("condition_to_valueset");
+      await executeDefaultQueryCreation();
+    }
   } else {
     console.log("Database already has data; skipping DIBBs DB creation.");
-  }
-
-  // Only run default and custom insertions if we're making the dump
-  // file for dev
-  if (process.env.NODE_ENV !== "production") {
-    await insertSeedDbStructs("valuesets");
-    await insertSeedDbStructs("concepts");
-    await insertSeedDbStructs("valueset_to_concept");
-    await insertSeedDbStructs("conditions");
-    await insertSeedDbStructs("condition_to_valueset");
-    await executeDefaultQueryCreation();
   }
 }
