@@ -21,7 +21,7 @@ on:
       target_repo_name:
         description: "Input for the name of the repository"
       target_event_type:
-        description: "Input for the event type that is configured as the trigger for the workflow"     
+        description: "Input for the event type that is configured as the trigger for the workflow"
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true

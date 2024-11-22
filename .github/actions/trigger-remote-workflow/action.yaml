@@ -15,7 +15,7 @@ inputs:
   target_repo_name:
     description: "Name of the repository that stores the workflow will be triggered"
   target_event_type:
-    description: "Event type that is configured as the trigger for the workflow" 
+    description: "Event type that is configured as the trigger for the workflow"
 
 runs:
   using: composite
@@ -73,4 +73,3 @@ runs:
           https://api.github.com/repos/${{ inputs.target_repo_owner }}/${{ inputs.target_repo_name }}/dispatches \
           -d "{\"event_type\": \"$event_type\", \"client_payload\": {\"service\": \"$service\", \"version\": \"$version\", \"unit\": false, \"integration\": true}}"
         echo "API URL: https://api.github.com/repos/${{ inputs.target_repo_owner }}/${{ inputs.target_repo_name }}/dispatches"
-
