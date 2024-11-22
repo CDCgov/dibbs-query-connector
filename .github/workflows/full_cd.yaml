@@ -15,7 +15,13 @@ on:
         required: true
       target_version:
         description: "Input a version (e.g., v1.0.0)"
+      target_repo_owner:
+        description: "Input for repository owner"
         required: true
+      target_repo_name:
+        description: "Input for the name of the repository"
+      target_event_type:
+        description: "Input for the event type that is configured as the trigger for the workflow"     
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -43,14 +49,13 @@ jobs:
       - uses: actions/checkout@v4
       - name: Increment chart version
         uses: ./.github/actions/trigger-remote-workflow
-        env:
-          REPO_OWNER: "CDCgov"
-          REPO_NAME: "phdi-charts"
-          EVENT_TYPE: "trigger-workflow"
         with:
           target_service: ${{ github.event.inputs.target_service || 'helm-chart' }}
           target_version: ${{ github.event.inputs.target_version || 'v1.0.0' }}
           deployment_auth: ${{ secrets.DEPLOYMENT_WORKFLOW }}
+          target_repo_owner: ${{ github.event.inputs.target_repo_owner || 'CDCgov' }}
+          target_repo_name: ${{ github.event.inputs.target_repo_name || 'phdi-charts' }}
+          target_event_type: ${{ github.event.inputs.target_event_type || 'trigger-workflow' }}
 
   deploy_image_eks:
     runs-on: ubuntu-latest
@@ -59,11 +64,10 @@ jobs:
       - uses: actions/checkout@v4
       - name: Increment chart version
         uses: ./.github/actions/trigger-remote-workflow
-        env:
-          REPO_OWNER: "CDCgov"
-          REPO_NAME: "phdi-playground"
-          EVENT_TYPE: "trigger-workflow"
         with:
           target_service: ${{ github.event.inputs.target_service || 'query-connector' }}
           target_version: ${{ github.event.inputs.target_version || 'v1.0.0' }}
           deployment_auth: ${{ secrets.DEPLOYMENT_WORKFLOW }}
+          target_repo_owner: ${{ github.event.inputs.target_repo_owner || 'CDCgov' }}
+          target_repo_name: ${{ github.event.inputs.target_repo_name || 'phdi-playground' }}
+          target_event_type: ${{ github.event.inputs.target_event_type || 'trigger-workflow' }}
