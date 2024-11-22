@@ -90,8 +90,41 @@
     text-align: right;
     padding-right: 1.5rem;
     white-space: nowrap;
-  }
+    position: relative;
+    }
+    
+    tbody td:hover .table-cell-buttons {
+      display: flex;
+    }
+    
+    .table-cell-buttons {
+      display: none;
+      position: absolute;
+      right: 1.5rem;
+      top: 50%;
+      transform: translateY(-50%);
+      gap: 0.5rem;
+    }    
 }
+
+.customQueryTable tbody td[title] {
+  cursor: help;
+}
+
+.customQueryTable tbody td[title]:hover::after {
+  content: attr(title);
+  position: absolute;
+  background-color: rgba(0, 0, 0, 0.75);
+  color: white;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  top: -1.5rem;
+  left: 0;
+  z-index: 999;
+}
+
 
 .iconWithText {
   width: 1.5rem; 
@@ -99,10 +132,3 @@
   margin-right: 0.25rem;
   }
 
-.table-cell-buttons {
-  display: none; /* Hide buttons by default */
-}
-
-.table-cell:hover .table-cell-buttons {
-  display: inline-flex; /* Show buttons when hovering over the cell */
-}
