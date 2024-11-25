@@ -50,7 +50,7 @@ services:
   keycloak:
     image: quay.io/keycloak/keycloak:26.0.2
     ports:
-      - 8081:8081
+      - 8081:8080
     volumes:
       - ./keycloak:/opt/keycloak/data/import
     restart: always
