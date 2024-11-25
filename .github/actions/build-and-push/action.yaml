@@ -40,4 +40,3 @@ runs:
         push: true
         tags: |
           ghcr.io/${{ env.REPO }}/:main, ghcr.io/${{ env.REPO }}/query-connector:latest
-
