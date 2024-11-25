@@ -42,8 +42,8 @@
   border-collapse: collapse;
   background-color: white;
   border: 0.25rem solid #DFE1E2;
-  box-shadow: 0 0.125rem 0.1875rem 0 #F3F3F3; /* x = 0, y = 2px (0.125rem), blur = 3px (0.1875rem), spread = 0 */
-  
+  box-shadow: 0 0.125rem 0.1875rem 0 #F3F3F3; 
+
   thead tr th {
     color: var(--gray-500, #919191);
     background-color: white;
@@ -77,58 +77,70 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap; 
+    position: relative; /* For tooltip positioning */
   }
 
-  tbody tr:hover td {
-    overflow: visible;
-    white-space: normal;
-    position: relative;
-    z-index: 10;
+  tbody td:hover {
+    background: rgba(217, 232, 246, 0.50); /* Change background only */
+  }
+
+  tbody td[title]:hover::after {
+    content: attr(title); /* Show the full text as a tooltip */
+    position: absolute;
+    top: 100%; /* Position below the cell */
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.75);
+    color: #fff;
+    padding: 0.5rem;
+    font-size: 0.75rem;
+    border-radius: 0.25rem;
+    white-space: nowrap;
+    z-index: 1000;
   }
 
   tbody td:last-child {
     text-align: right;
     padding-right: 1.5rem;
     white-space: nowrap;
-    position: relative;
-    }
-    
-    tbody td:hover .table-cell-buttons {
-      display: flex;
-    }
-    
-    .table-cell-buttons {
-      display: none;
-      position: absolute;
-      right: 1.5rem;
-      top: 50%;
-      transform: translateY(-50%);
-      gap: 0.5rem;
-    }    
-}
-
-.customQueryTable tbody td[title] {
-  cursor: help;
-}
-
-.customQueryTable tbody td[title]:hover::after {
-  content: attr(title);
-  position: absolute;
-  background-color: rgba(0, 0, 0, 0.75);
-  color: white;
-  padding: 0.5rem;
-  border-radius: 0.25rem;
-  font-size: 0.75rem;
-  white-space: nowrap;
-  top: -1.5rem;
-  left: 0;
-  z-index: 999;
-}
-
-
-.iconWithText {
-  width: 1.5rem; 
-  height: 1.5rem; 
-  margin-right: 0.25rem;
   }
+
+  .table-cell-buttons {
+    display: none;
+    position: absolute;
+    right: 1.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    gap: 0.5rem;
+  }
+
+  tbody td:hover .table-cell-buttons {
+    display: flex;
+  }
+}
+
+// Enable an alternative hover over feature for the titles 
+// .customQueryTable tbody td[title] {
+//   cursor: help;
+// }
+
+// .customQueryTable tbody td[title]:hover::after {
+//   content: attr(title);
+//   position: absolute;
+//   background-color: rgba(0, 0, 0, 0.75);
+//   color: white;
+//   padding: 0.5rem;
+//   border-radius: 0.25rem;
+//   font-size: 0.75rem;
+//   white-space: nowrap;
+//   top: -1.5rem;
+//   left: 0;
+//   z-index: 999;
+// }
+
+
+.icon-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
 

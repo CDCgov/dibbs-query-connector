@@ -51,11 +51,9 @@ export const UserQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
         <tbody>
           {queries.map((query, index) => (
             <tr key={index} className="tableRowWithHover">
-              <td title={query.query_name}>
-                {query.query_name} query for patient data in FHIR Server A
-              </td>
               <td title={query.query_name}>{query.query_name}</td>
-              {/*  TODO: Use conditions_list once available */}
+              <td title={query.query_name}>{query.query_name}</td>
+              {/* TODO: Use conditions_list once available */}
               <td className="table-cell">
                 <div className="table-cell-buttons">
                   <Button
@@ -63,14 +61,20 @@ export const UserQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
                     className="usa-button--unstyled text-bold text-no-underline"
                     onClick={() => console.log("Edit", query.query_id)}
                   >
-                    <Icon.Edit className="icon-large" /> Edit
+                    <span className="icon-text padding-right-4">
+                      <Icon.Edit className="icon-large" />
+                      <span>Edit</span>
+                    </span>
                   </Button>
                   <Button
                     type="button"
                     className="usa-button--unstyled text-bold text-no-underline"
                     onClick={() => console.log("Delete", query.query_id)}
                   >
-                    <Icon.Delete className="icon-large" /> Delete
+                    <span className="icon-text padding-right-4">
+                      <Icon.Delete className="icon-large" />
+                      <span>Delete</span>
+                    </span>
                   </Button>
                   <Button
                     type="button"
@@ -83,7 +87,10 @@ export const UserQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
                         );
                     }}
                   >
-                    <Icon.ContentCopy className="icon-large" /> Copy ID
+                    <span className="icon-text padding-right-1">
+                      <Icon.ContentCopy className="icon-large" />
+                      <span>Copy ID</span>
+                    </span>
                   </Button>
                 </div>
               </td>
