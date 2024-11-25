@@ -1119,6 +1119,16 @@
       "condition_name": "Zika Virus Disease",
       "condition_code": "3928002",
       "category": "Vectorborne Diseases"
+    },
+    {
+      "condition_name": "Streptococcal disease, invasive, Group A",
+      "condition_code": "406614006",
+      "category": "Streptococcal Diseases"
+    },
+    {
+      "condition_name": "Streptococcal disease, invasive, Group B",
+      "condition_code": "406612005",
+      "category": "Streptococcal Diseases"
     }
   ]
 }
