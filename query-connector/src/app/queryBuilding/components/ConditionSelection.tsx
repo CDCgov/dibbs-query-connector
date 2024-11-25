@@ -100,7 +100,7 @@ export const ConditionSelection: React.FC<ConditionSelectionProps> = ({
     <div
       className={classNames(
         "bg-gray-5 margin-top-4 ",
-        styles.queryTemplateContainer
+        styles.conditionTemplateContainer
       )}
     >
       <div className="display-flex flex-justify flex-align-end margin-bottom-3 width-full">
@@ -119,7 +119,7 @@ export const ConditionSelection: React.FC<ConditionSelectionProps> = ({
           Create query
         </Button>
       </div>
-      <div className={classNames(styles.querySelectionForm, "radius-lg")}>
+      <div className={classNames(styles.conditionSelectionForm, "radius-lg")}>
         <SearchField
           id="conditionTemplateSearch"
           placeholder="Search conditions"

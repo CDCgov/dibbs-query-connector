@@ -90,94 +90,45 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
     <div
       className={classNames(
         "bg-gray-5 margin-top-4 ",
-        styles.vsSearch__container
+        styles.valueSetTemplateContainer
       )}
     >
-      <div
-        style={{
-          display: "flex",
-          width: "100%",
-          justifyContent: "space-between",
-        }}
-      >
-        <div
-          className="left-column"
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            minWidth: "18rem",
-            justifyContent: "space-between",
-            padding: "1rem 0.5rem !important",
-          }}
-        >
-          <div
-            className="condition-list flex-column"
-            style={{ padding: "1rem 0.5rem", width: "100%" }}
-          >
-            <div
-              className="controls display-flex"
-              style={{
-                justifyContent: "space-between",
-                padding: "0.5rem",
-              }}
-            >
+      <div className={styles.valueSetTemplateContainer__inner}>
+        <div className={styles.valueSetTemplate__left}>
+          <div className={styles.conditionList}>
+            <div className={styles.controls}>
+              <div className={styles.conditionsTitle}>Conditions</div>
               <div
-                style={{
-                  width: "104px",
-                  color: "#919191",
-                  fontSize: "19px",
-                }}
-              >
-                Conditions
-              </div>
-              <div
-                style={{
-                  fontSize: "16px",
-                  color: "#005EA2",
-                  lineHeight: " 18.8px",
-                  fontWeight: "700",
-                  display: "flex",
-                  alignItems: "center",
-                  width: "59px",
-                }}
+                className={styles.addCondition}
+                role="button"
+                aria-role="button"
+                onClick={handleAddCondition}
               >
                 <Icon.Add
                   aria-label="Plus sign icon indicating addition"
                   className="usa-icon"
                   size={3}
                   color="#005EA2"
-                />{" "}
+                />
                 <span>ADD</span>
               </div>
             </div>
 
             {Object.values(includedConditionsWithIds).map((condition) => {
               return (
-                <div
-                  key={condition.id}
-                  className="condition cards"
-                  style={{
-                    background: "white",
-                    borderRadius: "4px",
-                    padding: "1rem",
-                    lineHeight: "22px",
-                    marginTop: " 0.5rem",
-                    color: "#111111",
-                  }}
-                >
+                <div key={condition.id} className={styles.conditionCard}>
                   {formatDiseaseDisplay(condition.name)}
                 </div>
               );
             })}
           </div>
         </div>
-        <div className={styles.vsSearch__right}>
-          <div className={styles.vsSearch__section}>
-            {" "}
+        <div className={styles.valueSetTemplate__right}>
+          <div className={styles.valueSetTemplate__search}>
             <SearchField
               id="valueSetTemplateSearch"
               placeholder="Search labs, medications, conditions"
-              className={styles.vsSearch}
+              className={styles.valueSetSearch}
               onChange={(e) => {
                 e.preventDefault();
                 setSearchFilter(e.target.value);
