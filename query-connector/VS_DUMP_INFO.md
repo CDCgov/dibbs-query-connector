@@ -7,7 +7,7 @@ In order to make the dev process as low-lift as possible, we want to avoid execu
 If the DB extract file ever needs to be updated, you can use the following simple process:
 
 1. Start up the application on your local machine using a regular `docker compose up`, and wait for the DB to be ready.
-2. Load the eRSD and valuesets into the DIBBs DB by using the `Create DB` button on the `/queryBuilding` page. Optionally, use DBeaver to verify that valuesets exist in the database.
+2. Load the eRSD and valuesets into the DIBBs DB by using the `Create Query` button on the `/queryBuilding` page. Optionally, use DBeaver to verify that valuesets exist in the database.
 3. In a fresh terminal window, run
 
 ```

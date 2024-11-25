@@ -27,16 +27,21 @@ import {
   ConditionIdToNameMap,
 } from "./queryBuilding/utils";
 import {
+  CategoryStruct,
   ConceptStruct,
   ConditionStruct,
   ConditionToValueSetStruct,
   dbInsertStruct,
+  insertCategorySql,
   insertConceptSql,
   insertConditionSql,
   insertConditionToValuesetSql,
   insertDefaultQueryLogicSql,
   insertValueSetSql,
   insertValuesetToConceptSql,
+  updatedCancerCategorySql,
+  updateErsdCategorySql,
+  updateNewbornScreeningCategorySql,
   ValuesetStruct,
   ValuesetToConceptStruct,
 } from "./seedSqlStructs";
@@ -665,6 +670,7 @@ export async function insertDBStructArray(
         (struct as ConditionStruct).system,
         (struct as ConditionStruct).name,
         (struct as ConditionStruct).version,
+        (struct as ConditionStruct).category,
       ];
     } else if (insertType === "condition_to_valueset") {
       structInsertSql = insertConditionToValuesetSql;
@@ -673,6 +679,13 @@ export async function insertDBStructArray(
         (struct as ConditionToValueSetStruct).condition_id,
         (struct as ConditionToValueSetStruct).valueset_id,
         (struct as ConditionToValueSetStruct).source,
+      ];
+    } else if (insertType === "category") {
+      structInsertSql = insertCategorySql;
+      valuesToInsert = [
+        (struct as CategoryStruct).condition_name,
+        (struct as CategoryStruct).condition_code,
+        (struct as CategoryStruct).category,
       ];
     }
     const insertPromise = dbClient.query(structInsertSql, valuesToInsert);
@@ -686,6 +699,22 @@ export async function insertDBStructArray(
     console.error("Problem inserting ", insertType);
   }
 }
+
+/**
+ * Helper function that execute the category data updates for inserted conditions.
+ */
+export const executeCategoryUpdates = async () => {
+  try {
+    console.log("Executing category data updates on inserted conditions");
+    await dbClient.query(updateErsdCategorySql);
+    await dbClient.query(updateNewbornScreeningCategorySql);
+    await dbClient.query(updatedCancerCategorySql);
+    await dbClient.query(`DROP TABLE category_data`);
+    console.log("All inserted queries cross-referenced with category data");
+  } catch (error) {
+    console.error("Could not update categories for inserted conditions", error);
+  }
+};
 
 /**
  * Fetches and structures custom user queries from the database.

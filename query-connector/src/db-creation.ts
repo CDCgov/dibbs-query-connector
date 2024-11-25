@@ -11,6 +11,7 @@ import {
   translateVSACToInternalValueSet,
   insertDBStructArray,
   executeDefaultQueryCreation,
+  executeCategoryUpdates,
 } from "@/app/database-service";
 import * as fs from "fs";
 import path from "path";
@@ -267,6 +268,7 @@ async function fetchBatchValueSetsFromVsac(oidData: OidData, batchSize = 100) {
           system: c[1],
           name: c[2],
           version: version,
+          category: "",
         };
         return finalCondition;
       } catch (error) {
@@ -359,14 +361,16 @@ export async function createDibbsDB() {
 
     // Only run default and custom insertions if we're making the dump
     // file for dev
-    if (process.env.NODE_ENV !== "production") {
-      await insertSeedDbStructs("valuesets");
-      await insertSeedDbStructs("concepts");
-      await insertSeedDbStructs("valueset_to_concept");
-      await insertSeedDbStructs("conditions");
-      await insertSeedDbStructs("condition_to_valueset");
-      await executeDefaultQueryCreation();
-    }
+    // if (process.env.NODE_ENV !== "production") {
+    await insertSeedDbStructs("valuesets");
+    await insertSeedDbStructs("concepts");
+    await insertSeedDbStructs("valueset_to_concept");
+    await insertSeedDbStructs("conditions");
+    await insertSeedDbStructs("condition_to_valueset");
+    await executeDefaultQueryCreation();
+    await insertSeedDbStructs("category");
+    await executeCategoryUpdates();
+    // }
   } else {
     console.log("Database already has data; skipping DIBBs DB creation.");
   }

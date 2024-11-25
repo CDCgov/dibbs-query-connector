@@ -27,6 +27,7 @@ export type ConditionStruct = {
   system: string;
   name: string;
   version: string;
+  category: string;
 };
 
 export type ConditionToValueSetStruct = {
@@ -36,12 +37,19 @@ export type ConditionToValueSetStruct = {
   source: string;
 };
 
+export type CategoryStruct = {
+  condition_name: string;
+  condition_code: string;
+  category: string;
+};
+
 export type dbInsertStruct =
   | ValuesetStruct
   | ConceptStruct
   | ValuesetToConceptStruct
   | ConditionStruct
-  | ConditionToValueSetStruct;
+  | ConditionToValueSetStruct
+  | CategoryStruct;
 
 export const insertValueSetSql = `
 INSERT INTO valuesets
@@ -85,13 +93,14 @@ export const insertValuesetToConceptSql = `
 
 export const insertConditionSql = `
 INSERT INTO conditions
-  VALUES($1,$2,$3,$4)
+  VALUES($1,$2,$3,$4,$5)
   ON CONFLICT(id)
   DO UPDATE SET
     id = EXCLUDED.id,
     system = EXCLUDED.system,
     name = EXCLUDED.name,
-    version = EXCLUDED.version
+    version = EXCLUDED.version,
+    category = EXCLUDED.category
   RETURNING id;
 `;
 
@@ -105,6 +114,17 @@ INSERT INTO condition_to_valueset
     valueset_id = EXCLUDED.valueset_id,
     source = EXCLUDED.source
   RETURNING id;
+`;
+
+export const insertCategorySql = `
+INSERT INTO category_data
+  VALUES($1,$2,$3)
+  ON CONFLICT(condition_code)
+  DO UPDATE SET
+    condition_name = EXCLUDED.condition_name,
+    condition_code = EXCLUDED.condition_code,
+    category = EXCLUDED.category
+  RETURNING condition_code;
 `;
 
 export const insertDefaultQueryLogicSql = `
@@ -166,4 +186,23 @@ select
 from qic_data
 join valueset_to_concept vtc 
 on qic_data.valueset_id = vtc.valueset_id;
+`;
+
+export const updateErsdCategorySql = `
+UPDATE conditions
+SET category = category_data.category
+FROM category_data
+WHERE conditions.id = category_data.condition_code;
+`;
+
+export const updateNewbornScreeningCategorySql = `
+UPDATE conditions
+SET category = 'Birth Defects and Infant Disorders'
+WHERE conditions.name = 'Newborn Screening';
+`;
+
+export const updatedCancerCategorySql = `
+UPDATE conditions
+SET category = 'Cancer'
+WHERE conditions.name = 'Cancer (Leukemia)';
 `;

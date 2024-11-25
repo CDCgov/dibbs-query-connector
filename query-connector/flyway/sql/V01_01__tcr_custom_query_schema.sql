@@ -4,7 +4,15 @@ CREATE TABLE IF NOT EXISTS conditions (
     id TEXT PRIMARY KEY,
     system TEXT,
     name TEXT,
-    version TEXT
+    version TEXT,
+    category TEXT
+);
+
+CREATE TABLE IF NOT EXISTS category_data (
+    condition_name TEXT,
+    condition_code TEXT PRIMARY KEY,
+    category TEXT,
+    FOREIGN KEY(condition_code) REFERENCES conditions(id)
 );
 
 CREATE TABLE IF NOT EXISTS valuesets (
