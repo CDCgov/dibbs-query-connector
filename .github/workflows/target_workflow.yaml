@@ -33,7 +33,8 @@ jobs:
           # Check if there's an existing version file; if not, start from 1.0.0
           VERSION_FILE="version.txt"
           if [ ! -f "$VERSION_FILE" ]; then
-            echo "v1.0.10" > $VERSION_FILE
+            echo "Error: Version file '$VERSION_FILE' does not exist."
+            exit 1
           fi
 
           # Read the current version, increment the patch (third) number

@@ -39,16 +39,5 @@ runs:
         context: ./query-connector
         push: true
         tags: |
-          ghcr.io/${{ env.REPO }}/query-connector:main, ghcr.io/${{ env.REPO }}/query-connector:latest
+          ghcr.io/${{ env.REPO }}/:main, ghcr.io/${{ env.REPO }}/query-connector:latest
 
-    # - name: Output image digest
-    #   shell: bash
-    #   run: |
-    #     echo "Image digest: ${{ steps.build_push.outputs.digest }}"
-
-    # - name: Add tag with digest
-    #   shell: bash
-    #   run: |
-    #     IMAGE_TAG=
-    #     IMAGE_TAG="ghcr.io/${{ env.REPO }}/query-connector:latest@${{ steps.build_push.outputs.digest }}"
-    #     echo "Tagging image with digest: $IMAGE_TAG"
