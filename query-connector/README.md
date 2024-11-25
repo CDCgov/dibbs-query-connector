@@ -77,7 +77,7 @@ The Query Connector will eventually require other inputs from other DIBBs servic
 
 ### Developer Documentation
 
-Can be found in [api-documentation.md](api-documentation.md).
+A Postman collection demonstrating use of the API can be found [here](https://github.com/CDCgov/dibbs-query-connector/blob/main/query-connector/src/app/assets/DIBBs_Query_Connector_API.postman_collection.json).
 
 ### Architecture Diagram
 
