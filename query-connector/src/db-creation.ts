@@ -1,7 +1,7 @@
 "use server";
 
 import { ersdToDibbsConceptMap, ErsdConceptType } from "@/app/constants";
-import { Bundle, BundleEntry, ValueSet } from "fhir/r4";
+import { Bundle, BundleEntry, Parameters, ValueSet } from "fhir/r4";
 import {
   checkDBForData,
   checkValueSetInsertion,
@@ -9,13 +9,32 @@ import {
   getVSACValueSet,
   insertValueSet,
   translateVSACToInternalValueSet,
+  insertDBStructArray,
+  executeDefaultQueryCreation,
+  executeCategoryUpdates,
 } from "@/app/database-service";
+import * as fs from "fs";
+import path from "path";
+import { randomUUID } from "crypto";
+import {
+  ConditionStruct,
+  ConditionToValueSetStruct,
+  dbInsertStruct,
+} from "./app/seedSqlStructs";
 
 const ERSD_TYPED_RESOURCE_URL = "http://ersd.aimsplatform.org/fhir/ValueSet/";
+
+type ersdCondition = {
+  code: string;
+  system: string;
+  text: string;
+  valueset_id: string;
+};
 
 type OidData = {
   oids: Array<string>;
   oidToErsdType: Map<string, string>;
+  conditions: Array<ersdCondition>;
 };
 
 /**
@@ -65,12 +84,49 @@ async function getOidsFromErsd() {
       }, oidToErsdType);
     });
 
+    // Condition-valueset linkages are stored in the "usage context" structure of
+    // the value codeable concept of each resource's base level
+    // We can filter out public health informatics contexts to get only the meaningful
+    // conditions
+    const nonUmbrellaEntries = valuesets?.filter(
+      (vs) =>
+        !Object.keys(ersdToDibbsConceptMap).includes(vs.resource?.id || ""),
+    ) as BundleEntry<ValueSet>[];
+    const nonUmbrellaValueSets: Array<ValueSet> = (
+      nonUmbrellaEntries || []
+    ).map((vs) => {
+      return vs.resource || ({} as ValueSet);
+    });
+    let conditionExtractor: Array<ersdCondition> = [];
+    nonUmbrellaValueSets.reduce((acc: Array<ersdCondition>, vs: ValueSet) => {
+      const conditionSchemes = vs.useContext?.filter(
+        (context) =>
+          !(context.valueCodeableConcept?.coding || [])[0].system?.includes(
+            "us-ph-usage-context",
+          ),
+      );
+      (conditionSchemes || []).forEach((usc) => {
+        const ersdCond: ersdCondition = {
+          code: (usc.valueCodeableConcept?.coding || [])[0].code || "",
+          system: (usc.valueCodeableConcept?.coding || [])[0].system || "",
+          text: usc.valueCodeableConcept?.text || "",
+          valueset_id: vs.id || "",
+        };
+        conditionExtractor.push(ersdCond);
+      });
+      return conditionExtractor;
+    }, conditionExtractor);
+
     // Make sure to take out the umbrella value sets from the ones we try to insert
     let oids = valuesets?.map((vs) => vs.resource?.id);
     oids = oids?.filter(
       (oid) => !Object.keys(ersdToDibbsConceptMap).includes(oid || ""),
     );
-    return { oids: oids, oidToErsdType: oidToErsdType } as OidData;
+    return {
+      oids: oids,
+      oidToErsdType: oidToErsdType,
+      conditions: conditionExtractor,
+    } as OidData;
   } catch (error) {
     console.error("Couldn't query eRSD: ", error);
   }
@@ -92,6 +148,9 @@ async function getOidsFromErsd() {
 async function fetchBatchValueSetsFromVsac(oidData: OidData, batchSize = 100) {
   let startIdx = 0;
   let lastIdx = startIdx + batchSize;
+
+  const oidsToVersion: Map<String, String> = new Map<String, String>();
+  const retiredOids: Set<String> = new Set<String>();
 
   console.log(
     "Attempting fetches and inserts for",
@@ -118,6 +177,12 @@ async function fetchBatchValueSetsFromVsac(oidData: OidData, batchSize = 100) {
             vs as unknown as ValueSet,
             eRSDType,
           );
+          oidsToVersion.set(oid, internalValueSet.valueSetVersion);
+
+          // Found a retired OID, store it so we don't insert condition mappings on it
+          if (internalValueSet.concepts === undefined) {
+            retiredOids.add(internalValueSet.valueSetExternalId || "");
+          }
           return internalValueSet;
         } catch (error) {
           console.error(error);
@@ -172,6 +237,110 @@ async function fetchBatchValueSetsFromVsac(oidData: OidData, batchSize = 100) {
     // free to ensure the pool itself doesn't time out
     await sleep(2000);
   }
+
+  // Once all the value sets are inserted, we need to do conditions
+  // Step one is filtering out duplicates, since we just assembled
+  // condition mappings directly from value sets
+  console.log("Inserting eRSD condition data");
+  const conditionSet = new Set<string>();
+  oidData.conditions.forEach((c) => {
+    const repString = c.code + "*" + c.system + "*" + c.text;
+    conditionSet.add(repString);
+  });
+
+  // Create DB based condition structures
+  let conditionPromises = await Promise.all(
+    Array.from(conditionSet).map(async (cString) => {
+      try {
+        const c = cString.split("*");
+        const vsacCondition: Parameters = (await getVSACValueSet(
+          c[0],
+          "condition",
+          c[1],
+        )) as Parameters;
+        const versionHolder = (vsacCondition.parameter || []).find(
+          (p) => p.name === "version",
+        );
+        const versionArray = (versionHolder?.valueString || "").split("/");
+        const version = versionArray[versionArray.length - 1];
+        const finalCondition: ConditionStruct = {
+          id: c[0],
+          system: c[1],
+          name: c[2],
+          version: version,
+          category: "",
+        };
+        return finalCondition;
+      } catch (error) {
+        console.error(error);
+      }
+    }),
+  );
+
+  // Now insert them
+  await insertDBStructArray(
+    conditionPromises as ConditionStruct[],
+    "conditions",
+  );
+
+  // Finally, take care of mapping inserted value sets to inserted conditions
+  // For this part, we do want the full list of conditions we obtained
+  // from the value sets
+  console.log("Inserting condition-to-valueset mappings");
+  let ctvStructs = oidData.conditions.map((c) => {
+    const ctvID = retiredOids.has(c.valueset_id) ? "NONE" : randomUUID();
+    const dbCTV: ConditionToValueSetStruct = {
+      id: ctvID,
+      condition_id: c.code,
+      valueset_id: c.valueset_id + "_" + oidsToVersion.get(c.valueset_id),
+      source: c.system,
+    };
+    return dbCTV;
+  });
+  ctvStructs = ctvStructs.filter((ctvs) => ctvs.id !== "NONE");
+  await insertDBStructArray(ctvStructs, "condition_to_valueset");
+}
+
+/**
+ * Helper utility to resolve the relative path of a file in the docker filesystem.
+ * @param filename The file to read from. Must be located in the assets folder.
+ * @returns Either the stringified data, or null.
+ */
+function readJsonFromRelativePath(filename: string) {
+  try {
+    // Re-scope file system reads to make sure we use the relative
+    // path via node directory resolution
+    const runtimeServerPath = path.resolve(
+      path.join(__dirname, "/", "..", "/", "assets", "/", filename),
+    );
+    const data = fs.readFileSync(runtimeServerPath, "utf-8");
+    return data;
+  } catch (error) {
+    console.error("Error reading JSON file:", error);
+    return;
+  }
+}
+
+/**
+ * Generalized function for reading JSON data out of a file, parsing it
+ * into an array of database compatibile structures, and using the Connection
+ * Pool to insert them. Files must be located in the mounted /assets
+ * directory.
+ * @param structType The type of structure to be inserted (e.g. valueset,
+ * concept, etc.).
+ */
+async function insertSeedDbStructs(structType: string) {
+  const data: string | undefined = readJsonFromRelativePath(
+    "dibbs_db_seed_" + structType + ".json",
+  );
+  if (data) {
+    const parsed: {
+      [key: string]: Array<dbInsertStruct>;
+    } = JSON.parse(data);
+    await insertDBStructArray(parsed[structType], structType);
+  } else {
+    console.error("Could not load JSON data for", structType);
+  }
 }
 
 /**
@@ -189,6 +358,19 @@ export async function createDibbsDB() {
     } else {
       console.error("Could not load eRSD, aborting DIBBs DB creation");
     }
+
+    // Only run default and custom insertions if we're making the dump
+    // file for dev
+    // if (process.env.NODE_ENV !== "production") {
+    await insertSeedDbStructs("valuesets");
+    await insertSeedDbStructs("concepts");
+    await insertSeedDbStructs("valueset_to_concept");
+    await insertSeedDbStructs("conditions");
+    await insertSeedDbStructs("condition_to_valueset");
+    await executeDefaultQueryCreation();
+    await insertSeedDbStructs("category");
+    await executeCategoryUpdates();
+    // }
   } else {
     console.log("Database already has data; skipping DIBBs DB creation.");
   }

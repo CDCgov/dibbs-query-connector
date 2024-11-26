@@ -4,7 +4,15 @@ CREATE TABLE IF NOT EXISTS conditions (
     id TEXT PRIMARY KEY,
     system TEXT,
     name TEXT,
-    version TEXT
+    version TEXT,
+    category TEXT
+);
+
+CREATE TABLE IF NOT EXISTS category_data (
+    condition_name TEXT,
+    condition_code TEXT PRIMARY KEY,
+    category TEXT,
+    FOREIGN KEY(condition_code) REFERENCES conditions(id)
 );
 
 CREATE TABLE IF NOT EXISTS valuesets (
@@ -13,7 +21,8 @@ CREATE TABLE IF NOT EXISTS valuesets (
     version TEXT,
     name TEXT,
     author TEXT,
-    type TEXT
+    type TEXT,
+    dibbs_concept_type TEXT
 );
 
 CREATE TABLE IF NOT EXISTS concepts (

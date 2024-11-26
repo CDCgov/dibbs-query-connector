@@ -48,7 +48,7 @@ test.describe("querying with the Query Connector", () => {
     test.slow();
     await expect(
       page.getByText(
-        "249 labs found, 4 medications found, 104 conditions found.",
+        "250 labs found, 4 medications found, 104 conditions found.",
       ),
     ).toBeVisible();
     await page.getByRole("link", { name: "Medications" }).click();
