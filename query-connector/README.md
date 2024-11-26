@@ -84,7 +84,7 @@ A Postman collection demonstrating use of the API can be found [here](https://gi
 When initializing the backend database for the first time, the Query Connector makes the value sets associated with 200+ reportable conditions available to users tasked with building queries for their jurisdiction. To group value sets by condition and to group the conditions by type, the Query Connector obtains and organizes data from the eRSD and the VSAC in the following way:
 
 1. The Query Connector retrieves the 200+ reportable conditions from the eRSD as well as the value sets' associated IDs.
-2. Using the value set IDs from the eRSD, the Query Connector retrieves the value sets from the VSAC, i.e., the LOINC, SNOMED, etc. codes associated with each value set ID.
+2. Using the value set IDs from the eRSD, the Query Connector retrieves the value set's comprehensive information from the VSAC, i.e., the LOINC, SNOMED, etc. codes associated with each value set ID.
 3. The Query Connector then organizes these value sets according to the conditions with which they're associated, making the result available to users interested in building queries. The conditions are additionally organized by category, e.g., sexually transmitted diseases or respiratory conditions, using a mapping curated by HLN Consulting.
 
 #### Query Building Data in `dev` mode
