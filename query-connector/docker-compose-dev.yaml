@@ -12,6 +12,8 @@ services:
       # DATABASE_URL=postgresql://postgres:pw@localhost:5432/tefca_db
       # Note: you must have a local .env file with the ERSD_API_KEY set to a key
       # obtained from the ERSD API at https://ersd.aimsplatform.org/#/api-keys
+    volumes:
+      - ./vs_dump.sql:/docker-entrypoint-initdb.d/vs_dump.sql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 2s
@@ -50,7 +52,7 @@ services:
   keycloak:
     image: quay.io/keycloak/keycloak:26.0.2
     ports:
-      - 8081:8081
+      - 8081:8080
     volumes:
       - ./keycloak:/opt/keycloak/data/import
     restart: always
