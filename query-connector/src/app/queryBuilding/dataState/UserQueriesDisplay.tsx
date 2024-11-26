@@ -29,7 +29,7 @@ export const UserQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
 
   return (
     <div>
-      <div className="display-flex flex-justify-between flex-align-center width-full margin-bottom-3">
+      <div className="display-flex flex-justify-between flex-align-center width-full margin-bottom-5">
         <h1 className="{styles.queryTitle} flex-align-center">My queries</h1>
         <div className="margin-left-auto">
           <Button
@@ -62,7 +62,7 @@ export const UserQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
                     onClick={() => console.log("Edit", query.query_id)}
                   >
                     <span className="icon-text padding-right-4">
-                      <Icon.Edit className="icon-large" />
+                      <Icon.Edit className="height-3 width-3" />
                       <span>Edit</span>
                     </span>
                   </Button>
@@ -72,7 +72,7 @@ export const UserQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
                     onClick={() => console.log("Delete", query.query_id)}
                   >
                     <span className="icon-text padding-right-4">
-                      <Icon.Delete className="icon-large" />
+                      <Icon.Delete className="height-3 width-3" />
                       <span>Delete</span>
                     </span>
                   </Button>
@@ -88,7 +88,7 @@ export const UserQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
                     }}
                   >
                     <span className="icon-text padding-right-1">
-                      <Icon.ContentCopy className="icon-large" />
+                      <Icon.ContentCopy className="height-3 width-3" />
                       <span>Copy ID</span>
                     </span>
                   </Button>

@@ -39,10 +39,11 @@
 
 .customQueryTable {
   width: 100%;
+  margin: 0rem;
   border-collapse: collapse;
   background-color: white;
   border: 0.25rem solid #DFE1E2;
-  box-shadow: 0 0.125rem 0.1875rem 0 #F3F3F3; 
+  box-shadow: 0 0.125rem 0.1875rem 0 #F3F3F3;
 
   thead tr th {
     color: var(--gray-500, #919191);
@@ -52,7 +53,8 @@
     font-weight: 700;
     line-height: 150%;
     text-transform: uppercase;
-    padding-left: 1.5rem;
+    padding-left: 2.5rem;
+    padding-right: 2.5rem;
     padding-top: 1.5rem;
     padding-bottom: 1rem;
     border: none;
@@ -62,9 +64,10 @@
     transition: background-color 0.3s ease;
   }
 
-  tbody tr:hover {
-    background: rgba(217, 232, 246, 0.50);
-  }
+  // Using default hover for now
+  // tbody tr:hover {
+  //   background: rgba(217, 232, 246, 0.50);
+  // }
 
   tbody td {
     font-family: "Public Sans", sans-serif;
@@ -72,11 +75,11 @@
     color: #000;
     border-top: 1px solid #ccc;
     border-bottom: 1px solid #ccc;
-    padding: 1.5rem;
+    padding: 1.5rem 2.5rem;
     max-width: 12rem;
     overflow: hidden;
     text-overflow: ellipsis;
-    white-space: nowrap; 
+    white-space: nowrap;
     position: relative; /* For tooltip positioning */
   }
 
@@ -136,11 +139,6 @@
 //   left: 0;
 //   z-index: 999;
 // }
-
-.icon-large {
-  width: 1.5rem; 
-  height: 1.5rem; 
-}
 
 .icon-text {
   display: inline-flex;
