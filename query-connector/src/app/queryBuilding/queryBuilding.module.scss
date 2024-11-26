@@ -62,6 +62,7 @@
 
   tbody tr {
     transition: background-color 0.3s ease;
+    position: relative;
   }
 
   // Using default hover for now
@@ -101,14 +102,7 @@
     z-index: 1000;
   }
 
-  tbody td:last-child {
-    text-align: right;
-    padding-right: 1.5rem;
-    white-space: nowrap;
-  }
-
   .table-cell-buttons {
-    display: none;
     position: absolute;
     right: 1.5rem;
     top: 50%;
@@ -116,9 +110,18 @@
     gap: 0.5rem;
   }
 
-  tbody td:hover .table-cell-buttons {
-    display: flex;
+  tbody td:last-child {
+    opacity: 0;
+    text-align: right;
+    padding-right: 1.5rem;
+    white-space: nowrap;
   }
+
+  tbody tr:hover td:last-child,
+  tbody td:last-child:hover {
+    opacity: 1;
+    pointer-events: auto;
+    }
 }
 
 // Enable an alternative hover over feature for the titles 
@@ -145,4 +148,3 @@
   align-items: center;
   gap: 0.25rem;
 }
-

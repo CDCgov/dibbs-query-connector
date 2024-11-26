@@ -54,7 +54,7 @@ export const UserQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
               <td title={query.query_name}>{query.query_name}</td>
               <td title={query.query_name}>{query.query_name}</td>
               {/* TODO: Use conditions_list once available */}
-              <td className="table-cell">
+              <td>
                 <div className="table-cell-buttons">
                   <Button
                     type="button"
