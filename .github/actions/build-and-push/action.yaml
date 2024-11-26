@@ -26,10 +26,9 @@ runs:
         password: ${{ inputs.password }}
 
     - name: grab the git sha
-      shell: bash  
+      shell: bash
       run: |
-         GIT_SHA=$(git rev-parse --short HEAD)
- 
+        GIT_SHA=$(git rev-parse --short HEAD)
 
     - name: Build and push
       id: build_push
@@ -39,4 +38,3 @@ runs:
         push: true
         tags: |
           ghcr.io/cdcgov/dibbs-query-connector:$GIT_SHA
-          
