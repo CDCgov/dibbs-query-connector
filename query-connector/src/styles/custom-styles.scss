@@ -1,17 +1,25 @@
 @use "uswds-core" as *;
 @use "_variables" as *;
 
+html,
+body {
+  height: 100%;
+}
 html {
   scroll-behavior: auto;
+  box-sizing: border-box;
 }
 
 body {
   font-family: $sans-serif-font;
   line-height: 1.4;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
   background-color: rgba(247, 249, 250, 1);
+}
+
+.application-container {
+  display: flex;
+  flex-flow: column;
+  min-height: 100%;
 }
 
 header,
@@ -26,7 +34,7 @@ h1 {
 
 .main-body {
   background-color: rgba(247, 249, 250, 1);
-  flex: auto; // Sizes main-body to fill space between header and footer
+  flex: 1 1 auto;
 }
 
 .page-title {

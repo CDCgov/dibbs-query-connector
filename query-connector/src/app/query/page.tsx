@@ -51,7 +51,7 @@ const Query: React.FC = () => {
     results: "main-container__wide",
   };
   return (
-    <>
+    <div className="main-body">
       <SiteAlert page={mode} />
       <div className={modeToCssContainerMap[mode]}>
         {Object.keys(CUSTOMIZE_QUERY_STEPS).includes(mode) &&
@@ -115,7 +115,7 @@ const Query: React.FC = () => {
         {loading && <LoadingView loading={loading} />}
         <ToastContainer icon={false} />
       </div>
-    </>
+    </div>
   );
 };
 

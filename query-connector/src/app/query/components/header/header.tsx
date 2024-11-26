@@ -51,7 +51,7 @@ export default function HeaderComponent() {
   const backLink = isProduction ? "/query-connector" : "/";
 
   return (
-    <>
+    <div className={styles.headerContainer}>
       <header className="usa-header usa-header--basic bg-primary-darker">
         <div
           className={classNames(
@@ -136,7 +136,7 @@ export default function HeaderComponent() {
           </ul>
         </div>
       )}
-    </>
+    </div>
   );
 }
 
