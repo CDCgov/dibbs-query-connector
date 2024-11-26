@@ -41,63 +41,65 @@ export const UserQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
           </Button>
         </div>
       </div>
-      <Table className={styles.customQueryTable}>
-        <thead>
-          <tr>
-            <th scope="col">NAME</th>
-            <th scope="col">CONDITIONS</th>
-          </tr>
-        </thead>
-        <tbody>
-          {queries.map((query, index) => (
-            <tr key={index} className="tableRowWithHover">
-              <td title={query.query_name}>{query.query_name}</td>
-              <td title={query.query_name}>{query.query_name}</td>
-              {/* TODO: Use conditions_list once available */}
-              <td>
-                <div className="table-cell-buttons">
-                  <Button
-                    type="button"
-                    className="usa-button--unstyled text-bold text-no-underline"
-                    onClick={() => console.log("Edit", query.query_id)}
-                  >
-                    <span className="icon-text padding-right-4">
-                      <Icon.Edit className="height-3 width-3" />
-                      <span>Edit</span>
-                    </span>
-                  </Button>
-                  <Button
-                    type="button"
-                    className="usa-button--unstyled text-bold text-no-underline"
-                    onClick={() => console.log("Delete", query.query_id)}
-                  >
-                    <span className="icon-text padding-right-4">
-                      <Icon.Delete className="height-3 width-3" />
-                      <span>Delete</span>
-                    </span>
-                  </Button>
-                  <Button
-                    type="button"
-                    className="usa-button--unstyled text-bold text-no-underline"
-                    onClick={() => {
-                      navigator.clipboard
-                        .writeText(query.query_id)
-                        .catch((error) =>
-                          console.error("Failed to copy text:", error),
-                        );
-                    }}
-                  >
-                    <span className="icon-text padding-right-1">
-                      <Icon.ContentCopy className="height-3 width-3" />
-                      <span>Copy ID</span>
-                    </span>
-                  </Button>
-                </div>
-              </td>
+      <div className={styles.customQueryWrapper}>
+        <Table className={styles.customQueryTable}>
+          <thead>
+            <tr>
+              <th scope="col">NAME</th>
+              <th scope="col">CONDITIONS</th>
             </tr>
-          ))}
-        </tbody>
-      </Table>
+          </thead>
+          <tbody>
+            {queries.map((query, index) => (
+              <tr key={index} className="tableRowWithHover">
+                <td title={query.query_name}>{query.query_name}</td>
+                <td title={query.query_name}>{query.query_name}</td>
+                {/* TODO: Use conditions_list once available */}
+                <td>
+                  <div className="table-cell-buttons">
+                    <Button
+                      type="button"
+                      className="usa-button--unstyled text-bold text-no-underline"
+                      onClick={() => console.log("Edit", query.query_id)}
+                    >
+                      <span className="icon-text padding-right-4">
+                        <Icon.Edit className="height-3 width-3" />
+                        <span>Edit</span>
+                      </span>
+                    </Button>
+                    <Button
+                      type="button"
+                      className="usa-button--unstyled text-bold text-no-underline"
+                      onClick={() => console.log("Delete", query.query_id)}
+                    >
+                      <span className="icon-text padding-right-4">
+                        <Icon.Delete className="height-3 width-3" />
+                        <span>Delete</span>
+                      </span>
+                    </Button>
+                    <Button
+                      type="button"
+                      className="usa-button--unstyled text-bold text-no-underline"
+                      onClick={() => {
+                        navigator.clipboard
+                          .writeText(query.query_id)
+                          .catch((error) =>
+                            console.error("Failed to copy text:", error),
+                          );
+                      }}
+                    >
+                      <span className="icon-text padding-right-1">
+                        <Icon.ContentCopy className="height-3 width-3" />
+                        <span>Copy ID</span>
+                      </span>
+                    </Button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
+      </div>
     </div>
   );
 };

@@ -37,14 +37,20 @@
   padding: 1rem !important;
 }
 
+.customQueryWrapper {
+  background-color: white;
+  padding: 1.5rem;
+  border: solid #DFE1E2;
+  border-radius: 0.25rem;
+  box-shadow: 0 0.125rem 0.1875rem 0 #F3F3F3;
+}
+
 .customQueryTable {
   width: 100%;
   margin: 0rem;
   border-collapse: collapse;
-  background-color: white;
-  border-radius: 0.25rem solid #DFE1E2;
-  border-color:  #DFE1E2;
-  box-shadow: 0 0.125rem 0.1875rem 0 #F3F3F3;
+  background-color: transparent;
+  border: none;
 
   thead tr th {
     color: var(--gray-500, #919191);
@@ -54,10 +60,7 @@
     font-weight: 700;
     line-height: 150%;
     text-transform: uppercase;
-    padding-left: 2.5rem;
-    padding-right: 2.5rem;
-    padding-top: 1.5rem;
-    padding-bottom: 1rem;
+    padding: 0; 
     border: none;
   }
 
@@ -75,13 +78,13 @@
     font-family: "Public Sans", sans-serif;
     font-size: 0.875rem;
     color: #000;
-    border-top: 1px solid #ccc;
-    border-bottom: 1px solid #ccc;
-    padding: 1.5rem 2.5rem;
+    border-top: 1px solid #F3F3F3;
+    border-bottom: 1px solid #F3F3F3;
     max-width: 12rem;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    padding-left: 0;
     position: relative; /* For tooltip positioning */
   }
 
