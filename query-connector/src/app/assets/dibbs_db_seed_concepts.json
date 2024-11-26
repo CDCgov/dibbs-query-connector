@@ -1,0 +1,1802 @@
+{
+  "concepts": [
+    {
+      "id": "1_73700-7",
+      "code": "73700-7",
+      "code_system": "http://loinc.org",
+      "display": "CCHD newborn screening interpretation",
+      "gem_formatted_code": "737007",
+      "version": "2024-09"
+    },
+    {
+      "id": "1_73698-3",
+      "code": "73698-3",
+      "code_system": "http://loinc.org",
+      "display": "Reason CCHD oxygen saturation screening not performed",
+      "gem_formatted_code": "736983",
+      "version": "2024-09"
+    },
+    {
+      "id": "1_54108-6",
+      "code": "54108-6",
+      "code_system": "http://loinc.org",
+      "display": "Newborn hearing screen of Ear - left",
+      "gem_formatted_code": "541086",
+      "version": "2024-09"
+    },
+    {
+      "id": "1_54109-4",
+      "code": "54109-4",
+      "code_system": "http://loinc.org",
+      "display": "Newborn hearing screen of Ear - right",
+      "gem_formatted_code": "541094",
+      "version": "2024-09"
+    },
+    {
+      "id": "1_58232-0",
+      "code": "58232-0",
+      "code_system": "http://loinc.org",
+      "display": "Hearing loss risk indicators",
+      "gem_formatted_code": "582320",
+      "version": "2024-09"
+    },
+    {
+      "id": "1_57700-7",
+      "code": "57700-7",
+      "code_system": "http://loinc.org",
+      "display": "Hearing loss newborn screening comment-discussion",
+      "gem_formatted_code": "577007",
+      "version": "2024-09"
+    },
+    {
+      "id": "1_73739-5",
+      "code": "73739-5",
+      "code_system": "http://loinc.org",
+      "display": "Newborn hearing screen reason not performed of Ear - left",
+      "gem_formatted_code": "737395",
+      "version": "2024-09"
+    },
+    {
+      "id": "1_73742-9",
+      "code": "73742-9",
+      "code_system": "http://loinc.org",
+      "display": "Newborn hearing screen reason not performed of Ear - right",
+      "gem_formatted_code": "737429",
+      "version": "2024-09"
+    },
+    {
+      "id": "1_2708-6",
+      "code": "2708-6",
+      "code_system": "http://loinc.org",
+      "display": "Cannabinoids [Presence] in Vitreous fluid",
+      "gem_formatted_code": "27086",
+      "version": "2024-09"
+    },
+    {
+      "id": "1_8336-0",
+      "code": "8336-0",
+      "code_system": "http://loinc.org",
+      "display": "Body weight [Percentile] Per age",
+      "gem_formatted_code": "83360",
+      "version": "2024-09"
+    },
+    {
+      "id": "1_828265",
+      "code": "828265",
+      "code_system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+      "display": "1 ML alemtuzumab 30 MG/ML Injection",
+      "gem_formatted_code": "828265",
+      "version": "2024-09"
+    },
+    {
+      "id": "1_2671695",
+      "code": "2671695",
+      "code_system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+      "display": "penicillin G benzathine 2400000 UNT Injection",
+      "gem_formatted_code": "2671695",
+      "version": "2024-09"
+    },
+    {
+      "id": "1_186647001",
+      "code": "186647001",
+      "code_system": "http://snomed.info/sct",
+      "display": "Primary genital syphilis",
+      "gem_formatted_code": "186647001",
+      "version": "2024-09"
+    },
+    {
+      "id": "1_434692",
+      "code": "434692",
+      "code_system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+      "display": "azithromycin 1000 MG",
+      "gem_formatted_code": "434692",
+      "version": "2024-09"
+    },
+    {
+      "id": "1_1665005",
+      "code": "1665005",
+      "code_system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+      "display": "ceftriaxone 500 MG Injection",
+      "gem_formatted_code": "1665005",
+      "version": "2024-09"
+    },
+    {
+      "id": "1_72531000052105",
+      "code": "72531000052105 ",
+      "code_system": "http://snomed.info/sct",
+      "display": "Counseling for contraception",
+      "gem_formatted_code": "72531000052105",
+      "version": "2024-09"
+    },
+    {
+      "id": "1_11350-6",
+      "code": "11350-6",
+      "code_system": "http://loinc.org",
+      "display": "History of Sexual behavior Narrative",
+      "gem_formatted_code": "113506",
+      "version": "2024-09"
+    },
+    {
+      "id": "1_82810-3",
+      "code": "82810-3",
+      "code_system": "http://loinc.org",
+      "display": "Pregnancy status",
+      "gem_formatted_code": "828103",
+      "version": "2024-09"
+    },
+    {
+      "id": "1_83317-8",
+      "code": "83317-8",
+      "code_system": "http://loinc.org",
+      "display": "Sexual activity with anonymous partner in the past year",
+      "gem_formatted_code": "833178",
+      "version": "2024-09"
+    },
+    {
+      "id": "1_82122",
+      "code": "82122",
+      "code_system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+      "display": "levofloxacin",
+      "gem_formatted_code": "82122",
+      "version": "2024-09"
+    },
+    {
+      "id": "1_1649987",
+      "code": "1649987",
+      "code_system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+      "display": "doxycycline hyclate 100 MG",
+      "gem_formatted_code": "1649987",
+      "version": "2024-09"
+    },
+    {
+      "id": "1_72828-7",
+      "code": "72828-7",
+      "code_system": "http://loinc.org",
+      "display": "Chlamydia trachomatis and Neisseria gonorrhoeae DNA panel - Specimen",
+      "gem_formatted_code": "728287",
+      "version": "2024-09"
+    },
+    {
+      "id": "1_2339001",
+      "code": "2339001",
+      "code_system": "http://snomed.info/sct",
+      "display": "Sexual overexposure",
+      "gem_formatted_code": "2339001",
+      "version": "2024-09"
+    },
+    {
+      "id": "1_21908-9",
+      "code": "21908-9",
+      "code_system": "http://loinc.org",
+      "display": "Stage group.clinical Cancer",
+      "gem_formatted_code": "219089",
+      "version": "2024-09"
+    },
+    {
+      "id": "1_36929009",
+      "code": "36929009",
+      "code_system": "http://snomed.info/sct",
+      "display": "Stage II (localized)",
+      "gem_formatted_code": "36929009",
+      "version": "2024-09"
+    },
+    {
+      "id": "1_60568-3",
+      "code": "60568-3",
+      "code_system": "http://loinc.org",
+      "display": "Pathology Synoptic report",
+      "gem_formatted_code": "605683",
+      "version": "2024-09"
+    },
+    {
+      "id": "1_30000.100004300",
+      "code": "30000.100004300",
+      "code_system": "http://cap.org/eCC",
+      "display": "MSH2 Result",
+      "gem_formatted_code": "30000.100004300",
+      "version": "2024-09"
+    },
+    {
+      "id": "1_1255068005",
+      "code": "1255068005",
+      "code_system": "http://snomed.info/sct",
+      "display": "Presence of DNA mismatch repair protein MSH2 in primary malignant neoplasm of colon by immunohistochemistry (observable entity)",
+      "gem_formatted_code": "1255068005",
+      "version": "2024-09"
+    },
+    {
+      "id": "1_9484.100004300",
+      "code": "9484.100004300",
+      "code_system": "http://cap.org/eCC",
+      "display": "RESULTS",
+      "gem_formatted_code": "9484.100004300",
+      "version": "2024-09"
+    },
+    {
+      "id": "1_363346000",
+      "code": "363346000",
+      "code_system": "http://snomed.info/sct",
+      "display": "Malignant neoplastic disease (disorder)",
+      "gem_formatted_code": "363346000",
+      "version": "2024-09"
+    },
+    {
+      "id": "1_418689008",
+      "code": "418689008",
+      "code_system": "http://snomed.info/sct",
+      "display": "Allergy to sulfonamide",
+      "gem_formatted_code": "418689008",
+      "version": "2024-09"
+    },
+    {
+      "id": "1_46252-3",
+      "code": "46252-3",
+      "code_system": "http://loinc.org",
+      "display": "Acylcarnitine pattern [Interpretation] in Serum or Plasma",
+      "gem_formatted_code": "462523",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_30191-1",
+      "code": "30191-1",
+      "code_system": "http://loinc.org",
+      "display": "Acetylcarnitine (C2) [Moles/volume] in Seerum or Plasma",
+      "gem_formatted_code": "301911",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_30551-6",
+      "code": "30551-6",
+      "code_system": "http://loinc.org",
+      "display": "Propionylcarnitine (C3) [Moles/volume] inn Serum or Plasma",
+      "gem_formatted_code": "305516",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_51413-3",
+      "code": "51413-3",
+      "code_system": "http://loinc.org",
+      "display": "Butyrylcarnitine+Isobutyrylcarnitine (C4)) [Moles/volume] in Serum or Plasma",
+      "gem_formatted_code": "514133",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_30531-8",
+      "code": "30531-8",
+      "code_system": "http://loinc.org",
+      "display": "Isovalerylcarnitine+Methylbutyrylcarnitinne (C5) [Moles/volume] in Serum or Plasma",
+      "gem_formatted_code": "305318",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_30349-5",
+      "code": "30349-5",
+      "code_system": "http://loinc.org",
+      "display": "Glutarylcarnitine (C5-DC) [Moles/volume]  in Serum or Plasma",
+      "gem_formatted_code": "303495",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_39001-3",
+      "code": "39001-3",
+      "code_system": "http://loinc.org",
+      "display": "3-Hydroxyisovalerylcarnitine (C5-OH) [Moles/volume] in Serum or Plasma",
+      "gem_formatted_code": "390013",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_30358-6",
+      "code": "30358-6",
+      "code_system": "http://loinc.org",
+      "display": "Hexanoylcarnitine (C6) [Moles/volume] in  Serum or Plasma",
+      "gem_formatted_code": "303586",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_30540-9",
+      "code": "30540-9",
+      "code_system": "http://loinc.org",
+      "display": "Octanoylcarnitine (C8) [Moles/volume] in  Serum or Plasma",
+      "gem_formatted_code": "305409",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_30541-7",
+      "code": "30541-7",
+      "code_system": "http://loinc.org",
+      "display": "Octenoylcarnitine (C8:1) [Moles/volume] iin Serum or Plasma",
+      "gem_formatted_code": "305417",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_30327-1",
+      "code": "30327-1",
+      "code_system": "http://loinc.org",
+      "display": "Decanoylcarnitine (C10) [Moles/volume] inn Serum or Plasma",
+      "gem_formatted_code": "303271",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_30328-9",
+      "code": "30328-9",
+      "code_system": "http://loinc.org",
+      "display": "Decenoylcarnitine (C10:1) [Moles/volume]  in Serum or Plasma",
+      "gem_formatted_code": "303289",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_30331-3",
+      "code": "30331-3",
+      "code_system": "http://loinc.org",
+      "display": "Dodecanoylcarnitine (C12) [Moles/volume]  in Serum or Plasma",
+      "gem_formatted_code": "303313",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_30332-1",
+      "code": "30332-1",
+      "code_system": "http://loinc.org",
+      "display": "Dodecenoylcarnitine (C12:1) [Moles/volumee] in Serum or Plasma",
+      "gem_formatted_code": "303321",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_30233-1",
+      "code": "30233-1",
+      "code_system": "http://loinc.org",
+      "display": "3-Hydroxydodecanoylcarnitine (C12-OH) [Moles/volume] in Serum or Plasma",
+      "gem_formatted_code": "302331",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_30564-9",
+      "code": "30564-9",
+      "code_system": "http://loinc.org",
+      "display": "Tetradecadienoylcarnitine (C14:2) [Moles/volume] in Serum or Plasma",
+      "gem_formatted_code": "305649",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_30565-6",
+      "code": "30565-6",
+      "code_system": "http://loinc.org",
+      "display": "Tetradecanoylcarnitine (C14) [Moles/volumme] in Serum or Plasma",
+      "gem_formatted_code": "305656",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_30566-4",
+      "code": "30566-4",
+      "code_system": "http://loinc.org",
+      "display": "Tetradecenoylcarnitine (C14:1) [Moles/vollume] in Serum or Plasma",
+      "gem_formatted_code": "305664",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_30190-3",
+      "code": "30190-3",
+      "code_system": "http://loinc.org",
+      "display": "3-Hydroxytetradecenoylcarnitine (C14:1-OH) [Moles/volume] in Serum or Plasma",
+      "gem_formatted_code": "301903",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_30238-0",
+      "code": "30238-0",
+      "code_system": "http://loinc.org",
+      "display": "3-Hydroxytetradecanoylcarnitine (C14-OH) [Moles/volume] in Serum or Plasma",
+      "gem_formatted_code": "302380",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_30356-0",
+      "code": "30356-0",
+      "code_system": "http://loinc.org",
+      "display": "Palmitoylcarnitine (C16) [Moles/volume] iin Serum or Plasma",
+      "gem_formatted_code": "303560",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_30357-8",
+      "code": "30357-8",
+      "code_system": "http://loinc.org",
+      "display": "Palmitoleylcarnitine (C16:1) [Moles/volumme] in Serum or Plasma",
+      "gem_formatted_code": "303578",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_30235-6",
+      "code": "30235-6",
+      "code_system": "http://loinc.org",
+      "display": "3-Hydroxypalmitoleylcarnitine (C16:1-OH) [Moles/volume] in Serum or Plasma",
+      "gem_formatted_code": "302356",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_30234-9",
+      "code": "30234-9",
+      "code_system": "http://loinc.org",
+      "display": "3-Hydroxypalmitoylcarnitine (C16-OH) [Moles/volume] in Serum or Plasma",
+      "gem_formatted_code": "302349",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_30560-7",
+      "code": "30560-7",
+      "code_system": "http://loinc.org",
+      "display": "Stearoylcarnitine (C18) [Moles/volume] inn Serum or Plasma",
+      "gem_formatted_code": "305607",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_35656-8",
+      "code": "35656-8",
+      "code_system": "http://loinc.org",
+      "display": "3-Hydroxystearoylcarnitine (C18-OH) [Moles/volume] in Serum or Plasma",
+      "gem_formatted_code": "356568",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_30542-5",
+      "code": "30542-5",
+      "code_system": "http://loinc.org",
+      "display": "Oleoylcarnitine (C18:1) [Moles/volume] inn Serum or Plasma",
+      "gem_formatted_code": "305425",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_30312-3",
+      "code": "30312-3",
+      "code_system": "http://loinc.org",
+      "display": "3-Hydroxyoleoylcarnitine (C18:1-OH) [Moles/volume] in Serum or Plasma",
+      "gem_formatted_code": "303123",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_30534-2",
+      "code": "30534-2",
+      "code_system": "http://loinc.org",
+      "display": "Linoleoylcarnitine (C18:2) [Moles/volume]] in Serum or Plasma",
+      "gem_formatted_code": "305342",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_30237-2",
+      "code": "30237-2",
+      "code_system": "http://loinc.org",
+      "display": "3-Hydroxylinoleoylcarnitine (C18:2-OH) [Moles/volume] in Serum or Plasma",
+      "gem_formatted_code": "302372",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_53718-3",
+      "code": "53718-3",
+      "code_system": "http://loinc.org",
+      "display": "Acylglycines [Interpretation] in Urine Narrative",
+      "gem_formatted_code": "537183",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_2161-8",
+      "code": "2161-8",
+      "code_system": "http://loinc.org",
+      "display": "Creatinine [Mass/volume] in Urine",
+      "gem_formatted_code": "21618",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_24442-6",
+      "code": "24442-6",
+      "code_system": "http://loinc.org",
+      "display": "Propionylglycine/Creatinine [Molar ratio]] in Urine",
+      "gem_formatted_code": "244426",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_24437-6",
+      "code": "24437-6",
+      "code_system": "http://loinc.org",
+      "display": "Butyrylglycine/Creatinine [Molar ratio] iin Urine",
+      "gem_formatted_code": "244376",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_24438-4",
+      "code": "24438-4",
+      "code_system": "http://loinc.org",
+      "display": "Hexanoylglycine/Creatinine [Molar ratio]  in Urine",
+      "gem_formatted_code": "244384",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_24439-2",
+      "code": "24439-2",
+      "code_system": "http://loinc.org",
+      "display": "Isobutyrylglycine/Creatinine [Molar ratioo] in Urine",
+      "gem_formatted_code": "244392",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_24440-0",
+      "code": "24440-0",
+      "code_system": "http://loinc.org",
+      "display": "Isovalerylglycine/Creatinine [Molar ratioo] in Urine",
+      "gem_formatted_code": "244400",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_24435-0",
+      "code": "24435-0",
+      "code_system": "http://loinc.org",
+      "display": "2-Methylbutyrylglycine/Creatinine [Molar  ratio] in Urine",
+      "gem_formatted_code": "244350",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_24441-8",
+      "code": "24441-8",
+      "code_system": "http://loinc.org",
+      "display": "Phenylpropionylglycine/Creatinine [Molar  ratio] in Urine",
+      "gem_formatted_code": "244418",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_24443-4",
+      "code": "24443-4",
+      "code_system": "http://loinc.org",
+      "display": "Suberylglycine/Creatinine [Molar ratio] iin Urine",
+      "gem_formatted_code": "244434",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_24436-8",
+      "code": "24436-8",
+      "code_system": "http://loinc.org",
+      "display": "3-Methylcrotonylglycine/Creatinine [Molarr ratio] in Urine",
+      "gem_formatted_code": "244368",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_24444-2",
+      "code": "24444-2",
+      "code_system": "http://loinc.org",
+      "display": "Tiglylglycine/Creatinine [Molar ratio] inn Urine",
+      "gem_formatted_code": "244442",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_14286-9",
+      "code": "14286-9",
+      "code_system": "http://loinc.org",
+      "display": "Carnitine free (C0) [Moles/volume] in Serrum or Plasma",
+      "gem_formatted_code": "142869",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_14288-5",
+      "code": "14288-5",
+      "code_system": "http://loinc.org",
+      "display": "Carnitine [Moles/volume] in Serum or Plassma",
+      "gem_formatted_code": "142885",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_19074-4",
+      "code": "19074-4",
+      "code_system": "http://loinc.org",
+      "display": "Carnitine esters [Moles/volume] in Serum  or Plasma",
+      "gem_formatted_code": "190744",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_40869-0",
+      "code": "40869-0",
+      "code_system": "http://loinc.org",
+      "display": "Carnitine esters/Carnitine.free (C0) [Mollar ratio] in Serum or Plasma",
+      "gem_formatted_code": "408690",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_17866-5",
+      "code": "17866-5",
+      "code_system": "http://loinc.org",
+      "display": "Carnitine/Creatinine [Ratio] in Urine",
+      "gem_formatted_code": "1178665",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_17867-3",
+      "code": "17867-3",
+      "code_system": "http://loinc.org",
+      "display": "Carnitine free (C0)/Creatinine [Ratio] inn Urine",
+      "gem_formatted_code": "178673",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_28589-0",
+      "code": "28589-0",
+      "code_system": "http://loinc.org",
+      "display": "Carnitine esters/Creatinine [Ratio] in Urrine",
+      "gem_formatted_code": "285890",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_54442-9",
+      "code": "54442-9",
+      "code_system": "http://loinc.org",
+      "display": "Carnitine esters/Carnitine.free (C0) [Mollar ratio] in Urine",
+      "gem_formatted_code": "544429",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_79291-1",
+      "code": "79291-1",
+      "code_system": "http://loinc.org",
+      "display": "Creatine and guanidinoacetate pattern [Interpretation] in Serum or Plasma Narrative",
+      "gem_formatted_code": "792911",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_15045-8",
+      "code": "15045-8",
+      "code_system": "http://loinc.org",
+      "display": "Creatine [Moles/volume] in Serum or Plasma",
+      "gem_formatted_code": "150458",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_33244-5",
+      "code": "33244-5",
+      "code_system": "http://loinc.org",
+      "display": "Guanidinoacetate [Moles/volume] in Serum  or Plasma",
+      "gem_formatted_code": "332445",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_79292-9",
+      "code": "79292-9",
+      "code_system": "http://loinc.org",
+      "display": "Creatine",
+      "version": " guanidinoacetate and creatinine pattern [Interpretation] in Urine Narrative"
+    },
+    {
+      "id": "1_14683-7",
+      "code": "14683-7",
+      "code_system": "http://loinc.org",
+      "display": "Creatinine [Moles/volume] in Urine",
+      "gem_formatted_code": "1468837",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_34275-8",
+      "code": "34275-8",
+      "code_system": "http://loinc.org",
+      "display": "Creatine/Creatinine [Molar ratio] in Urinne",
+      "gem_formatted_code": "342758",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_34155-2",
+      "code": "34155-2",
+      "code_system": "http://loinc.org",
+      "display": "Guanidinoacetate/Creatinine [Molar ratio]] in Urine",
+      "gem_formatted_code": "341552",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_13500-4",
+      "code": "13500-4",
+      "code_system": "http://loinc.org",
+      "display": "Amino acid pattern [Interpretation] in Serum or Plasma",
+      "gem_formatted_code": "135004",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_26604-9",
+      "code": "26604-9",
+      "code_system": "http://loinc.org",
+      "display": "Beta alanine [Moles/volume] in Serum or PPlasma",
+      "gem_formatted_code": "266049",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_20636-7",
+      "code": "20636-7",
+      "code_system": "http://loinc.org",
+      "display": "Alanine [Moles/volume] in Serum or Plasma",
+      "gem_formatted_code": "206367",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_22670-4",
+      "code": "22670-4",
+      "code_system": "http://loinc.org",
+      "display": "Alloisoleucine [Moles/volume] in Serum orr Plasma",
+      "gem_formatted_code": "226704",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_26600-7",
+      "code": "26600-7",
+      "code_system": "http://loinc.org",
+      "display": "Alpha aminoadipate [Moles/volume] in Seruum or Plasma",
+      "gem_formatted_code": "266007",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_26609-8",
+      "code": "26609-8",
+      "code_system": "http://loinc.org",
+      "display": "Gamma aminobutyrate [Moles/volume] in Serrum or Plasma",
+      "gem_formatted_code": "266098",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_26605-6",
+      "code": "26605-6",
+      "code_system": "http://loinc.org",
+      "display": "Beta aminoisobutyrate [Moles/volume] in SSerum or Plasma",
+      "gem_formatted_code": "266056",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_20634-2",
+      "code": "20634-2",
+      "code_system": "http://loinc.org",
+      "display": "Alpha aminobutyrate [Moles/volume] in Serrum or Plasma",
+      "gem_formatted_code": "206342",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_26599-1",
+      "code": "26599-1",
+      "code_system": "http://loinc.org",
+      "display": "Anserine [Moles/volume] in Serum or Plasma",
+      "gem_formatted_code": "265991",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_20637-5",
+      "code": "20637-5",
+      "code_system": "http://loinc.org",
+      "display": "Arginine [Moles/volume] in Serum or Plasma",
+      "gem_formatted_code": "206375",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_32227-1",
+      "code": "32227-1",
+      "code_system": "http://loinc.org",
+      "display": "Argininosuccinate [Moles/volume] in Serumm or Plasma",
+      "gem_formatted_code": "322271",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_20638-3",
+      "code": "20638-3",
+      "code_system": "http://loinc.org",
+      "display": "Asparagine [Moles/volume] in Serum or Plasma",
+      "gem_formatted_code": "206383",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_20639-1",
+      "code": "20639-1",
+      "code_system": "http://loinc.org",
+      "display": "Aspartate [Moles/volume] in Serum or Plassma",
+      "gem_formatted_code": "206391",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_20640-9",
+      "code": "20640-9",
+      "code_system": "http://loinc.org",
+      "display": "Citrulline [Moles/volume] in Serum or Plasma",
+      "gem_formatted_code": "206409",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_26607-2",
+      "code": "26607-2",
+      "code_system": "http://loinc.org",
+      "display": "Cystathionine [Moles/volume] in Serum or  Plasma",
+      "gem_formatted_code": "266072",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_22672-0",
+      "code": "22672-0",
+      "code_system": "http://loinc.org",
+      "display": "Cystine [Moles/volume] in Serum or Plasma",
+      "gem_formatted_code": "226720",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_26608-0",
+      "code": "26608-0",
+      "code_system": "http://loinc.org",
+      "display": "Ethanolamine [Moles/volume] in Serum or PPlasma",
+      "gem_formatted_code": "266080",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_20642-5",
+      "code": "20642-5",
+      "code_system": "http://loinc.org",
+      "display": "Glutamate [Moles/volume] in Serum or Plassma",
+      "gem_formatted_code": "206425",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_20643-3",
+      "code": "20643-3",
+      "code_system": "http://loinc.org",
+      "display": "Glutamine [Moles/volume] in Serum or Plassma",
+      "gem_formatted_code": "206433",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_20644-1",
+      "code": "20644-1",
+      "code_system": "http://loinc.org",
+      "display": "Glycine [Moles/volume] in Serum or Plasma",
+      "gem_formatted_code": "206441",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_20645-8",
+      "code": "20645-8",
+      "code_system": "http://loinc.org",
+      "display": "Histidine [Moles/volume] in Serum or Plassma",
+      "gem_formatted_code": "206458",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_55876-7",
+      "code": "55876-7",
+      "code_system": "http://loinc.org",
+      "display": "Homocitrulline [Moles/volume] in Serum orr Plasma",
+      "gem_formatted_code": "558767",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_20646-6",
+      "code": "20646-6",
+      "code_system": "http://loinc.org",
+      "display": "Homocystine [Moles/volume] in Serum or Pllasma",
+      "gem_formatted_code": "206466",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_26610-6",
+      "code": "26610-6",
+      "code_system": "http://loinc.org",
+      "display": "Hydroxylysine [Moles/volume] in Serum or  Plasma",
+      "gem_formatted_code": "266106",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_20647-4",
+      "code": "20647-4",
+      "code_system": "http://loinc.org",
+      "display": "Hydroxyproline [Moles/volume] in Serum orr Plasma",
+      "gem_formatted_code": "206474",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_20648-2",
+      "code": "20648-2",
+      "code_system": "http://loinc.org",
+      "display": "Isoleucine [Moles/volume] in Serum or Plasma",
+      "gem_formatted_code": "206482",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_20649-0",
+      "code": "20649-0",
+      "code_system": "http://loinc.org",
+      "display": "Leucine [Moles/volume] in Serum or Plasma",
+      "gem_formatted_code": "206490",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_20650-8",
+      "code": "20650-8",
+      "code_system": "http://loinc.org",
+      "display": "Lysine [Moles/volume] in Serum or Plasma",
+      "gem_formatted_code": "206508",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_20651-6",
+      "code": "20651-6",
+      "code_system": "http://loinc.org",
+      "display": "Methionine [Moles/volume] in Serum or Plasma",
+      "gem_formatted_code": "206516",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_20652-4",
+      "code": "20652-4",
+      "code_system": "http://loinc.org",
+      "display": "Ornithine [Moles/volume] in Serum or Plassma",
+      "gem_formatted_code": "206524",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_14875-9",
+      "code": "14875-9",
+      "code_system": "http://loinc.org",
+      "display": "Phenylalanine [Moles/volume] in Serum or  Plasma",
+      "gem_formatted_code": "148759",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_20655-7",
+      "code": "20655-7",
+      "code_system": "http://loinc.org",
+      "display": "Proline [Moles/volume] in Serum or Plasma",
+      "gem_formatted_code": "206557",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_26613-0",
+      "code": "26613-0",
+      "code_system": "http://loinc.org",
+      "display": "Sarcosine [Moles/volume] in Serum or Plassma",
+      "gem_formatted_code": "266130",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_20656-5",
+      "code": "20656-5",
+      "code_system": "http://loinc.org",
+      "display": "Serine [Moles/volume] in Serum or Plasma",
+      "gem_formatted_code": "206565",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_20657-3",
+      "code": "20657-3",
+      "code_system": "http://loinc.org",
+      "display": "Taurine [Moles/volume] in Serum or Plasma",
+      "gem_formatted_code": "206573",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_20658-1",
+      "code": "20658-1",
+      "code_system": "http://loinc.org",
+      "display": "Threonine [Moles/volume] in Serum or Plassma",
+      "gem_formatted_code": "206581",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_20659-9",
+      "code": "20659-9",
+      "code_system": "http://loinc.org",
+      "display": "Tryptophan [Moles/volume] in Serum or Plasma",
+      "gem_formatted_code": "206599",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_20660-7",
+      "code": "20660-7",
+      "code_system": "http://loinc.org",
+      "display": "Tyrosine [Moles/volume] in Serum or Plasma",
+      "gem_formatted_code": "206607",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_20661-5",
+      "code": "20661-5",
+      "code_system": "http://loinc.org",
+      "display": "Valine [Moles/volume] in Serum or Plasma",
+      "gem_formatted_code": "206615",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_49248-8",
+      "code": "49248-8",
+      "code_system": "http://loinc.org",
+      "display": "Amino acid pattern [Interpretation] in Urine Narrative",
+      "gem_formatted_code": "492488",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_28588-2",
+      "code": "28588-2",
+      "code_system": "http://loinc.org",
+      "display": "Beta alanine/Creatinine [Ratio] in Urine",
+      "gem_formatted_code": "285882",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_30068-1",
+      "code": "30068-1",
+      "code_system": "http://loinc.org",
+      "display": "Alanine/Creatinine [Ratio] in Urine",
+      "gem_formatted_code": "3000681",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_28598-1",
+      "code": "28598-1",
+      "code_system": "http://loinc.org",
+      "display": "Alpha aminoadipate/Creatinine [Ratio] in  Urine",
+      "gem_formatted_code": "285981",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_28590-8",
+      "code": "28590-8",
+      "code_system": "http://loinc.org",
+      "display": "Alpha aminobutyrate/Creatinine [Ratio] inn Urine",
+      "gem_formatted_code": "285908",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_28596-5",
+      "code": "28596-5",
+      "code_system": "http://loinc.org",
+      "display": "Anserine/Creatinine [Ratio] in Urine",
+      "gem_formatted_code": "2885965",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_30062-4",
+      "code": "30062-4",
+      "code_system": "http://loinc.org",
+      "display": "Arginine/Creatinine [Ratio] in Urine",
+      "gem_formatted_code": "3000624",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_32229-7",
+      "code": "32229-7",
+      "code_system": "http://loinc.org",
+      "display": "Argininosuccinate/Creatinine [Ratio] in UUrine",
+      "gem_formatted_code": "322297",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_28603-9",
+      "code": "28603-9",
+      "code_system": "http://loinc.org",
+      "display": "Asparagine/Creatinine [Ratio] in Urine",
+      "gem_formatted_code": "286039",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_30061-6",
+      "code": "30061-6",
+      "code_system": "http://loinc.org",
+      "display": "Aspartate/Creatinine [Ratio] in Urine",
+      "gem_formatted_code": "3300616",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_28602-1",
+      "code": "28602-1",
+      "code_system": "http://loinc.org",
+      "display": "Beta aminoisobutyrate/Creatinine [Ratio]  in Urine",
+      "gem_formatted_code": "286021",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_30161-4",
+      "code": "30161-4",
+      "code_system": "http://loinc.org",
+      "display": "Citrulline/Creatinine [Ratio] in Urine",
+      "gem_formatted_code": "301614",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_28599-9",
+      "code": "28599-9",
+      "code_system": "http://loinc.org",
+      "display": "Cystathionine/Creatinine [Ratio] in Urinee",
+      "gem_formatted_code": "285999",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_30065-7",
+      "code": "30065-7",
+      "code_system": "http://loinc.org",
+      "display": "Cystine/Creatinine [Ratio] in Urine",
+      "gem_formatted_code": "3000657",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_28605-4",
+      "code": "28605-4",
+      "code_system": "http://loinc.org",
+      "display": "Ethanolamine/Creatinine [Ratio] in Urine",
+      "gem_formatted_code": "286054",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_28593-2",
+      "code": "28593-2",
+      "code_system": "http://loinc.org",
+      "display": "Gamma aminobutyrate/Creatinine [Ratio] inn Urine",
+      "gem_formatted_code": "285932",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_30059-0",
+      "code": "30059-0",
+      "code_system": "http://loinc.org",
+      "display": "Glutamate/Creatinine [Ratio] in Urine",
+      "gem_formatted_code": "3300590",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_30056-6",
+      "code": "30056-6",
+      "code_system": "http://loinc.org",
+      "display": "Glutamine/Creatinine [Ratio] in Urine",
+      "gem_formatted_code": "3300566",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_30066-5",
+      "code": "30066-5",
+      "code_system": "http://loinc.org",
+      "display": "Glycine/Creatinine [Ratio] in Urine",
+      "gem_formatted_code": "3000665",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_30047-5",
+      "code": "30047-5",
+      "code_system": "http://loinc.org",
+      "display": "Histidine/Creatinine [Ratio] in Urine",
+      "gem_formatted_code": "3300475",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_32248-7",
+      "code": "32248-7",
+      "code_system": "http://loinc.org",
+      "display": "Homocitrulline/Creatinine [Ratio] in Urinne",
+      "gem_formatted_code": "322487",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_30050-9",
+      "code": "30050-9",
+      "code_system": "http://loinc.org",
+      "display": "Hydroxylysine/Creatinine [Ratio] in Urinee",
+      "gem_formatted_code": "300509",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_28601-3",
+      "code": "28601-3",
+      "code_system": "http://loinc.org",
+      "display": "Hydroxyproline/Creatinine [Ratio] in Urinne",
+      "gem_formatted_code": "286013",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_30052-5",
+      "code": "30052-5",
+      "code_system": "http://loinc.org",
+      "display": "Isoleucine/Creatinine [Ratio] in Urine",
+      "gem_formatted_code": "300525",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_30053-3",
+      "code": "30053-3",
+      "code_system": "http://loinc.org",
+      "display": "Leucine/Creatinine [Ratio] in Urine",
+      "gem_formatted_code": "3000533",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_30048-3",
+      "code": "30048-3",
+      "code_system": "http://loinc.org",
+      "display": "Lysine/Creatinine [Ratio] in Urine",
+      "gem_formatted_code": "3004483",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_30063-2",
+      "code": "30063-2",
+      "code_system": "http://loinc.org",
+      "display": "Methionine/Creatinine [Ratio] in Urine",
+      "gem_formatted_code": "300632",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_30049-1",
+      "code": "30049-1",
+      "code_system": "http://loinc.org",
+      "display": "Ornithine/Creatinine [Ratio] in Urine",
+      "gem_formatted_code": "3300491",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_30055-8",
+      "code": "30055-8",
+      "code_system": "http://loinc.org",
+      "display": "Phenylalanine/Creatinine [Ratio] in Urinee",
+      "gem_formatted_code": "300558",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_30067-3",
+      "code": "30067-3",
+      "code_system": "http://loinc.org",
+      "display": "Proline/Creatinine [Ratio] in Urine",
+      "gem_formatted_code": "3000673",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_28610-4",
+      "code": "28610-4",
+      "code_system": "http://loinc.org",
+      "display": "Sarcosine/Creatinine [Ratio] in Urine",
+      "gem_formatted_code": "2286104",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_30058-2",
+      "code": "30058-2",
+      "code_system": "http://loinc.org",
+      "display": "Serine/Creatinine [Ratio] in Urine",
+      "gem_formatted_code": "3005582",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_28595-7",
+      "code": "28595-7",
+      "code_system": "http://loinc.org",
+      "display": "Taurine/Creatinine [Ratio] in Urine",
+      "gem_formatted_code": "2855957",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_30057-4",
+      "code": "30057-4",
+      "code_system": "http://loinc.org",
+      "display": "Threonine/Creatinine [Ratio] in Urine",
+      "gem_formatted_code": "3300574",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_28608-8",
+      "code": "28608-8",
+      "code_system": "http://loinc.org",
+      "display": "Tryptophan/Creatinine [Ratio] in Urine",
+      "gem_formatted_code": "286088",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_30054-1",
+      "code": "30054-1",
+      "code_system": "http://loinc.org",
+      "display": "Tyrosine/Creatinine [Ratio] in Urine",
+      "gem_formatted_code": "3000541",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_30064-0",
+      "code": "30064-0",
+      "code_system": "http://loinc.org",
+      "display": "Valine/Creatinine [Ratio] in Urine",
+      "gem_formatted_code": "3006640",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_33477-1",
+      "code": "33477-1",
+      "code_system": "http://loinc.org",
+      "display": "Organic acids pattern [Interpretation] in Urine",
+      "gem_formatted_code": "334771",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_25112-4",
+      "code": "25112-4",
+      "code_system": "http://loinc.org",
+      "display": "Lactate/Creatinine [Molar ratio] in Urinee",
+      "gem_formatted_code": "251124",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_25132-2",
+      "code": "25132-2",
+      "code_system": "http://loinc.org",
+      "display": "Pyruvate/Creatinine [Molar ratio] in Urinne",
+      "gem_formatted_code": "251322",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_25136-3",
+      "code": "25136-3",
+      "code_system": "http://loinc.org",
+      "display": "Succinate/Creatinine [Molar ratio] in Uriine",
+      "gem_formatted_code": "251363",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_29507-1",
+      "code": "29507-1",
+      "code_system": "http://loinc.org",
+      "display": "Alpha ketoglutarate/Creatinine [Molar rattio] in Urine",
+      "gem_formatted_code": "295071",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_25101-7",
+      "code": "25101-7",
+      "code_system": "http://loinc.org",
+      "display": "Fumarate/Creatinine [Molar ratio] in Urinne",
+      "gem_formatted_code": "251017",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_25116-5",
+      "code": "25116-5",
+      "code_system": "http://loinc.org",
+      "display": "Methylmalonate/Creatinine [Molar ratio] iin Urine",
+      "gem_formatted_code": "251165",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_29509-7",
+      "code": "29509-7",
+      "code_system": "http://loinc.org",
+      "display": "Beta hydroxybutyrate/Creatinine [Molar raatio] in Urine",
+      "gem_formatted_code": "295097",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_29524-6",
+      "code": "29524-6",
+      "code_system": "http://loinc.org",
+      "display": "Acetoacetate/Creatinine [Molar ratio] in  Urine",
+      "gem_formatted_code": "295246",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_25083-7",
+      "code": "25083-7",
+      "code_system": "http://loinc.org",
+      "display": "2-Oxo",
+      "version": "3-Methylvalerate/Creatinine [Molar  ratio] in Urine"
+    },
+    {
+      "id": "1_25084-5",
+      "code": "25084-5",
+      "code_system": "http://loinc.org",
+      "display": "2-Oxoisocaproate/Creatinine [Molar ratio]] in Urine",
+      "gem_formatted_code": "250845",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_25085-2",
+      "code": "25085-2",
+      "code_system": "http://loinc.org",
+      "display": "2-Oxoisovalerate/Creatinine [Molar ratio]] in Urine",
+      "gem_formatted_code": "250852",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_25099-3",
+      "code": "25099-3",
+      "code_system": "http://loinc.org",
+      "display": "Ethylmalonate/Creatinine [Molar ratio] inn Urine",
+      "gem_formatted_code": "250993",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_29859-6",
+      "code": "29859-6",
+      "code_system": "http://loinc.org",
+      "display": "Adipate/Creatinine [Molar ratio] in Urinee",
+      "gem_formatted_code": "298596",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_25135-5",
+      "code": "25135-5",
+      "code_system": "http://loinc.org",
+      "display": "Suberate/Creatinine [Molar ratio] in Urinne",
+      "gem_formatted_code": "251355",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_25134-8",
+      "code": "25134-8",
+      "code_system": "http://loinc.org",
+      "display": "Sebacate (C8)/Creatinine [Molar ratio] inn Urine",
+      "gem_formatted_code": "251348",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_25088-6",
+      "code": "25088-6",
+      "code_system": "http://loinc.org",
+      "display": "4-Hydroxyphenylacetate/Creatinine [Molar  ratio] in Urine",
+      "gem_formatted_code": "250886",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_25089-4",
+      "code": "25089-4",
+      "code_system": "http://loinc.org",
+      "display": "4-Hydroxyphenyllactate/Creatinine [Molar  ratio] in Urine",
+      "gem_formatted_code": "250894",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_29519-6",
+      "code": "29519-6",
+      "code_system": "http://loinc.org",
+      "display": "4-Hydroxyphenylpyruvate/Creatinine [Molarr ratio] in Urine",
+      "gem_formatted_code": "295196",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_25137-1",
+      "code": "25137-1",
+      "code_system": "http://loinc.org",
+      "display": "Succinylacetone/Creatinine [Molar ratio]  in Urine",
+      "gem_formatted_code": "251371",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_1982-8",
+      "code": "1982-8",
+      "code_system": "http://loinc.org",
+      "display": "Biotinidase [Enzymatic activity/volume] in  Serum or Plasma",
+      "gem_formatted_code": "19828",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_54457-7",
+      "code": "54457-7",
+      "code_system": "http://loinc.org",
+      "display": "Biotinidase [Enzymatic activity/volume] iin Serum or Plasma from Normal control",
+      "gem_formatted_code": "544577",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_3024-7",
+      "code": "3024-7",
+      "code_system": "http://loinc.org",
+      "display": "Thyroxine (T4) free [Mass/volume] in Serum  or Plasma",
+      "gem_formatted_code": "30247",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_3016-3",
+      "code": "3016-3",
+      "code_system": "http://loinc.org",
+      "display": "Thyrotropin [Units/volume] in Serum or Plassma",
+      "gem_formatted_code": "30163",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_1668-3",
+      "code": "1668-3",
+      "code_system": "http://loinc.org",
+      "display": "17-Hydroxyprogesterone [Mass/volume] in Serrum or Plasma",
+      "gem_formatted_code": "16683",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_2077-6",
+      "code": "2077-6",
+      "code_system": "http://loinc.org",
+      "display": "Chloride [Moles/volume] in Sweat",
+      "gem_formatted_code": "20776",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_2954-6",
+      "code": "2954-6",
+      "code_system": "http://loinc.org",
+      "display": "Sodium [Moles/volume] in Sweat",
+      "gem_formatted_code": "29546",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_42940-7",
+      "code": "42940-7",
+      "code_system": "http://loinc.org",
+      "display": "GALT gene allele 1 [Presence] in Blood by Molecular genetics method",
+      "gem_formatted_code": "429407",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_42941-5",
+      "code": "42941-5",
+      "code_system": "http://loinc.org",
+      "display": "GALT gene allele 2 [Presence] in Blood by Molecular genetics method",
+      "gem_formatted_code": "429415",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_10970-2",
+      "code": "10970-2",
+      "code_system": "http://loinc.org",
+      "display": "Galactose 1 phosphate uridyl transferase [Enzymatic activity/volume] in Blood",
+      "gem_formatted_code": "109702",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_2312-7",
+      "code": "2312-7",
+      "code_system": "http://loinc.org",
+      "display": "Galactose 1 phosphate [Mass/volume] in Red  Blood Cells",
+      "gem_formatted_code": "23127",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_33360-9",
+      "code": "33360-9",
+      "code_system": "http://loinc.org",
+      "display": "Galactose 1 phosphate [Mass/mass] in Red  Blood Cells",
+      "gem_formatted_code": "333609",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_38485-9",
+      "code": "38485-9",
+      "code_system": "http://loinc.org",
+      "display": "Galactose 1 phosphate [Moles/mass] in Redd Blood Cells",
+      "gem_formatted_code": "384859",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_48767-8",
+      "code": "48767-8",
+      "code_system": "http://loinc.org",
+      "display": "Annotation comment [Interpretation] Narrative",
+      "gem_formatted_code": "487678",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_33617-2",
+      "code": "33617-2",
+      "code_system": "http://loinc.org",
+      "display": "HLA-DR+ cells [#/volume] in Blood",
+      "gem_formatted_code": "336172",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_15195-1",
+      "code": "15195-1",
+      "code_system": "http://loinc.org",
+      "display": "CD3-CD19+ cells [#/volume] in Blood",
+      "gem_formatted_code": "151951",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_32519-1",
+      "code": "32519-1",
+      "code_system": "http://loinc.org",
+      "display": "CD3-CD16+CD56+ (Natural killer) cells/1  100 cells in Unspecified specimen",
+      "gem_formatted_code": "325191",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_20604-5",
+      "code": "20604-5",
+      "code_system": "http://loinc.org",
+      "display": "CD3-CD16+CD56+ (Natural killer) cells [# #/volume] in Unspecified specimen",
+      "gem_formatted_code": "206045",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_34475-4",
+      "code": "34475-4",
+      "code_system": "http://loinc.org",
+      "display": "CD4+CD45RO+ cells [#/volume] in Blood",
+      "gem_formatted_code": "344754",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_41994-5",
+      "code": "41994-5",
+      "code_system": "http://loinc.org",
+      "display": "CD4+CD45RO+ cells/100 cells in Blood",
+      "gem_formatted_code": "419945",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_26759-1",
+      "code": "26759-1",
+      "code_system": "http://loinc.org",
+      "display": "CD4+CD45RA+ cells [#/volume] in Blood",
+      "gem_formatted_code": " 267591",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_17157-9",
+      "code": "17157-9",
+      "code_system": "http://loinc.org",
+      "display": "CD45RA cells/100 cells in Blood",
+      "gem_formatted_code": "171579",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_31113-4",
+      "code": "31113-4",
+      "code_system": "http://loinc.org",
+      "display": "HLA-DR+ cells/100 cells in Blood",
+      "gem_formatted_code": "311134",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_8122-4",
+      "code": "8122-4",
+      "code_system": "http://loinc.org",
+      "display": "CD3 cells [#/volume] in Blood",
+      "gem_formatted_code": "81224",
+      "version": "20224-10"
+    },
+    {
+      "id": "1_20599-7",
+      "code": "20599-7",
+      "code_system": "http://loinc.org",
+      "display": "CD3 cells/100 cells in Unspecified specimen",
+      "gem_formatted_code": "205997",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_24467-3",
+      "code": "24467-3",
+      "code_system": "http://loinc.org",
+      "display": "CD3+CD4+ (T4 helper) cells [#/volume] i  in Blood",
+      "gem_formatted_code": "244673",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_14135-8",
+      "code": "14135-8",
+      "code_system": "http://loinc.org",
+      "display": "CD3+CD8+ (T8 suppressor cells) cells [#/ /volume] in Blood",
+      "gem_formatted_code": "141358",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_8123-2",
+      "code": "8123-2",
+      "code_system": "http://loinc.org",
+      "display": "CD3+CD4+ (T4 helper) cells/100 cells in B  Blood",
+      "gem_formatted_code": "81232",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_32518-3",
+      "code": "32518-3",
+      "code_system": "http://loinc.org",
+      "display": "CD3+CD8+ (T8 suppressor cells) cells/10  00 cells in Unspecified specimen",
+      "gem_formatted_code": "325183",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_20593-0",
+      "code": "20593-0",
+      "code_system": "http://loinc.org",
+      "display": "CD19 cells/100 cells in Unspecified specimen",
+      "gem_formatted_code": "205930",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_54218-3",
+      "code": "54218-3",
+      "code_system": "http://loinc.org",
+      "display": "CD3+CD4+ (T4 helper) cells/CD3+CD8+ ((T8 suppressor cells) cells [# Ratio] in Blood",
+      "gem_formatted_code": "542183",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_8118-2",
+      "code": "8118-2",
+      "code_system": "http://loinc.org",
+      "display": "CD2 cells/100 cells in Blood",
+      "gem_formatted_code": "81182",
+      "version": "20244-10"
+    },
+    {
+      "id": "1_9557-0",
+      "code": "9557-0",
+      "code_system": "http://loinc.org",
+      "display": "CD2 cells [#/volume] in Blood",
+      "gem_formatted_code": "95570",
+      "version": "20224-10"
+    },
+    {
+      "id": "1_49857-6",
+      "code": "49857-6",
+      "code_system": "http://loinc.org",
+      "display": "SMN1 gene+SMN2 gene targeted mutation anaalysis in Blood or Tissue by Molecular genetics method Narrative",
+      "gem_formatted_code": "498576",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_35462-1",
+      "code": "35462-1",
+      "code_system": "http://loinc.org",
+      "display": "SMN1 gene targeted mutation analysis in Blood or Tissue by Molecular genetics method Narrative",
+      "gem_formatted_code": "354621",
+      "version": "2024-10"
+    },
+    {
+      "id": "1_54449-4",
+      "code": "54449-4",
+      "code_system": "http://loinc.org",
+      "display": "SMN2 gene targeted mutation analysis in Blood or Tissue by Molecular genetics method Narrative",
+      "gem_formatted_code": "544494",
+      "version": "2024-10"
+    },
+    {
+      "id": "2.16.840.1.113762.1.4.1146.1407_92814006",
+      "code": "92814006",
+      "code_system": "http://snomed.info/sct",
+      "display": "Chronic lymphoid leukemia, disease (disorder)",
+      "gem_formatted_code": "92814006",
+      "version": "2024-03"
+    },
+    {
+      "id": "2.16.840.1.113762.1.4.1146.239_21613-5",
+      "code": "21613-5",
+      "code_system": "http://loinc.org",
+      "display": "Chlamydia trachomatis DNA [Presence] in Specimen by NAA with probe detection",
+      "gem_formatted_code": "216135",
+      "version": "2.77"
+    },
+    {
+      "id": "2.16.840.1.113762.1.4.1146.244_24111-7",
+      "code": "24111-7",
+      "code_system": "http://loinc.org",
+      "display": "Neisseria gonorrhoeae DNA [Presence] in Specimen by NAA with probe detection",
+      "gem_formatted_code": "241117",
+      "version": "2.77"
+    },
+    {
+      "id": "2.16.840.1.113762.1.4.1146.239_21613-5",
+      "code": "21613-5",
+      "code_system": "http://loinc.org",
+      "display": "Chlamydia trachomatis DNA [Presence] in Specimen by NAA with probe detection",
+      "gem_formatted_code": "216135",
+      "version": "2.77"
+    },
+    {
+      "id": "2.16.840.1.113762.1.4.1146.395_76272004",
+      "code": "76272004",
+      "code_system": "http://snomed.info/sct",
+      "display": "Syphilis (disorder)",
+      "gem_formatted_code": "76272004",
+      "version": "2024-03"
+    }
+  ]
+}
