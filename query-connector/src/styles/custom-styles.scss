@@ -1,17 +1,25 @@
 @use "uswds-core" as *;
 @use "_variables" as *;
 
+html,
+body {
+  height: 100%;
+}
 html {
   scroll-behavior: auto;
+  box-sizing: border-box;
 }
 
 body {
   font-family: $sans-serif-font;
   line-height: 1.4;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
   background-color: rgba(247, 249, 250, 1);
+}
+
+.application-container {
+  display: flex;
+  flex-flow: column;
+  min-height: 100%;
 }
 
 header,
@@ -26,9 +34,7 @@ h1 {
 
 .main-body {
   background-color: rgba(247, 249, 250, 1);
-  display: flex;
-  flex: auto; // Sizes main-body to fill space between header and footer
-  flex-direction: column;
+  flex: 1 1 auto;
 }
 
 .page-title {
@@ -119,7 +125,11 @@ h1 {
 }
 
 .gradient-blue-background {
-  background: linear-gradient(109.54deg, rgba(173, 207, 220, 0.025) 8.02%, rgba(46, 98, 118, 0.5) 117.53%);
+  background: linear-gradient(
+    109.54deg,
+    rgba(173, 207, 220, 0.025) 8.02%,
+    rgba(46, 98, 118, 0.5) 117.53%
+  );
 
   padding: 0.5rem;
   /* Optional: some padding to make the background more noticeable */
@@ -293,11 +303,19 @@ hr.custom-hr {
   font-weight: bold;
 }
 
-ul.usa-sidenav > li.usa-sidenav__item > ul.usa-sidenav__sublist > li.usa-sidenav__item > a {
+ul.usa-sidenav
+  > li.usa-sidenav__item
+  > ul.usa-sidenav__sublist
+  > li.usa-sidenav__item
+  > a {
   font-weight: bold;
 }
 
-ul.usa-sidenav > li.usa-sidenav__item > ul.usa-sidenav__sublist > li.usa-sidenav__item > a.usa-current {
+ul.usa-sidenav
+  > li.usa-sidenav__item
+  > ul.usa-sidenav__sublist
+  > li.usa-sidenav__item
+  > a.usa-current {
   &::after {
     background-color: rgb(0, 94, 162);
     content: "";
@@ -397,13 +415,13 @@ ul.usa-sidenav > li.usa-sidenav__item > ul.usa-sidenav__sublist > li.usa-sidenav
 
 .usa-alert__heading {
   &.h1 {
-    font-size: 2.125rem; 
+    font-size: 2.125rem;
     font-weight: bold;
     line-height: 1.5;
   }
 
   &.h2 {
-    font-size: 1.875rem; 
+    font-size: 1.875rem;
     font-weight: bold;
     line-height: 1.5;
   }
@@ -427,12 +445,11 @@ ul.usa-sidenav > li.usa-sidenav__item > ul.usa-sidenav__sublist > li.usa-sidenav
   }
 
   &.h6 {
-    font-size: 1rem; 
+    font-size: 1rem;
     font-weight: bold;
     line-height: 1.2;
   }
 }
-
 
 .custom-query-step-indicator .usa-step-indicator__header {
   display: none !important;
