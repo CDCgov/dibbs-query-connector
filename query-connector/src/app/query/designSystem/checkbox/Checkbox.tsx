@@ -2,7 +2,7 @@ import { Checkbox as TrussCheckbox } from "@trussworks/react-uswds";
 import classNames from "classnames";
 import styles from "./checkbox.module.css";
 
-type CheckboxProps = {
+export type CheckboxProps = {
   id: string;
   label: string;
   className?: string;

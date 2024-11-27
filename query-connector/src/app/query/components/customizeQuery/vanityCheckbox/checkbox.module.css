@@ -1,0 +1,24 @@
+.vanity {
+  background: inherit;
+}
+
+.vanity label {
+  padding-left: 0;
+}
+
+.vanity label::before {
+  width: 2.25rem;
+  height: 2.25rem;
+  background-color: #fff;
+  box-shadow: 0 0 0 1px #a9aeb1 !important;
+  border-radius: 0.25rem;
+  margin: 0.5rem;
+  padding: 0 !important;
+  position: relative !important;
+}
+
+.vanity input:checked + label::before {
+  background-color: #fff !important;
+  background-image: url("checkmark.svg") !important;
+  background-size: cover !important;
+}
