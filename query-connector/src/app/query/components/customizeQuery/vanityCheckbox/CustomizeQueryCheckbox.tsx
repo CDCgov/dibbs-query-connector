@@ -10,7 +10,7 @@ type VanityCheckboxProps = CheckboxProps & {
 /**
  * Vanity component wrapper around the checkbox component for the query customization
  * checkboxes
- * @param root0
+ * @param root0 - params
  * @param root0.id - ID for checkbox
  * @param root0.checked - whether the checkbox is checked
  * @param root0.onChange - handler for when the checkbox is clicked
