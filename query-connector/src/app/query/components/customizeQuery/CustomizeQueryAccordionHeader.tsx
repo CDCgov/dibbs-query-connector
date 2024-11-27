@@ -1,6 +1,7 @@
 import { Icon } from "@trussworks/react-uswds";
 import styles from "./customizeQuery.module.css";
 import { GroupedValueSet } from "./customizeQueryUtils";
+import CustomizeQueryCheckbox from "./vanityCheckbox/CustomizeQueryCheckbox";
 
 type CustomizeQueryAccordionProps = {
   handleSelectAllChange: (groupIndex: string, checked: boolean) => void;
@@ -36,30 +37,15 @@ const CustomizeQueryAccordionHeader: React.FC<CustomizeQueryAccordionProps> = ({
     <div
       className={`${styles.accordionHeader} display-flex flex-no-wrap flex-align-start customize-query-header`}
     >
-      <div
-        id="select-all"
-        className={`hide-checkbox-label ${styles.customizeQueryCheckbox}`}
-        onClick={(e) => {
-          e.stopPropagation();
-          handleSelectAllChange(groupIndex, selectedCount !== selectedTotal);
-        }}
-      >
-        {selectedCount === selectedTotal && (
-          <Icon.Check
-            className="usa-icon bg-base-lightest"
-            size={4}
-            color="#565C65"
-            aria-label="Checkmark icon indicating addition"
-          />
-        )}
-        {selectedCount > 0 && selectedCount < selectedTotal && (
-          <Icon.Remove
-            className="usa-icon bg-base-lightest"
-            size={4}
-            color="#565C65"
-            aria-label="Minus icon indicating removal"
-          />
-        )}
+      <div id="select-all">
+        <CustomizeQueryCheckbox
+          id={group.valueSetName}
+          checked={selectedCount === selectedTotal}
+          isHeader
+          onChange={() => {
+            handleSelectAllChange(groupIndex, selectedCount !== selectedTotal);
+          }}
+        />
       </div>
       <div className={`${styles.accordionButtonTitle}`}>
         {`${group.valueSetName}`}

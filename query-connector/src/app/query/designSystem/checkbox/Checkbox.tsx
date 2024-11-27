@@ -4,10 +4,11 @@ import styles from "./checkbox.module.css";
 
 export type CheckboxProps = {
   id: string;
-  label: string;
+  label?: string;
   className?: string;
   onClick?: () => void;
-  checked: boolean;
+  onChange?: () => void;
+  checked?: boolean;
 };
 
 /**
@@ -25,6 +26,7 @@ const Checkbox: React.FC<CheckboxProps> = ({
   id,
   className,
   onClick,
+  onChange,
   checked,
 }) => {
   return (
@@ -34,7 +36,8 @@ const Checkbox: React.FC<CheckboxProps> = ({
       name={id}
       className={classNames(styles.checkbox, className)}
       onClick={onClick}
-      defaultChecked={checked}
+      onChange={onChange}
+      checked={checked}
     ></TrussCheckbox>
   );
 };

@@ -55,9 +55,8 @@ const CustomizeQueryAccordionBody: React.FC<
               <td className={styles.noBorderNoBackgroundNoPadding}>
                 <CustomizeQueryCheckbox
                   id={item.code}
-                  label=""
-                  checked={false}
-                  onClick={() => {
+                  checked={item.include}
+                  onChange={() => {
                     toggleInclude(groupIndex, item.vsIndex, conceptIndex);
                   }}
                 />
