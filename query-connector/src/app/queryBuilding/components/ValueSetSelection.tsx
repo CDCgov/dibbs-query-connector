@@ -13,7 +13,6 @@ import classNames from "classnames";
 import {
   CategoryNameToConditionOptionMap,
   ConditionIdToValueSetArray,
-  ValueSetsByGroup,
 } from "../utils";
 import { BuildStep } from "@/app/constants";
 import SearchField from "@/app/query/designSystem/searchField/SearchField";
@@ -35,14 +34,14 @@ type ConditionSelectionProps = {
   valueSetsByCondition: ConditionIdToValueSetArray;
 };
 
-const renderSelectionTable = (
-  activeCondition: string,
-  valueSets: ValueSetsByGroup
-) => {
-  return (
-    <SelectionTable conditionId={activeCondition ?? ""} valueSets={valueSets} />
-  );
-};
+// const renderSelectionTable = (
+//   activeCondition: string,
+//   valueSets: ValueSetsByGroup
+// ) => {
+//   return (
+//     <SelectionTable conditionId={activeCondition ?? ""} valueSets={valueSets} />
+//   );
+// };
 
 /**
  * Display component for a condition on the query building page
@@ -62,15 +61,9 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
   const focusRef = useRef<HTMLInputElement | null>(null);
   const [activeCondition, setActiveCondition] = useState<string>("");
   const [_searchFilter, setSearchFilter] = useState<string>();
-  const [_valueSets, setValueSets] = useState<ConditionToValueSetMap>();
-  // const [loadingValueSets, setLoadingValueSets] = useState<boolean>(true);
+  const [valueSets, setValueSets] = useState<ConditionToValueSetMap>();
 
   useEffect(() => {
-    // setLoadingQueryValueSets(true);
-    // fetchDataAndUpdateState().catch(console.error);
-    // setLoadingQueryValueSets(false);
-    // fetchDataAndUpdateState();
-    // need to fetch associated value sets and concepts
     let _isSubscribed = true;
 
     if (queryName == "" || queryName == undefined) {
@@ -81,24 +74,6 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
     const id = Object.keys(selectedConditions[first])[0];
 
     setActiveCondition(id);
-
-    // async function fetchConditionsAndUpdateState() {
-
-    //   if (isSubscribed) {
-    //     setFetchedConditions(
-    //       mapFetchedDataToFrontendStructure(categoryToConditionArrayMap)
-    //     );
-    //   }
-    // }
-
-    // const { labs, conditions, medications } =
-    //   mapValueSetsToValueSetTypes(queryValueSets);
-
-    // setValueSetOptions({
-    //   labs: labs,
-    //   conditions: conditions,
-    //   medications: medications,
-    // });
 
     const groupedValueSetByCondition: ConditionToValueSetMap = Object.entries(
       valueSetsByCondition
@@ -237,11 +212,12 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
             />
           </div>
           <div>
-            {_valueSets &&
-              renderSelectionTable(
-                activeCondition,
-                _valueSets[activeCondition]
-              )}
+            {valueSets && (
+              <SelectionTable
+                conditionId={activeCondition ?? ""}
+                valueSets={valueSets}
+              />
+            )}
           </div>
         </div>
       </div>

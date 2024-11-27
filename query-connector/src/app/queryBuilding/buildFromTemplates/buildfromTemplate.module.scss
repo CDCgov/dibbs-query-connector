@@ -94,6 +94,59 @@
   border-bottom: 1px #dfe1e2 solid;
 }
 
+.accordionContainer {
+  width: 100%;
+}
+
+.accordionHeaderWrapper {
+  background-color: transparent;
+  justify-content: space-between;
+  align-items: center;
+  display: flex;
+  width: 100%;
+}
+
+.accordionBodyWrapper {
+  background-color: transparent;
+}
+
+.accordionHeaderCount {
+  font-size: 1rem !important;
+  font-weight: 400 !important;
+  background-color: #f7f9fa;
+}
+
+.accordionInnerWrapper > h4 > button {
+  display: flex;
+  justify-content: space-between;
+  word-wrap: break-word;
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+  background-color: #f7f9fa;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px #dfe1e2 solid;
+  color: #111111;
+
+  &:hover {
+    background-color: #f7f9fa !important;
+
+    .valueSetTemplate__checkbox label {
+      background-color: #f7f9fa;
+      font-weight: 800;
+    }
+
+    .accordionHeaderCount {
+      color: #111111;
+    }
+  }
+}
+
+.accordionWrapper > div {
+  margin: 0.1rem 0rem;
+  padding: 1rem 1.5rem;
+}
+
 .conditionList {
   display: flex;
   flex-direction: column;
@@ -147,11 +200,18 @@
   width: 406px;
 }
 
+.valueSetTemplate__toggleRowHeader > svg {
+  color: black;
+}
 .valueSetTemplate__checkbox {
   margin-left: 6.5px;
 }
+
 .valueSetTemplate__checkbox label {
   margin-top: 0 !important;
   padding-left: 2.25rem;
   background-color: #f7f9fa;
+  font-weight: 700;
+  font-size: 18px;
+  text-transform: capitalize;
 }

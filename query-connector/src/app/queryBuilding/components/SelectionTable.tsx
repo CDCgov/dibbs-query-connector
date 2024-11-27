@@ -1,19 +1,18 @@
 "use client";
 
 import styles from "../buildFromTemplates/buildfromTemplate.module.scss";
-import {
-  // Accordion,
-  Checkbox,
-  Icon,
-} from "@trussworks/react-uswds";
-import { ValueSetsByGroup } from "../utils";
+import SelectionViewAccordionBody from "./SelectionViewAccordionBody";
+
+import { ValueSetsByGroup, ConditionToValueSetMap } from "../utils";
 // import formatIdForAnchorTag from "../../query/components/resultsView/ResultsViewTable";
 // import SelectionViewAccordionBody from "./SelectionViewAccordionBody";
 import { DibbsValueSetType } from "@/app/constants";
+import Accordion from "../../query/designSystem/Accordion";
+import SelectionViewAccordionHeader from "./SelectionViewAccordionHeader";
 
 type SelectionTableProps = {
   conditionId: string;
-  valueSets: ValueSetsByGroup;
+  valueSets: ConditionToValueSetMap;
 };
 
 // * @param root0.conditionId - ID of the active/selected condition
@@ -30,55 +29,11 @@ export const SelectionTable: React.FC<SelectionTableProps> = ({
   conditionId,
   valueSets,
 }) => {
-  // const accordionItems = renderValueSetAccordions(conditionId, valueSets);
   return (
     <div data-testid="accordion" className={""}>
-      {/* {accordionItems.map((item) => {
-        const titleId = formatIdForAnchorTag(item.title);
-
-        return (
-          item.content && (
-            <div className="styles.accordionInstance" key={item.title}>
-              <Accordion
-                title=""
-                content={
-                  <SelectionViewAccordionBody
-                    title={item.subtitle ?? ""}
-                    content={item.content}
-                    id={formatIdForAnchorTag(item.subtitle ?? "")}
-                  />
-                }
-                expanded={true}
-                id={titleId}
-                key={titleId}
-                headingLevel={"h3"}
-                accordionClassName={styles.accordionWrapper}
-                containerClassName={styles.accordionContainer}
-              />
-            </div>
-          )
-        );
-      })} */}
-      {renderValueSetAccordions(conditionId, valueSets)}
+      {renderValueSetAccordions(conditionId, valueSets[conditionId])}
     </div>
   );
-};
-
-const calculateTotals = (valueSets: ValueSetsByGroup, valueSetType: string) => {
-  const valueSetsByGroup =
-    valueSets[valueSetType.toLocaleLowerCase() as keyof ValueSetsByGroup];
-  console.log(valueSets, valueSetType);
-  const total = valueSetsByGroup && Object.keys(valueSetsByGroup).length;
-  let selected =
-    valueSetsByGroup &&
-    Object.values(valueSetsByGroup).filter((vs) => {
-      return vs.items.filter((obj) => obj.includeValueSet == true);
-    }).length;
-
-  return {
-    total,
-    selected,
-  };
 };
 
 function renderValueSetAccordions(
@@ -95,36 +50,60 @@ function renderValueSetAccordions(
 
   const ValueSetAccordionItem = Object.values(types).map(
     function (valueSetType) {
-      console.log(types, valueSetType);
       const total = calculateTotals(valueSets, valueSetType).total;
       const selected = calculateTotals(valueSets, valueSetType).selected;
+      const valueSetsForType = Object.values(valueSets[valueSetType]);
 
       return (
-        <div className={styles.valueSetTemplate__accordion} key={valueSetType}>
-          <div className={styles.valueSetTemplate__toggleRowHeader}>
-            <Icon.ArrowDropUp
-              aria-label="Arrow pointing right indicating collapsed toggle content"
-              style={{ rotate: "90deg" }}
-              size={3}
-              tabIndex={0}
-            />{" "}
-            <Checkbox
-              name={`checkbox-${valueSetType}`}
-              className={styles.valueSetTemplate__checkbox}
-              label={valueSetType}
-              onChange={(e) => {
-                e.stopPropagation();
-                handleCheckboxToggle(valueSetType, conditionId);
-              }}
-              id={`${conditionId}-${valueSetType}`}
-              checked={selected == total && selected > 0}
-              disabled={selected == 0}
-            />
-          </div>
-          <div>{`${selected} / ${total}`}</div>
+        <div
+          className={styles.valueSetTemplate__accordionContainer}
+          key={`${valueSetType}-${conditionId}`}
+        >
+          <Accordion
+            title={
+              <SelectionViewAccordionHeader
+                valueSetType={valueSetType}
+                conditionId={conditionId}
+                valueSets={valueSetsForType}
+                handleCheckboxToggle={handleCheckboxToggle}
+              />
+            }
+            content={
+              <SelectionViewAccordionBody
+                valueSetType={valueSetType}
+                conditionId={conditionId}
+                selected={selected}
+                total={total}
+                title=""
+                content={""}
+                handleCheckboxToggle={handleCheckboxToggle}
+              />
+            }
+            expanded={false}
+            id={`${valueSetType}-${conditionId}`}
+            key={`${valueSetType}-${conditionId}`}
+            accordionClassName={styles.accordionInnerWrapper}
+            containerClassName={styles.accordionContainer}
+          />
         </div>
       );
     }
   );
   return <div>{ValueSetAccordionItem}</div>;
 }
+const calculateTotals = (valueSets: ValueSetsByGroup, valueSetType: string) => {
+  const valueSetsByGroup =
+    valueSets[valueSetType.toLocaleLowerCase() as keyof ValueSetsByGroup];
+
+  const total = valueSetsByGroup && Object.keys(valueSetsByGroup).length;
+  let selected =
+    valueSetsByGroup &&
+    Object.values(valueSetsByGroup).filter((vs) => {
+      return vs.items.filter((obj) => obj.includeValueSet == true);
+    }).length;
+
+  return {
+    total,
+    selected,
+  };
+};
