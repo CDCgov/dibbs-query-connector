@@ -56,14 +56,14 @@ test.describe("querying with the Query Connector", () => {
     await page
       .getByRole("row")
       .filter({ hasText: "azithromycin 1000 MG" })
-      .getByRole("img")
-      .click();
+      .getByRole("checkbox")
+      .check();
     await expect(page.getByText("3 of 4 selected")).toBeVisible();
     await page
       .getByRole("row")
       .filter({ hasText: "ceftriaxone 500 MG Injection" })
-      .getByRole("img")
-      .click();
+      .getByRole("checkbox")
+      .check();
     await expect(page.getByText("2 of 4 selected")).toBeVisible();
     await page.getByRole("button", { name: "Apply changes" }).click();
     await expect(
@@ -124,8 +124,8 @@ test.describe("querying with the Query Connector", () => {
     await page.getByRole("link", { name: "Medications" }).click();
     await page
       .getByRole("button", { name: "Chlamydia Medication" })
-      .getByRole("img")
-      .click();
+      .getByRole("checkbox")
+      .check();
     await expect(page.getByText("0 of 4 selected")).toBeVisible();
 
     await page.getByRole("button", { name: "Apply changes" }).click();
@@ -182,8 +182,8 @@ test.describe("querying with the Query Connector", () => {
     for (let i = 1; i < 6; i++) {
       const row = obsRows.nth(i);
       const typeText = await row.locator("td").nth(1).textContent();
-      const presentKey = acceptableSdohKeywords.find((key) =>
-        typeText?.toLowerCase().includes(key),
+      const presentKey = acceptableSdohKeywords.find(
+        (key) => typeText?.toLowerCase().includes(key),
       );
       expect(presentKey).toBeDefined();
       expect(typeText?.includes("chlamydia")).toBeFalsy();
