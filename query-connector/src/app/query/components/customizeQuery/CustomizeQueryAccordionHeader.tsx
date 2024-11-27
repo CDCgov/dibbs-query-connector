@@ -1,4 +1,3 @@
-import { Icon } from "@trussworks/react-uswds";
 import styles from "./customizeQuery.module.css";
 import { GroupedValueSet } from "./customizeQueryUtils";
 import CustomizeQueryCheckbox from "./vanityCheckbox/CustomizeQueryCheckbox";

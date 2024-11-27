@@ -19,6 +19,8 @@ export type CheckboxProps = {
  * @param root0.className Optional styling classes
  * @param root0.onClick Event listener for checkbox click
  * @param root0.checked Boolean indicating whether the checkbox is checked
+ * @param root0.onChange - Event listener for checkbox change. Use this one
+ * over onClick if the component is controlled (ie checked is passed in)
  * @returns A checkbox styled according to our design system
  */
 const Checkbox: React.FC<CheckboxProps> = ({

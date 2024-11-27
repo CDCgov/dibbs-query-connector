@@ -7,25 +7,28 @@ import styles from "./checkbox.module.css";
 type VanityCheckboxProps = CheckboxProps & {
   isHeader?: boolean;
 };
+/**
+ * Vanity component wrapper around the checkbox component for the query customization
+ * checkboxes
+ * @param root0
+ * @param root0.id - ID for checkbox
+ * @param root0.checked - whether the checkbox is checked
+ * @param root0.onChange - handler for when the checkbox is clicked
+ * @param root0.isHeader - whether the checkbox is in the header
+ * @returns A checkbox for the customize query page
+ */
 const CustomizeQueryCheckbox: React.FC<VanityCheckboxProps> = ({
   id,
-  label,
   checked,
   onChange,
-  className,
   isHeader,
 }) => {
   return (
     <Checkbox
       id={id}
-      label={label}
       checked={checked}
       onChange={onChange}
-      className={classNames(
-        className,
-        styles.vanity,
-        isHeader ? styles.vanityHeader : "",
-      )}
+      className={classNames(styles.vanity, isHeader ? styles.vanityHeader : "")}
     />
   );
 };
