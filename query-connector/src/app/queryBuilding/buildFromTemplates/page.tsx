@@ -8,12 +8,14 @@ import { useEffect, useRef, useState } from "react";
 import { getConditionsData } from "@/app/database-service";
 import {
   CategoryNameToConditionOptionMap,
+  ConditionIdToValueSetArray,
   mapFetchedDataToFrontendStructure,
 } from "../utils";
 import { ConditionSelection } from "../components/ConditionSelection";
 import { ValueSetSelection } from "../components/ValueSetSelection";
 import SiteAlert from "@/app/query/designSystem/SiteAlert";
 import { BuildStep } from "../../constants";
+import LoadingView from "../../query/components/LoadingView";
 
 export type FormError = {
   queryName: boolean;
@@ -28,6 +30,7 @@ export default function QueryTemplateSelection() {
   const router = useRouter();
   const focusRef = useRef<HTMLInputElement | null>(null);
   const [buildStep, setBuildStep] = useState<BuildStep>("condition");
+  const [loading, setLoading] = useState<boolean>(false);
 
   const [queryName, setQueryName] = useState<string>("");
   const [fetchedConditions, setFetchedConditions] =
@@ -38,6 +41,8 @@ export default function QueryTemplateSelection() {
     queryName: false,
     selectedConditions: false,
   });
+  const [conditionValueSets, setConditionValueSets] =
+    useState<ConditionIdToValueSetArray>();
 
   useEffect(() => {
     let isSubscribed = true;
@@ -172,6 +177,9 @@ export default function QueryTemplateSelection() {
               setFormError={setFormError}
               formError={formError}
               validateForm={validateForm}
+              loading={loading}
+              setLoading={setLoading}
+              setConditionValueSets={setConditionValueSets}
             />
           )}
           {/* Step Two: Select Conditions */}
@@ -179,13 +187,12 @@ export default function QueryTemplateSelection() {
             <ValueSetSelection
               setBuildStep={setBuildStep}
               queryName={queryName}
-              fetchedConditions={fetchedConditions ?? {}}
               selectedConditions={selectedConditions ?? {}}
-              setFetchedConditions={setFetchedConditions}
-              setSelectedConditions={setSelectedConditions}
+              valueSetsByCondition={conditionValueSets ?? {}}
             />
           )}
         </div>
+        {loading && <LoadingView loading={loading} />}
       </div>
     </>
   );

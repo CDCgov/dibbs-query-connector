@@ -32,6 +32,15 @@ select q.query_name, q.id, qtv.valueset_id, vs.name as valueset_name, vs.oid as 
   where q.query_name = $1;
 `;
 
+const getValueSetsByConditionId = `
+SELECT c.display, c.code_system, c.code, vs.name as valueset_name, vs.id as valueset_id, vs.oid as valueset_external_id, vs.version, vs.author as author, vs.type, vs.dibbs_concept_type as dibbs_concept_type    
+  FROM valuesets vs 
+  LEFT JOIN condition_to_valueset ctvs on vs.id = ctvs.valueset_id 
+  LEFT JOIN valueset_to_concept vstc on vs.id = vstc.valueset_id
+  LEFT JOIN concepts c on vstc.concept_id = c.id
+  WHERE ctvs.condition_id = $1;
+`;
+
 // Load environment variables from .env and establish a Pool configuration
 const dbConfig: PoolConfig = {
   connectionString: process.env.DATABASE_URL,
@@ -40,6 +49,33 @@ const dbConfig: PoolConfig = {
   connectionTimeoutMillis: 2000, // Wait this long before timing out when connecting new client
 };
 const dbClient = new Pool(dbConfig);
+
+
+
+
+/**
+ * Executes a search for a ValueSets and Concepts against the Postgres
+ * Database, using the ID of the condition associated with any such data.
+ * @param id The id of an entry in the conditions table
+ * @returns One or more rows from the DB matching the requested saved query,
+ * or an error if no results can be found.
+ */
+export const getValueSetsAndConceptsByConditionID = async (id: string) => {
+  const values = [id]
+
+  try {
+    const result = await dbClient.query(getValueSetsByConditionId, values);
+    if (result.rows.length === 0) {
+      console.error("No results found for Condition", id)
+      return [];
+    }
+    return result.rows;
+
+  } catch (error) {
+    console.error("Error retrieving value sets and concepts for condition", error);
+    throw error;
+  }
+}
 
 /**
  * Executes a search for a CustomQuery against the query-loaded Postgres

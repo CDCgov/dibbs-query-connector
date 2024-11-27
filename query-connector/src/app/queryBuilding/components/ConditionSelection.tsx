@@ -4,15 +4,22 @@ import styles from "../buildFromTemplates/buildfromTemplate.module.scss";
 import { Button } from "@trussworks/react-uswds";
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import classNames from "classnames";
-import { getConditionsData } from "@/app/database-service";
+import {
+  getConditionsData,
+  getValueSetsAndConceptsByConditionID,
+} from "@/app/database-service";
 import {
   CategoryNameToConditionOptionMap,
   mapFetchedDataToFrontendStructure,
+  ConditionIdToValueSetArray,
 } from "../utils";
 import ConditionColumnDisplay from "../buildFromTemplates/ConditionColumnDisplay";
 import SearchField from "@/app/query/designSystem/searchField/SearchField";
 import { BuildStep } from "@/app/constants";
 import { FormError } from "../buildFromTemplates/page";
+
+import { ValueSet } from "@/app/constants";
+import { mapQueryRowsToValueSets } from "@/app/database-service";
 
 type ConditionSelectionProps = {
   fetchedConditions: CategoryNameToConditionOptionMap;
@@ -29,6 +36,11 @@ type ConditionSelectionProps = {
   validateForm: () => void;
   setFormError: Dispatch<SetStateAction<FormError>>;
   formError: FormError;
+  setLoading: Dispatch<SetStateAction<boolean>>;
+  loading: boolean;
+  setConditionValueSets: Dispatch<
+    SetStateAction<ConditionIdToValueSetArray | undefined>
+  >;
 };
 
 /**
@@ -46,6 +58,10 @@ type ConditionSelectionProps = {
  * @param root0.formError - indicates missing or incorrect form data
  * @param root0.setFormError - state function that updates the status of the
  * condition selection form input data
+ * @param root0.loading -  Boolean to track loading state
+ * @param root0.setLoading - The function to set the loading state
+ * @param root0.setConditionValueSets - state function that updates the status of the
+ * condition selection form input data
  * @returns A component for display to redner on the query building page
  */
 export const ConditionSelection: React.FC<ConditionSelectionProps> = ({
@@ -58,6 +74,9 @@ export const ConditionSelection: React.FC<ConditionSelectionProps> = ({
   validateForm,
   formError,
   setFormError,
+  loading,
+  setConditionValueSets,
+  setLoading,
 }) => {
   const focusRef = useRef<HTMLInputElement | null>(null);
 
@@ -86,13 +105,40 @@ export const ConditionSelection: React.FC<ConditionSelectionProps> = ({
     };
   }, []);
 
-  function handleCreateQueryClick(event: React.MouseEvent<HTMLButtonElement>) {
-    event.preventDefault();
+  async function getValueSetsForSelectedConditions() {
+    const conditionIds = Object.entries(selectedConditions)
+      .map(([_, conditionObj]) => {
+        return Object.keys(conditionObj);
+      })
+      .flatMap((ids) => ids);
 
+    const ConditionValueSets: ConditionIdToValueSetArray = {};
+
+    for (const id of conditionIds) {
+      const result: ValueSet[] = await getValueSetsAndConceptsByConditionID(id);
+
+      const results = await mapQueryRowsToValueSets(result);
+      // when fetching directly from table (as opposed to saved query), default to including all value sets
+      results.forEach((result) => (result.includeValueSet = true));
+      ConditionValueSets[id] = results;
+    }
+
+    return ConditionValueSets;
+  }
+
+  async function handleCreateQueryClick(
+    event: React.MouseEvent<HTMLButtonElement>
+  ) {
+    event.preventDefault();
+    setLoading(true);
     validateForm();
     if (!!queryName && !formError.queryName && !formError.selectedConditions) {
-      // continue to next page
+      // fetch valuesets for selected conditions
+      const valueSets = await getValueSetsForSelectedConditions();
+
+      setConditionValueSets(valueSets);
       setBuildStep("valueset");
+      setLoading(false);
     }
   }
 
@@ -108,7 +154,7 @@ export const ConditionSelection: React.FC<ConditionSelectionProps> = ({
         <Button
           className="margin-0"
           type={"button"}
-          disabled={formError.selectedConditions || !queryName}
+          disabled={formError.selectedConditions || !queryName || loading}
           title={
             formError.selectedConditions || formError.queryName
               ? "Enter a query name and condition"

@@ -74,9 +74,23 @@
   width: 88%;
   border-radius: 8px;
   margin-left: 0.5rem;
+  min-height: 50rem;
 }
+
 .valueSetTemplate__search {
   padding: 1.5rem;
+  border-bottom: 1px #dfe1e2 solid;
+}
+
+.valueSetTemplate__accordion {
+  display: flex;
+  justify-content: space-between;
+  word-wrap: break-word;
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+  background-color: #f7f9fa;
+  padding: 1rem 1.5rem;
   border-bottom: 1px #dfe1e2 solid;
 }
 
@@ -112,11 +126,32 @@
   }
 
   .conditionCard {
-    background: white;
+    background: transparent;
     border-radius: 4px;
     padding: 1rem;
     line-height: 22px;
     margin-top: 0.5rem;
     color: #111111;
+    cursor: pointer;
   }
+
+  .active {
+    background: #ffffff;
+  }
+}
+
+.valueSetTemplate__toggleRowHeader {
+  display: flex;
+  align-items: center;
+  margin: 0.5rem 0;
+  width: 406px;
+}
+
+.valueSetTemplate__checkbox {
+  margin-left: 6.5px;
+}
+.valueSetTemplate__checkbox label {
+  margin-top: 0 !important;
+  padding-left: 2.25rem;
+  background-color: #f7f9fa;
 }

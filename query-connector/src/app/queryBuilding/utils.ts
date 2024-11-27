@@ -1,3 +1,6 @@
+import { ValueSet } from "../constants";
+import { GroupedValueSet } from '../query/components/customizeQuery/customizeQueryUtils';
+
 // The structure of the data that's coming from the backend
 export type ConditionIdToNameMap = {
   [conditionId: string]: string;
@@ -6,6 +9,25 @@ export type CategoryToConditionArrayMap = {
   [categoryName: string]: ConditionIdToNameMap[];
 };
 
+export type ConditionIdToValueSetArray = {
+  [conditionId: string]: ValueSet[]
+}
+
+export type ValueSetsByGroup = {
+  labs: {
+    [name: string]: GroupedValueSet;
+  };
+  medications: {
+    [name: string]: GroupedValueSet;
+  };
+  conditions: {
+    [name: string]: GroupedValueSet;
+  };
+};
+
+export type ConditionToValueSetMap = {
+  [conditionId: string]: ValueSetsByGroup;
+};
 // The transform structs for use on the frontend, which is a grandparent - parent
 // - child mapping from category (indexed by name) - conditions (indexed by condition ID)
 // and - condition option (name and whether to include it in the query we're building).
