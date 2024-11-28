@@ -66,7 +66,7 @@
   flex-direction: row;
   min-width: 18rem;
   justify-content: space-between;
-  padding: 1rem 0.5rem !important;
+  padding: 0.5rem !important;
 }
 
 .valueSetTemplate__right {
@@ -96,6 +96,10 @@
 
 .accordionContainer {
   width: 100%;
+}
+
+.accordionInnerWrapper > div {
+  padding: 0 !important;
 }
 
 .accordionHeaderWrapper {
@@ -150,7 +154,7 @@
 .conditionList {
   display: flex;
   flex-direction: column;
-  padding: 1rem 0.5rem;
+  padding: 0.5rem;
   width: 100%;
 
   .controls {
@@ -214,4 +218,42 @@
   font-weight: 700;
   font-size: 18px;
   text-transform: capitalize;
+}
+
+.accordionBodyExpanded {
+  padding: 1rem 1.5rem 0 3.5rem;
+  background-color: #fff;
+  display: flex;
+  justify-content: space-between;
+}
+
+.accordionExpandedInner {
+  border-bottom: solid 1px #dfe1e2;
+  padding-bottom: 1rem;
+  width: 100%;
+
+  .valueSetTemplate__checkbox {
+    margin: 0 !important;
+  }
+}
+
+.expandedContent {
+  background-color: #fff;
+  font-size: 1rem;
+  font-weight: 400;
+}
+
+.expandedContent > div {
+  text-transform: none !important;
+  white-space: nowrap;
+  padding-right: 1rem;
+}
+
+.vsName {
+  color: #111111;
+}
+
+.vsDetails {
+  color: #919191;
+  display: flex;
 }

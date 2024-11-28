@@ -1,14 +1,11 @@
 "use client";
 
 import styles from "../buildFromTemplates/buildfromTemplate.module.scss";
-import SelectionViewAccordionBody from "./SelectionViewAccordionBody";
-
 import { ValueSetsByGroup, ConditionToValueSetMap } from "../utils";
-// import formatIdForAnchorTag from "../../query/components/resultsView/ResultsViewTable";
-// import SelectionViewAccordionBody from "./SelectionViewAccordionBody";
 import { DibbsValueSetType } from "@/app/constants";
 import Accordion from "../../query/designSystem/Accordion";
 import SelectionViewAccordionHeader from "./SelectionViewAccordionHeader";
+import SelectionViewAccordionBody from "./SelectionViewAccordionBody";
 
 type SelectionTableProps = {
   conditionId: string;
@@ -50,10 +47,8 @@ function renderValueSetAccordions(
 
   const ValueSetAccordionItem = Object.values(types).map(
     function (valueSetType) {
-      const total = calculateTotals(valueSets, valueSetType).total;
-      const selected = calculateTotals(valueSets, valueSetType).selected;
       const valueSetsForType = Object.values(valueSets[valueSetType]);
-
+      console.log(valueSetsForType);
       return (
         <div
           className={styles.valueSetTemplate__accordionContainer}
@@ -71,12 +66,8 @@ function renderValueSetAccordions(
             content={
               <SelectionViewAccordionBody
                 valueSetType={valueSetType}
-                conditionId={conditionId}
-                selected={selected}
-                total={total}
-                title=""
-                content={""}
                 handleCheckboxToggle={handleCheckboxToggle}
+                valueSets={valueSetsForType}
               />
             }
             expanded={false}
@@ -91,19 +82,3 @@ function renderValueSetAccordions(
   );
   return <div>{ValueSetAccordionItem}</div>;
 }
-const calculateTotals = (valueSets: ValueSetsByGroup, valueSetType: string) => {
-  const valueSetsByGroup =
-    valueSets[valueSetType.toLocaleLowerCase() as keyof ValueSetsByGroup];
-
-  const total = valueSetsByGroup && Object.keys(valueSetsByGroup).length;
-  let selected =
-    valueSetsByGroup &&
-    Object.values(valueSetsByGroup).filter((vs) => {
-      return vs.items.filter((obj) => obj.includeValueSet == true);
-    }).length;
-
-  return {
-    total,
-    selected,
-  };
-};

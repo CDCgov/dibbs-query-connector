@@ -164,7 +164,9 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
         <div className={styles.valueSetTemplate__left}>
           <div className={styles.conditionList}>
             <div className={styles.controls}>
-              <div className={styles.conditionsTitle}>Conditions</div>
+              <div className={styles.conditionsTitle}>
+                {"Conditions".toLocaleUpperCase()}
+              </div>
               <div
                 className={styles.addCondition}
                 role="button"
