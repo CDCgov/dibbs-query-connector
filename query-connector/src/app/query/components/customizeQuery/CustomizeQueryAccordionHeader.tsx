@@ -36,16 +36,14 @@ const CustomizeQueryAccordionHeader: React.FC<CustomizeQueryAccordionProps> = ({
     <div
       className={`${styles.accordionHeader} display-flex flex-no-wrap flex-align-start customize-query-header`}
     >
-      <div id="select-all">
-        <CustomizeQueryCheckbox
-          id={group.valueSetName}
-          checked={selectedCount === selectedTotal}
-          isHeader
-          onChange={() => {
-            handleSelectAllChange(groupIndex, selectedCount !== selectedTotal);
-          }}
-        />
-      </div>
+      <CustomizeQueryCheckbox
+        id={group.valueSetName}
+        checked={selectedCount === selectedTotal}
+        isHeader
+        onChange={() => {
+          handleSelectAllChange(groupIndex, selectedCount !== selectedTotal);
+        }}
+      />
       <div className={`${styles.accordionButtonTitle}`}>
         {`${group.valueSetName}`}
 
