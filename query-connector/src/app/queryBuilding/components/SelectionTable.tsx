@@ -1,15 +1,17 @@
 "use client";
-
+import { useEffect } from "react";
 import styles from "../buildFromTemplates/buildfromTemplate.module.scss";
-import { ValueSetsByGroup, ConditionToValueSetMap } from "../utils";
+import { ValueSetsByGroup, batchSelectConcepts } from "../utils";
 import { DibbsValueSetType } from "@/app/constants";
 import Accordion from "../../query/designSystem/Accordion";
 import SelectionViewAccordionHeader from "./SelectionViewAccordionHeader";
 import SelectionViewAccordionBody from "./SelectionViewAccordionBody";
+import { ValueSet } from "@/app/constants";
+import { GroupedValueSet } from "@/app/query/components/customizeQuery/customizeQueryUtils";
 
 type SelectionTableProps = {
   conditionId: string;
-  valueSets: ConditionToValueSetMap;
+  valueSets: ValueSetsByGroup;
 };
 
 // * @param root0.conditionId - ID of the active/selected condition
@@ -26,27 +28,44 @@ export const SelectionTable: React.FC<SelectionTableProps> = ({
   conditionId,
   valueSets,
 }) => {
+  useEffect(() => {});
+
   return (
     <div data-testid="accordion" className={""}>
-      {renderValueSetAccordions(conditionId, valueSets[conditionId])}
+      {renderValueSetAccordions(conditionId, valueSets)}
     </div>
   );
 };
+
+function toggleVSConceptCheckboxes(items: ValueSet[], setTo: boolean) {
+  items.forEach((item) => {
+    batchSelectConcepts(item, setTo);
+  });
+  return items;
+}
 
 function renderValueSetAccordions(
   conditionId: string,
   valueSets: ValueSetsByGroup
 ) {
-  const handleCheckboxToggle = (valueSetType: string, conditionId: string) => {
+  const handleCheckboxToggle = (
+    valueSetType: DibbsValueSetType,
+    conditionId: string
+  ) => {
     console.log(
+      valueSets[valueSetType],
       `placeholder: deselect all child values (${valueSetType}) for condition ID: ${conditionId}`
     );
   };
+
   const types = Object.keys(valueSets) as Array<DibbsValueSetType>;
 
   const ValueSetAccordionItem = Object.values(types).map(
     function (valueSetType) {
-      const valueSetsForType = Object.values(valueSets[valueSetType]);
+      const valueSetsForType: GroupedValueSet[] = Object.values(
+        valueSets[valueSetType]
+      );
+
       return (
         <div
           className={styles.valueSetTemplate__accordionContainer}
@@ -78,5 +97,6 @@ function renderValueSetAccordions(
       );
     }
   );
+
   return <div>{ValueSetAccordionItem}</div>;
 }

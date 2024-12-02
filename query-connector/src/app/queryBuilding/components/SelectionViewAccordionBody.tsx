@@ -3,12 +3,16 @@ import styles from "../buildFromTemplates/buildfromTemplate.module.scss";
 import { GroupedValueSet } from "@/app/query/components/customizeQuery/customizeQueryUtils";
 import { formatDiseaseDisplay } from "../utils";
 import { tallyConceptsForSingleValueSet } from "../utils";
+import { DibbsValueSetType } from "@/app/constants";
 
 type SelectionViewAccordionBodyProps = {
   id?: string;
-  valueSetType: string;
+  valueSetType: DibbsValueSetType;
   valueSets: GroupedValueSet[];
-  handleCheckboxToggle: (valueSetType: string, conditionId: string) => void;
+  handleCheckboxToggle: (
+    valueSetType: DibbsValueSetType,
+    conditionId: string
+  ) => void;
 };
 
 /**
@@ -47,7 +51,7 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
                 // disabled={selectedCount == 0}
               />{" "}
             </div>
-            <div>
+            <div className={styles.accordionBodyExpanded__right}>
               {selectedCount}/{totalCount}
             </div>
           </div>

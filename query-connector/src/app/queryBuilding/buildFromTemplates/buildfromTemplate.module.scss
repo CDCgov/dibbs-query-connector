@@ -207,6 +207,7 @@
 .valueSetTemplate__toggleRowHeader > svg {
   color: black;
 }
+
 .valueSetTemplate__checkbox {
   margin-left: 6.5px;
 }
@@ -225,6 +226,17 @@
   background-color: #fff;
   display: flex;
   justify-content: space-between;
+
+  .valueSetTemplate__checkbox label {
+    background-color: #fff;
+  }
+}
+div.accordionBodyExpanded:last-of-type {
+  border-bottom: 1px #dfe1e2 solid;
+
+  .accordionExpandedInner {
+    border-bottom: none !important;
+  }
 }
 
 .accordionExpandedInner {
@@ -245,7 +257,6 @@
 
 .expandedContent > div {
   text-transform: none !important;
-  white-space: nowrap;
   padding-right: 1rem;
 }
 
@@ -256,4 +267,10 @@
 .vsDetails {
   color: #919191;
   display: flex;
+}
+
+.accordionBodyExpanded__right {
+  padding-bottom: 1rem;
+  display: flex;
+  align-items: center;
 }

@@ -2,12 +2,16 @@ import styles from "../buildFromTemplates/buildfromTemplate.module.scss";
 import { Checkbox, Icon } from "@trussworks/react-uswds";
 import { GroupedValueSet } from "@/app/query/components/customizeQuery/customizeQueryUtils";
 import { tallyConcpetsForValueSetGroup } from "../utils";
+import { DibbsValueSetType } from "@/app/constants";
 
 type SelectionViewAccordionBodyProps = {
-  valueSetType: string;
+  valueSetType: DibbsValueSetType;
   conditionId: string;
   valueSets: GroupedValueSet[] | null;
-  handleCheckboxToggle: (valueSetType: string, conditionId: string) => void;
+  handleCheckboxToggle: (
+    valueSetType: DibbsValueSetType,
+    conditionId: string
+  ) => void;
 };
 
 /**

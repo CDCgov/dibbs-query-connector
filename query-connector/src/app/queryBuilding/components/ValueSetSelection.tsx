@@ -34,15 +34,6 @@ type ConditionSelectionProps = {
   valueSetsByCondition: ConditionIdToValueSetArray;
 };
 
-// const renderSelectionTable = (
-//   activeCondition: string,
-//   valueSets: ValueSetsByGroup
-// ) => {
-//   return (
-//     <SelectionTable conditionId={activeCondition ?? ""} valueSets={valueSets} />
-//   );
-// };
-
 /**
  * Display component for a condition on the query building page
  * @param root0 - params
@@ -217,7 +208,7 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
             {valueSets && (
               <SelectionTable
                 conditionId={activeCondition ?? ""}
-                valueSets={valueSets}
+                valueSets={valueSets[activeCondition]}
               />
             )}
           </div>
