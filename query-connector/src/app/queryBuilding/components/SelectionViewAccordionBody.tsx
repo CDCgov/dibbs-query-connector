@@ -2,6 +2,7 @@ import { Checkbox } from "@trussworks/react-uswds";
 import styles from "../buildFromTemplates/buildfromTemplate.module.scss";
 import { GroupedValueSet } from "@/app/query/components/customizeQuery/customizeQueryUtils";
 import { formatDiseaseDisplay } from "../utils";
+import { tallyConceptsForSingleValueSet } from "../utils";
 
 type SelectionViewAccordionBodyProps = {
   id?: string;
@@ -25,26 +26,31 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
   return (
     <div>
       {valueSets.map((vs) => {
+        const selectedCount = tallyConceptsForSingleValueSet(vs, true);
+        const totalCount = tallyConceptsForSingleValueSet(vs, false);
         return (
-          <>
-            <div className={styles.accordionBodyExpanded} key={valueSetType}>
-              <div className={styles.accordionExpandedInner}>
-                <Checkbox
-                  name={`checkbox-${vs.valueSetName}`}
-                  className={styles.valueSetTemplate__checkbox}
-                  label={checkboxLabel(vs.valueSetName, vs.author, vs.system)}
-                  onChange={(e) => {
-                    e.stopPropagation();
-                    // handleCheckboxToggle(valueSetType, conditionId);
-                  }}
-                  id={`${vs.valueSetName}-${valueSetType}`}
-                  checked={true}
-                  // disabled={selectedCount == 0}
-                />{" "}
-              </div>
-              <div>1/1</div>
+          <div
+            className={styles.accordionBodyExpanded}
+            key={`${valueSetType}-${vs.valueSetName}`}
+          >
+            <div className={styles.accordionExpandedInner}>
+              <Checkbox
+                name={`checkbox-${vs.valueSetName}`}
+                className={styles.valueSetTemplate__checkbox}
+                label={checkboxLabel(vs.valueSetName, vs.author, vs.system)}
+                onChange={(e) => {
+                  e.stopPropagation();
+                  // handleCheckboxToggle(valueSetType, conditionId);
+                }}
+                id={`${vs.valueSetName}-${valueSetType}`}
+                checked={true}
+                // disabled={selectedCount == 0}
+              />{" "}
             </div>
-          </>
+            <div>
+              {selectedCount}/{totalCount}
+            </div>
+          </div>
         );
       })}
     </div>

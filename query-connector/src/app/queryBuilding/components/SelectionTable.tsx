@@ -42,13 +42,11 @@ function renderValueSetAccordions(
       `placeholder: deselect all child values (${valueSetType}) for condition ID: ${conditionId}`
     );
   };
-
   const types = Object.keys(valueSets) as Array<DibbsValueSetType>;
 
   const ValueSetAccordionItem = Object.values(types).map(
     function (valueSetType) {
       const valueSetsForType = Object.values(valueSets[valueSetType]);
-      console.log(valueSetsForType);
       return (
         <div
           className={styles.valueSetTemplate__accordionContainer}

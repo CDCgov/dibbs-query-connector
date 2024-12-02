@@ -12,6 +12,7 @@ import {
   CategoryNameToConditionOptionMap,
   mapFetchedDataToFrontendStructure,
   ConditionIdToValueSetArray,
+  setIncludeAll,
 } from "../utils";
 import ConditionColumnDisplay from "../buildFromTemplates/ConditionColumnDisplay";
 import SearchField from "@/app/query/designSystem/searchField/SearchField";
@@ -115,12 +116,17 @@ export const ConditionSelection: React.FC<ConditionSelectionProps> = ({
     const ConditionValueSets: ConditionIdToValueSetArray = {};
 
     for (const id of conditionIds) {
-      const result: ValueSet[] = await getValueSetsAndConceptsByConditionID(id);
+      const results: ValueSet[] =
+        await getValueSetsAndConceptsByConditionID(id);
 
-      const results = await mapQueryRowsToValueSets(result);
-      // when fetching directly from table (as opposed to saved query), default to including all value sets
-      results.forEach((result) => (result.includeValueSet = true));
-      ConditionValueSets[id] = results;
+      const formattedResults = await mapQueryRowsToValueSets(results);
+      // when fetching directly from conditions table (as opposed to a saved query),
+      // default to including all value sets
+      formattedResults.forEach((result) => {
+        setIncludeAll(result);
+        return (result.includeValueSet = true);
+      });
+      ConditionValueSets[id] = formattedResults;
     }
 
     return ConditionValueSets;

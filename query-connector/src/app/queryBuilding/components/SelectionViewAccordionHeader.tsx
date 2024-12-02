@@ -1,6 +1,7 @@
 import styles from "../buildFromTemplates/buildfromTemplate.module.scss";
 import { Checkbox, Icon } from "@trussworks/react-uswds";
 import { GroupedValueSet } from "@/app/query/components/customizeQuery/customizeQueryUtils";
+import { tallyConcpetsForValueSetGroup } from "../utils";
 
 type SelectionViewAccordionBodyProps = {
   valueSetType: string;
@@ -22,21 +23,10 @@ type SelectionViewAccordionBodyProps = {
 const SelectionViewAccordionHeader: React.FC<
   SelectionViewAccordionBodyProps
 > = ({ valueSetType, conditionId, valueSets, handleCheckboxToggle }) => {
-  const selectedTotal =
-    valueSets &&
-    valueSets.reduce((sum, vs) => {
-      sum += vs.items.length;
-      return sum;
-    }, 0);
-
   const selectedCount =
-    valueSets &&
-    valueSets.reduce((sum, vs) => {
-      vs.items.forEach((item) => {
-        if (item.includeValueSet) sum += 1;
-      });
-      return sum;
-    }, 0);
+    valueSets && tallyConcpetsForValueSetGroup(valueSets, true);
+  const totalCount =
+    valueSets && tallyConcpetsForValueSetGroup(valueSets, false);
 
   return (
     <>
@@ -58,7 +48,7 @@ const SelectionViewAccordionHeader: React.FC<
             id={`${conditionId}-${valueSetType}`}
             checked={
               !!selectedCount &&
-              selectedCount == selectedTotal &&
+              selectedCount == totalCount &&
               selectedCount > 0
             }
             disabled={selectedCount == 0}
@@ -66,7 +56,7 @@ const SelectionViewAccordionHeader: React.FC<
         </div>
         <div
           className={styles.accordionHeaderCount}
-        >{`${selectedCount} / ${selectedTotal}`}</div>
+        >{`${selectedCount} / ${totalCount}`}</div>
       </div>
     </>
   );

@@ -50,9 +50,6 @@ const dbConfig: PoolConfig = {
 };
 const dbClient = new Pool(dbConfig);
 
-
-
-
 /**
  * Executes a search for a ValueSets and Concepts against the Postgres
  * Database, using the ID of the condition associated with any such data.
