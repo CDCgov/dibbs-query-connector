@@ -29,7 +29,7 @@ export const fhirServers: Record<FHIR_SERVERS, FHIR_SERVER_CONFIG> = {
     init: {} as RequestInit,
   },
   "Local e2e HAPI Server: Direct": {
-    hostname: "http://localhost:8080/fhir",
+    hostname: "http://hapi-fhir-server:8080/fhir",
     init: {} as RequestInit,
   },
   "OpenEpic: eHealthExchange": configureEHX("OpenEpic"),
