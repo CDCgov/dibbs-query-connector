@@ -23,11 +23,6 @@ export type FormError = {
   selectedConditions: boolean;
 };
 
-export type FormError = {
-  queryName: boolean;
-  selectedConditions: boolean;
-};
-
 /**
  * The query building page
  * @returns the component for the query building page
@@ -73,7 +68,7 @@ export default function QueryTemplateSelection() {
 
       if (isSubscribed) {
         setFetchedConditions(
-          mapFetchedDataToFrontendStructure(categoryToConditionArrayMap),
+          mapFetchedDataToFrontendStructure(categoryToConditionArrayMap)
         );
       }
     }
@@ -88,7 +83,7 @@ export default function QueryTemplateSelection() {
   // ensures the fetchedConditions' checkbox statuses match
   // the data in selectedCondtiions
   function updateFetchedConditionIncludeStatus(
-    selectedConditions: CategoryNameToConditionOptionMap,
+    selectedConditions: CategoryNameToConditionOptionMap
   ) {
     const prevFetch = structuredClone(fetchedConditions);
     Object.entries(selectedConditions).map(
@@ -103,9 +98,9 @@ export default function QueryTemplateSelection() {
               };
               return setFetchedConditions(prevFetch);
             }
-          },
+          }
         );
-      },
+      }
     );
   }
 
