@@ -3,8 +3,10 @@
 import Backlink from "@/app/query/components/backLink/Backlink";
 import styles from "../buildFromTemplates/buildfromTemplate.module.scss";
 import { useRouter } from "next/navigation";
-import { Label, TextInput } from "@trussworks/react-uswds";
+import { Button, Label, TextInput } from "@trussworks/react-uswds";
 import { useEffect, useRef, useState } from "react";
+import classNames from "classnames";
+
 import { getConditionsData } from "@/app/database-service";
 import {
   CategoryNameToConditionOptionMap,
@@ -22,6 +24,11 @@ export type FormError = {
   selectedConditions: boolean;
 };
 
+export type FormError = {
+  queryName: boolean;
+  selectedConditions: boolean;
+};
+
 /**
  * The query building page
  * @returns the component for the query building page
@@ -31,7 +38,6 @@ export default function QueryTemplateSelection() {
   const focusRef = useRef<HTMLInputElement | null>(null);
   const [buildStep, setBuildStep] = useState<BuildStep>("condition");
   const [loading, setLoading] = useState<boolean>(false);
-
   const [queryName, setQueryName] = useState<string>("");
   const [fetchedConditions, setFetchedConditions] =
     useState<CategoryNameToConditionOptionMap>();
@@ -79,7 +85,7 @@ export default function QueryTemplateSelection() {
       isSubscribed = false;
     };
   }, [selectedConditions, queryName]);
-
+  
   // ensures the fetchedConditions' checkbox statuses match
   // the data in selectedCondtiions
   function updateFetchedConditionIncludeStatus(
@@ -108,7 +114,7 @@ export default function QueryTemplateSelection() {
     if (!queryName || queryName == "") {
       focusRef?.current?.focus();
     }
-
+      
     return setFormError({
       ...formError,
       ...{ queryName: !queryName, selectedConditions: !atLeastOneItemSelected },
@@ -139,6 +145,7 @@ export default function QueryTemplateSelection() {
             } else {
               router.push("/queryBuilding");
             }
+
           }}
           // TODO: tidy this too
           label={
@@ -147,6 +154,7 @@ export default function QueryTemplateSelection() {
               : "Back to My queries"
           }
         />
+
         <div className="customQuery__header">
           <h1 className={styles.queryTitle}>Custom query</h1>
           <Label htmlFor="queryNameInput" className="margin-top-0-important">
@@ -191,6 +199,7 @@ export default function QueryTemplateSelection() {
               valueSetsByCondition={conditionValueSets ?? {}}
             />
           )}
+
         </div>
         {loading && <LoadingView loading={loading} />}
       </div>

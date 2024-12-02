@@ -94,8 +94,9 @@ export const ConditionColumnDisplay: React.FC<ConditionColumnDisplayProps> = ({
     shouldRemove: boolean,
     category: string,
     conditionId: string,
-    prevFetch: CategoryNameToConditionOptionMap
-  ) => {
+    prevFetch: CategoryNameToConditionOptionMap,
+
+        ) => {
     if (shouldRemove) {
       delete selectedConditions[category][conditionId];
       // if there are no more entries for a given category, remove the category

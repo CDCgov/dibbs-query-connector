@@ -1,6 +1,11 @@
 "use server";
 import { Pool, PoolConfig, QueryResultRow } from "pg";
-import { Bundle, OperationOutcome, ValueSet as FhirValueSet } from "fhir/r4";
+import {
+  Bundle,
+  OperationOutcome,
+  ValueSet as FhirValueSet,
+  Parameters,
+} from "fhir/r4";
 import {
   Concept,
   ErsdConceptType,
@@ -21,6 +26,25 @@ import {
   CategoryToConditionArrayMap,
   ConditionIdToNameMap,
 } from "./queryBuilding/utils";
+import {
+  CategoryStruct,
+  ConceptStruct,
+  ConditionStruct,
+  ConditionToValueSetStruct,
+  dbInsertStruct,
+  insertCategorySql,
+  insertConceptSql,
+  insertConditionSql,
+  insertConditionToValuesetSql,
+  insertDefaultQueryLogicSql,
+  insertValueSetSql,
+  insertValuesetToConceptSql,
+  updatedCancerCategorySql,
+  updateErsdCategorySql,
+  updateNewbornScreeningCategorySql,
+  ValuesetStruct,
+  ValuesetToConceptStruct,
+} from "./seedSqlStructs";
 
 const getQuerybyNameSQL = `
 select q.query_name, q.id, qtv.valueset_id, vs.name as valueset_name, vs.oid as valueset_external_id, vs.version, vs.author as author, vs.type, vs.dibbs_concept_type as dibbs_concept_type, qic.concept_id, qic.include, c.code, c.code_system, c.display 
@@ -46,7 +70,7 @@ const dbConfig: PoolConfig = {
   connectionString: process.env.DATABASE_URL,
   max: 10, // Maximum # of connections in the pool
   idleTimeoutMillis: 30000, // A client must sit idle this long before being released
-  connectionTimeoutMillis: 2000, // Wait this long before timing out when connecting new client
+  connectionTimeoutMillis: 3000, // Wait this long before timing out when connecting new client
 };
 const dbClient = new Pool(dbConfig);
 
@@ -94,6 +118,24 @@ export const getSavedQueryByName = async (name: string) => {
     return result.rows;
   } catch (error) {
     console.error("Error retrieving query:", error);
+    throw error;
+  }
+};
+
+/**
+ * Utility function to execute the insertions into three query tables
+ * programmatically after the database has been seeded with initial
+ * conditions.
+ */
+export const executeDefaultQueryCreation = async () => {
+  try {
+    console.log("Executing default query linking script");
+    await dbClient.query(insertDefaultQueryLogicSql);
+    console.log(
+      "Default queries, queries to conditions, and query included concepts insertion complete",
+    );
+  } catch (error) {
+    console.error("Could not cross-index default queries", error);
     throw error;
   }
 };
@@ -150,7 +192,7 @@ export const mapQueryRowsToValueSets = async (rows: QueryResultRow[]) => {
 /*
  * The expected return type from both the eRSD API and the VSAC FHIR API.
  */
-type ErsdOrVsacResponse = Bundle | OperationOutcome;
+type ErsdOrVsacResponse = Bundle | Parameters | OperationOutcome;
 
 /**
  * Fetches the eRSD Specification from the eRSD API. This function requires an API key
@@ -187,14 +229,22 @@ export async function getERSD(
  * Metathesaurus License. See https://www.nlm.nih.gov/vsac/support/usingvsac/vsacfhirapi.html
  * for authentication instructions.
  * @param oid The OID whose value sets to retrieve.
+ * @param searchStructType Optionally, a flag to identify what type of
+ * search to perform, since VSAC can be used for value sets as well as conditions.
+ * @param codeSystem Optional parameter for use with condition querying.
  * @returns The value sets as a FHIR bundle, or an Operation Outcome if there is an error.
  */
 export async function getVSACValueSet(
   oid: string,
+  searchStructType: string = "valueset",
+  codeSystem?: string,
 ): Promise<ErsdOrVsacResponse> {
   const username: string = "apikey";
   const umlsKey: string = process.env.UMLS_API_KEY || "";
-  const vsacUrl: string = `https://cts.nlm.nih.gov/fhir/ValueSet/${oid}`;
+  const vsacUrl: string =
+    searchStructType === "valueset"
+      ? `https://cts.nlm.nih.gov/fhir/ValueSet/${oid}`
+      : `https://cts.nlm.nih.gov/fhir/CodeSystem/$lookup?system=${codeSystem}&code=${oid}`;
   const response = await fetch(vsacUrl, {
     method: "get",
     headers: new Headers({
@@ -328,25 +378,13 @@ function generateValueSetSqlPromise(vs: ValueSet) {
   // ValueSets are already uniquely identified by OID + V so this just allows
   // us to proceed with DB creation in the event a duplicate VS from another
   // group is pulled and loaded
-  const insertValueSetSql = `
-  INSERT INTO valuesets
-    VALUES($1,$2,$3,$4,$5,$6)
-    ON CONFLICT(id)
-    DO UPDATE SET
-      id = EXCLUDED.id,
-      oid = EXCLUDED.oid,
-      version = EXCLUDED.version,
-      name = EXCLUDED.name,
-      author = EXCLUDED.author,
-      type = EXCLUDED.type
-    RETURNING id;
-  `;
   const valuesArray = [
     valueSetUniqueId,
     valueSetOid,
     vs.valueSetVersion,
     vs.valueSetName,
     vs.author,
+    vs.dibbsConceptType,
     vs.dibbsConceptType,
   ];
 
@@ -366,19 +404,6 @@ function generateConceptSqlPromises(vs: ValueSet) {
 
     // Duplicate value set insertion is likely to percolate to the concept level
     // Apply the same logic of overwriting if unique keys are the same
-    const insertConceptSql = `
-    INSERT INTO concepts
-      VALUES($1,$2,$3,$4,$5,$6)
-      ON CONFLICT(id)
-      DO UPDATE SET
-        id = EXCLUDED.id,
-        code = EXCLUDED.code,
-        code_system = EXCLUDED.code_system,
-        display = EXCLUDED.display,
-        gem_formatted_code = EXCLUDED.gem_formatted_code,
-        version = EXCLUDED.version
-      RETURNING id;
-    `;
     const conceptInsertPromise = dbClient.query(insertConceptSql, [
       conceptUniqueId,
       concept.code,
@@ -403,17 +428,7 @@ function generateValuesetConceptJoinSqlPromises(vs: ValueSet) {
     // Last place to make an overwriting upsert adjustment
     // Even if the duplicate entries have the same data, PG will attempt to
     // insert another row, so just make that upsert the relationship
-    const insertJoinSql = `
-    INSERT INTO valueset_to_concept
-    VALUES($1,$2,$3)
-    ON CONFLICT(id)
-    DO UPDATE SET
-      id = EXCLUDED.id,
-      valueset_id = EXCLUDED.valueset_id,
-      concept_id = EXCLUDED.concept_id
-    RETURNING valueset_id, concept_id;
-    `;
-    const conceptInsertPromise = dbClient.query(insertJoinSql, [
+    const conceptInsertPromise = dbClient.query(insertValuesetToConceptSql, [
       `${vs.valueSetId}_${conceptUniqueId}`,
       vs.valueSetId,
       conceptUniqueId,
@@ -639,6 +654,100 @@ export async function getConditionsData() {
     conditionIdToNameMap,
   } as const;
 }
+
+/**
+ * Generic function for inserting a variety of different DB structures
+ * into the databse during seeding.
+ * @param structs An array of structures that's been extracted from a file.
+ * @param insertType The type of structure being inserted.
+ */
+export async function insertDBStructArray(
+  structs: dbInsertStruct[],
+  insertType: string,
+) {
+  const allStructPromises = structs.map((struct) => {
+    let structInsertSql: string = "";
+    let valuesToInsert: string[] = [];
+    if (insertType === "valuesets") {
+      structInsertSql = insertValueSetSql;
+      valuesToInsert = [
+        (struct as ValuesetStruct).id,
+        (struct as ValuesetStruct).oid,
+        (struct as ValuesetStruct).version,
+        (struct as ValuesetStruct).name,
+        (struct as ValuesetStruct).author,
+        (struct as ValuesetStruct).type,
+        (struct as ValuesetStruct).dibbs_concept_type,
+      ];
+    } else if (insertType === "concepts") {
+      structInsertSql = insertConceptSql;
+      valuesToInsert = [
+        (struct as ConceptStruct).id,
+        (struct as ConceptStruct).code,
+        (struct as ConceptStruct).code_system,
+        (struct as ConceptStruct).display,
+        INTENTIONAL_EMPTY_STRING_FOR_GEM_CODE,
+        (struct as ConceptStruct).version,
+      ];
+    } else if (insertType === "valueset_to_concept") {
+      structInsertSql = insertValuesetToConceptSql;
+      valuesToInsert = [
+        (struct as ValuesetToConceptStruct).id,
+        (struct as ValuesetToConceptStruct).valueset_id,
+        (struct as ValuesetToConceptStruct).concept_id,
+      ];
+    } else if (insertType === "conditions") {
+      structInsertSql = insertConditionSql;
+      valuesToInsert = [
+        (struct as ConditionStruct).id,
+        (struct as ConditionStruct).system,
+        (struct as ConditionStruct).name,
+        (struct as ConditionStruct).version,
+        (struct as ConditionStruct).category,
+      ];
+    } else if (insertType === "condition_to_valueset") {
+      structInsertSql = insertConditionToValuesetSql;
+      valuesToInsert = [
+        (struct as ConditionToValueSetStruct).id,
+        (struct as ConditionToValueSetStruct).condition_id,
+        (struct as ConditionToValueSetStruct).valueset_id,
+        (struct as ConditionToValueSetStruct).source,
+      ];
+    } else if (insertType === "category") {
+      structInsertSql = insertCategorySql;
+      valuesToInsert = [
+        (struct as CategoryStruct).condition_name,
+        (struct as CategoryStruct).condition_code,
+        (struct as CategoryStruct).category,
+      ];
+    }
+    const insertPromise = dbClient.query(structInsertSql, valuesToInsert);
+    return insertPromise;
+  });
+
+  const allStructsInserted = await Promise.allSettled(allStructPromises);
+  if (allStructsInserted.every((p) => p.status === "fulfilled")) {
+    console.log("All", insertType, "inserted");
+  } else {
+    console.error("Problem inserting ", insertType);
+  }
+}
+
+/**
+ * Helper function that execute the category data updates for inserted conditions.
+ */
+export const executeCategoryUpdates = async () => {
+  try {
+    console.log("Executing category data updates on inserted conditions");
+    await dbClient.query(updateErsdCategorySql);
+    await dbClient.query(updateNewbornScreeningCategorySql);
+    await dbClient.query(updatedCancerCategorySql);
+    await dbClient.query(`DROP TABLE category_data`);
+    console.log("All inserted queries cross-referenced with category data");
+  } catch (error) {
+    console.error("Could not update categories for inserted conditions", error);
+  }
+};
 
 /**
  * Fetches and structures custom user queries from the database.
