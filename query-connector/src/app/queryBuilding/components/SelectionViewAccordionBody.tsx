@@ -11,7 +11,7 @@ type SelectionViewAccordionBodyProps = {
   valueSets: GroupedValueSet[];
   handleCheckboxToggle: (
     valueSetType: DibbsValueSetType,
-    conditionId: string
+    conditionId: string,
   ) => void;
 };
 

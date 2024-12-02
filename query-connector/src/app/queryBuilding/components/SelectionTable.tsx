@@ -46,15 +46,15 @@ function toggleVSConceptCheckboxes(items: ValueSet[], setTo: boolean) {
 
 function renderValueSetAccordions(
   conditionId: string,
-  valueSets: ValueSetsByGroup
+  valueSets: ValueSetsByGroup,
 ) {
   const handleCheckboxToggle = (
     valueSetType: DibbsValueSetType,
-    conditionId: string
+    conditionId: string,
   ) => {
     console.log(
       valueSets[valueSetType],
-      `placeholder: deselect all child values (${valueSetType}) for condition ID: ${conditionId}`
+      `placeholder: deselect all child values (${valueSetType}) for condition ID: ${conditionId}`,
     );
   };
 
@@ -63,7 +63,7 @@ function renderValueSetAccordions(
   const ValueSetAccordionItem = Object.values(types).map(
     function (valueSetType) {
       const valueSetsForType: GroupedValueSet[] = Object.values(
-        valueSets[valueSetType]
+        valueSets[valueSetType],
       );
 
       return (
@@ -95,7 +95,7 @@ function renderValueSetAccordions(
           />
         </div>
       );
-    }
+    },
   );
 
   return <div>{ValueSetAccordionItem}</div>;

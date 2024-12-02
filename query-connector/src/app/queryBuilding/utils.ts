@@ -1,5 +1,5 @@
 import { ValueSet } from "../constants";
-import { GroupedValueSet } from '../query/components/customizeQuery/customizeQueryUtils';
+import { GroupedValueSet } from "../query/components/customizeQuery/customizeQueryUtils";
 
 // The structure of the data that's coming from the backend
 export type ConditionIdToNameMap = {
@@ -10,8 +10,8 @@ export type CategoryToConditionArrayMap = {
 };
 
 export type ConditionIdToValueSetArray = {
-  [conditionId: string]: ValueSet[]
-}
+  [conditionId: string]: ValueSet[];
+};
 
 export type ValueSetsByGroup = {
   labs: {
@@ -119,16 +119,16 @@ export function formatDiseaseDisplay(diseaseName: string) {
 
 /**
  * Utility method that returns the number of concepts associated
- * with a given value set, with the option to return only 
+ * with a given value set, with the option to return only
  * concepts marked as included
  * @param valueSet - the GroupedValueSet to run the tally on
  * @param filterInclude - boolean to indicate whether to only count
  * included concepts (defaults to false)
  * @returns A number indicating the tally of relevant concpets
  */
-export function tallyConceptsForSingleValueSet (
+export function tallyConceptsForSingleValueSet(
   valueSet: GroupedValueSet,
-  filterInclude?: boolean
+  filterInclude?: boolean,
 ) {
   const selectedTotal = valueSet.items.reduce((sum, vs) => {
     const includedConcepts = !!filterInclude
@@ -139,7 +139,7 @@ export function tallyConceptsForSingleValueSet (
   }, 0);
 
   return selectedTotal;
-};
+}
 
 /**
  * Utility method that returns the total number of concepts associated
@@ -150,13 +150,13 @@ export function tallyConceptsForSingleValueSet (
  * included concepts
  * @returns A number indicating the tally of relevant concpets
  */
-export function tallyConcpetsForValueSetGroup (
+export function tallyConcpetsForValueSetGroup(
   valueSets: GroupedValueSet[],
-  filterInclude?: boolean
+  filterInclude?: boolean,
 ) {
   const selectedTotal = valueSets.reduce((sum, valueSet) => {
-    const childTotal = tallyConceptsForSingleValueSet(valueSet, filterInclude)
-    sum += childTotal
+    const childTotal = tallyConceptsForSingleValueSet(valueSet, filterInclude);
+    sum += childTotal;
     return sum;
   }, 0);
   return selectedTotal;
@@ -174,5 +174,5 @@ export const batchSelectConcepts = (input: ValueSet, value: boolean) => {
     concept.include = value;
   });
 
-  return input
+  return input;
 };

@@ -95,7 +95,7 @@ export const ConditionSelection: React.FC<ConditionSelectionProps> = ({
 
       if (isSubscribed) {
         setFetchedConditions(
-          mapFetchedDataToFrontendStructure(categoryToConditionArrayMap)
+          mapFetchedDataToFrontendStructure(categoryToConditionArrayMap),
         );
       }
     }
@@ -133,7 +133,7 @@ export const ConditionSelection: React.FC<ConditionSelectionProps> = ({
   }
 
   async function handleCreateQueryClick(
-    event: React.MouseEvent<HTMLButtonElement>
+    event: React.MouseEvent<HTMLButtonElement>,
   ) {
     event.preventDefault();
     setLoading(true);
@@ -152,7 +152,7 @@ export const ConditionSelection: React.FC<ConditionSelectionProps> = ({
     <div
       className={classNames(
         "bg-gray-5 margin-top-4 ",
-        styles.conditionTemplateContainer
+        styles.conditionTemplateContainer,
       )}
     >
       <div className="display-flex flex-justify flex-align-end margin-bottom-3 width-full">
@@ -176,7 +176,7 @@ export const ConditionSelection: React.FC<ConditionSelectionProps> = ({
           id="conditionTemplateSearch"
           placeholder="Search conditions"
           className={classNames(
-            "maxw-mobile margin-x-auto margin-top-0 margin-bottom-4"
+            "maxw-mobile margin-x-auto margin-top-0 margin-bottom-4",
           )}
           onChange={(e) => {
             e.preventDefault();

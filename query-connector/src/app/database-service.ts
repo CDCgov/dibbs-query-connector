@@ -82,21 +82,23 @@ const dbClient = new Pool(dbConfig);
  * or an error if no results can be found.
  */
 export const getValueSetsAndConceptsByConditionID = async (id: string) => {
-  const values = [id]
+  const values = [id];
 
   try {
     const result = await dbClient.query(getValueSetsByConditionId, values);
     if (result.rows.length === 0) {
-      console.error("No results found for Condition", id)
+      console.error("No results found for Condition", id);
       return [];
     }
     return result.rows;
-
   } catch (error) {
-    console.error("Error retrieving value sets and concepts for condition", error);
+    console.error(
+      "Error retrieving value sets and concepts for condition",
+      error,
+    );
     throw error;
   }
-}
+};
 
 /**
  * Executes a search for a CustomQuery against the query-loaded Postgres

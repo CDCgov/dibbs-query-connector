@@ -3,9 +3,8 @@
 import Backlink from "@/app/query/components/backLink/Backlink";
 import styles from "../buildFromTemplates/buildfromTemplate.module.scss";
 import { useRouter } from "next/navigation";
-import { Button, Label, TextInput } from "@trussworks/react-uswds";
+import { Label, TextInput } from "@trussworks/react-uswds";
 import { useEffect, useRef, useState } from "react";
-import classNames from "classnames";
 
 import { getConditionsData } from "@/app/database-service";
 import {
@@ -74,7 +73,7 @@ export default function QueryTemplateSelection() {
 
       if (isSubscribed) {
         setFetchedConditions(
-          mapFetchedDataToFrontendStructure(categoryToConditionArrayMap)
+          mapFetchedDataToFrontendStructure(categoryToConditionArrayMap),
         );
       }
     }
@@ -85,11 +84,11 @@ export default function QueryTemplateSelection() {
       isSubscribed = false;
     };
   }, [selectedConditions, queryName]);
-  
+
   // ensures the fetchedConditions' checkbox statuses match
   // the data in selectedCondtiions
   function updateFetchedConditionIncludeStatus(
-    selectedConditions: CategoryNameToConditionOptionMap
+    selectedConditions: CategoryNameToConditionOptionMap,
   ) {
     const prevFetch = structuredClone(fetchedConditions);
     Object.entries(selectedConditions).map(
@@ -104,9 +103,9 @@ export default function QueryTemplateSelection() {
               };
               return setFetchedConditions(prevFetch);
             }
-          }
+          },
         );
-      }
+      },
     );
   }
 
@@ -114,7 +113,7 @@ export default function QueryTemplateSelection() {
     if (!queryName || queryName == "") {
       focusRef?.current?.focus();
     }
-      
+
     return setFormError({
       ...formError,
       ...{ queryName: !queryName, selectedConditions: !atLeastOneItemSelected },
@@ -145,7 +144,6 @@ export default function QueryTemplateSelection() {
             } else {
               router.push("/queryBuilding");
             }
-
           }}
           // TODO: tidy this too
           label={
@@ -199,7 +197,6 @@ export default function QueryTemplateSelection() {
               valueSetsByCondition={conditionValueSets ?? {}}
             />
           )}
-
         </div>
         {loading && <LoadingView loading={loading} />}
       </div>
