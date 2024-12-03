@@ -29,7 +29,7 @@ export const UserQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
 
   return (
     <div>
-      <div className="display-flex flex-justify-between flex-align-center width-full margin-bottom-5">
+      <div className="display-flex flex-justify-between flex-align-center width-full margin-bottom-4">
         <h1 className="{styles.queryTitle} flex-align-center">My queries</h1>
         <div className="margin-left-auto">
           <Button

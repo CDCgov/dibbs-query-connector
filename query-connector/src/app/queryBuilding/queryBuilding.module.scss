@@ -40,7 +40,7 @@
 .customQueryWrapper {
   background-color: white;
   padding: 1.5rem;
-  border: solid #DFE1E2;
+  border: 0.0625rem solid var(--gray-400, #DFE1E2);
   border-radius: 0.25rem;
   box-shadow: 0 0.125rem 0.1875rem 0 #F3F3F3;
 }
@@ -67,6 +67,7 @@
   tbody tr {
     transition: background-color 0.3s ease;
     position: relative;
+    height: 5rem;
   }
 
   // Using default hover for now
@@ -78,33 +79,22 @@
     font-family: "Public Sans", sans-serif;
     font-size: 0.875rem;
     color: #000;
-    border-top: 1px solid #F3F3F3;
-    border-bottom: 1px solid #F3F3F3;
+    border-top: 0.0625rem solid #F3F3F3;
+    border-bottom: 0.0625rem solid #F3F3F3;
     max-width: 12rem;
     overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    white-space: normal;
     padding-left: 0;
-    position: relative; /* For tooltip positioning */
+    position: relative; 
   }
 
   tbody td:hover {
-    background: rgba(217, 232, 246, 0.50); /* Change background only */
+    background: rgba(217, 232, 246, 0.50);
+    white-space: normal; 
+    overflow: visible;
+    text-overflow: unset;  
   }
 
-  tbody td[title]:hover::after {
-    content: attr(title); /* Show the full text as a tooltip */
-    position: absolute;
-    top: 100%; /* Position below the cell */
-    left: 0;
-    background-color: rgba(0, 0, 0, 0.75);
-    color: #fff;
-    padding: 0.5rem;
-    font-size: 0.75rem;
-    border-radius: 0.25rem;
-    white-space: nowrap;
-    z-index: 1000;
-  }
 
   .table-cell-buttons {
     position: absolute;
