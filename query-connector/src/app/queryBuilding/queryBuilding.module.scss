@@ -39,10 +39,10 @@
 
 .customQueryWrapper {
   background-color: white;
-  padding: 1.5rem;
-  border: 0.0625rem solid var(--gray-400, #DFE1E2);
+  padding-top: 1.5rem;
+  border: 0.0625rem solid var(--gray-400, #dfe1e2);
   border-radius: 0.25rem;
-  box-shadow: 0 0.125rem 0.1875rem 0 #F3F3F3;
+  box-shadow: 0 0.125rem 0.1875rem 0 #f3f3f3;
 }
 
 .customQueryTable {
@@ -52,6 +52,11 @@
   background-color: transparent;
   border: none;
 
+  td,
+  th {
+    padding-left: 1.5rem;
+  }
+
   thead tr th {
     color: var(--gray-500, #919191);
     background-color: white;
@@ -60,7 +65,6 @@
     font-weight: 700;
     line-height: 150%;
     text-transform: uppercase;
-    padding-left: 0rem;
     padding-top: 0rem;
     padding-bottom: 0.5rem;
     border: none;
@@ -72,31 +76,16 @@
     height: 5rem;
   }
 
-  // Using default hover for now
-  // tbody tr:hover {
-  //   background: rgba(217, 232, 246, 0.50);
-  // }
-
   tbody td {
     font-family: "Public Sans", sans-serif;
     font-size: 0.875rem;
     color: #000;
-    border-top: 0.0625rem solid #F3F3F3;
-    border-bottom: 0.0625rem solid #F3F3F3;
     max-width: 12rem;
     overflow: hidden;
     white-space: normal;
-    padding-left: 0;
-    position: relative; 
+    position: relative;
+    border: none;
   }
-
-  tbody td:hover {
-    background: rgba(217, 232, 246, 0.50);
-    white-space: normal; 
-    overflow: visible;
-    text-overflow: unset;  
-  }
-
 
   .table-cell-buttons {
     position: absolute;
@@ -117,27 +106,23 @@
   tbody td:last-child:hover {
     opacity: 1;
     pointer-events: auto;
-    }
+  }
+
+  tbody tr:after {
+    position: absolute;
+    width: 95.5%;
+    border-bottom: 1px solid #f3f3f3;
+    left: 2%;
+    top: -1%;
+    height: 1px;
+    content: "";
+  }
+
+  tbody:hover tr:after {
+    width: 100%;
+    left: 0%;
+  }
 }
-
-// Enable an alternative hover over feature for the titles 
-// .customQueryTable tbody td[title] {
-//   cursor: help;
-// }
-
-// .customQueryTable tbody td[title]:hover::after {
-//   content: attr(title);
-//   position: absolute;
-//   background-color: rgba(0, 0, 0, 0.75);
-//   color: white;
-//   padding: 0.5rem;
-//   border-radius: 0.25rem;
-//   font-size: 0.75rem;
-//   white-space: nowrap;
-//   top: -1.5rem;
-//   left: 0;
-//   z-index: 999;
-// }
 
 .icon-text {
   display: inline-flex;
