@@ -204,7 +204,7 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
             {valueSets && (
               <SelectionTable
                 conditionId={activeCondition ?? ""}
-                valueSetsForCondition={valueSets[activeCondition]}
+                groupedValueSetsForCondition={valueSets[activeCondition]}
                 setValueSets={setValueSets}
               />
             )}

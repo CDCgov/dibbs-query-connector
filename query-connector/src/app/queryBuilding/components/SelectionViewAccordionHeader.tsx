@@ -1,26 +1,31 @@
 import styles from "../buildFromTemplates/buildfromTemplate.module.scss";
 import { Checkbox, Icon } from "@trussworks/react-uswds";
 import { DibbsValueSetType } from "@/app/constants";
+import { GroupedValueSet } from "@/app/query/components/customizeQuery/customizeQueryUtils";
 
 type SelectionViewAccordionBodyProps = {
   valueSetType: DibbsValueSetType;
   conditionId: string;
   selectedCount: number;
   totalCount: number;
+  valueSetsForType: GroupedValueSet[];
   handleCheckboxToggle: (
     valueSetType: DibbsValueSetType,
-    conditionId: string
+    groupedValueSets: GroupedValueSet[]
   ) => void;
 };
 
 /**
  * Fragment component to style out some of the accordion bodies
  * @param param0 - params
- * @param param0.handleCheckboxToggle - Table / content to display once the accordion
- * @param param0.valueSetType - Title to display once the accordion is expanded
- * @param param0.conditionId - Markup id for the accordion
- * @param param0.selectedCount - Markup id for the accordion
- * @param param0.totalCount - tk
+ * @param param0.handleCheckboxToggle - Listener event to handle a ValueSet inclusion/
+ * exclusion check
+ * @param param0.valueSetType - DibbsValueSetType (labs, conditions, medications)
+ * @param param0.conditionId - The ID of the active condition, whose associated value sets
+ * and concepts are shown in the table
+ * @param param0.valueSetsForType - ValueSets for a given ValueSetType
+ * @param param0.totalCount - Number of Concepts associated with all the Value Sets for the DibbsValueSetType
+ * @param param0.selectedCount - Number of Concepts that are marked as selected
  * is expanded
  * @returns An accordion body component
  */
@@ -31,6 +36,7 @@ const SelectionViewAccordionHeader: React.FC<
   conditionId,
   selectedCount,
   totalCount,
+  valueSetsForType,
   handleCheckboxToggle,
 }) => {
   return (
@@ -48,7 +54,7 @@ const SelectionViewAccordionHeader: React.FC<
             label={valueSetType}
             onChange={(e) => {
               e.stopPropagation();
-              handleCheckboxToggle(valueSetType, conditionId);
+              handleCheckboxToggle(valueSetType, valueSetsForType);
             }}
             id={`${conditionId}-${valueSetType}`}
             checked={

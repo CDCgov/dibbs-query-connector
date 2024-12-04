@@ -15,7 +15,7 @@ import { GroupedValueSet } from "@/app/query/components/customizeQuery/customize
 
 type SelectionTableProps = {
   conditionId: string;
-  valueSetsForCondition: ValueSetsByGroup;
+  groupedValueSetsForCondition: ValueSetsByGroup;
   setValueSets: Dispatch<SetStateAction<ConditionToValueSetMap>>;
 };
 
@@ -25,21 +25,24 @@ type SelectionTableProps = {
 /**
  * Detail display component for a condition on the query building page
  * @param root0 - params
- * @param root0.conditionId - an array of items to render as an accordion
- * @param root0.valueSetsForCondition - an array of items to render as an accordion
- * @param root0.setValueSets - an array of items to render as an accordion
+ * @param root0.conditionId - The ID of the active condition, whose associated value sets
+ * and concepts are shown in the table
+ * @param root0.groupedValueSetsForCondition - Value Sets for the active condition, organized by
+ * type (conditions, labs, medications)
+ * @param root0.setValueSets - State function that updates the include/exclude status of
+ * a Value Set and its associated Concepts
  * @returns A component for display to render on the query building page
  */
 export const SelectionTable: React.FC<SelectionTableProps> = ({
   conditionId,
-  valueSetsForCondition,
+  groupedValueSetsForCondition,
   setValueSets,
 }) => {
   return (
     <div data-testid="accordion" className={""}>
       {renderValueSetAccordions(
         conditionId,
-        valueSetsForCondition,
+        groupedValueSetsForCondition,
         setValueSets
       )}
     </div>
@@ -53,13 +56,11 @@ function renderValueSetAccordions(
 ) {
   const handleGroupCheckboxToggle = (
     valueSetType: DibbsValueSetType,
-    conditionId: string
+    groupedValueSets: GroupedValueSet[]
   ) => {
-    const group = valueSets[valueSetType];
-    console.log(
-      group,
-      `placeholder: deselect all child values (${valueSetType}) for condition ID: ${conditionId}`
-    );
+    groupedValueSets.forEach((vs) => {
+      handleSingleCheckboxToggle(valueSetType, vs);
+    });
   };
 
   const handleSingleCheckboxToggle = (
@@ -121,6 +122,7 @@ function renderValueSetAccordions(
                 conditionId={conditionId}
                 totalCount={totalCount}
                 selectedCount={selectedCount}
+                valueSetsForType={valueSetsForType}
                 handleCheckboxToggle={handleGroupCheckboxToggle}
               />
             }
@@ -128,7 +130,7 @@ function renderValueSetAccordions(
               <SelectionViewAccordionBody
                 valueSetType={valueSetType}
                 handleCheckboxToggle={handleSingleCheckboxToggle}
-                valueSets={valueSetsForType}
+                valueSetsForType={valueSetsForType}
               />
             }
             expanded={false}

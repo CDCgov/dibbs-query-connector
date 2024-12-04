@@ -8,7 +8,7 @@ import { DibbsValueSetType } from "@/app/constants";
 type SelectionViewAccordionBodyProps = {
   id?: string;
   valueSetType: DibbsValueSetType;
-  valueSets: GroupedValueSet[];
+  valueSetsForType: GroupedValueSet[];
   handleCheckboxToggle: (
     valueSetType: DibbsValueSetType,
     groupedValueSet: GroupedValueSet
@@ -18,20 +18,21 @@ type SelectionViewAccordionBodyProps = {
 /**
  * Fragment component to style out some of the accordion bodies
  * @param param0 - params
- * @param param0.valueSetType - Title to display once the accordion is expanded
- * @param param0.valueSets - tk
- * @param param0.handleCheckboxToggle - tk
+ * @param param0.valueSetType - DibbsValueSetType (labs, conditions, medications)
+ * @param param0.valueSetsForType - ValueSets for a given ValueSetType
+ * @param param0.handleCheckboxToggle - Listener event to handle a ValueSet inclusion/
+ * exclusion check
  * @returns An accordion body component
  */
 const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
   valueSetType,
-  valueSets,
+  valueSetsForType,
   handleCheckboxToggle,
 }) => {
   return (
     <div>
-      {valueSets &&
-        valueSets.map((vs) => {
+      {valueSetsForType &&
+        valueSetsForType.map((vs) => {
           const selectedCount = tallyConceptsForSingleValueSet(vs, true);
           const totalCount = tallyConceptsForSingleValueSet(vs, false);
           return (
