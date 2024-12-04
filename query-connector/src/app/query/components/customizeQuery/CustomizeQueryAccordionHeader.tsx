@@ -1,6 +1,6 @@
-import { Icon } from "@trussworks/react-uswds";
 import styles from "./customizeQuery.module.css";
 import { GroupedValueSet } from "./customizeQueryUtils";
+import CustomizeQueryCheckbox from "./vanityCheckbox/CustomizeQueryCheckbox";
 
 type CustomizeQueryAccordionProps = {
   handleSelectAllChange: (groupIndex: string, checked: boolean) => void;
@@ -31,36 +31,24 @@ const CustomizeQueryAccordionHeader: React.FC<CustomizeQueryAccordionProps> = ({
     sum += includedConcepts.length;
     return sum;
   }, 0);
+  const isMinusState = selectedCount !== selectedTotal && selectedCount !== 0;
 
   return (
     <div
       className={`${styles.accordionHeader} display-flex flex-no-wrap flex-align-start customize-query-header`}
     >
-      <div
-        id="select-all"
-        className={`hide-checkbox-label ${styles.customizeQueryCheckbox}`}
-        onClick={(e) => {
-          e.stopPropagation();
-          handleSelectAllChange(groupIndex, selectedCount !== selectedTotal);
+      <CustomizeQueryCheckbox
+        id={group.valueSetName}
+        checked={selectedCount === selectedTotal}
+        isMinusState={isMinusState}
+        isHeader
+        onChange={() => {
+          handleSelectAllChange(
+            groupIndex,
+            isMinusState ? false : selectedCount !== selectedTotal,
+          );
         }}
-      >
-        {selectedCount === selectedTotal && (
-          <Icon.Check
-            className="usa-icon bg-base-lightest"
-            size={4}
-            color="#565C65"
-            aria-label="Checkmark icon indicating addition"
-          />
-        )}
-        {selectedCount > 0 && selectedCount < selectedTotal && (
-          <Icon.Remove
-            className="usa-icon bg-base-lightest"
-            size={4}
-            color="#565C65"
-            aria-label="Minus icon indicating removal"
-          />
-        )}
-      </div>
+      />
       <div className={`${styles.accordionButtonTitle}`}>
         {`${group.valueSetName}`}
 

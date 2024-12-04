@@ -1,7 +1,7 @@
-import { Icon } from "@trussworks/react-uswds";
 import styles from "./customizeQuery.module.css";
 import { GroupedValueSet } from "./customizeQueryUtils";
 import Table from "../../designSystem/Table";
+import CustomizeQueryCheckbox from "./vanityCheckbox/CustomizeQueryCheckbox";
 
 type CustomizeQueryAccordionBodyProps = {
   group: GroupedValueSet;
@@ -52,22 +52,14 @@ const CustomizeQueryAccordionBody: React.FC<
           }, [] as ValueSetIndexedConcept[])
           .map((item, conceptIndex) => (
             <tr className={`${styles.customizeQueryGridRow}`} key={item.code}>
-              <td
-                className={`${styles.customizeQueryCheckbox}`}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  toggleInclude(groupIndex, item.vsIndex, conceptIndex);
-                }}
-              >
-                {item.include && (
-                  <Icon.Check
-                    aria-label="Check icon indicating selection"
-                    className="usa-icon"
-                    style={{ backgroundColor: "white" }}
-                    size={4}
-                    color="#005EA2"
-                  />
-                )}
+              <td className={styles.noBorderNoBackgroundNoPadding}>
+                <CustomizeQueryCheckbox
+                  id={item.code}
+                  checked={item.include}
+                  onChange={() => {
+                    toggleInclude(groupIndex, item.vsIndex, conceptIndex);
+                  }}
+                />
               </td>
               <td className={styles.noBorderNoBackgroundNoPadding}>
                 {item.code}
