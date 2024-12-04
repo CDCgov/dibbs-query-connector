@@ -31,6 +31,7 @@ const CustomizeQueryAccordionHeader: React.FC<CustomizeQueryAccordionProps> = ({
     sum += includedConcepts.length;
     return sum;
   }, 0);
+  const isMinusState = selectedCount !== selectedTotal && selectedCount !== 0;
 
   return (
     <div
@@ -39,10 +40,13 @@ const CustomizeQueryAccordionHeader: React.FC<CustomizeQueryAccordionProps> = ({
       <CustomizeQueryCheckbox
         id={group.valueSetName}
         checked={selectedCount === selectedTotal}
-        isMinusState={selectedCount !== selectedTotal}
+        isMinusState={isMinusState}
         isHeader
         onChange={() => {
-          handleSelectAllChange(groupIndex, selectedCount !== selectedTotal);
+          handleSelectAllChange(
+            groupIndex,
+            isMinusState ? false : selectedCount !== selectedTotal,
+          );
         }}
       />
       <div className={`${styles.accordionButtonTitle}`}>
