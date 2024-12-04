@@ -12,7 +12,7 @@ import {
   CategoryNameToConditionOptionMap,
   mapFetchedDataToFrontendStructure,
   ConditionIdToValueSetArray,
-  batchSelectConcepts,
+  batchToggleConcepts,
 } from "../utils";
 import ConditionColumnDisplay from "../buildFromTemplates/ConditionColumnDisplay";
 import SearchField from "@/app/query/designSystem/searchField/SearchField";
@@ -126,7 +126,7 @@ export const ConditionSelection: React.FC<ConditionSelectionProps> = ({
       // when fetching directly from conditions table (as opposed to a saved query),
       // default to including all value sets
       formattedResults.forEach((result) => {
-        batchSelectConcepts(result, true);
+        batchToggleConcepts(result);
         return (result.includeValueSet = true);
       });
       ConditionValueSets[id] = formattedResults;

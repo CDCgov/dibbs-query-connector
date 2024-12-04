@@ -1,16 +1,15 @@
 import styles from "../buildFromTemplates/buildfromTemplate.module.scss";
 import { Checkbox, Icon } from "@trussworks/react-uswds";
-import { GroupedValueSet } from "@/app/query/components/customizeQuery/customizeQueryUtils";
-import { tallyConcpetsForValueSetGroup } from "../utils";
 import { DibbsValueSetType } from "@/app/constants";
 
 type SelectionViewAccordionBodyProps = {
   valueSetType: DibbsValueSetType;
   conditionId: string;
-  valueSets: GroupedValueSet[] | null;
+  selectedCount: number;
+  totalCount: number;
   handleCheckboxToggle: (
     valueSetType: DibbsValueSetType,
-    conditionId: string,
+    conditionId: string
   ) => void;
 };
 
@@ -20,18 +19,20 @@ type SelectionViewAccordionBodyProps = {
  * @param param0.handleCheckboxToggle - Table / content to display once the accordion
  * @param param0.valueSetType - Title to display once the accordion is expanded
  * @param param0.conditionId - Markup id for the accordion
- * @param param0.valueSets - Markup id for the accordion
+ * @param param0.selectedCount - Markup id for the accordion
+ * @param param0.totalCount - tk
  * is expanded
  * @returns An accordion body component
  */
 const SelectionViewAccordionHeader: React.FC<
   SelectionViewAccordionBodyProps
-> = ({ valueSetType, conditionId, valueSets, handleCheckboxToggle }) => {
-  const selectedCount =
-    valueSets && tallyConcpetsForValueSetGroup(valueSets, true);
-  const totalCount =
-    valueSets && tallyConcpetsForValueSetGroup(valueSets, false);
-
+> = ({
+  valueSetType,
+  conditionId,
+  selectedCount,
+  totalCount,
+  handleCheckboxToggle,
+}) => {
   return (
     <>
       <div className={styles.accordionHeaderWrapper} key={valueSetType}>

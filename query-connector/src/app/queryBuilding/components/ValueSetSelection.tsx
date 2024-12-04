@@ -45,18 +45,15 @@ type ConditionSelectionProps = {
  */
 export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
   queryName,
-  // setBuildStep,
   selectedConditions,
   valueSetsByCondition,
 }) => {
   const focusRef = useRef<HTMLInputElement | null>(null);
   const [activeCondition, setActiveCondition] = useState<string>("");
   const [_searchFilter, setSearchFilter] = useState<string>();
-  const [valueSets, setValueSets] = useState<ConditionToValueSetMap>();
+  const [valueSets, setValueSets] = useState<ConditionToValueSetMap>({});
 
   useEffect(() => {
-    let _isSubscribed = true;
-
     if (queryName == "" || queryName == undefined) {
       focusRef?.current?.focus();
     }
@@ -67,7 +64,7 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
     setActiveCondition(id);
 
     const groupedValueSetByCondition: ConditionToValueSetMap = Object.entries(
-      valueSetsByCondition,
+      valueSetsByCondition
     )
       .map(([conditionId, valSet]) => {
         // results for each condition
@@ -87,7 +84,7 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
         Object.entries(valueSetsByNameAuthorSystem).map(
           ([nameAuthorSystem, groupedValueSet]) => {
             const mappedSets = mapValueSetsToValueSetType(
-              groupedValueSet.items,
+              groupedValueSet.items
             );
 
             Object.entries(mappedSets).forEach(([valueSetTypeKey, items]) => {
@@ -107,7 +104,7 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
             });
 
             return;
-          },
+          }
         );
 
         return { [conditionId]: results }; // the value of groupedValueSetByCondition
@@ -124,7 +121,6 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
 
     return () => {
       setValueSets(groupedValueSetByCondition);
-      _isSubscribed = false;
     };
   }, []);
 
@@ -139,8 +135,8 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
       Object.entries(conditionsByCategory).flatMap(
         ([conditionId, conditionObj]) => {
           return { id: conditionId, name: conditionObj.name };
-        },
-      ),
+        }
+      )
     )
     .flatMap((conditionsByCategory) => conditionsByCategory);
 
@@ -148,7 +144,7 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
     <div
       className={classNames(
         "bg-gray-5 margin-top-4 ",
-        styles.valueSetTemplateContainer,
+        styles.valueSetTemplateContainer
       )}
     >
       <div className={styles.valueSetTemplateContainer__inner}>
@@ -208,7 +204,8 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
             {valueSets && (
               <SelectionTable
                 conditionId={activeCondition ?? ""}
-                valueSets={valueSets[activeCondition]}
+                valueSetsForCondition={valueSets[activeCondition]}
+                setValueSets={setValueSets}
               />
             )}
           </div>

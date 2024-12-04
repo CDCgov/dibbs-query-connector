@@ -166,12 +166,12 @@ export function tallyConcpetsForValueSetGroup(
  * Utility method that marks all concepts as included for
  * a given ValueSet
  * @param input - the ValueSet to update
- * @param value - the value to set for each concept.include
  * @returns the updated ValueSet
  */
-export const batchSelectConcepts = (input: ValueSet, value: boolean) => {
+export const batchToggleConcepts = (input: ValueSet) => {
   input.concepts.forEach((concept) => {
-    concept.include = value;
+    const currentStatus = concept.include
+    concept.include = !currentStatus;
   });
 
   return input;

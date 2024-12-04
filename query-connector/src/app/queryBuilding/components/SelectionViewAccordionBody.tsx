@@ -11,7 +11,7 @@ type SelectionViewAccordionBodyProps = {
   valueSets: GroupedValueSet[];
   handleCheckboxToggle: (
     valueSetType: DibbsValueSetType,
-    conditionId: string,
+    groupedValueSet: GroupedValueSet
   ) => void;
 };
 
@@ -20,43 +20,47 @@ type SelectionViewAccordionBodyProps = {
  * @param param0 - params
  * @param param0.valueSetType - Title to display once the accordion is expanded
  * @param param0.valueSets - tk
- * is expanded
+ * @param param0.handleCheckboxToggle - tk
  * @returns An accordion body component
  */
 const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
   valueSetType,
   valueSets,
+  handleCheckboxToggle,
 }) => {
   return (
     <div>
-      {valueSets.map((vs) => {
-        const selectedCount = tallyConceptsForSingleValueSet(vs, true);
-        const totalCount = tallyConceptsForSingleValueSet(vs, false);
-        return (
-          <div
-            className={styles.accordionBodyExpanded}
-            key={`${valueSetType}-${vs.valueSetName}`}
-          >
-            <div className={styles.accordionExpandedInner}>
-              <Checkbox
-                name={`checkbox-${vs.valueSetName}`}
-                className={styles.valueSetTemplate__checkbox}
-                label={checkboxLabel(vs.valueSetName, vs.author, vs.system)}
-                onChange={(e) => {
-                  e.stopPropagation();
-                  // handleCheckboxToggle(valueSetType, conditionId);
-                }}
-                id={`${vs.valueSetName}-${valueSetType}`}
-                checked={true}
-                // disabled={selectedCount == 0}
-              />{" "}
+      {valueSets &&
+        valueSets.map((vs) => {
+          const selectedCount = tallyConceptsForSingleValueSet(vs, true);
+          const totalCount = tallyConceptsForSingleValueSet(vs, false);
+          return (
+            <div
+              className={styles.accordionBodyExpanded}
+              key={`${valueSetType}-${vs.valueSetName}`}
+            >
+              <div className={styles.accordionExpandedInner}>
+                <Checkbox
+                  name={`checkbox-${vs.valueSetName}`}
+                  className={styles.valueSetTemplate__checkbox}
+                  label={checkboxLabel(vs.valueSetName, vs.author, vs.system)}
+                  onChange={(e) => {
+                    e.stopPropagation();
+                    handleCheckboxToggle(valueSetType, vs);
+                  }}
+                  id={`${vs.valueSetName}-${valueSetType}`}
+                  checked={
+                    vs.items[0].includeValueSet || selectedCount == totalCount
+                  }
+                  // disabled={selectedCount == 0}
+                />{" "}
+              </div>
+              <div className={styles.accordionBodyExpanded__right}>
+                {selectedCount}/{totalCount}
+              </div>
             </div>
-            <div className={styles.accordionBodyExpanded__right}>
-              {selectedCount}/{totalCount}
-            </div>
-          </div>
-        );
-      })}
+          );
+        })}
     </div>
   );
 };
