@@ -27,7 +27,7 @@ const ConditionOption: React.FC<ConditionOptionProps> = ({
   return (
     <div className={styles.categoryOption}>
       <Checkbox
-        onClick={() => {
+        onChange={() => {
           handleConditionSelection(conditionId);
         }}
         id={conditionId}

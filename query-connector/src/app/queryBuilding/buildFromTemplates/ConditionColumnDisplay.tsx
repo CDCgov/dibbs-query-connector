@@ -12,9 +12,6 @@ type ConditionColumnDisplayProps = {
   fetchedConditions: CategoryNameToConditionOptionMap;
   searchFilter: string | undefined;
   selectedConditions: CategoryNameToConditionOptionMap;
-  setFetchedConditions: Dispatch<
-    SetStateAction<CategoryNameToConditionOptionMap | undefined>
-  >;
   setSelectedConditions: Dispatch<
     SetStateAction<CategoryNameToConditionOptionMap | undefined>
   >;
@@ -29,8 +26,6 @@ type ConditionColumnDisplayProps = {
  * components against
  * @param root0.selectedConditions - conditions the user has marked as included in
  * their query
- * @param root0.setFetchedConditions - state function that updates the include /
- * exclude of the queryset
  * @param root0.setSelectedConditions - state function that updates the subset of
  * fetched conditions to be included in the query
  * @param root0.setFormError - state function that updates the subset of
@@ -44,7 +39,6 @@ export const ConditionColumnDisplay: React.FC<ConditionColumnDisplayProps> = ({
   fetchedConditions,
   searchFilter,
   selectedConditions,
-  setFetchedConditions,
   setSelectedConditions,
   formError,
   setFormError,
@@ -59,7 +53,7 @@ export const ConditionColumnDisplay: React.FC<ConditionColumnDisplayProps> = ({
     if (searchFilter) {
       const filteredDisplay = filterSearchByCategoryAndCondition(
         searchFilter,
-        fetchedConditions,
+        fetchedConditions
       );
       setConditionsToDisplay(filteredDisplay);
     }
@@ -67,7 +61,7 @@ export const ConditionColumnDisplay: React.FC<ConditionColumnDisplayProps> = ({
 
   async function toggleFetchedConditionSelection(
     category: string,
-    conditionId: string,
+    conditionId: string
   ) {
     const prevSelected = selectedConditions?.[category]?.[conditionId]?.include;
     const prevFetch = structuredClone(fetchedConditions);
@@ -87,14 +81,13 @@ export const ConditionColumnDisplay: React.FC<ConditionColumnDisplayProps> = ({
           prevValues.include == false;
 
     updateSelectedConditions(shouldRemove, category, conditionId, prevFetch);
-    setFetchedConditions(prevFetch);
   }
 
   const updateSelectedConditions = (
     shouldRemove: boolean,
     category: string,
     conditionId: string,
-    prevFetch: CategoryNameToConditionOptionMap,
+    prevFetch: CategoryNameToConditionOptionMap
   ) => {
     if (shouldRemove) {
       delete selectedConditions[category][conditionId];
@@ -120,10 +113,10 @@ export const ConditionColumnDisplay: React.FC<ConditionColumnDisplayProps> = ({
   };
 
   const columnOneEntries = Object.entries(conditionsToDisplay).filter(
-    (_, i) => i % 2 === 0,
+    (_, i) => i % 2 === 0
   );
   const columnTwoEntries = Object.entries(conditionsToDisplay).filter(
-    (_, i) => i % 2 === 1,
+    (_, i) => i % 2 === 1
   );
 
   const colsToDisplay = [
@@ -152,14 +145,19 @@ export const ConditionColumnDisplay: React.FC<ConditionColumnDisplayProps> = ({
                       ([conditionId, conditionNameAndInclude]) => {
                         return (
                           <ConditionOption
-                            checked={conditionNameAndInclude.include}
+                            checked={
+                              selectedConditions[category] &&
+                              Object.keys(
+                                selectedConditions[category]
+                              ).includes(conditionId)
+                            }
                             key={conditionId}
                             conditionId={conditionId}
                             conditionName={conditionNameAndInclude.name}
                             handleConditionSelection={handleConditionSelection}
                           />
                         );
-                      },
+                      }
                     )}
                   </div>
                 );
