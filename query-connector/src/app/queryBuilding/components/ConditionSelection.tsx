@@ -42,6 +42,7 @@ type ConditionSelectionProps = {
   setConditionValueSets: Dispatch<
     SetStateAction<ConditionIdToValueSetArray | undefined>
   >;
+  updateFetched: (selectedConditions: CategoryNameToConditionOptionMap) => void;
 };
 
 /**
@@ -63,6 +64,7 @@ type ConditionSelectionProps = {
  * @param root0.setLoading - The function to set the loading state
  * @param root0.setConditionValueSets - state function that updates the status of the
  * condition selection form input data
+ * @param root0.updateFetched - tk
  * @returns A component for display to redner on the query building page
  */
 export const ConditionSelection: React.FC<ConditionSelectionProps> = ({
@@ -78,6 +80,7 @@ export const ConditionSelection: React.FC<ConditionSelectionProps> = ({
   loading,
   setConditionValueSets,
   setLoading,
+  updateFetched,
 }) => {
   const focusRef = useRef<HTMLInputElement | null>(null);
 
@@ -192,6 +195,7 @@ export const ConditionSelection: React.FC<ConditionSelectionProps> = ({
             searchFilter={searchFilter}
             formError={formError}
             setFormError={setFormError}
+            updateFetched={updateFetched}
           />
         )}
       </div>

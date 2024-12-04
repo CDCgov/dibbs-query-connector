@@ -32,7 +32,7 @@ const ConditionOption: React.FC<ConditionOptionProps> = ({
         }}
         id={conditionId}
         label={formatDiseaseDisplay(conditionName)}
-        checked={checked}
+        checked={checked || false}
       />
     </div>
   );

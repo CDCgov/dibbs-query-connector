@@ -181,6 +181,7 @@ export default function QueryTemplateSelection() {
               loading={loading}
               setLoading={setLoading}
               setConditionValueSets={setConditionValueSets}
+              updateFetched={updateFetchedConditionIncludeStatus}
             />
           )}
           {/* Step Two: Select ValueSets */}

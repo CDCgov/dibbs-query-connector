@@ -17,6 +17,7 @@ type ConditionColumnDisplayProps = {
   >;
   setFormError: Dispatch<SetStateAction<FormError>>;
   formError: FormError;
+  updateFetched: (selectedConditions: CategoryNameToConditionOptionMap) => void;
 };
 /**
  * Column display component for the query building page
@@ -32,6 +33,8 @@ type ConditionColumnDisplayProps = {
  * fetched conditions to be included in the query
  * @param root0.formError - state function that updates the subset of
  * fetched conditions to be included in the query
+ * @param root0.updateFetched - state function that updates the subset of
+ * fetched conditions to be included in the query
  * @returns Conditions split out into two columns that will filter themselves
  * at both the category and condition levels if a valid search filter is applied.
  */
@@ -42,6 +45,7 @@ export const ConditionColumnDisplay: React.FC<ConditionColumnDisplayProps> = ({
   setSelectedConditions,
   formError,
   setFormError,
+  updateFetched,
 }) => {
   const [conditionsToDisplay, setConditionsToDisplay] =
     useState(fetchedConditions);
@@ -74,13 +78,9 @@ export const ConditionColumnDisplay: React.FC<ConditionColumnDisplayProps> = ({
     const shouldRemove =
       // prevSelected being undefined means we've never added anything to selectedConditions,
       // so we shouldn't remove anything
-      prevSelected == undefined
-        ? false
-        : // otherwise, if include was previously true and now its false, we should remove it
-          prevFetch[category][conditionId].include == true &&
-          prevValues.include == false;
-
+      prevSelected == undefined ? false : true;
     updateSelectedConditions(shouldRemove, category, conditionId, prevFetch);
+    updateFetched(selectedConditions);
   }
 
   const updateSelectedConditions = (
