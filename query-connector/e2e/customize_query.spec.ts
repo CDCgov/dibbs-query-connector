@@ -54,15 +54,14 @@ test.describe("querying with the Query Connector", () => {
     await page.getByRole("link", { name: "Medications" }).click();
     await page.getByRole("button", { name: "Chlamydia Medication" }).click();
     await page
-      .getByRole("row")
-      .filter({ hasText: "azithromycin 1000 MG" })
-      .getByRole("img")
+      .getByRole("row", { name: "azithromycin 1000 MG" })
+      .locator("label")
       .click();
     await expect(page.getByText("3 of 4 selected")).toBeVisible();
     await page
       .getByRole("row")
       .filter({ hasText: "ceftriaxone 500 MG Injection" })
-      .getByRole("img")
+      .locator("label")
       .click();
     await expect(page.getByText("2 of 4 selected")).toBeVisible();
     await page.getByRole("button", { name: "Apply changes" }).click();
@@ -124,7 +123,7 @@ test.describe("querying with the Query Connector", () => {
     await page.getByRole("link", { name: "Medications" }).click();
     await page
       .getByRole("button", { name: "Chlamydia Medication" })
-      .getByRole("img")
+      .locator("label")
       .click();
     await expect(page.getByText("0 of 4 selected")).toBeVisible();
 
