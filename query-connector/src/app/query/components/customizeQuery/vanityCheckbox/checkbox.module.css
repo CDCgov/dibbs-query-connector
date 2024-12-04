@@ -26,5 +26,10 @@
 }
 
 .vanityHeader input:checked + label::before {
-  background-image: url("headerCheckbox.svg") !important;
+  background-image: url("headerCheckmark.svg") !important;
+}
+
+.isMinusCheckboxState input + label::before {
+  background-image: url("minus.svg") !important;
+  background-size: cover !important;
 }

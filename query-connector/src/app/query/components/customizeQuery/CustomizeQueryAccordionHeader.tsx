@@ -39,6 +39,7 @@ const CustomizeQueryAccordionHeader: React.FC<CustomizeQueryAccordionProps> = ({
       <CustomizeQueryCheckbox
         id={group.valueSetName}
         checked={selectedCount === selectedTotal}
+        isMinusState={selectedCount !== selectedTotal}
         isHeader
         onChange={() => {
           handleSelectAllChange(groupIndex, selectedCount !== selectedTotal);
