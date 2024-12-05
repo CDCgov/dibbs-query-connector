@@ -108,6 +108,12 @@ If the above doesn't work, try replacing `localhost` with `0.0.0.0`.
 4. Enter the DB password when prompted.
 5. The extract file, `vs_dump.sql`, should now be created. It should automatically be located in `/query-connector`, but if it isn't, put `vs_dump.sql` there.
 
+#### Running the e2e tests locally
+
+Our e2e's are available locally via `npm run test:playright:local`. You'll need to have the app running locally at `localhost:3000` first (ie using `npm run dev`).
+
+You'll need to set `E2E_LOCAL_FHIR_SERVER` in your local `.env` file first in order for the flows that use the local HAPI server to route correctly. This is pre-set for you in the `.env.sample` file.
+
 ### Architecture Diagram
 
 ```mermaid
