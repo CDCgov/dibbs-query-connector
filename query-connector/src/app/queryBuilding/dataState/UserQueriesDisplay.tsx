@@ -1,8 +1,10 @@
+import React, { useState, useContext } from "react";
 import { Button, Icon, Table } from "@trussworks/react-uswds";
-import { useState } from "react";
 import { useRouter } from "next/navigation";
 import styles from "@/app/queryBuilding/queryBuilding.module.scss";
 import { CustomUserQuery } from "@/app/query-building";
+import { deleteQueryById } from "@/app/database-service";
+import { DataContext } from "@/app/utils";
 
 interface UserQueriesDisplayProps {
   queries: CustomUserQuery[];
@@ -15,10 +17,30 @@ interface UserQueriesDisplayProps {
  * @returns the UserQueriesDisplay to render the queries with edit/delete options
  */
 export const UserQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
-  queries,
+  queries: initialQueries,
 }) => {
   const router = useRouter();
+  const context = useContext(DataContext);
+  const [queries, setQueries] = useState<CustomUserQuery[]>(initialQueries);
   const [loading, setLoading] = useState(false);
+
+  const handleDelete = async (queryId: string) => {
+    const result = await deleteQueryById(queryId);
+    if (result.success) {
+      console.log("Query deleted successfully");
+      const updatedQueries = queries.filter(
+        (query) => query.query_id !== queryId,
+      );
+      setQueries(updatedQueries);
+
+      // Update the global context
+      if (context) {
+        context.setData(updatedQueries);
+      }
+    } else {
+      console.error(result.error);
+    }
+  };
 
   const handleClick = async () => {
     setLoading(true);
@@ -70,7 +92,7 @@ export const UserQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
                     <Button
                       type="button"
                       className="usa-button--unstyled text-bold text-no-underline"
-                      onClick={() => console.log("Delete", query.query_id)}
+                      onClick={() => handleDelete(query.query_id)}
                     >
                       <span className="icon-text padding-right-4">
                         <Icon.Delete className="height-3 width-3" />

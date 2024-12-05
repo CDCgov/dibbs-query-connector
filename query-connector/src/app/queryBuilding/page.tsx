@@ -16,7 +16,6 @@ const QueryBuilding: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
   // Check whether custom queries exist in DB
-  // TODO: We will need to support re-running fetchQueries from DB if/when queries are added/deleted/edited
   useEffect(() => {
     if (context?.data === null) {
       const fetchQueries = async () => {
