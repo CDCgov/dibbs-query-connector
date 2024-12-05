@@ -12,7 +12,9 @@ type SelectionViewAccordionBodyProps = {
   valueSetsForType: GroupedValueSet[];
   handleCheckboxToggle: (
     valueSetType: DibbsValueSetType,
-    groupedValueSets: GroupedValueSet[]
+    groupedValueSets: GroupedValueSet[],
+    batchUpdate: boolean,
+    checkedState: boolean
   ) => void;
 };
 
@@ -41,6 +43,8 @@ const SelectionViewAccordionHeader: React.FC<
   handleCheckboxToggle,
 }) => {
   const isMinusState = selectedCount !== totalCount && selectedCount !== 0;
+  const checked =
+    !!selectedCount && selectedCount == totalCount && selectedCount > 0;
   return (
     <>
       <div className={styles.accordionHeaderWrapper} key={valueSetType}>
@@ -59,14 +63,15 @@ const SelectionViewAccordionHeader: React.FC<
             label={valueSetType}
             onChange={(e) => {
               e.stopPropagation();
-              handleCheckboxToggle(valueSetType, valueSetsForType);
+              handleCheckboxToggle(
+                valueSetType,
+                valueSetsForType,
+                true,
+                checked
+              );
             }}
             id={`${conditionId}-${valueSetType}`}
-            checked={
-              !!selectedCount &&
-              selectedCount == totalCount &&
-              selectedCount > 0
-            }
+            checked={checked}
           />
         </div>
         <div

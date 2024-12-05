@@ -56,25 +56,44 @@ function renderValueSetAccordions(
 ) {
   const handleGroupCheckboxToggle = (
     valueSetType: DibbsValueSetType,
-    groupedValueSets: GroupedValueSet[]
+    groupedValueSets: GroupedValueSet[],
+    isBatchUpdate: boolean,
+    currentCheckboxStatus?: boolean
   ) => {
     groupedValueSets.forEach((vs) => {
-      handleSingleCheckboxToggle(valueSetType, vs);
+      handleSingleCheckboxToggle(
+        valueSetType,
+        vs,
+        isBatchUpdate,
+        !currentCheckboxStatus
+      );
     });
   };
 
   const handleSingleCheckboxToggle = (
     valueSetType: DibbsValueSetType,
-    groupedValueSet: GroupedValueSet
+    groupedValueSet: GroupedValueSet,
+    isBatchUpdate: boolean = false,
+    batchValue?: boolean
   ) => {
     const key = `${groupedValueSet.valueSetName}:${groupedValueSet.author}:${groupedValueSet.system}`;
     const updatedVS = valueSets[valueSetType][key];
 
-    groupedValueSet.items = Object.values(updatedVS.items).map((vs) => {
-      batchToggleConcepts(vs);
-      vs.includeValueSet = !vs.includeValueSet;
-      return vs;
-    });
+    if (isBatchUpdate && batchValue !== undefined) {
+      groupedValueSet.items = Object.values(updatedVS.items).map((vs) => {
+        vs.includeValueSet = batchValue;
+        vs.concepts.forEach((concept) => {
+          concept.include = batchValue;
+        });
+        return vs;
+      });
+    } else {
+      groupedValueSet.items = Object.values(updatedVS.items).map((vs) => {
+        batchToggleConcepts(vs);
+        vs.includeValueSet = !vs.includeValueSet;
+        return vs;
+      });
+    }
 
     valueSets[valueSetType] = {
       ...valueSets[valueSetType],
