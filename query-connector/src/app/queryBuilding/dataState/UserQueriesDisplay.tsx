@@ -1,6 +1,8 @@
 import React, { useState, useContext } from "react";
 import { Button, Icon, Table } from "@trussworks/react-uswds";
 import { useRouter } from "next/navigation";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import styles from "@/app/queryBuilding/queryBuilding.module.scss";
 import { CustomUserQuery } from "@/app/query-building";
 import { deleteQueryById } from "@/app/database-service";
@@ -24,22 +26,37 @@ export const UserQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
   const [queries, setQueries] = useState<CustomUserQuery[]>(initialQueries);
   const [loading, setLoading] = useState(false);
 
-  const handleDelete = async (queryId: string) => {
+  const handleDelete = async (queryName: string, queryId: string) => {
     const result = await deleteQueryById(queryId);
     if (result.success) {
-      console.log("Query deleted successfully");
+      toast.error(`${queryName} (${queryId}) has been deleted.`, {
+        autoClose: 2000,
+      });
       const updatedQueries = queries.filter(
         (query) => query.query_id !== queryId,
       );
       setQueries(updatedQueries);
 
-      // Update the global context
       if (context) {
         context.setData(updatedQueries);
       }
     } else {
       console.error(result.error);
     }
+  };
+
+  const handleCopy = (queryName: string, queryId: string) => {
+    navigator.clipboard
+      .writeText(queryId)
+      .then(() => {
+        toast.success(`${queryName} (${queryId}) copied successfully!`, {
+          autoClose: 2000,
+        });
+      })
+      .catch((error) => {
+        console.error("Failed to copy text:", error);
+        toast.error("Failed to copy the ID. Please try again.");
+      });
   };
 
   const handleClick = async () => {
@@ -51,6 +68,7 @@ export const UserQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
 
   return (
     <div>
+      <ToastContainer position="bottom-left" />
       <div className="display-flex flex-justify-between flex-align-center width-full margin-bottom-4">
         <h1 className="{styles.queryTitle} flex-align-center">My queries</h1>
         <div className="margin-left-auto">
@@ -92,7 +110,9 @@ export const UserQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
                     <Button
                       type="button"
                       className="usa-button--unstyled text-bold text-no-underline"
-                      onClick={() => handleDelete(query.query_id)}
+                      onClick={() =>
+                        handleDelete(query.query_name, query.query_id)
+                      }
                     >
                       <span className="icon-text padding-right-4">
                         <Icon.Delete className="height-3 width-3" />
@@ -102,13 +122,9 @@ export const UserQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
                     <Button
                       type="button"
                       className="usa-button--unstyled text-bold text-no-underline"
-                      onClick={() => {
-                        navigator.clipboard
-                          .writeText(query.query_id)
-                          .catch((error) =>
-                            console.error("Failed to copy text:", error),
-                          );
-                      }}
+                      onClick={() =>
+                        handleCopy(query.query_name, query.query_id)
+                      }
                     >
                       <span className="icon-text padding-right-1">
                         <Icon.ContentCopy className="height-3 width-3" />
