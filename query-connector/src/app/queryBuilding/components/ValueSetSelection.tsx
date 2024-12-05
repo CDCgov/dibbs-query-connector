@@ -64,7 +64,7 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
     setActiveCondition(id);
 
     const groupedValueSetByCondition: ConditionToValueSetMap = Object.entries(
-      valueSetsByCondition
+      valueSetsByCondition,
     )
       .map(([conditionId, valSet]) => {
         // results for each condition
@@ -84,7 +84,7 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
         Object.entries(valueSetsByNameAuthorSystem).map(
           ([nameAuthorSystem, groupedValueSet]) => {
             const mappedSets = mapValueSetsToValueSetType(
-              groupedValueSet.items
+              groupedValueSet.items,
             );
 
             Object.entries(mappedSets).forEach(([valueSetTypeKey, items]) => {
@@ -104,7 +104,7 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
             });
 
             return;
-          }
+          },
         );
 
         return { [conditionId]: results }; // the value of groupedValueSetByCondition
@@ -135,8 +135,8 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
       Object.entries(conditionsByCategory).flatMap(
         ([conditionId, conditionObj]) => {
           return { id: conditionId, name: conditionObj.name };
-        }
-      )
+        },
+      ),
     )
     .flatMap((conditionsByCategory) => conditionsByCategory);
 
@@ -144,7 +144,7 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
     <div
       className={classNames(
         "bg-gray-5 margin-top-4 ",
-        styles.valueSetTemplateContainer
+        styles.valueSetTemplateContainer,
       )}
     >
       <div className={styles.valueSetTemplateContainer__inner}>

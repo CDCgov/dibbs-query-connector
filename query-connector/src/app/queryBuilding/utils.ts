@@ -170,7 +170,7 @@ export function tallyConcpetsForValueSetGroup(
  */
 export const batchToggleConcepts = (input: ValueSet) => {
   input.concepts.forEach((concept) => {
-    const currentStatus = concept.include
+    const currentStatus = concept.include;
     concept.include = !currentStatus;
   });
 

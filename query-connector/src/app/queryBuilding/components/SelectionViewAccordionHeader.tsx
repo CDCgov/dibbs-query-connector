@@ -14,7 +14,7 @@ type SelectionViewAccordionBodyProps = {
     valueSetType: DibbsValueSetType,
     groupedValueSets: GroupedValueSet[],
     batchUpdate: boolean,
-    checkedState: boolean
+    checkedState: boolean,
   ) => void;
 };
 
@@ -58,7 +58,7 @@ const SelectionViewAccordionHeader: React.FC<
             name={`checkbox-${valueSetType}`}
             className={classNames(
               styles.valueSetTemplate__checkbox,
-              isMinusState ? styles.valueSetTemplate__checkbox__partial : ""
+              isMinusState ? styles.valueSetTemplate__checkbox__partial : "",
             )}
             label={valueSetType}
             onChange={(e) => {
@@ -67,7 +67,7 @@ const SelectionViewAccordionHeader: React.FC<
                 valueSetType,
                 valueSetsForType,
                 true,
-                checked
+                checked,
               );
             }}
             id={`${conditionId}-${valueSetType}`}

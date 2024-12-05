@@ -43,7 +43,7 @@ export const SelectionTable: React.FC<SelectionTableProps> = ({
       {renderValueSetAccordions(
         conditionId,
         groupedValueSetsForCondition,
-        setValueSets
+        setValueSets,
       )}
     </div>
   );
@@ -52,20 +52,20 @@ export const SelectionTable: React.FC<SelectionTableProps> = ({
 function renderValueSetAccordions(
   conditionId: string,
   valueSets: ValueSetsByGroup,
-  setValueSets: React.Dispatch<React.SetStateAction<ConditionToValueSetMap>>
+  setValueSets: React.Dispatch<React.SetStateAction<ConditionToValueSetMap>>,
 ) {
   const handleGroupCheckboxToggle = (
     valueSetType: DibbsValueSetType,
     groupedValueSets: GroupedValueSet[],
     isBatchUpdate: boolean,
-    currentCheckboxStatus?: boolean
+    currentCheckboxStatus?: boolean,
   ) => {
     groupedValueSets.forEach((vs) => {
       handleSingleCheckboxToggle(
         valueSetType,
         vs,
         isBatchUpdate,
-        !currentCheckboxStatus
+        !currentCheckboxStatus,
       );
     });
   };
@@ -74,7 +74,7 @@ function renderValueSetAccordions(
     valueSetType: DibbsValueSetType,
     groupedValueSet: GroupedValueSet,
     isBatchUpdate: boolean = false,
-    batchValue?: boolean
+    batchValue?: boolean,
   ) => {
     const key = `${groupedValueSet.valueSetName}:${groupedValueSet.author}:${groupedValueSet.system}`;
     const updatedVS = valueSets[valueSetType][key];
@@ -121,12 +121,12 @@ function renderValueSetAccordions(
     types &&
     Object.values(types).map(function (valueSetType) {
       const valueSetsForType: GroupedValueSet[] = Object.values(
-        valueSets[valueSetType]
+        valueSets[valueSetType],
       );
       const totalCount = tallyConcpetsForValueSetGroup(valueSetsForType, false);
       const selectedCount = tallyConcpetsForValueSetGroup(
         valueSetsForType,
-        true
+        true,
       );
 
       return (
