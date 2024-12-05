@@ -1,4 +1,5 @@
 import styles from "../buildFromTemplates/buildfromTemplate.module.scss";
+import classNames from "classnames";
 import { Checkbox, Icon } from "@trussworks/react-uswds";
 import { DibbsValueSetType } from "@/app/constants";
 import { GroupedValueSet } from "@/app/query/components/customizeQuery/customizeQueryUtils";
@@ -39,6 +40,7 @@ const SelectionViewAccordionHeader: React.FC<
   valueSetsForType,
   handleCheckboxToggle,
 }) => {
+  const isMinusState = selectedCount !== totalCount && selectedCount !== 0;
   return (
     <>
       <div className={styles.accordionHeaderWrapper} key={valueSetType}>
@@ -50,7 +52,10 @@ const SelectionViewAccordionHeader: React.FC<
           />{" "}
           <Checkbox
             name={`checkbox-${valueSetType}`}
-            className={styles.valueSetTemplate__checkbox}
+            className={classNames(
+              styles.valueSetTemplate__checkbox,
+              isMinusState ? styles.valueSetTemplate__checkbox__partial : ""
+            )}
             label={valueSetType}
             onChange={(e) => {
               e.stopPropagation();
@@ -62,7 +67,6 @@ const SelectionViewAccordionHeader: React.FC<
               selectedCount == totalCount &&
               selectedCount > 0
             }
-            disabled={selectedCount == 0}
           />
         </div>
         <div

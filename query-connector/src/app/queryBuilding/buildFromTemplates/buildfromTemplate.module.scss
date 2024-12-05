@@ -274,3 +274,10 @@ div.accordionBodyExpanded:last-of-type {
   display: flex;
   align-items: center;
 }
+
+.valueSetTemplate__checkbox__partial label::before {
+  background-size: cover !important;
+  background-color: #005ea2;
+  box-shadow: 0 0 0 2px #005ea2;
+  background-image: url("../../queryBuilding/components/PartialCheckbox.svg");
+}
