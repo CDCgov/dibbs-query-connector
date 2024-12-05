@@ -74,5 +74,6 @@ export function generateQueryToValueSetInsertionSql(
 export interface CustomUserQuery {
   query_id: string;
   query_name: string;
+  conditions_list?: string;
   valuesets: ValueSet[];
 }

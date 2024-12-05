@@ -47,7 +47,9 @@ interface DataContextValue {
   setData: (data: unknown) => void;
 }
 
-const DataContext = createContext<DataContextValue | undefined>(undefined);
+export const DataContext = createContext<DataContextValue | undefined>(
+  undefined,
+);
 
 /**
  *
