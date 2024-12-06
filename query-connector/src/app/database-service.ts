@@ -18,7 +18,6 @@ import { encode } from "base-64";
 import {
   QueryInput,
   generateQueryInsertionSql,
-  generateQueryToValueSetInsertionSql,
   CustomUserQuery,
 } from "./query-building";
 import { UUID } from "crypto";
@@ -47,12 +46,8 @@ import {
 } from "./seedSqlStructs";
 
 const getQuerybyNameSQL = `
-select q.query_name, q.id, qtv.valueset_id, vs.name as valueset_name, vs.oid as valueset_external_id, vs.version, vs.author as author, vs.type, vs.dibbs_concept_type as dibbs_concept_type, qic.concept_id, qic.include, c.code, c.code_system, c.display 
+select q.query_name, q.id
   from query q 
-  left join query_to_valueset qtv on q.id = qtv.query_id 
-  left join valuesets vs on qtv.valueset_id = vs.id
-  left join query_included_concepts qic on qtv.id = qic.query_by_valueset_id 
-  left join concepts c on qic.concept_id = c.id 
   where q.query_name = $1;
 `;
 
@@ -448,29 +443,6 @@ export async function insertQuery(input: QueryInput) {
 
     return { success: false, error: errorArray.join(",") };
   }
-
-  const insertJoinSqlArray = generateQueryToValueSetInsertionSql(
-    input,
-    queryId as UUID,
-  );
-
-  const joinPromises = insertJoinSqlArray.map((q) => {
-    dbClient.query(q.sql, q.values);
-  });
-
-  const joinInsertResults = await Promise.allSettled(joinPromises);
-
-  const joinInsertsSucceeded = joinInsertResults.every(
-    (r) => r.status === "fulfilled",
-  );
-
-  if (!joinInsertsSucceeded) {
-    logRejectedPromiseReasons(joinInsertResults, "Concept insertion failed");
-    errorArray.push("Error occured in concept insertion");
-  }
-
-  if (errorArray.length === 0) return { success: true };
-  return { success: false, error: errorArray.join(",") };
 }
 
 /**
@@ -516,7 +488,7 @@ export async function checkValueSetInsertion(vs: ValueSet) {
   const brokenConcepts = await Promise.all(
     vs.concepts.map(async (c) => {
       const systemPrefix = stripProtocolAndTLDFromSystemUrl(vs.system);
-      const conceptId = `${systemPrefix}_${c.code}`;
+      const conceptId = `${systemPrefix}_${c?.code}`;
       const conceptSql = `SELECT * FROM concepts WHERE id = $1;`;
 
       try {
@@ -525,8 +497,8 @@ export async function checkValueSetInsertion(vs: ValueSet) {
 
         // We accumulate the unique DIBBs concept IDs of anything that's missing
         if (
-          foundConcept.code !== c.code ||
-          foundConcept.display !== c.display
+          foundConcept?.code !== c?.code ||
+          foundConcept?.display !== c?.display
         ) {
           console.error(
             "Retrieved concept " +
@@ -746,8 +718,6 @@ export async function getCustomQueries(): Promise<CustomUserQuery[]> {
       qic."include" AS concept_include
     FROM
       query q
-    LEFT JOIN query_to_valueset qtv ON q.id = qtv.query_id
-    LEFT JOIN query_included_concepts qic ON qic.query_by_valueset_id = qtv.id
     LEFT JOIN (
       SELECT
         v.id AS valueset_id,

@@ -61,30 +61,14 @@ CREATE TABLE IF NOT EXISTS icd_crosswalk (
 CREATE TABLE IF NOT EXISTS query (
     id UUID DEFAULT uuid_generate_v4 (),
     query_name VARCHAR(255),
+    query_data JSON,
+    conditions_list TEXT,
     author VARCHAR(255),
     date_created TIMESTAMP,
     date_last_modified TIMESTAMP,
     time_window_number INT,
     time_window_unit VARCHAR(80),
     PRIMARY KEY (id));
-
-CREATE TABLE IF NOT EXISTS query_to_valueset (
-    id TEXT PRIMARY KEY,
-    query_id UUID,
-    valueset_id TEXT,
-    valueset_oid TEXT,
-    FOREIGN KEY (query_id) REFERENCES query(id),
-    FOREIGN KEY (valueset_id) REFERENCES valuesets(id)
-);
-
-CREATE TABLE IF NOT EXISTS query_included_concepts (
-    id TEXT PRIMARY KEY,
-    query_by_valueset_id TEXT,
-    concept_id TEXT,
-    include BOOLEAN,
-    FOREIGN KEY (query_by_valueset_id) REFERENCES query_to_valueset(id),
-    FOREIGN KEY (concept_id) REFERENCES concepts(id)
-);
 
 -- Create indexes for all primary and foreign keys
 
@@ -107,11 +91,3 @@ CREATE INDEX IF NOT EXISTS icd_crosswalk_id_index ON icd_crosswalk (id);
 
 CREATE INDEX IF NOT EXISTS query_id_index ON query (id);
 CREATE INDEX IF NOT EXISTS query_name_index ON query (query_name);
-
-CREATE INDEX IF NOT EXISTS query_to_valueset_id_index ON query_to_valueset (id);
-CREATE INDEX IF NOT EXISTS query_to_valueset_query_id_index ON query_to_valueset (query_id);
-CREATE INDEX IF NOT EXISTS query_to_valueset_valueset_id_index ON query_to_valueset (valueset_id);
-
-CREATE INDEX IF NOT EXISTS query_included_concepts_id_index ON query_included_concepts (id);
-CREATE INDEX IF NOT EXISTS query_included_concepts_query_by_valueset_id_index ON query_included_concepts (query_by_valueset_id);
-CREATE INDEX IF NOT EXISTS query_included_concepts_concept_id_index ON query_included_concepts (concept_id);
