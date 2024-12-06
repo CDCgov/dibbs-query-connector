@@ -37,6 +37,7 @@ export const UserQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
     queryId: string;
   } | null>(null);
 
+  // Delete existing query workflow
   const handleDelete = async (queryName: string, queryId: string) => {
     const result = await deleteQueryById(queryId);
     if (result.success) {
@@ -61,6 +62,7 @@ export const UserQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
     modalRef.current?.toggleModal();
   };
 
+  // Copy ID workflow
   const handleCopy = (queryName: string, queryId: string) => {
     navigator.clipboard
       .writeText(queryId)
@@ -75,12 +77,20 @@ export const UserQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
       });
   };
 
+  // Create new query workflow
   const handleClick = async () => {
     setLoading(true);
 
     // Redirect to query updating/editing page
     router.push("/queryBuilding/buildFromTemplates");
   };
+
+  // TODO: Need to create workflow for Edit button
+  // It will need to direct directly to the buildFromTemplates workflow with a specified ID
+  // It would then render `query_data` from query_table on that page
+  // const handleEdit = (queryId: string) => {
+
+  // }
 
   return (
     <div>
