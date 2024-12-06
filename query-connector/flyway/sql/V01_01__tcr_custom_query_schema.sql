@@ -51,13 +51,6 @@ CREATE TABLE IF NOT EXISTS valueset_to_concept (
     FOREIGN KEY (concept_id) REFERENCES concepts(id)
 );
 
-CREATE TABLE IF NOT EXISTS icd_crosswalk (
-    id TEXT PRIMARY KEY,
-    icd10_code TEXT,
-    icd9_code TEXT,
-    match_flags TEXT);
-
-
 CREATE TABLE IF NOT EXISTS query (
     id UUID DEFAULT uuid_generate_v4 (),
     query_name VARCHAR(255),
@@ -86,8 +79,6 @@ CREATE INDEX IF NOT EXISTS condition_to_valueset_valueset_id_index ON condition_
 CREATE INDEX IF NOT EXISTS valueset_to_concept_id_index ON valueset_to_concept (id);
 CREATE INDEX IF NOT EXISTS valueset_to_concept_valueset_id_index ON valueset_to_concept (valueset_id);
 CREATE INDEX IF NOT EXISTS valueset_to_concept_concept_id_index ON valueset_to_concept (concept_id);
-
-CREATE INDEX IF NOT EXISTS icd_crosswalk_id_index ON icd_crosswalk (id);
 
 CREATE INDEX IF NOT EXISTS query_id_index ON query (id);
 CREATE INDEX IF NOT EXISTS query_name_index ON query (query_name);

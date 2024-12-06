@@ -370,6 +370,7 @@ export async function createDibbsDB() {
     await executeDefaultQueryCreation();
     await insertSeedDbStructs("category");
     await executeCategoryUpdates();
+
     // }
   } else {
     console.log("Database already has data; skipping DIBBs DB creation.");
