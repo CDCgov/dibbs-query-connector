@@ -1,5 +1,11 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useRef } from "react";
 import { Button, Icon, Table } from "@trussworks/react-uswds";
+import {
+  Modal,
+  ModalHeading,
+  ModalFooter,
+  ModalRef,
+} from "@trussworks/react-uswds";
 import { useRouter } from "next/navigation";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -25,6 +31,11 @@ export const UserQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
   const context = useContext(DataContext);
   const [queries, setQueries] = useState<CustomUserQuery[]>(initialQueries);
   const [loading, setLoading] = useState(false);
+  const modalRef = useRef<ModalRef>(null);
+  const [selectedQuery, setSelectedQuery] = useState<{
+    queryName: string;
+    queryId: string;
+  } | null>(null);
 
   const handleDelete = async (queryName: string, queryId: string) => {
     const result = await deleteQueryById(queryId);
@@ -43,6 +54,11 @@ export const UserQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
     } else {
       console.error(result.error);
     }
+  };
+
+  const confirmDelete = (queryName: string, queryId: string) => {
+    setSelectedQuery({ queryName, queryId });
+    modalRef.current?.toggleModal();
   };
 
   const handleCopy = (queryName: string, queryId: string) => {
@@ -69,6 +85,42 @@ export const UserQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
   return (
     <div>
       <ToastContainer position="bottom-left" />
+      <Modal
+        ref={modalRef}
+        id="delete-confirmation-modal"
+        aria-labelledby="modal-heading"
+        aria-describedby="modal-description"
+      >
+        <ModalHeading id="modal-heading">Confirm Deletion</ModalHeading>
+        <div className="usa-prose">
+          <p id="modal-description">
+            Are you sure you want to delete "
+            {selectedQuery ? selectedQuery.queryName : ""}" for all users? This
+            action cannot be undone.
+          </p>
+        </div>
+        <ModalFooter>
+          <Button
+            type="button"
+            className="usa-button--secondary"
+            onClick={() => {
+              if (selectedQuery) {
+                handleDelete(selectedQuery.queryName, selectedQuery.queryId);
+              }
+              modalRef.current?.toggleModal();
+            }}
+          >
+            Delete
+          </Button>
+          <Button
+            type="button"
+            className="usa-button--outline"
+            onClick={() => modalRef.current?.toggleModal()}
+          >
+            Cancel
+          </Button>
+        </ModalFooter>
+      </Modal>
       <div className="display-flex flex-justify-between flex-align-center width-full margin-bottom-4">
         <h1 className="{styles.queryTitle} flex-align-center">My queries</h1>
         <div className="margin-left-auto">
@@ -111,7 +163,7 @@ export const UserQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
                       type="button"
                       className="usa-button--unstyled text-bold text-no-underline"
                       onClick={() =>
-                        handleDelete(query.query_name, query.query_id)
+                        confirmDelete(query.query_name, query.query_id)
                       }
                     >
                       <span className="icon-text padding-right-4">
