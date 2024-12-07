@@ -69,7 +69,7 @@ export default function QueryTemplateSelection() {
 
       if (isSubscribed) {
         setFetchedConditions(
-          mapFetchedDataToFrontendStructure(categoryToConditionArrayMap)
+          mapFetchedDataToFrontendStructure(categoryToConditionArrayMap),
         );
       }
     }
@@ -84,7 +84,7 @@ export default function QueryTemplateSelection() {
   // ensures the fetchedConditions' checkbox statuses match
   // the data in selectedCondtiions
   function updateFetchedConditionIncludeStatus(
-    selectedConditions: CategoryNameToConditionOptionMap
+    selectedConditions: CategoryNameToConditionOptionMap,
   ) {
     const prevFetch = structuredClone(fetchedConditions);
     if (prevFetch) {
@@ -98,9 +98,9 @@ export default function QueryTemplateSelection() {
                 include: conditionObj.include,
               };
               return setFetchedConditions(prevFetch);
-            }
+            },
           );
-        }
+        },
       );
     }
   }
