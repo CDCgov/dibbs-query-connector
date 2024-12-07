@@ -14,8 +14,9 @@ type SelectionViewAccordionBodyProps = {
     valueSetType: DibbsValueSetType,
     groupedValueSets: GroupedValueSet[],
     batchUpdate: boolean,
-    checkedState: boolean,
+    checkedState: boolean
   ) => void;
+  expanded: boolean;
 };
 
 /**
@@ -30,6 +31,7 @@ type SelectionViewAccordionBodyProps = {
  * @param param0.totalCount - Number of Concepts associated with all the Value Sets for the DibbsValueSetType
  * @param param0.selectedCount - Number of Concepts that are marked as selected
  * is expanded
+ * @param param0.expanded - Boolean for managing icon orientation
  * @returns An accordion body component
  */
 const SelectionViewAccordionHeader: React.FC<
@@ -41,24 +43,26 @@ const SelectionViewAccordionHeader: React.FC<
   totalCount,
   valueSetsForType,
   handleCheckboxToggle,
+  expanded,
 }) => {
   const isMinusState = selectedCount !== totalCount && selectedCount !== 0;
   const checked =
     !!selectedCount && selectedCount == totalCount && selectedCount > 0;
+
   return (
     <>
       <div className={styles.accordionHeaderWrapper} key={valueSetType}>
         <div className={styles.valueSetTemplate__toggleRowHeader}>
           <Icon.ArrowDropUp
-            aria-label="Arrow pointing right indicating collapsed toggle content"
-            style={{ rotate: "90deg" }}
+            aria-label="Arrow indicating collapsed or expanded toggle content"
+            style={expanded ? { rotate: "180deg" } : { rotate: "90deg" }}
             size={3}
           />{" "}
           <Checkbox
             name={`checkbox-${valueSetType}`}
             className={classNames(
               styles.valueSetTemplate__checkbox,
-              isMinusState ? styles.valueSetTemplate__checkbox__partial : "",
+              isMinusState ? styles.valueSetTemplate__checkbox__partial : ""
             )}
             label={valueSetType}
             onChange={(e) => {
@@ -67,7 +71,7 @@ const SelectionViewAccordionHeader: React.FC<
                 valueSetType,
                 valueSetsForType,
                 true,
-                checked,
+                checked
               );
             }}
             id={`${conditionId}-${valueSetType}`}

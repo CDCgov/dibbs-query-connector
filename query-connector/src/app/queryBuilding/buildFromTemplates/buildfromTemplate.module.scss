@@ -1,5 +1,14 @@
 @use "../../../styles/variables" as *;
 
+// Shared styles
+
+.mainContainer {
+  display: flex;
+  flex-direction: column;
+  flex: auto;
+  margin-bottom: 0 !important;
+}
+
 // Condition styles
 
 .conditionTemplateContainer {
@@ -120,9 +129,12 @@
   background-color: #f7f9fa;
 }
 
+.accordionInnerWrapper > h4 {
+  margin-top: 0 !important;
+}
+
 .accordionInnerWrapper > h4 > button {
   display: flex;
-  justify-content: space-between;
   word-wrap: break-word;
   align-items: center;
   width: 100%;
@@ -209,7 +221,7 @@
 }
 
 .valueSetTemplate__checkbox {
-  margin-left: 6.5px;
+  margin-left: 8px;
 }
 
 .valueSetTemplate__checkbox label {
@@ -222,7 +234,7 @@
 }
 
 .accordionBodyExpanded {
-  padding: 1rem 1.5rem 0 3.5rem;
+  padding: 1.5rem 1.5rem 0 3.5rem;
   background-color: #fff;
   display: flex;
   justify-content: space-between;

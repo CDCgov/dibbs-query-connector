@@ -17,6 +17,7 @@ import { ValueSetSelection } from "../components/ValueSetSelection";
 import SiteAlert from "@/app/query/designSystem/SiteAlert";
 import { BuildStep } from "../../constants";
 import LoadingView from "../../query/components/LoadingView";
+import classNames from "classnames";
 
 export type FormError = {
   queryName: boolean;
@@ -68,7 +69,7 @@ export default function QueryTemplateSelection() {
 
       if (isSubscribed) {
         setFetchedConditions(
-          mapFetchedDataToFrontendStructure(categoryToConditionArrayMap),
+          mapFetchedDataToFrontendStructure(categoryToConditionArrayMap)
         );
       }
     }
@@ -83,14 +84,14 @@ export default function QueryTemplateSelection() {
   // ensures the fetchedConditions' checkbox statuses match
   // the data in selectedCondtiions
   function updateFetchedConditionIncludeStatus(
-    selectedConditions: CategoryNameToConditionOptionMap,
+    selectedConditions: CategoryNameToConditionOptionMap
   ) {
     const prevFetch = structuredClone(fetchedConditions);
-    Object.entries(selectedConditions).map(
-      ([category, conditionsByCategory]) => {
-        Object.entries(conditionsByCategory).flatMap(
-          ([conditionId, conditionObj]) => {
-            if (prevFetch) {
+    if (prevFetch) {
+      Object.entries(selectedConditions).map(
+        ([category, conditionsByCategory]) => {
+          Object.entries(conditionsByCategory).flatMap(
+            ([conditionId, conditionObj]) => {
               const prevValues = prevFetch[category][conditionId];
               prevFetch[category][conditionId] = {
                 name: prevValues.name,
@@ -98,10 +99,10 @@ export default function QueryTemplateSelection() {
               };
               return setFetchedConditions(prevFetch);
             }
-          },
-        );
-      },
-    );
+          );
+        }
+      );
+    }
   }
 
   const validateForm = () => {
@@ -121,15 +122,7 @@ export default function QueryTemplateSelection() {
   return (
     <>
       <SiteAlert />
-      <div
-        className="main-container__wide"
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          flex: "auto",
-          marginBottom: "0!important",
-        }}
-      >
+      <div className={classNames("main-container__wide", styles.mainContainer)}>
         <Backlink
           onClick={() => {
             // TODO: this can be tidied up...
@@ -165,7 +158,7 @@ export default function QueryTemplateSelection() {
             }}
           />
         </div>
-        <div style={{ flex: "auto", display: "flex" }}>
+        <div className="display-flex flex-auto">
           {/* Step One: Select Conditions */}
           {buildStep == "condition" && fetchedConditions && (
             <ConditionSelection

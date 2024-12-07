@@ -11,7 +11,7 @@ type SelectionViewAccordionBodyProps = {
   valueSetsForType: GroupedValueSet[];
   handleCheckboxToggle: (
     valueSetType: DibbsValueSetType,
-    groupedValueSet: GroupedValueSet,
+    groupedValueSet: GroupedValueSet
   ) => void;
 };
 
@@ -35,6 +35,9 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
         valueSetsForType.map((vs) => {
           const selectedCount = tallyConceptsForSingleValueSet(vs, true);
           const totalCount = tallyConceptsForSingleValueSet(vs, false);
+          const checked =
+            vs.items[0].includeValueSet || selectedCount == totalCount;
+
           return (
             <div
               className={styles.accordionBodyExpanded}
@@ -50,10 +53,7 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
                     handleCheckboxToggle(valueSetType, vs);
                   }}
                   id={`${vs.valueSetName}-${valueSetType}`}
-                  checked={
-                    vs.items[0].includeValueSet || selectedCount == totalCount
-                  }
-                  // disabled={selectedCount == 0}
+                  checked={checked}
                 />{" "}
               </div>
               <div className={styles.accordionBodyExpanded__right}>
@@ -71,7 +71,7 @@ const checkboxLabel = (name: string, author: string, system: string) => {
     <div className={styles.expandedContent}>
       <div className={styles.vsName}> {formatDiseaseDisplay(name)}</div>
       <div className={styles.vsDetails}>
-        <div style={{ paddingRight: "1rem" }}>{`Author: ${author}`}</div>
+        <div className="padding-right-2">{`Author: ${author}`}</div>
         <div>{`System: ${system.toLocaleLowerCase()}`}</div>
       </div>
     </div>
