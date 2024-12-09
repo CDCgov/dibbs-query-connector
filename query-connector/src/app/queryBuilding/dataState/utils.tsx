@@ -1,4 +1,5 @@
-import { Modal, ModalRef } from "@/app/query/designSystem/Modal";
+import { ModalRef } from "@/app/query/designSystem/modal/Modal";
+import { DeleteModal } from "@/app/query/designSystem/modal/deleteModal";
 import "react-toastify/dist/ReactToastify.css";
 import { RefObject } from "react";
 import { CustomUserQuery } from "@/app/query-building";
@@ -118,38 +119,23 @@ export const renderModal = (
   context: DataContextValue,
 ): JSX.Element => {
   return (
-    <Modal
-      id="delete-confirmation-modal"
+    <DeleteModal
       modalRef={modalRef}
       heading="Confirm Deletion"
       description={`Are you sure you want to delete "${
         selectedQuery ? selectedQuery.queryName : ""
       }"? This action cannot be undone.`}
-      buttons={[
-        {
-          text: "Delete",
-          type: "button",
-          className: "usa-button--secondary",
-          onClick: () => {
-            if (selectedQuery) {
-              handleDelete(
-                selectedQuery.queryName,
-                selectedQuery.queryId,
-                queries,
-                setQueries,
-                context,
-              );
-            }
-            modalRef.current?.toggleModal();
-          },
-        },
-        {
-          text: "Cancel",
-          type: "button",
-          className: "usa-button--outline",
-          onClick: () => modalRef.current?.toggleModal(),
-        },
-      ]}
+      onDelete={() => {
+        if (selectedQuery) {
+          handleDelete(
+            selectedQuery.queryName,
+            selectedQuery.queryId,
+            queries,
+            setQueries,
+            context,
+          );
+        }
+      }}
     />
   );
 };

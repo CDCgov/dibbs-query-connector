@@ -1,9 +1,7 @@
 import React, { useState, useContext, useRef } from "react";
 import { Button, Icon, Table } from "@trussworks/react-uswds";
-import { ModalRef } from "@/app/query/designSystem/Modal";
+import { ModalRef } from "@/app/query/designSystem/modal/Modal";
 import { useRouter } from "next/navigation";
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import styles from "@/app/queryBuilding/queryBuilding.module.scss";
 import { CustomUserQuery } from "@/app/query-building";
 import { DataContext } from "@/app/utils";
@@ -40,7 +38,6 @@ export const UserQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
 
   return (
     <div>
-      <ToastContainer position="bottom-left" icon={false} />
       {context &&
         renderModal(
           modalRef,

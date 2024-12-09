@@ -6,6 +6,8 @@ import { CustomUserQuery } from "@/app/query-building";
 import { getCustomQueries } from "@/app/database-service";
 import { DataContext } from "@/app/utils";
 import styles from "@/app/queryBuilding/queryBuilding.module.scss";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 /**
  * Component for Query Building Flow
@@ -49,6 +51,7 @@ const QueryBuilding: React.FC = () => {
         </div>
       ) : (
         <div className="main-container__wide">
+          <ToastContainer position="bottom-left" icon={false} />
           <UserQueriesDisplay queries={queries} />
         </div>
       )}
