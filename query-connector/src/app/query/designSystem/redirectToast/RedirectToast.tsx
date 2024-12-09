@@ -49,6 +49,16 @@ const options = {
   pauseOnFocusLoss: false,
 };
 
+/**
+ *
+ * @param content - content object to configure the redirect confirmation toast
+ * @param content.heading - heading of the redirect toast
+ * @param content.variant - one of "info", "success", "warning", "error" to
+ * render the relevant toast variant
+ * @param content.body - body text of the redirect toast
+ * @param content.headingLevel - h1-6 level of the heading tag associated with
+ * content.heading. defaults to h4
+ */
 export function showToastConfirmation(content: {
   heading: string;
   body?: string;
