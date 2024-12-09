@@ -1,5 +1,4 @@
 import { Modal, ModalRef } from "@/app/query/designSystem/Modal";
-import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { RefObject } from "react";
 import { CustomUserQuery } from "@/app/query-building";

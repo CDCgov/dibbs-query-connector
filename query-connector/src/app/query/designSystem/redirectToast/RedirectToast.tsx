@@ -49,6 +49,14 @@ const options = {
   pauseOnFocusLoss: false,
 };
 
+/**
+ *
+ * @param content
+ * @param content.heading
+ * @param content.body
+ * @param content.variant
+ * @param content.headingLevel
+ */
 export function showToastConfirmation(content: {
   heading: string;
   body?: string;
