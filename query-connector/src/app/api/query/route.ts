@@ -18,8 +18,8 @@ import {
 import { handleRequestError } from "./error-handling-service";
 import {
   getSavedQueryByName,
-  mapQueryRowsToValueSets,
 } from "@/app/database-service";
+import { mapQueryRowsToValueSets } from "@/app/utils";
 
 /**
  * Health check for TEFCA Viewer
