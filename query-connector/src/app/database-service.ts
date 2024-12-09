@@ -778,7 +778,7 @@ export async function getCustomQueries(): Promise<CustomUserQuery[]> {
       vc.valueset_include AS includeValueSet,
       vc.code,
       vc.display,
-      qic."include" AS concept_include
+      qic.include AS concept_include
     FROM
       query q
     LEFT JOIN query_to_valueset qtv ON q.id = qtv.query_id
@@ -800,8 +800,9 @@ export async function getCustomQueries(): Promise<CustomUserQuery[]> {
       LEFT JOIN valueset_to_concept vtc ON vtc.valueset_id = v.id
       LEFT JOIN concepts c ON c.id = vtc.concept_id
     ) vc ON vc.valueset_id = qtv.valueset_id
-    WHERE q.author = 'DIBBs';
+    WHERE     q.query_name IN ('Gonorrhea (disorder)', 'Newborn Screening', 'Syphilis (disorder)', 'Cancer (Leukemia)', 'Chlamydia trachomatis infection (disorder)');
   `;
+  // TODO: We will need to refactor this to just pull query_name and conditions_list
   // TODO: this will eventually need to take into account user permissions and specific authors
   // We might also be able to take advantage of the `query_name` var to avoid joining valuesets/conc
 
