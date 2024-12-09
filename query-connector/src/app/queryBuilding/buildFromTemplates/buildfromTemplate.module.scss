@@ -293,3 +293,10 @@ div.accordionBodyExpanded:last-of-type {
   box-shadow: 0 0 0 2px #005ea2;
   background-image: url("../../queryBuilding/components/PartialCheckbox.svg");
 }
+
+.customQuery__controls {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  justify-content: space-between;
+}

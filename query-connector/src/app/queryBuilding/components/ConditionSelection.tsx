@@ -1,26 +1,18 @@
 "use client";
 
 import styles from "../buildFromTemplates/buildfromTemplate.module.scss";
-import { Button } from "@trussworks/react-uswds";
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import classNames from "classnames";
-import {
-  getConditionsData,
-  getValueSetsAndConceptsByConditionID,
-} from "@/app/database-service";
+import { getConditionsData } from "@/app/database-service";
 import {
   CategoryNameToConditionOptionMap,
   mapFetchedDataToFrontendStructure,
   ConditionIdToValueSetArray,
-  batchToggleConcepts,
 } from "../utils";
 import ConditionColumnDisplay from "../buildFromTemplates/ConditionColumnDisplay";
 import SearchField from "@/app/query/designSystem/searchField/SearchField";
 import { BuildStep } from "@/app/constants";
 import { FormError } from "../buildFromTemplates/page";
-
-import { ValueSet } from "@/app/constants";
-import { mapQueryRowsToValueSets } from "@/app/utils";
 
 type ConditionSelectionProps = {
   fetchedConditions: CategoryNameToConditionOptionMap;
@@ -50,19 +42,12 @@ type ConditionSelectionProps = {
  * @param root0 - params
  * @param root0.fetchedConditions - ID of the condition to reference
  * @param root0.selectedConditions - name of condition to display
- * @param root0.setBuildStep - Redirect function to handle view routing
  * @param root0.setFetchedConditions - listener function for checkbox
  * selection
  * @param root0.setSelectedConditions - current checkbox selection status
  * @param root0.queryName - current checkbox selection status
- * @param root0.validateForm - function that checks for a valid query name
- * and at least one selected condition
  * @param root0.formError - indicates missing or incorrect form data
  * @param root0.setFormError - state function that updates the status of the
- * condition selection form input data
- * @param root0.loading -  Boolean to track loading state
- * @param root0.setLoading - The function to set the loading state
- * @param root0.setConditionValueSets - state function that updates the status of the
  * condition selection form input data
  * @param root0.updateFetched - tk
  * @returns A component for display to redner on the query building page
@@ -70,16 +55,11 @@ type ConditionSelectionProps = {
 export const ConditionSelection: React.FC<ConditionSelectionProps> = ({
   fetchedConditions,
   selectedConditions,
-  setBuildStep,
   setFetchedConditions,
   setSelectedConditions,
   queryName,
-  validateForm,
   formError,
   setFormError,
-  loading,
-  setConditionValueSets,
-  setLoading,
   updateFetched,
 }) => {
   const focusRef = useRef<HTMLInputElement | null>(null);
@@ -109,51 +89,6 @@ export const ConditionSelection: React.FC<ConditionSelectionProps> = ({
     };
   }, []);
 
-  async function getValueSetsForSelectedConditions() {
-    // return array of promises
-    const conditionIds = Object.entries(selectedConditions)
-      .map(([_, conditionObj]) => {
-        return Object.keys(conditionObj);
-      })
-      .flatMap((ids) => ids);
-
-    const ConditionValueSets: ConditionIdToValueSetArray = {};
-    // const joinInsertsPromiseArray = generateValuesetConceptJoinSqlPromises(vs);
-    // const joinInsertResults = await Promise.allSettled(joinInsertsPromiseArray);
-
-    for (const id of conditionIds) {
-      const results: ValueSet[] =
-        await getValueSetsAndConceptsByConditionID(id);
-
-      const formattedResults = await mapQueryRowsToValueSets(results);
-      // when fetching directly from conditions table (as opposed to a saved query),
-      // default to including all value sets
-      formattedResults.forEach((result) => {
-        batchToggleConcepts(result);
-        return (result.includeValueSet = true);
-      });
-      ConditionValueSets[id] = formattedResults;
-    }
-
-    return ConditionValueSets;
-  }
-
-  async function handleCreateQueryClick(
-    event: React.MouseEvent<HTMLButtonElement>
-  ) {
-    event.preventDefault();
-    setLoading(true);
-    validateForm();
-    if (!!queryName && !formError.queryName && !formError.selectedConditions) {
-      // fetch valuesets for selected conditions
-      const valueSets = await getValueSetsForSelectedConditions();
-
-      setConditionValueSets(valueSets);
-      setBuildStep("valueset");
-      setLoading(false);
-    }
-  }
-
   return (
     <div
       className={classNames(
@@ -163,19 +98,6 @@ export const ConditionSelection: React.FC<ConditionSelectionProps> = ({
     >
       <div className="display-flex flex-justify flex-align-end margin-bottom-3 width-full">
         <h2 className="margin-y-0-important">Select condition(s)</h2>
-        <Button
-          className="margin-0"
-          type={"button"}
-          disabled={formError.selectedConditions || !queryName || loading}
-          title={
-            formError.selectedConditions || formError.queryName
-              ? "Enter a query name and condition"
-              : "Click to create your query"
-          }
-          onClick={handleCreateQueryClick}
-        >
-          Create query
-        </Button>
       </div>
       <div className={classNames(styles.conditionSelectionForm, "radius-lg")}>
         <SearchField
