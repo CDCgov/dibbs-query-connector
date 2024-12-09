@@ -7,3 +7,5 @@ CREATE TABLE IF NOT EXISTS fhir_servers (
     headers JSON DEFAULT NULL
 );
 
+CREATE INDEX IF NOT EXISTS fhir_servers_id_index ON fhir_servers (id);
+CREATE INDEX IF NOT EXISTS fhir_servers_name_index ON fhir_servers (name);
