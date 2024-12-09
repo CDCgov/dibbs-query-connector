@@ -8,6 +8,7 @@ import {
   MedicationAdministration,
   MedicationRequest,
 } from "fhir/r4";
+import { headers } from "next/headers";
 /**
  * The use cases that can be used in the app
  */
@@ -54,7 +55,7 @@ export const demoQueryValToLabelMap = demoQueryOptions.reduce(
     acc[curVal.value as DemoQueryOptionValue] = curVal.label;
     return acc;
   },
-  {} as Record<DemoQueryOptionValue, string>,
+  {} as Record<DemoQueryOptionValue, string>
 );
 /*
  * Map between the queryType property used to define a demo use case's options,
@@ -404,3 +405,11 @@ export const INTENTIONAL_EMPTY_STRING_FOR_CONCEPT_VERSION = "";
 // we clean up the DB migration. Leaving these in until we can clean these up
 // in the migration schema
 export const INTENTIONAL_EMPTY_STRING_FOR_GEM_CODE = "";
+
+// Define the type for the FHIR server configurations
+export type fhirServerConfig = {
+  id: string;
+  name: string;
+  hostname: string;
+  headers: Record<string, string>;
+};
