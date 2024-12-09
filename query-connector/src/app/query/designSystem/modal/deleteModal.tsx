@@ -55,6 +55,7 @@ export const DeleteModal: React.FC<DeleteModalProps> = ({
           },
         },
       ]}
+      {...additionalProps}
     />
   );
 };
