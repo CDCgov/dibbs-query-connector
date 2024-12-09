@@ -849,24 +849,20 @@ export const deleteQueryById = async (queryId: string) => {
     DELETE FROM query WHERE id = $1;
   `;
 
-  const client = await dbClient.connect();
-
   try {
-    await client.query("BEGIN");
+    await dbClient.query("BEGIN");
 
     // Execute deletion queries in the correct order
-    await client.query(deleteQuerySql1, [queryId]);
-    await client.query(deleteQuerySql2, [queryId]);
-    await client.query(deleteQuerySql3, [queryId]);
+    await dbClient.query(deleteQuerySql1, [queryId]);
+    await dbClient.query(deleteQuerySql2, [queryId]);
+    await dbClient.query(deleteQuerySql3, [queryId]);
 
-    await client.query("COMMIT");
+    await dbClient.query("COMMIT");
     return { success: true };
   } catch (error) {
-    await client.query("ROLLBACK");
+    await dbClient.query("ROLLBACK");
     console.error(`Failed to delete query with ID ${queryId}:`, error);
     return { success: false, error: "Failed to delete the query." };
-  } finally {
-    client.release();
   }
 };
 
