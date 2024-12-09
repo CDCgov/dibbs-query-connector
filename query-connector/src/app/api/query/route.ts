@@ -16,9 +16,7 @@ import {
 } from "../../constants";
 
 import { handleRequestError } from "./error-handling-service";
-import {
-  getSavedQueryByName,
-} from "@/app/database-service";
+import { getSavedQueryByName } from "@/app/database-service";
 import { mapQueryRowsToValueSets } from "@/app/utils";
 
 /**

@@ -50,7 +50,7 @@ interface DataContextValue {
 }
 
 export const DataContext = createContext<DataContextValue | undefined>(
-  undefined
+  undefined,
 );
 
 /**
