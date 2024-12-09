@@ -40,7 +40,7 @@ export const UserQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
 
   return (
     <div>
-      <ToastContainer position="bottom-left" />
+      <ToastContainer position="bottom-left" icon={false} />
       {context &&
         renderModal(
           modalRef,
@@ -83,7 +83,7 @@ export const UserQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
                       className="usa-button--unstyled text-bold text-no-underline"
                       onClick={() => console.log("Edit", query.query_id)}
                     >
-                      <span className="icon-text padding-right-4">
+                      <span className="icon-text padding-right-4 display-flex flex-align-center">
                         <Icon.Edit className="height-3 width-3" />
                         <span>Edit</span>
                       </span>
@@ -100,7 +100,7 @@ export const UserQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
                         )
                       }
                     >
-                      <span className="icon-text padding-right-4">
+                      <span className="icon-text padding-right-4 display-flex flex-align-center">
                         <Icon.Delete className="height-3 width-3" />
                         <span>Delete</span>
                       </span>
@@ -112,7 +112,7 @@ export const UserQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
                         handleCopy(query.query_name, query.query_id)
                       }
                     >
-                      <span className="icon-text padding-right-1">
+                      <span className="icon-text padding-right-1 display-flex flex-align-center">
                         <Icon.ContentCopy className="height-3 width-3" />
                         <span>Copy ID</span>
                       </span>

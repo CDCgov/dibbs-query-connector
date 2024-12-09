@@ -1,11 +1,11 @@
 import { Modal, ModalRef } from "@/app/query/designSystem/Modal";
-import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { RefObject } from "react";
 import { CustomUserQuery } from "@/app/query-building";
 import { deleteQueryById } from "@/app/database-service";
 import { useRouter } from "next/navigation";
 import { DataContextValue } from "@/app/utils";
+import { showToastConfirmation } from "@/app/query/designSystem/redirectToast/RedirectToast";
 
 /**
  * Handles deleting a user query.
@@ -24,8 +24,9 @@ export const handleDelete = async (
 ) => {
   const result = await deleteQueryById(queryId);
   if (result.success) {
-    toast.error(`${queryName} (${queryId}) has been deleted.`, {
-      autoClose: 2000,
+    showToastConfirmation({
+      heading: `${queryName} (${queryId}) has been deleted.`,
+      variant: "error",
     });
     const updatedQueries = queries.filter(
       (query) => query.query_id !== queryId,
@@ -68,8 +69,8 @@ export const handleCopy = (queryName: string, queryId: string) => {
   navigator.clipboard
     .writeText(queryId)
     .then(() => {
-      toast.success(`${queryName} (${queryId}) copied successfully!`, {
-        autoClose: 2000,
+      showToastConfirmation({
+        heading: `${queryName} (${queryId}) copied successfully!`,
       });
     })
     .catch((error) => {
