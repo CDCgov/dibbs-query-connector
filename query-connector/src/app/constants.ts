@@ -8,7 +8,6 @@ import {
   MedicationAdministration,
   MedicationRequest,
 } from "fhir/r4";
-import { headers } from "next/headers";
 /**
  * The use cases that can be used in the app
  */
@@ -55,7 +54,7 @@ export const demoQueryValToLabelMap = demoQueryOptions.reduce(
     acc[curVal.value as DemoQueryOptionValue] = curVal.label;
     return acc;
   },
-  {} as Record<DemoQueryOptionValue, string>
+  {} as Record<DemoQueryOptionValue, string>,
 );
 /*
  * Map between the queryType property used to define a demo use case's options,
