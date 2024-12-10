@@ -82,7 +82,7 @@ class FHIRClient {
   constructor(server: string, configurations: FhirServerConfig[]) {
     // Get the configuration for the server if it exists
     let config: DevFhirServerConfig | undefined = configurations.find(
-      (config) => config.name === server
+      (config) => config.name === server,
     );
     if (!config) {
       config = fhirServers[server];
@@ -120,7 +120,7 @@ class FHIRClient {
     const fetchPromises = paths.map((path) =>
       fetch(this.hostname + path, this.init).then((response) => {
         return response;
-      })
+      }),
     );
 
     return await Promise.all(fetchPromises);
