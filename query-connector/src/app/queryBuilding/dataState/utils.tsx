@@ -73,7 +73,7 @@ export const handleCopy = (queryName: string, queryId: string) => {
     .then(() => {
       showToastConfirmation({
         heading: `${queryName} ID copied successfully!`,
-        headingLevel: "h6",
+        headingLevel: "h5",
         duration: 2000,
       });
     })

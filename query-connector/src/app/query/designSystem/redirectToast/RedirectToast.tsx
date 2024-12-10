@@ -28,10 +28,13 @@ const RedirectToast: React.FC<RedirectToastProps> = ({
   body,
   headingLevel,
 }) => {
+  const headingClass = headingLevel ? `h${headingLevel.slice(1)}` : "h4";
   return (
     <Alert
       type={toastVariant}
-      heading={heading}
+      heading={
+        <span className={`usa-alert__heading ${headingClass}`}>{heading}</span>
+      }
       headingLevel={headingLevel ? headingLevel : "h4"}
     >
       {body}
