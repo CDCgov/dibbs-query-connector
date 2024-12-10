@@ -144,6 +144,7 @@
   border-bottom: 1px #dfe1e2 solid;
   color: #111111;
 
+  // override default accordion hover styles (headers should not change on hover):
   &:hover {
     background-color: #f7f9fa !important;
 
@@ -243,6 +244,35 @@
     background-color: #fff;
   }
 }
+
+.accordionBodyExpanded {
+  &:hover {
+    background-color: rgba(217, 232, 246, 0.5) !important;
+
+    .valueSetTemplate__checkbox label {
+      background-color: rgba(217, 232, 246, 0.5) !important;
+    }
+
+    .viewCodesBtn {
+      display: block;
+      text-align: right;
+      width: 4rem;
+      line-height: normal;
+      font-weight: 700;
+      font-size: 14px;
+      color: #005ea2;
+
+      &:hover {
+        cursor: pointer;
+        text-decoration: underline;
+      }
+    }
+    .displayCount {
+      display: none;
+    }
+  }
+}
+
 div.accordionBodyExpanded:last-of-type {
   border-bottom: 1px #dfe1e2 solid;
 
@@ -262,7 +292,6 @@ div.accordionBodyExpanded:last-of-type {
 }
 
 .expandedContent {
-  background-color: #fff;
   font-size: 1rem;
   font-weight: 400;
 }
@@ -285,6 +314,8 @@ div.accordionBodyExpanded:last-of-type {
   padding-bottom: 1rem;
   display: flex;
   align-items: center;
+  min-width: 4rem;
+  justify-content: flex-end;
 }
 
 .valueSetTemplate__checkbox__partial label::before {
@@ -299,4 +330,8 @@ div.accordionBodyExpanded:last-of-type {
   flex-direction: row;
   align-items: flex-end;
   justify-content: space-between;
+}
+
+.viewCodesBtn {
+  display: none;
 }

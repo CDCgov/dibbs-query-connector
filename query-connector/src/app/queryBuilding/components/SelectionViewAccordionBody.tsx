@@ -11,7 +11,7 @@ type SelectionViewAccordionBodyProps = {
   valueSetsForType: GroupedValueSet[];
   handleCheckboxToggle: (
     valueSetType: DibbsValueSetType,
-    groupedValueSet: GroupedValueSet,
+    groupedValueSet: GroupedValueSet
   ) => void;
 };
 
@@ -57,7 +57,16 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
                 />{" "}
               </div>
               <div className={styles.accordionBodyExpanded__right}>
-                {selectedCount}/{totalCount}
+                <div className={styles.displayCount}>
+                  {selectedCount}/{totalCount}
+                </div>
+                <div
+                  className={styles.viewCodesBtn}
+                  role="button"
+                  onClick={() => console.log("clicky")}
+                >
+                  View Codes
+                </div>
               </div>
             </div>
           );
