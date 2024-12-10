@@ -29,6 +29,7 @@ export const handleDelete = async (
       heading: `${queryName} has been deleted.`,
       variant: "error",
       duration: 2000,
+      headingLevel: "h6",
     });
     const updatedQueries = queries.filter(
       (query) => query.query_id !== queryId,
@@ -73,7 +74,7 @@ export const handleCopy = (queryName: string, queryId: string) => {
     .then(() => {
       showToastConfirmation({
         heading: `${queryName} ID copied successfully!`,
-        headingLevel: "h5",
+        headingLevel: "h6",
         duration: 2000,
       });
     })
