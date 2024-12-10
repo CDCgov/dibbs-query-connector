@@ -392,7 +392,7 @@ ul.usa-sidenav
 }
 
 .usa-modal__heading {
-  font-family: "Source Sans Pro Web" !important;
+  font-family: "Public Sans", sans-serif !important;
   font-size: 1.219rem !important;
   font-style: normal;
   font-weight: 700;
@@ -404,6 +404,45 @@ ul.usa-sidenav
   width: calc($query-connector-wide-max-width * 0.4) !important;
   padding-top: 0 !important;
 }
+
+.usa-alert__heading {
+  &.h1 {
+    font-size: 2.125rem; 
+    font-weight: bold;
+    line-height: 1.5;
+  }
+
+  &.h2 {
+    font-size: 1.875rem; 
+    font-weight: bold;
+    line-height: 1.5;
+  }
+
+  &.h3 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    line-height: 1.4;
+  }
+
+  &.h4 {
+    font-size: 1.25rem;
+    font-weight: bold;
+    line-height: 1.3;
+  }
+
+  &.h5 {
+    font-size: 1.125rem;
+    font-weight: bold;
+    line-height: 1.2;
+  }
+
+  &.h6 {
+    font-size: 1rem; 
+    font-weight: bold;
+    line-height: 1.2;
+  }
+}
+
 
 .custom-query-step-indicator .usa-step-indicator__header {
   display: none !important;
