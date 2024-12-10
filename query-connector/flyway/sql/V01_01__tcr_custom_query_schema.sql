@@ -53,7 +53,7 @@ CREATE TABLE IF NOT EXISTS valueset_to_concept (
 
 CREATE TABLE IF NOT EXISTS query (
     id UUID DEFAULT uuid_generate_v4 (),
-    query_name VARCHAR(255),
+    query_name VARCHAR(255) UNIQUE,
     query_data JSON,
     conditions_list TEXT,
     author VARCHAR(255),
