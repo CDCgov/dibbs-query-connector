@@ -14,7 +14,6 @@ import {
   Mode,
 } from "@/app/constants";
 import { UseCaseQueryResponse, UseCaseQuery } from "@/app/query-service";
-import { fhirServers } from "@/app/fhir-servers";
 import styles from "./searchForm/searchForm.module.scss";
 import { FormatPhoneAsDigits } from "@/app/format-service";
 import { PAGE_TITLES } from "@/app/query/components/stepIndicator/StepIndicator";
@@ -23,11 +22,12 @@ interface SearchFormProps {
   useCase: USE_CASES;
   setUseCase: (useCase: USE_CASES) => void;
   setPatientDiscoveryQueryResponse: (
-    UseCaseQueryResponse: UseCaseQueryResponse,
+    UseCaseQueryResponse: UseCaseQueryResponse
   ) => void;
   setMode: (mode: Mode) => void;
   setLoading: (loading: boolean) => void;
-  fhirServer: FHIR_SERVERS;
+  fhirServers: string[];
+  selectedFhirServer: FHIR_SERVERS;
   setFhirServer: React.Dispatch<React.SetStateAction<FHIR_SERVERS>>;
 }
 
@@ -39,19 +39,20 @@ interface SearchFormProps {
  * @param root0.setLoading - The function to set the loading state.
  * @param root0.setPatientDiscoveryQueryResponse - callback function to set the
  * patient for use in future steps
- * @param root0.fhirServer - server to do the query against
+ * @param root0.selectedFhirServer - server to do the query against
  * @param root0.setFhirServer - callback function to update specified query
  * @returns - The SearchForm component.
  */
-const SearchForm: React.FC<SearchFormProps> = ({
+const SearchForm: React.FC<SearchFormProps> = function SearchForm({
   useCase,
   setUseCase,
   setPatientDiscoveryQueryResponse,
   setMode,
   setLoading,
-  fhirServer,
+  fhirServers,
+  selectedFhirServer: fhirServer,
   setFhirServer,
-}) => {
+}) {
   //Set the patient options based on the demoOption
   const [firstName, setFirstName] = useState<string>("");
   const [lastName, setLastName] = useState<string>("");
@@ -76,7 +77,7 @@ const SearchForm: React.FC<SearchFormProps> = ({
         setAutofilled(highlightAutofilled);
       }
     },
-    [setUseCase],
+    [setUseCase]
   );
 
   const nameRegex = "^[A-Za-z\u00C0-\u024F\u1E00-\u1EFF\\-'. ]+$";
@@ -174,7 +175,7 @@ const SearchForm: React.FC<SearchFormProps> = ({
                     }}
                     required
                   >
-                    {Object.keys(fhirServers).map((fhirServer: string) => (
+                    {fhirServers.map((fhirServer: string) => (
                       <option key={fhirServer} value={fhirServer}>
                         {fhirServer}
                       </option>
