@@ -26,6 +26,7 @@ import { Patient } from "fhir/r4";
  * form, the results of the query, or the multiple patients view.
  * @param root0 - params
  * @param root0.fhirServers - The list of FHIR servers to query against from the DB and harded coded (for now).
+ * @param root0
  * @returns - The Query component.
  */
 const QueryClient: React.FC<{ fhirServers: string[] }> = ({ fhirServers }) => {
@@ -33,7 +34,7 @@ const QueryClient: React.FC<{ fhirServers: string[] }> = ({ fhirServers }) => {
   const [mode, setMode] = useState<Mode>("search");
   const [loading, setLoading] = useState<boolean>(false);
   const [fhirServer, setFhirServer] = useState<FHIR_SERVERS>(
-    DEFAULT_DEMO_FHIR_SERVER
+    DEFAULT_DEMO_FHIR_SERVER,
   );
 
   const [patientDiscoveryQueryResponse, setPatientDiscoveryQueryResponse] =
