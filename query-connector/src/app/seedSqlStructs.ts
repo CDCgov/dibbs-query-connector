@@ -43,13 +43,20 @@ export type CategoryStruct = {
   category: string;
 };
 
+export type QueryDataStruct = {
+  query_name: string;
+  query_data: string;
+  conditions_list: string;
+};
+
 export type dbInsertStruct =
   | ValuesetStruct
   | ConceptStruct
   | ValuesetToConceptStruct
   | ConditionStruct
   | ConditionToValueSetStruct
-  | CategoryStruct;
+  | CategoryStruct
+  | QueryDataStruct;
 
 export const insertValueSetSql = `
 INSERT INTO valuesets
@@ -126,7 +133,6 @@ INSERT INTO category_data
     category = EXCLUDED.category
   RETURNING condition_code;
 `;
-
 export const insertDefaultQueryLogicSql = `
 WITH tcr_data AS (
   SELECT
@@ -152,6 +158,23 @@ SELECT
   'day' AS time_window_unit
 FROM tcr_data
 GROUP BY condition_name
+RETURNING id, query_name;
+`;
+
+export const updateDefaultDemoQueryNames = `
+UPDATE query
+SET query_name = v.query_name
+FROM (VALUES ($1, $2) AS v(query_name, condition_name)
+WHERE query.query_name = v.condition_name
+RETURNING id, query_name;
+`;
+
+export const updateQueryDataSql = `
+UPDATE query
+SET query_data = v.query_data,
+    conditions_list = v.conditions_list
+FROM (VALUES ($1, $2, $3)) AS v(query_name, query_data, conditions_list)
+WHERE query.query_name = v.query_name
 RETURNING id, query_name;
 `;
 

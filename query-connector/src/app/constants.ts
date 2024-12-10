@@ -60,7 +60,7 @@ export const demoQueryValToLabelMap = demoQueryOptions.reduce(
  * Map between the queryType property used to define a demo use case's options,
  * and the name of that query for purposes of searching the DB.
  */
-const demoQueryLabels = demoQueryOptions.map((dqo) => dqo.label);
+export const demoQueryLabels = demoQueryOptions.map((dqo) => dqo.label);
 export const QueryTypeToQueryName: {
   [key in (typeof demoQueryLabels)[number]]: string;
 } = {

@@ -368,6 +368,7 @@ export async function createDibbsDB() {
     await insertSeedDbStructs("conditions");
     await insertSeedDbStructs("condition_to_valueset");
     await executeDefaultQueryCreation();
+    await insertSeedDbStructs("query_data");
     await insertSeedDbStructs("category");
     await executeCategoryUpdates();
 
