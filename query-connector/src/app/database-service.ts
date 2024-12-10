@@ -865,7 +865,6 @@ export async function getFhirServerConfigs() {
   cachedFhirServerConfigs = (async () => {
     const query = `SELECT * FROM fhir_servers;`;
     const result = await dbClient.query(query);
-    console.log(result.rows);
     return result.rows;
   })();
   return cachedFhirServerConfigs;
@@ -876,7 +875,6 @@ export async function getFhirServerConfigs() {
  * @returns An array of FHIR server names.
  */
 export async function getFhirServerNames(): Promise<string[]> {
-  console.log("🔥🔥🔥🔥🔥🔥🔥🔥🔥", "Getting FHIR server names");
   const configs = await getFhirServerConfigs();
   return configs.map((config) => config.name);
 }
