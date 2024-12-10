@@ -25,12 +25,6 @@ export const fhirServers: Record<string, DevFhirServerConfig> = {
     headers: {},
   },
   "JMC Meld: eHealthExchange": configureEHX("JMCHelios"),
-  // "Public HAPI: Direct": {
-  //   id: "Public HAPI: Direct",
-  //   name: "Public HAPI: Direct",
-  //   hostname: "https://hapi.fhir.org/baseR4",
-  //   headers: {},
-  // },
   "Local e2e HAPI Server: Direct": {
     id: "Local e2e HAPI Server: Direct",
     name: "Local e2e HAPI Server: Direct",
@@ -88,7 +82,7 @@ class FHIRClient {
   constructor(server: string, configurations: FhirServerConfig[]) {
     // Get the configuration for the server if it exists
     let config: DevFhirServerConfig | undefined = configurations.find(
-      (config) => config.name === server,
+      (config) => config.name === server
     );
     if (!config) {
       config = fhirServers[server];
@@ -126,7 +120,7 @@ class FHIRClient {
     const fetchPromises = paths.map((path) =>
       fetch(this.hostname + path, this.init).then((response) => {
         return response;
-      }),
+      })
     );
 
     return await Promise.all(fetchPromises);
