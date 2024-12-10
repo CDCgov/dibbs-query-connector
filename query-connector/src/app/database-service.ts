@@ -100,7 +100,7 @@ export const executeDefaultQueryCreation = async () => {
     console.log("Executing default query linking script");
     await dbClient.query(insertDefaultQueryLogicSql);
     console.log(
-      "Default queries, queries to conditions, and query included concepts insertion complete"
+      "Default queries, queries to conditions, and query included concepts insertion complete",
     );
   } catch (error) {
     console.error("Could not cross-index default queries", error);
@@ -169,7 +169,7 @@ type ErsdOrVsacResponse = Bundle | Parameters | OperationOutcome;
  * @returns The eRSD Specification as a FHIR Bundle or an OperationOutcome if an error occurs.
  */
 export async function getERSD(
-  eRSDVersion: number = 3
+  eRSDVersion: number = 3,
 ): Promise<ErsdOrVsacResponse> {
   const ERSD_API_KEY = process.env.ERSD_API_KEY;
   const eRSDUrl = `https://ersd.aimsplatform.org/api/ersd/v${eRSDVersion}specification?format=json&api-key=${ERSD_API_KEY}`;
@@ -205,7 +205,7 @@ export async function getERSD(
 export async function getVSACValueSet(
   oid: string,
   searchStructType: string = "valueset",
-  codeSystem?: string
+  codeSystem?: string,
 ): Promise<ErsdOrVsacResponse> {
   const username: string = "apikey";
   const umlsKey: string = process.env.UMLS_API_KEY || "";
@@ -248,7 +248,7 @@ export async function getVSACValueSet(
  */
 export async function translateVSACToInternalValueSet(
   fhirValueset: FhirValueSet,
-  ersdConceptType: ErsdConceptType
+  ersdConceptType: ErsdConceptType,
 ) {
   const oid = fhirValueset.id;
   const version = fhirValueset.version;
@@ -289,7 +289,7 @@ export async function insertValueSet(vs: ValueSet) {
     await insertValueSetPromise;
   } catch (e) {
     console.error(
-      `ValueSet insertion for ${vs.valueSetId}_${vs.valueSetVersion} failed`
+      `ValueSet insertion for ${vs.valueSetId}_${vs.valueSetVersion} failed`,
     );
     console.error(e);
     errorArray.push("Error occured in valuset insertion");
@@ -297,11 +297,11 @@ export async function insertValueSet(vs: ValueSet) {
 
   const insertConceptsPromiseArray = generateConceptSqlPromises(vs);
   const conceptInsertResults = await Promise.allSettled(
-    insertConceptsPromiseArray
+    insertConceptsPromiseArray,
   );
 
   const allConceptInsertsSucceed = conceptInsertResults.every(
-    (r) => r.status === "fulfilled"
+    (r) => r.status === "fulfilled",
   );
 
   if (!allConceptInsertsSucceed) {
@@ -313,13 +313,13 @@ export async function insertValueSet(vs: ValueSet) {
   const joinInsertResults = await Promise.allSettled(joinInsertsPromiseArray);
 
   const allJoinInsertsSucceed = joinInsertResults.every(
-    (r) => r.status === "fulfilled"
+    (r) => r.status === "fulfilled",
   );
 
   if (!allJoinInsertsSucceed) {
     logRejectedPromiseReasons(
       joinInsertResults,
-      "ValueSet <> concept join insert failed"
+      "ValueSet <> concept join insert failed",
     );
     errorArray.push("Error occured in ValueSet <> concept join seeding");
   }
@@ -415,7 +415,7 @@ function stripProtocolAndTLDFromSystemUrl(systemURL: string) {
 
 function logRejectedPromiseReasons<T>(
   resultsArray: PromiseSettledResult<T>[],
-  errorMessageString: string
+  errorMessageString: string,
 ) {
   return resultsArray
     .filter((r): r is PromiseRejectedResult => r.status === "rejected")
@@ -442,7 +442,7 @@ export async function insertQuery(input: QueryInput) {
     queryId = results.rows[0].id as unknown as UUID;
   } catch (e) {
     console.error(
-      `Error occured in user query insertion: insertion for ${input.queryName} failed`
+      `Error occured in user query insertion: insertion for ${input.queryName} failed`,
     );
     console.error(e);
     errorArray.push("Error occured in user query insertion");
@@ -452,7 +452,7 @@ export async function insertQuery(input: QueryInput) {
 
   const insertJoinSqlArray = generateQueryToValueSetInsertionSql(
     input,
-    queryId as UUID
+    queryId as UUID,
   );
 
   const joinPromises = insertJoinSqlArray.map((q) => {
@@ -462,7 +462,7 @@ export async function insertQuery(input: QueryInput) {
   const joinInsertResults = await Promise.allSettled(joinPromises);
 
   const joinInsertsSucceeded = joinInsertResults.every(
-    (r) => r.status === "fulfilled"
+    (r) => r.status === "fulfilled",
   );
 
   if (!joinInsertsSucceeded) {
@@ -504,7 +504,7 @@ export async function checkValueSetInsertion(vs: ValueSet) {
       foundVS.author !== vs.author
     ) {
       console.error(
-        "Retrieved value set information differs from given value set"
+        "Retrieved value set information differs from given value set",
       );
       missingData.missingValueSet = true;
     }
@@ -532,18 +532,18 @@ export async function checkValueSetInsertion(vs: ValueSet) {
           console.error(
             "Retrieved concept " +
               conceptId +
-              " has different values than given concept"
+              " has different values than given concept",
           );
           return conceptId;
         }
       } catch (error) {
         console.error(
           "Couldn't fetch concept with ID " + conceptId + ": ",
-          error
+          error,
         );
         return conceptId;
       }
-    })
+    }),
   );
   missingData.missingConcepts = brokenConcepts.filter((bc) => bc !== undefined);
 
@@ -560,18 +560,18 @@ export async function checkValueSetInsertion(vs: ValueSet) {
       const fIdx = rows.findIndex((r) => r["concept_id"] === conceptUniqueId);
       if (fIdx === -1) {
         console.error(
-          "Couldn't locate concept " + conceptUniqueId + " in fetched mappings"
+          "Couldn't locate concept " + conceptUniqueId + " in fetched mappings",
         );
         return conceptUniqueId;
       }
     });
     missingData.missingMappings = missingConceptsFromMappings.filter(
-      (item) => item !== undefined
+      (item) => item !== undefined,
     );
   } catch (error) {
     console.error(
       "Couldn't fetch value set to concept mappings for this valueset: ",
-      error
+      error,
     );
     const systemPrefix = stripProtocolAndTLDFromSystemUrl(vs.system);
     vs.concepts.forEach((c) => {
@@ -609,7 +609,7 @@ export async function getConditionsData() {
       acc[category].push({ [id]: name });
       return acc;
     },
-    {} as CategoryToConditionArrayMap
+    {} as CategoryToConditionArrayMap,
   );
 
   // 2. ID-Name mapping
@@ -631,7 +631,7 @@ export async function getConditionsData() {
  */
 export async function insertDBStructArray(
   structs: dbInsertStruct[],
-  insertType: string
+  insertType: string,
 ) {
   const allStructPromises = structs.map((struct) => {
     let structInsertSql: string = "";
@@ -803,7 +803,7 @@ export async function getCustomQueries(): Promise<CustomUserQuery[]> {
 
     // Check if the valueSetId already exists in the valuesets array
     let valueset = formattedData[query_id].valuesets.find(
-      (v) => v.valueSetId === valueSetId
+      (v) => v.valueSetId === valueSetId,
     );
 
     // If valueSetId doesn't exist, add it

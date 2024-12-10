@@ -32,7 +32,7 @@ const Query: React.FC = () => {
   const [mode, setMode] = useState<Mode>("search");
   const [loading, setLoading] = useState<boolean>(false);
   const [fhirServer, setFhirServer] = useState<FHIR_SERVERS>(
-    DEFAULT_DEMO_FHIR_SERVER
+    DEFAULT_DEMO_FHIR_SERVER,
   );
   const [fhirServers, setFhirServers] = useState<string[]>([]);
 
