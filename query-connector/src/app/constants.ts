@@ -8,7 +8,6 @@ import {
   MedicationAdministration,
   MedicationRequest,
 } from "fhir/r4";
-import { headers } from "next/headers";
 /**
  * The use cases that can be used in the app
  */
@@ -407,7 +406,7 @@ export const INTENTIONAL_EMPTY_STRING_FOR_CONCEPT_VERSION = "";
 export const INTENTIONAL_EMPTY_STRING_FOR_GEM_CODE = "";
 
 // Define the type for the FHIR server configurations
-export type fhirServerConfig = {
+export type FhirServerConfig = {
   id: string;
   name: string;
   hostname: string;

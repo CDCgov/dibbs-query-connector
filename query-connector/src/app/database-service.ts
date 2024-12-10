@@ -13,7 +13,7 @@ import {
   INTENTIONAL_EMPTY_STRING_FOR_GEM_CODE,
   ValueSet,
   ersdToDibbsConceptMap,
-  fhirServerConfig,
+  FhirServerConfig,
 } from "./constants";
 import { encode } from "base-64";
 import {
@@ -852,7 +852,7 @@ export async function checkDBForData() {
 }
 
 //Cache for FHIR server configurations
-let cachedFhirServerConfigs: Promise<fhirServerConfig[]> | null = null;
+let cachedFhirServerConfigs: Promise<FhirServerConfig[]> | null = null;
 
 export async function getFhirServerConfigs() {
   if (cachedFhirServerConfigs) {
@@ -865,7 +865,6 @@ export async function getFhirServerConfigs() {
     console.log(result.rows);
     return result.rows;
   })();
-
   return cachedFhirServerConfigs;
 }
 

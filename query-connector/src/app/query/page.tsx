@@ -11,7 +11,7 @@ import QueryClient from "./queryStepper";
  * @returns - The Query component.
  */
 const Query: React.FC = async () => {
-  const fhirServers = await getFhirServerNames();
+  const fhirServers = await getFhirServerNames(); //send FHIR server names to the client side, but not the configs
   return <QueryClient fhirServers={fhirServers} />;
 };
 

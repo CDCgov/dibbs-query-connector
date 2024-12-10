@@ -14,7 +14,7 @@ import {
   Mode,
 } from "@/app/constants";
 import { UseCaseQueryResponse, UseCaseQuery } from "@/app/query-service";
-import { fhirServers } from "@/app/fhir-servers";
+import { fhirServers as hardcodedFhirServers } from "@/app/fhir-servers";
 import styles from "./searchForm/searchForm.module.scss";
 import { FormatPhoneAsDigits } from "@/app/format-service";
 import { PAGE_TITLES } from "@/app/query/components/stepIndicator/StepIndicator";
@@ -27,7 +27,7 @@ interface SearchFormProps {
   ) => void;
   setMode: (mode: Mode) => void;
   setLoading: (loading: boolean) => void;
-  // fhirServers: string[];
+  fhirServers: string[];
   selectedFhirServer: FHIR_SERVERS;
   setFhirServer: React.Dispatch<React.SetStateAction<FHIR_SERVERS>>;
 }
@@ -50,7 +50,7 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
   setPatientDiscoveryQueryResponse,
   setMode,
   setLoading,
-  // fhirServers,
+  fhirServers,
   selectedFhirServer: fhirServer,
   setFhirServer,
 }) {
@@ -111,6 +111,11 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  const combinedFhirServers = [
+    ...fhirServers,
+    ...Object.keys(hardcodedFhirServers),
+  ];
 
   return (
     <>
@@ -176,12 +181,7 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
                     }}
                     required
                   >
-                    {/* {fhirServers.find((fhirServer: string) => (
-                      <option key={fhirServer} value={fhirServer}>
-                        {fhirServer}
-                      </option>
-                    ))} */}
-                    {Object.keys(fhirServers).map((fhirServer: string) => (
+                    {combinedFhirServers.map((fhirServer: string) => (
                       <option key={fhirServer} value={fhirServer}>
                         {fhirServer}
                       </option>

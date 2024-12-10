@@ -67,7 +67,7 @@ const QueryClient: React.FC<{ fhirServers: string[] }> = ({ fhirServers }) => {
             setLoading={setLoading}
             setPatientDiscoveryQueryResponse={setPatientDiscoveryQueryResponse}
             fhirServers={fhirServers}
-            fhirServer={fhirServer}
+            selectedFhirServer={fhirServer}
             setFhirServer={setFhirServer}
           />
         )}
