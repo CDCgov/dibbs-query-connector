@@ -23,7 +23,7 @@ interface SearchFormProps {
   useCase: USE_CASES;
   setUseCase: (useCase: USE_CASES) => void;
   setPatientDiscoveryQueryResponse: (
-    UseCaseQueryResponse: UseCaseQueryResponse
+    UseCaseQueryResponse: UseCaseQueryResponse,
   ) => void;
   setMode: (mode: Mode) => void;
   setLoading: (loading: boolean) => void;
@@ -42,6 +42,7 @@ interface SearchFormProps {
  * patient for use in future steps
  * @param root0.selectedFhirServer - server to do the query against
  * @param root0.setFhirServer - callback function to update specified query
+ * @param root0.fhirServers
  * @returns - The SearchForm component.
  */
 const SearchForm: React.FC<SearchFormProps> = function SearchForm({
@@ -78,7 +79,7 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
         setAutofilled(highlightAutofilled);
       }
     },
-    [setUseCase]
+    [setUseCase],
   );
 
   const nameRegex = "^[A-Za-z\u00C0-\u024F\u1E00-\u1EFF\\-'. ]+$";
