@@ -24,6 +24,7 @@ import { Patient } from "fhir/r4";
 /**
  * Client side parent component for the query page. Based on the mode, it will display the search
  * form, the results of the query, or the multiple patients view.
+ * @param root0 - params
  * @param root0.fhirServers - The list of FHIR servers to query against from the DB and harded coded (for now).
  * @returns - The Query component.
  */
