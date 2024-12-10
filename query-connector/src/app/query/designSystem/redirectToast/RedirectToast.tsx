@@ -6,7 +6,7 @@ export type AlertType = "info" | "success" | "warning" | "error";
 
 type RedirectToastProps = {
   toastVariant: AlertType;
-  heading: string;
+  heading?: string;
   body: string;
   headingLevel?: HeadingLevel;
 };
@@ -26,16 +26,19 @@ const RedirectToast: React.FC<RedirectToastProps> = ({
   toastVariant,
   heading,
   body,
-  headingLevel,
+  headingLevel = "h4",
 }) => {
-  const headingClass = headingLevel ? `h${headingLevel.slice(1)}` : "h4";
   return (
     <Alert
       type={toastVariant}
       heading={
-        <span className={`usa-alert__heading ${headingClass}`}>{heading}</span>
+        heading ? (
+          <span className={`usa-alert__heading ${headingLevel}`}>
+            {heading}
+          </span>
+        ) : undefined
       }
-      headingLevel={headingLevel ? headingLevel : "h4"}
+      headingLevel={heading ? headingLevel : "h4"}
     >
       {body}
     </Alert>
@@ -64,7 +67,7 @@ const options = {
  * @param content.duration - Duration in milliseconds for how long the toast is visible. Defaults to 5000ms.
  */
 export function showToastConfirmation(content: {
-  heading: string;
+  heading?: string;
   body?: string;
   variant?: AlertType;
   headingLevel?: HeadingLevel;
