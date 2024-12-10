@@ -6,8 +6,7 @@ import { getFhirServerNames } from "../database-service";
 import QueryClient from "./queryStepper";
 
 /**
- * Parent component for the query page. Based on the mode, it will display the search
- * form, the results of the query, or the multiple patients view.
+ * Server side component for the query page that renders everything in queryStepper as a client component.
  * @returns - The Query component.
  */
 const Query: React.FC = async () => {
