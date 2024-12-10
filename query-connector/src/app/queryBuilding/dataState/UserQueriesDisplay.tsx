@@ -82,7 +82,7 @@ export const UserQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
                     >
                       <span className="icon-text padding-right-4 display-flex flex-align-center">
                         <Icon.Edit className="height-3 width-3" />
-                        <span>Edit</span>
+                        <span className="padding-left-05">Edit</span>
                       </span>
                     </Button>
                     <Button
@@ -99,7 +99,7 @@ export const UserQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
                     >
                       <span className="icon-text padding-right-4 display-flex flex-align-center">
                         <Icon.Delete className="height-3 width-3" />
-                        <span>Delete</span>
+                        <span className="padding-left-05">Delete</span>
                       </span>
                     </Button>
                     <Button
@@ -111,7 +111,7 @@ export const UserQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
                     >
                       <span className="icon-text padding-right-1 display-flex flex-align-center">
                         <Icon.ContentCopy className="height-3 width-3" />
-                        <span>Copy ID</span>
+                        <span className="padding-left-05">Copy ID</span>
                       </span>
                     </Button>
                   </div>

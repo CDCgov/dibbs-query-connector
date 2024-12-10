@@ -26,8 +26,9 @@ export const handleDelete = async (
   const result = await deleteQueryById(queryId);
   if (result.success) {
     showToastConfirmation({
-      heading: `${queryName} (${queryId}) has been deleted.`,
+      heading: `${queryName} has been deleted.`,
       variant: "error",
+      duration: 2000,
     });
     const updatedQueries = queries.filter(
       (query) => query.query_id !== queryId,
@@ -71,7 +72,8 @@ export const handleCopy = (queryName: string, queryId: string) => {
     .writeText(queryId)
     .then(() => {
       showToastConfirmation({
-        heading: `${queryName} (${queryId}) copied successfully!`,
+        heading: `${queryName} ID copied successfully!`,
+        duration: 2000,
       });
     })
     .catch((error) => {

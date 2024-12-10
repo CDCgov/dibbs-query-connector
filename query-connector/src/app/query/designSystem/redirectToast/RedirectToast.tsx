@@ -58,14 +58,18 @@ const options = {
  * @param content.body - body text of the redirect toast
  * @param content.headingLevel - h1-6 level of the heading tag associated with
  * content.heading. defaults to h4
+ * @param content.duration - Duration in milliseconds for how long the toast is visible. Defaults to 5000ms.
  */
 export function showToastConfirmation(content: {
   heading: string;
   body?: string;
   variant?: AlertType;
   headingLevel?: HeadingLevel;
+  duration?: number;
 }) {
   const toastVariant = content.variant ?? "success";
+  const toastDuration = content.duration ?? 5000; // Default to 5000ms
+
   toast[toastVariant](
     <RedirectToast
       toastVariant={toastVariant}
@@ -73,7 +77,7 @@ export function showToastConfirmation(content: {
       headingLevel={content.headingLevel}
       body={content.body ?? ""}
     />,
-    options,
+    { ...options, autoClose: toastDuration },
   );
 }
 
