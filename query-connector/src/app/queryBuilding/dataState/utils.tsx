@@ -6,7 +6,7 @@ import { CustomUserQuery } from "@/app/query-building";
 import { deleteQueryById } from "@/app/database-service";
 import { useRouter } from "next/navigation";
 import { DataContextValue } from "@/app/utils";
-import { showToastConfirmation } from "@/app/query/designSystem/redirectToast/RedirectToast";
+import { showToastConfirmation } from "@/app/query/designSystem/toast/Toast";
 
 /**
  * Handles deleting a user query.
