@@ -88,6 +88,9 @@
   }
 
   .table-cell-buttons {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
     position: absolute;
     right: 1.5rem;
     top: 50%;
@@ -119,7 +122,8 @@
 }
 
 .icon-text {
-  display: inline-flex;
+  display: flex;
+  justify-content: flex-start;
   align-items: center;
-  gap: 0.25rem;
+  gap: 0.5rem;
 }
