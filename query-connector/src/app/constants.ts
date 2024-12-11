@@ -404,3 +404,11 @@ export const INTENTIONAL_EMPTY_STRING_FOR_CONCEPT_VERSION = "";
 // we clean up the DB migration. Leaving these in until we can clean these up
 // in the migration schema
 export const INTENTIONAL_EMPTY_STRING_FOR_GEM_CODE = "";
+
+// Define the type for the FHIR server configurations
+export type FhirServerConfig = {
+  id: string;
+  name: string;
+  hostname: string;
+  headers: Record<string, string>;
+};

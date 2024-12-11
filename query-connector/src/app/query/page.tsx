@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { UseCaseQueryResponse } from "../query-service";
 import ResultsView from "./components/ResultsView";
 import PatientSearchResults from "./components/PatientSearchResults";
@@ -20,9 +20,10 @@ import StepIndicator, {
 } from "./components/stepIndicator/StepIndicator";
 import SiteAlert from "./designSystem/SiteAlert";
 import { Patient } from "fhir/r4";
+import { getFhirServerNames } from "@/app/database-service";
 
 /**
- * Parent component for the query page. Based on the mode, it will display the search
+ * Client side parent component for the query page. Based on the mode, it will display the search
  * form, the results of the query, or the multiple patients view.
  * @returns - The Query component.
  */
@@ -33,6 +34,13 @@ const Query: React.FC = () => {
   const [fhirServer, setFhirServer] = useState<FHIR_SERVERS>(
     DEFAULT_DEMO_FHIR_SERVER,
   );
+  const [fhirServers, setFhirServers] = useState<string[]>([]);
+
+  useEffect(() => {
+    getFhirServerNames().then((servers) => {
+      setFhirServers(servers);
+    });
+  }, []);
 
   const [patientDiscoveryQueryResponse, setPatientDiscoveryQueryResponse] =
     useState<UseCaseQueryResponse>({});
@@ -66,7 +74,8 @@ const Query: React.FC = () => {
             setMode={setMode}
             setLoading={setLoading}
             setPatientDiscoveryQueryResponse={setPatientDiscoveryQueryResponse}
-            fhirServer={fhirServer}
+            fhirServers={fhirServers}
+            selectedFhirServer={fhirServer}
             setFhirServer={setFhirServer}
           />
         )}
