@@ -102,18 +102,18 @@ type QueryTableQueryDataColumn = {
 export const mapQueryRowsToValueSets = async (
   rows: QueryResultRow[],
 ): Promise<ValueSet[]> => {
-  // Create groupings of rows (has {condition: valueset: concept} nesting) by their ValueSet ID
+  // Unest the {condition: valuesetId: valueSet} nesting in an array of valueSets
   const valueSetsByCondition = rows.map((curRow) => {
     return curRow.query_data as QueryTableQueryDataColumn;
   });
 
-  const valueSetsByIdArray = valueSetsByCondition
+  const valueSetsById = valueSetsByCondition
     .map((v) => {
       return Object.values(v);
     })
     .flat();
 
-  const valueSets: ValueSet[] = valueSetsByIdArray
+  const valueSets: ValueSet[] = valueSetsById
     .map((valById) => {
       const curValueSet = Object.values(valById)[0];
       return {
