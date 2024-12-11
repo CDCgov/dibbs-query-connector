@@ -892,18 +892,17 @@ let cachedFhirServerConfigs: Promise<FhirServerConfig[]> | null = null;
 
 /**
  * Fetches all FHIR server configurations from the database and caches the result.
+ * @param forceRefresh - Optional param to determine if the cache should be refreshed.
  * @returns An array of FHIR server configurations.
  */
-export async function getFhirServerConfigs() {
-  if (cachedFhirServerConfigs) {
-    return cachedFhirServerConfigs;
+export async function getFhirServerConfigs(forceRefresh = false) {
+  if (forceRefresh || !cachedFhirServerConfigs) {
+    cachedFhirServerConfigs = (async () => {
+      const query = `SELECT * FROM fhir_servers;`;
+      const result = await dbClient.query(query);
+      return result.rows;
+    })();
   }
-
-  cachedFhirServerConfigs = (async () => {
-    const query = `SELECT * FROM fhir_servers;`;
-    const result = await dbClient.query(query);
-    return result.rows;
-  })();
   return cachedFhirServerConfigs;
 }
 
