@@ -4,7 +4,7 @@ import classNames from "classnames";
 
 export type AlertType = "info" | "success" | "warning" | "error";
 
-type RedirectToastProps = {
+type ToastProps = {
   toastVariant: AlertType;
   heading?: string;
   body: string;
@@ -22,7 +22,7 @@ type RedirectToastProps = {
  * defaults to h4
  * @returns A toast component using the USWDS alert
  */
-const RedirectToast: React.FC<RedirectToastProps> = ({
+const Toast: React.FC<ToastProps> = ({
   toastVariant,
   heading,
   body,
@@ -77,7 +77,7 @@ export function showToastConfirmation(content: {
   const toastDuration = content.duration ?? 5000; // Default to 5000ms
 
   toast[toastVariant](
-    <RedirectToast
+    <Toast
       toastVariant={toastVariant}
       heading={content.heading}
       headingLevel={content.headingLevel}
@@ -87,4 +87,4 @@ export function showToastConfirmation(content: {
   );
 }
 
-export default RedirectToast;
+export default Toast;
