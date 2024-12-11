@@ -12,7 +12,6 @@ export type AccordionProps = {
   handleToggle?: (event: React.MouseEvent<HTMLButtonElement>) => void;
   containerClassName?: string;
   accordionClassName?: string;
-  multiselectable?: boolean;
 };
 
 /**
