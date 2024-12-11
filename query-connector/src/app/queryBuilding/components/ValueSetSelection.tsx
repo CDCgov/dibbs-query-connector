@@ -51,7 +51,8 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
   const focusRef = useRef<HTMLInputElement | null>(null);
   const [activeCondition, setActiveCondition] = useState<string>("");
   const [_searchFilter, setSearchFilter] = useState<string>();
-  const [valueSets, setValueSets] = useState<ConditionToValueSetMap>({});
+  const [selectedValueSets, setSelectedValueSets] =
+    useState<ConditionToValueSetMap>({});
 
   useEffect(() => {
     if (queryName == "" || queryName == undefined) {
@@ -120,12 +121,13 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
       }, {});
 
     return () => {
-      setValueSets(groupedValueSetByCondition);
+      setSelectedValueSets(groupedValueSetByCondition);
     };
   }, []);
 
   const handleAddCondition = () => {
     console.log("clicky");
+    console.log("selectedValueSets in state", selectedValueSets);
   };
 
   // Makes the conditionId more easily accessible within the group
@@ -201,11 +203,13 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
             />
           </div>
           <div>
-            {valueSets && (
+            {selectedValueSets && (
               <SelectionTable
                 conditionId={activeCondition ?? ""}
-                groupedValueSetsForCondition={valueSets[activeCondition]}
-                setValueSets={setValueSets}
+                groupedValueSetsForCondition={
+                  selectedValueSets[activeCondition]
+                }
+                setValueSets={setSelectedValueSets}
               />
             )}
           </div>

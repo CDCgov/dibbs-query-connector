@@ -113,6 +113,10 @@ export const mapQueryRowsToValueSets = (rows: QueryResultRow[]) => {
         };
       }),
     };
+    const conditionId = conceptGroup[0]["condition_id"];
+    if (conditionId) {
+      valueSet["conditionId"] = conditionId;
+    }
     return valueSet;
   });
   return valueSets;

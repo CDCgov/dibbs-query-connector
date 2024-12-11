@@ -330,6 +330,7 @@ export interface ValueSet {
   dibbsConceptType: string;
   includeValueSet: boolean;
   concepts: Concept[];
+  conditionId?: string
 }
 
 export const DEFAULT_ERSD_VERSION = "3";

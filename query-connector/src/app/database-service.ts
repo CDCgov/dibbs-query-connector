@@ -48,7 +48,7 @@ import {
 } from "./seedSqlStructs";
 
 const getQuerybyNameSQL = `
-select q.query_name, q.id, qtv.valueset_id, vs.name as valueset_name, vs.oid as valueset_external_id, vs.version, vs.author as author, vs.type, vs.dibbs_concept_type as dibbs_concept_type, qic.concept_id, qic.include, c.code, c.code_system, c.display 
+select q.query_name, q.id, qtv.valueset_id, vs.name as valueset_name, vs.oid as valueset_external_id, vs.version, vs.author as author, vs.type, vs.dibbs_concept_type as dibbs_concept_type, qic.concept_id, qic.include, c.code, c.code_system, c.display
   from query q 
   left join query_to_valueset qtv on q.id = qtv.query_id 
   left join valuesets vs on qtv.valueset_id = vs.id
@@ -58,12 +58,12 @@ select q.query_name, q.id, qtv.valueset_id, vs.name as valueset_name, vs.oid as 
 `;
 
 const getValueSetsByConditionId = `
-SELECT c.display, c.code_system, c.code, vs.name as valueset_name, vs.id as valueset_id, vs.oid as valueset_external_id, vs.version, vs.author as author, vs.type, vs.dibbs_concept_type as dibbs_concept_type    
+SELECT c.display, c.code_system, c.code, vs.name as valueset_name, vs.id as valueset_id, vs.oid as valueset_external_id, vs.version, vs.author as author, vs.type, vs.dibbs_concept_type as dibbs_concept_type, ctvs.condition_id
   FROM valuesets vs 
   LEFT JOIN condition_to_valueset ctvs on vs.id = ctvs.valueset_id 
   LEFT JOIN valueset_to_concept vstc on vs.id = vstc.valueset_id
   LEFT JOIN concepts c on vstc.concept_id = c.id
-  WHERE ctvs.condition_id = $1;
+  WHERE ctvs.condition_id IN (
 `;
 
 // Load environment variables from .env and establish a Pool configuration
@@ -78,17 +78,18 @@ const dbClient = new Pool(dbConfig);
 /**
  * Executes a search for a ValueSets and Concepts against the Postgres
  * Database, using the ID of the condition associated with any such data.
- * @param id The id of an entry in the conditions table
+ * @param ids Array of ids for entries in the conditions table
  * @returns One or more rows from the DB matching the requested saved query,
  * or an error if no results can be found.
  */
-export const getValueSetsAndConceptsByConditionID = async (id: string) => {
-  const values = [id];
-
+export const getValueSetsAndConceptsByConditionIDs = async (ids: string[]) => {
+  const escapedValues = ids.map((_, i) => `$${i+1}`).join() + ')'
+  const queryString = getValueSetsByConditionId + escapedValues
+ 
   try {
-    const result = await dbClient.query(getValueSetsByConditionId, values);
+    const result = await dbClient.query(queryString, ids);
     if (result.rows.length === 0) {
-      console.error("No results found for Condition", id);
+      console.error("No results found for given condition ids", ids);
       return [];
     }
     return result.rows;

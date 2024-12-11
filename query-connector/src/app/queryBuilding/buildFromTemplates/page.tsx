@@ -8,7 +8,7 @@ import { useEffect, useRef, useState } from "react";
 
 import {
   getConditionsData,
-  getValueSetsAndConceptsByConditionID,
+  getValueSetsAndConceptsByConditionIDs,
 } from "@/app/database-service";
 import {
   CategoryNameToConditionOptionMap,
@@ -21,7 +21,6 @@ import SiteAlert from "@/app/query/designSystem/SiteAlert";
 import { BuildStep } from "../../constants";
 import LoadingView from "../../query/components/LoadingView";
 import classNames from "classnames";
-import { ValueSet } from "@/app/constants";
 import { mapQueryRowsToValueSets } from "@/app/utils";
 import { batchToggleConcepts } from "../utils";
 
@@ -62,23 +61,32 @@ export default function QueryTemplateSelection() {
         .flatMap((ids) => ids);
 
     const ConditionValueSets: ConditionIdToValueSetArray = {};
-    // const joinInsertsPromiseArray = generateValuesetConceptJoinSqlPromises(vs);
-    // const joinInsertResults = await Promise.allSettled(joinInsertsPromiseArray);
 
-    if (conditionIds)
-      for (const id of conditionIds) {
-        const results: ValueSet[] =
-          await getValueSetsAndConceptsByConditionID(id);
+    if (conditionIds) {
+      const results = await getValueSetsAndConceptsByConditionIDs(conditionIds);
+      const formattedResults = results && mapQueryRowsToValueSets(results);
 
-        const formattedResults = await mapQueryRowsToValueSets(results);
-        // when fetching directly from conditions table (as opposed to a saved query),
-        // default to including all value sets
-        formattedResults.forEach((result) => {
-          batchToggleConcepts(result);
-          return (result.includeValueSet = true);
-        });
-        ConditionValueSets[id] = formattedResults;
-      }
+      // when fetching directly from conditions table (as opposed to a saved query),
+      // default to including all value sets
+      formattedResults.forEach((result) => {
+        batchToggleConcepts(result);
+        return (result.includeValueSet = true);
+      });
+
+      // group by Condition ID:
+      Object.values(formattedResults).reduce((acc, resultObj) => {
+        const id = resultObj.conditionId;
+
+        if (!!id) {
+          if (!acc[id]) {
+            acc[id] = [];
+          }
+          acc[id].push(resultObj);
+          return acc;
+        }
+        return acc;
+      }, ConditionValueSets);
+    }
 
     return ConditionValueSets;
   }
