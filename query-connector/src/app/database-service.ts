@@ -57,7 +57,7 @@ const dbConfig: PoolConfig = {
   connectionString: process.env.DATABASE_URL,
   max: 10, // Maximum # of connections in the pool
   idleTimeoutMillis: 30000, // A client must sit idle this long before being released
-  connectionTimeoutMillis: 10000, // Wait this long before timing out when connecting new client
+  connectionTimeoutMillis: 3000, // Wait this long before timing out when connecting new client
 };
 const dbClient = new Pool(dbConfig);
 
@@ -688,7 +688,7 @@ export async function getCustomQueries(): Promise<CustomUserQuery[]> {
     WHERE     q.query_name IN ('Gonorrhea case investigation', 'Newborn screening follow-up', 'Syphilis case investigation', 'Cancer case investigation', 'Chlamydia case investigation');
   `;
   // TODO: this will eventually need to take into account user permissions and specific authors
-  // We might also be able to take advantage of the `query_name` var to avoid joining valuesets/conc
+  // We'll probably also need to refactor this to not show up in any user-facing containers
 
   const results = await dbClient.query(query);
   const formattedData: { [key: string]: CustomUserQuery } = {};
