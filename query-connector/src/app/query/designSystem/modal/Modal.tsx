@@ -2,18 +2,27 @@ import {
   Modal as TrussModal,
   ModalHeading,
   ModalFooter,
+  Button,
   ButtonGroup,
-  ModalToggleButton,
-  ModalRef,
+  ModalRef as TrussModalRef,
 } from "@trussworks/react-uswds";
-import { RefObject } from "react";
+import React, { RefObject } from "react";
+
+export type ModalRef = TrussModalRef;
+
+type ModalButton = {
+  text: string;
+  type: "button" | "submit" | "reset";
+  className?: string; // Optional classes for styling
+  onClick: () => void; // Action to perform when the button is clicked
+};
 
 type ModalProps = {
+  id: string;
   heading: string;
   description: string;
-  id: string;
   modalRef: RefObject<ModalRef>;
-  // expand this to support more interesting button use cases when needed
+  buttons: ModalButton[]; // Dynamic buttons
 };
 
 /**
@@ -25,13 +34,15 @@ type ModalProps = {
  * @param param0.description - Modal body
  * @param param0.modalRef - ref object to connect the toggle button with the
  * actual modal.
- * @returns A modal component
+ * @param param0.buttons - Array of button definitions for the modal footer.
+ * @returns A customizable modal component
  */
 export const Modal: React.FC<ModalProps> = ({
   id,
   heading,
   description,
   modalRef,
+  buttons,
 }) => {
   return (
     <TrussModal
@@ -46,41 +57,18 @@ export const Modal: React.FC<ModalProps> = ({
       </div>
       <ModalFooter>
         <ButtonGroup>
-          <ModalToggleButton modalRef={modalRef} closer>
-            Close
-          </ModalToggleButton>
+          {buttons.map((button, index) => (
+            <Button
+              key={index}
+              type={button.type}
+              className={button.className}
+              onClick={button.onClick}
+            >
+              {button.text}
+            </Button>
+          ))}
         </ButtonGroup>
       </ModalFooter>
     </TrussModal>
-  );
-};
-
-type ModalButtonProps = {
-  modalRef: RefObject<ModalRef>;
-  title: string;
-  className?: string;
-};
-/**
- * Modal button trigger the opening of a modal
- * @param param0 params
- * @param param0.modalRef - Ref object to connect button to the parent modal instance
- * @param param0.title - What text to display on the button
- * @param param0.className - optional styling classes
- * @returns A modal button that should open the modal
- */
-export const ModalButton: React.FC<ModalButtonProps> = ({
-  modalRef,
-  title,
-  className,
-}) => {
-  return (
-    <ModalToggleButton
-      modalRef={modalRef}
-      opener
-      className={className}
-      title={title}
-    >
-      {title}
-    </ModalToggleButton>
   );
 };
