@@ -83,9 +83,9 @@ const dbClient = new Pool(dbConfig);
  * or an error if no results can be found.
  */
 export const getValueSetsAndConceptsByConditionIDs = async (ids: string[]) => {
-  const escapedValues = ids.map((_, i) => `$${i+1}`).join() + ')'
-  const queryString = getValueSetsByConditionId + escapedValues
- 
+  const escapedValues = ids.map((_, i) => `$${i + 1}`).join() + ")";
+  const queryString = getValueSetsByConditionId + escapedValues;
+
   try {
     const result = await dbClient.query(queryString, ids);
     if (result.rows.length === 0) {
