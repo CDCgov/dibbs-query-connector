@@ -57,7 +57,7 @@ select q.query_name, q.id, qtv.valueset_id, vs.name as valueset_name, vs.oid as 
   where q.query_name = $1;
 `;
 
-const getValueSetsByConditionId = `
+const getValueSetsByConditionIds = `
 SELECT c.display, c.code_system, c.code, vs.name as valueset_name, vs.id as valueset_id, vs.oid as valueset_external_id, vs.version, vs.author as author, vs.type, vs.dibbs_concept_type as dibbs_concept_type, ctvs.condition_id
   FROM valuesets vs 
   LEFT JOIN condition_to_valueset ctvs on vs.id = ctvs.valueset_id 
@@ -84,7 +84,7 @@ const dbClient = new Pool(dbConfig);
  */
 export const getValueSetsAndConceptsByConditionIDs = async (ids: string[]) => {
   const escapedValues = ids.map((_, i) => `$${i + 1}`).join() + ")";
-  const queryString = getValueSetsByConditionId + escapedValues;
+  const queryString = getValueSetsByConditionIds + escapedValues;
 
   try {
     const result = await dbClient.query(queryString, ids);
