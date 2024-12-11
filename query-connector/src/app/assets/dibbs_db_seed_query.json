@@ -1,6 +1,11 @@
 {
-  "query_data": [
+  "query": [
     {
+      "author": "DIBBs",
+      "date_created": "2024-12-10T15:45:30",
+      "date_last_modified": "2024-12-10T15:45:30",
+      "time_window_number": "30",
+      "time_window_unit": "days",
       "query_name": "Cancer case investigation",
       "conditions_list": ["Cancer (Leukemia)"],
       "query_data": {
@@ -111,6 +116,11 @@
       }
     },
     {
+      "author": "DIBBs",
+      "date_created": "2024-12-10T15:45:30",
+      "date_last_modified": "2024-12-10T15:45:30",
+      "time_window_number": "30",
+      "time_window_unit": "days",
       "query_name": "Chlamydia case investigation",
       "conditions_list": ["Chlamydia trachomatis infection"],
       "query_data": {
@@ -2156,6 +2166,11 @@
       }
     },
     {
+      "author": "DIBBs",
+      "date_created": "2024-12-10T15:45:30",
+      "date_last_modified": "2024-12-10T15:45:30",
+      "time_window_number": "30",
+      "time_window_unit": "days",
       "query_name": "Syphilis case investigation",
       "query_data": {
         "Congenital syphilis": {
@@ -3335,6 +3350,11 @@
       "conditions_list": ["Congenital syphilis"]
     },
     {
+      "author": "DIBBs",
+      "date_created": "2024-12-10T15:45:30",
+      "date_last_modified": "2024-12-10T15:45:30",
+      "time_window_number": "30",
+      "time_window_unit": "days",
       "query_name": "Gonorrhea case investigation",
       "query_data": {
         "Gonorrhea": {
@@ -4873,7 +4893,12 @@
       "conditions_list": ["Gonorrhea"]
     },
     {
-      "query_name": "Gonorrhea case investigation",
+      "author": "DIBBs",
+      "date_created": "2024-12-10T15:45:30",
+      "date_last_modified": "2024-12-10T15:45:30",
+      "time_window_number": "30",
+      "time_window_unit": "days",
+      "query_name": "Newborn Screening",
       "query_data": {
         "Newborn Screening": {
           "1_20240909": {

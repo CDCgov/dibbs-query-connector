@@ -11,7 +11,6 @@ import {
   ErsdConceptType,
   INTENTIONAL_EMPTY_STRING_FOR_CONCEPT_VERSION,
   INTENTIONAL_EMPTY_STRING_FOR_GEM_CODE,
-  QueryTypeToQueryName,
   ValueSet,
   ersdToDibbsConceptMap,
 } from "./constants";
@@ -36,15 +35,13 @@ import {
   insertConceptSql,
   insertConditionSql,
   insertConditionToValuesetSql,
-  insertDefaultQueryLogicSql,
+  insertDemoQueryLogicSql,
   insertValueSetSql,
   insertValuesetToConceptSql,
   QueryDataStruct,
   updatedCancerCategorySql,
-  updateDefaultDemoQueryNames,
   updateErsdCategorySql,
   updateNewbornScreeningCategorySql,
-  updateQueryDataSql,
   ValuesetStruct,
   ValuesetToConceptStruct,
 } from "./seedSqlStructs";
@@ -84,35 +81,6 @@ export const getSavedQueryByName = async (name: string) => {
     return result.rows;
   } catch (error) {
     console.error("Error retrieving query:", error);
-    throw error;
-  }
-};
-
-/**
- * Utility function to execute the insertions into three query tables
- * programmatically after the database has been seeded with initial
- * conditions.
- */
-export const executeDefaultQueryCreation = async () => {
-  try {
-    console.log("Executing default query linking script");
-    await dbClient.query(insertDefaultQueryLogicSql);
-    console.log("Updating demo query names");
-    const updateQueries = Object.entries(QueryTypeToQueryName).map(
-      ([newQueryName, conditionName]) => {
-        dbClient.query(updateDefaultDemoQueryNames, [
-          newQueryName,
-          conditionName,
-        ]);
-      },
-    );
-    await Promise.allSettled(updateQueries);
-
-    console.log(
-      "Default queries, queries to conditions, and query included concepts insertion complete",
-    );
-  } catch (error) {
-    console.error("Could not cross-index default queries", error);
     throw error;
   }
 };
@@ -674,12 +642,17 @@ export async function insertDBStructArray(
         (struct as CategoryStruct).condition_code,
         (struct as CategoryStruct).category,
       ];
-    } else if (insertType === "query_data") {
-      structInsertSql = updateQueryDataSql;
+    } else if (insertType === "query") {
+      structInsertSql = insertDemoQueryLogicSql;
       valuesToInsert = [
         (struct as QueryDataStruct).query_name,
         (struct as QueryDataStruct).query_data,
         (struct as QueryDataStruct).conditions_list,
+        (struct as QueryDataStruct).author,
+        (struct as QueryDataStruct).date_created,
+        (struct as QueryDataStruct).date_last_modified,
+        (struct as QueryDataStruct).time_window_number,
+        (struct as QueryDataStruct).time_window_unit,
       ];
     }
     const insertPromise = dbClient.query(structInsertSql, valuesToInsert);

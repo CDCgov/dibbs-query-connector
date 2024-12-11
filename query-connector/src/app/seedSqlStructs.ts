@@ -47,6 +47,11 @@ export type QueryDataStruct = {
   query_name: string;
   query_data: string;
   conditions_list: string;
+  author: string;
+  date_created: string;
+  date_last_modified: string;
+  time_window_number: string;
+  time_window_unit: string;
 };
 
 export type dbInsertStruct =
@@ -133,49 +138,10 @@ INSERT INTO category_data
     category = EXCLUDED.category
   RETURNING condition_code;
 `;
-export const insertDefaultQueryLogicSql = `
-WITH tcr_data AS (
-  SELECT
-      conditions.id AS condition_id,
-      conditions.name AS condition_name,
-      condition_to_valueset.valueset_id AS valueset_id,
-      valuesets.oid as valueset_oid
-  FROM conditions
-  JOIN condition_to_valueset
-      ON conditions.id = condition_to_valueset.condition_id
-  JOIN valuesets
-      ON condition_to_valueset.valueset_id = valuesets.id
-)
+export const insertDemoQueryLogicSql = `
 -- Insert data into the query table
-INSERT INTO query (id, query_name, author, date_created, date_last_modified, time_window_number, time_window_unit)
-SELECT 
-  uuid_generate_v4() AS id,
-  condition_name AS query_name,
-  'DIBBs' AS author,
-  NOW() AS date_created,
-  NOW() AS date_last_modified,
-  1 AS time_window_number,
-  'day' AS time_window_unit
-FROM tcr_data
-GROUP BY condition_name
-RETURNING id, query_name;
-`;
-
-export const updateDefaultDemoQueryNames = `
-UPDATE query
-SET query_name = v.query_name
-FROM (VALUES ($1, $2) AS v(query_name, condition_name)
-WHERE query.query_name = v.condition_name
-RETURNING id, query_name;
-`;
-
-export const updateQueryDataSql = `
-UPDATE query
-SET query_data = v.query_data,
-    conditions_list = v.conditions_list
-FROM (VALUES ($1, $2, $3)) AS v(query_name, query_data, conditions_list)
-WHERE query.query_name = v.query_name
-RETURNING id, query_name;
+INSERT INTO query (query_name, query_data, conditions_list, author, date_created, date_last_modified, time_window_number, time_window_unit)
+VALUES ($1, $2, $3,$4, $5, $6, $7, $8);
 `;
 
 export const updateErsdCategorySql = `
