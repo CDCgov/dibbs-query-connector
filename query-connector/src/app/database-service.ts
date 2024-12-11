@@ -99,8 +99,10 @@ type QueryTableQueryDataColumn = {
  * @param rows The Rows returned from the DB Query.
  * @returns A list of ValueSets, which hold the Concepts pulled from the DB.
  */
-export const mapQueryRowsToValueSets = async (rows: QueryResultRow[]) => {
-  // Create groupings of rows (each of which is a single Concept) by their ValueSet ID
+export const mapQueryRowsToValueSets = async (
+  rows: QueryResultRow[],
+): Promise<ValueSet[]> => {
+  // Create groupings of rows (has {condition: valueset: concept} nesting) by their ValueSet ID
   const valueSets: ValueSet[] = rows
     .map((curRow) => {
       const valueSetsByCondition =
@@ -393,7 +395,7 @@ function logRejectedPromiseReasons<T>(
 export async function insertQuery(input: QueryInput) {
   const { sql, values } = generateQueryInsertionSql(input);
   const insertUserQueryPromise = dbClient.query(sql, values);
-  const errorArray = [];
+  const errorArray: string[] = [];
 
   let queryId;
   try {
