@@ -24,12 +24,12 @@ export type USE_CASES = (typeof UseCases)[number];
 export const UseCaseToQueryName: {
   [key in USE_CASES]: string;
 } = {
-  "social-determinants": "Social Determinants of Health",
-  "newborn-screening": "Newborn Screening",
-  syphilis: "Congenital syphilis (disorder)",
-  gonorrhea: "Gonorrhea (disorder)",
-  chlamydia: "Chlamydia trachomatis infection (disorder)",
-  cancer: "Cancer (Leukemia)",
+  "social-determinants": "Gather social determinants of health",
+  "newborn-screening": "Newborn screening follow-up",
+  syphilis: "Syphilis case investigation",
+  gonorrhea: "Gonorrhea case investigation",
+  chlamydia: "Chlamydia case investigation",
+  cancer: "Cancer case investigation",
 };
 
 /**

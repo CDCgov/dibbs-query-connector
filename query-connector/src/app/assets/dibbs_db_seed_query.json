@@ -7,7 +7,7 @@
       "time_window_number": "30",
       "time_window_unit": "days",
       "query_name": "Cancer case investigation",
-      "conditions_list": ["Cancer (Leukemia)"],
+      "conditions_list": "{Cancer (Leukemia)}",
       "query_data": {
         "Cancer (Leukemia)": {
           "14_20240923": {
@@ -122,9 +122,9 @@
       "time_window_number": "30",
       "time_window_unit": "days",
       "query_name": "Chlamydia case investigation",
-      "conditions_list": ["Chlamydia trachomatis infection"],
+      "conditions_list": "{Chlamydia trachomatis infection (disorder)}",
       "query_data": {
-        "Chlamydia trachomatis infection": {
+        "Chlamydia trachomatis infection (disorder)": {
           "2.16.840.1.113762.1.4.1146.999_20230602": {
             "valueSetId": "2.16.840.1.113762.1.4.1146.999_20230602",
             "valueSetVersion": "20230602",
@@ -2173,7 +2173,7 @@
       "time_window_unit": "days",
       "query_name": "Syphilis case investigation",
       "query_data": {
-        "Congenital syphilis": {
+        "Congenital syphilis (disorder)": {
           "2.16.840.1.113762.1.4.1146.554_20191227": {
             "valueSetId": "2.16.840.1.113762.1.4.1146.554_20191227",
             "valueSetVersion": "20191227",
@@ -2789,7 +2789,7 @@
               },
               {
                 "code": "A50.4",
-                "display": "Late congenital neurosyphilis [juvenile neurosyphilis]",
+                "display": "Late congenital neurosyphilis [juvenile neurosyphilis}",
                 "include": true
               },
               {
@@ -3171,12 +3171,12 @@
             "concepts": [
               {
                 "code": "1050115",
-                "display": "penicillin G procaine 300000 UNT/ML Injectable Suspension [Norocillin]",
+                "display": "penicillin G procaine 300000 UNT/ML Injectable Suspension [Norocillin}",
                 "include": true
               },
               {
                 "code": "1050111",
-                "display": "penicillin G procaine 300000 UNT/ML Injectable Suspension [Bactracillin G]",
+                "display": "penicillin G procaine 300000 UNT/ML Injectable Suspension [Bactracillin G}",
                 "include": true
               },
               {
@@ -3191,7 +3191,7 @@
               },
               {
                 "code": "1731729",
-                "display": "penicillin G procaine 300000 UNT/ML Injectable Suspension [Vetripen]",
+                "display": "penicillin G procaine 300000 UNT/ML Injectable Suspension [Vetripen}",
                 "include": true
               },
               {
@@ -3201,7 +3201,7 @@
               },
               {
                 "code": "1233540",
-                "display": "penicillin G procaine 300000 UNT/ML Injectable Suspension [Pro-Pen-G]",
+                "display": "penicillin G procaine 300000 UNT/ML Injectable Suspension [Pro-Pen-G}",
                 "include": true
               },
               {
@@ -3211,7 +3211,7 @@
               },
               {
                 "code": "1094911",
-                "display": "penicillin G procaine 300000 UNT/ML Injectable Suspension [Pen-Aqueous]",
+                "display": "penicillin G procaine 300000 UNT/ML Injectable Suspension [Pen-Aqueous}",
                 "include": true
               },
               {
@@ -3221,12 +3221,12 @@
               },
               {
                 "code": "1438136",
-                "display": "10 ML penicillin G procaine 10000 UNT/ML Prefilled Syringe [Masti-clear]",
+                "display": "10 ML penicillin G procaine 10000 UNT/ML Prefilled Syringe [Masti-clear}",
                 "include": true
               },
               {
                 "code": "1438129",
-                "display": "10 ML penicillin G procaine 10000 UNT/ML Prefilled Syringe [Go-dry]",
+                "display": "10 ML penicillin G procaine 10000 UNT/ML Prefilled Syringe [Go-dry}",
                 "include": true
               }
             ]
@@ -3259,7 +3259,7 @@
               },
               {
                 "code": "995906",
-                "display": "penicillin G potassium 1000000 UNT/ML Injectable Solution [Pfizerpen]",
+                "display": "penicillin G potassium 1000000 UNT/ML Injectable Solution [Pfizerpen}",
                 "include": true
               },
               {
@@ -3305,7 +3305,7 @@
             "concepts": [
               {
                 "code": "731568",
-                "display": "2 ML penicillin G benzathine 600000 UNT/ML Prefilled Syringe [Bicillin L-A]",
+                "display": "2 ML penicillin G benzathine 600000 UNT/ML Prefilled Syringe [Bicillin L-A}",
                 "include": true
               },
               {
@@ -3315,7 +3315,7 @@
               },
               {
                 "code": "731566",
-                "display": "1 ML penicillin G benzathine 600000 UNT/ML Prefilled Syringe [Bicillin L-A]",
+                "display": "1 ML penicillin G benzathine 600000 UNT/ML Prefilled Syringe [Bicillin L-A}",
                 "include": true
               },
               {
@@ -3335,7 +3335,7 @@
               },
               {
                 "code": "731571",
-                "display": "4 ML penicillin G benzathine 600000 UNT/ML Prefilled Syringe [Bicillin L-A]",
+                "display": "4 ML penicillin G benzathine 600000 UNT/ML Prefilled Syringe [Bicillin L-A}",
                 "include": true
               },
               {
@@ -3347,7 +3347,7 @@
           }
         }
       },
-      "conditions_list": ["Congenital syphilis"]
+      "conditions_list": "{Congenital syphilis (disorder)}"
     },
     {
       "author": "DIBBs",
@@ -3357,7 +3357,7 @@
       "time_window_unit": "days",
       "query_name": "Gonorrhea case investigation",
       "query_data": {
-        "Gonorrhea": {
+        "Gonorrhea (disorder)": {
           "2.16.840.1.113762.1.4.1146.1036_20190605": {
             "valueSetId": "2.16.840.1.113762.1.4.1146.1036_20190605",
             "valueSetVersion": "20190605",
@@ -4890,7 +4890,7 @@
           }
         }
       },
-      "conditions_list": ["Gonorrhea"]
+      "conditions_list": "{Gonorrhea (disorder)}"
     },
     {
       "author": "DIBBs",
@@ -4898,7 +4898,7 @@
       "date_last_modified": "2024-12-10T15:45:30",
       "time_window_number": "30",
       "time_window_unit": "days",
-      "query_name": "Newborn Screening",
+      "query_name": "Newborn screening follow-up",
       "query_data": {
         "Newborn Screening": {
           "1_20240909": {
@@ -5924,7 +5924,7 @@
           }
         }
       },
-      "conditions_list": ["Newborn Screening"]
+      "conditions_list": "{Newborn Screening}"
     }
   ]
 }

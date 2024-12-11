@@ -47,7 +47,7 @@ import {
 } from "./seedSqlStructs";
 
 const getQuerybyNameSQL = `
-select q.query_name, q.id
+select q.query_name, q.id, q.query_data, q.conditions_list
   from query q 
   where q.query_name = $1;
 `;
@@ -85,6 +85,12 @@ export const getSavedQueryByName = async (name: string) => {
   }
 };
 
+type QueryTableQueryDataColumn = {
+  [condition_name: string]: {
+    [valueSetId: string]: ValueSet;
+  };
+};
+
 /**
  * Maps the results returned from the DIBBs value set and coding system database
  * into a collection of value sets, each containing one or more Concepts build out
@@ -94,43 +100,18 @@ export const getSavedQueryByName = async (name: string) => {
  */
 export const mapQueryRowsToValueSets = async (rows: QueryResultRow[]) => {
   // Create groupings of rows (each of which is a single Concept) by their ValueSet ID
-  const vsIdGroupedRows = rows.reduce((conceptsByVSId, r) => {
-    if (!(r["valueset_id"] in conceptsByVSId)) {
-      conceptsByVSId[r["valueset_id"]] = [];
-    }
-    conceptsByVSId[r["valueset_id"]].push(r);
-    return conceptsByVSId;
-  }, {});
+  const valueSets: ValueSet[] = rows
+    .map((curRow) => {
+      const valueSetsByCondition =
+        curRow.query_data as QueryTableQueryDataColumn;
+      const valueSetsById = Object.values(valueSetsByCondition);
+      const curRowValueSets = valueSetsById
+        .map((valById) => Object.values(valById))
+        .flat();
+      return curRowValueSets;
+    })
+    .flat();
 
-  // Each "prop" of the struct is now a ValueSet ID
-  // Iterate over them to create formal Concept Groups attached to a formal VS
-  const valueSets = Object.keys(vsIdGroupedRows).map((vsID) => {
-    const conceptGroup: QueryResultRow[] = vsIdGroupedRows[vsID];
-    const valueSet: ValueSet = {
-      valueSetId: conceptGroup[0]["valueset_id"],
-      valueSetVersion: conceptGroup[0]["version"],
-      valueSetName: conceptGroup[0]["valueset_name"],
-      // External ID might not be defined for user-defined valuesets
-      valueSetExternalId: conceptGroup[0]["valueset_external_id"]
-        ? conceptGroup[0]["valueset_external_id"]
-        : undefined,
-      author: conceptGroup[0]["author"],
-      system: conceptGroup[0]["code_system"],
-      ersdConceptType: conceptGroup[0]["type"]
-        ? conceptGroup[0]["type"]
-        : undefined,
-      dibbsConceptType: conceptGroup[0]["dibbs_concept_type"],
-      includeValueSet: conceptGroup.find((c) => c["include"]) ? true : false,
-      concepts: conceptGroup.map((c) => {
-        return {
-          code: c["code"],
-          display: c["display"],
-          include: c["include"],
-        };
-      }),
-    };
-    return valueSet;
-  });
   return valueSets;
 };
 
@@ -700,39 +681,12 @@ export async function getCustomQueries(): Promise<CustomUserQuery[]> {
     SELECT
       q.id AS query_id,
       q.query_name,
-      vc.valueset_id AS valueSetId,
-      vc.version AS valueSetVersion,
-      vc.valueset_name AS valueSetName,
-      vc.author,
-      vc.system,
-      vc.ersd_concept_type AS ersdConceptType,
-      vc.dibbs_concept_type AS dibbsConceptType,
-      vc.valueset_include AS includeValueSet,
-      vc.code,
-      vc.display,
-      qic.include AS concept_include
+      q.query_data,
+      q.conditions_list
     FROM
       query q
-    LEFT JOIN (
-      SELECT
-        v.id AS valueset_id,
-        v.version,
-        v.name AS valueset_name,
-        v.author,
-        c.code_system AS system,
-        v.type AS ersd_concept_type,
-        v.dibbs_concept_type,
-        true AS valueset_include,
-        c.code,
-        c.display
-      FROM
-        valuesets v
-      LEFT JOIN valueset_to_concept vtc ON vtc.valueset_id = v.id
-      LEFT JOIN concepts c ON c.id = vtc.concept_id
-    ) vc ON vc.valueset_id = qtv.valueset_id
-    WHERE     q.query_name IN ('Gonorrhea (disorder)', 'Newborn Screening', 'Syphilis (disorder)', 'Cancer (Leukemia)', 'Chlamydia trachomatis infection (disorder)');
+    WHERE     q.query_name IN ('Gonorrhea case investigation', 'Newborn screening follow-up', 'Syphilis case investigation', 'Cancer case investigation', 'Chlamydia case investigation');
   `;
-  // TODO: We will need to refactor this to just pull query_name and conditions_list
   // TODO: this will eventually need to take into account user permissions and specific authors
   // We might also be able to take advantage of the `query_name` var to avoid joining valuesets/conc
 
@@ -740,55 +694,35 @@ export async function getCustomQueries(): Promise<CustomUserQuery[]> {
   const formattedData: { [key: string]: CustomUserQuery } = {};
 
   results.rows.forEach((row) => {
-    const {
-      query_id,
-      query_name,
-      valueSetId,
-      valueSetVersion,
-      valueSetName,
-      author,
-      system,
-      ersdConceptType,
-      dibbsConceptType,
-      includeValueSet,
-      code,
-      display,
-      concept_include,
-    } = row;
+    const { query_id, query_name, query_data, conditions_list } = row;
 
     // Initialize query structure if it doesn't exist
     if (!formattedData[query_id]) {
       formattedData[query_id] = {
         query_id,
         query_name,
+        conditions_list,
         valuesets: [],
       };
     }
 
-    // Check if the valueSetId already exists in the valuesets array
-    let valueset = formattedData[query_id].valuesets.find(
-      (v) => v.valueSetId === valueSetId,
-    );
+    Object.entries(
+      query_data as { [condition: string]: { [valueSetId: string]: ValueSet } },
+    ).forEach(([_, includedValueSets]) => {
+      Object.entries(includedValueSets).forEach(
+        ([valueSetId, valueSetData]) => {
+          // Check if the valueSetId already exists in the valuesets array
+          let valueset = formattedData[query_id].valuesets.find(
+            (v) => v.valueSetId === valueSetId,
+          );
 
-    // If valueSetId doesn't exist, add it
-    if (!valueset) {
-      valueset = {
-        valueSetId,
-        valueSetVersion,
-        valueSetName,
-        author,
-        system,
-        ersdConceptType,
-        dibbsConceptType,
-        includeValueSet,
-        concepts: [],
-      };
-      formattedData[query_id].valuesets.push(valueset);
-    }
-
-    // Add concept data to the concepts array
-    const concept: Concept = { code, display, include: concept_include };
-    valueset.concepts.push(concept);
+          // If valueSetId doesn't exist, add it
+          if (!valueset) {
+            formattedData[query_id].valuesets.push(valueSetData);
+          }
+        },
+      );
+    });
   });
 
   return Object.values(formattedData);
@@ -801,16 +735,15 @@ export async function getCustomQueries(): Promise<CustomUserQuery[]> {
  * @returns A boolean indicating whether the valuesets table has data.
  */
 export async function checkDBForData() {
-  // const query = `
-  //   SELECT reltuples AS estimated_count
-  //   FROM pg_class
-  //   WHERE relname = 'valuesets';
-  // `;
-  // const result = await dbClient.query(query);
+  const query = `
+    SELECT reltuples AS estimated_count
+    FROM pg_class
+    WHERE relname = 'valuesets';
+  `;
+  const result = await dbClient.query(query);
 
-  // // Return true if the estimated count > 0, otherwise false
-  // return (
-  //   result.rows.length > 0 && parseFloat(result.rows[0].estimated_count) > 0
-  // );
-  return false;
+  // Return true if the estimated count > 0, otherwise false
+  return (
+    result.rows.length > 0 && parseFloat(result.rows[0].estimated_count) > 0
+  );
 }
