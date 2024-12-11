@@ -13,6 +13,7 @@ import {
   INTENTIONAL_EMPTY_STRING_FOR_GEM_CODE,
   ValueSet,
   ersdToDibbsConceptMap,
+  FhirServerConfig,
 } from "./constants";
 import { encode } from "base-64";
 import {
@@ -783,4 +784,42 @@ export async function checkDBForData() {
   return (
     result.rows.length > 0 && parseFloat(result.rows[0].estimated_count) > 0
   );
+}
+
+//Cache for FHIR server configurations
+let cachedFhirServerConfigs: Promise<FhirServerConfig[]> | null = null;
+
+/**
+ * Fetches all FHIR server configurations from the database and caches the result.
+ * @param forceRefresh - Optional param to determine if the cache should be refreshed.
+ * @returns An array of FHIR server configurations.
+ */
+export async function getFhirServerConfigs(forceRefresh = false) {
+  if (forceRefresh || !cachedFhirServerConfigs) {
+    cachedFhirServerConfigs = (async () => {
+      const query = `SELECT * FROM fhir_servers;`;
+      const result = await dbClient.query(query);
+      return result.rows;
+    })();
+  }
+  return cachedFhirServerConfigs;
+}
+
+/**
+ * Fetches all FHIR server names from the database to make them available for selection on the front end/client side.
+ * @returns An array of FHIR server names.
+ */
+export async function getFhirServerNames(): Promise<string[]> {
+  const configs = await getFhirServerConfigs();
+  return configs.map((config) => config.name);
+}
+
+/**
+ * Fetches the configuration for a FHIR server from the database.
+ * @param fhirServerName - The name of the FHIR server to fetch the configuration for.
+ * @returns The configuration for the FHIR server.
+ */
+export async function getFhirServerConfig(fhirServerName: string) {
+  const configs = await getFhirServerConfigs();
+  return configs.find((config) => config.name === fhirServerName);
 }
