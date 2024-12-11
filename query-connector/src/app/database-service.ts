@@ -103,15 +103,31 @@ export const mapQueryRowsToValueSets = async (
   rows: QueryResultRow[],
 ): Promise<ValueSet[]> => {
   // Create groupings of rows (has {condition: valueset: concept} nesting) by their ValueSet ID
-  const valueSets: ValueSet[] = rows
-    .map((curRow) => {
-      const valueSetsByCondition =
-        curRow.query_data as QueryTableQueryDataColumn;
-      const valueSetsById = Object.values(valueSetsByCondition);
-      const curRowValueSets = valueSetsById
-        .map((valById) => Object.values(valById))
-        .flat();
-      return curRowValueSets;
+  const valueSetsByCondition = rows.map((curRow) => {
+    return curRow.query_data as QueryTableQueryDataColumn;
+  });
+
+  const valueSetsByIdArray = valueSetsByCondition
+    .map((v) => {
+      return Object.values(v);
+    })
+    .flat();
+
+  const valueSets: ValueSet[] = valueSetsByIdArray
+    .map((valById) => {
+      const curValueSet = Object.values(valById)[0];
+      return {
+        valueSetId: curValueSet.valueSetId,
+        valueSetVersion: curValueSet.valueSetVersion,
+        valueSetName: curValueSet.valueSetName,
+        valueSetExternalId: curValueSet?.valueSetExternalId,
+        author: curValueSet.author,
+        system: curValueSet.system,
+        ersdConceptType: curValueSet?.ersdConceptType,
+        dibbsConceptType: curValueSet.dibbsConceptType,
+        includeValueSet: curValueSet.includeValueSet,
+        concepts: curValueSet.concepts,
+      };
     })
     .flat();
 
