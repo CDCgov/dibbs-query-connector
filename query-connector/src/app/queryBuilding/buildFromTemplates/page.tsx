@@ -50,8 +50,18 @@ export default function QueryTemplateSelection() {
   const [conditionValueSets, setConditionValueSets] =
     useState<ConditionIdToValueSetArray>();
 
+  const checkForAddedConditions = (selectedIds: string[]) => {
+    const alreadyRetrieved =
+      conditionValueSets && Object.keys(conditionValueSets);
+
+    const newIds = selectedIds.filter((id) =>
+      alreadyRetrieved?.includes(id) ? false : true,
+    );
+
+    return newIds;
+  };
+
   async function getValueSetsForSelectedConditions() {
-    // return array of promises
     const conditionIds =
       selectedConditions &&
       Object.entries(selectedConditions)
@@ -60,9 +70,17 @@ export default function QueryTemplateSelection() {
         })
         .flatMap((ids) => ids);
 
+    const idsToQuery = conditionIds && checkForAddedConditions(conditionIds);
+    const idsToRemove =
+      conditionValueSets &&
+      Object.keys(conditionValueSets).filter(
+        (vs) => !conditionIds?.includes(vs),
+      );
+
     const ConditionValueSets: ConditionIdToValueSetArray = {};
 
-    if (conditionIds) {
+    // if there are new ids, we need to query the db
+    if (idsToQuery && idsToQuery.length > 0) {
       const results = await getValueSetsAndConceptsByConditionIDs(conditionIds);
       const formattedResults = results && mapQueryRowsToValueSets(results);
 
@@ -74,10 +92,10 @@ export default function QueryTemplateSelection() {
       });
 
       // group by Condition ID:
-      Object.values(formattedResults).reduce((acc, resultObj) => {
-        const id = resultObj.conditionId;
+      return Object.values(formattedResults).reduce((acc, resultObj) => {
+        if (resultObj.conditionId) {
+          const id = resultObj.conditionId;
 
-        if (!!id) {
           if (!acc[id]) {
             acc[id] = [];
           }
@@ -87,8 +105,13 @@ export default function QueryTemplateSelection() {
         return acc;
       }, ConditionValueSets);
     }
+    // otherwise, nothing's changed, return existing state
+    // after we've removed anything we unchecked
+    idsToRemove?.forEach((id) => {
+      conditionValueSets && delete conditionValueSets[id];
+    });
 
-    return ConditionValueSets;
+    return conditionValueSets;
   }
 
   useEffect(() => {
