@@ -816,6 +816,43 @@ export async function getCustomQueries(): Promise<CustomUserQuery[]> {
 }
 
 /**
+ * Deletes a query from the database by its unique ID.
+ * @param queryId - The unique identifier of the query to delete.
+ * @returns A success or error response indicating the result.
+ */
+export const deleteQueryById = async (queryId: string) => {
+  // TODO: should be able to simplified when it is just deleting query table
+  const deleteQuerySql1 = `
+    DELETE FROM query_included_concepts 
+    WHERE query_by_valueset_id IN (
+      SELECT id FROM query_to_valueset WHERE query_id = $1
+    );
+  `;
+  const deleteQuerySql2 = `
+    DELETE FROM query_to_valueset WHERE query_id = $1;
+  `;
+  const deleteQuerySql3 = `
+    DELETE FROM query WHERE id = $1;
+  `;
+
+  try {
+    await dbClient.query("BEGIN");
+
+    // Execute deletion queries in the correct order
+    await dbClient.query(deleteQuerySql1, [queryId]);
+    await dbClient.query(deleteQuerySql2, [queryId]);
+    await dbClient.query(deleteQuerySql3, [queryId]);
+
+    await dbClient.query("COMMIT");
+    return { success: true };
+  } catch (error) {
+    await dbClient.query("ROLLBACK");
+    console.error(`Failed to delete query with ID ${queryId}:`, error);
+    return { success: false, error: "Failed to delete the query." };
+  }
+};
+
+/**
  * Checks the database to see if data has been loaded into the valuesets table by
  * estmating the number of rows in the table. If the estimated count is greater than
  * 0, the function returns true, otherwise false.

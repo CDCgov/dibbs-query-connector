@@ -44,7 +44,7 @@ export const DataDisplay: React.FC<{
   );
 };
 
-interface DataContextValue {
+export interface DataContextValue {
   data: unknown; // You can define a specific data type here
   setData: (data: unknown) => void;
 }
