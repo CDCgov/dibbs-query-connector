@@ -405,15 +405,26 @@ ul.usa-sidenav
   padding-top: 0 !important;
 }
 
+.Toastify__toast-body {
+  .usa-alert__body::before {
+    mask-size: 1.5rem 1.5rem !important;
+    top: unset !important;
+  }
+
+  .usa-alert__body > * {
+    margin-left: 2rem !important;
+  }
+}
+
 .usa-alert__heading {
   &.h1 {
-    font-size: 2.125rem; 
+    font-size: 2.125rem;
     font-weight: bold;
     line-height: 1.5;
   }
 
   &.h2 {
-    font-size: 1.875rem; 
+    font-size: 1.875rem;
     font-weight: bold;
     line-height: 1.5;
   }
@@ -437,12 +448,11 @@ ul.usa-sidenav
   }
 
   &.h6 {
-    font-size: 1rem; 
+    font-size: 1rem;
     font-weight: bold;
     line-height: 1.2;
   }
 }
-
 
 .custom-query-step-indicator .usa-step-indicator__header {
   display: none !important;

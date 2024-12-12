@@ -67,8 +67,8 @@ const options = {
  * @param content.duration - Duration in milliseconds for how long the toast is visible. Defaults to 5000ms.
  */
 export function showToastConfirmation(content: {
+  body: string;
   heading?: string;
-  body?: string;
   variant?: AlertType;
   headingLevel?: HeadingLevel;
   duration?: number;

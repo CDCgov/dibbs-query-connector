@@ -173,8 +173,7 @@ const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
     setQueryValuesets(selectedItems);
     goBack();
     showToastConfirmation({
-      heading: QUERY_CUSTOMIZATION_CONFIRMATION_HEADER,
-      headingLevel: "h4",
+      body: QUERY_CUSTOMIZATION_CONFIRMATION_BODY,
     });
   };
 
@@ -252,5 +251,5 @@ const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
 };
 
 export default CustomizeQuery;
-export const QUERY_CUSTOMIZATION_CONFIRMATION_HEADER =
+export const QUERY_CUSTOMIZATION_CONFIRMATION_BODY =
   "Query Customization Successful!";
