@@ -103,32 +103,30 @@ export const mapQueryRowsToValueSets = async (
   rows: QueryResultRow[],
 ): Promise<ValueSet[]> => {
   // Unest the {condition: valuesetId: valueSet} nesting in an array of valueSets
-  const valueSetsByCondition = rows.map((curRow) => {
-    return curRow.query_data as QueryTableQueryDataColumn;
-  });
-
-  const valueSetsById = valueSetsByCondition
-    .map((v) => {
-      return Object.values(v);
+  const valueSets = rows
+    .map((curRow) => {
+      const valueSetsByCondition =
+        curRow.query_data as QueryTableQueryDataColumn;
+      const valueSetsById = Object.values(valueSetsByCondition);
+      return valueSetsById.map((valById) => {
+        const curValueSet = Object.values(valById);
+        return curValueSet.map((v) => {
+          return {
+            valueSetId: v.valueSetId,
+            valueSetVersion: v.valueSetVersion,
+            valueSetName: v.valueSetName,
+            author: v.author,
+            system: v.system,
+            valueSetExternalId: v?.valueSetExternalId,
+            ersdConceptType: v?.ersdConceptType,
+            dibbsConceptType: v.dibbsConceptType,
+            includeValueSet: v.includeValueSet,
+            concepts: v.concepts,
+          };
+        });
+      });
     })
-    .flat();
-
-  const valueSets: ValueSet[] = valueSetsById
-    .map((valById) => {
-      const curValueSet = Object.values(valById)[0];
-      return {
-        valueSetId: curValueSet.valueSetId,
-        valueSetVersion: curValueSet.valueSetVersion,
-        valueSetName: curValueSet.valueSetName,
-        valueSetExternalId: curValueSet?.valueSetExternalId,
-        author: curValueSet.author,
-        system: curValueSet.system,
-        ersdConceptType: curValueSet?.ersdConceptType,
-        dibbsConceptType: curValueSet.dibbsConceptType,
-        includeValueSet: curValueSet.includeValueSet,
-        concepts: curValueSet.concepts,
-      };
-    })
+    .flat()
     .flat();
 
   return valueSets;
