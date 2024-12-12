@@ -128,6 +128,12 @@ export const groupConditionConceptsIntoValueSets = (rows: QueryResultRow[]) => {
 };
 
 // TODO?: Type the input param more explicitly to not be a generic DB return?
+/**
+ *
+ * @param conceptGroup - a grouping of concepts fetched from various coding
+ * systems that share the same ValueSet ID
+ * @returns a ValueSet shaped to our internal ValueSet structure
+ */
 function mapStoredValueSetIntoInternalValueset(
   conceptGroup: QueryResultRow[],
 ): ValueSet {
