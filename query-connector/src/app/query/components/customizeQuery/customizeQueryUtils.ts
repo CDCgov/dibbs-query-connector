@@ -17,7 +17,7 @@ export type GroupedValueSet = {
  * of valueSetName:author:system and the values are all the value set items that
  * share those identifiers in common, structed as a GroupedValueSet
  */
-function groupValueSetsByNameAuthorSystem(valueSetsToGroup: ValueSet[]) {
+export function groupValueSetsByNameAuthorSystem(valueSetsToGroup: ValueSet[]) {
   const results = valueSetsToGroup.reduce(
     (acc, row) => {
       // Check if both author and code_system are defined

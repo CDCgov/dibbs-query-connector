@@ -1,19 +1,28 @@
 "use client";
 
 import Backlink from "@/app/query/components/backLink/Backlink";
-import styles from "./buildfromTemplate.module.scss";
+import styles from "../buildFromTemplates/buildfromTemplate.module.scss";
 import { useRouter } from "next/navigation";
-import { Button, Label, TextInput } from "@trussworks/react-uswds";
+import { Label, TextInput, Button } from "@trussworks/react-uswds";
 import { useEffect, useRef, useState } from "react";
-import classNames from "classnames";
-import { getConditionsData } from "@/app/database-service";
+
+import {
+  getConditionsData,
+  getValueSetsAndConceptsByConditionIDs,
+} from "@/app/database-service";
 import {
   CategoryNameToConditionOptionMap,
+  ConditionIdToValueSetArray,
   mapFetchedDataToFrontendStructure,
 } from "../utils";
-import ConditionColumnDisplay from "./ConditionColumnDisplay";
-import SearchField from "@/app/query/designSystem/searchField/SearchField";
+import { ConditionSelection } from "../components/ConditionSelection";
+import { ValueSetSelection } from "../components/ValueSetSelection";
 import SiteAlert from "@/app/query/designSystem/SiteAlert";
+import { BuildStep } from "../../constants";
+import LoadingView from "../../query/components/LoadingView";
+import classNames from "classnames";
+import { mapQueryRowsToValueSets } from "@/app/utils";
+import { batchToggleConcepts } from "../utils";
 
 export type FormError = {
   queryName: boolean;
@@ -27,9 +36,9 @@ export type FormError = {
 export default function QueryTemplateSelection() {
   const router = useRouter();
   const focusRef = useRef<HTMLInputElement | null>(null);
-
+  const [buildStep, setBuildStep] = useState<BuildStep>("condition");
+  const [loading, setLoading] = useState<boolean>(false);
   const [queryName, setQueryName] = useState<string>("");
-  const [searchFilter, setSearchFilter] = useState<string>();
   const [fetchedConditions, setFetchedConditions] =
     useState<CategoryNameToConditionOptionMap>();
   const [selectedConditions, setSelectedConditions] =
@@ -38,6 +47,72 @@ export default function QueryTemplateSelection() {
     queryName: false,
     selectedConditions: false,
   });
+  const [conditionValueSets, setConditionValueSets] =
+    useState<ConditionIdToValueSetArray>();
+
+  const checkForAddedConditions = (selectedIds: string[]) => {
+    const alreadyRetrieved =
+      conditionValueSets && Object.keys(conditionValueSets);
+
+    const newIds = selectedIds.filter((id) =>
+      alreadyRetrieved?.includes(id) ? false : true,
+    );
+
+    return newIds;
+  };
+
+  async function getValueSetsForSelectedConditions() {
+    const conditionIds =
+      selectedConditions &&
+      Object.entries(selectedConditions)
+        .map(([_, conditionObj]) => {
+          return Object.keys(conditionObj);
+        })
+        .flatMap((ids) => ids);
+
+    const idsToQuery = conditionIds && checkForAddedConditions(conditionIds);
+    const idsToRemove =
+      conditionValueSets &&
+      Object.keys(conditionValueSets).filter(
+        (vs) => !conditionIds?.includes(vs),
+      );
+
+    const ConditionValueSets: ConditionIdToValueSetArray = {};
+
+    // if there are new ids, we need to query the db
+    if (idsToQuery && idsToQuery.length > 0) {
+      const results = await getValueSetsAndConceptsByConditionIDs(conditionIds);
+      const formattedResults = results && mapQueryRowsToValueSets(results);
+
+      // when fetching directly from conditions table (as opposed to a saved query),
+      // default to including all value sets
+      formattedResults.forEach((result) => {
+        batchToggleConcepts(result);
+        return (result.includeValueSet = true);
+      });
+
+      // group by Condition ID:
+      return Object.values(formattedResults).reduce((acc, resultObj) => {
+        if (resultObj.conditionId) {
+          const id = resultObj.conditionId;
+
+          if (!acc[id]) {
+            acc[id] = [];
+          }
+          acc[id].push(resultObj);
+          return acc;
+        }
+        return acc;
+      }, ConditionValueSets);
+    }
+    // otherwise, nothing's changed, return existing state
+    // after we've removed anything we unchecked
+    idsToRemove?.forEach((id) => {
+      conditionValueSets && delete conditionValueSets[id];
+    });
+
+    return conditionValueSets;
+  }
 
   useEffect(() => {
     let isSubscribed = true;
@@ -75,12 +150,43 @@ export default function QueryTemplateSelection() {
     };
   }, [selectedConditions, queryName]);
 
-  function handleCreateQueryClick(event: React.MouseEvent<HTMLButtonElement>) {
-    event.preventDefault();
+  // ensures the fetchedConditions' checkbox statuses match
+  // the data in selectedCondtiions
+  function updateFetchedConditionIncludeStatus(
+    selectedConditions: CategoryNameToConditionOptionMap,
+  ) {
+    const prevFetch = structuredClone(fetchedConditions);
+    if (prevFetch) {
+      Object.entries(selectedConditions).map(
+        ([category, conditionsByCategory]) => {
+          Object.entries(conditionsByCategory).flatMap(
+            ([conditionId, conditionObj]) => {
+              const prevValues = prevFetch[category][conditionId];
+              prevFetch[category][conditionId] = {
+                name: prevValues.name,
+                include: conditionObj.include,
+              };
+              return setFetchedConditions(prevFetch);
+            },
+          );
+        },
+      );
+    }
+  }
 
+  async function handleCreateQueryClick(
+    event: React.MouseEvent<HTMLButtonElement>,
+  ) {
+    event.preventDefault();
+    setLoading(true);
     validateForm();
     if (!!queryName && !formError.queryName && !formError.selectedConditions) {
-      submitForm();
+      // fetch valuesets for selected conditions
+      const valueSets = await getValueSetsForSelectedConditions();
+
+      setConditionValueSets(valueSets);
+      setBuildStep("valueset");
+      setLoading(false);
     }
   }
 
@@ -95,100 +201,111 @@ export default function QueryTemplateSelection() {
     });
   };
 
-  const submitForm = () => {
-    // TODO: do something with selectedConditions on next step/page
-    // will be addressed in https://linear.app/skylight-cdc/issue/QUE-65/create-the-valueset-selection-page
-    console.log(selectedConditions);
-  };
-
   const atLeastOneItemSelected =
     selectedConditions && Object.values(selectedConditions).length > 0;
 
   return (
     <>
       <SiteAlert />
-      <div className="main-container__wide">
+      <div className={classNames("main-container__wide", styles.mainContainer)}>
         <Backlink
           onClick={() => {
-            router.push("/queryBuilding");
+            // TODO: this can be tidied up...
+            if (buildStep == "valueset") {
+              setBuildStep("condition");
+              updateFetchedConditionIncludeStatus(selectedConditions ?? {});
+            } else {
+              router.push("/queryBuilding");
+            }
           }}
-          label={"Back to My queries"}
-        />
-        <h1 className={styles.queryTitle}>Custom query</h1>
-        <Label htmlFor="queryNameInput" className="margin-top-0-important">
-          Query name <span style={{ color: "#919191" }}>(required)</span>
-        </Label>
-        <TextInput
-          inputRef={focusRef}
-          id="queryNameInput"
-          name="queryNameInput"
-          type="text"
-          style={
-            formError.queryName && !queryName
-              ? { border: "1px solid #E41D3D" }
-              : {}
+          // TODO: tidy this too
+          label={
+            buildStep == "valueset"
+              ? "Back to condition selection"
+              : "Back to My queries"
           }
-          className="maxw-mobile"
-          required
-          onChange={(event) => {
-            setQueryName(event.target.value);
-          }}
         />
-        <span
-          className="inline-error queryName-error"
-          style={!!queryName ? { display: "none" } : { color: "#E41D3D" }}
-          hidden={formError.queryName == false}
-        >
-          Please enter a query name.
-        </span>
-        <div
-          className={classNames(
-            "bg-gray-5 margin-top-4 ",
-            styles.queryTemplateContainer,
-          )}
-        >
-          <div className="display-flex flex-justify flex-align-end margin-bottom-3 width-full">
-            <h2 className="margin-y-0-important">Select condition(s)</h2>
-            <Button
-              className="margin-0"
-              type={"button"}
-              disabled={formError.selectedConditions || !queryName}
-              title={
-                formError.selectedConditions || formError.queryName
-                  ? "Enter a query name and condition"
-                  : "Click to create your query"
-              }
-              onClick={handleCreateQueryClick}
-            >
-              Create query
-            </Button>
-          </div>
-          <div className={classNames(styles.querySelectionForm, "radius-lg")}>
-            <SearchField
-              id="conditionTemplateSearch"
-              placeholder="Search conditions"
-              className={classNames(
-                "maxw-mobile margin-x-auto margin-top-0 margin-bottom-4",
-              )}
-              onChange={(e) => {
-                e.preventDefault();
-                setSearchFilter(e.target.value);
-              }}
-            />
 
-            {fetchedConditions && (
-              <ConditionColumnDisplay
-                selectedConditions={selectedConditions ?? {}}
-                setSelectedConditions={setSelectedConditions}
-                fetchedConditions={fetchedConditions}
-                searchFilter={searchFilter}
-                setFetchedConditions={setFetchedConditions}
-                setFormError={setFormError}
-                formError={formError}
+        <div className="customQuery__header">
+          <h1 className={styles.queryTitle}>Custom query</h1>
+          <div className={styles.customQuery__controls}>
+            <div className={styles.customQuery__name}>
+              <Label
+                htmlFor="queryNameInput"
+                className="margin-top-0-important"
+              >
+                Query name <span style={{ color: "#919191" }}>(required)</span>
+              </Label>
+              <TextInput
+                inputRef={focusRef}
+                id="queryNameInput"
+                name="queryNameInput"
+                type="text"
+                className="maxw-mobile"
+                required
+                onChange={(event) => {
+                  setQueryName(event.target.value);
+                }}
               />
-            )}
+            </div>
+            <div className={styles.customQuery__saveButton}>
+              <Button
+                className="margin-0"
+                type={"button"}
+                disabled={
+                  formError.selectedConditions ||
+                  !queryName ||
+                  loading ||
+                  buildStep == "valueset" // hard-coding this off for now; should be handled in concept selection ticket
+                }
+                title={
+                  buildStep == "valueset"
+                    ? "Save query"
+                    : formError.selectedConditions || formError.queryName
+                      ? "Enter a query name and condition"
+                      : "Click to create your query"
+                }
+                onClick={
+                  buildStep == "condition"
+                    ? handleCreateQueryClick
+                    : () => console.log("save query")
+                }
+              >
+                {buildStep == "condition" ? "Customize query" : "Save query"}
+              </Button>
+            </div>
           </div>
         </div>
+        <div className="display-flex flex-auto">
+          {/* Step One: Select Conditions */}
+          {buildStep == "condition" && fetchedConditions && (
+            <ConditionSelection
+              setBuildStep={setBuildStep}
+              queryName={queryName}
+              fetchedConditions={fetchedConditions ?? {}}
+              selectedConditions={selectedConditions ?? {}}
+              setFetchedConditions={setFetchedConditions}
+              setSelectedConditions={setSelectedConditions}
+              setFormError={setFormError}
+              formError={formError}
+              validateForm={validateForm}
+              loading={loading}
+              setLoading={setLoading}
+              setConditionValueSets={setConditionValueSets}
+              updateFetched={updateFetchedConditionIncludeStatus}
+            />
+          )}
+          {/* Step Two: Select ValueSets */}
+          {buildStep == "valueset" && (
+            <ValueSetSelection
+              setBuildStep={setBuildStep}
+              queryName={queryName}
+              selectedConditions={selectedConditions ?? {}}
+              valueSetsByCondition={conditionValueSets ?? {}}
+            />
+          )}
+        </div>
+        {loading && <LoadingView loading={loading} />}
       </div>
     </>
   );

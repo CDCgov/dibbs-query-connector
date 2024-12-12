@@ -41,15 +41,19 @@ const Accordion: React.FC<AccordionProps> = ({
   accordionClassName,
 }) => {
   const accordionItem = [
-    { title, content, id, expanded, headingLevel, handleToggle },
+    {
+      title,
+      content,
+      id,
+      expanded,
+      headingLevel,
+      handleToggle,
+    },
   ];
+
   return (
     <div className={containerClassName}>
-      <TrussAccordion
-        items={accordionItem}
-        multiselectable={true}
-        className={accordionClassName}
-      />
+      <TrussAccordion items={accordionItem} className={accordionClassName} />
     </div>
   );
 };

@@ -299,6 +299,9 @@ export const stateOptions = [
 /* Mode that pages can be in; determines what is displayed to the user */
 export type Mode = "search" | "results" | "select-query" | "patient-results";
 
+/* Mode that query building pages can be in; determines what is displayed to the user */
+export type BuildStep = "condition" | "valueset" | "concept";
+
 export const metadata = {
   title: "Query Connector",
   description: "Try out TEFCA with queries for public health use cases.",
@@ -327,6 +330,7 @@ export interface ValueSet {
   dibbsConceptType: string;
   includeValueSet: boolean;
   concepts: Concept[];
+  conditionId?: string;
 }
 
 export const DEFAULT_ERSD_VERSION = "3";
