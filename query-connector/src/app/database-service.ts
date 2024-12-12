@@ -1,5 +1,5 @@
 "use server";
-import { Pool, PoolConfig, QueryResultRow } from "pg";
+import { Pool, PoolConfig } from "pg";
 import {
   Bundle,
   OperationOutcome,
@@ -48,13 +48,22 @@ import {
 } from "./seedSqlStructs";
 
 const getQuerybyNameSQL = `
-select q.query_name, q.id, qtv.valueset_id, vs.name as valueset_name, vs.oid as valueset_external_id, vs.version, vs.author as author, vs.type, vs.dibbs_concept_type as dibbs_concept_type, qic.concept_id, qic.include, c.code, c.code_system, c.display 
+select q.query_name, q.id, qtv.valueset_id, vs.name as valueset_name, vs.oid as valueset_external_id, vs.version, vs.author as author, vs.type, vs.dibbs_concept_type as dibbs_concept_type, qic.concept_id, qic.include, c.code, c.code_system, c.display
   from query q 
   left join query_to_valueset qtv on q.id = qtv.query_id 
   left join valuesets vs on qtv.valueset_id = vs.id
   left join query_included_concepts qic on qtv.id = qic.query_by_valueset_id 
   left join concepts c on qic.concept_id = c.id 
   where q.query_name = $1;
+`;
+
+const getValueSetsByConditionIds = `
+SELECT c.display, c.code_system, c.code, vs.name as valueset_name, vs.id as valueset_id, vs.oid as valueset_external_id, vs.version, vs.author as author, vs.type, vs.dibbs_concept_type as dibbs_concept_type, ctvs.condition_id
+  FROM valuesets vs 
+  LEFT JOIN condition_to_valueset ctvs on vs.id = ctvs.valueset_id 
+  LEFT JOIN valueset_to_concept vstc on vs.id = vstc.valueset_id
+  LEFT JOIN concepts c on vstc.concept_id = c.id
+  WHERE ctvs.condition_id IN (
 `;
 
 // Load environment variables from .env and establish a Pool configuration
@@ -65,6 +74,33 @@ const dbConfig: PoolConfig = {
   connectionTimeoutMillis: 3000, // Wait this long before timing out when connecting new client
 };
 const dbClient = new Pool(dbConfig);
+
+/**
+ * Executes a search for a ValueSets and Concepts against the Postgres
+ * Database, using the ID of the condition associated with any such data.
+ * @param ids Array of ids for entries in the conditions table
+ * @returns One or more rows from the DB matching the requested saved query,
+ * or an error if no results can be found.
+ */
+export const getValueSetsAndConceptsByConditionIDs = async (ids: string[]) => {
+  const escapedValues = ids.map((_, i) => `$${i + 1}`).join() + ")";
+  const queryString = getValueSetsByConditionIds + escapedValues;
+
+  try {
+    const result = await dbClient.query(queryString, ids);
+    if (result.rows.length === 0) {
+      console.error("No results found for given condition ids", ids);
+      return [];
+    }
+    return result.rows;
+  } catch (error) {
+    console.error(
+      "Error retrieving value sets and concepts for condition",
+      error,
+    );
+    throw error;
+  }
+};
 
 /**
  * Executes a search for a CustomQuery against the query-loaded Postgres
@@ -106,55 +142,6 @@ export const executeDefaultQueryCreation = async () => {
     console.error("Could not cross-index default queries", error);
     throw error;
   }
-};
-
-/**
- * Maps the results returned from the DIBBs value set and coding system database
- * into a collection of value sets, each containing one or more Concepts build out
- * of the coding information in the DB.
- * @param rows The Rows returned from the DB Query.
- * @returns A list of ValueSets, which hold the Concepts pulled from the DB.
- */
-export const mapQueryRowsToValueSets = async (rows: QueryResultRow[]) => {
-  // Create groupings of rows (each of which is a single Concept) by their ValueSet ID
-  const vsIdGroupedRows = rows.reduce((conceptsByVSId, r) => {
-    if (!(r["valueset_id"] in conceptsByVSId)) {
-      conceptsByVSId[r["valueset_id"]] = [];
-    }
-    conceptsByVSId[r["valueset_id"]].push(r);
-    return conceptsByVSId;
-  }, {});
-
-  // Each "prop" of the struct is now a ValueSet ID
-  // Iterate over them to create formal Concept Groups attached to a formal VS
-  const valueSets = Object.keys(vsIdGroupedRows).map((vsID) => {
-    const conceptGroup: QueryResultRow[] = vsIdGroupedRows[vsID];
-    const valueSet: ValueSet = {
-      valueSetId: conceptGroup[0]["valueset_id"],
-      valueSetVersion: conceptGroup[0]["version"],
-      valueSetName: conceptGroup[0]["valueset_name"],
-      // External ID might not be defined for user-defined valuesets
-      valueSetExternalId: conceptGroup[0]["valueset_external_id"]
-        ? conceptGroup[0]["valueset_external_id"]
-        : undefined,
-      author: conceptGroup[0]["author"],
-      system: conceptGroup[0]["code_system"],
-      ersdConceptType: conceptGroup[0]["type"]
-        ? conceptGroup[0]["type"]
-        : undefined,
-      dibbsConceptType: conceptGroup[0]["dibbs_concept_type"],
-      includeValueSet: conceptGroup.find((c) => c["include"]) ? true : false,
-      concepts: conceptGroup.map((c) => {
-        return {
-          code: c["code"],
-          display: c["display"],
-          include: c["include"],
-        };
-      }),
-    };
-    return valueSet;
-  });
-  return valueSets;
 };
 
 /*

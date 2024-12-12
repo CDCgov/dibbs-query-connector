@@ -4,10 +4,8 @@ import {
   ValueSet,
   hyperUnluckyPatient,
 } from "@/app/constants";
-import {
-  getSavedQueryByName,
-  mapQueryRowsToValueSets,
-} from "@/app/database-service";
+import { getSavedQueryByName } from "@/app/database-service";
+import { mapQueryRowsToValueSets } from "@/app/utils";
 import { UseCaseQuery, UseCaseQueryResponse } from "@/app/query-service";
 import { Patient } from "fhir/r4";
 
