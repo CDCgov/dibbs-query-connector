@@ -129,29 +129,25 @@ export const groupConditionConceptsIntoValueSets = (rows: QueryResultRow[]) => {
 
 // TODO?: Type the input param more explicitly to not be a generic DB return?
 function mapStoredValueSetIntoInternalValueset(
-  storedValueSetGroup: QueryResultRow[],
+  conceptGroup: QueryResultRow[],
 ): ValueSet {
   // For info that should be the same at the valueset-level, just use the first
-  // valueset to populate them for everything
-  const storedValueSet = storedValueSetGroup[0];
+  // fetched concept to populate
+  const storedConcept = conceptGroup[0];
   const valueSet: ValueSet = {
-    valueSetId: storedValueSet["valueset_id"],
-    valueSetVersion: storedValueSet["version"],
-    valueSetName: storedValueSet["valueset_name"],
+    valueSetId: storedConcept["valueset_id"],
+    valueSetVersion: storedConcept["version"],
+    valueSetName: storedConcept["valueset_name"],
     // External ID might not be defined for user-defined valuesets
-    valueSetExternalId: storedValueSet["valueset_external_id"]
-      ? storedValueSet["valueset_external_id"]
+    valueSetExternalId: storedConcept["valueset_external_id"]
+      ? storedConcept["valueset_external_id"]
       : undefined,
-    author: storedValueSet["author"],
-    system: storedValueSet["code_system"],
-    ersdConceptType: storedValueSet["type"]
-      ? storedValueSet["type"]
-      : undefined,
-    dibbsConceptType: storedValueSet["dibbs_concept_type"],
-    includeValueSet: storedValueSetGroup.find((c) => c["include"])
-      ? true
-      : false,
-    concepts: storedValueSetGroup.map((c) => {
+    author: storedConcept["author"],
+    system: storedConcept["code_system"],
+    ersdConceptType: storedConcept["type"] ? storedConcept["type"] : undefined,
+    dibbsConceptType: storedConcept["dibbs_concept_type"],
+    includeValueSet: conceptGroup.find((c) => c["include"]) ? true : false,
+    concepts: conceptGroup.map((c) => {
       return {
         code: c["code"],
         display: c["display"],
@@ -159,7 +155,7 @@ function mapStoredValueSetIntoInternalValueset(
       };
     }),
   };
-  const conditionId = storedValueSet["condition_id"];
+  const conditionId = storedConcept["condition_id"];
   if (conditionId) {
     valueSet["conditionId"] = conditionId;
   }
