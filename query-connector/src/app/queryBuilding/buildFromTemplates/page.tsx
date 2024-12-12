@@ -21,10 +21,7 @@ import SiteAlert from "@/app/query/designSystem/SiteAlert";
 import { BuildStep } from "../../constants";
 import LoadingView from "../../query/components/LoadingView";
 import classNames from "classnames";
-import {
-  unnestValueSetsFromQuery,
-  populateSavedValueSetWithConcepts,
-} from "@/app/utils";
+import { populateSavedValueSetWithConcepts } from "@/app/utils";
 import { batchToggleConcepts } from "../utils";
 
 export type FormError = {

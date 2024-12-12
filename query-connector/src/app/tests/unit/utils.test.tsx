@@ -11,7 +11,6 @@ import {
   groupConditionDataByCategoryName,
   filterSearchByCategoryAndCondition,
 } from "@/app/queryBuilding/utils";
-import { QueryResultRow } from "pg";
 import {
   CANCER_VALUESETS,
   CATEGORY_TO_CONDITION_ARRAY_MAP,
