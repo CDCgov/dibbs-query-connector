@@ -13,7 +13,7 @@ import {
 import {
   CategoryNameToConditionOptionMap,
   ConditionIdToValueSetArray,
-  mapFetchedDataToFrontendStructure,
+  groupConditionDataByCategoryName,
 } from "../utils";
 import { ConditionSelection } from "../components/ConditionSelection";
 import { ValueSetSelection } from "../components/ValueSetSelection";
@@ -21,7 +21,10 @@ import SiteAlert from "@/app/query/designSystem/SiteAlert";
 import { BuildStep } from "../../constants";
 import LoadingView from "../../query/components/LoadingView";
 import classNames from "classnames";
-import { mapQueryRowsToValueSets } from "@/app/utils";
+import {
+  unnestValueSetsFromQuery,
+  populateSavedValueSetWithConcepts,
+} from "@/app/utils";
 import { batchToggleConcepts } from "../utils";
 
 export type FormError = {
@@ -82,7 +85,8 @@ export default function QueryTemplateSelection() {
     // if there are new ids, we need to query the db
     if (idsToQuery && idsToQuery.length > 0) {
       const results = await getValueSetsAndConceptsByConditionIDs(conditionIds);
-      const formattedResults = results && mapQueryRowsToValueSets(results);
+      const formattedResults =
+        results && populateSavedValueSetWithConcepts(results);
 
       // when fetching directly from conditions table (as opposed to a saved query),
       // default to including all value sets
@@ -138,7 +142,7 @@ export default function QueryTemplateSelection() {
 
       if (isSubscribed) {
         setFetchedConditions(
-          mapFetchedDataToFrontendStructure(categoryToConditionArrayMap),
+          groupConditionDataByCategoryName(categoryToConditionArrayMap),
         );
       }
     }

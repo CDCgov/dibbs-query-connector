@@ -76,13 +76,16 @@ type QueryTableQueryDataColumn = {
 };
 
 /**
- * Maps the results returned from the DIBBs value set and coding system database
- * into a collection of value sets, each containing one or more Concepts build out
+ * Maps the results returned from the DIBBs query table into their associated
+ * valueSets, each containing one or more Concepts build out
  * of the coding information in the DB.
- * @param rows The Rows returned from the DB Query.
+ * @param rows The Rows returned from the ValueSet table.
  * @returns A list of ValueSets, which hold the Concepts pulled from the DB.
  */
-export const mapQueryRowsToValueSets = (rows: QueryResultRow[]): ValueSet[] => {
+
+export const unnestValueSetsFromQuery = (
+  rows: QueryResultRow[],
+): ValueSet[] => {
   // Unest the {condition: valuesetId: valueSet} nesting in an array of valueSets
   const valueSets = rows
     .map((curRow) => {
@@ -90,25 +93,63 @@ export const mapQueryRowsToValueSets = (rows: QueryResultRow[]): ValueSet[] => {
         curRow.query_data as QueryTableQueryDataColumn;
       const valueSetsById = Object.values(valueSetsByCondition);
       return valueSetsById.map((valById) => {
-        const curValueSet = Object.values(valById);
-        return curValueSet.map((v) => {
-          return {
-            valueSetId: v.valueSetId,
-            valueSetVersion: v.valueSetVersion,
-            valueSetName: v.valueSetName,
-            author: v.author,
-            system: v.system,
-            valueSetExternalId: v?.valueSetExternalId,
-            ersdConceptType: v?.ersdConceptType,
-            dibbsConceptType: v.dibbsConceptType,
-            includeValueSet: v.includeValueSet,
-            concepts: v.concepts,
-          };
-        });
+        return Object.values(valById);
       });
     })
     .flat()
     .flat();
 
+  return valueSets;
+};
+/**
+ * Maps the results returned from the DIBBs value set and coding system database
+ * into a collection of value sets, each containing one or more Concepts build out
+ * of the coding information in the DB.
+ * @param rows The Rows returned from the ValueSet table.
+ * @returns A list of ValueSets, which hold the Concepts pulled from the DB.
+ */
+export const populateSavedValueSetWithConcepts = (rows: QueryResultRow[]) => {
+  // Create groupings of rows (each of which is a single Concept) by their ValueSet ID
+  const vsIdGroupedRows = rows.reduce((conceptsByVSId, r) => {
+    if (!(r["valueset_id"] in conceptsByVSId)) {
+      conceptsByVSId[r["valueset_id"]] = [];
+    }
+    conceptsByVSId[r["valueset_id"]].push(r);
+    return conceptsByVSId;
+  }, {});
+
+  // Each "prop" of the struct is now a ValueSet ID
+  // Iterate over them to create formal Concept Groups attached to a formal VS
+  const valueSets = Object.keys(vsIdGroupedRows).map((vsID) => {
+    const conceptGroup: QueryResultRow[] = vsIdGroupedRows[vsID];
+    const valueSet: ValueSet = {
+      valueSetId: conceptGroup[0]["valueset_id"],
+      valueSetVersion: conceptGroup[0]["version"],
+      valueSetName: conceptGroup[0]["valueset_name"],
+      // External ID might not be defined for user-defined valuesets
+      valueSetExternalId: conceptGroup[0]["valueset_external_id"]
+        ? conceptGroup[0]["valueset_external_id"]
+        : undefined,
+      author: conceptGroup[0]["author"],
+      system: conceptGroup[0]["code_system"],
+      ersdConceptType: conceptGroup[0]["type"]
+        ? conceptGroup[0]["type"]
+        : undefined,
+      dibbsConceptType: conceptGroup[0]["dibbs_concept_type"],
+      includeValueSet: conceptGroup.find((c) => c["include"]) ? true : false,
+      concepts: conceptGroup.map((c) => {
+        return {
+          code: c["code"],
+          display: c["display"],
+          include: c["include"] ?? true,
+        };
+      }),
+    };
+    const conditionId = conceptGroup[0]["condition_id"];
+    if (conditionId) {
+      valueSet["conditionId"] = conditionId;
+    }
+    return valueSet;
+  });
   return valueSets;
 };
