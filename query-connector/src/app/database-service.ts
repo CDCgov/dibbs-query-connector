@@ -21,7 +21,6 @@ import {
   generateQueryInsertionSql,
   CustomUserQuery,
 } from "./query-building";
-import { UUID } from "crypto";
 import {
   CategoryToConditionArrayMap,
   ConditionIdToNameMap,
