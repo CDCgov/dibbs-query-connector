@@ -1,5 +1,5 @@
 "use server";
-import { Pool, PoolConfig, QueryResultRow } from "pg";
+import { Pool, PoolConfig } from "pg";
 import {
   Bundle,
   OperationOutcome,
