@@ -107,7 +107,7 @@ export const unnestValueSetsFromQuery = (
  * @param rows The Rows returned from the ValueSet table.
  * @returns A list of ValueSets, which hold the Concepts pulled from the DB.
  */
-export const populateSavedValueSetWithConcepts = (rows: QueryResultRow[]) => {
+export const groupConditionConceptsByValueSetId = (rows: QueryResultRow[]) => {
   // Create groupings of rows (each of which is a single Concept) by their ValueSet ID
   const vsIdGroupedRows = rows.reduce((conceptsByVSId, r) => {
     if (!(r["valueset_id"] in conceptsByVSId)) {

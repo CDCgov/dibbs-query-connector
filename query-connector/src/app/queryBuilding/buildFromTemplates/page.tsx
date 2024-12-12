@@ -21,7 +21,7 @@ import SiteAlert from "@/app/query/designSystem/SiteAlert";
 import { BuildStep } from "../../constants";
 import LoadingView from "../../query/components/LoadingView";
 import classNames from "classnames";
-import { populateSavedValueSetWithConcepts } from "@/app/utils";
+import { groupConditionConceptsByValueSetId } from "@/app/utils";
 import { batchToggleConcepts } from "../utils";
 
 export type FormError = {
@@ -83,7 +83,7 @@ export default function QueryTemplateSelection() {
     if (idsToQuery && idsToQuery.length > 0) {
       const results = await getValueSetsAndConceptsByConditionIDs(conditionIds);
       const formattedResults =
-        results && populateSavedValueSetWithConcepts(results);
+        results && groupConditionConceptsByValueSetId(results);
 
       // when fetching directly from conditions table (as opposed to a saved query),
       // default to including all value sets

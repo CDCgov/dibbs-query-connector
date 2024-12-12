@@ -3,7 +3,7 @@ import { render, screen } from "@testing-library/react";
 import {
   DataDisplay,
   DataDisplayInfo,
-  populateSavedValueSetWithConcepts,
+  groupConditionConceptsByValueSetId,
   unnestValueSetsFromQuery,
 } from "../../utils";
 
@@ -139,9 +139,9 @@ describe("data util methods for query building", () => {
     expect(unnestedVals.length).toBe(EXPECTED_CHLAMYDIA_VALUESET_LENGTH);
   });
 
-  describe("populateSavedValueSetWithConcepts", () => {
+  describe("groupConditionConceptsByValueSetId", () => {
     const formattedValueSets =
-      populateSavedValueSetWithConcepts(CANCER_VALUESETS);
+      groupConditionConceptsByValueSetId(CANCER_VALUESETS);
     const EXPECTED_CANCER_VALUESET_GROUPS = 4;
     expect(formattedValueSets.length).toBe(EXPECTED_CANCER_VALUESET_GROUPS);
     expect(
