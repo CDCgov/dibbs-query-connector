@@ -3,7 +3,7 @@ import { render, screen } from "@testing-library/react";
 import {
   DataDisplay,
   DataDisplayInfo,
-  groupConditionConceptsByValueSetId,
+  groupConditionConceptsIntoValueSets,
   unnestValueSetsFromQuery,
 } from "../../utils";
 
@@ -141,7 +141,7 @@ describe("data util methods for query building", () => {
 
   describe("groupConditionConceptsByValueSetId", () => {
     const formattedValueSets =
-      groupConditionConceptsByValueSetId(CANCER_VALUESETS);
+      groupConditionConceptsIntoValueSets(CANCER_VALUESETS);
     const EXPECTED_CANCER_VALUESET_GROUPS = 4;
     expect(formattedValueSets.length).toBe(EXPECTED_CANCER_VALUESET_GROUPS);
     expect(
