@@ -23,6 +23,8 @@ type ModalProps = {
   description: string;
   modalRef: RefObject<ModalRef>;
   buttons: ModalButton[]; // Dynamic buttons
+  children?: React.ReactNode;
+  className?: string;
 };
 
 /**
@@ -35,6 +37,8 @@ type ModalProps = {
  * @param param0.modalRef - ref object to connect the toggle button with the
  * actual modal.
  * @param param0.buttons - Array of button definitions for the modal footer.
+ * @param param0.children - Optional children to render inside the modal body
+ * @param param0.className - Optional classes for styling
  * @returns A customizable modal component
  */
 export const Modal: React.FC<ModalProps> = ({
@@ -43,17 +47,21 @@ export const Modal: React.FC<ModalProps> = ({
   description,
   modalRef,
   buttons,
+  children,
+  className,
 }) => {
   return (
     <TrussModal
       ref={modalRef}
       id={`${id}-modal`}
+      className={className}
       aria-labelledby={`${id}-modal-heading`}
       aria-describedby={`${id}-modal-description`}
     >
       <ModalHeading id={`${id}-modal-heading`}>{heading}</ModalHeading>
       <div className="usa-prose">
         <p id={`${id}-modal-description`}>{description}</p>
+        {children && <div>{children}</div>}
       </div>
       <ModalFooter>
         <ButtonGroup>
