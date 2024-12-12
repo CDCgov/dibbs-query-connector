@@ -29,7 +29,7 @@ export const UserQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
   const router = useRouter();
   const context = useContext(DataContext);
   const [queries, setQueries] = useState<CustomUserQuery[]>(initialQueries);
-  const [loading, setLoading] = useState(false);
+  const [_, setLoading] = useState(false);
   const modalRef = useRef<ModalRef>(null);
   const [selectedQuery, setSelectedQuery] = useState<{
     queryName: string;
@@ -71,8 +71,7 @@ export const UserQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
             {queries.map((query, index) => (
               <tr key={index} className="tableRowWithHover">
                 <td title={query.query_name}>{query.query_name}</td>
-                <td title={query.query_name}>{query.query_name}</td>
-                {/* TODO: Use conditions_list once available */}
+                <td title={query.conditions_list}>{query.conditions_list}</td>
                 <td>
                   <div className="table-cell-buttons">
                     <Button

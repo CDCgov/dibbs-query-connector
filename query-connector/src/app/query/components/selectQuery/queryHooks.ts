@@ -18,7 +18,7 @@ type SetStateCallback<T> = React.Dispatch<React.SetStateAction<T>>;
  */
 export async function fetchUseCaseValueSets(queryName: string) {
   const queryResults = await getSavedQueryByName(queryName);
-  const valueSets = await mapQueryRowsToValueSets(queryResults);
+  const valueSets = mapQueryRowsToValueSets(queryResults);
 
   return valueSets;
 }
