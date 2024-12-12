@@ -738,6 +738,7 @@ export const deleteQueryById = async (queryId: string) => {
     DELETE FROM query WHERE id = $1;
   `;
   try {
+    await dbClient.query("BEGIN");
     await dbClient.query(deleteQuery, [queryId]);
     await dbClient.query("COMMIT");
     return { success: true };
