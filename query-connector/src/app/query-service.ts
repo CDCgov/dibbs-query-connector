@@ -14,6 +14,7 @@ import {
 import { CustomQuery } from "./CustomQuery";
 import { GetPhoneQueryFormats } from "./format-service";
 import { formatValueSetsAsQuerySpec } from "./format-service";
+import { getFhirServerConfigs } from "./database-service";
 
 /**
  * The query response when the request source is from the Viewer UI.
@@ -150,7 +151,8 @@ export async function UseCaseQuery(
   queryValueSets: ValueSet[],
   queryResponse: QueryResponse = {},
 ): Promise<QueryResponse> {
-  const fhirClient = new FHIRClient(request.fhir_server);
+  const fhirServerConfigs = await getFhirServerConfigs();
+  const fhirClient = new FHIRClient(request.fhir_server, fhirServerConfigs);
 
   if (!queryResponse.Patient || queryResponse.Patient.length === 0) {
     await patientQuery(request, fhirClient, queryResponse);

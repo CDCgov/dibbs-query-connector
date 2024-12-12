@@ -13,6 +13,7 @@ import {
   INTENTIONAL_EMPTY_STRING_FOR_GEM_CODE,
   ValueSet,
   ersdToDibbsConceptMap,
+  FhirServerConfig,
 } from "./constants";
 import { encode } from "base-64";
 import {
@@ -98,18 +99,34 @@ type QueryTableQueryDataColumn = {
  * @param rows The Rows returned from the DB Query.
  * @returns A list of ValueSets, which hold the Concepts pulled from the DB.
  */
-export const mapQueryRowsToValueSets = async (rows: QueryResultRow[]) => {
-  // Create groupings of rows (each of which is a single Concept) by their ValueSet ID
-  const valueSets: ValueSet[] = rows
+export const mapQueryRowsToValueSets = async (
+  rows: QueryResultRow[],
+): Promise<ValueSet[]> => {
+  // Unest the {condition: valuesetId: valueSet} nesting in an array of valueSets
+  const valueSets = rows
     .map((curRow) => {
       const valueSetsByCondition =
         curRow.query_data as QueryTableQueryDataColumn;
       const valueSetsById = Object.values(valueSetsByCondition);
-      const curRowValueSets = valueSetsById
-        .map((valById) => Object.values(valById))
-        .flat();
-      return curRowValueSets;
+      return valueSetsById.map((valById) => {
+        const curValueSet = Object.values(valById);
+        return curValueSet.map((v) => {
+          return {
+            valueSetId: v.valueSetId,
+            valueSetVersion: v.valueSetVersion,
+            valueSetName: v.valueSetName,
+            author: v.author,
+            system: v.system,
+            valueSetExternalId: v?.valueSetExternalId,
+            ersdConceptType: v?.ersdConceptType,
+            dibbsConceptType: v.dibbsConceptType,
+            includeValueSet: v.includeValueSet,
+            concepts: v.concepts,
+          };
+        });
+      });
     })
+    .flat()
     .flat();
 
   return valueSets;
@@ -392,7 +409,7 @@ function logRejectedPromiseReasons<T>(
 export async function insertQuery(input: QueryInput) {
   const { sql, values } = generateQueryInsertionSql(input);
   const insertUserQueryPromise = dbClient.query(sql, values);
-  const errorArray = [];
+  const errorArray: string[] = [];
 
   let queryId;
   try {
@@ -767,4 +784,42 @@ export async function checkDBForData() {
   return (
     result.rows.length > 0 && parseFloat(result.rows[0].estimated_count) > 0
   );
+}
+
+//Cache for FHIR server configurations
+let cachedFhirServerConfigs: Promise<FhirServerConfig[]> | null = null;
+
+/**
+ * Fetches all FHIR server configurations from the database and caches the result.
+ * @param forceRefresh - Optional param to determine if the cache should be refreshed.
+ * @returns An array of FHIR server configurations.
+ */
+export async function getFhirServerConfigs(forceRefresh = false) {
+  if (forceRefresh || !cachedFhirServerConfigs) {
+    cachedFhirServerConfigs = (async () => {
+      const query = `SELECT * FROM fhir_servers;`;
+      const result = await dbClient.query(query);
+      return result.rows;
+    })();
+  }
+  return cachedFhirServerConfigs;
+}
+
+/**
+ * Fetches all FHIR server names from the database to make them available for selection on the front end/client side.
+ * @returns An array of FHIR server names.
+ */
+export async function getFhirServerNames(): Promise<string[]> {
+  const configs = await getFhirServerConfigs();
+  return configs.map((config) => config.name);
+}
+
+/**
+ * Fetches the configuration for a FHIR server from the database.
+ * @param fhirServerName - The name of the FHIR server to fetch the configuration for.
+ * @returns The configuration for the FHIR server.
+ */
+export async function getFhirServerConfig(fhirServerName: string) {
+  const configs = await getFhirServerConfigs();
+  return configs.find((config) => config.name === fhirServerName);
 }
