@@ -16,10 +16,8 @@ import {
 } from "../../constants";
 
 import { handleRequestError } from "./error-handling-service";
-import {
-  getSavedQueryByName,
-  mapQueryRowsToValueSets,
-} from "@/app/database-service";
+import { getSavedQueryByName } from "@/app/database-service";
+import { mapQueryRowsToValueSets } from "@/app/utils";
 
 /**
  * Health check for TEFCA Viewer
@@ -92,7 +90,7 @@ export async function POST(request: NextRequest) {
   // Lookup default parameters for particular use-case search
   const queryName = UseCaseToQueryName[use_case as USE_CASES];
   const queryResults = await getSavedQueryByName(queryName);
-  const valueSets = await mapQueryRowsToValueSets(queryResults);
+  const valueSets = mapQueryRowsToValueSets(queryResults);
 
   // Add params & patient identifiers to UseCaseRequest
   const UseCaseRequest: UseCaseQueryRequest = {

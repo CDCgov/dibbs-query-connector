@@ -53,6 +53,15 @@ select q.query_name, q.id, q.query_data, q.conditions_list
   where q.query_name = $1;
 `;
 
+const getValueSetsByConditionIds = `
+SELECT c.display, c.code_system, c.code, vs.name as valueset_name, vs.id as valueset_id, vs.oid as valueset_external_id, vs.version, vs.author as author, vs.type, vs.dibbs_concept_type as dibbs_concept_type, ctvs.condition_id
+  FROM valuesets vs 
+  LEFT JOIN condition_to_valueset ctvs on vs.id = ctvs.valueset_id 
+  LEFT JOIN valueset_to_concept vstc on vs.id = vstc.valueset_id
+  LEFT JOIN concepts c on vstc.concept_id = c.id
+  WHERE ctvs.condition_id IN (
+`;
+
 // Load environment variables from .env and establish a Pool configuration
 const dbConfig: PoolConfig = {
   connectionString: process.env.DATABASE_URL,
@@ -61,6 +70,33 @@ const dbConfig: PoolConfig = {
   connectionTimeoutMillis: 3000, // Wait this long before timing out when connecting new client
 };
 const dbClient = new Pool(dbConfig);
+
+/**
+ * Executes a search for a ValueSets and Concepts against the Postgres
+ * Database, using the ID of the condition associated with any such data.
+ * @param ids Array of ids for entries in the conditions table
+ * @returns One or more rows from the DB matching the requested saved query,
+ * or an error if no results can be found.
+ */
+export const getValueSetsAndConceptsByConditionIDs = async (ids: string[]) => {
+  const escapedValues = ids.map((_, i) => `$${i + 1}`).join() + ")";
+  const queryString = getValueSetsByConditionIds + escapedValues;
+
+  try {
+    const result = await dbClient.query(queryString, ids);
+    if (result.rows.length === 0) {
+      console.error("No results found for given condition ids", ids);
+      return [];
+    }
+    return result.rows;
+  } catch (error) {
+    console.error(
+      "Error retrieving value sets and concepts for condition",
+      error,
+    );
+    throw error;
+  }
+};
 
 /**
  * Executes a search for a CustomQuery against the query-loaded Postgres
@@ -84,52 +120,6 @@ export const getSavedQueryByName = async (name: string) => {
     console.error("Error retrieving query:", error);
     throw error;
   }
-};
-
-type QueryTableQueryDataColumn = {
-  [condition_name: string]: {
-    [valueSetId: string]: ValueSet;
-  };
-};
-
-/**
- * Maps the results returned from the DIBBs value set and coding system database
- * into a collection of value sets, each containing one or more Concepts build out
- * of the coding information in the DB.
- * @param rows The Rows returned from the DB Query.
- * @returns A list of ValueSets, which hold the Concepts pulled from the DB.
- */
-export const mapQueryRowsToValueSets = async (
-  rows: QueryResultRow[],
-): Promise<ValueSet[]> => {
-  // Unest the {condition: valuesetId: valueSet} nesting in an array of valueSets
-  const valueSets = rows
-    .map((curRow) => {
-      const valueSetsByCondition =
-        curRow.query_data as QueryTableQueryDataColumn;
-      const valueSetsById = Object.values(valueSetsByCondition);
-      return valueSetsById.map((valById) => {
-        const curValueSet = Object.values(valById);
-        return curValueSet.map((v) => {
-          return {
-            valueSetId: v.valueSetId,
-            valueSetVersion: v.valueSetVersion,
-            valueSetName: v.valueSetName,
-            author: v.author,
-            system: v.system,
-            valueSetExternalId: v?.valueSetExternalId,
-            ersdConceptType: v?.ersdConceptType,
-            dibbsConceptType: v.dibbsConceptType,
-            includeValueSet: v.includeValueSet,
-            concepts: v.concepts,
-          };
-        });
-      });
-    })
-    .flat()
-    .flat();
-
-  return valueSets;
 };
 
 /*

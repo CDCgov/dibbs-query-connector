@@ -2,6 +2,8 @@
 import { createContext, ReactNode, useState } from "react";
 import React from "react";
 import classNames from "classnames";
+import { QueryResultRow } from "pg";
+import { ValueSet } from "./constants";
 
 export interface DataDisplayInfo {
   title: string;
@@ -66,3 +68,47 @@ export function DataProvider({ children }: { children: ReactNode }) {
     </DataContext.Provider>
   );
 }
+
+type QueryTableQueryDataColumn = {
+  [condition_name: string]: {
+    [valueSetId: string]: ValueSet;
+  };
+};
+
+/**
+ * Maps the results returned from the DIBBs value set and coding system database
+ * into a collection of value sets, each containing one or more Concepts build out
+ * of the coding information in the DB.
+ * @param rows The Rows returned from the DB Query.
+ * @returns A list of ValueSets, which hold the Concepts pulled from the DB.
+ */
+export const mapQueryRowsToValueSets = (rows: QueryResultRow[]): ValueSet[] => {
+  // Unest the {condition: valuesetId: valueSet} nesting in an array of valueSets
+  const valueSets = rows
+    .map((curRow) => {
+      const valueSetsByCondition =
+        curRow.query_data as QueryTableQueryDataColumn;
+      const valueSetsById = Object.values(valueSetsByCondition);
+      return valueSetsById.map((valById) => {
+        const curValueSet = Object.values(valById);
+        return curValueSet.map((v) => {
+          return {
+            valueSetId: v.valueSetId,
+            valueSetVersion: v.valueSetVersion,
+            valueSetName: v.valueSetName,
+            author: v.author,
+            system: v.system,
+            valueSetExternalId: v?.valueSetExternalId,
+            ersdConceptType: v?.ersdConceptType,
+            dibbsConceptType: v.dibbsConceptType,
+            includeValueSet: v.includeValueSet,
+            concepts: v.concepts,
+          };
+        });
+      });
+    })
+    .flat()
+    .flat();
+
+  return valueSets;
+};
