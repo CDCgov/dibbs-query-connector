@@ -1,5 +1,5 @@
 "use server";
-import { Pool, PoolConfig, QueryResultRow } from "pg";
+import { Pool, PoolConfig } from "pg";
 import {
   Bundle,
   OperationOutcome,
@@ -401,10 +401,8 @@ export async function insertQuery(input: QueryInput) {
   const insertUserQueryPromise = dbClient.query(sql, values);
   const errorArray: string[] = [];
 
-  let queryId;
   try {
-    const results = await insertUserQueryPromise;
-    queryId = results.rows[0].id as unknown as UUID;
+    await insertUserQueryPromise;
   } catch (e) {
     console.error(
       `Error occured in user query insertion: insertion for ${input.queryName} failed`,

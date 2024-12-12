@@ -34,7 +34,6 @@ export default function HeaderComponent() {
     };
   }, [showMenu]);
 
-  const router = useRouter();
   const path = usePathname();
 
   const { data: session } = useSession();
