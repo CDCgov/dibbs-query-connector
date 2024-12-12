@@ -82,11 +82,6 @@ type QueryTableQueryDataColumn = {
  * @param rows The Rows returned from the ValueSet table.
  * @returns A list of ValueSets, which hold the Concepts pulled from the DB.
  */
-
-/**
- *
- * @param rows
- */
 export const unnestValueSetsFromQuery = (
   rows: QueryResultRow[],
 ): ValueSet[] => {
