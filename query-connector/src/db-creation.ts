@@ -10,7 +10,6 @@ import {
   insertValueSet,
   translateVSACToInternalValueSet,
   insertDBStructArray,
-  executeDefaultQueryCreation,
   executeCategoryUpdates,
 } from "@/app/database-service";
 import * as fs from "fs";
@@ -367,9 +366,10 @@ export async function createDibbsDB() {
     await insertSeedDbStructs("valueset_to_concept");
     await insertSeedDbStructs("conditions");
     await insertSeedDbStructs("condition_to_valueset");
-    await executeDefaultQueryCreation();
+    await insertSeedDbStructs("query");
     await insertSeedDbStructs("category");
     await executeCategoryUpdates();
+
     // }
   } else {
     console.log("Database already has data; skipping DIBBs DB creation.");
