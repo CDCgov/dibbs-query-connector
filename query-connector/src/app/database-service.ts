@@ -741,28 +741,12 @@ export async function getCustomQueries(): Promise<CustomUserQuery[]> {
  * @returns A success or error response indicating the result.
  */
 export const deleteQueryById = async (queryId: string) => {
-  // TODO: should be able to simplified when it is just deleting query table
-  const deleteQuerySql1 = `
-    DELETE FROM query_included_concepts 
-    WHERE query_by_valueset_id IN (
-      SELECT id FROM query_to_valueset WHERE query_id = $1
-    );
-  `;
-  const deleteQuerySql2 = `
-    DELETE FROM query_to_valueset WHERE query_id = $1;
-  `;
-  const deleteQuerySql3 = `
+  const deleteQuery = `
     DELETE FROM query WHERE id = $1;
   `;
-
   try {
     await dbClient.query("BEGIN");
-
-    // Execute deletion queries in the correct order
-    await dbClient.query(deleteQuerySql1, [queryId]);
-    await dbClient.query(deleteQuerySql2, [queryId]);
-    await dbClient.query(deleteQuerySql3, [queryId]);
-
+    await dbClient.query(deleteQuery, [queryId]);
     await dbClient.query("COMMIT");
     return { success: true };
   } catch (error) {
