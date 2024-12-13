@@ -110,7 +110,7 @@ export type PatientType =
   | "social-determinants"
   | "sti-syphilis-positive";
 
-export const DEFAULT_DEMO_FHIR_SERVER = "Public HAPI: Direct";
+export const DEFAULT_DEMO_FHIR_SERVER = "HELIOS Meld: Direct";
 /*
  * Common "Hyper Unlucky" patient data used for all non-newborn screening use cases
  */
