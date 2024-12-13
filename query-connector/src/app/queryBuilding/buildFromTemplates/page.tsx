@@ -85,13 +85,6 @@ export default function QueryTemplateSelection() {
       const formattedResults =
         results && groupConditionConceptsIntoValueSets(results);
 
-      // when fetching directly from conditions table (as opposed to a saved query),
-      // default to including all value sets
-      formattedResults.forEach((result) => {
-        batchToggleConcepts(result);
-        return (result.includeValueSet = true);
-      });
-
       // group by Condition ID:
       return Object.values(formattedResults).reduce((acc, resultObj) => {
         if (resultObj.conditionId) {

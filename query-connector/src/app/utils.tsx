@@ -152,12 +152,14 @@ function mapStoredValueSetIntoInternalValueset(
     system: storedConcept["code_system"],
     ersdConceptType: storedConcept["type"] ? storedConcept["type"] : undefined,
     dibbsConceptType: storedConcept["dibbs_concept_type"],
-    includeValueSet: conceptGroup.find((c) => c["include"]) ? true : false,
+    // if we're fetching a valueset/concept, by default we're including it
+    // in the context we're fetching things in.
+    includeValueSet: true,
     concepts: conceptGroup.map((c) => {
       return {
         code: c["code"],
         display: c["display"],
-        include: c["include"] ?? true,
+        include: true,
       };
     }),
   };
