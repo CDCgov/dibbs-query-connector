@@ -80,7 +80,6 @@ const SelectQuery: React.FC<SelectQueryProps> = ({
       if (selectedQuery) {
         const queryName = UseCaseToQueryName[selectedQuery as USE_CASES];
         const valueSets = await fetchUseCaseValueSets(queryName);
-
         // Only update if the fetch hasn't altered state yet
         if (isSubscribed) {
           setQueryValueSets(valueSets);

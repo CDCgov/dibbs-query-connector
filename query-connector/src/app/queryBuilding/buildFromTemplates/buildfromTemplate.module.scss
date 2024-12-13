@@ -1,12 +1,23 @@
 @use "../../../styles/variables" as *;
 
-.queryTemplateContainer {
+// Shared styles
+
+.mainContainer {
+  display: flex;
+  flex-direction: column;
+  flex: auto;
+  margin-bottom: 0 !important;
+}
+
+// Condition styles
+
+.conditionTemplateContainer {
   padding: 3.5rem 5rem;
   border-radius: 4px;
   min-height: 30rem;
 }
 
-.querySelectionForm {
+.conditionSelectionForm {
   background-color: #fff;
   padding: 2rem;
   min-height: 25rem;
@@ -17,6 +28,7 @@
   border-radius: 4px;
   height: 1.5rem;
   padding: 0.75rem;
+  min-width: 53rem;
 }
 
 #conditionTemplateSearch:first-child {
@@ -44,4 +56,292 @@
 }
 .categoryOption:last-of-type {
   margin-bottom: 3rem;
+}
+
+// Value Set and Concept styles
+
+.valueSetTemplateContainer {
+  padding: 0.5rem 0.5rem 0 0.5rem;
+  border-radius: 0.5rem;
+  display: flex;
+  flex: auto;
+}
+
+.valueSetTemplateContainer__inner {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.valueSetSearch {
+  width: 25rem !important;
+  padding: 0.75rem 0.75rem 0.75rem 2.25rem !important;
+  margin: 0 !important;
+  height: 3rem !important;
+}
+
+.valueSetTemplate__left {
+  display: flex;
+  flex-direction: row;
+  min-width: 18rem;
+  justify-content: space-between;
+  padding: 0.5rem !important;
+}
+
+.valueSetTemplate__right {
+  background-color: #fff;
+  width: 88%;
+  border-radius: 8px;
+  margin-left: 0.5rem;
+  min-height: 50rem;
+}
+
+.valueSetTemplate__search {
+  padding: 1.5rem;
+  border-bottom: 1px #dfe1e2 solid;
+}
+
+.valueSetTemplate__accordion {
+  display: flex;
+  justify-content: space-between;
+  word-wrap: break-word;
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+  background-color: #f7f9fa;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px #dfe1e2 solid;
+}
+
+.accordionContainer {
+  width: 100%;
+}
+
+.accordionInnerWrapper > div {
+  padding: 0 !important;
+}
+
+.accordionHeaderWrapper {
+  background-color: transparent;
+  justify-content: space-between;
+  align-items: center;
+  display: flex;
+  width: 100%;
+}
+
+.accordionBodyWrapper {
+  background-color: transparent;
+}
+
+.accordionHeaderCount {
+  font-size: 1rem !important;
+  font-weight: 400 !important;
+  background-color: #f7f9fa;
+}
+
+.accordionInnerWrapper > h4 {
+  margin-top: 0 !important;
+}
+
+.accordionInnerWrapper > h4 > button {
+  display: flex;
+  word-wrap: break-word;
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+  background-color: #f7f9fa;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px #dfe1e2 solid;
+  color: #111111;
+
+  // override default accordion hover styles (headers should not change on hover):
+  &:hover {
+    background-color: #f7f9fa !important;
+
+    .valueSetTemplate__checkbox label {
+      background-color: #f7f9fa;
+      font-weight: 800;
+    }
+
+    .accordionHeaderCount {
+      color: #111111;
+    }
+  }
+}
+
+.accordionWrapper > div {
+  margin: 0.1rem 0rem;
+  padding: 1rem 1.5rem;
+}
+
+.conditionList {
+  display: flex;
+  flex-direction: column;
+  padding: 0.5rem;
+  width: 100%;
+
+  .controls {
+    justify-content: space-between;
+    padding: 0.5rem;
+    display: flex;
+
+    .conditionsTitle {
+      width: 104px;
+      color: #919191;
+      font-size: 19px;
+    }
+
+    .addCondition {
+      font-size: 1rem;
+      color: #005ea2;
+      line-height: 18.8px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+
+      :hover {
+        cursor: pointer;
+      }
+    }
+  }
+
+  .conditionCard {
+    background: transparent;
+    border-radius: 4px;
+    padding: 1rem;
+    line-height: 22px;
+    margin-top: 0.5rem;
+    color: #111111;
+    cursor: pointer;
+  }
+
+  .active {
+    background: #ffffff;
+  }
+}
+
+.valueSetTemplate__toggleRowHeader {
+  display: flex;
+  align-items: center;
+  margin: 0.5rem 0;
+  width: 406px;
+}
+
+.valueSetTemplate__toggleRowHeader > svg {
+  color: black;
+}
+
+.valueSetTemplate__checkbox {
+  margin-left: 8px;
+}
+
+.valueSetTemplate__checkbox label {
+  margin-top: 0 !important;
+  padding-left: 2.25rem;
+  background-color: #f7f9fa;
+  font-weight: 700;
+  font-size: 18px;
+  text-transform: capitalize;
+}
+
+.accordionBodyExpanded {
+  padding: 1.5rem 1.5rem 0 3.5rem;
+  background-color: #fff;
+  display: flex;
+  justify-content: space-between;
+
+  .valueSetTemplate__checkbox label {
+    background-color: #fff;
+  }
+}
+
+.accordionBodyExpanded {
+  &:hover {
+    background-color: rgba(217, 232, 246, 0.5) !important;
+
+    .valueSetTemplate__checkbox label {
+      background-color: rgba(217, 232, 246, 0.5) !important;
+    }
+
+    .viewCodesBtn {
+      display: block;
+      text-align: right;
+      width: 4rem;
+      line-height: normal;
+      font-weight: 700;
+      font-size: 14px;
+      color: #005ea2;
+
+      &:hover {
+        cursor: pointer;
+        text-decoration: underline;
+      }
+    }
+    .displayCount {
+      display: none;
+    }
+  }
+}
+
+div.accordionBodyExpanded:last-of-type {
+  border-bottom: 1px #dfe1e2 solid;
+
+  .accordionExpandedInner {
+    border-bottom: none !important;
+  }
+}
+
+.accordionExpandedInner {
+  border-bottom: solid 1px #dfe1e2;
+  padding-bottom: 1rem;
+  width: 100%;
+
+  .valueSetTemplate__checkbox {
+    margin: 0 !important;
+  }
+}
+
+.expandedContent {
+  font-size: 1rem;
+  font-weight: 400;
+}
+
+.expandedContent > div {
+  text-transform: none !important;
+  padding-right: 1rem;
+}
+
+.vsName {
+  color: #111111;
+}
+
+.vsDetails {
+  color: #919191;
+  display: flex;
+}
+
+.accordionBodyExpanded__right {
+  padding-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  min-width: 4rem;
+  justify-content: flex-end;
+}
+
+.valueSetTemplate__checkbox__partial label::before {
+  background-size: cover !important;
+  background-color: #005ea2;
+  box-shadow: 0 0 0 2px #005ea2;
+  background-image: url("../../queryBuilding/components/PartialCheckbox.svg");
+}
+
+.customQuery__controls {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+
+.viewCodesBtn {
+  display: none;
 }

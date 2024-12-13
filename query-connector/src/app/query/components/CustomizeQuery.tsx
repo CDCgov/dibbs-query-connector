@@ -252,4 +252,4 @@ const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
 
 export default CustomizeQuery;
 export const QUERY_CUSTOMIZATION_CONFIRMATION_BODY =
-  "Query Customization Successful!";
+  "Query customization successful!";
