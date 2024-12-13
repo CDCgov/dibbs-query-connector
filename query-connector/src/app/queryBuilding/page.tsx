@@ -8,6 +8,9 @@ import { DataContext } from "@/app/utils";
 import styles from "@/app/queryBuilding/queryBuilding.module.scss";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import LoadingView from "../query/components/LoadingView";
+import { SelectedQueryContext, SelectedQueryState } from "./dataState/utils";
+import { useRouter } from "next/navigation";
 
 /**
  * Component for Query Building Flow
@@ -16,6 +19,17 @@ import "react-toastify/dist/ReactToastify.css";
 const QueryBuilding: React.FC = () => {
   const context = useContext(DataContext);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
+  const [selectedQuery, setSelectedQuery] = useState<SelectedQueryState>(null);
+
+  const handleEdit = (queryName: string, queryId: string) => {
+    console.log(queryName, queryId);
+    setSelectedQuery({
+      queryName: queryName,
+      queryId: queryId,
+    });
+    router.push("/queryBuilding/buildFromTemplates");
+  };
 
   // Check whether custom queries exist in DB
   useEffect(() => {
@@ -37,13 +51,13 @@ const QueryBuilding: React.FC = () => {
   }, [context]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <LoadingView loading={true} />;
   }
 
   const queries = (context?.data || []) as CustomUserQuery[];
 
   return (
-    <>
+    <SelectedQueryContext.Provider value={selectedQuery}>
       {queries.length === 0 ? (
         <div className="main-container">
           <h1 className={styles.queryTitle}>My queries</h1>
@@ -52,10 +66,15 @@ const QueryBuilding: React.FC = () => {
       ) : (
         <div className="main-container__wide">
           <ToastContainer position="bottom-left" icon={false} />
-          <UserQueriesDisplay queries={queries} />
+          <UserQueriesDisplay
+            queries={queries}
+            selectedQuery={selectedQuery}
+            setSelectedQuery={setSelectedQuery}
+            handleEdit={handleEdit}
+          />
         </div>
       )}
-    </>
+    </SelectedQueryContext.Provider>
   );
 };
 

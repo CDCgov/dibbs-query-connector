@@ -1,7 +1,7 @@
 import { ModalRef } from "@/app/query/designSystem/modal/Modal";
 import { DeleteModal } from "@/app/query/designSystem/modal/deleteModal";
 import "react-toastify/dist/ReactToastify.css";
-import { RefObject } from "react";
+import { RefObject, createContext } from "react";
 import { CustomUserQuery } from "@/app/query-building";
 import { deleteQueryById } from "@/app/database-service";
 import { useRouter } from "next/navigation";
@@ -141,3 +141,10 @@ export const renderModal = (
     />
   );
 };
+
+export const SelectedQueryContext = createContext<SelectedQueryState>(null);
+
+export type SelectedQueryState = {
+  queryName: string;
+  queryId: string;
+} | null;
