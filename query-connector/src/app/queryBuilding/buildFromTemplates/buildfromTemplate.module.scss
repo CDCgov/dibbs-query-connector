@@ -14,11 +14,20 @@
 .conditionTemplateContainer {
   padding: 3.5rem 5rem;
   border-radius: 4px;
+  min-height: 30rem;
 }
 
 .conditionSelectionForm {
   background-color: #fff;
   padding: 2rem;
+  min-height: 25rem;
+}
+
+.querySelectionFormSearch {
+  border: 1px solid #919191;
+  border-radius: 4px;
+  height: 1.5rem;
+  padding: 0.75rem;
   min-width: 53rem;
 }
 
