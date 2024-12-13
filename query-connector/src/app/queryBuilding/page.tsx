@@ -9,7 +9,6 @@ import styles from "@/app/queryBuilding/queryBuilding.module.scss";
 import { ToastContainer } from "react-toastify";
 import LoadingView from "@/app/query/components/LoadingView";
 import "react-toastify/dist/ReactToastify.css";
-import Drawer from "@/app/query/designSystem/drawer/Drawer";
 
 /**
  * Component for Query Building Flow
@@ -55,7 +54,6 @@ const QueryBuilding: React.FC = () => {
         <div className="main-container__wide">
           <ToastContainer position="bottom-left" icon={false} />
           <UserQueriesDisplay queries={queries} />
-          <Drawer />
         </div>
       )}
     </>
