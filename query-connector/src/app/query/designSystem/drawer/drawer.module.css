@@ -1,0 +1,39 @@
+.drawer {
+  position: fixed;
+  top: 0;
+  right: -35.1875rem;
+  height: 73.0625rem;
+  width: 35.1875rem;
+  padding: 0rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.5rem;
+  flex-shrink: 0;
+  transition: right 0.3s ease;
+  z-index: 1050;
+  border-left: 1px solid var(--gray-400, #dfe1e2);
+  background: var(--Gray-cool-gray-cool-2, #f7f9fa);
+}
+
+.drawer.open {
+  right: 0;
+}
+
+.drawer.closed {
+  right: -35.1875rem;
+}
+
+.drawerContent {
+  padding: 2rem;
+  overflow-y: auto;
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1040;
+}

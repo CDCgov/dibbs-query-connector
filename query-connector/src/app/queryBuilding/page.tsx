@@ -9,7 +9,7 @@ import styles from "@/app/queryBuilding/queryBuilding.module.scss";
 import { ToastContainer } from "react-toastify";
 import LoadingView from "@/app/query/components/LoadingView";
 import "react-toastify/dist/ReactToastify.css";
-import Drawer from "../query/designSystem/modal/drawerModal";
+import Drawer from "@/app/query/designSystem/drawer/Drawer";
 
 /**
  * Component for Query Building Flow
