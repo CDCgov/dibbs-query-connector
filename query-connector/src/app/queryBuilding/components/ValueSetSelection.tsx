@@ -224,7 +224,7 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
 
       <Drawer
         title="Add Condition(s)"
-        placeholder="      Search conditions"
+        placeholder="Search conditions"
         codes={<div>Dynamic codes go here</div>}
         isOpen={isDrawerOpen}
         onClose={handleCloseDrawer}

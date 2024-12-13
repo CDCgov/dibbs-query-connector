@@ -41,11 +41,26 @@
 .searchField {
   display: flex;
   width: 25rem;
-  padding: 0.75rem;
+  padding: 0.75rem 0.75rem 0.75rem 2.25rem !important;
   align-items: center;
   gap: 0.5rem;
   border-radius: 0.25rem;
   border: 1px solid var(--gray-500, #919191);
+}
+
+.valueSetSearch {
+  width: 25rem !important;
+  padding: 0.75rem 0.75rem 0.75rem 2.25rem !important;
+  margin: 0 !important;
+  height: 3rem !important;
+}
+
+.valueSetTemplate__left {
+  display: flex;
+  flex-direction: row;
+  min-width: 18rem;
+  justify-content: space-between;
+  padding: 0.5rem !important;
 }
 
 .closeButton {
