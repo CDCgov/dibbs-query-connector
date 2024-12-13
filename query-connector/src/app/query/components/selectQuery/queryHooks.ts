@@ -5,7 +5,7 @@ import {
   hyperUnluckyPatient,
 } from "@/app/constants";
 import { getSavedQueryByName } from "@/app/database-service";
-import { mapQueryRowsToValueSets } from "@/app/utils";
+import { unnestValueSetsFromQuery } from "@/app/utils";
 import { UseCaseQuery, UseCaseQueryResponse } from "@/app/query-service";
 import { Patient } from "fhir/r4";
 
@@ -18,7 +18,7 @@ type SetStateCallback<T> = React.Dispatch<React.SetStateAction<T>>;
  */
 export async function fetchUseCaseValueSets(queryName: string) {
   const queryResults = await getSavedQueryByName(queryName);
-  const valueSets = mapQueryRowsToValueSets(queryResults);
+  const valueSets = unnestValueSetsFromQuery(queryResults);
 
   return valueSets;
 }

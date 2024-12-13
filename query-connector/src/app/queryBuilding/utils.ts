@@ -49,7 +49,7 @@ export type CategoryNameToConditionOptionMap = {
  * category mapping
  * @returns - The data in a CategoryNameToConditionOptionMap shape
  */
-export function mapFetchedDataToFrontendStructure(fetchedData: {
+export function groupConditionDataByCategoryName(fetchedData: {
   [categoryName: string]: ConditionIdToNameMap[];
 }) {
   const result: CategoryNameToConditionOptionMap = {};

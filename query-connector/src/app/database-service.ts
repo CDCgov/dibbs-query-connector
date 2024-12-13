@@ -688,8 +688,7 @@ export async function getCustomQueries(): Promise<CustomUserQuery[]> {
       q.query_data,
       q.conditions_list
     FROM
-      query q
-    WHERE     q.query_name IN ('Gonorrhea case investigation', 'Newborn screening follow-up', 'Syphilis case investigation', 'Cancer case investigation', 'Chlamydia case investigation');
+      query q;
   `;
   // TODO: this will eventually need to take into account user permissions and specific authors
   // We'll probably also need to refactor this to not show up in any user-facing containers

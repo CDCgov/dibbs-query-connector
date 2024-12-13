@@ -6,7 +6,7 @@ import classNames from "classnames";
 import { getConditionsData } from "@/app/database-service";
 import {
   CategoryNameToConditionOptionMap,
-  mapFetchedDataToFrontendStructure,
+  groupConditionDataByCategoryName,
   ConditionIdToValueSetArray,
 } from "../utils";
 import ConditionColumnDisplay from "../buildFromTemplates/ConditionColumnDisplay";
@@ -78,7 +78,7 @@ export const ConditionSelection: React.FC<ConditionSelectionProps> = ({
 
       if (isSubscribed) {
         setFetchedConditions(
-          mapFetchedDataToFrontendStructure(categoryToConditionArrayMap),
+          groupConditionDataByCategoryName(categoryToConditionArrayMap),
         );
       }
     }
