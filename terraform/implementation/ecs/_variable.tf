@@ -7,7 +7,7 @@ variable "availability_zones" {
 variable "internal" {
   description = "Flag to determine if the several AWS resources are public (intended for external access, public internet) or private (only intended to be accessed within your AWS VPC or avaiable with other means, a transit gateway for example)."
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "owner" {
@@ -32,7 +32,7 @@ variable "private_subnets" {
 variable "project" {
   description = "The project name"
   type        = string
-  default     = "dibbs"
+  default     = "qc"
 }
 
 variable "public_subnets" {
@@ -53,7 +53,11 @@ variable "vpc_cidr" {
   default     = "176.24.0.0/16"
 }
 
-
+variable "qc_db_name" {
+  type        = string
+  description = "The name of the tefca database"
+  default     = "queryconnector_db"
+}
 # Note: only lowercase alphanumeric characters and hyphens allowed in "identifier"
 variable "db_identifier" {
   type        = string
@@ -91,3 +95,33 @@ variable "db_family" {
   description = "RDS Family"
   default     = "postgres16"
 }
+
+variable "fhir_url" {
+  type        = string
+  description = "URL for FHIR server"
+  default     = "undefined"
+}
+
+
+variable "cred_manager" {
+  type        = string
+  description = "URL for Credentials Manager"
+  default     = "undefined"
+}
+
+# variable "qc_db_connection_string" {
+#   description = "Connection string to the tefca database"
+# }
+
+# variable "qc_jdbc_db_url" {
+#   description = "JDBC connection string for flyway to the qc database"
+# }
+
+
+# variable "qc_jdbc_db_password" {
+#   description = "JDBC password for flyway to the qc database"
+# }
+
+# variable "qc_jdbc_db_user" {
+#   description = "JDBC username for flyway to the qc database"
+# }

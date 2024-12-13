@@ -4,6 +4,8 @@
 #   statuses = ["ISSUED"]
 # }
 
+data "aws_caller_identity" "current" {}
+
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
   version = "5.16.0"
@@ -33,7 +35,64 @@ module "ecs" {
   owner        = var.owner
   project      = var.project
   tags         = local.tags
-  phdi_version = var.phdi_version
+
+
+
+  phdi_version = "main"
+
+  service_data = {
+    query-connector = {
+      short_name     = "qc",
+      fargate_cpu    = 512,
+      fargate_memory = 1024,
+      min_capacity   = 1,
+      max_capacity   = 5,
+      app_repo       = "ghcr.io/cdcgov/dibbs-query-connector",
+      app_image      = "${terraform.workspace}-query-connector",
+      app_version    = "main",
+      container_port = 3000,
+      host_port      = 3000,
+      public         = true,
+      registry_url   = "${data.aws_caller_identity.current.account_id}.dkr.ecr.${var.region}.amazonaws.com",
+      env_vars = [
+        {
+          name  = "AWS_REGION",
+          value = var.region
+        },
+        {
+        name  = "fhir_url"
+        value = var.fhir_url
+        },
+        {    
+          name  = "cred_manager"
+          value = var.cred_manager
+        },
+        {    
+         name  = "DATABASE_URL"
+         value = "postgresql://${aws_db_instance.qc_db.username}:${aws_db_instance.qc_db.password}@${aws_db_instance.qc_db.endpoint}/${aws_db_instance.qc_db.db_name}"
+         },
+          # {    
+          # name  = "tefcaViewerDBRoleArn"
+          # value = var.tefca_viewer_db_role_arn
+          # },
+          {    
+         name  = "FLYWAY_URL"
+         value = "jdbc:postgresql://${aws_db_instance.qc_db.endpoint}/${aws_db_instance.qc_db.db_name}"
+
+         },
+         {    
+         name  = "FLYWAY_PASSWORD"
+         value = aws_db_instance.qc_db.password
+         },
+         {    
+         name  = "FLYWAY_USER"
+         value = aws_db_instance.qc_db.username
+         },
+         
+      ]
+    }
+  }
+
 
   # If intent is to pull from the phdi GHCR, set disable_ecr to true (default is false)
   # disable_ecr = true
@@ -43,7 +102,7 @@ module "ecs" {
   internal = var.internal
 
   # If the intent is to enable https and port 443, pass the arn of the cert in AWS certificate manager. This cert will be applied to the load balancer. (default is "")
-  certificate_arn = data.aws_acm_certificate.this.arn
+  # certificate_arn = data.aws_acm_certificate.this.arn
 
   # If the intent is to disable authentication, set ecr_viewer_app_env to "test" (default is "prod")
   # ecr_viewer_app_env = "test"
@@ -71,34 +130,67 @@ module "ecs" {
 }
 
 
-module "rds" {
-  source  = "terraform-aws-modules/rds/aws"
-  version = "6.10.0"
-  
+resource "aws_db_instance" "qc_db" {
+  allocated_storage = "10"
+  db_name = var.qc_db_name
   identifier = var.db_identifier
-  username = var.db_username
-  password = random_password.setup_rds_password.result
-  vpc_security_group_ids = module.vpc.default_security_group_id
-  engine = var.db_engine_type
-  engine_version = var.db_engine_version
-  instance_class = var.db_instance_class
-  family = var.db_family
-  subnet_ids = module.vpc.private_subnets
-  create_db_subnet_group = true
+  engine               = var.db_engine_type
+  engine_version       = var.db_engine_version
+  enabled_cloudwatch_logs_exports = ["postgresql", "upgrade"]
+  instance_class       = var.db_instance_class
+  username             = var.db_username
+  password             = random_password.setup_rds_password.result
+  parameter_group_name = aws_db_parameter_group.this.name
+  skip_final_snapshot  = true
+  db_subnet_group_name = aws_db_subnet_group.this.name
+  vpc_security_group_ids          = [aws_security_group.db_sg.id]
+}
 
-  parameters = [ 
-    {
+# Create a DB subnet group
+resource "aws_db_subnet_group" "this" {
+  name       = "${var.db_identifier}-subnet-group"
+  subnet_ids = module.vpc.private_subnets
+
+}
+
+# Create a parameter group to configure Postgres RDS parameters
+resource "aws_db_parameter_group" "this" {
+  name   = "${var.db_identifier}-pg"
+  family = var.db_family
+
+  parameter {
     name  = "log_connections"
     value = "1"
-  },
-  {
+  }
+  parameter {
     name  = "rds.force_ssl"
     value = "0"
   }
-]
 }
 
+resource "aws_security_group" "db_sg" {
+  vpc_id = module.vpc.vpc_id
 
+  # Allow inbound traffic on port 5432 for PostgreSQL from within the VPC
+  ingress {
+    from_port   = 5432
+    to_port     = 5432
+    protocol    = "tcp"
+    cidr_blocks = ["176.24.0.0/16"]
+  }
+
+  # Allow all outbound traffic
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "${var.db_identifier}-security-group"
+  }
+}
 
 # TODO: Update for Production to AWS Secrets Manager 
 # This resource's attribute(s) default value is true 
