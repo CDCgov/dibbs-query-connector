@@ -1,5 +1,5 @@
 import React from "react";
-import { Button } from "@trussworks/react-uswds";
+import { Button, Icon } from "@trussworks/react-uswds";
 import styles from "./drawer.module.css";
 import SearchField from "../searchField/SearchField";
 
@@ -38,6 +38,13 @@ export const Drawer: React.FC<DrawerProps> = ({
         role="dialog"
       >
         <div className={styles.drawerContent}>
+          <button
+            className={styles.closeButton}
+            onClick={onClose}
+            aria-label="Close drawer"
+          >
+            <Icon.Close size={3} />
+          </button>
           <h2 className="margin-0 padding-bottom-2">{title}</h2>
           <Button type="button" onClick={onClose}>
             Save changes
