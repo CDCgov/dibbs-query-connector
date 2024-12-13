@@ -20,28 +20,24 @@ const Drawer: React.FC = () => {
 
   return (
     <div>
-      <Button type="button" onClick={toggleDrawer}>
-        Open Drawer
+      <Button type="button" unstyled onClick={toggleDrawer}>
+        View Codes
       </Button>
 
       <Modal
         id="drawer"
         className={styles["drawer-modal"]}
         heading="Drawer Title"
-        description=""
+        description="Codes"
         modalRef={drawerRef}
         buttons={[
           {
-            text: "Save",
+            text: "Save changes",
             type: "button",
             onClick: toggleDrawer,
           },
         ]}
-      >
-        <div>
-          <p>Here's some content for the drawer.</p>
-        </div>
-      </Modal>
+      ></Modal>
     </div>
   );
 };

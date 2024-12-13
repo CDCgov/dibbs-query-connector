@@ -37,7 +37,6 @@ type ModalProps = {
  * @param param0.modalRef - ref object to connect the toggle button with the
  * actual modal.
  * @param param0.buttons - Array of button definitions for the modal footer.
- * @param param0.children - Optional children to render inside the modal body
  * @param param0.className - Optional classes for styling
  * @returns A customizable modal component
  */
@@ -47,7 +46,6 @@ export const Modal: React.FC<ModalProps> = ({
   description,
   modalRef,
   buttons,
-  children,
   className,
 }) => {
   return (
@@ -61,7 +59,6 @@ export const Modal: React.FC<ModalProps> = ({
       <ModalHeading id={`${id}-modal-heading`}>{heading}</ModalHeading>
       <div className="usa-prose">
         <p id={`${id}-modal-description`}>{description}</p>
-        {children && <div>{children}</div>}
       </div>
       <ModalFooter>
         <ButtonGroup>
