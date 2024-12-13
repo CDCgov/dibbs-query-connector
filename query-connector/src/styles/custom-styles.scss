@@ -135,6 +135,7 @@ h1 {
   /* Optional: some padding to make the background more noticeable */
   justify-content: left;
   display: flex;
+  align-items: center;
 
   .container {
     display: flex;
@@ -154,6 +155,7 @@ h1 {
   max-width: $query-connector-max-width;
   margin: 0 auto;
   text-align: left;
+  max-height: max-content;
 }
 
 // Context classes
