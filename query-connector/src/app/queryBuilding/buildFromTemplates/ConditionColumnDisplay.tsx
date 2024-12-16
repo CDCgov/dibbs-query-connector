@@ -12,8 +12,8 @@ import {
 import styles from "./buildfromTemplate.module.scss";
 import ConditionOption from "./ConditionOption";
 import classNames from "classnames";
-import { FormError } from "./page";
-import { SelectedQueryContext } from "../dataState/utils";
+import { FormError } from "./BuildFromTemplates";
+import { SelectedQueryContext } from "../querySelection/utils";
 
 type ConditionColumnDisplayProps = {
   fetchedConditions: CategoryNameToConditionOptionMap;
@@ -54,8 +54,6 @@ export const ConditionColumnDisplay: React.FC<ConditionColumnDisplayProps> = ({
   setFormError,
   updateFetched,
 }) => {
-  const selectedQueryContext = useContext(SelectedQueryContext);
-  console.log(selectedQueryContext);
   const [conditionsToDisplay, setConditionsToDisplay] =
     useState(fetchedConditions);
 

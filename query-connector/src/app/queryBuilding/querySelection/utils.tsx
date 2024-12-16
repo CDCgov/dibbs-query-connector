@@ -4,7 +4,6 @@ import "react-toastify/dist/ReactToastify.css";
 import { RefObject, createContext } from "react";
 import { CustomUserQuery } from "@/app/query-building";
 import { deleteQueryById } from "@/app/database-service";
-import { useRouter } from "next/navigation";
 import { DataContextValue } from "@/app/utils";
 import { showToastConfirmation } from "@/app/query/designSystem/toast/Toast";
 
@@ -86,14 +85,13 @@ export const handleCopy = (queryName: string, queryId: string) => {
  * @param router - Next.js router for navigation.
  * @param setLoading - Function to set the loading state.
  */
-export const handleClick = async (
-  router: ReturnType<typeof useRouter>,
+export const handleCreationConfirmation = async (
+  goForward: () => void,
   setLoading: React.Dispatch<React.SetStateAction<boolean>>,
 ) => {
   setLoading(true);
-
   // Redirect to query updating/editing page
-  router.push("/queryBuilding/buildFromTemplates");
+  goForward();
 };
 
 /**
@@ -142,9 +140,8 @@ export const renderModal = (
   );
 };
 
-export const SelectedQueryContext = createContext<SelectedQueryState>(null);
-
-export type SelectedQueryState = {
+export type SelectedQueryDetails = {
   queryName: string;
   queryId: string;
-} | null;
+};
+export type SelectedQueryState = SelectedQueryDetails | null;

@@ -300,7 +300,7 @@ export const stateOptions = [
 export type Mode = "search" | "results" | "select-query" | "patient-results";
 
 /* Mode that query building pages can be in; determines what is displayed to the user */
-export type BuildStep = "condition" | "valueset" | "concept";
+export type BuildStep = "selection" | "condition" | "valueset" | "concept";
 
 export const metadata = {
   title: "Query Connector",

@@ -1,9 +1,9 @@
 import { Button, Icon } from "@trussworks/react-uswds";
 import { useState } from "react";
-import styles from "../queryBuilding.module.scss";
+import styles from "./querySelection.module.scss";
 import { useRouter } from "next/navigation";
 import classNames from "classnames";
-import WorkSpaceSetUpView from "../loadingState/WorkspaceSetUp";
+import WorkSpaceSetUpView from "./WorkspaceSetUp";
 import { createDibbsDB } from "@/db-creation";
 /**
  * Empty-state component for query building

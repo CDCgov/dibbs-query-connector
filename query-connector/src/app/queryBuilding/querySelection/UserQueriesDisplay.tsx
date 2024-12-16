@@ -2,30 +2,31 @@ import React, {
   useState,
   useContext,
   useRef,
-  createContext,
   Dispatch,
   SetStateAction,
 } from "react";
 import { Button, Icon, Table } from "@trussworks/react-uswds";
 import { ModalRef } from "@/app/query/designSystem/modal/Modal";
-import styles from "@/app/queryBuilding/queryBuilding.module.scss";
+import styles from "./querySelection.module.scss";
 import { CustomUserQuery } from "@/app/query-building";
 import { DataContext } from "@/app/utils";
+
+import { useRouter } from "next/navigation";
+import { BuildStep } from "@/app/constants";
 import {
+  SelectedQueryState,
+  renderModal,
   handleDelete,
+  handleCreationConfirmation,
   confirmDelete,
   handleCopy,
-  handleClick,
-  renderModal,
-  SelectedQueryState,
-} from "@/app/queryBuilding/dataState/utils";
-import { useRouter } from "next/navigation";
+} from "./utils";
 
 interface UserQueriesDisplayProps {
   queries: CustomUserQuery[];
-  handleEdit: (queryName: string, queryId: string) => void;
   selectedQuery: SelectedQueryState;
   setSelectedQuery: Dispatch<SetStateAction<SelectedQueryState>>;
+  setBuildStep: Dispatch<SetStateAction<BuildStep>>;
 }
 
 /**
@@ -36,15 +37,22 @@ interface UserQueriesDisplayProps {
  */
 export const UserQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
   queries: initialQueries,
-  handleEdit,
   selectedQuery,
   setSelectedQuery,
+  setBuildStep,
 }) => {
   const context = useContext(DataContext);
   const [queries, setQueries] = useState<CustomUserQuery[]>(initialQueries);
   const [_, setLoading] = useState(false);
   const modalRef = useRef<ModalRef>(null);
   const router = useRouter();
+  const handleEdit = (queryName: string, queryId: string) => {
+    setSelectedQuery({
+      queryName: queryName,
+      queryId: queryId,
+    });
+    setBuildStep("condition");
+  };
 
   return (
     <div>
@@ -61,7 +69,12 @@ export const UserQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
         <h1 className="flex-align-center">My queries</h1>
         <div className="margin-left-auto">
           <Button
-            onClick={() => handleClick(router, setLoading)}
+            onClick={() =>
+              handleCreationConfirmation(
+                () => setBuildStep("condition"),
+                setLoading,
+              )
+            }
             className={styles.createQueryButton}
             type="button"
           >
