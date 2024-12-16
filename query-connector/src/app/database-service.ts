@@ -70,6 +70,9 @@ const dbConfig: PoolConfig = {
 };
 const dbClient = new Pool(dbConfig);
 
+/**
+ *
+ */
 export const getDbClient = async () => {
   return dbClient;
 };

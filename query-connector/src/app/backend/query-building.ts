@@ -4,6 +4,10 @@ import { getDbClient } from "../database-service";
 import { QueryDetailsResult } from "../queryBuilding/utils";
 const dbClient = await getDbClient();
 
+/**
+ *
+ * @param queryId
+ */
 export async function getSelectedQueryDetails(queryId: string) {
   const id = queryId;
   const queryString = `
