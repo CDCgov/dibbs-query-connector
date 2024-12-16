@@ -22,14 +22,12 @@ import { BuildStep } from "../../constants";
 import LoadingView from "../../query/components/LoadingView";
 import classNames from "classnames";
 import { groupConditionConceptsIntoValueSets } from "@/app/utils";
-import {
-  SelectedQueryDetails,
-  SelectedQueryState,
-} from "../querySelection/utils";
+import { SelectedQueryDetails } from "../querySelection/utils";
 
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { getSelectedQueryDetails } from "@/app/backend/query-building";
+import { getSavedQueryDetails } from "@/app/backend/query-building";
+import { EMPTY_QUERY_SELECTION } from "../page";
 
 export type FormError = {
   queryName: boolean;
@@ -39,8 +37,8 @@ export type FormError = {
 type BuildFromTemplatesProps = {
   buildStep: BuildStep;
   setBuildStep: Dispatch<SetStateAction<BuildStep>>;
-  selectedQuery: SelectedQueryDetails | "create";
-  setSelectedQuery: Dispatch<SetStateAction<SelectedQueryState>>;
+  selectedQuery: SelectedQueryDetails;
+  setSelectedQuery: Dispatch<SetStateAction<SelectedQueryDetails>>;
 };
 
 /**
@@ -64,10 +62,7 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
   const focusRef = useRef<HTMLInputElement | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [queryName, setQueryName] = useState<string | null>(
-    typeof selectedQuery === "string" ? "" : selectedQuery?.queryName,
-  );
-  const [queryId, setQueryId] = useState<string | null>(
-    typeof selectedQuery === "string" ? "" : selectedQuery?.queryId,
+    selectedQuery.queryName,
   );
 
   const [fetchedConditions, setFetchedConditions] =
@@ -83,7 +78,7 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
 
   function goBack() {
     setQueryName(null);
-    setSelectedQuery(null);
+    setSelectedQuery(EMPTY_QUERY_SELECTION);
     setBuildStep("selection");
   }
 
@@ -182,35 +177,47 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
   }, [selectedConditions, queryName]);
 
   useEffect(() => {
+    let isSubscribed = true;
+
     async function setDefaultSelectedConditions() {
-      if (queryId && fetchedConditions) {
-        const result = await getSelectedQueryDetails(queryId);
+      if (selectedQuery.queryId && fetchedConditions) {
+        const result = await getSavedQueryDetails(selectedQuery.queryId);
         const conditionNameToIdMap =
           generateConditionNameToIdAndCategoryMap(fetchedConditions);
-
         const queryConditions = result?.map((r) => r.conditions_list).flat();
+
+        const updatedConditions: CategoryNameToConditionOptionMap = {};
         queryConditions &&
           queryConditions.forEach((conditionName) => {
             const { category, conditionId } =
               conditionNameToIdMap[conditionName];
 
-            setSelectedConditions((prevState) => {
-              return {
-                ...prevState,
-                [category]: {
-                  ...prevState?.[category],
-                  [conditionId]: {
-                    name: conditionName,
-                    include: true,
-                  },
-                },
-              };
-            });
+            updatedConditions[category] = {
+              ...updatedConditions[category],
+              [conditionId]: {
+                name: conditionName,
+                include: true,
+              },
+            };
           });
+
+        if (isSubscribed) {
+          setSelectedConditions((prevState) => {
+            // Avoid unnecessary updates if the state is already the same
+            const newState = { ...prevState, ...updatedConditions };
+            return JSON.stringify(prevState) !== JSON.stringify(newState)
+              ? newState
+              : prevState;
+          });
+        }
       }
     }
     setDefaultSelectedConditions().catch(console.error);
-  }, [queryId, fetchedConditions]);
+
+    return () => {
+      isSubscribed = false;
+    };
+  }, [fetchedConditions]);
 
   // ensures the fetchedConditions' checkbox statuses match
   // the data in selectedCondtiions

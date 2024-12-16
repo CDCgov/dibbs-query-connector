@@ -1,14 +1,15 @@
 "use server";
 
-import { getDbClient } from "../database-service";
+import { getDbClient } from "./dbClient";
 import { QueryDetailsResult } from "../queryBuilding/utils";
-const dbClient = await getDbClient();
+const dbClient = getDbClient();
 
 /**
- *
- * @param queryId
+ * Getter function to grab saved query details from the DB
+ * @param queryId - Query ID to grab data from the db with
+ * @returns The query name, data, and conditions list from the query table
  */
-export async function getSelectedQueryDetails(queryId: string) {
+export async function getSavedQueryDetails(queryId: string) {
   const id = queryId;
   const queryString = `
     select q.query_name, q.id, q.query_data, q.conditions_list

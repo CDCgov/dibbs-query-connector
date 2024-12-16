@@ -52,9 +52,7 @@ export const handleDelete = async (
 export const confirmDelete = (
   queryName: string,
   queryId: string,
-  setSelectedQuery: React.Dispatch<
-    React.SetStateAction<{ queryName: string; queryId: string } | null>
-  >,
+  setSelectedQuery: React.Dispatch<React.SetStateAction<SelectedQueryDetails>>,
   modalRef: RefObject<ModalRef>,
 ) => {
   setSelectedQuery({ queryName, queryId });

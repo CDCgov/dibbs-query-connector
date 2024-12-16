@@ -19,13 +19,14 @@ import {
   handleCreationConfirmation,
   confirmDelete,
   handleCopy,
+  SelectedQueryDetails,
 } from "./utils";
 import LoadingView from "@/app/query/components/LoadingView";
 
 interface UserQueriesDisplayProps {
   queries: CustomUserQuery[];
   selectedQuery: SelectedQueryState;
-  setSelectedQuery: Dispatch<SetStateAction<SelectedQueryState>>;
+  setSelectedQuery: Dispatch<SetStateAction<SelectedQueryDetails>>;
   setBuildStep: Dispatch<SetStateAction<BuildStep>>;
 }
 

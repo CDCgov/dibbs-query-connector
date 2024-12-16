@@ -14,14 +14,14 @@ import {
 import { ToastContainer } from "react-toastify";
 import EmptyQueriesDisplay from "./EmptyQueriesDisplay";
 import UserQueriesDisplay from "./UserQueriesDisplay";
-import { SelectedQueryState } from "./utils";
+import { SelectedQueryDetails, SelectedQueryState } from "./utils";
 import styles from "./querySelection.module.scss";
 import { BuildStep } from "@/app/constants";
 
 type QuerySelectionProps = {
   selectedQuery: SelectedQueryState;
   setBuildStep: Dispatch<SetStateAction<BuildStep>>;
-  setSelectedQuery: Dispatch<SetStateAction<SelectedQueryState>>;
+  setSelectedQuery: Dispatch<SetStateAction<SelectedQueryDetails>>;
 };
 
 /**
