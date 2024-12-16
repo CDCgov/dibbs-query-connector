@@ -11,7 +11,6 @@ import styles from "./querySelection.module.scss";
 import { CustomUserQuery } from "@/app/query-building";
 import { DataContext } from "@/app/utils";
 
-import { useRouter } from "next/navigation";
 import { BuildStep } from "@/app/constants";
 import {
   SelectedQueryState,
@@ -21,6 +20,7 @@ import {
   confirmDelete,
   handleCopy,
 } from "./utils";
+import LoadingView from "@/app/query/components/LoadingView";
 
 interface UserQueriesDisplayProps {
   queries: CustomUserQuery[];
@@ -33,6 +33,10 @@ interface UserQueriesDisplayProps {
  * Component for query building when user-generated queries already exist
  * @param root0 - The props object.
  * @param root0.queries - Array of user-generated queries to display.
+ * @param root0.selectedQuery - the query object we're building
+ * @param root0.setBuildStep - setter function to progress the stage of the query
+ * building flow
+ * @param root0.setSelectedQuery - setter function to update the query for editing
  * @returns the UserQueriesDisplay to render the queries with edit/delete options
  */
 export const UserQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
@@ -43,9 +47,8 @@ export const UserQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
 }) => {
   const context = useContext(DataContext);
   const [queries, setQueries] = useState<CustomUserQuery[]>(initialQueries);
-  const [_, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const modalRef = useRef<ModalRef>(null);
-  const router = useRouter();
   const handleEdit = (queryName: string, queryId: string) => {
     setSelectedQuery({
       queryName: queryName,
@@ -56,6 +59,7 @@ export const UserQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
 
   return (
     <div>
+      {<LoadingView loading={loading} />}
       {context &&
         renderModal(
           modalRef,

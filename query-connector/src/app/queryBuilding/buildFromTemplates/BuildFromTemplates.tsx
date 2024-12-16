@@ -40,6 +40,14 @@ type BuildFromTemplatesProps = {
 
 /**
  * The query building page
+ * @param root0 params
+ * @param root0.selectedQuery - the query to edit or the "create" mode if it
+ * doesn't previously
+ * @param root0.buildStep - the stage in the build process, used to render
+ * subsequent steps
+ * @param root0.setBuildStep - setter function to move the app forward
+ * @param root0.setSelectedQuery - setter function to update / reset the query
+ * being built
  * @returns the component for the query building page
  */
 const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({

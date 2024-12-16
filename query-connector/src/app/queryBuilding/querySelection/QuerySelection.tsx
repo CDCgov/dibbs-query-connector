@@ -26,6 +26,11 @@ type QuerySelectionProps = {
 
 /**
  * Component for Query Building Flow
+ * @param root0 - params
+ * @param root0.selectedQuery - the query object we're building
+ * @param root0.setBuildStep - setter function to progress the stage of the query
+ * building flow
+ * @param root0.setSelectedQuery - setter function to update the query for editing
  * @returns The Query Building component flow
  */
 const QuerySelection: React.FC<QuerySelectionProps> = ({

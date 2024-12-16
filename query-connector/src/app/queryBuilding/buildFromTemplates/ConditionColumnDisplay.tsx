@@ -1,10 +1,4 @@
-import {
-  Dispatch,
-  SetStateAction,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import {
   CategoryNameToConditionOptionMap,
   filterSearchByCategoryAndCondition,
@@ -13,7 +7,6 @@ import styles from "./buildfromTemplate.module.scss";
 import ConditionOption from "./ConditionOption";
 import classNames from "classnames";
 import { FormError } from "./BuildFromTemplates";
-import { SelectedQueryContext } from "../querySelection/utils";
 
 type ConditionColumnDisplayProps = {
   fetchedConditions: CategoryNameToConditionOptionMap;
