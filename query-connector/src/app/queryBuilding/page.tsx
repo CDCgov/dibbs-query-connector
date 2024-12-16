@@ -5,8 +5,8 @@ import QuerySelection from "./querySelection/QuerySelection";
 import { BuildStep } from "../constants";
 import "react-toastify/dist/ReactToastify.css";
 import { useState } from "react";
+import { EMPTY_QUERY_SELECTION } from "./utils";
 
-export const EMPTY_QUERY_SELECTION = { queryId: "", queryName: "" };
 /**
  * Component for Query Building Flow
  * @returns The Query Building component flow

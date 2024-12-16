@@ -50,6 +50,8 @@ export type CategoryNameToConditionOptionMap = {
   [categoryName: string]: ConditionOptionMap;
 };
 
+export const EMPTY_QUERY_SELECTION = { queryId: "", queryName: "" };
+
 /**
  * Translation function format backend response to something more manageable for the
  * frontend

@@ -12,6 +12,7 @@ import {
 import {
   CategoryNameToConditionOptionMap,
   ConditionIdToValueSetArray,
+  EMPTY_QUERY_SELECTION,
   generateConditionNameToIdAndCategoryMap,
   groupConditionDataByCategoryName,
 } from "../utils";
@@ -27,7 +28,6 @@ import { SelectedQueryDetails } from "../querySelection/utils";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { getSavedQueryDetails } from "@/app/backend/query-building";
-import { EMPTY_QUERY_SELECTION } from "../page";
 
 export type FormError = {
   queryName: boolean;
