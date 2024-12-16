@@ -26,6 +26,9 @@ import {
   SelectedQueryState,
 } from "../querySelection/utils";
 
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 export type FormError = {
   queryName: boolean;
   selectedConditions: boolean;
@@ -248,7 +251,7 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
               : "Back to My queries"
           }
         />
-
+        <ToastContainer position="bottom-left" icon={false} />
         <div className="customQuery__header">
           <h1 className={styles.queryTitle}>Custom query</h1>
           <div className={styles.customQuery__controls}>
