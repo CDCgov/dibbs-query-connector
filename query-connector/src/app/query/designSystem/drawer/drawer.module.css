@@ -46,6 +46,7 @@
   gap: 0.5rem;
   border-radius: 0.25rem;
   border: 1px solid var(--gray-500, #919191);
+  background-color: #fff;
 }
 
 .valueSetSearch {
