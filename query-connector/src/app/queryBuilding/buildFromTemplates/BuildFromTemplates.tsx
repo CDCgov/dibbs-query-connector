@@ -28,6 +28,7 @@ import {
 
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { getSelectedQueryDetails } from "@/app/backend/query-building";
 
 export type FormError = {
   queryName: boolean;
@@ -63,6 +64,9 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
   const [loading, setLoading] = useState<boolean>(false);
   const [queryName, setQueryName] = useState<string | null>(
     typeof selectedQuery === "string" ? "" : selectedQuery?.queryName,
+  );
+  const [queryId, setQueryId] = useState<string | null>(
+    typeof selectedQuery === "string" ? "" : selectedQuery?.queryId,
   );
 
   const [fetchedConditions, setFetchedConditions] =
@@ -170,6 +174,15 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
     }
 
     fetchConditionsAndUpdateState().catch(console.error);
+
+    async function fetchQueryDetails() {
+      if (queryId) {
+        const result = await getSelectedQueryDetails(queryId);
+        console.log(result);
+      }
+    }
+
+    fetchQueryDetails().catch(console.error);
 
     return () => {
       isSubscribed = false;

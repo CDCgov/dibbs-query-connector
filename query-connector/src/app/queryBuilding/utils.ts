@@ -5,6 +5,14 @@ import { GroupedValueSet } from "../query/components/customizeQuery/customizeQue
 export type ConditionIdToNameMap = {
   [conditionId: string]: string;
 };
+
+export type QueryDetailsResult = {
+  query_name: string;
+  id: string;
+  query_data: { [condition_name: string]: { [valueSetId: string]: ValueSet } };
+  conditions_list: string[];
+};
+
 export type CategoryToConditionArrayMap = {
   [categoryName: string]: ConditionIdToNameMap[];
 };
