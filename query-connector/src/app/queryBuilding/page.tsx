@@ -7,6 +7,7 @@ import { getCustomQueries } from "@/app/database-service";
 import { DataContext } from "@/app/utils";
 import styles from "@/app/queryBuilding/queryBuilding.module.scss";
 import { ToastContainer } from "react-toastify";
+import LoadingView from "@/app/query/components/LoadingView";
 import "react-toastify/dist/ReactToastify.css";
 
 /**
@@ -37,7 +38,7 @@ const QueryBuilding: React.FC = () => {
   }, [context]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <LoadingView loading={loading} />;
   }
 
   const queries = (context?.data || []) as CustomUserQuery[];

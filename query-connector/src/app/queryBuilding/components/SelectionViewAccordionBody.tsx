@@ -4,6 +4,8 @@ import { GroupedValueSet } from "@/app/query/components/customizeQuery/customize
 import { formatDiseaseDisplay } from "../utils";
 import { tallyConceptsForSingleValueSet } from "../utils";
 import { DibbsValueSetType } from "@/app/constants";
+import Drawer from "@/app/query/designSystem/drawer/Drawer";
+import React, { useState } from "react";
 
 type SelectionViewAccordionBodyProps = {
   id?: string;
@@ -29,6 +31,16 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
   valueSetsForType,
   handleCheckboxToggle,
 }) => {
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [drawerTitle, setDrawerTitle] = useState<string>("");
+  const [drawerCodes, setDrawerCodes] = useState<React.ReactNode>(null);
+
+  const handleViewCodes = (vsName: string, codes: React.ReactNode) => {
+    setDrawerTitle(`${vsName}`);
+    setDrawerCodes(codes);
+    setIsDrawerOpen(true);
+  };
+
   return (
     <div>
       {valueSetsForType &&
@@ -54,7 +66,7 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
                   }}
                   id={`${vs.valueSetName}-${valueSetType}`}
                   checked={checked}
-                />{" "}
+                />
               </div>
               <div className={styles.accordionBodyExpanded__right}>
                 <div className={styles.displayCount}>
@@ -63,7 +75,9 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
                 <div
                   className={styles.viewCodesBtn}
                   role="button"
-                  onClick={() => console.log("clicky")}
+                  onClick={() =>
+                    handleViewCodes(vs.valueSetName, <div>TODO</div>)
+                  }
                 >
                   View Codes
                 </div>
@@ -71,6 +85,14 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
             </div>
           );
         })}
+      <Drawer
+        title={drawerTitle}
+        placeholder="Search by code or name"
+        toastMessage="Valueset concepts have been successfully modified."
+        codes={drawerCodes}
+        isOpen={isDrawerOpen}
+        onClose={() => setIsDrawerOpen(false)}
+      />
     </div>
   );
 };

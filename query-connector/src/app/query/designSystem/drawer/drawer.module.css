@@ -1,0 +1,64 @@
+.drawer {
+  position: fixed;
+  top: 0;
+  right: -35.1875rem;
+  height: 73.0625rem;
+  width: 35.1875rem;
+  padding: 0rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.5rem;
+  flex-shrink: 0;
+  transition: right 0.3s ease;
+  z-index: 1050;
+  border-left: 1px solid var(--gray-400, #dfe1e2);
+  background: var(--Gray-cool-gray-cool-2, #f7f9fa);
+}
+
+.drawer.open {
+  right: 0;
+}
+
+.drawer.closed {
+  right: -35.1875rem;
+}
+
+.drawerContent {
+  padding: 2rem;
+  overflow-y: auto;
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1040;
+}
+
+.searchField {
+  display: flex;
+  width: 25rem;
+  padding: 0.75rem 0.75rem 0.75rem 2.25rem !important;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 0.25rem;
+  border: 1px solid var(--gray-500, #919191);
+  background-color: #fff;
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  position: absolute;
+  top: 1.5rem;
+  right: 1rem;
+}
