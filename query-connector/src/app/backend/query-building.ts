@@ -15,7 +15,7 @@ export async function getSelectedQueryDetails(queryId: string) {
   try {
     const result = await dbClient.query(queryString, [id]);
     if (result.rows.length > 0) {
-      return result.rows[0] as unknown as QueryDetailsResult;
+      return result.rows as unknown as QueryDetailsResult[];
     }
     console.error("No results found for query:", id);
     return [];

@@ -62,7 +62,6 @@ export const ConditionSelection: React.FC<ConditionSelectionProps> = ({
   setFormError,
   updateFetched,
 }) => {
-  console.log(selectedConditions);
   const focusRef = useRef<HTMLInputElement | null>(null);
 
   const [searchFilter, setSearchFilter] = useState<string>();

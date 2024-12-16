@@ -175,19 +175,56 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
 
     fetchConditionsAndUpdateState().catch(console.error);
 
-    async function fetchQueryDetails() {
-      if (queryId) {
-        const result = await getSelectedQueryDetails(queryId);
-        console.log(result);
-      }
-    }
-
-    fetchQueryDetails().catch(console.error);
-
     return () => {
       isSubscribed = false;
     };
   }, [selectedConditions, queryName]);
+
+  useEffect(() => {
+    async function fetchQueryDetails() {
+      if (queryId && fetchedConditions) {
+        const prevFetch = structuredClone(fetchedConditions);
+        const result = await getSelectedQueryDetails(queryId);
+        Object.entries(fetchedConditions).forEach(
+          ([category, conditionOptionMap]) => {
+            result?.forEach((queryDetails) => {
+              const conditionNameToIdMap: {
+                [conditionName: string]: string;
+              } = {};
+              Object.entries(conditionOptionMap).forEach(
+                ([id, conditionOption]) => {
+                  conditionNameToIdMap[conditionOption.name] = id;
+                },
+              );
+              queryDetails.conditions_list.forEach((conditionNameToCheck) => {
+                if (
+                  Object.keys(conditionNameToIdMap).includes(
+                    conditionNameToCheck,
+                  )
+                ) {
+                  const idToSelect = conditionNameToIdMap[conditionNameToCheck];
+
+                  setSelectedConditions((prevState) => {
+                    return {
+                      ...prevState,
+                      [category]: {
+                        ...prevState?.[category],
+                        [idToSelect]: {
+                          name: conditionNameToCheck,
+                          include: true,
+                        },
+                      },
+                    };
+                  });
+                }
+              });
+            });
+          },
+        );
+      }
+    }
+    fetchQueryDetails().catch(console.error);
+  }, [queryId, fetchedConditions]);
 
   // ensures the fetchedConditions' checkbox statuses match
   // the data in selectedCondtiions

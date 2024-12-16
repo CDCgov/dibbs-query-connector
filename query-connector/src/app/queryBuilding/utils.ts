@@ -158,7 +158,7 @@ export function tallyConceptsForSingleValueSet(
  * included concepts
  * @returns A number indicating the tally of relevant concpets
  */
-export function tallyConcpetsForValueSetGroup(
+export function tallyConceptsForValueSetGroup(
   valueSets: GroupedValueSet[],
   filterInclude?: boolean,
 ) {
