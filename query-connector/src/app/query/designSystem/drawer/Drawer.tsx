@@ -66,7 +66,7 @@ export const Drawer: React.FC<DrawerProps> = ({
           <div className="padding-top-5">
             <div>
               <SearchField
-                id="valueSetTemplateSearch"
+                id="searchFieldTemplate"
                 placeholder={placeholder}
                 className={styles.searchField}
                 onChange={(e) => {

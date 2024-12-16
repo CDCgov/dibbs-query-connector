@@ -49,21 +49,6 @@
   background-color: #fff;
 }
 
-.valueSetSearch {
-  width: 25rem !important;
-  padding: 0.75rem 0.75rem 0.75rem 2.25rem !important;
-  margin: 0 !important;
-  height: 3rem !important;
-}
-
-.valueSetTemplate__left {
-  display: flex;
-  flex-direction: row;
-  min-width: 18rem;
-  justify-content: space-between;
-  padding: 0.5rem !important;
-}
-
 .closeButton {
   background: none;
   border: none;
