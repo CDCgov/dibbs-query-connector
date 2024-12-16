@@ -33,6 +33,9 @@ interface UserQueriesDisplayProps {
  * Component for query building when user-generated queries already exist
  * @param root0 - The props object.
  * @param root0.queries - Array of user-generated queries to display.
+ * @param root0.selectedQuery
+ * @param root0.setSelectedQuery
+ * @param root0.setBuildStep
  * @returns the UserQueriesDisplay to render the queries with edit/delete options
  */
 export const UserQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({

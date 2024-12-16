@@ -1,7 +1,7 @@
 import { ModalRef } from "@/app/query/designSystem/modal/Modal";
 import { DeleteModal } from "@/app/query/designSystem/modal/deleteModal";
 import "react-toastify/dist/ReactToastify.css";
-import { RefObject, createContext } from "react";
+import { RefObject } from "react";
 import { CustomUserQuery } from "@/app/query-building";
 import { deleteQueryById } from "@/app/database-service";
 import { DataContextValue } from "@/app/utils";
@@ -83,6 +83,7 @@ export const handleCopy = (queryName: string, queryId: string) => {
 /**
  * Handles the creation of a new query by redirecting to the query building page.
  * @param router - Next.js router for navigation.
+ * @param goForward
  * @param setLoading - Function to set the loading state.
  */
 export const handleCreationConfirmation = async (
