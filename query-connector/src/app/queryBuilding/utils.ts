@@ -77,6 +77,32 @@ export function groupConditionDataByCategoryName(fetchedData: {
 }
 
 /**
+ * Utility function to reverse the category : name: ID mapping between our conditions structure
+ * @param fetchedDate - data returned from the backend function grabbing condition <>
+ * category mapping
+ * @returns - The data in a CategoryNameToConditionOptionMap shape
+ */
+export function generateConditionNameToIdAndCategoryMap(
+  fetchedDate: CategoryNameToConditionOptionMap,
+) {
+  const result: {
+    [conditionName: string]: {
+      conditionId: string;
+      category: string;
+    };
+  } = {};
+  Object.entries(fetchedDate).forEach(([categoryName, conditionOptionMap]) => {
+    Object.entries(conditionOptionMap).forEach(([conditionId, optionMap]) => {
+      result[optionMap.name] = {
+        conditionId: conditionId,
+        category: categoryName,
+      };
+    });
+  });
+  return result;
+}
+
+/**
  * Filtering function that checks filtering at the category and the condition level
  * @param filterString - string to filter by
  * @param fetchedConditions - unfiltered list of conditions fetched from the backend

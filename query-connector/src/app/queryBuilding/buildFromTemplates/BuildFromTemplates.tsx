@@ -12,6 +12,7 @@ import {
 import {
   CategoryNameToConditionOptionMap,
   ConditionIdToValueSetArray,
+  generateConditionNameToIdAndCategoryMap,
   groupConditionDataByCategoryName,
 } from "../utils";
 import { ConditionSelection } from "../components/ConditionSelection";
@@ -181,49 +182,34 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
   }, [selectedConditions, queryName]);
 
   useEffect(() => {
-    async function fetchQueryDetails() {
+    async function setDefaultSelectedConditions() {
       if (queryId && fetchedConditions) {
-        const prevFetch = structuredClone(fetchedConditions);
         const result = await getSelectedQueryDetails(queryId);
-        Object.entries(fetchedConditions).forEach(
-          ([category, conditionOptionMap]) => {
-            result?.forEach((queryDetails) => {
-              const conditionNameToIdMap: {
-                [conditionName: string]: string;
-              } = {};
-              Object.entries(conditionOptionMap).forEach(
-                ([id, conditionOption]) => {
-                  conditionNameToIdMap[conditionOption.name] = id;
-                },
-              );
-              queryDetails.conditions_list.forEach((conditionNameToCheck) => {
-                if (
-                  Object.keys(conditionNameToIdMap).includes(
-                    conditionNameToCheck,
-                  )
-                ) {
-                  const idToSelect = conditionNameToIdMap[conditionNameToCheck];
+        const conditionNameToIdMap =
+          generateConditionNameToIdAndCategoryMap(fetchedConditions);
 
-                  setSelectedConditions((prevState) => {
-                    return {
-                      ...prevState,
-                      [category]: {
-                        ...prevState?.[category],
-                        [idToSelect]: {
-                          name: conditionNameToCheck,
-                          include: true,
-                        },
-                      },
-                    };
-                  });
-                }
-              });
+        const queryConditions = result?.map((r) => r.conditions_list).flat();
+        queryConditions &&
+          queryConditions.forEach((conditionName) => {
+            const { category, conditionId } =
+              conditionNameToIdMap[conditionName];
+
+            setSelectedConditions((prevState) => {
+              return {
+                ...prevState,
+                [category]: {
+                  ...prevState?.[category],
+                  [conditionId]: {
+                    name: conditionName,
+                    include: true,
+                  },
+                },
+              };
             });
-          },
-        );
+          });
       }
     }
-    fetchQueryDetails().catch(console.error);
+    setDefaultSelectedConditions().catch(console.error);
   }, [queryId, fetchedConditions]);
 
   // ensures the fetchedConditions' checkbox statuses match
