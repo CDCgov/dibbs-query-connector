@@ -27,6 +27,8 @@ import {
 import { DibbsValueSetType } from "../../constants";
 import { SelectionTable } from "./SelectionTable";
 
+import Drawer from "@/app/query/designSystem/drawer/Drawer";
+
 type ConditionSelectionProps = {
   queryName: string;
   setBuildStep: (buildStep: BuildStep) => void;
@@ -53,6 +55,7 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
   const [_searchFilter, setSearchFilter] = useState<string>();
   const [selectedValueSets, setSelectedValueSets] =
     useState<ConditionToValueSetMap>({});
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   useEffect(() => {
     if (queryName == "" || queryName == undefined) {
@@ -126,8 +129,11 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
   }, []);
 
   const handleAddCondition = () => {
-    console.log("clicky");
-    console.log("selectedValueSets in state", selectedValueSets);
+    setIsDrawerOpen(true);
+  };
+
+  const handleCloseDrawer = () => {
+    setIsDrawerOpen(false);
   };
 
   // Makes the conditionId more easily accessible within the group
@@ -215,6 +221,15 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
           </div>
         </div>
       </div>
+
+      <Drawer
+        title="Add Condition(s)"
+        placeholder="Search conditions"
+        codes={<div>Dynamic codes go here</div>}
+        toastMessage="Condition has been successfully added."
+        isOpen={isDrawerOpen}
+        onClose={handleCloseDrawer}
+      />
     </div>
   );
 };
