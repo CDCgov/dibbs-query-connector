@@ -88,6 +88,7 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
       <Drawer
         title={drawerTitle}
         placeholder="Search by code or name"
+        toastMessage="Valueset concepts have been successfully modified."
         codes={drawerCodes}
         isOpen={isDrawerOpen}
         onClose={() => setIsDrawerOpen(false)}
