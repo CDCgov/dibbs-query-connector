@@ -154,7 +154,10 @@ function mapStoredValueSetIntoInternalValueset(
     dibbsConceptType: storedConcept["dibbs_concept_type"],
     includeValueSet: conceptGroup
       .map((c) => c["include"])
-      .some((v) => v === false)
+      // if every concept is explicitly set to false, don't include this valueset.
+      // otherwise (even if inclusion is undefined, which by default it will be)
+      // assume we want to include that valueset
+      .every((v) => v === false)
       ? false
       : true,
     concepts: conceptGroup.map((c) => {

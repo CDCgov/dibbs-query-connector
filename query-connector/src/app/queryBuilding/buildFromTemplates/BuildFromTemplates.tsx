@@ -325,7 +325,7 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
               />
             )}
           {/* Step Two: Select ValueSets */}
-          {buildStep == "valueset" && queryName && (
+          {buildStep == "valueset" && queryName !== null && (
             <ValueSetSelection
               setBuildStep={setBuildStep}
               queryName={queryName}
