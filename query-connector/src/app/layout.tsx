@@ -19,11 +19,11 @@ export default function RootLayout({
     <html lang="en">
       <SessionProvider>
         <body>
-          <Header />
-          <div className="main-body">
+          <div className="application-container">
+            <Header />
             <DataProvider>{children}</DataProvider>
+            <Footer />
           </div>
-          <Footer />
         </body>
       </SessionProvider>
     </html>
