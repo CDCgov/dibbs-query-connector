@@ -7,6 +7,7 @@
   margin-bottom: 5rem;
   margin-top: 2rem;
   padding: 0 !important;
+  flex: 1 1 auto;
 
   &__wide {
     @extend .main-container;
