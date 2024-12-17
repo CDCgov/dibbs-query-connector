@@ -2,6 +2,7 @@ name: Terraform Apply
 run-name: Terraform apply ${{ inputs.workspace }} by @${{ github.actor }}
 
 on:
+  pull_request:
   workflow_dispatch:
     inputs:
       workspace:
