@@ -1,7 +1,6 @@
 import { Button, Icon } from "@trussworks/react-uswds";
 import { useState } from "react";
 import styles from "./querySelection.module.scss";
-import { useRouter } from "next/navigation";
 import classNames from "classnames";
 import WorkSpaceSetUpView from "./WorkspaceSetUp";
 import { createDibbsDB } from "@/db-creation";
@@ -10,7 +9,6 @@ import { createDibbsDB } from "@/db-creation";
  * @returns the EmptyQueriesDisplay to render the empty state status
  */
 export const EmptyQueriesDisplay: React.FC = () => {
-  const router = useRouter();
   const [loading, setLoading] = useState(false);
 
   const handleClick = async () => {
@@ -25,7 +23,7 @@ export const EmptyQueriesDisplay: React.FC = () => {
     setLoading(false);
 
     // Refresh query building page to display the now seeded values
-    router.refresh();
+    location.reload();
   };
 
   if (loading) {
