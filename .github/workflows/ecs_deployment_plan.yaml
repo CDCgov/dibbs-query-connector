@@ -2,7 +2,9 @@ name: Terraform Plan
 run-name: Terraform plan ${{ inputs.workspace }} by @${{ github.actor }}
 
 on:
-  # pull_request:
+  push: 
+    branches:
+      - shanice/transition_ecs_infra
   workflow_dispatch:
     inputs:
       workspace:
