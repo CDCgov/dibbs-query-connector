@@ -157,12 +157,6 @@ export const patientOptions: Record<string, Option[]> = {
       label: "A newborn with a passed screening",
     },
   ],
-  "social-determinants": [
-    {
-      value: "social-determinants",
-      label: "A patient with housing insecurity",
-    },
-  ],
   syphilis: [
     {
       value: "sti-syphilis-positive",
