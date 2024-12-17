@@ -25,7 +25,7 @@ export const EmptyQueriesDisplay: React.FC = () => {
     setLoading(false);
 
     // Redirect to query building page
-    router.push("/queryBuilding/buildFromTemplates");
+    router.push("/queryBuilding");
   };
 
   if (loading) {
