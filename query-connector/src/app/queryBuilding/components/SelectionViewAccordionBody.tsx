@@ -39,24 +39,63 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
     vsName: string,
     concepts: { code: string; display: string; include: boolean }[],
   ) => {
-    setDrawerTitle(`${vsName}`);
-    setDrawerCodes(
+    const allSelected = concepts.every((concept) => concept.include);
+
+    const toggleAll = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const isChecked = e.target.checked;
+      concepts.forEach((concept) => (concept.include = isChecked));
+      setDrawerCodes(renderConcepts());
+    };
+
+    const toggleSingle = (
+      e: React.ChangeEvent<HTMLInputElement>,
+      conceptIndex: number,
+    ) => {
+      concepts[conceptIndex].include = e.target.checked;
+      setDrawerCodes(renderConcepts());
+    };
+
+    const renderConcepts = () => (
       <div>
         <div className="display-flex padding-y-3">
-          <div className="width-15 font-sans-md text-bold flex-0">Code</div>
-          <div className="font-sans-md text-bold">Name</div>
+          <Checkbox
+            name="toggleAll"
+            id="toggleAll"
+            checked={allSelected}
+            onChange={toggleAll}
+            label={
+              <div className="display-flex">
+                <div className="width-15 font-sans-md text-bold flex-0">
+                  Code
+                </div>
+                <div className="font-sans-md text-bold">Name</div>
+              </div>
+            }
+          />
         </div>
-        {concepts.map((concept) => (
+        {concepts.map((concept, index) => (
           <div key={concept.code} className="display-flex padding-y-1">
-            <div className="width-15 text-no-wrap">{concept.code}</div>
-            <div className="flex-fill">{concept.display}</div>
+            <Checkbox
+              name={`checkbox-${concept.code}`}
+              id={`checkbox-${concept.code}`}
+              checked={concept.include}
+              onChange={(e) => toggleSingle(e, index)}
+              label={
+                <div className="display-flex">
+                  <div className="width-15 text-no-wrap">{concept.code}</div>
+                  <div className="flex-fill">{concept.display}</div>
+                </div>
+              }
+            />
           </div>
         ))}
-      </div>,
+      </div>
     );
+
+    setDrawerTitle(`${vsName}`);
+    setDrawerCodes(renderConcepts());
     setIsDrawerOpen(true);
   };
-
   return (
     <div>
       {valueSetsForType &&
