@@ -11,8 +11,7 @@ import {
   USE_CASES,
   FHIR_SERVERS,
   FhirServers,
-  UseCases,
-  UseCaseToQueryName,
+  USE_CASE_DETAILS,
 } from "../../constants";
 
 import { handleRequestError } from "./error-handling-service";
@@ -75,8 +74,10 @@ export async function POST(request: NextRequest) {
     const diagnostics_message = "Missing use_case or fhir_server.";
     const OperationOutcome = await handleRequestError(diagnostics_message);
     return NextResponse.json(OperationOutcome);
-  } else if (!Object.values(UseCases).includes(use_case as USE_CASES)) {
-    const diagnostics_message = `Invalid use_case. Please provide a valid use_case. Valid use_cases include ${UseCases}.`;
+  } else if (!Object.keys(USE_CASE_DETAILS).includes(use_case)) {
+    const diagnostics_message = `Invalid use_case. Please provide a valid use_case. Valid use_cases include ${Object.keys(
+      USE_CASE_DETAILS,
+    )}.`;
     const OperationOutcome = await handleRequestError(diagnostics_message);
     return NextResponse.json(OperationOutcome);
   } else if (
@@ -88,7 +89,7 @@ export async function POST(request: NextRequest) {
   }
 
   // Lookup default parameters for particular use-case search
-  const queryName = UseCaseToQueryName[use_case as USE_CASES];
+  const queryName = USE_CASE_DETAILS[use_case as USE_CASES].queryName;
   const queryResults = await getSavedQueryByName(queryName);
   const valueSets = unnestValueSetsFromQuery(queryResults);
 
