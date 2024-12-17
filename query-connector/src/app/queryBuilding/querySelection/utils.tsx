@@ -4,7 +4,6 @@ import "react-toastify/dist/ReactToastify.css";
 import { RefObject } from "react";
 import { CustomUserQuery } from "@/app/query-building";
 import { deleteQueryById } from "@/app/database-service";
-import { useRouter } from "next/navigation";
 import { DataContextValue } from "@/app/utils";
 import { showToastConfirmation } from "@/app/query/designSystem/toast/Toast";
 
@@ -53,9 +52,7 @@ export const handleDelete = async (
 export const confirmDelete = (
   queryName: string,
   queryId: string,
-  setSelectedQuery: React.Dispatch<
-    React.SetStateAction<{ queryName: string; queryId: string } | null>
-  >,
+  setSelectedQuery: React.Dispatch<React.SetStateAction<SelectedQueryDetails>>,
   modalRef: RefObject<ModalRef>,
 ) => {
   setSelectedQuery({ queryName, queryId });
@@ -83,17 +80,16 @@ export const handleCopy = (queryName: string, queryId: string) => {
 
 /**
  * Handles the creation of a new query by redirecting to the query building page.
- * @param router - Next.js router for navigation.
+ * @param goForward - method to progress the page to the next step
  * @param setLoading - Function to set the loading state.
  */
-export const handleClick = async (
-  router: ReturnType<typeof useRouter>,
+export const handleCreationConfirmation = async (
+  goForward: () => void,
   setLoading: React.Dispatch<React.SetStateAction<boolean>>,
 ) => {
   setLoading(true);
-
   // Redirect to query updating/editing page
-  router.push("/queryBuilding/buildFromTemplates");
+  goForward();
 };
 
 /**
@@ -141,3 +137,9 @@ export const renderModal = (
     />
   );
 };
+
+export type SelectedQueryDetails = {
+  queryName: string;
+  queryId: string;
+};
+export type SelectedQueryState = SelectedQueryDetails | null;

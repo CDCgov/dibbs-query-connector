@@ -5,6 +5,14 @@ import { GroupedValueSet } from "../query/components/customizeQuery/customizeQue
 export type ConditionIdToNameMap = {
   [conditionId: string]: string;
 };
+
+export type QueryDetailsResult = {
+  query_name: string;
+  id: string;
+  query_data: { [condition_name: string]: { [valueSetId: string]: ValueSet } };
+  conditions_list: string[];
+};
+
 export type CategoryToConditionArrayMap = {
   [categoryName: string]: ConditionIdToNameMap[];
 };
@@ -42,6 +50,8 @@ export type CategoryNameToConditionOptionMap = {
   [categoryName: string]: ConditionOptionMap;
 };
 
+export const EMPTY_QUERY_SELECTION = { queryId: "", queryName: "" };
+
 /**
  * Translation function format backend response to something more manageable for the
  * frontend
@@ -65,6 +75,32 @@ export function groupConditionDataByCategoryName(fetchedData: {
       });
     },
   );
+  return result;
+}
+
+/**
+ * Utility function to reverse the category : name: ID mapping between our conditions structure
+ * @param fetchedDate - data returned from the backend function grabbing condition <>
+ * category mapping
+ * @returns - The data in a CategoryNameToConditionOptionMap shape
+ */
+export function generateConditionNameToIdAndCategoryMap(
+  fetchedDate: CategoryNameToConditionOptionMap,
+) {
+  const result: {
+    [conditionName: string]: {
+      conditionId: string;
+      category: string;
+    };
+  } = {};
+  Object.entries(fetchedDate).forEach(([categoryName, conditionOptionMap]) => {
+    Object.entries(conditionOptionMap).forEach(([conditionId, optionMap]) => {
+      result[optionMap.name] = {
+        conditionId: conditionId,
+        category: categoryName,
+      };
+    });
+  });
   return result;
 }
 
@@ -150,7 +186,7 @@ export function tallyConceptsForSingleValueSet(
  * included concepts
  * @returns A number indicating the tally of relevant concpets
  */
-export function tallyConcpetsForValueSetGroup(
+export function tallyConceptsForValueSetGroup(
   valueSets: GroupedValueSet[],
   filterInclude?: boolean,
 ) {

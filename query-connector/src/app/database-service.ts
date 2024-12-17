@@ -1,5 +1,4 @@
 "use server";
-import { Pool, PoolConfig } from "pg";
 import {
   Bundle,
   OperationOutcome,
@@ -45,6 +44,7 @@ import {
   ValuesetStruct,
   ValuesetToConceptStruct,
 } from "./seedSqlStructs";
+import { getDbClient } from "./backend/dbClient";
 
 const getQuerybyNameSQL = `
 select q.query_name, q.id, q.query_data, q.conditions_list
@@ -61,14 +61,7 @@ SELECT c.display, c.code_system, c.code, vs.name as valueset_name, vs.id as valu
   WHERE ctvs.condition_id IN (
 `;
 
-// Load environment variables from .env and establish a Pool configuration
-const dbConfig: PoolConfig = {
-  connectionString: process.env.DATABASE_URL,
-  max: 10, // Maximum # of connections in the pool
-  idleTimeoutMillis: 30000, // A client must sit idle this long before being released
-  connectionTimeoutMillis: 3000, // Wait this long before timing out when connecting new client
-};
-const dbClient = new Pool(dbConfig);
+const dbClient = getDbClient();
 
 /**
  * Executes a search for a ValueSets and Concepts against the Postgres

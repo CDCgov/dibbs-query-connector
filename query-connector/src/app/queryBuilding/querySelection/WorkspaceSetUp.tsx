@@ -3,7 +3,7 @@
 import { Icon } from "@trussworks/react-uswds";
 import classNames from "classnames";
 import React from "react";
-import styles from "../queryBuilding.module.scss";
+import styles from "./querySelection.module.scss";
 
 interface LoadingViewProps {
   loading: boolean;

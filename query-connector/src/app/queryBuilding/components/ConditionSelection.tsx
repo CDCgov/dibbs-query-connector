@@ -12,7 +12,7 @@ import {
 import ConditionColumnDisplay from "../buildFromTemplates/ConditionColumnDisplay";
 import SearchField from "@/app/query/designSystem/searchField/SearchField";
 import { BuildStep } from "@/app/constants";
-import { FormError } from "../buildFromTemplates/page";
+import { FormError } from "../buildFromTemplates/BuildFromTemplates";
 
 type ConditionSelectionProps = {
   fetchedConditions: CategoryNameToConditionOptionMap;

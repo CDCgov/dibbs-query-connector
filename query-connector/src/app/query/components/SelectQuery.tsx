@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import {
   FHIR_SERVERS,
   USE_CASES,
-  UseCaseToQueryName,
+  USE_CASE_DETAILS,
   ValueSet,
 } from "../../constants";
 import CustomizeQuery from "./CustomizeQuery";
@@ -78,7 +78,8 @@ const SelectQuery: React.FC<SelectQueryProps> = ({
 
     const fetchDataAndUpdateState = async () => {
       if (selectedQuery) {
-        const queryName = UseCaseToQueryName[selectedQuery as USE_CASES];
+        const queryName =
+          USE_CASE_DETAILS[selectedQuery as USE_CASES].queryName;
         const valueSets = await fetchUseCaseValueSets(queryName);
         // Only update if the fetch hasn't altered state yet
         if (isSubscribed) {

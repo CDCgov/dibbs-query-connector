@@ -139,8 +139,4 @@ export default function HeaderComponent() {
   );
 }
 
-const LOGGED_IN_PATHS = [
-  "/query",
-  "/queryBuilding",
-  "/queryBuilding/buildFromTemplates",
-];
+const LOGGED_IN_PATHS = ["/query", "/queryBuilding"];

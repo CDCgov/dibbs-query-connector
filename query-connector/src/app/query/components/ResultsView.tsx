@@ -12,7 +12,7 @@ import EncounterTable from "./resultsView/tableComponents/EncounterTable";
 import MedicationRequestTable from "./resultsView/tableComponents/MedicationRequestTable";
 import ObservationTable from "./resultsView/tableComponents/ObservationTable";
 import Backlink from "./backLink/Backlink";
-import { USE_CASES, demoQueryValToLabelMap } from "@/app/constants";
+import { USE_CASES, USE_CASE_DETAILS } from "@/app/constants";
 import {
   PAGE_TITLES,
   RETURN_LABEL,
@@ -78,7 +78,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({
       <h2 className="page-explainer margin-bottom-3-important margin-top-0-important">
         <strong>Query: </strong>
         <span className="text-normal display-inline-block">
-          {demoQueryValToLabelMap[selectedQuery]}
+          {USE_CASE_DETAILS[selectedQuery].condition}
         </span>
       </h2>
 

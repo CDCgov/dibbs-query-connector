@@ -1,43 +1,66 @@
-import React, { useState, useContext, useRef } from "react";
+import React, {
+  useState,
+  useContext,
+  useRef,
+  Dispatch,
+  SetStateAction,
+} from "react";
 import { Button, Icon, Table } from "@trussworks/react-uswds";
 import { ModalRef } from "@/app/query/designSystem/modal/Modal";
-import { useRouter } from "next/navigation";
-import styles from "@/app/queryBuilding/queryBuilding.module.scss";
+import styles from "./querySelection.module.scss";
 import { CustomUserQuery } from "@/app/query-building";
 import { DataContext } from "@/app/utils";
+
+import { BuildStep } from "@/app/constants";
 import {
+  SelectedQueryState,
+  renderModal,
   handleDelete,
+  handleCreationConfirmation,
   confirmDelete,
   handleCopy,
-  handleClick,
-  renderModal,
-} from "@/app/queryBuilding/dataState/utils";
+  SelectedQueryDetails,
+} from "./utils";
+import LoadingView from "@/app/query/components/LoadingView";
 
 interface UserQueriesDisplayProps {
   queries: CustomUserQuery[];
+  selectedQuery: SelectedQueryState;
+  setSelectedQuery: Dispatch<SetStateAction<SelectedQueryDetails>>;
+  setBuildStep: Dispatch<SetStateAction<BuildStep>>;
 }
 
 /**
  * Component for query building when user-generated queries already exist
  * @param root0 - The props object.
  * @param root0.queries - Array of user-generated queries to display.
+ * @param root0.selectedQuery - the query object we're building
+ * @param root0.setBuildStep - setter function to progress the stage of the query
+ * building flow
+ * @param root0.setSelectedQuery - setter function to update the query for editing
  * @returns the UserQueriesDisplay to render the queries with edit/delete options
  */
 export const UserQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
   queries: initialQueries,
+  selectedQuery,
+  setSelectedQuery,
+  setBuildStep,
 }) => {
-  const router = useRouter();
   const context = useContext(DataContext);
   const [queries, setQueries] = useState<CustomUserQuery[]>(initialQueries);
-  const [_, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const modalRef = useRef<ModalRef>(null);
-  const [selectedQuery, setSelectedQuery] = useState<{
-    queryName: string;
-    queryId: string;
-  } | null>(null);
+  const handleEdit = (queryName: string, queryId: string) => {
+    setSelectedQuery({
+      queryName: queryName,
+      queryId: queryId,
+    });
+    setBuildStep("condition");
+  };
 
   return (
     <div>
+      {<LoadingView loading={loading} />}
       {context &&
         renderModal(
           modalRef,
@@ -48,10 +71,15 @@ export const UserQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
           context,
         )}
       <div className="display-flex flex-justify-between flex-align-center width-full margin-bottom-4">
-        <h1 className="{styles.queryTitle} flex-align-center">My queries</h1>
+        <h1 className="flex-align-center">My queries</h1>
         <div className="margin-left-auto">
           <Button
-            onClick={() => handleClick(router, setLoading)}
+            onClick={() =>
+              handleCreationConfirmation(
+                () => setBuildStep("condition"),
+                setLoading,
+              )
+            }
             className={styles.createQueryButton}
             type="button"
           >
@@ -77,11 +105,15 @@ export const UserQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
                     <Button
                       type="button"
                       className="usa-button--unstyled text-bold text-no-underline"
-                      onClick={() => console.log("Edit", query.query_id)}
+                      onClick={() =>
+                        handleEdit(query.query_name, query.query_id)
+                      }
                     >
                       <span className="icon-text padding-right-4 display-flex flex-align-center">
                         <Icon.Edit className="height-3 width-3" />
-                        <span className="padding-left-05">Edit</span>
+                        <span id={query.query_id} className="padding-left-05">
+                          Edit
+                        </span>
                       </span>
                     </Button>
                     <Button

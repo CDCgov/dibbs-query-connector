@@ -6,7 +6,7 @@ import {
 import styles from "./buildfromTemplate.module.scss";
 import ConditionOption from "./ConditionOption";
 import classNames from "classnames";
-import { FormError } from "./page";
+import { FormError } from "./BuildFromTemplates";
 
 type ConditionColumnDisplayProps = {
   fetchedConditions: CategoryNameToConditionOptionMap;

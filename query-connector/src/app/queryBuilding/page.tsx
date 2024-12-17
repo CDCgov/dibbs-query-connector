@@ -1,60 +1,38 @@
 "use client";
-import { useContext, useEffect, useState } from "react";
-import UserQueriesDisplay from "./dataState/UserQueriesDisplay";
-import EmptyQueriesDisplay from "./emptyState/EmptyQueriesDisplay";
-import { CustomUserQuery } from "@/app/query-building";
-import { getCustomQueries } from "@/app/database-service";
-import { DataContext } from "@/app/utils";
-import styles from "@/app/queryBuilding/queryBuilding.module.scss";
-import { ToastContainer } from "react-toastify";
-import LoadingView from "@/app/query/components/LoadingView";
+import { SelectedQueryDetails } from "./querySelection/utils";
+import BuildFromTemplates from "./buildFromTemplates/BuildFromTemplates";
+import QuerySelection from "./querySelection/QuerySelection";
+import { BuildStep } from "../constants";
 import "react-toastify/dist/ReactToastify.css";
+import { useState } from "react";
+import { EMPTY_QUERY_SELECTION } from "./utils";
 
 /**
  * Component for Query Building Flow
  * @returns The Query Building component flow
  */
 const QueryBuilding: React.FC = () => {
-  const context = useContext(DataContext);
-  const [loading, setLoading] = useState(true);
-
-  // Check whether custom queries exist in DB
-  useEffect(() => {
-    if (context?.data === null) {
-      const fetchQueries = async () => {
-        try {
-          const queries = await getCustomQueries();
-          context.setData(queries);
-        } catch (error) {
-          console.error("Failed to fetch queries:", error);
-        } finally {
-          setLoading(false);
-        }
-      };
-      fetchQueries();
-    } else {
-      setLoading(false); // Data already exists, no need to fetch again
-    }
-  }, [context]);
-
-  if (loading) {
-    return <LoadingView loading={loading} />;
-  }
-
-  const queries = (context?.data || []) as CustomUserQuery[];
+  const [selectedQuery, setSelectedQuery] = useState<SelectedQueryDetails>(
+    EMPTY_QUERY_SELECTION,
+  );
+  const [buildStep, setBuildStep] = useState<BuildStep>("selection");
 
   return (
     <>
-      {queries.length === 0 ? (
-        <div className="main-container">
-          <h1 className={styles.queryTitle}>My queries</h1>
-          <EmptyQueriesDisplay />
-        </div>
-      ) : (
-        <div className="main-container__wide">
-          <ToastContainer position="bottom-left" icon={false} />
-          <UserQueriesDisplay queries={queries} />
-        </div>
+      {buildStep === "selection" && (
+        <QuerySelection
+          selectedQuery={selectedQuery}
+          setBuildStep={setBuildStep}
+          setSelectedQuery={setSelectedQuery}
+        />
+      )}
+      {buildStep !== "selection" && (
+        <BuildFromTemplates
+          selectedQuery={selectedQuery}
+          buildStep={buildStep}
+          setSelectedQuery={setSelectedQuery}
+          setBuildStep={setBuildStep}
+        ></BuildFromTemplates>
       )}
     </>
   );
