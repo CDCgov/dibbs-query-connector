@@ -10,10 +10,6 @@ import {
 } from "fhir/r4";
 
 export const USE_CASE_DETAILS = {
-  "social-determinants": {
-    queryName: "Gather social determinants of health",
-    condition: "Social Determinants of Health",
-  },
   "newborn-screening": {
     queryName: "Newborn screening follow-up",
     condition: "Newborn Screening",
@@ -73,7 +69,6 @@ export type PatientType =
   | "newborn-screening-technical-fail"
   | "newborn-screening-referral"
   | "newborn-screening-pass"
-  | "social-determinants"
   | "sti-syphilis-positive";
 
 export const DEFAULT_DEMO_FHIR_SERVER = "HELIOS Meld: Direct";
@@ -97,26 +92,7 @@ export const demoData: Record<PatientType, DemoDataFields> = {
   cancer: { ...hyperUnluckyPatient, UseCase: "cancer" },
   "sti-chlamydia-positive": { ...hyperUnluckyPatient, UseCase: "chlamydia" },
   "sti-gonorrhea-positive": { ...hyperUnluckyPatient, UseCase: "gonorrhea" },
-  "social-determinants": {
-    ...hyperUnluckyPatient,
-    UseCase: "social-determinants",
-  },
   "sti-syphilis-positive": { ...hyperUnluckyPatient, UseCase: "syphilis" },
-
-  // Newborn screening data remains unchanged
-  // We need to figure how to display specific cases for specific referral, fail, pass
-  // "newborn-screening-technical-fail": {
-  //   ...hyperUnluckyPatient,
-  // UseCase: "newborn-screening",
-  // },
-  // "newborn-screening-referral": {
-  //   ...hyperUnluckyPatient,
-  //   UseCase: "newborn-screening",
-  // },
-  // "newborn-screening-pass": {
-  //   ...hyperUnluckyPatient,
-  //   UseCase: "newborn-screening",
-  // },
   "newborn-screening-technical-fail": {
     FirstName: "Mango",
     LastName: "Smith",
