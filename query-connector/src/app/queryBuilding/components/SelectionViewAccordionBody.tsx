@@ -35,9 +35,25 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
   const [drawerTitle, setDrawerTitle] = useState<string>("");
   const [drawerCodes, setDrawerCodes] = useState<React.ReactNode>(null);
 
-  const handleViewCodes = (vsName: string, codes: React.ReactNode) => {
+  const handleViewCodes = (
+    vsName: string,
+    concepts: { code: string; display: string; include: boolean }[],
+  ) => {
     setDrawerTitle(`${vsName}`);
-    setDrawerCodes(codes);
+    setDrawerCodes(
+      <div>
+        <div className="display-flex padding-y-3">
+          <div className="width-15 font-sans-md text-bold flex-0">Code</div>
+          <div className="font-sans-md text-bold">Name</div>
+        </div>
+        {concepts.map((concept) => (
+          <div key={concept.code} className="display-flex padding-y-1">
+            <div className="width-15 text-no-wrap">{concept.code}</div>
+            <div className="flex-fill">{concept.display}</div>
+          </div>
+        ))}
+      </div>,
+    );
     setIsDrawerOpen(true);
   };
 
@@ -76,7 +92,7 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
                   className={styles.viewCodesBtn}
                   role="button"
                   onClick={() =>
-                    handleViewCodes(vs.valueSetName, <div>TODO</div>)
+                    handleViewCodes(vs.valueSetName, vs.items[0].concepts)
                   }
                 >
                   View Codes
