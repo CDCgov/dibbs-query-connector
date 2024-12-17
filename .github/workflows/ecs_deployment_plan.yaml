@@ -50,7 +50,7 @@ jobs:
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           role-session-name: githubDeploymentWorkflow
-          aws-region: ${{ vars.region }}
+          aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Terraform
         env:
@@ -59,7 +59,7 @@ jobs:
           DYNAMODB_TABLE: ${{ secrets.TFSTATE_DYNAMODB_TABLE }}
           OWNER: ${{ vars.OWNER }}
           PROJECT: ${{ vars.PROJECT }}
-          REGION: ${{ secrets.AWS_REGION }}
+          REGION: ${{ vars.region }}
           WORKSPACE: ${{ env.workspace }}
           UMLS_API_KEY: ${{ secrets.UMLS_API_KEY }}
           ERSD_API_KEY: ${{ secrets.ERSD_API_KEY}}
