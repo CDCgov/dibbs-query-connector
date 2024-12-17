@@ -121,15 +121,15 @@ variable "ersd_api_key" {
   sensitive = true
 }
 
-variable "qc_tls_key" {
-  type= string
-  description = "Key for the Cloudfare cert for domain: queryconnector.dev"
-  sensitive = true
-}
+# variable "qc_tls_key" {
+#   type= string
+#   description = "Key for the Cloudfare cert for domain: queryconnector.dev"
+#   sensitive = true
+# }
 
-variable "qc_tls_cert" {
-  type= string
-  description = "Certificate importing from Cloudfare: queryconnector.dev"
-  sensitive = true
-}
+# variable "qc_tls_cert" {
+#   type= string
+#   description = "Certificate importing from Cloudfare: queryconnector.dev"
+#   sensitive = true
+# }
 
