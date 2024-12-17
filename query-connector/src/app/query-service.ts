@@ -199,10 +199,8 @@ async function generalizedQuery(
   const builtQuery = new CustomQuery(querySpec, patientId);
   let response: fetch.Response | fetch.Response[];
 
-  // Special cases for plain SDH or newborn screening, which just use one query
-  if (useCase === "social-determinants") {
-    response = await fhirClient.get(builtQuery.getQuery("social"));
-  } else if (useCase === "newborn-screening") {
+  // Special cases for newborn screening, which just use one query
+  if (useCase === "newborn-screening") {
     response = await fhirClient.get(builtQuery.getQuery("observation"));
   } else {
     const queryRequests: string[] = builtQuery.getAllQueries();

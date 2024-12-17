@@ -2,9 +2,8 @@
 
 import Backlink from "@/app/query/components/backLink/Backlink";
 import styles from "../buildFromTemplates/buildfromTemplate.module.scss";
-import { useRouter } from "next/navigation";
 import { Label, TextInput, Button } from "@trussworks/react-uswds";
-import { useEffect, useRef, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 
 import {
   getConditionsData,
@@ -13,6 +12,8 @@ import {
 import {
   CategoryNameToConditionOptionMap,
   ConditionIdToValueSetArray,
+  EMPTY_QUERY_SELECTION,
+  generateConditionNameToIdAndCategoryMap,
   groupConditionDataByCategoryName,
 } from "../utils";
 import { ConditionSelection } from "../components/ConditionSelection";
@@ -22,26 +23,48 @@ import { BuildStep } from "../../constants";
 import LoadingView from "../../query/components/LoadingView";
 import classNames from "classnames";
 import { groupConditionConceptsIntoValueSets } from "@/app/utils";
-import { batchToggleConcepts } from "../utils";
+import { SelectedQueryDetails } from "../querySelection/utils";
 
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { getSavedQueryDetails } from "@/app/backend/query-building";
 
 export type FormError = {
   queryName: boolean;
   selectedConditions: boolean;
 };
 
+type BuildFromTemplatesProps = {
+  buildStep: BuildStep;
+  setBuildStep: Dispatch<SetStateAction<BuildStep>>;
+  selectedQuery: SelectedQueryDetails;
+  setSelectedQuery: Dispatch<SetStateAction<SelectedQueryDetails>>;
+};
+
 /**
  * The query building page
+ * @param root0 params
+ * @param root0.selectedQuery - the query to edit or the "create" mode if it
+ * doesn't previously
+ * @param root0.buildStep - the stage in the build process, used to render
+ * subsequent steps
+ * @param root0.setBuildStep - setter function to move the app forward
+ * @param root0.setSelectedQuery - setter function to update / reset the query
+ * being built
  * @returns the component for the query building page
  */
-export default function QueryTemplateSelection() {
-  const router = useRouter();
+const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
+  selectedQuery,
+  buildStep,
+  setBuildStep,
+  setSelectedQuery,
+}) => {
   const focusRef = useRef<HTMLInputElement | null>(null);
-  const [buildStep, setBuildStep] = useState<BuildStep>("condition");
   const [loading, setLoading] = useState<boolean>(false);
-  const [queryName, setQueryName] = useState<string>("");
+  const [queryName, setQueryName] = useState<string | null>(
+    selectedQuery.queryName,
+  );
+
   const [fetchedConditions, setFetchedConditions] =
     useState<CategoryNameToConditionOptionMap>();
   const [selectedConditions, setSelectedConditions] =
@@ -52,6 +75,12 @@ export default function QueryTemplateSelection() {
   });
   const [conditionValueSets, setConditionValueSets] =
     useState<ConditionIdToValueSetArray>();
+
+  function goBack() {
+    setQueryName(null);
+    setSelectedQuery(EMPTY_QUERY_SELECTION);
+    setBuildStep("selection");
+  }
 
   const checkForAddedConditions = (selectedIds: string[]) => {
     const alreadyRetrieved =
@@ -87,13 +116,6 @@ export default function QueryTemplateSelection() {
       const results = await getValueSetsAndConceptsByConditionIDs(conditionIds);
       const formattedResults =
         results && groupConditionConceptsIntoValueSets(results);
-
-      // when fetching directly from conditions table (as opposed to a saved query),
-      // default to including all value sets
-      formattedResults.forEach((result) => {
-        batchToggleConcepts(result);
-        return (result.includeValueSet = true);
-      });
 
       // group by Condition ID:
       return Object.values(formattedResults).reduce((acc, resultObj) => {
@@ -153,6 +175,49 @@ export default function QueryTemplateSelection() {
       isSubscribed = false;
     };
   }, [selectedConditions, queryName]);
+
+  useEffect(() => {
+    let isSubscribed = true;
+
+    async function setDefaultSelectedConditions() {
+      if (selectedQuery.queryId && fetchedConditions) {
+        const result = await getSavedQueryDetails(selectedQuery.queryId);
+        const conditionNameToIdMap =
+          generateConditionNameToIdAndCategoryMap(fetchedConditions);
+        const queryConditions = result?.map((r) => r.conditions_list).flat();
+
+        const updatedConditions: CategoryNameToConditionOptionMap = {};
+        queryConditions &&
+          queryConditions.forEach((conditionName) => {
+            const { category, conditionId } =
+              conditionNameToIdMap[conditionName];
+
+            updatedConditions[category] = {
+              ...updatedConditions[category],
+              [conditionId]: {
+                name: conditionName,
+                include: true,
+              },
+            };
+          });
+
+        if (isSubscribed) {
+          setSelectedConditions((prevState) => {
+            // Avoid unnecessary updates if the state is already the same
+            const newState = { ...prevState, ...updatedConditions };
+            return JSON.stringify(prevState) !== JSON.stringify(newState)
+              ? newState
+              : prevState;
+          });
+        }
+      }
+    }
+    setDefaultSelectedConditions().catch(console.error);
+
+    return () => {
+      isSubscribed = false;
+    };
+  }, [fetchedConditions]);
 
   // ensures the fetchedConditions' checkbox statuses match
   // the data in selectedCondtiions
@@ -219,7 +284,7 @@ export default function QueryTemplateSelection() {
               setBuildStep("condition");
               updateFetchedConditionIncludeStatus(selectedConditions ?? {});
             } else {
-              router.push("/queryBuilding");
+              goBack();
             }
           }}
           // TODO: tidy this too
@@ -246,6 +311,7 @@ export default function QueryTemplateSelection() {
                 name="queryNameInput"
                 type="text"
                 className="maxw-mobile"
+                defaultValue={queryName ?? ""}
                 required
                 onChange={(event) => {
                   setQueryName(event.target.value);
@@ -282,25 +348,27 @@ export default function QueryTemplateSelection() {
         </div>
         <div className="display-flex flex-auto">
           {/* Step One: Select Conditions */}
-          {buildStep == "condition" && fetchedConditions && (
-            <ConditionSelection
-              setBuildStep={setBuildStep}
-              queryName={queryName}
-              fetchedConditions={fetchedConditions ?? {}}
-              selectedConditions={selectedConditions ?? {}}
-              setFetchedConditions={setFetchedConditions}
-              setSelectedConditions={setSelectedConditions}
-              setFormError={setFormError}
-              formError={formError}
-              validateForm={validateForm}
-              loading={loading}
-              setLoading={setLoading}
-              setConditionValueSets={setConditionValueSets}
-              updateFetched={updateFetchedConditionIncludeStatus}
-            />
-          )}
+          {buildStep == "condition" &&
+            fetchedConditions &&
+            queryName !== null && (
+              <ConditionSelection
+                setBuildStep={setBuildStep}
+                queryName={queryName}
+                fetchedConditions={fetchedConditions ?? {}}
+                selectedConditions={selectedConditions ?? {}}
+                setFetchedConditions={setFetchedConditions}
+                setSelectedConditions={setSelectedConditions}
+                setFormError={setFormError}
+                formError={formError}
+                validateForm={validateForm}
+                loading={loading}
+                setLoading={setLoading}
+                setConditionValueSets={setConditionValueSets}
+                updateFetched={updateFetchedConditionIncludeStatus}
+              />
+            )}
           {/* Step Two: Select ValueSets */}
-          {buildStep == "valueset" && (
+          {buildStep == "valueset" && queryName !== null && (
             <ValueSetSelection
               setBuildStep={setBuildStep}
               queryName={queryName}
@@ -313,4 +381,6 @@ export default function QueryTemplateSelection() {
       </div>
     </>
   );
-}
+};
+
+export default BuildFromTemplates;

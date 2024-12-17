@@ -4,7 +4,7 @@ import styles from "../buildFromTemplates/buildfromTemplate.module.scss";
 import {
   ValueSetsByGroup,
   batchToggleConcepts,
-  tallyConcpetsForValueSetGroup,
+  tallyConceptsForValueSetGroup,
   ConditionToValueSetMap,
 } from "../utils";
 import { DibbsValueSetType } from "@/app/constants";
@@ -112,11 +112,11 @@ export const SelectionTable: React.FC<SelectionTableProps> = ({
         const valueSetsForType = Object.values(
           groupedValueSetsForCondition[valueSetType],
         );
-        const totalCount = tallyConcpetsForValueSetGroup(
+        const totalCount = tallyConceptsForValueSetGroup(
           valueSetsForType,
           false,
         );
-        const selectedCount = tallyConcpetsForValueSetGroup(
+        const selectedCount = tallyConceptsForValueSetGroup(
           valueSetsForType,
           true,
         );
