@@ -34,14 +34,18 @@ export const Drawer: React.FC<DrawerProps> = ({
   isOpen,
   onClose,
 }) => {
-  const handleClose = () => {
+  const handleSaveChanges = () => {
     if (toastMessage) {
       showToastConfirmation({
         body: toastMessage,
         variant: "success",
       });
     }
-    onClose();
+    onClose(); // Close the drawer after save
+  };
+
+  const handleClose = () => {
+    onClose(); // Close without triggering the toast
   };
 
   return (
@@ -60,7 +64,7 @@ export const Drawer: React.FC<DrawerProps> = ({
             <Icon.Close size={3} />
           </button>
           <h2 className="margin-0 padding-bottom-2">{title}</h2>
-          <Button type="button" onClick={handleClose}>
+          <Button type="button" onClick={handleSaveChanges}>
             Save changes
           </Button>
           <div className="padding-top-5">

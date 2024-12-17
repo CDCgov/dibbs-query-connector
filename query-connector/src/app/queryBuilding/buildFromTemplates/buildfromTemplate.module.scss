@@ -114,6 +114,42 @@
   border-bottom: 1px #dfe1e2 solid;
 }
 
+.codeNameHeaders {
+  display: flex;
+  padding-top: 1.5rem;
+  padding-bottom: 1.5rem;
+}
+
+.codeNameHeaders > div {
+  display: flex;
+  color: var(--Base-ink, #111);
+  font-size: 1rem;
+  font-style: normal;
+  font-weight: 700;
+  line-height: normal;
+}
+
+.codeNameHeaders > .codeColumn {
+  flex: 0 0 7.5rem; }
+
+.codeRow {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.5rem 0;
+}
+
+.codeRow > .codeColumn {
+  display: flex;
+  align-items: center;
+  width: 7.5rem;
+  gap: 0.5rem;
+}
+
+.codeRow > .nameColumn {
+  flex: 1 0 0;
+}
+
 .accordionContainer {
   width: 100%;
 }
