@@ -6,8 +6,8 @@ import {
   DibbsConceptType,
   DibbsValueSetType,
   USE_CASES,
+  USE_CASE_DETAILS,
   ValueSet,
-  demoQueryValToLabelMap,
 } from "../../constants";
 import { UseCaseQueryResponse } from "@/app/query-service";
 import LoadingView from "./LoadingView";
@@ -199,7 +199,7 @@ const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
       <LoadingView loading={!useCaseQueryResponse} />
       <h1 className="page-title margin-bottom-05-important">Customize query</h1>
       <h2 className="page-explainer margin-y-0-important">
-        Query: {demoQueryValToLabelMap[queryType]}
+        Query: {USE_CASE_DETAILS[queryType].condition}
       </h2>
       <h3 className="margin-y-0-important font-sans-sm text-light padding-bottom-0 padding-top-05">
         {countLabs} labs found, {countMedications} medications found,{" "}
