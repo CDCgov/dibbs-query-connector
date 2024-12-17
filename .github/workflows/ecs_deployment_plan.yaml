@@ -2,14 +2,14 @@ name: Terraform Plan
 run-name: Terraform plan ${{ inputs.workspace }} by @${{ github.actor }}
 
 on:
-  # pull_request:  
+  # pull_request:
   workflow_dispatch:
     inputs:
       workspace:
         description: "The workspace to terraform against"
         required: true
         type: string
-        default: 'dev'
+        default: "dev"
 
 concurrency:
   group: ${{ github.event.inputs.workspace }}-terraform
