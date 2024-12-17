@@ -1,4 +1,4 @@
-import { UUID, randomUUID } from "crypto";
+import { randomUUID } from "crypto";
 import { ValueSet } from "./constants";
 
 // TODO: Potentially merge this / infer this from the type created via the
@@ -42,37 +42,10 @@ export function generateQueryInsertionSql(input: QueryInput) {
   return { sql: sql, values: values } as const;
 }
 
-/**
- * Function that generates SQL for the query_to_valueset join table needed for
- * query building.
- * @param input - Values of the shape QueryInput needed for query insertion
- * @param queryId - ID of the query that's already been created to associate with
- * a given valueset
- * @returns An array of {sql, values} to be inserted by the join insertion flow
- */
-export function generateQueryToValueSetInsertionSql(
-  input: QueryInput,
-  queryId: UUID,
-) {
-  const joinInsertionSqlArray = input.valueSets.map((v) => {
-    const sql =
-      "INSERT INTO query_to_valueset VALUES($1,$2,$3,$4) RETURNING query_id, valueset_id;";
-    const queryToValueSetId = `${queryId}_${v.valueSetId}`;
-    const values = [
-      queryToValueSetId,
-      queryId,
-      v.valueSetId,
-      v.valueSetExternalId,
-    ];
-
-    return { sql: sql, values: values } as const;
-  });
-  return joinInsertionSqlArray;
-}
-
 // Type definition for CustomUserQueries
 export interface CustomUserQuery {
   query_id: string;
   query_name: string;
+  conditions_list?: string;
   valuesets: ValueSet[];
 }

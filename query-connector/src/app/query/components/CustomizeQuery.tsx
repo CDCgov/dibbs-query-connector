@@ -11,7 +11,7 @@ import {
 } from "../../constants";
 import { UseCaseQueryResponse } from "@/app/query-service";
 import LoadingView from "./LoadingView";
-import { showRedirectConfirmation } from "../designSystem/redirectToast/RedirectToast";
+import { showToastConfirmation } from "../designSystem/toast/Toast";
 import styles from "./customizeQuery/customizeQuery.module.css";
 import CustomizeQueryAccordionHeader from "./customizeQuery/CustomizeQueryAccordionHeader";
 import CustomizeQueryAccordionBody from "./customizeQuery/CustomizeQueryAccordionBody";
@@ -172,10 +172,8 @@ const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
     }, [] as ValueSet[]);
     setQueryValuesets(selectedItems);
     goBack();
-    showRedirectConfirmation({
-      heading: QUERY_CUSTOMIZATION_CONFIRMATION_HEADER,
-      body: "",
-      headingLevel: "h4",
+    showToastConfirmation({
+      body: QUERY_CUSTOMIZATION_CONFIRMATION_BODY,
     });
   };
 
@@ -253,5 +251,5 @@ const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
 };
 
 export default CustomizeQuery;
-export const QUERY_CUSTOMIZATION_CONFIRMATION_HEADER =
-  "Query Customization Successful!";
+export const QUERY_CUSTOMIZATION_CONFIRMATION_BODY =
+  "Query customization successful!";

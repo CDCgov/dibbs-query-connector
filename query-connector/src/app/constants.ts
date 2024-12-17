@@ -24,12 +24,12 @@ export type USE_CASES = (typeof UseCases)[number];
 export const UseCaseToQueryName: {
   [key in USE_CASES]: string;
 } = {
-  "social-determinants": "Social Determinants of Health",
-  "newborn-screening": "Newborn Screening",
-  syphilis: "Congenital syphilis (disorder)",
-  gonorrhea: "Gonorrhea (disorder)",
-  chlamydia: "Chlamydia trachomatis infection (disorder)",
-  cancer: "Cancer (Leukemia)",
+  "social-determinants": "Gather social determinants of health",
+  "newborn-screening": "Newborn screening follow-up",
+  syphilis: "Syphilis case investigation",
+  gonorrhea: "Gonorrhea case investigation",
+  chlamydia: "Chlamydia case investigation",
+  cancer: "Cancer case investigation",
 };
 
 /**
@@ -60,7 +60,7 @@ export const demoQueryValToLabelMap = demoQueryOptions.reduce(
  * Map between the queryType property used to define a demo use case's options,
  * and the name of that query for purposes of searching the DB.
  */
-const demoQueryLabels = demoQueryOptions.map((dqo) => dqo.label);
+export const demoQueryLabels = demoQueryOptions.map((dqo) => dqo.label);
 export const QueryTypeToQueryName: {
   [key in (typeof demoQueryLabels)[number]]: string;
 } = {
@@ -110,7 +110,7 @@ export type PatientType =
   | "social-determinants"
   | "sti-syphilis-positive";
 
-export const DEFAULT_DEMO_FHIR_SERVER = "Public HAPI: Direct";
+export const DEFAULT_DEMO_FHIR_SERVER = "HELIOS Meld: Direct";
 /*
  * Common "Hyper Unlucky" patient data used for all non-newborn screening use cases
  */
@@ -299,6 +299,9 @@ export const stateOptions = [
 /* Mode that pages can be in; determines what is displayed to the user */
 export type Mode = "search" | "results" | "select-query" | "patient-results";
 
+/* Mode that query building pages can be in; determines what is displayed to the user */
+export type BuildStep = "condition" | "valueset" | "concept";
+
 export const metadata = {
   title: "Query Connector",
   description: "Try out TEFCA with queries for public health use cases.",
@@ -327,6 +330,7 @@ export interface ValueSet {
   dibbsConceptType: string;
   includeValueSet: boolean;
   concepts: Concept[];
+  conditionId?: string;
 }
 
 export const DEFAULT_ERSD_VERSION = "3";
@@ -404,3 +408,11 @@ export const INTENTIONAL_EMPTY_STRING_FOR_CONCEPT_VERSION = "";
 // we clean up the DB migration. Leaving these in until we can clean these up
 // in the migration schema
 export const INTENTIONAL_EMPTY_STRING_FOR_GEM_CODE = "";
+
+// Define the type for the FHIR server configurations
+export type FhirServerConfig = {
+  id: string;
+  name: string;
+  hostname: string;
+  headers: Record<string, string>;
+};

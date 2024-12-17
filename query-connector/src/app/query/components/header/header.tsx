@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useRouter, usePathname } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { Button, Icon } from "@trussworks/react-uswds";
 import styles from "./header.module.scss";
 import { metadata } from "@/app/constants";
@@ -34,7 +34,6 @@ export default function HeaderComponent() {
     };
   }, [showMenu]);
 
-  const router = useRouter();
   const path = usePathname();
 
   const { data: session } = useSession();
@@ -51,7 +50,7 @@ export default function HeaderComponent() {
   const backLink = isProduction ? "/query-connector" : "/";
 
   return (
-    <>
+    <div className={styles.headerContainer}>
       <header className="usa-header usa-header--basic bg-primary-darker">
         <div
           className={classNames(
@@ -136,7 +135,7 @@ export default function HeaderComponent() {
           </ul>
         </div>
       )}
-    </>
+    </div>
   );
 }
 
