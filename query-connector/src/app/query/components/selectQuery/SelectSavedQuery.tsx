@@ -2,7 +2,7 @@ import {
   FHIR_SERVERS,
   FhirServers,
   USE_CASES,
-  demoQueryOptions,
+  USE_CASE_DETAILS,
 } from "@/app/constants";
 import { Select, Button } from "@trussworks/react-uswds";
 import Backlink from "../backLink/Backlink";
@@ -75,9 +75,9 @@ const SelectSavedQuery: React.FC<SelectSavedQueryProps> = ({
           <option value="" disabled>
             Select query
           </option>
-          {demoQueryOptions.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
+          {Object.entries(USE_CASE_DETAILS).map(([useCase, useCaseDetails]) => (
+            <option key={useCase} value={useCase}>
+              {useCaseDetails.queryName}
             </option>
           ))}
         </Select>
