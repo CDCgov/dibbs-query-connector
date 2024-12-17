@@ -86,3 +86,5 @@ build/
 .local.env 
 
 tmp_remote_image_*
+
+.terraform

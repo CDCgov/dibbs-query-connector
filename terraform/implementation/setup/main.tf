@@ -24,7 +24,7 @@ module "oidc" {
   project = var.project
 
   # This variable must match the name of the terraform workspace that you'll be using for your ECS module call in the /ecs module
-  workspace = "prod"
+  workspace = "dev"
 
   # state_bucket_arn   = module.tfstate.aws_s3_bucket.tfstate.arn
   state_bucket_arn = module.tfstate.state_bucket.arn

@@ -4,6 +4,15 @@
 #   statuses = ["ISSUED"]
 # }
 
+
+
+resource "aws_acm_certificate" "cloudflare_cert" {
+  private_key      = var.qc_tls_key       # Private key from Cloudflare
+  certificate_body = var.qc_tls_cert      # Public cert from Cloudflare
+
+  provider = aws.us-east-1  # ACM certificates for ALB must be in the "us-east-1" region when using CloudFront
+}
+
 data "aws_caller_identity" "current" {}
 
 module "vpc" {
@@ -35,7 +44,6 @@ module "ecs" {
   owner        = var.owner
   project      = var.project
   tags         = local.tags
-
 
 
   phdi_version = "main"
@@ -88,7 +96,14 @@ module "ecs" {
          name  = "FLYWAY_USER"
          value = aws_db_instance.qc_db.username
          },
-         
+         {    
+         name  = "UMLS_API_KEY"
+         value = var.umls_api_key
+         },
+                  {    
+         name  = "ERSD_API_KEY"
+         value = var.ersd_api_key
+         },
       ]
     }
   }
@@ -102,13 +117,13 @@ module "ecs" {
   internal = var.internal
 
   # If the intent is to enable https and port 443, pass the arn of the cert in AWS certificate manager. This cert will be applied to the load balancer. (default is "")
-  # certificate_arn = data.aws_acm_certificate.this.arn
+  certificate_arn = aws_acm_certificate.cloudflare_cert.arn
 
   # If the intent is to disable authentication, set ecr_viewer_app_env to "test" (default is "prod")
   # ecr_viewer_app_env = "test"
 
   # To disable autoscaling, set enable_autoscaling to false (default is true)
-  # enable_autoscaling = false
+  enable_autoscaling = false
 
   # If intent is to use a metadata database for polutating the ecr-viewer library, setup the database data object to connect to the database (supported databases are postgres and sqlserver)
   # Postgresql database example

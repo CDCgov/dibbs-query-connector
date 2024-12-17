@@ -109,19 +109,23 @@ variable "cred_manager" {
   default     = "undefined"
 }
 
-# variable "qc_db_connection_string" {
-#   description = "Connection string to the tefca database"
-# }
+variable "umls_api_key" {
+  description = "Key for the UMLS API"
+  sensitive = true
+}
 
-# variable "qc_jdbc_db_url" {
-#   description = "JDBC connection string for flyway to the qc database"
-# }
+variable "ersd_api_key" {
+  description = "Key for the ERSD API"
+  sensitive = true
+}
 
+variable "qc_tls_key" {
+  description = "Key for the Cloudfare cert for domain: queryconnector.dev"
+  sensitive = true
+}
 
-# variable "qc_jdbc_db_password" {
-#   description = "JDBC password for flyway to the qc database"
-# }
+variable "qc_tls_cert" {
+  description = "Certificate importing from Cloudfare: queryconnector.dev"
+  sensitive = true
+}
 
-# variable "qc_jdbc_db_user" {
-#   description = "JDBC username for flyway to the qc database"
-# }
