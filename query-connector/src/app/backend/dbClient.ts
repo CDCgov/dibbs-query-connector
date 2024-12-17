@@ -5,7 +5,9 @@ const dbConfig: PoolConfig = {
   connectionString: process.env.DATABASE_URL,
   max: 10, // Maximum # of connections in the pool
   idleTimeoutMillis: 30000, // A client must sit idle this long before being released
-  connectionTimeoutMillis: 3000, // Wait this long before timing out when connecting new client
+  connectionTimeoutMillis: process.env.LOCAL_DB_CLIENT_TIMEOUT
+    ? Number(process.env.LOCAL_DB_CLIENT_TIMEOUT)
+    : 3000, // Wait this long before timing out when connecting new client
 };
 
 let cachedDbClient: Pool | null = null;

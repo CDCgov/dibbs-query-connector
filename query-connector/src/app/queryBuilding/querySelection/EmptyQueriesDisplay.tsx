@@ -24,8 +24,8 @@ export const EmptyQueriesDisplay: React.FC = () => {
     // Stop loading and redirect once function is complete
     setLoading(false);
 
-    // Redirect to query building page
-    router.push("/queryBuilding");
+    // Refresh query building page to display the now seeded values
+    router.refresh();
   };
 
   if (loading) {
