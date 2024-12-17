@@ -1,0 +1,53 @@
+name: Terraform Linting
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  tflint:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        dirs:
+          [
+            terraform/modules/oidc,
+            terraform/modules/tfstate,
+            terraform/implementation/setup,
+            terraform/implementation/ecs,
+          ]
+
+    steps:
+      - uses: actions/checkout@v4
+        name: Checkout source code
+
+      - uses: actions/cache@v4
+        name: Cache plugin dir
+        with:
+          path: ~/.tflint.d/plugins
+          key: ${{ matrix.dirs }}-tflint-${{ hashFiles('.tflint.hcl') }}
+
+      - uses: terraform-linters/setup-tflint@v4
+        name: Setup TFLint
+        with:
+          tflint_version: v0.52.0
+
+      - name: Show version
+        run: tflint --version
+
+      - name: Init TFLint
+        run: tflint --init
+        # If rate limiting becomes an issue, setup a GitHub token and enable it as an environment variable
+        # env:
+        # https://github.com/terraform-linters/tflint/blob/master/docs/user-guide/plugins.md#avoiding-rate-limiting
+        # GITHUB_TOKEN: ${{ github.token }}
+
+      - name: Run TFLint
+        working-directory: ${{ github.workspace }}/${{matrix.dirs}}
+        run: tflint -f compact
