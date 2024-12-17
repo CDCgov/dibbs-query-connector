@@ -15,7 +15,13 @@ jobs:
 
     strategy:
       matrix:
-        dirs: [terraform/modules/oidc, terraform/modules/tfstate, terraform/implementation/setup, terraform/implementation/ecs]
+        dirs:
+          [
+            terraform/modules/oidc,
+            terraform/modules/tfstate,
+            terraform/implementation/setup,
+            terraform/implementation/ecs,
+          ]
 
     steps:
       - uses: actions/checkout@v4
@@ -39,8 +45,8 @@ jobs:
         run: tflint --init
         # If rate limiting becomes an issue, setup a GitHub token and enable it as an environment variable
         # env:
-          # https://github.com/terraform-linters/tflint/blob/master/docs/user-guide/plugins.md#avoiding-rate-limiting
-          # GITHUB_TOKEN: ${{ github.token }}
+        # https://github.com/terraform-linters/tflint/blob/master/docs/user-guide/plugins.md#avoiding-rate-limiting
+        # GITHUB_TOKEN: ${{ github.token }}
 
       - name: Run TFLint
         working-directory: ${{ github.workspace }}/${{matrix.dirs}}

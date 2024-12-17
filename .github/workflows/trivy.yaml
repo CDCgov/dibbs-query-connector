@@ -3,7 +3,7 @@ name: Trivy Security Scan
 on:
   pull_request:
   push:
-    branches: 
+    branches:
       - main
 
 concurrency:
@@ -19,14 +19,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@0.28.0
         with:
-          scan-type: 'fs'
-          scan-ref: 'terraform/modules/'
-          scanners: 'vuln,secret,config'
+          scan-type: "fs"
+          scan-ref: "terraform/modules/"
+          scanners: "vuln,secret,config"
           ignore-unfixed: false
-          exit-code: '1'
-          format: 'table'
-          severity: 'CRITICAL,HIGH'
+          exit-code: "1"
+          format: "table"
+          severity: "CRITICAL,HIGH"
