@@ -110,21 +110,25 @@ variable "cred_manager" {
 }
 
 variable "umls_api_key" {
+  type= string
   description = "Key for the UMLS API"
   sensitive = true
 }
 
 variable "ersd_api_key" {
+  type= string
   description = "Key for the ERSD API"
   sensitive = true
 }
 
 variable "qc_tls_key" {
+  type= string
   description = "Key for the Cloudfare cert for domain: queryconnector.dev"
   sensitive = true
 }
 
 variable "qc_tls_cert" {
+  type= string
   description = "Certificate importing from Cloudfare: queryconnector.dev"
   sensitive = true
 }

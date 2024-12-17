@@ -59,7 +59,7 @@ jobs:
           DYNAMODB_TABLE: ${{ secrets.TFSTATE_DYNAMODB_TABLE }}
           OWNER: ${{ vars.OWNER }}
           PROJECT: ${{ vars.PROJECT }}
-          REGION: ${{ vars.REGION }}
+          REGION: ${{ secrets.AWS_REGION }}
           WORKSPACE: ${{ env.workspace }}
           UMLS_API_KEY: ${{ secrets.UMLS_API_KEY }}
           ERSD_API_KEY: ${{ secrets.ERSD_API_KEY}}
