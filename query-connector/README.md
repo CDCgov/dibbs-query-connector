@@ -29,9 +29,9 @@ Congratulations, the Query Connector app should now be running on `localhost:300
 
 We recommend running the Query Connector app from a container, but if that is not feasible for a given use-case, it may also be run directly from Node using the steps below.
 
-1. Ensure that both Git and Node 18.x or higher are installed.
+1. Ensure that both [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) and [Node 18.x or higher](https://nodejs.org/en/download/package-manager/current) are installed.
 2. Clone the Cuery Connector repository with `git clone https://github.com/CDCgov/dibbs-query-connector`.
-3. Navigate to `/query-connector/`.
+3. Navigate to the source folder with `cd /query-connector/`.
 4. Install all of the Node dependencies for the Query Connector app with `npm install`.
 5. Run the Query Connector app on `localhost:3000` with `npm run dev`. If you are on a Windows Machine, you may need to run `npm run dev-win` instead.
 
