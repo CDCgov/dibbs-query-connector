@@ -56,8 +56,6 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
   const renderConcepts = (
     concepts: { code: string; display: string; include: boolean }[],
   ) => {
-    const allSelected = concepts.every((concept) => concept.include);
-
     const toggleAll = (e: React.ChangeEvent<HTMLInputElement>) => {
       const isChecked = e.target.checked;
       const updatedConcepts = concepts.map((concept) => ({
@@ -72,8 +70,11 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
       e: React.ChangeEvent<HTMLInputElement>,
       conceptIndex: number,
     ) => {
-      const updatedConcepts = [...concepts];
-      updatedConcepts[conceptIndex].include = e.target.checked;
+      const updatedConcepts = concepts.map((concept, index) =>
+        index === conceptIndex
+          ? { ...concept, include: e.target.checked }
+          : concept,
+      );
       setCurrentState(updatedConcepts);
       setDrawerCodes(renderConcepts(updatedConcepts));
     };
@@ -84,7 +85,7 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
           <Checkbox
             name="toggleAll"
             id="toggleAll"
-            checked={allSelected}
+            checked={concepts.every((concept) => concept.include)}
             onChange={toggleAll}
             className="bg-transparent customConcept"
             label={
