@@ -3,7 +3,6 @@
 import { getCustomQueries } from "@/app/database-service";
 import { CustomUserQuery } from "@/app/query-building";
 import LoadingView from "@/app/query/components/LoadingView";
-import { DataContext } from "@/app/utils";
 import {
   useContext,
   useState,
@@ -17,6 +16,7 @@ import UserQueriesDisplay from "./UserQueriesDisplay";
 import { SelectedQueryDetails, SelectedQueryState } from "./utils";
 import styles from "./querySelection.module.scss";
 import { BuildStep } from "@/app/constants";
+import { DataContext } from "@/app/DataProvider";
 
 type QuerySelectionProps = {
   selectedQuery: SelectedQueryState;

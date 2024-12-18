@@ -1,8 +1,6 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
 import {
-  DataDisplay,
-  DataDisplayInfo,
   groupConditionConceptsIntoValueSets,
   unnestValueSetsFromQuery,
 } from "../../utils";
@@ -17,6 +15,7 @@ import {
   DEFAULT_CHLAMYDIA_QUERY,
   EXPECTED_CHLAMYDIA_VALUESET_LENGTH,
 } from "./fixtures";
+import { DataDisplayInfo, DataDisplay } from "@/app/DataProvider";
 
 describe("DataDisplay Component", () => {
   it("should render the title and value", () => {

@@ -4,8 +4,8 @@ import "react-toastify/dist/ReactToastify.css";
 import { RefObject } from "react";
 import { CustomUserQuery } from "@/app/query-building";
 import { deleteQueryById } from "@/app/database-service";
-import { DataContextValue } from "@/app/utils";
 import { showToastConfirmation } from "@/app/query/designSystem/toast/Toast";
+import { DataContextValue } from "@/app/DataProvider";
 
 /**
  * Handles deleting a user query.
