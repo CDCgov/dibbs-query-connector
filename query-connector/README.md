@@ -22,9 +22,10 @@ Docker version 20.10.21, build baeda1f
 ##### Run Query Connector in Dev Mode
 
 1. Navigate to the our source code directory using `cd query-connector`
+1. Run `npm run install` to install the needed app dependencies
 1. Run `npm run dev` on Linux/Mac or `npm run dev-win` on Windows
 
-If all works well, the containers should install their needed dependencies and after a few minutes, the app should be running `localhost:3000`
+If all works well, the containers should build and after a few minutes, the app should be running `localhost:3000`
 
 ##### Run Query Connector using Docker Compose
 
