@@ -63,7 +63,7 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
             id="toggleAll"
             checked={allSelected}
             onChange={toggleAll}
-            className="bg-transparent"
+            className="bg-transparent customConcept"
             label={
               <div
                 className="display-flex align-items-center align-self-stretch"
@@ -78,7 +78,7 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
           />
         </div>
         {concepts.map((concept, index) => (
-          <div key={concept.code} className="display-flex padding-bottom-105">
+          <div key={concept.code} className="display-flex padding-bottom-3">
             <Checkbox
               name={`checkbox-${concept.code}`}
               id={`checkbox-${concept.code}`}
