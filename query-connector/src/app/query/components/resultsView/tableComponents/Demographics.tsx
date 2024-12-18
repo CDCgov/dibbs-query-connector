@@ -1,6 +1,4 @@
 import { Patient } from "fhir/r4";
-import { DataDisplayInfo } from "@/app/utils";
-import { DataDisplay } from "@/app/utils";
 import * as dateFns from "date-fns";
 import { evaluate } from "fhirpath";
 
@@ -11,6 +9,7 @@ import {
   formatIdentifier,
   formatDate,
 } from "../../../../format-service";
+import { DataDisplay, DataDisplayInfo } from "@/app/DataProvider";
 
 /**
  * Displays the demographic information of a patient.
