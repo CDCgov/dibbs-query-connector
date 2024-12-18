@@ -31,7 +31,7 @@ We recommend running the Query Connector app from a container, but if that is no
 4. Install all of the Node dependencies for the Query Connector app with `npm install`.
 5. Run the Query Connector app on `localhost:3000` with `npm run dev`. If you are on a Windows Machine, you may need to run `npm run dev-win` instead.
 
-The containers should spin upCongratulations, the Query Connector app should now be running on `localhost:3000/query-connector`!
+The containers should spin upCongratulations, the Query Connector app should now be running on `localhost:3000`!
 
 ### Building the Docker Image
 
