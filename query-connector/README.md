@@ -4,24 +4,20 @@
 
 The DIBBs Query Connector app offers a REST API for searching for a patient and viewing information tied to your case investigation.
 
-### Running Query Connector
+### Running Query Connector (Prerequisites)
 
-The Query Connector app can be run using Docker (or any other OCI container runtime e.g., Podman), or directly from the Node.js source code.
-
-#### Running with Docker (Recommended)
-
-To run the Query Connector app with Docker, follow these steps.
-
-1. Confirm that you have Docker installed by running `docker -v`. If you do not see a response similar to what is shown below, follow [these instructions](https://docs.docker.com/get-docker/) to install Docker.
+The Query Connector app can be run using Docker (or any other OCI container runtime e.g., Podman), or directly from the Node.js source code. Confirm that you have Docker installed by running `docker -v`. If you do not see a response similar to what is shown below, follow [these instructions](https://docs.docker.com/get-docker/) to install Docker.
 
 ```
 ❯ docker -v
 Docker version 20.10.21, build baeda1f
 ```
 
-2. Download a copy of the Docker image from the Query Connector repository by running `docker pull ghcr.io/cdcgov/dibbs-query-connector/query-connector:latest`.
+#### Running with Docker (Recommended)
+
+1. Download a copy of the Docker image from the Query Connector repository by running `docker pull ghcr.io/cdcgov/dibbs-query-connector/query-connector:latest`.
    1. If you're using an M1 Mac, you'll need to tell Docker to pull the non-Apple Silicon image using `docker pull --platform linux/amd64 ghcr.io/cdcgov/dibbs-query-connector/query-connector:latest` since we don't have a image for Apple Silicon. If you're using this setup, there might be some issues with architecture incompatability that the team hasn't run into, so please flag if you run into something!
-3. Run the service with `docker run -p 3000:3000 query-connector:latest`. If you're on a Windows machine, you may need to run `docker run -p 3000:3000 ghcr.io/cdcgov/phdi/query-connector:latest` instead.
+2. Run the service with `docker run -p 3000:3000 query-connector:latest`. If you're on a Windows machine, you may need to run `docker run -p 3000:3000 ghcr.io/cdcgov/phdi/query-connector:latest` instead.
 
 Congratulations, the Query Connector app should now be running on `localhost:3000/query-connector`!
 
@@ -34,6 +30,8 @@ We recommend running the Query Connector app from a container, but if that is no
 3. Navigate to the source folder with `cd /query-connector/`.
 4. Install all of the Node dependencies for the Query Connector app with `npm install`.
 5. Run the Query Connector app on `localhost:3000` with `npm run dev`. If you are on a Windows Machine, you may need to run `npm run dev-win` instead.
+
+The containers should spin upCongratulations, the Query Connector app should now be running on `localhost:3000/query-connector`!
 
 ### Building the Docker Image
 
