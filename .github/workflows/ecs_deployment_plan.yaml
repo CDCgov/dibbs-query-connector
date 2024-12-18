@@ -49,7 +49,6 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
-          role-session-name: qc-github-role-skylight
           aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Terraform
