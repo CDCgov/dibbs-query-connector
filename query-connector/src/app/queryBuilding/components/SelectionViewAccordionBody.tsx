@@ -34,28 +34,51 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [drawerTitle, setDrawerTitle] = useState<string>("");
   const [drawerCodes, setDrawerCodes] = useState<React.ReactNode>(null);
+  const [initialState, setInitialState] = useState<
+    { code: string; display: string; include: boolean }[]
+  >([]);
+  const [currentState, setCurrentState] = useState<
+    { code: string; display: string; include: boolean }[]
+  >([]);
 
   const handleViewCodes = (
     vsName: string,
+    concepts: { code: string; display: string; include: boolean }[],
+  ) => {
+    const conceptsCopy = concepts.map((concept) => ({ ...concept }));
+    setDrawerTitle(vsName);
+    setInitialState(conceptsCopy);
+    setCurrentState(conceptsCopy);
+    setDrawerCodes(renderConcepts(conceptsCopy));
+    setIsDrawerOpen(true);
+  };
+
+  const renderConcepts = (
     concepts: { code: string; display: string; include: boolean }[],
   ) => {
     const allSelected = concepts.every((concept) => concept.include);
 
     const toggleAll = (e: React.ChangeEvent<HTMLInputElement>) => {
       const isChecked = e.target.checked;
-      concepts.forEach((concept) => (concept.include = isChecked));
-      setDrawerCodes(renderConcepts());
+      const updatedConcepts = concepts.map((concept) => ({
+        ...concept,
+        include: isChecked,
+      }));
+      setCurrentState(updatedConcepts);
+      setDrawerCodes(renderConcepts(updatedConcepts));
     };
 
     const toggleSingle = (
       e: React.ChangeEvent<HTMLInputElement>,
       conceptIndex: number,
     ) => {
-      concepts[conceptIndex].include = e.target.checked;
-      setDrawerCodes(renderConcepts());
+      const updatedConcepts = [...concepts];
+      updatedConcepts[conceptIndex].include = e.target.checked;
+      setCurrentState(updatedConcepts);
+      setDrawerCodes(renderConcepts(updatedConcepts));
     };
 
-    const renderConcepts = () => (
+    return (
       <div>
         <div className="display-flex padding-top-1 padding-bottom-3">
           <Checkbox
@@ -105,10 +128,19 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
         ))}
       </div>
     );
+  };
 
-    setDrawerTitle(`${vsName}`);
-    setDrawerCodes(renderConcepts());
-    setIsDrawerOpen(true);
+  const handleSaveChanges = () => {
+    const updatedValueSets = valueSetsForType.map((vs) =>
+      vs.valueSetName === drawerTitle
+        ? {
+            ...vs,
+            items: [{ ...vs.items[0], concepts: currentState }],
+          }
+        : vs,
+    );
+    setIsDrawerOpen(false);
+    console.log("Updated Value Sets:", updatedValueSets);
   };
   return (
     <div>
@@ -117,7 +149,7 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
           const selectedCount = tallyConceptsForSingleValueSet(vs, true);
           const totalCount = tallyConceptsForSingleValueSet(vs, false);
           const checked =
-            vs.items[0].includeValueSet || selectedCount == totalCount;
+            vs.items[0].includeValueSet || selectedCount === totalCount;
 
           return (
             <div
@@ -160,6 +192,9 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
         toastMessage="Valueset concepts have been successfully modified."
         codes={drawerCodes}
         isOpen={isDrawerOpen}
+        initialState={initialState}
+        currentState={currentState}
+        onSave={handleSaveChanges}
         onClose={() => setIsDrawerOpen(false)}
       />
     </div>
