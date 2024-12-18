@@ -57,33 +57,37 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
 
     const renderConcepts = () => (
       <div>
-        <div className="display-flex padding-y-3">
+        <div className="display-flex padding-top-1 padding-bottom-3">
           <Checkbox
             name="toggleAll"
             id="toggleAll"
             checked={allSelected}
             onChange={toggleAll}
+            className="bg-transparent"
             label={
               <div className="display-flex">
                 <div className="width-15 font-sans-md text-bold flex-0">
                   Code
                 </div>
-                <div className="font-sans-md text-bold">Name</div>
+                <div className="font-sans-md text-bold margin-left-2">Name</div>
               </div>
             }
           />
         </div>
         {concepts.map((concept, index) => (
-          <div key={concept.code} className="display-flex padding-y-1">
+          <div key={concept.code} className="display-flex padding-bottom-3">
             <Checkbox
               name={`checkbox-${concept.code}`}
               id={`checkbox-${concept.code}`}
               checked={concept.include}
               onChange={(e) => toggleSingle(e, index)}
+              className="bg-transparent"
               label={
-                <div className="display-flex">
-                  <div className="width-15 text-no-wrap">{concept.code}</div>
-                  <div className="flex-fill">{concept.display}</div>
+                <div className="display-flex margin-top-0">
+                  <div className="width-15">{concept.code}</div>
+                  <div className="flex-fill margin-left-2">
+                    {concept.display}
+                  </div>
                 </div>
               }
             />
