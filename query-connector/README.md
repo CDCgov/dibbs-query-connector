@@ -19,21 +19,21 @@ To run the Query Connector app with Docker, follow these steps.
 Docker version 20.10.21, build baeda1f
 ```
 
-##### Run Query Connector in Dev Mode
-
-1. Navigate to the our source code directory using `cd query-connector`
-1. Run `npm run install` to install the needed app dependencies
-1. Run `npm run dev` on Linux/Mac or `npm run dev-win` on Windows
-
-If all works well, the containers should build and after a few minutes, the app should be running `localhost:3000`
-
-##### Run Query Connector using Docker Compose
-
 2. Download a copy of the Docker image from the Query Connector repository by running `docker pull ghcr.io/cdcgov/dibbs-query-connector/query-connector:latest`.
    1. If you're using an M1 Mac, you'll need to tell Docker to pull the non-Apple Silicon image using `docker pull --platform linux/amd64 ghcr.io/cdcgov/dibbs-query-connector/query-connector:latest` since we don't have a image for Apple Silicon. If you're using this setup, there might be some issues with architecture incompatability that the team hasn't run into, so please flag if you run into something!
 3. Run the service with `docker run -p 3000:3000 query-connector:latest`. If you're on a Windows machine, you may need to run `docker run -p 3000:3000 ghcr.io/cdcgov/phdi/query-connector:latest` instead.
 
 Congratulations, the Query Connector app should now be running on `localhost:3000/query-connector`!
+
+#### Running from Dev Mode via the Node.js Source Code
+
+We recommend running the Query Connector app from a container, but if that is not feasible for a given use-case, it may also be run directly from Node using the steps below.
+
+1. Ensure that both Git and Node 18.x or higher are installed.
+2. Clone the Cuery Connector repository with `git clone https://github.com/CDCgov/dibbs-query-connector`.
+3. Navigate to `/query-connector/`.
+4. Install all of the Node dependencies for the Query Connector app with `npm install`.
+5. Run the Query Connector app on `localhost:3000` with `npm run dev`. If you are on a Windows Machine, you may need to run `npm run dev-win` instead.
 
 ### Building the Docker Image
 
@@ -43,16 +43,6 @@ To build the Docker image for the Query Connector app from source instead of dow
 2. Clone the Query Connector repository with `git clone https://github.com/CDCgov/dibbs-query-connector.git`.
 3. Navigate to `/query-connector`.
 4. Run `docker build -t query-connector .`.
-
-#### Running from Node.js Source Code
-
-We recommend running the Query Connector app from a container, but if that is not feasible for a given use-case, it may also be run directly from Node using the steps below.
-
-1. Ensure that both Git and Node 18.x or higher are installed.
-2. Clone the Cuery Connector repository with `git clone https://github.com/CDCgov/dibbs-query-connector`.
-3. Navigate to `/query-connector/`.
-4. Install all of the Node dependencies for the Query Connector app with `npm install`.
-5. Run the Query Connector app on `localhost:3000` with `npm run dev`. If you are on a Windows Machine, you may need to run `npm run dev-win` instead.
 
 ### Running via docker-compose (WIP)
 
