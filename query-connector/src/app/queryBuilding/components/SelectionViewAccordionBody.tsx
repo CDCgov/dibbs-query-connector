@@ -65,17 +65,20 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
             onChange={toggleAll}
             className="bg-transparent"
             label={
-              <div className="display-flex">
+              <div
+                className="display-flex align-items-center align-self-stretch"
+                style={{ gap: "1rem" }}
+              >
                 <div className="width-15 font-sans-md text-bold flex-0">
                   Code
                 </div>
-                <div className="font-sans-md text-bold margin-left-2">Name</div>
+                <div className="font-sans-md text-bold">Name</div>
               </div>
             }
           />
         </div>
         {concepts.map((concept, index) => (
-          <div key={concept.code} className="display-flex padding-bottom-3">
+          <div key={concept.code} className="display-flex padding-bottom-105">
             <Checkbox
               name={`checkbox-${concept.code}`}
               id={`checkbox-${concept.code}`}
@@ -83,11 +86,18 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
               onChange={(e) => toggleSingle(e, index)}
               className="bg-transparent"
               label={
-                <div className="display-flex margin-top-0">
-                  <div className="width-15">{concept.code}</div>
-                  <div className="flex-fill margin-left-2">
-                    {concept.display}
+                <div
+                  className="display-flex align-items-center align-self-stretch"
+                  style={{ gap: "1rem" }}
+                >
+                  <div
+                    className="width-15"
+                    style={{ wordWrap: "break-word" }}
+                    title={concept.code}
+                  >
+                    {concept.code}
                   </div>
+                  <div className="flex-fill">{concept.display}</div>
                 </div>
               }
             />
