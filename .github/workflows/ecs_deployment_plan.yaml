@@ -66,10 +66,7 @@ jobs:
           TLS_CERT: ${{ secrets.TLS_CERT}}
           TLS_KEY: ${{ secrets.TLS_KEY}}
         shell: bash
-        run: |
-          echo "owner = \"$OWNER\"" >> $WORKSPACE.tfvars
-          echo "project = \"$PROJECT\"" >> $WORKSPACE.tfvars
-          echo "region = \"$REGION\"" >> $WORKSPACE.tfvars         
+        run: |      
           terraform init \
             -var-file="$WORKSPACE.tfvars" \
             -backend-config "bucket=$BUCKET" \
