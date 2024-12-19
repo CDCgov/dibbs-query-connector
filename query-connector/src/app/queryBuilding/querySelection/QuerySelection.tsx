@@ -43,10 +43,15 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({
 
   // Check whether custom queries exist in DB
   useEffect(() => {
-    if (context?.data === null) {
+    console.log(context?.data);
+
+    if (context?.data === null || context?.data === undefined) {
       const fetchQueries = async () => {
         try {
+          console.log("here");
           const queries = await getCustomQueries();
+          console.log("here version 2");
+
           context.setData(queries);
         } catch (error) {
           console.error("Failed to fetch queries:", error);
