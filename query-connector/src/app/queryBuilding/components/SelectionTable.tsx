@@ -18,8 +18,9 @@ import { GroupedValueSet } from "@/app/query/components/customizeQuery/customize
 
 type SelectionTableProps = {
   conditionId: string;
-  groupedValueSetsForCondition: ValueSetsByGroup;
+  selectedValueSets: ConditionToValueSetMap;
   setValueSets: Dispatch<SetStateAction<ConditionToValueSetMap>>;
+  activeCondition: string;
 };
 
 /**
@@ -34,9 +35,11 @@ type SelectionTableProps = {
  */
 export const SelectionTable: React.FC<SelectionTableProps> = ({
   conditionId,
-  groupedValueSetsForCondition,
+  selectedValueSets,
+  activeCondition,
   setValueSets,
 }) => {
+  const groupedValueSetsForCondition = selectedValueSets[activeCondition];
   const [expanded, setExpandedGroup] = useState<string>("");
 
   const handleGroupCheckboxToggle = (
@@ -86,16 +89,8 @@ export const SelectionTable: React.FC<SelectionTableProps> = ({
     };
 
     setValueSets((prevState) => {
-      return {
-        ...prevState,
-        [conditionId]: {
-          ...prevState?.[conditionId],
-          [valueSetType]: {
-            ...prevState?.[conditionId]?.[valueSetType],
-            [key]: updatedVS,
-          },
-        },
-      };
+      prevState[conditionId][valueSetType][key] = updatedVS;
+      return prevState;
     });
   };
 
@@ -109,25 +104,13 @@ export const SelectionTable: React.FC<SelectionTableProps> = ({
     const ValueSetAccordionItems =
       typesWithContent &&
       typesWithContent.map((valueSetType) => {
-        const valueSetsForType = Object.values(
-          groupedValueSetsForCondition[valueSetType],
-        );
-        const totalCount = tallyConceptsForValueSetGroup(
-          valueSetsForType,
-          false,
-        );
-        const selectedCount = tallyConceptsForValueSetGroup(
-          valueSetsForType,
-          true,
-        );
-
         const title = (
           <SelectionViewAccordionHeader
             valueSetType={valueSetType}
             conditionId={conditionId}
-            totalCount={totalCount}
-            selectedCount={selectedCount}
-            valueSetsForType={valueSetsForType}
+            valueSetsForType={Object.values(
+              groupedValueSetsForCondition[valueSetType],
+            )}
             handleCheckboxToggle={handleGroupCheckboxToggle}
             expanded={expanded?.indexOf(valueSetType) > -1 || false}
           />
@@ -135,8 +118,11 @@ export const SelectionTable: React.FC<SelectionTableProps> = ({
         const content = (
           <SelectionViewAccordionBody
             valueSetType={valueSetType}
-            handleCheckboxToggle={handleSingleCheckboxToggle}
-            valueSetsForType={valueSetsForType}
+            valueSetsForType={Object.values(
+              groupedValueSetsForCondition[valueSetType],
+            )}
+            conditionId={conditionId}
+            setValueSets={setValueSets}
           />
         );
         const level: HeadingLevel = "h4";

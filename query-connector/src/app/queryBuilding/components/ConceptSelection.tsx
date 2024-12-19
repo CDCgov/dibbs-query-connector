@@ -5,7 +5,7 @@ import styles from "../buildFromTemplates/buildfromTemplate.module.scss";
 type ConceptSelectionProps = {
   concepts: { code: string; display: string; include: boolean }[];
   onConceptsChange: (
-    updatedConcepts: { code: string; display: string; include: boolean }[],
+    updatedConcepst: { code: string; display: string; include: boolean }[],
   ) => void;
 };
 

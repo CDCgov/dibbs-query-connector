@@ -79,7 +79,7 @@ const Drawer = <T,>({
     <>
       <div
         className={`${styles.drawer} ${isOpen ? styles.open : styles.closed}`}
-        aria-hidden={!isOpen}
+        inert={!isOpen}
         role="dialog"
       >
         <div className={styles.drawerContent}>

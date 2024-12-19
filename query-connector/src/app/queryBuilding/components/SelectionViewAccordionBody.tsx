@@ -1,21 +1,23 @@
 import { Checkbox } from "@trussworks/react-uswds";
 import styles from "../buildFromTemplates/buildfromTemplate.module.scss";
 import { GroupedValueSet } from "@/app/query/components/customizeQuery/customizeQueryUtils";
-import { formatDiseaseDisplay } from "../utils";
+import {
+  ConditionToValueSetMap,
+  ValueSetsByGroup,
+  formatDiseaseDisplay,
+} from "../utils";
 import { tallyConceptsForSingleValueSet } from "../utils";
 import { DibbsValueSetType } from "@/app/constants";
 import Drawer from "@/app/query/designSystem/drawer/Drawer";
-import React, { useState } from "react";
+import React, { Dispatch, SetStateAction, useState } from "react";
 import ConceptSelection from "./ConceptSelection";
 
 type SelectionViewAccordionBodyProps = {
   id?: string;
   valueSetType: DibbsValueSetType;
   valueSetsForType: GroupedValueSet[];
-  handleCheckboxToggle: (
-    valueSetType: DibbsValueSetType,
-    groupedValueSet: GroupedValueSet,
-  ) => void;
+  setValueSets: Dispatch<SetStateAction<ConditionToValueSetMap>>;
+  conditionId: string;
 };
 
 /**
@@ -30,8 +32,10 @@ type SelectionViewAccordionBodyProps = {
 const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
   valueSetType,
   valueSetsForType,
-  handleCheckboxToggle,
+  setValueSets,
+  conditionId,
 }) => {
+  console.log("body type: ", valueSetsForType);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [drawerTitle, setDrawerTitle] = useState<string>("");
   const [initialConcepts, setInitialConcepts] = useState<
@@ -59,18 +63,19 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
   };
 
   const handleSaveChanges = () => {
-    const updatedValueSet = valueSetsForType.find(
-      (vs) => vs.valueSetName === drawerTitle,
-    );
-
-    if (updatedValueSet) {
-      const updatedGroupedValueSet = {
-        ...updatedValueSet,
-        items: [{ ...updatedValueSet.items[0], concepts: currentConcepts }],
-      };
-      handleCheckboxToggle(valueSetType, updatedGroupedValueSet);
-    }
-
+    valueSetsForType.map((groupedVS) => {
+      if (groupedVS.valueSetName === drawerTitle) {
+        const groupVSNameAuthorSystem = `${groupedVS.valueSetName}:${groupedVS.author}:${groupedVS.system}`;
+        setValueSets((prevState) => {
+          prevState[conditionId][valueSetType][groupVSNameAuthorSystem] = {
+            ...groupedVS,
+            items: [{ ...groupedVS.items[0], concepts: currentConcepts }],
+          };
+          console.log("save state: ", prevState);
+          return prevState;
+        });
+      }
+    });
     setIsDrawerOpen(false);
   };
 
@@ -79,8 +84,7 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
       {valueSetsForType.map((vs) => {
         const selectedCount = tallyConceptsForSingleValueSet(vs, true);
         const totalCount = tallyConceptsForSingleValueSet(vs, false);
-        const checked =
-          vs.items[0].includeValueSet || selectedCount === totalCount;
+        const checked = vs.items[0].includeValueSet || selectedCount > 0;
 
         return (
           <div
@@ -94,7 +98,6 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
                 label={checkboxLabel(vs.valueSetName, vs.author, vs.system)}
                 onChange={(e) => {
                   e.stopPropagation();
-                  handleCheckboxToggle(valueSetType, vs);
                 }}
                 id={`${vs.valueSetName}-${valueSetType}`}
                 checked={checked}

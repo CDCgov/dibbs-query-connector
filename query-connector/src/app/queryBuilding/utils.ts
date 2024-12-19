@@ -166,6 +166,11 @@ export function tallyConceptsForSingleValueSet(
   valueSet: GroupedValueSet,
   filterInclude?: boolean,
 ) {
+  if (
+    valueSet.valueSetName === "Syphilis (Organism or Substance in Lab Results)"
+  ) {
+    console.log("valueSet", valueSet);
+  }
   const selectedTotal = valueSet.items.reduce((sum, vs) => {
     const includedConcepts = !!filterInclude
       ? vs.concepts.filter((c) => c.include)
