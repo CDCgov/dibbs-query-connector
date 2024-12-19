@@ -32,7 +32,6 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
   valueSetsForType,
   handleCheckboxToggle,
 }) => {
-  // State for the drawer
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [drawerTitle, setDrawerTitle] = useState<string>("");
   const [initialConcepts, setInitialConcepts] = useState<
@@ -48,8 +47,8 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
     concepts: { code: string; display: string; include: boolean }[],
   ) => {
     setDrawerTitle(vsName);
-    setInitialConcepts(concepts);
-    setCurrentConcepts(concepts);
+    setInitialConcepts([...concepts]);
+    setCurrentConcepts([...concepts]);
     setIsDrawerOpen(true);
   };
 
@@ -60,16 +59,19 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
   };
 
   const handleSaveChanges = () => {
-    const updatedValueSets = valueSetsForType.map((vs) =>
-      vs.valueSetName === drawerTitle
-        ? {
-            ...vs,
-            items: [{ ...vs.items[0], concepts: currentConcepts }],
-          }
-        : vs,
+    const updatedValueSet = valueSetsForType.find(
+      (vs) => vs.valueSetName === drawerTitle,
     );
+
+    if (updatedValueSet) {
+      const updatedGroupedValueSet = {
+        ...updatedValueSet,
+        items: [{ ...updatedValueSet.items[0], concepts: currentConcepts }],
+      };
+      handleCheckboxToggle(valueSetType, updatedGroupedValueSet);
+    }
+
     setIsDrawerOpen(false);
-    console.log("Updated Value Sets:", updatedValueSets);
   };
 
   return (
