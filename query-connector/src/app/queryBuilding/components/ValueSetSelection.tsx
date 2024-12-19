@@ -229,6 +229,9 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
         toastMessage="Condition has been successfully added."
         isOpen={isDrawerOpen}
         onClose={handleCloseDrawer}
+        initialState={{}} //TODO
+        currentState={{}} //TODO
+        onSave={() => {}} //TODO
       />
     </div>
   );
