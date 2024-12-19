@@ -1,8 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Button, Icon } from "@trussworks/react-uswds";
 import styles from "./drawer.module.css";
 import SearchField from "../searchField/SearchField";
 import { showToastConfirmation } from "../toast/Toast";
+import WarningModal from "../modal/warningModal";
+import { ModalRef } from "../modal/Modal";
 
 type DrawerProps<T> = {
   title: string;
@@ -42,6 +44,7 @@ const Drawer = <T,>({
   onSave,
 }: DrawerProps<T>) => {
   const [hasChanges, setHasChanges] = useState(false);
+  const modalRef = useRef<ModalRef>(null);
 
   // Compare initialState and currentState
   useEffect(() => {
@@ -65,7 +68,11 @@ const Drawer = <T,>({
   };
 
   const handleClose = () => {
-    onClose();
+    if (hasChanges) {
+      modalRef.current?.toggleModal();
+    } else {
+      onClose();
+    }
   };
 
   return (
@@ -106,6 +113,14 @@ const Drawer = <T,>({
       </div>
 
       {isOpen && <div className={styles.overlay} onClick={handleClose}></div>}
+
+      <WarningModal
+        modalRef={modalRef}
+        heading="Unsaved Changes"
+        description="You have unsaved changes. Do you want to save or undo your changes?"
+        onSave={handleSaveChanges}
+        onCancel={onClose}
+      />
     </>
   );
 };
