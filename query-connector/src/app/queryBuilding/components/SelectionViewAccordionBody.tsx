@@ -31,13 +31,16 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
   valueSetsForType,
   handleCheckboxToggle,
 }) => {
+  // State for the drawer
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [drawerTitle, setDrawerTitle] = useState<string>("");
   const [drawerCodes, setDrawerCodes] = useState<React.ReactNode>(null);
-  const [initialState, setInitialState] = useState<
+
+  // State for the drawer content
+  const [initialConceptState, setInitialConceptState] = useState<
     { code: string; display: string; include: boolean }[]
   >([]);
-  const [currentState, setCurrentState] = useState<
+  const [currentConceptState, setCurrentConceptState] = useState<
     { code: string; display: string; include: boolean }[]
   >([]);
 
@@ -47,8 +50,8 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
   ) => {
     const conceptsCopy = concepts.map((concept) => ({ ...concept }));
     setDrawerTitle(vsName);
-    setInitialState(conceptsCopy);
-    setCurrentState(conceptsCopy);
+    setInitialConceptState(conceptsCopy);
+    setCurrentConceptState(conceptsCopy);
     setDrawerCodes(renderConcepts(conceptsCopy));
     setIsDrawerOpen(true);
   };
@@ -62,7 +65,7 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
         ...concept,
         include: isChecked,
       }));
-      setCurrentState(updatedConcepts);
+      setCurrentConceptState(updatedConcepts);
       setDrawerCodes(renderConcepts(updatedConcepts));
     };
 
@@ -75,7 +78,7 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
           ? { ...concept, include: e.target.checked }
           : concept,
       );
-      setCurrentState(updatedConcepts);
+      setCurrentConceptState(updatedConcepts);
       setDrawerCodes(renderConcepts(updatedConcepts));
     };
 
@@ -136,7 +139,7 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
       vs.valueSetName === drawerTitle
         ? {
             ...vs,
-            items: [{ ...vs.items[0], concepts: currentState }],
+            items: [{ ...vs.items[0], concepts: currentConceptState }],
           }
         : vs,
     );
@@ -193,8 +196,8 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
         toastMessage="Valueset concepts have been successfully modified."
         codes={drawerCodes}
         isOpen={isDrawerOpen}
-        initialState={initialState}
-        currentState={currentState}
+        initialState={initialConceptState}
+        currentState={currentConceptState}
         onSave={handleSaveChanges}
         onClose={() => setIsDrawerOpen(false)}
       />
