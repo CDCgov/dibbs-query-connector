@@ -9,7 +9,6 @@ import { Button, Icon, Table } from "@trussworks/react-uswds";
 import { ModalRef } from "@/app/query/designSystem/modal/Modal";
 import styles from "./querySelection.module.scss";
 import { CustomUserQuery } from "@/app/query-building";
-import { DataContext } from "@/app/utils";
 
 import { BuildStep } from "@/app/constants";
 import {
@@ -22,6 +21,7 @@ import {
   SelectedQueryDetails,
 } from "./utils";
 import LoadingView from "@/app/query/components/LoadingView";
+import { DataContext } from "@/app/DataProvider";
 
 interface UserQueriesDisplayProps {
   queries: CustomUserQuery[];
