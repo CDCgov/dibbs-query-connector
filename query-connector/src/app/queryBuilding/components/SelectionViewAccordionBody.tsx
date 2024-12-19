@@ -6,6 +6,7 @@ import { tallyConceptsForSingleValueSet } from "../utils";
 import { DibbsValueSetType } from "@/app/constants";
 import Drawer from "@/app/query/designSystem/drawer/Drawer";
 import React, { useState } from "react";
+import ConceptSelection from "./ConceptSelection";
 
 type SelectionViewAccordionBodyProps = {
   id?: string;
@@ -34,13 +35,11 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
   // State for the drawer
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [drawerTitle, setDrawerTitle] = useState<string>("");
-  const [drawerCodes, setDrawerCodes] = useState<React.ReactNode>(null);
-
-  // State for the drawer content
-  const [initialConceptState, setInitialConceptState] = useState<
+  const [initialConcepts, setInitialConcepts] = useState<
     { code: string; display: string; include: boolean }[]
   >([]);
-  const [currentConceptState, setCurrentConceptState] = useState<
+
+  const [currentConcepts, setCurrentConcepts] = useState<
     { code: string; display: string; include: boolean }[]
   >([]);
 
@@ -48,90 +47,16 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
     vsName: string,
     concepts: { code: string; display: string; include: boolean }[],
   ) => {
-    const conceptsCopy = concepts.map((concept) => ({ ...concept }));
     setDrawerTitle(vsName);
-    setInitialConceptState(conceptsCopy);
-    setCurrentConceptState(conceptsCopy);
-    setDrawerCodes(renderConcepts(conceptsCopy));
+    setInitialConcepts(concepts);
+    setCurrentConcepts(concepts);
     setIsDrawerOpen(true);
   };
 
-  const renderConcepts = (
-    concepts: { code: string; display: string; include: boolean }[],
+  const handleConceptsChange = (
+    updatedConcepts: { code: string; display: string; include: boolean }[],
   ) => {
-    const toggleAll = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const isChecked = e.target.checked;
-      const updatedConcepts = concepts.map((concept) => ({
-        ...concept,
-        include: isChecked,
-      }));
-      setCurrentConceptState(updatedConcepts);
-      setDrawerCodes(renderConcepts(updatedConcepts));
-    };
-
-    const toggleSingle = (
-      e: React.ChangeEvent<HTMLInputElement>,
-      conceptIndex: number,
-    ) => {
-      const updatedConcepts = concepts.map((concept, index) =>
-        index === conceptIndex
-          ? { ...concept, include: e.target.checked }
-          : concept,
-      );
-      setCurrentConceptState(updatedConcepts);
-      setDrawerCodes(renderConcepts(updatedConcepts));
-    };
-
-    return (
-      <div>
-        <div className="display-flex padding-top-1 padding-bottom-3">
-          <Checkbox
-            name="toggleAll"
-            id="toggleAll"
-            checked={concepts.every((concept) => concept.include)}
-            onChange={toggleAll}
-            className="bg-transparent"
-            label={
-              <div
-                className="display-flex align-items-center align-self-stretch"
-                style={{ gap: "1rem" }}
-              >
-                <div className="width-15 font-sans-md text-bold flex-0">
-                  Code
-                </div>
-                <div className="font-sans-md text-bold">Name</div>
-              </div>
-            }
-          />
-        </div>
-        {concepts.map((concept, index) => (
-          <div key={concept.code} className="display-flex padding-bottom-3">
-            <Checkbox
-              name={`checkbox-${concept.code}`}
-              id={`checkbox-${concept.code}`}
-              checked={concept.include}
-              onChange={(e) => toggleSingle(e, index)}
-              className="bg-transparent"
-              label={
-                <div
-                  className="display-flex align-items-center align-self-stretch"
-                  style={{ gap: "1rem" }}
-                >
-                  <div
-                    className="width-15"
-                    style={{ wordWrap: "break-word" }}
-                    title={concept.code}
-                  >
-                    {concept.code}
-                  </div>
-                  <div className="flex-fill">{concept.display}</div>
-                </div>
-              }
-            />
-          </div>
-        ))}
-      </div>
-    );
+    setCurrentConcepts(updatedConcepts);
   };
 
   const handleSaveChanges = () => {
@@ -139,67 +64,72 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
       vs.valueSetName === drawerTitle
         ? {
             ...vs,
-            items: [{ ...vs.items[0], concepts: currentConceptState }],
+            items: [{ ...vs.items[0], concepts: currentConcepts }],
           }
         : vs,
     );
     setIsDrawerOpen(false);
     console.log("Updated Value Sets:", updatedValueSets);
   };
+
   return (
     <div>
-      {valueSetsForType &&
-        valueSetsForType.map((vs) => {
-          const selectedCount = tallyConceptsForSingleValueSet(vs, true);
-          const totalCount = tallyConceptsForSingleValueSet(vs, false);
-          const checked =
-            vs.items[0].includeValueSet || selectedCount === totalCount;
+      {valueSetsForType.map((vs) => {
+        const selectedCount = tallyConceptsForSingleValueSet(vs, true);
+        const totalCount = tallyConceptsForSingleValueSet(vs, false);
+        const checked =
+          vs.items[0].includeValueSet || selectedCount === totalCount;
 
-          return (
-            <div
-              className={styles.accordionBodyExpanded}
-              key={`${valueSetType}-${vs.valueSetName}`}
-            >
-              <div className={styles.accordionExpandedInner}>
-                <Checkbox
-                  name={`checkbox-${vs.valueSetName}`}
-                  className={styles.valueSetTemplate__checkbox}
-                  label={checkboxLabel(vs.valueSetName, vs.author, vs.system)}
-                  onChange={(e) => {
-                    e.stopPropagation();
-                    handleCheckboxToggle(valueSetType, vs);
-                  }}
-                  id={`${vs.valueSetName}-${valueSetType}`}
-                  checked={checked}
-                />
+        return (
+          <div
+            className={styles.accordionBodyExpanded}
+            key={`${valueSetType}-${vs.valueSetName}`}
+          >
+            <div className={styles.accordionExpandedInner}>
+              <Checkbox
+                name={`checkbox-${vs.valueSetName}`}
+                className={styles.valueSetTemplate__checkbox}
+                label={checkboxLabel(vs.valueSetName, vs.author, vs.system)}
+                onChange={(e) => {
+                  e.stopPropagation();
+                  handleCheckboxToggle(valueSetType, vs);
+                }}
+                id={`${vs.valueSetName}-${valueSetType}`}
+                checked={checked}
+              />
+            </div>
+            <div className={styles.accordionBodyExpanded__right}>
+              <div className={styles.displayCount}>
+                {selectedCount}/{totalCount}
               </div>
-              <div className={styles.accordionBodyExpanded__right}>
-                <div className={styles.displayCount}>
-                  {selectedCount}/{totalCount}
-                </div>
-                <div
-                  className={styles.viewCodesBtn}
-                  role="button"
-                  onClick={() =>
-                    handleViewCodes(vs.valueSetName, vs.items[0].concepts)
-                  }
-                >
-                  View Codes
-                </div>
+              <div
+                className={styles.viewCodesBtn}
+                role="button"
+                onClick={() =>
+                  handleViewCodes(vs.valueSetName, vs.items[0].concepts)
+                }
+              >
+                View Codes
               </div>
             </div>
-          );
-        })}
+          </div>
+        );
+      })}
       <Drawer
         title={drawerTitle}
         placeholder="Search by code or name"
         toastMessage="Valueset concepts have been successfully modified."
-        codes={drawerCodes}
+        codes={
+          <ConceptSelection
+            concepts={currentConcepts}
+            onConceptsChange={handleConceptsChange}
+          />
+        }
         isOpen={isDrawerOpen}
-        initialState={initialConceptState}
-        currentState={currentConceptState}
-        onSave={handleSaveChanges}
         onClose={() => setIsDrawerOpen(false)}
+        initialState={initialConcepts}
+        currentState={currentConcepts}
+        onSave={handleSaveChanges}
       />
     </div>
   );
