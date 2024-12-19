@@ -35,7 +35,6 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
   setValueSets,
   conditionId,
 }) => {
-  console.log("body type: ", valueSetsForType);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [drawerTitle, setDrawerTitle] = useState<string>("");
   const [initialConcepts, setInitialConcepts] = useState<
