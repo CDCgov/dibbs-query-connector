@@ -32,6 +32,8 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
   valueSetsForType,
   handleCheckboxToggle,
 }) => {
+  const [groupedValueSets, setGroupedValueSets] =
+    useState<GroupedValueSet[]>(valueSetsForType);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [drawerTitle, setDrawerTitle] = useState<string>("");
   const [initialConcepts, setInitialConcepts] = useState<
@@ -59,28 +61,31 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
   };
 
   const handleSaveChanges = () => {
-    const updatedValueSet = valueSetsForType.find(
-      (vs) => vs.valueSetName === drawerTitle,
+    valueSetsForType.map(
+      (vs) => {
+        console.log("Initial", vs);
+        if (vs.valueSetName === drawerTitle) {
+          console.log("Concepts", currentConcepts);
+          const vs_return = {
+            ...vs,
+            items: [{ ...vs.items[0], concepts: currentConcepts }],
+          };
+          console.log("Return", vs_return);
+          return vs_return;
+        }
+      }, //todo: switch to ID
     );
-
-    if (updatedValueSet) {
-      const updatedGroupedValueSet = {
-        ...updatedValueSet,
-        items: [{ ...updatedValueSet.items[0], concepts: currentConcepts }],
-      };
-      handleCheckboxToggle(valueSetType, updatedGroupedValueSet);
-    }
-
+    setGroupedValueSets(valueSetsForType);
+    console.log("VSFT:", valueSetsForType);
     setIsDrawerOpen(false);
   };
 
   return (
     <div>
-      {valueSetsForType.map((vs) => {
+      {groupedValueSets.map((vs) => {
         const selectedCount = tallyConceptsForSingleValueSet(vs, true);
         const totalCount = tallyConceptsForSingleValueSet(vs, false);
-        const checked =
-          vs.items[0].includeValueSet || selectedCount === totalCount;
+        const checked = vs.items[0].includeValueSet || selectedCount > 0;
 
         return (
           <div
