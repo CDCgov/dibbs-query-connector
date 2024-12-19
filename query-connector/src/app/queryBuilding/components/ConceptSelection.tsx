@@ -1,5 +1,6 @@
 import React from "react";
 import { Checkbox } from "@trussworks/react-uswds";
+import styles from "../buildFromTemplates/buildfromTemplate.module.scss";
 
 type ConceptSelectionProps = {
   concepts: { code: string; display: string; include: boolean }[];
@@ -35,15 +36,22 @@ const ConceptSelection: React.FC<ConceptSelectionProps> = ({
     onConceptsChange(updatedConcepts);
   };
 
+  const selectedCount = concepts.filter((concept) => concept.include).length;
+  const totalCount = concepts.length;
+
   return (
     <div>
       <div className="display-flex padding-top-1 padding-bottom-3">
         <Checkbox
           name="toggleAll"
           id="toggleAll"
-          checked={concepts.every((concept) => concept.include)}
+          checked={selectedCount === totalCount}
+          className={`bg-transparent ${
+            selectedCount > 0 && selectedCount < totalCount
+              ? styles.concept__checkbox__partial
+              : styles.concept__checkbox
+          }`}
           onChange={(e) => toggleAll(e.target.checked)}
-          className="bg-transparent"
           label={
             <div
               className="display-flex align-items-center align-self-stretch"
@@ -61,8 +69,10 @@ const ConceptSelection: React.FC<ConceptSelectionProps> = ({
             name={`checkbox-${concept.code}`}
             id={`checkbox-${concept.code}`}
             checked={concept.include}
+            className={`bg-transparent ${
+              concept.include ? styles.concept__checkbox : ""
+            }`}
             onChange={(e) => toggleSingle(index, e.target.checked)}
-            className="bg-transparent"
             label={
               <div
                 className="display-flex align-items-center align-self-stretch"
