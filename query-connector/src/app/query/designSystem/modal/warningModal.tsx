@@ -46,7 +46,7 @@ export const WarningModal: React.FC<WarningModalProps> = ({
           },
         },
         {
-          text: "Undo",
+          text: "Dismiss",
           type: "button",
           className: "usa-button--outline",
           onClick: () => {

@@ -117,7 +117,7 @@ const Drawer = <T,>({
       <WarningModal
         modalRef={modalRef}
         heading="Unsaved Changes"
-        description="You have unsaved changes. Do you want to save or undo your changes?"
+        description="You have unsaved changes. Do you want to dismiss them?"
         onSave={handleSaveChanges}
         onCancel={onClose}
       />

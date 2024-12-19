@@ -87,7 +87,7 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
             id="toggleAll"
             checked={concepts.every((concept) => concept.include)}
             onChange={toggleAll}
-            className="bg-transparent customConcept"
+            className="bg-transparent"
             label={
               <div
                 className="display-flex align-items-center align-self-stretch"
