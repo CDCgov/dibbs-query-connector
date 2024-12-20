@@ -19,7 +19,7 @@ import CustomizeQueryNav from "./customizeQuery/CustomizeQueryNav";
 import Backlink from "./backLink/Backlink";
 import { RETURN_LABEL } from "./stepIndicator/StepIndicator";
 import {
-  ValueSetGrouping,
+  VsGrouping,
   generateValueSetGroupingsByDibbsConceptType,
 } from "@/app/utils/valueSetTranslation";
 
@@ -52,7 +52,7 @@ const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
 
   const [valueSetOptions, setValueSetOptions] = useState<{
     [dibbsConceptType in DibbsConceptType]: {
-      [vsNameAuthorSystem: string]: ValueSetGrouping;
+      [vsNameAuthorSystem: string]: VsGrouping;
     };
   }>({
     labs: {},
@@ -259,7 +259,7 @@ export const QUERY_CUSTOMIZATION_CONFIRMATION_BODY =
  * @returns A count of the number of items in each of the DibbsConceptTypes
  */
 const countDibbsConceptTypeToVsMapItems = (obj: {
-  [vsNameAuthorSystem: string]: ValueSetGrouping;
+  [vsNameAuthorSystem: string]: VsGrouping;
 }) => {
   return Object.values(obj).reduce((runningSum, gvs) => {
     gvs.items.forEach((vs) => {

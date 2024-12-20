@@ -5,26 +5,20 @@ import {
 } from "../queryBuilding/utils";
 
 // ValueSets that share the same name, author, system unique identifier
-export type ValueSetGrouping = {
+export type VsGrouping = {
   valueSetName: string;
   author: string;
   system: string;
   items: DibbsValueSet[];
 };
 
-export type ConceptTypeToValueSetGroupingMap = {
-  labs: {
-    [name: string]: ValueSetGrouping;
-  };
-  medications: {
-    [name: string]: ValueSetGrouping;
-  };
-  conditions: {
-    [name: string]: ValueSetGrouping;
+export type ConceptTypeToVsNameToVsGroupingMap = {
+  [dibbsConceptType in DibbsConceptType]: {
+    [name: string]: VsGrouping;
   };
 };
 
-type ValueSetNameAuthorSystem = string;
+type VsNameAuthorSystem = string;
 /**
  * Helper function that takes an array of value set items and groups them using
  * a combination of the value set name, author, and system to create a unique
@@ -37,7 +31,7 @@ type ValueSetNameAuthorSystem = string;
  */
 export function groupValueSetsByNameAuthorSystem(
   valueSetsToGroup: DibbsValueSet[],
-): Record<ValueSetNameAuthorSystem, ValueSetGrouping> {
+): Record<VsNameAuthorSystem, VsGrouping> {
   const results = valueSetsToGroup.reduce(
     (acc, row) => {
       // Check if both author and code_system are defined
@@ -76,7 +70,7 @@ export function groupValueSetsByNameAuthorSystem(
       });
       return acc;
     },
-    {} as Record<ValueSetNameAuthorSystem, ValueSetGrouping>,
+    {} as Record<VsNameAuthorSystem, VsGrouping>,
   );
 
   return results;
@@ -85,7 +79,7 @@ export function groupValueSetsByNameAuthorSystem(
  * Utility function that grouops an array of DibbsValueSets into the name / author
  * / system groupings and then sorts them into their DibbsConceptType buckets
  * buckets
- * @param vsArray
+ * @param vsArray - an array of DibbsValueSets
  * @returns - {[DibbsConceptType]: ValueSetGrouping (VS's that share name / author / system) }
  */
 export function generateValueSetGroupingsByDibbsConceptType(
@@ -138,7 +132,7 @@ export function generateValueSetGroupingsByConceptType(valueSetsByConceptType: {
       return acc;
     },
     {} as {
-      [key in DibbsConceptType]: { [vsName: string]: ValueSetGrouping };
+      [key in DibbsConceptType]: { [vsName: string]: VsGrouping };
     },
   );
 }

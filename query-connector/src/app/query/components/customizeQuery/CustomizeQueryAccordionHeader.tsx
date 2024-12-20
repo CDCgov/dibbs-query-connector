@@ -1,11 +1,11 @@
+import { VsGrouping } from "@/app/utils/valueSetTranslation";
 import styles from "./customizeQuery.module.css";
-import { ValueSetGrouping } from "./customizeQueryUtils";
 import CustomizeQueryCheckbox from "./vanityCheckbox/CustomizeQueryCheckbox";
 
 type CustomizeQueryAccordionProps = {
   handleSelectAllChange: (groupIndex: string, checked: boolean) => void;
   groupIndex: string;
-  group: ValueSetGrouping;
+  group: VsGrouping;
 };
 
 /**

@@ -1,7 +1,7 @@
 import { DibbsValueSet } from "../constants";
 import {
-  ValueSetGrouping,
-  ConceptTypeToValueSetGroupingMap,
+  VsGrouping,
+  ConceptTypeToVsNameToVsGroupingMap,
 } from "../utils/valueSetTranslation";
 
 // The structure of the data that's coming from the backend
@@ -34,7 +34,7 @@ export type CategoryToConditionToNameMap = {
 };
 
 export type ConditionToConceptTypeToValueSetGroupingMap = {
-  [conditionId: string]: ConceptTypeToValueSetGroupingMap;
+  [conditionId: string]: ConceptTypeToVsNameToVsGroupingMap;
 };
 
 export type QueryDetailsResult = {
@@ -159,7 +159,7 @@ export function formatDiseaseDisplay(diseaseName: string) {
  * @returns A number indicating the tally of relevant concpets
  */
 export function tallyConceptsForSingleValueSet(
-  valueSet: ValueSetGrouping,
+  valueSet: VsGrouping,
   filterInclude?: boolean,
 ) {
   if (
@@ -188,7 +188,7 @@ export function tallyConceptsForSingleValueSet(
  * @returns A number indicating the tally of relevant concpets
  */
 export function tallyConceptsForValueSetGroup(
-  valueSets: ValueSetGrouping[],
+  valueSets: VsGrouping[],
   filterInclude?: boolean,
 ) {
   const selectedTotal = valueSets.reduce((sum, valueSet) => {

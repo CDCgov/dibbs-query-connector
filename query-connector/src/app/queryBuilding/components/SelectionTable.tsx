@@ -2,7 +2,6 @@
 import { Dispatch, SetStateAction, useState } from "react";
 import styles from "../buildFromTemplates/buildfromTemplate.module.scss";
 import {
-  ValueSetGroupingByConceptType,
   batchToggleConcepts,
   ConditionToConceptTypeToValueSetGroupingMap,
 } from "../utils";
@@ -13,13 +12,11 @@ import {
 } from "@trussworks/react-uswds";
 import SelectionViewAccordionHeader from "./SelectionViewAccordionHeader";
 import SelectionViewAccordionBody from "./SelectionViewAccordionBody";
-import { ValueSetGrouping } from "@/app/query/components/customizeQuery/customizeQueryUtils";
+import { VsGrouping } from "@/app/utils/valueSetTranslation";
 
 type SelectionTableProps = {
   conditionId: string;
   selectedValueSets: ConditionToConceptTypeToValueSetGroupingMap;
-  activeCondition: string;
-  groupedValueSetsForCondition: ValueSetGroupingByConceptType;
   setValueSets: Dispatch<
     SetStateAction<ConditionToConceptTypeToValueSetGroupingMap>
   >;
@@ -29,24 +26,21 @@ type SelectionTableProps = {
  * Detail display component for a condition on the query building page
  * @param root0 - params
  * @param root0.conditionId - The ID of the active condition, whose associated value sets
- * and concepts are shown in the table
- * @param root0.groupedValueSetsForCondition - Value Sets for the active condition, organized by
- * type (conditions, labs, medications)
+ * @param root0.selectedValueSets - the valueSets that are currently in the in-progress query
  * @param root0.setValueSets - State function that updates the value set data for the selected condition
  * @returns A component for display to render on the query building page
  */
 export const SelectionTable: React.FC<SelectionTableProps> = ({
   conditionId,
   selectedValueSets,
-  activeCondition,
   setValueSets,
 }) => {
-  const groupedValueSetsForCondition = selectedValueSets[activeCondition];
+  const groupedValueSetsForCondition = selectedValueSets[conditionId];
   const [expanded, setExpandedGroup] = useState<string>("");
 
   const handleGroupCheckboxToggle = (
     valueSetType: DibbsConceptType,
-    groupedValueSets: ValueSetGrouping[],
+    groupedValueSets: VsGrouping[],
     isBatchUpdate: boolean,
     currentCheckboxStatus?: boolean,
   ) => {
@@ -62,7 +56,7 @@ export const SelectionTable: React.FC<SelectionTableProps> = ({
 
   const handleSingleCheckboxToggle = (
     valueSetType: DibbsConceptType,
-    groupedValueSet: ValueSetGrouping,
+    groupedValueSet: VsGrouping,
     isBatchUpdate: boolean = false,
     batchValue?: boolean,
   ) => {
@@ -119,8 +113,8 @@ export const SelectionTable: React.FC<SelectionTableProps> = ({
         );
         const content = (
           <SelectionViewAccordionBody
-            valueSetType={valueSetType}
-            valueSetsForType={Object.values(
+            activeConceptType={valueSetType}
+            activeValueSetGroupings={Object.values(
               groupedValueSetsForCondition[valueSetType],
             )}
             conditionId={conditionId}
