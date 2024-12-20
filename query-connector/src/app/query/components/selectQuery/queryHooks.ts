@@ -1,7 +1,7 @@
 import {
   FHIR_SERVERS,
   USE_CASES,
-  ValueSet,
+  DibbsValueSet,
   hyperUnluckyPatient,
 } from "@/app/constants";
 import { getSavedQueryByName } from "@/app/database-service";
@@ -37,7 +37,7 @@ export async function fetchUseCaseValueSets(queryName: string) {
 export async function fetchQueryResponse(p: {
   patientForQuery: Patient | undefined;
   selectedQuery: USE_CASES;
-  queryValueSets: ValueSet[];
+  queryValueSets: DibbsValueSet[];
   fhirServer: FHIR_SERVERS;
   queryResponseStateCallback: SetStateCallback<UseCaseQueryResponse>;
   setIsLoading: (isLoading: boolean) => void;
@@ -67,7 +67,7 @@ export async function fetchQueryResponse(p: {
     const filteredValueSets = p.queryValueSets
       .filter((item) => item.includeValueSet)
       .map((fvs) => {
-        const conceptFilteredVS: ValueSet = {
+        const conceptFilteredVS: DibbsValueSet = {
           ...fvs,
           concepts: fvs.concepts.filter((c) => c.include),
         };

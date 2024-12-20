@@ -1,9 +1,9 @@
-import { ValueSet } from "@/app/constants";
-import ExampleVsacValueSet from "../assets/VSACValueSet.json";
-import { translateVSACToInternalValueSet } from "../../database-service";
+import { DibbsValueSet } from "@/app/constants";
+import ExampleVsacValueSet from "../../tests/assets/VSACValueSet.json";
 import { ValueSet as FhirValueSet } from "fhir/r4";
+import { translateVSACToInternalValueSet } from "./lib";
 
-const EXPECTED_INTERNAL_VALUESET: ValueSet = {
+const EXPECTED_INTERNAL_VALUESET: DibbsValueSet = {
   valueSetId: `${ExampleVsacValueSet.id}_${ExampleVsacValueSet.version}`,
   valueSetVersion: ExampleVsacValueSet.version,
   valueSetName: ExampleVsacValueSet.title,
@@ -19,8 +19,8 @@ const EXPECTED_INTERNAL_VALUESET: ValueSet = {
 };
 
 describe("VSAC FHIR response to internal application type", () => {
-  it("translate to expected fixture", async () => {
-    const translationResult = await translateVSACToInternalValueSet(
+  it("translate to expected fixture", () => {
+    const translationResult = translateVSACToInternalValueSet(
       ExampleVsacValueSet as FhirValueSet,
       "ostc",
     );
