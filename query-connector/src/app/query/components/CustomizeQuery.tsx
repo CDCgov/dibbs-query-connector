@@ -6,7 +6,7 @@ import {
   DibbsConceptType,
   USE_CASES,
   USE_CASE_DETAILS,
-  ValueSet,
+  DibbsValueSet,
 } from "../../constants";
 import { UseCaseQueryResponse } from "@/app/query-service";
 import LoadingView from "./LoadingView";
@@ -16,19 +16,18 @@ import CustomizeQueryAccordionHeader from "./customizeQuery/CustomizeQueryAccord
 import CustomizeQueryAccordionBody from "./customizeQuery/CustomizeQueryAccordionBody";
 import Accordion from "../designSystem/Accordion";
 import CustomizeQueryNav from "./customizeQuery/CustomizeQueryNav";
-import {
-  ValueSetGrouping,
-  mapValueSetsToValueSetTypes,
-  countDibbsConceptTypeToVsMapItems,
-} from "./customizeQuery/customizeQueryUtils";
 import Backlink from "./backLink/Backlink";
 import { RETURN_LABEL } from "./stepIndicator/StepIndicator";
+import {
+  ValueSetGrouping,
+  generateValueSetGroupingsByDibbsConceptType,
+} from "@/app/utils/valueSetTranslation";
 
 interface CustomizeQueryProps {
   useCaseQueryResponse: UseCaseQueryResponse;
   queryType: USE_CASES;
-  queryValueSets: ValueSet[];
-  setQueryValuesets: (queryVS: ValueSet[]) => void;
+  queryValueSets: DibbsValueSet[];
+  setQueryValuesets: (queryVS: DibbsValueSet[]) => void;
   goBack: () => void;
 }
 
@@ -63,7 +62,7 @@ const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
 
   useEffect(() => {
     const { labs, conditions, medications } =
-      mapValueSetsToValueSetTypes(queryValueSets);
+      generateValueSetGroupingsByDibbsConceptType(queryValueSets);
 
     setValueSetOptions({
       labs: labs,
@@ -168,7 +167,7 @@ const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
       const items = valueSetOptions[key as DibbsConceptType];
       acc = acc.concat(Object.values(items).flatMap((dict) => dict.items));
       return acc;
-    }, [] as ValueSet[]);
+    }, [] as DibbsValueSet[]);
     setQueryValuesets(selectedItems);
     goBack();
     showToastConfirmation({
@@ -252,3 +251,20 @@ const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
 export default CustomizeQuery;
 export const QUERY_CUSTOMIZATION_CONFIRMATION_BODY =
   "Query customization successful!";
+
+/**
+ * Utility function to count the number of labs / meds / conditions that we display
+ * on the customize query page
+ * @param obj a grouped ValueSet dictionary that we render as an individual accordion
+ * @returns A count of the number of items in each of the DibbsConceptTypes
+ */
+const countDibbsConceptTypeToVsMapItems = (obj: {
+  [vsNameAuthorSystem: string]: ValueSetGrouping;
+}) => {
+  return Object.values(obj).reduce((runningSum, gvs) => {
+    gvs.items.forEach((vs) => {
+      runningSum += vs.concepts.length;
+    });
+    return runningSum;
+  }, 0);
+};

@@ -10,7 +10,7 @@ import {
   ErsdConceptType,
   INTENTIONAL_EMPTY_STRING_FOR_CONCEPT_VERSION,
   INTENTIONAL_EMPTY_STRING_FOR_GEM_CODE,
-  ValueSet,
+  DibbsValueSet,
   ersdToDibbsConceptMap,
   FhirServerConfig,
 } from "./constants";
@@ -230,7 +230,7 @@ export async function translateVSACToInternalValueSet(
     dibbsConceptType: ersdToDibbsConceptMap[ersdConceptType],
     includeValueSet: false,
     concepts: concepts,
-  } as ValueSet;
+  } as DibbsValueSet;
 }
 
 /**
@@ -238,7 +238,7 @@ export async function translateVSACToInternalValueSet(
  * @param vs - a ValueSet in of the shape of our internal data model to insert
  * @returns success / failure information, as well as errors as appropriate
  */
-export async function insertValueSet(vs: ValueSet) {
+export async function insertValueSet(vs: DibbsValueSet) {
   let errorArray: string[] = [];
 
   const insertValueSetPromise = generateValueSetSqlPromise(vs);
@@ -290,7 +290,7 @@ export async function insertValueSet(vs: ValueSet) {
  * @param vs - The ValueSet in of the shape of our internal data model to insert
  * @returns The SQL statement for insertion
  */
-function generateValueSetSqlPromise(vs: ValueSet) {
+function generateValueSetSqlPromise(vs: DibbsValueSet) {
   const valueSetOid = vs.valueSetExternalId;
 
   // TODO: based on how non-VSAC valuests are shaped in the future, we may need
@@ -322,7 +322,7 @@ function generateValueSetSqlPromise(vs: ValueSet) {
  * @param vs - The ValueSet in of the shape of our internal data model to insert
  * @returns The SQL statement array for all concepts for insertion
  */
-function generateConceptSqlPromises(vs: ValueSet) {
+function generateConceptSqlPromises(vs: DibbsValueSet) {
   const insertConceptsSqlArray = vs.concepts.map((concept) => {
     const systemPrefix = stripProtocolAndTLDFromSystemUrl(vs.system);
     const conceptUniqueId = `${systemPrefix}_${concept.code}`;
@@ -345,7 +345,7 @@ function generateConceptSqlPromises(vs: ValueSet) {
   return insertConceptsSqlArray;
 }
 
-function generateValuesetConceptJoinSqlPromises(vs: ValueSet) {
+function generateValuesetConceptJoinSqlPromises(vs: DibbsValueSet) {
   const insertConceptsSqlArray = vs.concepts.map((concept) => {
     const systemPrefix = stripProtocolAndTLDFromSystemUrl(vs.system);
     const conceptUniqueId = `${systemPrefix}_${concept.code}`;
@@ -417,7 +417,7 @@ export async function insertQuery(input: QueryInput) {
  * @param vs The DIBBs internal representation of the value set to check.
  * @returns A data structure reporting on missing concepts or value set links.
  */
-export async function checkValueSetInsertion(vs: ValueSet) {
+export async function checkValueSetInsertion(vs: DibbsValueSet) {
   // Begin accumulating missing data
   const missingData = {
     missingValueSet: false,
@@ -703,7 +703,9 @@ export async function getCustomQueries(): Promise<CustomUserQuery[]> {
     }
 
     Object.entries(
-      query_data as { [condition: string]: { [valueSetId: string]: ValueSet } },
+      query_data as {
+        [condition: string]: { [valueSetId: string]: DibbsValueSet };
+      },
     ).forEach(([_, includedValueSets]) => {
       Object.entries(includedValueSets).forEach(
         ([valueSetId, valueSetData]) => {

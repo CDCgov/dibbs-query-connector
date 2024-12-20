@@ -1,9 +1,5 @@
-import { DibbsConceptType, ValueSet } from "../constants";
-import {
-  ValueSetGrouping,
-  groupValueSetsByNameAuthorSystem,
-  groupValueSetsByConceptType,
-} from "../query/components/customizeQuery/customizeQueryUtils";
+import { DibbsValueSet } from "../constants";
+import { ValueSetGrouping } from "../query/components/customizeQuery/customizeQueryUtils";
 
 // The structure of the data that's coming from the backend
 export type ConditionIdToNameMap = {
@@ -13,7 +9,9 @@ export type ConditionIdToNameMap = {
 export type QueryDetailsResult = {
   query_name: string;
   id: string;
-  query_data: { [condition_name: string]: { [valueSetId: string]: ValueSet } };
+  query_data: {
+    [condition_name: string]: { [valueSetId: string]: DibbsValueSet };
+  };
   conditions_list: string[];
 };
 
@@ -22,7 +20,7 @@ export type CategoryToConditionArrayMap = {
 };
 
 export type ConditionIdToValueSetArrayMap = {
-  [conditionId: string]: ValueSet[];
+  [conditionId: string]: DibbsValueSet[];
 };
 
 export type ValueSetGroupingByConceptType = {
@@ -57,8 +55,8 @@ export type CategoryNameToConditionOptionMap = {
 export const EMPTY_QUERY_SELECTION = { queryId: "", queryName: "" };
 
 /**
- * Translation function format backend response to something more manageable for the
- * frontend
+ * Translation function format backend {[categoryName: string]: ConditionIdToNameMap[]}
+ * into the { categoryName: {conditionId: ConditionOption } } shape used by the frontend
  * @param fetchedData - data returned from the backend function grabbing condition <>
  * category mapping
  * @returns - The data in a CategoryNameToConditionOptionMap shape
@@ -213,7 +211,7 @@ export function tallyConceptsForValueSetGroup(
  * @param input - the ValueSet to update
  * @returns the updated ValueSet
  */
-export const batchToggleConcepts = (input: ValueSet) => {
+export const batchToggleConcepts = (input: DibbsValueSet) => {
   input.concepts.forEach((concept) => {
     const currentStatus = concept.include;
     concept.include = !currentStatus;
@@ -221,45 +219,3 @@ export const batchToggleConcepts = (input: ValueSet) => {
 
   return input;
 };
-
-/**
- * Utility function to generate a three-layer condition : labs / conditions/
- * medications : {valueSetName: ValueSetGrouping} map
- * @param conditionIdToValueSetArrayMap map of condition IDs to ValueSet[]
- * @returns Map of {[conditionId]: {[valueSetName]: ValueSetGrouping} }
- */
-export function groupValueSetGroupingByConditionId(
-  conditionIdToValueSetArrayMap: ConditionIdToValueSetArrayMap,
-): ConditionToValueSetGroupingMap {
-  const results: ConditionToValueSetGroupingMap = {};
-
-  Object.entries(conditionIdToValueSetArrayMap).forEach(
-    ([conditionId, valueSetArray]) => {
-      const valueSetsByConceptType = groupValueSetsByConceptType(valueSetArray);
-      const curConditionGrouping = generateValueSetGroupingsByConceptType(
-        valueSetsByConceptType,
-      );
-      results[conditionId] = curConditionGrouping;
-    },
-  );
-
-  return results;
-}
-
-function generateValueSetGroupingsByConceptType(valueSetsByConceptType: {
-  [key in DibbsConceptType]: ValueSet[];
-}) {
-  return Object.keys(valueSetsByConceptType).reduce(
-    (acc, key) => {
-      const valueSetGroupings = groupValueSetsByNameAuthorSystem(
-        valueSetsByConceptType[key as DibbsConceptType],
-      );
-
-      acc[key as DibbsConceptType] = valueSetGroupings;
-      return acc;
-    },
-    {} as {
-      [key in DibbsConceptType]: { [vsName: string]: ValueSetGrouping };
-    },
-  );
-}

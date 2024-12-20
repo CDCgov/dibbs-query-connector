@@ -253,9 +253,9 @@ export interface Concept {
 }
 
 /*
- * The expected type of a ValueSet.
+ * The expected type of an DIBBS ValueSet.
  */
-export interface ValueSet {
+export interface DibbsValueSet {
   valueSetId: string;
   valueSetVersion: string;
   valueSetName: string;
@@ -263,7 +263,7 @@ export interface ValueSet {
   author: string;
   system: string;
   ersdConceptType?: string;
-  dibbsConceptType: string;
+  dibbsConceptType: DibbsConceptType;
   includeValueSet: boolean;
   concepts: Concept[];
   conditionId?: string;

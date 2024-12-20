@@ -19,15 +19,10 @@ import SearchField from "@/app/query/designSystem/searchField/SearchField";
 import { Icon } from "@trussworks/react-uswds";
 
 import { formatDiseaseDisplay, ConditionToValueSetGroupingMap } from "../utils";
-import {
-  ValueSetGrouping,
-  groupValueSetsByConceptType,
-  groupValueSetsByNameAuthorSystem,
-} from "../../query/components/customizeQuery/customizeQueryUtils";
-import { DibbsConceptType } from "../../constants";
 import { SelectionTable } from "./SelectionTable";
 
 import Drawer from "@/app/query/designSystem/drawer/Drawer";
+import { groupValueSetGroupingByConditionId } from "@/app/utils/valueSetTranslation";
 
 type ConditionSelectionProps = {
   queryName: string;
@@ -40,9 +35,8 @@ type ConditionSelectionProps = {
  * Display component for a condition on the query building page
  * @param root0 - params
  * @param root0.queryName - current checkbox selection status
-//  * @param root0.setBuildStep - Redirect function to handle view routing
  * @param root0.selectedConditions - name of condition to display
- * @param root0.valueSetsByCondition - name of condition to display
+ * @param root0.valueSetsByCondition - {conditionId: ValueSet[]} map
  * @returns A component for display to redner on the query building page
  */
 export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
@@ -64,63 +58,10 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
 
     const first = Object.keys(selectedConditions)[0];
     const id = Object.keys(selectedConditions[first])[0];
-
     setActiveCondition(id);
 
     const groupedValueSetByCondition: ConditionToValueSetGroupingMap =
-      Object.entries(valueSetsByCondition)
-        .map(([conditionId, valSet]) => {
-          // results for each condition
-          const results: {
-            [vsType in DibbsConceptType]: {
-              [vsNameAuthorSystem: string]: ValueSetGrouping;
-            };
-          } = {
-            labs: {},
-            conditions: {},
-            medications: {},
-          };
-
-          const valueSetsByNameAuthorSystem =
-            groupValueSetsByNameAuthorSystem(valSet);
-
-          Object.entries(valueSetsByNameAuthorSystem).map(
-            ([nameAuthorSystem, groupedValueSet]) => {
-              const mappedSets = groupValueSetsByConceptType(
-                groupedValueSet.items,
-              );
-
-              Object.entries(mappedSets).forEach(([valueSetTypeKey, items]) => {
-                // the sieving function below accounts for the case that a GroupedValueSet
-                // might have items that belong to more than one ValueSetType.
-                // In practice, this doesn't occur very often / will result in empty
-                // GroupedValueSets (ie the groupings on the other tabs) that we don't
-                // want to display, so we should filter those out.
-                if (items.length > 0) {
-                  results[valueSetTypeKey as DibbsConceptType][
-                    nameAuthorSystem
-                  ] = {
-                    ...groupedValueSet,
-                    items: items,
-                  };
-                }
-              });
-
-              return;
-            },
-          );
-
-          return { [conditionId]: results }; // the value of groupedValueSetByCondition
-        })
-        .reduce(function (result, current) {
-          const conditionId = Object.keys(current)[0];
-          result[conditionId] = {
-            labs: current[conditionId].labs,
-            medications: current[conditionId].medications,
-            conditions: current[conditionId].conditions,
-          };
-          return result;
-        }, {});
+      groupValueSetGroupingByConditionId(valueSetsByCondition);
 
     return () => {
       setSelectedValueSets(groupedValueSetByCondition);
