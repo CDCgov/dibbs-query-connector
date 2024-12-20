@@ -1,23 +1,20 @@
 import { Checkbox } from "@trussworks/react-uswds";
 import styles from "../buildFromTemplates/buildfromTemplate.module.scss";
-import { GroupedValueSet } from "@/app/query/components/customizeQuery/customizeQueryUtils";
-import {
-  ConditionToValueSetMap,
-  ValueSetsByGroup,
-  formatDiseaseDisplay,
-} from "../utils";
+import { ConditionToValueSetGroupingMap } from "../utils";
+import { ValueSetGrouping } from "@/app/query/components/customizeQuery/customizeQueryUtils";
+import { formatDiseaseDisplay } from "../utils";
 import { tallyConceptsForSingleValueSet } from "../utils";
-import { DibbsValueSetType } from "@/app/constants";
+import { DibbsConceptType } from "@/app/constants";
 import Drawer from "@/app/query/designSystem/drawer/Drawer";
 import React, { Dispatch, SetStateAction, useState } from "react";
 import ConceptSelection from "./ConceptSelection";
 
 type SelectionViewAccordionBodyProps = {
   id?: string;
-  valueSetType: DibbsValueSetType;
-  valueSetsForType: GroupedValueSet[];
-  setValueSets: Dispatch<SetStateAction<ConditionToValueSetMap>>;
+  setValueSets: Dispatch<SetStateAction<ConditionToValueSetGroupingMap>>;
   conditionId: string;
+  valueSetType: DibbsConceptType;
+  valueSetsForType: ValueSetGrouping[];
 };
 
 /**

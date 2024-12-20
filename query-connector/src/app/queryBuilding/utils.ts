@@ -1,5 +1,9 @@
-import { ValueSet } from "../constants";
-import { GroupedValueSet } from "../query/components/customizeQuery/customizeQueryUtils";
+import { DibbsConceptType, ValueSet } from "../constants";
+import {
+  ValueSetGrouping,
+  groupValueSetsByNameAuthorSystem,
+  groupValueSetsByConceptType,
+} from "../query/components/customizeQuery/customizeQueryUtils";
 
 // The structure of the data that's coming from the backend
 export type ConditionIdToNameMap = {
@@ -17,24 +21,24 @@ export type CategoryToConditionArrayMap = {
   [categoryName: string]: ConditionIdToNameMap[];
 };
 
-export type ConditionIdToValueSetArray = {
+export type ConditionIdToValueSetArrayMap = {
   [conditionId: string]: ValueSet[];
 };
 
-export type ValueSetsByGroup = {
+export type ValueSetsByConceptType = {
   labs: {
-    [name: string]: GroupedValueSet;
+    [name: string]: ValueSetGrouping;
   };
   medications: {
-    [name: string]: GroupedValueSet;
+    [name: string]: ValueSetGrouping;
   };
   conditions: {
-    [name: string]: GroupedValueSet;
+    [name: string]: ValueSetGrouping;
   };
 };
 
-export type ConditionToValueSetMap = {
-  [conditionId: string]: ValueSetsByGroup;
+export type ConditionToValueSetGroupingMap = {
+  [conditionId: string]: ValueSetsByConceptType;
 };
 // The transform structs for use on the frontend, which is a grandparent - parent
 // - child mapping from category (indexed by name) - conditions (indexed by condition ID)
@@ -163,7 +167,7 @@ export function formatDiseaseDisplay(diseaseName: string) {
  * @returns A number indicating the tally of relevant concpets
  */
 export function tallyConceptsForSingleValueSet(
-  valueSet: GroupedValueSet,
+  valueSet: ValueSetGrouping,
   filterInclude?: boolean,
 ) {
   if (
@@ -192,7 +196,7 @@ export function tallyConceptsForSingleValueSet(
  * @returns A number indicating the tally of relevant concpets
  */
 export function tallyConceptsForValueSetGroup(
-  valueSets: GroupedValueSet[],
+  valueSets: ValueSetGrouping[],
   filterInclude?: boolean,
 ) {
   const selectedTotal = valueSets.reduce((sum, valueSet) => {
@@ -217,3 +221,35 @@ export const batchToggleConcepts = (input: ValueSet) => {
 
   return input;
 };
+
+/**
+ * Utility function to group condition-indexed ValueSetGrouping by labs / conditions/
+ * medications
+ * @param conditionIdToValueSetArrayMap map of condition IDs to ValueSet[]
+ * @returns Map of conditionId: {lab, conditions, medications : ValueSetGrouping}
+ */
+export function groupValueSetGroupingByConditionId(
+  conditionIdToValueSetArrayMap: ConditionIdToValueSetArrayMap,
+): ConditionToValueSetGroupingMap {
+  const results: ConditionToValueSetGroupingMap = {};
+
+  Object.entries(conditionIdToValueSetArrayMap).forEach(
+    ([conditionId, valueSetArray]) => {
+      // results for each condition
+      const valueSetsByConceptType = groupValueSetsByConceptType(valueSetArray);
+      results[conditionId] = Object.keys(valueSetsByConceptType).reduce(
+        (acc, key) => {
+          const valueSetGroupings = groupValueSetsByNameAuthorSystem(
+            valueSetsByConceptType[key as DibbsConceptType],
+          );
+
+          acc[key as DibbsConceptType] = 
+          return acc;
+        },
+        {} as { [key in DibbsConceptType]: ValueSetGrouping },
+      );
+    },
+  );
+
+  return results;
+}

@@ -11,7 +11,7 @@ import {
 } from "@/app/database-service";
 import {
   CategoryNameToConditionOptionMap,
-  ConditionIdToValueSetArray,
+  ConditionIdToValueSetArrayMap,
   EMPTY_QUERY_SELECTION,
   generateConditionNameToIdAndCategoryMap,
   groupConditionDataByCategoryName,
@@ -74,7 +74,7 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
     selectedConditions: false,
   });
   const [conditionValueSets, setConditionValueSets] =
-    useState<ConditionIdToValueSetArray>();
+    useState<ConditionIdToValueSetArrayMap>();
 
   function goBack() {
     setQueryName(null);
@@ -109,7 +109,7 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
         (vs) => !conditionIds?.includes(vs),
       );
 
-    const ConditionValueSets: ConditionIdToValueSetArray = {};
+    const ConditionValueSets: ConditionIdToValueSetArrayMap = {};
 
     // if there are new ids, we need to query the db
     if (idsToQuery && idsToQuery.length > 0) {

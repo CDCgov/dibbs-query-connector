@@ -271,7 +271,7 @@ export interface ValueSet {
 
 export const DEFAULT_ERSD_VERSION = "3";
 
-export type DibbsConceptType = "labs" | "medications" | "conditions";
+export type DibbsConceptType = "labs" | "conditions" | "medications";
 export type ErsdConceptType =
   | "ostc"
   | "lotc"
@@ -290,16 +290,6 @@ export const ersdToDibbsConceptMap: {
   dxtc: "conditions",
   sdtc: "conditions",
 };
-
-/*
- * The expected type of ValueSets grouped by dibbsConceptType for the purpose of display.
- */
-export interface ValueSetDisplay {
-  labs: ValueSet[];
-  medications: ValueSet[];
-  conditions: ValueSet[];
-}
-export type DibbsValueSetType = keyof ValueSetDisplay;
 
 // Define the type guard for FHIR resources
 // Define the FHIR Resource types

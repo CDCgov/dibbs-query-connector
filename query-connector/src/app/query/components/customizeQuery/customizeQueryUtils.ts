@@ -1,12 +1,14 @@
-import { DibbsValueSetType, ValueSet } from "@/app/constants";
+import { DibbsConceptType, ValueSet } from "@/app/constants";
 
-export type GroupedValueSet = {
+// valuesets that share the same name, author, system unique identifier
+export type ValueSetGrouping = {
   valueSetName: string;
   author: string;
   system: string;
   items: ValueSet[];
 };
 
+type ValueSetNameAuthorSystem = string;
 /**
  * Helper function that takes an array of value set items and groups them using
  * a combination of the value set name, author, and system to create a unique
@@ -17,7 +19,9 @@ export type GroupedValueSet = {
  * of valueSetName:author:system and the values are all the value set items that
  * share those identifiers in common, structed as a GroupedValueSet
  */
-export function groupValueSetsByNameAuthorSystem(valueSetsToGroup: ValueSet[]) {
+export function groupValueSetsByNameAuthorSystem(
+  valueSetsToGroup: ValueSet[],
+): Record<ValueSetNameAuthorSystem, ValueSetGrouping> {
   const results = valueSetsToGroup.reduce(
     (acc, row) => {
       // Check if both author and code_system are defined
@@ -56,15 +60,15 @@ export function groupValueSetsByNameAuthorSystem(valueSetsToGroup: ValueSet[]) {
       });
       return acc;
     },
-    {} as Record<string, GroupedValueSet>,
+    {} as Record<ValueSetNameAuthorSystem, ValueSetGrouping>,
   );
 
   return results;
 }
 
 export type TypeIndexedGroupedValueSetDictionary = {
-  [valueSetType in DibbsValueSetType]: {
-    [vsNameAuthorSystem: string]: GroupedValueSet;
+  [valueSetType in DibbsConceptType]: {
+    [vsNameAuthorSystem: string]: ValueSetGrouping;
   };
 };
 
@@ -84,8 +88,8 @@ export type TypeIndexedGroupedValueSetDictionary = {
 export function mapValueSetsToValueSetTypes(vsArray: ValueSet[]) {
   const valueSetsByNameAuthorSystem = groupValueSetsByNameAuthorSystem(vsArray);
   const results: {
-    [vsType in DibbsValueSetType]: {
-      [vsNameAuthorSystem: string]: GroupedValueSet;
+    [vsType in DibbsConceptType]: {
+      [vsNameAuthorSystem: string]: ValueSetGrouping;
     };
   } = {
     labs: {},
@@ -95,7 +99,7 @@ export function mapValueSetsToValueSetTypes(vsArray: ValueSet[]) {
 
   Object.entries(valueSetsByNameAuthorSystem).map(
     ([nameAuthorSystem, groupedValueSet]) => {
-      const mappedSets = mapValueSetsToValueSetType(groupedValueSet.items);
+      const mappedSets = groupValueSetsByConceptType(groupedValueSet.items);
 
       Object.entries(mappedSets).forEach(([valueSetTypeKey, items]) => {
         // the sieving function below accounts for the case that a GroupedValueSet
@@ -104,7 +108,7 @@ export function mapValueSetsToValueSetTypes(vsArray: ValueSet[]) {
         // GroupedValueSets (ie the groupings on the other tabs) that we don't
         // want to display, so we should filter those out.
         if (items.length > 0) {
-          results[valueSetTypeKey as DibbsValueSetType][nameAuthorSystem] = {
+          results[valueSetTypeKey as DibbsConceptType][nameAuthorSystem] = {
             ...groupedValueSet,
             items: items,
           };
@@ -123,13 +127,15 @@ export function mapValueSetsToValueSetTypes(vsArray: ValueSet[]) {
  * @returns Dict of list of rows containing only the predicate service type
  * mapped to one of "labs", "medications", or "conditions".
  */
-export const mapValueSetsToValueSetType = (valueSets: ValueSet[]) => {
-  const results: { [vsType in DibbsValueSetType]: ValueSet[] } = {
+export const groupValueSetsByConceptType = (
+  valueSets: ValueSet[],
+): { [vsType in DibbsConceptType]: ValueSet[] } => {
+  const results: { [vsType in DibbsConceptType]: ValueSet[] } = {
     labs: [],
     medications: [],
     conditions: [],
   };
-  (Object.keys(results) as Array<DibbsValueSetType>).forEach((vsType) => {
+  (Object.keys(results) as Array<DibbsConceptType>).forEach((vsType) => {
     const itemsToInclude = valueSets.filter(
       (vs) => vs.dibbsConceptType === vsType,
     );
@@ -146,7 +152,7 @@ export const mapValueSetsToValueSetType = (valueSets: ValueSet[]) => {
  * @returns A count of the number of items in each of the DibbsConceptTypes
  */
 export const countDibbsConceptTypeToVsMapItems = (obj: {
-  [vsNameAuthorSystem: string]: GroupedValueSet;
+  [vsNameAuthorSystem: string]: ValueSetGrouping;
 }) => {
   return Object.values(obj).reduce((runningSum, gvs) => {
     gvs.items.forEach((vs) => {

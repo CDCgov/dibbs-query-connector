@@ -1,15 +1,15 @@
-import { DibbsValueSetType } from "@/app/constants";
+import { DibbsConceptType } from "@/app/constants";
 import styles from "./customizeQuery.module.css";
 import CustomizeQueryBulkSelect from "./CustomizeQueryBulkSelect";
-import { GroupedValueSet } from "./customizeQueryUtils";
+import { ValueSetGrouping } from "./customizeQueryUtils";
 
 type CustomizeQueryNavProps = {
-  activeTab: DibbsValueSetType;
-  handleTabChange: (tabName: DibbsValueSetType) => void;
+  activeTab: DibbsConceptType;
+  handleTabChange: (tabName: DibbsConceptType) => void;
   handleSelectAllForTab: (checked: boolean) => void;
   valueSetOptions: {
-    [key in DibbsValueSetType]: {
-      [vsNameAuthorSystem: string]: GroupedValueSet;
+    [key in DibbsConceptType]: {
+      [vsNameAuthorSystem: string]: ValueSetGrouping;
     };
   };
 };

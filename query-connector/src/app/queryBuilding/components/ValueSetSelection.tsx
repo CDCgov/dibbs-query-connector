@@ -12,19 +12,19 @@ import classNames from "classnames";
 
 import {
   CategoryNameToConditionOptionMap,
-  ConditionIdToValueSetArray,
+  ConditionIdToValueSetArrayMap,
 } from "../utils";
 import { BuildStep } from "@/app/constants";
 import SearchField from "@/app/query/designSystem/searchField/SearchField";
 import { Icon } from "@trussworks/react-uswds";
 
-import { formatDiseaseDisplay, ConditionToValueSetMap } from "../utils";
+import { formatDiseaseDisplay, ConditionToValueSetGroupingMap } from "../utils";
 import {
-  GroupedValueSet,
-  mapValueSetsToValueSetType,
+  ValueSetGrouping,
+  groupValueSetsByConceptType,
   groupValueSetsByNameAuthorSystem,
 } from "../../query/components/customizeQuery/customizeQueryUtils";
-import { DibbsValueSetType } from "../../constants";
+import { DibbsConceptType } from "../../constants";
 import { SelectionTable } from "./SelectionTable";
 
 import Drawer from "@/app/query/designSystem/drawer/Drawer";
@@ -33,7 +33,7 @@ type ConditionSelectionProps = {
   queryName: string;
   setBuildStep: (buildStep: BuildStep) => void;
   selectedConditions: CategoryNameToConditionOptionMap;
-  valueSetsByCondition: ConditionIdToValueSetArray;
+  valueSetsByCondition: ConditionIdToValueSetArrayMap;
 };
 
 /**
@@ -54,7 +54,7 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
   const [activeCondition, setActiveCondition] = useState<string>("");
   const [_searchFilter, setSearchFilter] = useState<string>();
   const [selectedValueSets, setSelectedValueSets] =
-    useState<ConditionToValueSetMap>({});
+    useState<ConditionToValueSetGroupingMap>({});
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   useEffect(() => {
@@ -67,61 +67,60 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
 
     setActiveCondition(id);
 
-    const groupedValueSetByCondition: ConditionToValueSetMap = Object.entries(
-      valueSetsByCondition,
-    )
-      .map(([conditionId, valSet]) => {
-        // results for each condition
-        const results: {
-          [vsType in DibbsValueSetType]: {
-            [vsNameAuthorSystem: string]: GroupedValueSet;
+    const groupedValueSetByCondition: ConditionToValueSetGroupingMap =
+      Object.entries(valueSetsByCondition)
+        .map(([conditionId, valSet]) => {
+          // results for each condition
+          const results: {
+            [vsType in DibbsConceptType]: {
+              [vsNameAuthorSystem: string]: ValueSetGrouping;
+            };
+          } = {
+            labs: {},
+            conditions: {},
+            medications: {},
           };
-        } = {
-          labs: {},
-          conditions: {},
-          medications: {},
-        };
 
-        const valueSetsByNameAuthorSystem =
-          groupValueSetsByNameAuthorSystem(valSet);
+          const valueSetsByNameAuthorSystem =
+            groupValueSetsByNameAuthorSystem(valSet);
 
-        Object.entries(valueSetsByNameAuthorSystem).map(
-          ([nameAuthorSystem, groupedValueSet]) => {
-            const mappedSets = mapValueSetsToValueSetType(
-              groupedValueSet.items,
-            );
+          Object.entries(valueSetsByNameAuthorSystem).map(
+            ([nameAuthorSystem, groupedValueSet]) => {
+              const mappedSets = groupValueSetsByConceptType(
+                groupedValueSet.items,
+              );
 
-            Object.entries(mappedSets).forEach(([valueSetTypeKey, items]) => {
-              // the sieving function below accounts for the case that a GroupedValueSet
-              // might have items that belong to more than one ValueSetType.
-              // In practice, this doesn't occur very often / will result in empty
-              // GroupedValueSets (ie the groupings on the other tabs) that we don't
-              // want to display, so we should filter those out.
-              if (items.length > 0) {
-                results[valueSetTypeKey as DibbsValueSetType][
-                  nameAuthorSystem
-                ] = {
-                  ...groupedValueSet,
-                  items: items,
-                };
-              }
-            });
+              Object.entries(mappedSets).forEach(([valueSetTypeKey, items]) => {
+                // the sieving function below accounts for the case that a GroupedValueSet
+                // might have items that belong to more than one ValueSetType.
+                // In practice, this doesn't occur very often / will result in empty
+                // GroupedValueSets (ie the groupings on the other tabs) that we don't
+                // want to display, so we should filter those out.
+                if (items.length > 0) {
+                  results[valueSetTypeKey as DibbsConceptType][
+                    nameAuthorSystem
+                  ] = {
+                    ...groupedValueSet,
+                    items: items,
+                  };
+                }
+              });
 
-            return;
-          },
-        );
+              return;
+            },
+          );
 
-        return { [conditionId]: results }; // the value of groupedValueSetByCondition
-      })
-      .reduce(function (result, current) {
-        const conditionId = Object.keys(current)[0];
-        result[conditionId] = {
-          labs: current[conditionId].labs,
-          medications: current[conditionId].medications,
-          conditions: current[conditionId].conditions,
-        };
-        return result;
-      }, {});
+          return { [conditionId]: results }; // the value of groupedValueSetByCondition
+        })
+        .reduce(function (result, current) {
+          const conditionId = Object.keys(current)[0];
+          result[conditionId] = {
+            labs: current[conditionId].labs,
+            medications: current[conditionId].medications,
+            conditions: current[conditionId].conditions,
+          };
+          return result;
+        }, {});
 
     return () => {
       setSelectedValueSets(groupedValueSetByCondition);
@@ -146,7 +145,7 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
         },
       ),
     )
-    .flatMap((conditionsByCategory) => conditionsByCategory);
+    .flat();
 
   return (
     <div

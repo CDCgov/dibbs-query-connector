@@ -4,7 +4,6 @@ import React, { useState, useEffect } from "react";
 import { Button } from "@trussworks/react-uswds";
 import {
   DibbsConceptType,
-  DibbsValueSetType,
   USE_CASES,
   USE_CASE_DETAILS,
   ValueSet,
@@ -18,7 +17,7 @@ import CustomizeQueryAccordionBody from "./customizeQuery/CustomizeQueryAccordio
 import Accordion from "../designSystem/Accordion";
 import CustomizeQueryNav from "./customizeQuery/CustomizeQueryNav";
 import {
-  GroupedValueSet,
+  ValueSetGrouping,
   mapValueSetsToValueSetTypes,
   countDibbsConceptTypeToVsMapItems,
 } from "./customizeQuery/customizeQueryUtils";
@@ -50,11 +49,11 @@ const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
   setQueryValuesets,
   goBack,
 }) => {
-  const [activeTab, setActiveTab] = useState<DibbsValueSetType>("labs");
+  const [activeTab, setActiveTab] = useState<DibbsConceptType>("labs");
 
   const [valueSetOptions, setValueSetOptions] = useState<{
     [dibbsConceptType in DibbsConceptType]: {
-      [vsNameAuthorSystem: string]: GroupedValueSet;
+      [vsNameAuthorSystem: string]: ValueSetGrouping;
     };
   }>({
     labs: {},
@@ -83,7 +82,7 @@ const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
   );
 
   // Keeps track of which side nav tab to display to users
-  const handleTabChange = (tab: DibbsValueSetType) => {
+  const handleTabChange = (tab: DibbsConceptType) => {
     setActiveTab(tab);
   };
 
@@ -166,7 +165,7 @@ const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
   // by the entire query branch of the app
   const handleApplyChanges = () => {
     const selectedItems = Object.keys(valueSetOptions).reduce((acc, key) => {
-      const items = valueSetOptions[key as DibbsValueSetType];
+      const items = valueSetOptions[key as DibbsConceptType];
       acc = acc.concat(Object.values(items).flatMap((dict) => dict.items));
       return acc;
     }, [] as ValueSet[]);

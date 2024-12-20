@@ -1,10 +1,10 @@
 import styles from "./customizeQuery.module.css";
-import { GroupedValueSet } from "./customizeQueryUtils";
+import { ValueSetGrouping } from "./customizeQueryUtils";
 import Table from "../../designSystem/Table";
 import CustomizeQueryCheckbox from "./vanityCheckbox/CustomizeQueryCheckbox";
 
 type CustomizeQueryAccordionBodyProps = {
-  group: GroupedValueSet;
+  group: ValueSetGrouping;
   toggleInclude: (
     groupIndex: string,
     valueSetIndex: number,
