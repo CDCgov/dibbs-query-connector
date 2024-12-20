@@ -52,7 +52,7 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({
           const queries = await getCustomQueries();
           console.log("here version 2");
 
-          context.setData(queries);
+          context?.setData(queries);
         } catch (error) {
           console.error("Failed to fetch queries:", error);
         } finally {
