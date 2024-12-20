@@ -1,9 +1,40 @@
 import { DibbsValueSet } from "../constants";
-import { ValueSetGrouping } from "../query/components/customizeQuery/customizeQueryUtils";
+import {
+  ValueSetGrouping,
+  ConceptTypeToValueSetGroupingMap,
+} from "../utils/valueSetTranslation";
 
 // The structure of the data that's coming from the backend
 export type ConditionIdToNameMap = {
   [conditionId: string]: string;
+};
+
+// The transform structs for use on the frontend, which is a grandparent - parent
+// - child mapping from category (indexed by name) - conditions (indexed by condition ID)
+// and - condition option (name and whether to include it in the query we're building).
+export type ConditionOption = {
+  name: string;
+  include: boolean;
+};
+
+export type ConditionOptionMap = {
+  [conditionId: string]: ConditionOption;
+};
+
+export type CategoryNameToConditionOptionMap = {
+  [categoryName: string]: ConditionOptionMap;
+};
+
+export type ConditionIdToValueSetArrayMap = {
+  [conditionId: string]: DibbsValueSet[];
+};
+
+export type CategoryToConditionToNameMap = {
+  [categoryName: string]: ConditionIdToNameMap[];
+};
+
+export type ConditionToConceptTypeToValueSetGroupingMap = {
+  [conditionId: string]: ConceptTypeToValueSetGroupingMap;
 };
 
 export type QueryDetailsResult = {
@@ -13,43 +44,6 @@ export type QueryDetailsResult = {
     [condition_name: string]: { [valueSetId: string]: DibbsValueSet };
   };
   conditions_list: string[];
-};
-
-export type CategoryToConditionArrayMap = {
-  [categoryName: string]: ConditionIdToNameMap[];
-};
-
-export type ConditionIdToValueSetArrayMap = {
-  [conditionId: string]: DibbsValueSet[];
-};
-
-export type ValueSetGroupingByConceptType = {
-  labs: {
-    [name: string]: ValueSetGrouping;
-  };
-  medications: {
-    [name: string]: ValueSetGrouping;
-  };
-  conditions: {
-    [name: string]: ValueSetGrouping;
-  };
-};
-
-export type ConditionToValueSetGroupingMap = {
-  [conditionId: string]: ValueSetGroupingByConceptType;
-};
-// The transform structs for use on the frontend, which is a grandparent - parent
-// - child mapping from category (indexed by name) - conditions (indexed by condition ID)
-// and - condition option (name and whether to include it in the query we're building).
-export type ConditionOption = {
-  name: string;
-  include: boolean;
-};
-export type ConditionOptionMap = {
-  [conditionId: string]: ConditionOption;
-};
-export type CategoryNameToConditionOptionMap = {
-  [categoryName: string]: ConditionOptionMap;
 };
 
 export const EMPTY_QUERY_SELECTION = { queryId: "", queryName: "" };

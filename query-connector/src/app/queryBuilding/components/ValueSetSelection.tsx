@@ -18,7 +18,10 @@ import { BuildStep } from "@/app/constants";
 import SearchField from "@/app/query/designSystem/searchField/SearchField";
 import { Icon } from "@trussworks/react-uswds";
 
-import { formatDiseaseDisplay, ConditionToValueSetGroupingMap } from "../utils";
+import {
+  formatDiseaseDisplay,
+  ConditionToConceptTypeToValueSetGroupingMap,
+} from "../utils";
 import { SelectionTable } from "./SelectionTable";
 
 import Drawer from "@/app/query/designSystem/drawer/Drawer";
@@ -48,7 +51,7 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
   const [activeCondition, setActiveCondition] = useState<string>("");
   const [_searchFilter, setSearchFilter] = useState<string>();
   const [selectedValueSets, setSelectedValueSets] =
-    useState<ConditionToValueSetGroupingMap>({});
+    useState<ConditionToConceptTypeToValueSetGroupingMap>({});
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   useEffect(() => {
@@ -60,7 +63,7 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
     const id = Object.keys(selectedConditions[first])[0];
     setActiveCondition(id);
 
-    const groupedValueSetByCondition: ConditionToValueSetGroupingMap =
+    const groupedValueSetByCondition: ConditionToConceptTypeToValueSetGroupingMap =
       groupValueSetGroupingByConditionId(valueSetsByCondition);
 
     return () => {

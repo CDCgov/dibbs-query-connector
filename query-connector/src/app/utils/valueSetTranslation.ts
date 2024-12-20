@@ -1,15 +1,27 @@
 import { DibbsConceptType, DibbsValueSet } from "../constants";
 import {
   ConditionIdToValueSetArrayMap,
-  ConditionToValueSetGroupingMap,
+  ConditionToConceptTypeToValueSetGroupingMap,
 } from "../queryBuilding/utils";
 
-// valuesets that share the same name, author, system unique identifier
+// ValueSets that share the same name, author, system unique identifier
 export type ValueSetGrouping = {
   valueSetName: string;
   author: string;
   system: string;
   items: DibbsValueSet[];
+};
+
+export type ConceptTypeToValueSetGroupingMap = {
+  labs: {
+    [name: string]: ValueSetGrouping;
+  };
+  medications: {
+    [name: string]: ValueSetGrouping;
+  };
+  conditions: {
+    [name: string]: ValueSetGrouping;
+  };
 };
 
 type ValueSetNameAuthorSystem = string;
@@ -91,8 +103,8 @@ export function generateValueSetGroupingsByDibbsConceptType(
  */
 export function groupValueSetGroupingByConditionId(
   conditionIdToValueSetArrayMap: ConditionIdToValueSetArrayMap,
-): ConditionToValueSetGroupingMap {
-  const results: ConditionToValueSetGroupingMap = {};
+): ConditionToConceptTypeToValueSetGroupingMap {
+  const results: ConditionToConceptTypeToValueSetGroupingMap = {};
 
   Object.entries(conditionIdToValueSetArrayMap).forEach(
     ([conditionId, valueSetArray]) => {

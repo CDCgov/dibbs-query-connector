@@ -1,6 +1,6 @@
 import { Checkbox } from "@trussworks/react-uswds";
 import styles from "../buildFromTemplates/buildfromTemplate.module.scss";
-import { ConditionToValueSetGroupingMap } from "../utils";
+import { ConditionToConceptTypeToValueSetGroupingMap } from "../utils";
 import { ValueSetGrouping } from "@/app/query/components/customizeQuery/customizeQueryUtils";
 import { formatDiseaseDisplay } from "../utils";
 import { tallyConceptsForSingleValueSet } from "../utils";
@@ -11,7 +11,9 @@ import ConceptSelection from "./ConceptSelection";
 
 type SelectionViewAccordionBodyProps = {
   id?: string;
-  setValueSets: Dispatch<SetStateAction<ConditionToValueSetGroupingMap>>;
+  setValueSets: Dispatch<
+    SetStateAction<ConditionToConceptTypeToValueSetGroupingMap>
+  >;
   conditionId: string;
   valueSetType: DibbsConceptType;
   valueSetsForType: ValueSetGrouping[];

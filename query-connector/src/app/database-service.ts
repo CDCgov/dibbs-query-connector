@@ -21,7 +21,7 @@ import {
   CustomUserQuery,
 } from "./query-building";
 import {
-  CategoryToConditionArrayMap,
+  CategoryToConditionToNameMap,
   ConditionIdToNameMap,
 } from "./queryBuilding/utils";
 import {
@@ -532,7 +532,7 @@ export async function getConditionsData() {
   const rows = result.rows;
 
   // 1. Grouped by category with id:name pairs
-  const categoryToConditionArrayMap: CategoryToConditionArrayMap = rows.reduce(
+  const categoryToConditionArrayMap: CategoryToConditionToNameMap = rows.reduce(
     (acc, row) => {
       const { category, id, name } = row;
       if (!acc[category]) {
@@ -541,7 +541,7 @@ export async function getConditionsData() {
       acc[category].push({ [id]: name });
       return acc;
     },
-    {} as CategoryToConditionArrayMap,
+    {} as CategoryToConditionToNameMap,
   );
 
   // 2. ID-Name mapping

@@ -4,7 +4,7 @@ import styles from "../buildFromTemplates/buildfromTemplate.module.scss";
 import {
   ValueSetGroupingByConceptType,
   batchToggleConcepts,
-  ConditionToValueSetGroupingMap,
+  ConditionToConceptTypeToValueSetGroupingMap,
 } from "../utils";
 import { DibbsConceptType } from "@/app/constants";
 import {
@@ -17,10 +17,12 @@ import { ValueSetGrouping } from "@/app/query/components/customizeQuery/customiz
 
 type SelectionTableProps = {
   conditionId: string;
-  selectedValueSets: ConditionToValueSetGroupingMap;
+  selectedValueSets: ConditionToConceptTypeToValueSetGroupingMap;
   activeCondition: string;
   groupedValueSetsForCondition: ValueSetGroupingByConceptType;
-  setValueSets: Dispatch<SetStateAction<ConditionToValueSetGroupingMap>>;
+  setValueSets: Dispatch<
+    SetStateAction<ConditionToConceptTypeToValueSetGroupingMap>
+  >;
 };
 
 /**
