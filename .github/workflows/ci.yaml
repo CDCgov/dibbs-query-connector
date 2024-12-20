@@ -62,6 +62,8 @@ jobs:
       - name: Run tests
         working-directory: ./query-connector
         run: npm run test:integration
+        env:
+          DATABASE_URL: postgresql://postgres:pw@localhost:5432/tefca_db
 
   end-to-end-tests:
     timeout-minutes: 15
