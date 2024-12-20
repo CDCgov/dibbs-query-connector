@@ -25,7 +25,7 @@ export type ConditionIdToValueSetArrayMap = {
   [conditionId: string]: ValueSet[];
 };
 
-export type ValueSetsByConceptType = {
+export type ValueSetGroupingByConceptType = {
   labs: {
     [name: string]: ValueSetGrouping;
   };
@@ -38,7 +38,7 @@ export type ValueSetsByConceptType = {
 };
 
 export type ConditionToValueSetGroupingMap = {
-  [conditionId: string]: ValueSetsByConceptType;
+  [conditionId: string]: ValueSetGroupingByConceptType;
 };
 // The transform structs for use on the frontend, which is a grandparent - parent
 // - child mapping from category (indexed by name) - conditions (indexed by condition ID)
@@ -223,10 +223,10 @@ export const batchToggleConcepts = (input: ValueSet) => {
 };
 
 /**
- * Utility function to group condition-indexed ValueSetGrouping by labs / conditions/
- * medications
+ * Utility function to generate a three-layer condition : labs / conditions/
+ * medications : {valueSetName: ValueSetGrouping} map
  * @param conditionIdToValueSetArrayMap map of condition IDs to ValueSet[]
- * @returns Map of conditionId: {lab, conditions, medications : ValueSetGrouping}
+ * @returns Map of {[conditionId]: {[valueSetName]: ValueSetGrouping} }
  */
 export function groupValueSetGroupingByConditionId(
   conditionIdToValueSetArrayMap: ConditionIdToValueSetArrayMap,
@@ -235,21 +235,31 @@ export function groupValueSetGroupingByConditionId(
 
   Object.entries(conditionIdToValueSetArrayMap).forEach(
     ([conditionId, valueSetArray]) => {
-      // results for each condition
       const valueSetsByConceptType = groupValueSetsByConceptType(valueSetArray);
-      results[conditionId] = Object.keys(valueSetsByConceptType).reduce(
-        (acc, key) => {
-          const valueSetGroupings = groupValueSetsByNameAuthorSystem(
-            valueSetsByConceptType[key as DibbsConceptType],
-          );
-
-          acc[key as DibbsConceptType] = 
-          return acc;
-        },
-        {} as { [key in DibbsConceptType]: ValueSetGrouping },
+      const curConditionGrouping = generateValueSetGroupingsByConceptType(
+        valueSetsByConceptType,
       );
+      results[conditionId] = curConditionGrouping;
     },
   );
 
   return results;
+}
+
+function generateValueSetGroupingsByConceptType(valueSetsByConceptType: {
+  [key in DibbsConceptType]: ValueSet[];
+}) {
+  return Object.keys(valueSetsByConceptType).reduce(
+    (acc, key) => {
+      const valueSetGroupings = groupValueSetsByNameAuthorSystem(
+        valueSetsByConceptType[key as DibbsConceptType],
+      );
+
+      acc[key as DibbsConceptType] = valueSetGroupings;
+      return acc;
+    },
+    {} as {
+      [key in DibbsConceptType]: { [vsName: string]: ValueSetGrouping };
+    },
+  );
 }

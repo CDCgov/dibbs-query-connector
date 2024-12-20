@@ -2,7 +2,7 @@
 import { Dispatch, SetStateAction, useState } from "react";
 import styles from "../buildFromTemplates/buildfromTemplate.module.scss";
 import {
-  ValueSetsByConceptType,
+  ValueSetGroupingByConceptType,
   batchToggleConcepts,
   ConditionToValueSetGroupingMap,
 } from "../utils";
@@ -19,7 +19,7 @@ type SelectionTableProps = {
   conditionId: string;
   selectedValueSets: ConditionToValueSetGroupingMap;
   activeCondition: string;
-  groupedValueSetsForCondition: ValueSetsByConceptType;
+  groupedValueSetsForCondition: ValueSetGroupingByConceptType;
   setValueSets: Dispatch<SetStateAction<ConditionToValueSetGroupingMap>>;
 };
 
