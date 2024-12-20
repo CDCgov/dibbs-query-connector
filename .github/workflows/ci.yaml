@@ -58,6 +58,7 @@ jobs:
       - name: Install dependencies
         working-directory: ./query-connector
         run: npm install
+
       - name: Run tests
         working-directory: ./query-connector
         run: npm run test:integration
