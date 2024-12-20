@@ -5,7 +5,11 @@ services:
     ports:
       - "5432:5432"
     environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=pw
+      - POSTGRES_DB=tefca_db
       - DATABASE_URL=postgresql://postgres:pw@localhost:5432/tefca_db
+
     volumes:
       - ./vs_dump.sql:/docker-entrypoint-initdb.d/vs_dump.sql
     healthcheck:
