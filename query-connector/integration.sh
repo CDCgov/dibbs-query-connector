@@ -8,7 +8,7 @@ docker compose -f docker-compose-integration.yaml up -d
 docker compose -f docker-compose-integration.yaml logs -f flyway | grep -q "Successfully applied"
 
 # running our integration tests
-jest --testPathPattern=tests/integration
+DATABASE_URL=postgresql://postgres:pw@localhost:5432/tefca_db TEST_TYPE=integration jest --testPathPattern=tests/integration
 JEST_EXIT_CODE=$?
 
 # Teardown containers
