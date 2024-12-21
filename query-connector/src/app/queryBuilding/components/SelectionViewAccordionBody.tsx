@@ -65,7 +65,6 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
           ...vs,
           items: [{ ...vs.items[0], concepts: currentConcepts }],
         };
-        console.log("Return", vs_return);
         return vs_return;
       }
     });
