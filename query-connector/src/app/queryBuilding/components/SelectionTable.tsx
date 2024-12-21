@@ -113,15 +113,15 @@ export const SelectionTable: React.FC<SelectionTableProps> = ({
     const ValueSetAccordionItems =
       typesWithContent &&
       typesWithContent.map((activeConceptType) => {
-        const actievVsGroupings = Object.values(
+        const activeVsGroupings = Object.values(
           groupedValueSetsForCondition[activeConceptType],
         );
         const totalCount = tallyConceptsForValueSetGroup(
-          actievVsGroupings,
+          activeVsGroupings,
           false,
         );
         const selectedCount = tallyConceptsForValueSetGroup(
-          actievVsGroupings,
+          activeVsGroupings,
           true,
         );
 
@@ -131,7 +131,7 @@ export const SelectionTable: React.FC<SelectionTableProps> = ({
             conditionId={conditionId}
             totalCount={totalCount}
             selectedCount={selectedCount}
-            activeVsGroupings={actievVsGroupings}
+            activeVsGroupings={activeVsGroupings}
             handleCheckboxToggle={handleGroupCheckboxToggle}
             expanded={expanded?.indexOf(activeConceptType) > -1 || false}
           />
@@ -140,7 +140,7 @@ export const SelectionTable: React.FC<SelectionTableProps> = ({
           <SelectionViewAccordionBody
             activeConceptType={activeConceptType}
             handleCheckboxToggle={handleSingleCheckboxToggle}
-            activeVsGroupings={actievVsGroupings}
+            activeVsGroupings={activeVsGroupings}
           />
         );
         const level: HeadingLevel = "h4";
