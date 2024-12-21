@@ -115,10 +115,11 @@ export const SelectionTable: React.FC<SelectionTableProps> = ({
         const content = (
           <SelectionViewAccordionBody
             activeConceptType={activeConceptType}
-            handleCheckboxToggle={handleSingleCheckboxToggle}
             activeVsGroupings={Object.values(
               groupedValueSetsForCondition[activeConceptType],
             )}
+            setValueSets={setValueSets}
+            conditionId={conditionId}
           />
         );
         const level: HeadingLevel = "h4";
