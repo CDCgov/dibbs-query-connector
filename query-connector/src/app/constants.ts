@@ -342,3 +342,13 @@ export type FhirServerConfig = {
   hostname: string;
   headers: Record<string, string>;
 };
+
+export const INVALID_USE_CASE = `Invalid use_case. Please provide a valid use_case. Valid use_cases include ${Object.keys(
+  USE_CASE_DETAILS,
+)}.`;
+export const INVALID_FHIR_SERVERS = `Invalid fhir_server. Please provide a valid fhir_server. Valid fhir_servers include ${FhirServers}.`;
+export const RESPONSE_BODY_IS_NOT_PATIENT_RESOURCE =
+  "Request body is not a Patient resource.";
+export const MISSING_API_QUERY_PARAM = "Missing use_case or fhir_server.";
+export const MISSING_PATIENT_IDENTIFIERS =
+  "No patient identifiers to parse from requestBody.";
