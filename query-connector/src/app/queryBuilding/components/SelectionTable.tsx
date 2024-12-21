@@ -92,6 +92,7 @@ export const SelectionTable: React.FC<SelectionTableProps> = ({
   };
 
   const generateAccordionItems = (types: Array<DibbsConceptType>) => {
+    console.log("generating accordion items");
     const typesWithContent =
       types &&
       types.filter(

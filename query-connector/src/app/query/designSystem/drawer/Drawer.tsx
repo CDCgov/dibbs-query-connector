@@ -79,7 +79,6 @@ const Drawer = <T,>({
     <>
       <div
         className={`${styles.drawer} ${isOpen ? styles.open : styles.closed}`}
-        inert={!isOpen}
         role="dialog"
       >
         <div className={styles.drawerContent}>
@@ -88,7 +87,7 @@ const Drawer = <T,>({
             onClick={handleClose}
             aria-label="Close drawer"
           >
-            <Icon.Close size={3} />
+            <Icon.Close size={3} aria-label="X icon indicating closure" />
           </button>
           <h2 className="margin-0 padding-bottom-2">{title}</h2>
           <Button

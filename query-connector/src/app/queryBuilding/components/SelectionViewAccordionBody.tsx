@@ -70,7 +70,6 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
             ...groupedVS,
             items: [{ ...groupedVS.items[0], concepts: currentConcepts }],
           };
-          console.log("save state: ", prevState);
           return prevState;
         });
       }
