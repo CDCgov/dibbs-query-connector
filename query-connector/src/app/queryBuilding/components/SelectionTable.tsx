@@ -100,13 +100,14 @@ export const SelectionTable: React.FC<SelectionTableProps> = ({
     const ValueSetAccordionItems =
       typesWithContent &&
       typesWithContent.map((activeConceptType) => {
+        const activeVsGroupings = Object.values(
+          groupedValueSetsForCondition[activeConceptType],
+        );
         const title = (
           <SelectionViewAccordionHeader
             activeConceptType={activeConceptType}
             conditionId={conditionId}
-            activeVsGroupings={Object.values(
-              groupedValueSetsForCondition[activeConceptType],
-            )}
+            activeVsGroupings={activeVsGroupings}
             handleCheckboxToggle={handleGroupCheckboxToggle}
             expanded={expanded?.indexOf(activeConceptType) > -1 || false}
           />
@@ -117,9 +118,7 @@ export const SelectionTable: React.FC<SelectionTableProps> = ({
         const content = (
           <SelectionViewAccordionBody
             activeConceptType={activeConceptType}
-            activeVsGroupings={Object.values(
-              groupedValueSetsForCondition[activeConceptType],
-            )}
+            activeVsGroupings={activeVsGroupings}
             setValueSets={setValueSets}
             conditionId={conditionId}
           />
