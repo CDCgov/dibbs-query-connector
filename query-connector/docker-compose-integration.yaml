@@ -1,0 +1,30 @@
+services:
+  # PostgreSQL DB for custom query and value set storage
+  db:
+    image: "postgres:alpine"
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=pw
+      - POSTGRES_DB=tefca_db
+
+    volumes:
+      - ./vs_dump.sql:/docker-entrypoint-initdb.d/vs_dump.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 2s
+      timeout: 5s
+      retries: 20
+
+  # Flyway migrations and DB version control
+  flyway:
+    image: flyway/flyway:10.16-alpine
+    command: -configFiles=/flyway/conf/flyway.conf -schemas=public -connectRetries=60 migrate
+    platform: linux/amd64
+    volumes:
+      - ./flyway/sql:/flyway/sql
+      - ./flyway/conf/flyway.conf:/flyway/conf/flyway.conf
+    depends_on:
+      db:
+        condition: service_started

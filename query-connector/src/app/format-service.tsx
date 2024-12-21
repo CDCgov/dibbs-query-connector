@@ -143,10 +143,10 @@ export function formatIdentifier(identifier: Identifier[]): JSX.Element {
         }
 
         return (
-          <>
+          <div key={id.value}>
             {" "}
             {idType}: {id.value} <br />{" "}
-          </>
+          </div>
         );
       })}
     </>
