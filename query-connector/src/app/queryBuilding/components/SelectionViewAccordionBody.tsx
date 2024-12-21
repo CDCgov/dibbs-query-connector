@@ -6,6 +6,7 @@ import Drawer from "@/app/query/designSystem/drawer/Drawer";
 import React, { useState } from "react";
 import { VsGrouping } from "@/app/utils/valueSetTranslation";
 import { DibbsConceptType } from "@/app/constants";
+import ConceptSelection from "./ConceptSelection";
 
 type SelectionViewAccordionBodyProps = {
   id?: string;
@@ -34,11 +35,41 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [drawerTitle, setDrawerTitle] = useState<string>("");
   const [drawerCodes, setDrawerCodes] = useState<React.ReactNode>(null);
+  const [currentConcepts, setCurrentConcepts] = useState<
+    { code: string; display: string; include: boolean }[]
+  >([]);
+  const [initialConcepts, setInitialConcepts] = useState<
+    { code: string; display: string; include: boolean }[]
+  >([]);
 
-  const handleViewCodes = (vsName: string, codes: React.ReactNode) => {
-    setDrawerTitle(`${vsName}`);
-    setDrawerCodes(codes);
+  const handleViewCodes = (
+    vsName: string,
+    concepts: { code: string; display: string; include: boolean }[],
+  ) => {
+    setDrawerTitle(vsName);
+    setInitialConcepts([...concepts]);
+    setCurrentConcepts([...concepts]);
     setIsDrawerOpen(true);
+  };
+
+  const handleConceptsChange = (
+    updatedConcepts: { code: string; display: string; include: boolean }[],
+  ) => {
+    setCurrentConcepts(updatedConcepts);
+  };
+
+  const handleSaveChanges = () => {
+    activeVsGroupings.map((vs) => {
+      if (vs.valueSetName === drawerTitle) {
+        const vs_return = {
+          ...vs,
+          items: [{ ...vs.items[0], concepts: currentConcepts }],
+        };
+        console.log("Return", vs_return);
+        return vs_return;
+      }
+    });
+    setIsDrawerOpen(false);
   };
 
   return (
@@ -76,7 +107,7 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
                   className={styles.viewCodesBtn}
                   role="button"
                   onClick={() =>
-                    handleViewCodes(vs.valueSetName, <div>TODO</div>)
+                    handleViewCodes(vs.valueSetName, vs.items[0].concepts)
                   }
                 >
                   View Codes
@@ -89,9 +120,17 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
         title={drawerTitle}
         placeholder="Search by code or name"
         toastMessage="Valueset concepts have been successfully modified."
-        codes={drawerCodes}
+        codes={
+          <ConceptSelection
+            concepts={currentConcepts}
+            onConceptsChange={handleConceptsChange}
+          />
+        }
         isOpen={isDrawerOpen}
         onClose={() => setIsDrawerOpen(false)}
+        initialState={initialConcepts}
+        currentState={currentConcepts}
+        onSave={handleSaveChanges}
       />
     </div>
   );

@@ -3,12 +3,11 @@ import classNames from "classnames";
 import { Checkbox, Icon } from "@trussworks/react-uswds";
 import { DibbsConceptType } from "@/app/constants";
 import { VsGrouping } from "@/app/utils/valueSetTranslation";
+import { tallyConceptsForValueSetGroup } from "../utils";
 
 type SelectionViewAccordionBodyProps = {
   activeConceptType: DibbsConceptType;
   conditionId: string;
-  selectedCount: number;
-  totalCount: number;
   activeVsGroupings: VsGrouping[];
   handleCheckboxToggle: (
     activeConceptType: DibbsConceptType,
@@ -28,9 +27,6 @@ type SelectionViewAccordionBodyProps = {
  * @param param0.conditionId - The ID of the active condition, whose associated value sets
  * and concepts are shown in the table
  * @param param0.activeVsGroupings - ValueSets for a given activeConceptType
- * @param param0.totalCount - Number of Concepts associated with all the Value Sets for the DibbsactiveConceptType
- * @param param0.selectedCount - Number of Concepts that are marked as selected
- * is expanded
  * @param param0.expanded - Boolean for managing icon orientation
  * @returns An accordion body component
  */
@@ -39,12 +35,13 @@ const SelectionViewAccordionHeader: React.FC<
 > = ({
   activeConceptType,
   conditionId,
-  selectedCount,
-  totalCount,
   activeVsGroupings,
   handleCheckboxToggle,
   expanded,
 }) => {
+  const selectedCount = tallyConceptsForValueSetGroup(activeVsGroupings, true);
+  const totalCount = tallyConceptsForValueSetGroup(activeVsGroupings, false);
+
   const isMinusState = selectedCount !== totalCount && selectedCount !== 0;
   const checked =
     !!selectedCount && selectedCount == totalCount && selectedCount > 0;

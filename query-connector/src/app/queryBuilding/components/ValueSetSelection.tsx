@@ -7,13 +7,14 @@ import classNames from "classnames";
 import {
   CategoryNameToConditionOptionMap,
   ConditionIdToValueSetArrayMap,
-  ConditionToConceptTypeToValueSetGroupingMap,
 } from "../utils";
 import SearchField from "@/app/query/designSystem/searchField/SearchField";
 import { Icon } from "@trussworks/react-uswds";
 
-import { formatDiseaseDisplay } from "../utils";
-
+import {
+  formatDiseaseDisplay,
+  ConditionToConceptTypeToValueSetGroupingMap,
+} from "../utils";
 import { SelectionTable } from "./SelectionTable";
 
 import Drawer from "@/app/query/designSystem/drawer/Drawer";
@@ -30,7 +31,7 @@ type ConditionSelectionProps = {
  * @param root0 - params
  * @param root0.queryName - current checkbox selection status
  * @param root0.selectedConditions - name of condition to display
- * @param root0.valueSetsByCondition - name of condition to display
+ * @param root0.valueSetsByCondition - {conditionId: ValueSet[]} map
  * @returns A component for display to redner on the query building page
  */
 export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
@@ -52,11 +53,11 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
 
     const first = Object.keys(selectedConditions)[0];
     const id = Object.keys(selectedConditions[first])[0];
-
     setActiveCondition(id);
 
-    const groupedValueSetByCondition =
+    const groupedValueSetByCondition: ConditionToConceptTypeToValueSetGroupingMap =
       groupValueSetGroupingByConditionId(valueSetsByCondition);
+
     return () => {
       setSelectedValueSets(groupedValueSetByCondition);
     };
@@ -80,7 +81,7 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
         },
       ),
     )
-    .flatMap((conditionsByCategory) => conditionsByCategory);
+    .flat();
 
   return (
     <div
@@ -143,12 +144,10 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
             />
           </div>
           <div>
-            {selectedValueSets && (
+            {selectedValueSets && activeCondition && (
               <SelectionTable
-                conditionId={activeCondition ?? ""}
-                groupedValueSetsForCondition={
-                  selectedValueSets[activeCondition]
-                }
+                conditionId={activeCondition}
+                selectedValueSets={selectedValueSets}
                 setValueSets={setSelectedValueSets}
               />
             )}
@@ -163,6 +162,9 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
         toastMessage="Condition has been successfully added."
         isOpen={isDrawerOpen}
         onClose={handleCloseDrawer}
+        initialState={{}} //TODO
+        currentState={{}} //TODO
+        onSave={() => {}} //TODO
       />
     </div>
   );

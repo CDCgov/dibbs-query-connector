@@ -198,6 +198,15 @@ h1 {
   }
 }
 
+.usa-checkbox__label {
+  cursor: pointer;
+  display: inherit;
+  font-weight: normal;
+  margin-top: 0rem;
+  padding-left: 2rem;
+  position: relative;
+}
+
 .query-page-wrapper {
   display: flex;
   align-items: flex-start;
