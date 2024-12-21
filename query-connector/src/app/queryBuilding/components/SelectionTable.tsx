@@ -1,5 +1,5 @@
 "use client";
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import styles from "../buildFromTemplates/buildfromTemplate.module.scss";
 import {
   batchToggleConcepts,
@@ -36,7 +36,6 @@ export const SelectionTable: React.FC<SelectionTableProps> = ({
   setValueSets,
 }) => {
   const groupedValueSetsForCondition = selectedValueSets[conditionId];
-  const [expanded, setExpandedGroup] = useState<string>("");
 
   const handleGroupCheckboxToggle = (
     activeConceptType: DibbsConceptType,
@@ -92,7 +91,6 @@ export const SelectionTable: React.FC<SelectionTableProps> = ({
   };
 
   const generateAccordionItems = (types: Array<DibbsConceptType>) => {
-    console.log("generating accordion items");
     const typesWithContent =
       types &&
       types.filter(
@@ -113,6 +111,9 @@ export const SelectionTable: React.FC<SelectionTableProps> = ({
             expanded={expanded?.indexOf(activeConceptType) > -1 || false}
           />
         );
+        // TODO: it seems that structuring the accordion generation this way doesn't
+        // rerender the accordion components on save, causing the numbers to update
+        // only partially. Refactor this accordingly
         const content = (
           <SelectionViewAccordionBody
             activeConceptType={activeConceptType}
@@ -156,7 +157,18 @@ export const SelectionTable: React.FC<SelectionTableProps> = ({
     groupedValueSetsForCondition &&
     (Object.keys(groupedValueSetsForCondition) as Array<DibbsConceptType>);
 
-  const accordionItems = generateAccordionItems(types);
+  const [expanded, setExpandedGroup] = useState<string>("");
+  const [accordionItems, setAccordionItems] = useState(
+    generateAccordionItems(types),
+  );
+
+  useEffect(() => {
+    console.log("generating new accordion items");
+    const newTypes =
+      selectedValueSets[conditionId] &&
+      (Object.keys(selectedValueSets[conditionId]) as Array<DibbsConceptType>);
+    setAccordionItems(generateAccordionItems(newTypes));
+  }, [selectedValueSets]);
 
   return (
     accordionItems && (
