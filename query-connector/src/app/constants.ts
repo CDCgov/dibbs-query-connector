@@ -253,7 +253,7 @@ export interface Concept {
 }
 
 /*
- * The expected type of an DIBBS ValueSet.
+ * The expected type of a DIBBS ValueSet.
  */
 export interface DibbsValueSet {
   valueSetId: string;
