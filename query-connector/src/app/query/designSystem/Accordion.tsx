@@ -14,6 +14,16 @@ export type AccordionProps = {
   accordionClassName?: string;
 };
 
+export type TrussAccordionProps = {
+  title: React.ReactNode | string;
+  content: React.ReactNode;
+  expanded: boolean;
+  id: string;
+  className?: string;
+  headingLevel: HeadingLevel;
+  handleToggle?: (event: React.MouseEvent<HTMLButtonElement>) => void;
+};
+
 /**
  * Accordion wrapper around the Truss implementation that takes in content-forward
  * params and puts it in the right data structure that Truss expects. Hiding

@@ -94,13 +94,10 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
     (vsName: string) =>
     (val: VsGrouping) => {
       setSelectedValueSets((prevState) => {
-        console.log(val);
         prevState[conditionId][vsType][vsName] = val;
         return prevState;
       });
     };
-
-  const handleVsTypeLevelUpdate = handleSelectedValueSetUpdate(activeCondition);
 
   return (
     <div
@@ -166,7 +163,9 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
             {selectedValueSets && activeCondition && (
               <SelectionTable
                 vsTypeLevelOptions={selectedValueSets[activeCondition]}
-                handleVsTypeLevelUpdate={handleVsTypeLevelUpdate}
+                handleVsTypeLevelUpdate={handleSelectedValueSetUpdate(
+                  activeCondition,
+                )}
               />
             )}
           </div>

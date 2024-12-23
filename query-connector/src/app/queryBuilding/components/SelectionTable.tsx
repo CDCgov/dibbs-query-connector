@@ -1,10 +1,6 @@
 "use client";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import styles from "../buildFromTemplates/buildfromTemplate.module.scss";
-import {
-  ConditionToConceptTypeToValueSetGroupingMap,
-  batchToggleConcepts,
-} from "../utils";
 import {
   HeadingLevel,
   Accordion as TrussAccordion,
@@ -16,6 +12,7 @@ import {
   VsGrouping,
 } from "@/app/utils/valueSetTranslation";
 import SelectionViewAccordionHeader from "./SelectionViewAccordionHeader";
+import { TrussAccordionProps } from "@/app/query/designSystem/Accordion";
 
 type SelectionTableProps = {
   vsTypeLevelOptions: ConceptTypeToVsNameToVsGroupingMap;
@@ -36,8 +33,11 @@ export const SelectionTable: React.FC<SelectionTableProps> = ({
   vsTypeLevelOptions,
   handleVsTypeLevelUpdate,
 }) => {
-  console.log(vsTypeLevelOptions);
   const [expanded, setExpandedGroup] = useState<string>("");
+  const [accordionItems, setAccordionItems] = useState<TrussAccordionProps[]>(
+    [],
+  );
+
   const generateTypeLevelAccordionItems = (vsType: DibbsConceptType) => {
     const handleVsNameLevelUpdate = handleVsTypeLevelUpdate(vsType);
 
@@ -45,7 +45,7 @@ export const SelectionTable: React.FC<SelectionTableProps> = ({
       <SelectionViewAccordionHeader
         activeValueSetType={vsType}
         activeVsGroupings={vsTypeLevelOptions[vsType]}
-        expanded={false}
+        expanded={expanded === vsType}
         handleVsNameLevelUpdate={handleVsNameLevelUpdate}
       />
     );
@@ -58,19 +58,11 @@ export const SelectionTable: React.FC<SelectionTableProps> = ({
     );
     const level: HeadingLevel = "h4";
 
-    const handleToggle = (e: React.MouseEvent) => {
-      const element = e.currentTarget.getAttribute("data-testid");
-      const startIndex = element?.indexOf(vsType) || 0;
-      const endIndex = vsType.length + startIndex;
-
-      if (expanded === vsType) {
-        // if the group we clicked on is currently expanded,
-        // toggle it closed
-        setExpandedGroup("");
-      } else {
-        // otherwise, expand the thing we clicked on
-        setExpandedGroup(element?.slice(startIndex, endIndex) || "");
-      }
+    const handleToggle = () => {
+      setExpandedGroup((prevState) => {
+        if (prevState === vsType) return "";
+        return vsType;
+      });
     };
 
     return {
@@ -83,17 +75,22 @@ export const SelectionTable: React.FC<SelectionTableProps> = ({
     };
   };
 
-  const accordionItems = Object.keys(vsTypeLevelOptions).map((vsType) => {
-    return (
+  useEffect(() => {
+    const accordionItems = Object.keys(vsTypeLevelOptions).map((vsType) => {
+      return generateTypeLevelAccordionItems(vsType as DibbsConceptType);
+    });
+    setAccordionItems(accordionItems);
+  }, [expanded]);
+
+  return (
+    accordionItems && (
       <div data-testid="accordion" className={styles.accordionContainer}>
         <TrussAccordion
-          items={[generateTypeLevelAccordionItems(vsType as DibbsConceptType)]}
+          items={accordionItems}
           multiselectable={false}
           className={styles.accordionInnerWrapper}
         />
       </div>
-    );
-  });
-
-  return accordionItems;
+    )
+  );
 };
