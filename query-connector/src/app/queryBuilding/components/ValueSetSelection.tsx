@@ -18,7 +18,12 @@ import {
 import { SelectionTable } from "./SelectionTable";
 
 import Drawer from "@/app/query/designSystem/drawer/Drawer";
-import { groupValueSetGroupingByConditionId } from "@/app/utils/valueSetTranslation";
+import {
+  ConceptTypeToVsNameToVsGroupingMap,
+  VsGrouping,
+  groupValueSetGroupingByConditionId,
+} from "@/app/utils/valueSetTranslation";
+import { DibbsConceptType } from "@/app/constants";
 
 type ConditionSelectionProps = {
   queryName: string;
@@ -45,7 +50,6 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
   const [selectedValueSets, setSelectedValueSets] =
     useState<ConditionToConceptTypeToValueSetGroupingMap>({});
 
-  console.log("VSSelection", selectedValueSets);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   useEffect(() => {
@@ -84,6 +88,20 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
       ),
     )
     .flat();
+
+  const handleSelectedValueSetUpdate =
+    (conditionId: string) =>
+    (vsType: DibbsConceptType) =>
+    (vsName: string) =>
+    (val: VsGrouping) => {
+      console.log(val);
+      setSelectedValueSets((prevState) => {
+        prevState[conditionId][vsType][vsName] = val;
+        return prevState;
+      });
+    };
+
+  const handleVsTypeLevelUpdate = handleSelectedValueSetUpdate(activeCondition);
 
   return (
     <div
@@ -148,9 +166,8 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
           <div>
             {selectedValueSets && activeCondition && (
               <SelectionTable
-                conditionId={activeCondition}
-                selectedValueSets={selectedValueSets}
-                setSelectedValueSets={setSelectedValueSets}
+                vsTypeLevelOptions={selectedValueSets[activeCondition]}
+                handleVsTypeLevelUpdate={handleVsTypeLevelUpdate}
               />
             )}
           </div>

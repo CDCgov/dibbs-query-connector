@@ -19,6 +19,12 @@ export type ConceptTypeToVsNameToVsGroupingMap = {
 };
 
 type VsNameAuthorSystem = string;
+export function getNameAuthorSystemFromVSGrouping(vsGroup: VsGrouping) {
+  return `${vsGroup.valueSetName}:${vsGroup.author}:${vsGroup.system}`;
+}
+
+export type ConceptOption = { code: string; display: string; include: boolean };
+
 /**
  * Helper function that takes an array of value set items and groups them using
  * a combination of the value set name, author, and system to create a unique

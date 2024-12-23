@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useState, useRef } from "react";
 import { Button, Icon } from "@trussworks/react-uswds";
 import styles from "./drawer.module.css";
 import SearchField from "../searchField/SearchField";
@@ -6,16 +6,14 @@ import { showToastConfirmation } from "../toast/Toast";
 import WarningModal from "../modal/warningModal";
 import { ModalRef } from "../modal/Modal";
 
-type DrawerProps<T> = {
+type DrawerProps = {
   title: string;
   placeholder: string;
   toastMessage?: string;
   codes: React.ReactNode;
   isOpen: boolean;
-  onClose: () => void;
-  initialState: T;
-  currentState: T;
   onSave: () => void;
+  onClose: () => void;
 };
 
 /**
@@ -32,29 +30,17 @@ type DrawerProps<T> = {
  * @param root0.onSave - Callback when the "Save Changes" button is clicked.`
  * @returns The Drawer component.
  */
-const Drawer = <T,>({
+const Drawer: React.FC<DrawerProps> = ({
   title,
   placeholder,
   toastMessage,
   codes,
   isOpen,
   onClose,
-  initialState,
-  currentState,
   onSave,
-}: DrawerProps<T>) => {
-  const [hasChanges, setHasChanges] = useState(false);
+}: DrawerProps) => {
+  const [hasChanges, setHasChanges] = useState(true);
   const modalRef = useRef<ModalRef>(null);
-
-  // Compare initialState and currentState
-  useEffect(() => {
-    const deepEqual = (obj1: T, obj2: T): boolean => {
-      return JSON.stringify(obj1) === JSON.stringify(obj2);
-    };
-
-    const statesAreEqual = deepEqual(initialState, currentState);
-    setHasChanges(!statesAreEqual);
-  }, [initialState, currentState]);
 
   const handleSaveChanges = () => {
     onSave();

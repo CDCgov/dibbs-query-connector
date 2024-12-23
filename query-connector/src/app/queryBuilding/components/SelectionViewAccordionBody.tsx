@@ -6,72 +6,60 @@ import { tallyConceptsForSingleValueSet } from "../utils";
 import React, { Dispatch, SetStateAction, useState } from "react";
 import ConceptSelection from "./ConceptSelection";
 import Drawer from "@/app/query/designSystem/drawer/Drawer";
-import { VsGrouping } from "@/app/utils/valueSetTranslation";
+import {
+  ConceptOption,
+  VsGrouping,
+  getNameAuthorSystemFromVSGrouping,
+} from "@/app/utils/valueSetTranslation";
 import { DibbsConceptType } from "@/app/constants";
 
 type SelectionViewAccordionBodyProps = {
   id?: string;
-  setSelectedValueSets: Dispatch<
-    SetStateAction<ConditionToConceptTypeToValueSetGroupingMap>
-  >;
-  conditionId: string;
-  activeVsGroupings: VsGrouping[];
-  activeValueSetType: DibbsConceptType;
+  activeVsGroupings: { [vsNameAuthorSystem: string]: VsGrouping };
+  handleVsNameLevelUpdate: (vsName: string) => (val: VsGrouping) => void;
 };
 
 /**
  * An accordion body fragment
  * @param param0 - params
- * @param param0.activeValueSetType - DibbsConceptType for display in this accordion
  * @param param0.activeVsGroupings - VsGroupings[] for display in this accordion
  * @param param0.setSelectedValueSets
  * @param param0.conditionId
  * @returns An accordion body component
  */
 const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
-  activeValueSetType,
   activeVsGroupings,
-  setSelectedValueSets,
-  conditionId,
+  handleVsNameLevelUpdate,
 }) => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [drawerTitle, setDrawerTitle] = useState<string>("");
-  const [initialConcepts, setInitialConcepts] = useState<
-    { code: string; display: string; include: boolean }[]
-  >([]);
+  const [activeVsGrouping, setActiveVsGrouping] = useState<VsGrouping>();
+  const [curConcepts, setCurConcepts] = useState<ConceptOption[]>();
 
-  const [currentConcepts, setCurrentConcepts] = useState<
-    { code: string; display: string; include: boolean }[]
-  >([]);
-
-  const handleViewCodes = (
-    vsName: string,
-    concepts: { code: string; display: string; include: boolean }[],
-  ) => {
-    setDrawerTitle(vsName);
-    setInitialConcepts([...concepts]);
-    setCurrentConcepts([...concepts]);
+  const handleViewCodes = (vs: VsGrouping) => {
+    setActiveVsGrouping(vs);
+    setCurConcepts(vs.items.map((i) => i.concepts).flat());
     setIsDrawerOpen(true);
   };
 
-  const handleConceptsChange = (
-    updatedConcepts: { code: string; display: string; include: boolean }[],
-  ) => {
-    setCurrentConcepts(updatedConcepts);
+  const handleConceptsChange = (updatedConcepts: ConceptOption[]) => {
+    setCurConcepts(updatedConcepts);
   };
 
   const handleSaveChanges = () => {
-    activeVsGroupings.map((groupedVS) => {
-      if (groupedVS.valueSetName === drawerTitle) {
-        const groupVSNameAuthorSystem = `${groupedVS.valueSetName}:${groupedVS.author}:${groupedVS.system}`;
-        setSelectedValueSets((prevState) => {
-          prevState[conditionId][activeValueSetType][groupVSNameAuthorSystem] =
-            {
-              ...groupedVS,
-              items: [{ ...groupedVS.items[0], concepts: currentConcepts }],
-            };
-          return prevState;
-        });
+    Object.values(activeVsGroupings).map((groupedVS) => {
+      if (
+        groupedVS.valueSetName === activeVsGrouping?.valueSetName &&
+        curConcepts
+      ) {
+        const activeVsName =
+          getNameAuthorSystemFromVSGrouping(activeVsGrouping);
+        const updatedVsGrouping = structuredClone(activeVsGrouping);
+        updatedVsGrouping.items = [
+          { ...activeVsGrouping.items[0], concepts: curConcepts },
+        ];
+
+        console.log(updatedVsGrouping);
+        handleVsNameLevelUpdate(activeVsName)(updatedVsGrouping);
       }
     });
     setIsDrawerOpen(false);
@@ -79,7 +67,7 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
 
   return (
     <div>
-      {activeVsGroupings.map((vs) => {
+      {Object.values(activeVsGroupings).map((vs) => {
         const selectedCount = tallyConceptsForSingleValueSet(vs, true);
         const totalCount = tallyConceptsForSingleValueSet(vs, false);
         const checked = vs.items[0].includeValueSet || selectedCount > 0;
@@ -87,7 +75,7 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
         return (
           <div
             className={styles.accordionBodyExpanded}
-            key={`${activeValueSetType}-${vs.valueSetName}`}
+            key={`${vs.valueSetName}`}
           >
             <div className={styles.accordionExpandedInner}>
               <Checkbox
@@ -97,7 +85,7 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
                 onChange={(e) => {
                   e.stopPropagation();
                 }}
-                id={`${vs.valueSetName}-${activeValueSetType}`}
+                id={`${vs.valueSetName}`}
                 checked={checked}
               />
             </div>
@@ -108,9 +96,7 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
               <div
                 className={styles.viewCodesBtn}
                 role="button"
-                onClick={() =>
-                  handleViewCodes(vs.valueSetName, vs.items[0].concepts)
-                }
+                onClick={() => handleViewCodes(vs)}
               >
                 View Codes
               </div>
@@ -118,22 +104,22 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
           </div>
         );
       })}
-      <Drawer
-        title={drawerTitle}
-        placeholder="Search by code or name"
-        toastMessage="Valueset concepts have been successfully modified."
-        codes={
-          <ConceptSelection
-            concepts={currentConcepts}
-            onConceptsChange={handleConceptsChange}
-          />
-        }
-        isOpen={isDrawerOpen}
-        onClose={() => setIsDrawerOpen(false)}
-        initialState={initialConcepts}
-        currentState={currentConcepts}
-        onSave={handleSaveChanges}
-      />
+      {curConcepts && activeVsGrouping && (
+        <Drawer
+          title={activeVsGrouping.valueSetName}
+          placeholder="Search by code or name"
+          toastMessage="Valueset concepts have been successfully modified."
+          codes={
+            <ConceptSelection
+              concepts={curConcepts}
+              onConceptsChange={handleConceptsChange}
+            />
+          }
+          isOpen={isDrawerOpen}
+          onClose={() => setIsDrawerOpen(false)}
+          onSave={handleSaveChanges}
+        />
+      )}
     </div>
   );
 };

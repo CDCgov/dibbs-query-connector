@@ -1,12 +1,11 @@
 import React from "react";
 import { Checkbox } from "@trussworks/react-uswds";
 import styles from "../buildFromTemplates/buildfromTemplate.module.scss";
+import { ConceptOption } from "@/app/utils/valueSetTranslation";
 
 type ConceptSelectionProps = {
-  concepts: { code: string; display: string; include: boolean }[];
-  onConceptsChange: (
-    updatedConcepst: { code: string; display: string; include: boolean }[],
-  ) => void;
+  concepts: ConceptOption[];
+  onConceptsChange: (updatedConcepst: ConceptOption[]) => void;
 };
 
 /**
