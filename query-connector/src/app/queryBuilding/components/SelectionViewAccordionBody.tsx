@@ -15,7 +15,6 @@ type SelectionViewAccordionBodyProps = {
     SetStateAction<ConditionToConceptTypeToValueSetGroupingMap>
   >;
   conditionId: string;
-  activeConceptType: DibbsConceptType;
   activeVsGroupings: VsGrouping[];
   activeValueSetType: DibbsConceptType;
 };
