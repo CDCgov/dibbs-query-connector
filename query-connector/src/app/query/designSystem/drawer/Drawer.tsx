@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import { Button, Icon } from "@trussworks/react-uswds";
 import styles from "./drawer.module.css";
 import SearchField from "../searchField/SearchField";
@@ -10,10 +10,11 @@ type DrawerProps = {
   title: string;
   placeholder: string;
   toastMessage?: string;
-  codes: React.ReactNode;
+  toRender: React.ReactNode;
   isOpen: boolean;
   onSave: () => void;
   onClose: () => void;
+  renderData: any;
 };
 
 /**
@@ -22,24 +23,30 @@ type DrawerProps = {
  * @param root0.title - The title displayed in the drawer.
  * @param root0.placeholder - The placeholder text for the search field.
  * @param root0.toastMessage - Optional message to show in a toast when the drawer closes.
- * @param root0.codes - The dynamic content to display.
  * @param root0.isOpen - Boolean to control the visibility of the drawer.
  * @param root0.onClose - Function to handle closing the drawer.
  * @param root0.initialState - The initial state to compare changes.
  * @param root0.currentState - The current state to check for changes.
  * @param root0.onSave - Callback when the "Save Changes" button is clicked.`
+ * @param root0.toRender - The dynamic content to display.
  * @returns The Drawer component.
  */
 const Drawer: React.FC<DrawerProps> = ({
   title,
   placeholder,
   toastMessage,
-  codes,
   isOpen,
   onClose,
   onSave,
+  toRender,
+  renderData,
 }: DrawerProps) => {
-  const [hasChanges, setHasChanges] = useState(true);
+  const [data] = useState(renderData);
+
+  const hasChanges = useMemo(() => {
+    return renderData !== data;
+  }, [renderData, data]);
+
   const modalRef = useRef<ModalRef>(null);
 
   const handleSaveChanges = () => {
@@ -76,13 +83,15 @@ const Drawer: React.FC<DrawerProps> = ({
             <Icon.Close size={3} aria-label="X icon indicating closure" />
           </button>
           <h2 className="margin-0 padding-bottom-2">{title}</h2>
-          <Button
-            type="button"
-            onClick={handleSaveChanges}
-            disabled={!hasChanges}
-          >
-            Save changes
-          </Button>
+          {hasChanges !== undefined && (
+            <Button
+              type="button"
+              onClick={handleSaveChanges}
+              disabled={!hasChanges}
+            >
+              Save changes
+            </Button>
+          )}
           <div className="padding-top-5">
             <SearchField
               id="searchFieldTemplate"
@@ -93,19 +102,21 @@ const Drawer: React.FC<DrawerProps> = ({
               }}
             />
           </div>
-          <div className="padding-top-2">{codes}</div>
+          <div className="padding-top-2">{toRender}</div>
         </div>
       </div>
 
       {isOpen && <div className={styles.overlay} onClick={handleClose}></div>}
 
-      <WarningModal
-        modalRef={modalRef}
-        heading="Unsaved Changes"
-        description="You have unsaved changes. Do you want to dismiss them?"
-        onSave={handleSaveChanges}
-        onCancel={onClose}
-      />
+      {hasChanges !== undefined && (
+        <WarningModal
+          modalRef={modalRef}
+          heading="Unsaved Changes"
+          description="You have unsaved changes. Do you want to dismiss them?"
+          onSave={handleSaveChanges}
+          onCancel={onClose}
+        />
+      )}
     </>
   );
 };

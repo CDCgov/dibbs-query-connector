@@ -19,7 +19,6 @@ import { SelectionTable } from "./SelectionTable";
 
 import Drawer from "@/app/query/designSystem/drawer/Drawer";
 import {
-  ConceptTypeToVsNameToVsGroupingMap,
   VsGrouping,
   groupValueSetGroupingByConditionId,
 } from "@/app/utils/valueSetTranslation";
@@ -94,8 +93,8 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
     (vsType: DibbsConceptType) =>
     (vsName: string) =>
     (val: VsGrouping) => {
-      console.log(val);
       setSelectedValueSets((prevState) => {
+        console.log(val);
         prevState[conditionId][vsType][vsName] = val;
         return prevState;
       });
@@ -177,13 +176,12 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
       <Drawer
         title="Add Condition(s)"
         placeholder="Search conditions"
-        codes={<div>Dynamic codes go here</div>}
+        toRender={<div>Dynamic codes go here</div>}
         toastMessage="Condition has been successfully added."
         isOpen={isDrawerOpen}
         onClose={handleCloseDrawer}
-        initialState={{}} //TODO
-        currentState={{}} //TODO
         onSave={() => {}} //TODO
+        renderData={[]}
       />
     </div>
   );

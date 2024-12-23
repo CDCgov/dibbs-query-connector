@@ -158,7 +158,7 @@ export function formatDiseaseDisplay(diseaseName: string) {
  * included concepts (defaults to false)
  * @returns A number indicating the tally of relevant concpets
  */
-export function tallyConceptsForSingleValueSet(
+export function tallyConceptsForSingleValueSetGroup(
   valueSet: VsGrouping,
   filterInclude?: boolean,
 ) {
@@ -187,12 +187,15 @@ export function tallyConceptsForSingleValueSet(
  * included concepts
  * @returns A number indicating the tally of relevant concpets
  */
-export function tallyConceptsForValueSetGroup(
+export function tallyConceptsForValueSetGroupArray(
   valueSets: VsGrouping[],
   filterInclude?: boolean,
 ) {
   const selectedTotal = valueSets.reduce((sum, valueSet) => {
-    const childTotal = tallyConceptsForSingleValueSet(valueSet, filterInclude);
+    const childTotal = tallyConceptsForSingleValueSetGroup(
+      valueSet,
+      filterInclude,
+    );
     sum += childTotal;
     return sum;
   }, 0);
