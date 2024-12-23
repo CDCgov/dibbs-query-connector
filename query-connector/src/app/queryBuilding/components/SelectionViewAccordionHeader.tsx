@@ -8,8 +8,6 @@ import { tallyConceptsForValueSetGroup } from "../utils";
 type SelectionViewAccordionBodyProps = {
   activeValueSetType: DibbsConceptType;
   conditionId: string;
-  selectedCount: number;
-  totalCount: number;
   activeVsGroupings: VsGrouping[];
   handleCheckboxToggle: (
     activeValueSetType: DibbsConceptType,

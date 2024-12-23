@@ -41,6 +41,7 @@ export const SelectionTable: React.FC<SelectionTableProps> = ({
   setValueSets,
 }) => {
   const groupedValueSetsForCondition = selectedValueSets[conditionId];
+  const [expanded, setExpandedGroup] = useState<string>("");
 
   const handleGroupCheckboxToggle = (
     activeValueSetType: DibbsConceptType,
@@ -109,21 +110,10 @@ export const SelectionTable: React.FC<SelectionTableProps> = ({
         const activeVsGroupings = Object.values(
           groupedValueSetsForCondition[activeValueSetType],
         );
-        const totalCount = tallyConceptsForValueSetGroup(
-          activeVsGroupings,
-          false,
-        );
-        const selectedCount = tallyConceptsForValueSetGroup(
-          activeVsGroupings,
-          true,
-        );
-
         const title = (
           <SelectionViewAccordionHeader
             activeValueSetType={activeValueSetType}
             conditionId={conditionId}
-            totalCount={totalCount}
-            selectedCount={selectedCount}
             activeVsGroupings={activeVsGroupings}
             handleCheckboxToggle={handleGroupCheckboxToggle}
             expanded={expanded?.indexOf(activeValueSetType) > -1 || false}
@@ -173,18 +163,7 @@ export const SelectionTable: React.FC<SelectionTableProps> = ({
     groupedValueSetsForCondition &&
     (Object.keys(groupedValueSetsForCondition) as Array<DibbsConceptType>);
 
-  const [expanded, setExpandedGroup] = useState<string>("");
-  const [accordionItems, setAccordionItems] = useState(
-    generateAccordionItems(types),
-  );
-
-  useEffect(() => {
-    console.log("generating new accordion items");
-    const newTypes =
-      selectedValueSets[conditionId] &&
-      (Object.keys(selectedValueSets[conditionId]) as Array<DibbsConceptType>);
-    setAccordionItems(generateAccordionItems(newTypes));
-  }, [selectedValueSets]);
+  const accordionItems = generateAccordionItems(types);
 
   return (
     accordionItems && (
