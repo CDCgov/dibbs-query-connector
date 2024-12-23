@@ -1,34 +1,34 @@
 import { Checkbox } from "@trussworks/react-uswds";
 import styles from "../buildFromTemplates/buildfromTemplate.module.scss";
-import { GroupedValueSet } from "@/app/query/components/customizeQuery/customizeQueryUtils";
 import { formatDiseaseDisplay } from "../utils";
 import { tallyConceptsForSingleValueSet } from "../utils";
-import { DibbsValueSetType } from "@/app/constants";
 import Drawer from "@/app/query/designSystem/drawer/Drawer";
 import React, { useState } from "react";
+import { VsGrouping } from "@/app/utils/valueSetTranslation";
+import { DibbsConceptType } from "@/app/constants";
 
 type SelectionViewAccordionBodyProps = {
   id?: string;
-  valueSetType: DibbsValueSetType;
-  valueSetsForType: GroupedValueSet[];
+  activeValueSetType: DibbsConceptType;
+  activeVsGroupings: VsGrouping[];
   handleCheckboxToggle: (
-    valueSetType: DibbsValueSetType,
-    groupedValueSet: GroupedValueSet,
+    activeValueSetType: DibbsConceptType,
+    groupedValueSet: VsGrouping,
   ) => void;
 };
 
 /**
  * Fragment component to style out some of the accordion bodies
  * @param param0 - params
- * @param param0.valueSetType - DibbsValueSetType (labs, conditions, medications)
- * @param param0.valueSetsForType - ValueSets for a given ValueSetType
+ * @param param0.activeValueSetType - DibbsConceptType for display in this accordion
+ * @param param0.activeVsGroupings - VsGroupings[] for display in this accordion
  * @param param0.handleCheckboxToggle - Listener event to handle a ValueSet inclusion/
  * exclusion check
  * @returns An accordion body component
  */
 const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
-  valueSetType,
-  valueSetsForType,
+  activeValueSetType,
+  activeVsGroupings,
   handleCheckboxToggle,
 }) => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -43,8 +43,8 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
 
   return (
     <div>
-      {valueSetsForType &&
-        valueSetsForType.map((vs) => {
+      {activeVsGroupings &&
+        activeVsGroupings.map((vs) => {
           const selectedCount = tallyConceptsForSingleValueSet(vs, true);
           const totalCount = tallyConceptsForSingleValueSet(vs, false);
           const checked =
@@ -53,7 +53,7 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
           return (
             <div
               className={styles.accordionBodyExpanded}
-              key={`${valueSetType}-${vs.valueSetName}`}
+              key={`${activeValueSetType}-${vs.valueSetName}`}
             >
               <div className={styles.accordionExpandedInner}>
                 <Checkbox
@@ -62,9 +62,9 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
                   label={checkboxLabel(vs.valueSetName, vs.author, vs.system)}
                   onChange={(e) => {
                     e.stopPropagation();
-                    handleCheckboxToggle(valueSetType, vs);
+                    handleCheckboxToggle(activeValueSetType, vs);
                   }}
-                  id={`${vs.valueSetName}-${valueSetType}`}
+                  id={`${vs.valueSetName}-${activeValueSetType}`}
                   checked={checked}
                 />
               </div>

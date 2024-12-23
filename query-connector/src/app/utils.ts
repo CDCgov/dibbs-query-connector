@@ -1,9 +1,9 @@
 import { QueryResultRow } from "pg";
-import { ValueSet } from "./constants";
+import { DibbsValueSet } from "./constants";
 
 type QueryTableQueryDataColumn = {
   [condition_name: string]: {
-    [valueSetId: string]: ValueSet;
+    [valueSetId: string]: DibbsValueSet;
   };
 };
 
@@ -16,7 +16,7 @@ type QueryTableQueryDataColumn = {
  */
 export const unnestValueSetsFromQuery = (
   rows: QueryResultRow[],
-): ValueSet[] => {
+): DibbsValueSet[] => {
   // Unest the {condition: valuesetId: valueSet} nesting in an array of valueSets
   const valueSets = rows
     .map((curRow) => {
@@ -68,11 +68,11 @@ export const groupConditionConceptsIntoValueSets = (rows: QueryResultRow[]) => {
  */
 function mapStoredValueSetIntoInternalValueset(
   conceptGroup: QueryResultRow[],
-): ValueSet {
+): DibbsValueSet {
   // For info that should be the same at the valueset-level, just use the first
   // fetched concept to populate
   const storedConcept = conceptGroup[0];
-  const valueSet: ValueSet = {
+  const valueSet: DibbsValueSet = {
     valueSetId: storedConcept["valueset_id"],
     valueSetVersion: storedConcept["version"],
     valueSetName: storedConcept["valueset_name"],
