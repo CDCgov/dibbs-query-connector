@@ -3,11 +3,11 @@ import styles from "../buildFromTemplates/buildfromTemplate.module.scss";
 import { ConditionToConceptTypeToValueSetGroupingMap } from "../utils";
 import { formatDiseaseDisplay } from "../utils";
 import { tallyConceptsForSingleValueSet } from "../utils";
-import { DibbsConceptType } from "@/app/constants";
-import Drawer from "@/app/query/designSystem/drawer/Drawer";
 import React, { Dispatch, SetStateAction, useState } from "react";
 import ConceptSelection from "./ConceptSelection";
+import Drawer from "@/app/query/designSystem/drawer/Drawer";
 import { VsGrouping } from "@/app/utils/valueSetTranslation";
+import { DibbsConceptType } from "@/app/constants";
 
 type SelectionViewAccordionBodyProps = {
   id?: string;
@@ -17,20 +17,18 @@ type SelectionViewAccordionBodyProps = {
   conditionId: string;
   activeConceptType: DibbsConceptType;
   activeVsGroupings: VsGrouping[];
+  activeValueSetType: DibbsConceptType;
 };
 
 /**
  * An accordion body fragment
  * @param param0 - params
- * @param param0.activeConceptType - the DibbsConceptType of the current accordion
- * @param param0.activeVsGroupings - the ValueSetGroupings associated
- * with the activeConceptTypes
- * @param param0.setValueSets - setter function the ValueSets to be built
- * @param param0.conditionId - the conditionId for the query in progress
+ * @param param0.activeValueSetType - DibbsConceptType for display in this accordion
+ * @param param0.activeVsGroupings - VsGroupings[] for display in this accordion
  * @returns An accordion body component
  */
 const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
-  activeConceptType,
+  activeValueSetType,
   activeVsGroupings,
   setValueSets,
   conditionId,
@@ -66,10 +64,11 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
       if (groupedVS.valueSetName === drawerTitle) {
         const groupVSNameAuthorSystem = `${groupedVS.valueSetName}:${groupedVS.author}:${groupedVS.system}`;
         setValueSets((prevState) => {
-          prevState[conditionId][activeConceptType][groupVSNameAuthorSystem] = {
-            ...groupedVS,
-            items: [{ ...groupedVS.items[0], concepts: currentConcepts }],
-          };
+          prevState[conditionId][activeValueSetType][groupVSNameAuthorSystem] =
+            {
+              ...groupedVS,
+              items: [{ ...groupedVS.items[0], concepts: currentConcepts }],
+            };
           return prevState;
         });
       }
@@ -87,7 +86,7 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
         return (
           <div
             className={styles.accordionBodyExpanded}
-            key={`${activeConceptType}-${vs.valueSetName}`}
+            key={`${activeValueSetType}-${vs.valueSetName}`}
           >
             <div className={styles.accordionExpandedInner}>
               <Checkbox
@@ -97,7 +96,7 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
                 onChange={(e) => {
                   e.stopPropagation();
                 }}
-                id={`${vs.valueSetName}-${activeConceptType}`}
+                id={`${vs.valueSetName}-${activeValueSetType}`}
                 checked={checked}
               />
             </div>

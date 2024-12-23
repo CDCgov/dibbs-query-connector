@@ -2,21 +2,26 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import styles from "../buildFromTemplates/buildfromTemplate.module.scss";
 import {
-  batchToggleConcepts,
   ConditionToConceptTypeToValueSetGroupingMap,
+  batchToggleConcepts,
+  tallyConceptsForValueSetGroup,
 } from "../utils";
-import { DibbsConceptType } from "@/app/constants";
 import {
   HeadingLevel,
   Accordion as TrussAccordion,
 } from "@trussworks/react-uswds";
 import SelectionViewAccordionHeader from "./SelectionViewAccordionHeader";
 import SelectionViewAccordionBody from "./SelectionViewAccordionBody";
-import { VsGrouping } from "@/app/utils/valueSetTranslation";
+import { DibbsConceptType } from "@/app/constants";
+import {
+  ConceptTypeToVsNameToVsGroupingMap,
+  VsGrouping,
+} from "@/app/utils/valueSetTranslation";
 
 type SelectionTableProps = {
-  conditionId: string;
   selectedValueSets: ConditionToConceptTypeToValueSetGroupingMap;
+  conditionId: string;
+  groupedValueSetsForCondition: ConceptTypeToVsNameToVsGroupingMap;
   setValueSets: Dispatch<
     SetStateAction<ConditionToConceptTypeToValueSetGroupingMap>
   >;
@@ -38,14 +43,14 @@ export const SelectionTable: React.FC<SelectionTableProps> = ({
   const groupedValueSetsForCondition = selectedValueSets[conditionId];
 
   const handleGroupCheckboxToggle = (
-    activeConceptType: DibbsConceptType,
+    activeValueSetType: DibbsConceptType,
     groupedValueSets: VsGrouping[],
     isBatchUpdate: boolean,
     currentCheckboxStatus?: boolean,
   ) => {
     groupedValueSets.forEach((vs) => {
       handleSingleCheckboxToggle(
-        activeConceptType,
+        activeValueSetType,
         vs,
         isBatchUpdate,
         !currentCheckboxStatus,
@@ -54,14 +59,14 @@ export const SelectionTable: React.FC<SelectionTableProps> = ({
   };
 
   const handleSingleCheckboxToggle = (
-    activeConceptType: DibbsConceptType,
+    activeValueSetType: DibbsConceptType,
     groupedValueSet: VsGrouping,
     isBatchUpdate: boolean = false,
     batchValue?: boolean,
   ) => {
     const vsNameAuthorSystem = `${groupedValueSet.valueSetName}:${groupedValueSet.author}:${groupedValueSet.system}`;
     const updatedVS =
-      groupedValueSetsForCondition[activeConceptType][vsNameAuthorSystem];
+      groupedValueSetsForCondition[activeValueSetType][vsNameAuthorSystem];
 
     if (isBatchUpdate && batchValue !== undefined) {
       groupedValueSet.items = Object.values(updatedVS.items).map((vs) => {
@@ -79,13 +84,14 @@ export const SelectionTable: React.FC<SelectionTableProps> = ({
       });
     }
 
-    groupedValueSetsForCondition[activeConceptType] = {
-      ...groupedValueSetsForCondition[activeConceptType],
+    groupedValueSetsForCondition[activeValueSetType] = {
+      ...groupedValueSetsForCondition[activeValueSetType],
       [vsNameAuthorSystem]: groupedValueSet,
     };
 
     setValueSets((prevState) => {
-      prevState[conditionId][activeConceptType][vsNameAuthorSystem] = updatedVS;
+      prevState[conditionId][activeValueSetType][vsNameAuthorSystem] =
+        updatedVS;
       return prevState;
     });
   };
@@ -99,17 +105,28 @@ export const SelectionTable: React.FC<SelectionTableProps> = ({
 
     const ValueSetAccordionItems =
       typesWithContent &&
-      typesWithContent.map((activeConceptType) => {
+      typesWithContent.map((activeValueSetType) => {
         const activeVsGroupings = Object.values(
-          groupedValueSetsForCondition[activeConceptType],
+          groupedValueSetsForCondition[activeValueSetType],
         );
+        const totalCount = tallyConceptsForValueSetGroup(
+          activeVsGroupings,
+          false,
+        );
+        const selectedCount = tallyConceptsForValueSetGroup(
+          activeVsGroupings,
+          true,
+        );
+
         const title = (
           <SelectionViewAccordionHeader
-            activeConceptType={activeConceptType}
+            activeValueSetType={activeValueSetType}
             conditionId={conditionId}
+            totalCount={totalCount}
+            selectedCount={selectedCount}
             activeVsGroupings={activeVsGroupings}
             handleCheckboxToggle={handleGroupCheckboxToggle}
-            expanded={expanded?.indexOf(activeConceptType) > -1 || false}
+            expanded={expanded?.indexOf(activeValueSetType) > -1 || false}
           />
         );
         // TODO: it seems that structuring the accordion generation this way doesn't
@@ -117,7 +134,7 @@ export const SelectionTable: React.FC<SelectionTableProps> = ({
         // only partially. Refactor this accordingly
         const content = (
           <SelectionViewAccordionBody
-            activeConceptType={activeConceptType}
+            activeValueSetType={activeValueSetType}
             activeVsGroupings={activeVsGroupings}
             setValueSets={setValueSets}
             conditionId={conditionId}
@@ -127,10 +144,10 @@ export const SelectionTable: React.FC<SelectionTableProps> = ({
 
         const handleToggle = (e: React.MouseEvent) => {
           const element = e.currentTarget.getAttribute("data-testid");
-          const startIndex = element?.indexOf(activeConceptType) || 0;
-          const endIndex = activeConceptType.length + startIndex;
+          const startIndex = element?.indexOf(activeValueSetType) || 0;
+          const endIndex = activeValueSetType.length + startIndex;
 
-          if (expanded == activeConceptType) {
+          if (expanded == activeValueSetType) {
             // if the group we clicked on is currently expanded,
             // toggle it closed
             setExpandedGroup("");
@@ -144,7 +161,7 @@ export const SelectionTable: React.FC<SelectionTableProps> = ({
           title,
           content,
           expanded: false,
-          id: `${activeConceptType}-${conditionId}`,
+          id: `${activeValueSetType}-${conditionId}`,
           headingLevel: level,
           handleToggle,
         };
