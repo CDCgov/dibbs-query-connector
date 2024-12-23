@@ -7,7 +7,7 @@ import { getConditionsData } from "@/app/database-service";
 import {
   CategoryNameToConditionOptionMap,
   groupConditionDataByCategoryName,
-  ConditionIdToValueSetArray,
+  ConditionIdToValueSetArrayMap,
 } from "../utils";
 import ConditionColumnDisplay from "../buildFromTemplates/ConditionColumnDisplay";
 import SearchField from "@/app/query/designSystem/searchField/SearchField";
@@ -32,7 +32,7 @@ type ConditionSelectionProps = {
   setLoading: Dispatch<SetStateAction<boolean>>;
   loading: boolean;
   setConditionValueSets: Dispatch<
-    SetStateAction<ConditionIdToValueSetArray | undefined>
+    SetStateAction<ConditionIdToValueSetArrayMap | undefined>
   >;
   updateFetched: (selectedConditions: CategoryNameToConditionOptionMap) => void;
 };

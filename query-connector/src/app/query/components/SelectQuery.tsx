@@ -4,7 +4,7 @@ import {
   FHIR_SERVERS,
   USE_CASES,
   USE_CASE_DETAILS,
-  ValueSet,
+  DibbsValueSet,
 } from "../../constants";
 import CustomizeQuery from "./CustomizeQuery";
 import SelectSavedQuery from "./selectQuery/SelectSavedQuery";
@@ -62,8 +62,8 @@ const SelectQuery: React.FC<SelectQueryProps> = ({
   setFhirServer,
   setShowCustomizeQuery,
 }) => {
-  const [queryValueSets, setQueryValueSets] = useState<ValueSet[]>(
-    [] as ValueSet[],
+  const [queryValueSets, setQueryValueSets] = useState<DibbsValueSet[]>(
+    [] as DibbsValueSet[],
   );
   const [loadingQueryValueSets, setLoadingQueryValueSets] =
     useState<boolean>(true);

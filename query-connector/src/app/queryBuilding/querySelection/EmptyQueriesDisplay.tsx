@@ -3,7 +3,7 @@ import { useState } from "react";
 import styles from "./querySelection.module.scss";
 import classNames from "classnames";
 import WorkSpaceSetUpView from "./WorkspaceSetUp";
-import { createDibbsDB } from "@/db-creation";
+import { createDibbsDB } from "@/app/backend/dbCreation/db-creation";
 /**
  * Empty-state component for query building
  * @returns the EmptyQueriesDisplay to render the empty state status

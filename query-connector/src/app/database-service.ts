@@ -1,17 +1,10 @@
 "use server";
-import {
-  Bundle,
-  OperationOutcome,
-  ValueSet as FhirValueSet,
-  Parameters,
-} from "fhir/r4";
+import { Bundle, OperationOutcome, Parameters } from "fhir/r4";
 import {
   Concept,
-  ErsdConceptType,
   INTENTIONAL_EMPTY_STRING_FOR_CONCEPT_VERSION,
   INTENTIONAL_EMPTY_STRING_FOR_GEM_CODE,
-  ValueSet,
-  ersdToDibbsConceptMap,
+  DibbsValueSet,
   FhirServerConfig,
 } from "./constants";
 import { encode } from "base-64";
@@ -21,7 +14,7 @@ import {
   CustomUserQuery,
 } from "./query-building";
 import {
-  CategoryToConditionArrayMap,
+  CategoryToConditionToNameMap,
   ConditionIdToNameMap,
 } from "./queryBuilding/utils";
 import {
@@ -198,47 +191,11 @@ export async function getVSACValueSet(
 }
 
 /**
- * Translates a VSAC FHIR bundle to our internal ValueSet struct
- * @param fhirValueset - The FHIR ValueSet response from VSAC
- * @param ersdConceptType - The associated clinical concept type from ERSD
- * @returns An object of type InternalValueSet
- */
-export async function translateVSACToInternalValueSet(
-  fhirValueset: FhirValueSet,
-  ersdConceptType: ErsdConceptType,
-) {
-  const oid = fhirValueset.id;
-  const version = fhirValueset.version;
-
-  const name = fhirValueset.title;
-  const author = fhirValueset.publisher;
-
-  const bundleConceptData = fhirValueset?.compose?.include[0];
-  const system = bundleConceptData?.system;
-  const concepts = bundleConceptData?.concept?.map((fhirConcept) => {
-    return { ...fhirConcept, include: false } as Concept;
-  });
-
-  return {
-    valueSetId: `${oid}_${version}`,
-    valueSetVersion: version,
-    valueSetName: name,
-    valueSetExternalId: oid,
-    author: author,
-    system: system,
-    ersdConceptType: ersdConceptType,
-    dibbsConceptType: ersdToDibbsConceptMap[ersdConceptType],
-    includeValueSet: false,
-    concepts: concepts,
-  } as ValueSet;
-}
-
-/**
  * Function call to insert a new ValueSet into the database.
  * @param vs - a ValueSet in of the shape of our internal data model to insert
  * @returns success / failure information, as well as errors as appropriate
  */
-export async function insertValueSet(vs: ValueSet) {
+export async function insertValueSet(vs: DibbsValueSet) {
   let errorArray: string[] = [];
 
   const insertValueSetPromise = generateValueSetSqlPromise(vs);
@@ -290,7 +247,7 @@ export async function insertValueSet(vs: ValueSet) {
  * @param vs - The ValueSet in of the shape of our internal data model to insert
  * @returns The SQL statement for insertion
  */
-function generateValueSetSqlPromise(vs: ValueSet) {
+function generateValueSetSqlPromise(vs: DibbsValueSet) {
   const valueSetOid = vs.valueSetExternalId;
 
   // TODO: based on how non-VSAC valuests are shaped in the future, we may need
@@ -322,7 +279,7 @@ function generateValueSetSqlPromise(vs: ValueSet) {
  * @param vs - The ValueSet in of the shape of our internal data model to insert
  * @returns The SQL statement array for all concepts for insertion
  */
-function generateConceptSqlPromises(vs: ValueSet) {
+function generateConceptSqlPromises(vs: DibbsValueSet) {
   const insertConceptsSqlArray = vs.concepts.map((concept) => {
     const systemPrefix = stripProtocolAndTLDFromSystemUrl(vs.system);
     const conceptUniqueId = `${systemPrefix}_${concept.code}`;
@@ -345,7 +302,7 @@ function generateConceptSqlPromises(vs: ValueSet) {
   return insertConceptsSqlArray;
 }
 
-function generateValuesetConceptJoinSqlPromises(vs: ValueSet) {
+function generateValuesetConceptJoinSqlPromises(vs: DibbsValueSet) {
   const insertConceptsSqlArray = vs.concepts.map((concept) => {
     const systemPrefix = stripProtocolAndTLDFromSystemUrl(vs.system);
     const conceptUniqueId = `${systemPrefix}_${concept.code}`;
@@ -417,7 +374,7 @@ export async function insertQuery(input: QueryInput) {
  * @param vs The DIBBs internal representation of the value set to check.
  * @returns A data structure reporting on missing concepts or value set links.
  */
-export async function checkValueSetInsertion(vs: ValueSet) {
+export async function checkValueSetInsertion(vs: DibbsValueSet) {
   // Begin accumulating missing data
   const missingData = {
     missingValueSet: false,
@@ -532,7 +489,7 @@ export async function getConditionsData() {
   const rows = result.rows;
 
   // 1. Grouped by category with id:name pairs
-  const categoryToConditionArrayMap: CategoryToConditionArrayMap = rows.reduce(
+  const categoryToConditionArrayMap: CategoryToConditionToNameMap = rows.reduce(
     (acc, row) => {
       const { category, id, name } = row;
       if (!acc[category]) {
@@ -541,7 +498,7 @@ export async function getConditionsData() {
       acc[category].push({ [id]: name });
       return acc;
     },
-    {} as CategoryToConditionArrayMap,
+    {} as CategoryToConditionToNameMap,
   );
 
   // 2. ID-Name mapping
@@ -703,7 +660,9 @@ export async function getCustomQueries(): Promise<CustomUserQuery[]> {
     }
 
     Object.entries(
-      query_data as { [condition: string]: { [valueSetId: string]: ValueSet } },
+      query_data as {
+        [condition: string]: { [valueSetId: string]: DibbsValueSet };
+      },
     ).forEach(([_, includedValueSets]) => {
       Object.entries(includedValueSets).forEach(
         ([valueSetId, valueSetData]) => {

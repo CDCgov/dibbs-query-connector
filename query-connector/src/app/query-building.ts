@@ -1,12 +1,12 @@
 import { randomUUID } from "crypto";
-import { ValueSet } from "./constants";
+import { DibbsValueSet } from "./constants";
 
 // TODO: Potentially merge this / infer this from the type created via the
 // database creation workstream
 export type QueryInput = {
   queryName: string;
   author: string;
-  valueSets: ValueSet[];
+  valueSets: DibbsValueSet[];
   timeWindowUnit?: string; // TODO: should probably type this more strongly
   timeWindowNumber?: Number;
 };
@@ -47,5 +47,5 @@ export interface CustomUserQuery {
   query_id: string;
   query_name: string;
   conditions_list?: string;
-  valuesets: ValueSet[];
+  valuesets: DibbsValueSet[];
 }
