@@ -11,7 +11,7 @@ import { DibbsConceptType } from "@/app/constants";
 
 type SelectionViewAccordionBodyProps = {
   id?: string;
-  setValueSets: Dispatch<
+  setSelectedValueSets: Dispatch<
     SetStateAction<ConditionToConceptTypeToValueSetGroupingMap>
   >;
   conditionId: string;
@@ -24,14 +24,14 @@ type SelectionViewAccordionBodyProps = {
  * @param param0 - params
  * @param param0.activeValueSetType - DibbsConceptType for display in this accordion
  * @param param0.activeVsGroupings - VsGroupings[] for display in this accordion
- * @param param0.setValueSets
+ * @param param0.setSelectedValueSets
  * @param param0.conditionId
  * @returns An accordion body component
  */
 const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
   activeValueSetType,
   activeVsGroupings,
-  setValueSets,
+  setSelectedValueSets,
   conditionId,
 }) => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -64,7 +64,7 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
     activeVsGroupings.map((groupedVS) => {
       if (groupedVS.valueSetName === drawerTitle) {
         const groupVSNameAuthorSystem = `${groupedVS.valueSetName}:${groupedVS.author}:${groupedVS.system}`;
-        setValueSets((prevState) => {
+        setSelectedValueSets((prevState) => {
           prevState[conditionId][activeValueSetType][groupVSNameAuthorSystem] =
             {
               ...groupedVS,

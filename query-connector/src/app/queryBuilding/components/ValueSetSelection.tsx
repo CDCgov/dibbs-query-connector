@@ -44,6 +44,8 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
   const [_searchFilter, setSearchFilter] = useState<string>();
   const [selectedValueSets, setSelectedValueSets] =
     useState<ConditionToConceptTypeToValueSetGroupingMap>({});
+
+  console.log("VSSelection", selectedValueSets);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   useEffect(() => {
@@ -148,7 +150,7 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
               <SelectionTable
                 conditionId={activeCondition}
                 selectedValueSets={selectedValueSets}
-                setValueSets={setSelectedValueSets}
+                setSelectedValueSets={setSelectedValueSets}
               />
             )}
           </div>
