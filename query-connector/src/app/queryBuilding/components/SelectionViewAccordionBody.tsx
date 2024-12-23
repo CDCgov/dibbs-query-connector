@@ -9,10 +9,10 @@ import { DibbsConceptType } from "@/app/constants";
 
 type SelectionViewAccordionBodyProps = {
   id?: string;
-  activeConceptType: DibbsConceptType;
+  activeValueSetType: DibbsConceptType;
   activeVsGroupings: VsGrouping[];
   handleCheckboxToggle: (
-    activeConceptType: DibbsConceptType,
+    activeValueSetType: DibbsConceptType,
     groupedValueSet: VsGrouping,
   ) => void;
 };
@@ -20,14 +20,14 @@ type SelectionViewAccordionBodyProps = {
 /**
  * Fragment component to style out some of the accordion bodies
  * @param param0 - params
- * @param param0.activeConceptType - DibbsConceptType for display in this accordion
+ * @param param0.activeValueSetType - DibbsConceptType for display in this accordion
  * @param param0.activeVsGroupings - VsGroupings[] for display in this accordion
  * @param param0.handleCheckboxToggle - Listener event to handle a ValueSet inclusion/
  * exclusion check
  * @returns An accordion body component
  */
 const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
-  activeConceptType,
+  activeValueSetType,
   activeVsGroupings,
   handleCheckboxToggle,
 }) => {
@@ -53,7 +53,7 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
           return (
             <div
               className={styles.accordionBodyExpanded}
-              key={`${activeConceptType}-${vs.valueSetName}`}
+              key={`${activeValueSetType}-${vs.valueSetName}`}
             >
               <div className={styles.accordionExpandedInner}>
                 <Checkbox
@@ -62,9 +62,9 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
                   label={checkboxLabel(vs.valueSetName, vs.author, vs.system)}
                   onChange={(e) => {
                     e.stopPropagation();
-                    handleCheckboxToggle(activeConceptType, vs);
+                    handleCheckboxToggle(activeValueSetType, vs);
                   }}
-                  id={`${vs.valueSetName}-${activeConceptType}`}
+                  id={`${vs.valueSetName}-${activeValueSetType}`}
                   checked={checked}
                 />
               </div>
