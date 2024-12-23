@@ -24,6 +24,8 @@ type SelectionViewAccordionBodyProps = {
  * @param param0 - params
  * @param param0.activeValueSetType - DibbsConceptType for display in this accordion
  * @param param0.activeVsGroupings - VsGroupings[] for display in this accordion
+ * @param param0.setValueSets
+ * @param param0.conditionId
  * @returns An accordion body component
  */
 const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
