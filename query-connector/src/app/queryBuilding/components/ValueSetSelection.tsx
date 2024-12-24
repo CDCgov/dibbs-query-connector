@@ -1,7 +1,7 @@
 "use client";
 
 import styles from "../buildFromTemplates/buildfromTemplate.module.scss";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useReducer, useRef, useState } from "react";
 import classNames from "classnames";
 
 import {
@@ -22,7 +22,7 @@ import {
   VsGrouping,
   groupValueSetGroupingByConditionId,
 } from "@/app/utils/valueSetTranslation";
-import { DibbsConceptType } from "@/app/constants";
+import { DibbsConceptType, DibbsValueSet } from "@/app/constants";
 
 type ConditionSelectionProps = {
   queryName: string;
@@ -48,7 +48,6 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
   const [_searchFilter, setSearchFilter] = useState<string>();
   const [selectedValueSets, setSelectedValueSets] =
     useState<ConditionToConceptTypeToValueSetGroupingMap>({});
-
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   useEffect(() => {
@@ -92,10 +91,16 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
     (conditionId: string) =>
     (vsType: DibbsConceptType) =>
     (vsName: string) =>
-    (val: VsGrouping) => {
+    (vsGrouping: VsGrouping) =>
+    (dibbsValueSets: DibbsValueSet[]) => {
       setSelectedValueSets((prevState) => {
-        prevState[conditionId][vsType][vsName] = val;
-        return prevState;
+        prevState[conditionId][vsType][vsName] = {
+          ...vsGrouping,
+          items: [
+            { ...dibbsValueSets[0], concepts: dibbsValueSets[0].concepts },
+          ],
+        };
+        return structuredClone(prevState);
       });
     };
 
@@ -180,7 +185,7 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
         isOpen={isDrawerOpen}
         onClose={handleCloseDrawer}
         onSave={() => {}} //TODO
-        renderData={[]}
+        hasChanges={false}
       />
     </div>
   );

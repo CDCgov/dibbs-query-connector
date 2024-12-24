@@ -14,7 +14,7 @@ type DrawerProps = {
   isOpen: boolean;
   onSave: () => void;
   onClose: () => void;
-  renderData: any;
+  hasChanges: boolean;
 };
 
 /**
@@ -39,14 +39,8 @@ const Drawer: React.FC<DrawerProps> = ({
   onClose,
   onSave,
   toRender,
-  renderData,
+  hasChanges,
 }: DrawerProps) => {
-  const [data] = useState(renderData);
-
-  const hasChanges = useMemo(() => {
-    return renderData !== data;
-  }, [renderData, data]);
-
   const modalRef = useRef<ModalRef>(null);
 
   const handleSaveChanges = () => {

@@ -1,24 +1,25 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import styles from "../buildFromTemplates/buildfromTemplate.module.scss";
 import {
   HeadingLevel,
   Accordion as TrussAccordion,
 } from "@trussworks/react-uswds";
 import SelectionViewAccordionBody from "./SelectionViewAccordionBody";
-import { DibbsConceptType } from "@/app/constants";
+import { DibbsConceptType, DibbsValueSet } from "@/app/constants";
 import {
   ConceptTypeToVsNameToVsGroupingMap,
   VsGrouping,
 } from "@/app/utils/valueSetTranslation";
 import SelectionViewAccordionHeader from "./SelectionViewAccordionHeader";
-import { TrussAccordionProps } from "@/app/query/designSystem/Accordion";
 
 type SelectionTableProps = {
   vsTypeLevelOptions: ConceptTypeToVsNameToVsGroupingMap;
   handleVsTypeLevelUpdate: (
     vsType: DibbsConceptType,
-  ) => (vsName: string) => (val: VsGrouping) => void;
+  ) => (
+    vsName: string,
+  ) => (val: VsGrouping) => (dibbsValueSets: DibbsValueSet[]) => void;
 };
 
 /**
@@ -34,9 +35,6 @@ export const SelectionTable: React.FC<SelectionTableProps> = ({
   handleVsTypeLevelUpdate,
 }) => {
   const [expanded, setExpandedGroup] = useState<string>("");
-  const [accordionItems, setAccordionItems] = useState<TrussAccordionProps[]>(
-    [],
-  );
 
   const generateTypeLevelAccordionItems = (vsType: DibbsConceptType) => {
     const handleVsNameLevelUpdate = handleVsTypeLevelUpdate(vsType);
@@ -74,23 +72,15 @@ export const SelectionTable: React.FC<SelectionTableProps> = ({
       handleToggle,
     };
   };
-
-  useEffect(() => {
-    const accordionItems = Object.keys(vsTypeLevelOptions).map((vsType) => {
-      return generateTypeLevelAccordionItems(vsType as DibbsConceptType);
-    });
-    setAccordionItems(accordionItems);
-  }, [expanded]);
-
   return (
-    accordionItems && (
-      <div data-testid="accordion" className={styles.accordionContainer}>
-        <TrussAccordion
-          items={accordionItems}
-          multiselectable={false}
-          className={styles.accordionInnerWrapper}
-        />
-      </div>
-    )
+    <div data-testid="accordion" className={styles.accordionContainer}>
+      <TrussAccordion
+        items={Object.keys(vsTypeLevelOptions).map((vsType) => {
+          return generateTypeLevelAccordionItems(vsType as DibbsConceptType);
+        })}
+        multiselectable={false}
+        className={styles.accordionInnerWrapper}
+      />
+    </div>
   );
 };

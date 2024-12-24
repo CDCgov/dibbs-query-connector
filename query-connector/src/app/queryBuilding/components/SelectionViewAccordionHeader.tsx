@@ -1,7 +1,7 @@
 import styles from "../buildFromTemplates/buildfromTemplate.module.scss";
 import classNames from "classnames";
 import { Checkbox, Icon } from "@trussworks/react-uswds";
-import { DibbsConceptType } from "@/app/constants";
+import { DibbsConceptType, DibbsValueSet } from "@/app/constants";
 import { VsGrouping } from "@/app/utils/valueSetTranslation";
 import { tallyConceptsForValueSetGroupArray } from "../utils";
 import { ChangeEvent } from "react";
@@ -10,7 +10,9 @@ type SelectionViewAccordionBodyProps = {
   activeValueSetType: DibbsConceptType;
   activeVsGroupings: { [vsNameAuthorSystem: string]: VsGrouping };
   expanded: boolean;
-  handleVsNameLevelUpdate: (vsName: string) => (val: VsGrouping) => void;
+  handleVsNameLevelUpdate: (
+    vsName: string,
+  ) => (val: VsGrouping) => (dibbsValueSets: DibbsValueSet[]) => void;
 };
 
 /**
@@ -38,14 +40,19 @@ const SelectionViewAccordionHeader: React.FC<
     false,
   );
 
-  function handleBulkToggle(e: ChangeEvent<HTMLInputElement>) {
+  function handleBulkToggle(
+    e: ChangeEvent<HTMLInputElement>,
+    isMinusState: boolean,
+  ) {
     Object.entries(activeVsGroupings).forEach(([vsName, curGrouping]) => {
       const handleVsGroupingLevelUpdate = handleVsNameLevelUpdate(vsName);
       const updatedGrouping = structuredClone(curGrouping);
       updatedGrouping.items.map((i) => {
-        return i.concepts.map((c) => (c.include = e.target.checked));
+        return i.concepts.map(
+          (c) => (c.include = isMinusState ? false : e.target.checked),
+        );
       });
-      handleVsGroupingLevelUpdate(updatedGrouping);
+      handleVsGroupingLevelUpdate(updatedGrouping)(updatedGrouping.items);
     });
   }
 
@@ -71,7 +78,7 @@ const SelectionViewAccordionHeader: React.FC<
             label={activeValueSetType}
             onChange={(e) => {
               e.stopPropagation();
-              handleBulkToggle(e);
+              handleBulkToggle(e, isMinusState);
             }}
             id={`${activeValueSetType}`}
             checked={checked}

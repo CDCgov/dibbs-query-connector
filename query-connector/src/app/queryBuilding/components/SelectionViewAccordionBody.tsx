@@ -11,11 +11,14 @@ import {
   getNameAuthorSystemFromVSGrouping,
 } from "@/app/utils/valueSetTranslation";
 import classNames from "classnames";
+import { DibbsValueSet } from "@/app/constants";
 
 type SelectionViewAccordionBodyProps = {
   id?: string;
   activeVsGroupings: { [vsNameAuthorSystem: string]: VsGrouping };
-  handleVsNameLevelUpdate: (vsName: string) => (val: VsGrouping) => void;
+  handleVsNameLevelUpdate: (
+    vsName: string,
+  ) => (val: VsGrouping) => (dibbsValueSets: DibbsValueSet[]) => void;
 };
 
 /**
@@ -31,6 +34,7 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
   handleVsNameLevelUpdate,
 }) => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [hasDrawerChange, setHasDrawerChange] = useState(false);
   const [curVsGrouping, setCurVsGrouping] = useState<VsGrouping>();
   const [curConcepts, setCurConcepts] = useState<ConceptOption[]>([]);
 
@@ -41,7 +45,17 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
   };
 
   const handleConceptsChange = (updatedConcepts: ConceptOption[]) => {
-    setCurConcepts(updatedConcepts);
+    if (curVsGrouping) {
+      const activeVsName = getNameAuthorSystemFromVSGrouping(curVsGrouping);
+      curVsGrouping.items = [
+        // assuming that name / author / system identifies a unique value set,
+        // the new items array will only differ by concepts
+        { ...curVsGrouping.items[0], concepts: updatedConcepts },
+      ];
+      handleVsNameLevelUpdate(activeVsName)(curVsGrouping)(curVsGrouping.items);
+      setCurConcepts(updatedConcepts);
+      setHasDrawerChange(true);
+    }
   };
 
   const handleSaveChanges = () => {
@@ -64,16 +78,29 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
     setIsDrawerOpen(false);
   };
 
-  function handleBulkToggle(e: ChangeEvent<HTMLInputElement>) {
-    const vsGrouping = activeVsGroupings[e.target.id];
-    const handleVsGroupingLevelUpdate = handleVsNameLevelUpdate(
-      getNameAuthorSystemFromVSGrouping(vsGrouping),
-    );
-    const updatedGrouping = structuredClone(vsGrouping);
-    updatedGrouping.items.map((i) => {
-      return i.concepts.map((c) => (c.include = e.target.checked));
-    });
-    handleVsGroupingLevelUpdate(updatedGrouping);
+  function handleBulkToggle(
+    e: ChangeEvent<HTMLInputElement>,
+    isMinusState: boolean,
+  ) {
+    const vsGrouping = structuredClone(activeVsGroupings[e.target.id]);
+    const activeVsName = getNameAuthorSystemFromVSGrouping(vsGrouping);
+    const handleValueSetLevelUpdate =
+      handleVsNameLevelUpdate(activeVsName)(vsGrouping);
+
+    const newConcepts = vsGrouping.items
+      .map((i) => {
+        return i.concepts.map((c) => {
+          return {
+            ...c,
+            include: isMinusState ? false : e.target.checked,
+          };
+        });
+      })
+      .flat();
+
+    handleValueSetLevelUpdate([
+      { ...vsGrouping.items[0], concepts: newConcepts },
+    ]);
   }
 
   return (
@@ -83,8 +110,7 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
         const totalCount = tallyConceptsForSingleValueSetGroup(vs, false);
         const isMinusState =
           selectedCount !== totalCount && selectedCount !== 0;
-        const checked =
-          !!selectedCount && selectedCount == totalCount && selectedCount > 0;
+        const checked = selectedCount == totalCount && selectedCount > 0;
         const vsLabel = getNameAuthorSystemFromVSGrouping(vs);
 
         return (
@@ -101,7 +127,7 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
                 label={checkboxLabel(vs.valueSetName, vs.author, vs.system)}
                 onChange={(e) => {
                   e.stopPropagation();
-                  handleBulkToggle(e);
+                  handleBulkToggle(e, isMinusState);
                 }}
                 id={vsLabel}
                 checked={checked}
@@ -114,7 +140,11 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
               <div
                 className={styles.viewCodesBtn}
                 role="button"
-                onClick={() => handleViewCodes(vs)}
+                onClick={() => {
+                  console.log("view codes:", vs);
+                  console.log();
+                  handleViewCodes(vs);
+                }}
               >
                 View Codes
               </div>
@@ -134,9 +164,11 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
             />
           }
           isOpen={isDrawerOpen}
-          onClose={() => setIsDrawerOpen(false)}
+          onClose={() => {
+            setIsDrawerOpen(false), setHasDrawerChange(false);
+          }}
           onSave={handleSaveChanges}
-          renderData={curConcepts}
+          hasChanges={hasDrawerChange}
         />
       )}
     </div>

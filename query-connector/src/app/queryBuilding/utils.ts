@@ -163,7 +163,7 @@ export function tallyConceptsForSingleValueSetGroup(
   filterInclude?: boolean,
 ) {
   const selectedTotal = valueSet.items.reduce((sum, vs) => {
-    const includedConcepts = !!filterInclude
+    const includedConcepts = filterInclude
       ? vs.concepts.filter((c) => c.include)
       : vs.concepts;
     sum += includedConcepts.length;

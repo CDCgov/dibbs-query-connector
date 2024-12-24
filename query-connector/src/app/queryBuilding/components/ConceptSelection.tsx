@@ -20,10 +20,14 @@ const ConceptSelection: React.FC<ConceptSelectionProps> = ({
   concepts,
   onConceptsChange,
 }) => {
+  const selectedCount = concepts.filter((concept) => concept.include).length;
+  const totalCount = concepts.length;
+  const isMinusState = selectedCount > 0 && selectedCount < totalCount;
+
   const toggleAll = (isChecked: boolean) => {
     const updatedConcepts = concepts.map((concept) => ({
       ...concept,
-      include: isChecked,
+      include: isMinusState ? false : isChecked,
     }));
     onConceptsChange(updatedConcepts);
   };
@@ -35,9 +39,6 @@ const ConceptSelection: React.FC<ConceptSelectionProps> = ({
     onConceptsChange(updatedConcepts);
   };
 
-  const selectedCount = concepts.filter((concept) => concept.include).length;
-  const totalCount = concepts.length;
-
   return (
     <div>
       <div className="display-flex padding-top-1 padding-bottom-3">
@@ -46,7 +47,7 @@ const ConceptSelection: React.FC<ConceptSelectionProps> = ({
           id="toggleAll"
           checked={selectedCount === totalCount}
           className={`bg-transparent ${
-            selectedCount > 0 && selectedCount < totalCount
+            isMinusState
               ? styles.concept__checkbox__partial
               : styles.concept__checkbox
           }`}
