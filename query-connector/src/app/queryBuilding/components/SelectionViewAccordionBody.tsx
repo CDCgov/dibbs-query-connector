@@ -27,6 +27,7 @@ type SelectionViewAccordionBodyProps = {
  * @param param0.activeVsGroupings - VsGroupings[] for display in this accordion
  * @param param0.setSelectedValueSets
  * @param param0.conditionId
+ * @param param0.handleVsNameLevelUpdate
  * @returns An accordion body component
  */
 const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({

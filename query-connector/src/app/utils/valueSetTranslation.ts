@@ -19,6 +19,10 @@ export type ConceptTypeToVsNameToVsGroupingMap = {
 };
 
 type VsNameAuthorSystem = string;
+/**
+ *
+ * @param vsGroup
+ */
 export function getNameAuthorSystemFromVSGrouping(vsGroup: VsGrouping) {
   return `${vsGroup.valueSetName}:${vsGroup.author}:${vsGroup.system}`;
 }

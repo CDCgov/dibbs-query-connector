@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useMemo } from "react";
+import React, { useRef } from "react";
 import { Button, Icon } from "@trussworks/react-uswds";
 import styles from "./drawer.module.css";
 import SearchField from "../searchField/SearchField";
@@ -29,6 +29,7 @@ type DrawerProps = {
  * @param root0.currentState - The current state to check for changes.
  * @param root0.onSave - Callback when the "Save Changes" button is clicked.`
  * @param root0.toRender - The dynamic content to display.
+ * @param root0.hasChanges
  * @returns The Drawer component.
  */
 const Drawer: React.FC<DrawerProps> = ({
