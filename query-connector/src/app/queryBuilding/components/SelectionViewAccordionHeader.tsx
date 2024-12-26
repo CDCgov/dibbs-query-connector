@@ -21,6 +21,8 @@ type SelectionViewAccordionBodyProps = {
  * @param param0.activeValueSetType - DibbsactiveValueSetType (labs, conditions, medications)
  * @param param0.activeVsGroupings - ValueSets for a given activeValueSetType
  * @param param0.expanded - Boolean for managing icon orientation
+ * @param param0.handleVsNameLevelUpdate - curried state update function that
+ * takes a VsName and generatesa ValueSet level update
  * @returns An accordion body component
  */
 const SelectionViewAccordionHeader: React.FC<

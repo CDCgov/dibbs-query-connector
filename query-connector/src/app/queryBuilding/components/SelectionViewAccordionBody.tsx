@@ -18,15 +18,15 @@ type SelectionViewAccordionBodyProps = {
   activeVsGroupings: { [vsNameAuthorSystem: string]: VsGrouping };
   handleVsNameLevelUpdate: (
     vsName: string,
-  ) => (val: VsGrouping) => (dibbsValueSets: DibbsValueSet[]) => void;
+  ) => (vsGrouping: VsGrouping) => (dibbsValueSets: DibbsValueSet[]) => void;
 };
 
 /**
  * An accordion body fragment
  * @param param0 - params
  * @param param0.activeVsGroupings - VsGroupings[] for display in this accordion
- * @param param0.setSelectedValueSets
- * @param param0.conditionId
+ * @param param0.handleVsNameLevelUpdate - curried state update function that
+ * takes a VsName and generatesa ValueSet level update
  * @returns An accordion body component
  */
 const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({

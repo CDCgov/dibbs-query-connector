@@ -19,6 +19,12 @@ export type ConceptTypeToVsNameToVsGroupingMap = {
 };
 
 type VsNameAuthorSystem = string;
+/**
+ * Utility function to extract the unique identifier for a ValueSetGrouping
+ * @param vsGroup - A ValueSetGrouping to identify
+ * @returns the vsName:Author:System key that should uniquely identify a
+ * valueset grouping
+ */
 export function getNameAuthorSystemFromVSGrouping(vsGroup: VsGrouping) {
   return `${vsGroup.valueSetName}:${vsGroup.author}:${vsGroup.system}`;
 }
