@@ -99,7 +99,7 @@ h1 {
 }
 
 .bg-gray-5 {
-  background-color: $input-field-border;
+  background-color: $page-background-dark;
 }
 
 .maxw7 {
@@ -468,4 +468,8 @@ ul.usa-sidenav
 
 #conditionTemplateSearch > div[data-testid="searchField"] {
   flex: 1;
+}
+
+.custom-alert {
+  margin-top: 0;
 }
