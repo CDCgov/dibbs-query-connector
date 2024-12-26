@@ -72,13 +72,15 @@ const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
   }, [queryValueSets]);
 
   // Compute counts of each tab-type
-  const countLabs = countDibbsConceptTypeToVsMapItems(valueSetOptions.labs);
-  const countConditions = countDibbsConceptTypeToVsMapItems(
-    valueSetOptions.conditions,
-  );
-  const countMedications = countDibbsConceptTypeToVsMapItems(
-    valueSetOptions.medications,
-  );
+  const countLabs = valueSetOptions.labs
+    ? countDibbsConceptTypeToVsMapItems(valueSetOptions.labs)
+    : 0;
+  const countConditions = valueSetOptions.conditions
+    ? countDibbsConceptTypeToVsMapItems(valueSetOptions.conditions)
+    : 0;
+  const countMedications = valueSetOptions.medications
+    ? countDibbsConceptTypeToVsMapItems(valueSetOptions.medications)
+    : 0;
 
   // Keeps track of which side nav tab to display to users
   const handleTabChange = (tab: DibbsConceptType) => {

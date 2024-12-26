@@ -21,12 +21,14 @@
   border: none;
 }
 
-.customizeQueryNav a {
+.customizeQueryNav button {
   padding: 0rem 1rem !important;
+  text-decoration: none !important;
+  color: $text-primary;
 }
 
-.customizeQueryNav a:hover,
-.customizeQueryNav a:focus {
+.customizeQueryNav button:hover,
+.customizeQueryNav button:focus {
   color: #565c65;
   background-color: transparent;
   border: none;
