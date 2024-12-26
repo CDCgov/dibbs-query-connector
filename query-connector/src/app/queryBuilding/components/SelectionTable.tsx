@@ -1,192 +1,84 @@
 "use client";
-import { Dispatch, SetStateAction, useState } from "react";
+import { useState } from "react";
 import styles from "../buildFromTemplates/buildfromTemplate.module.scss";
-import {
-  ConditionToConceptTypeToValueSetGroupingMap,
-  batchToggleConcepts,
-  tallyConceptsForValueSetGroupArray,
-} from "../utils";
-import {
-  HeadingLevel,
-  Accordion as TrussAccordion,
-} from "@trussworks/react-uswds";
-import SelectionViewAccordionHeader from "./SelectionViewAccordionHeader";
+import { HeadingLevel } from "@trussworks/react-uswds";
 import SelectionViewAccordionBody from "./SelectionViewAccordionBody";
-import { DibbsConceptType } from "@/app/constants";
+import { DibbsConceptType, DibbsValueSet } from "@/app/constants";
 import {
   ConceptTypeToVsNameToVsGroupingMap,
   VsGrouping,
 } from "@/app/utils/valueSetTranslation";
+import SelectionViewAccordionHeader from "./SelectionViewAccordionHeader";
+import MultiAccordion from "@/app/query/designSystem/MultiAccordion";
 
 type SelectionTableProps = {
-  conditionId: string;
-  groupedValueSetsForCondition: ConceptTypeToVsNameToVsGroupingMap;
-  setValueSets: Dispatch<
-    SetStateAction<ConditionToConceptTypeToValueSetGroupingMap>
-  >;
+  vsTypeLevelOptions: ConceptTypeToVsNameToVsGroupingMap;
+  handleVsTypeLevelUpdate: (
+    vsType: DibbsConceptType,
+  ) => (
+    vsName: string,
+  ) => (val: VsGrouping) => (dibbsValueSets: DibbsValueSet[]) => void;
 };
-
 /**
- * Detail display component for a condition on the query building page
+ * Component that displays ValueSetGroupings sorted by VsType (DibbsConceptType)
+ * for the active condition selected
  * @param root0 - params
- * @param root0.conditionId - The ID of the active condition, whose associated value sets
- * and concepts are shown in the table
- * @param root0.groupedValueSetsForCondition - Value Sets for the active condition, organized by
- * type (conditions, labs, medications)
- * @param root0.setValueSets - State function that updates the value set data for the selected condition
+ * @param root0.vsTypeLevelOptions - the valueSets that are currently in the in-progress query
+ * @param root0.handleVsTypeLevelUpdate - curried state update function that
+ * takes a VsType and generates a VsName level setter function
  * @returns A component for display to render on the query building page
  */
 export const SelectionTable: React.FC<SelectionTableProps> = ({
-  conditionId,
-  groupedValueSetsForCondition,
-  setValueSets,
+  vsTypeLevelOptions,
+  handleVsTypeLevelUpdate,
 }) => {
   const [expanded, setExpandedGroup] = useState<string>("");
 
-  const handleGroupCheckboxToggle = (
-    activeValueSetType: DibbsConceptType,
-    groupedValueSets: VsGrouping[],
-    isBatchUpdate: boolean,
-    currentCheckboxStatus?: boolean,
-  ) => {
-    groupedValueSets.forEach((vs) => {
-      handleSingleCheckboxToggle(
-        activeValueSetType,
-        vs,
-        isBatchUpdate,
-        !currentCheckboxStatus,
-      );
-    });
-  };
+  const generateTypeLevelAccordionItems = (vsType: DibbsConceptType) => {
+    const handleVsNameLevelUpdate = handleVsTypeLevelUpdate(vsType);
 
-  const handleSingleCheckboxToggle = (
-    activeValueSetType: DibbsConceptType,
-    groupedValueSet: VsGrouping,
-    isBatchUpdate: boolean = false,
-    batchValue?: boolean,
-  ) => {
-    const key = `${groupedValueSet.valueSetName}:${groupedValueSet.author}:${groupedValueSet.system}`;
-    const updatedVS = groupedValueSetsForCondition[activeValueSetType][key];
+    const title = (
+      <SelectionViewAccordionHeader
+        activeValueSetType={vsType}
+        activeVsGroupings={vsTypeLevelOptions[vsType]}
+        expanded={expanded === vsType}
+        handleVsNameLevelUpdate={handleVsNameLevelUpdate}
+      />
+    );
 
-    if (isBatchUpdate && batchValue !== undefined) {
-      groupedValueSet.items = Object.values(updatedVS.items).map((vs) => {
-        vs.includeValueSet = batchValue;
-        vs.concepts.forEach((concept) => {
-          concept.include = batchValue;
-        });
-        return vs;
+    const content = (
+      <SelectionViewAccordionBody
+        activeVsGroupings={vsTypeLevelOptions[vsType]}
+        handleVsNameLevelUpdate={handleVsNameLevelUpdate}
+      />
+    );
+    const level: HeadingLevel = "h4";
+
+    const handleToggle = () => {
+      setExpandedGroup((prevState) => {
+        if (prevState === vsType) return "";
+        return vsType;
       });
-    } else {
-      groupedValueSet.items = Object.values(updatedVS.items).map((vs) => {
-        batchToggleConcepts(vs);
-        vs.includeValueSet = !vs.includeValueSet;
-        return vs;
-      });
-    }
-
-    groupedValueSetsForCondition[activeValueSetType] = {
-      ...groupedValueSetsForCondition[activeValueSetType],
-      [key]: groupedValueSet,
     };
 
-    setValueSets((prevState) => {
-      return {
-        ...prevState,
-        [conditionId]: {
-          ...prevState?.[conditionId],
-          [activeValueSetType]: {
-            ...prevState?.[conditionId]?.[activeValueSetType],
-            [key]: updatedVS,
-          },
-        },
-      };
-    });
+    return {
+      title,
+      content,
+      expanded: false,
+      id: `${vsType}`,
+      headingLevel: level,
+      handleToggle,
+    };
   };
-
-  const generateAccordionItems = (types: Array<DibbsConceptType>) => {
-    const typesWithContent =
-      types &&
-      types.filter(
-        (type) => Object.values(groupedValueSetsForCondition[type]).length > 0,
-      );
-
-    const ValueSetAccordionItems =
-      typesWithContent &&
-      typesWithContent.map((activeValueSetType) => {
-        const activeVsGroupings = Object.values(
-          groupedValueSetsForCondition[activeValueSetType],
-        );
-        const totalCount = tallyConceptsForValueSetGroupArray(
-          activeVsGroupings,
-          false,
-        );
-        const selectedCount = tallyConceptsForValueSetGroupArray(
-          activeVsGroupings,
-          true,
-        );
-
-        const title = (
-          <SelectionViewAccordionHeader
-            activeValueSetType={activeValueSetType}
-            conditionId={conditionId}
-            totalCount={totalCount}
-            selectedCount={selectedCount}
-            activeVsGroupings={activeVsGroupings}
-            handleCheckboxToggle={handleGroupCheckboxToggle}
-            expanded={expanded?.indexOf(activeValueSetType) > -1 || false}
-          />
-        );
-        const content = (
-          <SelectionViewAccordionBody
-            activeValueSetType={activeValueSetType}
-            handleCheckboxToggle={handleSingleCheckboxToggle}
-            activeVsGroupings={activeVsGroupings}
-          />
-        );
-        const level: HeadingLevel = "h4";
-
-        const handleToggle = (e: React.MouseEvent) => {
-          const element = e.currentTarget.getAttribute("data-testid");
-          const startIndex = element?.indexOf(activeValueSetType) || 0;
-          const endIndex = activeValueSetType.length + startIndex;
-
-          if (expanded == activeValueSetType) {
-            // if the group we clicked on is currently expanded,
-            // toggle it closed
-            setExpandedGroup("");
-          } else {
-            // otherwise, expand the thing we clicked on
-            setExpandedGroup(element?.slice(startIndex, endIndex) || "");
-          }
-        };
-
-        return {
-          title,
-          content,
-          expanded: false,
-          id: `${activeValueSetType}-${conditionId}`,
-          headingLevel: level,
-          handleToggle,
-        };
-      });
-    return ValueSetAccordionItems;
-  };
-
-  const types =
-    groupedValueSetsForCondition &&
-    (Object.keys(groupedValueSetsForCondition) as Array<DibbsConceptType>);
-
-  const accordionItems = generateAccordionItems(types);
-
   return (
-    accordionItems && (
-      <div data-testid="accordion" className={styles.accordionContainer}>
-        <TrussAccordion
-          items={accordionItems}
-          multiselectable={false}
-          className={styles.accordionInnerWrapper}
-        />
-      </div>
-    )
+    <div data-testid="accordion" className={styles.accordionContainer}>
+      <MultiAccordion
+        items={Object.keys(vsTypeLevelOptions).map((vsType) => {
+          return generateTypeLevelAccordionItems(vsType as DibbsConceptType);
+        })}
+        multiselectable={false}
+        accordionClassName={styles.accordionInnerWrapper}
+      />
+    </div>
   );
 };

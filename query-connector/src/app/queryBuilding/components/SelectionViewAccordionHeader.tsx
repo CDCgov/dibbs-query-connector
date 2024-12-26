@@ -1,50 +1,63 @@
 import styles from "../buildFromTemplates/buildfromTemplate.module.scss";
 import classNames from "classnames";
 import { Checkbox, Icon } from "@trussworks/react-uswds";
-import { DibbsConceptType } from "@/app/constants";
+import { DibbsConceptType, DibbsValueSet } from "@/app/constants";
 import { VsGrouping } from "@/app/utils/valueSetTranslation";
+import { tallyConceptsForValueSetGroupArray } from "../utils";
+import { ChangeEvent } from "react";
 
 type SelectionViewAccordionBodyProps = {
   activeValueSetType: DibbsConceptType;
-  conditionId: string;
-  selectedCount: number;
-  totalCount: number;
-  activeVsGroupings: VsGrouping[];
-  handleCheckboxToggle: (
-    activeValueSetType: DibbsConceptType,
-    groupedValueSets: VsGrouping[],
-    batchUpdate: boolean,
-    checkedState: boolean,
-  ) => void;
+  activeVsGroupings: { [vsNameAuthorSystem: string]: VsGrouping };
   expanded: boolean;
+  handleVsNameLevelUpdate: (
+    vsName: string,
+  ) => (val: VsGrouping) => (dibbsValueSets: DibbsValueSet[]) => void;
 };
 
 /**
  * Fragment component to style out some of the accordion bodies
  * @param param0 - params
- * @param param0.handleCheckboxToggle - Listener event to handle a ValueSet inclusion/
- * exclusion check
  * @param param0.activeValueSetType - DibbsactiveValueSetType (labs, conditions, medications)
- * @param param0.conditionId - The ID of the active condition, whose associated value sets
- * and concepts are shown in the table
  * @param param0.activeVsGroupings - ValueSets for a given activeValueSetType
- * @param param0.totalCount - Number of Concepts associated with all the Value Sets for the DibbsactiveValueSetType
- * @param param0.selectedCount - Number of Concepts that are marked as selected
- * is expanded
  * @param param0.expanded - Boolean for managing icon orientation
+ * @param param0.handleVsNameLevelUpdate - curried state update function that
+ * takes a VsName and generatesa ValueSet level update
  * @returns An accordion body component
  */
 const SelectionViewAccordionHeader: React.FC<
   SelectionViewAccordionBodyProps
 > = ({
   activeValueSetType,
-  conditionId,
-  selectedCount,
-  totalCount,
   activeVsGroupings,
-  handleCheckboxToggle,
   expanded,
+  handleVsNameLevelUpdate,
 }) => {
+  const selectedCount = tallyConceptsForValueSetGroupArray(
+    Object.values(activeVsGroupings),
+    true,
+  );
+  const totalCount = tallyConceptsForValueSetGroupArray(
+    Object.values(activeVsGroupings),
+    false,
+  );
+
+  function handleBulkToggle(
+    e: ChangeEvent<HTMLInputElement>,
+    isMinusState: boolean,
+  ) {
+    Object.entries(activeVsGroupings).forEach(([vsName, curGrouping]) => {
+      const handleVsGroupingLevelUpdate = handleVsNameLevelUpdate(vsName);
+      const updatedGrouping = structuredClone(curGrouping);
+      updatedGrouping.items.map((i) => {
+        return i.concepts.map(
+          (c) => (c.include = isMinusState ? false : e.target.checked),
+        );
+      });
+      handleVsGroupingLevelUpdate(updatedGrouping)(updatedGrouping.items);
+    });
+  }
+
   const isMinusState = selectedCount !== totalCount && selectedCount !== 0;
   const checked =
     !!selectedCount && selectedCount == totalCount && selectedCount > 0;
@@ -67,14 +80,9 @@ const SelectionViewAccordionHeader: React.FC<
             label={activeValueSetType}
             onChange={(e) => {
               e.stopPropagation();
-              handleCheckboxToggle(
-                activeValueSetType,
-                activeVsGroupings,
-                true,
-                checked,
-              );
+              handleBulkToggle(e, isMinusState);
             }}
-            id={`${conditionId}-${activeValueSetType}`}
+            id={`${activeValueSetType}`}
             checked={checked}
           />
         </div>
