@@ -1,7 +1,7 @@
 "use client";
 
 import styles from "../buildFromTemplates/buildfromTemplate.module.scss";
-import { useEffect, useReducer, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import classNames from "classnames";
 
 import {
