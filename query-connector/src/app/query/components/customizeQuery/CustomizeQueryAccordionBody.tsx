@@ -35,12 +35,7 @@ const CustomizeQueryAccordionBody: React.FC<
   CustomizeQueryAccordionBodyProps
 > = ({ group, toggleInclude, groupIndex }) => {
   return (
-    <Table
-      className={classNames(
-        styles.customizeQueryGridContainer,
-        "table-soft-border",
-      )}
-    >
+    <Table className={classNames(styles.customizeQueryGridContainer)}>
       <thead>
         <tr className={styles.customizeQueryGridHeader}>
           <th>Include</th>

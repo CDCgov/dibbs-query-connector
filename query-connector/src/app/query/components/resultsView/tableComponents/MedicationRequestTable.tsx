@@ -3,6 +3,7 @@ import Table from "@/app/query/designSystem/table/Table";
 import { MedicationRequest } from "fhir/r4";
 import { formatCodeableConcept, formatDate } from "../../../../format-service";
 import { checkIfSomeElementWithPropertyExists } from "./utils";
+import styles from "./resultsTables.module.scss";
 
 /**
  * The props for the MedicationRequestTable component.
@@ -28,7 +29,7 @@ const MedicationRequestTable: React.FC<MedicationRequestTableProps> = ({
   return (
     <Table className="margin-top-0-important">
       <thead>
-        <tr>
+        <tr className={styles.medicationRow}>
           <th>Order Date</th>
           <th>Medication</th>
           {anyReasonCode && <th>Reason Code</th>}
@@ -37,7 +38,7 @@ const MedicationRequestTable: React.FC<MedicationRequestTableProps> = ({
       </thead>
       <tbody>
         {medicationRequests.map((medicationRequest) => (
-          <tr key={medicationRequest.id}>
+          <tr className={styles.medicationRow} key={medicationRequest.id}>
             <td>{formatDate(medicationRequest.authoredOn)}</td>
             <td>
               {formatCodeableConcept(

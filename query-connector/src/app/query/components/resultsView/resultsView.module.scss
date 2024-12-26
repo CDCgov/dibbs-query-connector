@@ -19,6 +19,18 @@
   padding: 1rem 1.5rem;
 }
 
+.accordionWrapper {
+  button,
+  button:hover {
+    background-image: url("../../../../styles/assets/expandUp.svg");
+  }
+
+  button[aria-expanded="false"],
+  button[aria-expanded="false"]:hover {
+    background-image: url("../../../../styles/assets/expandDown.svg");
+  }
+}
+
 .accordionHeading {
   font-family: "Source Sans Pro Web", "Helvetica Neue", "Helvetica", "Roboto",
     "Arial", "sans-serif" !important;

@@ -32,13 +32,7 @@ const PatientSearchResultsTable: React.FC<PatientSearchResultsTableProps> = ({
     <>
       <h1 className="page-title">{PAGE_TITLES["patient-results"]}</h1>
       <h2 className="page-explainer">The following record(s) match.</h2>
-      <Table
-        className={classNames(
-          "margin-top-4",
-          "table-soft-border",
-          styles.tableContainer,
-        )}
-      >
+      <Table className={classNames("margin-top-4", styles.tableContainer)}>
         <thead>
           <tr className={styles.header}>
             <th>Name</th>

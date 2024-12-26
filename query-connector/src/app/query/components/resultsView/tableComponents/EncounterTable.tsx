@@ -3,6 +3,7 @@ import Table from "@/app/query/designSystem/table/Table";
 import { Encounter } from "fhir/r4";
 import { formatCodeableConcept, formatDate } from "../../../../format-service";
 import { checkIfSomeElementWithPropertyExists } from "./utils";
+import styles from "./resultsTables.module.scss";
 
 /**
  * The props for the EncounterTable component.
@@ -31,7 +32,7 @@ const EncounterTable: React.FC<EncounterTableProps> = ({
   return (
     <Table className="margin-top-0-important">
       <thead>
-        <tr>
+        <tr className={styles.encountersRow}>
           <th>Visit Reason</th>
           {anyClinicType && <th>Clinic Type</th>}
           {anyServiceType && <th>Service Provider</th>}
@@ -42,7 +43,7 @@ const EncounterTable: React.FC<EncounterTableProps> = ({
       </thead>
       <tbody>
         {encounters.map((encounter) => (
-          <tr key={encounter.id}>
+          <tr className={styles.encountersRow} key={encounter.id}>
             <td>{formatCodeableConcept(encounter?.reasonCode?.[0])} </td>
             {anyClinicType && (
               <td>

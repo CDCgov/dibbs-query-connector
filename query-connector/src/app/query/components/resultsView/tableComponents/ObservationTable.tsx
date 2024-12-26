@@ -3,6 +3,9 @@ import Table from "@/app/query/designSystem/table/Table";
 import { Observation } from "fhir/r4";
 import { formatCodeableConcept, formatDate } from "../../../../format-service";
 import { checkIfSomeElementWithPropertyExists } from "./utils";
+import styles from "./resultsTables.module.scss";
+import classNames from "classnames";
+
 /**
  * The props for the ObservationTable component.
  */
@@ -28,9 +31,9 @@ const ObservationTable: React.FC<ObservationTableProps> = ({
     "referenceRange",
   );
   return (
-    <Table className="margin-top-0-important">
+    <Table className={classNames("margin-top-0-important")}>
       <thead>
-        <tr>
+        <tr className={styles.observationRow}>
           <th>Date</th>
           <th>Type</th>
           {anyObsInterpretation && <th>Interpretation</th>}
@@ -40,7 +43,7 @@ const ObservationTable: React.FC<ObservationTableProps> = ({
       </thead>
       <tbody>
         {observations.map((obs) => (
-          <tr key={obs.id}>
+          <tr className={styles.observationRow} key={obs.id}>
             <td>{formatDate(obs?.issued || obs?.effectiveDateTime)}</td>
             <td>{formatCodeableConcept(obs.code)}</td>
             {anyObsInterpretation && (
