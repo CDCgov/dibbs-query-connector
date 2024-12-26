@@ -141,8 +141,6 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
                 className={styles.viewCodesBtn}
                 role="button"
                 onClick={() => {
-                  console.log("view codes:", vs);
-                  console.log();
                   handleViewCodes(vs);
                 }}
               >
