@@ -11,7 +11,7 @@ import {
 import { UseCaseQueryResponse } from "@/app/query-service";
 import LoadingView from "./LoadingView";
 import { showToastConfirmation } from "../designSystem/toast/Toast";
-import styles from "./customizeQuery/customizeQuery.module.css";
+import styles from "./customizeQuery/customizeQuery.module.scss";
 import CustomizeQueryAccordionHeader from "./customizeQuery/CustomizeQueryAccordionHeader";
 import CustomizeQueryAccordionBody from "./customizeQuery/CustomizeQueryAccordionBody";
 import Accordion from "../designSystem/Accordion";

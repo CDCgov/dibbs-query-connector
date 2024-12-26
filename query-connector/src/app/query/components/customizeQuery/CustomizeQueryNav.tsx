@@ -1,5 +1,5 @@
 import { DibbsConceptType } from "@/app/constants";
-import styles from "./customizeQuery.module.css";
+import styles from "./customizeQuery.module.scss";
 import CustomizeQueryBulkSelect from "./CustomizeQueryBulkSelect";
 import { ConceptTypeToVsNameToVsGroupingMap } from "@/app/utils/valueSetTranslation";
 

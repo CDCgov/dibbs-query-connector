@@ -29,7 +29,7 @@
 .emptyQueryIcon {
   width: 7.5rem;
   height: 7.5rem;
-  color: $gray-cool-20;
+  color: $gray-20;
 }
 
 .createQueryButton {
@@ -42,7 +42,7 @@
   padding-top: 1.5rem;
   border: 0.0625rem solid var(--gray-400, #dfe1e2);
   border-radius: 0.25rem;
-  box-shadow: 0 0.125rem 0.1875rem 0 #f3f3f3;
+  box-shadow: 0 0.125rem 0.1875rem 0 $drop-shadow;
 }
 
 .customQueryTable {
@@ -58,7 +58,7 @@
   }
 
   thead tr th {
-    color: var(--gray-500, #919191);
+    color: $input-field-border;
     background-color: white;
     font-family: "Public Sans", sans-serif;
     font-size: 0.75rem;

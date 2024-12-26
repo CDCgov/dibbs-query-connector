@@ -59,7 +59,7 @@ const StepIndicator: React.FC<StepIndicatorProps> = ({
   return (
     <TrussStepIndicator
       headingLevel={headingLevel}
-      counters="default"
+      counters="none"
       className={classNames(
         "custom-query-step-indicator",
         styles.container,

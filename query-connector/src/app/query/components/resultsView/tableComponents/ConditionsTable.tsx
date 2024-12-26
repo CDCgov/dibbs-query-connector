@@ -1,5 +1,5 @@
 import React from "react";
-import Table from "@/app/query/designSystem/Table";
+import Table from "@/app/query/designSystem/table/Table";
 import { Condition } from "fhir/r4";
 import { formatCodeableConcept, formatDate } from "../../../../format-service";
 import { checkIfSomeElementWithPropertyExists } from "./utils";

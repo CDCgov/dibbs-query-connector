@@ -5,25 +5,32 @@ $query-connector-max-width: 45rem;
 $query-connector-wide-max-width: 90rem;
 $query-connector-content-margins: 13.75rem;
 
-// Pulled from the Design System Figma
-// https://www.figma.com/design/9Aa7G6xMt06JZUrSAxfiZv/CDC%2FSkylight-Design-System?node-id=1177-2479&node-type=rounded_rectangle&m=dev
-$text-base-lightest: #f0f0f0;
-$primary-primary: #005ea2;
-$primary-darker: #162e51;
-
-$gray-cool-20: #c6cace;
-$gray-cool-5: #edeff0;
-$gray-500: #919191;
-$base-base: #71767a;
-$base-lighter: #dfe1e2;
-$background-hover-color: #d9e8f680;
-
 // Design System Fonts
 $serif-font: family("heading");
 $sans-serif-font: "Public Sans Web", family("body");
 $mono-font: "Consolas", family("mono");
 
 // Design System Color Tokens
+
+// Primatives
+$black: #1b1b1b;
+$white: #fff;
+
+$gray-600: #5c5c5c;
+$gray-500: #919191;
+$gray-400: #dfe1e2;
+$gray-300: #f0f0f0;
+$gray-200: #f3f3f3;
+$gray-100: #fbfcfd;
+
+$blue-500: #112f4e;
+$blue-400: #005ea2;
+$blue-300: #0076d6;
+$blue-200: #a1d3ff;
+$blue-100: #e8f5ff;
+
+$red-300: #e41d3d;
+
 $red-5v: #fff3f2;
 $red-10v: #fde0db;
 $red-20v: #fdb8ae;
@@ -126,6 +133,40 @@ $gray-60: #5c5c5c;
 $gray-70: #454545;
 $gray-80: #2e2e2e;
 $gray-90: #1b1b1b;
+
+// Semantic Tokens
+// https://www.figma.com/design/Iuw9me6kYftBF4WTCEsCZz/Query-Connector?node-id=1856-3975
+
+// Pulled from the Design System Figma
+$border: $gray-400;
+$page-background: $gray-100;
+$stepper-inactive: $gray-500;
+$stepper-inactive-text: $gray-600;
+$drop-shadow: $gray-200;
+
+$empty-state: $blue-100;
+$highlight: $blue-100;
+$info: $blue-100;
+
+$primary: $blue-300;
+$header: $blue-400;
+$footer: $blue-400;
+$error: $red-300;
+
+$text-primary: $black;
+$text-secondary: $gray-500;
+$text-base-lightest: $gray-300;
+$text-blue: $blue-400;
+
+$table-row-border: $gray-300;
+$table-header: $gray-300;
+
+$stepper-completed: $blue-500;
+
+$dropdown-hover: $gray-200;
+
+$input-field-border: $gray-500;
+$checkbox-border: $gray-500;
 
 $header-content-height: 4.5rem;
 $footer-content-height: 5rem;
