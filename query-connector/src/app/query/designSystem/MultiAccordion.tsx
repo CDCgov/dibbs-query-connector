@@ -21,6 +21,18 @@ export type MultiAccordionProps = {
   multiselectable?: boolean;
 };
 
+/**
+ * A wrapper around the Truss accordion that renders a multi-accordion that can be
+ * configured to be multiselectable
+ * @param param0 - props
+ * @param param0.items - Accordion items
+ * @param param0.containerClassName - classname around the accordion container
+ * @param param0.accordionClassName - custom clasname around the accordion
+ * @param param0.multiselectable - whether the accordion segments can be opened
+ * at the same time
+ * @param param0.bordered - whether the accordion can be bordered
+ * @returns An accordion componet
+ */
 const MultiAccordion: React.FC<MultiAccordionProps> = ({
   items,
   containerClassName,
