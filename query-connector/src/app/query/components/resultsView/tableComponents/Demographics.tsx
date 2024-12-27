@@ -9,7 +9,8 @@ import {
   formatIdentifier,
   formatDate,
 } from "../../../../format-service";
-import { DataDisplay, DataDisplayInfo } from "@/app/DataProvider";
+import styles from "./resultsTables.module.scss";
+import Table from "@/app/query/designSystem/table/Table";
 
 /**
  * Displays the demographic information of a patient.
@@ -31,14 +32,28 @@ const Demographics: React.FC<DemographicsProps> = ({ patient }) => {
 
   return (
     <div className="margin-top-0-important">
-      {demographicData.map((item) => (
-        <DataDisplay item={item} key={item.title} />
-      ))}
+      <Table className="padding-0-important">
+        <tbody>
+          {demographicData.map((item) => (
+            <tr className={styles.demographicsRow} key={item.title}>
+              <td>
+                <strong>{item.title}</strong>
+              </td>
+              <td> {item.value}</td>
+            </tr>
+          ))}
+        </tbody>
+      </Table>
     </div>
   );
 };
 
 export default Demographics;
+
+export interface DataDisplayInfo {
+  title: string;
+  value?: string | React.JSX.Element | React.JSX.Element[];
+}
 
 /**
  * Formats the demographic information of a patient.
