@@ -6,10 +6,11 @@ type TitleBoxProps = {
 };
 
 /**
- * Title box that renders the page title and step counter state
+ * TitleBob that renders the page title and step counter state
  * along the customize query flow
  * @param root0 params
  * @param root0.step - The step of the customize query flow we're on
+ * @returns A component that renders the title and the step counter state
  */
 const TitleBox: React.FC<TitleBoxProps> = ({ step }) => {
   return (
