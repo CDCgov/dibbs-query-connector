@@ -6,9 +6,9 @@ import {
   formatMRN,
   formatName,
 } from "@/app/format-service";
-import { PAGE_TITLES } from "@/app/query/components/stepIndicator/StepIndicator";
 import styles from "./patientSearchResults.module.scss";
 import classNames from "classnames";
+import TitleBox from "../stepIndicator/TitleBox";
 
 type PatientSearchResultsTableProps = {
   patients: Patient[];
@@ -30,7 +30,7 @@ const PatientSearchResultsTable: React.FC<PatientSearchResultsTableProps> = ({
 }) => {
   return (
     <>
-      <h1 className="page-title">{PAGE_TITLES["patient-results"]}</h1>
+      <TitleBox step="patient-results" />
       <h2 className="page-explainer">The following record(s) match.</h2>
       <Table className={classNames("margin-top-4", styles.tableContainer)}>
         <thead>

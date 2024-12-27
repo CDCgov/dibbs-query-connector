@@ -23,12 +23,13 @@ export const CUSTOMIZE_QUERY_STEPS: { [mode in Mode]: string } = {
 };
 
 // Steps in the header level title
-export const PAGE_TITLES: { [mode in Mode]: string } = {
-  search: "Step 1: Enter patient information",
-  "patient-results": "Step 2: Select a patient",
-  "select-query": "Step 3: Select a query",
-  results: "Patient Record",
-};
+export const PAGE_TITLES: { [mode in Mode]: { title: string; step: number } } =
+  {
+    search: { step: 1, title: "Enter patient information" },
+    "patient-results": { step: 2, title: "Select a patient" },
+    "select-query": { step: 3, title: "Select a query" },
+    results: { step: 4, title: "Patient Record" },
+  };
 
 // Steps in the return to previous page
 export const RETURN_LABEL: { [mode in Mode]: string } = {

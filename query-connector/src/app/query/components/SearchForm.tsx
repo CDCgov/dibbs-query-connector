@@ -17,7 +17,7 @@ import { UseCaseQueryResponse, UseCaseQuery } from "@/app/query-service";
 import { fhirServers as hardcodedFhirServers } from "@/app/fhir-servers";
 import styles from "./searchForm/searchForm.module.scss";
 import { FormatPhoneAsDigits } from "@/app/format-service";
-import { PAGE_TITLES } from "@/app/query/components/stepIndicator/StepIndicator";
+import TitleBox from "./stepIndicator/TitleBox";
 
 interface SearchFormProps {
   useCase: USE_CASES;
@@ -121,7 +121,7 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
   return (
     <>
       <form onSubmit={HandleSubmit}>
-        <h1 className="page-title">{PAGE_TITLES["search"]}</h1>
+        <TitleBox step="search" />
         <h2 className="page-explainer">
           Enter patient information below to search for a patient. We will query
           the connected network to find matching records.{" "}

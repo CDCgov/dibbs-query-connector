@@ -335,6 +335,23 @@ ul.usa-sidenav
   }
 }
 
+.usa-step-indicator__current-step {
+  background-color: $primary;
+  margin-right: 0.5rem;
+  padding: 0;
+  height: 2.75rem;
+  width: 2.75rem;
+}
+
+.usa-step-indicator__total-steps {
+  color: $primary;
+}
+
+.usa-step-indicator__total-steps,
+.usa-step-indicator__current-step {
+  font-size: 2rem;
+}
+
 .usa-label {
   margin-top: 1.5rem;
 }

@@ -19,7 +19,10 @@ test.describe("querying with the Query Connector", () => {
       "This site is for demo purposes only. Please do not enter PII on this website.",
     );
     await expect(
-      page.getByRole("heading", { name: PAGE_TITLES["search"], exact: true }),
+      page.getByRole("heading", {
+        name: PAGE_TITLES["search"].title,
+        exact: true,
+      }),
     ).toBeVisible();
 
     await page.getByRole("button", { name: "Fill fields" }).click();
