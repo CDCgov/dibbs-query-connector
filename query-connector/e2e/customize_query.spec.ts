@@ -51,7 +51,7 @@ test.describe("querying with the Query Connector", () => {
         "250 labs found, 4 medications found, 104 conditions found.",
       ),
     ).toBeVisible();
-    await page.getByRole("link", { name: "Medications" }).click();
+    await page.getByRole("button", { name: "Medications" }).click();
     await page.getByRole("button", { name: "Chlamydia Medication" }).click();
     await page
       .getByRole("row", { name: "azithromycin 1000 MG" })
@@ -111,7 +111,7 @@ test.describe("querying with the Query Connector", () => {
     page,
   }) => {
     test.slow();
-    await page.getByRole("link", { name: "Labs" }).click();
+    await page.getByRole("button", { name: "Labs", exact: true }).click();
     await page.getByRole("button", { name: "Deselect all labs" }).click();
 
     // Spot check a couple valuesets for deselection
@@ -120,7 +120,7 @@ test.describe("querying with the Query Connector", () => {
     await expect(page.getByText("0 of 33 selected")).toBeVisible();
 
     // Now de-select all the medications via the group check marks
-    await page.getByRole("link", { name: "Medications" }).click();
+    await page.getByRole("button", { name: "Medications" }).click();
     await page
       .getByRole("button", { name: "Chlamydia Medication" })
       .locator("label")
@@ -181,8 +181,8 @@ test.describe("querying with the Query Connector", () => {
     for (let i = 1; i < 6; i++) {
       const row = obsRows.nth(i);
       const typeText = await row.locator("td").nth(1).textContent();
-      const presentKey = acceptableSdohKeywords.find((key) =>
-        typeText?.toLowerCase().includes(key),
+      const presentKey = acceptableSdohKeywords.find(
+        (key) => typeText?.toLowerCase().includes(key),
       );
       expect(presentKey).toBeDefined();
       expect(typeText?.includes("chlamydia")).toBeFalsy();
