@@ -1,16 +1,31 @@
+"use client"
 import { Icon } from "@trussworks/react-uswds"
 import { getFhirServerConfigs } from "../database-service";
 import SiteAlert from "../query/designSystem/SiteAlert";
 import Table from "../query/designSystem/Table";
+import { useEffect, useState } from "react";
+import { FhirServerConfig } from "../constants";
 
-export default async function FhirServers() {
-  const fhirServerConfigs = await getFhirServerConfigs(true)
+export default function FhirServers() {
+  const [fhirServers, setFhirServers] = useState<FhirServerConfig[]>([]);
+  useEffect(() => {
+    getFhirServerConfigs(true).then((servers) => {
+      setFhirServers(servers);
+    });
+  }, []);
 
   return (
     <>
       <SiteAlert />
       <div className="main-container__wide">
-        <h1 className="page-title">FHIR server configuration</h1>
+        <div className="grid-container grid-row padding-0">
+          <h1 className="page-title grid-col-10">FHIR server configuration</h1>
+          <div className="grid-col-2 display-flex flex-column">
+            <button className="usa-button flex-align-self-end margin-top-3">
+              New server
+            </button>
+          </div>
+        </div>
         <Table className="margin-top-4">
           <thead>
             <tr>
@@ -20,20 +35,22 @@ export default async function FhirServers() {
             </tr>
           </thead>
           <tbody>
-            {fhirServerConfigs.map((fhirServer) => (
+            {fhirServers.map((fhirServer) => (
               <tr key={fhirServer.id}>
                 <td>{fhirServer.name}</td>
                 <td>{fhirServer.hostname}</td>
                 <td>
-                  <Icon.Check size={3} className="usa-icon" aria-label="Connected" color="green" />{" "}
-                  Connectedz
+                  <div className="grid-container grid-row padding-0">
+                    <Icon.Check size={3} className="usa-icon" aria-label="Connected" color="green" />
+                    Connected
+                  </div>
                 </td>
               </tr>
 
             ))}
           </tbody>
         </Table>
-      </div>
+      </div >
     </>
   )
 }

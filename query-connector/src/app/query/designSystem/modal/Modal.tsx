@@ -6,7 +6,7 @@ import {
   ButtonGroup,
   ModalRef as TrussModalRef,
 } from "@trussworks/react-uswds";
-import React, { RefObject } from "react";
+import React, { RefObject, ReactNode } from "react";
 
 export type ModalRef = TrussModalRef;
 
@@ -20,7 +20,8 @@ type ModalButton = {
 type ModalProps = {
   id: string;
   heading: string;
-  description: string;
+  description?: string;
+  children?: ReactNode;
   modalRef: RefObject<ModalRef>;
   buttons: ModalButton[]; // Dynamic buttons
 };
@@ -32,6 +33,7 @@ type ModalProps = {
  * the modal
  * @param param0.heading - Modal heading
  * @param param0.description - Modal body
+ * @param param0.children - Optional children components to render in the modal body
  * @param param0.modalRef - ref object to connect the toggle button with the
  * actual modal.
  * @param param0.buttons - Array of button definitions for the modal footer.
@@ -41,6 +43,7 @@ export const Modal: React.FC<ModalProps> = ({
   id,
   heading,
   description,
+  children,
   modalRef,
   buttons,
 }) => {
@@ -49,11 +52,15 @@ export const Modal: React.FC<ModalProps> = ({
       ref={modalRef}
       id={`${id}-modal`}
       aria-labelledby={`${id}-modal-heading`}
-      aria-describedby={`${id}-modal-description`}
+      aria-describedby={description ? `${id}-modal-description` : undefined}
     >
       <ModalHeading id={`${id}-modal-heading`}>{heading}</ModalHeading>
       <div className="usa-prose">
-        <p id={`${id}-modal-description`}>{description}</p>
+        {description ? (
+          <p id={`${id}-modal-description`}>{description}</p>
+        ) : (
+          children
+        )}
       </div>
       <ModalFooter>
         <ButtonGroup>
