@@ -1,8 +1,8 @@
 import styles from "./customizeQuery.module.scss";
 import Table from "../../designSystem/table/Table";
-import CustomizeQueryCheckbox from "./vanityCheckbox/CustomizeQueryCheckbox";
 import { VsGrouping } from "@/app/utils/valueSetTranslation";
 import classNames from "classnames";
+import Checkbox from "../../designSystem/checkbox/Checkbox";
 
 type CustomizeQueryAccordionBodyProps = {
   group: VsGrouping;
@@ -38,7 +38,7 @@ const CustomizeQueryAccordionBody: React.FC<
     <Table className={classNames(styles.customizeQueryGridContainer)}>
       <thead>
         <tr className={styles.customizeQueryGridHeader}>
-          <th>Include</th>
+          <th></th>
           <th>Code</th>
           <th>Display</th>
         </tr>
@@ -52,9 +52,9 @@ const CustomizeQueryAccordionBody: React.FC<
             return acc;
           }, [] as ValueSetIndexedConcept[])
           .map((item, conceptIndex) => (
-            <tr className={`${styles.customizeQueryGridRow}`} key={item.code}>
-              <td className={styles.noBorderNoBackgroundNoPadding}>
-                <CustomizeQueryCheckbox
+            <tr className={styles.customizeQueryGridRow} key={item.code}>
+              <td className={styles.checkboxCell}>
+                <Checkbox
                   id={item.code}
                   checked={item.include}
                   onChange={() => {
@@ -62,12 +62,8 @@ const CustomizeQueryAccordionBody: React.FC<
                   }}
                 />
               </td>
-              <td className={styles.noBorderNoBackgroundNoPadding}>
-                {item.code}
-              </td>
-              <td className={styles.noBorderNoBackgroundNoPadding}>
-                {item.display}
-              </td>
+              <td>{item.code}</td>
+              <td>{item.display}</td>
             </tr>
           ))}
       </tbody>

@@ -6,7 +6,7 @@ type TitleBoxProps = {
 };
 
 /**
- * TitleBob that renders the page title and step counter state
+ * TitleBox that renders the page title and step counter state
  * along the customize query flow
  * @param root0 params
  * @param root0.step - The step of the customize query flow we're on

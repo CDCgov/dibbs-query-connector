@@ -6,16 +6,15 @@
   border-radius: 0.25rem;
   border: 1px solid $table-row-border;
   background: $white;
-  padding: 1.5rem;
+  padding: $default-table-padding 0;
   box-shadow: 0px 2px 3px 0px $drop-shadow;
 
   thead tr {
     display: grid;
     align-items: center;
-    border-bottom: 1px solid $table-row-border;
-    width: 100%;
     border-bottom: 1px solid $table-row-border !important;
   }
+
   th {
     background-color: $white !important;
     color: $text-secondary !important;
@@ -25,7 +24,6 @@
     font-weight: bold;
     word-wrap: break-word;
     align-items: center;
-    width: 100%;
     box-sizing: border-box;
     border-bottom: none !important;
     padding-left: 0 !important;
@@ -35,6 +33,15 @@
     display: grid;
     align-items: center;
     border-bottom: 1px solid $table-row-border;
+    margin: 0 $default-table-padding;
+  }
+
+  // switch to padding on hover to allow for hover effects to span the whole
+  // width of the row
+  tr:hover {
+    margin-left: 0;
+    margin-right: 0;
+    padding: 0 $default-table-padding;
   }
 
   tr:last-child {

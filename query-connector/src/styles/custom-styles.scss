@@ -290,13 +290,15 @@ hr.custom-hr {
   border: none !important;
 }
 
-.tableRowWithHover:hover td {
+.tableRowWithHover:hover,
+.tableRowWithHover:hover > td {
   background-color: $dropdown-hover;
 }
 
-.tableRowWithHover_clickable,
-.tableRowWithHover_clickable td {
+.tableRowWithHover_clickable:hover,
+.tableRowWithHover_clickable:hover td {
   cursor: pointer;
+  background-color: $dropdown-hover;
 }
 
 // Overrides
