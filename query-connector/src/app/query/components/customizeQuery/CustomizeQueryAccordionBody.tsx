@@ -1,7 +1,8 @@
-import styles from "./customizeQuery.module.css";
-import Table from "../../designSystem/Table";
+import styles from "./customizeQuery.module.scss";
+import Table from "../../designSystem/table/Table";
 import CustomizeQueryCheckbox from "./vanityCheckbox/CustomizeQueryCheckbox";
 import { VsGrouping } from "@/app/utils/valueSetTranslation";
+import classNames from "classnames";
 
 type CustomizeQueryAccordionBodyProps = {
   group: VsGrouping;
@@ -34,12 +35,12 @@ const CustomizeQueryAccordionBody: React.FC<
   CustomizeQueryAccordionBodyProps
 > = ({ group, toggleInclude, groupIndex }) => {
   return (
-    <Table className={`${styles.customizeQueryGridContainer}`}>
+    <Table className={classNames(styles.customizeQueryGridContainer)}>
       <thead>
         <tr className={styles.customizeQueryGridHeader}>
-          <th className={`${styles.accordionTableHeader}`}>Include</th>
-          <th className={`${styles.accordionTableHeader}`}>Code</th>
-          <th className={`${styles.accordionTableHeader}`}>Display</th>
+          <th>Include</th>
+          <th>Code</th>
+          <th>Display</th>
         </tr>
       </thead>
       <tbody className="display-flex flex-column">

@@ -1,0 +1,15 @@
+.tableContainer {
+  --column-spacing: 2fr 1fr 2fr 2fr 1fr 1fr;
+  --column-gap: 0.5rem;
+}
+
+.header {
+  display: grid;
+  grid-template-columns: var(--column-spacing);
+  gap: var(--column-gap);
+}
+
+.row {
+  grid-template-columns: var(--column-spacing);
+  gap: var(--column-gap);
+}

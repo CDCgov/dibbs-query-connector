@@ -1,7 +1,8 @@
 import { DibbsConceptType } from "@/app/constants";
-import styles from "./customizeQuery.module.css";
+import styles from "./customizeQuery.module.scss";
 import CustomizeQueryBulkSelect from "./CustomizeQueryBulkSelect";
 import { ConceptTypeToVsNameToVsGroupingMap } from "@/app/utils/valueSetTranslation";
+import { Button } from "@trussworks/react-uswds";
 
 type CustomizeQueryNavProps = {
   activeTab: DibbsConceptType;
@@ -46,37 +47,40 @@ const CustomizeQueryNav: React.FC<CustomizeQueryNavProps> = ({
       <nav className={`${styles.customizeQueryNav}`}>
         <ul className="usa-sidenav">
           <li className={`usa-sidenav_item`}>
-            <a
-              href="#labs"
-              className={`${
+            <Button
+              className={`usa-button--unstyled ${
                 activeTab === "labs" ? `${styles.currentTab}` : ""
               }`}
               onClick={() => handleTabChange("labs")}
+              disabled={valueSetOptions["labs"] === undefined}
+              type="button"
             >
               Labs
-            </a>
+            </Button>
           </li>
           <li className={`usa-sidenav_item`}>
-            <a
-              className={`${
+            <Button
+              className={`usa-button--unstyled ${
                 activeTab === "medications" ? `${styles.currentTab}` : ""
               }`}
-              href="#medications"
               onClick={() => handleTabChange("medications")}
+              disabled={valueSetOptions["medications"] === undefined}
+              type={"button"}
             >
               Medications
-            </a>
+            </Button>
           </li>
           <li className={`usa-sidenav_item`}>
-            <a
-              className={`${
+            <Button
+              className={`usa-button--unstyled ${
                 activeTab === "conditions" ? `${styles.currentTab}` : ""
               }`}
-              href="#conditions"
               onClick={() => handleTabChange("conditions")}
+              disabled={valueSetOptions["conditions"] === undefined}
+              type={"button"}
             >
               Conditions
-            </a>
+            </Button>
           </li>
         </ul>
       </nav>

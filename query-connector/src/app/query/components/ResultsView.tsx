@@ -13,10 +13,8 @@ import MedicationRequestTable from "./resultsView/tableComponents/MedicationRequ
 import ObservationTable from "./resultsView/tableComponents/ObservationTable";
 import Backlink from "./backLink/Backlink";
 import { USE_CASES, USE_CASE_DETAILS } from "@/app/constants";
-import {
-  PAGE_TITLES,
-  RETURN_LABEL,
-} from "@/app/query/components/stepIndicator/StepIndicator";
+import { RETURN_LABEL } from "@/app/query/components/stepIndicator/StepIndicator";
+import TitleBox from "./stepIndicator/TitleBox";
 
 type ResultsViewProps = {
   useCaseQueryResponse: UseCaseQueryResponse;
@@ -72,9 +70,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({
           New patient search
         </button>
       </div>
-      <h1 className="page-title margin-bottom-0-important">
-        {PAGE_TITLES["results"]}
-      </h1>
+      <TitleBox step="results" />
       <h2 className="page-explainer margin-bottom-3-important margin-top-0-important">
         <strong>Query: </strong>
         <span className="text-normal display-inline-block">

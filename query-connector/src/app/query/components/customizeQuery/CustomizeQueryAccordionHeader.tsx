@@ -1,5 +1,5 @@
 import { VsGrouping } from "@/app/utils/valueSetTranslation";
-import styles from "./customizeQuery.module.css";
+import styles from "./customizeQuery.module.scss";
 import CustomizeQueryCheckbox from "./vanityCheckbox/CustomizeQueryCheckbox";
 
 type CustomizeQueryAccordionProps = {

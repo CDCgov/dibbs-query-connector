@@ -1,3 +1,5 @@
+@use "../../../../styles/_variables" as *;
+
 .customizeQueryNav {
   display: flex;
   justify-content: flex-start;
@@ -19,12 +21,14 @@
   border: none;
 }
 
-.customizeQueryNav a {
+.customizeQueryNav button {
   padding: 0rem 1rem !important;
+  text-decoration: none !important;
+  color: $text-primary;
 }
 
-.customizeQueryNav a:hover,
-.customizeQueryNav a:focus {
+.customizeQueryNav button:hover,
+.customizeQueryNav button:focus {
   color: #565c65;
   background-color: transparent;
   border: none;
@@ -49,7 +53,7 @@
   left: 0;
   width: 100%;
   height: 4px;
-  background-color: #005ea2;
+  background-color: $primary;
 }
 
 .customizeQueryNav ul::after {
@@ -73,7 +77,7 @@
 .accordionHeader {
   display: flex;
   width: 100%;
-  color: var(--White, #fff);
+  color: $text-primary;
   font-size: 18px;
   font-style: normal;
   font-weight: 700;
@@ -85,7 +89,7 @@
   display: block;
   font-weight: normal;
   font-size: 16px;
-  color: var(--White, #fff);
+  color: $text-secondary;
   font-size: 16px;
   line-height: normal;
 }
@@ -96,12 +100,12 @@
 }
 
 .customizeQueryAccordion button {
-  background-color: #565c65;
+  background-color: $table-header;
 }
 
 .customizeQueryAccordion button:hover,
 .customizeQueryAccordion button:focus {
-  background-color: #565c65;
+  background-color: $table-header;
   outline: none;
 }
 
@@ -110,57 +114,18 @@
 }
 
 .customizeQueryGridContainer {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  height: 100%;
-  border: 1px solid #71767a;
-
   --column-spacing: 3.75rem 6.25rem 1fr;
   --column-gap: 3.75rem;
 }
 
 .customizeQueryGridHeader {
-  display: grid;
-  align-items: center;
-  padding: 0.65rem 1.5rem;
-  border-bottom: 1px solid #71767a;
-  width: 100%;
   grid-template-columns: var(--column-spacing);
   gap: var(--column-gap);
-}
-
-.customizeQueryGridHeader th {
-  padding: 0 !important;
-}
-
-.accordionTableHeader {
-  display: flex;
-  justify-content: space-between;
-  font-weight: bold;
-  word-wrap: break-word;
-  align-items: center;
-  width: 100%;
-  box-sizing: border-box;
-  border: none !important;
 }
 
 .customizeQueryGridRow {
-  display: grid;
   grid-template-columns: var(--column-spacing);
   gap: var(--column-gap);
-  align-items: center;
-  padding: 0.88rem 1.5rem;
-}
-
-.customizeQueryGridRow:nth-child(even) {
-  background-color: rgba(223, 225, 226, 0.5);
-  border-bottom: 1px solid #71767a;
-  border-top: 1px solid #71767a;
-}
-
-.customizeQueryGridRow:last-child {
-  border-bottom: none;
 }
 
 .bulkSelectLink {

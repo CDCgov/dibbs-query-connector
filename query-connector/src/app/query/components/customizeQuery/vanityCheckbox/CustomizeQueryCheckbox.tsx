@@ -2,7 +2,7 @@ import classNames from "classnames";
 import Checkbox, {
   CheckboxProps,
 } from "../../../designSystem/checkbox/Checkbox";
-import styles from "./checkbox.module.css";
+import styles from "./checkbox.module.scss";
 
 type VanityCheckboxProps = CheckboxProps & {
   isHeader?: boolean;

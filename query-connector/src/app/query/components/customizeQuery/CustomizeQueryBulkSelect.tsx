@@ -1,4 +1,4 @@
-import styles from "../customizeQuery/customizeQuery.module.css";
+import styles from "../customizeQuery/customizeQuery.module.scss";
 
 type CustomizeQueryBulkSelectProps = {
   allItemsDeselected: boolean;

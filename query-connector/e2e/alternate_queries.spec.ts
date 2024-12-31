@@ -30,11 +30,11 @@ test.describe("alternate queries with the Query Connector", () => {
     await page.getByRole("button", { name: "Search for patient" }).click();
     await expect(page.getByText("Loading")).toHaveCount(0, { timeout: 10000 });
     await expect(
-      page.getByRole("heading", { name: PAGE_TITLES["patient-results"] }),
+      page.getByRole("heading", { name: PAGE_TITLES["patient-results"].title }),
     ).toBeVisible();
     await page.getByRole("link", { name: "Select patient" }).click();
     await expect(
-      page.getByRole("heading", { name: PAGE_TITLES["select-query"] }),
+      page.getByRole("heading", { name: PAGE_TITLES["select-query"].title }),
     ).toBeVisible();
     await page.getByTestId("Select").selectOption("chlamydia");
     await page.getByRole("button", { name: "Submit" }).click();

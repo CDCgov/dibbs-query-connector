@@ -1,0 +1,32 @@
+$columnGap: 0.5rem;
+
+$conditionColumnSpacing: 3fr;
+$observationColumnSpacing: 1fr 2fr 2fr;
+$medicationColumnSpacing: 1fr 3fr 1fr;
+$encountersColumnSpacing: 2fr 1fr 1fr 1fr;
+$diagnosticsColumnSpacing: 1fr 3fr;
+
+.conditionRow {
+  grid-template-columns: $conditionColumnSpacing;
+  gap: $columnGap;
+}
+
+.observationRow {
+  grid-template-columns: $observationColumnSpacing;
+  gap: $columnGap;
+}
+
+.medicationRow {
+  grid-template-columns: $medicationColumnSpacing;
+  gap: $columnGap;
+}
+
+.encountersRow {
+  grid-template-columns: $encountersColumnSpacing;
+  gap: $columnGap;
+}
+
+.diagnosticsRow {
+  grid-template-columns: $diagnosticsColumnSpacing;
+  gap: $columnGap;
+}

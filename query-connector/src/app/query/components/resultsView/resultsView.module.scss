@@ -5,12 +5,12 @@
 }
 
 .accordionWrapper > h3 {
-  font-size: 32px;
+  font-size: 1.75rem;
   color: white !important;
-  background-color: #2e6276;
+  background-color: $table-header;
 
   &:hover {
-    background-color: #224856;
+    background-color: $table-header;
   }
 }
 
@@ -19,10 +19,22 @@
   padding: 1rem 1.5rem;
 }
 
+.accordionWrapper {
+  button,
+  button:hover {
+    background-image: url("../../../../styles/assets/expandUp.svg");
+  }
+
+  button[aria-expanded="false"],
+  button[aria-expanded="false"]:hover {
+    background-image: url("../../../../styles/assets/expandDown.svg");
+  }
+}
+
 .accordionHeading {
   font-family: "Source Sans Pro Web", "Helvetica Neue", "Helvetica", "Roboto",
     "Arial", "sans-serif" !important;
-  font-size: 1.46rem !important;
+  font-size: 1.25rem !important;
   line-height: 1.1 !important;
   padding-bottom: 0.75rem;
   margin-bottom: 0.5rem !important;

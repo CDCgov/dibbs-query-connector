@@ -8,10 +8,8 @@ import { Select, Button } from "@trussworks/react-uswds";
 import Backlink from "../backLink/Backlink";
 import styles from "./selectQuery.module.scss";
 import { useState } from "react";
-import {
-  PAGE_TITLES,
-  RETURN_LABEL,
-} from "@/app/query/components/stepIndicator/StepIndicator";
+import { RETURN_LABEL } from "@/app/query/components/stepIndicator/StepIndicator";
+import TitleBox from "../stepIndicator/TitleBox";
 
 type SelectSavedQueryProps = {
   selectedQuery: string;
@@ -57,7 +55,7 @@ const SelectSavedQuery: React.FC<SelectSavedQueryProps> = ({
       {/* Back button */}
 
       <Backlink onClick={goBack} label={RETURN_LABEL["select-query"]} />
-      <h1 className="page-title">{PAGE_TITLES["select-query"]}</h1>
+      <TitleBox step="select-query" />
       <h2 className="page-explainer">
         We will pull relevant data for your selected patient and query.
       </h2>
