@@ -294,7 +294,7 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
               : "Back to My queries"
           }
         />
-        <ToastContainer position="bottom-left" icon={false} />
+        <ToastContainer position="bottom-left" icon={false} stacked />
         <div className="customQuery__header">
           <h1 className={styles.queryTitle}>Custom query</h1>
           <div className={styles.customQuery__controls}>

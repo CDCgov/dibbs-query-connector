@@ -115,7 +115,10 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
                       }
                     >
                       <span className="icon-text padding-right-4 display-flex flex-align-center">
-                        <Icon.Edit className="height-3 width-3" />
+                        <Icon.Edit
+                          className="height-3 width-3"
+                          aria-label="Pencil icon indicating edit ability"
+                        />
                         <span id={query.query_id} className="padding-left-05">
                           Edit
                         </span>
@@ -134,7 +137,10 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
                       }
                     >
                       <span className="icon-text padding-right-4 display-flex flex-align-center">
-                        <Icon.Delete className="height-3 width-3" />
+                        <Icon.Delete
+                          className="height-3 width-3"
+                          aria-label="trashcan icon indicating deletion"
+                        />
                         <span className="padding-left-05">Delete</span>
                       </span>
                     </Button>
@@ -146,7 +152,10 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
                       }
                     >
                       <span className="icon-text padding-right-1 display-flex flex-align-center">
-                        <Icon.ContentCopy className="height-3 width-3" />
+                        <Icon.ContentCopy
+                          className="height-3 width-3"
+                          aria-label="Stacked paper icon indidcating copy"
+                        />
                         <span className="padding-left-05">Copy ID</span>
                       </span>
                     </Button>
