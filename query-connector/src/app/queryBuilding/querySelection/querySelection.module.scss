@@ -1,7 +1,7 @@
 @use "../../../styles/variables" as *;
 
 $columnGap: 0.5rem;
-$conditionColumnSpacing: 3fr 2fr 5fr;
+$conditionColumnSpacing: 2fr 3fr 3fr;
 
 .myQueriesRow {
   grid-template-columns: $conditionColumnSpacing;
