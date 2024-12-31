@@ -70,12 +70,14 @@ export const SelectionTable: React.FC<SelectionTableProps> = ({
       handleToggle,
     };
   };
+
+  const accordionItems = Object.keys(vsTypeLevelOptions).map((vsType) => {
+    return generateTypeLevelAccordionItems(vsType as DibbsConceptType);
+  });
   return (
     <div data-testid="accordion" className={styles.accordionContainer}>
       <MultiAccordion
-        items={Object.keys(vsTypeLevelOptions).map((vsType) => {
-          return generateTypeLevelAccordionItems(vsType as DibbsConceptType);
-        })}
+        items={accordionItems}
         multiselectable={false}
         accordionClassName={styles.accordionInnerWrapper}
       />
