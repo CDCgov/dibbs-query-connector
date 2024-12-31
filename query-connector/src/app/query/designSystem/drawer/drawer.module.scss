@@ -1,3 +1,5 @@
+@use "../../../../styles/_variables" as *;
+
 .drawer {
   position: fixed;
   top: 0;
@@ -12,8 +14,8 @@
   flex-shrink: 0;
   transition: right 0.3s ease;
   z-index: 1050;
-  border-left: 1px solid var(--gray-400, #dfe1e2);
-  background: var(--Gray-cool-gray-cool-2, #f7f9fa);
+  border-left: 1px solid $border;
+  background: $page-background;
 }
 
 .drawer.open {
@@ -45,7 +47,7 @@
   align-items: center;
   gap: 0.5rem;
   border-radius: 0.25rem;
-  border: 1px solid var(--gray-500, #919191);
+  border: 1px solid $input-field-border;
   background-color: #fff;
 }
 

@@ -1,4 +1,4 @@
-import Table from "../../designSystem/Table";
+import Table from "../../designSystem/table/Table";
 import { Patient } from "fhir/r4";
 import {
   formatAddress,
@@ -6,9 +6,11 @@ import {
   formatMRN,
   formatName,
 } from "@/app/format-service";
-import { PAGE_TITLES } from "@/app/query/components/stepIndicator/StepIndicator";
+import styles from "./patientSearchResults.module.scss";
+import classNames from "classnames";
+import TitleBox from "../stepIndicator/TitleBox";
 
-type PatientSeacrchResultsTableProps = {
+type PatientSearchResultsTableProps = {
   patients: Patient[];
   handlePatientSelect: (patient: Patient) => void;
 };
@@ -22,17 +24,17 @@ type PatientSeacrchResultsTableProps = {
  * to the results view
  * @returns The patient search results view
  */
-const PatientSearchResultsTable: React.FC<PatientSeacrchResultsTableProps> = ({
+const PatientSearchResultsTable: React.FC<PatientSearchResultsTableProps> = ({
   patients,
   handlePatientSelect: setPatientForQueryResponse,
 }) => {
   return (
     <>
-      <h1 className="page-title">{PAGE_TITLES["patient-results"]}</h1>
+      <TitleBox step="patient-results" />
       <h2 className="page-explainer">The following record(s) match.</h2>
-      <Table className="margin-top-4">
+      <Table className={classNames("margin-top-4", styles.tableContainer)}>
         <thead>
-          <tr>
+          <tr className={styles.header}>
             <th>Name</th>
             <th>DOB</th>
             <th>Contact</th>
@@ -45,7 +47,7 @@ const PatientSearchResultsTable: React.FC<PatientSeacrchResultsTableProps> = ({
           {patients.map((patient) => (
             <tr
               key={patient.id}
-              className="tableRowWithHover tableRowWithHover_clickable"
+              className={classNames("tableRowWithHover_clickable", styles.row)}
               onClick={() => setPatientForQueryResponse(patient)}
             >
               <td>{formatName(patient.name ?? [])}</td>

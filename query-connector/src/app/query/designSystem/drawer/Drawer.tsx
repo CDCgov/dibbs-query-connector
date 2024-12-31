@@ -1,6 +1,6 @@
 import React, { useRef } from "react";
 import { Button, Icon } from "@trussworks/react-uswds";
-import styles from "./drawer.module.css";
+import styles from "./drawer.module.scss";
 import SearchField from "../searchField/SearchField";
 import { showToastConfirmation } from "../toast/Toast";
 import WarningModal from "../modal/warningModal";
