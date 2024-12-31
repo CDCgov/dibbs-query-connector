@@ -20,6 +20,18 @@ export type ConceptTypeToVsNameToVsGroupingMap = {
 
 type VsNameAuthorSystem = string;
 /**
+ * Utility function to extract the unique identifier for a ValueSetGrouping
+ * @param vsGroup - A ValueSetGrouping to identify
+ * @returns the vsName:Author:System key that should uniquely identify a
+ * valueset grouping
+ */
+export function getNameAuthorSystemFromVSGrouping(vsGroup: VsGrouping) {
+  return `${vsGroup.valueSetName}:${vsGroup.author}:${vsGroup.system}`;
+}
+
+export type ConceptOption = { code: string; display: string; include: boolean };
+
+/**
  * Helper function that takes an array of value set items and groups them using
  * a combination of the value set name, author, and system to create a unique
  * grouping of items. These groups are displayed as individual accordions on

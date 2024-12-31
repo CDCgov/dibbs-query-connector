@@ -4,7 +4,7 @@ import styles from "../buildFromTemplates/buildfromTemplate.module.scss";
 import {
   ConditionToConceptTypeToValueSetGroupingMap,
   batchToggleConcepts,
-  tallyConceptsForValueSetGroup,
+  tallyConceptsForValueSetGroupArray,
 } from "../utils";
 import {
   HeadingLevel,
@@ -116,11 +116,11 @@ export const SelectionTable: React.FC<SelectionTableProps> = ({
         const activeVsGroupings = Object.values(
           groupedValueSetsForCondition[activeValueSetType],
         );
-        const totalCount = tallyConceptsForValueSetGroup(
+        const totalCount = tallyConceptsForValueSetGroupArray(
           activeVsGroupings,
           false,
         );
-        const selectedCount = tallyConceptsForValueSetGroup(
+        const selectedCount = tallyConceptsForValueSetGroupArray(
           activeVsGroupings,
           true,
         );
