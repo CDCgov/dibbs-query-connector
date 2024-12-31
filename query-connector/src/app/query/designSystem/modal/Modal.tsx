@@ -11,8 +11,9 @@ import React, { RefObject, ReactNode } from "react";
 export type ModalRef = TrussModalRef;
 
 type ModalButton = {
-  text: string;
+  text: string | JSX.Element;
   type: "button" | "submit" | "reset";
+  id?: string; // Optional ID for the button
   className?: string; // Optional classes for styling
   onClick: () => void; // Action to perform when the button is clicked
 };
@@ -24,6 +25,7 @@ type ModalProps = {
   children?: ReactNode;
   modalRef: RefObject<ModalRef>;
   buttons: ModalButton[]; // Dynamic buttons
+  isLarge?: boolean;
 };
 
 /**
@@ -37,6 +39,7 @@ type ModalProps = {
  * @param param0.modalRef - ref object to connect the toggle button with the
  * actual modal.
  * @param param0.buttons - Array of button definitions for the modal footer.
+ * @param param0.isLarge - Optional prop to make the modal large
  * @returns A customizable modal component
  */
 export const Modal: React.FC<ModalProps> = ({
@@ -46,18 +49,20 @@ export const Modal: React.FC<ModalProps> = ({
   children,
   modalRef,
   buttons,
+  isLarge,
 }) => {
   return (
     <TrussModal
       ref={modalRef}
       id={`${id}-modal`}
       aria-labelledby={`${id}-modal-heading`}
-      aria-describedby={description ? `${id}-modal-description` : undefined}
+      aria-describedby={`${id}-modal-description`}
+      isLarge={isLarge}
     >
       <ModalHeading id={`${id}-modal-heading`}>{heading}</ModalHeading>
-      <div className="usa-prose">
+      <div id={`${id}-modal-description`} className="usa-prose">
         {description ? (
-          <p id={`${id}-modal-description`}>{description}</p>
+          <p>{description}</p>
         ) : (
           children
         )}
@@ -68,6 +73,7 @@ export const Modal: React.FC<ModalProps> = ({
             <Button
               key={index}
               type={button.type}
+              id={button.id}
               className={button.className}
               onClick={button.onClick}
             >
@@ -76,6 +82,6 @@ export const Modal: React.FC<ModalProps> = ({
           ))}
         </ButtonGroup>
       </ModalFooter>
-    </TrussModal>
+    </TrussModal >
   );
 };
