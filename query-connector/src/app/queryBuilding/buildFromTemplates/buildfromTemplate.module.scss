@@ -38,7 +38,7 @@
 
 .categoryHeading {
   text-transform: uppercase;
-  color: $gray-500;
+  color: $text-secondary;
   font-weight: 700;
   font-size: 1rem;
   margin-bottom: 1rem;
@@ -46,7 +46,7 @@
 }
 
 .displayCol:first-of-type {
-  border-right: 1px solid $base-lighter;
+  border-right: 1px solid $table-row-border;
 }
 
 .displayCol:nth-of-type(2) {
