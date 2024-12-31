@@ -1,7 +1,7 @@
 import { Checkbox } from "@trussworks/react-uswds";
 import styles from "../buildFromTemplates/buildfromTemplate.module.scss";
 import { formatDiseaseDisplay } from "../utils";
-import { tallyConceptsForSingleValueSet } from "../utils";
+import { tallyConceptsForSingleValueSetGroup } from "../utils";
 import Drawer from "@/app/query/designSystem/drawer/Drawer";
 import React, { useState } from "react";
 import { VsGrouping } from "@/app/utils/valueSetTranslation";
@@ -45,8 +45,8 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
     <div>
       {activeVsGroupings &&
         activeVsGroupings.map((vs) => {
-          const selectedCount = tallyConceptsForSingleValueSet(vs, true);
-          const totalCount = tallyConceptsForSingleValueSet(vs, false);
+          const selectedCount = tallyConceptsForSingleValueSetGroup(vs, true);
+          const totalCount = tallyConceptsForSingleValueSetGroup(vs, false);
           const checked =
             vs.items[0].includeValueSet || selectedCount == totalCount;
 
