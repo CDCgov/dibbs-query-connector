@@ -41,25 +41,8 @@ const Drawer: React.FC<DrawerProps> = ({
   toRender,
   hasChanges,
 }: DrawerProps) => {
-  const modalRef = useRef<ModalRef>(null);
-
-  const handleSaveChanges = () => {
-    onSave();
-    if (toastMessage) {
-      showToastConfirmation({
-        body: toastMessage,
-        variant: "success",
-      });
-    }
-    onClose();
-  };
-
   const handleClose = () => {
-    if (hasChanges) {
-      modalRef.current?.toggleModal();
-    } else {
-      onClose();
-    }
+    onClose();
   };
 
   return (
@@ -71,21 +54,13 @@ const Drawer: React.FC<DrawerProps> = ({
         <div className={styles.drawerContent}>
           <button
             className={styles.closeButton}
-            onClick={handleClose}
+            onClick={onClose}
             aria-label="Close drawer"
           >
             <Icon.Close size={3} aria-label="X icon indicating closure" />
           </button>
           <h2 className="margin-0 padding-bottom-2">{title}</h2>
-          {hasChanges !== undefined && (
-            <Button
-              type="button"
-              onClick={handleSaveChanges}
-              disabled={!hasChanges}
-            >
-              Save changes
-            </Button>
-          )}
+
           <div className="padding-top-5">
             <SearchField
               id="searchFieldTemplate"
@@ -101,16 +76,6 @@ const Drawer: React.FC<DrawerProps> = ({
       </div>
 
       {isOpen && <div className={styles.overlay} onClick={handleClose}></div>}
-
-      {hasChanges !== undefined && (
-        <WarningModal
-          modalRef={modalRef}
-          heading="Unsaved Changes"
-          description="You have unsaved changes. Do you want to dismiss them?"
-          onSave={handleSaveChanges}
-          onCancel={onClose}
-        />
-      )}
     </>
   );
 };

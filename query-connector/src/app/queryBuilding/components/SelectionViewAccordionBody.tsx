@@ -44,7 +44,10 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
     setIsDrawerOpen(true);
   };
 
-  const handleConceptsChange = (updatedConcepts: ConceptOption[]) => {
+  const handleConceptsChange = (
+    updatedConcepts: ConceptOption[],
+    updateBatchSave = true,
+  ) => {
     if (curVsGrouping) {
       const activeVsName = getNameAuthorSystemFromVSGrouping(curVsGrouping);
       curVsGrouping.items = [
@@ -52,7 +55,12 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
         // the new items array will only differ by concepts
         { ...curVsGrouping.items[0], concepts: updatedConcepts },
       ];
-      handleVsNameLevelUpdate(activeVsName)(curVsGrouping)(curVsGrouping.items);
+
+      if (updateBatchSave) {
+        handleVsNameLevelUpdate(activeVsName)(curVsGrouping)(
+          curVsGrouping.items,
+        );
+      }
       setCurConcepts(updatedConcepts);
       setHasDrawerChange(true);
     }

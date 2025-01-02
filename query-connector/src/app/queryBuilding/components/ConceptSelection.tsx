@@ -2,6 +2,7 @@ import React from "react";
 import { Checkbox } from "@trussworks/react-uswds";
 import styles from "../buildFromTemplates/buildfromTemplate.module.scss";
 import { ConceptOption } from "@/app/utils/valueSetTranslation";
+import { showToastConfirmation } from "@/app/query/designSystem/toast/Toast";
 
 type ConceptSelectionProps = {
   concepts: ConceptOption[];
@@ -30,6 +31,12 @@ const ConceptSelection: React.FC<ConceptSelectionProps> = ({
       include: isMinusState ? false : isChecked,
     }));
     onConceptsChange(updatedConcepts);
+    showToastConfirmation({
+      body: `${updatedConcepts.length} codes successfully ${
+        isChecked ? "added" : "removed"
+      }`,
+      variant: "success",
+    });
   };
 
   const toggleSingle = (index: number, isChecked: boolean) => {
@@ -37,6 +44,12 @@ const ConceptSelection: React.FC<ConceptSelectionProps> = ({
       i === index ? { ...concept, include: isChecked } : concept,
     );
     onConceptsChange(updatedConcepts);
+    showToastConfirmation({
+      body: `${concepts[index].code} successfully ${
+        isChecked ? "added" : "removed"
+      }`,
+      variant: "success",
+    });
   };
 
   return (
