@@ -10,7 +10,7 @@ import {
   filterSearchByCategoryAndCondition,
 } from "@/app/queryBuilding/utils";
 import {
-  CANCER_VALUESETS,
+  CANCER_DB_QUERY_VALUES,
   CATEGORY_TO_CONDITION_ARRAY_MAP,
   DEFAULT_CHLAMYDIA_QUERY,
   EXPECTED_CHLAMYDIA_VALUESET_LENGTH,
@@ -139,8 +139,9 @@ describe("data util methods for query building", () => {
   });
 
   describe("groupConditionConceptsByValueSetId", () => {
-    const formattedValueSets =
-      groupConditionConceptsIntoValueSets(CANCER_VALUESETS);
+    const formattedValueSets = groupConditionConceptsIntoValueSets(
+      CANCER_DB_QUERY_VALUES,
+    );
     const EXPECTED_CANCER_VALUESET_GROUPS = 4;
     expect(formattedValueSets.length).toBe(EXPECTED_CANCER_VALUESET_GROUPS);
     expect(

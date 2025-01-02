@@ -88,12 +88,13 @@ export function groupValueSetsByNameAuthorSystem(
   return results;
 }
 /**
- * Utility function that grouops an array of DibbsValueSets into the name / author
+ * Utility function that groups an array of DibbsValueSets into the name / author
  * / system groupings and then sorts them into their DibbsConceptType buckets
  * buckets
  * @param vsArray - an array of DibbsValueSets
  * @returns - {[DibbsConceptType]: ValueSetGrouping (VS's that share name / author / system) }
  */
+
 export function generateValueSetGroupingsByDibbsConceptType(
   vsArray: DibbsValueSet[],
 ) {
@@ -131,7 +132,7 @@ export function groupValueSetGroupingByConditionId(
  * @param  valueSetsByConceptType - map of { dibbsConceptType : ValueSet[] }
  * @returns a { dibbsConceptType: {valueSetNameAuthorSystem}: ValueSetGrouping } map
  */
-export function generateValueSetGroupingsByConceptType(valueSetsByConceptType: {
+function generateValueSetGroupingsByConceptType(valueSetsByConceptType: {
   [key in DibbsConceptType]: DibbsValueSet[];
 }) {
   return Object.keys(valueSetsByConceptType).reduce(
