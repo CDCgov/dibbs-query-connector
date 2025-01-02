@@ -191,6 +191,11 @@ const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
     }
   }, [valueSetOptions, activeTab]);
 
+  const valueSetOptionsToDisplay =
+    valueSetOptions && valueSetOptions[activeTab]
+      ? Object.entries(valueSetOptions[activeTab])
+      : [];
+
   return (
     <div>
       <div className="padding-top-3">
@@ -212,7 +217,7 @@ const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
         handleSelectAllForTab={handleSelectAllForTab}
         valueSetOptions={valueSetOptions}
       />
-      {Object.entries(valueSetOptions[activeTab]).map(([groupIndex, group]) => {
+      {valueSetOptionsToDisplay.map(([groupIndex, group]) => {
         const id = group.author + ":" + group.system + ":" + group.valueSetName;
         return (
           <Accordion
