@@ -77,4 +77,3 @@ jobs:
             -var-file="$WORKSPACE.tfvars" \
             -var "umls_api_key=${UMLS_API_KEY}" \
             -var "ersd_api_key=${ERSD_API_KEY}" \
-
