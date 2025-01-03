@@ -67,6 +67,7 @@ const options = {
  * @param content.body - body text of the redirect toast
  * @param content.headingLevel - h1-6 level of the heading tag associated with
  * content.heading. defaults to h4
+ * @param content.hideProgressBar - Whether to hide the rendering of the progress bar
  * @param content.duration - Duration in milliseconds for how long the toast is visible. Defaults to 5000ms.
  */
 export function showToastConfirmation(content: {

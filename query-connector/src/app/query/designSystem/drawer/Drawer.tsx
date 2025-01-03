@@ -19,12 +19,9 @@ type DrawerProps = {
  * @param root0 - props
  * @param root0.title - The title displayed in the drawer.
  * @param root0.placeholder - The placeholder text for the search field.
- * @param root0.toastMessage - Optional message to show in a toast when the drawer closes.
  * @param root0.onClose - Function to handle closing the drawer.
- * @param root0.onSave - Callback when the "Save Changes" button is clicked.`
  * @param root0.isOpen - Boolean to control the visibility of the drawer.
  * @param root0.toRender - The dynamic content to display.
- * @param root0.hasChanges - whether passed in data has changes, controls whether
  * warning modal appears before saving
  * @returns The Drawer component.
  */
