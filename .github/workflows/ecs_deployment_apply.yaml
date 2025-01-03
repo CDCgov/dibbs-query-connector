@@ -2,9 +2,10 @@ name: Terraform Apply
 run-name: Terraform apply ${{ inputs.workspace }} by @${{ github.actor }}
 
 on:
-  push:
-    branches:
-      - shanice/transition_ecs_infra
+  workflow_run:
+    workflows: ["Terraform Plan"]
+    types:
+      - completed
   workflow_dispatch:
     inputs:
       workspace:
@@ -51,6 +52,10 @@ jobs:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: ${{ secrets.AWS_REGION }}
 
+      - name: Download Terraform Plan
+        uses: actions/download-artifact@v3
+        with:
+            name: tfplan
       - name: Terraform
         env:
           ACTION: ${{ env.terraform_action }}
@@ -76,7 +81,7 @@ jobs:
             -backend-config "region=$REGION" \
             || (echo "terraform init failed, exiting..." && exit 1)
           terraform workspace select "$WORKSPACE"
-          terraform apply -auto-approve \
+          terraform apply tfplan -auto-approve  \
             -var-file="$WORKSPACE.tfvars" \
             -var "umls_api_key=${UMLS_API_KEY}" \
             -var "ersd_api_key=${ERSD_API_KEY}" \      
