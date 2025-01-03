@@ -66,6 +66,7 @@ jobs:
           TLS_KEY: ${{ secrets.TLS_KEY}}
         shell: bash
         run: |
+          rm -rf .terraform .terraform.lock.hcl
           terraform init \
             -var-file="$WORKSPACE.tfvars" \
             -backend-config "bucket=$BUCKET" \
