@@ -1,5 +1,4 @@
 import styles from "../buildFromTemplates/buildfromTemplate.module.scss";
-import classNames from "classnames";
 import { Icon } from "@trussworks/react-uswds";
 import { DibbsConceptType, DibbsValueSet } from "@/app/constants";
 import { VsGrouping } from "@/app/utils/valueSetTranslation";

@@ -3,7 +3,6 @@ import styles from "../buildFromTemplates/buildfromTemplate.module.scss";
 import { ConceptOption } from "@/app/utils/valueSetTranslation";
 import { showToastConfirmation } from "@/app/query/designSystem/toast/Toast";
 import Checkbox from "@/app/query/designSystem/checkbox/Checkbox";
-import Table from "@/app/query/designSystem/table/Table";
 
 type ConceptSelectionProps = {
   concepts: ConceptOption[];

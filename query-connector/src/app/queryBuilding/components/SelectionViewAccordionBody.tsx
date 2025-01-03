@@ -9,9 +9,7 @@ import {
   VsGrouping,
   getNameAuthorSystemFromVSGrouping,
 } from "@/app/utils/valueSetTranslation";
-import classNames from "classnames";
 import { DibbsValueSet } from "@/app/constants";
-import { DibbsConceptType } from "@/app/constants";
 import Checkbox from "@/app/query/designSystem/checkbox/Checkbox";
 
 type SelectionViewAccordionBodyProps = {
