@@ -4,7 +4,7 @@ run-name: Terraform apply ${{ inputs.workspace }} by @${{ github.actor }}
 on:
   push:
     branches:
-      - shanice/transition_ecs_infra  
+      - shanice/transition_ecs_infra
   workflow_dispatch:
     inputs:
       workspace:
