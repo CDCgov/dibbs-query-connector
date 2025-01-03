@@ -15,7 +15,6 @@ body {
   line-height: 1.4;
   background-color: $page-background;
 }
-
 .application-container {
   display: flex;
   flex-flow: column;
@@ -299,13 +298,23 @@ hr.custom-hr {
   border: none !important;
 }
 
-.tableRowWithHover:hover td {
+.tableRowWithHover:hover,
+.tableRowWithHover:hover > td {
   background-color: $dropdown-hover;
 }
 
-.tableRowWithHover_clickable,
-.tableRowWithHover_clickable td {
+.tableRowWithHover_clickable:hover,
+.tableRowWithHover_clickable:hover td,
+.tableRowWithHover_clickable:hover .usa-checkbox {
   cursor: pointer;
+  background-color: $dropdown-hover !important;
+}
+
+.tableRowWithHover:hover,
+.tableRowWithHover_clickable:hover {
+  margin-left: 0;
+  margin-right: 0;
+  padding: 0 $default-table-padding;
 }
 
 // Overrides
@@ -508,4 +517,8 @@ ul.usa-sidenav
 
 .custom-alert {
   margin-top: 0;
+}
+
+.usa-alert__text {
+  font-size: 0.875rem;
 }

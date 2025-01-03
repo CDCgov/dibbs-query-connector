@@ -1,4 +1,3 @@
-import { Checkbox } from "@trussworks/react-uswds";
 import styles from "../buildFromTemplates/buildfromTemplate.module.scss";
 import { formatDiseaseDisplay } from "../utils";
 import { tallyConceptsForSingleValueSetGroup } from "../utils";
@@ -12,6 +11,8 @@ import {
 } from "@/app/utils/valueSetTranslation";
 import classNames from "classnames";
 import { DibbsValueSet } from "@/app/constants";
+import { DibbsConceptType } from "@/app/constants";
+import Checkbox from "@/app/query/designSystem/checkbox/Checkbox";
 
 type SelectionViewAccordionBodyProps = {
   id?: string;
@@ -125,7 +126,6 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
           <div className={styles.accordionBodyExpanded} key={vsLabel}>
             <div className={styles.accordionExpandedInner}>
               <Checkbox
-                name={`checkbox-${vs.valueSetName}`}
                 className={classNames(
                   styles.valueSetTemplate__checkbox,
                   isMinusState
@@ -133,8 +133,7 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
                     : "",
                 )}
                 label={checkboxLabel(vs.valueSetName, vs.author, vs.system)}
-                onChange={(e) => {
-                  e.stopPropagation();
+                onChange={(e: ChangeEvent<HTMLInputElement>) => {
                   handleBulkToggle(e, isMinusState);
                 }}
                 id={vsLabel}
