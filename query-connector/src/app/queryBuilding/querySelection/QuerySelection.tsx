@@ -12,7 +12,7 @@ import {
 } from "react";
 import { ToastContainer } from "react-toastify";
 import EmptyQueriesDisplay from "./EmptyQueriesDisplay";
-import UserQueriesDisplay from "./UserQueriesDisplay";
+import MyQueriesDisplay from "./MyQueries";
 import { SelectedQueryDetails, SelectedQueryState } from "./utils";
 import styles from "./querySelection.module.scss";
 import { BuildStep } from "@/app/constants";
@@ -77,7 +77,7 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({
       ) : (
         <div className="main-container__wide">
           <ToastContainer position="bottom-left" icon={false} />
-          <UserQueriesDisplay
+          <MyQueriesDisplay
             queries={queries}
             selectedQuery={selectedQuery}
             setSelectedQuery={setSelectedQuery}

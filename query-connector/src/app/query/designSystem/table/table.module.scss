@@ -4,18 +4,17 @@
   display: flex;
   flex-direction: column;
   border-radius: 0.25rem;
-  border: 1px solid $table-row-border;
+  border: 1px solid $table-border;
   background: $white;
-  padding: 1.5rem;
+  padding: $default-table-padding 0 0 0;
   box-shadow: 0px 2px 3px 0px $drop-shadow;
 
   thead tr {
     display: grid;
     align-items: center;
-    border-bottom: 1px solid $table-row-border;
-    width: 100%;
     border-bottom: 1px solid $table-row-border !important;
   }
+
   th {
     background-color: $white !important;
     color: $text-secondary !important;
@@ -25,16 +24,16 @@
     font-weight: bold;
     word-wrap: break-word;
     align-items: center;
-    width: 100%;
     box-sizing: border-box;
-    border-bottom: none !important;
-    padding-left: 0 !important;
+    border: none !important;
+    padding: 0 !important;
   }
 
   tr {
     display: grid;
     align-items: center;
     border-bottom: 1px solid $table-row-border;
+    margin: 0 $default-table-padding;
   }
 
   tr:last-child {
@@ -44,5 +43,20 @@
   td {
     border: none !important;
     padding: 2rem 0 !important;
+  }
+}
+
+.unbordered {
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  margin: 0;
+
+  tr {
+    margin: 0;
+  }
+
+  tr:hover {
+    padding: 0;
   }
 }

@@ -36,23 +36,36 @@ footer {
   background-color: $primary !important;
 }
 
-.usa-button {
-  background-color: $primary;
-
-  &--unstyled {
-    background-color: unset;
-    color: $primary;
-  }
-
-  &--outline {
-    background-color: $white;
-    color: $primary;
-    box-shadow: inset 0 0 0 2px $primary;
-  }
-}
-
 .usa-accordion__button,
 .usa-accordion__button:hover {
   background-color: $table-header;
   color: $text-primary;
+}
+
+.usa-button {
+  background-color: $primary;
+  &:hover {
+    background-color: $blue-40v;
+  }
+  &:active {
+    background-color: $blue-400;
+  }
+
+  &--outline {
+    background-color: white;
+
+    &:active,
+    &:hover {
+      background-color: white;
+    }
+  }
+
+  &--unstyled {
+    background-color: transparent;
+
+    &:active,
+    &:hover {
+      background-color: transparent;
+    }
+  }
 }

@@ -10,10 +10,11 @@
 .searchFormContainer {
   margin-top: 1rem;
   padding: 1.5rem;
+  border: 1px solid $border;
 }
 
 .demoQueryFiller {
-  background: #faf3d1;
+  background: $yellow-vivid-5v;
   border: 1px solid #fee685;
   border-radius: 4px;
   display: flex;
@@ -33,6 +34,6 @@
   width: 100%;
   margin-top: 0;
   margin-bottom: 0.75rem;
-  font-size: 1.375rem;
+  font-size: 1.25rem;
   font-weight: 700;
 }

@@ -1,8 +1,9 @@
 import styles from "../buildFromTemplates/buildfromTemplate.module.scss";
 import classNames from "classnames";
-import { Checkbox, Icon } from "@trussworks/react-uswds";
+import { Icon } from "@trussworks/react-uswds";
 import { DibbsConceptType } from "@/app/constants";
 import { VsGrouping } from "@/app/utils/valueSetTranslation";
+import Checkbox from "@/app/query/designSystem/checkbox/Checkbox";
 
 type SelectionViewAccordionBodyProps = {
   activeValueSetType: DibbsConceptType;
@@ -59,14 +60,12 @@ const SelectionViewAccordionHeader: React.FC<
             size={3}
           />{" "}
           <Checkbox
-            name={`checkbox-${activeValueSetType}`}
             className={classNames(
               styles.valueSetTemplate__checkbox,
               isMinusState ? styles.valueSetTemplate__checkbox__partial : "",
             )}
             label={activeValueSetType}
-            onChange={(e) => {
-              e.stopPropagation();
+            onChange={() => {
               handleCheckboxToggle(
                 activeValueSetType,
                 activeVsGroupings,

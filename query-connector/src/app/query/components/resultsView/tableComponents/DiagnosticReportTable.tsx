@@ -20,7 +20,7 @@ const DiagnosticReportTable: React.FC<DiagnosticReportTableProps> = ({
   diagnosticReports,
 }) => {
   return (
-    <Table className="margin-top-0-important">
+    <Table bordered={false} className="margin-top-0-important">
       <thead>
         <tr className={styles.diagnosticsRow}>
           <th>Date</th>

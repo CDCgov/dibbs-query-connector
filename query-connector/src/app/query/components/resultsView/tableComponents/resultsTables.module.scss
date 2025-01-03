@@ -5,6 +5,12 @@ $observationColumnSpacing: 1fr 2fr 2fr;
 $medicationColumnSpacing: 1fr 3fr 1fr;
 $encountersColumnSpacing: 2fr 1fr 1fr 1fr;
 $diagnosticsColumnSpacing: 1fr 3fr;
+$demographicsColumnSpacing: 1fr 3fr;
+
+.demographicsRow {
+  grid-template-columns: $demographicsColumnSpacing;
+  gap: $columnGap;
+}
 
 .conditionRow {
   grid-template-columns: $conditionColumnSpacing;

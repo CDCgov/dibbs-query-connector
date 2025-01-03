@@ -19,14 +19,18 @@ type TableProps = {
  */
 const Table: React.FC<TableProps> = ({
   children,
-  bordered,
+  bordered = true,
   className,
   striped,
 }) => {
   return (
     <TrussTable
       bordered={bordered}
-      className={classNames(styles.table, className)}
+      className={classNames(
+        styles.table,
+        className,
+        bordered ? "" : styles.unbordered,
+      )}
       striped={striped}
     >
       {children}

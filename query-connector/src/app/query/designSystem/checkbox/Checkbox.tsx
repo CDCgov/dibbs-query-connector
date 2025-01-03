@@ -1,14 +1,15 @@
 import { Checkbox as TrussCheckbox } from "@trussworks/react-uswds";
 import classNames from "classnames";
-import styles from "./checkbox.module.css";
+import styles from "./checkbox.module.scss";
 
 export type CheckboxProps = {
   id: string;
-  label?: string;
+  label?: string | React.ReactElement;
   className?: string;
   onClick?: () => void;
   onChange?: () => void;
   checked?: boolean;
+  isMinusState?: boolean;
 };
 
 /**
@@ -21,6 +22,7 @@ export type CheckboxProps = {
  * @param root0.checked Boolean indicating whether the checkbox is checked
  * @param root0.onChange - Event listener for checkbox change. Use this one
  * over onClick if the component is controlled (ie checked is passed in)
+ * @param root0.isMinusState - whether to display the minus checkbox state
  * @returns A checkbox styled according to our design system
  */
 const Checkbox: React.FC<CheckboxProps> = ({
@@ -30,13 +32,18 @@ const Checkbox: React.FC<CheckboxProps> = ({
   onClick,
   onChange,
   checked,
+  isMinusState,
 }) => {
   return (
     <TrussCheckbox
       label={label}
       id={id}
       name={id}
-      className={classNames(styles.checkbox, className)}
+      className={classNames(
+        className,
+        styles.checkbox,
+        isMinusState ? styles.isMinusCheckboxState : "",
+      )}
       onClick={onClick}
       onChange={onChange}
       checked={checked}

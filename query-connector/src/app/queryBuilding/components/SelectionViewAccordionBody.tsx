@@ -1,4 +1,3 @@
-import { Checkbox } from "@trussworks/react-uswds";
 import styles from "../buildFromTemplates/buildfromTemplate.module.scss";
 import { formatDiseaseDisplay } from "../utils";
 import { tallyConceptsForSingleValueSetGroup } from "../utils";
@@ -6,6 +5,7 @@ import Drawer from "@/app/query/designSystem/drawer/Drawer";
 import React, { useState } from "react";
 import { VsGrouping } from "@/app/utils/valueSetTranslation";
 import { DibbsConceptType } from "@/app/constants";
+import Checkbox from "@/app/query/designSystem/checkbox/Checkbox";
 
 type SelectionViewAccordionBodyProps = {
   id?: string;
@@ -57,11 +57,9 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
             >
               <div className={styles.accordionExpandedInner}>
                 <Checkbox
-                  name={`checkbox-${vs.valueSetName}`}
                   className={styles.valueSetTemplate__checkbox}
                   label={checkboxLabel(vs.valueSetName, vs.author, vs.system)}
-                  onChange={(e) => {
-                    e.stopPropagation();
+                  onChange={() => {
                     handleCheckboxToggle(activeValueSetType, vs);
                   }}
                   id={`${vs.valueSetName}-${activeValueSetType}`}

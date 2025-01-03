@@ -1,6 +1,6 @@
 import { VsGrouping } from "@/app/utils/valueSetTranslation";
 import styles from "./customizeQuery.module.scss";
-import CustomizeQueryCheckbox from "./vanityCheckbox/CustomizeQueryCheckbox";
+import Checkbox from "../../designSystem/checkbox/Checkbox";
 
 type CustomizeQueryAccordionProps = {
   handleSelectAllChange: (groupIndex: string, checked: boolean) => void;
@@ -37,17 +37,17 @@ const CustomizeQueryAccordionHeader: React.FC<CustomizeQueryAccordionProps> = ({
     <div
       className={`${styles.accordionHeader} display-flex flex-no-wrap flex-align-start customize-query-header`}
     >
-      <CustomizeQueryCheckbox
+      <Checkbox
         id={group.valueSetName}
         checked={selectedCount === selectedTotal}
         isMinusState={isMinusState}
-        isHeader
         onChange={() => {
           handleSelectAllChange(
             groupIndex,
             isMinusState ? false : selectedCount !== selectedTotal,
           );
         }}
+        className={styles.checkboxCell}
       />
       <div className={`${styles.accordionButtonTitle}`}>
         {`${group.valueSetName}`}

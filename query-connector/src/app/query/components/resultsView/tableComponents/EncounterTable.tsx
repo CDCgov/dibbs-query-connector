@@ -30,7 +30,7 @@ const EncounterTable: React.FC<EncounterTableProps> = ({
     "serviceProvider",
   );
   return (
-    <Table className="margin-top-0-important">
+    <Table bordered={false} className="margin-top-0-important">
       <thead>
         <tr className={styles.encountersRow}>
           <th>Visit Reason</th>
