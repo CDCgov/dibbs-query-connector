@@ -411,10 +411,20 @@ ul.usa-sidenav
 
 .Toastify__toast-container {
   width: calc($query-connector-wide-max-width * 0.4) !important;
-  padding-top: 0 !important;
+
+  .Toastify__toast--success {
+    background-color: #ecf3ec;
+  }
 }
 
 .Toastify__toast-body {
+  margin: 0 !important;
+
+  div {
+    height: 100%;
+    border-radius: var(--toastify-toast-bd-radius);
+  }
+
   .usa-alert__body::before {
     mask-size: 1.5rem 1.5rem !important;
     top: unset !important;

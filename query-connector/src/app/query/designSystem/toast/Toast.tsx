@@ -9,6 +9,7 @@ type ToastProps = {
   heading?: string;
   body: string;
   headingLevel?: HeadingLevel;
+  hideProgressBar?: boolean;
 };
 /**
  * Redirection toast to be invoked when there's a need to confirm with the user
@@ -46,6 +47,8 @@ const Toast: React.FC<ToastProps> = ({
 };
 
 const options = {
+  // uncomment this to debug toast styling issues
+  // progress: 0.2,
   hideProgressBar: false,
   position: "bottom-left" as const,
   closeOnClick: true,
@@ -72,9 +75,11 @@ export function showToastConfirmation(content: {
   variant?: AlertType;
   headingLevel?: HeadingLevel;
   duration?: number;
+  hideProgressBar?: boolean;
 }) {
   const toastVariant = content.variant ?? "success";
   const toastDuration = content.duration ?? 5000; // Default to 5000ms
+  const hideProgressBar = content.hideProgressBar ?? false;
 
   toast[toastVariant](
     <Toast
@@ -83,7 +88,7 @@ export function showToastConfirmation(content: {
       headingLevel={content.headingLevel}
       body={content.body ?? ""}
     />,
-    { ...options, autoClose: toastDuration },
+    { ...options, autoClose: toastDuration, hideProgressBar: hideProgressBar },
   );
 }
 

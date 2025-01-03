@@ -36,6 +36,7 @@ const ConceptSelection: React.FC<ConceptSelectionProps> = ({
         isChecked ? "added" : "removed"
       }`,
       variant: "success",
+      hideProgressBar: true,
     });
   };
 
@@ -49,6 +50,7 @@ const ConceptSelection: React.FC<ConceptSelectionProps> = ({
         isChecked ? "added" : "removed"
       }`,
       variant: "success",
+      hideProgressBar: true,
     });
   };
 

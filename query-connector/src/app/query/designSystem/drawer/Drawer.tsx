@@ -1,10 +1,7 @@
-import React, { useRef } from "react";
-import { Button, Icon } from "@trussworks/react-uswds";
+import React from "react";
+import { Icon } from "@trussworks/react-uswds";
 import styles from "./drawer.module.scss";
 import SearchField from "../searchField/SearchField";
-import { showToastConfirmation } from "../toast/Toast";
-import WarningModal from "../modal/warningModal";
-import { ModalRef } from "../modal/Modal";
 
 type DrawerProps = {
   title: string;
@@ -34,12 +31,9 @@ type DrawerProps = {
 const Drawer: React.FC<DrawerProps> = ({
   title,
   placeholder,
-  toastMessage,
   isOpen,
   onClose,
-  onSave,
   toRender,
-  hasChanges,
 }: DrawerProps) => {
   const handleClose = () => {
     onClose();
