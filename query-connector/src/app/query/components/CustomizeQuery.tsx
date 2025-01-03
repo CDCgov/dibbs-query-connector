@@ -165,7 +165,7 @@ const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
   // by the entire query branch of the app
   const handleApplyChanges = () => {
     const selectedItems = Object.keys(valueSetOptions).reduce((acc, key) => {
-      const items = valueSetOptions[key as DibbsConceptType];
+      const items = valueSetOptions[key as DibbsConceptType] ?? {};
       acc = acc.concat(Object.values(items).flatMap((dict) => dict.items));
       return acc;
     }, [] as DibbsValueSet[]);

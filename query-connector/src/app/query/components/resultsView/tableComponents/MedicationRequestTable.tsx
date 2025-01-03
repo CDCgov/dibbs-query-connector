@@ -27,7 +27,7 @@ const MedicationRequestTable: React.FC<MedicationRequestTableProps> = ({
   );
 
   return (
-    <Table className="margin-top-0-important">
+    <Table bordered={false} className="margin-top-0-important">
       <thead>
         <tr className={styles.medicationRow}>
           <th>Order Date</th>
