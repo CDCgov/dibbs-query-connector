@@ -1,13 +1,14 @@
 import { Checkbox as TrussCheckbox } from "@trussworks/react-uswds";
 import classNames from "classnames";
 import styles from "./checkbox.module.scss";
+import { ChangeEvent } from "react";
 
 export type CheckboxProps = {
   id: string;
   label?: string | React.ReactElement;
   className?: string;
   onClick?: () => void;
-  onChange?: () => void;
+  onChange?: (e: ChangeEvent<HTMLInputElement>) => void;
   checked?: boolean;
   isMinusState?: boolean;
 };
