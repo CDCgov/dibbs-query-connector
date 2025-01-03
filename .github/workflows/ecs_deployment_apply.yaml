@@ -57,7 +57,7 @@ jobs:
         with:
           name: tfplan
           path: ./terraform/implementation/ecs/tfplan
-          
+
       - name: Terraform
         env:
           ACTION: ${{ env.terraform_action }}
