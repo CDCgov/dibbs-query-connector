@@ -5,13 +5,35 @@
 # }
 
 
+resource "tls_private_key" "example" {
+  algorithm = "RSA"
+}
 
-# resource "aws_acm_certificate" "cloudflare_cert" {
-#   private_key      = var.qc_tls_key       # Private key from Cloudflare
-#   certificate_body = var.qc_tls_cert      # Public cert from Cloudflare
+resource "tls_self_signed_cert" "example" {
+  key_algorithm   = "RSA"
+  private_key_pem = tls_private_key.example.private_key_pem
 
-#   provider = aws.us-east-1  # ACM certificates for ALB must be in the "us-east-1" region when using CloudFront
-# }
+  subject {
+    common_name  = "example.com"
+    organization = "ACME Examples, Inc"
+  }
+
+  validity_period_hours = 12
+
+  allowed_uses = [
+    "key_encipherment",
+    "digital_signature",
+    "server_auth",
+  ]
+}
+
+
+resource "aws_acm_certificate" "cloudflare_cert" {
+  private_key      = var.qc_tls_key       # Private key from Cloudflare
+  certificate_body = var.qc_tls_cert      # Public cert from Cloudflare
+
+  provider = aws.us-east-1  # ACM certificates for ALB must be in the "us-east-1" region when using CloudFront
+}
 
 data "aws_caller_identity" "current" {}
 
@@ -121,7 +143,7 @@ module "ecs" {
   internal = var.internal
 
   # If the intent is to enable https and port 443, pass the arn of the cert in AWS certificate manager. This cert will be applied to the load balancer. (default is "")
-  # certificate_arn = aws_acm_certificate.cloudflare_cert.arn
+  certificate_arn = aws_acm_certificate.cloudflare_cert.arn
 
   # If the intent is to disable authentication, set ecr_viewer_app_env to "test" (default is "prod")
   # ecr_viewer_app_env = "test"
