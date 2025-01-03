@@ -88,7 +88,7 @@ jobs:
             -var "qc_tls_cert=${TLS_CERT}"
 
       - name: Save Terraform Plan
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4.5.0
         with:
           name: tfplan
           path: ./terraform/implementation/ecs/tfplan
