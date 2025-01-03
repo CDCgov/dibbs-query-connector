@@ -32,7 +32,7 @@ const Demographics: React.FC<DemographicsProps> = ({ patient }) => {
 
   return (
     <div className="margin-top-0-important">
-      <Table>
+      <Table bordered={false}>
         <tbody>
           {demographicData.map((item) => (
             <tr className={styles.demographicsRow} key={item.title}>

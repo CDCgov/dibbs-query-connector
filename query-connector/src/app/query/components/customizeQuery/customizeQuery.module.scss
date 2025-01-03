@@ -49,7 +49,7 @@
 .customizeQueryNav .currentTab::after {
   content: "";
   position: absolute;
-  bottom: -12px;
+  bottom: -14px;
   left: 0;
   width: 100%;
   height: 4px;
@@ -88,7 +88,7 @@
   display: block;
   font-weight: normal;
   font-size: 16px;
-  color: $text-secondary;
+  color: $gray-50;
   font-size: 16px;
   line-height: normal;
 }

@@ -52,7 +52,17 @@ const CustomizeQueryAccordionBody: React.FC<
             return acc;
           }, [] as ValueSetIndexedConcept[])
           .map((item, conceptIndex) => (
-            <tr className={styles.customizeQueryGridRow} key={item.code}>
+            <tr
+              onClick={() => {
+                toggleInclude(groupIndex, item.vsIndex, conceptIndex);
+              }}
+              className={classNames(
+                "tableRowWithHover_clickable",
+                styles.customizeQueryGridRow,
+              )}
+              key={item.code}
+              tabIndex={0}
+            >
               <td className={styles.checkboxCell}>
                 <Checkbox
                   id={item.code}
