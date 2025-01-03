@@ -5,6 +5,7 @@ import {
   Button,
   ButtonGroup,
   ModalRef as TrussModalRef,
+  Icon,
 } from "@trussworks/react-uswds";
 import React, { RefObject, ReactNode } from "react";
 
@@ -13,9 +14,9 @@ export type ModalRef = TrussModalRef;
 type ModalButton = {
   text: string | JSX.Element;
   type: "button" | "submit" | "reset";
-  id?: string; // Optional ID for the button
-  className?: string; // Optional classes for styling
-  onClick: () => void; // Action to perform when the button is clicked
+  id?: string;
+  className?: string;
+  onClick: () => void;
 };
 
 type ModalProps = {
@@ -24,24 +25,11 @@ type ModalProps = {
   description?: string;
   children?: ReactNode;
   modalRef: RefObject<ModalRef>;
-  buttons: ModalButton[]; // Dynamic buttons
+  buttons: ModalButton[];
   isLarge?: boolean;
+  errorMessage?: string | null; // New prop for error message
 };
 
-/**
- * Modal wrapper around the Truss modal
- * @param param0 - props
- * @param param0.id - ID for labeling / referencing the various subcomponents in
- * the modal
- * @param param0.heading - Modal heading
- * @param param0.description - Modal body
- * @param param0.children - Optional children components to render in the modal body
- * @param param0.modalRef - ref object to connect the toggle button with the
- * actual modal.
- * @param param0.buttons - Array of button definitions for the modal footer.
- * @param param0.isLarge - Optional prop to make the modal large
- * @returns A customizable modal component
- */
 export const Modal: React.FC<ModalProps> = ({
   id,
   heading,
@@ -50,6 +38,7 @@ export const Modal: React.FC<ModalProps> = ({
   modalRef,
   buttons,
   isLarge,
+  errorMessage,
 }) => {
   return (
     <TrussModal
@@ -61,11 +50,7 @@ export const Modal: React.FC<ModalProps> = ({
     >
       <ModalHeading id={`${id}-modal-heading`}>{heading}</ModalHeading>
       <div id={`${id}-modal-description`} className="usa-prose">
-        {description ? (
-          <p>{description}</p>
-        ) : (
-          children
-        )}
+        {description ? <p>{description}</p> : children}
       </div>
       <ModalFooter>
         <ButtonGroup>
@@ -81,7 +66,16 @@ export const Modal: React.FC<ModalProps> = ({
             </Button>
           ))}
         </ButtonGroup>
+        {errorMessage && (
+          <>
+            <hr className="usa-divider margin-y-3" />
+            <div className="margin-top-4 text-red display-flex">
+              <Icon.Close size={3} className="usa-icon" aria-label="Error" color="#B50909" />
+              {errorMessage}
+            </div>
+          </>
+        )}
       </ModalFooter>
-    </TrussModal >
+    </TrussModal>
   );
 };

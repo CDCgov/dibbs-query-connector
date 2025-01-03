@@ -1,19 +1,18 @@
 "use client"
 import { Icon, Label, TextInput } from "@trussworks/react-uswds"
-import { getFhirServerConfigs } from "../database-service";
+import { getFhirServerConfigs, insertFhirServer } from "../database-service";
 import SiteAlert from "../query/designSystem/SiteAlert";
 import Table from "../query/designSystem/Table";
 import { useEffect, useState, useRef } from "react";
 import { FhirServerConfig } from "../constants";
 import { Modal, ModalRef } from "../query/designSystem/modal/Modal";
-import { Connection } from "pg";
-import fhirServers from "../fhir-servers";
 
 export default function FhirServers() {
   const [fhirServers, setFhirServers] = useState<FhirServerConfig[]>([]);
   const [serverName, setServerName] = useState("");
   const [serverUrl, setServerUrl] = useState("");
   const [connectionStatus, setConnectionStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [errorMessage, setErrorMessage] = useState<string | undefined>('');
   const modalRef = useRef<ModalRef>(null);
 
   useEffect(() => {
@@ -29,6 +28,8 @@ export default function FhirServers() {
   const handleCloseModal = () => {
     setServerName("");
     setServerUrl("");
+    setConnectionStatus('idle');
+    setErrorMessage('');
     modalRef.current?.toggleModal();
   };
 
@@ -49,23 +50,61 @@ export default function FhirServers() {
         if (data.resourceType === 'CapabilityStatement') {
           console.log('Successfully connected to FHIR server:', baseUrl);
           setConnectionStatus('success');
+          setErrorMessage(undefined);
         } else {
           console.error('Invalid FHIR server response: missing CapabilityStatement');
           setConnectionStatus('error');
+          setErrorMessage('Invalid FHIR server response: Server did not return a valid CapabilityStatement');
         }
       } else {
         setConnectionStatus('error');
+        switch (response.status) {
+          case 401:
+            setErrorMessage('Connection failed: Authentication required. Please check your credentials.');
+            break;
+          case 403:
+            setErrorMessage('Connection failed: Access forbidden. You do not have permission to access this FHIR server.');
+            break;
+          case 404:
+            setErrorMessage('Connection failed: The FHIR server endpoint was not found. Please verify the URL.');
+            break;
+          case 408:
+            setErrorMessage('Connection failed: The request timed out. The FHIR server took too long to respond.');
+            break;
+          case 500:
+            setErrorMessage('Connection failed: Internal server error. The FHIR server encountered an unexpected condition.');
+            break;
+          case 502:
+            setErrorMessage('Connection failed: Bad gateway. The FHIR server received an invalid response from upstream.');
+            break;
+          case 503:
+            setErrorMessage('Connection failed: The FHIR server is temporarily unavailable or under maintenance.');
+            break;
+          case 504:
+            setErrorMessage('Connection failed: Gateway timeout. The upstream server did not respond in time.');
+            break;
+          default:
+            setErrorMessage(`Connection failed: The FHIR server returned an error. (${response.status} ${response.statusText})`);
+        }
       }
     } catch (error) {
       console.error('Failed to connect to FHIR server:', error);
       setConnectionStatus('error');
+      setErrorMessage('Connection failed: Unable to reach the FHIR server. Please check if the URL is correct and the server is accessible.');
     }
   };
-
-  const handleAddServer = () => {
-    // Implement server addition logic here
-    console.log("Adding server:", { name: serverName, url: serverUrl });
-    handleCloseModal();
+  const handleAddServer = async () => {
+    const result = await insertFhirServer(serverName, serverUrl);
+    if (result.success) {
+      // Refresh the server list
+      getFhirServerConfigs(true).then((servers) => {
+        setFhirServers(servers);
+      });
+      handleCloseModal();
+    } else {
+      setConnectionStatus('error');
+      setErrorMessage(result.error);
+    }
   };
 
   const modalButtons = [
@@ -149,6 +188,7 @@ export default function FhirServers() {
           heading="New server"
           modalRef={modalRef}
           buttons={modalButtons}
+          errorMessage={errorMessage}
         >
           <Label htmlFor="server-name">Server name</Label>
           <TextInput
