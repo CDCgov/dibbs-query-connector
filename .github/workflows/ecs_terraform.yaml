@@ -85,5 +85,3 @@ jobs:
             -var "qc_tls_key=${TLS_KEY}" \
             -var "qc_tls_cert=${TLS_CERT}"
           terraform apply tfplan -auto-approve
-
-
