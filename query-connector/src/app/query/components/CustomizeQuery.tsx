@@ -176,19 +176,6 @@ const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
     });
   };
 
-  // useEffect(() => {
-  //   const activeItems = valueSetOptions[activeTab];
-  //   const items = Object.values(activeItems).flatMap((group) => group.items);
-  //   const selectedCount = items.filter((item) => item.includeValueSet).length;
-  //   const topCheckbox = document.getElementById(
-  //     "select-all",
-  //   ) as HTMLInputElement;
-  //   if (topCheckbox) {
-  //     topCheckbox.indeterminate =
-  //       selectedCount > 0 && selectedCount < items.length;
-  //   }
-  // }, [valueSetOptions, activeTab]);
-
   const valueSetOptionsToDisplay =
     valueSetOptions && valueSetOptions[activeTab]
       ? Object.entries(valueSetOptions[activeTab])
