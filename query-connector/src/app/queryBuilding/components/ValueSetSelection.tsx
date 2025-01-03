@@ -31,7 +31,7 @@ type ConditionSelectionProps = {
  * @param root0.queryName - current checkbox selection status
  * @param root0.selectedConditions - name of condition to display
  * @param root0.valueSetsByCondition - name of condition to display
- * @returns A component for display to redner on the query building page
+ * @returns A component for display to render on the query building page
  */
 export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
   queryName,
@@ -44,6 +44,8 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
   const [selectedValueSets, setSelectedValueSets] =
     useState<ConditionToConceptTypeToValueSetGroupingMap>({});
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [allConditions, setAllConditions] =
+    useState<CategoryNameToConditionOptionMap>({});
 
   useEffect(() => {
     if (queryName == "" || queryName == undefined) {
@@ -54,12 +56,9 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
     const id = Object.keys(selectedConditions[first])[0];
 
     setActiveCondition(id);
-
-    const groupedValueSetByCondition =
+    const groupedValueSetByCondition: ConditionToConceptTypeToValueSetGroupingMap =
       groupValueSetGroupingByConditionId(valueSetsByCondition);
-    return () => {
-      setSelectedValueSets(groupedValueSetByCondition);
-    };
+    setSelectedValueSets(groupedValueSetByCondition);
   }, []);
 
   const handleAddCondition = () => {
@@ -70,17 +69,16 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
     setIsDrawerOpen(false);
   };
 
-  // Makes the conditionId more easily accessible within the group
-  // of selected conditions
-  const includedConditionsWithIds = Object.entries(selectedConditions)
-    .map(([_, conditionsByCategory]) =>
-      Object.entries(conditionsByCategory).flatMap(
-        ([conditionId, conditionObj]) => {
-          return { id: conditionId, name: conditionObj.name };
-        },
-      ),
-    )
-    .flatMap((conditionsByCategory) => conditionsByCategory);
+  const codes = Object.entries(allConditions).map(([category, conditions]) => (
+    <div key={category}>
+      <h4>{category}</h4>
+      <ul>
+        {Object.entries(conditions).map(([id, condition]) => (
+          <li key={id}>{formatDiseaseDisplay(condition.name)}</li>
+        ))}
+      </ul>
+    </div>
+  ));
 
   return (
     <div
@@ -112,12 +110,18 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
               </div>
             </div>
 
-            {Object.values(includedConditionsWithIds).map((condition) => {
-              return (
+            {Object.values(selectedConditions)
+              .flatMap((categoryConditions) =>
+                Object.entries(categoryConditions).map(([id, condition]) => ({
+                  id,
+                  name: condition.name,
+                })),
+              )
+              .map((condition) => (
                 <div
                   key={condition.id}
                   className={
-                    activeCondition == condition.id
+                    activeCondition === condition.id
                       ? `${styles.conditionCard} ${styles.active}`
                       : styles.conditionCard
                   }
@@ -126,8 +130,7 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
                 >
                   {formatDiseaseDisplay(condition.name)}
                 </div>
-              );
-            })}
+              ))}
           </div>
         </div>
         <div className={styles.valueSetTemplate__right}>
@@ -159,7 +162,7 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
       <Drawer
         title="Add Condition(s)"
         placeholder="Search conditions"
-        codes={<div>Dynamic codes go here</div>}
+        codes={<div>{codes}</div>}
         toastMessage="Condition has been successfully added."
         isOpen={isDrawerOpen}
         onClose={handleCloseDrawer}
