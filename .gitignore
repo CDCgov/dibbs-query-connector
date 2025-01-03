@@ -89,3 +89,4 @@ tmp_remote_image_*
 
 # Local .terraform directories
 **/.terraform/*
+.terraform/modules/ecs
