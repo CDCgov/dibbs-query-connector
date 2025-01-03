@@ -52,12 +52,13 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Download Terraform Plan
-        uses: actions/download-artifact@v4.1.8
+        uses: actions/download-artifact@v4
         with:
           name: tfplan
           path: ./terraform/implementation/ecs/tfplan
 
       - name: Terraform
+        working-directory: ./terraform/implementation/ecs
         env:
           ACTION: ${{ env.terraform_action }}
           BUCKET: ${{ secrets.TFSTATE_BUCKET }}
