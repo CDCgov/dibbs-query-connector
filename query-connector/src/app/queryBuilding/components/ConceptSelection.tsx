@@ -1,8 +1,9 @@
 import React from "react";
-import { Checkbox } from "@trussworks/react-uswds";
 import styles from "../buildFromTemplates/buildfromTemplate.module.scss";
 import { ConceptOption } from "@/app/utils/valueSetTranslation";
 import { showToastConfirmation } from "@/app/query/designSystem/toast/Toast";
+import Checkbox from "@/app/query/designSystem/checkbox/Checkbox";
+import Table from "@/app/query/designSystem/table/Table";
 
 type ConceptSelectionProps = {
   concepts: ConceptOption[];
@@ -55,58 +56,44 @@ const ConceptSelection: React.FC<ConceptSelectionProps> = ({
   };
 
   return (
-    <div>
-      <div className="display-flex padding-top-1 padding-bottom-3">
-        <Checkbox
-          name="toggleAll"
-          id="toggleAll"
-          checked={selectedCount === totalCount}
-          className={`bg-transparent ${
-            isMinusState
-              ? styles.concept__checkbox__partial
-              : styles.concept__checkbox
-          }`}
-          onChange={(e) => toggleAll(e.target.checked)}
-          label={
-            <div
-              className="display-flex align-items-center align-self-stretch"
-              style={{ gap: "1rem" }}
-            >
-              <div className="width-15 font-sans-md text-bold flex-0">Code</div>
-              <div className="font-sans-md text-bold">Name</div>
-            </div>
-          }
-        />
-      </div>
-      {concepts.map((concept, index) => (
-        <div key={concept.code} className="display-flex padding-bottom-3">
-          <Checkbox
-            name={`checkbox-${concept.code}`}
-            id={`checkbox-${concept.code}`}
-            checked={concept.include}
-            className={`bg-transparent ${
-              concept.include ? styles.concept__checkbox : ""
-            }`}
-            onChange={(e) => toggleSingle(index, e.target.checked)}
-            label={
-              <div
-                className="display-flex align-items-center align-self-stretch"
-                style={{ gap: "1rem" }}
-              >
-                <div
-                  className="width-15"
-                  style={{ wordWrap: "break-word" }}
-                  title={concept.code}
-                >
-                  {concept.code}
-                </div>
-                <div className="flex-fill">{concept.display}</div>
-              </div>
-            }
-          />
-        </div>
-      ))}
-    </div>
+    <table className={styles.conceptSelectionTable}>
+      <thead>
+        <tr className={styles.conceptSelectionRow}>
+          <th>
+            <Checkbox
+              id="toggleAll"
+              checked={selectedCount === totalCount}
+              className={`bg-transparent ${
+                isMinusState
+                  ? styles.concept__checkbox__partial
+                  : styles.concept__checkbox
+              }`}
+              onChange={(e) => toggleAll(e.target.checked)}
+            />
+          </th>
+          <th>Code</th>
+          <th>Name</th>
+        </tr>
+      </thead>
+      <tbody>
+        {concepts.map((concept, index) => (
+          <tr className={styles.conceptSelectionRow}>
+            <td>
+              <Checkbox
+                id={`checkbox-${concept.code}`}
+                checked={concept.include}
+                className={`bg-transparent ${
+                  concept.include ? styles.concept__checkbox : ""
+                }`}
+                onChange={(e) => toggleSingle(index, e.target.checked)}
+              />
+            </td>
+            <td>{concept.code}</td>
+            <td>{concept.display}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
   );
 };
 

@@ -126,18 +126,14 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
           <div className={styles.accordionBodyExpanded} key={vsLabel}>
             <div className={styles.accordionExpandedInner}>
               <Checkbox
-                className={classNames(
-                  styles.valueSetTemplate__checkbox,
-                  isMinusState
-                    ? styles.valueSetTemplate__checkbox__partial
-                    : "",
-                )}
+                className={styles.valueSetTemplate__checkbox}
                 label={checkboxLabel(vs.valueSetName, vs.author, vs.system)}
                 onChange={(e: ChangeEvent<HTMLInputElement>) => {
                   handleBulkToggle(e, isMinusState);
                 }}
                 id={vsLabel}
                 checked={checked}
+                isMinusState={isMinusState}
               />
             </div>
             <div className={styles.accordionBodyExpanded__right}>

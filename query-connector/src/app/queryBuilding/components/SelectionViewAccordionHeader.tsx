@@ -71,12 +71,9 @@ const SelectionViewAccordionHeader: React.FC<
             aria-label="Arrow indicating collapsed or expanded toggle content"
             style={expanded ? { rotate: "180deg" } : { rotate: "90deg" }}
             size={3}
-          />{" "}
+          />
           <Checkbox
-            className={classNames(
-              styles.valueSetTemplate__checkbox,
-              isMinusState ? styles.valueSetTemplate__checkbox__partial : "",
-            )}
+            className={styles.valueSetTemplate__titleCheckbox}
             label={activeValueSetType}
             onChange={(e) => {
               e.stopPropagation();
@@ -84,6 +81,7 @@ const SelectionViewAccordionHeader: React.FC<
             }}
             id={`${activeValueSetType}`}
             checked={checked}
+            isMinusState={isMinusState}
           />
         </div>
         <div
