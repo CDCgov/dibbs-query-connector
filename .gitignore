@@ -87,5 +87,5 @@ build/
 
 tmp_remote_image_*
 
-.terraform
-.terraform/implementation/ecs/.terraform/modules/rds
+# Local .terraform directories
+**/.terraform/*
