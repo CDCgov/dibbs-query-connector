@@ -86,5 +86,3 @@ jobs:
             -var "qc_tls_cert=${TLS_CERT}"
           ls -al  
           terraform apply tfplan
-
-
