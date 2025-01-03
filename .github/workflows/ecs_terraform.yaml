@@ -1,0 +1,94 @@
+name: Terraform Plan & Terraform Apply
+run-name: Terraform plan & apply ${{ inputs.workspace }} by @${{ github.actor }}
+
+on:
+  push:
+    branches:
+      - shanice/transition_ecs_infra
+  workflow_dispatch:
+    inputs:
+      workspace:
+        description: "The workspace to terraform against"
+        required: true
+        type: string
+        default: "dev"
+
+concurrency:
+  group: ${{ github.event.inputs.workspace }}-terraform
+  cancel-in-progress: false
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  workspace: dev
+
+jobs:
+  terraform:
+    name: Run Terraform
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+        # this may need to be updated if you change the directory you are working with
+        # ./terraform/implementation/dev || ./terraform/implementation/prod for example
+        # this practice is recommended to keep the terraform code organized while reducing the risk of conflicts
+        working-directory: ./terraform/implementation/ecs
+    steps:
+      - name: Check Out Changes
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3.1.2
+        with:
+          terraform_version: "1.9.8"
+
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Terraform
+        env:
+          BUCKET: ${{ secrets.TFSTATE_BUCKET }}
+          DYNAMODB_TABLE: ${{ secrets.TFSTATE_DYNAMODB_TABLE }}
+          OWNER: ${{ vars.OWNER }}
+          PROJECT: ${{ vars.PROJECT }}
+          REGION: ${{ vars.region }}
+          WORKSPACE: ${{ env.workspace }}
+          UMLS_API_KEY: ${{ secrets.UMLS_API_KEY }}
+          ERSD_API_KEY: ${{ secrets.ERSD_API_KEY}}
+          TLS_CERT: ${{ secrets.TLS_CERT}}
+          TLS_KEY: ${{ secrets.TLS_KEY}}
+        shell: bash
+        run: |
+          rm -rf .terraform .terraform.lock.hcl
+          terraform init \
+            -var-file="$WORKSPACE.tfvars" \
+            -backend-config "bucket=$BUCKET" \
+            -backend-config "dynamodb_table=$DYNAMODB_TABLE" \
+            -backend-config "region=$REGION" \
+            || (echo "terraform init failed, exiting..." && exit 1)
+          terraform workspace select "$WORKSPACE"
+          terraform apply -auto-approve -target=aws_acm_certificate.cloudflare_cert \
+            -var-file="$WORKSPACE.tfvars" \
+            -var "umls_api_key=${UMLS_API_KEY}" \
+            -var "ersd_api_key=${ERSD_API_KEY}" \
+            -var "qc_tls_key=${TLS_KEY}" \
+            -var "qc_tls_cert=${TLS_CERT}"
+          terraform plan -out=tfplan \
+            -var-file="$WORKSPACE.tfvars" \
+            -var "umls_api_key=${UMLS_API_KEY}" \
+            -var "ersd_api_key=${ERSD_API_KEY}" \
+            -var "qc_tls_key=${TLS_KEY}" \
+            -var "qc_tls_cert=${TLS_CERT}"
+          terraform apply tfplan -auto-approve  \
+            -var-file="$WORKSPACE.tfvars" \
+            -var "umls_api_key=${UMLS_API_KEY}" \
+            -var "ersd_api_key=${ERSD_API_KEY}" \      
+            -var "qc_tls_key=${TLS_KEY}" \
+            -var "qc_tls_cert=${TLS_CERT}" \
+
+
