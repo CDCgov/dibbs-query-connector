@@ -55,7 +55,7 @@ jobs:
       - name: Download Terraform Plan
         uses: actions/download-artifact@v3
         with:
-            name: tfplan
+          name: tfplan
       - name: Terraform
         env:
           ACTION: ${{ env.terraform_action }}

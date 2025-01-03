@@ -90,5 +90,5 @@ jobs:
       - name: Save Terraform Plan
         uses: actions/upload-artifact@v3
         with:
-            name: tfplan
-            path: tfplan
+          name: tfplan
+          path: tfplan
