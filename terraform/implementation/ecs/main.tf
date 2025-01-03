@@ -31,7 +31,6 @@ module "vpc" {
 }
 
 module "ecs" {
-  depends_on = [ aws_acm_certificate.cloudflare_cert ]
   source  = "CDCgov/dibbs-ecr-viewer/aws"
   version = "0.3.0"
   # source = "../../../../terraform-aws-dibbs-ecr-viewer"
