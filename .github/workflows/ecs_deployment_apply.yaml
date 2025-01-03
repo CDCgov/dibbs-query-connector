@@ -88,4 +88,4 @@ jobs:
             -var "umls_api_key=${UMLS_API_KEY}" \
             -var "ersd_api_key=${ERSD_API_KEY}" \      
             -var "qc_tls_key=${TLS_KEY}" \
-            -var "qc_tls_cert"=${TLS_CERT}" \
+            -var "qc_tls_cert=${TLS_CERT}" \
