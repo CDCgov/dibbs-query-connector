@@ -143,7 +143,7 @@ const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
 
   // Allows all items to be selected within the entire active tab
   const handleSelectAllForTab = (checked: boolean) => {
-    const activeItems = valueSetOptions[activeTab];
+    const activeItems = valueSetOptions[activeTab] ?? {};
     const updatedGroups = Object.values(activeItems).map((group) => ({
       ...group,
       items: group.items.map((item) => ({
