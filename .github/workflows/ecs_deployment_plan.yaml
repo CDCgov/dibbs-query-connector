@@ -74,7 +74,7 @@ jobs:
             -backend-config "region=$REGION" \
             || (echo "terraform init failed, exiting..." && exit 1)
           terraform workspace select "$WORKSPACE"
-          terraform apply -target=module.ecs.aws_alb.ecs
+          terraform apply -auto-approve -target=module.ecs.aws_alb.ecs
           terraform plan -out=tfplan \
             -var-file="$WORKSPACE.tfvars" \
             -var "umls_api_key=${UMLS_API_KEY}" \
