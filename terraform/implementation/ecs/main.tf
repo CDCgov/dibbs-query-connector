@@ -5,34 +5,11 @@
 # }
 
 
-resource "tls_private_key" "example" {
-  algorithm = "RSA"
-}
-
-resource "tls_self_signed_cert" "example" {
-  key_algorithm   = "RSA"
-  private_key_pem = tls_private_key.example.private_key_pem
-
-  subject {
-    common_name  = "example.com"
-    organization = "ACME Examples, Inc"
-  }
-
-  validity_period_hours = 12
-
-  allowed_uses = [
-    "key_encipherment",
-    "digital_signature",
-    "server_auth",
-  ]
-}
 
 
 resource "aws_acm_certificate" "cloudflare_cert" {
   private_key      = var.qc_tls_key       # Private key from Cloudflare
   certificate_body = var.qc_tls_cert      # Public cert from Cloudflare
-
-  provider = aws.us-east-1  # ACM certificates for ALB must be in the "us-east-1" region when using CloudFront
 }
 
 data "aws_caller_identity" "current" {}

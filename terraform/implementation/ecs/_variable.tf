@@ -17,11 +17,11 @@ variable "owner" {
 }
 
 # Manually update to set the version you want to run
-variable "phdi_version" {
-  description = "PHDI container image version"
-  type        = string
-  default     = "v1.7.6"
-}
+# variable "phdi_version" {
+#   description = "PHDI container image version"
+#   type        = string
+#   default     = "v1.7.6"
+# }
 
 variable "private_subnets" {
   description = "The private subnets"
