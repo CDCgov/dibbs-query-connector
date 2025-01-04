@@ -2,9 +2,15 @@ name: Terraform Plan & Terraform Apply
 run-name: Terraform plan & apply ${{ inputs.workspace }} by @${{ github.actor }}
 
 on:
+  pull_request:
+    branches:
+      - "**"
+  merge_group:
+        types:
+          - checks_requested
   push:
     branches:
-      - shanice/transition_ecs_infra
+      - main
   workflow_dispatch:
     inputs:
       workspace:

@@ -1,6 +1,8 @@
 name: Terraform Linting
 on:
   pull_request:
+    branches:
+      - "**"
   push:
     branches:
       - main

@@ -1,12 +1,3 @@
-# data "aws_acm_certificate" "this" {
-#   domain   = "streamline.dibbs.cloud"
-#   types    = ["AMAZON_ISSUED"] # or ["ISSUED"] or ["PRIVATE"]
-#   statuses = ["ISSUED"]
-# }
-
-
-
-
 resource "aws_acm_certificate" "cloudflare_cert" {
   private_key      = var.qc_tls_key       # Private key from Cloudflare
   certificate_body = var.qc_tls_cert      # Public cert from Cloudflare
@@ -33,7 +24,6 @@ module "vpc" {
 module "ecs" {
   source  = "CDCgov/dibbs-ecr-viewer/aws"
   version = "0.3.0"
-  # source = "../../../../terraform-aws-dibbs-ecr-viewer"
 
   public_subnet_ids  = flatten(module.vpc.public_subnets)
   private_subnet_ids = flatten(module.vpc.private_subnets)
@@ -82,11 +72,7 @@ module "ecs" {
          name  = "DATABASE_URL"
          value = "postgresql://${aws_db_instance.qc_db.username}:${aws_db_instance.qc_db.password}@${aws_db_instance.qc_db.endpoint}/${aws_db_instance.qc_db.db_name}"
          },
-          # {    
-          # name  = "tefcaViewerDBRoleArn"
-          # value = var.tefca_viewer_db_role_arn
-          # },
-          {    
+         {    
          name  = "FLYWAY_URL"
          value = "jdbc:postgresql://${aws_db_instance.qc_db.endpoint}/${aws_db_instance.qc_db.db_name}"
 
