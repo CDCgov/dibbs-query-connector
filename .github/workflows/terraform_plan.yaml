@@ -52,8 +52,6 @@ jobs:
           # ACTION: ${{ env.terraform_action }}
           BUCKET: ${{ secrets.TFSTATE_BUCKET }}
           DYNAMODB_TABLE: ${{ secrets.TFSTATE_DYNAMODB_TABLE }}
-          OWNER: ${{ vars.OWNER }}
-          PROJECT: ${{ vars.PROJECT }}
           REGION: ${{ vars.region }}
           WORKSPACE: ${{ env.workspace }}
           UMLS_API_KEY: ${{ secrets.UMLS_API_KEY }}
