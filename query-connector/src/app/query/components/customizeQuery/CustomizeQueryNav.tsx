@@ -27,16 +27,18 @@ const CustomizeQueryNav: React.FC<CustomizeQueryNavProps> = ({
   handleSelectAllForTab,
   valueSetOptions,
 }) => {
-  const hasSelectableItems = Object.values(valueSetOptions[activeTab]).some(
+  const activeItems = valueSetOptions[activeTab] ?? {};
+
+  const hasSelectableItems = Object.values(activeItems).some(
     (group) => group.items.length > 0,
   );
-  const allItemsDeselected = Object.values(valueSetOptions[activeTab])
+  const allItemsDeselected = Object.values(activeItems)
     .flatMap((groupedValSets) =>
       groupedValSets.items.flatMap((i) => i.includeValueSet),
     )
     .every((p) => !p);
 
-  const allItemsSelected = Object.values(valueSetOptions[activeTab])
+  const allItemsSelected = Object.values(activeItems)
     .flatMap((groupedValSets) =>
       groupedValSets.items.flatMap((i) => i.includeValueSet),
     )
