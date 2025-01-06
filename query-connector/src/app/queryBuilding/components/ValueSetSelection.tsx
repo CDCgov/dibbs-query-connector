@@ -146,27 +146,20 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
               </div>
             </div>
 
-            {Object.values(selectedConditions)
-              .flatMap((categoryConditions) =>
-                Object.entries(categoryConditions).map(([id, condition]) => ({
-                  id,
-                  name: condition.name,
-                })),
-              )
-              .map((condition) => (
+            {Object.values(includedConditionsWithIds).map((condition) => {
+              return (
                 <div
                   key={condition.id}
                   className={
-                    activeCondition === condition.id
+                    activeCondition == condition.id
                       ? `${styles.conditionCard} ${styles.active}`
                       : styles.conditionCard
                   }
-                  onClick={() => setActiveCondition(condition.id)}
-                  tabIndex={0}
                 >
                   {formatDiseaseDisplay(condition.name)}
                 </div>
-              ))}
+              );
+            })}
           </div>
         </div>
         <div className={styles.valueSetTemplate__right}>
