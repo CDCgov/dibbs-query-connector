@@ -39,7 +39,7 @@ export const EmptyQueriesDisplay: React.FC<EmptyQueryProps> = ({
   };
 
   if (loading) {
-    return <WorkSpaceSetUpView loading={loading} />;
+    return <WorkSpaceSetUpView />;
   }
 
   return (
