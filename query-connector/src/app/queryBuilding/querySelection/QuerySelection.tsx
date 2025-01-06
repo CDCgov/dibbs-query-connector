@@ -12,7 +12,7 @@ import {
 } from "react";
 import { ToastContainer } from "react-toastify";
 import EmptyQueriesDisplay from "./EmptyQueriesDisplay";
-import MyQueriesDisplay from "./MyQueries";
+import MyQueriesDisplay from "./QueryLibrary";
 import { SelectedQueryDetails, SelectedQueryState } from "./utils";
 import styles from "./querySelection.module.scss";
 import { BuildStep } from "@/app/constants";
@@ -70,9 +70,9 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({
   return (
     <>
       {queries.length === 0 ? (
-        <div className="main-container">
-          <h1 className={styles.queryTitle}>My queries</h1>
-          <EmptyQueriesDisplay />
+        <div className="main-container__wide">
+          <h1 className={styles.queryTitle}>Query Library</h1>
+          <EmptyQueriesDisplay setBuildStep={setBuildStep} />
         </div>
       ) : (
         <div className="main-container__wide">
