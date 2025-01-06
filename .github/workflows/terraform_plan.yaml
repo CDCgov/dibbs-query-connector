@@ -1,4 +1,4 @@
-name: Terraform Plan
+name: Ad-hoc Terraform Plan
 run-name: Terraform plan ${{ inputs.workspace }} by @${{ github.actor }}
 
 on:
@@ -70,7 +70,7 @@ jobs:
             -backend-config "region=$REGION" \
             || (echo "terraform init failed, exiting..." && exit 1)
           terraform workspace select "$WORKSPACE"
-          terraform plan -out=tfplan \
+          terraform plan \
             -var-file="$WORKSPACE.tfvars" \
             -var "umls_api_key=${UMLS_API_KEY}" \
             -var "ersd_api_key=${ERSD_API_KEY}" \
