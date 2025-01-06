@@ -43,37 +43,41 @@ export const EmptyQueriesDisplay: React.FC<EmptyQueryProps> = ({
   }
 
   return (
-    <div className={classNames("bg-gray-5", styles.emptyStateQueryContainer)}>
-      <div className="display-flex flex-column flex-align-left">
-        <h2 className={styles.emptyQueryTitle}>Start with Query Builder</h2>
-        <h3 className={styles.emptyQuerySubtitle}>
-          Create custom queries that your staff can use to search for relevant
-          data
-        </h3>
+    <>
+      <h1 className={styles.queryTitle}>Query Library</h1>
 
-        <ul className={styles.emptyQueryExplainer}>
-          <li>
-            <strong>Leverage</strong> our pre-populated templates with public
-            health codes from LOINC, ICD-10, SNOMED, and more.
-          </li>
-          <li>
-            <strong>Decide</strong> which codes to include in each query.
-          </li>
-          <li>
-            <strong>Combine</strong> codes from different conditions.
-          </li>
-        </ul>
-        <Button
-          onClick={async () => {
-            await handleClick();
-          }}
-          className={styles.createQueryButton}
-          type={"button"}
-        >
-          Build your first query
-        </Button>
+      <div className={classNames("bg-gray-5", styles.emptyStateQueryContainer)}>
+        <div className="display-flex flex-column flex-align-left">
+          <h2 className={styles.emptyQueryTitle}>Start with Query Builder</h2>
+          <h3 className={styles.emptyQuerySubtitle}>
+            Create custom queries that your staff can use to search for relevant
+            data
+          </h3>
+
+          <ul className={styles.emptyQueryExplainer}>
+            <li>
+              <strong>Leverage</strong> our pre-populated templates with public
+              health codes from LOINC, ICD-10, SNOMED, and more.
+            </li>
+            <li>
+              <strong>Decide</strong> which codes to include in each query.
+            </li>
+            <li>
+              <strong>Combine</strong> codes from different conditions.
+            </li>
+          </ul>
+          <Button
+            onClick={async () => {
+              await handleClick();
+            }}
+            className={styles.createQueryButton}
+            type={"button"}
+          >
+            Build your first query
+          </Button>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
