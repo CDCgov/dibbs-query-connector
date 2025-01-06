@@ -12,6 +12,7 @@ import {
 import {
   CategoryNameToConditionOptionMap,
   ConditionIdToValueSetArrayMap,
+  NestedQuery,
   EMPTY_QUERY_SELECTION,
   generateConditionNameToIdAndCategoryMap,
   groupConditionDataByCategoryName,
@@ -19,7 +20,7 @@ import {
 import { ConditionSelection } from "../components/ConditionSelection";
 import { ValueSetSelection } from "../components/ValueSetSelection";
 import SiteAlert from "@/app/query/designSystem/SiteAlert";
-import { BuildStep } from "../../constants";
+import { BuildStep, DibbsConceptType, DibbsValueSet } from "../../constants";
 import LoadingView from "../../query/components/LoadingView";
 import classNames from "classnames";
 import { groupConditionConceptsIntoValueSets } from "@/app/utils";
@@ -27,7 +28,11 @@ import { SelectedQueryDetails } from "../querySelection/utils";
 
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { getSavedQueryDetails } from "@/app/backend/query-building";
+import {
+  getSavedQueryDetails,
+  saveCustomQuery,
+} from "@/app/backend/query-building";
+import { VsGrouping } from "@/app/utils/valueSetTranslation";
 
 export type FormError = {
   queryName: boolean;
@@ -75,6 +80,8 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
   });
   const [conditionValueSets, setConditionValueSets] =
     useState<ConditionIdToValueSetArrayMap>();
+
+  const [constructedQuery, setConstructedQuery] = useState<NestedQuery>({});
 
   function goBack() {
     setQueryName(null);
@@ -270,6 +277,29 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
     });
   };
 
+  const handleSelectedValueSetUpdate =
+    (conditionId: string) =>
+    (vsType: DibbsConceptType) =>
+    (vsName: string) =>
+    (vsGrouping: VsGrouping) =>
+    (dibbsValueSets: DibbsValueSet[]) => {
+      setConstructedQuery((prevState) => {
+        prevState[conditionId][vsType][vsName] = {
+          ...vsGrouping,
+          items: [
+            { ...dibbsValueSets[0], concepts: dibbsValueSets[0].concepts },
+          ],
+        };
+        return structuredClone(prevState);
+      });
+    };
+
+  async function handleSaveQuery() {
+    if (constructedQuery && queryName) {
+      await saveCustomQuery(constructedQuery, queryName);
+    }
+  }
+
   const atLeastOneItemSelected =
     selectedConditions && Object.values(selectedConditions).length > 0;
 
@@ -327,12 +357,6 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
               <Button
                 className="margin-0"
                 type={"button"}
-                disabled={
-                  formError.selectedConditions ||
-                  !queryName ||
-                  loading ||
-                  buildStep == "valueset" // hard-coding this off for now; should be handled in concept selection ticket
-                }
                 title={
                   buildStep == "valueset"
                     ? "Save query"
@@ -343,7 +367,7 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
                 onClick={
                   buildStep == "condition"
                     ? handleCreateQueryClick
-                    : () => console.log("save query")
+                    : handleSaveQuery
                 }
               >
                 {buildStep == "condition" ? "Customize query" : "Save query"}
@@ -378,6 +402,9 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
               queryName={queryName}
               selectedConditions={selectedConditions ?? {}}
               valueSetsByCondition={conditionValueSets ?? {}}
+              constructedQuery={constructedQuery}
+              setConstructedQuery={setConstructedQuery}
+              handleSelectedValueSetUpdate={handleSelectedValueSetUpdate}
             />
           )}
         </div>

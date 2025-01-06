@@ -1,7 +1,8 @@
 "use server";
 
 import { getDbClient } from "./dbClient";
-import { QueryDetailsResult } from "../queryBuilding/utils";
+import { NestedQuery, QueryDetailsResult } from "../queryBuilding/utils";
+import { DibbsValueSet } from "../constants";
 const dbClient = getDbClient();
 
 /**
@@ -27,4 +28,34 @@ export async function getSavedQueryDetails(queryId: string) {
   } catch (error) {
     console.error("Error retrieving query", error);
   }
+}
+
+export async function saveCustomQuery(
+  queryData: NestedQuery,
+  queryName: string,
+) {
+  const queryString = `
+    select q.query_name, q.id, q.query_data, q.conditions_list
+        from query q 
+    where q.id = $1;
+    `;
+  const resultToSave = formatQueryDataForDatabase(queryData);
+}
+
+function formatQueryDataForDatabase(frontendInput: NestedQuery) {
+  const result: Record<string, { [valueSetId: string]: DibbsValueSet }> = {};
+
+  Object.entries(frontendInput).forEach(([queryId, data]) => {
+    result[queryId] = {};
+    Object.values(data).forEach((vsNameToVsGroupingMap) => {
+      Object.values(vsNameToVsGroupingMap).forEach((vsGrouping) => {
+        const valueSetsToSave = vsGrouping.items;
+        valueSetsToSave.forEach((dibbsVs) => {
+          result[queryId][dibbsVs.valueSetId] = dibbsVs;
+        });
+      });
+    });
+  });
+
+  return result;
 }

@@ -33,7 +33,7 @@ export type CategoryToConditionToNameMap = {
   [categoryName: string]: ConditionIdToNameMap[];
 };
 
-export type ConditionToConceptTypeToValueSetGroupingMap = {
+export type NestedQuery = {
   [conditionId: string]: ConceptTypeToVsNameToVsGroupingMap;
 };
 

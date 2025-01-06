@@ -1,7 +1,7 @@
 "use client";
 
 import styles from "../buildFromTemplates/buildfromTemplate.module.scss";
-import { useEffect, useRef, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import classNames from "classnames";
 
 import {
@@ -11,10 +11,7 @@ import {
 import SearchField from "@/app/query/designSystem/searchField/SearchField";
 import { Icon } from "@trussworks/react-uswds";
 
-import {
-  formatDiseaseDisplay,
-  ConditionToConceptTypeToValueSetGroupingMap,
-} from "../utils";
+import { formatDiseaseDisplay, NestedQuery } from "../utils";
 import { SelectionTable } from "./SelectionTable";
 
 import Drawer from "@/app/query/designSystem/drawer/Drawer";
@@ -28,6 +25,15 @@ type ConditionSelectionProps = {
   queryName: string;
   selectedConditions: CategoryNameToConditionOptionMap;
   valueSetsByCondition: ConditionIdToValueSetArrayMap;
+  constructedQuery: NestedQuery;
+  setConstructedQuery: Dispatch<SetStateAction<NestedQuery>>;
+  handleSelectedValueSetUpdate: (
+    conditionId: string,
+  ) => (
+    vsType: DibbsConceptType,
+  ) => (
+    vsName: string,
+  ) => (vsGrouping: VsGrouping) => (dibbsValueSets: DibbsValueSet[]) => void;
 };
 
 /**
@@ -42,12 +48,14 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
   queryName,
   selectedConditions,
   valueSetsByCondition,
+  constructedQuery,
+  setConstructedQuery,
+  handleSelectedValueSetUpdate,
 }) => {
   const focusRef = useRef<HTMLInputElement | null>(null);
   const [activeCondition, setActiveCondition] = useState<string>("");
   const [_searchFilter, setSearchFilter] = useState<string>();
-  const [selectedValueSets, setSelectedValueSets] =
-    useState<ConditionToConceptTypeToValueSetGroupingMap>({});
+
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   useEffect(() => {
@@ -59,11 +67,11 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
     const id = Object.keys(selectedConditions[first])[0];
     setActiveCondition(id);
 
-    const groupedValueSetByCondition: ConditionToConceptTypeToValueSetGroupingMap =
+    const groupedValueSetByCondition: NestedQuery =
       groupValueSetGroupingByConditionId(valueSetsByCondition);
 
     return () => {
-      setSelectedValueSets(groupedValueSetByCondition);
+      setConstructedQuery(groupedValueSetByCondition);
     };
   }, []);
 
@@ -86,23 +94,6 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
       ),
     )
     .flat();
-
-  const handleSelectedValueSetUpdate =
-    (conditionId: string) =>
-    (vsType: DibbsConceptType) =>
-    (vsName: string) =>
-    (vsGrouping: VsGrouping) =>
-    (dibbsValueSets: DibbsValueSet[]) => {
-      setSelectedValueSets((prevState) => {
-        prevState[conditionId][vsType][vsName] = {
-          ...vsGrouping,
-          items: [
-            { ...dibbsValueSets[0], concepts: dibbsValueSets[0].concepts },
-          ],
-        };
-        return structuredClone(prevState);
-      });
-    };
 
   return (
     <div
@@ -165,9 +156,9 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
             />
           </div>
           <div>
-            {selectedValueSets && activeCondition && (
+            {constructedQuery && activeCondition && (
               <SelectionTable
-                vsTypeLevelOptions={selectedValueSets[activeCondition]}
+                vsTypeLevelOptions={constructedQuery[activeCondition]}
                 handleVsTypeLevelUpdate={handleSelectedValueSetUpdate(
                   activeCondition,
                 )}
