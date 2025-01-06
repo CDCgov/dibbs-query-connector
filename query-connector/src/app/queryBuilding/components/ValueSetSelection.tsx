@@ -155,6 +155,8 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
                       ? `${styles.conditionCard} ${styles.active}`
                       : styles.conditionCard
                   }
+                  onClick={() => setActiveCondition(condition.id)}
+                  tabIndex={0}
                 >
                   {formatDiseaseDisplay(condition.name)}
                 </div>
