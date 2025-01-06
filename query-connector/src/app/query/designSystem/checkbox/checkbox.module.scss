@@ -1,25 +1,28 @@
-@use "../../../../../styles/_variables" as *;
+@use "../../../../styles/_variables" as *;
 
-.vanity {
-  margin: 0.5rem;
+.checkbox {
+  &.label,
+  &:before {
+    border-radius: 0.125rem;
+  }
 }
-
-.vanity label {
+.checkbox label {
   margin-top: 0;
   padding-left: 0;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }
 
-.vanity label::before {
+.checkbox label::before {
   width: 1.25rem;
   height: 1.25rem;
   box-shadow: 0 0 0 1px $black !important;
-  border-radius: 0.25rem;
+  position: static;
   margin: 0;
-  padding: 0 !important;
-  position: relative !important;
 }
 
-.vanity input:checked + label::before {
+.checkbox input:checked + label::before {
   background-color: $primary !important;
   box-shadow: none !important;
 }
