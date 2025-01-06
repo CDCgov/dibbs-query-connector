@@ -14,7 +14,6 @@ import { ToastContainer } from "react-toastify";
 import EmptyQueriesDisplay from "./EmptyQueriesDisplay";
 import MyQueriesDisplay from "./QueryLibrary";
 import { SelectedQueryDetails, SelectedQueryState } from "./utils";
-import styles from "./querySelection.module.scss";
 import { BuildStep } from "@/app/constants";
 import { DataContext } from "@/app/DataProvider";
 
