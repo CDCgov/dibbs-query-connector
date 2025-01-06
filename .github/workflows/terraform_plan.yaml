@@ -1,4 +1,4 @@
-name: Ad-hoc Terraform Plan
+name: Terraform Plan
 run-name: Terraform plan ${{ inputs.workspace }} by @${{ github.actor }}
 
 on:
