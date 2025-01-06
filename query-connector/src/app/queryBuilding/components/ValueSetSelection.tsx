@@ -7,17 +7,22 @@ import classNames from "classnames";
 import {
   CategoryNameToConditionOptionMap,
   ConditionIdToValueSetArrayMap,
-  ConditionToConceptTypeToValueSetGroupingMap,
 } from "../utils";
 import SearchField from "@/app/query/designSystem/searchField/SearchField";
 import { Icon } from "@trussworks/react-uswds";
 
-import { formatDiseaseDisplay } from "../utils";
-
+import {
+  formatDiseaseDisplay,
+  ConditionToConceptTypeToValueSetGroupingMap,
+} from "../utils";
 import { SelectionTable } from "./SelectionTable";
 
 import Drawer from "@/app/query/designSystem/drawer/Drawer";
-import { groupValueSetGroupingByConditionId } from "@/app/utils/valueSetTranslation";
+import {
+  VsGrouping,
+  groupValueSetGroupingByConditionId,
+} from "@/app/utils/valueSetTranslation";
+import { DibbsConceptType, DibbsValueSet } from "@/app/constants";
 
 type ConditionSelectionProps = {
   queryName: string;
@@ -30,8 +35,8 @@ type ConditionSelectionProps = {
  * @param root0 - params
  * @param root0.queryName - current checkbox selection status
  * @param root0.selectedConditions - name of condition to display
- * @param root0.valueSetsByCondition - name of condition to display
- * @returns A component for display to render on the query building page
+ * @param root0.valueSetsByCondition - {conditionId: ValueSet[]} map
+ * @returns A component for display to redner on the query building page
  */
 export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
   queryName,
@@ -54,11 +59,13 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
 
     const first = Object.keys(selectedConditions)[0];
     const id = Object.keys(selectedConditions[first])[0];
-
     setActiveCondition(id);
     const groupedValueSetByCondition: ConditionToConceptTypeToValueSetGroupingMap =
       groupValueSetGroupingByConditionId(valueSetsByCondition);
-    setSelectedValueSets(groupedValueSetByCondition);
+
+    return () => {
+      setSelectedValueSets(groupedValueSetByCondition);
+    };
   }, []);
 
   const handleAddCondition = () => {
@@ -79,6 +86,35 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
       </ul>
     </div>
   ));
+
+  // Makes the conditionId more easily accessible within the group
+  // of selected conditions
+  const includedConditionsWithIds = Object.entries(selectedConditions)
+    .map(([_, conditionsByCategory]) =>
+      Object.entries(conditionsByCategory).flatMap(
+        ([conditionId, conditionObj]) => {
+          return { id: conditionId, name: conditionObj.name };
+        },
+      ),
+    )
+    .flat();
+
+  const handleSelectedValueSetUpdate =
+    (conditionId: string) =>
+    (vsType: DibbsConceptType) =>
+    (vsName: string) =>
+    (vsGrouping: VsGrouping) =>
+    (dibbsValueSets: DibbsValueSet[]) => {
+      setSelectedValueSets((prevState) => {
+        prevState[conditionId][vsType][vsName] = {
+          ...vsGrouping,
+          items: [
+            { ...dibbsValueSets[0], concepts: dibbsValueSets[0].concepts },
+          ],
+        };
+        return structuredClone(prevState);
+      });
+    };
 
   return (
     <div
@@ -146,13 +182,12 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
             />
           </div>
           <div>
-            {selectedValueSets && (
+            {selectedValueSets && activeCondition && (
               <SelectionTable
-                conditionId={activeCondition ?? ""}
-                groupedValueSetsForCondition={
-                  selectedValueSets[activeCondition]
-                }
-                setValueSets={setSelectedValueSets}
+                vsTypeLevelOptions={selectedValueSets[activeCondition]}
+                handleVsTypeLevelUpdate={handleSelectedValueSetUpdate(
+                  activeCondition,
+                )}
               />
             )}
           </div>
@@ -162,10 +197,13 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
       <Drawer
         title="Add Condition(s)"
         placeholder="Search conditions"
-        codes={<div>{codes}</div>}
+        toRender={<div>{codes}</div>}
+        toRender={<div>Dynamic codes go here</div>}
         toastMessage="Condition has been successfully added."
         isOpen={isDrawerOpen}
         onClose={handleCloseDrawer}
+        onSave={() => {}} //TODO
+        hasChanges={false}
       />
     </div>
   );

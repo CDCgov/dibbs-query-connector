@@ -31,7 +31,7 @@ const ObservationTable: React.FC<ObservationTableProps> = ({
     "referenceRange",
   );
   return (
-    <Table className={classNames("margin-top-0-important")}>
+    <Table bordered={false} className={classNames("margin-top-0-important")}>
       <thead>
         <tr className={styles.observationRow}>
           <th>Date</th>

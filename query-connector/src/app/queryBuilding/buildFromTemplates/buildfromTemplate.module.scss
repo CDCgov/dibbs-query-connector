@@ -159,11 +159,6 @@
   &:hover {
     background-color: #f7f9fa !important;
 
-    .valueSetTemplate__checkbox label {
-      background-color: #f7f9fa;
-      font-weight: 800;
-    }
-
     .accordionHeaderCount {
       color: #111111;
     }
@@ -221,6 +216,11 @@
   }
 }
 
+.valueSetTemplate__titleCheckbox {
+  text-transform: capitalize;
+  background-color: #f7f9fa;
+}
+
 .valueSetTemplate__toggleRowHeader {
   display: flex;
   align-items: center;
@@ -232,38 +232,20 @@
   color: black;
 }
 
-.valueSetTemplate__checkbox {
-  margin-left: 8px;
-}
-
-.valueSetTemplate__checkbox label {
-  margin-top: 0 !important;
-  padding-left: 2.25rem;
-  background-color: #f7f9fa;
-  font-weight: 700;
-  font-size: 18px;
-  text-transform: capitalize;
-}
-
 .accordionBodyExpanded {
-  padding: 1.5rem 1.5rem 0 3.5rem;
+  padding: 1.5rem 1.5rem 0 3rem;
   background-color: #fff;
   display: flex;
   justify-content: space-between;
-
-  .valueSetTemplate__checkbox label {
-    background-color: #fff;
-  }
 }
 
 .accordionBodyExpanded {
   &:hover {
     background-color: rgba(217, 232, 246, 0.5) !important;
 
-    .valueSetTemplate__checkbox label {
-      background-color: rgba(217, 232, 246, 0.5) !important;
+    .valueSetTemplate__checkbox {
+      background-color: unset;
     }
-
     .viewCodesBtn {
       display: block;
       text-align: right;
@@ -296,10 +278,6 @@ div.accordionBodyExpanded:last-of-type {
   border-bottom: solid 1px #dfe1e2;
   padding-bottom: 1rem;
   width: 100%;
-
-  .valueSetTemplate__checkbox {
-    margin: 0 !important;
-  }
 }
 
 .expandedContent {
@@ -329,13 +307,6 @@ div.accordionBodyExpanded:last-of-type {
   justify-content: flex-end;
 }
 
-.valueSetTemplate__checkbox__partial label::before {
-  background-size: cover !important;
-  background-color: #005ea2;
-  box-shadow: 0 0 0 2px #005ea2;
-  background-image: url("../../queryBuilding/components/PartialCheckbox.svg");
-}
-
 .customQuery__controls {
   display: flex;
   flex-direction: row;
@@ -347,13 +318,17 @@ div.accordionBodyExpanded:last-of-type {
   display: none;
 }
 
-.concept__checkbox__partial label::before {
-  background-size: cover !important;
-  background-color: #005ea2; 
-  box-shadow: 0 0 0 2px #005ea2;
-  background-image: url("../../queryBuilding/components/PartialCheckbox.svg");
+.conceptSelectionTable {
+  display: grid;
 }
 
-.concept__checkbox label::before {
-  background-color: #fff;
+$conditionColumnSpacing: 1.25rem 2fr 6fr;
+$columnGap: 1rem;
+.conceptSelectionRow {
+  text-align: left;
+  display: grid;
+  grid-template-columns: $conditionColumnSpacing;
+  column-gap: $columnGap;
+  margin-top: 1.5rem;
+  align-items: center;
 }

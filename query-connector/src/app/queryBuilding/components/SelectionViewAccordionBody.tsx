@@ -1,98 +1,175 @@
-import { Checkbox } from "@trussworks/react-uswds";
 import styles from "../buildFromTemplates/buildfromTemplate.module.scss";
 import { formatDiseaseDisplay } from "../utils";
 import { tallyConceptsForSingleValueSetGroup } from "../utils";
+import React, { ChangeEvent, useState } from "react";
+import ConceptSelection from "./ConceptSelection";
 import Drawer from "@/app/query/designSystem/drawer/Drawer";
-import React, { useState } from "react";
-import { VsGrouping } from "@/app/utils/valueSetTranslation";
-import { DibbsConceptType } from "@/app/constants";
+import {
+  ConceptOption,
+  VsGrouping,
+  getNameAuthorSystemFromVSGrouping,
+} from "@/app/utils/valueSetTranslation";
+import { DibbsValueSet } from "@/app/constants";
+import Checkbox from "@/app/query/designSystem/checkbox/Checkbox";
 
 type SelectionViewAccordionBodyProps = {
   id?: string;
-  activeValueSetType: DibbsConceptType;
-  activeVsGroupings: VsGrouping[];
-  handleCheckboxToggle: (
-    activeValueSetType: DibbsConceptType,
-    groupedValueSet: VsGrouping,
-  ) => void;
+  activeVsGroupings: { [vsNameAuthorSystem: string]: VsGrouping };
+  handleVsNameLevelUpdate: (
+    vsName: string,
+  ) => (vsGrouping: VsGrouping) => (dibbsValueSets: DibbsValueSet[]) => void;
 };
 
 /**
- * Fragment component to style out some of the accordion bodies
+ * An accordion body fragment
  * @param param0 - params
- * @param param0.activeValueSetType - DibbsConceptType for display in this accordion
  * @param param0.activeVsGroupings - VsGroupings[] for display in this accordion
- * @param param0.handleCheckboxToggle - Listener event to handle a ValueSet inclusion/
- * exclusion check
+ * @param param0.handleVsNameLevelUpdate - curried state update function that
+ * takes a VsName and generatesa ValueSet level update
  * @returns An accordion body component
  */
 const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
-  activeValueSetType,
   activeVsGroupings,
-  handleCheckboxToggle,
+  handleVsNameLevelUpdate,
 }) => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [drawerTitle, setDrawerTitle] = useState<string>("");
-  const [drawerCodes, setDrawerCodes] = useState<React.ReactNode>(null);
+  const [hasDrawerChange, setHasDrawerChange] = useState(false);
+  const [curVsGrouping, setCurVsGrouping] = useState<VsGrouping>();
+  const [curConcepts, setCurConcepts] = useState<ConceptOption[]>([]);
 
-  const handleViewCodes = (vsName: string, codes: React.ReactNode) => {
-    setDrawerTitle(`${vsName}`);
-    setDrawerCodes(codes);
+  const handleViewCodes = (vs: VsGrouping) => {
+    setCurVsGrouping(vs);
+    setCurConcepts(vs.items.map((i) => i.concepts).flat());
     setIsDrawerOpen(true);
   };
 
+  const handleConceptsChange = (
+    updatedConcepts: ConceptOption[],
+    updateBatchSave = true,
+  ) => {
+    if (curVsGrouping) {
+      const activeVsName = getNameAuthorSystemFromVSGrouping(curVsGrouping);
+      curVsGrouping.items = [
+        // assuming that name / author / system identifies a unique value set,
+        // the new items array will only differ by concepts
+        { ...curVsGrouping.items[0], concepts: updatedConcepts },
+      ];
+
+      if (updateBatchSave) {
+        handleVsNameLevelUpdate(activeVsName)(curVsGrouping)(
+          curVsGrouping.items,
+        );
+      }
+      setCurConcepts(updatedConcepts);
+      setHasDrawerChange(true);
+    }
+  };
+
+  const handleSaveChanges = () => {
+    Object.values(activeVsGroupings).map((groupedVS) => {
+      if (
+        groupedVS.valueSetName === curVsGrouping?.valueSetName &&
+        curConcepts
+      ) {
+        const activeVsName = getNameAuthorSystemFromVSGrouping(curVsGrouping);
+        const updatedVsGrouping = structuredClone(curVsGrouping);
+        updatedVsGrouping.items = [
+          // assuming that name / author / system identifies a unique value set,
+          // the new items array will only differ by the concepts
+          { ...curVsGrouping.items[0], concepts: curConcepts },
+        ];
+
+        handleVsNameLevelUpdate(activeVsName)(updatedVsGrouping);
+      }
+    });
+    setIsDrawerOpen(false);
+  };
+
+  function handleBulkToggle(
+    e: ChangeEvent<HTMLInputElement>,
+    isMinusState: boolean,
+  ) {
+    const vsGrouping = structuredClone(activeVsGroupings[e.target.id]);
+    const activeVsName = getNameAuthorSystemFromVSGrouping(vsGrouping);
+    const handleValueSetLevelUpdate =
+      handleVsNameLevelUpdate(activeVsName)(vsGrouping);
+
+    const newConcepts = vsGrouping.items
+      .map((i) => {
+        return i.concepts.map((c) => {
+          return {
+            ...c,
+            include: isMinusState ? false : e.target.checked,
+          };
+        });
+      })
+      .flat();
+
+    handleValueSetLevelUpdate([
+      { ...vsGrouping.items[0], concepts: newConcepts },
+    ]);
+  }
+
   return (
     <div>
-      {activeVsGroupings &&
-        activeVsGroupings.map((vs) => {
-          const selectedCount = tallyConceptsForSingleValueSetGroup(vs, true);
-          const totalCount = tallyConceptsForSingleValueSetGroup(vs, false);
-          const checked =
-            vs.items[0].includeValueSet || selectedCount == totalCount;
+      {Object.values(activeVsGroupings).map((vs) => {
+        const selectedCount = tallyConceptsForSingleValueSetGroup(vs, true);
+        const totalCount = tallyConceptsForSingleValueSetGroup(vs, false);
+        const isMinusState =
+          selectedCount !== totalCount && selectedCount !== 0;
+        const checked = selectedCount == totalCount && selectedCount > 0;
+        const vsLabel = getNameAuthorSystemFromVSGrouping(vs);
 
-          return (
-            <div
-              className={styles.accordionBodyExpanded}
-              key={`${activeValueSetType}-${vs.valueSetName}`}
-            >
-              <div className={styles.accordionExpandedInner}>
-                <Checkbox
-                  name={`checkbox-${vs.valueSetName}`}
-                  className={styles.valueSetTemplate__checkbox}
-                  label={checkboxLabel(vs.valueSetName, vs.author, vs.system)}
-                  onChange={(e) => {
-                    e.stopPropagation();
-                    handleCheckboxToggle(activeValueSetType, vs);
-                  }}
-                  id={`${vs.valueSetName}-${activeValueSetType}`}
-                  checked={checked}
-                />
+        return (
+          <div className={styles.accordionBodyExpanded} key={vsLabel}>
+            <div className={styles.accordionExpandedInner}>
+              <Checkbox
+                className={styles.valueSetTemplate__checkbox}
+                label={checkboxLabel(vs.valueSetName, vs.author, vs.system)}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                  handleBulkToggle(e, isMinusState);
+                }}
+                id={vsLabel}
+                checked={checked}
+                isMinusState={isMinusState}
+              />
+            </div>
+            <div className={styles.accordionBodyExpanded__right}>
+              <div className={styles.displayCount}>
+                {selectedCount}/{totalCount}
               </div>
-              <div className={styles.accordionBodyExpanded__right}>
-                <div className={styles.displayCount}>
-                  {selectedCount}/{totalCount}
-                </div>
-                <div
-                  className={styles.viewCodesBtn}
-                  role="button"
-                  onClick={() =>
-                    handleViewCodes(vs.valueSetName, <div>TODO</div>)
-                  }
-                >
-                  View Codes
-                </div>
+              <div
+                className={styles.viewCodesBtn}
+                role="button"
+                onClick={() => {
+                  handleViewCodes(vs);
+                }}
+              >
+                View Codes
               </div>
             </div>
-          );
-        })}
-      <Drawer
-        title={drawerTitle}
-        placeholder="Search by code or name"
-        toastMessage="Valueset concepts have been successfully modified."
-        codes={drawerCodes}
-        isOpen={isDrawerOpen}
-        onClose={() => setIsDrawerOpen(false)}
-      />
+          </div>
+        );
+      })}
+      {curConcepts && curVsGrouping && (
+        <Drawer
+          title={curVsGrouping.valueSetName}
+          placeholder="Search by code or name"
+          toastMessage="Valueset concepts have been successfully modified."
+          toRender={
+            <ConceptSelection
+              concepts={curConcepts}
+              onConceptsChange={handleConceptsChange}
+            />
+          }
+          isOpen={isDrawerOpen}
+          onClose={() => {
+            setIsDrawerOpen(false), setHasDrawerChange(false);
+          }}
+          onSave={handleSaveChanges}
+          hasChanges={hasDrawerChange}
+        />
+      )}
     </div>
   );
 };
