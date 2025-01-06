@@ -72,7 +72,11 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({
       {queries.length === 0 ? (
         <div className="main-container__wide">
           <h1 className={styles.queryTitle}>Query Library</h1>
-          <EmptyQueriesDisplay setBuildStep={setBuildStep} />
+          <EmptyQueriesDisplay
+            goForward={() => {
+              setBuildStep("condition");
+            }}
+          />
         </div>
       ) : (
         <div className="main-container__wide">

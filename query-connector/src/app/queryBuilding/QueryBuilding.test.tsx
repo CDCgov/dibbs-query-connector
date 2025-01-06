@@ -25,10 +25,7 @@ describe("tests the query building steps", () => {
 
     // Wait for the asynchronous data to resolve and the component to update
     await waitFor(() => {
-      expect(screen.getByText("My queries")).toBeInTheDocument();
-      expect(
-        screen.getByText("No custom queries available"),
-      ).toBeInTheDocument();
+      expect(screen.getByText("Start with Query Builder")).toBeInTheDocument();
     });
   });
 });

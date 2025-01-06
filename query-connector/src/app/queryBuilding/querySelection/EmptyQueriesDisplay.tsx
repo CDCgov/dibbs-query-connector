@@ -1,20 +1,21 @@
 import { Button } from "@trussworks/react-uswds";
-import { Dispatch, SetStateAction, useState } from "react";
+import { useState } from "react";
 import styles from "./querySelection.module.scss";
 import classNames from "classnames";
 import WorkSpaceSetUpView from "./WorkspaceSetUp";
 import { createDibbsDB } from "@/app/backend/dbCreation/db-creation";
-import { BuildStep } from "@/app/constants";
 
 type EmptyQueryProps = {
-  setBuildStep: Dispatch<SetStateAction<BuildStep>>;
+  goForward: () => void;
 };
 /**
  * Empty-state component for query building
+ * @param root0 - params
+ * @param root0.goForward - navigation function to go to the next page
  * @returns the EmptyQueriesDisplay to render the empty state status
  */
 export const EmptyQueriesDisplay: React.FC<EmptyQueryProps> = ({
-  setBuildStep,
+  goForward,
 }) => {
   const [loading, setLoading] = useState(false);
 
@@ -24,13 +25,17 @@ export const EmptyQueriesDisplay: React.FC<EmptyQueryProps> = ({
     // DB Creation Function
     console.log("Creating DB...");
 
-    await createDibbsDB();
+    const { reload } = await createDibbsDB();
 
     // Stop loading and redirect once function is complete
     setLoading(false);
 
-    // Refresh query building page to display the now seeded values
-    location.reload();
+    if (reload) {
+      // Refresh query building page to display the now seeded values
+      location.reload();
+    } else {
+      goForward();
+    }
   };
 
   if (loading) {
@@ -59,7 +64,9 @@ export const EmptyQueriesDisplay: React.FC<EmptyQueryProps> = ({
           </li>
         </ul>
         <Button
-          onClick={() => setBuildStep("condition")}
+          onClick={async () => {
+            await handleClick();
+          }}
           className={styles.createQueryButton}
           type={"button"}
         >
