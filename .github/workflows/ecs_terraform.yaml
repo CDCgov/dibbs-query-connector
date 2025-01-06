@@ -78,13 +78,14 @@ jobs:
             -backend-config "region=$REGION" \
             || (echo "terraform init failed, exiting..." && exit 1)
           terraform workspace select "$WORKSPACE"
-          terraform apply -auto-approve -target=aws_acm_certificate.cloudflare_cert \
+          terraform plan -out=tfplan \
             -var-file="$WORKSPACE.tfvars" \
             -var "umls_api_key=${UMLS_API_KEY}" \
             -var "ersd_api_key=${ERSD_API_KEY}" \
             -var "qc_tls_key=${TLS_KEY}" \
-            -var "qc_tls_cert=${TLS_CERT}"
-          terraform plan -out=tfplan \
+            -var "qc_tls_cert=${TLS_CERT}"          
+          terraform apply -auto-approve -target=aws_acm_certificate.cloudflare_cert \
+            -replace="module.ecs.dockerless_remote_image.dibbs" \
             -var-file="$WORKSPACE.tfvars" \
             -var "umls_api_key=${UMLS_API_KEY}" \
             -var "ersd_api_key=${ERSD_API_KEY}" \
