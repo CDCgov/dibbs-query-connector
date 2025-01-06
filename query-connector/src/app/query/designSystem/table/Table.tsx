@@ -1,5 +1,6 @@
 import { Table as TrussTable } from "@trussworks/react-uswds";
-
+import styles from "./table.module.scss";
+import classNames from "classnames";
 type TableProps = {
   children: React.ReactNode;
   className?: string;
@@ -18,12 +19,20 @@ type TableProps = {
  */
 const Table: React.FC<TableProps> = ({
   children,
-  bordered,
+  bordered = true,
   className,
   striped,
 }) => {
   return (
-    <TrussTable bordered={bordered} className={className} striped={striped}>
+    <TrussTable
+      bordered={bordered}
+      className={classNames(
+        styles.table,
+        className,
+        bordered ? "" : styles.unbordered,
+      )}
+      striped={striped}
+    >
       {children}
     </TrussTable>
   );

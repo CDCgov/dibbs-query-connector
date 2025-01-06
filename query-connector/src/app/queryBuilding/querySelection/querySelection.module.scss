@@ -1,5 +1,13 @@
 @use "../../../styles/variables" as *;
 
+$columnGap: 0.5rem;
+$conditionColumnSpacing: 2fr 3fr 3fr;
+
+.myQueriesRow {
+  grid-template-columns: $conditionColumnSpacing;
+  gap: $columnGap;
+}
+
 .queryBuildingContainer {
   display: flex;
   flex-direction: column;
@@ -29,7 +37,7 @@
 .emptyQueryIcon {
   width: 7.5rem;
   height: 7.5rem;
-  color: $gray-cool-20;
+  color: $gray-20;
 }
 
 .createQueryButton {
@@ -37,56 +45,7 @@
   padding: 1rem !important;
 }
 
-.customQueryWrapper {
-  background-color: white;
-  padding-top: 1.5rem;
-  border: 0.0625rem solid var(--gray-400, #dfe1e2);
-  border-radius: 0.25rem;
-  box-shadow: 0 0.125rem 0.1875rem 0 #f3f3f3;
-}
-
 .customQueryTable {
-  width: 100%;
-  margin: 0rem;
-  border-collapse: collapse;
-  background-color: transparent;
-  border: none;
-
-  td,
-  th {
-    padding-left: 1.5rem;
-  }
-
-  thead tr th {
-    color: var(--gray-500, #919191);
-    background-color: white;
-    font-family: "Public Sans", sans-serif;
-    font-size: 0.75rem;
-    font-weight: 700;
-    line-height: 150%;
-    text-transform: uppercase;
-    padding-top: 0rem;
-    padding-bottom: 0.5rem;
-    border: none;
-  }
-
-  tbody tr {
-    transition: background-color 0.3s ease;
-    position: relative;
-    height: 5rem;
-  }
-
-  tbody td {
-    font-family: "Public Sans", sans-serif;
-    font-size: 0.875rem;
-    color: #000;
-    max-width: 12rem;
-    overflow: hidden;
-    white-space: normal;
-    position: relative;
-    border: none;
-  }
-
   .table-cell-buttons {
     display: flex;
     align-items: center;
@@ -109,15 +68,6 @@
   tbody td:last-child:hover {
     opacity: 1;
     pointer-events: auto;
-  }
-
-  tbody tr:after {
-    position: absolute;
-    width: 95.5%;
-    border-bottom: 1px solid #f3f3f3;
-    left: 2%;
-    top: -2%;
-    content: "";
   }
 }
 

@@ -6,7 +6,7 @@ import {
   ContactPoint,
   Identifier,
 } from "fhir/r4";
-import { ValueSet } from "./constants";
+import { DibbsValueSet } from "./constants";
 import { QueryStruct } from "./query-service";
 
 /**
@@ -143,10 +143,10 @@ export function formatIdentifier(identifier: Identifier[]): JSX.Element {
         }
 
         return (
-          <>
+          <div key={id.value}>
             {" "}
             {idType}: {id.value} <br />{" "}
-          </>
+          </div>
         );
       })}
     </>
@@ -269,7 +269,7 @@ export async function GetPhoneQueryFormats(phone: string) {
  */
 export const formatValueSetsAsQuerySpec = async (
   useCase: string,
-  valueSets: ValueSet[],
+  valueSets: DibbsValueSet[],
 ) => {
   let secondEncounter: boolean = false;
   if (["cancer", "chlamydia", "gonorrhea", "syphilis"].includes(useCase)) {

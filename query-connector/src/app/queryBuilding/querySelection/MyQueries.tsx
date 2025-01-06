@@ -5,7 +5,8 @@ import React, {
   Dispatch,
   SetStateAction,
 } from "react";
-import { Button, Icon, Table } from "@trussworks/react-uswds";
+import { Button, Icon } from "@trussworks/react-uswds";
+import Table from "@/app/query/designSystem/table/Table";
 import { ModalRef } from "@/app/query/designSystem/modal/Modal";
 import styles from "./querySelection.module.scss";
 import { CustomUserQuery } from "@/app/query-building";
@@ -22,6 +23,7 @@ import {
 } from "./utils";
 import LoadingView from "@/app/query/components/LoadingView";
 import { DataContext } from "@/app/DataProvider";
+import classNames from "classnames";
 
 interface UserQueriesDisplayProps {
   queries: CustomUserQuery[];
@@ -40,7 +42,7 @@ interface UserQueriesDisplayProps {
  * @param root0.setSelectedQuery - setter function to update the query for editing
  * @returns the UserQueriesDisplay to render the queries with edit/delete options
  */
-export const UserQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
+export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
   queries: initialQueries,
   selectedQuery,
   setSelectedQuery,
@@ -90,14 +92,17 @@ export const UserQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
       <div className={styles.customQueryWrapper}>
         <Table className={styles.customQueryTable}>
           <thead>
-            <tr>
+            <tr className={styles.myQueriesRow}>
               <th scope="col">NAME</th>
               <th scope="col">CONDITIONS</th>
             </tr>
           </thead>
           <tbody>
             {queries.map((query, index) => (
-              <tr key={index} className="tableRowWithHover">
+              <tr
+                key={index}
+                className={classNames(styles.myQueriesRow, "tableRowWithHover")}
+              >
                 <td title={query.query_name}>{query.query_name}</td>
                 <td title={query.conditions_list}>{query.conditions_list}</td>
                 <td>
@@ -110,7 +115,10 @@ export const UserQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
                       }
                     >
                       <span className="icon-text padding-right-4 display-flex flex-align-center">
-                        <Icon.Edit className="height-3 width-3" />
+                        <Icon.Edit
+                          className="height-3 width-3"
+                          aria-label="Pencil icon indicating edit ability"
+                        />
                         <span id={query.query_id} className="padding-left-05">
                           Edit
                         </span>
@@ -129,7 +137,10 @@ export const UserQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
                       }
                     >
                       <span className="icon-text padding-right-4 display-flex flex-align-center">
-                        <Icon.Delete className="height-3 width-3" />
+                        <Icon.Delete
+                          className="height-3 width-3"
+                          aria-label="trashcan icon indicating deletion"
+                        />
                         <span className="padding-left-05">Delete</span>
                       </span>
                     </Button>
@@ -141,7 +152,10 @@ export const UserQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
                       }
                     >
                       <span className="icon-text padding-right-1 display-flex flex-align-center">
-                        <Icon.ContentCopy className="height-3 width-3" />
+                        <Icon.ContentCopy
+                          className="height-3 width-3"
+                          aria-label="Stacked paper icon indidcating copy"
+                        />
                         <span className="padding-left-05">Copy ID</span>
                       </span>
                     </Button>
@@ -156,4 +170,4 @@ export const UserQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
   );
 };
 
-export default UserQueriesDisplay;
+export default MyQueriesDisplay;

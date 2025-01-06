@@ -1,6 +1,7 @@
 import Checkbox from "../../query/designSystem/checkbox/Checkbox";
 import { formatDiseaseDisplay } from "../utils";
 import styles from "./buildfromTemplate.module.scss";
+
 type ConditionOptionProps = {
   conditionId: string;
   conditionName: string;

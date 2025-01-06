@@ -1,17 +1,14 @@
-import { DibbsValueSetType } from "@/app/constants";
-import styles from "./customizeQuery.module.css";
+import { DibbsConceptType } from "@/app/constants";
+import styles from "./customizeQuery.module.scss";
 import CustomizeQueryBulkSelect from "./CustomizeQueryBulkSelect";
-import { GroupedValueSet } from "./customizeQueryUtils";
+import { ConceptTypeToVsNameToVsGroupingMap } from "@/app/utils/valueSetTranslation";
+import { Button } from "@trussworks/react-uswds";
 
 type CustomizeQueryNavProps = {
-  activeTab: DibbsValueSetType;
-  handleTabChange: (tabName: DibbsValueSetType) => void;
+  activeTab: DibbsConceptType;
+  handleTabChange: (tabName: DibbsConceptType) => void;
   handleSelectAllForTab: (checked: boolean) => void;
-  valueSetOptions: {
-    [key in DibbsValueSetType]: {
-      [vsNameAuthorSystem: string]: GroupedValueSet;
-    };
-  };
+  valueSetOptions: ConceptTypeToVsNameToVsGroupingMap;
 };
 
 /**
@@ -30,16 +27,18 @@ const CustomizeQueryNav: React.FC<CustomizeQueryNavProps> = ({
   handleSelectAllForTab,
   valueSetOptions,
 }) => {
-  const hasSelectableItems = Object.values(valueSetOptions[activeTab]).some(
+  const activeItems = valueSetOptions[activeTab] ?? {};
+
+  const hasSelectableItems = Object.values(activeItems).some(
     (group) => group.items.length > 0,
   );
-  const allItemsDeselected = Object.values(valueSetOptions[activeTab])
+  const allItemsDeselected = Object.values(activeItems)
     .flatMap((groupedValSets) =>
       groupedValSets.items.flatMap((i) => i.includeValueSet),
     )
     .every((p) => !p);
 
-  const allItemsSelected = Object.values(valueSetOptions[activeTab])
+  const allItemsSelected = Object.values(activeItems)
     .flatMap((groupedValSets) =>
       groupedValSets.items.flatMap((i) => i.includeValueSet),
     )
@@ -50,37 +49,40 @@ const CustomizeQueryNav: React.FC<CustomizeQueryNavProps> = ({
       <nav className={`${styles.customizeQueryNav}`}>
         <ul className="usa-sidenav">
           <li className={`usa-sidenav_item`}>
-            <a
-              href="#labs"
-              className={`${
+            <Button
+              className={`usa-button--unstyled ${
                 activeTab === "labs" ? `${styles.currentTab}` : ""
               }`}
               onClick={() => handleTabChange("labs")}
+              disabled={valueSetOptions["labs"] === undefined}
+              type="button"
             >
               Labs
-            </a>
+            </Button>
           </li>
           <li className={`usa-sidenav_item`}>
-            <a
-              className={`${
+            <Button
+              className={`usa-button--unstyled ${
                 activeTab === "medications" ? `${styles.currentTab}` : ""
               }`}
-              href="#medications"
               onClick={() => handleTabChange("medications")}
+              disabled={valueSetOptions["medications"] === undefined}
+              type={"button"}
             >
               Medications
-            </a>
+            </Button>
           </li>
           <li className={`usa-sidenav_item`}>
-            <a
-              className={`${
+            <Button
+              className={`usa-button--unstyled ${
                 activeTab === "conditions" ? `${styles.currentTab}` : ""
               }`}
-              href="#conditions"
               onClick={() => handleTabChange("conditions")}
+              disabled={valueSetOptions["conditions"] === undefined}
+              type={"button"}
             >
               Conditions
-            </a>
+            </Button>
           </li>
         </ul>
       </nav>

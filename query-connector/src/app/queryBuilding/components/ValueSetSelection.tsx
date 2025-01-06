@@ -1,48 +1,41 @@
 "use client";
 
 import styles from "../buildFromTemplates/buildfromTemplate.module.scss";
-import {
-  // Dispatch,
-  // SetStateAction,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { useEffect, useRef, useState } from "react";
 import classNames from "classnames";
 
 import {
   CategoryNameToConditionOptionMap,
-  ConditionIdToValueSetArray,
+  ConditionIdToValueSetArrayMap,
 } from "../utils";
-import { BuildStep } from "@/app/constants";
 import SearchField from "@/app/query/designSystem/searchField/SearchField";
 import { Icon } from "@trussworks/react-uswds";
 
-import { formatDiseaseDisplay, ConditionToValueSetMap } from "../utils";
 import {
-  GroupedValueSet,
-  mapValueSetsToValueSetType,
-  groupValueSetsByNameAuthorSystem,
-} from "../../query/components/customizeQuery/customizeQueryUtils";
-import { DibbsValueSetType } from "../../constants";
+  formatDiseaseDisplay,
+  ConditionToConceptTypeToValueSetGroupingMap,
+} from "../utils";
 import { SelectionTable } from "./SelectionTable";
 
 import Drawer from "@/app/query/designSystem/drawer/Drawer";
+import {
+  VsGrouping,
+  groupValueSetGroupingByConditionId,
+} from "@/app/utils/valueSetTranslation";
+import { DibbsConceptType, DibbsValueSet } from "@/app/constants";
 
 type ConditionSelectionProps = {
   queryName: string;
-  setBuildStep: (buildStep: BuildStep) => void;
   selectedConditions: CategoryNameToConditionOptionMap;
-  valueSetsByCondition: ConditionIdToValueSetArray;
+  valueSetsByCondition: ConditionIdToValueSetArrayMap;
 };
 
 /**
  * Display component for a condition on the query building page
  * @param root0 - params
  * @param root0.queryName - current checkbox selection status
-//  * @param root0.setBuildStep - Redirect function to handle view routing
  * @param root0.selectedConditions - name of condition to display
- * @param root0.valueSetsByCondition - name of condition to display
+ * @param root0.valueSetsByCondition - {conditionId: ValueSet[]} map
  * @returns A component for display to redner on the query building page
  */
 export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
@@ -54,7 +47,7 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
   const [activeCondition, setActiveCondition] = useState<string>("");
   const [_searchFilter, setSearchFilter] = useState<string>();
   const [selectedValueSets, setSelectedValueSets] =
-    useState<ConditionToValueSetMap>({});
+    useState<ConditionToConceptTypeToValueSetGroupingMap>({});
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   useEffect(() => {
@@ -64,64 +57,10 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
 
     const first = Object.keys(selectedConditions)[0];
     const id = Object.keys(selectedConditions[first])[0];
-
     setActiveCondition(id);
 
-    const groupedValueSetByCondition: ConditionToValueSetMap = Object.entries(
-      valueSetsByCondition,
-    )
-      .map(([conditionId, valSet]) => {
-        // results for each condition
-        const results: {
-          [vsType in DibbsValueSetType]: {
-            [vsNameAuthorSystem: string]: GroupedValueSet;
-          };
-        } = {
-          labs: {},
-          conditions: {},
-          medications: {},
-        };
-
-        const valueSetsByNameAuthorSystem =
-          groupValueSetsByNameAuthorSystem(valSet);
-
-        Object.entries(valueSetsByNameAuthorSystem).map(
-          ([nameAuthorSystem, groupedValueSet]) => {
-            const mappedSets = mapValueSetsToValueSetType(
-              groupedValueSet.items,
-            );
-
-            Object.entries(mappedSets).forEach(([valueSetTypeKey, items]) => {
-              // the sieving function below accounts for the case that a GroupedValueSet
-              // might have items that belong to more than one ValueSetType.
-              // In practice, this doesn't occur very often / will result in empty
-              // GroupedValueSets (ie the groupings on the other tabs) that we don't
-              // want to display, so we should filter those out.
-              if (items.length > 0) {
-                results[valueSetTypeKey as DibbsValueSetType][
-                  nameAuthorSystem
-                ] = {
-                  ...groupedValueSet,
-                  items: items,
-                };
-              }
-            });
-
-            return;
-          },
-        );
-
-        return { [conditionId]: results }; // the value of groupedValueSetByCondition
-      })
-      .reduce(function (result, current) {
-        const conditionId = Object.keys(current)[0];
-        result[conditionId] = {
-          labs: current[conditionId].labs,
-          medications: current[conditionId].medications,
-          conditions: current[conditionId].conditions,
-        };
-        return result;
-      }, {});
+    const groupedValueSetByCondition: ConditionToConceptTypeToValueSetGroupingMap =
+      groupValueSetGroupingByConditionId(valueSetsByCondition);
 
     return () => {
       setSelectedValueSets(groupedValueSetByCondition);
@@ -146,7 +85,24 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
         },
       ),
     )
-    .flatMap((conditionsByCategory) => conditionsByCategory);
+    .flat();
+
+  const handleSelectedValueSetUpdate =
+    (conditionId: string) =>
+    (vsType: DibbsConceptType) =>
+    (vsName: string) =>
+    (vsGrouping: VsGrouping) =>
+    (dibbsValueSets: DibbsValueSet[]) => {
+      setSelectedValueSets((prevState) => {
+        prevState[conditionId][vsType][vsName] = {
+          ...vsGrouping,
+          items: [
+            { ...dibbsValueSets[0], concepts: dibbsValueSets[0].concepts },
+          ],
+        };
+        return structuredClone(prevState);
+      });
+    };
 
   return (
     <div
@@ -209,13 +165,12 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
             />
           </div>
           <div>
-            {selectedValueSets && (
+            {selectedValueSets && activeCondition && (
               <SelectionTable
-                conditionId={activeCondition ?? ""}
-                groupedValueSetsForCondition={
-                  selectedValueSets[activeCondition]
-                }
-                setValueSets={setSelectedValueSets}
+                vsTypeLevelOptions={selectedValueSets[activeCondition]}
+                handleVsTypeLevelUpdate={handleSelectedValueSetUpdate(
+                  activeCondition,
+                )}
               />
             )}
           </div>
@@ -225,10 +180,12 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
       <Drawer
         title="Add Condition(s)"
         placeholder="Search conditions"
-        codes={<div>Dynamic codes go here</div>}
+        toRender={<div>Dynamic codes go here</div>}
         toastMessage="Condition has been successfully added."
         isOpen={isDrawerOpen}
         onClose={handleCloseDrawer}
+        onSave={() => {}} //TODO
+        hasChanges={false}
       />
     </div>
   );

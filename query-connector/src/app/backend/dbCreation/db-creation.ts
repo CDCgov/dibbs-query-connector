@@ -8,7 +8,6 @@ import {
   getERSD,
   getVSACValueSet,
   insertValueSet,
-  translateVSACToInternalValueSet,
   insertDBStructArray,
   executeCategoryUpdates,
 } from "@/app/database-service";
@@ -19,7 +18,8 @@ import {
   ConditionStruct,
   ConditionToValueSetStruct,
   dbInsertStruct,
-} from "./app/seedSqlStructs";
+} from "../../seedSqlStructs";
+import { translateVSACToInternalValueSet } from "./lib";
 
 const ERSD_TYPED_RESOURCE_URL = "http://ersd.aimsplatform.org/fhir/ValueSet/";
 
@@ -172,7 +172,7 @@ async function fetchBatchValueSetsFromVsac(oidData: OidData, batchSize = 100) {
           const eRSDType: ErsdConceptType = oidData.oidToErsdType.get(
             oid,
           ) as ErsdConceptType;
-          const internalValueSet = await translateVSACToInternalValueSet(
+          const internalValueSet = translateVSACToInternalValueSet(
             vs as unknown as ValueSet,
             eRSDType,
           );

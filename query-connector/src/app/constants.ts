@@ -253,9 +253,9 @@ export interface Concept {
 }
 
 /*
- * The expected type of a ValueSet.
+ * The expected type of a DIBBS ValueSet.
  */
-export interface ValueSet {
+export interface DibbsValueSet {
   valueSetId: string;
   valueSetVersion: string;
   valueSetName: string;
@@ -263,7 +263,7 @@ export interface ValueSet {
   author: string;
   system: string;
   ersdConceptType?: string;
-  dibbsConceptType: string;
+  dibbsConceptType: DibbsConceptType;
   includeValueSet: boolean;
   concepts: Concept[];
   conditionId?: string;
@@ -271,7 +271,7 @@ export interface ValueSet {
 
 export const DEFAULT_ERSD_VERSION = "3";
 
-export type DibbsConceptType = "labs" | "medications" | "conditions";
+export type DibbsConceptType = "labs" | "conditions" | "medications";
 export type ErsdConceptType =
   | "ostc"
   | "lotc"
@@ -290,16 +290,6 @@ export const ersdToDibbsConceptMap: {
   dxtc: "conditions",
   sdtc: "conditions",
 };
-
-/*
- * The expected type of ValueSets grouped by dibbsConceptType for the purpose of display.
- */
-export interface ValueSetDisplay {
-  labs: ValueSet[];
-  medications: ValueSet[];
-  conditions: ValueSet[];
-}
-export type DibbsValueSetType = keyof ValueSetDisplay;
 
 // Define the type guard for FHIR resources
 // Define the FHIR Resource types
@@ -352,3 +342,13 @@ export type FhirServerConfig = {
   hostname: string;
   headers: Record<string, string>;
 };
+
+export const INVALID_USE_CASE = `Invalid use_case. Please provide a valid use_case. Valid use_cases include ${Object.keys(
+  USE_CASE_DETAILS,
+)}.`;
+export const INVALID_FHIR_SERVERS = `Invalid fhir_server. Please provide a valid fhir_server. Valid fhir_servers include ${FhirServers}.`;
+export const RESPONSE_BODY_IS_NOT_PATIENT_RESOURCE =
+  "Request body is not a Patient resource.";
+export const MISSING_API_QUERY_PARAM = "Missing use_case or fhir_server.";
+export const MISSING_PATIENT_IDENTIFIERS =
+  "No patient identifiers to parse from requestBody.";

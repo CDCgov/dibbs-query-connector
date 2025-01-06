@@ -1,5 +1,7 @@
+@use "../../../../styles/_variables" as *;
+
 .container {
-  background-color: #fff !important;
+  background-color: $white !important;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -12,13 +14,13 @@
 
 .item {
   /* use to prevent double overlapping borders */
-  outline: 1px solid #dfe1e2;
+  outline: 1px solid $border;
   margin-top: 1px;
   margin-left: 1px;
 }
 
 .subItem {
-  color: #565c65;
+  color: $text-secondary;
   font-size: 1rem;
   font-style: normal;
   font-weight: 400;

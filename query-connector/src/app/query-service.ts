@@ -6,7 +6,7 @@ import FHIRClient from "./fhir-servers";
 import {
   USE_CASES,
   FHIR_SERVERS,
-  ValueSet,
+  DibbsValueSet,
   isFhirResource,
   FhirResource,
 } from "./constants";
@@ -147,7 +147,7 @@ async function patientQuery(
  */
 export async function UseCaseQuery(
   request: UseCaseQueryRequest,
-  queryValueSets: ValueSet[],
+  queryValueSets: DibbsValueSet[],
   queryResponse: QueryResponse = {},
 ): Promise<QueryResponse> {
   const fhirServerConfigs = await getFhirServerConfigs();
@@ -189,7 +189,7 @@ export async function UseCaseQuery(
  */
 async function generalizedQuery(
   useCase: USE_CASES,
-  queryValueSets: ValueSet[],
+  queryValueSets: DibbsValueSet[],
   patientId: string,
   fhirClient: FHIRClient,
   queryResponse: QueryResponse,

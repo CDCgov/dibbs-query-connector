@@ -1,10 +1,11 @@
-import styles from "./customizeQuery.module.css";
-import { GroupedValueSet } from "./customizeQueryUtils";
-import Table from "../../designSystem/Table";
-import CustomizeQueryCheckbox from "./vanityCheckbox/CustomizeQueryCheckbox";
+import styles from "./customizeQuery.module.scss";
+import Table from "../../designSystem/table/Table";
+import { VsGrouping } from "@/app/utils/valueSetTranslation";
+import classNames from "classnames";
+import Checkbox from "../../designSystem/checkbox/Checkbox";
 
 type CustomizeQueryAccordionBodyProps = {
-  group: GroupedValueSet;
+  group: VsGrouping;
   toggleInclude: (
     groupIndex: string,
     valueSetIndex: number,
@@ -34,12 +35,12 @@ const CustomizeQueryAccordionBody: React.FC<
   CustomizeQueryAccordionBodyProps
 > = ({ group, toggleInclude, groupIndex }) => {
   return (
-    <Table className={`${styles.customizeQueryGridContainer}`}>
+    <Table className={classNames(styles.customizeQueryGridContainer)}>
       <thead>
         <tr className={styles.customizeQueryGridHeader}>
-          <th className={`${styles.accordionTableHeader}`}>Include</th>
-          <th className={`${styles.accordionTableHeader}`}>Code</th>
-          <th className={`${styles.accordionTableHeader}`}>Display</th>
+          <th></th>
+          <th>Code</th>
+          <th>Display</th>
         </tr>
       </thead>
       <tbody className="display-flex flex-column">
@@ -51,9 +52,19 @@ const CustomizeQueryAccordionBody: React.FC<
             return acc;
           }, [] as ValueSetIndexedConcept[])
           .map((item, conceptIndex) => (
-            <tr className={`${styles.customizeQueryGridRow}`} key={item.code}>
-              <td className={styles.noBorderNoBackgroundNoPadding}>
-                <CustomizeQueryCheckbox
+            <tr
+              onClick={() => {
+                toggleInclude(groupIndex, item.vsIndex, conceptIndex);
+              }}
+              className={classNames(
+                "tableRowWithHover_clickable",
+                styles.customizeQueryGridRow,
+              )}
+              key={item.code}
+              tabIndex={0}
+            >
+              <td className={styles.checkboxCell}>
+                <Checkbox
                   id={item.code}
                   checked={item.include}
                   onChange={() => {
@@ -61,12 +72,8 @@ const CustomizeQueryAccordionBody: React.FC<
                   }}
                 />
               </td>
-              <td className={styles.noBorderNoBackgroundNoPadding}>
-                {item.code}
-              </td>
-              <td className={styles.noBorderNoBackgroundNoPadding}>
-                {item.display}
-              </td>
+              <td>{item.code}</td>
+              <td>{item.display}</td>
             </tr>
           ))}
       </tbody>

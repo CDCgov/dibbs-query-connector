@@ -4,32 +4,30 @@ import React, { useState, useEffect } from "react";
 import { Button } from "@trussworks/react-uswds";
 import {
   DibbsConceptType,
-  DibbsValueSetType,
   USE_CASES,
   USE_CASE_DETAILS,
-  ValueSet,
+  DibbsValueSet,
 } from "../../constants";
 import { UseCaseQueryResponse } from "@/app/query-service";
 import LoadingView from "./LoadingView";
 import { showToastConfirmation } from "../designSystem/toast/Toast";
-import styles from "./customizeQuery/customizeQuery.module.css";
+import styles from "./customizeQuery/customizeQuery.module.scss";
 import CustomizeQueryAccordionHeader from "./customizeQuery/CustomizeQueryAccordionHeader";
 import CustomizeQueryAccordionBody from "./customizeQuery/CustomizeQueryAccordionBody";
 import Accordion from "../designSystem/Accordion";
 import CustomizeQueryNav from "./customizeQuery/CustomizeQueryNav";
-import {
-  GroupedValueSet,
-  mapValueSetsToValueSetTypes,
-  countDibbsConceptTypeToVsMapItems,
-} from "./customizeQuery/customizeQueryUtils";
 import Backlink from "./backLink/Backlink";
 import { RETURN_LABEL } from "./stepIndicator/StepIndicator";
+import {
+  VsGrouping,
+  generateValueSetGroupingsByDibbsConceptType,
+} from "@/app/utils/valueSetTranslation";
 
 interface CustomizeQueryProps {
   useCaseQueryResponse: UseCaseQueryResponse;
   queryType: USE_CASES;
-  queryValueSets: ValueSet[];
-  setQueryValuesets: (queryVS: ValueSet[]) => void;
+  queryValueSets: DibbsValueSet[];
+  setQueryValuesets: (queryVS: DibbsValueSet[]) => void;
   goBack: () => void;
 }
 
@@ -50,11 +48,11 @@ const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
   setQueryValuesets,
   goBack,
 }) => {
-  const [activeTab, setActiveTab] = useState<DibbsValueSetType>("labs");
+  const [activeTab, setActiveTab] = useState<DibbsConceptType>("labs");
 
   const [valueSetOptions, setValueSetOptions] = useState<{
     [dibbsConceptType in DibbsConceptType]: {
-      [vsNameAuthorSystem: string]: GroupedValueSet;
+      [vsNameAuthorSystem: string]: VsGrouping;
     };
   }>({
     labs: {},
@@ -64,7 +62,7 @@ const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
 
   useEffect(() => {
     const { labs, conditions, medications } =
-      mapValueSetsToValueSetTypes(queryValueSets);
+      generateValueSetGroupingsByDibbsConceptType(queryValueSets);
 
     setValueSetOptions({
       labs: labs,
@@ -74,16 +72,18 @@ const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
   }, [queryValueSets]);
 
   // Compute counts of each tab-type
-  const countLabs = countDibbsConceptTypeToVsMapItems(valueSetOptions.labs);
-  const countConditions = countDibbsConceptTypeToVsMapItems(
-    valueSetOptions.conditions,
-  );
-  const countMedications = countDibbsConceptTypeToVsMapItems(
-    valueSetOptions.medications,
-  );
+  const countLabs = valueSetOptions.labs
+    ? countDibbsConceptTypeToVsMapItems(valueSetOptions.labs)
+    : 0;
+  const countConditions = valueSetOptions.conditions
+    ? countDibbsConceptTypeToVsMapItems(valueSetOptions.conditions)
+    : 0;
+  const countMedications = valueSetOptions.medications
+    ? countDibbsConceptTypeToVsMapItems(valueSetOptions.medications)
+    : 0;
 
   // Keeps track of which side nav tab to display to users
-  const handleTabChange = (tab: DibbsValueSetType) => {
+  const handleTabChange = (tab: DibbsConceptType) => {
     setActiveTab(tab);
   };
 
@@ -143,18 +143,17 @@ const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
 
   // Allows all items to be selected within the entire active tab
   const handleSelectAllForTab = (checked: boolean) => {
-    const updatedGroups = Object.values(valueSetOptions[activeTab]).map(
-      (group) => ({
-        ...group,
-        items: group.items.map((item) => ({
-          ...item,
-          includeValueSet: checked, // Set all items in this group to checked or unchecked
-          concepts: item.concepts.map((ic) => {
-            return { ...ic, include: checked };
-          }),
-        })),
-      }),
-    );
+    const activeItems = valueSetOptions[activeTab] ?? {};
+    const updatedGroups = Object.values(activeItems).map((group) => ({
+      ...group,
+      items: group.items.map((item) => ({
+        ...item,
+        includeValueSet: checked, // Set all items in this group to checked or unchecked
+        concepts: item.concepts.map((ic) => {
+          return { ...ic, include: checked };
+        }),
+      })),
+    }));
 
     setValueSetOptions((prevState) => ({
       ...prevState,
@@ -166,10 +165,10 @@ const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
   // by the entire query branch of the app
   const handleApplyChanges = () => {
     const selectedItems = Object.keys(valueSetOptions).reduce((acc, key) => {
-      const items = valueSetOptions[key as DibbsValueSetType];
+      const items = valueSetOptions[key as DibbsConceptType] ?? {};
       acc = acc.concat(Object.values(items).flatMap((dict) => dict.items));
       return acc;
-    }, [] as ValueSet[]);
+    }, [] as DibbsValueSet[]);
     setQueryValuesets(selectedItems);
     goBack();
     showToastConfirmation({
@@ -177,19 +176,10 @@ const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
     });
   };
 
-  useEffect(() => {
-    const items = Object.values(valueSetOptions[activeTab]).flatMap(
-      (group) => group.items,
-    );
-    const selectedCount = items.filter((item) => item.includeValueSet).length;
-    const topCheckbox = document.getElementById(
-      "select-all",
-    ) as HTMLInputElement;
-    if (topCheckbox) {
-      topCheckbox.indeterminate =
-        selectedCount > 0 && selectedCount < items.length;
-    }
-  }, [valueSetOptions, activeTab]);
+  const valueSetOptionsToDisplay =
+    valueSetOptions && valueSetOptions[activeTab]
+      ? Object.entries(valueSetOptions[activeTab])
+      : [];
 
   return (
     <div>
@@ -212,7 +202,7 @@ const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
         handleSelectAllForTab={handleSelectAllForTab}
         valueSetOptions={valueSetOptions}
       />
-      {Object.entries(valueSetOptions[activeTab]).map(([groupIndex, group]) => {
+      {valueSetOptionsToDisplay.map(([groupIndex, group]) => {
         const id = group.author + ":" + group.system + ":" + group.valueSetName;
         return (
           <Accordion
@@ -253,3 +243,20 @@ const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
 export default CustomizeQuery;
 export const QUERY_CUSTOMIZATION_CONFIRMATION_BODY =
   "Query customization successful!";
+
+/**
+ * Utility function to count the number of labs / meds / conditions that we display
+ * on the customize query page
+ * @param obj a grouped ValueSet dictionary that we render as an individual accordion
+ * @returns A count of the number of items in each of the DibbsConceptTypes
+ */
+const countDibbsConceptTypeToVsMapItems = (obj: {
+  [vsNameAuthorSystem: string]: VsGrouping;
+}) => {
+  return Object.values(obj).reduce((runningSum, gvs) => {
+    gvs.items.forEach((vs) => {
+      runningSum += vs.concepts.length;
+    });
+    return runningSum;
+  }, 0);
+};

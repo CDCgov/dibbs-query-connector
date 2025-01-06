@@ -19,7 +19,10 @@ test.describe("querying with the Query Connector", () => {
       "This site is for demo purposes only. Please do not enter PII on this website.",
     );
     await expect(
-      page.getByRole("heading", { name: PAGE_TITLES["search"], exact: true }),
+      page.getByRole("heading", {
+        name: PAGE_TITLES["search"].title,
+        exact: true,
+      }),
     ).toBeVisible();
 
     await page.getByRole("button", { name: "Fill fields" }).click();
@@ -51,7 +54,7 @@ test.describe("querying with the Query Connector", () => {
         "250 labs found, 4 medications found, 104 conditions found.",
       ),
     ).toBeVisible();
-    await page.getByRole("link", { name: "Medications" }).click();
+    await page.getByRole("button", { name: "Medications" }).click();
     await page.getByRole("button", { name: "Chlamydia Medication" }).click();
     await page
       .getByRole("row", { name: "azithromycin 1000 MG" })
@@ -111,7 +114,7 @@ test.describe("querying with the Query Connector", () => {
     page,
   }) => {
     test.slow();
-    await page.getByRole("link", { name: "Labs" }).click();
+    await page.getByRole("button", { name: "Labs", exact: true }).click();
     await page.getByRole("button", { name: "Deselect all labs" }).click();
 
     // Spot check a couple valuesets for deselection
@@ -120,7 +123,7 @@ test.describe("querying with the Query Connector", () => {
     await expect(page.getByText("0 of 33 selected")).toBeVisible();
 
     // Now de-select all the medications via the group check marks
-    await page.getByRole("link", { name: "Medications" }).click();
+    await page.getByRole("button", { name: "Medications" }).click();
     await page
       .getByRole("button", { name: "Chlamydia Medication" })
       .locator("label")

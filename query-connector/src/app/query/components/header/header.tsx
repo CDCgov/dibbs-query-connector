@@ -51,7 +51,7 @@ export default function HeaderComponent() {
 
   return (
     <div className={styles.headerContainer}>
-      <header className="usa-header usa-header--basic bg-primary-darker">
+      <header className="usa-header usa-header--basic">
         <div
           className={classNames(
             "usa-nav-container",
