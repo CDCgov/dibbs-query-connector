@@ -143,18 +143,17 @@ const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
 
   // Allows all items to be selected within the entire active tab
   const handleSelectAllForTab = (checked: boolean) => {
-    const updatedGroups = Object.values(valueSetOptions[activeTab]).map(
-      (group) => ({
-        ...group,
-        items: group.items.map((item) => ({
-          ...item,
-          includeValueSet: checked, // Set all items in this group to checked or unchecked
-          concepts: item.concepts.map((ic) => {
-            return { ...ic, include: checked };
-          }),
-        })),
-      }),
-    );
+    const activeItems = valueSetOptions[activeTab] ?? {};
+    const updatedGroups = Object.values(activeItems).map((group) => ({
+      ...group,
+      items: group.items.map((item) => ({
+        ...item,
+        includeValueSet: checked, // Set all items in this group to checked or unchecked
+        concepts: item.concepts.map((ic) => {
+          return { ...ic, include: checked };
+        }),
+      })),
+    }));
 
     setValueSetOptions((prevState) => ({
       ...prevState,
@@ -177,19 +176,10 @@ const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
     });
   };
 
-  useEffect(() => {
-    const items = Object.values(valueSetOptions[activeTab]).flatMap(
-      (group) => group.items,
-    );
-    const selectedCount = items.filter((item) => item.includeValueSet).length;
-    const topCheckbox = document.getElementById(
-      "select-all",
-    ) as HTMLInputElement;
-    if (topCheckbox) {
-      topCheckbox.indeterminate =
-        selectedCount > 0 && selectedCount < items.length;
-    }
-  }, [valueSetOptions, activeTab]);
+  const valueSetOptionsToDisplay =
+    valueSetOptions && valueSetOptions[activeTab]
+      ? Object.entries(valueSetOptions[activeTab])
+      : [];
 
   return (
     <div>
@@ -212,7 +202,7 @@ const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
         handleSelectAllForTab={handleSelectAllForTab}
         valueSetOptions={valueSetOptions}
       />
-      {Object.entries(valueSetOptions[activeTab]).map(([groupIndex, group]) => {
+      {valueSetOptionsToDisplay.map(([groupIndex, group]) => {
         const id = group.author + ":" + group.system + ":" + group.valueSetName;
         return (
           <Accordion
