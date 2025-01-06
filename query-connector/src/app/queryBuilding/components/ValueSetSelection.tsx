@@ -116,22 +116,27 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
       <div key={category}>
         <div className={styles.conditionDrawerHeader}>{category}</div>
         <div>
-          {Object.entries(conditions).map(([id, condition]) => (
-            <div key={id} className={styles.conditionItem}>
-              <span>{formatDiseaseDisplay(condition.name)}</span>
-              {addedConditions.has(id) ? (
-                <span className={styles.addedButton}>Added</span>
-              ) : (
-                <span
-                  className={styles.addButton}
-                  role="button"
-                  onClick={() => toggleAddCondition(id)}
-                >
-                  ADD
-                </span>
-              )}
-            </div>
-          ))}
+          {Object.entries(conditions).map(([id, condition]) => {
+            const isAlreadySelected =
+              selectedConditions?.[category]?.[id] !== undefined;
+
+            return (
+              <div key={id} className={styles.conditionItem}>
+                <span>{formatDiseaseDisplay(condition.name)}</span>
+                {isAlreadySelected ? (
+                  <span className={styles.addedButton}>Added</span>
+                ) : (
+                  <span
+                    className={styles.addButton}
+                    role="button"
+                    onClick={() => toggleAddCondition(id)}
+                  >
+                    ADD
+                  </span>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
     ),
