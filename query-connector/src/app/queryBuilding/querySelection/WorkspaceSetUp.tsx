@@ -36,8 +36,10 @@ const WorkSpaceSetUpView: React.FC<LoadingViewProps> = ({ loading }) => {
             <h2 className={styles.emptyQueryTitle}>
               Setting up your workspace...
             </h2>
-            <p>This is a one-time setup that may take several minutes.</p>
-            <p> Please do not navigate away from page during setup.</p>
+            <p>
+              This is a one-time setup that may take several minutes. Please do
+              not navigate away from page during setup.
+            </p>
           </div>
         </div>
       </>
