@@ -20,7 +20,7 @@ export const EXPECTED_CHLAMYDIA_VALUESET_LENGTH = Object.values(
   ],
 ).length;
 
-export const CANCER_VALUESETS = [
+export const CANCER_DB_QUERY_VALUES = [
   {
     display: "RESULTS",
     code_system: "http://cap.org/eCC",

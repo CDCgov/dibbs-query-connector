@@ -96,7 +96,7 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
           context,
         )}
       <div className="display-flex flex-justify-between flex-align-center width-full margin-bottom-4">
-        <h1 className="flex-align-center">My queries</h1>
+        <h1 className="flex-align-center">Query Library</h1>
         <div className="margin-left-auto">
           <Button
             onClick={() =>
