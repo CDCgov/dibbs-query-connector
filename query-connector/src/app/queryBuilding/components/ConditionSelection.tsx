@@ -97,7 +97,7 @@ export const ConditionSelection: React.FC<ConditionSelectionProps> = ({
       )}
     >
       <div className="display-flex flex-justify flex-align-end margin-bottom-3 width-full">
-        <h2 className="margin-y-0-important">Select condition(s)</h2>
+        <h2 className="margin-y-0-important">Select condition template(s)</h2>
       </div>
       <div className={classNames(styles.conditionSelectionForm, "radius-lg")}>
         <SearchField
