@@ -257,7 +257,7 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
   }, [fetchedConditions]);
 
   // ensures the fetchedConditions' checkbox statuses match
-  // the data in selectedCondtiions
+  // the data in selectedConditions
   function updateFetchedConditionIncludeStatus(
     selectedConditions: CategoryNameToConditionOptionMap,
   ) {
