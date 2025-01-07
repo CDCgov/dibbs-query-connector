@@ -41,12 +41,15 @@ export type QueryDetailsResult = {
   query_name: string;
   id: string;
   query_data: {
-    [condition_name: string]: { [valueSetId: string]: DibbsValueSet };
+    [conditionId: string]: { [valueSetId: string]: DibbsValueSet };
   };
   conditions_list: string[];
 };
 
-export const EMPTY_QUERY_SELECTION = { queryId: "", queryName: "" };
+export const EMPTY_QUERY_SELECTION = {
+  queryId: undefined,
+  queryName: undefined,
+};
 
 /**
  * Translation function format backend {[categoryName: string]: ConditionIdToNameMap[]}

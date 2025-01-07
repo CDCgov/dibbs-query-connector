@@ -32,7 +32,10 @@ import {
   getSavedQueryDetails,
   saveCustomQuery,
 } from "@/app/backend/query-building";
-import { VsGrouping } from "@/app/utils/valueSetTranslation";
+import {
+  VsGrouping,
+  groupValueSetsByNameAuthorSystem,
+} from "@/app/utils/valueSetTranslation";
 
 export type FormError = {
   queryName: boolean;
@@ -66,7 +69,7 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
 }) => {
   const focusRef = useRef<HTMLInputElement | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  const [queryName, setQueryName] = useState<string | null>(
+  const [queryName, setQueryName] = useState<string | undefined>(
     selectedQuery.queryName,
   );
 
@@ -84,7 +87,7 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
   const [constructedQuery, setConstructedQuery] = useState<NestedQuery>({});
 
   function goBack() {
-    setQueryName(null);
+    setQueryName(undefined);
     setSelectedQuery(EMPTY_QUERY_SELECTION);
     setBuildStep("selection");
   }
@@ -187,36 +190,63 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
     let isSubscribed = true;
 
     async function setDefaultSelectedConditions() {
-      if (selectedQuery.queryId && fetchedConditions) {
-        const result = await getSavedQueryDetails(selectedQuery.queryId);
-        const conditionNameToIdMap =
-          generateConditionNameToIdAndCategoryMap(fetchedConditions);
-        const queryConditions = result?.map((r) => r.conditions_list).flat();
+      if (
+        selectedQuery.queryId === undefined ||
+        fetchedConditions === undefined
+      ) {
+        return;
+      }
+      const result = await getSavedQueryDetails(selectedQuery.queryId);
 
-        const updatedConditions: CategoryNameToConditionOptionMap = {};
-        queryConditions &&
-          queryConditions.forEach((conditionId) => {
-            const { category, conditionName } =
-              conditionNameToIdMap[conditionId];
+      if (result === undefined) {
+        return;
+      }
+      const savedQuery = result[0];
+      const conditionNameToIdMap =
+        generateConditionNameToIdAndCategoryMap(fetchedConditions);
 
-            updatedConditions[category] = {
-              ...updatedConditions[category],
-              [conditionId]: {
-                name: conditionName,
-                include: true,
-              },
-            };
-          });
+      const updatedConditions: CategoryNameToConditionOptionMap = {};
 
-        if (isSubscribed) {
-          setSelectedConditions((prevState) => {
-            // Avoid unnecessary updates if the state is already the same
-            const newState = { ...prevState, ...updatedConditions };
-            return JSON.stringify(prevState) !== JSON.stringify(newState)
-              ? newState
-              : prevState;
-          });
-        }
+      Object.entries(savedQuery.query_data).forEach(
+        ([conditionId, valueSetMap]) => {
+          const typeLevelUpdate = handleSelectedValueSetUpdate(conditionId);
+          const category = conditionNameToIdMap[conditionId].category;
+          updatedConditions[category] = {
+            ...updatedConditions[category],
+            [conditionId]: {
+              name: conditionNameToIdMap[conditionId].conditionName,
+              include: true,
+            },
+          };
+
+          Object.entries(valueSetMap).forEach(
+            ([vsNameAuthorSystem, dibbsVs]) => {
+              const valueSetLevelUpdate = typeLevelUpdate(
+                dibbsVs.dibbsConceptType,
+              );
+              const vsGroupingUpdate = valueSetLevelUpdate(vsNameAuthorSystem);
+              // this is bad and should be refactored once we get rid of VsGrouping
+              const vsUpdate = vsGroupingUpdate({
+                valueSetName: vsNameAuthorSystem,
+                author: dibbsVs.author,
+                system: dibbsVs.system,
+                items: [dibbsVs],
+              });
+
+              vsUpdate([dibbsVs]);
+            },
+          );
+        },
+      );
+
+      if (isSubscribed) {
+        setSelectedConditions((prevState) => {
+          // Avoid unnecessary updates if the state is already the same
+          const newState = { ...prevState, ...updatedConditions };
+          return JSON.stringify(prevState) !== JSON.stringify(newState)
+            ? newState
+            : prevState;
+        });
       }
     }
     setDefaultSelectedConditions().catch(console.error);
@@ -284,13 +314,20 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
     (vsGrouping: VsGrouping) =>
     (dibbsValueSets: DibbsValueSet[]) => {
       setConstructedQuery((prevState) => {
-        prevState[conditionId][vsType][vsName] = {
+        prevState[conditionId] = prevState[conditionId] ?? {};
+        prevState[conditionId][vsType] = prevState[conditionId][vsType] ?? {};
+        prevState[conditionId][vsType][vsName] =
+          prevState[conditionId][vsType][vsName] ?? {};
+
+        const updatedState = structuredClone(prevState);
+        updatedState[conditionId][vsType][vsName] = {
           ...vsGrouping,
           items: [
             { ...dibbsValueSets[0], concepts: dibbsValueSets[0].concepts },
           ],
         };
-        return structuredClone(prevState);
+
+        return updatedState;
       });
     };
 
@@ -298,7 +335,12 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
     if (constructedQuery && queryName) {
       // TODO: get this from the auth session
       const userName = "DIBBS";
-      await saveCustomQuery(constructedQuery, queryName, userName);
+      const result = await saveCustomQuery(
+        constructedQuery,
+        queryName,
+        userName,
+        selectedQuery.queryId,
+      );
     }
   }
 
@@ -381,7 +423,7 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
           {/* Step One: Select Conditions */}
           {buildStep == "condition" &&
             fetchedConditions &&
-            queryName !== null && (
+            queryName !== undefined && (
               <ConditionSelection
                 setBuildStep={setBuildStep}
                 queryName={queryName}
@@ -399,7 +441,7 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
               />
             )}
           {/* Step Two: Select ValueSets */}
-          {buildStep == "valueset" && queryName !== null && (
+          {buildStep == "valueset" && queryName !== undefined && (
             <ValueSetSelection
               queryName={queryName}
               selectedConditions={selectedConditions ?? {}}

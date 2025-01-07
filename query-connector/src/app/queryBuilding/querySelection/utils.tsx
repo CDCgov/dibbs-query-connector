@@ -139,7 +139,7 @@ export const renderModal = (
 };
 
 export type SelectedQueryDetails = {
-  queryName: string;
-  queryId: string;
+  queryName?: string;
+  queryId?: string;
 };
 export type SelectedQueryState = SelectedQueryDetails | null;

@@ -50,9 +50,9 @@ const SelectionViewAccordionHeader: React.FC<
       const handleVsGroupingLevelUpdate = handleVsNameLevelUpdate(vsName);
       const updatedGrouping = structuredClone(curGrouping);
       updatedGrouping.items.map((i) => {
-        return i.concepts.map(
-          (c) => (c.include = isMinusState ? false : e.target.checked),
-        );
+        const bulkIncludeValue = isMinusState ? false : e.target.checked;
+        i.includeValueSet = bulkIncludeValue;
+        return i.concepts.map((c) => (c.include = bulkIncludeValue));
       });
       handleVsGroupingLevelUpdate(updatedGrouping)(updatedGrouping.items);
     });

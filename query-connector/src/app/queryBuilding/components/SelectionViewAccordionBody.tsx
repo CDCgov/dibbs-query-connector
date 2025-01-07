@@ -49,10 +49,17 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
   ) => {
     if (curVsGrouping) {
       const activeVsName = getNameAuthorSystemFromVSGrouping(curVsGrouping);
+      const shouldIncludeValueSet = updatedConcepts
+        .map((c) => c.include)
+        .some(Boolean);
       curVsGrouping.items = [
         // assuming that name / author / system identifies a unique value set,
         // the new items array will only differ by concepts
-        { ...curVsGrouping.items[0], concepts: updatedConcepts },
+        {
+          ...curVsGrouping.items[0],
+          includeValueSet: shouldIncludeValueSet,
+          concepts: updatedConcepts,
+        },
       ];
 
       if (updateBatchSave) {
@@ -60,6 +67,8 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
           curVsGrouping.items,
         );
       }
+      console.log(curVsGrouping);
+
       setCurConcepts(updatedConcepts);
       setHasDrawerChange(true);
     }
@@ -73,10 +82,17 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
       ) {
         const activeVsName = getNameAuthorSystemFromVSGrouping(curVsGrouping);
         const updatedVsGrouping = structuredClone(curVsGrouping);
+        const shouldIncludeValueSet = curConcepts
+          .map((c) => c.include)
+          .some(Boolean);
         updatedVsGrouping.items = [
           // assuming that name / author / system identifies a unique value set,
           // the new items array will only differ by the concepts
-          { ...curVsGrouping.items[0], concepts: curConcepts },
+          {
+            ...curVsGrouping.items[0],
+            includeValueSet: shouldIncludeValueSet,
+            concepts: curConcepts,
+          },
         ];
 
         handleVsNameLevelUpdate(activeVsName)(updatedVsGrouping);

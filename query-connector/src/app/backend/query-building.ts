@@ -4,6 +4,7 @@ import { getDbClient } from "./dbClient";
 import { NestedQuery, QueryDetailsResult } from "../queryBuilding/utils";
 import { DibbsValueSet } from "../constants";
 import { DEFAULT_TIME_WINDOW } from "../utils";
+import { randomUUID } from "crypto";
 const dbClient = getDbClient();
 
 /**
@@ -22,7 +23,6 @@ export async function getSavedQueryDetails(queryId: string) {
   try {
     const result = await dbClient.query(queryString, [id]);
     if (result.rows.length > 0) {
-      console.log(result.rows);
       return result.rows as unknown as QueryDetailsResult[];
     }
     console.error("No results found for query:", id);
@@ -36,12 +36,19 @@ export async function saveCustomQuery(
   queryInput: NestedQuery,
   queryName: string,
   author: string,
+  queryId?: string,
 ) {
   const queryString = `
-    insert into query
-      (query_name, query_data, conditions_list, author, date_created, date_last_modified, time_window_number, time_window_unit)
-      values($1, $2, $3, $4, $5, $6, $7, $8)
-      returning id, query_name
+    INSERT INTO query
+      values($1, $2, $3, $4, $5, $6, $7, $8, $9)
+      ON CONFLICT(id)
+      DO UPDATE SET
+        query_name = EXCLUDED.query_name,
+        conditions_list = EXCLUDED.conditions_list,
+        query_data = EXCLUDED.query_data,
+        author = EXCLUDED.author,
+        date_last_modified = EXCLUDED.date_last_modified
+      RETURNING id, query_name;
     `;
   const { queryDataInsert, conditionInsert } =
     formatQueryDataForDatabase(queryInput);
@@ -49,6 +56,7 @@ export async function saveCustomQuery(
   const NOW = new Date().toISOString();
   try {
     const dataToWrite = [
+      queryId ? queryId : randomUUID(),
       queryName,
       queryDataInsert,
       conditionInsert,

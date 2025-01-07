@@ -66,13 +66,6 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
     const first = Object.keys(selectedConditions)[0];
     const id = Object.keys(selectedConditions[first])[0];
     setActiveCondition(id);
-
-    const groupedValueSetByCondition: NestedQuery =
-      groupValueSetGroupingByConditionId(valueSetsByCondition);
-
-    return () => {
-      setConstructedQuery(groupedValueSetByCondition);
-    };
   }, []);
 
   const handleAddCondition = () => {
