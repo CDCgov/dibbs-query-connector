@@ -3,6 +3,7 @@ import {
   VsGrouping,
   ConceptTypeToVsNameToVsGroupingMap,
 } from "../utils/valueSetTranslation";
+import { Dispatch, SetStateAction } from "react";
 
 // The structure of the data that's coming from the backend
 export type ConditionIdToNameMap = {
@@ -216,3 +217,39 @@ export const batchToggleConcepts = (input: DibbsValueSet) => {
 
   return input;
 };
+
+/**
+ *
+ * @param fetchedConditions - stuff
+ * @param selectedConditions - stuff
+ * @param setFetchedConditions - stuff
+ */
+export function updateConditionStatus(
+  fetchedConditions: CategoryNameToConditionOptionMap | undefined,
+  selectedConditions: CategoryNameToConditionOptionMap,
+  setFetchedConditions: Dispatch<
+    SetStateAction<CategoryNameToConditionOptionMap | undefined>
+  >,
+) {
+  if (!fetchedConditions) return;
+
+  const updatedFetchedConditions = structuredClone(fetchedConditions);
+  Object.entries(selectedConditions).forEach(
+    ([category, conditionsByCategory]) => {
+      Object.entries(conditionsByCategory).forEach(
+        ([conditionId, conditionObj]) => {
+          const existingCondition =
+            updatedFetchedConditions[category]?.[conditionId];
+          if (existingCondition) {
+            updatedFetchedConditions[category][conditionId] = {
+              ...existingCondition,
+              include: conditionObj.include,
+            };
+          }
+        },
+      );
+    },
+  );
+
+  setFetchedConditions(updatedFetchedConditions);
+}
