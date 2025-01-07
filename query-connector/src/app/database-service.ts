@@ -766,14 +766,12 @@ export async function getFhirServerConfig(fhirServerName: string) {
  * Inserts a new FHIR server configuration into the database.
  * @param name - The name of the FHIR server
  * @param hostname - The URL/hostname of the FHIR server
- * @param lastConnectionAttempt - Optional timestamp of the last connection attempt
  * @param lastConnectionSuccessful - Optional boolean indicating if the last connection was successful
  * @returns An object indicating success or failure with optional error message
  */
 export async function insertFhirServer(
   name: string,
   hostname: string,
-  lastConnectionAttempt?: Date,
   lastConnectionSuccessful?: boolean
 ) {
   const insertQuery = `
@@ -789,7 +787,12 @@ export async function insertFhirServer(
   try {
     await dbClient.query('BEGIN');
 
-    const result = await dbClient.query(insertQuery, [name, hostname, lastConnectionAttempt, lastConnectionSuccessful]);
+    const result = await dbClient.query(insertQuery, [
+      name,
+      hostname,
+      new Date(),
+      lastConnectionSuccessful
+    ]);
 
     // Clear the cache so the next getFhirServerConfigs call will fetch fresh data
     cachedFhirServerConfigs = null;
@@ -806,6 +809,67 @@ export async function insertFhirServer(
     return {
       success: false,
       error: 'Failed to save the FHIR server configuration.'
+    };
+  }
+}
+
+/**
+ * Updates an existing FHIR server configuration in the database.
+ * @param id - The ID of the FHIR server to update
+ * @param name - The new name of the FHIR server
+ * @param hostname - The new URL/hostname of the FHIR server
+ * @param lastConnectionSuccessful - Optional boolean indicating if the last connection was successful
+ * @returns An object indicating success or failure with optional error message
+ */
+export async function updateFhirServer(
+  id: string,
+  name: string,
+  hostname: string,
+  lastConnectionSuccessful?: boolean
+) {
+  const updateQuery = `
+    UPDATE fhir_servers 
+    SET 
+      name = $2,
+      hostname = $3,
+      last_connection_attempt = CURRENT_TIMESTAMP,
+      last_connection_successful = $4
+    WHERE id = $1
+    RETURNING *;
+  `;
+
+  try {
+    await dbClient.query('BEGIN');
+
+    const result = await dbClient.query(updateQuery, [
+      id,
+      name,
+      hostname,
+      lastConnectionSuccessful
+    ]);
+
+    // Clear the cache so the next getFhirServerConfigs call will fetch fresh data
+    cachedFhirServerConfigs = null;
+
+    await dbClient.query('COMMIT');
+
+    if (result.rows.length === 0) {
+      return {
+        success: false,
+        error: 'Server not found'
+      };
+    }
+
+    return {
+      success: true,
+      server: result.rows[0]
+    };
+  } catch (error) {
+    await dbClient.query('ROLLBACK');
+    console.error('Failed to update FHIR server:', error);
+    return {
+      success: false,
+      error: 'Failed to update the server configuration.'
     };
   }
 }

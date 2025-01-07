@@ -522,3 +522,44 @@ ul.usa-sidenav
 .usa-alert__text {
   font-size: 0.875rem;
 }
+
+
+
+#new-fhir-server-modal, #edit-fhir-server-modal {
+  .usa-modal__close {
+    background-color: transparent !important;
+  }
+
+  .usa-modal__heading {
+    color: #000;
+    font-family: Merriweather !important;
+    font-size: 32px !important;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+  }
+
+  .usa-modal--lg {
+    max-width: 40rem;
+
+    .usa-modal__main {
+      max-width: 34rem;
+
+      input {
+        max-width: 100%;
+      }
+    }
+  }
+
+  .usa-button-group {
+    flex-direction: row-reverse;
+
+    .usa-button-group__item:last-child {
+      margin-right: 0.25rem;
+    }
+
+    .usa-button--secondary {
+      background-color: #d83933 !important;
+    }
+  }
+}

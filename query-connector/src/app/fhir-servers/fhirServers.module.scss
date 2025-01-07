@@ -1,0 +1,19 @@
+.fhirServersRow {
+  grid-template-columns: 1fr 2fr 2fr;
+  gap: 0.5rem;
+}
+
+.mainContainer {
+  max-width: 80%;
+}
+
+.titleContainer {
+  max-width: 100%;
+  margin-left: none;
+  margin-right: none;
+}
+
+.lastChecked {
+  color: #71767A;
+  margin-left: 0.25rem;
+}

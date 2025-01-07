@@ -1,7 +1,7 @@
 -- Add columns for connection tracking
 ALTER TABLE fhir_servers
 ADD COLUMN last_connection_attempt TIMESTAMP WITH TIME ZONE,
-ADD COLUMN last_connection_successful BOOLEAN;
+ADD COLUMN last_connection_successful BOOLEAN DEFAULT FALSE;
 
 -- Update existing rows to have null values for new columns
 UPDATE fhir_servers

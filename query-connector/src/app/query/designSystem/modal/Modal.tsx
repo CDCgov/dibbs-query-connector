@@ -70,7 +70,7 @@ export const Modal: React.FC<ModalProps> = ({
           <>
             <hr className="usa-divider margin-y-3" />
             <div className="margin-top-4 text-red display-flex">
-              <Icon.Close size={3} className="usa-icon" aria-label="Error" color="#B50909" />
+              <Icon.Close size={3} className="usa-icon" aria-label="Error" color="#D54309" />
               {errorMessage}
             </div>
           </>
