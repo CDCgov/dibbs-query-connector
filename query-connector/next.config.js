@@ -10,7 +10,7 @@ const nextConfig = {
   transpilePackages: ["yaml"],
 
   output: "standalone",
-  basePath: "/",
+  basePath: "",
 };
 
 module.exports = nextConfig;
