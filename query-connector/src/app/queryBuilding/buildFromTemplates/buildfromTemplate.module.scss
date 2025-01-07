@@ -332,3 +332,56 @@ $columnGap: 1rem;
   margin-top: 1.5rem;
   align-items: center;
 }
+
+.conditionDrawerHeader {
+  color: var(--gray-500, #919191);
+  font-size: 1rem;
+  font-style: normal;
+  font-weight: 700;
+  line-height: normal;
+  text-transform: uppercase;
+
+  display: flex;
+  padding-top: 2rem;
+  padding-bottom: 0.75rem;
+  justify-content: left;
+  align-items: center;
+  gap: 0.625rem;
+  align-self: stretch;
+}
+
+.conditionItem {
+  display: flex;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  justify-content: space-between;
+  align-items: flex-start;
+  align-self: stretch;
+  border-radius: 0.25rem;
+
+  &:hover {
+    background: var(--white, #FFF);
+  }
+  &:hover .addButton {
+    display: inline-block;
+  }
+  
+    &:hover .addedButton {
+      display: inline-block;
+    
+  }
+}
+.addButton {
+  display: none;
+  color: var(--Primary-primary, #005EA2);
+  font-size: 1rem;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 1.375rem;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.addedButton {
+  display: none;
+  }
