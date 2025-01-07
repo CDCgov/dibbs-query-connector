@@ -420,8 +420,8 @@ export async function checkValueSetInsertion(vs: DibbsValueSet) {
         ) {
           console.error(
             "Retrieved concept " +
-            conceptId +
-            " has different values than given concept",
+              conceptId +
+              " has different values than given concept",
           );
           return conceptId;
         }
@@ -772,7 +772,7 @@ export async function getFhirServerConfig(fhirServerName: string) {
 export async function insertFhirServer(
   name: string,
   hostname: string,
-  lastConnectionSuccessful?: boolean
+  lastConnectionSuccessful?: boolean,
 ) {
   const insertQuery = `
     INSERT INTO fhir_servers (
@@ -785,30 +785,30 @@ export async function insertFhirServer(
   `;
 
   try {
-    await dbClient.query('BEGIN');
+    await dbClient.query("BEGIN");
 
     const result = await dbClient.query(insertQuery, [
       name,
       hostname,
       new Date(),
-      lastConnectionSuccessful
+      lastConnectionSuccessful,
     ]);
 
     // Clear the cache so the next getFhirServerConfigs call will fetch fresh data
     cachedFhirServerConfigs = null;
 
-    await dbClient.query('COMMIT');
+    await dbClient.query("COMMIT");
 
     return {
       success: true,
-      server: result.rows[0]
+      server: result.rows[0],
     };
   } catch (error) {
-    await dbClient.query('ROLLBACK');
-    console.error('Failed to insert FHIR server:', error);
+    await dbClient.query("ROLLBACK");
+    console.error("Failed to insert FHIR server:", error);
     return {
       success: false,
-      error: 'Failed to save the FHIR server configuration.'
+      error: "Failed to save the FHIR server configuration.",
     };
   }
 }
@@ -825,7 +825,7 @@ export async function updateFhirServer(
   id: string,
   name: string,
   hostname: string,
-  lastConnectionSuccessful?: boolean
+  lastConnectionSuccessful?: boolean,
 ) {
   const updateQuery = `
     UPDATE fhir_servers 
@@ -839,37 +839,37 @@ export async function updateFhirServer(
   `;
 
   try {
-    await dbClient.query('BEGIN');
+    await dbClient.query("BEGIN");
 
     const result = await dbClient.query(updateQuery, [
       id,
       name,
       hostname,
-      lastConnectionSuccessful
+      lastConnectionSuccessful,
     ]);
 
     // Clear the cache so the next getFhirServerConfigs call will fetch fresh data
     cachedFhirServerConfigs = null;
 
-    await dbClient.query('COMMIT');
+    await dbClient.query("COMMIT");
 
     if (result.rows.length === 0) {
       return {
         success: false,
-        error: 'Server not found'
+        error: "Server not found",
       };
     }
 
     return {
       success: true,
-      server: result.rows[0]
+      server: result.rows[0],
     };
   } catch (error) {
-    await dbClient.query('ROLLBACK');
-    console.error('Failed to update FHIR server:', error);
+    await dbClient.query("ROLLBACK");
+    console.error("Failed to update FHIR server:", error);
     return {
       success: false,
-      error: 'Failed to update the server configuration.'
+      error: "Failed to update the server configuration.",
     };
   }
 }
@@ -882,7 +882,7 @@ export async function updateFhirServer(
  */
 export async function updateFhirServerConnectionStatus(
   name: string,
-  wasSuccessful: boolean
+  wasSuccessful: boolean,
 ) {
   const updateQuery = `
     UPDATE fhir_servers 
@@ -902,19 +902,19 @@ export async function updateFhirServerConnectionStatus(
     if (result.rows.length === 0) {
       return {
         success: false,
-        error: 'Server not found'
+        error: "Server not found",
       };
     }
 
     return {
       success: true,
-      server: result.rows[0]
+      server: result.rows[0],
     };
   } catch (error) {
-    console.error('Failed to update FHIR server connection status:', error);
+    console.error("Failed to update FHIR server connection status:", error);
     return {
       success: false,
-      error: 'Failed to update the server connection status.'
+      error: "Failed to update the server connection status.",
     };
   }
 }

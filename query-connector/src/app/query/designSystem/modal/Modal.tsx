@@ -30,6 +30,18 @@ type ModalProps = {
   errorMessage?: string | null; // New prop for error message
 };
 
+/**
+ *
+ * @param root0
+ * @param root0.id
+ * @param root0.heading
+ * @param root0.description
+ * @param root0.children
+ * @param root0.modalRef
+ * @param root0.buttons
+ * @param root0.isLarge
+ * @param root0.errorMessage
+ */
 export const Modal: React.FC<ModalProps> = ({
   id,
   heading,
@@ -70,7 +82,12 @@ export const Modal: React.FC<ModalProps> = ({
           <>
             <hr className="usa-divider margin-y-3" />
             <div className="margin-top-4 text-red display-flex">
-              <Icon.Close size={3} className="usa-icon" aria-label="Error" color="#D54309" />
+              <Icon.Close
+                size={3}
+                className="usa-icon"
+                aria-label="Error"
+                color="#D54309"
+              />
               {errorMessage}
             </div>
           </>

@@ -1,6 +1,10 @@
-"use client"
-import { Icon, Label, TextInput } from "@trussworks/react-uswds"
-import { getFhirServerConfigs, insertFhirServer, updateFhirServer } from "../database-service";
+"use client";
+import { Icon, Label, TextInput } from "@trussworks/react-uswds";
+import {
+  getFhirServerConfigs,
+  insertFhirServer,
+  updateFhirServer,
+} from "../database-service";
 import SiteAlert from "../query/designSystem/SiteAlert";
 import Table from "../query/designSystem/table/Table";
 import { useEffect, useState, useRef } from "react";
@@ -9,14 +13,21 @@ import { Modal, ModalRef } from "../query/designSystem/modal/Modal";
 import styles from "./fhirServers.module.scss";
 import classNames from "classnames";
 
+/**
+ *
+ */
 export default function FhirServers() {
   const [fhirServers, setFhirServers] = useState<FhirServerConfig[]>([]);
   const [serverName, setServerName] = useState("");
   const [serverUrl, setServerUrl] = useState("");
-  const [connectionStatus, setConnectionStatus] = useState<'idle' | 'success' | 'error'>('idle');
-  const [errorMessage, setErrorMessage] = useState<string | undefined>('');
+  const [connectionStatus, setConnectionStatus] = useState<
+    "idle" | "success" | "error"
+  >("idle");
+  const [errorMessage, setErrorMessage] = useState<string | undefined>("");
   const modalRef = useRef<ModalRef>(null);
-  const [selectedServer, setSelectedServer] = useState<FhirServerConfig | null>(null);
+  const [selectedServer, setSelectedServer] = useState<FhirServerConfig | null>(
+    null,
+  );
   const editModalRef = useRef<ModalRef>(null);
 
   useEffect(() => {
@@ -32,8 +43,8 @@ export default function FhirServers() {
   const handleCloseModal = () => {
     setServerName("");
     setServerUrl("");
-    setConnectionStatus('idle');
-    setErrorMessage('');
+    setConnectionStatus("idle");
+    setErrorMessage("");
     modalRef.current?.toggleModal();
   };
 
@@ -47,54 +58,65 @@ export default function FhirServers() {
    * @param url - The URL of the FHIR server to test
    * @returns A promise that resolves to an object containing the test result
    */
-  const testFhirConnection = async (url: string): Promise<ConnectionTestResult> => {
+  const testFhirConnection = async (
+    url: string,
+  ): Promise<ConnectionTestResult> => {
     try {
-      const baseUrl = url.replace(/\/$/, '');
+      const baseUrl = url.replace(/\/$/, "");
       const metadataUrl = `${baseUrl}/metadata`;
 
       const response = await fetch(metadataUrl, {
-        method: 'GET',
+        method: "GET",
         headers: {
-          'Accept': 'application/fhir+json',
+          Accept: "application/fhir+json",
         },
       });
 
       if (response.ok) {
         const data = await response.json();
-        if (data.resourceType === 'CapabilityStatement') {
+        if (data.resourceType === "CapabilityStatement") {
           return { success: true };
         } else {
           return {
             success: false,
-            error: 'Invalid FHIR server response: Server did not return a valid CapabilityStatement'
+            error:
+              "Invalid FHIR server response: Server did not return a valid CapabilityStatement",
           };
         }
       } else {
         let errorMessage: string;
         switch (response.status) {
           case 401:
-            errorMessage = 'Connection failed: Authentication required. Please check your credentials.';
+            errorMessage =
+              "Connection failed: Authentication required. Please check your credentials.";
             break;
           case 403:
-            errorMessage = 'Connection failed: Access forbidden. You do not have permission to access this FHIR server.';
+            errorMessage =
+              "Connection failed: Access forbidden. You do not have permission to access this FHIR server.";
             break;
           case 404:
-            errorMessage = 'Connection failed: The FHIR server endpoint was not found. Please verify the URL.';
+            errorMessage =
+              "Connection failed: The FHIR server endpoint was not found. Please verify the URL.";
             break;
           case 408:
-            errorMessage = 'Connection failed: The request timed out. The FHIR server took too long to respond.';
+            errorMessage =
+              "Connection failed: The request timed out. The FHIR server took too long to respond.";
             break;
           case 500:
-            errorMessage = 'Connection failed: Internal server error. The FHIR server encountered an unexpected condition.';
+            errorMessage =
+              "Connection failed: Internal server error. The FHIR server encountered an unexpected condition.";
             break;
           case 502:
-            errorMessage = 'Connection failed: Bad gateway. The FHIR server received an invalid response from upstream.';
+            errorMessage =
+              "Connection failed: Bad gateway. The FHIR server received an invalid response from upstream.";
             break;
           case 503:
-            errorMessage = 'Connection failed: The FHIR server is temporarily unavailable or under maintenance.';
+            errorMessage =
+              "Connection failed: The FHIR server is temporarily unavailable or under maintenance.";
             break;
           case 504:
-            errorMessage = 'Connection failed: Gateway timeout. The upstream server did not respond in time.';
+            errorMessage =
+              "Connection failed: Gateway timeout. The upstream server did not respond in time.";
             break;
           default:
             errorMessage = `Connection failed: The FHIR server returned an error. (${response.status} ${response.statusText})`;
@@ -104,14 +126,15 @@ export default function FhirServers() {
     } catch (error) {
       return {
         success: false,
-        error: 'Connection failed: Unable to reach the FHIR server. Please check if the URL is correct and the server is accessible.'
+        error:
+          "Connection failed: Unable to reach the FHIR server. Please check if the URL is correct and the server is accessible.",
       };
     }
   };
 
   const handleTestConnection = async () => {
     const result = await testFhirConnection(serverUrl);
-    setConnectionStatus(result.success ? 'success' : 'error');
+    setConnectionStatus(result.success ? "success" : "error");
     setErrorMessage(result.error);
   };
 
@@ -123,7 +146,7 @@ export default function FhirServers() {
     const result = await insertFhirServer(
       serverName,
       serverUrl,
-      connectionResult.success
+      connectionResult.success,
     );
 
     if (result.success) {
@@ -133,7 +156,7 @@ export default function FhirServers() {
       });
       handleCloseModal();
     } else {
-      setConnectionStatus('error');
+      setConnectionStatus("error");
       setErrorMessage(result.error);
     }
   };
@@ -163,14 +186,20 @@ export default function FhirServers() {
   ];
 
   switch (connectionStatus) {
-    case 'success':
+    case "success":
       modalButtons[1].text = (
         <>
-          <Icon.Check size={3} className="usa-icon" aria-label="Connected" color="green" />
+          <Icon.Check
+            size={3}
+            className="usa-icon"
+            aria-label="Connected"
+            color="green"
+          />
           Connection successful
         </>
-      )
-      modalButtons[1].className = "usa-button usa-button--outline shadow-none text-green padding-left-0 padding-right-2"
+      );
+      modalButtons[1].className =
+        "usa-button usa-button--outline shadow-none text-green padding-left-0 padding-right-2";
       break;
     default:
   }
@@ -179,8 +208,8 @@ export default function FhirServers() {
     setSelectedServer(server);
     setServerName(server.name);
     setServerUrl(server.hostname);
-    setConnectionStatus('idle');
-    setErrorMessage('');
+    setConnectionStatus("idle");
+    setErrorMessage("");
     editModalRef.current?.toggleModal();
   };
 
@@ -188,8 +217,8 @@ export default function FhirServers() {
     setSelectedServer(null);
     setServerName("");
     setServerUrl("");
-    setConnectionStatus('idle');
-    setErrorMessage('');
+    setConnectionStatus("idle");
+    setErrorMessage("");
     editModalRef.current?.toggleModal();
   };
 
@@ -204,7 +233,7 @@ export default function FhirServers() {
       selectedServer.id,
       serverName,
       serverUrl,
-      connectionResult.success
+      connectionResult.success,
     );
 
     if (result.success) {
@@ -214,7 +243,7 @@ export default function FhirServers() {
       });
       handleCloseEditModal();
     } else {
-      setConnectionStatus('error');
+      setConnectionStatus("error");
       setErrorMessage(result.error);
     }
   };
@@ -246,19 +275,27 @@ export default function FhirServers() {
       type: "button" as const,
       id: "modal-delete-button",
       className: "usa-button usa-button--secondary",
-      onClick: () => {/* Implement delete functionality later */ },
+      onClick: () => {
+        /* Implement delete functionality later */
+      },
     },
   ];
 
   switch (connectionStatus) {
-    case 'success':
+    case "success":
       editModalButtons[2].text = (
         <>
-          <Icon.Check size={3} className="usa-icon" aria-label="Connected" color="green" />
+          <Icon.Check
+            size={3}
+            className="usa-icon"
+            aria-label="Connected"
+            color="green"
+          />
           Connection successful
         </>
-      )
-      editModalButtons[2].className = "usa-button usa-button--outline shadow-none text-green padding-left-0 padding-right-2"
+      );
+      editModalButtons[2].className =
+        "usa-button usa-button--outline shadow-none text-green padding-left-0 padding-right-2";
       break;
     default:
   }
@@ -267,7 +304,12 @@ export default function FhirServers() {
     <>
       <SiteAlert />
       <div className={classNames("main-container__wide", styles.mainContainer)}>
-        <div className={classNames("grid-container grid-row padding-0", styles.titleContainer)}>
+        <div
+          className={classNames(
+            "grid-container grid-row padding-0",
+            styles.titleContainer,
+          )}
+        >
           <h1 className="page-title grid-col-10">FHIR server configuration</h1>
           <div className="grid-col-2 display-flex flex-column">
             <button
@@ -295,20 +337,39 @@ export default function FhirServers() {
                   <div className="grid-container grid-row padding-0 display-flex flex-align-center">
                     {fhirServer.last_connection_successful ? (
                       <>
-                        <Icon.Check size={3} className="usa-icon margin-right-05" aria-label="Connected" color="green" />
+                        <Icon.Check
+                          size={3}
+                          className="usa-icon margin-right-05"
+                          aria-label="Connected"
+                          color="green"
+                        />
                         Connected
                       </>
                     ) : (
                       <>
-                        <Icon.Close size={3} className="usa-icon margin-right-05" aria-label="Not connected" color="red" />
+                        <Icon.Close
+                          size={3}
+                          className="usa-icon margin-right-05"
+                          aria-label="Not connected"
+                          color="red"
+                        />
                         Not connected
                       </>
                     )}
                     <span className={styles.lastChecked}>
-                      (last checked: {fhirServer.last_connection_attempt ? new Date(fhirServer.last_connection_attempt).toLocaleString() : 'unknown'})
+                      (last checked:{" "}
+                      {fhirServer.last_connection_attempt
+                        ? new Date(
+                            fhirServer.last_connection_attempt,
+                          ).toLocaleString()
+                        : "unknown"}
+                      )
                     </span>
                     <button
-                      className={classNames(styles.editButton, "usa-button usa-button--unstyled")}
+                      className={classNames(
+                        styles.editButton,
+                        "usa-button usa-button--unstyled",
+                      )}
                       onClick={() => handleOpenEditModal(fhirServer)}
                       aria-label={`Edit ${fhirServer.name}`}
                     >
@@ -376,7 +437,7 @@ export default function FhirServers() {
             required
           />
         </Modal>
-      </div >
+      </div>
     </>
   );
 }

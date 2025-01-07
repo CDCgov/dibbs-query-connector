@@ -130,7 +130,8 @@ async function patientQuery(
   // Check for errors
   if (response.status !== 200) {
     console.error(
-      `Patient search failed. Status: ${response.status} \n Body: ${response.text
+      `Patient search failed. Status: ${response.status} \n Body: ${
+        response.text
       } \n Headers: ${JSON.stringify(response.headers.raw())}`,
     );
   }
