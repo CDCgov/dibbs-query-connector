@@ -1,30 +1,20 @@
 "use server";
-import { Pool, PoolConfig, QueryResultRow } from "pg";
-import {
-  Bundle,
-  OperationOutcome,
-  ValueSet as FhirValueSet,
-  Parameters,
-} from "fhir/r4";
+import { Bundle, OperationOutcome, Parameters } from "fhir/r4";
 import {
   Concept,
-  ErsdConceptType,
   INTENTIONAL_EMPTY_STRING_FOR_CONCEPT_VERSION,
   INTENTIONAL_EMPTY_STRING_FOR_GEM_CODE,
-  ValueSet,
-  ersdToDibbsConceptMap,
+  DibbsValueSet,
   FhirServerConfig,
 } from "./constants";
 import { encode } from "base-64";
 import {
   QueryInput,
   generateQueryInsertionSql,
-  generateQueryToValueSetInsertionSql,
   CustomUserQuery,
 } from "./query-building";
-import { UUID } from "crypto";
 import {
-  CategoryToConditionArrayMap,
+  CategoryToConditionToNameMap,
   ConditionIdToNameMap,
 } from "./queryBuilding/utils";
 import {
@@ -37,34 +27,61 @@ import {
   insertConceptSql,
   insertConditionSql,
   insertConditionToValuesetSql,
-  insertDefaultQueryLogicSql,
+  insertDemoQueryLogicSql,
   insertValueSetSql,
   insertValuesetToConceptSql,
+  QueryDataStruct,
   updatedCancerCategorySql,
   updateErsdCategorySql,
   updateNewbornScreeningCategorySql,
   ValuesetStruct,
   ValuesetToConceptStruct,
 } from "./seedSqlStructs";
+import { getDbClient } from "./backend/dbClient";
 
 const getQuerybyNameSQL = `
-select q.query_name, q.id, qtv.valueset_id, vs.name as valueset_name, vs.oid as valueset_external_id, vs.version, vs.author as author, vs.type, vs.dibbs_concept_type as dibbs_concept_type, qic.concept_id, qic.include, c.code, c.code_system, c.display 
+select q.query_name, q.id, q.query_data, q.conditions_list
   from query q 
-  left join query_to_valueset qtv on q.id = qtv.query_id 
-  left join valuesets vs on qtv.valueset_id = vs.id
-  left join query_included_concepts qic on qtv.id = qic.query_by_valueset_id 
-  left join concepts c on qic.concept_id = c.id 
   where q.query_name = $1;
 `;
 
-// Load environment variables from .env and establish a Pool configuration
-const dbConfig: PoolConfig = {
-  connectionString: process.env.DATABASE_URL,
-  max: 10, // Maximum # of connections in the pool
-  idleTimeoutMillis: 30000, // A client must sit idle this long before being released
-  connectionTimeoutMillis: 3000, // Wait this long before timing out when connecting new client
+const getValueSetsByConditionIds = `
+SELECT c.display, c.code_system, c.code, vs.name as valueset_name, vs.id as valueset_id, vs.oid as valueset_external_id, vs.version, vs.author as author, vs.type, vs.dibbs_concept_type as dibbs_concept_type, ctvs.condition_id
+  FROM valuesets vs 
+  LEFT JOIN condition_to_valueset ctvs on vs.id = ctvs.valueset_id 
+  LEFT JOIN valueset_to_concept vstc on vs.id = vstc.valueset_id
+  LEFT JOIN concepts c on vstc.concept_id = c.id
+  WHERE ctvs.condition_id IN (
+`;
+
+const dbClient = getDbClient();
+
+/**
+ * Executes a search for a ValueSets and Concepts against the Postgres
+ * Database, using the ID of the condition associated with any such data.
+ * @param ids Array of ids for entries in the conditions table
+ * @returns One or more rows from the DB matching the requested saved query,
+ * or an error if no results can be found.
+ */
+export const getValueSetsAndConceptsByConditionIDs = async (ids: string[]) => {
+  const escapedValues = ids.map((_, i) => `$${i + 1}`).join() + ")";
+  const queryString = getValueSetsByConditionIds + escapedValues;
+
+  try {
+    const result = await dbClient.query(queryString, ids);
+    if (result.rows.length === 0) {
+      console.error("No results found for given condition ids", ids);
+      return [];
+    }
+    return result.rows;
+  } catch (error) {
+    console.error(
+      "Error retrieving value sets and concepts for condition",
+      error,
+    );
+    throw error;
+  }
 };
-const dbClient = new Pool(dbConfig);
 
 /**
  * Executes a search for a CustomQuery against the query-loaded Postgres
@@ -88,73 +105,6 @@ export const getSavedQueryByName = async (name: string) => {
     console.error("Error retrieving query:", error);
     throw error;
   }
-};
-
-/**
- * Utility function to execute the insertions into three query tables
- * programmatically after the database has been seeded with initial
- * conditions.
- */
-export const executeDefaultQueryCreation = async () => {
-  try {
-    console.log("Executing default query linking script");
-    await dbClient.query(insertDefaultQueryLogicSql);
-    console.log(
-      "Default queries, queries to conditions, and query included concepts insertion complete",
-    );
-  } catch (error) {
-    console.error("Could not cross-index default queries", error);
-    throw error;
-  }
-};
-
-/**
- * Maps the results returned from the DIBBs value set and coding system database
- * into a collection of value sets, each containing one or more Concepts build out
- * of the coding information in the DB.
- * @param rows The Rows returned from the DB Query.
- * @returns A list of ValueSets, which hold the Concepts pulled from the DB.
- */
-export const mapQueryRowsToValueSets = async (rows: QueryResultRow[]) => {
-  // Create groupings of rows (each of which is a single Concept) by their ValueSet ID
-  const vsIdGroupedRows = rows.reduce((conceptsByVSId, r) => {
-    if (!(r["valueset_id"] in conceptsByVSId)) {
-      conceptsByVSId[r["valueset_id"]] = [];
-    }
-    conceptsByVSId[r["valueset_id"]].push(r);
-    return conceptsByVSId;
-  }, {});
-
-  // Each "prop" of the struct is now a ValueSet ID
-  // Iterate over them to create formal Concept Groups attached to a formal VS
-  const valueSets = Object.keys(vsIdGroupedRows).map((vsID) => {
-    const conceptGroup: QueryResultRow[] = vsIdGroupedRows[vsID];
-    const valueSet: ValueSet = {
-      valueSetId: conceptGroup[0]["valueset_id"],
-      valueSetVersion: conceptGroup[0]["version"],
-      valueSetName: conceptGroup[0]["valueset_name"],
-      // External ID might not be defined for user-defined valuesets
-      valueSetExternalId: conceptGroup[0]["valueset_external_id"]
-        ? conceptGroup[0]["valueset_external_id"]
-        : undefined,
-      author: conceptGroup[0]["author"],
-      system: conceptGroup[0]["code_system"],
-      ersdConceptType: conceptGroup[0]["type"]
-        ? conceptGroup[0]["type"]
-        : undefined,
-      dibbsConceptType: conceptGroup[0]["dibbs_concept_type"],
-      includeValueSet: conceptGroup.find((c) => c["include"]) ? true : false,
-      concepts: conceptGroup.map((c) => {
-        return {
-          code: c["code"],
-          display: c["display"],
-          include: c["include"],
-        };
-      }),
-    };
-    return valueSet;
-  });
-  return valueSets;
 };
 
 /*
@@ -241,47 +191,11 @@ export async function getVSACValueSet(
 }
 
 /**
- * Translates a VSAC FHIR bundle to our internal ValueSet struct
- * @param fhirValueset - The FHIR ValueSet response from VSAC
- * @param ersdConceptType - The associated clinical concept type from ERSD
- * @returns An object of type InternalValueSet
- */
-export async function translateVSACToInternalValueSet(
-  fhirValueset: FhirValueSet,
-  ersdConceptType: ErsdConceptType,
-) {
-  const oid = fhirValueset.id;
-  const version = fhirValueset.version;
-
-  const name = fhirValueset.title;
-  const author = fhirValueset.publisher;
-
-  const bundleConceptData = fhirValueset?.compose?.include[0];
-  const system = bundleConceptData?.system;
-  const concepts = bundleConceptData?.concept?.map((fhirConcept) => {
-    return { ...fhirConcept, include: false } as Concept;
-  });
-
-  return {
-    valueSetId: `${oid}_${version}`,
-    valueSetVersion: version,
-    valueSetName: name,
-    valueSetExternalId: oid,
-    author: author,
-    system: system,
-    ersdConceptType: ersdConceptType,
-    dibbsConceptType: ersdToDibbsConceptMap[ersdConceptType],
-    includeValueSet: false,
-    concepts: concepts,
-  } as ValueSet;
-}
-
-/**
  * Function call to insert a new ValueSet into the database.
  * @param vs - a ValueSet in of the shape of our internal data model to insert
  * @returns success / failure information, as well as errors as appropriate
  */
-export async function insertValueSet(vs: ValueSet) {
+export async function insertValueSet(vs: DibbsValueSet) {
   let errorArray: string[] = [];
 
   const insertValueSetPromise = generateValueSetSqlPromise(vs);
@@ -333,7 +247,7 @@ export async function insertValueSet(vs: ValueSet) {
  * @param vs - The ValueSet in of the shape of our internal data model to insert
  * @returns The SQL statement for insertion
  */
-function generateValueSetSqlPromise(vs: ValueSet) {
+function generateValueSetSqlPromise(vs: DibbsValueSet) {
   const valueSetOid = vs.valueSetExternalId;
 
   // TODO: based on how non-VSAC valuests are shaped in the future, we may need
@@ -365,7 +279,7 @@ function generateValueSetSqlPromise(vs: ValueSet) {
  * @param vs - The ValueSet in of the shape of our internal data model to insert
  * @returns The SQL statement array for all concepts for insertion
  */
-function generateConceptSqlPromises(vs: ValueSet) {
+function generateConceptSqlPromises(vs: DibbsValueSet) {
   const insertConceptsSqlArray = vs.concepts.map((concept) => {
     const systemPrefix = stripProtocolAndTLDFromSystemUrl(vs.system);
     const conceptUniqueId = `${systemPrefix}_${concept.code}`;
@@ -388,7 +302,7 @@ function generateConceptSqlPromises(vs: ValueSet) {
   return insertConceptsSqlArray;
 }
 
-function generateValuesetConceptJoinSqlPromises(vs: ValueSet) {
+function generateValuesetConceptJoinSqlPromises(vs: DibbsValueSet) {
   const insertConceptsSqlArray = vs.concepts.map((concept) => {
     const systemPrefix = stripProtocolAndTLDFromSystemUrl(vs.system);
     const conceptUniqueId = `${systemPrefix}_${concept.code}`;
@@ -434,12 +348,10 @@ function logRejectedPromiseReasons<T>(
 export async function insertQuery(input: QueryInput) {
   const { sql, values } = generateQueryInsertionSql(input);
   const insertUserQueryPromise = dbClient.query(sql, values);
-  const errorArray = [];
+  const errorArray: string[] = [];
 
-  let queryId;
   try {
-    const results = await insertUserQueryPromise;
-    queryId = results.rows[0].id as unknown as UUID;
+    await insertUserQueryPromise;
   } catch (e) {
     console.error(
       `Error occured in user query insertion: insertion for ${input.queryName} failed`,
@@ -449,29 +361,6 @@ export async function insertQuery(input: QueryInput) {
 
     return { success: false, error: errorArray.join(",") };
   }
-
-  const insertJoinSqlArray = generateQueryToValueSetInsertionSql(
-    input,
-    queryId as UUID,
-  );
-
-  const joinPromises = insertJoinSqlArray.map((q) => {
-    dbClient.query(q.sql, q.values);
-  });
-
-  const joinInsertResults = await Promise.allSettled(joinPromises);
-
-  const joinInsertsSucceeded = joinInsertResults.every(
-    (r) => r.status === "fulfilled",
-  );
-
-  if (!joinInsertsSucceeded) {
-    logRejectedPromiseReasons(joinInsertResults, "Concept insertion failed");
-    errorArray.push("Error occured in concept insertion");
-  }
-
-  if (errorArray.length === 0) return { success: true };
-  return { success: false, error: errorArray.join(",") };
 }
 
 /**
@@ -485,7 +374,7 @@ export async function insertQuery(input: QueryInput) {
  * @param vs The DIBBs internal representation of the value set to check.
  * @returns A data structure reporting on missing concepts or value set links.
  */
-export async function checkValueSetInsertion(vs: ValueSet) {
+export async function checkValueSetInsertion(vs: DibbsValueSet) {
   // Begin accumulating missing data
   const missingData = {
     missingValueSet: false,
@@ -517,7 +406,7 @@ export async function checkValueSetInsertion(vs: ValueSet) {
   const brokenConcepts = await Promise.all(
     vs.concepts.map(async (c) => {
       const systemPrefix = stripProtocolAndTLDFromSystemUrl(vs.system);
-      const conceptId = `${systemPrefix}_${c.code}`;
+      const conceptId = `${systemPrefix}_${c?.code}`;
       const conceptSql = `SELECT * FROM concepts WHERE id = $1;`;
 
       try {
@@ -526,8 +415,8 @@ export async function checkValueSetInsertion(vs: ValueSet) {
 
         // We accumulate the unique DIBBs concept IDs of anything that's missing
         if (
-          foundConcept.code !== c.code ||
-          foundConcept.display !== c.display
+          foundConcept?.code !== c?.code ||
+          foundConcept?.display !== c?.display
         ) {
           console.error(
             "Retrieved concept " +
@@ -600,7 +489,7 @@ export async function getConditionsData() {
   const rows = result.rows;
 
   // 1. Grouped by category with id:name pairs
-  const categoryToConditionArrayMap: CategoryToConditionArrayMap = rows.reduce(
+  const categoryToConditionArrayMap: CategoryToConditionToNameMap = rows.reduce(
     (acc, row) => {
       const { category, id, name } = row;
       if (!acc[category]) {
@@ -609,7 +498,7 @@ export async function getConditionsData() {
       acc[category].push({ [id]: name });
       return acc;
     },
-    {} as CategoryToConditionArrayMap,
+    {} as CategoryToConditionToNameMap,
   );
 
   // 2. ID-Name mapping
@@ -688,6 +577,18 @@ export async function insertDBStructArray(
         (struct as CategoryStruct).condition_code,
         (struct as CategoryStruct).category,
       ];
+    } else if (insertType === "query") {
+      structInsertSql = insertDemoQueryLogicSql;
+      valuesToInsert = [
+        (struct as QueryDataStruct).query_name,
+        (struct as QueryDataStruct).query_data,
+        (struct as QueryDataStruct).conditions_list,
+        (struct as QueryDataStruct).author,
+        (struct as QueryDataStruct).date_created,
+        (struct as QueryDataStruct).date_last_modified,
+        (struct as QueryDataStruct).time_window_number,
+        (struct as QueryDataStruct).time_window_unit,
+      ];
     }
     const insertPromise = dbClient.query(structInsertSql, valuesToInsert);
     return insertPromise;
@@ -734,97 +635,49 @@ export async function getCustomQueries(): Promise<CustomUserQuery[]> {
     SELECT
       q.id AS query_id,
       q.query_name,
-      vc.valueset_id AS valueSetId,
-      vc.version AS valueSetVersion,
-      vc.valueset_name AS valueSetName,
-      vc.author,
-      vc.system,
-      vc.ersd_concept_type AS ersdConceptType,
-      vc.dibbs_concept_type AS dibbsConceptType,
-      vc.valueset_include AS includeValueSet,
-      vc.code,
-      vc.display,
-      qic.include AS concept_include
+      q.query_data,
+      q.conditions_list
     FROM
-      query q
-    LEFT JOIN query_to_valueset qtv ON q.id = qtv.query_id
-    LEFT JOIN query_included_concepts qic ON qic.query_by_valueset_id = qtv.id
-    LEFT JOIN (
-      SELECT
-        v.id AS valueset_id,
-        v.version,
-        v.name AS valueset_name,
-        v.author,
-        c.code_system AS system,
-        v.type AS ersd_concept_type,
-        v.dibbs_concept_type,
-        true AS valueset_include,
-        c.code,
-        c.display
-      FROM
-        valuesets v
-      LEFT JOIN valueset_to_concept vtc ON vtc.valueset_id = v.id
-      LEFT JOIN concepts c ON c.id = vtc.concept_id
-    ) vc ON vc.valueset_id = qtv.valueset_id
-    WHERE     q.query_name IN ('Gonorrhea (disorder)', 'Newborn Screening', 'Syphilis (disorder)', 'Cancer (Leukemia)', 'Chlamydia trachomatis infection (disorder)');
+      query q;
   `;
-  // TODO: We will need to refactor this to just pull query_name and conditions_list
   // TODO: this will eventually need to take into account user permissions and specific authors
-  // We might also be able to take advantage of the `query_name` var to avoid joining valuesets/conc
+  // We'll probably also need to refactor this to not show up in any user-facing containers
 
   const results = await dbClient.query(query);
   const formattedData: { [key: string]: CustomUserQuery } = {};
 
   results.rows.forEach((row) => {
-    const {
-      query_id,
-      query_name,
-      valueSetId,
-      valueSetVersion,
-      valueSetName,
-      author,
-      system,
-      ersdConceptType,
-      dibbsConceptType,
-      includeValueSet,
-      code,
-      display,
-      concept_include,
-    } = row;
+    const { query_id, query_name, query_data, conditions_list } = row;
 
     // Initialize query structure if it doesn't exist
     if (!formattedData[query_id]) {
       formattedData[query_id] = {
         query_id,
         query_name,
+        conditions_list,
         valuesets: [],
       };
     }
 
-    // Check if the valueSetId already exists in the valuesets array
-    let valueset = formattedData[query_id].valuesets.find(
-      (v) => v.valueSetId === valueSetId,
-    );
+    Object.entries(
+      query_data as {
+        [condition: string]: { [valueSetId: string]: DibbsValueSet };
+      },
+    ).forEach(([_, includedValueSets]) => {
+      Object.entries(includedValueSets).forEach(
+        ([valueSetId, valueSetData]) => {
+          // Check if the valueSetId already exists in the valuesets array
+          let valueset = formattedData[query_id].valuesets.find(
+            (v) => v.valueSetId === valueSetId,
+          );
 
-    // If valueSetId doesn't exist, add it
-    if (!valueset) {
-      valueset = {
-        valueSetId,
-        valueSetVersion,
-        valueSetName,
-        author,
-        system,
-        ersdConceptType,
-        dibbsConceptType,
-        includeValueSet,
-        concepts: [],
-      };
-      formattedData[query_id].valuesets.push(valueset);
-    }
-
-    // Add concept data to the concepts array
-    const concept: Concept = { code, display, include: concept_include };
-    valueset.concepts.push(concept);
+          // If valueSetId doesn't exist, add it
+          if (!valueset) {
+            formattedData[query_id].valuesets.push(valueSetData);
+          }
+        },
+      );
+    });
   });
 
   return Object.values(formattedData);
@@ -836,28 +689,12 @@ export async function getCustomQueries(): Promise<CustomUserQuery[]> {
  * @returns A success or error response indicating the result.
  */
 export const deleteQueryById = async (queryId: string) => {
-  // TODO: should be able to simplified when it is just deleting query table
-  const deleteQuerySql1 = `
-    DELETE FROM query_included_concepts 
-    WHERE query_by_valueset_id IN (
-      SELECT id FROM query_to_valueset WHERE query_id = $1
-    );
-  `;
-  const deleteQuerySql2 = `
-    DELETE FROM query_to_valueset WHERE query_id = $1;
-  `;
-  const deleteQuerySql3 = `
+  const deleteQuery = `
     DELETE FROM query WHERE id = $1;
   `;
-
   try {
     await dbClient.query("BEGIN");
-
-    // Execute deletion queries in the correct order
-    await dbClient.query(deleteQuerySql1, [queryId]);
-    await dbClient.query(deleteQuerySql2, [queryId]);
-    await dbClient.query(deleteQuerySql3, [queryId]);
-
+    await dbClient.query(deleteQuery, [queryId]);
     await dbClient.query("COMMIT");
     return { success: true };
   } catch (error) {

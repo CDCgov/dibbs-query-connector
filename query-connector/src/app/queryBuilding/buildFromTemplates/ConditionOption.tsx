@@ -1,6 +1,7 @@
 import Checkbox from "../../query/designSystem/checkbox/Checkbox";
 import { formatDiseaseDisplay } from "../utils";
 import styles from "./buildfromTemplate.module.scss";
+
 type ConditionOptionProps = {
   conditionId: string;
   conditionName: string;
@@ -27,12 +28,12 @@ const ConditionOption: React.FC<ConditionOptionProps> = ({
   return (
     <div className={styles.categoryOption}>
       <Checkbox
-        onClick={() => {
+        onChange={() => {
           handleConditionSelection(conditionId);
         }}
         id={conditionId}
         label={formatDiseaseDisplay(conditionName)}
-        checked={checked}
+        checked={checked || false}
       />
     </div>
   );

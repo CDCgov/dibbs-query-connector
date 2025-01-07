@@ -1,8 +1,8 @@
 import "../styles/styles.scss";
 import Header from "./query/components/header/header";
 import Footer from "./query/components/footer/footer";
-import { DataProvider } from "./utils";
 import { SessionProvider } from "next-auth/react";
+import DataProvider from "./DataProvider";
 
 /**
  * Establishes the layout for the application.
@@ -19,11 +19,11 @@ export default function RootLayout({
     <html lang="en">
       <SessionProvider>
         <body>
-          <Header />
-          <div className="main-body">
+          <div className="application-container">
+            <Header />
             <DataProvider>{children}</DataProvider>
+            <Footer />
           </div>
-          <Footer />
         </body>
       </SessionProvider>
     </html>

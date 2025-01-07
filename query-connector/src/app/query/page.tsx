@@ -59,13 +59,17 @@ const Query: React.FC = () => {
     results: "main-container__wide",
   };
   return (
-    <>
+    <div className="main-body">
       <SiteAlert page={mode} />
+      {Object.keys(CUSTOMIZE_QUERY_STEPS).includes(mode) &&
+        !showCustomizeQuery && (
+          <StepIndicator
+            headingLevel="h4"
+            className="stepper-container"
+            curStep={mode}
+          />
+        )}
       <div className={modeToCssContainerMap[mode]}>
-        {Object.keys(CUSTOMIZE_QUERY_STEPS).includes(mode) &&
-          !showCustomizeQuery && (
-            <StepIndicator headingLevel="h4" curStep={mode} />
-          )}
         {/* Step 1 */}
         {mode === "search" && (
           <SearchForm
@@ -124,7 +128,7 @@ const Query: React.FC = () => {
         {loading && <LoadingView loading={loading} />}
         <ToastContainer icon={false} />
       </div>
-    </>
+    </div>
   );
 };
 

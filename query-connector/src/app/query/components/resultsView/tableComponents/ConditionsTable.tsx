@@ -1,8 +1,10 @@
 import React from "react";
-import Table from "@/app/query/designSystem/Table";
+import Table from "@/app/query/designSystem/table/Table";
 import { Condition } from "fhir/r4";
 import { formatCodeableConcept, formatDate } from "../../../../format-service";
 import { checkIfSomeElementWithPropertyExists } from "./utils";
+import styles from "./resultsTables.module.scss";
+import classNames from "classnames";
 
 /**
  * The props for the ConditionTable component.
@@ -34,9 +36,15 @@ const ConditionsTable: React.FC<ConditionTableProps> = ({ conditions }) => {
   );
 
   return (
-    <Table className="margin-top-0-important">
+    <Table
+      bordered={false}
+      className={classNames(
+        "margin-top-0-important",
+        styles.conditionsTableContainer,
+      )}
+    >
       <thead>
-        <tr>
+        <tr className={styles.conditionRow}>
           <th>Condition</th>
           {anyStatus && <th>Status</th>}
           {anyOnset && <th>Onset</th>}
@@ -45,7 +53,7 @@ const ConditionsTable: React.FC<ConditionTableProps> = ({ conditions }) => {
       </thead>
       <tbody>
         {conditions.map((condition) => (
-          <tr key={condition.id}>
+          <tr className={styles.conditionRow} key={condition.id}>
             <td>{formatCodeableConcept(condition.code ?? {})}</td>
             {anyStatus && (
               <td>{formatCodeableConcept(condition.clinicalStatus ?? {})}</td>

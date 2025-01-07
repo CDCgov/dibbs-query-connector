@@ -6,7 +6,7 @@ import FHIRClient from "./fhir-servers";
 import {
   USE_CASES,
   FHIR_SERVERS,
-  ValueSet,
+  DibbsValueSet,
   isFhirResource,
   FhirResource,
 } from "./constants";
@@ -148,7 +148,7 @@ async function patientQuery(
  */
 export async function UseCaseQuery(
   request: UseCaseQueryRequest,
-  queryValueSets: ValueSet[],
+  queryValueSets: DibbsValueSet[],
   queryResponse: QueryResponse = {},
 ): Promise<QueryResponse> {
   const fhirServerConfigs = await getFhirServerConfigs();
@@ -190,7 +190,7 @@ export async function UseCaseQuery(
  */
 async function generalizedQuery(
   useCase: USE_CASES,
-  queryValueSets: ValueSet[],
+  queryValueSets: DibbsValueSet[],
   patientId: string,
   fhirClient: FHIRClient,
   queryResponse: QueryResponse,
@@ -199,10 +199,8 @@ async function generalizedQuery(
   const builtQuery = new CustomQuery(querySpec, patientId);
   let response: fetch.Response | fetch.Response[];
 
-  // Special cases for plain SDH or newborn screening, which just use one query
-  if (useCase === "social-determinants") {
-    response = await fhirClient.get(builtQuery.getQuery("social"));
-  } else if (useCase === "newborn-screening") {
+  // Special cases for newborn screening, which just use one query
+  if (useCase === "newborn-screening") {
     response = await fhirClient.get(builtQuery.getQuery("observation"));
   } else {
     const queryRequests: string[] = builtQuery.getAllQueries();

@@ -1,12 +1,10 @@
 @use "../../../../styles/_variables" as *;
 
 .footerContainer {
-  height: $footer-content-height;
+  flex: 0 1 $footer-content-height;
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  background-color: $primary-darker;
-  overflow: scroll !important;
 }
 
 .cdcLogoContainer {

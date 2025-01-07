@@ -8,69 +8,31 @@ import {
   MedicationAdministration,
   MedicationRequest,
 } from "fhir/r4";
-/**
- * The use cases that can be used in the app
- */
-export const UseCases = [
-  "social-determinants",
-  "newborn-screening",
-  "syphilis",
-  "gonorrhea",
-  "chlamydia",
-  "cancer",
-] as const;
-export type USE_CASES = (typeof UseCases)[number];
 
-export const UseCaseToQueryName: {
-  [key in USE_CASES]: string;
-} = {
-  "social-determinants": "Social Determinants of Health",
-  "newborn-screening": "Newborn Screening",
-  syphilis: "Congenital syphilis (disorder)",
-  gonorrhea: "Gonorrhea (disorder)",
-  chlamydia: "Chlamydia trachomatis infection (disorder)",
-  cancer: "Cancer (Leukemia)",
-};
-
-/**
- * Labels and values for the query options dropdown on the query page
- */
-export const demoQueryOptions = [
-  { value: "cancer", label: "Cancer case investigation" },
-  { value: "chlamydia", label: "Chlamydia case investigation" },
-  { value: "gonorrhea", label: "Gonorrhea case investigation" },
-  { value: "newborn-screening", label: "Newborn screening follow-up" },
-  // Temporarily remove social determinants
-  // {
-  //   value: "social-determinants",
-  //   label: "Gather social determinants of health",
-  // },
-  { value: "syphilis", label: "Syphilis case investigation" },
-];
-
-type DemoQueryOptionValue = (typeof demoQueryLabels)[number];
-export const demoQueryValToLabelMap = demoQueryOptions.reduce(
-  (acc, curVal) => {
-    acc[curVal.value as DemoQueryOptionValue] = curVal.label;
-    return acc;
+export const USE_CASE_DETAILS = {
+  "newborn-screening": {
+    queryName: "Newborn screening follow-up",
+    condition: "Newborn Screening",
   },
-  {} as Record<DemoQueryOptionValue, string>,
-);
-/*
- * Map between the queryType property used to define a demo use case's options,
- * and the name of that query for purposes of searching the DB.
- */
-const demoQueryLabels = demoQueryOptions.map((dqo) => dqo.label);
-export const QueryTypeToQueryName: {
-  [key in (typeof demoQueryLabels)[number]]: string;
-} = {
-  "Gather social determinants of health": "Social Determinants of Health",
-  "Newborn screening follow-up": "Newborn Screening",
-  "Syphilis case investigation": "Congenital syphilis (disorder)",
-  "Gonorrhea case investigation": "Gonorrhea (disorder)",
-  "Chlamydia case investigation": "Chlamydia trachomatis infection (disorder)",
-  "Cancer case investigation": "Cancer (Leukemia)",
-};
+  syphilis: {
+    queryName: "Syphilis case investigation",
+    condition: "Congenital syphilis (disorder)",
+  },
+  gonorrhea: {
+    queryName: "Gonorrhea case investigation",
+    condition: "Gonorrhea (disorder)",
+  },
+  chlamydia: {
+    queryName: "Chlamydia case investigation",
+    condition: "Chlamydia trachomatis infection (disorder)",
+  },
+  cancer: {
+    queryName: "Cancer case investigation",
+    condition: "Cancer (Leukemia)",
+  },
+} as const;
+
+export type USE_CASES = keyof typeof USE_CASE_DETAILS;
 
 /**
  * The FHIR servers that can be used in the app
@@ -107,10 +69,9 @@ export type PatientType =
   | "newborn-screening-technical-fail"
   | "newborn-screening-referral"
   | "newborn-screening-pass"
-  | "social-determinants"
   | "sti-syphilis-positive";
 
-export const DEFAULT_DEMO_FHIR_SERVER = "Public HAPI: Direct";
+export const DEFAULT_DEMO_FHIR_SERVER = "HELIOS Meld: Direct";
 /*
  * Common "Hyper Unlucky" patient data used for all non-newborn screening use cases
  */
@@ -131,26 +92,7 @@ export const demoData: Record<PatientType, DemoDataFields> = {
   cancer: { ...hyperUnluckyPatient, UseCase: "cancer" },
   "sti-chlamydia-positive": { ...hyperUnluckyPatient, UseCase: "chlamydia" },
   "sti-gonorrhea-positive": { ...hyperUnluckyPatient, UseCase: "gonorrhea" },
-  "social-determinants": {
-    ...hyperUnluckyPatient,
-    UseCase: "social-determinants",
-  },
   "sti-syphilis-positive": { ...hyperUnluckyPatient, UseCase: "syphilis" },
-
-  // Newborn screening data remains unchanged
-  // We need to figure how to display specific cases for specific referral, fail, pass
-  // "newborn-screening-technical-fail": {
-  //   ...hyperUnluckyPatient,
-  // UseCase: "newborn-screening",
-  // },
-  // "newborn-screening-referral": {
-  //   ...hyperUnluckyPatient,
-  //   UseCase: "newborn-screening",
-  // },
-  // "newborn-screening-pass": {
-  //   ...hyperUnluckyPatient,
-  //   UseCase: "newborn-screening",
-  // },
   "newborn-screening-technical-fail": {
     FirstName: "Mango",
     LastName: "Smith",
@@ -213,12 +155,6 @@ export const patientOptions: Record<string, Option[]> = {
     {
       value: "newborn-screening-pass",
       label: "A newborn with a passed screening",
-    },
-  ],
-  "social-determinants": [
-    {
-      value: "social-determinants",
-      label: "A patient with housing insecurity",
     },
   ],
   syphilis: [
@@ -299,6 +235,9 @@ export const stateOptions = [
 /* Mode that pages can be in; determines what is displayed to the user */
 export type Mode = "search" | "results" | "select-query" | "patient-results";
 
+/* Mode that query building pages can be in; determines what is displayed to the user */
+export type BuildStep = "selection" | "condition" | "valueset";
+
 export const metadata = {
   title: "Query Connector",
   description: "Try out TEFCA with queries for public health use cases.",
@@ -314,9 +253,9 @@ export interface Concept {
 }
 
 /*
- * The expected type of a ValueSet.
+ * The expected type of a DIBBS ValueSet.
  */
-export interface ValueSet {
+export interface DibbsValueSet {
   valueSetId: string;
   valueSetVersion: string;
   valueSetName: string;
@@ -324,14 +263,15 @@ export interface ValueSet {
   author: string;
   system: string;
   ersdConceptType?: string;
-  dibbsConceptType: string;
+  dibbsConceptType: DibbsConceptType;
   includeValueSet: boolean;
   concepts: Concept[];
+  conditionId?: string;
 }
 
 export const DEFAULT_ERSD_VERSION = "3";
 
-export type DibbsConceptType = "labs" | "medications" | "conditions";
+export type DibbsConceptType = "labs" | "conditions" | "medications";
 export type ErsdConceptType =
   | "ostc"
   | "lotc"
@@ -350,16 +290,6 @@ export const ersdToDibbsConceptMap: {
   dxtc: "conditions",
   sdtc: "conditions",
 };
-
-/*
- * The expected type of ValueSets grouped by dibbsConceptType for the purpose of display.
- */
-export interface ValueSetDisplay {
-  labs: ValueSet[];
-  medications: ValueSet[];
-  conditions: ValueSet[];
-}
-export type DibbsValueSetType = keyof ValueSetDisplay;
 
 // Define the type guard for FHIR resources
 // Define the FHIR Resource types
@@ -412,3 +342,13 @@ export type FhirServerConfig = {
   hostname: string;
   headers: Record<string, string>;
 };
+
+export const INVALID_USE_CASE = `Invalid use_case. Please provide a valid use_case. Valid use_cases include ${Object.keys(
+  USE_CASE_DETAILS,
+)}.`;
+export const INVALID_FHIR_SERVERS = `Invalid fhir_server. Please provide a valid fhir_server. Valid fhir_servers include ${FhirServers}.`;
+export const RESPONSE_BODY_IS_NOT_PATIENT_RESOURCE =
+  "Request body is not a Patient resource.";
+export const MISSING_API_QUERY_PARAM = "Missing use_case or fhir_server.";
+export const MISSING_PATIENT_IDENTIFIERS =
+  "No patient identifiers to parse from requestBody.";

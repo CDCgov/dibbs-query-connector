@@ -1,13 +1,11 @@
 import {
   FHIR_SERVERS,
   USE_CASES,
-  ValueSet,
+  DibbsValueSet,
   hyperUnluckyPatient,
 } from "@/app/constants";
-import {
-  getSavedQueryByName,
-  mapQueryRowsToValueSets,
-} from "@/app/database-service";
+import { getSavedQueryByName } from "@/app/database-service";
+import { unnestValueSetsFromQuery } from "@/app/utils";
 import { UseCaseQuery, UseCaseQueryResponse } from "@/app/query-service";
 import { Patient } from "fhir/r4";
 
@@ -20,7 +18,7 @@ type SetStateCallback<T> = React.Dispatch<React.SetStateAction<T>>;
  */
 export async function fetchUseCaseValueSets(queryName: string) {
   const queryResults = await getSavedQueryByName(queryName);
-  const valueSets = await mapQueryRowsToValueSets(queryResults);
+  const valueSets = unnestValueSetsFromQuery(queryResults);
 
   return valueSets;
 }
@@ -39,7 +37,7 @@ export async function fetchUseCaseValueSets(queryName: string) {
 export async function fetchQueryResponse(p: {
   patientForQuery: Patient | undefined;
   selectedQuery: USE_CASES;
-  queryValueSets: ValueSet[];
+  queryValueSets: DibbsValueSet[];
   fhirServer: FHIR_SERVERS;
   queryResponseStateCallback: SetStateCallback<UseCaseQueryResponse>;
   setIsLoading: (isLoading: boolean) => void;
@@ -69,7 +67,7 @@ export async function fetchQueryResponse(p: {
     const filteredValueSets = p.queryValueSets
       .filter((item) => item.includeValueSet)
       .map((fvs) => {
-        const conceptFilteredVS: ValueSet = {
+        const conceptFilteredVS: DibbsValueSet = {
           ...fvs,
           concepts: fvs.concepts.filter((c) => c.include),
         };

@@ -5,8 +5,9 @@
   width: 100%;
   margin: auto;
   margin-bottom: 5rem;
-  margin-top: 2rem;
+  margin-top: 3.5rem;
   padding: 0 !important;
+  flex: 1 1 auto;
 
   &__wide {
     @extend .main-container;
@@ -14,4 +15,11 @@
       $query-connector-wide-max-width - 2 * $query-connector-content-margins
     );
   }
+}
+
+.stepper-container {
+  margin: 2rem auto 0 auto !important;
+  width: calc(
+    $query-connector-wide-max-width - 2 * $query-connector-content-margins
+  );
 }
