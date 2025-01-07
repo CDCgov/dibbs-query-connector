@@ -298,8 +298,7 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
     if (constructedQuery && queryName) {
       // TODO: get this from the auth session
       const userName = "DIBBS";
-      console.log(constructedQuery);
-      // await saveCustomQuery(constructedQuery, queryName, userName);
+      await saveCustomQuery(constructedQuery, queryName, userName);
     }
   }
 
