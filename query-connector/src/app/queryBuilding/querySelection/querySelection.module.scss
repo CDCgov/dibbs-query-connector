@@ -25,19 +25,28 @@ $conditionColumnSpacing: 2fr 3fr 3fr;
 }
 
 .emptyStateQueryContainer {
-  height: 27.75rem;
+  padding: 2.5rem 5rem;
 }
 
 .emptyQueryTitle {
   width: fit-content;
-  margin: 0.5rem 0 1.5rem 0;
-  font-family: $sans-serif-font;
+  margin: 0;
+}
+
+.emptyQuerySubtitle {
+  width: fit-content;
+  margin: 0.5rem 0;
 }
 
 .emptyQueryIcon {
   width: 7.5rem;
   height: 7.5rem;
   color: $gray-20;
+}
+
+.emptyQueryExplainer {
+  padding-left: 1.5rem;
+  margin: 0 0 1.5rem 0;
 }
 
 .createQueryButton {

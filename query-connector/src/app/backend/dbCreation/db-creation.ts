@@ -345,6 +345,8 @@ async function insertSeedDbStructs(structType: string) {
 /**
  * Overall orchestration function that performs the scripted process of querying
  * the eRSD, extracting OIDs, then inserting valuesets into the DB.
+ * @returns a { success: true/false reload: true/false } status dictionary for
+ * whether the creation failed / needs a reload on the frontend for display
  */
 export async function createDibbsDB() {
   // Check if the DB already contains valuesets
@@ -358,20 +360,27 @@ export async function createDibbsDB() {
       console.error("Could not load eRSD, aborting DIBBs DB creation");
     }
 
-    // Only run default and custom insertions if we're making the dump
-    // file for dev
-    // if (process.env.NODE_ENV !== "production") {
-    await insertSeedDbStructs("valuesets");
-    await insertSeedDbStructs("concepts");
-    await insertSeedDbStructs("valueset_to_concept");
-    await insertSeedDbStructs("conditions");
-    await insertSeedDbStructs("condition_to_valueset");
-    await insertSeedDbStructs("query");
-    await insertSeedDbStructs("category");
-    await executeCategoryUpdates();
+    try {
+      // Only run default and custom insertions if we're making the dump
+      // file for dev
+      // if (process.env.NODE_ENV !== "production") {
+      await insertSeedDbStructs("valuesets");
+      await insertSeedDbStructs("concepts");
+      await insertSeedDbStructs("valueset_to_concept");
+      await insertSeedDbStructs("conditions");
+      await insertSeedDbStructs("condition_to_valueset");
+      await insertSeedDbStructs("query");
+      await insertSeedDbStructs("category");
+      await executeCategoryUpdates();
+      return { success: false, reload: false };
 
-    // }
+      // }
+    } catch {
+      console.error("DB reload failed");
+      return { succes: false, reload: false };
+    }
   } else {
     console.log("Database already has data; skipping DIBBs DB creation.");
+    return { success: true, reload: false };
   }
 }
