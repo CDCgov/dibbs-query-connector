@@ -7,12 +7,13 @@ import classNames from "classnames";
 import {
   CategoryNameToConditionOptionMap,
   ConditionIdToValueSetArrayMap,
+  ConditionOption,
   groupConditionDataByCategoryName,
 } from "../utils";
 import SearchField from "@/app/query/designSystem/searchField/SearchField";
 import { Icon } from "@trussworks/react-uswds";
 
-import { formatDiseaseDisplay } from "../utils";
+import { formatDiseaseDisplay, updateConditionStatus } from "../utils";
 import { SelectionTable } from "./SelectionTable";
 
 import Drawer from "@/app/query/designSystem/drawer/Drawer";
@@ -29,6 +30,9 @@ type ConditionSelectionProps = {
   queryName: string;
   selectedConditions: CategoryNameToConditionOptionMap;
   valueSetsByCondition: ConditionIdToValueSetArrayMap;
+  setSelectedConditions: React.Dispatch<
+    React.SetStateAction<CategoryNameToConditionOptionMap>
+  >;
 };
 
 /**
@@ -37,12 +41,14 @@ type ConditionSelectionProps = {
  * @param root0.queryName - current checkbox selection status
  * @param root0.selectedConditions - name of condition to display
  * @param root0.valueSetsByCondition - {conditionId: ValueSet[]} map
+ * @param root0.setSelectedConditions - stuff
  * @returns A component for display to render on the query building page
  */
 export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
   queryName,
   selectedConditions,
   valueSetsByCondition,
+  setSelectedConditions,
 }) => {
   const focusRef = useRef<HTMLInputElement | null>(null);
   const [activeCondition, setActiveCondition] = useState<string>("");
@@ -50,8 +56,9 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
   const [selectedValueSets, setSelectedValueSets] =
     useState<ConditionToConceptTypeToValueSetGroupingMap>({});
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [allConditions, setAllConditions] =
-    useState<CategoryNameToConditionOptionMap>({});
+  const [allConditions, setAllConditions] = useState<
+    CategoryNameToConditionOptionMap | undefined
+  >({});
   const [addedConditions, setAddedConditions] = useState<Set<string>>(
     new Set(),
   );
@@ -96,46 +103,70 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
   };
 
   // Dynamically render condition codes grouped by category
-  const toggleAddCondition = (id: string) => {
+  const toggleAddCondition = (
+    id: string,
+    condition: ConditionOption,
+    category: string,
+  ) => {
     setAddedConditions((prev) => {
       const updated = new Set(prev);
       if (updated.has(id)) {
         updated.delete(id);
       } else {
         updated.add(id);
+
+        setSelectedConditions((prevSelected) => {
+          const updatedSelected = { ...(prevSelected || {}) };
+          if (!updatedSelected[category]) {
+            updatedSelected[category] = {};
+          }
+          updatedSelected[category][id] = {
+            name: condition.name,
+            include: true,
+          };
+
+          // Update fetched conditions after adding the condition
+          updateConditionStatus(
+            allConditions,
+            updatedSelected,
+            setAllConditions,
+          );
+          return updatedSelected;
+        });
       }
+      // setSelectedValueSets(groupedValueSetByCondition);
+      showToastConfirmation({
+        body: `${condition.name} has been successfully added.`,
+      });
       return updated;
-    });
-    showToastConfirmation({
-      body: `Condition has been successfully added.`,
     });
   };
 
-  const conditionUpdate = Object.entries(allConditions).map(
-    ([category, conditions]) => (
-      <div key={category}>
-        <div className={styles.conditionDrawerHeader}>{category}</div>
-        <div>
-          {Object.entries(conditions).map(([id, condition]) => (
-            <div key={id} className={styles.conditionItem}>
-              <span>{formatDiseaseDisplay(condition.name)}</span>
-              {addedConditions.has(id) ? (
-                <span className={styles.addedButton}>Added</span>
-              ) : (
-                <span
-                  className={styles.addButton}
-                  role="button"
-                  onClick={() => toggleAddCondition(id)}
-                >
-                  ADD
-                </span>
-              )}
-            </div>
-          ))}
+  const conditionUpdate = allConditions
+    ? Object.entries(allConditions).map(([category, conditions]) => (
+        <div key={category}>
+          <div className={styles.conditionDrawerHeader}>{category}</div>
+          <div>
+            {Object.entries(conditions).map(([id, condition]) => (
+              <div key={id} className={styles.conditionItem}>
+                <span>{formatDiseaseDisplay(condition.name)}</span>
+                {addedConditions.has(id) ? (
+                  <span className={styles.addedButton}>Added</span>
+                ) : (
+                  <span
+                    className={styles.addButton}
+                    role="button"
+                    onClick={() => toggleAddCondition(id, condition, category)}
+                  >
+                    ADD
+                  </span>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
-    ),
-  );
+      ))
+    : undefined;
 
   // Prepare selected conditions for display in the left pane
   const includedConditionsWithIds = Object.entries(selectedConditions)

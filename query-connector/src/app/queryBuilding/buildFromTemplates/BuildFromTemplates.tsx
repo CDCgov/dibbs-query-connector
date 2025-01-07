@@ -15,6 +15,7 @@ import {
   EMPTY_QUERY_SELECTION,
   generateConditionNameToIdAndCategoryMap,
   groupConditionDataByCategoryName,
+  updateConditionStatus,
 } from "../utils";
 import { ConditionSelection } from "../components/ConditionSelection";
 import { ValueSetSelection } from "../components/ValueSetSelection";
@@ -224,23 +225,11 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
   function updateFetchedConditionIncludeStatus(
     selectedConditions: CategoryNameToConditionOptionMap,
   ) {
-    const prevFetch = structuredClone(fetchedConditions);
-    if (prevFetch) {
-      Object.entries(selectedConditions).map(
-        ([category, conditionsByCategory]) => {
-          Object.entries(conditionsByCategory).flatMap(
-            ([conditionId, conditionObj]) => {
-              const prevValues = prevFetch[category][conditionId];
-              prevFetch[category][conditionId] = {
-                name: prevValues.name,
-                include: conditionObj.include,
-              };
-              return setFetchedConditions(prevFetch);
-            },
-          );
-        },
-      );
-    }
+    updateConditionStatus(
+      fetchedConditions,
+      selectedConditions,
+      setFetchedConditions,
+    );
   }
 
   async function handleCreateQueryClick(
@@ -377,6 +366,7 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
             <ValueSetSelection
               queryName={queryName}
               selectedConditions={selectedConditions ?? {}}
+              setSelectedConditions={setSelectedConditions}
               valueSetsByCondition={conditionValueSets ?? {}}
             />
           )}
