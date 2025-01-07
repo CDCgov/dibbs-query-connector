@@ -195,9 +195,9 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
 
         const updatedConditions: CategoryNameToConditionOptionMap = {};
         queryConditions &&
-          queryConditions.forEach((conditionName) => {
-            const { category, conditionId } =
-              conditionNameToIdMap[conditionName];
+          queryConditions.forEach((conditionId) => {
+            const { category, conditionName } =
+              conditionNameToIdMap[conditionId];
 
             updatedConditions[category] = {
               ...updatedConditions[category],

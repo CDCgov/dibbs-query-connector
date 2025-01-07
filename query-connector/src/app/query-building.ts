@@ -42,6 +42,6 @@ export function generateQueryInsertionSql(input: QueryInput) {
 export interface CustomUserQuery {
   query_id: string;
   query_name: string;
-  conditions_list?: string;
+  conditions_list?: string[];
   valuesets: DibbsValueSet[];
 }

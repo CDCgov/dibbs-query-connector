@@ -4,6 +4,7 @@ import React, {
   useRef,
   Dispatch,
   SetStateAction,
+  useEffect,
 } from "react";
 import { Button, Icon } from "@trussworks/react-uswds";
 import Table from "@/app/query/designSystem/table/Table";
@@ -24,6 +25,8 @@ import {
 import LoadingView from "@/app/query/components/LoadingView";
 import { DataContext } from "@/app/DataProvider";
 import classNames from "classnames";
+import { getConditionsData } from "@/app/database-service";
+import { ConditionIdToNameMap } from "../utils";
 
 interface UserQueriesDisplayProps {
   queries: CustomUserQuery[];
@@ -51,6 +54,8 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
   const context = useContext(DataContext);
   const [queries, setQueries] = useState<CustomUserQuery[]>(initialQueries);
   const [loading, setLoading] = useState(false);
+  const [fetchedConditions, setFetchedConditions] =
+    useState<ConditionIdToNameMap>();
   const modalRef = useRef<ModalRef>(null);
   const handleEdit = (queryName: string, queryId: string) => {
     setSelectedQuery({
@@ -59,6 +64,24 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
     });
     setBuildStep("condition");
   };
+
+  useEffect(() => {
+    let isSubscribed = true;
+
+    async function fetchConditionsAndUpdateState() {
+      const { conditionIdToNameMap } = await getConditionsData();
+
+      if (isSubscribed) {
+        setFetchedConditions(conditionIdToNameMap);
+      }
+    }
+
+    fetchConditionsAndUpdateState().catch(console.error);
+
+    return () => {
+      isSubscribed = false;
+    };
+  }, []);
 
   return (
     <div>
@@ -98,71 +121,81 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
             </tr>
           </thead>
           <tbody>
-            {queries.map((query, index) => (
-              <tr
-                key={index}
-                className={classNames(styles.myQueriesRow, "tableRowWithHover")}
-              >
-                <td title={query.query_name}>{query.query_name}</td>
-                <td title={query.conditions_list}>{query.conditions_list}</td>
-                <td>
-                  <div className="table-cell-buttons">
-                    <Button
-                      type="button"
-                      className="usa-button--unstyled text-bold text-no-underline"
-                      onClick={() =>
-                        handleEdit(query.query_name, query.query_id)
-                      }
-                    >
-                      <span className="icon-text padding-right-4 display-flex flex-align-center">
-                        <Icon.Edit
-                          className="height-3 width-3"
-                          aria-label="Pencil icon indicating edit ability"
-                        />
-                        <span id={query.query_id} className="padding-left-05">
-                          Edit
+            {fetchedConditions &&
+              queries.map((query, index) => (
+                <tr
+                  key={index}
+                  className={classNames(
+                    styles.myQueriesRow,
+                    "tableRowWithHover",
+                  )}
+                >
+                  <td title={query.query_name}>{query.query_name}</td>
+                  <td title={query.conditions_list?.join(",")}>
+                    {query.conditions_list
+                      ?.map((id) => {
+                        return fetchedConditions[id];
+                      })
+                      .join(", ")}
+                  </td>
+                  <td>
+                    <div className="table-cell-buttons">
+                      <Button
+                        type="button"
+                        className="usa-button--unstyled text-bold text-no-underline"
+                        onClick={() =>
+                          handleEdit(query.query_name, query.query_id)
+                        }
+                      >
+                        <span className="icon-text padding-right-4 display-flex flex-align-center">
+                          <Icon.Edit
+                            className="height-3 width-3"
+                            aria-label="Pencil icon indicating edit ability"
+                          />
+                          <span id={query.query_id} className="padding-left-05">
+                            Edit
+                          </span>
                         </span>
-                      </span>
-                    </Button>
-                    <Button
-                      type="button"
-                      className="usa-button--unstyled text-bold text-no-underline"
-                      onClick={() =>
-                        confirmDelete(
-                          query.query_name,
-                          query.query_id,
-                          setSelectedQuery,
-                          modalRef,
-                        )
-                      }
-                    >
-                      <span className="icon-text padding-right-4 display-flex flex-align-center">
-                        <Icon.Delete
-                          className="height-3 width-3"
-                          aria-label="trashcan icon indicating deletion"
-                        />
-                        <span className="padding-left-05">Delete</span>
-                      </span>
-                    </Button>
-                    <Button
-                      type="button"
-                      className="usa-button--unstyled text-bold text-no-underline"
-                      onClick={() =>
-                        handleCopy(query.query_name, query.query_id)
-                      }
-                    >
-                      <span className="icon-text padding-right-1 display-flex flex-align-center">
-                        <Icon.ContentCopy
-                          className="height-3 width-3"
-                          aria-label="Stacked paper icon indidcating copy"
-                        />
-                        <span className="padding-left-05">Copy ID</span>
-                      </span>
-                    </Button>
-                  </div>
-                </td>
-              </tr>
-            ))}
+                      </Button>
+                      <Button
+                        type="button"
+                        className="usa-button--unstyled text-bold text-no-underline"
+                        onClick={() =>
+                          confirmDelete(
+                            query.query_name,
+                            query.query_id,
+                            setSelectedQuery,
+                            modalRef,
+                          )
+                        }
+                      >
+                        <span className="icon-text padding-right-4 display-flex flex-align-center">
+                          <Icon.Delete
+                            className="height-3 width-3"
+                            aria-label="trashcan icon indicating deletion"
+                          />
+                          <span className="padding-left-05">Delete</span>
+                        </span>
+                      </Button>
+                      <Button
+                        type="button"
+                        className="usa-button--unstyled text-bold text-no-underline"
+                        onClick={() =>
+                          handleCopy(query.query_name, query.query_id)
+                        }
+                      >
+                        <span className="icon-text padding-right-1 display-flex flex-align-center">
+                          <Icon.ContentCopy
+                            className="height-3 width-3"
+                            aria-label="Stacked paper icon indidcating copy"
+                          />
+                          <span className="padding-left-05">Copy ID</span>
+                        </span>
+                      </Button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
           </tbody>
         </Table>
       </div>

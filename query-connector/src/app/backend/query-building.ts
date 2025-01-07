@@ -22,6 +22,7 @@ export async function getSavedQueryDetails(queryId: string) {
   try {
     const result = await dbClient.query(queryString, [id]);
     if (result.rows.length > 0) {
+      console.log(result.rows);
       return result.rows as unknown as QueryDetailsResult[];
     }
     console.error("No results found for query:", id);
