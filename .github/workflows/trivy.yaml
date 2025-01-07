@@ -1,0 +1,33 @@
+name: Trivy Security Scan
+
+on:
+  pull_request:
+    branches:
+      - "**"
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  trivy:
+    name: trivy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: "fs"
+          scan-ref: "terraform/modules/"
+          scanners: "vuln,secret,config"
+          ignore-unfixed: false
+          exit-code: "1"
+          format: "table"
+          severity: "CRITICAL,HIGH"
