@@ -65,12 +65,13 @@ export const ConditionColumnDisplay: React.FC<ConditionColumnDisplayProps> = ({
 
   async function toggleFetchedConditionSelection(
     category: string,
-    conditionId: string,
+    conditionName: string,
   ) {
-    const prevSelected = selectedConditions?.[category]?.[conditionId]?.include;
+    const prevSelected =
+      selectedConditions?.[category]?.[conditionName]?.include;
     const prevFetch = structuredClone(fetchedConditions);
-    const prevValues = prevFetch[category][conditionId];
-    prevFetch[category][conditionId] = {
+    const prevValues = prevFetch[category][conditionName];
+    prevFetch[category][conditionName] = {
       name: prevValues.name,
       include: !prevValues.include,
     };
@@ -79,18 +80,18 @@ export const ConditionColumnDisplay: React.FC<ConditionColumnDisplayProps> = ({
       // prevSelected being undefined means we've never added anything to selectedConditions,
       // so we shouldn't remove anything
       prevSelected == undefined ? false : true;
-    updateSelectedConditions(shouldRemove, category, conditionId, prevFetch);
+    updateSelectedConditions(shouldRemove, category, conditionName, prevFetch);
     updateFetched(selectedConditions);
   }
 
   const updateSelectedConditions = (
     shouldRemove: boolean,
     category: string,
-    conditionId: string,
+    conditionName: string,
     prevFetch: CategoryNameToConditionOptionMap,
   ) => {
     if (shouldRemove) {
-      delete selectedConditions[category][conditionId];
+      delete selectedConditions[category][conditionName];
       // if there are no more entries for a given category, remove the category
       if (Object.values(selectedConditions[category]).length == 0) {
         delete selectedConditions[category];
@@ -105,7 +106,7 @@ export const ConditionColumnDisplay: React.FC<ConditionColumnDisplayProps> = ({
           ...prevState,
           [category]: {
             ...prevState?.[category],
-            [conditionId]: prevFetch[category]?.[conditionId],
+            [conditionName]: prevFetch[category]?.[conditionName],
           },
         };
       });
@@ -135,14 +136,14 @@ export const ConditionColumnDisplay: React.FC<ConditionColumnDisplayProps> = ({
               key={`col-${i}`}
             >
               {colsToDisplay.map(([category, arr]) => {
-                const handleConditionSelection = (conditionId: string) => {
-                  toggleFetchedConditionSelection(category, conditionId);
+                const handleConditionSelection = (conditionName: string) => {
+                  toggleFetchedConditionSelection(category, conditionName);
                 };
                 return (
                   <div key={category}>
                     <h3 className={styles.categoryHeading}>{category}</h3>
                     {Object.entries(arr).map(
-                      ([conditionId, conditionNameAndInclude]) => {
+                      ([conditionId, conditionOption]) => {
                         return (
                           <ConditionOption
                             checked={
@@ -151,9 +152,9 @@ export const ConditionColumnDisplay: React.FC<ConditionColumnDisplayProps> = ({
                                 selectedConditions[category],
                               ).includes(conditionId)
                             }
-                            key={conditionId}
+                            key={conditionOption.name}
                             conditionId={conditionId}
-                            conditionName={conditionNameAndInclude.name}
+                            conditionName={conditionOption.name}
                             handleConditionSelection={handleConditionSelection}
                           />
                         );

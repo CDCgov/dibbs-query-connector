@@ -31,31 +31,45 @@ export async function getSavedQueryDetails(queryId: string) {
 }
 
 export async function saveCustomQuery(
-  queryData: NestedQuery,
+  queryInput: NestedQuery,
   queryName: string,
+  author: string,
 ) {
   const queryString = `
-    select q.query_name, q.id, q.query_data, q.conditions_list
-        from query q 
-    where q.id = $1;
+    insert into query
+      values($1, $2, $3, $4)
+      returning id, query_name
     `;
-  const resultToSave = formatQueryDataForDatabase(queryData);
+  const { queryData, conditionIds } = formatQueryDataForDatabase(queryInput);
+  try {
+    const dataToWrite = [queryName, queryData, conditionIds, author];
+    const result = await dbClient.query(queryString, dataToWrite);
+    if (result.rows.length > 0) {
+      return result.rows as unknown as QueryDetailsResult[];
+    }
+    console.error("Query save failed:", dataToWrite);
+    return [];
+  } catch (error) {
+    console.error("Error saving new query", error);
+  }
 }
 
 function formatQueryDataForDatabase(frontendInput: NestedQuery) {
-  const result: Record<string, { [valueSetId: string]: DibbsValueSet }> = {};
+  const queryData: Record<string, { [valueSetId: string]: DibbsValueSet }> = {};
+  const conditionIds: string[] = [];
 
-  Object.entries(frontendInput).forEach(([queryId, data]) => {
-    result[queryId] = {};
+  Object.entries(frontendInput).forEach(([conditionId, data]) => {
+    queryData[conditionId] = {};
+    conditionIds.push(conditionId);
     Object.values(data).forEach((vsNameToVsGroupingMap) => {
       Object.values(vsNameToVsGroupingMap).forEach((vsGrouping) => {
         const valueSetsToSave = vsGrouping.items;
         valueSetsToSave.forEach((dibbsVs) => {
-          result[queryId][dibbsVs.valueSetId] = dibbsVs;
+          queryData[conditionId][dibbsVs.valueSetId] = dibbsVs;
         });
       });
     });
   });
 
-  return result;
+  return { queryData, conditionIds };
 }
