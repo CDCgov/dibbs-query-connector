@@ -272,6 +272,7 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
         queriesContext?.setData(queries);
 
         showToastConfirmation({ body: `${queryName} successfully saved` });
+        goBack();
         resetQueryState();
       } catch (e) {
         showToastConfirmation({
