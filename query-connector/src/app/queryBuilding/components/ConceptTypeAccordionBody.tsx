@@ -1,4 +1,4 @@
-import styles from "../buildFromTemplates/buildfromTemplate.module.scss";
+import styles from "../conditionTemplateSelection/conditionTemplateSelection.module.scss";
 import { formatDiseaseDisplay } from "../utils";
 import { tallyConceptsForSingleValueSetGroup } from "../utils";
 import React, { ChangeEvent, useState } from "react";
@@ -12,7 +12,7 @@ import {
 import { DibbsValueSet } from "@/app/constants";
 import Checkbox from "@/app/query/designSystem/checkbox/Checkbox";
 
-type SelectionViewAccordionBodyProps = {
+type ConceptTypeAccordionBodyProps = {
   id?: string;
   activeVsGroupings: { [vsNameAuthorSystem: string]: VsGrouping };
   handleVsNameLevelUpdate: (
@@ -28,7 +28,7 @@ type SelectionViewAccordionBodyProps = {
  * takes a VsName and generatesa ValueSet level update
  * @returns An accordion body component
  */
-const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
+const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
   activeVsGroupings,
   handleVsNameLevelUpdate,
 }) => {
@@ -202,4 +202,4 @@ const checkboxLabel = (name: string, author: string, system: string) => {
   );
 };
 
-export default SelectionViewAccordionBody;
+export default ConceptTypeAccordionBody;

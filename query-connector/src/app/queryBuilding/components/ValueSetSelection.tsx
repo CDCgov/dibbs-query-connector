@@ -1,6 +1,6 @@
 "use client";
 
-import styles from "../buildFromTemplates/buildfromTemplate.module.scss";
+import styles from "../conditionTemplateSelection/conditionTemplateSelection.module.scss";
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import classNames from "classnames";
 
@@ -18,7 +18,7 @@ import {
   NestedQuery,
   updateConditionStatus,
 } from "../utils";
-import { SelectionTable } from "./SelectionTable";
+import { ConceptTypeSelectionTable } from "./ConceptTypeSelectionTable";
 
 import Drawer from "@/app/query/designSystem/drawer/Drawer";
 import {
@@ -30,11 +30,11 @@ import { DibbsConceptType, DibbsValueSet } from "@/app/constants";
 import { showToastConfirmation } from "@/app/query/designSystem/toast/Toast";
 
 type ConditionSelectionProps = {
-  queryName: string;
   selectedConditions: CategoryNameToConditionOptionMap;
   valueSetsByCondition: ConditionIdToValueSetArrayMap;
   constructedQuery: NestedQuery;
-  setConstructedQuery: Dispatch<SetStateAction<NestedQuery>>;
+  handleAddCondition: (conditionId: string) => void;
+  fetchedConditions: CategoryNameToConditionOptionMap | undefined;
   handleSelectedValueSetUpdate: (
     conditionId: string,
   ) => (
@@ -42,9 +42,6 @@ type ConditionSelectionProps = {
   ) => (
     vsName: string,
   ) => (vsGrouping: VsGrouping) => (dibbsValueSets: DibbsValueSet[]) => void;
-  setSelectedConditions: React.Dispatch<
-    React.SetStateAction<CategoryNameToConditionOptionMap | undefined>
-  >;
 };
 
 /**
@@ -57,129 +54,38 @@ type ConditionSelectionProps = {
  * @returns A component for display to render on the query building page
  */
 export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
-  queryName,
   selectedConditions,
   valueSetsByCondition,
-  constructedQuery,
-  setConstructedQuery,
   handleSelectedValueSetUpdate,
-  setSelectedConditions,
+  constructedQuery,
+  handleAddCondition,
+  fetchedConditions,
 }) => {
   const focusRef = useRef<HTMLInputElement | null>(null);
   const [activeCondition, setActiveCondition] = useState<string>("");
   const [_searchFilter, setSearchFilter] = useState<string>();
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [allConditions, setAllConditions] = useState<
-    CategoryNameToConditionOptionMap | undefined
-  >({});
-  const [addedConditions, setAddedConditions] = useState<Set<string>>(
-    new Set(),
-  );
 
-  useEffect(() => {
-    if (queryName == "" || queryName == undefined) {
-      focusRef?.current?.focus();
-    }
-
-    const first = Object.keys(selectedConditions)[0];
-    const id = Object.keys(selectedConditions[first])[0];
-    setActiveCondition(id);
-
-    // Fetch all conditions for rendering in the drawer
-    async function fetchConditions() {
-      try {
-        const { categoryToConditionArrayMap } = await getConditionsData();
-        setAllConditions(
-          groupConditionDataByCategoryName(categoryToConditionArrayMap),
-        );
-      } catch (error) {
-        console.error("Error fetching conditions:", error);
-      }
-    }
-
-    // Group value sets by condition ID for use in the selection table
-    const groupedValueSetByCondition =
-      groupValueSetGroupingByConditionId(valueSetsByCondition);
-
-    fetchConditions();
-    return () => {
-      setConstructedQuery((prevState) => {
-        if (Object.keys(prevState).length === 0) {
-          return groupedValueSetByCondition;
-        }
-        return prevState;
-      });
-    };
-  }, [queryName, selectedConditions, valueSetsByCondition]);
-
-  const handleAddCondition = () => {
-    setIsDrawerOpen(true);
+  const handleDrawer = (open: boolean) => {
+    setIsDrawerOpen(open);
   };
 
-  const handleCloseDrawer = () => {
-    setIsDrawerOpen(false);
-  };
-
-  // Dynamically render condition codes grouped by category
-  const toggleAddCondition = (
-    id: string,
-    condition: ConditionOption,
-    category: string,
-  ) => {
-    setAddedConditions((prev) => {
-      const updated = new Set(prev);
-      if (updated.has(id)) {
-        updated.delete(id);
-      } else {
-        updated.add(id);
-
-        setSelectedConditions((prevSelected) => {
-          const updatedSelected = { ...(prevSelected || {}) };
-          if (!updatedSelected[category]) {
-            updatedSelected[category] = {};
-          }
-          updatedSelected[category][id] = {
-            name: condition.name,
-            include: true,
-          };
-
-          // Update fetched conditions after adding the condition
-          updateConditionStatus(
-            allConditions,
-            updatedSelected,
-            setAllConditions,
-          );
-          return updatedSelected;
-        });
-      }
-      // setSelectedValueSets(groupedValueSetByCondition);
-      showToastConfirmation({
-        body: `${condition.name} has been successfully added.`,
-      });
-      return updated;
-    });
-  };
-
-  const conditionUpdate = allConditions
-    ? Object.entries(allConditions).map(([category, conditions]) => (
+  const conditionUpdate = fetchedConditions
+    ? Object.entries(fetchedConditions).map(([category, conditions]) => (
         <div key={category}>
           <div className={styles.conditionDrawerHeader}>{category}</div>
           <div>
             {Object.entries(conditions).map(([id, condition]) => (
               <div key={id} className={styles.conditionItem}>
                 <span>{formatDiseaseDisplay(condition.name)}</span>
-                {addedConditions.has(id) ? (
-                  <span className={styles.addedButton}>Added</span>
-                ) : (
-                  <span
-                    className={styles.addButton}
-                    role="button"
-                    onClick={() => toggleAddCondition(id, condition, category)}
-                  >
-                    ADD
-                  </span>
-                )}
+                <span
+                  className={styles.addButton}
+                  role="button"
+                  onClick={() => handleAddCondition(id)}
+                >
+                  ADD
+                </span>
               </div>
             ))}
           </div>
@@ -215,7 +121,7 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
               <div
                 className={styles.addCondition}
                 role="button"
-                onClick={handleAddCondition}
+                onClick={() => handleDrawer(true)}
                 tabIndex={0}
               >
                 <Icon.Add
@@ -260,7 +166,7 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
           </div>
           <div>
             {constructedQuery && activeCondition && (
-              <SelectionTable
+              <ConceptTypeSelectionTable
                 vsTypeLevelOptions={constructedQuery[activeCondition]}
                 handleVsTypeLevelUpdate={handleSelectedValueSetUpdate(
                   activeCondition,
@@ -277,7 +183,7 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
         toRender={<div>{conditionUpdate}</div>}
         toastMessage="Condition has been successfully added."
         isOpen={isDrawerOpen}
-        onClose={handleCloseDrawer}
+        onClose={() => handleDrawer(false)}
         onSave={() => {}} //TODO: Add save handler logic
         hasChanges={false}
       />

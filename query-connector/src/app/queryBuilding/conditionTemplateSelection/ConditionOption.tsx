@@ -1,11 +1,11 @@
 import Checkbox from "../../query/designSystem/checkbox/Checkbox";
 import { formatDiseaseDisplay } from "../utils";
-import styles from "./buildfromTemplate.module.scss";
+import styles from "./conditionTemplateSelection.module.scss";
 
 type ConditionOptionProps = {
   conditionId: string;
   conditionName: string;
-  handleConditionSelection: (conditionId: string) => void;
+  handleConditionSelection: (conditionId: string, checked: boolean) => void;
   checked: boolean;
 };
 
@@ -29,11 +29,11 @@ const ConditionOption: React.FC<ConditionOptionProps> = ({
     <div className={styles.categoryOption}>
       <Checkbox
         onChange={() => {
-          handleConditionSelection(conditionId);
+          handleConditionSelection(conditionId, checked);
         }}
         id={conditionName}
         label={formatDiseaseDisplay(conditionName)}
-        checked={checked || false}
+        checked={checked}
       />
     </div>
   );

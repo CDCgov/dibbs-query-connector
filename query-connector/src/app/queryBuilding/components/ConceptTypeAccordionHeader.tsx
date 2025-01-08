@@ -1,4 +1,4 @@
-import styles from "../buildFromTemplates/buildfromTemplate.module.scss";
+import styles from "../conditionTemplateSelection/conditionTemplateSelection.module.scss";
 import { Icon } from "@trussworks/react-uswds";
 import { DibbsConceptType, DibbsValueSet } from "@/app/constants";
 import { VsGrouping } from "@/app/utils/valueSetTranslation";
@@ -6,7 +6,7 @@ import { tallyConceptsForValueSetGroupArray } from "../utils";
 import { ChangeEvent } from "react";
 import Checkbox from "@/app/query/designSystem/checkbox/Checkbox";
 
-type SelectionViewAccordionBodyProps = {
+type ConceptTypeAccordionBodyProps = {
   activeValueSetType: DibbsConceptType;
   activeVsGroupings: { [vsNameAuthorSystem: string]: VsGrouping };
   expanded: boolean;
@@ -25,9 +25,7 @@ type SelectionViewAccordionBodyProps = {
  * takes a VsName and generatesa ValueSet level update
  * @returns An accordion body component
  */
-const SelectionViewAccordionHeader: React.FC<
-  SelectionViewAccordionBodyProps
-> = ({
+const ConceptTypeAccordionHeader: React.FC<ConceptTypeAccordionBodyProps> = ({
   activeValueSetType,
   activeVsGroupings,
   expanded,
@@ -91,4 +89,4 @@ const SelectionViewAccordionHeader: React.FC<
   );
 };
 
-export default SelectionViewAccordionHeader;
+export default ConceptTypeAccordionHeader;

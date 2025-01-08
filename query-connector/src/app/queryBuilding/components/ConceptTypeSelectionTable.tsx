@@ -1,17 +1,17 @@
 "use client";
 import { useState } from "react";
-import styles from "../buildFromTemplates/buildfromTemplate.module.scss";
+import styles from "../conditionTemplateSelection/conditionTemplateSelection.module.scss";
 import { HeadingLevel } from "@trussworks/react-uswds";
-import SelectionViewAccordionBody from "./SelectionViewAccordionBody";
+import ConceptTypeAccordionBody from "./ConceptTypeAccordionBody";
 import { DibbsConceptType, DibbsValueSet } from "@/app/constants";
 import {
   ConceptTypeToVsNameToVsGroupingMap,
   VsGrouping,
 } from "@/app/utils/valueSetTranslation";
-import SelectionViewAccordionHeader from "./SelectionViewAccordionHeader";
+import ConceptTypeAccordionHeader from "./ConceptTypeAccordionHeader";
 import MultiAccordion from "@/app/query/designSystem/MultiAccordion";
 
-type SelectionTableProps = {
+type ConceptTypeSelectionTableProps = {
   vsTypeLevelOptions: ConceptTypeToVsNameToVsGroupingMap;
   handleVsTypeLevelUpdate: (
     vsType: DibbsConceptType,
@@ -28,17 +28,16 @@ type SelectionTableProps = {
  * takes a VsType and generates a VsName level setter function
  * @returns A component for display to render on the query building page
  */
-export const SelectionTable: React.FC<SelectionTableProps> = ({
-  vsTypeLevelOptions,
-  handleVsTypeLevelUpdate,
-}) => {
+export const ConceptTypeSelectionTable: React.FC<
+  ConceptTypeSelectionTableProps
+> = ({ vsTypeLevelOptions, handleVsTypeLevelUpdate }) => {
   const [expanded, setExpandedGroup] = useState<string>("");
 
   const generateTypeLevelAccordionItems = (vsType: DibbsConceptType) => {
     const handleVsNameLevelUpdate = handleVsTypeLevelUpdate(vsType);
 
     const title = (
-      <SelectionViewAccordionHeader
+      <ConceptTypeAccordionHeader
         activeValueSetType={vsType}
         activeVsGroupings={vsTypeLevelOptions[vsType]}
         expanded={expanded === vsType}
@@ -47,7 +46,7 @@ export const SelectionTable: React.FC<SelectionTableProps> = ({
     );
 
     const content = (
-      <SelectionViewAccordionBody
+      <ConceptTypeAccordionBody
         activeVsGroupings={vsTypeLevelOptions[vsType]}
         handleVsNameLevelUpdate={handleVsNameLevelUpdate}
       />

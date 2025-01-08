@@ -1,23 +1,21 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import {
   CategoryNameToConditionOptionMap,
+  NestedQuery,
   filterSearchByCategoryAndCondition,
 } from "../utils";
-import styles from "./buildfromTemplate.module.scss";
+import styles from "./conditionTemplateSelection.module.scss";
 import ConditionOption from "./ConditionOption";
 import classNames from "classnames";
-import { FormError } from "./BuildFromTemplates";
+import { FormError } from "./ConditionTemplateSelection";
 
 type ConditionColumnDisplayProps = {
   fetchedConditions: CategoryNameToConditionOptionMap;
   searchFilter: string | undefined;
-  selectedConditions: CategoryNameToConditionOptionMap;
-  setSelectedConditions: Dispatch<
-    SetStateAction<CategoryNameToConditionOptionMap | undefined>
-  >;
+  constructedQuery: NestedQuery;
+  handleConditionUpdate: (conditionId: string, checked: boolean) => void;
   setFormError: Dispatch<SetStateAction<FormError>>;
   formError: FormError;
-  updateFetched: (selectedConditions: CategoryNameToConditionOptionMap) => void;
 };
 /**
  * Column display component for the query building page
@@ -27,7 +25,7 @@ type ConditionColumnDisplayProps = {
  * components against
  * @param root0.selectedConditions - conditions the user has marked as included in
  * their query
- * @param root0.setSelectedConditions - state function that updates the subset of
+ * @param root0.handleAddCondition - state function that updates the subset of
  * fetched conditions to be included in the query
  * @param root0.setFormError - state function that updates the subset of
  * fetched conditions to be included in the query
@@ -41,11 +39,10 @@ type ConditionColumnDisplayProps = {
 export const ConditionColumnDisplay: React.FC<ConditionColumnDisplayProps> = ({
   fetchedConditions,
   searchFilter,
-  selectedConditions,
-  setSelectedConditions,
+  constructedQuery,
+  handleConditionUpdate,
   formError,
   setFormError,
-  updateFetched,
 }) => {
   const [conditionsToDisplay, setConditionsToDisplay] =
     useState(fetchedConditions);
@@ -63,55 +60,14 @@ export const ConditionColumnDisplay: React.FC<ConditionColumnDisplayProps> = ({
     }
   }, [searchFilter]);
 
-  async function toggleFetchedConditionSelection(
-    category: string,
-    conditionName: string,
-  ) {
-    const prevSelected =
-      selectedConditions?.[category]?.[conditionName]?.include;
-    const prevFetch = structuredClone(fetchedConditions);
-    const prevValues = prevFetch[category][conditionName];
-    prevFetch[category][conditionName] = {
-      name: prevValues.name,
-      include: !prevValues.include,
-    };
-
-    const shouldRemove =
-      // prevSelected being undefined means we've never added anything to selectedConditions,
-      // so we shouldn't remove anything
-      prevSelected == undefined ? false : true;
-    updateSelectedConditions(shouldRemove, category, conditionName, prevFetch);
-    updateFetched(selectedConditions);
-  }
-
-  const updateSelectedConditions = (
-    shouldRemove: boolean,
-    category: string,
-    conditionName: string,
-    prevFetch: CategoryNameToConditionOptionMap,
-  ) => {
-    if (shouldRemove) {
-      delete selectedConditions[category][conditionName];
-      // if there are no more entries for a given category, remove the category
-      if (Object.values(selectedConditions[category]).length == 0) {
-        delete selectedConditions[category];
-      }
-      // if there are no entries at all, set an error (to disable the button)
-      if (Object.values(selectedConditions).length < 1) {
-        setFormError({ ...formError, ...{ selectedConditions: true } });
-      }
-    } else {
-      setSelectedConditions((prevState) => {
-        return {
-          ...prevState,
-          [category]: {
-            ...prevState?.[category],
-            [conditionName]: prevFetch[category]?.[conditionName],
-          },
-        };
-      });
+  function updateConditionSelection(conditionId: string, remove: boolean) {
+    const selectedConditions = Object.keys(constructedQuery);
+    // if there are no entries at all, set an error (to disable the button)
+    if (selectedConditions.length === 1 && remove) {
+      setFormError({ ...formError, ...{ selectedConditions: true } });
     }
-  };
+    handleConditionUpdate(conditionId, remove);
+  }
 
   const columnOneEntries = Object.entries(conditionsToDisplay).filter(
     (_, i) => i % 2 === 0,
@@ -136,9 +92,6 @@ export const ConditionColumnDisplay: React.FC<ConditionColumnDisplayProps> = ({
               key={`col-${i}`}
             >
               {colsToDisplay.map(([category, arr]) => {
-                const handleConditionSelection = (conditionName: string) => {
-                  toggleFetchedConditionSelection(category, conditionName);
-                };
                 return (
                   <div key={category}>
                     <h3 className={styles.categoryHeading}>{category}</h3>
@@ -146,16 +99,13 @@ export const ConditionColumnDisplay: React.FC<ConditionColumnDisplayProps> = ({
                       ([conditionId, conditionOption]) => {
                         return (
                           <ConditionOption
-                            checked={
-                              selectedConditions[category] &&
-                              Object.keys(
-                                selectedConditions[category],
-                              ).includes(conditionId)
-                            }
+                            checked={Object.keys(constructedQuery).includes(
+                              conditionId,
+                            )}
                             key={conditionOption.name}
                             conditionId={conditionId}
                             conditionName={conditionOption.name}
-                            handleConditionSelection={handleConditionSelection}
+                            handleConditionSelection={updateConditionSelection}
                           />
                         );
                       },
