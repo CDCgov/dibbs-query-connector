@@ -287,7 +287,7 @@ const FhirServers: React.FC = () => {
                 key={fhirServer.id}
                 className={classNames(
                   styles.fhirServersRow,
-                  styles.tableRowHover
+                  styles.tableRowHover,
                 )}
               >
                 <td>{fhirServer.name}</td>
