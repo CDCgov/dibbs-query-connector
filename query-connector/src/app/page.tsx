@@ -33,7 +33,7 @@ export default function LandingPage() {
           </div>
           <Image
             alt="Graphic illustrating what TEFCA is"
-            src="/query-connector/tefca-graphic.svg"
+            src="/tefca-graphic.svg"
             width={250}
             height={300}
             priority

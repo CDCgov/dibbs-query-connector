@@ -65,7 +65,7 @@ git checkout $BRANCH_NAME
 docker-compose build --no-cache && docker-compose up -d
 
 # Wait for TEFCA Viewer to be available
-URL="http://localhost:3000/query-connector"
+URL="http://localhost:3000/"
 while ! curl -s -o /dev/null -w "%{http_code}" "$URL" | grep -q "200"; do
     echo "Waiting for $URL to be available..."
     sleep 5
@@ -73,7 +73,7 @@ done
 
 
 # Open in default browser
-open http://localhost:3000/query-connector
+open http://localhost:3000/
 
 # Prompt to end review session
 read -p "Press enter to end review"

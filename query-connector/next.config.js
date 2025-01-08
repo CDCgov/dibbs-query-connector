@@ -8,16 +8,9 @@ const nextConfig = {
     ],
   },
   transpilePackages: ["yaml"],
-  async rewrites() {
-    return [
-      {
-        source: "/query-connector/:slug*",
-        destination: "/:slug*",
-      },
-    ];
-  },
+
   output: "standalone",
-  basePath: process.env.NODE_ENV === "production" ? "/query-connector" : "",
+  basePath: "",
 };
 
 module.exports = nextConfig;
