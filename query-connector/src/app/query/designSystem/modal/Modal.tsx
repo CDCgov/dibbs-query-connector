@@ -32,6 +32,7 @@ type ModalProps = {
 
 /**
  * Modal component that wraps the Truss Modal component and adds a footer with buttons.
+ * @param id.id
  * @param id - The id of the modal.
  * @param heading - The heading of the modal.
  * @param description - The description of the modal.
@@ -40,6 +41,13 @@ type ModalProps = {
  * @param buttons - The buttons to display in the footer.
  * @param isLarge - Whether the modal is large.
  * @param errorMessage - The error message to display in the footer.
+ * @param id.heading
+ * @param id.description
+ * @param id.children
+ * @param id.modalRef
+ * @param id.buttons
+ * @param id.isLarge
+ * @param id.errorMessage
  * @returns - The Modal component.
  */
 export const Modal: React.FC<ModalProps> = ({

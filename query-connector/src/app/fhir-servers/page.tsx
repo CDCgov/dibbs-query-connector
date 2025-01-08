@@ -13,7 +13,7 @@ import { Modal, ModalRef } from "../query/designSystem/modal/Modal";
 import styles from "./fhirServers.module.scss";
 import classNames from "classnames";
 
-type ModalMode = 'create' | 'edit';
+type ModalMode = "create" | "edit";
 
 /**
  * Client side parent component for the FHIR servers page. It displays a list of FHIR servers
@@ -23,10 +23,14 @@ const FhirServers: React.FC = () => {
   const [fhirServers, setFhirServers] = useState<FhirServerConfig[]>([]);
   const [serverName, setServerName] = useState("");
   const [serverUrl, setServerUrl] = useState("");
-  const [connectionStatus, setConnectionStatus] = useState<"idle" | "success" | "error">("idle");
+  const [connectionStatus, setConnectionStatus] = useState<
+    "idle" | "success" | "error"
+  >("idle");
   const [errorMessage, setErrorMessage] = useState<string | undefined>("");
-  const [selectedServer, setSelectedServer] = useState<FhirServerConfig | null>(null);
-  const [modalMode, setModalMode] = useState<ModalMode>('create');
+  const [selectedServer, setSelectedServer] = useState<FhirServerConfig | null>(
+    null,
+  );
+  const [modalMode, setModalMode] = useState<ModalMode>("create");
   const modalRef = useRef<ModalRef>(null);
 
   useEffect(() => {
@@ -45,7 +49,7 @@ const FhirServers: React.FC = () => {
 
   const handleOpenModal = (mode: ModalMode, server?: FhirServerConfig) => {
     setModalMode(mode);
-    if (mode === 'edit' && server) {
+    if (mode === "edit" && server) {
       setSelectedServer(server);
       setServerName(server.name);
       setServerUrl(server.hostname);
@@ -59,7 +63,6 @@ const FhirServers: React.FC = () => {
     resetModalState();
     modalRef.current?.toggleModal();
   };
-
 
   interface ConnectionTestResult {
     success: boolean;
@@ -155,7 +158,7 @@ const FhirServers: React.FC = () => {
     // First test the connection
     const connectionResult = await testFhirConnection(serverUrl);
 
-    if (modalMode === 'create') {
+    if (modalMode === "create") {
       const result = await insertFhirServer(
         serverName,
         serverUrl,
@@ -194,7 +197,7 @@ const FhirServers: React.FC = () => {
   const getModalButtons = () => {
     const buttons = [
       {
-        text: modalMode === 'create' ? "Add server" : "Save changes",
+        text: modalMode === "create" ? "Add server" : "Save changes",
         type: "submit" as const,
         id: "modal-save-button",
         className: "usa-button",
@@ -217,25 +220,33 @@ const FhirServers: React.FC = () => {
     ];
 
     // Add delete button only in edit mode
-    if (modalMode === 'edit') {
+    if (modalMode === "edit") {
       buttons.push({
         text: "Delete",
         type: "button" as const,
         id: "modal-delete-button",
         className: "usa-button usa-button--secondary",
-        onClick: () => {/* Implement delete functionality */ },
+        onClick: () => {
+          /* Implement delete functionality */
+        },
       });
     }
 
     // Update test connection button if successful
-    if (connectionStatus === 'success') {
+    if (connectionStatus === "success") {
       buttons[1].text = (
         <>
-          <Icon.Check size={3} className="usa-icon" aria-label="Connected" color="green" />
+          <Icon.Check
+            size={3}
+            className="usa-icon"
+            aria-label="Connected"
+            color="green"
+          />
           Connection successful
         </>
       );
-      buttons[1].className = "usa-button usa-button--outline shadow-none text-green padding-left-0 padding-right-2";
+      buttons[1].className =
+        "usa-button usa-button--outline shadow-none text-green padding-left-0 padding-right-2";
     }
 
     return buttons;
@@ -245,12 +256,17 @@ const FhirServers: React.FC = () => {
     <>
       <SiteAlert />
       <div className={classNames("main-container__wide", styles.mainContainer)}>
-        <div className={classNames("grid-container grid-row padding-0", styles.titleContainer)}>
+        <div
+          className={classNames(
+            "grid-container grid-row padding-0",
+            styles.titleContainer,
+          )}
+        >
           <h1 className="page-title grid-col-10">FHIR server configuration</h1>
           <div className="grid-col-2 display-flex flex-column">
             <button
               className="usa-button flex-align-self-end margin-top-3"
-              onClick={() => handleOpenModal('create')}
+              onClick={() => handleOpenModal("create")}
             >
               New server
             </button>
@@ -297,14 +313,17 @@ const FhirServers: React.FC = () => {
                       (last checked:{" "}
                       {fhirServer.last_connection_attempt
                         ? new Date(
-                          fhirServer.last_connection_attempt,
-                        ).toLocaleString()
+                            fhirServer.last_connection_attempt,
+                          ).toLocaleString()
                         : "unknown"}
                       )
                     </span>
                     <button
-                      className={classNames(styles.editButton, "usa-button usa-button--unstyled")}
-                      onClick={() => handleOpenModal('edit', fhirServer)}
+                      className={classNames(
+                        styles.editButton,
+                        "usa-button usa-button--unstyled",
+                      )}
+                      onClick={() => handleOpenModal("edit", fhirServer)}
                       aria-label={`Edit ${fhirServer.name}`}
                     >
                       <Icon.Edit size={3} />
@@ -319,7 +338,7 @@ const FhirServers: React.FC = () => {
 
         <Modal
           id="fhir-server"
-          heading={modalMode === 'create' ? "New server" : "Edit server"}
+          heading={modalMode === "create" ? "New server" : "Edit server"}
           modalRef={modalRef}
           buttons={getModalButtons()}
           errorMessage={errorMessage}
@@ -347,6 +366,6 @@ const FhirServers: React.FC = () => {
       </div>
     </>
   );
-}
+};
 
 export default FhirServers;
