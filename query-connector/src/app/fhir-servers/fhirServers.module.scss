@@ -34,8 +34,7 @@
   transition: background-color 0.2s ease;
   border-collapse: collapse;
 
-  &:hover,
-  &:hover > td {
+  &:hover {
     background-color: rgba(217, 232, 246, 0.50);
     cursor: default;
 
