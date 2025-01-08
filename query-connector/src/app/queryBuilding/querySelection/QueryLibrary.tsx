@@ -51,7 +51,7 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
   setSelectedQuery,
   setBuildStep,
 }) => {
-  const context = useContext(DataContext);
+  const queriesContext = useContext(DataContext);
   const [queries, setQueries] = useState<CustomUserQuery[]>(initialQueries);
   const [loading, setLoading] = useState(false);
   const [conditionIdToDetailsMap, setConditionIdToDetailsMap] =
@@ -87,14 +87,14 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
   return (
     <div>
       {<LoadingView loading={loading} />}
-      {context &&
+      {queriesContext &&
         renderModal(
           modalRef,
           selectedQuery,
           handleDelete,
           queries,
           setQueries,
-          context,
+          queriesContext,
         )}
       <div className="display-flex flex-justify-between flex-align-center width-full margin-bottom-4">
         <h1 className="flex-align-center">Query Library</h1>

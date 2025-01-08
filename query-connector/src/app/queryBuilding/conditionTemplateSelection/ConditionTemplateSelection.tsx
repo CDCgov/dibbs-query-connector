@@ -3,10 +3,18 @@
 import Backlink from "@/app/query/components/backLink/Backlink";
 import styles from "../conditionTemplateSelection/conditionTemplateSelection.module.scss";
 import { Label, TextInput, Button } from "@trussworks/react-uswds";
-import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
+import {
+  Dispatch,
+  SetStateAction,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
 import {
   getConditionsData,
+  getCustomQueries,
   getValueSetsAndConceptsByConditionIDs,
 } from "@/app/database-service";
 import {
@@ -15,6 +23,7 @@ import {
   EMPTY_QUERY_SELECTION,
   CategoryToConditionArrayMap,
   ConditionsMap,
+  EMPTY_CONCEPT_TYPE,
 } from "../utils";
 import { ConditionSelection } from "../components/ConditionSelection";
 import { ValueSetSelection } from "../components/ValueSetSelection";
@@ -25,13 +34,15 @@ import classNames from "classnames";
 import { groupConditionConceptsIntoValueSets } from "@/app/utils";
 import { SelectedQueryDetails } from "../querySelection/utils";
 
-import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import {
   getSavedQueryDetails,
   saveCustomQuery,
 } from "@/app/backend/query-building";
 import { groupValueSetsByConceptType } from "@/app/utils/valueSetTranslation";
+import { showToastConfirmation } from "@/app/query/designSystem/toast/Toast";
+import { DataContext } from "@/app/DataProvider";
+import { ToastContainer } from "react-toastify";
 
 export type FormError = {
   queryName: boolean;
@@ -80,9 +91,15 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
 
   const [constructedQuery, setConstructedQuery] = useState<NestedQuery>({});
 
-  function goBack() {
+  function resetQueryState() {
     setQueryName(undefined);
     setSelectedQuery(EMPTY_QUERY_SELECTION);
+    setConstructedQuery({});
+  }
+
+  function goBack() {
+    resetQueryState();
+
     setBuildStep("selection");
   }
 
@@ -92,16 +109,47 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
     if (queryName == "" || queryName == undefined) {
       focusRef?.current?.focus();
     }
-    // TODO: figure out customization disabled state
-    const atLeastOneItemSelected = Object.keys(constructedQuery).length > 0;
-    setFormError({
-      ...formError,
-      selectedConditions: !atLeastOneItemSelected,
-    });
 
-    // clear the error when the user enters a query name
-    if (formError.queryName && !!queryName) {
-      validateForm();
+    validateForm();
+
+    return () => {
+      isSubscribed = false;
+    };
+  }, [queryName]);
+
+  useEffect(() => {
+    let isSubscribed = true;
+
+    async function setInitialQueryState() {
+      if (selectedQuery.queryId === undefined) {
+        return;
+      }
+      const result = await getSavedQueryDetails(selectedQuery.queryId);
+
+      if (result === undefined) {
+        return;
+      }
+
+      const initialState: NestedQuery = {};
+      const savedQuery = result[0];
+
+      Object.entries(savedQuery.query_data).forEach(
+        ([conditionId, valueSetMap]) => {
+          initialState[conditionId] = structuredClone(EMPTY_CONCEPT_TYPE);
+
+          Object.entries(valueSetMap).forEach(([vsId, dibbsVs]) => {
+            initialState[conditionId][dibbsVs.dibbsConceptType][vsId] = dibbsVs;
+          });
+        },
+      );
+
+      if (isSubscribed) {
+        setConstructedQuery(initialState);
+      }
+
+      setFormError((prevError) => {
+        return { ...prevError, selectedConditions: false };
+      });
     }
 
     async function fetchInitialConditions() {
@@ -115,54 +163,12 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
     }
 
     fetchInitialConditions().catch(console.error);
-
-    return () => {
-      isSubscribed = false;
-    };
-  }, [queryName]);
-
-  useEffect(() => {
-    let isSubscribed = true;
-
-    async function setInitialQueryState() {
-      if (
-        selectedQuery.queryId === undefined ||
-        categoryToConditionMap === undefined
-      ) {
-        return;
-      }
-      const result = await getSavedQueryDetails(selectedQuery.queryId);
-
-      if (result === undefined) {
-        return;
-      }
-      const savedQuery = result[0];
-
-      Object.entries(savedQuery.query_data).forEach(
-        ([conditionId, valueSetMap]) => {
-          const typeLevelUpdate = handleQueryUpdate(conditionId);
-
-          Object.entries(valueSetMap).forEach(([vsId, dibbsVs]) => {
-            const valueSetLevelUpdate = typeLevelUpdate(
-              dibbsVs.dibbsConceptType,
-            );
-
-            if (isSubscribed) {
-              valueSetLevelUpdate(vsId)(dibbsVs);
-            }
-          });
-        },
-      );
-    }
     setInitialQueryState().catch(console.error);
-    setFormError({
-      queryName: false,
-      selectedConditions: false,
-    });
+
     return () => {
       isSubscribed = false;
     };
-  }, [categoryToConditionMap]);
+  }, []);
 
   async function handleCreateQueryClick(
     event: React.MouseEvent<HTMLButtonElement>,
@@ -171,10 +177,8 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
     setLoading(true);
     validateForm();
     if (!!queryName && !formError.queryName && !formError.selectedConditions) {
-      // fetch valuesets for selected conditions
       const conditionIdsToFetch = Object.keys(constructedQuery);
-      const valueSets =
-        await getValueSetsForSelectedConditions(conditionIdsToFetch);
+      await getValueSetsForSelectedConditions(conditionIdsToFetch);
 
       setBuildStep("valueset");
       setLoading(false);
@@ -186,7 +190,6 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
       focusRef?.current?.focus();
     }
     const atLeastOneItemSelected = Object.keys(constructedQuery).length > 0;
-
     return setFormError({
       ...formError,
       ...{ queryName: !queryName, selectedConditions: !atLeastOneItemSelected },
@@ -198,8 +201,14 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
       conditionId,
     ]);
 
-    // TODO: error handle this better
-    if (conditionValueSets === undefined) return;
+    if (conditionValueSets === undefined) {
+      showToastConfirmation({
+        heading: "Something went wrong",
+        body: "Couldn't fetch condition value sets. Try again, or contact us if the error persists",
+        variant: "error",
+      });
+      return;
+    }
 
     if (remove) {
       setConstructedQuery((prevState) => {
@@ -246,21 +255,43 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
       });
     };
 
+  const queriesContext = useContext(DataContext);
+
   async function handleSaveQuery() {
     if (constructedQuery && queryName) {
       // TODO: get this from the auth session
       const userName = "DIBBS";
-      const result = await saveCustomQuery(
-        constructedQuery,
-        queryName,
-        userName,
-        selectedQuery.queryId,
-      );
+      try {
+        await saveCustomQuery(
+          constructedQuery,
+          queryName,
+          userName,
+          selectedQuery.queryId,
+        );
+        const queries = await getCustomQueries();
+        queriesContext?.setData(queries);
+
+        showToastConfirmation({ body: `${queryName} successfully saved` });
+        resetQueryState();
+      } catch (e) {
+        showToastConfirmation({
+          heading: "Something went wrong",
+          body: `${queryName} wasn't successfully created. Please try again or contact us if the error persists`,
+        });
+      }
     }
   }
 
+  console.log(constructedQuery);
+
   return (
     <>
+      <ToastContainer
+        position="bottom-left"
+        icon={false}
+        stacked
+        hideProgressBar
+      />
       <SiteAlert />
       <div className={classNames("main-container__wide", styles.mainContainer)}>
         <Backlink
@@ -278,12 +309,6 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
               ? "Back to condition selection"
               : "Back to My queries"
           }
-        />
-        <ToastContainer
-          position="bottom-left"
-          icon={false}
-          stacked
-          hideProgressBar
         />
         <div className="customQuery__header">
           <h1 className={styles.queryTitle}>Custom query</h1>

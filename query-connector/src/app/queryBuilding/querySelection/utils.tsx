@@ -16,29 +16,38 @@ import { DataContextValue } from "@/app/DataProvider";
  * @param context - The data context used to update shared state.
  */
 export const handleDelete = async (
-  queryName: string,
-  queryId: string,
+  queryName: string | undefined,
+  queryId: string | undefined,
   queries: CustomUserQuery[],
   setQueries: React.Dispatch<React.SetStateAction<CustomUserQuery[]>>,
   context: DataContextValue | undefined,
 ) => {
-  const result = await deleteQueryById(queryId);
-  if (result.success) {
+  if (queryId) {
+    const result = await deleteQueryById(queryId);
+    if (result.success) {
+      showToastConfirmation({
+        body: `${queryName} has been deleted.`,
+        variant: "success",
+        duration: 2000,
+      });
+      const updatedQueries = queries.filter(
+        (query) => query.query_id !== queryId,
+      );
+      setQueries(updatedQueries);
+
+      if (context) {
+        context.setData(updatedQueries);
+      }
+    } else {
+      console.error(result.error);
+    }
+  } else {
     showToastConfirmation({
-      body: `${queryName} has been deleted.`,
+      heading: `Something went wrong`,
+      body: `${queryName} couldn't be deleted. Please try again or contact us if the error persists`,
       variant: "error",
       duration: 2000,
     });
-    const updatedQueries = queries.filter(
-      (query) => query.query_id !== queryId,
-    );
-    setQueries(updatedQueries);
-
-    if (context) {
-      context.setData(updatedQueries);
-    }
-  } else {
-    console.error(result.error);
   }
 };
 

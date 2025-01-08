@@ -1,7 +1,7 @@
 import { DibbsValueSet } from "../constants";
 import {
   VsGrouping,
-  ConceptTypeToVsNameToVsGroupingMap,
+  ConceptTypeToDibbsVsMap,
 } from "../utils/valueSetTranslation";
 
 // The structure of the data that's coming from the backend
@@ -24,7 +24,7 @@ export type ConditionIdToValueSetArrayMap = {
 };
 
 export type NestedQuery = {
-  [conditionId: string]: ConceptTypeToVsNameToVsGroupingMap;
+  [conditionId: string]: ConceptTypeToDibbsVsMap;
 };
 
 export type QueryDetailsResult = {
@@ -146,4 +146,10 @@ export const batchToggleConcepts = (input: DibbsValueSet) => {
   });
 
   return input;
+};
+
+export const EMPTY_CONCEPT_TYPE = {
+  labs: {},
+  conditions: {},
+  medications: {},
 };

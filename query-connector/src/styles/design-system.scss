@@ -69,3 +69,12 @@ footer {
     }
   }
 }
+
+.usa-modal__close {
+  background-color: white;
+
+  &:active,
+  &:hover {
+    background-color: white;
+  }
+}
