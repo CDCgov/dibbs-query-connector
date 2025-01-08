@@ -104,10 +104,10 @@ export const handleCreationConfirmation = async (
  */
 export const renderModal = (
   modalRef: RefObject<ModalRef>,
-  selectedQuery: { queryName: string; queryId: string } | null,
+  selectedQuery: SelectedQueryDetails | null,
   handleDelete: (
-    queryName: string,
-    queryId: string,
+    queryName: string | undefined,
+    queryId: string | undefined,
     queries: CustomUserQuery[],
     setQueries: React.Dispatch<React.SetStateAction<CustomUserQuery[]>>,
     context: DataContextValue,

@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import {
-  CategoryNameToConditionOptionMap,
+  CategoryToConditionArrayMap,
   NestedQuery,
   filterSearchByCategoryAndCondition,
 } from "../utils";
@@ -10,7 +10,7 @@ import classNames from "classnames";
 import { FormError } from "./ConditionTemplateSelection";
 
 type ConditionColumnDisplayProps = {
-  fetchedConditions: CategoryNameToConditionOptionMap;
+  categoryToConditionsMap: CategoryToConditionArrayMap;
   searchFilter: string | undefined;
   constructedQuery: NestedQuery;
   handleConditionUpdate: (conditionId: string, checked: boolean) => void;
@@ -37,24 +37,25 @@ type ConditionColumnDisplayProps = {
  * at both the category and condition levels if a valid search filter is applied.
  */
 export const ConditionColumnDisplay: React.FC<ConditionColumnDisplayProps> = ({
-  fetchedConditions,
+  categoryToConditionsMap,
   searchFilter,
   constructedQuery,
   handleConditionUpdate,
   formError,
   setFormError,
 }) => {
-  const [conditionsToDisplay, setConditionsToDisplay] =
-    useState(fetchedConditions);
+  const [conditionsToDisplay, setConditionsToDisplay] = useState(
+    categoryToConditionsMap,
+  );
 
   useEffect(() => {
     if (searchFilter === "") {
-      setConditionsToDisplay(fetchedConditions);
+      setConditionsToDisplay(categoryToConditionsMap);
     }
     if (searchFilter) {
       const filteredDisplay = filterSearchByCategoryAndCondition(
         searchFilter,
-        fetchedConditions,
+        categoryToConditionsMap,
       );
       setConditionsToDisplay(filteredDisplay);
     }
@@ -82,6 +83,7 @@ export const ConditionColumnDisplay: React.FC<ConditionColumnDisplayProps> = ({
     // alphabetize by category
   ].map((arr) => arr.sort((a, b) => (a[0] > b[0] ? 1 : -1)));
 
+  console.log(categoryToConditionsMap);
   return (
     <div className="grid-container ">
       <div className="grid-row grid-gap">

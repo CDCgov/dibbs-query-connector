@@ -10,13 +10,11 @@ import {
   getValueSetsAndConceptsByConditionIDs,
 } from "@/app/database-service";
 import {
-  CategoryNameToConditionOptionMap,
   ConditionIdToValueSetArrayMap,
   NestedQuery,
   EMPTY_QUERY_SELECTION,
-  generateConditionNameToIdAndCategoryMap,
-  groupConditionDataByCategoryName,
-  updateConditionStatus,
+  CategoryToConditionArrayMap,
+  ConditionIdToDetailsMap,
 } from "../utils";
 import { ConditionSelection } from "../components/ConditionSelection";
 import { ValueSetSelection } from "../components/ValueSetSelection";
@@ -73,8 +71,11 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
   const [queryName, setQueryName] = useState<string | undefined>(
     selectedQuery.queryName,
   );
-  const [fetchedConditions, setFetchedConditions] =
-    useState<CategoryNameToConditionOptionMap>();
+  const [categoryToConditionMap, setCategoryToConditionMap] =
+    useState<CategoryToConditionArrayMap>();
+  const [conditionIdToDetailsMap, setConditionsDetailsMap] =
+    useState<ConditionIdToDetailsMap>();
+
   const [formError, setFormError] = useState<FormError>({
     queryName: false,
     selectedConditions: false,
@@ -107,12 +108,12 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
     }
 
     async function fetchInitialConditions() {
-      const { categoryToConditionArrayMap } = await getConditionsData();
+      const { categoryToConditionNameArrayMap, conditionIdToNameMap } =
+        await getConditionsData();
 
       if (isSubscribed) {
-        setFetchedConditions(
-          groupConditionDataByCategoryName(categoryToConditionArrayMap),
-        );
+        setConditionsDetailsMap(conditionIdToNameMap);
+        setCategoryToConditionMap(categoryToConditionNameArrayMap);
       }
     }
 
@@ -129,7 +130,7 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
     async function setInitialQueryState() {
       if (
         selectedQuery.queryId === undefined ||
-        fetchedConditions === undefined
+        categoryToConditionMap === undefined
       ) {
         return;
       }
@@ -172,7 +173,7 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
     return () => {
       isSubscribed = false;
     };
-  }, [fetchedConditions]);
+  }, [categoryToConditionMap]);
 
   async function handleCreateQueryClick(
     event: React.MouseEvent<HTMLButtonElement>,
@@ -281,8 +282,6 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
     }
   }
 
-  console.log(formError.selectedConditions, !queryName, loading);
-
   return (
     <>
       <SiteAlert />
@@ -362,10 +361,10 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
         </div>
         <div className="display-flex flex-auto">
           {/* Step One: Select Conditions */}
-          {buildStep == "condition" && fetchedConditions && (
+          {buildStep == "condition" && categoryToConditionMap && (
             <ConditionSelection
               queryName={queryName}
-              fetchedConditions={fetchedConditions ?? {}}
+              fetchedConditions={categoryToConditionMap}
               setFormError={setFormError}
               formError={formError}
               validateForm={validateForm}
@@ -375,17 +374,18 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
               handleConditionUpdate={handleConditionUpdate}
             />
           )}
-          {/* Step Two: Select ValueSets
-          {buildStep == "valueset" && (
-            <ValueSetSelection
-              selectedConditions={Object.keys(constructedQuery)}
-              fetchedConditions={fetchedConditions}
-              valueSetsByCondition={conditionValueSets ?? {}}
-              constructedQuery={constructedQuery}
-              handleSelectedValueSetUpdate={handleQueryUpdate}
-              handleAddCondition={handleAddCondition}
-            />
-          )} */}
+          {/* Step Two: Select ValueSets */}
+          {buildStep == "valueset" &&
+            categoryToConditionMap &&
+            conditionIdToDetailsMap && (
+              <ValueSetSelection
+                categoryToConditionsMap={categoryToConditionMap}
+                conditionsDetailsMap={conditionIdToDetailsMap}
+                constructedQuery={constructedQuery}
+                handleSelectedValueSetUpdate={handleQueryUpdate}
+                handleUpdateCondition={handleConditionUpdate}
+              />
+            )}
         </div>
         {loading && <LoadingView loading={loading} />}
       </div>

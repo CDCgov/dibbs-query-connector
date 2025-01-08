@@ -67,7 +67,6 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
           curVsGrouping.items,
         );
       }
-      console.log(curVsGrouping);
 
       setCurConcepts(updatedConcepts);
       setHasDrawerChange(true);

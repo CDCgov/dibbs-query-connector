@@ -5,7 +5,7 @@ import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import classNames from "classnames";
 import { getConditionsData } from "@/app/database-service";
 import {
-  CategoryNameToConditionOptionMap,
+  CategoryNameToConditionNameMap,
   groupConditionDataByCategoryName,
   ConditionIdToValueSetArrayMap,
   NestedQuery,
@@ -15,7 +15,7 @@ import SearchField from "@/app/query/designSystem/searchField/SearchField";
 import { FormError } from "../conditionTemplateSelection/ConditionTemplateSelection";
 
 type ConditionSelectionProps = {
-  fetchedConditions: CategoryNameToConditionOptionMap;
+  fetchedConditions: CategoryNameToConditionNameMap;
   constructedQuery: NestedQuery;
   handleConditionUpdate: (conditionId: string, checked: boolean) => void;
   queryName: string | undefined;
@@ -85,7 +85,7 @@ export const ConditionSelection: React.FC<ConditionSelectionProps> = ({
           <ConditionColumnDisplay
             constructedQuery={constructedQuery}
             handleConditionUpdate={handleConditionUpdate}
-            fetchedConditions={fetchedConditions}
+            categoryToConditionsMap={fetchedConditions}
             searchFilter={searchFilter}
             formError={formError}
             setFormError={setFormError}

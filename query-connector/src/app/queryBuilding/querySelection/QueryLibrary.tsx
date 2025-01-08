@@ -26,7 +26,7 @@ import LoadingView from "@/app/query/components/LoadingView";
 import { DataContext } from "@/app/DataProvider";
 import classNames from "classnames";
 import { getConditionsData } from "@/app/database-service";
-import { ConditionIdToNameMap } from "../utils";
+import { ConditionIdToDetailsMap } from "../utils";
 
 interface UserQueriesDisplayProps {
   queries: CustomUserQuery[];
@@ -54,8 +54,9 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
   const context = useContext(DataContext);
   const [queries, setQueries] = useState<CustomUserQuery[]>(initialQueries);
   const [loading, setLoading] = useState(false);
-  const [fetchedConditions, setFetchedConditions] =
-    useState<ConditionIdToNameMap>();
+  const [conditionIdToDetailsMap, setConditionIdToDetailsMap] =
+    useState<ConditionIdToDetailsMap>();
+
   const modalRef = useRef<ModalRef>(null);
   const handleEdit = (queryName: string, queryId: string) => {
     setSelectedQuery({
@@ -72,7 +73,7 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
       const { conditionIdToNameMap } = await getConditionsData();
 
       if (isSubscribed) {
-        setFetchedConditions(conditionIdToNameMap);
+        setConditionIdToDetailsMap(conditionIdToNameMap);
       }
     }
 
@@ -121,7 +122,7 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
             </tr>
           </thead>
           <tbody>
-            {fetchedConditions &&
+            {conditionIdToDetailsMap &&
               queries.map((query, index) => (
                 <tr
                   key={index}
@@ -134,7 +135,7 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
                   <td title={query.conditions_list?.join(",")}>
                     {query.conditions_list
                       ?.map((id) => {
-                        return fetchedConditions[id];
+                        return conditionIdToDetailsMap[id].name;
                       })
                       .join(", ")}
                   </td>

@@ -1,40 +1,25 @@
 "use client";
 
 import styles from "../conditionTemplateSelection/conditionTemplateSelection.module.scss";
-import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import classNames from "classnames";
 
-import {
-  CategoryNameToConditionOptionMap,
-  ConditionIdToValueSetArrayMap,
-  ConditionOption,
-  groupConditionDataByCategoryName,
-} from "../utils";
+import { CategoryNameToConditionNameMap, ConditionIdToNameMap } from "../utils";
 import SearchField from "@/app/query/designSystem/searchField/SearchField";
 import { Icon } from "@trussworks/react-uswds";
 
-import {
-  formatDiseaseDisplay,
-  NestedQuery,
-  updateConditionStatus,
-} from "../utils";
+import { formatDiseaseDisplay, NestedQuery } from "../utils";
 import { ConceptTypeSelectionTable } from "./ConceptTypeSelectionTable";
 
 import Drawer from "@/app/query/designSystem/drawer/Drawer";
-import {
-  groupValueSetGroupingByConditionId,
-  VsGrouping,
-} from "@/app/utils/valueSetTranslation";
-import { getConditionsData } from "@/app/database-service";
+import { VsGrouping } from "@/app/utils/valueSetTranslation";
 import { DibbsConceptType, DibbsValueSet } from "@/app/constants";
-import { showToastConfirmation } from "@/app/query/designSystem/toast/Toast";
 
 type ConditionSelectionProps = {
-  selectedConditions: CategoryNameToConditionOptionMap;
-  valueSetsByCondition: ConditionIdToValueSetArrayMap;
   constructedQuery: NestedQuery;
-  handleAddCondition: (conditionId: string) => void;
-  fetchedConditions: CategoryNameToConditionOptionMap | undefined;
+  handleUpdateCondition: (conditionId: string, remove: boolean) => void;
+  conditionsDetailsMap: ConditionIdToNameMap;
+  categoryToConditionsMap: CategoryNameToConditionNameMap;
   handleSelectedValueSetUpdate: (
     conditionId: string,
   ) => (
@@ -54,12 +39,11 @@ type ConditionSelectionProps = {
  * @returns A component for display to render on the query building page
  */
 export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
-  selectedConditions,
-  valueSetsByCondition,
-  handleSelectedValueSetUpdate,
   constructedQuery,
-  handleAddCondition,
-  fetchedConditions,
+  handleSelectedValueSetUpdate,
+  handleUpdateCondition,
+  conditionsDetailsMap,
+  categoryToConditionsMap,
 }) => {
   const focusRef = useRef<HTMLInputElement | null>(null);
   const [activeCondition, setActiveCondition] = useState<string>("");
@@ -71,8 +55,8 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
     setIsDrawerOpen(open);
   };
 
-  const conditionUpdate = fetchedConditions
-    ? Object.entries(fetchedConditions).map(([category, conditions]) => (
+  const conditionUpdate = categoryToConditionsMap
+    ? Object.entries(categoryToConditionsMap).map(([category, conditions]) => (
         <div key={category}>
           <div className={styles.conditionDrawerHeader}>{category}</div>
           <div>
@@ -82,7 +66,7 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
                 <span
                   className={styles.addButton}
                   role="button"
-                  onClick={() => handleAddCondition(id)}
+                  onClick={() => handleUpdateCondition(id, false)}
                 >
                   ADD
                 </span>
@@ -94,7 +78,7 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
     : undefined;
 
   // Prepare selected conditions for display in the left pane
-  const includedConditionsWithIds = Object.entries(selectedConditions)
+  const includedConditionsWithIds = Object.entries(categoryToConditionsMap)
     .map(([_, conditionsByCategory]) =>
       Object.entries(conditionsByCategory).flatMap(
         ([conditionId, conditionObj]) => {
@@ -134,16 +118,17 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
               </div>
             </div>
 
-            {Object.values(includedConditionsWithIds).map((condition) => {
+            {Object.keys(constructedQuery).map((conditionId) => {
+              const condition = conditionsDetailsMap[conditionId];
               return (
                 <div
-                  key={condition.id}
+                  key={conditionId}
                   className={
-                    activeCondition == condition.id
+                    activeCondition == conditionId
                       ? `${styles.conditionCard} ${styles.active}`
                       : styles.conditionCard
                   }
-                  onClick={() => setActiveCondition(condition.id)}
+                  onClick={() => setActiveCondition(conditionId)}
                   tabIndex={0}
                 >
                   {formatDiseaseDisplay(condition.name)}
