@@ -283,7 +283,13 @@ const FhirServers: React.FC = () => {
           </thead>
           <tbody>
             {fhirServers.map((fhirServer) => (
-              <tr key={fhirServer.id} className={styles.fhirServersRow}>
+              <tr
+                key={fhirServer.id}
+                className={classNames(
+                  styles.fhirServersRow,
+                  styles.tableRowHover
+                )}
+              >
                 <td>{fhirServer.name}</td>
                 <td>{fhirServer.hostname}</td>
                 <td>
@@ -335,7 +341,6 @@ const FhirServers: React.FC = () => {
             ))}
           </tbody>
         </Table>
-
         <Modal
           id="fhir-server"
           heading={modalMode === "create" ? "New server" : "Edit server"}
