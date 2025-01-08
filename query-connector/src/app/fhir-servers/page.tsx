@@ -13,22 +13,21 @@ import { Modal, ModalRef } from "../query/designSystem/modal/Modal";
 import styles from "./fhirServers.module.scss";
 import classNames from "classnames";
 
+type ModalMode = 'create' | 'edit';
+
 /**
- *
+ * Client side parent component for the FHIR servers page. It displays a list of FHIR servers
+ * @returns - The FhirServers component.
  */
-export default function FhirServers() {
+const FhirServers: React.FC = () => {
   const [fhirServers, setFhirServers] = useState<FhirServerConfig[]>([]);
   const [serverName, setServerName] = useState("");
   const [serverUrl, setServerUrl] = useState("");
-  const [connectionStatus, setConnectionStatus] = useState<
-    "idle" | "success" | "error"
-  >("idle");
+  const [connectionStatus, setConnectionStatus] = useState<"idle" | "success" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState<string | undefined>("");
+  const [selectedServer, setSelectedServer] = useState<FhirServerConfig | null>(null);
+  const [modalMode, setModalMode] = useState<ModalMode>('create');
   const modalRef = useRef<ModalRef>(null);
-  const [selectedServer, setSelectedServer] = useState<FhirServerConfig | null>(
-    null,
-  );
-  const editModalRef = useRef<ModalRef>(null);
 
   useEffect(() => {
     getFhirServerConfigs(true).then((servers) => {
@@ -36,17 +35,31 @@ export default function FhirServers() {
     });
   }, []);
 
-  const handleOpenModal = () => {
-    modalRef.current?.toggleModal();
-  };
-
-  const handleCloseModal = () => {
+  const resetModalState = () => {
     setServerName("");
     setServerUrl("");
     setConnectionStatus("idle");
     setErrorMessage("");
+    setSelectedServer(null);
+  };
+
+  const handleOpenModal = (mode: ModalMode, server?: FhirServerConfig) => {
+    setModalMode(mode);
+    if (mode === 'edit' && server) {
+      setSelectedServer(server);
+      setServerName(server.name);
+      setServerUrl(server.hostname);
+    } else {
+      resetModalState();
+    }
     modalRef.current?.toggleModal();
   };
+
+  const handleCloseModal = () => {
+    resetModalState();
+    modalRef.current?.toggleModal();
+  };
+
 
   interface ConnectionTestResult {
     success: boolean;
@@ -138,188 +151,112 @@ export default function FhirServers() {
     setErrorMessage(result.error);
   };
 
-  const handleAddServer = async () => {
+  const handleSave = async () => {
     // First test the connection
     const connectionResult = await testFhirConnection(serverUrl);
 
-    // Attempt to add the server regardless of connection result
-    const result = await insertFhirServer(
-      serverName,
-      serverUrl,
-      connectionResult.success,
-    );
-
-    if (result.success) {
-      // If server was added successfully, update the list
-      getFhirServerConfigs(true).then((servers) => {
-        setFhirServers(servers);
-      });
-      handleCloseModal();
-    } else {
-      setConnectionStatus("error");
-      setErrorMessage(result.error);
-    }
-  };
-
-  const modalButtons = [
-    {
-      text: "Add server",
-      type: "submit" as const,
-      id: "modal-add-server-button",
-      className: "usa-button",
-      onClick: handleAddServer,
-    },
-    {
-      text: "Test connection" as string | JSX.Element,
-      type: "button" as const,
-      id: "modal-test-connection-button",
-      className: "usa-button usa-button--outline",
-      onClick: handleTestConnection,
-    },
-    {
-      text: "Cancel",
-      type: "button" as const,
-      id: "modal-cancel-button",
-      className: "usa-button usa-button--outline shadow-none",
-      onClick: handleCloseModal,
-    },
-  ];
-
-  switch (connectionStatus) {
-    case "success":
-      modalButtons[1].text = (
-        <>
-          <Icon.Check
-            size={3}
-            className="usa-icon"
-            aria-label="Connected"
-            color="green"
-          />
-          Connection successful
-        </>
+    if (modalMode === 'create') {
+      const result = await insertFhirServer(
+        serverName,
+        serverUrl,
+        connectionResult.success,
       );
-      modalButtons[1].className =
-        "usa-button usa-button--outline shadow-none text-green padding-left-0 padding-right-2";
-      break;
-    default:
-  }
 
-  const handleOpenEditModal = (server: FhirServerConfig) => {
-    setSelectedServer(server);
-    setServerName(server.name);
-    setServerUrl(server.hostname);
-    setConnectionStatus("idle");
-    setErrorMessage("");
-    editModalRef.current?.toggleModal();
-  };
+      if (result.success) {
+        getFhirServerConfigs(true).then((servers) => {
+          setFhirServers(servers);
+        });
+        handleCloseModal();
+      } else {
+        setConnectionStatus("error");
+        setErrorMessage(result.error);
+      }
+    } else if (selectedServer) {
+      const result = await updateFhirServer(
+        selectedServer.id,
+        serverName,
+        serverUrl,
+        connectionResult.success,
+      );
 
-  const handleCloseEditModal = () => {
-    setSelectedServer(null);
-    setServerName("");
-    setServerUrl("");
-    setConnectionStatus("idle");
-    setErrorMessage("");
-    editModalRef.current?.toggleModal();
-  };
-
-  const handleUpdateServer = async () => {
-    if (!selectedServer) return;
-
-    // First test the connection
-    const connectionResult = await testFhirConnection(serverUrl);
-
-    // Attempt to update the server
-    const result = await updateFhirServer(
-      selectedServer.id,
-      serverName,
-      serverUrl,
-      connectionResult.success,
-    );
-
-    if (result.success) {
-      // If server was updated successfully, update the list
-      getFhirServerConfigs(true).then((servers) => {
-        setFhirServers(servers);
-      });
-      handleCloseEditModal();
-    } else {
-      setConnectionStatus("error");
-      setErrorMessage(result.error);
+      if (result.success) {
+        getFhirServerConfigs(true).then((servers) => {
+          setFhirServers(servers);
+        });
+        handleCloseModal();
+      } else {
+        setConnectionStatus("error");
+        setErrorMessage(result.error);
+      }
     }
   };
 
-  const editModalButtons = [
-    {
-      text: "Save changes",
-      type: "submit" as const,
-      id: "modal-save-button",
-      className: "usa-button",
-      onClick: handleUpdateServer,
-    },
-    {
-      text: "Test connection" as string | JSX.Element,
-      type: "button" as const,
-      id: "modal-test-connection-button",
-      className: "usa-button usa-button--outline",
-      onClick: handleTestConnection,
-    },
-    {
-      text: "Cancel",
-      type: "button" as const,
-      id: "modal-cancel-button",
-      className: "usa-button usa-button--outline shadow-none",
-      onClick: handleCloseEditModal,
-    },
-    {
-      text: "Delete",
-      type: "button" as const,
-      id: "modal-delete-button",
-      className: "usa-button usa-button--secondary",
-      onClick: () => {
-        /* Implement delete functionality later */
+  const getModalButtons = () => {
+    const buttons = [
+      {
+        text: modalMode === 'create' ? "Add server" : "Save changes",
+        type: "submit" as const,
+        id: "modal-save-button",
+        className: "usa-button",
+        onClick: handleSave,
       },
-    },
-  ];
+      {
+        text: "Test connection" as string | JSX.Element,
+        type: "button" as const,
+        id: "modal-test-connection-button",
+        className: "usa-button usa-button--outline",
+        onClick: handleTestConnection,
+      },
+      {
+        text: "Cancel",
+        type: "button" as const,
+        id: "modal-cancel-button",
+        className: "usa-button usa-button--outline shadow-none",
+        onClick: handleCloseModal,
+      },
+    ];
 
-  switch (connectionStatus) {
-    case "success":
-      editModalButtons[2].text = (
+    // Add delete button only in edit mode
+    if (modalMode === 'edit') {
+      buttons.push({
+        text: "Delete",
+        type: "button" as const,
+        id: "modal-delete-button",
+        className: "usa-button usa-button--secondary",
+        onClick: () => {/* Implement delete functionality */ },
+      });
+    }
+
+    // Update test connection button if successful
+    if (connectionStatus === 'success') {
+      buttons[1].text = (
         <>
-          <Icon.Check
-            size={3}
-            className="usa-icon"
-            aria-label="Connected"
-            color="green"
-          />
+          <Icon.Check size={3} className="usa-icon" aria-label="Connected" color="green" />
           Connection successful
         </>
       );
-      editModalButtons[2].className =
-        "usa-button usa-button--outline shadow-none text-green padding-left-0 padding-right-2";
-      break;
-    default:
-  }
+      buttons[1].className = "usa-button usa-button--outline shadow-none text-green padding-left-0 padding-right-2";
+    }
+
+    return buttons;
+  };
 
   return (
     <>
       <SiteAlert />
       <div className={classNames("main-container__wide", styles.mainContainer)}>
-        <div
-          className={classNames(
-            "grid-container grid-row padding-0",
-            styles.titleContainer,
-          )}
-        >
+        <div className={classNames("grid-container grid-row padding-0", styles.titleContainer)}>
           <h1 className="page-title grid-col-10">FHIR server configuration</h1>
           <div className="grid-col-2 display-flex flex-column">
             <button
               className="usa-button flex-align-self-end margin-top-3"
-              onClick={handleOpenModal}
+              onClick={() => handleOpenModal('create')}
             >
               New server
             </button>
           </div>
         </div>
+
         <Table className="margin-top-4">
           <thead>
             <tr className={styles.fhirServersRow}>
@@ -360,17 +297,14 @@ export default function FhirServers() {
                       (last checked:{" "}
                       {fhirServer.last_connection_attempt
                         ? new Date(
-                            fhirServer.last_connection_attempt,
-                          ).toLocaleString()
+                          fhirServer.last_connection_attempt,
+                        ).toLocaleString()
                         : "unknown"}
                       )
                     </span>
                     <button
-                      className={classNames(
-                        styles.editButton,
-                        "usa-button usa-button--unstyled",
-                      )}
-                      onClick={() => handleOpenEditModal(fhirServer)}
+                      className={classNames(styles.editButton, "usa-button usa-button--unstyled")}
+                      onClick={() => handleOpenModal('edit', fhirServer)}
                       aria-label={`Edit ${fhirServer.name}`}
                     >
                       <Icon.Edit size={3} />
@@ -384,10 +318,10 @@ export default function FhirServers() {
         </Table>
 
         <Modal
-          id="new-fhir-server"
-          heading="New server"
+          id="fhir-server"
+          heading={modalMode === 'create' ? "New server" : "Edit server"}
           modalRef={modalRef}
-          buttons={modalButtons}
+          buttons={getModalButtons()}
           errorMessage={errorMessage}
           isLarge
         >
@@ -410,34 +344,9 @@ export default function FhirServers() {
             required
           />
         </Modal>
-        <Modal
-          id="edit-fhir-server"
-          heading="Edit server"
-          modalRef={editModalRef}
-          buttons={editModalButtons}
-          errorMessage={errorMessage}
-          isLarge
-        >
-          <Label htmlFor="edit-server-name">Server name</Label>
-          <TextInput
-            id="edit-server-name"
-            name="edit-server-name"
-            type="text"
-            value={serverName}
-            onChange={(e) => setServerName(e.target.value)}
-            required
-          />
-          <Label htmlFor="edit-server-url">URL</Label>
-          <TextInput
-            id="edit-server-url"
-            name="edit-server-url"
-            type="url"
-            value={serverUrl}
-            onChange={(e) => setServerUrl(e.target.value)}
-            required
-          />
-        </Modal>
       </div>
     </>
   );
 }
+
+export default FhirServers;
