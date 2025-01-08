@@ -1,32 +1,33 @@
 "use client";
 
 import styles from "../conditionTemplateSelection/conditionTemplateSelection.module.scss";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import classNames from "classnames";
 
-import { CategoryNameToConditionNameMap, ConditionIdToNameMap } from "../utils";
 import SearchField from "@/app/query/designSystem/searchField/SearchField";
 import { Icon } from "@trussworks/react-uswds";
 
-import { formatDiseaseDisplay, NestedQuery } from "../utils";
+import {
+  CategoryToConditionArrayMap,
+  ConditionsMap,
+  formatDiseaseDisplay,
+  NestedQuery,
+} from "../utils";
 import { ConceptTypeSelectionTable } from "./ConceptTypeSelectionTable";
 
 import Drawer from "@/app/query/designSystem/drawer/Drawer";
-import { VsGrouping } from "@/app/utils/valueSetTranslation";
 import { DibbsConceptType, DibbsValueSet } from "@/app/constants";
 
 type ConditionSelectionProps = {
   constructedQuery: NestedQuery;
   handleUpdateCondition: (conditionId: string, remove: boolean) => void;
-  conditionsDetailsMap: ConditionIdToNameMap;
-  categoryToConditionsMap: CategoryNameToConditionNameMap;
+  conditionsMap: ConditionsMap;
+  categoryToConditionsMap: CategoryToConditionArrayMap;
   handleSelectedValueSetUpdate: (
     conditionId: string,
   ) => (
     vsType: DibbsConceptType,
-  ) => (
-    vsName: string,
-  ) => (vsGrouping: VsGrouping) => (dibbsValueSets: DibbsValueSet[]) => void;
+  ) => (vsId: string) => (dibbsValueSets: DibbsValueSet) => void;
 };
 
 /**
@@ -42,13 +43,14 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
   constructedQuery,
   handleSelectedValueSetUpdate,
   handleUpdateCondition,
-  conditionsDetailsMap,
+  conditionsMap: conditionsDetailsMap,
   categoryToConditionsMap,
 }) => {
-  const focusRef = useRef<HTMLInputElement | null>(null);
-  const [activeCondition, setActiveCondition] = useState<string>("");
+  // display the first condition's valuesets on render
+  const [activeCondition, setActiveCondition] = useState<string>(
+    Object.keys(constructedQuery)[0],
+  );
   const [_searchFilter, setSearchFilter] = useState<string>();
-
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const handleDrawer = (open: boolean) => {
@@ -76,17 +78,6 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
         </div>
       ))
     : undefined;
-
-  // Prepare selected conditions for display in the left pane
-  const includedConditionsWithIds = Object.entries(categoryToConditionsMap)
-    .map(([_, conditionsByCategory]) =>
-      Object.entries(conditionsByCategory).flatMap(
-        ([conditionId, conditionObj]) => {
-          return { id: conditionId, name: conditionObj.name };
-        },
-      ),
-    )
-    .flat();
 
   return (
     <div

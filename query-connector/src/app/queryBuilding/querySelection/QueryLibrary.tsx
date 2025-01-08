@@ -26,7 +26,7 @@ import LoadingView from "@/app/query/components/LoadingView";
 import { DataContext } from "@/app/DataProvider";
 import classNames from "classnames";
 import { getConditionsData } from "@/app/database-service";
-import { ConditionIdToDetailsMap } from "../utils";
+import { ConditionsMap } from "../utils";
 
 interface UserQueriesDisplayProps {
   queries: CustomUserQuery[];
@@ -55,7 +55,7 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
   const [queries, setQueries] = useState<CustomUserQuery[]>(initialQueries);
   const [loading, setLoading] = useState(false);
   const [conditionIdToDetailsMap, setConditionIdToDetailsMap] =
-    useState<ConditionIdToDetailsMap>();
+    useState<ConditionsMap>();
 
   const modalRef = useRef<ModalRef>(null);
   const handleEdit = (queryName: string, queryId: string) => {

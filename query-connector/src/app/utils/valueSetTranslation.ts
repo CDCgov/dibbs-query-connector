@@ -14,7 +14,7 @@ export type VsGrouping = {
 
 export type ConceptTypeToVsNameToVsGroupingMap = {
   [dibbsConceptType in DibbsConceptType]: {
-    [name: string]: VsGrouping;
+    [vsId: string]: DibbsValueSet;
   };
 };
 
@@ -99,30 +99,6 @@ export function generateValueSetGroupingsByDibbsConceptType(
 ) {
   const valueSetsByConceptType = groupValueSetsByConceptType(vsArray);
   return generateValueSetGroupingsByConceptType(valueSetsByConceptType);
-}
-
-/**
- * Utility function to generate a three-layer condition : labs / conditions/
- * medications : {valueSetName: ValueSetGrouping} map
- * @param conditionIdToValueSetArrayMap map of condition IDs to ValueSet[]
- * @returns Map of {[conditionId]: {[valueSetName]: ValueSetGrouping} }
- */
-export function groupValueSetGroupingByConditionId(
-  conditionIdToValueSetArrayMap: ConditionIdToValueSetArrayMap,
-): NestedQuery {
-  const results: NestedQuery = {};
-
-  Object.entries(conditionIdToValueSetArrayMap).forEach(
-    ([conditionId, valueSetArray]) => {
-      const valueSetsByConceptType = groupValueSetsByConceptType(valueSetArray);
-      const curConditionGrouping = generateValueSetGroupingsByConceptType(
-        valueSetsByConceptType,
-      );
-      results[conditionId] = curConditionGrouping;
-    },
-  );
-
-  return results;
 }
 
 /**

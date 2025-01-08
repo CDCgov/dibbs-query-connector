@@ -15,9 +15,7 @@ type ConceptTypeSelectionTableProps = {
   vsTypeLevelOptions: ConceptTypeToVsNameToVsGroupingMap;
   handleVsTypeLevelUpdate: (
     vsType: DibbsConceptType,
-  ) => (
-    vsName: string,
-  ) => (val: VsGrouping) => (dibbsValueSets: DibbsValueSet[]) => void;
+  ) => (vsId: string) => (dibbsValueSets: DibbsValueSet) => void;
 };
 /**
  * Component that displays ValueSetGroupings sorted by VsType (DibbsConceptType)
@@ -32,14 +30,13 @@ export const ConceptTypeSelectionTable: React.FC<
   ConceptTypeSelectionTableProps
 > = ({ vsTypeLevelOptions, handleVsTypeLevelUpdate }) => {
   const [expanded, setExpandedGroup] = useState<string>("");
-
   const generateTypeLevelAccordionItems = (vsType: DibbsConceptType) => {
     const handleVsNameLevelUpdate = handleVsTypeLevelUpdate(vsType);
 
     const title = (
       <ConceptTypeAccordionHeader
         activeValueSetType={vsType}
-        activeVsGroupings={vsTypeLevelOptions[vsType]}
+        activeValueSets={vsTypeLevelOptions[vsType]}
         expanded={expanded === vsType}
         handleVsNameLevelUpdate={handleVsNameLevelUpdate}
       />
@@ -47,8 +44,8 @@ export const ConceptTypeSelectionTable: React.FC<
 
     const content = (
       <ConceptTypeAccordionBody
-        activeVsGroupings={vsTypeLevelOptions[vsType]}
-        handleVsNameLevelUpdate={handleVsNameLevelUpdate}
+        activeValueSets={vsTypeLevelOptions[vsType]}
+        handleVsIdLevelUpdate={handleVsNameLevelUpdate}
       />
     );
     const level: HeadingLevel = "h4";

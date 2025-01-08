@@ -1,6 +1,5 @@
 import styles from "../conditionTemplateSelection/conditionTemplateSelection.module.scss";
 import { formatDiseaseDisplay } from "../utils";
-import { tallyConceptsForSingleValueSetGroup } from "../utils";
 import React, { ChangeEvent, useState } from "react";
 import ConceptSelection from "./ConceptSelection";
 import Drawer from "@/app/query/designSystem/drawer/Drawer";
@@ -14,10 +13,10 @@ import Checkbox from "@/app/query/designSystem/checkbox/Checkbox";
 
 type ConceptTypeAccordionBodyProps = {
   id?: string;
-  activeVsGroupings: { [vsNameAuthorSystem: string]: VsGrouping };
-  handleVsNameLevelUpdate: (
-    vsName: string,
-  ) => (vsGrouping: VsGrouping) => (dibbsValueSets: DibbsValueSet[]) => void;
+  activeValueSets: { [vsId: string]: DibbsValueSet };
+  handleVsIdLevelUpdate: (
+    vsId: string,
+  ) => (dibbsValueSets: DibbsValueSet) => void;
 };
 
 /**
@@ -29,17 +28,17 @@ type ConceptTypeAccordionBodyProps = {
  * @returns An accordion body component
  */
 const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
-  activeVsGroupings,
-  handleVsNameLevelUpdate,
+  activeValueSets,
+  handleVsIdLevelUpdate,
 }) => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [hasDrawerChange, setHasDrawerChange] = useState(false);
-  const [curVsGrouping, setCurVsGrouping] = useState<VsGrouping>();
+  const [curValueSet, setCurValueSet] = useState<DibbsValueSet>();
   const [curConcepts, setCurConcepts] = useState<ConceptOption[]>([]);
 
-  const handleViewCodes = (vs: VsGrouping) => {
-    setCurVsGrouping(vs);
-    setCurConcepts(vs.items.map((i) => i.concepts).flat());
+  const handleViewCodes = (vs: DibbsValueSet) => {
+    setCurValueSet(vs);
+    setCurConcepts(vs.concepts);
     setIsDrawerOpen(true);
   };
 
@@ -47,25 +46,15 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
     updatedConcepts: ConceptOption[],
     updateBatchSave = true,
   ) => {
-    if (curVsGrouping) {
-      const activeVsName = getNameAuthorSystemFromVSGrouping(curVsGrouping);
+    if (curValueSet) {
       const shouldIncludeValueSet = updatedConcepts
         .map((c) => c.include)
         .some(Boolean);
-      curVsGrouping.items = [
-        // assuming that name / author / system identifies a unique value set,
-        // the new items array will only differ by concepts
-        {
-          ...curVsGrouping.items[0],
-          includeValueSet: shouldIncludeValueSet,
-          concepts: updatedConcepts,
-        },
-      ];
+      curValueSet.includeValueSet = shouldIncludeValueSet;
+      curValueSet.concepts = updatedConcepts;
 
       if (updateBatchSave) {
-        handleVsNameLevelUpdate(activeVsName)(curVsGrouping)(
-          curVsGrouping.items,
-        );
+        handleVsIdLevelUpdate(curValueSet.valueSetId)(curValueSet);
       }
 
       setCurConcepts(updatedConcepts);
@@ -73,78 +62,64 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
     }
   };
 
+  function handleBulkToggle(
+    e: ChangeEvent<HTMLInputElement>,
+    isMinusState: boolean,
+  ) {
+    const valueSetToUpdateId = e.target.id;
+    const includeStatus = e.target.checked;
+
+    const valueSetToUpdate = activeValueSets[valueSetToUpdateId];
+    const handleValueSetLevelUpdate = handleVsIdLevelUpdate(valueSetToUpdateId);
+    valueSetToUpdate.includeValueSet = includeStatus;
+    valueSetToUpdate.concepts.map((c) => {
+      c.include = isMinusState ? false : includeStatus;
+      return c;
+    });
+
+    handleValueSetLevelUpdate(valueSetToUpdate);
+  }
+
   const handleSaveChanges = () => {
-    Object.values(activeVsGroupings).map((groupedVS) => {
-      if (
-        groupedVS.valueSetName === curVsGrouping?.valueSetName &&
-        curConcepts
-      ) {
-        const activeVsName = getNameAuthorSystemFromVSGrouping(curVsGrouping);
-        const updatedVsGrouping = structuredClone(curVsGrouping);
+    Object.entries(activeValueSets).map(([vsId, dibbsVs]) => {
+      if (dibbsVs.valueSetName === curValueSet?.valueSetName && curConcepts) {
         const shouldIncludeValueSet = curConcepts
           .map((c) => c.include)
           .some(Boolean);
-        updatedVsGrouping.items = [
-          // assuming that name / author / system identifies a unique value set,
-          // the new items array will only differ by the concepts
-          {
-            ...curVsGrouping.items[0],
-            includeValueSet: shouldIncludeValueSet,
-            concepts: curConcepts,
-          },
-        ];
 
-        handleVsNameLevelUpdate(activeVsName)(updatedVsGrouping);
+        dibbsVs.concepts = curConcepts;
+        dibbsVs.includeValueSet = shouldIncludeValueSet;
+
+        handleVsIdLevelUpdate(vsId)(dibbsVs);
       }
     });
     setIsDrawerOpen(false);
   };
 
-  function handleBulkToggle(
-    e: ChangeEvent<HTMLInputElement>,
-    isMinusState: boolean,
-  ) {
-    const vsGrouping = structuredClone(activeVsGroupings[e.target.id]);
-    const activeVsName = getNameAuthorSystemFromVSGrouping(vsGrouping);
-    const handleValueSetLevelUpdate =
-      handleVsNameLevelUpdate(activeVsName)(vsGrouping);
-
-    const newConcepts = vsGrouping.items
-      .map((i) => {
-        return i.concepts.map((c) => {
-          return {
-            ...c,
-            include: isMinusState ? false : e.target.checked,
-          };
-        });
-      })
-      .flat();
-
-    handleValueSetLevelUpdate([
-      { ...vsGrouping.items[0], concepts: newConcepts },
-    ]);
-  }
-
   return (
     <div>
-      {Object.values(activeVsGroupings).map((vs) => {
-        const selectedCount = tallyConceptsForSingleValueSetGroup(vs, true);
-        const totalCount = tallyConceptsForSingleValueSetGroup(vs, false);
+      {Object.values(activeValueSets).map((dibbsVs) => {
+        const conceptsToRender = dibbsVs.concepts;
+        const selectedCount = conceptsToRender.filter((c) => c.include).length;
+        const totalCount = conceptsToRender.length;
+
         const isMinusState =
           selectedCount !== totalCount && selectedCount !== 0;
         const checked = selectedCount == totalCount && selectedCount > 0;
-        const vsLabel = getNameAuthorSystemFromVSGrouping(vs);
 
         return (
-          <div className={styles.accordionBodyExpanded} key={vsLabel}>
+          <div
+            className={styles.accordionBodyExpanded}
+            key={dibbsVs.valueSetId}
+          >
             <div className={styles.accordionExpandedInner}>
               <Checkbox
                 className={styles.valueSetTemplate__checkbox}
-                label={checkboxLabel(vs.valueSetName, vs.author, vs.system)}
+                label={checkboxLabel(dibbsVs)}
                 onChange={(e: ChangeEvent<HTMLInputElement>) => {
                   handleBulkToggle(e, isMinusState);
                 }}
-                id={vsLabel}
+                id={dibbsVs.valueSetId}
                 checked={checked}
                 isMinusState={isMinusState}
               />
@@ -157,7 +132,7 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
                 className={styles.viewCodesBtn}
                 role="button"
                 onClick={() => {
-                  handleViewCodes(vs);
+                  handleViewCodes(dibbsVs);
                 }}
               >
                 View Codes
@@ -166,9 +141,9 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
           </div>
         );
       })}
-      {curConcepts && curVsGrouping && (
+      {curConcepts && curValueSet && (
         <Drawer
-          title={curVsGrouping.valueSetName}
+          title={curValueSet.valueSetName}
           placeholder="Search by code or name"
           toastMessage="Valueset concepts have been successfully modified."
           toRender={
@@ -189,13 +164,13 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
   );
 };
 
-const checkboxLabel = (name: string, author: string, system: string) => {
+const checkboxLabel = (dibbsVs: DibbsValueSet) => {
   return (
     <div className={styles.expandedContent}>
-      <div className={styles.vsName}> {formatDiseaseDisplay(name)}</div>
+      <div className={styles.vsName}> {dibbsVs.valueSetName}</div>
       <div className={styles.vsDetails}>
-        <div className="padding-right-2">{`Author: ${author}`}</div>
-        <div>{`System: ${system.toLocaleLowerCase()}`}</div>
+        <div className="padding-right-2">{`Author: ${dibbsVs.author}`}</div>
+        <div>{`System: ${dibbsVs.system.toLocaleLowerCase()}`}</div>
       </div>
     </div>
   );

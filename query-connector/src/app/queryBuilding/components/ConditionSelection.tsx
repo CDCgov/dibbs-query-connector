@@ -4,18 +4,13 @@ import styles from "../conditionTemplateSelection/conditionTemplateSelection.mod
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import classNames from "classnames";
 import { getConditionsData } from "@/app/database-service";
-import {
-  CategoryNameToConditionNameMap,
-  groupConditionDataByCategoryName,
-  ConditionIdToValueSetArrayMap,
-  NestedQuery,
-} from "../utils";
+import { CategoryToConditionArrayMap, NestedQuery } from "../utils";
 import ConditionColumnDisplay from "../conditionTemplateSelection/ConditionColumnDisplay";
 import SearchField from "@/app/query/designSystem/searchField/SearchField";
 import { FormError } from "../conditionTemplateSelection/ConditionTemplateSelection";
 
 type ConditionSelectionProps = {
-  fetchedConditions: CategoryNameToConditionNameMap;
+  categoryToConditionsMap: CategoryToConditionArrayMap;
   constructedQuery: NestedQuery;
   handleConditionUpdate: (conditionId: string, checked: boolean) => void;
   queryName: string | undefined;
@@ -29,11 +24,7 @@ type ConditionSelectionProps = {
 /**
  * Display component for a condition on the query building page
  * @param root0 - params
- * @param root0.fetchedConditions - ID of the condition to reference
- * @param root0.selectedConditions - name of condition to display
- * @param root0.setFetchedConditions - listener function for checkbox
- * selection
- * @param root0.setSelectedConditions - current checkbox selection status
+ * @param root0.categoryToConditionsMap - ID of the condition to reference
  * @param root0.queryName - current checkbox selection status
  * @param root0.formError - indicates missing or incorrect form data
  * @param root0.setFormError - state function that updates the status of the
@@ -42,7 +33,7 @@ type ConditionSelectionProps = {
  * @returns A component for display to redner on the query building page
  */
 export const ConditionSelection: React.FC<ConditionSelectionProps> = ({
-  fetchedConditions,
+  categoryToConditionsMap,
   constructedQuery,
   handleConditionUpdate,
   queryName,
@@ -81,11 +72,11 @@ export const ConditionSelection: React.FC<ConditionSelectionProps> = ({
           }}
         />
 
-        {fetchedConditions && (
+        {categoryToConditionsMap && (
           <ConditionColumnDisplay
             constructedQuery={constructedQuery}
             handleConditionUpdate={handleConditionUpdate}
-            categoryToConditionsMap={fetchedConditions}
+            categoryToConditionsMap={categoryToConditionsMap}
             searchFilter={searchFilter}
             formError={formError}
             setFormError={setFormError}

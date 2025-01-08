@@ -83,7 +83,6 @@ export const ConditionColumnDisplay: React.FC<ConditionColumnDisplayProps> = ({
     // alphabetize by category
   ].map((arr) => arr.sort((a, b) => (a[0] > b[0] ? 1 : -1)));
 
-  console.log(categoryToConditionsMap);
   return (
     <div className="grid-container ">
       <div className="grid-row grid-gap">
@@ -97,21 +96,17 @@ export const ConditionColumnDisplay: React.FC<ConditionColumnDisplayProps> = ({
                 return (
                   <div key={category}>
                     <h3 className={styles.categoryHeading}>{category}</h3>
-                    {Object.entries(arr).map(
-                      ([conditionId, conditionOption]) => {
-                        return (
-                          <ConditionOption
-                            checked={Object.keys(constructedQuery).includes(
-                              conditionId,
-                            )}
-                            key={conditionOption.name}
-                            conditionId={conditionId}
-                            conditionName={conditionOption.name}
-                            handleConditionSelection={updateConditionSelection}
-                          />
-                        );
-                      },
-                    )}
+                    {arr.map((c) => {
+                      return (
+                        <ConditionOption
+                          checked={Object.keys(constructedQuery).includes(c.id)}
+                          key={c.name}
+                          conditionId={c.id}
+                          conditionName={c.name}
+                          handleConditionSelection={updateConditionSelection}
+                        />
+                      );
+                    })}
                   </div>
                 );
               })}

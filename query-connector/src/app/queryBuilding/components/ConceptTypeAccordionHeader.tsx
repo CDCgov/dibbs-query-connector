@@ -8,17 +8,17 @@ import Checkbox from "@/app/query/designSystem/checkbox/Checkbox";
 
 type ConceptTypeAccordionBodyProps = {
   activeValueSetType: DibbsConceptType;
-  activeVsGroupings: { [vsNameAuthorSystem: string]: VsGrouping };
+  activeValueSets: { [vsId: string]: DibbsValueSet };
   expanded: boolean;
   handleVsNameLevelUpdate: (
-    vsName: string,
-  ) => (val: VsGrouping) => (dibbsValueSets: DibbsValueSet[]) => void;
+    vsId: string,
+  ) => (dibbsValueSets: DibbsValueSet) => void;
 };
 
 /**
  * Fragment component to style out some of the accordion bodies
  * @param param0 - params
- * @param param0.activeValueSetType - DibbsactiveValueSetType (labs, conditions, medications)
+ * @param param0.activeVsType - DibbsactiveValueSetType (labs, conditions, medications)
  * @param param0.activeVsGroupings - ValueSets for a given activeValueSetType
  * @param param0.expanded - Boolean for managing icon orientation
  * @param param0.handleVsNameLevelUpdate - curried state update function that
@@ -27,32 +27,27 @@ type ConceptTypeAccordionBodyProps = {
  */
 const ConceptTypeAccordionHeader: React.FC<ConceptTypeAccordionBodyProps> = ({
   activeValueSetType,
-  activeVsGroupings,
+  activeValueSets,
   expanded,
   handleVsNameLevelUpdate,
 }) => {
-  const selectedCount = tallyConceptsForValueSetGroupArray(
-    Object.values(activeVsGroupings),
-    true,
-  );
-  const totalCount = tallyConceptsForValueSetGroupArray(
-    Object.values(activeVsGroupings),
-    false,
-  );
+  const selectedCount = Object.values(activeValueSets)[0].concepts.filter(
+    (c) => c.include,
+  ).length;
+  const totalCount = Object.values(activeValueSets)[0].concepts.length;
 
   function handleBulkToggle(
     e: ChangeEvent<HTMLInputElement>,
     isMinusState: boolean,
   ) {
-    Object.entries(activeVsGroupings).forEach(([vsName, curGrouping]) => {
-      const handleVsGroupingLevelUpdate = handleVsNameLevelUpdate(vsName);
-      const updatedGrouping = structuredClone(curGrouping);
-      updatedGrouping.items.map((i) => {
-        const bulkIncludeValue = isMinusState ? false : e.target.checked;
-        i.includeValueSet = bulkIncludeValue;
-        return i.concepts.map((c) => (c.include = bulkIncludeValue));
+    Object.entries(activeValueSets).forEach(([vsId, activeValueSets]) => {
+      const handleVsGroupingLevelUpdate = handleVsNameLevelUpdate(vsId);
+      const bulkIncludeValue = isMinusState ? false : e.target.checked;
+      activeValueSets.includeValueSet = bulkIncludeValue;
+      activeValueSets.concepts.map((c) => {
+        return (c.include = bulkIncludeValue);
       });
-      handleVsGroupingLevelUpdate(updatedGrouping)(updatedGrouping.items);
+      handleVsGroupingLevelUpdate(activeValueSets);
     });
   }
 

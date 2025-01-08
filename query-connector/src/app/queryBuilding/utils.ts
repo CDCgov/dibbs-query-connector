@@ -5,7 +5,7 @@ import {
 } from "../utils/valueSetTranslation";
 
 // The structure of the data that's coming from the backend
-export type ConditionIdToDetailsMap = {
+export type ConditionsMap = {
   [conditionId: string]: {
     name: string;
     category: string;

@@ -15,7 +15,7 @@ import {
 } from "./query-building";
 import {
   CategoryToConditionArrayMap,
-  ConditionIdToDetailsMap,
+  ConditionsMap,
 } from "./queryBuilding/utils";
 import {
   CategoryStruct,
@@ -500,13 +500,10 @@ export async function getConditionsData() {
     }, {} as CategoryToConditionArrayMap);
 
   // 2. ID-Name mapping
-  const conditionIdToNameMap: ConditionIdToDetailsMap = rows.reduce(
-    (acc, row) => {
-      acc[row.id] = { name: row.name, category: row.category };
-      return acc;
-    },
-    {} as ConditionIdToDetailsMap,
-  );
+  const conditionIdToNameMap: ConditionsMap = rows.reduce((acc, row) => {
+    acc[row.id] = { name: row.name, category: row.category };
+    return acc;
+  }, {} as ConditionsMap);
 
   return {
     categoryToConditionNameArrayMap,

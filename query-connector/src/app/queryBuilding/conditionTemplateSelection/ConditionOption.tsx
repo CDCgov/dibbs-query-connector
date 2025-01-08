@@ -31,7 +31,7 @@ const ConditionOption: React.FC<ConditionOptionProps> = ({
         onChange={() => {
           handleConditionSelection(conditionId, checked);
         }}
-        id={conditionName}
+        id={conditionId}
         label={formatDiseaseDisplay(conditionName)}
         checked={checked}
       />

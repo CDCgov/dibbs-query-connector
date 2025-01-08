@@ -84,12 +84,9 @@ function formatQueryDataForDatabase(frontendInput: NestedQuery) {
   Object.entries(frontendInput).forEach(([conditionId, data]) => {
     queryData[conditionId] = {};
     conditionIds.push(conditionId);
-    Object.values(data).forEach((vsNameToVsGroupingMap) => {
-      Object.values(vsNameToVsGroupingMap).forEach((vsGrouping) => {
-        const valueSetsToSave = vsGrouping.items;
-        valueSetsToSave.forEach((dibbsVs) => {
-          queryData[conditionId][dibbsVs.valueSetId] = dibbsVs;
-        });
+    Object.values(data).forEach((dibbsVsMap) => {
+      Object.entries(dibbsVsMap).forEach(([vsId, dibbsVs]) => {
+        queryData[conditionId][vsId] = dibbsVs;
       });
     });
   });
