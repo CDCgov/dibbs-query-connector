@@ -31,10 +31,22 @@ const ConceptTypeAccordionHeader: React.FC<ConceptTypeAccordionBodyProps> = ({
   expanded,
   handleVsNameLevelUpdate,
 }) => {
-  const selectedCount = Object.values(activeValueSets)[0].concepts.filter(
-    (c) => c.include,
-  ).length;
-  const totalCount = Object.values(activeValueSets)[0].concepts.length;
+  const selectedCount = Object.values(activeValueSets).reduce(
+    (acc, curValueSet) => {
+      const curConceptsIncludedCount = curValueSet.concepts.filter(
+        (c) => c.include,
+      ).length;
+      return acc + curConceptsIncludedCount;
+    },
+    0,
+  );
+  const totalCount = Object.values(activeValueSets).reduce(
+    (acc, curValueSet) => {
+      const curConceptsIncludedCount = curValueSet.concepts.length;
+      return acc + curConceptsIncludedCount;
+    },
+    0,
+  );
 
   function handleBulkToggle(
     e: ChangeEvent<HTMLInputElement>,
