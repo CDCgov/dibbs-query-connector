@@ -1,7 +1,8 @@
 import { DibbsConceptType, DibbsValueSet } from "../constants";
 import {
   ConditionIdToValueSetArrayMap,
-  ConditionToConceptTypeToValueSetGroupingMap,
+  // ConditionToConceptTypeToValueSetGroupingMap,
+  temp__ConditionToConceptTypeToValueSetGroupingMap,
 } from "../queryBuilding/utils";
 
 // ValueSets that share the same name, author, system unique identifier
@@ -10,6 +11,12 @@ export type VsGrouping = {
   author: string;
   system: string;
   items: DibbsValueSet[];
+};
+
+export type temp__ConceptTypeToVsNameToVsGroupingMap = {
+  [dibbsConceptType in DibbsConceptType]: {
+    [name: string]: DibbsValueSet;
+  };
 };
 
 export type ConceptTypeToVsNameToVsGroupingMap = {
@@ -43,7 +50,7 @@ export type ConceptOption = { code: string; display: string; include: boolean };
  */
 export function groupValueSetsByNameAuthorSystem(
   valueSetsToGroup: DibbsValueSet[],
-): Record<VsNameAuthorSystem, VsGrouping> {
+): Record<VsNameAuthorSystem, DibbsValueSet> {
   const results = valueSetsToGroup.reduce(
     (acc, row) => {
       // Check if both author and code_system are defined
@@ -58,15 +65,8 @@ export function groupValueSetsByNameAuthorSystem(
       }
 
       const groupKey = `${valueSetName}:${author}:${system}`;
-      if (!acc[groupKey]) {
+     
         acc[groupKey] = {
-          valueSetName: valueSetName,
-          author: author,
-          system: system,
-          items: [],
-        };
-      }
-      acc[groupKey].items.push({
         valueSetId: row.valueSetId,
         valueSetVersion: row.valueSetVersion,
         valueSetName: row.valueSetName,
@@ -79,10 +79,10 @@ export function groupValueSetsByNameAuthorSystem(
         concepts: row.concepts.map((c) => {
           return { ...c };
         }),
-      });
+        }
       return acc;
     },
-    {} as Record<VsNameAuthorSystem, VsGrouping>,
+    {} as Record<VsNameAuthorSystem, DibbsValueSet>,
   );
 
   return results;
@@ -109,8 +109,8 @@ export function generateValueSetGroupingsByDibbsConceptType(
  */
 export function groupValueSetGroupingByConditionId(
   conditionIdToValueSetArrayMap: ConditionIdToValueSetArrayMap,
-): ConditionToConceptTypeToValueSetGroupingMap {
-  const results: ConditionToConceptTypeToValueSetGroupingMap = {};
+): temp__ConditionToConceptTypeToValueSetGroupingMap {
+  const results: temp__ConditionToConceptTypeToValueSetGroupingMap = {};
 
   Object.entries(conditionIdToValueSetArrayMap).forEach(
     ([conditionId, valueSetArray]) => {
@@ -144,7 +144,7 @@ function generateValueSetGroupingsByConceptType(valueSetsByConceptType: {
       return acc;
     },
     {} as {
-      [key in DibbsConceptType]: { [vsName: string]: VsGrouping };
+      [key in DibbsConceptType]: { [vsName: string]: DibbsValueSet };
     },
   );
 }

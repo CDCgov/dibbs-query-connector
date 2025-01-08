@@ -1,14 +1,14 @@
 import { DibbsConceptType } from "@/app/constants";
 import styles from "./customizeQuery.module.scss";
 import CustomizeQueryBulkSelect from "./CustomizeQueryBulkSelect";
-import { ConceptTypeToVsNameToVsGroupingMap } from "@/app/utils/valueSetTranslation";
+import { temp__ConceptTypeToVsNameToVsGroupingMap } from "@/app/utils/valueSetTranslation";
 import { Button } from "@trussworks/react-uswds";
 
 type CustomizeQueryNavProps = {
   activeTab: DibbsConceptType;
   handleTabChange: (tabName: DibbsConceptType) => void;
   handleSelectAllForTab: (checked: boolean) => void;
-  valueSetOptions: ConceptTypeToVsNameToVsGroupingMap;
+  valueSetOptions: temp__ConceptTypeToVsNameToVsGroupingMap;
 };
 
 /**
@@ -29,19 +29,13 @@ const CustomizeQueryNav: React.FC<CustomizeQueryNavProps> = ({
 }) => {
   const activeItems = valueSetOptions[activeTab] ?? {};
 
-  const hasSelectableItems = Object.values(activeItems).some(
-    (group) => group.items.length > 0,
-  );
+  const hasSelectableItems = Object.values(activeItems).some((vs) => !!vs);
   const allItemsDeselected = Object.values(activeItems)
-    .flatMap((groupedValSets) =>
-      groupedValSets.items.flatMap((i) => i.includeValueSet),
-    )
+    .flatMap((vs) => vs.includeValueSet)
     .every((p) => !p);
 
   const allItemsSelected = Object.values(activeItems)
-    .flatMap((groupedValSets) =>
-      groupedValSets.items.flatMap((i) => i.includeValueSet),
-    )
+    .flatMap((vs) => vs.includeValueSet)
     .every((p) => p);
 
   return (
