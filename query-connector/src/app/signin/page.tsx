@@ -59,7 +59,7 @@ export default function SigninPage() {
         <Image
           alt="Graphic illustrating what TEFCA is"
           className={styles.image}
-          src="/query-connector/tefca-graphic.svg"
+          src="/tefca-graphic.svg"
           width={474}
           height={438}
           priority
