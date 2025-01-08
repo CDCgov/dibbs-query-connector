@@ -4,15 +4,12 @@ import styles from "../conditionTemplateSelection/conditionTemplateSelection.mod
 import { HeadingLevel } from "@trussworks/react-uswds";
 import ConceptTypeAccordionBody from "./ConceptTypeAccordionBody";
 import { DibbsConceptType, DibbsValueSet } from "@/app/constants";
-import {
-  ConceptTypeToVsNameToVsGroupingMap,
-  VsGrouping,
-} from "@/app/utils/valueSetTranslation";
+import { ConceptTypeToDibbsVsMap } from "@/app/utils/valueSetTranslation";
 import ConceptTypeAccordionHeader from "./ConceptTypeAccordionHeader";
 import MultiAccordion from "@/app/query/designSystem/MultiAccordion";
 
 type ConceptTypeSelectionTableProps = {
-  vsTypeLevelOptions: ConceptTypeToVsNameToVsGroupingMap;
+  vsTypeLevelOptions: ConceptTypeToDibbsVsMap;
   handleVsTypeLevelUpdate: (
     vsType: DibbsConceptType,
   ) => (vsId: string) => (dibbsValueSets: DibbsValueSet) => void;

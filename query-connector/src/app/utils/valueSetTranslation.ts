@@ -1,8 +1,4 @@
 import { DibbsConceptType, DibbsValueSet } from "../constants";
-import {
-  ConditionIdToValueSetArrayMap,
-  NestedQuery,
-} from "../queryBuilding/utils";
 
 // ValueSets that share the same name, author, system unique identifier
 export type VsGrouping = {
@@ -12,9 +8,15 @@ export type VsGrouping = {
   items: DibbsValueSet[];
 };
 
-export type ConceptTypeToVsNameToVsGroupingMap = {
+export type ConceptTypeToDibbsVsMap = {
   [dibbsConceptType in DibbsConceptType]: {
     [vsId: string]: DibbsValueSet;
+  };
+};
+
+export type ConceptTypeToVsNameToVsGroupingMap = {
+  [dibbsConceptType in DibbsConceptType]: {
+    [vsId: string]: VsGrouping;
   };
 };
 

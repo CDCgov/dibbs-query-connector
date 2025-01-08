@@ -160,7 +160,9 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
         toastMessage="Condition has been successfully added."
         isOpen={isDrawerOpen}
         onClose={() => handleDrawer(false)}
-        onSave={() => {}} //TODO: Add save handler logic
+        onSave={() => {
+          handleUpdateCondition;
+        }}
         hasChanges={false}
       />
     </div>

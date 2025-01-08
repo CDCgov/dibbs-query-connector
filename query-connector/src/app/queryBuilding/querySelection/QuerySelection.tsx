@@ -37,17 +37,17 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({
   setBuildStep,
   setSelectedQuery,
 }) => {
-  const context = useContext(DataContext);
+  const queriesContext = useContext(DataContext);
   const [loading, setLoading] = useState(true);
 
   // Check whether custom queries exist in DB
   useEffect(() => {
-    if (context?.data === null || context?.data === undefined) {
+    if (queriesContext?.data === null || queriesContext?.data === undefined) {
       const fetchQueries = async () => {
         try {
           const queries = await getCustomQueries();
 
-          context?.setData(queries);
+          queriesContext?.setData(queries);
         } catch (error) {
           console.error("Failed to fetch queries:", error);
         } finally {
@@ -58,16 +58,22 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({
     } else {
       setLoading(false); // Data already exists, no need to fetch again
     }
-  }, [context]);
+  }, [queriesContext]);
 
   if (loading) {
     return <LoadingView loading={true} />;
   }
 
-  const queries = (context?.data || []) as CustomUserQuery[];
+  const queries = (queriesContext?.data || []) as CustomUserQuery[];
 
   return (
     <>
+      <ToastContainer
+        position="bottom-left"
+        icon={false}
+        stacked
+        hideProgressBar
+      />
       {queries.length === 0 ? (
         <div className="main-container__wide">
           <EmptyQueriesDisplay
@@ -78,7 +84,6 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({
         </div>
       ) : (
         <div className="main-container__wide">
-          <ToastContainer position="bottom-left" icon={false} />
           <MyQueriesDisplay
             queries={queries}
             selectedQuery={selectedQuery}
