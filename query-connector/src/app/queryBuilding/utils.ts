@@ -2,7 +2,7 @@ import { DibbsValueSet } from "../constants";
 import {
   VsGrouping,
   ConceptTypeToVsNameToVsGroupingMap,
-  temp__ConceptTypeToVsNameToVsGroupingMap
+  temp__ConceptTypeToVsNameToVsGroupingMap,
 } from "../utils/valueSetTranslation";
 
 // The structure of the data that's coming from the backend
@@ -41,7 +41,6 @@ export type ConditionToConceptTypeToValueSetGroupingMap = {
 export type temp__ConditionToConceptTypeToValueSetGroupingMap = {
   [conditionId: string]: temp__ConceptTypeToVsNameToVsGroupingMap;
 };
-
 
 export type QueryDetailsResult = {
   query_name: string;

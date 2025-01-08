@@ -65,8 +65,8 @@ export function groupValueSetsByNameAuthorSystem(
       }
 
       const groupKey = `${valueSetName}:${author}:${system}`;
-     
-        acc[groupKey] = {
+
+      acc[groupKey] = {
         valueSetId: row.valueSetId,
         valueSetVersion: row.valueSetVersion,
         valueSetName: row.valueSetName,
@@ -79,7 +79,7 @@ export function groupValueSetsByNameAuthorSystem(
         concepts: row.concepts.map((c) => {
           return { ...c };
         }),
-        }
+      };
       return acc;
     },
     {} as Record<VsNameAuthorSystem, DibbsValueSet>,
