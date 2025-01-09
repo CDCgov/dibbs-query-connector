@@ -1,6 +1,6 @@
 "use client";
 import { SelectedQueryDetails } from "./querySelection/utils";
-import BuildFromTemplates from "./conditionTemplateSelection/ConditionTemplateSelection";
+import BuildFromTemplates from "./buildFromTemplates/BuildFromTemplates";
 import QuerySelection from "./querySelection/QuerySelection";
 import { BuildStep } from "../constants";
 import "react-toastify/dist/ReactToastify.css";

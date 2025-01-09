@@ -4,9 +4,9 @@ import styles from "../conditionTemplateSelection/conditionTemplateSelection.mod
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import classNames from "classnames";
 import { CategoryToConditionArrayMap, NestedQuery } from "../utils";
-import ConditionColumnDisplay from "../conditionTemplateSelection/ConditionColumnDisplay";
+import ConditionColumnDisplay from "../buildFromTemplates/ConditionColumnDisplay";
 import SearchField from "@/app/query/designSystem/searchField/SearchField";
-import { FormError } from "../conditionTemplateSelection/ConditionTemplateSelection";
+import { FormError } from "../buildFromTemplates/BuildFromTemplates";
 
 type ConditionSelectionProps = {
   categoryToConditionsMap: CategoryToConditionArrayMap;
