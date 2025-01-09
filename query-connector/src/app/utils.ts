@@ -106,3 +106,8 @@ function mapStoredValueSetIntoInternalValueset(
   }
   return valueSet;
 }
+
+export const DEFAULT_TIME_WINDOW = {
+  timeWindowNumber: 1,
+  timeWindowUnit: "day",
+};
