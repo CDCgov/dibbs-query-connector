@@ -1,5 +1,4 @@
-export const TEST_URL =
-  process.env.TEST_ENV ?? "http://localhost:3000/query-connector";
+export const TEST_URL = process.env.TEST_ENV ?? "http://localhost:3000/";
 /**
  *
  */
