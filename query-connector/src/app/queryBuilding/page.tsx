@@ -13,7 +13,7 @@ import { EMPTY_QUERY_SELECTION } from "./utils";
  */
 const QueryBuilding: React.FC = () => {
   const [selectedQuery, setSelectedQuery] = useState<SelectedQueryDetails>(
-    EMPTY_QUERY_SELECTION,
+    structuredClone(EMPTY_QUERY_SELECTION),
   );
   const [buildStep, setBuildStep] = useState<BuildStep>("selection");
 

@@ -1,18 +1,12 @@
 import styles from "../conditionTemplateSelection/conditionTemplateSelection.module.scss";
-import { formatDiseaseDisplay } from "../utils";
 import React, { ChangeEvent, useState } from "react";
 import ConceptSelection from "./ConceptSelection";
 import Drawer from "@/app/query/designSystem/drawer/Drawer";
-import {
-  ConceptOption,
-  VsGrouping,
-  getNameAuthorSystemFromVSGrouping,
-} from "@/app/utils/valueSetTranslation";
+import { ConceptOption } from "@/app/utils/valueSetTranslation";
 import { DibbsValueSet } from "@/app/constants";
 import Checkbox from "@/app/query/designSystem/checkbox/Checkbox";
 
 type ConceptTypeAccordionBodyProps = {
-  id?: string;
   activeValueSets: { [vsId: string]: DibbsValueSet };
   handleVsIdLevelUpdate: (
     vsId: string,
@@ -22,9 +16,9 @@ type ConceptTypeAccordionBodyProps = {
 /**
  * An accordion body fragment
  * @param param0 - params
- * @param param0.activeVsGroupings - VsGroupings[] for display in this accordion
- * @param param0.handleVsNameLevelUpdate - curried state update function that
- * takes a VsName and generatesa ValueSet level update
+ * @param param0.activeValueSets - Valuesets for display in this accordion
+ * @param param0.handleVsIdLevelUpdate - curried state update function that
+ * takes a valueset ID and generates a ValueSet level update
  * @returns An accordion body component
  */
 const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({

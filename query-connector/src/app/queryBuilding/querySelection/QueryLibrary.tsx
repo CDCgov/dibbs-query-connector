@@ -95,6 +95,7 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
           queries,
           setQueries,
           queriesContext,
+          setSelectedQuery,
         )}
       <div className="display-flex flex-justify-between flex-align-center width-full margin-bottom-4">
         <h1 className="flex-align-center">Query Library</h1>

@@ -61,12 +61,15 @@ export const ConceptTypeSelectionTable: React.FC<
       id: `${vsType}`,
       headingLevel: level,
       handleToggle,
+      length: Object.keys(vsTypeLevelOptions[vsType]).length,
     };
   };
 
-  const accordionItems = Object.keys(vsTypeLevelOptions).map((vsType) => {
-    return generateTypeLevelAccordionItems(vsType as DibbsConceptType);
-  });
+  const accordionItems = Object.keys(vsTypeLevelOptions)
+    .map((vsType) => {
+      return generateTypeLevelAccordionItems(vsType as DibbsConceptType);
+    })
+    .filter((v) => v.length > 0);
   return (
     <div data-testid="accordion" className={styles.accordionContainer}>
       <MultiAccordion

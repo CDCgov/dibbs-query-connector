@@ -3,7 +3,6 @@
 import styles from "../conditionTemplateSelection/conditionTemplateSelection.module.scss";
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import classNames from "classnames";
-import { getConditionsData } from "@/app/database-service";
 import { CategoryToConditionArrayMap, NestedQuery } from "../utils";
 import ConditionColumnDisplay from "../conditionTemplateSelection/ConditionColumnDisplay";
 import SearchField from "@/app/query/designSystem/searchField/SearchField";
@@ -24,12 +23,14 @@ type ConditionSelectionProps = {
 /**
  * Display component for a condition on the query building page
  * @param root0 - params
+ * @param root0.constructedQuery - current state of the built query
+ * @param root0.handleConditionUpdate - update function for condition addition and
+ * removal
  * @param root0.categoryToConditionsMap - ID of the condition to reference
  * @param root0.queryName - current checkbox selection status
  * @param root0.formError - indicates missing or incorrect form data
  * @param root0.setFormError - state function that updates the status of the
  * condition selection form input data
- * @param root0.updateFetched - tk
  * @returns A component for display to redner on the query building page
  */
 export const ConditionSelection: React.FC<ConditionSelectionProps> = ({

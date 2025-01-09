@@ -84,7 +84,7 @@
 .valueSetTemplate__left {
   display: flex;
   flex-direction: row;
-  min-width: 18rem;
+  width: 18rem;
   justify-content: space-between;
   padding: 0.5rem !important;
 }
@@ -201,6 +201,13 @@
     }
   }
 
+  .deleteIcon {
+    color: $error;
+    width: 1.5rem;
+    height: 1.5rem;
+    display: none;
+  }
+
   .conditionCard {
     background: transparent;
     border-radius: 4px;
@@ -209,6 +216,14 @@
     margin-top: 0.5rem;
     color: #111111;
     cursor: pointer;
+    position: relative;
+
+    &:hover .deleteIcon {
+      display: inline-block;
+      position: absolute;
+      right: 0;
+      top: 20%;
+    }
   }
 
   .active {
@@ -360,28 +375,28 @@ $columnGap: 1rem;
   border-radius: 0.25rem;
 
   &:hover {
-    background: var(--white, #FFF);
+    background: var(--white, #fff);
   }
   &:hover .addButton {
     display: inline-block;
   }
-  
-    &:hover .addedButton {
-      display: inline-block;
-    
+
+  &:hover .addedStatus {
+    display: inline-block;
   }
-}
-.addButton {
-  display: none;
-  color: var(--Primary-primary, #005EA2);
-  font-size: 1rem;
-  font-style: normal;
-  font-weight: 700;
-  line-height: 1.375rem;
-  text-transform: uppercase;
-  cursor: pointer;
 }
 
-.addedButton {
+.addedStatus,
+.addButton {
+  font-size: 1rem;
+  font-style: normal;
+  line-height: 1.375rem;
   display: none;
-  }
+}
+
+.addButton {
+  color: var(--Primary-primary, #005ea2);
+  text-transform: uppercase;
+  font-weight: 700;
+  cursor: pointer;
+}

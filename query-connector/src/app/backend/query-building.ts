@@ -32,6 +32,14 @@ export async function getSavedQueryDetails(queryId: string) {
   }
 }
 
+/**
+ * Backend handler function for upserting a query
+ * @param queryInput - frontend input for a query
+ * @param queryName - name of query
+ * @param author - author
+ * @param queryId - a queryId if previously defined
+ * @returns - all columns of the newly added row in the query table
+ */
 export async function saveCustomQuery(
   queryInput: NestedQuery,
   queryName: string,

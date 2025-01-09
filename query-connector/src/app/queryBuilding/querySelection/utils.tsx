@@ -79,7 +79,7 @@ export const handleCopy = (queryName: string, queryId: string) => {
     .then(() => {
       showToastConfirmation({
         body: `${queryName} ID copied successfully!`,
-        duration: 20000,
+        duration: 2000,
       });
     })
     .catch((error) => {
@@ -102,13 +102,15 @@ export const handleCreationConfirmation = async (
 };
 
 /**
- * Renders a modal to confirm the deletion of a user query.
+ *  Renders a modal to confirm the deletion of a user query.
  * @param modalRef - Reference to the modal component.
  * @param selectedQuery - The currently selected query for deletion.
  * @param handleDelete - Function to handle the deletion workflow.
+ * clean up the internal state after deletion.
  * @param queries - The current list of user queries.
  * @param setQueries - Function to update the state of queries.
  * @param context - The data context used to update shared state.
+ * @param setSelectedQuery - Function to update the currently selected query to
  * @returns The JSX element for the modal.
  */
 export const renderModal = (
@@ -124,6 +126,7 @@ export const renderModal = (
   queries: CustomUserQuery[],
   setQueries: React.Dispatch<React.SetStateAction<CustomUserQuery[]>>,
   context: DataContextValue,
+  setSelectedQuery: React.Dispatch<React.SetStateAction<SelectedQueryDetails>>,
 ): JSX.Element => {
   return (
     <DeleteModal
@@ -141,6 +144,8 @@ export const renderModal = (
             setQueries,
             context,
           );
+
+          setSelectedQuery({ queryName: undefined, queryId: undefined });
         }
       }}
     />

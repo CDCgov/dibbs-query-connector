@@ -1,8 +1,6 @@
 import styles from "../conditionTemplateSelection/conditionTemplateSelection.module.scss";
 import { Icon } from "@trussworks/react-uswds";
 import { DibbsConceptType, DibbsValueSet } from "@/app/constants";
-import { VsGrouping } from "@/app/utils/valueSetTranslation";
-import { tallyConceptsForValueSetGroupArray } from "../utils";
 import { ChangeEvent } from "react";
 import Checkbox from "@/app/query/designSystem/checkbox/Checkbox";
 
@@ -18,8 +16,8 @@ type ConceptTypeAccordionBodyProps = {
 /**
  * Fragment component to style out some of the accordion bodies
  * @param param0 - params
- * @param param0.activeVsType - DibbsactiveValueSetType (labs, conditions, medications)
- * @param param0.activeVsGroupings - ValueSets for a given activeValueSetType
+ * @param param0.activeValueSetType - DibbsactiveValueSetType (labs, conditions, medications)
+ * @param param0.activeValueSets - ValueSets for a given activeValueSetType
  * @param param0.expanded - Boolean for managing icon orientation
  * @param param0.handleVsNameLevelUpdate - curried state update function that
  * takes a VsName and generatesa ValueSet level update

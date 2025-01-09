@@ -17,22 +17,17 @@ type ConditionColumnDisplayProps = {
   setFormError: Dispatch<SetStateAction<FormError>>;
   formError: FormError;
 };
+
 /**
  * Column display component for the query building page
- * @param root0 - params
- * @param root0.fetchedConditions - conditions queried from backend to display
- * @param root0.searchFilter - filter grabbed from search field to filter fetched
- * components against
- * @param root0.selectedConditions - conditions the user has marked as included in
- * their query
- * @param root0.handleAddCondition - state function that updates the subset of
- * fetched conditions to be included in the query
- * @param root0.setFormError - state function that updates the subset of
- * fetched conditions to be included in the query
- * @param root0.formError - state function that updates the subset of
- * fetched conditions to be included in the query
- * @param root0.updateFetched - state function that updates the subset of
- * fetched conditions to be included in the query
+ * @param param0 - params
+ * @param param0.categoryToConditionsMap - category > condition information
+ * @param param0.searchFilter - substring to filter conditions / categories by
+ * @param param0.constructedQuery - the current state of the built query
+ * @param param0.handleConditionUpdate - handler function for updating a condition
+ * @param param0.formError - current state of the queryName / selectedConditions
+ * errors to gate navigation if there are errors
+ * @param param0.setFormError - setter function for the form
  * @returns Conditions split out into two columns that will filter themselves
  * at both the category and condition levels if a valid search filter is applied.
  */

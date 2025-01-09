@@ -20,7 +20,6 @@ import {
 import {
   ConditionIdToValueSetArrayMap,
   NestedQuery,
-  EMPTY_QUERY_SELECTION,
   CategoryToConditionArrayMap,
   ConditionsMap,
   EMPTY_CONCEPT_TYPE,
@@ -93,28 +92,24 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
 
   function resetQueryState() {
     setQueryName(undefined);
-    setSelectedQuery(EMPTY_QUERY_SELECTION);
+    setSelectedQuery({
+      queryId: undefined,
+      queryName: undefined,
+    });
     setConstructedQuery({});
   }
 
   function goBack() {
     resetQueryState();
-
     setBuildStep("selection");
   }
 
   useEffect(() => {
-    let isSubscribed = true;
-
     if (queryName == "" || queryName == undefined) {
       focusRef?.current?.focus();
     }
 
     validateForm();
-
-    return () => {
-      isSubscribed = false;
-    };
   }, [queryName]);
 
   useEffect(() => {
@@ -197,23 +192,9 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
   };
 
   async function handleConditionUpdate(conditionId: string, remove: boolean) {
-    const conditionValueSets = await getValueSetsForSelectedConditions([
-      conditionId,
-    ]);
-
-    if (conditionValueSets === undefined) {
-      showToastConfirmation({
-        heading: "Something went wrong",
-        body: "Couldn't fetch condition value sets. Try again, or contact us if the error persists",
-        variant: "error",
-      });
-      return;
-    }
-
     if (remove) {
       setConstructedQuery((prevState) => {
         delete prevState[conditionId];
-
         if (Object.keys(prevState).length === 0) {
           setFormError((prevError) => {
             return { ...prevError, selectedConditions: true };
@@ -222,7 +203,21 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
 
         return structuredClone(prevState);
       });
+
+      return;
     } else {
+      const conditionValueSets = await getValueSetsForSelectedConditions([
+        conditionId,
+      ]);
+
+      if (conditionValueSets === undefined) {
+        showToastConfirmation({
+          heading: "Something went wrong",
+          body: "Couldn't fetch condition value sets. Try again, or contact us if the error persists",
+          variant: "error",
+        });
+        return;
+      }
       const valueSetsToAdd = conditionValueSets[conditionId];
       const valueSetsByConceptType =
         groupValueSetsByConceptType(valueSetsToAdd);
@@ -268,12 +263,11 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
           userName,
           selectedQuery.queryId,
         );
+
         const queries = await getCustomQueries();
         queriesContext?.setData(queries);
 
         showToastConfirmation({ body: `${queryName} successfully saved` });
-        goBack();
-        resetQueryState();
       } catch (e) {
         showToastConfirmation({
           heading: "Something went wrong",
@@ -282,8 +276,6 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
       }
     }
   }
-
-  console.log(constructedQuery);
 
   return (
     <>
@@ -311,6 +303,7 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
               : "Back to My queries"
           }
         />
+
         <div className="customQuery__header">
           <h1 className={styles.queryTitle}>Custom query</h1>
           <div className={styles.customQuery__controls}>
