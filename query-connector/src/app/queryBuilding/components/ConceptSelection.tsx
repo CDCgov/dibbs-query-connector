@@ -1,5 +1,5 @@
 import React from "react";
-import styles from "../buildFromTemplates/buildfromTemplate.module.scss";
+import styles from "../conditionTemplateSelection/conditionTemplateSelection.module.scss";
 import { ConceptOption } from "@/app/utils/valueSetTranslation";
 import { showToastConfirmation } from "@/app/query/designSystem/toast/Toast";
 import Checkbox from "@/app/query/designSystem/checkbox/Checkbox";

@@ -1,8 +1,4 @@
 import { DibbsConceptType, DibbsValueSet } from "../constants";
-import {
-  ConditionIdToValueSetArrayMap,
-  ConditionToConceptTypeToValueSetGroupingMap,
-} from "../queryBuilding/utils";
 
 // ValueSets that share the same name, author, system unique identifier
 export type VsGrouping = {
@@ -20,7 +16,7 @@ export type ConceptTypeToDibbsVsMap = {
 
 export type ConceptTypeToVsNameToVsGroupingMap = {
   [dibbsConceptType in DibbsConceptType]: {
-    [name: string]: VsGrouping;
+    [vsId: string]: VsGrouping;
   };
 };
 
@@ -105,30 +101,6 @@ export function generateValueSetGroupingsByDibbsConceptType(
 ) {
   const valueSetsByConceptType = groupValueSetsByConceptType(vsArray);
   return generateValueSetGroupingsByConceptType(valueSetsByConceptType);
-}
-
-/**
- * Utility function to generate a three-layer condition : labs / conditions/
- * medications : {valueSetName: ValueSetGrouping} map
- * @param conditionIdToValueSetArrayMap map of condition IDs to ValueSet[]
- * @returns Map of {[conditionId]: {[valueSetName]: ValueSetGrouping} }
- */
-export function groupValueSetGroupingByConditionId(
-  conditionIdToValueSetArrayMap: ConditionIdToValueSetArrayMap,
-): ConditionToConceptTypeToValueSetGroupingMap {
-  const results: ConditionToConceptTypeToValueSetGroupingMap = {};
-
-  Object.entries(conditionIdToValueSetArrayMap).forEach(
-    ([conditionId, valueSetArray]) => {
-      const valueSetsByConceptType = groupValueSetsByConceptType(valueSetArray);
-      const curConditionGrouping = generateValueSetGroupingsByConceptType(
-        valueSetsByConceptType,
-      );
-      results[conditionId] = curConditionGrouping;
-    },
-  );
-
-  return results;
 }
 
 /**

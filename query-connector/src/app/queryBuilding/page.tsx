@@ -1,11 +1,11 @@
 "use client";
 import { SelectedQueryDetails } from "./querySelection/utils";
+import BuildFromTemplates from "./conditionTemplateSelection/ConditionTemplateSelection";
 import QuerySelection from "./querySelection/QuerySelection";
 import { BuildStep } from "../constants";
 import "react-toastify/dist/ReactToastify.css";
 import { useState } from "react";
 import { EMPTY_QUERY_SELECTION } from "./utils";
-import BuildFromTemplates from "./buildFromTemplates/BuildFromTemplates";
 
 /**
  * Component for Query Building Flow

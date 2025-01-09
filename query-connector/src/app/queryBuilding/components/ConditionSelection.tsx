@@ -1,92 +1,53 @@
 "use client";
 
-import styles from "../buildFromTemplates/buildfromTemplate.module.scss";
+import styles from "../conditionTemplateSelection/conditionTemplateSelection.module.scss";
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import classNames from "classnames";
-import { getConditionsData } from "@/app/database-service";
-import {
-  CategoryNameToConditionOptionMap,
-  groupConditionDataByCategoryName,
-  ConditionIdToValueSetArrayMap,
-} from "../utils";
-import ConditionColumnDisplay from "../buildFromTemplates/ConditionColumnDisplay";
+import { CategoryToConditionArrayMap, NestedQuery } from "../utils";
+import ConditionColumnDisplay from "../conditionTemplateSelection/ConditionColumnDisplay";
 import SearchField from "@/app/query/designSystem/searchField/SearchField";
-import { BuildStep } from "@/app/constants";
-import { FormError } from "../buildFromTemplates/BuildFromTemplates";
+import { FormError } from "../conditionTemplateSelection/ConditionTemplateSelection";
 
 type ConditionSelectionProps = {
-  fetchedConditions: CategoryNameToConditionOptionMap;
-  selectedConditions: CategoryNameToConditionOptionMap;
-  setBuildStep: (buildStep: BuildStep) => void;
-
-  setFetchedConditions: Dispatch<
-    SetStateAction<CategoryNameToConditionOptionMap | undefined>
-  >;
-  setSelectedConditions: Dispatch<
-    SetStateAction<CategoryNameToConditionOptionMap | undefined>
-  >;
-  queryName: string;
+  categoryToConditionsMap: CategoryToConditionArrayMap;
+  constructedQuery: NestedQuery;
+  handleConditionUpdate: (conditionId: string, checked: boolean) => void;
+  queryName: string | undefined;
   validateForm: () => void;
   setFormError: Dispatch<SetStateAction<FormError>>;
   formError: FormError;
   setLoading: Dispatch<SetStateAction<boolean>>;
   loading: boolean;
-  setConditionValueSets: Dispatch<
-    SetStateAction<ConditionIdToValueSetArrayMap | undefined>
-  >;
-  updateFetched: (selectedConditions: CategoryNameToConditionOptionMap) => void;
 };
 
 /**
  * Display component for a condition on the query building page
  * @param root0 - params
- * @param root0.fetchedConditions - ID of the condition to reference
- * @param root0.selectedConditions - name of condition to display
- * @param root0.setFetchedConditions - listener function for checkbox
- * selection
- * @param root0.setSelectedConditions - current checkbox selection status
+ * @param root0.constructedQuery - current state of the built query
+ * @param root0.handleConditionUpdate - update function for condition addition and
+ * removal
+ * @param root0.categoryToConditionsMap - ID of the condition to reference
  * @param root0.queryName - current checkbox selection status
  * @param root0.formError - indicates missing or incorrect form data
  * @param root0.setFormError - state function that updates the status of the
  * condition selection form input data
- * @param root0.updateFetched - tk
  * @returns A component for display to redner on the query building page
  */
 export const ConditionSelection: React.FC<ConditionSelectionProps> = ({
-  fetchedConditions,
-  selectedConditions,
-  setFetchedConditions,
-  setSelectedConditions,
+  categoryToConditionsMap,
+  constructedQuery,
+  handleConditionUpdate,
   queryName,
   formError,
   setFormError,
-  updateFetched,
 }) => {
   const focusRef = useRef<HTMLInputElement | null>(null);
-
   const [searchFilter, setSearchFilter] = useState<string>();
 
   useEffect(() => {
-    let isSubscribed = true;
-
     if (queryName == "" || queryName == undefined) {
       focusRef?.current?.focus();
     }
-
-    async function fetchConditionsAndUpdateState() {
-      const { categoryToConditionArrayMap } = await getConditionsData();
-
-      if (isSubscribed) {
-        setFetchedConditions(
-          groupConditionDataByCategoryName(categoryToConditionArrayMap),
-        );
-      }
-    }
-
-    fetchConditionsAndUpdateState().catch(console.error);
-    return () => {
-      isSubscribed = false;
-    };
   }, []);
 
   return (
@@ -112,15 +73,14 @@ export const ConditionSelection: React.FC<ConditionSelectionProps> = ({
           }}
         />
 
-        {fetchedConditions && (
+        {categoryToConditionsMap && (
           <ConditionColumnDisplay
-            selectedConditions={selectedConditions ?? {}}
-            setSelectedConditions={setSelectedConditions}
-            fetchedConditions={fetchedConditions}
+            constructedQuery={constructedQuery}
+            handleConditionUpdate={handleConditionUpdate}
+            categoryToConditionsMap={categoryToConditionsMap}
             searchFilter={searchFilter}
             formError={formError}
             setFormError={setFormError}
-            updateFetched={updateFetched}
           />
         )}
       </div>
