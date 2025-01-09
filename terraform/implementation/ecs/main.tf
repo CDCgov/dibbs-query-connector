@@ -136,7 +136,7 @@ module "ecs" {
 
 resource "aws_db_instance" "qc_db" {
   allocated_storage = "10"
-  db_name = var.qc_db_name
+  db_name = "var.qc_db_name-${terraform.workspace}"
   identifier = var.db_identifier
   engine               = var.db_engine_type
   engine_version       = var.db_engine_version

@@ -19,7 +19,7 @@ permissions:
   contents: read
 
 env:
-  workspace: dev
+  workspace: ${{ github.event.inputs.workspace }}
 
 jobs:
   terraform:
