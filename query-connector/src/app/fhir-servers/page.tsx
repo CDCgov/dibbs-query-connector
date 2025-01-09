@@ -1,6 +1,7 @@
 "use client";
 import { Icon, Label, TextInput } from "@trussworks/react-uswds";
 import {
+  deleteFhirServer,
   getFhirServerConfigs,
   insertFhirServer,
   updateFhirServer,
@@ -194,6 +195,23 @@ const FhirServers: React.FC = () => {
     }
   };
 
+  const handleDeleteServer = async () => {
+    if (!selectedServer) return;
+
+    const result = await deleteFhirServer(selectedServer.id);
+
+    if (result.success) {
+      // Refresh the server list after successful deletion
+      getFhirServerConfigs(true).then((servers) => {
+        setFhirServers(servers);
+      });
+      handleCloseModal();
+    } else {
+      setConnectionStatus("error");
+      setErrorMessage(result.error);
+    }
+  };
+
   const getModalButtons = () => {
     const buttons = [
       {
@@ -226,9 +244,7 @@ const FhirServers: React.FC = () => {
         type: "button" as const,
         id: "modal-delete-button",
         className: "usa-button usa-button--secondary",
-        onClick: () => {
-          /* Implement delete functionality */
-        },
+        onClick: handleDeleteServer,
       });
     }
 

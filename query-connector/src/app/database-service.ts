@@ -918,3 +918,46 @@ export async function updateFhirServerConnectionStatus(
     };
   }
 }
+
+/**
+ * Deletes a FHIR server configuration from the database.
+ * @param id - The ID of the FHIR server to delete
+ * @returns An object indicating success or failure with optional error message
+ */
+export async function deleteFhirServer(id: string) {
+  const deleteQuery = `
+    DELETE FROM fhir_servers 
+    WHERE id = $1
+    RETURNING *;
+  `;
+
+  try {
+    await dbClient.query("BEGIN");
+
+    const result = await dbClient.query(deleteQuery, [id]);
+
+    // Clear the cache so the next getFhirServerConfigs call will fetch fresh data
+    cachedFhirServerConfigs = null;
+
+    await dbClient.query("COMMIT");
+
+    if (result.rows.length === 0) {
+      return {
+        success: false,
+        error: "Server not found",
+      };
+    }
+
+    return {
+      success: true,
+      server: result.rows[0],
+    };
+  } catch (error) {
+    await dbClient.query("ROLLBACK");
+    console.error("Failed to delete FHIR server:", error);
+    return {
+      success: false,
+      error: "Failed to delete the server configuration.",
+    };
+  }
+}
