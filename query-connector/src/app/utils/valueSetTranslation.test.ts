@@ -11,8 +11,6 @@ describe("translation utils", () => {
   let cancerSets: DibbsValueSet[] = groupConditionConceptsIntoValueSets(
     CANCER_DB_QUERY_VALUES,
   );
-  const CANCER_CONDITION_ID = "2";
-
   describe("groupValueSetsByNameAuthorSystem", () => {
     it("returns expected grouped valueset", () => {
       const groupedValueSets = groupValueSetsByNameAuthorSystem(cancerSets);
