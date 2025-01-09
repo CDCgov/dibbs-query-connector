@@ -47,7 +47,7 @@ export default function HeaderComponent() {
     setShowMenu(!showMenu);
   };
   const isProduction = process.env.NODE_ENV === "production";
-  const backLink = isProduction ? "/query-connector" : "/";
+  const backLink = "/";
 
   return (
     <div className={styles.headerContainer}>
