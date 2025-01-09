@@ -1,4 +1,4 @@
-import styles from "../conditionTemplateSelection/conditionTemplateSelection.module.scss";
+import styles from "../buildFromTemplates/conditionTemplateSelection.module.scss";
 import React, { ChangeEvent, useState } from "react";
 import ConceptSelection from "./ConceptSelection";
 import Drawer from "@/app/query/designSystem/drawer/Drawer";

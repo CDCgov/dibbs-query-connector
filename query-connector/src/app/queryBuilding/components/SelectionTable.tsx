@@ -1,11 +1,11 @@
 "use client";
 import { useState } from "react";
-import styles from "../conditionTemplateSelection/conditionTemplateSelection.module.scss";
+import styles from "../buildFromTemplates/conditionTemplateSelection.module.scss";
 import { HeadingLevel } from "@trussworks/react-uswds";
-import ConceptTypeAccordionBody from "./ConceptTypeAccordionBody";
+import ConceptTypeAccordionBody from "./SelectionViewAccordionBody";
 import { DibbsConceptType, DibbsValueSet } from "@/app/constants";
 import { ConceptTypeToDibbsVsMap } from "@/app/utils/valueSetTranslation";
-import ConceptTypeAccordionHeader from "./ConceptTypeAccordionHeader";
+import ConceptTypeAccordionHeader from "./SelectionViewAccordionHeader";
 import MultiAccordion from "@/app/query/designSystem/MultiAccordion";
 
 type ConceptTypeSelectionTableProps = {

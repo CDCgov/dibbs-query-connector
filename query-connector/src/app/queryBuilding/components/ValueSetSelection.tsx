@@ -1,6 +1,6 @@
 "use client";
 
-import styles from "../conditionTemplateSelection/conditionTemplateSelection.module.scss";
+import styles from "../buildFromTemplates/conditionTemplateSelection.module.scss";
 import { useEffect, useState } from "react";
 import classNames from "classnames";
 
@@ -12,7 +12,7 @@ import {
   formatDiseaseDisplay,
   NestedQuery,
 } from "../utils";
-import { ConceptTypeSelectionTable } from "./ConceptTypeSelectionTable";
+import { ConceptTypeSelectionTable } from "./SelectionTable";
 
 import Drawer from "@/app/query/designSystem/drawer/Drawer";
 import { DibbsConceptType, DibbsValueSet } from "@/app/constants";

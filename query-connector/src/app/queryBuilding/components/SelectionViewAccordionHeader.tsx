@@ -1,4 +1,4 @@
-import styles from "../conditionTemplateSelection/conditionTemplateSelection.module.scss";
+import styles from "../buildFromTemplates/conditionTemplateSelection.module.scss";
 import { Icon } from "@trussworks/react-uswds";
 import { DibbsConceptType, DibbsValueSet } from "@/app/constants";
 import { ChangeEvent } from "react";

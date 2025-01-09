@@ -1,7 +1,7 @@
 "use client";
 
 import Backlink from "@/app/query/components/backLink/Backlink";
-import styles from "../conditionTemplateSelection/conditionTemplateSelection.module.scss";
+import styles from "./conditionTemplateSelection.module.scss";
 import { Label, TextInput, Button } from "@trussworks/react-uswds";
 import {
   Dispatch,

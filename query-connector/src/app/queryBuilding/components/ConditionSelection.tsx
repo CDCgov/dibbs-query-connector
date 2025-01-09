@@ -1,6 +1,6 @@
 "use client";
 
-import styles from "../conditionTemplateSelection/conditionTemplateSelection.module.scss";
+import styles from "../buildFromTemplates/conditionTemplateSelection.module.scss";
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import classNames from "classnames";
 import { CategoryToConditionArrayMap, NestedQuery } from "../utils";
