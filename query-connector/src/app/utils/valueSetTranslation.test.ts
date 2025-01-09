@@ -3,7 +3,6 @@ import { CANCER_DB_QUERY_VALUES } from "../tests/unit/fixtures";
 import { groupConditionConceptsIntoValueSets } from "../utils";
 import {
   generateValueSetGroupingsByDibbsConceptType,
-  groupValueSetGroupingByConditionId,
   groupValueSetsByConceptType,
   groupValueSetsByNameAuthorSystem,
 } from "./valueSetTranslation";
@@ -12,8 +11,6 @@ describe("translation utils", () => {
   let cancerSets: DibbsValueSet[] = groupConditionConceptsIntoValueSets(
     CANCER_DB_QUERY_VALUES,
   );
-  const CANCER_CONDITION_ID = "2";
-
   describe("groupValueSetsByNameAuthorSystem", () => {
     it("returns expected grouped valueset", () => {
       const groupedValueSets = groupValueSetsByNameAuthorSystem(cancerSets);
@@ -42,16 +39,6 @@ describe("translation utils", () => {
       expect(Object.values(groupedValueSets["conditions"]).length).toBe(2);
       expect(Object.values(groupedValueSets["medications"]).length).toBe(1);
     });
-  });
-  describe("groupValueSetGroupingByConditionId", () => {
-    const parentMap = groupValueSetGroupingByConditionId({
-      [CANCER_CONDITION_ID]: cancerSets,
-    });
-
-    const expectedGrouping =
-      generateValueSetGroupingsByDibbsConceptType(cancerSets);
-
-    expect(parentMap[CANCER_CONDITION_ID]).toEqual(expectedGrouping);
   });
 
   describe("groupValueSetsByConceptType", () => {
