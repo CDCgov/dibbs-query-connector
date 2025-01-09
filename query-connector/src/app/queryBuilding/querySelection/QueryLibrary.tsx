@@ -104,7 +104,9 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
                 className={classNames(styles.myQueriesRow, "tableRowWithHover")}
               >
                 <td title={query.query_name}>{query.query_name}</td>
-                <td title={query.conditions_list}>{query.conditions_list}</td>
+                <td title={query.conditions_list?.join(",")}>
+                  {query.conditions_list?.join(", ")}
+                </td>
                 <td>
                   <div className="table-cell-buttons">
                     <Button
