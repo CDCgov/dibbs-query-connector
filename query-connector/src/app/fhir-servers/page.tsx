@@ -242,7 +242,7 @@ const FhirServers: React.FC = () => {
             aria-label="Connected"
             color="green"
           />
-          Connection successful
+          Success
         </>
       );
       buttons[1].className =

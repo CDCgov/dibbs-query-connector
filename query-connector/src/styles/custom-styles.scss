@@ -561,5 +561,17 @@ ul.usa-sidenav
     .usa-button--secondary {
       background-color: #d83933 !important;
     }
+
+    #modal-cancel-button {
+      background-color: transparent;
+      
+      &:hover {
+        box-shadow: none;
+      }
+    }
+
+    .usa-button-group__item:has(> #modal-delete-button) {
+      flex: 1 1 0%;
+    }
   }
 }
