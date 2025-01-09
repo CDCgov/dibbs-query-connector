@@ -11,6 +11,7 @@ type DrawerProps = {
   isOpen: boolean;
   onSave: () => void;
   onClose: () => void;
+  onSearch?: () => void;
   hasChanges: boolean;
 };
 
@@ -20,6 +21,7 @@ type DrawerProps = {
  * @param root0.title - The title displayed in the drawer.
  * @param root0.placeholder - The placeholder text for the search field.
  * @param root0.onClose - Function to handle closing the drawer.
+ * @param root0.onSearch - Function to handle search actions in the drawer.
  * @param root0.isOpen - Boolean to control the visibility of the drawer.
  * @param root0.toRender - The dynamic content to display.
  * warning modal appears before saving
@@ -31,6 +33,7 @@ const Drawer: React.FC<DrawerProps> = ({
   isOpen,
   onClose,
   toRender,
+  onSearch,
 }: DrawerProps) => {
   const handleClose = () => {
     onClose();
@@ -52,16 +55,18 @@ const Drawer: React.FC<DrawerProps> = ({
           </button>
           <h2 className="margin-0 padding-bottom-2">{title}</h2>
 
-          <div className="padding-top-5">
-            <SearchField
-              id="searchFieldTemplate"
-              placeholder={placeholder}
-              className={styles.searchField}
-              onChange={(e) => {
-                e.preventDefault();
-              }}
-            />
-          </div>
+          {onSearch && (
+            <div className="padding-top-5">
+              <SearchField
+                id="searchFieldTemplate"
+                placeholder={placeholder}
+                className={styles.searchField}
+                onChange={(e) => {
+                  e.preventDefault();
+                }}
+              />
+            </div>
+          )}
           <div className="padding-top-2">{toRender}</div>
         </div>
       </div>

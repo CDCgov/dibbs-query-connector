@@ -2,7 +2,7 @@ import { DibbsValueSet } from "../constants";
 import {
   VsGrouping,
   ConceptTypeToVsNameToVsGroupingMap,
-  temp__ConceptTypeToVsNameToVsGroupingMap,
+  ConceptTypeToDibbsVsMap,
 } from "../utils/valueSetTranslation";
 
 // The structure of the data that's coming from the backend
@@ -18,6 +18,13 @@ export type ConditionOption = {
   include: boolean;
 };
 
+export type CategoryToConditionArrayMap = {
+  [category: string]: {
+    id: string;
+    name: string;
+  }[];
+};
+
 export type ConditionOptionMap = {
   [conditionId: string]: ConditionOption;
 };
@@ -28,6 +35,10 @@ export type CategoryNameToConditionOptionMap = {
 
 export type ConditionIdToValueSetArrayMap = {
   [conditionId: string]: DibbsValueSet[];
+};
+
+export type NestedQuery = {
+  [conditionId: string]: ConceptTypeToDibbsVsMap;
 };
 
 export type CategoryToConditionToNameMap = {

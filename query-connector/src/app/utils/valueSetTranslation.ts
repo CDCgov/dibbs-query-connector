@@ -13,9 +13,9 @@ export type VsGrouping = {
   items: DibbsValueSet[];
 };
 
-export type temp__ConceptTypeToVsNameToVsGroupingMap = {
+export type ConceptTypeToDibbsVsMap = {
   [dibbsConceptType in DibbsConceptType]: {
-    [name: string]: DibbsValueSet;
+    [vsId: string]: DibbsValueSet;
   };
 };
 
