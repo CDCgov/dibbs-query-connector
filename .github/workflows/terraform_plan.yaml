@@ -4,7 +4,7 @@ run-name: Terraform plan ${{ inputs.workspace }} by @${{ github.actor }}
 on:
   pull_request:
     branches:
-      - shanice/change_app_url
+      - shanice/deploy_demo_ecs
   workflow_dispatch:
     inputs:
       workspace:
