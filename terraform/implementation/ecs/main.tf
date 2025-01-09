@@ -159,7 +159,7 @@ resource "aws_db_subnet_group" "this" {
 
 # Create a parameter group to configure Postgres RDS parameters
 resource "aws_db_parameter_group" "this" {
-  name   = "${var.db_identifier}-pg"
+  name   = "${var.db_identifier}-pg-${terraform.workspace}"
   family = var.db_family
 
   parameter {
