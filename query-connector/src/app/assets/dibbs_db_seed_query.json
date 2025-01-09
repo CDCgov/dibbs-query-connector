@@ -7,9 +7,9 @@
       "time_window_number": "30",
       "time_window_unit": "days",
       "query_name": "Cancer case investigation",
-      "conditions_list": "{Cancer (Leukemia)}",
+      "conditions_list": "{2}",
       "query_data": {
-        "Cancer (Leukemia)": {
+        "2": {
           "14_20240923": {
             "valueSetId": "14_20240923",
             "valueSetVersion": "20240923",
@@ -122,9 +122,9 @@
       "time_window_number": "30",
       "time_window_unit": "days",
       "query_name": "Chlamydia case investigation",
-      "conditions_list": "{Chlamydia trachomatis infection (disorder)}",
+      "conditions_list": "{240589008}",
       "query_data": {
-        "Chlamydia trachomatis infection (disorder)": {
+        "240589008": {
           "2.16.840.1.113762.1.4.1146.999_20230602": {
             "valueSetId": "2.16.840.1.113762.1.4.1146.999_20230602",
             "valueSetVersion": "20230602",
@@ -2173,7 +2173,7 @@
       "time_window_unit": "days",
       "query_name": "Syphilis case investigation",
       "query_data": {
-        "Congenital syphilis (disorder)": {
+        "35742006": {
           "2.16.840.1.113762.1.4.1146.554_20191227": {
             "valueSetId": "2.16.840.1.113762.1.4.1146.554_20191227",
             "valueSetVersion": "20191227",
@@ -3347,7 +3347,7 @@
           }
         }
       },
-      "conditions_list": "{Congenital syphilis (disorder)}"
+      "conditions_list": "{35742006}"
     },
     {
       "author": "DIBBs",
@@ -3357,7 +3357,7 @@
       "time_window_unit": "days",
       "query_name": "Gonorrhea case investigation",
       "query_data": {
-        "Gonorrhea (disorder)": {
+        "15628003": {
           "2.16.840.1.113762.1.4.1146.1036_20190605": {
             "valueSetId": "2.16.840.1.113762.1.4.1146.1036_20190605",
             "valueSetVersion": "20190605",
@@ -4890,7 +4890,7 @@
           }
         }
       },
-      "conditions_list": "{Gonorrhea (disorder)}"
+      "conditions_list": "{15628003}"
     },
     {
       "author": "DIBBs",
@@ -4900,7 +4900,7 @@
       "time_window_unit": "days",
       "query_name": "Newborn screening follow-up",
       "query_data": {
-        "Newborn Screening": {
+        "1": {
           "1_20240909": {
             "valueSetId": "1_20240909",
             "valueSetVersion": "20240909",
@@ -5924,7 +5924,7 @@
           }
         }
       },
-      "conditions_list": "{Newborn Screening}"
+      "conditions_list": "{1}"
     }
   ]
 }

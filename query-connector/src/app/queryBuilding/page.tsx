@@ -1,6 +1,6 @@
 "use client";
 import { SelectedQueryDetails } from "./querySelection/utils";
-import BuildFromTemplates from "./buildFromTemplates/BuildFromTemplates";
+import BuildFromTemplates from "./conditionTemplateSelection/ConditionTemplateSelection";
 import QuerySelection from "./querySelection/QuerySelection";
 import { BuildStep } from "../constants";
 import "react-toastify/dist/ReactToastify.css";
@@ -13,7 +13,7 @@ import { EMPTY_QUERY_SELECTION } from "./utils";
  */
 const QueryBuilding: React.FC = () => {
   const [selectedQuery, setSelectedQuery] = useState<SelectedQueryDetails>(
-    EMPTY_QUERY_SELECTION,
+    structuredClone(EMPTY_QUERY_SELECTION),
   );
   const [buildStep, setBuildStep] = useState<BuildStep>("selection");
 

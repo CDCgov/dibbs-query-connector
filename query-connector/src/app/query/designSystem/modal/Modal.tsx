@@ -50,6 +50,7 @@ export const Modal: React.FC<ModalProps> = ({
       id={`${id}-modal`}
       aria-labelledby={`${id}-modal-heading`}
       aria-describedby={`${id}-modal-description`}
+      className="padding-x-2"
     >
       <ModalHeading id={`${id}-modal-heading`}>{heading}</ModalHeading>
       <div className="usa-prose">
