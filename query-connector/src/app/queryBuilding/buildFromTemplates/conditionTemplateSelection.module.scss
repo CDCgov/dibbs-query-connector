@@ -268,7 +268,7 @@
       line-height: normal;
       font-weight: 700;
       font-size: 14px;
-      color: #005ea2;
+      color: $text-blue;
 
       &:hover {
         cursor: pointer;
@@ -349,7 +349,7 @@ $columnGap: 1rem;
 }
 
 .conditionDrawerHeader {
-  color: var(--gray-500, #919191);
+  color: $text-secondary;
   font-size: 1rem;
   font-style: normal;
   font-weight: 700;
@@ -375,7 +375,7 @@ $columnGap: 1rem;
   border-radius: 0.25rem;
 
   &:hover {
-    background: var(--white, #fff);
+    background: $white;
   }
   &:hover .addButton {
     display: inline-block;
@@ -395,7 +395,7 @@ $columnGap: 1rem;
 }
 
 .addButton {
-  color: var(--Primary-primary, #005ea2);
+  color: $text-blue;
   text-transform: uppercase;
   font-weight: 700;
   cursor: pointer;
