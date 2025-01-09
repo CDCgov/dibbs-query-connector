@@ -152,7 +152,7 @@ resource "aws_db_instance" "qc_db" {
 
 # Create a DB subnet group
 resource "aws_db_subnet_group" "this" {
-  name       = "${var.db_identifier}-subnet-group"
+  name       = "${var.db_identifier}-subnet-group-${terraform.workspace}"
   subnet_ids = module.vpc.private_subnets
 
 }
