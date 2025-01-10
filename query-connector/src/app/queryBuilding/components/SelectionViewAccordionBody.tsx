@@ -26,7 +26,6 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
   handleVsIdLevelUpdate,
 }) => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [hasDrawerChange, setHasDrawerChange] = useState(false);
   const [curValueSet, setCurValueSet] = useState<DibbsValueSet>();
   const [curConcepts, setCurConcepts] = useState<ConceptOption[]>([]);
 
@@ -52,7 +51,6 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
       }
 
       setCurConcepts(updatedConcepts);
-      setHasDrawerChange(true);
     }
   };
 
@@ -148,10 +146,10 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
           }
           isOpen={isDrawerOpen}
           onClose={() => {
-            setIsDrawerOpen(false), setHasDrawerChange(false);
+            setIsDrawerOpen(false);
+            setCurValueSet(undefined);
           }}
           onSave={handleSaveChanges}
-          hasChanges={hasDrawerChange}
         />
       )}
     </div>

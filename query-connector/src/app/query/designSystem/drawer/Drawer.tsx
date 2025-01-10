@@ -12,7 +12,6 @@ type DrawerProps = {
   onSave: () => void;
   onClose: () => void;
   onSearch?: () => void;
-  hasChanges: boolean;
 };
 
 /**

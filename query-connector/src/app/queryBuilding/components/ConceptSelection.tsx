@@ -62,11 +62,7 @@ const ConceptSelection: React.FC<ConceptSelectionProps> = ({
             <Checkbox
               id="toggleAll"
               checked={selectedCount === totalCount}
-              className={`bg-transparent ${
-                isMinusState
-                  ? styles.concept__checkbox__partial
-                  : styles.concept__checkbox
-              }`}
+              isMinusState={isMinusState}
               onChange={(e) => toggleAll(e.target.checked)}
             />
           </th>
@@ -87,7 +83,7 @@ const ConceptSelection: React.FC<ConceptSelectionProps> = ({
                 onChange={(e) => toggleSingle(index, e.target.checked)}
               />
             </td>
-            <td>{concept.code}</td>
+            <td className={styles.conceptCode}>{concept.code}</td>
             <td>{concept.display}</td>
           </tr>
         ))}
