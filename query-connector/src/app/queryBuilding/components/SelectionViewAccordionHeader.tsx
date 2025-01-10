@@ -25,13 +25,21 @@ type ConceptTypeAccordionBodyProps = {
  * @returns An accordion body component
  */
 
+/**
+ *
+ * @param root0
+ * @param root0.activeValueSetType
+ * @param root0.activeValueSets
+ * @param root0.expanded
+ * @param root0.handleVsNameLevelUpdate
+ */
 const ConceptTypeAccordionHeader: React.FC<ConceptTypeAccordionBodyProps> = ({
   activeValueSetType,
   activeValueSets,
   expanded,
   handleVsNameLevelUpdate,
 }) => {
-   const selectedCount = tallyConceptsForValueSetArray(
+  const selectedCount = tallyConceptsForValueSetArray(
     Object.values(activeTypeValueSets),
     true,
   );

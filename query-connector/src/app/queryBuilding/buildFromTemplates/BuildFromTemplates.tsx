@@ -114,7 +114,7 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
   useEffect(() => {
     let isSubscribed = true;
 
-  async function setInitialQueryState() {
+    async function setInitialQueryState() {
       if (selectedQuery.queryId === undefined) {
         return;
       }

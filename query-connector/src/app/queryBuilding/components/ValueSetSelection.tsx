@@ -45,7 +45,7 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
   categoryToConditionsMap,
 }) => {
   const [activeCondition, setActiveCondition] = useState<string>("");
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false)
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const handleDrawer = (open: boolean) => {
     setIsDrawerOpen(open);
   };

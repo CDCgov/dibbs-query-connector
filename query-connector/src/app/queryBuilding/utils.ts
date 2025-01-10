@@ -1,7 +1,5 @@
 import { DibbsValueSet } from "../constants";
-import {
-  ConceptTypeToDibbsVsMap,
-} from "../utils/valueSetTranslation";
+import { ConceptTypeToDibbsVsMap } from "../utils/valueSetTranslation";
 
 // The structure of the data that's coming from the backend
 export type ConditionsMap = {
@@ -111,11 +109,13 @@ export function tallyConceptsForSingleValueSet(
   filterInclude?: boolean,
 ) {
   const selectedTotal = valueSet.concepts.reduce((sum, concept) => {
-    const addToTally = 
-    !filterInclude ? 1 : // add every item
-    concept.include ? 1 : 0 // only add items marked as included
+    const addToTally = !filterInclude
+      ? 1 // add every item
+      : concept.include
+        ? 1
+        : 0; // only add items marked as included
 
-    sum += addToTally
+    sum += addToTally;
 
     return sum;
   }, 0);
@@ -137,10 +137,7 @@ export function tallyConceptsForValueSetArray(
   filterInclude?: boolean,
 ) {
   const selectedTotal = valueSets.reduce((sum, valueSet) => {
-    const childTotal = tallyConceptsForSingleValueSet(
-      valueSet,
-      filterInclude,
-    );
+    const childTotal = tallyConceptsForSingleValueSet(valueSet, filterInclude);
     sum += childTotal;
     return sum;
   }, 0);

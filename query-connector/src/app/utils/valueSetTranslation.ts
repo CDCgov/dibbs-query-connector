@@ -36,8 +36,8 @@ export function groupValueSetsByVsId(
       const author = row?.author;
       const system = row?.system;
       const valueSetName = row?.valueSetName;
-      const vsId = row?.valueSetId
-      if (!author || !system || !valueSetName ) {
+      const vsId = row?.valueSetId;
+      if (!author || !system || !valueSetName) {
         console.warn(
           `Skipping malformed row: Missing author (${author}) or system (${system}) for ValueSet (${row?.valueSetId})`,
         );
