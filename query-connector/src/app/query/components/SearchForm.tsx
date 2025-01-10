@@ -6,15 +6,8 @@ import {
   Select,
   Button,
 } from "@trussworks/react-uswds";
-import {
-  USE_CASES,
-  FHIR_SERVERS,
-  demoData,
-  stateOptions,
-  Mode,
-} from "@/app/constants";
+import { USE_CASES, demoData, stateOptions, Mode } from "@/app/constants";
 import { UseCaseQueryResponse, UseCaseQuery } from "@/app/query-service";
-import { fhirServers as hardcodedFhirServers } from "@/app/fhir-servers";
 import styles from "./searchForm/searchForm.module.scss";
 import { FormatPhoneAsDigits } from "@/app/format-service";
 import TitleBox from "./stepIndicator/TitleBox";
@@ -28,8 +21,8 @@ interface SearchFormProps {
   setMode: (mode: Mode) => void;
   setLoading: (loading: boolean) => void;
   fhirServers: string[];
-  selectedFhirServer: FHIR_SERVERS;
-  setFhirServer: React.Dispatch<React.SetStateAction<FHIR_SERVERS>>;
+  selectedFhirServer: string;
+  setFhirServer: React.Dispatch<React.SetStateAction<string>>;
 }
 
 /**
@@ -75,7 +68,7 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
         setDOB(data.DOB);
         setMRN(data.MRN);
         setPhone(data.Phone);
-        setFhirServer(data.FhirServer as FHIR_SERVERS);
+        setFhirServer(data.FhirServer as string);
         setAutofilled(highlightAutofilled);
       }
     },
@@ -112,11 +105,6 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
-
-  const combinedFhirServers = [
-    ...fhirServers,
-    ...Object.keys(hardcodedFhirServers),
-  ];
 
   return (
     <>
@@ -178,11 +166,11 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
                     name="fhir_server"
                     value={fhirServer}
                     onChange={(event) => {
-                      setFhirServer(event.target.value as FHIR_SERVERS);
+                      setFhirServer(event.target.value as string);
                     }}
                     required
                   >
-                    {combinedFhirServers.map((fhirServer: string) => (
+                    {fhirServers.map((fhirServer: string) => (
                       <option key={fhirServer} value={fhirServer}>
                         {fhirServer}
                       </option>

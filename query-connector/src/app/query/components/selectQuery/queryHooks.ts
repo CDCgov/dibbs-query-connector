@@ -1,9 +1,4 @@
-import {
-  FHIR_SERVERS,
-  USE_CASES,
-  DibbsValueSet,
-  hyperUnluckyPatient,
-} from "@/app/constants";
+import { USE_CASES, DibbsValueSet, hyperUnluckyPatient } from "@/app/constants";
 import { getSavedQueryByName } from "@/app/database-service";
 import { unnestValueSetsFromQuery } from "@/app/utils";
 import { UseCaseQuery, UseCaseQueryResponse } from "@/app/query-service";
@@ -38,7 +33,7 @@ export async function fetchQueryResponse(p: {
   patientForQuery: Patient | undefined;
   selectedQuery: USE_CASES;
   queryValueSets: DibbsValueSet[];
-  fhirServer: FHIR_SERVERS;
+  fhirServer: string;
   queryResponseStateCallback: SetStateCallback<UseCaseQueryResponse>;
   setIsLoading: (isLoading: boolean) => void;
 }) {
