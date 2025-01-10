@@ -1,23 +1,18 @@
 "use client";
 import { useState } from "react";
-import styles from "../buildFromTemplates/buildfromTemplate.module.scss";
+import styles from "../buildFromTemplates/conditionTemplateSelection.module.scss";
 import { HeadingLevel } from "@trussworks/react-uswds";
-import SelectionViewAccordionBody from "./SelectionViewAccordionBody";
+import ConceptTypeAccordionBody from "./SelectionViewAccordionBody";
 import { DibbsConceptType, DibbsValueSet } from "@/app/constants";
-import {
-  ConceptTypeToVsNameToVsGroupingMap,
-  VsGrouping,
-} from "@/app/utils/valueSetTranslation";
-import SelectionViewAccordionHeader from "./SelectionViewAccordionHeader";
+import { ConceptTypeToDibbsVsMap } from "@/app/utils/valueSetTranslation";
+import ConceptTypeAccordionHeader from "./SelectionViewAccordionHeader";
 import MultiAccordion from "@/app/query/designSystem/MultiAccordion";
 
-type SelectionTableProps = {
-  vsTypeLevelOptions: ConceptTypeToVsNameToVsGroupingMap;
+type ConceptTypeSelectionTableProps = {
+  vsTypeLevelOptions: ConceptTypeToDibbsVsMap;
   handleVsTypeLevelUpdate: (
     vsType: DibbsConceptType,
-  ) => (
-    vsName: string,
-  ) => (val: VsGrouping) => (dibbsValueSets: DibbsValueSet[]) => void;
+  ) => (vsId: string) => (dibbsValueSets: DibbsValueSet) => void;
 };
 /**
  * Component that displays ValueSetGroupings sorted by VsType (DibbsConceptType)
@@ -28,28 +23,26 @@ type SelectionTableProps = {
  * takes a VsType and generates a VsName level setter function
  * @returns A component for display to render on the query building page
  */
-export const SelectionTable: React.FC<SelectionTableProps> = ({
-  vsTypeLevelOptions,
-  handleVsTypeLevelUpdate,
-}) => {
+export const ConceptTypeSelectionTable: React.FC<
+  ConceptTypeSelectionTableProps
+> = ({ vsTypeLevelOptions, handleVsTypeLevelUpdate }) => {
   const [expanded, setExpandedGroup] = useState<string>("");
-
   const generateTypeLevelAccordionItems = (vsType: DibbsConceptType) => {
     const handleVsNameLevelUpdate = handleVsTypeLevelUpdate(vsType);
 
     const title = (
-      <SelectionViewAccordionHeader
+      <ConceptTypeAccordionHeader
         activeValueSetType={vsType}
-        activeVsGroupings={vsTypeLevelOptions[vsType]}
+        activeValueSets={vsTypeLevelOptions[vsType]}
         expanded={expanded === vsType}
         handleVsNameLevelUpdate={handleVsNameLevelUpdate}
       />
     );
 
     const content = (
-      <SelectionViewAccordionBody
-        activeVsGroupings={vsTypeLevelOptions[vsType]}
-        handleVsNameLevelUpdate={handleVsNameLevelUpdate}
+      <ConceptTypeAccordionBody
+        activeValueSets={vsTypeLevelOptions[vsType]}
+        handleVsIdLevelUpdate={handleVsNameLevelUpdate}
       />
     );
     const level: HeadingLevel = "h4";
@@ -68,12 +61,15 @@ export const SelectionTable: React.FC<SelectionTableProps> = ({
       id: `${vsType}`,
       headingLevel: level,
       handleToggle,
+      length: Object.keys(vsTypeLevelOptions[vsType]).length,
     };
   };
 
-  const accordionItems = Object.keys(vsTypeLevelOptions).map((vsType) => {
-    return generateTypeLevelAccordionItems(vsType as DibbsConceptType);
-  });
+  const accordionItems = Object.keys(vsTypeLevelOptions)
+    .map((vsType) => {
+      return generateTypeLevelAccordionItems(vsType as DibbsConceptType);
+    })
+    .filter((v) => v.length > 0);
   return (
     <div data-testid="accordion" className={styles.accordionContainer}>
       <MultiAccordion

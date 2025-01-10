@@ -26,7 +26,7 @@ import LoadingView from "@/app/query/components/LoadingView";
 import { DataContext } from "@/app/DataProvider";
 import classNames from "classnames";
 import { getConditionsData } from "@/app/database-service";
-import { ConditionIdToNameMap } from "../utils";
+import { ConditionsMap } from "../utils";
 
 interface UserQueriesDisplayProps {
   queries: CustomUserQuery[];
@@ -55,7 +55,7 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
   const [queries, setQueries] = useState<CustomUserQuery[]>(initialQueries);
   const [loading, setLoading] = useState(false);
   const [conditionIdToDetailsMap, setConditionIdToDetailsMap] =
-    useState<ConditionIdToNameMap>();
+    useState<ConditionsMap>();
 
   const modalRef = useRef<ModalRef>(null);
   const handleEdit = (queryName: string, queryId: string) => {
@@ -78,7 +78,6 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
     }
 
     fetchConditionsAndUpdateState().catch(console.error);
-
     return () => {
       isSubscribed = false;
     };
@@ -95,6 +94,7 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
           queries,
           setQueries,
           queriesContext,
+          setSelectedQuery,
         )}
       <div className="display-flex flex-justify-between flex-align-center width-full margin-bottom-4">
         <h1 className="flex-align-center">Query Library</h1>
@@ -132,10 +132,17 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
                   )}
                 >
                   <td title={query.query_name}>{query.query_name}</td>
-                  <td title={query.conditions_list?.join(",")}>
+
+                  <td
+                    title={query.conditions_list
+                      ?.map((id) => {
+                        return conditionIdToDetailsMap[id].name;
+                      })
+                      .join(", ")}
+                  >
                     {query.conditions_list
                       ?.map((id) => {
-                        return conditionIdToDetailsMap[id];
+                        return conditionIdToDetailsMap[id].name;
                       })
                       .join(", ")}
                   </td>

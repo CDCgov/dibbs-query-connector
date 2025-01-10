@@ -16,29 +16,38 @@ import { DataContextValue } from "@/app/DataProvider";
  * @param context - The data context used to update shared state.
  */
 export const handleDelete = async (
-  queryName: string,
-  queryId: string,
+  queryName: string | undefined,
+  queryId: string | undefined,
   queries: CustomUserQuery[],
   setQueries: React.Dispatch<React.SetStateAction<CustomUserQuery[]>>,
   context: DataContextValue | undefined,
 ) => {
-  const result = await deleteQueryById(queryId);
-  if (result.success) {
+  if (queryId) {
+    const result = await deleteQueryById(queryId);
+    if (result.success) {
+      showToastConfirmation({
+        body: `${queryName} has been deleted.`,
+        variant: "success",
+        duration: 2000,
+      });
+      const updatedQueries = queries.filter(
+        (query) => query.query_id !== queryId,
+      );
+      setQueries(updatedQueries);
+
+      if (context) {
+        context.setData(updatedQueries);
+      }
+    } else {
+      console.error(result.error);
+    }
+  } else {
     showToastConfirmation({
-      body: `${queryName} has been deleted.`,
+      heading: `Something went wrong`,
+      body: `${queryName} couldn't be deleted. Please try again or contact us if the error persists`,
       variant: "error",
       duration: 2000,
     });
-    const updatedQueries = queries.filter(
-      (query) => query.query_id !== queryId,
-    );
-    setQueries(updatedQueries);
-
-    if (context) {
-      context.setData(updatedQueries);
-    }
-  } else {
-    console.error(result.error);
   }
 };
 
@@ -70,7 +79,7 @@ export const handleCopy = (queryName: string, queryId: string) => {
     .then(() => {
       showToastConfirmation({
         body: `${queryName} ID copied successfully!`,
-        duration: 20000,
+        duration: 2000,
       });
     })
     .catch((error) => {
@@ -93,21 +102,23 @@ export const handleCreationConfirmation = async (
 };
 
 /**
- * Renders a modal to confirm the deletion of a user query.
+ *  Renders a modal to confirm the deletion of a user query.
  * @param modalRef - Reference to the modal component.
  * @param selectedQuery - The currently selected query for deletion.
  * @param handleDelete - Function to handle the deletion workflow.
+ * clean up the internal state after deletion.
  * @param queries - The current list of user queries.
  * @param setQueries - Function to update the state of queries.
  * @param context - The data context used to update shared state.
+ * @param setSelectedQuery - Function to update the currently selected query to
  * @returns The JSX element for the modal.
  */
 export const renderModal = (
   modalRef: RefObject<ModalRef>,
-  selectedQuery: { queryName: string; queryId: string } | null,
+  selectedQuery: SelectedQueryDetails | null,
   handleDelete: (
-    queryName: string,
-    queryId: string,
+    queryName: string | undefined,
+    queryId: string | undefined,
     queries: CustomUserQuery[],
     setQueries: React.Dispatch<React.SetStateAction<CustomUserQuery[]>>,
     context: DataContextValue,
@@ -115,6 +126,7 @@ export const renderModal = (
   queries: CustomUserQuery[],
   setQueries: React.Dispatch<React.SetStateAction<CustomUserQuery[]>>,
   context: DataContextValue,
+  setSelectedQuery: React.Dispatch<React.SetStateAction<SelectedQueryDetails>>,
 ): JSX.Element => {
   return (
     <DeleteModal
@@ -132,6 +144,8 @@ export const renderModal = (
             setQueries,
             context,
           );
+
+          setSelectedQuery({ queryName: undefined, queryId: undefined });
         }
       }}
     />
@@ -139,7 +153,7 @@ export const renderModal = (
 };
 
 export type SelectedQueryDetails = {
-  queryName: string;
-  queryId: string;
+  queryName?: string;
+  queryId?: string;
 };
 export type SelectedQueryState = SelectedQueryDetails | null;

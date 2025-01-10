@@ -1,7 +1,11 @@
 "use server";
 
 import { getDbClient } from "./dbClient";
-import { NestedQuery, QueryDetailsResult } from "../queryBuilding/utils";
+import {
+  NestedQuery,
+  QueryDetailsResult,
+  QueryUpdateResult,
+} from "../queryBuilding/utils";
 import { DibbsValueSet } from "../constants";
 import { DEFAULT_TIME_WINDOW } from "../utils";
 import { randomUUID } from "crypto";
@@ -56,7 +60,7 @@ export async function saveCustomQuery(
         query_data = EXCLUDED.query_data,
         author = EXCLUDED.author,
         date_last_modified = EXCLUDED.date_last_modified
-      RETURNING id, query_name;
+      RETURNING id, query_name,  CASE WHEN xmax = 0 THEN 'INSERT' ELSE 'UPDATE' END AS operation;
     `;
   const { queryDataInsert, conditionInsert } =
     formatQueryDataForDatabase(queryInput);
@@ -76,7 +80,7 @@ export async function saveCustomQuery(
     ];
     const result = await dbClient.query(queryString, dataToWrite);
     if (result.rows.length > 0) {
-      return result.rows as unknown as QueryDetailsResult[];
+      return result.rows as QueryUpdateResult[];
     }
     console.error("Query save failed:", dataToWrite);
     return [];
