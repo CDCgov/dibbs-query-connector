@@ -2,16 +2,19 @@ name: Ad-hoc Terraform Plan
 run-name: Terraform plan ${{ inputs.workspace }} by @${{ github.actor }}
 
 on:
-  pull_request:
-    branches:
-      - shanice/deploy_demo_ecs
+  merge_group:
+    types:
+      - checks_requested
   workflow_dispatch:
     inputs:
       workspace:
-        description: "The workspace to terraform against"
+        description: "Choose terraform workspace for deployment"
         required: true
-        type: string
-        default: "dev"
+        type: choice
+        options:
+          - dev
+          - demo
+        default: dev
 
 concurrency:
   group: ${{ github.event.inputs.workspace }}-terraform
@@ -52,7 +55,6 @@ jobs:
 
       - name: Terraform
         env:
-          # ACTION: ${{ env.terraform_action }}
           BUCKET: ${{ secrets.TFSTATE_BUCKET }}
           DYNAMODB_TABLE: ${{ secrets.TFSTATE_DYNAMODB_TABLE }}
           REGION: ${{ vars.region }}
@@ -63,6 +65,7 @@ jobs:
           TLS_KEY: ${{ secrets.TLS_KEY}}
         shell: bash
         run: |
+          echo "Deploying to ${{ github.event.inputs.workspace }}..."
           rm -rf .terraform .terraform.lock.hcl
           terraform init \
             -var-file="$WORKSPACE.tfvars" \
