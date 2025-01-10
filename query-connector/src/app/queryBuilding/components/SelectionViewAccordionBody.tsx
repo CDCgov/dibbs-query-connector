@@ -1,64 +1,51 @@
 import styles from "../buildFromTemplates/buildfromTemplate.module.scss";
 import { formatDiseaseDisplay } from "../utils";
-import { tallyConceptsForSingleValueSetGroup } from "../utils";
+import { tallyConceptsForSingleValueSet } from "../utils";
 import React, { ChangeEvent, useState } from "react";
 import ConceptSelection from "./ConceptSelection";
 import Drawer from "@/app/query/designSystem/drawer/Drawer";
-import {
-  ConceptOption,
-  VsGrouping,
-  getNameAuthorSystemFromVSGrouping,
-} from "@/app/utils/valueSetTranslation";
-import { DibbsValueSet } from "@/app/constants";
+import { Concept, DibbsValueSet } from "@/app/constants";
 import Checkbox from "@/app/query/designSystem/checkbox/Checkbox";
 
 type SelectionViewAccordionBodyProps = {
   id?: string;
-  activeVsGroupings: { [vsNameAuthorSystem: string]: VsGrouping };
-  handleVsNameLevelUpdate: (
-    vsName: string,
-  ) => (vsGrouping: VsGrouping) => (dibbsValueSets: DibbsValueSet[]) => void;
+  activeTypeValueSets: { [vsId: string]: DibbsValueSet };
+  handleVsIdLevelUpdate: (vsId: string) => (vs: DibbsValueSet) => void;
 };
 
 /**
  * An accordion body fragment
  * @param param0 - params
- * @param param0.activeVsGroupings - VsGroupings[] for display in this accordion
- * @param param0.handleVsNameLevelUpdate - curried state update function that
+ * @param param0.activeTypeValueSets - VsGroupings[] for display in this accordion
+ * @param param0.handleVsIdLevelUpdate - curried state update function that
  * takes a VsName and generatesa ValueSet level update
  * @returns An accordion body component
  */
 const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
-  activeVsGroupings,
-  handleVsNameLevelUpdate,
+  activeTypeValueSets,
+  handleVsIdLevelUpdate,
 }) => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [hasDrawerChange, setHasDrawerChange] = useState(false);
-  const [curVsGrouping, setCurVsGrouping] = useState<VsGrouping>();
-  const [curConcepts, setCurConcepts] = useState<ConceptOption[]>([]);
+  const [curValueSet, setCurValueSet] = useState<DibbsValueSet>();
+  const [curConcepts, setCurConcepts] = useState<Concept[]>([]);
 
-  const handleViewCodes = (vs: VsGrouping) => {
-    setCurVsGrouping(vs);
-    setCurConcepts(vs.items.map((i) => i.concepts).flat());
+  const handleViewCodes = (vs: DibbsValueSet) => {
+    setCurValueSet(vs);
+    setCurConcepts(vs.concepts.flat());
     setIsDrawerOpen(true);
   };
 
   const handleConceptsChange = (
-    updatedConcepts: ConceptOption[],
+    updatedConcepts: Concept[],
     updateBatchSave = true,
   ) => {
-    if (curVsGrouping) {
-      const activeVsName = getNameAuthorSystemFromVSGrouping(curVsGrouping);
-      curVsGrouping.items = [
-        // assuming that name / author / system identifies a unique value set,
-        // the new items array will only differ by concepts
-        { ...curVsGrouping.items[0], concepts: updatedConcepts },
-      ];
+    if (curValueSet) {
+      const activeVsId = curValueSet.valueSetId;
+      curValueSet.concepts = updatedConcepts;
 
       if (updateBatchSave) {
-        handleVsNameLevelUpdate(activeVsName)(curVsGrouping)(
-          curVsGrouping.items,
-        );
+        handleVsIdLevelUpdate(activeVsId)(curValueSet);
       }
       setCurConcepts(updatedConcepts);
       setHasDrawerChange(true);
@@ -66,20 +53,13 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
   };
 
   const handleSaveChanges = () => {
-    Object.values(activeVsGroupings).map((groupedVS) => {
-      if (
-        groupedVS.valueSetName === curVsGrouping?.valueSetName &&
-        curConcepts
-      ) {
-        const activeVsName = getNameAuthorSystemFromVSGrouping(curVsGrouping);
-        const updatedVsGrouping = structuredClone(curVsGrouping);
-        updatedVsGrouping.items = [
-          // assuming that name / author / system identifies a unique value set,
-          // the new items array will only differ by the concepts
-          { ...curVsGrouping.items[0], concepts: curConcepts },
-        ];
+    Object.values(activeTypeValueSets).map((valueSet) => {
+      if (valueSet.valueSetName === curValueSet?.valueSetName && curConcepts) {
+        const activeVsId = curValueSet.valueSetId;
+        const updatedValueSet = structuredClone(curValueSet);
+        updatedValueSet.concepts = curConcepts;
 
-        handleVsNameLevelUpdate(activeVsName)(updatedVsGrouping);
+        handleVsIdLevelUpdate(activeVsId)(updatedValueSet);
       }
     });
     setIsDrawerOpen(false);
@@ -89,36 +69,31 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
     e: ChangeEvent<HTMLInputElement>,
     isMinusState: boolean,
   ) {
-    const vsGrouping = structuredClone(activeVsGroupings[e.target.id]);
-    const activeVsName = getNameAuthorSystemFromVSGrouping(vsGrouping);
-    const handleValueSetLevelUpdate =
-      handleVsNameLevelUpdate(activeVsName)(vsGrouping);
+    const activeVs = structuredClone(activeTypeValueSets[e.target.id]);
+    const activeVsId = activeVs.valueSetId;
+    const handleValueSetUpdate = handleVsIdLevelUpdate(activeVsId);
 
-    const newConcepts = vsGrouping.items
-      .map((i) => {
-        return i.concepts.map((c) => {
-          return {
-            ...c,
-            include: isMinusState ? false : e.target.checked,
-          };
-        });
+    const newConcepts = activeVs.concepts
+      .map((c) => {
+        return {
+          ...c,
+          include: isMinusState ? false : e.target.checked,
+        };
       })
       .flat();
 
-    handleValueSetLevelUpdate([
-      { ...vsGrouping.items[0], concepts: newConcepts },
-    ]);
+    handleValueSetUpdate({ ...activeVs, concepts: newConcepts });
   }
 
   return (
     <div>
-      {Object.values(activeVsGroupings).map((vs) => {
-        const selectedCount = tallyConceptsForSingleValueSetGroup(vs, true);
-        const totalCount = tallyConceptsForSingleValueSetGroup(vs, false);
+      {Object.values(activeTypeValueSets).map((vs) => {
+        const selectedCount = tallyConceptsForSingleValueSet(vs, true);
+        const totalCount = tallyConceptsForSingleValueSet(vs, false);
         const isMinusState =
           selectedCount !== totalCount && selectedCount !== 0;
         const checked = selectedCount == totalCount && selectedCount > 0;
-        const vsLabel = getNameAuthorSystemFromVSGrouping(vs);
+        const vsLabel = vs.valueSetId;
 
         return (
           <div className={styles.accordionBodyExpanded} key={vsLabel}>
@@ -151,9 +126,9 @@ const SelectionViewAccordionBody: React.FC<SelectionViewAccordionBodyProps> = ({
           </div>
         );
       })}
-      {curConcepts && curVsGrouping && (
+      {curConcepts && curValueSet && (
         <Drawer
-          title={curVsGrouping.valueSetName}
+          title={curValueSet.valueSetName}
           placeholder="Search by code or name"
           toastMessage="Valueset concepts have been successfully modified."
           toRender={

@@ -1,7 +1,5 @@
 import { DibbsValueSet } from "../constants";
 import {
-  VsGrouping,
-  ConceptTypeToVsNameToVsGroupingMap,
   ConceptTypeToDibbsVsMap,
 } from "../utils/valueSetTranslation";
 
@@ -43,10 +41,6 @@ export type NestedQuery = {
 
 export type CategoryToConditionToNameMap = {
   [categoryName: string]: ConditionIdToNameMap[];
-};
-
-export type ConditionToConceptTypeToValueSetGroupingMap = {
-  [conditionId: string]: ConceptTypeToVsNameToVsGroupingMap;
 };
 
 export type QueryDetailsResult = {
@@ -92,19 +86,19 @@ export function groupConditionDataByCategoryName(fetchedData: {
  * category mapping
  * @returns - The data in a CategoryNameToConditionOptionMap shape
  */
-export function generateConditionNameToIdAndCategoryMap(
+export function generateConditionIdToNameAndCategoryMap(
   fetchedDate: CategoryNameToConditionOptionMap,
 ) {
   const result: {
-    [conditionName: string]: {
-      conditionId: string;
+    [conditionId : string]: {
+      conditionName: string;
       category: string;
     };
   } = {};
   Object.entries(fetchedDate).forEach(([categoryName, conditionOptionMap]) => {
     Object.entries(conditionOptionMap).forEach(([conditionId, optionMap]) => {
-      result[optionMap.name] = {
-        conditionId: conditionId,
+      result[conditionId] = {
+        conditionName: optionMap.name,
         category: categoryName,
       };
     });
@@ -170,15 +164,17 @@ export function formatDiseaseDisplay(diseaseName: string) {
  * included concepts (defaults to false)
  * @returns A number indicating the tally of relevant concpets
  */
-export function tallyConceptsForSingleValueSetGroup(
-  valueSet: VsGrouping,
+export function tallyConceptsForSingleValueSet(
+  valueSet: DibbsValueSet,
   filterInclude?: boolean,
 ) {
-  const selectedTotal = valueSet.items.reduce((sum, vs) => {
-    const includedConcepts = filterInclude
-      ? vs.concepts.filter((c) => c.include)
-      : vs.concepts;
-    sum += includedConcepts.length;
+  const selectedTotal = valueSet.concepts.reduce((sum, concept) => {
+    const addToTally = 
+    !filterInclude ? 1 : // add every item
+    concept.include ? 1 : 0 // only add items marked as included
+
+    sum += addToTally
+
     return sum;
   }, 0);
 
@@ -194,12 +190,12 @@ export function tallyConceptsForSingleValueSetGroup(
  * included concepts
  * @returns A number indicating the tally of relevant concpets
  */
-export function tallyConceptsForValueSetGroupArray(
-  valueSets: VsGrouping[],
+export function tallyConceptsForValueSetArray(
+  valueSets: DibbsValueSet[],
   filterInclude?: boolean,
 ) {
   const selectedTotal = valueSets.reduce((sum, valueSet) => {
-    const childTotal = tallyConceptsForSingleValueSetGroup(
+    const childTotal = tallyConceptsForSingleValueSet(
       valueSet,
       filterInclude,
     );

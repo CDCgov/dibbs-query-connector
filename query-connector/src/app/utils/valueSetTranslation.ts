@@ -1,7 +1,6 @@
 import { DibbsConceptType, DibbsValueSet } from "../constants";
 import {
   ConditionIdToValueSetArrayMap,
-  // ConditionToConceptTypeToValueSetGroupingMap,
   NestedQuery,
 } from "../queryBuilding/utils";
 
@@ -19,12 +18,6 @@ export type ConceptTypeToDibbsVsMap = {
   };
 };
 
-export type ConceptTypeToVsNameToVsGroupingMap = {
-  [dibbsConceptType in DibbsConceptType]: {
-    [name: string]: VsGrouping;
-  };
-};
-
 type VsNameAuthorSystem = string;
 /**
  * Utility function to extract the unique identifier for a ValueSetGrouping
@@ -36,8 +29,6 @@ export function getNameAuthorSystemFromVSGrouping(vsGroup: VsGrouping) {
   return `${vsGroup.valueSetName}:${vsGroup.author}:${vsGroup.system}`;
 }
 
-export type ConceptOption = { code: string; display: string; include: boolean };
-
 /**
  * Helper function that takes an array of value set items and groups them using
  * a combination of the value set name, author, and system to create a unique
@@ -48,7 +39,7 @@ export type ConceptOption = { code: string; display: string; include: boolean };
  * of valueSetName:author:system and the values are all the value set items that
  * share those identifiers in common, structed as a GroupedValueSet
  */
-export function groupValueSetsByNameAuthorSystem(
+export function groupValueSetsByVsId(
   valueSetsToGroup: DibbsValueSet[],
 ): Record<VsNameAuthorSystem, DibbsValueSet> {
   const results = valueSetsToGroup.reduce(
@@ -57,14 +48,14 @@ export function groupValueSetsByNameAuthorSystem(
       const author = row?.author;
       const system = row?.system;
       const valueSetName = row?.valueSetName;
-      if (!author || !system || !valueSetName) {
+      const vsId = row?.valueSetId
+      if (!author || !system || !valueSetName ) {
         console.warn(
           `Skipping malformed row: Missing author (${author}) or system (${system}) for ValueSet (${row?.valueSetId})`,
         );
         return acc;
       }
-
-      const groupKey = `${valueSetName}:${author}:${system}`;
+      const groupKey = vsId;
 
       acc[groupKey] = {
         valueSetId: row.valueSetId,
@@ -107,7 +98,7 @@ export function generateValueSetGroupingsByDibbsConceptType(
  * @param conditionIdToValueSetArrayMap map of condition IDs to ValueSet[]
  * @returns Map of {[conditionId]: {[valueSetName]: ValueSetGrouping} }
  */
-export function groupValueSetGroupingByConditionId(
+export function groupValueSetByConditionId(
   conditionIdToValueSetArrayMap: ConditionIdToValueSetArrayMap,
 ): NestedQuery {
   const results: NestedQuery = {};
@@ -136,7 +127,7 @@ function generateValueSetGroupingsByConceptType(valueSetsByConceptType: {
 }) {
   return Object.keys(valueSetsByConceptType).reduce(
     (acc, key) => {
-      const valueSetGroupings = groupValueSetsByNameAuthorSystem(
+      const valueSetGroupings = groupValueSetsByVsId(
         valueSetsByConceptType[key as DibbsConceptType],
       );
 

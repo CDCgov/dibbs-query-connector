@@ -49,7 +49,7 @@ const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
 
   const [valueSetOptions, setValueSetOptions] = useState<{
     [dibbsConceptType in DibbsConceptType]: {
-      [vsNameAuthorSystem: string]: DibbsValueSet;
+      [vsId: string]: DibbsValueSet;
     };
   }>({
     labs: {},
@@ -86,9 +86,9 @@ const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
 
   // Handles the toggle of the 'include' state for individual concepts in
   // the accordion
-  const toggleInclude = (vsNameAuthorSystem: string, conceptIndex: number) => {
-    const updatedNameToVsMap = valueSetOptions[activeTab];
-    let updatedValueSet = updatedNameToVsMap[vsNameAuthorSystem];
+  const toggleInclude = (vsId: string, conceptIndex: number) => {
+    const updatedIdToVsMap = valueSetOptions[activeTab];
+    let updatedValueSet = updatedIdToVsMap[vsId];
     const updatedConcepts = updatedValueSet.concepts;
     updatedConcepts[conceptIndex] = {
       ...updatedConcepts[conceptIndex],
@@ -100,35 +100,26 @@ const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
       concepts: updatedConcepts, // Update the concepts in the accessed value set
     };
 
-    updatedNameToVsMap[vsNameAuthorSystem] = {
-      ...updatedNameToVsMap[vsNameAuthorSystem],
-      ...updatedValueSet, // Update the entire VS
-    };
-
+    updatedIdToVsMap[vsId] = updatedValueSet;
     setValueSetOptions((prevState) => ({
       ...prevState,
-      [activeTab]: updatedNameToVsMap, // Update the state with the modified VS
+      [activeTab]: updatedIdToVsMap, // Update the state with the modified VS
     }));
   };
 
   // Allows all items to be selected within all accordion sections of the active tab
-  const handleSelectAllChange = (
-    vsNameAuthorSystem: string,
-    checked: boolean,
-  ) => {
-    const updatedNameToVsMap = valueSetOptions[activeTab]; // a single group of lab/med/etc.
+  const handleSelectAllChange = (vsId: string, checked: boolean) => {
+    const updatedIdToVsMap = valueSetOptions[activeTab]; // a single group of lab/med/etc.
     // Update only the group at the specified index
-    updatedNameToVsMap[vsNameAuthorSystem].includeValueSet = checked;
-    const updatedConcepts = updatedNameToVsMap[vsNameAuthorSystem].concepts.map(
-      (concept) => {
-        return { ...concept, include: checked };
-      },
-    );
-    updatedNameToVsMap[vsNameAuthorSystem].concepts = updatedConcepts;
+    updatedIdToVsMap[vsId].includeValueSet = checked;
+    const updatedConcepts = updatedIdToVsMap[vsId].concepts.map((concept) => {
+      return { ...concept, include: checked };
+    });
+    updatedIdToVsMap[vsId].concepts = updatedConcepts;
 
     setValueSetOptions((prevState) => ({
       ...prevState,
-      [activeTab]: updatedNameToVsMap, // Update the state for the current tab
+      [activeTab]: updatedIdToVsMap, // Update the state for the current tab
     }));
   };
 
@@ -195,7 +186,7 @@ const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
         handleSelectAllForTab={handleSelectAllForTab}
         valueSetOptions={valueSetOptions}
       />
-      {valueSetOptionsToDisplay.map(([vsNameAuthorSystem, vs]) => {
+      {valueSetOptionsToDisplay.map(([vsId, vs]) => {
         const id = vs.author + ":" + vs.system + ":" + vs.valueSetName;
         return (
           <Accordion
@@ -204,7 +195,7 @@ const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
             title={
               <CustomizeQueryAccordionHeader
                 handleSelectAllChange={handleSelectAllChange}
-                vsIndex={vsNameAuthorSystem}
+                vsIndex={vsId}
                 valueSet={vs}
               />
             }
@@ -212,7 +203,7 @@ const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
               <CustomizeQueryAccordionBody
                 valueSet={vs}
                 toggleInclude={toggleInclude}
-                vsName={vsNameAuthorSystem}
+                vsName={vsId}
               />
             }
             headingLevel="h3"
@@ -244,7 +235,7 @@ export const QUERY_CUSTOMIZATION_CONFIRMATION_BODY =
  * @returns A count of the number of items in each of the DibbsConceptTypes
  */
 const countDibbsConceptTypeToVsMapItems = (obj: {
-  [vsNameAuthorSystem: string]: DibbsValueSet;
+  [vsId: string]: DibbsValueSet;
 }) => {
   return Object.values(obj).reduce((runningSum, vs) => {
     runningSum += vs.concepts.length;

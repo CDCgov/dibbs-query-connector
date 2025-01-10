@@ -4,20 +4,15 @@ import styles from "../buildFromTemplates/buildfromTemplate.module.scss";
 import { HeadingLevel } from "@trussworks/react-uswds";
 import SelectionViewAccordionBody from "./SelectionViewAccordionBody";
 import { DibbsConceptType, DibbsValueSet } from "@/app/constants";
-import {
-  ConceptTypeToVsNameToVsGroupingMap,
-  VsGrouping,
-} from "@/app/utils/valueSetTranslation";
+import { ConceptTypeToDibbsVsMap } from "@/app/utils/valueSetTranslation";
 import SelectionViewAccordionHeader from "./SelectionViewAccordionHeader";
 import MultiAccordion from "@/app/query/designSystem/MultiAccordion";
 
 type SelectionTableProps = {
-  vsTypeLevelOptions: ConceptTypeToVsNameToVsGroupingMap;
+  vsTypeLevelOptions: ConceptTypeToDibbsVsMap;
   handleVsTypeLevelUpdate: (
     vsType: DibbsConceptType,
-  ) => (
-    vsName: string,
-  ) => (val: VsGrouping) => (dibbsValueSets: DibbsValueSet[]) => void;
+  ) => (vsId: string) => (vs: DibbsValueSet) => void;
 };
 /**
  * Component that displays ValueSetGroupings sorted by VsType (DibbsConceptType)
@@ -35,21 +30,21 @@ export const SelectionTable: React.FC<SelectionTableProps> = ({
   const [expanded, setExpandedGroup] = useState<string>("");
 
   const generateTypeLevelAccordionItems = (vsType: DibbsConceptType) => {
-    const handleVsNameLevelUpdate = handleVsTypeLevelUpdate(vsType);
+    const handleVsIdLevelUpdate = handleVsTypeLevelUpdate(vsType);
 
     const title = (
       <SelectionViewAccordionHeader
-        activeValueSetType={vsType}
-        activeVsGroupings={vsTypeLevelOptions[vsType]}
+        activeType={vsType}
+        activeTypeValueSets={vsTypeLevelOptions[vsType]}
         expanded={expanded === vsType}
-        handleVsNameLevelUpdate={handleVsNameLevelUpdate}
+        handleVsIdLevelUpdate={handleVsIdLevelUpdate}
       />
     );
 
     const content = (
       <SelectionViewAccordionBody
-        activeVsGroupings={vsTypeLevelOptions[vsType]}
-        handleVsNameLevelUpdate={handleVsNameLevelUpdate}
+        activeTypeValueSets={vsTypeLevelOptions[vsType]}
+        handleVsIdLevelUpdate={handleVsIdLevelUpdate}
       />
     );
     const level: HeadingLevel = "h4";

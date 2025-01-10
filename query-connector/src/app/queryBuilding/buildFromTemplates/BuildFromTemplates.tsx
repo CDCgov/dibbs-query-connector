@@ -13,7 +13,7 @@ import {
   CategoryNameToConditionOptionMap,
   ConditionIdToValueSetArrayMap,
   EMPTY_QUERY_SELECTION,
-  generateConditionNameToIdAndCategoryMap,
+  generateConditionIdToNameAndCategoryMap,
   groupConditionDataByCategoryName,
 } from "../utils";
 import { ConditionSelection } from "../components/ConditionSelection";
@@ -182,15 +182,15 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
     async function setDefaultSelectedConditions() {
       if (selectedQuery.queryId && fetchedConditions) {
         const result = await getSavedQueryDetails(selectedQuery.queryId);
-        const conditionNameToIdMap =
-          generateConditionNameToIdAndCategoryMap(fetchedConditions);
+        const conditionIdToNameMap =
+          generateConditionIdToNameAndCategoryMap(fetchedConditions);
         const queryConditions = result?.map((r) => r.conditions_list).flat();
 
         const updatedConditions: CategoryNameToConditionOptionMap = {};
         queryConditions &&
-          queryConditions.forEach((conditionName) => {
-            const { category, conditionId } =
-              conditionNameToIdMap[conditionName];
+          queryConditions.forEach((conditionId) => {
+            const { category, conditionName } =
+              conditionIdToNameMap[conditionId];
 
             updatedConditions[category] = {
               ...updatedConditions[category],

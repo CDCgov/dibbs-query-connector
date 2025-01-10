@@ -16,13 +16,10 @@ import { formatDiseaseDisplay } from "../utils";
 import { SelectionTable } from "./SelectionTable";
 
 import Drawer from "@/app/query/designSystem/drawer/Drawer";
-import {
-  groupValueSetGroupingByConditionId,
-  VsGrouping,
-} from "@/app/utils/valueSetTranslation";
+import { groupValueSetByConditionId } from "@/app/utils/valueSetTranslation";
 import { getConditionsData } from "@/app/database-service";
 import { DibbsConceptType, DibbsValueSet } from "@/app/constants";
-import { ConditionToConceptTypeToValueSetGroupingMap } from "@/app/queryBuilding/utils";
+import { NestedQuery } from "@/app/queryBuilding/utils";
 import { showToastConfirmation } from "@/app/query/designSystem/toast/Toast";
 
 type ConditionSelectionProps = {
@@ -47,8 +44,7 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
   const focusRef = useRef<HTMLInputElement | null>(null);
   const [activeCondition, setActiveCondition] = useState<string>("");
   const [_searchFilter, setSearchFilter] = useState<string>();
-  const [selectedValueSets, setSelectedValueSets] =
-    useState<ConditionToConceptTypeToValueSetGroupingMap>({});
+  const [selectedValueSets, setSelectedValueSets] = useState<NestedQuery>({});
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [allConditions, setAllConditions] =
     useState<CategoryNameToConditionOptionMap>({});
@@ -78,8 +74,8 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
     }
 
     // Group value sets by condition ID for use in the selection table
-    const groupedValueSetByCondition: ConditionToConceptTypeToValueSetGroupingMap =
-      groupValueSetGroupingByConditionId(valueSetsByCondition);
+    const groupedValueSetByCondition: NestedQuery =
+      groupValueSetByConditionId(valueSetsByCondition);
 
     fetchConditions();
     return () => {
@@ -151,22 +147,16 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
   const handleSelectedValueSetUpdate =
     (conditionId: string) =>
     (vsType: DibbsConceptType) =>
-    (vsName: string) =>
-    (vsGrouping: VsGrouping) =>
-    (dibbsValueSets: DibbsValueSet[]) => {
-      setSelectedValueSets(
-        (prevState: ConditionToConceptTypeToValueSetGroupingMap) => {
-          const updatedState: ConditionToConceptTypeToValueSetGroupingMap =
-            structuredClone(prevState);
-          updatedState[conditionId][vsType][vsName] = {
-            ...vsGrouping,
-            items: [
-              { ...dibbsValueSets[0], concepts: dibbsValueSets[0].concepts },
-            ],
-          };
-          return updatedState;
-        },
-      );
+    (vsId: string) =>
+    (dibbsValueSet: DibbsValueSet) => {
+      setSelectedValueSets((prevState: NestedQuery) => {
+        const updatedState: NestedQuery = structuredClone(prevState);
+        updatedState[conditionId][vsType][vsId] = {
+          ...dibbsValueSet,
+          concepts: dibbsValueSet.concepts,
+        };
+        return updatedState;
+      });
     };
 
   return (
