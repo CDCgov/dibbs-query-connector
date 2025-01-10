@@ -30,6 +30,15 @@ export default function LandingPage() {
               network of healthcare providers through your existing data use
               agreements, giving you access to more complete and timely data
             </h2>
+
+            <Button
+              className="next-button margin-bottom-2"
+              type="button"
+              id="next-button"
+              onClick={() => handleGoToDemo()}
+            >
+              Try it out
+            </Button>
           </div>
           <Image
             alt="Graphic illustrating what TEFCA is"
@@ -80,24 +89,6 @@ export default function LandingPage() {
             </p>
           </ProcessListItem>
         </ProcessList>
-      </div>
-      <div className="blue-background-container">
-        <div className="flex-justify-center flex-column">
-          <div className="text-holder">
-            <h2 className="font-sans-xs text-light margin-top-0">
-              Check out the Query Connector demo to try out features using
-              sample data.
-            </h2>
-            <Button
-              className="next-button"
-              type="button"
-              id="next-button"
-              onClick={() => handleGoToDemo()}
-            >
-              Go to the demo
-            </Button>
-          </div>
-        </div>
       </div>
     </div>
   );
