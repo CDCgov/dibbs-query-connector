@@ -14,8 +14,8 @@ import {
   CustomUserQuery,
 } from "./query-building";
 import {
-  CategoryToConditionToNameMap,
-  ConditionIdToNameMap,
+  CategoryToConditionArrayMap,
+  ConditionsMap,
 } from "./queryBuilding/utils";
 import {
   CategoryStruct,
@@ -489,25 +489,24 @@ export async function getConditionsData() {
   const rows = result.rows;
 
   // 1. Grouped by category with id:name pairs
-  const categoryToConditionArrayMap: CategoryToConditionToNameMap = rows.reduce(
-    (acc, row) => {
+  const categoryToConditionNameArrayMap: CategoryToConditionArrayMap =
+    rows.reduce((acc, row) => {
       const { category, id, name } = row;
       if (!acc[category]) {
         acc[category] = [];
       }
-      acc[category].push({ [id]: name });
+      acc[category].push({ id: id, name: name });
       return acc;
-    },
-    {} as CategoryToConditionToNameMap,
-  );
+    }, {} as CategoryToConditionArrayMap);
 
   // 2. ID-Name mapping
-  const conditionIdToNameMap: ConditionIdToNameMap = rows.reduce((acc, row) => {
-    acc[row.id] = row.name;
+  const conditionIdToNameMap: ConditionsMap = rows.reduce((acc, row) => {
+    acc[row.id] = { name: row.name, category: row.category };
     return acc;
-  }, {} as ConditionIdToNameMap);
+  }, {} as ConditionsMap);
+
   return {
-    categoryToConditionArrayMap,
+    categoryToConditionNameArrayMap,
     conditionIdToNameMap,
   } as const;
 }

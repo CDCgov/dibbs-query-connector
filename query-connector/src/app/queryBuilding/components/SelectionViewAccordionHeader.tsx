@@ -1,60 +1,63 @@
-import styles from "../buildFromTemplates/buildfromTemplate.module.scss";
+import styles from "../buildFromTemplates/conditionTemplateSelection.module.scss";
 import { Icon } from "@trussworks/react-uswds";
 import { DibbsConceptType, DibbsValueSet } from "@/app/constants";
-import { VsGrouping } from "@/app/utils/valueSetTranslation";
-import { tallyConceptsForValueSetGroupArray } from "../utils";
 import { ChangeEvent } from "react";
 import Checkbox from "@/app/query/designSystem/checkbox/Checkbox";
 
-type SelectionViewAccordionBodyProps = {
+type ConceptTypeAccordionBodyProps = {
   activeValueSetType: DibbsConceptType;
-  activeVsGroupings: { [vsNameAuthorSystem: string]: VsGrouping };
+  activeValueSets: { [vsId: string]: DibbsValueSet };
   expanded: boolean;
   handleVsNameLevelUpdate: (
-    vsName: string,
-  ) => (val: VsGrouping) => (dibbsValueSets: DibbsValueSet[]) => void;
+    vsId: string,
+  ) => (dibbsValueSets: DibbsValueSet) => void;
 };
 
 /**
  * Fragment component to style out some of the accordion bodies
  * @param param0 - params
  * @param param0.activeValueSetType - DibbsactiveValueSetType (labs, conditions, medications)
- * @param param0.activeVsGroupings - ValueSets for a given activeValueSetType
+ * @param param0.activeValueSets - ValueSets for a given activeValueSetType
  * @param param0.expanded - Boolean for managing icon orientation
  * @param param0.handleVsNameLevelUpdate - curried state update function that
  * takes a VsName and generatesa ValueSet level update
  * @returns An accordion body component
  */
-const SelectionViewAccordionHeader: React.FC<
-  SelectionViewAccordionBodyProps
-> = ({
+const ConceptTypeAccordionHeader: React.FC<ConceptTypeAccordionBodyProps> = ({
   activeValueSetType,
-  activeVsGroupings,
+  activeValueSets,
   expanded,
   handleVsNameLevelUpdate,
 }) => {
-  const selectedCount = tallyConceptsForValueSetGroupArray(
-    Object.values(activeVsGroupings),
-    true,
+  const selectedCount = Object.values(activeValueSets).reduce(
+    (acc, curValueSet) => {
+      const curConceptsIncludedCount = curValueSet.concepts.filter(
+        (c) => c.include,
+      ).length;
+      return acc + curConceptsIncludedCount;
+    },
+    0,
   );
-  const totalCount = tallyConceptsForValueSetGroupArray(
-    Object.values(activeVsGroupings),
-    false,
+  const totalCount = Object.values(activeValueSets).reduce(
+    (acc, curValueSet) => {
+      const curConceptsIncludedCount = curValueSet.concepts.length;
+      return acc + curConceptsIncludedCount;
+    },
+    0,
   );
 
   function handleBulkToggle(
     e: ChangeEvent<HTMLInputElement>,
     isMinusState: boolean,
   ) {
-    Object.entries(activeVsGroupings).forEach(([vsName, curGrouping]) => {
-      const handleVsGroupingLevelUpdate = handleVsNameLevelUpdate(vsName);
-      const updatedGrouping = structuredClone(curGrouping);
-      updatedGrouping.items.map((i) => {
-        return i.concepts.map(
-          (c) => (c.include = isMinusState ? false : e.target.checked),
-        );
+    Object.entries(activeValueSets).forEach(([vsId, activeValueSets]) => {
+      const handleVsGroupingLevelUpdate = handleVsNameLevelUpdate(vsId);
+      const bulkIncludeValue = isMinusState ? false : e.target.checked;
+      activeValueSets.includeValueSet = bulkIncludeValue;
+      activeValueSets.concepts.map((c) => {
+        return (c.include = bulkIncludeValue);
       });
-      handleVsGroupingLevelUpdate(updatedGrouping)(updatedGrouping.items);
+      handleVsGroupingLevelUpdate(activeValueSets);
     });
   }
 
@@ -91,4 +94,4 @@ const SelectionViewAccordionHeader: React.FC<
   );
 };
 
-export default SelectionViewAccordionHeader;
+export default ConceptTypeAccordionHeader;
