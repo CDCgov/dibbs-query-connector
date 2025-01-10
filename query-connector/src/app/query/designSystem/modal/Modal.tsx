@@ -19,7 +19,7 @@ type ModalButton = {
   onClick: () => void;
 };
 
-type ModalProps = {
+export type ModalProps = {
   id: string;
   heading: string;
   description?: string;

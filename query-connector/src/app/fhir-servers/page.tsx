@@ -1,4 +1,5 @@
 "use client";
+
 import { Icon, Label, TextInput } from "@trussworks/react-uswds";
 import {
   deleteFhirServer,
@@ -6,13 +7,21 @@ import {
   insertFhirServer,
   updateFhirServer,
 } from "../database-service";
-import SiteAlert from "../query/designSystem/SiteAlert";
-import Table from "../query/designSystem/table/Table";
+import dynamic from "next/dynamic";
 import { useEffect, useState, useRef } from "react";
 import { FhirServerConfig } from "../constants";
-import { Modal, ModalRef } from "../query/designSystem/modal/Modal";
+import type { ModalRef } from "../query/designSystem/modal/Modal";
 import styles from "./fhirServers.module.scss";
 import classNames from "classnames";
+import SiteAlert from "../query/designSystem/SiteAlert";
+import Table from "../query/designSystem/table/Table";
+
+// Dynamic import with proper typing for Modal
+import type { ModalProps } from "../query/designSystem/modal/Modal";
+const Modal = dynamic<ModalProps>(
+  () => import("../query/designSystem/modal/Modal").then((mod) => mod.Modal),
+  { ssr: false },
+);
 
 type ModalMode = "create" | "edit";
 
@@ -21,6 +30,8 @@ type ModalMode = "create" | "edit";
  * @returns - The FhirServers component.
  */
 const FhirServers: React.FC = () => {
+  // State declarations
+  const [isClient, setIsClient] = useState(false);
   const [fhirServers, setFhirServers] = useState<FhirServerConfig[]>([]);
   const [serverName, setServerName] = useState("");
   const [serverUrl, setServerUrl] = useState("");
@@ -34,11 +45,19 @@ const FhirServers: React.FC = () => {
   const [modalMode, setModalMode] = useState<ModalMode>("create");
   const modalRef = useRef<ModalRef>(null);
 
+  // Handle client-side hydration
   useEffect(() => {
-    getFhirServerConfigs(true).then((servers) => {
-      setFhirServers(servers);
-    });
+    setIsClient(true);
   }, []);
+
+  // Fetch FHIR servers
+  useEffect(() => {
+    if (isClient) {
+      getFhirServerConfigs(true).then((servers) => {
+        setFhirServers(servers);
+      });
+    }
+  }, [isClient]);
 
   const resetModalState = () => {
     setServerName("");
@@ -70,14 +89,12 @@ const FhirServers: React.FC = () => {
     error?: string;
   }
 
-  /**
-   * Tests a connection to a FHIR server
-   * @param url - The URL of the FHIR server to test
-   * @returns A promise that resolves to an object containing the test result
-   */
   const testFhirConnection = async (
     url: string,
   ): Promise<ConnectionTestResult> => {
+    if (!isClient)
+      return { success: false, error: "Client-side only operation" };
+
     try {
       const baseUrl = url.replace(/\/$/, "");
       const metadataUrl = `${baseUrl}/metadata`;
@@ -156,7 +173,8 @@ const FhirServers: React.FC = () => {
   };
 
   const handleSave = async () => {
-    // First test the connection
+    if (!isClient) return;
+
     const connectionResult = await testFhirConnection(serverUrl);
 
     if (modalMode === "create") {
@@ -196,12 +214,11 @@ const FhirServers: React.FC = () => {
   };
 
   const handleDeleteServer = async () => {
-    if (!selectedServer) return;
+    if (!isClient || !selectedServer) return;
 
     const result = await deleteFhirServer(selectedServer.id);
 
     if (result.success) {
-      // Refresh the server list after successful deletion
       getFhirServerConfigs(true).then((servers) => {
         setFhirServers(servers);
       });
@@ -237,7 +254,6 @@ const FhirServers: React.FC = () => {
       },
     ];
 
-    // Add delete button only in edit mode
     if (modalMode === "edit") {
       buttons.push({
         text: "Delete",
@@ -248,7 +264,6 @@ const FhirServers: React.FC = () => {
       });
     }
 
-    // Update test connection button if successful
     if (connectionStatus === "success") {
       buttons[1].text = (
         <>
@@ -267,6 +282,11 @@ const FhirServers: React.FC = () => {
 
     return buttons;
   };
+
+  // Show loading state or nothing during SSR
+  if (!isClient) {
+    return null;
+  }
 
   return (
     <>
