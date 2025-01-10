@@ -2,6 +2,9 @@ name: Ad-hoc Terraform Plan
 run-name: Terraform plan ${{ inputs.workspace }} by @${{ github.actor }}
 
 on:
+  pull_request:
+    branches:
+      - shanice/deploy_demo_ecs
   merge_group:
     types:
       - checks_requested
