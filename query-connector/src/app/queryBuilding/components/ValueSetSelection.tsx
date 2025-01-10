@@ -195,7 +195,6 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
         onSave={() => {
           handleUpdateCondition;
         }}
-        hasChanges={false}
       />
     </div>
   );
