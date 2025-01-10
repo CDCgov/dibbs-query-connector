@@ -136,8 +136,8 @@ module "ecs" {
 
 resource "aws_db_instance" "qc_db" {
   allocated_storage = "10"
-  db_name = var.qc_db_name
-  identifier = var.db_identifier
+  db_name = "${var.qc_db_name}_${terraform.workspace}"
+  identifier = "${var.db_identifier}-${terraform.workspace}"
   engine               = var.db_engine_type
   engine_version       = var.db_engine_version
   enabled_cloudwatch_logs_exports = ["postgresql", "upgrade"]
@@ -152,14 +152,14 @@ resource "aws_db_instance" "qc_db" {
 
 # Create a DB subnet group
 resource "aws_db_subnet_group" "this" {
-  name       = "${var.db_identifier}-subnet-group"
+  name       = "${var.db_identifier}-subnet-group-${terraform.workspace}"
   subnet_ids = module.vpc.private_subnets
 
 }
 
 # Create a parameter group to configure Postgres RDS parameters
 resource "aws_db_parameter_group" "this" {
-  name   = "${var.db_identifier}-pg"
+  name   = "${var.db_identifier}-pg-${terraform.workspace}"
   family = var.db_family
 
   parameter {
