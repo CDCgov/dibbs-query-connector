@@ -68,12 +68,6 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({
 
   return (
     <>
-      <ToastContainer
-        position="bottom-left"
-        icon={false}
-        stacked
-        hideProgressBar
-      />
       {queries.length === 0 ? (
         <div className="main-container__wide">
           <EmptyQueriesDisplay

@@ -41,7 +41,6 @@ import {
 import { groupValueSetsByConceptType } from "@/app/utils/valueSetTranslation";
 import { showToastConfirmation } from "@/app/query/designSystem/toast/Toast";
 import { DataContext } from "@/app/DataProvider";
-import { ToastContainer } from "react-toastify";
 
 export type FormError = {
   queryName: boolean;
@@ -257,17 +256,26 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
       // TODO: get this from the auth session
       const userName = "DIBBS";
       try {
-        await saveCustomQuery(
+        const results = await saveCustomQuery(
           constructedQuery,
           queryName,
           userName,
           selectedQuery.queryId,
         );
 
+        if (results === undefined) {
+          throw "Result status not returned";
+        }
+
         const queries = await getCustomQueries();
         queriesContext?.setData(queries);
+        const statusMessage =
+          results[0].operation === "INSERT" ? "created" : "updated";
 
-        showToastConfirmation({ body: `${queryName} successfully saved` });
+        showToastConfirmation({
+          body: `${queryName} successfully ${statusMessage}`,
+        });
+        goBack();
       } catch (e) {
         showToastConfirmation({
           heading: "Something went wrong",
@@ -279,12 +287,6 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
 
   return (
     <>
-      <ToastContainer
-        position="bottom-left"
-        icon={false}
-        stacked
-        hideProgressBar
-      />
       <SiteAlert />
       <div className={classNames("main-container__wide", styles.mainContainer)}>
         <Backlink

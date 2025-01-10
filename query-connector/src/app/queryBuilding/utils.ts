@@ -27,6 +27,12 @@ export type NestedQuery = {
   [conditionId: string]: ConceptTypeToDibbsVsMap;
 };
 
+export type QueryUpdateResult = {
+  id: string;
+  query_name: string;
+  operation: "INSERT" | "UPDATE";
+};
+
 export type QueryDetailsResult = {
   query_name: string;
   id: string;
@@ -34,6 +40,7 @@ export type QueryDetailsResult = {
     [conditionId: string]: { [valueSetId: string]: DibbsValueSet };
   };
   conditions_list: string[];
+  updated: boolean;
 };
 
 export const EMPTY_QUERY_SELECTION = {

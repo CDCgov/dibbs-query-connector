@@ -25,8 +25,9 @@ import {
 import LoadingView from "@/app/query/components/LoadingView";
 import { DataContext } from "@/app/DataProvider";
 import classNames from "classnames";
-import { getConditionsData } from "@/app/database-service";
+import { getConditionsData, getCustomQueries } from "@/app/database-service";
 import { ConditionsMap } from "../utils";
+import { showToastConfirmation } from "@/app/query/designSystem/toast/Toast";
 
 interface UserQueriesDisplayProps {
   queries: CustomUserQuery[];
@@ -78,7 +79,6 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
     }
 
     fetchConditionsAndUpdateState().catch(console.error);
-
     return () => {
       isSubscribed = false;
     };
@@ -133,7 +133,14 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
                   )}
                 >
                   <td title={query.query_name}>{query.query_name}</td>
-                  <td title={query.conditions_list?.join(",")}>
+
+                  <td
+                    title={query.conditions_list
+                      ?.map((id) => {
+                        return conditionIdToDetailsMap[id].name;
+                      })
+                      .join(", ")}
+                  >
                     {query.conditions_list
                       ?.map((id) => {
                         return conditionIdToDetailsMap[id].name;

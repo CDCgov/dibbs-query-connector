@@ -16,6 +16,7 @@ import { ConceptTypeSelectionTable } from "./SelectionTable";
 
 import Drawer from "@/app/query/designSystem/drawer/Drawer";
 import { DibbsConceptType, DibbsValueSet } from "@/app/constants";
+import { showToastConfirmation } from "@/app/query/designSystem/toast/Toast";
 
 type ConditionSelectionProps = {
   constructedQuery: NestedQuery;
@@ -74,7 +75,12 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
                   <span
                     className={styles.addButton}
                     role="button"
-                    onClick={() => handleUpdateCondition(condition.id, false)}
+                    onClick={() => {
+                      handleUpdateCondition(condition.id, false);
+                      showToastConfirmation({
+                        body: `${condition.name} added to query`,
+                      });
+                    }}
                   >
                     ADD
                   </span>
