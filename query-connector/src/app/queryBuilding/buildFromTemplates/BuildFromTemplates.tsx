@@ -1,33 +1,46 @@
 "use client";
 
 import Backlink from "@/app/query/components/backLink/Backlink";
-import styles from "../buildFromTemplates/buildfromTemplate.module.scss";
+import styles from "./conditionTemplateSelection.module.scss";
 import { Label, TextInput, Button } from "@trussworks/react-uswds";
-import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
+import {
+  Dispatch,
+  SetStateAction,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
 import {
   getConditionsData,
+  getCustomQueries,
   getValueSetsAndConceptsByConditionIDs,
 } from "@/app/database-service";
 import {
-  CategoryNameToConditionOptionMap,
   ConditionIdToValueSetArrayMap,
-  EMPTY_QUERY_SELECTION,
-  generateConditionIdToNameAndCategoryMap,
-  groupConditionDataByCategoryName,
+  NestedQuery,
+  CategoryToConditionArrayMap,
+  ConditionsMap,
+  EMPTY_CONCEPT_TYPES,
 } from "../utils";
 import { ConditionSelection } from "../components/ConditionSelection";
 import { ValueSetSelection } from "../components/ValueSetSelection";
 import SiteAlert from "@/app/query/designSystem/SiteAlert";
-import { BuildStep } from "../../constants";
+import { BuildStep, DibbsConceptType, DibbsValueSet } from "../../constants";
 import LoadingView from "../../query/components/LoadingView";
 import classNames from "classnames";
 import { groupConditionConceptsIntoValueSets } from "@/app/utils";
 import { SelectedQueryDetails } from "../querySelection/utils";
 
-import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { getSavedQueryDetails } from "@/app/backend/query-building";
+import {
+  getSavedQueryDetails,
+  saveCustomQuery,
+} from "@/app/backend/query-building";
+import { groupValueSetsByConceptType } from "@/app/utils/valueSetTranslation";
+import { showToastConfirmation } from "@/app/query/designSystem/toast/Toast";
+import { DataContext } from "@/app/DataProvider";
 
 export type FormError = {
   queryName: boolean;
@@ -61,187 +74,95 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
 }) => {
   const focusRef = useRef<HTMLInputElement | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  const [queryName, setQueryName] = useState<string | null>(
+  const [queryName, setQueryName] = useState<string | undefined>(
     selectedQuery.queryName,
   );
+  const [categoryToConditionMap, setCategoryToConditionMap] =
+    useState<CategoryToConditionArrayMap>();
+  const [conditionIdToDetailsMap, setConditionsDetailsMap] =
+    useState<ConditionsMap>();
 
-  const [fetchedConditions, setFetchedConditions] =
-    useState<CategoryNameToConditionOptionMap>();
-  const [selectedConditions, setSelectedConditions] =
-    useState<CategoryNameToConditionOptionMap>();
   const [formError, setFormError] = useState<FormError>({
     queryName: false,
     selectedConditions: false,
   });
-  const [conditionValueSets, setConditionValueSets] =
-    useState<ConditionIdToValueSetArrayMap>();
+
+  const [constructedQuery, setConstructedQuery] = useState<NestedQuery>({});
+
+  function resetQueryState() {
+    setQueryName(undefined);
+    setSelectedQuery({
+      queryId: undefined,
+      queryName: undefined,
+    });
+    setConstructedQuery({});
+  }
 
   function goBack() {
-    setQueryName(null);
-    setSelectedQuery(EMPTY_QUERY_SELECTION);
+    resetQueryState();
     setBuildStep("selection");
   }
 
-  const checkForAddedConditions = (selectedIds: string[]) => {
-    const alreadyRetrieved =
-      conditionValueSets && Object.keys(conditionValueSets);
-
-    const newIds = selectedIds.filter((id) =>
-      alreadyRetrieved?.includes(id) ? false : true,
-    );
-
-    return newIds;
-  };
-
-  async function getValueSetsForSelectedConditions() {
-    const conditionIds =
-      selectedConditions &&
-      Object.entries(selectedConditions)
-        .map(([_, conditionObj]) => {
-          return Object.keys(conditionObj);
-        })
-        .flatMap((ids) => ids);
-
-    const idsToQuery = conditionIds && checkForAddedConditions(conditionIds);
-    const idsToRemove =
-      conditionValueSets &&
-      Object.keys(conditionValueSets).filter(
-        (vs) => !conditionIds?.includes(vs),
-      );
-
-    const ConditionValueSets: ConditionIdToValueSetArrayMap = {};
-
-    // if there are new ids, we need to query the db
-    if (idsToQuery && idsToQuery.length > 0) {
-      const results = await getValueSetsAndConceptsByConditionIDs(conditionIds);
-      const formattedResults =
-        results && groupConditionConceptsIntoValueSets(results);
-
-      // group by Condition ID:
-      return Object.values(formattedResults).reduce((acc, resultObj) => {
-        if (resultObj.conditionId) {
-          const id = resultObj.conditionId;
-
-          if (!acc[id]) {
-            acc[id] = [];
-          }
-          acc[id].push(resultObj);
-          return acc;
-        }
-        return acc;
-      }, ConditionValueSets);
-    }
-    // otherwise, nothing's changed, return existing state
-    // after we've removed anything we unchecked
-    idsToRemove?.forEach((id) => {
-      conditionValueSets && delete conditionValueSets[id];
-    });
-
-    return conditionValueSets;
-  }
-
   useEffect(() => {
-    let isSubscribed = true;
-
     if (queryName == "" || queryName == undefined) {
       focusRef?.current?.focus();
     }
 
-    // enables/disables the Create Query button based on selectedConditions
-    if (!selectedConditions || Object.values(selectedConditions).length < 1) {
-      setFormError({ ...formError, ...{ selectedConditions: true } });
-    } else {
-      setFormError({ ...formError, ...{ selectedConditions: false } });
-    }
-
-    // clear the error when the user enters a query name
-    if (formError.queryName && !!queryName) {
-      validateForm();
-    }
-
-    async function fetchConditionsAndUpdateState() {
-      const { categoryToConditionArrayMap } = await getConditionsData();
-
-      if (isSubscribed) {
-        setFetchedConditions(
-          groupConditionDataByCategoryName(categoryToConditionArrayMap),
-        );
-      }
-    }
-
-    fetchConditionsAndUpdateState().catch(console.error);
-
-    return () => {
-      isSubscribed = false;
-    };
-  }, [selectedConditions, queryName]);
+    validateForm();
+  }, [queryName]);
 
   useEffect(() => {
     let isSubscribed = true;
 
-    async function setDefaultSelectedConditions() {
-      if (selectedQuery.queryId && fetchedConditions) {
-        const result = await getSavedQueryDetails(selectedQuery.queryId);
-        const conditionIdToNameMap =
-          generateConditionIdToNameAndCategoryMap(fetchedConditions);
-        const queryConditions = result?.map((r) => r.conditions_list).flat();
+  async function setInitialQueryState() {
+      if (selectedQuery.queryId === undefined) {
+        return;
+      }
+      const result = await getSavedQueryDetails(selectedQuery.queryId);
 
-        const updatedConditions: CategoryNameToConditionOptionMap = {};
-        queryConditions &&
-          queryConditions.forEach((conditionId) => {
-            const { category, conditionName } =
-              conditionIdToNameMap[conditionId];
+      if (result === undefined) {
+        return; // todo: error???
+      }
 
-            updatedConditions[category] = {
-              ...updatedConditions[category],
-              [conditionId]: {
-                name: conditionName,
-                include: true,
-              },
-            };
+      const initialState: NestedQuery = {};
+      const savedQuery = result[0]; // what is this shape, why first index
+
+      Object.entries(savedQuery.query_data).forEach(
+        ([conditionId, valueSetMap]) => {
+          initialState[conditionId] = structuredClone(EMPTY_CONCEPT_TYPES);
+
+          Object.entries(valueSetMap).forEach(([vsId, dibbsVs]) => {
+            initialState[conditionId][dibbsVs.dibbsConceptType][vsId] = dibbsVs;
           });
+        },
+      );
 
-        if (isSubscribed) {
-          setSelectedConditions((prevState) => {
-            // Avoid unnecessary updates if the state is already the same
-            const newState = { ...prevState, ...updatedConditions };
-            return JSON.stringify(prevState) !== JSON.stringify(newState)
-              ? newState
-              : prevState;
-          });
-        }
+      if (isSubscribed) {
+        setConstructedQuery(initialState);
+      }
+
+      setFormError((prevError) => {
+        return { ...prevError, selectedConditions: false };
+      });
+    }
+
+    async function fetchInitialConditions() {
+      const { categoryToConditionNameArrayMap, conditionIdToNameMap } =
+        await getConditionsData();
+
+      if (isSubscribed) {
+        setConditionsDetailsMap(conditionIdToNameMap);
+        setCategoryToConditionMap(categoryToConditionNameArrayMap);
       }
     }
-    setDefaultSelectedConditions().catch(console.error);
+
+    fetchInitialConditions().catch(console.error);
+    setInitialQueryState().catch(console.error);
 
     return () => {
       isSubscribed = false;
     };
-  }, [fetchedConditions]);
-
-  // ensures the fetchedConditions' checkbox statuses match
-  // the data in selectedCondtiions
-  function updateFetchedConditionIncludeStatus(
-    selectedConditions: CategoryNameToConditionOptionMap,
-  ) {
-    const prevFetch = structuredClone(fetchedConditions);
-    if (prevFetch) {
-      Object.entries(selectedConditions).map(
-        ([category, conditionsByCategory]) => {
-          Object.entries(conditionsByCategory).flatMap(
-            ([conditionId, conditionObj]) => {
-              const prevValues = prevFetch[category][conditionId];
-              prevFetch[category][conditionId] = {
-                name: prevValues.name,
-                include: conditionObj.include,
-              };
-              return setFetchedConditions(prevFetch);
-            },
-          );
-        },
-      );
-    }
-  }
+  }, []);
 
   async function handleCreateQueryClick(
     event: React.MouseEvent<HTMLButtonElement>,
@@ -250,10 +171,9 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
     setLoading(true);
     validateForm();
     if (!!queryName && !formError.queryName && !formError.selectedConditions) {
-      // fetch valuesets for selected conditions
-      const valueSets = await getValueSetsForSelectedConditions();
+      const conditionIdsToFetch = Object.keys(constructedQuery);
+      await getValueSetsForSelectedConditions(conditionIdsToFetch);
 
-      setConditionValueSets(valueSets);
       setBuildStep("valueset");
       setLoading(false);
     }
@@ -263,15 +183,107 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
     if (!queryName || queryName == "") {
       focusRef?.current?.focus();
     }
-
+    const atLeastOneItemSelected = Object.keys(constructedQuery).length > 0;
     return setFormError({
       ...formError,
       ...{ queryName: !queryName, selectedConditions: !atLeastOneItemSelected },
     });
   };
 
-  const atLeastOneItemSelected =
-    selectedConditions && Object.values(selectedConditions).length > 0;
+  async function handleConditionUpdate(conditionId: string, remove: boolean) {
+    if (remove) {
+      setConstructedQuery((prevState) => {
+        delete prevState[conditionId];
+        if (Object.keys(prevState).length === 0) {
+          setFormError((prevError) => {
+            return { ...prevError, selectedConditions: true };
+          });
+        }
+
+        return structuredClone(prevState);
+      });
+
+      return;
+    } else {
+      const conditionValueSets = await getValueSetsForSelectedConditions([
+        conditionId,
+      ]);
+
+      if (conditionValueSets === undefined) {
+        showToastConfirmation({
+          heading: "Something went wrong",
+          body: "Couldn't fetch condition value sets. Try again, or contact us if the error persists",
+          variant: "error",
+        });
+        return;
+      }
+      const valueSetsToAdd = conditionValueSets[conditionId];
+      const valueSetsByConceptType =
+        groupValueSetsByConceptType(valueSetsToAdd);
+
+      Object.entries(valueSetsByConceptType).forEach(([vsType, dibbsVsArr]) => {
+        const typeLevelUpdate = handleQueryUpdate(conditionId)(
+          vsType as DibbsConceptType,
+        );
+
+        dibbsVsArr.forEach((dibbsVs) => {
+          typeLevelUpdate(dibbsVs.valueSetId)(dibbsVs);
+        });
+        setFormError((prevError) => {
+          return { ...prevError, selectedConditions: false };
+        });
+      });
+    }
+  }
+
+  const handleQueryUpdate =
+    (conditionId: string) =>
+    (vsType: DibbsConceptType) =>
+    (vsId: string) =>
+    (dibbsValueSets: DibbsValueSet) => {
+      setConstructedQuery((prevState) => {
+        prevState[conditionId] = prevState[conditionId] ?? {};
+        prevState[conditionId][vsType] = prevState[conditionId][vsType] ?? {};
+        prevState[conditionId][vsType][vsId] = dibbsValueSets;
+        return structuredClone(prevState);
+      });
+    };
+
+  const queriesContext = useContext(DataContext);
+
+  async function handleSaveQuery() {
+    if (constructedQuery && queryName) {
+      // TODO: get this from the auth session
+      const userName = "DIBBS";
+      try {
+        const results = await saveCustomQuery(
+          constructedQuery,
+          queryName,
+          userName,
+          selectedQuery.queryId,
+        );
+
+        if (results === undefined) {
+          throw "Result status not returned";
+        }
+
+        const queries = await getCustomQueries();
+        queriesContext?.setData(queries);
+        const statusMessage =
+          results[0].operation === "INSERT" ? "created" : "updated";
+
+        showToastConfirmation({
+          body: `${queryName} successfully ${statusMessage}`,
+        });
+        goBack();
+      } catch (e) {
+        showToastConfirmation({
+          heading: "Something went wrong",
+          body: `${queryName} wasn't successfully created. Please try again or contact us if the error persists`,
+        });
+      }
+    }
+  }
 
   return (
     <>
@@ -282,7 +294,6 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
             // TODO: this can be tidied up...
             if (buildStep == "valueset") {
               setBuildStep("condition");
-              updateFetchedConditionIncludeStatus(selectedConditions ?? {});
             } else {
               goBack();
             }
@@ -294,12 +305,7 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
               : "Back to My queries"
           }
         />
-        <ToastContainer
-          position="bottom-left"
-          icon={false}
-          stacked
-          hideProgressBar
-        />
+
         <div className="customQuery__header">
           <h1 className={styles.queryTitle}>Custom query</h1>
           <div className={styles.customQuery__controls}>
@@ -327,12 +333,6 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
               <Button
                 className="margin-0"
                 type={"button"}
-                disabled={
-                  formError.selectedConditions ||
-                  !queryName ||
-                  loading ||
-                  buildStep == "valueset" // hard-coding this off for now; should be handled in concept selection ticket
-                }
                 title={
                   buildStep == "valueset"
                     ? "Save query"
@@ -340,10 +340,11 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
                       ? "Enter a query name and condition"
                       : "Click to create your query"
                 }
+                disabled={formError.selectedConditions || !queryName || loading}
                 onClick={
                   buildStep == "condition"
                     ? handleCreateQueryClick
-                    : () => console.log("save query")
+                    : handleSaveQuery
                 }
               >
                 {buildStep == "condition" ? "Customize query" : "Save query"}
@@ -353,33 +354,31 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
         </div>
         <div className="display-flex flex-auto">
           {/* Step One: Select Conditions */}
-          {buildStep == "condition" &&
-            fetchedConditions &&
-            queryName !== null && (
-              <ConditionSelection
-                setBuildStep={setBuildStep}
-                queryName={queryName}
-                fetchedConditions={fetchedConditions ?? {}}
-                selectedConditions={selectedConditions ?? {}}
-                setFetchedConditions={setFetchedConditions}
-                setSelectedConditions={setSelectedConditions}
-                setFormError={setFormError}
-                formError={formError}
-                validateForm={validateForm}
-                loading={loading}
-                setLoading={setLoading}
-                setConditionValueSets={setConditionValueSets}
-                updateFetched={updateFetchedConditionIncludeStatus}
-              />
-            )}
-          {/* Step Two: Select ValueSets */}
-          {buildStep == "valueset" && queryName !== null && (
-            <ValueSetSelection
+          {buildStep == "condition" && categoryToConditionMap && (
+            <ConditionSelection
               queryName={queryName}
-              selectedConditions={selectedConditions ?? {}}
-              valueSetsByCondition={conditionValueSets ?? {}}
+              categoryToConditionsMap={categoryToConditionMap}
+              setFormError={setFormError}
+              formError={formError}
+              validateForm={validateForm}
+              loading={loading}
+              setLoading={setLoading}
+              constructedQuery={constructedQuery}
+              handleConditionUpdate={handleConditionUpdate}
             />
           )}
+          {/* Step Two: Select ValueSets */}
+          {buildStep == "valueset" &&
+            categoryToConditionMap &&
+            conditionIdToDetailsMap && (
+              <ValueSetSelection
+                categoryToConditionsMap={categoryToConditionMap}
+                conditionsMap={conditionIdToDetailsMap}
+                constructedQuery={constructedQuery}
+                handleSelectedValueSetUpdate={handleQueryUpdate}
+                handleUpdateCondition={handleConditionUpdate}
+              />
+            )}
         </div>
         {loading && <LoadingView loading={loading} />}
       </div>
@@ -388,3 +387,26 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
 };
 
 export default BuildFromTemplates;
+
+async function getValueSetsForSelectedConditions(conditionIds: string[]) {
+  const conditionValueSets: ConditionIdToValueSetArrayMap = {};
+
+  // if there are new ids, we need to query the db
+  const results = await getValueSetsAndConceptsByConditionIDs(conditionIds);
+  const formattedResults =
+    results && groupConditionConceptsIntoValueSets(results);
+
+  // group by Condition ID:
+  return Object.values(formattedResults).reduce((acc, resultObj) => {
+    if (resultObj.conditionId) {
+      const id = resultObj.conditionId;
+
+      if (!acc[id]) {
+        acc[id] = [];
+      }
+      acc[id].push(resultObj);
+      return acc;
+    }
+    return acc;
+  }, conditionValueSets);
+}

@@ -1,16 +1,4 @@
 import { DibbsConceptType, DibbsValueSet } from "../constants";
-import {
-  ConditionIdToValueSetArrayMap,
-  NestedQuery,
-} from "../queryBuilding/utils";
-
-// ValueSets that share the same name, author, system unique identifier
-export type VsGrouping = {
-  valueSetName: string;
-  author: string;
-  system: string;
-  items: DibbsValueSet[];
-};
 
 export type ConceptTypeToDibbsVsMap = {
   [dibbsConceptType in DibbsConceptType]: {
@@ -25,7 +13,7 @@ type VsNameAuthorSystem = string;
  * @returns the vsName:Author:System key that should uniquely identify a
  * valueset grouping
  */
-export function getNameAuthorSystemFromVSGrouping(vsGroup: VsGrouping) {
+export function getNameAuthorSystemFromVSGrouping(vsGroup: DibbsValueSet) {
   return `${vsGroup.valueSetName}:${vsGroup.author}:${vsGroup.system}`;
 }
 
@@ -90,30 +78,6 @@ export function generateValueSetGroupingsByDibbsConceptType(
 ) {
   const valueSetsByConceptType = groupValueSetsByConceptType(vsArray);
   return generateValueSetGroupingsByConceptType(valueSetsByConceptType);
-}
-
-/**
- * Utility function to generate a three-layer condition : labs / conditions/
- * medications : {valueSetName: ValueSetGrouping} map
- * @param conditionIdToValueSetArrayMap map of condition IDs to ValueSet[]
- * @returns Map of {[conditionId]: {[valueSetName]: ValueSetGrouping} }
- */
-export function groupValueSetByConditionId(
-  conditionIdToValueSetArrayMap: ConditionIdToValueSetArrayMap,
-): NestedQuery {
-  const results: NestedQuery = {};
-
-  Object.entries(conditionIdToValueSetArrayMap).forEach(
-    ([conditionId, valueSetArray]) => {
-      const valueSetsByConceptType = groupValueSetsByConceptType(valueSetArray);
-      const curConditionGrouping = generateValueSetGroupingsByConceptType(
-        valueSetsByConceptType,
-      );
-      results[conditionId] = curConditionGrouping;
-    },
-  );
-
-  return results;
 }
 
 /**

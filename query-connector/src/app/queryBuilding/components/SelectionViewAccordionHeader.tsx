@@ -1,33 +1,37 @@
-import styles from "../buildFromTemplates/buildfromTemplate.module.scss";
+import styles from "../buildFromTemplates/conditionTemplateSelection.module.scss";
 import { Icon } from "@trussworks/react-uswds";
 import { DibbsConceptType, DibbsValueSet } from "@/app/constants";
 import { tallyConceptsForValueSetArray } from "../utils";
 import { ChangeEvent } from "react";
 import Checkbox from "@/app/query/designSystem/checkbox/Checkbox";
 
-type SelectionViewAccordionBodyProps = {
-  activeType: DibbsConceptType;
-  activeTypeValueSets: { [vsId: string]: DibbsValueSet };
+type ConceptTypeAccordionBodyProps = {
+  activeValueSetType: DibbsConceptType;
+  activeValueSets: { [vsId: string]: DibbsValueSet };
   expanded: boolean;
-  handleVsIdLevelUpdate: (
+  handleVsNameLevelUpdate: (
     vsId: string,
-  ) => (dibbsValueSet: DibbsValueSet) => void;
+  ) => (dibbsValueSets: DibbsValueSet) => void;
 };
 
 /**
  * Fragment component to style out some of the accordion bodies
  * @param param0 - params
- * @param param0.activeType - DibbValueSetType (labs, conditions, medications)
- * @param param0.activeTypeValueSets - ValueSets for a given activeValueSetType
+ * @param param0.activeValueSetType - DibbsactiveValueSetType (labs, conditions, medications)
+ * @param param0.activeValueSets - ValueSets for a given activeValueSetType
  * @param param0.expanded - Boolean for managing icon orientation
  * @param param0.handleVsIdLevelUpdate - curried state update function that
  * takes a VsName and generatesa ValueSet level update
  * @returns An accordion body component
  */
-const SelectionViewAccordionHeader: React.FC<
-  SelectionViewAccordionBodyProps
-> = ({ activeType, activeTypeValueSets, expanded, handleVsIdLevelUpdate }) => {
-  const selectedCount = tallyConceptsForValueSetArray(
+
+const ConceptTypeAccordionHeader: React.FC<ConceptTypeAccordionBodyProps> = ({
+  activeValueSetType,
+  activeValueSets,
+  expanded,
+  handleVsNameLevelUpdate,
+}) => {
+   const selectedCount = tallyConceptsForValueSetArray(
     Object.values(activeTypeValueSets),
     true,
   );
@@ -40,13 +44,14 @@ const SelectionViewAccordionHeader: React.FC<
     e: ChangeEvent<HTMLInputElement>,
     isMinusState: boolean,
   ) {
-    Object.entries(activeTypeValueSets).forEach(([vsId, valueSet]) => {
-      const handleValueSetUpdate = handleVsIdLevelUpdate(vsId);
-      const updatedValueSet = structuredClone(valueSet);
-      updatedValueSet.concepts.map(
-        (c) => (c.include = isMinusState ? false : e.target.checked),
-      );
-      handleValueSetUpdate(updatedValueSet);
+    Object.entries(activeValueSets).forEach(([vsId, activeValueSets]) => {
+      const handleValueSetUpdate = handleVsNameLevelUpdate(vsId);
+      const bulkIncludeValue = isMinusState ? false : e.target.checked;
+      activeValueSets.includeValueSet = bulkIncludeValue;
+      activeValueSets.concepts.map((c) => {
+        return (c.include = bulkIncludeValue);
+      });
+      handleValueSetUpdate(activeValueSets);
     });
   }
 
@@ -83,4 +88,4 @@ const SelectionViewAccordionHeader: React.FC<
   );
 };
 
-export default SelectionViewAccordionHeader;
+export default ConceptTypeAccordionHeader;

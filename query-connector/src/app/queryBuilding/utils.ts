@@ -4,16 +4,11 @@ import {
 } from "../utils/valueSetTranslation";
 
 // The structure of the data that's coming from the backend
-export type ConditionIdToNameMap = {
-  [conditionId: string]: string;
-};
-
-// The transform structs for use on the frontend, which is a grandparent - parent
-// - child mapping from category (indexed by name) - conditions (indexed by condition ID)
-// and - condition option (name and whether to include it in the query we're building).
-export type ConditionOption = {
-  name: string;
-  include: boolean;
+export type ConditionsMap = {
+  [conditionId: string]: {
+    name: string;
+    category: string;
+  };
 };
 
 export type CategoryToConditionArrayMap = {
@@ -21,14 +16,6 @@ export type CategoryToConditionArrayMap = {
     id: string;
     name: string;
   }[];
-};
-
-export type ConditionOptionMap = {
-  [conditionId: string]: ConditionOption;
-};
-
-export type CategoryNameToConditionOptionMap = {
-  [categoryName: string]: ConditionOptionMap;
 };
 
 export type ConditionIdToValueSetArrayMap = {
@@ -39,72 +26,32 @@ export type NestedQuery = {
   [conditionId: string]: ConceptTypeToDibbsVsMap;
 };
 
-export type CategoryToConditionToNameMap = {
-  [categoryName: string]: ConditionIdToNameMap[];
+export type QueryUpdateResult = {
+  id: string;
+  query_name: string;
+  operation: "INSERT" | "UPDATE";
 };
 
 export type QueryDetailsResult = {
   query_name: string;
   id: string;
   query_data: {
-    [condition_name: string]: { [valueSetId: string]: DibbsValueSet };
+    [conditionId: string]: { [valueSetId: string]: DibbsValueSet };
   };
   conditions_list: string[];
+  updated: boolean;
 };
 
-export const EMPTY_QUERY_SELECTION = { queryId: "", queryName: "" };
+export const EMPTY_QUERY_SELECTION = {
+  queryId: undefined,
+  queryName: undefined,
+};
 
-/**
- * Translation function format backend {[categoryName: string]: ConditionIdToNameMap[]}
- * into the { categoryName: {conditionId: ConditionOption } } shape used by the frontend
- * @param fetchedData - data returned from the backend function grabbing condition <>
- * category mapping
- * @returns - The data in a CategoryNameToConditionOptionMap shape
- */
-export function groupConditionDataByCategoryName(fetchedData: {
-  [categoryName: string]: ConditionIdToNameMap[];
-}) {
-  const result: CategoryNameToConditionOptionMap = {};
-  Object.entries(fetchedData).forEach(
-    ([categoryName, conditionIdToNameMapArray]) => {
-      const curCategoryMap: ConditionOptionMap = {};
-      conditionIdToNameMapArray.forEach((e) => {
-        (curCategoryMap[Object.keys(e)[0]] = {
-          name: Object.values(e)[0],
-          include: false,
-        }),
-          (result[categoryName] = curCategoryMap);
-      });
-    },
-  );
-  return result;
-}
-
-/**
- * Utility function to reverse the category : name: ID mapping between our conditions structure
- * @param fetchedDate - data returned from the backend function grabbing condition <>
- * category mapping
- * @returns - The data in a CategoryNameToConditionOptionMap shape
- */
-export function generateConditionIdToNameAndCategoryMap(
-  fetchedDate: CategoryNameToConditionOptionMap,
-) {
-  const result: {
-    [conditionId : string]: {
-      conditionName: string;
-      category: string;
-    };
-  } = {};
-  Object.entries(fetchedDate).forEach(([categoryName, conditionOptionMap]) => {
-    Object.entries(conditionOptionMap).forEach(([conditionId, optionMap]) => {
-      result[conditionId] = {
-        conditionName: optionMap.name,
-        category: categoryName,
-      };
-    });
-  });
-  return result;
-}
+export const EMPTY_CONCEPT_TYPE = {
+  labs: {},
+  conditions: {},
+  medications: {},
+};
 
 /**
  * Filtering function that checks filtering at the category and the condition level
@@ -114,12 +61,12 @@ export function generateConditionIdToNameAndCategoryMap(
  */
 export function filterSearchByCategoryAndCondition(
   filterString: string,
-  fetchedConditions: CategoryNameToConditionOptionMap,
-): CategoryNameToConditionOptionMap {
-  const result: CategoryNameToConditionOptionMap = {};
+  fetchedConditions: CategoryToConditionArrayMap,
+): CategoryToConditionArrayMap {
+  const result: CategoryToConditionArrayMap = {};
 
   Object.entries(fetchedConditions).forEach(
-    ([categoryName, conditionNameArray]) => {
+    ([categoryName, conditionArray]) => {
       if (
         categoryName
           .toLocaleLowerCase()
@@ -127,18 +74,13 @@ export function filterSearchByCategoryAndCondition(
       ) {
         result[categoryName] = fetchedConditions[categoryName];
       }
-      Object.entries(conditionNameArray).forEach(
-        ([conditionId, conditionNameAndInclude]) => {
-          if (
-            conditionNameAndInclude.name
-              .toLocaleLowerCase()
-              .includes(filterString.toLocaleLowerCase())
-          ) {
-            result[categoryName] = result[categoryName] ?? {};
-            result[categoryName][conditionId] = conditionNameAndInclude;
-          }
-        },
+      const matches = conditionArray.filter((c) =>
+        c.name.toLocaleLowerCase().includes(filterString.toLocaleLowerCase()),
       );
+
+      if (matches.length > 0) {
+        result[categoryName] = matches;
+      }
     },
   );
 
