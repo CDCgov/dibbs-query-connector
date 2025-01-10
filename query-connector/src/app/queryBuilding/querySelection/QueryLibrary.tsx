@@ -25,9 +25,8 @@ import {
 import LoadingView from "@/app/query/components/LoadingView";
 import { DataContext } from "@/app/DataProvider";
 import classNames from "classnames";
-import { getConditionsData, getCustomQueries } from "@/app/database-service";
+import { getConditionsData } from "@/app/database-service";
 import { ConditionsMap } from "../utils";
-import { showToastConfirmation } from "@/app/query/designSystem/toast/Toast";
 
 interface UserQueriesDisplayProps {
   queries: CustomUserQuery[];

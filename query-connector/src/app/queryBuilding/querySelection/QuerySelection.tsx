@@ -10,7 +10,6 @@ import {
   SetStateAction,
   Dispatch,
 } from "react";
-import { ToastContainer } from "react-toastify";
 import EmptyQueriesDisplay from "./EmptyQueriesDisplay";
 import MyQueriesDisplay from "./QueryLibrary";
 import { SelectedQueryDetails, SelectedQueryState } from "./utils";
