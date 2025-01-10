@@ -1,14 +1,14 @@
 import { DibbsConceptType } from "@/app/constants";
 import styles from "./customizeQuery.module.scss";
 import CustomizeQueryBulkSelect from "./CustomizeQueryBulkSelect";
-import { temp__ConceptTypeToVsNameToVsGroupingMap } from "@/app/utils/valueSetTranslation";
+import { ConceptTypeToDibbsVsMap } from "@/app/utils/valueSetTranslation";
 import { Button } from "@trussworks/react-uswds";
 
 type CustomizeQueryNavProps = {
   activeTab: DibbsConceptType;
   handleTabChange: (tabName: DibbsConceptType) => void;
   handleSelectAllForTab: (checked: boolean) => void;
-  valueSetOptions: temp__ConceptTypeToVsNameToVsGroupingMap;
+  valueSetOptions: ConceptTypeToDibbsVsMap;
 };
 
 /**

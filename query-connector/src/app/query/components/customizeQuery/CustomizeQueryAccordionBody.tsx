@@ -58,7 +58,9 @@ const CustomizeQueryAccordionBody: React.FC<
                 "tableRowWithHover_clickable",
                 styles.customizeQueryGridRow,
               )}
-              key={item.code}
+              // TODO: this is where pulling in concept version would be useful -
+              // getting duplicate key error for loinc code 24111-7 (one has blank version, one is version 2.77)
+              key={`${item.code}-${item.vsIndex}`}
               tabIndex={0}
             >
               <td className={styles.checkboxCell}>

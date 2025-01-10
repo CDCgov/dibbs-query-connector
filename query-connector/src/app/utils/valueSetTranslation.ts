@@ -2,7 +2,7 @@ import { DibbsConceptType, DibbsValueSet } from "../constants";
 import {
   ConditionIdToValueSetArrayMap,
   // ConditionToConceptTypeToValueSetGroupingMap,
-  temp__ConditionToConceptTypeToValueSetGroupingMap,
+  NestedQuery,
 } from "../queryBuilding/utils";
 
 // ValueSets that share the same name, author, system unique identifier
@@ -109,8 +109,8 @@ export function generateValueSetGroupingsByDibbsConceptType(
  */
 export function groupValueSetGroupingByConditionId(
   conditionIdToValueSetArrayMap: ConditionIdToValueSetArrayMap,
-): temp__ConditionToConceptTypeToValueSetGroupingMap {
-  const results: temp__ConditionToConceptTypeToValueSetGroupingMap = {};
+): NestedQuery {
+  const results: NestedQuery = {};
 
   Object.entries(conditionIdToValueSetArrayMap).forEach(
     ([conditionId, valueSetArray]) => {

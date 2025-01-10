@@ -49,10 +49,6 @@ export type ConditionToConceptTypeToValueSetGroupingMap = {
   [conditionId: string]: ConceptTypeToVsNameToVsGroupingMap;
 };
 
-export type temp__ConditionToConceptTypeToValueSetGroupingMap = {
-  [conditionId: string]: temp__ConceptTypeToVsNameToVsGroupingMap;
-};
-
 export type QueryDetailsResult = {
   query_name: string;
   id: string;
