@@ -62,11 +62,15 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
 
   const conditionUpdate = categoryToConditionsMap
     ? Object.entries(categoryToConditionsMap).map(([category, conditions]) => (
-        <div key={category}>
+        <div id={category} key={category}>
           <div className={styles.conditionDrawerHeader}>{category}</div>
           <div>
-            {Object.entries(conditions).map(([, condition]) => (
-              <div key={condition.id} className={styles.conditionItem}>
+            {Object.values(conditions).map((condition) => (
+              <div
+                key={`update-${condition.id}`}
+                id={`update-${condition.id}`}
+                className={styles.conditionItem}
+              >
                 <span>{formatDiseaseDisplay(condition.name)}</span>
 
                 {Object.keys(constructedQuery).includes(condition.id) ? (
@@ -134,7 +138,8 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
                   )}
                 >
                   <div
-                    key={conditionId}
+                    key={`tab-${conditionId}`}
+                    id={`tab-${conditionId}`}
                     onClick={() => setActiveCondition(conditionId)}
                     tabIndex={0}
                   >

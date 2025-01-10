@@ -76,7 +76,7 @@ const ConceptSelection: React.FC<ConceptSelectionProps> = ({
       </thead>
       <tbody>
         {concepts.map((concept, index) => (
-          <tr className={styles.conceptSelectionRow}>
+          <tr key={concept.code} className={styles.conceptSelectionRow}>
             <td>
               <Checkbox
                 id={`checkbox-${concept.code}`}
