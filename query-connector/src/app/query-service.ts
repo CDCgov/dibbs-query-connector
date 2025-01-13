@@ -5,7 +5,6 @@ import { Bundle, DomainResource } from "fhir/r4";
 import FHIRClient from "./fhir-servers";
 import {
   USE_CASES,
-  FHIR_SERVERS,
   DibbsValueSet,
   isFhirResource,
   FhirResource,
@@ -33,7 +32,7 @@ export type APIQueryResponse = Bundle;
 
 export type UseCaseQueryRequest = {
   use_case: USE_CASES;
-  fhir_server: FHIR_SERVERS;
+  fhir_server: string;
   first_name?: string;
   last_name?: string;
   dob?: string;
