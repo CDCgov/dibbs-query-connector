@@ -3,9 +3,7 @@
 import styles from "../buildFromTemplates/conditionTemplateSelection.module.scss";
 import { useEffect, useState } from "react";
 import classNames from "classnames";
-
 import { Icon } from "@trussworks/react-uswds";
-
 import {
   CategoryToConditionArrayMap,
   ConditionsMap,
@@ -13,7 +11,6 @@ import {
   NestedQuery,
 } from "../utils";
 import { ConceptTypeSelectionTable } from "./SelectionTable";
-
 import Drawer from "@/app/query/designSystem/drawer/Drawer";
 import { DibbsConceptType, DibbsValueSet } from "@/app/constants";
 import { showToastConfirmation } from "@/app/query/designSystem/toast/Toast";
@@ -48,9 +45,7 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
   categoryToConditionsMap,
 }) => {
   const [activeCondition, setActiveCondition] = useState<string>("");
-  // const [_searchFilter, setSearchFilter] = useState<string>();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-
   const handleDrawer = (open: boolean) => {
     setIsDrawerOpen(open);
   };
