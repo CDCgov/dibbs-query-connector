@@ -34,22 +34,6 @@ export const USE_CASE_DETAILS = {
 
 export type USE_CASES = keyof typeof USE_CASE_DETAILS;
 
-/**
- * The FHIR servers that can be used in the app
- */
-export const FhirServers = [
-  "HELIOS Meld: Direct",
-  "HELIOS Meld: eHealthExchange",
-  "JMC Meld: Direct",
-  "JMC Meld: eHealthExchange",
-  "Public HAPI: Direct",
-  "Local e2e HAPI Server: Direct",
-  "OpenEpic: eHealthExchange",
-  "CernerHelios: eHealthExchange",
-  "OPHDST Meld: Direct",
-] as const;
-export type FHIR_SERVERS = (typeof FhirServers)[number];
-
 //Create type to specify the demographic data fields for a patient
 export type DemoDataFields = {
   FirstName: string;
@@ -57,7 +41,7 @@ export type DemoDataFields = {
   DOB: string;
   MRN: string;
   Phone: string;
-  FhirServer: FHIR_SERVERS;
+  FhirServer: string;
   UseCase: USE_CASES;
 };
 
@@ -71,7 +55,7 @@ export type PatientType =
   | "newborn-screening-pass"
   | "sti-syphilis-positive";
 
-export const DEFAULT_DEMO_FHIR_SERVER = "HELIOS Meld: Direct";
+export const DEFAULT_DEMO_FHIR_SERVER = "Public HAPI: Direct";
 /*
  * Common "Hyper Unlucky" patient data used for all non-newborn screening use cases
  */
@@ -340,13 +324,15 @@ export type FhirServerConfig = {
   id: string;
   name: string;
   hostname: string;
+  last_connection_attempt: Date;
+  last_connection_successful: boolean;
   headers: Record<string, string>;
 };
 
 export const INVALID_USE_CASE = `Invalid use_case. Please provide a valid use_case. Valid use_cases include ${Object.keys(
   USE_CASE_DETAILS,
 )}.`;
-export const INVALID_FHIR_SERVERS = `Invalid fhir_server. Please provide a valid fhir_server. Valid fhir_servers include ${FhirServers}.`;
+export const INVALID_FHIR_SERVERS = `Invalid fhir_server. Please provide a valid fhir_server.`;
 export const RESPONSE_BODY_IS_NOT_PATIENT_RESOURCE =
   "Request body is not a Patient resource.";
 export const MISSING_API_QUERY_PARAM = "Missing use_case or fhir_server.";
