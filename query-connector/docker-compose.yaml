@@ -17,8 +17,6 @@ services:
   # Keycloak for authentication
   keycloak:
     image: quay.io/keycloak/keycloak:26.0.2
-    # environment:
-    # - AUTH_KEYCLOAK_ISSUER=http://localhost:8080/realms/master
     ports:
       - 8080:8080
     volumes:
