@@ -7,11 +7,10 @@ import {
 import {
   categoryToConditionNameArrayMap,
   conditionIdToNameMap,
-  defaultQueries,
+  DEFAULT_QUERIES,
   malignantNeoplasticValuesets,
 } from "../fixtures";
 import BuildFromTemplates from "./BuildFromTemplates";
-import userEvent from "@testing-library/user-event";
 import { formatDiseaseDisplay } from "../utils";
 import { renderWithUser } from "@/app/tests/unit/setup";
 
@@ -39,7 +38,7 @@ describe("tests the build from template page interactions", () => {
 
   const mockSetData = jest.fn();
   const mockContextValue = {
-    data: defaultQueries,
+    data: DEFAULT_QUERIES,
     setData: mockSetData,
   };
 

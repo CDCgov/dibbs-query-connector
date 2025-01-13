@@ -1,4 +1,4 @@
-export const defaultQueries = [
+export const DEFAULT_QUERIES = [
   {
     query_id: "cf580d8d-cc7b-4eae-8a0d-96c36f9222e3",
     query_name: "Cancer case investigation",
