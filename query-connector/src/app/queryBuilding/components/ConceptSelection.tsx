@@ -1,12 +1,12 @@
 import React from "react";
-import styles from "../buildFromTemplates/buildfromTemplate.module.scss";
-import { ConceptOption } from "@/app/utils/valueSetTranslation";
+import styles from "../buildFromTemplates/conditionTemplateSelection.module.scss";
+import { Concept } from "@/app/constants";
 import { showToastConfirmation } from "@/app/query/designSystem/toast/Toast";
 import Checkbox from "@/app/query/designSystem/checkbox/Checkbox";
 
 type ConceptSelectionProps = {
-  concepts: ConceptOption[];
-  onConceptsChange: (updatedConcepst: ConceptOption[]) => void;
+  concepts: Concept[];
+  onConceptsChange: (updatedConcepst: Concept[]) => void;
 };
 
 /**
@@ -25,7 +25,8 @@ const ConceptSelection: React.FC<ConceptSelectionProps> = ({
   const totalCount = concepts.length;
   const isMinusState = selectedCount > 0 && selectedCount < totalCount;
 
-  const toggleAll = (isChecked: boolean) => {
+  const toggleAll = (targetChecked: boolean) => {
+    const isChecked = isMinusState ? false : targetChecked; // fixes the toast showing "Added" when deselecting all in a minusState
     const updatedConcepts = concepts.map((concept) => ({
       ...concept,
       include: isMinusState ? false : isChecked,
@@ -62,11 +63,7 @@ const ConceptSelection: React.FC<ConceptSelectionProps> = ({
             <Checkbox
               id="toggleAll"
               checked={selectedCount === totalCount}
-              className={`bg-transparent ${
-                isMinusState
-                  ? styles.concept__checkbox__partial
-                  : styles.concept__checkbox
-              }`}
+              isMinusState={isMinusState}
               onChange={(e) => toggleAll(e.target.checked)}
             />
           </th>
@@ -76,7 +73,7 @@ const ConceptSelection: React.FC<ConceptSelectionProps> = ({
       </thead>
       <tbody>
         {concepts.map((concept, index) => (
-          <tr className={styles.conceptSelectionRow}>
+          <tr key={concept.code} className={styles.conceptSelectionRow}>
             <td>
               <Checkbox
                 id={`checkbox-${concept.code}`}
@@ -87,7 +84,7 @@ const ConceptSelection: React.FC<ConceptSelectionProps> = ({
                 onChange={(e) => toggleSingle(index, e.target.checked)}
               />
             </td>
-            <td>{concept.code}</td>
+            <td className={styles.conceptCode}>{concept.code}</td>
             <td>{concept.display}</td>
           </tr>
         ))}

@@ -3,10 +3,7 @@ import {
   unnestValueSetsFromQuery,
 } from "../../utils";
 
-import {
-  groupConditionDataByCategoryName,
-  filterSearchByCategoryAndCondition,
-} from "@/app/queryBuilding/utils";
+import { filterSearchByCategoryAndCondition } from "@/app/queryBuilding/utils";
 import {
   CANCER_DB_QUERY_VALUES,
   CATEGORY_TO_CONDITION_ARRAY_MAP,
@@ -15,30 +12,9 @@ import {
 } from "./fixtures";
 
 describe("data util methods for query building", () => {
-  describe("groupConditionDataByCategoryName", () => {
-    it("translates backend query to frontend dictionary structure", () => {
-      const mappedExample = groupConditionDataByCategoryName(
-        CATEGORY_TO_CONDITION_ARRAY_MAP,
-      );
-      // check a couple of random values to make sure mapping works correctly
-      expect(mappedExample["Injuries, NEC"][44301001].name).toBe(
-        "Suicide (event)",
-      );
-      expect(mappedExample["Injuries, NEC"][44301001].include).toBe(false);
-      expect(mappedExample["Vaccine Preventable Diseases"][6142004].name).toBe(
-        "Influenza (disorder)",
-      );
-      expect(
-        mappedExample["Vaccine Preventable Diseases"][6142004].include,
-      ).toBe(false);
-    });
-  });
-
   describe("filterSearchByCategoryAndCondition", () => {
     it("filters by category (parent level)", () => {
-      const frontendStructuredData = groupConditionDataByCategoryName(
-        CATEGORY_TO_CONDITION_ARRAY_MAP,
-      );
+      const frontendStructuredData = CATEGORY_TO_CONDITION_ARRAY_MAP;
       const filterResults = filterSearchByCategoryAndCondition(
         "Diseases",
         frontendStructuredData,
@@ -47,9 +23,7 @@ describe("data util methods for query building", () => {
       expect(Object.values(filterResults).length).toBe(9);
     });
     it("filters by condition (child level)", () => {
-      const frontendStructuredData = groupConditionDataByCategoryName(
-        CATEGORY_TO_CONDITION_ARRAY_MAP,
-      );
+      const frontendStructuredData = CATEGORY_TO_CONDITION_ARRAY_MAP;
       const filterResults = filterSearchByCategoryAndCondition(
         "hepatitis",
         frontendStructuredData,

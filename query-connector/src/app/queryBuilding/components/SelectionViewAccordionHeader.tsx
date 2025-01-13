@@ -1,60 +1,50 @@
-import styles from "../buildFromTemplates/buildfromTemplate.module.scss";
+import styles from "../buildFromTemplates/conditionTemplateSelection.module.scss";
 import { Icon } from "@trussworks/react-uswds";
 import { DibbsConceptType, DibbsValueSet } from "@/app/constants";
-import { VsGrouping } from "@/app/utils/valueSetTranslation";
-import { tallyConceptsForValueSetGroupArray } from "../utils";
 import { ChangeEvent } from "react";
 import Checkbox from "@/app/query/designSystem/checkbox/Checkbox";
 
-type SelectionViewAccordionBodyProps = {
-  activeValueSetType: DibbsConceptType;
-  activeVsGroupings: { [vsNameAuthorSystem: string]: VsGrouping };
+type ConceptTypeAccordionBodyProps = {
+  activeType: DibbsConceptType;
+  activeTypeValueSets: { [vsId: string]: DibbsValueSet };
   expanded: boolean;
   handleVsNameLevelUpdate: (
-    vsName: string,
-  ) => (val: VsGrouping) => (dibbsValueSets: DibbsValueSet[]) => void;
+    vsId: string,
+  ) => (dibbsValueSets: DibbsValueSet) => void;
 };
 
 /**
  * Fragment component to style out some of the accordion bodies
  * @param param0 - params
- * @param param0.activeValueSetType - DibbsactiveValueSetType (labs, conditions, medications)
- * @param param0.activeVsGroupings - ValueSets for a given activeValueSetType
+ * @param param0.activeType - DibbsactiveValueSetType (labs, conditions, medications)
+ * @param param0.activeTypeValueSets - ValueSets for a given activeValueSetType
  * @param param0.expanded - Boolean for managing icon orientation
  * @param param0.handleVsNameLevelUpdate - curried state update function that
  * takes a VsName and generatesa ValueSet level update
  * @returns An accordion body component
  */
-const SelectionViewAccordionHeader: React.FC<
-  SelectionViewAccordionBodyProps
-> = ({
-  activeValueSetType,
-  activeVsGroupings,
+const ConceptTypeAccordionHeader: React.FC<ConceptTypeAccordionBodyProps> = ({
+  activeType,
+  activeTypeValueSets,
   expanded,
   handleVsNameLevelUpdate,
 }) => {
-  const selectedCount = tallyConceptsForValueSetGroupArray(
-    Object.values(activeVsGroupings),
-    true,
-  );
-  const totalCount = tallyConceptsForValueSetGroupArray(
-    Object.values(activeVsGroupings),
-    false,
-  );
+  const concepts = activeTypeValueSets[activeType].concepts;
+  const selectedCount = concepts.filter((c) => c.include).length;
+  const totalCount = concepts.length;
 
   function handleBulkToggle(
     e: ChangeEvent<HTMLInputElement>,
     isMinusState: boolean,
   ) {
-    Object.entries(activeVsGroupings).forEach(([vsName, curGrouping]) => {
-      const handleVsGroupingLevelUpdate = handleVsNameLevelUpdate(vsName);
-      const updatedGrouping = structuredClone(curGrouping);
-      updatedGrouping.items.map((i) => {
-        return i.concepts.map(
-          (c) => (c.include = isMinusState ? false : e.target.checked),
-        );
+    Object.entries(activeTypeValueSets).forEach(([vsId, activeValueSets]) => {
+      const handleValueSetUpdate = handleVsNameLevelUpdate(vsId);
+      const bulkIncludeValue = isMinusState ? false : e.target.checked;
+      activeValueSets.includeValueSet = bulkIncludeValue;
+      activeValueSets.concepts.map((c) => {
+        return (c.include = bulkIncludeValue);
       });
-      handleVsGroupingLevelUpdate(updatedGrouping)(updatedGrouping.items);
+      handleValueSetUpdate(activeValueSets);
     });
   }
 
@@ -64,7 +54,7 @@ const SelectionViewAccordionHeader: React.FC<
 
   return (
     <>
-      <div className={styles.accordionHeaderWrapper} key={activeValueSetType}>
+      <div className={styles.accordionHeaderWrapper} key={activeType}>
         <div className={styles.valueSetTemplate__toggleRowHeader}>
           <Icon.ArrowDropUp
             aria-label="Arrow indicating collapsed or expanded toggle content"
@@ -73,12 +63,12 @@ const SelectionViewAccordionHeader: React.FC<
           />
           <Checkbox
             className={styles.valueSetTemplate__titleCheckbox}
-            label={activeValueSetType}
+            label={activeType}
             onChange={(e) => {
               e.stopPropagation();
               handleBulkToggle(e, isMinusState);
             }}
-            id={`${activeValueSetType}`}
+            id={`${activeType}`}
             checked={checked}
             isMinusState={isMinusState}
           />
@@ -91,4 +81,4 @@ const SelectionViewAccordionHeader: React.FC<
   );
 };
 
-export default SelectionViewAccordionHeader;
+export default ConceptTypeAccordionHeader;

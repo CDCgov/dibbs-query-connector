@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
-import { Button, Icon } from "@trussworks/react-uswds";
+import { Icon } from "@trussworks/react-uswds";
 import styles from "./header.module.scss";
 import { metadata } from "@/app/constants";
 import classNames from "classnames";
@@ -57,7 +57,7 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
     setShowMenu(!showMenu);
   };
   const isProduction = process.env.NODE_ENV === "production";
-  const backLink = "/";
+  const landingPage = "/";
 
   return (
     <div className={styles.headerContainer}>
@@ -73,7 +73,7 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
               <em className="usa-logo__text text-base-lightest-important">
                 <a
                   className="font-mono-lg text-base-lightest-important font-weight-normal-important"
-                  href={backLink}
+                  href={landingPage}
                   title={metadata.title}
                 >
                   {metadata.title}
@@ -88,8 +88,8 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
               "flex-align-center",
             )}
           >
-            {/* TODO: Rework show/hide rules based on actual auth status */}
-            {!isLoggedIn && !LOGGED_IN_PATHS.includes(path) && (
+            {/* TODO: Enable this once we can show/hide rules based on actual auth status */}
+            {/* {!isLoggedIn && !LOGGED_IN_PATHS.includes(path) && (
               <Button
                 className={styles.signinButton}
                 type="button"
@@ -99,7 +99,7 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
               >
                 Sign in
               </Button>
-            )}
+            )} */}
             {LOGGED_IN_PATHS.includes(path) && (
               <button
                 onClick={toggleMenuDropdown}
@@ -130,18 +130,26 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
             id="dropdown-menu"
             className={`usa-nav__submenu ${styles.menuDropdown}`}
           >
-            {!isProduction && (
+            {/* TODO: Enable this once we can show/hide rules based on actual auth status */}
+            {/* {isProduction && ( */}
+            <>
               <li className={styles.subMenuItem}>
                 <a className={styles.menuItem} href={"/queryBuilding"}>
                   My queries
                 </a>
               </li>
-            )}
-            <li className={styles.subMenuItem}>
-              <a className={styles.menuItem} href={backLink}>
-                Log out
-              </a>
-            </li>
+              <li className={styles.subMenuItem}>
+                <a className={styles.menuItem} href={"/fhir-servers"}>
+                  FHIR Servers
+                </a>
+              </li>
+              <li className={styles.subMenuItem}>
+                <a className={styles.menuItem} href={landingPage}>
+                  Log out
+                </a>
+              </li>
+            </>
+            {/* )} */}
           </ul>
         </div>
       )}
@@ -149,6 +157,6 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
   );
 };
 
-const LOGGED_IN_PATHS = ["/query", "/queryBuilding"];
+const LOGGED_IN_PATHS = ["/query", "/queryBuilding", "/fhir-servers"];
 
 export default HeaderComponent;
