@@ -14,6 +14,20 @@ services:
       timeout: 5s
       retries: 20
 
+  # Keycloak for authentication
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.0.2
+    # environment:
+    # - AUTH_KEYCLOAK_ISSUER=http://localhost:8080/realms/master
+    ports:
+      - 8080:8080
+    volumes:
+      - ./keycloak:/opt/keycloak/data/import
+    restart: always
+    command:
+      - start-dev
+      - --import-realm
+
   # Next.js app with Flyway
   query-connector:
     platform: linux/amd64
@@ -25,9 +39,19 @@ services:
       - "3000:3000"
     environment:
       - NODE_ENV=production
+      - NODE_TLS_REJECT_UNAUTHORIZED=0
+      - AUTH_DISABLED=false
+      - AUTH_SECRET="ido5D/uybeAB3AmMQwn+ubw2zYC4t2h7RJlW2R79598="
+      - AUTH_KEYCLOAK_ISSUER=http://localhost:8080/realms/master
+      - LOCAL_KEYCLOAK=http://localhost:8080
+      - NAMED_KEYCLOAK=http://keycloak:8080
+      - AUTH_KEYCLOAK_ID=query-connector
+      - AUTH_KEYCLOAK_SECRET=ZG3f7R1J3qIwBaw8QtttJnJMinpERQKs
       - DATABASE_URL=postgres://postgres:pw@db:5432/tefca_db
       # Note: you must have a local .env file with the ERSD_API_KEY set to a key
       # obtained from the ERSD API at https://ersd.aimsplatform.org/#/api-keys
     depends_on:
       db:
         condition: service_healthy
+      keycloak:
+        condition: service_started
