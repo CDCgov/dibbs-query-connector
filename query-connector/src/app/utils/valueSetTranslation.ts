@@ -1,22 +1,8 @@
 import { DibbsConceptType, DibbsValueSet } from "../constants";
 
-// ValueSets that share the same name, author, system unique identifier
-export type VsGrouping = {
-  valueSetName: string;
-  author: string;
-  system: string;
-  items: DibbsValueSet[];
-};
-
 export type ConceptTypeToDibbsVsMap = {
   [dibbsConceptType in DibbsConceptType]: {
     [vsId: string]: DibbsValueSet;
-  };
-};
-
-export type ConceptTypeToVsNameToVsGroupingMap = {
-  [dibbsConceptType in DibbsConceptType]: {
-    [vsId: string]: VsGrouping;
   };
 };
 
@@ -27,11 +13,9 @@ type VsNameAuthorSystem = string;
  * @returns the vsName:Author:System key that should uniquely identify a
  * valueset grouping
  */
-export function getNameAuthorSystemFromVSGrouping(vsGroup: VsGrouping) {
+export function getNameAuthorSystemFromVSGrouping(vsGroup: DibbsValueSet) {
   return `${vsGroup.valueSetName}:${vsGroup.author}:${vsGroup.system}`;
 }
-
-export type ConceptOption = { code: string; display: string; include: boolean };
 
 /**
  * Helper function that takes an array of value set items and groups them using
@@ -43,32 +27,25 @@ export type ConceptOption = { code: string; display: string; include: boolean };
  * of valueSetName:author:system and the values are all the value set items that
  * share those identifiers in common, structed as a GroupedValueSet
  */
-export function groupValueSetsByNameAuthorSystem(
+export function groupValueSetsByVsId(
   valueSetsToGroup: DibbsValueSet[],
-): Record<VsNameAuthorSystem, VsGrouping> {
+): Record<VsNameAuthorSystem, DibbsValueSet> {
   const results = valueSetsToGroup.reduce(
     (acc, row) => {
       // Check if both author and code_system are defined
       const author = row?.author;
       const system = row?.system;
       const valueSetName = row?.valueSetName;
+      const vsId = row?.valueSetId;
       if (!author || !system || !valueSetName) {
         console.warn(
           `Skipping malformed row: Missing author (${author}) or system (${system}) for ValueSet (${row?.valueSetId})`,
         );
         return acc;
       }
+      const groupKey = vsId;
 
-      const groupKey = `${valueSetName}:${author}:${system}`;
-      if (!acc[groupKey]) {
-        acc[groupKey] = {
-          valueSetName: valueSetName,
-          author: author,
-          system: system,
-          items: [],
-        };
-      }
-      acc[groupKey].items.push({
+      acc[groupKey] = {
         valueSetId: row.valueSetId,
         valueSetVersion: row.valueSetVersion,
         valueSetName: row.valueSetName,
@@ -81,10 +58,10 @@ export function groupValueSetsByNameAuthorSystem(
         concepts: row.concepts.map((c) => {
           return { ...c };
         }),
-      });
+      };
       return acc;
     },
-    {} as Record<VsNameAuthorSystem, VsGrouping>,
+    {} as Record<VsNameAuthorSystem, DibbsValueSet>,
   );
 
   return results;
@@ -114,7 +91,7 @@ function generateValueSetGroupingsByConceptType(valueSetsByConceptType: {
 }) {
   return Object.keys(valueSetsByConceptType).reduce(
     (acc, key) => {
-      const valueSetGroupings = groupValueSetsByNameAuthorSystem(
+      const valueSetGroupings = groupValueSetsByVsId(
         valueSetsByConceptType[key as DibbsConceptType],
       );
 
@@ -122,7 +99,7 @@ function generateValueSetGroupingsByConceptType(valueSetsByConceptType: {
       return acc;
     },
     {} as {
-      [key in DibbsConceptType]: { [vsName: string]: VsGrouping };
+      [key in DibbsConceptType]: { [vsName: string]: DibbsValueSet };
     },
   );
 }

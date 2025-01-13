@@ -4,7 +4,7 @@ import { groupConditionConceptsIntoValueSets } from "../utils";
 import {
   generateValueSetGroupingsByDibbsConceptType,
   groupValueSetsByConceptType,
-  groupValueSetsByNameAuthorSystem,
+  groupValueSetsByVsId,
 } from "./valueSetTranslation";
 
 describe("translation utils", () => {
@@ -13,7 +13,7 @@ describe("translation utils", () => {
   );
   describe("groupValueSetsByNameAuthorSystem", () => {
     it("returns expected grouped valueset", () => {
-      const groupedValueSets = groupValueSetsByNameAuthorSystem(cancerSets);
+      const groupedValueSets = groupValueSetsByVsId(cancerSets);
       expect(Object.keys(groupedValueSets).length).toBe(4);
       expect(
         Object.values(groupedValueSets).map((v) => v.valueSetName),
