@@ -90,26 +90,26 @@ export default function HeaderComponent() {
                 Sign in
               </Button>
             )} */}
-            {/* {LOGGED_IN_PATHS.includes(path) && ( */}
-            <button
-              onClick={toggleMenuDropdown}
-              className={classNames(
-                styles.menuButton,
-                "usa-accordion__button",
-                "usa-nav__link",
-                "usa-current",
-              )}
-              aria-expanded="false"
-              aria-controls="dropdown-menu"
-            >
-              <Icon.Settings
-                className="usa-icon qc-settings"
-                size={3}
-                color="#fff"
-                aria-label="Gear icon indicating settings menu"
-              />
-            </button>
-            {/* )} */}
+            {LOGGED_IN_PATHS.includes(path) && (
+              <button
+                onClick={toggleMenuDropdown}
+                className={classNames(
+                  styles.menuButton,
+                  "usa-accordion__button",
+                  "usa-nav__link",
+                  "usa-current",
+                )}
+                aria-expanded="false"
+                aria-controls="dropdown-menu"
+              >
+                <Icon.Settings
+                  className="usa-icon qc-settings"
+                  size={3}
+                  color="#fff"
+                  aria-label="Gear icon indicating settings menu"
+                />
+              </button>
+            )}
           </div>
         </div>
       </header>
