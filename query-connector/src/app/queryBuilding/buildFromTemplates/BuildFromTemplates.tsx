@@ -22,7 +22,7 @@ import {
   NestedQuery,
   CategoryToConditionArrayMap,
   ConditionsMap,
-  EMPTY_CONCEPT_TYPES,
+  EMPTY_CONCEPT_TYPE,
 } from "../utils";
 import { ConditionSelection } from "../components/ConditionSelection";
 import { ValueSetSelection } from "../components/ValueSetSelection";
@@ -129,7 +129,7 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
 
       Object.entries(savedQuery.query_data).forEach(
         ([conditionId, valueSetMap]) => {
-          initialState[conditionId] = structuredClone(EMPTY_CONCEPT_TYPES);
+          initialState[conditionId] = structuredClone(EMPTY_CONCEPT_TYPE);
 
           Object.entries(valueSetMap).forEach(([vsId, dibbsVs]) => {
             initialState[conditionId][dibbsVs.dibbsConceptType][vsId] = dibbsVs;
