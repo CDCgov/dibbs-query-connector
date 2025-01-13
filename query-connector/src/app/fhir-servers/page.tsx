@@ -73,6 +73,7 @@ const FhirServers: React.FC = () => {
       setSelectedServer(server);
       setServerName(server.name);
       setServerUrl(server.hostname);
+      setConnectionStatus("idle");
     } else {
       resetModalState();
     }
@@ -264,20 +265,25 @@ const FhirServers: React.FC = () => {
       });
     }
 
-    if (connectionStatus === "success") {
-      buttons[1].text = (
-        <>
-          <Icon.Check
-            size={3}
-            className="usa-icon"
-            aria-label="Connected"
-            color="green"
-          />
-          Success
-        </>
-      );
-      buttons[1].className =
-        "usa-button usa-button--outline shadow-none text-green padding-left-0 padding-right-2";
+    switch (connectionStatus) {
+      case "success":
+        buttons[1].text = (
+          <>
+            <Icon.Check
+              className="usa-icon"
+              aria-label="Connected"
+              color="green"
+            />
+            Success
+          </>
+        );
+        buttons[1].className =
+          "usa-button usa-button--outline shadow-none text-green padding-left-2 padding-right-2";
+        break;
+      default:
+        buttons[1].text = "Test connection";
+        buttons[1].className = "usa-button usa-button--outline";
+        break;
     }
 
     return buttons;
