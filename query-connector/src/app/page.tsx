@@ -28,7 +28,7 @@ export default function LandingPage() {
             <h2 className={styles.pageContent}>
               The Query Connector allows your jurisdiction to query a wide
               network of healthcare providers through your existing data use
-              agreements, giving you access to more complete and timely data
+              agreements, giving you access to more complete and timely data.
             </h2>
 
             <Button
