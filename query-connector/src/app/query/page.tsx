@@ -5,12 +5,7 @@ import ResultsView from "./components/ResultsView";
 import PatientSearchResults from "./components/PatientSearchResults";
 import SearchForm from "./components/SearchForm";
 import SelectQuery from "./components/SelectQuery";
-import {
-  DEFAULT_DEMO_FHIR_SERVER,
-  FHIR_SERVERS,
-  Mode,
-  USE_CASES,
-} from "../constants";
+import { DEFAULT_DEMO_FHIR_SERVER, Mode, USE_CASES } from "../constants";
 import LoadingView from "./components/LoadingView";
 import { ToastContainer } from "react-toastify";
 
@@ -31,7 +26,7 @@ const Query: React.FC = () => {
   const [useCase, setUseCase] = useState<USE_CASES>("" as USE_CASES);
   const [mode, setMode] = useState<Mode>("search");
   const [loading, setLoading] = useState<boolean>(false);
-  const [fhirServer, setFhirServer] = useState<FHIR_SERVERS>(
+  const [fhirServer, setFhirServer] = useState<string>(
     DEFAULT_DEMO_FHIR_SERVER,
   );
   const [fhirServers, setFhirServers] = useState<string[]>([]);

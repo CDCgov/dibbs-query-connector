@@ -1,11 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import {
-  FHIR_SERVERS,
-  USE_CASES,
-  USE_CASE_DETAILS,
-  DibbsValueSet,
-} from "../../constants";
+import { USE_CASES, USE_CASE_DETAILS, DibbsValueSet } from "../../constants";
 import CustomizeQuery from "./CustomizeQuery";
 import SelectSavedQuery from "./selectQuery/SelectSavedQuery";
 
@@ -25,8 +20,8 @@ interface SelectQueryProps {
   patientForQuery: Patient | undefined;
   resultsQueryResponse: QueryResponse;
   setResultsQueryResponse: React.Dispatch<React.SetStateAction<QueryResponse>>;
-  fhirServer: FHIR_SERVERS;
-  setFhirServer: React.Dispatch<React.SetStateAction<FHIR_SERVERS>>;
+  fhirServer: string;
+  setFhirServer: React.Dispatch<React.SetStateAction<string>>;
   setLoading: (isLoading: boolean) => void;
   showCustomizeQuery: boolean;
   setShowCustomizeQuery: (showCustomizeQuery: boolean) => void;

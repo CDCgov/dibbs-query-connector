@@ -121,11 +121,18 @@ export default function HeaderComponent() {
             className={`usa-nav__submenu ${styles.menuDropdown}`}
           >
             {!isProduction && (
-              <li className={styles.subMenuItem}>
-                <a className={styles.menuItem} href={"/queryBuilding"}>
-                  My queries
-                </a>
-              </li>
+              <>
+                <li className={styles.subMenuItem}>
+                  <a className={styles.menuItem} href={"/fhir-servers"}>
+                    FHIR Servers
+                  </a>
+                </li>
+                <li className={styles.subMenuItem}>
+                  <a className={styles.menuItem} href={"/queryBuilding"}>
+                    My queries
+                  </a>
+                </li>
+              </>
             )}
             <li className={styles.subMenuItem}>
               <a className={styles.menuItem} href={backLink}>

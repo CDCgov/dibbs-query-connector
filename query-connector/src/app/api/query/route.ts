@@ -9,8 +9,6 @@ import {
 import { parsePatientDemographics } from "./parsing-service";
 import {
   USE_CASES,
-  FHIR_SERVERS,
-  FhirServers,
   USE_CASE_DETAILS,
   INVALID_FHIR_SERVERS,
   INVALID_USE_CASE,
@@ -20,7 +18,10 @@ import {
 } from "../../constants";
 
 import { handleRequestError } from "./error-handling-service";
-import { getSavedQueryByName } from "@/app/database-service";
+import {
+  getFhirServerNames,
+  getSavedQueryByName,
+} from "@/app/database-service";
 import { unnestValueSetsFromQuery } from "@/app/utils";
 
 /**
@@ -75,6 +76,7 @@ export async function POST(request: NextRequest) {
   const params = request.nextUrl.searchParams;
   const use_case = params.get("use_case");
   const fhir_server = params.get("fhir_server");
+  const fhirServers = await getFhirServerNames();
 
   if (!use_case || !fhir_server) {
     const OperationOutcome = await handleRequestError(MISSING_API_QUERY_PARAM);
@@ -82,9 +84,7 @@ export async function POST(request: NextRequest) {
   } else if (!Object.keys(USE_CASE_DETAILS).includes(use_case)) {
     const OperationOutcome = await handleRequestError(INVALID_USE_CASE);
     return NextResponse.json(OperationOutcome);
-  } else if (
-    !Object.values(FhirServers).includes(fhir_server as FHIR_SERVERS)
-  ) {
+  } else if (!Object.values(fhirServers).includes(fhir_server)) {
     const OperationOutcome = await handleRequestError(INVALID_FHIR_SERVERS);
     return NextResponse.json(OperationOutcome);
   }
@@ -97,7 +97,7 @@ export async function POST(request: NextRequest) {
   // Add params & patient identifiers to UseCaseRequest
   const UseCaseRequest: UseCaseQueryRequest = {
     use_case: use_case as USE_CASES,
-    fhir_server: fhir_server as FHIR_SERVERS,
+    fhir_server: fhir_server,
     ...(PatientIdentifiers.first_name && {
       first_name: PatientIdentifiers.first_name,
     }),
