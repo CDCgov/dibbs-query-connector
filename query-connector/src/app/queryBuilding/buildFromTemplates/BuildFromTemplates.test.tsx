@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import { DataContext } from "@/app/DataProvider";
 import {
   getConditionsData,
@@ -11,7 +11,6 @@ import {
   malignantNeoplasticValuesets,
 } from "../fixtures";
 import BuildFromTemplates from "./BuildFromTemplates";
-import userEvent from "@testing-library/user-event";
 import { formatDiseaseDisplay } from "../utils";
 import { renderWithUser } from "@/app/tests/unit/setup";
 
