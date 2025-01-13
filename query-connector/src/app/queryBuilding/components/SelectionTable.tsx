@@ -32,8 +32,8 @@ export const ConceptTypeSelectionTable: React.FC<
 
     const title = (
       <ConceptTypeAccordionHeader
-        activeValueSetType={vsType}
-        activeValueSets={vsTypeLevelOptions[vsType]}
+        activeType={vsType}
+        activeTypeValueSets={vsTypeLevelOptions[vsType]}
         expanded={expanded === vsType}
         handleVsNameLevelUpdate={handleVsNameLevelUpdate}
       />

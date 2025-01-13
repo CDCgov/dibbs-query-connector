@@ -26,7 +26,7 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
 }) => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [curValueSet, setCurValueSet] = useState<DibbsValueSet>();
-  const [curConcepts, setCurConcepts] = useState<ConceptOption[]>([]);
+  const [curConcepts, setCurConcepts] = useState<Concept[]>([]);
 
   const handleViewCodes = (vs: DibbsValueSet) => {
     setCurValueSet(vs);
