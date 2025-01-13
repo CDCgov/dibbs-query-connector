@@ -121,11 +121,11 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
       const result = await getSavedQueryDetails(selectedQuery.queryId);
 
       if (result === undefined) {
-        return;
+        return; // todo: error???
       }
 
       const initialState: NestedQuery = {};
-      const savedQuery = result[0];
+      const savedQuery = result[0]; // what is this shape, why first index
 
       Object.entries(savedQuery.query_data).forEach(
         ([conditionId, valueSetMap]) => {

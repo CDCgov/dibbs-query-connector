@@ -1,12 +1,12 @@
 import React from "react";
 import styles from "../buildFromTemplates/conditionTemplateSelection.module.scss";
-import { ConceptOption } from "@/app/utils/valueSetTranslation";
+import { Concept } from "@/app/constants";
 import { showToastConfirmation } from "@/app/query/designSystem/toast/Toast";
 import Checkbox from "@/app/query/designSystem/checkbox/Checkbox";
 
 type ConceptSelectionProps = {
-  concepts: ConceptOption[];
-  onConceptsChange: (updatedConcepst: ConceptOption[]) => void;
+  concepts: Concept[];
+  onConceptsChange: (updatedConcepst: Concept[]) => void;
 };
 
 /**
@@ -25,7 +25,8 @@ const ConceptSelection: React.FC<ConceptSelectionProps> = ({
   const totalCount = concepts.length;
   const isMinusState = selectedCount > 0 && selectedCount < totalCount;
 
-  const toggleAll = (isChecked: boolean) => {
+  const toggleAll = (targetChecked: boolean) => {
+    const isChecked = isMinusState ? false : targetChecked; // fixes the toast showing "Added" when deselecting all in a minusState
     const updatedConcepts = concepts.map((concept) => ({
       ...concept,
       include: isMinusState ? false : isChecked,
