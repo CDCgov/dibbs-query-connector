@@ -2,8 +2,7 @@ import styles from "../buildFromTemplates/conditionTemplateSelection.module.scss
 import React, { ChangeEvent, useState } from "react";
 import ConceptSelection from "./ConceptSelection";
 import Drawer from "@/app/query/designSystem/drawer/Drawer";
-import { ConceptOption } from "@/app/utils/valueSetTranslation";
-import { DibbsValueSet } from "@/app/constants";
+import { Concept, DibbsValueSet } from "@/app/constants";
 import Checkbox from "@/app/query/designSystem/checkbox/Checkbox";
 
 type ConceptTypeAccordionBodyProps = {
@@ -27,7 +26,7 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
 }) => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [curValueSet, setCurValueSet] = useState<DibbsValueSet>();
-  const [curConcepts, setCurConcepts] = useState<ConceptOption[]>([]);
+  const [curConcepts, setCurConcepts] = useState<Concept[]>([]);
 
   const handleViewCodes = (vs: DibbsValueSet) => {
     setCurValueSet(vs);
@@ -36,7 +35,7 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
   };
 
   const handleConceptsChange = (
-    updatedConcepts: ConceptOption[],
+    updatedConcepts: Concept[],
     updateBatchSave = true,
   ) => {
     if (curValueSet) {
