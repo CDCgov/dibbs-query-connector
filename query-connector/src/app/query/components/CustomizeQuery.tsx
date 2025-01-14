@@ -18,10 +18,7 @@ import Accordion from "../designSystem/Accordion";
 import CustomizeQueryNav from "./customizeQuery/CustomizeQueryNav";
 import Backlink from "./backLink/Backlink";
 import { RETURN_LABEL } from "./stepIndicator/StepIndicator";
-import {
-  VsGrouping,
-  generateValueSetGroupingsByDibbsConceptType,
-} from "@/app/utils/valueSetTranslation";
+import { generateValueSetGroupingsByDibbsConceptType } from "@/app/utils/valueSetTranslation";
 
 interface CustomizeQueryProps {
   useCaseQueryResponse: UseCaseQueryResponse;
@@ -52,7 +49,7 @@ const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
 
   const [valueSetOptions, setValueSetOptions] = useState<{
     [dibbsConceptType in DibbsConceptType]: {
-      [vsNameAuthorSystem: string]: VsGrouping;
+      [vsId: string]: DibbsValueSet;
     };
   }>({
     labs: {},
@@ -89,75 +86,62 @@ const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
 
   // Handles the toggle of the 'include' state for individual concepts in
   // the accordion
-  const toggleInclude = (
-    groupIndex: string,
-    valueSetIndex: number,
-    conceptIndex: number,
-  ) => {
-    const updatedGroups = valueSetOptions[activeTab];
-    const updatedValueSets = [...updatedGroups[groupIndex].items]; // Clone the current group items
-    const updatedConceptsInIndexedValueSet = [
-      ...updatedValueSets[valueSetIndex].concepts,
-    ];
-    updatedConceptsInIndexedValueSet[conceptIndex] = {
-      ...updatedConceptsInIndexedValueSet[conceptIndex],
-      include: !updatedConceptsInIndexedValueSet[conceptIndex].include, // Toggle the include for the clicked concept
+  const toggleInclude = (vsId: string, conceptIndex: number) => {
+    const updatedIdToVsMap = valueSetOptions[activeTab];
+    let updatedValueSet = updatedIdToVsMap[vsId];
+    const updatedConcepts = updatedValueSet.concepts;
+    updatedConcepts[conceptIndex] = {
+      ...updatedConcepts[conceptIndex],
+      include: !updatedConcepts[conceptIndex].include, // Toggle the include for the clicked concept
     };
 
-    updatedValueSets[valueSetIndex] = {
-      ...updatedValueSets[valueSetIndex],
-      concepts: updatedConceptsInIndexedValueSet, // Update the concepts in the accessed value set
+    updatedValueSet = {
+      ...updatedValueSet,
+      concepts: updatedConcepts, // Update the concepts in the accessed value set
     };
 
-    updatedGroups[groupIndex] = {
-      ...updatedGroups[groupIndex],
-      items: updatedValueSets, // Update the whole group's items
-    };
-
+    updatedIdToVsMap[vsId] = updatedValueSet;
     setValueSetOptions((prevState) => ({
       ...prevState,
-      [activeTab]: updatedGroups, // Update the state with the new group
+      [activeTab]: updatedIdToVsMap, // Update the state with the modified VS
     }));
   };
 
   // Allows all items to be selected within all accordion sections of the active tab
-  const handleSelectAllChange = (groupIndex: string, checked: boolean) => {
-    const updatedGroups = valueSetOptions[activeTab];
-
+  const handleSelectAllChange = (vsId: string, checked: boolean) => {
+    const updatedIdToVsMap = valueSetOptions[activeTab]; // a single group of lab/med/etc.
     // Update only the group at the specified index
-    updatedGroups[groupIndex].items = updatedGroups[groupIndex].items.map(
-      (item) => ({
-        ...item,
-        includeValueSet: checked, // Set all items in this group to checked or unchecked
-        concepts: item.concepts.map((ic) => {
-          return { ...ic, include: checked };
-        }),
-      }),
-    );
+    updatedIdToVsMap[vsId].includeValueSet = checked;
+    const updatedConcepts = updatedIdToVsMap[vsId].concepts.map((concept) => {
+      return { ...concept, include: checked };
+    });
+    updatedIdToVsMap[vsId].concepts = updatedConcepts;
 
     setValueSetOptions((prevState) => ({
       ...prevState,
-      [activeTab]: updatedGroups, // Update the state for the current tab
+      [activeTab]: updatedIdToVsMap, // Update the state for the current tab
     }));
   };
 
   // Allows all items to be selected within the entire active tab
   const handleSelectAllForTab = (checked: boolean) => {
     const activeItems = valueSetOptions[activeTab] ?? {};
-    const updatedGroups = Object.values(activeItems).map((group) => ({
-      ...group,
-      items: group.items.map((item) => ({
-        ...item,
+    const updatedValueSets = Object.values(activeItems).map((vs) => {
+      const updatedValueSetData = {
         includeValueSet: checked, // Set all items in this group to checked or unchecked
-        concepts: item.concepts.map((ic) => {
-          return { ...ic, include: checked };
+        concepts: vs.concepts.map((concept) => {
+          return { ...concept, include: checked };
         }),
-      })),
-    }));
+      };
+      return {
+        ...vs,
+        ...updatedValueSetData,
+      };
+    });
 
     setValueSetOptions((prevState) => ({
       ...prevState,
-      [activeTab]: updatedGroups, // Update the state for the current tab
+      [activeTab]: updatedValueSets, // Update the state for the current tab
     }));
   };
 
@@ -165,8 +149,8 @@ const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
   // by the entire query branch of the app
   const handleApplyChanges = () => {
     const selectedItems = Object.keys(valueSetOptions).reduce((acc, key) => {
-      const items = valueSetOptions[key as DibbsConceptType] ?? {};
-      acc = acc.concat(Object.values(items).flatMap((dict) => dict.items));
+      const nameToVs = valueSetOptions[key as DibbsConceptType] ?? {};
+      acc = acc.concat(Object.values(nameToVs));
       return acc;
     }, [] as DibbsValueSet[]);
     setQueryValuesets(selectedItems);
@@ -202,8 +186,8 @@ const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
         handleSelectAllForTab={handleSelectAllForTab}
         valueSetOptions={valueSetOptions}
       />
-      {valueSetOptionsToDisplay.map(([groupIndex, group]) => {
-        const id = group.author + ":" + group.system + ":" + group.valueSetName;
+      {valueSetOptionsToDisplay.map(([vsId, vs]) => {
+        const id = vs.author + ":" + vs.system + ":" + vs.valueSetName;
         return (
           <Accordion
             key={id}
@@ -211,15 +195,15 @@ const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
             title={
               <CustomizeQueryAccordionHeader
                 handleSelectAllChange={handleSelectAllChange}
-                groupIndex={groupIndex}
-                group={group}
+                vsIndex={vsId}
+                valueSet={vs}
               />
             }
             content={
               <CustomizeQueryAccordionBody
-                group={group}
+                valueSet={vs}
                 toggleInclude={toggleInclude}
-                groupIndex={groupIndex}
+                vsName={vsId}
               />
             }
             headingLevel="h3"
@@ -251,12 +235,10 @@ export const QUERY_CUSTOMIZATION_CONFIRMATION_BODY =
  * @returns A count of the number of items in each of the DibbsConceptTypes
  */
 const countDibbsConceptTypeToVsMapItems = (obj: {
-  [vsNameAuthorSystem: string]: VsGrouping;
+  [vsId: string]: DibbsValueSet;
 }) => {
-  return Object.values(obj).reduce((runningSum, gvs) => {
-    gvs.items.forEach((vs) => {
-      runningSum += vs.concepts.length;
-    });
+  return Object.values(obj).reduce((runningSum, vs) => {
+    runningSum += vs.concepts.length;
     return runningSum;
   }, 0);
 };
