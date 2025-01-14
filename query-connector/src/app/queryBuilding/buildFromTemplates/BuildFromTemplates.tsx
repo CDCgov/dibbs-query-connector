@@ -321,7 +321,7 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
                 id="queryNameInput"
                 name="queryNameInput"
                 type="text"
-                className="width-card-lg"
+                className="width-mobile"
                 defaultValue={queryName ?? ""}
                 required
                 onChange={(event) => {
