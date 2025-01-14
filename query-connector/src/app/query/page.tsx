@@ -16,14 +16,23 @@ import StepIndicator, {
 import SiteAlert from "./designSystem/SiteAlert";
 import { Patient } from "fhir/r4";
 import { getFhirServerNames } from "@/app/database-service";
+import { CustomUserQuery } from "../query-building";
 
+const blankUserQuery = {
+  query_id: "",
+  query_name: "",
+  conditions_list: [],
+  valuesets: [],
+};
 /**
  * Client side parent component for the query page. Based on the mode, it will display the search
  * form, the results of the query, or the multiple patients view.
  * @returns - The Query component.
  */
 const Query: React.FC = () => {
-  const [useCase, setUseCase] = useState<USE_CASES>("" as USE_CASES);
+  const [selectedQuery, setSelectedQuery] = useState<CustomUserQuery>(
+    structuredClone(blankUserQuery),
+  );
   const [mode, setMode] = useState<Mode>("search");
   const [loading, setLoading] = useState<boolean>(false);
   const [fhirServer, setFhirServer] = useState<string>(
@@ -68,8 +77,6 @@ const Query: React.FC = () => {
         {/* Step 1 */}
         {mode === "search" && (
           <SearchForm
-            useCase={useCase}
-            setUseCase={setUseCase}
             setMode={setMode}
             setLoading={setLoading}
             setPatientDiscoveryQueryResponse={setPatientDiscoveryQueryResponse}
@@ -90,12 +97,10 @@ const Query: React.FC = () => {
         )}
 
         {/* Step 3 */}
-        {mode === "select-query" && (
+        {mode === "select-query" && selectedQuery && (
           <SelectQuery
             goBack={() => setMode("patient-results")}
             goForward={() => setMode("results")}
-            selectedQuery={useCase}
-            setSelectedQuery={setUseCase}
             patientForQuery={patientForQuery}
             resultsQueryResponse={resultsQueryResponse}
             showCustomizeQuery={showCustomizeQuery}
@@ -104,13 +109,15 @@ const Query: React.FC = () => {
             fhirServer={fhirServer}
             setFhirServer={setFhirServer}
             setLoading={setLoading}
+            selectedQuery={selectedQuery}
+            setSelectedQuery={setSelectedQuery}
           />
         )}
 
         {/* Step 4 */}
-        {mode === "results" && resultsQueryResponse && (
+        {mode === "results" && resultsQueryResponse && selectedQuery && (
           <ResultsView
-            selectedQuery={useCase}
+            selectedQuery={selectedQuery}
             useCaseQueryResponse={resultsQueryResponse}
             goBack={() => {
               setMode("select-query");

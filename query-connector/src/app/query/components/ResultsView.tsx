@@ -12,13 +12,13 @@ import EncounterTable from "./resultsView/tableComponents/EncounterTable";
 import MedicationRequestTable from "./resultsView/tableComponents/MedicationRequestTable";
 import ObservationTable from "./resultsView/tableComponents/ObservationTable";
 import Backlink from "./backLink/Backlink";
-import { USE_CASES, USE_CASE_DETAILS } from "@/app/constants";
 import { RETURN_LABEL } from "@/app/query/components/stepIndicator/StepIndicator";
 import TitleBox from "./stepIndicator/TitleBox";
+import { CustomUserQuery } from "@/app/query-building";
 
 type ResultsViewProps = {
   useCaseQueryResponse: UseCaseQueryResponse;
-  selectedQuery: USE_CASES;
+  selectedQuery: CustomUserQuery;
   goBack: () => void;
   goToBeginning: () => void;
 };
@@ -74,7 +74,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({
       <h2 className="page-explainer margin-bottom-3-important margin-top-0-important">
         <strong>Query: </strong>
         <span className="text-normal display-inline-block">
-          {USE_CASE_DETAILS[selectedQuery].condition}
+          {selectedQuery.query_name}
         </span>
       </h2>
 

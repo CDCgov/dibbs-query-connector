@@ -6,15 +6,14 @@ import {
   Select,
   Button,
 } from "@trussworks/react-uswds";
-import { USE_CASES, demoData, stateOptions, Mode } from "@/app/constants";
+import { demoData, stateOptions, Mode } from "@/app/constants";
 import { UseCaseQueryResponse, UseCaseQuery } from "@/app/query-service";
 import styles from "./searchForm/searchForm.module.scss";
 import { FormatPhoneAsDigits } from "@/app/format-service";
 import TitleBox from "./stepIndicator/TitleBox";
+import { CustomUserQuery } from "@/app/query-building";
 
 interface SearchFormProps {
-  useCase: USE_CASES;
-  setUseCase: (useCase: USE_CASES) => void;
   setPatientDiscoveryQueryResponse: (
     UseCaseQueryResponse: UseCaseQueryResponse,
   ) => void;
@@ -39,8 +38,6 @@ interface SearchFormProps {
  * @returns - The SearchForm component.
  */
 const SearchForm: React.FC<SearchFormProps> = function SearchForm({
-  useCase,
-  setUseCase,
   setPatientDiscoveryQueryResponse,
   setMode,
   setLoading,
@@ -59,21 +56,18 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
   const [autofilled, setAutofilled] = useState(false); // boolean indicating if the form was autofilled, changes color if true
 
   // Fills fields with sample data based on the selected
-  const fillFields = useCallback(
-    (highlightAutofilled = true) => {
-      const data = demoData["cancer"];
-      if (data) {
-        setFirstName(data.FirstName);
-        setLastName(data.LastName);
-        setDOB(data.DOB);
-        setMRN(data.MRN);
-        setPhone(data.Phone);
-        setFhirServer(data.FhirServer as string);
-        setAutofilled(highlightAutofilled);
-      }
-    },
-    [setUseCase],
-  );
+  const fillFields = useCallback((highlightAutofilled = true) => {
+    const data = demoData["cancer"];
+    if (data) {
+      setFirstName(data.FirstName);
+      setLastName(data.LastName);
+      setDOB(data.DOB);
+      setMRN(data.MRN);
+      setPhone(data.Phone);
+      setFhirServer(data.FhirServer as string);
+      setAutofilled(highlightAutofilled);
+    }
+  }, []);
 
   const nameRegex = "^[A-Za-z\u00C0-\u024F\u1E00-\u1EFF\\-'. ]+$";
   const nameRuleHint =
@@ -87,13 +81,14 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
     }
     setLoading(true);
 
+    const PURPOSEFUL_EMPTY_STRING = "";
     const originalRequest = {
       first_name: firstName,
       last_name: lastName,
       dob: dob,
       mrn: mrn,
       fhir_server: fhirServer,
-      use_case: useCase,
+      use_case: PURPOSEFUL_EMPTY_STRING, //TODO: refactor this to just use the patient query?
       phone: FormatPhoneAsDigits(phone),
     };
     const queryResponse = await UseCaseQuery(originalRequest, []);

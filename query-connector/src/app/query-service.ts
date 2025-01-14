@@ -31,7 +31,7 @@ type SuperSetQueryResponse = {
 export type APIQueryResponse = Bundle;
 
 export type UseCaseQueryRequest = {
-  use_case: USE_CASES;
+  use_case: string;
   fhir_server: string;
   first_name?: string;
   last_name?: string;
@@ -188,7 +188,7 @@ export async function UseCaseQuery(
  * @returns A promise for an updated query response.
  */
 async function generalizedQuery(
-  useCase: USE_CASES,
+  useCase: string, // does this need to be a specialized thing??
   queryValueSets: DibbsValueSet[],
   patientId: string,
   fhirClient: FHIRClient,
@@ -204,6 +204,7 @@ async function generalizedQuery(
   } else {
     const queryRequests: string[] = builtQuery.getAllQueries();
     response = await fhirClient.getBatch(queryRequests);
+    console.log(response);
   }
   queryResponse = await parseFhirSearch(response, queryResponse);
   if (!querySpec.hasSecondEncounterQuery) {

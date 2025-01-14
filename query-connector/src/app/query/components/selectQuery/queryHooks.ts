@@ -31,7 +31,7 @@ export async function fetchUseCaseValueSets(queryName: string) {
  */
 export async function fetchQueryResponse(p: {
   patientForQuery: Patient | undefined;
-  selectedQuery: USE_CASES;
+  selectedQuery: string;
   queryValueSets: DibbsValueSet[];
   fhirServer: string;
   queryResponseStateCallback: SetStateCallback<UseCaseQueryResponse>;
@@ -69,10 +69,17 @@ export async function fetchQueryResponse(p: {
         return conceptFilteredVS;
       });
 
+    console.log(
+      filteredValueSets.map((v) => v.concepts.map((c) => c.code)).flat(),
+    );
+
     p.setIsLoading(true);
     const queryResponse = await UseCaseQuery(newRequest, filteredValueSets, {
       Patient: [p.patientForQuery],
     });
+
+    console.log(queryResponse);
+
     p.queryResponseStateCallback(queryResponse);
     p.setIsLoading(false);
   }

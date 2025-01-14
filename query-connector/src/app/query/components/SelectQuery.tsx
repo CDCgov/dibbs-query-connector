@@ -11,12 +11,11 @@ import {
   fetchUseCaseValueSets,
 } from "./selectQuery/queryHooks";
 import LoadingView from "./LoadingView";
+import { CustomUserQuery } from "@/app/query-building";
 
 interface SelectQueryProps {
   goForward: () => void;
   goBack: () => void;
-  selectedQuery: USE_CASES;
-  setSelectedQuery: React.Dispatch<React.SetStateAction<USE_CASES>>;
   patientForQuery: Patient | undefined;
   resultsQueryResponse: QueryResponse;
   setResultsQueryResponse: React.Dispatch<React.SetStateAction<QueryResponse>>;
@@ -25,6 +24,8 @@ interface SelectQueryProps {
   setLoading: (isLoading: boolean) => void;
   showCustomizeQuery: boolean;
   setShowCustomizeQuery: (showCustomizeQuery: boolean) => void;
+  selectedQuery: CustomUserQuery;
+  setSelectedQuery: React.Dispatch<React.SetStateAction<CustomUserQuery>>;
 }
 
 /**
@@ -45,17 +46,17 @@ interface SelectQueryProps {
  * @returns - The selectQuery component.
  */
 const SelectQuery: React.FC<SelectQueryProps> = ({
-  selectedQuery,
   patientForQuery,
   resultsQueryResponse,
   fhirServer,
   showCustomizeQuery,
   goForward,
   goBack,
-  setSelectedQuery,
   setResultsQueryResponse,
   setFhirServer,
   setShowCustomizeQuery,
+  selectedQuery,
+  setSelectedQuery,
 }) => {
   const [queryValueSets, setQueryValueSets] = useState<DibbsValueSet[]>(
     [] as DibbsValueSet[],
@@ -73,8 +74,7 @@ const SelectQuery: React.FC<SelectQueryProps> = ({
 
     const fetchDataAndUpdateState = async () => {
       if (selectedQuery) {
-        const queryName =
-          USE_CASE_DETAILS[selectedQuery as USE_CASES].queryName;
+        const queryName = selectedQuery.query_name;
         const valueSets = await fetchUseCaseValueSets(queryName);
         // Only update if the fetch hasn't altered state yet
         if (isSubscribed) {
@@ -96,7 +96,7 @@ const SelectQuery: React.FC<SelectQueryProps> = ({
   async function onSubmit() {
     await fetchQueryResponse({
       patientForQuery: patientForQuery,
-      selectedQuery: selectedQuery,
+      selectedQuery: selectedQuery.query_name,
       queryValueSets: queryValueSets,
       fhirServer: fhirServer,
       queryResponseStateCallback: setResultsQueryResponse,
@@ -113,8 +113,8 @@ const SelectQuery: React.FC<SelectQueryProps> = ({
 
       {showCustomizeQuery ? (
         <CustomizeQuery
+          selectedQuery={selectedQuery}
           useCaseQueryResponse={resultsQueryResponse}
-          queryType={selectedQuery}
           queryValueSets={queryValueSets}
           setQueryValuesets={setQueryValueSets}
           goBack={() => setShowCustomizeQuery(false)}
@@ -122,10 +122,10 @@ const SelectQuery: React.FC<SelectQueryProps> = ({
       ) : (
         <SelectSavedQuery
           selectedQuery={selectedQuery}
+          setSelectedQuery={setSelectedQuery}
           fhirServer={fhirServer}
           loadingQueryValueSets={loadingQueryValueSets}
           goBack={goBack}
-          setSelectedQuery={setSelectedQuery}
           setShowCustomizedQuery={setShowCustomizeQuery}
           handleSubmit={onSubmit}
           setFhirServer={setFhirServer}

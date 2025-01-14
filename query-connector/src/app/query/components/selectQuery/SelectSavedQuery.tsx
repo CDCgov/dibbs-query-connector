@@ -5,14 +5,17 @@ import styles from "./selectQuery.module.scss";
 import { useEffect, useState } from "react";
 import { RETURN_LABEL } from "@/app/query/components/stepIndicator/StepIndicator";
 import TitleBox from "../stepIndicator/TitleBox";
-import { getFhirServerNames } from "@/app/database-service";
+import { getCustomQueries, getFhirServerNames } from "@/app/database-service";
+import { CustomUserQuery } from "@/app/query-building";
+import LoadingView from "../LoadingView";
+import { showToastConfirmation } from "../../designSystem/toast/Toast";
 
 type SelectSavedQueryProps = {
-  selectedQuery: string;
+  selectedQuery: CustomUserQuery;
+  setSelectedQuery: React.Dispatch<React.SetStateAction<CustomUserQuery>>;
   fhirServer: string;
   loadingQueryValueSets: boolean;
   goBack: () => void;
-  setSelectedQuery: (selectedQuery: USE_CASES) => void;
   setShowCustomizedQuery: (showCustomize: boolean) => void;
   handleSubmit: () => void;
   setFhirServer: React.Dispatch<React.SetStateAction<string>>;
@@ -46,12 +49,45 @@ const SelectSavedQuery: React.FC<SelectSavedQueryProps> = ({
 }) => {
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [fhirServers, setFhirServers] = useState<string[]>([]);
+  const [queryOptions, setQueryOptions] = useState<CustomUserQuery[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     getFhirServerNames().then((servers) => {
       setFhirServers(servers);
     });
   }, []);
+
+  useEffect(() => {
+    const fetchQueries = async () => {
+      try {
+        const queries = await getCustomQueries();
+
+        setQueryOptions(queries);
+      } catch (error) {
+        console.error("Failed to fetch queries:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchQueries();
+    setLoading(false); // Data already exists, no need to fetch again
+  }, []);
+
+  function handleQuerySelection(queryName: string) {
+    const selectedQuery = queryOptions.filter(
+      (q) => q.query_name === queryName,
+    );
+    if (selectedQuery[0]) {
+      setSelectedQuery(selectedQuery[0]);
+    } else {
+      // TODO: error handle this better
+      showToastConfirmation({
+        body: "Please try again, or contact us if the error persists",
+        heading: "Something went wrong",
+      });
+    }
+  }
 
   return (
     <form>
@@ -64,24 +100,29 @@ const SelectSavedQuery: React.FC<SelectSavedQueryProps> = ({
       </h2>
       <h3 className={styles.queryDropdownLabel}>Query</h3>
       <div className={styles.queryRow}>
-        {/* Select a query drop down */}
-        <Select
-          id="querySelect"
-          name="query"
-          value={selectedQuery}
-          onChange={(e) => setSelectedQuery(e.target.value as USE_CASES)}
-          className={`${styles.queryDropDown}`}
-          required
-        >
-          <option value="" disabled>
-            Select query
-          </option>
-          {Object.entries(USE_CASE_DETAILS).map(([useCase, useCaseDetails]) => (
-            <option key={useCase} value={useCase}>
-              {useCaseDetails.queryName}
+        {loading ? (
+          <LoadingView loading={true} />
+        ) : (
+          <Select
+            id="querySelect"
+            name="query"
+            value={selectedQuery.query_name}
+            onChange={(e) => {
+              handleQuerySelection(e.target.value);
+            }}
+            className={`${styles.queryDropDown}`}
+            required
+          >
+            <option value="" disabled>
+              Select query
             </option>
-          ))}
-        </Select>
+            {queryOptions.map((query) => (
+              <option key={query.query_id} value={query.query_name}>
+                {query.query_name}
+              </option>
+            ))}
+          </Select>
+        )}
 
         {/* Customize Query Button */}
         <Button

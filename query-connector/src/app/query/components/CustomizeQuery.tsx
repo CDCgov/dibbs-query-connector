@@ -19,13 +19,14 @@ import CustomizeQueryNav from "./customizeQuery/CustomizeQueryNav";
 import Backlink from "./backLink/Backlink";
 import { RETURN_LABEL } from "./stepIndicator/StepIndicator";
 import { generateValueSetGroupingsByDibbsConceptType } from "@/app/utils/valueSetTranslation";
+import { CustomUserQuery } from "@/app/query-building";
 
 interface CustomizeQueryProps {
   useCaseQueryResponse: UseCaseQueryResponse;
-  queryType: USE_CASES;
   queryValueSets: DibbsValueSet[];
   setQueryValuesets: (queryVS: DibbsValueSet[]) => void;
   goBack: () => void;
+  selectedQuery: CustomUserQuery;
 }
 
 /**
@@ -40,10 +41,10 @@ interface CustomizeQueryProps {
  */
 const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
   useCaseQueryResponse,
-  queryType,
   queryValueSets: queryValueSets,
   setQueryValuesets,
   goBack,
+  selectedQuery,
 }) => {
   const [activeTab, setActiveTab] = useState<DibbsConceptType>("labs");
 
@@ -173,7 +174,7 @@ const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
       <LoadingView loading={!useCaseQueryResponse} />
       <h1 className="page-title margin-bottom-05-important">Customize query</h1>
       <h2 className="page-explainer margin-y-0-important">
-        Query: {USE_CASE_DETAILS[queryType].condition}
+        Query: {selectedQuery.query_name}
       </h2>
       <h3 className="margin-y-0-important font-sans-sm text-light padding-bottom-0 padding-top-05">
         {countLabs} labs found, {countMedications} medications found,{" "}
