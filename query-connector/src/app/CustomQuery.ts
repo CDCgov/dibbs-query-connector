@@ -54,7 +54,7 @@ export class CustomQuery {
       this.classTypeCodes = jsonSpec?.classTypeCodes || [];
       this.hasSecondEncounterQuery = jsonSpec?.hasSecondEncounterQuery || false;
       this.compileQueries(patientId);
-      this.createQueryBody(patientId);
+      this.createBodyParams(patientId);
     } catch (error) {
       console.error("Could not create CustomQuery Object: ", error);
     }
@@ -100,15 +100,41 @@ export class CustomQuery {
         : "";
   }
 
-  createQueryBody(patientId: string) {
-    return {
+  createBodyParams(patientId: string) {
+    const body = {
       subject: `Patient/${patientId}`,
-      code: this.getAllQueries(),
+      code: this.getAllCodes(),
     };
+
+    const formData = new URLSearchParams();
+    formData.append("subject", body.subject);
+    formData.append("code", body.code);
+    return formData;
   }
 
   getQueryBody() {
-    return this.createQueryBody(this.patientId);
+    return this.createBodyParams(this.patientId);
+  }
+
+  getAllCodes() {
+    const labsFilter = this.labCodes.join(",");
+    const snomedFilter = this.snomedCodes.join(",");
+    const rxnormFilter = this.rxnormCodes.join(",");
+    const classTypeFilter = this.classTypeCodes.join(",");
+    const codes = [labsFilter, snomedFilter, classTypeFilter, rxnormFilter]
+      .filter((q) => q !== "")
+      .join(",");
+    return codes;
+  }
+
+  getQueryPaths() {
+    return [
+      `/Observation/_search`,
+      `/DiagnosticReport/_search`,
+      `/Condition/_search`,
+      `/MedicationRequest/_search`,
+      `/Encounter/_search`,
+    ];
   }
 
   /**

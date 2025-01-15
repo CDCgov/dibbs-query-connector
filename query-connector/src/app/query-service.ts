@@ -202,7 +202,26 @@ async function generalizedQuery(
   if (useCase === "newborn-screening") {
     response = await fhirClient.get(builtQuery.getQuery("observation"));
   } else {
-    response = await fhirClient.post(builtQuery.getQueryBody());
+    const postPromises = builtQuery.getQueryPaths().map((path) => {
+      return fhirClient.post(path, builtQuery.getQueryBody());
+    });
+    const postResults = await Promise.allSettled(postPromises);
+    const rejectedResult: string[] = [];
+    const fulfilledResults = postResults
+      .map((r) => {
+        if (r.status === "fulfilled") {
+          return r.value;
+        } else {
+          rejectedResult.push(r.reason);
+        }
+      })
+      .filter((v): v is fetch.Response => !!v);
+
+    response = fulfilledResults;
+
+    if (rejectedResult.length > 0) {
+      console.error("Rejected reasons: ", rejectedResult);
+    }
   }
   queryResponse = await parseFhirSearch(response, queryResponse);
   if (!querySpec.hasSecondEncounterQuery) {
@@ -244,6 +263,7 @@ export async function parseFhirSearch(
       queryResponse[resourceType]!.push(resource);
     }
   }
+
   return queryResponse;
 }
 
