@@ -126,7 +126,6 @@ async function patientQuery(
   }
 
   const response = await fhirClient.get(query);
-  console.log("Patient query response", response);
 
   // Check for errors
   if (response.status !== 200) {
