@@ -6,6 +6,7 @@ $medicationColumnSpacing: 1fr 3fr 1fr;
 $encountersColumnSpacing: 2fr 1fr 1fr 1fr;
 $diagnosticsColumnSpacing: 1fr 3fr;
 $demographicsColumnSpacing: 1fr 3fr;
+$immunizationColumnSpacing: 1fr 3fr 1fr 1fr;
 
 .demographicsRow {
   grid-template-columns: $demographicsColumnSpacing;
@@ -34,5 +35,10 @@ $demographicsColumnSpacing: 1fr 3fr;
 
 .diagnosticsRow {
   grid-template-columns: $diagnosticsColumnSpacing;
+  gap: $columnGap;
+}
+
+.immunizationRow {
+  grid-template-columns: $immunizationColumnSpacing;
   gap: $columnGap;
 }

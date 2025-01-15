@@ -5,6 +5,8 @@ import {
   Address,
   ContactPoint,
   Identifier,
+  Immunization,
+  Coding,
 } from "fhir/r4";
 import { DibbsValueSet } from "./constants";
 import { QueryStruct } from "./query-service";
@@ -303,4 +305,18 @@ export const formatValueSetsAsQuerySpec = async (
   };
 
   return spec;
+};
+
+/**
+ * Formats the route of a FHIR Immunization object.
+ * @param immunization - The Immunization object to format.
+ * @returns The formatted route .
+ */
+export const formatImmunizationRoute = (immunization: Immunization): string => {
+  const initial = immunization.route?.coding?.[0].display ?? "";
+  const readable = immunization.route?.coding?.filter(
+    (code: Coding) =>
+      code.system === "http://terminology.hl7.org/CodeSystem/v2-0162",
+  );
+  return readable?.[0].display ?? initial;
 };

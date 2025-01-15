@@ -15,6 +15,7 @@ import styles from "./fhirServers.module.scss";
 import classNames from "classnames";
 import SiteAlert from "../query/designSystem/SiteAlert";
 import Table from "../query/designSystem/table/Table";
+import Checkbox from "../query/designSystem/checkbox/Checkbox";
 
 // Dynamic import with proper typing for Modal
 import type { ModalProps } from "../query/designSystem/modal/Modal";
@@ -37,6 +38,7 @@ const FhirServers: React.FC = () => {
   const [serverUrl, setServerUrl] = useState("");
   const [authMethod, setAuthMethod] = useState<"none" | "basic">("none");
   const [bearerToken, setBearerToken] = useState("");
+  const [disableCertValidation, setDisableCertValidation] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState<
     "idle" | "success" | "error"
   >("idle");
@@ -78,6 +80,7 @@ const FhirServers: React.FC = () => {
       setServerName(server.name);
       setServerUrl(server.hostname);
       setConnectionStatus("idle");
+      setDisableCertValidation(server.disable_cert_validation);
 
       // Set auth method and bearer token if they exist
       if (server.headers?.Authorization?.startsWith("Bearer ")) {
@@ -146,6 +149,7 @@ const FhirServers: React.FC = () => {
       const result = await insertFhirServer(
         serverName,
         serverUrl,
+        disableCertValidation,
         connectionResult.success,
         authMethod === "basic" ? bearerToken : undefined,
       );
@@ -164,6 +168,7 @@ const FhirServers: React.FC = () => {
         selectedServer.id,
         serverName,
         serverUrl,
+        disableCertValidation,
         connectionResult.success,
         authMethod === "basic" ? bearerToken : undefined,
       );
@@ -404,6 +409,12 @@ const FhirServers: React.FC = () => {
               />
             </>
           )}
+          <Checkbox
+            id="disable-cert-validation"
+            label="Disable certificate validation"
+            checked={disableCertValidation}
+            onChange={(e) => setDisableCertValidation(e.target.checked)}
+          />
         </Modal>
       </div>
     </>

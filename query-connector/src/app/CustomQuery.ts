@@ -30,6 +30,7 @@ export class CustomQuery {
   socialHistoryQuery: string = "";
   encounterQuery: string = "";
   encounterClassTypeQuery: string = "";
+  immunizationQuery: string = "";
 
   // Some queries need to be batched in waves because their encounter references
   // might depend on demographic information
@@ -94,6 +95,8 @@ export class CustomQuery {
       classTypeFilter !== ""
         ? `/Encounter?subject=${patientId}&class=${classTypeFilter}`
         : "";
+
+    this.immunizationQuery = `/Immunization?patient=${patientId}`;
   }
 
   /**
@@ -109,6 +112,7 @@ export class CustomQuery {
       this.socialHistoryQuery,
       this.encounterQuery,
       this.encounterClassTypeQuery,
+      this.immunizationQuery,
     ];
     const filteredRequests = queryRequests.filter((q) => q !== "");
     return filteredRequests;
@@ -136,6 +140,8 @@ export class CustomQuery {
         return this.encounterQuery;
       case "encounterClass":
         return this.encounterClassTypeQuery;
+      case "immunization":
+        return this.immunizationQuery;
       default:
         return "";
     }
