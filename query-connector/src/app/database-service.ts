@@ -852,13 +852,27 @@ export async function updateFhirServer(
   try {
     await dbClient.query("BEGIN");
 
-    // If updating with a bearer token, create new headers object
-    // If no bearer token provided, fetch existing headers first to preserve other headers
+    // If updating with a bearer token, add it to existing headers
+    // If no bearer token provided, fetch existing headers and remove Authorization
     let headers = {};
     if (bearerToken) {
-      headers = { Authorization: `Bearer ${bearerToken}` };
-    } else {
       // Get existing headers if any
+      const existingServer = await dbClient.query(
+        "SELECT headers FROM fhir_servers WHERE id = $1",
+        [id],
+      );
+      if (existingServer.rows.length > 0) {
+        // Keep existing headers and add/update Authorization
+        headers = {
+          ...existingServer.rows[0].headers,
+          Authorization: `Bearer ${bearerToken}`,
+        };
+      } else {
+        // No existing headers, just set Authorization
+        headers = { Authorization: `Bearer ${bearerToken}` };
+      }
+    } else {
+      // Get existing headers if any and remove Authorization
       const existingServer = await dbClient.query(
         "SELECT headers FROM fhir_servers WHERE id = $1",
         [id],
