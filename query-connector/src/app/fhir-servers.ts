@@ -56,6 +56,21 @@ class FHIRClient {
 
     return await Promise.all(fetchPromises);
   }
+
+  async post(path: string, body: JSON): Promise<Response> {
+    try {
+      return fetch(this.hostname + path, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: JSON.stringify(body),
+      });
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
 }
 
 export default FHIRClient;

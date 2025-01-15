@@ -194,7 +194,7 @@ async function generalizedQuery(
   fhirClient: FHIRClient,
   queryResponse: QueryResponse,
 ): Promise<QueryResponse> {
-  const querySpec = await formatValueSetsAsQuerySpec(useCase, queryValueSets);
+  const querySpec = formatValueSetsAsQuerySpec(useCase, queryValueSets);
   const builtQuery = new CustomQuery(querySpec, patientId);
   let response: fetch.Response | fetch.Response[];
 
@@ -202,9 +202,7 @@ async function generalizedQuery(
   if (useCase === "newborn-screening") {
     response = await fhirClient.get(builtQuery.getQuery("observation"));
   } else {
-    const queryRequests: string[] = builtQuery.getAllQueries();
-    response = await fhirClient.getBatch(queryRequests);
-    console.log(response);
+    response = await fhirClient.post(builtQuery.getQueryBody());
   }
   queryResponse = await parseFhirSearch(response, queryResponse);
   if (!querySpec.hasSecondEncounterQuery) {

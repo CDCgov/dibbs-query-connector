@@ -15,13 +15,15 @@ interface CustomQuerySpec {
  * information.
  */
 export class CustomQuery {
+  patientId: string = "";
+
   // Store four types of input codes
   labCodes: string[] = [];
   snomedCodes: string[] = [];
   rxnormCodes: string[] = [];
   classTypeCodes: string[] = [];
 
-  // Need default initialization of query strings outstide constructor,
+  // Need default initialization of query strings outside constructor,
   // since the `try` means we might not find the JSON spec
   observationQuery: string = "";
   diagnosticReportQuery: string = "";
@@ -45,12 +47,14 @@ export class CustomQuery {
    */
   constructor(jsonSpec: CustomQuerySpec, patientId: string) {
     try {
+      this.patientId = patientId;
       this.labCodes = jsonSpec?.labCodes || [];
       this.snomedCodes = jsonSpec?.snomedCodes || [];
       this.rxnormCodes = jsonSpec?.rxnormCodes || [];
       this.classTypeCodes = jsonSpec?.classTypeCodes || [];
       this.hasSecondEncounterQuery = jsonSpec?.hasSecondEncounterQuery || false;
       this.compileQueries(patientId);
+      this.createQueryBody(patientId);
     } catch (error) {
       console.error("Could not create CustomQuery Object: ", error);
     }
@@ -94,6 +98,17 @@ export class CustomQuery {
       classTypeFilter !== ""
         ? `/Encounter?subject=${patientId}&class=${classTypeFilter}`
         : "";
+  }
+
+  createQueryBody(patientId: string) {
+    return {
+      subject: `Patient/${patientId}`,
+      code: this.getAllQueries(),
+    };
+  }
+
+  getQueryBody() {
+    return this.createQueryBody(this.patientId);
   }
 
   /**

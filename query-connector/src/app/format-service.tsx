@@ -267,7 +267,7 @@ export async function GetPhoneQueryFormats(phone: string) {
  * @param valueSets The list of value sets the user wants included.
  * @returns A structured specification of a query that can be executed.
  */
-export const formatValueSetsAsQuerySpec = async (
+export const formatValueSetsAsQuerySpec = (
   useCase: string,
   valueSets: DibbsValueSet[],
 ) => {
