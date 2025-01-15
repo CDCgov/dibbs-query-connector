@@ -30,11 +30,10 @@ class FHIRClient {
       headers: config.headers as HeaderInit,
     };
     // Trust eHealth Exchange's self-signed certificate
-    if (config.trustSelfSigned) {
-      init.agent = new https.Agent({
-        rejectUnauthorized: false,
-      });
-    }
+    // if (config.trustSelfSigned) --temporarily comment
+    init.agent = new https.Agent({
+      rejectUnauthorized: false,
+    });
     this.init = init;
   }
 

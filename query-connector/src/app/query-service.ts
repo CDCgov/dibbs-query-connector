@@ -70,7 +70,7 @@ export type UseCaseQueryResponse = Awaited<ReturnType<typeof UseCaseQuery>>;
 async function queryEncounters(
   patientId: string,
   fhirClient: FHIRClient,
-  queryResponse: QueryResponse
+  queryResponse: QueryResponse,
 ): Promise<QueryResponse> {
   if (queryResponse.Condition && queryResponse.Condition.length > 0) {
     const conditionId = queryResponse.Condition[0].id;
@@ -92,7 +92,7 @@ async function queryEncounters(
 async function patientQuery(
   request: UseCaseQueryRequest,
   fhirClient: FHIRClient,
-  queryResponse: QueryResponse
+  queryResponse: QueryResponse,
 ): Promise<void> {
   // Query for patient
   let query = "/Patient?";
@@ -126,13 +126,14 @@ async function patientQuery(
   }
 
   const response = await fhirClient.get(query);
+  console.log("Patient query response", response);
 
   // Check for errors
   if (response.status !== 200) {
     console.error(
       `Patient search failed. Status: ${response.status} \n Body: ${
         response.text
-      } \n Headers: ${JSON.stringify(response.headers.raw())}`
+      } \n Headers: ${JSON.stringify(response.headers.raw())}`,
     );
   }
   queryResponse = await parseFhirSearch(response, queryResponse);
@@ -149,7 +150,7 @@ async function patientQuery(
 export async function UseCaseQuery(
   request: UseCaseQueryRequest,
   queryValueSets: DibbsValueSet[],
-  queryResponse: QueryResponse = {}
+  queryResponse: QueryResponse = {},
 ): Promise<QueryResponse> {
   const fhirServerConfigs = await getFhirServerConfigs();
   const fhirClient = new FHIRClient(request.fhir_server, fhirServerConfigs);
@@ -169,7 +170,7 @@ export async function UseCaseQuery(
     queryValueSets,
     patientId,
     fhirClient,
-    queryResponse
+    queryResponse,
   );
 
   return queryResponse;
@@ -193,7 +194,7 @@ async function generalizedQuery(
   queryValueSets: DibbsValueSet[],
   patientId: string,
   fhirClient: FHIRClient,
-  queryResponse: QueryResponse
+  queryResponse: QueryResponse,
 ): Promise<QueryResponse> {
   const querySpec = await formatValueSetsAsQuerySpec(useCase, queryValueSets);
   const builtQuery = new CustomQuery(querySpec, patientId);
@@ -226,7 +227,7 @@ async function generalizedQuery(
  */
 export async function parseFhirSearch(
   response: fetch.Response | Array<fetch.Response>,
-  queryResponse: SuperSetQueryResponse = {}
+  queryResponse: SuperSetQueryResponse = {},
 ): Promise<QueryResponse> {
   let resourceArray: SuperSetFhirResource[] = [];
 
@@ -258,7 +259,7 @@ export async function parseFhirSearch(
  * @returns - The array of resources from the response.
  */
 export async function processFhirResponse(
-  response: fetch.Response
+  response: fetch.Response,
 ): Promise<FhirResource[]> {
   let resourceArray: FhirResource[] = [];
   if (response.status === 200) {
@@ -267,7 +268,7 @@ export async function processFhirResponse(
       for (const entry of body.entry) {
         if (!isFhirResource(entry.resource)) {
           console.error(
-            "Entry in FHIR resource response parsing was of unexpected shape"
+            "Entry in FHIR resource response parsing was of unexpected shape",
           );
         }
         resourceArray.push(entry.resource);
@@ -283,7 +284,7 @@ export async function processFhirResponse(
  * @returns - The FHIR Bundle of queried data.
  */
 export async function createBundle(
-  queryResponse: QueryResponse
+  queryResponse: QueryResponse,
 ): Promise<APIQueryResponse> {
   const bundle: Bundle = {
     resourceType: "Bundle",
@@ -312,7 +313,7 @@ export async function createBundle(
  */
 export async function testFhirServerConnection(
   url: string,
-  bearerToken?: string
+  bearerToken?: string,
 ) {
   try {
     const baseUrl = url.replace(/\/$/, "");
@@ -358,7 +359,7 @@ export async function testFhirServerConnection(
               {
                 resourceType: data.resourceType,
                 type: data.type,
-              }
+              },
             );
             return {
               success: false,
