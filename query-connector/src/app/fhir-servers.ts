@@ -16,7 +16,7 @@ class FHIRClient {
   constructor(server: string, configurations: FhirServerConfig[]) {
     // Get the configuration for the server if it exists
     let config: DevFhirServerConfig | undefined = configurations.find(
-      (config) => config.name === server,
+      (config) => config.name === server
     );
 
     if (!config) {
@@ -30,10 +30,10 @@ class FHIRClient {
       headers: config.headers as HeaderInit,
     };
     // Trust eHealth Exchange's self-signed certificate
-    // if (config.trustSelfSigned) --temporarily comment
-    init.agent = new https.Agent({
-      rejectUnauthorized: false,
-    });
+    if (config.trustSelfSigned)
+      init.agent = new https.Agent({
+        rejectUnauthorized: false,
+      });
     this.init = init;
   }
 
@@ -50,7 +50,7 @@ class FHIRClient {
     const fetchPromises = paths.map((path) =>
       fetch(this.hostname + path, this.init).then((response) => {
         return response;
-      }),
+      })
     );
 
     return await Promise.all(fetchPromises);
