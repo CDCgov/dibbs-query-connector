@@ -7,6 +7,7 @@ import {
   Medication,
   MedicationAdministration,
   MedicationRequest,
+  Immunization,
 } from "fhir/r4";
 
 export const USE_CASE_DETAILS = {
@@ -289,7 +290,8 @@ export type FhirResource =
   | Encounter
   | Medication
   | MedicationAdministration
-  | MedicationRequest;
+  | MedicationRequest
+  | Immunization;
 
 /**
  * A type guard function that checks if the given resource is a valid FHIR resource.
