@@ -29,7 +29,7 @@ export async function getSavedQueryById(queryId: string) {
     if (result.rows.length > 0) {
       return result.rows as unknown as QueryDetailsResult[];
     }
-    console.error("No results found for query:", id);
+    console.error("No results found for query id:", id);
     return [];
   } catch (error) {
     console.error("Error retrieving query", error);

@@ -3,7 +3,7 @@ import fetch from "node-fetch";
 import { Bundle, DomainResource } from "fhir/r4";
 
 import FHIRClient from "./fhir-servers";
-import { DibbsValueSet, isFhirResource, FhirResource } from "./constants";
+import { isFhirResource, FhirResource } from "./constants";
 
 import { CustomQuery } from "./CustomQuery";
 import { GetPhoneQueryFormats } from "./format-service";
@@ -126,13 +126,11 @@ async function patientQuery(
  * Query a FHIR API for a public health use case based on patient demographics provided
  * in the request. If data is found, return in a queryResponse object.
  * @param request - QueryRequest object containing the patient demographics and query name.
- * @param queryValueSets - The value sets to be included in query filtering.
  * @param queryResponse - The response object to store the query results.
  * @returns - The response object containing the query results.
  */
 export async function makeFhirQuery(
   request: QueryRequest,
-  queryValueSets: DibbsValueSet[],
   queryResponse: QueryResponse = {},
 ): Promise<QueryResponse> {
   const fhirServerConfigs = await getFhirServerConfigs();
@@ -147,6 +145,10 @@ export async function makeFhirQuery(
   }
 
   const patientId = queryResponse.Patient[0].id ?? "";
+  if (request.query_name === "") {
+    return queryResponse;
+  }
+  console.log("query service reach to db");
   const savedQuery = await getSavedQueryByName(request.query_name);
   if (savedQuery[0] && savedQuery[0]["query_data"]) {
     const fhirResponse = await postFhirQuery(

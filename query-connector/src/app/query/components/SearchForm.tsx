@@ -92,7 +92,7 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
       query_name: PURPOSEFUL_EMPTY_STRING,
       phone: FormatPhoneAsDigits(phone),
     };
-    const queryResponse = await makeFhirQuery(originalRequest, []);
+    const queryResponse = await makeFhirQuery(originalRequest);
     setPatientDiscoveryQueryResponse(queryResponse);
 
     setMode("patient-results");

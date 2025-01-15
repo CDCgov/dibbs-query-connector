@@ -109,10 +109,7 @@ export async function POST(request: NextRequest) {
     ...(PatientIdentifiers.phone && { phone: PatientIdentifiers.phone }),
   };
 
-  const QueryResponse: QueryResponse = await makeFhirQuery(
-    QueryRequest,
-    valueSets,
-  );
+  const QueryResponse: QueryResponse = await makeFhirQuery(QueryRequest);
 
   // Bundle data
   const bundle: APIQueryResponse = await createBundle(QueryResponse);
