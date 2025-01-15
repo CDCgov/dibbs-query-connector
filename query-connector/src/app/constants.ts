@@ -30,6 +30,10 @@ export const USE_CASE_DETAILS = {
     queryName: "Cancer case investigation",
     condition: "Cancer (Leukemia)",
   },
+  immunization: {
+    queryName: "Immunization",
+    condition: "Immunization",
+  },
 } as const;
 
 export type USE_CASES = keyof typeof USE_CASE_DETAILS;
@@ -330,7 +334,7 @@ export type FhirServerConfig = {
 };
 
 export const INVALID_USE_CASE = `Invalid use_case. Please provide a valid use_case. Valid use_cases include ${Object.keys(
-  USE_CASE_DETAILS,
+  USE_CASE_DETAILS
 )}.`;
 export const INVALID_FHIR_SERVERS = `Invalid fhir_server. Please provide a valid fhir_server.`;
 export const RESPONSE_BODY_IS_NOT_PATIENT_RESOURCE =
