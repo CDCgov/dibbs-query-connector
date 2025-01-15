@@ -1,7 +1,7 @@
-import { USE_CASES, DibbsValueSet, hyperUnluckyPatient } from "@/app/constants";
+import { DibbsValueSet, hyperUnluckyPatient } from "@/app/constants";
 import { getSavedQueryByName } from "@/app/database-service";
 import { unnestValueSetsFromQuery } from "@/app/utils";
-import { UseCaseQuery, UseCaseQueryResponse } from "@/app/query-service";
+import { makeFhirQuery, UseCaseQueryResponse } from "@/app/query-service";
 import { Patient } from "fhir/r4";
 
 type SetStateCallback<T> = React.Dispatch<React.SetStateAction<T>>;
@@ -21,6 +21,7 @@ export async function fetchUseCaseValueSets(queryName: string) {
 /**
  * Query to apply for future view
  * @param p - object param for readability
+ * @param p.queryName - name of the custom user query that we want to fetch
  * @param p.patientForQuery - patient to do query against
  * @param p.selectedQuery - query use case
  * @param p.queryValueSets - valuesets to filter query from default usecase
@@ -30,6 +31,7 @@ export async function fetchUseCaseValueSets(queryName: string) {
  * @param p.setIsLoading - callback to update loading state
  */
 export async function fetchQueryResponse(p: {
+  queryName: string;
   patientForQuery: Patient | undefined;
   selectedQuery: string;
   queryValueSets: DibbsValueSet[];
@@ -50,6 +52,7 @@ export async function fetchQueryResponse(p: {
       hyperUnluckyPatient.MRN;
 
     const newRequest = {
+      query_name: p.queryName,
       first_name: patientFirstName as string,
       last_name: patientLastName as string,
       dob: p.patientForQuery.birthDate as string,
@@ -69,16 +72,10 @@ export async function fetchQueryResponse(p: {
         return conceptFilteredVS;
       });
 
-    console.log(
-      filteredValueSets.map((v) => v.concepts.map((c) => c.code)).flat(),
-    );
-
     p.setIsLoading(true);
-    const queryResponse = await UseCaseQuery(newRequest, filteredValueSets, {
+    const queryResponse = await makeFhirQuery(newRequest, filteredValueSets, {
       Patient: [p.patientForQuery],
     });
-
-    console.log(queryResponse);
 
     p.queryResponseStateCallback(queryResponse);
     p.setIsLoading(false);

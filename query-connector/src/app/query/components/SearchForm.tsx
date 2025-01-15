@@ -7,11 +7,10 @@ import {
   Button,
 } from "@trussworks/react-uswds";
 import { demoData, stateOptions, Mode } from "@/app/constants";
-import { UseCaseQueryResponse, UseCaseQuery } from "@/app/query-service";
+import { UseCaseQueryResponse, makeFhirQuery } from "@/app/query-service";
 import styles from "./searchForm/searchForm.module.scss";
 import { FormatPhoneAsDigits } from "@/app/format-service";
 import TitleBox from "./stepIndicator/TitleBox";
-import { CustomUserQuery } from "@/app/query-building";
 
 interface SearchFormProps {
   setPatientDiscoveryQueryResponse: (
@@ -26,8 +25,6 @@ interface SearchFormProps {
 
 /**
  * @param root0 - SearchFormProps
- * @param root0.useCase - The use case this query will cover.
- * @param root0.setUseCase - Update stateful use case.
  * @param root0.setMode - The function to set the mode.
  * @param root0.setLoading - The function to set the loading state.
  * @param root0.setPatientDiscoveryQueryResponse - callback function to set the
@@ -88,10 +85,14 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
       dob: dob,
       mrn: mrn,
       fhir_server: fhirServer,
-      use_case: PURPOSEFUL_EMPTY_STRING, //TODO: refactor this to just use the patient query?
+      // since our generic FHIR query method expects a named query in the DB
+      // to do the reach-out to the FHIR client, pass in a purposeful empty string
+      // since we just want the patient info
+      //TODO: refactor this to just use the patient query?
+      query_name: PURPOSEFUL_EMPTY_STRING,
       phone: FormatPhoneAsDigits(phone),
     };
-    const queryResponse = await UseCaseQuery(originalRequest, []);
+    const queryResponse = await makeFhirQuery(originalRequest, []);
     setPatientDiscoveryQueryResponse(queryResponse);
 
     setMode("patient-results");

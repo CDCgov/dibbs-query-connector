@@ -1,4 +1,3 @@
-import { USE_CASES, USE_CASE_DETAILS } from "@/app/constants";
 import { Select, Button } from "@trussworks/react-uswds";
 import Backlink from "../backLink/Backlink";
 import styles from "./selectQuery.module.scss";

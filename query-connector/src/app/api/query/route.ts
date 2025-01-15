@@ -1,7 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
 import {
-  UseCaseQuery,
-  UseCaseQueryRequest,
+  makeFhirQuery,
+  QueryRequest,
   QueryResponse,
   createBundle,
   APIQueryResponse,
@@ -94,9 +94,9 @@ export async function POST(request: NextRequest) {
   const queryResults = await getSavedQueryByName(queryName);
   const valueSets = unnestValueSetsFromQuery(queryResults);
 
-  // Add params & patient identifiers to UseCaseRequest
-  const UseCaseRequest: UseCaseQueryRequest = {
-    use_case: use_case as USE_CASES,
+  // Add params & patient identifiers to QueryName
+  const QueryRequest: QueryRequest = {
+    query_name: use_case as USE_CASES,
     fhir_server: fhir_server,
     ...(PatientIdentifiers.first_name && {
       first_name: PatientIdentifiers.first_name,
@@ -109,13 +109,13 @@ export async function POST(request: NextRequest) {
     ...(PatientIdentifiers.phone && { phone: PatientIdentifiers.phone }),
   };
 
-  const UseCaseQueryResponse: QueryResponse = await UseCaseQuery(
-    UseCaseRequest,
+  const QueryResponse: QueryResponse = await makeFhirQuery(
+    QueryRequest,
     valueSets,
   );
 
   // Bundle data
-  const bundle: APIQueryResponse = await createBundle(UseCaseQueryResponse);
+  const bundle: APIQueryResponse = await createBundle(QueryResponse);
 
   return NextResponse.json(bundle);
 }

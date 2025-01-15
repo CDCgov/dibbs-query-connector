@@ -57,15 +57,22 @@ class FHIRClient {
     return await Promise.all(fetchPromises);
   }
 
-  async post(path: string, body: URLSearchParams): Promise<Response> {
+  async post(path: string, params: Record<string, string>): Promise<Response> {
     try {
-      return fetch(this.hostname + path, {
+      const searchParams = new URLSearchParams();
+      Object.entries(params).map(([k, v]) => {
+        searchParams.append(k, v);
+      });
+
+      const bodyToPost = {
         method: "POST",
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
         },
-        body: body.toString(),
-      });
+        body: searchParams.toString(),
+      };
+
+      return fetch(this.hostname + path, bodyToPost);
     } catch (error) {
       console.error(error);
       throw error;

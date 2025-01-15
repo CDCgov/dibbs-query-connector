@@ -2,12 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Button } from "@trussworks/react-uswds";
-import {
-  DibbsConceptType,
-  USE_CASES,
-  USE_CASE_DETAILS,
-  DibbsValueSet,
-} from "../../constants";
+import { DibbsConceptType, DibbsValueSet } from "../../constants";
 import { UseCaseQueryResponse } from "@/app/query-service";
 import LoadingView from "./LoadingView";
 import { showToastConfirmation } from "../designSystem/toast/Toast";
@@ -32,8 +27,8 @@ interface CustomizeQueryProps {
 /**
  * CustomizeQuery component for displaying and customizing query details.
  * @param root0 - The properties object.
+ * @param root0.selectedQuery - The current query to be customized.
  * @param root0.useCaseQueryResponse - The response from the query service.
- * @param root0.queryType - The type of the query.
  * @param root0.queryValueSets - The pre-fetched value sets from the DB.
  * @param root0.setQueryValuesets - Function to update tracked custom query state.
  * @param root0.goBack - Back button to go from "customize-queries" to "search" component.

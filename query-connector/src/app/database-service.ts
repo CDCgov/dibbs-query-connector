@@ -16,6 +16,7 @@ import {
 import {
   CategoryToConditionArrayMap,
   ConditionsMap,
+  QueryDetailsResult,
 } from "./queryBuilding/utils";
 import {
   CategoryStruct,
@@ -100,7 +101,7 @@ export const getSavedQueryByName = async (name: string) => {
       console.error("No results found for query:", name);
       return [];
     }
-    return result.rows;
+    return result.rows as unknown as QueryDetailsResult[];
   } catch (error) {
     console.error("Error retrieving query:", error);
     throw error;

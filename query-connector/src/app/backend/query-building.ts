@@ -16,7 +16,7 @@ const dbClient = getDbClient();
  * @param queryId - Query ID to grab data from the db with
  * @returns The query name, data, and conditions list from the query table
  */
-export async function getSavedQueryDetails(queryId: string) {
+export async function getSavedQueryById(queryId: string) {
   const id = queryId;
   const queryString = `
     select q.query_name, q.id, q.query_data, q.conditions_list

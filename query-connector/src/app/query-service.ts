@@ -3,17 +3,13 @@ import fetch from "node-fetch";
 import { Bundle, DomainResource } from "fhir/r4";
 
 import FHIRClient from "./fhir-servers";
-import {
-  USE_CASES,
-  DibbsValueSet,
-  isFhirResource,
-  FhirResource,
-} from "./constants";
+import { DibbsValueSet, isFhirResource, FhirResource } from "./constants";
 
 import { CustomQuery } from "./CustomQuery";
 import { GetPhoneQueryFormats } from "./format-service";
 import { formatValueSetsAsQuerySpec } from "./format-service";
-import { getFhirServerConfigs } from "./database-service";
+import { getFhirServerConfigs, getSavedQueryByName } from "./database-service";
+import { QueryDataColumn } from "./queryBuilding/utils";
 
 /**
  * The query response when the request source is from the Viewer UI.
@@ -30,8 +26,8 @@ type SuperSetQueryResponse = {
 
 export type APIQueryResponse = Bundle;
 
-export type UseCaseQueryRequest = {
-  use_case: string;
+export type QueryRequest = {
+  query_name: string;
   fhir_server: string;
   first_name?: string;
   last_name?: string;
@@ -40,19 +36,8 @@ export type UseCaseQueryRequest = {
   phone?: string;
 };
 
-/**
- * Expected structure of a query object
- */
-export type QueryStruct = {
-  labCodes: string[];
-  snomedCodes: string[];
-  rxnormCodes: string[];
-  classTypeCodes: string[];
-  hasSecondEncounterQuery: boolean;
-};
-
 // Expected responses from the FHIR server
-export type UseCaseQueryResponse = Awaited<ReturnType<typeof UseCaseQuery>>;
+export type UseCaseQueryResponse = Awaited<ReturnType<typeof makeFhirQuery>>;
 
 /**
  * @todo Add encounters as _include in condition query & batch encounter queries
@@ -89,7 +74,7 @@ async function queryEncounters(
  * @returns - The response body from the FHIR server.
  */
 async function patientQuery(
-  request: UseCaseQueryRequest,
+  request: QueryRequest,
   fhirClient: FHIRClient,
   queryResponse: QueryResponse,
 ): Promise<void> {
@@ -140,13 +125,13 @@ async function patientQuery(
 /**
  * Query a FHIR API for a public health use case based on patient demographics provided
  * in the request. If data is found, return in a queryResponse object.
- * @param request - UseCaseQueryRequest object containing the patient demographics and use case.
+ * @param request - QueryRequest object containing the patient demographics and query name.
  * @param queryValueSets - The value sets to be included in query filtering.
  * @param queryResponse - The response object to store the query results.
  * @returns - The response object containing the query results.
  */
-export async function UseCaseQuery(
-  request: UseCaseQueryRequest,
+export async function makeFhirQuery(
+  request: QueryRequest,
   queryValueSets: DibbsValueSet[],
   queryResponse: QueryResponse = {},
 ): Promise<QueryResponse> {
@@ -162,16 +147,19 @@ export async function UseCaseQuery(
   }
 
   const patientId = queryResponse.Patient[0].id ?? "";
+  const savedQuery = await getSavedQueryByName(request.query_name);
+  if (savedQuery[0] && savedQuery[0]["query_data"]) {
+    const fhirResponse = await postFhirQuery(
+      savedQuery[0]["query_data"],
+      patientId,
+      fhirClient,
+      queryResponse,
+    );
 
-  await generalizedQuery(
-    request.use_case,
-    queryValueSets,
-    patientId,
-    fhirClient,
-    queryResponse,
-  );
-
-  return queryResponse;
+    return fhirResponse;
+  } else {
+    throw `Saved query data JSON for ${request.query_name} not found`;
+  }
 }
 
 /**
@@ -179,50 +167,50 @@ export async function UseCaseQuery(
  * particular criteria. The query is determined by a collection of passed-in
  * valuesets to include in the query results, and any patients found must
  * have eCR data interseecting with these valuesets.
- * @param useCase The particular use case the query is associated with.
- * @param queryValueSets The valuesets to include as reference points for patient
- * data.
+ * @param queryData The saved JSON query in the query table that we need to
+ * translate into a FHIR query
  * @param patientId The ID of the patient for whom to search.
  * @param fhirClient The client used to communicate with the FHIR server.
  * @param queryResponse The response object for the query results.
  * @returns A promise for an updated query response.
  */
-async function generalizedQuery(
-  useCase: string, // does this need to be a specialized thing??
-  queryValueSets: DibbsValueSet[],
+async function postFhirQuery(
+  queryData: QueryDataColumn,
   patientId: string,
   fhirClient: FHIRClient,
   queryResponse: QueryResponse,
 ): Promise<QueryResponse> {
-  const querySpec = formatValueSetsAsQuerySpec(useCase, queryValueSets);
+  const querySpec = formatValueSetsAsQuerySpec(queryData);
   const builtQuery = new CustomQuery(querySpec, patientId);
   let response: fetch.Response | fetch.Response[];
 
-  // Special cases for newborn screening, which just use one query
-  if (useCase === "newborn-screening") {
-    response = await fhirClient.get(builtQuery.getQuery("observation"));
-  } else {
-    const postPromises = builtQuery.getQueryPaths().map((path) => {
-      return fhirClient.post(path, builtQuery.getQueryBody());
-    });
-    const postResults = await Promise.allSettled(postPromises);
-    const rejectedResult: string[] = [];
-    const fulfilledResults = postResults
-      .map((r) => {
-        if (r.status === "fulfilled") {
-          return r.value;
-        } else {
-          rejectedResult.push(r.reason);
-        }
-      })
-      .filter((v): v is fetch.Response => !!v);
+  // Should we still individually handle newborn screening?
+  // if (useCase === "newborn-screening") {
+  // response = await fhirClient.get(builtQuery.getQuery("observation"));
+  // }
 
-    response = fulfilledResults;
+  const postPromises = builtQuery.compileAllPostRequests().map((req) => {
+    return fhirClient.post(req.path, req.params);
+  });
 
-    if (rejectedResult.length > 0) {
-      console.error("Rejected reasons: ", rejectedResult);
-    }
+  const postResults = await Promise.allSettled(postPromises);
+  const rejectedResult: string[] = [];
+  const fulfilledResults = postResults
+    .map((r) => {
+      if (r.status === "fulfilled") {
+        return r.value;
+      } else {
+        rejectedResult.push(r.reason);
+      }
+    })
+    .filter((v): v is fetch.Response => !!v);
+
+  response = fulfilledResults;
+
+  if (rejectedResult.length > 0) {
+    console.error("Rejected reasons: ", rejectedResult);
   }
+
   queryResponse = await parseFhirSearch(response, queryResponse);
   if (!querySpec.hasSecondEncounterQuery) {
     return queryResponse;

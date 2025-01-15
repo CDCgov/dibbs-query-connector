@@ -5,7 +5,7 @@ import ResultsView from "./components/ResultsView";
 import PatientSearchResults from "./components/PatientSearchResults";
 import SearchForm from "./components/SearchForm";
 import SelectQuery from "./components/SelectQuery";
-import { DEFAULT_DEMO_FHIR_SERVER, Mode, USE_CASES } from "../constants";
+import { DEFAULT_DEMO_FHIR_SERVER, Mode } from "../constants";
 import LoadingView from "./components/LoadingView";
 import { ToastContainer } from "react-toastify";
 

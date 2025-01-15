@@ -35,7 +35,7 @@ import { SelectedQueryDetails } from "../querySelection/utils";
 
 import "react-toastify/dist/ReactToastify.css";
 import {
-  getSavedQueryDetails,
+  getSavedQueryById,
   saveCustomQuery,
 } from "@/app/backend/query-building";
 import { groupValueSetsByConceptType } from "@/app/utils/valueSetTranslation";
@@ -118,7 +118,7 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
       if (selectedQuery.queryId === undefined) {
         return;
       }
-      const result = await getSavedQueryDetails(selectedQuery.queryId);
+      const result = await getSavedQueryById(selectedQuery.queryId);
 
       if (result === undefined) {
         return; // todo: error???

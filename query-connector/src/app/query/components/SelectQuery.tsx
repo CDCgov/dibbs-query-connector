@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { USE_CASES, USE_CASE_DETAILS, DibbsValueSet } from "../../constants";
+import { DibbsValueSet } from "../../constants";
 import CustomizeQuery from "./CustomizeQuery";
 import SelectSavedQuery from "./selectQuery/SelectSavedQuery";
 
@@ -95,6 +95,7 @@ const SelectQuery: React.FC<SelectQueryProps> = ({
 
   async function onSubmit() {
     await fetchQueryResponse({
+      queryName: selectedQuery.query_name,
       patientForQuery: patientForQuery,
       selectedQuery: selectedQuery.query_name,
       queryValueSets: queryValueSets,
