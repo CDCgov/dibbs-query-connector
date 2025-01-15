@@ -333,6 +333,7 @@ export type FhirServerConfig = {
   last_connection_attempt: Date;
   last_connection_successful: boolean;
   headers: Record<string, string>;
+  disable_cert_validation: boolean;
 };
 
 export const INVALID_USE_CASE = `Invalid use_case. Please provide a valid use_case. Valid use_cases include ${Object.keys(

@@ -316,7 +316,7 @@ export const formatImmunizationRoute = (immunization: Immunization): string => {
   const initial = immunization.route?.coding?.[0].display ?? "";
   const readable = immunization.route?.coding?.filter(
     (code: Coding) =>
-      code.system === "https://terminology.hl7.org/CodeSystem/v2-0162",
+      code.system === "http://terminology.hl7.org/CodeSystem/v2-0162",
   );
   return readable?.[0].display ?? initial;
 };
