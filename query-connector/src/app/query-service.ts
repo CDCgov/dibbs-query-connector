@@ -202,6 +202,8 @@ async function generalizedQuery(
   // Special cases for newborn screening, which just use one query
   if (useCase === "newborn-screening") {
     response = await fhirClient.get(builtQuery.getQuery("observation"));
+  } else if (useCase === "immunization") {
+    response = await fhirClient.get(builtQuery.getQuery("immunization"));
   } else {
     const queryRequests: string[] = builtQuery.getAllQueries();
     response = await fhirClient.getBatch(queryRequests);

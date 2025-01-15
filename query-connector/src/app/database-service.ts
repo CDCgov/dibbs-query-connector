@@ -765,6 +765,7 @@ export async function getFhirServerConfig(fhirServerName: string) {
  * Inserts a new FHIR server configuration into the database.
  * @param name - The name of the FHIR server
  * @param hostname - The URL/hostname of the FHIR server
+ * @param disableCertValidation - Whether to disable certificate validation
  * @param lastConnectionSuccessful - Optional boolean indicating if the last connection was successful
  * @param bearerToken - Optional bearer token for authentication
  * @returns An object indicating success or failure with optional error message
@@ -772,6 +773,7 @@ export async function getFhirServerConfig(fhirServerName: string) {
 export async function insertFhirServer(
   name: string,
   hostname: string,
+  disableCertValidation: boolean,
   lastConnectionSuccessful?: boolean,
   bearerToken?: string,
 ) {
@@ -781,9 +783,10 @@ export async function insertFhirServer(
       hostname, 
       last_connection_attempt,
       last_connection_successful,
-      headers
+      headers,
+      disable_cert_validation
     )
-    VALUES ($1, $2, $3, $4, $5);
+    VALUES ($1, $2, $3, $4, $5, $6);
   `;
 
   try {
@@ -800,6 +803,7 @@ export async function insertFhirServer(
       new Date(),
       lastConnectionSuccessful,
       headers,
+      disableCertValidation,
     ]);
 
     // Clear the cache so the next getFhirServerConfigs call will fetch fresh data
@@ -826,6 +830,7 @@ export async function insertFhirServer(
  * @param id - The ID of the FHIR server to update
  * @param name - The new name of the FHIR server
  * @param hostname - The new URL/hostname of the FHIR server
+ * @param disableCertValidation - Whether to disable certificate validation
  * @param lastConnectionSuccessful - Optional boolean indicating if the last connection was successful
  * @param bearerToken - Optional bearer token for authentication
  * @returns An object indicating success or failure with optional error message
@@ -834,6 +839,7 @@ export async function updateFhirServer(
   id: string,
   name: string,
   hostname: string,
+  disableCertValidation: boolean,
   lastConnectionSuccessful?: boolean,
   bearerToken?: string,
 ) {
@@ -844,7 +850,8 @@ export async function updateFhirServer(
       hostname = $3,
       last_connection_attempt = CURRENT_TIMESTAMP,
       last_connection_successful = $4,
-      headers = $5
+      headers = $5,
+      disable_cert_validation = $6
     WHERE id = $1
     RETURNING *;
   `;
@@ -891,6 +898,7 @@ export async function updateFhirServer(
       hostname,
       lastConnectionSuccessful,
       headers,
+      disableCertValidation,
     ]);
 
     // Clear the cache so the next getFhirServerConfigs call will fetch fresh data
