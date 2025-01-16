@@ -26,6 +26,7 @@ export async function fetchUseCaseValueSets(queryName: string) {
  * @param p.selectedQuery - query use case
  * @param p.queryResponseStateCallback - callback function to update state of the
  * query response
+ * @param p.queryValueSets - Valuesets to fetch as part of the query
  * @param p.fhirServer - fhir server to do the querying against
  * @param p.setIsLoading - callback to update loading state
  * @param p.queryValueSets
