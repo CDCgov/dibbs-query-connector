@@ -25,14 +25,6 @@ import {
 import { unnestValueSetsFromQuery } from "@/app/utils";
 
 /**
- * Health check for TEFCA Viewer
- * @returns Response with status OK.
- */
-export async function GET() {
-  return NextResponse.json({ status: "OK" }, { status: 200 });
-}
-
-/**
  * Handles a POST request to query a given FHIR server for a given use case. The
  * use_case and fhir_server are provided as query parameters in the request URL. The
  * request body contains the FHIR patient resource to be queried.
