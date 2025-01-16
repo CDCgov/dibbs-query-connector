@@ -14,7 +14,6 @@ import {
   RESPONSE_BODY_IS_NOT_PATIENT_RESOURCE,
   MISSING_API_QUERY_PARAM,
   MISSING_PATIENT_IDENTIFIERS,
-  USE_CASES,
 } from "../../constants";
 
 import { handleRequestError } from "./error-handling-service";
