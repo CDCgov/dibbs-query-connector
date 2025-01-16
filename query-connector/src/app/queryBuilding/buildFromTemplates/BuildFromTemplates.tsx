@@ -280,6 +280,7 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
         showToastConfirmation({
           heading: "Something went wrong",
           body: `${queryName} wasn't successfully created. Please try again or contact us if the error persists`,
+          variant: "error",
         });
       }
     }

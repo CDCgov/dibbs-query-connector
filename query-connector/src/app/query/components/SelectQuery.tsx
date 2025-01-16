@@ -74,37 +74,31 @@ const SelectQuery: React.FC<SelectQueryProps> = ({
     let isSubscribed = true;
 
     const fetchDataAndUpdateState = async () => {
-      if (selectedQuery.query_name) {
+      setLoadingQueryValueSets(true);
+      if (selectedQuery && selectedQuery.query_name) {
         const queryName = selectedQuery.query_name;
         const valueSets = await fetchUseCaseValueSets(queryName);
         // Only update if the fetch hasn't altered state yet
         if (isSubscribed) {
           setQueryValueSets(valueSets);
         }
-      } else {
-        showToastConfirmation({
-          heading: "Something went wrong",
-          body: "Try again or contact us if the issue keeps persisting",
-        });
       }
+      setLoadingQueryValueSets(false);
     };
 
-    setLoadingQueryValueSets(true);
     fetchDataAndUpdateState().catch(console.error);
-    setLoadingQueryValueSets(false);
 
     // Destructor hook to prevent future state updates
     return () => {
       isSubscribed = false;
     };
-  }, [selectedQuery, setQueryValueSets]);
+  }, [selectedQuery]);
 
   async function onSubmit() {
     await fetchQueryResponse({
       queryName: selectedQuery.query_name,
       patientForQuery: patientForQuery,
       selectedQuery: selectedQuery.query_name,
-      queryValueSets: queryValueSets,
       fhirServer: fhirServer,
       queryResponseStateCallback: setResultsQueryResponse,
       setIsLoading: setLoadingResultResponse,

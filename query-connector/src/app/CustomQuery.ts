@@ -186,7 +186,8 @@ export class CustomQuery {
     }
 
     // ? Doing these in sequence gives us 429's Too Many Requests :(. Might need
-    // ? to be smarter or introduce some sort of sleep await
+    // ? to be smarter about when to send which requests or introduce some
+    // ?  sort of sleep await
 
     // ? Marcelle will do separate digging into how encounter interacts with classType
     // if (classTypeFilter !== "") {

@@ -24,7 +24,6 @@ export async function fetchUseCaseValueSets(queryName: string) {
  * @param p.queryName - name of the custom user query that we want to fetch
  * @param p.patientForQuery - patient to do query against
  * @param p.selectedQuery - query use case
- * @param p.queryValueSets - valuesets to filter query from default usecase
  * @param p.queryResponseStateCallback - callback function to update state of the
  * query response
  * @param p.fhirServer - fhir server to do the querying against
@@ -34,7 +33,6 @@ export async function fetchQueryResponse(p: {
   queryName: string;
   patientForQuery: Patient | undefined;
   selectedQuery: string;
-  queryValueSets: DibbsValueSet[];
   fhirServer: string;
   queryResponseStateCallback: SetStateCallback<FhirQueryResponse>;
   setIsLoading: (isLoading: boolean) => void;

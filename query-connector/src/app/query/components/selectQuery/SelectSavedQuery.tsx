@@ -83,6 +83,7 @@ const SelectSavedQuery: React.FC<SelectSavedQueryProps> = ({
       showToastConfirmation({
         body: "Please try again, or contact us if the error persists",
         heading: "Something went wrong",
+        variant: "error",
       });
     }
   }
