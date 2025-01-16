@@ -29,7 +29,6 @@ export async function fetchUseCaseValueSets(queryName: string) {
  * @param p.queryValueSets - Valuesets to fetch as part of the query
  * @param p.fhirServer - fhir server to do the querying against
  * @param p.setIsLoading - callback to update loading state
- * @param p.queryValueSets
  */
 export async function fetchQueryResponse(p: {
   queryName: string;

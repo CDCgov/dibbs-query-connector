@@ -175,7 +175,6 @@ export async function makeFhirQuery(
  * particular criteria. The query is determined by a collection of passed-in
  * valuesets to include in the query results, and any patients found must
  * have eCR data interseecting with these valuesets.
- * @param useCase The particular use case the query is associated with.
  * @param queryName - Name of the query that we need to retrieve from the DB
  * @param queryValueSets The valuesets to include as reference points for patient
  * data.
