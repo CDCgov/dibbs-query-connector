@@ -15,6 +15,7 @@ import Backlink from "./backLink/Backlink";
 import { USE_CASES, USE_CASE_DETAILS } from "@/app/constants";
 import { RETURN_LABEL } from "@/app/query/components/stepIndicator/StepIndicator";
 import TitleBox from "./stepIndicator/TitleBox";
+import ImmunizationTable from "./resultsView/tableComponents/ImmunizationTable";
 
 type ResultsViewProps = {
   useCaseQueryResponse: UseCaseQueryResponse;
@@ -113,6 +114,9 @@ function mapQueryResponseToAccordionDataStructure(
   const medicationRequests = useCaseQueryResponse.MedicationRequest
     ? useCaseQueryResponse.MedicationRequest
     : null;
+  const immunizations = useCaseQueryResponse.Immunization
+    ? useCaseQueryResponse.Immunization
+    : null;
 
   const accordionItems: ResultsViewAccordionItem[] = [
     {
@@ -144,6 +148,12 @@ function mapQueryResponseToAccordionDataStructure(
       title: "Medication Requests",
       content: medicationRequests ? (
         <MedicationRequestTable medicationRequests={medicationRequests} />
+      ) : null,
+    },
+    {
+      title: "Immunizations",
+      content: immunizations ? (
+        <ImmunizationTable immunizations={immunizations} />
       ) : null,
     },
   ];

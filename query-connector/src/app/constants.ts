@@ -7,6 +7,7 @@ import {
   Medication,
   MedicationAdministration,
   MedicationRequest,
+  Immunization,
 } from "fhir/r4";
 
 export const USE_CASE_DETAILS = {
@@ -29,6 +30,10 @@ export const USE_CASE_DETAILS = {
   cancer: {
     queryName: "Cancer case investigation",
     condition: "Cancer (Leukemia)",
+  },
+  immunization: {
+    queryName: "Immunization",
+    condition: "Immunization",
   },
 } as const;
 
@@ -285,7 +290,8 @@ export type FhirResource =
   | Encounter
   | Medication
   | MedicationAdministration
-  | MedicationRequest;
+  | MedicationRequest
+  | Immunization;
 
 /**
  * A type guard function that checks if the given resource is a valid FHIR resource.
@@ -327,6 +333,7 @@ export type FhirServerConfig = {
   last_connection_attempt: Date;
   last_connection_successful: boolean;
   headers: Record<string, string>;
+  disable_cert_validation: boolean;
 };
 
 export const INVALID_USE_CASE = `Invalid use_case. Please provide a valid use_case. Valid use_cases include ${Object.keys(

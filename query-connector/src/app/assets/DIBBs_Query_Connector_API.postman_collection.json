@@ -489,7 +489,7 @@
   "variable": [
     {
       "key": "base_url",
-      "value": "https://dibbs.cloud/query-connector",
+      "value": "https://demo.queryconnector.dev",
       "type": "string"
     }
   ]
