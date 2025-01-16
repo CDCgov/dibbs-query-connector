@@ -1,11 +1,7 @@
 import { DibbsValueSet, hyperUnluckyPatient } from "@/app/constants";
 import { getSavedQueryByName } from "@/app/database-service";
 import { unnestValueSetsFromQuery } from "@/app/utils";
-import {
-  makeFhirQuery,
-  QueryRequest,
-  QueryResponse,
-} from "@/app/query-service";
+import { makeFhirQuery, QueryResponse } from "@/app/query-service";
 import { Patient } from "fhir/r4";
 
 type SetStateCallback<T> = React.Dispatch<React.SetStateAction<T>>;
@@ -32,6 +28,7 @@ export async function fetchUseCaseValueSets(queryName: string) {
  * query response
  * @param p.fhirServer - fhir server to do the querying against
  * @param p.setIsLoading - callback to update loading state
+ * @param p.queryValueSets
  */
 export async function fetchQueryResponse(p: {
   queryName: string;

@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "@trussworks/react-uswds";
 import { DibbsConceptType, DibbsValueSet } from "../../constants";
-import { QueryRequest, QueryResponse } from "@/app/query-service";
+import { QueryResponse } from "@/app/query-service";
 import LoadingView from "./LoadingView";
 import { showToastConfirmation } from "../designSystem/toast/Toast";
 import styles from "./customizeQuery/customizeQuery.module.scss";

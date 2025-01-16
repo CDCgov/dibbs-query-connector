@@ -1,4 +1,4 @@
-import { FhirQueryResponse, QueryRequest } from "../../query-service";
+import { FhirQueryResponse } from "../../query-service";
 import ResultsViewSideNav, {
   NavSection,
 } from "./resultsView/ResultsViewSideNav";
