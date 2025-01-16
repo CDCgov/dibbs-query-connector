@@ -74,17 +74,6 @@ describe("POST Query FHIR Server", () => {
     expect(body.issue[0].diagnostics).toBe(MISSING_API_QUERY_PARAM);
   });
 
-  it("should return an OperationOutcome if the use_case is not valid", async () => {
-    const request = createNextRequest(
-      PatientResource,
-      new URLSearchParams("use_case=invalid&fhir_server=HELIOS Meld: Direct"),
-    );
-    const response = await POST(request);
-    const body = await response.json();
-    expect(body.resourceType).toBe("OperationOutcome");
-    expect(body.issue[0].diagnostics).toBe(INVALID_USE_CASE);
-  });
-
   it("should return an OperationOutcome if the fhir_server is not valid", async () => {
     const request = createNextRequest(
       PatientResource,

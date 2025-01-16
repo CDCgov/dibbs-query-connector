@@ -12,6 +12,7 @@ import {
 } from "./selectQuery/queryHooks";
 import LoadingView from "./LoadingView";
 import { CustomUserQuery } from "@/app/query-building";
+import { showToastConfirmation } from "../designSystem/toast/Toast";
 
 interface SelectQueryProps {
   goForward: () => void;
@@ -73,13 +74,18 @@ const SelectQuery: React.FC<SelectQueryProps> = ({
     let isSubscribed = true;
 
     const fetchDataAndUpdateState = async () => {
-      if (selectedQuery) {
+      if (selectedQuery.query_name) {
         const queryName = selectedQuery.query_name;
         const valueSets = await fetchUseCaseValueSets(queryName);
         // Only update if the fetch hasn't altered state yet
         if (isSubscribed) {
           setQueryValueSets(valueSets);
         }
+      } else {
+        showToastConfirmation({
+          heading: "Something went wrong",
+          body: "Try again or contact us if the issue keeps persisting",
+        });
       }
     };
 

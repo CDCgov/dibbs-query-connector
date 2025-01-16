@@ -86,8 +86,9 @@ export async function POST(request: NextRequest) {
   }
 
   // Add params & patient identifiers to QueryName
+  console.log(PatientIdentifiers);
   const QueryRequest: QueryRequest = {
-    query_name: use_case as USE_CASES,
+    query_name: use_case,
     fhir_server: fhir_server,
     ...(PatientIdentifiers.first_name && {
       first_name: PatientIdentifiers.first_name,

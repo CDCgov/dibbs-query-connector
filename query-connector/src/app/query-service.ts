@@ -92,9 +92,8 @@ async function patientQuery(
     query += `birthdate=${request.dob}&`;
   }
   if (request.mrn) {
-    // ? Does this need another filter in order to match on MRN? Trying to
-    // ? look for Hyper Unlucky for this doesn't get a match on public HAPI
-    query += `identifier=MRN|${request.mrn}&`;
+    // ? Might need to extend this to include offering authority
+    query += `identifier=${request.mrn}&`;
   }
   if (request.phone) {
     // We might have multiple phone numbers if we're coming from the API
@@ -147,7 +146,13 @@ export async function makeFhirQuery(
   }
 
   // indication that we only want the patient result from the FHIR query
-  if (request.query_name === null || request.just_return_patient) {
+  const justReturnPatient =
+    request.query_name === null || request.just_return_patient;
+
+  const noPatientToQueryWith =
+    !queryResponse.Patient || queryResponse.Patient.length !== 1;
+
+  if (justReturnPatient || noPatientToQueryWith) {
     return queryResponse;
   }
 
@@ -156,7 +161,7 @@ export async function makeFhirQuery(
   }
 
   const patientId = queryResponse.Patient[0].id;
-  const savedQuery = await getSavedQueryByName(request.query_name);
+  const savedQuery = await getSavedQueryByName(request.query_name as string);
 
   if (savedQuery[0] && savedQuery[0]["query_data"]) {
     const fhirResponse = await postFhirQuery(

@@ -134,8 +134,6 @@ export class CustomQuery {
       },
     };
 
-    // ? Doing these in sequence gives us 429's Too Many Requests :(. Might need
-    // ? to be smarter or introduce some sort of sleep
     if (labsFilter !== "") {
       this.fhirResourceQueries["observation"] = {
         basePath: `/Observation/_search`,
@@ -187,16 +185,19 @@ export class CustomQuery {
       };
     }
 
+    // ? Doing these in sequence gives us 429's Too Many Requests :(. Might need
+    // ? to be smarter or introduce some sort of sleep await
+
     // ? Marcelle will do separate digging into how encounter interacts with classType
-    if (classTypeFilter !== "") {
-      this.fhirResourceQueries["encounterClass"] = {
-        basePath: `/Encounter/_search`,
-        params: {
-          subject: `Patient/${patientId}`,
-          class: classTypeFilter,
-        },
-      };
-    }
+    // if (classTypeFilter !== "") {
+    //   this.fhirResourceQueries["encounterClass"] = {
+    //     basePath: `/Encounter/_search`,
+    //     params: {
+    //       subject: `Patient/${patientId}`,
+    //       class: classTypeFilter,
+    //     },
+    //   };
+    // }
   }
 
   compilePostRequest(resource: {
