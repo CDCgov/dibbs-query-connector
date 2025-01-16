@@ -1,4 +1,4 @@
-import { DibbsValueSet, hyperUnluckyPatient } from "@/app/constants";
+import { hyperUnluckyPatient } from "@/app/constants";
 import { getSavedQueryByName } from "@/app/database-service";
 import { unnestValueSetsFromQuery } from "@/app/utils";
 import { makeFhirQuery, FhirQueryResponse } from "@/app/query-service";

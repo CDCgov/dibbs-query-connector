@@ -12,7 +12,6 @@ import {
 } from "./selectQuery/queryHooks";
 import LoadingView from "./LoadingView";
 import { CustomUserQuery } from "@/app/query-building";
-import { showToastConfirmation } from "../designSystem/toast/Toast";
 
 interface SelectQueryProps {
   goForward: () => void;
