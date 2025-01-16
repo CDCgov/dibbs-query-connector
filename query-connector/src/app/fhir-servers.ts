@@ -27,7 +27,7 @@ class FHIRClient {
       method: "GET",
       headers: config.headers as HeaderInit,
     };
-    // Trust eHealth Exchange's self-signed certificate
+    // Trust any configured server that has disabled SSL
     if (config.disable_cert_validation) {
       init.agent = new https.Agent({
         rejectUnauthorized: false,

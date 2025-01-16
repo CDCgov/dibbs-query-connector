@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { UseCaseQueryResponse } from "../query-service";
+import { FhirQueryResponse } from "../query-service";
 import ResultsView from "./components/ResultsView";
 import PatientSearchResults from "./components/PatientSearchResults";
 import SearchForm from "./components/SearchForm";
@@ -47,10 +47,10 @@ const Query: React.FC = () => {
   }, []);
 
   const [patientDiscoveryQueryResponse, setPatientDiscoveryQueryResponse] =
-    useState<UseCaseQueryResponse>({});
+    useState<FhirQueryResponse>({});
   const [patientForQuery, setPatientForQueryResponse] = useState<Patient>();
   const [resultsQueryResponse, setResultsQueryResponse] =
-    useState<UseCaseQueryResponse>({});
+    useState<FhirQueryResponse>({});
 
   const [showCustomizeQuery, setShowCustomizeQuery] = useState(false);
 
@@ -118,7 +118,7 @@ const Query: React.FC = () => {
         {mode === "results" && resultsQueryResponse && selectedQuery && (
           <ResultsView
             selectedQuery={selectedQuery}
-            useCaseQueryResponse={resultsQueryResponse}
+            fhirQueryResponse={resultsQueryResponse}
             goBack={() => {
               setMode("select-query");
             }}

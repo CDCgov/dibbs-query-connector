@@ -1,7 +1,7 @@
 "use server";
 import fetch from "node-fetch";
 import https from "https";
-import { Bundle, DomainResource } from "fhir/r4";
+import { Bundle, DomainResource, Patient } from "fhir/r4";
 
 import FHIRClient from "./fhir-servers";
 import { isFhirResource, FhirResource } from "./constants";
@@ -28,7 +28,7 @@ type SuperSetQueryResponse = {
 export type APIQueryResponse = Bundle;
 
 export type QueryRequest = {
-  query_name: string;
+  query_name: string | null;
   fhir_server: string;
   first_name?: string;
   last_name?: string;
@@ -38,7 +38,7 @@ export type QueryRequest = {
 };
 
 // Expected responses from the FHIR server
-export type UseCaseQueryResponse = Awaited<ReturnType<typeof makeFhirQuery>>;
+export type FhirQueryResponse = Awaited<ReturnType<typeof makeFhirQuery>>;
 
 /**
  * @todo Add encounters as _include in condition query & batch encounter queries
@@ -78,7 +78,7 @@ async function patientQuery(
   request: QueryRequest,
   fhirClient: FHIRClient,
   queryResponse: QueryResponse,
-): Promise<void> {
+): Promise<QueryResponse> {
   // Query for patient
   let query = "/Patient?";
   if (request.first_name) {
@@ -120,7 +120,8 @@ async function patientQuery(
       } \n Headers: ${JSON.stringify(response.headers.raw())}`,
     );
   }
-  queryResponse = await parseFhirSearch(response, queryResponse);
+  const newResponse = await parseFhirSearch(response, queryResponse);
+  return newResponse;
 }
 
 /**
@@ -136,21 +137,24 @@ export async function makeFhirQuery(
 ): Promise<QueryResponse> {
   const fhirServerConfigs = await getFhirServerConfigs();
   const fhirClient = new FHIRClient(request.fhir_server, fhirServerConfigs);
+  const onePatientDefined = queryResponse.Patient && queryResponse.Patient[0];
 
-  if (!queryResponse.Patient || queryResponse.Patient.length === 0) {
-    await patientQuery(request, fhirClient, queryResponse);
+  if (!onePatientDefined) {
+    queryResponse = await patientQuery(request, fhirClient, queryResponse);
   }
 
-  if (!queryResponse.Patient || queryResponse.Patient.length !== 1) {
+  // indication that we only want the patient result from the FHIR query
+  if (request.query_name === null) {
     return queryResponse;
   }
 
-  const patientId = queryResponse.Patient[0].id ?? "";
-  if (request.query_name === "") {
-    return queryResponse;
+  if (!queryResponse.Patient?.[0]?.id) {
+    throw new Error("Unable to retrieve valid patient ID");
   }
-  console.log("query service reach to db");
+
+  const patientId = queryResponse.Patient[0].id;
   const savedQuery = await getSavedQueryByName(request.query_name);
+
   if (savedQuery[0] && savedQuery[0]["query_data"]) {
     const fhirResponse = await postFhirQuery(
       savedQuery[0]["query_data"],
@@ -191,29 +195,41 @@ async function postFhirQuery(
   // if (useCase === "newborn-screening") {
   // response = await fhirClient.get(builtQuery.getQuery("observation"));
   // }
+  // if (useCase === "immunization") {
+  // response = await fhirClient.get(builtQuery.getQuery("observation"));
+  // }
 
   const postPromises = builtQuery.compileAllPostRequests().map((req) => {
     return fhirClient.post(req.path, req.params);
   });
 
   const postResults = await Promise.allSettled(postPromises);
-  const rejectedResult: string[] = [];
   const fulfilledResults = postResults
     .map((r) => {
       if (r.status === "fulfilled") {
         return r.value;
       } else {
-        rejectedResult.push(r.reason);
+        console.error("POST to FHIR query promise rejected: ", r.reason);
       }
     })
     .filter((v): v is fetch.Response => !!v);
 
-  response = fulfilledResults;
+  const successfulResults = fulfilledResults
+    .map((response) => {
+      if (response.status !== 200) {
+        response.text().then((reason) => {
+          console.error(
+            `FHIR query failed from ${response.url}. 
+            Status: ${response.status} \n Response: ${reason}`,
+          );
+        });
+      } else {
+        return response;
+      }
+    })
+    .filter((v): v is fetch.Response => !!v);
 
-  if (rejectedResult.length > 0) {
-    console.error("Rejected reasons: ", rejectedResult);
-  }
-
+  response = successfulResults;
   queryResponse = await parseFhirSearch(response, queryResponse);
   if (!querySpec.hasSecondEncounterQuery) {
     return queryResponse;

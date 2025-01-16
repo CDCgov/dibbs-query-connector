@@ -1,7 +1,7 @@
 import { DibbsValueSet, hyperUnluckyPatient } from "@/app/constants";
 import { getSavedQueryByName } from "@/app/database-service";
 import { unnestValueSetsFromQuery } from "@/app/utils";
-import { makeFhirQuery, UseCaseQueryResponse } from "@/app/query-service";
+import { makeFhirQuery, FhirQueryResponse } from "@/app/query-service";
 import { Patient } from "fhir/r4";
 
 type SetStateCallback<T> = React.Dispatch<React.SetStateAction<T>>;
@@ -36,7 +36,7 @@ export async function fetchQueryResponse(p: {
   selectedQuery: string;
   queryValueSets: DibbsValueSet[];
   fhirServer: string;
-  queryResponseStateCallback: SetStateCallback<UseCaseQueryResponse>;
+  queryResponseStateCallback: SetStateCallback<FhirQueryResponse>;
   setIsLoading: (isLoading: boolean) => void;
 }) {
   if (p.patientForQuery && p.selectedQuery) {
@@ -60,20 +60,8 @@ export async function fetchQueryResponse(p: {
       fhir_server: p.fhirServer,
       use_case: p.selectedQuery,
     };
-
-    // Need to also filter down by concepts to only display desired info
-    const filteredValueSets = p.queryValueSets
-      .filter((item) => item.includeValueSet)
-      .map((fvs) => {
-        const conceptFilteredVS: DibbsValueSet = {
-          ...fvs,
-          concepts: fvs.concepts.filter((c) => c.include),
-        };
-        return conceptFilteredVS;
-      });
-
     p.setIsLoading(true);
-    const queryResponse = await makeFhirQuery(newRequest, filteredValueSets, {
+    const queryResponse = await makeFhirQuery(newRequest, {
       Patient: [p.patientForQuery],
     });
 

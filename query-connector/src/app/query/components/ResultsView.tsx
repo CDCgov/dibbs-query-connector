@@ -1,4 +1,4 @@
-import { UseCaseQueryResponse } from "../../query-service";
+import { FhirQueryResponse } from "../../query-service";
 import ResultsViewSideNav, {
   NavSection,
 } from "./resultsView/ResultsViewSideNav";
@@ -18,7 +18,7 @@ import ImmunizationTable from "./resultsView/tableComponents/ImmunizationTable";
 import { CustomUserQuery } from "@/app/query-building";
 
 type ResultsViewProps = {
-  useCaseQueryResponse: UseCaseQueryResponse;
+  fhirQueryResponse: FhirQueryResponse;
   selectedQuery: CustomUserQuery;
   goBack: () => void;
   goToBeginning: () => void;
@@ -40,7 +40,7 @@ export type ResultsViewAccordionItem = {
  * @returns The QueryView component.
  */
 const ResultsView: React.FC<ResultsViewProps> = ({
-  useCaseQueryResponse,
+  fhirQueryResponse,
   selectedQuery,
   goBack,
   goToBeginning,
@@ -50,7 +50,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({
   }, []);
 
   const accordionItems =
-    mapQueryResponseToAccordionDataStructure(useCaseQueryResponse);
+    mapQueryResponseToAccordionDataStructure(fhirQueryResponse);
 
   const sideNavContent = accordionItems
     .map((item) => {
@@ -93,29 +93,29 @@ const ResultsView: React.FC<ResultsViewProps> = ({
 export default ResultsView;
 
 function mapQueryResponseToAccordionDataStructure(
-  useCaseQueryResponse: UseCaseQueryResponse,
+  resultsQueryResponse: FhirQueryResponse,
 ) {
   const patient =
-    useCaseQueryResponse.Patient && useCaseQueryResponse.Patient.length === 1
-      ? useCaseQueryResponse.Patient[0]
+    resultsQueryResponse.Patient && resultsQueryResponse.Patient.length === 1
+      ? resultsQueryResponse.Patient[0]
       : null;
-  const observations = useCaseQueryResponse.Observation
-    ? useCaseQueryResponse.Observation
+  const observations = resultsQueryResponse.Observation
+    ? resultsQueryResponse.Observation
     : null;
-  const encounters = useCaseQueryResponse.Encounter
-    ? useCaseQueryResponse.Encounter
+  const encounters = resultsQueryResponse.Encounter
+    ? resultsQueryResponse.Encounter
     : null;
-  const conditions = useCaseQueryResponse.Condition
-    ? useCaseQueryResponse.Condition
+  const conditions = resultsQueryResponse.Condition
+    ? resultsQueryResponse.Condition
     : null;
-  const diagnosticReports = useCaseQueryResponse.DiagnosticReport
-    ? useCaseQueryResponse.DiagnosticReport
+  const diagnosticReports = resultsQueryResponse.DiagnosticReport
+    ? resultsQueryResponse.DiagnosticReport
     : null;
-  const medicationRequests = useCaseQueryResponse.MedicationRequest
-    ? useCaseQueryResponse.MedicationRequest
+  const medicationRequests = resultsQueryResponse.MedicationRequest
+    ? resultsQueryResponse.MedicationRequest
     : null;
-  const immunizations = useCaseQueryResponse.Immunization
-    ? useCaseQueryResponse.Immunization
+  const immunizations = resultsQueryResponse.Immunization
+    ? resultsQueryResponse.Immunization
     : null;
 
   const accordionItems: ResultsViewAccordionItem[] = [

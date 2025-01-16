@@ -7,14 +7,14 @@ import {
   Button,
 } from "@trussworks/react-uswds";
 import { demoData, stateOptions, Mode } from "@/app/constants";
-import { UseCaseQueryResponse, makeFhirQuery } from "@/app/query-service";
+import { FhirQueryResponse, makeFhirQuery } from "@/app/query-service";
 import styles from "./searchForm/searchForm.module.scss";
 import { FormatPhoneAsDigits } from "@/app/format-service";
 import TitleBox from "./stepIndicator/TitleBox";
 
 interface SearchFormProps {
   setPatientDiscoveryQueryResponse: (
-    UseCaseQueryResponse: UseCaseQueryResponse,
+    UseCaseQueryResponse: FhirQueryResponse,
   ) => void;
   setMode: (mode: Mode) => void;
   setLoading: (loading: boolean) => void;
@@ -78,18 +78,15 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
     }
     setLoading(true);
 
-    const PURPOSEFUL_EMPTY_STRING = "";
     const originalRequest = {
       first_name: firstName,
       last_name: lastName,
       dob: dob,
       mrn: mrn,
       fhir_server: fhirServer,
-      // since our generic FHIR query method expects a named query in the DB
-      // to do the reach-out to the FHIR client, pass in a purposeful empty string
-      // since we just want the patient info
-      //TODO: refactor this to just use the patient query?
-      query_name: PURPOSEFUL_EMPTY_STRING,
+      // we just need the patient here and don't need to cross reference
+      // our DB
+      query_name: null,
       phone: FormatPhoneAsDigits(phone),
     };
     const queryResponse = await makeFhirQuery(originalRequest);
