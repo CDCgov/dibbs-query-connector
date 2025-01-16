@@ -5,7 +5,7 @@ import ResultsView from "./components/ResultsView";
 import PatientSearchResults from "./components/PatientSearchResults";
 import SearchForm from "./components/SearchForm";
 import SelectQuery from "./components/SelectQuery";
-import { DEFAULT_DEMO_FHIR_SERVER, Mode, USE_CASES } from "../constants";
+import { DEFAULT_DEMO_FHIR_SERVER, Mode } from "../constants";
 import LoadingView from "./components/LoadingView";
 import { ToastContainer } from "react-toastify";
 
@@ -16,14 +16,23 @@ import StepIndicator, {
 import SiteAlert from "./designSystem/SiteAlert";
 import { Patient } from "fhir/r4";
 import { getFhirServerNames } from "@/app/database-service";
+import { CustomUserQuery } from "../query-building";
 
+const blankUserQuery = {
+  query_id: "",
+  query_name: "",
+  conditions_list: [],
+  valuesets: [],
+};
 /**
  * Client side parent component for the query page. Based on the mode, it will display the search
  * form, the results of the query, or the multiple patients view.
  * @returns - The Query component.
  */
 const Query: React.FC = () => {
-  const [useCase, setUseCase] = useState<USE_CASES>("" as USE_CASES);
+  const [selectedQuery, setSelectedQuery] = useState<CustomUserQuery>(
+    structuredClone(blankUserQuery),
+  );
   const [mode, setMode] = useState<Mode>("search");
   const [loading, setLoading] = useState<boolean>(false);
   const [fhirServer, setFhirServer] = useState<string>(

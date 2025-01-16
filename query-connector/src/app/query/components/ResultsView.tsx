@@ -19,7 +19,7 @@ import ImmunizationTable from "./resultsView/tableComponents/ImmunizationTable";
 
 type ResultsViewProps = {
   useCaseQueryResponse: UseCaseQueryResponse;
-  selectedQuery: USE_CASES;
+  selectedQuery: CustomUserQuery;
   goBack: () => void;
   goToBeginning: () => void;
 };
@@ -75,7 +75,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({
       <h2 className="page-explainer margin-bottom-3-important margin-top-0-important">
         <strong>Query: </strong>
         <span className="text-normal display-inline-block">
-          {USE_CASE_DETAILS[selectedQuery].condition}
+          {selectedQuery.query_name}
         </span>
       </h2>
 

@@ -59,21 +59,15 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
   const [autofilled, setAutofilled] = useState(false); // boolean indicating if the form was autofilled, changes color if true
 
   // Fills fields with sample data based on the selected
-  const fillFields = useCallback(
-    (highlightAutofilled = true) => {
-      const data = demoData["cancer"];
-      if (data) {
-        setFirstName(data.FirstName);
-        setLastName(data.LastName);
-        setDOB(data.DOB);
-        setMRN(data.MRN);
-        setPhone(data.Phone);
-        setFhirServer(data.FhirServer as string);
-        setAutofilled(highlightAutofilled);
-      }
-    },
-    [setUseCase],
-  );
+  const fillFields = useCallback((highlightAutofilled = true) => {
+    setFirstName(hyperUnluckyPatient.FirstName);
+    setLastName(hyperUnluckyPatient.LastName);
+    setDOB(hyperUnluckyPatient.DOB);
+    setMRN(hyperUnluckyPatient.MRN);
+    setPhone(hyperUnluckyPatient.Phone);
+    setFhirServer(hyperUnluckyPatient.FhirServer as string);
+    setAutofilled(highlightAutofilled);
+  }, []);
 
   const nameRegex = "^[A-Za-z\u00C0-\u024F\u1E00-\u1EFF\\-'. ]+$";
   const nameRuleHint =
