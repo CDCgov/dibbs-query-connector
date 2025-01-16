@@ -17,7 +17,7 @@ import {
   MISSING_PATIENT_IDENTIFIERS,
 } from "../../../constants";
 
-import { handleRequestError } from "./error-handling-service";
+import { handleRequestError } from "../error-handling-service";
 import {
   getFhirServerNames,
   getSavedQueryByName,
