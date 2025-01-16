@@ -5,8 +5,8 @@ import {
   QueryResponse,
   createBundle,
   APIQueryResponse,
-} from "../../query-service";
-import { parsePatientDemographics } from "./parsing-service";
+} from "../../../query-service";
+import { parsePatientDemographics } from "./parsers";
 import {
   USE_CASES,
   USE_CASE_DETAILS,
@@ -15,7 +15,7 @@ import {
   RESPONSE_BODY_IS_NOT_PATIENT_RESOURCE,
   MISSING_API_QUERY_PARAM,
   MISSING_PATIENT_IDENTIFIERS,
-} from "../../constants";
+} from "../../../constants";
 
 import { handleRequestError } from "./error-handling-service";
 import {
