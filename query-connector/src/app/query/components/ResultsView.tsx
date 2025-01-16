@@ -1,4 +1,4 @@
-import { UseCaseQueryResponse } from "../../query-service";
+import { FhirQueryResponse } from "../../query-service";
 import ResultsViewSideNav, {
   NavSection,
 } from "./resultsView/ResultsViewSideNav";
@@ -12,14 +12,14 @@ import EncounterTable from "./resultsView/tableComponents/EncounterTable";
 import MedicationRequestTable from "./resultsView/tableComponents/MedicationRequestTable";
 import ObservationTable from "./resultsView/tableComponents/ObservationTable";
 import Backlink from "./backLink/Backlink";
-import { USE_CASES, USE_CASE_DETAILS } from "@/app/constants";
 import { RETURN_LABEL } from "@/app/query/components/stepIndicator/StepIndicator";
 import TitleBox from "./stepIndicator/TitleBox";
 import ImmunizationTable from "./resultsView/tableComponents/ImmunizationTable";
+import { CustomUserQuery } from "@/app/query-building";
 
 type ResultsViewProps = {
-  useCaseQueryResponse: UseCaseQueryResponse;
-  selectedQuery: USE_CASES;
+  fhirQueryResponse: FhirQueryResponse;
+  selectedQuery: CustomUserQuery;
   goBack: () => void;
   goToBeginning: () => void;
 };
@@ -33,14 +33,14 @@ export type ResultsViewAccordionItem = {
 /**
  * The QueryView component to render the query results.
  * @param props - The props for the QueryView component.
- * @param props.useCaseQueryResponse - The response from the query service.
+ * @param props.fhirQueryResponse - The response from the query service.
  * @param props.goBack - The function to go back to the previous page.
  * @param props.goToBeginning - Function to return to patient discover
  * @param props.selectedQuery - query that's been selected to view for results
  * @returns The QueryView component.
  */
 const ResultsView: React.FC<ResultsViewProps> = ({
-  useCaseQueryResponse,
+  fhirQueryResponse,
   selectedQuery,
   goBack,
   goToBeginning,
@@ -50,7 +50,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({
   }, []);
 
   const accordionItems =
-    mapQueryResponseToAccordionDataStructure(useCaseQueryResponse);
+    mapQueryResponseToAccordionDataStructure(fhirQueryResponse);
 
   const sideNavContent = accordionItems
     .map((item) => {
@@ -75,7 +75,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({
       <h2 className="page-explainer margin-bottom-3-important margin-top-0-important">
         <strong>Query: </strong>
         <span className="text-normal display-inline-block">
-          {USE_CASE_DETAILS[selectedQuery].condition}
+          {selectedQuery.query_name}
         </span>
       </h2>
 
@@ -93,29 +93,29 @@ const ResultsView: React.FC<ResultsViewProps> = ({
 export default ResultsView;
 
 function mapQueryResponseToAccordionDataStructure(
-  useCaseQueryResponse: UseCaseQueryResponse,
+  resultsQueryResponse: FhirQueryResponse,
 ) {
   const patient =
-    useCaseQueryResponse.Patient && useCaseQueryResponse.Patient.length === 1
-      ? useCaseQueryResponse.Patient[0]
+    resultsQueryResponse.Patient && resultsQueryResponse.Patient.length === 1
+      ? resultsQueryResponse.Patient[0]
       : null;
-  const observations = useCaseQueryResponse.Observation
-    ? useCaseQueryResponse.Observation
+  const observations = resultsQueryResponse.Observation
+    ? resultsQueryResponse.Observation
     : null;
-  const encounters = useCaseQueryResponse.Encounter
-    ? useCaseQueryResponse.Encounter
+  const encounters = resultsQueryResponse.Encounter
+    ? resultsQueryResponse.Encounter
     : null;
-  const conditions = useCaseQueryResponse.Condition
-    ? useCaseQueryResponse.Condition
+  const conditions = resultsQueryResponse.Condition
+    ? resultsQueryResponse.Condition
     : null;
-  const diagnosticReports = useCaseQueryResponse.DiagnosticReport
-    ? useCaseQueryResponse.DiagnosticReport
+  const diagnosticReports = resultsQueryResponse.DiagnosticReport
+    ? resultsQueryResponse.DiagnosticReport
     : null;
-  const medicationRequests = useCaseQueryResponse.MedicationRequest
-    ? useCaseQueryResponse.MedicationRequest
+  const medicationRequests = resultsQueryResponse.MedicationRequest
+    ? resultsQueryResponse.MedicationRequest
     : null;
-  const immunizations = useCaseQueryResponse.Immunization
-    ? useCaseQueryResponse.Immunization
+  const immunizations = resultsQueryResponse.Immunization
+    ? resultsQueryResponse.Immunization
     : null;
 
   const accordionItems: ResultsViewAccordionItem[] = [

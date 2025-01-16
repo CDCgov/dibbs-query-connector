@@ -1,14 +1,13 @@
 import { NextResponse, NextRequest } from "next/server";
 import {
-  UseCaseQuery,
-  UseCaseQueryRequest,
+  makeFhirQuery,
+  QueryRequest,
   QueryResponse,
   createBundle,
   APIQueryResponse,
 } from "../../query-service";
 import { parsePatientDemographics } from "./parsing-service";
 import {
-  USE_CASES,
   USE_CASE_DETAILS,
   INVALID_FHIR_SERVERS,
   INVALID_USE_CASE,
@@ -18,11 +17,7 @@ import {
 } from "../../constants";
 
 import { handleRequestError } from "./error-handling-service";
-import {
-  getFhirServerNames,
-  getSavedQueryByName,
-} from "@/app/database-service";
-import { unnestValueSetsFromQuery } from "@/app/utils";
+import { getFhirServerNames } from "@/app/database-service";
 
 /**
  * Health check for TEFCA Viewer
@@ -89,14 +84,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(OperationOutcome);
   }
 
-  // Lookup default parameters for particular use-case search
-  const queryName = USE_CASE_DETAILS[use_case as USE_CASES].queryName;
-  const queryResults = await getSavedQueryByName(queryName);
-  const valueSets = unnestValueSetsFromQuery(queryResults);
-
-  // Add params & patient identifiers to UseCaseRequest
-  const UseCaseRequest: UseCaseQueryRequest = {
-    use_case: use_case as USE_CASES,
+  // Add params & patient identifiers to QueryName
+  const QueryRequest: QueryRequest = {
+    query_name: use_case,
     fhir_server: fhir_server,
     ...(PatientIdentifiers.first_name && {
       first_name: PatientIdentifiers.first_name,
@@ -109,13 +99,10 @@ export async function POST(request: NextRequest) {
     ...(PatientIdentifiers.phone && { phone: PatientIdentifiers.phone }),
   };
 
-  const UseCaseQueryResponse: QueryResponse = await UseCaseQuery(
-    UseCaseRequest,
-    valueSets,
-  );
+  const QueryResponse: QueryResponse = await makeFhirQuery(QueryRequest);
 
   // Bundle data
-  const bundle: APIQueryResponse = await createBundle(UseCaseQueryResponse);
+  const bundle: APIQueryResponse = await createBundle(QueryResponse);
 
   return NextResponse.json(bundle);
 }

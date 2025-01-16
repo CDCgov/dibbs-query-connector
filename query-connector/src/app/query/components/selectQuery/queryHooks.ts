@@ -1,7 +1,7 @@
-import { USE_CASES, DibbsValueSet, hyperUnluckyPatient } from "@/app/constants";
+import { hyperUnluckyPatient } from "@/app/constants";
 import { getSavedQueryByName } from "@/app/database-service";
 import { unnestValueSetsFromQuery } from "@/app/utils";
-import { UseCaseQuery, UseCaseQueryResponse } from "@/app/query-service";
+import { makeFhirQuery, FhirQueryResponse } from "@/app/query-service";
 import { Patient } from "fhir/r4";
 
 type SetStateCallback<T> = React.Dispatch<React.SetStateAction<T>>;
@@ -21,20 +21,20 @@ export async function fetchUseCaseValueSets(queryName: string) {
 /**
  * Query to apply for future view
  * @param p - object param for readability
+ * @param p.queryName - name of the custom user query that we want to fetch
  * @param p.patientForQuery - patient to do query against
  * @param p.selectedQuery - query use case
- * @param p.queryValueSets - valuesets to filter query from default usecase
  * @param p.queryResponseStateCallback - callback function to update state of the
  * query response
  * @param p.fhirServer - fhir server to do the querying against
  * @param p.setIsLoading - callback to update loading state
  */
 export async function fetchQueryResponse(p: {
+  queryName: string;
   patientForQuery: Patient | undefined;
-  selectedQuery: USE_CASES;
-  queryValueSets: DibbsValueSet[];
+  selectedQuery: string;
   fhirServer: string;
-  queryResponseStateCallback: SetStateCallback<UseCaseQueryResponse>;
+  queryResponseStateCallback: SetStateCallback<FhirQueryResponse>;
   setIsLoading: (isLoading: boolean) => void;
 }) {
   if (p.patientForQuery && p.selectedQuery) {
@@ -50,6 +50,7 @@ export async function fetchQueryResponse(p: {
       hyperUnluckyPatient.MRN;
 
     const newRequest = {
+      query_name: p.queryName,
       first_name: patientFirstName as string,
       last_name: patientLastName as string,
       dob: p.patientForQuery.birthDate as string,
@@ -57,20 +58,8 @@ export async function fetchQueryResponse(p: {
       fhir_server: p.fhirServer,
       use_case: p.selectedQuery,
     };
-
-    // Need to also filter down by concepts to only display desired info
-    const filteredValueSets = p.queryValueSets
-      .filter((item) => item.includeValueSet)
-      .map((fvs) => {
-        const conceptFilteredVS: DibbsValueSet = {
-          ...fvs,
-          concepts: fvs.concepts.filter((c) => c.include),
-        };
-        return conceptFilteredVS;
-      });
-
     p.setIsLoading(true);
-    const queryResponse = await UseCaseQuery(newRequest, filteredValueSets, {
+    const queryResponse = await makeFhirQuery(newRequest, {
       Patient: [p.patientForQuery],
     });
     p.queryResponseStateCallback(queryResponse);
