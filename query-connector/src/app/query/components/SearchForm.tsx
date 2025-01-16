@@ -6,12 +6,7 @@ import {
   Select,
   Button,
 } from "@trussworks/react-uswds";
-import {
-  demoData,
-  stateOptions,
-  Mode,
-  hyperUnluckyPatient,
-} from "@/app/constants";
+import { stateOptions, Mode, hyperUnluckyPatient } from "@/app/constants";
 import {
   FhirQueryResponse,
   QueryRequest,
