@@ -54,6 +54,10 @@ export class CustomQuery {
       basePath: "",
       params: {} as { [paramName: string]: string },
     },
+    immunization: {
+      basePath: "",
+      params: {} as { [paramName: string]: string },
+    },
   };
 
   // Some queries need to be batched in waves because their encounter references
@@ -121,6 +125,12 @@ export class CustomQuery {
       params: {
         subject: `Patient/${patientId}`,
         category: "social-history",
+      },
+    };
+    this.fhirResourceQueries["immunization"] = {
+      basePath: `/Immunization/_search`,
+      params: {
+        subject: `Patient/${patientId}`,
       },
     };
 
@@ -231,6 +241,8 @@ export class CustomQuery {
         return this.fhirResourceQueries["encounter"];
       case "encounterClass":
         return this.fhirResourceQueries["encounterClass"];
+      case "immunization":
+        return this.fhirResourceQueries["immunization"];
       default:
         return { basePath: "", params: {} };
     }
