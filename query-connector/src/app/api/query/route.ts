@@ -18,11 +18,7 @@ import {
 } from "../../constants";
 
 import { handleRequestError } from "./error-handling-service";
-import {
-  getFhirServerNames,
-  getSavedQueryByName,
-} from "@/app/database-service";
-import { unnestValueSetsFromQuery } from "@/app/utils";
+import { getFhirServerNames } from "@/app/database-service";
 
 /**
  * Health check for TEFCA Viewer
@@ -88,11 +84,6 @@ export async function POST(request: NextRequest) {
     const OperationOutcome = await handleRequestError(INVALID_FHIR_SERVERS);
     return NextResponse.json(OperationOutcome);
   }
-
-  // Lookup default parameters for particular use-case search
-  const queryName = USE_CASE_DETAILS[use_case as USE_CASES].queryName;
-  const queryResults = await getSavedQueryByName(queryName);
-  const valueSets = unnestValueSetsFromQuery(queryResults);
 
   // Add params & patient identifiers to QueryName
   const QueryRequest: QueryRequest = {

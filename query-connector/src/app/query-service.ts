@@ -1,7 +1,7 @@
 "use server";
 import fetch from "node-fetch";
 import https from "https";
-import { Bundle, DomainResource, Patient } from "fhir/r4";
+import { Bundle, DomainResource } from "fhir/r4";
 
 import FHIRClient from "./fhir-servers";
 import { isFhirResource, FhirResource } from "./constants";
@@ -71,13 +71,13 @@ async function queryEncounters(
  * a patient is found, store in the queryResponse object.
  * @param request - The request object containing the patient demographics.
  * @param fhirClient - The client to query the FHIR server.
- * @param queryResponse - The response object to store the patient.
+ * @param runningQueryResponse - The response object to store the patient.
  * @returns - The response body from the FHIR server.
  */
 async function patientQuery(
   request: QueryRequest,
   fhirClient: FHIRClient,
-  queryResponse: QueryResponse,
+  runningQueryResponse: QueryResponse,
 ): Promise<QueryResponse> {
   // Query for patient
   let query = "/Patient?";
@@ -91,6 +91,8 @@ async function patientQuery(
     query += `birthdate=${request.dob}&`;
   }
   if (request.mrn) {
+    // ? Does this need another filter in order to match on MRN? Trying to
+    // ? look for Hyper Unlucky for this doesn't get a match on public HAPI
     query += `identifier=${request.mrn}&`;
   }
   if (request.phone) {
@@ -110,17 +112,18 @@ async function patientQuery(
     }
   }
 
-  const response = await fhirClient.get(query);
+  const fhirResponse = await fhirClient.get(query);
 
   // Check for errors
-  if (response.status !== 200) {
+  if (fhirResponse.status !== 200) {
     console.error(
-      `Patient search failed. Status: ${response.status} \n Body: ${
-        response.text
-      } \n Headers: ${JSON.stringify(response.headers.raw())}`,
+      `Patient search failed. Status: ${fhirResponse.status} \n Body: ${
+        fhirResponse.text
+      } \n Headers: ${JSON.stringify(fhirResponse.headers.raw())}`,
     );
   }
-  const newResponse = await parseFhirSearch(response, queryResponse);
+  const newResponse = await parseFhirSearch(fhirResponse, runningQueryResponse);
+  console.log("patient query: ", newResponse);
   return newResponse;
 }
 

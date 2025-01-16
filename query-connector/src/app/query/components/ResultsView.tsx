@@ -33,7 +33,7 @@ export type ResultsViewAccordionItem = {
 /**
  * The QueryView component to render the query results.
  * @param props - The props for the QueryView component.
- * @param props.useCaseQueryResponse - The response from the query service.
+ * @param props.fhirQueryResponse - The response from the query service.
  * @param props.goBack - The function to go back to the previous page.
  * @param props.goToBeginning - Function to return to patient discover
  * @param props.selectedQuery - query that's been selected to view for results

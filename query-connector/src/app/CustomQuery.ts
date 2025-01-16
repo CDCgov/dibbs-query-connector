@@ -118,8 +118,8 @@ export class CustomQuery {
     const conditionsFilter = this.conditionCodes.join(",");
     const classTypeFilter = this.classTypeCodes.join(",");
 
-    // do all users want to see social history? We default to yes, but might
-    // want to toggle similar to what we might do for immunization
+    // ? do all users want to see social history? We default to yes, but might
+    // ? want to toggle similar to what we might do for immunization
     this.fhirResourceQueries["socialHistory"] = {
       basePath: `/Observation/_search`,
       params: {
@@ -135,67 +135,69 @@ export class CustomQuery {
       },
     };
 
-    // if (labsFilter !== "") {
-    //   this.fhirResourceQueries["observation"] = {
-    //     basePath: `/Observation/_search`,
-    //     params: {
-    //       subject: `Patient/${patientId}`,
-    //       code: labsFilter,
-    //     },
-    //   };
+    // ? Doing these in sequence gives us 429's Too Many Requests :(. Might need
+    // ? to be smarter or introduce some sort of sleep
+    if (labsFilter !== "") {
+      this.fhirResourceQueries["observation"] = {
+        basePath: `/Observation/_search`,
+        params: {
+          subject: `Patient/${patientId}`,
+          code: labsFilter,
+        },
+      };
 
-    //   this.fhirResourceQueries["diagnosticReport"] = {
-    //     basePath: `/DiagnosticReport/_search`,
-    //     params: {
-    //       subject: `Patient/${patientId}`,
-    //       code: labsFilter,
-    //     },
-    //   };
-    // }
+      this.fhirResourceQueries["diagnosticReport"] = {
+        basePath: `/DiagnosticReport/_search`,
+        params: {
+          subject: `Patient/${patientId}`,
+          code: labsFilter,
+        },
+      };
+    }
 
-    // if (conditionsFilter !== "") {
-    //   this.fhirResourceQueries["encounter"] = {
-    //     basePath: `/Encounter/_search`,
-    //     params: {
-    //       subject: `Patient/${patientId}`,
-    //       "reason-code": conditionsFilter,
-    //     },
-    //   };
-    //   this.fhirResourceQueries["condition"] = {
-    //     basePath: `/Condition/_search`,
-    //     params: {
-    //       subject: `Patient/${patientId}`,
-    //       code: conditionsFilter,
-    //     },
-    //   };
-    // }
+    if (conditionsFilter !== "") {
+      this.fhirResourceQueries["encounter"] = {
+        basePath: `/Encounter/_search`,
+        params: {
+          subject: `Patient/${patientId}`,
+          "reason-code": conditionsFilter,
+        },
+      };
+      this.fhirResourceQueries["condition"] = {
+        basePath: `/Condition/_search`,
+        params: {
+          subject: `Patient/${patientId}`,
+          code: conditionsFilter,
+        },
+      };
+    }
 
-    // if (medicationsFilter !== "") {
-    //   // Medications are floating representations of drugs. Sometimes we need the extra
-    //   // info from the medication to display in the UI: that's what the ":medication" is doing
-    //   // and similarly for revinclude for the request <> admin relationship
+    if (medicationsFilter !== "") {
+      // Medications are floating representations of drugs. Sometimes we need the extra
+      // info from the medication to display in the UI: that's what the ":medication" is doing
+      // and similarly for revinclude for the request <> admin relationship
 
-    //   this.fhirResourceQueries["medicationRequest"] = {
-    //     basePath: `/MedicationRequest/_search`,
-    //     params: {
-    //       subject: `Patient/${patientId}`,
-    //       code: medicationsFilter,
-    //       _include: "MedicationRequest:medication",
-    //       _revinclude: "MedicationAdministration:request",
-    //     },
-    //   };
-    // }
+      this.fhirResourceQueries["medicationRequest"] = {
+        basePath: `/MedicationRequest/_search`,
+        params: {
+          subject: `Patient/${patientId}`,
+          code: medicationsFilter,
+          _include: "MedicationRequest:medication",
+          _revinclude: "MedicationAdministration:request",
+        },
+      };
+    }
 
-    // // Marcelle will do separate digging into how encounter interacts with classType
-    // if (classTypeFilter !== "") {
-    //   this.fhirResourceQueries["encounterClass"] = {
-    //     basePath: `/Encounter/_search`,
-    //     params: {
-    //       subject: `Patient/${patientId}`,
-    //       class: classTypeFilter,
-    //     },
-    //   };
-    // }
+    // ? Marcelle will do separate digging into how encounter interacts with classType
+    if (classTypeFilter !== "") {
+      this.fhirResourceQueries["encounterClass"] = {
+        basePath: `/Encounter/_search`,
+        params: {
+          subject: `Patient/${patientId}`,
+          class: classTypeFilter,
+        },
+      };
+    }
   }
 
   compilePostRequest(resource: {
