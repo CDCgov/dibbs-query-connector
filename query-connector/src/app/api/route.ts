@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+
 /**
  * Health check for TEFCA Viewer
  * @returns Response with status OK.
