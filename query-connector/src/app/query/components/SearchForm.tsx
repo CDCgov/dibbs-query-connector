@@ -6,8 +6,17 @@ import {
   Select,
   Button,
 } from "@trussworks/react-uswds";
-import { demoData, stateOptions, Mode } from "@/app/constants";
-import { FhirQueryResponse, makeFhirQuery } from "@/app/query-service";
+import {
+  demoData,
+  stateOptions,
+  Mode,
+  hyperUnluckyPatient,
+} from "@/app/constants";
+import {
+  FhirQueryResponse,
+  QueryRequest,
+  makeFhirQuery,
+} from "@/app/query-service";
 import styles from "./searchForm/searchForm.module.scss";
 import { FormatPhoneAsDigits } from "@/app/format-service";
 import TitleBox from "./stepIndicator/TitleBox";
@@ -54,16 +63,13 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
 
   // Fills fields with sample data based on the selected
   const fillFields = useCallback((highlightAutofilled = true) => {
-    const data = demoData["cancer"];
-    if (data) {
-      setFirstName(data.FirstName);
-      setLastName(data.LastName);
-      setDOB(data.DOB);
-      setMRN(data.MRN);
-      setPhone(data.Phone);
-      setFhirServer(data.FhirServer as string);
-      setAutofilled(highlightAutofilled);
-    }
+    setFirstName(hyperUnluckyPatient.FirstName);
+    setLastName(hyperUnluckyPatient.LastName);
+    setDOB(hyperUnluckyPatient.DOB);
+    setMRN(hyperUnluckyPatient.MRN);
+    setPhone(hyperUnluckyPatient.Phone);
+    setFhirServer(hyperUnluckyPatient.FhirServer as string);
+    setAutofilled(highlightAutofilled);
   }, []);
 
   const nameRegex = "^[A-Za-z\u00C0-\u024F\u1E00-\u1EFF\\-'. ]+$";
@@ -78,15 +84,18 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
     }
     setLoading(true);
 
-    const originalRequest = {
+    const originalRequest: QueryRequest = {
       first_name: firstName,
       last_name: lastName,
       dob: dob,
       mrn: mrn,
       fhir_server: fhirServer,
       // we just need the patient here and don't need to cross reference
-      // our DB
+      // our DB.
+      // ? maybe refactor to split out our generic FHIR query into more
+      // ? resource-based methods?
       query_name: null,
+      just_return_patient: true,
       phone: FormatPhoneAsDigits(phone),
     };
     const queryResponse = await makeFhirQuery(originalRequest);

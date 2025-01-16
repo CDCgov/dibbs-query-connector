@@ -23,8 +23,7 @@ export class CustomQuery {
   conditionCodes: string[] = [];
   classTypeCodes: string[] = [];
 
-  // Need default initialization of query strings outside constructor,
-  // since the `try` means we might not find the JSON spec
+  // initialize the query struct
   fhirResourceQueries = {
     observation: {
       basePath: "",

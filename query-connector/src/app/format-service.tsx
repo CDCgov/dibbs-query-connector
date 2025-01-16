@@ -269,7 +269,8 @@ export async function GetPhoneQueryFormats(phone: string) {
  * @returns A structured specification of a query that can be executed.
  */
 export const formatValueSetsAsQuerySpec = (queryData: QueryDataColumn) => {
-  // should we handle this initialization in a smarter way?
+  // ? How should we handle followup encounter queries now that we aren't
+  // ? hardcoding the conditions?
   let secondEncounter: boolean = true;
   // if (["cancer", "chlamydia", "gonorrhea", "syphilis"].includes(useCase)) {
   //   secondEncounter = true;
@@ -277,7 +278,8 @@ export const formatValueSetsAsQuerySpec = (queryData: QueryDataColumn) => {
 
   const spec: CustomQuerySpec = {
     queryData: queryData,
-    // does this need to get initalized differently?
+    // ? To determine how to better initialize this based on Marcelle's digging
+    // ? on class codes
     classTypeCodes: [] as string[],
     hasSecondEncounterQuery: secondEncounter,
   };

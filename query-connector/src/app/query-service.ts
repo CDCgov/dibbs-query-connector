@@ -29,6 +29,7 @@ export type APIQueryResponse = Bundle;
 
 export type QueryRequest = {
   query_name: string | null;
+  just_return_patient?: boolean;
   fhir_server: string;
   first_name?: string;
   last_name?: string;
@@ -93,7 +94,7 @@ async function patientQuery(
   if (request.mrn) {
     // ? Does this need another filter in order to match on MRN? Trying to
     // ? look for Hyper Unlucky for this doesn't get a match on public HAPI
-    query += `identifier=${request.mrn}&`;
+    query += `identifier=MRN|${request.mrn}&`;
   }
   if (request.phone) {
     // We might have multiple phone numbers if we're coming from the API
@@ -123,7 +124,6 @@ async function patientQuery(
     );
   }
   const newResponse = await parseFhirSearch(fhirResponse, runningQueryResponse);
-  console.log("patient query: ", newResponse);
   return newResponse;
 }
 
@@ -147,7 +147,7 @@ export async function makeFhirQuery(
   }
 
   // indication that we only want the patient result from the FHIR query
-  if (request.query_name === null) {
+  if (request.query_name === null || request.just_return_patient) {
     return queryResponse;
   }
 
@@ -194,12 +194,13 @@ async function postFhirQuery(
   const builtQuery = new CustomQuery(querySpec, patientId);
   let response: fetch.Response | fetch.Response[];
 
-  // Should we still individually handle newborn screening?
+  // ? Should we still individually handle individual use cases here somehow?
   // if (useCase === "newborn-screening") {
   // response = await fhirClient.get(builtQuery.getQuery("observation"));
   // }
   // if (useCase === "immunization") {
-  // response = await fhirClient.get(builtQuery.getQuery("observation"));
+  //   const { basePath, params } = builtQuery.getQuery("immunization");
+  //   response = await fhirClient.get([basePath, params].join(","));
   // }
 
   const postPromises = builtQuery.compileAllPostRequests().map((req) => {

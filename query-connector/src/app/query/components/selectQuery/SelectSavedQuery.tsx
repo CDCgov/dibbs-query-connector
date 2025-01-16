@@ -80,7 +80,6 @@ const SelectSavedQuery: React.FC<SelectSavedQueryProps> = ({
     if (selectedQuery[0]) {
       setSelectedQuery(selectedQuery[0]);
     } else {
-      // TODO: error handle this better
       showToastConfirmation({
         body: "Please try again, or contact us if the error persists",
         heading: "Something went wrong",
