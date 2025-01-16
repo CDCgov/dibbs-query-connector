@@ -61,7 +61,9 @@ const SelectSavedQuery: React.FC<SelectSavedQueryProps> = ({
     const fetchQueries = async () => {
       try {
         const queries = await getCustomQueries();
-
+        queries.forEach((q) => {
+          console.log(q.query_id);
+        });
         setQueryOptions(queries);
       } catch (error) {
         console.error("Failed to fetch queries:", error);
