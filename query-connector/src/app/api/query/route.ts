@@ -8,7 +8,6 @@ import {
 } from "../../query-service";
 import { parsePatientDemographics } from "./parsing-service";
 import {
-  USE_CASES,
   USE_CASE_DETAILS,
   INVALID_FHIR_SERVERS,
   INVALID_USE_CASE,

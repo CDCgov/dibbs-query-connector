@@ -3,7 +3,6 @@ import { GET, POST } from "../../api/query/route";
 import { readJsonFile } from "../shared_utils/readJsonFile";
 import {
   INVALID_FHIR_SERVERS,
-  INVALID_USE_CASE,
   MISSING_API_QUERY_PARAM,
   MISSING_PATIENT_IDENTIFIERS,
   RESPONSE_BODY_IS_NOT_PATIENT_RESOURCE,
