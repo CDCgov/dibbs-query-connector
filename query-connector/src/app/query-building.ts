@@ -1,19 +1,15 @@
 import { randomUUID } from "crypto";
-import { ValueSet } from "./constants";
+import { DibbsValueSet } from "./constants";
+import { DEFAULT_TIME_WINDOW } from "./utils";
 
 // TODO: Potentially merge this / infer this from the type created via the
 // database creation workstream
 export type QueryInput = {
   queryName: string;
   author: string;
-  valueSets: ValueSet[];
+  valueSets: DibbsValueSet[];
   timeWindowUnit?: string; // TODO: should probably type this more strongly
   timeWindowNumber?: Number;
-};
-
-const DEFAULT_TIME_WINDOW = {
-  timeWindowNumber: 1,
-  timeWindowUnit: "day",
 };
 
 /**
@@ -46,6 +42,6 @@ export function generateQueryInsertionSql(input: QueryInput) {
 export interface CustomUserQuery {
   query_id: string;
   query_name: string;
-  conditions_list?: string;
-  valuesets: ValueSet[];
+  conditions_list?: string[];
+  valuesets: DibbsValueSet[];
 }

@@ -1,12 +1,12 @@
 "use server";
 import fetch from "node-fetch";
+import https from "https";
 import { Bundle, DomainResource } from "fhir/r4";
 
 import FHIRClient from "./fhir-servers";
 import {
   USE_CASES,
-  FHIR_SERVERS,
-  ValueSet,
+  DibbsValueSet,
   isFhirResource,
   FhirResource,
 } from "./constants";
@@ -33,7 +33,7 @@ export type APIQueryResponse = Bundle;
 
 export type UseCaseQueryRequest = {
   use_case: USE_CASES;
-  fhir_server: FHIR_SERVERS;
+  fhir_server: string;
   first_name?: string;
   last_name?: string;
   dob?: string;
@@ -148,7 +148,7 @@ async function patientQuery(
  */
 export async function UseCaseQuery(
   request: UseCaseQueryRequest,
-  queryValueSets: ValueSet[],
+  queryValueSets: DibbsValueSet[],
   queryResponse: QueryResponse = {},
 ): Promise<QueryResponse> {
   const fhirServerConfigs = await getFhirServerConfigs();
@@ -190,7 +190,7 @@ export async function UseCaseQuery(
  */
 async function generalizedQuery(
   useCase: USE_CASES,
-  queryValueSets: ValueSet[],
+  queryValueSets: DibbsValueSet[],
   patientId: string,
   fhirClient: FHIRClient,
   queryResponse: QueryResponse,
@@ -199,11 +199,11 @@ async function generalizedQuery(
   const builtQuery = new CustomQuery(querySpec, patientId);
   let response: fetch.Response | fetch.Response[];
 
-  // Special cases for plain SDH or newborn screening, which just use one query
-  if (useCase === "social-determinants") {
-    response = await fhirClient.get(builtQuery.getQuery("social"));
-  } else if (useCase === "newborn-screening") {
+  // Special cases for newborn screening, which just use one query
+  if (useCase === "newborn-screening") {
     response = await fhirClient.get(builtQuery.getQuery("observation"));
+  } else if (useCase === "immunization") {
+    response = await fhirClient.get(builtQuery.getQuery("immunization"));
   } else {
     const queryRequests: string[] = builtQuery.getAllQueries();
     response = await fhirClient.getBatch(queryRequests);
@@ -302,4 +302,127 @@ export async function createBundle(
   });
 
   return bundle;
+}
+
+/**
+ * Tests a connection to a FHIR server from the backend to avoid CORS issues
+ * @param url - The URL of the FHIR server to test
+ * @param bearerToken - Optional bearer token for authentication
+ * @returns Object indicating success/failure and any error messages
+ */
+export async function testFhirServerConnection(
+  url: string,
+  bearerToken?: string,
+) {
+  try {
+    const baseUrl = url.replace(/\/$/, "");
+    const searchParams = new URLSearchParams({
+      given: "Hyper",
+      family: "Unlucky",
+      birthdate: "1975-12-06",
+      identifier: "8692756",
+    });
+    const patientSearchUrl = `${baseUrl}/Patient?${searchParams.toString()}`;
+
+    const headers: HeadersInit = {
+      Accept: "application/fhir+json",
+    };
+
+    if (bearerToken) {
+      headers.Authorization = `Bearer ${bearerToken}`;
+    }
+
+    const httpsAgent = new https.Agent({
+      rejectUnauthorized: false,
+    });
+
+    try {
+      const response = await fetch(patientSearchUrl, {
+        method: "GET",
+        headers,
+        // @ts-ignore - Node's fetch types don't include agent, but it works
+        agent: httpsAgent,
+      });
+
+      const responseText = await response.text(); // Get raw response text
+
+      if (response.ok) {
+        try {
+          const data = JSON.parse(responseText);
+
+          if (data.resourceType === "Bundle" && data.type === "searchset") {
+            return { success: true };
+          } else {
+            console.log(
+              "Invalid response structure. Expected Bundle/searchset, got:",
+              {
+                resourceType: data.resourceType,
+                type: data.type,
+              },
+            );
+            return {
+              success: false,
+              error:
+                "Invalid FHIR server response: Server did not return a valid search Bundle",
+            };
+          }
+        } catch (parseError) {
+          console.error("Error parsing JSON response:", parseError);
+          return {
+            success: false,
+            error: "Failed to parse server response as JSON",
+          };
+        }
+      } else {
+        let errorMessage: string;
+        switch (response.status) {
+          case 401:
+            errorMessage =
+              "Connection failed: Authentication required. Please check your credentials.";
+            break;
+          case 403:
+            errorMessage =
+              "Connection failed: Access forbidden. You do not have permission to access this FHIR server.";
+            break;
+          case 404:
+            errorMessage =
+              "Connection failed: The FHIR server endpoint was not found. Please verify the URL.";
+            break;
+          case 408:
+            errorMessage =
+              "Connection failed: The request timed out. The FHIR server took too long to respond.";
+            break;
+          case 500:
+            errorMessage =
+              "Connection failed: Internal server error. The FHIR server encountered an unexpected condition.";
+            break;
+          case 502:
+            errorMessage =
+              "Connection failed: Bad gateway. The FHIR server received an invalid response from upstream.";
+            break;
+          case 503:
+            errorMessage =
+              "Connection failed: The FHIR server is temporarily unavailable or under maintenance.";
+            break;
+          case 504:
+            errorMessage =
+              "Connection failed: Gateway timeout. The upstream server did not respond in time.";
+            break;
+          default:
+            errorMessage = `Connection failed: The FHIR server returned an error. (${response.status} ${response.statusText})`;
+        }
+        return { success: false, error: errorMessage };
+      }
+    } catch (fetchError) {
+      console.error("Fetch error:", fetchError);
+      throw fetchError; // Re-throw to be caught by outer try-catch
+    }
+  } catch (error) {
+    console.error("Overall error in testFhirServerConnection:", error);
+    return {
+      success: false,
+      error:
+        "Connection failed: Unable to reach the FHIR server. Please check if the URL is correct and the server is accessible.",
+    };
+  }
 }

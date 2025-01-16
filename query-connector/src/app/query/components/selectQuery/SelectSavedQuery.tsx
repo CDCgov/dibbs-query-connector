@@ -1,27 +1,21 @@
-import {
-  FHIR_SERVERS,
-  FhirServers,
-  USE_CASES,
-  demoQueryOptions,
-} from "@/app/constants";
+import { USE_CASES, USE_CASE_DETAILS } from "@/app/constants";
 import { Select, Button } from "@trussworks/react-uswds";
 import Backlink from "../backLink/Backlink";
 import styles from "./selectQuery.module.scss";
-import { useState } from "react";
-import {
-  PAGE_TITLES,
-  RETURN_LABEL,
-} from "@/app/query/components/stepIndicator/StepIndicator";
+import { useEffect, useState } from "react";
+import { RETURN_LABEL } from "@/app/query/components/stepIndicator/StepIndicator";
+import TitleBox from "../stepIndicator/TitleBox";
+import { getFhirServerNames } from "@/app/database-service";
 
 type SelectSavedQueryProps = {
   selectedQuery: string;
-  fhirServer: FHIR_SERVERS;
+  fhirServer: string;
   loadingQueryValueSets: boolean;
   goBack: () => void;
   setSelectedQuery: (selectedQuery: USE_CASES) => void;
   setShowCustomizedQuery: (showCustomize: boolean) => void;
   handleSubmit: () => void;
-  setFhirServer: React.Dispatch<React.SetStateAction<FHIR_SERVERS>>;
+  setFhirServer: React.Dispatch<React.SetStateAction<string>>;
 };
 
 /**
@@ -51,13 +45,20 @@ const SelectSavedQuery: React.FC<SelectSavedQueryProps> = ({
   setFhirServer,
 }) => {
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [fhirServers, setFhirServers] = useState<string[]>([]);
+
+  useEffect(() => {
+    getFhirServerNames().then((servers) => {
+      setFhirServers(servers);
+    });
+  }, []);
 
   return (
     <form>
       {/* Back button */}
 
       <Backlink onClick={goBack} label={RETURN_LABEL["select-query"]} />
-      <h1 className="page-title">{PAGE_TITLES["select-query"]}</h1>
+      <TitleBox step="select-query" />
       <h2 className="page-explainer">
         We will pull relevant data for your selected patient and query.
       </h2>
@@ -75,9 +76,9 @@ const SelectSavedQuery: React.FC<SelectSavedQueryProps> = ({
           <option value="" disabled>
             Select query
           </option>
-          {demoQueryOptions.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
+          {Object.entries(USE_CASE_DETAILS).map(([useCase, useCaseDetails]) => (
+            <option key={useCase} value={useCase}>
+              {useCaseDetails.queryName}
             </option>
           ))}
         </Select>
@@ -102,12 +103,12 @@ const SelectSavedQuery: React.FC<SelectSavedQueryProps> = ({
             id="fhir_server"
             name="fhir_server"
             value={fhirServer}
-            onChange={(e) => setFhirServer(e.target.value as FHIR_SERVERS)}
+            onChange={(e) => setFhirServer(e.target.value as string)}
             required
             className={`${styles.queryDropDown}`}
           >
             Select HCO
-            {FhirServers.map((fhirServer: string) => (
+            {fhirServers.map((fhirServer: string) => (
               <option key={fhirServer} value={fhirServer}>
                 {fhirServer}
               </option>

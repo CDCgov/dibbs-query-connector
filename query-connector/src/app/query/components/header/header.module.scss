@@ -45,7 +45,7 @@
 .menuDropdown {
   border-radius: 4px !important;
   padding: 0.5rem !important;
-  background: #ffffff !important;
+  background: $white !important;
   margin: 3.5rem 2rem 0rem 0rem !important;
   width: 10rem !important;
   box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, 0.16);
@@ -73,6 +73,7 @@
   margin: 0 !important;
   padding: 0 !important;
   max-width: 100% !important;
+  height: $header-content-height;
 }
 
 @media (max-width: 63.99em) {

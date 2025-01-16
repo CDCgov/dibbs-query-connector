@@ -1,6 +1,4 @@
 import { Patient } from "fhir/r4";
-import { DataDisplayInfo } from "@/app/utils";
-import { DataDisplay } from "@/app/utils";
 import * as dateFns from "date-fns";
 import { evaluate } from "fhirpath";
 
@@ -11,6 +9,8 @@ import {
   formatIdentifier,
   formatDate,
 } from "../../../../format-service";
+import styles from "./resultsTables.module.scss";
+import Table from "@/app/query/designSystem/table/Table";
 
 /**
  * Displays the demographic information of a patient.
@@ -32,14 +32,28 @@ const Demographics: React.FC<DemographicsProps> = ({ patient }) => {
 
   return (
     <div className="margin-top-0-important">
-      {demographicData.map((item) => (
-        <DataDisplay item={item} key={item.title} />
-      ))}
+      <Table bordered={false}>
+        <tbody>
+          {demographicData.map((item) => (
+            <tr className={styles.demographicsRow} key={item.title}>
+              <td>
+                <strong>{item.title}</strong>
+              </td>
+              <td> {item.value}</td>
+            </tr>
+          ))}
+        </tbody>
+      </Table>
     </div>
   );
 };
 
 export default Demographics;
+
+export interface DataDisplayInfo {
+  title: string;
+  value?: string | React.JSX.Element | React.JSX.Element[];
+}
 
 /**
  * Formats the demographic information of a patient.

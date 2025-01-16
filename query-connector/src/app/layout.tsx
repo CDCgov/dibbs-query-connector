@@ -1,8 +1,9 @@
 import "../styles/styles.scss";
 import Header from "./query/components/header/header";
 import Footer from "./query/components/footer/footer";
-import { DataProvider } from "./utils";
 import { SessionProvider } from "next-auth/react";
+import DataProvider from "./DataProvider";
+import { Metadata } from "next";
 
 /**
  * Establishes the layout for the application.
@@ -29,3 +30,8 @@ export default function RootLayout({
     </html>
   );
 }
+
+export const metadata: Metadata = {
+  title: "Query Connector",
+  description: "Data collection made easier",
+};

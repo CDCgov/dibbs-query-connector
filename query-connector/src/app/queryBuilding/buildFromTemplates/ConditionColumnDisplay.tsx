@@ -1,116 +1,69 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import {
-  CategoryNameToConditionOptionMap,
+  CategoryToConditionArrayMap,
+  NestedQuery,
   filterSearchByCategoryAndCondition,
 } from "../utils";
-import styles from "./buildfromTemplate.module.scss";
+import styles from "./conditionTemplateSelection.module.scss";
 import ConditionOption from "./ConditionOption";
 import classNames from "classnames";
-import { FormError } from "./page";
+import { FormError } from "./BuildFromTemplates";
 
 type ConditionColumnDisplayProps = {
-  fetchedConditions: CategoryNameToConditionOptionMap;
+  categoryToConditionsMap: CategoryToConditionArrayMap;
   searchFilter: string | undefined;
-  selectedConditions: CategoryNameToConditionOptionMap;
-  setSelectedConditions: Dispatch<
-    SetStateAction<CategoryNameToConditionOptionMap | undefined>
-  >;
+  constructedQuery: NestedQuery;
+  handleConditionUpdate: (conditionId: string, checked: boolean) => void;
   setFormError: Dispatch<SetStateAction<FormError>>;
   formError: FormError;
-  updateFetched: (selectedConditions: CategoryNameToConditionOptionMap) => void;
 };
+
 /**
  * Column display component for the query building page
- * @param root0 - params
- * @param root0.fetchedConditions - conditions queried from backend to display
- * @param root0.searchFilter - filter grabbed from search field to filter fetched
- * components against
- * @param root0.selectedConditions - conditions the user has marked as included in
- * their query
- * @param root0.setSelectedConditions - state function that updates the subset of
- * fetched conditions to be included in the query
- * @param root0.setFormError - state function that updates the subset of
- * fetched conditions to be included in the query
- * @param root0.formError - state function that updates the subset of
- * fetched conditions to be included in the query
- * @param root0.updateFetched - state function that updates the subset of
- * fetched conditions to be included in the query
+ * @param param0 - params
+ * @param param0.categoryToConditionsMap - category > condition information
+ * @param param0.searchFilter - substring to filter conditions / categories by
+ * @param param0.constructedQuery - the current state of the built query
+ * @param param0.handleConditionUpdate - handler function for updating a condition
+ * @param param0.formError - current state of the queryName / selectedConditions
+ * errors to gate navigation if there are errors
+ * @param param0.setFormError - setter function for the form
  * @returns Conditions split out into two columns that will filter themselves
  * at both the category and condition levels if a valid search filter is applied.
  */
 export const ConditionColumnDisplay: React.FC<ConditionColumnDisplayProps> = ({
-  fetchedConditions,
+  categoryToConditionsMap,
   searchFilter,
-  selectedConditions,
-  setSelectedConditions,
+  constructedQuery,
+  handleConditionUpdate,
   formError,
   setFormError,
-  updateFetched,
 }) => {
-  const [conditionsToDisplay, setConditionsToDisplay] =
-    useState(fetchedConditions);
+  const [conditionsToDisplay, setConditionsToDisplay] = useState(
+    categoryToConditionsMap,
+  );
 
   useEffect(() => {
     if (searchFilter === "") {
-      setConditionsToDisplay(fetchedConditions);
+      setConditionsToDisplay(categoryToConditionsMap);
     }
     if (searchFilter) {
       const filteredDisplay = filterSearchByCategoryAndCondition(
         searchFilter,
-        fetchedConditions,
+        categoryToConditionsMap,
       );
       setConditionsToDisplay(filteredDisplay);
     }
   }, [searchFilter]);
 
-  async function toggleFetchedConditionSelection(
-    category: string,
-    conditionId: string,
-  ) {
-    const prevSelected = selectedConditions?.[category]?.[conditionId]?.include;
-    const prevFetch = structuredClone(fetchedConditions);
-    const prevValues = prevFetch[category][conditionId];
-    prevFetch[category][conditionId] = {
-      name: prevValues.name,
-      include: !prevValues.include,
-    };
-
-    const shouldRemove =
-      // prevSelected being undefined means we've never added anything to selectedConditions,
-      // so we shouldn't remove anything
-      prevSelected == undefined ? false : true;
-    updateSelectedConditions(shouldRemove, category, conditionId, prevFetch);
-    updateFetched(selectedConditions);
-  }
-
-  const updateSelectedConditions = (
-    shouldRemove: boolean,
-    category: string,
-    conditionId: string,
-    prevFetch: CategoryNameToConditionOptionMap,
-  ) => {
-    if (shouldRemove) {
-      delete selectedConditions[category][conditionId];
-      // if there are no more entries for a given category, remove the category
-      if (Object.values(selectedConditions[category]).length == 0) {
-        delete selectedConditions[category];
-      }
-      // if there are no entries at all, set an error (to disable the button)
-      if (Object.values(selectedConditions).length < 1) {
-        setFormError({ ...formError, ...{ selectedConditions: true } });
-      }
-    } else {
-      setSelectedConditions((prevState) => {
-        return {
-          ...prevState,
-          [category]: {
-            ...prevState?.[category],
-            [conditionId]: prevFetch[category]?.[conditionId],
-          },
-        };
-      });
+  function updateConditionSelection(conditionId: string, remove: boolean) {
+    const selectedConditions = Object.keys(constructedQuery);
+    // if there are no entries at all, set an error (to disable the button)
+    if (selectedConditions.length === 1 && remove) {
+      setFormError({ ...formError, ...{ selectedConditions: true } });
     }
-  };
+    handleConditionUpdate(conditionId, remove);
+  }
 
   const columnOneEntries = Object.entries(conditionsToDisplay).filter(
     (_, i) => i % 2 === 0,
@@ -135,30 +88,20 @@ export const ConditionColumnDisplay: React.FC<ConditionColumnDisplayProps> = ({
               key={`col-${i}`}
             >
               {colsToDisplay.map(([category, arr]) => {
-                const handleConditionSelection = (conditionId: string) => {
-                  toggleFetchedConditionSelection(category, conditionId);
-                };
                 return (
                   <div key={category}>
                     <h3 className={styles.categoryHeading}>{category}</h3>
-                    {Object.entries(arr).map(
-                      ([conditionId, conditionNameAndInclude]) => {
-                        return (
-                          <ConditionOption
-                            checked={
-                              selectedConditions[category] &&
-                              Object.keys(
-                                selectedConditions[category],
-                              ).includes(conditionId)
-                            }
-                            key={conditionId}
-                            conditionId={conditionId}
-                            conditionName={conditionNameAndInclude.name}
-                            handleConditionSelection={handleConditionSelection}
-                          />
-                        );
-                      },
-                    )}
+                    {arr.map((c) => {
+                      return (
+                        <ConditionOption
+                          checked={Object.keys(constructedQuery).includes(c.id)}
+                          key={c.name}
+                          conditionId={c.id}
+                          conditionName={c.name}
+                          handleConditionSelection={updateConditionSelection}
+                        />
+                      );
+                    })}
                   </div>
                 );
               })}

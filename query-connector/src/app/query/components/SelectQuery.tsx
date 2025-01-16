@@ -1,11 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import {
-  FHIR_SERVERS,
-  USE_CASES,
-  UseCaseToQueryName,
-  ValueSet,
-} from "../../constants";
+import { USE_CASES, USE_CASE_DETAILS, DibbsValueSet } from "../../constants";
 import CustomizeQuery from "./CustomizeQuery";
 import SelectSavedQuery from "./selectQuery/SelectSavedQuery";
 
@@ -25,8 +20,8 @@ interface SelectQueryProps {
   patientForQuery: Patient | undefined;
   resultsQueryResponse: QueryResponse;
   setResultsQueryResponse: React.Dispatch<React.SetStateAction<QueryResponse>>;
-  fhirServer: FHIR_SERVERS;
-  setFhirServer: React.Dispatch<React.SetStateAction<FHIR_SERVERS>>;
+  fhirServer: string;
+  setFhirServer: React.Dispatch<React.SetStateAction<string>>;
   setLoading: (isLoading: boolean) => void;
   showCustomizeQuery: boolean;
   setShowCustomizeQuery: (showCustomizeQuery: boolean) => void;
@@ -62,8 +57,8 @@ const SelectQuery: React.FC<SelectQueryProps> = ({
   setFhirServer,
   setShowCustomizeQuery,
 }) => {
-  const [queryValueSets, setQueryValueSets] = useState<ValueSet[]>(
-    [] as ValueSet[],
+  const [queryValueSets, setQueryValueSets] = useState<DibbsValueSet[]>(
+    [] as DibbsValueSet[],
   );
   const [loadingQueryValueSets, setLoadingQueryValueSets] =
     useState<boolean>(true);
@@ -78,7 +73,8 @@ const SelectQuery: React.FC<SelectQueryProps> = ({
 
     const fetchDataAndUpdateState = async () => {
       if (selectedQuery) {
-        const queryName = UseCaseToQueryName[selectedQuery as USE_CASES];
+        const queryName =
+          USE_CASE_DETAILS[selectedQuery as USE_CASES].queryName;
         const valueSets = await fetchUseCaseValueSets(queryName);
         // Only update if the fetch hasn't altered state yet
         if (isSubscribed) {

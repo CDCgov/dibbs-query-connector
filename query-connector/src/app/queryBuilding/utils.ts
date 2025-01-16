@@ -1,72 +1,55 @@
-import { ValueSet } from "../constants";
-import { GroupedValueSet } from "../query/components/customizeQuery/customizeQueryUtils";
+import { DibbsValueSet } from "../constants";
+import { ConceptTypeToDibbsVsMap } from "../utils/valueSetTranslation";
 
 // The structure of the data that's coming from the backend
-export type ConditionIdToNameMap = {
-  [conditionId: string]: string;
+export type ConditionsMap = {
+  [conditionId: string]: {
+    name: string;
+    category: string;
+  };
 };
+
 export type CategoryToConditionArrayMap = {
-  [categoryName: string]: ConditionIdToNameMap[];
+  [category: string]: {
+    id: string;
+    name: string;
+  }[];
 };
 
-export type ConditionIdToValueSetArray = {
-  [conditionId: string]: ValueSet[];
+export type ConditionIdToValueSetArrayMap = {
+  [conditionId: string]: DibbsValueSet[];
 };
 
-export type ValueSetsByGroup = {
-  labs: {
-    [name: string]: GroupedValueSet;
+export type NestedQuery = {
+  [conditionId: string]: ConceptTypeToDibbsVsMap;
+};
+
+export type QueryUpdateResult = {
+  id: string;
+  query_name: string;
+  operation: "INSERT" | "UPDATE";
+};
+
+export type QueryDetailsResult = {
+  query_name: string;
+  id: string;
+  query_data: {
+    [conditionId: string]: { [valueSetId: string]: DibbsValueSet };
   };
-  medications: {
-    [name: string]: GroupedValueSet;
-  };
-  conditions: {
-    [name: string]: GroupedValueSet;
-  };
+  conditions_list: string[];
+  updated: boolean;
 };
 
-export type ConditionToValueSetMap = {
-  [conditionId: string]: ValueSetsByGroup;
-};
-// The transform structs for use on the frontend, which is a grandparent - parent
-// - child mapping from category (indexed by name) - conditions (indexed by condition ID)
-// and - condition option (name and whether to include it in the query we're building).
-export type ConditionOption = {
-  name: string;
-  include: boolean;
-};
-export type ConditionOptionMap = {
-  [conditionId: string]: ConditionOption;
-};
-export type CategoryNameToConditionOptionMap = {
-  [categoryName: string]: ConditionOptionMap;
+export const EMPTY_QUERY_SELECTION = {
+  queryId: undefined,
+  queryName: undefined,
 };
 
-/**
- * Translation function format backend response to something more manageable for the
- * frontend
- * @param fetchedData - data returned from the backend function grabbing condition <>
- * category mapping
- * @returns - The data in a CategoryNameToConditionOptionMap shape
- */
-export function groupConditionDataByCategoryName(fetchedData: {
-  [categoryName: string]: ConditionIdToNameMap[];
-}) {
-  const result: CategoryNameToConditionOptionMap = {};
-  Object.entries(fetchedData).forEach(
-    ([categoryName, conditionIdToNameMapArray]) => {
-      const curCategoryMap: ConditionOptionMap = {};
-      conditionIdToNameMapArray.forEach((e) => {
-        (curCategoryMap[Object.keys(e)[0]] = {
-          name: Object.values(e)[0],
-          include: false,
-        }),
-          (result[categoryName] = curCategoryMap);
-      });
-    },
-  );
-  return result;
-}
+export const EMPTY_CONCEPT_TYPE = {
+  labs: {},
+  conditions: {},
+  medications: {},
+};
 
 /**
  * Filtering function that checks filtering at the category and the condition level
@@ -76,12 +59,12 @@ export function groupConditionDataByCategoryName(fetchedData: {
  */
 export function filterSearchByCategoryAndCondition(
   filterString: string,
-  fetchedConditions: CategoryNameToConditionOptionMap,
-): CategoryNameToConditionOptionMap {
-  const result: CategoryNameToConditionOptionMap = {};
+  fetchedConditions: CategoryToConditionArrayMap,
+): CategoryToConditionArrayMap {
+  const result: CategoryToConditionArrayMap = {};
 
   Object.entries(fetchedConditions).forEach(
-    ([categoryName, conditionNameArray]) => {
+    ([categoryName, conditionArray]) => {
       if (
         categoryName
           .toLocaleLowerCase()
@@ -89,18 +72,13 @@ export function filterSearchByCategoryAndCondition(
       ) {
         result[categoryName] = fetchedConditions[categoryName];
       }
-      Object.entries(conditionNameArray).forEach(
-        ([conditionId, conditionNameAndInclude]) => {
-          if (
-            conditionNameAndInclude.name
-              .toLocaleLowerCase()
-              .includes(filterString.toLocaleLowerCase())
-          ) {
-            result[categoryName] = result[categoryName] ?? {};
-            result[categoryName][conditionId] = conditionNameAndInclude;
-          }
-        },
+      const matches = conditionArray.filter((c) =>
+        c.name.toLocaleLowerCase().includes(filterString.toLocaleLowerCase()),
       );
+
+      if (matches.length > 0) {
+        result[categoryName] = matches;
+      }
     },
   );
 
@@ -127,14 +105,18 @@ export function formatDiseaseDisplay(diseaseName: string) {
  * @returns A number indicating the tally of relevant concpets
  */
 export function tallyConceptsForSingleValueSet(
-  valueSet: GroupedValueSet,
+  valueSet: DibbsValueSet,
   filterInclude?: boolean,
 ) {
-  const selectedTotal = valueSet.items.reduce((sum, vs) => {
-    const includedConcepts = !!filterInclude
-      ? vs.concepts.filter((c) => c.include)
-      : vs.concepts;
-    sum += includedConcepts.length;
+  const selectedTotal = valueSet.concepts.reduce((sum, concept) => {
+    const addToTally = !filterInclude
+      ? 1 // add every item
+      : concept.include
+        ? 1
+        : 0; // only add items marked as included
+
+    sum += addToTally;
+
     return sum;
   }, 0);
 
@@ -150,8 +132,8 @@ export function tallyConceptsForSingleValueSet(
  * included concepts
  * @returns A number indicating the tally of relevant concpets
  */
-export function tallyConcpetsForValueSetGroup(
-  valueSets: GroupedValueSet[],
+export function tallyConceptsForValueSetArray(
+  valueSets: DibbsValueSet[],
   filterInclude?: boolean,
 ) {
   const selectedTotal = valueSets.reduce((sum, valueSet) => {
@@ -168,7 +150,7 @@ export function tallyConcpetsForValueSetGroup(
  * @param input - the ValueSet to update
  * @returns the updated ValueSet
  */
-export const batchToggleConcepts = (input: ValueSet) => {
+export const batchToggleConcepts = (input: DibbsValueSet) => {
   input.concepts.forEach((concept) => {
     const currentStatus = concept.include;
     concept.include = !currentStatus;

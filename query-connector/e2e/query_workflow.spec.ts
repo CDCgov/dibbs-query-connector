@@ -16,7 +16,7 @@ test.describe("querying with the Query Connector", () => {
   });
 
   test("unsuccessful user query: no patients", async ({ page }) => {
-    await page.getByRole("button", { name: "Go to the demo" }).click();
+    await page.getByRole("button", { name: "Try it out" }).click();
     await page.getByRole("button", { name: "Fill fields" }).click();
     await page.getByLabel("First name").fill("Shouldnt");
     await page.getByLabel("Last name").fill("Findanyone");
@@ -41,7 +41,7 @@ test.describe("querying with the Query Connector", () => {
   });
 
   test("successful demo user query", async ({ page }) => {
-    await page.getByRole("button", { name: "Go to the demo" }).click();
+    await page.getByRole("button", { name: "Try it out" }).click();
 
     // Check that the info alert is visible and contains the correct text
     const alert = page.locator(".custom-alert");
@@ -50,7 +50,10 @@ test.describe("querying with the Query Connector", () => {
       "This site is for demo purposes only. Please do not enter PII on this website.",
     );
     await expect(
-      page.getByRole("heading", { name: PAGE_TITLES["search"], exact: true }),
+      page.getByRole("heading", {
+        name: PAGE_TITLES["search"].title,
+        exact: true,
+      }),
     ).toBeVisible();
 
     await page.getByRole("button", { name: "Fill fields" }).click();
@@ -156,7 +159,10 @@ test.describe("querying with the Query Connector", () => {
     // Now let's use the return to search to go back to a blank form
     await page.getByRole("button", { name: "New patient search" }).click();
     await expect(
-      page.getByRole("heading", { name: PAGE_TITLES["search"], exact: true }),
+      page.getByRole("heading", {
+        name: PAGE_TITLES["search"].title,
+        exact: true,
+      }),
     ).toBeVisible();
   });
 });

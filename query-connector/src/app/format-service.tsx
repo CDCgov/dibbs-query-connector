@@ -5,8 +5,10 @@ import {
   Address,
   ContactPoint,
   Identifier,
+  Immunization,
+  Coding,
 } from "fhir/r4";
-import { ValueSet } from "./constants";
+import { DibbsValueSet } from "./constants";
 import { QueryStruct } from "./query-service";
 
 /**
@@ -143,10 +145,10 @@ export function formatIdentifier(identifier: Identifier[]): JSX.Element {
         }
 
         return (
-          <>
+          <div key={id.value}>
             {" "}
             {idType}: {id.value} <br />{" "}
-          </>
+          </div>
         );
       })}
     </>
@@ -269,7 +271,7 @@ export async function GetPhoneQueryFormats(phone: string) {
  */
 export const formatValueSetsAsQuerySpec = async (
   useCase: string,
-  valueSets: ValueSet[],
+  valueSets: DibbsValueSet[],
 ) => {
   let secondEncounter: boolean = false;
   if (["cancer", "chlamydia", "gonorrhea", "syphilis"].includes(useCase)) {
@@ -303,4 +305,18 @@ export const formatValueSetsAsQuerySpec = async (
   };
 
   return spec;
+};
+
+/**
+ * Formats the route of a FHIR Immunization object.
+ * @param immunization - The Immunization object to format.
+ * @returns The formatted route .
+ */
+export const formatImmunizationRoute = (immunization: Immunization): string => {
+  const initial = immunization.route?.coding?.[0].display ?? "";
+  const readable = immunization.route?.coding?.filter(
+    (code: Coding) =>
+      code.system === "http://terminology.hl7.org/CodeSystem/v2-0162",
+  );
+  return readable?.[0].display ?? initial;
 };

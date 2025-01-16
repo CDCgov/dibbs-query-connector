@@ -9,14 +9,19 @@ import {
 import { parsePatientDemographics } from "./parsing-service";
 import {
   USE_CASES,
-  FHIR_SERVERS,
-  FhirServers,
-  UseCases,
-  UseCaseToQueryName,
+  USE_CASE_DETAILS,
+  INVALID_FHIR_SERVERS,
+  INVALID_USE_CASE,
+  RESPONSE_BODY_IS_NOT_PATIENT_RESOURCE,
+  MISSING_API_QUERY_PARAM,
+  MISSING_PATIENT_IDENTIFIERS,
 } from "../../constants";
 
 import { handleRequestError } from "./error-handling-service";
-import { getSavedQueryByName } from "@/app/database-service";
+import {
+  getFhirServerNames,
+  getSavedQueryByName,
+} from "@/app/database-service";
 import { unnestValueSetsFromQuery } from "@/app/utils";
 
 /**
@@ -43,8 +48,9 @@ export async function POST(request: NextRequest) {
 
     // Check if requestBody is a patient resource
     if (requestBody.resourceType !== "Patient") {
-      const diagnostics_message = "Request body is not a Patient resource.";
-      const OperationOutcome = await handleRequestError(diagnostics_message);
+      const OperationOutcome = await handleRequestError(
+        RESPONSE_BODY_IS_NOT_PATIENT_RESOURCE,
+      );
       return NextResponse.json(OperationOutcome);
     }
   } catch (error: unknown) {
@@ -60,9 +66,9 @@ export async function POST(request: NextRequest) {
   PatientIdentifiers = await parsePatientDemographics(requestBody);
   // Check if PatientIdentifiers is empty or there was an error parsing patient identifiers
   if (Object.keys(PatientIdentifiers).length === 0) {
-    const diagnostics_message =
-      "No patient identifiers to parse from requestBody.";
-    const OperationOutcome = await handleRequestError(diagnostics_message);
+    const OperationOutcome = await handleRequestError(
+      MISSING_PATIENT_IDENTIFIERS,
+    );
     return NextResponse.json(OperationOutcome);
   }
 
@@ -70,32 +76,28 @@ export async function POST(request: NextRequest) {
   const params = request.nextUrl.searchParams;
   const use_case = params.get("use_case");
   const fhir_server = params.get("fhir_server");
+  const fhirServers = await getFhirServerNames();
 
   if (!use_case || !fhir_server) {
-    const diagnostics_message = "Missing use_case or fhir_server.";
-    const OperationOutcome = await handleRequestError(diagnostics_message);
+    const OperationOutcome = await handleRequestError(MISSING_API_QUERY_PARAM);
     return NextResponse.json(OperationOutcome);
-  } else if (!Object.values(UseCases).includes(use_case as USE_CASES)) {
-    const diagnostics_message = `Invalid use_case. Please provide a valid use_case. Valid use_cases include ${UseCases}.`;
-    const OperationOutcome = await handleRequestError(diagnostics_message);
+  } else if (!Object.keys(USE_CASE_DETAILS).includes(use_case)) {
+    const OperationOutcome = await handleRequestError(INVALID_USE_CASE);
     return NextResponse.json(OperationOutcome);
-  } else if (
-    !Object.values(FhirServers).includes(fhir_server as FHIR_SERVERS)
-  ) {
-    const diagnostics_message = `Invalid fhir_server. Please provide a valid fhir_server. Valid fhir_servers include ${FhirServers}.`;
-    const OperationOutcome = await handleRequestError(diagnostics_message);
+  } else if (!Object.values(fhirServers).includes(fhir_server)) {
+    const OperationOutcome = await handleRequestError(INVALID_FHIR_SERVERS);
     return NextResponse.json(OperationOutcome);
   }
 
   // Lookup default parameters for particular use-case search
-  const queryName = UseCaseToQueryName[use_case as USE_CASES];
+  const queryName = USE_CASE_DETAILS[use_case as USE_CASES].queryName;
   const queryResults = await getSavedQueryByName(queryName);
   const valueSets = unnestValueSetsFromQuery(queryResults);
 
   // Add params & patient identifiers to UseCaseRequest
   const UseCaseRequest: UseCaseQueryRequest = {
     use_case: use_case as USE_CASES,
-    fhir_server: fhir_server as FHIR_SERVERS,
+    fhir_server: fhir_server,
     ...(PatientIdentifiers.first_name && {
       first_name: PatientIdentifiers.first_name,
     }),

@@ -44,7 +44,24 @@ jobs:
         run: npm install
       - name: Run tests
         working-directory: ./query-connector
-        run: npm test
+        run: npm run test:unit
+
+  integration-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{env.NODE_VERSION}}
+      - name: Install dependencies
+        working-directory: ./query-connector
+        run: npm install
+
+      - name: Run tests
+        working-directory: ./query-connector
+        run: npm run test:integration
 
   end-to-end-tests:
     timeout-minutes: 15
@@ -70,7 +87,7 @@ jobs:
         run: docker compose -f ./docker-compose-e2e.yaml up -d
       - name: Poll until Query Connector is ready
         run: |
-          until curl -s http://localhost:3000/query-connector; do
+          until curl -s http://localhost:3000/; do
             echo "Waiting for Query Connector to be ready before running Playwright..."
             sleep 5
           done

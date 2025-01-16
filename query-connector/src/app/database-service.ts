@@ -1,18 +1,10 @@
 "use server";
-import { Pool, PoolConfig } from "pg";
-import {
-  Bundle,
-  OperationOutcome,
-  ValueSet as FhirValueSet,
-  Parameters,
-} from "fhir/r4";
+import { Bundle, OperationOutcome, Parameters } from "fhir/r4";
 import {
   Concept,
-  ErsdConceptType,
   INTENTIONAL_EMPTY_STRING_FOR_CONCEPT_VERSION,
   INTENTIONAL_EMPTY_STRING_FOR_GEM_CODE,
-  ValueSet,
-  ersdToDibbsConceptMap,
+  DibbsValueSet,
   FhirServerConfig,
 } from "./constants";
 import { encode } from "base-64";
@@ -23,7 +15,7 @@ import {
 } from "./query-building";
 import {
   CategoryToConditionArrayMap,
-  ConditionIdToNameMap,
+  ConditionsMap,
 } from "./queryBuilding/utils";
 import {
   CategoryStruct,
@@ -45,6 +37,7 @@ import {
   ValuesetStruct,
   ValuesetToConceptStruct,
 } from "./seedSqlStructs";
+import { getDbClient } from "./backend/dbClient";
 
 const getQuerybyNameSQL = `
 select q.query_name, q.id, q.query_data, q.conditions_list
@@ -61,14 +54,7 @@ SELECT c.display, c.code_system, c.code, vs.name as valueset_name, vs.id as valu
   WHERE ctvs.condition_id IN (
 `;
 
-// Load environment variables from .env and establish a Pool configuration
-const dbConfig: PoolConfig = {
-  connectionString: process.env.DATABASE_URL,
-  max: 10, // Maximum # of connections in the pool
-  idleTimeoutMillis: 30000, // A client must sit idle this long before being released
-  connectionTimeoutMillis: 3000, // Wait this long before timing out when connecting new client
-};
-const dbClient = new Pool(dbConfig);
+const dbClient = getDbClient();
 
 /**
  * Executes a search for a ValueSets and Concepts against the Postgres
@@ -205,47 +191,11 @@ export async function getVSACValueSet(
 }
 
 /**
- * Translates a VSAC FHIR bundle to our internal ValueSet struct
- * @param fhirValueset - The FHIR ValueSet response from VSAC
- * @param ersdConceptType - The associated clinical concept type from ERSD
- * @returns An object of type InternalValueSet
- */
-export async function translateVSACToInternalValueSet(
-  fhirValueset: FhirValueSet,
-  ersdConceptType: ErsdConceptType,
-) {
-  const oid = fhirValueset.id;
-  const version = fhirValueset.version;
-
-  const name = fhirValueset.title;
-  const author = fhirValueset.publisher;
-
-  const bundleConceptData = fhirValueset?.compose?.include[0];
-  const system = bundleConceptData?.system;
-  const concepts = bundleConceptData?.concept?.map((fhirConcept) => {
-    return { ...fhirConcept, include: false } as Concept;
-  });
-
-  return {
-    valueSetId: `${oid}_${version}`,
-    valueSetVersion: version,
-    valueSetName: name,
-    valueSetExternalId: oid,
-    author: author,
-    system: system,
-    ersdConceptType: ersdConceptType,
-    dibbsConceptType: ersdToDibbsConceptMap[ersdConceptType],
-    includeValueSet: false,
-    concepts: concepts,
-  } as ValueSet;
-}
-
-/**
  * Function call to insert a new ValueSet into the database.
  * @param vs - a ValueSet in of the shape of our internal data model to insert
  * @returns success / failure information, as well as errors as appropriate
  */
-export async function insertValueSet(vs: ValueSet) {
+export async function insertValueSet(vs: DibbsValueSet) {
   let errorArray: string[] = [];
 
   const insertValueSetPromise = generateValueSetSqlPromise(vs);
@@ -297,7 +247,7 @@ export async function insertValueSet(vs: ValueSet) {
  * @param vs - The ValueSet in of the shape of our internal data model to insert
  * @returns The SQL statement for insertion
  */
-function generateValueSetSqlPromise(vs: ValueSet) {
+function generateValueSetSqlPromise(vs: DibbsValueSet) {
   const valueSetOid = vs.valueSetExternalId;
 
   // TODO: based on how non-VSAC valuests are shaped in the future, we may need
@@ -329,7 +279,7 @@ function generateValueSetSqlPromise(vs: ValueSet) {
  * @param vs - The ValueSet in of the shape of our internal data model to insert
  * @returns The SQL statement array for all concepts for insertion
  */
-function generateConceptSqlPromises(vs: ValueSet) {
+function generateConceptSqlPromises(vs: DibbsValueSet) {
   const insertConceptsSqlArray = vs.concepts.map((concept) => {
     const systemPrefix = stripProtocolAndTLDFromSystemUrl(vs.system);
     const conceptUniqueId = `${systemPrefix}_${concept.code}`;
@@ -352,7 +302,7 @@ function generateConceptSqlPromises(vs: ValueSet) {
   return insertConceptsSqlArray;
 }
 
-function generateValuesetConceptJoinSqlPromises(vs: ValueSet) {
+function generateValuesetConceptJoinSqlPromises(vs: DibbsValueSet) {
   const insertConceptsSqlArray = vs.concepts.map((concept) => {
     const systemPrefix = stripProtocolAndTLDFromSystemUrl(vs.system);
     const conceptUniqueId = `${systemPrefix}_${concept.code}`;
@@ -424,7 +374,7 @@ export async function insertQuery(input: QueryInput) {
  * @param vs The DIBBs internal representation of the value set to check.
  * @returns A data structure reporting on missing concepts or value set links.
  */
-export async function checkValueSetInsertion(vs: ValueSet) {
+export async function checkValueSetInsertion(vs: DibbsValueSet) {
   // Begin accumulating missing data
   const missingData = {
     missingValueSet: false,
@@ -539,25 +489,24 @@ export async function getConditionsData() {
   const rows = result.rows;
 
   // 1. Grouped by category with id:name pairs
-  const categoryToConditionArrayMap: CategoryToConditionArrayMap = rows.reduce(
-    (acc, row) => {
+  const categoryToConditionNameArrayMap: CategoryToConditionArrayMap =
+    rows.reduce((acc, row) => {
       const { category, id, name } = row;
       if (!acc[category]) {
         acc[category] = [];
       }
-      acc[category].push({ [id]: name });
+      acc[category].push({ id: id, name: name });
       return acc;
-    },
-    {} as CategoryToConditionArrayMap,
-  );
+    }, {} as CategoryToConditionArrayMap);
 
   // 2. ID-Name mapping
-  const conditionIdToNameMap: ConditionIdToNameMap = rows.reduce((acc, row) => {
-    acc[row.id] = row.name;
+  const conditionIdToNameMap: ConditionsMap = rows.reduce((acc, row) => {
+    acc[row.id] = { name: row.name, category: row.category };
     return acc;
-  }, {} as ConditionIdToNameMap);
+  }, {} as ConditionsMap);
+
   return {
-    categoryToConditionArrayMap,
+    categoryToConditionNameArrayMap,
     conditionIdToNameMap,
   } as const;
 }
@@ -710,7 +659,9 @@ export async function getCustomQueries(): Promise<CustomUserQuery[]> {
     }
 
     Object.entries(
-      query_data as { [condition: string]: { [valueSetId: string]: ValueSet } },
+      query_data as {
+        [condition: string]: { [valueSetId: string]: DibbsValueSet };
+      },
     ).forEach(([_, includedValueSets]) => {
       Object.entries(includedValueSets).forEach(
         ([valueSetId, valueSetData]) => {
@@ -808,4 +759,258 @@ export async function getFhirServerNames(): Promise<string[]> {
 export async function getFhirServerConfig(fhirServerName: string) {
   const configs = await getFhirServerConfigs();
   return configs.find((config) => config.name === fhirServerName);
+}
+
+/**
+ * Inserts a new FHIR server configuration into the database.
+ * @param name - The name of the FHIR server
+ * @param hostname - The URL/hostname of the FHIR server
+ * @param disableCertValidation - Whether to disable certificate validation
+ * @param lastConnectionSuccessful - Optional boolean indicating if the last connection was successful
+ * @param bearerToken - Optional bearer token for authentication
+ * @returns An object indicating success or failure with optional error message
+ */
+export async function insertFhirServer(
+  name: string,
+  hostname: string,
+  disableCertValidation: boolean,
+  lastConnectionSuccessful?: boolean,
+  bearerToken?: string,
+) {
+  const insertQuery = `
+    INSERT INTO fhir_servers (
+      name,
+      hostname, 
+      last_connection_attempt,
+      last_connection_successful,
+      headers,
+      disable_cert_validation
+    )
+    VALUES ($1, $2, $3, $4, $5, $6);
+  `;
+
+  try {
+    await dbClient.query("BEGIN");
+
+    // Create headers object if bearer token is provided
+    const headers = bearerToken
+      ? { Authorization: `Bearer ${bearerToken}` }
+      : {};
+
+    const result = await dbClient.query(insertQuery, [
+      name,
+      hostname,
+      new Date(),
+      lastConnectionSuccessful,
+      headers,
+      disableCertValidation,
+    ]);
+
+    // Clear the cache so the next getFhirServerConfigs call will fetch fresh data
+    cachedFhirServerConfigs = null;
+
+    await dbClient.query("COMMIT");
+
+    return {
+      success: true,
+      server: result.rows[0],
+    };
+  } catch (error) {
+    await dbClient.query("ROLLBACK");
+    console.error("Failed to insert FHIR server:", error);
+    return {
+      success: false,
+      error: "Failed to save the FHIR server configuration.",
+    };
+  }
+}
+
+/**
+ * Updates an existing FHIR server configuration in the database.
+ * @param id - The ID of the FHIR server to update
+ * @param name - The new name of the FHIR server
+ * @param hostname - The new URL/hostname of the FHIR server
+ * @param disableCertValidation - Whether to disable certificate validation
+ * @param lastConnectionSuccessful - Optional boolean indicating if the last connection was successful
+ * @param bearerToken - Optional bearer token for authentication
+ * @returns An object indicating success or failure with optional error message
+ */
+export async function updateFhirServer(
+  id: string,
+  name: string,
+  hostname: string,
+  disableCertValidation: boolean,
+  lastConnectionSuccessful?: boolean,
+  bearerToken?: string,
+) {
+  const updateQuery = `
+    UPDATE fhir_servers 
+    SET 
+      name = $2,
+      hostname = $3,
+      last_connection_attempt = CURRENT_TIMESTAMP,
+      last_connection_successful = $4,
+      headers = $5,
+      disable_cert_validation = $6
+    WHERE id = $1
+    RETURNING *;
+  `;
+
+  try {
+    await dbClient.query("BEGIN");
+
+    // If updating with a bearer token, add it to existing headers
+    // If no bearer token provided, fetch existing headers and remove Authorization
+    let headers = {};
+    if (bearerToken) {
+      // Get existing headers if any
+      const existingServer = await dbClient.query(
+        "SELECT headers FROM fhir_servers WHERE id = $1",
+        [id],
+      );
+      if (existingServer.rows.length > 0) {
+        // Keep existing headers and add/update Authorization
+        headers = {
+          ...existingServer.rows[0].headers,
+          Authorization: `Bearer ${bearerToken}`,
+        };
+      } else {
+        // No existing headers, just set Authorization
+        headers = { Authorization: `Bearer ${bearerToken}` };
+      }
+    } else {
+      // Get existing headers if any and remove Authorization
+      const existingServer = await dbClient.query(
+        "SELECT headers FROM fhir_servers WHERE id = $1",
+        [id],
+      );
+      if (existingServer.rows.length > 0) {
+        const existingHeaders = existingServer.rows[0].headers || {};
+        // Remove Authorization if it exists when switching to no auth
+        const { Authorization, ...restHeaders } = existingHeaders;
+        headers = restHeaders;
+      }
+    }
+
+    const result = await dbClient.query(updateQuery, [
+      id,
+      name,
+      hostname,
+      lastConnectionSuccessful,
+      headers,
+      disableCertValidation,
+    ]);
+
+    // Clear the cache so the next getFhirServerConfigs call will fetch fresh data
+    cachedFhirServerConfigs = null;
+
+    await dbClient.query("COMMIT");
+
+    if (result.rows.length === 0) {
+      return {
+        success: false,
+        error: "Server not found",
+      };
+    }
+
+    return {
+      success: true,
+      server: result.rows[0],
+    };
+  } catch (error) {
+    await dbClient.query("ROLLBACK");
+    console.error("Failed to update FHIR server:", error);
+    return {
+      success: false,
+      error: "Failed to update the server configuration.",
+    };
+  }
+}
+
+/**
+ * Updates the connection status for a FHIR server.
+ * @param name - The name of the FHIR server
+ * @param wasSuccessful - Whether the connection attempt was successful
+ * @returns An object indicating success or failure with optional error message
+ */
+export async function updateFhirServerConnectionStatus(
+  name: string,
+  wasSuccessful: boolean,
+) {
+  const updateQuery = `
+    UPDATE fhir_servers 
+    SET 
+      last_connection_attempt = CURRENT_TIMESTAMP,
+      last_connection_successful = $2
+    WHERE name = $1
+    RETURNING *;
+  `;
+
+  try {
+    const result = await dbClient.query(updateQuery, [name, wasSuccessful]);
+
+    // Clear the cache so the next getFhirServerConfigs call will fetch fresh data
+    cachedFhirServerConfigs = null;
+
+    if (result.rows.length === 0) {
+      return {
+        success: false,
+        error: "Server not found",
+      };
+    }
+
+    return {
+      success: true,
+      server: result.rows[0],
+    };
+  } catch (error) {
+    console.error("Failed to update FHIR server connection status:", error);
+    return {
+      success: false,
+      error: "Failed to update the server connection status.",
+    };
+  }
+}
+
+/**
+ * Deletes a FHIR server configuration from the database.
+ * @param id - The ID of the FHIR server to delete
+ * @returns An object indicating success or failure with optional error message
+ */
+export async function deleteFhirServer(id: string) {
+  const deleteQuery = `
+    DELETE FROM fhir_servers 
+    WHERE id = $1
+    RETURNING *;
+  `;
+
+  try {
+    await dbClient.query("BEGIN");
+
+    const result = await dbClient.query(deleteQuery, [id]);
+
+    // Clear the cache so the next getFhirServerConfigs call will fetch fresh data
+    cachedFhirServerConfigs = null;
+
+    await dbClient.query("COMMIT");
+
+    if (result.rows.length === 0) {
+      return {
+        success: false,
+        error: "Server not found",
+      };
+    }
+
+    return {
+      success: true,
+      server: result.rows[0],
+    };
+  } catch (error) {
+    await dbClient.query("ROLLBACK");
+    console.error("Failed to delete FHIR server:", error);
+    return {
+      success: false,
+      error: "Failed to delete the server configuration.",
+    };
+  }
 }

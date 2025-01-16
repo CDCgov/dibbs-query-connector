@@ -1,26 +1,22 @@
 import categoryToConditionArrayMap from "../assets/aphlCategoryMapping.json";
 import queryTableDefaults from "../../assets/dibbs_db_seed_query.json";
-import { ConditionIdToNameMap } from "@/app/queryBuilding/utils";
+import { CategoryToConditionArrayMap } from "@/app/queryBuilding/utils";
 import { QueryResultRow } from "pg";
 
 export const CATEGORY_TO_CONDITION_ARRAY_MAP =
-  categoryToConditionArrayMap as unknown as {
-    [categoryName: string]: ConditionIdToNameMap[];
-  };
+  categoryToConditionArrayMap as unknown as CategoryToConditionArrayMap;
 
 export const DEFAULT_CHLAMYDIA_QUERY = [
   queryTableDefaults.query.find((v) =>
     v.query_name.includes("Chlamydia case investigation"),
   ),
 ] as QueryResultRow[];
-
+const CHLAMYDIA_CONDITION_ID = 240589008;
 export const EXPECTED_CHLAMYDIA_VALUESET_LENGTH = Object.values(
-  DEFAULT_CHLAMYDIA_QUERY[0].query_data[
-    "Chlamydia trachomatis infection (disorder)"
-  ],
+  DEFAULT_CHLAMYDIA_QUERY[0].query_data[CHLAMYDIA_CONDITION_ID],
 ).length;
 
-export const CANCER_VALUESETS = [
+export const CANCER_DB_QUERY_VALUES = [
   {
     display: "RESULTS",
     code_system: "http://cap.org/eCC",

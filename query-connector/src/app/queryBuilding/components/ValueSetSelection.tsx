@@ -1,152 +1,95 @@
 "use client";
 
-import styles from "../buildFromTemplates/buildfromTemplate.module.scss";
-import {
-  // Dispatch,
-  // SetStateAction,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import styles from "../buildFromTemplates/conditionTemplateSelection.module.scss";
+import { useEffect, useState } from "react";
 import classNames from "classnames";
-
-import {
-  CategoryNameToConditionOptionMap,
-  ConditionIdToValueSetArray,
-} from "../utils";
-import { BuildStep } from "@/app/constants";
-import SearchField from "@/app/query/designSystem/searchField/SearchField";
 import { Icon } from "@trussworks/react-uswds";
-
-import { formatDiseaseDisplay, ConditionToValueSetMap } from "../utils";
 import {
-  GroupedValueSet,
-  mapValueSetsToValueSetType,
-  groupValueSetsByNameAuthorSystem,
-} from "../../query/components/customizeQuery/customizeQueryUtils";
-import { DibbsValueSetType } from "../../constants";
-import { SelectionTable } from "./SelectionTable";
-
+  CategoryToConditionArrayMap,
+  ConditionsMap,
+  formatDiseaseDisplay,
+  NestedQuery,
+} from "../utils";
+import { ConceptTypeSelectionTable } from "./SelectionTable";
 import Drawer from "@/app/query/designSystem/drawer/Drawer";
+import { DibbsConceptType, DibbsValueSet } from "@/app/constants";
+import { showToastConfirmation } from "@/app/query/designSystem/toast/Toast";
 
 type ConditionSelectionProps = {
-  queryName: string;
-  setBuildStep: (buildStep: BuildStep) => void;
-  selectedConditions: CategoryNameToConditionOptionMap;
-  valueSetsByCondition: ConditionIdToValueSetArray;
+  constructedQuery: NestedQuery;
+  handleUpdateCondition: (conditionId: string, remove: boolean) => void;
+  conditionsMap: ConditionsMap;
+  categoryToConditionsMap: CategoryToConditionArrayMap;
+  handleSelectedValueSetUpdate: (
+    conditionId: string,
+  ) => (
+    vsType: DibbsConceptType,
+  ) => (vsId: string) => (dibbsValueSets: DibbsValueSet) => void;
 };
 
 /**
  * Display component for a condition on the query building page
  * @param root0 - params
- * @param root0.queryName - current checkbox selection status
-//  * @param root0.setBuildStep - Redirect function to handle view routing
- * @param root0.selectedConditions - name of condition to display
- * @param root0.valueSetsByCondition - name of condition to display
- * @returns A component for display to redner on the query building page
+ * @param root0.constructedQuery - current state of the built query
+ * @param root0.handleSelectedValueSetUpdate - handler function for ValueSet level updates
+ * @param root0.handleUpdateCondition - handler function for condition update
+ * @param root0.conditionsMap - condition details
+ * @param root0.categoryToConditionsMap - category-index condition details
+ * @returns A component for display to render on the query building page
  */
 export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
-  queryName,
-  selectedConditions,
-  valueSetsByCondition,
+  constructedQuery,
+  handleSelectedValueSetUpdate,
+  handleUpdateCondition,
+  conditionsMap: conditionsDetailsMap,
+  categoryToConditionsMap,
 }) => {
-  const focusRef = useRef<HTMLInputElement | null>(null);
   const [activeCondition, setActiveCondition] = useState<string>("");
-  const [_searchFilter, setSearchFilter] = useState<string>();
-  const [selectedValueSets, setSelectedValueSets] =
-    useState<ConditionToValueSetMap>({});
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const handleDrawer = (open: boolean) => {
+    setIsDrawerOpen(open);
+  };
 
   useEffect(() => {
-    if (queryName == "" || queryName == undefined) {
-      focusRef?.current?.focus();
-    }
-
-    const first = Object.keys(selectedConditions)[0];
-    const id = Object.keys(selectedConditions[first])[0];
-
-    setActiveCondition(id);
-
-    const groupedValueSetByCondition: ConditionToValueSetMap = Object.entries(
-      valueSetsByCondition,
-    )
-      .map(([conditionId, valSet]) => {
-        // results for each condition
-        const results: {
-          [vsType in DibbsValueSetType]: {
-            [vsNameAuthorSystem: string]: GroupedValueSet;
-          };
-        } = {
-          labs: {},
-          conditions: {},
-          medications: {},
-        };
-
-        const valueSetsByNameAuthorSystem =
-          groupValueSetsByNameAuthorSystem(valSet);
-
-        Object.entries(valueSetsByNameAuthorSystem).map(
-          ([nameAuthorSystem, groupedValueSet]) => {
-            const mappedSets = mapValueSetsToValueSetType(
-              groupedValueSet.items,
-            );
-
-            Object.entries(mappedSets).forEach(([valueSetTypeKey, items]) => {
-              // the sieving function below accounts for the case that a GroupedValueSet
-              // might have items that belong to more than one ValueSetType.
-              // In practice, this doesn't occur very often / will result in empty
-              // GroupedValueSets (ie the groupings on the other tabs) that we don't
-              // want to display, so we should filter those out.
-              if (items.length > 0) {
-                results[valueSetTypeKey as DibbsValueSetType][
-                  nameAuthorSystem
-                ] = {
-                  ...groupedValueSet,
-                  items: items,
-                };
-              }
-            });
-
-            return;
-          },
-        );
-
-        return { [conditionId]: results }; // the value of groupedValueSetByCondition
-      })
-      .reduce(function (result, current) {
-        const conditionId = Object.keys(current)[0];
-        result[conditionId] = {
-          labs: current[conditionId].labs,
-          medications: current[conditionId].medications,
-          conditions: current[conditionId].conditions,
-        };
-        return result;
-      }, {});
-
-    return () => {
-      setSelectedValueSets(groupedValueSetByCondition);
-    };
+    // display the first condition's valuesets on render
+    setActiveCondition(Object.keys(constructedQuery)[0]);
   }, []);
 
-  const handleAddCondition = () => {
-    setIsDrawerOpen(true);
-  };
+  const conditionUpdate = categoryToConditionsMap
+    ? Object.entries(categoryToConditionsMap).map(([category, conditions]) => (
+        <div id={category} key={category}>
+          <div className={styles.conditionDrawerHeader}>{category}</div>
+          <div>
+            {Object.values(conditions).map((condition) => (
+              <div
+                key={`update-${condition.id}`}
+                id={`update-${condition.id}`}
+                className={styles.conditionItem}
+              >
+                <span>{formatDiseaseDisplay(condition.name)}</span>
 
-  const handleCloseDrawer = () => {
-    setIsDrawerOpen(false);
-  };
-
-  // Makes the conditionId more easily accessible within the group
-  // of selected conditions
-  const includedConditionsWithIds = Object.entries(selectedConditions)
-    .map(([_, conditionsByCategory]) =>
-      Object.entries(conditionsByCategory).flatMap(
-        ([conditionId, conditionObj]) => {
-          return { id: conditionId, name: conditionObj.name };
-        },
-      ),
-    )
-    .flatMap((conditionsByCategory) => conditionsByCategory);
+                {Object.keys(constructedQuery).includes(condition.id) ? (
+                  <span className={styles.addedStatus}>Added</span>
+                ) : (
+                  <span
+                    className={styles.addButton}
+                    role="button"
+                    onClick={() => {
+                      handleUpdateCondition(condition.id, false);
+                      showToastConfirmation({
+                        body: `${condition.name} added to query`,
+                      });
+                    }}
+                  >
+                    ADD
+                  </span>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      ))
+    : undefined;
 
   return (
     <div
@@ -165,7 +108,7 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
               <div
                 className={styles.addCondition}
                 role="button"
-                onClick={handleAddCondition}
+                onClick={() => handleDrawer(true)}
                 tabIndex={0}
               >
                 <Icon.Add
@@ -178,19 +121,35 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
               </div>
             </div>
 
-            {Object.values(includedConditionsWithIds).map((condition) => {
+            {Object.keys(constructedQuery).map((conditionId) => {
+              const condition = conditionsDetailsMap[conditionId];
               return (
                 <div
-                  key={condition.id}
-                  className={
-                    activeCondition == condition.id
+                  className={classNames(
+                    "align-items-center",
+                    activeCondition == conditionId
                       ? `${styles.conditionCard} ${styles.active}`
-                      : styles.conditionCard
-                  }
-                  onClick={() => setActiveCondition(condition.id)}
-                  tabIndex={0}
+                      : styles.conditionCard,
+                  )}
                 >
-                  {formatDiseaseDisplay(condition.name)}
+                  <div
+                    key={`tab-${conditionId}`}
+                    id={`tab-${conditionId}`}
+                    onClick={() => setActiveCondition(conditionId)}
+                    tabIndex={0}
+                  >
+                    {formatDiseaseDisplay(condition.name)}
+                  </div>
+                  <Icon.Delete
+                    className={classNames("usa-icon", styles.deleteIcon)}
+                    size={5}
+                    color="red"
+                    aria-label="Trash icon indicating deletion of disease"
+                    onClick={() => {
+                      handleUpdateCondition(conditionId, true);
+                      setActiveCondition(Object.keys(constructedQuery)[0]);
+                    }}
+                  ></Icon.Delete>
                 </div>
               );
             })}
@@ -198,7 +157,7 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
         </div>
         <div className={styles.valueSetTemplate__right}>
           <div className={styles.valueSetTemplate__search}>
-            <SearchField
+            {/* <SearchField
               id="valueSetTemplateSearch"
               placeholder="Search labs, medications, conditions"
               className={styles.valueSetSearch}
@@ -206,16 +165,15 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
                 e.preventDefault();
                 setSearchFilter(e.target.value);
               }}
-            />
+            /> */}
           </div>
           <div>
-            {selectedValueSets && (
-              <SelectionTable
-                conditionId={activeCondition ?? ""}
-                groupedValueSetsForCondition={
-                  selectedValueSets[activeCondition]
-                }
-                setValueSets={setSelectedValueSets}
+            {constructedQuery && constructedQuery[activeCondition] && (
+              <ConceptTypeSelectionTable
+                vsTypeLevelOptions={constructedQuery[activeCondition]}
+                handleVsTypeLevelUpdate={handleSelectedValueSetUpdate(
+                  activeCondition,
+                )}
               />
             )}
           </div>
@@ -225,10 +183,13 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
       <Drawer
         title="Add Condition(s)"
         placeholder="Search conditions"
-        codes={<div>Dynamic codes go here</div>}
+        toRender={<div>{conditionUpdate}</div>}
         toastMessage="Condition has been successfully added."
         isOpen={isDrawerOpen}
-        onClose={handleCloseDrawer}
+        onClose={() => handleDrawer(false)}
+        onSave={() => {
+          handleUpdateCondition;
+        }}
       />
     </div>
   );
