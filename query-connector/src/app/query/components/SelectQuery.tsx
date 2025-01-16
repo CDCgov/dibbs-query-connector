@@ -99,6 +99,7 @@ const SelectQuery: React.FC<SelectQueryProps> = ({
       patientForQuery: patientForQuery,
       selectedQuery: selectedQuery.query_name,
       fhirServer: fhirServer,
+      queryValueSets: queryValueSets,
       queryResponseStateCallback: setResultsQueryResponse,
       setIsLoading: setLoadingResultResponse,
     }).catch(console.error);
@@ -113,7 +114,7 @@ const SelectQuery: React.FC<SelectQueryProps> = ({
 
       {showCustomizeQuery ? (
         <CustomizeQuery
-          useCaseQueryResponse={resultsQueryResponse}
+          fhirQueryResponse={resultsQueryResponse}
           selectedQuery={selectedQuery}
           queryValueSets={queryValueSets}
           setQueryValuesets={setQueryValueSets}

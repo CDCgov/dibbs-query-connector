@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "@trussworks/react-uswds";
 import { DibbsConceptType, DibbsValueSet } from "../../constants";
-import { FhirQueryResponse } from "@/app/query-service";
+import { QueryRequest, QueryResponse } from "@/app/query-service";
 import LoadingView from "./LoadingView";
 import { showToastConfirmation } from "../designSystem/toast/Toast";
 import styles from "./customizeQuery/customizeQuery.module.scss";
@@ -17,7 +17,7 @@ import { generateValueSetGroupingsByDibbsConceptType } from "@/app/utils/valueSe
 import { CustomUserQuery } from "@/app/query-building";
 
 interface CustomizeQueryProps {
-  useCaseQueryResponse: FhirQueryResponse;
+  fhirQueryResponse: QueryResponse;
   queryValueSets: DibbsValueSet[];
   setQueryValuesets: (queryVS: DibbsValueSet[]) => void;
   goBack: () => void;
@@ -27,7 +27,7 @@ interface CustomizeQueryProps {
 /**
  * CustomizeQuery component for displaying and customizing query details.
  * @param root0 - The properties object.
- * @param root0.useCaseQueryResponse - The response from the query service.
+ * @param root0.fhirQueryResponse - The response from the query service.
  * @param root0.selectedQuery - The current query to be customized.
  * @param root0.queryValueSets - The pre-fetched value sets from the DB.
  * @param root0.setQueryValuesets - Function to update tracked custom query state.
@@ -35,7 +35,7 @@ interface CustomizeQueryProps {
  * @returns The CustomizeQuery component.
  */
 const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
-  useCaseQueryResponse,
+  fhirQueryResponse,
   queryValueSets: queryValueSets,
   setQueryValuesets,
   goBack,
@@ -166,7 +166,7 @@ const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
       <div className="padding-top-3">
         <Backlink onClick={goBack} label={RETURN_LABEL["results"]} />
       </div>
-      <LoadingView loading={!useCaseQueryResponse} />
+      <LoadingView loading={!fhirQueryResponse} />
       <h1 className="page-title margin-bottom-05-important">Customize query</h1>
       <h2 className="page-explainer margin-y-0-important">
         Query: {selectedQuery.query_name}

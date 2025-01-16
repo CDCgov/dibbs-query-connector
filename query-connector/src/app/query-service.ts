@@ -4,12 +4,7 @@ import https from "https";
 import { Bundle, DomainResource } from "fhir/r4";
 
 import FHIRClient from "./fhir-servers";
-import {
-  USE_CASES,
-  DibbsValueSet,
-  isFhirResource,
-  FhirResource,
-} from "./constants";
+import { DibbsValueSet, isFhirResource, FhirResource } from "./constants";
 
 import { CustomQuery } from "./CustomQuery";
 import { GetPhoneQueryFormats } from "./format-service";
@@ -31,8 +26,8 @@ type SuperSetQueryResponse = {
 
 export type APIQueryResponse = Bundle;
 
-export type UseCaseQueryRequest = {
-  use_case: USE_CASES;
+export type QueryRequest = {
+  query_name: string;
   fhir_server: string;
   first_name?: string;
   last_name?: string;
@@ -53,7 +48,7 @@ export type QueryStruct = {
 };
 
 // Expected responses from the FHIR server
-export type UseCaseQueryResponse = Awaited<ReturnType<typeof UseCaseQuery>>;
+export type FhirQueryResponse = Awaited<ReturnType<typeof makeFhirQuery>>;
 
 /**
  * @todo Add encounters as _include in condition query & batch encounter queries
@@ -90,7 +85,7 @@ async function queryEncounters(
  * @returns - The response body from the FHIR server.
  */
 async function patientQuery(
-  request: UseCaseQueryRequest,
+  request: QueryRequest,
   fhirClient: FHIRClient,
   queryResponse: QueryResponse,
 ): Promise<void> {
@@ -146,8 +141,8 @@ async function patientQuery(
  * @param queryResponse - The response object to store the query results.
  * @returns - The response object containing the query results.
  */
-export async function UseCaseQuery(
-  request: UseCaseQueryRequest,
+export async function makeFhirQuery(
+  request: QueryRequest,
   queryValueSets: DibbsValueSet[],
   queryResponse: QueryResponse = {},
 ): Promise<QueryResponse> {
@@ -165,7 +160,7 @@ export async function UseCaseQuery(
   const patientId = queryResponse.Patient[0].id ?? "";
 
   await generalizedQuery(
-    request.use_case,
+    request.query_name,
     queryValueSets,
     patientId,
     fhirClient,
@@ -189,20 +184,20 @@ export async function UseCaseQuery(
  * @returns A promise for an updated query response.
  */
 async function generalizedQuery(
-  useCase: USE_CASES,
+  queryName: string,
   queryValueSets: DibbsValueSet[],
   patientId: string,
   fhirClient: FHIRClient,
   queryResponse: QueryResponse,
 ): Promise<QueryResponse> {
-  const querySpec = await formatValueSetsAsQuerySpec(useCase, queryValueSets);
+  const querySpec = await formatValueSetsAsQuerySpec(queryName, queryValueSets);
   const builtQuery = new CustomQuery(querySpec, patientId);
   let response: fetch.Response | fetch.Response[];
 
   // Special cases for newborn screening, which just use one query
-  if (useCase === "newborn-screening") {
+  if (queryName.includes("Newborn")) {
     response = await fhirClient.get(builtQuery.getQuery("observation"));
-  } else if (useCase === "immunization") {
+  } else if (queryName.includes("Immunization")) {
     response = await fhirClient.get(builtQuery.getQuery("immunization"));
   } else {
     const queryRequests: string[] = builtQuery.getAllQueries();

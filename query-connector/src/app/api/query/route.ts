@@ -14,10 +14,15 @@ import {
   RESPONSE_BODY_IS_NOT_PATIENT_RESOURCE,
   MISSING_API_QUERY_PARAM,
   MISSING_PATIENT_IDENTIFIERS,
+  USE_CASES,
 } from "../../constants";
 
 import { handleRequestError } from "./error-handling-service";
-import { getFhirServerNames } from "@/app/database-service";
+import {
+  getFhirServerNames,
+  getSavedQueryByName,
+} from "@/app/database-service";
+import { unnestValueSetsFromQuery } from "@/app/utils";
 
 /**
  * Health check for TEFCA Viewer
@@ -99,7 +104,14 @@ export async function POST(request: NextRequest) {
     ...(PatientIdentifiers.phone && { phone: PatientIdentifiers.phone }),
   };
 
-  const QueryResponse: QueryResponse = await makeFhirQuery(QueryRequest);
+  const queryName = USE_CASE_DETAILS[use_case as USE_CASES].queryName;
+  const queryResults = await getSavedQueryByName(queryName);
+  const valueSets = unnestValueSetsFromQuery(queryResults);
+
+  const QueryResponse: QueryResponse = await makeFhirQuery(
+    QueryRequest,
+    valueSets,
+  );
 
   // Bundle data
   const bundle: APIQueryResponse = await createBundle(QueryResponse);
