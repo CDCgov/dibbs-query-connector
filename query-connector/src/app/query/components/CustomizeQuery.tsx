@@ -17,8 +17,7 @@ import { generateValueSetGroupingsByDibbsConceptType } from "@/app/utils/valueSe
 import { CustomUserQuery } from "@/app/query-building";
 
 interface CustomizeQueryProps {
-  useCaseQueryResponse: UseCaseQueryResponse;
-  queryType: USE_CASES;
+  useCaseQueryResponse: FhirQueryResponse;
   queryValueSets: DibbsValueSet[];
   setQueryValuesets: (queryVS: DibbsValueSet[]) => void;
   goBack: () => void;

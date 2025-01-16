@@ -6,17 +6,19 @@ import {
   Select,
   Button,
 } from "@trussworks/react-uswds";
-import { USE_CASES, demoData, stateOptions, Mode } from "@/app/constants";
-import { UseCaseQueryResponse, UseCaseQuery } from "@/app/query-service";
+import { stateOptions, Mode, hyperUnluckyPatient } from "@/app/constants";
+import {
+  FhirQueryResponse,
+  QueryRequest,
+  makeFhirQuery,
+} from "@/app/query-service";
 import styles from "./searchForm/searchForm.module.scss";
 import { FormatPhoneAsDigits } from "@/app/format-service";
 import TitleBox from "./stepIndicator/TitleBox";
 
 interface SearchFormProps {
-  useCase: USE_CASES;
-  setUseCase: (useCase: USE_CASES) => void;
   setPatientDiscoveryQueryResponse: (
-    UseCaseQueryResponse: UseCaseQueryResponse,
+    UseCaseQueryResponse: FhirQueryResponse,
   ) => void;
   setMode: (mode: Mode) => void;
   setLoading: (loading: boolean) => void;
@@ -27,8 +29,6 @@ interface SearchFormProps {
 
 /**
  * @param root0 - SearchFormProps
- * @param root0.useCase - The use case this query will cover.
- * @param root0.setUseCase - Update stateful use case.
  * @param root0.setMode - The function to set the mode.
  * @param root0.setLoading - The function to set the loading state.
  * @param root0.setPatientDiscoveryQueryResponse - callback function to set the
@@ -39,8 +39,6 @@ interface SearchFormProps {
  * @returns - The SearchForm component.
  */
 const SearchForm: React.FC<SearchFormProps> = function SearchForm({
-  useCase,
-  setUseCase,
   setPatientDiscoveryQueryResponse,
   setMode,
   setLoading,
@@ -81,16 +79,21 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
     }
     setLoading(true);
 
-    const originalRequest = {
+    const originalRequest: QueryRequest = {
       first_name: firstName,
       last_name: lastName,
       dob: dob,
       mrn: mrn,
       fhir_server: fhirServer,
-      use_case: useCase,
+      // we just need the patient here and don't need to cross reference
+      // our DB.
+      // ? maybe refactor to split out our generic FHIR query into more
+      // ? resource-based methods?
+      query_name: null,
+      just_return_patient: true,
       phone: FormatPhoneAsDigits(phone),
     };
-    const queryResponse = await UseCaseQuery(originalRequest, []);
+    const queryResponse = await makeFhirQuery(originalRequest);
     setPatientDiscoveryQueryResponse(queryResponse);
 
     setMode("patient-results");
