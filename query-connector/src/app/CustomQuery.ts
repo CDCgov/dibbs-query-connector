@@ -1,7 +1,7 @@
-interface CustomQuerySpec {
-  labCodes?: string[];
-  snomedCodes?: string[];
-  rxnormCodes?: string[];
+import { QueryDataColumn } from "./queryBuilding/utils";
+
+export interface CustomQuerySpec {
+  queryData: QueryDataColumn;
   classTypeCodes?: string[];
   hasSecondEncounterQuery?: boolean;
 }
@@ -15,22 +15,49 @@ interface CustomQuerySpec {
  * information.
  */
 export class CustomQuery {
+  patientId: string = "";
+
   // Store four types of input codes
   labCodes: string[] = [];
-  snomedCodes: string[] = [];
-  rxnormCodes: string[] = [];
+  medicationCodes: string[] = [];
+  conditionCodes: string[] = [];
   classTypeCodes: string[] = [];
 
-  // Need default initialization of query strings outstide constructor,
-  // since the `try` means we might not find the JSON spec
-  observationQuery: string = "";
-  diagnosticReportQuery: string = "";
-  conditionQuery: string = "";
-  medicationRequestQuery: string = "";
-  socialHistoryQuery: string = "";
-  encounterQuery: string = "";
-  encounterClassTypeQuery: string = "";
-  immunizationQuery: string = "";
+  // initialize the query struct
+  fhirResourceQueries = {
+    observation: {
+      basePath: "",
+      params: {} as { [paramName: string]: string },
+    },
+    diagnosticReport: {
+      basePath: "",
+      params: {} as { [paramName: string]: string },
+    },
+    condition: {
+      basePath: "",
+      params: {} as { [paramName: string]: string },
+    },
+    medicationRequest: {
+      basePath: "",
+      params: {} as { [paramName: string]: string },
+    },
+    socialHistory: {
+      basePath: "",
+      params: {} as { [paramName: string]: string },
+    },
+    encounter: {
+      basePath: "",
+      params: {} as { [paramName: string]: string },
+    },
+    encounterClass: {
+      basePath: "",
+      params: {} as { [paramName: string]: string },
+    },
+    immunization: {
+      basePath: "",
+      params: {} as { [paramName: string]: string },
+    },
+  };
 
   // Some queries need to be batched in waves because their encounter references
   // might depend on demographic information
@@ -46,15 +73,35 @@ export class CustomQuery {
    */
   constructor(jsonSpec: CustomQuerySpec, patientId: string) {
     try {
-      this.labCodes = jsonSpec?.labCodes || [];
-      this.snomedCodes = jsonSpec?.snomedCodes || [];
-      this.rxnormCodes = jsonSpec?.rxnormCodes || [];
+      this.patientId = patientId;
+      this.initializeQueryConceptTypes(jsonSpec.queryData);
+      this.compileFhirResourceQueries(patientId);
       this.classTypeCodes = jsonSpec?.classTypeCodes || [];
       this.hasSecondEncounterQuery = jsonSpec?.hasSecondEncounterQuery || false;
-      this.compileQueries(patientId);
     } catch (error) {
       console.error("Could not create CustomQuery Object: ", error);
     }
+  }
+
+  initializeQueryConceptTypes(queryData: QueryDataColumn) {
+    Object.values(queryData).forEach((condition) => {
+      Object.values(condition).forEach((valueSet) => {
+        const conceptsToParse = valueSet.concepts.map((c) => c.code);
+        switch (valueSet.dibbsConceptType) {
+          case "labs":
+            this.labCodes = this.labCodes.concat(conceptsToParse);
+            break;
+          case "conditions":
+            this.conditionCodes = this.conditionCodes.concat(conceptsToParse);
+            break;
+          case "medications":
+            this.medicationCodes = this.medicationCodes.concat(conceptsToParse);
+            break;
+          default:
+            break;
+        }
+      });
+    });
   }
 
   /**
@@ -64,58 +111,113 @@ export class CustomQuery {
    * any query built using those codes' filter will be left as the empty string.
    * @param patientId The ID of the patient to query for.
    */
-  compileQueries(patientId: string): void {
-    const labsFilter = this.labCodes.join(",");
-    const snomedFilter = this.snomedCodes.join(",");
-    const rxnormFilter = this.rxnormCodes.join(",");
+  compileFhirResourceQueries(patientId: string): void {
+    const labsFilter = this.labCodes.join(","); // pull labs on dibbsConceptType - will need to find the valid codes all the code systems
+    const medicationsFilter = this.medicationCodes.join(",");
+    const conditionsFilter = this.conditionCodes.join(",");
     const classTypeFilter = this.classTypeCodes.join(",");
 
-    this.observationQuery =
-      labsFilter !== ""
-        ? `/Observation?subject=Patient/${patientId}&code=${labsFilter}`
-        : "";
-    this.diagnosticReportQuery =
-      labsFilter !== ""
-        ? `/DiagnosticReport?subject=${patientId}&code=${labsFilter}`
-        : "";
-    this.conditionQuery =
-      snomedFilter !== ""
-        ? `/Condition?subject=${patientId}&code=${snomedFilter}`
-        : "";
-    this.medicationRequestQuery =
-      rxnormFilter !== ""
-        ? `/MedicationRequest?subject=${patientId}&code=${rxnormFilter}&_include=MedicationRequest:medication&_revinclude=MedicationAdministration:request`
-        : "";
-    this.socialHistoryQuery = `/Observation?subject=${patientId}&category=social-history`;
-    this.encounterQuery =
-      snomedFilter !== ""
-        ? `/Encounter?subject=${patientId}&reason-code=${snomedFilter}`
-        : "";
-    this.encounterClassTypeQuery =
-      classTypeFilter !== ""
-        ? `/Encounter?subject=${patientId}&class=${classTypeFilter}`
-        : "";
+    // ? do all users want to see social history? We default to yes, but might
+    // ? want to toggle similar to what we might do for immunization
+    this.fhirResourceQueries["socialHistory"] = {
+      basePath: `/Observation/_search`,
+      params: {
+        subject: `Patient/${patientId}`,
+        category: "social-history",
+      },
+    };
 
-    this.immunizationQuery = `/Immunization?patient=${patientId}`;
+    this.fhirResourceQueries["immunization"] = {
+      basePath: `/Immunization/_search`,
+      params: {
+        patient: patientId,
+      },
+    };
+
+    if (labsFilter !== "") {
+      this.fhirResourceQueries["observation"] = {
+        basePath: `/Observation/_search`,
+        params: {
+          subject: `Patient/${patientId}`,
+          code: labsFilter,
+        },
+      };
+
+      this.fhirResourceQueries["diagnosticReport"] = {
+        basePath: `/DiagnosticReport/_search`,
+        params: {
+          subject: `Patient/${patientId}`,
+          code: labsFilter,
+        },
+      };
+    }
+
+    if (conditionsFilter !== "") {
+      this.fhirResourceQueries["encounter"] = {
+        basePath: `/Encounter/_search`,
+        params: {
+          subject: `Patient/${patientId}`,
+          "reason-code": conditionsFilter,
+        },
+      };
+      this.fhirResourceQueries["condition"] = {
+        basePath: `/Condition/_search`,
+        params: {
+          subject: `Patient/${patientId}`,
+          code: conditionsFilter,
+        },
+      };
+    }
+
+    if (medicationsFilter !== "") {
+      // Medications are floating representations of drugs. Sometimes we need the extra
+      // info from the medication to display in the UI: that's what the ":medication" is doing
+      // and similarly for revinclude for the request <> admin relationship
+
+      this.fhirResourceQueries["medicationRequest"] = {
+        basePath: `/MedicationRequest/_search`,
+        params: {
+          subject: `Patient/${patientId}`,
+          code: medicationsFilter,
+          _include: "MedicationRequest:medication",
+          _revinclude: "MedicationAdministration:request",
+        },
+      };
+    }
+
+    // ? Doing these in sequence gives us 429's Too Many Requests :(. Might need
+    // ? to be smarter about when to send which requests or introduce some
+    // ?  sort of sleep await
+
+    // ? Marcelle will do separate digging into how encounter interacts with classType
+    // if (classTypeFilter !== "") {
+    //   this.fhirResourceQueries["encounterClass"] = {
+    //     basePath: `/Encounter/_search`,
+    //     params: {
+    //       subject: `Patient/${patientId}`,
+    //       class: classTypeFilter,
+    //     },
+    //   };
+    // }
   }
 
-  /**
-   * Yields all non-empty-string queries compiled using the stored codes.
-   * @returns A list of queries.
-   */
-  getAllQueries(): string[] {
-    const queryRequests: string[] = [
-      this.observationQuery,
-      this.diagnosticReportQuery,
-      this.conditionQuery,
-      this.medicationRequestQuery,
-      this.socialHistoryQuery,
-      this.encounterQuery,
-      this.encounterClassTypeQuery,
-      this.immunizationQuery,
-    ];
-    const filteredRequests = queryRequests.filter((q) => q !== "");
-    return filteredRequests;
+  compilePostRequest(resource: {
+    basePath: string;
+    params: Record<string, string>;
+  }) {
+    return {
+      path: resource.basePath,
+      params: resource.params,
+    };
+  }
+
+  compileAllPostRequests() {
+    // return [this.compilePostRequest(this.fhirResourceQueries["condition"])];
+    return Object.values(this.fhirResourceQueries)
+      .map((q) => {
+        return this.compilePostRequest(q);
+      })
+      .filter((v) => v.path !== "");
   }
 
   /**
@@ -124,26 +226,29 @@ export class CustomQuery {
    * @param desiredQuery The type of query the user wants.
    * @returns The compiled query string for that type.
    */
-  getQuery(desiredQuery: string): string {
+  getQuery(desiredQuery: string): {
+    basePath: string;
+    params: Record<string, string>;
+  } {
     switch (desiredQuery) {
       case "observation":
-        return this.observationQuery;
-      case "diagnostic":
-        return this.diagnosticReportQuery;
+        return this.fhirResourceQueries["observation"];
+      case "diagnosticReport":
+        return this.fhirResourceQueries["diagnosticReport"];
       case "condition":
-        return this.conditionQuery;
+        return this.fhirResourceQueries["condition"];
       case "medicationRequest":
-        return this.medicationRequestQuery;
-      case "social":
-        return this.socialHistoryQuery;
+        return this.fhirResourceQueries["medicationRequest"];
+      case "socialHistory":
+        return this.fhirResourceQueries["socialHistory"];
       case "encounter":
-        return this.encounterQuery;
+        return this.fhirResourceQueries["encounter"];
       case "encounterClass":
-        return this.encounterClassTypeQuery;
+        return this.fhirResourceQueries["encounterClass"];
       case "immunization":
-        return this.immunizationQuery;
+        return this.fhirResourceQueries["immunization"];
       default:
-        return "";
+        return { basePath: "", params: {} };
     }
   }
 }

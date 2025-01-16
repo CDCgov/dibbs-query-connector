@@ -8,8 +8,8 @@ import {
   Immunization,
   Coding,
 } from "fhir/r4";
-import { DibbsValueSet } from "./constants";
-import { QueryStruct } from "./query-service";
+import { CustomQuerySpec } from "./CustomQuery";
+import { QueryDataColumn } from "./queryBuilding/utils";
 
 /**
  * Formats a string.
@@ -265,41 +265,21 @@ export async function GetPhoneQueryFormats(phone: string) {
 /**
  * Formats a statefully updated list of value sets into a JSON structure
  * used for executing custom queries.
- * @param useCase The base use case being queried for.
- * @param valueSets The list of value sets the user wants included.
+ * @param queryData The saved JSON for the query we need to unnest.
  * @returns A structured specification of a query that can be executed.
  */
-export const formatValueSetsAsQuerySpec = async (
-  useCase: string,
-  valueSets: DibbsValueSet[],
-) => {
-  let secondEncounter: boolean = false;
-  if (["cancer", "chlamydia", "gonorrhea", "syphilis"].includes(useCase)) {
-    secondEncounter = true;
-  }
-  const labCodes: string[] = valueSets
-    .filter((vs) => vs.system === "http://loinc.org")
-    .reduce((acc, vs) => {
-      vs.concepts.forEach((concept) => acc.push(concept.code));
-      return acc;
-    }, [] as string[]);
-  const snomedCodes: string[] = valueSets
-    .filter((vs) => vs.system === "http://snomed.info/sct")
-    .reduce((acc, vs) => {
-      vs.concepts.forEach((concept) => acc.push(concept.code));
-      return acc;
-    }, [] as string[]);
-  const rxnormCodes: string[] = valueSets
-    .filter((vs) => vs.system === "http://www.nlm.nih.gov/research/umls/rxnorm")
-    .reduce((acc, vs) => {
-      vs.concepts.forEach((concept) => acc.push(concept.code));
-      return acc;
-    }, [] as string[]);
+export const formatValueSetsAsQuerySpec = (queryData: QueryDataColumn) => {
+  // ? How should we handle followup encounter queries now that we aren't
+  // ? hardcoding the conditions?
+  let secondEncounter: boolean = true;
+  // if (["cancer", "chlamydia", "gonorrhea", "syphilis"].includes(useCase)) {
+  //   secondEncounter = true;
+  // }
 
-  const spec: QueryStruct = {
-    labCodes: labCodes,
-    snomedCodes: snomedCodes,
-    rxnormCodes: rxnormCodes,
+  const spec: CustomQuerySpec = {
+    queryData: queryData,
+    // ? To determine how to better initialize this based on Marcelle's digging
+    // ? on class codes
     classTypeCodes: [] as string[],
     hasSecondEncounterQuery: secondEncounter,
   };

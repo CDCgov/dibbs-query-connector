@@ -18,11 +18,7 @@ import {
 } from "../../constants";
 
 import { handleRequestError } from "./error-handling-service";
-import {
-  getFhirServerNames,
-  getSavedQueryByName,
-} from "@/app/database-service";
-import { unnestValueSetsFromQuery } from "@/app/utils";
+import { getFhirServerNames } from "@/app/database-service";
 
 /**
  * Health check for TEFCA Viewer
@@ -104,14 +100,7 @@ export async function POST(request: NextRequest) {
     ...(PatientIdentifiers.phone && { phone: PatientIdentifiers.phone }),
   };
 
-  const queryName = USE_CASE_DETAILS[use_case as USE_CASES].queryName;
-  const queryResults = await getSavedQueryByName(queryName);
-  const valueSets = unnestValueSetsFromQuery(queryResults);
-
-  const QueryResponse: QueryResponse = await makeFhirQuery(
-    QueryRequest,
-    valueSets,
-  );
+  const QueryResponse: QueryResponse = await makeFhirQuery(QueryRequest);
 
   // Bundle data
   const bundle: APIQueryResponse = await createBundle(QueryResponse);
