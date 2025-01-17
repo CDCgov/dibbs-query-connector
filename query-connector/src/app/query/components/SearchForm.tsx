@@ -18,7 +18,7 @@ import TitleBox from "./stepIndicator/TitleBox";
 
 interface SearchFormProps {
   setPatientDiscoveryQueryResponse: (
-    UseCaseQueryResponse: FhirQueryResponse,
+    FhirPatientDiscoveryResponse: FhirQueryResponse,
   ) => void;
   setMode: (mode: Mode) => void;
   setLoading: (loading: boolean) => void;
@@ -118,8 +118,8 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
               htmlFor="query"
             >
               The demo site uses synthetic data to provide examples of possible
-              queries that you can make with the Query Connector. Select a query
-              use case, a sample patient, and then click “fill fields” below.
+              queries that you can make with the Query Connector. To proceed,
+              click “fill fields” below.
             </Label>
 
             <div className={`${styles.searchCallToActionContainer}`}>
