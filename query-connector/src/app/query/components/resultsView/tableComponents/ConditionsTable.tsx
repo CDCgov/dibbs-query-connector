@@ -31,7 +31,7 @@ const ConditionsTable: React.FC<ConditionTableProps> = ({ conditions }) => {
       bordered={false}
       className={classNames(
         "margin-top-0-important",
-        styles.conditionsTableContainer
+        styles.conditionsTableContainer,
       )}
     >
       <thead>

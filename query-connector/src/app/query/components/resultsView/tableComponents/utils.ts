@@ -16,7 +16,7 @@ export function checkIfSomeElementWithPropertyExists<
       acc[p] = false;
       return acc;
     },
-    {} as Record<K, boolean>
+    {} as Record<K, boolean>,
   );
 
   for (const e of array) {
