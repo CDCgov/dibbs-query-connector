@@ -65,7 +65,7 @@ describe("POST Query FHIR Server", () => {
     expect(body.issue[0].diagnostics).toBe(MISSING_PATIENT_IDENTIFIERS);
   });
 
-  it("should return an OperationOutcome if the use_case or fhir_server is missing", async () => {
+  it("should return an OperationOutcome if the query_name or fhir_server is missing", async () => {
     const request = createNextRequest(PatientResource, new URLSearchParams());
     const response = await POST(request);
     const body = await response.json();
@@ -76,7 +76,9 @@ describe("POST Query FHIR Server", () => {
   it("should return an OperationOutcome if the fhir_server is not valid", async () => {
     const request = createNextRequest(
       PatientResource,
-      new URLSearchParams("use_case=syphilis&fhir_server=invalid"),
+      new URLSearchParams(
+        "query_name=Syphilis%20case%20investigation&fhir_server=invalid",
+      ),
     );
     const response = await POST(request);
     const body = await response.json();
