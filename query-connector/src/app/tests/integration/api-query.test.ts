@@ -87,7 +87,9 @@ describe("POST Query FHIR Server", () => {
   it("should return a legitimate FHIR bundle if the query is successful", async () => {
     const request = createNextRequest(
       PatientResource,
-      new URLSearchParams("use_case=syphilis&fhir_server=HELIOS Meld: Direct"),
+      new URLSearchParams(
+        "use_case=Syphilis%20case%20investigation&fhir_server=HELIOS Meld: Direct",
+      ),
     );
     const response = await POST(request);
     const body = await response.json();

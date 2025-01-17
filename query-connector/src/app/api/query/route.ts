@@ -8,13 +8,11 @@ import {
 } from "../../query-service";
 import { parsePatientDemographics } from "./parsing-service";
 import {
-  USE_CASE_DETAILS,
   INVALID_FHIR_SERVERS,
-  INVALID_USE_CASE,
+  INVALID_QUERY,
   RESPONSE_BODY_IS_NOT_PATIENT_RESOURCE,
   MISSING_API_QUERY_PARAM,
   MISSING_PATIENT_IDENTIFIERS,
-  USE_CASES,
 } from "../../constants";
 
 import { handleRequestError } from "./error-handling-service";
@@ -81,9 +79,6 @@ export async function POST(request: NextRequest) {
   if (!use_case || !fhir_server) {
     const OperationOutcome = await handleRequestError(MISSING_API_QUERY_PARAM);
     return NextResponse.json(OperationOutcome);
-  } else if (!Object.keys(USE_CASE_DETAILS).includes(use_case)) {
-    const OperationOutcome = await handleRequestError(INVALID_USE_CASE);
-    return NextResponse.json(OperationOutcome);
   } else if (!Object.values(fhirServers).includes(fhir_server)) {
     const OperationOutcome = await handleRequestError(INVALID_FHIR_SERVERS);
     return NextResponse.json(OperationOutcome);
@@ -104,8 +99,15 @@ export async function POST(request: NextRequest) {
     ...(PatientIdentifiers.phone && { phone: PatientIdentifiers.phone }),
   };
 
-  const queryName = USE_CASE_DETAILS[use_case as USE_CASES].queryName;
+  const queryName = use_case;
   const queryResults = await getSavedQueryByName(queryName);
+  console.log(queryResults);
+
+  if (queryResults.length === 0) {
+    const OperationOutcome = await handleRequestError(INVALID_QUERY);
+    return NextResponse.json(OperationOutcome);
+  }
+
   const valueSets = unnestValueSetsFromQuery(queryResults);
 
   const QueryResponse: QueryResponse = await makeFhirQuery(

@@ -47,7 +47,6 @@ export type DemoDataFields = {
   MRN: string;
   Phone: string;
   FhirServer: string;
-  UseCase: USE_CASES;
 };
 
 /*Type to specify the different patient types*/
@@ -71,44 +70,6 @@ export const hyperUnluckyPatient: DemoDataFields = {
   MRN: "8692756",
   Phone: "517-425-1398",
   FhirServer: DEFAULT_DEMO_FHIR_SERVER,
-  UseCase: "cancer", // UseCase will be updated per case
-};
-
-/*
-Demo patient data used to populate the form fields with each value being a type of DemoDataFields
-*/
-export const demoData: Record<PatientType, DemoDataFields> = {
-  cancer: { ...hyperUnluckyPatient, UseCase: "cancer" },
-  "sti-chlamydia-positive": { ...hyperUnluckyPatient, UseCase: "chlamydia" },
-  "sti-gonorrhea-positive": { ...hyperUnluckyPatient, UseCase: "gonorrhea" },
-  "sti-syphilis-positive": { ...hyperUnluckyPatient, UseCase: "syphilis" },
-  "newborn-screening-technical-fail": {
-    FirstName: "Mango",
-    LastName: "Smith",
-    DOB: "2024-07-12",
-    MRN: "67890",
-    Phone: "555-123-4567",
-    FhirServer: "HELIOS Meld: Direct",
-    UseCase: "newborn-screening",
-  },
-  "newborn-screening-referral": {
-    FirstName: "Watermelon",
-    LastName: "McGee",
-    DOB: "2024-07-12",
-    MRN: "18091",
-    Phone: "5555555555",
-    FhirServer: "HELIOS Meld: Direct",
-    UseCase: "newborn-screening",
-  },
-  "newborn-screening-pass": {
-    FirstName: "Cucumber",
-    LastName: "Hill",
-    DOB: "2023-08-29",
-    MRN: "18091",
-    Phone: "",
-    FhirServer: "CernerHelios: eHealthExchange",
-    UseCase: "newborn-screening",
-  },
 };
 
 // Define Option type
@@ -336,9 +297,7 @@ export type FhirServerConfig = {
   disable_cert_validation: boolean;
 };
 
-export const INVALID_USE_CASE = `Invalid use_case. Please provide a valid use_case. Valid use_cases include ${Object.keys(
-  USE_CASE_DETAILS,
-)}.`;
+export const INVALID_QUERY = `Query described in the use_case param not found in the set of saved queries. Please provide a valid use_case.`;
 export const INVALID_FHIR_SERVERS = `Invalid fhir_server. Please provide a valid fhir_server.`;
 export const RESPONSE_BODY_IS_NOT_PATIENT_RESOURCE =
   "Request body is not a Patient resource.";
