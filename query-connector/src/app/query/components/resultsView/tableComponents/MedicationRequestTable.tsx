@@ -21,9 +21,9 @@ export interface MedicationRequestTableProps {
 const MedicationRequestTable: React.FC<MedicationRequestTableProps> = ({
   medicationRequests,
 }) => {
-  const anyReasonCode = checkIfSomeElementWithPropertyExists(
+  const availableElements = checkIfSomeElementWithPropertyExists(
     medicationRequests,
-    "reasonCode",
+    ["reasonCode"]
   );
 
   return (
@@ -32,7 +32,7 @@ const MedicationRequestTable: React.FC<MedicationRequestTableProps> = ({
         <tr className={styles.medicationRow}>
           <th>Order Date</th>
           <th>Medication</th>
-          {anyReasonCode && <th>Reason Code</th>}
+          {availableElements.reasonCode && <th>Reason Code</th>}
           <th>Status</th>
         </tr>
       </thead>
@@ -42,10 +42,10 @@ const MedicationRequestTable: React.FC<MedicationRequestTableProps> = ({
             <td>{formatDate(medicationRequest.authoredOn)}</td>
             <td>
               {formatCodeableConcept(
-                medicationRequest.medicationCodeableConcept,
+                medicationRequest.medicationCodeableConcept
               )}
             </td>
-            {anyReasonCode && (
+            {availableElements.reasonCode && (
               <td>
                 {formatCodeableConcept(medicationRequest?.reasonCode?.[0])}
               </td>

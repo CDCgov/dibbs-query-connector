@@ -20,46 +20,39 @@ export interface ConditionTableProps {
  * @returns - The ConditionTable component.
  */
 const ConditionsTable: React.FC<ConditionTableProps> = ({ conditions }) => {
-  const anyResolution = checkIfSomeElementWithPropertyExists(
-    conditions,
+  const availableElements = checkIfSomeElementWithPropertyExists(conditions, [
     "abatementDateTime",
-  );
-
-  const anyStatus = checkIfSomeElementWithPropertyExists(
-    conditions,
     "clinicalStatus",
-  );
-
-  const anyOnset = checkIfSomeElementWithPropertyExists(
-    conditions,
     "onsetDateTime",
-  );
+  ]);
 
   return (
     <Table
       bordered={false}
       className={classNames(
         "margin-top-0-important",
-        styles.conditionsTableContainer,
+        styles.conditionsTableContainer
       )}
     >
       <thead>
         <tr className={styles.conditionRow}>
           <th>Condition</th>
-          {anyStatus && <th>Status</th>}
-          {anyOnset && <th>Onset</th>}
-          {anyResolution && <th>Resolution</th>}
+          {availableElements.clinicalStatus && <th>Status</th>}
+          {availableElements.onsetDateTime && <th>Onset</th>}
+          {availableElements.abatementDateTime && <th>Resolution</th>}
         </tr>
       </thead>
       <tbody>
         {conditions.map((condition) => (
           <tr className={styles.conditionRow} key={condition.id}>
             <td>{formatCodeableConcept(condition.code ?? {})}</td>
-            {anyStatus && (
+            {availableElements.clinicalStatus && (
               <td>{formatCodeableConcept(condition.clinicalStatus ?? {})}</td>
             )}
-            {anyOnset && <td>{formatDate(condition.onsetDateTime)}</td>}
-            {anyResolution && (
+            {availableElements.onsetDateTime && (
+              <td>{formatDate(condition.onsetDateTime)}</td>
+            )}
+            {availableElements.abatementDateTime && (
               <td>{formatDate(condition.abatementDateTime)}</td>
             )}
           </tr>

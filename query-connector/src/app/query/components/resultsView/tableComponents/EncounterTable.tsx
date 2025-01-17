@@ -1,7 +1,11 @@
 import React from "react";
 import Table from "@/app/query/designSystem/table/Table";
 import { Encounter } from "fhir/r4";
-import { formatCodeableConcept, formatDate } from "../../../../format-service";
+import {
+  formatCodeableConcept,
+  formatCoding,
+  formatDate,
+} from "../../../../format-service";
 import { checkIfSomeElementWithPropertyExists } from "./utils";
 import styles from "./resultsTables.module.scss";
 
@@ -21,21 +25,20 @@ export interface EncounterTableProps {
 const EncounterTable: React.FC<EncounterTableProps> = ({
   encounters: encounters,
 }) => {
-  const anyClinicType =
-    checkIfSomeElementWithPropertyExists(encounters, "class") ||
-    checkIfSomeElementWithPropertyExists(encounters, "serviceType");
-
-  const anyServiceType = checkIfSomeElementWithPropertyExists(
-    encounters,
+  const availableElements = checkIfSomeElementWithPropertyExists(encounters, [
+    "class",
     "serviceProvider",
-  );
+    "serviceType",
+  ]);
+  console.log(availableElements);
+
   return (
     <Table bordered={false} className="margin-top-0-important">
       <thead>
         <tr className={styles.encountersRow}>
           <th>Visit Reason</th>
-          {anyClinicType && <th>Clinic Type</th>}
-          {anyServiceType && <th>Service Provider</th>}
+          {availableElements?.class && <th>Clinic Type</th>}
+          {availableElements?.serviceProvider && <th>Service Provider</th>}
           <th>Encounter Status</th>
           <th>Encounter Start</th>
           <th>Encounter End</th>
@@ -45,15 +48,12 @@ const EncounterTable: React.FC<EncounterTableProps> = ({
         {encounters.map((encounter) => (
           <tr className={styles.encountersRow} key={encounter.id}>
             <td>{formatCodeableConcept(encounter?.reasonCode?.[0])} </td>
-            {anyClinicType && (
-              <td>
-                {formatCodeableConcept(encounter?.class)} <br></br>
-                {encounter?.serviceType
-                  ? formatCodeableConcept(encounter.serviceType)
-                  : ""}
-              </td>
+            {availableElements?.class && (
+              <td>{formatCoding(encounter?.class)}</td>
             )}
-            {anyServiceType && <td>{encounter?.serviceProvider?.display}</td>}
+            {availableElements?.serviceProvider && (
+              <td>{encounter?.serviceProvider?.display}</td>
+            )}
             <td>{encounter?.status}</td>
             <td>{formatDate(encounter?.period?.start)}</td>
             <td>{formatDate(encounter?.period?.end)}</td>
