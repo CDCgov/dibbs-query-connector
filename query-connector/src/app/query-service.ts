@@ -242,10 +242,8 @@ export async function parseFhirSearch(
   for (const resource of resourceArray) {
     const resourceType = resource.resourceType;
     if (!(resourceType in queryResponse)) {
-      // make queryResponse[resourceType] a dict and add an array to store the resource IDs to check against for de-duping
       queryResponse[resourceType] = [resource];
     } else {
-      // Only add resources that do not have the same ID as an existing resources in resourceArray (de-dupe resources)
       queryResponse[resourceType]!.push(resource);
     }
   }

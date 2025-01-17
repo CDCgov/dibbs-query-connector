@@ -12,22 +12,20 @@ export function checkIfSomeElementWithPropertyExists<
   K extends keyof T,
 >(array: T[], propertiesToCheck: K[]): Record<K, boolean> {
   const result: Record<K, boolean> = propertiesToCheck.reduce(
-    (acc, p) => {
-      acc[p] = false;
-      return acc;
+    (accumulation, p) => {
+      accumulation[p] = false;
+      return accumulation;
     },
     {} as Record<K, boolean>
   );
 
-  for (const e of array) {
-    for (const p of propertiesToCheck) {
-      const prop = e[p];
-      if ((prop as string) in e) {
-        result[p] = true;
+  for (const resource of array) {
+    for (const property of propertiesToCheck) {
+      if (property in resource) {
+        result[property] = true;
       }
     }
   }
-  console.log(result);
 
   return result;
 }

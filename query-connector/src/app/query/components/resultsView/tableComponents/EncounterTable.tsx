@@ -30,7 +30,6 @@ const EncounterTable: React.FC<EncounterTableProps> = ({
     "serviceProvider",
     "serviceType",
   ]);
-  console.log(availableElements);
 
   return (
     <Table bordered={false} className="margin-top-0-important">
