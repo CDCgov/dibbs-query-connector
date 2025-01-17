@@ -4,7 +4,7 @@ import https from "https";
 import { Bundle, DomainResource } from "fhir/r4";
 
 import FHIRClient from "./fhir-servers";
-import { DibbsValueSet, isFhirResource, FhirResource } from "./constants";
+import { isFhirResource, FhirResource } from "./constants";
 
 import { CustomQuery } from "./CustomQuery";
 import { GetPhoneQueryFormats } from "./format-service";
