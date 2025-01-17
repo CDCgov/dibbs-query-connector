@@ -67,7 +67,7 @@ test.describe("alternate queries with the Query Connector", () => {
     await expect(
       page.getByRole("heading", { name: "Select a query" }),
     ).toBeVisible();
-    await page.getByTestId("Select").selectOption("cancer");
+    await page.getByTestId("Select").selectOption("Cancer case investigation");
     await page.getByRole("button", { name: "Submit" }).click();
     await expect(page.getByText("Loading")).toHaveCount(0, { timeout: 10000 });
 
