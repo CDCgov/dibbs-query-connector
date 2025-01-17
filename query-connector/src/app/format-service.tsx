@@ -300,7 +300,6 @@ export const formatValueSetsAsQuerySpec = async (
     labCodes: labCodes,
     snomedCodes: snomedCodes,
     rxnormCodes: rxnormCodes,
-    classTypeCodes: [] as string[],
     hasSecondEncounterQuery: secondEncounter,
   };
 
@@ -327,7 +326,7 @@ export const formatImmunizationRoute = (immunization: Immunization): string => {
  * @param coding - The Coding object.
  * @returns The Coding data formatted for display.
  */
-export function formatCoding(coding: Coding) {
+export function formatCoding(coding: Coding | undefined) {
   if (!coding) {
     return "";
   }

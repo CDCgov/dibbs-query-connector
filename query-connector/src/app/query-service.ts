@@ -48,7 +48,6 @@ export type QueryStruct = {
   labCodes: string[];
   snomedCodes: string[];
   rxnormCodes: string[];
-  classTypeCodes: string[];
   hasSecondEncounterQuery: boolean;
 };
 
