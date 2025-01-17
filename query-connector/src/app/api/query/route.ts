@@ -130,6 +130,5 @@ function mapDeprecatedUseCaseToQueryName(use_case: string | null) {
   if (use_case === null) return null;
   const potentialUseCaseMatch = USE_CASE_DETAILS[use_case as USE_CASES];
   const queryName = potentialUseCaseMatch?.queryName ?? null;
-  console.log(queryName);
   return queryName;
 }
