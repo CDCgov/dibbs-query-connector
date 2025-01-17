@@ -271,7 +271,7 @@ export async function GetPhoneQueryFormats(phone: string) {
  */
 export const formatValueSetsAsQuerySpec = async (
   useCase: string,
-  valueSets: DibbsValueSet[],
+  valueSets: DibbsValueSet[]
 ) => {
   let secondEncounter: boolean = false;
   if (["cancer", "chlamydia", "gonorrhea", "syphilis"].includes(useCase)) {
@@ -316,7 +316,25 @@ export const formatImmunizationRoute = (immunization: Immunization): string => {
   const initial = immunization.route?.coding?.[0].display ?? "";
   const readable = immunization.route?.coding?.filter(
     (code: Coding) =>
-      code.system === "http://terminology.hl7.org/CodeSystem/v2-0162",
+      code.system === "http://terminology.hl7.org/CodeSystem/v2-0162"
   );
   return readable?.[0].display ?? initial;
 };
+
+/**
+ * Formats a Coding object for display. If the object has a coding array,
+ * the first coding object is used.
+ * @param coding - The Coding object.
+ * @returns The Coding data formatted for display.
+ */
+export function formatCoding(coding: Coding) {
+  if (!coding) {
+    return "";
+  }
+  return (
+    <>
+      {" "}
+      {coding?.display} <br /> {coding?.code} <br /> {coding?.system}{" "}
+    </>
+  );
+}
