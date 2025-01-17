@@ -8,7 +8,6 @@ import {
   Immunization,
   Coding,
 } from "fhir/r4";
-import { CustomQuerySpec } from "./CustomQuery";
 import { QueryDataColumn } from "./queryBuilding/utils";
 
 /**
@@ -261,31 +260,6 @@ export async function GetPhoneQueryFormats(phone: string) {
   });
   return possibleFormats;
 }
-
-/**
- * Formats a statefully updated list of value sets into a JSON structure
- * used for executing custom queries.
- * @param queryData The saved JSON for the query we need to unnest.
- * @returns A structured specification of a query that can be executed.
- */
-export const formatValueSetsAsQuerySpec = (queryData: QueryDataColumn) => {
-  // ? How should we handle followup encounter queries now that we aren't
-  // ? hardcoding the conditions?
-  let secondEncounter: boolean = true;
-  // if (["cancer", "chlamydia", "gonorrhea", "syphilis"].includes(useCase)) {
-  //   secondEncounter = true;
-  // }
-
-  const spec: CustomQuerySpec = {
-    queryData: queryData,
-    // ? To determine how to better initialize this based on Marcelle's digging
-    // ? on class codes
-    classTypeCodes: [] as string[],
-    hasSecondEncounterQuery: secondEncounter,
-  };
-
-  return spec;
-};
 
 /**
  * Formats the route of a FHIR Immunization object.

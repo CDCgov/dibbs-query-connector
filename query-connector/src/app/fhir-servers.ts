@@ -70,6 +70,8 @@ class FHIRClient {
         body: searchParams.toString(),
       };
 
+      console.log(this.hostname + path, bodyToPost);
+
       return fetch(this.hostname + path, bodyToPost);
     } catch (error) {
       console.error(error);

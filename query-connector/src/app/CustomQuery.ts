@@ -1,11 +1,5 @@
 import { QueryDataColumn } from "./queryBuilding/utils";
 
-export interface CustomQuerySpec {
-  queryData: QueryDataColumn;
-  classTypeCodes?: string[];
-  hasSecondEncounterQuery?: boolean;
-}
-
 /**
  * A Data Class designed to store and manipulate various code values used
  * to create a fully customized FHIR query. The class holds instance variables
@@ -59,10 +53,6 @@ export class CustomQuery {
     },
   };
 
-  // Some queries need to be batched in waves because their encounter references
-  // might depend on demographic information
-  hasSecondEncounterQuery: boolean = false;
-
   /**
    * Creates a CustomQuery Object. The constructor accepts a JSONspec, a
    * DIBBs-defined JSON structure consisting of four keys corresponding to
@@ -71,13 +61,11 @@ export class CustomQuery {
    * @param jsonSpec A JSON Object containing four code fields to load.
    * @param patientId The ID of the patient to build into query strings.
    */
-  constructor(jsonSpec: CustomQuerySpec, patientId: string) {
+  constructor(savedQueryJson: QueryDataColumn, patientId: string) {
     try {
       this.patientId = patientId;
-      this.initializeQueryConceptTypes(jsonSpec.queryData);
+      this.initializeQueryConceptTypes(savedQueryJson);
       this.compileFhirResourceQueries(patientId);
-      this.classTypeCodes = jsonSpec?.classTypeCodes || [];
-      this.hasSecondEncounterQuery = jsonSpec?.hasSecondEncounterQuery || false;
     } catch (error) {
       console.error("Could not create CustomQuery Object: ", error);
     }
@@ -112,13 +100,11 @@ export class CustomQuery {
    * @param patientId The ID of the patient to query for.
    */
   compileFhirResourceQueries(patientId: string): void {
-    const labsFilter = this.labCodes.join(","); // pull labs on dibbsConceptType - will need to find the valid codes all the code systems
+    const labsFilter = this.labCodes.join(",");
     const medicationsFilter = this.medicationCodes.join(",");
     const conditionsFilter = this.conditionCodes.join(",");
-    const classTypeFilter = this.classTypeCodes.join(",");
 
-    // ? do all users want to see social history? We default to yes, but might
-    // ? want to toggle similar to what we might do for immunization
+    // TODO: Research / design ticket
     this.fhirResourceQueries["socialHistory"] = {
       basePath: `/Observation/_search`,
       params: {
@@ -188,17 +174,6 @@ export class CustomQuery {
     // ? Doing these in sequence gives us 429's Too Many Requests :(. Might need
     // ? to be smarter about when to send which requests or introduce some
     // ?  sort of sleep await
-
-    // ? Marcelle will do separate digging into how encounter interacts with classType
-    // if (classTypeFilter !== "") {
-    //   this.fhirResourceQueries["encounterClass"] = {
-    //     basePath: `/Encounter/_search`,
-    //     params: {
-    //       subject: `Patient/${patientId}`,
-    //       class: classTypeFilter,
-    //     },
-    //   };
-    // }
   }
 
   compilePostRequest(resource: {
@@ -230,25 +205,13 @@ export class CustomQuery {
     basePath: string;
     params: Record<string, string>;
   } {
-    switch (desiredQuery) {
-      case "observation":
-        return this.fhirResourceQueries["observation"];
-      case "diagnosticReport":
-        return this.fhirResourceQueries["diagnosticReport"];
-      case "condition":
-        return this.fhirResourceQueries["condition"];
-      case "medicationRequest":
-        return this.fhirResourceQueries["medicationRequest"];
-      case "socialHistory":
-        return this.fhirResourceQueries["socialHistory"];
-      case "encounter":
-        return this.fhirResourceQueries["encounter"];
-      case "encounterClass":
-        return this.fhirResourceQueries["encounterClass"];
-      case "immunization":
-        return this.fhirResourceQueries["immunization"];
-      default:
-        return { basePath: "", params: {} };
+    const availableKeys = Object.keys(this.fhirResourceQueries);
+    if (!availableKeys.includes(desiredQuery)) {
+      return { basePath: "", params: {} };
     }
+
+    return this.fhirResourceQueries[
+      desiredQuery as keyof typeof this.fhirResourceQueries
+    ];
   }
 }

@@ -8,7 +8,6 @@ import { isFhirResource, FhirResource } from "./constants";
 
 import { CustomQuery } from "./CustomQuery";
 import { GetPhoneQueryFormats } from "./format-service";
-import { formatValueSetsAsQuerySpec } from "./format-service";
 import { getFhirServerConfigs, getSavedQueryByName } from "./database-service";
 import { QueryDataColumn } from "./queryBuilding/utils";
 
@@ -42,32 +41,6 @@ export type QueryRequest = {
 export type FhirQueryResponse = Awaited<ReturnType<typeof makeFhirQuery>>;
 
 /**
- * @todo Add encounters as _include in condition query & batch encounter queries
- * A helper function to handle the "second-pass" batching approach to custom
- * queries, namely the encounters by referenced condition. Many use cases will
- * have a subset of queries mutually dependent on the results of another query,
- * meaning they can't be batched in the initial call. This function handles
- * that remaining subset, after other queries have already returned.
- * @param patientId The ID of the patient being queried for.
- * @param fhirClient The FHIR client to use for the queries.
- * @param queryResponse The data structure to store the accumulated results.
- * @returns The updated query response with encounter information.
- */
-async function queryEncounters(
-  patientId: string,
-  fhirClient: FHIRClient,
-  queryResponse: QueryResponse,
-): Promise<QueryResponse> {
-  if (queryResponse.Condition && queryResponse.Condition.length > 0) {
-    const conditionId = queryResponse.Condition[0].id;
-    const encounterQuery = `/Encounter?subject=${patientId}&reason-reference=${conditionId}`;
-    const encounterResponse = await fhirClient.get(encounterQuery);
-    queryResponse = await parseFhirSearch(encounterResponse, queryResponse);
-  }
-  return queryResponse;
-}
-
-/**
  * Query a FHIR server for a patient based on demographics provided in the request. If
  * a patient is found, store in the queryResponse object.
  * @param request - The request object containing the patient demographics.
@@ -92,7 +65,6 @@ async function patientQuery(
     query += `birthdate=${request.dob}&`;
   }
   if (request.mrn) {
-    // ? Might need to extend this to include offering authority
     query += `identifier=${request.mrn}&`;
   }
   if (request.phone) {
@@ -169,6 +141,7 @@ export async function makeFhirQuery(
       patientId,
       fhirClient,
       queryResponse,
+      request.query_name as string,
     );
 
     return fhirResponse;
@@ -194,19 +167,16 @@ async function postFhirQuery(
   patientId: string,
   fhirClient: FHIRClient,
   queryResponse: QueryResponse,
+  queryName?: string,
 ): Promise<QueryResponse> {
-  const querySpec = formatValueSetsAsQuerySpec(queryData);
-  const builtQuery = new CustomQuery(querySpec, patientId);
+  const builtQuery = new CustomQuery(queryData, patientId);
   let response: fetch.Response | fetch.Response[];
 
-  // ? Should we still individually handle individual use cases here somehow?
-  // if (useCase === "newborn-screening") {
-  // response = await fhirClient.get(builtQuery.getQuery("observation"));
-  // }
-  // if (useCase === "immunization") {
-  //   const { basePath, params } = builtQuery.getQuery("immunization");
-  //   response = await fhirClient.get([basePath, params].join(","));
-  // }
+  // keep this
+  if (queryName?.includes("Immunization")) {
+    const { basePath, params } = builtQuery.getQuery("immunization");
+    response = await fhirClient.get([basePath, params].join(","));
+  }
 
   const postPromises = builtQuery.compileAllPostRequests().map((req) => {
     return fhirClient.post(req.path, req.params);
@@ -240,12 +210,7 @@ async function postFhirQuery(
 
   response = successfulResults;
   queryResponse = await parseFhirSearch(response, queryResponse);
-  if (!querySpec.hasSecondEncounterQuery) {
-    return queryResponse;
-  } else {
-    queryResponse = await queryEncounters(patientId, fhirClient, queryResponse);
-    return queryResponse;
-  }
+  return queryResponse;
 }
 
 /**
