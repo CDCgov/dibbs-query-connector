@@ -16,7 +16,7 @@ export function checkIfSomeElementWithPropertyExists<
       accumulation[p] = false;
       return accumulation;
     },
-    {} as Record<K, boolean>
+    {} as Record<K, boolean>,
   );
 
   for (const resource of array) {

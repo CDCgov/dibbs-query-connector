@@ -23,7 +23,7 @@ const MedicationRequestTable: React.FC<MedicationRequestTableProps> = ({
 }) => {
   const availableElements = checkIfSomeElementWithPropertyExists(
     medicationRequests,
-    ["reasonCode"]
+    ["reasonCode"],
   );
 
   return (
@@ -42,7 +42,7 @@ const MedicationRequestTable: React.FC<MedicationRequestTableProps> = ({
             <td>{formatDate(medicationRequest.authoredOn)}</td>
             <td>
               {formatCodeableConcept(
-                medicationRequest.medicationCodeableConcept
+                medicationRequest.medicationCodeableConcept,
               )}
             </td>
             {availableElements.reasonCode && (
