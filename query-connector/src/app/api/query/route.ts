@@ -33,11 +33,11 @@ export async function GET() {
 }
 
 /**
- * Handles a POST request to query a given FHIR server for a given use case. The
- * use_case and fhir_server are provided as query parameters in the request URL. The
+ * Handles a POST request to query a given FHIR server for a given query. The
+ * query_name and fhir_server are provided as query parameters in the request URL. The
  * request body contains the FHIR patient resource to be queried.
  * @param request - The incoming Next.js request object.
- * @returns Response with UseCaseResponse.
+ * @returns Response with QueryResponse.
  */
 export async function POST(request: NextRequest) {
   let requestBody;
@@ -72,9 +72,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(OperationOutcome);
   }
 
-  // Extract use_case and fhir_server from nextUrl
+  // Extract query_name and fhir_server from nextUrl
   const params = request.nextUrl.searchParams;
-  const use_case_param = params.get("use_case"); //deprecated, prefer query_name
+  //deprecated, prefer query_name
+  const use_case_param = params.get("use_case");
   const query_name_param = params.get("query_name");
   const fhir_server = params.get("fhir_server");
   const fhirServers = await getFhirServerNames();

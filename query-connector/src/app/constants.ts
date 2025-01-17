@@ -297,10 +297,10 @@ export type FhirServerConfig = {
   disable_cert_validation: boolean;
 };
 
-export const INVALID_QUERY = `Query described in the use_case param not found in the set of saved queries. Please provide a valid use_case.`;
+export const INVALID_QUERY = `Query described in the query_name param not found in the set of saved queries. Please provide a name that exists in the saved set of queries.`;
 export const INVALID_FHIR_SERVERS = `Invalid fhir_server. Please provide a valid fhir_server.`;
 export const RESPONSE_BODY_IS_NOT_PATIENT_RESOURCE =
   "Request body is not a Patient resource.";
-export const MISSING_API_QUERY_PARAM = "Missing use_case or fhir_server.";
+export const MISSING_API_QUERY_PARAM = "Missing query_name or fhir_server.";
 export const MISSING_PATIENT_IDENTIFIERS =
   "No patient identifiers to parse from requestBody.";

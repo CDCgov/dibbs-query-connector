@@ -136,7 +136,7 @@ async function patientQuery(
 /**
  * Query a FHIR API for a public health use case based on patient demographics provided
  * in the request. If data is found, return in a queryResponse object.
- * @param request - UseCaseQueryRequest object containing the patient demographics and use case.
+ * @param request - QueryRequest object containing the patient demographics and use case.
  * @param queryValueSets - The value sets to be included in query filtering.
  * @param queryResponse - The response object to store the query results.
  * @returns - The response object containing the query results.

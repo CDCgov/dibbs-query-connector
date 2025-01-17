@@ -11,7 +11,7 @@ type SetStateCallback<T> = React.Dispatch<React.SetStateAction<T>>;
  * @param queryName - name of the query to grab associated ValueSets for
  * @returns The valuesets from the specified query name
  */
-export async function fetchUseCaseValueSets(queryName: string) {
+export async function fetchQueryValueSets(queryName: string) {
   const queryResults = await getSavedQueryByName(queryName);
   const valueSets = unnestValueSetsFromQuery(queryResults);
 
@@ -23,7 +23,7 @@ export async function fetchUseCaseValueSets(queryName: string) {
  * @param p - object param for readability
  * @param p.queryName - name of the custom user query that we want to fetch
  * @param p.patientForQuery - patient to do query against
- * @param p.selectedQuery - query use case
+ * @param p.selectedQuery - selected query
  * @param p.queryResponseStateCallback - callback function to update state of the
  * query response
  * @param p.queryValueSets - Valuesets to fetch as part of the query
@@ -58,7 +58,6 @@ export async function fetchQueryResponse(p: {
       dob: p.patientForQuery.birthDate as string,
       mrn: patientMRN,
       fhir_server: p.fhirServer,
-      use_case: p.selectedQuery,
     };
 
     // Need to also filter down by concepts to only display desired info
