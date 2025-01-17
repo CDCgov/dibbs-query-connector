@@ -22,6 +22,6 @@ export function checkIfSomeElementWithPropertyExists<T, K extends keyof T>(
   return array
     .map((e) => e[propertyToCheck])
     .some((prop) => {
-      return prop != undefined && isLengthwise(prop) ? prop.length > 0 : true;
+      return prop !== undefined && (!isLengthwise(prop) || prop.length > 0);
     });
 }
