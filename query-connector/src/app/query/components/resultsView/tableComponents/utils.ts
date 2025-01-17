@@ -1,11 +1,3 @@
-type Lengthwise = {
-  length: number;
-};
-
-function isLengthwise(thing: unknown): thing is Lengthwise {
-  return typeof thing === "object" && thing !== null && "length" in thing;
-}
-
 /**
  * Helper function to not display tables in results view where there are no
  * elements in a column to display. Allows for non-lengthwise properties
