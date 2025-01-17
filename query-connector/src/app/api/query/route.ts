@@ -13,6 +13,8 @@ import {
   RESPONSE_BODY_IS_NOT_PATIENT_RESOURCE,
   MISSING_API_QUERY_PARAM,
   MISSING_PATIENT_IDENTIFIERS,
+  USE_CASE_DETAILS,
+  USE_CASES,
 } from "../../constants";
 
 import { handleRequestError } from "./error-handling-service";
@@ -72,11 +74,16 @@ export async function POST(request: NextRequest) {
 
   // Extract use_case and fhir_server from nextUrl
   const params = request.nextUrl.searchParams;
-  const use_case = params.get("use_case");
+  const use_case_param = params.get("use_case"); //deprecated, prefer query_name
+  const query_name_param = params.get("query_name");
   const fhir_server = params.get("fhir_server");
   const fhirServers = await getFhirServerNames();
 
-  if (!use_case || !fhir_server) {
+  const query_name = query_name_param
+    ? query_name_param
+    : mapDeprecatedUseCaseToQueryName(use_case_param);
+
+  if (!query_name || !fhir_server) {
     const OperationOutcome = await handleRequestError(MISSING_API_QUERY_PARAM);
     return NextResponse.json(OperationOutcome);
   } else if (!Object.values(fhirServers).includes(fhir_server)) {
@@ -86,7 +93,7 @@ export async function POST(request: NextRequest) {
 
   // Add params & patient identifiers to QueryName
   const QueryRequest: QueryRequest = {
-    query_name: use_case,
+    query_name: query_name,
     fhir_server: fhir_server,
     ...(PatientIdentifiers.first_name && {
       first_name: PatientIdentifiers.first_name,
@@ -99,9 +106,7 @@ export async function POST(request: NextRequest) {
     ...(PatientIdentifiers.phone && { phone: PatientIdentifiers.phone }),
   };
 
-  const queryName = use_case;
-  const queryResults = await getSavedQueryByName(queryName);
-  console.log(queryResults);
+  const queryResults = await getSavedQueryByName(query_name);
 
   if (queryResults.length === 0) {
     const OperationOutcome = await handleRequestError(INVALID_QUERY);
@@ -119,4 +124,12 @@ export async function POST(request: NextRequest) {
   const bundle: APIQueryResponse = await createBundle(QueryResponse);
 
   return NextResponse.json(bundle);
+}
+
+function mapDeprecatedUseCaseToQueryName(use_case: string | null) {
+  if (use_case === null) return null;
+  const potentialUseCaseMatch = USE_CASE_DETAILS[use_case as USE_CASES];
+  const queryName = potentialUseCaseMatch?.queryName ?? null;
+  console.log(queryName);
+  return queryName;
 }

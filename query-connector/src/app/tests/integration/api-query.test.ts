@@ -83,12 +83,22 @@ describe("POST Query FHIR Server", () => {
     expect(body.resourceType).toBe("OperationOutcome");
     expect(body.issue[0].diagnostics).toBe(INVALID_FHIR_SERVERS);
   });
-
+  // Delete this test once we've messaged out the deprecation of use_case and
+  // partners have switched over to using query_name
+  it("should return a legitimate FHIR bundle if it uses the deprecated use_case param", async () => {
+    const request = createNextRequest(
+      PatientResource,
+      new URLSearchParams("use_case=syphilis&fhir_server=HELIOS Meld: Direct"),
+    );
+    const response = await POST(request);
+    const body = await response.json();
+    expect(body.resourceType).toBe("Bundle");
+  });
   it("should return a legitimate FHIR bundle if the query is successful", async () => {
     const request = createNextRequest(
       PatientResource,
       new URLSearchParams(
-        "use_case=Syphilis%20case%20investigation&fhir_server=HELIOS Meld: Direct",
+        "query_name=Syphilis%20case%20investigation&fhir_server=HELIOS Meld: Direct",
       ),
     );
     const response = await POST(request);
