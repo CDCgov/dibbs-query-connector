@@ -17,11 +17,11 @@ function isLengthwise(thing: unknown): thing is Lengthwise {
  */
 export function checkIfSomeElementWithPropertyExists<T, K extends keyof T>(
   array: T[],
-  propertyToCheck: K,
+  propertyToCheck: K
 ): boolean {
   return array
     .map((e) => e[propertyToCheck])
     .some((prop) => {
-      prop != undefined && isLengthwise(prop) ? prop.length > 0 : true;
+      return prop != undefined && isLengthwise(prop) ? prop.length > 0 : true;
     });
 }
