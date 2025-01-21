@@ -2,13 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import { Button } from "@trussworks/react-uswds";
-import {
-  DibbsConceptType,
-  USE_CASES,
-  USE_CASE_DETAILS,
-  DibbsValueSet,
-} from "../../constants";
-import { UseCaseQueryResponse } from "@/app/query-service";
+import { DibbsConceptType, DibbsValueSet } from "../../constants";
+import { QueryResponse } from "@/app/query-service";
 import LoadingView from "./LoadingView";
 import { showToastConfirmation } from "../designSystem/toast/Toast";
 import styles from "./customizeQuery/customizeQuery.module.scss";
@@ -19,31 +14,32 @@ import CustomizeQueryNav from "./customizeQuery/CustomizeQueryNav";
 import Backlink from "./backLink/Backlink";
 import { RETURN_LABEL } from "./stepIndicator/StepIndicator";
 import { generateValueSetGroupingsByDibbsConceptType } from "@/app/utils/valueSetTranslation";
+import { CustomUserQuery } from "@/app/query-building";
 
 interface CustomizeQueryProps {
-  useCaseQueryResponse: UseCaseQueryResponse;
-  queryType: USE_CASES;
+  fhirQueryResponse: QueryResponse;
   queryValueSets: DibbsValueSet[];
   setQueryValuesets: (queryVS: DibbsValueSet[]) => void;
   goBack: () => void;
+  selectedQuery: CustomUserQuery;
 }
 
 /**
  * CustomizeQuery component for displaying and customizing query details.
  * @param root0 - The properties object.
- * @param root0.useCaseQueryResponse - The response from the query service.
- * @param root0.queryType - The type of the query.
+ * @param root0.fhirQueryResponse - The response from the query service.
+ * @param root0.selectedQuery - The current query to be customized.
  * @param root0.queryValueSets - The pre-fetched value sets from the DB.
  * @param root0.setQueryValuesets - Function to update tracked custom query state.
  * @param root0.goBack - Back button to go from "customize-queries" to "search" component.
  * @returns The CustomizeQuery component.
  */
 const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
-  useCaseQueryResponse,
-  queryType,
+  fhirQueryResponse,
   queryValueSets: queryValueSets,
   setQueryValuesets,
   goBack,
+  selectedQuery,
 }) => {
   const [activeTab, setActiveTab] = useState<DibbsConceptType>("labs");
 
@@ -170,10 +166,10 @@ const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
       <div className="padding-top-3">
         <Backlink onClick={goBack} label={RETURN_LABEL["results"]} />
       </div>
-      <LoadingView loading={!useCaseQueryResponse} />
+      <LoadingView loading={!fhirQueryResponse} />
       <h1 className="page-title margin-bottom-05-important">Customize query</h1>
       <h2 className="page-explainer margin-y-0-important">
-        Query: {USE_CASE_DETAILS[queryType].condition}
+        Query: {selectedQuery.query_name}
       </h2>
       <h3 className="margin-y-0-important font-sans-sm text-light padding-bottom-0 padding-top-05">
         {countLabs} labs found, {countMedications} medications found,{" "}

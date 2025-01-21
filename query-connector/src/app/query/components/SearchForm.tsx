@@ -6,17 +6,19 @@ import {
   Select,
   Button,
 } from "@trussworks/react-uswds";
-import { USE_CASES, demoData, stateOptions, Mode } from "@/app/constants";
-import { UseCaseQueryResponse, UseCaseQuery } from "@/app/query-service";
+import { stateOptions, Mode, hyperUnluckyPatient } from "@/app/constants";
+import {
+  FhirQueryResponse,
+  QueryRequest,
+  makeFhirQuery,
+} from "@/app/query-service";
 import styles from "./searchForm/searchForm.module.scss";
 import { FormatPhoneAsDigits } from "@/app/format-service";
 import TitleBox from "./stepIndicator/TitleBox";
 
 interface SearchFormProps {
-  useCase: USE_CASES;
-  setUseCase: (useCase: USE_CASES) => void;
   setPatientDiscoveryQueryResponse: (
-    UseCaseQueryResponse: UseCaseQueryResponse,
+    FhirPatientDiscoveryResponse: FhirQueryResponse,
   ) => void;
   setMode: (mode: Mode) => void;
   setLoading: (loading: boolean) => void;
@@ -27,8 +29,6 @@ interface SearchFormProps {
 
 /**
  * @param root0 - SearchFormProps
- * @param root0.useCase - The use case this query will cover.
- * @param root0.setUseCase - Update stateful use case.
  * @param root0.setMode - The function to set the mode.
  * @param root0.setLoading - The function to set the loading state.
  * @param root0.setPatientDiscoveryQueryResponse - callback function to set the
@@ -39,8 +39,6 @@ interface SearchFormProps {
  * @returns - The SearchForm component.
  */
 const SearchForm: React.FC<SearchFormProps> = function SearchForm({
-  useCase,
-  setUseCase,
   setPatientDiscoveryQueryResponse,
   setMode,
   setLoading,
@@ -59,21 +57,15 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
   const [autofilled, setAutofilled] = useState(false); // boolean indicating if the form was autofilled, changes color if true
 
   // Fills fields with sample data based on the selected
-  const fillFields = useCallback(
-    (highlightAutofilled = true) => {
-      const data = demoData["cancer"];
-      if (data) {
-        setFirstName(data.FirstName);
-        setLastName(data.LastName);
-        setDOB(data.DOB);
-        setMRN(data.MRN);
-        setPhone(data.Phone);
-        setFhirServer(data.FhirServer as string);
-        setAutofilled(highlightAutofilled);
-      }
-    },
-    [setUseCase],
-  );
+  const fillFields = useCallback((highlightAutofilled = true) => {
+    setFirstName(hyperUnluckyPatient.FirstName);
+    setLastName(hyperUnluckyPatient.LastName);
+    setDOB(hyperUnluckyPatient.DOB);
+    setMRN(hyperUnluckyPatient.MRN);
+    setPhone(hyperUnluckyPatient.Phone);
+    setFhirServer(hyperUnluckyPatient.FhirServer as string);
+    setAutofilled(highlightAutofilled);
+  }, []);
 
   const nameRegex = "^[A-Za-z\u00C0-\u024F\u1E00-\u1EFF\\-'. ]+$";
   const nameRuleHint =
@@ -87,16 +79,20 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
     }
     setLoading(true);
 
-    const originalRequest = {
+    const originalRequest: QueryRequest = {
       first_name: firstName,
       last_name: lastName,
       dob: dob,
       mrn: mrn,
       fhir_server: fhirServer,
-      use_case: useCase,
+      // we just need the patient here and don't need to cross reference
+      // our DB.
+      // ? maybe refactor to split out our generic FHIR query into more
+      // ? resource-based methods?
+      query_name: "",
       phone: FormatPhoneAsDigits(phone),
     };
-    const queryResponse = await UseCaseQuery(originalRequest, []);
+    const queryResponse = await makeFhirQuery(originalRequest, []);
     setPatientDiscoveryQueryResponse(queryResponse);
 
     setMode("patient-results");
@@ -121,8 +117,8 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
               htmlFor="query"
             >
               The demo site uses synthetic data to provide examples of possible
-              queries that you can make with the Query Connector. Select a query
-              use case, a sample patient, and then click “fill fields” below.
+              queries that you can make with the Query Connector. To proceed,
+              click “fill fields” below.
             </Label>
 
             <div className={`${styles.searchCallToActionContainer}`}>

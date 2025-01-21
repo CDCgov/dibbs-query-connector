@@ -14,26 +14,33 @@ export const USE_CASE_DETAILS = {
   "newborn-screening": {
     queryName: "Newborn screening follow-up",
     condition: "Newborn Screening",
+    // These are the ID's defined in the vs_dump.sql file
+    id: "c025a247-0129-4f0c-a2c6-7f3af08e06b4",
   },
   syphilis: {
     queryName: "Syphilis case investigation",
     condition: "Congenital syphilis (disorder)",
+    id: "facfefc1-dd39-4f84-9d91-e924e860ad1c",
   },
   gonorrhea: {
     queryName: "Gonorrhea case investigation",
     condition: "Gonorrhea (disorder)",
+    id: "73e1a777-49cb-4e19-bc71-8c3fd3ffda64",
   },
   chlamydia: {
     queryName: "Chlamydia case investigation",
     condition: "Chlamydia trachomatis infection (disorder)",
+    id: "6edd14a2-ef78-4d8e-8509-0f87a7228d67",
   },
   cancer: {
     queryName: "Cancer case investigation",
     condition: "Cancer (Leukemia)",
+    id: "cf580d8d-cc7b-4eae-8a0d-96c36f9222e3",
   },
   immunization: {
     queryName: "Immunization",
     condition: "Immunization",
+    id: null,
   },
 } as const;
 
@@ -47,7 +54,6 @@ export type DemoDataFields = {
   MRN: string;
   Phone: string;
   FhirServer: string;
-  UseCase: USE_CASES;
 };
 
 /*Type to specify the different patient types*/
@@ -71,44 +77,6 @@ export const hyperUnluckyPatient: DemoDataFields = {
   MRN: "8692756",
   Phone: "517-425-1398",
   FhirServer: DEFAULT_DEMO_FHIR_SERVER,
-  UseCase: "cancer", // UseCase will be updated per case
-};
-
-/*
-Demo patient data used to populate the form fields with each value being a type of DemoDataFields
-*/
-export const demoData: Record<PatientType, DemoDataFields> = {
-  cancer: { ...hyperUnluckyPatient, UseCase: "cancer" },
-  "sti-chlamydia-positive": { ...hyperUnluckyPatient, UseCase: "chlamydia" },
-  "sti-gonorrhea-positive": { ...hyperUnluckyPatient, UseCase: "gonorrhea" },
-  "sti-syphilis-positive": { ...hyperUnluckyPatient, UseCase: "syphilis" },
-  "newborn-screening-technical-fail": {
-    FirstName: "Mango",
-    LastName: "Smith",
-    DOB: "2024-07-12",
-    MRN: "67890",
-    Phone: "555-123-4567",
-    FhirServer: "HELIOS Meld: Direct",
-    UseCase: "newborn-screening",
-  },
-  "newborn-screening-referral": {
-    FirstName: "Watermelon",
-    LastName: "McGee",
-    DOB: "2024-07-12",
-    MRN: "18091",
-    Phone: "5555555555",
-    FhirServer: "HELIOS Meld: Direct",
-    UseCase: "newborn-screening",
-  },
-  "newborn-screening-pass": {
-    FirstName: "Cucumber",
-    LastName: "Hill",
-    DOB: "2023-08-29",
-    MRN: "18091",
-    Phone: "",
-    FhirServer: "CernerHelios: eHealthExchange",
-    UseCase: "newborn-screening",
-  },
 };
 
 // Define Option type
@@ -336,12 +304,10 @@ export type FhirServerConfig = {
   disable_cert_validation: boolean;
 };
 
-export const INVALID_USE_CASE = `Invalid use_case. Please provide a valid use_case. Valid use_cases include ${Object.keys(
-  USE_CASE_DETAILS,
-)}.`;
+export const INVALID_QUERY = `Query identified in the id param not found in the set of saved queries. Please provide an ID that exists in the saved set of queries.`;
 export const INVALID_FHIR_SERVERS = `Invalid fhir_server. Please provide a valid fhir_server.`;
 export const RESPONSE_BODY_IS_NOT_PATIENT_RESOURCE =
   "Request body is not a Patient resource.";
-export const MISSING_API_QUERY_PARAM = "Missing use_case or fhir_server.";
+export const MISSING_API_QUERY_PARAM = "Missing id or fhir_server.";
 export const MISSING_PATIENT_IDENTIFIERS =
   "No patient identifiers to parse from requestBody.";

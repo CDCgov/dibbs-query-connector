@@ -265,16 +265,16 @@ export async function GetPhoneQueryFormats(phone: string) {
 /**
  * Formats a statefully updated list of value sets into a JSON structure
  * used for executing custom queries.
- * @param useCase The base use case being queried for.
+ * @param queryName The name of the query being transformed for.
  * @param valueSets The list of value sets the user wants included.
  * @returns A structured specification of a query that can be executed.
  */
 export const formatValueSetsAsQuerySpec = async (
-  useCase: string,
+  queryName: string,
   valueSets: DibbsValueSet[],
 ) => {
   let secondEncounter: boolean = false;
-  if (["cancer", "chlamydia", "gonorrhea", "syphilis"].includes(useCase)) {
+  if (["cancer", "chlamydia", "gonorrhea", "syphilis"].includes(queryName)) {
     secondEncounter = true;
   }
   const labCodes: string[] = valueSets

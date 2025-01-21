@@ -70,7 +70,9 @@ test.describe("querying with the Query Connector", () => {
     await expect(
       page.getByRole("heading", { name: "Select a query" }),
     ).toBeVisible();
-    await page.getByTestId("Select").selectOption("chlamydia");
+    await page
+      .getByTestId("Select")
+      .selectOption("Chlamydia case investigation");
 
     // For some reason only in Chromium (ie not in firefox / webkit) there were
     // issues connecting to the database for the cancer use case, which was resulting
