@@ -160,7 +160,7 @@ export async function makeFhirQuery(
  * @param patientId The ID of the patient for whom to search.
  * @param fhirClient The client used to communicate with the FHIR server.
  * @param queryResponse The response object for the query results.
- * @param queryName
+ * @param queryName Name of the query to send out to tthe FHIR server
  * @returns A promise for an updated query response.
  */
 async function postFhirQuery(
@@ -173,7 +173,6 @@ async function postFhirQuery(
   const builtQuery = new CustomQuery(queryData, patientId);
   let response: fetch.Response | fetch.Response[];
 
-  // keep this
   if (queryName?.includes("Immunization")) {
     const { basePath, params } = builtQuery.getQuery("immunization");
     response = await fhirClient.get([basePath, params].join(","));

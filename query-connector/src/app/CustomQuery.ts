@@ -171,10 +171,6 @@ export class CustomQuery {
         },
       };
     }
-
-    // ? Doing these in sequence gives us 429's Too Many Requests :(. Might need
-    // ? to be smarter about when to send which requests or introduce some
-    // ?  sort of sleep await
   }
 
   compilePostRequest(resource: {
