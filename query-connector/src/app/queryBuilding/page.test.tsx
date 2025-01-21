@@ -2,7 +2,7 @@ import QueryBuilding from "./page";
 import { render, screen, waitFor } from "@testing-library/react";
 import { DataContext } from "@/app/DataProvider";
 import { getConditionsData, getCustomQueries } from "../database-service";
-import { conditionIdToNameMap, defaultQueries } from "./fixtures";
+import { conditionIdToNameMap, DEFAULT_QUERIES } from "./fixtures";
 
 jest.mock("../database-service", () => ({
   getCustomQueries: jest.fn(),
@@ -32,14 +32,14 @@ describe("tests the query building steps", () => {
     expect(screen).toMatchSnapshot();
   });
   it("renders the default state", async () => {
-    (getCustomQueries as jest.Mock).mockResolvedValue(defaultQueries);
+    (getCustomQueries as jest.Mock).mockResolvedValue(DEFAULT_QUERIES);
     (getConditionsData as jest.Mock).mockResolvedValue({
       conditionIdToNameMap,
     });
 
     const mockSetData = jest.fn();
     const mockContextValue = {
-      data: defaultQueries,
+      data: DEFAULT_QUERIES,
       setData: mockSetData,
     };
 
@@ -49,15 +49,15 @@ describe("tests the query building steps", () => {
       </DataContext.Provider>,
     );
 
-    const expectedQueryNames = defaultQueries.map((q) => q.query_name);
+    const expectedQueryNames = DEFAULT_QUERIES.map((q) => q.query_name);
 
     await waitFor(() => {
       expect(screen.queryByText("Loading")).not.toBeInTheDocument();
     });
 
-    expect(screen.getByText("Query Library")).toBeInTheDocument();
-    expectedQueryNames.forEach((name) => {
-      expect(screen.getByText(name)).toBeInTheDocument();
+    await expect(screen.getByText("Query Library")).toBeInTheDocument();
+    expectedQueryNames.forEach(async (name) => {
+      await expect(screen.getByText(name)).toBeInTheDocument();
     });
 
     expect(screen).toMatchSnapshot();
