@@ -160,6 +160,7 @@ export async function makeFhirQuery(
  * @param patientId The ID of the patient for whom to search.
  * @param fhirClient The client used to communicate with the FHIR server.
  * @param queryResponse The response object for the query results.
+ * @param queryName
  * @returns A promise for an updated query response.
  */
 async function postFhirQuery(

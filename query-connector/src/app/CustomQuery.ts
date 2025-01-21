@@ -59,6 +59,7 @@ export class CustomQuery {
    * the four types of codes this data class encompasses. These Specs are
    * currently located in the `customQueries` directory of the app.
    * @param jsonSpec A JSON Object containing four code fields to load.
+   * @param savedQueryJson
    * @param patientId The ID of the patient to build into query strings.
    */
   constructor(savedQueryJson: QueryDataColumn, patientId: string) {

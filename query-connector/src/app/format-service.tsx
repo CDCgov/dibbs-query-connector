@@ -8,7 +8,6 @@ import {
   Immunization,
   Coding,
 } from "fhir/r4";
-import { QueryDataColumn } from "./queryBuilding/utils";
 
 /**
  * Formats a string.
