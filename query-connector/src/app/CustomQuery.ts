@@ -58,8 +58,9 @@ export class CustomQuery {
    * DIBBs-defined JSON structure consisting of four keys corresponding to
    * the four types of codes this data class encompasses. These Specs are
    * currently located in the `customQueries` directory of the app.
-   * @param jsonSpec A JSON Object containing four code fields to load.
-   * @param savedQueryJson
+   * @param savedQueryJson A entry from the query_data column of our query table
+   * that has nested information about the conditions / valuesets / concepts
+   * relevant to the query
    * @param patientId The ID of the patient to build into query strings.
    */
   constructor(savedQueryJson: QueryDataColumn, patientId: string) {
