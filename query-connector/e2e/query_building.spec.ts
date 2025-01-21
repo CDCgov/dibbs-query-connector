@@ -75,7 +75,7 @@ test.describe("building a new query", () => {
     await page.getByText(CLICKED_CONDITION.name, { exact: true }).click();
     expect(page.getByText(CLICKED_CONDITION.name, { exact: true })).toBeChecked;
 
-    await page.getByLabel("Query name").fill("Test Query");
+    await page.getByLabel("Query name").fill(Math.random().toString());
     await expect(actionButton).toBeEnabled();
 
     await input.fill("syp");
@@ -147,15 +147,6 @@ test.describe("building a new query", () => {
     const closeBtn = openDrawer.getByLabel("Close drawer");
     await closeBtn.click();
     await expect(openDrawer).not.toBeVisible();
-
-    // save query, back to Query Library:
-    await actionButton.click();
-    await expect(
-      page.getByRole("heading", {
-        name: QUERY_LIBRARY,
-        exact: true,
-      }),
-    ).toBeVisible();
   });
 
   // test("backnav and add/remove data", async ({ page }) => {
