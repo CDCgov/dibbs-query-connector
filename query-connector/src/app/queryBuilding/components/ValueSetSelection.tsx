@@ -7,6 +7,7 @@ import { Icon } from "@trussworks/react-uswds";
 import {
   CategoryToConditionArrayMap,
   ConditionsMap,
+  EMPTY_CONCEPT_TYPE,
   filterSearchByCategoryAndCondition,
   formatDiseaseDisplay,
   NestedQuery,
@@ -15,6 +16,8 @@ import { ConceptTypeSelectionTable } from "./SelectionTable";
 import Drawer from "@/app/query/designSystem/drawer/Drawer";
 import { DibbsConceptType, DibbsValueSet } from "@/app/constants";
 import { showToastConfirmation } from "@/app/query/designSystem/toast/Toast";
+import SearchField from "@/app/query/designSystem/searchField/SearchField";
+import { filterValueSetConcepts } from "./SelectionViewAccordionBody";
 
 type ConditionSelectionProps = {
   constructedQuery: NestedQuery;
@@ -42,21 +45,23 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
   constructedQuery,
   handleSelectedValueSetUpdate,
   handleUpdateCondition,
-  conditionsMap: conditionsDetailsMap,
+  conditionsMap,
   categoryToConditionsMap,
 }) => {
   const [activeCondition, setActiveCondition] = useState<string>("");
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const handleDrawer = (open: boolean) => {
-    setIsDrawerOpen(open);
-  };
-  const [filteredConditionsDisplay, setFilteredConditionsDisplay] =
+  const [searchFilter, setSearchFilter] = useState("");
+  const [conditionDrawerDisplay, setConditionDrawerDisplay] =
     useState<CategoryToConditionArrayMap>(categoryToConditionsMap);
 
   useEffect(() => {
     // display the first condition's valuesets on render
     setActiveCondition(Object.keys(constructedQuery)[0]);
   }, []);
+
+  const handleDrawer = (open: boolean) => {
+    setIsDrawerOpen(open);
+  };
 
   function generateConditionDrawerDisplay(
     categoryToConditionsMap: CategoryToConditionArrayMap,
@@ -104,12 +109,16 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
         searchFilter,
         categoryToConditionsMap,
       );
-      setFilteredConditionsDisplay(filteredDisplay);
+      setConditionDrawerDisplay(filteredDisplay);
     }
   }
 
-  const conditionUpdate = filteredConditionsDisplay
-    ? generateConditionDrawerDisplay(filteredConditionsDisplay)
+  function handleSearch(searchFilter: string) {
+    setSearchFilter(searchFilter);
+  }
+
+  const conditionUpdate = conditionDrawerDisplay
+    ? generateConditionDrawerDisplay(conditionDrawerDisplay)
     : undefined;
 
   return (
@@ -143,7 +152,7 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
             </div>
 
             {Object.keys(constructedQuery).map((conditionId) => {
-              const condition = conditionsDetailsMap[conditionId];
+              const condition = conditionsMap[conditionId];
               return (
                 <div
                   className={classNames(
@@ -178,15 +187,15 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
         </div>
         <div className={styles.valueSetTemplate__right}>
           <div className={styles.valueSetTemplate__search}>
-            {/* <SearchField
+            <SearchField
               id="valueSetTemplateSearch"
               placeholder="Search labs, medications, conditions"
               className={styles.valueSetSearch}
               onChange={(e) => {
                 e.preventDefault();
-                setSearchFilter(e.target.value);
+                handleSearch(e.target.value);
               }}
-            /> */}
+            />
           </div>
           <div>
             {constructedQuery && constructedQuery[activeCondition] && (
@@ -195,6 +204,7 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
                 handleVsTypeLevelUpdate={handleSelectedValueSetUpdate(
                   activeCondition,
                 )}
+                searchFilter={searchFilter}
               />
             )}
           </div>

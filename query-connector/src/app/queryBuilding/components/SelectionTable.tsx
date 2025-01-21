@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styles from "../buildFromTemplates/conditionTemplateSelection.module.scss";
 import { HeadingLevel } from "@trussworks/react-uswds";
 import ConceptTypeAccordionBody from "./SelectionViewAccordionBody";
@@ -13,6 +13,17 @@ type ConceptTypeSelectionTableProps = {
   handleVsTypeLevelUpdate: (
     vsType: DibbsConceptType,
   ) => (vsId: string) => (dibbsValueSets: DibbsValueSet) => void;
+  searchFilter: string;
+};
+
+type VsTypeAccordion = {
+  title: JSX.Element;
+  content: JSX.Element;
+  expanded: boolean;
+  id: string;
+  headingLevel: "h4";
+  handleToggle: () => void;
+  length: number;
 };
 /**
  * Component that displays ValueSetGroupings sorted by VsType (DibbsConceptType)
@@ -25,15 +36,44 @@ type ConceptTypeSelectionTableProps = {
  */
 export const ConceptTypeSelectionTable: React.FC<
   ConceptTypeSelectionTableProps
-> = ({ vsTypeLevelOptions, handleVsTypeLevelUpdate }) => {
+> = ({ vsTypeLevelOptions, handleVsTypeLevelUpdate, searchFilter }) => {
   const [expanded, setExpandedGroup] = useState<string>("");
+  const [valueSetDisplay, setValueSetDisplay] =
+    useState<ConceptTypeToDibbsVsMap>(vsTypeLevelOptions);
+
+  useEffect(() => {
+    const casedSearchFilter = searchFilter.toLocaleLowerCase();
+
+    const filteredValueSets = structuredClone(vsTypeLevelOptions);
+
+    Object.entries(filteredValueSets).forEach(([vsType, vsDict]) => {
+      Object.entries(vsDict).forEach(([vsId, vs]) => {
+        if (vs.valueSetName.toLocaleLowerCase().includes(casedSearchFilter)) {
+          filteredValueSets[vsType as DibbsConceptType][vsId] = vs;
+        } else {
+          vs.concepts = vs.concepts.filter(
+            (c) =>
+              c.code.toLocaleLowerCase().includes(casedSearchFilter) ||
+              c.display.toLocaleLowerCase().includes(casedSearchFilter),
+          );
+
+          if (vs.concepts.length > 0) {
+            filteredValueSets[vsType as DibbsConceptType][vsId] = vs;
+          }
+        }
+      });
+    });
+
+    setValueSetDisplay(filteredValueSets);
+  }, [searchFilter]);
+
   const generateTypeLevelAccordionItems = (vsType: DibbsConceptType) => {
     const handleVsNameLevelUpdate = handleVsTypeLevelUpdate(vsType);
 
     const title = (
       <ConceptTypeAccordionHeader
         activeType={vsType}
-        activeTypeValueSets={vsTypeLevelOptions[vsType]}
+        activeTypeValueSets={valueSetDisplay[vsType]}
         expanded={expanded === vsType}
         handleVsNameLevelUpdate={handleVsNameLevelUpdate}
       />
@@ -41,7 +81,7 @@ export const ConceptTypeSelectionTable: React.FC<
 
     const content = (
       <ConceptTypeAccordionBody
-        activeValueSets={vsTypeLevelOptions[vsType]}
+        activeValueSets={valueSetDisplay[vsType]}
         handleVsIdLevelUpdate={handleVsNameLevelUpdate}
       />
     );
@@ -70,6 +110,7 @@ export const ConceptTypeSelectionTable: React.FC<
       return generateTypeLevelAccordionItems(vsType as DibbsConceptType);
     })
     .filter((v) => v.length > 0);
+
   return (
     <div data-testid="accordion" className={styles.accordionContainer}>
       <MultiAccordion
