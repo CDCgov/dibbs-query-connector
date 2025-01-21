@@ -35,7 +35,7 @@ import { SelectedQueryDetails } from "../querySelection/utils";
 
 import "react-toastify/dist/ReactToastify.css";
 import {
-  getSavedQueryDetails,
+  getSavedQueryById,
   saveCustomQuery,
 } from "@/app/backend/query-building";
 import { groupValueSetsByConceptType } from "@/app/utils/valueSetTranslation";
@@ -118,7 +118,7 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
       if (selectedQuery.queryId === undefined) {
         return;
       }
-      const result = await getSavedQueryDetails(selectedQuery.queryId);
+      const result = await getSavedQueryById(selectedQuery.queryId);
 
       if (result === undefined) {
         return; // todo: error???
@@ -280,6 +280,7 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
         showToastConfirmation({
           heading: "Something went wrong",
           body: `${queryName} wasn't successfully created. Please try again or contact us if the error persists`,
+          variant: "error",
         });
       }
     }
@@ -315,7 +316,7 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
                 id="queryNameInput"
                 name="queryNameInput"
                 type="text"
-                className="maxw-mobile"
+                className="width-mobile"
                 defaultValue={queryName ?? ""}
                 required
                 onChange={(event) => {

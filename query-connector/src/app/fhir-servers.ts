@@ -2,8 +2,6 @@ import fetch, { RequestInit, HeaderInit, Response } from "node-fetch";
 import { FhirServerConfig } from "./constants";
 import https from "https";
 
-type DevFhirServerConfig = FhirServerConfig & { trustSelfSigned?: boolean };
-
 /**
  * A client for querying a FHIR server
  * @param server The FHIR server to query
@@ -15,7 +13,7 @@ class FHIRClient {
 
   constructor(server: string, configurations: FhirServerConfig[]) {
     // Get the configuration for the server if it exists
-    let config: DevFhirServerConfig | undefined = configurations.find(
+    let config: FhirServerConfig | undefined = configurations.find(
       (config) => config.name === server,
     );
 
@@ -29,8 +27,8 @@ class FHIRClient {
       method: "GET",
       headers: config.headers as HeaderInit,
     };
-    // Trust eHealth Exchange's self-signed certificate
-    if (config.trustSelfSigned) {
+    // Trust any configured server that has disabled SSL
+    if (config.disable_cert_validation) {
       init.agent = new https.Agent({
         rejectUnauthorized: false,
       });

@@ -15,6 +15,7 @@ import styles from "./fhirServers.module.scss";
 import classNames from "classnames";
 import SiteAlert from "../query/designSystem/SiteAlert";
 import Table from "../query/designSystem/table/Table";
+import Checkbox from "../query/designSystem/checkbox/Checkbox";
 
 // Dynamic import with proper typing for Modal
 import type { ModalProps } from "../query/designSystem/modal/Modal";
@@ -35,6 +36,9 @@ const FhirServers: React.FC = () => {
   const [fhirServers, setFhirServers] = useState<FhirServerConfig[]>([]);
   const [serverName, setServerName] = useState("");
   const [serverUrl, setServerUrl] = useState("");
+  const [authMethod, setAuthMethod] = useState<"none" | "basic">("none");
+  const [bearerToken, setBearerToken] = useState("");
+  const [disableCertValidation, setDisableCertValidation] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState<
     "idle" | "success" | "error"
   >("idle");
@@ -62,6 +66,8 @@ const FhirServers: React.FC = () => {
   const resetModalState = () => {
     setServerName("");
     setServerUrl("");
+    setAuthMethod("none");
+    setBearerToken("");
     setConnectionStatus("idle");
     setErrorMessage("");
     setSelectedServer(null);
@@ -74,6 +80,16 @@ const FhirServers: React.FC = () => {
       setServerName(server.name);
       setServerUrl(server.hostname);
       setConnectionStatus("idle");
+      setDisableCertValidation(server.disable_cert_validation);
+
+      // Set auth method and bearer token if they exist
+      if (server.headers?.Authorization?.startsWith("Bearer ")) {
+        setAuthMethod("basic");
+        setBearerToken(server.headers.Authorization.replace("Bearer ", ""));
+      } else {
+        setAuthMethod("none");
+        setBearerToken("");
+      }
     } else {
       resetModalState();
     }
@@ -97,72 +113,23 @@ const FhirServers: React.FC = () => {
       return { success: false, error: "Client-side only operation" };
 
     try {
-      const baseUrl = url.replace(/\/$/, "");
-      const metadataUrl = `${baseUrl}/metadata`;
-
-      const response = await fetch(metadataUrl, {
-        method: "GET",
+      const response = await fetch("/api/test-fhir-connection", {
+        method: "POST",
         headers: {
-          Accept: "application/fhir+json",
+          "Content-Type": "application/json",
         },
+        body: JSON.stringify({
+          url,
+          bearerToken: authMethod === "basic" ? bearerToken : undefined,
+        }),
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        if (data.resourceType === "CapabilityStatement") {
-          return { success: true };
-        } else {
-          return {
-            success: false,
-            error:
-              "Invalid FHIR server response: Server did not return a valid CapabilityStatement",
-          };
-        }
-      } else {
-        let errorMessage: string;
-        switch (response.status) {
-          case 401:
-            errorMessage =
-              "Connection failed: Authentication required. Please check your credentials.";
-            break;
-          case 403:
-            errorMessage =
-              "Connection failed: Access forbidden. You do not have permission to access this FHIR server.";
-            break;
-          case 404:
-            errorMessage =
-              "Connection failed: The FHIR server endpoint was not found. Please verify the URL.";
-            break;
-          case 408:
-            errorMessage =
-              "Connection failed: The request timed out. The FHIR server took too long to respond.";
-            break;
-          case 500:
-            errorMessage =
-              "Connection failed: Internal server error. The FHIR server encountered an unexpected condition.";
-            break;
-          case 502:
-            errorMessage =
-              "Connection failed: Bad gateway. The FHIR server received an invalid response from upstream.";
-            break;
-          case 503:
-            errorMessage =
-              "Connection failed: The FHIR server is temporarily unavailable or under maintenance.";
-            break;
-          case 504:
-            errorMessage =
-              "Connection failed: Gateway timeout. The upstream server did not respond in time.";
-            break;
-          default:
-            errorMessage = `Connection failed: The FHIR server returned an error. (${response.status} ${response.statusText})`;
-        }
-        return { success: false, error: errorMessage };
-      }
+      const result = await response.json();
+      return result;
     } catch (error) {
       return {
         success: false,
-        error:
-          "Connection failed: Unable to reach the FHIR server. Please check if the URL is correct and the server is accessible.",
+        error: "Failed to test connection. Please try again.",
       };
     }
   };
@@ -182,7 +149,9 @@ const FhirServers: React.FC = () => {
       const result = await insertFhirServer(
         serverName,
         serverUrl,
+        disableCertValidation,
         connectionResult.success,
+        authMethod === "basic" ? bearerToken : undefined,
       );
 
       if (result.success) {
@@ -199,7 +168,9 @@ const FhirServers: React.FC = () => {
         selectedServer.id,
         serverName,
         serverUrl,
+        disableCertValidation,
         connectionResult.success,
+        authMethod === "basic" ? bearerToken : undefined,
       );
 
       if (result.success) {
@@ -408,6 +379,41 @@ const FhirServers: React.FC = () => {
             value={serverUrl}
             onChange={(e) => setServerUrl(e.target.value)}
             required
+          />
+          <Label htmlFor="auth-method">Auth Method</Label>
+          <select
+            className="usa-select"
+            id="auth-method"
+            name="auth-method"
+            value={authMethod}
+            onChange={(e) => {
+              setAuthMethod(e.target.value as "none" | "basic");
+              if (e.target.value === "none") {
+                setBearerToken("");
+              }
+            }}
+          >
+            <option value="none">None</option>
+            <option value="basic">Basic auth</option>
+          </select>
+          {authMethod === "basic" && (
+            <>
+              <Label htmlFor="bearer-token">Bearer Token</Label>
+              <TextInput
+                id="bearer-token"
+                name="bearer-token"
+                type="text"
+                value={bearerToken}
+                onChange={(e) => setBearerToken(e.target.value)}
+                required
+              />
+            </>
+          )}
+          <Checkbox
+            id="disable-cert-validation"
+            label="Disable certificate validation"
+            checked={disableCertValidation}
+            onChange={(e) => setDisableCertValidation(e.target.checked)}
           />
         </Modal>
       </div>
