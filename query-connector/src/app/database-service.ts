@@ -16,6 +16,7 @@ import {
 import {
   CategoryToConditionArrayMap,
   ConditionsMap,
+  QueryDetailsResult,
 } from "./queryBuilding/utils";
 import {
   CategoryStruct,
@@ -97,10 +98,10 @@ export const getSavedQueryByName = async (name: string) => {
   try {
     const result = await dbClient.query(getQuerybyNameSQL, values);
     if (result.rows.length === 0) {
-      console.error("No results found for query:", name);
+      console.error("No results found for query named:", name);
       return [];
     }
-    return result.rows;
+    return result.rows as unknown as QueryDetailsResult[];
   } catch (error) {
     console.error("Error retrieving query:", error);
     throw error;

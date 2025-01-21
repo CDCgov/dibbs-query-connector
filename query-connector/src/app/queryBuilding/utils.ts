@@ -29,15 +29,14 @@ export type QueryUpdateResult = {
   query_name: string;
   operation: "INSERT" | "UPDATE";
 };
-
+export type QueryDataColumn = {
+  [conditionId: string]: { [valueSetId: string]: DibbsValueSet };
+};
 export type QueryDetailsResult = {
   query_name: string;
   id: string;
-  query_data: {
-    [conditionId: string]: { [valueSetId: string]: DibbsValueSet };
-  };
+  query_data: QueryDataColumn;
   conditions_list: string[];
-  updated: boolean;
 };
 
 export const EMPTY_QUERY_SELECTION = {
