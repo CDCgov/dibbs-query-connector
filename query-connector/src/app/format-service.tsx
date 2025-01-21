@@ -273,3 +273,21 @@ export const formatImmunizationRoute = (immunization: Immunization): string => {
   );
   return readable?.[0].display ?? initial;
 };
+
+/**
+ * Formats a Coding object for display. If the object has a coding array,
+ * the first coding object is used.
+ * @param coding - The Coding object.
+ * @returns The Coding data formatted for display.
+ */
+export function formatCoding(coding: Coding | undefined) {
+  if (!coding) {
+    return "";
+  }
+  return (
+    <>
+      {" "}
+      {coding?.display} <br /> {coding?.code} <br /> {coding?.system}{" "}
+    </>
+  );
+}
