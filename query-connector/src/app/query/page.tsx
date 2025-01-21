@@ -1,11 +1,11 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { UseCaseQueryResponse } from "../query-service";
+import { FhirQueryResponse } from "../query-service";
 import ResultsView from "./components/ResultsView";
 import PatientSearchResults from "./components/PatientSearchResults";
 import SearchForm from "./components/SearchForm";
 import SelectQuery from "./components/SelectQuery";
-import { DEFAULT_DEMO_FHIR_SERVER, Mode, USE_CASES } from "../constants";
+import { DEFAULT_DEMO_FHIR_SERVER, Mode } from "../constants";
 import LoadingView from "./components/LoadingView";
 import { ToastContainer } from "react-toastify";
 
@@ -16,14 +16,23 @@ import StepIndicator, {
 import SiteAlert from "./designSystem/SiteAlert";
 import { Patient } from "fhir/r4";
 import { getFhirServerNames } from "@/app/database-service";
+import { CustomUserQuery } from "../query-building";
 
+const blankUserQuery = {
+  query_id: "",
+  query_name: "",
+  conditions_list: [],
+  valuesets: [],
+};
 /**
  * Client side parent component for the query page. Based on the mode, it will display the search
  * form, the results of the query, or the multiple patients view.
  * @returns - The Query component.
  */
 const Query: React.FC = () => {
-  const [useCase, setUseCase] = useState<USE_CASES>("" as USE_CASES);
+  const [selectedQuery, setSelectedQuery] = useState<CustomUserQuery>(
+    structuredClone(blankUserQuery),
+  );
   const [mode, setMode] = useState<Mode>("search");
   const [loading, setLoading] = useState<boolean>(false);
   const [fhirServer, setFhirServer] = useState<string>(
@@ -38,10 +47,10 @@ const Query: React.FC = () => {
   }, []);
 
   const [patientDiscoveryQueryResponse, setPatientDiscoveryQueryResponse] =
-    useState<UseCaseQueryResponse>({});
+    useState<FhirQueryResponse>({});
   const [patientForQuery, setPatientForQueryResponse] = useState<Patient>();
   const [resultsQueryResponse, setResultsQueryResponse] =
-    useState<UseCaseQueryResponse>({});
+    useState<FhirQueryResponse>({});
 
   const [showCustomizeQuery, setShowCustomizeQuery] = useState(false);
 
@@ -68,8 +77,6 @@ const Query: React.FC = () => {
         {/* Step 1 */}
         {mode === "search" && (
           <SearchForm
-            useCase={useCase}
-            setUseCase={setUseCase}
             setMode={setMode}
             setLoading={setLoading}
             setPatientDiscoveryQueryResponse={setPatientDiscoveryQueryResponse}
@@ -90,12 +97,10 @@ const Query: React.FC = () => {
         )}
 
         {/* Step 3 */}
-        {mode === "select-query" && (
+        {mode === "select-query" && selectedQuery && (
           <SelectQuery
             goBack={() => setMode("patient-results")}
             goForward={() => setMode("results")}
-            selectedQuery={useCase}
-            setSelectedQuery={setUseCase}
             patientForQuery={patientForQuery}
             resultsQueryResponse={resultsQueryResponse}
             showCustomizeQuery={showCustomizeQuery}
@@ -104,14 +109,16 @@ const Query: React.FC = () => {
             fhirServer={fhirServer}
             setFhirServer={setFhirServer}
             setLoading={setLoading}
+            selectedQuery={selectedQuery}
+            setSelectedQuery={setSelectedQuery}
           />
         )}
 
         {/* Step 4 */}
-        {mode === "results" && resultsQueryResponse && (
+        {mode === "results" && resultsQueryResponse && selectedQuery && (
           <ResultsView
-            selectedQuery={useCase}
-            useCaseQueryResponse={resultsQueryResponse}
+            selectedQuery={selectedQuery}
+            fhirQueryResponse={resultsQueryResponse}
             goBack={() => {
               setMode("select-query");
             }}

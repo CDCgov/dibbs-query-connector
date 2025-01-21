@@ -16,6 +16,7 @@ import {
 import {
   CategoryToConditionArrayMap,
   ConditionsMap,
+  QueryDetailsResult,
 } from "./queryBuilding/utils";
 import {
   CategoryStruct,
@@ -97,10 +98,10 @@ export const getSavedQueryByName = async (name: string) => {
   try {
     const result = await dbClient.query(getQuerybyNameSQL, values);
     if (result.rows.length === 0) {
-      console.error("No results found for query:", name);
+      console.error("No results found for query named:", name);
       return [];
     }
-    return result.rows;
+    return result.rows as unknown as QueryDetailsResult[];
   } catch (error) {
     console.error("Error retrieving query:", error);
     throw error;
@@ -765,32 +766,45 @@ export async function getFhirServerConfig(fhirServerName: string) {
  * Inserts a new FHIR server configuration into the database.
  * @param name - The name of the FHIR server
  * @param hostname - The URL/hostname of the FHIR server
+ * @param disableCertValidation - Whether to disable certificate validation
  * @param lastConnectionSuccessful - Optional boolean indicating if the last connection was successful
+ * @param bearerToken - Optional bearer token for authentication
  * @returns An object indicating success or failure with optional error message
  */
 export async function insertFhirServer(
   name: string,
   hostname: string,
+  disableCertValidation: boolean,
   lastConnectionSuccessful?: boolean,
+  bearerToken?: string,
 ) {
   const insertQuery = `
     INSERT INTO fhir_servers (
       name,
       hostname, 
       last_connection_attempt,
-      last_connection_successful
+      last_connection_successful,
+      headers,
+      disable_cert_validation
     )
-    VALUES ($1, $2, $3, $4);
+    VALUES ($1, $2, $3, $4, $5, $6);
   `;
 
   try {
     await dbClient.query("BEGIN");
+
+    // Create headers object if bearer token is provided
+    const headers = bearerToken
+      ? { Authorization: `Bearer ${bearerToken}` }
+      : {};
 
     const result = await dbClient.query(insertQuery, [
       name,
       hostname,
       new Date(),
       lastConnectionSuccessful,
+      headers,
+      disableCertValidation,
     ]);
 
     // Clear the cache so the next getFhirServerConfigs call will fetch fresh data
@@ -817,14 +831,18 @@ export async function insertFhirServer(
  * @param id - The ID of the FHIR server to update
  * @param name - The new name of the FHIR server
  * @param hostname - The new URL/hostname of the FHIR server
+ * @param disableCertValidation - Whether to disable certificate validation
  * @param lastConnectionSuccessful - Optional boolean indicating if the last connection was successful
+ * @param bearerToken - Optional bearer token for authentication
  * @returns An object indicating success or failure with optional error message
  */
 export async function updateFhirServer(
   id: string,
   name: string,
   hostname: string,
+  disableCertValidation: boolean,
   lastConnectionSuccessful?: boolean,
+  bearerToken?: string,
 ) {
   const updateQuery = `
     UPDATE fhir_servers 
@@ -832,7 +850,9 @@ export async function updateFhirServer(
       name = $2,
       hostname = $3,
       last_connection_attempt = CURRENT_TIMESTAMP,
-      last_connection_successful = $4
+      last_connection_successful = $4,
+      headers = $5,
+      disable_cert_validation = $6
     WHERE id = $1
     RETURNING *;
   `;
@@ -840,11 +860,46 @@ export async function updateFhirServer(
   try {
     await dbClient.query("BEGIN");
 
+    // If updating with a bearer token, add it to existing headers
+    // If no bearer token provided, fetch existing headers and remove Authorization
+    let headers = {};
+    if (bearerToken) {
+      // Get existing headers if any
+      const existingServer = await dbClient.query(
+        "SELECT headers FROM fhir_servers WHERE id = $1",
+        [id],
+      );
+      if (existingServer.rows.length > 0) {
+        // Keep existing headers and add/update Authorization
+        headers = {
+          ...existingServer.rows[0].headers,
+          Authorization: `Bearer ${bearerToken}`,
+        };
+      } else {
+        // No existing headers, just set Authorization
+        headers = { Authorization: `Bearer ${bearerToken}` };
+      }
+    } else {
+      // Get existing headers if any and remove Authorization
+      const existingServer = await dbClient.query(
+        "SELECT headers FROM fhir_servers WHERE id = $1",
+        [id],
+      );
+      if (existingServer.rows.length > 0) {
+        const existingHeaders = existingServer.rows[0].headers || {};
+        // Remove Authorization if it exists when switching to no auth
+        const { Authorization, ...restHeaders } = existingHeaders;
+        headers = restHeaders;
+      }
+    }
+
     const result = await dbClient.query(updateQuery, [
       id,
       name,
       hostname,
       lastConnectionSuccessful,
+      headers,
+      disableCertValidation,
     ]);
 
     // Clear the cache so the next getFhirServerConfigs call will fetch fresh data
