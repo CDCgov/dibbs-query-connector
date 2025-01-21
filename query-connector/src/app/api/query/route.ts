@@ -18,11 +18,9 @@ import {
 } from "../../constants";
 
 import { handleRequestError } from "./error-handling-service";
-import {
-  getFhirServerNames,
-  getSavedQueryByName,
-} from "@/app/database-service";
+import { getFhirServerNames } from "@/app/database-service";
 import { unnestValueSetsFromQuery } from "@/app/utils";
+import { getSavedQueryById } from "@/app/backend/query-building";
 
 /**
  * Health check for TEFCA Viewer
@@ -34,7 +32,7 @@ export async function GET() {
 
 /**
  * Handles a POST request to query a given FHIR server for a given query. The
- * query_name and fhir_server are provided as query parameters in the request URL. The
+ * id and fhir_server are provided as query parameters in the request URL. The
  * request body contains the FHIR patient resource to be queried.
  * @param request - The incoming Next.js request object.
  * @returns Response with QueryResponse.
@@ -72,19 +70,17 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(OperationOutcome);
   }
 
-  // Extract query_name and fhir_server from nextUrl
+  // Extract id and fhir_server from nextUrl
   const params = request.nextUrl.searchParams;
-  //deprecated, prefer query_name
+  //deprecated, prefer id
   const use_case_param = params.get("use_case");
-  const query_name_param = params.get("query_name");
+  const id_param = params.get("id");
   const fhir_server = params.get("fhir_server");
   const fhirServers = await getFhirServerNames();
 
-  const query_name = query_name_param
-    ? query_name_param
-    : mapDeprecatedUseCaseToQueryName(use_case_param);
+  const id = id_param ? id_param : mapDeprecatedUseCaseToId(use_case_param);
 
-  if (!query_name || !fhir_server) {
+  if (!id || !fhir_server) {
     const OperationOutcome = await handleRequestError(MISSING_API_QUERY_PARAM);
     return NextResponse.json(OperationOutcome);
   } else if (!Object.values(fhirServers).includes(fhir_server)) {
@@ -92,9 +88,16 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(OperationOutcome);
   }
 
+  const queryResults = await getSavedQueryById(id);
+
+  if (queryResults.length === 0) {
+    const OperationOutcome = await handleRequestError(INVALID_QUERY);
+    return NextResponse.json(OperationOutcome);
+  }
+
   // Add params & patient identifiers to QueryName
   const QueryRequest: QueryRequest = {
-    query_name: query_name,
+    query_name: queryResults[0].query_name,
     fhir_server: fhir_server,
     ...(PatientIdentifiers.first_name && {
       first_name: PatientIdentifiers.first_name,
@@ -106,13 +109,6 @@ export async function POST(request: NextRequest) {
     ...(PatientIdentifiers.mrn && { mrn: PatientIdentifiers.mrn }),
     ...(PatientIdentifiers.phone && { phone: PatientIdentifiers.phone }),
   };
-
-  const queryResults = await getSavedQueryByName(query_name);
-
-  if (queryResults.length === 0) {
-    const OperationOutcome = await handleRequestError(INVALID_QUERY);
-    return NextResponse.json(OperationOutcome);
-  }
 
   const valueSets = unnestValueSetsFromQuery(queryResults);
 
@@ -127,9 +123,9 @@ export async function POST(request: NextRequest) {
   return NextResponse.json(bundle);
 }
 
-function mapDeprecatedUseCaseToQueryName(use_case: string | null) {
+function mapDeprecatedUseCaseToId(use_case: string | null) {
   if (use_case === null) return null;
   const potentialUseCaseMatch = USE_CASE_DETAILS[use_case as USE_CASES];
-  const queryName = potentialUseCaseMatch?.queryName ?? null;
-  return queryName;
+  const queryId = potentialUseCaseMatch?.id ?? null;
+  return queryId;
 }

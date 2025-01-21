@@ -26,13 +26,15 @@ export async function getSavedQueryById(queryId: string) {
 
   try {
     const result = await dbClient.query(queryString, [id]);
-    if (result.rows.length > 0) {
-      return result.rows as unknown as QueryDetailsResult[];
+
+    if (result.rows.length === 0) {
+      console.error("No results found for query id:", id);
+      return [];
     }
-    console.error("No results found for query id:", id);
-    return [];
+    return result.rows as unknown as QueryDetailsResult[];
   } catch (error) {
     console.error("Error retrieving query", error);
+    throw error;
   }
 }
 
