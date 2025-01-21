@@ -11,7 +11,7 @@ type DrawerProps = {
   isOpen: boolean;
   onSave: () => void;
   onClose: () => void;
-  onSearch?: () => void;
+  onSearch?: (searchFilter: string) => void;
 };
 
 /**
@@ -62,6 +62,7 @@ const Drawer: React.FC<DrawerProps> = ({
                 className={styles.searchField}
                 onChange={(e) => {
                   e.preventDefault();
+                  onSearch(e.target.value);
                 }}
               />
             </div>

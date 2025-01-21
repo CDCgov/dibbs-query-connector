@@ -7,6 +7,7 @@ import { Icon } from "@trussworks/react-uswds";
 import {
   CategoryToConditionArrayMap,
   ConditionsMap,
+  filterSearchByCategoryAndCondition,
   formatDiseaseDisplay,
   NestedQuery,
 } from "../utils";
@@ -49,14 +50,19 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
   const handleDrawer = (open: boolean) => {
     setIsDrawerOpen(open);
   };
+  const [filteredConditionsDisplay, setFilteredConditionsDisplay] =
+    useState<CategoryToConditionArrayMap>(categoryToConditionsMap);
 
   useEffect(() => {
     // display the first condition's valuesets on render
     setActiveCondition(Object.keys(constructedQuery)[0]);
   }, []);
 
-  const conditionUpdate = categoryToConditionsMap
-    ? Object.entries(categoryToConditionsMap).map(([category, conditions]) => (
+  function generateConditionDrawerDisplay(
+    categoryToConditionsMap: CategoryToConditionArrayMap,
+  ) {
+    return Object.entries(categoryToConditionsMap).map(
+      ([category, conditions]) => (
         <div id={category} key={category}>
           <div className={styles.conditionDrawerHeader}>{category}</div>
           <div>
@@ -88,7 +94,22 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
             ))}
           </div>
         </div>
-      ))
+      ),
+    );
+  }
+
+  function handleConditionSearch(searchFilter: string) {
+    if (searchFilter) {
+      const filteredDisplay = filterSearchByCategoryAndCondition(
+        searchFilter,
+        categoryToConditionsMap,
+      );
+      setFilteredConditionsDisplay(filteredDisplay);
+    }
+  }
+
+  const conditionUpdate = filteredConditionsDisplay
+    ? generateConditionDrawerDisplay(filteredConditionsDisplay)
     : undefined;
 
   return (
@@ -190,6 +211,7 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
         onSave={() => {
           handleUpdateCondition;
         }}
+        onSearch={handleConditionSearch}
       />
     </div>
   );
