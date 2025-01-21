@@ -134,13 +134,13 @@ test.describe("querying with the Query Connector", () => {
         .filter({ hasText: "Sexual overexposure" })
         .getByRole("row"),
     ).toHaveCount(5);
-    // Conditions
+    // Conditions + Medication Requests (Reason Code)
     await expect(
       page
         .getByRole("table")
         .filter({ hasText: "Chlamydial infection, unspecified" })
         .getByRole("row"),
-    ).toHaveCount(3);
+    ).toHaveCount(10);
     // Diagnostic Reports
     await expect(
       page
