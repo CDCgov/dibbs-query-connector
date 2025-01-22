@@ -167,7 +167,7 @@ export async function getVSACValueSet(
   const response = await fetch(vsacUrl, {
     method: "get",
     headers: new Headers({
-      Authorization: "Basic " + encode(username + ":" + umlsKey),
+      _Authorization: "Basic " + encode(username + ":" + umlsKey),
       "Content-Type": "application/fhir+json",
     }),
   });
@@ -795,7 +795,7 @@ export async function insertFhirServer(
 
     // Create headers object if bearer token is provided
     const headers = bearerToken
-      ? { Authorization: `Bearer ${bearerToken}` }
+      ? { _Authorization: `Bearer ${bearerToken}` }
       : {};
 
     const result = await dbClient.query(insertQuery, [
@@ -861,7 +861,7 @@ export async function updateFhirServer(
     await dbClient.query("BEGIN");
 
     // If updating with a bearer token, add it to existing headers
-    // If no bearer token provided, fetch existing headers and remove Authorization
+    // If no bearer token provided, fetch existing headers and remove _Authorization
     let headers = {};
     if (bearerToken) {
       // Get existing headers if any
@@ -870,25 +870,25 @@ export async function updateFhirServer(
         [id],
       );
       if (existingServer.rows.length > 0) {
-        // Keep existing headers and add/update Authorization
+        // Keep existing headers and add/update _Authorization
         headers = {
           ...existingServer.rows[0].headers,
-          Authorization: `Bearer ${bearerToken}`,
+          _Authorization: `Bearer ${bearerToken}`,
         };
       } else {
-        // No existing headers, just set Authorization
-        headers = { Authorization: `Bearer ${bearerToken}` };
+        // No existing headers, just set _Authorization
+        headers = { _Authorization: `Bearer ${bearerToken}` };
       }
     } else {
-      // Get existing headers if any and remove Authorization
+      // Get existing headers if any and remove _Authorization
       const existingServer = await dbClient.query(
         "SELECT headers FROM fhir_servers WHERE id = $1",
         [id],
       );
       if (existingServer.rows.length > 0) {
         const existingHeaders = existingServer.rows[0].headers || {};
-        // Remove Authorization if it exists when switching to no auth
-        const { Authorization, ...restHeaders } = existingHeaders;
+        // Remove _Authorization if it exists when switching to no auth
+        const { _Authorization, ...restHeaders } = existingHeaders;
         headers = restHeaders;
       }
     }
