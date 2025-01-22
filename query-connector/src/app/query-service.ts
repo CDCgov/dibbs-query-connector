@@ -222,7 +222,6 @@ export async function parseFhirSearch(
   queryResponse: Record<string, FhirResource[]> = {},
 ): Promise<QueryResponse> {
   let resourceArray: FhirResource[] = [];
-  // let resourceIds: string[] = [];
   const resourceIds = new Set<string>();
 
   // Process the responses and flatten them
