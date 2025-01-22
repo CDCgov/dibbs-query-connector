@@ -57,35 +57,35 @@ export type FhirQueryResponse = Awaited<ReturnType<typeof makeFhirQuery>>;
  * that remaining subset, after other queries have already returned.
  * @param patientId The ID of the patient being queried for.
  * @param fhirClient The FHIR client to use for the queries.
- * @param _queryResponse The data structure to store the accumulated results.
+ * @param queryResponse The data structure to store the accumulated results.
  * @returns The updated query response with encounter information.
  */
 async function queryEncounters(
   patientId: string,
   fhirClient: FHIRClient,
-  _queryResponse: QueryResponse,
+  queryResponse: QueryResponse,
 ): Promise<QueryResponse> {
-  if (_queryResponse.Condition && _queryResponse.Condition.length > 0) {
-    const conditionId = _queryResponse.Condition[0].id;
+  if (queryResponse.Condition && queryResponse.Condition.length > 0) {
+    const conditionId = queryResponse.Condition[0].id;
     const encounterQuery = `/Encounter?subject=${patientId}&reason-reference=${conditionId}`;
     const encounterResponse = await fhirClient.get(encounterQuery);
-    _queryResponse = await parseFhirSearch(encounterResponse, _queryResponse);
+    queryResponse = await parseFhirSearch(encounterResponse, queryResponse);
   }
-  return _queryResponse;
+  return queryResponse;
 }
 
 /**
  * Query a FHIR server for a patient based on demographics provided in the request. If
- * a patient is found, store in the _queryResponse object.
+ * a patient is found, store in the queryResponse object.
  * @param request - The request object containing the patient demographics.
  * @param fhirClient - The client to query the FHIR server.
- * @param _queryResponse - The response object to store the patient.
+ * @param queryResponse - The response object to store the patient.
  * @returns - The response body from the FHIR server.
  */
 async function patientQuery(
   request: QueryRequest,
   fhirClient: FHIRClient,
-  _queryResponse: QueryResponse,
+  queryResponse: QueryResponse,
 ): Promise<void> {
   // Query for patient
   let query = "/Patient?";
@@ -128,44 +128,44 @@ async function patientQuery(
       } \n Headers: ${JSON.stringify(response.headers.raw())}`,
     );
   }
-  _queryResponse = await parseFhirSearch(response, _queryResponse);
+  queryResponse = await parseFhirSearch(response, queryResponse);
 }
 
 /**
  * Query a FHIR API for a public health use case based on patient demographics provided
- * in the request. If data is found, return in a _queryResponse object.
+ * in the request. If data is found, return in a queryResponse object.
  * @param request - QueryRequest object containing the patient demographics and use case.
  * @param queryValueSets - The value sets to be included in query filtering.
- * @param _queryResponse - The response object to store the query results.
+ * @param queryResponse - The response object to store the query results.
  * @returns - The response object containing the query results.
  */
 export async function makeFhirQuery(
   request: QueryRequest,
   queryValueSets: DibbsValueSet[],
-  _queryResponse: QueryResponse = {},
+  queryResponse: QueryResponse = {},
 ): Promise<QueryResponse> {
   const fhirServerConfigs = await getFhirServerConfigs();
   const fhirClient = new FHIRClient(request.fhir_server, fhirServerConfigs);
 
-  if (!_queryResponse.Patient || _queryResponse.Patient.length === 0) {
-    await patientQuery(request, fhirClient, _queryResponse);
+  if (!queryResponse.Patient || queryResponse.Patient.length === 0) {
+    await patientQuery(request, fhirClient, queryResponse);
   }
 
-  if (!_queryResponse.Patient || _queryResponse.Patient.length !== 1) {
-    return _queryResponse;
+  if (!queryResponse.Patient || queryResponse.Patient.length !== 1) {
+    return queryResponse;
   }
 
-  const patientId = _queryResponse.Patient[0].id ?? "";
+  const patientId = queryResponse.Patient[0].id ?? "";
 
   await generalizedQuery(
     request.query_name,
     queryValueSets,
     patientId,
     fhirClient,
-    _queryResponse,
+    queryResponse,
   );
 
-  return _queryResponse;
+  return queryResponse;
 }
 
 /**
@@ -178,7 +178,7 @@ export async function makeFhirQuery(
  * data.
  * @param patientId The ID of the patient for whom to search.
  * @param fhirClient The client used to communicate with the FHIR server.
- * @param _queryResponse The response object for the query results.
+ * @param queryResponse The response object for the query results.
  * @returns A promise for an updated query response.
  */
 async function generalizedQuery(
@@ -186,7 +186,7 @@ async function generalizedQuery(
   queryValueSets: DibbsValueSet[],
   patientId: string,
   fhirClient: FHIRClient,
-  _queryResponse: QueryResponse,
+  queryResponse: QueryResponse,
 ): Promise<QueryResponse> {
   const querySpec = await formatValueSetsAsQuerySpec(queryName, queryValueSets);
   const builtQuery = new CustomQuery(querySpec, patientId);
@@ -201,16 +201,12 @@ async function generalizedQuery(
     const queryRequests: string[] = builtQuery.getAllQueries();
     response = await fhirClient.getBatch(queryRequests);
   }
-  _queryResponse = await parseFhirSearch(response, _queryResponse);
+  queryResponse = await parseFhirSearch(response, queryResponse);
   if (!querySpec.hasSecondEncounterQuery) {
-    return _queryResponse;
+    return queryResponse;
   } else {
-    _queryResponse = await queryEncounters(
-      patientId,
-      fhirClient,
-      _queryResponse,
-    );
-    return _queryResponse;
+    queryResponse = await queryEncounters(patientId, fhirClient, queryResponse);
+    return queryResponse;
   }
 }
 
@@ -218,12 +214,12 @@ async function generalizedQuery(
  * Parse the response from a FHIR search query. If the response is successful and
  * contains data, return an array of parsed resources.
  * @param response - The response from the FHIR server.
- * @param _queryResponse - The response object to store the results.
+ * @param queryResponse - The response object to store the results.
  * @returns - The parsed response.
  */
 export async function parseFhirSearch(
   response: fetch.Response | Array<fetch.Response>,
-  _queryResponse: SuperSetQueryResponse = {},
+  queryResponse: Record<string, FhirResource[]> = {},
 ): Promise<QueryResponse> {
   let resourceArray: FhirResource[] = [];
   const resourceIds = new Set<string>();
@@ -236,23 +232,22 @@ export async function parseFhirSearch(
   } else {
     resourceArray = await processFhirResponse(response);
   }
-
-  // Add resources to _queryResponse
+  // Add resources to queryResponse
   for (const resource of resourceArray) {
     const resourceType = resource.resourceType;
 
     // Check if resourceType already exists in queryResponse & initialize if not
-    if (!(resourceType in _queryResponse)) {
-      _queryResponse[resourceType] = [];
+    if (!(resourceType in queryResponse)) {
+      queryResponse[resourceType] = [];
     }
     // Check if the resourceID has already been seen & only added resources that haven't been seen before
     if (resource.id && !resourceIds.has(resource.id)) {
       queryResponse[resourceType]!.push(resource);
-      _resourceIds.add(resource.id);
+      resourceIds.add(resource.id);
     }
   }
 
-  return _queryResponse;
+  return queryResponse;
 }
 
 /**
@@ -289,11 +284,11 @@ export async function processFhirResponse(
 
 /**
  * Create a FHIR Bundle from the query response.
- * @param _queryResponse - The response object to store the results.
+ * @param queryResponse - The response object to store the results.
  * @returns - The FHIR Bundle of queried data.
  */
 export async function createBundle(
-  _queryResponse: QueryResponse,
+  queryResponse: QueryResponse,
 ): Promise<APIQueryResponse> {
   const bundle: Bundle = {
     resourceType: "Bundle",
@@ -302,7 +297,7 @@ export async function createBundle(
     entry: [],
   };
 
-  Object.entries(_queryResponse).forEach(([_, resources]) => {
+  Object.entries(queryResponse).forEach(([_, resources]) => {
     if (Array.isArray(resources)) {
       resources.forEach((resource) => {
         bundle.entry?.push({ resource });
