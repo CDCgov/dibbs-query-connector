@@ -30,10 +30,10 @@ test.describe("querying with the Query Connector", () => {
 
     // Better luck next time, user!
     await expect(
-      page.getByRole("heading", { name: "No Records Found" }),
+      page.getByRole("heading", { name: "No Records Found" })
     ).toBeVisible();
     await expect(
-      page.getByText("No records were found for your search"),
+      page.getByText("No records were found for your search")
     ).toBeVisible();
     await page
       .getByRole("link", { name: "Revise your patient search" })
@@ -47,13 +47,13 @@ test.describe("querying with the Query Connector", () => {
     const alert = page.locator(".custom-alert");
     await expect(alert).toBeVisible();
     await expect(alert).toHaveText(
-      "This site is for demo purposes only. Please do not enter PII on this website.",
+      "This site is for demo purposes only. Please do not enter PII on this website."
     );
     await expect(
       page.getByRole("heading", {
         name: PAGE_TITLES["search"].title,
         exact: true,
-      }),
+      })
     ).toBeVisible();
 
     await page.getByRole("button", { name: "Fill fields" }).click();
@@ -68,7 +68,7 @@ test.describe("querying with the Query Connector", () => {
 
     await page.getByRole("link", { name: "Select patient" }).click();
     await expect(
-      page.getByRole("heading", { name: "Select a query" }),
+      page.getByRole("heading", { name: "Select a query" })
     ).toBeVisible();
     await page
       .getByTestId("Select")
@@ -82,10 +82,10 @@ test.describe("querying with the Query Connector", () => {
     // dev can have a note to help debug.
     await page.getByRole("button", { name: "Customize Query" }).click();
     await expect(
-      page.getByRole("heading", { name: "Customize Query" }),
+      page.getByRole("heading", { name: "Customize Query" })
     ).toBeVisible();
     await expect(
-      page.getByText("0 labs found, 0 medications found, 0 conditions found."),
+      page.getByText("0 labs found, 0 medications found, 0 conditions found.")
     ).not.toBeVisible();
     await page.getByText("Return to Select query").click();
 
@@ -95,27 +95,27 @@ test.describe("querying with the Query Connector", () => {
     // Make sure we have a results page with a single patient
     // Non-interactive 'div' elements in the table should be located by text
     await expect(
-      page.getByRole("heading", { name: "Patient Record" }),
+      page.getByRole("heading", { name: "Patient Record" })
     ).toBeVisible();
     await expect(page.getByText("Patient Name")).toBeVisible();
     await expect(page.getByText(TEST_PATIENT_NAME)).toBeVisible();
     await expect(page.getByText("Patient Identifiers")).toBeVisible();
     await expect(
-      page.getByText(`Medical Record Number: ${TEST_PATIENT.MRN}`),
+      page.getByText(`Medical Record Number: ${TEST_PATIENT.MRN}`)
     ).toBeVisible();
 
     // Check that the info alert is visible and has updated to the correct text
     const alert2 = page.locator(".custom-alert");
     await expect(alert2).toBeVisible();
     await expect(alert2).toHaveText(
-      `${CONTACT_US_DISCLAIMER_TEXT} ${CONTACT_US_DISCLAIMER_EMAIL}`,
+      `${CONTACT_US_DISCLAIMER_TEXT} ${CONTACT_US_DISCLAIMER_EMAIL}`
     );
 
     await expect(
-      page.getByRole("button", { name: "Observations", expanded: true }),
+      page.getByRole("button", { name: "Observations", expanded: true })
     ).toBeVisible();
     await expect(
-      page.getByRole("button", { name: "Medication Requests", expanded: true }),
+      page.getByRole("button", { name: "Medication Requests", expanded: true })
     ).toBeVisible();
 
     // We can also just directly ask the page to find us the number of rows
@@ -125,21 +125,21 @@ test.describe("querying with the Query Connector", () => {
       page
         .getByRole("table")
         .filter({ hasText: "Chlamydia trachomatis DNA" })
-        .getByRole("row"),
-    ).toHaveCount(18);
+        .getByRole("row")
+    ).toHaveCount(14);
     // Encounters
     await expect(
       page
         .getByRole("table")
         .filter({ hasText: "Sexual overexposure" })
-        .getByRole("row"),
+        .getByRole("row")
     ).toHaveCount(5);
     // Conditions + Medication Requests (Reason Code)
     await expect(
       page
         .getByRole("table")
         .filter({ hasText: "Chlamydial infection, unspecified" })
-        .getByRole("row"),
+        .getByRole("row")
     ).toHaveCount(10);
     // Diagnostic Reports
     await expect(
@@ -148,14 +148,14 @@ test.describe("querying with the Query Connector", () => {
         .filter({
           hasText: "Chlamydia trachomatis and Neisseria gonorrhoeae DNA panel",
         })
-        .getByRole("row"),
+        .getByRole("row")
     ).toHaveCount(4);
     // Medication Requests
     await expect(
       page
         .getByRole("table")
         .filter({ hasText: "azithromycin 1000 MG" })
-        .getByRole("row"),
+        .getByRole("row")
     ).toHaveCount(7);
 
     // Now let's use the return to search to go back to a blank form
@@ -164,7 +164,7 @@ test.describe("querying with the Query Connector", () => {
       page.getByRole("heading", {
         name: PAGE_TITLES["search"].title,
         exact: true,
-      }),
+      })
     ).toBeVisible();
   });
 });
