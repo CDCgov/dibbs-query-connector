@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { useSession, signIn } from "next-auth/react";
-import { Button, Icon } from "@trussworks/react-uswds";
+import { Icon } from "@trussworks/react-uswds";
 import styles from "./header.module.scss";
 import { metadata } from "@/app/constants";
 import classNames from "classnames";
@@ -38,7 +38,7 @@ export default function HeaderComponent() {
 
   // To readd this once we fix sign in
   const { data: session } = useSession();
-  const isLoggedIn = session?.user != null;
+  // const isLoggedIn = session?.user != null;
 
   const handleSignIn = () => {
     signIn("keycloak", { redirectTo: "/query" });
@@ -80,7 +80,7 @@ export default function HeaderComponent() {
             )}
           >
             {/* TODO: Enable this once we can show/hide rules based on actual auth status */}
-            {!isLoggedIn && !LOGGED_IN_PATHS.includes(path) && (
+            {/* {!isLoggedIn && !LOGGED_IN_PATHS.includes(path) && (
               <Button
                 className={styles.signinButton}
                 type="button"
@@ -90,7 +90,7 @@ export default function HeaderComponent() {
               >
                 Sign in
               </Button>
-            )}
+            )} */}
             {LOGGED_IN_PATHS.includes(path) && (
               <button
                 onClick={toggleMenuDropdown}
