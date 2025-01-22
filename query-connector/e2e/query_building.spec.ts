@@ -31,8 +31,8 @@ const SEARCHED_CONDITION = {
 };
 const ADDED_CONDITION = {
   name: "Disease caused by severe acute respiratory syndrome coronavirus 2",
-  condition_id: "840539006"
-}
+  condition_id: "840539006",
+};
 
 test.describe("building a new query", () => {
   // Start every test by navigating to the query building workflow
@@ -82,7 +82,7 @@ test.describe("building a new query", () => {
     await page.getByLabel("Query name").fill(Math.random().toString());
     await expect(actionButton).toBeEnabled();
 
-    const search = page.getByTestId("textInput")
+    const search = page.getByTestId("textInput");
     await search.fill("syp");
     await page.getByText(SEARCHED_CONDITION.name, { exact: true }).click();
     expect(page.getByText(SEARCHED_CONDITION.name, { exact: true }))
@@ -153,7 +153,6 @@ test.describe("building a new query", () => {
     await closeBtn.click();
     await expect(openDrawer).not.toBeVisible();
   });
-
 });
 
 test.describe("editing an exisiting query", () => {
@@ -166,7 +165,7 @@ test.describe("editing an exisiting query", () => {
         exact: true,
       }),
     ).toBeVisible();
-    
+
     // Default queries should render
     DEFAULT_QUERIES.forEach(async (query) => {
       await expect(page.getByTitle(query.query_name)).toBeVisible();
@@ -174,16 +173,19 @@ test.describe("editing an exisiting query", () => {
   });
 
   test("edit query name", async ({ page }) => {
-    const subjectQuery = DEFAULT_QUERIES[0]
-    const query = page.getByTitle(subjectQuery.query_name)
-    await expect(query).toBeVisible()
-   
+    const subjectQuery = DEFAULT_QUERIES[0];
+    const query = page.getByTitle(subjectQuery.query_name);
+    await expect(query).toBeVisible();
+
     // click edit
     await query.hover();
-    const editBtn = page.getByRole("button").locator(`#${subjectQuery.query_id}`).getByText("Edit")
-    await expect(editBtn).toBeVisible()
-    await editBtn.click()
-   
+    const editBtn = page
+      .getByRole("button")
+      .locator(`#${subjectQuery.query_id}`)
+      .getByText("Edit");
+    await expect(editBtn).toBeVisible();
+    await editBtn.click();
+
     //  customize query
     await expect(
       page.getByRole("heading", {
@@ -197,51 +199,60 @@ test.describe("editing an exisiting query", () => {
     await expect(actionButton).not.toBeDisabled(); // not disabled since we have condition(s) + name filled
 
     // update query name
-    const queryNameInput = await page.getByTestId("queryNameInput")
-    expect(queryNameInput).toHaveValue(subjectQuery.query_name)
-    const newName = await queryNameInput.inputValue()
+    const queryNameInput = await page.getByTestId("queryNameInput");
+    expect(queryNameInput).toHaveValue(subjectQuery.query_name);
+    const newName = await queryNameInput.inputValue();
 
-    await queryNameInput.fill(`${newName}-edited`)
+    await queryNameInput.fill(`${newName}-edited`);
 
     // move to next page
-    await actionButton.click()
+    await actionButton.click();
     await expect(actionButton).toContainText("Save query");
 
     // save edited query, back to my queries page
-    await actionButton.click()
-    await expect(page.getByRole("heading", {
-      name: QUERY_LIBRARY
-    })).toBeVisible()
+    await actionButton.click();
+    await expect(
+      page.getByRole("heading", {
+        name: QUERY_LIBRARY,
+      }),
+    ).toBeVisible();
 
     // change name back to original
     await query.hover();
-    await expect(editBtn).toBeVisible()
-    await editBtn.click()
+    await expect(editBtn).toBeVisible();
+    await editBtn.click();
 
-    expect(queryNameInput).toHaveValue(newName)
-    await queryNameInput.fill(subjectQuery.query_name)
- 
-    await actionButton.click()
+    expect(queryNameInput).toHaveValue(newName);
+    await queryNameInput.fill(subjectQuery.query_name);
+
+    await actionButton.click();
     await expect(actionButton).toContainText("Save query");
 
-    await actionButton.click()
-    await expect(page.getByRole("heading", {
-      name: QUERY_LIBRARY
-    })).toBeVisible()
+    await actionButton.click();
+    await expect(
+      page.getByRole("heading", {
+        name: QUERY_LIBRARY,
+      }),
+    ).toBeVisible();
   });
 
   test("edit query conditions", async ({ page }) => {
-    const subjectQuery = DEFAULT_QUERIES[0]
-    const query = page.locator("tr", { has: page.getByTitle(subjectQuery.query_name) })
+    const subjectQuery = DEFAULT_QUERIES[0];
+    const query = page.locator("tr", {
+      has: page.getByTitle(subjectQuery.query_name),
+    });
 
-    await expect(query).toBeVisible()
-   
+    await expect(query).toBeVisible();
+
     // click edit
     await query.hover();
-    const editBtn = query.getByRole("button").locator(`#${subjectQuery.query_id}`).getByText("Edit")
-    await expect(editBtn).toBeVisible()
-    await editBtn.click()
-   
+    const editBtn = query
+      .getByRole("button")
+      .locator(`#${subjectQuery.query_id}`)
+      .getByText("Edit");
+    await expect(editBtn).toBeVisible();
+    await editBtn.click();
+
     //  customize query
     await expect(
       page.getByRole("heading", {
@@ -255,59 +266,73 @@ test.describe("editing an exisiting query", () => {
     await expect(actionButton).not.toBeDisabled(); // not disabled since we have condition(s) + name filled
 
     // update query conditions
-    const search = page.getByTestId("textInput")
+    const search = page.getByTestId("textInput");
     await search.fill(ADDED_CONDITION.name);
 
     await page.getByText(ADDED_CONDITION.name, { exact: true }).click();
-    await expect(page.getByText(ADDED_CONDITION.name, { exact: true })).toBeChecked;
+    await expect(page.getByText(ADDED_CONDITION.name, { exact: true }))
+      .toBeChecked;
 
     // move to next page
-    await actionButton.click()
+    await actionButton.click();
     await expect(actionButton).toContainText("Save query");
 
     // save edited query, back to my queries page
-    await actionButton.click()
-    await expect(page.getByRole("heading", {
-      name: QUERY_LIBRARY
-    })).toBeVisible()
+    await actionButton.click();
+    await expect(
+      page.getByRole("heading", {
+        name: QUERY_LIBRARY,
+      }),
+    ).toBeVisible();
 
     // confirm query shows correct condition/s
-    await editBtn.click()
-    await expect(page.getByText(ADDED_CONDITION.name, { exact: true })).toBeChecked;
-    await expect(page.getByText(subjectQuery.query_name, { exact: true })).toBeChecked;
+    await editBtn.click();
+    await expect(page.getByText(ADDED_CONDITION.name, { exact: true }))
+      .toBeChecked;
+    await expect(page.getByText(subjectQuery.query_name, { exact: true }))
+      .toBeChecked;
 
     // remove added condition
     await page.getByText(ADDED_CONDITION.name, { exact: true }).click();
-    await expect(page.getByText(ADDED_CONDITION.name, { exact: true })).not.toBeChecked;
- 
+    await expect(page.getByText(ADDED_CONDITION.name, { exact: true })).not
+      .toBeChecked;
+
     // move to next page
-    await actionButton.click() // customize query
+    await actionButton.click(); // customize query
     await expect(actionButton).toContainText("Save query");
 
     // save edited query, back to my queries page
-    await actionButton.click() // save query
-    await expect(page.getByRole("heading", {
-      name: QUERY_LIBRARY
-    })).toBeVisible()
+    await actionButton.click(); // save query
+    await expect(
+      page.getByRole("heading", {
+        name: QUERY_LIBRARY,
+      }),
+    ).toBeVisible();
 
-    await expect(page.getByText(ADDED_CONDITION.name, { exact: true })).not.toBeChecked;
+    await expect(page.getByText(ADDED_CONDITION.name, { exact: true })).not
+      .toBeChecked;
   });
 
   test("edit query value sets and concept codes", async ({ page }) => {
-    const subjectQuery = DEFAULT_QUERIES[0]
+    const subjectQuery = DEFAULT_QUERIES[0];
     const subjectVS = DEFAULT_QUERIES[0].valuesets[0];
     const subjectConcept = subjectVS.concepts[0];
 
-    const query = page.locator("tr", { has: page.getByTitle(subjectQuery.query_name) })
+    const query = page.locator("tr", {
+      has: page.getByTitle(subjectQuery.query_name),
+    });
 
-    await expect(query).toBeVisible()
-   
+    await expect(query).toBeVisible();
+
     // click edit
     await query.hover();
-    const editBtn = query.getByRole("button").locator(`#${subjectQuery.query_id}`).getByText("Edit")
-    await expect(editBtn).toBeVisible()
-    await editBtn.click()
-   
+    const editBtn = query
+      .getByRole("button")
+      .locator(`#${subjectQuery.query_id}`)
+      .getByText("Edit");
+    await expect(editBtn).toBeVisible();
+    await editBtn.click();
+
     //  customize query
     await expect(
       page.getByRole("heading", {
@@ -319,19 +344,21 @@ test.describe("editing an exisiting query", () => {
     await expect(actionButton).toBeVisible();
 
     // move to next page
-    await actionButton.click()
+    await actionButton.click();
     await expect(actionButton).toContainText("Save query");
 
     // uncheck a value set
     const labsHeader = await page.getByTestId("accordionButton_labs");
     await expect(labsHeader).toBeVisible();
-    await labsHeader.click()
+    await labsHeader.click();
 
-    const firstLabVS = page.getByTestId("accordionItem_labs")
-    const firstVsCheckbox = firstLabVS.getByTestId("checkbox").getByRole("checkbox")
-    await expect(firstVsCheckbox).toBeChecked()
-    firstLabVS.click()
-    await expect(firstVsCheckbox).not.toBeChecked()
+    const firstLabVS = page.getByTestId("accordionItem_labs");
+    const firstVsCheckbox = firstLabVS
+      .getByTestId("checkbox")
+      .getByRole("checkbox");
+    await expect(firstVsCheckbox).toBeChecked();
+    firstLabVS.click();
+    await expect(firstVsCheckbox).not.toBeChecked();
 
     // recheck a single concept code
     const openDrawer = page.getByTestId("drawer-open-true");
@@ -341,7 +368,9 @@ test.describe("editing an exisiting query", () => {
     await page.getByTestId(subjectVS.valueSetId).getByRole("button").click();
     await expect(openDrawer).toBeVisible();
 
-    const code = page.locator("tr", { hasText: subjectConcept.code }).getByTestId("checkbox");
+    const code = page
+      .locator("tr", { hasText: subjectConcept.code })
+      .getByTestId("checkbox");
     await expect(code.getByRole("checkbox")).not.toBeChecked(); // because we unchecked all codes in prev step
     await code.click();
     await expect(code.getByRole("checkbox")).toBeChecked();
@@ -352,9 +381,11 @@ test.describe("editing an exisiting query", () => {
     await expect(openDrawer).not.toBeVisible();
 
     // save edited query, back to my queries page
-    await actionButton.click()
-    await expect(page.getByRole("heading", {
-      name: QUERY_LIBRARY
-    })).toBeVisible()
+    await actionButton.click();
+    await expect(
+      page.getByRole("heading", {
+        name: QUERY_LIBRARY,
+      }),
+    ).toBeVisible();
   });
 });
