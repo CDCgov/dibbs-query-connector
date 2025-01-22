@@ -126,7 +126,7 @@ test.describe("querying with the Query Connector", () => {
         .getByRole("table")
         .filter({ hasText: "Chlamydia trachomatis DNA" })
         .getByRole("row"),
-    ).toHaveCount(18);
+    ).toHaveCount(14);
     // Encounters
     await expect(
       page

@@ -5,7 +5,6 @@ import { Bundle, DomainResource } from "fhir/r4";
 
 import FHIRClient from "./fhir-servers";
 import { DibbsValueSet, isFhirResource, FhirResource } from "./constants";
-
 import { CustomQuery } from "./CustomQuery";
 import { GetPhoneQueryFormats } from "./format-service";
 import { formatValueSetsAsQuerySpec } from "./format-service";
@@ -226,7 +225,8 @@ export async function parseFhirSearch(
   response: fetch.Response | Array<fetch.Response>,
   _queryResponse: SuperSetQueryResponse = {},
 ): Promise<QueryResponse> {
-  let resourceArray: SuperSetFhirResource[] = [];
+  let resourceArray: FhirResource[] = [];
+  const resourceIds = new Set<string>();
 
   // Process the responses and flatten them
   if (Array.isArray(response)) {
@@ -240,12 +240,18 @@ export async function parseFhirSearch(
   // Add resources to _queryResponse
   for (const resource of resourceArray) {
     const resourceType = resource.resourceType;
+
+    // Check if resourceType already exists in queryResponse & initialize if not
     if (!(resourceType in _queryResponse)) {
-      _queryResponse[resourceType] = [resource];
-    } else {
-      _queryResponse[resourceType]!.push(resource);
+      _queryResponse[resourceType] = [];
+    }
+    // Check if the resourceID has already been seen & only added resources that haven't been seen before
+    if (resource.id && !resourceIds.has(resource.id)) {
+      queryResponse[resourceType]!.push(resource);
+      _resourceIds.add(resource.id);
     }
   }
+
   return _queryResponse;
 }
 
@@ -259,6 +265,8 @@ export async function processFhirResponse(
   response: fetch.Response,
 ): Promise<FhirResource[]> {
   let resourceArray: FhirResource[] = [];
+  let resourceIds: string[] = [];
+
   if (response.status === 200) {
     const body = await response.json();
     if (body.entry) {
@@ -268,7 +276,11 @@ export async function processFhirResponse(
             "Entry in FHIR resource response parsing was of unexpected shape",
           );
         }
-        resourceArray.push(entry.resource);
+        // Add the resource only if the ID is unique to the resources being returned for the query
+        if (!resourceIds.includes(entry.resource.id)) {
+          resourceIds.push(entry.resource.id);
+          resourceArray.push(entry.resource);
+        }
       }
     }
   }
