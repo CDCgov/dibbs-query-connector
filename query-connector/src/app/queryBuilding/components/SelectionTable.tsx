@@ -16,19 +16,11 @@ type ConceptTypeSelectionTableProps = {
   searchFilter: string;
 };
 
-type VsTypeAccordion = {
-  title: JSX.Element;
-  content: JSX.Element;
-  expanded: boolean;
-  id: string;
-  headingLevel: "h4";
-  handleToggle: () => void;
-  length: number;
-};
 /**
  * Component that displays ValueSetGroupings sorted by VsType (DibbsConceptType)
  * for the active condition selected
  * @param root0 - params
+ * @param root0.searchFilter - the string set in the search field to filter options by
  * @param root0.vsTypeLevelOptions - the valueSets that are currently in the in-progress query
  * @param root0.handleVsTypeLevelUpdate - curried state update function that
  * takes a VsType and generates a VsName level setter function

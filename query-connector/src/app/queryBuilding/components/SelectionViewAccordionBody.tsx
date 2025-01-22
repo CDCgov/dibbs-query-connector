@@ -67,7 +67,6 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
   function handleBulkToggle(
     e: ChangeEvent<HTMLInputElement>,
     isMinusState: boolean,
-    isDrawer = false,
   ) {
     const valueSetToUpdateId = e.target.id;
     const includeStatus = e.target.checked;
@@ -191,6 +190,12 @@ const checkboxLabel = (dibbsVs: DibbsValueSet) => {
   );
 };
 
+/**
+ * Helper function for search to filter out valuesets against a search param
+ * @param searchFilter - search string
+ * @param selectedValueSet - the active valueset displayed in the drawer
+ * @returns - a transformed list of concepts to display
+ */
 export function filterValueSetConcepts(
   searchFilter: string,
   selectedValueSet: DibbsValueSet,

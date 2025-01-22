@@ -7,7 +7,6 @@ import { Icon } from "@trussworks/react-uswds";
 import {
   CategoryToConditionArrayMap,
   ConditionsMap,
-  EMPTY_CONCEPT_TYPE,
   filterSearchByCategoryAndCondition,
   formatDiseaseDisplay,
   NestedQuery,
@@ -17,7 +16,6 @@ import Drawer from "@/app/query/designSystem/drawer/Drawer";
 import { DibbsConceptType, DibbsValueSet } from "@/app/constants";
 import { showToastConfirmation } from "@/app/query/designSystem/toast/Toast";
 import SearchField from "@/app/query/designSystem/searchField/SearchField";
-import { filterValueSetConcepts } from "./SelectionViewAccordionBody";
 
 type ConditionSelectionProps = {
   constructedQuery: NestedQuery;
