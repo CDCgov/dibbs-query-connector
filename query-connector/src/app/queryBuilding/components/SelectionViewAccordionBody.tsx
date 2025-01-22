@@ -113,6 +113,7 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
                 id={dibbsVs.valueSetId}
                 checked={checked}
                 isMinusState={isMinusState}
+                data-testid={dibbsVs.valueSetId}
               />
             </div>
             <div className={styles.accordionBodyExpanded__right}>
@@ -120,6 +121,7 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
                 {selectedCount}/{totalCount}
               </div>
               <div
+                data-testid={dibbsVs.valueSetId}
                 className={styles.viewCodesBtn}
                 role="button"
                 onClick={() => {

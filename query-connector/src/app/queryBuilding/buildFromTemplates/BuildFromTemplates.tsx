@@ -342,6 +342,7 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
                     ? handleCreateQueryClick
                     : handleSaveQuery
                 }
+                data-testid="createSaveQueryBtn"
               >
                 {buildStep == "condition" ? "Customize query" : "Save query"}
               </Button>

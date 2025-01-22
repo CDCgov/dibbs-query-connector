@@ -125,6 +125,12 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
               const condition = conditionsDetailsMap[conditionId];
               return (
                 <div
+                  key={conditionId}
+                  data-testid={
+                    activeCondition == conditionId
+                      ? "conditionCard-active"
+                      : "conditionCard"
+                  }
                   className={classNames(
                     "align-items-center",
                     activeCondition == conditionId
