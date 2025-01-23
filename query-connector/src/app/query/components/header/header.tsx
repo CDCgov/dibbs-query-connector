@@ -42,8 +42,9 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
 
   const path = usePathname();
 
-  const { data: session } = useSession();
-  const isLoggedIn = session?.user != null;
+  // To readd this once we fix sign in
+  // const { data: session } = useSession();
+  // const isLoggedIn = session?.user != null;
 
   const handleSignIn = () => {
     if (authDisabled) {
@@ -56,7 +57,7 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
   const toggleMenuDropdown = () => {
     setShowMenu(!showMenu);
   };
-  const isProduction = process.env.NODE_ENV === "production";
+  // const isProduction = process.env.NODE_ENV === "production";
   const landingPage = "/";
 
   return (

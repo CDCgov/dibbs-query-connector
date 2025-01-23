@@ -2,7 +2,6 @@ interface CustomQuerySpec {
   labCodes?: string[];
   snomedCodes?: string[];
   rxnormCodes?: string[];
-  classTypeCodes?: string[];
   hasSecondEncounterQuery?: boolean;
 }
 
@@ -19,7 +18,6 @@ export class CustomQuery {
   labCodes: string[] = [];
   snomedCodes: string[] = [];
   rxnormCodes: string[] = [];
-  classTypeCodes: string[] = [];
 
   // Need default initialization of query strings outstide constructor,
   // since the `try` means we might not find the JSON spec
@@ -29,7 +27,7 @@ export class CustomQuery {
   medicationRequestQuery: string = "";
   socialHistoryQuery: string = "";
   encounterQuery: string = "";
-  encounterClassTypeQuery: string = "";
+  immunizationQuery: string = "";
 
   // Some queries need to be batched in waves because their encounter references
   // might depend on demographic information
@@ -48,7 +46,6 @@ export class CustomQuery {
       this.labCodes = jsonSpec?.labCodes || [];
       this.snomedCodes = jsonSpec?.snomedCodes || [];
       this.rxnormCodes = jsonSpec?.rxnormCodes || [];
-      this.classTypeCodes = jsonSpec?.classTypeCodes || [];
       this.hasSecondEncounterQuery = jsonSpec?.hasSecondEncounterQuery || false;
       this.compileQueries(patientId);
     } catch (error) {
@@ -67,7 +64,6 @@ export class CustomQuery {
     const labsFilter = this.labCodes.join(",");
     const snomedFilter = this.snomedCodes.join(",");
     const rxnormFilter = this.rxnormCodes.join(",");
-    const classTypeFilter = this.classTypeCodes.join(",");
 
     this.observationQuery =
       labsFilter !== ""
@@ -90,10 +86,8 @@ export class CustomQuery {
       snomedFilter !== ""
         ? `/Encounter?subject=${patientId}&reason-code=${snomedFilter}`
         : "";
-    this.encounterClassTypeQuery =
-      classTypeFilter !== ""
-        ? `/Encounter?subject=${patientId}&class=${classTypeFilter}`
-        : "";
+
+    this.immunizationQuery = `/Immunization?patient=${patientId}`;
   }
 
   /**
@@ -108,7 +102,7 @@ export class CustomQuery {
       this.medicationRequestQuery,
       this.socialHistoryQuery,
       this.encounterQuery,
-      this.encounterClassTypeQuery,
+      this.immunizationQuery,
     ];
     const filteredRequests = queryRequests.filter((q) => q !== "");
     return filteredRequests;
@@ -134,8 +128,8 @@ export class CustomQuery {
         return this.socialHistoryQuery;
       case "encounter":
         return this.encounterQuery;
-      case "encounterClass":
-        return this.encounterClassTypeQuery;
+      case "immunization":
+        return this.immunizationQuery;
       default:
         return "";
     }

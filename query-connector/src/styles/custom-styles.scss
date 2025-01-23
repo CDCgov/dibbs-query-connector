@@ -545,7 +545,7 @@ ul.usa-sidenav
     .usa-modal__main {
       max-width: 34rem;
 
-      input {
+      input, select {
         max-width: 100%;
       }
     }
@@ -573,5 +573,9 @@ ul.usa-sidenav
     .usa-button-group__item:has(> #modal-delete-button) {
       flex: 1 1 0%;
     }
+  }
+
+  .usa-checkbox {
+    background-color: transparent;
   }
 }
