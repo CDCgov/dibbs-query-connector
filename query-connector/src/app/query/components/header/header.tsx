@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
+import { useSession, signIn } from "next-auth/react";
 import { Icon } from "@trussworks/react-uswds";
 import styles from "./header.module.scss";
 import { metadata } from "@/app/constants";
@@ -43,8 +44,8 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
   const path = usePathname();
 
   // To readd this once we fix sign in
-  // const { data: session } = useSession();
-  // const isLoggedIn = session?.user != null;
+  const { data: session } = useSession();
+  const isLoggedIn = session?.user != null;
 
   const handleSignIn = () => {
     if (authDisabled) {
