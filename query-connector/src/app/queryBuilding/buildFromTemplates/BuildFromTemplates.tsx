@@ -388,6 +388,9 @@ export default BuildFromTemplates;
 async function getValueSetsForSelectedConditions(conditionIds: string[]) {
   const conditionValueSets: ConditionIdToValueSetArrayMap = {};
 
+  if (conditionIds.length === 0) {
+    return {};
+  }
   // if there are new ids, we need to query the db
   const results = await getValueSetsAndConceptsByConditionIDs(conditionIds);
   const formattedResults =
