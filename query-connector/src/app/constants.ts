@@ -1,14 +1,4 @@
-import {
-  Patient,
-  Observation,
-  DiagnosticReport,
-  Condition,
-  Encounter,
-  Medication,
-  MedicationAdministration,
-  MedicationRequest,
-  Immunization,
-} from "fhir/r4";
+import { FhirResource } from "fhir/r4";
 
 export const USE_CASE_DETAILS = {
   "newborn-screening": {
@@ -200,19 +190,6 @@ export const ersdToDibbsConceptMap: {
   dxtc: "conditions",
   sdtc: "conditions",
 };
-
-// Define the type guard for FHIR resources
-// Define the FHIR Resource types
-export type FhirResource =
-  | Patient
-  | Observation
-  | DiagnosticReport
-  | Condition
-  | Encounter
-  | Medication
-  | MedicationAdministration
-  | MedicationRequest
-  | Immunization;
 
 /**
  * A type guard function that checks if the given resource is a valid FHIR resource.
