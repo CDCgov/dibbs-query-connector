@@ -116,7 +116,7 @@ If the above doesn't work, try replacing `localhost` with `0.0.0.0`.
 
 Our e2e's are available locally via `npm run test:playright:local`. You'll need to have the app running locally at `localhost:3000` first (ie using `npm run dev` or running `npm run dev:db` and `npm run dev:next` in two separate terminals).
 
-For flows that do reach-outs to a FHIR server (ie the flow at `/query`), you'll need to use a DB utility to change the local E2E server address stored in the DB to whatever localhost port your local HAPI server is living at. If you have questions, reach out to another eng on the team.
+For flows that do queries to a FHIR server (ie `/query`), you'll need to use a DB utility to change the address of the local E2E server to whatever localhost port your dev HAPI server is living at. If you have questions, reach out to another eng on the team.
 
 ### Architecture Diagram
 
