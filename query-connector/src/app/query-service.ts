@@ -1,10 +1,10 @@
 "use server";
 import fetch from "node-fetch";
 import https from "https";
-import { Bundle, DomainResource } from "fhir/r4";
+import { Bundle, FhirResource } from "fhir/r4";
 
 import FHIRClient from "./fhir-servers";
-import { DibbsValueSet, isFhirResource, FhirResource } from "./constants";
+import { DibbsValueSet, isFhirResource } from "./constants";
 import { CustomQuery } from "./CustomQuery";
 import { GetPhoneQueryFormats } from "./format-service";
 import { formatValueSetsAsQuerySpec } from "./format-service";
@@ -15,12 +15,6 @@ import { getFhirServerConfigs } from "./database-service";
  */
 export type QueryResponse = {
   [R in FhirResource as R["resourceType"]]?: R[];
-};
-
-// workaround types to get around a typescript compilation issue
-type SuperSetFhirResource = DomainResource | FhirResource;
-type SuperSetQueryResponse = {
-  [R in SuperSetFhirResource as R["resourceType"]]?: R[];
 };
 
 export type APIQueryResponse = Bundle;
