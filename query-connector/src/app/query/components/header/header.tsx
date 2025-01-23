@@ -7,7 +7,6 @@ import { Icon } from "@trussworks/react-uswds";
 import styles from "./header.module.scss";
 import { metadata } from "@/app/constants";
 import classNames from "classnames";
-import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
 /**
