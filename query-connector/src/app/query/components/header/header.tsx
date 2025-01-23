@@ -1,20 +1,26 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { useSession, signIn } from "next-auth/react";
 import { Icon } from "@trussworks/react-uswds";
 import styles from "./header.module.scss";
 import { metadata } from "@/app/constants";
 import classNames from "classnames";
+import { useRouter } from "next/navigation";
+
 /**
  * Produces the header.
+ * @param root0 - The properties object
+ * @param root0.authDisabled - The server-side read of the auth disabled environment variable.
  * @returns The HeaderComponent component.
  */
-export default function HeaderComponent() {
+const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
+  authDisabled,
+}) => {
   const menuRef = useRef<HTMLDivElement>(null);
-
   const [showMenu, setShowMenu] = useState(false);
+  const router = useRouter();
 
   const outsideMenuClick = (event: MouseEvent) => {
     if (
@@ -41,7 +47,11 @@ export default function HeaderComponent() {
   const isLoggedIn = session?.user != null;
 
   const handleSignIn = () => {
-    signIn("keycloak", { redirectTo: "/query" });
+    if (authDisabled) {
+      router.push(`/query`);
+    } else {
+      signIn("keycloak", { redirectTo: "/query" });
+    }
   };
 
   const toggleMenuDropdown = () => {
@@ -146,6 +156,8 @@ export default function HeaderComponent() {
       )}
     </div>
   );
-}
+};
 
 const LOGGED_IN_PATHS = ["/query", "/queryBuilding", "/fhir-servers"];
+
+export default HeaderComponent;
