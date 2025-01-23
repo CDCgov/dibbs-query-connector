@@ -102,6 +102,7 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
           <div
             className={styles.accordionBodyExpanded}
             key={dibbsVs.valueSetId}
+            data-testid={`container-${dibbsVs.valueSetId}`}
           >
             <div className={styles.accordionExpandedInner}>
               <Checkbox

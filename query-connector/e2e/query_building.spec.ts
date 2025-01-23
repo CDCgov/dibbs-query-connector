@@ -361,7 +361,10 @@ test.describe("editing an exisiting query", () => {
     await expect(openDrawer).not.toBeVisible();
 
     await firstLabVS.hover();
-    await page.getByTestId(subjectVS.valueSetId).getByRole("button").click();
+    await page
+      .getByTestId(`container-${subjectVS.valueSetId}`)
+      .getByRole("button")
+      .click();
     await expect(openDrawer).toBeVisible();
 
     const code = page
