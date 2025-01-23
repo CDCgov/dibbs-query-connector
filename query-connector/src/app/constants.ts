@@ -1,14 +1,4 @@
-import {
-  Patient,
-  Observation,
-  DiagnosticReport,
-  Condition,
-  Encounter,
-  Medication,
-  MedicationAdministration,
-  MedicationRequest,
-  Immunization,
-} from "fhir/r4";
+import { FhirResource } from "fhir/r4";
 
 export const USE_CASE_DETAILS = {
   "newborn-screening": {
@@ -56,16 +46,6 @@ export type DemoDataFields = {
   FhirServer: string;
 };
 
-/*Type to specify the different patient types*/
-export type PatientType =
-  | "cancer"
-  | "sti-chlamydia-positive"
-  | "sti-gonorrhea-positive"
-  | "newborn-screening-technical-fail"
-  | "newborn-screening-referral"
-  | "newborn-screening-pass"
-  | "sti-syphilis-positive";
-
 export const DEFAULT_DEMO_FHIR_SERVER = "Public HAPI: Direct";
 /*
  * Common "Hyper Unlucky" patient data used for all non-newborn screening use cases
@@ -83,43 +63,6 @@ export const hyperUnluckyPatient: DemoDataFields = {
 type Option = {
   value: string;
   label: string;
-};
-
-/* Labels and values for the patient options that are available based on the query option selected */
-export const patientOptions: Record<string, Option[]> = {
-  cancer: [{ value: "cancer", label: "A patient with leukemia" }],
-  chlamydia: [
-    {
-      value: "sti-chlamydia-positive",
-      label: "A male patient with a positive chlamydia lab test",
-    },
-  ],
-  gonorrhea: [
-    {
-      value: "sti-gonorrhea-positive",
-      label: "A male patient with a positive gonorrhea lab test",
-    },
-  ],
-  "newborn-screening": [
-    {
-      value: "newborn-screening-technical-fail",
-      label: "A newborn with a technical failure on screening",
-    },
-    {
-      value: "newborn-screening-referral",
-      label: "A newborn with a hearing referral & risk indicator",
-    },
-    {
-      value: "newborn-screening-pass",
-      label: "A newborn with a passed screening",
-    },
-  ],
-  syphilis: [
-    {
-      value: "sti-syphilis-positive",
-      label: "A patient with a positive syphilis lab test",
-    },
-  ],
 };
 
 /*Labels and values for the state options dropdown on the query page*/
@@ -247,19 +190,6 @@ export const ersdToDibbsConceptMap: {
   dxtc: "conditions",
   sdtc: "conditions",
 };
-
-// Define the type guard for FHIR resources
-// Define the FHIR Resource types
-export type FhirResource =
-  | Patient
-  | Observation
-  | DiagnosticReport
-  | Condition
-  | Encounter
-  | Medication
-  | MedicationAdministration
-  | MedicationRequest
-  | Immunization;
 
 /**
  * A type guard function that checks if the given resource is a valid FHIR resource.
