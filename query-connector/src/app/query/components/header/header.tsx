@@ -37,12 +37,19 @@ export default function HeaderComponent() {
   const path = usePathname();
 
   // To readd this once we fix sign in
-  const { data: session } = useSession();
-  // const isLoggedIn = session?.user != null;
+  const { data: session, status } = useSession();
+  const isLoggedIn = session?.user != null;
 
-  const handleSignIn = () => {
-    signIn("keycloak", { redirectTo: "/query" });
-  };
+  // const handleSignIn = () => {
+  //   signIn("keycloak", { redirectTo: "/query" });
+  // };
+
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      console.log("User is unauthenticated, triggering sign-in");
+      signIn("keycloak", { redirect: true, callbackUrl: "/query" });
+    }
+  }, [status]);
 
   const toggleMenuDropdown = () => {
     setShowMenu(!showMenu);
