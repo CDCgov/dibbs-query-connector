@@ -10,17 +10,17 @@ import {
 import dynamic from "next/dynamic";
 import { useEffect, useState, useRef } from "react";
 import { FhirServerConfig } from "../constants";
-import type { ModalRef } from "../query/designSystem/modal/Modal";
+import type { ModalRef } from "../designSystem/modal/Modal";
 import styles from "./fhirServers.module.scss";
 import classNames from "classnames";
-import SiteAlert from "../query/designSystem/SiteAlert";
-import Table from "../query/designSystem/table/Table";
-import Checkbox from "../query/designSystem/checkbox/Checkbox";
+import SiteAlert from "../designSystem/SiteAlert";
+import Table from "../designSystem/table/Table";
+import Checkbox from "../designSystem/checkbox/Checkbox";
 
 // Dynamic import with proper typing for Modal
-import type { ModalProps } from "../query/designSystem/modal/Modal";
+import type { ModalProps } from "../designSystem/modal/Modal";
 const Modal = dynamic<ModalProps>(
-  () => import("../query/designSystem/modal/Modal").then((mod) => mod.Modal),
+  () => import("../designSystem/modal/Modal").then((mod) => mod.Modal),
   { ssr: false },
 );
 

@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { formatIdForAnchorTag } from "./ResultsViewTable";
-import SideNav, { NavItem } from "../../designSystem/sideNav/SideNav";
+import SideNav, { NavItem } from "../../../designSystem/sideNav/SideNav";
 
 export type NavSection = {
   title: string;

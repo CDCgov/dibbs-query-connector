@@ -1,10 +1,10 @@
-import { ModalRef } from "@/app/query/designSystem/modal/Modal";
-import { DeleteModal } from "@/app/query/designSystem/modal/deleteModal";
+import { ModalRef } from "@/app/designSystem/modal/Modal";
+import { DeleteModal } from "@/app/designSystem/modal/deleteModal";
 import "react-toastify/dist/ReactToastify.css";
 import { RefObject } from "react";
 import { CustomUserQuery } from "@/app/query-building";
 import { deleteQueryById } from "@/app/database-service";
-import { showToastConfirmation } from "@/app/query/designSystem/toast/Toast";
+import { showToastConfirmation } from "@/app/designSystem/toast/Toast";
 import { DataContextValue } from "@/app/DataProvider";
 
 /**

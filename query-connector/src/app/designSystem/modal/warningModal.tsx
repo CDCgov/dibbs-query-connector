@@ -1,5 +1,5 @@
 import React, { RefObject } from "react";
-import { Modal, ModalRef } from "@/app/query/designSystem/modal/Modal";
+import { Modal, ModalRef } from "@/app/designSystem/modal/Modal";
 
 interface WarningModalProps {
   modalRef: RefObject<ModalRef>;

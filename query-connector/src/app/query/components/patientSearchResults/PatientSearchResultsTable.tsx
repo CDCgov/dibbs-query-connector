@@ -1,4 +1,4 @@
-import Table from "../../designSystem/table/Table";
+import Table from "../../../designSystem/table/Table";
 import { Patient } from "fhir/r4";
 import {
   formatAddress,

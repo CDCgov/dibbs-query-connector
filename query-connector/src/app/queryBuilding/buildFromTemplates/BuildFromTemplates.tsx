@@ -1,6 +1,6 @@
 "use client";
 
-import Backlink from "@/app/query/components/backLink/Backlink";
+import Backlink from "@/app/designSystem/backLink/Backlink";
 import styles from "./conditionTemplateSelection.module.scss";
 import { Label, TextInput, Button } from "@trussworks/react-uswds";
 import {
@@ -26,9 +26,9 @@ import {
 } from "../utils";
 import { ConditionSelection } from "../components/ConditionSelection";
 import { ValueSetSelection } from "../components/ValueSetSelection";
-import SiteAlert from "@/app/query/designSystem/SiteAlert";
+import SiteAlert from "@/app/designSystem/SiteAlert";
 import { BuildStep, DibbsConceptType, DibbsValueSet } from "../../constants";
-import LoadingView from "../../query/components/LoadingView";
+import LoadingView from "../../designSystem/LoadingView";
 import classNames from "classnames";
 import { groupConditionConceptsIntoValueSets } from "@/app/utils";
 import { SelectedQueryDetails } from "../querySelection/utils";
@@ -39,7 +39,7 @@ import {
   saveCustomQuery,
 } from "@/app/backend/query-building";
 import { groupValueSetsByConceptType } from "@/app/utils/valueSetTranslation";
-import { showToastConfirmation } from "@/app/query/designSystem/toast/Toast";
+import { showToastConfirmation } from "@/app/designSystem/toast/Toast";
 import { DataContext } from "@/app/DataProvider";
 
 export type FormError = {

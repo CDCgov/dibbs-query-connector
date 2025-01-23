@@ -6,7 +6,7 @@ import { PAGE_TITLES } from "@/app/query/components/stepIndicator/StepIndicator"
 import {
   CONTACT_US_DISCLAIMER_EMAIL,
   CONTACT_US_DISCLAIMER_TEXT,
-} from "@/app/query/designSystem/SiteAlert";
+} from "@/app/designSystem/SiteAlert";
 import { TEST_PATIENT, TEST_PATIENT_NAME } from "./constants";
 
 test.describe("querying with the Query Connector", () => {

@@ -3,17 +3,17 @@ import React, { useEffect, useState } from "react";
 import { FhirQueryResponse } from "../query-service";
 import ResultsView from "./components/ResultsView";
 import PatientSearchResults from "./components/PatientSearchResults";
-import SearchForm from "./components/SearchForm";
+import SearchForm from "./components/searchForm/SearchForm";
 import SelectQuery from "./components/SelectQuery";
 import { DEFAULT_DEMO_FHIR_SERVER, Mode } from "../constants";
-import LoadingView from "./components/LoadingView";
+import LoadingView from "../designSystem/LoadingView";
 import { ToastContainer } from "react-toastify";
 
 import "react-toastify/dist/ReactToastify.min.css";
 import StepIndicator, {
   CUSTOMIZE_QUERY_STEPS,
 } from "./components/stepIndicator/StepIndicator";
-import SiteAlert from "./designSystem/SiteAlert";
+import SiteAlert from "../designSystem/SiteAlert";
 import { Patient } from "fhir/r4";
 import { getFhirServerNames } from "@/app/database-service";
 import { CustomUserQuery } from "../query-building";

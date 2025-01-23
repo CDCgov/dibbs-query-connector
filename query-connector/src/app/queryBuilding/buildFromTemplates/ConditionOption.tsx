@@ -1,4 +1,4 @@
-import Checkbox from "../../query/designSystem/checkbox/Checkbox";
+import Checkbox from "../../designSystem/checkbox/Checkbox";
 import { formatDiseaseDisplay } from "../utils";
 import styles from "./conditionTemplateSelection.module.scss";
 

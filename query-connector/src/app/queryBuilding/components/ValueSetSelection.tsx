@@ -11,9 +11,9 @@ import {
   NestedQuery,
 } from "../utils";
 import { ConceptTypeSelectionTable } from "./SelectionTable";
-import Drawer from "@/app/query/designSystem/drawer/Drawer";
+import Drawer from "@/app/designSystem/drawer/Drawer";
 import { DibbsConceptType, DibbsValueSet } from "@/app/constants";
-import { showToastConfirmation } from "@/app/query/designSystem/toast/Toast";
+import { showToastConfirmation } from "@/app/designSystem/toast/Toast";
 
 type ConditionSelectionProps = {
   constructedQuery: NestedQuery;

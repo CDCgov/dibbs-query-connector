@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { Patient } from "fhir/r4";
 
 import { Mode } from "@/app/constants";
-import Backlink from "./backLink/Backlink";
+import Backlink from "../../designSystem/backLink/Backlink";
 import PatientSearchResultsTable from "./patientSearchResults/PatientSearchResultsTable";
 import NoPatientsFound from "./patientSearchResults/NoPatientsFound";
 import { RETURN_LABEL } from "@/app/query/components/stepIndicator/StepIndicator";

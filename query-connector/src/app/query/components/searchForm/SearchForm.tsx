@@ -12,9 +12,9 @@ import {
   QueryRequest,
   makeFhirQuery,
 } from "@/app/query-service";
-import styles from "./searchForm/searchForm.module.scss";
+import styles from "../searchForm/searchForm.module.scss";
 import { FormatPhoneAsDigits } from "@/app/format-service";
-import TitleBox from "./stepIndicator/TitleBox";
+import TitleBox from "../../components/stepIndicator/TitleBox";
 
 interface SearchFormProps {
   setPatientDiscoveryQueryResponse: (

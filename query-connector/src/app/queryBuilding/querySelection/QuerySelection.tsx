@@ -2,7 +2,7 @@
 
 import { getCustomQueries } from "@/app/database-service";
 import { CustomUserQuery } from "@/app/query-building";
-import LoadingView from "@/app/query/components/LoadingView";
+import LoadingView from "@/app/designSystem/LoadingView";
 import {
   useContext,
   useState,

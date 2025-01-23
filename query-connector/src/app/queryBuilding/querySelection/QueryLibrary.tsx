@@ -7,8 +7,8 @@ import React, {
   useEffect,
 } from "react";
 import { Button, Icon } from "@trussworks/react-uswds";
-import Table from "@/app/query/designSystem/table/Table";
-import { ModalRef } from "@/app/query/designSystem/modal/Modal";
+import Table from "@/app/designSystem/table/Table";
+import { ModalRef } from "@/app/designSystem/modal/Modal";
 import styles from "./querySelection.module.scss";
 import { CustomUserQuery } from "@/app/query-building";
 
@@ -22,7 +22,7 @@ import {
   handleCopy,
   SelectedQueryDetails,
 } from "./utils";
-import LoadingView from "@/app/query/components/LoadingView";
+import LoadingView from "@/app/designSystem/LoadingView";
 import { DataContext } from "@/app/DataProvider";
 import classNames from "classnames";
 import { getConditionsData } from "@/app/database-service";

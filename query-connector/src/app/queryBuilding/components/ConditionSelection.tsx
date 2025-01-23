@@ -5,7 +5,7 @@ import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import classNames from "classnames";
 import { CategoryToConditionArrayMap, NestedQuery } from "../utils";
 import ConditionColumnDisplay from "../buildFromTemplates/ConditionColumnDisplay";
-import SearchField from "@/app/query/designSystem/searchField/SearchField";
+import SearchField from "@/app/designSystem/searchField/SearchField";
 import { FormError } from "../buildFromTemplates/BuildFromTemplates";
 
 type ConditionSelectionProps = {

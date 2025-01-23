@@ -6,7 +6,7 @@ import ConceptTypeAccordionBody from "./SelectionViewAccordionBody";
 import { DibbsConceptType, DibbsValueSet } from "@/app/constants";
 import { ConceptTypeToDibbsVsMap } from "@/app/utils/valueSetTranslation";
 import ConceptTypeAccordionHeader from "./SelectionViewAccordionHeader";
-import MultiAccordion from "@/app/query/designSystem/MultiAccordion";
+import MultiAccordion from "@/app/designSystem/MultiAccordion";
 
 type ConceptTypeSelectionTableProps = {
   vsTypeLevelOptions: ConceptTypeToDibbsVsMap;

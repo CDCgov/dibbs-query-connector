@@ -1,9 +1,9 @@
 import styles from "../buildFromTemplates/conditionTemplateSelection.module.scss";
 import React, { ChangeEvent, useState } from "react";
 import ConceptSelection from "./ConceptSelection";
-import Drawer from "@/app/query/designSystem/drawer/Drawer";
+import Drawer from "@/app/designSystem/drawer/Drawer";
 import { Concept, DibbsValueSet } from "@/app/constants";
-import Checkbox from "@/app/query/designSystem/checkbox/Checkbox";
+import Checkbox from "@/app/designSystem/checkbox/Checkbox";
 
 type ConceptTypeAccordionBodyProps = {
   activeValueSets: { [vsId: string]: DibbsValueSet };

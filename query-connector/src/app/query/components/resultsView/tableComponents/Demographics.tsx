@@ -10,7 +10,7 @@ import {
   formatDate,
 } from "../../../../format-service";
 import styles from "./resultsTables.module.scss";
-import Table from "@/app/query/designSystem/table/Table";
+import Table from "@/app/designSystem/table/Table";
 
 /**
  * Displays the demographic information of a patient.

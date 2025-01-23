@@ -11,7 +11,7 @@ import DiagnosticReportTable from "./resultsView/tableComponents/DiagnosticRepor
 import EncounterTable from "./resultsView/tableComponents/EncounterTable";
 import MedicationRequestTable from "./resultsView/tableComponents/MedicationRequestTable";
 import ObservationTable from "./resultsView/tableComponents/ObservationTable";
-import Backlink from "./backLink/Backlink";
+import Backlink from "../../designSystem/backLink/Backlink";
 import { RETURN_LABEL } from "@/app/query/components/stepIndicator/StepIndicator";
 import TitleBox from "./stepIndicator/TitleBox";
 import ImmunizationTable from "./resultsView/tableComponents/ImmunizationTable";

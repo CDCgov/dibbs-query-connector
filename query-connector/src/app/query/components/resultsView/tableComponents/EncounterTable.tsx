@@ -1,5 +1,5 @@
 import React from "react";
-import Table from "@/app/query/designSystem/table/Table";
+import Table from "@/app/designSystem/table/Table";
 import { Encounter } from "fhir/r4";
 import {
   formatCodeableConcept,

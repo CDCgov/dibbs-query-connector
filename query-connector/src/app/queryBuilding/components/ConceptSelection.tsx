@@ -1,8 +1,8 @@
 import React from "react";
 import styles from "../buildFromTemplates/conditionTemplateSelection.module.scss";
 import { Concept } from "@/app/constants";
-import { showToastConfirmation } from "@/app/query/designSystem/toast/Toast";
-import Checkbox from "@/app/query/designSystem/checkbox/Checkbox";
+import { showToastConfirmation } from "@/app/designSystem/toast/Toast";
+import Checkbox from "@/app/designSystem/checkbox/Checkbox";
 
 type ConceptSelectionProps = {
   concepts: Concept[];

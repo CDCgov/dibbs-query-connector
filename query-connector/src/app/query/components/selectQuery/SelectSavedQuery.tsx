@@ -1,13 +1,13 @@
 import { Select, Button } from "@trussworks/react-uswds";
-import Backlink from "../backLink/Backlink";
+import Backlink from "../../../designSystem/backLink/Backlink";
 import styles from "./selectQuery.module.scss";
 import { useEffect, useState } from "react";
 import { RETURN_LABEL } from "@/app/query/components/stepIndicator/StepIndicator";
 import TitleBox from "../stepIndicator/TitleBox";
 import { getCustomQueries, getFhirServerNames } from "@/app/database-service";
 import { CustomUserQuery } from "@/app/query-building";
-import LoadingView from "../LoadingView";
-import { showToastConfirmation } from "../../designSystem/toast/Toast";
+import LoadingView from "../../../designSystem/LoadingView";
+import { showToastConfirmation } from "../../../designSystem/toast/Toast";
 
 type SelectSavedQueryProps = {
   selectedQuery: CustomUserQuery;

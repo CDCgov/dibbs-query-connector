@@ -10,7 +10,7 @@ import {
   fetchQueryResponse,
   fetchQueryValueSets,
 } from "./selectQuery/queryHooks";
-import LoadingView from "./LoadingView";
+import LoadingView from "../../designSystem/LoadingView";
 import { CustomUserQuery } from "@/app/query-building";
 
 interface SelectQueryProps {
