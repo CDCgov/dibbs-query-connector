@@ -8,7 +8,7 @@ import {
   categoryToConditionNameArrayMap,
   conditionIdToNameMap,
   DEFAULT_QUERIES,
-  malignantNeoplasticValuesets,
+  gonorreheaValueSets,
 } from "../fixtures";
 import BuildFromTemplates from "./BuildFromTemplates";
 import { formatDiseaseDisplay } from "../utils";
@@ -21,19 +21,17 @@ jest.mock("../../database-service", () => ({
 }));
 
 describe("tests the build from template page interactions", () => {
-  const MALIGNANT_NEOPLASTIC_ID = 363346000;
-  const MALIGNANT_NEOPLASTIC_DETAILS =
-    conditionIdToNameMap[MALIGNANT_NEOPLASTIC_ID];
-  const MALIGNANT_NEOPLASTIC_NAME = formatDiseaseDisplay(
-    MALIGNANT_NEOPLASTIC_DETAILS.name,
-  );
+  const GONORREHEA_ID = 15628003;
+  const GONORREHEA_DETAILS = conditionIdToNameMap[GONORREHEA_ID];
+  const GONORREHEA_NAME = formatDiseaseDisplay(GONORREHEA_DETAILS.name);
 
   (getConditionsData as jest.Mock).mockResolvedValue({
     conditionIdToNameMap,
     categoryToConditionNameArrayMap,
   });
+
   (getValueSetsAndConceptsByConditionIDs as jest.Mock).mockResolvedValue(
-    malignantNeoplasticValuesets,
+    gonorreheaValueSets,
   );
 
   const mockSetData = jest.fn();
@@ -60,7 +58,7 @@ describe("tests the build from template page interactions", () => {
     expect(screen.getByText("Customize query")).toBeDisabled();
 
     await user.type(screen.getByTestId("queryNameInput"), "some name");
-    await user.click(screen.getByLabelText(MALIGNANT_NEOPLASTIC_NAME));
+    await user.click(screen.getByLabelText(GONORREHEA_NAME));
 
     expect(screen.getByText("Customize query")).not.toBeDisabled();
   });
@@ -80,11 +78,11 @@ describe("tests the build from template page interactions", () => {
       </DataContext.Provider>,
     );
 
-    expect(
-      await screen.findByText(MALIGNANT_NEOPLASTIC_NAME),
-    ).toBeInTheDocument();
+    expect(await screen.findByText(GONORREHEA_NAME)).toBeInTheDocument();
     expect(await screen.findByText("Cancer (Leukemia)")).toBeInTheDocument();
-    expect(await screen.findByText("Gastroschisis")).toBeInTheDocument();
+    expect(
+      await screen.findByText("Malignant neoplastic disease"),
+    ).toBeInTheDocument();
 
     // Name match
     await user.type(
@@ -92,23 +90,27 @@ describe("tests the build from template page interactions", () => {
       "leukemia",
     );
     expect(screen.getByText("Cancer (Leukemia)")).toBeInTheDocument();
+    expect(screen.queryByText(GONORREHEA_NAME)).not.toBeInTheDocument();
     expect(
-      screen.queryByText(MALIGNANT_NEOPLASTIC_NAME),
+      screen.queryByText("Malignant neoplastic disease"),
     ).not.toBeInTheDocument();
-    expect(screen.queryByText("Gastroschisis")).not.toBeInTheDocument();
 
     // Category match
     await user.clear(screen.getByPlaceholderText("Search conditions"));
     await user.type(screen.getByPlaceholderText("Search conditions"), "can");
 
-    expect(screen.getByText(MALIGNANT_NEOPLASTIC_NAME)).toBeInTheDocument();
+    expect(
+      screen.getByText("Malignant neoplastic disease"),
+    ).toBeInTheDocument();
     expect(screen.getByText("Cancer (Leukemia)")).toBeInTheDocument();
-    expect(screen.queryByText("Gastroschisis")).not.toBeInTheDocument();
+    expect(screen.queryByText(GONORREHEA_NAME)).not.toBeInTheDocument();
 
     // Reset state
     await user.clear(screen.getByPlaceholderText("Search conditions"));
-    expect(screen.getByText(MALIGNANT_NEOPLASTIC_NAME)).toBeInTheDocument();
+    expect(screen.getByText(GONORREHEA_NAME)).toBeInTheDocument();
     expect(screen.getByText("Cancer (Leukemia)")).toBeInTheDocument();
-    expect(screen.getByText("Gastroschisis")).toBeInTheDocument();
+    expect(
+      screen.getByText("Malignant neoplastic disease"),
+    ).toBeInTheDocument();
   });
 });
