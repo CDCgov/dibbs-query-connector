@@ -61,15 +61,15 @@ test.describe("building a new query", () => {
       }),
     ).toBeVisible();
 
-    const backLink = await page.getByTestId("backArrowLink");
+    const backLink = page.getByTestId("backArrowLink");
     expect(backLink).toContainText(BACKLINK_MY_QUERIES);
 
-    const actionButton = await page.getByTestId("createSaveQueryBtn");
+    const actionButton = page.getByTestId("createSaveQueryBtn");
     expect(actionButton).toBeVisible();
     expect(actionButton).toHaveText("Customize query");
     expect(actionButton).toBeDisabled();
 
-    const input = await page.getByTestId("queryNameInput");
+    const input = page.getByTestId("queryNameInput");
     const hasFocus = await input.evaluate(
       (node) => document.activeElement === node,
     );
@@ -91,13 +91,9 @@ test.describe("building a new query", () => {
     // move to value set selection:
     await actionButton.click();
 
-    const labsHeader = await page.getByTestId("accordionButton_labs");
-    const conditionsHeader = await page.getByTestId(
-      "accordionButton_conditions",
-    );
-    const medicationsHeader = await page.getByTestId(
-      "accordionButton_medications",
-    );
+    const labsHeader = page.getByTestId("accordionButton_labs");
+    const conditionsHeader = page.getByTestId("accordionButton_conditions");
+    const medicationsHeader = page.getByTestId("accordionButton_medications");
 
     await expect(labsHeader).toBeVisible();
     expect(labsHeader).toContainText(CLICKED_CONDITION.labsCount);
@@ -137,7 +133,9 @@ test.describe("building a new query", () => {
     await expect(openDrawer).not.toBeVisible();
 
     await expandedMedValueSet.hover();
-    await page.getByTestId(CLICKED_CONDITION.sampleMedValueSetID).click();
+    await page
+      .getByTestId(`viewCodes-${CLICKED_CONDITION.sampleMedValueSetID}`)
+      .click();
     await expect(openDrawer).toBeVisible();
 
     const code = page
@@ -193,13 +191,13 @@ test.describe("editing an exisiting query", () => {
       }),
     ).toBeVisible();
 
-    const actionButton = await page.getByTestId("createSaveQueryBtn");
+    const actionButton = page.getByTestId("createSaveQueryBtn");
     await expect(actionButton).toBeVisible();
     await expect(actionButton).toHaveText("Customize query");
     await expect(actionButton).not.toBeDisabled(); // not disabled since we have condition(s) + name filled
 
     // update query name
-    const queryNameInput = await page.getByTestId("queryNameInput");
+    const queryNameInput = page.getByTestId("queryNameInput");
     expect(queryNameInput).toHaveValue(subjectQuery.query_name);
     const newName = await queryNameInput.inputValue();
 
@@ -260,7 +258,7 @@ test.describe("editing an exisiting query", () => {
       }),
     ).toBeVisible();
 
-    const actionButton = await page.getByTestId("createSaveQueryBtn");
+    const actionButton = page.getByTestId("createSaveQueryBtn");
     await expect(actionButton).toBeVisible();
     await expect(actionButton).toHaveText("Customize query");
     await expect(actionButton).not.toBeDisabled(); // not disabled since we have condition(s) + name filled
@@ -270,8 +268,7 @@ test.describe("editing an exisiting query", () => {
     await search.fill(ADDED_CONDITION.name);
 
     await page.getByText(ADDED_CONDITION.name, { exact: true }).click();
-    await expect(page.getByText(ADDED_CONDITION.name, { exact: true }))
-      .toBeChecked;
+    expect(page.getByText(ADDED_CONDITION.name, { exact: true })).toBeChecked;
 
     // move to next page
     await actionButton.click();
@@ -287,14 +284,13 @@ test.describe("editing an exisiting query", () => {
 
     // confirm query shows correct condition/s
     await editBtn.click();
-    await expect(page.getByText(ADDED_CONDITION.name, { exact: true }))
-      .toBeChecked;
-    await expect(page.getByText(subjectQuery.query_name, { exact: true }))
+    expect(page.getByText(ADDED_CONDITION.name, { exact: true })).toBeChecked;
+    expect(page.getByText(subjectQuery.query_name, { exact: true }))
       .toBeChecked;
 
     // remove added condition
     await page.getByText(ADDED_CONDITION.name, { exact: true }).click();
-    await expect(page.getByText(ADDED_CONDITION.name, { exact: true })).not
+    expect(page.getByText(ADDED_CONDITION.name, { exact: true })).not
       .toBeChecked;
 
     // move to next page
@@ -309,7 +305,7 @@ test.describe("editing an exisiting query", () => {
       }),
     ).toBeVisible();
 
-    await expect(page.getByText(ADDED_CONDITION.name, { exact: true })).not
+    expect(page.getByText(ADDED_CONDITION.name, { exact: true })).not
       .toBeChecked;
   });
 
@@ -340,7 +336,7 @@ test.describe("editing an exisiting query", () => {
       }),
     ).toBeVisible();
 
-    const actionButton = await page.getByTestId("createSaveQueryBtn");
+    const actionButton = page.getByTestId("createSaveQueryBtn");
     await expect(actionButton).toBeVisible();
 
     // move to next page
@@ -348,17 +344,17 @@ test.describe("editing an exisiting query", () => {
     await expect(actionButton).toContainText("Save query");
 
     // uncheck a value set
-    const labsHeader = await page.getByTestId("accordionButton_labs");
+    const labsHeader = page.getByTestId("accordionButton_labs");
     await expect(labsHeader).toBeVisible();
     await labsHeader.click();
 
     const firstLabVS = page.getByTestId("accordionItem_labs");
-    const firstVsCheckbox = firstLabVS
-      .getByTestId("checkbox")
-      .getByRole("checkbox");
-    await expect(firstVsCheckbox).toBeChecked();
-    firstLabVS.click();
-    await expect(firstVsCheckbox).not.toBeChecked();
+    const firstVsCheckTarget = firstLabVS.getByTestId("checkbox");
+    // initial render is a minus state, so need to check and uncheck to reset the
+    // state to uncheck
+    await firstVsCheckTarget.dblclick();
+    await expect(firstVsCheckTarget.getByRole("checkbox")).toBeChecked();
+    await firstVsCheckTarget.click();
 
     // recheck a single concept code
     const openDrawer = page.getByTestId("drawer-open-true");
