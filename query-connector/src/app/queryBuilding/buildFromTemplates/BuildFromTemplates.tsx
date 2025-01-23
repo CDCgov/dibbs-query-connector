@@ -392,7 +392,6 @@ async function getValueSetsForSelectedConditions(conditionIds: string[]) {
   const results = await getValueSetsAndConceptsByConditionIDs(conditionIds);
   const formattedResults =
     results && groupConditionConceptsIntoValueSets(results);
-
   // group by Condition ID:
   return Object.values(formattedResults).reduce((acc, resultObj) => {
     if (resultObj.conditionId) {
