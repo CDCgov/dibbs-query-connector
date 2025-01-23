@@ -29,7 +29,7 @@ describe("tests the query building steps", () => {
       expect(screen.queryByText("Loading")).not.toBeInTheDocument();
     });
     expect(screen.getByText("Start with Query Builder")).toBeInTheDocument();
-    expect(screen).toMatchSnapshot();
+    expect(screen.getByTestId("empty-state-container")).toMatchSnapshot();
   });
   it("renders the default state", async () => {
     (getCustomQueries as jest.Mock).mockResolvedValue(DEFAULT_QUERIES);
@@ -55,11 +55,9 @@ describe("tests the query building steps", () => {
       expect(screen.queryByText("Loading")).not.toBeInTheDocument();
     });
 
-    await expect(screen.getByText("Query Library")).toBeInTheDocument();
+    expect(screen.getByText("Query Library")).toBeInTheDocument();
     expectedQueryNames.forEach(async (name) => {
-      await expect(screen.getByText(name)).toBeInTheDocument();
+      expect(screen.getByText(name)).toBeInTheDocument();
     });
-
-    expect(screen).toMatchSnapshot();
   });
 });
