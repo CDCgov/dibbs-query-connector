@@ -93,10 +93,12 @@ const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
 
     updatedValueSet = {
       ...updatedValueSet,
+      includeValueSet: updatedConcepts.map((c) => c.include).some(Boolean),
       concepts: updatedConcepts, // Update the concepts in the accessed value set
     };
 
     updatedIdToVsMap[vsId] = updatedValueSet;
+
     setValueSetOptions((prevState) => ({
       ...prevState,
       [activeTab]: updatedIdToVsMap, // Update the state with the modified VS

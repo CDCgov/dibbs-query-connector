@@ -99,6 +99,7 @@ const SelectQuery: React.FC<SelectQueryProps> = ({
       patientForQuery: patientForQuery,
       selectedQuery: selectedQuery.query_name,
       fhirServer: fhirServer,
+      valueSetOverrides: queryValueSets,
       queryResponseStateCallback: setResultsQueryResponse,
       setIsLoading: setLoadingResultResponse,
     }).catch(console.error);

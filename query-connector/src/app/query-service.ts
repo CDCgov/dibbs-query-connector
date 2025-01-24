@@ -4,7 +4,7 @@ import https from "https";
 import { Bundle, FhirResource } from "fhir/r4";
 
 import FHIRClient from "./fhir-servers";
-import { isFhirResource } from "./constants";
+import { DibbsValueSet, isFhirResource } from "./constants";
 import { CustomQuery } from "./CustomQuery";
 import { GetPhoneQueryFormats } from "./format-service";
 import { getFhirServerConfigs, getSavedQueryByName } from "./database-service";
@@ -96,11 +96,14 @@ async function patientQuery(
  * in the request. If data is found, return in a queryResponse object.
  * @param request - QueryRequest object containing the patient demographics and query name.
  * @param queryResponse - The response object to store the query results.
+ * @param valueSetOverrides - Overrides from the saved query state from customize
+ * query
  * @returns - The response object containing the query results.
  */
 export async function makeFhirQuery(
   request: QueryRequest,
   queryResponse: QueryResponse = {},
+  valueSetOverrides = [],
 ): Promise<QueryResponse> {
   const fhirServerConfigs = await getFhirServerConfigs();
   const fhirClient = new FHIRClient(request.fhir_server, fhirServerConfigs);
@@ -129,8 +132,13 @@ export async function makeFhirQuery(
   const savedQuery = await getSavedQueryByName(request.query_name as string);
 
   if (savedQuery[0] && savedQuery[0]["query_data"]) {
+    const savedQueryInformation = savedQuery[0]["query_data"];
+    const queryToPost = reconcileSavedQueryDataWithOverrides(
+      savedQueryInformation,
+      valueSetOverrides,
+    );
     const fhirResponse = await postFhirQuery(
-      savedQuery[0]["query_data"],
+      queryToPost,
       patientId,
       fhirClient,
       queryResponse,
@@ -141,6 +149,34 @@ export async function makeFhirQuery(
   } else {
     throw `Saved query data JSON for ${request.query_name} not found`;
   }
+}
+
+function reconcileSavedQueryDataWithOverrides(
+  savedQuery: QueryDataColumn,
+  valueSetOverrides: DibbsValueSet[],
+) {
+  const reconciledQuery: QueryDataColumn = {};
+
+  Object.entries(savedQuery).forEach(([conditionId, valueSetMap]) => {
+    reconciledQuery[conditionId] = {};
+    Object.entries(valueSetMap).forEach(([vsId, vs]) => {
+      const matchedValueSet = valueSetOverrides.find(
+        (v) => v.valueSetId === vsId,
+      );
+      if (matchedValueSet && matchedValueSet.includeValueSet) {
+        const filteredValueSet = matchedValueSet;
+        filteredValueSet.concepts = matchedValueSet.concepts.filter(
+          (c) => c.include,
+        );
+        reconciledQuery[conditionId][vsId] = filteredValueSet;
+      }
+      if (matchedValueSet === undefined) {
+        reconciledQuery[conditionId][vsId] = vs;
+      }
+    });
+  });
+
+  return reconciledQuery;
 }
 
 /**

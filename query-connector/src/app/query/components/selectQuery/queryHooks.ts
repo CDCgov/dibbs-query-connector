@@ -1,4 +1,4 @@
-import { hyperUnluckyPatient } from "@/app/constants";
+import { DibbsValueSet, hyperUnluckyPatient } from "@/app/constants";
 import { getSavedQueryByName } from "@/app/database-service";
 import { unnestValueSetsFromQuery } from "@/app/utils";
 import { makeFhirQuery, FhirQueryResponse } from "@/app/query-service";
@@ -36,6 +36,7 @@ export async function fetchQueryResponse(p: {
   fhirServer: string;
   queryResponseStateCallback: SetStateCallback<FhirQueryResponse>;
   setIsLoading: (isLoading: boolean) => void;
+  valueSetOverrides?: DibbsValueSet[];
 }) {
   if (p.patientForQuery && p.selectedQuery) {
     const patientFirstName =
@@ -58,9 +59,13 @@ export async function fetchQueryResponse(p: {
       fhir_server: p.fhirServer,
     };
     p.setIsLoading(true);
-    const queryResponse = await makeFhirQuery(newRequest, {
-      Patient: [p.patientForQuery],
-    });
+    const queryResponse = await makeFhirQuery(
+      newRequest,
+      {
+        Patient: [p.patientForQuery],
+      },
+      p.valueSetOverrides,
+    );
 
     p.queryResponseStateCallback(queryResponse);
     p.setIsLoading(false);
