@@ -1,6 +1,6 @@
 resource "aws_acm_certificate" "cloudflare_cert" {
-  private_key      = var.qc_tls_key       # Private key from Cloudflare
-  certificate_body = var.qc_tls_cert      # Public cert from Cloudflare
+  private_key      = var.qc_tls_key  # Private key from Cloudflare
+  certificate_body = var.qc_tls_cert # Public cert from Cloudflare
 }
 
 data "aws_caller_identity" "current" {}
@@ -30,9 +30,9 @@ module "ecs" {
   vpc_id             = module.vpc.vpc_id
   region             = var.region
 
-  owner        = var.owner
-  project      = var.project
-  tags         = local.tags
+  owner   = var.owner
+  project = var.project
+  tags    = local.tags
 
 
   phdi_version = "main"
@@ -59,42 +59,58 @@ module "ecs" {
         {
           name  = "HOSTNAME",
           value = "0.0.0.0"
-        },        
-        {
-        name  = "fhir_url"
-        value = var.fhir_url
         },
-        {    
+        {
+          name  = "fhir_url"
+          value = var.fhir_url
+        },
+        {
           name  = "cred_manager"
           value = var.cred_manager
         },
-        {    
-         name  = "DATABASE_URL"
-         value = "postgresql://${aws_db_instance.qc_db.username}:${aws_db_instance.qc_db.password}@${aws_db_instance.qc_db.endpoint}/${aws_db_instance.qc_db.db_name}"
-         },
-         {    
-         name  = "FLYWAY_URL"
-         value = "jdbc:postgresql://${aws_db_instance.qc_db.endpoint}/${aws_db_instance.qc_db.db_name}"
+        {
+          name  = "DATABASE_URL"
+          value = "postgresql://${aws_db_instance.qc_db.username}:${aws_db_instance.qc_db.password}@${aws_db_instance.qc_db.endpoint}/${aws_db_instance.qc_db.db_name}"
+        },
+        {
+          name  = "FLYWAY_URL"
+          value = "jdbc:postgresql://${aws_db_instance.qc_db.endpoint}/${aws_db_instance.qc_db.db_name}"
 
-         },
-         {    
-         name  = "FLYWAY_PASSWORD"
-         value = aws_db_instance.qc_db.password
-         },
-         {    
-         name  = "FLYWAY_USER"
-         value = aws_db_instance.qc_db.username
-         },
-         {    
-         name  = "UMLS_API_KEY"
-         value = var.umls_api_key
-         },
-                  {    
-         name  = "ERSD_API_KEY"
-         value = var.ersd_api_key
-         },
+        },
+        {
+          name  = "FLYWAY_PASSWORD"
+          value = aws_db_instance.qc_db.password
+        },
+        {
+          name  = "FLYWAY_USER"
+          value = aws_db_instance.qc_db.username
+        },
+        {
+          name  = "UMLS_API_KEY"
+          value = var.umls_api_key
+        },
+        {
+          name  = "ERSD_API_KEY"
+          value = var.ersd_api_key
+        },
       ]
+    },
+    keycloak = {
+      short_name     = "kc",
+      fargate_cpu    = 512,
+      fargate_memory = 1024,
+      min_capacity   = 1,
+      max_capacity   = 5,
+      app_repo       = "ghcr.io/cdcgov/dibbs-query-connector",
+      app_image      = "${terraform.workspace}-keycloak",
+      app_version    = "main",
+      container_port = 8080,
+      host_port      = 8080,
+      public         = true,
+      registry_url   = "${data.aws_caller_identity.current.account_id}.dkr.ecr.${var.region}.amazonaws.com",
+      env_vars       = []
     }
+
   }
 
 
@@ -135,18 +151,18 @@ module "ecs" {
 
 
 resource "aws_db_instance" "qc_db" {
-  allocated_storage = "10"
-  db_name = "${var.qc_db_name}_${terraform.workspace}"
-  identifier = "${var.db_identifier}-${terraform.workspace}"
-  engine               = var.db_engine_type
-  engine_version       = var.db_engine_version
+  allocated_storage               = "10"
+  db_name                         = "${var.qc_db_name}_${terraform.workspace}"
+  identifier                      = "${var.db_identifier}-${terraform.workspace}"
+  engine                          = var.db_engine_type
+  engine_version                  = var.db_engine_version
   enabled_cloudwatch_logs_exports = ["postgresql", "upgrade"]
-  instance_class       = var.db_instance_class
-  username             = var.db_username
-  password             = random_password.setup_rds_password.result
-  parameter_group_name = aws_db_parameter_group.this.name
-  skip_final_snapshot  = true
-  db_subnet_group_name = aws_db_subnet_group.this.name
+  instance_class                  = var.db_instance_class
+  username                        = var.db_username
+  password                        = random_password.setup_rds_password.result
+  parameter_group_name            = aws_db_parameter_group.this.name
+  skip_final_snapshot             = true
+  db_subnet_group_name            = aws_db_subnet_group.this.name
   vpc_security_group_ids          = [aws_security_group.db_sg.id]
 }
 

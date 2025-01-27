@@ -91,3 +91,4 @@ tmp_remote_image_*
 **/.terraform/*
 .terraform/modules/ecs
 terraform/implementation/ecs/.terraform/*
+.terraform.lock.hcl
