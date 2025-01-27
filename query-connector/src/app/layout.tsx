@@ -21,7 +21,7 @@ export default function RootLayout({
       <SessionProvider>
         <body>
           <div className="application-container">
-            <Header />
+            <Header authDisabled={process.env.AUTH_DISABLED === "true"} />
             <DataProvider>{children}</DataProvider>
             <Footer />
           </div>
