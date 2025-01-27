@@ -53,276 +53,14 @@ SELECT c.display, c.code_system, c.code, vs.name as valueset_name, vs.id as valu
 
 const dbClient = getDbClient();
 
-/**
- * Executes a search for a ValueSets and Concepts against the Postgres
- * Database, using the ID of the condition associated with any such data.
- * @param ids Array of ids for entries in the conditions table
- * @returns One or more rows from the DB matching the requested saved query,
- * or an error if no results can be found.
- */
-export const getValueSetsAndConceptsByConditionIDs = async (ids: string[]) => {
-  try {
-    if (ids.length === 0) {
-      throw Error("No condition ids passed in to query by");
-    }
-
-    const escapedValues = ids.map((_, i) => `$${i + 1}`).join() + ")";
-    const queryString = getValueSetsByConditionIds + escapedValues;
-
-    const result = await dbClient.query(queryString, ids);
-    if (result.rows.length === 0) {
-      console.error("No results found for given condition ids", ids);
-      return [];
-    }
-    return result.rows;
-  } catch (error) {
-    console.error(
-      "Error retrieving value sets and concepts for condition",
-      error,
-    );
-    throw error;
-  }
-};
-
-/**
- * Executes a search for a CustomQuery against the query-loaded Postgres
- * Database, using the saved name associated with the query as the unique
- * identifier by which to load the result.
- * @param name The name given to a stored query in the DB.
- * @returns One or more rows from the DB matching the requested saved query,
- * or an error if no results can be found.
- */
-export const getSavedQueryByName = async (name: string) => {
-  const values = [name];
-
-  try {
-    const result = await dbClient.query(getQuerybyNameSQL, values);
-    if (result.rows.length === 0) {
-      console.error("No results found for query named:", name);
-      return [];
-    }
-    return result.rows as unknown as QueryDetailsResult[];
-  } catch (error) {
-    console.error("Error retrieving query:", error);
-    throw error;
-  }
-};
-
 /*
  * The expected return type from both the eRSD API and the VSAC FHIR API.
  */
 type ErsdOrVsacResponse = Bundle | Parameters | OperationOutcome;
 
-/**
- * Fetches the eRSD Specification from the eRSD API. This function requires an API key
- * to access the eRSD API. The API key can be obtained at https://ersd.aimsplatform.org/#/api-keys.
- * @param eRSDVersion - The version of the eRSD specification to retrieve. Defaults to v2.
- * @returns The eRSD Specification as a FHIR Bundle or an OperationOutcome if an error occurs.
- */
-export async function getERSD(
-  eRSDVersion: number = 3,
-): Promise<ErsdOrVsacResponse> {
-  const ERSD_API_KEY = process.env.ERSD_API_KEY;
-  const eRSDUrl = `https://ersd.aimsplatform.org/api/ersd/v${eRSDVersion}specification?format=json&api-key=${ERSD_API_KEY}`;
-  const response = await fetch(eRSDUrl);
-  if (response.status === 200) {
-    const data = (await response.json()) as Bundle;
-    return data;
-  } else {
-    return {
-      resourceType: "OperationOutcome",
-      issue: [
-        {
-          severity: "error",
-          code: "processing",
-          diagnostics: `Failed to retrieve data from eRSD: ${response.status} ${response.statusText}`,
-        },
-      ],
-    } as OperationOutcome;
-  }
-}
-
-/**
- * Fetches the VSAC Value Sets and supporting code systems information for a given OID
- * as a FHIR bundle. This function requires a UMLS API Key which must be obtained as a
- * Metathesaurus License. See https://www.nlm.nih.gov/vsac/support/usingvsac/vsacfhirapi.html
- * for authentication instructions.
- * @param oid The OID whose value sets to retrieve.
- * @param searchStructType Optionally, a flag to identify what type of
- * search to perform, since VSAC can be used for value sets as well as conditions.
- * @param codeSystem Optional parameter for use with condition querying.
- * @returns The value sets as a FHIR bundle, or an Operation Outcome if there is an error.
- */
-export async function getVSACValueSet(
-  oid: string,
-  searchStructType: string = "valueset",
-  codeSystem?: string,
-): Promise<ErsdOrVsacResponse> {
-  const username: string = "apikey";
-  const umlsKey: string = process.env.UMLS_API_KEY || "";
-  const vsacUrl: string =
-    searchStructType === "valueset"
-      ? `https://cts.nlm.nih.gov/fhir/ValueSet/${oid}`
-      : `https://cts.nlm.nih.gov/fhir/CodeSystem/$lookup?system=${codeSystem}&code=${oid}`;
-  const response = await fetch(vsacUrl, {
-    method: "get",
-    headers: new Headers({
-      Authorization: "Basic " + encode(username + ":" + umlsKey),
-      "Content-Type": "application/fhir+json",
-    }),
-  });
-  if (response.status === 200) {
-    const data = (await response.json()) as Bundle;
-    return data;
-  } else {
-    const diagnosticIssue = await response
-      .json()
-      .then((r) => r.issue[0].diagnostics);
-    return {
-      resourceType: "OperationOutcome",
-      issue: [
-        {
-          severity: "error",
-          code: "processing",
-          diagnostics: `${response.status}: ${diagnosticIssue}`,
-        },
-      ],
-    } as OperationOutcome;
-  }
-}
-
-/**
- * Function call to insert a new ValueSet into the database.
- * @param vs - a ValueSet in of the shape of our internal data model to insert
- * @returns success / failure information, as well as errors as appropriate
- */
-export async function insertValueSet(vs: DibbsValueSet) {
-  let errorArray: string[] = [];
-
-  const insertValueSetPromise = generateValueSetSqlPromise(vs);
-  try {
-    await insertValueSetPromise;
-  } catch (e) {
-    console.error(
-      `ValueSet insertion for ${vs.valueSetId}_${vs.valueSetVersion} failed`,
-    );
-    console.error(e);
-    errorArray.push("Error occured in valuset insertion");
-  }
-
-  const insertConceptsPromiseArray = generateConceptSqlPromises(vs);
-  const conceptInsertResults = await Promise.allSettled(
-    insertConceptsPromiseArray,
-  );
-
-  const allConceptInsertsSucceed = conceptInsertResults.every(
-    (r) => r.status === "fulfilled",
-  );
-
-  if (!allConceptInsertsSucceed) {
-    logRejectedPromiseReasons(conceptInsertResults, "Concept insertion failed");
-    errorArray.push("Error occured in concept insertion");
-  }
-
-  const joinInsertsPromiseArray = generateValuesetConceptJoinSqlPromises(vs);
-  const joinInsertResults = await Promise.allSettled(joinInsertsPromiseArray);
-
-  const allJoinInsertsSucceed = joinInsertResults.every(
-    (r) => r.status === "fulfilled",
-  );
-
-  if (!allJoinInsertsSucceed) {
-    logRejectedPromiseReasons(
-      joinInsertResults,
-      "ValueSet <> concept join insert failed",
-    );
-    errorArray.push("Error occured in ValueSet <> concept join seeding");
-  }
-
-  if (errorArray.length === 0) return { success: true };
-  return { success: false, error: errorArray.join(",") };
-}
-
-/**
- * Helper function to generate the SQL needed for valueset insertion.
- * @param vs - The ValueSet in of the shape of our internal data model to insert
- * @returns The SQL statement for insertion
- */
-function generateValueSetSqlPromise(vs: DibbsValueSet) {
-  const valueSetOid = vs.valueSetExternalId;
-
-  // TODO: based on how non-VSAC valuests are shaped in the future, we may need
-  // to update the ID scheme to have something more generically defined that
-  // don't rely on potentially null external ID values.
-  const valueSetUniqueId = `${valueSetOid}_${vs.valueSetVersion}`;
-
-  // In the event a duplicate value set by OID + Version is entered, simply
-  // update the existing one to have the new set of information
-  // ValueSets are already uniquely identified by OID + V so this just allows
-  // us to proceed with DB creation in the event a duplicate VS from another
-  // group is pulled and loaded
-  const valuesArray = [
-    valueSetUniqueId,
-    valueSetOid,
-    vs.valueSetVersion,
-    vs.valueSetName,
-    vs.author,
-    vs.dibbsConceptType,
-    vs.dibbsConceptType,
-  ];
-
-  return dbClient.query(insertValueSetSql, valuesArray);
-}
-
-/**
- * Helper function to generate the SQL needed for concept / valueset join insertion
- * needed during valueset creation.
- * @param vs - The ValueSet in of the shape of our internal data model to insert
- * @returns The SQL statement array for all concepts for insertion
- */
-function generateConceptSqlPromises(vs: DibbsValueSet) {
-  const insertConceptsSqlArray = vs.concepts.map((concept) => {
-    const systemPrefix = stripProtocolAndTLDFromSystemUrl(vs.system);
-    const conceptUniqueId = `${systemPrefix}_${concept.code}`;
-
-    // Duplicate value set insertion is likely to percolate to the concept level
-    // Apply the same logic of overwriting if unique keys are the same
-    const conceptInsertPromise = dbClient.query(insertConceptSql, [
-      conceptUniqueId,
-      concept.code,
-      vs.system,
-      concept.display,
-      // see notes in constants file for the intentional empty strings
-      INTENTIONAL_EMPTY_STRING_FOR_GEM_CODE,
-      INTENTIONAL_EMPTY_STRING_FOR_CONCEPT_VERSION,
-    ]);
-
-    return conceptInsertPromise;
-  });
-
-  return insertConceptsSqlArray;
-}
-
-function generateValuesetConceptJoinSqlPromises(vs: DibbsValueSet) {
-  const insertConceptsSqlArray = vs.concepts.map((concept) => {
-    const systemPrefix = stripProtocolAndTLDFromSystemUrl(vs.system);
-    const conceptUniqueId = `${systemPrefix}_${concept.code}`;
-
-    // Last place to make an overwriting upsert adjustment
-    // Even if the duplicate entries have the same data, PG will attempt to
-    // insert another row, so just make that upsert the relationship
-    const conceptInsertPromise = dbClient.query(insertValuesetToConceptSql, [
-      `${vs.valueSetId}_${conceptUniqueId}`,
-      vs.valueSetId,
-      conceptUniqueId,
-    ]);
-
-    return conceptInsertPromise;
-  });
-
-  return insertConceptsSqlArray;
-}
-
+// -------------------------------- //
+//          Helper Methods
+// -------------------------------- //
 function stripProtocolAndTLDFromSystemUrl(systemURL: string) {
   const match = systemURL.match(/https?:\/\/([^\.]+)/);
   return match ? match[1] : systemURL;
@@ -341,48 +79,9 @@ function logRejectedPromiseReasons<T>(
     });
 }
 
-/**
- * Retrieves all records from the conditions table in the database.
- * This function queries the database to fetch condition data, including
- * condition name, code, and category.
- * @returns An object containing:
- * - `conditionCatergories`: a JSON object grouped by category with id:name pairs,
- * to display on build-query page
- * - `conditionLookup`: a JSON object with id as the key and name as the value in
- * order to make a call to the DB with the necessary ID(s) to get the valuesets
- * on subsequent pages.
- */
-export async function getConditionsData() {
-  const query = "SELECT * FROM conditions";
-  const result = await dbClient.query(query);
-  const rows = result.rows;
-
-  // 1. Grouped by category with id:name pairs
-  const categoryToConditionNameArrayMap: CategoryToConditionArrayMap =
-    rows.reduce((acc, row) => {
-      const { category, id, name } = row;
-      if (!acc[category]) {
-        acc[category] = [];
-      }
-      acc[category].push({ id: id, name: name });
-      return acc;
-    }, {} as CategoryToConditionArrayMap);
-
-  // 2. ID-Name mapping
-  const conditionIdToNameMap: ConditionsMap = rows.reduce((acc, row) => {
-    acc[row.id] = { name: row.name, category: row.category };
-    return acc;
-  }, {} as ConditionsMap);
-
-  return {
-    categoryToConditionNameArrayMap,
-    conditionIdToNameMap,
-  } as const;
-}
-
-// -------------------------- //
-//        DB Creation
-// -------------------------- //
+// -------------------------------- //
+//          DB Creation
+// -------------------------------- //
 /**
  * Checks the database to see if data has been loaded into the valuesets table by
  * estmating the number of rows in the table. If the estimated count is greater than
@@ -529,6 +228,164 @@ export const executeCategoryUpdates = async () => {
 };
 
 /**
+ * Helper function to generate the SQL needed for valueset insertion.
+ * @param vs - The ValueSet in of the shape of our internal data model to insert
+ * @returns The SQL statement for insertion
+ */
+function generateValueSetSqlPromise(vs: DibbsValueSet) {
+  const valueSetOid = vs.valueSetExternalId;
+
+  // TODO: based on how non-VSAC valuests are shaped in the future, we may need
+  // to update the ID scheme to have something more generically defined that
+  // don't rely on potentially null external ID values.
+  const valueSetUniqueId = `${valueSetOid}_${vs.valueSetVersion}`;
+
+  // In the event a duplicate value set by OID + Version is entered, simply
+  // update the existing one to have the new set of information
+  // ValueSets are already uniquely identified by OID + V so this just allows
+  // us to proceed with DB creation in the event a duplicate VS from another
+  // group is pulled and loaded
+  const valuesArray = [
+    valueSetUniqueId,
+    valueSetOid,
+    vs.valueSetVersion,
+    vs.valueSetName,
+    vs.author,
+    vs.dibbsConceptType,
+    vs.dibbsConceptType,
+  ];
+
+  return dbClient.query(insertValueSetSql, valuesArray);
+}
+
+/**
+ * Helper function to generate the SQL needed for concept / valueset join insertion
+ * needed during valueset creation.
+ * @param vs - The ValueSet in of the shape of our internal data model to insert
+ * @returns The SQL statement array for all concepts for insertion
+ */
+function generateConceptSqlPromises(vs: DibbsValueSet) {
+  const insertConceptsSqlArray = vs.concepts.map((concept) => {
+    const systemPrefix = stripProtocolAndTLDFromSystemUrl(vs.system);
+    const conceptUniqueId = `${systemPrefix}_${concept.code}`;
+
+    // Duplicate value set insertion is likely to percolate to the concept level
+    // Apply the same logic of overwriting if unique keys are the same
+    const conceptInsertPromise = dbClient.query(insertConceptSql, [
+      conceptUniqueId,
+      concept.code,
+      vs.system,
+      concept.display,
+      // see notes in constants file for the intentional empty strings
+      INTENTIONAL_EMPTY_STRING_FOR_GEM_CODE,
+      INTENTIONAL_EMPTY_STRING_FOR_CONCEPT_VERSION,
+    ]);
+
+    return conceptInsertPromise;
+  });
+
+  return insertConceptsSqlArray;
+}
+
+function generateValuesetConceptJoinSqlPromises(vs: DibbsValueSet) {
+  const insertConceptsSqlArray = vs.concepts.map((concept) => {
+    const systemPrefix = stripProtocolAndTLDFromSystemUrl(vs.system);
+    const conceptUniqueId = `${systemPrefix}_${concept.code}`;
+
+    // Last place to make an overwriting upsert adjustment
+    // Even if the duplicate entries have the same data, PG will attempt to
+    // insert another row, so just make that upsert the relationship
+    const conceptInsertPromise = dbClient.query(insertValuesetToConceptSql, [
+      `${vs.valueSetId}_${conceptUniqueId}`,
+      vs.valueSetId,
+      conceptUniqueId,
+    ]);
+
+    return conceptInsertPromise;
+  });
+
+  return insertConceptsSqlArray;
+}
+
+/**
+ * Fetches the eRSD Specification from the eRSD API. This function requires an API key
+ * to access the eRSD API. The API key can be obtained at https://ersd.aimsplatform.org/#/api-keys.
+ * @param eRSDVersion - The version of the eRSD specification to retrieve. Defaults to v2.
+ * @returns The eRSD Specification as a FHIR Bundle or an OperationOutcome if an error occurs.
+ */
+export async function getERSD(
+  eRSDVersion: number = 3,
+): Promise<ErsdOrVsacResponse> {
+  const ERSD_API_KEY = process.env.ERSD_API_KEY;
+  const eRSDUrl = `https://ersd.aimsplatform.org/api/ersd/v${eRSDVersion}specification?format=json&api-key=${ERSD_API_KEY}`;
+  const response = await fetch(eRSDUrl);
+  if (response.status === 200) {
+    const data = (await response.json()) as Bundle;
+    return data;
+  } else {
+    return {
+      resourceType: "OperationOutcome",
+      issue: [
+        {
+          severity: "error",
+          code: "processing",
+          diagnostics: `Failed to retrieve data from eRSD: ${response.status} ${response.statusText}`,
+        },
+      ],
+    } as OperationOutcome;
+  }
+}
+
+/**
+ * Fetches the VSAC Value Sets and supporting code systems information for a given OID
+ * as a FHIR bundle. This function requires a UMLS API Key which must be obtained as a
+ * Metathesaurus License. See https://www.nlm.nih.gov/vsac/support/usingvsac/vsacfhirapi.html
+ * for authentication instructions.
+ * @param oid The OID whose value sets to retrieve.
+ * @param searchStructType Optionally, a flag to identify what type of
+ * search to perform, since VSAC can be used for value sets as well as conditions.
+ * @param codeSystem Optional parameter for use with condition querying.
+ * @returns The value sets as a FHIR bundle, or an Operation Outcome if there is an error.
+ */
+export async function getVSACValueSet(
+  oid: string,
+  searchStructType: string = "valueset",
+  codeSystem?: string,
+): Promise<ErsdOrVsacResponse> {
+  const username: string = "apikey";
+  const umlsKey: string = process.env.UMLS_API_KEY || "";
+  const vsacUrl: string =
+    searchStructType === "valueset"
+      ? `https://cts.nlm.nih.gov/fhir/ValueSet/${oid}`
+      : `https://cts.nlm.nih.gov/fhir/CodeSystem/$lookup?system=${codeSystem}&code=${oid}`;
+  const response = await fetch(vsacUrl, {
+    method: "get",
+    headers: new Headers({
+      Authorization: "Basic " + encode(username + ":" + umlsKey),
+      "Content-Type": "application/fhir+json",
+    }),
+  });
+  if (response.status === 200) {
+    const data = (await response.json()) as Bundle;
+    return data;
+  } else {
+    const diagnosticIssue = await response
+      .json()
+      .then((r) => r.issue[0].diagnostics);
+    return {
+      resourceType: "OperationOutcome",
+      issue: [
+        {
+          severity: "error",
+          code: "processing",
+          diagnostics: `${response.status}: ${diagnosticIssue}`,
+        },
+      ],
+    } as OperationOutcome;
+  }
+}
+
+/**
  * Generic function for inserting a variety of different DB structures
  * into the databse during seeding.
  * @param structs An array of structures that's been extracted from a file.
@@ -618,9 +475,99 @@ export async function insertDBStructArray(
   }
 }
 
-// -------------------------- //
-//      Saved Queries
-// -------------------------- //
+/**
+ * Function call to insert a new ValueSet into the database.
+ * @param vs - a ValueSet in of the shape of our internal data model to insert
+ * @returns success / failure information, as well as errors as appropriate
+ */
+export async function insertValueSet(vs: DibbsValueSet) {
+  let errorArray: string[] = [];
+
+  const insertValueSetPromise = generateValueSetSqlPromise(vs);
+  try {
+    await insertValueSetPromise;
+  } catch (e) {
+    console.error(
+      `ValueSet insertion for ${vs.valueSetId}_${vs.valueSetVersion} failed`,
+    );
+    console.error(e);
+    errorArray.push("Error occured in valuset insertion");
+  }
+
+  const insertConceptsPromiseArray = generateConceptSqlPromises(vs);
+  const conceptInsertResults = await Promise.allSettled(
+    insertConceptsPromiseArray,
+  );
+
+  const allConceptInsertsSucceed = conceptInsertResults.every(
+    (r) => r.status === "fulfilled",
+  );
+
+  if (!allConceptInsertsSucceed) {
+    logRejectedPromiseReasons(conceptInsertResults, "Concept insertion failed");
+    errorArray.push("Error occured in concept insertion");
+  }
+
+  const joinInsertsPromiseArray = generateValuesetConceptJoinSqlPromises(vs);
+  const joinInsertResults = await Promise.allSettled(joinInsertsPromiseArray);
+
+  const allJoinInsertsSucceed = joinInsertResults.every(
+    (r) => r.status === "fulfilled",
+  );
+
+  if (!allJoinInsertsSucceed) {
+    logRejectedPromiseReasons(
+      joinInsertResults,
+      "ValueSet <> concept join insert failed",
+    );
+    errorArray.push("Error occured in ValueSet <> concept join seeding");
+  }
+
+  if (errorArray.length === 0) return { success: true };
+  return { success: false, error: errorArray.join(",") };
+}
+
+// -------------------------------- //
+//  Saved Queries / Query Building
+// -------------------------------- //
+/**
+ * Retrieves all records from the conditions table in the database.
+ * This function queries the database to fetch condition data, including
+ * condition name, code, and category.
+ * @returns An object containing:
+ * - `conditionCatergories`: a JSON object grouped by category with id:name pairs,
+ * to display on build-query page
+ * - `conditionLookup`: a JSON object with id as the key and name as the value in
+ * order to make a call to the DB with the necessary ID(s) to get the valuesets
+ * on subsequent pages.
+ */
+export async function getConditionsData() {
+  const query = "SELECT * FROM conditions";
+  const result = await dbClient.query(query);
+  const rows = result.rows;
+
+  // 1. Grouped by category with id:name pairs
+  const categoryToConditionNameArrayMap: CategoryToConditionArrayMap =
+    rows.reduce((acc, row) => {
+      const { category, id, name } = row;
+      if (!acc[category]) {
+        acc[category] = [];
+      }
+      acc[category].push({ id: id, name: name });
+      return acc;
+    }, {} as CategoryToConditionArrayMap);
+
+  // 2. ID-Name mapping
+  const conditionIdToNameMap: ConditionsMap = rows.reduce((acc, row) => {
+    acc[row.id] = { name: row.name, category: row.category };
+    return acc;
+  }, {} as ConditionsMap);
+
+  return {
+    categoryToConditionNameArrayMap,
+    conditionIdToNameMap,
+  } as const;
+}
 
 /**
  * Fetches and structures custom user queries from the database.
@@ -708,12 +655,120 @@ export const deleteQueryById = async (queryId: string) => {
   }
 };
 
-// -------------------------- //
-//    FHIR Server Config
-// -------------------------- //
+/**
+ * Executes a search for a CustomQuery against the query-loaded Postgres
+ * Database, using the saved name associated with the query as the unique
+ * identifier by which to load the result.
+ * @param name The name given to a stored query in the DB.
+ * @returns One or more rows from the DB matching the requested saved query,
+ * or an error if no results can be found.
+ */
+export const getSavedQueryByName = async (name: string) => {
+  const values = [name];
+
+  try {
+    const result = await dbClient.query(getQuerybyNameSQL, values);
+    if (result.rows.length === 0) {
+      console.error("No results found for query named:", name);
+      return [];
+    }
+    return result.rows as unknown as QueryDetailsResult[];
+  } catch (error) {
+    console.error("Error retrieving query:", error);
+    throw error;
+  }
+};
+
+/**
+ * Executes a search for a ValueSets and Concepts against the Postgres
+ * Database, using the ID of the condition associated with any such data.
+ * @param ids Array of ids for entries in the conditions table
+ * @returns One or more rows from the DB matching the requested saved query,
+ * or an error if no results can be found.
+ */
+export const getValueSetsAndConceptsByConditionIDs = async (ids: string[]) => {
+  try {
+    if (ids.length === 0) {
+      throw Error("No condition ids passed in to query by");
+    }
+
+    const escapedValues = ids.map((_, i) => `$${i + 1}`).join() + ")";
+    const queryString = getValueSetsByConditionIds + escapedValues;
+
+    const result = await dbClient.query(queryString, ids);
+    if (result.rows.length === 0) {
+      console.error("No results found for given condition ids", ids);
+      return [];
+    }
+    return result.rows;
+  } catch (error) {
+    console.error(
+      "Error retrieving value sets and concepts for condition",
+      error,
+    );
+    throw error;
+  }
+};
+
+// -------------------------------- //
+//        FHIR Server Config
+// -------------------------------- //
 
 //Cache for FHIR server configurations
 let cachedFhirServerConfigs: Promise<FhirServerConfig[]> | null = null;
+
+/**
+ * Deletes a FHIR server configuration from the database.
+ * @param id - The ID of the FHIR server to delete
+ * @returns An object indicating success or failure with optional error message
+ */
+export async function deleteFhirServer(id: string) {
+  const deleteQuery = `
+    DELETE FROM fhir_servers 
+    WHERE id = $1
+    RETURNING *;
+  `;
+
+  try {
+    await dbClient.query("BEGIN");
+
+    const result = await dbClient.query(deleteQuery, [id]);
+
+    // Clear the cache so the next getFhirServerConfigs call will fetch fresh data
+    cachedFhirServerConfigs = null;
+
+    await dbClient.query("COMMIT");
+
+    if (result.rows.length === 0) {
+      return {
+        success: false,
+        error: "Server not found",
+      };
+    }
+
+    return {
+      success: true,
+      server: result.rows[0],
+    };
+  } catch (error) {
+    await dbClient.query("ROLLBACK");
+    console.error("Failed to delete FHIR server:", error);
+    return {
+      success: false,
+      error: "Failed to delete the server configuration.",
+    };
+  }
+}
+
+/**
+ * Fetches the configuration for a FHIR server from the database.
+ * @param fhirServerName - The name of the FHIR server to fetch the configuration for.
+ * @returns The configuration for the FHIR server.
+ */
+export async function getFhirServerConfig(fhirServerName: string) {
+  const configs = await getFhirServerConfigs();
+  return configs.find((config) => config.name === fhirServerName);
+}
 
 /**
  * Fetches all FHIR server configurations from the database and caches the result.
@@ -738,16 +793,6 @@ export async function getFhirServerConfigs(forceRefresh = false) {
 export async function getFhirServerNames(): Promise<string[]> {
   const configs = await getFhirServerConfigs();
   return configs.map((config) => config.name);
-}
-
-/**
- * Fetches the configuration for a FHIR server from the database.
- * @param fhirServerName - The name of the FHIR server to fetch the configuration for.
- * @returns The configuration for the FHIR server.
- */
-export async function getFhirServerConfig(fhirServerName: string) {
-  const configs = await getFhirServerConfigs();
-  return configs.find((config) => config.name === fhirServerName);
 }
 
 /**
@@ -957,49 +1002,6 @@ export async function updateFhirServerConnectionStatus(
     return {
       success: false,
       error: "Failed to update the server connection status.",
-    };
-  }
-}
-
-/**
- * Deletes a FHIR server configuration from the database.
- * @param id - The ID of the FHIR server to delete
- * @returns An object indicating success or failure with optional error message
- */
-export async function deleteFhirServer(id: string) {
-  const deleteQuery = `
-    DELETE FROM fhir_servers 
-    WHERE id = $1
-    RETURNING *;
-  `;
-
-  try {
-    await dbClient.query("BEGIN");
-
-    const result = await dbClient.query(deleteQuery, [id]);
-
-    // Clear the cache so the next getFhirServerConfigs call will fetch fresh data
-    cachedFhirServerConfigs = null;
-
-    await dbClient.query("COMMIT");
-
-    if (result.rows.length === 0) {
-      return {
-        success: false,
-        error: "Server not found",
-      };
-    }
-
-    return {
-      success: true,
-      server: result.rows[0],
-    };
-  } catch (error) {
-    await dbClient.query("ROLLBACK");
-    console.error("Failed to delete FHIR server:", error);
-    return {
-      success: false,
-      error: "Failed to delete the server configuration.",
     };
   }
 }

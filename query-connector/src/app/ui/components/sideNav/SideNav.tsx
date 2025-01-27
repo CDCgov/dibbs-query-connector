@@ -1,7 +1,7 @@
 import { SideNav as UswdsSideNav } from "@trussworks/react-uswds";
 import { formatIdForAnchorTag } from "../../../(pages)/query/components/resultsView/ResultsViewTable";
 import { ReactNode } from "react";
-import styles from "../sideNav/sidenav.module.scss";
+import styles from "./sidenav.module.scss";
 
 export type NavItem = {
   title: string;
