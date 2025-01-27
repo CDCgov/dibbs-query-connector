@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - nickclyde/keycloak-terraform
     paths:
       - "query-connector/Dockerfile.keycloak"
       - "query-connector/keycloak/master-realm.json"
