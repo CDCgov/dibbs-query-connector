@@ -43,6 +43,7 @@ const Drawer: React.FC<DrawerProps> = ({
       <div
         className={`${styles.drawer} ${isOpen ? styles.open : styles.closed}`}
         role="dialog"
+        data-testid={`drawer-open-${isOpen}`}
       >
         <div className={styles.drawerContent}>
           <button

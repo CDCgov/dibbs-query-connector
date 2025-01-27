@@ -43,7 +43,7 @@ export const EmptyQueriesDisplay: React.FC<EmptyQueryProps> = ({
   }
 
   return (
-    <>
+    <div data-testid={"empty-state-container"}>
       <h1 className={styles.queryTitle}>Query Library</h1>
 
       <div className={classNames("bg-gray-5", styles.emptyStateQueryContainer)}>
@@ -77,7 +77,7 @@ export const EmptyQueriesDisplay: React.FC<EmptyQueryProps> = ({
           </Button>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

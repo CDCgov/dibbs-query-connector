@@ -70,13 +70,13 @@ export function filterSearchByCategoryAndCondition(
           .includes(filterString.toLocaleLowerCase())
       ) {
         result[categoryName] = fetchedConditions[categoryName];
-      }
-      const matches = conditionArray.filter((c) =>
-        c.name.toLocaleLowerCase().includes(filterString.toLocaleLowerCase()),
-      );
-
-      if (matches.length > 0) {
-        result[categoryName] = matches;
+      } else {
+        const matches = conditionArray.filter((c) =>
+          c.name.toLocaleLowerCase().includes(filterString.toLocaleLowerCase()),
+        );
+        if (matches.length > 0) {
+          result[categoryName] = matches;
+        }
       }
     },
   );
@@ -91,7 +91,7 @@ export function filterSearchByCategoryAndCondition(
  * @returns A disease display string for display
  */
 export function formatDiseaseDisplay(diseaseName: string) {
-  return diseaseName.replace("(disorder)", "");
+  return diseaseName.replace("(disorder)", "").trim();
 }
 
 /**

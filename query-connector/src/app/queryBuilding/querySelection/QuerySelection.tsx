@@ -45,7 +45,6 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({
       const fetchQueries = async () => {
         try {
           const queries = await getCustomQueries();
-
           queriesContext?.setData(queries);
         } catch (error) {
           console.error("Failed to fetch queries:", error);
@@ -64,7 +63,6 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({
   }
 
   const queries = (queriesContext?.data || []) as CustomUserQuery[];
-
   return (
     <>
       {queries.length === 0 ? (
