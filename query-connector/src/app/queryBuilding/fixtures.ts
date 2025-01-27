@@ -1,4 +1,4 @@
-import { NestedQuery, QueryDetailsResult } from "./utils";
+import { QueryDetailsResult } from "./utils";
 
 // Fixture shortened significantly for maintenance purposes
 export const DEFAULT_QUERIES = [
