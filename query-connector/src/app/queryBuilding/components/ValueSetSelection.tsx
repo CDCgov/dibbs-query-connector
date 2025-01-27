@@ -57,10 +57,6 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
     setActiveCondition(Object.keys(constructedQuery)[0]);
   }, []);
 
-  const handleDrawer = (open: boolean) => {
-    setIsDrawerOpen(open);
-  };
-
   function generateConditionDrawerDisplay(
     categoryToConditionsMap: CategoryToConditionArrayMap,
   ) {
@@ -78,11 +74,17 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
                 <span>{formatDiseaseDisplay(condition.name)}</span>
 
                 {Object.keys(constructedQuery).includes(condition.id) ? (
-                  <span className={styles.addedStatus}>Added</span>
+                  <span
+                    className={styles.addedStatus}
+                    data-testid={`condition-drawer-added-${condition.id}`}
+                  >
+                    Added
+                  </span>
                 ) : (
                   <span
                     className={styles.addButton}
                     role="button"
+                    data-testid={`condition-drawer-add-${condition.id}`}
                     onClick={() => {
                       handleUpdateCondition(condition.id, false);
                       showToastConfirmation({
@@ -136,7 +138,7 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
               <div
                 className={styles.addCondition}
                 role="button"
-                onClick={() => handleDrawer(true)}
+                onClick={() => setIsDrawerOpen(true)}
                 tabIndex={0}
               >
                 <Icon.Add
@@ -145,7 +147,7 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
                   size={3}
                   color="#005EA2"
                 />
-                <span>ADD</span>
+                <span data-testid="add-left-rail">ADD</span>
               </div>
             </div>
 
@@ -156,8 +158,8 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
                   key={conditionId}
                   data-testid={
                     activeCondition == conditionId
-                      ? "conditionCard-active"
-                      : "conditionCard"
+                      ? `${conditionId}-conditionCard-active`
+                      : `${conditionId}-conditionCard`
                   }
                   className={classNames(
                     "align-items-center",
@@ -221,7 +223,7 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
         toRender={<div>{conditionUpdate}</div>}
         toastMessage="Condition has been successfully added."
         isOpen={isDrawerOpen}
-        onClose={() => handleDrawer(false)}
+        onClose={() => setIsDrawerOpen(false)}
         onSave={() => {
           handleUpdateCondition;
         }}
