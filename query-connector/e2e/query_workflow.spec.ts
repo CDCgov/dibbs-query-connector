@@ -124,38 +124,35 @@ test.describe("querying with the Query Connector", () => {
     await expect(
       page
         .getByRole("table")
-        .filter({ hasText: "Chlamydia trachomatis DNA" })
-        .getByRole("row"),
+        .getByRole("row")
+        .filter({ hasText: "Chlamydia trachomatis DNA" }),
     ).toHaveCount(14);
     // Encounters
     await expect(
       page
         .getByRole("table")
-        .filter({ hasText: "Sexual overexposure" })
-        .getByRole("row"),
+        .getByRole("row")
+        .filter({ hasText: "Sexual overexposure" }),
     ).toHaveCount(5);
     // Conditions + Medication Requests (Reason Code)
     await expect(
       page
         .getByRole("table")
-        .filter({ hasText: "Chlamydial infection, unspecified" })
-        .getByRole("row"),
-    ).toHaveCount(10);
+        .getByRole("row")
+        .filter({ hasText: "Chlamydial infection, unspecified" }),
+    ).toHaveCount(7);
     // Diagnostic Reports
     await expect(
-      page
-        .getByRole("table")
-        .filter({
-          hasText: "Chlamydia trachomatis and Neisseria gonorrhoeae DNA panel",
-        })
-        .getByRole("row"),
+      page.getByRole("table").getByRole("row").filter({
+        hasText: "Chlamydia trachomatis and Neisseria gonorrhoeae DNA panel",
+      }),
     ).toHaveCount(4);
     // Medication Requests
     await expect(
       page
         .getByRole("table")
-        .filter({ hasText: "azithromycin 1000 MG" })
-        .getByRole("row"),
+        .getByRole("row")
+        .filter({ hasText: "azithromycin 1000 MG" }),
     ).toHaveCount(7);
 
     // Now let's use the return to search to go back to a blank form

@@ -107,8 +107,8 @@ test.describe("querying with the Query Connector", () => {
     await expect(
       page
         .getByRole("table")
-        .filter({ hasText: "doxycycline hyclate 100 MG" })
-        .getByRole("row"),
+        .getByRole("row")
+        .filter({ hasText: "doxycycline hyclate 100 MG" }),
     ).toHaveCount(2);
   });
 
@@ -169,8 +169,8 @@ test.describe("querying with the Query Connector", () => {
     await expect(
       page
         .getByRole("table")
-        .filter({ hasText: "I do not have housing" })
-        .getByRole("row"),
+        .getByRole("row")
+        .filter({ hasText: "I do not have housing" }),
     ).toHaveCount(6);
     const acceptableSdohKeywords = [
       "history",
@@ -181,13 +181,13 @@ test.describe("querying with the Query Connector", () => {
     ];
     const obsRows = page
       .getByRole("table")
-      .filter({ hasText: "I do not have housing" })
-      .getByRole("row");
+      .getByRole("row")
+      .filter({ hasText: "I do not have housing" });
     for (let i = 1; i < 6; i++) {
       const row = obsRows.nth(i);
       const typeText = await row.locator("td").nth(1).textContent();
-      const presentKey = acceptableSdohKeywords.find((key) =>
-        typeText?.toLowerCase().includes(key),
+      const presentKey = acceptableSdohKeywords.find(
+        (key) => typeText?.toLowerCase().includes(key),
       );
       expect(presentKey).toBeDefined();
       expect(typeText?.includes("chlamydia")).toBeFalsy();

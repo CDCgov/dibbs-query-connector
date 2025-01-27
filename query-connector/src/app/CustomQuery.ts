@@ -115,12 +115,12 @@ export class CustomQuery {
       },
     };
 
-    this.fhirResourceQueries["immunization"] = {
-      basePath: `/Immunization/_search`,
-      params: {
-        patient: patientId,
-      },
-    };
+    // this.fhirResourceQueries["immunization"] = {
+    //   basePath: `/Immunization/_search`,
+    //   params: {
+    //     patient: patientId,
+    //   },
+    // };
 
     if (labsFilter !== "") {
       this.fhirResourceQueries["observation"] = {
