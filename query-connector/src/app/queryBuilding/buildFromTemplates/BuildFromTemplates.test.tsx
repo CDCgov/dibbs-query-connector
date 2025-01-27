@@ -174,6 +174,14 @@ describe("tests the valueset selection page interactions", () => {
   });
 
   it("filters search on the valueset selection drawer appropriately", async () => {
+    const GONORREHEA_VALUESET_MAP = Object.values(
+      gonorreheaSavedQuery[0].query_data,
+    )[0];
+    const GONORREHEA_VALUESET_IDS = Object.keys(GONORREHEA_VALUESET_MAP);
+
+    const TEST_ID = GONORREHEA_VALUESET_IDS[0];
+    const TEST_VALUESET = GONORREHEA_VALUESET_MAP[TEST_ID];
+
     const { user } = renderWithUser(
       <DataContext.Provider value={mockContextValue}>
         <BuildFromTemplates
@@ -188,27 +196,38 @@ describe("tests the valueset selection page interactions", () => {
       </DataContext.Provider>,
     );
 
-    const GONORREHEA_VALUESET_MAP = Object.values(
-      gonorreheaSavedQuery[0].query_data,
-    )[0];
-    const GONORREHEA_VALUESET_IDS = Object.keys(GONORREHEA_VALUESET_MAP);
+    await waitFor(() => {
+      screen.getByText("Save query");
+    });
 
-    const TEST_ID = GONORREHEA_VALUESET_IDS[0];
-    const TEST_VALUESET = GONORREHEA_VALUESET_MAP[TEST_ID];
-    await waitFor(() => screen.getByText("Save query"));
-    await user.click(screen.getByText("Labs", { exact: false }));
+    await user.click(
+      screen.getByTestId("15628003-conditionCard", { exact: false }),
+    );
+    await user.click(
+      screen.getByTestId("accordionButton_labs", { exact: false }),
+    );
+    expect(screen.getByText(TEST_VALUESET.valueSetName)).toBeVisible();
+
     await user.click(screen.getByTestId(`viewCodes-${TEST_ID}`));
-    screen.logTestingPlaygroundURL();
 
     await waitFor(() => {
       expect(
         screen.getByTestId(`drawer-title-${TEST_VALUESET.valueSetName}`),
       ).toBeVisible();
-
-      const valueSetSearch = screen.getByPlaceholderText(
-        "Search by code or name",
-      );
-      expect(valueSetSearch).toBeVisible();
     });
+
+    const valueSetSearch = screen.getByPlaceholderText(
+      "Search by code or name",
+    );
+    expect(valueSetSearch).toBeVisible();
+    expect(screen.getByText(TEST_VALUESET.concepts[0].display)).toBeVisible();
+    expect(screen.getByText(TEST_VALUESET.concepts[1].display)).toBeVisible();
+    await user.type(valueSetSearch, "meningitidis");
+    expect(
+      screen.queryByText(TEST_VALUESET.concepts[1].display),
+    ).not.toBeInTheDocument();
+    await user.clear(valueSetSearch);
+    expect(screen.getByText(TEST_VALUESET.concepts[0].display)).toBeVisible();
+    expect(screen.getByText(TEST_VALUESET.concepts[1].display)).toBeVisible();
   });
 });
