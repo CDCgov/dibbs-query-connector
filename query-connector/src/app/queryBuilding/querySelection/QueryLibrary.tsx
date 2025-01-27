@@ -191,6 +191,7 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
                         onClick={() =>
                           handleCopy(query.query_name, query.query_id)
                         }
+                        data-testid={`copy-${query.query_id}`}
                       >
                         <span className="icon-text padding-right-1 display-flex flex-align-center">
                           <Icon.ContentCopy
