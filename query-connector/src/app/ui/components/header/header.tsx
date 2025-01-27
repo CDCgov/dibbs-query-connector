@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { useSession, signIn } from "next-auth/react";
-import { Icon } from "@trussworks/react-uswds";
+import { Button, Icon } from "@trussworks/react-uswds";
 import styles from "./header.module.scss";
 import { metadata } from "@/app/shared/constants";
 import classNames from "classnames";
@@ -90,7 +90,7 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
             )}
           >
             {/* TODO: Enable this once we can show/hide rules based on actual auth status */}
-            {/* {!isLoggedIn && !LOGGED_IN_PATHS.includes(path) && (
+            {!isLoggedIn && !LOGGED_IN_PATHS.includes(path) && (
               <Button
                 className={styles.signinButton}
                 type="button"
@@ -100,7 +100,7 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
               >
                 Sign in
               </Button>
-            )} */}
+            )}
             {LOGGED_IN_PATHS.includes(path) && (
               <button
                 onClick={toggleMenuDropdown}
