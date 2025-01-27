@@ -34,7 +34,7 @@ export type QueryDataColumn = {
 };
 export type QueryDetailsResult = {
   query_name: string;
-  id: string;
+  query_id: string;
   query_data: QueryDataColumn;
   conditions_list: string[];
 };

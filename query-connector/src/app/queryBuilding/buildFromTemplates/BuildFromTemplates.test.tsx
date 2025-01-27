@@ -172,4 +172,43 @@ describe("tests the valueset selection page interactions", () => {
       screen.getByTestId(`${GONORREHEA_ID}-conditionCard-active`),
     ).toBeInTheDocument();
   });
+
+  it("filters search on the valueset selection drawer appropriately", async () => {
+    const { user } = renderWithUser(
+      <DataContext.Provider value={mockContextValue}>
+        <BuildFromTemplates
+          buildStep={"valueset"}
+          setBuildStep={jest.fn}
+          selectedQuery={{
+            queryName: "Gonorrhea case investigation",
+            queryId: USE_CASE_DETAILS["gonorrhea"].id,
+          }}
+          setSelectedQuery={jest.fn}
+        />
+      </DataContext.Provider>,
+    );
+
+    const GONORREHEA_VALUESET_MAP = Object.values(
+      gonorreheaSavedQuery[0].query_data,
+    )[0];
+    const GONORREHEA_VALUESET_IDS = Object.keys(GONORREHEA_VALUESET_MAP);
+
+    const TEST_ID = GONORREHEA_VALUESET_IDS[0];
+    const TEST_VALUESET = GONORREHEA_VALUESET_MAP[TEST_ID];
+    await waitFor(() => screen.getByText("Save query"));
+    await user.click(screen.getByText("Labs", { exact: false }));
+    await user.click(screen.getByTestId(`viewCodes-${TEST_ID}`));
+    screen.logTestingPlaygroundURL();
+
+    await waitFor(() => {
+      expect(
+        screen.getByTestId(`drawer-title-${TEST_VALUESET.valueSetName}`),
+      ).toBeVisible();
+
+      const valueSetSearch = screen.getByPlaceholderText(
+        "Search by code or name",
+      );
+      expect(valueSetSearch).toBeVisible();
+    });
+  });
 });

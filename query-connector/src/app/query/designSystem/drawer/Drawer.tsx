@@ -56,7 +56,12 @@ const Drawer: React.FC<DrawerProps> = ({
           >
             <Icon.Close size={3} aria-label="X icon indicating closure" />
           </button>
-          <h2 className="margin-0 padding-bottom-2">{title}</h2>
+          <h2
+            data-testid={`drawer-title-${title}`}
+            className="margin-0 padding-bottom-2"
+          >
+            {title}
+          </h2>
 
           {onSearch && (
             <div className="padding-top-5">

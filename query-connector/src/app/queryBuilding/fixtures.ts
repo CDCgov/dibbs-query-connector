@@ -1,3 +1,5 @@
+import { NestedQuery, QueryDetailsResult } from "./utils";
+
 // Fixture shortened significantly for maintenance purposes
 export const DEFAULT_QUERIES = [
   {
@@ -603,7 +605,7 @@ export const cancerValueSets = [
   },
 ];
 
-export const gonorreheaSavedQuery = [
+export const gonorreheaSavedQuery: QueryDetailsResult[] = [
   {
     query_id: "73e1a777-49cb-4e19-bc71-8c3fd3ffda64",
     query_name: "Gonorrhea case investigation",
