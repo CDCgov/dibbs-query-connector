@@ -1,0 +1,143 @@
+@use "../ui/styles/_variables" as *;
+
+.signInContainer {
+  position: absolute;
+  top: $header-content-height;
+  bottom: $footer-content-height;
+  width: 100%;
+}
+
+.column {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.column-left {
+  background: #adcfdc;
+}
+
+.signin-button {
+  margin: 0;
+  width: 100%;
+  padding: 0.75rem 1.25rem 0.75rem 1.25rem;
+  font-size: 16px;
+  line-height: 19px;
+  font-weight: 700;
+}
+
+.card {
+  min-width: 50%;
+  max-width: 25rem;
+  color: #5c5c5c;
+  margin: 1.5rem;
+}
+
+.image {
+  max-height: 66%;
+  padding: 1.5rem;
+}
+
+@media screen and (max-width: 786px) {
+  .column-left {
+    display: none;
+  }
+}
+
+.formContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 2.5rem 0.75rem 2.5rem;
+}
+
+.formContent {
+  padding: 0.75rem 0 0.75rem 0;
+}
+
+.formHeader {
+  text-align: center;
+  margin: 0 0 0.5rem 0;
+  padding: 0 0 0.5rem 0;
+
+  h3 {
+    font-size: 20px;
+    line-height: 23.5px;
+    margin: 0;
+    padding: 2.25px 0;
+  }
+
+  p {
+    font-size: 14px;
+    line-height: 19px;
+    font-weight: 400;
+    padding: 0;
+    margin: 0;
+  }
+}
+
+.formFields {
+  padding: 0;
+  margin: 0;
+}
+
+.formInputGroup {
+  label {
+    font-size: 14px;
+    line-height: 19px;
+    margin-bottom: 0.25rem;
+  }
+
+  padding-bottom: 1.5rem;
+}
+
+.formInput {
+  border-radius: 0.25rem;
+  padding: 0.75rem;
+  margin: 0;
+  font-size: 14px;
+  line-height: 17px;
+  height: unset;
+}
+
+.formError {
+  border-radius: 0.25rem;
+  padding: 0.75rem;
+  margin: 0;
+  font-size: 14px;
+  line-height: 17px;
+  height: unset;
+  border: 1px solid #e41d3d !important;
+}
+
+.inlineError {
+  width: 100%;
+  display: inline-flex;
+  color: #e41d3d;
+  align-items: center;
+  justify-content: center;
+
+  p {
+    margin: 0 0 0 0.5rem;
+    font-size: 14px;
+    line-height: 19px;
+  }
+}
+
+.hidden {
+  visibility: hidden;
+  width: 100%;
+  display: inline-flex;
+  color: #e41d3d;
+  align-items: center;
+  justify-content: center;
+
+  p {
+    margin: 0 0 0 0.5rem;
+    font-size: 14px;
+    line-height: 19px;
+  }
+}

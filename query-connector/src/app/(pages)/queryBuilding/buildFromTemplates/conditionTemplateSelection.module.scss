@@ -1,0 +1,407 @@
+@use "../../../ui/styles/variables" as *;
+
+// Shared styles
+
+.mainContainer {
+  display: flex;
+  flex-direction: column;
+  flex: auto;
+  margin-bottom: 0 !important;
+}
+
+// Condition styles
+
+.conditionTemplateContainer {
+  padding: 3.5rem 5rem;
+  border-radius: 4px;
+  min-height: 30rem;
+  min-width: 100%;
+}
+
+.conditionSelectionForm {
+  background-color: #fff;
+  padding: 2rem;
+  min-height: 25rem;
+}
+
+.querySelectionFormSearch {
+  border: 1px solid #919191;
+  border-radius: 4px;
+  height: 1.5rem;
+  padding: 0.75rem;
+  min-width: 53rem;
+}
+
+#conditionTemplateSearch:first-child {
+  flex: 1;
+}
+
+.categoryHeading {
+  text-transform: uppercase;
+  color: $text-secondary;
+  font-weight: 700;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+  margin-top: 0;
+}
+
+.displayCol:first-of-type {
+  border-right: 1px solid $table-row-border;
+}
+
+.displayCol:nth-of-type(2) {
+  padding-left: 2rem;
+}
+.categoryOption {
+  margin: 2rem 0;
+}
+.categoryOption:last-of-type {
+  margin-bottom: 3rem;
+}
+
+// Value Set and Concept styles
+
+.valueSetTemplateContainer {
+  padding: 0.5rem 0.5rem 0 0.5rem;
+  border-radius: 0.5rem;
+  display: flex;
+  flex: auto;
+}
+
+.valueSetTemplateContainer__inner {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.valueSetSearch {
+  width: 25rem !important;
+  padding: 0.75rem 0.75rem 0.75rem 2.25rem !important;
+  margin: 0 !important;
+  height: 3rem !important;
+}
+
+.valueSetTemplate__left {
+  display: flex;
+  flex-direction: row;
+  width: 18rem;
+  justify-content: space-between;
+  padding: 0.5rem !important;
+}
+
+.valueSetTemplate__right {
+  background-color: #fff;
+  width: 88%;
+  border-radius: 8px;
+  margin-left: 0.5rem;
+  min-height: 50rem;
+}
+
+.valueSetTemplate__search {
+  padding: 1.5rem;
+  border-bottom: 1px #dfe1e2 solid;
+}
+
+.valueSetTemplate__accordion {
+  display: flex;
+  justify-content: space-between;
+  word-wrap: break-word;
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+  background-color: #f7f9fa;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px #dfe1e2 solid;
+}
+
+.accordionContainer {
+  width: 100%;
+}
+
+.accordionInnerWrapper > div {
+  padding: 0 !important;
+}
+
+.accordionHeaderWrapper {
+  background-color: transparent;
+  justify-content: space-between;
+  align-items: center;
+  display: flex;
+  width: 100%;
+}
+
+.accordionBodyWrapper {
+  background-color: transparent;
+}
+
+.accordionHeaderCount {
+  font-size: 1rem !important;
+  font-weight: 400 !important;
+  background-color: #f7f9fa;
+}
+
+.accordionInnerWrapper > h4 {
+  margin-top: 0 !important;
+}
+
+.accordionInnerWrapper > h4 > button {
+  display: flex;
+  word-wrap: break-word;
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+  background-color: #f7f9fa;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px #dfe1e2 solid;
+  color: #111111;
+
+  // override default accordion hover styles (headers should not change on hover):
+  &:hover {
+    background-color: #f7f9fa !important;
+
+    .accordionHeaderCount {
+      color: #111111;
+    }
+  }
+}
+
+.accordionWrapper > div {
+  margin: 0.1rem 0rem;
+  padding: 1rem 1.5rem;
+}
+
+.conditionList {
+  display: flex;
+  flex-direction: column;
+  padding: 0.5rem;
+  width: 100%;
+
+  .controls {
+    justify-content: space-between;
+    padding: 0.5rem;
+    display: flex;
+
+    .conditionsTitle {
+      width: 104px;
+      color: #919191;
+      font-size: 19px;
+    }
+
+    .addCondition {
+      font-size: 1rem;
+      color: #005ea2;
+      line-height: 18.8px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+
+      :hover {
+        cursor: pointer;
+      }
+    }
+  }
+
+  .deleteIcon {
+    color: $error;
+    width: 1.5rem;
+    height: 1.5rem;
+    display: none;
+  }
+
+  .conditionCard {
+    background: transparent;
+    border-radius: 4px;
+    padding: 1rem;
+    line-height: 22px;
+    margin-top: 0.5rem;
+    color: #111111;
+    cursor: pointer;
+    position: relative;
+
+    &:hover .deleteIcon {
+      display: inline-block;
+      position: absolute;
+      right: 2.5%;
+      top: 25%;
+    }
+  }
+
+  .active {
+    background: #ffffff;
+  }
+}
+
+.valueSetTemplate__titleCheckbox {
+  text-transform: capitalize;
+  background-color: #f7f9fa;
+}
+
+.valueSetTemplate__toggleRowHeader {
+  display: flex;
+  align-items: center;
+  margin: 0.5rem 0;
+  width: 406px;
+}
+
+.valueSetTemplate__toggleRowHeader > svg {
+  color: black;
+}
+
+.accordionBodyExpanded {
+  padding: 1.5rem 1.5rem 0 3rem;
+  background-color: #fff;
+  display: flex;
+  justify-content: space-between;
+}
+
+.accordionBodyExpanded {
+  &:hover {
+    background-color: rgba(217, 232, 246, 0.5) !important;
+
+    .valueSetTemplate__checkbox {
+      background-color: unset;
+    }
+    .viewCodesBtn {
+      display: block;
+      text-align: right;
+      width: 4rem;
+      line-height: normal;
+      font-weight: 700;
+      font-size: 14px;
+      color: $text-blue;
+
+      &:hover {
+        cursor: pointer;
+        text-decoration: underline;
+      }
+    }
+    .displayCount {
+      display: none;
+    }
+  }
+}
+
+div.accordionBodyExpanded:last-of-type {
+  border-bottom: 1px #dfe1e2 solid;
+
+  .accordionExpandedInner {
+    border-bottom: none !important;
+  }
+}
+
+.accordionExpandedInner {
+  border-bottom: solid 1px #dfe1e2;
+  padding-bottom: 1rem;
+  width: 100%;
+}
+
+.expandedContent {
+  font-size: 1rem;
+  font-weight: 400;
+}
+
+.expandedContent > div {
+  text-transform: none !important;
+  padding-right: 1rem;
+}
+
+.vsName {
+  color: #111111;
+}
+
+.vsDetails {
+  color: #919191;
+  display: flex;
+}
+
+.accordionBodyExpanded__right {
+  padding-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  min-width: 4rem;
+  justify-content: flex-end;
+}
+
+.customQuery__controls {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+
+.viewCodesBtn {
+  display: none;
+}
+
+.conceptSelectionTable {
+  display: grid;
+}
+
+$conditionColumnSpacing: 1.25rem 2fr 6fr;
+$columnGap: 1rem;
+.conceptSelectionRow {
+  text-align: left;
+  display: grid;
+  grid-template-columns: $conditionColumnSpacing;
+  column-gap: $columnGap;
+  margin-top: 1.5rem;
+  align-items: center;
+}
+
+.conceptCode {
+  max-width: 7rem;
+  word-wrap: break-word;
+}
+
+.conditionDrawerHeader {
+  color: $text-secondary;
+  font-size: 1rem;
+  font-style: normal;
+  font-weight: 700;
+  line-height: normal;
+  text-transform: uppercase;
+
+  display: flex;
+  padding-top: 2rem;
+  padding-bottom: 0.75rem;
+  justify-content: left;
+  align-items: center;
+  gap: 0.625rem;
+  align-self: stretch;
+}
+
+.conditionItem {
+  display: flex;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  justify-content: space-between;
+  align-items: flex-start;
+  align-self: stretch;
+  border-radius: 0.25rem;
+
+  &:hover {
+    background: $white;
+  }
+  &:hover .addButton {
+    display: inline-block;
+  }
+
+  &:hover .addedStatus {
+    display: inline-block;
+  }
+}
+
+.addedStatus,
+.addButton {
+  font-size: 1rem;
+  font-style: normal;
+  line-height: 1.375rem;
+  display: none;
+}
+
+.addButton {
+  color: $text-blue;
+  text-transform: uppercase;
+  font-weight: 700;
+  cursor: pointer;
+}

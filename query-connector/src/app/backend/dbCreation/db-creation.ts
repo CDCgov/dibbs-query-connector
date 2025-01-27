@@ -1,6 +1,6 @@
 "use server";
 
-import { ersdToDibbsConceptMap, ErsdConceptType } from "@/app/constants";
+import { ersdToDibbsConceptMap, ErsdConceptType } from "@/app/shared/constants";
 import { Bundle, BundleEntry, Parameters, ValueSet } from "fhir/r4";
 import {
   checkDBForData,
@@ -10,7 +10,7 @@ import {
   insertValueSet,
   insertDBStructArray,
   executeCategoryUpdates,
-} from "@/app/database-service";
+} from "@/app/shared/database-service";
 import * as fs from "fs";
 import path from "path";
 import { randomUUID } from "crypto";
@@ -18,7 +18,7 @@ import {
   ConditionStruct,
   ConditionToValueSetStruct,
   dbInsertStruct,
-} from "../../seedSqlStructs";
+} from "../../shared/seedSqlStructs";
 import { translateVSACToInternalValueSet } from "./lib";
 
 const ERSD_TYPED_RESOURCE_URL = "http://ersd.aimsplatform.org/fhir/ValueSet/";

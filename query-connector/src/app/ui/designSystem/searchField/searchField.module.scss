@@ -1,0 +1,12 @@
+@use "../../../ui/styles/variables" as *;
+
+.searchField {
+  border-radius: 0.25rem;
+  border: 1px solid $input-field-border;
+  height: 3%;
+  padding: 0.75rem;
+  padding-left: 2.4rem;
+  background: url("../../../ui/styles/assets/search.svg") center / contain no-repeat;
+  background-position: 12px 12px;
+  float: none;
+}

@@ -2,11 +2,11 @@
 
 import { test, expect } from "@playwright/test";
 import { TEST_URL } from "../playwright-setup";
-import { PAGE_TITLES } from "@/app/query/components/stepIndicator/StepIndicator";
+import { PAGE_TITLES } from "@/app/(pages)/query/components/stepIndicator/StepIndicator";
 import {
   CONTACT_US_DISCLAIMER_EMAIL,
   CONTACT_US_DISCLAIMER_TEXT,
-} from "@/app/designSystem/SiteAlert";
+} from "@/app/ui/designSystem/SiteAlert";
 import { TEST_PATIENT, TEST_PATIENT_NAME } from "./constants";
 
 test.describe("querying with the Query Connector", () => {
