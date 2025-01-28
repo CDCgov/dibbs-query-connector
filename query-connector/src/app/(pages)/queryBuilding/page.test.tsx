@@ -1,10 +1,13 @@
 import QueryBuilding from "./page";
 import { render, screen, waitFor } from "@testing-library/react";
-import { DataContext } from "@/app/DataProvider";
-import { getConditionsData, getCustomQueries } from "../database-service";
+import { DataContext } from "@/app/shared/DataProvider";
+import {
+  getConditionsData,
+  getCustomQueries,
+} from "../../shared/database-service";
 import { conditionIdToNameMap, DEFAULT_QUERIES } from "./fixtures";
 
-jest.mock("../database-service", () => ({
+jest.mock(".../../../shared/database-service", () => ({
   getCustomQueries: jest.fn(),
   getConditionsData: jest.fn(),
 }));

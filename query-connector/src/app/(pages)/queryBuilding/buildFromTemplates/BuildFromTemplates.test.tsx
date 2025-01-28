@@ -1,9 +1,9 @@
 import { screen } from "@testing-library/react";
-import { DataContext } from "@/app/DataProvider";
+import { DataContext } from "@/app/shared/DataProvider";
 import {
   getConditionsData,
   getValueSetsAndConceptsByConditionIDs,
-} from "../../database-service";
+} from "../../../shared/database-service";
 import {
   categoryToConditionNameArrayMap,
   conditionIdToNameMap,
@@ -14,7 +14,7 @@ import BuildFromTemplates from "./BuildFromTemplates";
 import { formatDiseaseDisplay } from "../utils";
 import { renderWithUser } from "@/app/tests/unit/setup";
 
-jest.mock("../../database-service", () => ({
+jest.mock("../../../shared/database-service", () => ({
   getCustomQueries: jest.fn(),
   getConditionsData: jest.fn(),
   getValueSetsAndConceptsByConditionIDs: jest.fn(),

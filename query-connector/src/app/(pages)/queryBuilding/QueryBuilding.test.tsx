@@ -3,7 +3,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import { DataContext } from "@/app/shared/DataProvider";
 import { getCustomQueries } from "../../shared/database-service";
 
-jest.mock("../shared/database-service", () => ({
+jest.mock("../../shared/database-service", () => ({
   getCustomQueries: jest.fn(),
 }));
 
