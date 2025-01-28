@@ -108,7 +108,12 @@ module "ecs" {
       host_port      = 8080,
       public         = true,
       registry_url   = "${data.aws_caller_identity.current.account_id}.dkr.ecr.${var.region}.amazonaws.com",
-      env_vars       = []
+      env_vars = [
+        {
+          name  = "KC_HTTP_RELATIVE_PATH"
+          value = "/keycloak"
+        }
+      ]
     }
 
   }

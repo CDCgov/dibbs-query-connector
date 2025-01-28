@@ -1,4 +1,3 @@
 FROM quay.io/keycloak/keycloak:26.1
 COPY ./keycloak /opt/keycloak/data/import
-ENV KC_HTTP_RELATIVE_PATH /keycloak
 CMD ["start-dev", "--import-realm"]
