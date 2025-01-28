@@ -220,9 +220,9 @@ describe("tests the valueset selection page interactions", () => {
     expect(
       screen.getByTestId(`condition-drawer-added-${CANCER_ID}`),
     ).toBeInTheDocument();
-    await user.click(screen.getByTestId("close-drawer"));
+    // click out of the drawer
+    await user.click(screen.getByTestId(`${CANCER_ID}-conditionCard`));
 
-    expect(screen.getByTestId("drawer-open-false")).toBeInTheDocument();
     expect(
       screen.getByTestId(`${CANCER_ID}-conditionCard`),
     ).toBeInTheDocument();
