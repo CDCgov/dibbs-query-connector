@@ -157,26 +157,24 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
           </div>
         );
       })}
-      {curConcepts && curValueSet && (
-        <Drawer
-          title={curValueSet.valueSetName}
-          placeholder="Search by code or name"
-          toastMessage="Valueset concepts have been successfully modified."
-          toRender={
-            <ConceptSelection
-              concepts={curConcepts}
-              onConceptsChange={handleConceptsChange}
-            />
-          }
-          isOpen={isDrawerOpen}
-          onClose={() => {
-            setIsDrawerOpen(false);
-            setCurValueSet(undefined);
-          }}
-          onSave={handleSaveChanges}
-          onSearch={handleValueSetSearch}
-        />
-      )}
+      <Drawer
+        title={curValueSet?.valueSetName ?? ""}
+        placeholder="Search by code or name"
+        toastMessage="Valueset concepts have been successfully modified."
+        toRender={
+          <ConceptSelection
+            concepts={curConcepts}
+            onConceptsChange={handleConceptsChange}
+          />
+        }
+        isOpen={isDrawerOpen}
+        onClose={() => {
+          setIsDrawerOpen(false);
+          setCurValueSet(undefined);
+        }}
+        onSave={handleSaveChanges}
+        onSearch={handleValueSetSearch}
+      />
     </div>
   );
 };

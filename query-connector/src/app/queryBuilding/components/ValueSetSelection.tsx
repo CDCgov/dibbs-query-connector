@@ -223,7 +223,7 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
       <Drawer
         title="Add Condition(s)"
         placeholder="Search conditions"
-        toRender={<div>{conditionUpdate}</div>}
+        toRender={conditionUpdate}
         toastMessage="Condition has been successfully added."
         isOpen={isDrawerOpen}
         onClose={() => setIsDrawerOpen(false)}
