@@ -61,15 +61,16 @@ export function filterSearchByCategoryAndCondition(
   fetchedConditions: CategoryToConditionArrayMap,
 ): CategoryToConditionArrayMap {
   const result: CategoryToConditionArrayMap = {};
+  const unfilteredConditions = structuredClone(fetchedConditions);
 
-  Object.entries(fetchedConditions).forEach(
+  Object.entries(unfilteredConditions).forEach(
     ([categoryName, conditionArray]) => {
       if (
         categoryName
           .toLocaleLowerCase()
           .includes(filterString.toLocaleLowerCase())
       ) {
-        result[categoryName] = fetchedConditions[categoryName];
+        result[categoryName] = unfilteredConditions[categoryName];
       } else {
         const matches = conditionArray.filter((c) =>
           c.name.toLocaleLowerCase().includes(filterString.toLocaleLowerCase()),

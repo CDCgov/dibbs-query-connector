@@ -6,7 +6,7 @@ import { ConceptDisplay } from "./SelectionViewAccordionBody";
 
 type ConceptSelectionProps = {
   concepts: ConceptDisplay[];
-  onConceptsChange: (updatedConcepst: ConceptDisplay[]) => void;
+  onConceptsChange: (updatedConcepts: ConceptDisplay[]) => void;
 };
 
 /**
@@ -63,18 +63,24 @@ const ConceptSelection: React.FC<ConceptSelectionProps> = ({
   return (
     <table className={styles.conceptSelectionTable}>
       <thead>
-        <tr className={styles.conceptSelectionRow}>
-          <th>
-            <Checkbox
-              id="toggleAll"
-              checked={selectedCount === totalCount}
-              isMinusState={isMinusState}
-              onChange={(e) => toggleAll(e.target.checked)}
-            />
-          </th>
-          <th>Code</th>
-          <th>Name</th>
-        </tr>
+        {concepts.filter((c) => c.render).length > 0 ? (
+          <tr className={styles.conceptSelectionRow}>
+            <th>
+              <Checkbox
+                id="toggleAll"
+                checked={selectedCount === totalCount}
+                isMinusState={isMinusState}
+                onChange={(e) => toggleAll(e.target.checked)}
+              />
+            </th>
+            <th>Code</th>
+            <th>Name</th>
+          </tr>
+        ) : (
+          <tr className="margin-top-3">
+            <th>No matching codes found</th>
+          </tr>
+        )}
       </thead>
       <tbody>
         {concepts.map(

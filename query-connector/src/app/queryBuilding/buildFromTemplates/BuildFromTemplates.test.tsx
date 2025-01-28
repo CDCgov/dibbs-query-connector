@@ -113,8 +113,66 @@ describe("tests the build from template page interactions", () => {
     ).toBeInTheDocument();
     expect(screen.getByText("Cancer (Leukemia)")).toBeInTheDocument();
     expect(screen.queryByText(GONORREHEA_NAME)).not.toBeInTheDocument();
+  });
+  it("search filters reset properly", async () => {
+    const { user } = renderWithUser(
+      <DataContext.Provider value={mockContextValue}>
+        <BuildFromTemplates
+          buildStep={"condition"}
+          setBuildStep={jest.fn}
+          selectedQuery={{
+            queryName: undefined,
+            queryId: undefined,
+          }}
+          setSelectedQuery={jest.fn}
+        />
+      </DataContext.Provider>,
+    );
+
+    expect(await screen.findByText(GONORREHEA_NAME)).toBeInTheDocument();
+    expect(await screen.findByText("Cancer (Leukemia)")).toBeInTheDocument();
+    expect(
+      await screen.findByText("Malignant neoplastic disease"),
+    ).toBeInTheDocument();
+
+    // "can" (2 matches) --> "an" (3 matches, Gonorrehea matched on Sexually Transmitted)
+    await user.type(screen.getByPlaceholderText("Search conditions"), "can");
+    expect(screen.getByText("Cancer (Leukemia)")).toBeInTheDocument();
+    expect(
+      screen.getByText("Malignant neoplastic disease"),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(GONORREHEA_NAME)).not.toBeInTheDocument();
+    await user.type(
+      screen.getByPlaceholderText("Search conditions"),
+      "[ArrowLeft][ArrowLeft][Backspace]",
+    );
+    expect(screen.getByText(GONORREHEA_NAME)).toBeInTheDocument();
+    expect(screen.getByText("Cancer (Leukemia)")).toBeInTheDocument();
+    expect(
+      screen.getByText("Malignant neoplastic disease"),
+    ).toBeInTheDocument();
+    await user.clear(screen.getByPlaceholderText("Search conditions"));
+
+    // "can" (2 matches) --> "" (3 matches, testing the empty string case)
+    await user.type(screen.getByPlaceholderText("Search conditions"), "can");
+    expect(screen.getByText("Cancer (Leukemia)")).toBeInTheDocument();
+    expect(
+      screen.getByText("Malignant neoplastic disease"),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(GONORREHEA_NAME)).not.toBeInTheDocument();
+    await user.type(
+      screen.getByPlaceholderText("Search conditions"),
+      "[Backspace][Backspace][Backspace]",
+    );
+    expect(screen.getByText(GONORREHEA_NAME)).toBeInTheDocument();
+    expect(screen.getByText("Cancer (Leukemia)")).toBeInTheDocument();
+    expect(
+      screen.getByText("Malignant neoplastic disease"),
+    ).toBeInTheDocument();
+    await user.clear(screen.getByPlaceholderText("Search conditions"));
 
     // Reset state
+    await user.type(screen.getByPlaceholderText("Search conditions"), "leuk");
     await user.clear(screen.getByPlaceholderText("Search conditions"));
     expect(screen.getByText(GONORREHEA_NAME)).toBeInTheDocument();
     expect(screen.getByText("Cancer (Leukemia)")).toBeInTheDocument();

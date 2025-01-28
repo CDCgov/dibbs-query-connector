@@ -104,22 +104,25 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
   }
 
   function handleConditionSearch(searchFilter: string) {
-    if (searchFilter) {
-      const filteredDisplay = filterSearchByCategoryAndCondition(
-        searchFilter,
-        categoryToConditionsMap,
-      );
-      setConditionDrawerDisplay(filteredDisplay);
-    }
+    const filteredDisplay = filterSearchByCategoryAndCondition(
+      searchFilter,
+      categoryToConditionsMap,
+    );
+    setConditionDrawerDisplay(filteredDisplay);
   }
 
   function handleSearch(searchFilter: string) {
     setSearchFilter(searchFilter);
   }
 
-  const conditionUpdate = conditionDrawerDisplay
-    ? generateConditionDrawerDisplay(conditionDrawerDisplay)
-    : undefined;
+  const conditionUpdate =
+    Object.keys(conditionDrawerDisplay).length > 0 ? (
+      generateConditionDrawerDisplay(conditionDrawerDisplay)
+    ) : (
+      <div>
+        <div className="padding-top-4"> No conditions found</div>
+      </div>
+    );
 
   return (
     <div
