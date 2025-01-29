@@ -123,13 +123,11 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
         return;
       }
       const result = await getSavedQueryById(selectedQuery.queryId);
-
       if (result === undefined) {
         return; // todo: error???
       }
-
       const initialState: NestedQuery = {};
-      const savedQuery = result[0]; // what is this shape, why first index
+      const savedQuery = result[0];
 
       Object.entries(savedQuery.query_data).forEach(
         ([conditionId, valueSetMap]) => {
@@ -213,7 +211,10 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
         conditionId,
       ]);
 
-      if (conditionValueSets === undefined) {
+      if (
+        conditionValueSets === undefined ||
+        conditionValueSets[conditionId] === undefined
+      ) {
         showToastConfirmation({
           heading: "Something went wrong",
           body: "Couldn't fetch condition value sets. Try again, or contact us if the error persists",
