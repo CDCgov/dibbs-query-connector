@@ -113,7 +113,8 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
   }
 
   function handleSearch(searchFilter: string) {
-    setSearchFilter(searchFilter);
+    // TODO: in an upcoming PR
+    console.log(searchFilter);
   }
 
   const conditionUpdate =
