@@ -9,7 +9,7 @@ import { DibbsValueSet, isFhirResource } from "../shared/constants";
 import { CustomQuery } from "./CustomQuery";
 import { GetPhoneQueryFormats } from "./format-service";
 import { getFhirServerConfigs, getSavedQueryByName } from "./database-service";
-import { QueryDataColumn } from "./queryBuilding/utils";
+import { QueryDataColumn } from "../(pages)/queryBuilding/utils";
 
 /**
  * The query response when the request source is from the Viewer UI.
@@ -104,7 +104,7 @@ async function patientQuery(
 export async function makeFhirQuery(
   request: QueryRequest,
   queryResponse: QueryResponse = {},
-  valueSetOverrides = [],
+  valueSetOverrides: DibbsValueSet[] = [],
 ): Promise<QueryResponse> {
   const fhirServerConfigs = await getFhirServerConfigs();
   const fhirClient = new FHIRClient(request.fhir_server, fhirServerConfigs);
