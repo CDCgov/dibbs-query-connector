@@ -29,15 +29,14 @@ export type QueryUpdateResult = {
   query_name: string;
   operation: "INSERT" | "UPDATE";
 };
-
+export type QueryDataColumn = {
+  [conditionId: string]: { [valueSetId: string]: DibbsValueSet };
+};
 export type QueryDetailsResult = {
   query_name: string;
-  id: string;
-  query_data: {
-    [conditionId: string]: { [valueSetId: string]: DibbsValueSet };
-  };
+  query_id: string;
+  query_data: QueryDataColumn;
   conditions_list: string[];
-  updated: boolean;
 };
 
 export const EMPTY_QUERY_SELECTION = {
@@ -62,22 +61,23 @@ export function filterSearchByCategoryAndCondition(
   fetchedConditions: CategoryToConditionArrayMap,
 ): CategoryToConditionArrayMap {
   const result: CategoryToConditionArrayMap = {};
+  const unfilteredConditions = structuredClone(fetchedConditions);
 
-  Object.entries(fetchedConditions).forEach(
+  Object.entries(unfilteredConditions).forEach(
     ([categoryName, conditionArray]) => {
       if (
         categoryName
           .toLocaleLowerCase()
           .includes(filterString.toLocaleLowerCase())
       ) {
-        result[categoryName] = fetchedConditions[categoryName];
-      }
-      const matches = conditionArray.filter((c) =>
-        c.name.toLocaleLowerCase().includes(filterString.toLocaleLowerCase()),
-      );
-
-      if (matches.length > 0) {
-        result[categoryName] = matches;
+        result[categoryName] = unfilteredConditions[categoryName];
+      } else {
+        const matches = conditionArray.filter((c) =>
+          c.name.toLocaleLowerCase().includes(filterString.toLocaleLowerCase()),
+        );
+        if (matches.length > 0) {
+          result[categoryName] = matches;
+        }
       }
     },
   );
@@ -92,7 +92,7 @@ export function filterSearchByCategoryAndCondition(
  * @returns A disease display string for display
  */
 export function formatDiseaseDisplay(diseaseName: string) {
-  return diseaseName.replace("(disorder)", "");
+  return diseaseName.replace("(disorder)", "").trim();
 }
 
 /**

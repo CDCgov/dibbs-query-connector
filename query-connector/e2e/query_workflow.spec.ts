@@ -70,7 +70,9 @@ test.describe("querying with the Query Connector", () => {
     await expect(
       page.getByRole("heading", { name: "Select a query" }),
     ).toBeVisible();
-    await page.getByTestId("Select").selectOption("chlamydia");
+    await page
+      .getByTestId("Select")
+      .selectOption("Chlamydia case investigation");
 
     // For some reason only in Chromium (ie not in firefox / webkit) there were
     // issues connecting to the database for the cancer use case, which was resulting
@@ -124,7 +126,7 @@ test.describe("querying with the Query Connector", () => {
         .getByRole("table")
         .filter({ hasText: "Chlamydia trachomatis DNA" })
         .getByRole("row"),
-    ).toHaveCount(18);
+    ).toHaveCount(14);
     // Encounters
     await expect(
       page
@@ -132,13 +134,13 @@ test.describe("querying with the Query Connector", () => {
         .filter({ hasText: "Sexual overexposure" })
         .getByRole("row"),
     ).toHaveCount(5);
-    // Conditions
+    // Conditions + Medication Requests (Reason Code)
     await expect(
       page
         .getByRole("table")
         .filter({ hasText: "Chlamydial infection, unspecified" })
         .getByRole("row"),
-    ).toHaveCount(3);
+    ).toHaveCount(10);
     // Diagnostic Reports
     await expect(
       page

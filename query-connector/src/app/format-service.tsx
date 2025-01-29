@@ -265,16 +265,16 @@ export async function GetPhoneQueryFormats(phone: string) {
 /**
  * Formats a statefully updated list of value sets into a JSON structure
  * used for executing custom queries.
- * @param useCase The base use case being queried for.
+ * @param queryName The name of the query being transformed for.
  * @param valueSets The list of value sets the user wants included.
  * @returns A structured specification of a query that can be executed.
  */
 export const formatValueSetsAsQuerySpec = async (
-  useCase: string,
+  queryName: string,
   valueSets: DibbsValueSet[],
 ) => {
   let secondEncounter: boolean = false;
-  if (["cancer", "chlamydia", "gonorrhea", "syphilis"].includes(useCase)) {
+  if (["cancer", "chlamydia", "gonorrhea", "syphilis"].includes(queryName)) {
     secondEncounter = true;
   }
   const labCodes: string[] = valueSets
@@ -300,7 +300,6 @@ export const formatValueSetsAsQuerySpec = async (
     labCodes: labCodes,
     snomedCodes: snomedCodes,
     rxnormCodes: rxnormCodes,
-    classTypeCodes: [] as string[],
     hasSecondEncounterQuery: secondEncounter,
   };
 
@@ -320,3 +319,21 @@ export const formatImmunizationRoute = (immunization: Immunization): string => {
   );
   return readable?.[0].display ?? initial;
 };
+
+/**
+ * Formats a Coding object for display. If the object has a coding array,
+ * the first coding object is used.
+ * @param coding - The Coding object.
+ * @returns The Coding data formatted for display.
+ */
+export function formatCoding(coding: Coding | undefined) {
+  if (!coding) {
+    return "";
+  }
+  return (
+    <>
+      {" "}
+      {coding?.display} <br /> {coding?.code} <br /> {coding?.system}{" "}
+    </>
+  );
+}

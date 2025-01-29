@@ -1,16 +1,10 @@
 "use server";
 import fetch from "node-fetch";
 import https from "https";
-import { Bundle, DomainResource } from "fhir/r4";
+import { Bundle, FhirResource } from "fhir/r4";
 
 import FHIRClient from "./fhir-servers";
-import {
-  USE_CASES,
-  DibbsValueSet,
-  isFhirResource,
-  FhirResource,
-} from "./constants";
-
+import { DibbsValueSet, isFhirResource } from "./constants";
 import { CustomQuery } from "./CustomQuery";
 import { GetPhoneQueryFormats } from "./format-service";
 import { formatValueSetsAsQuerySpec } from "./format-service";
@@ -23,16 +17,10 @@ export type QueryResponse = {
   [R in FhirResource as R["resourceType"]]?: R[];
 };
 
-// workaround types to get around a typescript compilation issue
-type SuperSetFhirResource = DomainResource | FhirResource;
-type SuperSetQueryResponse = {
-  [R in SuperSetFhirResource as R["resourceType"]]?: R[];
-};
-
 export type APIQueryResponse = Bundle;
 
-export type UseCaseQueryRequest = {
-  use_case: USE_CASES;
+export type QueryRequest = {
+  query_name: string;
   fhir_server: string;
   first_name?: string;
   last_name?: string;
@@ -48,12 +36,11 @@ export type QueryStruct = {
   labCodes: string[];
   snomedCodes: string[];
   rxnormCodes: string[];
-  classTypeCodes: string[];
   hasSecondEncounterQuery: boolean;
 };
 
 // Expected responses from the FHIR server
-export type UseCaseQueryResponse = Awaited<ReturnType<typeof UseCaseQuery>>;
+export type FhirQueryResponse = Awaited<ReturnType<typeof makeFhirQuery>>;
 
 /**
  * @todo Add encounters as _include in condition query & batch encounter queries
@@ -90,7 +77,7 @@ async function queryEncounters(
  * @returns - The response body from the FHIR server.
  */
 async function patientQuery(
-  request: UseCaseQueryRequest,
+  request: QueryRequest,
   fhirClient: FHIRClient,
   queryResponse: QueryResponse,
 ): Promise<void> {
@@ -141,13 +128,13 @@ async function patientQuery(
 /**
  * Query a FHIR API for a public health use case based on patient demographics provided
  * in the request. If data is found, return in a queryResponse object.
- * @param request - UseCaseQueryRequest object containing the patient demographics and use case.
+ * @param request - QueryRequest object containing the patient demographics and use case.
  * @param queryValueSets - The value sets to be included in query filtering.
  * @param queryResponse - The response object to store the query results.
  * @returns - The response object containing the query results.
  */
-export async function UseCaseQuery(
-  request: UseCaseQueryRequest,
+export async function makeFhirQuery(
+  request: QueryRequest,
   queryValueSets: DibbsValueSet[],
   queryResponse: QueryResponse = {},
 ): Promise<QueryResponse> {
@@ -165,7 +152,7 @@ export async function UseCaseQuery(
   const patientId = queryResponse.Patient[0].id ?? "";
 
   await generalizedQuery(
-    request.use_case,
+    request.query_name,
     queryValueSets,
     patientId,
     fhirClient,
@@ -180,7 +167,7 @@ export async function UseCaseQuery(
  * particular criteria. The query is determined by a collection of passed-in
  * valuesets to include in the query results, and any patients found must
  * have eCR data interseecting with these valuesets.
- * @param useCase The particular use case the query is associated with.
+ * @param queryName - Name of the query that we need to retrieve from the DB
  * @param queryValueSets The valuesets to include as reference points for patient
  * data.
  * @param patientId The ID of the patient for whom to search.
@@ -189,20 +176,20 @@ export async function UseCaseQuery(
  * @returns A promise for an updated query response.
  */
 async function generalizedQuery(
-  useCase: USE_CASES,
+  queryName: string,
   queryValueSets: DibbsValueSet[],
   patientId: string,
   fhirClient: FHIRClient,
   queryResponse: QueryResponse,
 ): Promise<QueryResponse> {
-  const querySpec = await formatValueSetsAsQuerySpec(useCase, queryValueSets);
+  const querySpec = await formatValueSetsAsQuerySpec(queryName, queryValueSets);
   const builtQuery = new CustomQuery(querySpec, patientId);
   let response: fetch.Response | fetch.Response[];
 
   // Special cases for newborn screening, which just use one query
-  if (useCase === "newborn-screening") {
+  if (queryName.includes("Newborn")) {
     response = await fhirClient.get(builtQuery.getQuery("observation"));
-  } else if (useCase === "immunization") {
+  } else if (queryName.includes("Immunization")) {
     response = await fhirClient.get(builtQuery.getQuery("immunization"));
   } else {
     const queryRequests: string[] = builtQuery.getAllQueries();
@@ -226,9 +213,10 @@ async function generalizedQuery(
  */
 export async function parseFhirSearch(
   response: fetch.Response | Array<fetch.Response>,
-  queryResponse: SuperSetQueryResponse = {},
+  queryResponse: Record<string, FhirResource[]> = {},
 ): Promise<QueryResponse> {
-  let resourceArray: SuperSetFhirResource[] = [];
+  let resourceArray: FhirResource[] = [];
+  const resourceIds = new Set<string>();
 
   // Process the responses and flatten them
   if (Array.isArray(response)) {
@@ -238,16 +226,21 @@ export async function parseFhirSearch(
   } else {
     resourceArray = await processFhirResponse(response);
   }
-
   // Add resources to queryResponse
   for (const resource of resourceArray) {
     const resourceType = resource.resourceType;
+
+    // Check if resourceType already exists in queryResponse & initialize if not
     if (!(resourceType in queryResponse)) {
-      queryResponse[resourceType] = [resource];
-    } else {
+      queryResponse[resourceType] = [];
+    }
+    // Check if the resourceID has already been seen & only added resources that haven't been seen before
+    if (resource.id && !resourceIds.has(resource.id)) {
       queryResponse[resourceType]!.push(resource);
+      resourceIds.add(resource.id);
     }
   }
+
   return queryResponse;
 }
 
@@ -261,6 +254,8 @@ export async function processFhirResponse(
   response: fetch.Response,
 ): Promise<FhirResource[]> {
   let resourceArray: FhirResource[] = [];
+  let resourceIds: string[] = [];
+
   if (response.status === 200) {
     const body = await response.json();
     if (body.entry) {
@@ -270,7 +265,11 @@ export async function processFhirResponse(
             "Entry in FHIR resource response parsing was of unexpected shape",
           );
         }
-        resourceArray.push(entry.resource);
+        // Add the resource only if the ID is unique to the resources being returned for the query
+        if (!resourceIds.includes(entry.resource.id)) {
+          resourceIds.push(entry.resource.id);
+          resourceArray.push(entry.resource);
+        }
       }
     }
   }

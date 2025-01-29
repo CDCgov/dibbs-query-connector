@@ -2,6 +2,7 @@ import React from "react";
 import { Icon } from "@trussworks/react-uswds";
 import styles from "./drawer.module.scss";
 import SearchField from "../searchField/SearchField";
+import classNames from "classnames";
 
 type DrawerProps = {
   title: string;
@@ -11,7 +12,7 @@ type DrawerProps = {
   isOpen: boolean;
   onSave: () => void;
   onClose: () => void;
-  onSearch?: () => void;
+  onSearch?: (searchFilter: string) => void;
 };
 
 /**
@@ -34,34 +35,43 @@ const Drawer: React.FC<DrawerProps> = ({
   toRender,
   onSearch,
 }: DrawerProps) => {
-  const handleClose = () => {
-    onClose();
-  };
-
   return (
     <>
       <div
         className={`${styles.drawer} ${isOpen ? styles.open : styles.closed}`}
         role="dialog"
+        data-testid={`drawer-open-${isOpen}`}
       >
-        <div className={styles.drawerContent}>
+        <div
+          className={classNames(
+            styles.drawerContent,
+            isOpen ? "display-block" : "display-none",
+          )}
+        >
           <button
             className={styles.closeButton}
             onClick={onClose}
             aria-label="Close drawer"
+            data-testid={"close-drawer"}
           >
             <Icon.Close size={3} aria-label="X icon indicating closure" />
           </button>
-          <h2 className="margin-0 padding-bottom-2">{title}</h2>
+          <h2
+            data-testid={`drawer-title-${title}`}
+            className="margin-0 padding-bottom-2"
+          >
+            {title}
+          </h2>
 
           {onSearch && (
-            <div className="padding-top-5">
+            <div>
               <SearchField
                 id="searchFieldTemplate"
                 placeholder={placeholder}
                 className={styles.searchField}
                 onChange={(e) => {
                   e.preventDefault();
+                  onSearch(e.target.value);
                 }}
               />
             </div>
@@ -70,7 +80,7 @@ const Drawer: React.FC<DrawerProps> = ({
         </div>
       </div>
 
-      {isOpen && <div className={styles.overlay} onClick={handleClose}></div>}
+      {isOpen && <div className={styles.overlay} onClick={onClose}></div>}
     </>
   );
 };

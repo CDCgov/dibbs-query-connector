@@ -1,39 +1,36 @@
-import {
-  Patient,
-  Observation,
-  DiagnosticReport,
-  Condition,
-  Encounter,
-  Medication,
-  MedicationAdministration,
-  MedicationRequest,
-  Immunization,
-} from "fhir/r4";
+import { FhirResource } from "fhir/r4";
 
 export const USE_CASE_DETAILS = {
   "newborn-screening": {
     queryName: "Newborn screening follow-up",
     condition: "Newborn Screening",
+    // These are the ID's defined in the vs_dump.sql file
+    id: "c025a247-0129-4f0c-a2c6-7f3af08e06b4",
   },
   syphilis: {
     queryName: "Syphilis case investigation",
     condition: "Congenital syphilis (disorder)",
+    id: "facfefc1-dd39-4f84-9d91-e924e860ad1c",
   },
   gonorrhea: {
     queryName: "Gonorrhea case investigation",
     condition: "Gonorrhea (disorder)",
+    id: "73e1a777-49cb-4e19-bc71-8c3fd3ffda64",
   },
   chlamydia: {
     queryName: "Chlamydia case investigation",
     condition: "Chlamydia trachomatis infection (disorder)",
+    id: "6edd14a2-ef78-4d8e-8509-0f87a7228d67",
   },
   cancer: {
     queryName: "Cancer case investigation",
     condition: "Cancer (Leukemia)",
+    id: "cf580d8d-cc7b-4eae-8a0d-96c36f9222e3",
   },
   immunization: {
     queryName: "Immunization",
     condition: "Immunization",
+    id: null,
   },
 } as const;
 
@@ -47,18 +44,7 @@ export type DemoDataFields = {
   MRN: string;
   Phone: string;
   FhirServer: string;
-  UseCase: USE_CASES;
 };
-
-/*Type to specify the different patient types*/
-export type PatientType =
-  | "cancer"
-  | "sti-chlamydia-positive"
-  | "sti-gonorrhea-positive"
-  | "newborn-screening-technical-fail"
-  | "newborn-screening-referral"
-  | "newborn-screening-pass"
-  | "sti-syphilis-positive";
 
 export const DEFAULT_DEMO_FHIR_SERVER = "Public HAPI: Direct";
 /*
@@ -71,87 +57,12 @@ export const hyperUnluckyPatient: DemoDataFields = {
   MRN: "8692756",
   Phone: "517-425-1398",
   FhirServer: DEFAULT_DEMO_FHIR_SERVER,
-  UseCase: "cancer", // UseCase will be updated per case
-};
-
-/*
-Demo patient data used to populate the form fields with each value being a type of DemoDataFields
-*/
-export const demoData: Record<PatientType, DemoDataFields> = {
-  cancer: { ...hyperUnluckyPatient, UseCase: "cancer" },
-  "sti-chlamydia-positive": { ...hyperUnluckyPatient, UseCase: "chlamydia" },
-  "sti-gonorrhea-positive": { ...hyperUnluckyPatient, UseCase: "gonorrhea" },
-  "sti-syphilis-positive": { ...hyperUnluckyPatient, UseCase: "syphilis" },
-  "newborn-screening-technical-fail": {
-    FirstName: "Mango",
-    LastName: "Smith",
-    DOB: "2024-07-12",
-    MRN: "67890",
-    Phone: "555-123-4567",
-    FhirServer: "HELIOS Meld: Direct",
-    UseCase: "newborn-screening",
-  },
-  "newborn-screening-referral": {
-    FirstName: "Watermelon",
-    LastName: "McGee",
-    DOB: "2024-07-12",
-    MRN: "18091",
-    Phone: "5555555555",
-    FhirServer: "HELIOS Meld: Direct",
-    UseCase: "newborn-screening",
-  },
-  "newborn-screening-pass": {
-    FirstName: "Cucumber",
-    LastName: "Hill",
-    DOB: "2023-08-29",
-    MRN: "18091",
-    Phone: "",
-    FhirServer: "CernerHelios: eHealthExchange",
-    UseCase: "newborn-screening",
-  },
 };
 
 // Define Option type
 type Option = {
   value: string;
   label: string;
-};
-
-/* Labels and values for the patient options that are available based on the query option selected */
-export const patientOptions: Record<string, Option[]> = {
-  cancer: [{ value: "cancer", label: "A patient with leukemia" }],
-  chlamydia: [
-    {
-      value: "sti-chlamydia-positive",
-      label: "A male patient with a positive chlamydia lab test",
-    },
-  ],
-  gonorrhea: [
-    {
-      value: "sti-gonorrhea-positive",
-      label: "A male patient with a positive gonorrhea lab test",
-    },
-  ],
-  "newborn-screening": [
-    {
-      value: "newborn-screening-technical-fail",
-      label: "A newborn with a technical failure on screening",
-    },
-    {
-      value: "newborn-screening-referral",
-      label: "A newborn with a hearing referral & risk indicator",
-    },
-    {
-      value: "newborn-screening-pass",
-      label: "A newborn with a passed screening",
-    },
-  ],
-  syphilis: [
-    {
-      value: "sti-syphilis-positive",
-      label: "A patient with a positive syphilis lab test",
-    },
-  ],
 };
 
 /*Labels and values for the state options dropdown on the query page*/
@@ -280,19 +191,6 @@ export const ersdToDibbsConceptMap: {
   sdtc: "conditions",
 };
 
-// Define the type guard for FHIR resources
-// Define the FHIR Resource types
-export type FhirResource =
-  | Patient
-  | Observation
-  | DiagnosticReport
-  | Condition
-  | Encounter
-  | Medication
-  | MedicationAdministration
-  | MedicationRequest
-  | Immunization;
-
 /**
  * A type guard function that checks if the given resource is a valid FHIR resource.
  * This ensures the resource has a `resourceType` field and is one of the allowed
@@ -336,12 +234,10 @@ export type FhirServerConfig = {
   disable_cert_validation: boolean;
 };
 
-export const INVALID_USE_CASE = `Invalid use_case. Please provide a valid use_case. Valid use_cases include ${Object.keys(
-  USE_CASE_DETAILS,
-)}.`;
+export const INVALID_QUERY = `Query identified in the id param not found in the set of saved queries. Please provide an ID that exists in the saved set of queries.`;
 export const INVALID_FHIR_SERVERS = `Invalid fhir_server. Please provide a valid fhir_server.`;
 export const RESPONSE_BODY_IS_NOT_PATIENT_RESOURCE =
   "Request body is not a Patient resource.";
-export const MISSING_API_QUERY_PARAM = "Missing use_case or fhir_server.";
+export const MISSING_API_QUERY_PARAM = "Missing id or fhir_server.";
 export const MISSING_PATIENT_IDENTIFIERS =
   "No patient identifiers to parse from requestBody.";

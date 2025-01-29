@@ -35,7 +35,7 @@ import { SelectedQueryDetails } from "../querySelection/utils";
 
 import "react-toastify/dist/ReactToastify.css";
 import {
-  getSavedQueryDetails,
+  getSavedQueryById,
   saveCustomQuery,
 } from "@/app/backend/query-building";
 import { groupValueSetsByConceptType } from "@/app/utils/valueSetTranslation";
@@ -118,14 +118,12 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
       if (selectedQuery.queryId === undefined) {
         return;
       }
-      const result = await getSavedQueryDetails(selectedQuery.queryId);
-
+      const result = await getSavedQueryById(selectedQuery.queryId);
       if (result === undefined) {
         return; // todo: error???
       }
-
       const initialState: NestedQuery = {};
-      const savedQuery = result[0]; // what is this shape, why first index
+      const savedQuery = result[0];
 
       Object.entries(savedQuery.query_data).forEach(
         ([conditionId, valueSetMap]) => {
@@ -209,7 +207,10 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
         conditionId,
       ]);
 
-      if (conditionValueSets === undefined) {
+      if (
+        conditionValueSets === undefined ||
+        conditionValueSets[conditionId] === undefined
+      ) {
         showToastConfirmation({
           heading: "Something went wrong",
           body: "Couldn't fetch condition value sets. Try again, or contact us if the error persists",
@@ -280,6 +281,7 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
         showToastConfirmation({
           heading: "Something went wrong",
           body: `${queryName} wasn't successfully created. Please try again or contact us if the error persists`,
+          variant: "error",
         });
       }
     }
@@ -289,22 +291,16 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
     <>
       <SiteAlert />
       <div className={classNames("main-container__wide", styles.mainContainer)}>
-        <Backlink
-          onClick={() => {
-            // TODO: this can be tidied up...
-            if (buildStep == "valueset") {
+        {buildStep === "valueset" ? (
+          <Backlink
+            onClick={() => {
               setBuildStep("condition");
-            } else {
-              goBack();
-            }
-          }}
-          // TODO: tidy this too
-          label={
-            buildStep == "valueset"
-              ? "Back to condition selection"
-              : "Back to My queries"
-          }
-        />
+            }}
+            label={"Back to condition selection"}
+          />
+        ) : (
+          <Backlink onClick={goBack} label={"Back to My queries"} />
+        )}
 
         <div className="customQuery__header">
           <h1 className={styles.queryTitle}>Custom query</h1>
@@ -327,6 +323,7 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
                 onChange={(event) => {
                   setQueryName(event.target.value);
                 }}
+                data-testid="queryNameInput"
               />
             </div>
             <div className={styles.customQuery__saveButton}>
@@ -334,7 +331,7 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
                 className="margin-0"
                 type={"button"}
                 title={
-                  buildStep == "valueset"
+                  buildStep === "valueset"
                     ? "Save query"
                     : formError.selectedConditions || formError.queryName
                       ? "Enter a query name and condition"
@@ -342,10 +339,11 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
                 }
                 disabled={formError.selectedConditions || !queryName || loading}
                 onClick={
-                  buildStep == "condition"
+                  buildStep === "condition"
                     ? handleCreateQueryClick
                     : handleSaveQuery
                 }
+                data-testid="createSaveQueryBtn"
               >
                 {buildStep == "condition" ? "Customize query" : "Save query"}
               </Button>
@@ -391,6 +389,9 @@ export default BuildFromTemplates;
 async function getValueSetsForSelectedConditions(conditionIds: string[]) {
   const conditionValueSets: ConditionIdToValueSetArrayMap = {};
 
+  if (conditionIds.length === 0) {
+    return {};
+  }
   // if there are new ids, we need to query the db
   const results = await getValueSetsAndConceptsByConditionIDs(conditionIds);
   const formattedResults =
