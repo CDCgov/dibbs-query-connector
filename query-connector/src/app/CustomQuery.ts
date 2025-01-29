@@ -41,13 +41,17 @@ export class CustomQuery {
    * @param jsonSpec A JSON Object containing four code fields to load.
    * @param patientId The ID of the patient to build into query strings.
    */
-  constructor(jsonSpec: CustomQuerySpec, patientId: string) {
+  constructor(
+    jsonSpec: CustomQuerySpec,
+    patientId: string,
+    includeImmunization = false,
+  ) {
     try {
       this.labCodes = jsonSpec?.labCodes || [];
       this.snomedCodes = jsonSpec?.snomedCodes || [];
       this.rxnormCodes = jsonSpec?.rxnormCodes || [];
       this.hasSecondEncounterQuery = jsonSpec?.hasSecondEncounterQuery || false;
-      this.compileQueries(patientId);
+      this.compileQueries(patientId, includeImmunization);
     } catch (error) {
       console.error("Could not create CustomQuery Object: ", error);
     }
@@ -60,7 +64,7 @@ export class CustomQuery {
    * any query built using those codes' filter will be left as the empty string.
    * @param patientId The ID of the patient to query for.
    */
-  compileQueries(patientId: string): void {
+  compileQueries(patientId: string, includeImmunization = false): void {
     const labsFilter = this.labCodes.join(",");
     const snomedFilter = this.snomedCodes.join(",");
     const rxnormFilter = this.rxnormCodes.join(",");
@@ -87,7 +91,9 @@ export class CustomQuery {
         ? `/Encounter?subject=${patientId}&reason-code=${snomedFilter}`
         : "";
 
-    this.immunizationQuery = `/Immunization?patient=${patientId}`;
+    this.immunizationQuery = includeImmunization
+      ? `/Immunization?patient=${patientId}`
+      : "";
   }
 
   /**

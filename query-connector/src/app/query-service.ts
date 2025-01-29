@@ -8,7 +8,7 @@ import { DibbsValueSet, isFhirResource } from "./constants";
 import { CustomQuery } from "./CustomQuery";
 import { GetPhoneQueryFormats } from "./format-service";
 import { formatValueSetsAsQuerySpec } from "./format-service";
-import { getFhirServerConfigs } from "./database-service";
+import { getFhirServerConfigs, getSavedQueryByName } from "./database-service";
 
 /**
  * The query response when the request source is from the Viewer UI.
@@ -150,6 +150,7 @@ export async function makeFhirQuery(
   }
 
   const patientId = queryResponse.Patient[0].id ?? "";
+  const savedQuery = await getSavedQueryByName(request.query_name);
 
   await generalizedQuery(
     request.query_name,
@@ -157,6 +158,7 @@ export async function makeFhirQuery(
     patientId,
     fhirClient,
     queryResponse,
+    savedQuery[0] ? savedQuery[0].immunization : false,
   );
 
   return queryResponse;
@@ -173,6 +175,7 @@ export async function makeFhirQuery(
  * @param patientId The ID of the patient for whom to search.
  * @param fhirClient The client used to communicate with the FHIR server.
  * @param queryResponse The response object for the query results.
+ * @param includeImmunization Whether to include immunization in the query execution
  * @returns A promise for an updated query response.
  */
 async function generalizedQuery(
@@ -181,9 +184,10 @@ async function generalizedQuery(
   patientId: string,
   fhirClient: FHIRClient,
   queryResponse: QueryResponse,
+  includeImmunization: boolean,
 ): Promise<QueryResponse> {
   const querySpec = await formatValueSetsAsQuerySpec(queryName, queryValueSets);
-  const builtQuery = new CustomQuery(querySpec, patientId);
+  const builtQuery = new CustomQuery(querySpec, patientId, includeImmunization);
   let response: fetch.Response | fetch.Response[];
 
   // Special cases for newborn screening, which just use one query
