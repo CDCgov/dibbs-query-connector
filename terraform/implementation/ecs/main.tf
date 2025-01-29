@@ -93,6 +93,22 @@ module "ecs" {
           name  = "ERSD_API_KEY"
           value = var.ersd_api_key
         },
+        {
+          name  = "AUTH_SECRET"
+          value = var.auth_secret
+        },
+        {
+          name  = "AUTH_KEYCLOAK_ID"
+          value = var.keycloak_client_id
+        },
+        {
+          name  = "AUTH_KEYCLOAK_SECRET"
+          value = var.keycloak_client_secret
+        },
+        {
+          name  = "AUTH_KEYCLOAK_ISSUER"
+          value = var.keycloak_url
+        },
       ]
     },
     keycloak = {

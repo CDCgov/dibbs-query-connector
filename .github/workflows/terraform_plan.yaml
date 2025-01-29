@@ -66,6 +66,10 @@ jobs:
           ERSD_API_KEY: ${{ secrets.ERSD_API_KEY}}
           TLS_CERT: ${{ secrets.TLS_CERT}}
           TLS_KEY: ${{ secrets.TLS_KEY}}
+          AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
+          KEYCLOAK_CLIENT_ID: ${{ secrets.KEYCLOAK_CLIENT_ID }}
+          KEYCLOAK_CLIENT_SECRET: ${{ secrets.KEYCLOAK_CLIENT_SECRET }}
+          KEYCLOAK_URL: https://${{ github.workspace == 'dev' && secrets.KEYCLOAK_URL || format('%s.%s', env.workspace, secrets.KEYCLOAK_URL) }}
         shell: bash
         run: |
           echo "Deploying to ${{ github.event.inputs.workspace }}..."
@@ -82,10 +86,18 @@ jobs:
             -var "umls_api_key=${UMLS_API_KEY}" \
             -var "ersd_api_key=${ERSD_API_KEY}" \
             -var "qc_tls_key=${TLS_KEY}" \
-            -var "qc_tls_cert=${TLS_CERT}"          
+            -var "qc_tls_cert=${TLS_CERT}" \
+            -var "auth_secret=${AUTH_SECRET}" \
+            -var "keycloak_client_id=${KEYCLOAK_CLIENT_ID}" \
+            -var "keycloak_client_secret=${KEYCLOAK_CLIENT_SECRET}" \
+            -var "keycloak_url=${KEYCLOAK_URL}" 
           terraform plan \
             -var-file="$WORKSPACE.tfvars" \
             -var "umls_api_key=${UMLS_API_KEY}" \
             -var "ersd_api_key=${ERSD_API_KEY}" \
             -var "qc_tls_key=${TLS_KEY}" \
-            -var "qc_tls_cert=${TLS_CERT}"
+            -var "qc_tls_cert=${TLS_CERT}" \
+            -var "auth_secret=${AUTH_SECRET}" \
+            -var "keycloak_client_id=${KEYCLOAK_CLIENT_ID}" \
+            -var "keycloak_client_secret=${KEYCLOAK_CLIENT_SECRET}" \
+            -var "keycloak_url=${KEYCLOAK_URL}"

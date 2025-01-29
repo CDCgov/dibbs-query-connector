@@ -83,10 +83,10 @@ variable "db_engine_version" {
   default     = "16.3"
 }
 
-variable "db_instance_class"{
-  type = string
+variable "db_instance_class" {
+  type        = string
   description = "The instance type of the RDS instance"
-  default = "db.t3.micro"
+  default     = "db.t3.micro"
 }
 
 
@@ -110,26 +110,49 @@ variable "cred_manager" {
 }
 
 variable "umls_api_key" {
-  type= string
+  type        = string
   description = "Key for the UMLS API"
-  sensitive = true
+  sensitive   = true
 }
 
 variable "ersd_api_key" {
-  type= string
+  type        = string
   description = "Key for the ERSD API"
-  sensitive = true
+  sensitive   = true
 }
 
 variable "qc_tls_key" {
-  type= string
+  type        = string
   description = "Key for the Cloudfare cert for domain: queryconnector.dev"
-  sensitive = true
+  sensitive   = true
 }
 
 variable "qc_tls_cert" {
-  type= string
+  type        = string
   description = "Certificate importing from Cloudfare: queryconnector.dev"
-  sensitive = true
+  sensitive   = true
 }
 
+variable "auth_secret" {
+  type        = string
+  description = "Secret for the Auth server"
+  sensitive   = true
+}
+
+variable "keycloak_client_id" {
+  type        = string
+  description = "Client ID for Keycloak"
+  sensitive   = true
+}
+
+variable "keycloak_client_secret" {
+  type        = string
+  description = "Client Secret for Keycloak"
+  sensitive   = true
+}
+
+variable "keycloak_url" {
+  type        = string
+  description = "URL for Keycloak"
+  sensitive   = true
+}
