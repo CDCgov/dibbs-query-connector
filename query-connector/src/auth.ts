@@ -44,10 +44,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         // Ensure user is in the database **only on first login**
         try {
           await addUserIfNotExists(userToken);
-          console.log("User successfully added to user_management");
-        } catch (error) {
-          console.error("Error adding user in JWT callback:", error);
-        }
+        } catch (error) {}
 
         return { ...token, ...userToken };
       }

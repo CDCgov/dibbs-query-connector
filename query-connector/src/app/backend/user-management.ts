@@ -21,8 +21,6 @@ export async function addUserIfNotExists(userToken: {
   firstName: string;
   lastName: string;
 }) {
-  console.log("addUserIfNotExists called with userToken:", userToken);
-
   if (!userToken || !userToken.username) {
     console.error("Invalid user token. Cannot add user.");
     return;
@@ -37,8 +35,6 @@ export async function addUserIfNotExists(userToken: {
     const checkUserQuery = `SELECT username FROM user_management WHERE username = $1;`;
     const userExists = await dbClient.query(checkUserQuery, [userIdentifier]);
 
-    console.log("Check user query result:", userExists.rows);
-
     if (userExists.rows.length > 0) {
       console.log("User already exists in user_management:", userIdentifier);
       return userExists.rows[0];
@@ -46,6 +42,7 @@ export async function addUserIfNotExists(userToken: {
 
     console.log("User not found. Proceeding to insert:", userIdentifier);
 
+    // TODO: Update the role based on the user's group in Keycloak
     const qc_role = "super-admin";
 
     const insertUserQuery = `
@@ -53,13 +50,6 @@ export async function addUserIfNotExists(userToken: {
       VALUES ($1, $2, $3, $4)
       RETURNING username, qc_role, first_name, last_name;
     `;
-
-    console.log("Executing insert query:", [
-      userIdentifier,
-      qc_role,
-      firstName,
-      lastName,
-    ]);
 
     const result = await dbClient.query(insertUserQuery, [
       userIdentifier,
