@@ -1,8 +1,8 @@
-import "../styles/styles.scss";
-import Header from "./query/components/header/header";
-import Footer from "./query/components/footer/footer";
+import "./ui/styles/styles.scss";
+import Header from "./ui/components/header/header";
+import Footer from "./ui/components/footer/footer";
 import { SessionProvider } from "next-auth/react";
-import DataProvider from "./DataProvider";
+import DataProvider from "./shared/DataProvider";
 import { Metadata } from "next";
 
 /**

@@ -5,7 +5,7 @@ import {
   QueryResponse,
   createBundle,
   APIQueryResponse,
-} from "../../query-service";
+} from "../../shared/query-service";
 import { parsePatientDemographics } from "./parsing-service";
 import {
   INVALID_FHIR_SERVERS,
@@ -15,10 +15,10 @@ import {
   MISSING_PATIENT_IDENTIFIERS,
   USE_CASE_DETAILS,
   USE_CASES,
-} from "../../constants";
+} from "../../shared/constants";
 
 import { handleRequestError } from "./error-handling-service";
-import { getFhirServerNames } from "@/app/database-service";
+import { getFhirServerNames } from "@/app/shared/database-service";
 import { getSavedQueryById } from "@/app/backend/query-building";
 
 /**
