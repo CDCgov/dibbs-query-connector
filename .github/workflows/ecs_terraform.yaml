@@ -96,7 +96,7 @@ jobs:
             -var "auth_secret=${AUTH_SECRET}" \
             -var "keycloak_client_id=${KEYCLOAK_CLIENT_ID}" \
             -var "keycloak_client_secret=${KEYCLOAK_CLIENT_SECRET}" \
-            -var "keycloak_url=${KEYCLOAK_URL}" 
+            -var "keycloak_url=${KEYCLOAK_URL}"
           terraform apply -auto-approve -replace="module.ecs.dockerless_remote_image.dibbs[\"query-connector\"]" \
             -var-file="$WORKSPACE.tfvars" \
             -var "umls_api_key=${UMLS_API_KEY}" \
