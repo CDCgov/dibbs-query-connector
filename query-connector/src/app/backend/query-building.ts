@@ -3,7 +3,7 @@
 import { getDbClient } from "./dbClient";
 import {
   NestedQuery,
-  QueryDetailsResult,
+  QueryTableResult,
   QueryUpdateResult,
 } from "../queryBuilding/utils";
 import { DibbsValueSet } from "../constants";
@@ -29,9 +29,9 @@ export async function getSavedQueryById(queryId: string) {
 
     if (result.rows.length === 0) {
       console.error("No results found for query id:", id);
-      return [];
+      return undefined;
     }
-    return result.rows as unknown as QueryDetailsResult[];
+    return result.rows[0] as unknown as QueryTableResult;
   } catch (error) {
     console.error("Error retrieving query", error);
     throw error;

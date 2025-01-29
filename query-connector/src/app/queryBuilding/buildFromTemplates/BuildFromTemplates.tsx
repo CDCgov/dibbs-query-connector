@@ -118,12 +118,11 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
       if (selectedQuery.queryId === undefined) {
         return;
       }
-      const result = await getSavedQueryById(selectedQuery.queryId);
-      if (result === undefined) {
-        return; // todo: error???
+      const savedQuery = await getSavedQueryById(selectedQuery.queryId);
+      if (savedQuery === undefined) {
+        return;
       }
       const initialState: NestedQuery = {};
-      const savedQuery = result[0];
 
       Object.entries(savedQuery.query_data).forEach(
         ([conditionId, valueSetMap]) => {

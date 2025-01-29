@@ -233,7 +233,7 @@ describe("tests the valueset selection page interactions", () => {
 
   it("filters search on the valueset selection drawer appropriately", async () => {
     const GONORREHEA_VALUESET_MAP = Object.values(
-      gonorreheaSavedQuery[0].query_data,
+      gonorreheaSavedQuery.query_data,
     )[0];
     const GONORREHEA_VALUESET_IDS = Object.keys(GONORREHEA_VALUESET_MAP);
 
