@@ -7,6 +7,7 @@ import { CategoryToConditionArrayMap, NestedQuery } from "../utils";
 import ConditionColumnDisplay from "../buildFromTemplates/ConditionColumnDisplay";
 import SearchField from "@/app/query/designSystem/searchField/SearchField";
 import { FormError } from "../buildFromTemplates/BuildFromTemplates";
+import { CONDITION_DRAWER_SEARCH_PLACEHOLDER } from "./constants";
 
 type ConditionSelectionProps = {
   categoryToConditionsMap: CategoryToConditionArrayMap;
@@ -63,7 +64,7 @@ export const ConditionSelection: React.FC<ConditionSelectionProps> = ({
       <div className={classNames(styles.conditionSelectionForm, "radius-lg")}>
         <SearchField
           id="conditionTemplateSearch"
-          placeholder="Search conditions"
+          placeholder={CONDITION_DRAWER_SEARCH_PLACEHOLDER}
           className={classNames(
             "maxw-mobile margin-x-auto margin-top-0 margin-bottom-4",
           )}
