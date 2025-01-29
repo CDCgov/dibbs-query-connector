@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Icon } from "@trussworks/react-uswds";
 import styles from "./drawer.module.scss";
 import SearchField from "../searchField/SearchField";
@@ -35,6 +35,19 @@ const Drawer: React.FC<DrawerProps> = ({
   toRender,
   onSearch,
 }: DrawerProps) => {
+  const [searchFilter, setSearchFilter] = useState("");
+
+  useEffect(() => {
+    if (onSearch) {
+      onSearch(searchFilter);
+    }
+  }, [searchFilter]);
+
+  function handleClose() {
+    setSearchFilter("");
+    onClose();
+  }
+
   return (
     <>
       <div
@@ -50,7 +63,7 @@ const Drawer: React.FC<DrawerProps> = ({
         >
           <button
             className={styles.closeButton}
-            onClick={onClose}
+            onClick={handleClose}
             aria-label="Close drawer"
             data-testid={"close-drawer"}
           >
@@ -69,18 +82,20 @@ const Drawer: React.FC<DrawerProps> = ({
                 id="searchFieldTemplate"
                 placeholder={placeholder}
                 className={styles.searchField}
+                value={searchFilter}
                 onChange={(e) => {
                   e.preventDefault();
-                  onSearch(e.target.value);
+                  setSearchFilter(e.target.value);
                 }}
               />
             </div>
           )}
+
           <div className="padding-top-2">{toRender}</div>
         </div>
       </div>
 
-      {isOpen && <div className={styles.overlay} onClick={onClose}></div>}
+      {isOpen && <div className={styles.overlay} onClick={handleClose}></div>}
     </>
   );
 };
