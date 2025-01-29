@@ -25,7 +25,7 @@ jest.mock("../../../shared/database-service", () => ({
   getValueSetsAndConceptsByConditionIDs: jest.fn(),
 }));
 
-jest.mock("../../backend/query-building", () => ({
+jest.mock("../../../backend/query-building", () => ({
   getSavedQueryById: jest.fn(),
 }));
 const mockSetData = jest.fn();
