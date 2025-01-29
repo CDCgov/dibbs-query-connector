@@ -40,6 +40,7 @@ export class CustomQuery {
    * currently located in the `customQueries` directory of the app.
    * @param jsonSpec A JSON Object containing four code fields to load.
    * @param patientId The ID of the patient to build into query strings.
+   * @param includeImmunization whether to include immunizations in the query
    */
   constructor(
     jsonSpec: CustomQuerySpec,
@@ -63,6 +64,7 @@ export class CustomQuery {
    * the provided spec (e.g. a Newborn Screening case will have no rxnorm codes),
    * any query built using those codes' filter will be left as the empty string.
    * @param patientId The ID of the patient to query for.
+   * @param includeImmunization whether to include the immunization
    */
   compileQueries(patientId: string, includeImmunization = false): void {
     const labsFilter = this.labCodes.join(",");
