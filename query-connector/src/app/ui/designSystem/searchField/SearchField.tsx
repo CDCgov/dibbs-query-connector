@@ -18,7 +18,8 @@ type SearchFieldProps = {
  * Defaults to "Search"
  * @param root0.onChange - change event listener
  * @param root0.className - optional styling classes
- * @param root0.value
+ * @param root0.value - value of the search field if it's to be a controlled
+ * component
  * @returns A search field component styled according to our design system
  */
 const SearchField: React.FC<SearchFieldProps> = ({
