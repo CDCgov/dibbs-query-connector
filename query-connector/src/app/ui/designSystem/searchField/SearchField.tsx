@@ -8,6 +8,7 @@ type SearchFieldProps = {
   placeholder?: string;
   onChange?: (e: ChangeEvent<HTMLInputElement>) => void;
   className?: string;
+  value?: string;
 };
 /**
  * A search component bar styled according to our design system
@@ -24,6 +25,7 @@ const SearchField: React.FC<SearchFieldProps> = ({
   placeholder,
   onChange,
   className,
+  value,
 }) => {
   return (
     <TextInput
@@ -32,6 +34,7 @@ const SearchField: React.FC<SearchFieldProps> = ({
       id={id}
       name={id}
       onChange={onChange}
+      value={value}
       className={classNames(styles.searchField, className)}
     ></TextInput>
   );

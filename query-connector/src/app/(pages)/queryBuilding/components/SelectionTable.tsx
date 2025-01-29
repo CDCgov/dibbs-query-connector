@@ -7,6 +7,7 @@ import { DibbsConceptType, DibbsValueSet } from "@/app/shared/constants";
 import { ConceptTypeToDibbsVsMap } from "@/app/utils/valueSetTranslation";
 import ConceptTypeAccordionHeader from "./SelectionViewAccordionHeader";
 import MultiAccordion from "@/app/ui/designSystem/MultiAccordion";
+import { EMPTY_CONCEPT_TYPE } from "../utils";
 
 type ConceptTypeSelectionTableProps = {
   vsTypeLevelOptions: ConceptTypeToDibbsVsMap;
@@ -31,11 +32,10 @@ export const ConceptTypeSelectionTable: React.FC<
 > = ({ vsTypeLevelOptions, handleVsTypeLevelUpdate, searchFilter }) => {
   const [expanded, setExpandedGroup] = useState<string>("");
   const [valueSetDisplay, setValueSetDisplay] =
-    useState<ConceptTypeToDibbsVsMap>(vsTypeLevelOptions);
+    useState<ConceptTypeToDibbsVsMap>(EMPTY_CONCEPT_TYPE);
 
   useEffect(() => {
     const casedSearchFilter = searchFilter.toLocaleLowerCase();
-
     const filteredValueSets = structuredClone(vsTypeLevelOptions);
 
     Object.entries(filteredValueSets).forEach(([vsType, vsDict]) => {
@@ -58,6 +58,10 @@ export const ConceptTypeSelectionTable: React.FC<
 
     setValueSetDisplay(filteredValueSets);
   }, [searchFilter]);
+
+  useEffect(() => {
+    setValueSetDisplay(vsTypeLevelOptions);
+  }, [vsTypeLevelOptions]);
 
   const generateTypeLevelAccordionItems = (vsType: DibbsConceptType) => {
     const handleVsNameLevelUpdate = handleVsTypeLevelUpdate(vsType);
@@ -93,11 +97,11 @@ export const ConceptTypeSelectionTable: React.FC<
       id: `${vsType}`,
       headingLevel: level,
       handleToggle,
-      length: Object.keys(vsTypeLevelOptions[vsType]).length,
+      length: Object.keys(valueSetDisplay[vsType]).length,
     };
   };
 
-  const accordionItems = Object.keys(vsTypeLevelOptions)
+  const accordionItems = Object.keys(valueSetDisplay)
     .map((vsType) => {
       return generateTypeLevelAccordionItems(vsType as DibbsConceptType);
     })
