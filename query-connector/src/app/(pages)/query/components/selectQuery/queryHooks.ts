@@ -28,6 +28,8 @@ export async function fetchQueryValueSets(queryName: string) {
  * query response
  * @param p.fhirServer - fhir server to do the querying against
  * @param p.setIsLoading - callback to update loading state
+ * @param p.valueSetOverrides - list of overrides from the customize query flow
+ * to not include in the final query execution
  */
 export async function fetchQueryResponse(p: {
   queryName: string;
