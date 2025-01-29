@@ -8,6 +8,7 @@ type SearchFieldProps = {
   placeholder?: string;
   onChange?: (e: ChangeEvent<HTMLInputElement>) => void;
   className?: string;
+  value?: string;
 };
 /**
  * A search component bar styled according to our design system
@@ -17,6 +18,8 @@ type SearchFieldProps = {
  * Defaults to "Search"
  * @param root0.onChange - change event listener
  * @param root0.className - optional styling classes
+ * @param root0.value - value of the search field if it's to be a controlled
+ * component
  * @returns A search field component styled according to our design system
  */
 const SearchField: React.FC<SearchFieldProps> = ({
@@ -24,6 +27,7 @@ const SearchField: React.FC<SearchFieldProps> = ({
   placeholder,
   onChange,
   className,
+  value,
 }) => {
   return (
     <TextInput
@@ -32,6 +36,7 @@ const SearchField: React.FC<SearchFieldProps> = ({
       id={id}
       name={id}
       onChange={onChange}
+      value={value}
       className={classNames(styles.searchField, className)}
     ></TextInput>
   );
