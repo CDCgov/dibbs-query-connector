@@ -112,6 +112,10 @@ module "ecs" {
         {
           name  = "KC_HTTP_RELATIVE_PATH"
           value = "/keycloak"
+        },
+        {
+          name  = "KC_PROXY_HEADERS"
+          value = "xforwarded"
         }
       ]
     }
