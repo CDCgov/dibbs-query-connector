@@ -5,7 +5,7 @@ import {
   Concept,
   ersdToDibbsConceptMap,
   DibbsValueSet,
-} from "../../constants";
+} from "../../shared/constants";
 import { ValueSet as FhirValueSet } from "fhir/r4";
 /**
  * Translates a VSAC FHIR bundle to our internal ValueSet struct

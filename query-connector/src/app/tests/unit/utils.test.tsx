@@ -1,9 +1,9 @@
 import {
   groupConditionConceptsIntoValueSets,
   unnestValueSetsFromQuery,
-} from "../../utils";
+} from "../../shared/utils";
 
-import { filterSearchByCategoryAndCondition } from "@/app/queryBuilding/utils";
+import { filterSearchByCategoryAndCondition } from "@/app/(pages)/queryBuilding/utils";
 import {
   CANCER_DB_QUERY_VALUES,
   CATEGORY_TO_CONDITION_ARRAY_MAP,

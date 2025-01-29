@@ -1,6 +1,6 @@
 import categoryToConditionArrayMap from "../assets/aphlCategoryMapping.json";
 import queryTableDefaults from "../../assets/dibbs_db_seed_query.json";
-import { CategoryToConditionArrayMap } from "@/app/queryBuilding/utils";
+import { CategoryToConditionArrayMap } from "@/app/(pages)/queryBuilding/utils";
 import { QueryResultRow } from "pg";
 
 export const CATEGORY_TO_CONDITION_ARRAY_MAP =

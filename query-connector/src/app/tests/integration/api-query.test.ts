@@ -7,7 +7,7 @@ import {
   MISSING_PATIENT_IDENTIFIERS,
   RESPONSE_BODY_IS_NOT_PATIENT_RESOURCE,
   USE_CASE_DETAILS,
-} from "@/app/constants";
+} from "@/app/shared/constants";
 import { NextRequest } from "next/server";
 
 // Utility function to create a minimal NextRequest-like object

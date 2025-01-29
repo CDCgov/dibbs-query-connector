@@ -1,6 +1,6 @@
-import { DibbsValueSet } from "../constants";
+import { DibbsValueSet } from "../shared/constants";
 import { CANCER_DB_QUERY_VALUES } from "../tests/unit/fixtures";
-import { groupConditionConceptsIntoValueSets } from "../utils";
+import { groupConditionConceptsIntoValueSets } from "../shared/utils";
 import {
   generateValueSetGroupingsByDibbsConceptType,
   groupValueSetsByConceptType,

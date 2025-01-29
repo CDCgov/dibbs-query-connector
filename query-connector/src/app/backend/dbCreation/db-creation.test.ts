@@ -1,4 +1,4 @@
-import { DibbsValueSet } from "@/app/constants";
+import { DibbsValueSet } from "@/app/shared/constants";
 import ExampleVsacValueSet from "../../tests/assets/VSACValueSet.json";
 import { ValueSet as FhirValueSet } from "fhir/r4";
 import { translateVSACToInternalValueSet } from "./lib";

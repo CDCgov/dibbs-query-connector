@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { TEST_URL } from "../playwright-setup";
-import { metadata } from "@/app/constants";
+import { metadata } from "@/app/shared/constants";
 
 test("landing page loads", async ({ page }) => {
   await page.goto(TEST_URL);
