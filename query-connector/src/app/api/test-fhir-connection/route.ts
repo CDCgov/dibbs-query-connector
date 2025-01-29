@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { testFhirServerConnection } from "../../query-service";
+import { testFhirServerConnection } from "../../shared/query-service";
 
 /**
  * Test FHIR connection

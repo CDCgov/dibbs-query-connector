@@ -5,9 +5,9 @@ import {
   NestedQuery,
   QueryDetailsResult,
   QueryUpdateResult,
-} from "../queryBuilding/utils";
-import { DibbsValueSet } from "../constants";
-import { DEFAULT_TIME_WINDOW } from "../utils";
+} from "../(pages)/queryBuilding/utils";
+import { DibbsValueSet } from "../shared/constants";
+import { DEFAULT_TIME_WINDOW } from "../shared/utils";
 import { randomUUID } from "crypto";
 const dbClient = getDbClient();
 
