@@ -12,6 +12,10 @@ type ConceptTypeAccordionBodyProps = {
   ) => (dibbsValueSets: DibbsValueSet) => void;
 };
 
+export type ConceptDisplay = Concept & {
+  render: boolean;
+};
+
 /**
  * An accordion body fragment
  * @param param0 - params
@@ -26,16 +30,21 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
 }) => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [curValueSet, setCurValueSet] = useState<DibbsValueSet>();
-  const [curConcepts, setCurConcepts] = useState<Concept[]>([]);
+  const [curConcepts, setCurConcepts] = useState<ConceptDisplay[]>([]);
 
   const handleViewCodes = (vs: DibbsValueSet) => {
     setCurValueSet(vs);
-    setCurConcepts(vs.concepts);
+    setCurConcepts(
+      vs.concepts.map((c) => {
+        return { ...c, render: true };
+      }),
+    );
+
     setIsDrawerOpen(true);
   };
 
   const handleConceptsChange = (
-    updatedConcepts: Concept[],
+    updatedConcepts: ConceptDisplay[],
     updateBatchSave = true,
   ) => {
     if (curValueSet) {
@@ -43,7 +52,9 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
         .map((c) => c.include)
         .some(Boolean);
       curValueSet.includeValueSet = shouldIncludeValueSet;
-      curValueSet.concepts = updatedConcepts;
+      curValueSet.concepts = updatedConcepts.map((c) => {
+        return { display: c.display, code: c.code, include: c.include };
+      });
 
       if (updateBatchSave) {
         handleVsIdLevelUpdate(curValueSet.valueSetId)(curValueSet);
@@ -86,6 +97,17 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
     });
     setIsDrawerOpen(false);
   };
+
+  function handleValueSetSearch(searchFilter: string) {
+    if (curValueSet) {
+      const filteredConcepts = filterValueSetConcepts(
+        searchFilter,
+        curValueSet,
+      );
+
+      setCurConcepts(filteredConcepts);
+    }
+  }
 
   return (
     <div>
@@ -135,25 +157,24 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
           </div>
         );
       })}
-      {curConcepts && curValueSet && (
-        <Drawer
-          title={curValueSet.valueSetName}
-          placeholder="Search by code or name"
-          toastMessage="Valueset concepts have been successfully modified."
-          toRender={
-            <ConceptSelection
-              concepts={curConcepts}
-              onConceptsChange={handleConceptsChange}
-            />
-          }
-          isOpen={isDrawerOpen}
-          onClose={() => {
-            setIsDrawerOpen(false);
-            setCurValueSet(undefined);
-          }}
-          onSave={handleSaveChanges}
-        />
-      )}
+      <Drawer
+        title={curValueSet?.valueSetName ?? ""}
+        placeholder="Search by code or name"
+        toastMessage="Valueset concepts have been successfully modified."
+        toRender={
+          <ConceptSelection
+            concepts={curConcepts}
+            onConceptsChange={handleConceptsChange}
+          />
+        }
+        isOpen={isDrawerOpen}
+        onClose={() => {
+          setIsDrawerOpen(false);
+          setCurValueSet(undefined);
+        }}
+        onSave={handleSaveChanges}
+        onSearch={handleValueSetSearch}
+      />
     </div>
   );
 };
@@ -169,5 +190,30 @@ const checkboxLabel = (dibbsVs: DibbsValueSet) => {
     </div>
   );
 };
+
+/**
+ * Helper function for search to filter out valuesets against a search param
+ * @param searchFilter - search string
+ * @param selectedValueSet - the active valueset displayed in the drawer
+ * @returns - a transformed list of concepts to display
+ */
+export function filterValueSetConcepts(
+  searchFilter: string,
+  selectedValueSet: DibbsValueSet,
+) {
+  const newConcepts = structuredClone(selectedValueSet.concepts);
+  const casedSearchFilter = searchFilter.toLocaleLowerCase();
+  return newConcepts.map((concept) => {
+    let toRender = false;
+    if (
+      concept.code.toLocaleLowerCase().includes(casedSearchFilter) ||
+      concept.display.toLocaleLowerCase().includes(casedSearchFilter)
+    ) {
+      toRender = true;
+    }
+
+    return { ...concept, render: toRender };
+  });
+}
 
 export default ConceptTypeAccordionBody;
