@@ -65,10 +65,14 @@ const dbClient = getDbClient();
  * or an error if no results can be found.
  */
 export const getValueSetsAndConceptsByConditionIDs = async (ids: string[]) => {
-  const escapedValues = ids.map((_, i) => `$${i + 1}`).join() + ")";
-  const queryString = getValueSetsByConditionIds + escapedValues;
-
   try {
+    if (ids.length === 0) {
+      throw Error("No condition ids passed in to query by");
+    }
+
+    const escapedValues = ids.map((_, i) => `$${i + 1}`).join() + ")";
+    const queryString = getValueSetsByConditionIds + escapedValues;
+
     const result = await dbClient.query(queryString, ids);
     if (result.rows.length === 0) {
       console.error("No results found for given condition ids", ids);
