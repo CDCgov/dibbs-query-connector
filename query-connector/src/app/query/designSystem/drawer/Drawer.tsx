@@ -64,7 +64,7 @@ const Drawer: React.FC<DrawerProps> = ({
           </h2>
 
           {onSearch && (
-            <div className="padding-top-5">
+            <div>
               <SearchField
                 id="searchFieldTemplate"
                 placeholder={placeholder}

@@ -16,6 +16,7 @@ import Drawer from "@/app/query/designSystem/drawer/Drawer";
 import { DibbsConceptType, DibbsValueSet } from "@/app/constants";
 import { showToastConfirmation } from "@/app/query/designSystem/toast/Toast";
 import SearchField from "@/app/query/designSystem/searchField/SearchField";
+import { CONDITION_DRAWER_SEARCH_PLACEHOLDER } from "./constants";
 
 type ConditionSelectionProps = {
   constructedQuery: NestedQuery;
@@ -222,7 +223,7 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
 
       <Drawer
         title="Add Condition(s)"
-        placeholder="Search conditions"
+        placeholder={CONDITION_DRAWER_SEARCH_PLACEHOLDER}
         toRender={conditionUpdate}
         toastMessage="Condition has been successfully added."
         isOpen={isDrawerOpen}

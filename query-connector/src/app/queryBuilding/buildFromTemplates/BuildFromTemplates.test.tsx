@@ -17,6 +17,7 @@ import { formatDiseaseDisplay } from "../utils";
 import { renderWithUser } from "@/app/tests/unit/setup";
 import { USE_CASE_DETAILS } from "@/app/constants";
 import { getSavedQueryById } from "@/app/backend/query-building";
+import { CONDITION_DRAWER_SEARCH_PLACEHOLDER } from "../components/constants";
 
 jest.mock("../../database-service", () => ({
   getCustomQueries: jest.fn(),
@@ -95,7 +96,7 @@ describe("tests the build from template page interactions", () => {
 
     // Name match
     await user.type(
-      screen.getByPlaceholderText("Search conditions"),
+      screen.getByPlaceholderText(CONDITION_DRAWER_SEARCH_PLACEHOLDER),
       "leukemia",
     );
     expect(screen.getByText("Cancer (Leukemia)")).toBeInTheDocument();
@@ -105,8 +106,13 @@ describe("tests the build from template page interactions", () => {
     ).not.toBeInTheDocument();
 
     // Category match
-    await user.clear(screen.getByPlaceholderText("Search conditions"));
-    await user.type(screen.getByPlaceholderText("Search conditions"), "can");
+    await user.clear(
+      screen.getByPlaceholderText(CONDITION_DRAWER_SEARCH_PLACEHOLDER),
+    );
+    await user.type(
+      screen.getByPlaceholderText(CONDITION_DRAWER_SEARCH_PLACEHOLDER),
+      "can",
+    );
 
     expect(
       screen.getByText("Malignant neoplastic disease"),
@@ -136,14 +142,17 @@ describe("tests the build from template page interactions", () => {
     ).toBeInTheDocument();
 
     // "can" (2 matches) --> "an" (3 matches, Gonorrehea matched on Sexually Transmitted)
-    await user.type(screen.getByPlaceholderText("Search conditions"), "can");
+    await user.type(
+      screen.getByPlaceholderText(CONDITION_DRAWER_SEARCH_PLACEHOLDER),
+      "can",
+    );
     expect(screen.getByText("Cancer (Leukemia)")).toBeInTheDocument();
     expect(
       screen.getByText("Malignant neoplastic disease"),
     ).toBeInTheDocument();
     expect(screen.queryByText(GONORREHEA_NAME)).not.toBeInTheDocument();
     await user.type(
-      screen.getByPlaceholderText("Search conditions"),
+      screen.getByPlaceholderText(CONDITION_DRAWER_SEARCH_PLACEHOLDER),
       "[ArrowLeft][ArrowLeft][Backspace]",
     );
     expect(screen.getByText(GONORREHEA_NAME)).toBeInTheDocument();
@@ -151,17 +160,22 @@ describe("tests the build from template page interactions", () => {
     expect(
       screen.getByText("Malignant neoplastic disease"),
     ).toBeInTheDocument();
-    await user.clear(screen.getByPlaceholderText("Search conditions"));
+    await user.clear(
+      screen.getByPlaceholderText(CONDITION_DRAWER_SEARCH_PLACEHOLDER),
+    );
 
     // "can" (2 matches) --> "" (3 matches, testing the empty string case)
-    await user.type(screen.getByPlaceholderText("Search conditions"), "can");
+    await user.type(
+      screen.getByPlaceholderText(CONDITION_DRAWER_SEARCH_PLACEHOLDER),
+      "can",
+    );
     expect(screen.getByText("Cancer (Leukemia)")).toBeInTheDocument();
     expect(
       screen.getByText("Malignant neoplastic disease"),
     ).toBeInTheDocument();
     expect(screen.queryByText(GONORREHEA_NAME)).not.toBeInTheDocument();
     await user.type(
-      screen.getByPlaceholderText("Search conditions"),
+      screen.getByPlaceholderText(CONDITION_DRAWER_SEARCH_PLACEHOLDER),
       "[Backspace][Backspace][Backspace]",
     );
     expect(screen.getByText(GONORREHEA_NAME)).toBeInTheDocument();
@@ -169,11 +183,18 @@ describe("tests the build from template page interactions", () => {
     expect(
       screen.getByText("Malignant neoplastic disease"),
     ).toBeInTheDocument();
-    await user.clear(screen.getByPlaceholderText("Search conditions"));
+    await user.clear(
+      screen.getByPlaceholderText(CONDITION_DRAWER_SEARCH_PLACEHOLDER),
+    );
 
     // Reset state
-    await user.type(screen.getByPlaceholderText("Search conditions"), "leuk");
-    await user.clear(screen.getByPlaceholderText("Search conditions"));
+    await user.type(
+      screen.getByPlaceholderText(CONDITION_DRAWER_SEARCH_PLACEHOLDER),
+      "leuk",
+    );
+    await user.clear(
+      screen.getByPlaceholderText(CONDITION_DRAWER_SEARCH_PLACEHOLDER),
+    );
     expect(screen.getByText(GONORREHEA_NAME)).toBeInTheDocument();
     expect(screen.getByText("Cancer (Leukemia)")).toBeInTheDocument();
     expect(
@@ -200,8 +221,9 @@ describe("tests the valueset selection page interactions", () => {
     await waitFor(() => screen.getByText("Save query"));
     await user.click(screen.getByTestId("add-left-rail"));
 
-    const drawerConditionsSearch =
-      screen.getByPlaceholderText("Search conditions");
+    const drawerConditionsSearch = screen.getByPlaceholderText(
+      CONDITION_DRAWER_SEARCH_PLACEHOLDER,
+    );
     expect(drawerConditionsSearch).toBeVisible();
 
     const CANCER_NAME = "Cancer (Leukemia)";
