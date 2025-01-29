@@ -28,7 +28,6 @@ services:
 
   # Next.js app with Flyway
   query-connector:
-    platform: linux/amd64
     build:
       context: .
       dockerfile: Dockerfile
