@@ -22,9 +22,9 @@ module "vpc" {
 }
 
 module "ecs" {
-  source  = "CDCgov/dibbs-ecr-viewer/aws"
-  version = "0.3.0"
-
+  # source  = "CDCgov/dibbs-ecr-viewer/aws"
+  # version = "0.3.0"
+  source = "git::https://github.com/CDCgov/terraform-aws-dibbs-ecr-viewer.git?ref=38a6a8213d3fa07ed9e523d0ef0311038d9b72bf"
   public_subnet_ids  = flatten(module.vpc.public_subnets)
   private_subnet_ids = flatten(module.vpc.private_subnets)
   vpc_id             = module.vpc.vpc_id
@@ -39,6 +39,7 @@ module "ecs" {
 
   service_data = {
     query-connector = {
+      root_service   = true,
       short_name     = "qc",
       fargate_cpu    = 512,
       fargate_memory = 1024,
