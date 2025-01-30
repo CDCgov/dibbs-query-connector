@@ -11,7 +11,7 @@ import {
   formatString,
   FormatPhoneAsDigits,
   GetPhoneQueryFormats,
-} from "@/app/format-service";
+} from "@/app/shared/format-service";
 import {
   Address,
   HumanName,
