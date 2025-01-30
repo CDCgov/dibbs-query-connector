@@ -150,6 +150,27 @@ describe("formatMRN", () => {
     const { container } = render(formatMRN(identifiers));
     expect(container).toBeEmptyDOMElement();
   });
+
+  it("should display assigner if available", () => {
+    const identifiers: Identifier[] = [
+      {
+        value: "67890",
+        type: {
+          coding: [
+            {
+              code: "MR",
+            },
+          ],
+        },
+        assigner: {
+          display: "Test Hospital",
+        },
+      },
+    ];
+
+    const { getByText } = render(formatMRN(identifiers));
+    expect(getByText("Test Hospital: 67890")).toBeInTheDocument();
+  });
 });
 
 describe("formatIdentifier", () => {
@@ -179,18 +200,30 @@ describe("formatIdentifier", () => {
           ],
         },
       },
+      {
+        value: "0123456789",
+        type: {
+          coding: [
+            {
+              code: "DL",
+              system: "urn:ietf:rfc:3987",
+              display: "Driver's License Number",
+            },
+          ],
+        },
+        assigner: { display: "Some State" },
+      },
     ];
 
     const { getByText } = render(formatIdentifier(identifiers));
-    // Turn off exact matching because the presence of the id_type breaks
-    // the value across multiple elements
-    expect(getByText("999-99-9999", { exact: false })).toBeInTheDocument();
     expect(
-      getByText("Social Security Number", { exact: false }),
+      getByText("Social Security Number: 999-99-9999")
     ).toBeInTheDocument();
-    expect(getByText("0123456789", { exact: false })).toBeInTheDocument();
     expect(
-      getByText("Internal Reference Identifier", { exact: false }),
+      getByText("Internal Reference Identifier: 0123456789")
+    ).toBeInTheDocument();
+    expect(
+      getByText("Driver's License Number: Some State: 0123456789")
     ).toBeInTheDocument();
   });
 
@@ -219,7 +252,7 @@ describe("formatIdentifier", () => {
     ];
 
     render(formatIdentifier(identifiers));
-    expect(screen.getByText(": 999-99-9999")).toBeInTheDocument();
+    expect(screen.getByText("999-99-9999")).toBeInTheDocument();
   });
 
   it("should handle an empty identifier array without breaking", () => {
