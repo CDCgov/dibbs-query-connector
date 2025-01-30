@@ -610,6 +610,7 @@ export const gonorreheaSavedQuery: QueryDetailsResult[] = [
     query_id: "73e1a777-49cb-4e19-bc71-8c3fd3ffda64",
     query_name: "Gonorrhea case investigation",
     conditions_list: ["15628003"],
+    immunization: false,
     query_data: {
       "15628003": {
         "2.16.840.1.113762.1.4.1146.1036_20190605": {

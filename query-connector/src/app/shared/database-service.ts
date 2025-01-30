@@ -37,7 +37,7 @@ import {
 import { getDbClient } from "../backend/dbClient";
 
 const getQuerybyNameSQL = `
-select q.query_name, q.id, q.query_data, q.conditions_list
+select q.query_name, q.id, q.query_data, q.conditions_list, q.immunization
   from query q 
   where q.query_name = $1;
 `;
