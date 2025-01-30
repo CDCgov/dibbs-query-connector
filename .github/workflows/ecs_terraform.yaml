@@ -66,7 +66,7 @@ jobs:
           AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
           KEYCLOAK_CLIENT_ID: ${{ secrets.KEYCLOAK_CLIENT_ID }}
           KEYCLOAK_CLIENT_SECRET: ${{ secrets.KEYCLOAK_CLIENT_SECRET }}
-          KEYCLOAK_URL: https://${{ github.workspace == 'dev' && secrets.KEYCLOAK_URL || format('%s.%s', env.workspace, secrets.KEYCLOAK_URL) }}
+          KEYCLOAK_URL: ${{ env.workspace == 'dev' && format('https://{0}', secrets.KEYCLOAK_URL) || format('https://{0}.{1}', env.workspace, secrets.KEYCLOAK_URL) }}
         shell: bash
         run: |
           rm -rf .terraform .terraform.lock.hcl
