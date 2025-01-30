@@ -26,21 +26,21 @@ export async function addUserIfNotExists(userToken: {
     return;
   }
 
-  const { username, email, firstName, lastName } = userToken;
+  const { id, username, email, firstName, lastName } = userToken;
   const userIdentifier = username || email;
 
   try {
-    console.log("Checking if user exists:", userIdentifier);
+    console.log("Checking if user exists:", id);
 
     const checkUserQuery = `SELECT username FROM user_management WHERE username = $1;`;
     const userExists = await dbClient.query(checkUserQuery, [userIdentifier]);
 
     if (userExists.rows.length > 0) {
-      console.log("User already exists in user_management:", userIdentifier);
+      console.log("User already exists in user_management:", id);
       return userExists.rows[0];
     }
 
-    console.log("User not found. Proceeding to insert:", userIdentifier);
+    console.log("User not found. Proceeding to insert:", id);
 
     // TODO: Update the role based on the user's group in Keycloak
     const qc_role = "super-admin";
@@ -58,7 +58,7 @@ export async function addUserIfNotExists(userToken: {
       lastName,
     ]);
 
-    console.log("User added to user_management:", result.rows[0]);
+    console.log("User added to user_management", id);
     return result.rows[0];
   } catch (error) {
     console.error("Error adding user to user_management:", error);
