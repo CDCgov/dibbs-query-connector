@@ -309,9 +309,7 @@ function readJsonFromRelativePath(filename: string) {
   try {
     // Re-scope file system reads to make sure we use the relative
     // path via node directory resolution
-    const runtimeServerPath = path.resolve(
-      path.join(__dirname, "/", "..", "/", "assets", "/", filename),
-    );
+    const runtimeServerPath = path.join("/app/assets", filename);
     const data = fs.readFileSync(runtimeServerPath, "utf-8");
     return data;
   } catch (error) {
