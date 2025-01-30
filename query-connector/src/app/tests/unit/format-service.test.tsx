@@ -217,13 +217,13 @@ describe("formatIdentifier", () => {
 
     const { getByText } = render(formatIdentifier(identifiers));
     expect(
-      getByText("Social Security Number: 999-99-9999")
+      getByText("Social Security Number: 999-99-9999"),
     ).toBeInTheDocument();
     expect(
-      getByText("Internal Reference Identifier: 0123456789")
+      getByText("Internal Reference Identifier: 0123456789"),
     ).toBeInTheDocument();
     expect(
-      getByText("Driver's License Number: Some State: 456")
+      getByText("Driver's License Number: Some State: 456"),
     ).toBeInTheDocument();
   });
 
