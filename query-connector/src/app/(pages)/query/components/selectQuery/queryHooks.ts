@@ -13,8 +13,14 @@ type SetStateCallback<T> = React.Dispatch<React.SetStateAction<T>>;
  */
 export async function fetchQueryValueSets(queryName: string) {
   const queryResults = await getSavedQueryByName(queryName);
-  const valueSets = unnestValueSetsFromQuery(queryResults);
+  if (queryResults === undefined) {
+    console.error(
+      `Query by name ${queryName} not found. Returning no value sets`,
+    );
+    return [];
+  }
 
+  const valueSets = unnestValueSetsFromQuery(queryResults);
   return valueSets;
 }
 

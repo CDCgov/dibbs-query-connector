@@ -1,37 +1,24 @@
 import { QueryResultRow } from "pg";
 import { DibbsValueSet } from "./constants";
-
-type QueryTableQueryDataColumn = {
-  [condition_name: string]: {
-    [valueSetId: string]: DibbsValueSet;
-  };
-};
+import { QueryDataColumn } from "../(pages)/queryBuilding/utils";
 
 /**
  * Maps the results returned from the DIBBs query table into their associated
  * valueSets, each containing one or more Concepts build out
  * of the coding information in the DB.
- * @param rows The Rows returned from the ValueSet table.
+ * @param result The Rows returned from the ValueSet table.
  * @returns A list of ValueSets, which hold the Concepts pulled from the DB.
  */
-export const unnestValueSetsFromQuery = (
-  rows: QueryResultRow[],
-): DibbsValueSet[] => {
+export function unnestValueSetsFromQuery<
+  T extends { query_data: QueryDataColumn },
+>(result: T): DibbsValueSet[] {
   // Unest the {condition: valuesetId: valueSet} nesting in an array of valueSets
-  const valueSets = rows
-    .map((curRow) => {
-      const valueSetsByCondition =
-        curRow.query_data as QueryTableQueryDataColumn;
-      const valueSetsById = Object.values(valueSetsByCondition);
-      return valueSetsById.map((valById) => {
-        return Object.values(valById);
-      });
+  return Object.values(result.query_data)
+    .map((valById) => {
+      return Object.values(valById);
     })
-    .flat()
     .flat();
-
-  return valueSets;
-};
+}
 /**
  * Maps the results returned from the DIBBs value set and coding system database
  * into a collection of value sets, each containing one or more Concepts build out

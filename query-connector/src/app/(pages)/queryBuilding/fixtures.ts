@@ -1,4 +1,4 @@
-import { QueryDetailsResult } from "./utils";
+import { QueryTableResult } from "./utils";
 
 // Fixture shortened significantly for maintenance purposes
 export const DEFAULT_QUERIES = [
@@ -605,133 +605,126 @@ export const cancerValueSets = [
   },
 ];
 
-export const gonorreheaSavedQuery: QueryDetailsResult[] = [
-  {
-    query_id: "73e1a777-49cb-4e19-bc71-8c3fd3ffda64",
-    query_name: "Gonorrhea case investigation",
-    conditions_list: ["15628003"],
-    immunization: false,
-    query_data: {
-      "15628003": {
-        "2.16.840.1.113762.1.4.1146.1036_20190605": {
-          valueSetId: "2.16.840.1.113762.1.4.1146.1036_20190605",
-          valueSetVersion: "20190605",
-          valueSetName:
-            "Gonorrhea [Neisseria species Unspecified] (Organism or Substance in Lab Results)",
-          valueSetExternalId: "2.16.840.1.113762.1.4.1146.1036",
-          author: "CSTE Steward",
-          system: "http://snomed.info/sct",
-          ersdConceptType: "labs",
-          dibbsConceptType: "labs",
-          includeValueSet: true,
-          concepts: [
-            {
-              code: "715869002",
-              display:
-                "Neisseria species, not Neisseria meningitidis (organism)",
-              include: true,
-            },
-            {
-              code: "414811005",
-              display: "Neisseria species not Neisseria gonococci (organism)",
-              include: true,
-            },
-            {
-              code: "59083001",
-              display: "Genus Neisseria (organism)",
-              include: true,
-            },
-            {
-              code: "715872009",
-              display:
-                "Neisseria species, not Neisseria gonorrhoeae and not Neisseria meningitidis (organism)",
-              include: true,
-            },
-          ],
-        },
-        "2.16.840.1.113762.1.4.1146.169_20230602": {
-          valueSetId: "2.16.840.1.113762.1.4.1146.169_20230602",
-          valueSetVersion: "20230602",
-          valueSetName:
-            "Gonorrhea [Neisseria gonorrhoeae] (Organism or Substance in Lab Results)",
-          valueSetExternalId: "2.16.840.1.113762.1.4.1146.169",
-          author: "CSTE Steward",
-          system: "http://snomed.info/sct",
-          ersdConceptType: "labs",
-          dibbsConceptType: "labs",
-          includeValueSet: true,
-          concepts: [
-            {
-              code: "277504006",
-              display:
-                "Spectinomycin-resistant Neisseria gonorrhoeae (organism)",
-              include: true,
-            },
-            {
-              code: "120977006",
-              display: "Antigen of Neisseria gonorrhoeae (substance)",
-              include: true,
-            },
-            {
-              code: "703483000",
-              display:
-                "Deoxyribonucleic acid of Neisseria gonorrhoeae (substance)",
-              include: true,
-            },
-            {
-              code: "277501003",
-              display:
-                "Penicillinase-producing Neisseria gonorrhoeae (organism)",
-              include: true,
-            },
-            {
-              code: "409805000",
-              display:
-                "Fluoroquinolone-resistant Neisseria gonorrhoeae (organism)",
-              include: true,
-            },
-            {
-              code: "277502005",
-              display:
-                "Tetracycline-resistant Neisseria gonorrhoeae (organism)",
-              include: true,
-            },
-            {
-              code: "469831000124106",
-              display: "Neisseria gonorrhoeae subspecies kochii (organism)",
-              include: true,
-            },
-            {
-              code: "454421000124100",
-              display: "Neisseria gonorrhoeae nucleic acid detected (finding)",
-              include: true,
-            },
-            {
-              code: "121172006",
-              display:
-                "Ribosomal ribonucleic acid of Neisseria gonorrhoeae (substance)",
-              include: true,
-            },
-            {
-              code: "68704007",
-              display: "Neisseria gonorrhoeae (organism)",
-              include: true,
-            },
-            {
-              code: "277503000",
-              display:
-                "Cephalosporin-resistant Neisseria gonorrhoeae (organism)",
-              include: true,
-            },
-            {
-              code: "414809001",
-              display:
-                "Neisseria gonorrhoeae, beta lactamase negative (organism)",
-              include: true,
-            },
-          ],
-        },
+export const gonorreheaSavedQuery: QueryTableResult = {
+  query_id: "73e1a777-49cb-4e19-bc71-8c3fd3ffda64",
+  query_name: "Gonorrhea case investigation",
+  conditions_list: ["15628003"],
+  query_data: {
+    "15628003": {
+      "2.16.840.1.113762.1.4.1146.1036_20190605": {
+        valueSetId: "2.16.840.1.113762.1.4.1146.1036_20190605",
+        valueSetVersion: "20190605",
+        valueSetName:
+          "Gonorrhea [Neisseria species Unspecified] (Organism or Substance in Lab Results)",
+        valueSetExternalId: "2.16.840.1.113762.1.4.1146.1036",
+        author: "CSTE Steward",
+        system: "http://snomed.info/sct",
+        ersdConceptType: "labs",
+        dibbsConceptType: "labs",
+        includeValueSet: true,
+        concepts: [
+          {
+            code: "715869002",
+            display: "Neisseria species, not Neisseria meningitidis (organism)",
+            include: true,
+          },
+          {
+            code: "414811005",
+            display: "Neisseria species not Neisseria gonococci (organism)",
+            include: true,
+          },
+          {
+            code: "59083001",
+            display: "Genus Neisseria (organism)",
+            include: true,
+          },
+          {
+            code: "715872009",
+            display:
+              "Neisseria species, not Neisseria gonorrhoeae and not Neisseria meningitidis (organism)",
+            include: true,
+          },
+        ],
+      },
+      "2.16.840.1.113762.1.4.1146.169_20230602": {
+        valueSetId: "2.16.840.1.113762.1.4.1146.169_20230602",
+        valueSetVersion: "20230602",
+        valueSetName:
+          "Gonorrhea [Neisseria gonorrhoeae] (Organism or Substance in Lab Results)",
+        valueSetExternalId: "2.16.840.1.113762.1.4.1146.169",
+        author: "CSTE Steward",
+        system: "http://snomed.info/sct",
+        ersdConceptType: "labs",
+        dibbsConceptType: "labs",
+        includeValueSet: true,
+        concepts: [
+          {
+            code: "277504006",
+            display: "Spectinomycin-resistant Neisseria gonorrhoeae (organism)",
+            include: true,
+          },
+          {
+            code: "120977006",
+            display: "Antigen of Neisseria gonorrhoeae (substance)",
+            include: true,
+          },
+          {
+            code: "703483000",
+            display:
+              "Deoxyribonucleic acid of Neisseria gonorrhoeae (substance)",
+            include: true,
+          },
+          {
+            code: "277501003",
+            display: "Penicillinase-producing Neisseria gonorrhoeae (organism)",
+            include: true,
+          },
+          {
+            code: "409805000",
+            display:
+              "Fluoroquinolone-resistant Neisseria gonorrhoeae (organism)",
+            include: true,
+          },
+          {
+            code: "277502005",
+            display: "Tetracycline-resistant Neisseria gonorrhoeae (organism)",
+            include: true,
+          },
+          {
+            code: "469831000124106",
+            display: "Neisseria gonorrhoeae subspecies kochii (organism)",
+            include: true,
+          },
+          {
+            code: "454421000124100",
+            display: "Neisseria gonorrhoeae nucleic acid detected (finding)",
+            include: true,
+          },
+          {
+            code: "121172006",
+            display:
+              "Ribosomal ribonucleic acid of Neisseria gonorrhoeae (substance)",
+            include: true,
+          },
+          {
+            code: "68704007",
+            display: "Neisseria gonorrhoeae (organism)",
+            include: true,
+          },
+          {
+            code: "277503000",
+            display: "Cephalosporin-resistant Neisseria gonorrhoeae (organism)",
+            include: true,
+          },
+          {
+            code: "414809001",
+            display:
+              "Neisseria gonorrhoeae, beta lactamase negative (organism)",
+            include: true,
+          },
+        ],
       },
     },
   },
-];
+  immunization: false,
+};
