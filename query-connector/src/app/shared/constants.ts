@@ -28,9 +28,9 @@ export const USE_CASE_DETAILS = {
     id: "cf580d8d-cc7b-4eae-8a0d-96c36f9222e3",
   },
   immunization: {
-    queryName: "Immunization",
-    condition: "Immunization",
-    id: null,
+    queryName: "Immunization query",
+    condition: "",
+    id: "e858cba3-59f6-4bc8-9a1e-28fac21c5813",
   },
 } as const;
 

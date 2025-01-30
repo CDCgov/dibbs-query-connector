@@ -726,4 +726,5 @@ export const gonorreheaSavedQuery: QueryTableResult = {
       },
     },
   },
+  immunization: false,
 };

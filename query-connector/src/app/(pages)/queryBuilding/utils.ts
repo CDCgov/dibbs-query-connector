@@ -37,6 +37,7 @@ export type QueryTableResult = {
   query_id: string;
   query_data: QueryDataColumn;
   conditions_list: string[];
+  immunization: boolean;
 };
 
 export const EMPTY_QUERY_SELECTION = {
