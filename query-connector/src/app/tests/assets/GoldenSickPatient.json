@@ -63,10 +63,6 @@
                 "valueString": "Hispanic or Latino"
               }
             ]
-          },
-          {
-            "url": "http://hl7.org/fhir/us/core/StructureDefinition/us-core-birthsex",
-            "valueCode": "M"
           }
         ],
         "identifier": [
@@ -90,10 +86,7 @@
         "name": [
           {
             "family": "Unlucky",
-            "given": [
-              "Hyper",
-              "A."
-            ],
+            "given": ["Hyper", "A."],
             "period": {
               "start": "1975-12-06",
               "end": "2020-01-22"
@@ -115,9 +108,7 @@
         "birthDate": "1975-12-06",
         "address": [
           {
-            "line": [
-              "49 Meadow St"
-            ],
+            "line": ["49 Meadow St"],
             "city": "Lansing",
             "state": "MI",
             "postalCode": "48864",
@@ -128,9 +119,7 @@
             }
           },
           {
-            "line": [
-              "183 Mountain View St"
-            ],
+            "line": ["183 Mountain View St"],
             "city": "Lansing",
             "state": "MI",
             "postalCode": "48901",
@@ -179,20 +168,14 @@
         "name": [
           {
             "family": "Pocondriac",
-            "given": [
-              "Hai"
-            ],
-            "prefix": [
-              "Dr"
-            ]
+            "given": ["Hai"],
+            "prefix": ["Dr"]
           }
         ],
         "address": [
           {
             "use": "home",
-            "line": [
-              "4531 Marketplace Drive"
-            ],
+            "line": ["4531 Marketplace Drive"],
             "city": "Lansing",
             "state": "MI",
             "postalCode": "48893"
@@ -265,9 +248,7 @@
         ],
         "address": [
           {
-            "line": [
-              "2034 West Main St"
-            ],
+            "line": ["2034 West Main St"],
             "city": "Hamersville",
             "state": "OH",
             "postalCode": "45130",

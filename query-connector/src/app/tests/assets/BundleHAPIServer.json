@@ -57,9 +57,7 @@
           {
             "use": "official",
             "family": "Smith",
-            "given": [
-              "Mango"
-            ]
+            "given": ["Mango"]
           }
         ],
         "telecom": [
@@ -72,9 +70,7 @@
         "address": [
           {
             "use": "home",
-            "line": [
-              "123 Fake Street"
-            ],
+            "line": ["123 Fake Street"],
             "city": "Faketown",
             "state": "CA",
             "postalCode": "12345",
@@ -597,9 +593,7 @@
             "use": "official",
             "text": "HILL, CUCUMBER",
             "family": "HILL",
-            "given": [
-              "CUCUMBER"
-            ],
+            "given": ["CUCUMBER"],
             "period": {
               "start": "2023-08-29T16:00:28.000Z"
             }
@@ -631,9 +625,7 @@
             "id": "CI-24375992-0",
             "use": "home",
             "text": "551 MAIN ST\nKANSAS CITY, MO 64003\nUS",
-            "line": [
-              "551 MAIN ST"
-            ],
+            "line": ["551 MAIN ST"],
             "city": "KANSAS CITY",
             "district": "Jackson",
             "state": "MO",
@@ -687,9 +679,7 @@
               "use": "official",
               "text": "HILL, ORANGE",
               "family": "HILL",
-              "given": [
-                "ORANGE"
-              ],
+              "given": ["ORANGE"],
               "period": {
                 "start": "2023-09-01T13:38:07.000Z"
               }
@@ -729,9 +719,7 @@
             "address": {
               "use": "home",
               "text": "551 MAIN ST\nKANSAS CITY, MO 64030\nUS",
-              "line": [
-                "551 MAIN ST"
-              ],
+              "line": ["551 MAIN ST"],
               "city": "KANSAS CITY",
               "district": "Jackson",
               "state": "MO",
@@ -771,9 +759,7 @@
               "use": "official",
               "text": "HILL, ORANGE",
               "family": "HILL",
-              "given": [
-                "ORANGE"
-              ],
+              "given": ["ORANGE"],
               "period": {
                 "start": "2023-08-29T16:00:28.000Z"
               }
@@ -798,9 +784,7 @@
             "address": {
               "use": "home",
               "text": "551 Main St\nKansas City, MO 64030\nUS",
-              "line": [
-                "551 Main St"
-              ],
+              "line": ["551 Main St"],
               "city": "Kansas City",
               "district": "Jackson",
               "state": "MO",
@@ -5992,9 +5976,7 @@
         ],
         "address": [
           {
-            "line": [
-              "2034 West Main St"
-            ],
+            "line": ["2034 West Main St"],
             "city": "Hamersville",
             "state": "OH",
             "postalCode": "45130",
@@ -6042,9 +6024,7 @@
           {
             "use": "official",
             "family": "Alexis",
-            "given": [
-              "Aaron"
-            ]
+            "given": ["Aaron"]
           }
         ],
         "gender": "male",
@@ -6117,10 +6097,6 @@
                 "valueString": "Hispanic or Latino"
               }
             ]
-          },
-          {
-            "url": "http://hl7.org/fhir/us/core/StructureDefinition/us-core-birthsex",
-            "valueCode": "M"
           }
         ],
         "identifier": [
@@ -6144,10 +6120,7 @@
         "name": [
           {
             "family": "Shaw",
-            "given": [
-              "Lee",
-              "A."
-            ],
+            "given": ["Lee", "A."],
             "period": {
               "start": "1975-12-06",
               "end": "2020-01-22"
@@ -6155,13 +6128,8 @@
           },
           {
             "family": "Shaw",
-            "given": [
-              "Lee",
-              "V."
-            ],
-            "suffix": [
-              "MD"
-            ],
+            "given": ["Lee", "V."],
+            "suffix": ["MD"],
             "period": {
               "start": "2020-01-23"
             }
@@ -6182,9 +6150,7 @@
         "birthDate": "1975-12-06",
         "address": [
           {
-            "line": [
-              "49 Meadow St"
-            ],
+            "line": ["49 Meadow St"],
             "city": "Lansing",
             "state": "MI",
             "postalCode": "48864",
@@ -6195,9 +6161,7 @@
             }
           },
           {
-            "line": [
-              "183 Mountain View St"
-            ],
+            "line": ["183 Mountain View St"],
             "city": "Lansing",
             "state": "MI",
             "postalCode": "48901",
@@ -6291,10 +6255,6 @@
                 "valueString": "Hispanic or Latino"
               }
             ]
-          },
-          {
-            "url": "http://hl7.org/fhir/us/core/StructureDefinition/us-core-birthsex",
-            "valueCode": "F"
           }
         ],
         "identifier": [
@@ -6318,10 +6278,7 @@
         "name": [
           {
             "family": "Blackstone",
-            "given": [
-              "Veronica",
-              "Anne"
-            ]
+            "given": ["Veronica", "Anne"]
           }
         ],
         "telecom": [
@@ -6339,9 +6296,7 @@
         "birthDate": "1998-06-18",
         "address": [
           {
-            "line": [
-              "120 Lucas Rd"
-            ],
+            "line": ["120 Lucas Rd"],
             "city": "Hamersville",
             "state": "OH",
             "postalCode": "45130",
@@ -6372,12 +6327,8 @@
           {
             "use": "official",
             "family": "Smith",
-            "given": [
-              "John"
-            ],
-            "suffix": [
-              "MD"
-            ]
+            "given": ["John"],
+            "suffix": ["MD"]
           }
         ],
         "telecom": [
@@ -6389,9 +6340,7 @@
         "address": [
           {
             "use": "home",
-            "line": [
-              "35 Ridge StApt 13"
-            ],
+            "line": ["35 Ridge StApt 13"],
             "city": "Tulsa",
             "state": "OK",
             "postalCode": "74117",
@@ -6424,13 +6373,8 @@
           {
             "use": "official",
             "family": "Fox",
-            "given": [
-              "Amy",
-              "R"
-            ],
-            "suffix": [
-              "MD"
-            ]
+            "given": ["Amy", "R"],
+            "suffix": ["MD"]
           }
         ],
         "telecom": [
@@ -6442,9 +6386,7 @@
         "address": [
           {
             "use": "home",
-            "line": [
-              "35 Ridge StApt 13"
-            ],
+            "line": ["35 Ridge StApt 13"],
             "city": "Tulsa",
             "state": "OK",
             "postalCode": "74117",
@@ -6488,20 +6430,14 @@
         "name": [
           {
             "family": "Randa",
-            "given": [
-              "William"
-            ],
-            "prefix": [
-              "Dr"
-            ]
+            "given": ["William"],
+            "prefix": ["Dr"]
           }
         ],
         "address": [
           {
             "use": "home",
-            "line": [
-              "4531 Marketplace Drive"
-            ],
+            "line": ["4531 Marketplace Drive"],
             "city": "Lansing",
             "state": "MI",
             "postalCode": "48893"
@@ -6548,12 +6484,8 @@
         "name": [
           {
             "family": "Miller",
-            "given": [
-              "Susan"
-            ],
-            "prefix": [
-              "Dr"
-            ]
+            "given": ["Susan"],
+            "prefix": ["Dr"]
           }
         ],
         "telecom": [
@@ -6571,9 +6503,7 @@
         "address": [
           {
             "use": "work",
-            "line": [
-              "210 Walnut St"
-            ],
+            "line": ["210 Walnut St"],
             "city": "Hamersville",
             "state": "OH",
             "postalCode": "45130"
@@ -6610,9 +6540,7 @@
         "name": "IOI Modified SDOHCCQuestionnairePRAPARE",
         "title": "IOI Modified SDOHCC Questionnaire PRAPARE",
         "status": "draft",
-        "subjectType": [
-          "Patient"
-        ],
+        "subjectType": ["Patient"],
         "date": "2021-04-01T04:01:34+00:00",
         "publisher": "HL7 International Patient Care WG",
         "contact": [
@@ -7563,10 +7491,7 @@
             "use": "official",
             "text": "MCGEE, WATERMELON",
             "family": "MCGEE",
-            "given": [
-              "WATERMELON",
-              "SPROUT"
-            ],
+            "given": ["WATERMELON", "SPROUT"],
             "period": {
               "start": "2024-07-12T16:00:28.000Z"
             }
@@ -7598,9 +7523,7 @@
             "id": "CI-24375992-0",
             "use": "home",
             "text": "1457 SOUTH ST\nWHEATLAND, WY 82201\nUS",
-            "line": [
-              "1457 SOUTH ST"
-            ],
+            "line": ["1457 SOUTH ST"],
             "city": "WHEATLAND",
             "district": "Platte",
             "state": "WY",
@@ -7654,9 +7577,7 @@
               "use": "official",
               "text": "MCGEE, PICKLE",
               "family": "MCGEE",
-              "given": [
-                "PICKLE"
-              ],
+              "given": ["PICKLE"],
               "period": {
                 "start": "2024-07-13T13:38:07.000Z"
               }
@@ -7696,9 +7617,7 @@
             "address": {
               "use": "home",
               "text": "1457 SOUTH ST\nWHEATLAND, WY 64030\nUS",
-              "line": [
-                "1457 SOUTH ST"
-              ],
+              "line": ["1457 SOUTH ST"],
               "city": "WHEATLAND",
               "district": "Platte",
               "state": "WY",
@@ -7738,9 +7657,7 @@
               "use": "official",
               "text": "MCGEE, PICKLE",
               "family": "MCGEE",
-              "given": [
-                "PICKLE"
-              ],
+              "given": ["PICKLE"],
               "period": {
                 "start": "2024-07-12T16:00:28.000Z"
               }
@@ -7765,9 +7682,7 @@
             "address": {
               "use": "home",
               "text": "1457 SOUTH ST\nWHEATLAND, WY 64030\nUS",
-              "line": [
-                "1457 SOUTH ST"
-              ],
+              "line": ["1457 SOUTH ST"],
               "city": "WHEATLAND",
               "district": "Platte",
               "state": "WY",

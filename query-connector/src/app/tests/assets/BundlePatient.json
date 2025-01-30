@@ -11,9 +11,7 @@
           "profile": [
             "http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient"
           ],
-          "source": [
-            "ecr"
-          ]
+          "source": ["ecr"]
         },
         "identifier": [
           {
@@ -24,9 +22,7 @@
         "name": [
           {
             "family": "CASTILLO",
-            "given": [
-              "ABEL"
-            ]
+            "given": ["ABEL"]
           }
         ],
         "birthDate": "2015-04-15",
@@ -63,30 +59,11 @@
                 "valueString": "Hispanic or Latino"
               }
             ]
-          },
-          {
-            "url": "http://hl7.org/fhir/us/core/StructureDefinition/us-core-birthsex",
-            "extension": [
-              {
-                "url": "value",
-                "valueCodeableConcept": {
-                  "coding": [
-                    {
-                      "code": "M",
-                      "display": "Male",
-                      "system": "urn:oid:2.16.840.1.113883.5.1"
-                    }
-                  ]
-                }
-              }
-            ]
           }
         ],
         "address": [
           {
-            "line": [
-              "1050 CARPENTER ST"
-            ],
+            "line": ["1050 CARPENTER ST"],
             "city": "EDWARDS",
             "state": "CA",
             "country": "US",
