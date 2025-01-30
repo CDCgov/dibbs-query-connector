@@ -1,6 +1,6 @@
 import { QueryResultRow } from "pg";
 import { DibbsValueSet } from "./constants";
-import { QueryDataColumn } from "./queryBuilding/utils";
+import { QueryDataColumn } from "../(pages)/queryBuilding/utils";
 
 /**
  * Maps the results returned from the DIBBs query table into their associated

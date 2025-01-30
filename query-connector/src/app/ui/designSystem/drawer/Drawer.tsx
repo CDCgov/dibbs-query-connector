@@ -95,7 +95,7 @@ const Drawer: React.FC<DrawerProps> = ({
         </div>
       </div>
 
-      {isOpen && <div className={styles.overlay} onClick={onClose}></div>}
+      {isOpen && <div className={styles.overlay} onClick={handleClose}></div>}
     </>
   );
 };
