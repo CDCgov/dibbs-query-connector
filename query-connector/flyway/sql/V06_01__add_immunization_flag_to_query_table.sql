@@ -1,0 +1,2 @@
+ALTER TABLE query 
+ADD COLUMN immunization BOOLEAN DEFAULT FALSE;
