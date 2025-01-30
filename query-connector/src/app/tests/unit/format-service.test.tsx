@@ -201,7 +201,7 @@ describe("formatIdentifier", () => {
         },
       },
       {
-        value: "0123456789",
+        value: "456",
         type: {
           coding: [
             {
@@ -223,7 +223,7 @@ describe("formatIdentifier", () => {
       getByText("Internal Reference Identifier: 0123456789")
     ).toBeInTheDocument();
     expect(
-      getByText("Driver's License Number: Some State: 0123456789")
+      getByText("Driver's License Number: Some State: 456")
     ).toBeInTheDocument();
   });
 
