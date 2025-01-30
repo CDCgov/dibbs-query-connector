@@ -90,14 +90,14 @@ export async function POST(request: NextRequest) {
 
   const queryResults = await getSavedQueryById(id);
 
-  if (queryResults.length === 0) {
+  if (queryResults === undefined) {
     const OperationOutcome = await handleRequestError(INVALID_QUERY);
     return NextResponse.json(OperationOutcome);
   }
 
   // Add params & patient identifiers to QueryName
   const QueryRequest: QueryRequest = {
-    query_name: queryResults[0].query_name,
+    query_name: queryResults.query_name,
     fhir_server: fhir_server,
     ...(PatientIdentifiers.first_name && {
       first_name: PatientIdentifiers.first_name,
