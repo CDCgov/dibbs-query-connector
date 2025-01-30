@@ -3,8 +3,6 @@ import { getSavedQueryByName } from "@/app/shared/database-service";
 import { unnestValueSetsFromQuery } from "@/app/shared/utils";
 import { makeFhirQuery, QueryResponse } from "@/app/shared/query-service";
 import { Patient } from "fhir/r4";
-import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
-import { error } from "console";
 
 type SetStateCallback<T> = React.Dispatch<React.SetStateAction<T>>;
 
