@@ -3,7 +3,7 @@ import queryTableDefaults from "../../assets/dibbs_db_seed_query.json";
 import {
   CategoryToConditionArrayMap,
   QueryTableResult,
-} from "@/app/queryBuilding/utils";
+} from "@/app/(pages)/queryBuilding/utils";
 
 export const CATEGORY_TO_CONDITION_ARRAY_MAP =
   categoryToConditionArrayMap as unknown as CategoryToConditionArrayMap;

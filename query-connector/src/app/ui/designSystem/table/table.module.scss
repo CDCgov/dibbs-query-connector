@@ -1,0 +1,62 @@
+@use "../../../ui/styles/_variables" as *;
+
+.table {
+  display: flex;
+  flex-direction: column;
+  border-radius: 0.25rem;
+  border: 1px solid $table-border;
+  background: $white;
+  padding: $default-table-padding 0 0 0;
+  box-shadow: 0px 2px 3px 0px $drop-shadow;
+
+  thead tr {
+    display: grid;
+    align-items: center;
+    border-bottom: 1px solid $table-row-border !important;
+  }
+
+  th {
+    background-color: $white !important;
+    color: $text-secondary !important;
+    text-transform: uppercase;
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+    word-wrap: break-word;
+    align-items: center;
+    box-sizing: border-box;
+    border: none !important;
+    padding: 0 !important;
+  }
+
+  tr {
+    display: grid;
+    align-items: center;
+    border-bottom: 1px solid $table-row-border;
+    margin: 0 $default-table-padding;
+  }
+
+  tr:last-child {
+    border-bottom: none;
+  }
+
+  td {
+    border: none !important;
+    padding: 2rem 0 !important;
+  }
+}
+
+.unbordered {
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  margin: 0;
+
+  tr {
+    margin: 0;
+  }
+
+  tr:hover {
+    padding: 0;
+  }
+}
