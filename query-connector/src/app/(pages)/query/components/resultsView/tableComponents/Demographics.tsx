@@ -8,6 +8,7 @@ import {
   formatContact,
   formatIdentifier,
   formatDate,
+  formatSex,
 } from "../../../../../shared/format-service";
 import styles from "./resultsTables.module.scss";
 import Table from "@/app/ui/designSystem/table/Table";
@@ -76,7 +77,7 @@ function formatDemographics(patient: Patient): DataDisplayInfo[] {
     },
     {
       title: "Sex",
-      value: patient.gender ?? "",
+      value: formatSex(patient.gender),
     },
     {
       title: "Race",

@@ -337,3 +337,22 @@ export function formatCoding(coding: Coding | undefined) {
     </>
   );
 }
+
+/**
+ * Formats a patient's sex in compliance with Executive order 14168:
+ * https://www.federalregister.gov/documents/2025/01/30/2025-02090/defending-women-from-gender-ideology-extremism-and-restoring-biological-truth-to-the-federal
+ * and OPM guidance on the Implementation of Executive Order 14168:
+ * https://www.chcoc.gov/content/initial-guidance-regarding-president-trump%E2%80%99s-executive-order-defending-women
+ * @param sex - The patient's sex
+ * @returns The string "Male", "Female", or "".
+ */
+export function formatSex(sex: string | undefined): string {
+  switch (sex) {
+    case "male":
+      return "Male";
+    case "female":
+      return "Female";
+    default:
+      return "";
+  }
+}
