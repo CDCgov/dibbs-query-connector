@@ -139,17 +139,19 @@ export function formatIdentifier(identifier: Identifier[]): JSX.Element {
   return (
     <>
       {identifier.map((id) => {
-        let idType = id.type?.coding?.[0].display ?? "";
-        if (idType === "") {
-          idType = id.type?.text ?? "";
-        }
+        let idType = id.type?.coding?.[0]?.display || id.type?.text || "";
+        let idAssigner = id.assigner?.display || "";
+        let idValue = id.value || "";
 
-        return (
-          <div key={id.value}>
-            {" "}
-            {idType}: {id.value} <br />{" "}
-          </div>
-        );
+        let formattedId =
+          idType && idAssigner
+            ? `${idType}: ${idAssigner}: ${idValue}`
+            : idType
+              ? `${idType}: ${idValue}`
+              : idAssigner
+                ? `${idAssigner}: ${idValue}`
+                : idValue;
+        return <div key={idValue}>{formattedId}</div>;
       })}
     </>
   );
@@ -164,22 +166,17 @@ export function formatMRN(identifier: Identifier[]): JSX.Element {
   return (
     <>
       {identifier.map((id) => {
-        let mrnFlag = false;
-        id.type?.coding?.forEach((code) => {
-          if (code.code === "MR") {
-            mrnFlag = true;
-          }
-        });
-        if (mrnFlag) {
-          return (
-            <div key={id.value}>
-              {" "}
-              {id.value} <br />{" "}
-            </div>
-          );
-        }
+        const isMRN = id.type?.coding?.some((code) => code.code === "MR");
+        if (!isMRN) return null;
 
-        return null;
+        const idAssigner = id.assigner?.display || "";
+        const idValue = id.value || "";
+
+        return (
+          <div key={idValue}>
+            {idAssigner ? `${idAssigner}: ${idValue}` : idValue}
+          </div>
+        );
       })}
     </>
   );
