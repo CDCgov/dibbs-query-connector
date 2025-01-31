@@ -28,9 +28,9 @@ export const USE_CASE_DETAILS = {
     id: "cf580d8d-cc7b-4eae-8a0d-96c36f9222e3",
   },
   immunization: {
-    queryName: "Immunization",
-    condition: "Immunization",
-    id: null,
+    queryName: "Immunization query",
+    condition: "",
+    id: "e858cba3-59f6-4bc8-9a1e-28fac21c5813",
   },
 } as const;
 
@@ -57,12 +57,6 @@ export const hyperUnluckyPatient: DemoDataFields = {
   MRN: "8692756",
   Phone: "517-425-1398",
   FhirServer: DEFAULT_DEMO_FHIR_SERVER,
-};
-
-// Define Option type
-type Option = {
-  value: string;
-  label: string;
 };
 
 /*Labels and values for the state options dropdown on the query page*/
