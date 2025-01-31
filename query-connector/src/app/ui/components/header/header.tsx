@@ -159,6 +159,11 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
   );
 };
 
-const LOGGED_IN_PATHS = ["/query", "/queryBuilding", "/fhir-servers"];
+const LOGGED_IN_PATHS = [
+  "/query",
+  "/queryBuilding",
+  "/fhir-servers",
+  "/userManagement",
+];
 
 export default HeaderComponent;
