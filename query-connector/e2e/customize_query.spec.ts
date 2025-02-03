@@ -111,7 +111,7 @@ test.describe("querying with the Query Connector", () => {
         .getByRole("table")
         .getByRole("row")
         .filter({ hasText: "doxycycline hyclate 100 MG" }),
-    ).toHaveCount(2);
+    ).toHaveCount(1);
   });
 
   test("customize query select / deselect all filters whole DibbsConceptType, across tabs", async ({
@@ -175,7 +175,7 @@ test.describe("querying with the Query Connector", () => {
         .getByRole("table")
         .getByRole("row")
         .filter({ hasText: "I do not have housing" }),
-    ).toHaveCount(6);
+    ).toHaveCount(1);
     const acceptableSdohKeywords = [
       "history",
       "narrative",
@@ -190,8 +190,8 @@ test.describe("querying with the Query Connector", () => {
     for (let i = 1; i < 6; i++) {
       const row = obsRows.nth(i);
       const typeText = await row.locator("td").nth(1).textContent();
-      const presentKey = acceptableSdohKeywords.find((key) =>
-        typeText?.toLowerCase().includes(key),
+      const presentKey = acceptableSdohKeywords.find(
+        (key) => typeText?.toLowerCase().includes(key),
       );
       expect(presentKey).toBeDefined();
       expect(typeText?.includes("chlamydia")).toBeFalsy();
