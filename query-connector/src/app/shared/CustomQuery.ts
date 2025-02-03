@@ -131,7 +131,7 @@ export class CustomQuery {
 
     if (includeImmunization) {
       this.fhirResourceQueries["immunization"] = {
-        basePath: `/Immunization/_search`,
+        basePath: `/Immunization`,
         params: {
           patient: patientId,
         },

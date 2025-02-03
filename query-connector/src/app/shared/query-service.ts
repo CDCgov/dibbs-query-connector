@@ -208,9 +208,17 @@ async function postFhirQuery(
   const builtQuery = new CustomQuery(queryData, patientId, includeImmunization);
   let response: fetch.Response | fetch.Response[];
 
+  // handle the immunization query using "get" separately since posting against
+  // the dev IZ gateway endpoint results in auth errors
   if (queryName?.includes("Immunization")) {
     const { basePath, params } = builtQuery.getQuery("immunization");
-    response = await fhirClient.get([basePath, params].join(","));
+    let fetchString = basePath;
+    Object.entries(params).forEach(([k, v]) => {
+      fetchString += `?${k}=${v}`;
+    });
+    response = await fhirClient.get(fetchString);
+    queryResponse = await parseFhirSearch(response, queryResponse);
+    return queryResponse;
   }
 
   const postPromises = builtQuery.compileAllPostRequests().map((req) => {
