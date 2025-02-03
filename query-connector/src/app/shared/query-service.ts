@@ -132,6 +132,15 @@ export async function makeFhirQuery(
   const patientId = queryResponse.Patient[0].id;
   const savedQuery = await getSavedQueryByName(request.query_name as string);
 
+  await postFhirQuery(
+    savedQuery,
+    queryValueSets,
+    patientId,
+    fhirClient,
+    queryResponse,
+    savedQuery[0] ? savedQuery[0].immunization : false,
+  );
+
   if (savedQuery[0] && savedQuery[0]["query_data"]) {
     const savedQueryInformation = savedQuery[0]["query_data"];
     const queryToPost = reconcileSavedQueryDataWithOverrides(
@@ -191,6 +200,7 @@ function reconcileSavedQueryDataWithOverrides(
  * @param fhirClient The client used to communicate with the FHIR server.
  * @param queryResponse The response object for the query results.
  * @param queryName Name of the query to send out to tthe FHIR server
+ * @param includeImmunization Whether to include immunization in the query execution
  * @returns A promise for an updated query response.
  */
 async function postFhirQuery(
@@ -199,8 +209,10 @@ async function postFhirQuery(
   fhirClient: FHIRClient,
   queryResponse: QueryResponse,
   queryName?: string,
+  includeImmunization?: boolean,
 ): Promise<QueryResponse> {
-  const builtQuery = new CustomQuery(queryData, patientId);
+  const querySpec = await formatValueSetsAsQuerySpec(queryName, queryValueSets);
+  const builtQuery = new CustomQuery(querySpec, patientId, includeImmunization);
   let response: fetch.Response | fetch.Response[];
 
   if (queryName?.includes("Immunization")) {

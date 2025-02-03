@@ -34,9 +34,10 @@ export type QueryDataColumn = {
 };
 export type QueryDetailsResult = {
   query_name: string;
-  id: string;
+  query_id: string;
   query_data: QueryDataColumn;
   conditions_list: string[];
+  immunization: boolean;
 };
 
 export const EMPTY_QUERY_SELECTION = {
@@ -61,15 +62,16 @@ export function filterSearchByCategoryAndCondition(
   fetchedConditions: CategoryToConditionArrayMap,
 ): CategoryToConditionArrayMap {
   const result: CategoryToConditionArrayMap = {};
+  const unfilteredConditions = structuredClone(fetchedConditions);
 
-  Object.entries(fetchedConditions).forEach(
+  Object.entries(unfilteredConditions).forEach(
     ([categoryName, conditionArray]) => {
       if (
         categoryName
           .toLocaleLowerCase()
           .includes(filterString.toLocaleLowerCase())
       ) {
-        result[categoryName] = fetchedConditions[categoryName];
+        result[categoryName] = unfilteredConditions[categoryName];
       } else {
         const matches = conditionArray.filter((c) =>
           c.name.toLocaleLowerCase().includes(filterString.toLocaleLowerCase()),

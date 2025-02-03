@@ -63,11 +63,15 @@ export class CustomQuery {
    * relevant to the query
    * @param patientId The ID of the patient to build into query strings.
    */
-  constructor(savedQueryJson: QueryDataColumn, patientId: string) {
+  constructor(
+    savedQueryJson: QueryDataColumn,
+    patientId: string,
+    includeImmunization = false,
+  ) {
     try {
       this.patientId = patientId;
       this.initializeQueryConceptTypes(savedQueryJson);
-      this.compileFhirResourceQueries(patientId);
+      this.compileFhirResourceQueries(patientId, includeImmunization);
     } catch (error) {
       console.error("Could not create CustomQuery Object: ", error);
     }
@@ -101,7 +105,10 @@ export class CustomQuery {
    * any query built using those codes' filter will be left as the empty string.
    * @param patientId The ID of the patient to query for.
    */
-  compileFhirResourceQueries(patientId: string): void {
+  compileFhirResourceQueries(
+    patientId: string,
+    includeImmunization?: boolean,
+  ): void {
     const labsFilter = this.labCodes.join(",");
     const medicationsFilter = this.medicationCodes.join(",");
     const conditionsFilter = this.conditionCodes.join(",");
@@ -115,12 +122,14 @@ export class CustomQuery {
       },
     };
 
-    // this.fhirResourceQueries["immunization"] = {
-    //   basePath: `/Immunization/_search`,
-    //   params: {
-    //     patient: patientId,
-    //   },
-    // };
+    if (includeImmunization) {
+      this.fhirResourceQueries["immunization"] = {
+        basePath: `/Immunization/_search`,
+        params: {
+          patient: patientId,
+        },
+      };
+    }
 
     if (labsFilter !== "") {
       this.fhirResourceQueries["observation"] = {
