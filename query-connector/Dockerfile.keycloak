@@ -1,3 +1,11 @@
 FROM quay.io/keycloak/keycloak:26.1
-COPY ./keycloak /opt/keycloak/data/import
-CMD ["start-dev", "--import-realm"]
+
+# Copy all realm files
+COPY ./keycloak/*.json /opt/keycloak/
+
+# Copy selection script
+COPY ./keycloak/select-realm.sh /opt/keycloak/select-realm.sh
+RUN chmod +x /opt/keycloak/select-realm.sh
+
+# Use script as the entrypoint
+CMD ["/opt/keycloak/select-realm.sh"]

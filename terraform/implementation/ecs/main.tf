@@ -121,8 +121,8 @@ module "ecs" {
     },
     keycloak = {
       short_name     = "kc",
-      fargate_cpu    = 1024,
-      fargate_memory = 2048,
+      fargate_cpu    = 512,
+      fargate_memory = 1024,
       min_capacity   = 1,
       max_capacity   = 5,
       app_repo       = "ghcr.io/cdcgov/dibbs-query-connector",
@@ -140,6 +140,10 @@ module "ecs" {
         {
           name  = "KC_PROXY_HEADERS"
           value = "xforwarded"
+        },
+        {
+          name  = "ENVIRONMENT"
+          value = terraform.workspace
         }
       ]
     }
