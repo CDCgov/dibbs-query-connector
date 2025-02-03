@@ -8,6 +8,7 @@ import styles from "./header.module.scss";
 import { metadata } from "@/app/shared/constants";
 import classNames from "classnames";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 /**
  * Produces the header.
@@ -72,13 +73,13 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
           <div className={classNames("display-flex", "flex-align-center")}>
             <div className="usa-logo" style={{ marginLeft: "0" }}>
               <em className="usa-logo__text text-base-lightest-important">
-                <a
+                <Link
                   className="font-mono-lg text-base-lightest-important font-weight-normal-important"
                   href={landingPage}
                   title={metadata.title}
                 >
                   {metadata.title}
-                </a>
+                </Link>
               </em>
             </div>
           </div>
@@ -134,19 +135,19 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
             {/* {isProduction && ( */}
             <>
               <li className={styles.subMenuItem}>
-                <a className={styles.menuItem} href={"/queryBuilding"}>
+                <Link className={styles.menuItem} href={"/queryBuilding"}>
                   My queries
-                </a>
+                </Link>
               </li>
               <li className={styles.subMenuItem}>
-                <a className={styles.menuItem} href={"/fhir-servers"}>
+                <Link className={styles.menuItem} href={"/fhir-servers"}>
                   FHIR Servers
-                </a>
+                </Link>
               </li>
               <li className={styles.subMenuItem}>
-                <a className={styles.menuItem} href={landingPage}>
+                <Link className={styles.menuItem} href={landingPage}>
                   Log out
-                </a>
+                </Link>
               </li>
             </>
             {/* )} */}

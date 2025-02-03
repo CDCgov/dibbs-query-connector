@@ -10,7 +10,7 @@ test.describe("querying with the Query Connector", () => {
   // Start every test by navigating to the customize query workflow
   test.beforeEach(async ({ page }) => {
     await page.goto(TEST_URL);
-    await page.getByRole("button", { name: "Try it out" }).click();
+    await page.getByRole("link", { name: "Try it out" }).click();
 
     // Check that the info alert is visible and contains the correct text
     const alert = page.locator(".custom-alert");
@@ -86,7 +86,9 @@ test.describe("querying with the Query Connector", () => {
     await expect(page.getByText(TEST_PATIENT_NAME)).toBeVisible();
     await expect(page.getByText("Patient Identifiers")).toBeVisible();
     await expect(
-      page.getByText(`Medical Record Number: ${TEST_PATIENT.MRN}`),
+      page.getByText(
+        `Medical Record Number: St. Worrywart’s Hospital: ${TEST_PATIENT.MRN}`,
+      ),
     ).toBeVisible();
 
     // Should now just be a single lonely medication request
@@ -149,7 +151,9 @@ test.describe("querying with the Query Connector", () => {
     await expect(page.getByText(TEST_PATIENT_NAME)).toBeVisible();
     await expect(page.getByText("Patient Identifiers")).toBeVisible();
     await expect(
-      page.getByText(`Medical Record Number: ${TEST_PATIENT.MRN}`),
+      page.getByText(
+        `Medical Record Number: St. Worrywart’s Hospital: ${TEST_PATIENT.MRN}`,
+      ),
     ).toBeVisible();
 
     // Should be no medication requests available
