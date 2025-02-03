@@ -58,7 +58,7 @@ module "ecs" {
         },
         {
           name  = "HOSTNAME",
-          value = var.hostname
+          value = "0.0.0.0"
         },
         {
           name  = "fhir_url"

@@ -71,7 +71,6 @@ jobs:
           KEYCLOAK_CLIENT_SECRET: ${{ secrets.KEYCLOAK_CLIENT_SECRET }}
           KEYCLOAK_URL: ${{ env.workspace == 'dev' && format('https://{0}', secrets.KEYCLOAK_URL) || format('https://{0}.{1}', env.workspace, secrets.KEYCLOAK_URL) }}
           AUTH_REDIRECT_PROXY_URL: ${{ env.workspace == 'dev' && format('https://{0}', 'queryconnector.dev/api/auth') || format('https://{0}.{1}', env.workspace, 'queryconnector.dev/api/auth') }}
-          HOSTNAME: ${{ env.workspace == 'dev' && format('{0}', 'queryconnector.dev') || format('{0}.{1}', env.workspace, 'queryconnector.dev') }}
         shell: bash
         run: |
           echo "Deploying to ${{ github.event.inputs.workspace }}..."
@@ -94,7 +93,6 @@ jobs:
             -var "keycloak_client_secret=${KEYCLOAK_CLIENT_SECRET}" \
             -var "keycloak_url=${KEYCLOAK_URL}" \
             -var "auth_redirect_proxy_url=${AUTH_REDIRECT_PROXY_URL}" \
-            -var "hostname=${HOSTNAME}"
           terraform plan \
             -var-file="$WORKSPACE.tfvars" \
             -var "umls_api_key=${UMLS_API_KEY}" \
@@ -106,4 +104,3 @@ jobs:
             -var "keycloak_client_secret=${KEYCLOAK_CLIENT_SECRET}" \
             -var "keycloak_url=${KEYCLOAK_URL}" \
             -var "auth_redirect_proxy_url=${AUTH_REDIRECT_PROXY_URL}" \
-            -var "hostname=${HOSTNAME}"
