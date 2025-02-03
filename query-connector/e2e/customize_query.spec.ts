@@ -10,7 +10,7 @@ test.describe("querying with the Query Connector", () => {
   // Start every test by navigating to the customize query workflow
   test.beforeEach(async ({ page }) => {
     await page.goto(TEST_URL);
-    await page.getByRole("button", { name: "Try it out" }).click();
+    await page.getByRole("link", { name: "Try it out" }).click();
 
     // Check that the info alert is visible and contains the correct text
     const alert = page.locator(".custom-alert");
