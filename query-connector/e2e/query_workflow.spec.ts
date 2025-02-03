@@ -136,7 +136,7 @@ test.describe("querying with the Query Connector", () => {
         .getByRole("row")
         .filter({ hasText: "Sexual overexposure" }),
     ).toHaveCount(3);
-    // Conditions + Medication Requests (Reason Code)
+    // 4 Conditions + 3 Medication Requests (Reason Code)
     await expect(
       page
         .getByRole("table")
