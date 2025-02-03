@@ -1,25 +1,47 @@
 import NextAuth from "next-auth";
 import KeycloakProvider from "next-auth/providers/keycloak";
 
+function addRealm(url: string) {
+  return url.endsWith("/realms/master") ? url : `${url}/realms/master`;
+}
+
+let { NAMED_KEYCLOAK, LOCAL_KEYCLOAK } = process.env;
+if (!NAMED_KEYCLOAK || !LOCAL_KEYCLOAK) {
+  const KEYCLOAK_URL = process.env.AUTH_KEYCLOAK_ISSUER;
+  // Check if undefined or empty string.
+  if (!KEYCLOAK_URL) {
+    throw new Error(
+      "AUTH_KEYCLOAK_ISSUER is missing. Please provide a valid Keycloak URL.",
+    );
+  }
+  NAMED_KEYCLOAK = KEYCLOAK_URL;
+  LOCAL_KEYCLOAK = KEYCLOAK_URL;
+}
+
+// Add /realms/master to the end of the URL if it's missing.
+NAMED_KEYCLOAK = addRealm(NAMED_KEYCLOAK);
+LOCAL_KEYCLOAK = addRealm(LOCAL_KEYCLOAK);
+
 export const { handlers, signIn, signOut, auth } = NextAuth({
   secret: process.env.AUTH_SECRET,
   trustHost: true,
   basePath: "/api/auth",
+  redirectProxyUrl: process.env.AUTH_REDIRECT_PROXY_URL,
   providers: [
     KeycloakProvider({
-      jwks_endpoint: `${process.env.NAMED_KEYCLOAK}/realms/master/protocol/openid-connect/certs`,
+      jwks_endpoint: `${NAMED_KEYCLOAK}/protocol/openid-connect/certs`,
       wellKnown: undefined,
       clientId: process.env.AUTH_KEYCLOAK_ID,
       clientSecret: process.env.AUTH_KEYCLOAK_SECRET,
-      issuer: `${process.env.LOCAL_KEYCLOAK}/realms/master`,
+      issuer: `${LOCAL_KEYCLOAK}`,
       authorization: {
         params: {
           scope: "openid email profile",
         },
-        url: `${process.env.LOCAL_KEYCLOAK}/realms/master/protocol/openid-connect/auth`,
+        url: `${LOCAL_KEYCLOAK}/protocol/openid-connect/auth`,
       },
-      token: `${process.env.NAMED_KEYCLOAK}/realms/master/protocol/openid-connect/token`,
-      userinfo: `${process.env.NAMED_KEYCLOAK}/realms/master/protocol/openid-connect/userinfo`,
+      token: `${NAMED_KEYCLOAK}/protocol/openid-connect/token`,
+      userinfo: `${NAMED_KEYCLOAK}/protocol/openid-connect/userinfo`,
     }),
   ],
   callbacks: {
