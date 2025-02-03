@@ -146,6 +146,11 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
                 </Link>
               </li>
               <li className={styles.subMenuItem}>
+                <Link className={styles.menuItem} href={"/userManagement"}>
+                  User Management
+                </Link>
+              </li>
+              <li className={styles.subMenuItem}>
                 <Link className={styles.menuItem} href={landingPage}>
                   Log out
                 </Link>
