@@ -138,7 +138,7 @@ export async function makeFhirQuery(
     patientId,
     fhirClient,
     queryResponse,
-    savedQuery[0] ? savedQuery[0].immunization : false,
+    savedQuery ? savedQuery.immunization : false,
   );
 
   if (savedQuery[0] && savedQuery[0]["query_data"]) {

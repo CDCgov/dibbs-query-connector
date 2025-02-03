@@ -136,17 +136,19 @@ export function formatIdentifier(identifier: Identifier[]): JSX.Element {
   return (
     <>
       {identifier.map((id) => {
-        let idType = id.type?.coding?.[0].display ?? "";
-        if (idType === "") {
-          idType = id.type?.text ?? "";
-        }
+        let idType = id.type?.coding?.[0]?.display || id.type?.text || "";
+        let idAssigner = id.assigner?.display || "";
+        let idValue = id.value || "";
 
-        return (
-          <div key={id.value}>
-            {" "}
-            {idType}: {id.value} <br />{" "}
-          </div>
-        );
+        let formattedId =
+          idType && idAssigner
+            ? `${idType}: ${idAssigner}: ${idValue}`
+            : idType
+              ? `${idType}: ${idValue}`
+              : idAssigner
+                ? `${idAssigner}: ${idValue}`
+                : idValue;
+        return <div key={idValue}>{formattedId}</div>;
       })}
     </>
   );
@@ -161,22 +163,17 @@ export function formatMRN(identifier: Identifier[]): JSX.Element {
   return (
     <>
       {identifier.map((id) => {
-        let mrnFlag = false;
-        id.type?.coding?.forEach((code) => {
-          if (code.code === "MR") {
-            mrnFlag = true;
-          }
-        });
-        if (mrnFlag) {
-          return (
-            <div key={id.value}>
-              {" "}
-              {id.value} <br />{" "}
-            </div>
-          );
-        }
+        const isMRN = id.type?.coding?.some((code) => code.code === "MR");
+        if (!isMRN) return null;
 
-        return null;
+        const idAssigner = id.assigner?.display || "";
+        const idValue = id.value || "";
+
+        return (
+          <div key={idValue}>
+            {idAssigner ? `${idAssigner}: ${idValue}` : idValue}
+          </div>
+        );
       })}
     </>
   );
@@ -289,4 +286,23 @@ export function formatCoding(coding: Coding | undefined) {
       {coding?.display} <br /> {coding?.code} <br /> {coding?.system}{" "}
     </>
   );
+}
+
+/**
+ * Formats a patient's sex in compliance with Executive order 14168:
+ * https://www.federalregister.gov/documents/2025/01/30/2025-02090/defending-women-from-gender-ideology-extremism-and-restoring-biological-truth-to-the-federal
+ * and OPM guidance on the Implementation of Executive Order 14168:
+ * https://www.chcoc.gov/content/initial-guidance-regarding-president-trump%E2%80%99s-executive-order-defending-women
+ * @param sex - The patient's sex
+ * @returns The string "Male", "Female", or "".
+ */
+export function formatSex(sex: string | undefined): string {
+  switch (sex) {
+    case "male":
+      return "Male";
+    case "female":
+      return "Female";
+    default:
+      return "";
+  }
 }

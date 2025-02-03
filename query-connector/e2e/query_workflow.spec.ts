@@ -101,7 +101,9 @@ test.describe("querying with the Query Connector", () => {
     await expect(page.getByText(TEST_PATIENT_NAME)).toBeVisible();
     await expect(page.getByText("Patient Identifiers")).toBeVisible();
     await expect(
-      page.getByText(`Medical Record Number: ${TEST_PATIENT.MRN}`),
+      page.getByText(
+        `Medical Record Number: St. Worrywart’s Hospital: ${TEST_PATIENT.MRN}`,
+      ),
     ).toBeVisible();
 
     // Check that the info alert is visible and has updated to the correct text
