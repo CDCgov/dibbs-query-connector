@@ -132,33 +132,24 @@ export async function makeFhirQuery(
   const patientId = queryResponse.Patient[0].id;
   const savedQuery = await getSavedQueryByName(request.query_name as string);
 
-  await postFhirQuery(
-    savedQuery,
-    queryValueSets,
+  if (!savedQuery) {
+    throw new Error(`Unable to query of name ${request?.query_name}`);
+  }
+
+  const queryToPost = reconcileSavedQueryDataWithOverrides(
+    savedQuery.query_data,
+    valueSetOverrides,
+  );
+  const fhirResponse = await postFhirQuery(
+    queryToPost,
     patientId,
     fhirClient,
     queryResponse,
+    savedQuery.query_name,
     savedQuery ? savedQuery.immunization : false,
   );
 
-  if (savedQuery[0] && savedQuery[0]["query_data"]) {
-    const savedQueryInformation = savedQuery[0]["query_data"];
-    const queryToPost = reconcileSavedQueryDataWithOverrides(
-      savedQueryInformation,
-      valueSetOverrides,
-    );
-    const fhirResponse = await postFhirQuery(
-      queryToPost,
-      patientId,
-      fhirClient,
-      queryResponse,
-      request.query_name as string,
-    );
-
-    return fhirResponse;
-  } else {
-    throw `Saved query data JSON for ${request.query_name} not found`;
-  }
+  return fhirResponse;
 }
 
 function reconcileSavedQueryDataWithOverrides(
@@ -211,8 +202,7 @@ async function postFhirQuery(
   queryName?: string,
   includeImmunization?: boolean,
 ): Promise<QueryResponse> {
-  const querySpec = await formatValueSetsAsQuerySpec(queryName, queryValueSets);
-  const builtQuery = new CustomQuery(querySpec, patientId, includeImmunization);
+  const builtQuery = new CustomQuery(queryData, patientId, includeImmunization);
   let response: fetch.Response | fetch.Response[];
 
   if (queryName?.includes("Immunization")) {

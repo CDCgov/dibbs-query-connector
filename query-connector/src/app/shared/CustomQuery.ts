@@ -62,10 +62,16 @@ export class CustomQuery {
    * that has nested information about the conditions / valuesets / concepts
    * relevant to the query
    * @param patientId The ID of the patient to build into query strings.
+   * @param includeImmunization Whether to include immunizations in the outgoing
+   * FHIR query
    */
   constructor(
     savedQueryJson: QueryDataColumn,
     patientId: string,
+    // this was added as a quick and dirty addition to get a previous feature
+    // working again. Should we need to extend this further, probably should
+    // extend savedQueryJson to be more flexible rather than tacking on additional
+    // config options
     includeImmunization = false,
   ) {
     try {
@@ -104,6 +110,8 @@ export class CustomQuery {
    * the provided spec (e.g. a Newborn Screening case will have no rxnorm codes),
    * any query built using those codes' filter will be left as the empty string.
    * @param patientId The ID of the patient to query for.
+   * @param includeImmunization Whether to include immunizations in the outgoing
+   * FHIR query
    */
   compileFhirResourceQueries(
     patientId: string,
@@ -113,7 +121,6 @@ export class CustomQuery {
     const medicationsFilter = this.medicationCodes.join(",");
     const conditionsFilter = this.conditionCodes.join(",");
 
-    // TODO: Research / design ticket
     this.fhirResourceQueries["socialHistory"] = {
       basePath: `/Observation/_search`,
       params: {
@@ -167,9 +174,10 @@ export class CustomQuery {
     }
 
     if (medicationsFilter !== "") {
-      // Medications are floating representations of drugs. Sometimes we need the extra
-      // info from the medication to display in the UI: that's what the ":medication" is doing
-      // and similarly for revinclude for the request <> admin relationship
+      // Medications are representations of drugs independent of patient resources.
+      // Sometimes we need the extra info from the medication to display in the
+      // UI: that's what the ":medication" is doing and similarly for revinclude
+      // for the request <> admin relationship
 
       this.fhirResourceQueries["medicationRequest"] = {
         basePath: `/MedicationRequest/_search`,
