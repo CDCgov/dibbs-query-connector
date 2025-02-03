@@ -189,8 +189,8 @@ test.describe("querying with the Query Connector", () => {
       .filter({ hasText: "I do not have housing" });
 
     const typeText = await obsRow.locator("td").nth(1).textContent();
-    const presentKey = acceptableSdohKeywords.find(
-      (key) => typeText?.toLowerCase().includes(key),
+    const presentKey = acceptableSdohKeywords.find((key) =>
+      typeText?.toLowerCase().includes(key),
     );
     expect(presentKey).toBeDefined();
     expect(typeText?.includes("chlamydia")).toBeFalsy();
