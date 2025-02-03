@@ -59,12 +59,6 @@ export const hyperUnluckyPatient: DemoDataFields = {
   FhirServer: DEFAULT_DEMO_FHIR_SERVER,
 };
 
-// Define Option type
-type Option = {
-  value: string;
-  label: string;
-};
-
 /*Labels and values for the state options dropdown on the query page*/
 export const stateOptions = [
   { value: "AL", label: "AL - Alabama" },
