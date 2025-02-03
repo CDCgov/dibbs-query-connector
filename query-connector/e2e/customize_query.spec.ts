@@ -86,7 +86,9 @@ test.describe("querying with the Query Connector", () => {
     await expect(page.getByText(TEST_PATIENT_NAME)).toBeVisible();
     await expect(page.getByText("Patient Identifiers")).toBeVisible();
     await expect(
-      page.getByText(`Medical Record Number: ${TEST_PATIENT.MRN}`),
+      page.getByText(
+        `Medical Record Number: St. Worrywart’s Hospital: ${TEST_PATIENT.MRN}`,
+      ),
     ).toBeVisible();
 
     // Should now just be a single lonely medication request
@@ -149,7 +151,9 @@ test.describe("querying with the Query Connector", () => {
     await expect(page.getByText(TEST_PATIENT_NAME)).toBeVisible();
     await expect(page.getByText("Patient Identifiers")).toBeVisible();
     await expect(
-      page.getByText(`Medical Record Number: ${TEST_PATIENT.MRN}`),
+      page.getByText(
+        `Medical Record Number: St. Worrywart’s Hospital: ${TEST_PATIENT.MRN}`,
+      ),
     ).toBeVisible();
 
     // Should be no medication requests available
