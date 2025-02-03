@@ -152,6 +152,9 @@ export async function makeFhirQuery(
   return fhirResponse;
 }
 
+// Helper function that integrates the selections from the CustomizeQuery page
+// into the saved valuesets from build query. Can be deleted if / when we remove
+// CustomizeQuery fully
 function reconcileSavedQueryDataWithOverrides(
   savedQuery: QueryDataColumn,
   valueSetOverrides: DibbsValueSet[],
