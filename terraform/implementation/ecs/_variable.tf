@@ -162,3 +162,9 @@ variable "auth_redirect_proxy_url" {
   description = "URL for the Auth Redirect Proxy"
   sensitive   = true
 }
+
+variable "hostname" {
+  type        = string
+  description = "Hostname for the container"
+  default     = "0.0.0.0"
+}

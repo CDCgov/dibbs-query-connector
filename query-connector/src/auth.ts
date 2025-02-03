@@ -7,13 +7,8 @@ function addRealm(url: string) {
 
 let { NAMED_KEYCLOAK, LOCAL_KEYCLOAK } = process.env;
 if (!NAMED_KEYCLOAK || !LOCAL_KEYCLOAK) {
-  const KEYCLOAK_URL = process.env.AUTH_KEYCLOAK_ISSUER;
-  // Check if undefined or empty string.
-  if (!KEYCLOAK_URL) {
-    throw new Error(
-      "AUTH_KEYCLOAK_ISSUER is missing. Please provide a valid Keycloak URL.",
-    );
-  }
+  const KEYCLOAK_URL =
+    process.env.AUTH_KEYCLOAK_ISSUER || "http://localhost:8080";
   NAMED_KEYCLOAK = KEYCLOAK_URL;
   LOCAL_KEYCLOAK = KEYCLOAK_URL;
 }

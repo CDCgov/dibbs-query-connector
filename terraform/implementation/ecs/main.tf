@@ -58,7 +58,7 @@ module "ecs" {
         },
         {
           name  = "HOSTNAME",
-          value = "0.0.0.0"
+          value = var.hostname
         },
         {
           name  = "fhir_url"
@@ -110,7 +110,7 @@ module "ecs" {
           value = var.keycloak_url
         },
         {
-          name = "AUTH_REDIRECT_PROXY_URL"
+          name  = "AUTH_REDIRECT_PROXY_URL"
           value = var.auth_redirect_proxy_url
         }
       ]
