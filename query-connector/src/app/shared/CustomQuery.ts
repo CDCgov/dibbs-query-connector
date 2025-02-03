@@ -202,7 +202,6 @@ export class CustomQuery {
   }
 
   compileAllPostRequests() {
-    // return [this.compilePostRequest(this.fhirResourceQueries["condition"])];
     return Object.values(this.fhirResourceQueries)
       .map((q) => {
         return this.compilePostRequest(q);

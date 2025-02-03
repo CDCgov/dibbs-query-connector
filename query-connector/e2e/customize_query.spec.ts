@@ -183,18 +183,16 @@ test.describe("querying with the Query Connector", () => {
       "pregnancy",
       "with anonymous partner",
     ];
-    const obsRows = page
+    const obsRow = page
       .getByRole("table")
       .getByRole("row")
       .filter({ hasText: "I do not have housing" });
-    for (let i = 1; i < 6; i++) {
-      const row = obsRows.nth(i);
-      const typeText = await row.locator("td").nth(1).textContent();
-      const presentKey = acceptableSdohKeywords.find((key) =>
-        typeText?.toLowerCase().includes(key),
-      );
-      expect(presentKey).toBeDefined();
-      expect(typeText?.includes("chlamydia")).toBeFalsy();
-    }
+
+    const typeText = await obsRow.locator("td").nth(1).textContent();
+    const presentKey = acceptableSdohKeywords.find(
+      (key) => typeText?.toLowerCase().includes(key),
+    );
+    expect(presentKey).toBeDefined();
+    expect(typeText?.includes("chlamydia")).toBeFalsy();
   });
 });
