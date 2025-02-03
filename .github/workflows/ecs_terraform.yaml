@@ -66,8 +66,9 @@ jobs:
           AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
           KEYCLOAK_CLIENT_ID: ${{ secrets.KEYCLOAK_CLIENT_ID }}
           KEYCLOAK_CLIENT_SECRET: ${{ secrets.KEYCLOAK_CLIENT_SECRET }}
-          KEYCLOAK_URL: ${{ env.workspace == 'dev' && format('https://{0}', secrets.KEYCLOAK_URL) || format('https://{0}.{1}', env.workspace, secrets.KEYCLOAK_URL) }}
-          AUTH_REDIRECT_PROXY_URL: ${{ env.workspace == 'dev' && format('https://{0}', 'queryconnector.dev/api/auth') || format('https://{0}.{1}', env.workspace, 'queryconnector.dev/api/auth') }}
+          AUTH_KEYCLOAK_ISSUER: ${{ env.workspace == 'dev' && format('https://{0}/keycloak', secrets.ECS_HOSTNAME) || format('https://{0}.{1}/keycloak', env.workspace, secrets.ECS_HOSTNAME) }}
+          AUTH_URL: ${{ env.workspace == 'dev' && format('https://{0}', secrets.ECS_HOSTNAME) || format('https://{0}.{1}', env.workspace, secrets.ECS_HOSTNAME) }}
+          AUTH_REDIRECT_PROXY_URL: ${{ env.workspace == 'dev' && format('https://{0}/api/auth', secrets.ECS_HOSTNAME) || format('https://{0}.{1}/api/auth', env.workspace, secrets.ECS_HOSTNAME) }}
         shell: bash
         run: |
           rm -rf .terraform .terraform.lock.hcl
@@ -87,7 +88,8 @@ jobs:
             -var "auth_secret=${AUTH_SECRET}" \
             -var "keycloak_client_id=${KEYCLOAK_CLIENT_ID}" \
             -var "keycloak_client_secret=${KEYCLOAK_CLIENT_SECRET}" \
-            -var "keycloak_url=${KEYCLOAK_URL}" \
+            -var "auth_keycloak_issuer=${AUTH_KEYCLOAK_ISSUER}" \
+            -var "auth_url=${AUTH_URL}" \
             -var "auth_redirect_proxy_url=${AUTH_REDIRECT_PROXY_URL}"
           terraform plan \
             -var-file="$WORKSPACE.tfvars" \
@@ -98,7 +100,8 @@ jobs:
             -var "auth_secret=${AUTH_SECRET}" \
             -var "keycloak_client_id=${KEYCLOAK_CLIENT_ID}" \
             -var "keycloak_client_secret=${KEYCLOAK_CLIENT_SECRET}" \
-            -var "keycloak_url=${KEYCLOAK_URL}" \
+            -var "auth_keycloak_issuer=${AUTH_KEYCLOAK_ISSUER}" \
+            -var "auth_url=${AUTH_URL}" \
             -var "auth_redirect_proxy_url=${AUTH_REDIRECT_PROXY_URL}"
           terraform apply -auto-approve -replace="module.ecs.dockerless_remote_image.dibbs[\"query-connector\"]" \
             -var-file="$WORKSPACE.tfvars" \
@@ -109,5 +112,6 @@ jobs:
             -var "auth_secret=${AUTH_SECRET}" \
             -var "keycloak_client_id=${KEYCLOAK_CLIENT_ID}" \
             -var "keycloak_client_secret=${KEYCLOAK_CLIENT_SECRET}" \
-            -var "keycloak_url=${KEYCLOAK_URL}" \
+            -var "auth_keycloak_issuer=${AUTH_KEYCLOAK_ISSUER}" \
+            -var "auth_url=${AUTH_URL}" \
             -var "auth_redirect_proxy_url=${AUTH_REDIRECT_PROXY_URL}"

@@ -151,9 +151,15 @@ variable "keycloak_client_secret" {
   sensitive   = true
 }
 
-variable "keycloak_url" {
+variable "auth_keycloak_issuer" {
   type        = string
   description = "URL for Keycloak"
+  sensitive   = true
+}
+
+variable "auth_url" {
+  type        = string
+  description = "URL for the Auth server"
   sensitive   = true
 }
 

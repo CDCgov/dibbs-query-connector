@@ -107,7 +107,11 @@ module "ecs" {
         },
         {
           name  = "AUTH_KEYCLOAK_ISSUER"
-          value = var.keycloak_url
+          value = var.auth_keycloak_issuer
+        },
+        {
+          name  = "AUTH_URL"
+          value = var.auth_url
         },
         {
           name  = "AUTH_REDIRECT_PROXY_URL"
