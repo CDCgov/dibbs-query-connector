@@ -16,7 +16,7 @@ test.describe("querying with the Query Connector", () => {
   });
 
   test("unsuccessful user query: no patients", async ({ page }) => {
-    await page.getByRole("button", { name: "Try it out" }).click();
+    await page.getByRole("link", { name: "Try it out" }).click();
     await page.getByRole("button", { name: "Fill fields" }).click();
     await page.getByLabel("First name").fill("Shouldnt");
     await page.getByLabel("Last name").fill("Findanyone");
@@ -41,7 +41,7 @@ test.describe("querying with the Query Connector", () => {
   });
 
   test("successful demo user query", async ({ page }) => {
-    await page.getByRole("button", { name: "Try it out" }).click();
+    await page.getByRole("link", { name: "Try it out" }).click();
 
     // Check that the info alert is visible and contains the correct text
     const alert = page.locator(".custom-alert");
