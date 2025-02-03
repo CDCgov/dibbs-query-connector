@@ -195,11 +195,11 @@ test.describe("querying with the Query Connector", () => {
     const EXPECTED_OBSERVATIONS = 5;
     expect(obsRows).toHaveCount(EXPECTED_OBSERVATIONS);
 
-    for (let i = 0; i < EXPECTED_OBSERVATIONS + 1; i++) {
+    for (let i = 0; i < EXPECTED_OBSERVATIONS; i++) {
       const row = obsRows.nth(i);
       const typeText = await row.locator("td").nth(1).textContent();
-      const presentKey = acceptableSdohKeywords.find((key) =>
-        typeText?.toLowerCase().includes(key),
+      const presentKey = acceptableSdohKeywords.find(
+        (key) => typeText?.toLowerCase().includes(key),
       );
       expect(presentKey).toBeDefined();
       expect(typeText?.includes("chlamydia")).toBeFalsy();
