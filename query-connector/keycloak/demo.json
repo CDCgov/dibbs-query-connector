@@ -773,7 +773,7 @@
       "id": "d2e8ce4e-a19e-44c6-97b4-3fefa586d5e1",
       "clientId": "query-connector",
       "name": "Query Connector",
-      "description": "Demo",
+      "description": "Demo Keycloak client for Query Connector",
       "rootUrl": "https://demo.queryconnector.dev",
       "adminUrl": "https://demo.queryconnector.dev",
       "baseUrl": "https://demo.queryconnector.dev",
