@@ -38,6 +38,8 @@ const Drawer: React.FC<DrawerProps> = ({
   const [searchFilter, setSearchFilter] = useState("");
 
   useEffect(() => {
+    // do this in a useEffect rather than in the JSX so that we can control
+    // a drawer-specific search vs a filter passed in from the parent component
     if (onSearch) {
       onSearch(searchFilter);
     }

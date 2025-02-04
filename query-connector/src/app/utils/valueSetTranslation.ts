@@ -1,8 +1,15 @@
+import { FilterableValueSet } from "../(pages)/queryBuilding/components/SelectionTable";
 import { DibbsConceptType, DibbsValueSet } from "../shared/constants";
 
 export type ConceptTypeToDibbsVsMap = {
   [dibbsConceptType in DibbsConceptType]: {
     [vsId: string]: DibbsValueSet;
+  };
+};
+
+export type ConceptTypeToFilterableDibbsVsMap = {
+  [dibbsConceptType in DibbsConceptType]: {
+    [vsId: string]: FilterableValueSet;
   };
 };
 

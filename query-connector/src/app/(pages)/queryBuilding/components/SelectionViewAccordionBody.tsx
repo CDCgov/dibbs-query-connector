@@ -4,6 +4,7 @@ import ConceptSelection from "./ConceptSelection";
 import Drawer from "@/app/ui/designSystem/drawer/Drawer";
 import { Concept, DibbsValueSet } from "@/app/shared/constants";
 import Checkbox from "@/app/ui/designSystem/checkbox/Checkbox";
+import Highlighter from "react-highlight-words";
 
 type ConceptTypeAccordionBodyProps = {
   activeValueSets: { [vsId: string]: DibbsValueSet };
@@ -165,12 +166,14 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
           <ConceptSelection
             concepts={curConcepts}
             onConceptsChange={handleConceptsChange}
+            searchFilter={drawerSearchFilter}
           />
         }
         isOpen={isDrawerOpen}
         onClose={() => {
           setIsDrawerOpen(false);
           setCurValueSet(undefined);
+          setDrawerSearchFilter("");
         }}
         onSave={handleSaveChanges}
         onSearch={handleValueSetSearch}
