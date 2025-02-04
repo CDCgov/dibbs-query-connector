@@ -33,7 +33,7 @@ type VsTypeAccordion = {
   expanded: boolean;
   id: string;
   headingLevel: "h4";
-  handleToggle: () => void;
+  handleToggle: (e: React.MouseEvent<HTMLButtonElement>) => void;
   atLeastOneRenderedValueSet: boolean;
 };
 
@@ -62,14 +62,14 @@ export type FilterableValueSet = Omit<DibbsValueSet, "concepts"> &
 export const ConceptTypeSelectionTable: React.FC<
   ConceptTypeSelectionTableProps
 > = ({ vsTypeLevelOptions, handleVsTypeLevelUpdate, searchFilter }) => {
-  const [expanded, setExpandedGroup] = useState<string>("");
+  const [curExpanded, setCurExpanded] = useState<string>("");
   const [accordionItems, setAccordionItems] = useState<VsTypeAccordion[]>([]);
 
   useEffect(() => {
     setAccordionItems(
       generateTypeLevelAccordionItems(vsTypeLevelOptions, searchFilter),
     );
-  }, [vsTypeLevelOptions, searchFilter]);
+  }, [vsTypeLevelOptions, searchFilter, curExpanded]);
 
   const generateTypeLevelAccordionItems = (
     vsTypeLevelOptions:
@@ -97,7 +97,7 @@ export const ConceptTypeSelectionTable: React.FC<
           <ConceptTypeAccordionHeader
             activeType={vsType}
             activeTypeValueSets={valueSetsInType}
-            expanded={expanded === vsType}
+            expanded={curExpanded === vsType}
             handleVsNameLevelUpdate={handleVsNameLevelUpdate}
             areItemsFiltered={areItemsFiltered}
           />
@@ -107,16 +107,13 @@ export const ConceptTypeSelectionTable: React.FC<
           <ConceptTypeAccordionBody
             activeValueSets={valueSetsInType}
             handleVsIdLevelUpdate={handleVsNameLevelUpdate}
-            searchFilter={searchFilter}
+            tableSearchFilter={searchFilter}
           />
         );
         const level: HeadingLevel = "h4";
 
         const handleToggle = () => {
-          setExpandedGroup((prevState) => {
-            if (prevState === vsType) return "";
-            return vsType;
-          });
+          setCurExpanded(vsType);
         };
 
         return {

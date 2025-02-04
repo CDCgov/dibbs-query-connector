@@ -8,7 +8,7 @@ import Highlighter from "react-highlight-words";
 type ConceptSelectionProps = {
   concepts: FilterableConcept[];
   onConceptsChange: (updatedConcepts: FilterableConcept[]) => void;
-  searchFilter?: string;
+  searchFilter?: string[];
 };
 
 /**
@@ -24,7 +24,7 @@ type ConceptSelectionProps = {
 const ConceptSelection: React.FC<ConceptSelectionProps> = ({
   concepts,
   onConceptsChange,
-  searchFilter = "",
+  searchFilter = [""],
 }) => {
   const selectedCount = concepts.filter(
     (concept) => concept.include && concept.render,
@@ -105,7 +105,7 @@ const ConceptSelection: React.FC<ConceptSelectionProps> = ({
                 <td className={styles.conceptCode}>
                   <Highlighter
                     highlightClassName="bg-yellow"
-                    searchWords={[searchFilter]}
+                    searchWords={searchFilter}
                     autoEscape={true}
                     textToHighlight={concept.code}
                   />
@@ -113,7 +113,7 @@ const ConceptSelection: React.FC<ConceptSelectionProps> = ({
                 <td>
                   <Highlighter
                     highlightClassName="bg-yellow"
-                    searchWords={[searchFilter]}
+                    searchWords={searchFilter}
                     autoEscape={true}
                     textToHighlight={concept.display}
                   />

@@ -5,7 +5,8 @@ import SearchField from "../searchField/SearchField";
 import classNames from "classnames";
 
 type DrawerProps = {
-  title: string;
+  title: string | React.ReactNode;
+  subtitle?: string;
   placeholder: string;
   toastMessage?: string;
   toRender: React.ReactNode;
@@ -29,6 +30,7 @@ type DrawerProps = {
  */
 const Drawer: React.FC<DrawerProps> = ({
   title,
+  subtitle,
   placeholder,
   isOpen,
   onClose,
@@ -73,10 +75,12 @@ const Drawer: React.FC<DrawerProps> = ({
           </button>
           <h2
             data-testid={`drawer-title-${title}`}
-            className="margin-0 padding-bottom-2"
+            className={`margin-0 padding-0`}
           >
             {title}
           </h2>
+
+          <div className={styles.subtitle}>{subtitle}</div>
 
           {onSearch && (
             <div>

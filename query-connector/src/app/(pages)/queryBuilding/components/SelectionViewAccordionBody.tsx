@@ -16,7 +16,7 @@ type ConceptTypeAccordionBodyProps = {
   handleVsIdLevelUpdate: (
     vsId: string,
   ) => (dibbsValueSets: DibbsValueSet) => void;
-  searchFilter?: string;
+  tableSearchFilter?: string;
 };
 
 export type ConceptDisplay = Concept & {
@@ -35,23 +35,23 @@ export type ConceptDisplay = Concept & {
 const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
   activeValueSets,
   handleVsIdLevelUpdate,
-  searchFilter = "",
+  tableSearchFilter = "",
 }) => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [curValueSet, setCurValueSet] = useState<DibbsValueSet>();
   const [curConcepts, setCurConcepts] = useState<FilterableConcept[]>([]);
   const [drawerSearchFilter, setDrawerSearchFilter] = useState<string>("");
-  const areItemsFiltered = searchFilter !== "";
+  const areItemsFiltered = tableSearchFilter !== "";
 
   useEffect(() => {
     if (curValueSet) {
       const filteredConcepts = filterConceptsBySearchFilter(
-        searchFilter,
+        tableSearchFilter,
         curValueSet,
       );
       setCurConcepts(filteredConcepts);
     }
-  }, [searchFilter, curValueSet]);
+  }, [tableSearchFilter, curValueSet]);
 
   const handleViewCodes = (vs: FilterableValueSet) => {
     setCurValueSet(vs);
@@ -81,7 +81,6 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
       if (updateBatchSave) {
         handleVsIdLevelUpdate(curValueSet.valueSetId)(curValueSet);
       }
-
       setCurConcepts(updatedConcepts);
     }
   };
@@ -125,17 +124,18 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
     if (curValueSet) {
       // first filter by whatever search filter we've set at the valueset level
       const valueSetFilteredConcepts = filterValueSet(
-        searchFilter,
+        tableSearchFilter,
         curValueSet,
       );
-      const conceptFilteredConcepts = filterConceptsBySearchFilter(
+
+      const filteredConcepts = filterConceptsBySearchFilter(
         drawerSearchFilter,
         // and use that subset to display anything within the drawer
         valueSetFilteredConcepts,
         false,
       );
 
-      setCurConcepts(conceptFilteredConcepts);
+      setCurConcepts(filteredConcepts);
       setDrawerSearchFilter(drawerSearchFilter);
     }
   }
@@ -163,7 +163,11 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
             <div className={styles.accordionExpandedInner}>
               <Checkbox
                 className={styles.valueSetTemplate__checkbox}
-                label={checkboxLabel(dibbsVs, searchFilter, areItemsFiltered)}
+                label={checkboxLabel(
+                  dibbsVs,
+                  tableSearchFilter,
+                  areItemsFiltered,
+                )}
                 onChange={(e: ChangeEvent<HTMLInputElement>) => {
                   handleBulkToggle(e, isMinusState);
                 }}
@@ -192,14 +196,24 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
         );
       })}
       <Drawer
-        title={curValueSet?.valueSetName ?? ""}
+        title={
+          <Highlighter
+            highlightClassName="bg-yellow"
+            searchWords={[tableSearchFilter]}
+            autoEscape={true}
+            textToHighlight={curValueSet?.valueSetName ?? ""}
+          />
+        }
+        subtitle={
+          tableSearchFilter ? `Pre-filtered by "${tableSearchFilter}"` : ""
+        }
         placeholder="Search by code or name"
         toastMessage="Valueset concepts have been successfully modified."
         toRender={
           <ConceptSelection
             concepts={curConcepts}
             onConceptsChange={handleConceptsChange}
-            searchFilter={drawerSearchFilter}
+            searchFilter={[drawerSearchFilter, tableSearchFilter]}
           />
         }
         isOpen={isDrawerOpen}
@@ -269,7 +283,7 @@ const checkboxLabel = (
  */
 export function filterConceptsBySearchFilter(
   searchFilter: string,
-  selectedValueSet: DibbsValueSet,
+  selectedValueSet: FilterableValueSet | DibbsValueSet,
   matchOnValueSetName = true,
 ) {
   const casedSearchFilter = searchFilter.toLocaleLowerCase();
@@ -281,6 +295,12 @@ export function filterConceptsBySearchFilter(
 
   const newConcepts = structuredClone(selectedValueSet.concepts);
   return newConcepts.map((concept) => {
+    // if render has been set to false by a previous filter action (ie at the
+    // valueset level, skip this concept)
+    if ("render" in concept && concept.render === false) {
+      return concept;
+    }
+
     let toRender =
       valueSetNameMatch ||
       concept.code.toLocaleLowerCase().includes(casedSearchFilter) ||
