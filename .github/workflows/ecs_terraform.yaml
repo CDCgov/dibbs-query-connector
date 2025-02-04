@@ -103,7 +103,9 @@ jobs:
             -var "auth_keycloak_issuer=${AUTH_KEYCLOAK_ISSUER}" \
             -var "auth_url=${AUTH_URL}" \
             -var "auth_redirect_proxy_url=${AUTH_REDIRECT_PROXY_URL}"
-          terraform apply -auto-approve -replace="module.ecs.dockerless_remote_image.dibbs" \
+          terraform apply -auto-approve \
+            -replace="module.ecs.dockerless_remote_image.dibbs[\"query-connector\"]" \
+            -replace="module.ecs.dockerless_remote_image.dibbs[\"keycloak\"]" \
             -var-file="$WORKSPACE.tfvars" \
             -var "umls_api_key=${UMLS_API_KEY}" \
             -var "ersd_api_key=${ERSD_API_KEY}" \
