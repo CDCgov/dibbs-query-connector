@@ -49,7 +49,7 @@ COPY --from=installer /app/next.config.js .
 COPY --from=installer /app/package.json .
 COPY --from=installer /app/flyway/conf/flyway.conf ../flyway/conf/flyway.conf
 COPY --from=installer /app/flyway/sql ../flyway/sql
-COPY --from=installer /app/src/app/assets /app/assets
+COPY --from=installer /app/src/app/assets ./.next/server/app/assets
 
 # Automatically leverage output traces to reduce image size
 COPY --from=installer --chown=nextjs:nodejs /app/.next/standalone ./
