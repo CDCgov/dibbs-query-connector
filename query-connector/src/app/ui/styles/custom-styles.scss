@@ -579,3 +579,14 @@ ul.usa-sidenav
     background-color: transparent;
   }
 }
+
+.usa-table.qc-table{
+  border: solid 1px;
+}
+
+.usa-table.qc-table thead tr th, .usa-table.qc-table tbody tr td{
+  padding-top: 20px;
+  padding-bottom: 20px;
+  border-left: none;
+  border-right: none;
+}

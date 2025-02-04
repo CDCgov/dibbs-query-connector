@@ -169,6 +169,7 @@ const LOGGED_IN_PATHS = [
   "/queryBuilding",
   "/fhir-servers",
   "/userManagement",
+  "/userManagement/userGroups",
 ];
 
 export default HeaderComponent;
