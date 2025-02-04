@@ -109,9 +109,9 @@ test.describe("querying with the Query Connector", () => {
     await expect(
       page
         .getByRole("table")
-        .filter({ hasText: "doxycycline hyclate 100 MG" })
-        .getByRole("row"),
-    ).toHaveCount(2);
+        .getByRole("row")
+        .filter({ hasText: "doxycycline hyclate 100 MG" }),
+    ).toHaveCount(1);
   });
 
   test("customize query select / deselect all filters whole DibbsConceptType, across tabs", async ({
@@ -166,16 +166,16 @@ test.describe("querying with the Query Connector", () => {
       page.getByRole("button", { name: "Diagnostic Reports" }),
     ).not.toBeVisible();
 
-    // Observations table should have 5 rows, all of which are SDoH factors rather than lab results
     await expect(
       page.getByRole("button", { name: "Observations", expanded: true }),
     ).toBeVisible();
     await expect(
       page
         .getByRole("table")
-        .filter({ hasText: "I do not have housing" })
-        .getByRole("row"),
-    ).toHaveCount(6);
+        .getByRole("row")
+        .filter({ hasText: "I do not have housing" }),
+    ).toHaveCount(1);
+
     const acceptableSdohKeywords = [
       "history",
       "narrative",
@@ -183,11 +183,19 @@ test.describe("querying with the Query Connector", () => {
       "pregnancy",
       "with anonymous partner",
     ];
+
+    // Observations table should have 5 rows, all of which are SDoH factors rather than lab results
     const obsRows = page
-      .getByRole("table")
-      .filter({ hasText: "I do not have housing" })
-      .getByRole("row");
-    for (let i = 1; i < 6; i++) {
+      .getByTestId("accordionItem_observations")
+      .locator("div")
+      .getByRole("row")
+      // add this filter to exclude header
+      .filter({ hasText: "http://loinc.org" });
+
+    const EXPECTED_OBSERVATIONS = 5;
+    expect(obsRows).toHaveCount(EXPECTED_OBSERVATIONS);
+
+    for (let i = 0; i < EXPECTED_OBSERVATIONS; i++) {
       const row = obsRows.nth(i);
       const typeText = await row.locator("td").nth(1).textContent();
       const presentKey = acceptableSdohKeywords.find((key) =>

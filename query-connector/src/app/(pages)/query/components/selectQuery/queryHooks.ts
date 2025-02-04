@@ -1,7 +1,7 @@
 import { DibbsValueSet, hyperUnluckyPatient } from "@/app/shared/constants";
 import { getSavedQueryByName } from "@/app/shared/database-service";
 import { unnestValueSetsFromQuery } from "@/app/shared/utils";
-import { makeFhirQuery, QueryResponse } from "@/app/shared/query-service";
+import { FhirQueryResponse, makeFhirQuery } from "@/app/shared/query-service";
 import { Patient } from "fhir/r4";
 
 type SetStateCallback<T> = React.Dispatch<React.SetStateAction<T>>;
@@ -32,18 +32,19 @@ export async function fetchQueryValueSets(queryName: string) {
  * @param p.selectedQuery - selected query
  * @param p.queryResponseStateCallback - callback function to update state of the
  * query response
- * @param p.queryValueSets - Valuesets to fetch as part of the query
  * @param p.fhirServer - fhir server to do the querying against
  * @param p.setIsLoading - callback to update loading state
+ * @param p.valueSetOverrides - list of overrides from the customize query flow
+ * to not include in the final query execution
  */
 export async function fetchQueryResponse(p: {
   queryName: string;
   patientForQuery: Patient | undefined;
   selectedQuery: string;
   fhirServer: string;
-  queryValueSets: DibbsValueSet[];
-  queryResponseStateCallback: SetStateCallback<QueryResponse>;
+  queryResponseStateCallback: SetStateCallback<FhirQueryResponse>;
   setIsLoading: (isLoading: boolean) => void;
+  valueSetOverrides?: DibbsValueSet[];
 }) {
   if (p.patientForQuery && p.selectedQuery) {
     const patientFirstName =
@@ -65,22 +66,15 @@ export async function fetchQueryResponse(p: {
       mrn: patientMRN,
       fhir_server: p.fhirServer,
     };
-
-    // Need to also filter down by concepts to only display desired info
-    const filteredValueSets = p.queryValueSets
-      .filter((item) => item.includeValueSet)
-      .map((fvs) => {
-        const conceptFilteredVS: DibbsValueSet = {
-          ...fvs,
-          concepts: fvs.concepts.filter((c) => c.include),
-        };
-        return conceptFilteredVS;
-      });
-
     p.setIsLoading(true);
-    const queryResponse = await makeFhirQuery(newRequest, filteredValueSets, {
-      Patient: [p.patientForQuery],
-    });
+    const queryResponse = await makeFhirQuery(
+      newRequest,
+      {
+        Patient: [p.patientForQuery],
+      },
+      p.valueSetOverrides,
+    );
+
     p.queryResponseStateCallback(queryResponse);
     p.setIsLoading(false);
   }

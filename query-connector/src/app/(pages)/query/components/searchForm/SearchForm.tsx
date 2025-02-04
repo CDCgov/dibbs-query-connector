@@ -91,12 +91,11 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
       fhir_server: fhirServer,
       // we just need the patient here and don't need to cross reference
       // our DB.
-      // ? maybe refactor to split out our generic FHIR query into more
-      // ? resource-based methods?
-      query_name: "",
+      query_name: null,
+      just_return_patient: true,
       phone: FormatPhoneAsDigits(phone),
     };
-    const queryResponse = await makeFhirQuery(originalRequest, []);
+    const queryResponse = await makeFhirQuery(originalRequest);
     setPatientDiscoveryQueryResponse(queryResponse);
 
     setMode("patient-results");
