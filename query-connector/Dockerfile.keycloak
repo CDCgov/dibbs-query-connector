@@ -1,13 +1,12 @@
 FROM quay.io/keycloak/keycloak:26.1
 USER root
 
-# Copy all realm files
-COPY ./keycloak/*.json /opt/keycloak/
+# Copy all keycloak files to /opt/keycloak
+COPY ./keycloak/ /opt/keycloak/
 
 # Copy selection script
-COPY ./keycloak/select-realm.sh /opt/keycloak/select-realm.sh
 RUN chmod +x /opt/keycloak/select-realm.sh
 
 # Use script as the entrypoint
 USER 1000
-CMD ["/opt/keycloak/select-realm.sh"]
+ENTRYPOINT ["/opt/keycloak/select-realm.sh"]
