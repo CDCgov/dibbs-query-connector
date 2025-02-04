@@ -40,6 +40,7 @@ services:
       - AUTH_DISABLED=false
       - AUTH_SECRET="ido5D/uybeAB3AmMQwn+ubw2zYC4t2h7RJlW2R79598="
       - AUTH_KEYCLOAK_ISSUER=http://localhost:8080/realms/master
+      - NEXTAUTH_URL=http://localhost:3000
       - LOCAL_KEYCLOAK=http://localhost:8080
       - NAMED_KEYCLOAK=http://keycloak:8080
       - AUTH_KEYCLOAK_ID=query-connector
