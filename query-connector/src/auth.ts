@@ -1,5 +1,6 @@
 import NextAuth from "next-auth";
 import KeycloakProvider from "next-auth/providers/keycloak";
+import { addUserIfNotExists } from "@/app/backend/user-management";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   secret: process.env.AUTH_SECRET,
@@ -31,20 +32,26 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
      * @returns The updated JWT token with user details.
      */
     async jwt({ token, profile }) {
-      console.log("JWT Callback - Initial Token:", token);
-      console.log("JWT Callback - Profile:", profile);
-
       if (profile) {
-        token.id = profile.sub;
-        token.username = profile.preferred_username || profile.email;
-        token.email = profile.email;
-        token.firstName = profile.given_name;
-        token.lastName = profile.family_name;
+        const userToken = {
+          id: profile.sub || "",
+          username: profile.preferred_username || profile.email || "",
+          email: profile.email || "",
+          firstName: profile.given_name || "",
+          lastName: profile.family_name || "",
+        };
+
+        // Ensure user is in the database **only on first login**
+        try {
+          await addUserIfNotExists(userToken);
+        } catch (error) {}
+
+        return { ...token, ...userToken };
       }
 
-      console.log("JWT Callback - Final Token:", token);
       return token;
     },
+
     /**
      * Session callback to pass user data to the session object.
      * @param session The root object containing session properties.
@@ -53,17 +60,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
      * @returns The updated session object with user details.
      */
     async session({ session, token }) {
-      console.log("Session Callback - Initial Session:", session);
-      console.log("Session Callback - Token:", token);
-
       session.user = {
-        ...token,
         id: typeof token.id === "string" ? token.id : "",
         email: token.email || "",
+        username: typeof token.username === "string" ? token.username : "",
+        firstName: typeof token.firstName === "string" ? token.firstName : "",
+        lastName: typeof token.lastName === "string" ? token.lastName : "",
         emailVerified: null,
       };
-
-      console.log("Session Callback - Final Session:", session);
       return session;
     },
   },
