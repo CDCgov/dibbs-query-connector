@@ -774,19 +774,19 @@
       "clientId": "query-connector",
       "name": "Query Connector",
       "description": "",
-      "rootUrl": "http://demo.queryconnector.dev",
-      "adminUrl": "http://demo.queryconnector.dev",
-      "baseUrl": "http://demo.queryconnector.dev",
+      "rootUrl": "https://demo.queryconnector.dev",
+      "adminUrl": "https://demo.queryconnector.dev",
+      "baseUrl": "https://demo.queryconnector.dev",
       "surrogateAuthRequired": false,
       "enabled": true,
       "alwaysDisplayInConsole": true,
       "clientAuthenticatorType": "client-secret",
       "secret": "ZG3f7R1J3qIwBaw8QtttJnJMinpERQKs",
       "redirectUris": [
-        "http://demo.queryconnector.dev/api/auth/callback/keycloak"
+        "https://demo.queryconnector.dev/api/auth/callback/keycloak"
       ],
       "webOrigins": [
-        "http://demo.queryconnector.dev"
+        "https://demo.queryconnector.dev"
       ],
       "notBefore": 0,
       "bearerOnly": false,

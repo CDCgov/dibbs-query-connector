@@ -157,12 +157,6 @@ variable "auth_keycloak_issuer" {
   sensitive   = true
 }
 
-variable "auth_url" {
-  type        = string
-  description = "URL for the Auth server"
-  sensitive   = true
-}
-
 variable "auth_redirect_proxy_url" {
   type        = string
   description = "URL for the Auth Redirect Proxy"
