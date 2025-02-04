@@ -7,7 +7,7 @@ import { CategoryToConditionArrayMap, NestedQuery } from "../utils";
 import ConditionColumnDisplay from "../buildFromTemplates/ConditionColumnDisplay";
 import SearchField from "@/app/ui/designSystem/searchField/SearchField";
 import { FormError } from "../buildFromTemplates/BuildFromTemplates";
-import { CONDITION_DRAWER_SEARCH_PLACEHOLDER } from "./constants";
+import { CONDITION_DRAWER_SEARCH_PLACEHOLDER } from "./utils";
 
 type ConditionSelectionProps = {
   categoryToConditionsMap: CategoryToConditionArrayMap;
