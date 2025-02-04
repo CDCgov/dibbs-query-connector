@@ -54,6 +54,28 @@ class FHIRClient {
 
     return await Promise.all(fetchPromises);
   }
+
+  async post(path: string, params: Record<string, string>): Promise<Response> {
+    try {
+      const searchParams = new URLSearchParams();
+      Object.entries(params).map(([k, v]) => {
+        searchParams.append(k, v);
+      });
+
+      const bodyToPost = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: searchParams.toString(),
+      };
+
+      return fetch(this.hostname + path, bodyToPost);
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
 }
 
 export default FHIRClient;
