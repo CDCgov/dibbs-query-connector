@@ -29,7 +29,7 @@ export type ConceptDisplay = Concept & {
  * @param param0.activeValueSets - Valuesets for display in this accordion
  * @param param0.handleVsIdLevelUpdate - curried state update function that
  * takes a valueset ID and generates a ValueSet level update
- * @param param0.searchFilter - the search string
+ * @param param0.tableSearchFilter - the search string from the selection table
  * @returns An accordion body component
  */
 const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({

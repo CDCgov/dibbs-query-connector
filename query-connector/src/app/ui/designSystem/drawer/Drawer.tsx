@@ -20,6 +20,7 @@ type DrawerProps = {
  * Drawer component to review and refine changes to conditions or concepts.
  * @param root0 - props
  * @param root0.title - The title displayed in the drawer.
+ * @param root0.subtitle - The drawer subtitle
  * @param root0.placeholder - The placeholder text for the search field.
  * @param root0.onClose - Function to handle closing the drawer.
  * @param root0.onSearch - Function to handle search actions in the drawer.
