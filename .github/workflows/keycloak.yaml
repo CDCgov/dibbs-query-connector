@@ -7,7 +7,7 @@ on:
       - nickclyde/keycloak-terraform
     paths:
       - "query-connector/Dockerfile.keycloak"
-      - "query-connector/keycloak/master-realm.json"
+      - "query-connector/keycloak/"
   workflow_dispatch:
 
 concurrency:
