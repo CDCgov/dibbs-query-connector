@@ -8,9 +8,6 @@ import {
   Immunization,
   Coding,
 } from "fhir/r4";
-import { DibbsValueSet } from "../shared/constants";
-import { QueryStruct } from "./query-service";
-
 /**
  * Formats a string.
  * @param input - The string to format.
@@ -258,50 +255,6 @@ export async function GetPhoneQueryFormats(phone: string) {
   });
   return possibleFormats;
 }
-
-/**
- * Formats a statefully updated list of value sets into a JSON structure
- * used for executing custom queries.
- * @param queryName The name of the query being transformed for.
- * @param valueSets The list of value sets the user wants included.
- * @returns A structured specification of a query that can be executed.
- */
-export const formatValueSetsAsQuerySpec = async (
-  queryName: string,
-  valueSets: DibbsValueSet[],
-) => {
-  let secondEncounter: boolean = false;
-  if (["cancer", "chlamydia", "gonorrhea", "syphilis"].includes(queryName)) {
-    secondEncounter = true;
-  }
-  const labCodes: string[] = valueSets
-    .filter((vs) => vs.system === "http://loinc.org")
-    .reduce((acc, vs) => {
-      vs.concepts.forEach((concept) => acc.push(concept.code));
-      return acc;
-    }, [] as string[]);
-  const snomedCodes: string[] = valueSets
-    .filter((vs) => vs.system === "http://snomed.info/sct")
-    .reduce((acc, vs) => {
-      vs.concepts.forEach((concept) => acc.push(concept.code));
-      return acc;
-    }, [] as string[]);
-  const rxnormCodes: string[] = valueSets
-    .filter((vs) => vs.system === "http://www.nlm.nih.gov/research/umls/rxnorm")
-    .reduce((acc, vs) => {
-      vs.concepts.forEach((concept) => acc.push(concept.code));
-      return acc;
-    }, [] as string[]);
-
-  const spec: QueryStruct = {
-    labCodes: labCodes,
-    snomedCodes: snomedCodes,
-    rxnormCodes: rxnormCodes,
-    hasSecondEncounterQuery: secondEncounter,
-  };
-
-  return spec;
-};
 
 /**
  * Formats the route of a FHIR Immunization object.

@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "@trussworks/react-uswds";
 import { DibbsConceptType, DibbsValueSet } from "../../../shared/constants";
-import { QueryResponse } from "@/app/shared/query-service";
+import { FhirQueryResponse } from "@/app/shared/query-service";
 import LoadingView from "../../../ui/designSystem/LoadingView";
 import { showToastConfirmation } from "../../../ui/designSystem/toast/Toast";
 import styles from "./customizeQuery/customizeQuery.module.scss";
@@ -17,7 +17,7 @@ import { generateValueSetGroupingsByDibbsConceptType } from "@/app/utils/valueSe
 import { CustomUserQuery } from "@/app/shared/constants";
 
 interface CustomizeQueryProps {
-  fhirQueryResponse: QueryResponse;
+  fhirQueryResponse: FhirQueryResponse;
   queryValueSets: DibbsValueSet[];
   setQueryValuesets: (queryVS: DibbsValueSet[]) => void;
   goBack: () => void;
@@ -93,10 +93,12 @@ const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
 
     updatedValueSet = {
       ...updatedValueSet,
+      includeValueSet: updatedConcepts.map((c) => c.include).some(Boolean),
       concepts: updatedConcepts, // Update the concepts in the accessed value set
     };
 
     updatedIdToVsMap[vsId] = updatedValueSet;
+
     setValueSetOptions((prevState) => ({
       ...prevState,
       [activeTab]: updatedIdToVsMap, // Update the state with the modified VS
