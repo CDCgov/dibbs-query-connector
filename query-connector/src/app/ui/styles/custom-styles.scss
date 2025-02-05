@@ -523,8 +523,6 @@ ul.usa-sidenav
   font-size: 0.875rem;
 }
 
-
-
 #fhir-server-modal {
   .usa-modal__close {
     background-color: transparent !important;
@@ -545,7 +543,8 @@ ul.usa-sidenav
     .usa-modal__main {
       max-width: 34rem;
 
-      input, select {
+      input,
+      select {
         max-width: 100%;
       }
     }
@@ -564,7 +563,7 @@ ul.usa-sidenav
 
     #modal-cancel-button {
       background-color: transparent;
-      
+
       &:hover {
         box-shadow: none;
       }
@@ -578,4 +577,8 @@ ul.usa-sidenav
   .usa-checkbox {
     background-color: transparent;
   }
+}
+
+.searchHighlight {
+  background-color: $yellow-vivid-20v;
 }

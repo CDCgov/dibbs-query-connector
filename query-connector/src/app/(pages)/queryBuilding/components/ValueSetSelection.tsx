@@ -16,7 +16,7 @@ import Drawer from "@/app/ui/designSystem/drawer/Drawer";
 import { DibbsConceptType, DibbsValueSet } from "@/app/shared/constants";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import SearchField from "@/app/ui/designSystem/searchField/SearchField";
-import { CONDITION_DRAWER_SEARCH_PLACEHOLDER } from "./constants";
+import { CONDITION_DRAWER_SEARCH_PLACEHOLDER } from "./utils";
 
 type ConditionSelectionProps = {
   constructedQuery: NestedQuery;

@@ -17,7 +17,7 @@ import {
 } from "@/app/shared/database-service";
 import { renderWithUser } from "@/app/tests/unit/setup";
 import { screen, waitFor } from "@testing-library/dom";
-import { CONDITION_DRAWER_SEARCH_PLACEHOLDER } from "../components/constants";
+import { CONDITION_DRAWER_SEARCH_PLACEHOLDER } from "../components/utils";
 
 jest.mock("../../../shared/database-service", () => ({
   getCustomQueries: jest.fn(),
