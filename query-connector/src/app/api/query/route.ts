@@ -19,7 +19,6 @@ import {
 
 import { handleRequestError } from "./error-handling-service";
 import { getFhirServerNames } from "@/app/shared/database-service";
-import { unnestValueSetsFromQuery } from "@/app/shared/utils";
 import { getSavedQueryById } from "@/app/backend/query-building";
 
 /**
@@ -110,12 +109,7 @@ export async function POST(request: NextRequest) {
     ...(PatientIdentifiers.phone && { phone: PatientIdentifiers.phone }),
   };
 
-  const valueSets = unnestValueSetsFromQuery(queryResults);
-
-  const QueryResponse: QueryResponse = await makeFhirQuery(
-    QueryRequest,
-    valueSets,
-  );
+  const QueryResponse: QueryResponse = await makeFhirQuery(QueryRequest);
 
   // Bundle data
   const bundle: APIQueryResponse = await createBundle(QueryResponse);
