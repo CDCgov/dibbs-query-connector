@@ -3,7 +3,7 @@
 .drawer {
   position: fixed;
   top: 0;
-  right: -35.1875rem;
+  right: -35rem;
   padding: 0rem;
   display: flex;
   flex-direction: column;
@@ -23,7 +23,7 @@
 }
 
 .drawer.closed {
-  right: -35.1875rem;
+  right: -35rem;
 }
 
 .drawerContent {
