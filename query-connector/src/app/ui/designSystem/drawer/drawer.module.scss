@@ -4,8 +4,6 @@
   position: fixed;
   top: 0;
   right: -35.1875rem;
-  height: 73.0625rem;
-  width: 35.1875rem;
   padding: 0rem;
   display: flex;
   flex-direction: column;
@@ -31,6 +29,7 @@
 .drawerContent {
   padding: 2rem;
   overflow-y: auto;
+  width: 90%;
 }
 
 .overlay {
