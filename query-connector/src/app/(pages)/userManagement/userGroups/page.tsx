@@ -17,11 +17,11 @@ const UserGroups: React.FC = () => {
     setUserGroups(userGroupsMock);
   }, []);
 
-  function GetMemberLabel(memberSize: number) {
+  function GetMemberLabel(memberSize: number): string {
     return memberSize == 1 ? `${memberSize} member` : `${memberSize} members`;
   }
 
-  function GetQueryLabel(querySize: number) {
+  function GetQueryLabel(querySize: number): string {
     return querySize == 1 ? `${querySize} query` : `${querySize} queries`;
   }
 
@@ -46,6 +46,7 @@ const UserGroups: React.FC = () => {
                 type="button"
                 className={classNames("text-no-underline")}
                 unstyled
+                aria-description={`Edit ${group.name} members`}
                 onClick={() => {}}
               >
                 {GetMemberLabel(group.memberSize)}
@@ -56,6 +57,7 @@ const UserGroups: React.FC = () => {
                 type="button"
                 className={classNames("text-no-underline")}
                 unstyled
+                aria-description={`Edit ${group.name} queries`}
                 onClick={() => {}}
               >
                 {GetQueryLabel(group.querySize)}

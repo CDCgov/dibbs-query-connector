@@ -4,15 +4,17 @@ import React from "react";
 import { RoleTypeValues } from "../types";
 
 export interface RoleDropdownProps {
+  id: string;
   defaultValue: RoleTypeValues;
 }
 
 /**
  * @param root0 - RoleDropdown component props
  * @param root0.defaultValue - initial values loaded as selected in the dropdown
+ * @param root0.id - id prop for the dropdown element
  * @returns - A dropdown with the different role options
  */
-const RoleDropdown: React.FC<RoleDropdownProps> = ({ defaultValue }) => {
+const RoleDropdown: React.FC<RoleDropdownProps> = ({ id, defaultValue }) => {
   const roleOptions = [
     { label: "Super Admin", value: RoleTypeValues.SuperAdmin },
     { label: "Admin", value: RoleTypeValues.Admin },
@@ -21,12 +23,12 @@ const RoleDropdown: React.FC<RoleDropdownProps> = ({ defaultValue }) => {
 
   return (
     <>
-      <Label htmlFor={`role-combo-box`} className={classNames("usa-sr-only")}>
-        Role
+      <Label htmlFor={id} className={classNames("usa-sr-only")}>
+        User role
       </Label>
       <ComboBox
-        id={`role-combo-box`}
-        name="user-role-combo-box"
+        id={id}
+        name="user-role-combobox"
         options={roleOptions}
         onChange={() => {}}
         defaultValue={defaultValue.toString()}

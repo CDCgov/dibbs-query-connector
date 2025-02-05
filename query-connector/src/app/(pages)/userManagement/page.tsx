@@ -59,7 +59,10 @@ const UserManagement: React.FC = () => {
             <tr key={user.id}>
               <td>{`${user.lastName}, ${user.firstName}`}</td>
               <td width={270}>
-                <RoleDropdown defaultValue={user.role} />
+                <RoleDropdown
+                  id={`${user.id}-role-combobox`}
+                  defaultValue={user.role}
+                />
               </td>
               <td>
                 {user.userGroups.length > 0
@@ -72,6 +75,7 @@ const UserManagement: React.FC = () => {
                         type="button"
                         unstyled
                         key={group.id}
+                        aria-description={`Edit ${group.name} members`}
                       >
                         {group.name}
                         {idx + 1 != user.userGroups.length && ","}
