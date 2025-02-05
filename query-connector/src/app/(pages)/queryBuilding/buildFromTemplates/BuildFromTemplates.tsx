@@ -243,11 +243,11 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
     (conditionId: string) =>
     (vsType: DibbsConceptType) =>
     (vsId: string) =>
-    (dibbsValueSets: DibbsValueSet) => {
+    (dibbsValueSet: DibbsValueSet) => {
       setConstructedQuery((prevState) => {
         prevState[conditionId] = prevState[conditionId] ?? {};
         prevState[conditionId][vsType] = prevState[conditionId][vsType] ?? {};
-        prevState[conditionId][vsType][vsId] = dibbsValueSets;
+        prevState[conditionId][vsType][vsId] = dibbsValueSet;
         return structuredClone(prevState);
       });
     };
