@@ -16,6 +16,8 @@
   z-index: 1050;
   border-left: 1px solid $border;
   background: $page-background;
+  overflow: scroll;
+  max-height: 100%;
 }
 
 .drawer.open {
@@ -63,4 +65,10 @@
   position: absolute;
   top: 1.5rem;
   right: 1rem;
+}
+
+.subtitle {
+  color: $gray-600;
+  display: flex;
+  padding-bottom: 1rem;
 }

@@ -5,7 +5,8 @@ import SearchField from "../searchField/SearchField";
 import classNames from "classnames";
 
 type DrawerProps = {
-  title: string;
+  title: string | React.ReactNode;
+  subtitle?: string;
   placeholder: string;
   toastMessage?: string;
   toRender: React.ReactNode;
@@ -19,6 +20,7 @@ type DrawerProps = {
  * Drawer component to review and refine changes to conditions or concepts.
  * @param root0 - props
  * @param root0.title - The title displayed in the drawer.
+ * @param root0.subtitle - The drawer subtitle
  * @param root0.placeholder - The placeholder text for the search field.
  * @param root0.onClose - Function to handle closing the drawer.
  * @param root0.onSearch - Function to handle search actions in the drawer.
@@ -29,6 +31,7 @@ type DrawerProps = {
  */
 const Drawer: React.FC<DrawerProps> = ({
   title,
+  subtitle,
   placeholder,
   isOpen,
   onClose,
@@ -38,6 +41,8 @@ const Drawer: React.FC<DrawerProps> = ({
   const [searchFilter, setSearchFilter] = useState("");
 
   useEffect(() => {
+    // do this in a useEffect rather than in the JSX so that we can control
+    // a drawer-specific search vs a filter passed in from the parent component
     if (onSearch) {
       onSearch(searchFilter);
     }
@@ -71,10 +76,12 @@ const Drawer: React.FC<DrawerProps> = ({
           </button>
           <h2
             data-testid={`drawer-title-${title}`}
-            className="margin-0 padding-bottom-2"
+            className={`margin-0 padding-0`}
           >
             {title}
           </h2>
+
+          <div className={styles.subtitle}>{subtitle}</div>
 
           {onSearch && (
             <div>
