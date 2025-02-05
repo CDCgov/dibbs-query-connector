@@ -14,7 +14,11 @@ interface UserManagementData {
 }
 
 interface UserManagementContext extends UserManagementData {
-  OpenEditSection: () => void; //todo real method type
+  OpenEditSection: (
+    title: string,
+    subjectType: SubjectType,
+    subjectId: string,
+  ) => void;
   CloseEditSection: () => void;
 }
 
