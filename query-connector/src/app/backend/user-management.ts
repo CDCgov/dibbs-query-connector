@@ -42,8 +42,8 @@ export async function addUserIfNotExists(userToken: {
 
     console.log("User not found. Proceeding to insert:", id);
 
-    // TODO: Update the role based on the user's group in Keycloak
-    const qc_role = "super-admin";
+    // Default role when adding a new user, which includer Super Admin, Admin, and Standard User.
+    const qc_role = "Standard User";
 
     const insertUserQuery = `
       INSERT INTO user_management (username, qc_role, first_name, last_name)
@@ -62,6 +62,43 @@ export async function addUserIfNotExists(userToken: {
     return result.rows[0];
   } catch (error) {
     console.error("Error adding user to user_management:", error);
+    throw error;
+  }
+}
+
+/**
+ * Updates the role of an existing user in the user_management table.
+ * @param username - The username of the user whose role is being updated.
+ * @param newRole - The new role to assign to the user.
+ * @returns The updated user record or an error if the update fails.
+ */
+export async function updateUserRole(username: string, newRole: string) {
+  if (!username || !newRole) {
+    console.error("Invalid input: username and newRole are required.");
+    throw new Error("Username and new role are required.");
+  }
+
+  try {
+    console.log(`Updating role for user: ${username} to ${newRole}`);
+
+    const updateQuery = `
+      UPDATE user_management
+      SET qc_role = $1
+      WHERE username = $2
+      RETURNING username, qc_role, first_name, last_name;
+    `;
+
+    const result = await dbClient.query(updateQuery, [newRole, username]);
+
+    if (result.rows.length === 0) {
+      console.error(`User not found: ${username}`);
+      throw new Error(`User not found: ${username}`);
+    }
+
+    console.log(`User role updated successfully: ${username} -> ${newRole}`);
+    return result.rows[0];
+  } catch (error) {
+    console.error("Error updating user role:", error);
     throw error;
   }
 }
