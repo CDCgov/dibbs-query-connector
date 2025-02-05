@@ -163,8 +163,3 @@ variable "auth_url" {
   sensitive   = true
 }
 
-variable "auth_redirect_proxy_url" {
-  type        = string
-  description = "URL for the Auth Redirect Proxy"
-  sensitive   = true
-}

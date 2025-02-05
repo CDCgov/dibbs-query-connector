@@ -22,7 +22,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   secret: process.env.AUTH_SECRET,
   trustHost: true,
   basePath: "/api/auth",
-  redirectProxyUrl: process.env.AUTH_REDIRECT_PROXY_URL,
   providers: [
     KeycloakProvider({
       jwks_endpoint: `${NAMED_KEYCLOAK}/protocol/openid-connect/certs`,
