@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import styles from "../buildFromTemplates/conditionTemplateSelection.module.scss";
 import { HeadingLevel } from "@trussworks/react-uswds";
 import ConceptTypeAccordionBody from "./SelectionViewAccordionBody";
@@ -7,7 +7,7 @@ import { DibbsConceptType, DibbsValueSet } from "@/app/shared/constants";
 import { ConceptTypeToDibbsVsMap } from "@/app/utils/valueSetTranslation";
 import ConceptTypeAccordionHeader from "./SelectionViewAccordionHeader";
 import MultiAccordion from "@/app/ui/designSystem/MultiAccordion";
-import { EMPTY_CONCEPT_TYPE } from "../utils";
+import { filterVsTypeOptions } from "./utils";
 
 type ConceptTypeSelectionTableProps = {
   vsTypeLevelOptions: ConceptTypeToDibbsVsMap;
@@ -15,6 +15,17 @@ type ConceptTypeSelectionTableProps = {
     vsType: DibbsConceptType,
   ) => (vsId: string) => (dibbsValueSets: DibbsValueSet) => void;
   searchFilter: string;
+  setSearchFilter: Dispatch<SetStateAction<string>>;
+};
+
+type VsTypeAccordion = {
+  title: JSX.Element;
+  content: JSX.Element;
+  expanded: boolean;
+  id: string;
+  headingLevel: "h4";
+  handleToggle: (e: React.MouseEvent<HTMLButtonElement>) => void;
+  atLeastOneRenderedValueSet: boolean;
 };
 
 /**
@@ -30,90 +41,91 @@ type ConceptTypeSelectionTableProps = {
 export const ConceptTypeSelectionTable: React.FC<
   ConceptTypeSelectionTableProps
 > = ({ vsTypeLevelOptions, handleVsTypeLevelUpdate, searchFilter }) => {
-  const [expanded, setExpandedGroup] = useState<string>("");
-  const [valueSetDisplay, setValueSetDisplay] =
-    useState<ConceptTypeToDibbsVsMap>(EMPTY_CONCEPT_TYPE);
+  const [curExpanded, setCurExpanded] = useState<string>("");
+  const [accordionItems, setAccordionItems] = useState<VsTypeAccordion[]>([]);
 
   useEffect(() => {
-    const casedSearchFilter = searchFilter.toLocaleLowerCase();
-    const filteredValueSets = structuredClone(vsTypeLevelOptions);
-
-    Object.entries(filteredValueSets).forEach(([vsType, vsDict]) => {
-      Object.entries(vsDict).forEach(([vsId, vs]) => {
-        if (vs.valueSetName.toLocaleLowerCase().includes(casedSearchFilter)) {
-          filteredValueSets[vsType as DibbsConceptType][vsId] = vs;
-        } else {
-          vs.concepts = vs.concepts.filter(
-            (c) =>
-              c.code.toLocaleLowerCase().includes(casedSearchFilter) ||
-              c.display.toLocaleLowerCase().includes(casedSearchFilter),
-          );
-
-          if (vs.concepts.length > 0) {
-            filteredValueSets[vsType as DibbsConceptType][vsId] = vs;
-          }
-        }
-      });
-    });
-
-    setValueSetDisplay(filteredValueSets);
-  }, [searchFilter]);
-
-  useEffect(() => {
-    setValueSetDisplay(vsTypeLevelOptions);
-  }, [vsTypeLevelOptions]);
-
-  const generateTypeLevelAccordionItems = (vsType: DibbsConceptType) => {
-    const handleVsNameLevelUpdate = handleVsTypeLevelUpdate(vsType);
-
-    const title = (
-      <ConceptTypeAccordionHeader
-        activeType={vsType}
-        activeTypeValueSets={valueSetDisplay[vsType]}
-        expanded={expanded === vsType}
-        handleVsNameLevelUpdate={handleVsNameLevelUpdate}
-      />
+    setAccordionItems(
+      generateTypeLevelAccordionItems(vsTypeLevelOptions, searchFilter),
     );
+  }, [vsTypeLevelOptions, searchFilter, curExpanded]);
 
-    const content = (
-      <ConceptTypeAccordionBody
-        activeValueSets={valueSetDisplay[vsType]}
-        handleVsIdLevelUpdate={handleVsNameLevelUpdate}
-      />
+  const generateTypeLevelAccordionItems = (
+    vsTypeLevelOptions: ConceptTypeToDibbsVsMap,
+    searchFilter: string,
+  ) => {
+    const accordionDataToDisplay = filterVsTypeOptions(
+      vsTypeLevelOptions,
+      searchFilter,
     );
-    const level: HeadingLevel = "h4";
+    const areItemsFiltered = searchFilter !== "";
 
-    const handleToggle = () => {
-      setExpandedGroup((prevState) => {
-        if (prevState === vsType) return "";
-        return vsType;
-      });
-    };
+    return Object.entries(accordionDataToDisplay).map(
+      ([k, valueSetsInType]) => {
+        const atLeastOneRenderedValueSet = Object.values(valueSetsInType)
+          .map((vs) => vs.render)
+          .flat()
+          .some(Boolean);
 
-    return {
-      title,
-      content,
-      expanded: false,
-      id: `${vsType}`,
-      headingLevel: level,
-      handleToggle,
-      length: Object.keys(valueSetDisplay[vsType]).length,
-    };
+        const vsType = k as DibbsConceptType;
+        const handleVsNameLevelUpdate = handleVsTypeLevelUpdate(vsType);
+
+        const title = (
+          <ConceptTypeAccordionHeader
+            activeType={vsType}
+            activeTypeValueSets={valueSetsInType}
+            expanded={curExpanded === vsType}
+            handleVsNameLevelUpdate={handleVsNameLevelUpdate}
+            areItemsFiltered={areItemsFiltered}
+          />
+        );
+
+        const content = (
+          <ConceptTypeAccordionBody
+            activeValueSets={valueSetsInType}
+            handleVsIdLevelUpdate={handleVsNameLevelUpdate}
+            tableSearchFilter={searchFilter}
+          />
+        );
+        const level: HeadingLevel = "h4";
+
+        const handleToggle = () => {
+          setCurExpanded((prevState) => {
+            if (prevState === vsType) return "";
+            return vsType;
+          });
+        };
+
+        return {
+          title,
+          content,
+          expanded: false,
+          id: `${vsType}`,
+          headingLevel: level,
+          handleToggle,
+          atLeastOneRenderedValueSet,
+        };
+      },
+    );
   };
 
-  const accordionItems = Object.keys(valueSetDisplay)
-    .map((vsType) => {
-      return generateTypeLevelAccordionItems(vsType as DibbsConceptType);
-    })
-    .filter((v) => v.length > 0);
+  const accordionsToRender = accordionItems.filter(
+    (i) => i.atLeastOneRenderedValueSet,
+  );
 
   return (
     <div data-testid="accordion" className={styles.accordionContainer}>
-      <MultiAccordion
-        items={accordionItems}
-        multiselectable={false}
-        accordionClassName={styles.accordionInnerWrapper}
-      />
+      {accordionsToRender.length > 0 ? (
+        <MultiAccordion
+          items={accordionsToRender}
+          multiselectable={false}
+          accordionClassName={styles.accordionInnerWrapper}
+        />
+      ) : (
+        <div className="padding-2">
+          <strong>No valuesets found</strong>
+        </div>
+      )}
     </div>
   );
 };

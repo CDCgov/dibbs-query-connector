@@ -1,15 +1,28 @@
 import styles from "../buildFromTemplates/conditionTemplateSelection.module.scss";
-import React, { ChangeEvent, useState } from "react";
+import React, { ChangeEvent, useEffect, useState } from "react";
 import ConceptSelection from "./ConceptSelection";
 import Drawer from "@/app/ui/designSystem/drawer/Drawer";
 import { Concept, DibbsValueSet } from "@/app/shared/constants";
 import Checkbox from "@/app/ui/designSystem/checkbox/Checkbox";
+import Highlighter from "react-highlight-words";
+import {
+  FilterableConcept,
+  FilterableValueSet,
+  VALUESET_DRAWER_SEARCH_PLACEHOLDER,
+  filterConcepts,
+  filterValueSet,
+} from "./utils";
+import { Tooltip } from "@trussworks/react-uswds";
+import TooltipWrapper, {
+  TooltipWrapperProps,
+} from "@/app/ui/designSystem/Tooltip";
 
 type ConceptTypeAccordionBodyProps = {
-  activeValueSets: { [vsId: string]: DibbsValueSet };
+  activeValueSets: { [vsId: string]: FilterableValueSet };
   handleVsIdLevelUpdate: (
     vsId: string,
   ) => (dibbsValueSets: DibbsValueSet) => void;
+  tableSearchFilter?: string;
 };
 
 export type ConceptDisplay = Concept & {
@@ -22,21 +35,32 @@ export type ConceptDisplay = Concept & {
  * @param param0.activeValueSets - Valuesets for display in this accordion
  * @param param0.handleVsIdLevelUpdate - curried state update function that
  * takes a valueset ID and generates a ValueSet level update
+ * @param param0.tableSearchFilter - the search string from the selection table
  * @returns An accordion body component
  */
 const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
   activeValueSets,
   handleVsIdLevelUpdate,
+  tableSearchFilter = "",
 }) => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [curValueSet, setCurValueSet] = useState<DibbsValueSet>();
-  const [curConcepts, setCurConcepts] = useState<ConceptDisplay[]>([]);
+  const [curConcepts, setCurConcepts] = useState<FilterableConcept[]>([]);
+  const [drawerSearchFilter, setDrawerSearchFilter] = useState<string>("");
+  const areItemsFiltered = tableSearchFilter !== "";
 
-  const handleViewCodes = (vs: DibbsValueSet) => {
+  useEffect(() => {
+    if (curValueSet) {
+      const filteredConcepts = filterConcepts(tableSearchFilter, curValueSet);
+      setCurConcepts(filteredConcepts);
+    }
+  }, [tableSearchFilter, curValueSet]);
+
+  const handleViewCodes = (vs: FilterableValueSet) => {
     setCurValueSet(vs);
     setCurConcepts(
       vs.concepts.map((c) => {
-        return { ...c, render: true };
+        return { ...c, render: c.render ?? true };
       }),
     );
 
@@ -44,7 +68,7 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
   };
 
   const handleConceptsChange = (
-    updatedConcepts: ConceptDisplay[],
+    updatedConcepts: FilterableConcept[],
     updateBatchSave = true,
   ) => {
     if (curValueSet) {
@@ -53,13 +77,13 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
         .some(Boolean);
       curValueSet.includeValueSet = shouldIncludeValueSet;
       curValueSet.concepts = updatedConcepts.map((c) => {
+        // the state update doesn't need the extra .render method
         return { display: c.display, code: c.code, include: c.include };
       });
 
       if (updateBatchSave) {
         handleVsIdLevelUpdate(curValueSet.valueSetId)(curValueSet);
       }
-
       setCurConcepts(updatedConcepts);
     }
   };
@@ -69,13 +93,15 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
     isMinusState: boolean,
   ) {
     const valueSetToUpdateId = e.target.id;
-    const includeStatus = e.target.checked;
+    const includeStatus = e.target.checked || isMinusState;
 
     const valueSetToUpdate = activeValueSets[valueSetToUpdateId];
     const handleValueSetLevelUpdate = handleVsIdLevelUpdate(valueSetToUpdateId);
     valueSetToUpdate.includeValueSet = includeStatus;
     valueSetToUpdate.concepts.map((c) => {
-      c.include = isMinusState ? false : includeStatus;
+      if (c.render) {
+        c.include = isMinusState ? false : includeStatus;
+      }
       return c;
     });
 
@@ -95,26 +121,37 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
         handleVsIdLevelUpdate(vsId)(dibbsVs);
       }
     });
-    setIsDrawerOpen(false);
   };
 
-  function handleValueSetSearch(searchFilter: string) {
+  function handleValueSetSearch(drawerSearchFilter: string) {
     if (curValueSet) {
-      const filteredConcepts = filterValueSetConcepts(
-        searchFilter,
+      // first filter by whatever search filter we've set at the valueset level
+      const valueSetFilteredConcepts = filterValueSet(
+        tableSearchFilter,
         curValueSet,
       );
 
+      const filteredConcepts = filterConcepts(
+        drawerSearchFilter,
+        // and use that subset to display anything within the drawer
+        valueSetFilteredConcepts,
+        false,
+      );
+
       setCurConcepts(filteredConcepts);
+      setDrawerSearchFilter(drawerSearchFilter);
     }
   }
 
   return (
     <div>
       {Object.values(activeValueSets).map((dibbsVs) => {
+        if (areItemsFiltered && !dibbsVs.render) return;
         const conceptsToRender = dibbsVs.concepts;
-        const selectedCount = conceptsToRender.filter((c) => c.include).length;
-        const totalCount = conceptsToRender.length;
+        const selectedCount = conceptsToRender.filter(
+          (c) => c.include && c.render,
+        ).length;
+        const totalCount = conceptsToRender.filter((c) => c.render).length;
 
         const isMinusState =
           selectedCount !== totalCount && selectedCount !== 0;
@@ -127,17 +164,42 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
             data-testid={`container-${dibbsVs.valueSetId}`}
           >
             <div className={styles.accordionExpandedInner}>
-              <Checkbox
-                className={styles.valueSetTemplate__checkbox}
-                label={checkboxLabel(dibbsVs)}
-                onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                  handleBulkToggle(e, isMinusState);
-                }}
-                id={dibbsVs.valueSetId}
-                checked={checked}
-                isMinusState={isMinusState}
-                data-testid={`selectValueset-${dibbsVs.valueSetId}`}
-              />
+              <div
+                className={areItemsFiltered ? `usa-tooltip` : ""}
+                data-position="top"
+                data-classes="width-3 text-red"
+                title={
+                  areItemsFiltered
+                    ? `This will change only the ${
+                        dibbsVs.concepts.filter((c) => c.render).length
+                      } filtered codes`
+                    : ""
+                }
+              >
+                <Tooltip<TooltipWrapperProps>
+                  label={`This will only change these ${
+                    dibbsVs.concepts.filter((c) => c.render).length
+                  } code(s)`}
+                  asCustom={TooltipWrapper}
+                  position="left"
+                >
+                  <Checkbox
+                    className={styles.valueSetTemplate__checkbox}
+                    label={checkboxLabel(
+                      dibbsVs,
+                      tableSearchFilter,
+                      areItemsFiltered,
+                    )}
+                    onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                      handleBulkToggle(e, isMinusState);
+                    }}
+                    id={dibbsVs.valueSetId}
+                    checked={checked}
+                    isMinusState={isMinusState}
+                    data-testid={`selectValueset-${dibbsVs.valueSetId}`}
+                  />
+                </Tooltip>
+              </div>
             </div>
             <div className={styles.accordionBodyExpanded__right}>
               <div className={styles.displayCount}>
@@ -158,19 +220,31 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
         );
       })}
       <Drawer
-        title={curValueSet?.valueSetName ?? ""}
-        placeholder="Search by code or name"
+        title={
+          <Highlighter
+            highlightClassName="searchHighlight"
+            searchWords={[tableSearchFilter]}
+            autoEscape={true}
+            textToHighlight={curValueSet?.valueSetName ?? ""}
+          />
+        }
+        subtitle={
+          tableSearchFilter ? `Pre-filtered by "${tableSearchFilter}"` : ""
+        }
+        placeholder={VALUESET_DRAWER_SEARCH_PLACEHOLDER}
         toastMessage="Valueset concepts have been successfully modified."
         toRender={
           <ConceptSelection
             concepts={curConcepts}
             onConceptsChange={handleConceptsChange}
+            searchFilter={[drawerSearchFilter, tableSearchFilter]}
           />
         }
         isOpen={isDrawerOpen}
         onClose={() => {
           setIsDrawerOpen(false);
           setCurValueSet(undefined);
+          setDrawerSearchFilter("");
         }}
         onSave={handleSaveChanges}
         onSearch={handleValueSetSearch}
@@ -179,10 +253,39 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
   );
 };
 
-const checkboxLabel = (dibbsVs: DibbsValueSet) => {
+const checkboxLabel = (
+  dibbsVs: FilterableValueSet,
+  searchFilter = "",
+  isFilteredItem = false,
+) => {
+  const SUMMARIZE_CODE_RENDER_LIMIT = 5;
+  const codesToRender = dibbsVs.concepts.filter((c) => c.render);
   return (
     <div className={styles.expandedContent}>
-      <div className={styles.vsName}> {dibbsVs.valueSetName}</div>
+      <div className={styles.vsName}>
+        <Highlighter
+          highlightClassName="searchHighlight"
+          searchWords={[searchFilter]}
+          autoEscape={true}
+          textToHighlight={dibbsVs.valueSetName}
+        />
+      </div>
+      {isFilteredItem && (
+        <strong>
+          Includes:{" "}
+          {codesToRender.length < SUMMARIZE_CODE_RENDER_LIMIT ? (
+            // render the individual code matches
+            <span className="searchHighlight">
+              {codesToRender.map((c) => c.code).join(", ")}
+            </span>
+          ) : (
+            //  past this many matches, don't render the individual codes in favor of a
+            // "this many matches" string
+            <span className="searchHighlight">{`${dibbsVs.concepts.length} codes`}</span>
+          )}
+        </strong>
+      )}
+
       <div className={styles.vsDetails}>
         <div className="padding-right-2">{`Author: ${dibbsVs.author}`}</div>
         <div>{`System: ${dibbsVs.system.toLocaleLowerCase()}`}</div>
@@ -190,30 +293,5 @@ const checkboxLabel = (dibbsVs: DibbsValueSet) => {
     </div>
   );
 };
-
-/**
- * Helper function for search to filter out valuesets against a search param
- * @param searchFilter - search string
- * @param selectedValueSet - the active valueset displayed in the drawer
- * @returns - a transformed list of concepts to display
- */
-export function filterValueSetConcepts(
-  searchFilter: string,
-  selectedValueSet: DibbsValueSet,
-) {
-  const newConcepts = structuredClone(selectedValueSet.concepts);
-  const casedSearchFilter = searchFilter.toLocaleLowerCase();
-  return newConcepts.map((concept) => {
-    let toRender = false;
-    if (
-      concept.code.toLocaleLowerCase().includes(casedSearchFilter) ||
-      concept.display.toLocaleLowerCase().includes(casedSearchFilter)
-    ) {
-      toRender = true;
-    }
-
-    return { ...concept, render: toRender };
-  });
-}
 
 export default ConceptTypeAccordionBody;
