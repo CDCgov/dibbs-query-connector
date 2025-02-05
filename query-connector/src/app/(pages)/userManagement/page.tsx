@@ -1,11 +1,12 @@
 "use client";
 
+import { useContext, useEffect, useState } from "react";
 import { Button } from "@trussworks/react-uswds";
+import classNames from "classnames";
 import Table from "../../ui/designSystem/table/Table";
 import { User, UserGroup, usersMock } from "./types";
-import classNames from "classnames";
-import { useEffect, useState } from "react";
 import RoleDropdown from "./components/RoleDropdown";
+import { DataContext } from "./components/DataProvider";
 
 /**
  * User section in the user management page
@@ -14,11 +15,15 @@ import RoleDropdown from "./components/RoleDropdown";
 const UserManagement: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
 
-  // revisit if this can be retrieve ahead of time
   useEffect(() => {
     setUsers(usersMock);
   }, []);
 
+  const { OpenEditSection } = useContext(DataContext);
+
+  /**
+   * HTML
+   */
   return (
     <>
       <div
@@ -76,6 +81,9 @@ const UserManagement: React.FC = () => {
                         unstyled
                         key={group.id}
                         aria-description={`Edit ${group.name} members`}
+                        onClick={() => {
+                          OpenEditSection(group.name, "Team", group.id);
+                        }}
                       >
                         {group.name}
                         {idx + 1 != user.userGroups.length && ","}

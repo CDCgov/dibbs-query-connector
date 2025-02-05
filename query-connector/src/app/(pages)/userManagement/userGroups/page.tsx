@@ -1,10 +1,11 @@
 "use client";
 
+import { useContext, useEffect, useState } from "react";
+import classNames from "classnames";
 import { Button } from "@trussworks/react-uswds";
 import Table from "../../../ui/designSystem/table/Table";
 import { UserGroup, userGroupsMock } from "../types";
-import { useEffect, useState } from "react";
-import classNames from "classnames";
+import { DataContext } from "../components/DataProvider";
 
 /**
  * User groups section in the user management page
@@ -12,6 +13,8 @@ import classNames from "classnames";
  */
 const UserGroups: React.FC = () => {
   const [userGroups, setUserGroups] = useState<UserGroup[]>([]);
+
+  const { OpenEditSection } = useContext(DataContext);
 
   useEffect(() => {
     setUserGroups(userGroupsMock);
@@ -47,7 +50,9 @@ const UserGroups: React.FC = () => {
                 className={classNames("text-no-underline")}
                 unstyled
                 aria-description={`Edit ${group.name} members`}
-                onClick={() => {}}
+                onClick={() => {
+                  OpenEditSection(group.name, "Team", group.id);
+                }}
               >
                 {GetMemberLabel(group.memberSize)}
               </Button>
@@ -58,7 +63,9 @@ const UserGroups: React.FC = () => {
                 className={classNames("text-no-underline")}
                 unstyled
                 aria-description={`Edit ${group.name} queries`}
-                onClick={() => {}}
+                onClick={() => {
+                  OpenEditSection(group.name, "Query", group.id);
+                }}
               >
                 {GetQueryLabel(group.querySize)}
               </Button>
