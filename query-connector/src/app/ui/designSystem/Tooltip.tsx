@@ -1,5 +1,7 @@
 import React from "react";
 
+// https://trussworks.github.io/react-uswds/?path=/docs/components-tooltip--docs#custom%20component
+
 export type TooltipWrapperProps = {
   className?: string;
 } & JSX.IntrinsicElements["div"] &
