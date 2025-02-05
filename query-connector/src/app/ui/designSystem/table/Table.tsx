@@ -1,11 +1,13 @@
 import { Table as TrussTable } from "@trussworks/react-uswds";
-import styles from "./table.module.scss";
 import classNames from "classnames";
+import styles from "./table.module.scss";
+
 type TableProps = {
   children: React.ReactNode;
   className?: string;
   bordered?: boolean;
   striped?: boolean;
+  fullWidth?: boolean;
 };
 
 /**
@@ -15,26 +17,27 @@ type TableProps = {
  * @param root0.bordered - whether to render a bordered table
  * @param root0.striped - whether to render a striped table
  * @param root0.className - additional custom class names
+ * @param root0.fullWidth - whether to render with fullWidth mode
  * @returns - A UWSDS-styled table
  */
 const Table: React.FC<TableProps> = ({
   children,
-  bordered = true,
+  bordered = false,
   className,
   striped,
+  fullWidth,
 }) => {
   return (
-    <TrussTable
-      bordered={bordered}
-      className={classNames(
-        styles.table,
-        className,
-        bordered ? "" : styles.unbordered,
-      )}
-      striped={striped}
-    >
-      {children}
-    </TrussTable>
+    <div className={classNames(styles.customizeTableWrapper)}>
+      <TrussTable
+        bordered={bordered}
+        className={classNames(styles.customizeTable, className)}
+        striped={striped}
+        fullWidth={fullWidth}
+      >
+        {children}
+      </TrussTable>
+    </div>
   );
 };
 

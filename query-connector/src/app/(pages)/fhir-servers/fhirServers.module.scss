@@ -1,18 +1,5 @@
-.fhirServersRow {
-  grid-template-columns: 1fr 2fr 2fr;
-  gap: 1rem;
-  vertical-align: middle;
-  margin: 0 !important;
-  padding: 0 1.5rem;
-  td {
-      padding: 1rem;
-      background-color: transparent;
-    }
-}
-
 .mainContainer {
   max-width: 80%;
-  padding: 2rem;
 }
 
 .titleContainer {

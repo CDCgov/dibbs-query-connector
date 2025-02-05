@@ -1,9 +1,10 @@
 import { ComboBox, Label } from "@trussworks/react-uswds";
 import classNames from "classnames";
 import React from "react";
+import { RoleTypeValues } from "../types";
 
 export interface RoleDropdownProps {
-  defaultValue: string;
+  defaultValue: RoleTypeValues;
 }
 
 /**
@@ -13,9 +14,9 @@ export interface RoleDropdownProps {
  */
 const RoleDropdown: React.FC<RoleDropdownProps> = ({ defaultValue }) => {
   const roleOptions = [
-    { label: "Super Admin", value: "super-admin" },
-    { label: "Admin", value: "admin" },
-    { label: "Standard", value: "standard" },
+    { label: "Super Admin", value: RoleTypeValues.SuperAdmin },
+    { label: "Admin", value: RoleTypeValues.Admin },
+    { label: "Standard", value: RoleTypeValues.Standard },
   ];
 
   return (
@@ -28,7 +29,7 @@ const RoleDropdown: React.FC<RoleDropdownProps> = ({ defaultValue }) => {
         name="user-role-combo-box"
         options={roleOptions}
         onChange={() => {}}
-        defaultValue={defaultValue}
+        defaultValue={defaultValue.toString()}
       />
     </>
   );

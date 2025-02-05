@@ -523,8 +523,6 @@ ul.usa-sidenav
   font-size: 0.875rem;
 }
 
-
-
 #fhir-server-modal {
   .usa-modal__close {
     background-color: transparent !important;
@@ -545,7 +543,8 @@ ul.usa-sidenav
     .usa-modal__main {
       max-width: 34rem;
 
-      input, select {
+      input,
+      select {
         max-width: 100%;
       }
     }
@@ -564,7 +563,7 @@ ul.usa-sidenav
 
     #modal-cancel-button {
       background-color: transparent;
-      
+
       &:hover {
         box-shadow: none;
       }
@@ -580,13 +579,3 @@ ul.usa-sidenav
   }
 }
 
-.usa-table.qc-table{
-  border: solid 1px;
-}
-
-.usa-table.qc-table thead tr th, .usa-table.qc-table tbody tr td{
-  padding-top: 20px;
-  padding-bottom: 20px;
-  border-left: none;
-  border-right: none;
-}

@@ -1,5 +1,3 @@
-// Temporary file with dumy data
-
 export interface UserGroup {
   id: string;
   name: string;
@@ -11,10 +9,20 @@ export interface User {
   id: string;
   firstName: string;
   lastName: string;
-  role: string;
+  role:
+    | RoleTypeValues.SuperAdmin
+    | RoleTypeValues.Admin
+    | RoleTypeValues.Standard;
   userGroups: UserGroup[];
 }
 
+export enum RoleTypeValues {
+  Admin = "Admin",
+  SuperAdmin = "Super Admin",
+  Standard = "Standard",
+}
+
+// Temporary file with dumy data
 export const team1: UserGroup = {
   id: "123",
   name: "Team 1",
@@ -34,21 +42,21 @@ export const usersMock: User[] = [
     id: "1",
     firstName: "Jane",
     lastName: "Doe",
-    role: "Admin",
+    role: RoleTypeValues.Admin,
     userGroups: [],
   },
   {
     id: "2",
-    firstName: "Jane",
-    lastName: "Doe",
-    role: "Standard",
+    firstName: "John",
+    lastName: "Smith",
+    role: RoleTypeValues.Standard,
     userGroups: [team1, team2],
   },
   {
     id: "3",
-    firstName: "Jane",
-    lastName: "Doe",
-    role: "Super Admin",
+    firstName: "Lucas",
+    lastName: "Green",
+    role: RoleTypeValues.SuperAdmin,
     userGroups: [team1],
   },
 ];

@@ -1,8 +1,10 @@
 "use client";
 
-import { Button, Table } from "@trussworks/react-uswds";
+import { Button } from "@trussworks/react-uswds";
+import Table from "../../../ui/designSystem/table/Table";
 import { UserGroup, userGroupsMock } from "../types";
 import { useEffect, useState } from "react";
+import classNames from "classnames";
 
 /**
  * User groups section in the user management page
@@ -27,7 +29,7 @@ const UserGroups: React.FC = () => {
    * HTML
    */
   return (
-    <Table fullWidth={true} className="qc-table">
+    <Table>
       <thead>
         <tr>
           <th>Name</th>
@@ -40,12 +42,22 @@ const UserGroups: React.FC = () => {
           <tr key={group.id}>
             <td>{group.name}</td>
             <td>
-              <Button type="button" unstyled onClick={() => {}}>
+              <Button
+                type="button"
+                className={classNames("text-no-underline")}
+                unstyled
+                onClick={() => {}}
+              >
                 {GetMemberLabel(group.memberSize)}
               </Button>
             </td>
             <td>
-              <Button type="button" unstyled onClick={() => {}}>
+              <Button
+                type="button"
+                className={classNames("text-no-underline")}
+                unstyled
+                onClick={() => {}}
+              >
                 {GetQueryLabel(group.querySize)}
               </Button>
             </td>

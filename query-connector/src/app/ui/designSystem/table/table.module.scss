@@ -1,62 +1,62 @@
 @use "../../../ui/styles/_variables" as *;
 
-.table {
-  display: flex;
-  flex-direction: column;
+.customizeTableWrapper {
+  border: solid 1px $table-border;
   border-radius: 0.25rem;
-  border: 1px solid $table-border;
-  background: $white;
-  padding: $default-table-padding 0 0 0;
   box-shadow: 0px 2px 3px 0px $drop-shadow;
-
-  thead tr {
-    display: grid;
-    align-items: center;
-    border-bottom: 1px solid $table-row-border !important;
-  }
-
-  th {
-    background-color: $white !important;
-    color: $text-secondary !important;
-    text-transform: uppercase;
-    display: flex;
-    justify-content: space-between;
-    font-weight: bold;
-    word-wrap: break-word;
-    align-items: center;
-    box-sizing: border-box;
-    border: none !important;
-    padding: 0 !important;
-  }
-
-  tr {
-    display: grid;
-    align-items: center;
-    border-bottom: 1px solid $table-row-border;
-    margin: 0 $default-table-padding;
-  }
-
-  tr:last-child {
-    border-bottom: none;
-  }
-
-  td {
-    border: none !important;
-    padding: 2rem 0 !important;
-  }
+  padding: 1px;
+  background-color: $white;
 }
 
-.unbordered {
-  border: none;
-  box-shadow: none;
-  padding: 0;
+.customizeTable {
   margin: 0;
 
-  tr {
-    margin: 0;
+  thead tr th,
+  tbody tr td {
+    padding-top: $default-table-padding;
+    padding-bottom: $default-table-padding;
+    padding-left: calc($default-table-padding - 10px);
+    padding-right: calc($default-table-padding - 10px);
+    border: none;
   }
 
-  tr:hover {
-    padding: 0;
+  thead tr th:first-child,
+  tbody tr td:first-child {
+    padding-left: $default-table-padding;
+  }
+
+  thead tr th:last-child,
+  tbody tr td:last-child {
+    padding-right: $default-table-padding;
+  }
+
+  thead tr th {
+    text-transform: uppercase;
+    background-color: inherit;
+    color: $text-secondary;
+  }
+
+  tbody tr {
+    position: relative;
+
+    &:after {
+      display: block;
+      content: "";
+      background: $table-row-border;
+      height: 1px;
+      position: absolute;
+      top: 0px;
+      left: 10px;
+      right: 10px;
+    }
+
+    /* highlight row on hover*/
+    &:hover{
+      background-color: #f3f3f3;
+
+      td {
+        background-color: inherit;
+      }
+    }
   }
 }
