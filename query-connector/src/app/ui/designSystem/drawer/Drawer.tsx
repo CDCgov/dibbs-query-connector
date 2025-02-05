@@ -81,7 +81,7 @@ const Drawer: React.FC<DrawerProps> = ({
             {title}
           </h2>
 
-          <div className={styles.subtitle}>{subtitle}</div>
+          <h3 className={styles.subtitle}>{subtitle}</h3>
 
           {onSearch && (
             <div>
