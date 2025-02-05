@@ -783,10 +783,10 @@
       "clientAuthenticatorType": "client-secret",
       "secret": "ZG3f7R1J3qIwBaw8QtttJnJMinpERQKs",
       "redirectUris": [
-        "https://demo.queryconnector.dev/api/auth/callback/keycloak"
+        "http://demo.queryconnector.dev/api/auth/callback/keycloak"
       ],
       "webOrigins": [
-        "https://demo.queryconnector.dev"
+        "http://demo.queryconnector.dev"
       ],
       "notBefore": 0,
       "bearerOnly": false,
