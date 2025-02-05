@@ -7,7 +7,7 @@ import {
   DibbsValueSet,
   FhirServerConfig,
   CustomUserQuery,
-} from "../shared/constants";
+} from "./constants";
 import { encode } from "base-64";
 import {
   CategoryToConditionArrayMap,
@@ -33,7 +33,7 @@ import {
   updateNewbornScreeningCategorySql,
   ValuesetStruct,
   ValuesetToConceptStruct,
-} from "../shared/seedSqlStructs";
+} from "./seedSqlStructs";
 import { getDbClient } from "../backend/dbClient";
 
 const getQuerybyNameSQL = `
