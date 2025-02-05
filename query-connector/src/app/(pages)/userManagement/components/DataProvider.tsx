@@ -2,12 +2,13 @@
 
 import { createContext, useState } from "react";
 
-type SubjectType = "Team" | "Query";
+type SubjectType = "Members" | "Query";
 
 interface UserManagementData {
   TeamQueryEditSection: {
     isOpen: boolean;
     title: string;
+    subtitle: string;
     content: JSX.Element;
     subjectType: SubjectType;
   };
@@ -16,6 +17,7 @@ interface UserManagementData {
 interface UserManagementContext extends UserManagementData {
   OpenEditSection: (
     title: string,
+    subtitle: string,
     subjectType: SubjectType,
     subjectId: string,
   ) => void;
@@ -26,8 +28,9 @@ const initData: UserManagementData = {
   TeamQueryEditSection: {
     isOpen: false,
     title: "",
+    subtitle: "",
     content: <></>,
-    subjectType: "Team",
+    subjectType: "Members",
   },
 };
 
@@ -59,6 +62,7 @@ const DataProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
 
   function OpenEditSection(
     title: string,
+    subtitle: string,
     subjectType: SubjectType,
     subjectId: string,
   ) {
@@ -68,6 +72,7 @@ const DataProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
       TeamQueryEditSection: {
         ...innerState.TeamQueryEditSection,
         title,
+        subtitle,
         subjectType,
         isOpen: true,
       },

@@ -51,7 +51,7 @@ const UserGroups: React.FC = () => {
                 unstyled
                 aria-description={`Edit ${group.name} members`}
                 onClick={() => {
-                  OpenEditSection(group.name, "Team", group.id);
+                  OpenEditSection(group.name, "Members", "Members", group.id);
                 }}
               >
                 {GetMemberLabel(group.memberSize)}
@@ -64,7 +64,7 @@ const UserGroups: React.FC = () => {
                 unstyled
                 aria-description={`Edit ${group.name} queries`}
                 onClick={() => {
-                  OpenEditSection(group.name, "Query", group.id);
+                  OpenEditSection(group.name, "Queries", "Query", group.id);
                 }}
               >
                 {GetQueryLabel(group.querySize)}

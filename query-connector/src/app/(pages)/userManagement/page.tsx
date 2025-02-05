@@ -82,7 +82,12 @@ const UserManagement: React.FC = () => {
                         key={group.id}
                         aria-description={`Edit ${group.name} members`}
                         onClick={() => {
-                          OpenEditSection(group.name, "Team", group.id);
+                          OpenEditSection(
+                            group.name,
+                            "Members",
+                            "Members",
+                            group.id,
+                          );
                         }}
                       >
                         {group.name}

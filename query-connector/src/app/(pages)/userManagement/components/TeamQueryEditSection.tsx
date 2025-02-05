@@ -13,6 +13,7 @@ const TeamQueryEditSection: React.FC = () => {
   return (
     <Drawer
       title={TeamQueryEditSection.title}
+      subtitle={TeamQueryEditSection.subtitle}
       placeholder={"Loading data..."}
       toRender={TeamQueryEditSection.content}
       isOpen={TeamQueryEditSection.isOpen}
