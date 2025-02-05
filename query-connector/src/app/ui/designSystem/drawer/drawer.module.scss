@@ -1,9 +1,12 @@
 @use "../../../ui/styles/_variables" as *;
 
+$drawerWidth: 30%;
 .drawer {
   position: fixed;
   top: 0;
   right: -35rem;
+  width: $drawerWidth;
+  height: 100%;
   padding: 0rem;
   display: flex;
   flex-direction: column;
@@ -23,13 +26,13 @@
 }
 
 .drawer.closed {
-  right: -35rem;
+  right: -1 * $drawerWidth;
 }
 
 .drawerContent {
   padding: 2rem;
   overflow-y: auto;
-  width: 90%;
+  width: 100%;
 }
 
 .overlay {
@@ -43,7 +46,6 @@
 
 .searchField {
   display: flex;
-  width: 25rem;
   padding: 0.75rem 0.75rem 0.75rem 2.25rem !important;
   align-items: center;
   gap: 0.5rem;
