@@ -39,16 +39,14 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{env.NODE_VERSION}}
-      - name: Install dependencies
-        working-directory: ./query-connector
-        run: npm install
       - name: Checkout code
         uses: actions/checkout@v3
       - name: Setup reporting action and run tests
         uses: ArtiomTr/jest-coverage-report-action@v2
         with:
           test-script: npm run test:ci
-          skip-step: install
+          working-directory: ./query-connector
+          skip-step: none
 
   end-to-end-tests:
     timeout-minutes: 15
