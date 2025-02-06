@@ -90,7 +90,6 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
               "flex-align-center",
             )}
           >
-            {/* TODO: Enable this once we can show/hide rules based on actual auth status */}
             {!isLoggedIn && !LOGGED_IN_PATHS.includes(path) && (
               <Button
                 className={styles.signinButton}

@@ -16,11 +16,14 @@ services:
 
   # Keycloak for authentication
   keycloak:
-    image: quay.io/keycloak/keycloak:26.0.2
+    build:
+      context: .
+      dockerfile: Dockerfile.keycloak
+    environment:
+      # For M4: https://github.com/keycloak/keycloak/issues/36008#issuecomment-2564871619
+      - JAVA_OPTS_APPEND=-XX:UseSVE=0
     ports:
       - 8080:8080
-    volumes:
-      - ./keycloak:/opt/keycloak/data/import
     restart: always
     command:
       - start-dev
@@ -39,8 +42,7 @@ services:
       - NODE_TLS_REJECT_UNAUTHORIZED=0
       - AUTH_DISABLED=false
       - AUTH_SECRET="ido5D/uybeAB3AmMQwn+ubw2zYC4t2h7RJlW2R79598="
-      - AUTH_KEYCLOAK_ISSUER=http://localhost:8080/realms/master
-      - NEXTAUTH_URL=http://localhost:3000
+      - AUTH_URL=http://localhost:3000
       - LOCAL_KEYCLOAK=http://localhost:8080
       - NAMED_KEYCLOAK=http://keycloak:8080
       - AUTH_KEYCLOAK_ID=query-connector
