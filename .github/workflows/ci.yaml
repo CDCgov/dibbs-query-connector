@@ -50,7 +50,6 @@ jobs:
           test-script: npm run test:ci
           working-directory: ./query-connector
           coverage-file: report.json
-          skip-step: all
 
   end-to-end-tests:
     timeout-minutes: 15
