@@ -42,16 +42,12 @@ jobs:
       - name: Install dependencies
         working-directory: ./query-connector
         run: npm install
-
-      - name: Run unit and integration tests
-        working-directory: ./query-connector
-        run: npm run test:ci
-
-      - name: Report coverage
+      - name: Checkout code
         uses: actions/checkout@v3
-      - name: Setup reporting action
+      - name: Setup reporting action and run tests
         uses: ArtiomTr/jest-coverage-report-action@v2
         with:
+          test-script: npm run test:ci
           working-directory: ./query-connector
           coverage-file: report.json
           skip-step: all
