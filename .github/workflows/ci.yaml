@@ -61,7 +61,17 @@ jobs:
 
       - name: Run tests
         working-directory: ./query-connector
-        run: npm run test:integration
+        run: npm run test:ci
+
+  coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ArtiomTr/jest-coverage-report-action@v2
+        with:
+          working-directory: ./query-connector
+          coverage-file: ./query-connector/report.json
+          skip-step: all
 
   end-to-end-tests:
     timeout-minutes: 15
