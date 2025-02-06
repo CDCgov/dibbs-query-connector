@@ -68,18 +68,23 @@ export async function addUserIfNotExists(userToken: {
 
 /**
  * Updates the role of an existing user in the user_management table.
+ * @param id - The user ID from the JWT token.
  * @param username - The username of the user whose role is being updated.
  * @param newRole - The new role to assign to the user.
  * @returns The updated user record or an error if the update fails.
  */
-export async function updateUserRole(username: string, newRole: string) {
-  if (!username || !newRole) {
-    console.error("Invalid input: username and newRole are required.");
-    throw new Error("Username and new role are required.");
+export async function updateUserRole(
+  id: string,
+  username: string,
+  newRole: string,
+) {
+  if (!id || !username || !newRole) {
+    console.error("Invalid input: id, username, and newRole are required.");
+    throw new Error("User ID, username, and new role are required.");
   }
 
   try {
-    console.log(`Updating role for user: ${username} to ${newRole}`);
+    console.log(`Updating role for user: ${id} to ${newRole}`);
 
     const updateQuery = `
       UPDATE user_management
@@ -91,11 +96,11 @@ export async function updateUserRole(username: string, newRole: string) {
     const result = await dbClient.query(updateQuery, [newRole, username]);
 
     if (result.rows.length === 0) {
-      console.error(`User not found: ${username}`);
-      throw new Error(`User not found: ${username}`);
+      console.error(`User not found: ${id}`);
+      throw new Error(`User not found: ${id}`);
     }
 
-    console.log(`User role updated successfully: ${username} -> ${newRole}`);
+    console.log(`User role updated successfully: ${id} -> ${newRole}`);
     return result.rows[0];
   } catch (error) {
     console.error("Error updating user role:", error);
