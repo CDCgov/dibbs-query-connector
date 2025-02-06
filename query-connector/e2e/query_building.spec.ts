@@ -352,7 +352,9 @@ test.describe("editing an exisiting query", () => {
     const firstVsCheckTarget = firstLabVS.getByTestId("checkbox");
     // initial render is a minus state, so need to check and uncheck to reset the
     // state to uncheck
-    await firstVsCheckTarget.dblclick();
+    await firstVsCheckTarget.click();
+    await expect(firstVsCheckTarget.getByRole("checkbox")).not.toBeChecked();
+    await firstVsCheckTarget.click();
     await expect(firstVsCheckTarget.getByRole("checkbox")).toBeChecked();
     await firstVsCheckTarget.click();
 
