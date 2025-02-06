@@ -1,12 +1,14 @@
 import React from "react";
 import styles from "../buildFromTemplates/conditionTemplateSelection.module.scss";
-import { ConceptDisplay } from "./SelectionViewAccordionBody";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import Checkbox from "@/app/ui/designSystem/checkbox/Checkbox";
+import Highlighter from "react-highlight-words";
+import { FilterableConcept } from "./utils";
 
 type ConceptSelectionProps = {
-  concepts: ConceptDisplay[];
-  onConceptsChange: (updatedConcepts: ConceptDisplay[]) => void;
+  concepts: FilterableConcept[];
+  onConceptsChange: (updatedConcepts: FilterableConcept[]) => void;
+  searchFilter?: string[];
 };
 
 /**
@@ -15,11 +17,14 @@ type ConceptSelectionProps = {
  * @param root0.concepts - Array of concepts to display and manage.
  * Each concept includes a `code`, `display`, and `include` flag.
  * @param root0.onConceptsChange - Callback to handle updates when concepts are selected/deselected.
+ * @param root0.searchFilter - a search string to filter concept names / displays
+ * against
  * @returns A React component that renders a list of concepts with checkboxes for selection.
  */
 const ConceptSelection: React.FC<ConceptSelectionProps> = ({
   concepts,
   onConceptsChange,
+  searchFilter = [""],
 }) => {
   const selectedCount = concepts.filter(
     (concept) => concept.include && concept.render,
@@ -97,8 +102,22 @@ const ConceptSelection: React.FC<ConceptSelectionProps> = ({
                     onChange={(e) => toggleSingle(index, e.target.checked)}
                   />
                 </td>
-                <td className={styles.conceptCode}>{concept.code}</td>
-                <td>{concept.display}</td>
+                <td className={styles.conceptCode}>
+                  <Highlighter
+                    highlightClassName="searchHighlight"
+                    searchWords={searchFilter}
+                    autoEscape={true}
+                    textToHighlight={concept.code}
+                  />
+                </td>
+                <td>
+                  <Highlighter
+                    highlightClassName="searchHighlight"
+                    searchWords={searchFilter}
+                    autoEscape={true}
+                    textToHighlight={concept.display}
+                  />
+                </td>
               </tr>
             ),
         )}
