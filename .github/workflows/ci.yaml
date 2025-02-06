@@ -48,7 +48,6 @@ jobs:
         uses: ArtiomTr/jest-coverage-report-action@v2
         with:
           test-script: npm run test:ci
-          working-directory: ./query-connector
           skip-step: install
 
   end-to-end-tests:
