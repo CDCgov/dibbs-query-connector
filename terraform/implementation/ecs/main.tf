@@ -1,6 +1,6 @@
 resource "aws_acm_certificate" "cloudflare_cert" {
-  private_key      = var.qc_tls_key       # Private key from Cloudflare
-  certificate_body = var.qc_tls_cert      # Public cert from Cloudflare
+  private_key      = var.qc_tls_key  # Private key from Cloudflare
+  certificate_body = var.qc_tls_cert # Public cert from Cloudflare
 }
 
 data "aws_caller_identity" "current" {}
@@ -24,35 +24,35 @@ module "vpc" {
 module "ecs" {
   # source  = "CDCgov/dibbs-ecr-viewer/aws"
   # version = "0.3.0"
-  source = "git::https://github.com/CDCgov/terraform-aws-dibbs-ecr-viewer.git?ref=1df03178a66bcbeef430eae7e35b9bea6d98857a"
+  source             = "git::https://github.com/CDCgov/terraform-aws-dibbs-ecr-viewer.git?ref=1df03178a66bcbeef430eae7e35b9bea6d98857a"
   public_subnet_ids  = flatten(module.vpc.public_subnets)
   private_subnet_ids = flatten(module.vpc.private_subnets)
   vpc_id             = module.vpc.vpc_id
   region             = var.region
 
-  owner        = var.owner
-  project      = var.project
-  tags         = local.tags
+  owner   = var.owner
+  project = var.project
+  tags    = local.tags
 
 
   phdi_version = "main"
 
   service_data = {
     query-connector = {
-      root_service   = true,
-      listener_priority = 1
-      short_name     = "qc",
-      fargate_cpu    = 512,
-      fargate_memory = 1024,
-      min_capacity   = 1,
-      max_capacity   = 5,
-      app_repo       = "ghcr.io/cdcgov/dibbs-query-connector",
-      app_image      = "${terraform.workspace}-query-connector",
-      app_version    = "main",
-      container_port = 3000,
-      host_port      = 3000,
-      public         = true,
-      registry_url   = "${data.aws_caller_identity.current.account_id}.dkr.ecr.${var.region}.amazonaws.com",
+      root_service      = true,
+      listener_priority = 2,
+      short_name        = "qc",
+      fargate_cpu       = 512,
+      fargate_memory    = 1024,
+      min_capacity      = 1,
+      max_capacity      = 5,
+      app_repo          = "ghcr.io/cdcgov/dibbs-query-connector",
+      app_image         = "${terraform.workspace}-query-connector",
+      app_version       = "main",
+      container_port    = 3000,
+      host_port         = 3000,
+      public            = true,
+      registry_url      = "${data.aws_caller_identity.current.account_id}.dkr.ecr.${var.region}.amazonaws.com",
       env_vars = [
         {
           name  = "AWS_REGION",
@@ -61,42 +61,93 @@ module "ecs" {
         {
           name  = "HOSTNAME",
           value = "0.0.0.0"
-        },        
-        {
-        name  = "fhir_url"
-        value = var.fhir_url
         },
-        {    
+        {
+          name  = "fhir_url"
+          value = var.fhir_url
+        },
+        {
           name  = "cred_manager"
           value = var.cred_manager
         },
-        {    
-         name  = "DATABASE_URL"
-         value = "postgresql://${aws_db_instance.qc_db.username}:${aws_db_instance.qc_db.password}@${aws_db_instance.qc_db.endpoint}/${aws_db_instance.qc_db.db_name}"
-         },
-         {    
-         name  = "FLYWAY_URL"
-         value = "jdbc:postgresql://${aws_db_instance.qc_db.endpoint}/${aws_db_instance.qc_db.db_name}"
+        {
+          name  = "DATABASE_URL"
+          value = "postgresql://${aws_db_instance.qc_db.username}:${aws_db_instance.qc_db.password}@${aws_db_instance.qc_db.endpoint}/${aws_db_instance.qc_db.db_name}"
+        },
+        {
+          name  = "FLYWAY_URL"
+          value = "jdbc:postgresql://${aws_db_instance.qc_db.endpoint}/${aws_db_instance.qc_db.db_name}"
 
-         },
-         {    
-         name  = "FLYWAY_PASSWORD"
-         value = aws_db_instance.qc_db.password
-         },
-         {    
-         name  = "FLYWAY_USER"
-         value = aws_db_instance.qc_db.username
-         },
-         {    
-         name  = "UMLS_API_KEY"
-         value = var.umls_api_key
-         },
-                  {    
-         name  = "ERSD_API_KEY"
-         value = var.ersd_api_key
-         },
+        },
+        {
+          name  = "FLYWAY_PASSWORD"
+          value = aws_db_instance.qc_db.password
+        },
+        {
+          name  = "FLYWAY_USER"
+          value = aws_db_instance.qc_db.username
+        },
+        {
+          name  = "UMLS_API_KEY"
+          value = var.umls_api_key
+        },
+        {
+          name  = "ERSD_API_KEY"
+          value = var.ersd_api_key
+        },
+        {
+          name  = "AUTH_SECRET"
+          value = var.auth_secret
+        },
+        {
+          name  = "AUTH_KEYCLOAK_ID"
+          value = var.keycloak_client_id
+        },
+        {
+          name  = "AUTH_KEYCLOAK_SECRET"
+          value = var.keycloak_client_secret
+        },
+        {
+          name  = "AUTH_KEYCLOAK_ISSUER"
+          value = var.auth_keycloak_issuer
+        },
+        {
+          name  = "AUTH_URL"
+          value = var.auth_url
+        }
+      ]
+    },
+    keycloak = {
+      root_service      = false,
+      listener_priority = 1,
+      short_name        = "kc",
+      fargate_cpu       = 512,
+      fargate_memory    = 1024,
+      min_capacity      = 1,
+      max_capacity      = 5,
+      app_repo          = "ghcr.io/cdcgov/dibbs-query-connector",
+      app_image         = "${terraform.workspace}-keycloak",
+      app_version       = "main",
+      container_port    = 8080,
+      host_port         = 8080,
+      public            = true,
+      registry_url      = "${data.aws_caller_identity.current.account_id}.dkr.ecr.${var.region}.amazonaws.com",
+      env_vars = [
+        {
+          name  = "KC_HTTP_RELATIVE_PATH"
+          value = "/keycloak"
+        },
+        {
+          name  = "KC_PROXY_HEADERS"
+          value = "xforwarded"
+        },
+        {
+          name  = "ENVIRONMENT"
+          value = terraform.workspace
+        }
       ]
     }
+
   }
 
 
@@ -137,18 +188,18 @@ module "ecs" {
 
 
 resource "aws_db_instance" "qc_db" {
-  allocated_storage = "10"
-  db_name = "${var.qc_db_name}_${terraform.workspace}"
-  identifier = "${var.db_identifier}-${terraform.workspace}"
-  engine               = var.db_engine_type
-  engine_version       = var.db_engine_version
+  allocated_storage               = "10"
+  db_name                         = "${var.qc_db_name}_${terraform.workspace}"
+  identifier                      = "${var.db_identifier}-${terraform.workspace}"
+  engine                          = var.db_engine_type
+  engine_version                  = var.db_engine_version
   enabled_cloudwatch_logs_exports = ["postgresql", "upgrade"]
-  instance_class       = var.db_instance_class
-  username             = var.db_username
-  password             = random_password.setup_rds_password.result
-  parameter_group_name = aws_db_parameter_group.this.name
-  skip_final_snapshot  = true
-  db_subnet_group_name = aws_db_subnet_group.this.name
+  instance_class                  = var.db_instance_class
+  username                        = var.db_username
+  password                        = random_password.setup_rds_password.result
+  parameter_group_name            = aws_db_parameter_group.this.name
+  skip_final_snapshot             = true
+  db_subnet_group_name            = aws_db_subnet_group.this.name
   vpc_security_group_ids          = [aws_security_group.db_sg.id]
 }
 
