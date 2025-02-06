@@ -10,7 +10,7 @@ docker compose -f docker-compose-integration.yaml logs -f flyway | grep -q "Succ
 BASE_CMD="DATABASE_URL=postgresql://postgres:pw@localhost:5432/tefca_db TEST_TYPE=integration jest "
 # running our integration tests
 if [ "$GENERATE_COVERAGE_REPORT" = "true" ]; then 
-    JEST_CMD="$BASE_CMD --testPathIgnorePatterns='/e2e/' --ci --json --coverage --testLocationInResults --outputFile=coverageReport.json"
+    JEST_CMD="$BASE_CMD --testPathIgnorePatterns='/e2e/' --ci --json --coverage --testLocationInResults --outputFile=report.json"
 else 
     JEST_CMD="$BASE_CMD --testPathPattern=tests/integration"
 fi 

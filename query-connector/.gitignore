@@ -7,4 +7,4 @@ certificates
 /blob-report/
 /playwright/.cache/
 /coverage
-coverageReport.json
+report.json
