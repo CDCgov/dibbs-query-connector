@@ -30,23 +30,7 @@ jobs:
           npm ci
           npm run lint
 
-  unit-tests:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{env.NODE_VERSION}}
-      - name: Install dependencies
-        working-directory: ./query-connector
-        run: npm install
-      - name: Run tests
-        working-directory: ./query-connector
-        run: npm run test:unit
-
-  integration-tests:
+  unit-and-integration-tests:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -59,16 +43,14 @@ jobs:
         working-directory: ./query-connector
         run: npm install
 
-      - name: Run tests
+      - name: Run unit and integration tests
         working-directory: ./query-connector
         run: npm run test:ci
 
-  coverage:
-    needs: integration-tests
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: ArtiomTr/jest-coverage-report-action@v2
+      - name: Report coverage
+        uses: actions/checkout@v3
+      - name: Setup reporting action
+        uses: ArtiomTr/jest-coverage-report-action@v2
         with:
           working-directory: ./query-connector
           coverage-file: report.json
