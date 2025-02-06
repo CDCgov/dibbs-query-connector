@@ -1,23 +1,23 @@
-import { screen, waitFor } from "@testing-library/react";
+import BuildFromTemplates from "@/app/(pages)/queryBuilding/buildFromTemplates/BuildFromTemplates";
+import {
+  DEFAULT_QUERIES,
+  conditionIdToNameMap,
+  categoryToConditionNameArrayMap,
+  gonorreheaValueSets,
+  gonorreheaSavedQuery,
+  cancerValueSets,
+} from "@/app/(pages)/queryBuilding/fixtures";
+import { formatDiseaseDisplay } from "@/app/(pages)/queryBuilding/utils";
+import { getSavedQueryById } from "@/app/backend/query-building";
 import { DataContext } from "@/app/shared/DataProvider";
+import { USE_CASE_DETAILS } from "@/app/shared/constants";
 import {
   getConditionsData,
   getValueSetsAndConceptsByConditionIDs,
-} from "../../../shared/database-service";
-import {
-  cancerValueSets,
-  categoryToConditionNameArrayMap,
-  conditionIdToNameMap,
-  DEFAULT_QUERIES,
-  gonorreheaSavedQuery,
-  gonorreheaValueSets,
-} from "../fixtures";
-import BuildFromTemplates from "./BuildFromTemplates";
-import { formatDiseaseDisplay } from "../utils";
+} from "@/app/shared/database-service";
 import { renderWithUser } from "@/app/tests/unit/setup";
-import { USE_CASE_DETAILS } from "@/app/shared/constants";
-import { getSavedQueryById } from "@/app/backend/query-building";
-import { CONDITION_DRAWER_SEARCH_PLACEHOLDER } from "../components/constants";
+import { screen, waitFor } from "@testing-library/dom";
+import { CONDITION_DRAWER_SEARCH_PLACEHOLDER } from "../components/utils";
 
 jest.mock("../../../shared/database-service", () => ({
   getCustomQueries: jest.fn(),
@@ -255,7 +255,7 @@ describe("tests the valueset selection page interactions", () => {
 
   it("filters search on the valueset selection drawer appropriately", async () => {
     const GONORREHEA_VALUESET_MAP = Object.values(
-      gonorreheaSavedQuery[0].query_data,
+      gonorreheaSavedQuery.query_data,
     )[0];
     const GONORREHEA_VALUESET_IDS = Object.keys(GONORREHEA_VALUESET_MAP);
 

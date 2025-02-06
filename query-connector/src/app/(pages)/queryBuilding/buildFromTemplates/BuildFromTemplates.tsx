@@ -122,12 +122,11 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
       if (selectedQuery.queryId === undefined) {
         return;
       }
-      const result = await getSavedQueryById(selectedQuery.queryId);
-      if (result === undefined) {
-        return; // todo: error???
+      const savedQuery = await getSavedQueryById(selectedQuery.queryId);
+      if (savedQuery === undefined) {
+        return;
       }
       const initialState: NestedQuery = {};
-      const savedQuery = result[0];
 
       Object.entries(savedQuery.query_data).forEach(
         ([conditionId, valueSetMap]) => {
@@ -245,11 +244,11 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
     (conditionId: string) =>
     (vsType: DibbsConceptType) =>
     (vsId: string) =>
-    (dibbsValueSets: DibbsValueSet) => {
+    (dibbsValueSet: DibbsValueSet) => {
       setConstructedQuery((prevState) => {
         prevState[conditionId] = prevState[conditionId] ?? {};
         prevState[conditionId][vsType] = prevState[conditionId][vsType] ?? {};
-        prevState[conditionId][vsType][vsId] = dibbsValueSets;
+        prevState[conditionId][vsType][vsId] = dibbsValueSet;
         return structuredClone(prevState);
       });
     };

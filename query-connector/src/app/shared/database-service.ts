@@ -7,12 +7,12 @@ import {
   DibbsValueSet,
   FhirServerConfig,
   CustomUserQuery,
-} from "../shared/constants";
+} from "./constants";
 import { encode } from "base-64";
 import {
   CategoryToConditionArrayMap,
   ConditionsMap,
-  QueryDetailsResult,
+  QueryTableResult,
 } from "../(pages)/queryBuilding/utils";
 import {
   CategoryStruct,
@@ -33,11 +33,11 @@ import {
   updateNewbornScreeningCategorySql,
   ValuesetStruct,
   ValuesetToConceptStruct,
-} from "../shared/seedSqlStructs";
+} from "./seedSqlStructs";
 import { getDbClient } from "../backend/dbClient";
 
 const getQuerybyNameSQL = `
-select q.query_name, q.id, q.query_data, q.conditions_list
+select q.query_name, q.id, q.query_data, q.conditions_list, q.immunization
   from query q 
   where q.query_name = $1;
 `;
@@ -52,6 +52,30 @@ SELECT c.display, c.code_system, c.code, vs.name as valueset_name, vs.id as valu
 `;
 
 const dbClient = getDbClient();
+
+/**
+ * Executes a search for a CustomQuery against the query-loaded Postgres
+ * Database, using the saved name associated with the query as the unique
+ * identifier by which to load the result.
+ * @param name The name given to a stored query in the DB.
+ * @returns One or more rows from the DB matching the requested saved query,
+ * or an error if no results can be found.
+ */
+export const getSavedQueryByName = async (name: string) => {
+  const values = [name];
+
+  try {
+    const result = await dbClient.query(getQuerybyNameSQL, values);
+    if (result.rows.length === 0) {
+      console.error("No results found for query named:", name);
+      return undefined;
+    }
+    return result.rows[0] as unknown as QueryTableResult;
+  } catch (error) {
+    console.error("Error retrieving query:", error);
+    throw error;
+  }
+};
 
 /*
  * The expected return type from both the eRSD API and the VSAC FHIR API.
@@ -652,30 +676,6 @@ export const deleteQueryById = async (queryId: string) => {
     await dbClient.query("ROLLBACK");
     console.error(`Failed to delete query with ID ${queryId}:`, error);
     return { success: false, error: "Failed to delete the query." };
-  }
-};
-
-/**
- * Executes a search for a CustomQuery against the query-loaded Postgres
- * Database, using the saved name associated with the query as the unique
- * identifier by which to load the result.
- * @param name The name given to a stored query in the DB.
- * @returns One or more rows from the DB matching the requested saved query,
- * or an error if no results can be found.
- */
-export const getSavedQueryByName = async (name: string) => {
-  const values = [name];
-
-  try {
-    const result = await dbClient.query(getQuerybyNameSQL, values);
-    if (result.rows.length === 0) {
-      console.error("No results found for query named:", name);
-      return [];
-    }
-    return result.rows as unknown as QueryDetailsResult[];
-  } catch (error) {
-    console.error("Error retrieving query:", error);
-    throw error;
   }
 };
 

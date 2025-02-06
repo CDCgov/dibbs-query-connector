@@ -16,7 +16,7 @@ test.describe("querying with the Query Connector", () => {
   });
 
   test("unsuccessful user query: no patients", async ({ page }) => {
-    await page.getByRole("button", { name: "Try it out" }).click();
+    await page.getByRole("link", { name: "Try it out" }).click();
     await page.getByRole("button", { name: "Fill fields" }).click();
     await page.getByLabel("First name").fill("Shouldnt");
     await page.getByLabel("Last name").fill("Findanyone");
@@ -41,7 +41,7 @@ test.describe("querying with the Query Connector", () => {
   });
 
   test("successful demo user query", async ({ page }) => {
-    await page.getByRole("button", { name: "Try it out" }).click();
+    await page.getByRole("link", { name: "Try it out" }).click();
 
     // Check that the info alert is visible and contains the correct text
     const alert = page.locator(".custom-alert");
@@ -101,7 +101,9 @@ test.describe("querying with the Query Connector", () => {
     await expect(page.getByText(TEST_PATIENT_NAME)).toBeVisible();
     await expect(page.getByText("Patient Identifiers")).toBeVisible();
     await expect(
-      page.getByText(`Medical Record Number: ${TEST_PATIENT.MRN}`),
+      page.getByText(
+        `Medical Record Number: St. Worrywart’s Hospital: ${TEST_PATIENT.MRN}`,
+      ),
     ).toBeVisible();
 
     // Check that the info alert is visible and has updated to the correct text
@@ -124,39 +126,36 @@ test.describe("querying with the Query Connector", () => {
     await expect(
       page
         .getByRole("table")
-        .filter({ hasText: "Chlamydia trachomatis DNA" })
-        .getByRole("row"),
-    ).toHaveCount(14);
+        .getByRole("row")
+        .filter({ hasText: "Chlamydia trachomatis DNA" }),
+    ).toHaveCount(4);
     // Encounters
     await expect(
       page
         .getByRole("table")
-        .filter({ hasText: "Sexual overexposure" })
-        .getByRole("row"),
-    ).toHaveCount(5);
-    // Conditions + Medication Requests (Reason Code)
+        .getByRole("row")
+        .filter({ hasText: "Sexual overexposure" }),
+    ).toHaveCount(3);
+    // 4 Conditions + 3 Medication Requests (Reason Code)
     await expect(
       page
         .getByRole("table")
-        .filter({ hasText: "Chlamydial infection, unspecified" })
-        .getByRole("row"),
-    ).toHaveCount(10);
+        .getByRole("row")
+        .filter({ hasText: "Chlamydial infection, unspecified" }),
+    ).toHaveCount(7);
     // Diagnostic Reports
     await expect(
-      page
-        .getByRole("table")
-        .filter({
-          hasText: "Chlamydia trachomatis and Neisseria gonorrhoeae DNA panel",
-        })
-        .getByRole("row"),
-    ).toHaveCount(4);
+      page.getByRole("table").getByRole("row").filter({
+        hasText: "Chlamydia trachomatis and Neisseria gonorrhoeae DNA panel",
+      }),
+    ).toHaveCount(3);
     // Medication Requests
     await expect(
       page
         .getByRole("table")
-        .filter({ hasText: "azithromycin 1000 MG" })
-        .getByRole("row"),
-    ).toHaveCount(7);
+        .getByRole("row")
+        .filter({ hasText: "azithromycin 1000 MG" }),
+    ).toHaveCount(2);
 
     // Now let's use the return to search to go back to a blank form
     await page.getByRole("button", { name: "New patient search" }).click();
