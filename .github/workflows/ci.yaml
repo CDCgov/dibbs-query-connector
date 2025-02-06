@@ -64,13 +64,14 @@ jobs:
         run: npm run test:ci
 
   coverage:
+    needs: integration-tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: ArtiomTr/jest-coverage-report-action@v2
         with:
           working-directory: ./query-connector
-          coverage-file: ./query-connector/report.json
+          coverage-file: report.json
           skip-step: all
 
   end-to-end-tests:
