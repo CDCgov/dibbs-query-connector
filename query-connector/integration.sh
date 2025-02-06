@@ -7,8 +7,14 @@ docker compose -f docker-compose-integration.yaml up -d
 # wait for flyway to finish running before...
 docker compose -f docker-compose-integration.yaml logs -f flyway | grep -q "Successfully applied\|No migration necessary"
 
+BASE_CMD="DATABASE_URL=postgresql://postgres:pw@localhost:5432/tefca_db TEST_TYPE=integration jest --testPathPattern=tests/integration"
 # running our integration tests
-DATABASE_URL=postgresql://postgres:pw@localhost:5432/tefca_db TEST_TYPE=integration jest --testPathPattern=tests/integration --ci --json --coverage --testLocationInResults --outputFile=/coverage/integration/report.json
+if [ "$GENERATE_COVERAGE_REPORT" = "true" ]; then 
+    JEST_CMD="$BASE_CMD --ci --json --coverage --testLocationInResults --outputFile=integration-jestCoverageReport.json"
+else 
+    JEST_CMD="$BASE_CMD"
+fi 
+eval $JEST_CMD
 JEST_EXIT_CODE=$?
 
 # Teardown containers
