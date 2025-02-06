@@ -270,7 +270,7 @@ const checkboxLabel = (
           ) : (
             //  past this many matches, don't render the individual codes in favor of a
             // "this many matches" string
-            <span className="searchHighlight">{`${dibbsVs.concepts.length} codes`}</span>
+            <span className="searchHighlight">{`${codesToRender.length} codes`}</span>
           )}
         </strong>
       )}
