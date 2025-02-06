@@ -118,8 +118,9 @@ module "ecs" {
       ]
     },
     keycloak = {
-      short_name        = "kc",
+      root_service      = false,
       listener_priority = 1,
+      short_name        = "kc",
       fargate_cpu       = 512,
       fargate_memory    = 1024,
       min_capacity      = 1,
