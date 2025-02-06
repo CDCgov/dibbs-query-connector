@@ -156,7 +156,19 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
         const isMinusState =
           selectedCount !== totalCount && selectedCount !== 0;
         const checked = selectedCount == totalCount && selectedCount > 0;
-
+        const checkboxToRender = (
+          <Checkbox
+            className={styles.valueSetTemplate__checkbox}
+            label={checkboxLabel(dibbsVs, tableSearchFilter, areItemsFiltered)}
+            onChange={(e: ChangeEvent<HTMLInputElement>) => {
+              handleBulkToggle(e, isMinusState);
+            }}
+            id={dibbsVs.valueSetId}
+            checked={checked}
+            isMinusState={isMinusState}
+            data-testid={`selectValueset-${dibbsVs.valueSetId}`}
+          />
+        );
         return (
           <div
             className={styles.accordionBodyExpanded}
@@ -164,18 +176,7 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
             data-testid={`container-${dibbsVs.valueSetId}`}
           >
             <div className={styles.accordionExpandedInner}>
-              <div
-                className={areItemsFiltered ? `usa-tooltip` : ""}
-                data-position="top"
-                data-classes="width-3 text-red"
-                title={
-                  areItemsFiltered
-                    ? `This will change only the ${
-                        dibbsVs.concepts.filter((c) => c.render).length
-                      } filtered codes`
-                    : ""
-                }
-              >
+              {areItemsFiltered ? (
                 <Tooltip<TooltipWrapperProps>
                   label={`This will only change these ${
                     dibbsVs.concepts.filter((c) => c.render).length
@@ -183,23 +184,11 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
                   asCustom={TooltipWrapper}
                   position="left"
                 >
-                  <Checkbox
-                    className={styles.valueSetTemplate__checkbox}
-                    label={checkboxLabel(
-                      dibbsVs,
-                      tableSearchFilter,
-                      areItemsFiltered,
-                    )}
-                    onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                      handleBulkToggle(e, isMinusState);
-                    }}
-                    id={dibbsVs.valueSetId}
-                    checked={checked}
-                    isMinusState={isMinusState}
-                    data-testid={`selectValueset-${dibbsVs.valueSetId}`}
-                  />
+                  {checkboxToRender}
                 </Tooltip>
-              </div>
+              ) : (
+                checkboxToRender
+              )}
             </div>
             <div className={styles.accordionBodyExpanded__right}>
               <div className={styles.displayCount}>
