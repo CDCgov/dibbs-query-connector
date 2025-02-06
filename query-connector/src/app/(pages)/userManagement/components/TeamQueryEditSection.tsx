@@ -1,10 +1,10 @@
 "use client";
 
 import { useContext } from "react";
-import Drawer from "@/app/ui/designSystem/drawer/Drawer";
-import { DataContext } from "./DataProvider";
 import classNames from "classnames";
 import { Checkbox } from "@trussworks/react-uswds";
+import Drawer from "@/app/ui/designSystem/drawer/Drawer";
+import { DataContext } from "./DataProvider";
 
 /**
  *  @returns TeamQueryEditSection component which is the collapsible section that allows to edit members and queries of a team
