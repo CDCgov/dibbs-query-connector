@@ -9,7 +9,8 @@ interface UserManagementData {
     isOpen: boolean;
     title: string;
     subtitle: string;
-    content: JSX.Element;
+    placeholder: string;
+    subjectData: unknown;
     subjectType: SubjectType;
   };
 }
@@ -22,6 +23,9 @@ interface UserManagementContext extends UserManagementData {
     subjectId: string,
   ) => void;
   CloseEditSection: () => void;
+  HandleSearch: (searchFilter: string) => void;
+  HandleMemberUpdate: () => void;
+  HandleQueryUpdate: () => void;
 }
 
 const initData: UserManagementData = {
@@ -29,7 +33,8 @@ const initData: UserManagementData = {
     isOpen: false,
     title: "",
     subtitle: "",
-    content: <></>,
+    placeholder: "Search",
+    subjectData: [],
     subjectType: "Members",
   },
 };
@@ -38,6 +43,9 @@ export const DataContext = createContext<UserManagementContext>({
   ...initData,
   OpenEditSection: () => {},
   CloseEditSection: () => {},
+  HandleSearch: (searchFilter: string) => {},
+  HandleMemberUpdate: () => {},
+  HandleQueryUpdate: () => {},
 });
 
 /**
@@ -49,6 +57,9 @@ export const DataContext = createContext<UserManagementContext>({
 const DataProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
   const [innerState, setInnerState] = useState<UserManagementData>(initData);
 
+  /**
+   * Event handlers for edit section
+   */
   function CloseEditSection() {
     const newState: UserManagementData = {
       ...innerState,
@@ -66,23 +77,74 @@ const DataProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     subjectType: SubjectType,
     subjectId: string,
   ) {
-    // here we retrieve the relevant data
+    let subjectData = null;
+    let placeholder = "";
+
+    if (subjectType == "Members") {
+      placeholder = "Search members";
+      subjectData = GetTeamMembers(subjectId);
+    } else {
+      placeholder = "Search queries";
+      subjectData = GetTeamQueries(subjectId);
+    }
+
     const newState: UserManagementData = {
       ...innerState,
       TeamQueryEditSection: {
         ...innerState.TeamQueryEditSection,
         title,
         subtitle,
+        placeholder,
         subjectType,
+        subjectData,
         isOpen: true,
       },
     };
     setInnerState(newState);
   }
 
+  function HandleSearch(filter: string) {
+    // TODO data filtering
+    console.log("filtering ...");
+  }
+
+  function HandleMemberUpdate() {
+    console.log("update team members");
+  }
+
+  function HandleQueryUpdate() {
+    console.log("update team queries");
+  }
+
+  /**
+   * Data fetching
+   */
+
+  function GetTeamMembers(teamId: string): unknown {
+    // TODO retrieve member data
+    const ListOfMembers = ["Member 1", "Member 2", "Member 3"];
+    return ListOfMembers;
+  }
+
+  function GetTeamQueries(teamId: string): unknown {
+    // TODO retrieve queries data
+    const ListOfQueries = ["Query 1", "Query 2", "Query 3"];
+    return ListOfQueries;
+  }
+
+  /**
+   * HTML
+   */
   return (
     <DataContext.Provider
-      value={{ ...innerState, OpenEditSection, CloseEditSection }}
+      value={{
+        ...innerState,
+        OpenEditSection,
+        CloseEditSection,
+        HandleSearch,
+        HandleMemberUpdate,
+        HandleQueryUpdate,
+      }}
     >
       {children}
     </DataContext.Provider>
