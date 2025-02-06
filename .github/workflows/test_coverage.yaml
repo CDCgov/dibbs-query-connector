@@ -12,3 +12,4 @@ jobs:
         with:
           working-directory: ./query-connector
           test-script: npm run test:ci
+          coverage-file: coverageReport.json
