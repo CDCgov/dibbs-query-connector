@@ -24,7 +24,7 @@ module "vpc" {
 module "ecs" {
   # source  = "CDCgov/dibbs-ecr-viewer/aws"
   # version = "0.3.0"
-  source = "git::https://github.com/CDCgov/terraform-aws-dibbs-ecr-viewer.git?ref=1df03178a66bcbeef430eae7e35b9bea6d98857a"
+  source             = "git::https://github.com/CDCgov/terraform-aws-dibbs-ecr-viewer.git?ref=1df03178a66bcbeef430eae7e35b9bea6d98857a"
   public_subnet_ids  = flatten(module.vpc.public_subnets)
   private_subnet_ids = flatten(module.vpc.private_subnets)
   vpc_id             = module.vpc.vpc_id
@@ -39,20 +39,20 @@ module "ecs" {
 
   service_data = {
     query-connector = {
-      root_service   = true,
-      listener_priority = 1
-      short_name     = "qc",
-      fargate_cpu    = 512,
-      fargate_memory = 1024,
-      min_capacity   = 1,
-      max_capacity   = 5,
-      app_repo       = "ghcr.io/cdcgov/dibbs-query-connector",
-      app_image      = "${terraform.workspace}-query-connector",
-      app_version    = "main",
-      container_port = 3000,
-      host_port      = 3000,
-      public         = true,
-      registry_url   = "${data.aws_caller_identity.current.account_id}.dkr.ecr.${var.region}.amazonaws.com",
+      root_service      = true,
+      listener_priority = 2,
+      short_name        = "qc",
+      fargate_cpu       = 512,
+      fargate_memory    = 1024,
+      min_capacity      = 1,
+      max_capacity      = 5,
+      app_repo          = "ghcr.io/cdcgov/dibbs-query-connector",
+      app_image         = "${terraform.workspace}-query-connector",
+      app_version       = "main",
+      container_port    = 3000,
+      host_port         = 3000,
+      public            = true,
+      registry_url      = "${data.aws_caller_identity.current.account_id}.dkr.ecr.${var.region}.amazonaws.com",
       env_vars = [
         {
           name  = "AWS_REGION",
@@ -118,18 +118,19 @@ module "ecs" {
       ]
     },
     keycloak = {
-      short_name     = "kc",
-      fargate_cpu    = 512,
-      fargate_memory = 1024,
-      min_capacity   = 1,
-      max_capacity   = 5,
-      app_repo       = "ghcr.io/cdcgov/dibbs-query-connector",
-      app_image      = "${terraform.workspace}-keycloak",
-      app_version    = "main",
-      container_port = 8080,
-      host_port      = 8080,
-      public         = true,
-      registry_url   = "${data.aws_caller_identity.current.account_id}.dkr.ecr.${var.region}.amazonaws.com",
+      short_name        = "kc",
+      listener_priority = 1,
+      fargate_cpu       = 512,
+      fargate_memory    = 1024,
+      min_capacity      = 1,
+      max_capacity      = 5,
+      app_repo          = "ghcr.io/cdcgov/dibbs-query-connector",
+      app_image         = "${terraform.workspace}-keycloak",
+      app_version       = "main",
+      container_port    = 8080,
+      host_port         = 8080,
+      public            = true,
+      registry_url      = "${data.aws_caller_identity.current.account_id}.dkr.ecr.${var.region}.amazonaws.com",
       env_vars = [
         {
           name  = "KC_HTTP_RELATIVE_PATH"
