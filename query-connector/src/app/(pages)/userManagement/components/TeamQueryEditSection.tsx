@@ -5,6 +5,7 @@ import classNames from "classnames";
 import { Checkbox } from "@trussworks/react-uswds";
 import Drawer from "@/app/ui/designSystem/drawer/Drawer";
 import { DataContext } from "./DataProvider";
+import style from "./TeamQueryEditSection.module.scss";
 
 /**
  *  @returns TeamQueryEditSection component which is the collapsible section that allows to edit members and queries of a team
@@ -42,7 +43,7 @@ const TeamQueryEditSection: React.FC = () => {
               label={item}
               defaultChecked
               onChange={isMemberView ? HandleMemberUpdate : HandleQueryUpdate}
-              className={classNames("margin-bottom-3")}
+              className={classNames("margin-bottom-3", style.checkbox)}
             />
           </li>
         ))}
