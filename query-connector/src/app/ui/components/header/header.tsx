@@ -124,42 +124,41 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
             )}
           </div>
         </div>
+        {showMenu && (
+          <div ref={menuRef} className={styles.menuDropdownContainer}>
+            <ul
+              id="dropdown-menu"
+              className={classNames(`usa-nav__submenu`, styles.menuDropdown)}
+            >
+              {/* TODO: Enable this once we can show/hide rules based on actual auth status */}
+              {/* {isProduction && ( */}
+              <>
+                <li className={styles.subMenuItem}>
+                  <Link className={styles.menuItem} href={"/queryBuilding"}>
+                    My queries
+                  </Link>
+                </li>
+                <li className={styles.subMenuItem}>
+                  <Link className={styles.menuItem} href={"/fhir-servers"}>
+                    FHIR Servers
+                  </Link>
+                </li>
+                <li className={styles.subMenuItem}>
+                  <Link className={styles.menuItem} href={"/userManagement"}>
+                    User Management
+                  </Link>
+                </li>
+                <li className={styles.subMenuItem}>
+                  <Link className={styles.menuItem} href={landingPage}>
+                    Log out
+                  </Link>
+                </li>
+              </>
+              {/* )} */}
+            </ul>
+          </div>
+        )}
       </header>
-
-      {showMenu && (
-        <div ref={menuRef} className={styles.menuDropdownContainer}>
-          <ul
-            id="dropdown-menu"
-            className={`usa-nav__submenu ${styles.menuDropdown}`}
-          >
-            {/* TODO: Enable this once we can show/hide rules based on actual auth status */}
-            {/* {isProduction && ( */}
-            <>
-              <li className={styles.subMenuItem}>
-                <Link className={styles.menuItem} href={"/queryBuilding"}>
-                  My queries
-                </Link>
-              </li>
-              <li className={styles.subMenuItem}>
-                <Link className={styles.menuItem} href={"/fhir-servers"}>
-                  FHIR Servers
-                </Link>
-              </li>
-              <li className={styles.subMenuItem}>
-                <Link className={styles.menuItem} href={"/userManagement"}>
-                  User Management
-                </Link>
-              </li>
-              <li className={styles.subMenuItem}>
-                <Link className={styles.menuItem} href={landingPage}>
-                  Log out
-                </Link>
-              </li>
-            </>
-            {/* )} */}
-          </ul>
-        </div>
-      )}
     </div>
   );
 };
