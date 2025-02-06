@@ -66,37 +66,35 @@ const Drawer: React.FC<DrawerProps> = ({
             isOpen ? "display-block" : "display-none",
           )}
         >
-          <button
-            className={styles.closeButton}
-            onClick={handleClose}
-            aria-label="Close drawer"
-            data-testid={"close-drawer"}
-          >
-            <Icon.Close size={3} aria-label="X icon indicating closure" />
-          </button>
-          <h2
-            data-testid={`drawer-title-${title}`}
-            className={`margin-0 padding-0`}
-          >
-            {title}
-          </h2>
+          <div className={styles.drawerHeader}>
+            <button
+              className={styles.closeButton}
+              onClick={handleClose}
+              aria-label="Close drawer"
+              data-testid={"close-drawer"}
+            >
+              <Icon.Close size={3} aria-label="X icon indicating closure" />
+            </button>
+            <h2 data-testid={`drawer-title`} className={`margin-0 padding-0`}>
+              {title}
+            </h2>
+            {subtitle ? <h3 className={styles.subtitle}>{subtitle}</h3> : <></>}
 
-          <h3 className={styles.subtitle}>{subtitle}</h3>
-
-          {onSearch && (
-            <div>
-              <SearchField
-                id="searchFieldTemplate"
-                placeholder={placeholder}
-                className={styles.searchField}
-                value={searchFilter}
-                onChange={(e) => {
-                  e.preventDefault();
-                  setSearchFilter(e.target.value);
-                }}
-              />
-            </div>
-          )}
+            {onSearch && (
+              <div>
+                <SearchField
+                  id="searchFieldTemplate"
+                  placeholder={placeholder}
+                  className={styles.searchField}
+                  value={searchFilter}
+                  onChange={(e) => {
+                    e.preventDefault();
+                    setSearchFilter(e.target.value);
+                  }}
+                />
+              </div>
+            )}
+          </div>
 
           <div className="padding-top-2">{toRender}</div>
         </div>

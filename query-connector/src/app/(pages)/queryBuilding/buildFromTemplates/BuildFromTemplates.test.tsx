@@ -16,8 +16,14 @@ import {
   getValueSetsAndConceptsByConditionIDs,
 } from "@/app/shared/database-service";
 import { renderWithUser } from "@/app/tests/unit/setup";
-import { screen, waitFor } from "@testing-library/dom";
-import { CONDITION_DRAWER_SEARCH_PLACEHOLDER } from "../components/utils";
+import { screen, waitFor, within } from "@testing-library/dom";
+import {
+  CONDITION_DRAWER_SEARCH_PLACEHOLDER,
+  VALUESET_DRAWER_SEARCH_PLACEHOLDER,
+  VALUESET_SELECTION_SEARCH_PLACEHOLDER,
+} from "../components/utils";
+import { userEvent } from "@testing-library/user-event";
+import { render } from "@testing-library/react";
 
 jest.mock("../../../shared/database-service", () => ({
   getCustomQueries: jest.fn(),
@@ -204,8 +210,17 @@ describe("tests the build from template page interactions", () => {
 });
 
 describe("tests the valueset selection page interactions", () => {
-  it("filters search on the condition selection drawer appropriately", async () => {
-    const { user } = renderWithUser(
+  const GONORREHEA_VALUESET_MAP = Object.values(
+    gonorreheaSavedQuery.query_data,
+  )[0];
+  const GONORREHEA_VALUESET_IDS = Object.keys(GONORREHEA_VALUESET_MAP);
+
+  const TEST_ID = GONORREHEA_VALUESET_IDS[0];
+  const TEST_VALUESET = GONORREHEA_VALUESET_MAP[TEST_ID];
+  let user = userEvent.setup();
+
+  beforeEach(async () => {
+    render(
       <DataContext.Provider value={mockContextValue}>
         <BuildFromTemplates
           buildStep={"valueset"}
@@ -218,7 +233,21 @@ describe("tests the valueset selection page interactions", () => {
         />
       </DataContext.Provider>,
     );
-    await waitFor(() => screen.getByText("Save query"));
+
+    await waitFor(() => {
+      screen.getByText("Save query");
+    });
+
+    await user.click(
+      screen.getByTestId("15628003-conditionCard", { exact: false }),
+    );
+    await user.click(
+      screen.getByTestId("accordionButton_labs", { exact: false }),
+    );
+    expect(screen.getByText(TEST_VALUESET.valueSetName)).toBeVisible();
+  });
+
+  it("filters search on the condition selection drawer appropriately", async () => {
     await user.click(screen.getByTestId("add-left-rail"));
 
     const drawerConditionsSearch = screen.getByPlaceholderText(
@@ -254,50 +283,15 @@ describe("tests the valueset selection page interactions", () => {
   });
 
   it("filters search on the valueset selection drawer appropriately", async () => {
-    const GONORREHEA_VALUESET_MAP = Object.values(
-      gonorreheaSavedQuery.query_data,
-    )[0];
-    const GONORREHEA_VALUESET_IDS = Object.keys(GONORREHEA_VALUESET_MAP);
-
-    const TEST_ID = GONORREHEA_VALUESET_IDS[0];
-    const TEST_VALUESET = GONORREHEA_VALUESET_MAP[TEST_ID];
-
-    const { user } = renderWithUser(
-      <DataContext.Provider value={mockContextValue}>
-        <BuildFromTemplates
-          buildStep={"valueset"}
-          setBuildStep={jest.fn}
-          selectedQuery={{
-            queryName: "Gonorrhea case investigation",
-            queryId: USE_CASE_DETAILS["gonorrhea"].id,
-          }}
-          setSelectedQuery={jest.fn}
-        />
-      </DataContext.Provider>,
-    );
-
-    await waitFor(() => {
-      screen.getByText("Save query");
-    });
-
-    await user.click(
-      screen.getByTestId("15628003-conditionCard", { exact: false }),
-    );
-    await user.click(
-      screen.getByTestId("accordionButton_labs", { exact: false }),
-    );
-    expect(screen.getByText(TEST_VALUESET.valueSetName)).toBeVisible();
-
     await user.click(screen.getByTestId(`viewCodes-${TEST_ID}`));
-
     await waitFor(() => {
       expect(
-        screen.getByTestId(`drawer-title-${TEST_VALUESET.valueSetName}`),
+        screen.getByRole("heading", { name: TEST_VALUESET.valueSetName }),
       ).toBeVisible();
     });
 
     const valueSetSearch = screen.getByPlaceholderText(
-      "Search by code or name",
+      VALUESET_DRAWER_SEARCH_PLACEHOLDER,
     );
     expect(valueSetSearch).toBeVisible();
     expect(screen.getByText(TEST_VALUESET.concepts[0].display)).toBeVisible();
@@ -309,5 +303,120 @@ describe("tests the valueset selection page interactions", () => {
     await user.clear(valueSetSearch);
     expect(screen.getByText(TEST_VALUESET.concepts[0].display)).toBeVisible();
     expect(screen.getByText(TEST_VALUESET.concepts[1].display)).toBeVisible();
+  });
+
+  it("filters search on the valueset selection table appropriately", async () => {
+    const valueSetSearch = screen.getByPlaceholderText(
+      VALUESET_SELECTION_SEARCH_PLACEHOLDER,
+    );
+    expect(valueSetSearch).toBeVisible();
+    expect(screen.getByText(TEST_VALUESET.valueSetName)).toBeVisible();
+
+    // search filters populate the right amount of valuesets / codes
+    await user.type(valueSetSearch, "meningitidis");
+    expect(
+      screen.getByText("1 valueset(s) found", { exact: false }),
+    ).toBeVisible();
+    expect(
+      screen.getByText(
+        `${TEST_VALUESET.concepts[0].code}, ${TEST_VALUESET.concepts[3].code}`,
+        { exact: false },
+      ),
+    ).toBeVisible();
+
+    // drawer population works
+    await user.click(
+      screen.getByRole("button", {
+        name: /view codes/i,
+      }),
+    );
+    const heading = screen.getByRole("heading", {
+      name: TEST_VALUESET.valueSetName,
+    });
+
+    expect(
+      within(heading).getByText(TEST_VALUESET.valueSetName),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByRole("cell", {
+        name: TEST_VALUESET.concepts[0].code,
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("cell", {
+        name: TEST_VALUESET.concepts[3].code,
+      }),
+    ).toBeInTheDocument();
+
+    // drawer search works
+    const valueSetDrawerSearch = screen.getByPlaceholderText(
+      VALUESET_DRAWER_SEARCH_PLACEHOLDER,
+    );
+    await user.type(valueSetDrawerSearch, TEST_VALUESET.concepts[0].code);
+
+    expect(
+      screen.getByRole("cell", {
+        name: TEST_VALUESET.concepts[0].display,
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("cell", {
+        name: TEST_VALUESET.concepts[3].display,
+      }),
+    ).not.toBeInTheDocument();
+  });
+  it("filter bulk selection updates only the filtered valuesets", async () => {
+    const valueSetSearch = screen.getByPlaceholderText(
+      VALUESET_SELECTION_SEARCH_PLACEHOLDER,
+    );
+    expect(valueSetSearch).toBeVisible();
+    expect(screen.getByText(TEST_VALUESET.valueSetName)).toBeVisible();
+
+    // search filters populate the right amount of valuesets / codes
+    await user.type(valueSetSearch, "meningitidis");
+    expect(
+      screen.getByText("1 valueset(s) found", { exact: false }),
+    ).toBeVisible();
+    const searchResultLabel = screen.getByText(
+      `${TEST_VALUESET.concepts[0].code}, ${TEST_VALUESET.concepts[3].code}`,
+      { exact: false },
+    );
+    expect(searchResultLabel).toBeVisible();
+    await user.click(searchResultLabel);
+
+    // the "total" selected values should be just the 2 search results, and since
+    // we've bulk toggled them off, none of them should be selected
+    expect(screen.getByText("0/2")).toBeInTheDocument();
+    await user.click(searchResultLabel);
+
+    // toggle on and off again
+    expect(screen.getByText("2/2")).toBeInTheDocument();
+    await user.click(searchResultLabel);
+
+    await user.clear(valueSetSearch);
+    // when we clear the search filter, the other two non-rendered codes shouldn't
+    // have been affected
+    expect(screen.getByText("2/4")).toBeInTheDocument();
+
+    // do the same for the accordidion
+    await user.type(valueSetSearch, "meningitidis");
+
+    await user.click(screen.getByLabelText("Labs", { exact: false }));
+    expect(screen.getByText("2/2")).toBeInTheDocument();
+    await user.click(screen.getByLabelText("Labs", { exact: false }));
+    expect(screen.getByText("0/2")).toBeInTheDocument();
+
+    await user.clear(valueSetSearch);
+    expect(screen.getByText("2/4")).toBeInTheDocument();
+
+    // ... and the drawer
+    await user.type(valueSetSearch, "meningitidis");
+    await user.click(screen.getByText("View codes", { exact: false }));
+    await user.click(screen.getByText(TEST_VALUESET.concepts[0].code));
+    await user.click(screen.getByText(TEST_VALUESET.concepts[3].code));
+    expect(screen.getByText("0/2")).toBeInTheDocument();
+    await user.clear(valueSetSearch);
+    expect(screen.getByText("2/4")).toBeInTheDocument();
   });
 });

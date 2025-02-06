@@ -1,16 +1,18 @@
 import styles from "../buildFromTemplates/conditionTemplateSelection.module.scss";
 import { Icon } from "@trussworks/react-uswds";
-import { DibbsConceptType, DibbsValueSet } from "@/app/shared/constants";
+import { DibbsConceptType } from "@/app/shared/constants";
 import { ChangeEvent } from "react";
 import Checkbox from "@/app/ui/designSystem/checkbox/Checkbox";
+import { FilterableValueSet } from "./utils";
 
 type ConceptTypeAccordionBodyProps = {
   activeType: DibbsConceptType;
-  activeTypeValueSets: { [vsId: string]: DibbsValueSet };
+  activeTypeValueSets: { [vsId: string]: FilterableValueSet };
   expanded: boolean;
   handleVsNameLevelUpdate: (
     vsId: string,
-  ) => (dibbsValueSets: DibbsValueSet) => void;
+  ) => (dibbsValueSets: FilterableValueSet) => void;
+  areItemsFiltered?: boolean;
 };
 
 /**
@@ -21,6 +23,8 @@ type ConceptTypeAccordionBodyProps = {
  * @param param0.expanded - Boolean for managing icon orientation
  * @param param0.handleVsNameLevelUpdate - curried state update function that
  * takes a VsName and generatesa ValueSet level update
+ * @param param0.areItemsFiltered - whether the activeValueSets are filtered to
+ * assist with some additional rendering logic
  * @returns An accordion body component
  */
 const ConceptTypeAccordionHeader: React.FC<ConceptTypeAccordionBodyProps> = ({
@@ -28,11 +32,12 @@ const ConceptTypeAccordionHeader: React.FC<ConceptTypeAccordionBodyProps> = ({
   activeTypeValueSets,
   expanded,
   handleVsNameLevelUpdate,
+  areItemsFiltered = false,
 }) => {
   const selectedCount = Object.values(activeTypeValueSets).reduce(
     (acc, curValueSet) => {
       const curConceptsIncludedCount = curValueSet.concepts.filter(
-        (c) => c.include,
+        (c) => c.include && c.render,
       ).length;
       return acc + curConceptsIncludedCount;
     },
@@ -40,7 +45,9 @@ const ConceptTypeAccordionHeader: React.FC<ConceptTypeAccordionBodyProps> = ({
   );
   const totalCount = Object.values(activeTypeValueSets).reduce(
     (acc, curValueSet) => {
-      const curConceptsIncludedCount = curValueSet.concepts.length;
+      const curConceptsIncludedCount = curValueSet.concepts.filter(
+        (c) => c.render,
+      ).length;
       return acc + curConceptsIncludedCount;
     },
     0,
@@ -55,7 +62,10 @@ const ConceptTypeAccordionHeader: React.FC<ConceptTypeAccordionBodyProps> = ({
       const bulkIncludeValue = isMinusState ? false : e.target.checked;
       activeValueSets.includeValueSet = bulkIncludeValue;
       activeValueSets.concepts.map((c) => {
-        return (c.include = bulkIncludeValue);
+        if (c.render) {
+          c.include = bulkIncludeValue;
+        }
+        return c;
       });
       handleValueSetUpdate(activeValueSets);
     });
@@ -86,9 +96,14 @@ const ConceptTypeAccordionHeader: React.FC<ConceptTypeAccordionBodyProps> = ({
             isMinusState={isMinusState}
           />
         </div>
-        <div
-          className={styles.accordionHeaderCount}
-        >{`${selectedCount} / ${totalCount}`}</div>
+        <div className={styles.accordionHeaderCount}>
+          {areItemsFiltered
+            ? `${
+                Object.values(activeTypeValueSets).filter((v) => v.render)
+                  .length
+              } valueset(s) found`
+            : `${selectedCount} / ${totalCount}`}
+        </div>
       </div>
     </>
   );
