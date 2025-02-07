@@ -135,11 +135,11 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
               <>
                 <li className={styles.subMenuItem}>
                   <Link className={styles.menuItem} href={"/queryBuilding"}>
-                    My queries
+                    My Queries
                   </Link>
                 </li>
                 <li className={styles.subMenuItem}>
-                  <Link className={styles.menuItem} href={"/fhir-servers"}>
+                  <Link className={styles.menuItem} href={"/fhirServers"}>
                     FHIR Servers
                   </Link>
                 </li>
@@ -166,7 +166,7 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
 const LOGGED_IN_PATHS = [
   "/query",
   "/queryBuilding",
-  "/fhir-servers",
+  "/fhirServers",
   "/userManagement",
   "/userManagement/userGroups",
 ];

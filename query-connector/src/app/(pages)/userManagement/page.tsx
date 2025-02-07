@@ -19,7 +19,7 @@ const UserManagement: React.FC = () => {
     setUsers(usersMock);
   }, []);
 
-  const { OpenEditSection } = useContext(DataContext);
+  const { openEditSection } = useContext(DataContext);
 
   /**
    * HTML
@@ -82,7 +82,7 @@ const UserManagement: React.FC = () => {
                         key={group.id}
                         aria-description={`Edit ${group.name} members`}
                         onClick={() => {
-                          OpenEditSection(
+                          openEditSection(
                             group.name,
                             "Members",
                             "Members",

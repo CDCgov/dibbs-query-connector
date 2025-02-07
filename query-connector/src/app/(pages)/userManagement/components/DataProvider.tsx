@@ -5,7 +5,7 @@ import { createContext, useState } from "react";
 type SubjectType = "Members" | "Query";
 
 interface UserManagementData {
-  TeamQueryEditSection: {
+  teamQueryEditSection: {
     isOpen: boolean;
     title: string;
     subtitle: string;
@@ -16,20 +16,20 @@ interface UserManagementData {
 }
 
 interface UserManagementContext extends UserManagementData {
-  OpenEditSection: (
+  openEditSection: (
     title: string,
     subtitle: string,
     subjectType: SubjectType,
     subjectId: string,
   ) => void;
-  CloseEditSection: () => void;
-  HandleSearch: (searchFilter: string) => void;
-  HandleMemberUpdate: () => void;
-  HandleQueryUpdate: () => void;
+  closeEditSection: () => void;
+  handleSearch: (searchFilter: string) => void;
+  handleMemberUpdate: () => void;
+  handleQueryUpdate: () => void;
 }
 
 const initData: UserManagementData = {
-  TeamQueryEditSection: {
+  teamQueryEditSection: {
     isOpen: false,
     title: "",
     subtitle: "",
@@ -41,11 +41,11 @@ const initData: UserManagementData = {
 
 export const DataContext = createContext<UserManagementContext>({
   ...initData,
-  OpenEditSection: () => {},
-  CloseEditSection: () => {},
-  HandleSearch: (searchFilter: string) => {},
-  HandleMemberUpdate: () => {},
-  HandleQueryUpdate: () => {},
+  openEditSection: () => {},
+  closeEditSection: () => {},
+  handleSearch: (searchFilter: string) => {},
+  handleMemberUpdate: () => {},
+  handleQueryUpdate: () => {},
 });
 
 /**
@@ -60,18 +60,18 @@ const DataProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
   /**
    * Event handlers for edit section
    */
-  function CloseEditSection() {
+  function closeEditSection() {
     const newState: UserManagementData = {
       ...innerState,
-      TeamQueryEditSection: {
-        ...innerState.TeamQueryEditSection,
+      teamQueryEditSection: {
+        ...innerState.teamQueryEditSection,
         isOpen: false,
       },
     };
     setInnerState(newState);
   }
 
-  function OpenEditSection(
+  function openEditSection(
     title: string,
     subtitle: string,
     subjectType: SubjectType,
@@ -82,16 +82,16 @@ const DataProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
 
     if (subjectType == "Members") {
       placeholder = "Search members";
-      subjectData = GetTeamMembers(subjectId);
+      subjectData = getTeamMembers(subjectId);
     } else {
       placeholder = "Search queries";
-      subjectData = GetTeamQueries(subjectId);
+      subjectData = getTeamQueries(subjectId);
     }
 
     const newState: UserManagementData = {
       ...innerState,
-      TeamQueryEditSection: {
-        ...innerState.TeamQueryEditSection,
+      teamQueryEditSection: {
+        ...innerState.teamQueryEditSection,
         title,
         subtitle,
         placeholder,
@@ -103,16 +103,16 @@ const DataProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     setInnerState(newState);
   }
 
-  function HandleSearch(filter: string) {
+  function handleSearch(filter: string) {
     // TODO data filtering
     console.log("filtering ...");
   }
 
-  function HandleMemberUpdate() {
+  function handleMemberUpdate() {
     console.log("update team members");
   }
 
-  function HandleQueryUpdate() {
+  function handleQueryUpdate() {
     console.log("update team queries");
   }
 
@@ -120,13 +120,13 @@ const DataProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
    * Data fetching
    */
 
-  function GetTeamMembers(teamId: string): unknown {
+  function getTeamMembers(teamId: string): unknown {
     // TODO retrieve member data
     const ListOfMembers = ["Member 1", "Member 2", "Member 3"];
     return ListOfMembers;
   }
 
-  function GetTeamQueries(teamId: string): unknown {
+  function getTeamQueries(teamId: string): unknown {
     // TODO retrieve queries data
     const ListOfQueries = ["Query 1", "Query 2", "Query 3"];
     return ListOfQueries;
@@ -139,11 +139,11 @@ const DataProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     <DataContext.Provider
       value={{
         ...innerState,
-        OpenEditSection,
-        CloseEditSection,
-        HandleSearch,
-        HandleMemberUpdate,
-        HandleQueryUpdate,
+        openEditSection,
+        closeEditSection,
+        handleSearch,
+        handleMemberUpdate,
+        handleQueryUpdate,
       }}
     >
       {children}

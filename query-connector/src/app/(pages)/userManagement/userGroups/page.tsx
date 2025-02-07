@@ -14,17 +14,17 @@ import { DataContext } from "../components/DataProvider";
 const UserGroups: React.FC = () => {
   const [userGroups, setUserGroups] = useState<UserGroup[]>([]);
 
-  const { OpenEditSection } = useContext(DataContext);
+  const { openEditSection } = useContext(DataContext);
 
   useEffect(() => {
     setUserGroups(userGroupsMock);
   }, []);
 
-  function GetMemberLabel(memberSize: number): string {
+  function getMemberLabel(memberSize: number): string {
     return memberSize == 1 ? `${memberSize} member` : `${memberSize} members`;
   }
 
-  function GetQueryLabel(querySize: number): string {
+  function getQueryLabel(querySize: number): string {
     return querySize == 1 ? `${querySize} query` : `${querySize} queries`;
   }
 
@@ -51,10 +51,10 @@ const UserGroups: React.FC = () => {
                 unstyled
                 aria-description={`Edit ${group.name} members`}
                 onClick={() => {
-                  OpenEditSection(group.name, "Members", "Members", group.id);
+                  openEditSection(group.name, "Members", "Members", group.id);
                 }}
               >
-                {GetMemberLabel(group.memberSize)}
+                {getMemberLabel(group.memberSize)}
               </Button>
             </td>
             <td>
@@ -64,7 +64,7 @@ const UserGroups: React.FC = () => {
                 unstyled
                 aria-description={`Edit ${group.name} queries`}
                 onClick={() => {
-                  OpenEditSection(
+                  openEditSection(
                     group.name,
                     "Assigned queries",
                     "Query",
@@ -72,7 +72,7 @@ const UserGroups: React.FC = () => {
                   );
                 }}
               >
-                {GetQueryLabel(group.querySize)}
+                {getQueryLabel(group.querySize)}
               </Button>
             </td>
           </tr>

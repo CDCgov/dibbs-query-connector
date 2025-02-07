@@ -12,23 +12,23 @@ import style from "./TeamQueryEditSection.module.scss";
  */
 const TeamQueryEditSection: React.FC = () => {
   const {
-    TeamQueryEditSection,
-    CloseEditSection,
-    HandleSearch,
-    HandleMemberUpdate,
-    HandleQueryUpdate,
+    teamQueryEditSection,
+    closeEditSection,
+    handleSearch,
+    handleMemberUpdate,
+    handleQueryUpdate,
   } = useContext(DataContext);
 
   /**
    * DOM content helpers
    */
 
-  function CreateListOfItems(items: string[]): JSX.Element {
-    const isMemberView = TeamQueryEditSection.subjectType == "Members";
+  function createListOfItems(items: string[]): JSX.Element {
+    const isMemberView = teamQueryEditSection.subjectType == "Members";
 
     const description = isMemberView
-      ? "members of {TeamQueryEditSection.title}"
-      : "queries of {TeamQueryEditSection.title}";
+      ? `members of ${teamQueryEditSection.title}`
+      : `queries of ${teamQueryEditSection.title}`;
 
     return (
       <ul
@@ -42,7 +42,7 @@ const TeamQueryEditSection: React.FC = () => {
               name={item}
               label={item}
               defaultChecked
-              onChange={isMemberView ? HandleMemberUpdate : HandleQueryUpdate}
+              onChange={isMemberView ? handleMemberUpdate : handleQueryUpdate}
               className={classNames("margin-bottom-3", style.checkbox)}
             />
           </li>
@@ -51,8 +51,8 @@ const TeamQueryEditSection: React.FC = () => {
     );
   }
 
-  function GenerateContent(): JSX.Element {
-    return CreateListOfItems(TeamQueryEditSection.subjectData as string[]);
+  function generateContent(): JSX.Element {
+    return createListOfItems(teamQueryEditSection.subjectData as string[]);
   }
 
   /**
@@ -61,14 +61,14 @@ const TeamQueryEditSection: React.FC = () => {
 
   return (
     <Drawer
-      title={TeamQueryEditSection.title}
-      subtitle={TeamQueryEditSection.subtitle}
-      placeholder={TeamQueryEditSection.placeholder}
-      toRender={GenerateContent()}
-      isOpen={TeamQueryEditSection.isOpen}
+      title={teamQueryEditSection.title}
+      subtitle={teamQueryEditSection.subtitle}
+      placeholder={teamQueryEditSection.placeholder}
+      toRender={generateContent()}
+      isOpen={teamQueryEditSection.isOpen}
       onSave={() => {}}
-      onSearch={HandleSearch}
-      onClose={CloseEditSection}
+      onSearch={handleSearch}
+      onClose={closeEditSection}
     />
   );
 };

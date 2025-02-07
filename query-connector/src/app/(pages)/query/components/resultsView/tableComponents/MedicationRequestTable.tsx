@@ -7,6 +7,7 @@ import {
 } from "../../../../../shared/format-service";
 import styles from "./resultsTables.module.scss";
 import { checkIfSomeElementWithPropertyExists } from "./utils";
+import classNames from "classnames";
 
 /**
  * The props for the MedicationRequestTable component.
@@ -30,7 +31,12 @@ const MedicationRequestTable: React.FC<MedicationRequestTableProps> = ({
   );
 
   return (
-    <Table contained={false} className={styles.medicationsTable}>
+    <Table
+      contained={false}
+      className={classNames(
+        availableElements.reasonCode && styles.medicationsFixedTable,
+      )}
+    >
       <thead>
         <tr>
           <th>Order Date</th>
