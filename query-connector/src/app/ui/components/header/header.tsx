@@ -59,7 +59,7 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
     setShowMenu(!showMenu);
   };
   // const isProduction = process.env.NODE_ENV === "production";
-  const landingPage = "/";
+  const landingPage = authDisabled || isLoggedIn ? "/query" : "/";
 
   return (
     <div className={styles.headerContainer}>
