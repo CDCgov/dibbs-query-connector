@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
-import { useSession, signIn } from "next-auth/react";
+import { useSession, signIn, signOut } from "next-auth/react";
 import { Button, Icon } from "@trussworks/react-uswds";
 import styles from "./header.module.scss";
 import { metadata } from "@/app/shared/constants";
@@ -43,7 +43,6 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
 
   const path = usePathname();
 
-  // To readd this once we fix sign in
   const { data: session } = useSession();
   const isLoggedIn = session?.user != null;
 
@@ -52,6 +51,13 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
       router.push(`/query`);
     } else {
       signIn("keycloak", { redirectTo: "/query" });
+    }
+  };
+  const handleSignOut = async () => {
+    if (authDisabled) {
+      router.push(`/`);
+    } else {
+      await signOut({ redirectTo: "/" });
     }
   };
 
@@ -145,9 +151,15 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
                 </Link>
               </li>
               <li className={styles.subMenuItem}>
-                <Link className={styles.menuItem} href={landingPage}>
+                <button
+                  className={classNames(
+                    styles.menuItem,
+                    "usa-button--unstyled",
+                  )}
+                  onClick={async () => await handleSignOut()}
+                >
                   Log out
-                </Link>
+                </button>
               </li>
             </>
             {/* )} */}
