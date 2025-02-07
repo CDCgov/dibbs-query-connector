@@ -13,10 +13,7 @@
 
   thead tr th,
   tbody tr td {
-    padding-top: $default-table-padding;
-    padding-bottom: $default-table-padding;
-    padding-left: calc($default-table-padding - 10px);
-    padding-right: calc($default-table-padding - 10px);
+    padding: $default-table-padding calc($default-table-padding - 10px);
     border: none;
   }
 
