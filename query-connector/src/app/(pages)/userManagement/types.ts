@@ -19,7 +19,7 @@ export interface User {
 export enum RoleTypeValues {
   Admin = "Admin",
   SuperAdmin = "Super Admin",
-  Standard = "Standard",
+  Standard = "Standard User",
 }
 
 // Temporary file with dumy data
