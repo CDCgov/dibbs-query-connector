@@ -16,7 +16,11 @@ import Drawer from "@/app/ui/designSystem/drawer/Drawer";
 import { DibbsConceptType, DibbsValueSet } from "@/app/shared/constants";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import SearchField from "@/app/ui/designSystem/searchField/SearchField";
-import { CONDITION_DRAWER_SEARCH_PLACEHOLDER } from "./utils";
+import {
+  CONDITION_DRAWER_SEARCH_PLACEHOLDER,
+  VALUESET_SELECTION_SEARCH_PLACEHOLDER,
+} from "./utils";
+import Highlighter from "react-highlight-words";
 
 type ConditionSelectionProps = {
   constructedQuery: NestedQuery;
@@ -49,9 +53,10 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
 }) => {
   const [activeCondition, setActiveCondition] = useState<string>("");
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [searchFilter, _setSearchFilter] = useState("");
-  const [conditionDrawerDisplay, setConditionDrawerDisplay] =
+  const [conditionDrawerData, setConditionDrawerData] =
     useState<CategoryToConditionArrayMap>(categoryToConditionsMap);
+  const [conditionSearchFilter, setConditionSearchFilter] = useState("");
+  const [valueSetSearchFilter, setValueSetSearchFilter] = useState("");
 
   useEffect(() => {
     // display the first condition's valuesets on render
@@ -64,7 +69,14 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
     return Object.entries(categoryToConditionsMap).map(
       ([category, conditions]) => (
         <div id={category} key={category}>
-          <div className={styles.conditionDrawerHeader}>{category}</div>
+          <div className={styles.conditionDrawerHeader}>
+            <Highlighter
+              highlightClassName="searchHighlight"
+              searchWords={[conditionSearchFilter]}
+              autoEscape={true}
+              textToHighlight={category}
+            ></Highlighter>
+          </div>
           <div>
             {Object.values(conditions).map((condition) => (
               <div
@@ -72,7 +84,15 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
                 id={`update-${condition.id}`}
                 className={styles.conditionItem}
               >
-                <span>{formatDiseaseDisplay(condition.name)}</span>
+                <span>
+                  {" "}
+                  <Highlighter
+                    highlightClassName="searchHighlight"
+                    searchWords={[conditionSearchFilter]}
+                    autoEscape={true}
+                    textToHighlight={formatDiseaseDisplay(condition.name)}
+                  ></Highlighter>
+                </span>
 
                 {Object.keys(constructedQuery).includes(condition.id) ? (
                   <span
@@ -109,22 +129,16 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
       searchFilter,
       categoryToConditionsMap,
     );
-    setConditionDrawerDisplay(filteredDisplay);
+    setConditionSearchFilter(searchFilter);
+    setConditionDrawerData(filteredDisplay);
   }
 
-  function handleSearch(searchFilter: string) {
-    // TODO: in an upcoming PR
-    console.log(searchFilter);
+  function handleConditionToggle(conditionId: string) {
+    setActiveCondition(conditionId);
+    setValueSetSearchFilter("");
   }
 
-  const conditionUpdate =
-    Object.keys(conditionDrawerDisplay).length > 0 ? (
-      generateConditionDrawerDisplay(conditionDrawerDisplay)
-    ) : (
-      <div>
-        <div className="padding-top-4"> No conditions found</div>
-      </div>
-    );
+  const activeConditionValueSets = constructedQuery[activeCondition];
 
   return (
     <div
@@ -176,7 +190,7 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
                   <div
                     key={`tab-${conditionId}`}
                     id={`tab-${conditionId}`}
-                    onClick={() => setActiveCondition(conditionId)}
+                    onClick={() => handleConditionToggle(conditionId)}
                     tabIndex={0}
                   >
                     {formatDiseaseDisplay(condition.name)}
@@ -188,7 +202,7 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
                     aria-label="Trash icon indicating deletion of disease"
                     onClick={() => {
                       handleUpdateCondition(conditionId, true);
-                      setActiveCondition(Object.keys(constructedQuery)[0]);
+                      handleConditionToggle(Object.keys(constructedQuery)[0]);
                     }}
                   ></Icon.Delete>
                 </div>
@@ -200,22 +214,24 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
           <div className={styles.valueSetTemplate__search}>
             <SearchField
               id="valueSetTemplateSearch"
-              placeholder="Search labs, medications, conditions"
+              placeholder={VALUESET_SELECTION_SEARCH_PLACEHOLDER}
               className={styles.valueSetSearch}
               onChange={(e) => {
                 e.preventDefault();
-                handleSearch(e.target.value);
+                setValueSetSearchFilter(e.target.value);
               }}
+              value={valueSetSearchFilter}
             />
           </div>
           <div>
-            {constructedQuery && constructedQuery[activeCondition] && (
+            {activeConditionValueSets && (
               <ConceptTypeSelectionTable
-                vsTypeLevelOptions={constructedQuery[activeCondition]}
+                vsTypeLevelOptions={activeConditionValueSets}
                 handleVsTypeLevelUpdate={handleSelectedValueSetUpdate(
                   activeCondition,
                 )}
-                searchFilter={searchFilter}
+                searchFilter={valueSetSearchFilter}
+                setSearchFilter={setValueSetSearchFilter}
               />
             )}
           </div>
@@ -225,7 +241,17 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
       <Drawer
         title="Add Condition(s)"
         placeholder={CONDITION_DRAWER_SEARCH_PLACEHOLDER}
-        toRender={conditionUpdate}
+        toRender={
+          <>
+            {Object.keys(conditionDrawerData).length > 0 ? (
+              generateConditionDrawerDisplay(conditionDrawerData)
+            ) : (
+              <div>
+                <div className="padding-top-4"> No conditions found</div>
+              </div>
+            )}{" "}
+          </>
+        }
         toastMessage="Condition has been successfully added."
         isOpen={isDrawerOpen}
         onClose={() => setIsDrawerOpen(false)}

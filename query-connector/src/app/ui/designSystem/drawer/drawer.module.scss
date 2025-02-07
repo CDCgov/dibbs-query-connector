@@ -35,6 +35,10 @@ $drawerWidth: 30%;
   width: 100%;
 }
 
+.drawerHeader {
+  width: 25rem;
+}
+
 .overlay {
   position: fixed;
   top: 0;
@@ -72,4 +76,5 @@ $drawerWidth: 30%;
   color: $gray-600;
   display: flex;
   padding-bottom: 1rem;
+  margin: 0;
 }
