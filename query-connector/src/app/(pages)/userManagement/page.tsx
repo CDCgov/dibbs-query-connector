@@ -6,7 +6,7 @@ import classNames from "classnames";
 import Table from "../../ui/designSystem/table/Table";
 import { User, UserGroup, usersMock } from "./types";
 import RoleDropdown from "./components/RoleDropdown";
-import { DataContext } from "./components/DataProvider";
+import { UserManagementContext } from "./components/UserManagementProvider";
 
 /**
  * User section in the user management page
@@ -19,7 +19,7 @@ const UserManagement: React.FC = () => {
     setUsers(usersMock);
   }, []);
 
-  const { openEditSection } = useContext(DataContext);
+  const { openEditSection } = useContext(UserManagementContext);
 
   /**
    * HTML

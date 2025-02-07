@@ -6,7 +6,6 @@ import {
   formatDate,
 } from "../../../../../shared/format-service";
 import { checkIfSomeElementWithPropertyExists } from "./utils";
-import classNames from "classnames";
 
 /**
  * The props for the ObservationTable component.
@@ -28,8 +27,14 @@ const ObservationTable: React.FC<ObservationTableProps> = ({
     "interpretation",
     "referenceRange",
   ]);
+
   return (
-    <Table contained={false} className={classNames("margin-top-0-important")}>
+    <Table
+      contained={false}
+      fixed={
+        availableElements.interpretation || availableElements.referenceRange
+      }
+    >
       <thead>
         <tr>
           <th>Date</th>

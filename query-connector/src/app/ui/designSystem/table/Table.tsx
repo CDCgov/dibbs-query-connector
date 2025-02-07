@@ -9,6 +9,7 @@ type TableProps = {
   bordered?: boolean;
   striped?: boolean;
   fullWidth?: boolean;
+  fixed?: boolean;
 };
 
 /**
@@ -20,6 +21,7 @@ type TableProps = {
  * @param root0.striped - whether to render a striped table
  * @param root0.className - additional custom class names
  * @param root0.fullWidth - whether to render with fullWidth mode
+ * @param root0.fixed - whether to render with a fixed layout. All columns will be enforced to same width.
  * @returns - A UWSDS-styled table
  */
 const Table: React.FC<TableProps> = ({
@@ -29,6 +31,7 @@ const Table: React.FC<TableProps> = ({
   className,
   striped,
   fullWidth,
+  fixed,
 }) => {
   return (
     <div
@@ -39,7 +42,10 @@ const Table: React.FC<TableProps> = ({
     >
       <TrussTable
         bordered={bordered}
-        className={classNames(styles.customizeTable)}
+        className={classNames(
+          styles.customizeTable,
+          fixed && styles.customizeFixedTable,
+        )}
         striped={striped}
         fullWidth={fullWidth}
       >

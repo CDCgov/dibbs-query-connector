@@ -6,7 +6,6 @@ import {
   formatDate,
 } from "../../../../../shared/format-service";
 import { checkIfSomeElementWithPropertyExists } from "./utils";
-import classNames from "classnames";
 
 /**
  * The props for the ConditionTable component.
@@ -29,7 +28,7 @@ const ConditionsTable: React.FC<ConditionTableProps> = ({ conditions }) => {
   ]);
 
   return (
-    <Table contained={false} className={classNames("margin-top-0-important")}>
+    <Table contained={false}>
       <thead>
         <tr>
           <th>Condition</th>

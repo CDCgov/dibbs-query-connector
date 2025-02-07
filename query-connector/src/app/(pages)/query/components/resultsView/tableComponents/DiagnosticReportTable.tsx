@@ -23,7 +23,7 @@ const DiagnosticReportTable: React.FC<DiagnosticReportTableProps> = ({
   diagnosticReports,
 }) => {
   return (
-    <Table contained={false} className="margin-top-0-important">
+    <Table contained={false}>
       <thead>
         <tr>
           <th>Date</th>

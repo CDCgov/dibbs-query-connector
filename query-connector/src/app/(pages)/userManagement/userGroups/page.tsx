@@ -5,7 +5,7 @@ import classNames from "classnames";
 import { Button } from "@trussworks/react-uswds";
 import Table from "../../../ui/designSystem/table/Table";
 import { UserGroup, userGroupsMock } from "../types";
-import { DataContext } from "../components/DataProvider";
+import { UserManagementContext } from "../components/UserManagementProvider";
 
 /**
  * User groups section in the user management page
@@ -14,7 +14,7 @@ import { DataContext } from "../components/DataProvider";
 const UserGroups: React.FC = () => {
   const [userGroups, setUserGroups] = useState<UserGroup[]>([]);
 
-  const { openEditSection } = useContext(DataContext);
+  const { openEditSection } = useContext(UserManagementContext);
 
   useEffect(() => {
     setUserGroups(userGroupsMock);

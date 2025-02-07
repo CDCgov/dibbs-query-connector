@@ -4,7 +4,7 @@ import { useContext } from "react";
 import classNames from "classnames";
 import { Checkbox } from "@trussworks/react-uswds";
 import Drawer from "@/app/ui/designSystem/drawer/Drawer";
-import { DataContext } from "./DataProvider";
+import { UserManagementContext } from "./UserManagementProvider";
 import style from "./TeamQueryEditSection.module.scss";
 
 /**
@@ -17,7 +17,7 @@ const TeamQueryEditSection: React.FC = () => {
     handleSearch,
     handleMemberUpdate,
     handleQueryUpdate,
-  } = useContext(DataContext);
+  } = useContext(UserManagementContext);
 
   /**
    * DOM content helpers

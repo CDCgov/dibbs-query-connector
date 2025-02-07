@@ -1,11 +1,5 @@
 @use "../../../../../ui/styles/_variables" as *;
 
-.demographicsTable thead tr th{
-    color: $black;
-    text-transform: none;
-    font-size: 1.25rem;
-}
-
 .medicationsFixedTable table{
     table-layout: fixed;
     word-wrap: break-word;

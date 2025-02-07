@@ -39,7 +39,7 @@ const initData: UserManagementData = {
   },
 };
 
-export const DataContext = createContext<UserManagementContext>({
+export const UserManagementContext = createContext<UserManagementContext>({
   ...initData,
   openEditSection: () => {},
   closeEditSection: () => {},
@@ -136,7 +136,7 @@ const DataProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
    * HTML
    */
   return (
-    <DataContext.Provider
+    <UserManagementContext.Provider
       value={{
         ...innerState,
         openEditSection,
@@ -147,7 +147,7 @@ const DataProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
       }}
     >
       {children}
-    </DataContext.Provider>
+    </UserManagementContext.Provider>
   );
 };
 
