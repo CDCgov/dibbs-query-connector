@@ -6,7 +6,6 @@ import {
   formatDate,
 } from "../../../../../shared/format-service";
 import { checkIfSomeElementWithPropertyExists } from "./utils";
-import styles from "./resultsTables.module.scss";
 import classNames from "classnames";
 
 /**
@@ -30,9 +29,9 @@ const ObservationTable: React.FC<ObservationTableProps> = ({
     "referenceRange",
   ]);
   return (
-    <Table bordered={false} className={classNames("margin-top-0-important")}>
+    <Table contained={false} className={classNames("margin-top-0-important")}>
       <thead>
-        <tr className={styles.observationRow}>
+        <tr>
           <th>Date</th>
           <th>Type</th>
           {availableElements.interpretation && <th>Interpretation</th>}
@@ -42,7 +41,7 @@ const ObservationTable: React.FC<ObservationTableProps> = ({
       </thead>
       <tbody>
         {observations.map((obs) => (
-          <tr className={styles.observationRow} key={obs.id}>
+          <tr key={obs.id}>
             <td>{formatDate(obs?.issued || obs?.effectiveDateTime)}</td>
             <td>{formatCodeableConcept(obs.code)}</td>
             {availableElements.interpretation && (

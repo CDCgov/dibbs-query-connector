@@ -5,8 +5,8 @@ import {
   formatCodeableConcept,
   formatDate,
 } from "../../../../../shared/format-service";
-import { checkIfSomeElementWithPropertyExists } from "./utils";
 import styles from "./resultsTables.module.scss";
+import { checkIfSomeElementWithPropertyExists } from "./utils";
 
 /**
  * The props for the MedicationRequestTable component.
@@ -30,9 +30,9 @@ const MedicationRequestTable: React.FC<MedicationRequestTableProps> = ({
   );
 
   return (
-    <Table bordered={false} className="margin-top-0-important">
+    <Table contained={false} className={styles.medicationsTable}>
       <thead>
-        <tr className={styles.medicationRow}>
+        <tr>
           <th>Order Date</th>
           <th>Medication</th>
           {availableElements.reasonCode && <th>Reason Code</th>}
@@ -41,7 +41,7 @@ const MedicationRequestTable: React.FC<MedicationRequestTableProps> = ({
       </thead>
       <tbody>
         {medicationRequests.map((medicationRequest) => (
-          <tr className={styles.medicationRow} key={medicationRequest.id}>
+          <tr key={medicationRequest.id}>
             <td>{formatDate(medicationRequest.authoredOn)}</td>
             <td>
               {formatCodeableConcept(

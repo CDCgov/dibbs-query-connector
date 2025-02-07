@@ -1,58 +1,24 @@
-$columnGap: 0.5rem;
+@use "../../../../../ui/styles/_variables" as *;
 
-$conditionColumnSpacing: 3fr;
-$observationColumnSpacing: 1fr 2fr 2fr;
-$medicationColumnSpacing: 1fr 3fr 1fr;
-$encountersColumnSpacing: 2fr 1fr 1fr 1fr;
-$diagnosticsColumnSpacing: 1fr 3fr;
-$demographicsColumnSpacing: 1fr 3fr;
-$immunizationColumnSpacing: 1fr 3fr 1fr 1fr;
-
-.demographicsRow {
-  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-  gap: $columnGap;
-  word-wrap: break-word;
-  overflow-wrap: break-word;
+.demographicsTable thead tr th{
+    color: $black;
+    text-transform: none;
+    font-size: 1.25rem;
 }
 
-.conditionRow {
-  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-  gap: $columnGap;
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-}
+.medicationsTable table{
+    table-layout: fixed;
+    word-wrap: break-word;
 
-.observationRow {
-  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-  gap: $columnGap;
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-}
+    thead tr th{
+        width: 32%;
 
-.medicationRow {
-  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-  gap: $columnGap;
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-}
+        &:first-child{
+            width:20%;
+        }
 
-.encountersRow {
-  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-  gap: $columnGap;
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-}
-
-.diagnosticsRow {
-  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-  gap: $columnGap;
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-}
-
-.immunizationRow {
-  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-  gap: $columnGap;
-  word-wrap: break-word;
-  overflow-wrap: break-word;
+        &:last-child{
+            width:15%;
+        }
+    }
 }
