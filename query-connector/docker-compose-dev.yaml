@@ -57,9 +57,6 @@ services:
       - 8081:8080
     volumes:
       - ./keycloak:/opt/keycloak/data/import
-    environment:
-      # For M4: https://github.com/keycloak/keycloak/issues/36008#issuecomment-2564871619
-      - JAVA_OPTS_APPEND=-XX:UseSVE=0
     restart: always
     command:
       - start-dev
