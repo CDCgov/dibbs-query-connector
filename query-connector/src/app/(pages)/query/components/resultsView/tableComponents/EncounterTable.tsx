@@ -7,7 +7,6 @@ import {
   formatDate,
 } from "../../../../../shared/format-service";
 import { checkIfSomeElementWithPropertyExists } from "./utils";
-import styles from "./resultsTables.module.scss";
 
 /**
  * The props for the EncounterTable component.
@@ -32,9 +31,9 @@ const EncounterTable: React.FC<EncounterTableProps> = ({
   ]);
 
   return (
-    <Table bordered={false} className="margin-top-0-important">
+    <Table contained={false}>
       <thead>
-        <tr className={styles.encountersRow}>
+        <tr>
           <th>Visit Reason</th>
           {availableElements?.class && <th>Clinic Type</th>}
           {availableElements?.serviceProvider && <th>Service Provider</th>}
@@ -45,7 +44,7 @@ const EncounterTable: React.FC<EncounterTableProps> = ({
       </thead>
       <tbody>
         {encounters.map((encounter) => (
-          <tr className={styles.encountersRow} key={encounter.id}>
+          <tr key={encounter.id}>
             <td>{formatCodeableConcept(encounter?.reasonCode?.[0])} </td>
             {availableElements?.class && (
               <td>{formatCoding(encounter?.class)}</td>

@@ -85,7 +85,6 @@ const Drawer: React.FC<DrawerProps> = ({
                 <SearchField
                   id="searchFieldTemplate"
                   placeholder={placeholder}
-                  className={styles.searchField}
                   value={searchFilter}
                   onChange={(e) => {
                     e.preventDefault();

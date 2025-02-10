@@ -6,7 +6,6 @@ import {
   formatMRN,
   formatName,
 } from "@/app/shared/format-service";
-import styles from "./patientSearchResults.module.scss";
 import classNames from "classnames";
 import TitleBox from "../stepIndicator/TitleBox";
 
@@ -32,9 +31,9 @@ const PatientSearchResultsTable: React.FC<PatientSearchResultsTableProps> = ({
     <>
       <TitleBox step="patient-results" />
       <h2 className="page-explainer">The following record(s) match.</h2>
-      <Table className={classNames("margin-top-4", styles.tableContainer)}>
+      <Table className={classNames("margin-top-4")}>
         <thead>
-          <tr className={styles.header}>
+          <tr>
             <th>Name</th>
             <th>DOB</th>
             <th>Contact</th>
@@ -47,15 +46,15 @@ const PatientSearchResultsTable: React.FC<PatientSearchResultsTableProps> = ({
           {patients.map((patient) => (
             <tr
               key={patient.id}
-              className={classNames("tableRowWithHover_clickable", styles.row)}
+              className={classNames("tableRowWithHover_clickable")}
               onClick={() => setPatientForQueryResponse(patient)}
             >
               <td>{formatName(patient.name ?? [])}</td>
-              <td>{patient.birthDate ?? ""}</td>
+              <td width={120}>{patient.birthDate ?? ""}</td>
               <td>{formatContact(patient.telecom ?? [])}</td>
               <td>{formatAddress(patient.address ?? [])}</td>
-              <td>{formatMRN(patient.identifier ?? [])}</td>
-              <td>
+              <td width={150}>{formatMRN(patient.identifier ?? [])}</td>
+              <td width={100}>
                 <a
                   href="#"
                   className="unchanged-color-on-visit"

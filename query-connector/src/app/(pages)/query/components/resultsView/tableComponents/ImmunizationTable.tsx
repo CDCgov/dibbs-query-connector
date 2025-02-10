@@ -5,7 +5,6 @@ import {
   formatDate,
   formatImmunizationRoute,
 } from "../../../../../shared/format-service";
-import styles from "./resultsTables.module.scss";
 
 /**
  * The props for the ImmunizationTable component.
@@ -24,9 +23,9 @@ const ImmunizationTable: React.FC<ImmunizationTableProps> = ({
   immunizations,
 }) => {
   return (
-    <Table bordered={false} className="margin-top-0-important">
+    <Table contained={false} className="margin-top-0-important">
       <thead>
-        <tr className={styles.immunizationRow}>
+        <tr>
           <th>Date</th>
           <th>Vaccine name</th>
           <th>Dose</th>
@@ -35,7 +34,7 @@ const ImmunizationTable: React.FC<ImmunizationTableProps> = ({
       </thead>
       <tbody>
         {immunizations.map((immunization) => (
-          <tr className={styles.immunizationRow} key={immunization.id}>
+          <tr key={immunization.id}>
             <td>{formatDate(immunization.occurrenceDateTime)}</td>
             <td>{immunization.vaccineCode?.coding?.[0].display}</td>
             <td>

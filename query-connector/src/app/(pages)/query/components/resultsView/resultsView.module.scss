@@ -16,7 +16,11 @@
 
 .accordionWrapper > div {
   margin: 0.1rem 0rem;
-  padding: 1rem 1.5rem;
+  padding: 0;
+
+  h4[id="demographics"]{
+    margin: 1.25rem;
+  }
 }
 
 .accordionWrapper {

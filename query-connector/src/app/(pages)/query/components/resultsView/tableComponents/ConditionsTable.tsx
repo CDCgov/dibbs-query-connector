@@ -6,8 +6,6 @@ import {
   formatDate,
 } from "../../../../../shared/format-service";
 import { checkIfSomeElementWithPropertyExists } from "./utils";
-import styles from "./resultsTables.module.scss";
-import classNames from "classnames";
 
 /**
  * The props for the ConditionTable component.
@@ -30,15 +28,9 @@ const ConditionsTable: React.FC<ConditionTableProps> = ({ conditions }) => {
   ]);
 
   return (
-    <Table
-      bordered={false}
-      className={classNames(
-        "margin-top-0-important",
-        styles.conditionsTableContainer,
-      )}
-    >
+    <Table contained={false}>
       <thead>
-        <tr className={styles.conditionRow}>
+        <tr>
           <th>Condition</th>
           {availableElements.clinicalStatus && <th>Status</th>}
           {availableElements.onsetDateTime && <th>Onset</th>}
@@ -47,7 +39,7 @@ const ConditionsTable: React.FC<ConditionTableProps> = ({ conditions }) => {
       </thead>
       <tbody>
         {conditions.map((condition) => (
-          <tr className={styles.conditionRow} key={condition.id}>
+          <tr key={condition.id}>
             <td>{formatCodeableConcept(condition.code ?? {})}</td>
             {availableElements.clinicalStatus && (
               <td>{formatCodeableConcept(condition.clinicalStatus ?? {})}</td>
