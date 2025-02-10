@@ -127,7 +127,7 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
           <div ref={menuRef} className={styles.menuDropdownContainer}>
             <ul
               id="dropdown-menu"
-              className={classNames(`usa-nav__submenu`, styles.menuDropdown)}
+              className={classNames("usa-nav__submenu", styles.menuDropdown)}
             >
               {/* TODO: Enable this once we can show/hide rules based on actual auth status */}
               {/* {isProduction && ( */}
