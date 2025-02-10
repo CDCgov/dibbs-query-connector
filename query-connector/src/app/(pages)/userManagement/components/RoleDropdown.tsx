@@ -1,4 +1,4 @@
-import { ComboBox, Label } from "@trussworks/react-uswds";
+import { Label } from "@trussworks/react-uswds";
 import classNames from "classnames";
 import React from "react";
 import { RoleTypeValues } from "../types";
@@ -26,13 +26,11 @@ const RoleDropdown: React.FC<RoleDropdownProps> = ({ id, defaultValue }) => {
       <Label htmlFor={id} className={classNames("usa-sr-only")}>
         User role
       </Label>
-      <ComboBox
-        id={id}
-        name="user-role-combobox"
-        options={roleOptions}
-        onChange={() => {}}
-        defaultValue={defaultValue.toString()}
-      />
+      <select className="usa-select" value={defaultValue}>
+        {roleOptions.map((option) => (
+          <option value={option.value}>{option.label}</option>
+        ))}
+      </select>
     </>
   );
 };
