@@ -15,6 +15,8 @@ export interface RoleDropdownProps {
  * @returns - A dropdown with the different role options
  */
 const RoleDropdown: React.FC<RoleDropdownProps> = ({ id, defaultValue }) => {
+  const selectId = `role-select-${id}`;
+
   const roleOptions = [
     { label: "Super Admin", value: RoleTypeValues.SuperAdmin },
     { label: "Admin", value: RoleTypeValues.Admin },
@@ -23,10 +25,10 @@ const RoleDropdown: React.FC<RoleDropdownProps> = ({ id, defaultValue }) => {
 
   return (
     <>
-      <Label htmlFor={id} className={classNames("usa-sr-only")}>
+      <Label htmlFor={selectId} className={classNames("usa-sr-only")}>
         User role
       </Label>
-      <select className="usa-select" value={defaultValue}>
+      <select className="usa-select" value={defaultValue} id={selectId}>
         {roleOptions.map((option) => (
           <option value={option.value}>{option.label}</option>
         ))}
