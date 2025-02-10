@@ -271,6 +271,7 @@ const FhirServers: React.FC = () => {
           className={classNames(
             "grid-container grid-row padding-0",
             styles.titleContainer,
+            "margin-bottom-4",
           )}
         >
           <h1 className="page-title grid-col-10">FHIR server configuration</h1>
@@ -284,9 +285,9 @@ const FhirServers: React.FC = () => {
           </div>
         </div>
 
-        <Table className="margin-top-4">
+        <Table fullWidth>
           <thead>
-            <tr className={styles.fhirServersRow}>
+            <tr>
               <th>FHIR server</th>
               <th>URL</th>
               <th>Status</th>
@@ -296,14 +297,11 @@ const FhirServers: React.FC = () => {
             {fhirServers.map((fhirServer) => (
               <tr
                 key={fhirServer.id}
-                className={classNames(
-                  styles.fhirServersRow,
-                  styles.tableRowHover,
-                )}
+                className={classNames(styles.tableRowHover)}
               >
                 <td>{fhirServer.name}</td>
                 <td>{fhirServer.hostname}</td>
-                <td>
+                <td width={480}>
                   <div className="grid-container grid-row padding-0 display-flex flex-align-center">
                     {fhirServer.last_connection_successful ? (
                       <>

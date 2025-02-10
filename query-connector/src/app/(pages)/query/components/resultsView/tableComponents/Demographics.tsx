@@ -10,7 +10,6 @@ import {
   formatDate,
   formatSex,
 } from "../../../../../shared/format-service";
-import styles from "./resultsTables.module.scss";
 import Table from "@/app/ui/designSystem/table/Table";
 
 /**
@@ -32,20 +31,25 @@ const Demographics: React.FC<DemographicsProps> = ({ patient }) => {
   const demographicData = formatDemographics(patient).filter((e) => Boolean(e));
 
   return (
-    <div className="margin-top-0-important">
-      <Table bordered={false}>
-        <tbody>
-          {demographicData.map((item) => (
-            <tr className={styles.demographicsRow} key={item.title}>
-              <td>
-                <strong>{item.title}</strong>
-              </td>
-              <td> {item.value}</td>
-            </tr>
-          ))}
-        </tbody>
-      </Table>
-    </div>
+    <Table contained={false}>
+      <thead className="usa-sr-only">
+        <tr>
+          <th colSpan={2} scope="col">
+            Demographics
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        {demographicData.map((item) => (
+          <tr key={item.title}>
+            <td scope="row">
+              <strong>{item.title}</strong>
+            </td>
+            <td> {item.value}</td>
+          </tr>
+        ))}
+      </tbody>
+    </Table>
   );
 };
 

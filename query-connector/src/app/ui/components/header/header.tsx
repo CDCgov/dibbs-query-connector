@@ -129,6 +129,46 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
             )}
           </div>
         </div>
+        {showMenu && (
+          <div ref={menuRef} className={styles.menuDropdownContainer}>
+            <ul
+              id="dropdown-menu"
+              className={classNames("usa-nav__submenu", styles.menuDropdown)}
+            >
+              {/* TODO: Enable this once we can show/hide rules based on actual auth status */}
+              {/* {isProduction && ( */}
+              <>
+                <li className={styles.subMenuItem}>
+                  <Link className={styles.menuItem} href={"/queryBuilding"}>
+                    My Queries
+                  </Link>
+                </li>
+                <li className={styles.subMenuItem}>
+                  <Link className={styles.menuItem} href={"/fhirServers"}>
+                    FHIR Servers
+                  </Link>
+                </li>
+                <li className={styles.subMenuItem}>
+                  <Link className={styles.menuItem} href={"/userManagement"}>
+                    User Management
+                  </Link>
+                </li>
+                <li className={styles.subMenuItem}>
+                  <button
+                    className={classNames(
+                      styles.menuItem,
+                      "usa-button--unstyled",
+                    )}
+                    onClick={async () => await handleSignOut()}
+                  >
+                    Log out
+                  </button>
+                </li>
+              </>
+              {/* )} */}
+            </ul>
+          </div>
+        )}
       </header>
 
       {showMenu && (
@@ -167,6 +207,12 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
   );
 };
 
-const LOGGED_IN_PATHS = ["/query", "/queryBuilding", "/fhir-servers"];
+const LOGGED_IN_PATHS = [
+  "/query",
+  "/queryBuilding",
+  "/fhirServers",
+  "/userManagement",
+  "/userManagement/userGroups",
+];
 
 export default HeaderComponent;
