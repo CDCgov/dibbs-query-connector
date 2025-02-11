@@ -170,39 +170,6 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
           </div>
         )}
       </header>
-
-      {showMenu && (
-        <div ref={menuRef} className={styles.menuDropdownContainer}>
-          <ul
-            id="dropdown-menu"
-            className={`usa-nav__submenu ${styles.menuDropdown}`}
-          >
-            <>
-              <li className={styles.subMenuItem}>
-                <Link className={styles.menuItem} href={"/queryBuilding"}>
-                  My queries
-                </Link>
-              </li>
-              <li className={styles.subMenuItem}>
-                <Link className={styles.menuItem} href={"/fhir-servers"}>
-                  FHIR Servers
-                </Link>
-              </li>
-              <li className={styles.subMenuItem}>
-                <button
-                  className={classNames(
-                    styles.menuItem,
-                    "usa-button--unstyled",
-                  )}
-                  onClick={async () => await handleSignOut()}
-                >
-                  Log out
-                </button>
-              </li>
-            </>
-          </ul>
-        </div>
-      )}
     </div>
   );
 };
