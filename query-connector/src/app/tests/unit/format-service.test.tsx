@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react";
 import {
   formatAddress,
   formatContact,
+  formatCoding,
   formatCodeableConcept,
   formatDate,
   formatIdentifier,
@@ -10,13 +11,14 @@ import {
   formatString,
   FormatPhoneAsDigits,
   GetPhoneQueryFormats,
-} from "@/app/format-service";
+} from "@/app/shared/format-service";
 import {
   Address,
   HumanName,
   ContactPoint,
   Identifier,
   CodeableConcept,
+  Coding,
 } from "fhir/r4";
 
 describe("formatDate", () => {
@@ -148,6 +150,27 @@ describe("formatMRN", () => {
     const { container } = render(formatMRN(identifiers));
     expect(container).toBeEmptyDOMElement();
   });
+
+  it("should display assigner if available", () => {
+    const identifiers: Identifier[] = [
+      {
+        value: "67890",
+        type: {
+          coding: [
+            {
+              code: "MR",
+            },
+          ],
+        },
+        assigner: {
+          display: "Test Hospital",
+        },
+      },
+    ];
+
+    const { getByText } = render(formatMRN(identifiers));
+    expect(getByText("Test Hospital: 67890")).toBeInTheDocument();
+  });
 });
 
 describe("formatIdentifier", () => {
@@ -177,18 +200,30 @@ describe("formatIdentifier", () => {
           ],
         },
       },
+      {
+        value: "456",
+        type: {
+          coding: [
+            {
+              code: "DL",
+              system: "urn:ietf:rfc:3987",
+              display: "Driver's License Number",
+            },
+          ],
+        },
+        assigner: { display: "Some State" },
+      },
     ];
 
     const { getByText } = render(formatIdentifier(identifiers));
-    // Turn off exact matching because the presence of the id_type breaks
-    // the value across multiple elements
-    expect(getByText("999-99-9999", { exact: false })).toBeInTheDocument();
     expect(
-      getByText("Social Security Number", { exact: false }),
+      getByText("Social Security Number: 999-99-9999"),
     ).toBeInTheDocument();
-    expect(getByText("0123456789", { exact: false })).toBeInTheDocument();
     expect(
-      getByText("Internal Reference Identifier", { exact: false }),
+      getByText("Internal Reference Identifier: 0123456789"),
+    ).toBeInTheDocument();
+    expect(
+      getByText("Driver's License Number: Some State: 456"),
     ).toBeInTheDocument();
   });
 
@@ -217,7 +252,7 @@ describe("formatIdentifier", () => {
     ];
 
     render(formatIdentifier(identifiers));
-    expect(screen.getByText(": 999-99-9999")).toBeInTheDocument();
+    expect(screen.getByText("999-99-9999")).toBeInTheDocument();
   });
 
   it("should handle an empty identifier array without breaking", () => {
@@ -493,5 +528,37 @@ describe("GetPhoneQueryFormats", () => {
       "1(123)456-7890",
     ];
     expect(await GetPhoneQueryFormats(inputPhone)).toEqual(expectedResult);
+  });
+});
+
+describe("formatCoding", () => {
+  it("should return an empty string when coding is undefined", () => {
+    const result = formatCoding(undefined);
+    expect(result).toBe("");
+  });
+
+  it("should return the display, code, and system", () => {
+    const coding: Coding = {
+      display: "Example Display",
+      code: "Example Code",
+      system: "Example System",
+    };
+
+    const { getByText } = render(formatCoding(coding));
+    expect(getByText(/Example Display/)).toBeInTheDocument();
+    expect(getByText(/Example Code/)).toBeInTheDocument();
+    expect(getByText(/Example System/)).toBeInTheDocument();
+  });
+
+  it("should return the parts of the display, code, and system", () => {
+    const coding: Coding = {
+      display: "Example Display",
+      system: "Example System",
+    };
+
+    const { queryByText } = render(formatCoding(coding));
+    expect(queryByText(/Example Display/)).toBeInTheDocument();
+    expect(queryByText(/Example Code/)).not.toBeInTheDocument();
+    expect(queryByText(/Example System/)).toBeInTheDocument();
   });
 });

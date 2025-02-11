@@ -1,0 +1,88 @@
+@use "../../../ui/styles/_variables" as *;
+
+$columnGap: 0.5rem;
+$conditionColumnSpacing: 2fr 3fr 3fr;
+
+.myQueriesRow {
+  grid-template-columns: $conditionColumnSpacing;
+  gap: $columnGap;
+}
+
+.queryBuildingContainer {
+  display: flex;
+  flex-direction: column;
+  width: 15rem;
+  margin: auto;
+}
+
+.queryTitle {
+  font-size: 2rem;
+  margin-top: 1rem;
+  margin-bottom: 2rem;
+}
+.queryBuildingContainer > * {
+  margin-top: 1rem;
+}
+
+.emptyStateQueryContainer {
+  padding: 2.5rem 5rem;
+}
+
+.emptyQueryTitle {
+  width: fit-content;
+  margin: 0;
+}
+
+.emptyQuerySubtitle {
+  width: fit-content;
+  margin: 0.5rem 0;
+}
+
+.emptyQueryIcon {
+  width: 7.5rem;
+  height: 7.5rem;
+  color: $gray-20;
+}
+
+.emptyQueryExplainer {
+  padding-left: 1.5rem;
+  margin: 0 0 1.5rem 0;
+}
+
+.createQueryButton {
+  width: fit-content;
+  padding: 1rem !important;
+}
+
+.customQueryTable {
+  .table-cell-buttons {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    position: absolute;
+    right: 1.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    gap: 0.5rem;
+  }
+
+  tbody td:last-child {
+    opacity: 0;
+    text-align: right;
+    padding-right: 1.5rem;
+    white-space: nowrap;
+  }
+
+  tbody tr:hover td:last-child,
+  tbody td:last-child:hover {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+.icon-text {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 0.5rem;
+}

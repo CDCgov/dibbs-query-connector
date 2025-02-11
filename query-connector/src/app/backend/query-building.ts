@@ -3,11 +3,11 @@
 import { getDbClient } from "./dbClient";
 import {
   NestedQuery,
-  QueryDetailsResult,
+  QueryTableResult,
   QueryUpdateResult,
-} from "../queryBuilding/utils";
-import { DibbsValueSet } from "../constants";
-import { DEFAULT_TIME_WINDOW } from "../utils";
+} from "../(pages)/queryBuilding/utils";
+import { DibbsValueSet } from "../shared/constants";
+import { DEFAULT_TIME_WINDOW } from "../shared/utils";
 import { randomUUID } from "crypto";
 const dbClient = getDbClient();
 
@@ -16,7 +16,7 @@ const dbClient = getDbClient();
  * @param queryId - Query ID to grab data from the db with
  * @returns The query name, data, and conditions list from the query table
  */
-export async function getSavedQueryDetails(queryId: string) {
+export async function getSavedQueryById(queryId: string) {
   const id = queryId;
   const queryString = `
     select q.query_name, q.id, q.query_data, q.conditions_list
@@ -26,13 +26,15 @@ export async function getSavedQueryDetails(queryId: string) {
 
   try {
     const result = await dbClient.query(queryString, [id]);
-    if (result.rows.length > 0) {
-      return result.rows as unknown as QueryDetailsResult[];
+
+    if (result.rows.length === 0) {
+      console.error("No results found for query id:", id);
+      return undefined;
     }
-    console.error("No results found for query:", id);
-    return [];
+    return result.rows[0] as unknown as QueryTableResult;
   } catch (error) {
     console.error("Error retrieving query", error);
+    throw error;
   }
 }
 

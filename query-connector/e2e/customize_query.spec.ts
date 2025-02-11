@@ -2,7 +2,7 @@
 
 import { test, expect } from "@playwright/test";
 import { TEST_URL } from "../playwright-setup";
-import { PAGE_TITLES } from "@/app/query/components/stepIndicator/StepIndicator";
+import { PAGE_TITLES } from "@/app/(pages)/query/components/stepIndicator/StepIndicator";
 
 import { TEST_PATIENT, TEST_PATIENT_NAME } from "./constants";
 
@@ -10,7 +10,7 @@ test.describe("querying with the Query Connector", () => {
   // Start every test by navigating to the customize query workflow
   test.beforeEach(async ({ page }) => {
     await page.goto(TEST_URL);
-    await page.getByRole("button", { name: "Try it out" }).click();
+    await page.getByRole("link", { name: "Try it out" }).click();
 
     // Check that the info alert is visible and contains the correct text
     const alert = page.locator(".custom-alert");
@@ -39,7 +39,9 @@ test.describe("querying with the Query Connector", () => {
     await expect(
       page.getByRole("heading", { name: "Select a query" }),
     ).toBeVisible();
-    await page.getByTestId("Select").selectOption("chlamydia");
+    await page
+      .getByTestId("Select")
+      .selectOption("Chlamydia case investigation");
 
     await page.getByRole("button", { name: "Customize Query" }).click();
     await expect(
@@ -84,7 +86,9 @@ test.describe("querying with the Query Connector", () => {
     await expect(page.getByText(TEST_PATIENT_NAME)).toBeVisible();
     await expect(page.getByText("Patient Identifiers")).toBeVisible();
     await expect(
-      page.getByText(`Medical Record Number: ${TEST_PATIENT.MRN}`),
+      page.getByText(
+        `Medical Record Number: St. Worrywart’s Hospital: ${TEST_PATIENT.MRN}`,
+      ),
     ).toBeVisible();
 
     // Should now just be a single lonely medication request
@@ -105,9 +109,9 @@ test.describe("querying with the Query Connector", () => {
     await expect(
       page
         .getByRole("table")
-        .filter({ hasText: "doxycycline hyclate 100 MG" })
-        .getByRole("row"),
-    ).toHaveCount(2);
+        .getByRole("row")
+        .filter({ hasText: "doxycycline hyclate 100 MG" }),
+    ).toHaveCount(1);
   });
 
   test("customize query select / deselect all filters whole DibbsConceptType, across tabs", async ({
@@ -147,7 +151,9 @@ test.describe("querying with the Query Connector", () => {
     await expect(page.getByText(TEST_PATIENT_NAME)).toBeVisible();
     await expect(page.getByText("Patient Identifiers")).toBeVisible();
     await expect(
-      page.getByText(`Medical Record Number: ${TEST_PATIENT.MRN}`),
+      page.getByText(
+        `Medical Record Number: St. Worrywart’s Hospital: ${TEST_PATIENT.MRN}`,
+      ),
     ).toBeVisible();
 
     // Should be no medication requests available
@@ -160,16 +166,16 @@ test.describe("querying with the Query Connector", () => {
       page.getByRole("button", { name: "Diagnostic Reports" }),
     ).not.toBeVisible();
 
-    // Observations table should have 5 rows, all of which are SDoH factors rather than lab results
     await expect(
       page.getByRole("button", { name: "Observations", expanded: true }),
     ).toBeVisible();
     await expect(
       page
         .getByRole("table")
-        .filter({ hasText: "I do not have housing" })
-        .getByRole("row"),
-    ).toHaveCount(6);
+        .getByRole("row")
+        .filter({ hasText: "I do not have housing" }),
+    ).toHaveCount(1);
+
     const acceptableSdohKeywords = [
       "history",
       "narrative",
@@ -177,11 +183,19 @@ test.describe("querying with the Query Connector", () => {
       "pregnancy",
       "with anonymous partner",
     ];
+
+    // Observations table should have 5 rows, all of which are SDoH factors rather than lab results
     const obsRows = page
-      .getByRole("table")
-      .filter({ hasText: "I do not have housing" })
-      .getByRole("row");
-    for (let i = 1; i < 6; i++) {
+      .getByTestId("accordionItem_observations")
+      .locator("div")
+      .getByRole("row")
+      // add this filter to exclude header
+      .filter({ hasText: "http://loinc.org" });
+
+    const EXPECTED_OBSERVATIONS = 5;
+    expect(obsRows).toHaveCount(EXPECTED_OBSERVATIONS);
+
+    for (let i = 0; i < EXPECTED_OBSERVATIONS; i++) {
       const row = obsRows.nth(i);
       const typeText = await row.locator("td").nth(1).textContent();
       const presentKey = acceptableSdohKeywords.find((key) =>

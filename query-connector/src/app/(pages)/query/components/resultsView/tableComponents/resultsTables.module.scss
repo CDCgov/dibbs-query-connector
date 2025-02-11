@@ -1,0 +1,18 @@
+@use "../../../../../ui/styles/_variables" as *;
+
+.medicationsFixedTable table{
+    table-layout: fixed;
+    word-wrap: break-word;
+
+    thead tr th{
+        width: 32%;
+
+        &:first-child{
+            width:20%;
+        }
+
+        &:last-child{
+            width:15%;
+        }
+    }
+}

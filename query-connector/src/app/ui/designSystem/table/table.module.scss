@@ -1,0 +1,65 @@
+@use "../../../ui/styles/_variables" as *;
+
+.customizeTableWrapper {
+  border: solid 1px $table-border;
+  border-radius: 0.25rem;
+  box-shadow: 0px 2px 3px 0px $drop-shadow;
+  padding: 1px;
+  background-color: $white;
+}
+
+.customizeTable {
+  margin: 0;
+
+  thead tr th,
+  tbody tr td {
+    padding: $default-table-padding calc($default-table-padding - 10px);
+    border: none;
+    word-wrap: break-word;
+  }
+
+  thead tr th:first-child,
+  tbody tr td:first-child {
+    padding-left: $default-table-padding;
+  }
+
+  thead tr th:last-child,
+  tbody tr td:last-child {
+    padding-right: $default-table-padding;
+  }
+
+  thead tr th {
+    text-transform: uppercase;
+    background-color: inherit;
+    color: $text-secondary;
+  }
+
+  tbody tr {
+    position: relative;
+
+    &:after {
+      display: block;
+      content: "";
+      background: $table-row-border;
+      height: 1px;
+      position: absolute;
+      top: 0px;
+      left: 10px;
+      right: 10px;
+    }
+
+    /* highlight row on hover*/
+    &:hover{
+      background-color: #f3f3f3;
+
+      td {
+        background-color: inherit;
+      }
+    }
+  }
+}
+
+.customizeFixedTable{
+  table-layout: fixed;
+  width: calc(100% + 186px);
+}
