@@ -1,5 +1,6 @@
 import { Alert, HeadingLevel } from "@trussworks/react-uswds";
-import { toast } from "react-toastify";
+import { toast, ToastPosition } from "react-toastify";
+import type { ToastIcon } from "../../../../../node_modules/react-toastify/dist/types";
 import classNames from "classnames";
 
 export type AlertType = "info" | "success" | "warning" | "error";
@@ -46,7 +47,19 @@ const Toast: React.FC<ToastProps> = ({
   );
 };
 
-const options = {
+export type ToastConfigOptions = {
+  position?: ToastPosition;
+  stacked?: boolean;
+  hideProgressBar?: boolean;
+  closeOnClick?: boolean;
+  closeButton?: boolean;
+  className?: string;
+  bodyClassName?: string;
+  pauseOnFocusLoss?: boolean;
+  icon?: ToastIcon;
+};
+
+const options: ToastConfigOptions = {
   // uncomment this to debug toast styling issues
   // progress: 0.2,
   hideProgressBar: false,

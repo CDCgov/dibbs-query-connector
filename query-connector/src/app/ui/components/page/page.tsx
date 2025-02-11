@@ -1,28 +1,23 @@
 "use client";
 import { useEffect, useContext } from "react";
-import { ToastContainer, ToastPosition } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 import { usePathname } from "next/navigation";
+import { AppProgressBar as ProgressBar } from "next-nprogress-bar";
 import { DataContext } from "@/app/shared/DataProvider";
 import SiteAlert from "../../designSystem/SiteAlert";
-import "react-toastify/dist/ReactToastify.css";
-import "react-toastify/dist/ReactToastify.min.css";
-import { AppProgressBar as ProgressBar } from "next-nprogress-bar";
+import { ToastConfigOptions } from "../../designSystem/toast/Toast";
+
 export type PageProps = {
   children: React.ReactNode;
   showSiteAlert: boolean;
 };
 import styles from "./page.module.scss";
 
-export type ToastConfig = {
-  position?: ToastPosition;
-  stacked?: boolean;
-  hideProgressBar?: boolean;
-};
-
-const toastDefault: ToastConfig = {
+const toastDefault: ToastConfigOptions = {
   position: "bottom-left",
-  stacked: true,
-  hideProgressBar: true,
+  stacked: false,
+  hideProgressBar: false,
+  icon: false,
 };
 
 /**
@@ -48,12 +43,13 @@ const Page: React.FC<PageProps> = ({ children, showSiteAlert }) => {
   return (
     <>
       {showSiteAlert && <SiteAlert page={ctx?.currentPage} />}
-      <ToastContainer
-        position={toastDefault.position}
-        stacked={toastDefault.stacked}
-        hideProgressBar={toastDefault.hideProgressBar}
-      />
-      <div>
+      <div className={styles.pageContainer}>
+        <ToastContainer
+          position={toastDefault.position}
+          stacked={toastDefault.stacked}
+          hideProgressBar={toastDefault.hideProgressBar}
+          icon={false}
+        />
         <ProgressBar
           height="12px"
           color="#005EA2"

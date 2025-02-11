@@ -1,5 +1,11 @@
 @use "../../styles/_variables" as *;
 
+.pageContainer {
+    display: flex;
+    flex: auto;
+    flex-direction: column;
+}
+
 .progressBar {
     margin-top: $header-content-height;
 
