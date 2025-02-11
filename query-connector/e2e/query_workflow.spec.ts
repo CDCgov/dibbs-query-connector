@@ -42,7 +42,7 @@ test.describe("querying with the Query Connector", () => {
 
   test("successful demo user query", async ({ page }) => {
     await page.getByRole("link", { name: "Try it out" }).click();
-    const showSiteAlert = process.env.DEMO_MODE === "true"
+    const showSiteAlert = process.env.DEMO_MODE === "true";
 
     // Check that the info alert is visible and contains the correct text
     if (showSiteAlert) {
@@ -111,8 +111,8 @@ test.describe("querying with the Query Connector", () => {
     ).toBeVisible();
 
     // Check that the info alert is visible and has updated to the correct text
-    
-     if (showSiteAlert) {
+
+    if (showSiteAlert) {
       const alert2 = page.locator(".custom-alert");
       await expect(alert2).toBeVisible();
       await expect(alert2).toHaveText(
