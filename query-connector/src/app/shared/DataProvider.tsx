@@ -2,15 +2,15 @@
 
 import { createContext, ReactNode, useState } from "react";
 import { PageType } from "./constants";
-import { ToastConfig } from "../ui/components/page/page";
+import { ToastConfigOptions } from "../ui/designSystem/toast/Toast";
 
 export interface DataContextValue {
   data: unknown; // You can define a specific data type here
   setData: (data: unknown) => void;
   currentPage: PageType | string | undefined;
   setCurrentPage: (currentPage: PageType | string | undefined) => void;
-  toastConfig: ToastConfig | null;
-  setToastConfig: (config: ToastConfig) => void;
+  toastConfig: ToastConfigOptions | null;
+  setToastConfig: (config: ToastConfigOptions) => void;
 }
 // Context lets the parent component make some information available to any component in the tree below it,
 // no matter how deep, without passing it explicitly through props.
@@ -29,7 +29,9 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const [currentPage, setCurrentPage] = useState<
     PageType | string | undefined
   >();
-  const [toastConfig, setToastConfig] = useState<ToastConfig | null>(null);
+  const [toastConfig, setToastConfig] = useState<ToastConfigOptions | null>(
+    null,
+  );
 
   return (
     <DataContext.Provider

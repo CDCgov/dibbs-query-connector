@@ -51,7 +51,7 @@ const Page: React.FC<PageProps> = ({ children, showSiteAlert }) => {
           icon={false}
         />
         <ProgressBar
-          height="12px"
+          height="8px"
           color="#005EA2"
           options={{
             easing: "ease-in-out",
