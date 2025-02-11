@@ -55,9 +55,21 @@ export async function GET() {
  *               type: string
  *             id:
  *               type: string
+ *             first_name:
+ *               type: string
+ *             last_name:
+ *               type: string
+ *             dob:
+ *               type: string
+ *             mrn:
+ *               type: string
+ *             phone:
+ *               type: string
  *     responses:
  *       200:
  *         description: The FHIR resources returned that match the information configured in the query referenced
+ *       400:
+ *         description: Missing patient identifiers
  *       500:
  *         description: Something went wrong :(
  * @param request - The incoming Next.js request object.
