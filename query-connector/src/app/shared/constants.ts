@@ -133,8 +133,13 @@ export type Mode = "search" | "results" | "select-query" | "patient-results";
 export type BuildStep = "selection" | "condition" | "valueset";
 
 /* Mode that all pages can be in; used to set page data in context */
-export type PageType = "/" | "queryBuilding" | "fhir-servers"| "userManagement" | BuildStep | Mode;
-
+export type PageType =
+  | "/"
+  | "queryBuilding"
+  | "fhir-servers"
+  | "userManagement"
+  | BuildStep
+  | Mode;
 
 export const metadata = {
   title: "Query Connector",
