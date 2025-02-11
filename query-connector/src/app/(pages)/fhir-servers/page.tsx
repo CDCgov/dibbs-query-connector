@@ -13,7 +13,6 @@ import { FhirServerConfig } from "../../shared/constants";
 import type { ModalRef } from "../../ui/designSystem/modal/Modal";
 import styles from "./fhirServers.module.scss";
 import classNames from "classnames";
-import SiteAlert from "../../ui/designSystem/SiteAlert";
 import Table from "../../ui/designSystem/table/Table";
 import Checkbox from "../../ui/designSystem/checkbox/Checkbox";
 
@@ -267,7 +266,6 @@ const FhirServers: React.FC = () => {
 
   return (
     <>
-      <SiteAlert />
       <div className={classNames("main-container__wide", styles.mainContainer)}>
         <div
           className={classNames(
@@ -345,7 +343,7 @@ const FhirServers: React.FC = () => {
                       onClick={() => handleOpenModal("edit", fhirServer)}
                       aria-label={`Edit ${fhirServer.name}`}
                     >
-                      <Icon.Edit size={3} />
+                      <Icon.Edit aria-label="edit" size={3} />
                       Edit
                     </button>
                   </div>

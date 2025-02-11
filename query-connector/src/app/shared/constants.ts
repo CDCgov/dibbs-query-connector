@@ -126,11 +126,15 @@ export const stateOptions = [
   { value: "AP", label: "AP - Armed Forces Pacific" },
 ];
 
-/* Mode that pages can be in; determines what is displayed to the user */
+/* Mode that query pages can be in; determines what is displayed to the user */
 export type Mode = "search" | "results" | "select-query" | "patient-results";
 
 /* Mode that query building pages can be in; determines what is displayed to the user */
 export type BuildStep = "selection" | "condition" | "valueset";
+
+/* Mode that all pages can be in; used to set page data in context */
+export type PageType = "/" | "queryBuilding" | "fhir-servers"| "userManagement" | BuildStep | Mode;
+
 
 export const metadata = {
   title: "Query Connector",

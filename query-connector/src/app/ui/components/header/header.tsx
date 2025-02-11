@@ -90,7 +90,6 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
               "flex-align-center",
             )}
           >
-            {/* TODO: Enable this once we can show/hide rules based on actual auth status */}
             {!isLoggedIn && !LOGGED_IN_PATHS.includes(path) && (
               <Button
                 className={styles.signinButton}
@@ -132,8 +131,6 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
             id="dropdown-menu"
             className={`usa-nav__submenu ${styles.menuDropdown}`}
           >
-            {/* TODO: Enable this once we can show/hide rules based on actual auth status */}
-            {/* {isProduction && ( */}
             <>
               <li className={styles.subMenuItem}>
                 <Link className={styles.menuItem} href={"/queryBuilding"}>
@@ -151,7 +148,6 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
                 </Link>
               </li>
             </>
-            {/* )} */}
           </ul>
         </div>
       )}
