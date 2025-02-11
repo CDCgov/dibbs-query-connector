@@ -6,8 +6,6 @@ import TabGroup, { Tab } from "@/app/ui/designSystem/TabGroup/tabGroup";
 import TeamQueryEditSection from "./components/TeamQueryEditSection";
 import UserManagementProvider from "./components/UserManagementProvider";
 
-import { ToastContainer } from "react-toastify";
-
 /**
  * @param root0 - User management page layour props
  * @param root0.children - content of the active user management section
@@ -26,12 +24,6 @@ const UserManagement: React.FC<React.PropsWithChildren> = ({ children }) => {
    */
   return (
     <>
-      <ToastContainer
-        position="bottom-left"
-        icon={false}
-        stacked
-        hideProgressBar
-      />
       <SiteAlert />
       <div className={classNames("main-container__wide", "user-management")}>
         <h1 className="margin-bottom-4">User management</h1>

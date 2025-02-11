@@ -14,12 +14,16 @@ import {
 import { getUsers, updateUserRole } from "@/app/backend/user-management";
 import { QCResponse } from "@/app/models/responses/collections";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
+import { useSession } from "next-auth/react";
 
 /**
  * User section in the user management page
  * @returns Users table
  */
 const UserManagement: React.FC = () => {
+  const { data: session } = useSession();
+  console.log("user management session:", session);
+
   const { openEditSection } = useContext(UserManagementContext);
   const [users, setUsers] = useState<User[] | null>(null);
 
@@ -84,7 +88,7 @@ const UserManagement: React.FC = () => {
           <td>{`${user.last_name}, ${user.first_name}`}</td>
           <td width={270}>
             <RoleDropdown
-              id={`${user.id}-role-combobox`}
+              id={user.username}
               defaultValue={user.qc_role}
               OnChange={(role: RoleTypeValues) => {
                 handleUserRoleChange(user.username, role);

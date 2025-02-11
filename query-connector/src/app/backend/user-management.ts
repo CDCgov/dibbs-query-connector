@@ -133,3 +133,30 @@ export async function getUsers(): Promise<QCResponse<User>> {
     throw error;
   }
 }
+
+/**
+ * Retrieves all registered users in query connector
+ * @param username user's username. Username must be unique.
+ * @returns User record that has the username provided
+ */
+export async function getUserByUsername(
+  username: string,
+): Promise<QCResponse<User>> {
+  try {
+    const selectUsersQuery = `
+      SELECT username, qc_role, first_name, last_name
+      FROM user_management
+      WHERE username = $1;
+    `;
+
+    const result = await dbClient.query(selectUsersQuery, [username]);
+
+    return {
+      totalItems: result.rowCount,
+      items: result.rows,
+    } as QCResponse<User>;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+}
