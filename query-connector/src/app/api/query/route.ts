@@ -22,17 +22,45 @@ import { getFhirServerNames } from "@/app/shared/database-service";
 import { getSavedQueryById } from "@/app/backend/query-building";
 
 /**
- * Health check for TEFCA Viewer
- * @returns Response with status OK.
+ * @swagger
+ * /api/query:
+ *   get:
+ *     description: Returns the health status of the API
+ *     responses:
+ *       200:
+ *         description: Health check for Query Connector
+ * @returns An indication for the health of the API
  */
 export async function GET() {
   return NextResponse.json({ status: "OK" }, { status: 200 });
 }
 
 /**
- * Handles a POST request to query a given FHIR server for a given query. The
- * id and fhir_server are provided as query parameters in the request URL. The
- * request body contains the FHIR patient resource to be queried.
+ * @swagger
+ * /api/query:
+ *   post:
+ *     description: Handles a POST request to query a given FHIR server for a given query. The id and fhir_server are provided as query parameters in the request URL. The request body contains the FHIR patient resource to be queried.
+ *     consumes:
+ *       - application/json
+ *     parameters:
+ *       - in: body
+ *         name: queryInfo
+ *         description: Information about the query we want to use.
+ *         schema:
+ *           type: object
+ *           required:
+ *             - id
+ *             - fhir_server
+ *           properties:
+ *             fhir_server:
+ *               type: string
+ *             id:
+ *               type: string
+ *     responses:
+ *       200:
+ *         description: The FHIR resources returned that match the information configured in the query referenced
+ *       500:
+ *         description: Something went wrong :(
  * @param request - The incoming Next.js request object.
  * @returns Response with QueryResponse.
  */
@@ -81,17 +109,23 @@ export async function POST(request: NextRequest) {
 
   if (!id || !fhir_server) {
     const OperationOutcome = await handleRequestError(MISSING_API_QUERY_PARAM);
-    return NextResponse.json(OperationOutcome);
+    return NextResponse.json(OperationOutcome, {
+      status: 500,
+    });
   } else if (!Object.values(fhirServers).includes(fhir_server)) {
     const OperationOutcome = await handleRequestError(INVALID_FHIR_SERVERS);
-    return NextResponse.json(OperationOutcome);
+    return NextResponse.json(OperationOutcome, {
+      status: 500,
+    });
   }
 
   const queryResults = await getSavedQueryById(id);
 
   if (queryResults === undefined) {
     const OperationOutcome = await handleRequestError(INVALID_QUERY);
-    return NextResponse.json(OperationOutcome);
+    return NextResponse.json(OperationOutcome, {
+      status: 500,
+    });
   }
 
   // Add params & patient identifiers to QueryName
@@ -114,7 +148,9 @@ export async function POST(request: NextRequest) {
   // Bundle data
   const bundle: APIQueryResponse = await createBundle(QueryResponse);
 
-  return NextResponse.json(bundle);
+  return NextResponse.json(bundle, {
+    status: 200,
+  });
 }
 
 function mapDeprecatedUseCaseToId(use_case: string | null) {
