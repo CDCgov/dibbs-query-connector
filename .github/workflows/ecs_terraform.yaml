@@ -62,82 +62,82 @@ jobs:
           fi
 
   terraform:
-            needs: check-dependencies
-            runs-on: ubuntu-latest
-            if: needs.check-dependencies.outputs.source_a_status == 'success' && needs.check-dependencies.outputs.source_b_status != 'failure'        
+    needs: check-dependencies
+    runs-on: ubuntu-latest
+    if: needs.check-dependencies.outputs.source_a_status == 'success' && needs.check-dependencies.outputs.source_b_status != 'failure'
 
-            steps:
-              - name: Check Out Changes
-                uses: actions/checkout@v4
+    steps:
+      - name: Check Out Changes
+        uses: actions/checkout@v4
 
-              - name: Setup Terraform
-                uses: hashicorp/setup-terraform@v3.1.2
-                with:
-                  terraform_version: "1.9.8"
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3.1.2
+        with:
+          terraform_version: "1.9.8"
 
-              - name: configure aws credentials
-                uses: aws-actions/configure-aws-credentials@v4
-                with:
-                  role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
-                  aws-region: ${{ secrets.AWS_REGION }}
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ secrets.AWS_REGION }}
 
-              - name: Terraform
-                env:
-                  BUCKET: ${{ secrets.TFSTATE_BUCKET }}
-                  DYNAMODB_TABLE: ${{ secrets.TFSTATE_DYNAMODB_TABLE }}
-                  REGION: ${{ vars.region }}
-                  WORKSPACE: ${{ env.workspace }}
-                  UMLS_API_KEY: ${{ secrets.UMLS_API_KEY }}
-                  ERSD_API_KEY: ${{ secrets.ERSD_API_KEY}}
-                  TLS_CERT: ${{ secrets.TLS_CERT}}
-                  TLS_KEY: ${{ secrets.TLS_KEY}}
-                  AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
-                  KEYCLOAK_CLIENT_ID: ${{ secrets.KEYCLOAK_CLIENT_ID }}
-                  KEYCLOAK_CLIENT_SECRET: ${{ secrets.KEYCLOAK_CLIENT_SECRET }}
-                  AUTH_KEYCLOAK_ISSUER: ${{ env.workspace == 'dev' && format('https://{0}/keycloak', secrets.ECS_HOSTNAME) || format('https://{0}.{1}/keycloak', env.workspace, secrets.ECS_HOSTNAME) }}
-                  AUTH_URL: ${{ env.workspace == 'dev' && format('https://{0}', secrets.ECS_HOSTNAME) || format('https://{0}.{1}', env.workspace, secrets.ECS_HOSTNAME) }}
-                shell: bash
-                run: |
-                  rm -rf .terraform .terraform.lock.hcl
-                  terraform init \
-                    -var-file="$WORKSPACE.tfvars" \
-                    -backend-config "bucket=$BUCKET" \
-                    -backend-config "dynamodb_table=$DYNAMODB_TABLE" \
-                    -backend-config "region=$REGION" \
-                    || (echo "terraform init failed, exiting..." && exit 1)
-                  terraform workspace select "$WORKSPACE"
-                  terraform apply -auto-approve -target=aws_acm_certificate.cloudflare_cert \
-                    -var-file="$WORKSPACE.tfvars" \
-                    -var "umls_api_key=${UMLS_API_KEY}" \
-                    -var "ersd_api_key=${ERSD_API_KEY}" \
-                    -var "qc_tls_key=${TLS_KEY}" \
-                    -var "qc_tls_cert=${TLS_CERT}" \
-                    -var "auth_secret=${AUTH_SECRET}" \
-                    -var "keycloak_client_id=${KEYCLOAK_CLIENT_ID}" \
-                    -var "keycloak_client_secret=${KEYCLOAK_CLIENT_SECRET}" \
-                    -var "auth_keycloak_issuer=${AUTH_KEYCLOAK_ISSUER}" \
-                    -var "auth_url=${AUTH_URL}"
-                  terraform plan \
-                    -var-file="$WORKSPACE.tfvars" \
-                    -var "umls_api_key=${UMLS_API_KEY}" \
-                    -var "ersd_api_key=${ERSD_API_KEY}" \
-                    -var "qc_tls_key=${TLS_KEY}" \
-                    -var "qc_tls_cert=${TLS_CERT}" \
-                    -var "auth_secret=${AUTH_SECRET}" \
-                    -var "keycloak_client_id=${KEYCLOAK_CLIENT_ID}" \
-                    -var "keycloak_client_secret=${KEYCLOAK_CLIENT_SECRET}" \
-                    -var "auth_keycloak_issuer=${AUTH_KEYCLOAK_ISSUER}" \
-                    -var "auth_url=${AUTH_URL}"
-                  terraform apply -auto-approve \
-                    -replace="module.ecs.dockerless_remote_image.dibbs[\"query-connector\"]" \
-                    -replace="module.ecs.dockerless_remote_image.dibbs[\"keycloak\"]" \
-                    -var-file="$WORKSPACE.tfvars" \
-                    -var "umls_api_key=${UMLS_API_KEY}" \
-                    -var "ersd_api_key=${ERSD_API_KEY}" \
-                    -var "qc_tls_key=${TLS_KEY}" \
-                    -var "qc_tls_cert=${TLS_CERT}" \
-                    -var "auth_secret=${AUTH_SECRET}" \
-                    -var "keycloak_client_id=${KEYCLOAK_CLIENT_ID}" \
-                    -var "keycloak_client_secret=${KEYCLOAK_CLIENT_SECRET}" \
-                    -var "auth_keycloak_issuer=${AUTH_KEYCLOAK_ISSUER}" \
-                    -var "auth_url=${AUTH_URL}"
+      - name: Terraform
+        env:
+          BUCKET: ${{ secrets.TFSTATE_BUCKET }}
+          DYNAMODB_TABLE: ${{ secrets.TFSTATE_DYNAMODB_TABLE }}
+          REGION: ${{ vars.region }}
+          WORKSPACE: ${{ env.workspace }}
+          UMLS_API_KEY: ${{ secrets.UMLS_API_KEY }}
+          ERSD_API_KEY: ${{ secrets.ERSD_API_KEY}}
+          TLS_CERT: ${{ secrets.TLS_CERT}}
+          TLS_KEY: ${{ secrets.TLS_KEY}}
+          AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
+          KEYCLOAK_CLIENT_ID: ${{ secrets.KEYCLOAK_CLIENT_ID }}
+          KEYCLOAK_CLIENT_SECRET: ${{ secrets.KEYCLOAK_CLIENT_SECRET }}
+          AUTH_KEYCLOAK_ISSUER: ${{ env.workspace == 'dev' && format('https://{0}/keycloak', secrets.ECS_HOSTNAME) || format('https://{0}.{1}/keycloak', env.workspace, secrets.ECS_HOSTNAME) }}
+          AUTH_URL: ${{ env.workspace == 'dev' && format('https://{0}', secrets.ECS_HOSTNAME) || format('https://{0}.{1}', env.workspace, secrets.ECS_HOSTNAME) }}
+        shell: bash
+        run: |
+          rm -rf .terraform .terraform.lock.hcl
+          terraform init \
+            -var-file="$WORKSPACE.tfvars" \
+            -backend-config "bucket=$BUCKET" \
+            -backend-config "dynamodb_table=$DYNAMODB_TABLE" \
+            -backend-config "region=$REGION" \
+            || (echo "terraform init failed, exiting..." && exit 1)
+          terraform workspace select "$WORKSPACE"
+          terraform apply -auto-approve -target=aws_acm_certificate.cloudflare_cert \
+            -var-file="$WORKSPACE.tfvars" \
+            -var "umls_api_key=${UMLS_API_KEY}" \
+            -var "ersd_api_key=${ERSD_API_KEY}" \
+            -var "qc_tls_key=${TLS_KEY}" \
+            -var "qc_tls_cert=${TLS_CERT}" \
+            -var "auth_secret=${AUTH_SECRET}" \
+            -var "keycloak_client_id=${KEYCLOAK_CLIENT_ID}" \
+            -var "keycloak_client_secret=${KEYCLOAK_CLIENT_SECRET}" \
+            -var "auth_keycloak_issuer=${AUTH_KEYCLOAK_ISSUER}" \
+            -var "auth_url=${AUTH_URL}"
+          terraform plan \
+            -var-file="$WORKSPACE.tfvars" \
+            -var "umls_api_key=${UMLS_API_KEY}" \
+            -var "ersd_api_key=${ERSD_API_KEY}" \
+            -var "qc_tls_key=${TLS_KEY}" \
+            -var "qc_tls_cert=${TLS_CERT}" \
+            -var "auth_secret=${AUTH_SECRET}" \
+            -var "keycloak_client_id=${KEYCLOAK_CLIENT_ID}" \
+            -var "keycloak_client_secret=${KEYCLOAK_CLIENT_SECRET}" \
+            -var "auth_keycloak_issuer=${AUTH_KEYCLOAK_ISSUER}" \
+            -var "auth_url=${AUTH_URL}"
+          terraform apply -auto-approve \
+            -replace="module.ecs.dockerless_remote_image.dibbs[\"query-connector\"]" \
+            -replace="module.ecs.dockerless_remote_image.dibbs[\"keycloak\"]" \
+            -var-file="$WORKSPACE.tfvars" \
+            -var "umls_api_key=${UMLS_API_KEY}" \
+            -var "ersd_api_key=${ERSD_API_KEY}" \
+            -var "qc_tls_key=${TLS_KEY}" \
+            -var "qc_tls_cert=${TLS_CERT}" \
+            -var "auth_secret=${AUTH_SECRET}" \
+            -var "keycloak_client_id=${KEYCLOAK_CLIENT_ID}" \
+            -var "keycloak_client_secret=${KEYCLOAK_CLIENT_SECRET}" \
+            -var "auth_keycloak_issuer=${AUTH_KEYCLOAK_ISSUER}" \
+            -var "auth_url=${AUTH_URL}"
