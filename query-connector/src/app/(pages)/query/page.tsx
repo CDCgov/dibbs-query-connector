@@ -7,7 +7,6 @@ import SearchForm from "./components/searchForm/SearchForm";
 import SelectQuery from "./components/SelectQuery";
 import { DEFAULT_DEMO_FHIR_SERVER, Mode } from "../../shared/constants";
 import LoadingView from "../../ui/designSystem/LoadingView";
-import { ToastContainer } from "react-toastify";
 
 import "react-toastify/dist/ReactToastify.min.css";
 import StepIndicator, {
@@ -128,7 +127,6 @@ const Query: React.FC = () => {
           />
         )}
         {loading && <LoadingView loading={loading} />}
-        <ToastContainer icon={false} />
       </div>
     </div>
   );

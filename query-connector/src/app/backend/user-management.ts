@@ -119,7 +119,8 @@ export async function getUsers(): Promise<QCResponse<User>> {
   try {
     const selectAllUsersQuery = `
       SELECT username, qc_role, first_name, last_name
-      FROM user_management;
+      FROM user_management
+      ORDER BY last_name, first_name ASC;
     `;
 
     const result = await dbClient.query(selectAllUsersQuery);

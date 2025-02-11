@@ -28,8 +28,15 @@ const UserManagement: React.FC = () => {
    */
 
   async function fetchUsers() {
-    const userList: QCResponse<User> = await getUsers();
-    setUsers(userList.items ?? []);
+    try {
+      const userList: QCResponse<User> = await getUsers();
+      setUsers(userList.items ?? []);
+    } catch (e) {
+      showToastConfirmation({
+        body: "Unable to retrieve users. Please try again.",
+        variant: "error",
+      });
+    }
   }
 
   useEffect(() => {
