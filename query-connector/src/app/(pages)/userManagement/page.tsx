@@ -42,13 +42,9 @@ const UserManagement: React.FC = () => {
 
   async function handleUserRoleChange(username: string, role: RoleTypeValues) {
     try {
-      const updatedUser: QCResponse<User> = await updateUserRole(
-        "",
-        username,
-        role,
-      );
+      await updateUserRole("", username, role);
       showToastConfirmation({
-        body: "Role updated successfully.",
+        body: "Role successfully updated.",
       });
     } catch (e) {
       showToastConfirmation({
