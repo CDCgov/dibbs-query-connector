@@ -42,13 +42,17 @@ test.describe("querying with the Query Connector", () => {
 
   test("successful demo user query", async ({ page }) => {
     await page.getByRole("link", { name: "Try it out" }).click();
+    const showSiteAlert = process.env.DEMO_MODE === "true"
 
     // Check that the info alert is visible and contains the correct text
-    const alert = page.locator(".custom-alert");
-    await expect(alert).toBeVisible();
-    await expect(alert).toHaveText(
-      "This site is for demo purposes only. Please do not enter PII on this website.",
-    );
+    if (showSiteAlert) {
+      const alert = page.getByTestId("alert");
+      await expect(alert).toBeVisible();
+      await expect(alert).toHaveText(
+        "This site is for demo purposes only. Please do not enter PII on this website.",
+      );
+    }
+
     await expect(
       page.getByRole("heading", {
         name: PAGE_TITLES["search"].title,
@@ -107,11 +111,14 @@ test.describe("querying with the Query Connector", () => {
     ).toBeVisible();
 
     // Check that the info alert is visible and has updated to the correct text
-    const alert2 = page.locator(".custom-alert");
-    await expect(alert2).toBeVisible();
-    await expect(alert2).toHaveText(
-      `${CONTACT_US_DISCLAIMER_TEXT} ${CONTACT_US_DISCLAIMER_EMAIL}`,
-    );
+    
+     if (showSiteAlert) {
+      const alert2 = page.locator(".custom-alert");
+      await expect(alert2).toBeVisible();
+      await expect(alert2).toHaveText(
+        `${CONTACT_US_DISCLAIMER_TEXT} ${CONTACT_US_DISCLAIMER_EMAIL}`,
+      );
+    }
 
     await expect(
       page.getByRole("button", { name: "Observations", expanded: true }),
