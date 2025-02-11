@@ -5,7 +5,7 @@ import {
   formatCodeableConcept,
   formatDate,
 } from "../../../../../shared/format-service";
-import styles from "./resultsTables.module.scss";
+
 /**
  * The props for the DiagnosticReportTable component.
  */
@@ -23,16 +23,16 @@ const DiagnosticReportTable: React.FC<DiagnosticReportTableProps> = ({
   diagnosticReports,
 }) => {
   return (
-    <Table bordered={false} className="margin-top-0-important">
+    <Table contained={false}>
       <thead>
-        <tr className={styles.diagnosticsRow}>
+        <tr>
           <th>Date</th>
           <th>Code</th>
         </tr>
       </thead>
       <tbody>
         {diagnosticReports.map((diagnosticReport) => (
-          <tr className={styles.diagnosticsRow} key={diagnosticReport.id}>
+          <tr key={diagnosticReport.id}>
             <td>{formatDate(diagnosticReport?.effectiveDateTime)}</td>
             <td>{formatCodeableConcept(diagnosticReport.code)}</td>
           </tr>
