@@ -1,7 +1,6 @@
 "use client";
 
 import classNames from "classnames";
-import SiteAlert from "@/app/ui/designSystem/SiteAlert";
 import TabGroup, { Tab } from "@/app/ui/designSystem/TabGroup/tabGroup";
 import TeamQueryEditSection from "./components/TeamQueryEditSection";
 import UserManagementProvider from "./components/UserManagementProvider";
@@ -24,7 +23,6 @@ const UserManagement: React.FC<React.PropsWithChildren> = ({ children }) => {
    */
   return (
     <>
-      <SiteAlert />
       <div className={classNames("main-container__wide", "user-management")}>
         <h1 className="margin-bottom-4">User management</h1>
         <TabGroup tabs={sections} />

@@ -37,8 +37,7 @@ const Page: React.FC<PageProps> = ({ children, showSiteAlert }) => {
   const ctx = useContext(DataContext);
   const path = usePathname();
 
-  // sets the current path/page in context accessible throughout the app;
-  // primarily used by SiteAlert component so it can determine which content to display
+  // sets the current path/page in context accessible throughout the app
   useEffect(() => {
     ctx?.setCurrentPage(path);
   }, [path]);
@@ -57,11 +56,10 @@ const Page: React.FC<PageProps> = ({ children, showSiteAlert }) => {
       <div>
         <ProgressBar
           height="12px"
-          color="#162E51"
+          color="#005EA2"
           options={{
             easing: "ease-in-out",
             showSpinner: false,
-            // style?: string;
             template: templateString,
           }}
           startPosition={0.15}
