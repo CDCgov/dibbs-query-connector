@@ -1,5 +1,5 @@
 import { Bundle, BundleEntry, Patient } from "fhir/r4";
-import { GET, POST } from "../../api/query/route";
+import { GET, POST } from "../../api/query/fhir/route";
 import { readJsonFile } from "../shared_utils/readJsonFile";
 import {
   INVALID_FHIR_SERVERS,

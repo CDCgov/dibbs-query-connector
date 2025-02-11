@@ -1,4 +1,5 @@
-import { NextResponse, NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { handleRequestError } from "./error-handling-service";
 import {
   makeFhirQuery,
   QueryRequest,
@@ -6,20 +7,18 @@ import {
   createBundle,
   APIQueryResponse,
 } from "../../shared/query-service";
-import { parsePatientDemographics } from "./parsing-service";
+import { getSavedQueryById } from "@/app/backend/query-building";
 import {
+  RESPONSE_BODY_IS_NOT_PATIENT_RESOURCE,
+  MISSING_PATIENT_IDENTIFIERS,
+  MISSING_API_QUERY_PARAM,
   INVALID_FHIR_SERVERS,
   INVALID_QUERY,
-  RESPONSE_BODY_IS_NOT_PATIENT_RESOURCE,
-  MISSING_API_QUERY_PARAM,
-  MISSING_PATIENT_IDENTIFIERS,
   USE_CASE_DETAILS,
   USE_CASES,
-} from "../../shared/constants";
-
-import { handleRequestError } from "./error-handling-service";
+} from "@/app/shared/constants";
 import { getFhirServerNames } from "@/app/shared/database-service";
-import { getSavedQueryById } from "@/app/backend/query-building";
+import { parsePatientDemographics } from "./fhir/parsers";
 
 /**
  * @swagger
@@ -128,19 +127,28 @@ export async function POST(request: NextRequest) {
     });
   }
 
+  const first_name = params.get("given") || "";
+  const last_name = params.get("family") || "";
+  const dob = params.get("dob") || "";
+  const mrn = params.get("mrn") || "";
+  const phone = params.get("phone") || "";
+
+  if (!first_name && !last_name && !dob && !mrn && !phone) {
+    const OperationOutcome = await handleRequestError(
+      MISSING_PATIENT_IDENTIFIERS,
+    );
+    return NextResponse.json(OperationOutcome, { status: 400 });
+  }
+
   // Add params & patient identifiers to QueryName
   const QueryRequest: QueryRequest = {
     query_name: queryResults.query_name,
     fhir_server: fhir_server,
-    ...(PatientIdentifiers.first_name && {
-      first_name: PatientIdentifiers.first_name,
-    }),
-    ...(PatientIdentifiers.last_name && {
-      last_name: PatientIdentifiers.last_name,
-    }),
-    ...(PatientIdentifiers.dob && { dob: PatientIdentifiers.dob }),
-    ...(PatientIdentifiers.mrn && { mrn: PatientIdentifiers.mrn }),
-    ...(PatientIdentifiers.phone && { phone: PatientIdentifiers.phone }),
+    first_name: first_name,
+    last_name: last_name,
+    dob: dob,
+    mrn: mrn,
+    phone: phone,
   };
 
   const QueryResponse: QueryResponse = await makeFhirQuery(QueryRequest);
