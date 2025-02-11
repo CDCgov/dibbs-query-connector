@@ -1,4 +1,5 @@
 import "./ui/styles/styles.scss";
+import "react-toastify/dist/ReactToastify.css";
 import Header from "./ui/components/header/header";
 import Footer from "./ui/components/footer/footer";
 import { SessionProvider } from "next-auth/react";

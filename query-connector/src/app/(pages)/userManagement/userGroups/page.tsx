@@ -4,8 +4,9 @@ import { useContext, useEffect, useState } from "react";
 import classNames from "classnames";
 import { Button } from "@trussworks/react-uswds";
 import Table from "../../../ui/designSystem/table/Table";
-import { UserGroup, userGroupsMock } from "../types";
+
 import { UserManagementContext } from "../components/UserManagementProvider";
+import { UserGroup } from "@/app/models/entities/user-management";
 
 /**
  * User groups section in the user management page
@@ -17,7 +18,7 @@ const UserGroups: React.FC = () => {
   const { openEditSection } = useContext(UserManagementContext);
 
   useEffect(() => {
-    setUserGroups(userGroupsMock);
+    setUserGroups([]);
   }, []);
 
   function getMemberLabel(memberSize: number): string {

@@ -37,7 +37,6 @@ import classNames from "classnames";
 import { groupConditionConceptsIntoValueSets } from "@/app/shared/utils";
 import { SelectedQueryDetails } from "../querySelection/utils";
 
-import "react-toastify/dist/ReactToastify.css";
 import {
   getSavedQueryById,
   saveCustomQuery,

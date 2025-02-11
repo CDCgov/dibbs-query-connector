@@ -1,5 +1,7 @@
 "use server";
 
+import { RoleTypeValues, User } from "../models/entities/user-management";
+import { QCResponse } from "../models/responses/collections";
 import { getDbClient } from "./dbClient";
 const dbClient = getDbClient();
 
@@ -76,9 +78,10 @@ export async function addUserIfNotExists(userToken: {
 export async function updateUserRole(
   id: string,
   username: string,
-  newRole: string,
-) {
-  if (!id || !username || !newRole) {
+  newRole: RoleTypeValues,
+): Promise<QCResponse<User>> {
+  // TODO uncomment id check after it has been added to the table
+  if (/*!id ||*/ !username || !newRole) {
     console.error("Invalid input: id, username, and newRole are required.");
     throw new Error("User ID, username, and new role are required.");
   }
@@ -101,9 +104,31 @@ export async function updateUserRole(
     }
 
     console.log(`User role updated successfully: ${id} -> ${newRole}`);
-    return result.rows[0];
+    return { totalItems: 1, items: [result.rows[0]] };
   } catch (error) {
     console.error("Error updating user role:", error);
+    throw error;
+  }
+}
+
+/**
+ * Retrieves all registered users in query connector
+ * @returns List of users registered in qc
+ */
+export async function getUsers(): Promise<QCResponse<User>> {
+  try {
+    const selectAllUsersQuery = `
+      SELECT username, qc_role, first_name, last_name
+      FROM user_management;
+    `;
+
+    const result = await dbClient.query(selectAllUsersQuery);
+    return {
+      totalItems: result.rowCount,
+      items: result.rows,
+    } as QCResponse<User>;
+  } catch (error) {
+    console.error(error);
     throw error;
   }
 }
