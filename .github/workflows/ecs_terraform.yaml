@@ -5,7 +5,7 @@ on:
   workflow_run:
     workflows: [CD, Build Keycloak]
     types:
-        - completed  
+      - completed
   merge_group:
     types:
       - checks_requested
