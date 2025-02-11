@@ -61,6 +61,7 @@ const Page: React.FC<PageProps> = ({ children, showSiteAlert }) => {
           startPosition={0.15}
           shouldCompareComplexProps={true}
           disableSameURL={true}
+          delay={200} // if the page loads faster than this, the bar won't render
         />
         {children}
       </div>
