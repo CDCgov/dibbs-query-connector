@@ -52,7 +52,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         username: typeof token.username === "string" ? token.username : "",
         firstName: typeof token.firstName === "string" ? token.firstName : "",
         lastName: typeof token.lastName === "string" ? token.lastName : "",
-        role: "Super Admin",
         emailVerified: null,
       };
 
