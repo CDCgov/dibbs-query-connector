@@ -47,9 +47,11 @@ const PageModeToSiteAlertMap: { [page in Mode]?: React.ReactNode } = {
  * semantic context
  */
 const SiteAlert: React.FC<SiteAlertProps> = ({ page }) => {
+  const mappedAlert = PageModeToSiteAlertMap[page as Mode];
+
   return (
     <Alert type="info" headingLevel="h4" slim className="custom-alert">
-      {page ? PageModeToSiteAlertMap[page as Mode] : piiDisclaimer}
+      {mappedAlert ?? piiDisclaimer}
     </Alert>
   );
 };

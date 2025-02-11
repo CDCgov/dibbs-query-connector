@@ -1,0 +1,10 @@
+@use "../../styles/_variables" as *;
+
+.progressBar {
+    margin-top: $header-content-height;
+
+    &__alert {
+        @extend .progressBar;
+        margin-top: calc($header-content-height + $site-alert-height);
+    }
+}

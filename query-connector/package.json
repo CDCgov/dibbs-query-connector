@@ -43,6 +43,7 @@
     "js-yaml": "4.1.0",
     "next": "14.2.22",
     "next-auth": "^5.0.0-beta.25",
+    "next-nprogress-bar": "^2.4.4",
     "node-fetch": "^2.7.0",
     "pg": "^8.12.0",
     "pg-promise": "^11.5.4",

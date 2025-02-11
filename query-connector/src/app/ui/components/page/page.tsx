@@ -5,11 +5,13 @@ import { usePathname } from "next/navigation";
 import { DataContext } from "@/app/shared/DataProvider";
 import SiteAlert from "../../designSystem/SiteAlert";
 import "react-toastify/dist/ReactToastify.css";
-
+import "react-toastify/dist/ReactToastify.min.css";
+import { AppProgressBar as ProgressBar } from "next-nprogress-bar";
 export type PageProps = {
   children: React.ReactNode;
   showSiteAlert: boolean;
 };
+import styles from "./page.module.scss";
 
 export type ToastConfig = {
   position?: ToastPosition;
@@ -41,6 +43,9 @@ const Page: React.FC<PageProps> = ({ children, showSiteAlert }) => {
     ctx?.setCurrentPage(path);
   }, [path]);
 
+  const templateString = `<div class="bar ${
+    showSiteAlert ? styles.progressBar__alert : styles.progressBar
+  }"role="bar"></div>`;
   return (
     <>
       {showSiteAlert && <SiteAlert page={ctx?.currentPage} />}
@@ -50,7 +55,19 @@ const Page: React.FC<PageProps> = ({ children, showSiteAlert }) => {
         hideProgressBar={toastDefault.hideProgressBar}
       />
       <div>
-        {ctx?.currentPage}
+        <ProgressBar
+          height="12px"
+          color="#162E51"
+          options={{
+            easing: "ease-in-out",
+            showSpinner: false,
+            // style?: string;
+            template: templateString,
+          }}
+          startPosition={0.15}
+          shouldCompareComplexProps={true}
+          disableSameURL={true}
+        />
         {children}
       </div>
     </>
