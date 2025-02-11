@@ -1,6 +1,8 @@
 import type { NextAuthConfig } from "next-auth";
 import KeycloakProvider from "next-auth/providers/keycloak";
 
+//Follows pattern described in https://authjs.dev/getting-started/migrating-to-v5#edge-compatibility
+
 function addRealm(url: string) {
   return url.endsWith("/realms/master") ? url : `${url}/realms/master`;
 }

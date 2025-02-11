@@ -59,7 +59,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         if (isDemoMode()) {
           session.user.role = RoleTypeValues.SuperAdmin;
         } else {
-          // swallow error and do not block sign in flow
+          // ignore error and do not block sign in flow
           const user = await getUserByUsername(
             session.user.username as string,
           ).catch();
