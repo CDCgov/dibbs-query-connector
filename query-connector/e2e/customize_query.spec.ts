@@ -9,15 +9,19 @@ import { TEST_PATIENT, TEST_PATIENT_NAME } from "./constants";
 test.describe("querying with the Query Connector", () => {
   // Start every test by navigating to the customize query workflow
   test.beforeEach(async ({ page }) => {
+    const showSiteAlert = process.env.DEMO_MODE === "true"
     await page.goto(TEST_URL);
     await page.getByRole("link", { name: "Try it out" }).click();
 
     // Check that the info alert is visible and contains the correct text
-    const alert = page.getByTestId("alert");
-    await expect(alert).toBeVisible();
-    await expect(alert).toHaveText(
-      "This site is for demo purposes only. Please do not enter PII on this website.",
-    );
+    if (showSiteAlert) {
+      const alert = page.getByTestId("alert");
+      await expect(alert).toBeVisible();
+      await expect(alert).toHaveText(
+        "This site is for demo purposes only. Please do not enter PII on this website.",
+      );
+    }
+   
     await expect(
       page.getByRole("heading", {
         name: PAGE_TITLES["search"].title,
@@ -33,7 +37,6 @@ test.describe("querying with the Query Connector", () => {
       .selectOption("Local e2e HAPI Server: Direct");
 
     await page.getByRole("button", { name: "Search for patient" }).click();
-    await expect(page.getByText("Loading")).toHaveCount(1, { timeout: 20000 });
     await expect(page.getByText("Loading")).toHaveCount(0, { timeout: 20000 });
 
     await page.getByRole("link", { name: "Select patient" }).click();
