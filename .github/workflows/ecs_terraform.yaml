@@ -2,6 +2,10 @@ name: Terraform Plan & Terraform Apply
 run-name: Terraform plan & apply ${{ inputs.workspace }} by @${{ github.actor }}
 
 on:
+  workflow_run:
+    workflows: [CD, Build Keycloak]
+    types:
+        - completed  
   merge_group:
     types:
       - checks_requested
