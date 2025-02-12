@@ -1,7 +1,7 @@
 import NextAuth from "next-auth";
 import KeycloakProvider from "next-auth/providers/keycloak";
 import { addUserIfNotExists, getUserRole } from "@/app/backend/user-management";
-import { isDemoMode } from "./app/utils/configChecks";
+import { isAuthDisabled } from "./app/utils/configChecks";
 import { RoleTypeValues } from "./app/models/entities/user-management";
 
 function addRealm(url: string) {
@@ -66,7 +66,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         } catch (error) {}
 
         if (userToken.username !== "") {
-          if (isDemoMode()) {
+          if (isAuthDisabled()) {
             userToken.role = RoleTypeValues.SuperAdmin;
           } else {
             const role = await getUserRole(
