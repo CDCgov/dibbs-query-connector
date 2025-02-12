@@ -1,14 +1,46 @@
 import NextAuth from "next-auth";
-import authConfig from "./auth.config";
-import {
-  addUserIfNotExists,
-  getUserByUsername,
-} from "@/app/backend/user-management";
+import KeycloakProvider from "next-auth/providers/keycloak";
+import { addUserIfNotExists, getUserRole } from "@/app/backend/user-management";
 import { isDemoMode } from "./app/utils/configChecks";
 import { RoleTypeValues } from "./app/models/entities/user-management";
 
+function addRealm(url: string) {
+  return url.endsWith("/realms/master") ? url : `${url}/realms/master`;
+}
+
+let { NAMED_KEYCLOAK, LOCAL_KEYCLOAK } = process.env;
+if (!NAMED_KEYCLOAK || !LOCAL_KEYCLOAK) {
+  const KEYCLOAK_URL =
+    process.env.AUTH_KEYCLOAK_ISSUER || "http://localhost:8080";
+  NAMED_KEYCLOAK = KEYCLOAK_URL;
+  LOCAL_KEYCLOAK = KEYCLOAK_URL;
+}
+
+// Add /realms/master to the end of the URL if it's missing.
+NAMED_KEYCLOAK = addRealm(NAMED_KEYCLOAK);
+LOCAL_KEYCLOAK = addRealm(LOCAL_KEYCLOAK);
+
 export const { handlers, signIn, signOut, auth } = NextAuth({
-  ...authConfig,
+  secret: process.env.AUTH_SECRET,
+  trustHost: true,
+  basePath: "/api/auth",
+  providers: [
+    KeycloakProvider({
+      jwks_endpoint: `${NAMED_KEYCLOAK}/protocol/openid-connect/certs`,
+      wellKnown: undefined,
+      clientId: process.env.AUTH_KEYCLOAK_ID,
+      clientSecret: process.env.AUTH_KEYCLOAK_SECRET,
+      issuer: `${LOCAL_KEYCLOAK}`,
+      authorization: {
+        params: {
+          scope: "openid email profile",
+        },
+        url: `${LOCAL_KEYCLOAK}/protocol/openid-connect/auth`,
+      },
+      token: `${NAMED_KEYCLOAK}/protocol/openid-connect/token`,
+      userinfo: `${NAMED_KEYCLOAK}/protocol/openid-connect/userinfo`,
+    }),
+  ],
   callbacks: {
     /**
      * JWT callback to store Keycloak user data in the token.
@@ -25,12 +57,24 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           email: profile.email || "",
           firstName: profile.given_name || "",
           lastName: profile.family_name || "",
+          role: "",
         };
 
         // Ensure user is in the database **only on first login**
         try {
           await addUserIfNotExists(userToken);
         } catch (error) {}
+
+        if (userToken.username !== "") {
+          if (isDemoMode()) {
+            userToken.role = RoleTypeValues.SuperAdmin;
+          } else {
+            const role = await getUserRole(
+              userToken.username as string,
+            ).catch();
+            userToken.role = role;
+          }
+        }
 
         return { ...token, ...userToken };
       }
@@ -53,21 +97,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         firstName: typeof token.firstName === "string" ? token.firstName : "",
         lastName: typeof token.lastName === "string" ? token.lastName : "",
         emailVerified: null,
+        role: typeof token.role === "string" ? token.role : "",
       };
-
-      if (session.user.username) {
-        if (isDemoMode()) {
-          session.user.role = RoleTypeValues.SuperAdmin;
-        } else {
-          // ignore error and do not block sign in flow
-          const user = await getUserByUsername(
-            session.user.username as string,
-          ).catch();
-          session.user.role =
-            user?.totalItems > 0 ? user.items?.[0].qc_role : "";
-        }
-      }
-
       return session;
     },
   },

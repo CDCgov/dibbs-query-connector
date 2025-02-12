@@ -137,11 +137,9 @@ export async function getUsers(): Promise<QCResponse<User>> {
 /**
  * Retrieves all registered users in query connector
  * @param username user's username. Username must be unique.
- * @returns User record that has the username provided
+ * @returns The user's role or empty if the user is not found
  */
-export async function getUserByUsername(
-  username: string,
-): Promise<QCResponse<User>> {
+export async function getUserRole(username: string): Promise<string> {
   try {
     const selectUsersQuery = `
       SELECT username, qc_role, first_name, last_name
@@ -151,10 +149,9 @@ export async function getUserByUsername(
 
     const result = await dbClient.query(selectUsersQuery, [username]);
 
-    return {
-      totalItems: result.rowCount,
-      items: result.rows,
-    } as QCResponse<User>;
+    return result?.rowCount && result.rowCount > 0
+      ? result.rows?.[0].qc_role
+      : "";
   } catch (error) {
     console.error(error);
     throw error;

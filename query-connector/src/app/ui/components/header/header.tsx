@@ -9,6 +9,7 @@ import { metadata } from "@/app/shared/constants";
 import classNames from "classnames";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { RoleTypeValues } from "@/app/models/entities/user-management";
 
 /**
  * Produces the header.
@@ -48,16 +49,16 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
 
   const handleSignIn = () => {
     if (authDisabled) {
-      router.push(`/query`);
+      router.push(PAGES.QUERY);
     } else {
-      signIn("keycloak", { redirectTo: "/query" });
+      signIn("keycloak", { redirectTo: PAGES.QUERY });
     }
   };
   const handleSignOut = async () => {
     if (authDisabled) {
-      router.push(`/`);
+      router.push(PAGES.LANDING);
     } else {
-      await signOut({ redirectTo: "/" });
+      await signOut({ redirectTo: PAGES.LANDING });
     }
   };
 
@@ -65,7 +66,7 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
     setShowMenu(!showMenu);
   };
   // const isProduction = process.env.NODE_ENV === "production";
-  const landingPage = authDisabled || isLoggedIn ? "/query" : "/";
+  const landingPage = authDisabled || isLoggedIn ? PAGES.QUERY : PAGES.LANDING;
 
   return (
     <div className={styles.headerContainer}>
@@ -96,7 +97,7 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
               "flex-align-center",
             )}
           >
-            {!isLoggedIn && !LOGGED_IN_PATHS.includes(path) && (
+            {!isLoggedIn && !LOGGED_IN_PATHS.includes(path as PAGES) && (
               <Button
                 className={styles.signinButton}
                 type="button"
@@ -107,7 +108,7 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
                 Sign in
               </Button>
             )}
-            {LOGGED_IN_PATHS.includes(path) && (
+            {LOGGED_IN_PATHS.includes(path as PAGES) && (
               <button
                 onClick={toggleMenuDropdown}
                 className={classNames(
@@ -139,17 +140,20 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
               {/* {isProduction && ( */}
               <>
                 <li className={styles.subMenuItem}>
-                  <Link className={styles.menuItem} href={"/queryBuilding"}>
+                  <Link className={styles.menuItem} href={PAGES.MY_QUERIES}>
                     My Queries
                   </Link>
                 </li>
                 <li className={styles.subMenuItem}>
-                  <Link className={styles.menuItem} href={"/fhirServers"}>
+                  <Link className={styles.menuItem} href={PAGES.FHIR_SERVERS}>
                     FHIR Servers
                   </Link>
                 </li>
                 <li className={styles.subMenuItem}>
-                  <Link className={styles.menuItem} href={"/userManagement"}>
+                  <Link
+                    className={styles.menuItem}
+                    href={PAGES.USER_MANAGEMENT}
+                  >
                     User Management
                   </Link>
                 </li>
@@ -174,12 +178,41 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
   );
 };
 
+export enum PAGES {
+  LANDING = "/",
+  QUERY = "/query",
+  MY_QUERIES = "/queryBuilding",
+  FHIR_SERVERS = "/fhirServers",
+  USER_MANAGEMENT = "/userManagement",
+  GROUP_MANAGEMENT = "/userManagement/userGroups",
+}
+
 const LOGGED_IN_PATHS = [
-  "/query",
-  "/queryBuilding",
-  "/fhirServers",
-  "/userManagement",
-  "/userManagement/userGroups",
+  PAGES.QUERY,
+  PAGES.MY_QUERIES,
+  PAGES.FHIR_SERVERS,
+  PAGES.USER_MANAGEMENT,
+  PAGES.GROUP_MANAGEMENT,
+];
+
+const pagesRoleAccess: Record<string, RoleTypeValues[]> = {};
+pagesRoleAccess[PAGES.QUERY] = [
+  RoleTypeValues.SuperAdmin,
+  RoleTypeValues.Admin,
+  RoleTypeValues.Standard,
+];
+pagesRoleAccess[PAGES.MY_QUERIES] = [
+  RoleTypeValues.SuperAdmin,
+  RoleTypeValues.Admin,
+];
+pagesRoleAccess[PAGES.FHIR_SERVERS] = [
+  RoleTypeValues.SuperAdmin,
+  RoleTypeValues.Admin,
+];
+pagesRoleAccess[PAGES.USER_MANAGEMENT] = [RoleTypeValues.SuperAdmin];
+pagesRoleAccess[PAGES.GROUP_MANAGEMENT] = [
+  RoleTypeValues.SuperAdmin,
+  RoleTypeValues.Admin,
 ];
 
 export default HeaderComponent;
