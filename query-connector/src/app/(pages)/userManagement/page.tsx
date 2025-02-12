@@ -3,6 +3,10 @@
 import { useContext, useEffect, useState } from "react";
 import { Button } from "@trussworks/react-uswds";
 import classNames from "classnames";
+import { getUsers, updateUserRole } from "@/app/backend/user-management";
+import { QCResponse } from "@/app/models/responses/collections";
+import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
+import WithAuth from "@/app/ui/components/withAuth/WithAuth";
 import Table from "../../ui/designSystem/table/Table";
 import RoleDropdown from "./components/RoleDropdown";
 import { UserManagementContext } from "./components/UserManagementProvider";
@@ -11,19 +15,13 @@ import {
   User,
   UserGroup,
 } from "../../models/entities/user-management";
-import { getUsers, updateUserRole } from "@/app/backend/user-management";
-import { QCResponse } from "@/app/models/responses/collections";
-import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
-import { useSession } from "next-auth/react";
+import { PAGES, pagesRoleAccess } from "@/app/ui/components/header/header";
 
 /**
  * User section in the user management page
  * @returns Users table
  */
 const UserManagement: React.FC = () => {
-  const { data: session } = useSession();
-  console.log("user management session:", session);
-
   const { openEditSection } = useContext(UserManagementContext);
   const [users, setUsers] = useState<User[] | null>(null);
 
@@ -131,7 +129,7 @@ const UserManagement: React.FC = () => {
    * HTML
    */
   return (
-    <>
+    <WithAuth access={pagesRoleAccess[PAGES.USER_MANAGEMENT]}>
       <div
         className={classNames(
           "margin-x-3",
@@ -167,7 +165,7 @@ const UserManagement: React.FC = () => {
         </thead>
         <tbody>{renderUserRows(users)}</tbody>
       </Table>
-    </>
+    </WithAuth>
   );
 };
 

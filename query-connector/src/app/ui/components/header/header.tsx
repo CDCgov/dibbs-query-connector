@@ -195,7 +195,7 @@ const LOGGED_IN_PATHS = [
   PAGES.GROUP_MANAGEMENT,
 ];
 
-const pagesRoleAccess: Record<string, RoleTypeValues[]> = {};
+export const pagesRoleAccess: Record<string, RoleTypeValues[]> = {};
 pagesRoleAccess[PAGES.QUERY] = [
   RoleTypeValues.SuperAdmin,
   RoleTypeValues.Admin,

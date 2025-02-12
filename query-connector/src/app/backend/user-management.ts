@@ -129,7 +129,6 @@ export async function getUsers(): Promise<QCResponse<User>> {
       items: result.rows,
     } as QCResponse<User>;
   } catch (error) {
-    console.error(error);
     throw error;
   }
 }
@@ -153,7 +152,6 @@ export async function getUserRole(username: string): Promise<string> {
       ? result.rows?.[0].qc_role
       : "";
   } catch (error) {
-    console.error(error);
     throw error;
   }
 }
