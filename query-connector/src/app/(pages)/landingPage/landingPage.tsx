@@ -7,7 +7,7 @@ import {
 } from "@trussworks/react-uswds";
 import Link from "next/link";
 import Image from "next/image";
-import styles from "./landpingPage.module.scss";
+import styles from "./landingPage.module.scss";
 
 /**
  * The landing page for the TEFCA Viewer.
