@@ -1,27 +1,22 @@
-import { NextResponse, NextRequest } from "next/server";
 import {
-  UseCaseQuery,
-  UseCaseQueryRequest,
-  QueryResponse,
-  createBundle,
-  APIQueryResponse,
-} from "../../../query-service";
-import {
-  USE_CASES,
+  MISSING_API_QUERY_PARAM,
   USE_CASE_DETAILS,
   INVALID_FHIR_SERVERS,
-  INVALID_USE_CASE,
-  MISSING_API_QUERY_PARAM,
+  USE_CASES,
   MISSING_PATIENT_IDENTIFIERS,
-} from "../../../constants";
-
-import { handleRequestError } from "../error-handling-service";
+} from "@/app/shared/constants";
 import {
   getFhirServerNames,
   getSavedQueryByName,
-} from "@/app/database-service";
-import { unnestValueSetsFromQuery } from "@/app/utils";
-import { Message } from "node-hl7-client";
+} from "@/app/shared/database-service";
+import {
+  QueryResponse,
+  APIQueryResponse,
+  createBundle,
+} from "@/app/shared/query-service";
+import { unnestValueSetsFromQuery } from "@/app/shared/utils";
+import { NextRequest, NextResponse } from "next/server";
+import { handleRequestError } from "../error-handling-service";
 
 /**
  * Runs a query for a given use case and FHIR server. Patient demographics are provided
@@ -39,9 +34,6 @@ export async function POST(request: NextRequest) {
 
   if (!use_case || !fhir_server) {
     const OperationOutcome = await handleRequestError(MISSING_API_QUERY_PARAM);
-    return NextResponse.json(OperationOutcome);
-  } else if (!Object.keys(USE_CASE_DETAILS).includes(use_case)) {
-    const OperationOutcome = await handleRequestError(INVALID_USE_CASE);
     return NextResponse.json(OperationOutcome);
   } else if (!Object.values(fhirServers).includes(fhir_server)) {
     const OperationOutcome = await handleRequestError(INVALID_FHIR_SERVERS);

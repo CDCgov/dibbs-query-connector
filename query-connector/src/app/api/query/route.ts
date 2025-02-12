@@ -36,35 +36,52 @@ export async function GET() {
 
 /**
  * @swagger
- * /api/query:
+ * /api/query?{fhir_server}&{id}:
  *   post:
  *     description: Handles a POST request to query a given FHIR server for a given query. The id and fhir_server are provided as query parameters in the request URL. The request body contains the FHIR patient resource to be queried.
- *     consumes:
- *       - application/json
  *     parameters:
- *       - in: body
- *         name: queryInfo
- *         description: Information about the query we want to use.
+ *       - name: fhir_server
+ *         in: path
+ *         description: Name of the FHIR server to query
+ *         required: true
  *         schema:
- *           type: object
- *           required:
- *             - id
- *             - fhir_server
- *           properties:
- *             fhir_server:
- *               type: string
- *             id:
- *               type: string
- *             first_name:
- *               type: string
- *             last_name:
- *               type: string
- *             dob:
- *               type: string
- *             mrn:
- *               type: string
- *             phone:
- *               type: string
+ *           type: string
+ *       - name: id
+ *         in: path
+ *         description: ID of the query to use
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               given:
+ *                 type: string
+ *                 description: Patient given name
+ *               family:
+ *                 type: string
+ *                 description: Patient family name
+ *               dob:
+ *                 type: string
+ *                 description: Patient date of birth
+ *               mrn:
+ *                 type: string
+ *                 description: Patient Medical Record number
+ *               phone:
+ *                 type: string
+ *                 description: Patient phone number
+ *               resourceType:
+ *                 type: string
+ *                 description: The FHIR resource type
+ *             example:
+ *               given: "Lee"
+ *               family: "Shaw"
+ *               dob: "1975-12-06"
+ *               resourceType: "Patient"
  *     responses:
  *       200:
  *         description: The FHIR resources returned that match the information configured in the query referenced
@@ -72,7 +89,6 @@ export async function GET() {
  *         description: Missing patient identifiers
  *       500:
  *         description: Something went wrong :(
- * @param request - The incoming Next.js request object.
  * @returns Response with QueryResponse.
  */
 export async function POST(request: NextRequest) {
@@ -91,13 +107,14 @@ export async function POST(request: NextRequest) {
     }
   } catch (error: unknown) {
     let diagnostics_message = "An error occurred.";
+    console.error(error);
     if (error instanceof Error) {
       diagnostics_message = `${error.message}`;
     }
     const OperationOutcome = await handleRequestError(diagnostics_message);
-    return NextResponse.json(OperationOutcome);
+    return NextResponse.json(OperationOutcome, { status: 500 });
   }
-
+  console.log(requestBody);
   // Parse patient identifiers from requestBody
   PatientIdentifiers = await parsePatientDemographics(requestBody);
   // Check if PatientIdentifiers is empty or there was an error parsing patient identifiers
@@ -105,7 +122,7 @@ export async function POST(request: NextRequest) {
     const OperationOutcome = await handleRequestError(
       MISSING_PATIENT_IDENTIFIERS,
     );
-    return NextResponse.json(OperationOutcome);
+    return NextResponse.json(OperationOutcome, { status: 400 });
   }
 
   // Extract id and fhir_server from nextUrl
@@ -117,8 +134,9 @@ export async function POST(request: NextRequest) {
   const fhirServers = await getFhirServerNames();
 
   const id = id_param ? id_param : mapDeprecatedUseCaseToId(use_case_param);
+  const bodyParams = await request.formData();
 
-  if (!id || !fhir_server) {
+  if (!id || !fhir_server || !bodyParams) {
     const OperationOutcome = await handleRequestError(MISSING_API_QUERY_PARAM);
     return NextResponse.json(OperationOutcome, {
       status: 500,
@@ -139,18 +157,11 @@ export async function POST(request: NextRequest) {
     });
   }
 
-  const first_name = params.get("given") || "";
-  const last_name = params.get("family") || "";
-  const dob = params.get("dob") || "";
-  const mrn = params.get("mrn") || "";
-  const phone = params.get("phone") || "";
-
-  if (!first_name && !last_name && !dob && !mrn && !phone) {
-    const OperationOutcome = await handleRequestError(
-      MISSING_PATIENT_IDENTIFIERS,
-    );
-    return NextResponse.json(OperationOutcome, { status: 400 });
-  }
+  const first_name = bodyParams.get("given")?.toString() || "";
+  const last_name = bodyParams.get("family")?.toString() || "";
+  const dob = bodyParams.get("dob")?.toString() || "";
+  const mrn = bodyParams.get("mrn")?.toString() || "";
+  const phone = bodyParams.get("phone")?.toString() || "";
 
   // Add params & patient identifiers to QueryName
   const QueryRequest: QueryRequest = {
