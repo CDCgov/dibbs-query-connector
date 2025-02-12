@@ -38,7 +38,6 @@ const AuthPageGuard: React.FC<React.PropsWithChildren> = ({ children }) => {
  * @returns A wrapped component that displays its content  if the user is logged in and their role has access
  */
 export default function withAuth(WrappedComponent: any) {
-  /* eslint-disable  @typescript-eslint/no-explicit-any */
   return function authWrapper(props: any) {
     return (
       <AuthPageGuard>
@@ -47,3 +46,4 @@ export default function withAuth(WrappedComponent: any) {
     );
   };
 }
+/* eslint-enable  @typescript-eslint/no-explicit-any */
