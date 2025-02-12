@@ -28,9 +28,16 @@ const RoleDropdown: React.FC<RoleDropdownProps> = ({ id, defaultValue }) => {
       <Label htmlFor={selectId} className={classNames("usa-sr-only")}>
         User role
       </Label>
-      <select className="usa-select" value={defaultValue} id={selectId}>
+      <select
+        className="usa-select"
+        value={defaultValue}
+        id={selectId}
+        onChange={() => console.log("change value")}
+      >
         {roleOptions.map((option) => (
-          <option value={option.value}>{option.label}</option>
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
         ))}
       </select>
     </>

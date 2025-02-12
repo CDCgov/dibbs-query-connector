@@ -1,4 +1,4 @@
-import { Mode } from "@/app/shared/constants";
+import { Mode, PageType } from "@/app/shared/constants";
 import { Alert } from "@trussworks/react-uswds";
 
 export const CONTACT_US_DISCLAIMER_TEXT =
@@ -29,7 +29,7 @@ const piiDisclaimer = (
 );
 
 type SiteAlertProps = {
-  page?: Mode;
+  page?: PageType | string;
 };
 
 const PageModeToSiteAlertMap: { [page in Mode]?: React.ReactNode } = {
@@ -47,9 +47,11 @@ const PageModeToSiteAlertMap: { [page in Mode]?: React.ReactNode } = {
  * semantic context
  */
 const SiteAlert: React.FC<SiteAlertProps> = ({ page }) => {
+  const mappedAlert = PageModeToSiteAlertMap[page as Mode];
+
   return (
     <Alert type="info" headingLevel="h4" slim className="custom-alert">
-      {page ? PageModeToSiteAlertMap[page] : piiDisclaimer}
+      {mappedAlert ?? piiDisclaimer}
     </Alert>
   );
 };

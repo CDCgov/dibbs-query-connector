@@ -7,7 +7,8 @@ import {
   CONTACT_US_DISCLAIMER_EMAIL,
   CONTACT_US_DISCLAIMER_TEXT,
 } from "@/app/ui/designSystem/SiteAlert";
-import { TEST_PATIENT, TEST_PATIENT_NAME } from "./constants";
+import { TEST_PATIENT, TEST_PATIENT_NAME, showSiteAlert } from "./constants";
+import { checkForSiteAlert } from "./utils";
 
 test.describe("querying with the Query Connector", () => {
   test.beforeEach(async ({ page }) => {
@@ -44,11 +45,10 @@ test.describe("querying with the Query Connector", () => {
     await page.getByRole("link", { name: "Try it out" }).click();
 
     // Check that the info alert is visible and contains the correct text
-    const alert = page.locator(".custom-alert");
-    await expect(alert).toBeVisible();
-    await expect(alert).toHaveText(
-      "This site is for demo purposes only. Please do not enter PII on this website.",
-    );
+    if (showSiteAlert) {
+      await checkForSiteAlert(page);
+    }
+
     await expect(
       page.getByRole("heading", {
         name: PAGE_TITLES["search"].title,
@@ -107,11 +107,10 @@ test.describe("querying with the Query Connector", () => {
     ).toBeVisible();
 
     // Check that the info alert is visible and has updated to the correct text
-    const alert2 = page.locator(".custom-alert");
-    await expect(alert2).toBeVisible();
-    await expect(alert2).toHaveText(
-      `${CONTACT_US_DISCLAIMER_TEXT} ${CONTACT_US_DISCLAIMER_EMAIL}`,
-    );
+    if (showSiteAlert) {
+      const matchText = `${CONTACT_US_DISCLAIMER_TEXT} ${CONTACT_US_DISCLAIMER_EMAIL}`;
+      checkForSiteAlert(page, matchText);
+    }
 
     await expect(
       page.getByRole("button", { name: "Observations", expanded: true }),

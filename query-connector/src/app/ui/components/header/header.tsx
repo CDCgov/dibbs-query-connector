@@ -139,17 +139,29 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
               {/* {isProduction && ( */}
               <>
                 <li className={styles.subMenuItem}>
-                  <Link className={styles.menuItem} href={"/queryBuilding"}>
+                  <Link
+                    className={styles.menuItem}
+                    href={"/queryBuilding"}
+                    scroll={false}
+                  >
                     My Queries
                   </Link>
                 </li>
                 <li className={styles.subMenuItem}>
-                  <Link className={styles.menuItem} href={"/fhirServers"}>
+                  <Link
+                    className={styles.menuItem}
+                    href={"/fhirServers"}
+                    scroll={false}
+                  >
                     FHIR Servers
                   </Link>
                 </li>
                 <li className={styles.subMenuItem}>
-                  <Link className={styles.menuItem} href={"/userManagement"}>
+                  <Link
+                    className={styles.menuItem}
+                    href={"/userManagement"}
+                    scroll={false}
+                  >
                     User Management
                   </Link>
                 </li>

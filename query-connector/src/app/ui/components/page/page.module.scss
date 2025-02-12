@@ -1,0 +1,16 @@
+@use "../../styles/_variables" as *;
+
+.pageContainer {
+    display: flex;
+    flex: auto;
+    flex-direction: column;
+}
+
+.progressBar {
+    margin-top: $header-content-height;
+
+    &__alert {
+        @extend .progressBar;
+        margin-top: calc($header-content-height + $site-alert-height);
+    }
+}

@@ -17,9 +17,15 @@ describe("tests the query building steps", () => {
     (getCustomQueries as jest.Mock).mockResolvedValue([]);
 
     const mockSetData = jest.fn();
+    const mockSetCurrentPage = jest.fn();
+    const mockSetToatConfig = jest.fn();
     const mockContextValue = {
       data: undefined,
       setData: mockSetData,
+      currentPage: "/queryBuilding",
+      setCurrentPage: mockSetCurrentPage,
+      toastConfig: {},
+      setToastConfig: mockSetToatConfig,
     };
 
     render(
@@ -34,6 +40,7 @@ describe("tests the query building steps", () => {
     expect(screen.getByText("Start with Query Builder")).toBeInTheDocument();
     expect(screen.getByTestId("empty-state-container")).toMatchSnapshot();
   });
+
   it("renders the default state", async () => {
     (getCustomQueries as jest.Mock).mockResolvedValue(DEFAULT_QUERIES);
     (getConditionsData as jest.Mock).mockResolvedValue({
@@ -41,9 +48,15 @@ describe("tests the query building steps", () => {
     });
 
     const mockSetData = jest.fn();
+    const mockSetCurrentPage = jest.fn();
+    const mockSetToatConfig = jest.fn();
     const mockContextValue = {
       data: DEFAULT_QUERIES,
       setData: mockSetData,
+      currentPage: "/queryBuilding",
+      setCurrentPage: mockSetCurrentPage,
+      toastConfig: {},
+      setToastConfig: mockSetToatConfig,
     };
 
     render(

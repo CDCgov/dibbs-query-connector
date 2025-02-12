@@ -45,6 +45,7 @@ const TabGroup: React.FC<TabGroupProps> = ({ tabs }) => {
       {tabs.map((tab) => {
         return (
           <Link
+            data-prevent-nprogress={true} // don't show loading bar when switching between tabs
             key={tab.label}
             className={classNames(
               "display-inline-block",

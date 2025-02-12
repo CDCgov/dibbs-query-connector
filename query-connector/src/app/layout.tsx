@@ -4,7 +4,7 @@ import Footer from "./ui/components/footer/footer";
 import { SessionProvider } from "next-auth/react";
 import DataProvider from "./shared/DataProvider";
 import { Metadata } from "next";
-
+import Page from "./ui/components/page/page";
 /**
  * Establishes the layout for the application.
  * @param props - Props for the component.
@@ -22,7 +22,11 @@ export default function RootLayout({
         <body>
           <div className="application-container">
             <Header authDisabled={process.env.AUTH_DISABLED === "true"} />
-            <DataProvider>{children}</DataProvider>
+            <DataProvider>
+              <Page showSiteAlert={process.env.DEMO_MODE === "true"}>
+                {children}
+              </Page>
+            </DataProvider>
             <Footer />
           </div>
         </body>

@@ -12,9 +12,15 @@ describe("tests the query building steps", () => {
     (getCustomQueries as jest.Mock).mockResolvedValue([]);
 
     const mockSetData = jest.fn();
+    const mockSetCurrentPage = jest.fn();
+    const mockSetToatConfig = jest.fn();
     const mockContextValue = {
       data: [],
       setData: mockSetData,
+      currentPage: "/",
+      setCurrentPage: mockSetCurrentPage,
+      toastConfig: {},
+      setToastConfig: mockSetToatConfig,
     };
 
     render(
