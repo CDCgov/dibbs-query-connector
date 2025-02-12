@@ -6,7 +6,7 @@ import classNames from "classnames";
 import { getUsers, updateUserRole } from "@/app/backend/user-management";
 import { QCResponse } from "@/app/models/responses/collections";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
-import WithAuth from "@/app/ui/components/withAuth/WithAuth";
+import withAuth from "@/app/ui/components/withAuth/WithAuth";
 import Table from "../../ui/designSystem/table/Table";
 import RoleDropdown from "./components/RoleDropdown";
 import { UserManagementContext } from "./components/UserManagementProvider";
@@ -15,7 +15,6 @@ import {
   User,
   UserGroup,
 } from "../../models/entities/user-management";
-import { PAGES, pagesRoleAccess } from "@/app/ui/components/header/header";
 
 /**
  * User section in the user management page
@@ -129,7 +128,7 @@ const UserManagement: React.FC = () => {
    * HTML
    */
   return (
-    <WithAuth access={pagesRoleAccess[PAGES.USER_MANAGEMENT]}>
+    <>
       <div
         className={classNames(
           "margin-x-3",
@@ -165,8 +164,8 @@ const UserManagement: React.FC = () => {
         </thead>
         <tbody>{renderUserRows(users)}</tbody>
       </Table>
-    </WithAuth>
+    </>
   );
 };
 
-export default UserManagement;
+export default withAuth(UserManagement);
