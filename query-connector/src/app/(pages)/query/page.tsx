@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { FhirQueryResponse } from "../../shared/query-service";
 import ResultsView from "./components/ResultsView";
 import PatientSearchResults from "./components/PatientSearchResults";
@@ -7,12 +7,10 @@ import SearchForm from "./components/searchForm/SearchForm";
 import SelectQuery from "./components/SelectQuery";
 import { DEFAULT_DEMO_FHIR_SERVER, Mode } from "../../shared/constants";
 import LoadingView from "../../ui/designSystem/LoadingView";
-
-import "react-toastify/dist/ReactToastify.min.css";
 import StepIndicator, {
   CUSTOMIZE_QUERY_STEPS,
 } from "./components/stepIndicator/StepIndicator";
-import SiteAlert from "../../ui/designSystem/SiteAlert";
+import { DataContext } from "@/app/shared/DataProvider";
 import { Patient } from "fhir/r4";
 import { getFhirServerNames } from "@/app/shared/database-service";
 import { CustomUserQuery } from "../../shared/constants";
@@ -38,12 +36,19 @@ const Query: React.FC = () => {
     DEFAULT_DEMO_FHIR_SERVER,
   );
   const [fhirServers, setFhirServers] = useState<string[]>([]);
+  const ctx = useContext(DataContext);
 
   useEffect(() => {
     getFhirServerNames().then((servers) => {
       setFhirServers(servers);
     });
   }, []);
+
+  // update the current page details when switching between modes,
+  // so the SiteAlert displays the correct content
+  useEffect(() => {
+    ctx?.setCurrentPage(mode);
+  }, [mode]);
 
   const [patientDiscoveryQueryResponse, setPatientDiscoveryQueryResponse] =
     useState<FhirQueryResponse>({});
@@ -62,8 +67,7 @@ const Query: React.FC = () => {
     results: "main-container__wide",
   };
   return (
-    <div className="main-body">
-      <SiteAlert page={mode} />
+    <>
       {Object.keys(CUSTOMIZE_QUERY_STEPS).includes(mode) &&
         !showCustomizeQuery && (
           <StepIndicator
@@ -128,7 +132,7 @@ const Query: React.FC = () => {
         )}
         {loading && <LoadingView loading={loading} />}
       </div>
-    </div>
+    </>
   );
 };
 

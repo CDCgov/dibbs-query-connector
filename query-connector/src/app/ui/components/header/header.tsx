@@ -140,12 +140,20 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
               {/* {isProduction && ( */}
               <>
                 <li className={styles.subMenuItem}>
-                  <Link className={styles.menuItem} href={PAGES.MY_QUERIES}>
+                  <Link
+                    className={styles.menuItem}
+                    href={PAGES.MY_QUERIES}
+                    scroll={false}
+                  >
                     My Queries
                   </Link>
                 </li>
                 <li className={styles.subMenuItem}>
-                  <Link className={styles.menuItem} href={PAGES.FHIR_SERVERS}>
+                  <Link
+                    className={styles.menuItem}
+                    href={PAGES.FHIR_SERVERS}
+                    scroll={false}
+                  >
                     FHIR Servers
                   </Link>
                 </li>
@@ -153,6 +161,7 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
                   <Link
                     className={styles.menuItem}
                     href={PAGES.USER_MANAGEMENT}
+                    scroll={false}
                   >
                     User Management
                   </Link>
