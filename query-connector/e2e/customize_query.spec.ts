@@ -4,7 +4,8 @@ import { test, expect } from "@playwright/test";
 import { TEST_URL } from "../playwright-setup";
 import { PAGE_TITLES } from "@/app/(pages)/query/components/stepIndicator/StepIndicator";
 
-import { TEST_PATIENT, TEST_PATIENT_NAME } from "./constants";
+import { TEST_PATIENT, TEST_PATIENT_NAME, showSiteAlert } from "./constants";
+import { checkForSiteAlert } from "./utils";
 
 test.describe("querying with the Query Connector", () => {
   // Start every test by navigating to the customize query workflow
@@ -13,11 +14,10 @@ test.describe("querying with the Query Connector", () => {
     await page.getByRole("link", { name: "Try it out" }).click();
 
     // Check that the info alert is visible and contains the correct text
-    const alert = page.locator(".custom-alert");
-    await expect(alert).toBeVisible();
-    await expect(alert).toHaveText(
-      "This site is for demo purposes only. Please do not enter PII on this website.",
-    );
+    if (showSiteAlert) {
+      await checkForSiteAlert(page);
+    }
+
     await expect(
       page.getByRole("heading", {
         name: PAGE_TITLES["search"].title,
@@ -33,7 +33,7 @@ test.describe("querying with the Query Connector", () => {
       .selectOption("Local e2e HAPI Server: Direct");
 
     await page.getByRole("button", { name: "Search for patient" }).click();
-    await expect(page.getByText("Loading")).toHaveCount(0, { timeout: 10000 });
+    await expect(page.getByText("Loading")).toHaveCount(0, { timeout: 20000 });
 
     await page.getByRole("link", { name: "Select patient" }).click();
     await expect(

@@ -43,7 +43,7 @@ export const UserManagementContext = createContext<UserManagementContext>({
   ...initData,
   openEditSection: () => {},
   closeEditSection: () => {},
-  handleSearch: (searchFilter: string) => {},
+  handleSearch: (_searchFilter: string) => {},
   handleMemberUpdate: () => {},
   handleQueryUpdate: () => {},
 });
@@ -105,7 +105,7 @@ const DataProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
 
   function handleSearch(filter: string) {
     // TODO data filtering
-    console.log("filtering ...");
+    console.log("filtering ...", filter);
   }
 
   function handleMemberUpdate() {
@@ -120,13 +120,13 @@ const DataProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
    * Data fetching
    */
 
-  function getTeamMembers(teamId: string): unknown {
+  function getTeamMembers(_teamId: string): unknown {
     // TODO retrieve member data
     const ListOfMembers = ["Member 1", "Member 2", "Member 3"];
     return ListOfMembers;
   }
 
-  function getTeamQueries(teamId: string): unknown {
+  function getTeamQueries(_teamId: string): unknown {
     // TODO retrieve queries data
     const ListOfQueries = ["Query 1", "Query 2", "Query 3"];
     return ListOfQueries;

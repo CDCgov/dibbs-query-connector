@@ -26,7 +26,6 @@ import {
 } from "../utils";
 import { ConditionSelection } from "../components/ConditionSelection";
 import { ValueSetSelection } from "../components/ValueSetSelection";
-import SiteAlert from "@/app/ui/designSystem/SiteAlert";
 import {
   BuildStep,
   DibbsConceptType,
@@ -292,7 +291,6 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
 
   return (
     <>
-      <SiteAlert />
       <div className={classNames("main-container__wide", styles.mainContainer)}>
         {buildStep === "valueset" ? (
           <Backlink
