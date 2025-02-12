@@ -35,9 +35,15 @@ jest.mock("../../../backend/query-building", () => ({
   getSavedQueryById: jest.fn(),
 }));
 const mockSetData = jest.fn();
+const mockSetCurrentPage = jest.fn();
+const mockSetToatConfig = jest.fn();
 const mockContextValue = {
   data: DEFAULT_QUERIES,
   setData: mockSetData,
+  currentPage: "/",
+  setCurrentPage: mockSetCurrentPage,
+  toastConfig: {},
+  setToastConfig: mockSetToatConfig,
 };
 
 const GONORREHEA_ID = 15628003;
