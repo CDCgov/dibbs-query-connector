@@ -15,7 +15,7 @@ test.describe("querying with the Query Connector", () => {
 
     // Check that the info alert is visible and contains the correct text
     if (showSiteAlert) {
-      await checkForSiteAlert(page)
+      await checkForSiteAlert(page);
     }
 
     await expect(

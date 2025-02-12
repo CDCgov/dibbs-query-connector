@@ -46,7 +46,7 @@ test.describe("querying with the Query Connector", () => {
 
     // Check that the info alert is visible and contains the correct text
     if (showSiteAlert) {
-      await checkForSiteAlert(page)
+      await checkForSiteAlert(page);
     }
 
     await expect(
@@ -107,12 +107,9 @@ test.describe("querying with the Query Connector", () => {
     ).toBeVisible();
 
     // Check that the info alert is visible and has updated to the correct text
-     if (showSiteAlert) {
-      const matchText = `${CONTACT_US_DISCLAIMER_TEXT} ${CONTACT_US_DISCLAIMER_EMAIL}`
-      checkForSiteAlert(
-        page, 
-        matchText,
-      )
+    if (showSiteAlert) {
+      const matchText = `${CONTACT_US_DISCLAIMER_TEXT} ${CONTACT_US_DISCLAIMER_EMAIL}`;
+      checkForSiteAlert(page, matchText);
     }
 
     await expect(
