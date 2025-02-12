@@ -4,22 +4,18 @@ import { test, expect } from "@playwright/test";
 import { TEST_URL } from "../playwright-setup";
 import { PAGE_TITLES } from "@/app/(pages)/query/components/stepIndicator/StepIndicator";
 
-import { TEST_PATIENT, TEST_PATIENT_NAME } from "./constants";
+import { TEST_PATIENT, TEST_PATIENT_NAME, showSiteAlert } from "./constants";
+import { checkForSiteAlert } from "./utils";
 
 test.describe("querying with the Query Connector", () => {
   // Start every test by navigating to the customize query workflow
   test.beforeEach(async ({ page }) => {
-    const showSiteAlert = process.env.DEMO_MODE === "true";
     await page.goto(TEST_URL);
     await page.getByRole("link", { name: "Try it out" }).click();
 
     // Check that the info alert is visible and contains the correct text
     if (showSiteAlert) {
-      const alert = page.getByTestId("alert");
-      await expect(alert).toBeVisible();
-      await expect(alert).toHaveText(
-        "This site is for demo purposes only. Please do not enter PII on this website.",
-      );
+      await checkForSiteAlert(page)
     }
 
     await expect(
