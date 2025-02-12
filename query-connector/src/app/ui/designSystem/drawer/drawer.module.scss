@@ -7,6 +7,7 @@ $drawerWidth: 30%;
   top: 0;
   right: -35rem;
   width: $drawerWidth;
+  max-width: 35rem;
   height: 100%;
   padding: 0rem;
   display: flex;
@@ -21,7 +22,7 @@ $drawerWidth: 30%;
   overflow: scroll;
   max-height: 100%;
 
-  input[type="search"]{
+  input[type="search"] {
     display: flex;
     padding: 0.75rem 0.75rem 0.75rem 2.25rem !important;
     align-items: center;

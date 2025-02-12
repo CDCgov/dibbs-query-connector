@@ -40,14 +40,16 @@ const Page: React.FC<PageProps> = ({ children, showSiteAlert }) => {
   const templateString = `<div class="bar ${
     showSiteAlert ? styles.progressBar__alert : styles.progressBar
   }"role="bar"></div>`;
+
+  const toastOptions = ctx?.toastConfig ?? toastDefault;
   return (
     <>
       {showSiteAlert && <SiteAlert page={ctx?.currentPage} />}
       <div className={styles.pageContainer}>
         <ToastContainer
-          position={toastDefault.position}
-          stacked={toastDefault.stacked}
-          hideProgressBar={toastDefault.hideProgressBar}
+          position={toastOptions.position}
+          stacked={toastOptions.stacked}
+          hideProgressBar={toastOptions.hideProgressBar}
           icon={false}
         />
         <ProgressBar
