@@ -20,10 +20,10 @@ export function isAuthDisabled(): boolean {
 }
 
 /**
- * Retrieves the logged user. Will only contain the information retrieved from the IDP
+ * Retrieves the logged in user. Will only contain the information retrieved from the IDP
  * @returns User object in the session or undefined if there is no active session
  */
-export async function getLoggedUser(): Promise<User | undefined> {
+export async function getLoggedInUser(): Promise<User | undefined> {
   const session = await auth();
 
   return session ? session.user : undefined;
@@ -34,7 +34,7 @@ export async function getLoggedUser(): Promise<User | undefined> {
  * @returns true if there is an session and the user has a super admin role
  */
 export async function superAdminAccessCheck(): Promise<boolean> {
-  const user = await getLoggedUser();
+  const user = await getLoggedInUser();
 
   if (
     isAuthDisabled() ||
