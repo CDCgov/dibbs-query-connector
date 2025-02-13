@@ -39,6 +39,9 @@ jobs:
       source_b_status: ${{ steps.check_b_status.outputs.status }}
 
     steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
       - name: Check CD Status
         id: check_a_status
         env:
@@ -54,7 +57,7 @@ jobs:
 
           echo "CD workflow completed successfully."
 
-      - name: Check Keycloak Status (if it exists)
+      - name: Check Keycloak Status
         id: check_b_status
         env:
           GH_TOKEN: ${{ github.token }}
