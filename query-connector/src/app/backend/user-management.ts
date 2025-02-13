@@ -81,6 +81,11 @@ export async function updateUserRole(
   username: string,
   newRole: RoleTypeValues,
 ): Promise<QCResponse<User>> {
+  if (!(await superAdminAccessCheck())) {
+    console.log("this method should fail");
+    throw new Error("Unauthorized");
+  }
+
   // TODO uncomment id check after it has been added to the table
   if (/*!id ||*/ !username || !newRole) {
     console.error("Invalid input: id, username, and newRole are required.");
@@ -117,7 +122,7 @@ export async function updateUserRole(
  * @returns List of users registered in qc
  */
 export async function getUsers(): Promise<QCResponse<User>> {
-  if (!superAdminAccessCheck()) {
+  if (!(await superAdminAccessCheck())) {
     throw new Error("Unauthorized");
   }
 

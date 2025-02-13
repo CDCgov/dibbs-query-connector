@@ -44,5 +44,6 @@ export async function superAdminAccessCheck(): Promise<boolean> {
   ) {
     return true;
   }
+
   return false;
 }
