@@ -41,7 +41,18 @@ jobs:
     steps:
       - name: Check CD Status
         id: check_a_status
-        run: echo "status=success" >> $GITHUB_OUTPUT
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          echo "Checking if CD has ran."
+          response=$(gh run list --workflow "CD" --branch $GITHUB_REF_NAME --json status --jq '.[0]')
+
+          if [ "$response" = "failure" ] || [ "$response" = "cancelled" ]; then
+            echo "CD workflow failed or was cancelled."
+            exit 1
+          fi
+
+          echo "CD workflow completed successfully."
 
       - name: Check Keycloak Status (if it exists)
         id: check_b_status
@@ -50,11 +61,13 @@ jobs:
         run: |
           echo "Checking if Keycloak has ran."
           response=$(gh run list --workflow "Build Keycloak" --branch $GITHUB_REF_NAME --json status --jq '.[0]')
-          if [ "$response" = "null" ]; then
-            echo "status=skipped" >> $GITHUB_OUTPUT
-          else
-            echo "status=success" >> $GITHUB_OUTPUT
+
+          if [ "$response" != "success" ] && [ "$response" != "skipped" ]; then
+            echo "CD workflow did not succeed or was not skipped. Status: $status"
+            exit 1
           fi
+
+          echo "CD workflow status is $response."
 
   terraform:
     needs: check-dependencies
