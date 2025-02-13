@@ -82,7 +82,7 @@ jobs:
         # ./terraform/implementation/dev || ./terraform/implementation/prod for example
         # this practice is recommended to keep the terraform code organized while reducing the risk of conflicts
         working-directory: ./terraform/implementation/ecs
-    if: needs.check-dependencies.outputs.source_a_status == 'success' && needs.check-dependencies.outputs.source_b_status != 'failure'
+    if: needs.check-dependencies.outputs.source_a_status != 'failure' && needs.check-dependencies.outputs.source_b_status != 'failure'
 
     steps:
       - name: Check Out Changes
