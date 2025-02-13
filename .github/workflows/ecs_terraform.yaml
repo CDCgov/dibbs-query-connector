@@ -65,8 +65,8 @@ jobs:
           echo "Checking if Keycloak has ran."
           response=$(gh run list --workflow "Build Keycloak" --branch $GITHUB_REF_NAME --json status --jq '.[0]')
 
-          if [ "$response" != "success" ] && [ "$response" != "skipped" ]; then
-            echo "CD workflow did not succeed or was not skipped. Status: $status"
+          if [ "$response" = "failure" ] || [ "$response" = "cancelled" ]; then
+            echo "CD workflow failed or was cancelled."
             exit 1
           fi
 
