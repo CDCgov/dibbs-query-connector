@@ -4,7 +4,7 @@ import { getDbClient } from "./dbClient";
 const dbClient = getDbClient();
 
 /**
- * Adds a user to the user_management table if they do not already exist.
+ * Adds a user to the users table if they do not already exist.
  * Uses data extracted from the JWT token.
  * @param userToken - The user data from the JWT token.
  * @param userToken.id - The user ID from the JWT token.
@@ -30,25 +30,25 @@ export async function addUserIfNotExists(userToken: {
   const userIdentifier = username || email;
 
   try {
-    console.log("Checking if user exists:", id);
+    console.log("Checking if user exists.");
 
-    const checkUserQuery = `SELECT username FROM user_management WHERE username = $1;`;
+    const checkUserQuery = `SELECT id, username FROM users WHERE username = $1;`;
     const userExists = await dbClient.query(checkUserQuery, [userIdentifier]);
 
     if (userExists.rows.length > 0) {
-      console.log("User already exists in user_management:", id);
-      return userExists.rows[0];
+      console.log("User already exists in users:", userExists.rows[0].id);
+      return userExists.rows[0]; // Return existing user
     }
 
-    console.log("User not found. Proceeding to insert:", id);
+    console.log("User not found. Proceeding to insert.");
 
-    // Default role when adding a new user, which includer Super Admin, Admin, and Standard User.
+    // Default role when adding a new user, which includes Super Admin, Admin, and Standard User.
     const qc_role = "Standard User";
 
     const insertUserQuery = `
-      INSERT INTO user_management (username, qc_role, first_name, last_name)
+      INSERT INTO users (username, qc_role, first_name, last_name)
       VALUES ($1, $2, $3, $4)
-      RETURNING username, qc_role, first_name, last_name;
+      RETURNING id, username, qc_role, first_name, last_name;
     `;
 
     const result = await dbClient.query(insertUserQuery, [
@@ -58,42 +58,37 @@ export async function addUserIfNotExists(userToken: {
       lastName,
     ]);
 
-    console.log("User added to user_management", id);
+    console.log("User added to users:", result.rows[0].id);
     return result.rows[0];
   } catch (error) {
-    console.error("Error adding user to user_management:", error);
+    console.error("Error adding user to users:", error);
     throw error;
   }
 }
 
 /**
- * Updates the role of an existing user in the user_management table.
- * @param id - The user ID from the JWT token.
- * @param username - The username of the user whose role is being updated.
+ * Updates the role of an existing user in the users table.
+ * @param id - The user ID.
  * @param newRole - The new role to assign to the user.
  * @returns The updated user record or an error if the update fails.
  */
-export async function updateUserRole(
-  id: string,
-  username: string,
-  newRole: string,
-) {
-  if (!id || !username || !newRole) {
-    console.error("Invalid input: id, username, and newRole are required.");
-    throw new Error("User ID, username, and new role are required.");
+export async function updateUserRole(id: string, newRole: string) {
+  if (!id || !newRole) {
+    console.error("Invalid input: id and newRole are required.");
+    throw new Error("User ID and new role are required.");
   }
 
   try {
-    console.log(`Updating role for user: ${id} to ${newRole}`);
+    console.log(`Updating role for user ID: ${id} to ${newRole}`);
 
     const updateQuery = `
-      UPDATE user_management
+      UPDATE users
       SET qc_role = $1
-      WHERE username = $2
-      RETURNING username, qc_role, first_name, last_name;
+      WHERE id = $2
+      RETURNING id, username, qc_role, first_name, last_name;
     `;
 
-    const result = await dbClient.query(updateQuery, [newRole, username]);
+    const result = await dbClient.query(updateQuery, [newRole, id]);
 
     if (result.rows.length === 0) {
       console.error(`User not found: ${id}`);
