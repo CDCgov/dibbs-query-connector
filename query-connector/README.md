@@ -118,6 +118,10 @@ Our e2e's are available locally via `npm run test:playwright:local`. You'll need
 
 For flows that do queries to a FHIR server (ie `/query`), you'll need to use a DB utility to change the address of the local E2E server to whatever localhost port your dev HAPI server is living at. If you have questions, reach out to another eng on the team.
 
+### Query Connector ERD
+
+![Query Connector Database Structure](public/Query%20Connector%20ERD.drawio.svg)
+
 ### Architecture Diagram
 
 ```mermaid
