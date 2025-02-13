@@ -2,6 +2,7 @@
 
 import { RoleTypeValues, User } from "../models/entities/user-management";
 import { QCResponse } from "../models/responses/collections";
+import { superAdminAccessCheck } from "../utils/auth";
 import { getDbClient } from "./dbClient";
 const dbClient = getDbClient();
 
@@ -116,6 +117,10 @@ export async function updateUserRole(
  * @returns List of users registered in qc
  */
 export async function getUsers(): Promise<QCResponse<User>> {
+  if (!superAdminAccessCheck()) {
+    throw new Error("Unauthorized");
+  }
+
   try {
     const selectAllUsersQuery = `
       SELECT username, qc_role, first_name, last_name
@@ -124,6 +129,7 @@ export async function getUsers(): Promise<QCResponse<User>> {
     `;
 
     const result = await dbClient.query(selectAllUsersQuery);
+
     return {
       totalItems: result.rowCount,
       items: result.rows,

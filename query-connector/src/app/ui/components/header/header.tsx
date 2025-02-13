@@ -9,7 +9,7 @@ import { metadata } from "@/app/shared/constants";
 import classNames from "classnames";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { RoleTypeValues } from "@/app/models/entities/user-management";
+import { LOGGED_IN_PATHS, PAGES } from "@/app/shared/page-routes";
 
 /**
  * Produces the header.
@@ -186,42 +186,5 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
     </div>
   );
 };
-
-export enum PAGES {
-  LANDING = "/",
-  QUERY = "/query",
-  MY_QUERIES = "/queryBuilding",
-  FHIR_SERVERS = "/fhirServers",
-  USER_MANAGEMENT = "/userManagement",
-  GROUP_MANAGEMENT = "/userManagement/userGroups",
-}
-
-const LOGGED_IN_PATHS = [
-  PAGES.QUERY,
-  PAGES.MY_QUERIES,
-  PAGES.FHIR_SERVERS,
-  PAGES.USER_MANAGEMENT,
-  PAGES.GROUP_MANAGEMENT,
-];
-
-export const pagesRoleAccess: Record<string, RoleTypeValues[]> = {};
-pagesRoleAccess[PAGES.QUERY] = [
-  RoleTypeValues.SuperAdmin,
-  RoleTypeValues.Admin,
-  RoleTypeValues.Standard,
-];
-pagesRoleAccess[PAGES.MY_QUERIES] = [
-  RoleTypeValues.SuperAdmin,
-  RoleTypeValues.Admin,
-];
-pagesRoleAccess[PAGES.FHIR_SERVERS] = [
-  RoleTypeValues.SuperAdmin,
-  RoleTypeValues.Admin,
-];
-pagesRoleAccess[PAGES.USER_MANAGEMENT] = [RoleTypeValues.SuperAdmin];
-pagesRoleAccess[PAGES.GROUP_MANAGEMENT] = [
-  RoleTypeValues.SuperAdmin,
-  RoleTypeValues.Admin,
-];
 
 export default HeaderComponent;
