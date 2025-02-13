@@ -140,7 +140,7 @@ export async function getUsers(): Promise<QCResponse<User>> {
 }
 
 /**
- * Retrieves all registered users in query connector
+ * Retrieves a user's role
  * @param username user's username. Username must be unique.
  * @returns The user's role or empty if the user is not found
  */

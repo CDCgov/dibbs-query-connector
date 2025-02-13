@@ -6,7 +6,6 @@ import classNames from "classnames";
 import { getUsers, updateUserRole } from "@/app/backend/user-management";
 import { QCResponse } from "@/app/models/responses/collections";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
-import withAuth from "@/app/ui/components/withAuth/WithAuth";
 import Table from "../../ui/designSystem/table/Table";
 import RoleDropdown from "./components/RoleDropdown";
 import { UserManagementContext } from "./components/UserManagementProvider";
@@ -168,4 +167,4 @@ const UserManagement: React.FC = () => {
   );
 };
 
-export default withAuth(UserManagement);
+export default UserManagement;
