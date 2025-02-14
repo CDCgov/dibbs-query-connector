@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
-import { useSession, signIn } from "next-auth/react";
+import { useSession, signIn, signOut } from "next-auth/react";
 import { Button, Icon } from "@trussworks/react-uswds";
 import styles from "./header.module.scss";
 import { metadata } from "@/app/shared/constants";
@@ -43,7 +43,6 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
 
   const path = usePathname();
 
-  // To readd this once we fix sign in
   const { data: session } = useSession();
   const isLoggedIn = session?.user != null;
 
@@ -54,12 +53,19 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
       signIn("keycloak", { redirectTo: "/query" });
     }
   };
+  const handleSignOut = async () => {
+    if (authDisabled) {
+      router.push(`/`);
+    } else {
+      await signOut({ redirectTo: "/" });
+    }
+  };
 
   const toggleMenuDropdown = () => {
     setShowMenu(!showMenu);
   };
   // const isProduction = process.env.NODE_ENV === "production";
-  const landingPage = "/";
+  const landingPage = authDisabled || isLoggedIn ? "/query" : "/";
 
   return (
     <div className={styles.headerContainer}>
@@ -123,41 +129,69 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
             )}
           </div>
         </div>
+        {showMenu && (
+          <div ref={menuRef} className={styles.menuDropdownContainer}>
+            <ul
+              id="dropdown-menu"
+              className={classNames("usa-nav__submenu", styles.menuDropdown)}
+            >
+              {/* TODO: Enable this once we can show/hide rules based on actual auth status */}
+              {/* {isProduction && ( */}
+              <>
+                <li className={styles.subMenuItem}>
+                  <Link
+                    className={styles.menuItem}
+                    href={"/queryBuilding"}
+                    scroll={false}
+                  >
+                    My Queries
+                  </Link>
+                </li>
+                <li className={styles.subMenuItem}>
+                  <Link
+                    className={styles.menuItem}
+                    href={"/fhirServers"}
+                    scroll={false}
+                  >
+                    FHIR Servers
+                  </Link>
+                </li>
+                <li className={styles.subMenuItem}>
+                  <Link
+                    className={styles.menuItem}
+                    href={"/userManagement"}
+                    scroll={false}
+                  >
+                    User Management
+                  </Link>
+                </li>
+                <li className={styles.subMenuItem}>
+                  <button
+                    className={classNames(
+                      styles.menuItem,
+                      "usa-button--unstyled",
+                    )}
+                    onClick={async () => await handleSignOut()}
+                  >
+                    Log out
+                  </button>
+                </li>
+              </>
+              {/* )} */}
+            </ul>
+          </div>
+        )}
       </header>
-
-      {showMenu && (
-        <div ref={menuRef} className={styles.menuDropdownContainer}>
-          <ul
-            id="dropdown-menu"
-            className={`usa-nav__submenu ${styles.menuDropdown}`}
-          >
-            {/* TODO: Enable this once we can show/hide rules based on actual auth status */}
-            {/* {isProduction && ( */}
-            <>
-              <li className={styles.subMenuItem}>
-                <Link className={styles.menuItem} href={"/queryBuilding"}>
-                  My queries
-                </Link>
-              </li>
-              <li className={styles.subMenuItem}>
-                <Link className={styles.menuItem} href={"/fhir-servers"}>
-                  FHIR Servers
-                </Link>
-              </li>
-              <li className={styles.subMenuItem}>
-                <Link className={styles.menuItem} href={landingPage}>
-                  Log out
-                </Link>
-              </li>
-            </>
-            {/* )} */}
-          </ul>
-        </div>
-      )}
     </div>
   );
 };
 
-const LOGGED_IN_PATHS = ["/query", "/queryBuilding", "/fhir-servers"];
+const LOGGED_IN_PATHS = [
+  "/query",
+  "/queryBuilding",
+  "/fhirServers",
+  "/userManagement",
+  "/userManagement/userGroups",
+];
 
 export default HeaderComponent;

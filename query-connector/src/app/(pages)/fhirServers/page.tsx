@@ -13,7 +13,6 @@ import { FhirServerConfig } from "../../shared/constants";
 import type { ModalRef } from "../../ui/designSystem/modal/Modal";
 import styles from "./fhirServers.module.scss";
 import classNames from "classnames";
-import SiteAlert from "../../ui/designSystem/SiteAlert";
 import Table from "../../ui/designSystem/table/Table";
 import Checkbox from "../../ui/designSystem/checkbox/Checkbox";
 
@@ -267,12 +266,12 @@ const FhirServers: React.FC = () => {
 
   return (
     <>
-      <SiteAlert />
       <div className={classNames("main-container__wide", styles.mainContainer)}>
         <div
           className={classNames(
             "grid-container grid-row padding-0",
             styles.titleContainer,
+            "margin-bottom-4",
           )}
         >
           <h1 className="page-title grid-col-10">FHIR server configuration</h1>
@@ -286,9 +285,9 @@ const FhirServers: React.FC = () => {
           </div>
         </div>
 
-        <Table className="margin-top-4">
+        <Table fullWidth>
           <thead>
-            <tr className={styles.fhirServersRow}>
+            <tr>
               <th>FHIR server</th>
               <th>URL</th>
               <th>Status</th>
@@ -298,14 +297,11 @@ const FhirServers: React.FC = () => {
             {fhirServers.map((fhirServer) => (
               <tr
                 key={fhirServer.id}
-                className={classNames(
-                  styles.fhirServersRow,
-                  styles.tableRowHover,
-                )}
+                className={classNames(styles.tableRowHover)}
               >
                 <td>{fhirServer.name}</td>
                 <td>{fhirServer.hostname}</td>
-                <td>
+                <td width={480}>
                   <div className="grid-container grid-row padding-0 display-flex flex-align-center">
                     {fhirServer.last_connection_successful ? (
                       <>
@@ -345,7 +341,7 @@ const FhirServers: React.FC = () => {
                       onClick={() => handleOpenModal("edit", fhirServer)}
                       aria-label={`Edit ${fhirServer.name}`}
                     >
-                      <Icon.Edit size={3} />
+                      <Icon.Edit aria-label="edit" size={3} />
                       Edit
                     </button>
                   </div>

@@ -75,7 +75,13 @@ const Drawer: React.FC<DrawerProps> = ({
             >
               <Icon.Close size={3} aria-label="X icon indicating closure" />
             </button>
-            <h2 data-testid={`drawer-title`} className={`margin-0 padding-0`}>
+            <h2
+              data-testid={`drawer-title`}
+              className={classNames(
+                "margin-0",
+                subtitle ? "padding-bottom-0" : "padding-bottom-2",
+              )}
+            >
               {title}
             </h2>
             {subtitle ? <h3 className={styles.subtitle}>{subtitle}</h3> : <></>}
@@ -85,7 +91,6 @@ const Drawer: React.FC<DrawerProps> = ({
                 <SearchField
                   id="searchFieldTemplate"
                   placeholder={placeholder}
-                  className={styles.searchField}
                   value={searchFilter}
                   onChange={(e) => {
                     e.preventDefault();
