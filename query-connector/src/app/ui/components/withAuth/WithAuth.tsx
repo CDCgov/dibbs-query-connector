@@ -29,7 +29,12 @@ const WithAuth: React.FC<React.PropsWithChildren> = ({ children }) => {
     !access.includes(session?.user?.role as RoleTypeValues)
   ) {
     redirect("/unauthorized");
+  } else if (session === null) {
+    // if session object is null it means the session was retrieved and none was found
+    redirect("/");
   } else {
+    // if session object is undefined it means the session is being retrieved
+    // hold until you show content or redirect user
     return null;
   }
 };

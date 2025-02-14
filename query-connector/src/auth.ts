@@ -102,5 +102,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       return session;
     },
   },
-  debug: true,
+  // WARNING: Turning this on will log out session info (which in all likelihood)
+  // will contain PII into the system logs whenever users log in/out. Proceed
+  // with caution
+  debug: false,
 });

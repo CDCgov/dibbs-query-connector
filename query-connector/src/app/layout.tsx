@@ -7,6 +7,7 @@ import DataProvider from "./shared/DataProvider";
 import { Metadata } from "next";
 import { ToastContainer } from "react-toastify";
 import Page from "./ui/components/page/page";
+import { auth } from "@/auth";
 
 /**
  * Establishes the layout for the application.
@@ -14,11 +15,15 @@ import Page from "./ui/components/page/page";
  * @param props.children - The children to render.
  * @returns - The root layout component.
  */
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  // Initializes user session on server side for the first load
+  // if session does not exists then session object remains null
+  await auth();
+
   return (
     <html lang="en">
       <SessionProvider>

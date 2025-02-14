@@ -45,7 +45,8 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
   const path = usePathname();
 
   const { data: session } = useSession();
-  const isLoggedIn = session?.user != null;
+
+  const isLoggedIn = !(session === null);
 
   const handleSignIn = () => {
     if (authDisabled) {
@@ -54,6 +55,7 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
       signIn("keycloak", { redirectTo: PAGES.QUERY });
     }
   };
+
   const handleSignOut = async () => {
     if (authDisabled) {
       router.push(PAGES.LANDING);
@@ -66,7 +68,8 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
     setShowMenu(!showMenu);
   };
   // const isProduction = process.env.NODE_ENV === "production";
-  const landingPage = authDisabled || isLoggedIn ? PAGES.QUERY : PAGES.LANDING;
+  const landingPage: string =
+    authDisabled || isLoggedIn ? PAGES.QUERY : PAGES.LANDING;
 
   return (
     <div className={styles.headerContainer}>

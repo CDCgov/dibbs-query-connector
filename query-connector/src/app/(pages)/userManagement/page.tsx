@@ -47,9 +47,9 @@ const UserManagement: React.FC = () => {
    * Role update
    */
 
-  async function handleUserRoleChange(username: string, role: RoleTypeValues) {
+  async function handleUserRoleChange(id: string, role: RoleTypeValues) {
     try {
-      await updateUserRole("", username, role);
+      await updateUserRole(id, role);
       showToastConfirmation({
         body: "Role successfully updated.",
       });
@@ -80,14 +80,14 @@ const UserManagement: React.FC = () => {
       );
     } else {
       return users.map((user: User) => (
-        <tr key={user.username}>
+        <tr key={user.id}>
           <td>{`${user.last_name}, ${user.first_name}`}</td>
           <td width={270}>
             <RoleDropdown
-              id={user.username}
+              id={user.id}
               defaultValue={user.qc_role}
               OnChange={(role: RoleTypeValues) => {
-                handleUserRoleChange(user.username, role);
+                handleUserRoleChange(user.id, role);
               }}
             />
           </td>
