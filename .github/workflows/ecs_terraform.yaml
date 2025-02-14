@@ -2,6 +2,10 @@ name: Terraform Plan & Terraform Apply
 run-name: Terraform plan & apply ${{ inputs.workspace }} by @${{ github.actor }}
 
 on:
+  workflow_run:
+    workflows: [CD, Build Keycloak]
+    types:
+      - completed
   merge_group:
     types:
       - checks_requested
@@ -28,8 +32,48 @@ env:
   workspace: ${{ github.event.inputs.workspace }}
 
 jobs:
+  check-dependencies:
+    runs-on: ubuntu-latest
+    outputs:
+      source_a_status: ${{ steps.check_a_status.outputs.status }}
+      source_b_status: ${{ steps.check_b_status.outputs.status }}
+
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Check CD Status
+        id: check_a_status
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          echo "Checking if CD has ran."
+          response=$(gh run list --workflow "CD" --branch $GITHUB_REF_NAME --json status --jq '.[0]')
+
+          if [ "$response" = "failure" ] || [ "$response" = "cancelled" ]; then
+            echo "CD workflow failed or was cancelled."
+            exit 1
+          fi
+
+          echo "CD workflow completed successfully."
+
+      - name: Check Keycloak Status
+        id: check_b_status
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          echo "Checking if Keycloak has ran."
+          response=$(gh run list --workflow "Build Keycloak" --branch $GITHUB_REF_NAME --json status --jq '.[0]')
+
+          if [ "$response" = "failure" ] || [ "$response" = "cancelled" ]; then
+            echo "Building Keycloak workflow failed or was cancelled."
+            exit 1
+          fi
+
+          echo "Building Keycloak workflow status is $response."
+
   terraform:
-    name: Run Terraform
+    needs: check-dependencies
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -38,6 +82,8 @@ jobs:
         # ./terraform/implementation/dev || ./terraform/implementation/prod for example
         # this practice is recommended to keep the terraform code organized while reducing the risk of conflicts
         working-directory: ./terraform/implementation/ecs
+    if: needs.check-dependencies.outputs.source_a_status != 'failure' && needs.check-dependencies.outputs.source_b_status != 'failure'
+
     steps:
       - name: Check Out Changes
         uses: actions/checkout@v4
