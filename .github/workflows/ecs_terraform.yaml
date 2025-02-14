@@ -29,7 +29,7 @@ permissions:
   contents: read
 
 env:
-  workspace: ${{ github.event.inputs.workspace }}
+  workspace: dev
 
 jobs:
   check-dependencies:
