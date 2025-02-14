@@ -24,7 +24,7 @@ import { parsePatientDemographics } from "./fhir/parsers";
  * @swagger
  * /api/query:
  *   get:
- *     description: A GET endpoint that accepts a series of query parameters to execute a query within the query connector.
+ *     description: A GET endpoint that accepts a series of query parameters to execute a query within the Query Connector.
  *     parameters:
  *       - name: fhir_server
  *         in: query
@@ -32,38 +32,45 @@ import { parsePatientDemographics } from "./fhir/parsers";
  *         required: true
  *         schema:
  *           type: string
+ *           example: "HELIOS Meld: Direct"
  *       - name: id
  *         in: query
  *         description: ID of the query to use
  *         required: true
  *         schema:
  *           type: string
+ *           example: cf580d8d-cc7b-4eae-8a0d-96c36f9222e3
  *       - name: given
  *         type: string
  *         in: query
  *         description: Patient given name
  *         schema:
  *           type: string
+ *           example: Lee
  *       - name: family
  *         in: query
  *         description: Patient family name
  *         schema:
  *           type: string
+ *           example: Shaw
  *       - name: dob
  *         in: query
  *         description: Patient date of birth in YYYY-MM-DD format
  *         schema:
  *           type: string
+ *           example: 1975-12-06
  *       - name: mrn
  *         in: query
  *         description: Patient medical record number
  *         schema:
  *           type: string
+ *           example: 8692756
  *       - name: phone
  *         in: query
  *         description: Patient phone number
  *         schema:
  *           type: string
+ *           example: 517-425-1398
  *     responses:
  *       200:
  *         description: The FHIR resources returned that match the information configured in the query referenced
@@ -147,7 +154,7 @@ export async function GET(request: NextRequest) {
  * @swagger
  * /api/query:
  *   post:
- *     description: A POST endpoint that accepts a FHIR patient resource in the request body to execute a query within the query connector
+ *     description: A POST endpoint that accepts a FHIR patient resource in the request body to execute a query within the Query Connector
  *     parameters:
  *       - name: fhir_server
  *         in: query
@@ -170,7 +177,6 @@ export async function GET(request: NextRequest) {
  *           schema:
  *             type: object
  *           example: { "resourceType": "Patient", "id": "1C", "meta": { "versionId": "1", "lastUpdated": "2024-01-16T15:08:24.000+00:00", "source": "#Aolu2ZnQyoelPvRd", "profile": [ "http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient" ] }, "text": { "status": "generated", "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">This is a simple narrative with only plain text</div>" }, "extension": [ { "url": "http://hl7.org/fhir/us/core/StructureDefinition/us-core-race", "extension": [ { "url": "ombCategory", "valueCoding": { "system": "urn:oid:2.16.840.1.113883.6.238", "code": "2106-3", "display": "White" } }, { "url": "text", "valueString": "Mixed" } ] }, { "url": "http://hl7.org/fhir/us/core/StructureDefinition/us-core-ethnicity", "extension": [ { "url": "ombCategory", "valueCoding": { "system": "urn:oid:2.16.840.1.113883.6.238", "code": "2135-2", "display": "Hispanic or Latino" } }, { "url": "text", "valueString": "Hispanic or Latino" } ] } ], "identifier": [ { "use": "usual", "type": { "coding": [ { "system": "http://terminology.hl7.org/CodeSystem/v2-0203", "code": "MR", "display": "Medical Record Number" } ], "text": "Medical Record Number" }, "system": "http://hospital.smarthealthit.org", "value": "8692756" } ], "active": true, "name": [ { "family": "Shaw", "given": [ "Lee", "A." ], "period": { "start": "1975-12-06", "end": "2020-01-22" } }, { "family": "Shaw", "given": [ "Lee", "V." ], "suffix": [ "MD" ], "period": { "start": "2020-01-23" } } ], "telecom": [ { "system": "phone", "value": "517-425-1398", "use": "home" }, { "system": "email", "value": "lee.shaw@email.com" } ], "gender": "male", "birthDate": "1975-12-06", "address": [ { "line": [ "49 Meadow St" ], "city": "Lansing", "state": "MI", "postalCode": "48864", "country": "US", "period": { "start": "2016-12-06", "end": "2020-07-22" } }, { "line": [ "183 Mountain View St" ], "city": "Lansing", "state": "MI", "postalCode": "48901", "country": "US", "period": { "start": "2020-07-22" } } ] }
- *
  *     responses:
  *       200:
  *         description: The FHIR resources returned that match the information configured in the query referenced
