@@ -1,22 +1,21 @@
 import {
   MISSING_API_QUERY_PARAM,
-  USE_CASE_DETAILS,
   INVALID_FHIR_SERVERS,
-  USE_CASES,
   MISSING_PATIENT_IDENTIFIERS,
+  INVALID_QUERY,
 } from "@/app/shared/constants";
-import {
-  getFhirServerNames,
-  getSavedQueryByName,
-} from "@/app/shared/database-service";
+import { getFhirServerNames } from "@/app/shared/database-service";
 import {
   QueryResponse,
   APIQueryResponse,
   createBundle,
+  makeFhirQuery,
+  QueryRequest,
 } from "@/app/shared/query-service";
-import { unnestValueSetsFromQuery } from "@/app/shared/utils";
 import { NextRequest, NextResponse } from "next/server";
 import { handleRequestError } from "../error-handling-service";
+import { getSavedQueryById } from "@/app/backend/query-building";
+import { Message } from "node-hl7-client";
 
 /**
  * Runs a query for a given use case and FHIR server. Patient demographics are provided
@@ -28,11 +27,11 @@ import { handleRequestError } from "../error-handling-service";
 export async function POST(request: NextRequest) {
   // Extract use_case and fhir_server from nextUrl
   const params = request.nextUrl.searchParams;
-  const use_case = params.get("use_case");
+  const id = params.get("id");
   const fhir_server = params.get("fhir_server");
   const fhirServers = await getFhirServerNames();
 
-  if (!use_case || !fhir_server) {
+  if (!id || !fhir_server) {
     const OperationOutcome = await handleRequestError(MISSING_API_QUERY_PARAM);
     return NextResponse.json(OperationOutcome);
   } else if (!Object.values(fhirServers).includes(fhir_server)) {
@@ -41,25 +40,31 @@ export async function POST(request: NextRequest) {
   }
 
   // Lookup default parameters for particular use-case search
-  const queryName = USE_CASE_DETAILS[use_case as USE_CASES].queryName;
-  const queryResults = await getSavedQueryByName(queryName);
-  const valueSets = unnestValueSetsFromQuery(queryResults);
+  const queryResults = await getSavedQueryById(id);
+
+  if (queryResults === undefined) {
+    const OperationOutcome = await handleRequestError(INVALID_QUERY);
+    return NextResponse.json(OperationOutcome, {
+      status: 500,
+    });
+  }
 
   const rawMessage = await request.text();
   const parsedMessage = new Message({ text: rawMessage });
 
-  // Add params & patient identifiers to UseCaseRequest
-  const UseCaseRequest: UseCaseQueryRequest = {
-    use_case: use_case as USE_CASES,
+  // Add params & patient identifiers to QueryRequest
+  const queryRequest: QueryRequest = {
+    query_name: queryResults?.query_name,
     fhir_server: fhir_server,
     first_name: parsedMessage.get("PID.5.2").toString() || "",
     last_name: parsedMessage.get("PID.5.1").toString() || "",
+    dob: parsedMessage.get("PID.7.1").toString() || "",
   };
 
   if (
-    !UseCaseRequest.first_name &&
-    !UseCaseRequest.last_name &&
-    !UseCaseRequest.dob
+    !queryRequest.first_name &&
+    !queryRequest.last_name &&
+    !queryRequest.dob
   ) {
     const OperationOutcome = await handleRequestError(
       MISSING_PATIENT_IDENTIFIERS,
@@ -67,10 +72,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(OperationOutcome, { status: 400 });
   }
 
-  const UseCaseQueryResponse: QueryResponse = await UseCaseQuery(
-    UseCaseRequest,
-    valueSets,
-  );
+  const UseCaseQueryResponse: QueryResponse = await makeFhirQuery(queryRequest);
 
   // Bundle data
   const bundle: APIQueryResponse = await createBundle(UseCaseQueryResponse);
