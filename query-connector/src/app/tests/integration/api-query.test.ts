@@ -47,7 +47,9 @@ describe("POST Query FHIR Server", () => {
   it("should return an OperationOutcome if the request body is not a Patient resource", async () => {
     const request = createNextRequest(
       { resourceType: "Observation" },
-      new URLSearchParams(),
+      new URLSearchParams(
+        `id=${SYPHILIS_QUERY_ID}&fhir_server=HELIOS Meld: Direct`,
+      ),
     );
     const response = await POST(request);
     const body = await response.json();
@@ -60,7 +62,9 @@ describe("POST Query FHIR Server", () => {
   it("should return an OperationOutcome if there are no patient identifiers to parse from the request body", async () => {
     const request = createNextRequest(
       { resourceType: "Patient" },
-      new URLSearchParams(),
+      new URLSearchParams(
+        `id=${SYPHILIS_QUERY_ID}&fhir_server=HELIOS Meld: Direct`,
+      ),
     );
     const response = await POST(request);
     const body = await response.json();
