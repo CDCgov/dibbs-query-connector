@@ -7,7 +7,7 @@ import { getUsers, updateUserRole } from "@/app/backend/user-management";
 import { QCResponse } from "@/app/models/responses/collections";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import Table from "../../ui/designSystem/table/Table";
-import RoleDropdown from "./components/RoleDropdown";
+import RoleDropdown from "./components/roleDropdown/RoleDropdown";
 import { UserManagementContext } from "./components/UserManagementProvider";
 import {
   RoleTypeValues,
@@ -38,6 +38,7 @@ const UserManagement: React.FC = () => {
         body: "Unable to retrieve users. Please try again.",
         variant: "error",
       });
+      throw e;
     }
   }
 
@@ -60,6 +61,7 @@ const UserManagement: React.FC = () => {
         body: "Unable to update the user role. Please try again.",
         variant: "error",
       });
+      throw e;
     }
   }
 
