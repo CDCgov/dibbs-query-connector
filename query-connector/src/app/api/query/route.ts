@@ -28,6 +28,7 @@ import {
 import { Message } from "node-hl7-client";
 
 /**
+ * @param request
  * @swagger
  * /api/query:
  *   get:
@@ -158,6 +159,7 @@ export async function GET(request: NextRequest) {
 }
 
 /**
+ * @param request
  * @swagger
  * /api/query:
  *   post:

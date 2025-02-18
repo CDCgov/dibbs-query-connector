@@ -70,13 +70,12 @@ export async function parseMRNs(
   patient: Patient,
 ): Promise<(string | undefined)[] | undefined> {
   if (patient.identifier) {
-    const mrnIdentifiers = patient.identifier.filter(
-      (id) =>
-        id.type?.coding?.some(
-          (coding) =>
-            coding.system === "http://terminology.hl7.org/CodeSystem/v2-0203" &&
-            coding.code === "MR",
-        ),
+    const mrnIdentifiers = patient.identifier.filter((id) =>
+      id.type?.coding?.some(
+        (coding) =>
+          coding.system === "http://terminology.hl7.org/CodeSystem/v2-0203" &&
+          coding.code === "MR",
+      ),
     );
     return mrnIdentifiers.map((id) => id.value);
   }
@@ -102,6 +101,10 @@ export async function parsePhoneNumbers(
   }
 }
 
+/**
+ *
+ * @param requestText
+ */
 export function parseHL7FromRequestBody(requestText: string) {
   let result = requestText;
 
@@ -117,6 +120,10 @@ export function parseHL7FromRequestBody(requestText: string) {
   return result;
 }
 
+/**
+ *
+ * @param use_case
+ */
 export function mapDeprecatedUseCaseToId(use_case: string | null) {
   if (use_case === null) return null;
   const potentialUseCaseMatch = USE_CASE_DETAILS[use_case as USE_CASES];

@@ -23,6 +23,11 @@ export async function handleRequestError(
   return OperationOutcome;
 }
 
+/**
+ *
+ * @param error
+ * @param status
+ */
 export async function handleAndReturnError(error: unknown, status = 500) {
   let diagnostics_message = "An error has occurred";
 
