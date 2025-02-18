@@ -70,12 +70,13 @@ export async function parseMRNs(
   patient: Patient,
 ): Promise<(string | undefined)[] | undefined> {
   if (patient.identifier) {
-    const mrnIdentifiers = patient.identifier.filter((id) =>
-      id.type?.coding?.some(
-        (coding) =>
-          coding.system === "http://terminology.hl7.org/CodeSystem/v2-0203" &&
-          coding.code === "MR",
-      ),
+    const mrnIdentifiers = patient.identifier.filter(
+      (id) =>
+        id.type?.coding?.some(
+          (coding) =>
+            coding.system === "http://terminology.hl7.org/CodeSystem/v2-0203" &&
+            coding.code === "MR",
+        ),
     );
     return mrnIdentifiers.map((id) => id.value);
   }
@@ -102,8 +103,9 @@ export async function parsePhoneNumbers(
 }
 
 /**
- *
- * @param requestText
+ * Function to parse out the HL7 message from the requestBody of a POST request
+ * @param requestText the text to parse / return
+ * @returns - A parsed HL7 message for further processing
  */
 export function parseHL7FromRequestBody(requestText: string) {
   let result = requestText;
@@ -121,8 +123,10 @@ export function parseHL7FromRequestBody(requestText: string) {
 }
 
 /**
- *
- * @param use_case
+ * Deprecation method to backfill information from the old demo use cases into
+ * our new query table
+ * @param use_case - The old use case names that came out of the demo options
+ * @returns The ID that maps to the old use case params
  */
 export function mapDeprecatedUseCaseToId(use_case: string | null) {
   if (use_case === null) return null;

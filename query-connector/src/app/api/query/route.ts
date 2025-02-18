@@ -28,7 +28,7 @@ import {
 import { Message } from "node-hl7-client";
 
 /**
- * @param request
+ * @param request - A GET request as described by the Swagger docs
  * @swagger
  * /api/query:
  *   get:
@@ -159,7 +159,7 @@ export async function GET(request: NextRequest) {
 }
 
 /**
- * @param request
+ * @param request A POST request as described by the Swagger docs
  * @swagger
  * /api/query:
  *   post:

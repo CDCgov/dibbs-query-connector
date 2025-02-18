@@ -25,8 +25,9 @@ export async function handleRequestError(
 
 /**
  *
- * @param error
- * @param status
+ * @param error - the error to parse / return as needed
+ * @param status - Status for error, defaults to 500
+ * @returns a Next response with information about the outcome and the status
  */
 export async function handleAndReturnError(error: unknown, status = 500) {
   let diagnostics_message = "An error has occurred";
