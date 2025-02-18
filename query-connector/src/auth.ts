@@ -1,6 +1,8 @@
 import NextAuth from "next-auth";
 import KeycloakProvider from "next-auth/providers/keycloak";
-import { addUserIfNotExists } from "@/app/backend/user-management";
+import { addUserIfNotExists, getUserRole } from "@/app/backend/user-management";
+import { isAuthDisabled } from "./app/utils/auth";
+import { RoleTypeValues } from "./app/models/entities/user-management";
 
 function addRealm(url: string) {
   return url.endsWith("/realms/master") ? url : `${url}/realms/master`;
@@ -55,12 +57,24 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           email: profile.email || "",
           firstName: profile.given_name || "",
           lastName: profile.family_name || "",
+          role: "",
         };
 
         // Ensure user is in the database **only on first login**
         try {
           await addUserIfNotExists(userToken);
         } catch (error) {}
+
+        if (userToken.username !== "") {
+          if (isAuthDisabled()) {
+            userToken.role = RoleTypeValues.SuperAdmin;
+          } else {
+            const role = await getUserRole(
+              userToken.username as string,
+            ).catch();
+            userToken.role = role;
+          }
+        }
 
         return { ...token, ...userToken };
       }
@@ -83,6 +97,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         firstName: typeof token.firstName === "string" ? token.firstName : "",
         lastName: typeof token.lastName === "string" ? token.lastName : "",
         emailVerified: null,
+        role: typeof token.role === "string" ? token.role : "",
       };
       return session;
     },
