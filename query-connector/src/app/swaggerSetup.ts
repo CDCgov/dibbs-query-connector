@@ -16,13 +16,13 @@ export const getApiDocs = async () => {
       components: {
         // TODO: THIS NEEDS TO BE SET UP BEFORE WE SHIP ANYTHING. OTHERWISE
         // TODO: YOU'LL BE ABLE TO GET ACCESS TO THE DB WITHOUT AUTH
-        securitySchemes: {
-          BearerAuth: {
-            type: "http",
-            scheme: "bearer",
-            bearerFormat: "JWT",
-          },
-        },
+        // securitySchemes: {
+        //   BearerAuth: {
+        //     type: "http",
+        //     scheme: "bearer",
+        //     bearerFormat: "JWT",
+        //   },
+        // },
       },
       security: [],
     },
