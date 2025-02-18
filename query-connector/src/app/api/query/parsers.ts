@@ -2,6 +2,7 @@
 
 import { Patient } from "fhir/r4";
 import { FormatPhoneAsDigits } from "@/app/shared/format-service";
+import { USE_CASES, USE_CASE_DETAILS } from "@/app/shared/constants";
 
 export type PatientIdentifiers = {
   first_name?: string;
@@ -69,12 +70,13 @@ export async function parseMRNs(
   patient: Patient,
 ): Promise<(string | undefined)[] | undefined> {
   if (patient.identifier) {
-    const mrnIdentifiers = patient.identifier.filter((id) =>
-      id.type?.coding?.some(
-        (coding) =>
-          coding.system === "http://terminology.hl7.org/CodeSystem/v2-0203" &&
-          coding.code === "MR",
-      ),
+    const mrnIdentifiers = patient.identifier.filter(
+      (id) =>
+        id.type?.coding?.some(
+          (coding) =>
+            coding.system === "http://terminology.hl7.org/CodeSystem/v2-0203" &&
+            coding.code === "MR",
+        ),
     );
     return mrnIdentifiers.map((id) => id.value);
   }
@@ -98,4 +100,26 @@ export async function parsePhoneNumbers(
     );
     return phoneNumbers.map((contactPoint) => contactPoint.value);
   }
+}
+
+export function parseHL7FromRequestBody(requestText: string) {
+  let result = requestText;
+
+  // strip the leading { / closing } if they exist
+  if (requestText[0] === "{" || requestText[requestText.length - 1] === "}") {
+    const leadingClosingBraceRegex = /\{([\s\S]*)\}/;
+    const requestMatch = requestText.match(leadingClosingBraceRegex);
+    if (requestMatch) {
+      console.log(requestMatch[1]);
+      result = requestMatch[1].trim();
+    }
+  }
+  return result;
+}
+
+export function mapDeprecatedUseCaseToId(use_case: string | null) {
+  if (use_case === null) return null;
+  const potentialUseCaseMatch = USE_CASE_DETAILS[use_case as USE_CASES];
+  const queryId = potentialUseCaseMatch?.id ?? null;
+  return queryId;
 }
