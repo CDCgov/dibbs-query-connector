@@ -66,6 +66,11 @@ jobs:
           ERSD_API_KEY: ${{ secrets.ERSD_API_KEY}}
           TLS_CERT: ${{ secrets.TLS_CERT}}
           TLS_KEY: ${{ secrets.TLS_KEY}}
+          AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
+          KEYCLOAK_CLIENT_ID: ${{ secrets.KEYCLOAK_CLIENT_ID }}
+          KEYCLOAK_CLIENT_SECRET: ${{ secrets.KEYCLOAK_CLIENT_SECRET }}
+          AUTH_KEYCLOAK_ISSUER: ${{ env.workspace == 'dev' && format('https://{0}/keycloak', secrets.ECS_HOSTNAME) || format('https://{0}.{1}/keycloak', env.workspace, secrets.ECS_HOSTNAME) }}
+          AUTH_URL: ${{ env.workspace == 'dev' && format('https://{0}', secrets.ECS_HOSTNAME) || format('https://{0}.{1}', env.workspace, secrets.ECS_HOSTNAME) }}
         shell: bash
         run: |
           echo "Deploying to ${{ github.event.inputs.workspace }}..."
@@ -82,10 +87,20 @@ jobs:
             -var "umls_api_key=${UMLS_API_KEY}" \
             -var "ersd_api_key=${ERSD_API_KEY}" \
             -var "qc_tls_key=${TLS_KEY}" \
-            -var "qc_tls_cert=${TLS_CERT}"          
+            -var "qc_tls_cert=${TLS_CERT}" \
+            -var "auth_secret=${AUTH_SECRET}" \
+            -var "keycloak_client_id=${KEYCLOAK_CLIENT_ID}" \
+            -var "keycloak_client_secret=${KEYCLOAK_CLIENT_SECRET}" \
+            -var "auth_keycloak_issuer=${AUTH_KEYCLOAK_ISSUER}" \
+            -var "auth_url=${AUTH_URL}"
           terraform plan \
             -var-file="$WORKSPACE.tfvars" \
             -var "umls_api_key=${UMLS_API_KEY}" \
             -var "ersd_api_key=${ERSD_API_KEY}" \
             -var "qc_tls_key=${TLS_KEY}" \
-            -var "qc_tls_cert=${TLS_CERT}"
+            -var "qc_tls_cert=${TLS_CERT}" \
+            -var "auth_secret=${AUTH_SECRET}" \
+            -var "keycloak_client_id=${KEYCLOAK_CLIENT_ID}" \
+            -var "keycloak_client_secret=${KEYCLOAK_CLIENT_SECRET}" \
+            -var "auth_keycloak_issuer=${AUTH_KEYCLOAK_ISSUER}" \
+            -var "auth_url=${AUTH_URL}"

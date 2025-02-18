@@ -2,7 +2,7 @@
 
 import { test, expect } from "@playwright/test";
 import { TEST_URL } from "../playwright-setup";
-import { DEFAULT_QUERIES } from "@/app/queryBuilding/fixtures";
+import { DEFAULT_QUERIES } from "@/app/(pages)/queryBuilding/fixtures";
 
 // consts
 const QUERY_LIBRARY = "Query Library";
@@ -352,7 +352,9 @@ test.describe("editing an exisiting query", () => {
     const firstVsCheckTarget = firstLabVS.getByTestId("checkbox");
     // initial render is a minus state, so need to check and uncheck to reset the
     // state to uncheck
-    await firstVsCheckTarget.dblclick();
+    await firstVsCheckTarget.click();
+    await expect(firstVsCheckTarget.getByRole("checkbox")).not.toBeChecked();
+    await firstVsCheckTarget.click();
     await expect(firstVsCheckTarget.getByRole("checkbox")).toBeChecked();
     await firstVsCheckTarget.click();
 

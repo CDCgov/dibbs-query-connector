@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { TEST_URL } from "../playwright-setup";
-import { PAGE_TITLES } from "@/app/query/components/stepIndicator/StepIndicator";
+import { PAGE_TITLES } from "@/app/(pages)/query/components/stepIndicator/StepIndicator";
 
 import { TEST_PATIENT, TEST_PATIENT_NAME } from "./constants";
 
@@ -13,7 +13,7 @@ test.describe("alternate queries with the Query Connector", () => {
   test("query using form-fillable demo patient by phone number", async ({
     page,
   }) => {
-    await page.getByRole("button", { name: "Try it out" }).click();
+    await page.getByRole("link", { name: "Try it out" }).click();
     await page.getByRole("button", { name: "Fill fields" }).click();
 
     // Delete Last name and MRN to force phone number as one of the 3 fields
@@ -52,7 +52,7 @@ test.describe("alternate queries with the Query Connector", () => {
 
   // test("social determinants query with generalized function", async ({
   test("cancer query with generalized function", async ({ page }) => {
-    await page.getByRole("button", { name: "Try it out" }).click();
+    await page.getByRole("link", { name: "Try it out" }).click();
     await page.getByRole("button", { name: "Fill fields" }).click();
     // Select FHIR server from drop down
     await page.getByRole("button", { name: "Advanced" }).click();
@@ -79,7 +79,7 @@ test.describe("alternate queries with the Query Connector", () => {
   test("form-fillable STI query using generalized function", async ({
     page,
   }) => {
-    await page.getByRole("button", { name: "Try it out" }).click();
+    await page.getByRole("link", { name: "Try it out" }).click();
     await page.getByRole("button", { name: "Fill fields" }).click();
     // Select FHIR server from drop down
     await page.getByRole("button", { name: "Advanced" }).click();

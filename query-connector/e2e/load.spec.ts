@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { TEST_URL } from "../playwright-setup";
-import { metadata } from "@/app/constants";
+import { metadata } from "@/app/shared/constants";
 
 test("landing page loads", async ({ page }) => {
   await page.goto(TEST_URL);
@@ -18,5 +18,5 @@ test("landing page loads", async ({ page }) => {
 
   // Check that interactable elements are present (header and Get Started)
   await expect(page.getByRole("link", { name: metadata.title })).toBeVisible();
-  await expect(page.getByRole("button", { name: "Try it out" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Try it out" })).toBeVisible();
 });
