@@ -2,12 +2,12 @@
 import { SelectedQueryDetails } from "./querySelection/utils";
 import QuerySelection from "./querySelection/QuerySelection";
 import { BuildStep } from "../../shared/constants";
-import "react-toastify/dist/ReactToastify.css";
 import { useState } from "react";
 import { EMPTY_QUERY_SELECTION } from "./utils";
 import BuildFromTemplates from "./buildFromTemplates/BuildFromTemplates";
 import { useContext, useEffect } from "react";
 import { DataContext } from "@/app/shared/DataProvider";
+
 /**
  * Component for Query Building Flow
  * @returns The Query Building component flow

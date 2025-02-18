@@ -1,6 +1,5 @@
 import { ModalRef } from "@/app/ui/designSystem/modal/Modal";
 import { DeleteModal } from "@/app/ui/designSystem/modal/deleteModal";
-import "react-toastify/dist/ReactToastify.css";
 import { RefObject } from "react";
 import { CustomUserQuery } from "../../../shared/constants";
 import { deleteQueryById } from "@/app/shared/database-service";

@@ -9,6 +9,7 @@ import { metadata } from "@/app/shared/constants";
 import classNames from "classnames";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { LOGGED_IN_PATHS, PAGES } from "@/app/shared/page-routes";
 
 /**
  * Produces the header.
@@ -44,20 +45,22 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
   const path = usePathname();
 
   const { data: session } = useSession();
-  const isLoggedIn = session?.user != null;
+
+  const isLoggedIn = !(session === null);
 
   const handleSignIn = () => {
     if (authDisabled) {
-      router.push(`/query`);
+      router.push(PAGES.QUERY);
     } else {
-      signIn("keycloak", { redirectTo: "/query" });
+      signIn("keycloak", { redirectTo: PAGES.QUERY });
     }
   };
+
   const handleSignOut = async () => {
     if (authDisabled) {
-      router.push(`/`);
+      router.push(PAGES.LANDING);
     } else {
-      await signOut({ redirectTo: "/" });
+      await signOut({ redirectTo: PAGES.LANDING });
     }
   };
 
@@ -65,7 +68,8 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
     setShowMenu(!showMenu);
   };
   // const isProduction = process.env.NODE_ENV === "production";
-  const landingPage = authDisabled || isLoggedIn ? "/query" : "/";
+  const landingPage: string =
+    authDisabled || isLoggedIn ? PAGES.QUERY : PAGES.LANDING;
 
   return (
     <div className={styles.headerContainer}>
@@ -96,7 +100,7 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
               "flex-align-center",
             )}
           >
-            {!isLoggedIn && !LOGGED_IN_PATHS.includes(path) && (
+            {!isLoggedIn && !LOGGED_IN_PATHS.includes(path as PAGES) && (
               <Button
                 className={styles.signinButton}
                 type="button"
@@ -107,7 +111,7 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
                 Sign in
               </Button>
             )}
-            {LOGGED_IN_PATHS.includes(path) && (
+            {LOGGED_IN_PATHS.includes(path as PAGES) && (
               <button
                 onClick={toggleMenuDropdown}
                 className={classNames(
@@ -141,7 +145,7 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
                 <li className={styles.subMenuItem}>
                   <Link
                     className={styles.menuItem}
-                    href={"/queryBuilding"}
+                    href={PAGES.MY_QUERIES}
                     scroll={false}
                   >
                     My Queries
@@ -150,7 +154,7 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
                 <li className={styles.subMenuItem}>
                   <Link
                     className={styles.menuItem}
-                    href={"/fhirServers"}
+                    href={PAGES.FHIR_SERVERS}
                     scroll={false}
                   >
                     FHIR Servers
@@ -159,7 +163,7 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
                 <li className={styles.subMenuItem}>
                   <Link
                     className={styles.menuItem}
-                    href={"/userManagement"}
+                    href={PAGES.USER_MANAGEMENT}
                     scroll={false}
                   >
                     User Management
@@ -185,13 +189,5 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
     </div>
   );
 };
-
-const LOGGED_IN_PATHS = [
-  "/query",
-  "/queryBuilding",
-  "/fhirServers",
-  "/userManagement",
-  "/userManagement/userGroups",
-];
 
 export default HeaderComponent;

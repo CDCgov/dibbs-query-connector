@@ -4,6 +4,7 @@ import classNames from "classnames";
 import TabGroup, { Tab } from "@/app/ui/designSystem/TabGroup/tabGroup";
 import TeamQueryEditSection from "./components/TeamQueryEditSection";
 import UserManagementProvider from "./components/UserManagementProvider";
+import WithAuth from "@/app/ui/components/withAuth/WithAuth";
 
 /**
  * @param root0 - User management page layour props
@@ -23,14 +24,16 @@ const UserManagement: React.FC<React.PropsWithChildren> = ({ children }) => {
    */
   return (
     <>
-      <div className={classNames("main-container__wide", "user-management")}>
-        <h1 className="margin-bottom-4">User management</h1>
-        <TabGroup tabs={sections} />
-        <UserManagementProvider>
-          {children}
-          <TeamQueryEditSection />
-        </UserManagementProvider>
-      </div>
+      <WithAuth>
+        <div className={classNames("main-container__wide", "user-management")}>
+          <h1 className="margin-bottom-4">User management</h1>
+          <TabGroup tabs={sections} />
+          <UserManagementProvider>
+            {children}
+            <TeamQueryEditSection />
+          </UserManagementProvider>
+        </div>
+      </WithAuth>
     </>
   );
 };
