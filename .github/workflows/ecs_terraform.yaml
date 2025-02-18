@@ -29,7 +29,7 @@ permissions:
   contents: read
 
 env:
-  workspace: dev
+  workspace: ${{ steps.set-environment.outputs.tf_env }}
 
 jobs:
   check-dependencies:
@@ -38,6 +38,7 @@ jobs:
       source_a_status: ${{ steps.check_a_status.outputs.status }}
       source_b_status: ${{ steps.check_b_status.outputs.status }}
 
+      tf_env: ${{ steps.set-environment.outputs.tf_env }}
     steps:
       - name: Check out the repository
         uses: actions/checkout@v4
@@ -99,6 +100,16 @@ jobs:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: ${{ secrets.AWS_REGION }}
 
+      - name: Set workspace
+        id: set-workspace
+        run: |-
+          echo "tf_env=$(
+          if [[ "${{ github.event.inputs.workspace }}" != "" ]]; then
+            echo ${{ github.event.inputs.workspace}}
+          else
+            echo dev
+          fi
+          )" >> $GITHUB_OUTPUT
       - name: Terraform
         env:
           BUCKET: ${{ secrets.TFSTATE_BUCKET }}
