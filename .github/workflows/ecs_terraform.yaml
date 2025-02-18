@@ -28,9 +28,6 @@ permissions:
   id-token: write
   contents: read
 
-env:
-  workspace: ${{ steps.set-environment.outputs.tf_env }}
-
 jobs:
   check-dependencies:
     runs-on: ubuntu-latest
@@ -38,7 +35,6 @@ jobs:
       source_a_status: ${{ steps.check_a_status.outputs.status }}
       source_b_status: ${{ steps.check_b_status.outputs.status }}
 
-      tf_env: ${{ steps.set-environment.outputs.tf_env }}
     steps:
       - name: Check out the repository
         uses: actions/checkout@v4
@@ -76,6 +72,8 @@ jobs:
   terraform:
     needs: check-dependencies
     runs-on: ubuntu-latest
+    outputs:
+      workspace: ${{ steps.set-workspace.outputs.workspace }}
     defaults:
       run:
         shell: bash
@@ -103,19 +101,20 @@ jobs:
       - name: Set workspace
         id: set-workspace
         run: |-
-          echo "tf_env=$(
+          echo "workspace=$(
           if [[ "${{ github.event.inputs.workspace }}" != "" ]]; then
             echo ${{ github.event.inputs.workspace}}
           else
             echo dev
           fi
           )" >> $GITHUB_OUTPUT
+
       - name: Terraform
         env:
           BUCKET: ${{ secrets.TFSTATE_BUCKET }}
           DYNAMODB_TABLE: ${{ secrets.TFSTATE_DYNAMODB_TABLE }}
           REGION: ${{ vars.region }}
-          WORKSPACE: ${{ env.workspace }}
+          WORKSPACE: ${{ steps.set-workspace.outputs.workspace }}
           UMLS_API_KEY: ${{ secrets.UMLS_API_KEY }}
           ERSD_API_KEY: ${{ secrets.ERSD_API_KEY}}
           TLS_CERT: ${{ secrets.TLS_CERT}}
