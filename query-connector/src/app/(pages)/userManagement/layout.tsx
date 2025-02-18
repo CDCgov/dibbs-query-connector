@@ -1,7 +1,7 @@
 "use client";
 
 import classNames from "classnames";
-import TabGroup, { Tab } from "@/app/ui/designSystem/TabGroup/tabGroup";
+import TabGroup, { Tab } from "@/app/ui/designSystem/tabGroup/tabGroup";
 import TeamQueryEditSection from "./components/TeamQueryEditSection";
 import UserManagementProvider from "./components/UserManagementProvider";
 import WithAuth from "@/app/ui/components/withAuth/WithAuth";
