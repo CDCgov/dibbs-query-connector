@@ -270,8 +270,7 @@ export async function POST(request: NextRequest) {
       }
 
       // Parse patient identifiers from a potential FHIR resource
-      const PatientIdentifiers =
-        await parsePatientDemographics(requestBodyToCheck);
+      const PatientIdentifiers = parsePatientDemographics(requestBodyToCheck);
 
       if (Object.keys(PatientIdentifiers).length === 0) {
         return await handleAndReturnError(MISSING_PATIENT_IDENTIFIERS, 400);

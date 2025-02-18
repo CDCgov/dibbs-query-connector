@@ -1,5 +1,3 @@
-"use server";
-
 import { Patient } from "fhir/r4";
 import { FormatPhoneAsDigits } from "@/app/shared/format-service";
 import { USE_CASES, USE_CASE_DETAILS } from "@/app/shared/constants";
@@ -17,9 +15,7 @@ export type PatientIdentifiers = {
  * @param patient - The patient resource to parse.
  * @returns An array of patient demographics extracted from the patient resource.
  */
-export async function parsePatientDemographics(
-  patient: Patient,
-): Promise<PatientIdentifiers> {
+export function parsePatientDemographics(patient: Patient): PatientIdentifiers {
   const identifiers: PatientIdentifiers = {};
 
   if (patient.name) {
@@ -37,7 +33,7 @@ export async function parsePatientDemographics(
   }
 
   // Extract MRNs from patient.identifier
-  const mrnIdentifiers = await parseMRNs(patient);
+  const mrnIdentifiers = parseMRNs(patient);
   // Add 1st value of MRN array to identifiers
   // TODO: Handle multiple MRNs to query
   if (mrnIdentifiers && mrnIdentifiers.length > 0) {
@@ -45,7 +41,7 @@ export async function parsePatientDemographics(
   }
 
   // Extract phone numbers from patient telecom arrays
-  let phoneNumbers = await parsePhoneNumbers(patient);
+  let phoneNumbers = parsePhoneNumbers(patient);
   if (phoneNumbers) {
     // Strip formatting so the query service can generate options
     phoneNumbers = phoneNumbers
@@ -66,16 +62,17 @@ export async function parsePatientDemographics(
  * @param patient - The patient resource to parse.
  * @returns An array of MRNs extracted from the patient resource.
  */
-export async function parseMRNs(
+export function parseMRNs(
   patient: Patient,
-): Promise<(string | undefined)[] | undefined> {
+): (string | undefined)[] | undefined {
   if (patient.identifier) {
-    const mrnIdentifiers = patient.identifier.filter((id) =>
-      id.type?.coding?.some(
-        (coding) =>
-          coding.system === "http://terminology.hl7.org/CodeSystem/v2-0203" &&
-          coding.code === "MR",
-      ),
+    const mrnIdentifiers = patient.identifier.filter(
+      (id) =>
+        id.type?.coding?.some(
+          (coding) =>
+            coding.system === "http://terminology.hl7.org/CodeSystem/v2-0203" &&
+            coding.code === "MR",
+        ),
     );
     return mrnIdentifiers.map((id) => id.value);
   }
@@ -88,9 +85,9 @@ export async function parseMRNs(
  * @param patient A FHIR Patient resource.
  * @returns A list of phone numbers, or undefined if the patient has no telecom.
  */
-export async function parsePhoneNumbers(
+export function parsePhoneNumbers(
   patient: Patient,
-): Promise<(string | undefined)[] | undefined> {
+): (string | undefined)[] | undefined {
   if (patient.telecom) {
     const phoneNumbers = patient.telecom.filter(
       (contactPoint) =>
