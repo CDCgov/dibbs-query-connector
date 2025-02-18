@@ -75,14 +75,14 @@ jobs:
         run: |
           echo "Deploying to ${{ github.event.inputs.workspace }}..."
           rm -rf .terraform .terraform.lock.hcl
-          terraform init \
+          terraform init -upgrade \
             -var-file="$WORKSPACE.tfvars" \
             -backend-config "bucket=$BUCKET" \
             -backend-config "dynamodb_table=$DYNAMODB_TABLE" \
             -backend-config "region=$REGION" \
             || (echo "terraform init failed, exiting..." && exit 1)
           terraform workspace select "$WORKSPACE"
-          terraform apply -auto-approve -target=aws_acm_certificate.cloudflare_cert \
+          terraform plan -target=aws_acm_certificate.cloudflare_cert \
             -var-file="$WORKSPACE.tfvars" \
             -var "umls_api_key=${UMLS_API_KEY}" \
             -var "ersd_api_key=${ERSD_API_KEY}" \
