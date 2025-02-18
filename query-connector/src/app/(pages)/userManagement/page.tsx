@@ -3,23 +3,125 @@
 import { useContext, useEffect, useState } from "react";
 import { Button } from "@trussworks/react-uswds";
 import classNames from "classnames";
+import { getUsers, updateUserRole } from "@/app/backend/user-management";
+import { QCResponse } from "@/app/models/responses/collections";
+import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import Table from "../../ui/designSystem/table/Table";
-import { User, UserGroup, usersMock } from "./types";
 import RoleDropdown from "./components/RoleDropdown";
 import { UserManagementContext } from "./components/UserManagementProvider";
+import {
+  RoleTypeValues,
+  User,
+  UserGroup,
+} from "../../models/entities/user-management";
 
 /**
  * User section in the user management page
  * @returns Users table
  */
 const UserManagement: React.FC = () => {
-  const [users, setUsers] = useState<User[]>([]);
+  const { openEditSection } = useContext(UserManagementContext);
+  const [users, setUsers] = useState<User[] | null>(null);
+
+  /**
+   * Initialization
+   */
+
+  async function fetchUsers() {
+    try {
+      const userList: QCResponse<User> = await getUsers();
+      setUsers(userList.items ?? []);
+    } catch (e) {
+      showToastConfirmation({
+        body: "Unable to retrieve users. Please try again.",
+        variant: "error",
+      });
+    }
+  }
 
   useEffect(() => {
-    setUsers(usersMock);
+    fetchUsers();
   }, []);
 
-  const { openEditSection } = useContext(UserManagementContext);
+  /**
+   * Role update
+   */
+
+  async function handleUserRoleChange(id: string, role: RoleTypeValues) {
+    try {
+      await updateUserRole(id, role);
+      showToastConfirmation({
+        body: "Role successfully updated.",
+      });
+    } catch (e) {
+      showToastConfirmation({
+        body: "Unable to update the user role. Please try again.",
+        variant: "error",
+      });
+    }
+  }
+
+  /**
+   * DOM helpers
+   */
+
+  function renderUserRows(users: User[] | null): React.ReactNode {
+    if (users == null) {
+      return (
+        <tr>
+          <td colSpan={3}>Loading...</td>
+        </tr>
+      );
+    } else if (users.length == 0) {
+      return (
+        <tr>
+          <td colSpan={3}>No users found</td>
+        </tr>
+      );
+    } else {
+      return users.map((user: User) => (
+        <tr key={user.id}>
+          <td>{`${user.last_name}, ${user.first_name}`}</td>
+          <td width={270}>
+            <RoleDropdown
+              id={user.id}
+              defaultValue={user.qc_role}
+              OnChange={(role: RoleTypeValues) => {
+                handleUserRoleChange(user.id, role);
+              }}
+            />
+          </td>
+          <td>
+            {user.userGroups && user.userGroups?.length > 0
+              ? user.userGroups?.map((group: UserGroup, idx: number) => (
+                  <Button
+                    className={classNames(
+                      "margin-right-2",
+                      "text-no-underline",
+                    )}
+                    type="button"
+                    unstyled
+                    key={group.id}
+                    aria-description={`Edit ${group.name} members`}
+                    onClick={() => {
+                      openEditSection(
+                        group.name,
+                        "Members",
+                        "Members",
+                        group.id,
+                      );
+                    }}
+                  >
+                    {group.name}
+                    {idx + 1 != user.userGroups?.length && ","}
+                  </Button>
+                ))
+              : "--"}
+          </td>
+        </tr>
+      ));
+    }
+  }
 
   /**
    * HTML
@@ -59,46 +161,7 @@ const UserManagement: React.FC = () => {
             <th>User groups</th>
           </tr>
         </thead>
-        <tbody>
-          {users.map((user: User) => (
-            <tr key={user.id}>
-              <td>{`${user.lastName}, ${user.firstName}`}</td>
-              <td width={270}>
-                <RoleDropdown
-                  id={`${user.id}-role-combobox`}
-                  defaultValue={user.role}
-                />
-              </td>
-              <td>
-                {user.userGroups.length > 0
-                  ? user.userGroups.map((group: UserGroup, idx: number) => (
-                      <Button
-                        className={classNames(
-                          "margin-right-2",
-                          "text-no-underline",
-                        )}
-                        type="button"
-                        unstyled
-                        key={group.id}
-                        aria-description={`Edit ${group.name} members`}
-                        onClick={() => {
-                          openEditSection(
-                            group.name,
-                            "Members",
-                            "Members",
-                            group.id,
-                          );
-                        }}
-                      >
-                        {group.name}
-                        {idx + 1 != user.userGroups.length && ","}
-                      </Button>
-                    ))
-                  : "--"}
-              </td>
-            </tr>
-          ))}
-        </tbody>
+        <tbody>{renderUserRows(users)}</tbody>
       </Table>
     </>
   );
