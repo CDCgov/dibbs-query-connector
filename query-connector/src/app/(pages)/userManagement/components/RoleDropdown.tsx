@@ -1,20 +1,26 @@
 import { Label } from "@trussworks/react-uswds";
 import classNames from "classnames";
 import React from "react";
-import { RoleTypeValues } from "../types";
+import { RoleTypeValues } from "../../../models/entities/user-management";
 
 export interface RoleDropdownProps {
   id: string;
   defaultValue: RoleTypeValues;
+  OnChange: (role: RoleTypeValues) => void;
 }
 
 /**
  * @param root0 - RoleDropdown component props
  * @param root0.defaultValue - initial values loaded as selected in the dropdown
  * @param root0.id - id prop for the dropdown element
+ * @param root0.OnChange - event handler that receives the value
  * @returns - A dropdown with the different role options
  */
-const RoleDropdown: React.FC<RoleDropdownProps> = ({ id, defaultValue }) => {
+const RoleDropdown: React.FC<RoleDropdownProps> = ({
+  id,
+  defaultValue,
+  OnChange,
+}) => {
   const selectId = `role-select-${id}`;
 
   const roleOptions = [
@@ -30,9 +36,11 @@ const RoleDropdown: React.FC<RoleDropdownProps> = ({ id, defaultValue }) => {
       </Label>
       <select
         className="usa-select"
-        value={defaultValue}
+        defaultValue={defaultValue}
         id={selectId}
-        onChange={() => console.log("change value")}
+        onChange={(e) => {
+          OnChange(e?.target?.value as RoleTypeValues);
+        }}
       >
         {roleOptions.map((option) => (
           <option key={option.value} value={option.value}>

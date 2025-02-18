@@ -1,5 +1,8 @@
 "use server";
 
+import { RoleTypeValues, User } from "../models/entities/user-management";
+import { QCResponse } from "../models/responses/collections";
+import { superAdminAccessCheck } from "../utils/auth";
 import { getDbClient } from "./dbClient";
 const dbClient = getDbClient();
 
@@ -26,7 +29,7 @@ export async function addUserIfNotExists(userToken: {
     return;
   }
 
-  const { id, username, email, firstName, lastName } = userToken;
+  const { username, email, firstName, lastName } = userToken;
   const userIdentifier = username || email;
 
   try {
@@ -72,9 +75,15 @@ export async function addUserIfNotExists(userToken: {
  * @param newRole - The new role to assign to the user.
  * @returns The updated user record or an error if the update fails.
  */
-export async function updateUserRole(id: string, newRole: string) {
+export async function updateUserRole(
+  id: string,
+  newRole: RoleTypeValues,
+): Promise<QCResponse<User>> {
+  if (!(await superAdminAccessCheck())) {
+    throw new Error("Unauthorized");
+  }
+
   if (!id || !newRole) {
-    console.error("Invalid input: id and newRole are required.");
     throw new Error("User ID and new role are required.");
   }
 
@@ -96,9 +105,59 @@ export async function updateUserRole(id: string, newRole: string) {
     }
 
     console.log(`User role updated successfully: ${id} -> ${newRole}`);
-    return result.rows[0];
+    return { totalItems: 1, items: [result.rows[0]] };
   } catch (error) {
     console.error("Error updating user role:", error);
+    throw error;
+  }
+}
+
+/**
+ * Retrieves all registered users in query connector
+ * @returns List of users registered in qc
+ */
+export async function getUsers(): Promise<QCResponse<User>> {
+  if (!(await superAdminAccessCheck())) {
+    throw new Error("Unauthorized");
+  }
+
+  try {
+    const selectAllUsersQuery = `
+      SELECT id, username, qc_role, first_name, last_name
+      FROM users
+      ORDER BY last_name, first_name ASC;
+    `;
+
+    const result = await dbClient.query(selectAllUsersQuery);
+
+    return {
+      totalItems: result.rowCount,
+      items: result.rows,
+    } as QCResponse<User>;
+  } catch (error) {
+    throw error;
+  }
+}
+
+/**
+ * Retrieves a user's role
+ * @param username user's username. Username must be unique.
+ * @returns The user's role or empty if the user is not found
+ */
+export async function getUserRole(username: string): Promise<string> {
+  try {
+    const selectUsersQuery = `
+      SELECT id, username, qc_role, first_name, last_name
+      FROM users
+      WHERE username = $1;
+    `;
+
+    const result = await dbClient.query(selectUsersQuery, [username]);
+
+    return result?.rowCount && result.rowCount > 0
+      ? result.rows?.[0].qc_role
+      : "";
+  } catch (error) {
     throw error;
   }
 }
