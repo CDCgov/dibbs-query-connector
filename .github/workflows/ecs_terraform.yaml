@@ -28,9 +28,6 @@ permissions:
   id-token: write
   contents: read
 
-env:
-  workspace: ${{ github.event.inputs.workspace }}
-
 jobs:
   check-dependencies:
     runs-on: ubuntu-latest
@@ -75,6 +72,8 @@ jobs:
   terraform:
     needs: check-dependencies
     runs-on: ubuntu-latest
+    outputs:
+      workspace: ${{ steps.set-workspace.outputs.workspace }}
     defaults:
       run:
         shell: bash
@@ -99,12 +98,23 @@ jobs:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: ${{ secrets.AWS_REGION }}
 
+      - name: Set workspace
+        id: set-workspace
+        run: |-
+          echo "workspace=$(
+          if [[ "${{ github.event.inputs.workspace }}" != "" ]]; then
+            echo ${{ github.event.inputs.workspace}}
+          else
+            echo dev
+          fi
+          )" >> $GITHUB_OUTPUT
+
       - name: Terraform
         env:
           BUCKET: ${{ secrets.TFSTATE_BUCKET }}
           DYNAMODB_TABLE: ${{ secrets.TFSTATE_DYNAMODB_TABLE }}
           REGION: ${{ vars.region }}
-          WORKSPACE: ${{ env.workspace }}
+          WORKSPACE: ${{ steps.set-workspace.outputs.workspace }}
           UMLS_API_KEY: ${{ secrets.UMLS_API_KEY }}
           ERSD_API_KEY: ${{ secrets.ERSD_API_KEY}}
           TLS_CERT: ${{ secrets.TLS_CERT}}
