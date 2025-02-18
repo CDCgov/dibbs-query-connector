@@ -17,10 +17,7 @@ import {
   MISSING_API_QUERY_PARAM,
   INVALID_FHIR_SERVERS,
   INVALID_QUERY,
-  USE_CASE_DETAILS,
-  USE_CASES,
   INVALID_MESSAGE_FORMAT,
-  HL7_BODY_MISFORMAT,
 } from "@/app/shared/constants";
 import { getFhirServerNames } from "@/app/shared/database-service";
 import {

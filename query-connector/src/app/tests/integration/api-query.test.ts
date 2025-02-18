@@ -1,5 +1,4 @@
 import { Bundle, BundleEntry, Patient } from "fhir/r4";
-import { GET, POST } from "../../api/query/fhir/route";
 import { readJsonFile } from "../shared_utils/readJsonFile";
 import {
   INVALID_FHIR_SERVERS,
@@ -9,6 +8,8 @@ import {
   USE_CASE_DETAILS,
 } from "@/app/shared/constants";
 import { NextRequest } from "next/server";
+import { POST } from "@/app/api/query/route";
+import { GET } from "@/app/api/route";
 
 // Utility function to create a minimal NextRequest-like object
 function createNextRequest(
