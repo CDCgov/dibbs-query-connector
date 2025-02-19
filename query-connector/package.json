@@ -24,6 +24,8 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.515.0",
+    "@scalar/nextjs-api-reference": "^0.4.106",
+    "@scalar/nextjs-openapi": "^0.0.36",
     "@trussworks/react-uswds": "^9.1.0",
     "@uswds/uswds": "^3.8.2",
     "base-64": "^1.0.0",
@@ -35,7 +37,6 @@
     "jose": "5.2.2",
     "next": "14.2.22",
     "next-auth": "^5.0.0-beta.25",
-    "next-swagger-doc": "^0.4.1",
     "next-nprogress-bar": "^2.4.4",
     "node-fetch": "^2.7.0",
     "node-hl7-client": "^3.0.0",
@@ -45,8 +46,7 @@
     "react-dom": "^18",
     "react-highlight-words": "^0.21.0",
     "react-toastify": "^10.0.5",
-    "sharp": "^0.33.5",
-    "swagger-ui-react": "^5.18.3"
+    "sharp": "^0.33.5"
   },
   "devDependencies": {
     "@next/eslint-plugin-next": "^14.0.4",
@@ -64,8 +64,8 @@
     "@types/pg": "^8.11.8",
     "@types/react": "^18.3.11",
     "@types/react-dom": "^18.3.0",
-    "@types/swagger-ui-react": "^5.18.0",
     "@types/react-highlight-words": "^0.20.0",
+    "@types/swagger-ui-react": "^5.18.0",
     "@types/uuid": "^9.0.8",
     "@typescript-eslint/eslint-plugin": "^8.24.0",
     "@typescript-eslint/parser": "^8.24.0",
