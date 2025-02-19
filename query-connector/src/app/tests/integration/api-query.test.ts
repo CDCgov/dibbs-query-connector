@@ -11,7 +11,10 @@ import {
 import { NextRequest } from "next/server";
 import { POST } from "@/app/api/query/route";
 import { GET } from "@/app/api/route";
-import { PATIENT_HL7_MESSAGE } from "./fixtures";
+import {
+  PATIENT_HL7_MESSAGE,
+  PATIENT_HL7_MESSAGE_NO_IDENTIFIERS,
+} from "./fixtures";
 
 // Utility function to create a minimal NextRequest-like object
 function createNextRequest(
@@ -113,6 +116,18 @@ describe("POST Query FHIR Server", () => {
     const body = await response.json();
     expect(body.resourceType).toBe("OperationOutcome");
     expect(body.issue[0].diagnostics).toBe(INVALID_MESSAGE_FORMAT);
+  });
+  it("should return a 400 Patient identifier error if HL7 message doesn't have identifiers", async () => {
+    const request = createNextRequest(
+      PATIENT_HL7_MESSAGE_NO_IDENTIFIERS,
+      new URLSearchParams(
+        `id=${SYPHILIS_QUERY_ID}&fhir_server=HELIOS Meld: Direct&message_format=HL7`,
+      ),
+    );
+    const response = await POST(request);
+    const body = await response.json();
+    expect(body.resourceType).toBe("OperationOutcome");
+    expect(body.issue[0].diagnostics).toBe(MISSING_PATIENT_IDENTIFIERS);
   });
   // Delete this test once we've messaged out the deprecation of use_case and
   // partners have switched over to using id

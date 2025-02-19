@@ -142,14 +142,32 @@ export async function POST(request: NextRequest) {
         text: parseHL7FromRequestBody(requestText),
       });
 
+      const firstName = parsedMessage.get("PID.5.2").toString() ?? "";
+      const lastName = parsedMessage.get("PID.5.1").toString() ?? "";
+      const dob = parsedMessage.get("PID.7.1").toString() ?? "";
+      const mrn = parsedMessage.get("PID.3.1").toString() ?? "";
+      const phone = parsedMessage.get("NK1.5.1").toString() ?? "";
+      const noPatientIdentifierDefined = [
+        firstName,
+        lastName,
+        mrn,
+        phone,
+        dob,
+      ].every((e) => e === "");
+      console.log(firstName, lastName, mrn, phone, dob);
+
+      if (noPatientIdentifierDefined) {
+        return await handleAndReturnError(MISSING_PATIENT_IDENTIFIERS, 400);
+      }
+
       QueryRequest = {
         query_name: queryResults?.query_name,
         fhir_server: fhir_server,
-        first_name: parsedMessage.get("PID.5.2").toString() || "",
-        last_name: parsedMessage.get("PID.5.1").toString() || "",
-        dob: parsedMessage.get("PID.7.1").toString() || "",
-        mrn: parsedMessage.get("PID.3.1").toString() || "",
-        phone: parsedMessage.get("NK1.5.1").toString() || "",
+        first_name: firstName,
+        last_name: lastName,
+        dob: dob,
+        mrn: mrn,
+        phone: phone,
       };
     } catch (error: unknown) {
       return await handleAndReturnError(error);
