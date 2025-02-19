@@ -5,6 +5,8 @@ import { RoleTypeValues } from "@/app/models/entities/user-management";
 import { RootProviderMock, renderWithUser } from "@/app/tests/unit/setup";
 import UserManagement from "./page";
 
+jest.mock("next-auth/react");
+
 jest.mock("@/app/backend/user-management", () => ({
   getUsers: jest.fn().mockResolvedValue({ items: [], totalItems: 0 }),
   updateUserRole: jest.fn(),
@@ -135,4 +137,6 @@ describe("User Management: User tab", () => {
     expect(dropdownEl).toHaveValue("Super Admin");
     expect(updateRoleFnSpy).toHaveBeenCalledWith(userMock.id, "Super Admin");
   });
+
+  // Test self user cannot see dropdown for themselves
 });
