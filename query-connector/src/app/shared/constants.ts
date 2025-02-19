@@ -242,6 +242,10 @@ export const INVALID_FHIR_SERVERS = `Invalid fhir_server. Please provide a valid
 export const RESPONSE_BODY_IS_NOT_PATIENT_RESOURCE =
   "Request body is not a Patient resource.";
 export const MISSING_API_QUERY_PARAM = "Missing id or fhir_server.";
+export const INVALID_MESSAGE_FORMAT =
+  "Invalid message format. Format parameter needs to be either 'HL7' or 'FHIR'";
+export const HL7_BODY_MISFORMAT =
+  "Invalid HL7 request. Please add your HL7 message to the request body in between curly braces like so - { YOUR MESSAGE HERE } ";
 export const MISSING_PATIENT_IDENTIFIERS =
   "No patient identifiers to parse from requestBody.";
 

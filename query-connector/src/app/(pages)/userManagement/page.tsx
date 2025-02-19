@@ -31,7 +31,7 @@ const UserManagement: React.FC = () => {
     try {
       const userList: QCResponse<User> = await getUsers();
       setUsers(userList.items ?? []);
-    } catch (e) {
+    } catch (_) {
       showToastConfirmation({
         body: "Unable to retrieve users. Please try again.",
         variant: "error",
@@ -53,7 +53,7 @@ const UserManagement: React.FC = () => {
       showToastConfirmation({
         body: "Role successfully updated.",
       });
-    } catch (e) {
+    } catch (_) {
       showToastConfirmation({
         body: "Unable to update the user role. Please try again.",
         variant: "error",

@@ -63,7 +63,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         // Ensure user is in the database **only on first login**
         try {
           await addUserIfNotExists(userToken);
-        } catch (error) {}
+        } catch (error) {
+          console.error("Something went wrong in generating user token", error);
+        }
 
         if (userToken.username !== "") {
           if (isAuthDisabled()) {
