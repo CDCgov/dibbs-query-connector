@@ -44,9 +44,9 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
 
   const path = usePathname();
 
-  const { data: session } = useSession();
+  const { status } = useSession();
 
-  const isLoggedIn = !(session === null);
+  const isLoggedIn = status === "authenticated";
 
   const handleSignIn = () => {
     if (authDisabled) {
@@ -100,17 +100,18 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
               "flex-align-center",
             )}
           >
-            {!isLoggedIn && !LOGGED_IN_PATHS.includes(path as PAGES) && (
-              <Button
-                className={styles.signinButton}
-                type="button"
-                id="signin-button"
-                title={"Sign in button"}
-                onClick={handleSignIn}
-              >
-                Sign in
-              </Button>
-            )}
+            {status === "unauthenticated" &&
+              !LOGGED_IN_PATHS.includes(path as PAGES) && (
+                <Button
+                  className={styles.signinButton}
+                  type="button"
+                  id="signin-button"
+                  title={"Sign in button"}
+                  onClick={handleSignIn}
+                >
+                  Sign in
+                </Button>
+              )}
             {LOGGED_IN_PATHS.includes(path as PAGES) && (
               <button
                 onClick={toggleMenuDropdown}
