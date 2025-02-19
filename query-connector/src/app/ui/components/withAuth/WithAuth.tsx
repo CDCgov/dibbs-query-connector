@@ -15,27 +15,22 @@ import { pagesRoleAccess } from "@/app/shared/page-routes";
  * unless auth is disabled in which case the component will render without issues.
  */
 const WithAuth: React.FC<React.PropsWithChildren> = ({ children }) => {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
+
   const path = usePathname();
   const access = pagesRoleAccess[path] ?? [];
 
-  if (
+  if (status === "loading") {
+    return null;
+  } else if (status === "unauthenticated") {
+    redirect("/");
+  } else if (
     isAuthDisabled() ||
     (session && access.includes(session?.user?.role as RoleTypeValues))
   ) {
     return <>{children}</>;
-  } else if (
-    session &&
-    !access.includes(session?.user?.role as RoleTypeValues)
-  ) {
-    redirect("/unauthorized");
-  } else if (session === null) {
-    // if session object is null it means the session was retrieved and none was found
-    redirect("/");
   } else {
-    // if session object is undefined it means the session is being retrieved
-    // hold until you show content or redirect user
-    return null;
+    redirect("/unauthorized");
   }
 };
 

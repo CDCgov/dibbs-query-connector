@@ -2,7 +2,7 @@
 
 import { createContext, useState } from "react";
 
-type SubjectType = "Members" | "Query";
+export type SubjectType = "Members" | "Query";
 
 interface UserManagementData {
   teamQueryEditSection: {
