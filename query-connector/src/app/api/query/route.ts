@@ -239,10 +239,6 @@ export async function POST(request: NextRequest) {
         text: parseHL7FromRequestBody(requestText),
       });
 
-      console.log(
-        parsedMessage.get("PID.3.1").toString(),
-        parsedMessage.get("NK1.5.1").toString(),
-      );
       QueryRequest = {
         query_name: queryResults?.query_name,
         fhir_server: fhir_server,
@@ -252,6 +248,7 @@ export async function POST(request: NextRequest) {
         mrn: parsedMessage.get("PID.3.1").toString() || "",
         phone: parsedMessage.get("NK1.5.1").toString() || "",
       };
+      console.log(QueryRequest);
     } catch (error: unknown) {
       return await handleAndReturnError(error);
     }
