@@ -46,15 +46,14 @@ describe("GET Health Check", () => {
 });
 
 describe("POST Query FHIR Server", () => {
-  // let warn;
-  // beforeEach(() => {
-  //   // supress the console warns for the error endpoints
-  //   // warn = jest.spyOn(console, "error").mockImplementation(() => {});
-  // });
+  beforeEach(() => {
+    // supress the console warns for the error endpoints
+    jest.spyOn(console, "error").mockImplementation(() => {});
+  });
 
-  // afterEach(() => {
-  //   warn.mockRestore();
-  // });
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
 
   const SYPHILIS_QUERY_ID = USE_CASE_DETAILS.syphilis.id;
   it("should return an OperationOutcome if the request body is not a Patient resource", async () => {
