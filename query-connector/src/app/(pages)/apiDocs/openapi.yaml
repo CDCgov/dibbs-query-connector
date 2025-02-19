@@ -184,7 +184,7 @@ paths:
         500:
           description: Something went wrong :(
     get:
-      description: A GET endpoint that accepts a series of query parameters to execute a query within the Query Connector.
+      description: A GET endpoint that accepts a series of query parameters to execute a query within the Query Connector. At least one of the patient identifier params are required
       parameters:
         - name: fhir_server
           in: query
@@ -201,32 +201,32 @@ paths:
             type: string
             example: cf580d8d-cc7b-4eae-8a0d-96c36f9222e3
         - name: given
-          description: Patient given name
+          description: Patient given name. At least one of the patient identifier params are required
           in: query
           schema:
             type: string
             example: Lee
         - name: family
           in: query
-          description: Patient family name
+          description: Patient family name. At least one of the patient identifier params are required
           schema:
             type: string
             example: Shaw
         - name: dob
           in: query
-          description: Patient date of birth in YYYY-MM-DD format
+          description: Patient date of birth in YYYY-MM-DD format. At least one of the patient identifier params are required
           schema:
             type: string
             example: 1975-12-06
         - name: mrn
           in: query
-          description: Patient medical record number
+          description: Patient medical record number. At least one of the patient identifier params are required
           schema:
             type: string
             example: 8692756
         - name: phone
           in: query
-          description: Patient phone number
+          description: Patient phone number. At least one of the patient identifier params are required
           schema:
             type: string
             example: 517-425-1398
