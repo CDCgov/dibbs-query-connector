@@ -45,10 +45,7 @@
             "description": "Whether the request body contents are HL7 or FHIR formatted messages",
             "schema": {
               "type": "string",
-              "enum": [
-                "HL7",
-                "FHIR"
-              ],
+              "enum": ["HL7", "FHIR"],
               "example": "FHIR"
             }
           }
@@ -132,10 +129,7 @@
                 "name": [
                   {
                     "family": "Shaw",
-                    "given": [
-                      "Lee",
-                      "A."
-                    ],
+                    "given": ["Lee", "A."],
                     "period": {
                       "start": "1975-12-06",
                       "end": "2020-01-22"
@@ -143,13 +137,8 @@
                   },
                   {
                     "family": "Shaw",
-                    "given": [
-                      "Lee",
-                      "V."
-                    ],
-                    "suffix": [
-                      "MD"
-                    ],
+                    "given": ["Lee", "V."],
+                    "suffix": ["MD"],
                     "period": {
                       "start": "2020-01-23"
                     }
@@ -170,9 +159,7 @@
                 "birthDate": "1975-12-06",
                 "address": [
                   {
-                    "line": [
-                      "49 Meadow St"
-                    ],
+                    "line": ["49 Meadow St"],
                     "city": "Lansing",
                     "state": "MI",
                     "postalCode": "48864",
@@ -183,9 +170,7 @@
                     }
                   },
                   {
-                    "line": [
-                      "183 Mountain View St"
-                    ],
+                    "line": ["183 Mountain View St"],
                     "city": "Lansing",
                     "state": "MI",
                     "postalCode": "48901",
