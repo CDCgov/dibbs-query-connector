@@ -25,6 +25,7 @@ export function isAuthDisabled(): boolean {
  */
 export async function getLoggedInUser(): Promise<User | undefined> {
   const session = await auth();
+  console.log("logged in user: ", session);
   return session ? session.user : undefined;
 }
 

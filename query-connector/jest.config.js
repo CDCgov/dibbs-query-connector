@@ -16,15 +16,7 @@ const customJestConfig = {
   modulePathIgnorePatterns: ["<rootDir>/.next/"],
 };
 
-const esModules = ["next-auth", "@auth/core", "oauth4webapi"].join("|");
-
 // createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async
-/**
- *
- */
 module.exports = async () => ({
   ...(await createJestConfig(customJestConfig)()),
-  // Need to manually include some node_modules for transformation to get some integration tests to work
-  // https://stackoverflow.com/questions/70916761/next-js-and-jest-syntaxerror-cannot-use-import-statement-outside-a-module
-  transformIgnorePatterns: [`/node_modules/(?!${esModules})`],
 });

@@ -31,7 +31,7 @@ describe("User Group Integration Tests", () => {
     await dbClient.query("ROLLBACK"); // Rollback changes to keep test DB clean
   });
 
-  test.only("should create a new user group", async () => {
+  test("should create a new user group", async () => {
     const groupName = "Test Group";
     const result = await createUserGroup(groupName);
 
