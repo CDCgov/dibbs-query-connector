@@ -299,19 +299,18 @@ resource "aws_db_instance" "qc_db" {
 }
 
 provider "postgresql" {
-  host            = aws_db_instance.main.endpoint
-  port            = aws_db_instance.main.port
-  database        = aws_db_instance.main.db_name
-  username        = aws_db_instance.main.username
-  password        = aws_db_instance.main.password
+  host            = aws_db_instance.qc_db.endpoint
+  port            = 5432
+  database        = aws_db_instance.qc_db.db_name
+  username        = aws_db_instance.qc_db.username
+  password        = aws_db_instance.qc_db.password
   sslmode         = "require"
   connect_timeout = 15
 }
 
-# Create a second database for aidbox
 resource "postgresql_database" "aidbox" {
   name  = "aidbox"
-  owner = aws_db_instance.main.username
+  owner = aws_db_instance.qc_db.username
 }
 
 # Create a DB subnet group
