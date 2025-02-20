@@ -66,7 +66,7 @@ jobs:
         run: npx playwright install --with-deps
       - name: Build Query Connector
         working-directory: ./query-connector
-        run: NEXT_PUBLIC_AUTH_DISABLED="true" docker compose build --no-cache
+        run: docker compose build --no-cache -e NEXT_PUBLIC_AUTH_DISABLED=true
       - name: Run Query Connector
         working-directory: ./query-connector
         run: docker compose -f ./docker-compose-e2e.yaml up -d
