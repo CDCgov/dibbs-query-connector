@@ -11,9 +11,9 @@ const dbClient = getDbClient();
 jest.mock("../../../auth", () => ({
   auth: jest.fn(),
 }));
-const RANDOM_USER_ID = "13e1efb2-5889-4157-8f34-78d7f02dbf84";
+const TEST_USER_ID = "13e1efb2-5889-4157-8f34-78d7f02dbf84";
 (auth as jest.Mock).mockResolvedValue({
-  id: RANDOM_USER_ID,
+  id: TEST_USER_ID,
   username: "Ima User",
   firstName: "Ima",
   lastName: "User",
