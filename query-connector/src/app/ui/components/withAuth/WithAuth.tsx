@@ -30,7 +30,12 @@ const WithAuth: React.FC<React.PropsWithChildren> = ({ children }) => {
   } else if (status === "unauthenticated") {
     redirect("/");
   } else {
-    redirect("/unauthorized");
+    return (
+      <div className="main-container__wide">
+        <h1>Unauthorized Access</h1>
+        <p>You are not authorized to access this page.</p>
+      </div>
+    );
   }
 };
 
