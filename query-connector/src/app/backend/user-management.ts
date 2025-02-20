@@ -47,12 +47,14 @@ export async function addUserIfNotExists(userToken: {
     let qc_role = RoleTypeValues.Standard;
     console.log("User not found. Proceeding to insert.");
 
-    // First registered user is set as Super Admin
-    const queryUserRecordCount = `SELECT COUNT(*) FROM users`;
-    const userCount = await dbClient.query(queryUserRecordCount);
+    if (process.env.NODE_ENV !== "production") {
+      // First registered user is set as Super Admin
+      const queryUserRecordCount = `SELECT COUNT(*) FROM users`;
+      const userCount = await dbClient.query(queryUserRecordCount);
 
-    if (userCount?.rows?.[0]?.count === "0") {
-      qc_role = RoleTypeValues.SuperAdmin;
+      if (userCount?.rows?.[0]?.count === "0") {
+        qc_role = RoleTypeValues.SuperAdmin;
+      }
     }
 
     const insertUserQuery = `
