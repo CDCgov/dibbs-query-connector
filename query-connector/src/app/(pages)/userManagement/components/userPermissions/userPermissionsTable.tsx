@@ -16,6 +16,7 @@ type PermissionsProps = {
   users: User[] | null;
   fetchGroupMembers: (groupId: string) => Promise<User[]>;
 };
+
 /**
  * User section in the user management page
  * @param root0 - The user groups table

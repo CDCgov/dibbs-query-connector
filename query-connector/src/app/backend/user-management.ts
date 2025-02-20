@@ -117,7 +117,8 @@ export async function updateUserRole(
  * @returns List of users registered in qc
  */
 export async function getUsers(): Promise<QCResponse<User>> {
-  if (!(await superAdminAccessCheck())) {
+  if (!(await adminAccessCheck())) {
+    // admins need read access to users for group management
     throw new Error("Unauthorized");
   }
 
