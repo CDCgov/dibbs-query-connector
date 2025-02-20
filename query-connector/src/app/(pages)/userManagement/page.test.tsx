@@ -137,6 +137,4 @@ describe("User Management: User tab", () => {
     expect(dropdownEl).toHaveValue("Super Admin");
     expect(updateRoleFnSpy).toHaveBeenCalledWith(userMock.id, "Super Admin");
   });
-
-  // Test self user cannot see dropdown for themselves
 });

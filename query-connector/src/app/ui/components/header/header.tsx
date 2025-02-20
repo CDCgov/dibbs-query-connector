@@ -124,6 +124,7 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
                 )}
                 aria-expanded="false"
                 aria-controls="dropdown-menu"
+                data-testid="menu-button"
               >
                 <Icon.Settings
                   className="usa-icon qc-settings"
