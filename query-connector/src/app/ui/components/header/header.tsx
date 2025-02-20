@@ -10,6 +10,7 @@ import classNames from "classnames";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { LOGGED_IN_PATHS, PAGES } from "@/app/shared/page-routes";
+import { isAuthDisabled } from "@/app/utils/auth";
 
 /**
  * Produces the header.
@@ -169,7 +170,7 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
                     href={PAGES.USER_MANAGEMENT}
                     scroll={false}
                   >
-                    User Management
+                    User Management {`${isAuthDisabled()}`}
                   </Link>
                 </li>
                 <li className={styles.subMenuItem}>
