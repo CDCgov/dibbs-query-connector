@@ -16,19 +16,19 @@ import { pagesRoleAccess } from "@/app/shared/page-routes";
  */
 const WithAuth: React.FC<React.PropsWithChildren> = ({ children }) => {
   const { data: session, status } = useSession();
-
   const path = usePathname();
   const access = pagesRoleAccess[path] ?? [];
 
-  if (status === "loading") {
+  if (
+    isAuthDisabled() ||
+    (status === "authenticated" &&
+      access.includes(session?.user?.role as RoleTypeValues))
+  ) {
+    return <>{children}</>;
+  } else if (status === "loading") {
     return null;
   } else if (status === "unauthenticated") {
     redirect("/");
-  } else if (
-    isAuthDisabled() ||
-    (session && access.includes(session?.user?.role as RoleTypeValues))
-  ) {
-    return <>{children}</>;
   } else {
     redirect("/unauthorized");
   }

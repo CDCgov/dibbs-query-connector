@@ -12,11 +12,11 @@ export function isDemoMode(): boolean {
 }
 
 /**
- * Checks if the property AUTH_DISABLED is true
+ * Checks if the property NEXT_PUBLIC_AUTH_DISABLED is true
  * @returns true if auth is disabled for the application
  */
 export function isAuthDisabled(): boolean {
-  return process.env.AUTH_DISABLED === "true";
+  return process.env.NEXT_PUBLIC_AUTH_DISABLED === "true";
 }
 
 /**

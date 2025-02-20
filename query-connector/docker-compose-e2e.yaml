@@ -27,7 +27,7 @@ services:
       - "3000:3000"
     environment:
       - NODE_ENV=production
-      - AUTH_DISABLED=true
+      - NEXT_PUBLIC_AUTH_DISABLED=true
       - DATABASE_URL=postgres://postgres:pw@db:5432/tefca_db
       - NEXT_PUBLIC_HAPI_FHIR_URL=http://hapi-fhir-server:8080
       - DEMO_MODE=false

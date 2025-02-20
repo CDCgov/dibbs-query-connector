@@ -100,7 +100,8 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
               "flex-align-center",
             )}
           >
-            {status === "unauthenticated" &&
+            {!authDisabled &&
+              status === "unauthenticated" &&
               !LOGGED_IN_PATHS.includes(path as PAGES) && (
                 <Button
                   className={styles.signinButton}

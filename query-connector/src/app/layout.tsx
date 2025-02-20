@@ -8,6 +8,7 @@ import { Metadata } from "next";
 import { ToastContainer } from "react-toastify";
 import Page from "./ui/components/page/page";
 import { auth } from "@/auth";
+import { isAuthDisabled } from "./utils/auth";
 
 /**
  * Establishes the layout for the application.
@@ -35,7 +36,7 @@ export default async function RootLayout({
             hideProgressBar
           />
           <div className="application-container">
-            <Header authDisabled={process.env.AUTH_DISABLED === "true"} />
+            <Header authDisabled={isAuthDisabled()} />
             <DataProvider>
               <Page showSiteAlert={process.env.DEMO_MODE === "true"}>
                 {children}
