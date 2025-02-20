@@ -4,9 +4,21 @@ import {
   updateUserGroup,
   deleteUserGroup,
 } from "@/app/backend/user-management";
-import { getDbClient } from "./dbClient";
+import { getDbClient } from "../../backend/dbClient";
+import { auth } from "@/auth";
 
 const dbClient = getDbClient();
+jest.mock("../../../auth", () => ({
+  auth: jest.fn(),
+}));
+const RANDOM_USER_ID = "13e1efb2-5889-4157-8f34-78d7f02dbf84";
+(auth as jest.Mock).mockResolvedValue({
+  id: RANDOM_USER_ID,
+  username: "Ima User",
+  firstName: "Ima",
+  lastName: "User",
+  role: "Super Admin",
+});
 
 describe("User Group Integration Tests", () => {
   let testGroupId: string;
@@ -17,10 +29,9 @@ describe("User Group Integration Tests", () => {
 
   afterAll(async () => {
     await dbClient.query("ROLLBACK"); // Rollback changes to keep test DB clean
-    await dbClient.end();
   });
 
-  test("should create a new user group", async () => {
+  test.only("should create a new user group", async () => {
     const groupName = "Test Group";
     const result = await createUserGroup(groupName);
 

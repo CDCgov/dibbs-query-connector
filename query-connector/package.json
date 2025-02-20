@@ -46,6 +46,7 @@
     "sharp": "^0.33.5"
   },
   "devDependencies": {
+    "@babel/preset-env": "^7.26.9",
     "@next/eslint-plugin-next": "^14.0.4",
     "@playwright/test": "^1.45.2",
     "@smithy/util-stream": "^2.1.2",
