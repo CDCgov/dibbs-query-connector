@@ -3,7 +3,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 5.56.1"  # Adjust based on your needs
+      version = "~> 5.56.1" # Adjust based on your needs
     }
     random = {
       source  = "hashicorp/random"
@@ -15,7 +15,11 @@ terraform {
     }
     dockerless = {
       source  = "nullstone-io/dockerless"
-      version = "0.1.1"  # Specify a valid version
+      version = "0.1.1" # Specify a valid version
+    }
+    postgresql = {
+      source  = "cyrilgdn/postgresql"
+      version = "1.25.0"
     }
   }
 

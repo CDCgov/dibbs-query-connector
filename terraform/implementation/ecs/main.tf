@@ -40,7 +40,7 @@ module "ecs" {
   service_data = {
     query-connector = {
       root_service      = true,
-      listener_priority = 2,
+      listener_priority = 3,
       short_name        = "qc",
       fargate_cpu       = 512,
       fargate_memory    = 1024,
@@ -146,6 +146,101 @@ module "ecs" {
           value = terraform.workspace
         }
       ]
+    },
+    aidboxone = {
+      root_service      = false,
+      listener_priority = 2,
+      short_name        = "ab",
+      fargate_cpu       = 512,
+      fargate_memory    = 1024,
+      min_capacity      = 1,
+      max_capacity      = 5,
+      # Use Docker Hub for app_repo
+      app_repo       = "docker.io/healthsamurai",
+      app_image      = "${terraform.workspace}-aidbox",
+      app_version    = "edge",
+      container_port = 8080,
+      host_port      = 8080,
+      public         = true,
+      registry_url   = "${data.aws_caller_identity.current.account_id}.dkr.ecr.${var.region}.amazonaws.com",
+      env_vars = [
+        {
+          name  = "AIDBOX_TERMINOLOGY_SERVICE_BASE_URL"
+          value = "https://tx.fhir.org/r4"
+        },
+        {
+          name  = "AIDBOX_FHIR_PACKAGES"
+          value = "hl7.fhir.r4.core#4.0.1"
+        },
+        {
+          name  = "AIDBOX_FHIR_SCHEMA_VALIDATION"
+          value = "true"
+        },
+        {
+          name  = "AIDBOX_CREATED_AT_URL"
+          value = "https://aidbox.app/ex/createdAt"
+        },
+        {
+          name  = "AIDBOX_CLIENT_SECRET"
+          value = var.aidbox_client_secret
+        },
+        {
+          name  = "AIDBOX_CORRECT_AIDBOX_FORMAT"
+          value = "true"
+        },
+        {
+          name  = "AIDBOX_ADMIN_PASSWORD"
+          value = var.aidbox_admin_password
+        },
+        {
+          name  = "AIDBOX_COMPLIANCE"
+          value = "enabled"
+        },
+        {
+          name  = "AIDBOX_SECURITY_AUDIT__LOG_ENABLED"
+          value = "true"
+        },
+        {
+          name  = "BOX_SEARCH_FHIR__COMPARISONS"
+          value = "true"
+        },
+        {
+          name  = "PGHOST"
+          value = aws_db_instance.qc_db.endpoint
+        },
+        {
+          name  = "BOX_COMPATIBILITY_VALIDATION_JSON__SCHEMA_REGEX"
+          value = "#{:fhir-datetime}"
+        },
+        {
+          name  = "BOX_SEARCH_AUTHORIZE_INLINE_REQUESTS"
+          value = "true"
+        },
+        {
+          name  = "PGUSER"
+          value = aws_db_instance.qc_db.username
+        },
+        {
+          name  = "AIDBOX_PORT"
+          value = "8080"
+        },
+        {
+          name  = "PGDATABASE"
+          value = postgresql_database.aidbox.name
+        },
+        {
+          name  = "PGPASSWORD"
+          value = aws_db_instance.qc_db.password
+        },
+        {
+          name  = "PGPORT"
+          value = "5432"
+        },
+        {
+          name  = "BOX_SEARCH_INCLUDE_CONFORMANT"
+          value = "true"
+        }
+      ]
     }
 
   }
@@ -201,6 +296,22 @@ resource "aws_db_instance" "qc_db" {
   skip_final_snapshot             = true
   db_subnet_group_name            = aws_db_subnet_group.this.name
   vpc_security_group_ids          = [aws_security_group.db_sg.id]
+}
+
+provider "postgresql" {
+  host            = aws_db_instance.main.endpoint
+  port            = aws_db_instance.main.port
+  database        = aws_db_instance.main.db_name
+  username        = aws_db_instance.main.username
+  password        = aws_db_instance.main.password
+  sslmode         = "require"
+  connect_timeout = 15
+}
+
+# Create a second database for aidbox
+resource "postgresql_database" "aidbox" {
+  name  = "aidbox"
+  owner = aws_db_instance.main.username
 }
 
 # Create a DB subnet group

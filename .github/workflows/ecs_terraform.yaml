@@ -124,6 +124,8 @@ jobs:
           KEYCLOAK_CLIENT_SECRET: ${{ secrets.KEYCLOAK_CLIENT_SECRET }}
           AUTH_KEYCLOAK_ISSUER: ${{ env.workspace == 'dev' && format('https://{0}/keycloak', secrets.ECS_HOSTNAME) || format('https://{0}.{1}/keycloak', env.workspace, secrets.ECS_HOSTNAME) }}
           AUTH_URL: ${{ env.workspace == 'dev' && format('https://{0}', secrets.ECS_HOSTNAME) || format('https://{0}.{1}', env.workspace, secrets.ECS_HOSTNAME) }}
+          AIDBOX_CLIENT_SECRET: ${{ secrets.AIDBOX_CLIENT_SECRET }}
+          AIDBOX_ADMIN_PASSWORD: ${{ secrets.AIDBOX_ADMIN_PASSWORD }}
         shell: bash
         run: |
           rm -rf .terraform .terraform.lock.hcl
@@ -144,7 +146,9 @@ jobs:
             -var "keycloak_client_id=${KEYCLOAK_CLIENT_ID}" \
             -var "keycloak_client_secret=${KEYCLOAK_CLIENT_SECRET}" \
             -var "auth_keycloak_issuer=${AUTH_KEYCLOAK_ISSUER}" \
-            -var "auth_url=${AUTH_URL}"
+            -var "auth_url=${AUTH_URL}" \
+            -var "aidbox_client_secret=${AIDBOX_CLIENT_SECRET}" \
+            -var "aidbox_admin_password=${AIDBOX_ADMIN_PASSWORD}"
           terraform plan \
             -var-file="$WORKSPACE.tfvars" \
             -var "umls_api_key=${UMLS_API_KEY}" \
@@ -155,7 +159,9 @@ jobs:
             -var "keycloak_client_id=${KEYCLOAK_CLIENT_ID}" \
             -var "keycloak_client_secret=${KEYCLOAK_CLIENT_SECRET}" \
             -var "auth_keycloak_issuer=${AUTH_KEYCLOAK_ISSUER}" \
-            -var "auth_url=${AUTH_URL}"
+            -var "auth_url=${AUTH_URL}" \
+            -var "aidbox_client_secret=${AIDBOX_CLIENT_SECRET}" \
+            -var "aidbox_admin_password=${AIDBOX_ADMIN_PASSWORD}"
           terraform apply -auto-approve \
             -replace="module.ecs.dockerless_remote_image.dibbs[\"query-connector\"]" \
             -replace="module.ecs.dockerless_remote_image.dibbs[\"keycloak\"]" \
@@ -168,4 +174,6 @@ jobs:
             -var "keycloak_client_id=${KEYCLOAK_CLIENT_ID}" \
             -var "keycloak_client_secret=${KEYCLOAK_CLIENT_SECRET}" \
             -var "auth_keycloak_issuer=${AUTH_KEYCLOAK_ISSUER}" \
-            -var "auth_url=${AUTH_URL}"
+            -var "auth_url=${AUTH_URL}" \
+            -var "aidbox_client_secret=${AIDBOX_CLIENT_SECRET}" \
+            -var "aidbox_admin_password=${AIDBOX_ADMIN_PASSWORD}"

@@ -163,3 +163,14 @@ variable "auth_url" {
   sensitive   = true
 }
 
+variable "aidbox_client_secret" {
+  type       = string
+  description = "Client Secret for Aidbox"
+  sensitive   = true
+}
+
+variable "aidbox_admin_password" {
+  type       = string
+  description = "Admin password for Aidbox"
+  sensitive   = true
+}
