@@ -1,25 +1,32 @@
 "use client";
 
-import { useContext, useEffect, useState } from "react";
+import { useContext } from "react";
 import classNames from "classnames";
 import { Button } from "@trussworks/react-uswds";
 import Table from "../../../../ui/designSystem/table/Table";
 
 import { UserManagementContext } from "../UserManagementProvider";
-import { UserGroup } from "../../../../models/entities/user-management";
+import { User, UserGroup } from "../../../../models/entities/user-management";
 
+type GroupProps = {
+  users: User[];
+  userGroups: UserGroup[];
+  setUserGroups: (foo: UserGroup[]) => void;
+};
 /**
  * User groups section in the user management page
+ * @param root0 - The user groups table
+ * @param root0.users The user groups table
+ * @param root0.userGroups The user groups table
+ * @param root0.setUserGroups The user groups table
  * @returns The user groups table
  */
-const UserGroups: React.FC = () => {
-  const [userGroups, setUserGroups] = useState<UserGroup[]>([]);
-
+const UserGroupsTable: React.FC<GroupProps> = ({
+  users,
+  userGroups,
+  setUserGroups,
+}) => {
   const { openEditSection } = useContext(UserManagementContext);
-
-  useEffect(() => {
-    setUserGroups([]);
-  }, []);
 
   function getMemberLabel(memberSize: number): string {
     return memberSize == 1 ? `${memberSize} member` : `${memberSize} members`;
@@ -44,7 +51,7 @@ const UserGroups: React.FC = () => {
       <tbody>
         {userGroups.map((group: UserGroup) => (
           <tr key={group.id}>
-            <td>{group.name}</td>
+            <td width={270}>{group.name}</td>
             <td>
               <Button
                 type="button"
@@ -55,7 +62,7 @@ const UserGroups: React.FC = () => {
                   openEditSection(group.name, "Members", "Members", group.id);
                 }}
               >
-                {getMemberLabel(group.memberSize)}
+                {getMemberLabel(group.member_size)}
               </Button>
             </td>
             <td>
@@ -73,7 +80,7 @@ const UserGroups: React.FC = () => {
                   );
                 }}
               >
-                {getQueryLabel(group.querySize)}
+                {getQueryLabel(group.query_size)}
               </Button>
             </td>
           </tr>
@@ -83,4 +90,4 @@ const UserGroups: React.FC = () => {
   );
 };
 
-export default UserGroups;
+export default UserGroupsTable;

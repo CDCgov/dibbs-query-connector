@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { RoleTypeValues } from "@/app/models/entities/user-management";
+import { UserRole } from "@/app/models/entities/user-management";
 import { useSession } from "next-auth/react";
 import { isAuthDisabled } from "@/app/utils/auth";
 import { redirect, usePathname } from "next/navigation";
@@ -21,13 +21,10 @@ const WithAuth: React.FC<React.PropsWithChildren> = ({ children }) => {
 
   if (
     isAuthDisabled() ||
-    (session && access.includes(session?.user?.role as RoleTypeValues))
+    (session && access.includes(session?.user?.role as UserRole))
   ) {
     return <>{children}</>;
-  } else if (
-    session &&
-    !access.includes(session?.user?.role as RoleTypeValues)
-  ) {
+  } else if (session && !access.includes(session?.user?.role as UserRole)) {
     redirect("/unauthorized");
   } else if (session === null) {
     // if session object is null it means the session was retrieved and none was found

@@ -1,7 +1,7 @@
 import { auth } from "@/auth";
 import { User } from "next-auth";
 import { getUserRole } from "../backend/user-management";
-import { RoleTypeValues } from "../models/entities/user-management";
+import {  UserRole } from "../models/entities/user-management";
 
 /**
  * Checks if the property DEMO_MODE is true (Configured this way in demo env only)
@@ -30,21 +30,24 @@ export async function getLoggedInUser(): Promise<User | undefined> {
 
 /**
  * Performs super admin role check
- * @returns true if there is an session and the user has a super admin role
+ * @returns true if there is a session and the user has a super admin role
  */
 export async function superAdminAccessCheck(): Promise<boolean> {
   const user = await getLoggedInUser();
+  const role = await getUserRole(user?.username as string)
 
-  if (
-    isAuthDisabled() ||
-    (user &&
-      (await getUserRole(user.username as string)) ===
-        RoleTypeValues.SuperAdmin)
-  ) {
-    return true;
-  }
+  return role === UserRole.SUPER_ADMIN || isAuthDisabled()
+}
 
-  return false;
+/**
+ * Performs admin role check
+ * @returns true if there is a session and the user has a super admin OR admin role
+ */
+export async function adminAccessCheck(): Promise<boolean> {
+  const user = await getLoggedInUser();
+  const role = await getUserRole(user?.username as string)
+
+  return role === UserRole.SUPER_ADMIN || role === UserRole.ADMIN || isAuthDisabled()
 }
 
 /**
