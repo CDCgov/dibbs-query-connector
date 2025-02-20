@@ -1,27 +1,27 @@
-export enum RoleTypeValues {
-  Admin = "Admin",
-  SuperAdmin = "Super Admin",
-  Standard = "Standard User",
-}
+import { QueryTableResult } from "@/app/(pages)/queryBuilding/utils";
 
+export enum UserRole {
+  ADMIN = "Admin",
+  STANDARD ="Standard",
+  SUPER_ADMIN = "Super Admin"
+}
 export interface User {
   id: string;
   username: string;
   first_name: string;
   last_name: string;
-  qc_role:
-    | RoleTypeValues.SuperAdmin
-    | RoleTypeValues.Admin
-    | RoleTypeValues.Standard;
-  userGroups?: UserGroup[];
+  qc_role: UserRole;
+  user_groups?: UserGroup[];
   userGroupMemberships?: UserGroupMembership[];
 }
 
 export interface UserGroup {
   id: string;
   name: string;
-  memberSize: number;
-  querySize: number;
+  member_size: number;
+  query_size: number;
+  members?: User[];
+  queries?: QueryTableResult[]; 
 }
 
 export interface UserGroupMembership {

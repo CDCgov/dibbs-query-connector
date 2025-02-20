@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useContext } from "react";
-import { RoleTypeValues } from "@/app/models/entities/user-management";
+import { UserRole } from "@/app/models/entities/user-management";
 import { useSession } from "next-auth/react";
 import { redirect, usePathname } from "next/navigation";
 import { pagesRoleAccess } from "@/app/shared/page-routes";
@@ -25,7 +25,7 @@ const WithAuth: React.FC<React.PropsWithChildren> = ({ children }) => {
   if (
     isAuthDisabled ||
     (status === "authenticated" &&
-      access.includes(session?.user?.role as RoleTypeValues))
+      access.includes(session?.user?.role as UserRole))
   ) {
     return <>{children}</>;
   } else if (status === "loading") {

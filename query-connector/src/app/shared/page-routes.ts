@@ -1,4 +1,4 @@
-import { RoleTypeValues } from "../models/entities/user-management";
+import { UserRole } from "../models/entities/user-management";
 
 /**
  * Pathnames
@@ -6,38 +6,34 @@ import { RoleTypeValues } from "../models/entities/user-management";
 export enum PAGES {
   LANDING = "/",
   QUERY = "/query",
-  MY_QUERIES = "/queryBuilding",
+  QUERY_BUILDING = "/queryBuilding",
   FHIR_SERVERS = "/fhirServers",
   USER_MANAGEMENT = "/userManagement",
-  GROUP_MANAGEMENT = "/userManagement/userGroups",
 }
 
 /**
  * Role access per page
  */
-export const pagesRoleAccess: Record<string, RoleTypeValues[]> = {};
+export const pagesRoleAccess: Record<string, UserRole[]> = {};
 
 pagesRoleAccess[PAGES.QUERY] = [
-  RoleTypeValues.SuperAdmin,
-  RoleTypeValues.Admin,
-  RoleTypeValues.Standard,
+  UserRole.SUPER_ADMIN,
+  UserRole.ADMIN,
+  UserRole.STANDARD,
 ];
 
-pagesRoleAccess[PAGES.MY_QUERIES] = [
-  RoleTypeValues.SuperAdmin,
-  RoleTypeValues.Admin,
+pagesRoleAccess[PAGES.QUERY_BUILDING] = [
+  UserRole.SUPER_ADMIN,
+  UserRole.ADMIN,
 ];
 
 pagesRoleAccess[PAGES.FHIR_SERVERS] = [
-  RoleTypeValues.SuperAdmin,
-  RoleTypeValues.Admin,
+  UserRole.SUPER_ADMIN,
+  UserRole.ADMIN,
 ];
 
-pagesRoleAccess[PAGES.USER_MANAGEMENT] = [RoleTypeValues.SuperAdmin];
-
-pagesRoleAccess[PAGES.GROUP_MANAGEMENT] = [
-  RoleTypeValues.SuperAdmin,
-  RoleTypeValues.Admin,
+pagesRoleAccess[PAGES.USER_MANAGEMENT] = [
+  UserRole.SUPER_ADMIN, UserRole.ADMIN
 ];
 
 /**

@@ -10,6 +10,7 @@ import classNames from "classnames";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { LOGGED_IN_PATHS, PAGES } from "@/app/shared/page-routes";
+import { UserRole } from "@/app/models/entities/user-management";
 
 /**
  * Produces the header.
@@ -44,9 +45,10 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
 
   const path = usePathname();
 
-  const { status } = useSession();
+  const { status, data: session } = useSession();
 
   const isLoggedIn = status === "authenticated";
+  const role = session?.user.role;
 
   const handleSignIn = () => {
     if (authDisabled) {
@@ -142,13 +144,11 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
               id="dropdown-menu"
               className={classNames("usa-nav__submenu", styles.menuDropdown)}
             >
-              {/* TODO: Enable this once we can show/hide rules based on actual auth status */}
-              {/* {isProduction && ( */}
               <>
                 <li className={styles.subMenuItem}>
                   <Link
                     className={styles.menuItem}
-                    href={PAGES.MY_QUERIES}
+                    href={PAGES.QUERY_BUILDING}
                     scroll={false}
                   >
                     My Queries
@@ -163,15 +163,17 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
                     FHIR Servers
                   </Link>
                 </li>
-                <li className={styles.subMenuItem}>
-                  <Link
-                    className={styles.menuItem}
-                    href={PAGES.USER_MANAGEMENT}
-                    scroll={false}
-                  >
-                    User Management
-                  </Link>
-                </li>
+                {(role == UserRole.ADMIN || role == UserRole.SUPER_ADMIN) && (
+                  <li className={styles.subMenuItem}>
+                    <Link
+                      className={styles.menuItem}
+                      href={PAGES.USER_MANAGEMENT}
+                      scroll={false}
+                    >
+                      User Management
+                    </Link>
+                  </li>
+                )}
                 <li className={styles.subMenuItem}>
                   <button
                     className={classNames(

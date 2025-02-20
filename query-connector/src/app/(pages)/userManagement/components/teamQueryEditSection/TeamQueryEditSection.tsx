@@ -3,7 +3,7 @@
 import { useContext } from "react";
 import classNames from "classnames";
 import { Checkbox } from "@trussworks/react-uswds";
-import Drawer from "../../../../ui/designSystem/drawer/Drawer";
+import Drawer from "@/app/ui/designSystem/drawer/Drawer";
 import { UserManagementContext } from "../UserManagementProvider";
 import style from "./TeamQueryEditSection.module.scss";
 
