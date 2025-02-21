@@ -921,7 +921,7 @@ export async function updateFhirServer(
       if (existingServer.rows.length > 0) {
         const existingHeaders = existingServer.rows[0].headers || {};
         // Remove Authorization if it exists when switching to no auth
-        const { Authorization, ...restHeaders } = existingHeaders;
+        const { _, ...restHeaders } = existingHeaders;
         headers = restHeaders;
       }
     }
