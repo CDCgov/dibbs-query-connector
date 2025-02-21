@@ -125,7 +125,7 @@ const FhirServers: React.FC = () => {
 
       const result = await response.json();
       return result;
-    } catch (error) {
+    } catch {
       return {
         success: false,
         error: "Failed to test connection. Please try again.",
