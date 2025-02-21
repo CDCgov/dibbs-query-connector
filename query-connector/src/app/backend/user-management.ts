@@ -429,7 +429,7 @@ export async function getGroupQueries(groupId: string): Promise<QCResponse<UserG
   try {
     const selectQueriesByGroupQuery = 
     `
-    SELECT q.id, q.query_name, q.query_data, q.conditions_list, q.author, q.date_created, q.date_last_modified
+    SELECT q.id as query_id, q.query_name, q.query_data, q.conditions_list, q.author, q.date_created, q.date_last_modified
     FROM query as q
     LEFT JOIN usergroup_to_query as ugtq ON ugtq.query_id = q.id
     WHERE ugtq.usergroup_id = $1;

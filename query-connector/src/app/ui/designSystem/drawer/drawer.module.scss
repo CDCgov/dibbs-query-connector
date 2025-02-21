@@ -5,9 +5,7 @@ $drawerWidth: 29rem;
 .drawer {
   position: fixed;
   top: 0;
-  right: -35rem;
-  width: $drawerWidth;
-  max-width: 35rem;
+  width: calc(max($drawerWidth, 30%));
   height: 100%;
   padding: 0rem;
   display: flex;

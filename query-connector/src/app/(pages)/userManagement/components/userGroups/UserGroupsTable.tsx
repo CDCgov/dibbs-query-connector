@@ -3,29 +3,21 @@
 import { useContext } from "react";
 import classNames from "classnames";
 import { Button } from "@trussworks/react-uswds";
+
 import Table from "../../../../ui/designSystem/table/Table";
-
 import { UserManagementContext } from "../UserManagementProvider";
-import { User, UserGroup } from "../../../../models/entities/user-management";
+import { UserGroup } from "../../../../models/entities/user-management";
 
-type GroupProps = {
-  users: User[];
+type UserGroupsTableProps = {
   userGroups: UserGroup[];
-  setUserGroups: (foo: UserGroup[]) => void;
 };
 /**
  * User groups section in the user management page
- * @param root0 - The user groups table
- * @param root0.users The user groups table
- * @param root0.userGroups The user groups table
- * @param root0.setUserGroups The user groups table
+ * @param root0 - The properties object
+ * @param root0.userGroups The list of user groups to display
  * @returns The user groups table
  */
-const UserGroupsTable: React.FC<GroupProps> = ({
-  users,
-  userGroups,
-  setUserGroups,
-}) => {
+const UserGroupsTable: React.FC<UserGroupsTableProps> = ({ userGroups }) => {
   const { openEditSection } = useContext(UserManagementContext);
 
   function getMemberLabel(memberSize: number): string {
@@ -36,9 +28,6 @@ const UserGroupsTable: React.FC<GroupProps> = ({
     return querySize == 1 ? `${querySize} query` : `${querySize} queries`;
   }
 
-  /**
-   * HTML
-   */
   return (
     <Table>
       <thead>

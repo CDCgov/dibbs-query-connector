@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import TeamQueryEditSection from "../teamQueryEditSection/TeamQueryEditSection";
+import UserManagementDrawer from "../teamQueryEditSection/TeamQueryEditSection";
 
 import UserGroups from "../userGroups/UserGroupsTable";
 import TabGroup, { Tab } from "@/app/ui/designSystem/tabGroup/tabGroup";
@@ -65,20 +65,8 @@ const UsersTable: React.FC<UsersTableProps> = ({ role }) => {
       label: "User groups",
       access: ["Super Admin", "Admin"],
       onClick: setTab,
-      renderContent: () => (
-        <UserGroups
-          userGroups={userGroups}
-          setUserGroups={setUserGroups}
-          users={users}
-        />
-      ),
+      renderContent: () => <UserGroups userGroups={userGroups} />,
     },
-    // {
-    //   label: "Secret third tab",
-    //   access: ["Super Admin", "Admin"],
-    //   onClick: setTab,
-    //   renderContent: () => <div>"Secret third tab...</div>,
-    // },
   ];
 
   const tabsForRole = sections.filter((tab) => tab.access?.includes(role));
@@ -94,7 +82,7 @@ const UsersTable: React.FC<UsersTableProps> = ({ role }) => {
     <>
       {shouldRenderTabs && <TabGroup tabs={tabsForRole} />}
       {users && activeTab?.renderContent && activeTab?.renderContent()}
-      <TeamQueryEditSection />
+      <UserManagementDrawer userGroups={userGroups} />
     </>
   );
 };
