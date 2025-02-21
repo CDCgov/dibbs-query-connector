@@ -52,7 +52,7 @@ const UserManagementDrawer: React.FC<UserManagementDrawerProps> = ({
                   name={query.query_name}
                   label={`${query.query_name}`}
                   defaultChecked
-                  onChange={(e: React.ChangeEvent) => handleQueryUpdate(e)}
+                  onChange={handleQueryUpdate}
                   className={classNames("margin-bottom-3", style.checkbox)}
                 />
               </li>

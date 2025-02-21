@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useState } from "react";
+import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 
 export type SubjectType = "Members" | "Query";
 
@@ -24,8 +25,8 @@ interface UserManagementContext extends UserManagementData {
   ) => void;
   closeEditSection: () => void;
   handleSearch: (searchFilter: string) => void;
-  handleMemberUpdate: (e: React.ChangeEvent) => void;
-  handleQueryUpdate: (e: React.ChangeEvent) => void;
+  handleMemberUpdate: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleQueryUpdate: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 const initData: UserManagementData = {
@@ -105,14 +106,48 @@ const DataProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     console.log("filtering ...", filter);
   }
 
-  function handleMemberUpdate(e: React.ChangeEvent) {
-    const id = e.currentTarget.id;
-    console.log("update team members", id);
+  function handleMemberUpdate(e: React.ChangeEvent<HTMLInputElement>) {
+    const user = e.currentTarget.labels?.[0].innerText;
+    const checked = e.target.checked;
+
+    const alertText = checked
+      ? `Added ${user} to ${innerState.teamQueryEditSection.title}`
+      : `Removed ${user} from ${innerState.teamQueryEditSection.title}`;
+
+    try {
+      showToastConfirmation({
+        body: alertText,
+      });
+    } catch (error) {
+      showToastConfirmation({
+        heading: "Something went wrong",
+        body: alertText,
+        variant: "error",
+      });
+      console.error("Error updating group member list:", error);
+    }
   }
 
-  function handleQueryUpdate(e: React.ChangeEvent) {
-    const id = e.currentTarget.id;
-    console.log("update team queries", id);
+  async function handleQueryUpdate(e: React.ChangeEvent<HTMLInputElement>) {
+    const queryName = e.currentTarget.name;
+    const checked = e.target.checked;
+
+    const alertText = checked
+      ? `Assigned ${queryName} to ${innerState.teamQueryEditSection.title}`
+      : `Removed ${queryName} from ${innerState.teamQueryEditSection.title}`;
+
+    try {
+      showToastConfirmation({
+        body: alertText,
+      });
+    } catch (error) {
+      showToastConfirmation({
+        heading: "Something went wrong",
+        body: alertText,
+        variant: "error",
+      });
+      console.error("Error updating group queries list:", error);
+    }
   }
 
   return (
