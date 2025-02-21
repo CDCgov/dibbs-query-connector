@@ -226,7 +226,7 @@ module "ecs" {
         },
         {
           name  = "PGDATABASE"
-          value = postgresql_database.aidbox.name
+          value = "aidbox"
         },
         {
           name  = "PGPASSWORD"

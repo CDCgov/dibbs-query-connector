@@ -17,10 +17,6 @@ terraform {
       source  = "nullstone-io/dockerless"
       version = "0.1.1" # Specify a valid version
     }
-    postgresql = {
-      source  = "cyrilgdn/postgresql"
-      version = "1.25.0"
-    }
     local = {
       source  = "hashicorp/local"
       version = "2.5.2"
