@@ -21,4 +21,10 @@ const customJestConfig = {
 };
 
 // createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async
-module.exports = createJestConfig(customJestConfig);
+/**
+ * Creates and exports Jest configuration.
+ * @returns The Jest configuration object.
+ */
+module.exports = async () => ({
+  ...(await createJestConfig(customJestConfig)()),
+});

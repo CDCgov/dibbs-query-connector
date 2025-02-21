@@ -55,7 +55,7 @@ const UserManagement: React.FC = () => {
       showToastConfirmation({
         body: "Role successfully updated.",
       });
-    } catch (e) {
+    } catch {
       showToastConfirmation({
         body: "Unable to update the user role. Please try again.",
         variant: "error",
