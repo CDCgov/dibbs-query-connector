@@ -66,9 +66,13 @@ jobs:
         run: npx playwright install --with-deps
       - name: Build Query Connector
         working-directory: ./query-connector
+        env:
+          NEXT_PUBLIC_AUTH_DISABLED: true
         run: docker compose -f ./docker-compose-e2e.yaml build --no-cache
       - name: Run Query Connector
         working-directory: ./query-connector
+        env:
+          NEXT_PUBLIC_AUTH_DISABLED: true
         run: docker compose -f ./docker-compose-e2e.yaml up -d
       - name: Poll until Query Connector is ready
         run: |
