@@ -1,7 +1,6 @@
-"use server";
-
 import { Patient } from "fhir/r4";
 import { FormatPhoneAsDigits } from "@/app/shared/format-service";
+import { USE_CASES, USE_CASE_DETAILS } from "@/app/shared/constants";
 
 export type PatientIdentifiers = {
   first_name?: string;
@@ -16,9 +15,7 @@ export type PatientIdentifiers = {
  * @param patient - The patient resource to parse.
  * @returns An array of patient demographics extracted from the patient resource.
  */
-export async function parsePatientDemographics(
-  patient: Patient,
-): Promise<PatientIdentifiers> {
+export function parsePatientDemographics(patient: Patient): PatientIdentifiers {
   const identifiers: PatientIdentifiers = {};
 
   if (patient.name) {
@@ -36,7 +33,7 @@ export async function parsePatientDemographics(
   }
 
   // Extract MRNs from patient.identifier
-  const mrnIdentifiers = await parseMRNs(patient);
+  const mrnIdentifiers = parseMRNs(patient);
   // Add 1st value of MRN array to identifiers
   // TODO: Handle multiple MRNs to query
   if (mrnIdentifiers && mrnIdentifiers.length > 0) {
@@ -44,7 +41,7 @@ export async function parsePatientDemographics(
   }
 
   // Extract phone numbers from patient telecom arrays
-  let phoneNumbers = await parsePhoneNumbers(patient);
+  let phoneNumbers = parsePhoneNumbers(patient);
   if (phoneNumbers) {
     // Strip formatting so the query service can generate options
     phoneNumbers = phoneNumbers
@@ -65,9 +62,9 @@ export async function parsePatientDemographics(
  * @param patient - The patient resource to parse.
  * @returns An array of MRNs extracted from the patient resource.
  */
-export async function parseMRNs(
+export function parseMRNs(
   patient: Patient,
-): Promise<(string | undefined)[] | undefined> {
+): (string | undefined)[] | undefined {
   if (patient.identifier) {
     const mrnIdentifiers = patient.identifier.filter((id) =>
       id.type?.coding?.some(
@@ -87,9 +84,9 @@ export async function parseMRNs(
  * @param patient A FHIR Patient resource.
  * @returns A list of phone numbers, or undefined if the patient has no telecom.
  */
-export async function parsePhoneNumbers(
+export function parsePhoneNumbers(
   patient: Patient,
-): Promise<(string | undefined)[] | undefined> {
+): (string | undefined)[] | undefined {
   if (patient.telecom) {
     const phoneNumbers = patient.telecom.filter(
       (contactPoint) =>
@@ -98,4 +95,36 @@ export async function parsePhoneNumbers(
     );
     return phoneNumbers.map((contactPoint) => contactPoint.value);
   }
+}
+
+/**
+ * Function to parse out the HL7 message from the requestBody of a POST request
+ * @param requestText the text to parse / return
+ * @returns - A parsed HL7 message for further processing
+ */
+export function parseHL7FromRequestBody(requestText: string) {
+  let result = requestText;
+
+  // strip the leading { / closing } if they exist
+  if (requestText[0] === "{" || requestText[requestText.length - 1] === "}") {
+    const leadingClosingBraceRegex = /\{([\s\S]*)\}/;
+    const requestMatch = requestText.match(leadingClosingBraceRegex);
+    if (requestMatch) {
+      result = requestMatch[1].trim();
+    }
+  }
+  return result;
+}
+
+/**
+ * Deprecation method to backfill information from the old demo use cases into
+ * our new query table
+ * @param use_case - The old use case names that came out of the demo options
+ * @returns The ID that maps to the old use case params
+ */
+export function mapDeprecatedUseCaseToId(use_case: string | null) {
+  if (use_case === null) return null;
+  const potentialUseCaseMatch = USE_CASE_DETAILS[use_case as USE_CASES];
+  const queryId = potentialUseCaseMatch?.id ?? null;
+  return queryId;
 }
