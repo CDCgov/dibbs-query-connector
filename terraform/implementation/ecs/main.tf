@@ -298,21 +298,6 @@ resource "aws_db_instance" "qc_db" {
   vpc_security_group_ids          = [aws_security_group.db_sg.id]
 }
 
-provider "postgresql" {
-  host            = aws_db_instance.qc_db.endpoint
-  port            = 5432
-  database        = aws_db_instance.qc_db.db_name
-  username        = aws_db_instance.qc_db.username
-  password        = aws_db_instance.qc_db.password
-  sslmode         = "require"
-  connect_timeout = 15
-}
-
-resource "postgresql_database" "aidbox" {
-  name  = "aidbox"
-  owner = aws_db_instance.qc_db.username
-}
-
 # Create a DB subnet group
 resource "aws_db_subnet_group" "this" {
   name       = "${var.db_identifier}-subnet-group-${terraform.workspace}"
@@ -368,3 +353,90 @@ resource "random_password" "setup_rds_password" {
   override_special = "[]{}"
 }
 
+# Create key pair for bastion
+resource "aws_key_pair" "bastion" {
+  key_name   = "bastion-key-${terraform.workspace}"
+  public_key = var.bastion_public_key
+}
+
+# Security group for bastion
+resource "aws_security_group" "bastion" {
+  name        = "bastion-sg-${terraform.workspace}"
+  description = "Security group for bastion host"
+  vpc_id      = module.vpc.vpc_id
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = var.bastion_allowed_ips
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "bastion-sg-${terraform.workspace}"
+  }
+}
+
+# Bastion host
+resource "aws_instance" "bastion" {
+  ami           = "ami-053a45fff0a704a47" # Amazon Linux 2023 AMI
+  instance_type = "t3.nano"
+  subnet_id     = module.vpc.public_subnets[0]
+  key_name      = aws_key_pair.bastion.key_name
+
+  vpc_security_group_ids = [aws_security_group.bastion.id]
+
+  tags = {
+    Name = "bastion-${terraform.workspace}"
+  }
+}
+
+# Update DB security group to allow access from bastion
+resource "aws_security_group_rule" "allow_bastion" {
+  type                     = "ingress"
+  from_port                = 5432
+  to_port                  = 5432
+  protocol                 = "tcp"
+  source_security_group_id = aws_security_group.bastion.id
+  security_group_id        = aws_security_group.db_sg.id
+}
+
+# Create private key file for bastion
+resource "local_file" "bastion_private_key" {
+  content         = var.bastion_private_key
+  filename        = "${path.module}/bastion-key-${terraform.workspace}.pem"
+  file_permission = "0600"
+}
+
+# Create the aidbox database using the bastion host
+resource "null_resource" "create_aidbox_db" {
+  triggers = {
+    instance_id = aws_db_instance.qc_db.id
+  }
+
+  provisioner "local-exec" {
+    command = <<-EOT
+      chmod 600 ${local_file.bastion_private_key.filename}
+      ssh -o StrictHostKeyChecking=no -i ${local_file.bastion_private_key.filename} \
+          -L 5432:${aws_db_instance.qc_db.endpoint}:5432 \
+          ec2-user@${aws_instance.bastion.public_ip} \
+          "PGPASSWORD='${aws_db_instance.qc_db.password}' \
+           psql -h localhost \
+           -U ${aws_db_instance.qc_db.username} \
+           -d ${aws_db_instance.qc_db.db_name} \
+           -c 'CREATE DATABASE aidbox;'"
+    EOT
+  }
+
+  depends_on = [
+    aws_db_instance.qc_db,
+    aws_instance.bastion
+  ]
+}
