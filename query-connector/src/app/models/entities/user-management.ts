@@ -22,3 +22,10 @@ export interface UserGroup {
   memberSize: number;
   querySize: number;
 }
+
+export interface UserGroupMembership {
+  id: string;
+  user: User;
+  usergroup_id: string;
+  is_member: boolean;
+}
