@@ -6,11 +6,21 @@ import { Checkbox } from "@trussworks/react-uswds";
 import Drawer from "@/app/ui/designSystem/drawer/Drawer";
 import { UserManagementContext } from "../UserManagementProvider";
 import style from "./TeamQueryEditSection.module.scss";
+import { User, UserGroup } from "@/app/models/entities/user-management";
+import { QueryTableResult } from "@/app/(pages)/queryBuilding/utils";
+
+export type UserManagementDrawerProps = {
+  userGroups: UserGroup[];
+};
 
 /**
- *  @returns TeamQueryEditSection component which is the collapsible section that allows to edit members and queries of a team
+ * @param root0 - The properties object
+ * @param root0.userGroups The list of usergroups to display
+ * @returns TeamQueryEditSection component which is the collapsible section that allows to edit members and queries of a team
  */
-const TeamQueryEditSection: React.FC = () => {
+const UserManagementDrawer: React.FC<UserManagementDrawerProps> = ({
+  userGroups,
+}) => {
   const {
     teamQueryEditSection,
     closeEditSection,
@@ -19,45 +29,79 @@ const TeamQueryEditSection: React.FC = () => {
     handleQueryUpdate,
   } = useContext(UserManagementContext);
 
-  /**
-   * DOM content helpers
-   */
+  const renderQueries = (queries: QueryTableResult[] | undefined) => {
+    if (queries) {
+      return (
+        <ul
+          aria-description={`queries for ${teamQueryEditSection.title}`}
+          className={classNames("usa-list--unstyled", "margin-top-2")}
+        >
+          {queries.map((query) => {
+            return (
+              <li key={query.query_id}>
+                <Checkbox
+                  id={query.query_id}
+                  name={query.query_name}
+                  label={`${query.query_name}`}
+                  defaultChecked
+                  onChange={(e: React.ChangeEvent) => handleQueryUpdate(e)}
+                  className={classNames("margin-bottom-3", style.checkbox)}
+                />
+              </li>
+            );
+          })}
+        </ul>
+      );
+    } else {
+      return renderError("queries");
+    }
+  };
 
-  function createListOfItems(items: string[]): JSX.Element {
-    const isMemberView = teamQueryEditSection.subjectType == "Members";
+  const renderUsers = (users: User[] | undefined) => {
+    if (users) {
+      return (
+        <ul
+          aria-description={`members of ${teamQueryEditSection.title}`}
+          className={classNames("usa-list--unstyled", "margin-top-2")}
+        >
+          {users.map((user) => {
+            return (
+              <li key={user.id}>
+                <Checkbox
+                  id={user.id}
+                  name={user.username}
+                  label={`${user.first_name} ${user.last_name}`}
+                  defaultChecked
+                  onChange={handleMemberUpdate}
+                  className={classNames("margin-bottom-3", style.checkbox)}
+                />
+              </li>
+            );
+          })}
+        </ul>
+      );
+    } else {
+      return renderError("members");
+    }
+  };
 
-    const description = isMemberView
-      ? `members of ${teamQueryEditSection.title}`
-      : `queries of ${teamQueryEditSection.title}`;
-
+  const renderError = (content: string) => {
     return (
-      <ul
-        aria-description={description}
-        className={classNames("usa-list--unstyled", "margin-top-2")}
-      >
-        {items.map((item: string) => (
-          <li key={item}>
-            <Checkbox
-              id={item}
-              name={item}
-              label={item}
-              defaultChecked
-              onChange={isMemberView ? handleMemberUpdate : handleQueryUpdate}
-              className={classNames("margin-bottom-3", style.checkbox)}
-            />
-          </li>
-        ))}
-      </ul>
+      <div>{`Error: could not retrieve ${content} for user group. Please try again later.`}</div>
     );
-  }
+  };
 
   function generateContent(): JSX.Element {
-    return createListOfItems(teamQueryEditSection.subjectData as string[]);
-  }
+    const isMemberView = teamQueryEditSection.subjectType == "Members";
 
-  /**
-   * HTML
-   */
+    const group = userGroups.filter(
+      (group) => group.id == teamQueryEditSection.groupId,
+    )[0];
+
+    return isMemberView
+      ? renderUsers(group.members)
+      : renderQueries(group.queries);
+  }
 
   return (
     <Drawer
@@ -73,4 +117,4 @@ const TeamQueryEditSection: React.FC = () => {
   );
 };
 
-export default TeamQueryEditSection;
+export default UserManagementDrawer;
