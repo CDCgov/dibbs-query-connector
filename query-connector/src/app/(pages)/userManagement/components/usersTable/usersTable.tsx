@@ -5,10 +5,10 @@ import UserManagementDrawer from "../teamQueryEditSection/TeamQueryEditSection";
 
 import UserGroups from "../userGroups/UserGroupsTable";
 import TabGroup, { Tab } from "@/app/ui/designSystem/tabGroup/tabGroup";
-import UserPermissionsTable from "../userPermissions/UserPermissionsTable";
+import UserPermissionsTable from "../userPermissions/userPermissionsTable";
 import { QCResponse } from "@/app/models/responses/collections";
 import { User, UserGroup } from "../../../../models/entities/user-management";
-import { getUsers, getAllUserGroups } from "@/app/backend/user-management";
+import { getUsers, getUserGroups } from "@/app/backend/user-management";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 
 export type UsersTableProps = {
@@ -39,7 +39,7 @@ const UsersTable: React.FC<UsersTableProps> = ({ role }) => {
     }
   }
   async function fetchUserGroups() {
-    const userGroups = await getAllUserGroups();
+    const userGroups = await getUserGroups();
     return setUserGroups(userGroups.items);
   }
 

@@ -49,23 +49,3 @@ export async function adminAccessCheck(): Promise<boolean> {
 
   return role === UserRole.SUPER_ADMIN || role === UserRole.ADMIN || isAuthDisabled()
 }
-
-/**
- * Performs admin role check
- * @returns true if there is an session and the user has an admin or super-admin role
- */
-export async function adminAccessCheck(): Promise<boolean> {
-  const user = await getLoggedInUser();
-
-  if (
-    isAuthDisabled() ||
-    (user &&
-      [RoleTypeValues.Admin, RoleTypeValues.SuperAdmin].includes(
-        (await getUserRole(user.username as string)) as RoleTypeValues,
-      ))
-  ) {
-    return true;
-  }
-
-  return false;
-}

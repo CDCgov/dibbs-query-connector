@@ -187,8 +187,8 @@ export async function getUserGroups(): Promise<QCResponse<UserGroup>> {
       SELECT 
         ug.id, 
         ug.name, 
-        COALESCE(member_count, 0) AS memberSize,
-        COALESCE(query_count, 0) AS querySize
+        COALESCE(member_count, 0) AS member_size,
+        COALESCE(query_count, 0) AS query_size
       FROM usergroup ug
       LEFT JOIN (
         SELECT usergroup_id, COUNT(*) AS member_count 
@@ -214,7 +214,6 @@ export async function getUserGroups(): Promise<QCResponse<UserGroup>> {
     throw error;
   }
 }
-
 
 /**
  * Retrieves the user group(s) for a given user
@@ -365,7 +364,7 @@ export async function deleteUserGroup(id: string): Promise<UserGroup | string> {
     if (result.rows.length === 0) {
       throw new Error(`User group with ID '${id}' not found.`);
     }
-
+    
     return {
       id: result.rows[0].id,
       name: result.rows[0].name,
