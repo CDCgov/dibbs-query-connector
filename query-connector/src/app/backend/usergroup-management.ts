@@ -16,6 +16,12 @@ export async function getUsersWithGroupStatus(
     throw new Error("Unauthorized");
   }
 
+  const groupCheckQuery = `SELECT id FROM usergroup WHERE id = $1;`;
+  const groupCheckResult = await dbClient.query(groupCheckQuery, [groupId]);
+  if (groupCheckResult.rows.length === 0) {
+    return [];
+  }
+
   const query = `
     SELECT u.id, u.username, u.first_name, u.last_name, u.qc_role,
            COALESCE(ug.id, '') AS membership_id,
@@ -56,7 +62,22 @@ export async function addUsersToGroup(
   userIds: string[],
 ): Promise<string[]> {
   if (!userIds.length) return [];
-  const values = userIds
+
+  const existingUsersQuery = `SELECT id FROM users WHERE id = ANY($1);`;
+  const existingUsersResult = await dbClient.query(existingUsersQuery, [
+    userIds,
+  ]);
+  const existingUserIds = new Set(
+    existingUsersResult.rows.map((row) => row.id),
+  );
+  const validUserIds = userIds.filter((id) => existingUserIds.has(id));
+
+  // If no valid user IDs are found, return an empty array
+  if (!validUserIds.length) {
+    return [];
+  }
+
+  const values = validUserIds
     .map((userId) => `('${userId}_${groupId}', '${userId}', '${groupId}')`)
     .join(",");
   const query = `
@@ -109,9 +130,7 @@ export async function saveUserGroupMembership(
     // Fetch current memberships
     const existingMemberships = await getUsersWithGroupStatus(groupId);
     const existingUserIds = new Set(
-      existingMemberships
-        .filter((m) => m.is_member) // Ensure we're only tracking actual members
-        .map((m) => m.user.id),
+      existingMemberships.filter((m) => m.is_member).map((m) => m.user.id),
     );
 
     // Determine users to add and remove

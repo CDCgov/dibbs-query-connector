@@ -132,4 +132,45 @@ describe("User Group Membership Tests", () => {
       updatedMemberships.some((m) => m.user.id === TEST_USER_2 && m.is_member),
     ).toBe(false);
   });
+
+  test("should return empty array when adding users with empty list", async () => {
+    const result = await addUsersToGroup(TEST_GROUP_ID, []);
+    expect(result).toEqual([]);
+  });
+
+  test("should return empty array when removing users with empty list", async () => {
+    const result = await removeUsersFromGroup(TEST_GROUP_ID, []);
+    expect(result).toEqual([]);
+  });
+
+  test("should return empty array when adding users with empty list", async () => {
+    const result = await addUsersToGroup(TEST_GROUP_ID, []);
+    expect(result).toEqual([]);
+  });
+
+  test("should return empty array when removing users with empty list", async () => {
+    const result = await removeUsersFromGroup(TEST_GROUP_ID, []);
+    expect(result).toEqual([]);
+  });
+
+  test("should not add non-existent user to group", async () => {
+    const INVALID_USER_ID = "99999999-9999-9999-9999-999999999999";
+    const result = await addUsersToGroup(TEST_GROUP_ID, [INVALID_USER_ID]);
+
+    expect(result).toEqual([]);
+  });
+
+  test("should not remove non-existent user from group", async () => {
+    const INVALID_USER_ID = "99999999-9999-9999-9999-999999999999";
+    const result = await removeUsersFromGroup(TEST_GROUP_ID, [INVALID_USER_ID]);
+
+    expect(result).toEqual([]);
+  });
+
+  test("should return empty result when querying a non-existent group", async () => {
+    const INVALID_GROUP_ID = "99999999-9999-9999-9999-999999999999";
+    const result = await getUsersWithGroupStatus(INVALID_GROUP_ID);
+
+    expect(result).toEqual([]);
+  });
 });
