@@ -6,8 +6,13 @@ import { Checkbox } from "@trussworks/react-uswds";
 import Drawer from "@/app/ui/designSystem/drawer/Drawer";
 import { UserManagementContext } from "../UserManagementProvider";
 import style from "./TeamQueryEditSection.module.scss";
-import { User, UserGroup } from "@/app/models/entities/user-management";
+import {
+  User,
+  UserGroup,
+  UserRole,
+} from "@/app/models/entities/user-management";
 import { QueryTableResult } from "@/app/(pages)/queryBuilding/utils";
+import { useSession } from "next-auth/react";
 
 export type UserManagementDrawerProps = {
   userGroups: UserGroup[];
@@ -28,6 +33,9 @@ const UserManagementDrawer: React.FC<UserManagementDrawerProps> = ({
     handleMemberUpdate,
     handleQueryUpdate,
   } = useContext(UserManagementContext);
+
+  const { data: session } = useSession();
+  const role = session?.user.role;
 
   const renderQueries = (queries: QueryTableResult[] | undefined) => {
     if (queries) {
@@ -67,14 +75,21 @@ const UserManagementDrawer: React.FC<UserManagementDrawerProps> = ({
           {users.map((user) => {
             return (
               <li key={user.id}>
-                <Checkbox
-                  id={user.id}
-                  name={user.username}
-                  label={`${user.first_name} ${user.last_name}`}
-                  defaultChecked
-                  onChange={handleMemberUpdate}
-                  className={classNames("margin-bottom-3", style.checkbox)}
-                />
+                {role == UserRole.SUPER_ADMIN ? (
+                  <Checkbox
+                    id={user.id}
+                    name={user.username}
+                    label={`${user.first_name} ${user.last_name}`}
+                    defaultChecked
+                    onChange={handleMemberUpdate}
+                    className={classNames("margin-bottom-3", style.checkbox)}
+                  />
+                ) : (
+                  <div
+                    key={user.id}
+                    className={"padding-bottom-2"}
+                  >{`${user.first_name} ${user.last_name}`}</div>
+                )}
               </li>
             );
           })}
@@ -99,8 +114,8 @@ const UserManagementDrawer: React.FC<UserManagementDrawerProps> = ({
     )[0];
 
     return isMemberView
-      ? renderUsers(group.members)
-      : renderQueries(group.queries);
+      ? renderUsers(group?.members)
+      : renderQueries(group?.queries);
   }
 
   return (
