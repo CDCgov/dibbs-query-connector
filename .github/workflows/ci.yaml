@@ -64,9 +64,12 @@ jobs:
       - name: Install Playwright Browsers
         working-directory: ./query-connector
         run: npx playwright install --with-deps
-      - name: Build and Run Query Connector
+      - name: Build Query Connector
         working-directory: ./query-connector
-        run: docker compose -f ./docker-compose-e2e.yaml up --build -d
+        run: docker compose -f ./docker-compose-e2e.yaml build --no-cache
+      - name: Run Query Connector
+        working-directory: ./query-connector
+        run: docker compose -f ./docker-compose-e2e.yaml up -d
       - name: Poll until Query Connector is ready
         run: |
           until curl -s http://localhost:3000/; do
