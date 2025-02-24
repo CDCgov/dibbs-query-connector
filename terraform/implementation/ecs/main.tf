@@ -433,6 +433,8 @@ resource "null_resource" "create_aidbox_db" {
 
   provisioner "local-exec" {
     command = <<-EOT
+      echo "Waiting for bastion host to become available..."
+      sleep 30
       chmod 600 ${local_file.bastion_private_key.filename}
       ssh -o StrictHostKeyChecking=no -i ${local_file.bastion_private_key.filename} \
           -L 5432:${aws_db_instance.qc_db.endpoint} \
