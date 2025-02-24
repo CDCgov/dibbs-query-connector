@@ -193,9 +193,9 @@ module "ecs" {
           value = var.aidbox_admin_password
         },
         {
-          name = "AIDBOX_BASE_URL"
+          name  = "AIDBOX_BASE_URL"
           value = var.aidbox_base_url
-        }
+        },
         {
           name  = "AIDBOX_COMPLIANCE"
           value = "enabled"
