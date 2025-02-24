@@ -27,9 +27,9 @@ services:
       - "3000:3000"
     environment:
       - NODE_ENV=production
-      - NEXT_PUBLIC_AUTH_DISABLED=true
+      - AUTH_DISABLED=true
       - DATABASE_URL=postgres://postgres:pw@db:5432/tefca_db
-      - NEXT_PUBLIC_HAPI_FHIR_URL=http://hapi-fhir-server:8080
+      - NEXT_PUBLIC_HAPI_FHIR_URL=http://localhost:8080
       - DEMO_MODE=false
       # Note: you must have a local .env file with the ERSD_API_KEY set to a key
       # obtained from the ERSD API at https://ersd.aimsplatform.org/#/api-keys

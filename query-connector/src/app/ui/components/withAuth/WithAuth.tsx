@@ -1,11 +1,12 @@
 "use client";
 
-import React from "react";
+import React, { useContext } from "react";
 import { RoleTypeValues } from "@/app/models/entities/user-management";
 import { useSession } from "next-auth/react";
-import { isAuthDisabled } from "@/app/utils/auth";
 import { redirect, usePathname } from "next/navigation";
 import { pagesRoleAccess } from "@/app/shared/page-routes";
+import { DataContext } from "@/app/shared/DataProvider";
+import { isAuthDisabledAtRuntime } from "@/app/utils/auth";
 
 /**
  * @param root0 AuthPageGuard component props
@@ -16,11 +17,13 @@ import { pagesRoleAccess } from "@/app/shared/page-routes";
  */
 const WithAuth: React.FC<React.PropsWithChildren> = ({ children }) => {
   const { data: session, status } = useSession();
+  const ctx = useContext(DataContext);
+  const isAuthDisabled = isAuthDisabledAtRuntime(ctx?.runtimeConfig);
   const path = usePathname();
   const access = pagesRoleAccess[path] ?? [];
 
   if (
-    isAuthDisabled() ||
+    isAuthDisabled ||
     (status === "authenticated" &&
       access.includes(session?.user?.role as RoleTypeValues))
   ) {

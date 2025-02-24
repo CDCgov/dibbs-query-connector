@@ -8,7 +8,6 @@ import { Metadata } from "next";
 import { ToastContainer } from "react-toastify";
 import Page from "./ui/components/page/page";
 import { auth } from "@/auth";
-import { isAuthDisabled } from "./utils/auth";
 
 /**
  * Establishes the layout for the application.
@@ -25,6 +24,10 @@ export default async function RootLayout({
   // if session does not exists then session object remains null
   await auth();
 
+  const runtimeConfig = {
+    AUTH_DISABLED: process.env.AUTH_DISABLED || "false",
+  };
+
   return (
     <html lang="en">
       <SessionProvider>
@@ -36,8 +39,8 @@ export default async function RootLayout({
             hideProgressBar
           />
           <div className="application-container">
-            <Header authDisabled={isAuthDisabled()} />
-            <DataProvider>
+            <Header authDisabled={process.env.AUTH_DISABLED === "true"} />
+            <DataProvider runtimeConfig={runtimeConfig}>
               <Page showSiteAlert={process.env.DEMO_MODE === "true"}>
                 {children}
               </Page>

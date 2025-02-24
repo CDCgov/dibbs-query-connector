@@ -37,7 +37,7 @@ services:
     environment:
       - NODE_ENV=production
       - NODE_TLS_REJECT_UNAUTHORIZED=0
-      - NEXT_PUBLIC_AUTH_DISABLED=false
+      - AUTH_DISABLED=false
       - AUTH_SECRET="ido5D/uybeAB3AmMQwn+ubw2zYC4t2h7RJlW2R79598="
       - AUTH_URL=http://localhost:3000
       - LOCAL_KEYCLOAK=http://localhost:8080

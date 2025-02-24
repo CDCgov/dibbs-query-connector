@@ -12,11 +12,24 @@ export function isDemoMode(): boolean {
 }
 
 /**
- * Checks if the property NEXT_PUBLIC_AUTH_DISABLED is true
+ * Checks if the property AUTH_DISABLED is true
+ * USE ONLY ON FRONTEND COMPONENTS
+ * @param runtimeConfig - object that contains all runtime variables
+ * @returns true if auth is disabled for the application
+ */
+export function isAuthDisabledAtRuntime(
+  runtimeConfig: Record<string, string> | undefined,
+): boolean {
+  return runtimeConfig?.AUTH_DISABLED === "true";
+}
+
+/**
+ * Checks if the property AUTH_DISABLED is true
+ * USE ONLY ON SERVER CODE
  * @returns true if auth is disabled for the application
  */
 export function isAuthDisabled(): boolean {
-  return process.env.NEXT_PUBLIC_AUTH_DISABLED === "true";
+  return process.env.AUTH_DISABLED === "true";
 }
 
 /**

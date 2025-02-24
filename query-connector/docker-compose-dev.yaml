@@ -49,7 +49,7 @@ services:
       - hapi-fhir-server
 
   # Keycloak for authentication
-  # Note: you must have a local .env file with a parameter NEXT_PUBLIC_AUTH_DISABLED.
+  # Note: you must have a local .env file with a parameter AUTH_DISABLED.
   # You may set it to true or false depending on what you'd like to test.
   keycloak:
     image: quay.io/keycloak/keycloak:26.1

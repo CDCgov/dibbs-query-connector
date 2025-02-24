@@ -169,8 +169,7 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
                     href={PAGES.USER_MANAGEMENT}
                     scroll={false}
                   >
-                    User Management{" "}
-                    {`|${process.env.NEXT_PUBLIC_AUTH_DISABLED}|${typeof process.env.NEXT_PUBLIC_AUTH_DISABLED}`}
+                    User Management
                   </Link>
                 </li>
                 <li className={styles.subMenuItem}>

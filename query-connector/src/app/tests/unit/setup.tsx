@@ -1,4 +1,4 @@
-import { DataContext } from "../../shared/DataProvider";
+import { DataContext, DataContextValue } from "../../shared/DataProvider";
 import { render } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
@@ -19,6 +19,7 @@ interface RootProviderMockProps extends React.PropsWithChildren {
   setCurrentPage?: jest.Mock;
   toastConfig?: unknown;
   setToastConfig?: jest.Mock;
+  runtimeConfig?: Record<string, string>;
 }
 
 export const RootProviderMock: React.FC<RootProviderMockProps> = ({
@@ -29,14 +30,16 @@ export const RootProviderMock: React.FC<RootProviderMockProps> = ({
   setCurrentPage,
   toastConfig,
   setToastConfig,
+  runtimeConfig,
 }) => {
-  const mockContextValue = {
+  const mockContextValue: DataContextValue = {
     data: data,
     setData: setData || jest.fn(),
     currentPage: currentPage,
     setCurrentPage: setCurrentPage || jest.fn(),
     toastConfig: toastConfig || {},
     setToastConfig: setToastConfig || jest.fn(),
+    runtimeConfig: runtimeConfig || { AUTH_DISABLED: "true" },
   };
 
   return (
