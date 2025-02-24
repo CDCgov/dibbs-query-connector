@@ -24,6 +24,10 @@ export default async function RootLayout({
   // if session does not exists then session object remains null
   await auth();
 
+  const runtimeConfig = {
+    AUTH_DISABLED: process.env.AUTH_DISABLED || "false",
+  };
+
   return (
     <html lang="en">
       <SessionProvider>
@@ -36,7 +40,7 @@ export default async function RootLayout({
           />
           <div className="application-container">
             <Header authDisabled={process.env.AUTH_DISABLED === "true"} />
-            <DataProvider>
+            <DataProvider runtimeConfig={runtimeConfig}>
               <Page showSiteAlert={process.env.DEMO_MODE === "true"}>
                 {children}
               </Page>

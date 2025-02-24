@@ -14,6 +14,7 @@ import {
   User,
   UserGroup,
 } from "../../models/entities/user-management";
+import { useSession } from "next-auth/react";
 
 /**
  * User section in the user management page
@@ -22,6 +23,7 @@ import {
 const UserManagement: React.FC = () => {
   const { openEditSection } = useContext(UserManagementContext);
   const [users, setUsers] = useState<User[] | null>(null);
+  const { data: session } = useSession();
 
   /**
    * Initialization
@@ -30,8 +32,8 @@ const UserManagement: React.FC = () => {
   async function fetchUsers() {
     try {
       const userList: QCResponse<User> = await getUsers();
-      setUsers(userList.items ?? []);
-    } catch {
+      setUsers(userList.items);
+    } catch (e) {
       showToastConfirmation({
         body: "Unable to retrieve users. Please try again.",
         variant: "error",
@@ -81,15 +83,22 @@ const UserManagement: React.FC = () => {
     } else {
       return users.map((user: User) => (
         <tr key={user.id}>
-          <td>{`${user.last_name}, ${user.first_name}`}</td>
+          <td>
+            {`${user.last_name}, ${user.first_name}`}
+            {isSelf(user) ? <span> (self)</span> : null}
+          </td>
           <td width={270}>
-            <RoleDropdown
-              id={user.id}
-              defaultValue={user.qc_role}
-              OnChange={(role: RoleTypeValues) => {
-                handleUserRoleChange(user.id, role);
-              }}
-            />
+            {isSelf(user) ? (
+              user.qc_role
+            ) : (
+              <RoleDropdown
+                id={user.id}
+                defaultValue={user.qc_role}
+                OnChange={(role: RoleTypeValues) => {
+                  handleUserRoleChange(user.id, role);
+                }}
+              />
+            )}
           </td>
           <td>
             {user.userGroups && user.userGroups?.length > 0
@@ -121,6 +130,14 @@ const UserManagement: React.FC = () => {
         </tr>
       ));
     }
+  }
+
+  function isSelf(user: User): boolean {
+    if (user.username === session?.user.username) {
+      return true;
+    }
+
+    return false;
   }
 
   /**
