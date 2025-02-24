@@ -56,8 +56,6 @@ describe("User Management Integration Tests", () => {
   /**
    * Tests adding a new user if they do not already exist.
    */
-  []; //first user
-
   test.each([
     { user: TEST_SUPER_USER, role: RoleTypeValues.SuperAdmin },
     { user: TEST_USER, role: RoleTypeValues.Standard },
