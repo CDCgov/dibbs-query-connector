@@ -120,6 +120,7 @@ jobs:
           TF_VAR_keycloak_client_secret: ${{ secrets.KEYCLOAK_CLIENT_SECRET }}
           TF_VAR_auth_keycloak_issuer: ${{ env.workspace == 'dev' && format('https://{0}/keycloak', secrets.ECS_HOSTNAME) || format('https://{0}.{1}/keycloak', env.workspace, secrets.ECS_HOSTNAME) }}
           TF_VAR_auth_url: ${{ env.workspace == 'dev' && format('https://{0}', secrets.ECS_HOSTNAME) || format('https://{0}.{1}', env.workspace, secrets.ECS_HOSTNAME) }}
+          TF_VAR_aidbox_base_url: ${{ env.workspace == 'dev' && format('https://{0}/aidboxone', secrets.ECS_HOSTNAME) || format('https://{0}.{1}/aidboxone', env.workspace, secrets.ECS_HOSTNAME) }}
           TF_VAR_aidbox_client_secret: ${{ secrets.AIDBOX_CLIENT_SECRET }}
           TF_VAR_aidbox_admin_password: ${{ secrets.AIDBOX_ADMIN_PASSWORD }}
           TF_VAR_bastion_public_key: ${{ secrets.BASTION_PUBLIC_KEY }}

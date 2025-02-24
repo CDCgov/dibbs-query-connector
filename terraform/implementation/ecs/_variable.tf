@@ -192,3 +192,9 @@ variable "bastion_allowed_ips" {
   description = "List of CIDR blocks to allow access to the bastion host"
   default     = []
 }
+
+variable "aidbox_base_url" {
+  type        = string
+  description = "Base URL for Aidbox"
+  default     = ""
+}
