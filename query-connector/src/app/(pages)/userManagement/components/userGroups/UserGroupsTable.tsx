@@ -6,18 +6,29 @@ import { Button } from "@trussworks/react-uswds";
 
 import Table from "../../../../ui/designSystem/table/Table";
 import { UserManagementContext } from "../UserManagementProvider";
-import { UserGroup } from "../../../../models/entities/user-management";
+import { UserGroup, User } from "../../../../models/entities/user-management";
+import { QueryTableResult } from "@/app/(pages)/queryBuilding/utils";
+import styles from "../usersTable/usersTable.module.scss";
 
 type UserGroupsTableProps = {
   userGroups: UserGroup[];
+  fetchGroupMembers: (groupId: string) => Promise<User[]>;
+  fetchGroupQueries: (groupId: string) => Promise<QueryTableResult[]>;
 };
+
 /**
  * User groups section in the user management page
  * @param root0 - The properties object
  * @param root0.userGroups The list of user groups to display
+ *  @param root0.fetchGroupMembers Function to retrieve a group's list of users
+ *  @param root0.fetchGroupQueries Function to retrieve a group's list of assigned queries
  * @returns The user groups table
  */
-const UserGroupsTable: React.FC<UserGroupsTableProps> = ({ userGroups }) => {
+const UserGroupsTable: React.FC<UserGroupsTableProps> = ({
+  userGroups,
+  fetchGroupQueries,
+  fetchGroupMembers,
+}) => {
   const { openEditSection } = useContext(UserManagementContext);
 
   function getMemberLabel(memberSize: number): string {
@@ -28,6 +39,60 @@ const UserGroupsTable: React.FC<UserGroupsTableProps> = ({ userGroups }) => {
     return querySize == 1 ? `${querySize} query` : `${querySize} queries`;
   }
 
+  function renderGroupsTable() {
+    return userGroups.map((group: UserGroup) => (
+      <tr key={group.id}>
+        <td width={270}>{group.name}</td>
+        <td>
+          <Button
+            type="button"
+            className={classNames(styles.drawerButton, "text-no-underline")}
+            unstyled
+            aria-description={`Edit ${group.name} members`}
+            onClick={async () => {
+              let members = group.members;
+              if (!members || members?.length <= 0) {
+                members = await fetchGroupMembers(group.id);
+              }
+              openEditSection(
+                group.name,
+                "Members",
+                "Members",
+                group.id,
+                members as User[],
+              );
+            }}
+            disabled={group.member_size <= 0}
+          >
+            {getMemberLabel(group.member_size)}
+          </Button>
+        </td>
+        <td>
+          <Button
+            type="button"
+            className={classNames("text-no-underline")}
+            unstyled
+            aria-description={`Edit ${group.name} queries`}
+            onClick={async () => {
+              let queries = group.queries;
+              if (!queries || queries?.length <= 0) {
+                queries = await fetchGroupQueries(group.id);
+              }
+              openEditSection(
+                group.name,
+                "Assigned Queries",
+                "Queries",
+                group.id,
+                queries as QueryTableResult[],
+              );
+            }}
+          >
+            {getQueryLabel(group.query_size)}
+          </Button>
+        </td>
+      </tr>
+    ));
+  }
   return (
     <Table>
       <thead>
@@ -38,42 +103,13 @@ const UserGroupsTable: React.FC<UserGroupsTableProps> = ({ userGroups }) => {
         </tr>
       </thead>
       <tbody>
-        {userGroups.map((group: UserGroup) => (
-          <tr key={group.id}>
-            <td width={270}>{group.name}</td>
-            <td>
-              <Button
-                type="button"
-                className={classNames("text-no-underline")}
-                unstyled
-                aria-description={`Edit ${group.name} members`}
-                onClick={() => {
-                  openEditSection(group.name, "Members", "Members", group.id);
-                }}
-              >
-                {getMemberLabel(group.member_size)}
-              </Button>
-            </td>
-            <td>
-              <Button
-                type="button"
-                className={classNames("text-no-underline")}
-                unstyled
-                aria-description={`Edit ${group.name} queries`}
-                onClick={() => {
-                  openEditSection(
-                    group.name,
-                    "Assigned queries",
-                    "Query",
-                    group.id,
-                  );
-                }}
-              >
-                {getQueryLabel(group.query_size)}
-              </Button>
-            </td>
+        {userGroups.length > 0 ? (
+          renderGroupsTable()
+        ) : (
+          <tr key={0}>
+            <td>{"No user groups found."}</td>
           </tr>
-        ))}
+        )}
       </tbody>
     </Table>
   );

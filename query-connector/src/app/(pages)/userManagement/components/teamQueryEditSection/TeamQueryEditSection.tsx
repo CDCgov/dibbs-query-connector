@@ -1,6 +1,5 @@
 "use client";
-
-import { useContext } from "react";
+import { Dispatch, SetStateAction, useContext, useEffect } from "react";
 import classNames from "classnames";
 import { Checkbox } from "@trussworks/react-uswds";
 import Drawer from "@/app/ui/designSystem/drawer/Drawer";
@@ -16,15 +15,18 @@ import { useSession } from "next-auth/react";
 
 export type UserManagementDrawerProps = {
   userGroups: UserGroup[];
+  setUserGroups: Dispatch<SetStateAction<UserGroup[]>>;
 };
 
 /**
  * @param root0 - The properties object
  * @param root0.userGroups The list of usergroups to display
+ * @param root0.setUserGroups -
  * @returns TeamQueryEditSection component which is the collapsible section that allows to edit members and queries of a team
  */
 const UserManagementDrawer: React.FC<UserManagementDrawerProps> = ({
   userGroups,
+  setUserGroups,
 }) => {
   const {
     teamQueryEditSection,
@@ -36,6 +38,24 @@ const UserManagementDrawer: React.FC<UserManagementDrawerProps> = ({
 
   const { data: session } = useSession();
   const role = session?.user.role;
+
+  useEffect(() => {
+    const groupId = teamQueryEditSection.groupId;
+    const activeGroupIndex = userGroups.findIndex(
+      (group) => group.id == groupId,
+    );
+    const activeGroup = userGroups[activeGroupIndex];
+    const dataToUpdate = teamQueryEditSection.subjectData;
+
+    if (activeGroup && teamQueryEditSection.subjectType == "Members") {
+      activeGroup.members = dataToUpdate as User[];
+      setUserGroups([...userGroups]);
+    }
+    if (activeGroup && teamQueryEditSection.subjectType === "Queries") {
+      activeGroup.queries = dataToUpdate as QueryTableResult[];
+      setUserGroups([...userGroups]);
+    }
+  }, [teamQueryEditSection]);
 
   const renderQueries = (queries: QueryTableResult[] | undefined) => {
     if (queries) {
@@ -66,7 +86,7 @@ const UserManagementDrawer: React.FC<UserManagementDrawerProps> = ({
   };
 
   const renderUsers = (users: User[] | undefined) => {
-    if (users) {
+    if (users && users.length > 0) {
       return (
         <ul
           aria-description={`members of ${teamQueryEditSection.title}`}
@@ -109,13 +129,14 @@ const UserManagementDrawer: React.FC<UserManagementDrawerProps> = ({
   function generateContent(): JSX.Element {
     const isMemberView = teamQueryEditSection.subjectType == "Members";
 
-    const group = userGroups.filter(
+    const activeGroupIndex = userGroups.findIndex(
       (group) => group.id == teamQueryEditSection.groupId,
-    )[0];
+    );
+    const activeGroup = userGroups[activeGroupIndex];
 
     return isMemberView
-      ? renderUsers(group?.members)
-      : renderQueries(group?.queries);
+      ? renderUsers(activeGroup?.members)
+      : renderQueries(activeGroup?.queries);
   }
 
   return (

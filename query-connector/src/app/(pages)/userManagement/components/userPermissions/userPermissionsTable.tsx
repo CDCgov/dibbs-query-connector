@@ -11,16 +11,22 @@ import { UserManagementContext } from "../UserManagementProvider";
 import { User, UserGroup } from "../../../../models/entities/user-management";
 import { UserRole } from "../../../../models/entities/user-management";
 import styles from "../../userManagement.module.scss";
+
 type PermissionsProps = {
   users: User[] | null;
+  fetchGroupMembers: (groupId: string) => Promise<User[]>;
 };
 /**
  * User section in the user management page
  * @param root0 - The user groups table
  * @param root0.users The user groups table
+ *  @param root0.fetchGroupMembers Function to retrieve a group's list of users
  * @returns Users table
  */
-const UserPermissionsTable: React.FC<PermissionsProps> = ({ users }) => {
+const UserPermissionsTable: React.FC<PermissionsProps> = ({
+  users,
+  fetchGroupMembers,
+}) => {
   const { openEditSection } = useContext(UserManagementContext);
 
   /**
@@ -55,6 +61,7 @@ const UserPermissionsTable: React.FC<PermissionsProps> = ({ users }) => {
       </td>
     );
   };
+
   const renderGroups = (user: User) => {
     return (
       <td>
@@ -67,8 +74,18 @@ const UserPermissionsTable: React.FC<PermissionsProps> = ({ users }) => {
                   unstyled
                   key={group.id}
                   aria-description={`Edit ${group.name} members`}
-                  onClick={() => {
-                    openEditSection(group.name, "Members", "Members", group.id);
+                  onClick={async () => {
+                    let members = group.members;
+                    if (!members || members?.length <= 0) {
+                      members = await fetchGroupMembers(group.id);
+                    }
+                    openEditSection(
+                      group.name,
+                      "Members",
+                      "Members",
+                      group.id,
+                      members as User[],
+                    );
                   }}
                 >
                   {group.name}
@@ -80,6 +97,7 @@ const UserPermissionsTable: React.FC<PermissionsProps> = ({ users }) => {
       </td>
     );
   };
+
   const renderUserRows = (users: User[] | null): React.ReactNode => {
     return users?.map((user: User) => {
       return (
@@ -92,9 +110,6 @@ const UserPermissionsTable: React.FC<PermissionsProps> = ({ users }) => {
     });
   };
 
-  /**
-   * HTML
-   */
   return (
     <>
       <Table>

@@ -1,6 +1,7 @@
 "use server";
 
 import { User, UserGroup, UserRole } from "../models/entities/user-management";
+import { QueryTableResult } from "../(pages)/queryBuilding/utils";
 import { QCResponse } from "../models/responses/collections";
 import { adminAccessCheck, superAdminAccessCheck } from "../utils/auth";
 import { getDbClient } from "./dbClient";
@@ -364,7 +365,7 @@ export async function deleteUserGroup(id: string): Promise<UserGroup | string> {
     if (result.rows.length === 0) {
       throw new Error(`User group with ID '${id}' not found.`);
     }
-    
+
     return {
       id: result.rows[0].id,
       name: result.rows[0].name,
@@ -382,7 +383,7 @@ export async function deleteUserGroup(id: string): Promise<UserGroup | string> {
  * @param groupId identifier of the group whose members we are retrieving
  * @returns A list of User data for the given group
  */
-export async function getGroupMembers(groupId: string): Promise<QCResponse<UserGroup>> {
+export async function getGroupMembers(groupId: string): Promise<QCResponse<User>> {
   try {
     const selectMembersByGroupQuery = 
     `
@@ -396,7 +397,7 @@ export async function getGroupMembers(groupId: string): Promise<QCResponse<UserG
     return {
       totalItems: result.rowCount,
       items: result.rows || [],
-    } as QCResponse<UserGroup>;
+    } as QCResponse<User>;
   } catch (error) {
     throw error;
   }
@@ -407,7 +408,7 @@ export async function getGroupMembers(groupId: string): Promise<QCResponse<UserG
  * @param groupId identifier of the group whose queries we are retrieving
  * @returns A list of Query data for the given group
  */
-export async function getGroupQueries(groupId: string): Promise<QCResponse<UserGroup>> {
+export async function getGroupQueries(groupId: string): Promise<QCResponse<QueryTableResult>> {
   try {
     const selectQueriesByGroupQuery = 
     `
@@ -420,7 +421,7 @@ export async function getGroupQueries(groupId: string): Promise<QCResponse<UserG
     return {
       totalItems: result.rowCount,
       items: result.rows || [],
-    } as QCResponse<UserGroup>;
+    } as QCResponse<QueryTableResult>;
   } catch (error) {
     throw error;
   }
