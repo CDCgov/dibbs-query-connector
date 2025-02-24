@@ -398,6 +398,11 @@ resource "aws_instance" "bastion" {
 
   vpc_security_group_ids = [aws_security_group.bastion.id]
 
+  user_data = <<-EOF
+    #!/bin/bash
+    dnf install -y postgresql15
+  EOF
+
   tags = {
     Name = "bastion-${terraform.workspace}"
   }
