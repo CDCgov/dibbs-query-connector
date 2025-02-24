@@ -198,3 +198,9 @@ variable "aidbox_base_url" {
   description = "Base URL for Aidbox"
   default     = ""
 }
+
+variable "aidbox_license" {
+  type        = string
+  description = "License for Aidbox"
+  sensitive   = true
+}

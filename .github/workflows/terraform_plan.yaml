@@ -91,6 +91,7 @@ jobs:
           TF_VAR_aidbox_base_url: ${{ steps.set-url-format.outputs.base_url }}/aidboxone
           TF_VAR_aidbox_client_secret: ${{ secrets.AIDBOX_CLIENT_SECRET }}
           TF_VAR_aidbox_admin_password: ${{ secrets.AIDBOX_ADMIN_PASSWORD }}
+          TF_VAR_aidbox_license: ${{ secrets.AIDBOX_LICENSE }}
           TF_VAR_bastion_public_key: ${{ secrets.BASTION_PUBLIC_KEY }}
           TF_VAR_bastion_private_key: ${{ secrets.BASTION_PRIVATE_KEY }}
           TF_VAR_bastion_allowed_ips: ${{ secrets.BASTION_ALLOWED_IPS }}

@@ -197,6 +197,10 @@ module "ecs" {
           value = var.aidbox_base_url
         },
         {
+          name  = "AIDBOX_LICENSE"
+          value = var.aidbox_license
+        },
+        {
           name  = "AIDBOX_COMPLIANCE"
           value = "enabled"
         },
