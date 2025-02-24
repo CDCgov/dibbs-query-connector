@@ -328,7 +328,7 @@ resource "aws_security_group" "db_sg" {
     from_port   = 5432
     to_port     = 5432
     protocol    = "tcp"
-    cidr_blocks = ["176.24.0.0/16"]
+    cidr_blocks = [module.vpc.vpc_cidr_block]
   }
 
   # Allow all outbound traffic
@@ -437,10 +437,10 @@ resource "null_resource" "create_aidbox_db" {
       sleep 30
       chmod 600 ${local_file.bastion_private_key.filename}
       ssh -o StrictHostKeyChecking=no -i ${local_file.bastion_private_key.filename} \
-          -L 5432:${aws_db_instance.qc_db.endpoint} \
           ec2-user@${aws_instance.bastion.public_ip} \
           "PGPASSWORD='${aws_db_instance.qc_db.password}' \
-          psql -h localhost \
+          psql -h ${aws_db_instance.qc_db.address} \
+          -p ${aws_db_instance.qc_db.port} \
           -U ${aws_db_instance.qc_db.username} \
           -d ${aws_db_instance.qc_db.db_name} \
           -c 'CREATE DATABASE aidbox;'"
