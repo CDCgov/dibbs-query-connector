@@ -22,19 +22,11 @@ pagesRoleAccess[PAGES.QUERY] = [
   UserRole.STANDARD,
 ];
 
-pagesRoleAccess[PAGES.QUERY_BUILDING] = [
-  UserRole.SUPER_ADMIN,
-  UserRole.ADMIN,
-];
+pagesRoleAccess[PAGES.QUERY_BUILDING] = [UserRole.SUPER_ADMIN, UserRole.ADMIN];
 
-pagesRoleAccess[PAGES.FHIR_SERVERS] = [
-  UserRole.SUPER_ADMIN,
-  UserRole.ADMIN,
-];
+pagesRoleAccess[PAGES.FHIR_SERVERS] = [UserRole.SUPER_ADMIN, UserRole.ADMIN];
 
-pagesRoleAccess[PAGES.USER_MANAGEMENT] = [
-  UserRole.SUPER_ADMIN, UserRole.ADMIN
-];
+pagesRoleAccess[PAGES.USER_MANAGEMENT] = [UserRole.SUPER_ADMIN, UserRole.ADMIN];
 
 /**
  * List of pages behind authentication (display in the menu)

@@ -2,8 +2,10 @@
 
 import { createContext, useState } from "react";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
+import { User } from "@/app/models/entities/user-management";
+import { QueryTableResult } from "../../queryBuilding/utils";
 
-export type SubjectType = "Members" | "Query";
+export type SubjectType = "Members" | "Queries" | null;
 
 interface UserManagementData {
   teamQueryEditSection: {
@@ -13,6 +15,7 @@ interface UserManagementData {
     placeholder: string;
     groupId: string;
     subjectType: SubjectType;
+    subjectData: User[] | QueryTableResult[];
   };
 }
 
@@ -22,6 +25,7 @@ interface UserManagementContext extends UserManagementData {
     subtitle: string,
     subjectType: SubjectType,
     groupId: string,
+    subjectData?: User[] | QueryTableResult[],
   ) => void;
   closeEditSection: () => void;
   handleSearch: (searchFilter: string) => void;
@@ -36,7 +40,8 @@ const initData: UserManagementData = {
     subtitle: "",
     placeholder: "Search",
     groupId: "",
-    subjectType: "Members",
+    subjectType: null,
+    subjectData: [],
   },
 };
 
@@ -62,14 +67,7 @@ const DataProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
    * Event handlers for edit section
    */
   function closeEditSection() {
-    const newState: UserManagementData = {
-      ...innerState,
-      teamQueryEditSection: {
-        ...innerState.teamQueryEditSection,
-        isOpen: false,
-      },
-    };
-    setInnerState(newState);
+    setInnerState(initData);
   }
 
   function openEditSection(
@@ -77,6 +75,7 @@ const DataProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     subtitle: string,
     subjectType: SubjectType,
     id: string,
+    subjectData?: User[] | QueryTableResult[],
   ) {
     let placeholder = "";
 
@@ -85,7 +84,7 @@ const DataProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     } else {
       placeholder = "Search queries";
     }
-
+    const newData = subjectData ?? [];
     const newState: UserManagementData = {
       ...innerState,
       teamQueryEditSection: {
@@ -95,6 +94,7 @@ const DataProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
         placeholder,
         subjectType,
         groupId: id,
+        subjectData: newData,
         isOpen: true,
       },
     };

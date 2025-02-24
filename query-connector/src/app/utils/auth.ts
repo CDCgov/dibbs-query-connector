@@ -1,7 +1,7 @@
 import { auth } from "@/auth";
 import { User } from "next-auth";
 import { getUserRole } from "../backend/user-management";
-import {  UserRole } from "../models/entities/user-management";
+import { UserRole } from "../models/entities/user-management";
 
 /**
  * Checks if the property DEMO_MODE is true (Configured this way in demo env only)
@@ -47,7 +47,7 @@ export async function getLoggedInUser(): Promise<User | undefined> {
  */
 export async function superAdminAccessCheck(): Promise<boolean> {
   const user = await getLoggedInUser();
-  const role = await getUserRole(user?.username as string)
+  const role = await getUserRole(user?.username as string);
 
   return role === UserRole.SUPER_ADMIN || isAuthDisabledServerCheck()
 }
@@ -58,7 +58,11 @@ export async function superAdminAccessCheck(): Promise<boolean> {
  */
 export async function adminAccessCheck(): Promise<boolean> {
   const user = await getLoggedInUser();
-  const role = await getUserRole(user?.username as string)
+  const role = await getUserRole(user?.username as string);
 
-  return role === UserRole.SUPER_ADMIN || role === UserRole.ADMIN || isAuthDisabledServerCheck()
+  return (
+    role === UserRole.SUPER_ADMIN ||
+    role === UserRole.ADMIN ||
+    isAuthDisabledServerCheck()
+  );
 }

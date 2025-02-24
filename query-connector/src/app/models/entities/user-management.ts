@@ -2,8 +2,8 @@ import { QueryTableResult } from "@/app/(pages)/queryBuilding/utils";
 
 export enum UserRole {
   ADMIN = "Admin",
-  STANDARD ="Standard",
-  SUPER_ADMIN = "Super Admin"
+  STANDARD = "Standard",
+  SUPER_ADMIN = "Super Admin",
 }
 export interface User {
   id: string;
@@ -21,7 +21,7 @@ export interface UserGroup {
   member_size: number;
   query_size: number;
   members?: User[];
-  queries?: QueryTableResult[]; 
+  queries?: QueryTableResult[];
 }
 
 export interface UserGroupMembership {
