@@ -206,7 +206,7 @@ module "ecs" {
         },
         {
           name  = "PGHOST"
-          value = aws_db_instance.qc_db.endpoint
+          value = aws_db_instance.qc_db.address
         },
         {
           name  = "BOX_COMPATIBILITY_VALIDATION_JSON__SCHEMA_REGEX"
