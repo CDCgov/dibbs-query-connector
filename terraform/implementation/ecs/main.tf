@@ -359,6 +359,10 @@ resource "aws_key_pair" "bastion" {
   public_key = var.bastion_public_key
 }
 
+data "http" "my_ip" {
+  url = "https://api.ipify.org"
+}
+
 # Security group for bastion
 resource "aws_security_group" "bastion" {
   name        = "bastion-sg-${terraform.workspace}"
@@ -369,7 +373,7 @@ resource "aws_security_group" "bastion" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = var.bastion_allowed_ips
+    cidr_blocks = concat(var.bastion_allowed_ips, ["${data.http.my_ip.response_body}/32"])
   }
 
   egress {
