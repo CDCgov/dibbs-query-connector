@@ -118,7 +118,8 @@ export async function updateUserRole(
  * @returns List of users registered in qc
  */
 export async function getUsers(): Promise<QCResponse<User>> {
-  if (!(await adminAccessCheck())) { // admins need read access to users for group management
+  if (!(await adminAccessCheck())) {
+    // admins need read access to users for group management
     throw new Error("Unauthorized");
   }
 
@@ -130,22 +131,22 @@ export async function getUsers(): Promise<QCResponse<User>> {
     `;
 
     const result = await dbClient.query(selectAllUsersQuery);
-    const users = await Promise.all(  
+    const users = await Promise.all(
       result.rows.map(async (user) => {
         try {
           const groups = await getUserGroupsForUser(user.id);
-          user.user_groups = groups.items
+          user.user_groups = groups.items;
           return user;
         } catch (error) {
           console.error(error);
-          throw error
+          throw error;
         }
       }),
     );
 
     return {
       totalItems: result.rowCount,
-      items: users
+      items: users,
     } as QCResponse<User>;
   } catch (error) {
     throw error;
@@ -221,7 +222,9 @@ export async function getUserGroups(): Promise<QCResponse<UserGroup>> {
  * @param userId identifier of the user whose groups we are retrieving
  * @returns A list of UserGroup items for the given user
  */
-export async function getUserGroupsForUser(userId: string): Promise<QCResponse<UserGroup>> {
+export async function getUserGroupsForUser(
+  userId: string,
+): Promise<QCResponse<UserGroup>> {
   if (!(await adminAccessCheck())) {
     throw new Error("Unauthorized");
   }
@@ -241,7 +244,7 @@ export async function getUserGroupsForUser(userId: string): Promise<QCResponse<U
     } as QCResponse<UserGroup>;
   } catch (error) {
     console.error("Error retrieving user groups:", error);
-    throw error
+    throw error;
   }
 }
 
@@ -284,7 +287,7 @@ export async function createUserGroup(
     };
   } catch (error) {
     console.error("Error creating user group:", error);
-    throw error
+    throw error;
   }
 }
 
@@ -383,10 +386,11 @@ export async function deleteUserGroup(id: string): Promise<UserGroup | string> {
  * @param groupId identifier of the group whose members we are retrieving
  * @returns A list of User data for the given group
  */
-export async function getGroupMembers(groupId: string): Promise<QCResponse<User>> {
+export async function getGroupMembers(
+  groupId: string,
+): Promise<QCResponse<User>> {
   try {
-    const selectMembersByGroupQuery = 
-    `
+    const selectMembersByGroupQuery = `
     SELECT u.id, u.first_name, u.last_name, u.username, u.qc_role
     FROM users as u
     LEFT JOIN usergroup_to_users as ugtu ON ugtu.user_id = u.id
@@ -408,10 +412,11 @@ export async function getGroupMembers(groupId: string): Promise<QCResponse<User>
  * @param groupId identifier of the group whose queries we are retrieving
  * @returns A list of Query data for the given group
  */
-export async function getGroupQueries(groupId: string): Promise<QCResponse<QueryTableResult>> {
+export async function getGroupQueries(
+  groupId: string,
+): Promise<QCResponse<QueryTableResult>> {
   try {
-    const selectQueriesByGroupQuery = 
-    `
+    const selectQueriesByGroupQuery = `
     SELECT q.id as query_id, q.query_name, q.query_data, q.conditions_list, q.author, q.date_created, q.date_last_modified
     FROM query as q
     LEFT JOIN usergroup_to_query as ugtq ON ugtq.query_id = q.id
