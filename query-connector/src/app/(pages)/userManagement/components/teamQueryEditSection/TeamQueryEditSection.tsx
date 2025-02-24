@@ -52,6 +52,24 @@ const UserManagementDrawer: React.FC<UserManagementDrawerProps> = ({
     }
   }, [teamQueryEditSection]);
 
+  useEffect(() => {
+    const groupId = teamQueryEditSection.groupId;
+    const activeGroupIndex = userGroups.findIndex(
+      (group) => group.id == groupId,
+    );
+    const activeGroup = userGroups[activeGroupIndex];
+    const dataToUpdate = teamQueryEditSection.subjectData;
+
+    if (activeGroup && teamQueryEditSection.subjectType == "Members") {
+      activeGroup.members = dataToUpdate as User[];
+      setUserGroups([...userGroups]);
+    }
+    if (activeGroup && teamQueryEditSection.subjectType === "Queries") {
+      activeGroup.queries = dataToUpdate as QueryTableResult[];
+      setUserGroups([...userGroups]);
+    }
+  }, [teamQueryEditSection]);
+
   const renderQueries = (queries: QueryTableResult[] | undefined) => {
     if (queries && queries.length > 0) {
       return (

@@ -356,14 +356,6 @@ export async function deleteUserGroup(id: string): Promise<UserGroup | string> {
   }
 
   try {
-    await dbClient.query(
-      "DELETE FROM usergroup_to_users WHERE usergroup_id = $1",
-      [id],
-    );
-    await dbClient.query(
-      "DELETE FROM usergroup_to_query WHERE usergroup_id = $1",
-      [id],
-    );
     const deleteGroupQuery = `
       DELETE FROM usergroup
       WHERE id = $1
@@ -375,7 +367,7 @@ export async function deleteUserGroup(id: string): Promise<UserGroup | string> {
     if (result.rows.length === 0) {
       throw new Error(`User group with ID '${id}' not found.`);
     }
-    
+
     return {
       id: result.rows[0].id,
       name: result.rows[0].name,
