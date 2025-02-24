@@ -1,12 +1,15 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import classNames from "classnames";
+import styles from "./tabGroup.module.scss";
 
 export interface Tab {
+  access?: string[];
   label: string;
-  path: string;
+  path?: string;
+  onClick?: (e: React.MouseEvent<HTMLElement>) => void;
+  renderContent?: () => JSX.Element;
 }
 
 export interface TabGroupProps {
@@ -15,25 +18,19 @@ export interface TabGroupProps {
 
 /**
  * @param root0 - TabGroup compoennt props
- * @param root0.tabs - an array of Tab object
+ * @param root0.tabs - an array of Tab objects
  * @returns A tab group component
  */
 const TabGroup: React.FC<TabGroupProps> = ({ tabs }) => {
-  const currentPath = usePathname();
+  const [activeTab, setActiveTab] = useState(tabs[0].label);
 
-  /**
-   * @param path - the current path loaded in the browser
-   * @returns the groups of classes that apply to the tab to support the states of active and inactive
-   */
-  function getActiveClass(path: string): string {
-    return currentPath == path
-      ? "text-bold border-bottom-05 border-primary"
-      : "";
-  }
+  const handleTabClick = (e: React.MouseEvent<HTMLElement>) => {
+    const clickedTab = e.currentTarget.innerHTML;
+    setActiveTab(clickedTab);
+    const active = tabs.find((tab) => tab.label == activeTab);
+    active && active?.onClick && active.onClick(e);
+  };
 
-  /**
-   * HTML
-   */
   return (
     <div
       className={classNames(
@@ -47,12 +44,9 @@ const TabGroup: React.FC<TabGroupProps> = ({ tabs }) => {
           <Link
             data-prevent-nprogress={true} // don't show loading bar when switching between tabs
             key={tab.label}
-            className={classNames(
-              "display-inline-block",
-              "text-gray-50 text-no-underline padding-bottom-1 margin-right-3 cursor-pointer",
-              getActiveClass(tab.path),
-            )}
-            href={tab.path}
+            className={tab.label == activeTab ? styles.tab__active : styles.tab}
+            href={tab.path || ""}
+            onClick={(e) => handleTabClick(e)}
           >
             {tab.label}
           </Link>
@@ -61,4 +55,5 @@ const TabGroup: React.FC<TabGroupProps> = ({ tabs }) => {
     </div>
   );
 };
+
 export default TabGroup;
