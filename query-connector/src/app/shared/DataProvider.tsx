@@ -6,13 +6,11 @@ import { ToastConfigOptions } from "../ui/designSystem/toast/Toast";
 
 export interface DataContextValue {
   data: unknown; // You can define a specific data type here
-  setData: undefined | ((data: unknown) => void);
+  setData: (data: unknown) => void;
   currentPage: PageType | string | undefined;
-  setCurrentPage:
-    | ((currentPage: PageType | string | undefined) => void)
-    | undefined;
+  setCurrentPage: (currentPage: PageType | string | undefined) => void;
   toastConfig: ToastConfigOptions | null;
-  setToastConfig: ((config: ToastConfigOptions) => void) | undefined;
+  setToastConfig: (config: ToastConfigOptions) => void;
   runtimeConfig: Record<string, string>;
 }
 // Context lets the parent component make some information available to any component in the tree below it,

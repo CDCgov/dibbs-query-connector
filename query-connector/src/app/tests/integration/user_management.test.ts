@@ -32,6 +32,14 @@ const TEST_USER = {
   lastName: "User",
 };
 
+const TEST_SUPER_USER = {
+  id: "13e1efb2-5889-4157-8f34-78d7f02dbf78",
+  username: "Ima OtherUser",
+  email: "ima.otheruser@example.com",
+  firstName: "Ima",
+  lastName: "OtherUser",
+};
+
 (auth as jest.Mock).mockResolvedValue(TEST_USER);
 
 describe("User Management Integration Tests", () => {
@@ -48,12 +56,17 @@ describe("User Management Integration Tests", () => {
   /**
    * Tests adding a new user if they do not already exist.
    */
-  test("should add a user if they do not exist", async () => {
-    const result = await addUserIfNotExists(TEST_USER);
+  []; //first user
+
+  test.each([
+    { user: TEST_SUPER_USER, role: RoleTypeValues.SuperAdmin },
+    { user: TEST_USER, role: RoleTypeValues.Standard },
+  ])("should add a user if they do not exist", async ({ user, role }) => {
+    const result = await addUserIfNotExists(user);
 
     expect(result).toHaveProperty("id");
-    expect(result).toHaveProperty("username", TEST_USER.username);
-    expect(result).toHaveProperty("qc_role", RoleTypeValues.Standard);
+    expect(result).toHaveProperty("username", user.username);
+    expect(result).toHaveProperty("qc_role", role);
     createdUserId = result.id;
   });
 
