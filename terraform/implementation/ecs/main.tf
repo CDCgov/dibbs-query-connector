@@ -386,10 +386,11 @@ resource "aws_security_group" "bastion" {
 
 # Bastion host
 resource "aws_instance" "bastion" {
-  ami           = "ami-053a45fff0a704a47" # Amazon Linux 2023 AMI
-  instance_type = "t3.nano"
-  subnet_id     = module.vpc.public_subnets[0]
-  key_name      = aws_key_pair.bastion.key_name
+  ami                         = "ami-053a45fff0a704a47" # Amazon Linux 2023 AMI
+  instance_type               = "t3.nano"
+  subnet_id                   = module.vpc.public_subnets[0]
+  key_name                    = aws_key_pair.bastion.key_name
+  associate_public_ip_address = true
 
   vpc_security_group_ids = [aws_security_group.bastion.id]
 
@@ -425,13 +426,13 @@ resource "null_resource" "create_aidbox_db" {
     command = <<-EOT
       chmod 600 ${local_file.bastion_private_key.filename}
       ssh -o StrictHostKeyChecking=no -i ${local_file.bastion_private_key.filename} \
-          -L 5432:${aws_db_instance.qc_db.endpoint}:5432 \
+          -L 5432:${aws_db_instance.qc_db.endpoint} \
           ec2-user@${aws_instance.bastion.public_ip} \
           "PGPASSWORD='${aws_db_instance.qc_db.password}' \
-           psql -h localhost \
-           -U ${aws_db_instance.qc_db.username} \
-           -d ${aws_db_instance.qc_db.db_name} \
-           -c 'CREATE DATABASE aidbox;'"
+          psql -h localhost \
+          -U ${aws_db_instance.qc_db.username} \
+          -d ${aws_db_instance.qc_db.db_name} \
+          -c 'CREATE DATABASE aidbox;'"
     EOT
   }
 
