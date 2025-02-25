@@ -6,7 +6,7 @@ import { useSession } from "next-auth/react";
 import { redirect, usePathname } from "next/navigation";
 import { pagesRoleAccess } from "@/app/shared/page-routes";
 import { DataContext } from "@/app/shared/DataProvider";
-import { isAuthDisabledAtRuntime } from "@/app/utils/auth";
+import { isAuthDisabledClientCheck } from "@/app/utils/auth";
 
 /**
  * @param root0 AuthPageGuard component props
@@ -18,7 +18,7 @@ import { isAuthDisabledAtRuntime } from "@/app/utils/auth";
 const WithAuth: React.FC<React.PropsWithChildren> = ({ children }) => {
   const { data: session, status } = useSession();
   const ctx = useContext(DataContext);
-  const isAuthDisabled = isAuthDisabledAtRuntime(ctx?.runtimeConfig);
+  const isAuthDisabled = isAuthDisabledClientCheck(ctx?.runtimeConfig);
   const path = usePathname();
   const access = pagesRoleAccess[path] ?? [];
 
