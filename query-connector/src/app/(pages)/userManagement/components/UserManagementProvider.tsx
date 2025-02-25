@@ -5,7 +5,7 @@ import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import { User } from "@/app/models/entities/user-management";
 import { QueryTableResult } from "../../queryBuilding/utils";
 
-type SubjectType = "Members" | "Queries" | null;
+export type SubjectType = "Members" | "Queries" | null;
 
 interface UserManagementData {
   teamQueryEditSection: {

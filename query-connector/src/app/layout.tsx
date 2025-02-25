@@ -7,6 +7,7 @@ import DataProvider from "./shared/DataProvider";
 import { Metadata } from "next";
 import Page from "./ui/components/page/page";
 import { auth } from "@/auth";
+import { isAuthDisabledServerCheck } from "./utils/auth";
 
 /**
  * Establishes the layout for the application.
@@ -23,13 +24,17 @@ export default async function RootLayout({
   // if session does not exists then session object remains null
   await auth();
 
+  const runtimeConfig = {
+    AUTH_DISABLED: process.env.AUTH_DISABLED || "false",
+  };
+
   return (
     <html lang="en">
       <SessionProvider>
         <body>
           <div className="application-container">
-            <Header authDisabled={process.env.AUTH_DISABLED === "true"} />
-            <DataProvider>
+            <Header authDisabled={isAuthDisabledServerCheck()} />
+            <DataProvider runtimeConfig={runtimeConfig}>
               <Page showSiteAlert={process.env.DEMO_MODE === "true"}>
                 {children}
               </Page>

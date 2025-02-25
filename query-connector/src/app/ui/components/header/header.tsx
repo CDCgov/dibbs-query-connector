@@ -45,9 +45,9 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
 
   const path = usePathname();
 
-  const { data: session } = useSession();
+  const { status } = useSession();
 
-  const isLoggedIn = !(session === null);
+  const isLoggedIn = status === "authenticated";
   const role = session?.user.role;
 
   const handleSignIn = () => {
@@ -102,17 +102,19 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
               "flex-align-center",
             )}
           >
-            {!isLoggedIn && !LOGGED_IN_PATHS.includes(path as PAGES) && (
-              <Button
-                className={styles.signinButton}
-                type="button"
-                id="signin-button"
-                title={"Sign in button"}
-                onClick={handleSignIn}
-              >
-                Sign in
-              </Button>
-            )}
+            {!authDisabled &&
+              status === "unauthenticated" &&
+              !LOGGED_IN_PATHS.includes(path as PAGES) && (
+                <Button
+                  className={styles.signinButton}
+                  type="button"
+                  id="signin-button"
+                  title={"Sign in button"}
+                  onClick={handleSignIn}
+                >
+                  Sign in
+                </Button>
+              )}
             {LOGGED_IN_PATHS.includes(path as PAGES) && (
               <button
                 onClick={toggleMenuDropdown}
@@ -124,6 +126,7 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
                 )}
                 aria-expanded="false"
                 aria-controls="dropdown-menu"
+                data-testid="menu-button"
               >
                 <Icon.Settings
                   className="usa-icon qc-settings"

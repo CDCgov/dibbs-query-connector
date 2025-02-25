@@ -13,9 +13,22 @@ export function isDemoMode(): boolean {
 
 /**
  * Checks if the property AUTH_DISABLED is true
+ * USE ONLY ON FRONTEND COMPONENTS
+ * @param runtimeConfig - object that contains all runtime variables
  * @returns true if auth is disabled for the application
  */
-export function isAuthDisabled(): boolean {
+export function isAuthDisabledClientCheck(
+  runtimeConfig: Record<string, string> | undefined,
+): boolean {
+  return runtimeConfig?.AUTH_DISABLED === "true";
+}
+
+/**
+ * Checks if the property AUTH_DISABLED is true
+ * USE ONLY ON SERVER CODE
+ * @returns true if auth is disabled for the application
+ */
+export function isAuthDisabledServerCheck(): boolean {
   return process.env.AUTH_DISABLED === "true";
 }
 
@@ -36,7 +49,7 @@ export async function superAdminAccessCheck(): Promise<boolean> {
   const user = await getLoggedInUser();
   const role = await getUserRole(user?.username as string);
 
-  return role === UserRole.SUPER_ADMIN || isAuthDisabled();
+  return role === UserRole.SUPER_ADMIN || isAuthDisabledServerCheck();
 }
 
 /**
@@ -48,6 +61,6 @@ export async function adminAccessCheck(): Promise<boolean> {
   const role = await getUserRole(user?.username as string);
 
   return (
-    role === UserRole.SUPER_ADMIN || role === UserRole.ADMIN || isAuthDisabled()
+    role === UserRole.SUPER_ADMIN || role === UserRole.ADMIN || isAuthDisabledServerCheck()
   );
 }
