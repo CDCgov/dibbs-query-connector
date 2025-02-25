@@ -11,6 +11,7 @@ export interface DataContextValue {
   setCurrentPage: (currentPage: PageType | string | undefined) => void;
   toastConfig: ToastConfigOptions | null;
   setToastConfig: (config: ToastConfigOptions) => void;
+  runtimeConfig: Record<string, string>;
 }
 // Context lets the parent component make some information available to any component in the tree below it,
 // no matter how deep, without passing it explicitly through props.
@@ -22,9 +23,16 @@ export const DataContext = createContext<DataContextValue | undefined>(
  *
  * @param root0 - Children
  * @param root0.children - Children
+ * @param root0.runtimeConfig - env variables that are needed at runtime
  * @returns - The data provider component.
  */
-export function DataProvider({ children }: { children: ReactNode }) {
+export function DataProvider({
+  children,
+  runtimeConfig,
+}: {
+  children: ReactNode;
+  runtimeConfig: Record<string, string>;
+}) {
   const [data, setData] = useState<unknown | null>(null);
   const [currentPage, setCurrentPage] = useState<
     PageType | string | undefined
@@ -42,6 +50,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         setCurrentPage,
         toastConfig,
         setToastConfig,
+        runtimeConfig,
       }}
     >
       {children}

@@ -14,7 +14,7 @@
     "lint": "next lint",
     "test": "npm run test:unit && npm run test:integration",
     "test:ci": " bash ./unit_and_integration_tests.sh",
-    "test:unit": "jest --testPathIgnorePatterns='/e2e/' '/integration/'",
+    "test:unit": "jest --coverage --testPathIgnorePatterns='/e2e/' '/integration/'",
     "test:unit:watch": "jest --watch",
     "test:integration": "JUST_INTEGRATION=true bash ./unit_and_integration_tests.sh",
     "test:playwright": "docker compose -f ./docker-compose-e2e.yaml build --no-cache && docker compose -f ./docker-compose-e2e.yaml up -d && npx playwright test --reporter=list",

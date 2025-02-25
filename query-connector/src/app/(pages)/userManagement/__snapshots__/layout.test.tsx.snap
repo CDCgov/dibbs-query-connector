@@ -1,0 +1,339 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`User Management Layout Integrates the 'Members' edit section with all inner pages  1`] = `
+<body>
+  <div>
+    <div>
+      <div
+        class="main-container__wide user-management"
+      >
+        <h1
+          class="margin-bottom-4"
+        >
+          User management
+        </h1>
+        <div
+          class="border-base border-bottom-1px margin-bottom-3"
+        >
+          <a
+            class="display-inline-block text-gray-50 text-no-underline padding-bottom-1 margin-right-3 cursor-pointer"
+            data-prevent-nprogress="true"
+            href="/userManagement"
+          >
+            Users
+          </a>
+          <a
+            class="display-inline-block text-gray-50 text-no-underline padding-bottom-1 margin-right-3 cursor-pointer"
+            data-prevent-nprogress="true"
+            href="/userManagement/userGroups"
+          >
+            User groups
+          </a>
+        </div>
+        <div>
+          <button>
+            Open edit section
+          </button>
+        </div>
+        <div
+          class="drawer open"
+          data-testid="drawer-open-true"
+          role="dialog"
+        >
+          <div
+            class="drawerContent display-block"
+          >
+            <div
+              class="drawerHeader"
+            >
+              <button
+                aria-label="Close drawer"
+                class="closeButton"
+                data-testid="close-drawer"
+              >
+                <svg
+                  aria-label="X icon indicating closure"
+                  class="usa-icon usa-icon--size-3"
+                  focusable="false"
+                  height="1em"
+                  role="img"
+                  viewBox="0 0 24 24"
+                  width="1em"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+                  />
+                </svg>
+              </button>
+              <h2
+                class="margin-0 padding-bottom-0"
+                data-testid="drawer-title"
+              >
+                Mock title
+              </h2>
+              <h3
+                class="subtitle"
+              >
+                Mock subtitle
+              </h3>
+              <div>
+                <input
+                  class="usa-input searchField"
+                  data-testid="textInput"
+                  id="searchFieldTemplate"
+                  name="searchFieldTemplate"
+                  placeholder="Search members"
+                  type="search"
+                  value=""
+                />
+              </div>
+            </div>
+            <div
+              class="padding-top-2"
+            >
+              <ul
+                aria-description="members of Mock title"
+                class="usa-list--unstyled margin-top-2"
+              >
+                <li>
+                  <div
+                    class="usa-checkbox margin-bottom-3 checkbox"
+                    data-testid="checkbox"
+                  >
+                    <input
+                      checked=""
+                      class="usa-checkbox__input"
+                      id="Member 1"
+                      name="Member 1"
+                      type="checkbox"
+                    />
+                    <label
+                      class="usa-checkbox__label"
+                      for="Member 1"
+                    >
+                      Member 1
+                    </label>
+                  </div>
+                </li>
+                <li>
+                  <div
+                    class="usa-checkbox margin-bottom-3 checkbox"
+                    data-testid="checkbox"
+                  >
+                    <input
+                      checked=""
+                      class="usa-checkbox__input"
+                      id="Member 2"
+                      name="Member 2"
+                      type="checkbox"
+                    />
+                    <label
+                      class="usa-checkbox__label"
+                      for="Member 2"
+                    >
+                      Member 2
+                    </label>
+                  </div>
+                </li>
+                <li>
+                  <div
+                    class="usa-checkbox margin-bottom-3 checkbox"
+                    data-testid="checkbox"
+                  >
+                    <input
+                      checked=""
+                      class="usa-checkbox__input"
+                      id="Member 3"
+                      name="Member 3"
+                      type="checkbox"
+                    />
+                    <label
+                      class="usa-checkbox__label"
+                      for="Member 3"
+                    >
+                      Member 3
+                    </label>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div
+          class="overlay"
+        />
+      </div>
+    </div>
+  </div>
+</body>
+`;
+
+exports[`User Management Layout Integrates the 'Query' edit section with all inner pages  1`] = `
+<body>
+  <div>
+    <div>
+      <div
+        class="main-container__wide user-management"
+      >
+        <h1
+          class="margin-bottom-4"
+        >
+          User management
+        </h1>
+        <div
+          class="border-base border-bottom-1px margin-bottom-3"
+        >
+          <a
+            class="display-inline-block text-gray-50 text-no-underline padding-bottom-1 margin-right-3 cursor-pointer"
+            data-prevent-nprogress="true"
+            href="/userManagement"
+          >
+            Users
+          </a>
+          <a
+            class="display-inline-block text-gray-50 text-no-underline padding-bottom-1 margin-right-3 cursor-pointer"
+            data-prevent-nprogress="true"
+            href="/userManagement/userGroups"
+          >
+            User groups
+          </a>
+        </div>
+        <div>
+          <button>
+            Open edit section
+          </button>
+        </div>
+        <div
+          class="drawer open"
+          data-testid="drawer-open-true"
+          role="dialog"
+        >
+          <div
+            class="drawerContent display-block"
+          >
+            <div
+              class="drawerHeader"
+            >
+              <button
+                aria-label="Close drawer"
+                class="closeButton"
+                data-testid="close-drawer"
+              >
+                <svg
+                  aria-label="X icon indicating closure"
+                  class="usa-icon usa-icon--size-3"
+                  focusable="false"
+                  height="1em"
+                  role="img"
+                  viewBox="0 0 24 24"
+                  width="1em"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+                  />
+                </svg>
+              </button>
+              <h2
+                class="margin-0 padding-bottom-0"
+                data-testid="drawer-title"
+              >
+                Mock title
+              </h2>
+              <h3
+                class="subtitle"
+              >
+                Mock subtitle
+              </h3>
+              <div>
+                <input
+                  class="usa-input searchField"
+                  data-testid="textInput"
+                  id="searchFieldTemplate"
+                  name="searchFieldTemplate"
+                  placeholder="Search queries"
+                  type="search"
+                  value=""
+                />
+              </div>
+            </div>
+            <div
+              class="padding-top-2"
+            >
+              <ul
+                aria-description="queries of Mock title"
+                class="usa-list--unstyled margin-top-2"
+              >
+                <li>
+                  <div
+                    class="usa-checkbox margin-bottom-3 checkbox"
+                    data-testid="checkbox"
+                  >
+                    <input
+                      checked=""
+                      class="usa-checkbox__input"
+                      id="Query 1"
+                      name="Query 1"
+                      type="checkbox"
+                    />
+                    <label
+                      class="usa-checkbox__label"
+                      for="Query 1"
+                    >
+                      Query 1
+                    </label>
+                  </div>
+                </li>
+                <li>
+                  <div
+                    class="usa-checkbox margin-bottom-3 checkbox"
+                    data-testid="checkbox"
+                  >
+                    <input
+                      checked=""
+                      class="usa-checkbox__input"
+                      id="Query 2"
+                      name="Query 2"
+                      type="checkbox"
+                    />
+                    <label
+                      class="usa-checkbox__label"
+                      for="Query 2"
+                    >
+                      Query 2
+                    </label>
+                  </div>
+                </li>
+                <li>
+                  <div
+                    class="usa-checkbox margin-bottom-3 checkbox"
+                    data-testid="checkbox"
+                  >
+                    <input
+                      checked=""
+                      class="usa-checkbox__input"
+                      id="Query 3"
+                      name="Query 3"
+                      type="checkbox"
+                    />
+                    <label
+                      class="usa-checkbox__label"
+                      for="Query 3"
+                    >
+                      Query 3
+                    </label>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div
+          class="overlay"
+        />
+      </div>
+    </div>
+  </div>
+</body>
+`;
