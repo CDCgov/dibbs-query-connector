@@ -61,6 +61,8 @@ export async function adminAccessCheck(): Promise<boolean> {
   const role = await getUserRole(user?.username as string);
 
   return (
-    role === UserRole.SUPER_ADMIN || role === UserRole.ADMIN || isAuthDisabledServerCheck()
+    role === UserRole.SUPER_ADMIN ||
+    role === UserRole.ADMIN ||
+    isAuthDisabledServerCheck()
   );
 }
