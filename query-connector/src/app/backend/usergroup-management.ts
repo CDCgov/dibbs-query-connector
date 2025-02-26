@@ -16,26 +16,32 @@ export async function getUsersWithGroupStatus(
     throw new Error("Unauthorized");
   }
 
-  const groupCheckQuery = `SELECT id FROM usergroup WHERE id = $1;`;
-  const groupCheckResult = await dbClient.query(groupCheckQuery, [groupId]);
+  const groupCheckQuery = {
+    text: `SELECT id FROM usergroup WHERE id = $1;`,
+    values: [groupId],
+  };
+  const groupCheckResult = await dbClient.query(groupCheckQuery);
   if (groupCheckResult.rows.length === 0) {
     return [];
   }
 
-  const query = `
-    SELECT u.id, u.username, u.first_name, u.last_name, u.qc_role,
-           COALESCE(ug.id, '') AS membership_id,
-           CASE 
-             WHEN ug.user_id IS NOT NULL THEN TRUE
-             ELSE FALSE
-           END AS is_member
-    FROM users u
-    LEFT JOIN usergroup_to_users ug 
-      ON u.id = ug.user_id AND ug.usergroup_id = $1
-    ORDER BY u.last_name, u.first_name;
-  `;
+  const query = {
+    text: `
+      SELECT u.id, u.username, u.first_name, u.last_name, u.qc_role,
+             COALESCE(ug.id, '') AS membership_id,
+             CASE 
+               WHEN ug.user_id IS NOT NULL THEN TRUE
+               ELSE FALSE
+             END AS is_member
+      FROM users u
+      LEFT JOIN usergroup_to_users ug 
+        ON u.id = ug.user_id AND ug.usergroup_id = $1
+      ORDER BY u.last_name, u.first_name;
+    `,
+    values: [groupId],
+  };
 
-  const result = await dbClient.query(query, [groupId]);
+  const result = await dbClient.query(query);
 
   return result.rows.map((row) => ({
     id: row.membership_id,
@@ -63,30 +69,35 @@ export async function addUsersToGroup(
 ): Promise<string[]> {
   if (!userIds.length) return [];
 
-  const existingUsersQuery = `SELECT id FROM users WHERE id = ANY($1);`;
-  const existingUsersResult = await dbClient.query(existingUsersQuery, [
-    userIds,
-  ]);
+  const existingUsersQuery = {
+    text: `SELECT id FROM users WHERE id = ANY($1);`,
+    values: [userIds],
+  };
+  const existingUsersResult = await dbClient.query(existingUsersQuery);
   const existingUserIds = new Set(
     existingUsersResult.rows.map((row) => row.id),
   );
   const validUserIds = userIds.filter((id) => existingUserIds.has(id));
 
-  // If no valid user IDs are found, return an empty array
-  if (!validUserIds.length) {
+  if (validUserIds.length === 0) {
     return [];
   }
 
-  const values = validUserIds
-    .map((userId) => `('${userId}_${groupId}', '${userId}', '${groupId}')`)
-    .join(",");
-  const query = `
-    INSERT INTO usergroup_to_users (id, user_id, usergroup_id)
-    VALUES ${values}
-    ON CONFLICT DO NOTHING
-    RETURNING user_id;
-  `;
-  const result = await dbClient.query(query);
+  const insertQuery = {
+    text: `
+      INSERT INTO usergroup_to_users (id, user_id, usergroup_id)
+      VALUES ${validUserIds.map((_, i) => `($${i * 3 + 1}, $${i * 3 + 2}, $${i * 3 + 3})`).join(",")}
+      ON CONFLICT DO NOTHING
+      RETURNING user_id;
+    `,
+    values: validUserIds.flatMap((userId) => [
+      `${userId}_${groupId}`,
+      userId,
+      groupId,
+    ]),
+  };
+
+  const result = await dbClient.query(insertQuery);
   return result.rows.map((row) => row.user_id);
 }
 
@@ -101,12 +112,17 @@ export async function removeUsersFromGroup(
   userIds: string[],
 ): Promise<string[]> {
   if (!userIds.length) return [];
-  const query = `
-    DELETE FROM usergroup_to_users 
-    WHERE usergroup_id = $1 AND user_id = ANY($2)
-    RETURNING user_id;
-  `;
-  const result = await dbClient.query(query, [groupId, userIds]);
+
+  const query = {
+    text: `
+      DELETE FROM usergroup_to_users 
+      WHERE usergroup_id = $1 AND user_id = ANY($2)
+      RETURNING user_id;
+    `,
+    values: [groupId, userIds],
+  };
+
+  const result = await dbClient.query(query);
   return result.rows.map((row) => row.user_id);
 }
 
@@ -127,24 +143,20 @@ export async function saveUserGroupMembership(
   await dbClient.query("BEGIN");
 
   try {
-    // Fetch current memberships
     const existingMemberships = await getUsersWithGroupStatus(groupId);
     const existingUserIds = new Set(
       existingMemberships.filter((m) => m.is_member).map((m) => m.user.id),
     );
 
-    // Determine users to add and remove
     const usersToAdd = selectedUsers.filter((id) => !existingUserIds.has(id));
     const usersToRemove = existingMemberships
       .filter((m) => m.is_member && !selectedUsers.includes(m.user.id))
       .map((m) => m.user.id);
 
-    // Update group membership
     if (usersToRemove.length)
       await removeUsersFromGroup(groupId, usersToRemove);
     if (usersToAdd.length) await addUsersToGroup(groupId, usersToAdd);
 
-    // Fetch updated memberships
     const updatedMemberships = await getUsersWithGroupStatus(groupId);
     await dbClient.query("COMMIT");
     return updatedMemberships;
