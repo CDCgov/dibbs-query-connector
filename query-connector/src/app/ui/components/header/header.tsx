@@ -9,7 +9,7 @@ import { metadata } from "@/app/shared/constants";
 import classNames from "classnames";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { LOGGED_IN_PATHS, PAGES } from "@/app/shared/page-routes";
+import { PAGES } from "@/app/shared/page-routes";
 
 /**
  * Produces the header.
@@ -100,20 +100,17 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
               "flex-align-center",
             )}
           >
-            {!authDisabled &&
-              status === "unauthenticated" &&
-              !LOGGED_IN_PATHS.includes(path as PAGES) && (
-                <Button
-                  className={styles.signinButton}
-                  type="button"
-                  id="signin-button"
-                  title={"Sign in button"}
-                  onClick={handleSignIn}
-                >
-                  Sign in
-                </Button>
-              )}
-            {LOGGED_IN_PATHS.includes(path as PAGES) && (
+            {!authDisabled && status === "unauthenticated" ? (
+              <Button
+                className={styles.signinButton}
+                type="button"
+                id="signin-button"
+                title={"Sign in button"}
+                onClick={handleSignIn}
+              >
+                Sign in
+              </Button>
+            ) : (
               <button
                 onClick={toggleMenuDropdown}
                 className={classNames(
@@ -142,49 +139,44 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
               id="dropdown-menu"
               className={classNames("usa-nav__submenu", styles.menuDropdown)}
             >
-              {/* TODO: Enable this once we can show/hide rules based on actual auth status */}
-              {/* {isProduction && ( */}
-              <>
-                <li className={styles.subMenuItem}>
-                  <Link
-                    className={styles.menuItem}
-                    href={PAGES.MY_QUERIES}
-                    scroll={false}
-                  >
-                    My Queries
-                  </Link>
-                </li>
-                <li className={styles.subMenuItem}>
-                  <Link
-                    className={styles.menuItem}
-                    href={PAGES.FHIR_SERVERS}
-                    scroll={false}
-                  >
-                    FHIR Servers
-                  </Link>
-                </li>
-                <li className={styles.subMenuItem}>
-                  <Link
-                    className={styles.menuItem}
-                    href={PAGES.USER_MANAGEMENT}
-                    scroll={false}
-                  >
-                    User Management
-                  </Link>
-                </li>
-                <li className={styles.subMenuItem}>
-                  <button
-                    className={classNames(
-                      styles.menuItem,
-                      "usa-button--unstyled",
-                    )}
-                    onClick={async () => await handleSignOut()}
-                  >
-                    Log out
-                  </button>
-                </li>
-              </>
-              {/* )} */}
+              <li className={styles.subMenuItem}>
+                <Link
+                  className={styles.menuItem}
+                  href={PAGES.MY_QUERIES}
+                  scroll={false}
+                >
+                  My Queries
+                </Link>
+              </li>
+              <li className={styles.subMenuItem}>
+                <Link
+                  className={styles.menuItem}
+                  href={PAGES.FHIR_SERVERS}
+                  scroll={false}
+                >
+                  FHIR Servers
+                </Link>
+              </li>
+              <li className={styles.subMenuItem}>
+                <Link
+                  className={styles.menuItem}
+                  href={PAGES.USER_MANAGEMENT}
+                  scroll={false}
+                >
+                  User Management
+                </Link>
+              </li>
+              <li className={styles.subMenuItem}>
+                <button
+                  className={classNames(
+                    styles.menuItem,
+                    "usa-button--unstyled",
+                  )}
+                  onClick={async () => await handleSignOut()}
+                >
+                  Log out
+                </button>
+              </li>
             </ul>
           </div>
         )}

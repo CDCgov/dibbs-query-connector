@@ -18,6 +18,7 @@ import Checkbox from "../../ui/designSystem/checkbox/Checkbox";
 
 // Dynamic import with proper typing for Modal
 import type { ModalProps } from "../../ui/designSystem/modal/Modal";
+import WithAuth from "@/app/ui/components/withAuth/WithAuth";
 const Modal = dynamic<ModalProps>(
   () => import("../../ui/designSystem/modal/Modal").then((mod) => mod.Modal),
   { ssr: false },
@@ -265,7 +266,7 @@ const FhirServers: React.FC = () => {
   }
 
   return (
-    <>
+    <WithAuth>
       <div className={classNames("main-container__wide", styles.mainContainer)}>
         <div
           className={classNames(
@@ -413,7 +414,7 @@ const FhirServers: React.FC = () => {
           />
         </Modal>
       </div>
-    </>
+    </WithAuth>
   );
 };
 
