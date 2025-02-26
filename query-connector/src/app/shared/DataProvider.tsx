@@ -36,7 +36,7 @@ export function DataProvider({
 }: {
   children: ReactNode;
   runtimeConfig: Record<string, string>;
-  session: Session;
+  session: Session | null;
 }) {
   const [data, setData] = useState<unknown | null>(null);
   const [currentPage, setCurrentPage] = useState<
