@@ -11,7 +11,7 @@ import {
   UserRole,
 } from "@/app/models/entities/user-management";
 import { QueryTableResult } from "@/app/(pages)/queryBuilding/utils";
-import { useSession } from "next-auth/react";
+import { getSessionRole } from "../../utils";
 
 export type UserManagementDrawerProps = {
   userGroups: UserGroup[];
@@ -36,8 +36,7 @@ const UserManagementDrawer: React.FC<UserManagementDrawerProps> = ({
     handleQueryUpdate,
   } = useContext(UserManagementContext);
 
-  const { data: session } = useSession();
-  const role = session?.user.role;
+  const role = getSessionRole();
 
   useEffect(() => {
     const groupId = teamQueryEditSection.groupId;

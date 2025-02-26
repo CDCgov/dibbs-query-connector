@@ -11,6 +11,7 @@ import { UserManagementContext } from "../UserManagementProvider";
 import { User, UserGroup } from "../../../../models/entities/user-management";
 import { UserRole } from "../../../../models/entities/user-management";
 import styles from "../../userManagement.module.scss";
+import { useSession } from "next-auth/react";
 
 type PermissionsProps = {
   users: User[] | null;
@@ -29,6 +30,7 @@ const UserPermissionsTable: React.FC<PermissionsProps> = ({
 }) => {
   const { openEditSection } = useContext(UserManagementContext);
 
+  const { data: session } = useSession();
   /**
    * Role update
    */
@@ -48,16 +50,24 @@ const UserPermissionsTable: React.FC<PermissionsProps> = ({
     }
   }
 
+  function isSelf(user: User): boolean {
+    return user.username === session?.user.username;
+  }
+
   const renderDropdown = (user: User) => {
     return (
       <td className={styles.roleDropdown} width={270}>
-        <RoleDropdown
-          id={user.id}
-          defaultValue={user.qc_role}
-          OnChange={(role: UserRole) => {
-            handleUserRoleChange(user.id, role);
-          }}
-        />
+        {isSelf(user) ? (
+          user.qc_role
+        ) : (
+          <RoleDropdown
+            id={user.id}
+            defaultValue={user.qc_role}
+            OnChange={(role: UserRole) => {
+              handleUserRoleChange(user.id, role);
+            }}
+          />
+        )}
       </td>
     );
   };
@@ -102,7 +112,10 @@ const UserPermissionsTable: React.FC<PermissionsProps> = ({
     return users?.map((user: User) => {
       return (
         <tr key={user.id}>
-          <td width={270}>{`${user.last_name}, ${user.first_name}`}</td>
+          <td width={270}>{`${user.last_name}, ${user.first_name} ${
+            isSelf(user) ? "(self)" : ""
+          }
+          `}</td>
           {renderDropdown(user)}
           {renderGroups(user)}
         </tr>
@@ -111,18 +124,16 @@ const UserPermissionsTable: React.FC<PermissionsProps> = ({
   };
 
   return (
-    <>
-      <Table>
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Permissions</th>
-            <th>User groups</th>
-          </tr>
-        </thead>
-        <tbody>{renderUserRows(users)}</tbody>
-      </Table>
-    </>
+    <Table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Permissions</th>
+          <th>User groups</th>
+        </tr>
+      </thead>
+      <tbody>{renderUserRows(users)}</tbody>
+    </Table>
   );
 };
 

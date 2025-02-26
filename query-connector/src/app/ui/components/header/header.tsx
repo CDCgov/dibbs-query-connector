@@ -45,7 +45,7 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
 
   const path = usePathname();
 
-  const { status } = useSession();
+  const { status, data: session } = useSession();
 
   const isLoggedIn = status === "authenticated";
   const role = session?.user.role;

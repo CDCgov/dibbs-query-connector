@@ -45,7 +45,7 @@ export async function addUserIfNotExists(userToken: {
     }
 
     // Default role when adding a new user, which includes Super Admin, Admin, and Standard User.
-    let qc_role = RoleTypeValues.Standard;
+    let qc_role = UserRole.STANDARD;
     console.log("User not found. Proceeding to insert.");
 
     if (process.env.NODE_ENV !== "production") {
@@ -54,7 +54,7 @@ export async function addUserIfNotExists(userToken: {
       const userCount = await dbClient.query(queryUserRecordCount);
 
       if (userCount?.rows?.[0]?.count === "0") {
-        qc_role = RoleTypeValues.SuperAdmin;
+        qc_role = UserRole.SUPER_ADMIN;
       }
     }
 
