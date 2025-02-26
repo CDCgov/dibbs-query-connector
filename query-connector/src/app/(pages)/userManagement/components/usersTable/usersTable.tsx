@@ -4,15 +4,19 @@ import { useEffect, useState } from "react";
 import UserManagementDrawer from "../teamQueryEditSection/TeamQueryEditSection";
 
 import UserGroups from "../userGroups/UserGroupsTable";
-import TabGroup, { Tab } from "@/app/ui/designSystem/tabGroup/tabGroup";
+import TabGroup, { Tab } from "../../../../ui/designSystem/tabGroup/tabGroup";
 import UserPermissionsTable from "../userPermissions/userPermissionsTable";
 import { QCResponse } from "@/app/models/responses/collections";
-import { User, UserGroup } from "../../../../models/entities/user-management";
+import {
+  User,
+  UserGroup,
+  UserRole,
+} from "../../../../models/entities/user-management";
 import {
   getUsers,
   getUserGroups,
-  getGroupQueries,
   getGroupMembers,
+  getGroupQueries,
 } from "@/app/backend/user-management";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 
@@ -30,23 +34,6 @@ const UsersTable: React.FC<UsersTableProps> = ({ role }) => {
   const [activeTab, setActiveTab] = useState<Tab>();
   const [users, setUsers] = useState<User[]>([]);
   const [userGroups, setUserGroups] = useState<UserGroup[]>([]);
-
-  async function fetchUsers() {
-    try {
-      const userList: QCResponse<User> = await getUsers();
-      setUsers(userList.items);
-    } catch (e) {
-      showToastConfirmation({
-        body: "Unable to retrieve users. Please try again.",
-        variant: "error",
-      });
-      throw e;
-    }
-  }
-  async function fetchUserGroups() {
-    const userGroups = await getUserGroups();
-    return setUserGroups(userGroups.items);
-  }
 
   async function fetchGroupMembers(groupId: string) {
     const groupMembers = await getGroupMembers(groupId);
@@ -67,26 +54,32 @@ const UsersTable: React.FC<UsersTableProps> = ({ role }) => {
   const sections: Tab[] = [
     {
       label: "Users",
-      access: ["Super Admin"],
+      access: [UserRole.SUPER_ADMIN],
       onClick: setTab,
-      renderContent: () => (
-        <UserPermissionsTable
-          fetchGroupMembers={fetchGroupMembers}
-          users={users}
-        />
-      ),
+      renderContent: () =>
+        users.length > 0 ? (
+          <UserPermissionsTable
+            fetchGroupMembers={fetchGroupMembers}
+            users={users}
+          />
+        ) : (
+          <div className="empty-response">No users found</div>
+        ),
     },
     {
       label: "User groups",
-      access: ["Super Admin", "Admin"],
+      access: [UserRole.SUPER_ADMIN, UserRole.ADMIN],
       onClick: setTab,
-      renderContent: () => (
-        <UserGroups
-          fetchGroupMembers={fetchGroupMembers}
-          fetchGroupQueries={fetchGroupQueries}
-          userGroups={userGroups}
-        />
-      ),
+      renderContent: () =>
+        userGroups.length > 0 ? (
+          <UserGroups
+            fetchGroupMembers={fetchGroupMembers}
+            fetchGroupQueries={fetchGroupQueries}
+            userGroups={userGroups}
+          />
+        ) : (
+          <div className="empty-response">No user groups found</div>
+        ),
     },
   ];
   const tabsForRole = sections.filter((tab) => tab.access?.includes(role));
@@ -94,18 +87,47 @@ const UsersTable: React.FC<UsersTableProps> = ({ role }) => {
   const shouldRenderTabs = tabsForRole.length > 1;
 
   useEffect(() => {
-    fetchUsers();
-    fetchUserGroups();
+    async function fetchUsers() {
+      try {
+        const userList: QCResponse<User> = await getUsers();
+        setUsers(userList.items);
+      } catch (e) {
+        showToastConfirmation({
+          body: "Unable to retrieve users. Please try again.",
+          variant: "error",
+        });
+        throw e;
+      }
+    }
+
+    async function fetchUserGroups() {
+      try {
+        const userGroups: QCResponse<UserGroup> = await getUserGroups();
+        return setUserGroups(userGroups.items);
+      } catch (e) {
+        showToastConfirmation({
+          body: "Unable to retrieve user groups. Please try again.",
+          variant: "error",
+        });
+        throw e;
+      }
+    }
+
+    role == UserRole.SUPER_ADMIN && users.length <= 0 && fetchUsers();
+    userGroups.length <= 0 && fetchUserGroups();
   }, []);
 
+  const dataLoaded =
+    role == UserRole.ADMIN ? !!users && !!userGroups : !!userGroups;
+
   useEffect(() => {
-    setActiveTab(defaultTab); // once users are loaded, set the default table display
-  }, [users]);
+    setActiveTab(defaultTab); // once data are loaded, set the default table display
+  }, [users, userGroups.length]);
 
   return (
     <div className="main-container__wide">
       {shouldRenderTabs && <TabGroup tabs={tabsForRole} />}
-      {users && activeTab?.renderContent && activeTab?.renderContent()}
+      {dataLoaded && activeTab?.renderContent && activeTab?.renderContent()}
       <UserManagementDrawer
         userGroups={userGroups}
         setUserGroups={setUserGroups}
