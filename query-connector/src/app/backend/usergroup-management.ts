@@ -1,5 +1,5 @@
 "use server";
-import { UserGroupMembership } from "../models/entities/user-management";
+import { User } from "../models/entities/user-management";
 import { adminAccessCheck } from "../utils/auth";
 import { getDbClient } from "./dbClient";
 const dbClient = getDbClient();
@@ -11,7 +11,7 @@ const dbClient = getDbClient();
  */
 export async function getUsersWithGroupStatus(
   groupId: string,
-): Promise<UserGroupMembership[]> {
+): Promise<User[]> {
   if (!(await adminAccessCheck())) {
     throw new Error("Unauthorized");
   }
@@ -44,16 +44,18 @@ export async function getUsersWithGroupStatus(
   const result = await dbClient.query(query);
 
   return result.rows.map((row) => ({
-    id: row.membership_id,
-    user: {
-      id: row.id,
-      username: row.username,
-      first_name: row.first_name,
-      last_name: row.last_name,
-      qc_role: row.qc_role,
-    },
-    usergroup_id: groupId,
-    is_member: row.is_member,
+    id: row.id,
+    username: row.username,
+    first_name: row.first_name,
+    last_name: row.last_name,
+    qc_role: row.qc_role,
+    userGroupMemberships: [
+      {
+        id: row.membership_id,
+        usergroup_id: groupId,
+        is_member: row.is_member,
+      },
+    ],
   }));
 }
 
@@ -135,7 +137,7 @@ export async function removeUsersFromGroup(
 export async function saveUserGroupMembership(
   groupId: string,
   selectedUsers: string[],
-): Promise<UserGroupMembership[]> {
+): Promise<User[]> {
   if (!(await adminAccessCheck())) {
     throw new Error("Unauthorized");
   }
@@ -145,21 +147,29 @@ export async function saveUserGroupMembership(
   try {
     const existingMemberships = await getUsersWithGroupStatus(groupId);
     const existingUserIds = new Set(
-      existingMemberships.filter((m) => m.is_member).map((m) => m.user.id),
+      existingMemberships.flatMap(
+        (user) =>
+          user.userGroupMemberships
+            ?.filter((m) => m.is_member)
+            .map((m) => user.id) || [],
+      ),
     );
 
     const usersToAdd = selectedUsers.filter((id) => !existingUserIds.has(id));
-    const usersToRemove = existingMemberships
-      .filter((m) => m.is_member && !selectedUsers.includes(m.user.id))
-      .map((m) => m.user.id);
+    const usersToRemove = existingMemberships.flatMap(
+      (user) =>
+        user.userGroupMemberships
+          ?.filter((m) => m.is_member && !selectedUsers.includes(user.id))
+          .map((m) => user.id) || [],
+    );
 
     if (usersToRemove.length)
       await removeUsersFromGroup(groupId, usersToRemove);
     if (usersToAdd.length) await addUsersToGroup(groupId, usersToAdd);
 
-    const updatedMemberships = await getUsersWithGroupStatus(groupId);
+    const updatedUsers = await getUsersWithGroupStatus(groupId);
     await dbClient.query("COMMIT");
-    return updatedMemberships;
+    return updatedUsers;
   } catch (error) {
     await dbClient.query("ROLLBACK");
     throw error;

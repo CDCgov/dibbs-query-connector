@@ -5,6 +5,7 @@ import {
   saveUserGroupMembership,
 } from "@/app/backend/usergroup-management";
 import { getDbClient } from "@/app/backend/dbClient";
+import { User } from "@/app/models/entities/user-management";
 
 const dbClient = getDbClient();
 
@@ -19,6 +20,7 @@ const TEST_USER_2_ID = "00000000-0000-0000-0000-000000000002";
 describe("User Group Membership Tests", () => {
   beforeAll(async () => {
     await dbClient.query("BEGIN");
+
     // Insert test users
     const insertUsersQuery = `
       INSERT INTO users (id, username, first_name, last_name, qc_role)
@@ -59,14 +61,19 @@ describe("User Group Membership Tests", () => {
    * Tests retrieving user group memberships.
    */
   test("should retrieve user group memberships", async () => {
-    const result = await getUsersWithGroupStatus(TEST_GROUP_ID);
+    const result: User[] = await getUsersWithGroupStatus(TEST_GROUP_ID);
 
     expect(Array.isArray(result)).toBe(true);
-    if (result.length) {
+    if (result.length > 0 && result[0] && typeof result[0] === "object") {
       expect(result[0]).toHaveProperty("id");
-      expect(result[0]).toHaveProperty("user");
-      expect(result[0]).toHaveProperty("usergroup_id", TEST_GROUP_ID);
-      expect(result[0]).toHaveProperty("is_member");
+      expect(result[0]).toHaveProperty("username");
+      expect(result[0]).toHaveProperty("userGroupMemberships");
+
+      const membership = result[0].userGroupMemberships?.find(
+        (m) => m.usergroup_id === TEST_GROUP_ID,
+      );
+      expect(membership).toBeDefined();
+      expect(membership?.is_member).toBeDefined();
     }
   });
 
@@ -82,12 +89,14 @@ describe("User Group Membership Tests", () => {
     expect(result).toContain(TEST_USER_2_ID);
     expect(result.length).toBe(2);
 
-    const updatedMemberships = await getUsersWithGroupStatus(TEST_GROUP_ID);
-    const members = updatedMemberships.filter((m) => m.is_member);
+    const updatedUsers = await getUsersWithGroupStatus(TEST_GROUP_ID);
+    const members = updatedUsers.filter((user) =>
+      user.userGroupMemberships?.some((m) => m.is_member),
+    );
 
     expect(members.length).toBe(2);
-    expect(members.some((m) => m.user.id === TEST_USER_1_ID)).toBe(true);
-    expect(members.some((m) => m.user.id === TEST_USER_2_ID)).toBe(true);
+    expect(members.some((user) => user.id === TEST_USER_1_ID)).toBe(true);
+    expect(members.some((user) => user.id === TEST_USER_2_ID)).toBe(true);
   });
 
   /**
@@ -101,17 +110,24 @@ describe("User Group Membership Tests", () => {
     expect(result).toContain(TEST_USER_1_ID);
     expect(result).toContain(TEST_USER_2_ID);
 
-    const updatedMemberships = await getUsersWithGroupStatus(TEST_GROUP_ID);
-    const members = updatedMemberships.filter((m) => m.is_member);
+    const updatedUsers = await getUsersWithGroupStatus(TEST_GROUP_ID);
+    const members = updatedUsers.filter((user) =>
+      user.userGroupMemberships?.some((m) => m.is_member),
+    );
+
     expect(members.length).toBe(0);
     expect(
-      updatedMemberships.some(
-        (m) => m.user.id === TEST_USER_1_ID && m.is_member,
+      updatedUsers.some(
+        (user) =>
+          user.id === TEST_USER_1_ID &&
+          user.userGroupMemberships?.some((m) => m.is_member),
       ),
     ).toBe(false);
     expect(
-      updatedMemberships.some(
-        (m) => m.user.id === TEST_USER_2_ID && m.is_member,
+      updatedUsers.some(
+        (user) =>
+          user.id === TEST_USER_2_ID &&
+          user.userGroupMemberships?.some((m) => m.is_member),
       ),
     ).toBe(false);
   });
@@ -123,32 +139,26 @@ describe("User Group Membership Tests", () => {
     const selectedUsers = [TEST_USER_1_ID];
 
     // Add and remove users in one call
-    const updatedMemberships = await saveUserGroupMembership(
+    const updatedUsers = await saveUserGroupMembership(
       TEST_GROUP_ID,
       selectedUsers,
     );
 
     // Verify membership contains only selected users
     expect(
-      updatedMemberships.some(
-        (m) => m.user.id === TEST_USER_1_ID && m.is_member,
+      updatedUsers.some(
+        (user) =>
+          user.id === TEST_USER_1_ID &&
+          user.userGroupMemberships?.some((m) => m.is_member),
       ),
     ).toBe(true);
     expect(
-      updatedMemberships.some(
-        (m) => m.user.id === TEST_USER_2_ID && m.is_member,
+      updatedUsers.some(
+        (user) =>
+          user.id === TEST_USER_2_ID &&
+          user.userGroupMemberships?.some((m) => m.is_member),
       ),
     ).toBe(false);
-  });
-
-  test("should return empty array when adding users with empty list", async () => {
-    const result = await addUsersToGroup(TEST_GROUP_ID, []);
-    expect(result).toEqual([]);
-  });
-
-  test("should return empty array when removing users with empty list", async () => {
-    const result = await removeUsersFromGroup(TEST_GROUP_ID, []);
-    expect(result).toEqual([]);
   });
 
   test("should return empty array when adding users with empty list", async () => {
