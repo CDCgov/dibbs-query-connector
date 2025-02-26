@@ -64,15 +64,15 @@ describe("User Group Membership Tests", () => {
     const result: User[] = await getUsersWithGroupStatus(TEST_GROUP_ID);
 
     expect(Array.isArray(result)).toBe(true);
-expect(result[0]).toHaveProperty("id");
-expect(result[0]).toHaveProperty("username");
-expect(result[0]).toHaveProperty("userGroupMemberships");
+    expect(result[0]).toHaveProperty("id");
+    expect(result[0]).toHaveProperty("username");
+    expect(result[0]).toHaveProperty("userGroupMemberships");
 
-const membership = result[0].userGroupMemberships?.find(
-  (m) => m.usergroup_id === TEST_GROUP_ID,
-);
-expect(membership).toBeDefined();
-expect(membership?.is_member).toBeDefined();
+    const membership = result[0].userGroupMemberships?.find(
+      (m) => m.usergroup_id === TEST_GROUP_ID,
+    );
+    expect(membership).toBeDefined();
+    expect(membership?.is_member).toBeDefined();
   });
 
   /**
