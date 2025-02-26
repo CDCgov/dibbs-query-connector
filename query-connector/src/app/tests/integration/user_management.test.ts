@@ -72,15 +72,9 @@ describe("User Management Integration Tests", () => {
    * Tests updating the role of an existing user.
    */
   test("should update a user's role", async () => {
-    const result = await updateUserRole(
-      createdUserId,
-      UserRole.SUPER_ADMIN,
-    );
+    const result = await updateUserRole(createdUserId, UserRole.SUPER_ADMIN);
     expect(result.items).not.toBeNull();
-    expect(result.items![0]).toHaveProperty(
-      "qc_role",
-      UserRole.SUPER_ADMIN,
-    );
+    expect(result.items![0]).toHaveProperty("qc_role", UserRole.SUPER_ADMIN);
   });
 
   /**
