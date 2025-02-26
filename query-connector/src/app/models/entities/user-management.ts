@@ -14,6 +14,7 @@ export interface User {
     | RoleTypeValues.Admin
     | RoleTypeValues.Standard;
   userGroups?: UserGroup[];
+  userGroupMemberships?: UserGroupMembership[];
 }
 
 export interface UserGroup {
@@ -21,4 +22,10 @@ export interface UserGroup {
   name: string;
   memberSize: number;
   querySize: number;
+}
+
+export interface UserGroupMembership {
+  id: string;
+  usergroup_id: string;
+  is_member: boolean;
 }
