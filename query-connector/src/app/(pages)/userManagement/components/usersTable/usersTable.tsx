@@ -7,7 +7,11 @@ import UserGroups from "../userGroups/UserGroupsTable";
 import TabGroup, { Tab } from "@/app/ui/designSystem/tabGroup/tabGroup";
 import UserPermissionsTable from "../userPermissions/userPermissionsTable";
 import { QCResponse } from "@/app/models/responses/collections";
-import { User, UserGroup } from "../../../../models/entities/user-management";
+import {
+  User,
+  UserGroup,
+  UserRole,
+} from "../../../../models/entities/user-management";
 import {
   getUsers,
   getUserGroups,
@@ -43,9 +47,18 @@ const UsersTable: React.FC<UsersTableProps> = ({ role }) => {
       throw e;
     }
   }
+
   async function fetchUserGroups() {
-    const userGroups = await getUserGroups();
-    return setUserGroups(userGroups.items);
+    try {
+      const userGroups: QCResponse<UserGroup> = await getUserGroups();
+      return setUserGroups(userGroups.items);
+    } catch (e) {
+      showToastConfirmation({
+        body: "Unable to retrieve user groups. Please try again.",
+        variant: "error",
+      });
+      throw e;
+    }
   }
 
   async function fetchGroupMembers(groupId: string) {
@@ -67,7 +80,7 @@ const UsersTable: React.FC<UsersTableProps> = ({ role }) => {
   const sections: Tab[] = [
     {
       label: "Users",
-      access: ["Super Admin"],
+      access: [UserRole.SUPER_ADMIN],
       onClick: setTab,
       renderContent: () => (
         <UserPermissionsTable
@@ -78,7 +91,7 @@ const UsersTable: React.FC<UsersTableProps> = ({ role }) => {
     },
     {
       label: "User groups",
-      access: ["Super Admin", "Admin"],
+      access: [UserRole.SUPER_ADMIN, UserRole.ADMIN],
       onClick: setTab,
       renderContent: () => (
         <UserGroups
@@ -94,18 +107,21 @@ const UsersTable: React.FC<UsersTableProps> = ({ role }) => {
   const shouldRenderTabs = tabsForRole.length > 1;
 
   useEffect(() => {
-    fetchUsers();
-    fetchUserGroups();
+    role == UserRole.SUPER_ADMIN && users.length <= 0 && fetchUsers();
+    userGroups.length <= 0 && fetchUserGroups();
   }, []);
 
+  const dataLoaded =
+    role == UserRole.ADMIN ? !!users && !!userGroups : !!userGroups;
+
   useEffect(() => {
-    setActiveTab(defaultTab); // once users are loaded, set the default table display
-  }, [users]);
+    setActiveTab(defaultTab); // once data are loaded, set the default table display
+  }, [users, userGroups.length]);
 
   return (
     <div className="main-container__wide">
       {shouldRenderTabs && <TabGroup tabs={tabsForRole} />}
-      {users && activeTab?.renderContent && activeTab?.renderContent()}
+      {dataLoaded && activeTab?.renderContent && activeTab?.renderContent()}
       <UserManagementDrawer
         userGroups={userGroups}
         setUserGroups={setUserGroups}

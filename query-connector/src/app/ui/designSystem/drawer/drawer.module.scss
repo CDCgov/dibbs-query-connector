@@ -6,6 +6,7 @@ $drawerWidth: 29rem;
   position: fixed;
   top: 0;
   width: calc(max($drawerWidth, 30%));
+  max-width: 50%;
   height: 100%;
   padding: 0rem;
   display: flex;

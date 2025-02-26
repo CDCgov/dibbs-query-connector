@@ -1,7 +1,7 @@
 import { ToastContainer } from "react-toastify";
 import { render, waitFor, screen } from "@testing-library/react";
 import * as UserManagementBackend from "@/app/backend/user-management";
-import { RoleTypeValues } from "@/app/models/entities/user-management";
+import { UserRole } from "@/app/models/entities/user-management";
 import { RootProviderMock, renderWithUser } from "@/app/tests/unit/setup";
 import UserManagement from "./page";
 
@@ -36,20 +36,20 @@ describe("User Management: User tab", () => {
           username: "harrypotter",
           first_name: "harry",
           last_name: "potter",
-          qc_role: RoleTypeValues.Admin,
+          qc_role: UserRole.ADMIN,
         },
         {
           id: "456",
           username: "lilypotter",
           first_name: "lily",
           last_name: "potter",
-          qc_role: RoleTypeValues.Admin,
-          userGroups: [
+          qc_role: UserRole.ADMIN,
+          user_groups: [
             {
               id: "123",
               name: "Team 1",
-              memberSize: 1,
-              querySize: 0,
+              member_size: 1,
+              query_size: 0,
             },
           ],
         },
@@ -99,7 +99,7 @@ describe("User Management: User tab", () => {
       username: "harrypotter",
       first_name: "harry",
       last_name: "potter",
-      qc_role: RoleTypeValues.Admin,
+      qc_role: UserRole.ADMIN,
     };
 
     jest.spyOn(UserManagementBackend, "getUsers").mockResolvedValue({
@@ -114,7 +114,7 @@ describe("User Management: User tab", () => {
         items: [
           {
             ...userMock,
-            qc_role: RoleTypeValues.SuperAdmin,
+            qc_role: UserRole.SUPER_ADMIN,
           },
         ],
       });

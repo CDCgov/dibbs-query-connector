@@ -26,9 +26,9 @@ const TabGroup: React.FC<TabGroupProps> = ({ tabs }) => {
 
   const handleTabClick = (e: React.MouseEvent<HTMLElement>) => {
     const clickedTab = e.currentTarget.innerHTML;
-    setActiveTab(clickedTab);
-    const active = tabs.find((tab) => tab.label == activeTab);
-    active && active?.onClick && active.onClick(e);
+    setActiveTab(clickedTab); // local component state
+    const active = tabs.find((tab) => tab.label == clickedTab);
+    active && active?.onClick && active.onClick(e); // parent component state
   };
 
   return (

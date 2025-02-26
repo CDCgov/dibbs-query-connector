@@ -6,9 +6,14 @@ import { Button } from "@trussworks/react-uswds";
 
 import Table from "../../../../ui/designSystem/table/Table";
 import { UserManagementContext } from "../UserManagementProvider";
-import { UserGroup, User } from "../../../../models/entities/user-management";
+import {
+  UserGroup,
+  UserRole,
+  User,
+} from "../../../../models/entities/user-management";
 import { QueryTableResult } from "@/app/(pages)/queryBuilding/utils";
 import styles from "../usersTable/usersTable.module.scss";
+import { getSessionRole } from "../../utils";
 
 type UserGroupsTableProps = {
   userGroups: UserGroup[];
@@ -30,6 +35,7 @@ const UserGroupsTable: React.FC<UserGroupsTableProps> = ({
   fetchGroupMembers,
 }) => {
   const { openEditSection } = useContext(UserManagementContext);
+  const role = getSessionRole();
 
   function getMemberLabel(memberSize: number): string {
     return memberSize == 1 ? `${memberSize} member` : `${memberSize} members`;
@@ -44,28 +50,31 @@ const UserGroupsTable: React.FC<UserGroupsTableProps> = ({
       <tr key={group.id}>
         <td width={270}>{group.name}</td>
         <td>
-          <Button
-            type="button"
-            className={classNames(styles.drawerButton, "text-no-underline")}
-            unstyled
-            aria-description={`Edit ${group.name} members`}
-            onClick={async () => {
-              let members = group.members;
-              if (!members || members?.length <= 0) {
-                members = await fetchGroupMembers(group.id);
-              }
-              openEditSection(
-                group.name,
-                "Members",
-                "Members",
-                group.id,
-                members as User[],
-              );
-            }}
-            disabled={group.member_size <= 0}
-          >
-            {getMemberLabel(group.member_size)}
-          </Button>
+          {role != UserRole.SUPER_ADMIN && group.member_size <= 0 ? (
+            getMemberLabel(group.member_size)
+          ) : (
+            <Button
+              type="button"
+              className={classNames(styles.drawerButton, "text-no-underline")}
+              unstyled
+              aria-description={`Edit ${group.name} members`}
+              onClick={async () => {
+                let members = group.members;
+                if (!members || members?.length <= 0) {
+                  members = await fetchGroupMembers(group.id);
+                }
+                openEditSection(
+                  group.name,
+                  "Members",
+                  "Members",
+                  group.id,
+                  members as User[],
+                );
+              }}
+            >
+              {getMemberLabel(group.member_size)}
+            </Button>
+          )}
         </td>
         <td>
           <Button
