@@ -13,9 +13,22 @@ export function isDemoMode(): boolean {
 
 /**
  * Checks if the property AUTH_DISABLED is true
+ * USE ONLY ON FRONTEND COMPONENTS
+ * @param runtimeConfig - object that contains all runtime variables
  * @returns true if auth is disabled for the application
  */
-export function isAuthDisabled(): boolean {
+export function isAuthDisabledClientCheck(
+  runtimeConfig: Record<string, string> | undefined,
+): boolean {
+  return runtimeConfig?.AUTH_DISABLED === "true";
+}
+
+/**
+ * Checks if the property AUTH_DISABLED is true
+ * USE ONLY ON SERVER CODE
+ * @returns true if auth is disabled for the application
+ */
+export function isAuthDisabledServerCheck(): boolean {
   return process.env.AUTH_DISABLED === "true";
 }
 
@@ -25,7 +38,6 @@ export function isAuthDisabled(): boolean {
  */
 export async function getLoggedInUser(): Promise<User | undefined> {
   const session = await auth();
-
   return session ? session.user : undefined;
 }
 
@@ -37,10 +49,30 @@ export async function superAdminAccessCheck(): Promise<boolean> {
   const user = await getLoggedInUser();
 
   if (
-    isAuthDisabled() ||
+    isAuthDisabledServerCheck() ||
     (user &&
       (await getUserRole(user.username as string)) ===
         RoleTypeValues.SuperAdmin)
+  ) {
+    return true;
+  }
+
+  return false;
+}
+
+/**
+ * Performs admin role check
+ * @returns true if there is an session and the user has an admin or super-admin role
+ */
+export async function adminAccessCheck(): Promise<boolean> {
+  const user = await getLoggedInUser();
+
+  if (
+    isAuthDisabledServerCheck() ||
+    (user &&
+      [RoleTypeValues.Admin, RoleTypeValues.SuperAdmin].includes(
+        (await getUserRole(user.username as string)) as RoleTypeValues,
+      ))
   ) {
     return true;
   }

@@ -1,8 +1,11 @@
 "use server";
-
-import { RoleTypeValues, User } from "../models/entities/user-management";
+import {
+  RoleTypeValues,
+  User,
+  UserGroup,
+} from "../models/entities/user-management";
 import { QCResponse } from "../models/responses/collections";
-import { superAdminAccessCheck } from "../utils/auth";
+import { adminAccessCheck, superAdminAccessCheck } from "../utils/auth";
 import { getDbClient } from "./dbClient";
 const dbClient = getDbClient();
 
@@ -43,10 +46,19 @@ export async function addUserIfNotExists(userToken: {
       return userExists.rows[0]; // Return existing user
     }
 
+    // Default role when adding a new user, which includes Super Admin, Admin, and Standard User.
+    let qc_role = RoleTypeValues.Standard;
     console.log("User not found. Proceeding to insert.");
 
-    // Default role when adding a new user, which includes Super Admin, Admin, and Standard User.
-    const qc_role = "Standard User";
+    if (process.env.NODE_ENV !== "production") {
+      // First registered user is set as Super Admin
+      const queryUserRecordCount = `SELECT COUNT(*) FROM users`;
+      const userCount = await dbClient.query(queryUserRecordCount);
+
+      if (userCount?.rows?.[0]?.count === "0") {
+        qc_role = RoleTypeValues.SuperAdmin;
+      }
+    }
 
     const insertUserQuery = `
       INSERT INTO users (username, qc_role, first_name, last_name)
@@ -158,6 +170,181 @@ export async function getUserRole(username: string): Promise<string> {
       ? result.rows?.[0].qc_role
       : "";
   } catch (error) {
+    throw error;
+  }
+}
+
+/**
+ * Retrieves all registered user groups in query connector along with member and query counts.
+ * @returns A list of user groups registered in the query connector.
+ */
+export async function getUserGroups(): Promise<QCResponse<UserGroup>> {
+  if (!(await adminAccessCheck())) {
+    throw new Error("Unauthorized");
+  }
+
+  try {
+    const selectAllUserGroupQuery = `
+      SELECT 
+        ug.id, 
+        ug.name, 
+        COALESCE(member_count, 0) AS memberSize,
+        COALESCE(query_count, 0) AS querySize
+      FROM usergroup ug
+      LEFT JOIN (
+        SELECT usergroup_id, COUNT(*) AS member_count 
+        FROM usergroup_to_users 
+        GROUP BY usergroup_id
+      ) uu ON ug.id = uu.usergroup_id
+      LEFT JOIN (
+        SELECT usergroup_id, COUNT(*) AS query_count 
+        FROM usergroup_to_query 
+        GROUP BY usergroup_id
+      ) uq ON ug.id = uq.usergroup_id
+      ORDER BY ug.name ASC;
+    `;
+
+    const result = await dbClient.query(selectAllUserGroupQuery);
+
+    return {
+      totalItems: result.rowCount,
+      items: result.rows,
+    } as QCResponse<UserGroup>;
+  } catch (error) {
+    console.error("Error retrieving user groups:", error);
+    throw error;
+  }
+}
+
+/**
+ * Creates a new user group if it does not already exist.
+ * @param groupName - The name of the user group to create.
+ * @returns The created user group or an error message if it already exists.
+ */
+export async function createUserGroup(
+  groupName: string,
+): Promise<UserGroup | string> {
+  if (!(await adminAccessCheck())) {
+    throw new Error("Unauthorized");
+  }
+
+  try {
+    // Check if the group name already exists
+    const existingGroups = await getUserGroups();
+    const groupExists =
+      existingGroups.items?.some((group) => group.name === groupName) ?? false;
+
+    if (groupExists) {
+      console.warn(`Group with name '${groupName}' already exists.`);
+      return `Group '${groupName}' already exists.`;
+    }
+
+    const createGroupQuery = `
+      INSERT INTO usergroup (name)
+      VALUES ($1)
+      RETURNING id, name;
+    `;
+
+    const result = await dbClient.query(createGroupQuery, [groupName]);
+
+    return {
+      id: result.rows[0].id,
+      name: result.rows[0].name,
+      memberSize: 0,
+      querySize: 0,
+    };
+  } catch (error) {
+    console.error("Error creating user group:", error);
+    throw error;
+  }
+}
+
+/**
+ * Updates the name of an existing user group.
+ * @param id - The unique identifier of the user group to update.
+ * @param newName - The new name to assign to the user group.
+ * @returns The updated user group or an error if the update fails.
+ */
+export async function updateUserGroup(
+  id: string,
+  newName: string,
+): Promise<UserGroup | string> {
+  if (!(await adminAccessCheck())) {
+    throw new Error("Unauthorized");
+  }
+
+  try {
+    // Check if the new name already exists
+    const existingGroups = await getUserGroups();
+    const groupExists =
+      existingGroups.items?.some((group) => group.name === newName) ?? false;
+
+    if (groupExists) {
+      console.warn(`Group with name '${newName}' already exists.`);
+      return `Group '${newName}' already exists.`;
+    }
+
+    const updateGroupQuery = `
+      UPDATE usergroup
+      SET name = $1
+      WHERE id = $2
+      RETURNING id, name;
+    `;
+
+    const result = await dbClient.query(updateGroupQuery, [newName, id]);
+
+    if (result.rows.length === 0) {
+      throw new Error(`User group with ID '${id}' not found.`);
+    }
+
+    // Get updated memberSize and querySize from getUserGroup
+    const userGroups = await getUserGroups();
+    const updatedGroup =
+      userGroups?.items?.find((group) => group.id === id) ?? null;
+
+    return {
+      id: result.rows[0].id,
+      name: result.rows[0].name,
+      memberSize: updatedGroup?.memberSize ?? 0,
+      querySize: updatedGroup?.querySize ?? 0,
+    };
+  } catch (error) {
+    console.error("Error updating user group:", error);
+    throw error;
+  }
+}
+
+/**
+ * Deletes a user group by its unique identifier.
+ * @param id - The unique identifier of the user group to delete.
+ * @returns The deleted user group or an error if the deletion fails.
+ */
+export async function deleteUserGroup(id: string): Promise<UserGroup | string> {
+  if (!(await adminAccessCheck())) {
+    throw new Error("Unauthorized");
+  }
+
+  try {
+    const deleteGroupQuery = `
+      DELETE FROM usergroup
+      WHERE id = $1
+      RETURNING id, name;
+    `;
+
+    const result = await dbClient.query(deleteGroupQuery, [id]);
+
+    if (result.rows.length === 0) {
+      throw new Error(`User group with ID '${id}' not found.`);
+    }
+
+    return {
+      id: result.rows[0].id,
+      name: result.rows[0].name,
+      memberSize: 0,
+      querySize: 0,
+    };
+  } catch (error) {
+    console.error("Error deleting user group:", error);
     throw error;
   }
 }
