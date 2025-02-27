@@ -26,11 +26,7 @@ import {
 } from "../utils";
 import { ConditionSelection } from "../components/ConditionSelection";
 import { ValueSetSelection } from "../components/ValueSetSelection";
-import {
-  BuildStep,
-  DibbsConceptType,
-  DibbsValueSet,
-} from "../../../shared/constants";
+import { BuildStep } from "../../../shared/constants";
 import LoadingView from "../../../ui/designSystem/LoadingView";
 import classNames from "classnames";
 import { groupConditionConceptsIntoValueSets } from "@/app/shared/utils";
@@ -43,6 +39,10 @@ import {
 import { groupValueSetsByConceptType } from "@/app/utils/valueSetTranslation";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import { DataContext } from "@/app/shared/DataProvider";
+import {
+  DibbsConceptType,
+  DibbsValueSet,
+} from "@/app/models/entities/valuesets";
 
 export type FormError = {
   queryName: boolean;

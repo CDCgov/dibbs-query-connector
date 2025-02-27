@@ -6,9 +6,10 @@ import {
   QueryTableResult,
   QueryUpdateResult,
 } from "../(pages)/queryBuilding/utils";
-import { DibbsValueSet } from "../shared/constants";
 import { DEFAULT_TIME_WINDOW } from "../shared/utils";
 import { randomUUID } from "crypto";
+import { DibbsValueSet } from "../models/entities/valuesets";
+import { adminAccessCheck, superAdminAccessCheck } from "../utils/auth";
 const dbClient = getDbClient();
 
 /**
@@ -52,6 +53,10 @@ export async function saveCustomQuery(
   author: string,
   queryId?: string,
 ) {
+  if (!((await superAdminAccessCheck()) || (await adminAccessCheck()))) {
+    throw new Error("Unauthorized");
+  }
+
   const queryString = `
     INSERT INTO query
       values($1, $2, $3, $4, $5, $6, $7, $8, $9)

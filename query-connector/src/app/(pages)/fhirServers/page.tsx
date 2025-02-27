@@ -9,7 +9,6 @@ import {
 } from "./../../backend/fhir-servers";
 import dynamic from "next/dynamic";
 import { useEffect, useState, useRef } from "react";
-import { FhirServerConfig } from "../../shared/constants";
 import type { ModalRef } from "../../ui/designSystem/modal/Modal";
 import styles from "./fhirServers.module.scss";
 import classNames from "classnames";
@@ -20,6 +19,7 @@ import Checkbox from "../../ui/designSystem/checkbox/Checkbox";
 import type { ModalProps } from "../../ui/designSystem/modal/Modal";
 import WithAuth from "@/app/ui/components/withAuth/WithAuth";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
+import { FhirServerConfig } from "@/app/models/entities/fhir-servers";
 const Modal = dynamic<ModalProps>(
   () => import("../../ui/designSystem/modal/Modal").then((mod) => mod.Modal),
   { ssr: false },

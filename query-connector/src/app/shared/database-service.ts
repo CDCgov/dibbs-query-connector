@@ -1,11 +1,8 @@
 "use server";
 import { Bundle, OperationOutcome, Parameters } from "fhir/r4";
 import {
-  Concept,
   INTENTIONAL_EMPTY_STRING_FOR_CONCEPT_VERSION,
   INTENTIONAL_EMPTY_STRING_FOR_GEM_CODE,
-  DibbsValueSet,
-  CustomUserQuery,
 } from "./constants";
 import { encode } from "base-64";
 import {
@@ -34,6 +31,9 @@ import {
   ValuesetToConceptStruct,
 } from "./seedSqlStructs";
 import { getDbClient } from "../backend/dbClient";
+import { DibbsValueSet } from "../models/entities/valuesets";
+import { Concept } from "../models/entities/concepts";
+import { CustomUserQuery } from "../models/entities/query";
 
 const getQuerybyNameSQL = `
 select q.query_name, q.id, q.query_data, q.conditions_list, q.immunization

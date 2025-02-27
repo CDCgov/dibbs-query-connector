@@ -12,8 +12,8 @@ import StepIndicator, {
 } from "./components/stepIndicator/StepIndicator";
 import { DataContext } from "@/app/shared/DataProvider";
 import { Patient } from "fhir/r4";
-import { CustomUserQuery } from "../../shared/constants";
 import { getFhirServerNames } from "@/app/backend/fhir-servers";
+import { CustomUserQuery } from "@/app/models/entities/query";
 
 const blankUserQuery = {
   query_id: "",

@@ -15,7 +15,7 @@ import Backlink from "../../../ui/designSystem/backLink/Backlink";
 import { RETURN_LABEL } from "@/app/(pages)/query/components/stepIndicator/StepIndicator";
 import TitleBox from "./stepIndicator/TitleBox";
 import ImmunizationTable from "./resultsView/tableComponents/ImmunizationTable";
-import { CustomUserQuery } from "@/app/shared/constants";
+import { CustomUserQuery } from "@/app/models/entities/query";
 
 type ResultsViewProps = {
   fhirQueryResponse: FhirQueryResponse;
