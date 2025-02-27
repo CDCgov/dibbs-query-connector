@@ -75,7 +75,7 @@ jobs:
         run: |
           echo "Deploying to ${{ github.event.inputs.workspace }}..."
           rm -rf .terraform .terraform.lock.hcl
-          terraform init \
+          terraform init -upgrade\
             -var-file="$WORKSPACE.tfvars" \
             -backend-config "bucket=$BUCKET" \
             -backend-config "dynamodb_table=$DYNAMODB_TABLE" \
