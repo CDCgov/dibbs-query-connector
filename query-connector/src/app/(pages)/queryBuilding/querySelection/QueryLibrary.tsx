@@ -52,7 +52,6 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
 }) => {
   const queriesContext = useContext(DataContext);
   const [queries, setQueries] = useState<CustomUserQuery[]>(initialQueries);
-  const [loading, setLoading] = useState(false);
   const [conditionIdToDetailsMap, setConditionIdToDetailsMap] =
     useState<ConditionsMap>();
 
@@ -84,7 +83,6 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
 
   return (
     <div>
-      {<LoadingView loading={loading} />}
       {queriesContext &&
         renderModal(
           modalRef,
