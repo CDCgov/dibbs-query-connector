@@ -21,7 +21,6 @@ import {
   handleCopy,
   SelectedQueryDetails,
 } from "./utils";
-import LoadingView from "@/app/ui/designSystem/LoadingView";
 import { DataContext } from "@/app/shared/DataProvider";
 import classNames from "classnames";
 import { getConditionsData } from "@/app/shared/database-service";
