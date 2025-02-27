@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useState } from "react";
 import { formatIdForAnchorTag } from "./ResultsViewTable";
 import SideNav, { NavItem } from "../../../../ui/components/sideNav/SideNav";
 import { SideNav as UswdsSideNav } from "@trussworks/react-uswds";
@@ -17,6 +17,7 @@ type ResultsViewSideNavProps = {
  * ResultsViewSideNav component
  * @param root0 - params
  * @param root0.items - a list of nav items to display in the sidenav
+ * @param root0.loading
  * @returns - The ResultsViewSideNav component
  */
 const ResultsViewSideNav: React.FC<ResultsViewSideNavProps> = ({

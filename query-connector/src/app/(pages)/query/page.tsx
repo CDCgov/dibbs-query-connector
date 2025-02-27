@@ -6,7 +6,6 @@ import PatientSearchResults from "./components/PatientSearchResults";
 import SearchForm from "./components/searchForm/SearchForm";
 import SelectQuery from "./components/SelectQuery";
 import { DEFAULT_DEMO_FHIR_SERVER, Mode } from "../../shared/constants";
-import LoadingView from "../../ui/designSystem/LoadingView";
 import StepIndicator, {
   CUSTOMIZE_QUERY_STEPS,
 } from "./components/stepIndicator/StepIndicator";

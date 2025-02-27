@@ -39,6 +39,7 @@ export type ResultsViewAccordionItem = {
  * @param props.goBack - The function to go back to the previous page.
  * @param props.goToBeginning - Function to return to patient discover
  * @param props.selectedQuery - query that's been selected to view for results
+ * @param props.loading
  * @returns The QueryView component.
  */
 const ResultsView: React.FC<ResultsViewProps> = ({

@@ -43,6 +43,7 @@ interface SelectQueryProps {
  * show customize query
  * @param root0.fhirServer - the FHIR server that we're running the query against
  * @param root0.setFhirServer - callback function to update the FHIR server
+ * @param root0.setLoading
  * @returns - The selectQuery component.
  */
 const SelectQuery: React.FC<SelectQueryProps> = ({
