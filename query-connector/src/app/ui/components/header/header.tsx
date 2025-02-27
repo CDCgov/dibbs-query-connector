@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { usePathname } from "next/navigation";
 import { useSession, signIn, signOut } from "next-auth/react";
 import { Button, Icon } from "@trussworks/react-uswds";
 import styles from "./header.module.scss";
@@ -9,7 +8,8 @@ import { metadata } from "@/app/shared/constants";
 import classNames from "classnames";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { PAGES } from "@/app/shared/page-routes";
+import { getSettingsMenuPages, PAGES } from "@/app/shared/page-routes";
+import { RoleTypeValues } from "@/app/models/entities/user-management";
 
 /**
  * Produces the header.
@@ -23,6 +23,11 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
   const menuRef = useRef<HTMLDivElement>(null);
   const [showMenu, setShowMenu] = useState(false);
   const router = useRouter();
+  const { data: session, status } = useSession();
+  const isLoggedIn = status === "authenticated";
+  const userRole = authDisabled
+    ? RoleTypeValues.SuperAdmin
+    : session?.user.role || "";
 
   const outsideMenuClick = (event: MouseEvent) => {
     if (
@@ -41,12 +46,6 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
       document.removeEventListener("mousedown", outsideMenuClick);
     };
   }, [showMenu]);
-
-  const path = usePathname();
-
-  const { status } = useSession();
-
-  const isLoggedIn = status === "authenticated";
 
   const handleSignIn = () => {
     if (authDisabled) {
@@ -67,7 +66,7 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
   const toggleMenuDropdown = () => {
     setShowMenu(!showMenu);
   };
-  // const isProduction = process.env.NODE_ENV === "production";
+
   const landingPage: string =
     authDisabled || isLoggedIn ? PAGES.QUERY : PAGES.LANDING;
 
@@ -139,44 +138,30 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
               id="dropdown-menu"
               className={classNames("usa-nav__submenu", styles.menuDropdown)}
             >
-              <li className={styles.subMenuItem}>
-                <Link
-                  className={styles.menuItem}
-                  href={PAGES.MY_QUERIES}
-                  scroll={false}
-                >
-                  My Queries
-                </Link>
-              </li>
-              <li className={styles.subMenuItem}>
-                <Link
-                  className={styles.menuItem}
-                  href={PAGES.FHIR_SERVERS}
-                  scroll={false}
-                >
-                  FHIR Servers
-                </Link>
-              </li>
-              <li className={styles.subMenuItem}>
-                <Link
-                  className={styles.menuItem}
-                  href={PAGES.USER_MANAGEMENT}
-                  scroll={false}
-                >
-                  User Management
-                </Link>
-              </li>
-              <li className={styles.subMenuItem}>
-                <button
-                  className={classNames(
-                    styles.menuItem,
-                    "usa-button--unstyled",
-                  )}
-                  onClick={async () => await handleSignOut()}
-                >
-                  Log out
-                </button>
-              </li>
+              {getSettingsMenuPages(userRole as RoleTypeValues).map((page) => (
+                <li className={styles.subMenuItem}>
+                  <Link
+                    className={styles.menuItem}
+                    href={page.path}
+                    scroll={false}
+                  >
+                    {page.name}
+                  </Link>
+                </li>
+              ))}
+              {!authDisabled && (
+                <li className={styles.subMenuItem}>
+                  <button
+                    className={classNames(
+                      styles.menuItem,
+                      "usa-button--unstyled",
+                    )}
+                    onClick={async () => await handleSignOut()}
+                  >
+                    Log out
+                  </button>
+                </li>
+              )}
             </ul>
           </div>
         )}

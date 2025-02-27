@@ -12,35 +12,51 @@ export enum PAGES {
   GROUP_MANAGEMENT = "/userManagement/userGroups",
 }
 
+interface Page {
+  path: string;
+  name: string;
+  roleAccess: RoleTypeValues[];
+}
 /**
- * Role access per page
+ * Pages configuration
  */
-export const pagesRoleAccess: Record<string, RoleTypeValues[]> = {};
 
-pagesRoleAccess[PAGES.QUERY] = [
-  RoleTypeValues.SuperAdmin,
-  RoleTypeValues.Admin,
-  RoleTypeValues.Standard,
-];
+export const pagesConfig: Record<string, Page> = {};
 
-pagesRoleAccess[PAGES.MY_QUERIES] = [
-  RoleTypeValues.SuperAdmin,
-  RoleTypeValues.Admin,
-];
+pagesConfig[PAGES.QUERY] = {
+  path: PAGES.QUERY,
+  name: "Query",
+  roleAccess: [
+    RoleTypeValues.SuperAdmin,
+    RoleTypeValues.Admin,
+    RoleTypeValues.Standard,
+  ],
+};
 
-pagesRoleAccess[PAGES.FHIR_SERVERS] = [
-  RoleTypeValues.SuperAdmin,
-  RoleTypeValues.Admin,
-];
+pagesConfig[PAGES.MY_QUERIES] = {
+  path: PAGES.MY_QUERIES,
+  name: "My Queries",
+  roleAccess: [RoleTypeValues.SuperAdmin, RoleTypeValues.Admin],
+};
 
-pagesRoleAccess[PAGES.USER_MANAGEMENT] = [RoleTypeValues.SuperAdmin];
+pagesConfig[PAGES.FHIR_SERVERS] = {
+  path: PAGES.FHIR_SERVERS,
+  name: "FHIR Servers",
+  roleAccess: [RoleTypeValues.SuperAdmin],
+};
 
-pagesRoleAccess[PAGES.GROUP_MANAGEMENT] = [
-  RoleTypeValues.SuperAdmin,
-  RoleTypeValues.Admin,
-];
+pagesConfig[PAGES.USER_MANAGEMENT] = {
+  path: PAGES.USER_MANAGEMENT,
+  name: "User Management",
+  roleAccess: [RoleTypeValues.SuperAdmin, RoleTypeValues.Admin],
+};
 
 /**
- * List of pages behind authentication (display in the menu)
+ * @param userRole - the logged in user's role
+ * @returns List of pages that will display in the settings menu based on the user's role
  */
-export const LOGGED_IN_PATHS = Object.keys(pagesRoleAccess);
+export function getSettingsMenuPages(userRole: RoleTypeValues): Page[] {
+  return Object.values(pagesConfig)
+    .filter((page: Page) => page.roleAccess.includes(userRole))
+    .sort((a, b) => (a.name > b.name ? 1 : -1));
+}
