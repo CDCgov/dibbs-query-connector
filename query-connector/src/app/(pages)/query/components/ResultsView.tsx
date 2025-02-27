@@ -16,12 +16,14 @@ import { RETURN_LABEL } from "@/app/(pages)/query/components/stepIndicator/StepI
 import TitleBox from "./stepIndicator/TitleBox";
 import ImmunizationTable from "./resultsView/tableComponents/ImmunizationTable";
 import { CustomUserQuery } from "@/app/shared/constants";
+import Skeleton from "react-loading-skeleton";
 
 type ResultsViewProps = {
   fhirQueryResponse: FhirQueryResponse;
   selectedQuery: CustomUserQuery;
   goBack: () => void;
   goToBeginning: () => void;
+  loading: boolean;
 };
 
 export type ResultsViewAccordionItem = {
@@ -44,6 +46,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({
   selectedQuery,
   goBack,
   goToBeginning,
+  loading,
 }) => {
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -63,28 +66,40 @@ const ResultsView: React.FC<ResultsViewProps> = ({
   return (
     <>
       <div className={`${styles.resultsBannerContent}`}>
-        <Backlink onClick={() => goBack()} label={RETURN_LABEL["results"]} />
-        <button
-          className="usa-button usa-button--outline margin-left-auto"
-          onClick={() => goToBeginning()}
-        >
-          New patient search
-        </button>
+        {loading ? (
+          <>
+            <Skeleton width={150} />
+            <Skeleton width={200} height={50} />
+          </>
+        ) : (
+          <>
+            <Backlink
+              onClick={() => goBack()}
+              label={RETURN_LABEL["results"]}
+            />
+            <button
+              className="usa-button usa-button--outline"
+              onClick={() => goToBeginning()}
+            >
+              New patient search
+            </button>
+          </>
+        )}
       </div>
       <TitleBox step="results" />
       <h2 className="page-explainer margin-bottom-3-important margin-top-0-important">
         <strong>Query: </strong>
         <span className="text-normal display-inline-block">
-          {selectedQuery.query_name}
+          {loading ? <Skeleton width={250} /> : selectedQuery.query_name}
         </span>
       </h2>
 
       <div className=" grid-container grid-row grid-gap-md padding-0 ">
         <div className="tablet:grid-col-3">
-          <ResultsViewSideNav items={sideNavContent} />
+          <ResultsViewSideNav items={sideNavContent} loading={loading} />
         </div>
         <div className="tablet:grid-col-9 ecr-content">
-          <ResultsViewTable accordionItems={accordionItems} />
+          <ResultsViewTable accordionItems={accordionItems} loading={loading} />
         </div>
       </div>
     </>

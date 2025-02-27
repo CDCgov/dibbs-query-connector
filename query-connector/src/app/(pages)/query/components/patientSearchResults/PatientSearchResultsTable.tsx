@@ -8,10 +8,13 @@ import {
 } from "@/app/shared/format-service";
 import classNames from "classnames";
 import TitleBox from "../stepIndicator/TitleBox";
+import NoPatientsFound from "./NoPatientsFound";
+import Skeleton from "react-loading-skeleton";
 
 type PatientSearchResultsTableProps = {
   patients: Patient[];
   handlePatientSelect: (patient: Patient) => void;
+  loading: boolean;
 };
 
 /**
@@ -26,45 +29,56 @@ type PatientSearchResultsTableProps = {
 const PatientSearchResultsTable: React.FC<PatientSearchResultsTableProps> = ({
   patients,
   handlePatientSelect: setPatientForQueryResponse,
+  loading,
 }) => {
   return (
     <>
-      <TitleBox step="patient-results" />
-      <h2 className="page-explainer">The following record(s) match.</h2>
+      <h2 className="page-explainer">
+        {loading ? <Skeleton width={250} /> : "The following record(s) match."}
+      </h2>
+
       <Table className={classNames("margin-top-4")}>
         <thead>
-          <tr>
-            <th>Name</th>
-            <th>DOB</th>
-            <th>Contact</th>
-            <th>Address</th>
-            <th>MRN</th>
-            <th>Actions</th>
-          </tr>
+          {loading ? (
+            <LoadingTableHeader />
+          ) : (
+            <tr>
+              <th>Name</th>
+              <th>DOB</th>
+              <th>Contact</th>
+              <th>Address</th>
+              <th>MRN</th>
+              <th>Actions</th>
+            </tr>
+          )}
         </thead>
         <tbody>
-          {patients.map((patient) => (
-            <tr
-              key={patient.id}
-              className={classNames("tableRowWithHover_clickable")}
-              onClick={() => setPatientForQueryResponse(patient)}
-            >
-              <td>{formatName(patient.name ?? [])}</td>
-              <td width={120}>{patient.birthDate ?? ""}</td>
-              <td>{formatContact(patient.telecom ?? [])}</td>
-              <td>{formatAddress(patient.address ?? [])}</td>
-              <td width={150}>{formatMRN(patient.identifier ?? [])}</td>
-              <td width={100}>
-                <a
-                  href="#"
-                  className="unchanged-color-on-visit"
-                  onClick={() => setPatientForQueryResponse(patient)}
-                >
-                  Select patient
-                </a>
-              </td>
-            </tr>
-          ))}
+          {loading ? (
+            <LoadingTableBody />
+          ) : (
+            patients.map((patient) => (
+              <tr
+                key={patient.id}
+                className={classNames("tableRowWithHover_clickable")}
+                onClick={() => setPatientForQueryResponse(patient)}
+              >
+                <td>{formatName(patient.name ?? [])}</td>
+                <td width={120}>{patient.birthDate ?? ""}</td>
+                <td>{formatContact(patient.telecom ?? [])}</td>
+                <td>{formatAddress(patient.address ?? [])}</td>
+                <td width={150}>{formatMRN(patient.identifier ?? [])}</td>
+                <td width={100}>
+                  <a
+                    href="#"
+                    className="unchanged-color-on-visit"
+                    onClick={() => setPatientForQueryResponse(patient)}
+                  >
+                    Select patient
+                  </a>
+                </td>
+              </tr>
+            ))
+          )}
         </tbody>
       </Table>
     </>
@@ -72,3 +86,59 @@ const PatientSearchResultsTable: React.FC<PatientSearchResultsTableProps> = ({
 };
 
 export default PatientSearchResultsTable;
+
+const LoadingTableHeader: React.FC = () => {
+  return (
+    <tr>
+      <th>
+        <Skeleton />
+      </th>
+      <th>
+        <Skeleton />
+      </th>
+      <th>
+        <Skeleton />
+      </th>
+      <th>
+        <Skeleton />
+      </th>
+      <th>
+        <Skeleton />
+      </th>
+      <th>
+        <Skeleton />
+      </th>
+      <th>
+        <Skeleton />
+      </th>
+    </tr>
+  );
+};
+
+const LoadingTableBody: React.FC = () => {
+  return (
+    <tr className={classNames("tableRowWithHover_clickable")}>
+      <td>
+        <Skeleton />
+      </td>
+      <td>
+        <Skeleton />
+      </td>
+      <td>
+        <Skeleton />
+      </td>
+      <td>
+        <Skeleton />
+      </td>
+      <td>
+        <Skeleton />
+      </td>
+      <td>
+        <Skeleton />
+      </td>
+      <td>
+        <Skeleton />
+      </td>
+    </tr>
+  );
+};

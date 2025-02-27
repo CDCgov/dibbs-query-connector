@@ -57,6 +57,7 @@ const SelectQuery: React.FC<SelectQueryProps> = ({
   setShowCustomizeQuery,
   selectedQuery,
   setSelectedQuery,
+  setLoading,
 }) => {
   const [queryValueSets, setQueryValueSets] = useState<DibbsValueSet[]>(
     [] as DibbsValueSet[],
@@ -94,6 +95,8 @@ const SelectQuery: React.FC<SelectQueryProps> = ({
   }, [selectedQuery]);
 
   async function onSubmit() {
+    setLoading(true);
+    goForward();
     await fetchQueryResponse({
       queryName: selectedQuery.query_name,
       patientForQuery: patientForQuery,
@@ -103,7 +106,7 @@ const SelectQuery: React.FC<SelectQueryProps> = ({
       queryResponseStateCallback: setResultsQueryResponse,
       setIsLoading: setLoadingResultResponse,
     }).catch(console.error);
-    goForward();
+    setLoading(false);
   }
 
   const displayLoading = loadingResultResponse || loadingQueryValueSets;

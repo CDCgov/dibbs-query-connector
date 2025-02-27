@@ -1,6 +1,8 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { formatIdForAnchorTag } from "./ResultsViewTable";
 import SideNav, { NavItem } from "../../../../ui/components/sideNav/SideNav";
+import { SideNav as UswdsSideNav } from "@trussworks/react-uswds";
+import Skeleton from "react-loading-skeleton";
 
 export type NavSection = {
   title: string;
@@ -9,6 +11,7 @@ export type NavSection = {
 
 type ResultsViewSideNavProps = {
   items: NavSection[];
+  loading: boolean;
 };
 /**
  * ResultsViewSideNav component
@@ -16,19 +19,23 @@ type ResultsViewSideNavProps = {
  * @param root0.items - a list of nav items to display in the sidenav
  * @returns - The ResultsViewSideNav component
  */
-const ResultsViewSideNav: React.FC<ResultsViewSideNavProps> = ({ items }) => {
+const ResultsViewSideNav: React.FC<ResultsViewSideNavProps> = ({
+  items,
+  loading,
+}) => {
   const [activeItem, setActiveItem] = useState(
     window.location.hash || formatIdForAnchorTag(items[0]?.title),
   );
-  const hashChangeHandler = useCallback(() => {
-    setActiveItem(window.location.hash);
-  }, [window.location.hash]);
-  useEffect(() => {
-    window.addEventListener("hashchange", hashChangeHandler);
-    return () => {
-      window.removeEventListener("hashchange", hashChangeHandler);
-    };
-  }, []);
+  // const hashChangeHandler = useCallback(() => {
+  //   setActiveItem(window.location.hash);
+  // }, [window.location.hash]);
+
+  // useEffect(() => {
+  //   window.addEventListener("hashchange", hashChangeHandler);
+  //   return () => {
+  //     window.removeEventListener("hashchange", hashChangeHandler);
+  //   };
+  // }, []);
 
   const sideNavItems: NavItem[] = items.flatMap((item) => {
     const sectionId = formatIdForAnchorTag(item.title);
@@ -37,23 +44,35 @@ const ResultsViewSideNav: React.FC<ResultsViewSideNavProps> = ({ items }) => {
       return [
         {
           title: item.title,
-          activeItem: activeItem.includes(sectionId),
+          activeItem: activeItem?.includes(sectionId),
         },
         {
           title: item.subtitle,
-          activeItem: activeItem.includes(subSectionId),
+          activeItem: activeItem?.includes(subSectionId),
           isSubNav: true,
         },
       ];
     } else {
       return {
         ...item,
-        activeItem: activeItem.includes(sectionId),
+        activeItem: activeItem?.includes(sectionId),
       };
     }
   });
 
-  return (
+  return loading ? (
+    <UswdsSideNav
+      items={Array.from(Array(5).keys()).map((_) => {
+        return (
+          <li className="usa-sidenav__item">
+            <div className="padding-1">
+              <Skeleton height={25} />
+            </div>
+          </li>
+        );
+      })}
+    />
+  ) : (
     <SideNav
       items={sideNavItems}
       containerClassName="resultsViewSideNav"

@@ -96,6 +96,7 @@ const Query: React.FC = () => {
             goBack={() => setMode("search")}
             setMode={setMode}
             setPatientForQueryResponse={setPatientForQueryResponse}
+            loading={loading}
           />
         )}
 
@@ -118,7 +119,7 @@ const Query: React.FC = () => {
         )}
 
         {/* Step 4 */}
-        {mode === "results" && resultsQueryResponse && selectedQuery && (
+        {mode === "results" && (
           <ResultsView
             selectedQuery={selectedQuery}
             fhirQueryResponse={resultsQueryResponse}
@@ -128,9 +129,9 @@ const Query: React.FC = () => {
             goToBeginning={() => {
               setMode("search");
             }}
+            loading={loading}
           />
         )}
-        {loading && <LoadingView loading={loading} />}
       </div>
     </>
   );

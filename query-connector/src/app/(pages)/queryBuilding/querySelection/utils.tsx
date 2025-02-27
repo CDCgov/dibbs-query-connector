@@ -91,11 +91,7 @@ export const handleCopy = (queryName: string, queryId: string) => {
  * @param goForward - method to progress the page to the next step
  * @param setLoading - Function to set the loading state.
  */
-export const handleCreationConfirmation = async (
-  goForward: () => void,
-  setLoading: React.Dispatch<React.SetStateAction<boolean>>,
-) => {
-  setLoading(true);
+export const handleCreationConfirmation = async (goForward: () => void) => {
   // Redirect to query updating/editing page
   goForward();
 };

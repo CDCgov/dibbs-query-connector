@@ -6,6 +6,7 @@ import Backlink from "../../../ui/designSystem/backLink/Backlink";
 import PatientSearchResultsTable from "./patientSearchResults/PatientSearchResultsTable";
 import NoPatientsFound from "./patientSearchResults/NoPatientsFound";
 import { RETURN_LABEL } from "@/app/(pages)/query/components/stepIndicator/StepIndicator";
+import TitleBox from "./stepIndicator/TitleBox";
 
 /**
  * The props for the PatientSearchResults component.
@@ -15,6 +16,7 @@ export interface PatientSearchResultsProps {
   goBack: () => void;
   setMode: (mode: Mode) => void;
   setPatientForQueryResponse: (patient: Patient) => void;
+  loading: boolean;
 }
 
 /**
@@ -32,6 +34,7 @@ const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({
   goBack,
   setPatientForQueryResponse,
   setMode,
+  loading,
 }) => {
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -44,7 +47,21 @@ const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({
 
   return (
     <>
-      {patients.length === 0 && (
+      {(loading || patients.length > 0) && (
+        <>
+          <Backlink onClick={goBack} label={RETURN_LABEL["patient-results"]} />
+
+          <TitleBox step="patient-results" />
+
+          <PatientSearchResultsTable
+            patients={patients}
+            handlePatientSelect={handlePatientSelect}
+            loading={loading}
+          />
+        </>
+      )}
+
+      {!loading && patients.length === 0 && (
         <>
           <NoPatientsFound />
           <a
@@ -54,16 +71,6 @@ const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({
           >
             Revise your patient search
           </a>
-        </>
-      )}
-      {patients.length > 0 && (
-        <>
-          <Backlink onClick={goBack} label={RETURN_LABEL["patient-results"]} />
-
-          <PatientSearchResultsTable
-            patients={patients}
-            handlePatientSelect={handlePatientSelect}
-          />
         </>
       )}
     </>
