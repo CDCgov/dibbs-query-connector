@@ -87,15 +87,6 @@ export const handleCopy = (queryName: string, queryId: string) => {
 };
 
 /**
- * Handles the creation of a new query by redirecting to the query building page.
- * @param goForward - method to progress the page to the next step
- */
-export const handleCreationConfirmation = async (goForward: () => void) => {
-  // Redirect to query updating/editing page
-  goForward();
-};
-
-/**
  *  Renders a modal to confirm the deletion of a user query.
  * @param modalRef - Reference to the modal component.
  * @param selectedQuery - The currently selected query for deletion.

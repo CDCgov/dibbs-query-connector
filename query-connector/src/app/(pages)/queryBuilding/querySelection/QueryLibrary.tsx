@@ -17,7 +17,6 @@ import {
   SelectedQueryState,
   renderModal,
   handleDelete,
-  handleCreationConfirmation,
   confirmDelete,
   handleCopy,
   SelectedQueryDetails,
@@ -100,12 +99,7 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
         <h1 className="flex-align-center">Query Library</h1>
         <div className="margin-left-auto">
           <Button
-            onClick={() =>
-              handleCreationConfirmation(
-                () => setBuildStep("condition"),
-                setLoading,
-              )
-            }
+            onClick={() => setBuildStep("condition")}
             className={styles.createQueryButton}
             type="button"
           >
