@@ -1,6 +1,6 @@
 "use server";
 import { User } from "../models/entities/user-management";
-import { adminAccessCheck } from "../utils/auth";
+import { superAdminAccessCheck } from "../utils/auth";
 import { getDbClient } from "./dbClient";
 const dbClient = getDbClient();
 
@@ -12,7 +12,7 @@ const dbClient = getDbClient();
 export async function getUsersWithGroupStatus(
   groupId: string,
 ): Promise<User[]> {
-  if (!(await adminAccessCheck())) {
+  if (!(await superAdminAccessCheck())) {
     throw new Error("Unauthorized");
   }
 
@@ -69,34 +69,19 @@ export async function addUsersToGroup(
   groupId: string,
   userIds: string[],
 ): Promise<string[]> {
-  if (!userIds.length) return [];
+  if (userIds.length === 0) return [];
 
-  const existingUsersQuery = {
-    text: `SELECT id FROM users WHERE id = ANY($1);`,
-    values: [userIds],
-  };
-  const existingUsersResult = await dbClient.query(existingUsersQuery);
-  const existingUserIds = new Set(
-    existingUsersResult.rows.map((row) => row.id),
-  );
-  const validUserIds = userIds.filter((id) => existingUserIds.has(id));
-
-  if (validUserIds.length === 0) {
-    return [];
-  }
+  const values = userIds
+    .map((userId) => `('${userId}_${groupId}', '${userId}', '${groupId}')`)
+    .join(",");
 
   const insertQuery = {
     text: `
       INSERT INTO usergroup_to_users (id, user_id, usergroup_id)
-      VALUES ${validUserIds.map((_, i) => `($${i * 3 + 1}, $${i * 3 + 2}, $${i * 3 + 3})`).join(",")}
+      VALUES ${values}
       ON CONFLICT DO NOTHING
       RETURNING user_id;
     `,
-    values: validUserIds.flatMap((userId) => [
-      `${userId}_${groupId}`,
-      userId,
-      groupId,
-    ]),
   };
 
   const result = await dbClient.query(insertQuery);
@@ -113,7 +98,7 @@ export async function removeUsersFromGroup(
   groupId: string,
   userIds: string[],
 ): Promise<string[]> {
-  if (!userIds.length) return [];
+  if (userIds.length === 0) return [];
 
   const query = {
     text: `
@@ -138,7 +123,7 @@ export async function saveUserGroupMembership(
   groupId: string,
   selectedUsers: string[],
 ): Promise<User[]> {
-  if (!(await adminAccessCheck())) {
+  if (!(await superAdminAccessCheck())) {
     throw new Error("Unauthorized");
   }
 

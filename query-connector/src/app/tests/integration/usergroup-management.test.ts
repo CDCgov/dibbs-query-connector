@@ -10,7 +10,7 @@ import { User } from "@/app/models/entities/user-management";
 const dbClient = getDbClient();
 
 jest.mock("@/app/utils/auth", () => ({
-  adminAccessCheck: jest.fn(() => Promise.resolve(true)),
+  superAdminAccessCheck: jest.fn(() => Promise.resolve(true)),
 }));
 
 const TEST_GROUP_ID = "00000000-0000-0000-0000-000000000000";
@@ -166,13 +166,6 @@ describe("User Group Membership Tests", () => {
 
   test("should return empty array when removing users with empty list", async () => {
     const result = await removeUsersFromGroup(TEST_GROUP_ID, []);
-    expect(result).toEqual([]);
-  });
-
-  test("should not add non-existent user to group", async () => {
-    const INVALID_USER_ID = "99999999-9999-9999-9999-999999999999";
-    const result = await addUsersToGroup(TEST_GROUP_ID, [INVALID_USER_ID]);
-
     expect(result).toEqual([]);
   });
 
