@@ -89,7 +89,7 @@ export default PatientSearchResultsTable;
 const LoadingTableHeader: React.FC = () => {
   return (
     <tr>
-      {Array.from(Array(8).keys()).map((_) => {
+      {Array.from(Array(7).keys()).map((_) => {
         return (
           <th>
             <Skeleton />
