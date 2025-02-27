@@ -33,7 +33,7 @@ const UserManagement: React.FC = () => {
     try {
       const userList: QCResponse<User> = await getUsers();
       setUsers(userList.items);
-    } catch (e) {
+    } catch {
       showToastConfirmation({
         body: "Unable to retrieve users. Please try again.",
         variant: "error",

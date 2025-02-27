@@ -17,5 +17,5 @@ Anything else the review team should know?
 - [ ] Descriptive Pull Request title
 - [ ] Link to relevant issues
 - [ ] Provide necessary context for design reviewers
+- [ ] Ensure test coverage is above agreed upon threshold
 - [ ] Update documentation
-

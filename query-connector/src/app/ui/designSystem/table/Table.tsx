@@ -10,6 +10,7 @@ type TableProps = {
   striped?: boolean;
   fullWidth?: boolean;
   fixed?: boolean;
+  loading?: boolean;
 };
 
 /**

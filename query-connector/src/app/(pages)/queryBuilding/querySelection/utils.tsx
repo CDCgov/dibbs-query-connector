@@ -87,20 +87,6 @@ export const handleCopy = (queryName: string, queryId: string) => {
 };
 
 /**
- * Handles the creation of a new query by redirecting to the query building page.
- * @param goForward - method to progress the page to the next step
- * @param setLoading - Function to set the loading state.
- */
-export const handleCreationConfirmation = async (
-  goForward: () => void,
-  setLoading: React.Dispatch<React.SetStateAction<boolean>>,
-) => {
-  setLoading(true);
-  // Redirect to query updating/editing page
-  goForward();
-};
-
-/**
  *  Renders a modal to confirm the deletion of a user query.
  * @param modalRef - Reference to the modal component.
  * @param selectedQuery - The currently selected query for deletion.

@@ -18,7 +18,7 @@
   margin: 0.1rem 0rem;
   padding: 0;
 
-  h4[id="demographics"]{
+  h4[id="demographics"] {
     margin: 1.25rem;
   }
 }
@@ -36,7 +36,8 @@
 }
 
 .accordionHeading {
-  font-family: "Source Sans Pro Web", "Helvetica Neue", "Helvetica", "Roboto", "Arial", "sans-serif" !important;
+  font-family: "Source Sans Pro Web", "Helvetica Neue", "Helvetica", "Roboto",
+    "Arial", "sans-serif" !important;
   font-size: 1.25rem !important;
   line-height: 1.1 !important;
 }
@@ -44,4 +45,5 @@
 .resultsBannerContent {
   display: flex;
   align-items: center;
+  justify-content: space-between;
 }

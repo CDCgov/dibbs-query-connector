@@ -17,12 +17,10 @@ import {
   SelectedQueryState,
   renderModal,
   handleDelete,
-  handleCreationConfirmation,
   confirmDelete,
   handleCopy,
   SelectedQueryDetails,
 } from "./utils";
-import LoadingView from "@/app/ui/designSystem/LoadingView";
 import { DataContext } from "@/app/shared/DataProvider";
 import classNames from "classnames";
 import { getConditionsData } from "@/app/shared/database-service";
@@ -53,7 +51,6 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
 }) => {
   const queriesContext = useContext(DataContext);
   const [queries, setQueries] = useState<CustomUserQuery[]>(initialQueries);
-  const [loading, setLoading] = useState(false);
   const [conditionIdToDetailsMap, setConditionIdToDetailsMap] =
     useState<ConditionsMap>();
 
@@ -85,7 +82,6 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
 
   return (
     <div>
-      {<LoadingView loading={loading} />}
       {queriesContext &&
         renderModal(
           modalRef,
@@ -100,12 +96,7 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
         <h1 className="flex-align-center">Query Library</h1>
         <div className="margin-left-auto">
           <Button
-            onClick={() =>
-              handleCreationConfirmation(
-                () => setBuildStep("condition"),
-                setLoading,
-              )
-            }
+            onClick={() => setBuildStep("condition")}
             className={styles.createQueryButton}
             type="button"
           >

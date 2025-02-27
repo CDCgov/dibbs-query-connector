@@ -6,6 +6,7 @@ import { AppProgressBar as ProgressBar } from "next-nprogress-bar";
 import { DataContext } from "@/app/shared/DataProvider";
 import SiteAlert from "../../designSystem/SiteAlert";
 import { ToastConfigOptions } from "../../designSystem/toast/Toast";
+import "react-loading-skeleton/dist/skeleton.css";
 
 export type PageProps = {
   children: React.ReactNode;

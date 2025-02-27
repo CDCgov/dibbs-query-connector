@@ -82,6 +82,7 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
       return;
     }
     setLoading(true);
+    setMode("patient-results");
 
     const originalRequest: QueryRequest = {
       first_name: firstName,
@@ -98,7 +99,6 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
     const queryResponse = await makeFhirQuery(originalRequest);
     setPatientDiscoveryQueryResponse(queryResponse);
 
-    setMode("patient-results");
     setLoading(false);
   }
   useEffect(() => {
