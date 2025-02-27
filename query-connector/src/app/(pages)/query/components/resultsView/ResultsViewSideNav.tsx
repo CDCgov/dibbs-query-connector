@@ -17,7 +17,7 @@ type ResultsViewSideNavProps = {
  * ResultsViewSideNav component
  * @param root0 - params
  * @param root0.items - a list of nav items to display in the sidenav
- * @param root0.loading
+ * @param root0.loading -  whether the component is in a loading state
  * @returns - The ResultsViewSideNav component
  */
 const ResultsViewSideNav: React.FC<ResultsViewSideNavProps> = ({

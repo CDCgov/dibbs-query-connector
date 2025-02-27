@@ -91,7 +91,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({
       <h2 className="page-explainer margin-bottom-3-important margin-top-0-important">
         <strong>Query: </strong>
         <span className="text-normal display-inline-block">
-          {loading ? <Skeleton width={250} /> : selectedQuery.query_name}
+          {selectedQuery.query_name}
         </span>
       </h2>
 
