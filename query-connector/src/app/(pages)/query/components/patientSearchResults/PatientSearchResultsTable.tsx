@@ -89,27 +89,13 @@ export default PatientSearchResultsTable;
 const LoadingTableHeader: React.FC = () => {
   return (
     <tr>
-      <th>
-        <Skeleton />
-      </th>
-      <th>
-        <Skeleton />
-      </th>
-      <th>
-        <Skeleton />
-      </th>
-      <th>
-        <Skeleton />
-      </th>
-      <th>
-        <Skeleton />
-      </th>
-      <th>
-        <Skeleton />
-      </th>
-      <th>
-        <Skeleton />
-      </th>
+      {Array.from(Array(8).keys()).map((_) => {
+        return (
+          <th>
+            <Skeleton />
+          </th>
+        );
+      })}
     </tr>
   );
 };
@@ -117,27 +103,13 @@ const LoadingTableHeader: React.FC = () => {
 const LoadingTableBody: React.FC = () => {
   return (
     <tr className={classNames("tableRowWithHover_clickable")}>
-      <td>
-        <Skeleton />
-      </td>
-      <td>
-        <Skeleton />
-      </td>
-      <td>
-        <Skeleton />
-      </td>
-      <td>
-        <Skeleton />
-      </td>
-      <td>
-        <Skeleton />
-      </td>
-      <td>
-        <Skeleton />
-      </td>
-      <td>
-        <Skeleton />
-      </td>
+      {Array.from(Array(7).keys()).map((_) => {
+        return (
+          <td>
+            <Skeleton />
+          </td>
+        );
+      })}
     </tr>
   );
 };
