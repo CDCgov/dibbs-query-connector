@@ -9,7 +9,7 @@ import classNames from "classnames";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { getSettingsMenuPages, PAGES } from "@/app/shared/page-routes";
-import { RoleTypeValues } from "@/app/models/entities/user-management";
+import { RoleTypeValues } from "@/app/models/entities/users";
 
 /**
  * Produces the header.
@@ -139,7 +139,7 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
               className={classNames("usa-nav__submenu", styles.menuDropdown)}
             >
               {getSettingsMenuPages(userRole as RoleTypeValues).map((page) => (
-                <li className={styles.subMenuItem}>
+                <li key={page.path} className={styles.subMenuItem}>
                   <Link
                     className={styles.menuItem}
                     href={page.path}

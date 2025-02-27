@@ -12,8 +12,8 @@ import StepIndicator, {
 } from "./components/stepIndicator/StepIndicator";
 import { DataContext } from "@/app/shared/DataProvider";
 import { Patient } from "fhir/r4";
-import { getFhirServerNames } from "@/app/shared/database-service";
 import { CustomUserQuery } from "../../shared/constants";
+import { getFhirServerNames } from "@/app/backend/fhir-servers";
 
 const blankUserQuery = {
   query_id: "",
@@ -38,10 +38,14 @@ const Query: React.FC = () => {
   const [fhirServers, setFhirServers] = useState<string[]>([]);
   const ctx = useContext(DataContext);
 
-  useEffect(() => {
-    getFhirServerNames().then((servers) => {
+  async function fetchFHIRServerNames() {
+    await getFhirServerNames().then((servers) => {
       setFhirServers(servers);
     });
+  }
+
+  useEffect(() => {
+    fetchFHIRServerNames();
   }, []);
 
   // update the current page details when switching between modes,

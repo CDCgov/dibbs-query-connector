@@ -1,7 +1,7 @@
 import { ToastContainer } from "react-toastify";
 import { render, waitFor, screen } from "@testing-library/react";
 import * as UserManagementBackend from "@/app/backend/user-management";
-import { RoleTypeValues } from "@/app/models/entities/user-management";
+import { RoleTypeValues } from "@/app/models/entities/users";
 import { RootProviderMock, renderWithUser } from "@/app/tests/unit/setup";
 import UserManagement from "./page";
 

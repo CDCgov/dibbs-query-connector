@@ -8,8 +8,9 @@ import { DibbsValueSet, isFhirResource } from "../shared/constants";
 
 import { CustomQuery } from "./CustomQuery";
 import { GetPhoneQueryFormats } from "./format-service";
-import { getFhirServerConfigs, getSavedQueryByName } from "./database-service";
+import { getSavedQueryByName } from "./database-service";
 import { QueryDataColumn } from "../(pages)/queryBuilding/utils";
+import { getFhirServerConfigs } from "../backend/fhir-servers";
 
 /**
  * The query response when the request source is from the Viewer UI.

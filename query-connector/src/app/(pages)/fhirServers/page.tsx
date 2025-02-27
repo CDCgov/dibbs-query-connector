@@ -3,10 +3,10 @@
 import { Icon, Label, TextInput } from "@trussworks/react-uswds";
 import {
   deleteFhirServer,
-  getFhirServerConfigs,
+  getFhirServersList,
   insertFhirServer,
   updateFhirServer,
-} from "../../shared/database-service";
+} from "./../../backend/fhir-servers";
 import dynamic from "next/dynamic";
 import { useEffect, useState, useRef } from "react";
 import { FhirServerConfig } from "../../shared/constants";
@@ -19,6 +19,7 @@ import Checkbox from "../../ui/designSystem/checkbox/Checkbox";
 // Dynamic import with proper typing for Modal
 import type { ModalProps } from "../../ui/designSystem/modal/Modal";
 import WithAuth from "@/app/ui/components/withAuth/WithAuth";
+import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 const Modal = dynamic<ModalProps>(
   () => import("../../ui/designSystem/modal/Modal").then((mod) => mod.Modal),
   { ssr: false },
@@ -32,7 +33,6 @@ type ModalMode = "create" | "edit";
  */
 const FhirServers: React.FC = () => {
   // State declarations
-  const [isClient, setIsClient] = useState(false);
   const [fhirServers, setFhirServers] = useState<FhirServerConfig[]>([]);
   const [serverName, setServerName] = useState("");
   const [serverUrl, setServerUrl] = useState("");
@@ -49,19 +49,23 @@ const FhirServers: React.FC = () => {
   const [modalMode, setModalMode] = useState<ModalMode>("create");
   const modalRef = useRef<ModalRef>(null);
 
-  // Handle client-side hydration
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-
   // Fetch FHIR servers
-  useEffect(() => {
-    if (isClient) {
-      getFhirServerConfigs(true).then((servers) => {
+  async function fetchFHIRServers() {
+    try {
+      await getFhirServersList(true).then((servers) => {
         setFhirServers(servers);
       });
+    } catch (_) {
+      showToastConfirmation({
+        body: "Unable to retrieve FHIR Server Configurations. Please try again.",
+        variant: "error",
+      });
     }
-  }, [isClient]);
+  }
+
+  useEffect(() => {
+    fetchFHIRServers();
+  }, []);
 
   const resetModalState = () => {
     setServerName("");
@@ -109,9 +113,6 @@ const FhirServers: React.FC = () => {
   const testFhirConnection = async (
     url: string,
   ): Promise<ConnectionTestResult> => {
-    if (!isClient)
-      return { success: false, error: "Client-side only operation" };
-
     try {
       const response = await fetch("/api/test-fhir-connection", {
         method: "POST",
@@ -141,8 +142,6 @@ const FhirServers: React.FC = () => {
   };
 
   const handleSave = async () => {
-    if (!isClient) return;
-
     const connectionResult = await testFhirConnection(serverUrl);
 
     if (modalMode === "create") {
@@ -155,7 +154,7 @@ const FhirServers: React.FC = () => {
       );
 
       if (result.success) {
-        getFhirServerConfigs(true).then((servers) => {
+        getFhirServersList(true).then((servers) => {
           setFhirServers(servers);
         });
         handleCloseModal();
@@ -174,7 +173,7 @@ const FhirServers: React.FC = () => {
       );
 
       if (result.success) {
-        getFhirServerConfigs(true).then((servers) => {
+        getFhirServersList(true).then((servers) => {
           setFhirServers(servers);
         });
         handleCloseModal();
@@ -186,12 +185,14 @@ const FhirServers: React.FC = () => {
   };
 
   const handleDeleteServer = async () => {
-    if (!isClient || !selectedServer) return;
+    if (!selectedServer) {
+      return;
+    }
 
     const result = await deleteFhirServer(selectedServer.id);
 
     if (result.success) {
-      getFhirServerConfigs(true).then((servers) => {
+      getFhirServersList(true).then((servers) => {
         setFhirServers(servers);
       });
       handleCloseModal();
@@ -259,11 +260,6 @@ const FhirServers: React.FC = () => {
 
     return buttons;
   };
-
-  // Show loading state or nothing during SSR
-  if (!isClient) {
-    return null;
-  }
 
   return (
     <WithAuth>

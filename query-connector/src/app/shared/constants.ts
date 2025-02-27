@@ -226,17 +226,6 @@ export const INTENTIONAL_EMPTY_STRING_FOR_CONCEPT_VERSION = "";
 // in the migration schema
 export const INTENTIONAL_EMPTY_STRING_FOR_GEM_CODE = "";
 
-// Define the type for the FHIR server configurations
-export type FhirServerConfig = {
-  id: string;
-  name: string;
-  hostname: string;
-  last_connection_attempt: Date;
-  last_connection_successful: boolean;
-  headers: Record<string, string>;
-  disable_cert_validation: boolean;
-};
-
 export const INVALID_QUERY = `Query identified in the id param not found in the set of saved queries. Please provide an ID that exists in the saved set of queries.`;
 export const INVALID_FHIR_SERVERS = `Invalid fhir_server. Please provide a valid fhir_server.`;
 export const RESPONSE_BODY_IS_NOT_PATIENT_RESOURCE =

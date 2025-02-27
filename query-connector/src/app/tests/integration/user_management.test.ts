@@ -10,7 +10,7 @@ import {
 } from "@/app/backend/user-management";
 import { getDbClient } from "@/app/backend/dbClient";
 import { auth } from "@/auth";
-import { RoleTypeValues } from "@/app/models/entities/user-management";
+import { RoleTypeValues } from "@/app/models/entities/users";
 
 const dbClient = getDbClient();
 jest.mock("@/auth", () => ({

@@ -9,11 +9,7 @@ import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import Table from "../../ui/designSystem/table/Table";
 import RoleDropdown from "./components/RoleDropdown";
 import { UserManagementContext } from "./components/UserManagementProvider";
-import {
-  RoleTypeValues,
-  User,
-  UserGroup,
-} from "../../models/entities/user-management";
+import { RoleTypeValues, User, UserGroup } from "../../models/entities/users";
 import { useSession } from "next-auth/react";
 
 /**

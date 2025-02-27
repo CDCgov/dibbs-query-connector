@@ -1,4 +1,4 @@
-import { RoleTypeValues } from "../models/entities/user-management";
+import { RoleTypeValues } from "../models/entities/users";
 
 /**
  * Pathnames
