@@ -16,7 +16,7 @@ type ResultsViewTable = {
  * @param root0 - The props for the AccordionContainer component.
  * @param root0.accordionItems - an array of items to render as an accordion
  * group of type ResultsViewAccordionItem
- * @param root0.loading
+ * @param root0.loading -  whether the component is in a loading state
  * @returns The ResultsViewTable component.
  */
 const ResultsViewTable: React.FC<ResultsViewTable> = ({

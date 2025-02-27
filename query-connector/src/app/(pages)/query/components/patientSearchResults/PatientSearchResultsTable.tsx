@@ -22,7 +22,7 @@ type PatientSearchResultsTableProps = {
  * @param param0.patients - Patient[] from the FHIR spec to display as rows
  * @param param0.handlePatientSelect - state setter function to redirect
  * to the results view
- * @param param0.loading
+ * @param param0.loading -  whether the component is in a loading state
  * @returns The patient search results view
  */
 const PatientSearchResultsTable: React.FC<PatientSearchResultsTableProps> = ({

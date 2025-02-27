@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { formatIdForAnchorTag } from "./ResultsViewTable";
 import SideNav, { NavItem } from "../../../../ui/components/sideNav/SideNav";
 import { SideNav as UswdsSideNav } from "@trussworks/react-uswds";
@@ -27,16 +27,16 @@ const ResultsViewSideNav: React.FC<ResultsViewSideNavProps> = ({
   const [activeItem, setActiveItem] = useState(
     window.location.hash || formatIdForAnchorTag(items[0]?.title),
   );
-  // const hashChangeHandler = useCallback(() => {
-  //   setActiveItem(window.location.hash);
-  // }, [window.location.hash]);
+  const hashChangeHandler = useCallback(() => {
+    setActiveItem(window.location.hash);
+  }, [window.location.hash]);
 
-  // useEffect(() => {
-  //   window.addEventListener("hashchange", hashChangeHandler);
-  //   return () => {
-  //     window.removeEventListener("hashchange", hashChangeHandler);
-  //   };
-  // }, []);
+  useEffect(() => {
+    window.addEventListener("hashchange", hashChangeHandler);
+    return () => {
+      window.removeEventListener("hashchange", hashChangeHandler);
+    };
+  }, []);
 
   const sideNavItems: NavItem[] = items.flatMap((item) => {
     const sectionId = formatIdForAnchorTag(item.title);
