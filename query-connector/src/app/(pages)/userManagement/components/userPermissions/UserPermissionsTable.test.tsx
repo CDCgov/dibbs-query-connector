@@ -2,7 +2,7 @@ import { waitFor, screen, render } from "@testing-library/react";
 import * as UserManagementBackend from "@/app/backend/user-management";
 import { UserRole } from "@/app/models/entities/user-management";
 import { renderWithUser, RootProviderMock } from "@/app/tests/unit/setup";
-import UsersTable from "../usersTable/usersTable";
+import UserPermissionsTable from "./userPermissionsTable";
 import {
   mockAdmin,
   mockSuperAdmin,
@@ -32,7 +32,10 @@ describe("User Management: User tab", () => {
 
     render(
       <RootProviderMock currentPage="/userManagement">
-        <UsersTable role={UserRole.SUPER_ADMIN} />
+        <UserPermissionsTable
+          users={[mockAdmin, mockSuperAdmin]}
+          fetchGroupMembers={jest.fn()}
+        />
       </RootProviderMock>,
     );
     await waitFor(() => {
@@ -65,7 +68,14 @@ describe("User Management: User tab", () => {
         ],
       });
 
-    const { user } = renderWithUser(<UsersTable role={UserRole.SUPER_ADMIN} />);
+    const { user } = renderWithUser(
+      <RootProviderMock currentPage="/userManagement">
+        <UserPermissionsTable
+          users={[mockAdmin, mockSuperAdmin]}
+          fetchGroupMembers={jest.fn()}
+        />
+      </RootProviderMock>,
+    );
 
     await waitFor(() => {
       expect(screen.queryByText("Loading")).not.toBeInTheDocument();

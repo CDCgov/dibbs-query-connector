@@ -10,7 +10,7 @@ import { getSessionRole } from "./utils";
  * Client side parent component for the User Management page
  * @returns the UserManagement component
  */
-const UserManagement: React.FC<React.PropsWithChildren> = () => {
+const UserManagement: React.FC = () => {
   const role = getSessionRole();
 
   const renderRoleDescriptions = () => {

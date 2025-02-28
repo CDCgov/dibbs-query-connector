@@ -142,6 +142,7 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
           <div ref={menuRef} className={styles.menuDropdownContainer}>
             <ul
               id="dropdown-menu"
+              data-testid="dropdown-menu"
               className={classNames("usa-nav__submenu", styles.menuDropdown)}
             >
               <>

@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import UserManagementDrawer from "../teamQueryEditSection/TeamQueryEditSection";
 
 import UserGroups from "../userGroups/UserGroupsTable";
-import TabGroup, { Tab } from "../../../../ui/designSystem/tabGroup/tabGroup";
+import TabGroup, { Tab } from "@/app/ui/designSystem/TabGroup/tabGroup";
+
 import UserPermissionsTable from "../userPermissions/userPermissionsTable";
 import { QCResponse } from "@/app/models/responses/collections";
 import {
