@@ -38,6 +38,7 @@ const RoleDropdown: React.FC<RoleDropdownProps> = ({
         className="usa-select"
         defaultValue={defaultValue}
         id={selectId}
+        data-testid={selectId}
         onChange={(e) => {
           OnChange(e?.target?.value as UserRole);
         }}

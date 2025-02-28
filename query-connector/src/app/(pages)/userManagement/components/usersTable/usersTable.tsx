@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import UserManagementDrawer from "../teamQueryEditSection/TeamQueryEditSection";
 
 import UserGroups from "../userGroups/UserGroupsTable";
-import TabGroup, { Tab } from "@/app/ui/designSystem/tabGroup/tabGroup";
+import TabGroup, { Tab } from "../../../../ui/designSystem/tabGroup/tabGroup";
 import UserPermissionsTable from "../userPermissions/userPermissionsTable";
 import { QCResponse } from "@/app/models/responses/collections";
 import {
@@ -15,8 +15,8 @@ import {
 import {
   getUsers,
   getUserGroups,
-  getGroupQueries,
   getGroupMembers,
+  getGroupQueries,
 } from "@/app/backend/user-management";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 
@@ -34,32 +34,6 @@ const UsersTable: React.FC<UsersTableProps> = ({ role }) => {
   const [activeTab, setActiveTab] = useState<Tab>();
   const [users, setUsers] = useState<User[]>([]);
   const [userGroups, setUserGroups] = useState<UserGroup[]>([]);
-
-  async function fetchUsers() {
-    try {
-      const userList: QCResponse<User> = await getUsers();
-      setUsers(userList.items);
-    } catch (e) {
-      showToastConfirmation({
-        body: "Unable to retrieve users. Please try again.",
-        variant: "error",
-      });
-      throw e;
-    }
-  }
-
-  async function fetchUserGroups() {
-    try {
-      const userGroups: QCResponse<UserGroup> = await getUserGroups();
-      return setUserGroups(userGroups.items);
-    } catch (e) {
-      showToastConfirmation({
-        body: "Unable to retrieve user groups. Please try again.",
-        variant: "error",
-      });
-      throw e;
-    }
-  }
 
   async function fetchGroupMembers(groupId: string) {
     const groupMembers = await getGroupMembers(groupId);
@@ -82,24 +56,30 @@ const UsersTable: React.FC<UsersTableProps> = ({ role }) => {
       label: "Users",
       access: [UserRole.SUPER_ADMIN],
       onClick: setTab,
-      renderContent: () => (
-        <UserPermissionsTable
-          fetchGroupMembers={fetchGroupMembers}
-          users={users}
-        />
-      ),
+      renderContent: () =>
+        users.length > 0 ? (
+          <UserPermissionsTable
+            fetchGroupMembers={fetchGroupMembers}
+            users={users}
+          />
+        ) : (
+          <div className="empty-response">No users found</div>
+        ),
     },
     {
       label: "User groups",
       access: [UserRole.SUPER_ADMIN, UserRole.ADMIN],
       onClick: setTab,
-      renderContent: () => (
-        <UserGroups
-          fetchGroupMembers={fetchGroupMembers}
-          fetchGroupQueries={fetchGroupQueries}
-          userGroups={userGroups}
-        />
-      ),
+      renderContent: () =>
+        userGroups.length > 0 ? (
+          <UserGroups
+            fetchGroupMembers={fetchGroupMembers}
+            fetchGroupQueries={fetchGroupQueries}
+            userGroups={userGroups}
+          />
+        ) : (
+          <div className="empty-response">No user groups found</div>
+        ),
     },
   ];
   const tabsForRole = sections.filter((tab) => tab.access?.includes(role));
@@ -107,6 +87,32 @@ const UsersTable: React.FC<UsersTableProps> = ({ role }) => {
   const shouldRenderTabs = tabsForRole.length > 1;
 
   useEffect(() => {
+    async function fetchUsers() {
+      try {
+        const userList: QCResponse<User> = await getUsers();
+        setUsers(userList.items);
+      } catch (e) {
+        showToastConfirmation({
+          body: "Unable to retrieve users. Please try again.",
+          variant: "error",
+        });
+        throw e;
+      }
+    }
+
+    async function fetchUserGroups() {
+      try {
+        const userGroups: QCResponse<UserGroup> = await getUserGroups();
+        return setUserGroups(userGroups.items);
+      } catch (e) {
+        showToastConfirmation({
+          body: "Unable to retrieve user groups. Please try again.",
+          variant: "error",
+        });
+        throw e;
+      }
+    }
+
     role == UserRole.SUPER_ADMIN && users.length <= 0 && fetchUsers();
     userGroups.length <= 0 && fetchUserGroups();
   }, []);

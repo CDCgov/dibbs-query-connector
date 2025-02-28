@@ -92,6 +92,14 @@ describe("User Management Integration Tests", () => {
     const result = await getUserRole(TEST_USER.username);
     expect(result).toBe(UserRole.SUPER_ADMIN);
   });
+
+  /**
+   * Tests retrieving all registered users.
+   */
+  test("should retrieve all users", async () => {
+    const result = await getUsers();
+    expect(result.totalItems).toBeGreaterThan(0);
+  });
 });
 
 describe("User Group Integration Tests", () => {

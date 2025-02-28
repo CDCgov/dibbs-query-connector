@@ -46,7 +46,7 @@ const UserGroupsTable: React.FC<UserGroupsTableProps> = ({
   }
 
   function renderGroupsTable() {
-    return userGroups.map((group: UserGroup) => (
+    return userGroups.map((group: UserGroup, idx: number) => (
       <tr key={group.id}>
         <td width={270}>{group.name}</td>
         <td>
@@ -55,6 +55,7 @@ const UserGroupsTable: React.FC<UserGroupsTableProps> = ({
           ) : (
             <Button
               type="button"
+              data-testid={`edit-member-list-${idx}`}
               className={classNames(styles.drawerButton, "text-no-underline")}
               unstyled
               aria-description={`Edit ${group.name} members`}
@@ -79,6 +80,7 @@ const UserGroupsTable: React.FC<UserGroupsTableProps> = ({
         <td>
           <Button
             type="button"
+            data-testid={`edit-query-list-${idx}`}
             className={classNames("text-no-underline")}
             unstyled
             aria-description={`Edit ${group.name} queries`}
