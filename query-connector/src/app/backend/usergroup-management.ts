@@ -1,4 +1,5 @@
 "use server";
+import format from "pg-format";
 import { User } from "../models/entities/user-management";
 import { superAdminAccessCheck } from "../utils/auth";
 import { getDbClient } from "./dbClient";
@@ -74,21 +75,21 @@ export async function addUsersToGroup(
 ): Promise<string[]> {
   if (userIds.length === 0) return [];
 
-  const values = userIds.flatMap((userId) => [
+  const values = userIds.map((userId) => [
     `${userId}_${groupId}`,
     userId,
     groupId,
   ]);
 
-  const insertQuery = {
-    text: `
-      INSERT INTO usergroup_to_users (id, user_id, usergroup_id)
-      VALUES ${userIds.map(() => "(?, ?, ?)").join(",")}
-      ON CONFLICT DO NOTHING
-      RETURNING user_id;
-    `,
+  const insertQuery = format(
+    `
+    INSERT INTO usergroup_to_users (id, user_id, usergroup_id)
+    VALUES %L
+    ON CONFLICT DO NOTHING
+    RETURNING user_id;
+  `,
     values,
-  };
+  );
 
   const result = await dbClient.query(insertQuery);
   return result.rows.map((row) => row.user_id);
