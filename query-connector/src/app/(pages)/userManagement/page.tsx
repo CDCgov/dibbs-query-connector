@@ -5,19 +5,13 @@ import WithAuth from "@/app/ui/components/withAuth/WithAuth";
 import UserManagementProvider from "./components/UserManagementProvider";
 import ManagementTabs from "./components/managementTabs/managementTabs";
 import { getSessionRole } from "./utils";
-import { isAuthDisabledClientCheck } from "@/app/utils/auth";
-import { useContext } from "react";
-import { DataContext } from "@/app/shared/DataProvider";
 
 /**
  * Client side parent component for the User Management page
  * @returns the UserManagement component
  */
 const UserManagement: React.FC = () => {
-  const ctx = useContext(DataContext);
-  const role = isAuthDisabledClientCheck(ctx?.runtimeConfig)
-    ? UserRole.SUPER_ADMIN
-    : getSessionRole();
+  const role = getSessionRole();
 
   const renderRoleDescriptions = () => {
     return (
