@@ -70,14 +70,29 @@ echo "GoldenSickPatient data loaded successfully."
 # Get current datetime in ISO 8601 format
 CURRENT_DATETIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 
-# Create auth headers JSON
-AUTH_HEADERS=$(
-  cat <<EOF
-{"Authorization": "Bearer ${TOKEN}"}
+# Create a temporary SQL file with the INSERT statement
+cat >/tmp/insert_fhir_server.sql <<EOF
+INSERT INTO fhir_servers (
+  name,
+  hostname,
+  headers,
+  last_connection_attempt,
+  last_connection_successful,
+  disable_cert_validation
+) VALUES (
+  'Aidbox',
+  '${BASE_URL}/aidboxone',
+  '{"Authorization": "Bearer ${TOKEN}"}'::jsonb,
+  '${CURRENT_DATETIME}'::timestamp,
+  true,
+  false
+);
 EOF
-)
 
-# Insert data into fhir_servers table using individual columns
+# Copy the SQL file to the bastion host
+scp -o StrictHostKeyChecking=no -i ${KEY_FILE} /tmp/insert_fhir_server.sql ec2-user@${BASTION_IP}:/tmp/insert_fhir_server.sql
+
+# Execute the SQL file via the bastion host
 echo "Inserting data into fhir_servers table..."
 ssh -o StrictHostKeyChecking=no -i ${KEY_FILE} \
   ec2-user@${BASTION_IP} \
@@ -86,20 +101,10 @@ ssh -o StrictHostKeyChecking=no -i ${KEY_FILE} \
    -p ${DB_PORT} \
    -U ${DB_USERNAME} \
    -d ${DB_NAME} \
-   -c \"INSERT INTO fhir_servers (
-        name,
-        hostname,
-        headers,
-        last_connection_attempt,
-        last_connection_successful,
-        disable_cert_validation
-      ) VALUES (
-        'Aidbox',
-        '${BASE_URL}/aidboxone',
-        '${AUTH_HEADERS}'::jsonb,
-        '${CURRENT_DATETIME}'::timestamp,
-        true,
-        false
-      );\""
+   -f /tmp/insert_fhir_server.sql && \
+   rm -f /tmp/insert_fhir_server.sql"
+
+# Clean up local temporary file
+rm -f /tmp/insert_fhir_server.sql
 
 echo "Finished configuring Aidbox and database."
