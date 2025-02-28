@@ -14,7 +14,6 @@ import {
 
 import {
   getConditionsData,
-  getCustomQueries,
   getValueSetsAndConceptsByConditionIDs,
 } from "@/app/shared/database-service";
 import {
@@ -33,6 +32,7 @@ import { groupConditionConceptsIntoValueSets } from "@/app/shared/utils";
 import { SelectedQueryDetails } from "../querySelection/utils";
 
 import {
+  getCustomQueries,
   getSavedQueryById,
   saveCustomQuery,
 } from "@/app/backend/query-building";

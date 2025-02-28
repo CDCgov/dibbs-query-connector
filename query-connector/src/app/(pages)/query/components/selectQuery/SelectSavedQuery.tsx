@@ -4,11 +4,11 @@ import styles from "./selectQuery.module.scss";
 import { useEffect, useState } from "react";
 import { RETURN_LABEL } from "@/app/(pages)/query/components/stepIndicator/StepIndicator";
 import TitleBox from "../stepIndicator/TitleBox";
-import { getCustomQueries } from "@/app/shared/database-service";
 import LoadingView from "../../../../ui/designSystem/LoadingView";
 import { showToastConfirmation } from "../../../../ui/designSystem/toast/Toast";
 import { getFhirServerNames } from "@/app/backend/fhir-servers";
 import { CustomUserQuery } from "@/app/models/entities/query";
+import { getCustomQueries } from "@/app/backend/query-building";
 
 type SelectSavedQueryProps = {
   selectedQuery: CustomUserQuery;
