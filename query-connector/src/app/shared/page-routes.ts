@@ -55,7 +55,7 @@ pagesConfig[PAGES.USER_MANAGEMENT] = {
  * @param userRole - the logged in user's role
  * @returns List of pages that will display in the settings menu based on the user's role
  */
-export function getSettingsMenuPages(userRole: RoleTypeValues): Page[] {
+export function getPagesInSettingsMenu(userRole: RoleTypeValues): Page[] {
   return Object.values(pagesConfig)
     .filter((page: Page) => page.roleAccess.includes(userRole))
     .sort((a, b) => (a.name > b.name ? 1 : -1));

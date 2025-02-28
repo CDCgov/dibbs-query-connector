@@ -8,7 +8,7 @@ import { metadata } from "@/app/shared/constants";
 import classNames from "classnames";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { getSettingsMenuPages, PAGES } from "@/app/shared/page-routes";
+import { getPagesInSettingsMenu, PAGES } from "@/app/shared/page-routes";
 import { RoleTypeValues } from "@/app/models/entities/users";
 
 /**
@@ -138,17 +138,19 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
               id="dropdown-menu"
               className={classNames("usa-nav__submenu", styles.menuDropdown)}
             >
-              {getSettingsMenuPages(userRole as RoleTypeValues).map((page) => (
-                <li key={page.path} className={styles.subMenuItem}>
-                  <Link
-                    className={styles.menuItem}
-                    href={page.path}
-                    scroll={false}
-                  >
-                    {page.name}
-                  </Link>
-                </li>
-              ))}
+              {getPagesInSettingsMenu(userRole as RoleTypeValues).map(
+                (page) => (
+                  <li key={page.path} className={styles.subMenuItem}>
+                    <Link
+                      className={styles.menuItem}
+                      href={page.path}
+                      scroll={false}
+                    >
+                      {page.name}
+                    </Link>
+                  </li>
+                ),
+              )}
               {!authDisabled && (
                 <li className={styles.subMenuItem}>
                   <button
