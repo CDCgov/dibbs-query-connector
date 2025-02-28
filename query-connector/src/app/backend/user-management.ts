@@ -128,7 +128,6 @@ export async function updateUserRole(
  * Retrieves all registered users in query connector
  * @returns List of users registered in qc
  */
-// TODO: update getUsers() with user group information
 export async function getUsers(): Promise<QCResponse<User>> {
   if (!(await superAdminAccessCheck())) {
     throw new Error("Unauthorized");
