@@ -325,6 +325,14 @@ export async function deleteUserGroup(id: string): Promise<UserGroup | string> {
   }
 
   try {
+    await dbClient.query(
+      "DELETE FROM usergroup_to_users WHERE usergroup_id = $1",
+      [id],
+    );
+    await dbClient.query(
+      "DELETE FROM usergroup_to_query WHERE usergroup_id = $1",
+      [id],
+    );
     const deleteGroupQuery = `
       DELETE FROM usergroup
       WHERE id = $1
