@@ -1,7 +1,7 @@
 import styles from "./resultsView.module.scss";
 
 type ResultsViewAccordionBodyProps = {
-  title: string;
+  title: string | React.ReactNode;
   id?: string;
   content: React.ReactNode;
 };
