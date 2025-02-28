@@ -440,19 +440,7 @@ resource "null_resource" "create_aidbox_db" {
   }
 
   provisioner "local-exec" {
-    command = <<-EOT
-      echo "Waiting for bastion host to become available..."
-      sleep 30
-      chmod 600 ${local_file.bastion_private_key.filename}
-      ssh -o StrictHostKeyChecking=no -i ${local_file.bastion_private_key.filename} \
-          ec2-user@${aws_instance.bastion.public_ip} \
-          "PGPASSWORD='${aws_db_instance.qc_db.password}' \
-          psql -h ${aws_db_instance.qc_db.address} \
-          -p ${aws_db_instance.qc_db.port} \
-          -U ${aws_db_instance.qc_db.username} \
-          -d ${aws_db_instance.qc_db.db_name} \
-          -c 'CREATE DATABASE aidbox;'"
-    EOT
+    command = "bash ${path.module}/create_aidbox_db.sh '${local_file.bastion_private_key.filename}' '${aws_instance.bastion.public_ip}' '${aws_db_instance.qc_db.password}' '${aws_db_instance.qc_db.address}' '${aws_db_instance.qc_db.port}' '${aws_db_instance.qc_db.username}' '${aws_db_instance.qc_db.db_name}' '${var.auth_url}' '${var.aidbox_client_secret}'"
   }
 
   depends_on = [
