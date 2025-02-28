@@ -62,7 +62,7 @@ echo "Loading GoldenSickPatient data into Aidbox..."
 curl -X POST \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer ${TOKEN}" \
-  -d @"query-connector/src/app/tests/assets/GoldenSickPatient.json" \
+  -d @"../../../query-connector/src/app/tests/assets/GoldenSickPatient.json" \
   ${BASE_URL}/aidboxone/fhir
 
 echo "GoldenSickPatient data loaded successfully."
@@ -70,26 +70,14 @@ echo "GoldenSickPatient data loaded successfully."
 # Get current datetime in ISO 8601 format
 CURRENT_DATETIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 
-# Create a local JSON file with the fhir_servers configuration
-cat >/tmp/fhir_server.json <<EOF
-[
-  {
-    "name": "Aidbox",
-    "hostname": "${BASE_URL}/aidboxone",
-    "headers": {
-      "Authorization": "Bearer ${TOKEN}"
-    },
-    "last_connection_attempt": "${CURRENT_DATETIME}",
-    "last_connection_successful": true,
-    "disable_cert_validation": false
-  }
-]
+# Create auth headers JSON
+AUTH_HEADERS=$(
+  cat <<EOF
+{"Authorization": "Bearer ${TOKEN}"}
 EOF
+)
 
-# Copy the JSON file to the bastion host
-scp -o StrictHostKeyChecking=no -i ${KEY_FILE} /tmp/fhir_server.json ec2-user@${BASTION_IP}:/tmp/fhir_server.json
-
-# Insert data into fhir_servers table using psql via bastion host
+# Insert data into fhir_servers table using individual columns
 echo "Inserting data into fhir_servers table..."
 ssh -o StrictHostKeyChecking=no -i ${KEY_FILE} \
   ec2-user@${BASTION_IP} \
@@ -98,10 +86,20 @@ ssh -o StrictHostKeyChecking=no -i ${KEY_FILE} \
    -p ${DB_PORT} \
    -U ${DB_USERNAME} \
    -d ${DB_NAME} \
-   -c \"INSERT INTO fhir_servers (config) VALUES ('\$(cat /tmp/fhir_server.json)'::jsonb);\" && \
-   rm -f /tmp/fhir_server.json"
-
-# Clean up local file
-rm -f /tmp/fhir_server.json
+   -c \"INSERT INTO fhir_servers (
+        name,
+        hostname,
+        headers,
+        last_connection_attempt,
+        last_connection_successful,
+        disable_cert_validation
+      ) VALUES (
+        'Aidbox',
+        '${BASE_URL}/aidboxone',
+        '${AUTH_HEADERS}'::jsonb,
+        '${CURRENT_DATETIME}'::timestamp,
+        true,
+        false
+      );\""
 
 echo "Finished configuring Aidbox and database."
