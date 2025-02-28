@@ -74,20 +74,15 @@ export async function addUsersToGroup(
 ): Promise<string[]> {
   if (userIds.length === 0) return [];
 
-  const values = userIds.flatMap((userId) => [
-    `${userId}_${groupId}`,
-    userId,
-    groupId,
-  ]);
-
+  const ids = userIds.map((userId) => `${userId}_${groupId}`);
   const insertQuery = {
     text: `
       INSERT INTO usergroup_to_users (id, user_id, usergroup_id)
-      VALUES ${userIds.map(() => "(?, ?, ?)").join(",")}
+      SELECT * FROM unnest($1::text[], $2::uuid[], $3::uuid[])
       ON CONFLICT DO NOTHING
       RETURNING user_id;
     `,
-    values,
+    values: [ids, userIds, new Array(userIds.length).fill(groupId)],
   };
 
   const result = await dbClient.query(insertQuery);
