@@ -1,5 +1,5 @@
 import React from "react";
-import { Tab } from "@/app/ui/designSystem/tabGroup/tabGroup";
+import { Tab } from "../../ui/designSystem/tabGroup/tabGroup";
 import { UserRole, User } from "@/app/models/entities/user-management";
 import UserPermissionsTable from "./components/userPermissions/userPermissionsTable";
 import UserGroupsTable from "./components/userGroups/UserGroupsTable";
