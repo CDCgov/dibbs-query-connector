@@ -1,13 +1,11 @@
-import {
+import {  
   createUserGroup,
   getUserGroups,
   updateUserGroup,
   deleteUserGroup,
   addUserIfNotExists,
   updateUserRole,
-  getUsers,
-  getUserRole,
-} from "@/app/backend/user-management";
+  getUsers,getUserRole } from "@/app/backend/user-management";
 import { getDbClient } from "@/app/backend/dbClient";
 import { auth } from "@/auth";
 import { UserRole } from "@/app/models/entities/user-management";
@@ -72,23 +70,9 @@ describe("User Management Integration Tests", () => {
    * Tests updating the role of an existing user.
    */
   test("should update a user's role", async () => {
-    const result = await updateUserRole(
-      createdUserId,
-      UserRole.SUPER_ADMIN,
-    );
+    const result = await updateUserRole(createdUserId, UserRole.SUPER_ADMIN);
     expect(result.items).not.toBeNull();
-    expect(result.items![0]).toHaveProperty(
-      "qc_role",
-      UserRole.SUPER_ADMIN,
-    );
-  });
-
-  /**
-   * Tests retrieving a user's role by username.
-   */
-  test("should retrieve user role by username", async () => {
-    const result = await getUserRole(TEST_USER.username);
-    expect(result).toBe(UserRole.SUPER_ADMIN);
+    expect(result.items![0]).toHaveProperty("qc_role", UserRole.SUPER_ADMIN);
   });
 
   /**
@@ -97,6 +81,14 @@ describe("User Management Integration Tests", () => {
   test("should retrieve all users", async () => {
     const result = await getUsers();
     expect(result.totalItems).toBeGreaterThan(0);
+  });
+
+  /**
+   * Tests retrieving a user's role by username.
+   */
+  test("should retrieve user role by username", async () => {
+    const result = await getUserRole(TEST_USER.username);
+    expect(result).toBe(UserRole.SUPER_ADMIN);
   });
 });
 
@@ -120,8 +112,8 @@ describe("User Group Integration Tests", () => {
 
     expect(result).toHaveProperty("id");
     expect(result).toHaveProperty("name", groupName);
-    expect(result).toHaveProperty("member_size", 0);
-    expect(result).toHaveProperty("query_size", 0);
+    expect(result).toHaveProperty("memberSize", 0);
+    expect(result).toHaveProperty("querySize", 0);
 
     if (typeof result === "string") {
       throw new Error(`Failed to create test group: ${result}`);

@@ -49,7 +49,7 @@ export async function superAdminAccessCheck(): Promise<boolean> {
   const user = await getLoggedInUser();
   const role = await getUserRole(user?.username as string);
 
-  return role === UserRole.SUPER_ADMIN || isAuthDisabledServerCheck()
+  return role === UserRole.SUPER_ADMIN || isAuthDisabledServerCheck();
 }
 
 /**
