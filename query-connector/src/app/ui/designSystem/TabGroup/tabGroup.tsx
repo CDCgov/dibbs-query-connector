@@ -4,13 +4,13 @@ import Link from "next/link";
 import classNames from "classnames";
 import styles from "./tabGroup.module.scss";
 
-export interface Tab {
+export type Tab = {
   access?: string[];
   label: string;
   path?: string;
   onClick?: (e: React.MouseEvent<HTMLElement>) => void;
   renderContent?: () => JSX.Element;
-}
+};
 
 export interface TabGroupProps {
   tabs: Tab[];
