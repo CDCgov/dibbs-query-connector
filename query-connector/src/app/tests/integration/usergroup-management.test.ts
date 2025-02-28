@@ -69,7 +69,10 @@ describe("User Group Membership Tests", () => {
     expect(result[0]).toHaveProperty("userGroupMemberships");
 
     const membership = result[0].userGroupMemberships?.find(
-      (m) => m.usergroup_id === TEST_GROUP_ID,
+      (m: { usergroup_id: string; group_name: string }) =>
+        m.usergroup_id === TEST_GROUP_ID,
+      (m: { usergroup_id: string; group_name: string }) =>
+        m.group_name === "Test Group",
     );
     expect(membership).toBeDefined();
     expect(membership?.is_member).toBeDefined();

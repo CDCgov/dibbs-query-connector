@@ -26,6 +26,7 @@ export interface UserGroup {
 
 export interface UserGroupMembership {
   id: string;
+  group_name: string;
   usergroup_id: string;
   is_member: boolean;
 }

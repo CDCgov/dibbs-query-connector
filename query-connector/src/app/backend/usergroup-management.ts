@@ -27,7 +27,7 @@ export async function getUsersWithGroupStatus(
 
   const query = {
     text: `
-      SELECT u.id, u.username, u.first_name, u.last_name, u.qc_role,
+      SELECT u.id, u.username, u.first_name, u.last_name, u.qc_role, g.name AS group_name,
              COALESCE(ug.id, '') AS membership_id,
              CASE 
                WHEN ug.user_id IS NOT NULL THEN TRUE
@@ -36,6 +36,8 @@ export async function getUsersWithGroupStatus(
       FROM users u
       LEFT JOIN usergroup_to_users ug 
         ON u.id = ug.user_id AND ug.usergroup_id = $1
+      LEFT JOIN usergroup g 
+        ON ug.usergroup_id = g.id
       ORDER BY u.last_name, u.first_name;
     `,
     values: [groupId],
@@ -53,6 +55,7 @@ export async function getUsersWithGroupStatus(
       {
         id: row.membership_id,
         usergroup_id: groupId,
+        group_name: row.group_name,
         is_member: row.is_member,
       },
     ],
