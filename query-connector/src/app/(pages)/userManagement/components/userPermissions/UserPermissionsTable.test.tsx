@@ -65,7 +65,11 @@ describe("User Management: User tab", () => {
         ],
       });
 
-    const { user } = renderWithUser(<UsersTable role={UserRole.SUPER_ADMIN} />);
+    const { user } = renderWithUser(
+      <RootProviderMock currentPage="/userManagement">
+        <UsersTable role={UserRole.SUPER_ADMIN} />
+      </RootProviderMock>,
+    );
 
     await waitFor(() => {
       expect(screen.queryByText("Loading")).not.toBeInTheDocument();

@@ -2,6 +2,7 @@ import { waitFor, screen, render } from "@testing-library/react";
 import * as UserManagementBackend from "@/app/backend/user-management";
 import { UserRole } from "@/app/models/entities/user-management";
 import { renderWithUser, RootProviderMock } from "@/app/tests/unit/setup";
+import UsersTable from "./usersTable";
 import UserManagement from "../../page";
 import React, { act } from "react";
 import {
@@ -11,8 +12,6 @@ import {
   mockGroupsTab,
   mockPermissionsTab,
 } from "../../test-utils";
-
-import UsersTable from "./usersTable";
 
 jest.mock("next-auth/react");
 
@@ -30,7 +29,11 @@ jest.mock(
 describe("Super Admin view of Users Table", () => {
   const role = UserRole.SUPER_ADMIN;
   it("renders error message when no users are found", async () => {
-    render(<UsersTable role={role} />);
+    render(
+      <RootProviderMock currentPage="/userManagement">
+        <UsersTable role={role} />
+      </RootProviderMock>,
+    );
 
     await waitFor(() => {
       expect(screen.queryByText("Loading")).not.toBeInTheDocument();
@@ -77,7 +80,11 @@ describe("Super Admin view of Users Table", () => {
       items: [mockGroupBasic],
       totalItems: 2,
     });
-    const { user } = renderWithUser(<UsersTable role={role} />);
+    const { user } = renderWithUser(
+      <RootProviderMock currentPage="/userManagement">
+        <UsersTable role={role} />
+      </RootProviderMock>,
+    );
     await waitFor(() => {
       expect(screen.queryByText("Loading")).not.toBeInTheDocument();
     });
