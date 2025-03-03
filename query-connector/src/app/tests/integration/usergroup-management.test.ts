@@ -239,12 +239,9 @@ describe("User Group and Query Membership Tests", () => {
    * Tests saving query group memberships.
    */
   test("should correctly update query group memberships", async () => {
-    const selectedQueries = [TEST_QUERY_ID];
-
-    const updatedQueries = await saveQueryGroupMembership(
-      TEST_GROUP_ID,
-      selectedQueries,
-    );
+    const updatedQueries = await saveQueryGroupMembership(TEST_GROUP_ID, [
+      TEST_QUERY_ID,
+    ]);
 
     expect(
       updatedQueries.some(
