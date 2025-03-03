@@ -117,6 +117,12 @@ describe("User Group and Query Membership Tests", () => {
     expect(members.some((user) => user.id === TEST_USER_2_ID)).toBe(true);
   });
 
+  test("should not add duplicate users to a group", async () => {
+    await addUsersToGroup(TEST_GROUP_ID, [TEST_USER_1_ID]);
+    const result = await addUsersToGroup(TEST_GROUP_ID, [TEST_USER_1_ID]);
+    expect(result).toEqual([]);
+  });
+
   /**
    * Tests removing users from a user group.
    */
@@ -148,6 +154,11 @@ describe("User Group and Query Membership Tests", () => {
           user.userGroupMemberships?.some((m) => m.is_member),
       ),
     ).toBe(false);
+  });
+
+  test("should not remove a user that is not in the group", async () => {
+    const result = await removeUsersFromGroup(TEST_GROUP_ID, [TEST_USER_1_ID]);
+    expect(result).toEqual([]);
   });
 
   /**
@@ -198,6 +209,12 @@ describe("User Group and Query Membership Tests", () => {
     expect(members.some((query) => query.name === "Test Query")).toBe(true);
   });
 
+  test("should not add duplicate queries to a group", async () => {
+    await addQueriesToGroup(TEST_GROUP_ID, [TEST_QUERY_ID]);
+    const result = await addQueriesToGroup(TEST_GROUP_ID, [TEST_QUERY_ID]);
+    expect(result).toEqual([]);
+  });
+
   /**
    * Tests removing queries from a user group.
    */
@@ -211,6 +228,11 @@ describe("User Group and Query Membership Tests", () => {
     );
 
     expect(members.length).toBe(0);
+  });
+
+  test("should not remove a query that is not in the group", async () => {
+    const result = await removeQueriesFromGroup(TEST_GROUP_ID, [TEST_QUERY_ID]);
+    expect(result).toEqual([]);
   });
 
   /**
