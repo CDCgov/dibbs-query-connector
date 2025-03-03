@@ -1,13 +1,12 @@
 @use "../../../ui/styles/_variables" as *;
 
-$drawerWidth: 30%;
+$drawerWidth: 29rem;
 
 .drawer {
   position: fixed;
   top: 0;
-  right: -35rem;
-  width: $drawerWidth;
-  max-width: 35rem;
+  width: calc(max($drawerWidth, 30%));
+  max-width: 50%;
   height: 100%;
   padding: 0rem;
   display: flex;
@@ -19,7 +18,6 @@ $drawerWidth: 30%;
   z-index: 1050;
   border-left: 1px solid $border;
   background: $page-background;
-  overflow: scroll;
   max-height: 100%;
 
   input[type="search"] {
@@ -43,7 +41,6 @@ $drawerWidth: 30%;
 
 .drawerContent {
   padding: 2rem;
-  overflow-y: auto;
   width: 100%;
 }
 
