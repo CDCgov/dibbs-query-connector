@@ -1,6 +1,6 @@
 "use server";
 import { User, Query } from "../models/entities/user-management";
-import { superAdminAccessCheck } from "../utils/auth";
+import { adminAccessCheck, superAdminAccessCheck } from "../utils/auth";
 import { getDbClient } from "./dbClient";
 const dbClient = getDbClient();
 
@@ -170,7 +170,7 @@ export async function saveUserGroupMembership(
 export async function getQueriesWithGroupStatus(
   groupId: string,
 ): Promise<Query[]> {
-  if (!(await superAdminAccessCheck())) {
+  if (!(await adminAccessCheck())) {
     throw new Error("Unauthorized");
   }
 
@@ -279,7 +279,7 @@ export async function saveQueryGroupMembership(
   groupId: string,
   selectedQueries: string[],
 ): Promise<Query[]> {
-  if (!(await superAdminAccessCheck())) {
+  if (!(await adminAccessCheck())) {
     throw new Error("Unauthorized");
   }
 

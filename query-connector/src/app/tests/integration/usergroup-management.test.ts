@@ -15,6 +15,7 @@ const dbClient = getDbClient();
 
 jest.mock("@/app/utils/auth", () => ({
   superAdminAccessCheck: jest.fn(() => Promise.resolve(true)),
+  adminAccessCheck: jest.fn(() => Promise.resolve(true)),
 }));
 
 const TEST_GROUP_ID = "00000000-0000-0000-0000-000000000000";
