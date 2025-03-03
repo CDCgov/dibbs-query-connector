@@ -30,3 +30,9 @@ export interface UserGroupMembership {
   usergroup_id: string;
   is_member: boolean;
 }
+
+export interface Query {
+  id: string;
+  name: string;
+  userGroupMemberships?: UserGroupMembership[];
+}
