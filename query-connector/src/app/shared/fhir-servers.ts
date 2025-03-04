@@ -1,7 +1,7 @@
 import fetch, { RequestInit, HeaderInit, Response } from "node-fetch";
 import { FhirServerConfig } from "../shared/constants";
 import https from "https";
-
+import { auditable } from "./decorators";
 /**
  * A client for querying a FHIR server
  * @param server The FHIR server to query
@@ -55,6 +55,7 @@ class FHIRClient {
     return await Promise.all(fetchPromises);
   }
 
+  @auditable(true)
   async post(path: string, params: Record<string, string>): Promise<Response> {
     try {
       const searchParams = new URLSearchParams();
