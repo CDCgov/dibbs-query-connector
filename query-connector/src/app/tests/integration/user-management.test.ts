@@ -13,14 +13,11 @@ import { auth } from "@/auth";
 import { RoleTypeValues } from "@/app/models/entities/users";
 
 const dbClient = getDbClient();
-jest.mock("@/auth", () => ({
-  auth: jest.fn(),
-}));
 
 jest.mock("@/app/utils/auth", () => {
   return {
-    superAdminAccessCheck: jest.fn(() => Promise.resolve(true)),
-    adminAccessCheck: jest.fn(() => Promise.resolve(true)),
+    superAdminAccessCheck: jest.fn().mockResolvedValue(true),
+    adminAccessCheck: jest.fn().mockResolvedValue(true),
   };
 });
 

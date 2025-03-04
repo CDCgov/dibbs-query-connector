@@ -9,7 +9,7 @@ import {
   saveQueryGroupMembership,
 } from "@/app/backend/usergroup-management";
 import { getDbClient } from "@/app/backend/dbClient";
-import { User, Query } from "@/app/models/entities/user-management";
+import { User, Query } from "@/app/models/entities/users";
 
 const dbClient = getDbClient();
 
