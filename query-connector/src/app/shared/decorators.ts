@@ -1,5 +1,10 @@
 import { getDbClient } from "../backend/dbClient";
 
+/**
+ * Decorator that adds audit log write logic to an annotated function
+ * @param async - whether the method is async. Defaults to false
+ * @returns The result of the function, with the args / result logged appropriately
+ */
 export function auditable(async = false) {
   return function (
     target: Object,
