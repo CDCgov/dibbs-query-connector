@@ -137,7 +137,7 @@ export async function saveUserGroupMembership(
         (user) =>
           user.userGroupMemberships
             ?.filter((m) => m.is_member)
-            .map((m) => user.id) || [],
+            .map((_) => user.id) || [],
       ),
     );
 
@@ -146,7 +146,7 @@ export async function saveUserGroupMembership(
       (user) =>
         user.userGroupMemberships
           ?.filter((m) => m.is_member && !selectedUsers.includes(user.id))
-          .map((m) => user.id) || [],
+          .map((_) => user.id) || [],
     );
 
     if (usersToRemove.length)
@@ -292,7 +292,7 @@ export async function saveQueryGroupMembership(
         (query) =>
           query.userGroupMemberships
             ?.filter((m) => m.is_member)
-            .map((m) => query.id) || [],
+            .map((_) => query.id) || [],
       ),
     );
 
@@ -303,7 +303,7 @@ export async function saveQueryGroupMembership(
       (query) =>
         query.userGroupMemberships
           ?.filter((m) => m.is_member && !selectedQueries.includes(query.id))
-          .map((m) => query.id) || [],
+          .map((_) => query.id) || [],
     );
 
     if (queriesToRemove.length)
