@@ -1,9 +1,5 @@
 "use server";
-import {
-  RoleTypeValues,
-  User,
-  UserGroup,
-} from "../models/entities/user-management";
+import { RoleTypeValues, User, UserGroup } from "../models/entities/users";
 import { QCResponse } from "../models/responses/collections";
 import { adminAccessCheck, superAdminAccessCheck } from "../utils/auth";
 import { getDbClient } from "./dbClient";

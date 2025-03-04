@@ -7,6 +7,7 @@ import { EMPTY_QUERY_SELECTION } from "./utils";
 import BuildFromTemplates from "./buildFromTemplates/BuildFromTemplates";
 import { useContext, useEffect } from "react";
 import { DataContext } from "@/app/shared/DataProvider";
+import WithAuth from "@/app/ui/components/withAuth/WithAuth";
 
 /**
  * Component for Query Building Flow
@@ -33,7 +34,7 @@ const QueryBuilding: React.FC = () => {
   }, []);
 
   return (
-    <>
+    <WithAuth>
       {buildStep === "selection" && (
         <QuerySelection
           selectedQuery={selectedQuery}
@@ -49,7 +50,7 @@ const QueryBuilding: React.FC = () => {
           setBuildStep={setBuildStep}
         ></BuildFromTemplates>
       )}
-    </>
+    </WithAuth>
   );
 };
 

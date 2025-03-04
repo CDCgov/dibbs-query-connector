@@ -6,7 +6,7 @@ import { Button } from "@trussworks/react-uswds";
 import Table from "../../../ui/designSystem/table/Table";
 
 import { UserManagementContext } from "../components/UserManagementProvider";
-import { UserGroup } from "@/app/models/entities/user-management";
+import { UserGroup } from "@/app/models/entities/users";
 
 /**
  * User groups section in the user management page
