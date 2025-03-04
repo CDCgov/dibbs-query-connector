@@ -47,7 +47,7 @@ export type DemoDataFields = {
   FhirServer: string;
 };
 
-export const DEFAULT_DEMO_FHIR_SERVER = "Public HAPI: Direct";
+export const DEFAULT_DEMO_FHIR_SERVER = "Aidbox";
 /*
  * Common "Hyper Unlucky" patient data used for all non-newborn screening use cases
  */

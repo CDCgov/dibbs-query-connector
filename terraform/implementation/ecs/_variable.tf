@@ -163,3 +163,44 @@ variable "auth_url" {
   sensitive   = true
 }
 
+variable "aidbox_client_secret" {
+  type        = string
+  description = "Client Secret for Aidbox"
+  sensitive   = true
+}
+
+variable "aidbox_admin_password" {
+  type        = string
+  description = "Admin password for Aidbox"
+  sensitive   = true
+}
+
+variable "bastion_public_key" {
+  type        = string
+  description = "Public key for the bastion host"
+  sensitive   = true
+}
+
+variable "bastion_private_key" {
+  type        = string
+  description = "Private key for the bastion host"
+  sensitive   = true
+}
+
+variable "bastion_allowed_ips" {
+  type        = list(string)
+  description = "List of CIDR blocks to allow access to the bastion host"
+  default     = []
+}
+
+variable "aidbox_base_url" {
+  type        = string
+  description = "Base URL for Aidbox"
+  default     = ""
+}
+
+variable "aidbox_license" {
+  type        = string
+  description = "License for Aidbox"
+  sensitive   = true
+}
