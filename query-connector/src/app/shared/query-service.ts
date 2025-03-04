@@ -1,5 +1,4 @@
 "use server";
-import fetch from "node-fetch";
 import https from "https";
 import { Bundle, FhirResource } from "fhir/r4";
 
@@ -85,7 +84,7 @@ async function patientQuery(
     console.error(
       `Patient search failed. Status: ${fhirResponse.status} \n Body: ${
         fhirResponse.text
-      } \n Headers: ${JSON.stringify(fhirResponse.headers.raw())}`,
+      } \n Headers: ${JSON.stringify(Object.fromEntries(fhirResponse.headers.entries()))}`,
     );
   }
   const newResponse = await parseFhirSearch(fhirResponse, runningQueryResponse);
@@ -206,7 +205,7 @@ async function postFhirQuery(
   includeImmunization?: boolean,
 ): Promise<QueryResponse> {
   const builtQuery = new CustomQuery(queryData, patientId, includeImmunization);
-  let response: fetch.Response | fetch.Response[];
+  let response: Response | Response[];
 
   // handle the immunization query using "get" separately since posting against
   // the dev IZ gateway endpoint results in auth errors
@@ -234,7 +233,7 @@ async function postFhirQuery(
         console.error("POST to FHIR query promise rejected: ", r.reason);
       }
     })
-    .filter((v): v is fetch.Response => !!v);
+    .filter((v): v is Response => !!v);
 
   const successfulResults = fulfilledResults
     .map((response) => {
@@ -249,7 +248,7 @@ async function postFhirQuery(
         return response;
       }
     })
-    .filter((v): v is fetch.Response => !!v);
+    .filter((v): v is Response => !!v);
 
   response = successfulResults;
   queryResponse = await parseFhirSearch(response, queryResponse);
@@ -264,7 +263,7 @@ async function postFhirQuery(
  * @returns - The parsed response.
  */
 export async function parseFhirSearch(
-  response: fetch.Response | Array<fetch.Response>,
+  response: Response | Array<Response>,
   queryResponse: Record<string, FhirResource[]> = {},
 ): Promise<QueryResponse> {
   let resourceArray: FhirResource[] = [];
@@ -303,7 +302,7 @@ export async function parseFhirSearch(
  * @returns - The array of resources from the response.
  */
 export async function processFhirResponse(
-  response: fetch.Response,
+  response: Response,
 ): Promise<FhirResource[]> {
   let resourceArray: FhirResource[] = [];
   let resourceIds: string[] = [];
