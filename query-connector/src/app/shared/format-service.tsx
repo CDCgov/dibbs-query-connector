@@ -302,9 +302,7 @@ export function formatSex(sex: string | undefined): string {
       return "Male";
     case "female":
       return "Female";
-    case undefined:
-      return "";
     default:
-      return sex;
+      return "";
   }
 }
