@@ -26,7 +26,7 @@ The containers should take a few minutes to spin up, but if all goes well, congr
 We recommend running the Query Connector app from a container, but if that is not feasible for a given use-case, it may also be run directly from Node using the steps below.
 
 1. Ensure that both [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) and [Node 18.x or higher](https://nodejs.org/en/download/package-manager/current) are installed.
-2. Clone the Query Connector repository with `git clone https://github.com/CDCgov/dibbs-query-connector`.
+2. Clone the Query Connector repository with `git clone git@github.com:CDCgov/dibbs-query-connector.git`.
 3. Navigate to the source folder with `cd /query-connector/`.
 4. Install all of the Node dependencies for the Query Connector app with `npm install`.
 5. Run the Query Connector app on `localhost:3000` with `npm run dev`. If you are on a Windows Machine, you may need to run `npm run dev-win` instead.
@@ -38,7 +38,7 @@ The containers should take a few minutes to spin up, but if all goes well, congr
 To build the Docker image for the Query Connector app from source instead of downloading it from the PHDI repository follow these steps.
 
 1. Ensure that both [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) and [Docker](https://docs.docker.com/get-docker/) are installed.
-2. Clone the Query Connector repository with `git clone https://github.com/CDCgov/dibbs-query-connector.git`.
+2. Clone the Query Connector repository with `git clone git@github.com:CDCgov/dibbs-query-connector.git`.
 3. Navigate to `/query-connector`.
 4. Run `docker build -t query-connector .`.
 
