@@ -43,7 +43,7 @@ export function auditable(async = false) {
             throw error;
           }
         }
-      : function (this: unknown, ...args: any) {
+      : function (this: unknown, ...args: unknown[]) {
           try {
             const resultToLog = method.apply(this, args);
             logAndReturnResult(resultToLog);
