@@ -110,7 +110,7 @@ exports[`Admin view of Users Table fetches usergroups on page load 1`] = `
             class="padding-top-2"
           >
             <div>
-              Error: could not retrieve queries for user group. Please try again later.
+              No queries assigned to this group.
             </div>
           </div>
         </div>
@@ -182,7 +182,7 @@ exports[`Admin view of Users Table renders error message when no user groups are
             class="padding-top-2"
           >
             <div>
-              Error: could not retrieve queries for user group. Please try again later.
+              No queries assigned to this group.
             </div>
           </div>
         </div>
@@ -388,7 +388,7 @@ exports[`Super Admin view of Users Table renders content on tab click 1`] = `
             class="padding-top-2"
           >
             <div>
-              Error: could not retrieve queries for user group. Please try again later.
+              No queries assigned to this group.
             </div>
           </div>
         </div>
@@ -524,7 +524,7 @@ exports[`Super Admin view of Users Table renders content on tab click 2`] = `
             class="padding-top-2"
           >
             <div>
-              Error: could not retrieve queries for user group. Please try again later.
+              No queries assigned to this group.
             </div>
           </div>
         </div>
@@ -614,7 +614,7 @@ exports[`Super Admin view of Users Table renders error message when no users are
             class="padding-top-2"
           >
             <div>
-              Error: could not retrieve queries for user group. Please try again later.
+              No queries assigned to this group.
             </div>
           </div>
         </div>
@@ -820,7 +820,7 @@ exports[`Super Admin view of Users Table renders table view after content is loa
             class="padding-top-2"
           >
             <div>
-              Error: could not retrieve queries for user group. Please try again later.
+              No queries assigned to this group.
             </div>
           </div>
         </div>
@@ -1026,7 +1026,7 @@ exports[`Super Admin view of Users Table renders table view after content is loa
             class="padding-top-2"
           >
             <div>
-              Error: could not retrieve queries for user group. Please try again later.
+              No queries assigned to this group.
             </div>
           </div>
         </div>
