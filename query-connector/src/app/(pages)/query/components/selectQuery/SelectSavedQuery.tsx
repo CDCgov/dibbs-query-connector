@@ -53,9 +53,8 @@ const SelectSavedQuery: React.FC<SelectSavedQueryProps> = ({
   const [loading, setLoading] = useState<boolean>(false);
 
   async function fetchFHIRServers() {
-    await getFhirServerNames().then((servers) => {
-      setFhirServers(servers);
-    });
+    const servers = await getFhirServerNames();
+    setFhirServers(servers);
   }
 
   useEffect(() => {

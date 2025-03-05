@@ -38,9 +38,8 @@ const Query: React.FC = () => {
   const ctx = useContext(DataContext);
 
   async function fetchFHIRServerNames() {
-    await getFhirServerNames().then((servers) => {
-      setFhirServers(servers);
-    });
+    const servers = await getFhirServerNames();
+    setFhirServers(servers);
   }
 
   useEffect(() => {

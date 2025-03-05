@@ -52,9 +52,8 @@ const FhirServers: React.FC = () => {
   // Fetch FHIR servers
   async function fetchFHIRServers() {
     try {
-      await getFhirServersList(true).then((servers) => {
-        setFhirServers(servers);
-      });
+      const servers = await getFhirServersList(true);
+      setFhirServers(servers);
     } catch (_) {
       showToastConfirmation({
         body: "Unable to retrieve FHIR Server Configurations. Please try again.",
