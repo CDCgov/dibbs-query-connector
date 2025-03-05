@@ -11,8 +11,8 @@ import StepIndicator, {
 } from "./components/stepIndicator/StepIndicator";
 import { DataContext } from "@/app/shared/DataProvider";
 import { Patient } from "fhir/r4";
-import { getFhirServerNames } from "@/app/shared/database-service";
 import { CustomUserQuery } from "../../shared/constants";
+import { getFhirServerNames } from "@/app/backend/fhir-server-config-service";
 
 const blankUserQuery = {
   query_id: "",
@@ -20,6 +20,7 @@ const blankUserQuery = {
   conditions_list: [],
   valuesets: [],
 };
+
 /**
  * Client side parent component for the query page. Based on the mode, it will display the search
  * form, the results of the query, or the multiple patients view.

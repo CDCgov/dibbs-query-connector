@@ -7,8 +7,9 @@ import { DibbsValueSet, isFhirResource } from "../shared/constants";
 
 import { CustomQuery } from "./CustomQuery";
 import { GetPhoneQueryFormats } from "./format-service";
-import { getFhirServerConfigs, getSavedQueryByName } from "./database-service";
+import { getSavedQueryByName } from "./database-service";
 import { QueryDataColumn } from "../(pages)/queryBuilding/utils";
+import { getFhirServerConfigs } from "../backend/fhir-server-config-service";
 
 /**
  * The query response when the request source is from the Viewer UI.
@@ -84,7 +85,9 @@ async function patientQuery(
     console.error(
       `Patient search failed. Status: ${fhirResponse.status} \n Body: ${
         fhirResponse.text
-      } \n Headers: ${JSON.stringify(Object.fromEntries(fhirResponse.headers.entries()))}`,
+      } \n Headers: ${JSON.stringify(
+        Object.fromEntries(fhirResponse.headers.entries()),
+      )}`,
     );
   }
   const newResponse = await parseFhirSearch(fhirResponse, runningQueryResponse);

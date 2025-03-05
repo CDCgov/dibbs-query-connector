@@ -58,3 +58,28 @@ export function auditable(async = false) {
     return descriptor;
   };
 }
+
+export function transaction(
+  target: Object,
+  key: string,
+  descriptor: PropertyDescriptor,
+) {
+  const method = descriptor.value;
+  const dbClient = getDbClient();
+
+  descriptor.value = async function (this: unknown, ...args: unknown[]) {
+    try {
+      await dbClient.query("BEGIN");
+      const result = await method.apply(this, args);
+      if (result.success === false) {
+        throw Error("Transaction failed");
+      }
+      await dbClient.query("COMMIT");
+
+      return result;
+    } catch (error) {
+      await dbClient.query("ROLLBACK");
+      console.error(`Database transaction ${key} failed`);
+    }
+  };
+}
