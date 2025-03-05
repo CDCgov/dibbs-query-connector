@@ -64,7 +64,6 @@ export function auditable(async = false) {
  * @param target - class prototype the annotation is hoisted into
  * @param key - the name of the method
  * @param descriptor - metadata for the object
- * @returns the value of the method, with rollback / error defaults
  */
 export function transaction(
   target: Object,
@@ -84,7 +83,7 @@ export function transaction(
       await dbClient.query("COMMIT");
 
       return result;
-    } catch (error) {
+    } catch {
       await dbClient.query("ROLLBACK");
       console.error(`Database transaction ${key} failed`);
     }
