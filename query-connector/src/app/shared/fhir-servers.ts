@@ -1,82 +1,81 @@
-import fetch, { RequestInit, HeaderInit, Response } from "node-fetch";
 import { FhirServerConfig } from "../shared/constants";
 import https from "https";
 import { auditable } from "./decorators";
 /**
- * A client for querying a FHIR server
- * @param server The FHIR server to query
- * @returns The client
+ * A client for querying a FHIR server.
+ * @param server The FHIR server to query.
+ * @returns The client instance.
  */
 class FHIRClient {
   private hostname: string;
-  private init;
+  private init: RequestInit;
 
   constructor(server: string, configurations: FhirServerConfig[]) {
-    // Get the configuration for the server if it exists
-    let config: FhirServerConfig | undefined = configurations.find(
-      (config) => config.name === server,
-    );
+    // Find the configuration for the given server
+    const config = configurations.find((c) => c.name === server);
 
     if (!config) {
       throw new Error(`No configuration found for server: ${server}`);
     }
-    // Set server hostname
+
     this.hostname = config.hostname;
-    // Set request init, including headers
-    let init: RequestInit = {
+
+    // Set request initialization parameters
+    this.init = {
       method: "GET",
-      headers: config.headers as HeaderInit,
+      headers: config.headers ?? {},
     };
-    // Trust any configured server that has disabled SSL
+
+    // Trust any configured server that has disabled SSL validation
     if (config.disable_cert_validation) {
-      init.agent = new https.Agent({
-        rejectUnauthorized: false,
-      });
+      (this.init as RequestInit & { agent?: https.Agent }).agent =
+        new https.Agent({
+          rejectUnauthorized: false,
+        });
     }
-    this.init = init;
   }
 
+  /**
+   * Sends a GET request to the specified path.
+   * @param path - The request path.
+   * @returns The response from the server.
+   */
   async get(path: string): Promise<Response> {
-    try {
-      return fetch(this.hostname + path, this.init);
-    } catch (error) {
-      console.error(error);
-      throw error;
-    }
+    const response = await fetch(this.hostname + path, this.init);
+    return response;
   }
 
-  async getBatch(paths: Array<string>): Promise<Array<Response>> {
-    const fetchPromises = paths.map((path) =>
-      fetch(this.hostname + path, this.init).then((response) => {
-        return response;
-      }),
+  /**
+   * Sends multiple GET requests concurrently.
+   * @param paths - Array of request paths.
+   * @returns Array of responses from the server.
+   */
+  async getBatch(paths: string[]): Promise<Response[]> {
+    return Promise.all(
+      paths.map((path) => fetch(this.hostname + path, this.init)),
     );
-
-    return await Promise.all(fetchPromises);
   }
 
+  /**
+   * Sends a POST request to the specified path with the given parameters.
+   * @param path - The request path.
+   * @param params - The request parameters.
+   * @returns The response from the server.
+   */
   @auditable(true)
   async post(path: string, params: Record<string, string>): Promise<Response> {
-    try {
-      const searchParams = new URLSearchParams();
-      Object.entries(params).map(([k, v]) => {
-        searchParams.append(k, v);
-      });
+    const searchParams = new URLSearchParams(params);
 
-      const bodyToPost = {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-          ...this.init.headers,
-        },
-        body: searchParams.toString(),
-      };
+    const requestOptions: RequestInit = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        ...this.init.headers,
+      },
+      body: searchParams.toString(),
+    };
 
-      return fetch(this.hostname + path, bodyToPost);
-    } catch (error) {
-      console.error(error);
-      throw error;
-    }
+    return fetch(this.hostname + path, requestOptions);
   }
 }
 
