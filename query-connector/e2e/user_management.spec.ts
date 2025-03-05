@@ -26,7 +26,7 @@ test.describe("User management", () => {
     ).toBeVisible();
     // Users tab is selected by default
     await expect(page.getByRole("link", { name: "Users" })).toHaveClass(
-      /border-bottom-05 border-primary/,
+      /tabGroup_tab__active/,
     );
     await expect(page.getByText("No users found")).toBeVisible();
   });
