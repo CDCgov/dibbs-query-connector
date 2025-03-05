@@ -164,7 +164,9 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
                     FHIR Servers
                   </Link>
                 </li>
-                {(role == UserRole.ADMIN || role == UserRole.SUPER_ADMIN) && (
+                {(authDisabled ||
+                  role == UserRole.ADMIN ||
+                  role == UserRole.SUPER_ADMIN) && (
                   <li className={styles.subMenuItem}>
                     <Link
                       className={styles.menuItem}
@@ -187,7 +189,6 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
                   </button>
                 </li>
               </>
-              {/* )} */}
             </ul>
           </div>
         )}

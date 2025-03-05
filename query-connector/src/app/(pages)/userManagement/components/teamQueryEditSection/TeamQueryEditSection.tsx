@@ -57,7 +57,7 @@ const UserManagementDrawer: React.FC<UserManagementDrawerProps> = ({
   }, [teamQueryEditSection]);
 
   const renderQueries = (queries: QueryTableResult[] | undefined) => {
-    if (queries) {
+    if (queries && queries.length > 0) {
       return (
         <ul
           aria-description={`queries for ${teamQueryEditSection.title}`}
@@ -120,9 +120,7 @@ const UserManagementDrawer: React.FC<UserManagementDrawerProps> = ({
   };
 
   const renderError = (content: string) => {
-    return (
-      <div>{`Error: could not retrieve ${content} for user group. Please try again later.`}</div>
-    );
+    return <div>{`No ${content} assigned to this group.`}</div>;
   };
 
   function generateContent(): JSX.Element {
