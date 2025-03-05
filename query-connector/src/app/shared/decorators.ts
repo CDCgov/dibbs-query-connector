@@ -59,6 +59,12 @@ export function auditable(async = false) {
   };
 }
 
+/**
+ *
+ * @param target
+ * @param key
+ * @param descriptor
+ */
 export function transaction(
   target: Object,
   key: string,
