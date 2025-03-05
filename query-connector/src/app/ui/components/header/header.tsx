@@ -160,7 +160,7 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
                     )}
                     onClick={async () => await handleSignOut()}
                   >
-                    Log out
+                    Sign out
                   </button>
                 </li>
               )}

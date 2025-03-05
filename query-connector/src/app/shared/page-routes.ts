@@ -13,6 +13,7 @@ export enum PAGES {
 }
 
 interface Page {
+  position: number;
   path: string;
   name: string;
   roleAccess: RoleTypeValues[];
@@ -24,8 +25,9 @@ interface Page {
 export const pagesConfig: Record<string, Page> = {};
 
 pagesConfig[PAGES.QUERY] = {
+  position: 0,
   path: PAGES.QUERY,
-  name: "Query",
+  name: "Run query",
   roleAccess: [
     RoleTypeValues.SuperAdmin,
     RoleTypeValues.Admin,
@@ -34,21 +36,24 @@ pagesConfig[PAGES.QUERY] = {
 };
 
 pagesConfig[PAGES.MY_QUERIES] = {
+  position: 1,
   path: PAGES.MY_QUERIES,
-  name: "My Queries",
+  name: "Query library",
+  roleAccess: [RoleTypeValues.SuperAdmin, RoleTypeValues.Admin],
+};
+
+pagesConfig[PAGES.USER_MANAGEMENT] = {
+  position: 2,
+  path: PAGES.USER_MANAGEMENT,
+  name: "User management",
   roleAccess: [RoleTypeValues.SuperAdmin, RoleTypeValues.Admin],
 };
 
 pagesConfig[PAGES.FHIR_SERVERS] = {
+  position: 3,
   path: PAGES.FHIR_SERVERS,
-  name: "FHIR Servers",
+  name: "FHIR servers",
   roleAccess: [RoleTypeValues.SuperAdmin],
-};
-
-pagesConfig[PAGES.USER_MANAGEMENT] = {
-  path: PAGES.USER_MANAGEMENT,
-  name: "User Management",
-  roleAccess: [RoleTypeValues.SuperAdmin, RoleTypeValues.Admin],
 };
 
 /**
@@ -58,5 +63,5 @@ pagesConfig[PAGES.USER_MANAGEMENT] = {
 export function getPagesInSettingsMenu(userRole: RoleTypeValues): Page[] {
   return Object.values(pagesConfig)
     .filter((page: Page) => page.roleAccess.includes(userRole))
-    .sort((a, b) => (a.name > b.name ? 1 : -1));
+    .sort((a, b) => (a.position > b.position ? 1 : -1));
 }
