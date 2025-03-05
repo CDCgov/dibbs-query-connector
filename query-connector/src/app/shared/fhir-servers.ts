@@ -1,6 +1,6 @@
 import { FhirServerConfig } from "../shared/constants";
 import https from "https";
-
+import { auditable } from "./decorators";
 /**
  * A client for querying a FHIR server.
  * @param server The FHIR server to query.
@@ -62,6 +62,7 @@ class FHIRClient {
    * @param params - The request parameters.
    * @returns The response from the server.
    */
+  @auditable(true)
   async post(path: string, params: Record<string, string>): Promise<Response> {
     const searchParams = new URLSearchParams(params);
 
