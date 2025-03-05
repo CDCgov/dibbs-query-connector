@@ -60,10 +60,11 @@ export function auditable(async = false) {
 }
 
 /**
- *
- * @param target
- * @param key
- * @param descriptor
+ * Annotation to make a db interaction transactable
+ * @param target - class prototype the annotation is hoisted into
+ * @param key - the name of the method
+ * @param descriptor - metadata for the object
+ * @returns the value of the method, with rollback / error defaults
  */
 export function transaction(
   target: Object,
