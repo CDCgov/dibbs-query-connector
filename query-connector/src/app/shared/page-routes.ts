@@ -1,4 +1,4 @@
-import { RoleTypeValues } from "../models/entities/user-management";
+import { RoleTypeValues } from "../models/entities/users";
 
 /**
  * Pathnames
@@ -12,35 +12,56 @@ export enum PAGES {
   GROUP_MANAGEMENT = "/userManagement/userGroups",
 }
 
+interface Page {
+  position: number;
+  path: string;
+  name: string;
+  roleAccess: RoleTypeValues[];
+}
 /**
- * Role access per page
+ * Pages configuration
  */
-export const pagesRoleAccess: Record<string, RoleTypeValues[]> = {};
 
-pagesRoleAccess[PAGES.QUERY] = [
-  RoleTypeValues.SuperAdmin,
-  RoleTypeValues.Admin,
-  RoleTypeValues.Standard,
-];
+export const pagesConfig: Record<string, Page> = {};
 
-pagesRoleAccess[PAGES.MY_QUERIES] = [
-  RoleTypeValues.SuperAdmin,
-  RoleTypeValues.Admin,
-];
+pagesConfig[PAGES.QUERY] = {
+  position: 0,
+  path: PAGES.QUERY,
+  name: "Run query",
+  roleAccess: [
+    RoleTypeValues.SuperAdmin,
+    RoleTypeValues.Admin,
+    RoleTypeValues.Standard,
+  ],
+};
 
-pagesRoleAccess[PAGES.FHIR_SERVERS] = [
-  RoleTypeValues.SuperAdmin,
-  RoleTypeValues.Admin,
-];
+pagesConfig[PAGES.MY_QUERIES] = {
+  position: 1,
+  path: PAGES.MY_QUERIES,
+  name: "Query library",
+  roleAccess: [RoleTypeValues.SuperAdmin, RoleTypeValues.Admin],
+};
 
-pagesRoleAccess[PAGES.USER_MANAGEMENT] = [RoleTypeValues.SuperAdmin];
+pagesConfig[PAGES.USER_MANAGEMENT] = {
+  position: 2,
+  path: PAGES.USER_MANAGEMENT,
+  name: "User management",
+  roleAccess: [RoleTypeValues.SuperAdmin, RoleTypeValues.Admin],
+};
 
-pagesRoleAccess[PAGES.GROUP_MANAGEMENT] = [
-  RoleTypeValues.SuperAdmin,
-  RoleTypeValues.Admin,
-];
+pagesConfig[PAGES.FHIR_SERVERS] = {
+  position: 3,
+  path: PAGES.FHIR_SERVERS,
+  name: "FHIR servers",
+  roleAccess: [RoleTypeValues.SuperAdmin],
+};
 
 /**
- * List of pages behind authentication (display in the menu)
+ * @param userRole - the logged in user's role
+ * @returns List of pages that will display in the settings menu based on the user's role
  */
-export const LOGGED_IN_PATHS = Object.keys(pagesRoleAccess);
+export function getPagesInSettingsMenu(userRole: RoleTypeValues): Page[] {
+  return Object.values(pagesConfig)
+    .filter((page: Page) => page.roleAccess.includes(userRole))
+    .sort((a, b) => (a.position > b.position ? 1 : -1));
+}

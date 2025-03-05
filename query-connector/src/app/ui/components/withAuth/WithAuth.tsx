@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useContext } from "react";
-import { RoleTypeValues } from "@/app/models/entities/user-management";
+import { RoleTypeValues } from "@/app/models/entities/users";
 import { useSession } from "next-auth/react";
 import { redirect, usePathname } from "next/navigation";
-import { pagesRoleAccess } from "@/app/shared/page-routes";
+import { pagesConfig } from "@/app/shared/page-routes";
 import { DataContext } from "@/app/shared/DataProvider";
 import { isAuthDisabledClientCheck } from "@/app/utils/auth";
 
@@ -20,7 +20,7 @@ const WithAuth: React.FC<React.PropsWithChildren> = ({ children }) => {
   const ctx = useContext(DataContext);
   const isAuthDisabled = isAuthDisabledClientCheck(ctx?.runtimeConfig);
   const path = usePathname();
-  const access = pagesRoleAccess[path] ?? [];
+  const access = pagesConfig[path]?.roleAccess ?? [];
 
   if (
     isAuthDisabled ||

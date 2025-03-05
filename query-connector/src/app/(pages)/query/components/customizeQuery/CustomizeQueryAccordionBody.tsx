@@ -1,8 +1,8 @@
 import styles from "./customizeQuery.module.scss";
 import Table from "../../../../ui/designSystem/table/Table";
-import { DibbsValueSet } from "@/app/shared/constants";
 import classNames from "classnames";
 import Checkbox from "../../../../ui/designSystem/checkbox/Checkbox";
+import { DibbsValueSet } from "@/app/models/entities/valuesets";
 
 type CustomizeQueryAccordionBodyProps = {
   valueSet: DibbsValueSet;

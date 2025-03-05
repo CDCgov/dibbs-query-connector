@@ -1,9 +1,9 @@
 import styles from "../buildFromTemplates/conditionTemplateSelection.module.scss";
 import { Icon } from "@trussworks/react-uswds";
-import { DibbsConceptType } from "@/app/shared/constants";
 import { ChangeEvent } from "react";
 import Checkbox from "@/app/ui/designSystem/checkbox/Checkbox";
 import { FilterableValueSet } from "./utils";
+import { DibbsConceptType } from "@/app/models/entities/valuesets";
 
 type ConceptTypeAccordionBodyProps = {
   activeType: DibbsConceptType;

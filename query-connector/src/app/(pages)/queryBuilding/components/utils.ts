@@ -1,10 +1,10 @@
+import { ConceptTypeToDibbsVsMap } from "@/app/utils/valueSetTranslation";
+import { EMPTY_CONCEPT_TYPE } from "../utils";
+import { Concept } from "@/app/models/entities/concepts";
 import {
   DibbsValueSet,
   DibbsConceptType,
-  Concept,
-} from "@/app/shared/constants";
-import { ConceptTypeToDibbsVsMap } from "@/app/utils/valueSetTranslation";
-import { EMPTY_CONCEPT_TYPE } from "../utils";
+} from "@/app/models/entities/valuesets";
 
 export const CONDITION_DRAWER_SEARCH_PLACEHOLDER =
   "Search condition or category";

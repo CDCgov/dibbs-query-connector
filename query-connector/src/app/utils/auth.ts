@@ -1,7 +1,7 @@
 import { auth } from "@/auth";
 import { User } from "next-auth";
 import { getUserRole } from "../backend/user-management";
-import { RoleTypeValues } from "../models/entities/user-management";
+import { RoleTypeValues } from "../models/entities/users";
 
 /**
  * Checks if the property DEMO_MODE is true (Configured this way in demo env only)

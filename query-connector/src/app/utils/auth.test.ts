@@ -1,7 +1,7 @@
 import { auth } from "@/auth";
 import { User } from "next-auth";
 import { getUserRole } from "@/app/backend/user-management";
-import { RoleTypeValues } from "@/app/models/entities/user-management";
+import { RoleTypeValues } from "@/app/models/entities/users";
 import {
   isDemoMode,
   isAuthDisabledClientCheck,
