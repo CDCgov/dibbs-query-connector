@@ -1,0 +1,86 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`User Groups table renders the correct label syntax based on member/query size 1`] = `
+<body>
+  <div>
+    <div
+      class="customizeTableWrapper"
+    >
+      <table
+        class="usa-table usa-table--borderless customizeTable"
+        data-testid="table"
+      >
+        <thead>
+          <tr>
+            <th>
+              Name
+            </th>
+            <th>
+              Members
+            </th>
+            <th>
+              Assigned queries
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td
+              width="270"
+            >
+              Order of the Phoenix
+            </td>
+            <td>
+              <button
+                aria-description="Edit Order of the Phoenix members"
+                class="usa-button usa-button--unstyled drawerButton text-no-underline"
+                data-testid="edit-member-list-0"
+                type="button"
+              >
+                3 members
+              </button>
+            </td>
+            <td>
+              <button
+                aria-description="Edit Order of the Phoenix queries"
+                class="usa-button usa-button--unstyled text-no-underline"
+                data-testid="edit-query-list-0"
+                type="button"
+              >
+                3 queries
+              </button>
+            </td>
+          </tr>
+          <tr>
+            <td
+              width="270"
+            >
+              S.P.E.W.
+            </td>
+            <td>
+              <button
+                aria-description="Edit S.P.E.W. members"
+                class="usa-button usa-button--unstyled drawerButton text-no-underline"
+                data-testid="edit-member-list-1"
+                type="button"
+              >
+                1 member
+              </button>
+            </td>
+            <td>
+              <button
+                aria-description="Edit S.P.E.W. queries"
+                class="usa-button usa-button--unstyled text-no-underline"
+                data-testid="edit-query-list-1"
+                type="button"
+              >
+                1 query
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</body>
+`;

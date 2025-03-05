@@ -11,7 +11,7 @@ export interface DataContextValue {
   setCurrentPage: (currentPage: PageType | string | undefined) => void;
   toastConfig: ToastConfigOptions | null;
   setToastConfig: (config: ToastConfigOptions) => void;
-  runtimeConfig: Record<string, string>;
+  runtimeConfig?: Record<string, string>;
 }
 // Context lets the parent component make some information available to any component in the tree below it,
 // no matter how deep, without passing it explicitly through props.
