@@ -1,0 +1,69 @@
+import React from "react";
+import { waitFor, screen, render } from "@testing-library/react";
+import UserGroupsTable from "./UserGroupsTable";
+import { mockGroupMany, mockGroupSingle, allGroups } from "../../test-utils";
+import { RootProviderMock } from "@/app/tests/unit/setup";
+
+jest.mock("next-auth/react");
+
+jest.mock(
+  "@/app/ui/components/withAuth/WithAuth",
+  () =>
+    ({ children }: React.PropsWithChildren) => <div>{children}</div>,
+);
+
+jest.mock("@/app/backend/user-management", () => ({
+  getGroupMembers: jest.fn().mockResolvedValue({ items: [], totalItems: 0 }),
+  getGroupQueries: jest.fn().mockResolvedValue({ items: [], totalItems: 0 }),
+  getUsers: jest.fn().mockResolvedValue({ items: [], totalItems: 0 }),
+  getUserGroups: jest.fn().mockResolvedValue({ items: [], totalItems: 0 }),
+}));
+
+describe("User Groups table", () => {
+  it("renders the correct label syntax based on member/query size", async () => {
+    render(
+      <RootProviderMock currentPage="/userManagement">
+        <UserGroupsTable
+          userGroups={allGroups}
+          fetchGroupMembers={jest.fn()}
+          fetchGroupQueries={jest.fn()}
+        />
+      </RootProviderMock>,
+    );
+
+    await waitFor(() => {
+      expect(screen.queryByText("Loading")).not.toBeInTheDocument();
+    });
+
+    expect(document.body).toMatchSnapshot();
+
+    const singleMemberBtn = screen.getByTestId(
+      `edit-member-list-${allGroups.indexOf(mockGroupSingle)}`,
+    );
+    const multiMemberBtn = screen.getByTestId(
+      `edit-member-list-${allGroups.indexOf(mockGroupMany)}`,
+    );
+    const singleQueryBtn = screen.getByTestId(
+      `edit-query-list-${allGroups.indexOf(mockGroupSingle)}`,
+    );
+    const multiQueryBtn = screen.getByTestId(
+      `edit-query-list-${allGroups.indexOf(mockGroupMany)}`,
+    );
+
+    expect(singleMemberBtn).toHaveTextContent(
+      mockGroupSingle.member_size + " member",
+    );
+
+    expect(multiMemberBtn).toHaveTextContent(
+      mockGroupMany.member_size + " members",
+    );
+
+    expect(singleQueryBtn).toHaveTextContent(
+      mockGroupSingle.query_size + " query",
+    );
+
+    expect(multiQueryBtn).toHaveTextContent(
+      mockGroupMany.query_size + " queries",
+    );
+  });
+});

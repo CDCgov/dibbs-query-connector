@@ -5,7 +5,6 @@ import Footer from "./ui/components/footer/footer";
 import { SessionProvider } from "next-auth/react";
 import DataProvider from "./shared/DataProvider";
 import { Metadata } from "next";
-import { ToastContainer } from "react-toastify";
 import Page from "./ui/components/page/page";
 import { auth } from "@/auth";
 import { isAuthDisabledServerCheck } from "./utils/auth";
@@ -33,12 +32,6 @@ export default async function RootLayout({
     <html lang="en">
       <SessionProvider>
         <body>
-          <ToastContainer
-            position="bottom-left"
-            icon={false}
-            stacked
-            hideProgressBar
-          />
           <div className="application-container">
             <Header authDisabled={isAuthDisabledServerCheck()} />
             <DataProvider runtimeConfig={runtimeConfig}>

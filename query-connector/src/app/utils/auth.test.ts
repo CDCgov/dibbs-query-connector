@@ -1,7 +1,7 @@
 import { auth } from "@/auth";
 import { User } from "next-auth";
 import { getUserRole } from "@/app/backend/user-management";
-import { RoleTypeValues } from "@/app/models/entities/user-management";
+import { UserRole } from "@/app/models/entities/user-management";
 import {
   isDemoMode,
   isAuthDisabledClientCheck,
@@ -98,14 +98,14 @@ describe("Authentication Utilities", () => {
 
     test("should return true if user is a super admin", async () => {
       (auth as jest.Mock).mockResolvedValue({ user: TEST_USER });
-      (getUserRole as jest.Mock).mockResolvedValue(RoleTypeValues.SuperAdmin);
+      (getUserRole as jest.Mock).mockResolvedValue(UserRole.SUPER_ADMIN);
 
       expect(await superAdminAccessCheck()).toBe(true);
     });
 
     test("should return false if user is not a super admin", async () => {
       (auth as jest.Mock).mockResolvedValue({ user: TEST_USER });
-      (getUserRole as jest.Mock).mockResolvedValue(RoleTypeValues.Standard);
+      (getUserRole as jest.Mock).mockResolvedValue(UserRole.STANDARD);
 
       expect(await superAdminAccessCheck()).toBe(false);
     });
@@ -127,21 +127,21 @@ describe("Authentication Utilities", () => {
 
     test("should return true if user is an admin", async () => {
       (auth as jest.Mock).mockResolvedValue({ user: TEST_USER });
-      (getUserRole as jest.Mock).mockResolvedValue(RoleTypeValues.Admin);
+      (getUserRole as jest.Mock).mockResolvedValue(UserRole.ADMIN);
 
       expect(await adminAccessCheck()).toBe(true);
     });
 
     test("should return true if user is a super admin", async () => {
       (auth as jest.Mock).mockResolvedValue({ user: TEST_USER });
-      (getUserRole as jest.Mock).mockResolvedValue(RoleTypeValues.SuperAdmin);
+      (getUserRole as jest.Mock).mockResolvedValue(UserRole.SUPER_ADMIN);
 
       expect(await adminAccessCheck()).toBe(true);
     });
 
     test("should return false if user is not an admin or super admin", async () => {
       (auth as jest.Mock).mockResolvedValue({ user: TEST_USER });
-      (getUserRole as jest.Mock).mockResolvedValue(RoleTypeValues.Standard);
+      (getUserRole as jest.Mock).mockResolvedValue(UserRole.STANDARD);
 
       expect(await adminAccessCheck()).toBe(false);
     });
