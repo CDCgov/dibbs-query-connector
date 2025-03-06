@@ -18,7 +18,7 @@ import {
   insertFhirServer,
   updateFhirServer,
   deleteFhirServer,
-} from "@/app/backend/fhir-server-config-service";
+} from "@/app/backend/dbServices/fhir-servers";
 const Modal = dynamic<ModalProps>(
   () => import("../../ui/designSystem/modal/Modal").then((mod) => mod.Modal),
   { ssr: false },

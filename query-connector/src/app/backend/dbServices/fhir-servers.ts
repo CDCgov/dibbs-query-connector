@@ -1,8 +1,8 @@
 "use server";
 import { Pool } from "pg";
-import { FhirServerConfig } from "../shared/constants";
-import { getDbClient } from "./dbClient";
-import { transaction } from "../shared/decorators";
+import { FhirServerConfig } from "../../shared/constants";
+import { getDbClient } from "../dbClient";
+import { transaction } from "../../shared/decorators";
 
 class FhirServerConfigService {
   private dbClient: Pool;

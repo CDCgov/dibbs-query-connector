@@ -8,7 +8,7 @@ import { getCustomQueries } from "@/app/shared/database-service";
 import { CustomUserQuery } from "@/app/shared/constants";
 import LoadingView from "../../../../ui/designSystem/LoadingView";
 import { showToastConfirmation } from "../../../../ui/designSystem/toast/Toast";
-import { getFhirServerNames } from "@/app/backend/fhir-server-config-service";
+import { getFhirServerNames } from "@/app/backend/dbServices/fhir-servers";
 
 type SelectSavedQueryProps = {
   selectedQuery: CustomUserQuery;

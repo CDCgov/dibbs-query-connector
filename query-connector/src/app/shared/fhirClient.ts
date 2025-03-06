@@ -1,4 +1,4 @@
-import { FhirServerConfig } from "../shared/constants";
+import { FhirServerConfig } from "./constants";
 import https from "https";
 import { auditable } from "./decorators";
 /**
