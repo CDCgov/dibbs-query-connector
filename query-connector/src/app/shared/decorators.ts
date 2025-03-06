@@ -63,15 +63,19 @@ export function auditable(async = false) {
  * @param key - the name of the method
  * @param descriptor - metadata for the method, which has restrictions on the
  * return type
+ * @returns - Success information of the db transaction, as well as additional
+ * error / db result types as specified in the function body
  */
 export function transaction<T extends { success: boolean }>(
   _: Object,
   key: string,
+  // eslint-disable-next-line  @typescript-eslint/no-explicit-any
   descriptor: TypedPropertyDescriptor<(...args: any[]) => Promise<T>>,
 ) {
   const method = descriptor.value;
   const dbClient = getDbClient();
 
+  // eslint-disable-next-line  @typescript-eslint/no-explicit-any
   descriptor.value = async function (...args: any[]): Promise<T> {
     try {
       await dbClient.query("BEGIN");
