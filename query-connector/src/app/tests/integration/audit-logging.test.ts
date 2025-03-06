@@ -1,4 +1,7 @@
-import { addUserIfNotExists, updateUserRole } from "@/app/backend/user-management";
+import {
+  addUserIfNotExists,
+  updateUserRole,
+} from "@/app/backend/user-management";
 import { auth } from "@/auth";
 import { Bundle, BundleEntry, Patient } from "fhir/r4";
 import { getDbClient } from "@/app/backend/dbClient";
@@ -71,7 +74,10 @@ describe("Audit Logging Integration Tests", () => {
       createdUserId,
       RoleTypeValues.SuperAdmin,
     );
-    expect(newresult.items![0]).toHaveProperty("qc_role", RoleTypeValues.SuperAdmin);
+    expect(newresult.items![0]).toHaveProperty(
+      "qc_role",
+      RoleTypeValues.SuperAdmin,
+    );
   });
 });
 
