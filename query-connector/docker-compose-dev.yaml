@@ -80,7 +80,7 @@ services:
     depends_on:
       - aidbox_db
     ports:
-      - 8080:8080
+      - 8082:8082
     environment:
       AIDBOX_TERMINOLOGY_SERVICE_BASE_URL: https://tx.fhir.org/r4
       AIDBOX_FHIR_PACKAGES: hl7.fhir.r4.core#4.0.1
@@ -96,7 +96,7 @@ services:
       BOX_COMPATIBILITY_VALIDATION_JSON__SCHEMA_REGEX: "#{:fhir-datetime}"
       BOX_SEARCH_AUTHORIZE_INLINE_REQUESTS: true
       PGUSER: aidbox
-      AIDBOX_PORT: 8080
+      AIDBOX_PORT: 8082
       PGDATABASE: aidbox
       PGPASSWORD: gOxAmiyiz4
       PGPORT: "5432"

@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 17.2
+-- Dumped from database version 17.4
 -- Dumped by pg_dump version 17.2 (Homebrew)
 
 SET statement_timeout = 0;
@@ -150,6 +150,59 @@ CREATE TABLE public.user_management (
 
 
 ALTER TABLE public.user_management OWNER TO postgres;
+
+--
+-- Name: usergroup; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.usergroup (
+    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    name text NOT NULL
+);
+
+
+ALTER TABLE public.usergroup OWNER TO postgres;
+
+--
+-- Name: usergroup_to_query; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.usergroup_to_query (
+    id text NOT NULL,
+    query_id uuid,
+    usergroup_id uuid
+);
+
+
+ALTER TABLE public.usergroup_to_query OWNER TO postgres;
+
+--
+-- Name: usergroup_to_users; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.usergroup_to_users (
+    id text NOT NULL,
+    user_id uuid,
+    usergroup_id uuid
+);
+
+
+ALTER TABLE public.usergroup_to_users OWNER TO postgres;
+
+--
+-- Name: users; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.users (
+    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    username text NOT NULL,
+    qc_role text,
+    first_name text,
+    last_name text
+);
+
+
+ALTER TABLE public.users OWNER TO postgres;
 
 --
 -- Name: valueset_to_concept; Type: TABLE; Schema: public; Owner: postgres
@@ -36001,6 +36054,7 @@ deb1f251-5f0e-45bc-9ac3-16e89ff1295c	HELIOS Meld: eHealthExchange	https://concep
 bb060ae8-1e99-4a46-8e52-4490e7ec5f87	JMC Meld: eHealthExchange	https://concept01.ehealthexchange.org:52780/fhirproxy/r4	{\n        "Accept": "application/json, application/*+json, */*",\n        "Accept-Encoding": "gzip, deflate, br",\n        "Content-Type": "application/fhir+json; charset=UTF-8",\n        "X-DESTINATION": "JMCHelios",\n        "X-POU": "PUBHLTH",\n        "prefer": "return=representation",\n        "Cache-Control": "no-cache"\n     }	2025-01-29 16:15:28.579435+00	t	t
 57b4861a-ef92-45d9-ba23-789706b39520	OpenEpic: eHealthExchange	https://concept01.ehealthexchange.org:52780/fhirproxy/r4	{\n        "Accept": "application/json, application/*+json, */*",\n        "Accept-Encoding": "gzip, deflate, br",\n        "Content-Type": "application/fhir+json; charset=UTF-8",\n        "X-DESTINATION": "OpenEpic",\n        "X-POU": "PUBHLTH",\n        "prefer": "return=representation",\n        "Cache-Control": "no-cache"\n     }	2025-01-29 16:15:28.579435+00	t	t
 c1231518-675f-4567-b1da-d6600b8473ee	CernerHelios: eHealthExchange	https://concept01.ehealthexchange.org:52780/fhirproxy/r4	{\n        "Accept": "application/json, application/*+json, */*",\n        "Accept-Encoding": "gzip, deflate, br",\n        "Content-Type": "application/fhir+json; charset=UTF-8",\n        "X-DESTINATION": "CernerHelios",\n        "X-POU": "PUBHLTH",\n        "prefer": "return=representation",\n        "Cache-Control": "no-cache",\n        "OAUTHSCOPES": "system/Condition.read system/Encounter.read system/Immunization.read system/MedicationRequest.read system/Observation.read system/Patient.read system/Procedure.read system/MedicationAdministration.read system/DiagnosticReport.read system/RelatedPerson.read"\n     }	2025-01-29 16:15:28.579435+00	t	t
+2eeb4699-56da-4c21-ac05-e9caa19ff3d0	Aidbox	http://not-the-real-url:8080	{}	2025-03-06 18:17:14.034+00	f	f
 \.
 
 
@@ -36015,6 +36069,7 @@ COPY public.flyway_schema_history (installed_rank, version, description, type, s
 4	04.01	add fhir server disable cert validation	SQL	V04_01__add_fhir_server_disable_cert_validation.sql	640792751	postgres	2025-01-29 16:15:28.667058	27	t
 5	05.01	add user management	SQL	V05_01__add_user_management.sql	724938270	postgres	2025-01-29 16:15:28.840276	24	t
 6	06.01	add immunization flag to query table	SQL	V06_01__add_immunization_flag_to_query_table.sql	1445351806	postgres	2025-01-29 16:15:28.944822	16	t
+7	07.01	update user management	SQL	V07_01__update_user_management.sql	-726868426	postgres	2025-03-06 18:07:47.100461	461	t
 \.
 
 
@@ -36037,6 +36092,38 @@ e858cba3-59f6-4bc8-9a1e-28fac21c5813	Immunization query	{}	{}	DIBBs	2025-01-29 1
 --
 
 COPY public.user_management (username, qc_role, first_name, last_name) FROM stdin;
+\.
+
+
+--
+-- Data for Name: usergroup; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.usergroup (id, name) FROM stdin;
+\.
+
+
+--
+-- Data for Name: usergroup_to_query; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.usergroup_to_query (id, query_id, usergroup_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: usergroup_to_users; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.usergroup_to_users (id, user_id, usergroup_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.users (id, username, qc_role, first_name, last_name) FROM stdin;
 \.
 
 
@@ -77549,6 +77636,46 @@ ALTER TABLE ONLY public.user_management
 
 
 --
+-- Name: usergroup usergroup_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.usergroup
+    ADD CONSTRAINT usergroup_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: usergroup_to_query usergroup_to_query_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.usergroup_to_query
+    ADD CONSTRAINT usergroup_to_query_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: usergroup_to_users usergroup_to_users_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.usergroup_to_users
+    ADD CONSTRAINT usergroup_to_users_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.users
+    ADD CONSTRAINT users_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: users users_username_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.users
+    ADD CONSTRAINT users_username_key UNIQUE (username);
+
+
+--
 -- Name: valueset_to_concept valueset_to_concept_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -77642,6 +77769,69 @@ CREATE INDEX query_name_index ON public.query USING btree (query_name);
 
 
 --
+-- Name: user_id_index; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX user_id_index ON public.users USING btree (id);
+
+
+--
+-- Name: user_username_index; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX user_username_index ON public.users USING btree (username);
+
+
+--
+-- Name: usergroup_id_index; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX usergroup_id_index ON public.usergroup USING btree (id);
+
+
+--
+-- Name: usergroup_to_query_id_index; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX usergroup_to_query_id_index ON public.usergroup_to_query USING btree (id);
+
+
+--
+-- Name: usergroup_to_query_query_id_index; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX usergroup_to_query_query_id_index ON public.usergroup_to_query USING btree (query_id);
+
+
+--
+-- Name: usergroup_to_query_usergroup_id_index; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX usergroup_to_query_usergroup_id_index ON public.usergroup_to_query USING btree (usergroup_id);
+
+
+--
+-- Name: usergroup_to_users_id_index; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX usergroup_to_users_id_index ON public.usergroup_to_users USING btree (id);
+
+
+--
+-- Name: usergroup_to_users_user_id_index; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX usergroup_to_users_user_id_index ON public.usergroup_to_users USING btree (user_id);
+
+
+--
+-- Name: usergroup_to_users_usergroup_id_index; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX usergroup_to_users_usergroup_id_index ON public.usergroup_to_users USING btree (usergroup_id);
+
+
+--
 -- Name: valueset_to_concept_concept_id_index; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -77686,6 +77876,38 @@ ALTER TABLE ONLY public.condition_to_valueset
 
 
 --
+-- Name: usergroup_to_query usergroup_to_query_query_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.usergroup_to_query
+    ADD CONSTRAINT usergroup_to_query_query_id_fkey FOREIGN KEY (query_id) REFERENCES public.query(id);
+
+
+--
+-- Name: usergroup_to_query usergroup_to_query_usergroup_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.usergroup_to_query
+    ADD CONSTRAINT usergroup_to_query_usergroup_id_fkey FOREIGN KEY (usergroup_id) REFERENCES public.usergroup(id);
+
+
+--
+-- Name: usergroup_to_users usergroup_to_users_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.usergroup_to_users
+    ADD CONSTRAINT usergroup_to_users_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id);
+
+
+--
+-- Name: usergroup_to_users usergroup_to_users_usergroup_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.usergroup_to_users
+    ADD CONSTRAINT usergroup_to_users_usergroup_id_fkey FOREIGN KEY (usergroup_id) REFERENCES public.usergroup(id);
+
+
+--
 -- Name: valueset_to_concept valueset_to_concept_concept_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -77704,3 +77926,4 @@ ALTER TABLE ONLY public.valueset_to_concept
 --
 -- PostgreSQL database dump complete
 --
+
