@@ -6,11 +6,7 @@ import { getDbClient } from "../backend/dbClient";
  * @returns The result of the function, with the args / result logged appropriately
  */
 export function auditable(async = false) {
-  return function (
-    target: Object,
-    key: string,
-    descriptor: PropertyDescriptor,
-  ) {
+  return function (_: Object, key: string, descriptor: PropertyDescriptor) {
     const dbConnection = getDbClient();
     const method = descriptor.value;
 
@@ -60,32 +56,46 @@ export function auditable(async = false) {
 }
 
 /**
- * Annotation to make a db interaction transactable
- * @param target - class prototype the annotation is hoisted into
+ * Annotation to make a db query into a transaction. Requires all return branches
+ * to include {success: boolean}, which will control the rollback behavior,
+ * in order to compile
+ * @param _ - class prototype the annotation is hoisted into
  * @param key - the name of the method
- * @param descriptor - metadata for the object
+ * @param descriptor - metadata for the method, which has restrictions on the
+ * return type
  */
-export function transaction(
-  target: Object,
+export function transaction<T extends { success: boolean }>(
+  _: Object,
   key: string,
-  descriptor: PropertyDescriptor,
+  descriptor: TypedPropertyDescriptor<(...args: any[]) => Promise<T>>,
 ) {
   const method = descriptor.value;
   const dbClient = getDbClient();
 
-  descriptor.value = async function (this: unknown, ...args: unknown[]) {
+  descriptor.value = async function (...args: any[]): Promise<T> {
     try {
       await dbClient.query("BEGIN");
-      const result = await method.apply(this, args);
-      if (result.success === false) {
+      const result = method && (await method.apply(this, args));
+      if (result === undefined || result.success === false) {
         throw Error("Transaction failed");
       }
       await dbClient.query("COMMIT");
 
       return result;
-    } catch {
+    } catch (error) {
       await dbClient.query("ROLLBACK");
       console.error(`Database transaction ${key} failed`);
+
+      type ErrorResult<T extends { success: boolean }> = T & {
+        error?: string;
+      };
+
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : String(error),
+      } as ErrorResult<T>;
     }
   };
+
+  return descriptor;
 }
