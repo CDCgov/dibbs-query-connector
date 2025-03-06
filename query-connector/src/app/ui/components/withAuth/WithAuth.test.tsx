@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 import WithAuth from "./WithAuth";
 import * as nextAuthReact from "next-auth/react";
 import * as authUtils from "@/app/utils/auth";
-import { RoleTypeValues } from "@/app/models/entities/users";
+import { UserRole } from "@/app/models/entities/users";
 import * as nextNavigation from "next/navigation";
 import { Session } from "next-auth";
 import { SessionContextValue } from "next-auth/react";
@@ -47,7 +47,7 @@ describe("WithAuth component (page access guard)", () => {
 
   it("Renders content if user is logged in and has role access", () => {
     const session: SessionContextValue = {
-      data: { user: { role: RoleTypeValues.SuperAdmin } } as Session,
+      data: { user: { role: UserRole.SUPER_ADMIN } } as Session,
       status: "authenticated",
       update: jest.fn(),
     };
@@ -64,7 +64,7 @@ describe("WithAuth component (page access guard)", () => {
 
   it("Renders unauthorized if user is logged in and does not have role access", () => {
     const session: SessionContextValue = {
-      data: { user: { role: RoleTypeValues.Standard } } as Session,
+      data: { user: { role: UserRole.STANDARD } } as Session,
       status: "authenticated",
       update: jest.fn(),
     };

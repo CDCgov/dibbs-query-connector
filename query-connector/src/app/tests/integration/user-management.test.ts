@@ -10,7 +10,7 @@ import {
 } from "@/app/backend/user-management";
 import { getDbClient } from "@/app/backend/dbClient";
 import { auth } from "@/auth";
-import { RoleTypeValues } from "@/app/models/entities/users";
+import { UserRole } from "@/app/models/entities/users";
 
 const dbClient = getDbClient();
 
@@ -54,8 +54,8 @@ describe("User Management Integration Tests", () => {
    * Tests adding a new user if they do not already exist.
    */
   test.each([
-    { user: TEST_SUPER_USER, role: RoleTypeValues.SuperAdmin },
-    { user: TEST_USER, role: RoleTypeValues.Standard },
+    { user: TEST_SUPER_USER, role: UserRole.SUPER_ADMIN },
+    { user: TEST_USER, role: UserRole.STANDARD },
   ])("should add a user if they do not exist", async ({ user, role }) => {
     const result = await addUserIfNotExists(user);
 
@@ -69,15 +69,17 @@ describe("User Management Integration Tests", () => {
    * Tests updating the role of an existing user.
    */
   test("should update a user's role", async () => {
-    const result = await updateUserRole(
-      createdUserId,
-      RoleTypeValues.SuperAdmin,
-    );
+    const result = await updateUserRole(createdUserId, UserRole.SUPER_ADMIN);
     expect(result.items).not.toBeNull();
-    expect(result.items![0]).toHaveProperty(
-      "qc_role",
-      RoleTypeValues.SuperAdmin,
-    );
+    expect(result.items![0]).toHaveProperty("qc_role", UserRole.SUPER_ADMIN);
+  });
+
+  /**
+   * Tests retrieving a user's role by username.
+   */
+  test("should retrieve user role by username", async () => {
+    const result = await getUserRole(TEST_USER.username);
+    expect(result).toBe(UserRole.SUPER_ADMIN);
   });
 
   /**
@@ -86,14 +88,6 @@ describe("User Management Integration Tests", () => {
   test("should retrieve all users", async () => {
     const result = await getUsers();
     expect(result.totalItems).toBeGreaterThan(0);
-  });
-
-  /**
-   * Tests retrieving a user's role by username.
-   */
-  test("should retrieve user role by username", async () => {
-    const result = await getUserRole(TEST_USER.username);
-    expect(result).toBe(RoleTypeValues.SuperAdmin);
   });
 });
 
@@ -117,8 +111,8 @@ describe("User Group Integration Tests", () => {
 
     expect(result).toHaveProperty("id");
     expect(result).toHaveProperty("name", groupName);
-    expect(result).toHaveProperty("memberSize", 0);
-    expect(result).toHaveProperty("querySize", 0);
+    expect(result).toHaveProperty("member_size", 0);
+    expect(result).toHaveProperty("query_size", 0);
 
     if (typeof result === "string") {
       throw new Error(`Failed to create test group: ${result}`);

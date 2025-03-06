@@ -4,7 +4,6 @@ import Header from "./ui/components/header/header";
 import Footer from "./ui/components/footer/footer";
 import DataProvider from "./shared/DataProvider";
 import { Metadata } from "next";
-import { ToastContainer } from "react-toastify";
 import Page from "./ui/components/page/page";
 import { auth } from "@/auth";
 import { isAuthDisabledServerCheck } from "./utils/auth";
@@ -31,12 +30,6 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body>
-        <ToastContainer
-          position="bottom-left"
-          icon={false}
-          stacked
-          hideProgressBar
-        />
         <div className="application-container">
           <DataProvider runtimeConfig={runtimeConfig} session={session}>
             <Header authDisabled={isAuthDisabledServerCheck()} />

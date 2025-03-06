@@ -1,4 +1,4 @@
-import { RoleTypeValues } from "../models/entities/users";
+import { UserRole } from "../models/entities/users";
 
 /**
  * Pathnames
@@ -6,17 +6,16 @@ import { RoleTypeValues } from "../models/entities/users";
 export enum PAGES {
   LANDING = "/",
   QUERY = "/query",
-  MY_QUERIES = "/queryBuilding",
+  QUERY_BUILDING = "/queryBuilding",
   FHIR_SERVERS = "/fhirServers",
   USER_MANAGEMENT = "/userManagement",
-  GROUP_MANAGEMENT = "/userManagement/userGroups",
 }
 
 interface Page {
   position: number;
   path: string;
   name: string;
-  roleAccess: RoleTypeValues[];
+  roleAccess: UserRole[];
 }
 /**
  * Pages configuration
@@ -28,39 +27,35 @@ pagesConfig[PAGES.QUERY] = {
   position: 0,
   path: PAGES.QUERY,
   name: "Run query",
-  roleAccess: [
-    RoleTypeValues.SuperAdmin,
-    RoleTypeValues.Admin,
-    RoleTypeValues.Standard,
-  ],
+  roleAccess: [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.STANDARD],
 };
 
-pagesConfig[PAGES.MY_QUERIES] = {
+pagesConfig[PAGES.QUERY_BUILDING] = {
   position: 1,
-  path: PAGES.MY_QUERIES,
+  path: PAGES.QUERY_BUILDING,
   name: "Query library",
-  roleAccess: [RoleTypeValues.SuperAdmin, RoleTypeValues.Admin],
+  roleAccess: [UserRole.SUPER_ADMIN, UserRole.ADMIN],
 };
 
 pagesConfig[PAGES.USER_MANAGEMENT] = {
   position: 2,
   path: PAGES.USER_MANAGEMENT,
   name: "User management",
-  roleAccess: [RoleTypeValues.SuperAdmin, RoleTypeValues.Admin],
+  roleAccess: [UserRole.SUPER_ADMIN, UserRole.ADMIN],
 };
 
 pagesConfig[PAGES.FHIR_SERVERS] = {
   position: 3,
   path: PAGES.FHIR_SERVERS,
   name: "FHIR servers",
-  roleAccess: [RoleTypeValues.SuperAdmin],
+  roleAccess: [UserRole.SUPER_ADMIN],
 };
 
 /**
  * @param userRole - the logged in user's role
  * @returns List of pages that will display in the settings menu based on the user's role
  */
-export function getPagesInSettingsMenu(userRole: RoleTypeValues): Page[] {
+export function getPagesInSettingsMenu(userRole: UserRole): Page[] {
   return Object.values(pagesConfig)
     .filter((page: Page) => page.roleAccess.includes(userRole))
     .sort((a, b) => (a.position > b.position ? 1 : -1));

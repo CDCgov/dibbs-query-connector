@@ -47,7 +47,8 @@ export type DemoDataFields = {
   FhirServer: string;
 };
 
-export const DEFAULT_DEMO_FHIR_SERVER = "Aidbox";
+// TODO: switch this back after we add proper seeding for local
+export const DEFAULT_DEMO_FHIR_SERVER = "Public HAPI: Direct"; // "Aidbox";
 /*
  * Common "Hyper Unlucky" patient data used for all non-newborn screening use cases
  */

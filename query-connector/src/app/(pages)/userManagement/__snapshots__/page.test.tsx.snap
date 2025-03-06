@@ -4,70 +4,131 @@ exports[`User Management: User tab Loads user list and not users are found 1`] =
 <body>
   <div>
     <div
-      aria-description="Available user roles"
-      class="margin-x-3 margin-y-4 grid-row flex-row flex-no-wrap flex-justify"
+      class="main-container__wide user-management"
     >
-      <p
-        class="grid-col-4"
+      <h1
+        class="page-title"
       >
-        <span
-          class="text-bold"
+        User management
+      </h1>
+      <div
+        aria-description="Available user roles"
+        class="margin-x-3 margin-y-4 grid-row flex-row flex-no-wrap flex-justify grid-gap"
+      >
+        <p
+          class="grid-col-4"
         >
-          Super Admin:
-        </span>
-         Manage user permissions; create and manage user groups; view audit logs; configure FHIR servers; create, assign, and run queries
-      </p>
-      <p
-        class="grid-col-4"
-      >
-        <span
-          class="text-bold"
+          <span
+            class="text-bold"
+          >
+            Super Admin:
+          </span>
+           Manage user permissions; create and manage user groups; view audit logs; configure FHIR servers; create, assign, and run queries
+        </p>
+        <p
+          class="grid-col-4"
         >
-          Admin:
-        </span>
-         Create, assign, and run queries
-      </p>
-      <p
-        class="grid-col-3"
-      >
-        <span
-          class="text-bold"
+          <span
+            class="text-bold"
+          >
+            Admin:
+          </span>
+           Create, assign, and run queries
+        </p>
+        <p
+          class="grid-col-4"
         >
-          Standard:
-        </span>
-         Only run queries
-      </p>
-    </div>
-    <div
-      class="customizeTableWrapper"
-    >
-      <table
-        class="usa-table usa-table--borderless customizeTable"
-        data-testid="table"
+          <span
+            class="text-bold"
+          >
+            Standard:
+          </span>
+           Only run queries
+        </p>
+      </div>
+      <div
+        class="main-container__wide"
       >
-        <thead>
-          <tr>
-            <th>
-              Name
-            </th>
-            <th>
-              Permissions
-            </th>
-            <th>
-              User groups
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td
-              colspan="3"
+        <div
+          class="border-base border-bottom-1px margin-bottom-3"
+        >
+          <a
+            class="tab__active"
+            data-prevent-nprogress="true"
+            href=""
+          >
+            Users
+          </a>
+          <a
+            class="tab"
+            data-prevent-nprogress="true"
+            href=""
+          >
+            User groups
+          </a>
+        </div>
+        <div
+          class="empty-response"
+        >
+          No users found
+        </div>
+        <div
+          class="drawer closed"
+          data-testid="drawer-open-false"
+          role="dialog"
+        >
+          <div
+            class="drawerContent display-none"
+          >
+            <div
+              class="drawerHeader"
             >
-              No users found
-            </td>
-          </tr>
-        </tbody>
-      </table>
+              <button
+                aria-label="Close drawer"
+                class="closeButton"
+                data-testid="close-drawer"
+              >
+                <svg
+                  aria-label="X icon indicating closure"
+                  class="usa-icon usa-icon--size-3"
+                  focusable="false"
+                  height="1em"
+                  role="img"
+                  viewBox="0 0 24 24"
+                  width="1em"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+                  />
+                </svg>
+              </button>
+              <h2
+                class="margin-0 padding-bottom-2"
+                data-testid="drawer-title"
+              />
+              <div>
+                <input
+                  class="usa-input searchField"
+                  data-testid="textInput"
+                  id="searchFieldTemplate"
+                  name="searchFieldTemplate"
+                  placeholder="Search"
+                  type="search"
+                  value=""
+                />
+              </div>
+            </div>
+            <div
+              class="padding-top-2"
+            >
+              <div>
+                No queries assigned to this group.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </body>
@@ -77,150 +138,247 @@ exports[`User Management: User tab Loads user list successfully 1`] = `
 <body>
   <div>
     <div
-      aria-description="Available user roles"
-      class="margin-x-3 margin-y-4 grid-row flex-row flex-no-wrap flex-justify"
+      class="main-container__wide user-management"
     >
-      <p
-        class="grid-col-4"
+      <h1
+        class="page-title"
       >
-        <span
-          class="text-bold"
+        User management
+      </h1>
+      <div
+        aria-description="Available user roles"
+        class="margin-x-3 margin-y-4 grid-row flex-row flex-no-wrap flex-justify grid-gap"
+      >
+        <p
+          class="grid-col-4"
         >
-          Super Admin:
-        </span>
-         Manage user permissions; create and manage user groups; view audit logs; configure FHIR servers; create, assign, and run queries
-      </p>
-      <p
-        class="grid-col-4"
-      >
-        <span
-          class="text-bold"
+          <span
+            class="text-bold"
+          >
+            Super Admin:
+          </span>
+           Manage user permissions; create and manage user groups; view audit logs; configure FHIR servers; create, assign, and run queries
+        </p>
+        <p
+          class="grid-col-4"
         >
-          Admin:
-        </span>
-         Create, assign, and run queries
-      </p>
-      <p
-        class="grid-col-3"
-      >
-        <span
-          class="text-bold"
+          <span
+            class="text-bold"
+          >
+            Admin:
+          </span>
+           Create, assign, and run queries
+        </p>
+        <p
+          class="grid-col-4"
         >
-          Standard:
-        </span>
-         Only run queries
-      </p>
-    </div>
-    <div
-      class="customizeTableWrapper"
-    >
-      <table
-        class="usa-table usa-table--borderless customizeTable"
-        data-testid="table"
+          <span
+            class="text-bold"
+          >
+            Standard:
+          </span>
+           Only run queries
+        </p>
+      </div>
+      <div
+        class="main-container__wide"
       >
-        <thead>
-          <tr>
-            <th>
-              Name
-            </th>
-            <th>
-              Permissions
-            </th>
-            <th>
-              User groups
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>
-              potter, harry
-            </td>
-            <td
-              width="270"
+        <div
+          class="border-base border-bottom-1px margin-bottom-3"
+        >
+          <a
+            class="tab__active"
+            data-prevent-nprogress="true"
+            href=""
+          >
+            Users
+          </a>
+          <a
+            class="tab"
+            data-prevent-nprogress="true"
+            href=""
+          >
+            User groups
+          </a>
+        </div>
+        <div
+          class="customizeTableWrapper"
+        >
+          <table
+            class="usa-table usa-table--borderless customizeTable"
+            data-testid="table"
+          >
+            <thead>
+              <tr>
+                <th>
+                  Name
+                </th>
+                <th>
+                  Permissions
+                </th>
+                <th>
+                  User groups
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td
+                  width="270"
+                >
+                  potter, harry 
+          
+                </td>
+                <td
+                  class="roleDropdown"
+                  width="270"
+                >
+                  <label
+                    class="usa-label usa-sr-only"
+                    data-testid="label"
+                    for="role-select-123"
+                  >
+                    User role
+                  </label>
+                  <select
+                    class="usa-select"
+                    data-testid="role-select-123"
+                    id="role-select-123"
+                  >
+                    <option
+                      value="Super Admin"
+                    >
+                      Super Admin
+                    </option>
+                    <option
+                      selected=""
+                      value="Admin"
+                    >
+                      Admin
+                    </option>
+                    <option
+                      value="Standard"
+                    >
+                      Standard
+                    </option>
+                  </select>
+                </td>
+                <td>
+                  --
+                </td>
+              </tr>
+              <tr>
+                <td
+                  width="270"
+                >
+                  potter, lily 
+          
+                </td>
+                <td
+                  class="roleDropdown"
+                  width="270"
+                >
+                  <label
+                    class="usa-label usa-sr-only"
+                    data-testid="label"
+                    for="role-select-456"
+                  >
+                    User role
+                  </label>
+                  <select
+                    class="usa-select"
+                    data-testid="role-select-456"
+                    id="role-select-456"
+                  >
+                    <option
+                      selected=""
+                      value="Super Admin"
+                    >
+                      Super Admin
+                    </option>
+                    <option
+                      value="Admin"
+                    >
+                      Admin
+                    </option>
+                    <option
+                      value="Standard"
+                    >
+                      Standard
+                    </option>
+                  </select>
+                </td>
+                <td>
+                  <button
+                    aria-description="Edit Team 1 members"
+                    class="usa-button usa-button--unstyled margin-right-2 text-no-underline"
+                    data-testid="button"
+                    type="button"
+                  >
+                    Team 1
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div
+          class="drawer closed"
+          data-testid="drawer-open-false"
+          role="dialog"
+        >
+          <div
+            class="drawerContent display-none"
+          >
+            <div
+              class="drawerHeader"
             >
-              <label
-                class="usa-label usa-sr-only"
-                data-testid="label"
-                for="role-select-123"
-              >
-                User role
-              </label>
-              <select
-                class="usa-select"
-                id="role-select-123"
-              >
-                <option
-                  value="Super Admin"
-                >
-                  Super Admin
-                </option>
-                <option
-                  selected=""
-                  value="Admin"
-                >
-                  Admin
-                </option>
-                <option
-                  value="Standard User"
-                >
-                  Standard
-                </option>
-              </select>
-            </td>
-            <td>
-              --
-            </td>
-          </tr>
-          <tr>
-            <td>
-              potter, lily
-            </td>
-            <td
-              width="270"
-            >
-              <label
-                class="usa-label usa-sr-only"
-                data-testid="label"
-                for="role-select-456"
-              >
-                User role
-              </label>
-              <select
-                class="usa-select"
-                id="role-select-456"
-              >
-                <option
-                  value="Super Admin"
-                >
-                  Super Admin
-                </option>
-                <option
-                  selected=""
-                  value="Admin"
-                >
-                  Admin
-                </option>
-                <option
-                  value="Standard User"
-                >
-                  Standard
-                </option>
-              </select>
-            </td>
-            <td>
               <button
-                aria-description="Edit Team 1 members"
-                class="usa-button usa-button--unstyled margin-right-2 text-no-underline"
-                data-testid="button"
-                type="button"
+                aria-label="Close drawer"
+                class="closeButton"
+                data-testid="close-drawer"
               >
-                Team 1
+                <svg
+                  aria-label="X icon indicating closure"
+                  class="usa-icon usa-icon--size-3"
+                  focusable="false"
+                  height="1em"
+                  role="img"
+                  viewBox="0 0 24 24"
+                  width="1em"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+                  />
+                </svg>
               </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+              <h2
+                class="margin-0 padding-bottom-2"
+                data-testid="drawer-title"
+              />
+              <div>
+                <input
+                  class="usa-input searchField"
+                  data-testid="textInput"
+                  id="searchFieldTemplate"
+                  name="searchFieldTemplate"
+                  placeholder="Search"
+                  type="search"
+                  value=""
+                />
+              </div>
+            </div>
+            <div
+              class="padding-top-2"
+            >
+              <div>
+                No queries assigned to this group.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </body>

@@ -9,7 +9,7 @@ import classNames from "classnames";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { getPagesInSettingsMenu, PAGES } from "@/app/shared/page-routes";
-import { RoleTypeValues } from "@/app/models/entities/users";
+import { UserRole } from "@/app/models/entities/users";
 
 /**
  * Produces the header.
@@ -26,7 +26,7 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
   const { data: session, status } = useSession();
   const isLoggedIn = status === "authenticated";
   const userRole = authDisabled
-    ? RoleTypeValues.SuperAdmin
+    ? UserRole.SUPER_ADMIN
     : session?.user.role || "";
 
   const outsideMenuClick = (event: MouseEvent) => {
@@ -136,21 +136,20 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
           <div ref={menuRef} className={styles.menuDropdownContainer}>
             <ul
               id="dropdown-menu"
+              data-testid="dropdown-menu"
               className={classNames("usa-nav__submenu", styles.menuDropdown)}
             >
-              {getPagesInSettingsMenu(userRole as RoleTypeValues).map(
-                (page) => (
-                  <li key={page.path} className={styles.subMenuItem}>
-                    <Link
-                      className={styles.menuItem}
-                      href={page.path}
-                      scroll={false}
-                    >
-                      {page.name}
-                    </Link>
-                  </li>
-                ),
-              )}
+              {getPagesInSettingsMenu(userRole as UserRole).map((page) => (
+                <li key={page.path} className={styles.subMenuItem}>
+                  <Link
+                    className={styles.menuItem}
+                    href={page.path}
+                    scroll={false}
+                  >
+                    {page.name}
+                  </Link>
+                </li>
+              ))}
               {!authDisabled && (
                 <li className={styles.subMenuItem}>
                   <button
