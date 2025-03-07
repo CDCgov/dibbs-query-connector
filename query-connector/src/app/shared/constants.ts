@@ -46,7 +46,6 @@ export type DemoDataFields = {
   FhirServer: string;
 };
 
-// TODO: switch this back after we add proper seeding for local
 export const DEFAULT_DEMO_FHIR_SERVER = "Aidbox";
 /*
  * Common "Hyper Unlucky" patient data used for all non-newborn screening use cases
