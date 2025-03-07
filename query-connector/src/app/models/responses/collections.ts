@@ -1,5 +1,5 @@
 export interface QCResponse<T> {
-  items: T[] | null;
+  items: T[];
   totalItems: number;
 }
 
