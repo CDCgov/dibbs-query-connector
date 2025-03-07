@@ -101,6 +101,21 @@ services:
       PGPASSWORD: gOxAmiyiz4
       PGPORT: "5432"
       BOX_SEARCH_INCLUDE_CONFORMANT: true
+    env_file:
+      - .env
+  aidbox-seeder:
+    build:
+      context: .
+      dockerfile: Dockerfile.aidbox-seeder
+    volumes:
+      - ./src/app/tests/assets/GoldenSickPatient.json:/data/GoldenSickPatient.json
+    depends_on:
+      db:
+        condition: service_healthy
+      aidbox:
+        condition: service_started
+      flyway:
+        condition: service_completed_successfully
 
 volumes:
   aidbox_pg_data:
