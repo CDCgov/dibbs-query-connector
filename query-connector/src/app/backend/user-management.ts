@@ -264,7 +264,7 @@ export async function getUserGroupsForUser(
 export async function createUserGroup(
   groupName: string,
 ): Promise<UserGroup | string> {
-  if (!(await adminAccessCheck())) {
+  if (!(await superAdminAccessCheck())) {
     throw new Error("Unauthorized");
   }
 
@@ -309,7 +309,7 @@ export async function updateUserGroup(
   id: string,
   newName: string,
 ): Promise<UserGroup | string> {
-  if (!(await adminAccessCheck())) {
+  if (!(await superAdminAccessCheck())) {
     throw new Error("Unauthorized");
   }
 
@@ -360,7 +360,7 @@ export async function updateUserGroup(
  * @returns The deleted user group or an error if the deletion fails.
  */
 export async function deleteUserGroup(id: string): Promise<UserGroup | string> {
-  if (!(await adminAccessCheck())) {
+  if (!(await superAdminAccessCheck())) {
     throw new Error("Unauthorized");
   }
 

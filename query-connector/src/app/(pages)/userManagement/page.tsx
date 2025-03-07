@@ -42,7 +42,7 @@ const UserManagement: React.FC = () => {
           <span className={"text-bold"}>Admin:</span> Create, assign, and run
           queries
         </p>
-        <p className={classNames("grid-col-4")}>
+        <p className={classNames("grid-col-3")}>
           <span className={"text-bold"}>Standard:</span> Only run queries
         </p>
       </div>
