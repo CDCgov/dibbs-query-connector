@@ -225,20 +225,16 @@ exports[`Super Admin view of Users Table renders content on tab click 1`] = `
       <div
         class="border-base border-bottom-1px margin-bottom-3"
       >
-        <a
-          class="tab__active"
-          data-prevent-nprogress="true"
-          href=""
+        <button
+          class="usa-button--unstyled tab__active"
         >
           Users
-        </a>
-        <a
-          class="tab"
-          data-prevent-nprogress="true"
-          href=""
+        </button>
+        <button
+          class="usa-button--unstyled tab"
         >
           User groups
-        </a>
+        </button>
       </div>
       <div
         class="customizeTableWrapper"
@@ -431,20 +427,16 @@ exports[`Super Admin view of Users Table renders content on tab click 2`] = `
       <div
         class="border-base border-bottom-1px margin-bottom-3"
       >
-        <a
-          class="tab"
-          data-prevent-nprogress="true"
-          href=""
+        <button
+          class="usa-button--unstyled tab"
         >
           Users
-        </a>
-        <a
-          class="tab__active"
-          data-prevent-nprogress="true"
-          href=""
+        </button>
+        <button
+          class="usa-button--unstyled tab__active"
         >
           User groups
-        </a>
+        </button>
       </div>
       <div
         class="customizeTableWrapper"
@@ -567,20 +559,16 @@ exports[`Super Admin view of Users Table renders error message when no users are
       <div
         class="border-base border-bottom-1px margin-bottom-3"
       >
-        <a
-          class="tab__active"
-          data-prevent-nprogress="true"
-          href=""
+        <button
+          class="usa-button--unstyled tab__active"
         >
           Users
-        </a>
-        <a
-          class="tab"
-          data-prevent-nprogress="true"
-          href=""
+        </button>
+        <button
+          class="usa-button--unstyled tab"
         >
           User groups
-        </a>
+        </button>
       </div>
       <div
         class="customizeTableWrapper"
@@ -683,20 +671,16 @@ exports[`Super Admin view of Users Table renders table view after content is loa
       <div
         class="border-base border-bottom-1px margin-bottom-3"
       >
-        <a
-          class="tab__active"
-          data-prevent-nprogress="true"
-          href=""
+        <button
+          class="usa-button--unstyled tab__active"
         >
           Users
-        </a>
-        <a
-          class="tab"
-          data-prevent-nprogress="true"
-          href=""
+        </button>
+        <button
+          class="usa-button--unstyled tab"
         >
           User groups
-        </a>
+        </button>
       </div>
       <div
         class="customizeTableWrapper"
@@ -889,20 +873,16 @@ exports[`Super Admin view of Users Table renders table view after content is loa
       <div
         class="border-base border-bottom-1px margin-bottom-3"
       >
-        <a
-          class="tab__active"
-          data-prevent-nprogress="true"
-          href=""
+        <button
+          class="usa-button--unstyled tab__active"
         >
           Users
-        </a>
-        <a
-          class="tab"
-          data-prevent-nprogress="true"
-          href=""
+        </button>
+        <button
+          class="usa-button--unstyled tab"
         >
           User groups
-        </a>
+        </button>
       </div>
       <div
         class="customizeTableWrapper"
