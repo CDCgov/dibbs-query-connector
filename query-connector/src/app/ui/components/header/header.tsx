@@ -27,7 +27,7 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
   const isLoggedIn = status === "authenticated";
   const userRole = authDisabled
     ? UserRole.SUPER_ADMIN
-    : session?.user.role || "";
+    : session?.user?.role || "";
 
   const outsideMenuClick = (event: MouseEvent) => {
     if (
