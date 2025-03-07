@@ -62,19 +62,20 @@ In order to make the dev process as low-lift as possible, we want to avoid execu
 
 #### Obtaining an eRSD API Key
 
-Before running the Query Connector locally, you will need to obtain an API key for the electronic Reporting and Surveillance Distribution (eRSD). With the API key, you have access to 200+ pre-built queries for reportable conditions, e.g., chlamydia, influenza, hepatitis A, etc. These queries can be used and modified in the Query Connector app.
+Before running the Query Connector locally, you will need to obtain an API key for the electronic Reporting and Surveillance Distribution (eRSD), Unified Medical Language System (UMLS), and Aidbox. With the API key, you have access to 200+ pre-built queries for reportable conditions, e.g., chlamydia, influenza, hepatitis A, etc. These queries can be used and modified in the Query Connector app.
 ``
 
 To obtain the free API keys, please visit the following URLs and follow the sign up instructions.
 
 - [https://ersd.aimsplatform.org/#/api-keys](https://ersd.aimsplatform.org/#/api-keys)
 - [https://uts.nlm.nih.gov/uts/login](https://uts.nlm.nih.gov/uts/login)
+- [https://aidbox.app/](https://aidbox.app/)
 
 Next, set up your `.env` file with the following command: `cp .env.sample .env`
 
 Adjust your `DATABASE_URL` as needed.
 
-Add your API keys as an environment variables called `ERSD_API_KEY` and `UMLS_API_KEY` in the `.env` file so that they can be accessed when running the Query Connector app.
+Add your API keys as an environment variables called `ERSD_API_KEY`, `UMLS_API_KEY`, and `AIDBOX_LICENSE` in the `.env` file so that they can be accessed when running the Query Connector app.
 
 #### Running Keycloak for Authentication
 

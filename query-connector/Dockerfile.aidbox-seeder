@@ -1,0 +1,13 @@
+FROM alpine:latest
+
+# Install curl and PostgreSQL client
+RUN apk add --no-cache curl postgresql-client bash
+
+# Copy the script
+COPY ./seed_aidbox.sh /seed_aidbox.sh
+RUN chmod +x /seed_aidbox.sh
+
+# Create data directory
+RUN mkdir /data
+
+CMD ["/seed_aidbox.sh"]
