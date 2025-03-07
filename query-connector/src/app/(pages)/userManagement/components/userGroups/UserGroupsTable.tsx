@@ -8,7 +8,7 @@ import Table from "../../../../ui/designSystem/table/Table";
 import { UserManagementContext } from "../UserManagementProvider";
 import { UserGroup, UserRole, User } from "../../../../models/entities/users";
 import { QueryTableResult } from "@/app/(pages)/queryBuilding/utils";
-import styles from "../usersTable/usersTable.module.scss";
+import styles from "../ManagementTabs/ManagementTabs.module.scss";
 import { getSessionRole } from "../../utils";
 
 type UserGroupsTableProps = {
@@ -42,6 +42,14 @@ const UserGroupsTable: React.FC<UserGroupsTableProps> = ({
   }
 
   function renderGroupsTable() {
+    if (userGroups.length === 0) {
+      return (
+        <tr>
+          <td colSpan={3}>No user groups found</td>
+        </tr>
+      );
+    }
+
     return userGroups.map((group: UserGroup, idx: number) => (
       <tr key={group.id}>
         <td width={270}>{group.name}</td>
@@ -109,15 +117,7 @@ const UserGroupsTable: React.FC<UserGroupsTableProps> = ({
           <th>Assigned queries</th>
         </tr>
       </thead>
-      <tbody>
-        {userGroups.length > 0 ? (
-          renderGroupsTable()
-        ) : (
-          <tr key={0}>
-            <td>{"No user groups found."}</td>
-          </tr>
-        )}
-      </tbody>
+      <tbody>{renderGroupsTable()}</tbody>
     </Table>
   );
 };

@@ -108,6 +108,14 @@ const UserPermissionsTable: React.FC<PermissionsProps> = ({
   };
 
   const renderUserRows = (users: User[] | null): React.ReactNode => {
+    if (users?.length == 0) {
+      return (
+        <tr>
+          <td colSpan={3}>No users found</td>
+        </tr>
+      );
+    }
+
     return users?.map((user: User) => {
       return (
         <tr key={user.id}>

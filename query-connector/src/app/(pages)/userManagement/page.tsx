@@ -3,7 +3,7 @@ import classNames from "classnames";
 import { UserRole } from "@/app/models/entities/users";
 import WithAuth from "@/app/ui/components/withAuth/WithAuth";
 import UserManagementProvider from "./components/UserManagementProvider";
-import UsersTable from "./components/usersTable/usersTable";
+import ManagementTabs from "./components/managementTabs/managementTabs";
 import { getSessionRole } from "./utils";
 import { isAuthDisabledClientCheck } from "@/app/utils/auth";
 import { useContext } from "react";
@@ -55,7 +55,7 @@ const UserManagement: React.FC = () => {
         <h1 className="page-title">User management</h1>
         <UserManagementProvider>
           {role == UserRole.SUPER_ADMIN && renderRoleDescriptions()}
-          {role && <UsersTable role={role as UserRole} />}
+          {role && <ManagementTabs role={role as UserRole} />}
         </UserManagementProvider>
       </div>
     </WithAuth>

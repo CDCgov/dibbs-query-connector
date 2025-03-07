@@ -4,61 +4,59 @@ exports[`Admin view of Users Table fetches usergroups on page load 1`] = `
 <body>
   <div>
     <div
-      class="customizeTableWrapper"
-    >
-      <table
-        class="usa-table usa-table--borderless customizeTable"
-        data-testid="table"
-      >
-        <thead>
-          <tr>
-            <th>
-              Name
-            </th>
-            <th>
-              Members
-            </th>
-            <th>
-              Assigned queries
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td
-              width="270"
-            >
-              Hogwarts
-            </td>
-            <td>
-              <button
-                aria-description="Edit Hogwarts members"
-                class="usa-button usa-button--unstyled drawerButton text-no-underline"
-                data-testid="edit-member-list-0"
-                type="button"
-              >
-                1 member
-              </button>
-            </td>
-            <td>
-              <button
-                aria-description="Edit Hogwarts queries"
-                class="usa-button usa-button--unstyled text-no-underline"
-                data-testid="edit-query-list-0"
-                type="button"
-              >
-                0 queries
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-  <div>
-    <div
       class="main-container__wide"
     >
+      <div
+        class="customizeTableWrapper"
+      >
+        <table
+          class="usa-table usa-table--borderless customizeTable"
+          data-testid="table"
+        >
+          <thead>
+            <tr>
+              <th>
+                Name
+              </th>
+              <th>
+                Members
+              </th>
+              <th>
+                Assigned queries
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td
+                width="270"
+              >
+                Hogwarts
+              </td>
+              <td>
+                <button
+                  aria-description="Edit Hogwarts members"
+                  class="usa-button usa-button--unstyled drawerButton text-no-underline"
+                  data-testid="edit-member-list-0"
+                  type="button"
+                >
+                  1 member
+                </button>
+              </td>
+              <td>
+                <button
+                  aria-description="Edit Hogwarts queries"
+                  class="usa-button usa-button--unstyled text-no-underline"
+                  data-testid="edit-query-list-0"
+                  type="button"
+                >
+                  0 queries
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
       <div
         class="drawer closed"
         data-testid="drawer-open-false"
@@ -127,9 +125,35 @@ exports[`Admin view of Users Table renders error message when no user groups are
       class="main-container__wide"
     >
       <div
-        class="empty-response"
+        class="customizeTableWrapper"
       >
-        No user groups found
+        <table
+          class="usa-table usa-table--borderless customizeTable"
+          data-testid="table"
+        >
+          <thead>
+            <tr>
+              <th>
+                Name
+              </th>
+              <th>
+                Members
+              </th>
+              <th>
+                Assigned queries
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td
+                colspan="3"
+              >
+                No user groups found
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
       <div
         class="drawer closed"
@@ -559,9 +583,35 @@ exports[`Super Admin view of Users Table renders error message when no users are
         </a>
       </div>
       <div
-        class="empty-response"
+        class="customizeTableWrapper"
       >
-        No users found
+        <table
+          class="usa-table usa-table--borderless customizeTable"
+          data-testid="table"
+        >
+          <thead>
+            <tr>
+              <th>
+                Name
+              </th>
+              <th>
+                Permissions
+              </th>
+              <th>
+                User groups
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td
+                colspan="3"
+              >
+                No users found
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
       <div
         class="drawer closed"
