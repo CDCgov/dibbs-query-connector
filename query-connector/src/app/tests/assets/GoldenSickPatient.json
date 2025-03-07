@@ -324,7 +324,8 @@
         "subject": {
           "reference": "Patient/f288c654-6885-4f48-999c-48d776dc06af",
           "type": "Patient"
-        }
+        },
+        "onsetDateTime": "2021-09-11T17:43:27.663+00:00"
       },
       "search": {
         "mode": "match"
@@ -757,7 +758,7 @@
         "subject": {
           "reference": "Patient/f288c654-6885-4f48-999c-48d776dc06af"
         },
-        "onsetDateTime": "2023-11-12",
+        "onsetDateTime": "2023-11-12T00:00:00Z",
         "asserter": {
           "reference": "Practitioner/8085737b-28ec-4b23-8604-83fd20076933"
         },
@@ -3773,6 +3774,425 @@
     },
 
     {
+      "fullUrl": "ClaimResponse/8f7d38e5-2e5c-4d9a-b3c7-9f42f3d9e1b2",
+      "resource": {
+        "resourceType": "ClaimResponse",
+        "id": "8f7d38e5-2e5c-4d9a-b3c7-9f42f3d9e1b2",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2023-09-01T15:18:19.000Z"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p><b>ClaimResponse</b></p><p><b>Patient</b>: f288c654-6885-4f48-999c-48d776dc06af</p><p><b>Status</b>: active</p><p><b>Created</b>: Oct 16, 2023</p><p><b>Outcome</b>: complete</p><p><b>Payment Amount</b>: $1,078.20 USD</p></div>"
+        },
+        "status": "active",
+        "type": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/claim-type",
+              "code": "institutional"
+            }
+          ]
+        },
+        "use": "claim",
+        "patient": {
+          "reference": "Patient/f288c654-6885-4f48-999c-48d776dc06af"
+        },
+        "created": "2023-10-16",
+        "insurer": {
+          "reference": "Organization/cc8a572b-0ae5-4497-97cf-bab563cbb131"
+        },
+        "request": {
+          "reference": "Claim/1cee4a99-ef5d-406e-80de-3a9a1b47c445"
+        },
+        "outcome": "complete",
+        "item": [
+          {
+            "itemSequence": 1,
+            "adjudication": [
+              {
+                "category": {
+                  "coding": [
+                    {
+                      "system": "http://terminology.hl7.org/CodeSystem/adjudication",
+                      "code": "benefit"
+                    }
+                  ]
+                },
+                "amount": {
+                  "value": 527.0,
+                  "currency": "USD"
+                }
+              }
+            ]
+          },
+          {
+            "itemSequence": 2,
+            "adjudication": [
+              {
+                "category": {
+                  "coding": [
+                    {
+                      "system": "http://terminology.hl7.org/CodeSystem/adjudication",
+                      "code": "benefit"
+                    }
+                  ]
+                },
+                "amount": {
+                  "value": 551.2,
+                  "currency": "USD"
+                }
+              }
+            ]
+          }
+        ],
+        "payment": {
+          "date": "2023-10-17",
+          "amount": {
+            "value": 1078.2,
+            "currency": "USD"
+          },
+          "type": {
+            "coding": [
+              {
+                "code": "complete",
+                "display": "Complete"
+              }
+            ]
+          }
+        },
+        "insurance": [
+          {
+            "sequence": 1,
+            "focal": true,
+            "coverage": {
+              "reference": "Coverage/d91140ee-684a-487e-894f-2791f82e1888"
+            }
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      },
+      "request": {
+        "method": "PUT",
+        "url": "ClaimResponse/8f7d38e5-2e5c-4d9a-b3c7-9f42f3d9e1b2"
+      }
+    },
+    {
+      "fullUrl": "ExplanationOfBenefit/4cf9dc47-5e71-47d0-b0ff-b283fe8dc47c",
+      "resource": {
+        "resourceType": "ExplanationOfBenefit",
+        "id": "4cf9dc47-5e71-47d0-b0ff-b283fe8dc47c",
+        "meta": {
+          "versionId": "4",
+          "lastUpdated": "2022-04-07T21:47:14.000+00:00",
+          "source": "#a72b33cd02c572b3"
+        },
+        "identifier": [
+          {
+            "value": "d96030446269cb1e0a862d"
+          }
+        ],
+        "status": "active",
+        "type": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/claim-type",
+              "code": "institutional",
+              "display": "Institutional"
+            }
+          ]
+        },
+        "use": "claim",
+        "patient": {
+          "reference": "Patient/f288c654-6885-4f48-999c-48d776dc06af",
+          "type": "Patient"
+        },
+        "billablePeriod": {
+          "start": "2020-03-02",
+          "end": "2020-03-03"
+        },
+        "created": "2020-03-03",
+        "enterer": {
+          "reference": "Practitioner/8085737b-28ec-4b23-8604-83fd20076933",
+          "type": "Practitioner"
+        },
+        "insurer": {
+          "reference": "Organization/cc8a572b-0ae5-4497-97cf-bab563cbb131",
+          "type": "Organization"
+        },
+        "provider": {
+          "reference": "Practitioner/8085737b-28ec-4b23-8604-83fd20076933",
+          "type": "Practitioner"
+        },
+        "priority": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/processpriority",
+              "code": "normal",
+              "display": "Normal"
+            }
+          ]
+        },
+        "payee": {
+          "type": {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/payeetype",
+                "code": "provider",
+                "display": "Provider"
+              }
+            ]
+          },
+          "party": {
+            "reference": "Practitioner/8085737b-28ec-4b23-8604-83fd20076933",
+            "type": "Practitioner"
+          }
+        },
+        "claim": {
+          "reference": "Claim/1cee4a99-ef5d-406e-80de-3a9a1b47c445",
+          "type": "Claim"
+        },
+        "claimResponse": {
+          "reference": "ClaimResponse/8f7d38e5-2e5c-4d9a-b3c7-9f42f3d9e1b2",
+          "type": "ClaimResponse"
+        },
+        "outcome": "complete",
+        "diagnosis": [
+          {
+            "sequence": 1,
+            "diagnosisReference": {
+              "reference": "Condition/c7ae0606-d0df-4ffd-a535-91697eabf9d5",
+              "type": "Condition"
+            },
+            "onAdmission": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/ex-diagnosis-on-admission",
+                  "code": "y",
+                  "display": "Yes"
+                }
+              ]
+            }
+          }
+        ],
+        "procedure": [
+          {
+            "sequence": 1,
+            "date": "2020-03-02",
+            "procedureReference": {
+              "reference": "Procedure/8b9a9a37-4d83-4400-b32f-48f681fc2f88",
+              "type": "Procedure"
+            }
+          }
+        ],
+        "insurance": [
+          {
+            "focal": true,
+            "coverage": {
+              "reference": "Coverage/d91140ee-684a-487e-894f-2791f82e1888",
+              "type": "Coverage"
+            }
+          }
+        ],
+        "item": [
+          {
+            "sequence": 1,
+            "revenue": {
+              "coding": [
+                {
+                  "system": "https://build.fhir.org/ig/HL7/carin-bb/ValueSet-AHANUBCRevenueCodes.html",
+                  "code": "450",
+                  "display": "Emergency Room"
+                }
+              ]
+            },
+            "productOrService": {
+              "coding": [
+                {
+                  "system": "http://id.who.int/icd/release/10/2019,https://clinicaltables.nlm.nih.gov/api/hcpcs"
+                }
+              ]
+            },
+            "modifier": [
+              {
+                "coding": [
+                  {
+                    "system": "http://terminology.hl7.org/CodeSystem/modifiers"
+                  }
+                ]
+              }
+            ],
+            "servicedPeriod": {
+              "start": "2020-03-02",
+              "end": "2020-03-03"
+            }
+          },
+          {
+            "sequence": 2,
+            "revenue": {
+              "coding": [
+                {
+                  "system": "https://build.fhir.org/ig/HL7/carin-bb/ValueSet-AHANUBCRevenueCodes.html",
+                  "code": "123",
+                  "display": "Pediatric"
+                }
+              ]
+            },
+            "productOrService": {
+              "coding": [
+                {
+                  "system": "http://id.who.int/icd/release/10/2019,https://clinicaltables.nlm.nih.gov/api/hcpcs"
+                }
+              ]
+            },
+            "modifier": [
+              {
+                "coding": [
+                  {
+                    "system": "http://terminology.hl7.org/CodeSystem/modifiers"
+                  }
+                ]
+              }
+            ],
+            "servicedPeriod": {
+              "start": "2020-03-02",
+              "end": "2020-03-03"
+            }
+          },
+          {
+            "sequence": 3,
+            "revenue": {
+              "coding": [
+                {
+                  "system": "https://build.fhir.org/ig/HL7/carin-bb/ValueSet-AHANUBCRevenueCodes.html",
+                  "code": "410",
+                  "display": "Respiratory Services"
+                }
+              ]
+            },
+            "productOrService": {
+              "coding": [
+                {
+                  "system": "http://id.who.int/icd/release/10/2019,https://clinicaltables.nlm.nih.gov/api/hcpcs"
+                }
+              ]
+            },
+            "modifier": [
+              {
+                "coding": [
+                  {
+                    "system": "http://terminology.hl7.org/CodeSystem/modifiers"
+                  }
+                ]
+              }
+            ],
+            "servicedPeriod": {
+              "start": "2020-03-02",
+              "end": "2020-03-03"
+            }
+          },
+          {
+            "sequence": 4,
+            "revenue": {
+              "coding": [
+                {
+                  "system": "https://build.fhir.org/ig/HL7/carin-bb/ValueSet-AHANUBCRevenueCodes.html",
+                  "code": "250",
+                  "display": "Pharmacy (Also see 063X, an extension of 250X)"
+                }
+              ]
+            },
+            "productOrService": {
+              "coding": [
+                {
+                  "system": "http://id.who.int/icd/release/10/2019,https://clinicaltables.nlm.nih.gov/api/hcpcs"
+                }
+              ]
+            },
+            "modifier": [
+              {
+                "coding": [
+                  {
+                    "system": "http://terminology.hl7.org/CodeSystem/modifiers"
+                  }
+                ]
+              }
+            ],
+            "servicedPeriod": {
+              "start": "2020-03-02",
+              "end": "2020-03-03"
+            }
+          },
+          {
+            "sequence": 5,
+            "revenue": {
+              "coding": [
+                {
+                  "system": "https://build.fhir.org/ig/HL7/carin-bb/ValueSet-AHANUBCRevenueCodes.html",
+                  "code": "252",
+                  "display": "Nongeneric drugs"
+                }
+              ]
+            },
+            "productOrService": {
+              "coding": [
+                {
+                  "system": "http://id.who.int/icd/release/10/2019,https://clinicaltables.nlm.nih.gov/api/hcpcs"
+                }
+              ]
+            },
+            "modifier": [
+              {
+                "coding": [
+                  {
+                    "system": "http://terminology.hl7.org/CodeSystem/modifiers"
+                  }
+                ]
+              }
+            ],
+            "servicedPeriod": {
+              "start": "2020-03-02",
+              "end": "2020-03-03"
+            }
+          }
+        ],
+        "payment": {
+          "type": {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/ex-paymenttype",
+                "code": "complete",
+                "display": "Complete"
+              }
+            ]
+          },
+          "date": "2020-03-13",
+          "amount": {
+            "value": 3260.4,
+            "currency": "USD"
+          },
+          "identifier": {
+            "system": "http://better.health.insurance.com/fhir/paymentidentifier",
+            "value": "080633-1216-1962925"
+          }
+        },
+        "benefitPeriod": {
+          "start": "2018-11-04",
+          "end": "2019-11-04"
+        }
+      },
+      "search": {
+        "mode": "match"
+      },
+      "request": {
+        "method": "PUT",
+        "url": "ExplanationOfBenefit/4cf9dc47-5e71-47d0-b0ff-b283fe8dc47c"
+      }
+    },
+    {
       "fullUrl": "Observation/41ad774f-024f-4c16-b870-fb6702f389f9",
       "resource": {
         "resourceType": "Observation",
@@ -4585,11 +5005,11 @@
                   "coding": [
                     {
                       "system": "http://terminology.hl7.org/CodeSystem/v3-ParticipationType",
-                      "code": "PPRF",
-                      "display": "primary performer"
+                      "code": "LA",
+                      "display": "legal authenticator"
                     }
                   ],
-                  "text": "primary performer"
+                  "text": "legal authenticator"
                 },
                 "url": "http://hl7.org/fhir/StructureDefinition/event-performerFunction"
               },
@@ -4598,16 +5018,16 @@
                   "coding": [
                     {
                       "system": "http://terminology.hl7.org/CodeSystem/v3-ParticipationType",
-                      "code": "LA",
-                      "display": "legal authenticator"
+                      "code": "PPRF",
+                      "display": "primary performer"
                     }
                   ],
-                  "text": "legal authenticator"
+                  "text": "primary performer"
                 },
                 "url": "http://hl7.org/fhir/StructureDefinition/event-performerFunction"
               }
             ],
-            "reference": "Practioner/8085737b-28ec-4b23-8604-83fd20076933"
+            "reference": "Practitioner/8085737b-28ec-4b23-8604-83fd20076933"
           }
         ],
         "valueCodeableConcept": {
@@ -5134,7 +5554,7 @@
           "reference": "Patient/f288c654-6885-4f48-999c-48d776dc06af",
           "display": "Hyper A Unlucky"
         },
-        "onsetDateTime": "2023-09-05"
+        "onsetDateTime": "2023-09-05T00:00:00Z"
       },
       "search": {
         "mode": "match"
@@ -5213,7 +5633,7 @@
           "reference": "Patient/f288c654-6885-4f48-999c-48d776dc06af",
           "display": "Hyper A Unlucky"
         },
-        "onsetDateTime": "2023-12-15"
+        "onsetDateTime": "2023-12-15T00:00:00Z"
       },
       "search": {
         "mode": "match"
@@ -6023,7 +6443,8 @@
         "subject": {
           "reference": "Patient/f288c654-6885-4f48-999c-48d776dc06af",
           "type": "Patient"
-        }
+        },
+        "onsetDateTime": "2024-01-11T17:43:27.663+00:00"
       },
       "search": {
         "mode": "match"
@@ -6193,7 +6614,7 @@
           "reference": "Patient/f288c654-6885-4f48-999c-48d776dc06af"
         },
         "effectiveDateTime": "2000-04-04",
-        "issued": "2000-04-04",
+        "issued": "2000-04-04T00:00:00Z",
         "result": [
           {
             "reference": "Observation/6d22c4f2-1e19-42c7-8618-ed0f6b8e4f7b"
@@ -6366,7 +6787,8 @@
         "subject": {
           "reference": "Patient/f288c654-6885-4f48-999c-48d776dc06af",
           "type": "Patient"
-        }
+        },
+        "onsetDateTime": "2024-01-11T17:43:27.663+00:00"
       },
       "search": {
         "mode": "match"
@@ -6416,7 +6838,8 @@
         "subject": {
           "reference": "Patient/f288c654-6885-4f48-999c-48d776dc06af",
           "type": "Patient"
-        }
+        },
+        "onsetDateTime": "2023-05-17T17:43:27.663+00:00"
       },
       "search": {
         "mode": "match"
@@ -6638,7 +7061,7 @@
           "reference": "Patient/f288c654-6885-4f48-999c-48d776dc06af"
         },
         "effectiveDateTime": "2000-01-04",
-        "issued": "2000-01-04"
+        "issued": "2000-01-04T00:00:00Z"
       },
       "search": {
         "mode": "match"
@@ -6936,7 +7359,8 @@
         "subject": {
           "reference": "Patient/f288c654-6885-4f48-999c-48d776dc06af",
           "type": "Patient"
-        }
+        },
+        "onsetDateTime": "2021-02-19T17:43:27.663+00:00"
       },
       "search": {
         "mode": "match"
@@ -6986,7 +7410,8 @@
         "subject": {
           "reference": "Patient/f288c654-6885-4f48-999c-48d776dc06af",
           "type": "Patient"
-        }
+        },
+        "onsetDateTime": "2022-09-11T17:43:27.663+00:00"
       },
       "search": {
         "mode": "match"
