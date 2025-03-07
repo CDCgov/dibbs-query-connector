@@ -62,7 +62,6 @@ class FHIRClient {
    * @param params - The request parameters.
    * @returns The response from the server.
    */
-  @auditable(true)
   async post(path: string, params: Record<string, string>): Promise<Response> {
     const searchParams = new URLSearchParams(params);
 
