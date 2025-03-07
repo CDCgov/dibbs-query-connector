@@ -5,12 +5,12 @@ import { getDbClient } from "../dbClient";
 import { transaction } from "../../shared/decorators";
 
 class FhirServerConfigService {
-  private dbClient: Pool;
-  private cachedFhirServerConfigs: FhirServerConfig[] | null;
+  private static dbClient: Pool = getDbClient();
+  private static cachedFhirServerConfigs: FhirServerConfig[] | null = null;
 
   constructor() {
-    this.dbClient = getDbClient();
-    this.cachedFhirServerConfigs = null;
+    //FhirServerConfigService.dbClient = dbClient;
+    //FhirServerConfigService.cachedFhirServerConfigs = null;
   }
 
   /**
@@ -18,18 +18,21 @@ class FhirServerConfigService {
    * @param forceRefresh - Whether to flush the config cache
    * @returns The configuration for the FHIR server.
    */
-  async getFhirServerConfigs(forceRefresh = false) {
-    if (forceRefresh || this.cachedFhirServerConfigs === null) {
+  static async getFhirServerConfigs(forceRefresh = false) {
+    if (
+      forceRefresh ||
+      FhirServerConfigService.cachedFhirServerConfigs === null
+    ) {
       const query = `SELECT * FROM fhir_servers;`;
-      const result = await this.dbClient.query(query);
+      const result = await FhirServerConfigService.dbClient.query(query);
       const newServerConfigs = result.rows as FhirServerConfig[];
-      this.cachedFhirServerConfigs = newServerConfigs;
+      FhirServerConfigService.cachedFhirServerConfigs = newServerConfigs;
     }
-    return this.cachedFhirServerConfigs;
+    return FhirServerConfigService.cachedFhirServerConfigs;
   }
 
-  async getFhirServerNames(): Promise<string[]> {
-    const configs = await this.getFhirServerConfigs();
+  static async getFhirServerNames(): Promise<string[]> {
+    const configs = await getFhirServerConfigs();
     return configs.map((config) => config.name);
   }
 
@@ -40,7 +43,10 @@ class FhirServerConfigService {
    * @returns An object indicating success or failure with optional error message
    */
   @transaction
-  async updateFhirServerConnectionStatus(name: string, wasSuccessful: boolean) {
+  static async updateFhirServerConnectionStatus(
+    name: string,
+    wasSuccessful: boolean,
+  ) {
     const updateQuery = `
     UPDATE fhir_servers 
     SET 
@@ -51,13 +57,13 @@ class FhirServerConfigService {
   `;
 
     try {
-      const result = await this.dbClient.query(updateQuery, [
+      const result = await FhirServerConfigService.dbClient.query(updateQuery, [
         name,
         wasSuccessful,
       ]);
 
       // Clear the cache so the next getFhirServerConfigs call will fetch fresh data
-      this.cachedFhirServerConfigs = null;
+      FhirServerConfigService.cachedFhirServerConfigs = null;
 
       if (result.rows.length === 0) {
         return {
@@ -90,7 +96,7 @@ class FhirServerConfigService {
    * @returns An object indicating success or failure with optional error message
    */
   @transaction
-  async updateFhirServer(
+  static async updateFhirServer(
     id: string,
     name: string,
     hostname: string,
@@ -117,7 +123,7 @@ class FhirServerConfigService {
       let headers = {};
       if (bearerToken) {
         // Get existing headers if any
-        const existingServer = await this.dbClient.query(
+        const existingServer = await FhirServerConfigService.dbClient.query(
           "SELECT headers FROM fhir_servers WHERE id = $1",
           [id],
         );
@@ -133,7 +139,7 @@ class FhirServerConfigService {
         }
       } else {
         // Get existing headers if any and remove Authorization
-        const existingServer = await this.dbClient.query(
+        const existingServer = await FhirServerConfigService.dbClient.query(
           "SELECT headers FROM fhir_servers WHERE id = $1",
           [id],
         );
@@ -145,7 +151,7 @@ class FhirServerConfigService {
         }
       }
 
-      const result = await this.dbClient.query(updateQuery, [
+      const result = await FhirServerConfigService.dbClient.query(updateQuery, [
         id,
         name,
         hostname,
@@ -155,7 +161,7 @@ class FhirServerConfigService {
       ]);
 
       // Clear the cache so the next getFhirServerConfigs call will fetch fresh data
-      this.cachedFhirServerConfigs = null;
+      FhirServerConfigService.cachedFhirServerConfigs = null;
 
       if (result.rows.length === 0) {
         return {
@@ -187,7 +193,7 @@ class FhirServerConfigService {
    * @returns An object indicating success or failure with optional error message
    */
   @transaction
-  async insertFhirServer(
+  static async insertFhirServer(
     name: string,
     hostname: string,
     disableCertValidation: boolean,
@@ -212,7 +218,7 @@ class FhirServerConfigService {
         ? { Authorization: `Bearer ${bearerToken}` }
         : {};
 
-      const result = await this.dbClient.query(insertQuery, [
+      const result = await FhirServerConfigService.dbClient.query(insertQuery, [
         name,
         hostname,
         new Date(),
@@ -222,7 +228,7 @@ class FhirServerConfigService {
       ]);
 
       // Clear the cache so the next getFhirServerConfigs call will fetch fresh data
-      this.cachedFhirServerConfigs = null;
+      FhirServerConfigService.cachedFhirServerConfigs = null;
 
       return {
         success: true,
@@ -243,7 +249,7 @@ class FhirServerConfigService {
    * @returns An object indicating success or failure with optional error message
    */
   @transaction
-  async deleteFhirServer(id: string) {
+  static async deleteFhirServer(id: string) {
     const deleteQuery = `
     DELETE FROM fhir_servers 
     WHERE id = $1
@@ -251,10 +257,12 @@ class FhirServerConfigService {
   `;
 
     try {
-      const result = await this.dbClient.query(deleteQuery, [id]);
+      const result = await FhirServerConfigService.dbClient.query(deleteQuery, [
+        id,
+      ]);
 
       // Clear the cache so the next getFhirServerConfigs call will fetch fresh data
-      this.cachedFhirServerConfigs = null;
+      FhirServerConfigService.cachedFhirServerConfigs = null;
 
       if (result.rows.length === 0) {
         return {
@@ -277,17 +285,11 @@ class FhirServerConfigService {
   }
 }
 
-const configService = new FhirServerConfigService();
-
 export const getFhirServerConfigs =
-  configService.getFhirServerConfigs.bind(configService);
-export const getFhirServerNames =
-  configService.getFhirServerNames.bind(configService);
+  FhirServerConfigService.getFhirServerConfigs;
+export const getFhirServerNames = FhirServerConfigService.getFhirServerNames;
 export const updateFhirServerConnectionStatus =
-  configService.updateFhirServerConnectionStatus.bind(configService);
-export const updateFhirServer =
-  configService.updateFhirServer.bind(configService);
-export const insertFhirServer =
-  configService.insertFhirServer.bind(configService);
-export const deleteFhirServer =
-  configService.deleteFhirServer.bind(configService);
+  FhirServerConfigService.updateFhirServerConnectionStatus;
+export const updateFhirServer = FhirServerConfigService.updateFhirServer;
+export const insertFhirServer = FhirServerConfigService.insertFhirServer;
+export const deleteFhirServer = FhirServerConfigService.deleteFhirServer;
