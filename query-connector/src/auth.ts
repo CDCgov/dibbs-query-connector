@@ -2,7 +2,7 @@ import NextAuth from "next-auth";
 import KeycloakProvider from "next-auth/providers/keycloak";
 import { addUserIfNotExists, getUserRole } from "@/app/backend/user-management";
 import { isAuthDisabledServerCheck } from "./app/utils/auth";
-import { UserRole } from "./app/models/entities/user-management";
+import { UserRole } from "./app/models/entities/users";
 
 function addRealm(url: string) {
   return url.endsWith("/realms/master") ? url : `${url}/realms/master`;

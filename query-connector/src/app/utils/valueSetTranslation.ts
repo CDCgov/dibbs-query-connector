@@ -1,4 +1,4 @@
-import { DibbsConceptType, DibbsValueSet } from "../shared/constants";
+import { DibbsConceptType, DibbsValueSet } from "../models/entities/valuesets";
 
 export type ConceptTypeToDibbsVsMap = {
   [dibbsConceptType in DibbsConceptType]: {

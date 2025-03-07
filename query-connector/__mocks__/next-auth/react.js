@@ -1,6 +1,8 @@
 /* eslint-disable jsdoc/require-returns, jsdoc/require-param-description */
 // __mocks__/next-auth/react.js
-const useSession = jest.fn().mockReturnValue({ data: undefined });
+const useSession = jest
+  .fn()
+  .mockReturnValue({ data: undefined, status: "loading" });
 
 /**
  *

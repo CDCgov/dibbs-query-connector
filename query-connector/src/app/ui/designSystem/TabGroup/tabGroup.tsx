@@ -1,6 +1,5 @@
 "use client";
 import React, { useState } from "react";
-import Link from "next/link";
 import classNames from "classnames";
 import styles from "./tabGroup.module.scss";
 
@@ -41,15 +40,16 @@ const TabGroup: React.FC<TabGroupProps> = ({ tabs }) => {
     >
       {tabs.map((tab) => {
         return (
-          <Link
-            data-prevent-nprogress={true} // don't show loading bar when switching between tabs
+          <button
             key={tab.label}
-            className={tab.label == activeTab ? styles.tab__active : styles.tab}
-            href={tab.path || ""}
+            className={classNames(
+              "usa-button--unstyled",
+              tab.label == activeTab ? styles.tab__active : styles.tab,
+            )}
             onClick={(e) => handleTabClick(e)}
           >
             {tab.label}
-          </Link>
+          </button>
         );
       })}
     </div>

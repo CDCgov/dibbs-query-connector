@@ -1,5 +1,5 @@
-import { FhirServerConfig } from "../shared/constants";
 import https from "https";
+import { FhirServerConfig } from "../models/entities/fhir-servers";
 
 /**
  * A client for querying a FHIR server.

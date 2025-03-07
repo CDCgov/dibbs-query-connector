@@ -1,7 +1,7 @@
 import { Label } from "@trussworks/react-uswds";
 import classNames from "classnames";
 import React from "react";
-import { UserRole } from "../../../../models/entities/user-management";
+import { UserRole } from "../../../../models/entities/users";
 
 export interface RoleDropdownProps {
   id: string;

@@ -9,18 +9,14 @@ import {
   getUserRole,
 } from "@/app/backend/user-management";
 import { getDbClient } from "@/app/backend/dbClient";
-import { auth } from "@/auth";
-import { UserRole } from "@/app/models/entities/user-management";
+import { UserRole } from "@/app/models/entities/users";
 
 const dbClient = getDbClient();
-jest.mock("@/auth", () => ({
-  auth: jest.fn(),
-}));
 
 jest.mock("@/app/utils/auth", () => {
   return {
-    superAdminAccessCheck: jest.fn(() => Promise.resolve(true)),
-    adminAccessCheck: jest.fn(() => Promise.resolve(true)),
+    superAdminAccessCheck: jest.fn().mockResolvedValue(true),
+    adminAccessCheck: jest.fn().mockResolvedValue(true),
   };
 });
 
@@ -39,8 +35,6 @@ const TEST_SUPER_USER = {
   firstName: "Ima",
   lastName: "OtherUser",
 };
-
-(auth as jest.Mock).mockResolvedValue(TEST_USER);
 
 describe("User Management Integration Tests", () => {
   let createdUserId: string;

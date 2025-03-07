@@ -1,6 +1,6 @@
 "use server";
 
-import { User, UserGroup, UserRole } from "../models/entities/user-management";
+import { User, UserGroup, UserRole } from "../models/entities/users";
 import { QueryTableResult } from "../(pages)/queryBuilding/utils";
 import { QCResponse } from "../models/responses/collections";
 import { adminAccessCheck, superAdminAccessCheck } from "../utils/auth";
@@ -127,8 +127,7 @@ export async function updateUserRole(
  * @returns List of users registered in qc
  */
 export async function getUsers(): Promise<QCResponse<User>> {
-  if (!(await adminAccessCheck())) {
-    // admins need read access to users for group management
+  if (!(await superAdminAccessCheck())) {
     throw new Error("Unauthorized");
   }
 
@@ -265,7 +264,7 @@ export async function getUserGroupsForUser(
 export async function createUserGroup(
   groupName: string,
 ): Promise<UserGroup | string> {
-  if (!(await adminAccessCheck())) {
+  if (!(await superAdminAccessCheck())) {
     throw new Error("Unauthorized");
   }
 
@@ -310,7 +309,7 @@ export async function updateUserGroup(
   id: string,
   newName: string,
 ): Promise<UserGroup | string> {
-  if (!(await adminAccessCheck())) {
+  if (!(await superAdminAccessCheck())) {
     throw new Error("Unauthorized");
   }
 
@@ -361,7 +360,7 @@ export async function updateUserGroup(
  * @returns The deleted user group or an error if the deletion fails.
  */
 export async function deleteUserGroup(id: string): Promise<UserGroup | string> {
-  if (!(await adminAccessCheck())) {
+  if (!(await superAdminAccessCheck())) {
     throw new Error("Unauthorized");
   }
 

@@ -2,7 +2,7 @@
 
 import { createContext, useState } from "react";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
-import { User } from "@/app/models/entities/user-management";
+import { User } from "@/app/models/entities/users";
 import { QueryTableResult } from "../../queryBuilding/utils";
 
 export type SubjectType = "Members" | "Queries" | null;

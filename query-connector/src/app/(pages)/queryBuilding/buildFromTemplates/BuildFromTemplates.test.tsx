@@ -1,6 +1,5 @@
 import BuildFromTemplates from "@/app/(pages)/queryBuilding/buildFromTemplates/BuildFromTemplates";
 import {
-  DEFAULT_QUERIES,
   conditionIdToNameMap,
   categoryToConditionNameArrayMap,
   gonorreheaValueSets,
@@ -9,13 +8,12 @@ import {
 } from "@/app/(pages)/queryBuilding/fixtures";
 import { formatDiseaseDisplay } from "@/app/(pages)/queryBuilding/utils";
 import { getSavedQueryById } from "@/app/backend/query-building";
-import { DataContext } from "@/app/shared/DataProvider";
 import { USE_CASE_DETAILS } from "@/app/shared/constants";
 import {
   getConditionsData,
   getValueSetsAndConceptsByConditionIDs,
 } from "@/app/shared/database-service";
-import { renderWithUser } from "@/app/tests/unit/setup";
+import { renderWithUser, RootProviderMock } from "@/app/tests/unit/setup";
 import { screen, waitFor, within } from "@testing-library/dom";
 import {
   CONDITION_DRAWER_SEARCH_PLACEHOLDER,
@@ -34,18 +32,8 @@ jest.mock("../../../shared/database-service", () => ({
 jest.mock("../../../backend/query-building", () => ({
   getSavedQueryById: jest.fn(),
 }));
-const mockSetData = jest.fn();
-const mockSetCurrentPage = jest.fn();
-const mockSetToatConfig = jest.fn();
-const mockContextValue = {
-  data: DEFAULT_QUERIES,
-  setData: mockSetData,
-  currentPage: "/",
-  setCurrentPage: mockSetCurrentPage,
-  toastConfig: {},
-  setToastConfig: mockSetToatConfig,
-};
 
+const currentPage = "/";
 const GONORREHEA_ID = 15628003;
 const GONORREHEA_DETAILS = conditionIdToNameMap[GONORREHEA_ID];
 const GONORREHEA_NAME = formatDiseaseDisplay(GONORREHEA_DETAILS.name);
@@ -64,7 +52,7 @@ const GONORREHEA_NAME = formatDiseaseDisplay(GONORREHEA_DETAILS.name);
 describe("tests the build from template page interactions", () => {
   it("customize query button is disabled unless name and individual condition are defined", async () => {
     const { user } = renderWithUser(
-      <DataContext.Provider value={mockContextValue}>
+      <RootProviderMock currentPage={currentPage}>
         <BuildFromTemplates
           buildStep={"condition"}
           setBuildStep={jest.fn}
@@ -74,7 +62,7 @@ describe("tests the build from template page interactions", () => {
           }}
           setSelectedQuery={jest.fn}
         />
-      </DataContext.Provider>,
+      </RootProviderMock>,
     );
 
     expect(screen.getByText("Customize query")).toBeDisabled();
@@ -87,7 +75,7 @@ describe("tests the build from template page interactions", () => {
 
   it("search filters by category and by condition name", async () => {
     const { user } = renderWithUser(
-      <DataContext.Provider value={mockContextValue}>
+      <RootProviderMock currentPage={currentPage}>
         <BuildFromTemplates
           buildStep={"condition"}
           setBuildStep={jest.fn}
@@ -97,7 +85,7 @@ describe("tests the build from template page interactions", () => {
           }}
           setSelectedQuery={jest.fn}
         />
-      </DataContext.Provider>,
+      </RootProviderMock>,
     );
 
     expect(await screen.findByText(GONORREHEA_NAME)).toBeInTheDocument();
@@ -134,7 +122,7 @@ describe("tests the build from template page interactions", () => {
   });
   it("search filters reset properly", async () => {
     const { user } = renderWithUser(
-      <DataContext.Provider value={mockContextValue}>
+      <RootProviderMock currentPage={currentPage}>
         <BuildFromTemplates
           buildStep={"condition"}
           setBuildStep={jest.fn}
@@ -144,7 +132,7 @@ describe("tests the build from template page interactions", () => {
           }}
           setSelectedQuery={jest.fn}
         />
-      </DataContext.Provider>,
+      </RootProviderMock>,
     );
 
     expect(await screen.findByText(GONORREHEA_NAME)).toBeInTheDocument();
@@ -227,7 +215,7 @@ describe("tests the valueset selection page interactions", () => {
 
   beforeEach(async () => {
     render(
-      <DataContext.Provider value={mockContextValue}>
+      <RootProviderMock currentPage={currentPage}>
         <BuildFromTemplates
           buildStep={"valueset"}
           setBuildStep={jest.fn}
@@ -237,7 +225,7 @@ describe("tests the valueset selection page interactions", () => {
           }}
           setSelectedQuery={jest.fn}
         />
-      </DataContext.Provider>,
+      </RootProviderMock>,
     );
 
     await waitFor(() => {

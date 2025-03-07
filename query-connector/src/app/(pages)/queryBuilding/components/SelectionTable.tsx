@@ -3,11 +3,14 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import styles from "../buildFromTemplates/conditionTemplateSelection.module.scss";
 import { HeadingLevel } from "@trussworks/react-uswds";
 import ConceptTypeAccordionBody from "./SelectionViewAccordionBody";
-import { DibbsConceptType, DibbsValueSet } from "@/app/shared/constants";
 import { ConceptTypeToDibbsVsMap } from "@/app/utils/valueSetTranslation";
 import ConceptTypeAccordionHeader from "./SelectionViewAccordionHeader";
 import MultiAccordion from "@/app/ui/designSystem/MultiAccordion";
 import { filterVsTypeOptions } from "./utils";
+import {
+  DibbsConceptType,
+  DibbsValueSet,
+} from "@/app/models/entities/valuesets";
 
 type ConceptTypeSelectionTableProps = {
   vsTypeLevelOptions: ConceptTypeToDibbsVsMap;

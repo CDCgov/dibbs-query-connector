@@ -5,6 +5,7 @@
     text-decoration: none;
     padding-bottom: 0.5rem;
     margin-right: 1.5rem;
+    text-decoration: none;
     cursor: pointer;
     color: #757575;
 
@@ -12,5 +13,9 @@
         @extend .tab;
         font-weight: 700;
         border-bottom: 0.25rem solid #005ea2;
+    }
+
+    &:hover{
+        text-decoration: none;
     }
 }
