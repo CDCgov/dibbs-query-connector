@@ -1,6 +1,5 @@
-import { FhirServerConfig } from "../shared/constants";
+import { FhirServerConfig } from "./constants";
 import https from "https";
-
 /**
  * A client for querying a FHIR server.
  * @param server The FHIR server to query.
