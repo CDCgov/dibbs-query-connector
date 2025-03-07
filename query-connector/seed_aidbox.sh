@@ -78,7 +78,7 @@ INSERT INTO fhir_servers (
   disable_cert_validation
 ) VALUES (
   'Aidbox',
-  'http://aidbox:8082',
+  'http://localhost:8082/fhir',
   '{"Authorization": "Bearer ${TOKEN}"}'::jsonb,
   '${CURRENT_DATETIME}'::timestamp,
   true,
