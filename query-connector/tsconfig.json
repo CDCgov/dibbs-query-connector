@@ -41,5 +41,10 @@
     "./cypress.config.ts",
     "cypress",
     "**/*.cy.tsx"
-  ]
+  ],
+  "ts-node": {
+    "compilerOptions": {
+      "module": "CommonJS"
+    }
+  },
 }

@@ -1,15 +1,35 @@
 import { createLogger, transports, format } from "winston";
 
+// const logger = createLogger({
+//   transports: [new transports.Console()],
+//   format: format.combine(
+//     format.colorize(),
+//     format.timestamp(),
+//     format.printf(({ timestamp, level, message }) => {
+//       return `[${timestamp}] ${level}: ${message}`;
+//     })
+//   ),
+// });
+
+
 const logger = createLogger({
-  transports: [new transports.Console()],
+  transports: [
+    new transports.File({
+      dirname: "logs",
+      filename: "winston_example.log",
+    }),
+  ],
   format: format.combine(
-    format.colorize(),
     format.timestamp(),
-    format.printf(({ timestamp, level, message }) => {
-      return `[${timestamp}] ${level}: ${message}`;
+    format.printf(({ timestamp, level, message, service }) => {
+      return `[${timestamp}] ${service} ${level}: ${message}`;
     })
   ),
+  defaultMeta: {
+    service: "WinstonExample",
+  },
 });
+logger.info("trial")
 
 // Below are a few different examples of how to configure the logger and transports
 
