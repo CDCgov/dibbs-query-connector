@@ -9,7 +9,7 @@ import {
   saveQueryGroupMembership,
 } from "@/app/backend/usergroup-management";
 import { getDbClient } from "@/app/backend/dbClient";
-import { User, Query } from "@/app/models/entities/user-management";
+import { User, Query } from "@/app/models/entities/users";
 
 const dbClient = getDbClient();
 
@@ -18,10 +18,10 @@ jest.mock("@/app/utils/auth", () => ({
   adminAccessCheck: jest.fn(() => Promise.resolve(true)),
 }));
 
-const TEST_GROUP_ID = "00000000-0000-0000-0000-000000000000";
-const TEST_USER_1_ID = "00000000-0000-0000-0000-000000000001";
-const TEST_USER_2_ID = "00000000-0000-0000-0000-000000000002";
-const TEST_QUERY_ID = "00000000-0000-0000-0000-000000000003";
+const TEST_GROUP_ID = "00000000-0000-0000-0000-000000000001";
+const TEST_USER_1_ID = "00000000-0000-0000-0000-000000000002";
+const TEST_USER_2_ID = "00000000-0000-0000-0000-000000000003";
+const TEST_QUERY_ID = "00000000-0000-0000-0000-000000000004";
 
 describe("User Group and Query Membership Tests", () => {
   beforeAll(async () => {

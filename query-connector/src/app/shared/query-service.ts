@@ -3,13 +3,14 @@ import https from "https";
 import { Bundle, FhirResource } from "fhir/r4";
 
 import FHIRClient from "./fhirClient";
-import { DibbsValueSet, isFhirResource } from "../shared/constants";
+import { isFhirResource } from "../shared/constants";
 
 import { CustomQuery } from "./CustomQuery";
 import { GetPhoneQueryFormats } from "./format-service";
 import { getSavedQueryByName } from "./database-service";
 import { QueryDataColumn } from "../(pages)/queryBuilding/utils";
 import { getFhirServerConfigs } from "../backend/dbServices/fhir-servers";
+import { DibbsValueSet } from "../models/entities/valuesets";
 
 /**
  * The query response when the request source is from the Viewer UI.

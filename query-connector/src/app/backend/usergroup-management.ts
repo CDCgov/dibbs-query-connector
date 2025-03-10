@@ -1,5 +1,5 @@
 "use server";
-import { User, Query } from "../models/entities/user-management";
+import { User, Query } from "../models/entities/users";
 import { adminAccessCheck, superAdminAccessCheck } from "../utils/auth";
 import { getDbClient } from "./dbClient";
 const dbClient = getDbClient();
