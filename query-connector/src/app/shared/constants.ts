@@ -1,4 +1,5 @@
 import { FhirResource } from "fhir/r4";
+import { DibbsConceptType } from "../models/entities/valuesets";
 
 export const USE_CASE_DETAILS = {
   "newborn-screening": {
@@ -146,35 +147,8 @@ export const metadata = {
   description: "Try out TEFCA with queries for public health use cases.",
 };
 
-/*
- * The expected type of a ValueSet concept.
- */
-export interface Concept {
-  code: string;
-  display: string;
-  include: boolean;
-}
-
-/*
- * The expected type of a DIBBS ValueSet.
- */
-export interface DibbsValueSet {
-  valueSetId: string;
-  valueSetVersion: string;
-  valueSetName: string;
-  valueSetExternalId?: string;
-  author: string;
-  system: string;
-  ersdConceptType?: string;
-  dibbsConceptType: DibbsConceptType;
-  includeValueSet: boolean;
-  concepts: Concept[];
-  conditionId?: string;
-}
-
 export const DEFAULT_ERSD_VERSION = "3";
 
-export type DibbsConceptType = "labs" | "conditions" | "medications";
 export type ErsdConceptType =
   | "ostc"
   | "lotc"
@@ -226,17 +200,6 @@ export const INTENTIONAL_EMPTY_STRING_FOR_CONCEPT_VERSION = "";
 // in the migration schema
 export const INTENTIONAL_EMPTY_STRING_FOR_GEM_CODE = "";
 
-// Define the type for the FHIR server configurations
-export type FhirServerConfig = {
-  id: string;
-  name: string;
-  hostname: string;
-  last_connection_attempt: Date;
-  last_connection_successful: boolean;
-  headers: Record<string, string>;
-  disable_cert_validation: boolean;
-};
-
 export const INVALID_QUERY = `Query identified in the id param not found in the set of saved queries. Please provide an ID that exists in the saved set of queries.`;
 export const INVALID_FHIR_SERVERS = `Invalid fhir_server. Please provide a valid fhir_server.`;
 export const RESPONSE_BODY_IS_NOT_PATIENT_RESOURCE =
@@ -248,11 +211,3 @@ export const HL7_BODY_MISFORMAT =
   "Invalid HL7 request. Please add your HL7 message to the request body in between curly braces like so - { YOUR MESSAGE HERE } ";
 export const MISSING_PATIENT_IDENTIFIERS =
   "No patient identifiers to parse from requestBody.";
-
-// Type definition for CustomUserQueries
-export interface CustomUserQuery {
-  query_id: string;
-  query_name: string;
-  conditions_list?: string[];
-  valuesets: DibbsValueSet[];
-}

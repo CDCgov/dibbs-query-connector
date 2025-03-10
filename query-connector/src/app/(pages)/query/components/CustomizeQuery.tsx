@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from "react";
 import { Button } from "@trussworks/react-uswds";
-import { DibbsConceptType, DibbsValueSet } from "../../../shared/constants";
 import { FhirQueryResponse } from "@/app/shared/query-service";
 import LoadingView from "../../../ui/designSystem/LoadingView";
 import { showToastConfirmation } from "../../../ui/designSystem/toast/Toast";
@@ -14,7 +13,11 @@ import CustomizeQueryNav from "./customizeQuery/CustomizeQueryNav";
 import Backlink from "../../../ui/designSystem/backLink/Backlink";
 import { RETURN_LABEL } from "./stepIndicator/StepIndicator";
 import { generateValueSetGroupingsByDibbsConceptType } from "@/app/utils/valueSetTranslation";
-import { CustomUserQuery } from "@/app/shared/constants";
+import { CustomUserQuery } from "@/app/models/entities/query";
+import {
+  DibbsValueSet,
+  DibbsConceptType,
+} from "@/app/models/entities/valuesets";
 
 interface CustomizeQueryProps {
   fhirQueryResponse: FhirQueryResponse;

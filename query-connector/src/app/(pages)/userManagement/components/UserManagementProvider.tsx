@@ -1,8 +1,11 @@
 "use client";
 
 import { createContext, useState } from "react";
+import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
+import { User } from "@/app/models/entities/users";
+import { QueryTableResult } from "../../queryBuilding/utils";
 
-export type SubjectType = "Members" | "Query";
+export type SubjectType = "Members" | "Queries" | null;
 
 interface UserManagementData {
   teamQueryEditSection: {
@@ -10,8 +13,9 @@ interface UserManagementData {
     title: string;
     subtitle: string;
     placeholder: string;
-    subjectData: unknown;
+    groupId: string;
     subjectType: SubjectType;
+    subjectData: User[] | QueryTableResult[];
   };
 }
 
@@ -20,12 +24,13 @@ interface UserManagementContext extends UserManagementData {
     title: string,
     subtitle: string,
     subjectType: SubjectType,
-    subjectId: string,
+    groupId: string,
+    subjectData?: User[] | QueryTableResult[],
   ) => void;
   closeEditSection: () => void;
   handleSearch: (searchFilter: string) => void;
-  handleMemberUpdate: () => void;
-  handleQueryUpdate: () => void;
+  handleMemberUpdate: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleQueryUpdate: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 const initData: UserManagementData = {
@@ -34,8 +39,9 @@ const initData: UserManagementData = {
     title: "",
     subtitle: "",
     placeholder: "Search",
+    groupId: "",
+    subjectType: null,
     subjectData: [],
-    subjectType: "Members",
   },
 };
 
@@ -61,33 +67,24 @@ const DataProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
    * Event handlers for edit section
    */
   function closeEditSection() {
-    const newState: UserManagementData = {
-      ...innerState,
-      teamQueryEditSection: {
-        ...innerState.teamQueryEditSection,
-        isOpen: false,
-      },
-    };
-    setInnerState(newState);
+    setInnerState(initData);
   }
 
   function openEditSection(
     title: string,
     subtitle: string,
     subjectType: SubjectType,
-    subjectId: string,
+    id: string,
+    subjectData?: User[] | QueryTableResult[],
   ) {
-    let subjectData = null;
     let placeholder = "";
 
     if (subjectType == "Members") {
       placeholder = "Search members";
-      subjectData = getTeamMembers(subjectId);
     } else {
       placeholder = "Search queries";
-      subjectData = getTeamQueries(subjectId);
     }
-
+    const newData = subjectData ?? [];
     const newState: UserManagementData = {
       ...innerState,
       teamQueryEditSection: {
@@ -96,7 +93,8 @@ const DataProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
         subtitle,
         placeholder,
         subjectType,
-        subjectData,
+        groupId: id,
+        subjectData: newData,
         isOpen: true,
       },
     };
@@ -108,33 +106,50 @@ const DataProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     console.log("filtering ...", filter);
   }
 
-  function handleMemberUpdate() {
-    console.log("update team members");
+  function handleMemberUpdate(e: React.ChangeEvent<HTMLInputElement>) {
+    const user = e.currentTarget.labels?.[0].innerText;
+    const checked = e.target.checked;
+
+    const alertText = checked
+      ? `Added ${user} to ${innerState.teamQueryEditSection.title}`
+      : `Removed ${user} from ${innerState.teamQueryEditSection.title}`;
+
+    try {
+      showToastConfirmation({
+        body: alertText,
+      });
+    } catch (error) {
+      showToastConfirmation({
+        heading: "Something went wrong",
+        body: alertText,
+        variant: "error",
+      });
+      console.error("Error updating group member list:", error);
+    }
   }
 
-  function handleQueryUpdate() {
-    console.log("update team queries");
+  async function handleQueryUpdate(e: React.ChangeEvent<HTMLInputElement>) {
+    const queryName = e.currentTarget.name;
+    const checked = e.target.checked;
+
+    const alertText = checked
+      ? `Assigned ${queryName} to ${innerState.teamQueryEditSection.title}`
+      : `Removed ${queryName} from ${innerState.teamQueryEditSection.title}`;
+
+    try {
+      showToastConfirmation({
+        body: alertText,
+      });
+    } catch (error) {
+      showToastConfirmation({
+        heading: "Something went wrong",
+        body: alertText,
+        variant: "error",
+      });
+      console.error("Error updating group queries list:", error);
+    }
   }
 
-  /**
-   * Data fetching
-   */
-
-  function getTeamMembers(_teamId: string): unknown {
-    // TODO retrieve member data
-    const ListOfMembers = ["Member 1", "Member 2", "Member 3"];
-    return ListOfMembers;
-  }
-
-  function getTeamQueries(_teamId: string): unknown {
-    // TODO retrieve queries data
-    const ListOfQueries = ["Query 1", "Query 2", "Query 3"];
-    return ListOfQueries;
-  }
-
-  /**
-   * HTML
-   */
   return (
     <UserManagementContext.Provider
       value={{

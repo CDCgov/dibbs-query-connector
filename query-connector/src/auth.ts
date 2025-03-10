@@ -2,7 +2,7 @@ import NextAuth from "next-auth";
 import KeycloakProvider from "next-auth/providers/keycloak";
 import { addUserIfNotExists, getUserRole } from "@/app/backend/user-management";
 import { isAuthDisabledServerCheck } from "./app/utils/auth";
-import { RoleTypeValues } from "./app/models/entities/user-management";
+import { UserRole } from "./app/models/entities/users";
 
 function addRealm(url: string) {
   return url.endsWith("/realms/master") ? url : `${url}/realms/master`;
@@ -69,7 +69,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
         if (userToken.username !== "") {
           if (isAuthDisabledServerCheck()) {
-            userToken.role = RoleTypeValues.SuperAdmin;
+            userToken.role = UserRole.SUPER_ADMIN;
           } else {
             const role = await getUserRole(
               userToken.username as string,

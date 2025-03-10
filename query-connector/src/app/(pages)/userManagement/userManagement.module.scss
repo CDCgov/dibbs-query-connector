@@ -1,0 +1,23 @@
+.roleDescriptions {
+    margin: 2rem 0;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+
+    .textContainer {
+        flex: 1;
+        margin-right: 1rem;
+
+        &:last-of-type {
+            margin-right: 0;
+        }
+    }
+}
+
+.roleDropdown {
+    padding: 0.75rem !important;
+
+    select {
+        margin: 0 !important;
+    }
+}

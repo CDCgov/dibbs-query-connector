@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { usePathname } from "next/navigation";
 import { useSession, signIn, signOut } from "next-auth/react";
 import { Button, Icon } from "@trussworks/react-uswds";
 import styles from "./header.module.scss";
@@ -9,7 +8,8 @@ import { metadata } from "@/app/shared/constants";
 import classNames from "classnames";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { LOGGED_IN_PATHS, PAGES } from "@/app/shared/page-routes";
+import { getPagesInSettingsMenu, PAGES } from "@/app/shared/page-routes";
+import { UserRole } from "@/app/models/entities/users";
 
 /**
  * Produces the header.
@@ -23,6 +23,11 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
   const menuRef = useRef<HTMLDivElement>(null);
   const [showMenu, setShowMenu] = useState(false);
   const router = useRouter();
+  const { data: session, status } = useSession();
+  const isLoggedIn = status === "authenticated";
+  const userRole = authDisabled
+    ? UserRole.SUPER_ADMIN
+    : session?.user?.role || "";
 
   const outsideMenuClick = (event: MouseEvent) => {
     if (
@@ -41,12 +46,6 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
       document.removeEventListener("mousedown", outsideMenuClick);
     };
   }, [showMenu]);
-
-  const path = usePathname();
-
-  const { status } = useSession();
-
-  const isLoggedIn = status === "authenticated";
 
   const handleSignIn = () => {
     if (authDisabled) {
@@ -67,7 +66,7 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
   const toggleMenuDropdown = () => {
     setShowMenu(!showMenu);
   };
-  // const isProduction = process.env.NODE_ENV === "production";
+
   const landingPage: string =
     authDisabled || isLoggedIn ? PAGES.QUERY : PAGES.LANDING;
 
@@ -100,20 +99,17 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
               "flex-align-center",
             )}
           >
-            {!authDisabled &&
-              status === "unauthenticated" &&
-              !LOGGED_IN_PATHS.includes(path as PAGES) && (
-                <Button
-                  className={styles.signinButton}
-                  type="button"
-                  id="signin-button"
-                  title={"Sign in button"}
-                  onClick={handleSignIn}
-                >
-                  Sign in
-                </Button>
-              )}
-            {LOGGED_IN_PATHS.includes(path as PAGES) && (
+            {!authDisabled && status === "unauthenticated" ? (
+              <Button
+                className={styles.signinButton}
+                type="button"
+                id="signin-button"
+                title={"Sign in button"}
+                onClick={handleSignIn}
+              >
+                Sign in
+              </Button>
+            ) : (
               <button
                 onClick={toggleMenuDropdown}
                 className={classNames(
@@ -140,38 +136,21 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
           <div ref={menuRef} className={styles.menuDropdownContainer}>
             <ul
               id="dropdown-menu"
+              data-testid="dropdown-menu"
               className={classNames("usa-nav__submenu", styles.menuDropdown)}
             >
-              {/* TODO: Enable this once we can show/hide rules based on actual auth status */}
-              {/* {isProduction && ( */}
-              <>
-                <li className={styles.subMenuItem}>
+              {getPagesInSettingsMenu(userRole as UserRole).map((page) => (
+                <li key={page.path} className={styles.subMenuItem}>
                   <Link
                     className={styles.menuItem}
-                    href={PAGES.MY_QUERIES}
+                    href={page.path}
                     scroll={false}
                   >
-                    My Queries
+                    {page.name}
                   </Link>
                 </li>
-                <li className={styles.subMenuItem}>
-                  <Link
-                    className={styles.menuItem}
-                    href={PAGES.FHIR_SERVERS}
-                    scroll={false}
-                  >
-                    FHIR Servers
-                  </Link>
-                </li>
-                <li className={styles.subMenuItem}>
-                  <Link
-                    className={styles.menuItem}
-                    href={PAGES.USER_MANAGEMENT}
-                    scroll={false}
-                  >
-                    User Management
-                  </Link>
-                </li>
+              ))}
+              {!authDisabled && (
                 <li className={styles.subMenuItem}>
                   <button
                     className={classNames(
@@ -180,11 +159,10 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
                     )}
                     onClick={async () => await handleSignOut()}
                   >
-                    Log out
+                    Sign out
                   </button>
                 </li>
-              </>
-              {/* )} */}
+              )}
             </ul>
           </div>
         )}

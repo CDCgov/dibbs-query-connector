@@ -19,13 +19,14 @@ import {
   INVALID_QUERY,
   INVALID_MESSAGE_FORMAT,
 } from "@/app/shared/constants";
-import { getFhirServerNames } from "@/app/shared/database-service";
+
 import {
   mapDeprecatedUseCaseToId,
   parseHL7FromRequestBody,
   parsePatientDemographics,
 } from "./parsers";
 import { Message } from "node-hl7-client";
+import { getFhirServerNames } from "@/app/backend/fhir-servers";
 
 /**
  * @param request - A GET request as described by the Swagger docs
@@ -154,7 +155,6 @@ export async function POST(request: NextRequest) {
         phone,
         dob,
       ].every((e) => e === "");
-      console.log(firstName, lastName, mrn, phone, dob);
 
       if (noPatientIdentifierDefined) {
         return await handleAndReturnError(MISSING_PATIENT_IDENTIFIERS, 400);

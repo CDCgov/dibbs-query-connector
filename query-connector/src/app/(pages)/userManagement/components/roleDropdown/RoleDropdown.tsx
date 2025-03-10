@@ -1,12 +1,12 @@
 import { Label } from "@trussworks/react-uswds";
 import classNames from "classnames";
 import React from "react";
-import { RoleTypeValues } from "../../../models/entities/user-management";
+import { UserRole } from "../../../../models/entities/users";
 
 export interface RoleDropdownProps {
   id: string;
-  defaultValue: RoleTypeValues;
-  OnChange: (role: RoleTypeValues) => void;
+  defaultValue: UserRole;
+  OnChange: (role: UserRole) => void;
 }
 
 /**
@@ -24,9 +24,9 @@ const RoleDropdown: React.FC<RoleDropdownProps> = ({
   const selectId = `role-select-${id}`;
 
   const roleOptions = [
-    { label: "Super Admin", value: RoleTypeValues.SuperAdmin },
-    { label: "Admin", value: RoleTypeValues.Admin },
-    { label: "Standard", value: RoleTypeValues.Standard },
+    { label: "Super Admin", value: UserRole.SUPER_ADMIN },
+    { label: "Admin", value: UserRole.ADMIN },
+    { label: "Standard", value: UserRole.STANDARD },
   ];
 
   return (
@@ -38,8 +38,9 @@ const RoleDropdown: React.FC<RoleDropdownProps> = ({
         className="usa-select"
         defaultValue={defaultValue}
         id={selectId}
+        data-testid={selectId}
         onChange={(e) => {
-          OnChange(e?.target?.value as RoleTypeValues);
+          OnChange(e?.target?.value as UserRole);
         }}
       >
         {roleOptions.map((option) => (

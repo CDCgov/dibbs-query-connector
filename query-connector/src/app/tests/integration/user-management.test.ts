@@ -9,18 +9,15 @@ import {
   getUserRole,
 } from "@/app/backend/user-management";
 import { getDbClient } from "@/app/backend/dbClient";
-import { auth } from "@/auth";
-import { RoleTypeValues } from "@/app/models/entities/user-management";
+import { UserRole } from "@/app/models/entities/users";
+import { suppressConsoleLogs } from "./fixtures";
 
 const dbClient = getDbClient();
-jest.mock("@/auth", () => ({
-  auth: jest.fn(),
-}));
 
 jest.mock("@/app/utils/auth", () => {
   return {
-    superAdminAccessCheck: jest.fn(() => Promise.resolve(true)),
-    adminAccessCheck: jest.fn(() => Promise.resolve(true)),
+    superAdminAccessCheck: jest.fn().mockResolvedValue(true),
+    adminAccessCheck: jest.fn().mockResolvedValue(true),
   };
 });
 
@@ -32,21 +29,21 @@ const TEST_USER = {
   lastName: "User",
 };
 
-const TEST_SUPER_USER = {
-  id: "13e1efb2-5889-4157-8f34-78d7f02dbf78",
-  username: "Ima OtherUser",
-  email: "ima.otheruser@example.com",
-  firstName: "Ima",
-  lastName: "OtherUser",
-};
-
-(auth as jest.Mock).mockResolvedValue(TEST_USER);
+suppressConsoleLogs();
 
 describe("User Management Integration Tests", () => {
   let createdUserId: string;
 
   beforeAll(async () => {
     await dbClient.query("BEGIN");
+
+    // Insert first user as super admin
+    const insertSuperUsersQuery = `
+     INSERT INTO users (username, first_name, last_name, qc_role)
+     VALUES 
+       ('super-admin', 'admin', 'admin', 'Super Admin');
+   `;
+    await dbClient.query(insertSuperUsersQuery);
   });
 
   afterAll(async () => {
@@ -56,15 +53,12 @@ describe("User Management Integration Tests", () => {
   /**
    * Tests adding a new user if they do not already exist.
    */
-  test.each([
-    { user: TEST_SUPER_USER, role: RoleTypeValues.SuperAdmin },
-    { user: TEST_USER, role: RoleTypeValues.Standard },
-  ])("should add a user if they do not exist", async ({ user, role }) => {
-    const result = await addUserIfNotExists(user);
+  test("should add a user if they do not exist", async () => {
+    const result = await addUserIfNotExists(TEST_USER);
 
     expect(result).toHaveProperty("id");
-    expect(result).toHaveProperty("username", user.username);
-    expect(result).toHaveProperty("qc_role", role);
+    expect(result).toHaveProperty("username", TEST_USER.username);
+    expect(result).toHaveProperty("qc_role", UserRole.STANDARD);
     createdUserId = result.id;
   });
 
@@ -72,15 +66,17 @@ describe("User Management Integration Tests", () => {
    * Tests updating the role of an existing user.
    */
   test("should update a user's role", async () => {
-    const result = await updateUserRole(
-      createdUserId,
-      RoleTypeValues.SuperAdmin,
-    );
+    const result = await updateUserRole(createdUserId, UserRole.SUPER_ADMIN);
     expect(result.items).not.toBeNull();
-    expect(result.items![0]).toHaveProperty(
-      "qc_role",
-      RoleTypeValues.SuperAdmin,
-    );
+    expect(result.items![0]).toHaveProperty("qc_role", UserRole.SUPER_ADMIN);
+  });
+
+  /**
+   * Tests retrieving a user's role by username.
+   */
+  test("should retrieve user role by username", async () => {
+    const result = await getUserRole(TEST_USER.username);
+    expect(result).toBe(UserRole.SUPER_ADMIN);
   });
 
   /**
@@ -89,14 +85,6 @@ describe("User Management Integration Tests", () => {
   test("should retrieve all users", async () => {
     const result = await getUsers();
     expect(result.totalItems).toBeGreaterThan(0);
-  });
-
-  /**
-   * Tests retrieving a user's role by username.
-   */
-  test("should retrieve user role by username", async () => {
-    const result = await getUserRole(TEST_USER.username);
-    expect(result).toBe(RoleTypeValues.SuperAdmin);
   });
 });
 
@@ -115,16 +103,16 @@ describe("User Group Integration Tests", () => {
    * Tests creating a new user group.
    */
   test("should create a new user group", async () => {
-    const groupName = "Test Group";
+    const groupName = "Pilot Group";
     const result = await createUserGroup(groupName);
 
     expect(result).toHaveProperty("id");
     expect(result).toHaveProperty("name", groupName);
-    expect(result).toHaveProperty("memberSize", 0);
-    expect(result).toHaveProperty("querySize", 0);
+    expect(result).toHaveProperty("member_size", 0);
+    expect(result).toHaveProperty("query_size", 0);
 
     if (typeof result === "string") {
-      throw new Error(`Failed to create test group: ${result}`);
+      throw new Error(`Failed to create Pilot Group: ${result}`);
     }
 
     expect(result).toHaveProperty("id");
@@ -136,9 +124,9 @@ describe("User Group Integration Tests", () => {
    * Tests preventing duplicate user group creation.
    */
   test("should not create duplicate user group", async () => {
-    const result = await createUserGroup("Test Group");
+    const result = await createUserGroup("Pilot Group");
     expect(typeof result).toBe("string"); // It should return a string error
-    expect(result).toBe(`Group 'Test Group' already exists.`);
+    expect(result).toBe(`Group 'Pilot Group' already exists.`);
   });
 
   /**
