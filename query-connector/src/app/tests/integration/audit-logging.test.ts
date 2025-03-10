@@ -4,7 +4,6 @@ import {
 } from "@/app/backend/user-management";
 import { auth } from "@/auth";
 import { Bundle, BundleEntry, Patient } from "fhir/r4";
-import { getFhirServerConfigs, updateFhirServer } from "@/app/backend/dbServices/fhir-servers";
 import { getDbClient } from "@/app/backend/dbClient";
 import { NextRequest } from "next/server";
 import { POST } from "@/app/api/query/route";
@@ -71,14 +70,8 @@ describe("Audit Logging Integration Tests", () => {
     const result = await addUserIfNotExists(TEST_USER);
     const createdUserId = result.id;
 
-    const newresult = await updateUserRole(
-      createdUserId,
-      UserRole.SUPER_ADMIN,
-    );
-    expect(newresult.items![0]).toHaveProperty(
-      "qc_role",
-      UserRole.SUPER_ADMIN,
-    );
+    const newresult = await updateUserRole(createdUserId, UserRole.SUPER_ADMIN);
+    expect(newresult.items![0]).toHaveProperty("qc_role", UserRole.SUPER_ADMIN);
   });
 });
 
@@ -93,15 +86,15 @@ describe("Audit Log of FHIR Servers class", () => {
   });
 
   it("should audit and update to the fhir-servers class", async () => {
-    jest.mock("@/app/backend/dbServices/fhir-servers")
-    const fhirServer = require("@/app/backend/dbServices/fhir-servers")
+    jest.mock("@/app/backend/dbServices/fhir-servers");
+    const fhirServer = require("@/app/backend/dbServices/fhir-servers");
     // fhirServer. .mockImplementation(() => {
     //   return {
     //     FhirServerConfigService: jest.fn(() => dbClient.query("SELECT headers FROM fhir_servers WHERE id = $1",
     //     [SYPHILIS_QUERY_ID])),
     //   };
     // });
-    
+
     // expect(existingServer.mock.caller).toHaveBeenCalledWith("somedatahere");
     // expect(fhirServer).toHaveAttribute("somedatahere");
     // expect(existingServer).toBe("somedatahere");
@@ -133,8 +126,8 @@ describe("Audit Log of POST Query to FHIR Server", () => {
     //   name: 'Malignant neoplastic disease (disorder)',
     //   version: '20240901',
     //   category: 'Cancer'
-    });
+  });
 
-    //TO DO = once there's an actual DB write, we can check that the auditable query shows up as it should.
-    //Right now, it's generating console logs in the terminal, which doesn't make sense to test.
+  //TO DO = once there's an actual DB write, we can check that the auditable query shows up as it should.
+  //Right now, it's generating console logs in the terminal, which doesn't make sense to test.
 });
