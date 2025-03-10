@@ -4,13 +4,11 @@ import styles from "./selectQuery.module.scss";
 import { useEffect, useState } from "react";
 import { RETURN_LABEL } from "@/app/(pages)/query/components/stepIndicator/StepIndicator";
 import TitleBox from "../stepIndicator/TitleBox";
-import {
-  getCustomQueries,
-  getFhirServerNames,
-} from "@/app/shared/database-service";
-import { CustomUserQuery } from "@/app/shared/constants";
 import LoadingView from "../../../../ui/designSystem/LoadingView";
 import { showToastConfirmation } from "../../../../ui/designSystem/toast/Toast";
+import { getFhirServerNames } from "@/app/backend/fhir-servers";
+import { CustomUserQuery } from "@/app/models/entities/query";
+import { getCustomQueries } from "@/app/backend/query-building";
 
 type SelectSavedQueryProps = {
   selectedQuery: CustomUserQuery;
@@ -54,10 +52,13 @@ const SelectSavedQuery: React.FC<SelectSavedQueryProps> = ({
   const [queryOptions, setQueryOptions] = useState<CustomUserQuery[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
 
+  async function fetchFHIRServers() {
+    const servers = await getFhirServerNames();
+    setFhirServers(servers);
+  }
+
   useEffect(() => {
-    getFhirServerNames().then((servers) => {
-      setFhirServers(servers);
-    });
+    fetchFHIRServers();
   }, []);
 
   useEffect(() => {

@@ -1,6 +1,5 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { DibbsValueSet } from "../../../shared/constants";
 import CustomizeQuery from "./CustomizeQuery";
 import SelectSavedQuery from "./selectQuery/SelectSavedQuery";
 
@@ -11,7 +10,8 @@ import {
   fetchQueryValueSets,
 } from "./selectQuery/queryHooks";
 import LoadingView from "../../../ui/designSystem/LoadingView";
-import { CustomUserQuery } from "@/app/shared/constants";
+import { CustomUserQuery } from "@/app/models/entities/query";
+import { DibbsValueSet } from "@/app/models/entities/valuesets";
 
 interface SelectQueryProps {
   goForward: () => void;
