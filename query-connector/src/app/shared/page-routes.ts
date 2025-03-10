@@ -52,7 +52,12 @@ pagesConfig[PAGES.FHIR_SERVERS] = {
   roleAccess: [UserRole.SUPER_ADMIN],
 };
 
-pagesRoleAccess[PAGES.AUDIT_LOGS] = [UserRole.SUPER_ADMIN];
+pagesConfig[PAGES.AUDIT_LOGS] = {
+  position: 3,
+  path: PAGES.AUDIT_LOGS,
+  name: "Audit Logs",
+  roleAccess: [UserRole.SUPER_ADMIN],
+};
 
 /**
  * @param userRole - the logged in user's role
