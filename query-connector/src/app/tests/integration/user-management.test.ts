@@ -10,6 +10,7 @@ import {
 } from "@/app/backend/user-management";
 import { getDbClient } from "@/app/backend/dbClient";
 import { UserRole } from "@/app/models/entities/users";
+import { suppressConsoleLogs } from "./fixtures";
 
 const dbClient = getDbClient();
 
@@ -27,6 +28,8 @@ const TEST_USER = {
   firstName: "Ima",
   lastName: "User",
 };
+
+suppressConsoleLogs();
 
 describe("User Management Integration Tests", () => {
   let createdUserId: string;

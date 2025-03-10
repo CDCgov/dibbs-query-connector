@@ -10,6 +10,7 @@ import {
 } from "@/app/backend/usergroup-management";
 import { getDbClient } from "@/app/backend/dbClient";
 import { User, Query } from "@/app/models/entities/users";
+import { suppressConsoleLogs } from "./fixtures";
 
 const dbClient = getDbClient();
 
@@ -17,6 +18,8 @@ jest.mock("@/app/utils/auth", () => ({
   superAdminAccessCheck: jest.fn(() => Promise.resolve(true)),
   adminAccessCheck: jest.fn(() => Promise.resolve(true)),
 }));
+
+suppressConsoleLogs();
 
 const TEST_GROUP_ID = "00000000-0000-0000-0000-000000000001";
 const TEST_USER_1_ID = "00000000-0000-0000-0000-000000000002";
