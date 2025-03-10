@@ -113,8 +113,8 @@ describe("User Group and Query Membership Tests", () => {
     expect(result.length).toBe(2);
 
     const updatedUsers = await getUsersWithGroupStatus(TEST_GROUP_ID);
-    const members = updatedUsers.filter(
-      (user) => user.userGroupMemberships?.some((m) => m.is_member),
+    const members = updatedUsers.filter((user) =>
+      user.userGroupMemberships?.some((m) => m.is_member),
     );
 
     expect(members.length).toBe(2);
@@ -140,8 +140,8 @@ describe("User Group and Query Membership Tests", () => {
     expect(result).toContain(TEST_USER_2_ID);
 
     const updatedUsers = await getUsersWithGroupStatus(TEST_GROUP_ID);
-    const members = updatedUsers.filter(
-      (user) => user.userGroupMemberships?.some((m) => m.is_member),
+    const members = updatedUsers.filter((user) =>
+      user.userGroupMemberships?.some((m) => m.is_member),
     );
 
     expect(members.length).toBe(0);
@@ -205,8 +205,8 @@ describe("User Group and Query Membership Tests", () => {
 
     const updatedQueries: Query[] =
       await getQueriesWithGroupStatus(TEST_GROUP_ID);
-    const members = updatedQueries.filter(
-      (query) => query.userGroupMemberships?.some((m) => m.is_member),
+    const members = updatedQueries.filter((query) =>
+      query.userGroupMemberships?.some((m) => m.is_member),
     );
 
     expect(members.length).toBe(1);
@@ -228,8 +228,8 @@ describe("User Group and Query Membership Tests", () => {
     expect(result).toContain(TEST_QUERY_ID);
 
     const updatedQueries = await getQueriesWithGroupStatus(TEST_GROUP_ID);
-    const members = updatedQueries.filter(
-      (query) => query.userGroupMemberships?.some((m) => m.is_member),
+    const members = updatedQueries.filter((query) =>
+      query.userGroupMemberships?.some((m) => m.is_member),
     );
 
     expect(members.length).toBe(0);
