@@ -19,14 +19,13 @@ import {
   INVALID_QUERY,
   INVALID_MESSAGE_FORMAT,
 } from "@/app/shared/constants";
-
 import {
   mapDeprecatedUseCaseToId,
   parseHL7FromRequestBody,
   parsePatientDemographics,
 } from "./parsers";
 import { Message } from "node-hl7-client";
-import { getFhirServerNames } from "@/app/backend/fhir-servers";
+import { getFhirServerNames } from "@/app/backend/dbServices/fhir-servers";
 
 /**
  * @param request - A GET request as described by the Swagger docs
