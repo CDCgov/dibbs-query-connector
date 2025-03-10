@@ -10,6 +10,7 @@ import {
 } from "@/app/backend/user-management";
 import { getDbClient } from "@/app/backend/dbClient";
 import { UserRole } from "@/app/models/entities/users";
+import { suppressConsoleLogs } from "./fixtures";
 
 const dbClient = getDbClient();
 
@@ -28,9 +29,7 @@ const TEST_USER = {
   lastName: "User",
 };
 
-jest.spyOn(console, "log").mockImplementation(() => {});
-jest.spyOn(console, "warn").mockImplementation(() => {});
-jest.spyOn(console, "error").mockImplementation(() => {});
+suppressConsoleLogs();
 
 describe("User Management Integration Tests", () => {
   let createdUserId: string;
