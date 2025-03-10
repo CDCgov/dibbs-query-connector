@@ -173,3 +173,17 @@ graph TD
   class P1,P2,P3,P4,P5 pages;
   class I external;
 ```
+
+
+
+### Infrastructure Architecture Diagram
+
+
+**ECS Infrastructure**
+
+![ECS](./public/QC%20Architecture-ECS.jpg)
+
+
+
+**VM Infrastructure**
+![VM](./public/QC%20Architecture-VM.jpg)
