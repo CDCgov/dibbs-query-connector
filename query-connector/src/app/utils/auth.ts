@@ -38,6 +38,7 @@ export function isAuthDisabledServerCheck(): boolean {
  */
 export async function getLoggedInUser(): Promise<User | undefined> {
   const session = await auth();
+  console.log("mocked session: ", session);
   return session ? session.user : undefined;
 }
 

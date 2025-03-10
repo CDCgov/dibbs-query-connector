@@ -40,7 +40,7 @@ const TEST_SUPER_USER = {
 jest.spyOn(console, "log").mockImplementation(() => {});
 jest.spyOn(console, "warn").mockImplementation(() => {});
 jest.spyOn(console, "error").mockImplementation(() => {});
-(auth as jest.Mock).mockResolvedValue(TEST_USER);
+(auth as jest.Mock).mockResolvedValue(TEST_SUPER_USER);
 
 describe("User Management Integration Tests", () => {
   let createdUserId: string;
