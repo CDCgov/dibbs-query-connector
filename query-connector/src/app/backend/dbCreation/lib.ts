@@ -1,12 +1,9 @@
 // Lib file for any code that doesn't need to be async, which is a requirement
 // to export out the db-creation server component file
-import {
-  ErsdConceptType,
-  Concept,
-  ersdToDibbsConceptMap,
-  DibbsValueSet,
-} from "../../shared/constants";
+import { Concept } from "@/app/models/entities/concepts";
+import { ErsdConceptType, ersdToDibbsConceptMap } from "../../shared/constants";
 import { ValueSet as FhirValueSet } from "fhir/r4";
+import { DibbsValueSet } from "@/app/models/entities/valuesets";
 /**
  * Translates a VSAC FHIR bundle to our internal ValueSet struct
  * @param fhirValueset - The FHIR ValueSet response from VSAC

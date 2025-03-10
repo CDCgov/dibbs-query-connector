@@ -1,4 +1,4 @@
-import { DibbsConceptType } from "@/app/shared/constants";
+import { DibbsConceptType } from "@/app/models/entities/valuesets";
 import styles from "./customizeQuery.module.scss";
 import CustomizeQueryBulkSelect from "./CustomizeQueryBulkSelect";
 import { ConceptTypeToDibbsVsMap } from "@/app/utils/valueSetTranslation";

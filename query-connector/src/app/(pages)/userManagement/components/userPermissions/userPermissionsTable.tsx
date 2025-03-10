@@ -8,10 +8,9 @@ import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import Table from "../../../../ui/designSystem/table/Table";
 import RoleDropdown from "../roleDropdown/RoleDropdown";
 import { UserManagementContext } from "../UserManagementProvider";
-import { User, UserGroup } from "../../../../models/entities/user-management";
-import { UserRole } from "../../../../models/entities/user-management";
 import styles from "../../userManagement.module.scss";
 import { useSession } from "next-auth/react";
+import { UserRole, UserGroup, User } from "@/app/models/entities/users";
 
 type PermissionsProps = {
   users: User[] | null;
@@ -109,6 +108,14 @@ const UserPermissionsTable: React.FC<PermissionsProps> = ({
   };
 
   const renderUserRows = (users: User[] | null): React.ReactNode => {
+    if (users?.length == 0) {
+      return (
+        <tr>
+          <td colSpan={3}>No users found</td>
+        </tr>
+      );
+    }
+
     return users?.map((user: User) => {
       return (
         <tr key={user.id}>

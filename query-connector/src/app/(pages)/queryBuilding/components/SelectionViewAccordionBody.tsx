@@ -2,7 +2,6 @@ import styles from "../buildFromTemplates/conditionTemplateSelection.module.scss
 import React, { ChangeEvent, useEffect, useState } from "react";
 import ConceptSelection from "./ConceptSelection";
 import Drawer from "@/app/ui/designSystem/drawer/Drawer";
-import { Concept, DibbsValueSet } from "@/app/shared/constants";
 import Checkbox from "@/app/ui/designSystem/checkbox/Checkbox";
 import Highlighter from "react-highlight-words";
 import {
@@ -16,6 +15,8 @@ import { Tooltip } from "@trussworks/react-uswds";
 import TooltipWrapper, {
   TooltipWrapperProps,
 } from "@/app/ui/designSystem/Tooltip";
+import { DibbsValueSet } from "@/app/models/entities/valuesets";
+import { Concept } from "@/app/models/entities/concepts";
 
 type ConceptTypeAccordionBodyProps = {
   activeValueSets: { [vsId: string]: FilterableValueSet };

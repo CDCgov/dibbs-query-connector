@@ -1,13 +1,14 @@
 "use client";
 import classNames from "classnames";
-import { UserRole } from "@/app/models/entities/user-management";
+import { UserRole } from "@/app/models/entities/users";
 import WithAuth from "@/app/ui/components/withAuth/WithAuth";
 import UserManagementProvider from "./components/UserManagementProvider";
-import UsersTable from "./components/usersTable/usersTable";
+import ManagementTabs from "./components/managementTabs/managementTabs";
 import { getSessionRole } from "./utils";
 import { isAuthDisabledClientCheck } from "@/app/utils/auth";
 import { useContext } from "react";
 import { DataContext } from "@/app/shared/DataProvider";
+
 /**
  * Client side parent component for the User Management page
  * @returns the UserManagement component
@@ -41,7 +42,7 @@ const UserManagement: React.FC = () => {
           <span className={"text-bold"}>Admin:</span> Create, assign, and run
           queries
         </p>
-        <p className={classNames("grid-col-4")}>
+        <p className={classNames("grid-col-3")}>
           <span className={"text-bold"}>Standard:</span> Only run queries
         </p>
       </div>
@@ -54,7 +55,7 @@ const UserManagement: React.FC = () => {
         <h1 className="page-title">User management</h1>
         <UserManagementProvider>
           {role == UserRole.SUPER_ADMIN && renderRoleDescriptions()}
-          {role && <UsersTable role={role as UserRole} />}
+          {role && <ManagementTabs role={role as UserRole} />}
         </UserManagementProvider>
       </div>
     </WithAuth>

@@ -35,8 +35,6 @@ describe("User Groups table", () => {
       expect(screen.queryByText("Loading")).not.toBeInTheDocument();
     });
 
-    expect(document.body).toMatchSnapshot();
-
     const singleMemberBtn = screen.getByTestId(
       `edit-member-list-${allGroups.indexOf(mockGroupSingle)}`,
     );
@@ -65,5 +63,7 @@ describe("User Groups table", () => {
     expect(multiQueryBtn).toHaveTextContent(
       mockGroupMany.query_size + " queries",
     );
+
+    expect(document.body).toMatchSnapshot();
   });
 });

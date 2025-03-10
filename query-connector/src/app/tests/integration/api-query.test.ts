@@ -16,6 +16,9 @@ import {
   PATIENT_HL7_MESSAGE_NO_IDENTIFIERS,
 } from "./fixtures";
 
+jest.mock("next-auth");
+jest.mock("next-auth/providers/keycloak");
+
 // Utility function to create a minimal NextRequest-like object
 function createNextRequest(
   body: unknown,

@@ -1,8 +1,9 @@
-import { DibbsValueSet, hyperUnluckyPatient } from "@/app/shared/constants";
+import { hyperUnluckyPatient } from "@/app/shared/constants";
 import { getSavedQueryByName } from "@/app/shared/database-service";
 import { unnestValueSetsFromQuery } from "@/app/shared/utils";
 import { FhirQueryResponse, makeFhirQuery } from "@/app/shared/query-service";
 import { Patient } from "fhir/r4";
+import { DibbsValueSet } from "@/app/models/entities/valuesets";
 
 type SetStateCallback<T> = React.Dispatch<React.SetStateAction<T>>;
 

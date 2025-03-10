@@ -13,7 +13,6 @@ import {
 } from "../utils";
 import { ConceptTypeSelectionTable } from "./SelectionTable";
 import Drawer from "@/app/ui/designSystem/drawer/Drawer";
-import { DibbsConceptType, DibbsValueSet } from "@/app/shared/constants";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import SearchField from "@/app/ui/designSystem/searchField/SearchField";
 import {
@@ -21,6 +20,10 @@ import {
   VALUESET_SELECTION_SEARCH_PLACEHOLDER,
 } from "./utils";
 import Highlighter from "react-highlight-words";
+import {
+  DibbsConceptType,
+  DibbsValueSet,
+} from "@/app/models/entities/valuesets";
 
 type ConditionSelectionProps = {
   constructedQuery: NestedQuery;

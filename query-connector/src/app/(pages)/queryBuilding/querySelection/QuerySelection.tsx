@@ -1,6 +1,5 @@
 "use client";
 
-import { getCustomQueries } from "@/app/shared/database-service";
 import LoadingView from "@/app/ui/designSystem/LoadingView";
 import {
   useContext,
@@ -14,7 +13,9 @@ import MyQueriesDisplay from "./QueryLibrary";
 import { SelectedQueryDetails, SelectedQueryState } from "./utils";
 import { BuildStep } from "@/app/shared/constants";
 import { DataContext } from "@/app/shared/DataProvider";
-import { CustomUserQuery } from "@/app/shared/constants";
+import { CustomUserQuery } from "@/app/models/entities/query";
+import { getQueryList } from "@/app/backend/query-building";
+import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 
 type QuerySelectionProps = {
   selectedQuery: SelectedQueryState;
@@ -36,6 +37,7 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({
   setBuildStep,
   setSelectedQuery,
 }) => {
+  const [unauthorizedError, setUnauthorizedError] = useState(false);
   const queriesContext = useContext(DataContext);
   const [loading, setLoading] = useState(true);
 
@@ -44,9 +46,16 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({
     if (queriesContext?.data === null || queriesContext?.data === undefined) {
       const fetchQueries = async () => {
         try {
-          const queries = await getCustomQueries();
+          const queries = await getQueryList();
           queriesContext?.setData(queries);
         } catch (error) {
+          if (error == "Error: Unauthorized") {
+            setUnauthorizedError(true);
+            showToastConfirmation({
+              body: "You are not authorized to see queries.",
+              variant: "error",
+            });
+          }
           console.error("Failed to fetch queries:", error);
         } finally {
           setLoading(false);
@@ -65,7 +74,7 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({
   const queries = (queriesContext?.data || []) as CustomUserQuery[];
   return (
     <>
-      {queries.length === 0 ? (
+      {queries.length === 0 && !unauthorizedError ? (
         <div className="main-container__wide">
           <EmptyQueriesDisplay
             goForward={() => {

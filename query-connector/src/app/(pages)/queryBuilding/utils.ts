@@ -1,4 +1,4 @@
-import { DibbsValueSet } from "../../shared/constants";
+import { DibbsValueSet } from "@/app/models/entities/valuesets";
 import { ConceptTypeToDibbsVsMap } from "../../utils/valueSetTranslation";
 
 // The structure of the data that's coming from the backend

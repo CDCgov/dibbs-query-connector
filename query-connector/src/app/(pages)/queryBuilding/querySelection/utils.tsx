@@ -1,10 +1,10 @@
 import { ModalRef } from "@/app/ui/designSystem/modal/Modal";
 import { DeleteModal } from "@/app/ui/designSystem/modal/deleteModal";
 import { RefObject } from "react";
-import { CustomUserQuery } from "../../../shared/constants";
-import { deleteQueryById } from "@/app/shared/database-service";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import { DataContextValue } from "@/app/shared/DataProvider";
+import { deleteQueryById } from "@/app/backend/query-building";
+import { CustomUserQuery } from "@/app/models/entities/query";
 
 /**
  * Handles deleting a user query.

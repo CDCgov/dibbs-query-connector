@@ -1,13 +1,12 @@
 "use client";
 
 import React, { useContext } from "react";
-import { UserRole } from "@/app/models/entities/user-management";
+import { UserRole } from "@/app/models/entities/users";
 import { useSession } from "next-auth/react";
 import { redirect, usePathname } from "next/navigation";
-import { pagesRoleAccess } from "@/app/shared/page-routes";
+import { pagesConfig } from "@/app/shared/page-routes";
 import { DataContext } from "@/app/shared/DataProvider";
 import { isAuthDisabledClientCheck } from "@/app/utils/auth";
-import { getSessionRole } from "@/app/(pages)/userManagement/utils";
 
 /**
  * @param root0 AuthPageGuard component props
@@ -17,12 +16,12 @@ import { getSessionRole } from "@/app/(pages)/userManagement/utils";
  * unless auth is disabled in which case the component will render without issues.
  */
 const WithAuth: React.FC<React.PropsWithChildren> = ({ children }) => {
-  const { status } = useSession();
-  const role = getSessionRole();
+  const { status, data: session } = useSession();
+  const role = session?.user?.role || "";
   const ctx = useContext(DataContext);
   const isAuthDisabled = isAuthDisabledClientCheck(ctx?.runtimeConfig);
   const path = usePathname();
-  const access = pagesRoleAccess[path] ?? [];
+  const access = pagesConfig[path]?.roleAccess ?? [];
 
   if (
     isAuthDisabled ||
