@@ -177,6 +177,17 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
                     </Link>
                   </li>
                 )}
+                {(authDisabled || role == UserRole.SUPER_ADMIN) && (
+                  <li className={styles.subMenuItem}>
+                    <Link
+                      className={styles.menuItem}
+                      href={PAGES.AUDIT_LOGS}
+                      scroll={false}
+                    >
+                      Audit Logs
+                    </Link>
+                  </li>
+                )}
                 <li className={styles.subMenuItem}>
                   <button
                     className={classNames(
