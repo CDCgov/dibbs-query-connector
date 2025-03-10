@@ -1,17 +1,12 @@
 "use server";
 import { Pool } from "pg";
-import { FhirServerConfig } from "../../shared/constants";
 import { getDbClient } from "../dbClient";
 import { transaction } from "../../shared/decorators";
+import { FhirServerConfig } from "@/app/models/entities/fhir-servers";
 
 class FhirServerConfigService {
   private static dbClient: Pool = getDbClient();
   private static cachedFhirServerConfigs: FhirServerConfig[] | null = null;
-
-  constructor() {
-    //FhirServerConfigService.dbClient = dbClient;
-    //FhirServerConfigService.cachedFhirServerConfigs = null;
-  }
 
   /**
    * Fetches the configuration for a FHIR server from the database.

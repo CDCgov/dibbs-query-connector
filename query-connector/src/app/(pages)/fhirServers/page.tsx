@@ -1,6 +1,12 @@
 "use client";
 
 import { Icon, Label, TextInput } from "@trussworks/react-uswds";
+import {
+  insertFhirServer,
+  updateFhirServer,
+  deleteFhirServer,
+  getFhirServerConfigs,
+} from "@/app/backend/dbServices/fhir-servers";
 import dynamic from "next/dynamic";
 import { useEffect, useState, useRef } from "react";
 import type { ModalRef } from "../../ui/designSystem/modal/Modal";
@@ -11,15 +17,10 @@ import Checkbox from "../../ui/designSystem/checkbox/Checkbox";
 
 // Dynamic import with proper typing for Modal
 import type { ModalProps } from "../../ui/designSystem/modal/Modal";
-import {
-  insertFhirServer,
-  updateFhirServer,
-  deleteFhirServer,
-} from "@/app/backend/dbServices/fhir-servers";
+
 import WithAuth from "@/app/ui/components/withAuth/WithAuth";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import { FhirServerConfig } from "@/app/models/entities/fhir-servers";
-import { getFhirServerConfigs } from "@/app/backend/dbServices/fhir-servers";
 
 const Modal = dynamic<ModalProps>(
   () => import("../../ui/designSystem/modal/Modal").then((mod) => mod.Modal),

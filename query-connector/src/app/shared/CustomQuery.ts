@@ -202,7 +202,6 @@ export class CustomQuery {
     };
   }
 
-  @auditable()
   compileAllPostRequests() {
     return Object.values(this.fhirResourceQueries)
       .map((q) => {
