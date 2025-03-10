@@ -40,6 +40,9 @@ const TEST_SUPER_USER = {
   lastName: "OtherUser",
 };
 
+jest.spyOn(console, "log").mockImplementation(() => {});
+jest.spyOn(console, "warn").mockImplementation(() => {});
+jest.spyOn(console, "error").mockImplementation(() => {});
 (auth as jest.Mock).mockResolvedValue(TEST_USER);
 
 describe("User Management Integration Tests", () => {
@@ -51,6 +54,7 @@ describe("User Management Integration Tests", () => {
 
   afterAll(async () => {
     await dbClient.query("ROLLBACK");
+    jest.resetAllMocks();
   });
 
   /**

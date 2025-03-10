@@ -154,7 +154,6 @@ export async function POST(request: NextRequest) {
         phone,
         dob,
       ].every((e) => e === "");
-      console.log(firstName, lastName, mrn, phone, dob);
 
       if (noPatientIdentifierDefined) {
         return await handleAndReturnError(MISSING_PATIENT_IDENTIFIERS, 400);
