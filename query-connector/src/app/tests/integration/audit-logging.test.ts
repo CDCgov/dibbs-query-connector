@@ -8,8 +8,8 @@ import { getDbClient } from "@/app/backend/dbClient";
 import { NextRequest } from "next/server";
 import { POST } from "@/app/api/query/route";
 import { readJsonFile } from "../shared_utils/readJsonFile";
-import { RoleTypeValues } from "@/app/models/entities/user-management";
 import { USE_CASE_DETAILS } from "@/app/shared/constants";
+import { UserRole } from "@/app/models/entities/users";
 
 // Utility function to create a minimal NextRequest-like object
 function createNextRequest(
@@ -70,14 +70,8 @@ describe("Audit Logging Integration Tests", () => {
     const result = await addUserIfNotExists(TEST_USER);
     const createdUserId = result.id;
 
-    const newresult = await updateUserRole(
-      createdUserId,
-      RoleTypeValues.SuperAdmin,
-    );
-    expect(newresult.items![0]).toHaveProperty(
-      "qc_role",
-      RoleTypeValues.SuperAdmin,
-    );
+    const newresult = await updateUserRole(createdUserId, UserRole.SUPER_ADMIN);
+    expect(newresult.items![0]).toHaveProperty("qc_role", UserRole.SUPER_ADMIN);
   });
 });
 
