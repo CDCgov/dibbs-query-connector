@@ -10,7 +10,6 @@ import {
 } from "@/app/backend/user-management";
 import { getDbClient } from "@/app/backend/dbClient";
 import { UserRole } from "@/app/models/entities/users";
-import { auth } from "@/auth";
 
 const dbClient = getDbClient();
 
@@ -29,18 +28,9 @@ const TEST_USER = {
   lastName: "User",
 };
 
-const TEST_SUPER_USER = {
-  id: "13e1efb2-5889-4157-8f34-78d7f02dbf78",
-  username: "Ima OtherUser",
-  email: "ima.otheruser@example.com",
-  firstName: "Ima",
-  lastName: "OtherUser",
-};
-
 jest.spyOn(console, "log").mockImplementation(() => {});
 jest.spyOn(console, "warn").mockImplementation(() => {});
 jest.spyOn(console, "error").mockImplementation(() => {});
-(auth as jest.Mock).mockResolvedValue(TEST_SUPER_USER);
 
 describe("User Management Integration Tests", () => {
   let createdUserId: string;
@@ -59,7 +49,6 @@ describe("User Management Integration Tests", () => {
 
   afterAll(async () => {
     await dbClient.query("ROLLBACK");
-    jest.resetAllMocks();
   });
 
   /**
