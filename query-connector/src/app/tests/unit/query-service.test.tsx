@@ -8,6 +8,10 @@ import { readJsonFile } from "../shared_utils/readJsonFile";
 import { DiagnosticReport, Observation } from "fhir/r4";
 import fetch from "node-fetch";
 
+jest.mock("@/app/utils/auth", () => ({
+  superAdminAccessCheck: jest.fn().mockReturnValue(true),
+}));
+
 // Test case for processResponse
 describe("process response", () => {
   it("should unpack a response from the server into an array of resources", async () => {

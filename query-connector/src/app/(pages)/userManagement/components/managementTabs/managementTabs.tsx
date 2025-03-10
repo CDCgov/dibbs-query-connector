@@ -2,17 +2,11 @@
 
 import { useEffect, useState } from "react";
 import UserManagementDrawer from "../teamQueryEditSection/TeamQueryEditSection";
-
-import UserGroups from "../userGroups/UserGroupsTable";
+import UserGroupsTable from "../userGroups/UserGroupsTable";
 import TabGroup, { Tab } from "@/app/ui/designSystem/TabGroup/tabGroup";
-
 import UserPermissionsTable from "../userPermissions/userPermissionsTable";
 import { QCResponse } from "@/app/models/responses/collections";
-import {
-  User,
-  UserGroup,
-  UserRole,
-} from "../../../../models/entities/user-management";
+import { User, UserGroup, UserRole } from "../../../../models/entities/users";
 import {
   getUsers,
   getUserGroups,
@@ -21,17 +15,17 @@ import {
 } from "@/app/backend/user-management";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 
-export type UsersTableProps = {
+export type ManagementTabsProps = {
   role: string;
 };
 
 /**
- * UsersTable container component
- * @param root0 - UsersTable container props
+ * ManagementTabs container component
+ * @param root0 - ManagementTabs container props
  * @param root0.role - The permissions role of the current logged-in user
- * @returns The UsersTable container component
+ * @returns The ManagementTabs container component
  */
-const UsersTable: React.FC<UsersTableProps> = ({ role }) => {
+const ManagementTabs: React.FC<ManagementTabsProps> = ({ role }) => {
   const [activeTab, setActiveTab] = useState<Tab>();
   const [users, setUsers] = useState<User[]>([]);
   const [userGroups, setUserGroups] = useState<UserGroup[]>([]);
@@ -57,30 +51,24 @@ const UsersTable: React.FC<UsersTableProps> = ({ role }) => {
       label: "Users",
       access: [UserRole.SUPER_ADMIN],
       onClick: setTab,
-      renderContent: () =>
-        users.length > 0 ? (
-          <UserPermissionsTable
-            fetchGroupMembers={fetchGroupMembers}
-            users={users}
-          />
-        ) : (
-          <div className="empty-response">No users found</div>
-        ),
+      renderContent: () => (
+        <UserPermissionsTable
+          fetchGroupMembers={fetchGroupMembers}
+          users={users}
+        />
+      ),
     },
     {
       label: "User groups",
       access: [UserRole.SUPER_ADMIN, UserRole.ADMIN],
       onClick: setTab,
-      renderContent: () =>
-        userGroups.length > 0 ? (
-          <UserGroups
-            fetchGroupMembers={fetchGroupMembers}
-            fetchGroupQueries={fetchGroupQueries}
-            userGroups={userGroups}
-          />
-        ) : (
-          <div className="empty-response">No user groups found</div>
-        ),
+      renderContent: () => (
+        <UserGroupsTable
+          fetchGroupMembers={fetchGroupMembers}
+          fetchGroupQueries={fetchGroupQueries}
+          userGroups={userGroups}
+        />
+      ),
     },
   ];
   const tabsForRole = sections.filter((tab) => tab.access?.includes(role));
@@ -137,4 +125,4 @@ const UsersTable: React.FC<UsersTableProps> = ({ role }) => {
   );
 };
 
-export default UsersTable;
+export default ManagementTabs;

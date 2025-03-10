@@ -5,11 +5,7 @@ import { Checkbox } from "@trussworks/react-uswds";
 import Drawer from "@/app/ui/designSystem/drawer/Drawer";
 import { UserManagementContext } from "../UserManagementProvider";
 import style from "./TeamQueryEditSection.module.scss";
-import {
-  User,
-  UserGroup,
-  UserRole,
-} from "@/app/models/entities/user-management";
+import { User, UserGroup, UserRole } from "@/app/models/entities/users";
 import { QueryTableResult } from "@/app/(pages)/queryBuilding/utils";
 import { getSessionRole } from "../../utils";
 

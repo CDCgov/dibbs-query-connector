@@ -1,6 +1,6 @@
 import { waitFor, screen, render } from "@testing-library/react";
 import * as UserManagementBackend from "@/app/backend/user-management";
-import { UserRole } from "@/app/models/entities/user-management";
+import { UserRole } from "@/app/models/entities/users";
 import { renderWithUser, RootProviderMock } from "@/app/tests/unit/setup";
 import UserPermissionsTable from "./userPermissionsTable";
 import {
