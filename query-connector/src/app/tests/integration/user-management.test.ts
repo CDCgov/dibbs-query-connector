@@ -10,6 +10,7 @@ import {
 } from "@/app/backend/user-management";
 import { getDbClient } from "@/app/backend/dbClient";
 import { UserRole } from "@/app/models/entities/users";
+import { auth } from "@/auth";
 
 const dbClient = getDbClient();
 
@@ -39,6 +40,7 @@ const TEST_SUPER_USER = {
 jest.spyOn(console, "log").mockImplementation(() => {});
 jest.spyOn(console, "warn").mockImplementation(() => {});
 jest.spyOn(console, "error").mockImplementation(() => {});
+(auth as jest.Mock).mockResolvedValue(TEST_USER);
 
 describe("User Management Integration Tests", () => {
   let createdUserId: string;
