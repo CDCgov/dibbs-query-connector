@@ -1,4 +1,4 @@
-import { UserRole } from "../models/entities/user-management";
+import { UserRole } from "../models/entities/users";
 
 /**
  * Pathnames
@@ -12,26 +12,54 @@ export enum PAGES {
   AUDIT_LOGS = "/auditLogs",
 }
 
+interface Page {
+  position: number;
+  path: string;
+  name: string;
+  roleAccess: UserRole[];
+}
 /**
- * Role access per page
+ * Pages configuration
  */
-export const pagesRoleAccess: Record<string, UserRole[]> = {};
 
-pagesRoleAccess[PAGES.QUERY] = [
-  UserRole.SUPER_ADMIN,
-  UserRole.ADMIN,
-  UserRole.STANDARD,
-];
+export const pagesConfig: Record<string, Page> = {};
 
-pagesRoleAccess[PAGES.QUERY_BUILDING] = [UserRole.SUPER_ADMIN, UserRole.ADMIN];
+pagesConfig[PAGES.QUERY] = {
+  position: 0,
+  path: PAGES.QUERY,
+  name: "Run query",
+  roleAccess: [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.STANDARD],
+};
 
-pagesRoleAccess[PAGES.FHIR_SERVERS] = [UserRole.SUPER_ADMIN, UserRole.ADMIN];
+pagesConfig[PAGES.QUERY_BUILDING] = {
+  position: 1,
+  path: PAGES.QUERY_BUILDING,
+  name: "Query library",
+  roleAccess: [UserRole.SUPER_ADMIN, UserRole.ADMIN],
+};
 
-pagesRoleAccess[PAGES.USER_MANAGEMENT] = [UserRole.SUPER_ADMIN, UserRole.ADMIN];
+pagesConfig[PAGES.USER_MANAGEMENT] = {
+  position: 2,
+  path: PAGES.USER_MANAGEMENT,
+  name: "User management",
+  roleAccess: [UserRole.SUPER_ADMIN, UserRole.ADMIN],
+};
+
+pagesConfig[PAGES.FHIR_SERVERS] = {
+  position: 3,
+  path: PAGES.FHIR_SERVERS,
+  name: "FHIR servers",
+  roleAccess: [UserRole.SUPER_ADMIN],
+};
 
 pagesRoleAccess[PAGES.AUDIT_LOGS] = [UserRole.SUPER_ADMIN];
 
 /**
- * List of pages behind authentication (display in the menu)
+ * @param userRole - the logged in user's role
+ * @returns List of pages that will display in the settings menu based on the user's role
  */
-export const LOGGED_IN_PATHS = Object.keys(pagesRoleAccess);
+export function getPagesInSettingsMenu(userRole: UserRole): Page[] {
+  return Object.values(pagesConfig)
+    .filter((page: Page) => page.roleAccess.includes(userRole))
+    .sort((a, b) => (a.position > b.position ? 1 : -1));
+}
