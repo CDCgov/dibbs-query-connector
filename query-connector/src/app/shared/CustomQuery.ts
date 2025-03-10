@@ -1,5 +1,4 @@
 import { QueryDataColumn } from "../(pages)/queryBuilding/utils";
-import { auditable } from "./decorators";
 
 /**
  * A Data Class designed to store and manipulate various code values used
