@@ -4,10 +4,12 @@ import {
 } from "@/app/backend/user-management";
 import { auth } from "@/auth";
 import { Bundle, BundleEntry, Patient } from "fhir/r4";
+import { getFhirServerConfigs, updateFhirServer } from "@/app/backend/dbServices/fhir-servers";
 import { getDbClient } from "@/app/backend/dbClient";
 import { NextRequest } from "next/server";
 import { POST } from "@/app/api/query/route";
 import { readJsonFile } from "../shared_utils/readJsonFile";
+import { UserRole } from "@/app/models/entities/user-management";
 import { USE_CASE_DETAILS } from "@/app/shared/constants";
 import { UserRole } from "@/app/models/entities/users";
 
@@ -33,7 +35,6 @@ jest.mock("@/auth", () => ({
 jest.mock("@/app/utils/auth", () => {
   return {
     superAdminAccessCheck: jest.fn(() => Promise.resolve(true)),
-    adminAccessCheck: jest.fn(() => Promise.resolve(true)),
   };
 });
 
@@ -70,11 +71,42 @@ describe("Audit Logging Integration Tests", () => {
     const result = await addUserIfNotExists(TEST_USER);
     const createdUserId = result.id;
 
-    const newresult = await updateUserRole(createdUserId, UserRole.SUPER_ADMIN);
-    expect(newresult.items![0]).toHaveProperty("qc_role", UserRole.SUPER_ADMIN);
+    const newresult = await updateUserRole(
+      createdUserId,
+      UserRole.SUPER_ADMIN,
+    );
+    expect(newresult.items![0]).toHaveProperty(
+      "qc_role",
+      UserRole.SUPER_ADMIN,
+    );
   });
 });
 
+describe("Audit Log of FHIR Servers class", () => {
+  beforeEach(() => {
+    // supress the console warns for the error endpoints
+    jest.spyOn(console, "error").mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  it("should audit and update to the fhir-servers class", async () => {
+    jest.mock("@/app/backend/dbServices/fhir-servers")
+    const fhirServer = require("@/app/backend/dbServices/fhir-servers")
+    // fhirServer. .mockImplementation(() => {
+    //   return {
+    //     FhirServerConfigService: jest.fn(() => dbClient.query("SELECT headers FROM fhir_servers WHERE id = $1",
+    //     [SYPHILIS_QUERY_ID])),
+    //   };
+    // });
+    
+    // expect(existingServer.mock.caller).toHaveBeenCalledWith("somedatahere");
+    // expect(fhirServer).toHaveAttribute("somedatahere");
+    // expect(existingServer).toBe("somedatahere");
+  });
+});
 describe("Audit Log of POST Query to FHIR Server", () => {
   beforeEach(() => {
     // supress the console warns for the error endpoints
@@ -93,8 +125,16 @@ describe("Audit Log of POST Query to FHIR Server", () => {
     );
     const response = await POST(request);
     const body = await response.json();
+    const logs = jest.spyOn(global.console, "log");
     expect(body.resourceType).toBe("Bundle");
+    // expect(logs).toContain({
+    //   id: '363346000',
+    //   system: 'http://snomed.info/sct',
+    //   name: 'Malignant neoplastic disease (disorder)',
+    //   version: '20240901',
+    //   category: 'Cancer'
+    });
+
     //TO DO = once there's an actual DB write, we can check that the auditable query shows up as it should.
     //Right now, it's generating console logs in the terminal, which doesn't make sense to test.
-  });
 });
