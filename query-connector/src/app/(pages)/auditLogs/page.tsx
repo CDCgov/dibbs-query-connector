@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, ChangeEvent } from "react";
 import styles from "./auditLogs.module.scss";
 import classNames from "classnames";
+import SearchField from "@/app/ui/designSystem/searchField/SearchField";
 import Table from "@/app/ui/designSystem/table/Table";
-import { Select, TextInput, Pagination } from "@trussworks/react-uswds";
+import { Select, Pagination, DatePicker } from "@trussworks/react-uswds";
 
 /**
  * Client component for the Audit Logs page.
@@ -18,8 +19,10 @@ const AuditLogs: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [actionsPerPage, setActionsPerPage] = useState(10);
 
-  // Mock data array (replace with real API data)
-  const logs = Array(243).fill({ name: "", action: "", date: "" }); // Placeholder for 243 entries
+  // Mock data array (replace with real API data); the data should have the
+  // following structure: { name: string, action: json, date: datetime }
+  // TBD if action will be something parsed from json log earlier in process
+  const logs = Array(243).fill({ name: "", action: {}, date: Date });
 
   // Calculate total pages based on logs.length and actionsPerPage
   const totalPages = Math.ceil(logs.length / actionsPerPage);
@@ -32,42 +35,45 @@ const AuditLogs: React.FC = () => {
 
       <div className={classNames("grid-row", "margin-bottom-3")}>
         <div className="grid-col-3">
-          <TextInput
+          <label htmlFor="name">Name(s)</label>
+          <Select
             name="name"
             id="name"
-            placeholder="Name(s)"
-            type="text"
             value={selectedName}
             onChange={(e) => setSelectedName(e.target.value)}
-          />
+          >
+            <option value="">Select a name</option>
+          </Select>
         </div>
         <div className="grid-col-3">
+          <label htmlFor="action">Action(s)</label>
           <Select
             name="action"
             id="action"
             value={selectedAction}
             onChange={(e) => setSelectedAction(e.target.value)}
           >
-            <option value="">Action(s)</option>
+            <option value="">Select an action</option>
           </Select>
         </div>
         <div className="grid-col-3">
-          <TextInput
-            name="date"
+          <label htmlFor="date">Date</label>
+          <DatePicker
             id="date"
-            type="text"
+            name="date"
+            onChange={(value) => setSelectedDate(value || "")}
             value={selectedDate}
-            onChange={(e) => setSelectedDate(e.target.value)}
           />
         </div>
         <div className="grid-col-3">
-          <TextInput
-            name="search"
+          <label htmlFor="search">Search</label>
+          <SearchField
             id="search"
             placeholder="Search name or action"
-            type="text"
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+              setSearch(e.target.value)
+            }
           />
         </div>
       </div>
@@ -97,16 +103,19 @@ const AuditLogs: React.FC = () => {
           // onPageChange={(page: number) => setCurrentPage(page)}
         />
 
-        <Select
-          name="actionsPerPage"
-          id="actionsPerPage"
-          value={actionsPerPage}
-          onChange={(e) => setActionsPerPage(Number(e.target.value))}
-        >
-          <option value="10">10</option>
-          <option value="25">25</option>
-          <option value="50">50</option>
-        </Select>
+        <div>
+          <label htmlFor="actionsPerPage">Actions per page</label>
+          <Select
+            name="actionsPerPage"
+            id="actionsPerPage"
+            value={actionsPerPage}
+            onChange={(e) => setActionsPerPage(Number(e.target.value))}
+          >
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+          </Select>
+        </div>
       </div>
     </div>
   );
