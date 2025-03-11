@@ -6,7 +6,7 @@ import { RETURN_LABEL } from "@/app/(pages)/query/components/stepIndicator/StepI
 import TitleBox from "../stepIndicator/TitleBox";
 import LoadingView from "../../../../ui/designSystem/LoadingView";
 import { showToastConfirmation } from "../../../../ui/designSystem/toast/Toast";
-import { getFhirServerNames } from "@/app/backend/fhir-servers";
+import { getFhirServerNames } from "@/app/backend/dbServices/fhir-servers";
 import { CustomUserQuery } from "@/app/models/entities/query";
 import { getCustomQueries } from "@/app/backend/query-building";
 
