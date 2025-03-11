@@ -29,12 +29,12 @@ const AuditLogs: React.FC = () => {
 
   return (
     <div className={classNames("main-container__wide", styles.mainContainer)}>
-      <div className={classNames("grid-container grid-row", "margin-bottom-4")}>
+      <div className={classNames("grid-row", "margin-bottom-3")}>
         <h1 className="page-title grid-col-10">Audit Log</h1>
       </div>
 
       <div className={classNames("grid-row", "margin-bottom-3")}>
-        <div className="grid-col-3">
+        <div className={classNames("padding-right-1", styles.inputGroup)}>
           <label htmlFor="name">Name(s)</label>
           <Select
             name="name"
@@ -42,10 +42,10 @@ const AuditLogs: React.FC = () => {
             value={selectedName}
             onChange={(e) => setSelectedName(e.target.value)}
           >
-            <option value="">Select a name</option>
+            <option value=""> </option>
           </Select>
         </div>
-        <div className="grid-col-3">
+        <div className={classNames("padding-right-1", styles.inputGroup)}>
           <label htmlFor="action">Action(s)</label>
           <Select
             name="action"
@@ -53,43 +53,45 @@ const AuditLogs: React.FC = () => {
             value={selectedAction}
             onChange={(e) => setSelectedAction(e.target.value)}
           >
-            <option value="">Select an action</option>
+            <option value=""> </option>
           </Select>
         </div>
-        <div className="grid-col-3">
+        <div className={classNames(styles.inputGroup)}>
           <label htmlFor="date">Date</label>
           <DatePicker
             id="date"
             name="date"
             onChange={(value) => setSelectedDate(value || "")}
             value={selectedDate}
+            minDate="2021-01-01" // TBD: set minDate to earliest log date
+            maxDate={new Date().toISOString().split("T")[0]} // set maxDate to today
           />
         </div>
-        <div className="grid-col-3">
-          <label htmlFor="search">Search</label>
-          <SearchField
-            id="search"
-            placeholder="Search name or action"
-            value={search}
-            onChange={(e: ChangeEvent<HTMLInputElement>) =>
-              setSearch(e.target.value)
-            }
-          />
-        </div>
+        <SearchField
+          id="search"
+          placeholder="Search name or action"
+          value={search}
+          className="margin-left-3 margin-top-3 align-center"
+          onChange={(e: ChangeEvent<HTMLInputElement>) =>
+            setSearch(e.target.value)
+          }
+        />
       </div>
 
-      <Table fullWidth>
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Action</th>
-            <th>Date</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </Table>
+      <div>
+        <Table fullWidth>
+          <thead>
+            <tr>
+              <th className={styles.tableHeader}>Name</th>
+              <th className={styles.tableHeader}>Action</th>
+              <th className={styles.tableHeader}>Date</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </Table>
+      </div>
 
-      <div className="margin-top-3 display-flex flex-justify-between">
+      <div className={styles.paginationContainer}>
         <span>
           Showing {(currentPage - 1) * actionsPerPage + 1}-
           {Math.min(currentPage * actionsPerPage, logs.length)} of {logs.length}{" "}
@@ -100,10 +102,11 @@ const AuditLogs: React.FC = () => {
           pathname="/auditLogs"
           totalPages={totalPages}
           currentPage={currentPage}
+          className={styles.paginationText}
           // onPageChange={(page: number) => setCurrentPage(page)}
         />
 
-        <div>
+        <div className={styles.actionsPerPageContainer}>
           <label htmlFor="actionsPerPage">Actions per page</label>
           <Select
             name="actionsPerPage"
