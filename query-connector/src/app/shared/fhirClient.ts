@@ -1,5 +1,6 @@
 import https from "https";
 import { FhirServerConfig } from "../models/entities/fhir-servers";
+import { auditable } from "./decorators";
 
 /**
  * A client for querying a FHIR server.
@@ -40,6 +41,7 @@ class FHIRClient {
    * @param path - The request path.
    * @returns The response from the server.
    */
+  @auditable()
   async get(path: string): Promise<Response> {
     const response = await fetch(this.hostname + path, this.init);
     return response;
@@ -50,6 +52,7 @@ class FHIRClient {
    * @param paths - Array of request paths.
    * @returns Array of responses from the server.
    */
+  @auditable()
   async getBatch(paths: string[]): Promise<Response[]> {
     return Promise.all(
       paths.map((path) => fetch(this.hostname + path, this.init)),
@@ -62,6 +65,7 @@ class FHIRClient {
    * @param params - The request parameters.
    * @returns The response from the server.
    */
+  @auditable()
   async post(path: string, params: Record<string, string>): Promise<Response> {
     const searchParams = new URLSearchParams(params);
 
