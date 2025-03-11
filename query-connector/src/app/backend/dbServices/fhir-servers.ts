@@ -14,15 +14,18 @@ class FhirServerConfigService {
    * @param forceRefresh - Whether to flush the config cache
    * @returns The configuration for the FHIR server.
    */
-  static async getFhirServerConfigs(forceRefresh = false) {
+  static async getFhirServerConfigs(
+    checkAdminPermissions = true,
+    forceRefresh = false,
+  ) {
+    if (checkAdminPermissions && !(await superAdminAccessCheck())) {
+      throw new Error("Unauthorized");
+    }
+
     if (
       forceRefresh ||
       FhirServerConfigService.cachedFhirServerConfigs === null
     ) {
-      if (!(await superAdminAccessCheck())) {
-        throw new Error("Unauthorized");
-      }
-
       const query = `SELECT * FROM fhir_servers;`;
       const result = await FhirServerConfigService.dbClient.query(query);
       const newServerConfigs = result.rows as FhirServerConfig[];
@@ -32,7 +35,7 @@ class FhirServerConfigService {
   }
 
   static async getFhirServerNames(): Promise<string[]> {
-    const configs = await getFhirServerConfigs();
+    const configs = await getFhirServerConfigs(false);
     return configs.map((config) => config.name);
   }
 

@@ -109,7 +109,7 @@ export async function makeFhirQuery(
   queryResponse: QueryResponse = {},
   valueSetOverrides: DibbsValueSet[] = [],
 ): Promise<QueryResponse> {
-  const fhirServerConfigs = await getFhirServerConfigs();
+  const fhirServerConfigs = await getFhirServerConfigs(false);
   const fhirClient = new FHIRClient(request.fhir_server, fhirServerConfigs);
   const onePatientDefined = queryResponse.Patient && queryResponse.Patient[0];
 
