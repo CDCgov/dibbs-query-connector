@@ -3,6 +3,7 @@ import { Pool } from "pg";
 import { getDbClient } from "../dbClient";
 import { transaction } from "../../shared/decorators";
 import { FhirServerConfig } from "@/app/models/entities/fhir-servers";
+import { superAdminAccessCheck } from "@/app/utils/auth";
 
 class FhirServerConfigService {
   private static dbClient: Pool = getDbClient();
@@ -18,6 +19,10 @@ class FhirServerConfigService {
       forceRefresh ||
       FhirServerConfigService.cachedFhirServerConfigs === null
     ) {
+      if (!(await superAdminAccessCheck())) {
+        throw new Error("Unauthorized");
+      }
+
       const query = `SELECT * FROM fhir_servers;`;
       const result = await FhirServerConfigService.dbClient.query(query);
       const newServerConfigs = result.rows as FhirServerConfig[];

@@ -20,7 +20,7 @@ jest.mock("next-auth");
 jest.mock("next-auth/providers/keycloak");
 
 // Utility function to create a minimal NextRequest-like object
-function createNextRequest(
+export function createNextRequest(
   body: unknown,
   searchParams: URLSearchParams,
 ): NextRequest {
@@ -53,8 +53,9 @@ describe("GET Health Check", () => {
 
 describe("POST Query FHIR Server", () => {
   beforeEach(() => {
-    // supress the console warns for the error endpoints
+    // supress the warnings for the error endpoints and general console.logs
     jest.spyOn(console, "error").mockImplementation(() => {});
+    jest.spyOn(console, "log").mockImplementation(() => {});
   });
 
   afterEach(() => {
