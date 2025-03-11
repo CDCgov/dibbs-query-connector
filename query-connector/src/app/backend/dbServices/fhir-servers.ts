@@ -11,6 +11,9 @@ class FhirServerConfigService {
 
   /**
    * Fetches the configuration for a FHIR server from the database.
+   * @param checkAdminPermissions - Whether to bypass the admin check. Set to
+   * false for internal service code where fetched configs won't be displayed
+   * to the end user
    * @param forceRefresh - Whether to flush the config cache
    * @returns The configuration for the FHIR server.
    */
