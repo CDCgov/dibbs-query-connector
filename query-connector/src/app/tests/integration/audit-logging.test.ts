@@ -5,30 +5,14 @@ import {
 import { auth } from "@/auth";
 import { Bundle, BundleEntry, Patient } from "fhir/r4";
 import { getDbClient } from "@/app/backend/dbClient";
-import { NextRequest } from "next/server";
 import { POST } from "@/app/api/query/route";
 import { readJsonFile } from "../shared_utils/readJsonFile";
 import { USE_CASE_DETAILS } from "@/app/shared/constants";
 import { UserRole } from "@/app/models/entities/users";
-
-// Utility function to create a minimal NextRequest-like object
-function createNextRequest(
-  body: unknown,
-  searchParams: URLSearchParams,
-): NextRequest {
-  return {
-    json: async () => body,
-    text: async () => body,
-    nextUrl: { searchParams },
-    method: "POST",
-    headers: new Headers(),
-  } as unknown as NextRequest;
-}
+import { createNextRequest } from "./api-query.test";
+import { suppressConsoleLogs } from "./fixtures";
 
 const dbClient = getDbClient();
-jest.mock("@/auth", () => ({
-  auth: jest.fn(),
-}));
 
 jest.mock("@/app/utils/auth", () => {
   return {
@@ -59,6 +43,7 @@ const SYPHILIS_QUERY_ID = USE_CASE_DETAILS.syphilis.id;
 
 describe("Audit Logging Integration Tests", () => {
   beforeAll(async () => {
+    suppressConsoleLogs();
     await dbClient.query("BEGIN");
   });
 
@@ -76,14 +61,6 @@ describe("Audit Logging Integration Tests", () => {
 });
 
 describe("Audit Log of POST Query to FHIR Server", () => {
-  beforeEach(() => {
-    // supress the console warns for the error endpoints
-    jest.spyOn(console, "error").mockImplementation(() => {});
-  });
-
-  afterEach(() => {
-    jest.restoreAllMocks();
-  });
   it("should create an audit log if query is successful", async () => {
     const request = createNextRequest(
       PatientResource,

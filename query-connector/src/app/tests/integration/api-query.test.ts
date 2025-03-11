@@ -33,6 +33,13 @@ export function createNextRequest(
   } as unknown as NextRequest;
 }
 
+jest.mock("@/app/utils/auth", () => {
+  return {
+    superAdminAccessCheck: jest.fn(() => Promise.resolve(true)),
+    adminAccessCheck: jest.fn(() => Promise.resolve(true)),
+  };
+});
+
 const PatientBundle = readJsonFile("./src/app/tests/assets/BundlePatient.json");
 const PatientResource: Patient | undefined = (
   (PatientBundle as Bundle).entry as BundleEntry[]
