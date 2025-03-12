@@ -3,8 +3,36 @@ import classNames from "classnames";
 import { UserRole } from "@/app/models/entities/users";
 import WithAuth from "@/app/ui/components/withAuth/WithAuth";
 import UserManagementProvider from "./components/UserManagementProvider";
-import ManagementTabs from "./components/managementTabs/managementTabs";
-import { getSessionRole } from "./utils";
+// import ManagementTabs from "./components/managementTabs/managementTabs";
+import UsersTable from "./components/usersTable/usersTable";
+import { getSessionRole, RoleDescriptons } from "./utils";
+
+/**
+ * @param textContent asdf
+ * @returns asdf
+ */
+export const renderRoleDescriptions = (textContent: object) => {
+  return (
+    <div
+      className={classNames(
+        "margin-x-3",
+        "margin-y-4",
+        "grid-row",
+        "flex-row",
+        "flex-no-wrap",
+        "flex-justify",
+        "grid-gap",
+      )}
+      aria-description="Available user roles"
+    >
+      {Object.entries(textContent).map(([role, description]) => (
+        <p key={`${role}`} className={classNames("grid-col-4")}>
+          <span className="text-bold">{`${role}:`}</span> {description}
+        </p>
+      ))}
+    </div>
+  );
+};
 
 /**
  * Client side parent component for the User Management page
@@ -13,43 +41,23 @@ import { getSessionRole } from "./utils";
 const UserManagement: React.FC = () => {
   const role = getSessionRole();
 
-  const renderRoleDescriptions = () => {
-    return (
-      <div
-        className={classNames(
-          "margin-x-3",
-          "margin-y-4",
-          "grid-row",
-          "flex-row",
-          "flex-no-wrap",
-          "flex-justify",
-          "grid-gap",
-        )}
-        aria-description="Available user roles"
-      >
-        <p className={classNames("grid-col-4")}>
-          <span className="text-bold">Super Admin:</span> Manage user
-          permissions; create and manage user groups; view audit logs; configure
-          FHIR servers; create, assign, and run queries
-        </p>
-        <p className={classNames("grid-col-4")}>
-          <span className={"text-bold"}>Admin:</span> Create, assign, and run
-          queries
-        </p>
-        <p className={classNames("grid-col-3")}>
-          <span className={"text-bold"}>Standard:</span> Only run queries
-        </p>
-      </div>
-    );
-  };
-
   return (
     <WithAuth>
       <div className={classNames("main-container__wide", "user-management")}>
-        <h1 className="page-title">User management</h1>
+        <div
+          className={classNames(
+            "grid-row",
+            "padding-0",
+            "flex-justify",
+            "flex-align-center",
+          )}
+        >
+          <h1 className="page-title">User management</h1>
+        </div>
         <UserManagementProvider>
-          {role == UserRole.SUPER_ADMIN && renderRoleDescriptions()}
-          {role && <ManagementTabs role={role as UserRole} />}
+          {role == UserRole.SUPER_ADMIN &&
+            renderRoleDescriptions(RoleDescriptons)}
+          <UsersTable role={role as string} />
         </UserManagementProvider>
       </div>
     </WithAuth>

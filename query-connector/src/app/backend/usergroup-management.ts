@@ -137,7 +137,7 @@ export async function saveUserGroupMembership(
         (user) =>
           user.userGroupMemberships
             ?.filter((m) => m.is_member)
-            .map((_) => user.id) || [],
+            .map(() => user.id) || [],
       ),
     );
 
@@ -146,7 +146,7 @@ export async function saveUserGroupMembership(
       (user) =>
         user.userGroupMemberships
           ?.filter((m) => m.is_member && !selectedUsers.includes(user.id))
-          .map((_) => user.id) || [],
+          .map(() => user.id) || [],
     );
 
     if (usersToRemove.length)

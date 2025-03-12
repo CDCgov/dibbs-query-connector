@@ -16,6 +16,7 @@ const dbClient = getDbClient();
  * @param userToken.email - The email from the JWT token.
  * @param userToken.firstName - The first name from the JWT token.
  * @param userToken.lastName - The last name from the JWT token.
+ * @param userToken.role - The role from the JWT token.
  * @returns The newly added user or an empty result if already exists.
  */
 export async function addUserIfNotExists(userToken: {
@@ -24,13 +25,14 @@ export async function addUserIfNotExists(userToken: {
   email: string;
   firstName: string;
   lastName: string;
+  role?: string;
 }) {
   if (!userToken || !userToken.username) {
     console.error("Invalid user token. Cannot add user.");
     return;
   }
 
-  const { username, email, firstName, lastName } = userToken;
+  const { username, email, firstName, lastName, role } = userToken;
   const userIdentifier = username || email;
 
   try {
@@ -41,11 +43,11 @@ export async function addUserIfNotExists(userToken: {
 
     if (userExists.rows.length > 0) {
       console.log("User already exists in users:", userExists.rows[0].id);
-      return userExists.rows[0]; // Return existing user
+      return { msg: "User already exists", user: userExists.rows[0] }; // Return existing user
     }
 
     // Default role when adding a new user, which includes Super Admin, Admin, and Standard User.
-    let qc_role = UserRole.STANDARD;
+    let qc_role = role ?? UserRole.STANDARD;
     console.log("User not found. Proceeding to insert.");
 
     const insertUserQuery = `
@@ -218,6 +220,37 @@ export async function getUserGroups(): Promise<QCResponse<UserGroup>> {
 
 /**
  * Retrieves the user group(s) for a given user
+ * @param id identifier of the us user groups in query connector along with member and query counts.
+ * @returns A list of user groups registered in the query connector.
+ */
+export async function getUserGroupById(id: string): Promise<UserGroup> {
+  if (!(await adminAccessCheck())) {
+    throw new Error("Unauthorized");
+  }
+
+  try {
+    const selectAllUserGroupQuery = `
+      SELECT id, name 
+      FROM usergroup 
+      WHERE id = $1 
+    `;
+
+    const result = await dbClient.query(selectAllUserGroupQuery, [id]);
+
+    return {
+      id: result.rows[0].id,
+      name: result.rows[0].name,
+      member_size: result.rows[0].member_size,
+      query_size: result.rows[0].query_size,
+    };
+  } catch (error) {
+    console.error("Error retrieving user group:", error);
+    throw error;
+  }
+}
+
+/**
+ * Retrieves the user group(s) for a given user
  * @param userId identifier of the user whose groups we are retrieving
  * @returns A list of UserGroup items for the given user
  */
@@ -294,11 +327,15 @@ export async function createUserGroup(
  * Updates the name of an existing user group.
  * @param id - The unique identifier of the user group to update.
  * @param newName - The new name to assign to the user group.
+ * @param userIds - The new name to assign to the user group.
+//  * @param queryIds - The new name to assign to the user group.
  * @returns The updated user group or an error if the update fails.
  */
 export async function updateUserGroup(
   id: string,
   newName: string,
+  userIds?: string[],
+  // queryIds?: string[],
 ): Promise<UserGroup | string> {
   if (!(await superAdminAccessCheck())) {
     throw new Error("Unauthorized");
@@ -315,14 +352,17 @@ export async function updateUserGroup(
       return `Group '${newName}' already exists.`;
     }
 
-    const updateGroupQuery = `
+    const updateUserGroupMembersQuery = `
       UPDATE usergroup
       SET name = $1
       WHERE id = $2
       RETURNING id, name;
     `;
+    const escapedValues =
+      userIds && userIds.map((_, i) => `$${i + 1}`).join() + ")";
+    const queryString = updateUserGroupMembersQuery + escapedValues;
 
-    const result = await dbClient.query(updateGroupQuery, [newName, id]);
+    const result = await dbClient.query(queryString, [newName, id, userIds]);
 
     if (result.rows.length === 0) {
       throw new Error(`User group with ID '${id}' not found.`);

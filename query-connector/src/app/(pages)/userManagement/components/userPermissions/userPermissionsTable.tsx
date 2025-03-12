@@ -1,6 +1,6 @@
 "use client";
 
-import { useContext } from "react";
+import { SetStateAction, useContext } from "react";
 import { Button } from "@trussworks/react-uswds";
 import classNames from "classnames";
 import { updateUserRole } from "@/app/backend/user-management";
@@ -11,10 +11,16 @@ import { UserManagementContext } from "../UserManagementProvider";
 import styles from "../../userManagement.module.scss";
 import { useSession } from "next-auth/react";
 import { UserRole, UserGroup, User } from "@/app/models/entities/users";
+import { UserManagementMode } from "../../utils";
+import { ModalRef } from "@/app/ui/designSystem/modal/Modal";
 
 type PermissionsProps = {
   users: User[] | null;
+  setUsers: React.Dispatch<React.SetStateAction<User[]>>;
   fetchGroupMembers: (groupId: string) => Promise<User[]>;
+  setModalMode: React.Dispatch<SetStateAction<UserManagementMode>>;
+  modalMode: UserManagementMode;
+  modalRef: React.RefObject<ModalRef>;
 };
 
 /**
@@ -31,9 +37,6 @@ const UserPermissionsTable: React.FC<PermissionsProps> = ({
   const { openEditSection } = useContext(UserManagementContext);
 
   const { data: session } = useSession();
-  /**
-   * Role update
-   */
 
   async function handleUserRoleChange(id: string, role: UserRole) {
     try {
@@ -118,12 +121,16 @@ const UserPermissionsTable: React.FC<PermissionsProps> = ({
     }
 
     return users?.map((user: User) => {
+      const display =
+        user.first_name && user.last_name
+          ? `${user.last_name}, ${user.first_name} ${
+              isSelf(user) ? "(self)" : ""
+            }`
+          : `${user.username}`;
+
       return (
         <tr key={user.id}>
-          <td width={270}>{`${user.last_name}, ${user.first_name} ${
-            isSelf(user) ? "(self)" : ""
-          }
-          `}</td>
+          <td width={270}>{display}</td>
           {renderDropdown(user)}
           {renderGroups(user)}
         </tr>

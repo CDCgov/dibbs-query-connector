@@ -606,6 +606,97 @@ ul.usa-sidenav > li.usa-sidenav__item > ul.usa-sidenav__sublist > li.usa-sidenav
   }
 }
 
+#user-mgmt-modal {
+  .usa-modal {
+    border-radius: 0;
+    max-width: 31rem;
+    padding: 0 2rem;
+  }
+
+  .usa-modal__content {
+    padding-top: 0;
+  }
+
+  .usa-modal__close {
+    background-color: transparent !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 1.5rem !important;
+    height: 1.5rem !important;
+    margin: 1rem 0rem 0px 0px !important;
+
+    .usa-icon {
+      height: 1.5rem;
+      margin: 0;
+      width: 1.5rem;
+    }
+  }
+
+  .usa-modal__heading {
+    color: #000;
+    font-family: Merriweather !important;
+    font-size: 32px !important;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 40px;
+  }
+
+  .usa-modal__main {
+    max-width: 26rem;
+    margin: 0 !important;
+
+    input,
+    select {
+      max-width: 100%;
+    }
+  }
+
+  .usa-button-group {
+    flex-direction: row-reverse;
+
+    .usa-button {
+      background-color: #005ea2;
+    }
+    .usa-button-group__item:last-child {
+      margin-right: 0.25rem;
+    }
+
+    .usa-button--secondary {
+      background-color: #d83933 !important;
+    }
+
+    #modal-cancel-button {
+      background-color: transparent;
+
+      &:hover {
+        box-shadow: none;
+      }
+    }
+
+    .usa-button-group__item:has(> #modal-delete-button) {
+      flex: 1 1 0%;
+    }
+  }
+
+  .usa-checkbox {
+    background-color: transparent;
+  }
+
+  .role-descriptions {
+    background-color: #f3f3f3;
+    padding: 0.5rem;
+    line-height: 22px;
+
+    .role-description {
+      margin-bottom: 1rem;
+    }
+
+    .role-description:last-child {
+      margin-bottom: 0 !important;
+    }
+  }
+}
+
 .searchHighlight {
   background-color: $yellow-vivid-20v;
 }
