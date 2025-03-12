@@ -26,15 +26,18 @@ export function auditable(async = false) {
 
       generateAuditValues(key, resultToLog, args)
         .then((values) => {
+          // ? what to do with error handling here? on the event of a failure,
+          // ? probably need some retry logic to ensure we don't lose data
           return dbConnection.query(query, values);
         })
         .then((v) => {
           const auditMetadata = v.rows[0];
           console.info(
-            `${auditMetadata.action_type} write with id ${auditMetadata?.id} and checksum ${auditMetadata?.audit_checksum} added to audit table`,
+            `${auditMetadata.action_type} audit action with id ${auditMetadata?.id} and checksum ${auditMetadata?.audit_checksum} added to audit table`,
           );
         });
     };
+
     // need to do this check so that async vs sync returns are properly typed
     descriptor.value = async
       ? async function (this: unknown, ...args: unknown[]) {
@@ -71,26 +74,31 @@ async function generateAuditValues(
 ) {
   const session = await auth();
   const author = `${session?.user.username}`;
-  const actionType = methodName;
-  const auditChecksum = generateAuditChecksum(author, functionArgs);
-  const auditContents = generateAuditMessage(functionResult, functionArgs);
-  const auditValues = [author, actionType, auditChecksum, auditContents];
-  return auditValues;
-}
 
-function generateAuditChecksum(author: string, messageContents: unknown[]) {
-  return "result of some hashing algo based on author and message contents";
+  // ? Double check: do we need more fancy mapping between events here, or does the
+  // ? name of the method suffice?
+  const actionType = methodName;
+  const auditContents = generateAuditMessage(functionResult, functionArgs);
+  const auditChecksum = generateAuditChecksum(author, auditContents);
+  return [author, actionType, auditChecksum, auditContents];
 }
 
 function generateAuditMessage(result: unknown, args: unknown[]) {
   // can do more fancy serialization here if needed
-
-  args = args.map((obj) => {
-    return JSON.stringify(obj);
-  });
-
   return {
-    args: args.join(","),
+    args: args
+      .map((obj) => {
+        // TODO: Should probably type guard this process more rigorously
+        return JSON.stringify(obj);
+      })
+      .join(","),
     result: JSON.stringify(result),
   };
+}
+
+function generateAuditChecksum(
+  author: string,
+  auditContents: { result: string; args: string },
+) {
+  return "result of some SHA-2 hashing algo based on author and audit contents";
 }
