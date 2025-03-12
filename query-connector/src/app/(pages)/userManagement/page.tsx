@@ -3,7 +3,6 @@ import classNames from "classnames";
 import { UserRole } from "@/app/models/entities/users";
 import WithAuth from "@/app/ui/components/withAuth/WithAuth";
 import UserManagementProvider from "./components/UserManagementProvider";
-// import ManagementTabs from "./components/managementTabs/managementTabs";
 import UsersTable from "./components/usersTable/usersTable";
 import { getSessionRole, RoleDescriptons } from "./utils";
 

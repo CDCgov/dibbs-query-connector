@@ -8,7 +8,7 @@ import Table from "../../../../ui/designSystem/table/Table";
 import { UserManagementContext } from "../UserManagementProvider";
 import { UserGroup, UserRole, User } from "../../../../models/entities/users";
 import { QueryTableResult } from "@/app/(pages)/queryBuilding/utils";
-import styles from "../managementTabs/managementTabs.module.scss";
+import styles from "../usersTable/usersTable.module.scss";
 import { getSessionRole } from "../../utils";
 
 type UserGroupsTableProps = {

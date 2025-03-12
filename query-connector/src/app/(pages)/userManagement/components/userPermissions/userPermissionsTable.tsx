@@ -1,6 +1,6 @@
 "use client";
 
-import { SetStateAction, useContext } from "react";
+import { useContext } from "react";
 import { Button } from "@trussworks/react-uswds";
 import classNames from "classnames";
 import { updateUserRole } from "@/app/backend/user-management";
@@ -11,16 +11,10 @@ import { UserManagementContext } from "../UserManagementProvider";
 import styles from "../../userManagement.module.scss";
 import { useSession } from "next-auth/react";
 import { UserRole, UserGroup, User } from "@/app/models/entities/users";
-import { UserManagementMode } from "../../utils";
-import { ModalRef } from "@/app/ui/designSystem/modal/Modal";
 
 type PermissionsProps = {
   users: User[] | null;
-  setUsers: React.Dispatch<React.SetStateAction<User[]>>;
   fetchGroupMembers: (groupId: string) => Promise<User[]>;
-  setModalMode: React.Dispatch<SetStateAction<UserManagementMode>>;
-  modalMode: UserManagementMode;
-  modalRef: React.RefObject<ModalRef>;
 };
 
 /**
@@ -112,14 +106,6 @@ const UserPermissionsTable: React.FC<PermissionsProps> = ({
   };
 
   const renderUserRows = (users: User[] | null): React.ReactNode => {
-    if (users?.length == 0) {
-      return (
-        <tr>
-          <td colSpan={3}>No users found</td>
-        </tr>
-      );
-    }
-
     return users?.map((user: User) => {
       const display =
         user.first_name && user.last_name

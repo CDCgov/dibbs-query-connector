@@ -1,11 +1,12 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import dynamic from "next/dynamic";
 // import classNames from "classnames";
 import { Label, TextInput } from "@trussworks/react-uswds";
 import {
   addUserIfNotExists,
-  createUserGroup,
+  updateUserDetails,
+  // createUserGroup,
 } from "@/app/backend/user-management";
 import { addUsersToGroup } from "@/app/backend/usergroup-management";
 import {
@@ -13,13 +14,12 @@ import {
   UserGroup,
   UserGroupMembership,
   UserRole,
-} from "@/app/models/entities/user-management";
+} from "@/app/models/entities/users";
 import type { ModalRef } from "../../../../ui/designSystem/modal/Modal";
 import type { ModalProps } from "../../../../ui/designSystem/modal/Modal";
-import { UserManagementMode } from "../../utils";
+import { UserManagementMode, ModalStates } from "../../utils";
 import Checkbox from "@/app/ui/designSystem/checkbox/Checkbox";
 import { RoleDescriptons } from "../../utils";
-// import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 
 const Modal = dynamic<ModalProps>(
   () =>
@@ -28,16 +28,14 @@ const Modal = dynamic<ModalProps>(
 );
 
 /**
- * The props for the PatientSearchResults component.
+ * The props for the UserModal component.
  */
 export interface UserModalProps {
   modalRef: React.RefObject<ModalRef>;
   mode: UserManagementMode;
   setMode: (arg: UserManagementMode) => void;
-  users?: User[] | null;
-  setUsers: React.Dispatch<React.SetStateAction<User[]>>;
+  refreshUsers: React.Dispatch<React.SetStateAction<boolean>>;
   userGroups?: UserGroup[] | null;
-  setUserGroups: React.Dispatch<React.SetStateAction<UserGroup[]>>;
 }
 
 /**
@@ -45,26 +43,19 @@ export interface UserModalProps {
  * of Users, UserGroups, and associated queries
  * @param root0 - UserModal props.
  * @param root0.modalRef - reference passed from parent to control showing/hiding the modal
- * @param root0.mode - Whether the modal should display the form for creating or editing a user
- * @param root0.setMode - Whether the modal should display the form for creating or editing a user
- * @param root0.users - reference passed from parent to control showing/hiding the modal
- * @param root0.setUsers -asdf
+ * @param root0.mode - Indicates which content the modal should render
+ * @param root0.setMode - State function to control which content the modal should render
+ * @param root0.refreshUsers - State function that indicates if the list of Users should be refreshed
  * @param root0.userGroups - reference passed from parent to control showing/hiding the modal
- * @param root0.setUserGroups -asdf
  * @returns - The UserModal component.
  */
 const UserModal: React.FC<UserModalProps> = ({
   mode,
   setMode,
   modalRef,
-  users,
-  setUsers,
+  refreshUsers,
   userGroups,
-  setUserGroups,
 }) => {
-  useEffect(() => {
-    console.log;
-  }, [mode]);
   const [newUser, setNewUser] = useState<User>({
     id: "",
     username: "",
@@ -73,22 +64,14 @@ const UserModal: React.FC<UserModalProps> = ({
     qc_role: UserRole.STANDARD,
     userGroupMemberships: [],
   });
+  const [errorMessage, setErrorMessage] = useState<string>("");
 
-  const [newGroup, setNewGroup] = useState<UserGroup>({
-    id: "",
-    name: "",
-    member_size: 0,
-    query_size: 0,
-  });
+  const handleButtonClick = async () => {
+    setErrorMessage("");
 
-  const [errorMessage, setErrorMessage] = useState<string | undefined>("");
-  const [userIdsToAdd, setUserIdsToAdd] = useState<string[]>([]);
-
-  const handleSave = async () => {
-    console.log("mode before we decide what to do on save", mode);
-    if (mode === "create-user") {
+    if (mode == "create-user") {
       const userToAdd = {
-        id: "",
+        id: newUser.id || "",
         email: "",
         username: newUser.username,
         firstName: newUser.first_name,
@@ -96,61 +79,73 @@ const UserModal: React.FC<UserModalProps> = ({
         role: newUser.qc_role,
       };
 
+      if (userToAdd.id) {
+        // if we have an ID but we're in create-user mode, we backnav'd here;
+        // we should update rather than add as a new user
+        const udpatedUser = await updateUserDetails(
+          userToAdd.id,
+          userToAdd.username,
+          userToAdd.firstName,
+          userToAdd.lastName,
+          userToAdd.role,
+        );
+        if (udpatedUser?.msg) {
+          return setErrorMessage(udpatedUser.msg);
+        } else {
+          setNewUser({ ...newUser, ...udpatedUser });
+          return setMode("select-groups");
+        }
+      }
+
+      // add new user to the db
       const newUserAdded = await addUserIfNotExists(userToAdd);
-      setNewUser({ ...newUser, ...{ id: newUserAdded.id } });
-      if (!!newUserAdded && !newUserAdded?.msg) {
+      if (newUserAdded.msg) {
+        return setErrorMessage(newUserAdded.msg);
+      } else {
+        setNewUser({ ...newUser, ...newUserAdded });
         return setMode("select-groups");
-      } else {
-        console.log("oh no!!", newUserAdded.msg);
-        setErrorMessage(newUserAdded.msg);
       }
     }
 
-    if (mode === "select-groups") {
-      if (newUser.id) {
-        let groupMemberships = 0;
+    if (mode == "select-groups") {
+      if (newUser.id && !errorMessage) {
+        // update db on save
         newUser.userGroupMemberships?.forEach(async (group) => {
-          const result = await addUsersToGroup(group.usergroup_id, [
-            newUser.id,
-          ]);
-          if (result.length > 0) {
-            groupMemberships++;
-          }
-          return setUsers({ ...(users as User[]) });
+          console.log(group.group_name);
+          await addUsersToGroup(group.usergroup_id, [newUser.id]);
         });
-      }
-      handleCloseModal();
 
-      // if (!!newUserAdded && !newUserAdded?.msg) {
-      //   setMode("select-groups");
-      // } else {
-      //   console.log("oh no!!", newUserAdded.msg);
-      //   setErrorMessage(newUserAdded.msg);
-      // }
-    }
-    if (mode === "create-group") {
-      const result = (await createUserGroup(newGroup.name)) as UserGroup;
-
-      if (result) {
-        console.log("success!", result);
-
-        // fetchUsers().then(() => {
-        //   console.log("kcd", users);
-        //   setMode("add-members");
-        //   setNewGroup({ ...newGroup, ...{ id: result.id, name: result.name } });
-        // });
-        // const userList: QCResponse<User> = await getUsers();
-        // console.log(userList);
-        // // get(true).then((users) => {
-        // //   fetchuser(servers);
-        // // });
-        // handleCloseModal();
-        // setShouldUpdateData(true);
+        refreshUsers(true);
+        return handleCloseModal();
       } else {
-        // console.log("oh no!!", result.msg);
-        // setErrorMessage(result.msg);
+        setErrorMessage("Error adding user to group.");
       }
     }
+
+    // if (mode == "create-group") {
+    //   const result = (await createUserGroup(newGroup.name)) as UserGroup;
+
+    //   if (result) {
+    //     console.log("success!", result);
+    //   }
+    // }
+    // fetchUsers().then(() => {
+    //   console.log("kcd", users);
+    //   setMode("add-members");
+    //   setNewGroup({ ...newGroup, ...{ id: result.id, name: result.name } });
+    // });
+    // const userList: QCResponse<User> = await getUsers();
+    // console.log(userList);
+    // // get(true).then((users) => {
+    // //   fetchuser(servers);
+    // // });
+    // handleCloseModal();
+    // setShouldUpdateData(true);
+    // {
+    // console.log("oh no!!", result.msg);
+    // setErrorMessage(result.msg);
+    // }
+    // }
     // if (mode == "add-members" && newGroup.id) {
     //   console.log(newGroup);
     //   const result = await updateUserGroupMembers(
@@ -172,22 +167,12 @@ const UserModal: React.FC<UserModalProps> = ({
     //   } else {
     //   }
     // }
-    if (mode == "add-queries") {
-      console.log("success!");
-      handleCloseModal();
-    }
   };
 
-  const handleMemberUpdate = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(e.currentTarget);
-    const user = e.currentTarget.name;
-    const checked = e.target.checked;
-    console.log(user, checked);
-    setUserIdsToAdd([...userIdsToAdd, user]);
-    console.log(userIdsToAdd);
-  };
-
-  const handleAddNewUserToGroup = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // updates local state on checkbox toggle
+  const toggleUserGroupMembership = async (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     const groupName = e.currentTarget.nextSibling?.textContent || "";
     const groupId = e.currentTarget.name;
     const checked = e.target.checked;
@@ -199,26 +184,24 @@ const UserModal: React.FC<UserModalProps> = ({
         usergroup_id: groupId,
         is_member: checked,
       };
-      newUser.userGroupMemberships?.push(newGroup);
+      newUser?.userGroupMemberships?.push(newGroup);
+
       return setNewUser({
         ...newUser,
         ...{ userGroupMemberships: newUser.userGroupMemberships },
       });
     }
+
     const currentGroups = newUser.userGroupMemberships;
-    const updatedGroups = currentGroups?.filter(
-      (g) => g.usergroup_id != groupId,
-    );
+    const updatedGroups = currentGroups?.filter((g) => {
+      return g.usergroup_id !== groupId;
+    });
 
     return setNewUser({
       ...newUser,
       ...{ userGroupMemberships: updatedGroups },
     });
   };
-
-  useEffect(() => {
-    console.log(newUser);
-  }, [newUser]);
 
   const handleCloseModal = () => {
     resetModalState();
@@ -232,7 +215,35 @@ const UserModal: React.FC<UserModalProps> = ({
       first_name: "",
       last_name: "",
       qc_role: UserRole.STANDARD,
+      userGroupMemberships: [],
     });
+    setErrorMessage("");
+    setMode("closed");
+  };
+
+  const getModalButtons = () => {
+    const buttons = [
+      {
+        text: ModalStates[mode].buttonText,
+        type: "submit" as const,
+        id: "modal-step-button",
+        className: "usa-button",
+        onClick: handleButtonClick,
+      },
+      {
+        text: "Back",
+        type: "button" as const,
+        id: "modal-back-button",
+        className: "usa-button usa-button--secondary",
+        onClick: async () => setMode(ModalStates[mode].prevStep || "closed"),
+      },
+    ];
+
+    if (mode == "create-user") {
+      buttons.pop();
+    }
+
+    return buttons;
   };
 
   const renderAddUser = () => {
@@ -255,13 +266,12 @@ const UserModal: React.FC<UserModalProps> = ({
           id="user-role"
           name="user-role"
           value={newUser.qc_role}
-          onChange={(e) => {
-            console.log(e.target.value);
+          onChange={(e) =>
             setNewUser({
               ...newUser,
               ...{ qc_role: e.target.value as UserRole },
-            });
-          }}
+            })
+          }
         >
           <option value="Standard">Standard</option>
           <option value="Admin">Admin</option>
@@ -278,17 +288,11 @@ const UserModal: React.FC<UserModalProps> = ({
     );
   };
 
-  const userGroupIds = newUser.userGroupMemberships?.flatMap(
-    (gr) => gr.usergroup_id,
-  );
-
-  const renderSelectUserGroup = () => {
-    console.log(
-      userIdsToAdd.includes(newUser.id),
-      newUser,
-      newUser.id,
-      userIdsToAdd,
+  const renderSelectUserGroups = () => {
+    const userGroupIds = newUser.userGroupMemberships?.flatMap(
+      (gr) => gr.usergroup_id,
     );
+
     return (
       <>
         <div>User groups</div>
@@ -296,12 +300,12 @@ const UserModal: React.FC<UserModalProps> = ({
           userGroups.length > 0 &&
           userGroups.map((group) => {
             return (
-              <div>
+              <div key={group.id}>
                 <Checkbox
                   id={group.id}
                   label={`${group.name}`}
                   checked={userGroupIds?.includes(group.id)}
-                  onChange={handleAddNewUserToGroup}
+                  onChange={toggleUserGroupMembership}
                 />
               </div>
             );
@@ -310,76 +314,21 @@ const UserModal: React.FC<UserModalProps> = ({
     );
   };
 
-  const renderUserGroupFields = () => {
-    return (
-      <>
-        <div>User groups</div>
-      </>
-    );
-  };
-
   const renderModalContent = (mode: UserManagementMode) => {
-    console.log("current mode for render?", mode);
     switch (mode) {
       case "create-user":
         return renderAddUser();
       case "select-groups":
-        return renderSelectUserGroup();
-
-      default:
+        return renderSelectUserGroups();
     }
-  };
-
-  const userMode = mode === "create-user" || mode === "remove-user";
-  const userGroupMode = mode === "select-groups";
-
-  const groupMode =
-    mode === "create-group" ||
-    mode === "remove-group" ||
-    mode == "add-members" ||
-    mode == "add-queries";
-
-  const modalState = {
-    heading: "",
-    buttonText: "",
-    render: () => {},
   };
 
   return (
     <Modal
       id="user-mgmt"
-      heading={
-        mode === "create-user"
-          ? "New user"
-          : mode == "select-groups"
-            ? "Add to user groups"
-            : mode === "create-group"
-              ? "Create user group"
-              : mode === "add-members"
-                ? "Assign members"
-                : "Edit changes"
-      }
+      heading={ModalStates[mode].heading}
       modalRef={modalRef}
-      buttons={[
-        {
-          text:
-            mode === "create-user"
-              ? "Next: Add to user groups"
-              : mode == "select-groups"
-                ? "Add User"
-                : mode == "create-group"
-                  ? "Next: Assign members"
-                  : mode === "add-members"
-                    ? "Next: Assign queries"
-                    : mode === "add-queries"
-                      ? "Save Changes"
-                      : "Save changes",
-          type: "submit" as const,
-          id: "modal-save-button",
-          className: "usa-button",
-          onClick: handleSave,
-        },
-      ]}
+      buttons={getModalButtons()}
       errorMessage={errorMessage}
     >
       {renderModalContent(mode)}

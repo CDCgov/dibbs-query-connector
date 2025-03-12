@@ -12,17 +12,20 @@ import { getSessionRole } from "../../utils";
 export type UserManagementDrawerProps = {
   userGroups: UserGroup[];
   setUserGroups: Dispatch<SetStateAction<UserGroup[]>>;
+  refreshUsers: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 /**
  * @param root0 - The properties object
  * @param root0.userGroups The list of usergroups to display
- * @param root0.setUserGroups -
+ * @param root0.setUserGroups - State function that updates UserGroup data
+ * @param root0.refreshUsers - State function that indicates if the list of Users should be refreshed
  * @returns TeamQueryEditSection component which is the collapsible section that allows to edit members and queries of a team
  */
 const UserManagementDrawer: React.FC<UserManagementDrawerProps> = ({
   userGroups,
   setUserGroups,
+  refreshUsers,
 }) => {
   const {
     teamQueryEditSection,

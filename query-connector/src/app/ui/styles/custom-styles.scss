@@ -653,21 +653,20 @@ ul.usa-sidenav > li.usa-sidenav__item > ul.usa-sidenav__sublist > li.usa-sidenav
 
   .usa-button-group {
     flex-direction: row-reverse;
+    justify-content: space-between;
 
     .usa-button {
       background-color: #005ea2;
     }
+
     .usa-button-group__item:last-child {
       margin-right: 0.25rem;
     }
 
-    .usa-button--secondary {
-      background-color: #d83933 !important;
-    }
-
-    #modal-cancel-button {
+    #modal-back-button {
       background-color: transparent;
-
+      color: #005ea2;
+      padding: 0 !important;
       &:hover {
         box-shadow: none;
       }

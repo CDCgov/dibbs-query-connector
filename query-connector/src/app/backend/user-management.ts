@@ -72,6 +72,70 @@ export async function addUserIfNotExists(userToken: {
 }
 
 /**
+ * Updates an existing user in the users table.
+ * @param userId - The user ID from the JWT token.
+ * @param updated_userName - The username from the JWT token.
+ * @param updated_firstName - The first name from the JWT token.
+ * @param updated_lastName - The last name from the JWT token.
+ * @param updated_role - The role from the JWT token.
+ * @returns The newly added user or an empty result if already exists.
+ */
+export async function updateUserDetails(
+  userId: string,
+  updated_userName: string,
+  updated_firstName: string,
+  updated_lastName: string,
+  updated_role: string,
+) {
+  if (!userId) {
+    console.error("Cannot update user, no ID provided.");
+    return;
+  }
+
+  try {
+    console.log("Checking if user exists.");
+
+    const checkUserQuery = `SELECT id, username, qc_role FROM users WHERE id = $1;`;
+    const userExists = await dbClient.query(checkUserQuery, [userId]);
+
+    if (userExists.rowCount == 0) {
+      console.log("User not found in Users", userId);
+      return { msg: "Unable to update user", userId: userId };
+    }
+
+    const { username, qc_role } = userExists.rows[0];
+    if (username !== updated_userName || qc_role !== updated_role) {
+      const insertUserQuery = `
+        UPDATE users
+        SET 
+          username = $2,
+          first_name = $3,
+          last_name = $4,
+          qc_role = $5
+        WHERE id = $1
+        RETURNING id, username, qc_role, first_name, last_name;
+      `;
+
+      const result = await dbClient.query(insertUserQuery, [
+        userId,
+        updated_userName,
+        updated_firstName,
+        updated_lastName,
+        updated_role,
+      ]);
+
+      console.log("User updated:", result.rows[0].id);
+      return result.rows[0];
+    } else {
+      // nothing to update, carry on...
+      return;
+    }
+  } catch (error) {
+    console.error("Error updating user", error);
+    throw error;
+  }
+}
+/**
  * Updates the role of an existing user in the users table.
  * @param userId - The user ID.
  * @param newRole - The new role to assign to the user.

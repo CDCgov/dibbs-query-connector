@@ -4,6 +4,10 @@ import { createContext, useState } from "react";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import { User } from "@/app/models/entities/users";
 import { QueryTableResult } from "../../queryBuilding/utils";
+import {
+  addUsersToGroup,
+  removeUsersFromGroup,
+} from "@/app/backend/usergroup-management";
 
 export type SubjectType = "Members" | "Queries" | null;
 
@@ -106,15 +110,24 @@ const DataProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     console.log("filtering ...", filter);
   }
 
-  function handleMemberUpdate(e: React.ChangeEvent<HTMLInputElement>) {
+  async function handleMemberUpdate(e: React.ChangeEvent<HTMLInputElement>) {
+    const groupId = innerState.teamQueryEditSection.groupId;
+    const groupName = innerState.teamQueryEditSection.title;
     const user = e.currentTarget.labels?.[0].innerText;
+    const userId = e.currentTarget.id;
     const checked = e.target.checked;
 
     const alertText = checked
-      ? `Added ${user} to ${innerState.teamQueryEditSection.title}`
-      : `Removed ${user} from ${innerState.teamQueryEditSection.title}`;
+      ? `Added ${user} to ${groupName}`
+      : `Removed ${user} from ${groupName}`;
 
     try {
+      if (checked) {
+        await addUsersToGroup(groupId, [userId]);
+      } else {
+        await removeUsersFromGroup(groupId, [userId]);
+      }
+
       showToastConfirmation({
         body: alertText,
       });

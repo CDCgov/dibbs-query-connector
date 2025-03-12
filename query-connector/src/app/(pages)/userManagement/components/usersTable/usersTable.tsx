@@ -2,16 +2,12 @@
 
 import { useEffect, useState, useRef } from "react";
 import UserManagementDrawer from "../teamQueryEditSection/TeamQueryEditSection";
-import UserGroups from "../userGroups/UserGroupsTable";
+import UserGroupsTable from "../userGroups/UserGroupsTable";
 import TabGroup, { Tab } from "@/app/ui/designSystem/TabGroup/tabGroup";
 import { Button } from "@trussworks/react-uswds";
 import UserPermissionsTable from "../userPermissions/userPermissionsTable";
 import { QCResponse } from "@/app/models/responses/collections";
-import {
-  User,
-  UserGroup,
-  UserRole,
-} from "../../../../models/entities/user-management";
+import { User, UserGroup, UserRole } from "../../../../models/entities/users";
 import {
   getUsers,
   getUserGroups,
@@ -26,7 +22,6 @@ import UserModal from "../../components/userModal/userModal";
 
 export type UsersTableProps = {
   role: string;
-  fetchNewUsers?: boolean;
   handleOpenModal?: (mode: UserManagementMode) => void;
 };
 
@@ -34,14 +29,14 @@ export type UsersTableProps = {
  * UsersTable container component
  * @param root0 - UsersTable container props
  * @param root0.role - The permissions role of the current logged-in user
- * @param root0.fetchNewUsers - The permissions role of the current logged-in user
  * @returns The UsersTable container component
  */
-const UsersTable: React.FC<UsersTableProps> = ({ role, fetchNewUsers }) => {
+const UsersTable: React.FC<UsersTableProps> = ({ role }) => {
   const [activeTab, setActiveTab] = useState<Tab>();
   const [users, setUsers] = useState<User[]>([]);
   const [userGroups, setUserGroups] = useState<UserGroup[]>([]);
   const [modalMode, setModalMode] = useState<UserManagementMode>("closed");
+  const [shouldRefreshUsers, setShouldRefreshUsers] = useState<boolean>(false);
 
   const modalRef = useRef<ModalRef>(null);
 
@@ -87,10 +82,6 @@ const UsersTable: React.FC<UsersTableProps> = ({ role, fetchNewUsers }) => {
               <UserPermissionsTable
                 fetchGroupMembers={fetchGroupMembers}
                 users={users}
-                setUsers={setUsers}
-                modalMode={modalMode}
-                setModalMode={setModalMode}
-                modalRef={modalRef}
               />
             ) : (
               <div className="empty-response">No users found</div>
@@ -106,14 +97,21 @@ const UsersTable: React.FC<UsersTableProps> = ({ role, fetchNewUsers }) => {
       renderContent: () =>
         userGroups.length > 0 ? (
           <>
-            {/* <Button
-              style={{ marginTop: "1rem" }}
-              type="button"
+            <Button
               onClick={() => handleOpenModal("create-group")}
+              className={classNames(
+                "styles.createQueryButton",
+                "margin-bottom-3",
+              )}
+              style={{
+                marginLeft: "1px",
+                backgroundColor: "#005EA2",
+              }}
+              type="button"
             >
               Create group
-            </Button>{" "} */}
-            <UserGroups
+            </Button>
+            <UserGroupsTable
               fetchGroupMembers={fetchGroupMembers}
               fetchGroupQueries={fetchGroupQueries}
               userGroups={userGroups}
@@ -123,13 +121,20 @@ const UsersTable: React.FC<UsersTableProps> = ({ role, fetchNewUsers }) => {
           <div className="empty-response">
             <div className="empty-response display-flex flex-column flex-align-start">
               No user groups found
-              {/* <Button
-                style={{ marginTop: "1rem" }}
-                type="button"
+              <Button
                 onClick={() => handleOpenModal("create-group")}
+                className={classNames(
+                  "styles.createQueryButton",
+                  "margin-bottom-3",
+                )}
+                style={{
+                  marginLeft: "1px",
+                  backgroundColor: "#005EA2",
+                }}
+                type="button"
               >
                 Create group
-              </Button> */}
+              </Button>
             </div>
           </div>
         ),
@@ -174,10 +179,6 @@ const UsersTable: React.FC<UsersTableProps> = ({ role, fetchNewUsers }) => {
     role == UserRole.ADMIN ? !!users && !!userGroups : !!userGroups;
 
   useEffect(() => {
-    console.log("new mode", modalMode);
-  }, [modalMode]);
-
-  useEffect(() => {
     setActiveTab(defaultTab); // once data are loaded, set the default table display
   }, [users, userGroups.length]);
 
@@ -195,10 +196,11 @@ const UsersTable: React.FC<UsersTableProps> = ({ role, fetchNewUsers }) => {
       }
     }
 
-    if (fetchNewUsers) {
+    if (shouldRefreshUsers) {
       fetchUsers();
+      setShouldRefreshUsers(false);
     }
-  }, [fetchNewUsers]);
+  }, [shouldRefreshUsers]);
 
   const handleOpenModal = (mode: UserManagementMode) => {
     setModalMode(mode);
@@ -214,14 +216,13 @@ const UsersTable: React.FC<UsersTableProps> = ({ role, fetchNewUsers }) => {
           setMode={setModalMode}
           mode={modalMode}
           modalRef={modalRef}
-          users={users}
-          setUsers={setUsers}
+          refreshUsers={setShouldRefreshUsers}
           userGroups={userGroups}
-          setUserGroups={setUserGroups}
         />
         <UserManagementDrawer
           userGroups={userGroups}
           setUserGroups={setUserGroups}
+          refreshUsers={setShouldRefreshUsers}
         />
       </div>
     </>

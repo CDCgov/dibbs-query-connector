@@ -1,14 +1,12 @@
 import { waitFor, screen, render } from "@testing-library/react";
 import * as UserManagementBackend from "@/app/backend/user-management";
-import { UserRole } from "@/app/models/entities/user-management";
+import { UserRole } from "@/app/models/entities/users";
 import { renderWithUser, RootProviderMock } from "@/app/tests/unit/setup";
 import UsersTable from "./usersTable";
-import React, { act } from "react";
 import {
   mockSuperAdmin,
   mockAdmin,
   mockGroupBasic,
-  mockGroupsTab,
   mockPermissionsTab,
 } from "../../test-utils";
 
@@ -43,7 +41,7 @@ describe("Super Admin view of Users Table", () => {
   });
 
   it("renders table view after content is loaded", async () => {
-    jest.spyOn(UserManagementBackend, "getUsers").mockResolvedValue({
+    jest.spyOn(UserManagementBackend, "getUsers").mockResolvedValueOnce({
       items: [mockAdmin, mockSuperAdmin],
       totalItems: 2,
     });
@@ -71,11 +69,11 @@ describe("Super Admin view of Users Table", () => {
   });
 
   it("renders content on tab click", async () => {
-    jest.spyOn(UserManagementBackend, "getUsers").mockResolvedValue({
+    jest.spyOn(UserManagementBackend, "getUsers").mockResolvedValueOnce({
       items: [mockAdmin, mockSuperAdmin],
       totalItems: 2,
     });
-    jest.spyOn(UserManagementBackend, "getUserGroups").mockResolvedValue({
+    jest.spyOn(UserManagementBackend, "getUserGroups").mockResolvedValueOnce({
       items: [mockGroupBasic],
       totalItems: 2,
     });
@@ -115,21 +113,22 @@ describe("Admin view of Users Table", () => {
       </RootProviderMock>,
     );
 
+    await waitFor(() => {
+      expect(screen.queryByText("Loading")).not.toBeInTheDocument();
+    });
+
     expect(screen.getByText("No user groups found")).toBeInTheDocument();
     expect(document.body).toMatchSnapshot();
     jest.restoreAllMocks();
   });
 
   it("fetches usergroups on page load", async () => {
-    jest
-      .spyOn(React, "useEffect")
-      .mockImplementation(() =>
-        Promise.resolve({ json: () => Promise.resolve(mockGroupsTab) }),
-      );
-
-    await act(async () => {
-      if (mockGroupsTab.renderContent) render(mockGroupsTab?.renderContent());
-    });
+    const getUserGroupsSpy = jest
+      .spyOn(UserManagementBackend, "getUserGroups")
+      .mockResolvedValueOnce({
+        items: [mockGroupBasic],
+        totalItems: 1,
+      });
 
     render(
       <RootProviderMock currentPage="/userManagement">
@@ -137,7 +136,12 @@ describe("Admin view of Users Table", () => {
       </RootProviderMock>,
     );
 
-    expect(document.body).toHaveTextContent(mockGroupBasic.name);
+    await waitFor(() => {
+      expect(screen.queryByText("Loading")).not.toBeInTheDocument();
+    });
+
+    expect(getUserGroupsSpy).toHaveBeenCalled();
+    await screen.findByText(mockGroupBasic.name);
     expect(document.body).toMatchSnapshot();
     jest.restoreAllMocks();
   });
