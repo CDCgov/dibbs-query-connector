@@ -42,11 +42,12 @@ describe("auditable decorator", () => {
       last_connection_successful: false,
       headers: {header: "headerhere"},
       disable_cert_validation: true}]);
-    global.fetch = jest.fn();
+    const spy = global.fetch = jest.fn();
     client.get("path");
-    const spy = jest.spyOn(decorators, "auditable");
+    // const auditable = jest.spyOn(decorators, "auditable");
     // expect(FHIRClient).toHaveBeenCalledWith("get");
     expect(spy).toHaveBeenCalled();
-    // expect(log).toInclude("To add to audit log: ");
+    expect(decorators.auditable).toHaveBeenCalledAfter(spy);
+    // expect(auditable).toHaveBeenCalled();
   });
 });
