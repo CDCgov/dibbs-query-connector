@@ -15,7 +15,7 @@ const AuditLogs: React.FC = () => {
   const [search, setSearch] = useState("");
   const [selectedName, setSelectedName] = useState("");
   const [selectedAction, setSelectedAction] = useState("");
-  const [selectedDate, setSelectedDate] = useState("");
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [actionsPerPage, setActionsPerPage] = useState(10);
 
@@ -93,13 +93,20 @@ const AuditLogs: React.FC = () => {
   }, [logs, currentPage, actionsPerPage]);
 
   return (
-    <div className={classNames("main-container__wide", styles.mainContainer)}>
+    <div className={classNames(styles.mainContainerWider)}>
       <div className={classNames("grid-row", "margin-bottom-3")}>
         <h1 className="page-title grid-col-10">Audit Log</h1>
       </div>
 
-      <div className={classNames("grid-row", "margin-bottom-3")}>
-        <div className={classNames("padding-right-1", styles.inputGroup)}>
+      <div
+        className={classNames(
+          "grid-row",
+          "margin-bottom-3",
+          "align-center",
+          styles.searchContainer,
+        )}
+      >
+        <div className={classNames(styles.inputGroup)}>
           <label htmlFor="name">Name(s)</label>
           <Select
             name="name"
@@ -115,7 +122,7 @@ const AuditLogs: React.FC = () => {
             ))}
           </Select>
         </div>
-        <div className={classNames("padding-right-1", styles.inputGroup)}>
+        <div className={classNames(styles.inputGroup)}>
           <label htmlFor="action">Action(s)</label>
           <Select
             name="action"
@@ -148,15 +155,15 @@ const AuditLogs: React.FC = () => {
           id="search"
           placeholder="Search name or action"
           value={search}
-          className="margin-left-3 margin-top-3 align-center"
           onChange={(e: ChangeEvent<HTMLInputElement>) =>
             setSearch(e.target.value)
           }
+          className={styles.searchField}
         />
       </div>
 
-      <div>
-        <Table fullWidth>
+      <div className={styles.auditTableContainer}>
+        <Table className={styles.auditTable}>
           <thead>
             <tr>
               <th className={styles.tableHeader}>Name</th>
@@ -176,7 +183,7 @@ const AuditLogs: React.FC = () => {
         </Table>
       </div>
 
-      <div className={styles.paginationContainer}>
+      <div className={classNames(styles.paginationContainer)}>
         <span>
           Showing {(currentPage - 1) * actionsPerPage + 1}-
           {Math.min(currentPage * actionsPerPage, logs.length)} of {logs.length}{" "}
@@ -184,11 +191,20 @@ const AuditLogs: React.FC = () => {
         </span>
 
         <Pagination
+          className={styles.paginationText}
           pathname="/auditLogs"
           totalPages={totalPages}
           currentPage={currentPage}
-          onChange={(page) => setCurrentPage(page)} // Ensure page updates correctly
-          className={styles.paginationText}
+          onClickNext={() =>
+            setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+          }
+          onClickPrevious={() =>
+            setCurrentPage((prev) => Math.max(prev - 1, 1))
+          }
+          onClickPageNumber={(event, page) => {
+            event.preventDefault();
+            setCurrentPage(page);
+          }}
         />
 
         <div className={styles.actionsPerPageContainer}>
@@ -197,6 +213,7 @@ const AuditLogs: React.FC = () => {
             name="actionsPerPage"
             id="actionsPerPage"
             value={actionsPerPage}
+            className={styles.actionsPerPageDropdown}
             onChange={(e) => setActionsPerPage(Number(e.target.value))}
           >
             <option value="10">10</option>
