@@ -75,7 +75,6 @@ async function generateAuditValues(
   const auditChecksum = generateAuditChecksum(author, functionArgs);
   const auditContents = generateAuditMessage(functionResult, functionArgs);
   const auditValues = [author, actionType, auditChecksum, auditContents];
-  //   console.log(auditValues);
   return auditValues;
 }
 
@@ -83,15 +82,15 @@ function generateAuditChecksum(author: string, messageContents: unknown[]) {
   return "result of some hashing algo based on author and message contents";
 }
 
-function generateAuditMessage(functionResult: unknown, args: unknown[]) {
+function generateAuditMessage(result: unknown, args: unknown[]) {
   // can do more fancy serialization here if needed
 
   args = args.map((obj) => {
     return JSON.stringify(obj);
   });
-  functionResult = JSON.stringify(functionResult);
+
   return {
-    functionResult: functionResult,
-    functionParams: args.join(","),
+    args: args.join(","),
+    result: JSON.stringify(result),
   };
 }
