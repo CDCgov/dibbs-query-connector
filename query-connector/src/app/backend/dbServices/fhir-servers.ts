@@ -215,7 +215,8 @@ class FhirServerConfigService {
       headers,
       disable_cert_validation
     )
-    VALUES ($1, $2, $3, $4, $5, $6);
+    VALUES ($1, $2, $3, $4, $5, $6)
+    RETURNING *;
   `;
 
     try {

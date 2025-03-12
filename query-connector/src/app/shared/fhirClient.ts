@@ -7,7 +7,7 @@ import { auditable } from "./decorators";
  * @param server The FHIR server to query.
  * @returns The client instance.
  */
-class FHIRClient {
+export default class FHIRClient {
   private hostname: string;
   private init: RequestInit;
 
@@ -41,7 +41,7 @@ class FHIRClient {
    * @param path - The request path.
    * @returns The response from the server.
    */
-  @auditable()
+  @auditable(true)
   async get(path: string): Promise<Response> {
     const response = await fetch(this.hostname + path, this.init);
     return response;
@@ -52,7 +52,7 @@ class FHIRClient {
    * @param paths - Array of request paths.
    * @returns Array of responses from the server.
    */
-  @auditable()
+  @auditable(true)
   async getBatch(paths: string[]): Promise<Response[]> {
     return Promise.all(
       paths.map((path) => fetch(this.hostname + path, this.init)),
@@ -65,7 +65,7 @@ class FHIRClient {
    * @param params - The request parameters.
    * @returns The response from the server.
    */
-  @auditable()
+  @auditable(true)
   async post(path: string, params: Record<string, string>): Promise<Response> {
     const searchParams = new URLSearchParams(params);
 
@@ -81,5 +81,3 @@ class FHIRClient {
     return fetch(this.hostname + path, requestOptions);
   }
 }
-
-export default FHIRClient;

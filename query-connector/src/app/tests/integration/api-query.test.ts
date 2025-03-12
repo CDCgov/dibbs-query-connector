@@ -14,6 +14,7 @@ import { GET } from "@/app/api/route";
 import {
   PATIENT_HL7_MESSAGE,
   PATIENT_HL7_MESSAGE_NO_IDENTIFIERS,
+  suppressConsoleLogs,
 } from "./fixtures";
 
 jest.mock("next-auth");
@@ -49,6 +50,8 @@ if (!PatientResource || PatientResource.resourceType !== "Patient") {
   throw new Error("Invalid Patient resource in the test bundle.");
 }
 
+suppressConsoleLogs();
+
 describe("GET Health Check", () => {
   it("should return status OK", async () => {
     const response = await GET();
@@ -59,16 +62,6 @@ describe("GET Health Check", () => {
 });
 
 describe("POST Query FHIR Server", () => {
-  beforeEach(() => {
-    // supress the warnings for the error endpoints and general console.logs
-    jest.spyOn(console, "error").mockImplementation(() => {});
-    jest.spyOn(console, "log").mockImplementation(() => {});
-  });
-
-  afterEach(() => {
-    jest.restoreAllMocks();
-  });
-
   const SYPHILIS_QUERY_ID = USE_CASE_DETAILS.syphilis.id;
   it("should return an OperationOutcome if the request body is not a Patient resource", async () => {
     const request = createNextRequest(
