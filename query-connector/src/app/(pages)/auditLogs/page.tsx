@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, ChangeEvent, useMemo } from "react";
+import { useState, useEffect, ChangeEvent, useMemo } from "react";
 import styles from "./auditLogs.module.scss";
 import classNames from "classnames";
 import SearchField from "@/app/ui/designSystem/searchField/SearchField";
@@ -19,7 +19,7 @@ const AuditLogs: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [actionsPerPage, setActionsPerPage] = useState(10);
 
-  // Is this the right place to do this? I think it
+  // Dummy data multiplied by 50 to simulate a large dataset
   const logs = useMemo(() => {
     const baseData = [
       {
@@ -49,13 +49,12 @@ const AuditLogs: React.FC = () => {
       },
     ];
 
-    // Multiply data 50 times (adjust as needed)
     return Array.from({ length: 50 }, (_, index) =>
       baseData.map((entry) => ({
         ...entry,
-        date: new Date(entry.date.getTime() + index * 86400000), // Add days to each entry
+        date: new Date(entry.date.getTime() + index * 86400000),
       })),
-    ).flat(); // Flatten array of arrays
+    ).flat();
   }, []);
 
   // Get unique names from logs; we could have this be a pull of getUsers() to avoid recalculating it
@@ -65,6 +64,7 @@ const AuditLogs: React.FC = () => {
   }, [logs]);
 
   // Get unique actions from logs; we could have this be a const to avoid recalculating it
+  // Other question would be if we have actions that are calculated in the DB from a large json, if that large json needs to be represented here
   const uniqueActions = useMemo(() => {
     return Array.from(new Set(logs.map((log) => log.action))).sort();
   }, [logs]);
@@ -84,13 +84,39 @@ const AuditLogs: React.FC = () => {
   }, [logs]);
 
   // Calculate total pages based on logs.length and actionsPerPage
-  const totalPages = Math.ceil(logs.length / actionsPerPage);
+  const [filteredLogs, setFilteredLogs] = useState(logs);
+
+  // Update filtered logs dynamically when filters change
+  useEffect(() => {
+    setFilteredLogs(
+      logs.filter((log) => {
+        const matchesName = selectedName ? log.name === selectedName : true;
+        const matchesAction = selectedAction
+          ? log.action === selectedAction
+          : true;
+        const matchesSearch =
+          search.length === 0 ||
+          log.name.toLowerCase().includes(search.toLowerCase()) ||
+          log.action.toLowerCase().includes(search.toLowerCase());
+        const matchesDate = selectedDate
+          ? log.date.toISOString().split("T")[0] ===
+            selectedDate.toISOString().split("T")[0]
+          : true;
+
+        return matchesName && matchesAction && matchesSearch && matchesDate;
+      }),
+    );
+    setCurrentPage(1);
+  }, [selectedName, selectedAction, selectedDate, search, logs]);
+
   const paginatedLogs = useMemo(() => {
-    return logs.slice(
+    return filteredLogs.slice(
       (currentPage - 1) * actionsPerPage,
       currentPage * actionsPerPage,
     );
-  }, [logs, currentPage, actionsPerPage]);
+  }, [filteredLogs, currentPage, actionsPerPage]);
+
+  const totalPages = Math.ceil(filteredLogs.length / actionsPerPage);
 
   return (
     <div className={classNames(styles.mainContainerWider)}>
@@ -186,8 +212,8 @@ const AuditLogs: React.FC = () => {
       <div className={classNames(styles.paginationContainer)}>
         <span>
           Showing {(currentPage - 1) * actionsPerPage + 1}-
-          {Math.min(currentPage * actionsPerPage, logs.length)} of {logs.length}{" "}
-          actions
+          {Math.min(currentPage * actionsPerPage, filteredLogs.length)} of{" "}
+          {filteredLogs.length} actions
         </span>
 
         <Pagination
