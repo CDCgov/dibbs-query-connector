@@ -2,6 +2,11 @@ import { render, screen, fireEvent, within } from "@testing-library/react";
 import AuditLogs from "./page";
 import userEvent from "@testing-library/user-event";
 
+jest.mock("@/app/ui/components/withAuth/WithAuth", () => ({
+  __esModule: true,
+  default: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+}));
+
 /**
  * Helper function to select an option in a dropdown
  * @param label - The label of the dropdown
