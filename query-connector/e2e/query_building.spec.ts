@@ -66,7 +66,7 @@ test.describe("building a new query", () => {
 
     const actionButton = page.getByTestId("createSaveQueryBtn");
     expect(actionButton).toBeVisible();
-    expect(actionButton).toHaveText("Save query");
+    expect(actionButton).toHaveText("Customize query");
     expect(actionButton).toBeDisabled();
 
     const input = page.getByTestId("queryNameInput");
@@ -339,15 +339,13 @@ test.describe("editing an exisiting query", () => {
     const actionButton = page.getByTestId("createSaveQueryBtn");
     await expect(actionButton).toBeVisible();
 
-    // move to next page
-    await actionButton.click();
-    await expect(actionButton).toContainText("Save query");
+    //click into the condition to edit
+    await page.getByText(subjectQuery.query_name, { exact: true }).click();
 
-    // uncheck a value set
-    const firstLabVS = page.getByTestId("accordionItem_labs");
-    const firstVsCheckTarget = firstLabVS.getByTestId("checkbox");
     // initial render is a minus state, so need to check and uncheck to reset the
     // state to uncheck
+    const firstLabVS = page.getByTestId("accordionItem_labs");
+    const firstVsCheckTarget = firstLabVS.getByTestId("checkbox");
     await firstVsCheckTarget.click();
     await expect(firstVsCheckTarget.getByRole("checkbox")).not.toBeChecked();
     await firstVsCheckTarget.click();
@@ -364,7 +362,7 @@ test.describe("editing an exisiting query", () => {
       .getByRole("button")
       .click();
     await expect(openDrawer).toBeVisible();
-
+  
     const code = page
       .locator("tr", { hasText: subjectConcept.code })
       .getByTestId("checkbox");
