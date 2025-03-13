@@ -55,7 +55,7 @@ pagesConfig[PAGES.FHIR_SERVERS] = {
 pagesConfig[PAGES.AUDIT_LOGS] = {
   position: 3,
   path: PAGES.AUDIT_LOGS,
-  name: "Audit Logs",
+  name: "Audit logs",
   roleAccess: [UserRole.SUPER_ADMIN],
 };
 

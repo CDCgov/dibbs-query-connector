@@ -203,7 +203,7 @@ const AuditLogs: React.FC = () => {
           </thead>
           <tbody>
             {paginatedLogs.map((log, index) => (
-              <tr key={index}>
+              <tr className={styles.tableRows} key={index}>
                 <td>{log.name}</td>
                 <td>{log.action}</td>
                 <td>{log.date.toLocaleString()}</td>

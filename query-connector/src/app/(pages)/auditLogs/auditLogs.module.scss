@@ -71,7 +71,17 @@ gap: 0.5rem;
 
 .tableHeader:nth-child(3) {
   width: 12.5rem;
+  
 }
+
+.tableRows {
+  height: 4.25rem;
+}
+
+.tableRows td:nth-child(3) {
+  white-space: nowrap;
+}
+
 
 .paginationContainerWrapper {
   display: flex;
