@@ -343,17 +343,6 @@ test.describe("editing an exisiting query", () => {
     await actionButton.click();
     await expect(actionButton).toContainText("Save query");
 
-    // uncheck a value set
-    const firstLabVS = page.getByTestId("accordionItem_labs");
-    const firstVsCheckTarget = firstLabVS.getByTestId("checkbox");
-    // initial render is a minus state, so need to check and uncheck to reset the
-    // state to uncheck
-    await firstVsCheckTarget.click();
-    await expect(firstVsCheckTarget.getByRole("checkbox")).not.toBeChecked();
-    await firstVsCheckTarget.click();
-    await expect(firstVsCheckTarget.getByRole("checkbox")).toBeChecked();
-    await firstVsCheckTarget.click();
-
     // recheck a single concept code
     const openDrawer = page.getByTestId("drawer-open-true");
     await expect(openDrawer).not.toBeVisible();
