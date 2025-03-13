@@ -6,6 +6,8 @@ import { PageType } from "./constants";
 import { ToastConfigOptions } from "../ui/designSystem/toast/Toast";
 import { Session } from "next-auth";
 
+const REFRESH_INTERVAL_MINS = 15;
+
 export interface DataContextValue {
   data: unknown; // You can define a specific data type here
   setData: (data: unknown) => void;
@@ -58,7 +60,12 @@ export function DataProvider({
         runtimeConfig,
       }}
     >
-      <SessionProvider session={session}>{children}</SessionProvider>
+      <SessionProvider
+        session={session}
+        refetchInterval={REFRESH_INTERVAL_MINS * 60000}
+      >
+        {children}
+      </SessionProvider>
     </DataContext.Provider>
   );
 }
