@@ -12,13 +12,22 @@ DB_NAME="tefca_db"
 
 # Wait for Aidbox to be healthy
 echo "Waiting for Aidbox to become healthy..."
-while true; do
+max_retries=15
+attempt=0
+while [ $attempt -le $max_retries ]; do
   health_status=$(curl -s -o /dev/null -w "%{http_code}" ${NETWORK_URL}/health || echo "000")
   if [ "$health_status" = "200" ]; then
     echo "Aidbox is healthy!"
     break
   else
-    echo "Waiting for Aidbox health check to pass (status: $health_status)..."
+    echo "Waiting for Aidbox health check to pass (status: $health_status)... Attempt $attempt/$max_retries"
+
+   if [ $attempt -eq $max_retries ]; then
+      echo "Maximum retry attempts reached. Exiting."
+      exit 1
+    fi
+
+    attempt=$((attempt + 1))
     sleep 10
   fi
 done
