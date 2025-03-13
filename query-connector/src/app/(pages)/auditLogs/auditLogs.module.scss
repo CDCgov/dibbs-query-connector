@@ -76,6 +76,7 @@ gap: 0.5rem;
 
 .tableRows {
   height: 4.25rem;
+  white-space: ellipsis;
 }
 
 .tableRows td:nth-child(3) {
