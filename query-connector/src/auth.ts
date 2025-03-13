@@ -67,18 +67,16 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           console.error("Something went wrong in generating user token", error);
         }
 
-        if (userToken.username !== "") {
-          if (isAuthDisabledServerCheck()) {
-            userToken.role = UserRole.SUPER_ADMIN;
-          } else {
-            const role = await getUserRole(
-              userToken.username as string,
-            ).catch();
-            userToken.role = role;
-          }
-        }
-
         return { ...token, ...userToken };
+      }
+
+      if (token.username !== "") {
+        if (isAuthDisabledServerCheck()) {
+          token.role = UserRole.SUPER_ADMIN;
+        } else {
+          const role = await getUserRole(token.username as string).catch();
+          token.role = role;
+        }
       }
 
       return token;
@@ -101,6 +99,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         emailVerified: null,
         role: typeof token.role === "string" ? token.role : "",
       };
+
       return session;
     },
   },
