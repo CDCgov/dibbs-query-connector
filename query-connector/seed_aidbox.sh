@@ -10,7 +10,7 @@ DB_PASSWORD="pw"
 DB_NAME="tefca_db"
 
 # Wait for Aidbox to be healthy
-echo "Waiting for Aidbox to become healthy..."
+echo "Waiting for Aidbox to become healthy on: $BASE_URL"
 while true; do
   health_status=$(curl -s -o /dev/null -w "%{http_code}" ${BASE_URL}/health || echo "000")
   if [ "$health_status" = "200" ]; then
@@ -83,7 +83,12 @@ INSERT INTO fhir_servers (
   '${CURRENT_DATETIME}'::timestamp,
   true,
   false
-);
+)
+ON CONFLICT(name)
+DO UPDATE SET
+  hostname = '${BASE_URL}/fhir',
+  headers = '{"Authorization": "Bearer ${TOKEN}"}'::jsonb,
+;
 EOF
 
 echo "Finished configuring Aidbox and database."
