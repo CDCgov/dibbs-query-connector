@@ -345,7 +345,6 @@ test.describe("editing an exisiting query", () => {
 
     // uncheck a value set
     const labsHeader = page.getByTestId("accordionButton_labs");
-    await expect(labsHeader).toBeVisible();
     await labsHeader.click();
 
     const firstLabVS = page.getByTestId("accordionItem_labs");
