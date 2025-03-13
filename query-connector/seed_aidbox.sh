@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Environment variables set by docker-compose
-BASE_URL="http://aidbox:8082"
+BASE_URL="http://aidbox:8080"
 AIDBOX_CLIENT_SECRET="L6AGe_5V2O"
 DB_ADDRESS="db"
 DB_PORT="5432"
@@ -78,7 +78,7 @@ INSERT INTO fhir_servers (
   disable_cert_validation
 ) VALUES (
   'Aidbox',
-  'http://localhost:8082/fhir',
+  'http://${BASE_URL}/fhir',
   '{"Authorization": "Bearer ${TOKEN}"}'::jsonb,
   '${CURRENT_DATETIME}'::timestamp,
   true,

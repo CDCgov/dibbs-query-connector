@@ -76,22 +76,41 @@ jobs:
             echo "Waiting for Query Connector to be ready before running Playwright..."
             sleep 5
           done
-      - name: Poll until HAPI server is ready
+      - name: Poll until FHIR server is ready
         run: |
           until response=$(curl -v -s -w "HTTP_STATUS:%{http_code}" http://localhost:8080/fhir/Patient); do
             # Extract status code from the response
             http_status=$(echo "$response" | grep "HTTP_STATUS" | awk -F: '{print $2}')
-            echo "Waiting for HAPI server to be ready..."
+            echo "Waiting for Aidbox server to be ready..."
             echo "Response code: $http_status"
             echo "Full response: $response"
             sleep 5
           done
       - name: Poll until FHIR server has data
         run: |
-          until curl -s http://localhost:8080/fhir/Patient | jq '.entry | length > 0' | grep -q 'true'; do
-            echo "Waiting for FHIR server to have data..."
-            sleep 5
+          timeout=300  # 5 minutes timeout
+          interval=5   # Check every 5 seconds
+          elapsed=0
+          found=false
+
+          echo "Waiting for log message to appear..."
+
+          while [ $elapsed -lt $timeout ]; do
+            if docker logs aidbox-seeder | grep -q "Finished configuring Aidbox and database"; then
+              echo "✅ Aidbox configured!"
+              found=true
+              break
+            fi
+            
+            echo "Waiting for log message... ($elapsed seconds elapsed)"
+            sleep $interval
+            elapsed=$((elapsed + interval))
           done
+
+          if [ "$found" != "true" ]; then
+            echo "❌ Timeout reached. Aidbox never set up was not found."
+            exit 1
+          fi
       - name: Playwright Tests
         working-directory: ./query-connector
         run: npx playwright test e2e --reporter=list --config playwright.config.ts
