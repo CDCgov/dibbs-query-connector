@@ -2,11 +2,11 @@
 
 import { Icon, Label, TextInput } from "@trussworks/react-uswds";
 import {
-  deleteFhirServer,
-  getFhirServersList,
   insertFhirServer,
   updateFhirServer,
-} from "./../../backend/fhir-servers";
+  deleteFhirServer,
+  getFhirServerConfigs,
+} from "@/app/backend/dbServices/fhir-servers";
 import dynamic from "next/dynamic";
 import { useEffect, useState, useRef } from "react";
 import type { ModalRef } from "../../ui/designSystem/modal/Modal";
@@ -17,9 +17,11 @@ import Checkbox from "../../ui/designSystem/checkbox/Checkbox";
 
 // Dynamic import with proper typing for Modal
 import type { ModalProps } from "../../ui/designSystem/modal/Modal";
+
 import WithAuth from "@/app/ui/components/withAuth/WithAuth";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import { FhirServerConfig } from "@/app/models/entities/fhir-servers";
+
 const Modal = dynamic<ModalProps>(
   () => import("../../ui/designSystem/modal/Modal").then((mod) => mod.Modal),
   { ssr: false },
@@ -52,7 +54,7 @@ const FhirServers: React.FC = () => {
   // Fetch FHIR servers
   async function fetchFHIRServers() {
     try {
-      const servers = await getFhirServersList(true);
+      const servers = await getFhirServerConfigs(true, true);
       setFhirServers(servers);
     } catch (e) {
       showToastConfirmation({
@@ -153,7 +155,7 @@ const FhirServers: React.FC = () => {
       );
 
       if (result.success) {
-        getFhirServersList(true).then((servers) => {
+        getFhirServerConfigs(true, true).then((servers) => {
           setFhirServers(servers);
         });
         handleCloseModal();
@@ -172,7 +174,7 @@ const FhirServers: React.FC = () => {
       );
 
       if (result.success) {
-        getFhirServersList(true).then((servers) => {
+        getFhirServerConfigs(true, true).then((servers) => {
           setFhirServers(servers);
         });
         handleCloseModal();
@@ -191,7 +193,7 @@ const FhirServers: React.FC = () => {
     const result = await deleteFhirServer(selectedServer.id);
 
     if (result.success) {
-      getFhirServersList(true).then((servers) => {
+      getFhirServerConfigs(true, true).then((servers) => {
         setFhirServers(servers);
       });
       handleCloseModal();
