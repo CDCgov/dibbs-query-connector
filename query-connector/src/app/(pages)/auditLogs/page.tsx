@@ -6,6 +6,7 @@ import classNames from "classnames";
 import SearchField from "@/app/ui/designSystem/searchField/SearchField";
 import Table from "@/app/ui/designSystem/table/Table";
 import { Select, Pagination, DatePicker } from "@trussworks/react-uswds";
+import WithAuth from "@/app/ui/components/withAuth/WithAuth";
 
 /**
  * Client component for the Audit Logs page.
@@ -119,140 +120,142 @@ const AuditLogs: React.FC = () => {
   const totalPages = Math.ceil(filteredLogs.length / actionsPerPage);
 
   return (
-    <div className={classNames(styles.mainContainerWider)}>
-      <div className={classNames("grid-row", "margin-bottom-3")}>
-        <h1 className="page-title grid-col-10">Audit Log</h1>
-      </div>
+    <WithAuth>
+      <div className={classNames(styles.mainContainerWider)}>
+        <div className={classNames("grid-row", "margin-bottom-3")}>
+          <h1 className="page-title grid-col-10">Audit Log</h1>
+        </div>
 
-      <div
-        className={classNames(
-          "grid-row",
-          "margin-bottom-3",
-          "align-center",
-          styles.searchContainer,
-        )}
-      >
-        <div className={classNames(styles.inputGroup)}>
-          <label htmlFor="name">Name(s)</label>
-          <Select
-            name="name"
-            id="name"
-            value={selectedName}
-            onChange={(e) => setSelectedName(e.target.value)}
-          >
-            <option value="" disabled></option>
-            {uniqueNames.map((name) => (
-              <option key={name} value={name}>
-                {name}
-              </option>
-            ))}
-          </Select>
-        </div>
-        <div className={classNames(styles.inputGroup)}>
-          <label htmlFor="action">Action(s)</label>
-          <Select
-            name="action"
-            id="action"
-            value={selectedAction}
-            onChange={(e) => setSelectedAction(e.target.value)}
-          >
-            <option value="" disabled></option>
-            {uniqueActions.map((action) => (
-              <option key={action} value={action}>
-                {action}
-              </option>
-            ))}
-          </Select>
-        </div>
-        <div className={classNames(styles.inputGroup)}>
-          <label htmlFor="date">Date</label>
-          <DatePicker
-            id="date"
-            name="date"
-            onChange={(value) =>
-              setSelectedDate(value ? new Date(value) : null)
+        <div
+          className={classNames(
+            "grid-row",
+            "margin-bottom-3",
+            "align-center",
+            styles.searchContainer,
+          )}
+        >
+          <div className={classNames(styles.inputGroup)}>
+            <label htmlFor="name">Name(s)</label>
+            <Select
+              name="name"
+              id="name"
+              value={selectedName}
+              onChange={(e) => setSelectedName(e.target.value)}
+            >
+              <option value="">All names</option>
+              {uniqueNames.map((name) => (
+                <option key={name} value={name}>
+                  {name}
+                </option>
+              ))}
+            </Select>
+          </div>
+          <div className={classNames(styles.inputGroup)}>
+            <label htmlFor="action">Action(s)</label>
+            <Select
+              name="action"
+              id="action"
+              value={selectedAction}
+              onChange={(e) => setSelectedAction(e.target.value)}
+            >
+              <option value="">All actions</option>
+              {uniqueActions.map((action) => (
+                <option key={action} value={action}>
+                  {action}
+                </option>
+              ))}
+            </Select>
+          </div>
+          <div className={classNames(styles.inputGroup)}>
+            <label htmlFor="date">Date</label>
+            <DatePicker
+              id="date"
+              name="date"
+              onChange={(value) =>
+                setSelectedDate(value ? new Date(value) : null)
+              }
+              value={
+                selectedDate instanceof Date && !isNaN(selectedDate.getTime())
+                  ? selectedDate.toISOString().split("T")[0]
+                  : ""
+              }
+              minDate={minDate ? minDate.toISOString().split("T")[0] : ""}
+              maxDate={maxDate ? maxDate.toISOString().split("T")[0] : ""}
+            />
+          </div>
+          <SearchField
+            id="search"
+            placeholder="Search name or action"
+            value={search}
+            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+              setSearch(e.target.value)
             }
-            value={
-              selectedDate instanceof Date && !isNaN(selectedDate.getTime())
-                ? selectedDate.toISOString().split("T")[0]
-                : ""
-            }
-            minDate={minDate ? minDate.toISOString().split("T")[0] : ""}
-            maxDate={maxDate ? maxDate.toISOString().split("T")[0] : ""}
+            className={styles.searchField}
           />
         </div>
-        <SearchField
-          id="search"
-          placeholder="Search name or action"
-          value={search}
-          onChange={(e: ChangeEvent<HTMLInputElement>) =>
-            setSearch(e.target.value)
-          }
-          className={styles.searchField}
-        />
-      </div>
 
-      <div className={styles.auditTableContainer}>
-        <Table className={styles.auditTable}>
-          <thead>
-            <tr>
-              <th className={styles.tableHeader}>Name</th>
-              <th className={styles.tableHeader}>Action</th>
-              <th className={styles.tableHeader}>Date</th>
-            </tr>
-          </thead>
-          <tbody>
-            {paginatedLogs.map((log, index) => (
-              <tr className={styles.tableRows} key={index}>
-                <td>{log.name}</td>
-                <td>{log.action}</td>
-                <td>{log.date.toLocaleString()}</td>
+        <div className={styles.auditTableContainer}>
+          <Table>
+            <thead>
+              <tr>
+                <th className={styles.tableHeader}>Name</th>
+                <th className={styles.tableHeader}>Action</th>
+                <th className={styles.tableHeader}>Date</th>
               </tr>
-            ))}
-          </tbody>
-        </Table>
-      </div>
+            </thead>
+            <tbody>
+              {paginatedLogs.map((log, index) => (
+                <tr className={styles.tableRows} key={index}>
+                  <td>{log.name}</td>
+                  <td>{log.action}</td>
+                  <td>{log.date.toLocaleString()}</td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+        </div>
 
-      <div className={classNames(styles.paginationContainer)}>
-        <span>
-          Showing {(currentPage - 1) * actionsPerPage + 1}-
-          {Math.min(currentPage * actionsPerPage, filteredLogs.length)} of{" "}
-          {filteredLogs.length} actions
-        </span>
+        <div className={classNames(styles.paginationContainer)}>
+          <span>
+            Showing {(currentPage - 1) * actionsPerPage + 1}-
+            {Math.min(currentPage * actionsPerPage, filteredLogs.length)} of{" "}
+            {filteredLogs.length} actions
+          </span>
 
-        <Pagination
-          className={styles.paginationText}
-          pathname="/auditLogs"
-          totalPages={totalPages}
-          currentPage={currentPage}
-          onClickNext={() =>
-            setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-          }
-          onClickPrevious={() =>
-            setCurrentPage((prev) => Math.max(prev - 1, 1))
-          }
-          onClickPageNumber={(event, page) => {
-            event.preventDefault();
-            setCurrentPage(page);
-          }}
-        />
+          <Pagination
+            className={styles.paginationText}
+            pathname="/auditLogs"
+            totalPages={totalPages}
+            currentPage={currentPage}
+            onClickNext={() =>
+              setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+            }
+            onClickPrevious={() =>
+              setCurrentPage((prev) => Math.max(prev - 1, 1))
+            }
+            onClickPageNumber={(event, page) => {
+              event.preventDefault();
+              setCurrentPage(page);
+            }}
+          />
 
-        <div className={styles.actionsPerPageContainer}>
-          <label htmlFor="actionsPerPage">Actions per page</label>
-          <Select
-            name="actionsPerPage"
-            id="actionsPerPage"
-            value={actionsPerPage}
-            className={styles.actionsPerPageDropdown}
-            onChange={(e) => setActionsPerPage(Number(e.target.value))}
-          >
-            <option value="10">10</option>
-            <option value="25">25</option>
-            <option value="50">50</option>
-          </Select>
+          <div className={styles.actionsPerPageContainer}>
+            <label htmlFor="actionsPerPage">Actions per page</label>
+            <Select
+              name="actionsPerPage"
+              id="actionsPerPage"
+              value={actionsPerPage}
+              className={styles.actionsPerPageDropdown}
+              onChange={(e) => setActionsPerPage(Number(e.target.value))}
+            >
+              <option value="10">10</option>
+              <option value="25">25</option>
+              <option value="50">50</option>
+            </Select>
+          </div>
         </div>
       </div>
-    </div>
+    </WithAuth>
   );
 };
 
