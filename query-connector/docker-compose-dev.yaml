@@ -32,22 +32,6 @@ services:
       db:
         condition: service_started
 
-  # HAPI FHIR Server for running e2e tests
-  hapi-fhir-server:
-    image: "hapiproject/hapi:latest"
-    ports:
-      - "8080:8080"
-  data-loader:
-    build:
-      context: .
-      dockerfile: Dockerfile.dev
-    volumes:
-      - "./src/app/tests/assets/GoldenSickPatient.json:/etc/GoldenSickPatient.json"
-      - "./post_e2e_data_hapi.sh:/post_e2e_data_hapi.sh"
-    command: ["sh", "post_e2e_data_hapi.sh"]
-    depends_on:
-      - hapi-fhir-server
-
   # Keycloak for authentication
   # Note: you must have a local .env file with a parameter AUTH_DISABLED.
   # You may set it to true or false depending on what you'd like to test.

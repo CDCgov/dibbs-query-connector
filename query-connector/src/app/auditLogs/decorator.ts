@@ -7,24 +7,17 @@ import { getDbClient } from "../backend/dbClient";
  * @returns The result of the function, with the args / result logged appropriately
  */
 export function auditable(async = false) {
-  return function (
-    target: Object,
-    key: string,
-    descriptor: PropertyDescriptor,
-  ) {
+  return function (target: any, key: string, descriptor: PropertyDescriptor) {
     const dbConnection = getDbClient();
     const method = descriptor.value;
 
-    const writeResultToAuditTable = async (
-      resultToLog: unknown,
-      args: any[],
-    ) => {
+    const writeToAuditTable = async (args: any[]) => {
       const query = `INSERT INTO 
         audit_logs (author, action_type, audit_checksum, audit_message) 
         VALUES ($1, $2, $3, $4)
         RETURNING id, action_type, audit_checksum`;
 
-      generateAuditValues(key, resultToLog, args)
+      generateAuditValues(target, key, args)
         .then((values) => {
           // ? what to do with error handling here? on the event of a failure,
           // ? probably need some retry logic to ensure we don't lose data
@@ -42,10 +35,9 @@ export function auditable(async = false) {
     descriptor.value = async
       ? async function (this: unknown, ...args: unknown[]) {
           try {
-            const resultToLog = await method.apply(this, args);
-            writeResultToAuditTable(resultToLog, args);
+            writeToAuditTable(args);
 
-            return resultToLog;
+            return await method.apply(this, args);
           } catch (error) {
             console.error(`Async method ${key} threw error`, error);
             throw error;
@@ -53,10 +45,9 @@ export function auditable(async = false) {
         }
       : function (this: unknown, ...args: unknown[]) {
           try {
-            const resultToLog = method.apply(this, args);
-            writeResultToAuditTable(resultToLog, args);
+            writeToAuditTable(args);
 
-            return resultToLog;
+            return method.apply(this, args);
           } catch (error) {
             console.error(`Async method ${key} threw error`, error);
             throw error;
@@ -68,37 +59,50 @@ export function auditable(async = false) {
 }
 
 async function generateAuditValues(
+  target: any,
   methodName: string,
-  functionResult: unknown,
-  functionArgs: unknown[],
+  args: unknown[],
 ) {
   const session = await auth();
   const author = `${session?.user.username}`;
 
-  // ? Double check: do we need more fancy mapping between events here, or does the
+  // ? Double check: do we need more fancy mapping for actionType here, or does the
   // ? name of the method suffice?
   const actionType = methodName;
-  const auditContents = generateAuditMessage(functionResult, functionArgs);
+
+  const argLabels = target[methodName]
+    .toString()
+    // match everything between the first "(" and first ")" and use [1] to get
+    // everything in the first capture group (ie exclude the lead / trail parens)
+    .match(/\(([^)]*)\)/)[1]
+    .split(", ");
+
+  const auditContents = generateAuditMessage(argLabels, args);
   const auditChecksum = generateAuditChecksum(author, auditContents);
   return [author, actionType, auditChecksum, auditContents];
 }
 
-function generateAuditMessage(result: unknown, args: unknown[]) {
+function generateAuditMessage(argLabels: string[], args: unknown[]) {
   // can do more fancy serialization here if needed
-  return {
-    args: args
-      .map((obj) => {
-        // TODO: Should probably type guard this process more rigorously
-        return JSON.stringify(obj);
-      })
-      .join(","),
-    result: JSON.stringify(result),
-  };
+  const mappedArgs: { [s: string]: string } = {};
+
+  args.forEach((obj, i) => {
+    mappedArgs[argLabels[i]] = sanitizeString(JSON.stringify(obj));
+  });
+
+  return mappedArgs;
 }
 
-function generateAuditChecksum(
-  author: string,
-  auditContents: { result: string; args: string },
-) {
+function generateAuditChecksum(author: string, auditContents: Object) {
   return "result of some SHA-2 hashing algo based on author and audit contents";
+}
+
+function sanitizeString(s: string) {
+  // add any other sanitization functions we need to this array
+  const functionsToApply = [redactBearerToken];
+  return functionsToApply.reduce((acc, cur) => cur(acc), s);
+}
+
+function redactBearerToken(s: string) {
+  return s.replace(/"Bearer\s+([^\s]+)\"/, "Bearer REDACTED");
 }
