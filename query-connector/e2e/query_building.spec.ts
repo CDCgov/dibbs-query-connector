@@ -344,9 +344,6 @@ test.describe("editing an exisiting query", () => {
     await expect(actionButton).toContainText("Save query");
 
     // uncheck a value set
-    const labsHeader = page.getByTestId("accordionButton_labs");
-    await labsHeader.click();
-
     const firstLabVS = page.getByTestId("accordionItem_labs");
     const firstVsCheckTarget = firstLabVS.getByTestId("checkbox");
     // initial render is a minus state, so need to check and uncheck to reset the
