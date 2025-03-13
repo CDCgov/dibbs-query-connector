@@ -2,6 +2,7 @@
 
 # Environment variables set by docker-compose
 BASE_URL=$1
+NETWORK_URL=http://aidbox:8080
 AIDBOX_CLIENT_SECRET="L6AGe_5V2O"
 DB_ADDRESS="db"
 DB_PORT="5432"
@@ -10,9 +11,9 @@ DB_PASSWORD="pw"
 DB_NAME="tefca_db"
 
 # Wait for Aidbox to be healthy
-echo "Waiting for Aidbox to become healthy on: $BASE_URL"
+echo "Waiting for Aidbox to become healthy..."
 while true; do
-  health_status=$(curl -s -o /dev/null -w "%{http_code}" ${BASE_URL}/health || echo "000")
+  health_status=$(curl -s -o /dev/null -w "%{http_code}" ${NETWORK_URL}/health || echo "000")
   if [ "$health_status" = "200" ]; then
     echo "Aidbox is healthy!"
     break
@@ -32,7 +33,7 @@ TOKEN_RESPONSE=$(curl -X POST \
     "grant_type": "client_credentials",
     "audience": "'${BASE_URL}'"
   }' \
-  ${BASE_URL}/auth/token)
+  ${NETWORK_URL}/auth/token)
 
 # Extract the access_token value
 TOKEN=$(echo $TOKEN_RESPONSE | grep -o '"access_token":"[^"]*"' | sed 's/"access_token":"//;s/"//')
@@ -50,7 +51,7 @@ curl -X POST \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer ${TOKEN}" \
   -d @"/data/GoldenSickPatient.json" \
-  ${BASE_URL}/fhir
+  ${NETWORK_URL}/fhir
 
 echo "GoldenSickPatient data loaded successfully."
 
@@ -87,7 +88,7 @@ INSERT INTO fhir_servers (
 ON CONFLICT(name)
 DO UPDATE SET
   hostname = '${BASE_URL}/fhir',
-  headers = '{"Authorization": "Bearer ${TOKEN}"}'::jsonb,
+  headers = '{"Authorization": "Bearer ${TOKEN}"}'::jsonb
 ;
 EOF
 
