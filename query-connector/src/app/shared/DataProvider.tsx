@@ -62,7 +62,7 @@ export function DataProvider({
     >
       <SessionProvider
         session={session}
-        refetchInterval={REFRESH_INTERVAL_MINS * 60000}
+        refetchInterval={REFRESH_INTERVAL_MINS * 60}
       >
         {children}
       </SessionProvider>
