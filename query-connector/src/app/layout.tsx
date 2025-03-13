@@ -7,6 +7,7 @@ import { Metadata } from "next";
 import Page from "./ui/components/page/page";
 import { auth } from "@/auth";
 import { isAuthDisabledServerCheck } from "./utils/auth";
+import SessionTimeout from "./ui/components/sessionTimeout/sessionTimeout";
 
 /**
  * Establishes the layout for the application.
@@ -32,6 +33,7 @@ export default async function RootLayout({
       <body>
         <div className="application-container">
           <DataProvider runtimeConfig={runtimeConfig} session={session}>
+            <SessionTimeout />
             <Header authDisabled={isAuthDisabledServerCheck()} />
             <Page showSiteAlert={process.env.DEMO_MODE === "true"}>
               {children}

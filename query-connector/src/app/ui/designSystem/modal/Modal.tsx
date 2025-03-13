@@ -28,6 +28,7 @@ export type ModalProps = {
   buttons: ModalButton[];
   isLarge?: boolean;
   errorMessage?: string | null; // New prop for error message
+  forceAction?: boolean;
 };
 
 /**
@@ -41,6 +42,7 @@ export type ModalProps = {
  * @param props.buttons - The buttons to display in the footer.
  * @param props.isLarge - Whether the modal is large.
  * @param props.errorMessage - The error message to display in the footer.
+ * @param props.forceAction - when true the user cannot dismiss the modal unless an specific action is made.
  * @returns - A customizable modal component
  */
 export const Modal: React.FC<ModalProps> = ({
@@ -52,6 +54,7 @@ export const Modal: React.FC<ModalProps> = ({
   buttons,
   isLarge,
   errorMessage,
+  forceAction,
 }) => {
   return (
     <TrussModal
@@ -60,6 +63,7 @@ export const Modal: React.FC<ModalProps> = ({
       aria-labelledby={`${id}-modal-heading`}
       aria-describedby={`${id}-modal-description`}
       isLarge={isLarge}
+      forceAction={forceAction}
       className="padding-x-2"
     >
       <ModalHeading id={`${id}-modal-heading`}>{heading}</ModalHeading>
