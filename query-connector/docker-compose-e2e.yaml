@@ -69,19 +69,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.aidbox-seeder
-    healthcheck:
-      test:
-        [
-          "CMD",
-          "grep",
-          "-q",
-          "Finished configuring Aidbox and database",
-          "/var/log/service.log",
-        ]
-      interval: 5s
-      timeout: 5s
-      retries: 60
-      start_period: 5s
     volumes:
       - ./src/app/tests/assets/GoldenSickPatient.json:/data/GoldenSickPatient.json
       - ./logs:/var/log
@@ -112,7 +99,7 @@ services:
       db:
         condition: service_healthy
       aidbox-seeder:
-        condition: service_healthy
+        condition: service_completed_successfully
 
 volumes:
   aidbox_pg_data:
