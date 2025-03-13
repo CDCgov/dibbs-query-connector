@@ -90,7 +90,14 @@ services:
       context: .
       dockerfile: Dockerfile.aidbox-seeder
     healthcheck:
-      test: ["CMD", "grep", "-q", "String to look for", "/var/log/service.log"]
+      test:
+        [
+          "CMD",
+          "grep",
+          "-q",
+          "Finished configuring Aidbox and database",
+          "/var/log/service.log",
+        ]
       interval: 5s
       timeout: 5s
       retries: 60
