@@ -10,4 +10,4 @@ RUN chmod +x /seed_aidbox.sh
 # Create data directory
 RUN mkdir /data
 
-CMD ["/seed_aidbox.sh"]
+CMD ["/seed_aidbox.sh", "$AIDBOX_BASE_URL"]
