@@ -66,7 +66,7 @@ test.describe("building a new query", () => {
 
     const actionButton = page.getByTestId("createSaveQueryBtn");
     expect(actionButton).toBeVisible();
-    expect(actionButton).toHaveText("Customize query");
+    expect(actionButton).toHaveText("Save query");
     expect(actionButton).toBeDisabled();
 
     const input = page.getByTestId("queryNameInput");
@@ -193,7 +193,7 @@ test.describe("editing an exisiting query", () => {
 
     const actionButton = page.getByTestId("createSaveQueryBtn");
     await expect(actionButton).toBeVisible();
-    await expect(actionButton).toHaveText("Customize query");
+    await expect(actionButton).toHaveText("Save query");
     await expect(actionButton).not.toBeDisabled(); // not disabled since we have condition(s) + name filled
 
     // update query name
@@ -260,7 +260,7 @@ test.describe("editing an exisiting query", () => {
 
     const actionButton = page.getByTestId("createSaveQueryBtn");
     await expect(actionButton).toBeVisible();
-    await expect(actionButton).toHaveText("Customize query");
+    await expect(actionButton).toHaveText("Save query");
     await expect(actionButton).not.toBeDisabled(); // not disabled since we have condition(s) + name filled
 
     // update query conditions
@@ -343,10 +343,22 @@ test.describe("editing an exisiting query", () => {
     await actionButton.click();
     await expect(actionButton).toContainText("Save query");
 
+    // uncheck a value set
+    const firstLabVS = page.getByTestId("accordionItem_labs");
+    const firstVsCheckTarget = firstLabVS.getByTestId("checkbox");
+    // initial render is a minus state, so need to check and uncheck to reset the
+    // state to uncheck
+    await firstVsCheckTarget.click();
+    await expect(firstVsCheckTarget.getByRole("checkbox")).not.toBeChecked();
+    await firstVsCheckTarget.click();
+    await expect(firstVsCheckTarget.getByRole("checkbox")).toBeChecked();
+    await firstVsCheckTarget.click();
+
     // recheck a single concept code
     const openDrawer = page.getByTestId("drawer-open-true");
     await expect(openDrawer).not.toBeVisible();
 
+    await firstLabVS.hover();
     await page
       .getByTestId(`container-${subjectVS.valueSetId}`)
       .getByRole("button")
