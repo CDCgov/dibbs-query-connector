@@ -172,7 +172,11 @@ const AuditLogs: React.FC = () => {
             onChange={(value) =>
               setSelectedDate(value ? new Date(value) : null)
             }
-            value={selectedDate ? selectedDate.toISOString().split("T")[0] : ""}
+            value={
+              selectedDate instanceof Date && !isNaN(selectedDate.getTime())
+                ? selectedDate.toISOString().split("T")[0]
+                : ""
+            }
             minDate={minDate ? minDate.toISOString().split("T")[0] : ""}
             maxDate={maxDate ? maxDate.toISOString().split("T")[0] : ""}
           />
