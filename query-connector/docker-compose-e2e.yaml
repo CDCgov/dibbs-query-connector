@@ -111,7 +111,7 @@ services:
     depends_on:
       db:
         condition: service_healthy
-      aidbox_seeder:
+      aidbox-seeder:
         condition: service_healthy
 
 volumes:
