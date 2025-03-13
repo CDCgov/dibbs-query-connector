@@ -142,7 +142,7 @@ const AuditLogs: React.FC = () => {
               value={selectedName}
               onChange={(e) => setSelectedName(e.target.value)}
             >
-              <option value="">All names</option>
+              <option value="" disabled></option>
               {uniqueNames.map((name) => (
                 <option key={name} value={name}>
                   {name}
@@ -158,7 +158,7 @@ const AuditLogs: React.FC = () => {
               value={selectedAction}
               onChange={(e) => setSelectedAction(e.target.value)}
             >
-              <option value="">All actions</option>
+              <option value="" disabled></option>
               {uniqueActions.map((action) => (
                 <option key={action} value={action}>
                   {action}
