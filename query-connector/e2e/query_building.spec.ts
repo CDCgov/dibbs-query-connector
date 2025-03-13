@@ -362,7 +362,7 @@ test.describe("editing an exisiting query", () => {
       .getByRole("button")
       .click();
     await expect(openDrawer).toBeVisible();
-  
+
     const code = page
       .locator("tr", { hasText: subjectConcept.code })
       .getByTestId("checkbox");
