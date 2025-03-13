@@ -83,8 +83,7 @@ services:
       PGPASSWORD: gOxAmiyiz4
       PGPORT: "5432"
       BOX_SEARCH_INCLUDE_CONFORMANT: true
-    env_file:
-      - .env
+
   aidbox-seeder:
     build:
       context: .
