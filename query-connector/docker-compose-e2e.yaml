@@ -41,7 +41,8 @@ services:
     image: healthsamurai/aidboxone:edge
     pull_policy: always
     depends_on:
-      - aidbox_db
+      aidbox_db:
+        condition: service_healthy
     ports:
       - 8080:8080
     environment:

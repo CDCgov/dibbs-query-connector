@@ -15,7 +15,7 @@ echo "Waiting for Aidbox to become healthy..."
 max_retries=15
 attempt=0
 while [ $attempt -le $max_retries ]; do
-  health_status=$(curl -s -L -o /dev/null -w "%{http_code}" ${NETWORK_URL}/health || echo "000")
+  health_status=$(curl -v -L -o /dev/null -w "%{http_code}" ${NETWORK_URL}/health || echo "000")
   if [[ "$health_status" -ge 200 && "$health_status" -lt 300 ]]; then
     echo "Aidbox is healthy!"
     break
