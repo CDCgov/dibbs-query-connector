@@ -13,12 +13,12 @@
     "start": "NODE_TLS_REJECT_UNAUTHORIZED=0 node .next/standalone/server.js",
     "lint": "next lint",
     "test": "npm run test:unit && npm run test:integration",
-    "test:ci": " bash ./unit_and_integration_tests.sh",
+    "test:ci": " bash ./setup-scripts/unit_and_integration_tests.sh",
     "test:unit": "jest --coverage --testPathIgnorePatterns='/e2e/' '/integration/'",
     "test:unit:watch": "jest --watch",
-    "test:integration": "JUST_INTEGRATION=true bash ./unit_and_integration_tests.sh",
-    "test:playwright": "docker compose -f ./docker-compose-e2e.yaml build --no-cache && docker compose -f ./docker-compose-e2e.yaml up -d && npx playwright test --reporter=list",
-    "test:playwright:local": "bash ./local_e2e.sh"
+    "test:integration": "JUST_INTEGRATION=true bash ./setup-scripts/unit_and_integration_tests.sh",
+    "test:playwright": "RUN_WITH_UI=false bash ./setup-scripts/run_e2e.sh",
+    "test:playwright:local": "RUN_WITH_UI=true bash ./setup-scripts/run_e2e.sh"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.515.0",
