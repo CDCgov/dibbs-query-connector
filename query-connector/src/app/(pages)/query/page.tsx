@@ -13,6 +13,7 @@ import { DataContext } from "@/app/shared/DataProvider";
 import { Patient } from "fhir/r4";
 import { getFhirServerNames } from "@/app/backend/dbServices/fhir-servers";
 import { CustomUserQuery } from "@/app/models/entities/query";
+import WithAuth from "@/app/ui/components/withAuth/WithAuth";
 
 const blankUserQuery = {
   query_id: "",
@@ -69,7 +70,7 @@ const Query: React.FC = () => {
     results: "main-container__wide",
   };
   return (
-    <>
+    <WithAuth>
       {Object.keys(CUSTOMIZE_QUERY_STEPS).includes(mode) &&
         !showCustomizeQuery && (
           <StepIndicator
@@ -135,7 +136,7 @@ const Query: React.FC = () => {
           />
         )}
       </div>
-    </>
+    </WithAuth>
   );
 };
 
