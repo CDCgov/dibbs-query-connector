@@ -34,7 +34,7 @@ done
 
 # Get the access token
 echo "Getting access token..."
-TOKEN_RESPONSE=$(curl -L -X POST \
+TOKEN_RESPONSE=$(curl -X POST \
   -H "Content-Type: application/json" \
   -d '{
     "client_id": "root",
@@ -56,7 +56,7 @@ echo "Access token obtained."
 
 # Post the GoldenSickPatient data to Aidbox
 echo "Loading GoldenSickPatient data into Aidbox..."
-curl -L -X POST \
+curl -X POST \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer ${TOKEN}" \
   -d @"/data/GoldenSickPatient.json" \
