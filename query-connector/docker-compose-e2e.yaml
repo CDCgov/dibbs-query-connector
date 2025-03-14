@@ -45,7 +45,7 @@ services:
     ports:
       - 8080:8080
     env_file:
-      - ./query-connector/.env
+      - .env
     environment:
       AIDBOX_LICENSE: ${AIDBOX_LICENSE}
       AIDBOX_TERMINOLOGY_SERVICE_BASE_URL: https://tx.fhir.org/r4
@@ -76,7 +76,7 @@ services:
       - ./src/app/tests/assets/GoldenSickPatient.json:/data/GoldenSickPatient.json
       - ./logs:/var/log
     env_file:
-      - ./query-connector/.env
+      - .env
     environment:
       - AIDBOX_BASE_URL=http://aidbox:8080
       - RUN_WITH_UI = ${RUN_WITH_UI}

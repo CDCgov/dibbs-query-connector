@@ -69,6 +69,11 @@ jobs:
         run: |
           echo "AIDBOX_LICENSE=${{ secrets.AIDBOX_LICENSE }}" > .env
           echo "RUN_WITH_UI=false" > .env
+          cat .env
+          # Check the location
+          pwd
+          ls -la
+
       - name: Build Query Connector and Run Playwright Tests
         id: run_tests
         working-directory: ./query-connector
