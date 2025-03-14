@@ -25,4 +25,4 @@ docker compose -f docker-compose-e2e.yaml logs > logs-after-tests.txt
 # Teardown containers
 docker compose -f docker-compose-e2e.yaml down
 
-exit $JEST_EXIT_CODE
+exit $E2E_EXIT_CODE
