@@ -40,7 +40,7 @@ TOKEN_RESPONSE=$(curl -L -X POST \
     "client_id": "root",
     "client_secret": "'${AIDBOX_CLIENT_SECRET}'",
     "grant_type": "client_credentials",
-    "audience": "'${BASE_URL}'"
+    "audience": "'${NETWORK_URL}'"
   }' \
   ${NETWORK_URL}/auth/token)
 
