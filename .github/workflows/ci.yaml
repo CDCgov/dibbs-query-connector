@@ -67,7 +67,7 @@ jobs:
       - name: Create .env
         working-directory: ./query-connector
         run: |
-          echo "AIDBOX_LICENSE = ${{ secrets.AIDBOX_LICENSE }}" > .env
+          echo "AIDBOX_LICENSE=${{ secrets.AIDBOX_LICENSE }}" > .env
           echo "RUN_WITH_UI=false" > .env
       - name: Build Query Connector and Run Playwright Tests
         id: run_tests
