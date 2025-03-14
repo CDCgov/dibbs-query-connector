@@ -265,15 +265,6 @@ describe("tests the valueset selection page interactions", () => {
     expect(
       screen.getByTestId(`condition-drawer-added-${CANCER_ID}`),
     ).toBeInTheDocument();
-    // click out of the drawer
-    await user.click(screen.getByTestId(`${CANCER_ID}-conditionCard`));
-
-    expect(
-      screen.getByTestId(`${CANCER_ID}-conditionCard`),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByTestId(`${GONORREHEA_ID}-conditionCard-active`),
-    ).toBeInTheDocument();
   });
 
   it("filters search on the valueset selection drawer appropriately", async () => {

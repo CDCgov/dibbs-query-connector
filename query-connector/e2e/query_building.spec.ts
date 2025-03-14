@@ -193,7 +193,7 @@ test.describe("editing an exisiting query", () => {
 
     const actionButton = page.getByTestId("createSaveQueryBtn");
     await expect(actionButton).toBeVisible();
-    await expect(actionButton).toHaveText("Customize query");
+    await expect(actionButton).toHaveText("Save query");
     await expect(actionButton).not.toBeDisabled(); // not disabled since we have condition(s) + name filled
 
     // update query name
@@ -260,7 +260,7 @@ test.describe("editing an exisiting query", () => {
 
     const actionButton = page.getByTestId("createSaveQueryBtn");
     await expect(actionButton).toBeVisible();
-    await expect(actionButton).toHaveText("Customize query");
+    await expect(actionButton).toHaveText("Save query");
     await expect(actionButton).not.toBeDisabled(); // not disabled since we have condition(s) + name filled
 
     // update query conditions

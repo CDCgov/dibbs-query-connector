@@ -64,7 +64,7 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
   useEffect(() => {
     // display the first condition's valuesets on render
     setActiveCondition(Object.keys(constructedQuery)[0]);
-  }, []);
+  }, [constructedQuery]);
 
   function generateConditionDrawerDisplay(
     categoryToConditionsMap: CategoryToConditionArrayMap,
