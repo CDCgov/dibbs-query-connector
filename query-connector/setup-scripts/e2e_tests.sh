@@ -6,7 +6,7 @@ docker compose -f docker-compose-e2e.yaml up -d
 # wait for Aidbox seeder to finish running before...
 docker compose -f docker-compose-e2e.yaml logs -f aidbox-seeder | grep -q "Finished configuring Aidbox and database."
 
-docker compose -f docker-compose-e2e.yaml logs  aidbox-seeder> logs-before-tests.txt
+docker compose -f docker-compose-e2e.yaml logs aidbox-seeder > logs-before-tests.txt
 
 BASE_CMD="npx dotenv -e ./.env -- npx playwright test "
 # running our e2e tests
