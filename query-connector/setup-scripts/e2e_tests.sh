@@ -1,6 +1,5 @@
 #!/bin/bash
 
-set -e  # Exit immediately if a command exits with a non-zero status
 docker compose down --volumes --remove-orphans
 docker compose -f docker-compose-e2e.yaml up -d
 

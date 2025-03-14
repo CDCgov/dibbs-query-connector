@@ -28,6 +28,9 @@ async function globalSetup() {
       await new Promise((resolve) => setTimeout(resolve, delay));
     }
   }
+
+  // we've failed more than the max retries, quit playwright
+  process.exit(1);
 }
 
 export default globalSetup;
