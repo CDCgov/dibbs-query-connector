@@ -77,7 +77,6 @@ jobs:
         continue-on-error: true
 
       - name: Upload Docker Logs
-        if: steps.run_tests.outcome == 'failure' # Only upload logs on failure
         uses: actions/upload-artifact@v4
         with:
           name: docker-logs
