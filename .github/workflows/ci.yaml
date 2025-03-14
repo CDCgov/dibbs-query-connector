@@ -66,9 +66,11 @@ jobs:
         run: npx playwright install --with-deps
       - name: Build Query Connector and Run Playwright Tests
         id: run_tests
+        env:
+          AIDBOX_LICENSE: ${{secrets.AIDBOX_LICENSE}}
         working-directory: ./query-connector
         run: |
-          npm run test:playwright
+          RUN_WITH_UI=false bash ./setup-scripts/e2e_tests.sh
         continue-on-error: true
 
       - name: Upload Docker Logs
