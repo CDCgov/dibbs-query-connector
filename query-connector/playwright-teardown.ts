@@ -8,7 +8,7 @@ async function globalTeardown() {
   console.log("Stopping Docker...");
   await new Promise<void>((resolve, reject) => {
     exec(
-      "docker compose down -- volumes --remove-orphans",
+      "docker compose down --volumes --remove-orphans",
       (err, stdout, stderr) => {
         if (err) {
           console.error(`Error stopping Docker: ${stderr}`);
