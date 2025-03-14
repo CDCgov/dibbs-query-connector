@@ -339,13 +339,19 @@ test.describe("editing an exisiting query", () => {
     const actionButton = page.getByTestId("createSaveQueryBtn");
     await expect(actionButton).toBeVisible();
 
-    //click into the condition to edit
-    await page.getByText(subjectQuery.query_name, { exact: true }).click();
+    // move to next page
+    await actionButton.click();
+    await expect(actionButton).toContainText("Save query");
 
-    // initial render is a minus state, so need to check and uncheck to reset the
-    // state to uncheck
+    // uncheck a value set
+    const labsHeader = page.getByTestId("accordionButton_labs");
+    await expect(labsHeader).toBeVisible();
+    await labsHeader.click();
+
     const firstLabVS = page.getByTestId("accordionItem_labs");
     const firstVsCheckTarget = firstLabVS.getByTestId("checkbox");
+    // initial render is a minus state, so need to check and uncheck to reset the
+    // state to uncheck
     await firstVsCheckTarget.click();
     await expect(firstVsCheckTarget.getByRole("checkbox")).not.toBeChecked();
     await firstVsCheckTarget.click();
