@@ -38,17 +38,10 @@ gap: 0.5rem;
   gap: 0.5rem;
   margin-top: 1.75rem;
   margin-left: 4.25rem;
+  background-color: white !important;
 }
 
-.tableHeader {
-  flex: 1 0 0;
-  color: var(--text-secondary, var(--gray-500, #919191));
-  font-size: 0.75rem;
-  font-style: normal;
-  font-weight: 700;
-  line-height: 150%; 
-  text-transform: uppercase;
-}
+
 
 .tableHeader:first-child {
   width: 13rem;
@@ -89,18 +82,6 @@ gap: 0.5rem;
   border: 1px solid var(--gray-400, #DFE1E2);
   background: var(--white, #FFF);
   margin-left: -2rem;
-}
-
-.paginationText {
-  font-size: 1rem;
-  font-style: normal;
-  font-weight: 700;
-  line-height: 140%;
-  margin: 0rem;
-}
-
-.paginationText a {
-  text-decoration: none;
 }
 
 .actionsPerPageContainer {

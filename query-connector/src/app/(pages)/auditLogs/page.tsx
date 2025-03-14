@@ -190,7 +190,7 @@ const AuditLogs: React.FC = () => {
             onChange={(e: ChangeEvent<HTMLInputElement>) =>
               setSearch(e.target.value)
             }
-            className={styles.searchField}
+            className={classNames(styles.searchField)}
           />
         </div>
 
@@ -223,7 +223,6 @@ const AuditLogs: React.FC = () => {
           </span>
 
           <Pagination
-            className={styles.paginationText}
             pathname="/auditLogs"
             totalPages={totalPages}
             currentPage={currentPage}
