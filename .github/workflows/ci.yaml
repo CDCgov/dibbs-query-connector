@@ -65,6 +65,7 @@ jobs:
         working-directory: ./query-connector
         run: npx playwright install --with-deps
       - name: Create .env
+        working-directory: ./query-connector
         run: |
           echo "AIDBOX_LICENSE = ${{ secrets.AIDBOX_LICENSE }}" > .env
           echo "RUN_WITH_UI=false" > .env
