@@ -65,6 +65,7 @@ jobs:
         working-directory: ./query-connector
         run: npx playwright install --with-deps
       - name: Build Query Connector and Run Playwright Tests
+        id: run_tests
         working-directory: ./query-connector
         run: |
           npm run test:playwright
