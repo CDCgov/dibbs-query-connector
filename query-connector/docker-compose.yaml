@@ -16,6 +16,7 @@ services:
 
   # Keycloak for authentication
   keycloak:
+    platform: linux/amd64
     build:
       context: .
       dockerfile: Dockerfile.keycloak

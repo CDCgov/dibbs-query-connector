@@ -117,5 +117,14 @@ services:
       flyway:
         condition: service_completed_successfully
 
+  # JWKS key generator
+  jwks-generator:
+    build:
+      context: .
+      dockerfile: Dockerfile.jwks-seeder
+    volumes:
+      - "./keys:/app/keys"
+      - "./generate_jwks.sh:/app/generate_jwks.sh"
+
 volumes:
   aidbox_pg_data:
