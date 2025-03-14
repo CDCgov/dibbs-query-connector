@@ -16,6 +16,9 @@ else
 fi 
 
 eval $E2E_CMD
+E2E_EXIT_CODE=$?
 
 # Teardown containers
 docker compose -f docker-compose-integration.yaml down
+
+exit $JEST_EXIT_CODE
