@@ -1,12 +1,13 @@
 #!/bin/bash
 
+set -e  # Exit immediately if a command exits with a non-zero status
 docker compose down --volumes --remove-orphans
 docker compose -f docker-compose-e2e.yaml up -d
 
 # wait for Aidbox seeder to finish running before...
 docker compose -f docker-compose-e2e.yaml logs -f aidbox-seeder | grep -q "Finished configuring Aidbox and database."
 
-docker compose -f docker-compose-e2e.yaml logs > logs-before-tests.txt
+docker compose -f docker-compose-e2e.yaml logs > logs-before-test.txt
 
 BASE_CMD="npx dotenv -e ./.env -- npx playwright test "
 # running our e2e tests
@@ -19,9 +20,9 @@ fi
 eval $E2E_CMD
 E2E_EXIT_CODE=$?
 
-docker compose -f docker-compose-e2e.yaml logs > logs-after-tests.txt
+# docker compose -f docker-compose-e2e.yaml logs > logs-after-tests.txt
 
 # Teardown containers
-docker compose -f docker-compose-e2e.yaml down
+# docker compose -f docker-compose-e2e.yaml down
 
-exit $E2E_EXIT_CODE
+# exit $JEST_EXIT_CODE
