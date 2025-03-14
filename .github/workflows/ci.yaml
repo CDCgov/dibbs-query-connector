@@ -77,8 +77,8 @@ jobs:
         with:
           name: docker-logs
           path: |
-            ./query-connector/docker-logs.txt
-            ./query-connector/docker-logs-after-tests.txt
+            ./query-connector/logs-before-tests.txt
+            ./query-connector/logs-after-tests.txt
 
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
