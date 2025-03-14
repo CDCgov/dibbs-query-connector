@@ -64,12 +64,14 @@ jobs:
       - name: Install Playwright Browsers
         working-directory: ./query-connector
         run: npx playwright install --with-deps
+      - name: Create .env
+        run: |
+          echo "AIDBOX_LICENSE = ${{ secrets.AIDBOX_LICENSE }}" > .env
+          echo "RUN_WITH_UI=false" > .env
       - name: Build Query Connector and Run Playwright Tests
         id: run_tests
         working-directory: ./query-connector
         run: |
-          echo "AIDBOX_LICENSE=${{secrets.AIDBOX_LICENSE}}" > .env
-          echo "RUN_WITH_UI=false" > .env 
           bash ./setup-scripts/e2e_tests.sh
         continue-on-error: true
 
