@@ -66,9 +66,25 @@ jobs:
         run: npx playwright install --with-deps
       - name: Build Query Connector and Run Playwright Tests
         working-directory: ./query-connector
-        run: npm run test:playwright
+        run: |
+          npm run test:playwright
+        continue-on-error: true
+
+      - name: Upload Docker Logs
+        if: steps.run_tests.outcome == 'failure' # Only upload logs on failure
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-logs
+          path: |
+            ./query-connector/docker-logs.txt
+            ./query-connector/docker-logs-after-tests.txt
+
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
           name: test-results
           path: ./query-connector/test-results/
+
+      - name: Exit with proper code
+        if: steps.run_tests.outcome == 'failure'
+        run: exit 1 # Force the workflow to fail if tests failed
