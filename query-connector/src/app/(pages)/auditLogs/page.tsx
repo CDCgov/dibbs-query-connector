@@ -176,12 +176,18 @@ const AuditLogs: React.FC = () => {
                 setSelectedDate(value ? new Date(value) : null)
               }
               value={
-                selectedDate
-                  ? selectedDate.toISOString().split("T")[0] // Ensures selected date displays correctly
-                  : ""
+                selectedDate ? selectedDate.toISOString().split("T")[0] : ""
               }
               minDate={minDate ? minDate.toISOString().split("T")[0] : ""}
               maxDate={maxDate ? maxDate.toISOString().split("T")[0] : ""}
+              onClick={() => {
+                const datePickerButton = document.querySelector(
+                  ".usa-date-picker__button",
+                );
+                if (datePickerButton) {
+                  (datePickerButton as HTMLElement).click();
+                }
+              }}
             />
           </div>
           <SearchField
