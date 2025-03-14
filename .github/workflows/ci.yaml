@@ -70,12 +70,8 @@ jobs:
       - name: Run Query Connector
         working-directory: ./query-connector
         run: docker compose -f ./docker-compose-e2e.yaml up -d
-      - name: Poll until Query Connector is ready
-        run: |
-          until curl -s http://localhost:3000/; do
-            echo "Waiting for Query Connector to be ready before running Playwright..."
-            sleep 5
-          done
+      - name: Poll until Aidbox seeder has completed
+        run: docker compose -f docker-compose-e2e.yaml logs -f aidbox-seeder | grep -q "Finished configuring Aidbox and database."
       - name: Playwright Tests
         working-directory: ./query-connector
         run: npx playwright test e2e --reporter=list --config playwright.config.ts
