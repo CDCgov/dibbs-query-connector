@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Modal as TrussModal,
   ModalHeading,
