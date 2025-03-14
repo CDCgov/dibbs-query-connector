@@ -22,31 +22,14 @@ services:
 
   # Flyway migrations and DB version control
   flyway:
-    image: flyway/flyway:10.16-alpine
+    image: flyway/flyway:11-alpine
     command: -configFiles=/flyway/conf/flyway.conf -schemas=public -connectRetries=60 migrate
-    platform: linux/amd64
     volumes:
       - ./flyway/sql:/flyway/sql
       - ./flyway/conf/flyway.conf:/flyway/conf/flyway.conf
     depends_on:
       db:
         condition: service_started
-
-  # HAPI FHIR Server for running e2e tests
-  hapi-fhir-server:
-    image: "hapiproject/hapi:latest"
-    ports:
-      - "8080:8080"
-  data-loader:
-    build:
-      context: .
-      dockerfile: Dockerfile.dev
-    volumes:
-      - "./src/app/tests/assets/GoldenSickPatient.json:/etc/GoldenSickPatient.json"
-      - "./post_e2e_data_hapi.sh:/post_e2e_data_hapi.sh"
-    command: ["sh", "post_e2e_data_hapi.sh"]
-    depends_on:
-      - hapi-fhir-server
 
   # Keycloak for authentication
   # Note: you must have a local .env file with a parameter AUTH_DISABLED.
@@ -75,12 +58,11 @@ services:
 
   aidbox:
     image: healthsamurai/aidboxone:edge
-    platform: linux/amd64
     pull_policy: always
     depends_on:
       - aidbox_db
     ports:
-      - 8082:8082
+      - 8080:8080
     environment:
       AIDBOX_TERMINOLOGY_SERVICE_BASE_URL: https://tx.fhir.org/r4
       AIDBOX_FHIR_PACKAGES: hl7.fhir.r4.core#4.0.1
@@ -96,7 +78,7 @@ services:
       BOX_COMPATIBILITY_VALIDATION_JSON__SCHEMA_REGEX: "#{:fhir-datetime}"
       BOX_SEARCH_AUTHORIZE_INLINE_REQUESTS: true
       PGUSER: aidbox
-      AIDBOX_PORT: 8082
+      AIDBOX_PORT: 8080
       PGDATABASE: aidbox
       PGPASSWORD: gOxAmiyiz4
       PGPORT: "5432"
@@ -109,6 +91,8 @@ services:
       dockerfile: Dockerfile.aidbox-seeder
     volumes:
       - ./src/app/tests/assets/GoldenSickPatient.json:/data/GoldenSickPatient.json
+    environment:
+      - AIDBOX_BASE_URL=http://localhost:8080
     depends_on:
       db:
         condition: service_healthy
