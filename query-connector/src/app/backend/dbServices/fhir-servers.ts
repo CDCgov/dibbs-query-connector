@@ -6,7 +6,7 @@ import { FhirServerConfig } from "@/app/models/entities/fhir-servers";
 import { superAdminAccessCheck } from "@/app/utils/auth";
 
 // Define an interface for authentication data
-interface AuthData {
+export interface AuthData {
   authType: "none" | "basic" | "client_credentials" | "SMART";
   bearerToken?: string;
   clientId?: string;
