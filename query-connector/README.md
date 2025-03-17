@@ -115,9 +115,42 @@ If the above doesn't work, try replacing `localhost` with `0.0.0.0`.
 
 #### Running the e2e tests locally
 
-Our e2e's are available locally via `npm run test:playwright:local`. You'll need to have the app running locally at `localhost:3000` first (ie using `npm run dev` or running `npm run dev:db` and `npm run dev:next` in two separate terminals).
+The Query Connector uses Playwright Test as its end-to-end testing framework. Playwright is a browser-based testing library that enables tests to run against a variety of different browsers under a variety of different conditions. To manage this suite, Playwright creates some helpful files (and commands) that can be used to tweak its configuration.
 
-For flows that do queries to a FHIR server (ie `/query`), you'll need to use a DB utility to change the address of the local E2E server to whatever localhost port your dev HAPI server is living at. If you have questions, reach out to another eng on the team.
+##### Config and Directories
+
+Playwright's configuration is managed by the file `playwright.config.ts`. This file has information on which browsers to test against, configuration options for those browsers, optional mobile browser ports, retry and other utility options, and a dev webserver. Changing this file will make global changes to Playwright's operations.
+
+By default, Playwright will look for end to end tests in `/e2e`.
+
+##### Testing Commands and Demos
+
+Playwright provides a number of different ways of executing end to end tests. From the `query-connector/` directory, you can run several commands:
+
+`npm run test:playwright`
+Runs the end-to-end tests.
+
+`npm run test:playwright:ui`
+Starts the interactive UI mode. The script will spin up a full version of the app on the default ports, so make sure you don't have another app instance running
+
+`npm run test:playwright -- --project=chromium`
+Runs the tests only on Desktop Chrome.
+
+`npm run test:playwright -- example`
+Runs the tests in a specific file.
+
+`npm run test:playwright -- -g "test name"`
+Runs the test with the name "test name", e.g., Query("test name") would run here.
+
+`npm run test:playwright -- --debug`
+Runs the tests in debug mode.
+
+`npm run test:playwright -- codegen`
+Auto generate tests with Codegen.
+
+After running a test set on your local, you can also additionally type `npx playwright show-report` to view an HTML report page of different test statuses and results.
+
+Playwright is managed by an end-to-end job in the `.github/workflows/ci.yaml` file of the project root. Since it requires browser installation to effectively test, and since it operates using an independent framework from jest, it is explicitly _not_ included in the basic `npm test` scripts (specified in `package.json`).
 
 ### Query Connector ERD
 
@@ -174,16 +207,11 @@ graph TD
   class I external;
 ```
 
-
-
 ### Infrastructure Architecture Diagram
-
 
 **ECS Infrastructure**
 
 ![ECS](./public/QC%20Architecture-ECS.jpg)
-
-
 
 **VM Infrastructure**
 ![VM](./public/QC%20Architecture-VM.jpg)
