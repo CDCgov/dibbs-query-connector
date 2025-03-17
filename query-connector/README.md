@@ -130,8 +130,8 @@ Playwright provides a number of different ways of executing end to end tests. Fr
 `npm run test:playwright`
 Runs the end-to-end tests.
 
-`npm run test:playwright:local`
-Starts the interactive UI mode.
+`npm run test:playwright:ui`
+Starts the interactive UI mode. The script will spin up a full version of the app on the default ports, so make sure you don't have another app instance running
 
 `npm run test:playwright -- --project=chromium`
 Runs the tests only on Desktop Chrome.
@@ -151,8 +151,6 @@ Auto generate tests with Codegen.
 After running a test set on your local, you can also additionally type `npx playwright show-report` to view an HTML report page of different test statuses and results.
 
 Playwright is managed by an end-to-end job in the `.github/workflows/ci.yaml` file of the project root. Since it requires browser installation to effectively test, and since it operates using an independent framework from jest, it is explicitly _not_ included in the basic `npm test` scripts (specified in `package.json`).
-
-Our e2e's are available locally via `npm run test:playwright:local`. The script will spin up a full version of the app on the default ports, so make sure you don't have another app instance running
 
 ### Query Connector ERD
 
