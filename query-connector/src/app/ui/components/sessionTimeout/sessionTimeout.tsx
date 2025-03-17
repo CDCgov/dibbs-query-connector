@@ -5,6 +5,7 @@ import { useIdleTimer } from "react-idle-timer";
 import type { ModalProps, ModalRef } from "../../designSystem/modal/Modal";
 import { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
+import { PAGES } from "@/app/shared/page-routes";
 
 const Modal = dynamic<ModalProps>(
   () => import("../../designSystem/modal/Modal").then((mod) => mod.Modal),
@@ -26,6 +27,8 @@ const SessionTimeout: React.FC = () => {
     return null;
   }
 
+  const [remainingTime, setRemainingTime] = useState("");
+  const intervalId = useRef<NodeJS.Timeout | null>(null);
   const [started, setStarted] = useState(false);
   const modalRef = useRef<ModalRef>(null);
   const { activate, start, reset, pause, getRemainingTime } = useIdleTimer({
@@ -38,15 +41,29 @@ const SessionTimeout: React.FC = () => {
   });
 
   function handlePrompt() {
+    intervalId.current = setInterval(() => {
+      const msecs = getRemainingTime();
+      const mins = Math.floor(msecs / 60000);
+      const secs = Math.floor((msecs / 1000) % 60);
+
+      setRemainingTime(
+        `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`,
+      );
+    }, 500);
+
     modalRef.current?.toggleModal();
   }
 
   async function handleLogout() {
+    if (intervalId.current !== null) {
+      clearInterval(intervalId.current);
+    }
+
     modalRef.current?.modalIsOpen && modalRef.current?.toggleModal();
     //stop timer and logout
     reset();
     pause();
-    await signOut({ redirect: false }); // TODO tests this again
+    await signOut({ redirectTo: PAGES.LANDING });
   }
 
   function handleStay() {
@@ -60,13 +77,13 @@ const SessionTimeout: React.FC = () => {
       setStarted(true);
       start();
     }
-  }, [status, started, setStarted]);
+  }, [status, started, setStarted, start]);
 
   return (
     <Modal
       id="session-timeout"
       modalRef={modalRef}
-      heading="Your session will end soon"
+      heading={`Your session will end in ${remainingTime}`}
       forceAction
       buttons={[
         {
@@ -85,8 +102,7 @@ const SessionTimeout: React.FC = () => {
         },
       ]}
     >
-      You've been inactive for too long. Please choose to stay signed in or
-      signout. Otherwise, you will be signed out automatically in 5 minutes.
+      You've been inactive for over 55 minutes. Do you wish to stay signed in?
     </Modal>
   );
 };
