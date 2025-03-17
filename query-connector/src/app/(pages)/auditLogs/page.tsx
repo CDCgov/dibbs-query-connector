@@ -71,6 +71,7 @@ const AuditLogs: React.FC = () => {
     [logs],
   );
 
+  const [dateError, setDateError] = useState("");
   const minDate = useMemo(
     () =>
       logs.length > 0
@@ -172,23 +173,30 @@ const AuditLogs: React.FC = () => {
               key={selectedDate === null ? "reset" : "date-picker"}
               id="date"
               name="date"
-              onChange={(value) =>
-                setSelectedDate(value ? new Date(value) : null)
-              }
+              onChange={(value) => {
+                if (value) {
+                  const parsedDate = new Date(value);
+                  if (isNaN(parsedDate.getTime())) {
+                    setDateError(
+                      "Your entry does not match the allowed format MM/DD/YYYY.",
+                    );
+                  } else {
+                    setDateError("");
+                    setSelectedDate(parsedDate);
+                  }
+                } else {
+                  setDateError("");
+                  setSelectedDate(null);
+                }
+              }}
               value={
                 selectedDate ? selectedDate.toISOString().split("T")[0] : ""
               }
               minDate={minDate ? minDate.toISOString().split("T")[0] : ""}
               maxDate={maxDate ? maxDate.toISOString().split("T")[0] : ""}
-              onClick={() => {
-                const datePickerButton = document.querySelector(
-                  ".usa-date-picker__button",
-                );
-                if (datePickerButton) {
-                  (datePickerButton as HTMLElement).click();
-                }
-              }}
             />
+
+            {dateError && <p className={styles.errorText}>{dateError}</p>}
           </div>
           <SearchField
             id="search"
@@ -212,6 +220,7 @@ const AuditLogs: React.FC = () => {
                 setSearch("");
                 setSelectedName("");
                 setSelectedAction("");
+                setDateError("");
                 setSelectedDate(null);
                 const dateInput =
                   document.querySelector<HTMLInputElement>("#date");
