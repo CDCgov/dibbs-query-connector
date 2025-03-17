@@ -16,9 +16,78 @@ services:
       timeout: 5s
       retries: 20
 
+  flyway:
+    image: flyway/flyway:11-alpine
+    command: -configFiles=/flyway/conf/flyway.conf -schemas=public -connectRetries=60 migrate
+    volumes:
+      - ./flyway/sql:/flyway/sql
+      - ./flyway/conf/flyway.conf:/flyway/conf/flyway.conf
+    depends_on:
+      db:
+        condition: service_started
+
+  # Aidbox
+  aidbox_db:
+    image: healthsamurai/aidboxdb:17
+    volumes:
+      - aidbox_pg_data:/var/lib/postgresql/data:delegated
+    environment:
+      POSTGRES_USER: aidbox
+      POSTGRES_PORT: "5432"
+      POSTGRES_DB: aidbox
+      POSTGRES_PASSWORD: gOxAmiyiz4
+
+  aidbox:
+    image: healthsamurai/aidboxone:edge
+    pull_policy: always
+    depends_on:
+      - aidbox_db
+    ports:
+      - 8080:8080
+    env_file:
+      - .env
+    environment:
+      AIDBOX_TERMINOLOGY_SERVICE_BASE_URL: https://tx.fhir.org/r4
+      AIDBOX_FHIR_PACKAGES: hl7.fhir.r4.core#4.0.1
+      AIDBOX_FHIR_SCHEMA_VALIDATION: true
+      AIDBOX_CREATED_AT_URL: https://aidbox.app/ex/createdAt
+      AIDBOX_CLIENT_SECRET: L6AGe_5V2O
+      AIDBOX_CORRECT_AIDBOX_FORMAT: true
+      AIDBOX_ADMIN_PASSWORD: OC1MzJ5QNV
+      AIDBOX_COMPLIANCE: enabled
+      AIDBOX_SECURITY_AUDIT__LOG_ENABLED: true
+      BOX_SEARCH_FHIR__COMPARISONS: true
+      PGHOST: aidbox_db
+      BOX_COMPATIBILITY_VALIDATION_JSON__SCHEMA_REGEX: "#{:fhir-datetime}"
+      BOX_SEARCH_AUTHORIZE_INLINE_REQUESTS: true
+      PGUSER: aidbox
+      AIDBOX_PORT: 8080
+      PGDATABASE: aidbox
+      PGPASSWORD: gOxAmiyiz4
+      PGPORT: "5432"
+      BOX_SEARCH_INCLUDE_CONFORMANT: true
+
+  aidbox-seeder:
+    build:
+      context: .
+      dockerfile: Dockerfile.aidbox-seeder
+    volumes:
+      - ./src/app/tests/assets/GoldenSickPatient.json:/data/GoldenSickPatient.json
+      - ./logs:/var/log
+    env_file:
+      - .env
+    environment:
+      - AIDBOX_BASE_URL=http://aidbox:8080
+    depends_on:
+      db:
+        condition: service_healthy
+      aidbox:
+        condition: service_started
+      flyway:
+        condition: service_completed_successfully
+
   # Next.js app with Flyway
   query-connector:
-    platform: linux/amd64
     build:
       context: .
       dockerfile: Dockerfile
@@ -29,26 +98,14 @@ services:
       - NODE_ENV=production
       - AUTH_DISABLED=true
       - DATABASE_URL=postgres://postgres:pw@db:5432/tefca_db
-      - NEXT_PUBLIC_HAPI_FHIR_URL=http://localhost:8080
       - DEMO_MODE=false
       # Note: you must have a local .env file with the ERSD_API_KEY set to a key
       # obtained from the ERSD API at https://ersd.aimsplatform.org/#/api-keys
     depends_on:
       db:
         condition: service_healthy
-  # HAPI FHIR Server for running e2e tests
-  hapi-fhir-server:
-    image: "hapiproject/hapi:latest"
-    ports:
-      - "8080:8080"
-  # Loads synthetic data into hapi-fhir-server for e2e tests
-  data-loader:
-    build:
-      context: .
-      dockerfile: Dockerfile.dev
-    volumes:
-      - "./src/app/tests/assets/GoldenSickPatient.json:/etc/GoldenSickPatient.json"
-      - "./post_e2e_data_hapi.sh:/post_e2e_data_hapi.sh"
-    command: ["sh", "post_e2e_data_hapi.sh"]
-    depends_on:
-      - hapi-fhir-server
+      aidbox-seeder:
+        condition: service_completed_successfully
+
+volumes:
+  aidbox_pg_data:

@@ -2,7 +2,11 @@ import { test, expect } from "@playwright/test";
 import { TEST_URL } from "../playwright-setup";
 import { PAGE_TITLES } from "@/app/(pages)/query/components/stepIndicator/StepIndicator";
 
-import { TEST_PATIENT, TEST_PATIENT_NAME } from "./constants";
+import {
+  DEFAULT_FHIR_SERVER,
+  TEST_PATIENT,
+  TEST_PATIENT_NAME,
+} from "./constants";
 
 test.describe("alternate queries with the Query Connector", () => {
   test.beforeEach(async ({ page }) => {
@@ -24,7 +28,7 @@ test.describe("alternate queries with the Query Connector", () => {
     await page.getByRole("button", { name: "Advanced" }).click();
     await page
       .getByLabel("Healthcare Organization (HCO)")
-      .selectOption("Local e2e HAPI Server: Direct");
+      .selectOption(DEFAULT_FHIR_SERVER);
 
     // Among verification, make sure phone number is right
     await page.getByRole("button", { name: "Search for patient" }).click();
@@ -58,7 +62,7 @@ test.describe("alternate queries with the Query Connector", () => {
     await page.getByRole("button", { name: "Advanced" }).click();
     await page
       .getByLabel("Healthcare Organization (HCO)")
-      .selectOption("Local e2e HAPI Server: Direct");
+      .selectOption(DEFAULT_FHIR_SERVER);
 
     await page.getByRole("button", { name: "Search for patient" }).click();
     await expect(page.getByText("Loading")).toHaveCount(0, { timeout: 10000 });
@@ -85,7 +89,7 @@ test.describe("alternate queries with the Query Connector", () => {
     await page.getByRole("button", { name: "Advanced" }).click();
     await page
       .getByLabel("Healthcare Organization (HCO)")
-      .selectOption("Local e2e HAPI Server: Direct");
+      .selectOption(DEFAULT_FHIR_SERVER);
 
     await page.getByRole("button", { name: "Search for patient" }).click();
     await expect(page.getByText("Loading")).toHaveCount(0, { timeout: 10000 });
