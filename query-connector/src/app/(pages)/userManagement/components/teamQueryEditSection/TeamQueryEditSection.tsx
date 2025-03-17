@@ -8,51 +8,45 @@ import style from "./TeamQueryEditSection.module.scss";
 import { User, UserGroup, UserRole } from "@/app/models/entities/users";
 import { QueryTableResult } from "@/app/(pages)/queryBuilding/utils";
 import { getSessionRole } from "../../utils";
+import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
+import {
+  addSingleUserToGroup,
+  removeSingleUserFromGroup,
+} from "@/app/backend/usergroup-management";
 
 export type UserManagementDrawerProps = {
   userGroups: UserGroup[];
   setUserGroups: Dispatch<SetStateAction<UserGroup[]>>;
-  refreshUsers: React.Dispatch<React.SetStateAction<boolean>>;
+  users: User[];
+  setUsers: Dispatch<SetStateAction<User[]>>;
+  refreshView: React.Dispatch<React.SetStateAction<boolean | string>>;
 };
 
 /**
  * @param root0 - The properties object
  * @param root0.userGroups The list of usergroups to display
  * @param root0.setUserGroups - State function that updates UserGroup data
- * @param root0.refreshUsers - State function that indicates if the list of Users should be refreshed
+ * @param root0.users The list of users to display
+ * @param root0.setUsers - State function that updates User data
  * @returns TeamQueryEditSection component which is the collapsible section that allows to edit members and queries of a team
  */
 const UserManagementDrawer: React.FC<UserManagementDrawerProps> = ({
   userGroups,
   setUserGroups,
-  refreshUsers,
+  users,
+  setUsers,
 }) => {
   const {
     teamQueryEditSection,
     closeEditSection,
     handleSearch,
-    handleMemberUpdate,
     handleQueryUpdate,
   } = useContext(UserManagementContext);
 
   const role = getSessionRole();
 
   useEffect(() => {
-    const groupId = teamQueryEditSection.groupId;
-    const activeGroupIndex = userGroups.findIndex(
-      (group) => group.id == groupId,
-    );
-    const activeGroup = userGroups[activeGroupIndex];
-    const dataToUpdate = teamQueryEditSection.subjectData;
-
-    if (activeGroup && teamQueryEditSection.subjectType == "Members") {
-      activeGroup.members = dataToUpdate as User[];
-      setUserGroups([...userGroups]);
-    }
-    if (activeGroup && teamQueryEditSection.subjectType === "Queries") {
-      activeGroup.queries = dataToUpdate as QueryTableResult[];
-      setUserGroups([...userGroups]);
-    }
+    console.log(teamQueryEditSection);
   }, [teamQueryEditSection]);
 
   useEffect(() => {
@@ -101,23 +95,33 @@ const UserManagementDrawer: React.FC<UserManagementDrawerProps> = ({
     }
   };
 
-  const renderUsers = (users: User[] | undefined) => {
-    if (users && users.length > 0) {
+  const renderUsers = (users: User[]) => {
+    if (users.length > 0) {
       return (
         <ul
           aria-description={`members of ${teamQueryEditSection.title}`}
           className={classNames("usa-list--unstyled", "margin-top-2")}
         >
           {users.map((user) => {
+            const display =
+              user.first_name && user.last_name
+                ? `${user.first_name} ${user.last_name}`
+                : `${user.username}`;
+
+            const isMemberOfCurrentGroup = user.userGroupMemberships?.filter(
+              (membership) =>
+                membership?.usergroup_id == teamQueryEditSection?.groupId,
+            )[0];
+
             return (
               <li key={user.id}>
                 {role == UserRole.SUPER_ADMIN ? (
                   <Checkbox
                     id={user.id}
                     name={user.username}
-                    label={`${user.first_name} ${user.last_name}`}
-                    defaultChecked
-                    onChange={handleMemberUpdate}
+                    label={display}
+                    defaultChecked={!!isMemberOfCurrentGroup}
+                    onChange={handleToggleMembership}
                     className={classNames("margin-bottom-3", style.checkbox)}
                   />
                 ) : (
@@ -149,8 +153,56 @@ const UserManagementDrawer: React.FC<UserManagementDrawerProps> = ({
     const activeGroup = userGroups[activeGroupIndex];
 
     return isMemberView
-      ? renderUsers(activeGroup?.members)
+      ? renderUsers(users)
       : renderQueries(activeGroup?.queries);
+  }
+
+  async function handleToggleMembership(
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) {
+    const groupId = teamQueryEditSection.groupId;
+    const groupName = teamQueryEditSection.title;
+    const userName = e.currentTarget.labels?.[0].innerText;
+    const userId = e.currentTarget.id;
+    const checked = e.target.checked;
+
+    const alertText = checked
+      ? `Added ${userName} to ${groupName}`
+      : `Removed ${userName} from ${groupName}`;
+
+    try {
+      const updatedUser = !!checked
+        ? await addSingleUserToGroup(groupId, userId)
+        : await removeSingleUserFromGroup(groupId, userId);
+
+      if (updatedUser === undefined) {
+        throw "Unable to update group membership";
+      }
+
+      let newUsersList = users.map((u) => {
+        if (u.id == userId) {
+          u = updatedUser as User;
+          return {
+            ...u,
+            ...{ userGroupMemberships: u?.userGroupMemberships },
+          };
+        } else {
+          return u;
+        }
+      });
+
+      setUsers(newUsersList);
+      showToastConfirmation({
+        body: alertText,
+      });
+    } catch (error) {
+      showToastConfirmation({
+        heading: "Something went wrong",
+        body: alertText,
+        variant: "error",
+      });
+      console.error("Error updating group membership:", error);
+    }
   }
 
   return (

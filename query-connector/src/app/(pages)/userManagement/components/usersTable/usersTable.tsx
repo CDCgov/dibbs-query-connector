@@ -8,12 +8,12 @@ import { Button } from "@trussworks/react-uswds";
 import UserPermissionsTable from "../userPermissions/userPermissionsTable";
 import { QCResponse } from "@/app/models/responses/collections";
 import { User, UserGroup, UserRole } from "../../../../models/entities/users";
+import { getAllUsers } from "@/app/backend/user-management";
 import {
-  getUsers,
-  getUserGroups,
-  getGroupMembers,
-  getGroupQueries,
-} from "@/app/backend/user-management";
+  getAllGroupMembers,
+  getAllGroupQueries,
+  getAllUserGroups,
+} from "@/app/backend/usergroup-management";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import { UserManagementMode } from "../../utils";
 import classNames from "classnames";
@@ -36,23 +36,16 @@ const UsersTable: React.FC<UsersTableProps> = ({ role }) => {
   const [users, setUsers] = useState<User[]>([]);
   const [userGroups, setUserGroups] = useState<UserGroup[]>([]);
   const [modalMode, setModalMode] = useState<UserManagementMode>("closed");
-  const [shouldRefreshUsers, setShouldRefreshUsers] = useState<boolean>(false);
+  const [shouldRefreshView, setShouldRefreshView] = useState<boolean | string>(
+    false,
+  );
 
   const modalRef = useRef<ModalRef>(null);
-
-  async function fetchGroupMembers(groupId: string) {
-    const groupMembers = await getGroupMembers(groupId);
-    return groupMembers.items;
-  }
-
-  async function fetchGroupQueries(groupId: string) {
-    const queries = await getGroupQueries(groupId);
-    return queries.items;
-  }
 
   const setTab = (e: React.MouseEvent<HTMLElement>) => {
     const clickedTab = e.currentTarget.innerHTML;
     const tabObj = tabsForRole.filter((tab) => tab.label == clickedTab)[0];
+    setShouldRefreshView(tabObj.label);
     setActiveTab(tabObj);
   };
 
@@ -61,7 +54,7 @@ const UsersTable: React.FC<UsersTableProps> = ({ role }) => {
       label: "Users",
       access: [UserRole.SUPER_ADMIN],
       onClick: setTab,
-      renderContent: () => {
+      renderContent: (users?: User[]) => {
         return (
           <>
             <Button
@@ -78,7 +71,7 @@ const UsersTable: React.FC<UsersTableProps> = ({ role }) => {
             >
               Add user
             </Button>
-            {users.length > 0 ? (
+            {users && users.length > 0 ? (
               <UserPermissionsTable
                 fetchGroupMembers={fetchGroupMembers}
                 users={users}
@@ -144,85 +137,108 @@ const UsersTable: React.FC<UsersTableProps> = ({ role }) => {
   const defaultTab = tabsForRole[0];
   const shouldRenderTabs = tabsForRole.length > 1;
 
+  async function fetchUsers() {
+    try {
+      const userList: QCResponse<User> = await getAllUsers();
+      setUsers(userList.items);
+    } catch (e) {
+      showToastConfirmation({
+        body: "Unable to retrieve users. Please try again.",
+        variant: "error",
+      });
+      throw e;
+    }
+  }
+
+  async function fetchUserGroups() {
+    try {
+      const userGroups: QCResponse<UserGroup> = await getAllUserGroups();
+      return setUserGroups(userGroups.items);
+    } catch (e) {
+      showToastConfirmation({
+        body: "Unable to retrieve user groups. Please try again.",
+        variant: "error",
+      });
+      throw e;
+    }
+  }
+
+  async function fetchGroupMembers(groupId: string) {
+    const groupMembers = await getAllGroupMembers(groupId);
+    return groupMembers.items;
+  }
+
+  async function fetchGroupQueries(groupId: string) {
+    const queries = await getAllGroupQueries(groupId);
+    return queries.items;
+  }
+
+  // page load
   useEffect(() => {
-    async function fetchUsers() {
-      try {
-        const userList: QCResponse<User> = await getUsers();
-        setUsers(userList.items);
-      } catch (e) {
-        showToastConfirmation({
-          body: "Unable to retrieve users. Please try again.",
-          variant: "error",
-        });
-        throw e;
-      }
-    }
-
-    async function fetchUserGroups() {
-      try {
-        const userGroups: QCResponse<UserGroup> = await getUserGroups();
-        return setUserGroups(userGroups.items);
-      } catch (e) {
-        showToastConfirmation({
-          body: "Unable to retrieve user groups. Please try again.",
-          variant: "error",
-        });
-        throw e;
-      }
-    }
-
     role == UserRole.SUPER_ADMIN && users.length <= 0 && fetchUsers();
     userGroups.length <= 0 && fetchUserGroups();
   }, []);
 
-  const dataLoaded =
-    role == UserRole.ADMIN ? !!users && !!userGroups : !!userGroups;
-
+  // when users or groups update
   useEffect(() => {
-    setActiveTab(defaultTab); // once data are loaded, set the default table display
-  }, [users, userGroups.length]);
-
-  useEffect(() => {
-    async function fetchUsers() {
-      try {
-        const userList: QCResponse<User> = await getUsers();
-        setUsers(userList.items);
-      } catch (e) {
-        showToastConfirmation({
-          body: "Unable to retrieve users. Please try again.",
-          variant: "error",
-        });
-        throw e;
-      }
+    if (!shouldRefreshView) {
+      setActiveTab(defaultTab);
     }
 
-    if (shouldRefreshUsers) {
+    const userTab = sections.filter((tab) => tab.label == "Users")[0];
+    const groupsTab = sections.filter((tab) => tab.label == "User groups")[0];
+
+    if (shouldRefreshView == "Users") {
+      setActiveTab(userTab);
+      setShouldRefreshView("none");
+    }
+    if (shouldRefreshView == "User groups") {
+      setActiveTab(groupsTab);
+      setShouldRefreshView("none");
+    }
+  }, [users, userGroups]);
+
+  // when we trigger shouldRefreshView
+  useEffect(() => {
+    if (shouldRefreshView == "Users") {
       fetchUsers();
-      setShouldRefreshUsers(false);
+      setShouldRefreshView("none");
     }
-  }, [shouldRefreshUsers]);
+    if (shouldRefreshView == "User groups") {
+      fetchUserGroups().then(() => {
+        return setShouldRefreshView("none");
+      });
+    }
+  }, [shouldRefreshView]);
 
   const handleOpenModal = (mode: UserManagementMode) => {
     setModalMode(mode);
     modalRef.current?.toggleModal();
   };
 
+  const dataLoaded =
+    role == UserRole.ADMIN ? !!users && !!userGroups : !!userGroups;
+
   return (
     <>
       <div className="main-container__wide">
         {shouldRenderTabs && <TabGroup tabs={tabsForRole} />}
-        {dataLoaded && activeTab?.renderContent && activeTab?.renderContent()}
+        {dataLoaded &&
+          activeTab?.renderContent &&
+          activeTab?.renderContent(users)}
         <UserModal
-          setMode={setModalMode}
-          mode={modalMode}
+          setModalMode={setModalMode}
+          modalMode={modalMode}
           modalRef={modalRef}
-          refreshUsers={setShouldRefreshUsers}
+          refreshView={setShouldRefreshView}
           userGroups={userGroups}
         />
         <UserManagementDrawer
+          users={users}
+          setUsers={setUsers}
           userGroups={userGroups}
           setUserGroups={setUserGroups}
-          refreshUsers={setShouldRefreshUsers}
+          refreshView={setShouldRefreshView}
         />
       </div>
     </>

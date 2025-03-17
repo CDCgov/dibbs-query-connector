@@ -10,7 +10,11 @@ import RoleDropdown from "../roleDropdown/RoleDropdown";
 import { UserManagementContext } from "../UserManagementProvider";
 import styles from "../../userManagement.module.scss";
 import { useSession } from "next-auth/react";
-import { UserRole, UserGroup, User } from "@/app/models/entities/users";
+import {
+  UserRole,
+  User,
+  UserGroupMembership,
+} from "@/app/models/entities/users";
 
 type PermissionsProps = {
   users: User[] | null;
@@ -71,35 +75,39 @@ const UserPermissionsTable: React.FC<PermissionsProps> = ({
 
   const renderGroups = (user: User) => {
     return (
-      <td>
-        {user.user_groups && user.user_groups?.length > 0
-          ? user.user_groups?.map((group: UserGroup, idx: number) => {
-              return (
-                <Button
-                  className={classNames("margin-right-2", "text-no-underline")}
-                  type="button"
-                  unstyled
-                  key={group.id}
-                  aria-description={`Edit ${group.name} members`}
-                  onClick={async () => {
-                    let members = group.members;
-                    if (!members || members?.length <= 0) {
-                      members = await fetchGroupMembers(group.id);
-                    }
-                    openEditSection(
-                      group.name,
-                      "Members",
-                      "Members",
-                      group.id,
-                      members as User[],
-                    );
-                  }}
-                >
-                  {group.name}
-                  {idx + 1 != user.user_groups?.length && ","}
-                </Button>
-              );
-            })
+      <td key={user.id}>
+        {user?.userGroupMemberships && user.userGroupMemberships?.length > 0
+          ? user.userGroupMemberships?.map(
+              (membership: UserGroupMembership, idx: number) => {
+                return (
+                  <Button
+                    className={classNames(
+                      "margin-right-2",
+                      "text-no-underline",
+                    )}
+                    type="button"
+                    unstyled
+                    key={membership.usergroup_id}
+                    aria-description={`Edit ${membership.usergroup_name} members`}
+                    onClick={async () => {
+                      await fetchGroupMembers(membership.usergroup_id).then(
+                        (members) =>
+                          openEditSection(
+                            membership.usergroup_name,
+                            "Members",
+                            "Members",
+                            membership.usergroup_id,
+                            members,
+                          ),
+                      );
+                    }}
+                  >
+                    {membership.usergroup_name}
+                    {idx + 1 != user.userGroupMemberships?.length && ","}
+                  </Button>
+                );
+              },
+            )
           : "--"}
       </td>
     );

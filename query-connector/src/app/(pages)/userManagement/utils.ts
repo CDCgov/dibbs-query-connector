@@ -31,6 +31,7 @@ type ModalMap = {
   [mode in UserManagementMode]: {
     heading: string;
     buttonText: string;
+    secondaryBtnText: string;
     prevStep?: UserManagementMode;
   };
 };
@@ -39,46 +40,55 @@ export const ModalStates: ModalMap = {
   "create-user": {
     heading: "New user",
     buttonText: "Next: Add to user groups",
+    secondaryBtnText: "",
     prevStep: "closed",
   },
   "edit-user": {
     heading: "Edit user",
     buttonText: "Next: Edit user groups",
+    secondaryBtnText: "",
     prevStep: "closed",
   },
   "select-groups": {
     heading: "Add to user groups",
     buttonText: "Add User",
+    secondaryBtnText: "Back",
     prevStep: "create-user",
   },
   "create-group": {
     heading: "Create user group",
     buttonText: "Next: Assign members",
+    secondaryBtnText: "Cancel",
     prevStep: "closed",
   },
   "add-members": {
-    heading: "TK",
+    heading: "Add members",
     buttonText: "TK",
+    secondaryBtnText: "Next: Add to user groups",
     prevStep: "create-group",
   },
   "add-queries": {
     heading: "TK",
     buttonText: "TK",
+    secondaryBtnText: "Next: Add to user groups",
     prevStep: "add-members",
   },
   "remove-user": {
     heading: "TK",
     buttonText: "TK",
+    secondaryBtnText: "Next: Add to user groups",
     prevStep: "closed",
   },
   "remove-group": {
     heading: "TK",
     buttonText: "TK",
+    secondaryBtnText: "Next: Add to user groups",
     prevStep: "closed",
   },
   closed: {
     heading: "",
     buttonText: "",
+    secondaryBtnText: "Next: Add to user groups",
     prevStep: "closed",
   },
 };

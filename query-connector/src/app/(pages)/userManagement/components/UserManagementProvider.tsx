@@ -4,10 +4,6 @@ import { createContext, useState } from "react";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import { User } from "@/app/models/entities/users";
 import { QueryTableResult } from "../../queryBuilding/utils";
-import {
-  addUsersToGroup,
-  removeUsersFromGroup,
-} from "@/app/backend/usergroup-management";
 
 export type SubjectType = "Members" | "Queries" | null;
 
@@ -33,7 +29,6 @@ interface UserManagementContext extends UserManagementData {
   ) => void;
   closeEditSection: () => void;
   handleSearch: (searchFilter: string) => void;
-  handleMemberUpdate: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleQueryUpdate: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
@@ -54,7 +49,6 @@ export const UserManagementContext = createContext<UserManagementContext>({
   openEditSection: () => {},
   closeEditSection: () => {},
   handleSearch: (_searchFilter: string) => {},
-  handleMemberUpdate: () => {},
   handleQueryUpdate: () => {},
 });
 
@@ -110,37 +104,6 @@ const DataProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     console.log("filtering ...", filter);
   }
 
-  async function handleMemberUpdate(e: React.ChangeEvent<HTMLInputElement>) {
-    const groupId = innerState.teamQueryEditSection.groupId;
-    const groupName = innerState.teamQueryEditSection.title;
-    const user = e.currentTarget.labels?.[0].innerText;
-    const userId = e.currentTarget.id;
-    const checked = e.target.checked;
-
-    const alertText = checked
-      ? `Added ${user} to ${groupName}`
-      : `Removed ${user} from ${groupName}`;
-
-    try {
-      if (checked) {
-        await addUsersToGroup(groupId, [userId]);
-      } else {
-        await removeUsersFromGroup(groupId, [userId]);
-      }
-
-      showToastConfirmation({
-        body: alertText,
-      });
-    } catch (error) {
-      showToastConfirmation({
-        heading: "Something went wrong",
-        body: alertText,
-        variant: "error",
-      });
-      console.error("Error updating group member list:", error);
-    }
-  }
-
   async function handleQueryUpdate(e: React.ChangeEvent<HTMLInputElement>) {
     const queryName = e.currentTarget.name;
     const checked = e.target.checked;
@@ -170,7 +133,6 @@ const DataProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
         openEditSection,
         closeEditSection,
         handleSearch,
-        handleMemberUpdate,
         handleQueryUpdate,
       }}
     >
