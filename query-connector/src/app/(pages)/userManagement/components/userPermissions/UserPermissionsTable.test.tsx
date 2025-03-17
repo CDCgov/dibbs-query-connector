@@ -18,14 +18,14 @@ jest.mock(
 );
 
 jest.mock("@/app/backend/user-management", () => ({
-  getUsers: jest.fn().mockResolvedValue({ items: [], totalItems: 0 }),
+  getAllUsers: jest.fn().mockResolvedValue({ items: [], totalItems: 0 }),
   getUserGroups: jest.fn().mockResolvedValue({ items: [], totalItems: 0 }),
   updateUserRole: jest.fn(),
 }));
 
 describe("User Management: User tab", () => {
   it("Loads user list successfully", async () => {
-    jest.spyOn(UserManagementBackend, "getUsers").mockResolvedValue({
+    jest.spyOn(UserManagementBackend, "getAllUsers").mockResolvedValue({
       items: [mockAdmin, mockSuperAdmin],
       totalItems: 2,
     });
@@ -51,7 +51,7 @@ describe("User Management: User tab", () => {
   });
 
   it("Changes a user's role", async () => {
-    jest.spyOn(UserManagementBackend, "getUsers").mockResolvedValue({
+    jest.spyOn(UserManagementBackend, "getAllUsers").mockResolvedValue({
       items: [mockAdmin, mockSuperAdmin],
       totalItems: 2,
     });

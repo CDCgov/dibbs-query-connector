@@ -1,427 +1,21 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Admin view of Users Table fetches usergroups on page load 1`] = `
-<body>
-  <div>
-    <div
-      class="customizeTableWrapper"
-    >
-      <table
-        class="usa-table usa-table--borderless customizeTable"
-        data-testid="table"
-      >
-        <thead>
-          <tr>
-            <th>
-              Name
-            </th>
-            <th>
-              Members
-            </th>
-            <th>
-              Assigned queries
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td
-              width="270"
-            >
-              Hogwarts
-            </td>
-            <td>
-              <button
-                aria-description="Edit Hogwarts members"
-                class="usa-button usa-button--unstyled drawerButton text-no-underline"
-                data-testid="edit-member-list-0"
-                type="button"
-              >
-                1 member
-              </button>
-            </td>
-            <td>
-              <button
-                aria-description="Edit Hogwarts queries"
-                class="usa-button usa-button--unstyled text-no-underline"
-                data-testid="edit-query-list-0"
-                type="button"
-              >
-                0 queries
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
+<body
+  style="padding-right: 0px;"
+>
   <div>
     <div
       class="main-container__wide"
     >
-      <div
-        class="drawer closed"
-        data-testid="drawer-open-false"
-        role="dialog"
+      <button
+        class="usa-button styles.createQueryButton margin-bottom-3"
+        data-testid="button"
+        style="margin-left: 1px; background-color: rgb(0, 94, 162);"
+        type="button"
       >
-        <div
-          class="drawerContent display-none"
-        >
-          <div
-            class="drawerHeader"
-          >
-            <button
-              aria-label="Close drawer"
-              class="closeButton"
-              data-testid="close-drawer"
-            >
-              <svg
-                aria-label="X icon indicating closure"
-                class="usa-icon usa-icon--size-3"
-                focusable="false"
-                height="1em"
-                role="img"
-                viewBox="0 0 24 24"
-                width="1em"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
-                />
-              </svg>
-            </button>
-            <h2
-              class="margin-0 padding-bottom-2"
-              data-testid="drawer-title"
-            />
-            <div>
-              <input
-                class="usa-input searchField"
-                data-testid="textInput"
-                id="searchFieldTemplate"
-                name="searchFieldTemplate"
-                placeholder="Search"
-                type="search"
-                value=""
-              />
-            </div>
-          </div>
-          <div
-            class="padding-top-2"
-          >
-            <div>
-              Error: could not retrieve queries for user group. Please try again later.
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</body>
-`;
-
-exports[`Admin view of Users Table renders error message when no user groups are found 1`] = `
-<body>
-  <div>
-    <div
-      class="main-container__wide"
-    >
-      <div
-        class="empty-response"
-      >
-        No user groups found
-      </div>
-      <div
-        class="drawer closed"
-        data-testid="drawer-open-false"
-        role="dialog"
-      >
-        <div
-          class="drawerContent display-none"
-        >
-          <div
-            class="drawerHeader"
-          >
-            <button
-              aria-label="Close drawer"
-              class="closeButton"
-              data-testid="close-drawer"
-            >
-              <svg
-                aria-label="X icon indicating closure"
-                class="usa-icon usa-icon--size-3"
-                focusable="false"
-                height="1em"
-                role="img"
-                viewBox="0 0 24 24"
-                width="1em"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
-                />
-              </svg>
-            </button>
-            <h2
-              class="margin-0 padding-bottom-2"
-              data-testid="drawer-title"
-            />
-            <div>
-              <input
-                class="usa-input searchField"
-                data-testid="textInput"
-                id="searchFieldTemplate"
-                name="searchFieldTemplate"
-                placeholder="Search"
-                type="search"
-                value=""
-              />
-            </div>
-          </div>
-          <div
-            class="padding-top-2"
-          >
-            <div>
-              Error: could not retrieve queries for user group. Please try again later.
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</body>
-`;
-
-exports[`Super Admin view of Users Table renders content on tab click 1`] = `
-<body>
-  <div>
-    <div
-      class="main-container__wide"
-    >
-      <div
-        class="border-base border-bottom-1px margin-bottom-3"
-      >
-        <a
-          class="tab__active"
-          data-prevent-nprogress="true"
-          href=""
-        >
-          Users
-        </a>
-        <a
-          class="tab"
-          data-prevent-nprogress="true"
-          href=""
-        >
-          User groups
-        </a>
-      </div>
-      <div
-        class="customizeTableWrapper"
-      >
-        <table
-          class="usa-table usa-table--borderless customizeTable"
-          data-testid="table"
-        >
-          <thead>
-            <tr>
-              <th>
-                Name
-              </th>
-              <th>
-                Permissions
-              </th>
-              <th>
-                User groups
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td
-                width="270"
-              >
-                Potter, Lily 
-          
-              </td>
-              <td
-                class="roleDropdown"
-                width="270"
-              >
-                <label
-                  class="usa-label usa-sr-only"
-                  data-testid="label"
-                  for="role-select-456"
-                >
-                  User role
-                </label>
-                <select
-                  class="usa-select"
-                  data-testid="role-select-456"
-                  id="role-select-456"
-                >
-                  <option
-                    value="Super Admin"
-                  >
-                    Super Admin
-                  </option>
-                  <option
-                    selected=""
-                    value="Admin"
-                  >
-                    Admin
-                  </option>
-                  <option
-                    value="Standard"
-                  >
-                    Standard
-                  </option>
-                </select>
-              </td>
-              <td>
-                <button
-                  aria-description="Edit Order of the Phoenix members"
-                  class="usa-button usa-button--unstyled margin-right-2 text-no-underline"
-                  data-testid="button"
-                  type="button"
-                >
-                  Order of the Phoenix
-                </button>
-              </td>
-            </tr>
-            <tr>
-              <td
-                width="270"
-              >
-                Potter, Harry 
-          
-              </td>
-              <td
-                class="roleDropdown"
-                width="270"
-              >
-                <label
-                  class="usa-label usa-sr-only"
-                  data-testid="label"
-                  for="role-select-123"
-                >
-                  User role
-                </label>
-                <select
-                  class="usa-select"
-                  data-testid="role-select-123"
-                  id="role-select-123"
-                >
-                  <option
-                    selected=""
-                    value="Super Admin"
-                  >
-                    Super Admin
-                  </option>
-                  <option
-                    value="Admin"
-                  >
-                    Admin
-                  </option>
-                  <option
-                    value="Standard"
-                  >
-                    Standard
-                  </option>
-                </select>
-              </td>
-              <td>
-                --
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <div
-        class="drawer closed"
-        data-testid="drawer-open-false"
-        role="dialog"
-      >
-        <div
-          class="drawerContent display-none"
-        >
-          <div
-            class="drawerHeader"
-          >
-            <button
-              aria-label="Close drawer"
-              class="closeButton"
-              data-testid="close-drawer"
-            >
-              <svg
-                aria-label="X icon indicating closure"
-                class="usa-icon usa-icon--size-3"
-                focusable="false"
-                height="1em"
-                role="img"
-                viewBox="0 0 24 24"
-                width="1em"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
-                />
-              </svg>
-            </button>
-            <h2
-              class="margin-0 padding-bottom-2"
-              data-testid="drawer-title"
-            />
-            <div>
-              <input
-                class="usa-input searchField"
-                data-testid="textInput"
-                id="searchFieldTemplate"
-                name="searchFieldTemplate"
-                placeholder="Search"
-                type="search"
-                value=""
-              />
-            </div>
-          </div>
-          <div
-            class="padding-top-2"
-          >
-            <div>
-              Error: could not retrieve queries for user group. Please try again later.
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</body>
-`;
-
-exports[`Super Admin view of Users Table renders content on tab click 2`] = `
-<body>
-  <div>
-    <div
-      class="main-container__wide"
-    >
-      <div
-        class="border-base border-bottom-1px margin-bottom-3"
-      >
-        <a
-          class="tab"
-          data-prevent-nprogress="true"
-          href=""
-        >
-          Users
-        </a>
-        <a
-          class="tab__active"
-          data-prevent-nprogress="true"
-          href=""
-        >
-          User groups
-        </a>
-      </div>
+        Create group
+      </button>
       <div
         class="customizeTableWrapper"
       >
@@ -524,9 +118,815 @@ exports[`Super Admin view of Users Table renders content on tab click 2`] = `
             class="padding-top-2"
           >
             <div>
-              Error: could not retrieve queries for user group. Please try again later.
+              No queries assigned to this group.
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    aria-describedby="user-mgmt-modal-description"
+    aria-labelledby="user-mgmt-modal-heading"
+    class="usa-modal-wrapper is-hidden"
+    data-force-action="false"
+    id="user-mgmt-modal"
+    role="dialog"
+  >
+    <div
+      aria-controls="user-mgmt-modal"
+      class="usa-modal-overlay"
+      data-testid="modalOverlay"
+    >
+      <div
+        class="usa-modal"
+        data-force-action="false"
+        data-testid="modalWindow"
+        tabindex="-1"
+      >
+        <div
+          class="usa-modal__content"
+        >
+          <div
+            class="usa-modal__main"
+          >
+            <h2
+              class="usa-modal__heading"
+              id="user-mgmt-modal-heading"
+            />
+            <div
+              class="usa-prose"
+              id="user-mgmt-modal-description"
+            />
+            <div
+              class="usa-modal__footer"
+              data-testid="modalFooter"
+            >
+              <ul
+                class="usa-button-group"
+              >
+                <li
+                  class="usa-button-group__item"
+                >
+                  <button
+                    class="usa-button usa-button"
+                    data-testid="button"
+                    id="modal-step-button"
+                    type="submit"
+                  />
+                </li>
+                <li
+                  class="usa-button-group__item"
+                >
+                  <button
+                    class="usa-button usa-button usa-button--secondary"
+                    data-testid="button"
+                    id="modal-back-button"
+                    type="button"
+                  >
+                    Next: Add to user groups
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <button
+            aria-controls="user-mgmt-modal"
+            aria-label="Close this window"
+            class="usa-button usa-modal__close"
+            data-close-modal="true"
+            data-testid="button"
+            type="button"
+          >
+            <svg
+              aria-hidden="true"
+              class="usa-icon"
+              focusable="false"
+              height="1em"
+              role="img"
+              viewBox="0 0 24 24"
+              width="1em"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+`;
+
+exports[`Admin view of Users Table renders error message when no user groups are found 1`] = `
+<body
+  style="padding-right: 0px;"
+>
+  <div>
+    <div
+      class="main-container__wide"
+    >
+      <div
+        class="empty-response"
+      >
+        <div
+          class="empty-response display-flex flex-column flex-align-start"
+        >
+          No user groups found
+          <button
+            class="usa-button styles.createQueryButton margin-bottom-3"
+            data-testid="button"
+            style="margin-left: 1px; background-color: rgb(0, 94, 162);"
+            type="button"
+          >
+            Create group
+          </button>
+        </div>
+      </div>
+      <div
+        class="drawer closed"
+        data-testid="drawer-open-false"
+        role="dialog"
+      >
+        <div
+          class="drawerContent display-none"
+        >
+          <div
+            class="drawerHeader"
+          >
+            <button
+              aria-label="Close drawer"
+              class="closeButton"
+              data-testid="close-drawer"
+            >
+              <svg
+                aria-label="X icon indicating closure"
+                class="usa-icon usa-icon--size-3"
+                focusable="false"
+                height="1em"
+                role="img"
+                viewBox="0 0 24 24"
+                width="1em"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+                />
+              </svg>
+            </button>
+            <h2
+              class="margin-0 padding-bottom-2"
+              data-testid="drawer-title"
+            />
+            <div>
+              <input
+                class="usa-input searchField"
+                data-testid="textInput"
+                id="searchFieldTemplate"
+                name="searchFieldTemplate"
+                placeholder="Search"
+                type="search"
+                value=""
+              />
+            </div>
+          </div>
+          <div
+            class="padding-top-2"
+          >
+            <div>
+              No queries assigned to this group.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    aria-describedby="user-mgmt-modal-description"
+    aria-labelledby="user-mgmt-modal-heading"
+    class="usa-modal-wrapper is-hidden"
+    data-force-action="false"
+    id="user-mgmt-modal"
+    role="dialog"
+  >
+    <div
+      aria-controls="user-mgmt-modal"
+      class="usa-modal-overlay"
+      data-testid="modalOverlay"
+    >
+      <div
+        class="usa-modal"
+        data-force-action="false"
+        data-testid="modalWindow"
+        tabindex="-1"
+      >
+        <div
+          class="usa-modal__content"
+        >
+          <div
+            class="usa-modal__main"
+          >
+            <h2
+              class="usa-modal__heading"
+              id="user-mgmt-modal-heading"
+            />
+            <div
+              class="usa-prose"
+              id="user-mgmt-modal-description"
+            />
+            <div
+              class="usa-modal__footer"
+              data-testid="modalFooter"
+            >
+              <ul
+                class="usa-button-group"
+              >
+                <li
+                  class="usa-button-group__item"
+                >
+                  <button
+                    class="usa-button usa-button"
+                    data-testid="button"
+                    id="modal-step-button"
+                    type="submit"
+                  />
+                </li>
+                <li
+                  class="usa-button-group__item"
+                >
+                  <button
+                    class="usa-button usa-button usa-button--secondary"
+                    data-testid="button"
+                    id="modal-back-button"
+                    type="button"
+                  >
+                    Next: Add to user groups
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <button
+            aria-controls="user-mgmt-modal"
+            aria-label="Close this window"
+            class="usa-button usa-modal__close"
+            data-close-modal="true"
+            data-testid="button"
+            type="button"
+          >
+            <svg
+              aria-hidden="true"
+              class="usa-icon"
+              focusable="false"
+              height="1em"
+              role="img"
+              viewBox="0 0 24 24"
+              width="1em"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+`;
+
+exports[`Super Admin view of Users Table renders content on tab click 1`] = `
+<body
+  style="padding-right: 0px;"
+>
+  <div>
+    <div
+      class="main-container__wide"
+    >
+      <div
+        class="border-base border-bottom-1px margin-bottom-3"
+      >
+        <button
+          class="usa-button--unstyled tab__active"
+        >
+          Users
+        </button>
+        <button
+          class="usa-button--unstyled tab"
+        >
+          User groups
+        </button>
+      </div>
+      <button
+        class="usa-button styles.createQueryButton margin-bottom-3"
+        data-testid="button"
+        style="margin-left: 1px; background-color: rgb(0, 94, 162);"
+        type="button"
+      >
+        Add user
+      </button>
+      <div
+        class="customizeTableWrapper"
+      >
+        <table
+          class="usa-table usa-table--borderless customizeTable"
+          data-testid="table"
+        >
+          <thead>
+            <tr>
+              <th>
+                Name
+              </th>
+              <th>
+                Permissions
+              </th>
+              <th>
+                User groups
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td
+                width="270"
+              >
+                Potter, Lily 
+              </td>
+              <td
+                class="roleDropdown"
+                width="270"
+              >
+                <label
+                  class="usa-label usa-sr-only"
+                  data-testid="label"
+                  for="role-select-456"
+                >
+                  User role
+                </label>
+                <select
+                  class="usa-select"
+                  data-testid="role-select-456"
+                  id="role-select-456"
+                >
+                  <option
+                    value="Super Admin"
+                  >
+                    Super Admin
+                  </option>
+                  <option
+                    selected=""
+                    value="Admin"
+                  >
+                    Admin
+                  </option>
+                  <option
+                    value="Standard"
+                  >
+                    Standard
+                  </option>
+                </select>
+              </td>
+              <td>
+                <button
+                  aria-description="Edit Order of the Phoenix members"
+                  class="usa-button usa-button--unstyled margin-right-2 text-no-underline"
+                  data-testid="button"
+                  type="button"
+                >
+                  Order of the Phoenix
+                </button>
+              </td>
+            </tr>
+            <tr>
+              <td
+                width="270"
+              >
+                Potter, Harry 
+              </td>
+              <td
+                class="roleDropdown"
+                width="270"
+              >
+                <label
+                  class="usa-label usa-sr-only"
+                  data-testid="label"
+                  for="role-select-123"
+                >
+                  User role
+                </label>
+                <select
+                  class="usa-select"
+                  data-testid="role-select-123"
+                  id="role-select-123"
+                >
+                  <option
+                    selected=""
+                    value="Super Admin"
+                  >
+                    Super Admin
+                  </option>
+                  <option
+                    value="Admin"
+                  >
+                    Admin
+                  </option>
+                  <option
+                    value="Standard"
+                  >
+                    Standard
+                  </option>
+                </select>
+              </td>
+              <td>
+                --
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div
+        class="drawer closed"
+        data-testid="drawer-open-false"
+        role="dialog"
+      >
+        <div
+          class="drawerContent display-none"
+        >
+          <div
+            class="drawerHeader"
+          >
+            <button
+              aria-label="Close drawer"
+              class="closeButton"
+              data-testid="close-drawer"
+            >
+              <svg
+                aria-label="X icon indicating closure"
+                class="usa-icon usa-icon--size-3"
+                focusable="false"
+                height="1em"
+                role="img"
+                viewBox="0 0 24 24"
+                width="1em"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+                />
+              </svg>
+            </button>
+            <h2
+              class="margin-0 padding-bottom-2"
+              data-testid="drawer-title"
+            />
+            <div>
+              <input
+                class="usa-input searchField"
+                data-testid="textInput"
+                id="searchFieldTemplate"
+                name="searchFieldTemplate"
+                placeholder="Search"
+                type="search"
+                value=""
+              />
+            </div>
+          </div>
+          <div
+            class="padding-top-2"
+          >
+            <div>
+              No queries assigned to this group.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    aria-describedby="user-mgmt-modal-description"
+    aria-labelledby="user-mgmt-modal-heading"
+    class="usa-modal-wrapper is-hidden"
+    data-force-action="false"
+    id="user-mgmt-modal"
+    role="dialog"
+  >
+    <div
+      aria-controls="user-mgmt-modal"
+      class="usa-modal-overlay"
+      data-testid="modalOverlay"
+    >
+      <div
+        class="usa-modal"
+        data-force-action="false"
+        data-testid="modalWindow"
+        tabindex="-1"
+      >
+        <div
+          class="usa-modal__content"
+        >
+          <div
+            class="usa-modal__main"
+          >
+            <h2
+              class="usa-modal__heading"
+              id="user-mgmt-modal-heading"
+            />
+            <div
+              class="usa-prose"
+              id="user-mgmt-modal-description"
+            />
+            <div
+              class="usa-modal__footer"
+              data-testid="modalFooter"
+            >
+              <ul
+                class="usa-button-group"
+              >
+                <li
+                  class="usa-button-group__item"
+                >
+                  <button
+                    class="usa-button usa-button"
+                    data-testid="button"
+                    id="modal-step-button"
+                    type="submit"
+                  />
+                </li>
+                <li
+                  class="usa-button-group__item"
+                >
+                  <button
+                    class="usa-button usa-button usa-button--secondary"
+                    data-testid="button"
+                    id="modal-back-button"
+                    type="button"
+                  >
+                    Next: Add to user groups
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <button
+            aria-controls="user-mgmt-modal"
+            aria-label="Close this window"
+            class="usa-button usa-modal__close"
+            data-close-modal="true"
+            data-testid="button"
+            type="button"
+          >
+            <svg
+              aria-hidden="true"
+              class="usa-icon"
+              focusable="false"
+              height="1em"
+              role="img"
+              viewBox="0 0 24 24"
+              width="1em"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+`;
+
+exports[`Super Admin view of Users Table renders content on tab click 2`] = `
+<body
+  style="padding-right: 0px;"
+>
+  <div>
+    <div
+      class="main-container__wide"
+    >
+      <div
+        class="border-base border-bottom-1px margin-bottom-3"
+      >
+        <button
+          class="usa-button--unstyled tab"
+        >
+          Users
+        </button>
+        <button
+          class="usa-button--unstyled tab__active"
+        >
+          User groups
+        </button>
+      </div>
+      <button
+        class="usa-button styles.createQueryButton margin-bottom-3"
+        data-testid="button"
+        style="margin-left: 1px; background-color: rgb(0, 94, 162);"
+        type="button"
+      >
+        Create group
+      </button>
+      <div
+        class="customizeTableWrapper"
+      >
+        <table
+          class="usa-table usa-table--borderless customizeTable"
+          data-testid="table"
+        >
+          <thead>
+            <tr>
+              <th>
+                Name
+              </th>
+              <th>
+                Members
+              </th>
+              <th>
+                Assigned queries
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td
+                width="270"
+              >
+                Hogwarts
+              </td>
+              <td>
+                <button
+                  aria-description="Edit Hogwarts members"
+                  class="usa-button usa-button--unstyled drawerButton text-no-underline"
+                  data-testid="edit-member-list-0"
+                  type="button"
+                >
+                  1 member
+                </button>
+              </td>
+              <td>
+                <button
+                  aria-description="Edit Hogwarts queries"
+                  class="usa-button usa-button--unstyled text-no-underline"
+                  data-testid="edit-query-list-0"
+                  type="button"
+                >
+                  0 queries
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div
+        class="drawer closed"
+        data-testid="drawer-open-false"
+        role="dialog"
+      >
+        <div
+          class="drawerContent display-none"
+        >
+          <div
+            class="drawerHeader"
+          >
+            <button
+              aria-label="Close drawer"
+              class="closeButton"
+              data-testid="close-drawer"
+            >
+              <svg
+                aria-label="X icon indicating closure"
+                class="usa-icon usa-icon--size-3"
+                focusable="false"
+                height="1em"
+                role="img"
+                viewBox="0 0 24 24"
+                width="1em"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+                />
+              </svg>
+            </button>
+            <h2
+              class="margin-0 padding-bottom-2"
+              data-testid="drawer-title"
+            />
+            <div>
+              <input
+                class="usa-input searchField"
+                data-testid="textInput"
+                id="searchFieldTemplate"
+                name="searchFieldTemplate"
+                placeholder="Search"
+                type="search"
+                value=""
+              />
+            </div>
+          </div>
+          <div
+            class="padding-top-2"
+          >
+            <div>
+              No queries assigned to this group.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    aria-describedby="user-mgmt-modal-description"
+    aria-labelledby="user-mgmt-modal-heading"
+    class="usa-modal-wrapper is-hidden"
+    data-force-action="false"
+    id="user-mgmt-modal"
+    role="dialog"
+  >
+    <div
+      aria-controls="user-mgmt-modal"
+      class="usa-modal-overlay"
+      data-testid="modalOverlay"
+    >
+      <div
+        class="usa-modal"
+        data-force-action="false"
+        data-testid="modalWindow"
+        tabindex="-1"
+      >
+        <div
+          class="usa-modal__content"
+        >
+          <div
+            class="usa-modal__main"
+          >
+            <h2
+              class="usa-modal__heading"
+              id="user-mgmt-modal-heading"
+            />
+            <div
+              class="usa-prose"
+              id="user-mgmt-modal-description"
+            />
+            <div
+              class="usa-modal__footer"
+              data-testid="modalFooter"
+            >
+              <ul
+                class="usa-button-group"
+              >
+                <li
+                  class="usa-button-group__item"
+                >
+                  <button
+                    class="usa-button usa-button"
+                    data-testid="button"
+                    id="modal-step-button"
+                    type="submit"
+                  />
+                </li>
+                <li
+                  class="usa-button-group__item"
+                >
+                  <button
+                    class="usa-button usa-button usa-button--secondary"
+                    data-testid="button"
+                    id="modal-back-button"
+                    type="button"
+                  >
+                    Next: Add to user groups
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <button
+            aria-controls="user-mgmt-modal"
+            aria-label="Close this window"
+            class="usa-button usa-modal__close"
+            data-close-modal="true"
+            data-testid="button"
+            type="button"
+          >
+            <svg
+              aria-hidden="true"
+              class="usa-icon"
+              focusable="false"
+              height="1em"
+              role="img"
+              viewBox="0 0 24 24"
+              width="1em"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+              />
+            </svg>
+          </button>
         </div>
       </div>
     </div>
@@ -543,21 +943,25 @@ exports[`Super Admin view of Users Table renders error message when no users are
       <div
         class="border-base border-bottom-1px margin-bottom-3"
       >
-        <a
-          class="tab__active"
-          data-prevent-nprogress="true"
-          href=""
+        <button
+          class="usa-button--unstyled tab__active"
         >
           Users
-        </a>
-        <a
-          class="tab"
-          data-prevent-nprogress="true"
-          href=""
+        </button>
+        <button
+          class="usa-button--unstyled tab"
         >
           User groups
-        </a>
+        </button>
       </div>
+      <button
+        class="usa-button styles.createQueryButton margin-bottom-3"
+        data-testid="button"
+        style="margin-left: 1px; background-color: rgb(0, 94, 162);"
+        type="button"
+      >
+        Add user
+      </button>
       <div
         class="empty-response"
       >
@@ -614,9 +1018,101 @@ exports[`Super Admin view of Users Table renders error message when no users are
             class="padding-top-2"
           >
             <div>
-              Error: could not retrieve queries for user group. Please try again later.
+              No queries assigned to this group.
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    aria-describedby="user-mgmt-modal-description"
+    aria-labelledby="user-mgmt-modal-heading"
+    class="usa-modal-wrapper is-hidden"
+    data-force-action="false"
+    id="user-mgmt-modal"
+    role="dialog"
+  >
+    <div
+      aria-controls="user-mgmt-modal"
+      class="usa-modal-overlay"
+      data-testid="modalOverlay"
+    >
+      <div
+        class="usa-modal"
+        data-force-action="false"
+        data-testid="modalWindow"
+        tabindex="-1"
+      >
+        <div
+          class="usa-modal__content"
+        >
+          <div
+            class="usa-modal__main"
+          >
+            <h2
+              class="usa-modal__heading"
+              id="user-mgmt-modal-heading"
+            />
+            <div
+              class="usa-prose"
+              id="user-mgmt-modal-description"
+            />
+            <div
+              class="usa-modal__footer"
+              data-testid="modalFooter"
+            >
+              <ul
+                class="usa-button-group"
+              >
+                <li
+                  class="usa-button-group__item"
+                >
+                  <button
+                    class="usa-button usa-button"
+                    data-testid="button"
+                    id="modal-step-button"
+                    type="submit"
+                  />
+                </li>
+                <li
+                  class="usa-button-group__item"
+                >
+                  <button
+                    class="usa-button usa-button usa-button--secondary"
+                    data-testid="button"
+                    id="modal-back-button"
+                    type="button"
+                  >
+                    Next: Add to user groups
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <button
+            aria-controls="user-mgmt-modal"
+            aria-label="Close this window"
+            class="usa-button usa-modal__close"
+            data-close-modal="true"
+            data-testid="button"
+            type="button"
+          >
+            <svg
+              aria-hidden="true"
+              class="usa-icon"
+              focusable="false"
+              height="1em"
+              role="img"
+              viewBox="0 0 24 24"
+              width="1em"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+              />
+            </svg>
+          </button>
         </div>
       </div>
     </div>
@@ -625,7 +1121,9 @@ exports[`Super Admin view of Users Table renders error message when no users are
 `;
 
 exports[`Super Admin view of Users Table renders table view after content is loaded 1`] = `
-<body>
+<body
+  style="padding-right: 0px;"
+>
   <div>
     <div
       class="main-container__wide"
@@ -633,21 +1131,25 @@ exports[`Super Admin view of Users Table renders table view after content is loa
       <div
         class="border-base border-bottom-1px margin-bottom-3"
       >
-        <a
-          class="tab__active"
-          data-prevent-nprogress="true"
-          href=""
+        <button
+          class="usa-button--unstyled tab__active"
         >
           Users
-        </a>
-        <a
-          class="tab"
-          data-prevent-nprogress="true"
-          href=""
+        </button>
+        <button
+          class="usa-button--unstyled tab"
         >
           User groups
-        </a>
+        </button>
       </div>
+      <button
+        class="usa-button styles.createQueryButton margin-bottom-3"
+        data-testid="button"
+        style="margin-left: 1px; background-color: rgb(0, 94, 162);"
+        type="button"
+      >
+        Add user
+      </button>
       <div
         class="customizeTableWrapper"
       >
@@ -674,7 +1176,6 @@ exports[`Super Admin view of Users Table renders table view after content is loa
                 width="270"
               >
                 Potter, Lily 
-          
               </td>
               <td
                 class="roleDropdown"
@@ -726,7 +1227,6 @@ exports[`Super Admin view of Users Table renders table view after content is loa
                 width="270"
               >
                 Potter, Harry 
-          
               </td>
               <td
                 class="roleDropdown"
@@ -820,9 +1320,101 @@ exports[`Super Admin view of Users Table renders table view after content is loa
             class="padding-top-2"
           >
             <div>
-              Error: could not retrieve queries for user group. Please try again later.
+              No queries assigned to this group.
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    aria-describedby="user-mgmt-modal-description"
+    aria-labelledby="user-mgmt-modal-heading"
+    class="usa-modal-wrapper is-hidden"
+    data-force-action="false"
+    id="user-mgmt-modal"
+    role="dialog"
+  >
+    <div
+      aria-controls="user-mgmt-modal"
+      class="usa-modal-overlay"
+      data-testid="modalOverlay"
+    >
+      <div
+        class="usa-modal"
+        data-force-action="false"
+        data-testid="modalWindow"
+        tabindex="-1"
+      >
+        <div
+          class="usa-modal__content"
+        >
+          <div
+            class="usa-modal__main"
+          >
+            <h2
+              class="usa-modal__heading"
+              id="user-mgmt-modal-heading"
+            />
+            <div
+              class="usa-prose"
+              id="user-mgmt-modal-description"
+            />
+            <div
+              class="usa-modal__footer"
+              data-testid="modalFooter"
+            >
+              <ul
+                class="usa-button-group"
+              >
+                <li
+                  class="usa-button-group__item"
+                >
+                  <button
+                    class="usa-button usa-button"
+                    data-testid="button"
+                    id="modal-step-button"
+                    type="submit"
+                  />
+                </li>
+                <li
+                  class="usa-button-group__item"
+                >
+                  <button
+                    class="usa-button usa-button usa-button--secondary"
+                    data-testid="button"
+                    id="modal-back-button"
+                    type="button"
+                  >
+                    Next: Add to user groups
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <button
+            aria-controls="user-mgmt-modal"
+            aria-label="Close this window"
+            class="usa-button usa-modal__close"
+            data-close-modal="true"
+            data-testid="button"
+            type="button"
+          >
+            <svg
+              aria-hidden="true"
+              class="usa-icon"
+              focusable="false"
+              height="1em"
+              role="img"
+              viewBox="0 0 24 24"
+              width="1em"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+              />
+            </svg>
+          </button>
         </div>
       </div>
     </div>
@@ -831,7 +1423,9 @@ exports[`Super Admin view of Users Table renders table view after content is loa
 `;
 
 exports[`Super Admin view of Users Table renders table view after content is loaded 2`] = `
-<body>
+<body
+  style="padding-right: 0px;"
+>
   <div>
     <div
       class="main-container__wide"
@@ -839,21 +1433,25 @@ exports[`Super Admin view of Users Table renders table view after content is loa
       <div
         class="border-base border-bottom-1px margin-bottom-3"
       >
-        <a
-          class="tab__active"
-          data-prevent-nprogress="true"
-          href=""
+        <button
+          class="usa-button--unstyled tab__active"
         >
           Users
-        </a>
-        <a
-          class="tab"
-          data-prevent-nprogress="true"
-          href=""
+        </button>
+        <button
+          class="usa-button--unstyled tab"
         >
           User groups
-        </a>
+        </button>
       </div>
+      <button
+        class="usa-button styles.createQueryButton margin-bottom-3"
+        data-testid="button"
+        style="margin-left: 1px; background-color: rgb(0, 94, 162);"
+        type="button"
+      >
+        Add user
+      </button>
       <div
         class="customizeTableWrapper"
       >
@@ -880,7 +1478,6 @@ exports[`Super Admin view of Users Table renders table view after content is loa
                 width="270"
               >
                 Potter, Lily 
-          
               </td>
               <td
                 class="roleDropdown"
@@ -932,7 +1529,6 @@ exports[`Super Admin view of Users Table renders table view after content is loa
                 width="270"
               >
                 Potter, Harry 
-          
               </td>
               <td
                 class="roleDropdown"
@@ -1026,9 +1622,101 @@ exports[`Super Admin view of Users Table renders table view after content is loa
             class="padding-top-2"
           >
             <div>
-              Error: could not retrieve queries for user group. Please try again later.
+              No queries assigned to this group.
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    aria-describedby="user-mgmt-modal-description"
+    aria-labelledby="user-mgmt-modal-heading"
+    class="usa-modal-wrapper is-hidden"
+    data-force-action="false"
+    id="user-mgmt-modal"
+    role="dialog"
+  >
+    <div
+      aria-controls="user-mgmt-modal"
+      class="usa-modal-overlay"
+      data-testid="modalOverlay"
+    >
+      <div
+        class="usa-modal"
+        data-force-action="false"
+        data-testid="modalWindow"
+        tabindex="-1"
+      >
+        <div
+          class="usa-modal__content"
+        >
+          <div
+            class="usa-modal__main"
+          >
+            <h2
+              class="usa-modal__heading"
+              id="user-mgmt-modal-heading"
+            />
+            <div
+              class="usa-prose"
+              id="user-mgmt-modal-description"
+            />
+            <div
+              class="usa-modal__footer"
+              data-testid="modalFooter"
+            >
+              <ul
+                class="usa-button-group"
+              >
+                <li
+                  class="usa-button-group__item"
+                >
+                  <button
+                    class="usa-button usa-button"
+                    data-testid="button"
+                    id="modal-step-button"
+                    type="submit"
+                  />
+                </li>
+                <li
+                  class="usa-button-group__item"
+                >
+                  <button
+                    class="usa-button usa-button usa-button--secondary"
+                    data-testid="button"
+                    id="modal-back-button"
+                    type="button"
+                  >
+                    Next: Add to user groups
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <button
+            aria-controls="user-mgmt-modal"
+            aria-label="Close this window"
+            class="usa-button usa-modal__close"
+            data-close-modal="true"
+            data-testid="button"
+            type="button"
+          >
+            <svg
+              aria-hidden="true"
+              class="usa-icon"
+              focusable="false"
+              height="1em"
+              role="img"
+              viewBox="0 0 24 24"
+              width="1em"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+              />
+            </svg>
+          </button>
         </div>
       </div>
     </div>
@@ -1060,7 +1748,6 @@ exports[`Super Admin view of Users Table renders table view after content is loa
               width="270"
             >
               Potter, Lily 
-          
             </td>
             <td
               class="roleDropdown"
@@ -1112,7 +1799,6 @@ exports[`Super Admin view of Users Table renders table view after content is loa
               width="270"
             >
               Potter, Harry 
-          
             </td>
             <td
               class="roleDropdown"

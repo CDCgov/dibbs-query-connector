@@ -1,5 +1,6 @@
 import { waitFor, screen, render } from "@testing-library/react";
 import * as UserManagementBackend from "@/app/backend/user-management";
+import * as UserGroupManagementBackend from "@/app/backend/usergroup-management";
 import { UserRole } from "@/app/models/entities/users";
 import { renderWithUser, RootProviderMock } from "@/app/tests/unit/setup";
 import UsersTable from "./usersTable";
@@ -13,8 +14,12 @@ import {
 jest.mock("next-auth/react");
 
 jest.mock("@/app/backend/user-management", () => ({
-  getUsers: jest.fn().mockResolvedValue({ items: [], totalItems: 0 }),
-  getUserGroups: jest.fn().mockResolvedValue({ items: [], totalItems: 0 }),
+  getAllUsers: jest.fn().mockResolvedValue({ items: [], totalItems: 0 }),
+  getUserRole: jest.fn(),
+}));
+
+jest.mock("@/app/backend/usergroup-management", () => ({
+  getAllUserGroups: jest.fn().mockResolvedValue({ items: [], totalItems: 0 }),
 }));
 
 jest.mock(
@@ -41,7 +46,7 @@ describe("Super Admin view of Users Table", () => {
   });
 
   it("renders table view after content is loaded", async () => {
-    jest.spyOn(UserManagementBackend, "getUsers").mockResolvedValueOnce({
+    jest.spyOn(UserManagementBackend, "getAllUsers").mockResolvedValueOnce({
       items: [mockAdmin, mockSuperAdmin],
       totalItems: 2,
     });
@@ -69,14 +74,16 @@ describe("Super Admin view of Users Table", () => {
   });
 
   it("renders content on tab click", async () => {
-    jest.spyOn(UserManagementBackend, "getUsers").mockResolvedValueOnce({
+    jest.spyOn(UserManagementBackend, "getAllUsers").mockResolvedValueOnce({
       items: [mockAdmin, mockSuperAdmin],
       totalItems: 2,
     });
-    jest.spyOn(UserManagementBackend, "getUserGroups").mockResolvedValueOnce({
-      items: [mockGroupBasic],
-      totalItems: 2,
-    });
+    jest
+      .spyOn(UserGroupManagementBackend, "getAllUserGroups")
+      .mockResolvedValueOnce({
+        items: [mockGroupBasic],
+        totalItems: 1,
+      });
     const { user } = renderWithUser(
       <RootProviderMock currentPage="/userManagement">
         <UsersTable role={role} />
@@ -124,7 +131,7 @@ describe("Admin view of Users Table", () => {
 
   it("fetches usergroups on page load", async () => {
     const getUserGroupsSpy = jest
-      .spyOn(UserManagementBackend, "getUserGroups")
+      .spyOn(UserGroupManagementBackend, "getAllUserGroups")
       .mockResolvedValueOnce({
         items: [mockGroupBasic],
         totalItems: 1,

@@ -6,7 +6,7 @@ import { useSession } from "next-auth/react";
  */
 export function getSessionRole() {
   const { data: session } = useSession();
-  return session?.user?.role;
+  return session?.user.role;
 }
 
 export const RoleDescriptons = {

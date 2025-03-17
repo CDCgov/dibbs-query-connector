@@ -170,10 +170,10 @@ export async function deleteUserGroup(id: string): Promise<UserGroup | string> {
 export async function addSingleUserToGroup(
   groupId: string,
   userId: string,
-): Promise<User | null> {
+): Promise<QCResponse<User>> {
   const userCheckResult = await checkUserExists(userId);
   if (!userCheckResult) {
-    return null;
+    return { items: [], totalItems: 0 };
   }
 
   try {
@@ -191,7 +191,7 @@ export async function addSingleUserToGroup(
     const updatedUserId = await dbClient.query(insertQuery);
     const updatedUserWithGroups: QCResponse<User> =
       await getSingleUserWithGroupMemberships(updatedUserId.rows[0].user_id);
-    return updatedUserWithGroups.items[0];
+    return { totalItems: 1, items: updatedUserWithGroups.items };
   } catch (error) {
     console.error("Error adding user to group:", error);
     throw error;
@@ -234,8 +234,8 @@ export async function addMultipleUsersToGroup(
 export async function removeSingleUserFromGroup(
   groupId: string,
   userId: string,
-): Promise<User | null> {
-  if (!userId) return null;
+): Promise<QCResponse<User>> {
+  if (!userId) return { items: [], totalItems: 0 };
 
   const userCheckQuery = {
     text: `SELECT * FROM users WHERE id = $1;`,
@@ -243,7 +243,7 @@ export async function removeSingleUserFromGroup(
   };
   const userCheckResult = await dbClient.query(userCheckQuery);
   if (userCheckResult.rows.length === 0) {
-    return null;
+    return { items: [], totalItems: 0 };
   }
 
   try {
@@ -259,7 +259,7 @@ export async function removeSingleUserFromGroup(
     const updatedUserId = await dbClient.query(removeUserQuery);
     const updatedUserWithGroups: QCResponse<User> =
       await getSingleUserWithGroupMemberships(updatedUserId.rows[0].user_id);
-    return updatedUserWithGroups.items[0];
+    return { totalItems: 1, items: updatedUserWithGroups.items };
   } catch (error) {
     console.error("Error removing user from group:", error);
     throw error;

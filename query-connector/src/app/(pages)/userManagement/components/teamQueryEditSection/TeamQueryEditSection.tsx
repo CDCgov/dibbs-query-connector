@@ -171,14 +171,15 @@ const UserManagementDrawer: React.FC<UserManagementDrawerProps> = ({
       : `Removed ${userName} from ${groupName}`;
 
     try {
-      const updatedUser = !!checked
+      const updatedUserResponse = !!checked
         ? await addSingleUserToGroup(groupId, userId)
         : await removeSingleUserFromGroup(groupId, userId);
 
-      if (updatedUser === undefined) {
+      if (updatedUserResponse.totalItems === 0) {
         throw "Unable to update group membership";
       }
 
+      const updatedUser = updatedUserResponse.items[0];
       let newUsersList = users.map((u) => {
         if (u.id == userId) {
           u = updatedUser as User;

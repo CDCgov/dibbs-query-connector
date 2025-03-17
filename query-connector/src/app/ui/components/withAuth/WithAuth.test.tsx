@@ -4,6 +4,7 @@ import * as nextAuthReact from "next-auth/react";
 import * as authUtils from "@/app/utils/auth";
 import { UserRole } from "@/app/models/entities/users";
 import * as nextNavigation from "next/navigation";
+import * as Utils from "@/app/(pages)/userManagement/utils";
 import { Session } from "next-auth";
 import { SessionContextValue } from "next-auth/react";
 
@@ -11,6 +12,10 @@ jest.mock("next-auth/react");
 
 jest.mock("@/app/utils/auth", () => ({
   isAuthDisabledClientCheck: jest.fn().mockReturnValue(false),
+}));
+
+jest.mock("@/app/(pages)/userManagement/utils", () => ({
+  getSessionRole: jest.fn().mockReturnValue("Standard"),
 }));
 
 jest.mock("next/navigation", () => ({
@@ -51,7 +56,7 @@ describe("WithAuth component (page access guard)", () => {
       status: "authenticated",
       update: jest.fn(),
     };
-
+    jest.spyOn(Utils, "getSessionRole").mockReturnValueOnce("Super Admin");
     jest.spyOn(nextAuthReact, "useSession").mockReturnValueOnce(session);
 
     render(
@@ -59,6 +64,8 @@ describe("WithAuth component (page access guard)", () => {
         <DummyComponent />
       </WithAuth>,
     );
+    expect(document.body).toMatchSnapshot();
+
     expect(screen.getByText("Special content")).toBeInTheDocument();
   });
 
@@ -79,7 +86,6 @@ describe("WithAuth component (page access guard)", () => {
     expect(
       screen.getByText("You are not authorized to access this page."),
     ).toBeInTheDocument();
-    expect(document.body).toMatchSnapshot();
   });
   it("Redirects user to landing page if user is not logged in", () => {
     const session: SessionContextValue = {

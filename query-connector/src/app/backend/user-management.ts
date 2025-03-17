@@ -186,9 +186,9 @@ export async function updateUserRole(
  */
 export async function checkUserExists(
   userId: string,
-): Promise<QCResponse<User> | null> {
+): Promise<QCResponse<User>> {
   if (!userId) {
-    return null;
+    return { totalItems: 0, items: [] };
   }
 
   const userCheckQuery = {
@@ -198,7 +198,7 @@ export async function checkUserExists(
 
   const userCheckResult = await dbClient.query(userCheckQuery);
   if (userCheckResult.rows.length === 0) {
-    return null;
+    return { totalItems: 0, items: [] };
   }
 
   return {
@@ -389,7 +389,7 @@ export async function getAllUsersWithSingleGroupStatus(
 
   const query = {
     text: `
-      SELECT u.id as user_id, u.username, u.first_name, u.last_name, u.qc_role, g.name AS group_name, g.id as usergroup_id,
+      SELECT u.id, u.username, u.first_name, u.last_name, u.qc_role, g.name AS group_name, g.id as usergroup_id,
         COALESCE(ug.id, '') AS membership_id,
         CASE 
           WHEN ug.user_id IS NOT NULL THEN TRUE
@@ -397,10 +397,10 @@ export async function getAllUsersWithSingleGroupStatus(
         END AS is_member
       FROM users u
       LEFT JOIN usergroup_to_users ug 
-        ON u.id = ug.user_id 
+        ON u.id = ug.user_id AND ug.usergroup_id = $1
       LEFT JOIN usergroup g 
         ON ug.usergroup_id = g.id
-      ORDER BY u.last_name, u.first_name;
+        ORDER BY u.last_name, u.first_name;
     `,
     values: [groupId],
   };
