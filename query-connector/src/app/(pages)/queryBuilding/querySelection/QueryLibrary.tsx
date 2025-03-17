@@ -60,7 +60,7 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
       queryName: queryName,
       queryId: queryId,
     });
-    setBuildStep("condition");
+    setBuildStep("valueset");
   };
 
   useEffect(() => {

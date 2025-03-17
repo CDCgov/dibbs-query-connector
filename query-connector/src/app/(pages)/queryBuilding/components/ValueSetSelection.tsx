@@ -64,7 +64,7 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
   useEffect(() => {
     // display the first condition's valuesets on render
     setActiveCondition(Object.keys(constructedQuery)[0]);
-  }, []);
+  }, [constructedQuery]);
 
   function generateConditionDrawerDisplay(
     categoryToConditionsMap: CategoryToConditionArrayMap,
@@ -85,6 +85,7 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
               <div
                 key={`update-${condition.id}`}
                 id={`update-${condition.id}`}
+                data-testid={`update-${condition.id}`}
                 className={styles.conditionItem}
               >
                 <span>
@@ -160,6 +161,7 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
               <div
                 className={styles.addCondition}
                 role="button"
+                data-testid={"add-condition-icon"}
                 onClick={() => setIsDrawerOpen(true)}
                 tabIndex={0}
               >
@@ -202,6 +204,7 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
                     className={classNames("usa-icon", styles.deleteIcon)}
                     size={5}
                     color="red"
+                    data-testid={`delete-condition-${conditionId}`}
                     aria-label="Trash icon indicating deletion of disease"
                     onClick={() => {
                       handleUpdateCondition(conditionId, true);
