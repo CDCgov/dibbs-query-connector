@@ -20,6 +20,7 @@ done
 
 echo -e "\nAidbox seeder finished!"
 
+# Run Next dev without auth to allow the e2e's to work
 npx dotenv -v AUTH_DISABLED=true -- next dev &
 
 echo "Waiting Next server to be healthy..."

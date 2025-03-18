@@ -155,6 +155,10 @@ test.describe("building a new query", () => {
 });
 
 test.describe("editing an exisiting query", () => {
+  // since we're deleting / editing the queries across browsers and asserting on
+  // in between state in a way that might cause race conditions, run these serially
+  test.describe.configure({ mode: "serial" });
+
   // Start every test by navigating to the customize query workflow
   test.beforeEach(async ({ page }) => {
     await page.goto(`${TEST_URL}/queryBuilding`);
@@ -227,6 +231,8 @@ test.describe("editing an exisiting query", () => {
   });
 
   test("edit query conditions", async ({ page }) => {
+    test.describe.configure({ mode: "serial" });
+
     const subjectQuery = DEFAULT_QUERIES[0];
     const query = page.locator("tr", {
       has: page.getByTitle(subjectQuery.query_name),
