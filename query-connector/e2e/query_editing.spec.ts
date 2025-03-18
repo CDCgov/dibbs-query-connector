@@ -91,8 +91,6 @@ test.describe("editing an exisiting query", () => {
   });
 
   test("edit query conditions", async ({ page }) => {
-    test.describe.configure({ mode: "serial" });
-
     const subjectQuery = DEFAULT_QUERIES[0];
     const query = page.locator("tr", {
       has: page.getByTitle(subjectQuery.query_name),

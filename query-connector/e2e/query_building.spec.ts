@@ -1,9 +1,6 @@
 // @ts-check
-
 import { test, expect } from "@playwright/test";
 import { TEST_URL } from "../playwright-setup";
-import { DEFAULT_QUERIES } from "@/app/(pages)/queryBuilding/fixtures";
-import { CONDITION_DRAWER_SEARCH_PLACEHOLDER } from "@/app/(pages)/queryBuilding/components/utils";
 
 // consts
 const QUERY_LIBRARY = "Query Library";
@@ -29,10 +26,6 @@ const SEARCHED_CONDITION = {
   labsCount: "97 / 97",
   medsCount: "27 / 27",
   conditionsCount: "79 / 79",
-};
-const ADDED_CONDITION = {
-  name: "Disease caused by severe acute respiratory syndrome coronavirus 2",
-  condition_id: "840539006",
 };
 
 test.describe("building a new query", () => {
