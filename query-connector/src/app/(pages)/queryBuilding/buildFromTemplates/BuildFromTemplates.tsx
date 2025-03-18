@@ -31,11 +31,7 @@ import classNames from "classnames";
 import { groupConditionConceptsIntoValueSets } from "@/app/shared/utils";
 import { SelectedQueryDetails } from "../querySelection/utils";
 
-import {
-  getCustomQueries,
-  getSavedQueryById,
-  saveCustomQuery,
-} from "@/app/backend/query-building";
+import { getCustomQueries } from "@/app/backend/query-building";
 import { groupValueSetsByConceptType } from "@/app/utils/valueSetTranslation";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import { DataContext } from "@/app/shared/DataProvider";
@@ -43,6 +39,10 @@ import {
   DibbsConceptType,
   DibbsValueSet,
 } from "@/app/models/entities/valuesets";
+import {
+  getSavedQueryById,
+  saveCustomQuery,
+} from "@/app/backend/dbServices/query-building";
 
 export type FormError = {
   queryName: boolean;

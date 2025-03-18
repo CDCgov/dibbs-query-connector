@@ -114,13 +114,14 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
           </thead>
           <tbody>
             {conditionIdToDetailsMap &&
-              queries.map((query, index) => (
+              queries.map((query) => (
                 <tr
-                  key={index}
+                  key={query.query_id}
                   className={classNames(
                     styles.myQueriesRow,
                     "tableRowWithHover",
                   )}
+                  data-testid={`query-row-${query.query_id}`}
                 >
                   <td title={query.query_name}>{query.query_name}</td>
 
@@ -151,7 +152,10 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
                             className="height-3 width-3"
                             aria-label="Pencil icon indicating edit ability"
                           />
-                          <span id={query.query_id} className="padding-left-05">
+                          <span
+                            data-testid={`edit-query-${query.query_id}`}
+                            className="padding-left-05"
+                          >
                             Edit
                           </span>
                         </span>
