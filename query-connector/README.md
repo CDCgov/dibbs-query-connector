@@ -127,6 +127,9 @@ By default, Playwright will look for end to end tests in `/e2e`.
 
 Playwright provides a number of different ways of executing end to end tests. From the `query-connector/` directory, you can run several commands:
 
+`npm run test:playwright:ui`
+Runs the end-to-end tests locally by spawning the Playwright UI mode. This will start a dev server off localhost:3000, so make sure you don't have another app instance running off that port.
+
 `npm run test:playwright`
 Runs the end-to-end tests.
 
