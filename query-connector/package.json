@@ -17,8 +17,8 @@
     "test:unit": "jest --coverage --testPathIgnorePatterns='/e2e/' '/integration/'",
     "test:unit:watch": "jest --watch",
     "test:integration": "JUST_INTEGRATION=true bash ./setup-scripts/unit_and_integration_tests.sh",
-    "test:playwright": "RUN_WITH_UI=false bash ./setup-scripts/e2e_tests.sh",
-    "test:playwright:ui": "RUN_WITH_UI=true bash ./setup-scripts/e2e_tests.sh"
+    "test:playwright": "bash ./setup-scripts/e2e_tests.sh",
+    "test:playwright:ui": "npx dotenv -e ./.env -- npx playwright test --ui "
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.515.0",

@@ -285,14 +285,14 @@ test.describe("editing an exisiting query", () => {
     ).toBeVisible();
 
     // confirm query shows correct condition/s
-    expect(
-      page.getByRole("cell", { name: "Cancer (Leukemia), Disease" }),
-    ).toBeVisible();
 
-    // remove added condition
     await editBtn.click();
     await expect(actionButton).not.toBeDisabled();
+    expect(
+      page.getByTestId(`${ADDED_CONDITION.condition_id}-conditionCard`),
+    ).toBeEnabled();
 
+    // remove added condition
     await page
       .getByTestId(`${ADDED_CONDITION.condition_id}-conditionCard`)
       .hover();
