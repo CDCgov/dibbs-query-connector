@@ -1,4 +1,3 @@
-import { UserRole } from "@/app/models/entities/users";
 import { adminAccessCheck, superAdminAccessCheck } from "@/app/utils/auth";
 import { getDbClient } from "../dbClient";
 

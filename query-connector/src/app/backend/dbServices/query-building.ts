@@ -49,7 +49,6 @@ class QueryBuildingService {
   /**
    * Deletes a query from the database by its unique ID.
    * @param queryId - The unique identifier of the query to delete.
-   * @param dbClient - the DB client to execute queries against
    * @returns A success or error response indicating the result.
    */
   @transaction

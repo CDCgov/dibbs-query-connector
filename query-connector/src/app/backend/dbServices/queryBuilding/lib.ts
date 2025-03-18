@@ -18,8 +18,8 @@ import { Pool } from "pg";
  * @param queryInput - frontend input for a query
  * @param queryName - name of query
  * @param author - author
- * @param queryId - a queryId if previously defined
  * @param dbClient - the DB client to execute queries against
+ * @param queryId - a queryId if previously defined
  * @returns - all columns of the newly added row in the query table
  */
 export async function saveCustomQueryHelp(

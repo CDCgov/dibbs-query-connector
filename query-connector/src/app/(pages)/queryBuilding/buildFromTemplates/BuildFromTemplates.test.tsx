@@ -7,7 +7,6 @@ import {
   cancerValueSets,
 } from "@/app/(pages)/queryBuilding/fixtures";
 import { formatDiseaseDisplay } from "@/app/(pages)/queryBuilding/utils";
-import { getSavedQueryById } from "@/app/backend/query-building";
 import { USE_CASE_DETAILS } from "@/app/shared/constants";
 import {
   getConditionsData,
@@ -22,6 +21,7 @@ import {
 } from "../components/utils";
 import { userEvent } from "@testing-library/user-event";
 import { render } from "@testing-library/react";
+import { getSavedQueryById } from "@/app/backend/dbServices/query-building";
 
 jest.mock("../../../shared/database-service", () => ({
   getCustomQueries: jest.fn(),
@@ -29,7 +29,7 @@ jest.mock("../../../shared/database-service", () => ({
   getValueSetsAndConceptsByConditionIDs: jest.fn(),
 }));
 
-jest.mock("../../../backend/query-building", () => ({
+jest.mock("../../../backend/dbServices/query-building", () => ({
   getSavedQueryById: jest.fn(),
 }));
 
