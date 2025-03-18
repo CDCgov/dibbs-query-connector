@@ -5,7 +5,7 @@ import {
   getSingleUserWithGroupMemberships,
 } from "./user-management";
 
-import { adminAccessCheck, superAdminAccessCheck } from "../utils/auth";
+import { adminAccessCheck } from "../utils/auth";
 import { getDbClient } from "./dbClient";
 import { QCResponse } from "../models/responses/collections";
 import { CustomUserQuery } from "../models/entities/query";
@@ -22,7 +22,7 @@ export async function createUserGroup(
   groupName: string,
 ): Promise<QCResponse<UserGroup>> {
   // TODO: https://linear.app/skylight-cdc/issue/QUE-216/refactor-user-management-code-into-service-class-pattern
-  if (!(await superAdminAccessCheck())) {
+  if (!(await adminAccessCheck())) {
     throw new Error("Unauthorized");
   }
 
@@ -68,7 +68,7 @@ export async function updateUserGroup(
   newName: string,
 ): Promise<UserGroup | string> {
   // TODO: https://linear.app/skylight-cdc/issue/QUE-216/refactor-user-management-code-into-service-class-pattern
-  if (!(await superAdminAccessCheck())) {
+  if (!(await adminAccessCheck())) {
     throw new Error("Unauthorized");
   }
 
@@ -125,7 +125,7 @@ export async function updateUserGroup(
  */
 export async function deleteUserGroup(id: string): Promise<UserGroup | string> {
   // TODO: https://linear.app/skylight-cdc/issue/QUE-216/refactor-user-management-code-into-service-class-pattern
-  if (!(await superAdminAccessCheck())) {
+  if (!(await adminAccessCheck())) {
     throw new Error("Unauthorized");
   }
 
@@ -259,7 +259,7 @@ export async function saveUserGroupMembership(
   selectedUsers: string[],
 ): Promise<User[]> {
   // TODO: https://linear.app/skylight-cdc/issue/QUE-216/refactor-user-management-code-into-service-class-pattern
-  if (!(await superAdminAccessCheck())) {
+  if (!(await adminAccessCheck())) {
     throw new Error("Unauthorized");
   }
 

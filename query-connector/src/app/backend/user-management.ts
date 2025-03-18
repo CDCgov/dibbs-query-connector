@@ -384,7 +384,7 @@ export async function getSingleUserWithGroupMemberships(
 export async function getAllUsersWithSingleGroupStatus(
   groupId: string,
 ): Promise<User[]> {
-  if (!(await superAdminAccessCheck())) {
+  if (!(await adminAccessCheck())) {
     throw new Error("Unauthorized");
   }
 

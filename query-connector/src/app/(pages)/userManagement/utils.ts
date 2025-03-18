@@ -29,8 +29,7 @@ export type UserManagementMode =
   | "remove-user"
   | "select-groups"
   | "create-group"
-  | "add-members"
-  | "add-queries"
+  | "edit-group"
   | "remove-group"
   | "closed";
 
@@ -53,7 +52,7 @@ export const ModalStates: ModalMap = {
   "edit-user": {
     heading: "Edit user",
     buttonText: "Next: Edit user groups",
-    secondaryBtnText: "",
+    secondaryBtnText: "Cancel",
     prevStep: "closed",
   },
   "select-groups": {
@@ -68,34 +67,28 @@ export const ModalStates: ModalMap = {
     secondaryBtnText: "Cancel",
     prevStep: "closed",
   },
-  "add-members": {
-    heading: "Add members",
-    buttonText: "",
-    secondaryBtnText: "Next: Add to user groups",
-    prevStep: "create-group",
-  },
-  "add-queries": {
-    heading: "TK",
-    buttonText: "TK",
-    secondaryBtnText: "Next: Add to user groups",
-    prevStep: "add-members",
+  "edit-group": {
+    heading: "Edit user group",
+    buttonText: "Save & update members",
+    secondaryBtnText: "Cancel",
+    prevStep: "closed",
   },
   "remove-user": {
-    heading: "TK",
-    buttonText: "TK",
-    secondaryBtnText: "Next: Add to user groups",
+    heading: "Delete user?",
+    buttonText: "Yes, Delete",
+    secondaryBtnText: "Cancel",
     prevStep: "closed",
   },
   "remove-group": {
-    heading: "TK",
-    buttonText: "TK",
-    secondaryBtnText: "Next: Add to user groups",
+    heading: "Delete group?",
+    buttonText: "Yes, Delete",
+    secondaryBtnText: "Cancel",
     prevStep: "closed",
   },
   closed: {
     heading: "",
     buttonText: "",
-    secondaryBtnText: "Next: Add to user groups",
+    secondaryBtnText: "",
     prevStep: "closed",
   },
 };

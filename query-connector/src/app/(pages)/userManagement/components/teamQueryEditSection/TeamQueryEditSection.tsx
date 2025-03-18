@@ -137,7 +137,7 @@ const UserManagementDrawer: React.FC<UserManagementDrawerProps> = ({
   function generateContent(): JSX.Element {
     const isMemberView = teamQueryEditSection.subjectType == "Members";
     return isMemberView
-      ? renderUsers(users)
+      ? renderUsers((teamQueryEditSection.subjectData as User[]) || users)
       : renderQueries(teamQueryEditSection.subjectData as CustomUserQuery[]);
   }
 

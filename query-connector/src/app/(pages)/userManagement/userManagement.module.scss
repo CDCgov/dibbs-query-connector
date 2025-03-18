@@ -1,3 +1,5 @@
+@use "../../ui/styles/_variables" as *;
+
 .roleDescriptions {
     margin: 2rem 0;
     display: flex;
@@ -19,5 +21,40 @@
 
     select {
         margin: 0 !important;
+    }
+}
+
+.drawerButton,
+.drawerButton:disabled,
+.drawerButton:disabled:hover {
+    text-decoration: none;
+}
+
+.userGroupsTable,
+.userPermissionsTable {
+    .actionButtons {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        position: absolute;
+        right: 1.5rem;
+        top: 50%;
+        transform: translateY(-50%);
+        gap: 0.5rem;
+        color: #005ea2;
+    }
+
+    tbody td:last-child {
+        opacity: 0;
+        text-align: right;
+        padding-right: 0 !important;
+        white-space: nowrap;
+    }
+
+    tbody tr:hover td:last-child,
+    tbody td:last-child:hover {
+        opacity: 1;
+        pointer-events: auto;
+        max-height: inherit;
     }
 }
