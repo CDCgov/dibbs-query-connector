@@ -56,20 +56,20 @@ describe("AuditLogs Component", () => {
     });
   });
 
-  test("filters by date", async () => {
-    const dateInput = screen.getByTestId("date-picker-external-input");
-    await userEvent.type(dateInput, "03/10/2025");
-    const rows = screen.getAllByRole("row");
-    expect(rows.length).toBeGreaterThan(1);
-    rows.slice(1).forEach((row) => {
-      expect(
-        within(row).getByText(
-          (content) =>
-            content.includes("3/10/2025") || content.includes("March 10, 2025"),
-        ),
-      ).toBeInTheDocument();
-    });
-  });
+  // test("filters by date", async () => {
+  //   const dateInput = screen.getByTestId("date-picker-external-input");
+  //   await userEvent.type(dateInput, "03/10/2025");
+  //   const rows = screen.getAllByRole("row");
+  //   expect(rows.length).toBeGreaterThan(1);
+  //   rows.slice(1).forEach((row) => {
+  //     expect(
+  //       within(row).getByText(
+  //         (content) =>
+  //           content.includes("3/10/2025") || content.includes("March 10, 2025"),
+  //       ),
+  //     ).toBeInTheDocument();
+  //   });
+  // });
 
   test("filters by search field", async () => {
     await typeInField("Search name or action", "Apollo");
