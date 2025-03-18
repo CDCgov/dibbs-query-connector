@@ -68,6 +68,7 @@ jobs:
         working-directory: ./query-connector
         run: |
           echo "AIDBOX_LICENSE=${{ secrets.AIDBOX_LICENSE }}" > .env
+          echo "DATABASE_URL=postgres://postgres:pw@db:5432/tefca_db" >> .env
       - name: Build Query Connector and Run Playwright Tests
         id: run_tests
         working-directory: ./query-connector
