@@ -126,7 +126,12 @@ test.describe("editing an exisiting query", () => {
     await page
       .getByTestId(`condition-drawer-add-${ADDED_CONDITION.condition_id}`)
       .click();
-    await expect(page.getByText(`ADDED`)).toBeVisible();
+    await expect(
+      page.getByTestId(
+        `condition-drawer-added-${ADDED_CONDITION.condition_id}`,
+      ),
+    ).toBeVisible();
+
     await page
       .getByTestId("drawer-open-true")
       .getByTestId(`close-drawer`)
