@@ -66,7 +66,7 @@ test.describe("editing an exisiting query", () => {
     await deleteQueryByIdHelp(subjectQuery.query_id, dbClient);
   });
 
-  test.only("edit query name", async ({ page }) => {
+  test("edit query name", async ({ page }) => {
     const originalName = structuredClone(subjectQuery.query_name);
     const query = page.getByTitle(originalName);
     await expect(query).toBeVisible();
