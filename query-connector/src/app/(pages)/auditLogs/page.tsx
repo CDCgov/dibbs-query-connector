@@ -87,6 +87,19 @@ const AuditLogs: React.FC = () => {
     [logs],
   );
 
+  useEffect(() => {
+    const dateInput = document.querySelector(
+      ".usa-date-picker__external-input",
+    );
+    if (dateInput) {
+      if (dateError) {
+        dateInput.classList.add(styles.bgErrorLighter, styles.borderError);
+      } else {
+        dateInput.classList.remove(styles.bgErrorLighter, styles.borderError);
+      }
+    }
+  }, [dateError]);
+
   const [filteredLogs, setFilteredLogs] = useState(logs);
 
   useEffect(() => {
@@ -169,33 +182,42 @@ const AuditLogs: React.FC = () => {
           </div>
           <div className={classNames(styles.inputGroup)}>
             <label htmlFor="date">Date</label>
-            <DatePicker
-              key={selectedDate === null ? "reset" : "date-picker"}
-              id="date"
-              name="date"
-              onChange={(value) => {
-                if (value) {
-                  const parsedDate = new Date(value);
-                  if (isNaN(parsedDate.getTime())) {
-                    setDateError(
-                      "Your entry does not match the allowed format MM/DD/YYYY.",
-                    );
+            <div>
+              <DatePicker
+                key={selectedDate === null ? "reset" : "date-picker"}
+                id="date"
+                name="date"
+                onChange={(value) => {
+                  if (value) {
+                    const parsedDate = new Date(value);
+                    if (isNaN(parsedDate.getTime())) {
+                      setDateError(
+                        "Your entry does not match the allowed format MM/DD/YYYY.",
+                      );
+                    } else {
+                      setDateError("");
+                      setSelectedDate(parsedDate);
+                    }
                   } else {
                     setDateError("");
-                    setSelectedDate(parsedDate);
+                    setSelectedDate(null);
                   }
-                } else {
-                  setDateError("");
-                  setSelectedDate(null);
+                }}
+                value={
+                  selectedDate ? selectedDate.toISOString().split("T")[0] : ""
                 }
-              }}
-              value={
-                selectedDate ? selectedDate.toISOString().split("T")[0] : ""
-              }
-              minDate={minDate ? minDate.toISOString().split("T")[0] : ""}
-              maxDate={maxDate ? maxDate.toISOString().split("T")[0] : ""}
-            />
-
+                minDate={minDate ? minDate.toISOString().split("T")[0] : ""}
+                maxDate={maxDate ? maxDate.toISOString().split("T")[0] : ""}
+                onClick={() => {
+                  const datePickerButton = document.querySelector(
+                    ".usa-date-picker__button",
+                  );
+                  if (datePickerButton) {
+                    (datePickerButton as HTMLElement).click();
+                  }
+                }}
+              />
+            </div>
             {dateError && <p className={styles.errorText}>{dateError}</p>}
           </div>
           <SearchField
