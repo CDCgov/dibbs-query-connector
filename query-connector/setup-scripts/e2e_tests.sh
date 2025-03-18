@@ -7,6 +7,9 @@ docker compose -f docker-compose-e2e.yaml --env-file .env up -d --build
 docker compose -f docker-compose-e2e.yaml logs -f aidbox-seeder | grep -q "Finished configuring Aidbox and database."
 
 npx dotenv -e ./.env -- npx playwright test --reporter=list
+E2E_EXIT_CODE=$?
 
 # Teardown containers
 docker compose -f docker-compose-e2e.yaml down
+
+exit $E2E_EXIT_CODE

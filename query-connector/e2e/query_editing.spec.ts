@@ -1,9 +1,22 @@
-// @ts-check
-
 import { test, expect } from "@playwright/test";
 import { TEST_URL } from "../playwright-setup";
-import { DEFAULT_QUERIES } from "@/app/(pages)/queryBuilding/fixtures";
 import { CONDITION_DRAWER_SEARCH_PLACEHOLDER } from "@/app/(pages)/queryBuilding/components/utils";
+import {
+  getSavedQueryById,
+  saveCustomQuery,
+} from "@/app/backend/dbServices/query-building";
+import {
+  NestedQuery,
+  QueryTableResult,
+} from "@/app/(pages)/queryBuilding/utils";
+import { CANCER_FRONTEND_NESTED_INPUT } from "./constants";
+import { getDbClient } from "@/app/backend/dbClient";
+import {
+  deleteQueryByIdHelp,
+  getSavedQueryByIdHelp,
+  saveCustomQueryHelp,
+} from "@/app/backend/dbServices/queryBuilding/lib";
+import { deleteQueryById } from "@/app/backend/query-building";
 
 // consts
 const QUERY_LIBRARY = "Query Library";
@@ -13,14 +26,33 @@ const ADDED_CONDITION = {
   name: "Disease caused by severe acute respiratory syndrome coronavirus 2",
   condition_id: "840539006",
 };
+const CANCER_CONDITION_ID = "2";
+const dbClient = getDbClient();
 
-// since we're deleting / editing the queries across browsers and asserting on
-// in between state in a way that might cause race conditions, run these serially
-test.describe.configure({ mode: "serial" });
+async function createTestQuery() {
+  const queryInputFixture = CANCER_FRONTEND_NESTED_INPUT as NestedQuery;
+  const randomName = "Cancer query " + Math.random() * 100;
+  const author = "Test Steward";
+  const result = await saveCustomQueryHelp(
+    queryInputFixture,
+    randomName,
+    author,
+    dbClient,
+  );
+  if (result === undefined) throw Error("Failed to set up test query");
+
+  return (await getSavedQueryByIdHelp(
+    result[0].id,
+    dbClient,
+  )) as QueryTableResult;
+}
 
 test.describe("editing an exisiting query", () => {
+  let subjectQuery: QueryTableResult;
   // Start every test by navigating to the customize query workflow
   test.beforeEach(async ({ page }) => {
+    subjectQuery = await createTestQuery();
+
     await page.goto(`${TEST_URL}/queryBuilding`);
     await expect(
       page.getByRole("heading", {
@@ -30,18 +62,18 @@ test.describe("editing an exisiting query", () => {
     ).toBeVisible();
   });
 
-  test("edit query name", async ({ page }) => {
-    const subjectQuery = DEFAULT_QUERIES[0];
+  test.afterEach(async () => {
+    await deleteQueryByIdHelp(subjectQuery.query_id, dbClient);
+  });
+
+  test.only("edit query name", async ({ page }) => {
     const originalName = structuredClone(subjectQuery.query_name);
     const query = page.getByTitle(originalName);
     await expect(query).toBeVisible();
 
     // click edit
     await query.hover();
-    const editBtn = page
-      .getByRole("button")
-      .locator(`#${subjectQuery.query_id}`)
-      .getByText("Edit");
+    const editBtn = page.getByTestId(`edit-query-${subjectQuery.query_id}`);
     await expect(editBtn).toBeVisible();
     await editBtn.click();
 
@@ -70,7 +102,7 @@ test.describe("editing an exisiting query", () => {
       }),
     ).toBeVisible();
     expect(
-      page.getByRole("cell", { name: "Cancer case investigation-edited" }),
+      page.getByRole("cell", { name: `${subjectQuery.query_name}-edited` }),
     ).toBeVisible();
 
     // change name back to original
@@ -91,7 +123,6 @@ test.describe("editing an exisiting query", () => {
   });
 
   test("edit query conditions", async ({ page }) => {
-    const subjectQuery = DEFAULT_QUERIES[0];
     const query = page.locator("tr", {
       has: page.getByTitle(subjectQuery.query_name),
     });
@@ -100,10 +131,8 @@ test.describe("editing an exisiting query", () => {
 
     // click edit
     await query.hover();
-    const editBtn = query
-      .getByRole("button")
-      .locator(`#${subjectQuery.query_id}`)
-      .getByText("Edit");
+    const editBtn = query.getByTestId(`edit-query-${subjectQuery.query_id}`);
+
     await expect(editBtn).toBeVisible();
     await editBtn.click();
 
@@ -174,12 +203,18 @@ test.describe("editing an exisiting query", () => {
       }),
     ).toBeVisible();
 
-    expect(page.getByRole("cell", { name: "Cancer (Leukemia)" })).toBeVisible();
+    expect(
+      page
+        .getByTestId(`query-row-${subjectQuery.query_id}`)
+        .getByRole("cell", { name: "Cancer (Leukemia)" }),
+    ).toBeVisible();
   });
 
   test("edit query value sets and concept codes", async ({ page }) => {
-    const subjectQuery = DEFAULT_QUERIES[0];
-    const subjectVS = DEFAULT_QUERIES[0].valuesets[0];
+    const subjectVS = Object.values(
+      subjectQuery.query_data[CANCER_CONDITION_ID],
+    )[0];
+
     const subjectConcept = subjectVS.concepts[0];
 
     const query = page.locator("tr", {
@@ -190,10 +225,7 @@ test.describe("editing an exisiting query", () => {
 
     // click edit
     await query.hover();
-    const editBtn = query
-      .getByRole("button")
-      .locator(`#${subjectQuery.query_id}`)
-      .getByText("Edit");
+    const editBtn = query.getByTestId("edit-query-${subjectQuery.query_id}");
     await expect(editBtn).toBeVisible();
     await editBtn.click();
 

@@ -1,4 +1,4 @@
-import { getDbClient } from "../backend/dbClient";
+import { getDbClient } from "../dbClient";
 
 /**
  * Decorator that adds audit log write logic to an annotated function
