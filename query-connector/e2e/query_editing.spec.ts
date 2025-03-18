@@ -16,36 +16,6 @@ import {
   getSavedQueryByIdHelp,
   saveCustomQueryHelp,
 } from "@/app/backend/dbServices/queryBuilding/lib";
-import { deleteQueryById } from "@/app/backend/query-building";
-
-// consts
-const QUERY_LIBRARY = "Query Library";
-const CUSTOM_QUERY = "Custom Query";
-
-const ADDED_CONDITION = {
-  name: "Disease caused by severe acute respiratory syndrome coronavirus 2",
-  condition_id: "840539006",
-};
-const CANCER_CONDITION_ID = "2";
-const dbClient = getDbClient();
-
-async function createTestQuery() {
-  const queryInputFixture = CANCER_FRONTEND_NESTED_INPUT as NestedQuery;
-  const randomName = "Cancer query " + Math.random() * 100;
-  const author = "Test Steward";
-  const result = await saveCustomQueryHelp(
-    queryInputFixture,
-    randomName,
-    author,
-    dbClient,
-  );
-  if (result === undefined) throw Error("Failed to set up test query");
-
-  return (await getSavedQueryByIdHelp(
-    result[0].id,
-    dbClient,
-  )) as QueryTableResult;
-}
 
 test.describe("editing an exisiting query", () => {
   let subjectQuery: QueryTableResult;
@@ -225,7 +195,7 @@ test.describe("editing an exisiting query", () => {
 
     // click edit
     await query.hover();
-    const editBtn = query.getByTestId("edit-query-${subjectQuery.query_id}");
+    const editBtn = query.getByTestId(`edit-query-${subjectQuery.query_id}`);
     await expect(editBtn).toBeVisible();
     await editBtn.click();
 
@@ -285,3 +255,31 @@ test.describe("editing an exisiting query", () => {
     ).toBeVisible();
   });
 });
+
+const QUERY_LIBRARY = "Query Library";
+const CUSTOM_QUERY = "Custom Query";
+
+const ADDED_CONDITION = {
+  name: "Disease caused by severe acute respiratory syndrome coronavirus 2",
+  condition_id: "840539006",
+};
+const CANCER_CONDITION_ID = "2";
+const dbClient = getDbClient();
+
+async function createTestQuery() {
+  const queryInputFixture = CANCER_FRONTEND_NESTED_INPUT as NestedQuery;
+  const randomName = "Cancer query " + Math.random() * 100;
+  const author = "Test Steward";
+  const result = await saveCustomQueryHelp(
+    queryInputFixture,
+    randomName,
+    author,
+    dbClient,
+  );
+  if (result === undefined) throw Error("Failed to set up test query");
+
+  return (await getSavedQueryByIdHelp(
+    result[0].id,
+    dbClient,
+  )) as QueryTableResult;
+}

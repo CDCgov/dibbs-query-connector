@@ -8,6 +8,11 @@ import { DEFAULT_TIME_WINDOW } from "@/app/shared/utils";
 import { randomUUID } from "crypto";
 import { Pool } from "pg";
 
+// The underlying functionality here is reused in Playwright to do some
+// test setup, but for some DUMB reason Playwright refuses to play nicely with
+// decorators. As a workaround, we're spliting off the underlying logic between
+// the
+
 export async function saveCustomQueryHelp(
   queryInput: NestedQuery,
   queryName: string,
