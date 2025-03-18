@@ -9,7 +9,7 @@ import { UserManagementContext } from "../UserManagementProvider";
 import { UserGroup, UserRole, User } from "../../../../models/entities/users";
 import { QueryTableResult } from "@/app/(pages)/queryBuilding/utils";
 import styles from "../usersTable/usersTable.module.scss";
-import { getSessionRole } from "../../utils";
+import { getContextRole } from "../../utils";
 
 type UserGroupsTableProps = {
   userGroups: UserGroup[];
@@ -31,7 +31,7 @@ const UserGroupsTable: React.FC<UserGroupsTableProps> = ({
   fetchGroupMembers,
 }) => {
   const { openEditSection } = useContext(UserManagementContext);
-  const role = getSessionRole();
+  const role = getContextRole();
 
   function getMemberLabel(memberSize: number): string {
     return memberSize == 1 ? `${memberSize} member` : `${memberSize} members`;

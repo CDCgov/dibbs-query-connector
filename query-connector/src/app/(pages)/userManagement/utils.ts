@@ -1,12 +1,19 @@
 import { useSession } from "next-auth/react";
+import { useContext } from "react";
+import { DataContext } from "@/app/shared/DataProvider";
+import { isAuthDisabledClientCheck } from "@/app/utils/auth";
+import { UserRole } from "@/app/models/entities/users";
 
 /**
  * Function that retrieves the role value from the current session object
  * @returns - The UserRole for the current logged-in user
  */
-export function getSessionRole() {
+export function getContextRole() {
   const { data: session } = useSession();
-  return session?.user.role;
+  const ctx = useContext(DataContext);
+  const isAuthDisabled = isAuthDisabledClientCheck(ctx?.runtimeConfig);
+
+  return isAuthDisabled ? UserRole.SUPER_ADMIN : session?.user.role;
 }
 
 export const RoleDescriptons = {

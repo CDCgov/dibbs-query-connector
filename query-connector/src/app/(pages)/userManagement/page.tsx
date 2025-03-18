@@ -4,7 +4,7 @@ import { UserRole } from "@/app/models/entities/users";
 import WithAuth from "@/app/ui/components/withAuth/WithAuth";
 import UserManagementProvider from "./components/UserManagementProvider";
 import UsersTable from "./components/usersTable/usersTable";
-import { getSessionRole, RoleDescriptons } from "./utils";
+import { getContextRole, RoleDescriptons } from "./utils";
 
 /**
  * @param textContent asdf
@@ -38,7 +38,7 @@ export const renderRoleDescriptions = (textContent: object) => {
  * @returns the UserManagement component
  */
 const UserManagement: React.FC = () => {
-  const role = getSessionRole();
+  const role = getContextRole();
 
   return (
     <WithAuth>

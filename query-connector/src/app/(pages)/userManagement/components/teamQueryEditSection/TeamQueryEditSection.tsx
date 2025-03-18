@@ -7,7 +7,7 @@ import { UserManagementContext } from "../UserManagementProvider";
 import style from "./TeamQueryEditSection.module.scss";
 import { User, UserGroup, UserRole } from "@/app/models/entities/users";
 import { QueryTableResult } from "@/app/(pages)/queryBuilding/utils";
-import { getSessionRole } from "../../utils";
+import { getContextRole } from "../../utils";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import {
   addSingleUserToGroup,
@@ -43,7 +43,7 @@ const UserManagementDrawer: React.FC<UserManagementDrawerProps> = ({
     handleQueryUpdate,
   } = useContext(UserManagementContext);
 
-  const role = getSessionRole();
+  const role = getContextRole();
 
   useEffect(() => {
     console.log(teamQueryEditSection);

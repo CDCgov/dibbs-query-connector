@@ -15,7 +15,7 @@ jest.mock("@/app/utils/auth", () => ({
 }));
 
 jest.mock("@/app/(pages)/userManagement/utils", () => ({
-  getSessionRole: jest.fn().mockReturnValue("Standard"),
+  getContextRole: jest.fn().mockReturnValue("Standard"),
 }));
 
 jest.mock("next/navigation", () => ({
@@ -56,7 +56,7 @@ describe("WithAuth component (page access guard)", () => {
       status: "authenticated",
       update: jest.fn(),
     };
-    jest.spyOn(Utils, "getSessionRole").mockReturnValueOnce("Super Admin");
+    jest.spyOn(Utils, "getContextRole").mockReturnValueOnce("Super Admin");
     jest.spyOn(nextAuthReact, "useSession").mockReturnValueOnce(session);
 
     render(
