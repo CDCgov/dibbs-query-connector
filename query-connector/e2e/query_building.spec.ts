@@ -2,8 +2,6 @@
 
 import { test, expect } from "@playwright/test";
 import { TEST_URL } from "../playwright-setup";
-import { DEFAULT_QUERIES } from "@/app/(pages)/queryBuilding/fixtures";
-import { CONDITION_DRAWER_SEARCH_PLACEHOLDER } from "@/app/(pages)/queryBuilding/components/utils";
 
 // consts
 const QUERY_LIBRARY = "Query Library";
