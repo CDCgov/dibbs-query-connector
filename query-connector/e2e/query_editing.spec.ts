@@ -2,10 +2,6 @@ import { test, expect } from "@playwright/test";
 import { TEST_URL } from "../playwright-setup";
 import { CONDITION_DRAWER_SEARCH_PLACEHOLDER } from "@/app/(pages)/queryBuilding/components/utils";
 import {
-  getSavedQueryById,
-  saveCustomQuery,
-} from "@/app/backend/dbServices/query-building";
-import {
   NestedQuery,
   QueryTableResult,
 } from "@/app/(pages)/queryBuilding/utils";

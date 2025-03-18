@@ -10,9 +10,18 @@ import { Pool } from "pg";
 
 // The underlying functionality here is reused in Playwright to do some
 // test setup, but for some DUMB reason Playwright refuses to play nicely with
-// decorators. As a workaround, we're spliting off the underlying logic between
-// the
+// decorators. As a workaround, we're doing some fiddly imports to expose the
+// underlying logic away from the decorated exports
 
+/**
+ * Backend handler function for upserting a query
+ * @param queryInput - frontend input for a query
+ * @param queryName - name of query
+ * @param author - author
+ * @param queryId - a queryId if previously defined
+ * @param dbClient - the DB client to execute queries against
+ * @returns - all columns of the newly added row in the query table
+ */
 export async function saveCustomQueryHelp(
   queryInput: NestedQuery,
   queryName: string,
@@ -58,7 +67,12 @@ export async function saveCustomQueryHelp(
     console.error("Error saving new query", error);
   }
 }
-
+/**
+ * Getter function to grab saved query details from the DB
+ * @param queryId - Query ID to grab data from the db with
+ * @param dbClient - the DB client to execute queries against
+ * @returns The query name, data, and conditions list from the query table
+ */
 export async function getSavedQueryByIdHelp(queryId: string, dbClient: Pool) {
   const id = queryId;
   const queryString = `
@@ -74,7 +88,6 @@ export async function getSavedQueryByIdHelp(queryId: string, dbClient: Pool) {
       console.error("No results found for query id:", id);
       return undefined;
     }
-    console.log(result.rows[0]);
     return result.rows[0] as unknown as QueryTableResult;
   } catch (error) {
     console.error("Error retrieving query", error);
@@ -82,6 +95,12 @@ export async function getSavedQueryByIdHelp(queryId: string, dbClient: Pool) {
   }
 }
 
+/**
+ * Deletes a query from the database by its unique ID.
+ * @param queryId - The unique identifier of the query to delete.
+ * @param dbClient - the DB client to execute queries against
+ * @returns A success or error response indicating the result.
+ */
 export async function deleteQueryByIdHelp(queryId: string, dbClient: Pool) {
   const deleteQuery = `
       DELETE FROM query WHERE id = $1;

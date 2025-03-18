@@ -1,10 +1,9 @@
+"use server";
+
 import { Pool } from "pg";
 import { getDbClient } from "../dbClient";
-import { NestedQuery } from "@/app/(pages)/queryBuilding/utils";
-import { DibbsValueSet } from "@/app/models/entities/valuesets";
-import { DEFAULT_TIME_WINDOW } from "@/app/shared/utils";
-import { randomUUID } from "crypto";
-import { transaction } from "./decorators";
+import type { NestedQuery } from "@/app/(pages)/queryBuilding/utils";
+import { adminRequired, transaction } from "./decorators";
 import {
   deleteQueryByIdHelp,
   getSavedQueryByIdHelp,
@@ -14,7 +13,15 @@ import {
 class QueryBuildingService {
   private static dbClient: Pool = getDbClient();
 
-  // TODO: annotate and implement admin checks against these
+  /**
+   * Backend handler function for upserting a query
+   * @param queryInput - frontend input for a query
+   * @param queryName - name of query
+   * @param author - author
+   * @param queryId - a queryId if previously defined
+   * @returns - all columns of the newly added row in the query table
+   */
+  @adminRequired
   static async saveCustomQuery(
     queryInput: NestedQuery,
     queryName: string,
@@ -30,10 +37,21 @@ class QueryBuildingService {
     );
   }
 
+  /**
+   * Getter function to grab saved query details from the DB
+   * @param queryId - Query ID to grab data from the db with
+   * @returns The query name, data, and conditions list from the query table
+   */
   static async getSavedQueryById(queryId: string) {
     return getSavedQueryByIdHelp(queryId, QueryBuildingService.dbClient);
   }
 
+  /**
+   * Deletes a query from the database by its unique ID.
+   * @param queryId - The unique identifier of the query to delete.
+   * @param dbClient - the DB client to execute queries against
+   * @returns A success or error response indicating the result.
+   */
   @transaction
   static async deleteQueryById(queryId: string) {
     return deleteQueryByIdHelp(queryId, QueryBuildingService.dbClient);
