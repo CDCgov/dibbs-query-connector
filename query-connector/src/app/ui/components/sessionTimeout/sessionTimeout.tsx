@@ -13,23 +13,35 @@ const Modal = dynamic<ModalProps>(
 );
 
 // 60 mins inactivity
-const IDLE_TIMEOUT_MSEC = 60 * 60000;
+export const IDLE_TIMEOUT_MSEC = 60 * 60000;
 // 5 mins to answer prompt / 5 mins before timeout
-const PROMPT_TIMEOUT_MSEC = 5 * 60000;
+export const PROMPT_TIMEOUT_MSEC = 5 * 60000;
+
+export interface SessionTimeoutProps {
+  idleTimeMsec: number;
+  promptTimeMsec: number;
+}
 
 /**
+ * @param root0 Props of SessionTimeout component
+ * @param root0.idleTimeMsec amout of time that the user needs to be idle in order to trigger automatic signout
+ * @param root0.promptTimeMsec amount of time that the prompt will be displayed to a user. This time uses as reference the idle timeout
+ * for example if it is set to 5 mins then the prompt will become visible 5 mins before the idle time has been reached.
  * @returns SessionTimeout component which handles tracking idle time for a logged in user.
  */
-const SessionTimeout: React.FC = () => {
+const SessionTimeout: React.FC<SessionTimeoutProps> = ({
+  idleTimeMsec,
+  promptTimeMsec,
+}) => {
   const { status } = useSession();
-
   const [remainingTime, setRemainingTime] = useState("");
   const intervalId = useRef<NodeJS.Timeout | null>(null);
   const [started, setStarted] = useState(false);
   const modalRef = useRef<ModalRef>(null);
+
   const { activate, start, reset, pause, getRemainingTime } = useIdleTimer({
-    timeout: IDLE_TIMEOUT_MSEC,
-    promptBeforeIdle: PROMPT_TIMEOUT_MSEC,
+    timeout: idleTimeMsec,
+    promptBeforeIdle: promptTimeMsec,
     onPrompt: handlePrompt,
     onIdle: handleLogout,
     stopOnIdle: true,
