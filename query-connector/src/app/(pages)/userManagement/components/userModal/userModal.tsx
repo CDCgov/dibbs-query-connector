@@ -298,7 +298,12 @@ const UserModal: React.FC<UserModalProps> = ({
 
     return (
       <>
-        <div>User groups</div>
+        <div>
+          {userGroups && userGroups.length > 0
+            ? "User groups"
+            : "No user groups found. Create a new group on the User Groups tab. You can still continue adding this user."}
+        </div>
+
         {userGroups &&
           userGroups.length > 0 &&
           userGroups.map((group) => {

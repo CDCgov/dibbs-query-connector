@@ -37,7 +37,7 @@ const UsersTable: React.FC<UsersTableProps> = ({ role }) => {
   const [userGroups, setUserGroups] = useState<UserGroup[]>([]);
   const [modalMode, setModalMode] = useState<UserManagementMode>("closed");
   const [shouldRefreshView, setShouldRefreshView] = useState<boolean | string>(
-    false,
+    true,
   );
 
   const modalRef = useRef<ModalRef>(null);
@@ -179,35 +179,27 @@ const UsersTable: React.FC<UsersTableProps> = ({ role }) => {
     userGroups.length <= 0 && fetchUserGroups();
   }, []);
 
-  // when users or groups update
+  // wait for users/groups to load before setting active tab;
+  // reset shouldRefreshView to false so that the table view
+  // doesn't change back to default when we update data in the
+  // background (e.g. after clicking checkboxes in the drawer)
   useEffect(() => {
-    if (!shouldRefreshView) {
+    if (shouldRefreshView) {
       setActiveTab(defaultTab);
-    }
-
-    const userTab = sections.filter((tab) => tab.label == "Users")[0];
-    const groupsTab = sections.filter((tab) => tab.label == "User groups")[0];
-
-    if (shouldRefreshView == "Users") {
-      setActiveTab(userTab);
-      setShouldRefreshView("none");
-    }
-    if (shouldRefreshView == "User groups") {
-      setActiveTab(groupsTab);
-      setShouldRefreshView("none");
+      setShouldRefreshView(false);
     }
   }, [users, userGroups]);
 
-  // when we trigger shouldRefreshView
+  // update the table display when we modify data via the modal
+  // or when we click to change tabs
   useEffect(() => {
     if (shouldRefreshView == "Users") {
       fetchUsers();
-      setShouldRefreshView("none");
+      setShouldRefreshView(false);
     }
     if (shouldRefreshView == "User groups") {
-      fetchUserGroups().then(() => {
-        return setShouldRefreshView("none");
-      });
+      fetchUserGroups();
+      setShouldRefreshView(false);
     }
   }, [shouldRefreshView]);
 
@@ -238,7 +230,6 @@ const UsersTable: React.FC<UsersTableProps> = ({ role }) => {
           setUsers={setUsers}
           userGroups={userGroups}
           setUserGroups={setUserGroups}
-          refreshView={setShouldRefreshView}
         />
       </div>
     </>

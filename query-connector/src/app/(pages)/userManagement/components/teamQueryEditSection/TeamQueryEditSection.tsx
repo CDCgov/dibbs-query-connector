@@ -19,7 +19,6 @@ export type UserManagementDrawerProps = {
   setUserGroups: Dispatch<SetStateAction<UserGroup[]>>;
   users: User[];
   setUsers: Dispatch<SetStateAction<User[]>>;
-  refreshView: React.Dispatch<React.SetStateAction<boolean | string>>;
 };
 
 /**
