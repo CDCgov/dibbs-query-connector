@@ -130,9 +130,6 @@ Playwright provides a number of different ways of executing end to end tests. Fr
 `npm run test:playwright`
 Runs the end-to-end tests.
 
-`npm run test:playwright:ui`
-Starts the interactive UI mode. The script will spin up a full version of the app on the default ports, so make sure you don't have another app instance running
-
 `npm run test:playwright -- --project=chromium`
 Runs the tests only on Desktop Chrome.
 
