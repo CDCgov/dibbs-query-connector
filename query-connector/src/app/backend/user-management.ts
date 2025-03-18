@@ -1,5 +1,6 @@
 "use server";
 
+import { QueryResult } from "pg";
 import { User, UserRole, UserGroup } from "../models/entities/users";
 import { QCResponse } from "../models/responses/collections";
 import { adminAccessCheck, superAdminAccessCheck } from "../utils/auth";
@@ -135,7 +136,27 @@ export async function updateUserDetails(
     throw error;
   }
 }
+/**
+ * Retrieves group membership data for the given users and formats it on the User object
+ * @param userList - The users whose group memberships we are retrieving
+ * @returns The updated user record or an error if the update fails.
+ */
+async function fetchUserGroupMembershipDetails(userList: QueryResult) {
+  const users = await Promise.all(
+    userList.rows.map(async (user) => {
+      try {
+        const userGroups = await getAllUserGroupsForUser(user.id);
+        user.userGroupMemberships = userGroups.items;
+        return user;
+      } catch (error) {
+        console.error(error);
+        throw error;
+      }
+    }),
+  );
 
+  return users;
+}
 /**
  * Updates the role of an existing user in the users table.
  * @param userId - The user ID.
@@ -172,7 +193,9 @@ export async function updateUserRole(
     }
 
     console.log(`User role updated successfully: ${userId} -> ${newRole}`);
-    return { totalItems: 1, items: [result.rows[0]] };
+    const userWithGroups = await fetchUserGroupMembershipDetails(result);
+
+    return { totalItems: 1, items: userWithGroups };
   } catch (error) {
     console.error("Error updating user role:", error);
     throw error;
@@ -225,22 +248,11 @@ export async function getAllUsers(): Promise<QCResponse<User>> {
     `;
 
     const result = await dbClient.query(selectAllUsersQuery);
-    const users = await Promise.all(
-      result.rows.map(async (user) => {
-        try {
-          const userGroups = await getAllUserGroupsForUser(user.id);
-          user.userGroupMemberships = userGroups.items;
-          return user;
-        } catch (error) {
-          console.error(error);
-          throw error;
-        }
-      }),
-    );
+    const usersWithGroups = await fetchUserGroupMembershipDetails(result);
 
     return {
       totalItems: result.rowCount,
-      items: users,
+      items: usersWithGroups,
     } as QCResponse<User>;
   } catch (error) {
     throw error;

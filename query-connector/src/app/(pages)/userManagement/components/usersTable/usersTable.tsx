@@ -75,6 +75,7 @@ const UsersTable: React.FC<UsersTableProps> = ({ role }) => {
               <UserPermissionsTable
                 fetchGroupMembers={fetchGroupMembers}
                 users={users}
+                setUsers={setUsers}
               />
             ) : (
               <div className="empty-response">No users found</div>
@@ -217,7 +218,7 @@ const UsersTable: React.FC<UsersTableProps> = ({ role }) => {
         {shouldRenderTabs && <TabGroup tabs={tabsForRole} />}
         {dataLoaded &&
           activeTab?.renderContent &&
-          activeTab?.renderContent(users)}
+          activeTab?.renderContent(users, userGroups)}
         <UserModal
           setModalMode={setModalMode}
           modalMode={modalMode}

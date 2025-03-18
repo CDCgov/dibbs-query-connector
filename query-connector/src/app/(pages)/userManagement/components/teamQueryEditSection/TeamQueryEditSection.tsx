@@ -179,7 +179,7 @@ const UserManagementDrawer: React.FC<UserManagementDrawerProps> = ({
       }
 
       const updatedUser = updatedUserResponse.items[0];
-      let newUsersList = users.map((u) => {
+      const newUsersList = users.map((u) => {
         if (u.id == userId) {
           u = updatedUser as User;
           return {

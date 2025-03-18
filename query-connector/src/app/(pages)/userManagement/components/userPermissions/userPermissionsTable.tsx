@@ -1,6 +1,6 @@
 "use client";
 
-import { useContext } from "react";
+import { useContext, Dispatch, SetStateAction } from "react";
 import { Button } from "@trussworks/react-uswds";
 import classNames from "classnames";
 import { updateUserRole } from "@/app/backend/user-management";
@@ -18,6 +18,7 @@ import {
 
 type PermissionsProps = {
   users: User[] | null;
+  setUsers: Dispatch<SetStateAction<User[]>>;
   fetchGroupMembers: (groupId: string) => Promise<User[]>;
 };
 
@@ -25,23 +26,38 @@ type PermissionsProps = {
  * User section in the user management page
  * @param root0 - The user groups table
  * @param root0.users The user groups table
+ * @param root0.setUsers The user groups table
  *  @param root0.fetchGroupMembers Function to retrieve a group's list of users
  * @returns Users table
  */
 const UserPermissionsTable: React.FC<PermissionsProps> = ({
   users,
+  setUsers,
   fetchGroupMembers,
 }) => {
   const { openEditSection } = useContext(UserManagementContext);
-
   const { data: session } = useSession();
 
   async function handleUserRoleChange(id: string, role: UserRole) {
     try {
-      await updateUserRole(id, role);
-      showToastConfirmation({
-        body: "Role successfully updated.",
-      });
+      if (users) {
+        const updatedUser = await updateUserRole(id, role);
+        const newUsersList = users.map((u) => {
+          if (u.id == updatedUser.items[0].id) {
+            u = updatedUser.items[0] as User;
+            return {
+              ...u,
+              ...{ userGroupMemberships: u?.userGroupMemberships },
+            };
+          } else {
+            return u;
+          }
+        });
+        setUsers(newUsersList);
+        showToastConfirmation({
+          body: "Role successfully updated.",
+        });
+      }
     } catch (e) {
       showToastConfirmation({
         body: "Unable to update the user role. Please try again.",

@@ -87,6 +87,7 @@ export const mockPermissionsTab: Tab = {
     .fn()
     .mockReturnValue(
       <UserPermissionsTable
+        setUsers={jest.fn()}
         users={[mockAdmin, mockSuperAdmin]}
         fetchGroupMembers={jest.fn()}
       />,
