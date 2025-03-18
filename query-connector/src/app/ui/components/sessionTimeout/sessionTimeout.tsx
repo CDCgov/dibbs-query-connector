@@ -23,10 +23,6 @@ const PROMPT_TIMEOUT_MSEC = 5 * 60000;
 const SessionTimeout: React.FC = () => {
   const { status } = useSession();
 
-  if (status == "unauthenticated") {
-    return null;
-  }
-
   const [remainingTime, setRemainingTime] = useState("");
   const intervalId = useRef<NodeJS.Timeout | null>(null);
   const [started, setStarted] = useState(false);
@@ -38,6 +34,7 @@ const SessionTimeout: React.FC = () => {
     onIdle: handleLogout,
     stopOnIdle: true,
     startManually: true,
+    disabled: status !== "authenticated",
   });
 
   function handlePrompt() {
