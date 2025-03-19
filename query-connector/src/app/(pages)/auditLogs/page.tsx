@@ -207,7 +207,12 @@ const AuditLogs: React.FC = () => {
                 minDate={minDate ? minDate.toISOString().split("T")[0] : ""}
                 maxDate={maxDate ? maxDate.toISOString().split("T")[0] : ""}
                 onClick={() => {
-                  document.getElementById("date-picker-button")?.click();
+                  const datePickerButton = document.querySelector(
+                    "button[data-testid='date-picker-button']",
+                  );
+                  if (datePickerButton) {
+                    (datePickerButton as HTMLElement).click();
+                  }
                 }}
               />
             </div>
