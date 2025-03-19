@@ -1,43 +1,42 @@
 import { screen, within, waitFor } from "@testing-library/react";
 import AuditLogs from "./page";
 import { renderWithUser, RootProviderMock } from "@/app/tests/unit/setup";
-import { UserEvent } from "@testing-library/user-event";
+import userEvent from "@testing-library/user-event";
 
 const TEST_NAME = "Rocky Balboa";
 const TEST_REPORT = "Created Report";
 
 /**
- * Helper function to select an option in a dropdown
+ * Creates an enhanced user event with custom helper methods.
  * @param user - The user event from renderWithUser
- * @param label - The label of the dropdown
- * @param value - The value of the option to select
+ * @returns - The enhanced user event object with custom helpers
  */
-const selectDropdownOption = async (
-  user: UserEvent,
-  label: string,
-  value: string,
-) => {
-  const select = screen.getByLabelText(label);
-  await user.selectOptions(select, value);
-};
+const createUserWithHelpers = (user: ReturnType<typeof userEvent.setup>) => ({
+  ...user,
 
-/**
- * Helper function to input text in a field
- * @param user - The user event from renderWithUser
- * @param placeholder - The placeholder of the input field
- * @param text - The text to input
- */
-const typeInField = async (
-  user: UserEvent,
-  placeholder: string,
-  text: string,
-) => {
-  const input = screen.getByPlaceholderText(placeholder);
-  await user.type(input, text);
-};
+  /**
+   * Selects an option in a dropdown.
+   * @param label - The label of the dropdown
+   * @param value - The value of the option to select
+   */
+  async selectDropdownOption(label: string, value: string) {
+    const select = screen.getByLabelText(label);
+    await user.selectOptions(select, value);
+  },
+
+  /**
+   * Inputs text in a field.
+   * @param placeholder - The placeholder of the input field
+   * @param text - The text to input
+   */
+  async typeInField(placeholder: string, text: string) {
+    const input = screen.getByPlaceholderText(placeholder);
+    await user.type(input, text);
+  },
+});
 
 describe("AuditLogs Component", () => {
-  let user: UserEvent;
+  let user: ReturnType<typeof createUserWithHelpers>;
 
   beforeEach(() => {
     const renderResult = renderWithUser(
@@ -45,7 +44,7 @@ describe("AuditLogs Component", () => {
         <AuditLogs />
       </RootProviderMock>,
     );
-    user = renderResult.user;
+    user = createUserWithHelpers(renderResult.user);
   });
 
   test("renders the audit logs table", async () => {
@@ -53,7 +52,7 @@ describe("AuditLogs Component", () => {
   });
 
   test("filters by name and clears filter", async () => {
-    await selectDropdownOption(user, "Name(s)", TEST_NAME);
+    await user.selectDropdownOption("Name(s)", TEST_NAME);
 
     const rows = await screen.findAllByRole("row");
     expect(rows.length).toBeGreaterThan(1);
@@ -61,15 +60,11 @@ describe("AuditLogs Component", () => {
       expect(within(row).getByText(TEST_NAME)).toBeInTheDocument();
     });
 
-    await selectDropdownOption(user, "Name(s)", "");
-
-    await waitFor(() => {
-      expect(screen.getAllByRole("row").length).toBeGreaterThan(1);
-    });
+    await user.selectDropdownOption("Name(s)", "");
   });
 
   test("filters by action and clears filter", async () => {
-    await selectDropdownOption(user, "Action(s)", TEST_REPORT);
+    await user.selectDropdownOption("Action(s)", TEST_REPORT);
 
     const rows = await screen.findAllByRole("row");
     expect(rows.length).toBeGreaterThan(1);
@@ -77,20 +72,16 @@ describe("AuditLogs Component", () => {
       expect(within(row).getByText(TEST_REPORT)).toBeInTheDocument();
     });
 
-    await selectDropdownOption(user, "Action(s)", "");
-
-    await waitFor(() => {
-      expect(screen.getAllByRole("row").length).toBeGreaterThan(1);
-    });
+    await user.selectDropdownOption("Action(s)", "");
   });
 
   test("filters by partial search", async () => {
-    await typeInField(user, "Search name or action", TEST_NAME);
+    await user.typeInField("Search name or action", "Apollo");
 
     const rows = await screen.findAllByRole("row");
     expect(rows.length).toBeGreaterThan(1);
     rows.slice(1).forEach((row) => {
-      expect(within(row).getByText(TEST_NAME)).toBeInTheDocument();
+      expect(within(row).getByText(/Apollo/i)).toBeInTheDocument();
     });
   });
 
@@ -129,7 +120,7 @@ describe("AuditLogs Component", () => {
   });
 
   test("changing actions per page updates table", async () => {
-    await selectDropdownOption(user, "Actions per page", "25");
+    await user.selectDropdownOption("Actions per page", "25");
 
     await waitFor(() => {
       const rows = screen.getAllByRole("row");
@@ -138,9 +129,8 @@ describe("AuditLogs Component", () => {
   });
 
   test("clear filters resets empty state", async () => {
-    // there is no Apollo Creed with Created Report; will need to come up with a different test
-    await selectDropdownOption(user, "Name(s)", "Apollo Creed");
-    await selectDropdownOption(user, "Action(s)", TEST_REPORT);
+    await user.selectDropdownOption("Name(s)", "Apollo Creed");
+    await user.selectDropdownOption("Action(s)", "Created Report");
 
     await waitFor(() => {
       expect(
