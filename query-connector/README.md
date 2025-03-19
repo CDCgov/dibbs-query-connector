@@ -130,6 +130,8 @@ Playwright provides a number of different ways of executing end to end tests. Fr
 `npm run test:playwright:ui`
 Runs the end-to-end tests locally by spawning the Playwright UI mode. This will start a dev server off localhost:3000, so make sure you don't have another app instance running off that port.
 
+You'll need to have a token for Aidbox under AIDBOX_LICENSE in your .env for the Aidbox seeder to run correctly. You can sign up for a dev license at https://aidbox.app and use that in your local setup.
+
 `npm run test:playwright`
 Runs the end-to-end tests.
 
