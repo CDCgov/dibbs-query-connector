@@ -1,7 +1,7 @@
 import https from "https";
 import { FhirServerConfig } from "../models/entities/fhir-servers";
 import { createSmartJwt } from "../utils/jwt";
-import { AuthData, updateFhirServer } from "../backend/dbServices/fhir-servers";
+import { updateFhirServer } from "../backend/dbServices/fhir-servers";
 
 /**
  * A client for querying a FHIR server.
@@ -73,6 +73,9 @@ class FHIRClient {
 
   /**
    * Gets a new access token using SMART on FHIR or client credentials flow
+   * and updates the server configuration with the new token.
+   * @throws Error if authentication fails.
+   * @returns The new access token.
    */
   private async getAccessToken(): Promise<void> {
     try {
@@ -92,12 +95,14 @@ class FHIRClient {
         throw new Error("Token endpoint is required for authentication");
       }
 
-      // Create form data for token request
-      const formData = new URLSearchParams();
-      formData.append("grant_type", "client_credentials");
+      // Create request payload based on auth type
+      const requestPayload: Record<string, string> = {
+        grant_type: "client_credentials",
+      };
 
+      // Add scopes if available
       if (this.serverConfig.scopes) {
-        formData.append("scope", this.serverConfig.scopes);
+        requestPayload.scope = this.serverConfig.scopes;
       }
 
       // Handle authentication based on auth type
@@ -108,35 +113,44 @@ class FHIRClient {
           tokenEndpoint,
         );
 
-        formData.append(
-          "client_assertion_type",
-          "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
-        );
-        formData.append("client_assertion", jwt);
+        requestPayload.client_assertion_type =
+          "urn:ietf:params:oauth:client-assertion-type:jwt-bearer";
+        requestPayload.client_assertion = jwt;
       } else {
         // For client_credentials, use client_id/client_secret
-        formData.append("client_id", this.serverConfig.client_id);
+        requestPayload.client_id = this.serverConfig.client_id;
 
         if (this.serverConfig.client_secret) {
-          formData.append("client_secret", this.serverConfig.client_secret);
+          requestPayload.client_secret = this.serverConfig.client_secret;
         }
       }
 
-      // Send token request
+      // Debug information
+      console.log(
+        "Token request payload:",
+        JSON.stringify(requestPayload, null, 2),
+      );
+
+      // Send token request with JSON format
       const response = await fetch(tokenEndpoint, {
         method: "POST",
         headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
+          "Content-Type": "application/json",
+          Accept: "application/json",
         },
-        body: formData.toString(),
+        body: JSON.stringify(requestPayload),
       });
 
+      // Log the raw response for debugging
+      const responseText = await response.text();
+      console.log("Token response:", responseText);
+
       if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Token request failed: ${errorText}`);
+        throw new Error(`Token request failed: ${responseText}`);
       }
 
-      const tokenData = await response.json();
+      // Parse the response
+      const tokenData = JSON.parse(responseText);
 
       // Calculate expiry time (default to 55 minutes if expires_in not provided)
       const expiresIn = tokenData.expires_in || 3300; // 55 minutes
@@ -162,12 +176,16 @@ class FHIRClient {
         this.serverConfig.disable_cert_validation,
         this.serverConfig.last_connection_successful,
         {
-          authType: this.serverConfig.auth_type,
+          authType: this.serverConfig.auth_type as
+            | "none"
+            | "basic"
+            | "client_credentials"
+            | "SMART",
           clientId: this.serverConfig.client_id,
           clientSecret: this.serverConfig.client_secret,
           tokenEndpoint: this.serverConfig.token_endpoint,
           scopes: this.serverConfig.scopes,
-        } as AuthData,
+        },
       );
     } catch (error) {
       console.error("Error getting access token:", error);
