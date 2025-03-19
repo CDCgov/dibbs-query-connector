@@ -111,7 +111,11 @@ const SessionTimeout: React.FC<SessionTimeoutProps> = ({
         },
       ]}
     >
-      You've been inactive for over 55 minutes. Do you wish to stay signed in?
+      <p>
+        You've been inactive for over 55 minutes.
+        <br />
+        Do you wish to stay signed in?
+      </p>
     </Modal>
   );
 };
