@@ -1,6 +1,5 @@
 import https from "https";
 import { FhirServerConfig } from "../models/entities/fhir-servers";
-import { auditable } from "../auditLogs/decorator";
 
 /**
  * A client for querying a FHIR server.
