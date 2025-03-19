@@ -88,9 +88,7 @@ const AuditLogs: React.FC = () => {
   );
 
   useEffect(() => {
-    const dateInput = document.querySelector(
-      ".usa-date-picker__external-input",
-    );
+    const dateInput = document.getElementById("date");
     if (dateInput) {
       if (dateError) {
         dateInput.classList.add(styles.bgErrorLighter, styles.borderError);
@@ -209,12 +207,7 @@ const AuditLogs: React.FC = () => {
                 minDate={minDate ? minDate.toISOString().split("T")[0] : ""}
                 maxDate={maxDate ? maxDate.toISOString().split("T")[0] : ""}
                 onClick={() => {
-                  const datePickerButton = document.querySelector(
-                    ".usa-date-picker__button",
-                  );
-                  if (datePickerButton) {
-                    (datePickerButton as HTMLElement).click();
-                  }
+                  document.getElementById("date-picker-button")?.click();
                 }}
               />
             </div>
