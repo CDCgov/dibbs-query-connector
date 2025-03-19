@@ -407,6 +407,43 @@ ul.usa-sidenav > li.usa-sidenav__item > ul.usa-sidenav__sublist > li.usa-sidenav
   margin-bottom: 1rem;
 }
 
+.usa-pagination .usa-current {
+  background-color: white;
+  border-color: rgba(27, 27, 27, 0.2);
+  border-radius: 0.25rem;
+  border: 1px solid rgba(27, 27, 27, 0.2);
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 140%;
+  margin: 0;
+  text-decoration: none;
+}
+
+.usa-pagination .usa-current, 
+.usa-pagination .usa-current button, 
+.usa-pagination .usa-current a {
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.usa-pagination .usa-current:hover, 
+.usa-pagination .usa-current:focus, 
+.usa-pagination .usa-current:active {
+  background-color: white;
+  border-color: rgba(27, 27, 27, 0.2);
+  color: inherit;
+  text-decoration: none;
+}
+
+.usa-pagination__button,
+.usa-pagination__link {
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 140%;
+  margin: 0;
+  text-decoration: none;
+}
+
 .Toastify__toast-container {
   width: calc($query-connector-wide-max-width * 0.4) !important;
 
