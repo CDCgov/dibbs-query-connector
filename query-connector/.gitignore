@@ -9,3 +9,4 @@ certificates
 /coverage
 report.json
 .tool-versions
+keys/
