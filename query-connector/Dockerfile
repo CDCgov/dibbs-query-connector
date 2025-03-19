@@ -3,8 +3,7 @@ FROM node:22-alpine AS base
 FROM base AS installer
 
 RUN apk update
-RUN apk add --no-cache libc6-compat
-RUN apk add --no-cache bash curl
+RUN apk add --no-cache libc6-compat bash curl git go
 
 WORKDIR /app
 COPY . .
@@ -24,11 +23,16 @@ ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm ci
 RUN npm run build
 
+# Download jwksetinfer tool
+RUN git clone https://github.com/MicahParks/jwkset.git \
+    && cd jwkset/cmd/jwksetinfer \
+    && go build
+
 # Final stage for running the app
 FROM base AS runner
 WORKDIR /app
 
-RUN apk add --no-cache bash openjdk17-jre
+RUN apk add --no-cache bash openjdk17-jre openssl uuidgen jq
 
 # Copy Flyway from the installer stage
 COPY --from=installer /flyway /flyway
@@ -50,11 +54,13 @@ COPY --from=installer /app/package.json .
 COPY --from=installer /app/flyway/conf/flyway.conf ../flyway/conf/flyway.conf
 COPY --from=installer /app/flyway/sql ../flyway/sql
 COPY --from=installer /app/src/app/assets ./.next/server/app/assets
+COPY --from=installer /app/jwkset/cmd/jwksetinfer/jwksetinfer /usr/local/bin/jwksetinfer
 
 # Automatically leverage output traces to reduce image size
 COPY --from=installer --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=installer --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=installer --chown=nextjs:nodejs /app/public ./public
+COPY --from=installer --chown=nextjs:nodejs /app/start.sh ./start.sh
 RUN ls -R
 # Set environment variables for Flyway and Node.js telemetry
 ENV NEXT_TELEMETRY_DISABLED=1
@@ -64,4 +70,5 @@ ENV JAVA_HOME=/usr/lib/jvm/default-jvm
 # Add the OpenJDK to the PATH so the java command is available for Flways
 ENV PATH=$JAVA_HOME/bin:$PATH
 
-CMD ["sh", "-c","flyway -configFiles=../flyway/conf/flyway.conf -schemas=public -connectRetries=60 migrate && echo done with flyway && node server.js"]
+ENTRYPOINT ["/bin/bash"]
+CMD ["/app/start.sh"]
