@@ -338,8 +338,8 @@ div.accordionBodyExpanded:last-of-type {
   display: grid;
 }
 
-$conditionColumnSpacing: 1.25rem 3fr 5fr;
-$columnGap: 0.5rem;
+$conditionColumnSpacing: 1.25rem 2fr 5fr;
+$columnGap: 1rem;
 .conceptSelectionRow {
   text-align: left;
   display: grid;
@@ -350,7 +350,7 @@ $columnGap: 0.5rem;
 }
 
 .conceptCode {
-  word-wrap: break-word;
+  word-break: break-all;
 }
 
 .conditionDrawerHeader {
