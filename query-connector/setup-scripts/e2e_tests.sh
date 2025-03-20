@@ -1,20 +1,21 @@
 #!/bin/bash
 
 docker compose down --volumes --remove-orphans
-docker compose -f docker-compose-e2e.yaml --env-file .env up -d
+docker compose -f docker-compose-e2e.yaml --env-file .env up -d --build 
 
 # wait for Aidbox seeder to finish running before...
 docker compose -f docker-compose-e2e.yaml logs -f aidbox-seeder | grep -q "Finished configuring Aidbox and database."
+command_pid=$!
 
-BASE_CMD="npx dotenv -e ./.env -- npx playwright test "
-# running our e2e tests
-if [ "$RUN_WITH_UI" = "true" ]; then 
-    E2E_CMD="$BASE_CMD  --ui"
-else 
-    E2E_CMD="$BASE_CMD --reporter=list"
-fi 
+echo -n "Waiting for Aidbox seeder to complete."
+while kill -0 $command_pid 2>/dev/null; do
+    echo -n "."
+    sleep 1
+done
 
-eval $E2E_CMD
+echo -e "\nAidbox seeder finished!"
+
+npx dotenv -e ./.env -- npx playwright test --reporter=list
 E2E_EXIT_CODE=$?
 
 # Teardown containers

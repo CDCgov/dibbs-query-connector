@@ -17,8 +17,8 @@
     "test:unit": "jest --coverage --testPathIgnorePatterns='/e2e/' '/integration/'",
     "test:unit:watch": "jest --watch",
     "test:integration": "JUST_INTEGRATION=true bash ./setup-scripts/unit_and_integration_tests.sh",
-    "test:playwright": "RUN_WITH_UI=false bash ./setup-scripts/e2e_tests.sh",
-    "test:playwright:ui": "RUN_WITH_UI=true bash ./setup-scripts/e2e_tests.sh"
+    "test:playwright": "bash ./setup-scripts/e2e_tests.sh",
+    "test:playwright:ui": "bash ./setup-scripts/e2e_tests_local.sh"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.515.0",
@@ -41,6 +41,7 @@
     "react": "^18",
     "react-dom": "^18",
     "react-highlight-words": "^0.21.0",
+    "react-idle-timer": "^5.7.2",
     "react-loading-skeleton": "^3.5.0",
     "react-toastify": "^10.0.5",
     "sharp": "^0.33.5"

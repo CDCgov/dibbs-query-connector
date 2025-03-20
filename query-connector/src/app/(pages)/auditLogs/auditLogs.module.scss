@@ -1,0 +1,147 @@
+.mainContainerWider {
+  max-width: 74rem;
+  width: 100%;
+  margin: auto;
+  margin-bottom: 1.5rem;
+  margin-top: 1.5rem;
+  padding: 0 !important;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.auditTableContainer {
+  flex-grow: 1;
+  justify-content: space-between;
+  align-items: center;
+  width: 70rem;
+  padding-bottom: 1.5rem;
+}
+
+.errorText {
+  color: #d73a49;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+  position: fixed;
+  width: 100%;
+  top: 27%;
+}
+
+.bgErrorLighter {
+  background-color: #fce8e8;
+}
+
+.borderError {
+  border: 2px solid #d73a49;
+}
+
+.searchContainer {
+display: flex;
+width: 70rem;
+align-items: center;
+gap: 0.5rem;
+}
+
+.inputGroup {
+  display: flex;
+  width: 13.0625rem;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+
+.searchField {
+  display: flex;
+  width: 25rem;
+  padding: 0.75rem;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1.75rem;
+  margin-left: 4.25rem;
+  background-color: white !important;
+}
+
+
+
+.tableHeader:first-child {
+  width: 13rem;
+}
+
+.tableHeader:nth-child(2) {
+  width: 41.5rem;
+}
+
+.tableHeader:nth-child(3) {
+  width: 12.5rem;
+  
+}
+
+.tableRows {
+  height: 4.25rem;
+  white-space: ellipsis;
+}
+
+.tableRows td:nth-child(3) {
+  white-space: nowrap;
+}
+
+
+.paginationContainerWrapper {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  position: absolute;
+  bottom: 1.5rem;
+  left: 0;
+  background: var(--white, #FFF);
+  padding: 1rem 0;
+  z-index: 10;
+}
+
+.paginationContainer {
+  display: flex;
+  width: 100%;
+  padding: 1rem 1.5rem;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 0.5rem;
+  border: 1px solid var(--gray-400, #DFE1E2);
+  background: var(--white, #FFF);
+  margin-left: -2rem;
+}
+
+.actionsPerPageContainer {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.actionsPerPageContainer label {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.actionsPerPageDropdown {
+  display: flex;
+  width: 5.875rem;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+  border-radius: 0.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.noResultsContainer {
+  display: flex;
+  justify-content: center;
+  background: var(--blue-100, #E8F5FF);  padding: 2rem;
+  border-radius: 0.5rem;
+  text-align: center;
+  padding: 7.5rem 0rem;
+  flex-direction: column;
+  align-items: center;
+  gap: 2.5rem;
+  align-self: stretch;
+}
