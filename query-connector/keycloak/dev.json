@@ -473,6 +473,87 @@
   "webAuthnPolicyPasswordlessExtraOrigins": [],
   "users": [
     {
+      "id": "3295c949-ddd4-484c-b1ac-904484e72d7f",
+      "username": "mario",
+      "firstName": "Mario",
+      "lastName": "Mario",
+      "emailVerified": true,
+      "createdTimestamp": 1742398946534,
+      "enabled": true,
+      "totp": false,
+      "credentials": [
+        {
+          "id": "5ba5f7ee-b1ce-4969-814e-0c4b2dc5f3ec",
+          "type": "password",
+          "userLabel": "My password",
+          "createdDate": 1742398959892,
+          "secretData": "{\"value\":\"vHe/0T6rE+6tPtQaeWpbv0qMZJBqkiW4Dj9YtDsRS2g=\",\"salt\":\"+1StaWt5e8GT3b+sycysyw==\",\"additionalParameters\":{}}",
+          "credentialData": "{\"hashIterations\":5,\"algorithm\":\"argon2\",\"additionalParameters\":{\"hashLength\":[\"32\"],\"memory\":[\"7168\"],\"type\":[\"id\"],\"version\":[\"1.3\"],\"parallelism\":[\"1\"]}}"
+        }
+      ],
+      "disableableCredentialTypes": [],
+      "requiredActions": [],
+      "realmRoles": [
+        "default-roles-master"
+      ],
+      "notBefore": 0,
+      "groups": []
+    },
+    {
+      "id": "ab29205c-5a84-49ed-8f60-5b7c2cd1575c",
+      "username": "peach",
+      "firstName": "Princess",
+      "lastName": "Peach",
+      "emailVerified": true,
+      "createdTimestamp": 1742398897969,
+      "enabled": true,
+      "totp": false,
+      "credentials": [
+        {
+          "id": "3368ea8a-96ae-463f-ac94-f7d6063b1000",
+          "type": "password",
+          "userLabel": "My password",
+          "createdDate": 1742398909496,
+          "secretData": "{\"value\":\"WrWIzPPGQQD3OJhaH5UbhVbCBOlXuUx9wkzLKtjO2p8=\",\"salt\":\"OObODYLOFzabgRoCis3GkA==\",\"additionalParameters\":{}}",
+          "credentialData": "{\"hashIterations\":5,\"algorithm\":\"argon2\",\"additionalParameters\":{\"hashLength\":[\"32\"],\"memory\":[\"7168\"],\"type\":[\"id\"],\"version\":[\"1.3\"],\"parallelism\":[\"1\"]}}"
+        }
+      ],
+      "disableableCredentialTypes": [],
+      "requiredActions": [],
+      "realmRoles": [
+        "default-roles-master"
+      ],
+      "notBefore": 0,
+      "groups": []
+    },
+    {
+      "id": "fe1c1448-e555-4bcc-a0d7-13970503a705",
+      "username": "toad",
+      "firstName": "Captain",
+      "lastName": "Toad",
+      "emailVerified": true,
+      "createdTimestamp": 1742398923041,
+      "enabled": true,
+      "totp": false,
+      "credentials": [
+        {
+          "id": "f6451e2e-e1da-4439-a3ae-09fa27207fa0",
+          "type": "password",
+          "userLabel": "My password",
+          "createdDate": 1742398933723,
+          "secretData": "{\"value\":\"qcsrP+smMu2563eL7mEIeYTwUA68bK31YJy+ohOek8g=\",\"salt\":\"mlmPcb4YSPOA53lVzIKWWQ==\",\"additionalParameters\":{}}",
+          "credentialData": "{\"hashIterations\":5,\"algorithm\":\"argon2\",\"additionalParameters\":{\"hashLength\":[\"32\"],\"memory\":[\"7168\"],\"type\":[\"id\"],\"version\":[\"1.3\"],\"parallelism\":[\"1\"]}}"
+        }
+      ],
+      "disableableCredentialTypes": [],
+      "requiredActions": [],
+      "realmRoles": [
+        "default-roles-master"
+      ],
+      "notBefore": 0,
+      "groups": []
+    },
+    {
       "id": "1c3b6114-3c12-4ef7-95ba-a0091f506ed6",
       "username": "qc-admin",
       "firstName": "QC",

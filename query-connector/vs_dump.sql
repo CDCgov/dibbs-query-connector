@@ -3,7 +3,7 @@
 --
 
 -- Dumped from database version 17.4
--- Dumped by pg_dump version 17.2 (Homebrew)
+-- Dumped by pg_dump version 17.4
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -136,20 +136,6 @@ CREATE TABLE public.query (
 
 
 ALTER TABLE public.query OWNER TO postgres;
-
---
--- Name: user_management; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.user_management (
-    username text NOT NULL,
-    qc_role text,
-    first_name text,
-    last_name text
-);
-
-
-ALTER TABLE public.user_management OWNER TO postgres;
 
 --
 -- Name: usergroup; Type: TABLE; Schema: public; Owner: postgres
@@ -36069,6 +36055,7 @@ COPY public.flyway_schema_history (installed_rank, version, description, type, s
 5	05.01	add user management	SQL	V05_01__add_user_management.sql	724938270	postgres	2025-01-29 16:15:28.840276	24	t
 6	06.01	add immunization flag to query table	SQL	V06_01__add_immunization_flag_to_query_table.sql	1445351806	postgres	2025-01-29 16:15:28.944822	16	t
 7	07.01	update user management	SQL	V07_01__update_user_management.sql	-726868426	postgres	2025-03-06 18:07:47.100461	461	t
+8	08.01	drop user management table	SQL	V08_01__drop_user_management_table.sql	-487528295	postgres	2025-03-19 16:01:06.423764	12	t
 \.
 
 
@@ -36087,18 +36074,12 @@ e858cba3-59f6-4bc8-9a1e-28fac21c5813	Immunization query	{}	{}	DIBBs	2025-01-29 1
 
 
 --
--- Data for Name: user_management; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY public.user_management (username, qc_role, first_name, last_name) FROM stdin;
-\.
-
-
---
 -- Data for Name: usergroup; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 COPY public.usergroup (id, name) FROM stdin;
+817771fc-de8b-403b-9d43-b86b81d151e3	Castle Team
+d017a9f4-79b3-48d7-8d52-d226372acd64	Mushroom Team
 \.
 
 
@@ -36107,6 +36088,8 @@ COPY public.usergroup (id, name) FROM stdin;
 --
 
 COPY public.usergroup_to_query (id, query_id, usergroup_id) FROM stdin;
+c025a247-0129-4f0c-a2c6-7f3af08e06b4	c025a247-0129-4f0c-a2c6-7f3af08e06b4	817771fc-de8b-403b-9d43-b86b81d151e3
+e858cba3-59f6-4bc8-9a1e-28fac21c5813	e858cba3-59f6-4bc8-9a1e-28fac21c5813	d017a9f4-79b3-48d7-8d52-d226372acd64
 \.
 
 
@@ -36115,6 +36098,9 @@ COPY public.usergroup_to_query (id, query_id, usergroup_id) FROM stdin;
 --
 
 COPY public.usergroup_to_users (id, user_id, usergroup_id) FROM stdin;
+817771fc-de8b-403b-9d43-b86b81d151e3	6a6998a8-ed6a-452e-9cdc-3ffbdf462909	817771fc-de8b-403b-9d43-b86b81d151e3
+6335edf7-46ad-40c1-9840-d68b172cec03	6335edf7-46ad-40c1-9840-d68b172cec03	817771fc-de8b-403b-9d43-b86b81d151e3
+d017a9f4-79b3-48d7-8d52-d226372acd64	d094581b-0fef-489a-b552-47a252c083fe	d017a9f4-79b3-48d7-8d52-d226372acd64
 \.
 
 
@@ -36123,6 +36109,10 @@ COPY public.usergroup_to_users (id, user_id, usergroup_id) FROM stdin;
 --
 
 COPY public.users (id, username, qc_role, first_name, last_name) FROM stdin;
+e7acb434-0df3-467d-b692-b251f1173f4c	qc-admin	Super Admin	QC	Admin
+6335edf7-46ad-40c1-9840-d68b172cec03	mario	Standard	Mario	Mario
+6a6998a8-ed6a-452e-9cdc-3ffbdf462909	peach	Admin	Princess	Peach
+d094581b-0fef-489a-b552-47a252c083fe	toad	Standard	Captain	Toad
 \.
 
 
@@ -77624,14 +77614,6 @@ ALTER TABLE ONLY public.query
 
 ALTER TABLE ONLY public.query
     ADD CONSTRAINT query_query_name_key UNIQUE (query_name);
-
-
---
--- Name: user_management user_management_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.user_management
-    ADD CONSTRAINT user_management_pkey PRIMARY KEY (username);
 
 
 --
