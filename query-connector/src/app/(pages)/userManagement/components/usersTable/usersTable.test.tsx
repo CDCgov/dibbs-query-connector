@@ -28,6 +28,10 @@ jest.mock(
     ({ children }: React.PropsWithChildren) => <div>{children}</div>,
 );
 
+jest.mock(
+  "@/app/(pages)/userManagement/components/userModal/userModal",
+  () => () => <div>Modal Mock</div>,
+);
 describe("Super Admin view of Users Table", () => {
   const role = UserRole.SUPER_ADMIN;
   it("renders error message when no users are found", async () => {
@@ -125,30 +129,6 @@ describe("Admin view of Users Table", () => {
     });
 
     expect(screen.getByText("No user groups found")).toBeInTheDocument();
-    expect(document.body).toMatchSnapshot();
-    jest.restoreAllMocks();
-  });
-
-  it("fetches usergroups on page load", async () => {
-    const getUserGroupsSpy = jest
-      .spyOn(UserGroupManagementBackend, "getAllUserGroups")
-      .mockResolvedValueOnce({
-        items: [mockGroupBasic],
-        totalItems: 1,
-      });
-
-    render(
-      <RootProviderMock currentPage="/userManagement">
-        <UsersTable role={role} />
-      </RootProviderMock>,
-    );
-
-    await waitFor(() => {
-      expect(screen.queryByText("Loading")).not.toBeInTheDocument();
-    });
-
-    expect(getUserGroupsSpy).toHaveBeenCalled();
-    await screen.findByText(mockGroupBasic.name);
     expect(document.body).toMatchSnapshot();
     jest.restoreAllMocks();
   });

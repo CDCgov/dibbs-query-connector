@@ -1,5 +1,5 @@
 "use client";
-import { Dispatch, SetStateAction, useContext, useEffect } from "react";
+import { Dispatch, SetStateAction, useContext } from "react";
 import classNames from "classnames";
 import { Checkbox } from "@trussworks/react-uswds";
 import Drawer from "@/app/ui/designSystem/drawer/Drawer";
@@ -11,6 +11,7 @@ import { getContextRole } from "../../utils";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import {
   addSingleUserToGroup,
+  getAllUserGroups,
   removeSingleUserFromGroup,
 } from "@/app/backend/usergroup-management";
 
@@ -19,6 +20,8 @@ export type UserManagementDrawerProps = {
   setUserGroups: Dispatch<SetStateAction<UserGroup[]>>;
   users: User[];
   setUsers: Dispatch<SetStateAction<User[]>>;
+  refreshView: Dispatch<SetStateAction<boolean | string>>;
+  activeTabLabel: string;
 };
 
 /**
@@ -27,6 +30,8 @@ export type UserManagementDrawerProps = {
  * @param root0.setUserGroups - State function that updates UserGroup data
  * @param root0.users The list of users to display
  * @param root0.setUsers - State function that updates User data
+ * @param root0.refreshView - State function that triggers a refresh of User or Group data
+ * @param root0.activeTabLabel - State function that triggers a refresh of User or Group data
  * @returns TeamQueryEditSection component which is the collapsible section that allows to edit members and queries of a team
  */
 const UserManagementDrawer: React.FC<UserManagementDrawerProps> = ({
@@ -34,6 +39,8 @@ const UserManagementDrawer: React.FC<UserManagementDrawerProps> = ({
   setUserGroups,
   users,
   setUsers,
+  refreshView,
+  activeTabLabel,
 }) => {
   const {
     teamQueryEditSection,
@@ -43,28 +50,6 @@ const UserManagementDrawer: React.FC<UserManagementDrawerProps> = ({
   } = useContext(UserManagementContext);
 
   const role = getContextRole();
-
-  useEffect(() => {
-    console.log(teamQueryEditSection);
-  }, [teamQueryEditSection]);
-
-  useEffect(() => {
-    const groupId = teamQueryEditSection.groupId;
-    const activeGroupIndex = userGroups.findIndex(
-      (group) => group.id == groupId,
-    );
-    const activeGroup = userGroups[activeGroupIndex];
-    const dataToUpdate = teamQueryEditSection.subjectData;
-
-    if (activeGroup && teamQueryEditSection.subjectType == "Members") {
-      activeGroup.members = dataToUpdate as User[];
-      setUserGroups([...userGroups]);
-    }
-    if (activeGroup && teamQueryEditSection.subjectType === "Queries") {
-      activeGroup.queries = dataToUpdate as QueryTableResult[];
-      setUserGroups([...userGroups]);
-    }
-  }, [teamQueryEditSection]);
 
   const renderQueries = (queries: QueryTableResult[] | undefined) => {
     if (queries && queries.length > 0) {
@@ -177,7 +162,7 @@ const UserManagementDrawer: React.FC<UserManagementDrawerProps> = ({
       if (updatedUserResponse.totalItems === 0) {
         throw "Unable to update group membership";
       }
-
+      const updatedUserGroups = await getAllUserGroups();
       const updatedUser = updatedUserResponse.items[0];
       const newUsersList = users.map((u) => {
         if (u.id == userId) {
@@ -192,6 +177,9 @@ const UserManagementDrawer: React.FC<UserManagementDrawerProps> = ({
       });
 
       setUsers(newUsersList);
+      setUserGroups(updatedUserGroups.items);
+      refreshView(activeTabLabel);
+
       showToastConfirmation({
         body: alertText,
       });

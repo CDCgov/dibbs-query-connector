@@ -108,7 +108,7 @@ describe("User Group Integration Tests", () => {
    */
   test("should create a new user group", async () => {
     const groupName = "Pilot Group";
-    const result = await createUserGroup(groupName);
+    const result = (await createUserGroup(groupName)).items[0];
 
     expect(result).toHaveProperty("id");
     expect(result).toHaveProperty("name", groupName);
@@ -128,9 +128,9 @@ describe("User Group Integration Tests", () => {
    * Tests preventing duplicate user group creation.
    */
   test("should not create duplicate user group", async () => {
-    const result = await createUserGroup("Pilot Group");
-    expect(typeof result).toBe("string"); // It should return a string error
-    expect(result).toBe(`Group 'Pilot Group' already exists.`);
+    await expect(createUserGroup("Pilot Group")).rejects.toThrow(
+      `User group 'Pilot Group' already exists.`,
+    );
   });
 
   /**

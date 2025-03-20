@@ -33,6 +33,7 @@ describe("User Management: User tab", () => {
     render(
       <RootProviderMock currentPage="/userManagement">
         <UserPermissionsTable
+          setUsers={jest.fn()}
           users={[mockAdmin, mockSuperAdmin]}
           fetchGroupMembers={jest.fn()}
         />
@@ -71,6 +72,7 @@ describe("User Management: User tab", () => {
     const { user } = renderWithUser(
       <RootProviderMock currentPage="/userManagement">
         <UserPermissionsTable
+          setUsers={jest.fn()}
           users={[mockAdmin, mockSuperAdmin]}
           fetchGroupMembers={jest.fn()}
         />

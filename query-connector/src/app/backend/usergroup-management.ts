@@ -20,7 +20,7 @@ const dbClient = getDbClient();
  */
 export async function createUserGroup(
   groupName: string,
-): Promise<UserGroup | string> {
+): Promise<QCResponse<UserGroup>> {
   if (!(await superAdminAccessCheck())) {
     throw new Error("Unauthorized");
   }
@@ -32,8 +32,7 @@ export async function createUserGroup(
       existingGroups.items?.some((group) => group.name === groupName) ?? false;
 
     if (groupExists) {
-      console.warn(`Group with name '${groupName}' already exists.`);
-      return `Group '${groupName}' already exists.`;
+      throw new Error(`User group '${groupName}' already exists.`);
     }
 
     const createGroupQuery = `
@@ -44,12 +43,13 @@ export async function createUserGroup(
 
     const result = await dbClient.query(createGroupQuery, [groupName]);
 
-    return {
+    const newUserGroup = {
       id: result.rows[0].id,
       name: result.rows[0].name,
       member_size: 0,
       query_size: 0,
     };
+    return { items: [newUserGroup], totalItems: 1 };
   } catch (error) {
     console.error("Error creating user group:", error);
     throw error;
@@ -68,12 +68,11 @@ export async function updateUserGroup(
   id: string,
   newName: string,
   userIds?: string[],
-  // queryIds?: string[],
 ): Promise<UserGroup | string> {
   if (!(await superAdminAccessCheck())) {
     throw new Error("Unauthorized");
   }
-
+  console.log(id, newName);
   try {
     // Check if the new name already exists
     const existingGroups = await getAllUserGroups();

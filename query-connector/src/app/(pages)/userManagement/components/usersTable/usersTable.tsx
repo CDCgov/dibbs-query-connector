@@ -32,12 +32,12 @@ export type UsersTableProps = {
  * @returns The UsersTable container component
  */
 const UsersTable: React.FC<UsersTableProps> = ({ role }) => {
-  const [activeTab, setActiveTab] = useState<Tab>();
+  const [activeTab, setActiveTab] = useState<Tab>({ label: "" });
   const [users, setUsers] = useState<User[]>([]);
   const [userGroups, setUserGroups] = useState<UserGroup[]>([]);
   const [modalMode, setModalMode] = useState<UserManagementMode>("closed");
   const [shouldRefreshView, setShouldRefreshView] = useState<boolean | string>(
-    true,
+    "default",
   );
 
   const modalRef = useRef<ModalRef>(null);
@@ -123,6 +123,7 @@ const UsersTable: React.FC<UsersTableProps> = ({ role }) => {
                 )}
                 style={{
                   marginLeft: "1px",
+                  marginTop: "1.5rem",
                   backgroundColor: "#005EA2",
                 }}
                 type="button"
@@ -134,6 +135,8 @@ const UsersTable: React.FC<UsersTableProps> = ({ role }) => {
         ),
     },
   ];
+  const usersTab = sections.filter((tab) => tab.label == "Users")[0];
+  const groupsTab = sections.filter((tab) => tab.label == "User groups")[0];
   const tabsForRole = sections.filter((tab) => tab.access?.includes(role));
   const defaultTab = tabsForRole[0];
   const shouldRenderTabs = tabsForRole.length > 1;
@@ -154,7 +157,8 @@ const UsersTable: React.FC<UsersTableProps> = ({ role }) => {
   async function fetchUserGroups() {
     try {
       const userGroups: QCResponse<UserGroup> = await getAllUserGroups();
-      return setUserGroups(userGroups.items);
+      setUserGroups(userGroups.items);
+      return userGroups.items;
     } catch (e) {
       showToastConfirmation({
         body: "Unable to retrieve user groups. Please try again.",
@@ -185,23 +189,38 @@ const UsersTable: React.FC<UsersTableProps> = ({ role }) => {
   // doesn't change back to default when we update data in the
   // background (e.g. after clicking checkboxes in the drawer)
   useEffect(() => {
-    if (shouldRefreshView) {
+    if (shouldRefreshView == "default") {
       setActiveTab(defaultTab);
       setShouldRefreshView(false);
     }
-  }, [users, userGroups]);
+    if (shouldRefreshView == "Users") {
+      setActiveTab(usersTab);
+    }
+
+    if (shouldRefreshView == "User groups") {
+      setActiveTab(activeTab); // group membership is editable from either view
+    }
+  }, [users]);
 
   // update the table display when we modify data via the modal
   // or when we click to change tabs
   useEffect(() => {
-    if (shouldRefreshView == "Users") {
-      fetchUsers();
-      setShouldRefreshView(false);
+    if (shouldRefreshView == false) {
+      return;
     }
-    if (shouldRefreshView == "User groups") {
-      fetchUserGroups();
-      setShouldRefreshView(false);
+
+    if (activeTab.label == "Users") {
+      fetchUsers().then(() => {
+        setActiveTab(usersTab);
+      });
     }
+
+    if (activeTab.label == "User groups") {
+      fetchUserGroups().then(() => {
+        setActiveTab(groupsTab);
+      });
+    }
+    setShouldRefreshView(false);
   }, [shouldRefreshView]);
 
   const handleOpenModal = (mode: UserManagementMode) => {
@@ -209,8 +228,7 @@ const UsersTable: React.FC<UsersTableProps> = ({ role }) => {
     modalRef.current?.toggleModal();
   };
 
-  const dataLoaded =
-    role == UserRole.ADMIN ? !!users && !!userGroups : !!userGroups;
+  const dataLoaded = !!users && !!userGroups;
 
   return (
     <>
@@ -231,6 +249,8 @@ const UsersTable: React.FC<UsersTableProps> = ({ role }) => {
           setUsers={setUsers}
           userGroups={userGroups}
           setUserGroups={setUserGroups}
+          refreshView={setShouldRefreshView}
+          activeTabLabel={activeTab.label}
         />
       </div>
     </>

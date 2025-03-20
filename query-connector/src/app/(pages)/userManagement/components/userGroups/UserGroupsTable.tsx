@@ -21,8 +21,8 @@ type UserGroupsTableProps = {
  * User groups section in the user management page
  * @param root0 - The properties object
  * @param root0.userGroups The list of user groups to display
- *  @param root0.fetchGroupMembers Function to retrieve a group's list of users
- *  @param root0.fetchGroupQueries Function to retrieve a group's list of assigned queries
+ * @param root0.fetchGroupMembers Function to retrieve a group's list of users
+ * @param root0.fetchGroupQueries Function to retrieve a group's list of assigned queries
  * @returns The user groups table
  */
 const UserGroupsTable: React.FC<UserGroupsTableProps> = ({
@@ -64,17 +64,15 @@ const UserGroupsTable: React.FC<UserGroupsTableProps> = ({
               unstyled
               aria-description={`Edit ${group.name} members`}
               onClick={async () => {
-                let members = group.members;
-                if (!members || members?.length <= 0) {
-                  members = await fetchGroupMembers(group.id);
-                }
-                openEditSection(
-                  group.name,
-                  "Members",
-                  "Members",
-                  group.id,
-                  members as User[],
-                );
+                await fetchGroupMembers(group.id).then((members) => {
+                  openEditSection(
+                    group.name,
+                    "Members",
+                    "Members",
+                    group.id,
+                    members as User[],
+                  );
+                });
               }}
             >
               {getMemberLabel(group.member_size)}
@@ -108,6 +106,7 @@ const UserGroupsTable: React.FC<UserGroupsTableProps> = ({
       </tr>
     ));
   }
+
   return (
     <Table>
       <thead>

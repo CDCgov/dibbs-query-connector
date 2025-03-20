@@ -1,5 +1,5 @@
 "use client";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 // import classNames from "classnames";
 import { Label, TextInput } from "@trussworks/react-uswds";
@@ -60,22 +60,45 @@ const UserModal: React.FC<UserModalProps> = ({
   refreshView,
   userGroups,
 }) => {
-  const [newUser, setNewUser] = useState<User>({
+  const emptyUser = {
     id: "",
     username: "",
     first_name: "",
     last_name: "",
     qc_role: UserRole.STANDARD,
     userGroupMemberships: [],
-  });
-  const [newGroup, setNewGroup] = useState<UserGroup>({
+  };
+  const emptyGroup = {
     id: "",
     name: "",
     member_size: 0,
     query_size: 0,
-  });
+  };
+
+  const [newUser, setNewUser] = useState<User>(emptyUser);
+  const [newGroup, setNewGroup] = useState<UserGroup>(emptyGroup);
   const [errorMessage, setErrorMessage] = useState<string>("");
   const { openEditSection } = useContext(UserManagementContext);
+
+  useEffect(() => {
+    if (modalMode === "closed") {
+      handleCloseModal();
+    }
+  }, [modalMode]);
+
+  useEffect(() => {
+    if (newGroup.id) {
+      openEditSection(
+        newGroup.name,
+        "Members",
+        "Members",
+        newGroup.id,
+        newGroup.members as User[],
+      );
+      refreshView("User groups");
+      setNewGroup(emptyGroup);
+    }
+  }, [newGroup]);
 
   const handleButtonClick = async () => {
     setErrorMessage("");
@@ -114,7 +137,10 @@ const UserModal: React.FC<UserModalProps> = ({
         return setErrorMessage(newUserAdded.msg);
       } else {
         setNewUser({ ...newUser, ...newUserAdded });
-        return setModalMode("select-groups");
+        refreshView("Users");
+        return emptyGroups
+          ? setModalMode("closed")
+          : setModalMode("select-groups");
       }
     }
 
@@ -126,15 +152,17 @@ const UserModal: React.FC<UserModalProps> = ({
         });
 
         refreshView("Users");
-        return handleCloseModal();
+        setNewUser(emptyUser);
+        setModalMode("closed");
       } else {
         setErrorMessage("Error adding user to group.");
+        setModalMode("closed");
       }
     }
 
     if (modalMode == "create-group") {
       const groupToAdd = {
-        id: newGroup.id || "",
+        id: newGroup.id,
         name: newGroup.name,
         memberSize: newGroup.member_size,
         querySize: newGroup.query_size,
@@ -147,27 +175,23 @@ const UserModal: React.FC<UserModalProps> = ({
         );
         if (updatedGroup) {
           setNewGroup({ ...newGroup, ...(updatedGroup as UserGroup) });
+          refreshView("User groups");
+          setModalMode("closed");
         } else {
+          setModalMode("closed");
           return setErrorMessage("Unable to add group.");
         }
       } else {
         const newGroupAdded = await createUserGroup(newGroup.name);
+
         if (!newGroupAdded) {
+          setModalMode("closed");
           return setErrorMessage("Unable to add group.");
         } else {
-          setNewGroup({ ...newGroup, ...(newGroupAdded as UserGroup) });
+          setNewGroup({ ...newGroup, ...newGroupAdded.items[0] });
+          setModalMode("closed");
         }
       }
-      handleCloseModal();
-      refreshView("User groups");
-      openEditSection(
-        newGroup.name,
-        "Members",
-        "Members",
-        newGroup.id,
-        newGroup.members as User[],
-      );
-      return setModalMode("closed");
     }
   };
 
@@ -222,11 +246,15 @@ const UserModal: React.FC<UserModalProps> = ({
     setErrorMessage("");
     setModalMode("closed");
   };
+  const emptyGroups = !userGroups || (userGroups && userGroups.length == 0);
 
   const getModalButtons = () => {
     const buttons = [
       {
-        text: ModalStates[modalMode].buttonText,
+        text:
+          modalMode == "create-user" && emptyGroups
+            ? "Add user"
+            : ModalStates[modalMode].buttonText,
         type: "submit" as const,
         id: "modal-step-button",
         className: "usa-button",
@@ -299,9 +327,9 @@ const UserModal: React.FC<UserModalProps> = ({
     return (
       <>
         <div>
-          {userGroups && userGroups.length > 0
+          {!emptyGroups
             ? "User groups"
-            : "No user groups found. Create a new group on the User Groups tab. You can still continue adding this user."}
+            : "No user groups found. Create a new group on the User Groups tab."}
         </div>
 
         {userGroups &&

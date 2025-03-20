@@ -70,7 +70,7 @@ export const ModalStates: ModalMap = {
   },
   "add-members": {
     heading: "Add members",
-    buttonText: "TK",
+    buttonText: "",
     secondaryBtnText: "Next: Add to user groups",
     prevStep: "create-group",
   },
