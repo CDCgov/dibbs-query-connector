@@ -19,6 +19,8 @@ import { UserManagementMode } from "../../utils";
 import classNames from "classnames";
 import type { ModalRef } from "../../../../ui/designSystem/modal/Modal";
 import UserModal from "../../components/userModal/userModal";
+import { CustomUserQuery } from "@/app/models/entities/query";
+import { getCustomQueries } from "@/app/backend/query-building";
 
 export type UsersTableProps = {
   role: string;
@@ -34,6 +36,8 @@ export type UsersTableProps = {
 const UsersTable: React.FC<UsersTableProps> = ({ role }) => {
   const [activeTab, setActiveTab] = useState<Tab>({ label: "" });
   const [users, setUsers] = useState<User[]>([]);
+  const [allQueries, setAllQueries] = useState<CustomUserQuery[]>([]);
+
   const [userGroups, setUserGroups] = useState<UserGroup[]>([]);
   const [modalMode, setModalMode] = useState<UserManagementMode>("closed");
   const [shouldRefreshView, setShouldRefreshView] = useState<boolean | string>(
@@ -108,6 +112,7 @@ const UsersTable: React.FC<UsersTableProps> = ({ role }) => {
             <UserGroupsTable
               fetchGroupMembers={fetchGroupMembers}
               fetchGroupQueries={fetchGroupQueries}
+              fetchAllQueries={fetchAllQueries}
               userGroups={userGroups}
             />
           </>
@@ -176,6 +181,12 @@ const UsersTable: React.FC<UsersTableProps> = ({ role }) => {
   async function fetchGroupQueries(groupId: string) {
     const queries = await getAllGroupQueries(groupId);
     return queries.items;
+  }
+
+  async function fetchAllQueries() {
+    const queriesResponse = await getCustomQueries();
+    setAllQueries(queriesResponse);
+    return queriesResponse;
   }
 
   // page load
@@ -251,6 +262,8 @@ const UsersTable: React.FC<UsersTableProps> = ({ role }) => {
           setUserGroups={setUserGroups}
           refreshView={setShouldRefreshView}
           activeTabLabel={activeTab.label}
+          allQueries={allQueries}
+          setAllQueries={setAllQueries}
         />
       </div>
     </>

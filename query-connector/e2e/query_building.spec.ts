@@ -1,4 +1,5 @@
 // @ts-check
+
 import { test, expect } from "@playwright/test";
 import { TEST_URL } from "../playwright-setup";
 

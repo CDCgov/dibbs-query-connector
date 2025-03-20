@@ -6,14 +6,16 @@ import Drawer from "@/app/ui/designSystem/drawer/Drawer";
 import { UserManagementContext } from "../UserManagementProvider";
 import style from "./TeamQueryEditSection.module.scss";
 import { User, UserGroup, UserRole } from "@/app/models/entities/users";
-import { QueryTableResult } from "@/app/(pages)/queryBuilding/utils";
 import { getContextRole } from "../../utils";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import {
-  addSingleUserToGroup,
   getAllUserGroups,
+  addSingleUserToGroup,
   removeSingleUserFromGroup,
+  addSingleQueryToGroup,
+  removeSingleQueryFromGroup,
 } from "@/app/backend/usergroup-management";
+import { CustomUserQuery } from "@/app/models/entities/query";
 
 export type UserManagementDrawerProps = {
   userGroups: UserGroup[];
@@ -22,51 +24,54 @@ export type UserManagementDrawerProps = {
   setUsers: Dispatch<SetStateAction<User[]>>;
   refreshView: Dispatch<SetStateAction<boolean | string>>;
   activeTabLabel: string;
+  allQueries: CustomUserQuery[];
+  setAllQueries: Dispatch<SetStateAction<CustomUserQuery[]>>;
 };
 
 /**
  * @param root0 - The properties object
- * @param root0.userGroups The list of usergroups to display
  * @param root0.setUserGroups - State function that updates UserGroup data
  * @param root0.users The list of users to display
  * @param root0.setUsers - State function that updates User data
  * @param root0.refreshView - State function that triggers a refresh of User or Group data
+ * @param root0.allQueries The list of users to display
+ * @param root0.setAllQueries The list of users to display
  * @param root0.activeTabLabel - State function that triggers a refresh of User or Group data
  * @returns TeamQueryEditSection component which is the collapsible section that allows to edit members and queries of a team
  */
 const UserManagementDrawer: React.FC<UserManagementDrawerProps> = ({
-  userGroups,
   setUserGroups,
   users,
   setUsers,
   refreshView,
   activeTabLabel,
+  allQueries,
+  setAllQueries,
 }) => {
-  const {
-    teamQueryEditSection,
-    closeEditSection,
-    handleSearch,
-    handleQueryUpdate,
-  } = useContext(UserManagementContext);
+  const { teamQueryEditSection, closeEditSection, handleSearch } = useContext(
+    UserManagementContext,
+  );
 
   const role = getContextRole();
-
-  const renderQueries = (queries: QueryTableResult[] | undefined) => {
-    if (queries && queries.length > 0) {
+  const renderQueries = (queries: CustomUserQuery[]) => {
+    if (queries.length > 0) {
       return (
         <ul
           aria-description={`queries for ${teamQueryEditSection.title}`}
           className={classNames("usa-list--unstyled", "margin-top-2")}
         >
           {queries.map((query) => {
+            const isAssignedToGroup = query.groupAssignments?.some((q) => {
+              return q.is_member;
+            });
             return (
               <li key={query.query_id}>
                 <Checkbox
                   id={query.query_id}
                   name={query.query_name}
                   label={`${query.query_name}`}
-                  defaultChecked
-                  onChange={handleQueryUpdate}
+                  defaultChecked={isAssignedToGroup}
+                  onChange={handleToggleQuery}
                   className={classNames("margin-bottom-3", style.checkbox)}
                 />
               </li>
@@ -130,15 +135,9 @@ const UserManagementDrawer: React.FC<UserManagementDrawerProps> = ({
 
   function generateContent(): JSX.Element {
     const isMemberView = teamQueryEditSection.subjectType == "Members";
-
-    const activeGroupIndex = userGroups.findIndex(
-      (group) => group.id == teamQueryEditSection.groupId,
-    );
-    const activeGroup = userGroups[activeGroupIndex];
-
     return isMemberView
       ? renderUsers(users)
-      : renderQueries(activeGroup?.queries);
+      : renderQueries(teamQueryEditSection.subjectData as CustomUserQuery[]);
   }
 
   async function handleToggleMembership(
@@ -177,7 +176,7 @@ const UserManagementDrawer: React.FC<UserManagementDrawerProps> = ({
       });
 
       setUsers(newUsersList);
-      setUserGroups(updatedUserGroups.items);
+      setUserGroups(updatedUserGroups.items); // for refreshing member count in table view
       refreshView(activeTabLabel);
 
       showToastConfirmation({
@@ -193,6 +192,55 @@ const UserManagementDrawer: React.FC<UserManagementDrawerProps> = ({
     }
   }
 
+  async function handleToggleQuery(e: React.ChangeEvent<HTMLInputElement>) {
+    const groupId = teamQueryEditSection.groupId;
+    const groupName = teamQueryEditSection.title;
+    const queryName = e.currentTarget.labels?.[0].innerText;
+    const queryId = e.currentTarget.id;
+    const checked = e.target.checked;
+
+    const alertText = checked
+      ? `Assigned ${queryName} to ${groupName}`
+      : `Unassigned ${queryName} from ${groupName}`;
+
+    try {
+      const updatedQueryResponse = !!checked
+        ? await addSingleQueryToGroup(groupId, queryId)
+        : await removeSingleQueryFromGroup(groupId, queryId);
+
+      if (updatedQueryResponse.totalItems === 0) {
+        throw "Unable to update query assignment";
+      }
+
+      const newQueriesList = allQueries.map((q) => {
+        if (q.query_id == queryId) {
+          const groupAssignments = q.groupAssignments || [];
+          return {
+            ...q,
+            ...{ userGroupMemberships: groupAssignments },
+          };
+        } else {
+          return q;
+        }
+      });
+
+      const updatedUserGroups = await getAllUserGroups();
+
+      setAllQueries(newQueriesList);
+      setUserGroups(updatedUserGroups.items); // for refreshing query count in table view
+      refreshView(activeTabLabel);
+      showToastConfirmation({
+        body: alertText,
+      });
+    } catch (error) {
+      showToastConfirmation({
+        heading: "Something went wrong",
+        body: alertText,
+        variant: "error",
+      });
+      console.error("Error updating group membership:", error);
+    }
+  }
   return (
     <Drawer
       title={teamQueryEditSection.title}

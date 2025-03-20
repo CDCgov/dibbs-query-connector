@@ -9,7 +9,8 @@ import {
 import { adminAccessCheck, superAdminAccessCheck } from "../utils/auth";
 import { getDbClient } from "./dbClient";
 import { QCResponse } from "../models/responses/collections";
-import { QueryTableResult } from "../(pages)/queryBuilding/utils";
+import { CustomUserQuery } from "../models/entities/query";
+import { getQueryById } from "./query-building";
 
 const dbClient = getDbClient();
 
@@ -60,24 +61,23 @@ export async function createUserGroup(
  * Updates the name of an existing user group.
  * @param id - The unique identifier of the user group to update.
  * @param newName - The new name to assign to the user group.
- * @param userIds - The new name to assign to the user group.
-//  * @param queryIds - The new name to assign to the user group.
  * @returns The updated user group or an error if the update fails.
  */
 export async function updateUserGroup(
   id: string,
   newName: string,
-  userIds?: string[],
 ): Promise<UserGroup | string> {
   if (!(await superAdminAccessCheck())) {
     throw new Error("Unauthorized");
   }
-  console.log(id, newName);
+
   try {
     // Check if the new name already exists
     const existingGroups = await getAllUserGroups();
     const groupExists =
-      existingGroups.items?.some((group) => group.name === newName) ?? false;
+      existingGroups.items?.some((group) => {
+        return group.name === newName;
+      }) ?? false;
 
     if (groupExists) {
       console.warn(`Group with name '${newName}' already exists.`);
@@ -90,11 +90,11 @@ export async function updateUserGroup(
       WHERE id = $2
       RETURNING id, name;
     `;
-    const escapedValues =
-      userIds && userIds.map((_, i) => `$${i + 1}`).join() + ")";
-    const queryString = updateUserGroupMembersQuery + escapedValues;
 
-    const result = await dbClient.query(queryString, [newName, id, userIds]);
+    const result = await dbClient.query(updateUserGroupMembersQuery, [
+      newName,
+      id,
+    ]);
 
     if (result.rows.length === 0) {
       throw new Error(`User group with ID '${id}' not found.`);
@@ -444,20 +444,178 @@ export async function getAllGroupMembers(
  */
 export async function getAllGroupQueries(
   groupId: string,
-): Promise<QCResponse<QueryTableResult>> {
+): Promise<QCResponse<CustomUserQuery>> {
   try {
     const selectQueriesByGroupQuery = `
-    SELECT q.id as query_id, q.query_name, q.query_data, q.conditions_list, q.author, q.date_created, q.date_last_modified
+    SELECT ugtq.id as membership_id, ug.name as usergroup_name, ug.id as usergroup_id,q.id as query_id, q.query_name
     FROM query as q
     LEFT JOIN usergroup_to_query as ugtq ON ugtq.query_id = q.id
+    LEFT JOIN usergroup ug ON ug.id = ugtq.usergroup_id 
     WHERE ugtq.usergroup_id = $1;
     `;
     const result = await dbClient.query(selectQueriesByGroupQuery, [groupId]);
+
+    const groupQueries = result.rows.map((row) => {
+      const formattedQuery: CustomUserQuery = {
+        query_id: row.query_id,
+        query_name: row.query_name,
+        valuesets: [],
+      };
+      return formattedQuery;
+    });
+
     return {
       totalItems: result.rowCount,
-      items: result.rows || [],
-    } as QCResponse<QueryTableResult>;
+      items: groupQueries,
+    } as QCResponse<CustomUserQuery>;
   } catch (error) {
+    throw error;
+  }
+}
+
+/**
+ * Adds users to a user group.
+ * @param groupId - The unique identifier of the user group.
+ * @param queryId - The unique identifier of the query to add.
+ * @returns The user IDs of the users added to the group.
+ */
+export async function addSingleQueryToGroup(
+  groupId: string,
+  queryId: string,
+): Promise<QCResponse<CustomUserQuery>> {
+  const userCheckResult = await checkUserExists(queryId);
+  if (!userCheckResult) {
+    return { items: [], totalItems: 0 };
+  }
+
+  try {
+    const idString = `${queryId}_${groupId}`;
+    const insertQuery = {
+      text: `
+          INSERT INTO usergroup_to_query (id, query_id, usergroup_id)
+          VALUES ($1,$2,$3)
+          ON CONFLICT DO NOTHING
+          RETURNING query_id;
+        `,
+      values: [idString, queryId, groupId],
+    };
+
+    const updatedQueryId = await dbClient.query(insertQuery);
+
+    const updatedQueryWithGroupAssignments: QCResponse<CustomUserQuery> =
+      await getSingleQueryGroupAssignments(updatedQueryId.rows[0].query_id);
+
+    return { totalItems: 1, items: updatedQueryWithGroupAssignments.items };
+  } catch (error) {
+    console.error("Error adding user to group:", error);
+    throw error;
+  }
+}
+
+/**
+ * Adds users to a user group.
+ * @param groupId - The unique identifier of the user group.
+ * @param queryId - The unique identifiers of the users to add.
+ * @returns The user IDs of the users added to the group.
+ */
+export async function removeSingleQueryFromGroup(
+  groupId: string,
+  queryId: string,
+): Promise<QCResponse<CustomUserQuery>> {
+  if (!queryId) return { items: [], totalItems: 0 };
+  const queryExistsCheck = {
+    text: `SELECT * FROM query WHERE id = $1;`,
+    values: [queryId],
+  };
+  const queryCheckResult = await dbClient.query(queryExistsCheck);
+  if (queryCheckResult.rows.length === 0) {
+    return { items: [], totalItems: 0 };
+  }
+
+  try {
+    const removeQuery = {
+      text: `
+      DELETE FROM usergroup_to_query 
+      WHERE usergroup_id = $1 AND query_id = $2
+      RETURNING query_id;
+    `,
+      values: [groupId, queryId],
+    };
+
+    const updatedQueryId = await dbClient.query(removeQuery);
+    console.log("updated query id", updatedQueryId);
+    const updatedQueryWithGroupAssignments: QCResponse<CustomUserQuery> =
+      await getSingleQueryGroupAssignments(updatedQueryId.rows[0].query_id);
+
+    return {
+      totalItems: updatedQueryWithGroupAssignments.totalItems,
+      items: updatedQueryWithGroupAssignments.items,
+    };
+  } catch (error) {
+    console.error("Error removing user from group:", error);
+    throw error;
+  }
+}
+
+/**
+ * Retrieves a single query and its group assignment data
+ * This method performs role checks before retrieving the data.
+ * @param queryId - The unique identifier of the query to add.
+ * @returns A single query with all group assignments.
+ */
+export async function getSingleQueryGroupAssignments(
+  queryId: string,
+): Promise<QCResponse<CustomUserQuery>> {
+  if (!(await adminAccessCheck())) {
+    throw new Error("Unauthorized");
+  }
+  try {
+    const query = `
+    SELECT
+      q.query_name, q.id as query_id, ugtq.id as membership_id, ug.name as usergroup_name, ugtq.usergroup_id,
+        COALESCE(ugtq.id, '') AS membership_id,
+          CASE 
+            WHEN ugtq.query_id IS NOT NULL THEN TRUE
+            ELSE FALSE
+          END AS is_member
+    FROM
+      usergroup ug
+    LEFT JOIN usergroup_to_query as ugtq ON ugtq.usergroup_id = ug.id
+    LEFT JOIN query q ON ugtq.query_id = q.id
+    WHERE ugtq.query_id = $1
+  `;
+
+    const results = await dbClient.query(query, [queryId]);
+    let queryResponse = results.rows;
+    if (queryResponse.length > 0) {
+      const groupAssignments = results.rows.map((row) => {
+        return {
+          membership_id: row.membership_id,
+          usergroup_name: "Hogwarts Staff",
+          usergroup_id: "809fd207-63d5-4c92-a23a-d3d9ce566d1e",
+          is_member: true,
+        };
+      });
+
+      const queryWithGroups: CustomUserQuery = {
+        query_id: queryId,
+        query_name: results.rows[0].query_name,
+        valuesets: [],
+        groupAssignments,
+      };
+      return { totalItems: 1, items: [queryWithGroups] };
+    } else {
+      const query = (await getQueryById(queryId)) as CustomUserQuery;
+      const formattedQuery: CustomUserQuery = {
+        query_id: queryId,
+        query_name: query.query_name,
+        valuesets: [],
+        groupAssignments: [],
+      };
+      return { totalItems: 1, items: [formattedQuery] };
+    }
+  } catch (error) {
+    console.error("Error fetching groups for query:", error);
     throw error;
   }
 }

@@ -74,7 +74,7 @@ exports[`Admin view of Users Table renders error message when no user groups are
             </div>
           </div>
           <div
-            class="padding-top-2"
+            class="padding-top-2 drawerBody"
           >
             <div>
               No queries assigned to this group.
@@ -285,7 +285,7 @@ exports[`Super Admin view of Users Table renders content on tab click 1`] = `
             </div>
           </div>
           <div
-            class="padding-top-2"
+            class="padding-top-2 drawerBody"
           >
             <div>
               No queries assigned to this group.
@@ -428,7 +428,7 @@ exports[`Super Admin view of Users Table renders content on tab click 2`] = `
             </div>
           </div>
           <div
-            class="padding-top-2"
+            class="padding-top-2 drawerBody"
           >
             <div>
               No queries assigned to this group.
@@ -525,7 +525,7 @@ exports[`Super Admin view of Users Table renders error message when no users are
             </div>
           </div>
           <div
-            class="padding-top-2"
+            class="padding-top-2 drawerBody"
           >
             <div>
               No queries assigned to this group.
@@ -736,7 +736,7 @@ exports[`Super Admin view of Users Table renders table view after content is loa
             </div>
           </div>
           <div
-            class="padding-top-2"
+            class="padding-top-2 drawerBody"
           >
             <div>
               No queries assigned to this group.
@@ -947,7 +947,7 @@ exports[`Super Admin view of Users Table renders table view after content is loa
             </div>
           </div>
           <div
-            class="padding-top-2"
+            class="padding-top-2 drawerBody"
           >
             <div>
               No queries assigned to this group.

@@ -3,7 +3,7 @@
 import { createContext, useState } from "react";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import { User } from "@/app/models/entities/users";
-import { QueryTableResult } from "../../queryBuilding/utils";
+import { CustomUserQuery } from "@/app/models/entities/query";
 
 export type SubjectType = "Members" | "Queries" | null;
 
@@ -15,7 +15,7 @@ interface UserManagementData {
     placeholder: string;
     groupId: string;
     subjectType: SubjectType;
-    subjectData: User[] | QueryTableResult[];
+    subjectData: User[] | CustomUserQuery[];
   };
 }
 
@@ -25,7 +25,7 @@ interface UserManagementContext extends UserManagementData {
     subtitle: string,
     subjectType: SubjectType,
     groupId: string,
-    subjectData?: User[] | QueryTableResult[],
+    subjectData?: User[] | CustomUserQuery[],
   ) => void;
   closeEditSection: () => void;
   handleSearch: (searchFilter: string) => void;
@@ -73,7 +73,7 @@ const DataProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     subtitle: string,
     subjectType: SubjectType,
     id: string,
-    subjectData?: User[] | QueryTableResult[],
+    subjectData?: User[] | CustomUserQuery[],
   ) {
     let placeholder = "";
 

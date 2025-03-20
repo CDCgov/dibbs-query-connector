@@ -76,7 +76,7 @@ describe("User Group and Query Membership Tests", () => {
       await dbClient.query("DELETE FROM usergroup WHERE id = $1;", [
         TEST_GROUP_ID,
       ]);
-      await dbClient.query("DELETE FROM users WHERE id IN ($1, $2);", [
+      await dbClient.query("DELETE FROM users WHERE id IN ($1, $2, $3);", [
         TEST_USER_1_ID,
         TEST_USER_2_ID,
         TEST_USER_3_ID,
@@ -151,8 +151,8 @@ describe("User Group and Query Membership Tests", () => {
    */
   test("should remove multiple users from a group", async () => {
     const users: User[] = await getAllUsersWithSingleGroupStatus(TEST_GROUP_ID);
-    const members = users.filter(
-      (user) => user.userGroupMemberships?.some((m) => m.is_member),
+    const members = users.filter((user) =>
+      user.userGroupMemberships?.some((m) => m.is_member),
     );
     expect(members.length).toBe(3);
 
@@ -191,8 +191,8 @@ describe("User Group and Query Membership Tests", () => {
     expect(result.items.length).toBe(1);
 
     const users: User[] = await getAllUsersWithSingleGroupStatus(TEST_GROUP_ID);
-    const members = users.filter(
-      (user) => user.userGroupMemberships?.some((m) => m.is_member),
+    const members = users.filter((user) =>
+      user.userGroupMemberships?.some((m) => m.is_member),
     );
 
     expect(members.length).toBe(0);

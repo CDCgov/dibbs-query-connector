@@ -33,7 +33,7 @@ export async function addUserIfNotExists(userToken: {
     return;
   }
 
-  const { username, email, firstName, lastName, role } = userToken;
+  const { username, email, firstName, lastName } = userToken;
   const userIdentifier = username || email;
 
   try {
@@ -48,8 +48,18 @@ export async function addUserIfNotExists(userToken: {
     }
 
     // Default role when adding a new user, which includes Super Admin, Admin, and Standard User.
-    let qc_role = role ?? UserRole.STANDARD;
+    let qc_role = UserRole.STANDARD;
     console.log("User not found. Proceeding to insert.");
+
+    if (process.env.NODE_ENV !== "production") {
+      // First registered user is set as Super Admin
+      const queryUserRecordCount = `SELECT COUNT(*) FROM users`;
+      const userCount = await dbClient.query(queryUserRecordCount);
+
+      if (userCount?.rows?.[0]?.count === "0") {
+        qc_role = UserRole.SUPER_ADMIN;
+      }
+    }
 
     const insertUserQuery = `
       INSERT INTO users (username, qc_role, first_name, last_name)
@@ -273,6 +283,7 @@ export async function getUserRole(username: string): Promise<string> {
     `;
 
     const result = await dbClient.query(selectUserRoleQuery, [username]);
+    console.log(result.rows);
     return result?.rowCount && result.rowCount > 0
       ? result.rows?.[0].qc_role
       : "";

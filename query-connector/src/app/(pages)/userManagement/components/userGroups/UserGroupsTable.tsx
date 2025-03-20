@@ -1,20 +1,28 @@
 "use client";
 
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import classNames from "classnames";
 import { Button } from "@trussworks/react-uswds";
 
 import Table from "../../../../ui/designSystem/table/Table";
 import { UserManagementContext } from "../UserManagementProvider";
-import { UserGroup, UserRole, User } from "../../../../models/entities/users";
-import { QueryTableResult } from "@/app/(pages)/queryBuilding/utils";
+import {
+  UserGroup,
+  UserRole,
+  User,
+  UserGroupMembership,
+} from "../../../../models/entities/users";
 import styles from "../usersTable/usersTable.module.scss";
 import { getContextRole } from "../../utils";
+import { CustomUserQuery } from "@/app/models/entities/query";
+
+import { getCustomQueries } from "@/app/backend/query-building";
 
 type UserGroupsTableProps = {
   userGroups: UserGroup[];
   fetchGroupMembers: (groupId: string) => Promise<User[]>;
-  fetchGroupQueries: (groupId: string) => Promise<QueryTableResult[]>;
+  fetchGroupQueries: (groupId: string) => Promise<CustomUserQuery[]>;
+  fetchAllQueries: () => Promise<CustomUserQuery[]>;
 };
 
 /**
@@ -33,6 +41,16 @@ const UserGroupsTable: React.FC<UserGroupsTableProps> = ({
   const { openEditSection } = useContext(UserManagementContext);
   const role = getContextRole();
 
+  const [queries, setQueries] = useState<CustomUserQuery[]>([]);
+
+  useEffect(() => {
+    async function fetchAllQueries() {
+      const queriesResponse = await getCustomQueries();
+      setQueries(queriesResponse);
+    }
+    fetchAllQueries();
+  }, []);
+
   function getMemberLabel(memberSize: number): string {
     return memberSize == 1 ? `${memberSize} member` : `${memberSize} members`;
   }
@@ -48,6 +66,29 @@ const UserGroupsTable: React.FC<UserGroupsTableProps> = ({
           <td colSpan={3}>No user groups found</td>
         </tr>
       );
+    }
+
+    function addGroupAssignments(
+      query: CustomUserQuery,
+      group: UserGroup,
+      groupQueries: CustomUserQuery[],
+    ) {
+      let memberships: UserGroupMembership[] = [];
+
+      groupQueries.forEach((gq) => {
+        if (gq.query_id == query.query_id) {
+          const membership = {
+            membership_id:
+              gq.groupAssignments?.find((g) => g.membership_id)
+                ?.membership_id || "",
+            usergroup_id: group.id,
+            usergroup_name: group.name,
+            is_member: true,
+          };
+          memberships.push(membership);
+        }
+      });
+      query.groupAssignments = memberships;
     }
 
     return userGroups.map((group: UserGroup, idx: number) => (
@@ -87,17 +128,19 @@ const UserGroupsTable: React.FC<UserGroupsTableProps> = ({
             unstyled
             aria-description={`Edit ${group.name} queries`}
             onClick={async () => {
-              let queries = group.queries;
-              if (!queries || queries?.length <= 0) {
-                queries = await fetchGroupQueries(group.id);
-              }
-              openEditSection(
-                group.name,
-                "Assigned Queries",
-                "Queries",
-                group.id,
-                queries as QueryTableResult[],
-              );
+              await fetchGroupQueries(group.id).then((groupQueries) => {
+                queries.forEach((query) =>
+                  addGroupAssignments(query, group, groupQueries),
+                );
+
+                openEditSection(
+                  group.name,
+                  "Assigned Queries",
+                  "Queries",
+                  group.id,
+                  queries,
+                );
+              });
             }}
           >
             {getQueryLabel(group.query_size)}

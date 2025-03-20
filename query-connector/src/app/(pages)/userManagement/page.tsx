@@ -10,7 +10,7 @@ import { getContextRole, RoleDescriptons } from "./utils";
  * @param textContent asdf
  * @returns asdf
  */
-export const renderRoleDescriptions = (textContent: object) => {
+const renderRoleDescriptions = (textContent: object) => {
   return (
     <div
       className={classNames(
