@@ -94,6 +94,7 @@ const SessionTimeout: React.FC<SessionTimeoutProps> = ({
       modalRef={modalRef}
       heading={`Your session will end in ${remainingTime}`}
       forceAction
+      className={"width-auto padding-x-3"}
       buttons={[
         {
           text: "Yes, stay signed in",
