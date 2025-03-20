@@ -12,17 +12,15 @@ import {
   User,
   UserGroupMembership,
 } from "../../../../models/entities/users";
+import { CustomUserQuery } from "@/app/models/entities/query";
 import styles from "../usersTable/usersTable.module.scss";
 import { getContextRole } from "../../utils";
-import { CustomUserQuery } from "@/app/models/entities/query";
-
 import { getCustomQueries } from "@/app/backend/query-building";
 
 type UserGroupsTableProps = {
   userGroups: UserGroup[];
   fetchGroupMembers: (groupId: string) => Promise<User[]>;
   fetchGroupQueries: (groupId: string) => Promise<CustomUserQuery[]>;
-  fetchAllQueries: () => Promise<CustomUserQuery[]>;
 };
 
 /**

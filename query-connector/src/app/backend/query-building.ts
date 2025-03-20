@@ -85,8 +85,8 @@ export async function getQueryList(): Promise<CustomUserQuery[]> {
 }
 
 /**
- * Deletes a query from the database by its unique ID.
- * @param queryId - The unique identifier of the query to delete.
+ * Retrieves a query from the database by its unique ID.
+ * @param queryId - The unique identifier of the query to retrieve.
  * @returns A success or error response indicating the result.
  */
 export async function getQueryById(queryId: string) {

@@ -24,9 +24,9 @@ type PermissionsProps = {
 
 /**
  * User section in the user management page
- * @param root0 - The user groups table
- * @param root0.users The user groups table
- * @param root0.setUsers The user groups table
+ * @param root0 - The user permissions table
+ * @param root0.users The list of users
+ * @param root0.setUsers State function to update the list of users
  *  @param root0.fetchGroupMembers Function to retrieve a group's list of users
  * @returns Users table
  */

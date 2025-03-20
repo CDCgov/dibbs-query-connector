@@ -33,10 +33,10 @@ export type UserManagementDrawerProps = {
  * @param root0.setUserGroups - State function that updates UserGroup data
  * @param root0.users The list of users to display
  * @param root0.setUsers - State function that updates User data
+ * @param root0.allQueries The list of querires to display
+ * @param root0.setAllQueries State function that updates CustomUserQuery data
  * @param root0.refreshView - State function that triggers a refresh of User or Group data
- * @param root0.allQueries The list of users to display
- * @param root0.setAllQueries The list of users to display
- * @param root0.activeTabLabel - State function that triggers a refresh of User or Group data
+ * @param root0.activeTabLabel - The string label name of the active Tab
  * @returns TeamQueryEditSection component which is the collapsible section that allows to edit members and queries of a team
  */
 const UserManagementDrawer: React.FC<UserManagementDrawerProps> = ({

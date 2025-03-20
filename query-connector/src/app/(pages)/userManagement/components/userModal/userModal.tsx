@@ -1,7 +1,6 @@
 "use client";
 import { useContext, useEffect, useState } from "react";
 import dynamic from "next/dynamic";
-// import classNames from "classnames";
 import { Label, TextInput } from "@trussworks/react-uswds";
 import {
   addUserIfNotExists,
@@ -50,7 +49,7 @@ export interface UserModalProps {
  * @param root0.modalMode - Indicates which content the modal should render
  * @param root0.setModalMode - State function to control which content the modal should render
  * @param root0.refreshView - State function that indicates if the list of Users should be refreshed
- * @param root0.userGroups - reference passed from parent to control showing/hiding the modal
+ * @param root0.userGroups - List of UserGroups, to display when adding a new User
  * @returns - The UserModal component.
  */
 const UserModal: React.FC<UserModalProps> = ({

@@ -17,7 +17,6 @@ const dbClient = getDbClient();
  * @param userToken.email - The email from the JWT token.
  * @param userToken.firstName - The first name from the JWT token.
  * @param userToken.lastName - The last name from the JWT token.
- * @param userToken.role - The role from the JWT token.
  * @returns The newly added user or an empty result if already exists.
  */
 export async function addUserIfNotExists(userToken: {
@@ -26,7 +25,6 @@ export async function addUserIfNotExists(userToken: {
   email: string;
   firstName: string;
   lastName: string;
-  role?: string;
 }) {
   if (!userToken || !userToken.username) {
     console.error("Invalid user token. Cannot add user.");
@@ -50,16 +48,6 @@ export async function addUserIfNotExists(userToken: {
     // Default role when adding a new user, which includes Super Admin, Admin, and Standard User.
     let qc_role = UserRole.STANDARD;
     console.log("User not found. Proceeding to insert.");
-
-    if (process.env.NODE_ENV !== "production") {
-      // First registered user is set as Super Admin
-      const queryUserRecordCount = `SELECT COUNT(*) FROM users`;
-      const userCount = await dbClient.query(queryUserRecordCount);
-
-      if (userCount?.rows?.[0]?.count === "0") {
-        qc_role = UserRole.SUPER_ADMIN;
-      }
-    }
 
     const insertUserQuery = `
       INSERT INTO users (username, qc_role, first_name, last_name)
@@ -283,7 +271,6 @@ export async function getUserRole(username: string): Promise<string> {
     `;
 
     const result = await dbClient.query(selectUserRoleQuery, [username]);
-    console.log(result.rows);
     return result?.rowCount && result.rowCount > 0
       ? result.rows?.[0].qc_role
       : "";
@@ -336,14 +323,14 @@ export async function getAllUserGroupsForUser(
 }
 
 /**
- * Retrieves the full user object with all group membership(s) for a specific user group.
+ * Retrieves the full user object with all group membership(s)
  * @param userId - The unique identifier of the user.
- * @returns A list of UserGroupMembership items for the specified user.
+ * @returns A User with an updated list of UserGroupMembership items
  */
 export async function getSingleUserWithGroupMemberships(
   userId: string,
 ): Promise<QCResponse<User>> {
-  if (!(await superAdminAccessCheck())) {
+  if (!(await adminAccessCheck())) {
     throw new Error("Unauthorized");
   }
 
@@ -392,7 +379,7 @@ export async function getSingleUserWithGroupMemberships(
 /**
  * Retrieves the user group membership for a specific user group.
  * @param groupId - The unique identifier of the user group.
- * @returns A list of user group memberships for the specified group.
+ * @returns A list of users with membership status for the specified group.
  */
 export async function getAllUsersWithSingleGroupStatus(
   groupId: string,

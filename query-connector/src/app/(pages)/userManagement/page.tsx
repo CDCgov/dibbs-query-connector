@@ -7,8 +7,8 @@ import UsersTable from "./components/usersTable/usersTable";
 import { getContextRole, RoleDescriptons } from "./utils";
 
 /**
- * @param textContent asdf
- * @returns asdf
+ * @param textContent the text values to display
+ * @returns HTML element containing text descriptions for each of the User roles
  */
 const renderRoleDescriptions = (textContent: object) => {
   return (

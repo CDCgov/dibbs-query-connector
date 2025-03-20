@@ -513,10 +513,10 @@ export async function addSingleQueryToGroup(
 }
 
 /**
- * Adds users to a user group.
+ * Unassigns a query from a user group.
  * @param groupId - The unique identifier of the user group.
- * @param queryId - The unique identifiers of the users to add.
- * @returns The user IDs of the users added to the group.
+ * @param queryId - The unique identifiers of the query to remove.
+ * @returns The query with updated groupAssignment data
  */
 export async function removeSingleQueryFromGroup(
   groupId: string,
