@@ -37,6 +37,7 @@ interface UserQueriesDisplayProps {
  * Component for query building when user-generated queries already exist
  * @param root0 - The props object.
  * @param root0.queries - Array of user-generated queries to display.
+ * @param root0.queries.userGroupMembership - the user's group from which to filter queries for display
  * @param root0.selectedQuery - the query object we're building
  * @param root0.setBuildStep - setter function to progress the stage of the query
  * building flow
@@ -45,11 +46,13 @@ interface UserQueriesDisplayProps {
  */
 export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
   queries: initialQueries,
+  queries: userGroupMembership,
   selectedQuery,
   setSelectedQuery,
   setBuildStep,
 }) => {
   const queriesContext = useContext(DataContext);
+  const group = useState<CustomUserQuery[]>(userGroupMembership);
   const [queries, setQueries] = useState<CustomUserQuery[]>(initialQueries);
   const [conditionIdToDetailsMap, setConditionIdToDetailsMap] =
     useState<ConditionsMap>();
@@ -87,6 +90,7 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
           modalRef,
           selectedQuery,
           handleDelete,
+          group,
           queries,
           setQueries,
           queriesContext,

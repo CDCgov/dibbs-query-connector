@@ -9,4 +9,7 @@ certificates
 /coverage
 report.json
 .tool-versions
+logs-after-tests.txt
+logs-before-tests.txt
+.env.sample
 keys/
