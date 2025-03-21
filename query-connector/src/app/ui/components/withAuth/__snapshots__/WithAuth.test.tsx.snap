@@ -1,24 +1,15 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`WithAuth component (page access guard) Renders empty content while the session is being retrieved 1`] = `
+exports[`WithAuth component (page access guard) Renders content if user is logged in and has role access 1`] = `
 <body>
-  <div />
+  <div>
+    Special content
+  </div>
 </body>
 `;
 
-exports[`WithAuth component (page access guard) Renders unauthorized if user is logged in and does not have role access 1`] = `
+exports[`WithAuth component (page access guard) Renders empty content while the session is being retrieved 1`] = `
 <body>
-  <div>
-    <div
-      class="main-container__wide"
-    >
-      <h1>
-        Unauthorized Access
-      </h1>
-      <p>
-        You are not authorized to access this page.
-      </p>
-    </div>
-  </div>
+  <div />
 </body>
 `;
