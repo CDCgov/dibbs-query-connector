@@ -49,7 +49,7 @@
     }
 
     /* highlight row on hover*/
-    &:hover{
+    &:hover {
       background-color: #f3f3f3;
 
       td {
@@ -59,7 +59,7 @@
   }
 }
 
-.customizeFixedTable{
+.customizeFixedTable {
   table-layout: fixed;
   width: calc(100% + 186px);
 }
