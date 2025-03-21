@@ -1,7 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { DateRangePicker as USWDSDateRangePicker } from "@trussworks/react-uswds";
+import { useState, useEffect, useRef } from "react";
+import {
+  DateRangePicker as USWDSDateRangePicker,
+  Icon,
+  TextInput,
+} from "@trussworks/react-uswds";
 import styles from "./DateRangePicker.module.scss";
 
 export interface DateRange {
@@ -21,7 +25,7 @@ interface DateRangePickerProps {
 }
 
 /**
- * A date range picker component.
+ * A date range picker component with a toggleable modal.
  * @param root0 - The component props.
  * @param root0.startDate - The start date.
  * @param root0.endDate - The end date.
@@ -33,16 +37,20 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
   endDate,
   onChange,
 }) => {
-  const [dateErrors, setDateErrors] = useState<{
-    start?: string;
-    end?: string;
-  }>({});
+  const [dateErrors, setDateErrors] = useState<DateErrors>({});
+  const [isOpen, setIsOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const formattedStart = startDate ? startDate.toLocaleDateString() : "";
+  const formattedEnd = endDate ? endDate.toLocaleDateString() : "";
+  const displayText =
+    formattedStart && formattedEnd ? `${formattedStart} - ${formattedEnd}` : "";
 
   const validateDates = (
     newStartDate: Date | null,
     newEndDate: Date | null,
   ) => {
-    const errors: { start?: string; end?: string } = {};
+    const errors: DateErrors = {};
 
     if (newStartDate && isNaN(newStartDate.getTime())) {
       errors.start = "Invalid start date format. Use MM/DD/YYYY.";
@@ -56,16 +64,16 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
     }
 
     document
-      .getElementById("event-date-start")
+      .getElementById("log-date-start")
       ?.classList.toggle(styles.bgErrorLighter, !!errors.start);
     document
-      .getElementById("event-date-start")
+      .getElementById("log-date-start")
       ?.classList.toggle(styles.borderError, !!errors.start);
     document
-      .getElementById("event-date-end")
+      .getElementById("log-date-end")
       ?.classList.toggle(styles.bgErrorLighter, !!errors.end);
     document
-      .getElementById("event-date-end")
+      .getElementById("log-date-end")
       ?.classList.toggle(styles.borderError, !!errors.end);
 
     setDateErrors(errors);
@@ -76,36 +84,72 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
     validateDates(startDate, endDate);
   }, [startDate, endDate]);
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false);
+      }
+    };
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isOpen]);
+
   return (
-    <div>
-      <USWDSDateRangePicker
-        startDateLabel="Start Date"
-        endDateLabel="End Date"
-        startDatePickerProps={{
-          id: "event-date-start",
-          name: "event-date-start",
-          value: startDate ? startDate.toISOString().split("T")[0] : "",
-          onChange: (val?: string) => {
-            const date = val ? new Date(val) : null;
-            if (!validateDates(date, endDate).start) {
-              onChange({ startDate: date, endDate });
-            }
-          },
-        }}
-        endDatePickerProps={{
-          id: "event-date-end",
-          name: "event-date-end",
-          value: endDate ? endDate.toISOString().split("T")[0] : "",
-          onChange: (val?: string) => {
-            const date = val ? new Date(val) : null;
-            if (!validateDates(startDate, date).end) {
-              onChange({ startDate, endDate: date });
-            }
-          },
-        }}
-      />
-      {(dateErrors.start || dateErrors.end) && (
-        <p className={styles.errorText}>{dateErrors.start || dateErrors.end}</p>
+    <div className={styles.datePickerContainer} ref={containerRef}>
+      <div className={styles.textInputContainer}>
+        <TextInput
+          type="text"
+          id="date-range-input"
+          name="date-range-input"
+          value={displayText}
+          readOnly
+          onClick={() => setIsOpen((prev) => !prev)}
+        />
+        {!displayText && (
+          <Icon.CalendarToday size={3} className={styles.calendarIcon} />
+        )}
+      </div>
+      {isOpen && (
+        <div className={styles.datePickerModal}>
+          <USWDSDateRangePicker
+            startDateLabel="Start Date"
+            endDateLabel="End Date"
+            startDatePickerProps={{
+              id: "log-date-start",
+              name: "log-date-start",
+              value: formattedStart,
+              onChange: (val?: string) => {
+                const date = val ? new Date(val) : null;
+                if (!validateDates(date, endDate).start) {
+                  onChange({ startDate: date, endDate });
+                }
+              },
+            }}
+            endDatePickerProps={{
+              id: "log-date-end",
+              name: "log-date-end",
+              value: formattedEnd,
+              onChange: (val?: string) => {
+                const date = val ? new Date(val) : null;
+                if (!validateDates(startDate, date).end) {
+                  onChange({ startDate, endDate: date });
+                }
+              },
+            }}
+          />
+          {(dateErrors.start || dateErrors.end) && (
+            <p className={styles.errorText}>
+              {dateErrors.start || dateErrors.end}
+            </p>
+          )}
+        </div>
       )}
     </div>
   );

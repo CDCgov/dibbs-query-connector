@@ -3,7 +3,7 @@
   color: #d73a49;
   font-size: 0.875rem;
   margin-top: 0.25rem;
-  position: absolute;
+  position: relative;;
   width: 100%;
 }
 
@@ -14,3 +14,37 @@
 .borderError {
   border: 2px solid #d73a49;
 }
+
+.textInputContainer {
+  position: relative;
+  display: inline-block;
+}
+
+.calendarIcon {
+  position: absolute;
+  right: 0.625rem;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.datePickerContainer {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+.datePickerModal {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 10;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 0.25rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 0.5rem;
+  width: max-content;
+  margin-top: 0.5rem;
+}
+

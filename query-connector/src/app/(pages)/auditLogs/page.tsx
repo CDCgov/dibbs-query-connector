@@ -166,7 +166,7 @@ const AuditLogs: React.FC = () => {
             </Select>
           </div>
           <div className={classNames(styles.inputGroup)}>
-            <label htmlFor="dateRange">Date Range</label>
+            <label htmlFor="dateRange">Custom date range</label>
             <div>
               <DateRangePicker
                 startDate={dateRange.startDate || null}
