@@ -102,7 +102,6 @@ export const mockGroupsTab: Tab = {
     .mockReturnValue(
       <UserGroupsTable
         userGroups={[mockGroupBasic]}
-        fetchAllQueries={jest.fn()}
         fetchGroupMembers={jest.fn().mockReturnValue(mockAdmin)}
         fetchGroupQueries={jest.fn()}
       />,
