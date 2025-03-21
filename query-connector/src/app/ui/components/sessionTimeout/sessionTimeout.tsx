@@ -36,6 +36,7 @@ const SessionTimeout: React.FC<SessionTimeoutProps> = ({
   const { status, data } = useSession();
   const [remainingTime, setRemainingTime] = useState("");
   const intervalId = useRef<NodeJS.Timeout | null>(null);
+  const expTimerId = useRef<NodeJS.Timeout | null>(null);
   const [started, setStarted] = useState(false);
   const modalRef = useRef<ModalRef>(null);
   const expiresBeforeIdle: boolean = !!(
@@ -52,7 +53,7 @@ const SessionTimeout: React.FC<SessionTimeoutProps> = ({
     onIdle: handleLogout,
     stopOnIdle: true,
     startManually: true,
-    disabled: status !== "authenticated" || expiresBeforeIdle,
+    disabled: status !== "authenticated",
   });
 
   function handlePrompt() {
@@ -88,11 +89,18 @@ const SessionTimeout: React.FC<SessionTimeoutProps> = ({
 
   // Inititalize timer
   useEffect(() => {
+    // trigger expired token timer
+    if (expiresBeforeIdle && expTimerId.current == null) {
+      expTimerId.current = setTimeout(async () => {
+        await handleLogout();
+      }, data?.expiresIn);
+    }
+
     if (!started && status === "authenticated") {
       setStarted(true);
       start();
     }
-  }, [status, started, setStarted, start]);
+  }, [status, started, setStarted, start, expTimerId, expiresBeforeIdle]);
 
   return (
     <Modal
