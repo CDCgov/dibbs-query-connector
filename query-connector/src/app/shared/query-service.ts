@@ -277,78 +277,6 @@ export async function testFhirServerConnection(
   }
 }
 
-/**
- * Parse the response from a FHIR search query. If the response is successful and
- * contains data, return an array of parsed resources.
- * @param response - The response from the FHIR server.
- * @param queryResponse - The response object to store the results.
- * @returns - The parsed response.
- */
-async function parseFhirSearch(
-  response: Response | Array<Response>,
-  queryResponse: Record<string, FhirResource[]> = {},
-): Promise<QueryResponse> {
-  let resourceArray: FhirResource[] = [];
-  const resourceIds = new Set<string>();
-
-  // Process the responses and flatten them
-  if (Array.isArray(response)) {
-    resourceArray = (
-      await Promise.all(response.map(processFhirResponse))
-    ).flat();
-  } else {
-    resourceArray = await processFhirResponse(response);
-  }
-  // Add resources to queryResponse
-  for (const resource of resourceArray) {
-    const resourceType = resource.resourceType;
-
-    // Check if resourceType already exists in queryResponse & initialize if not
-    if (!(resourceType in queryResponse)) {
-      queryResponse[resourceType] = [];
-    }
-    // Check if the resourceID has already been seen & only added resources that haven't been seen before
-    if (resource.id && !resourceIds.has(resource.id)) {
-      queryResponse[resourceType]!.push(resource);
-      resourceIds.add(resource.id);
-    }
-  }
-
-  return queryResponse;
-}
-
-/**
- * Process the response from a FHIR search query. If the response is successful and
- * contains data, return an array of resources that are ready to be parsed.
- * @param response - The response from the FHIR server.
- * @returns - The array of resources from the response.
- */
-async function processFhirResponse(
-  response: Response,
-): Promise<FhirResource[]> {
-  let resourceArray: FhirResource[] = [];
-  let resourceIds: string[] = [];
-
-  if (response.status === 200) {
-    const body = await response.json();
-    if (body.entry) {
-      for (const entry of body.entry) {
-        if (!isFhirResource(entry.resource)) {
-          console.error(
-            "Entry in FHIR resource response parsing was of unexpected shape",
-          );
-        }
-        // Add the resource only if the ID is unique to the resources being returned for the query
-        if (!resourceIds.includes(entry.resource.id)) {
-          resourceIds.push(entry.resource.id);
-          resourceArray.push(entry.resource);
-        }
-      }
-    }
-  }
-  return resourceArray;
-}
-
 class QueryService {
   /**
    * Performs a generalized query for collections of patients matching
@@ -491,7 +419,81 @@ class QueryService {
     );
     return newResponse;
   }
+
+  /**
+   * Parse the response from a FHIR search query. If the response is successful and
+   * contains data, return an array of parsed resources.
+   * @param response - The response from the FHIR server.
+   * @param queryResponse - The response object to store the results.
+   * @returns - The parsed response.
+   */
+  static async parseFhirSearch(
+    response: Response | Array<Response>,
+    queryResponse: Record<string, FhirResource[]> = {},
+  ): Promise<QueryResponse> {
+    let resourceArray: FhirResource[] = [];
+    const resourceIds = new Set<string>();
+
+    // Process the responses and flatten them
+    if (Array.isArray(response)) {
+      resourceArray = (
+        await Promise.all(response.map(processFhirResponse))
+      ).flat();
+    } else {
+      resourceArray = await processFhirResponse(response);
+    }
+    // Add resources to queryResponse
+    for (const resource of resourceArray) {
+      const resourceType = resource.resourceType;
+
+      // Check if resourceType already exists in queryResponse & initialize if not
+      if (!(resourceType in queryResponse)) {
+        queryResponse[resourceType] = [];
+      }
+      // Check if the resourceID has already been seen & only added resources that haven't been seen before
+      if (resource.id && !resourceIds.has(resource.id)) {
+        queryResponse[resourceType]!.push(resource);
+        resourceIds.add(resource.id);
+      }
+    }
+
+    return queryResponse;
+  }
+
+  /**
+   * Process the response from a FHIR search query. If the response is successful and
+   * contains data, return an array of resources that are ready to be parsed.
+   * @param response - The response from the FHIR server.
+   * @returns - The array of resources from the response.
+   */
+  static async processFhirResponse(
+    response: Response,
+  ): Promise<FhirResource[]> {
+    let resourceArray: FhirResource[] = [];
+    let resourceIds: string[] = [];
+
+    if (response.status === 200) {
+      const body = await response.json();
+      if (body.entry) {
+        for (const entry of body.entry) {
+          if (!isFhirResource(entry.resource)) {
+            console.error(
+              "Entry in FHIR resource response parsing was of unexpected shape",
+            );
+          }
+          // Add the resource only if the ID is unique to the resources being returned for the query
+          if (!resourceIds.includes(entry.resource.id)) {
+            resourceIds.push(entry.resource.id);
+            resourceArray.push(entry.resource);
+          }
+        }
+      }
+    }
+    return resourceArray;
+  }
 }
 
 export const postFhirQuery = QueryService.postFhirQuery;
 export const patientQuery = QueryService.patientQuery;
+export const parseFhirSearch = QueryService.parseFhirSearch;
+export const processFhirResponse = QueryService.processFhirResponse;
