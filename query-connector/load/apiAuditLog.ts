@@ -3,9 +3,12 @@ export const config = {
   processor: "./processor.ts",
   phases: [
     {
-      name: "150 ELR's a day",
-      duration: 9,
-      arrivalRate: 3,
+      name: "Max load for large STLT estimate",
+      // number of seconds we're simulating
+      duration: 60,
+      // total ELR's we want to simulate over the period
+      // the load we'd expect in an hour of time
+      arrivalCount: 1025,
     },
   ],
 };
