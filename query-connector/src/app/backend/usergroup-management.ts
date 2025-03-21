@@ -591,8 +591,8 @@ export async function getSingleQueryGroupAssignments(
       const groupAssignments = results.rows.map((row) => {
         return {
           membership_id: row.membership_id,
-          usergroup_name: "Hogwarts Staff",
-          usergroup_id: "809fd207-63d5-4c92-a23a-d3d9ce566d1e",
+          usergroup_name: row.usergroup_name,
+          usergroup_id: row.usergroup_id,
           is_member: true,
         };
       });
