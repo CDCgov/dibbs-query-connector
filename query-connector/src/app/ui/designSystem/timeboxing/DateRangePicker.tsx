@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import {
+  Button,
   DateRangePicker as USWDSDateRangePicker,
   Icon,
   TextInput,
@@ -93,6 +94,16 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
         setIsOpen(false);
       }
     };
+    if (isOpen && startDate && endDate) {
+      const startInput = document.getElementById(
+        "log-date-start",
+      ) as HTMLInputElement;
+      const endInput = document.getElementById(
+        "log-date-end",
+      ) as HTMLInputElement;
+      if (startInput) startInput.value = startDate.toLocaleDateString();
+      if (endInput) endInput.value = endDate.toLocaleDateString();
+    }
     if (isOpen) {
       document.addEventListener("mousedown", handleClickOutside);
     } else {
@@ -118,6 +129,21 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
       </div>
       {isOpen && (
         <div className={styles.datePickerModal}>
+          <div className={styles.clearButtonContainer}>
+            <Button
+              unstyled
+              type="button"
+              className={styles.clearButton}
+              onClick={() => {
+                onChange({ startDate: null, endDate: null });
+                setDateErrors({});
+                setIsOpen(false);
+                setTimeout(() => setIsOpen(true), 0);
+              }}
+            >
+              Clear
+            </Button>
+          </div>
           <USWDSDateRangePicker
             startDateLabel="Start Date"
             endDateLabel="End Date"

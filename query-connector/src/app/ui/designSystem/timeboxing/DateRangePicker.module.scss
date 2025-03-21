@@ -44,7 +44,22 @@
   border-radius: 0.25rem;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   padding: 0.5rem;
-  width: max-content;
+  // width: max-content; // without this, the calendar looks somewhat squished
   margin-top: 0.5rem;
 }
 
+.clearButtonContainer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 0.5rem;
+}
+
+.clearButton {
+  background: none;
+  border: none;
+  color: #005ea2;
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 0.875rem;
+  padding: 0;
+}
