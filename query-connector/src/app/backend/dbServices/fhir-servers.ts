@@ -1,7 +1,7 @@
 "use server";
 import { Pool } from "pg";
 import { getDbClient } from "../dbClient";
-import { transaction } from "../../shared/decorators";
+import { transaction } from "./decorators";
 import { FhirServerConfig } from "@/app/models/entities/fhir-servers";
 import { superAdminAccessCheck } from "@/app/utils/auth";
 

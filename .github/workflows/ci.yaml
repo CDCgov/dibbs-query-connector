@@ -64,39 +64,23 @@ jobs:
       - name: Install Playwright Browsers
         working-directory: ./query-connector
         run: npx playwright install --with-deps
-      - name: Build Query Connector
+      - name: Create .env
         working-directory: ./query-connector
-        run: docker compose -f ./docker-compose-e2e.yaml build --no-cache
-      - name: Run Query Connector
+        run: |
+          echo "AIDBOX_LICENSE=${{ secrets.AIDBOX_LICENSE }}" > .env
+          echo "DATABASE_URL=postgresql://postgres:pw@localhost:5432/tefca_db" >> .env
+      - name: Build Query Connector and Run Playwright Tests
+        id: run_tests
         working-directory: ./query-connector
-        run: docker compose -f ./docker-compose-e2e.yaml up -d
-      - name: Poll until Query Connector is ready
         run: |
-          until curl -s http://localhost:3000/; do
-            echo "Waiting for Query Connector to be ready before running Playwright..."
-            sleep 5
-          done
-      - name: Poll until HAPI server is ready
-        run: |
-          until response=$(curl -v -s -w "HTTP_STATUS:%{http_code}" http://localhost:8080/fhir/Patient); do
-            # Extract status code from the response
-            http_status=$(echo "$response" | grep "HTTP_STATUS" | awk -F: '{print $2}')
-            echo "Waiting for HAPI server to be ready..."
-            echo "Response code: $http_status"
-            echo "Full response: $response"
-            sleep 5
-          done
-      - name: Poll until FHIR server has data
-        run: |
-          until curl -s http://localhost:8080/fhir/Patient | jq '.entry | length > 0' | grep -q 'true'; do
-            echo "Waiting for FHIR server to have data..."
-            sleep 5
-          done
-      - name: Playwright Tests
-        working-directory: ./query-connector
-        run: npx playwright test e2e --reporter=list --config playwright.config.ts
+          bash ./setup-scripts/e2e_tests.sh
+
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
           name: test-results
           path: ./query-connector/test-results/
+
+      - name: Exit with proper code
+        if: steps.run_tests.outcome == 'failure'
+        run: exit 1 # Force the workflow to fail if tests failed

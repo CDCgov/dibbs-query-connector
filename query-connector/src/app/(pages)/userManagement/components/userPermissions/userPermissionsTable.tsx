@@ -50,7 +50,7 @@ const UserPermissionsTable: React.FC<PermissionsProps> = ({
   }
 
   function isSelf(user: User): boolean {
-    return user.username === session?.user.username;
+    return user.username === session?.user?.username;
   }
 
   const renderDropdown = (user: User) => {

@@ -15,6 +15,6 @@ test.describe("User management", () => {
     await expect(page.getByRole("button", { name: "Users" })).toHaveClass(
       /tabGroup_tab__active__/,
     );
-    await expect(page.getByText("No users found")).toBeVisible();
+    await expect(page.getByText("Mario, Mario")).toBeVisible();
   });
 });

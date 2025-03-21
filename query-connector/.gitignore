@@ -12,3 +12,4 @@ report.json
 logs-after-tests.txt
 logs-before-tests.txt
 .env.sample
+keys/

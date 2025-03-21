@@ -9,6 +9,7 @@ export enum PAGES {
   QUERY_BUILDING = "/queryBuilding",
   FHIR_SERVERS = "/fhirServers",
   USER_MANAGEMENT = "/userManagement",
+  AUDIT_LOGS = "/auditLogs",
 }
 
 interface Page {
@@ -48,6 +49,13 @@ pagesConfig[PAGES.FHIR_SERVERS] = {
   position: 3,
   path: PAGES.FHIR_SERVERS,
   name: "FHIR servers",
+  roleAccess: [UserRole.SUPER_ADMIN],
+};
+
+pagesConfig[PAGES.AUDIT_LOGS] = {
+  position: 3,
+  path: PAGES.AUDIT_LOGS,
+  name: "Audit logs",
   roleAccess: [UserRole.SUPER_ADMIN],
 };
 

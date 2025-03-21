@@ -4,6 +4,7 @@ const useSession = jest
   .fn()
   .mockReturnValue({ data: undefined, status: "loading" });
 
+const signOut = jest.fn();
 /**
  *
  * @param root0
@@ -11,4 +12,4 @@ const useSession = jest
  */
 const SessionProvider = ({ children }) => <>{children}</>;
 
-export { useSession, SessionProvider };
+export { useSession, signOut, SessionProvider };
