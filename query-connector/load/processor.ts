@@ -51,6 +51,9 @@ const SUPPORTED_QUERIES = Object.values(USE_CASE_DETAILS).filter((v) => {
   return v.queryName !== "Immunization query";
 });
 
+/**
+ *
+ */
 export function chooseDefaultQueryToRun() {
   const index = Math.floor(Math.random() * SUPPORTED_QUERIES.length);
   const query = SUPPORTED_QUERIES[index];
@@ -65,6 +68,12 @@ export function chooseDefaultQueryToRun() {
   };
 }
 
+/**
+ *
+ * @param userContext
+ * @param events
+ * @param done
+ */
 export function setup(userContext: any, events: any, done: () => void) {
   const vars = chooseDefaultQueryToRun();
   userContext.vars = { ...vars };
