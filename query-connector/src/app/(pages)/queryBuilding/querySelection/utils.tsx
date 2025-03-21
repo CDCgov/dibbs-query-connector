@@ -5,7 +5,6 @@ import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import { DataContextValue } from "@/app/shared/DataProvider";
 import { deleteQueryById } from "@/app/backend/query-building";
 import { CustomUserQuery } from "@/app/models/entities/query";
-import { UserGroupMembership } from "@/app/models/entities/users";
 
 /**
  * Handles deleting a user query.

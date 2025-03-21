@@ -25,8 +25,6 @@ import classNames from "classnames";
 import { getConditionsData } from "@/app/shared/database-service";
 import { ConditionsMap } from "../utils";
 import { CustomUserQuery } from "@/app/models/entities/query";
-import { queries } from "@testing-library/dom";
-import { UserGroupMembership } from "@/app/models/entities/users";
 
 interface UserQueriesDisplayProps {
   queries: CustomUserQuery[];
