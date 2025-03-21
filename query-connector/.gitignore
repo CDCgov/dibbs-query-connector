@@ -9,6 +9,12 @@ certificates
 /coverage
 report.json
 .tool-versions
+<<<<<<< HEAD
 keys/
 logs-after-tests.txt
 logs-before-tests.txt
+=======
+logs-after-tests.txt
+logs-before-tests.txt
+.env.sample
+>>>>>>> 4ade91df (update gitignore to ignore logs)
