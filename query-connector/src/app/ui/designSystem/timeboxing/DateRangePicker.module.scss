@@ -1,3 +1,4 @@
+@use "../../../ui/styles/_variables" as *;
 
 .errorText {
   color: #d73a49;
@@ -23,15 +24,21 @@
 .calendarIcon {
   position: absolute;
   right: 0.625rem;
-  top: 50%;
+  top: 55%;
   transform: translateY(-50%);
   pointer-events: none;
+  align-items: center;
+  justify-content: center;
 }
 
 .datePickerContainer {
   position: relative;
   display: inline-block;
   width: 100%;
+}
+
+.customDateRangeWrapper :global(.usa-form-group) {
+  margin-top: 0.25rem;
 }
 
 .datePickerModal {
