@@ -50,6 +50,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
      * @returns The updated JWT token with user details.
      */
     async jwt({ token, profile }) {
+      const now = Math.floor(Date.now() / 1000);
+
       if (profile) {
         const userToken = {
           id: profile.sub || "",
@@ -67,9 +69,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           console.error("Something went wrong in generating user token", error);
         }
 
-        return { ...token, ...userToken };
+        token = { ...token, ...userToken };
       }
 
+      // Extend session with role and time to expire
       if (token.username !== "") {
         if (isAuthDisabledServerCheck()) {
           token.role = UserRole.SUPER_ADMIN;
@@ -77,6 +80,15 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           const role = await getUserRole(token.username as string).catch();
           token.role = role;
         }
+      }
+
+      if (token.exp) {
+        token.expiresIn = token.exp - now;
+      }
+
+      // handle expired tokens
+      if (token.expires_in && (token.expires_in as number) <= 0) {
+        return null;
       }
 
       return token;
@@ -91,14 +103,16 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
      */
     async session({ session, token }) {
       session.user = {
-        id: typeof token.id === "string" ? token.id : "",
+        id: token.id || "",
         email: token.email || "",
-        username: typeof token.username === "string" ? token.username : "",
-        firstName: typeof token.firstName === "string" ? token.firstName : "",
-        lastName: typeof token.lastName === "string" ? token.lastName : "",
+        username: token.username || "",
+        firstName: token.firstName || "",
+        lastName: token.lastName || "",
         emailVerified: null,
-        role: typeof token.role === "string" ? token.role : "",
+        role: token.role || "",
       };
+
+      session.expiresIn = token.expiresIn;
 
       return session;
     },
