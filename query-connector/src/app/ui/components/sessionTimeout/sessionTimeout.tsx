@@ -100,7 +100,7 @@ const SessionTimeout: React.FC<SessionTimeoutProps> = ({
       setStarted(true);
       start();
     }
-  }, [status, started, setStarted, start, expTimerId, expiresBeforeIdle]);
+  }, [status, started, setStarted, start, expTimerId, expiresBeforeIdle, data]);
 
   return (
     <Modal

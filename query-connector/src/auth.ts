@@ -72,7 +72,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token = { ...token, ...userToken };
       }
 
-      // Extend session with role and time to expire
+      // Extend token with role and time to expire
       if (token.username !== "") {
         if (isAuthDisabledServerCheck()) {
           token.role = UserRole.SUPER_ADMIN;
@@ -87,7 +87,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       }
 
       // handle expired tokens
-      if (token.expires_in && (token.expires_in as number) <= 0) {
+      if (token.expiresIn && token.expiresIn <= 0) {
         return null;
       }
 
