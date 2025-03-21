@@ -20,7 +20,6 @@ import classNames from "classnames";
 import type { ModalRef } from "../../../../ui/designSystem/modal/Modal";
 import UserModal from "../../components/userModal/userModal";
 import { CustomUserQuery } from "@/app/models/entities/query";
-import { getCustomQueries } from "@/app/backend/query-building";
 
 export type UsersTableProps = {
   role: string;
@@ -112,7 +111,6 @@ const UsersTable: React.FC<UsersTableProps> = ({ role }) => {
             <UserGroupsTable
               fetchGroupMembers={fetchGroupMembers}
               fetchGroupQueries={fetchGroupQueries}
-              fetchAllQueries={fetchAllQueries}
               userGroups={userGroups}
             />
           </>
@@ -181,12 +179,6 @@ const UsersTable: React.FC<UsersTableProps> = ({ role }) => {
   async function fetchGroupQueries(groupId: string) {
     const queries = await getAllGroupQueries(groupId);
     return queries.items;
-  }
-
-  async function fetchAllQueries() {
-    const queriesResponse = await getCustomQueries();
-    setAllQueries(queriesResponse);
-    return queriesResponse;
   }
 
   // page load
