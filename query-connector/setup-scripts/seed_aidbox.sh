@@ -22,7 +22,7 @@ while [ $attempt -le $max_retries ]; do
   else
     echo "Waiting for Aidbox health check to pass (status: $health_status)... Attempt $attempt/$max_retries"
 
-   if [ $attempt -eq $max_retries ]; then
+    if [ $attempt -eq $max_retries ]; then
       echo "Maximum retry attempts reached. Exiting."
       exit 1
     fi

@@ -22,7 +22,7 @@ export function getJwks() {
  */
 export function getPrivateKey() {
   try {
-    const keyPath = path.join(process.cwd(), "keys", "ec384-private.pem");
+    const keyPath = path.join(process.cwd(), "keys", "rsa-private.pem");
     return fs.readFileSync(keyPath, "utf-8");
   } catch (error) {
     console.error("Error loading private key:", error);

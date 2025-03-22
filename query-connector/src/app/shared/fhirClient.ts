@@ -95,9 +95,11 @@ class FHIRClient {
         throw new Error("Token endpoint is required for authentication");
       }
 
-      // Create request payload based on auth type
+      // Create request payload
       const requestPayload: Record<string, string> = {
         grant_type: "client_credentials",
+        // Always include the client_id explicitly in the request
+        client_id: this.serverConfig.client_id,
       };
 
       // Add scopes if available
@@ -113,19 +115,19 @@ class FHIRClient {
           tokenEndpoint,
         );
 
+        // Include the JWT assertion
         requestPayload.client_assertion_type =
           "urn:ietf:params:oauth:client-assertion-type:jwt-bearer";
         requestPayload.client_assertion = jwt;
-      } else {
-        // For client_credentials, use client_id/client_secret
-        requestPayload.client_id = this.serverConfig.client_id;
-
+      } else if (this.serverConfig.auth_type === "client_credentials") {
+        // For standard client_credentials, use client_secret
         if (this.serverConfig.client_secret) {
           requestPayload.client_secret = this.serverConfig.client_secret;
         }
       }
 
       // Debug information
+      console.log("Token request to:", tokenEndpoint);
       console.log(
         "Token request payload:",
         JSON.stringify(requestPayload, null, 2),
@@ -141,7 +143,7 @@ class FHIRClient {
         body: JSON.stringify(requestPayload),
       });
 
-      // Log the raw response for debugging
+      // Get response as text first for debugging
       const responseText = await response.text();
       console.log("Token response:", responseText);
 
@@ -149,8 +151,17 @@ class FHIRClient {
         throw new Error(`Token request failed: ${responseText}`);
       }
 
-      // Parse the response
-      const tokenData = JSON.parse(responseText);
+      // Parse the response if it's valid JSON
+      let tokenData;
+      try {
+        tokenData = JSON.parse(responseText);
+      } catch (error) {
+        throw new Error(`Invalid JSON response: ${responseText}`);
+      }
+
+      if (!tokenData.access_token) {
+        throw new Error(`No access token in response: ${responseText}`);
+      }
 
       // Calculate expiry time (default to 55 minutes if expires_in not provided)
       const expiresIn = tokenData.expires_in || 3300; // 55 minutes
@@ -168,6 +179,8 @@ class FHIRClient {
       (this.init.headers as Record<string, string>)["Authorization"] =
         `Bearer ${tokenData.access_token}`;
 
+      console.log("Successfully obtained access token");
+
       // Save token to database
       await updateFhirServer(
         this.serverConfig.id,
@@ -177,10 +190,10 @@ class FHIRClient {
         this.serverConfig.last_connection_successful,
         {
           authType: this.serverConfig.auth_type as
-            | "none"
-            | "basic"
+            | "SMART"
             | "client_credentials"
-            | "SMART",
+            | "basic"
+            | "none",
           clientId: this.serverConfig.client_id,
           clientSecret: this.serverConfig.client_secret,
           tokenEndpoint: this.serverConfig.token_endpoint,
