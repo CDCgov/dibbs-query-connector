@@ -85,62 +85,54 @@ class FHIRClient {
 
       // Determine the token endpoint
       let tokenEndpoint = this.serverConfig.token_endpoint;
-
-      // If token endpoint not specified and it's SMART, try to discover it
       if (!tokenEndpoint && this.serverConfig.auth_type === "SMART") {
         tokenEndpoint = await this.discoverTokenEndpoint();
       }
-
       if (!tokenEndpoint) {
         throw new Error("Token endpoint is required for authentication");
       }
 
-      // Create request payload
-      const requestPayload: Record<string, string> = {
-        grant_type: "client_credentials",
-        // Always include the client_id explicitly in the request
-        client_id: this.serverConfig.client_id,
-      };
+      // Create URLSearchParams for all auth types
+      const formData = new URLSearchParams();
+      formData.append("grant_type", "client_credentials");
+      formData.append("client_id", this.serverConfig.client_id);
 
       // Add scopes if available
       if (this.serverConfig.scopes) {
-        requestPayload.scope = this.serverConfig.scopes;
+        formData.append("scope", this.serverConfig.scopes);
       }
 
-      // Handle authentication based on auth type
+      // Add JWT assertion for SMART auth type
       if (this.serverConfig.auth_type === "SMART") {
-        // For SMART, use JWT authentication
         const jwt = await createSmartJwt(
           this.serverConfig.client_id,
           tokenEndpoint,
         );
 
-        // Include the JWT assertion
-        requestPayload.client_assertion_type =
-          "urn:ietf:params:oauth:client-assertion-type:jwt-bearer";
-        requestPayload.client_assertion = jwt;
-      } else if (this.serverConfig.auth_type === "client_credentials") {
-        // For standard client_credentials, use client_secret
-        if (this.serverConfig.client_secret) {
-          requestPayload.client_secret = this.serverConfig.client_secret;
-        }
+        formData.append(
+          "client_assertion_type",
+          "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
+        );
+        formData.append("client_assertion", jwt);
+      } else if (
+        this.serverConfig.auth_type === "client_credentials" &&
+        this.serverConfig.client_secret
+      ) {
+        formData.append("client_secret", this.serverConfig.client_secret);
       }
 
-      // Debug information
+      // Debug the actual request payload
       console.log("Token request to:", tokenEndpoint);
-      console.log(
-        "Token request payload:",
-        JSON.stringify(requestPayload, null, 2),
-      );
+      console.log("Full request payload:", formData.toString());
 
-      // Send token request with JSON format
+      // IMPORTANT: Use the formData object for the actual request
       const response = await fetch(tokenEndpoint, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
+          "Content-Type": "application/x-www-form-urlencoded",
           Accept: "application/json",
         },
-        body: JSON.stringify(requestPayload),
+        body: formData,
       });
 
       // Get response as text first for debugging

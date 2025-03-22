@@ -31,6 +31,20 @@ export function getPrivateKey() {
 }
 
 /**
+ * Get the public key for verifying JWTs
+ * @returns The public key
+ */
+export function getPublicKey() {
+  try {
+    const keyPath = path.join(process.cwd(), "keys", "rsa-public.pem");
+    return fs.readFileSync(keyPath, "utf-8");
+  } catch (error) {
+    console.error("Error loading public key:", error);
+    throw new Error("Failed to load public key");
+  }
+}
+
+/**
  * Get the kid (Key ID) from the JWKS
  * @returns The key ID
  */
