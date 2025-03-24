@@ -14,7 +14,7 @@ import {
 } from "../../../../models/entities/users";
 import { CustomUserQuery } from "@/app/models/entities/query";
 import styles from "../usersTable/usersTable.module.scss";
-import { getContextRole } from "../../utils";
+import { getRole } from "../../utils";
 import { getCustomQueries } from "@/app/backend/query-building";
 
 type UserGroupsTableProps = {
@@ -37,7 +37,7 @@ const UserGroupsTable: React.FC<UserGroupsTableProps> = ({
   fetchGroupMembers,
 }) => {
   const { openEditSection } = useContext(UserManagementContext);
-  const role = getContextRole();
+  const role = getRole();
 
   const [queries, setQueries] = useState<CustomUserQuery[]>([]);
 

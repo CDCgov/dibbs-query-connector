@@ -6,7 +6,7 @@ import Drawer from "@/app/ui/designSystem/drawer/Drawer";
 import { UserManagementContext } from "../UserManagementProvider";
 import style from "./TeamQueryEditSection.module.scss";
 import { User, UserGroup, UserRole } from "@/app/models/entities/users";
-import { getContextRole } from "../../utils";
+import { getRole } from "../../utils";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import {
   getAllUserGroups,
@@ -52,7 +52,7 @@ const UserManagementDrawer: React.FC<UserManagementDrawerProps> = ({
     UserManagementContext,
   );
 
-  const role = getContextRole();
+  const role = getRole();
   const renderQueries = (queries: CustomUserQuery[]) => {
     if (queries.length > 0) {
       return (

@@ -8,7 +8,7 @@ import { UserRole } from "@/app/models/entities/users";
  * Function that retrieves the role value from the current session object
  * @returns - The UserRole for the current logged-in user
  */
-export function getContextRole() {
+export function getRole() {
   const { data: session } = useSession();
   const ctx = useContext(DataContext);
   const isAuthDisabled = isAuthDisabledClientCheck(ctx?.runtimeConfig);
