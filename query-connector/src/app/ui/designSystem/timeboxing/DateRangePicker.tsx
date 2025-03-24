@@ -44,8 +44,32 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
 
   const formattedStart = startDate ? startDate.toLocaleDateString() : "";
   const formattedEnd = endDate ? endDate.toLocaleDateString() : "";
+
+  const displayStart = startDate
+    ? startDate.toLocaleDateString("en-US", {
+        year: "2-digit",
+        month: "2-digit",
+        day: "2-digit",
+      })
+    : "";
+
+  const displayEnd = endDate
+    ? endDate.toLocaleDateString("en-US", {
+        year: "2-digit",
+        month: "2-digit",
+        day: "2-digit",
+      })
+    : "";
+
   const displayText =
-    formattedStart && formattedEnd ? `${formattedStart} - ${formattedEnd}` : "";
+    formattedStart && formattedEnd ? `${displayStart} - ${displayEnd}` : "";
+
+  const handleDateInputClick = (id: string) => {
+    const button = document.querySelector(
+      `#${id} ~ button[data-testid='date-picker-button']`,
+    );
+    if (button) (button as HTMLElement).click();
+  };
 
   const validateDates = (
     newStartDate: Date | null,
@@ -119,13 +143,16 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
           type="text"
           id="date-range-input"
           name="date-range-input"
+          aria-label="Date range input"
           value={displayText}
           readOnly
           onClick={() => setIsOpen((prev) => !prev)}
         />
-        {!displayText && (
-          <Icon.CalendarToday size={3} className={styles.calendarIcon} />
-        )}
+        <Icon.CalendarToday
+          size={3}
+          className={styles.calendarIcon}
+          aria-label="date-range-calendar-icon"
+        />
       </div>
       {isOpen && (
         <div className={styles.customDateRangeWrapper}>
@@ -148,13 +175,17 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
             <USWDSDateRangePicker
               startDateLabel="Start Date"
               endDateLabel="End Date"
+              aria-label="Date range picker"
               startDatePickerProps={{
                 id: "log-date-start",
                 name: "log-date-start",
                 value: formattedStart,
+                onClick: () => handleDateInputClick("log-date-start"),
                 onChange: (val?: string) => {
                   const date = val ? new Date(val) : null;
-                  if (!validateDates(date, endDate).start) {
+                  const errors = validateDates(date, endDate);
+                  setDateErrors(errors);
+                  if (Object.keys(errors).length === 0) {
                     onChange({ startDate: date, endDate });
                   }
                 },
@@ -163,16 +194,19 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
                 id: "log-date-end",
                 name: "log-date-end",
                 value: formattedEnd,
+                onClick: () => handleDateInputClick("log-date-end"),
                 onChange: (val?: string) => {
                   const date = val ? new Date(val) : null;
-                  if (!validateDates(startDate, date).end) {
+                  const errors = validateDates(startDate, date);
+                  setDateErrors(errors);
+                  if (Object.keys(errors).length === 0) {
                     onChange({ startDate, endDate: date });
                   }
                 },
               }}
             />
             {(dateErrors.start || dateErrors.end) && (
-              <p className={styles.errorText}>
+              <p className={styles.errorText} role="alert">
                 {dateErrors.start || dateErrors.end}
               </p>
             )}
