@@ -73,11 +73,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       }
 
       // Extend token with role and time to expire
-      if (token.username !== "") {
+      if (token.username && token.username !== "") {
         if (isAuthDisabledServerCheck()) {
           token.role = UserRole.SUPER_ADMIN;
         } else {
-          const role = await getUserRole(token.username as string).catch();
+          const role = await getUserRole(token.username).catch();
           token.role = role;
         }
       }
