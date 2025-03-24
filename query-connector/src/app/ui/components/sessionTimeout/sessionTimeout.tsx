@@ -43,9 +43,6 @@ const SessionTimeout: React.FC<SessionTimeoutProps> = ({
     data?.expiresIn && data?.expiresIn < idleTimeMsec
   );
 
-  // this does not work because the idle timer resets on non idle and the expiration period should be enforced!
-  // set timer for expiration and ensure timer stops when login out!
-
   const { activate, start, reset, pause, getRemainingTime } = useIdleTimer({
     timeout: idleTimeMsec,
     promptBeforeIdle: promptTimeMsec,

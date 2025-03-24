@@ -92,4 +92,36 @@ describe("SessionTimeout", () => {
     );
     jest.clearAllMocks();
   });
+
+  it("trigger sing in on token expiration", async () => {
+    const session: SessionContextValue = {
+      data: { user: { role: UserRole.STANDARD }, expiresIn: 100 } as Session,
+      status: "authenticated",
+      update: jest.fn(),
+    };
+
+    jest.spyOn(nextAuthReact, "useSession").mockReturnValue(session);
+    const signOutSpy = jest.spyOn(nextAuthReact, "signOut");
+
+    render(
+      <RootProviderMock currentPage={"/"}>
+        <SessionTimeout idleTimeMsec={1000} promptTimeMsec={500} />
+      </RootProviderMock>,
+    );
+
+    // give opportunity for a potential modal to display
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    });
+
+    const dialog = screen.getByRole("dialog", { hidden: true });
+    await waitFor(() =>
+      expect(dialog).toHaveAttribute("class", "usa-modal-wrapper is-hidden"),
+    );
+
+    await waitFor(() =>
+      expect(signOutSpy).toHaveBeenCalledWith({ redirectTo: PAGES.LANDING }),
+    );
+    jest.clearAllMocks();
+  });
 });
