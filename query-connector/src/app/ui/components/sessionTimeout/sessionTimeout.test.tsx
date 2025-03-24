@@ -93,7 +93,7 @@ describe("SessionTimeout", () => {
     jest.clearAllMocks();
   });
 
-  it("trigger sing in on token expiration", async () => {
+  it("sign out user on token expiration", async () => {
     const session: SessionContextValue = {
       data: { user: { role: UserRole.STANDARD }, expiresIn: 100 } as Session,
       status: "authenticated",
