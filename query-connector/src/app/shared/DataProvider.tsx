@@ -6,6 +6,8 @@ import { PageType } from "./constants";
 import { ToastConfigOptions } from "../ui/designSystem/toast/Toast";
 import { Session } from "next-auth";
 
+// Set session sync interval in accordance with moderate baseline controls AC-17
+// time to disconnect/revoke access no greter than 15mins.
 const REFRESH_INTERVAL_MINS = 15;
 
 export interface DataContextValue {
