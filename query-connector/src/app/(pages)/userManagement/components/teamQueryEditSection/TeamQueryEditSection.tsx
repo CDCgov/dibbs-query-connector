@@ -10,10 +10,10 @@ import { getContextRole } from "../../utils";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import {
   getAllUserGroups,
-  addSingleUserToGroup,
-  removeSingleUserFromGroup,
-  addSingleQueryToGroup,
-  removeSingleQueryFromGroup,
+  addUsersToGroup,
+  removeUsersFromGroup,
+  removeQueriesFromGroup,
+  addQueriesToGroup,
 } from "@/app/backend/usergroup-management";
 import { CustomUserQuery } from "@/app/models/entities/query";
 
@@ -155,8 +155,8 @@ const UserManagementDrawer: React.FC<UserManagementDrawerProps> = ({
 
     try {
       const updatedUserResponse = !!checked
-        ? await addSingleUserToGroup(groupId, userId)
-        : await removeSingleUserFromGroup(groupId, userId);
+        ? await addUsersToGroup(groupId, [userId])
+        : await removeUsersFromGroup(groupId, [userId]);
 
       if (updatedUserResponse.totalItems === 0) {
         throw "Unable to update group membership";
@@ -205,8 +205,8 @@ const UserManagementDrawer: React.FC<UserManagementDrawerProps> = ({
 
     try {
       const updatedQueryResponse = !!checked
-        ? await addSingleQueryToGroup(groupId, queryId)
-        : await removeSingleQueryFromGroup(groupId, queryId);
+        ? await addQueriesToGroup(groupId, [queryId])
+        : await removeQueriesFromGroup(groupId, [queryId]);
 
       if (updatedQueryResponse.totalItems === 0) {
         throw "Unable to update query assignment";
