@@ -291,7 +291,19 @@ class FHIRClient {
           this.serverConfig.hostname,
           this.serverConfig.disable_cert_validation,
           this.serverConfig.last_connection_successful,
-          tokenData.access_token,
+          {
+            authType: this.serverConfig.auth_type as
+              | "SMART"
+              | "client_credentials"
+              | "basic"
+              | "none",
+            clientId: this.serverConfig.client_id,
+            clientSecret: this.serverConfig.client_secret,
+            tokenEndpoint: this.serverConfig.token_endpoint,
+            scopes: this.serverConfig.scopes,
+            accessToken: tokenData.access_token, // Pass the access token
+            tokenExpiry: expiryIso, // Pass the token expiry
+          },
         );
       }
     } catch (error) {
