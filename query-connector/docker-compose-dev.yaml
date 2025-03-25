@@ -23,6 +23,8 @@ services:
   # Flyway migrations and DB version control
   flyway:
     image: flyway/flyway:11-alpine
+    environment:
+      - JAVA_OPTS_APPEND="-XX:UseSVE=0"
     command: -configFiles=/flyway/conf/flyway.conf -schemas=public -connectRetries=60 migrate
     volumes:
       - ./flyway/sql:/flyway/sql
@@ -83,6 +85,7 @@ services:
       PGPASSWORD: gOxAmiyiz4
       PGPORT: "5432"
       BOX_SEARCH_INCLUDE_CONFORMANT: true
+      JAVA_TOOL_OPTIONS: "-XX:UseSVE=0"
     env_file:
       - .env
   aidbox-seeder:
@@ -100,15 +103,6 @@ services:
         condition: service_started
       flyway:
         condition: service_completed_successfully
-
-  # JWKS key generator
-  jwks-generator:
-    build:
-      context: .
-      dockerfile: Dockerfile.jwks-seeder
-    volumes:
-      - "./keys:/app/keys"
-      - "./generate_jwks.sh:/app/generate_jwks.sh"
 
 volumes:
   aidbox_pg_data:
