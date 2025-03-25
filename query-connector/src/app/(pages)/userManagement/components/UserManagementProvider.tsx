@@ -1,7 +1,6 @@
 "use client";
 
 import { createContext, useState } from "react";
-import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import { User } from "@/app/models/entities/users";
 import { CustomUserQuery } from "@/app/models/entities/query";
 
@@ -29,7 +28,6 @@ interface UserManagementContext extends UserManagementData {
   ) => void;
   closeEditSection: () => void;
   handleSearch: (searchFilter: string) => void;
-  handleQueryUpdate: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 const initData: UserManagementData = {
@@ -49,7 +47,6 @@ export const UserManagementContext = createContext<UserManagementContext>({
   openEditSection: () => {},
   closeEditSection: () => {},
   handleSearch: (_searchFilter: string) => {},
-  handleQueryUpdate: () => {},
 });
 
 /**
@@ -104,28 +101,6 @@ const DataProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     console.log("filtering ...", filter);
   }
 
-  async function handleQueryUpdate(e: React.ChangeEvent<HTMLInputElement>) {
-    const queryName = e.currentTarget.name;
-    const checked = e.target.checked;
-
-    const alertText = checked
-      ? `Assigned ${queryName} to ${innerState.teamQueryEditSection.title}`
-      : `Removed ${queryName} from ${innerState.teamQueryEditSection.title}`;
-
-    try {
-      showToastConfirmation({
-        body: alertText,
-      });
-    } catch (error) {
-      showToastConfirmation({
-        heading: "Something went wrong",
-        body: alertText,
-        variant: "error",
-      });
-      console.error("Error updating group queries list:", error);
-    }
-  }
-
   return (
     <UserManagementContext.Provider
       value={{
@@ -133,7 +108,6 @@ const DataProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
         openEditSection,
         closeEditSection,
         handleSearch,
-        handleQueryUpdate,
       }}
     >
       {children}

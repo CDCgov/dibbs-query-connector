@@ -183,13 +183,12 @@ const UserManagementDrawer: React.FC<UserManagementDrawerProps> = ({
       showToastConfirmation({
         body: alertText,
       });
-    } catch (error) {
+    } catch {
       showToastConfirmation({
         heading: "Something went wrong",
-        body: alertText,
+        body: `Unable to update ${groupName} membership. Please try again or contact us if the error persists`,
         variant: "error",
       });
-      console.error("Error updating group membership:", error);
     }
   }
 
@@ -233,13 +232,12 @@ const UserManagementDrawer: React.FC<UserManagementDrawerProps> = ({
       showToastConfirmation({
         body: alertText,
       });
-    } catch (error) {
+    } catch {
       showToastConfirmation({
         heading: "Something went wrong",
-        body: alertText,
+        body: `Unable to update group assignment for ${queryName}. Please try again or contact us if the error persists`,
         variant: "error",
       });
-      console.error("Error updating group membership:", error);
     }
   }
   return (
