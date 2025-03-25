@@ -1,8 +1,8 @@
 import React from "react";
 import { Tab } from "@/app/ui/designSystem/TabGroup/tabGroup";
 import { UserRole, User } from "@/app/models/entities/users";
-import UserPermissionsTable from "./components/userPermissions/userPermissionsTable";
-import UserGroupsTable from "./components/userGroups/UserGroupsTable";
+import UserPermissionsTable from "./components/userPermissionsTable/userPermissionsTable";
+import UserGroupsTable from "./components/userGroupsTable/UserGroupsTable";
 import { QueryTableResult } from "../queryBuilding/utils";
 
 // User Mocks

@@ -2,10 +2,10 @@
 
 import { useEffect, useState, useRef } from "react";
 import UserManagementDrawer from "../teamQueryEditSection/TeamQueryEditSection";
-import UserGroupsTable from "../userGroups/UserGroupsTable";
+import UserGroupsTable from "../userGroupsTable/UserGroupsTable";
 import TabGroup, { Tab } from "@/app/ui/designSystem/TabGroup/tabGroup";
 import { Button } from "@trussworks/react-uswds";
-import UserPermissionsTable from "../userPermissions/userPermissionsTable";
+import UserPermissionsTable from "../userPermissionsTable/userPermissionsTable";
 import { QCResponse } from "@/app/models/responses/collections";
 import { User, UserGroup, UserRole } from "../../../../models/entities/users";
 import { getAllUsers } from "@/app/backend/user-management";
@@ -18,7 +18,7 @@ import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import { UserManagementMode } from "../../utils";
 import classNames from "classnames";
 import type { ModalRef } from "../../../../ui/designSystem/modal/Modal";
-import UserModal from "../../components/userModal/userModal";
+import UserModal from "../userModal/userModal";
 import { CustomUserQuery } from "@/app/models/entities/query";
 
 export type UsersTableProps = {

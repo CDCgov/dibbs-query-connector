@@ -13,7 +13,7 @@ import {
   UserGroupMembership,
 } from "../../../../models/entities/users";
 import { CustomUserQuery } from "@/app/models/entities/query";
-import styles from "../usersTable/usersTable.module.scss";
+import styles from "../userManagementContainer/userManagementContainer.module.scss";
 import { getRole } from "../../utils";
 import { getCustomQueries } from "@/app/backend/query-building";
 

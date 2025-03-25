@@ -3,7 +3,7 @@ import * as UserManagementBackend from "@/app/backend/user-management";
 import * as UserGroupManagementBackend from "@/app/backend/usergroup-management";
 import { UserRole } from "@/app/models/entities/users";
 import { renderWithUser, RootProviderMock } from "@/app/tests/unit/setup";
-import UsersTable from "./usersTable";
+import UsersTable from "./userManagementContainer";
 import {
   mockSuperAdmin,
   mockAdmin,

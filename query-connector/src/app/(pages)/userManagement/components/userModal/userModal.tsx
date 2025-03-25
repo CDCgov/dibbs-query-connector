@@ -23,7 +23,7 @@ import { UserManagementMode, ModalStates } from "../../utils";
 import Checkbox from "@/app/ui/designSystem/checkbox/Checkbox";
 import { RoleDescriptons } from "../../utils";
 import { UserManagementContext } from "../UserManagementProvider";
-import { viewMode } from "../usersTable/usersTable";
+import { viewMode } from "../userManagementContainer/userManagementContainer";
 
 const Modal = dynamic<ModalProps>(
   () =>

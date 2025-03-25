@@ -16,7 +16,7 @@ import {
   addQueriesToGroup,
 } from "@/app/backend/usergroup-management";
 import { CustomUserQuery } from "@/app/models/entities/query";
-import { viewMode } from "../usersTable/usersTable";
+import { viewMode } from "../userManagementContainer/userManagementContainer";
 
 export type UserManagementDrawerProps = {
   userGroups: UserGroup[];
