@@ -5,6 +5,18 @@ import { transaction } from "./decorators";
 import { FhirServerConfig } from "@/app/models/entities/fhir-servers";
 import { superAdminAccessCheck } from "@/app/utils/auth";
 
+// Define an interface for authentication data
+export interface AuthData {
+  authType: "none" | "basic" | "client_credentials" | "SMART";
+  bearerToken?: string;
+  clientId?: string;
+  clientSecret?: string;
+  tokenEndpoint?: string;
+  scopes?: string;
+  accessToken?: string;
+  tokenExpiry?: string;
+}
+
 class FhirServerConfigService {
   private static dbClient: Pool = getDbClient();
   private static cachedFhirServerConfigs: FhirServerConfig[] | null = null;

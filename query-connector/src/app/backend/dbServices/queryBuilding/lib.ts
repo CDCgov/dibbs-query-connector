@@ -11,7 +11,8 @@ import { Pool } from "pg";
 // The underlying functionality here is reused in Playwright to do some
 // test setup, but for some DUMB reason Playwright refuses to play nicely with
 // decorators. As a workaround, we're doing some fiddly imports to expose the
-// underlying logic away from the decorated exports
+// underlying logic away from the decorated exports available in the class exported
+// in query-building.ts
 
 /**
  * Backend handler function for upserting a query

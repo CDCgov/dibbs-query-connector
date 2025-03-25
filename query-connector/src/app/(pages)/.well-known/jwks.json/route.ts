@@ -1,17 +1,12 @@
 import { NextResponse } from "next/server";
-import fs from "fs";
-import path from "path";
+import { getOrCreateKeys } from "../../../backend/dbServices/smartOnFhir/lib";
 
 export async function GET() {
   try {
-    // Path to the JWKS file
-    const jwksPath = path.join(process.cwd(), "keys", "jwks.json");
+    // Get or create JWKS
+    const jwks = await getOrCreateKeys();
 
-    // Read the JWKS file
-    const jwksContent = fs.readFileSync(jwksPath, "utf-8");
-    const jwks = JSON.parse(jwksContent);
-
-    // Return the JWKS as JSON
+    // Return the JWKS as JSON with appropriate headers
     return NextResponse.json(jwks, {
       headers: {
         "Cache-Control": "public, max-age=3600", // Cache for 1 hour
@@ -20,6 +15,9 @@ export async function GET() {
     });
   } catch (error) {
     console.error("Error serving JWKS:", error);
-    return NextResponse.json({ error: "Failed to load JWKS" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to load or generate JWKS" },
+      { status: 500 },
+    );
   }
 }

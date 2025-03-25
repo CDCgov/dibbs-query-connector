@@ -1,5 +1,5 @@
+import FHIRClient from "@/app/shared/fhirClient";
 import { NextRequest, NextResponse } from "next/server";
-import { testFhirServerConnection } from "../../shared/query-service";
 
 /**
  * Test FHIR connection
@@ -9,7 +9,7 @@ import { testFhirServerConnection } from "../../shared/query-service";
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { url, bearerToken } = body;
+    const { url, disableCertValidation, authData } = body;
 
     if (!url) {
       return NextResponse.json(
@@ -18,12 +18,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const result = await testFhirServerConnection(url, bearerToken);
+    const result = await FHIRClient.testConnection(
+      url,
+      disableCertValidation,
+      authData,
+    );
+
     return NextResponse.json(result);
   } catch (error) {
     console.error("Error testing FHIR connection:", error);
     return NextResponse.json(
-      { success: false, error: "Internal server error" },
+      {
+        success: false,
+        error: error instanceof Error ? error.message : "Internal server error",
+      },
       { status: 500 },
     );
   }

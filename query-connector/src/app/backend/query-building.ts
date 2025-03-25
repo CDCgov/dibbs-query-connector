@@ -4,6 +4,11 @@ import { getDbClient } from "./dbClient";
 import { DibbsValueSet } from "../models/entities/valuesets";
 import { adminAccessCheck } from "../utils/auth";
 import { CustomUserQuery } from "../models/entities/query";
+
+// TODO: the functionality in this file should eventually be moved into the
+// TODO: corresponding file in dbServices within the service class pattern to
+// TODO: take advantage of our decorator patterns
+
 const dbClient = getDbClient();
 
 /**
