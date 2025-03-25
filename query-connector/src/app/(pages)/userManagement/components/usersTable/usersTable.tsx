@@ -26,6 +26,13 @@ export type UsersTableProps = {
   handleOpenModal?: (mode: UserManagementMode) => void;
 };
 
+export type viewMode =
+  | "Load default"
+  | "Load Users"
+  | "Load User groups"
+  | "Update Users"
+  | "Update User groups";
+
 /**
  * UsersTable container component
  * @param root0 - UsersTable container props
@@ -39,16 +46,16 @@ const UsersTable: React.FC<UsersTableProps> = ({ role }) => {
 
   const [userGroups, setUserGroups] = useState<UserGroup[]>([]);
   const [modalMode, setModalMode] = useState<UserManagementMode>("closed");
-  const [shouldRefreshView, setShouldRefreshView] = useState<boolean | string>(
-    "default",
-  );
+  const [shouldRefreshView, setShouldRefreshView] = useState<
+    boolean | viewMode
+  >("Load default");
 
   const modalRef = useRef<ModalRef>(null);
 
   const setTab = (e: React.MouseEvent<HTMLElement>) => {
     const clickedTab = e.currentTarget.innerHTML;
     const tabObj = tabsForRole.filter((tab) => tab.label == clickedTab)[0];
-    setShouldRefreshView(tabObj.label);
+    setShouldRefreshView(`Load ${tabObj.label}` as viewMode);
     setActiveTab(tabObj);
   };
 
@@ -192,35 +199,37 @@ const UsersTable: React.FC<UsersTableProps> = ({ role }) => {
   // doesn't change back to default when we update data in the
   // background (e.g. after clicking checkboxes in the drawer)
   useEffect(() => {
-    if (shouldRefreshView == "default") {
+    if (shouldRefreshView == "Load default") {
       setActiveTab(defaultTab);
       setShouldRefreshView(false);
     }
-    if (shouldRefreshView == "Users") {
+
+    if (shouldRefreshView == "Load Users") {
       setActiveTab(usersTab);
     }
 
-    if (shouldRefreshView == "User groups") {
-      setActiveTab(activeTab); // group membership is editable from either view
+    if (shouldRefreshView == "Load User groups") {
+      setActiveTab(groupsTab);
     }
-  }, [users]);
+  }, [users, userGroups]);
 
-  // update the table display when we modify data via the modal
-  // or when we click to change tabs
+  // update the table display when we modify data
   useEffect(() => {
     if (shouldRefreshView == false) {
       return;
     }
 
-    if (activeTab.label == "Users") {
+    if (shouldRefreshView == "Update Users") {
+      // fetch triggers useEffect above; refresh view determines which tab to re-draw
       fetchUsers().then(() => {
-        setActiveTab(usersTab);
+        setShouldRefreshView("Load Users");
       });
     }
 
-    if (activeTab.label == "User groups") {
+    if (shouldRefreshView == "Update User groups") {
+      // fetch triggers useEffect above; refresh view determines which tab to re-draw
       fetchUserGroups().then(() => {
-        setActiveTab(groupsTab);
+        setShouldRefreshView("Load User groups");
       });
     }
     setShouldRefreshView(false);
@@ -231,7 +240,8 @@ const UsersTable: React.FC<UsersTableProps> = ({ role }) => {
     modalRef.current?.toggleModal();
   };
 
-  const dataLoaded = !!users && !!userGroups;
+  const dataLoaded =
+    role == UserRole.ADMIN ? !!users && !!userGroups : !!userGroups;
 
   return (
     <>

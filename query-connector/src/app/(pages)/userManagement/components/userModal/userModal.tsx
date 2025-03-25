@@ -7,9 +7,9 @@ import {
   updateUserDetails,
 } from "@/app/backend/user-management";
 import {
-  addMultipleUsersToGroup,
   createUserGroup,
   updateUserGroup,
+  addUsersToGroup,
 } from "@/app/backend/usergroup-management";
 import {
   User,
@@ -23,6 +23,7 @@ import { UserManagementMode, ModalStates } from "../../utils";
 import Checkbox from "@/app/ui/designSystem/checkbox/Checkbox";
 import { RoleDescriptons } from "../../utils";
 import { UserManagementContext } from "../UserManagementProvider";
+import { viewMode } from "../usersTable/usersTable";
 
 const Modal = dynamic<ModalProps>(
   () =>
@@ -37,7 +38,7 @@ export interface UserModalProps {
   modalRef: React.RefObject<ModalRef>;
   modalMode: UserManagementMode;
   setModalMode: (arg: UserManagementMode) => void;
-  refreshView: React.Dispatch<React.SetStateAction<boolean | string>>;
+  refreshView: React.Dispatch<React.SetStateAction<boolean | viewMode>>;
   userGroups?: UserGroup[] | null;
 }
 
@@ -86,7 +87,7 @@ const UserModal: React.FC<UserModalProps> = ({
   }, [modalMode]);
 
   useEffect(() => {
-    if (newGroup.id) {
+    if (newGroup.id !== "") {
       openEditSection(
         newGroup.name,
         "Members",
@@ -94,7 +95,7 @@ const UserModal: React.FC<UserModalProps> = ({
         newGroup.id,
         newGroup.members as User[],
       );
-      refreshView("User groups");
+      refreshView("Update User groups");
       setNewGroup(emptyGroup);
     }
   }, [newGroup]);
@@ -136,7 +137,7 @@ const UserModal: React.FC<UserModalProps> = ({
         return setErrorMessage(newUserAdded.msg);
       } else {
         setNewUser({ ...newUser, ...newUserAdded });
-        refreshView("Users");
+        refreshView("Update Users");
         return emptyGroups
           ? setModalMode("closed")
           : setModalMode("select-groups");
@@ -147,10 +148,10 @@ const UserModal: React.FC<UserModalProps> = ({
       if (newUser.id && !errorMessage) {
         // update db on save
         newUser.userGroupMemberships?.forEach(async (membership) => {
-          await addMultipleUsersToGroup(membership.usergroup_id, [newUser.id]);
+          await addUsersToGroup(membership.usergroup_id, [newUser.id]);
         });
 
-        refreshView("Users");
+        refreshView("Update Users");
         setNewUser(emptyUser);
         setModalMode("closed");
       } else {
@@ -174,7 +175,7 @@ const UserModal: React.FC<UserModalProps> = ({
         );
         if (updatedGroup) {
           setNewGroup({ ...newGroup, ...(updatedGroup as UserGroup) });
-          refreshView("User groups");
+          refreshView("Update User groups");
           setModalMode("closed");
         } else {
           setModalMode("closed");
@@ -188,6 +189,7 @@ const UserModal: React.FC<UserModalProps> = ({
           return setErrorMessage("Unable to add group.");
         } else {
           setNewGroup({ ...newGroup, ...newGroupAdded.items[0] });
+          refreshView("Update User groups");
           setModalMode("closed");
         }
       }

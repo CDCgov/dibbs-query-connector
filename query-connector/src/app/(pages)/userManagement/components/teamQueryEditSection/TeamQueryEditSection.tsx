@@ -16,13 +16,14 @@ import {
   addQueriesToGroup,
 } from "@/app/backend/usergroup-management";
 import { CustomUserQuery } from "@/app/models/entities/query";
+import { viewMode } from "../usersTable/usersTable";
 
 export type UserManagementDrawerProps = {
   userGroups: UserGroup[];
   setUserGroups: Dispatch<SetStateAction<UserGroup[]>>;
   users: User[];
   setUsers: Dispatch<SetStateAction<User[]>>;
-  refreshView: Dispatch<SetStateAction<boolean | string>>;
+  refreshView: Dispatch<SetStateAction<boolean | viewMode>>;
   activeTabLabel: string;
   allQueries: CustomUserQuery[];
   setAllQueries: Dispatch<SetStateAction<CustomUserQuery[]>>;
@@ -177,7 +178,7 @@ const UserManagementDrawer: React.FC<UserManagementDrawerProps> = ({
 
       setUsers(newUsersList);
       setUserGroups(updatedUserGroups.items); // for refreshing member count in table view
-      refreshView(activeTabLabel);
+      refreshView(`Update ${activeTabLabel}` as viewMode);
 
       showToastConfirmation({
         body: alertText,
@@ -228,7 +229,7 @@ const UserManagementDrawer: React.FC<UserManagementDrawerProps> = ({
 
       setAllQueries(newQueriesList);
       setUserGroups(updatedUserGroups.items); // for refreshing query count in table view
-      refreshView(activeTabLabel);
+      refreshView(`Update ${activeTabLabel}` as viewMode);
       showToastConfirmation({
         body: alertText,
       });
