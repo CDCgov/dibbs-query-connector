@@ -10,6 +10,8 @@ export type Tab = {
   path?: string;
   onClick?: (e: React.MouseEvent<HTMLElement>) => void;
   renderContent?: (users?: User[], userGroups?: UserGroup[]) => JSX.Element;
+  // TODO: rework this so renderContent isn't tied to user management; see
+  // https://linear.app/skylight-cdc/issue/QUE-217/rework-tabtabgroup-component-so-its-not-limited-to-user-management
 };
 
 export interface TabGroupProps {
