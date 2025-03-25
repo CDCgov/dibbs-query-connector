@@ -21,6 +21,7 @@ const dbClient = getDbClient();
 export async function createUserGroup(
   groupName: string,
 ): Promise<QCResponse<UserGroup>> {
+  // TODO: https://linear.app/skylight-cdc/issue/QUE-216/refactor-user-management-code-into-service-class-pattern
   if (!(await superAdminAccessCheck())) {
     throw new Error("Unauthorized");
   }
@@ -66,6 +67,7 @@ export async function updateUserGroup(
   id: string,
   newName: string,
 ): Promise<UserGroup | string> {
+  // TODO: https://linear.app/skylight-cdc/issue/QUE-216/refactor-user-management-code-into-service-class-pattern
   if (!(await superAdminAccessCheck())) {
     throw new Error("Unauthorized");
   }
@@ -122,6 +124,7 @@ export async function updateUserGroup(
  * @returns The deleted user group or an error if the deletion fails.
  */
 export async function deleteUserGroup(id: string): Promise<UserGroup | string> {
+  // TODO: https://linear.app/skylight-cdc/issue/QUE-216/refactor-user-management-code-into-service-class-pattern
   if (!(await superAdminAccessCheck())) {
     throw new Error("Unauthorized");
   }
@@ -267,6 +270,7 @@ export async function saveUserGroupMembership(
   groupId: string,
   selectedUsers: string[],
 ): Promise<User[]> {
+  // TODO: https://linear.app/skylight-cdc/issue/QUE-216/refactor-user-management-code-into-service-class-pattern
   if (!(await superAdminAccessCheck())) {
     throw new Error("Unauthorized");
   }
@@ -310,6 +314,7 @@ export async function saveUserGroupMembership(
  * @returns A list of user groups registered in the query connector.
  */
 export async function getAllUserGroups(): Promise<QCResponse<UserGroup>> {
+  // TODO: https://linear.app/skylight-cdc/issue/QUE-216/refactor-user-management-code-into-service-class-pattern
   if (!(await adminAccessCheck())) {
     throw new Error("Unauthorized");
   }
@@ -353,6 +358,7 @@ export async function getAllUserGroups(): Promise<QCResponse<UserGroup>> {
  * @returns A UserGroup object with the given id
  */
 export async function getUserGroupById(id: string): Promise<UserGroup> {
+  // TODO: https://linear.app/skylight-cdc/issue/QUE-216/refactor-user-management-code-into-service-class-pattern
   if (!(await adminAccessCheck())) {
     throw new Error("Unauthorized");
   }
@@ -547,6 +553,7 @@ export async function removeQueriesFromGroup(
 export async function getSingleQueryGroupAssignments(
   queryId: string,
 ): Promise<QCResponse<CustomUserQuery>> {
+  // TODO: https://linear.app/skylight-cdc/issue/QUE-216/refactor-user-management-code-into-service-class-pattern
   if (!(await adminAccessCheck())) {
     throw new Error("Unauthorized");
   }
