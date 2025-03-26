@@ -356,6 +356,7 @@ const FhirServers: React.FC = () => {
             <TextInput
               id="client-secret"
               name="client-secret"
+              data-testid="client-secret"
               type="password"
               value={clientSecret}
               onChange={(e) => setClientSecret(e.target.value)}
@@ -366,6 +367,7 @@ const FhirServers: React.FC = () => {
             <TextInput
               id="token-endpoint"
               name="token-endpoint"
+              data-testid="token-endpoint"
               type="url"
               value={tokenEndpoint}
               onChange={(e) => setTokenEndpoint(e.target.value)}
@@ -376,6 +378,7 @@ const FhirServers: React.FC = () => {
             <TextInput
               id="scopes"
               name="scopes"
+              data-testid="scopes"
               type="text"
               value={scopes}
               onChange={(e) => setScopes(e.target.value)}
@@ -390,6 +393,7 @@ const FhirServers: React.FC = () => {
             <TextInput
               id="client-id"
               name="client-id"
+              data-testid="client-id"
               type="text"
               value={clientId}
               onChange={(e) => setClientId(e.target.value)}
@@ -415,6 +419,7 @@ const FhirServers: React.FC = () => {
             </div>
             <TextInput
               id="scopes"
+              data-testid="scopes"
               name="scopes"
               type="text"
               value={scopes}
@@ -531,6 +536,7 @@ const FhirServers: React.FC = () => {
           <Label htmlFor="server-name">Server name</Label>
           <TextInput
             id="server-name"
+            data-testid="server-name"
             name="server-name"
             type="text"
             value={serverName}
@@ -540,6 +546,7 @@ const FhirServers: React.FC = () => {
           <Label htmlFor="server-url">URL</Label>
           <TextInput
             id="server-url"
+            data-testid="server-url"
             name="server-url"
             type="url"
             value={serverUrl}
@@ -550,6 +557,7 @@ const FhirServers: React.FC = () => {
           <select
             className="usa-select"
             id="auth-method"
+            data-testid="auth-method"
             name="auth-method"
             value={authMethod}
             onChange={(e) => {

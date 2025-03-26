@@ -1,9 +1,36 @@
 import { TEST_URL } from "../playwright-setup";
-import { test } from "@playwright/test";
+import { test, expect } from "@playwright/test";
+import { E2E_SMART_TEST_CLIENT_ID } from "./constants";
 
 test.describe("the e2e SMART on FHIR flow", () => {
   test("successfully validates the e2e flow", async ({ page }) => {
     await page.goto(`${TEST_URL}/fhirServers`);
-    page.getByText("New server").click();
+    expect(
+      page.getByRole("heading", { name: "FHIR server configuration" }),
+    ).toBeVisible();
+
+    await page.getByRole("button", { name: "New server" }).click();
+    await expect(
+      page.getByRole("heading", { name: "New server" }),
+    ).toBeVisible();
+
+    const serverName = `E2E Smart on FHIR ${Math.random() * 100}`;
+    await page.getByTestId("server-name").fill(serverName);
+
+    await page.getByTestId("server-url").fill("http://localhost:8080");
+
+    await page.getByTestId("auth-method").selectOption("SMART");
+    await page.getByTestId("client-id").fill(E2E_SMART_TEST_CLIENT_ID);
+
+    await page.getByTestId("scopes").fill("system/*.read");
+
+    await page.getByRole("button", { name: "Test connection" }).click();
+    await expect(page.getByRole("button", { name: "Success" })).toBeVisible();
+
+    await page.getByRole("button", { name: "Add server" }).click();
+
+    await expect(
+      page.getByRole("row").filter({ hasText: serverName }),
+    ).toHaveText(/Connected/);
   });
 });
