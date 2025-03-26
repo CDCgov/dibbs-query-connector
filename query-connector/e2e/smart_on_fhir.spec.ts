@@ -17,7 +17,9 @@ test.describe("the e2e SMART on FHIR flow", () => {
     const serverName = `E2E Smart on FHIR ${Math.random() * 100}`;
     await page.getByTestId("server-name").fill(serverName);
 
-    await page.getByTestId("server-url").fill("http://localhost:8080");
+    await page
+      .getByTestId("server-url")
+      .fill(process.env.AIDBOX_BASE_URL as string);
 
     await page.getByTestId("auth-method").selectOption("SMART");
     await page.getByTestId("client-id").fill(E2E_SMART_TEST_CLIENT_ID);
