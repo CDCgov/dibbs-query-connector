@@ -28,6 +28,7 @@ const TEST_USER_3_ID = "00000000-0000-0000-0000-000000000004";
 const TEST_QUERY_1_ID = "00000000-0000-0000-0000-000000000005";
 const TEST_QUERY_2_ID = "00000000-0000-0000-0000-000000000006";
 const TEST_QUERY_3_ID = "00000000-0000-0000-0000-000000000007";
+const TEST_QUERY_CONDITIONS: string[] = [];
 
 describe("User Group and Query Membership Tests", () => {
   beforeAll(async () => {
@@ -56,17 +57,18 @@ describe("User Group and Query Membership Tests", () => {
     await dbClient.query(insertGroupQuery, [TEST_GROUP_ID]);
 
     // Insert test queries
-    const insertQueryQuery = `INSERT INTO query (id, query_name)
+    const insertQueryQuery = `INSERT INTO query (id, query_name, conditions_list)
     VALUES
-      ($1, 'Test Query 1'),
-      ($2, 'Test Query 2'),
-      ($3, 'Test Query 3');
+      ($1, 'Test Query 1', $4),
+      ($2, 'Test Query 2', $4),
+      ($3, 'Test Query 3', $4);
     `;
 
     await dbClient.query(insertQueryQuery, [
       TEST_QUERY_1_ID,
       TEST_QUERY_2_ID,
       TEST_QUERY_3_ID,
+      TEST_QUERY_CONDITIONS,
     ]);
   });
 
@@ -162,8 +164,8 @@ describe("User Group and Query Membership Tests", () => {
    */
   test("should remove multiple users from a group", async () => {
     const users: User[] = await getAllUsersWithSingleGroupStatus(TEST_GROUP_ID);
-    const members = users.filter((user) =>
-      user.userGroupMemberships?.some((m) => m.is_member),
+    const members = users.filter(
+      (user) => user.userGroupMemberships?.some((m) => m.is_member),
     );
     expect(members.length).toBe(3);
 
@@ -199,8 +201,8 @@ describe("User Group and Query Membership Tests", () => {
     expect(result.items.length).toBe(1);
 
     const users: User[] = await getAllUsersWithSingleGroupStatus(TEST_GROUP_ID);
-    const members = users.filter((user) =>
-      user.userGroupMemberships?.some((m) => m.is_member),
+    const members = users.filter(
+      (user) => user.userGroupMemberships?.some((m) => m.is_member),
     );
 
     expect(members.length).toBe(0);
