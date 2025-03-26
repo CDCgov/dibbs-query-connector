@@ -2,7 +2,7 @@ import { TEST_URL } from "../playwright-setup";
 import { test, expect } from "@playwright/test";
 import { E2E_SMART_TEST_CLIENT_ID } from "./constants";
 
-test.describe("the e2e SMART on FHIR flow", () => {
+test.describe("SMART on FHIR", () => {
   test("successfully validates the e2e flow", async ({ page }) => {
     await page.goto(`${TEST_URL}/fhirServers`);
     expect(
