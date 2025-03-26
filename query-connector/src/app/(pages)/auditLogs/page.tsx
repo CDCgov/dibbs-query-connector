@@ -60,7 +60,9 @@ const AuditLogs: React.FC = () => {
         ...entry,
         date: new Date(entry.date.getTime() + index * 86400000),
       })),
-    ).flat();
+    )
+      .flat()
+      .sort((a, b) => b.date.getTime() - a.date.getTime());
   }, []);
 
   const [filteredLogs, setFilteredLogs] = useState(logs);

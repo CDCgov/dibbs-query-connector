@@ -25,6 +25,12 @@ interface DateRangePickerProps {
   onChange: (dates: { startDate: Date | null; endDate: Date | null }) => void;
 }
 
+const normalizeStart = (date: Date | null) =>
+  date ? new Date(date.setHours(0, 0, 0, 0)) : null;
+
+const normalizeEnd = (date: Date | null) =>
+  date ? new Date(date.setHours(23, 59, 59, 999)) : null;
+
 /**
  * A date range picker component with a toggleable modal.
  * @param root0 - The component props.
@@ -34,10 +40,12 @@ interface DateRangePickerProps {
  * @returns - The date range picker component.
  */
 const DateRangePicker: React.FC<DateRangePickerProps> = ({
-  startDate,
-  endDate,
+  startDate: initialStart,
+  endDate: initialEnd,
   onChange,
 }) => {
+  const [startDate, setStartDate] = useState<Date | null>(initialStart);
+  const [endDate, setEndDate] = useState<Date | null>(initialEnd);
   const [dateErrors, setDateErrors] = useState<DateErrors>({});
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -106,8 +114,9 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
   };
 
   useEffect(() => {
-    validateDates(startDate, endDate);
-  }, [startDate, endDate]);
+    setStartDate(initialStart);
+    setEndDate(initialEnd);
+  }, [initialStart, initialEnd]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -118,23 +127,30 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
         setIsOpen(false);
       }
     };
-    if (isOpen && startDate && endDate) {
+
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (isOpen) {
       const startInput = document.getElementById(
         "log-date-start",
       ) as HTMLInputElement;
       const endInput = document.getElementById(
         "log-date-end",
       ) as HTMLInputElement;
-      if (startInput) startInput.value = startDate.toLocaleDateString();
-      if (endInput) endInput.value = endDate.toLocaleDateString();
+      if (startInput)
+        startInput.value = startDate ? startDate.toLocaleDateString() : "";
+      if (endInput)
+        endInput.value = endDate ? endDate.toLocaleDateString() : "";
     }
-    if (isOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-    } else {
-      document.removeEventListener("mousedown", handleClickOutside);
-    }
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [isOpen]);
+  }, [isOpen, startDate, endDate]);
 
   return (
     <div className={styles.datePickerContainer} ref={containerRef}>
@@ -161,12 +177,29 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
               <Button
                 unstyled
                 type="button"
+                data-testid="date-range-clear-button"
                 className={styles.clearButton}
                 onClick={() => {
-                  onChange({ startDate: null, endDate: null });
+                  setStartDate(null);
+                  setEndDate(null);
                   setDateErrors({});
                   setIsOpen(false);
-                  setTimeout(() => setIsOpen(true), 0);
+                  onChange({ startDate: null, endDate: null });
+                  setTimeout(() => {
+                    const startInput = document.getElementById(
+                      "log-date-start",
+                    ) as HTMLInputElement;
+                    const endInput = document.getElementById(
+                      "log-date-end",
+                    ) as HTMLInputElement;
+                    if (startInput) startInput.value = "";
+                    if (endInput) endInput.value = "";
+
+                    const inputField = document.getElementById(
+                      "date-range-input",
+                    ) as HTMLInputElement;
+                    if (inputField) inputField.value = "";
+                  });
                 }}
               >
                 Clear
@@ -180,13 +213,18 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
                 id: "log-date-start",
                 name: "log-date-start",
                 value: formattedStart,
-                onClick: () => handleDateInputClick("log-date-start"),
+                // onClick: () => handleDateInputClick("log-date-start"),
                 onChange: (val?: string) => {
-                  const date = val ? new Date(val) : null;
+                  const rawDate = val ? new Date(val) : null;
+                  const date = normalizeStart(rawDate);
                   const errors = validateDates(date, endDate);
                   setDateErrors(errors);
+                  setStartDate(date);
                   if (Object.keys(errors).length === 0) {
-                    onChange({ startDate: date, endDate });
+                    onChange({
+                      startDate: date,
+                      endDate: normalizeEnd(endDate),
+                    });
                   }
                 },
               }}
@@ -194,13 +232,18 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
                 id: "log-date-end",
                 name: "log-date-end",
                 value: formattedEnd,
-                onClick: () => handleDateInputClick("log-date-end"),
+                // onClick: () => handleDateInputClick("log-date-end"),
                 onChange: (val?: string) => {
-                  const date = val ? new Date(val) : null;
+                  const rawDate = val ? new Date(val) : null;
+                  const date = normalizeEnd(rawDate);
                   const errors = validateDates(startDate, date);
                   setDateErrors(errors);
+                  setEndDate(date);
                   if (Object.keys(errors).length === 0) {
-                    onChange({ startDate, endDate: date });
+                    onChange({
+                      startDate: normalizeStart(startDate),
+                      endDate: date,
+                    });
                   }
                 },
               }}

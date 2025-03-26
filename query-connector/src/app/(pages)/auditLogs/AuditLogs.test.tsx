@@ -124,7 +124,7 @@ describe("AuditLogs Component", () => {
 
     await waitFor(() => {
       const rows = screen.getAllByRole("row");
-      expect(rows.length).toBe(26); // 25 logs + 1 header row
+      expect(rows.length).toBe(26);
     });
   });
 
@@ -145,6 +145,94 @@ describe("AuditLogs Component", () => {
 
     await waitFor(() => {
       expect(screen.getByRole("table")).toBeInTheDocument();
+    });
+  });
+
+  test("updates start and end date inputs", async () => {
+    await screen.findByText("Audit Log");
+
+    const startInput = screen.getByRole("textbox", {
+      name: /date range input/i,
+    });
+    await user.click(startInput);
+
+    const resolvedStart = document.getElementById(
+      "log-date-start",
+    ) as HTMLInputElement;
+    const resolvedEnd = document.getElementById(
+      "log-date-end",
+    ) as HTMLInputElement;
+
+    expect(resolvedStart).toBeInTheDocument();
+    expect(resolvedEnd).toBeInTheDocument();
+
+    await user.clear(resolvedStart);
+    await user.type(resolvedStart, "02/28/2025");
+
+    await user.clear(resolvedEnd);
+    await user.type(resolvedEnd, "03/01/2025");
+
+    await waitFor(() => {
+      expect(resolvedStart.value).toBe("2/28/2025");
+      expect(resolvedEnd.value).toBe("3/1/2025");
+    });
+  });
+
+  test("clears both start and end dates when Clear is clicked", async () => {
+    await screen.findByText("Audit Log");
+
+    const input = screen.getByRole("textbox", { name: /date range input/i });
+    await user.click(input);
+
+    const resolvedStart = document.getElementById(
+      "log-date-start",
+    ) as HTMLInputElement;
+    const resolvedEnd = document.getElementById(
+      "log-date-end",
+    ) as HTMLInputElement;
+
+    await user.clear(resolvedStart);
+    await user.type(resolvedStart, "02/28/2025");
+
+    await user.clear(resolvedEnd);
+    await user.type(resolvedEnd, "03/01/2025");
+
+    console.log("resolvedStart.value", resolvedStart.value);
+    console.log("resolvedEnd.value", resolvedEnd.value);
+
+    const clearButton = screen.getByTestId("date-range-clear-button");
+    await user.click(clearButton);
+
+    await waitFor(() => {
+      expect(resolvedStart.value).toBe("");
+      expect(resolvedEnd.value).toBe("");
+    });
+  });
+
+  test("shows validation message for invalid start date format", async () => {
+    await screen.findByText("Audit Log");
+
+    const startInput = screen.getByRole("textbox", {
+      name: /date range input/i,
+    });
+    await user.click(startInput);
+
+    const resolvedStart = document.getElementById(
+      "log-date-start",
+    ) as HTMLInputElement;
+    const resolvedEnd = document.getElementById(
+      "log-date-end",
+    ) as HTMLInputElement;
+
+    await user.clear(resolvedStart);
+    await user.type(resolvedStart, "invalid-date");
+
+    await user.clear(resolvedEnd);
+    await user.type(resolvedEnd, "03/01/2025");
+
+    await waitFor(() => {
+      const alert = screen.getByRole("alert");
+      expect(alert).toHaveTextContent("Invalid start date format");
     });
   });
 });
