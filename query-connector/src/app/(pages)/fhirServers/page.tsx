@@ -408,6 +408,7 @@ const FhirServers: React.FC = () => {
             <TextInput
               id="token-endpoint"
               name="token-endpoint"
+              data-testid="token-endpoint"
               type="url"
               value={tokenEndpoint}
               onChange={(e) => setTokenEndpoint(e.target.value)}

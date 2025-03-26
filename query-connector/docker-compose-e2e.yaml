@@ -78,6 +78,7 @@ services:
       - .env
     environment:
       - AIDBOX_BASE_URL=http://aidbox:8080
+      - APP_HOSTNAME=http://query-connector:3000
     depends_on:
       db:
         condition: service_healthy

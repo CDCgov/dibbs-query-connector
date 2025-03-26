@@ -11,4 +11,4 @@ RUN chmod +x /seed_aidbox.sh
 RUN mkdir /data
 
 ENTRYPOINT ["/bin/bash", "-c"]
-CMD ["/seed_aidbox.sh $AIDBOX_BASE_URL"]
+CMD ["/seed_aidbox.sh $AIDBOX_BASE_URL $APP_HOSTNAME"]

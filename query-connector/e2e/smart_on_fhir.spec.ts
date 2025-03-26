@@ -25,6 +25,9 @@ test.describe("SMART on FHIR", () => {
     await page.getByTestId("client-id").fill(E2E_SMART_TEST_CLIENT_ID);
 
     await page.getByTestId("scopes").fill("system/*.read");
+    await page
+      .getByTestId("token-endpoint")
+      .fill(`${process.env.APP_HOSTNAME}/.well-known/jwks.json`);
 
     await page.getByRole("button", { name: "Test connection" }).click();
     await expect(page.getByRole("button", { name: "Success" })).toBeVisible();

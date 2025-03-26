@@ -2,6 +2,7 @@
 
 # Environment variables set by docker-compose
 BASE_URL=$1
+APP_HOSTNAME=$2
 NETWORK_URL=http://aidbox:8080
 AIDBOX_CLIENT_SECRET="L6AGe_5V2O"
 DB_ADDRESS="db"
@@ -84,7 +85,7 @@ curl -L -X PUT \
     "scope": [
       "system/*.read"
     ],
-    "jwks_uri": "http://host.docker.internal:3000/.well-known/jwks.json",
+    "jwks_uri": "http://query-connector:3000/.well-known/jwks.json",
     "grant_types": [
       "client_credentials"
     ]
