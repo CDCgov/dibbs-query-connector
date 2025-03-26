@@ -208,6 +208,7 @@ export async function updateUserRole(
 export async function checkUserExists(
   userId: string,
 ): Promise<QCResponse<User>> {
+  console.log("make sure theres a userId", userId);
   if (!userId) {
     return { totalItems: 0, items: [] };
   }
@@ -218,6 +219,7 @@ export async function checkUserExists(
   };
 
   const userCheckResult = await dbClient.query(userCheckQuery);
+  console.log("userCheckResult", userCheckResult.rows);
   if (userCheckResult.rows.length === 0) {
     return { totalItems: 0, items: [] };
   }
@@ -335,7 +337,7 @@ export async function getSingleUserWithGroupMemberships(
   }
 
   const userCheckResult = await checkUserExists(userId);
-
+  console.log("kcd user check:", userCheckResult);
   if (!userCheckResult || userCheckResult?.totalItems == 0) {
     return { totalItems: 0, items: [] };
   }

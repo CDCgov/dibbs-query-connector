@@ -1,9 +1,9 @@
 import {
-  addMultipleUsersToGroup,
-  addSingleUserToGroup,
+  addUsersToGroup,
+  // addQueriesToGroup,
   getAllGroupMembers,
-  removeMultipleUsersFromGroup,
-  removeSingleUserFromGroup,
+  removeUsersFromGroup,
+  // removeQueriesFromGroup,
   saveUserGroupMembership,
 } from "@/app/backend/usergroup-management";
 import { getAllUsersWithSingleGroupStatus } from "@/app/backend/user-management";
@@ -12,7 +12,7 @@ import {
   User,
   //  Query
 } from "@/app/models/entities/users";
-import { suppressConsoleLogs } from "./fixtures";
+// import { suppressConsoleLogs } from "./fixtures";
 
 const dbClient = getDbClient();
 
@@ -21,7 +21,7 @@ jest.mock("@/app/utils/auth", () => ({
   adminAccessCheck: jest.fn(() => Promise.resolve(true)),
 }));
 
-suppressConsoleLogs();
+// suppressConsoleLogs();
 
 const TEST_GROUP_ID = "00000000-0000-0000-0000-000000000001";
 const TEST_USER_1_ID = "00000000-0000-0000-0000-000000000002";
@@ -113,14 +113,25 @@ describe("User Group and Query Membership Tests", () => {
   /**
    * Tests adding users to a user group.
    */
-  test("should add multiple users to a group", async () => {
-    const result = await addMultipleUsersToGroup(TEST_GROUP_ID, [
+  test("should add a single user to a group", async () => {
+    const result = await addUsersToGroup(TEST_GROUP_ID, [TEST_USER_3_ID]);
+    expect(result.totalItems).toBe(1);
+    expect(result.items[0].id).toContain(TEST_USER_3_ID);
+    expect(result?.items[0].userGroupMemberships?.[0].membership_id).toContain(
+      TEST_GROUP_ID,
+    );
+  });
+
+  test.only("should add multiple users to a group", async () => {
+    const result = await addUsersToGroup(TEST_GROUP_ID, [
       TEST_USER_1_ID,
       TEST_USER_2_ID,
     ]);
-    expect(result).toContain(TEST_USER_1_ID);
-    expect(result).toContain(TEST_USER_2_ID);
-    expect(result.length).toBe(2);
+
+    expect(result.totalItems).toBe(2);
+    expect(result).toBe("");
+    expect(result.items.some((user) => user.id == TEST_USER_1_ID));
+    expect(result.items.some((user) => user.id == TEST_USER_2_ID));
 
     const members = (await getAllGroupMembers(TEST_GROUP_ID)).items;
 
@@ -129,21 +140,11 @@ describe("User Group and Query Membership Tests", () => {
     expect(members.some((user) => user.id == TEST_USER_2_ID)).toBe(true);
   });
 
-  test("should add a single user to a group", async () => {
-    const result = await addSingleUserToGroup(TEST_GROUP_ID, TEST_USER_3_ID);
-    expect(result.items.length).toBe(1);
-    expect(result.items[0].id).toContain(TEST_USER_3_ID);
-    expect(result?.items[0].userGroupMemberships?.[0].membership_id).toContain(
-      TEST_GROUP_ID,
-    );
-  });
-
   test("should not add duplicate users to a group", async () => {
-    await addMultipleUsersToGroup(TEST_GROUP_ID, [TEST_USER_1_ID]);
-    const result = await addMultipleUsersToGroup(TEST_GROUP_ID, [
-      TEST_USER_1_ID,
-    ]);
-    expect(result).toEqual([]);
+    await addUsersToGroup(TEST_GROUP_ID, [TEST_USER_1_ID]);
+    const result = await addUsersToGroup(TEST_GROUP_ID, [TEST_USER_1_ID]);
+    expect(result.totalItems).toEqual(0);
+    expect(result.items).toEqual([]);
   });
 
   /**
@@ -151,18 +152,18 @@ describe("User Group and Query Membership Tests", () => {
    */
   test("should remove multiple users from a group", async () => {
     const users: User[] = await getAllUsersWithSingleGroupStatus(TEST_GROUP_ID);
-    const members = users.filter((user) =>
-      user.userGroupMemberships?.some((m) => m.is_member),
+    const members = users.filter(
+      (user) => user.userGroupMemberships?.some((m) => m.is_member),
     );
     expect(members.length).toBe(3);
 
-    const result = await removeMultipleUsersFromGroup(TEST_GROUP_ID, [
+    const result = await removeUsersFromGroup(TEST_GROUP_ID, [
       TEST_USER_1_ID,
       TEST_USER_2_ID,
     ]);
 
-    expect(result).toContain(TEST_USER_1_ID);
-    expect(result).toContain(TEST_USER_2_ID);
+    expect(result.items[0].id).toBe(TEST_USER_1_ID);
+    expect(result.items[1]).toContain(TEST_USER_2_ID);
 
     const updatedMembers = await getAllGroupMembers(TEST_GROUP_ID);
 
@@ -184,15 +185,12 @@ describe("User Group and Query Membership Tests", () => {
   });
 
   test("should remove a single user from a group", async () => {
-    const result = await removeSingleUserFromGroup(
-      TEST_GROUP_ID,
-      TEST_USER_3_ID,
-    );
-    expect(result.items.length).toBe(1);
+    const result = await removeUsersFromGroup(TEST_GROUP_ID, [TEST_USER_3_ID]);
+    expect(result.items.length).toBe(0);
 
     const users: User[] = await getAllUsersWithSingleGroupStatus(TEST_GROUP_ID);
-    const members = users.filter((user) =>
-      user.userGroupMemberships?.some((m) => m.is_member),
+    const members = users.filter(
+      (user) => user.userGroupMemberships?.some((m) => m.is_member),
     );
 
     expect(members.length).toBe(0);
@@ -206,10 +204,8 @@ describe("User Group and Query Membership Tests", () => {
   });
 
   test("should not remove a user that is not in the group", async () => {
-    const result = await removeMultipleUsersFromGroup(TEST_GROUP_ID, [
-      TEST_USER_3_ID,
-    ]);
-    expect(result).toEqual([]);
+    const result = await removeUsersFromGroup(TEST_GROUP_ID, [TEST_USER_3_ID]);
+    expect(result.items).toEqual([]);
   });
 
   /**

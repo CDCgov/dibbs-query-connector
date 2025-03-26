@@ -172,47 +172,43 @@ export async function addUsersToGroup(
   groupId: string,
   userIds: string[],
 ): Promise<QCResponse<User>> {
+  console.log("kcd 0", groupId, userIds);
   if (!userIds || !groupId) return { items: [], totalItems: 0 };
-
   try {
-    const selectValues =
-      userIds.length > 1
-        ? `SELECT * FROM unnest($1::text[], $2::uuid[], $3::uuid[])`
-        : `VALUES ($1,$2,$3)
-  `;
-
-    const fullQuery = `
-      INSERT INTO usergroup_to_users (id, user_id, usergroup_id)
-      ${selectValues}
-      ON CONFLICT DO NOTHING
-      RETURNING user_id;
-  `;
-
     const membershipIds = userIds.map((userId) => `${userId}_${groupId}`);
+    console.log("kcd 1", membershipIds);
     const groupIds: string[] = new Array(userIds.length).fill(groupId);
-
-    const values =
-      userIds.length > 1
-        ? [membershipIds, userIds, groupIds]
-        : [membershipIds[0], userIds[0], groupIds[0]];
+    console.log("kcd 2", groupIds);
 
     const insertQuery = {
-      text: fullQuery,
-      values: values as string[],
+      text: `
+        INSERT INTO usergroup_to_users (id, user_id, usergroup_id)
+        SELECT * FROM unnest($1::text[], $2::uuid[], $3::uuid[])
+        ON CONFLICT DO NOTHING
+        RETURNING user_id;
+      `,
+      values: [membershipIds, userIds, groupIds],
     };
+    console.log("kcd 3", insertQuery);
 
     const result = await dbClient.query(insertQuery);
+    console.log("result.rows", result.rows);
 
     const updatedUsers = await Promise.all(
       result.rows.map(async (updatedUser) => {
+        console.log("1 updatedUser", updatedUser);
+
         const updatedUserWithGroups = await getSingleUserWithGroupMemberships(
           updatedUser.user_id,
         );
+        console.log("updatedUserWithGroups", updatedUserWithGroups);
+
         return updatedUserWithGroups.items[0];
       }),
     );
+    console.log("final", updatedUsers);
 
-    return { totalItems: result.rowCount || 0, items: updatedUsers };
+    return { totalItems: result.rows.length || 0, items: updatedUsers };
   } catch (error) {
     console.error("Error adding user(s) to user group:", error);
     throw error;
@@ -243,7 +239,6 @@ export async function removeUsersFromGroup(
     };
 
     const result = await dbClient.query(insertQuery);
-
     const updatedUsers = await Promise.all(
       result.rows.map(async (updatedUser) => {
         const updatedUserWithGroups = await getSingleUserWithGroupMemberships(
@@ -296,9 +291,11 @@ export async function saveUserGroupMembership(
           .map(() => user.id) || [],
     );
 
-    if (usersToRemove.length)
+    if (usersToRemove.length > 0)
       await removeUsersFromGroup(groupId, usersToRemove);
-    if (usersToAdd.length) await addUsersToGroup(groupId, usersToAdd);
+    if (usersToAdd.length > 0) {
+      await addUsersToGroup(groupId, usersToAdd);
+    }
 
     const updatedUsers = await getAllUsersWithSingleGroupStatus(groupId);
     await dbClient.query("COMMIT");
