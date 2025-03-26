@@ -197,15 +197,19 @@ describe("AuditLogs Component", () => {
     await user.clear(resolvedEnd);
     await user.type(resolvedEnd, "03/01/2025");
 
-    console.log("resolvedStart.value", resolvedStart.value);
-    console.log("resolvedEnd.value", resolvedEnd.value);
-
     const clearButton = screen.getByTestId("date-range-clear-button");
     await user.click(clearButton);
 
     await waitFor(() => {
-      expect(resolvedStart.value).toBe("");
-      expect(resolvedEnd.value).toBe("");
+      const newStart = document.getElementById(
+        "log-date-start",
+      ) as HTMLInputElement;
+      const newEnd = document.getElementById(
+        "log-date-end",
+      ) as HTMLInputElement;
+
+      expect(newStart).toBe(null);
+      expect(newEnd).toBe(null);
     });
   });
 
