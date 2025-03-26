@@ -245,7 +245,6 @@ class FHIRClient {
 
       // IMPORTANT: Use the formData object for the actual request
       const response = await fetch(tokenEndpoint, requestInit);
-
       // Get response as text first for debugging
       const responseText = await response.text();
 

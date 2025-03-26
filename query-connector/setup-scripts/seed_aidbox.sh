@@ -64,6 +64,53 @@ curl -L -X POST \
 
 echo "GoldenSickPatient data loaded successfully."
 
+# Client information for the SMART on FHIR test
+echo "Loading client information into Aidbox..."
+curl -L -X PUT \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer ${TOKEN}" \
+  -d '{
+    "type": "client-confidential-asymmetric",
+    "active": true,
+    "auth": {
+      "client_credentials": {
+        "client_assertion_types": [
+          "urn:ietf:params:oauth:client-assertion-type:jwt-bearer"
+        ],
+        "access_token_expiration": 300,
+        "token_format": "jwt"
+      }
+    },
+    "scope": [
+      "system/*.read"
+    ],
+    "jwks_uri": "http://host.docker.internal:3000/.well-known/jwks.json",
+    "grant_types": [
+      "client_credentials"
+    ]
+  }' \
+  ${NETWORK_URL}/Client/e2e-smart-test-client
+
+echo "Client information data loaded successfully."
+
+# Access policy information for the SMART on FHIR test
+echo "Loading access policy information into Aidbox.."
+curl -L -X PUT \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer ${TOKEN}" \
+  -d '{
+      "engine": "allow",
+      "link": [
+        {
+          "id": "e2e-smart-test-client",
+          "resourceType": "Client"
+        }
+      ]
+    }' \
+  ${NETWORK_URL}/AccessPolicy/e2e-smart-test-client
+
+echo "Access policy information data loaded successfully."
+
 # Get current datetime in ISO 8601 format
 CURRENT_DATETIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 

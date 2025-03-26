@@ -123,3 +123,7 @@ export const CANCER_FRONTEND_NESTED_INPUT = {
     },
   },
 };
+
+// note: the value here is also hard-coded in the seed script, so change it there
+// as well if you change it here
+export const E2E_SMART_TEST_CLIENT_ID = "e2e-smart-test-client";
