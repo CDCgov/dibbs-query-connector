@@ -11,6 +11,7 @@ import { getAllUsersWithSingleGroupStatus } from "@/app/backend/user-management"
 import { getDbClient } from "@/app/backend/dbClient";
 import { User } from "@/app/models/entities/users";
 import { suppressConsoleLogs } from "./fixtures";
+import { QueryDataColumn } from "@/app/(pages)/queryBuilding/utils";
 
 const dbClient = getDbClient();
 
@@ -29,6 +30,7 @@ const TEST_QUERY_1_ID = "00000000-0000-0000-0000-000000000005";
 const TEST_QUERY_2_ID = "00000000-0000-0000-0000-000000000006";
 const TEST_QUERY_3_ID = "00000000-0000-0000-0000-000000000007";
 const TEST_QUERY_CONDITIONS: string[] = [];
+const TEST_QUERY_DATA: QueryDataColumn = {};
 
 describe("User Group and Query Membership Tests", () => {
   beforeAll(async () => {
@@ -57,11 +59,11 @@ describe("User Group and Query Membership Tests", () => {
     await dbClient.query(insertGroupQuery, [TEST_GROUP_ID]);
 
     // Insert test queries
-    const insertQueryQuery = `INSERT INTO query (id, query_name, conditions_list)
+    const insertQueryQuery = `INSERT INTO query (id, query_name, conditions_list, query_data)
     VALUES
-      ($1, 'Test Query 1', $4),
-      ($2, 'Test Query 2', $4),
-      ($3, 'Test Query 3', $4);
+      ($1, 'Test Query 1', $4, $5),
+      ($2, 'Test Query 2', $4, $5),
+      ($3, 'Test Query 3', $4, $5);
     `;
 
     await dbClient.query(insertQueryQuery, [
@@ -69,6 +71,7 @@ describe("User Group and Query Membership Tests", () => {
       TEST_QUERY_2_ID,
       TEST_QUERY_3_ID,
       TEST_QUERY_CONDITIONS,
+      TEST_QUERY_DATA,
     ]);
   });
 
@@ -164,8 +167,8 @@ describe("User Group and Query Membership Tests", () => {
    */
   test("should remove multiple users from a group", async () => {
     const users: User[] = await getAllUsersWithSingleGroupStatus(TEST_GROUP_ID);
-    const members = users.filter((user) =>
-      user.userGroupMemberships?.some((m) => m.is_member),
+    const members = users.filter(
+      (user) => user.userGroupMemberships?.some((m) => m.is_member),
     );
     expect(members.length).toBe(3);
 
@@ -201,8 +204,8 @@ describe("User Group and Query Membership Tests", () => {
     expect(result.items.length).toBe(1);
 
     const users: User[] = await getAllUsersWithSingleGroupStatus(TEST_GROUP_ID);
-    const members = users.filter((user) =>
-      user.userGroupMemberships?.some((m) => m.is_member),
+    const members = users.filter(
+      (user) => user.userGroupMemberships?.some((m) => m.is_member),
     );
 
     expect(members.length).toBe(0);
