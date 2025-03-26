@@ -1,7 +1,7 @@
 "use client";
 import { Dispatch, SetStateAction, useContext } from "react";
 import classNames from "classnames";
-import { Button, Checkbox } from "@trussworks/react-uswds";
+import { Checkbox } from "@trussworks/react-uswds";
 import Drawer from "@/app/ui/designSystem/drawer/Drawer";
 import { UserManagementContext } from "../UserManagementProvider";
 import style from "./TeamQueryEditSection.module.scss";
@@ -85,60 +85,45 @@ const UserManagementDrawer: React.FC<UserManagementDrawerProps> = ({
     }
   };
 
-  const handleMultiUserTest = async () => {
-    const user1 = "00000000-0000-0000-0000-000000000002";
-    const user2 = "00000000-0000-0000-0000-000000000003";
-    const group = "00000000-0000-0000-0000-000000000001";
-
-    const result = await addUsersToGroup(group, [user1, user2]);
-    console.log(result);
-    return result;
-  };
-
   const renderUsers = (users: User[]) => {
     if (users.length > 0) {
       return (
-        <>
-          <ul
-            aria-description={`members of ${teamQueryEditSection.title}`}
-            className={classNames("usa-list--unstyled", "margin-top-2")}
-          >
-            {users.map((user) => {
-              const display =
-                user.first_name && user.last_name
-                  ? `${user.first_name} ${user.last_name}`
-                  : `${user.username}`;
+        <ul
+          aria-description={`members of ${teamQueryEditSection.title}`}
+          className={classNames("usa-list--unstyled", "margin-top-2")}
+        >
+          {users.map((user) => {
+            const display =
+              user.first_name && user.last_name
+                ? `${user.first_name} ${user.last_name}`
+                : `${user.username}`;
 
-              const isMemberOfCurrentGroup = user.userGroupMemberships?.filter(
-                (membership) =>
-                  membership?.usergroup_id == teamQueryEditSection?.groupId,
-              )[0];
+            const isMemberOfCurrentGroup = user.userGroupMemberships?.filter(
+              (membership) =>
+                membership?.usergroup_id == teamQueryEditSection?.groupId,
+            )[0];
 
-              return (
-                <li key={user.id}>
-                  {role == UserRole.SUPER_ADMIN ? (
-                    <Checkbox
-                      id={user.id}
-                      name={user.username}
-                      label={display}
-                      defaultChecked={!!isMemberOfCurrentGroup}
-                      onChange={handleToggleMembership}
-                      className={classNames("margin-bottom-3", style.checkbox)}
-                    />
-                  ) : (
-                    <div
-                      key={user.id}
-                      className={"padding-bottom-2"}
-                    >{`${user.first_name} ${user.last_name}`}</div>
-                  )}
-                </li>
-              );
-            })}
-          </ul>
-          <Button type="button" onClick={handleMultiUserTest}>
-            Test Button
-          </Button>
-        </>
+            return (
+              <li key={user.id}>
+                {role == UserRole.SUPER_ADMIN ? (
+                  <Checkbox
+                    id={user.id}
+                    name={user.username}
+                    label={display}
+                    defaultChecked={!!isMemberOfCurrentGroup}
+                    onChange={handleToggleMembership}
+                    className={classNames("margin-bottom-3", style.checkbox)}
+                  />
+                ) : (
+                  <div
+                    key={user.id}
+                    className={"padding-bottom-2"}
+                  >{`${user.first_name} ${user.last_name}`}</div>
+                )}
+              </li>
+            );
+          })}
+        </ul>
       );
     } else {
       return renderError("members");
