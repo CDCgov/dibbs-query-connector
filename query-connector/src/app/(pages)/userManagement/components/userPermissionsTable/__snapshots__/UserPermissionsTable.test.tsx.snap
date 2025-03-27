@@ -29,7 +29,6 @@ exports[`User Management: User tab Loads user list successfully 1`] = `
               width="270"
             >
               Potter, Lily 
-          
             </td>
             <td
               class="roleDropdown"
@@ -81,7 +80,6 @@ exports[`User Management: User tab Loads user list successfully 1`] = `
               width="270"
             >
               Potter, Harry 
-          
             </td>
             <td
               class="roleDropdown"
@@ -152,7 +150,6 @@ exports[`User Management: User tab Loads user list successfully 1`] = `
               width="270"
             >
               Potter, Lily 
-          
             </td>
             <td
               class="roleDropdown"
@@ -204,7 +201,6 @@ exports[`User Management: User tab Loads user list successfully 1`] = `
               width="270"
             >
               Potter, Harry 
-          
             </td>
             <td
               class="roleDropdown"
