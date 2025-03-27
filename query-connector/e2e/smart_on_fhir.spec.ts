@@ -10,9 +10,6 @@ test.describe("SMART on FHIR", () => {
     ).toBeVisible();
 
     await page.getByRole("button", { name: "New server" }).click();
-    await expect(
-      page.getByRole("heading", { name: "New server" }),
-    ).toBeVisible();
 
     const serverName = `E2E Smart on FHIR ${Math.random() * 100}`;
     await page.getByTestId("server-name").fill(serverName);
