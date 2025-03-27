@@ -1,8 +1,8 @@
 import React from "react";
 import { Tab } from "@/app/ui/designSystem/TabGroup/tabGroup";
 import { UserRole, User } from "@/app/models/entities/users";
-import UserPermissionsTable from "./components/userPermissions/userPermissionsTable";
-import UserGroupsTable from "./components/userGroups/UserGroupsTable";
+import UserPermissionsTable from "./components/userPermissionsTable/userPermissionsTable";
+import UserGroupsTable from "./components/userGroupsTable/UserGroupsTable";
 import { QueryTableResult } from "../queryBuilding/utils";
 
 // User Mocks
@@ -20,12 +20,12 @@ export const mockAdmin = {
   first_name: "Lily",
   last_name: "Potter",
   qc_role: UserRole.ADMIN,
-  user_groups: [
+  userGroupMemberships: [
     {
-      id: "1",
-      name: "Order of the Phoenix",
-      member_size: 1,
-      query_size: 0,
+      membership_id: "456_876",
+      usergroup_name: "Order of the Phoenix",
+      usergroup_id: "876",
+      is_member: true,
     },
   ],
 };
@@ -36,12 +36,12 @@ export const mockStandard = {
   first_name: "Hermione",
   last_name: "Granger",
   qc_role: UserRole.ADMIN,
-  user_groups: [
+  userroupMemberships: [
     {
-      id: "1",
-      name: "S.P.E.W.",
-      member_size: 1,
-      query_size: 0,
+      membership_id: "789_012",
+      usergroup_name: "S.P.E.W.",
+      usergroup_id: "012",
+      is_member: true,
     },
   ],
 };
@@ -87,6 +87,7 @@ export const mockPermissionsTab: Tab = {
     .fn()
     .mockReturnValue(
       <UserPermissionsTable
+        setUsers={jest.fn()}
         users={[mockAdmin, mockSuperAdmin]}
         fetchGroupMembers={jest.fn()}
       />,

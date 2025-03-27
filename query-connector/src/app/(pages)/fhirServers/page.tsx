@@ -61,6 +61,7 @@ const FhirServers: React.FC = () => {
         body: "Unable to retrieve FHIR Server Configurations. Please try again.",
         variant: "error",
       });
+      console.error(e);
     }
   }
 

@@ -1,9 +1,8 @@
 "use client";
 
 import { createContext, useState } from "react";
-import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import { User } from "@/app/models/entities/users";
-import { QueryTableResult } from "../../queryBuilding/utils";
+import { CustomUserQuery } from "@/app/models/entities/query";
 
 export type SubjectType = "Members" | "Queries" | null;
 
@@ -15,7 +14,7 @@ interface UserManagementData {
     placeholder: string;
     groupId: string;
     subjectType: SubjectType;
-    subjectData: User[] | QueryTableResult[];
+    subjectData: User[] | CustomUserQuery[];
   };
 }
 
@@ -25,12 +24,10 @@ interface UserManagementContext extends UserManagementData {
     subtitle: string,
     subjectType: SubjectType,
     groupId: string,
-    subjectData?: User[] | QueryTableResult[],
+    subjectData?: User[] | CustomUserQuery[],
   ) => void;
   closeEditSection: () => void;
   handleSearch: (searchFilter: string) => void;
-  handleMemberUpdate: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  handleQueryUpdate: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 const initData: UserManagementData = {
@@ -50,8 +47,6 @@ export const UserManagementContext = createContext<UserManagementContext>({
   openEditSection: () => {},
   closeEditSection: () => {},
   handleSearch: (_searchFilter: string) => {},
-  handleMemberUpdate: () => {},
-  handleQueryUpdate: () => {},
 });
 
 /**
@@ -75,7 +70,7 @@ const DataProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     subtitle: string,
     subjectType: SubjectType,
     id: string,
-    subjectData?: User[] | QueryTableResult[],
+    subjectData?: User[] | CustomUserQuery[],
   ) {
     let placeholder = "";
 
@@ -106,50 +101,6 @@ const DataProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     console.log("filtering ...", filter);
   }
 
-  function handleMemberUpdate(e: React.ChangeEvent<HTMLInputElement>) {
-    const user = e.currentTarget.labels?.[0].innerText;
-    const checked = e.target.checked;
-
-    const alertText = checked
-      ? `Added ${user} to ${innerState.teamQueryEditSection.title}`
-      : `Removed ${user} from ${innerState.teamQueryEditSection.title}`;
-
-    try {
-      showToastConfirmation({
-        body: alertText,
-      });
-    } catch (error) {
-      showToastConfirmation({
-        heading: "Something went wrong",
-        body: alertText,
-        variant: "error",
-      });
-      console.error("Error updating group member list:", error);
-    }
-  }
-
-  async function handleQueryUpdate(e: React.ChangeEvent<HTMLInputElement>) {
-    const queryName = e.currentTarget.name;
-    const checked = e.target.checked;
-
-    const alertText = checked
-      ? `Assigned ${queryName} to ${innerState.teamQueryEditSection.title}`
-      : `Removed ${queryName} from ${innerState.teamQueryEditSection.title}`;
-
-    try {
-      showToastConfirmation({
-        body: alertText,
-      });
-    } catch (error) {
-      showToastConfirmation({
-        heading: "Something went wrong",
-        body: alertText,
-        variant: "error",
-      });
-      console.error("Error updating group queries list:", error);
-    }
-  }
-
   return (
     <UserManagementContext.Provider
       value={{
@@ -157,8 +108,6 @@ const DataProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
         openEditSection,
         closeEditSection,
         handleSearch,
-        handleMemberUpdate,
-        handleQueryUpdate,
       }}
     >
       {children}

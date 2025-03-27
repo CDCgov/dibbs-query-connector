@@ -11,7 +11,6 @@ export interface User {
   first_name: string;
   last_name: string;
   qc_role: UserRole;
-  user_groups?: UserGroup[];
   userGroupMemberships?: UserGroupMembership[];
 }
 
@@ -25,8 +24,8 @@ export interface UserGroup {
 }
 
 export interface UserGroupMembership {
-  id: string;
-  group_name: string;
+  membership_id: string;
+  usergroup_name: string;
   usergroup_id: string;
   is_member: boolean;
 }
