@@ -53,7 +53,6 @@ ENV HOSTNAME="0.0.0.0"
 
 # Copy necessary app files
 COPY --from=installer /app/next.config.js .
-COPY --from=installer /app/keys ./keys
 COPY --from=installer /app/package.json .
 COPY --from=installer /app/flyway/conf/flyway.conf ../flyway/conf/flyway.conf
 COPY --from=installer /app/flyway/sql ../flyway/sql
@@ -65,6 +64,7 @@ COPY --from=installer --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=installer --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=installer --chown=nextjs:nodejs /app/public ./public
 COPY --from=installer --chown=nextjs:nodejs /app/start.sh ./start.sh
+COPY --from=installer --chown=nextjs:nodejs /app/keys ./keys
 
 RUN mkdir -p .next/static public && \
     chown -R nextjs:nodejs .next/static public
