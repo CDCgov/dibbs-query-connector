@@ -10,13 +10,15 @@ test.describe("SMART on FHIR", () => {
     ).toBeVisible();
 
     await page.getByRole("button", { name: "New server" }).click();
-
+    await expect(
+      page.getByRole("heading", { name: "New server" }),
+    ).toBeVisible();
     const serverName = `E2E Smart on FHIR ${Math.random() * 100}`;
     await page.getByTestId("server-name").fill(serverName);
 
     await page
       .getByTestId("server-url")
-      .fill(process.env.AIDBOX_BASE_URL as string);
+      .fill(`${process.env.AIDBOX_BASE_URL}/fhir`);
 
     await page.getByTestId("auth-method").selectOption("SMART");
     await page.getByTestId("client-id").fill(E2E_SMART_TEST_CLIENT_ID);
@@ -24,7 +26,7 @@ test.describe("SMART on FHIR", () => {
     await page.getByTestId("scopes").fill("system/*.read");
     await page
       .getByTestId("token-endpoint")
-      .fill(`${process.env.APP_HOSTNAME}/.well-known/jwks.json`);
+      .fill(`${process.env.AIDBOX_BASE_URL}/auth/token`);
 
     await page.getByRole("button", { name: "Test connection" }).click();
     await expect(page.getByRole("button", { name: "Success" })).toBeVisible();
