@@ -2,13 +2,16 @@
 import React, { useState } from "react";
 import classNames from "classnames";
 import styles from "./tabGroup.module.scss";
+import { User, UserGroup } from "@/app/models/entities/users";
 
 export type Tab = {
   access?: string[];
   label: string;
   path?: string;
   onClick?: (e: React.MouseEvent<HTMLElement>) => void;
-  renderContent?: () => JSX.Element;
+  renderContent?: (users?: User[], userGroups?: UserGroup[]) => JSX.Element;
+  // TODO: rework this so renderContent isn't tied to user management; see
+  // https://linear.app/skylight-cdc/issue/QUE-217/rework-tabtabgroup-component-so-its-not-limited-to-user-management
 };
 
 export interface TabGroupProps {
