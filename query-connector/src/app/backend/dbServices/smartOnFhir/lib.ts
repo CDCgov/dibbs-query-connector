@@ -121,6 +121,7 @@ export async function createSmartJwt(clientId: string, tokenEndpoint: string) {
         alg, // Algorithm (RSA with SHA-384)
         typ: "JWT", // Type
         kid, // Key ID from your JWKS
+        jku, // JWK Set URL
       })
       .sign(privateKey);
 
