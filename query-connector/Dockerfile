@@ -53,6 +53,7 @@ ENV HOSTNAME="0.0.0.0"
 
 # Copy necessary app files
 COPY --from=installer /app/next.config.js .
+COPY --from=installer /app/keys .
 COPY --from=installer /app/package.json .
 COPY --from=installer /app/flyway/conf/flyway.conf ../flyway/conf/flyway.conf
 COPY --from=installer /app/flyway/sql ../flyway/sql

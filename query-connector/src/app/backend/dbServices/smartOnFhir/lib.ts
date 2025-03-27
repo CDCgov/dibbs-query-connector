@@ -31,21 +31,8 @@ export async function getPrivateKey() {
     const privateKeyPath = path.join(process.cwd(), "keys", "rsa-private.pem");
     return fs.readFileSync(privateKeyPath, "utf-8");
   } catch (error) {
-    if (
-      error instanceof Error &&
-      error.message.includes("no such file or directory")
-    ) {
-      const keysDir = ensureKeysDirectory();
-      const privateKeyPath = path.join(keysDir, "rsa-private.pem");
-      const publicKeyPath = path.join(keysDir, "rsa-public.pem");
-      const jwksPath = path.join(keysDir, "jwks.json");
-
-      await createKeyPair(privateKeyPath, publicKeyPath, jwksPath);
-      return fs.readFileSync(privateKeyPath, "utf-8");
-    } else {
-      console.error("Error loading private key:", error);
-      throw new Error("Failed to load private key");
-    }
+    console.error("Error loading private key:", error);
+    throw new Error("Failed to load private key");
   }
 }
 
