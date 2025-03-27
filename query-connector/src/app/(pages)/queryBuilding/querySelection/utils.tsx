@@ -5,6 +5,7 @@ import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import { DataContextValue } from "@/app/shared/DataProvider";
 import { deleteQueryById } from "@/app/backend/query-building";
 import { CustomUserQuery } from "@/app/models/entities/query";
+import { UserGroupMembership } from "@/app/models/entities/users";
 
 /**
  * Handles deleting a user query.
@@ -92,6 +93,7 @@ export const handleCopy = (queryName: string, queryId: string) => {
  * @param selectedQuery - The currently selected query for deletion.
  * @param handleDelete - Function to handle the deletion workflow.
  * clean up the internal state after deletion.
+ * @param group - The current user's group.
  * @param queries - The current list of user queries.
  * @param setQueries - Function to update the state of queries.
  * @param context - The data context used to update shared state.
@@ -108,6 +110,7 @@ export const renderModal = (
     setQueries: React.Dispatch<React.SetStateAction<CustomUserQuery[]>>,
     context: DataContextValue,
   ) => void,
+  group: CustomUserQuery["userGroupMemberships"],
   queries: CustomUserQuery[],
   setQueries: React.Dispatch<React.SetStateAction<CustomUserQuery[]>>,
   context: DataContextValue,

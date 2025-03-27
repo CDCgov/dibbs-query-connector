@@ -6,5 +6,5 @@ export interface CustomUserQuery {
   query_name: string;
   conditions_list?: string[];
   valuesets: DibbsValueSet[];
-  groupAssignments?: UserGroupMembership[];
+  userGroupMemberships?: UserGroupMembership[];
 }
