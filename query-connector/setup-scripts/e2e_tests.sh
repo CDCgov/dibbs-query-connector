@@ -7,7 +7,8 @@ docker compose -f docker-compose-e2e.yaml --env-file .env up -d --build
 docker compose -f docker-compose-e2e.yaml logs -f aidbox-seeder | grep -q "Finished configuring Aidbox and database."
 command_pid=$!
 
-docker compose -f docker-compose-e2e.yaml logs > logs-before-tests.txt
+mkdir test-results
+docker compose -f docker-compose-e2e.yaml logs > test-results/logs-before-tests.txt
 
 echo -n "Waiting for Aidbox seeder to complete."
 while kill -0 $command_pid 2>/dev/null; do
@@ -20,9 +21,9 @@ echo -e "\nAidbox seeder finished!"
 npx dotenv -e ./.env -- npx playwright test --reporter=list
 E2E_EXIT_CODE=$?
 
-docker compose -f docker-compose-e2e.yaml logs > logs-after-tests.txt
+docker compose -f docker-compose-e2e.yaml logs > test-results/logs-after-tests.txt
 
 # Teardown containers
-docker compose -f docker-compose-e2e.yaml down
+# docker compose -f docker-compose-e2e.yaml down
 
 exit $E2E_EXIT_CODE

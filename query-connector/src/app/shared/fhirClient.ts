@@ -225,6 +225,8 @@ class FHIRClient {
         formData.append("client_secret", this.serverConfig.client_secret);
       }
 
+      console.log(formData);
+
       // Prepare the request options
       const requestInit: RequestInit = {
         method: "POST",

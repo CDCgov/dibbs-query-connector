@@ -85,7 +85,6 @@ curl -L -X PUT \
     "scope": [
       "system/*.read"
     ],
-    "jwks_uri": "'${APP_HOSTNAME}'/.well-known/jwks.json",
     "grant_types": [
       "client_credentials"
     ]
