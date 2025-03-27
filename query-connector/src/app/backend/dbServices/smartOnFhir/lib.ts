@@ -26,13 +26,26 @@ export function getJwks() {
  * Get the private key for signing JWTs
  * @returns The private key
  */
-export function getPrivateKey() {
+export async function getPrivateKey() {
   try {
-    const keyPath = path.join(process.cwd(), "keys", "rsa-private.pem");
-    return fs.readFileSync(keyPath, "utf-8");
+    const privateKeyPath = path.join(process.cwd(), "keys", "rsa-private.pem");
+    return fs.readFileSync(privateKeyPath, "utf-8");
   } catch (error) {
-    console.error("Error loading private key:", error);
-    throw new Error("Failed to load private key");
+    if (
+      error instanceof Error &&
+      error.message.includes("no such file or directory")
+    ) {
+      const keysDir = ensureKeysDirectory();
+      const privateKeyPath = path.join(keysDir, "rsa-private.pem");
+      const publicKeyPath = path.join(keysDir, "rsa-public.pem");
+      const jwksPath = path.join(keysDir, "jwks.json");
+
+      await createKeyPair(privateKeyPath, publicKeyPath, jwksPath);
+      return fs.readFileSync(privateKeyPath, "utf-8");
+    } else {
+      console.error("Error loading private key:", error);
+      throw new Error("Failed to load private key");
+    }
   }
 }
 
@@ -71,7 +84,9 @@ export function getKeyId() {
 export async function createSmartJwt(clientId: string, tokenEndpoint: string) {
   try {
     // Get the private key and key ID
-    const privateKeyPem = getPrivateKey();
+
+    const privateKeyPem = await getPrivateKey();
+
     const kid = getKeyId();
     const alg = "RS384";
 
@@ -147,6 +162,15 @@ export async function getOrCreateKeys() {
     return JSON.parse(jwksContent);
   }
 
+  const jwks = await createKeyPair(privateKeyPath, publicKeyPath, jwksPath);
+  return jwks;
+}
+
+async function createKeyPair(
+  privateKeyPath: string,
+  publicKeyPath: string,
+  jwksPath: string,
+) {
   console.info("Generating new RSA key pair and JWKS...");
 
   // Generate new RSA key pair
@@ -180,6 +204,5 @@ export async function getOrCreateKeys() {
   fs.writeFileSync(jwksPath, JSON.stringify(jwks, null, 2), { mode: 0o644 });
 
   console.info("Key generation complete. Key ID:", kid);
-
   return jwks;
 }
