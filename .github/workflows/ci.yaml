@@ -76,6 +76,15 @@ jobs:
         working-directory: ./query-connector
         run: |
           bash ./setup-scripts/e2e_tests.sh
+        continue-on-error: true
+
+      - name: Upload Docker Logs
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-logs
+          path: |
+            ./query-connector/logs-before-tests.txt
+            ./query-connector/logs-after-tests.txt
 
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
