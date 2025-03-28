@@ -328,7 +328,9 @@ const UserModal: React.FC<UserModalProps> = ({
         text:
           modalMode == "create-user" && emptyGroups
             ? "Add user" // if there are no groups, don't move to second step
-            : ModalStates[modalMode].buttonText,
+            : role == UserRole.ADMIN && modalMode == "create-group"
+              ? "Next: Assign queries"
+              : ModalStates[modalMode].buttonText,
         type: "submit" as const,
         id: "modal-step-button",
         className: "usa-button",
@@ -360,7 +362,7 @@ const UserModal: React.FC<UserModalProps> = ({
           id="email"
           name="email"
           type="email"
-          value={newUser.username || existingUser.username}
+          value={newUser.username || existingUser?.username}
           onChange={(e) =>
             setNewUser({ ...newUser, ...{ username: e.target.value } })
           }
