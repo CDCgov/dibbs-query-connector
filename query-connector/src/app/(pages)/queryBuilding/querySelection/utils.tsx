@@ -140,7 +140,11 @@ export const renderModal = (
             context,
           );
 
-          setSelectedQuery({ queryName: undefined, queryId: undefined, groupId: undefined });
+          setSelectedQuery({
+            queryName: undefined,
+            queryId: undefined,
+            groupId: undefined,
+          });
         }
       }}
     />

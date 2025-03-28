@@ -25,8 +25,6 @@ import classNames from "classnames";
 import { getConditionsData } from "@/app/shared/database-service";
 import { ConditionsMap } from "../utils";
 import { CustomUserQuery } from "@/app/models/entities/query";
-import { queries } from "@testing-library/dom";
-import { UserGroupMembership } from "@/app/models/entities/users";
 
 interface UserQueriesDisplayProps {
   queries: CustomUserQuery[];
@@ -44,6 +42,7 @@ interface UserQueriesDisplayProps {
  * @param root0.setBuildStep - setter function to progress the stage of the query
  * building flow
  * @param root0.setSelectedQuery - setter function to update the query for editing
+ * @param root0.group
  * @returns the UserQueriesDisplay to render the queries with edit/delete options
  */
 export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({

@@ -1,11 +1,6 @@
 import {
-  addUsersToGroup,
   addQueriesToGroup,
-  getAllGroupMembers,
   getAllGroupQueries,
-  removeUsersFromGroup,
-  removeQueriesFromGroup,
-  saveUserGroupMembership,
 } from "@/app/backend/usergroup-management";
 import { getAllUsersWithSingleGroupStatus } from "@/app/backend/user-management";
 import { getDbClient } from "@/app/backend/dbClient";
@@ -43,10 +38,7 @@ describe("User Group and Query Membership Tests", () => {
         ($2, 'mamaTroi', 'Lwaxana', 'Troi', 'Standard User'),
 
     `;
-    await dbClient.query(insertUsersQuery, [
-      TEST_USER_1_ID,
-      TEST_USER_2_ID,
-    ]);
+    await dbClient.query(insertUsersQuery, [TEST_USER_1_ID, TEST_USER_2_ID]);
 
     // Insert test group
     const insertGroupQuery = `
@@ -145,5 +137,4 @@ describe("User Group and Query Membership Tests", () => {
       true,
     );
   });
-
 });
