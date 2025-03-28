@@ -238,6 +238,8 @@ export async function removeUsersFromGroup(
         const updatedUserWithGroups = await getSingleUserWithGroupMemberships(
           updatedUser.user_id,
         );
+        await dbClient.query("COMMIT");
+
         return updatedUserWithGroups.items[0];
       }),
     );
@@ -480,6 +482,8 @@ export async function addQueriesToGroup(
         const updatedUserWithGroups = await getSingleQueryGroupAssignments(
           updatedQuery.query_id,
         );
+        await dbClient.query("COMMIT");
+
         return updatedUserWithGroups.items[0];
       }),
     );
@@ -520,6 +524,7 @@ export async function removeQueriesFromGroup(
         const updatedUserWithGroups = await getSingleQueryGroupAssignments(
           updatedQuery.query_id,
         );
+        await dbClient.query("COMMIT");
 
         return updatedUserWithGroups.items[0];
       }),
