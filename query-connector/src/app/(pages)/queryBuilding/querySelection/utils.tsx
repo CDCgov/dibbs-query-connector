@@ -5,12 +5,12 @@ import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import { DataContextValue } from "@/app/shared/DataProvider";
 import { deleteQueryById } from "@/app/backend/query-building";
 import { CustomUserQuery } from "@/app/models/entities/query";
-import { UserGroupMembership } from "@/app/models/entities/users";
 
 /**
  * Handles deleting a user query.
  * @param queryName - The name of the query to delete.
  * @param queryId - The ID of the query to delete.
+ * @param groupId - The ID of the user group to which the query belongs.
  * @param queries - The current list of user queries.
  * @param setQueries - Function to update the state of queries.
  * @param context - The data context used to update shared state.
@@ -18,6 +18,7 @@ import { UserGroupMembership } from "@/app/models/entities/users";
 export const handleDelete = async (
   queryName: string | undefined,
   queryId: string | undefined,
+  groupId: string | undefined,
   queries: CustomUserQuery[],
   setQueries: React.Dispatch<React.SetStateAction<CustomUserQuery[]>>,
   context: DataContextValue | undefined,
@@ -55,12 +56,14 @@ export const handleDelete = async (
  * Confirms the deletion of a user query by toggling a modal.
  * @param queryName - The name of the query to confirm deletion for.
  * @param queryId - The ID of the query to confirm deletion for.
+ * @param groupId - The ID of the user group to which the query belongs.
  * @param setSelectedQuery - Function to set the currently selected query for deletion.
  * @param modalRef - Reference to the modal component.
  */
 export const confirmDelete = (
   queryName: string,
   queryId: string,
+  groupId: string,
   setSelectedQuery: React.Dispatch<React.SetStateAction<SelectedQueryDetails>>,
   modalRef: RefObject<ModalRef>,
 ) => {
@@ -72,6 +75,7 @@ export const confirmDelete = (
  * Copies the query ID to the clipboard.
  * @param queryName - The name of the query to copy the ID for.
  * @param queryId - The ID of the query to copy.
+ * @param groupId - The ID of the user group to which the query belongs.
  */
 export const handleCopy = (queryName: string, queryId: string) => {
   navigator.clipboard
@@ -106,6 +110,7 @@ export const renderModal = (
   handleDelete: (
     queryName: string | undefined,
     queryId: string | undefined,
+    groupId: string | undefined,
     queries: CustomUserQuery[],
     setQueries: React.Dispatch<React.SetStateAction<CustomUserQuery[]>>,
     context: DataContextValue,
@@ -128,12 +133,14 @@ export const renderModal = (
           handleDelete(
             selectedQuery.queryName,
             selectedQuery.queryId,
+            selectedQuery.groupId,
+            group,
             queries,
             setQueries,
             context,
           );
 
-          setSelectedQuery({ queryName: undefined, queryId: undefined });
+          setSelectedQuery({ queryName: undefined, queryId: undefined, groupId: undefined });
         }
       }}
     />
@@ -143,5 +150,6 @@ export const renderModal = (
 export type SelectedQueryDetails = {
   queryName?: string;
   queryId?: string;
+  groupId?: string;
 };
 export type SelectedQueryState = SelectedQueryDetails | null;

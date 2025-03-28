@@ -48,22 +48,23 @@ interface UserQueriesDisplayProps {
  */
 export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
   queries: initialQueries,
-  queries: userGroupMembership,
+  group: userGroupMembership,
   selectedQuery,
   setSelectedQuery,
   setBuildStep,
 }) => {
   const queriesContext = useContext(DataContext);
-  const group = useState<CustomUserQuery[]>(userGroupMembership);
+  const userGroup = useState<CustomUserQuery[]>(userGroupMembership);
   const [queries, setQueries] = useState<CustomUserQuery[]>(initialQueries);
   const [conditionIdToDetailsMap, setConditionIdToDetailsMap] =
     useState<ConditionsMap>();
 
   const modalRef = useRef<ModalRef>(null);
-  const handleEdit = (queryName: string, queryId: string) => {
+  const handleEdit = (queryName: string, queryId: string, groupId: string) => {
     setSelectedQuery({
       queryName: queryName,
       queryId: queryId,
+      groupId: groupId,
     });
     setBuildStep("valueset");
   };
@@ -92,8 +93,8 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
           modalRef,
           selectedQuery,
           handleDelete,
-          group,
           queries,
+          userGroup,
           setQueries,
           queriesContext,
           setSelectedQuery,
