@@ -1,21 +1,16 @@
 "use client";
 
-import { useContext, useEffect, useState } from "react";
+import { useContext } from "react";
 import classNames from "classnames";
 import { Button } from "@trussworks/react-uswds";
 import { Icon } from "@trussworks/react-uswds";
 import Table from "../../../../ui/designSystem/table/Table";
 import { UserManagementContext } from "../UserManagementProvider";
-import {
-  UserGroup,
-  UserRole,
-  User,
-  UserGroupMembership,
-} from "../../../../models/entities/users";
+import { UserGroup, UserRole, User } from "../../../../models/entities/users";
 import { CustomUserQuery } from "@/app/models/entities/query";
 import styles from "../../userManagement.module.scss";
 import { getRole } from "../../utils";
-import { getCustomQueries } from "@/app/backend/query-building";
+
 import { UserManagementMode } from "../../utils";
 
 type UserGroupsTableProps = {
@@ -47,16 +42,6 @@ const UserGroupsTable: React.FC<UserGroupsTableProps> = ({
   const { openEditSection } = useContext(UserManagementContext);
   const role = getRole();
 
-  const [queries, setQueries] = useState<CustomUserQuery[]>([]);
-
-  useEffect(() => {
-    async function fetchAllQueries() {
-      const queriesResponse = await getCustomQueries();
-      setQueries(queriesResponse);
-    }
-    fetchAllQueries();
-  }, []);
-
   function getMemberLabel(memberSize: number): string {
     return memberSize == 1 ? `${memberSize} member` : `${memberSize} members`;
   }
@@ -72,29 +57,6 @@ const UserGroupsTable: React.FC<UserGroupsTableProps> = ({
           <td colSpan={3}>No user groups found</td>
         </tr>
       );
-    }
-
-    function addGroupAssignments(
-      query: CustomUserQuery,
-      group: UserGroup,
-      groupQueries: CustomUserQuery[],
-    ) {
-      let memberships: UserGroupMembership[] = [];
-
-      groupQueries.forEach((gq) => {
-        if (gq.query_id == query.query_id) {
-          const membership = {
-            membership_id:
-              gq.groupAssignments?.find((g) => g.membership_id)
-                ?.membership_id || "",
-            usergroup_id: group.id,
-            usergroup_name: group.name,
-            is_member: true,
-          };
-          memberships.push(membership);
-        }
-      });
-      query.groupAssignments = memberships;
     }
 
     return userGroups.map((group: UserGroup, idx: number) => (
@@ -135,16 +97,12 @@ const UserGroupsTable: React.FC<UserGroupsTableProps> = ({
             aria-description={`Edit ${group.name} queries`}
             onClick={async () => {
               await fetchGroupQueries(group.id).then((groupQueries) => {
-                queries.forEach((query) =>
-                  addGroupAssignments(query, group, groupQueries),
-                );
-
                 openEditSection(
                   group.name,
                   "Assigned Queries",
                   "Queries",
                   group.id,
-                  queries,
+                  groupQueries,
                 );
               });
             }}

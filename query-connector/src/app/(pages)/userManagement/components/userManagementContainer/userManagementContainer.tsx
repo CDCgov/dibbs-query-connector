@@ -9,10 +9,12 @@ import UserPermissionsTable from "../userPermissionsTable/userPermissionsTable";
 import { QCResponse } from "@/app/models/responses/collections";
 import { User, UserGroup, UserRole } from "../../../../models/entities/users";
 import { getAllUsers } from "@/app/backend/user-management";
+import { getCustomQueries } from "@/app/backend/query-building";
 import {
   getAllGroupMembers,
   getAllGroupQueries,
   getAllUserGroups,
+  getSingleQueryGroupAssignments,
 } from "@/app/backend/usergroup-management";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import { UserManagementMode } from "../../utils";
@@ -183,6 +185,21 @@ const UsersTable: React.FC<UsersTableProps> = ({ role }) => {
     }
   }
 
+  async function fetchQueries() {
+    await getCustomQueries().then(async (queries) => {
+      const queriesResponse = await Promise.all(
+        queries.map(async (query) => {
+          const queryWithGroups = await getSingleQueryGroupAssignments(
+            query.query_id,
+          );
+          return queryWithGroups.items[0];
+        }),
+      );
+
+      setAllQueries(queriesResponse);
+    });
+  }
+
   async function fetchGroupMembers(groupId: string) {
     const groupMembers = await getAllGroupMembers(groupId);
     return groupMembers.items;
@@ -199,6 +216,7 @@ const UsersTable: React.FC<UsersTableProps> = ({ role }) => {
       fetchUsers().then(() => setShouldRefreshView("Load default"));
     userGroups.length <= 0 &&
       fetchUserGroups().then(() => setShouldRefreshView("Load default"));
+    fetchQueries();
   }, []);
 
   // wait for users/groups to load before setting active tab;

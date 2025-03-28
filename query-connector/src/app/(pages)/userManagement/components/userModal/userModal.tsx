@@ -198,8 +198,8 @@ const UserModal: React.FC<UserModalProps> = ({
       const groupToAdd = {
         id: existingGroup?.id || newGroup.id,
         name: newGroup.name,
-        memberSize: existingGroup?.member_size || newGroup.member_size,
-        querySize: existingGroup?.query_size || newGroup.query_size,
+        member_size: existingGroup?.member_size || newGroup.member_size || 0,
+        query_size: existingGroup?.query_size || newGroup.query_size || 0,
       };
 
       if (newGroup.name == "" && existingGroup?.name != "") {
@@ -223,6 +223,7 @@ const UserModal: React.FC<UserModalProps> = ({
           groupToAdd.id,
           groupToAdd.name,
         );
+
         if (updatedGroup) {
           setNewGroup({ ...newGroup, ...(updatedGroup as UserGroup) });
           refreshView("Update User groups");

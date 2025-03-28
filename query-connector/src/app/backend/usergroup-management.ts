@@ -10,6 +10,7 @@ import { getDbClient } from "./dbClient";
 import { QCResponse } from "../models/responses/collections";
 import { CustomUserQuery } from "../models/entities/query";
 import { getQueryById } from "./query-building";
+import { QueryResult } from "pg";
 
 const dbClient = getDbClient();
 
@@ -331,10 +332,17 @@ export async function getAllUserGroups(): Promise<QCResponse<UserGroup>> {
     `;
 
     const result = await dbClient.query(selectAllUserGroupQuery);
+    const groupsWithQueries = await Promise.all(
+      result.rows.map(async (group) => {
+        const groupQueries = await getAllGroupQueries(group.id);
+        group.queries = groupQueries.items;
+        return group;
+      }),
+    );
 
     return {
       totalItems: result.rowCount,
-      items: result.rows,
+      items: groupsWithQueries,
     } as QCResponse<UserGroup>;
   } catch (error) {
     console.error("Error retrieving user groups:", error);
@@ -417,19 +425,11 @@ export async function getAllGroupQueries(
     WHERE ugtq.usergroup_id = $1;
     `;
     const result = await dbClient.query(selectQueriesByGroupQuery, [groupId]);
-
-    const groupQueries = result.rows.map((row) => {
-      const formattedQuery: CustomUserQuery = {
-        query_id: row.query_id,
-        query_name: row.query_name,
-        valuesets: [],
-      };
-      return formattedQuery;
-    });
+    const queriesWithGroups = await fetchQueryGroupAssignmentDetails(result);
 
     return {
       totalItems: result.rowCount,
-      items: groupQueries,
+      items: queriesWithGroups,
     } as QCResponse<CustomUserQuery>;
   } catch (error) {
     throw error;
@@ -597,4 +597,27 @@ export async function getSingleQueryGroupAssignments(
     console.error("Error fetching groups for query:", error);
     throw error;
   }
+}
+
+/**
+ * Retrieves group assignment data for the given queries and formats it on the CustomUserQuery object
+ * @param queryList - The queries whose group assignments we are retrieving
+ * @returns The updated query record list or an error if the update fails.
+ */
+async function fetchQueryGroupAssignmentDetails(queryList: QueryResult) {
+  const queries = await Promise.all(
+    queryList.rows.map(async (query) => {
+      try {
+        const groupWithQuery = await getSingleQueryGroupAssignments(
+          query.query_id,
+        );
+        return groupWithQuery.items[0];
+      } catch (error) {
+        console.error(error);
+        throw error;
+      }
+    }),
+  );
+
+  return queries;
 }
