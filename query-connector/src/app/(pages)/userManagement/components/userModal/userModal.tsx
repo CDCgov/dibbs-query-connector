@@ -102,6 +102,15 @@ const UserModal: React.FC<UserModalProps> = ({
     if (!!existingGroup && newGroup.name != "") {
       existingGroup.name = newGroup.name;
     }
+    if (!!existingUser && newUser.first_name != "") {
+      existingUser.first_name = newUser.first_name;
+    }
+    if (!!existingUser && newUser.last_name != "") {
+      existingUser.last_name = newUser.last_name;
+    }
+    if (!!existingUser && newUser.username != "") {
+      existingUser.username = newUser.username;
+    }
   }, [modalMode]);
 
   async function openQueriesList() {
@@ -178,6 +187,38 @@ const UserModal: React.FC<UserModalProps> = ({
       }
     }
 
+    if (modalMode == "edit-user") {
+      const userToAdd: User = {
+        id: newUser.id,
+        first_name: newUser.first_name,
+        last_name: newUser.last_name,
+        username: newUser.username,
+        qc_role: newUser.qc_role,
+      };
+
+      if (userToAdd.id) {
+        if (!!errorMessage) {
+          return;
+        }
+
+        const updatedUser = await updateUserDetails(
+          userToAdd.id,
+          userToAdd.username,
+          userToAdd.first_name,
+          userToAdd.last_name,
+          userToAdd.qc_role,
+        );
+
+        if (updatedUser) {
+          setNewUser(emptyUser);
+          refreshView("Update Users");
+          setModalMode("closed");
+        } else {
+          setModalMode("closed");
+          return setErrorMessage("Unable to add group.");
+        }
+      }
+    }
     if (modalMode == "select-groups") {
       if (newUser.id && !errorMessage) {
         // update db on save
@@ -396,6 +437,52 @@ const UserModal: React.FC<UserModalProps> = ({
     );
   };
 
+  const renderEditUser = () => {
+    return (
+      <>
+        <Label htmlFor="username">First name</Label>
+        <TextInput
+          id="firstName"
+          name="firstName"
+          type="text"
+          value={newUser.first_name || existingUser?.first_name}
+          onChange={handleUserInput("first_name")}
+          required
+        />
+        <Label htmlFor="username">Last name</Label>
+        <TextInput
+          id="lastName"
+          name="lastName"
+          type="text"
+          value={newUser.last_name || existingUser?.last_name}
+          onChange={handleUserInput("last_name")}
+          required
+        />
+        <Label htmlFor="username">Email address</Label>
+        <TextInput
+          id="email"
+          name="email"
+          type="email"
+          value={newUser.username || existingUser?.username}
+          onChange={handleUserInput("username")}
+          required
+        />
+      </>
+    );
+  };
+  const handleUserInput =
+    (field: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
+      setErrorMessage("");
+
+      return setNewUser({
+        ...existingUser,
+        ...{
+          [field]: e.target.value,
+          id: existingUser?.id || "",
+        },
+      });
+    };
+
   const renderSelectUserGroups = () => {
     const userGroupIds = newUser.userGroupMemberships?.flatMap(
       (membership) => membership.usergroup_id,
@@ -426,6 +513,7 @@ const UserModal: React.FC<UserModalProps> = ({
       </>
     );
   };
+
   const handleInputUpdate = (e: React.ChangeEvent<HTMLInputElement>) => {
     setErrorMessage("");
 
@@ -470,6 +558,8 @@ const UserModal: React.FC<UserModalProps> = ({
     switch (mode) {
       case "create-user":
         return renderAddUser();
+      case "edit-user":
+        return renderEditUser();
       case "select-groups":
         return renderSelectUserGroups();
       case "create-group":
@@ -490,6 +580,10 @@ const UserModal: React.FC<UserModalProps> = ({
   let buttonText = ModalStates[modalMode].buttonText;
   if (modalMode == "edit-group" && role == "Admin") {
     buttonText = `Save & update queries`;
+    buttonsList[0].text = buttonText;
+  }
+  if (modalMode == "edit-user") {
+    buttonText = `Save changes`;
     buttonsList[0].text = buttonText;
   }
 

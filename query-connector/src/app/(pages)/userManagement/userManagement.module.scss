@@ -30,8 +30,7 @@
     text-decoration: none;
 }
 
-.userGroupsTable,
-.userPermissionsTable {
+.userGroupsTable {
     .actionButtons {
         display: flex;
         align-items: center;
@@ -53,6 +52,27 @@
 
     tbody tr:hover td:last-child,
     tbody td:last-child:hover {
+        opacity: 1;
+        pointer-events: auto;
+        max-height: inherit;
+    }
+}
+
+.userPermissionsTable {
+    td.userDisplay {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .actionButtons {
+        display: flex;
+        opacity: 0;
+        text-align: right;
+        padding-right: 0 !important;
+        white-space: nowrap;
+    }
+
+    td.userDisplay:hover .actionButtons {
         opacity: 1;
         pointer-events: auto;
         max-height: inherit;

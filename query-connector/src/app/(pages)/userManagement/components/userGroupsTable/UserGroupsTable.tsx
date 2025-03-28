@@ -17,11 +17,7 @@ type UserGroupsTableProps = {
   userGroups: UserGroup[];
   fetchGroupMembers: (groupId: string) => Promise<User[]>;
   fetchGroupQueries: (groupId: string) => Promise<CustomUserQuery[]>;
-  openModal: (
-    mode: UserManagementMode,
-    userGroup?: UserGroup,
-    user?: User,
-  ) => void;
+  openModal: (mode: UserManagementMode, data?: UserGroup | User) => void;
 };
 
 /**

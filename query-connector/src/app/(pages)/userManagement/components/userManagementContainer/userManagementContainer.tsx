@@ -25,11 +25,7 @@ import { CustomUserQuery } from "@/app/models/entities/query";
 
 export type UsersTableProps = {
   role: string;
-  handleOpenModal?: (
-    mode: UserManagementMode,
-    userGroup?: UserGroup,
-    user?: User,
-  ) => void;
+  handleOpenModal?: (mode: UserManagementMode, data?: UserGroup | User) => void;
 };
 
 export type viewMode =
@@ -89,6 +85,7 @@ const UsersTable: React.FC<UsersTableProps> = ({ role }) => {
             </Button>
             {users && users.length > 0 ? (
               <UserPermissionsTable
+                openModal={handleOpenModal}
                 fetchGroupMembers={fetchGroupMembers}
                 users={users}
                 setUsers={setUsers}
@@ -262,12 +259,10 @@ const UsersTable: React.FC<UsersTableProps> = ({ role }) => {
 
   const handleOpenModal = (
     mode: UserManagementMode,
-    userGroup?: UserGroup,
-    user?: User,
+    data?: UserGroup | User,
   ) => {
     setModalMode(mode);
-    const dataToEdit = userGroup ?? user;
-    setSubjectData(dataToEdit);
+    setSubjectData(data);
     modalRef.current?.toggleModal();
   };
 
