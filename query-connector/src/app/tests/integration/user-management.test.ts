@@ -1,13 +1,17 @@
 import {
-  createUserGroup,
-  getUserGroups,
-  updateUserGroup,
-  deleteUserGroup,
   addUserIfNotExists,
   updateUserRole,
-  getUsers,
+  getAllUsers,
   getUserRole,
 } from "@/app/backend/user-management";
+
+import {
+  createUserGroup,
+  getAllUserGroups,
+  updateUserGroup,
+  deleteUserGroup,
+} from "@/app/backend/usergroup-management";
+
 import { getDbClient } from "@/app/backend/dbClient";
 import { UserRole } from "@/app/models/entities/users";
 import { suppressConsoleLogs } from "./fixtures";
@@ -83,7 +87,7 @@ describe("User Management Integration Tests", () => {
    * Tests retrieving all registered users.
    */
   test("should retrieve all users", async () => {
-    const result = await getUsers();
+    const result = await getAllUsers();
     expect(result.totalItems).toBeGreaterThan(0);
   });
 });
@@ -104,7 +108,7 @@ describe("User Group Integration Tests", () => {
    */
   test("should create a new user group", async () => {
     const groupName = "Pilot Group";
-    const result = await createUserGroup(groupName);
+    const result = (await createUserGroup(groupName)).items[0];
 
     expect(result).toHaveProperty("id");
     expect(result).toHaveProperty("name", groupName);
@@ -124,16 +128,16 @@ describe("User Group Integration Tests", () => {
    * Tests preventing duplicate user group creation.
    */
   test("should not create duplicate user group", async () => {
-    const result = await createUserGroup("Pilot Group");
-    expect(typeof result).toBe("string"); // It should return a string error
-    expect(result).toBe(`Group 'Pilot Group' already exists.`);
+    await expect(createUserGroup("Pilot Group")).rejects.toThrow(
+      `User group 'Pilot Group' already exists.`,
+    );
   });
 
   /**
    * Tests retrieving all user groups.
    */
   test("should retrieve user groups", async () => {
-    const result = await getUserGroups();
+    const result = await getAllUserGroups();
     expect(result.items).not.toBeNull();
     expect(result.items!.length).toBeGreaterThanOrEqual(1);
   });
