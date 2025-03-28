@@ -74,9 +74,6 @@ services:
     volumes:
       - ./src/app/tests/assets/GoldenSickPatient.json:/data/GoldenSickPatient.json
       - ./logs:/var/log
-    environment:
-      - AIDBOX_BASE_URL=http://aidbox:8080
-      - APP_HOSTNAME=http://query-connector:3000
     env_file:
       - .env
     depends_on:
