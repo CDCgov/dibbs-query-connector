@@ -14,6 +14,7 @@ import { SelectedQueryDetails, SelectedQueryState } from "./utils";
 import { BuildStep } from "@/app/shared/constants";
 import { DataContext } from "@/app/shared/DataProvider";
 import { CustomUserQuery } from "@/app/models/entities/query";
+import { getRole } from "@/app/(pages)/userManagement/utils"; 
 import { getQueryList } from "@/app/backend/query-building";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import { checkUserQuery } from "@/app/backend/user-management"; 
@@ -44,22 +45,26 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({
   const sesh = session?.user.username
   console.log(sesh);
   let getUserId = async() => {
-    const id = await checkUserQuery(sesh); //filter for super admin who can see everything regardless with getRole()
-    return id;
+    const user = await checkUserQuery(sesh);
+    return user;
   }
   const user = !!sesh && getUserId();
 
   let getGroupMemberships = async() => {
-    const group = await getSingleUserWithGroupMemberships(user.id);
-    return group;
+    const groups = await getSingleUserWithGroupMemberships(user.id);
+    return groups;
   }
+
+  //TO DO figure out how to pass groups to fetchQueries below
+
+  const userRole = getRole();
   const [unauthorizedError, setUnauthorizedError] = useState(false);
   const queriesContext = useContext(DataContext);
   const [loading, setLoading] = useState(true);
 
   // Check whether custom queries exist in DB
   useEffect(() => {
-    if (queriesContext?.data === null || queriesContext?.data === undefined) && superAdmin {
+    if (queriesContext?.data === null || queriesContext?.data === undefined) && (userRole == "Super Admin") {
       const fetchQueries = async () => {
         try {
           const queries = await getQueryList();
