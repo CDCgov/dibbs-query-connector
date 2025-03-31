@@ -52,7 +52,9 @@ const SUPPORTED_QUERIES = Object.values(USE_CASE_DETAILS).filter((v) => {
 });
 
 /**
- *
+ * Helper function for the load test process
+ * @returns A random query from the out-of-box options for
+ * the db load tests
  */
 export function chooseDefaultQueryToRun() {
   const index = Math.floor(Math.random() * SUPPORTED_QUERIES.length);
@@ -69,11 +71,13 @@ export function chooseDefaultQueryToRun() {
 }
 
 /**
- *
- * @param userContext
- * @param events
- * @param done
+ * Helper function for load tests
+ * @param userContext - information about the synthetic user event being run
+ * @param events - info about the user events
+ * @param done - a callback function to call to trigger the next value
+ * @returns - Status to trigger the following step of the load test process
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function setup(userContext: any, events: any, done: () => void) {
   const vars = chooseDefaultQueryToRun();
   userContext.vars = { ...vars };
