@@ -76,8 +76,6 @@ services:
       - ./logs:/var/log
     env_file:
       - .env
-    environment:
-      - AIDBOX_BASE_URL=http://aidbox:8080
     depends_on:
       db:
         condition: service_healthy
