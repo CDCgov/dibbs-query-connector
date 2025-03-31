@@ -98,6 +98,7 @@ describe("User Group and Query Membership Tests", () => {
   test("should retrieve user group memberships", async () => {
     const result: User[] =
       await getAllUsersWithSingleGroupStatus(TEST_GROUP_ID);
+      await dbClient.query("COMMIT")
 
     expect(Array.isArray(result)).toBe(true);
     expect(result[0]).toHaveProperty("id");
@@ -122,6 +123,7 @@ describe("User Group and Query Membership Tests", () => {
       TEST_QUERY_2_ID,
       TEST_QUERY_3_ID,
     ]);
+    await dbClient.query("COMMIT")
 
     expect(result.totalItems).toBe(2);
     expect(result.items.some((query) => query.query_id == TEST_QUERY_2_ID));
