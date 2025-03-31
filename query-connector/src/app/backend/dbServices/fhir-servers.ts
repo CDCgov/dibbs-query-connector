@@ -4,6 +4,7 @@ import { getDbClient } from "../dbClient";
 import { transaction } from "./decorators";
 import { FhirServerConfig } from "@/app/models/entities/fhir-servers";
 import { superAdminAccessCheck } from "@/app/utils/auth";
+import { auditable } from "@/app/auditLogs/decorator";
 
 // Define an interface for authentication data
 export interface AuthData {
@@ -114,6 +115,7 @@ class FhirServerConfigService {
    * @returns An object indicating success or failure with optional error message
    */
   @transaction
+  @auditable
   static async updateFhirServer(
     id: string,
     name: string,
@@ -210,7 +212,9 @@ class FhirServerConfigService {
    * @param bearerToken - Optional bearer token for authentication
    * @returns An object indicating success or failure with optional error message
    */
+
   @transaction
+  @auditable
   static async insertFhirServer(
     name: string,
     hostname: string,
@@ -267,6 +271,7 @@ class FhirServerConfigService {
    * @returns An object indicating success or failure with optional error message
    */
   @transaction
+  @auditable
   static async deleteFhirServer(id: string) {
     const deleteQuery = `
     DELETE FROM fhir_servers 
