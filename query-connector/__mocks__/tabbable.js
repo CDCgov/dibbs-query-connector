@@ -1,6 +1,3 @@
-/* eslint-disable jsdoc/require-returns, jsdoc/require-param-description */
-// __mocks__/tabbable.js
-
 const lib = jest.requireActual("tabbable");
 
 const tabbable = {

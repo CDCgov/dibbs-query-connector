@@ -4,6 +4,11 @@ import { getDbClient } from "./dbClient";
 import { DibbsValueSet } from "../models/entities/valuesets";
 import { adminAccessCheck } from "../utils/auth";
 import { CustomUserQuery } from "../models/entities/query";
+
+// TODO: the functionality in this file should eventually be moved into the
+// TODO: corresponding file in dbServices within the service class pattern to
+// TODO: take advantage of our decorator patterns
+
 const dbClient = getDbClient();
 
 /**
@@ -83,6 +88,34 @@ export async function getQueryList(): Promise<CustomUserQuery[]> {
 
   return getCustomQueries();
 }
+
+/**
+ * Retrieves a query from the database by its unique ID.
+ * @param queryId - The unique identifier of the query to retrieve.
+ * @returns A success or error response indicating the result.
+ */
+export async function getQueryById(queryId: string) {
+  if (!(await adminAccessCheck())) {
+    throw new Error("Unauthorized");
+  }
+
+  try {
+    const getQuery = `
+    SELECT * FROM query WHERE id = $1;
+  `;
+    const result = await dbClient.query(getQuery, [queryId]);
+
+    if (result.rows.length === 0) {
+      console.error("No results found for query id:", queryId);
+      return undefined;
+    }
+    return result.rows[0] as unknown as CustomUserQuery;
+  } catch (error) {
+    console.error(`Failed to retrieve query with ID ${queryId}:`, error);
+    return { success: false, error: "Failed to retrieve the query." };
+  }
+}
+
 /**
  * Deletes a query from the database by its unique ID.
  * @param queryId - The unique identifier of the query to delete.
