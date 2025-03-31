@@ -5,6 +5,7 @@ import userEvent from "@testing-library/user-event";
 
 const TEST_NAME = "Rocky Balboa";
 const TEST_REPORT = "Created Report";
+const NUM_ROWS = 26;
 
 /**
  * Creates an enhanced user event with custom helper methods.
@@ -124,7 +125,7 @@ describe("AuditLogs Component", () => {
 
     await waitFor(() => {
       const rows = screen.getAllByRole("row");
-      expect(rows.length).toBe(26);
+      expect(rows.length).toBe(NUM_ROWS);
     });
   });
 

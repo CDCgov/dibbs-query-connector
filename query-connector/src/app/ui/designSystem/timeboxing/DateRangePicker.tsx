@@ -72,13 +72,6 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
   const displayText =
     formattedStart && formattedEnd ? `${displayStart} - ${displayEnd}` : "";
 
-  const handleDateInputClick = (id: string) => {
-    const button = document.querySelector(
-      `#${id} ~ button[data-testid='date-picker-button']`,
-    );
-    if (button) (button as HTMLElement).click();
-  };
-
   const validateDates = (
     newStartDate: Date | null,
     newEndDate: Date | null,
@@ -185,21 +178,19 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
                   setDateErrors({});
                   setIsOpen(false);
                   onChange({ startDate: null, endDate: null });
-                  setTimeout(() => {
-                    const startInput = document.getElementById(
-                      "log-date-start",
-                    ) as HTMLInputElement;
-                    const endInput = document.getElementById(
-                      "log-date-end",
-                    ) as HTMLInputElement;
-                    if (startInput) startInput.value = "";
-                    if (endInput) endInput.value = "";
+                  const startInput = document.getElementById(
+                    "log-date-start",
+                  ) as HTMLInputElement;
+                  const endInput = document.getElementById(
+                    "log-date-end",
+                  ) as HTMLInputElement;
+                  if (startInput) startInput.value = "";
+                  if (endInput) endInput.value = "";
 
-                    const inputField = document.getElementById(
-                      "date-range-input",
-                    ) as HTMLInputElement;
-                    if (inputField) inputField.value = "";
-                  });
+                  const inputField = document.getElementById(
+                    "date-range-input",
+                  ) as HTMLInputElement;
+                  if (inputField) inputField.value = "";
                 }}
               >
                 Clear
