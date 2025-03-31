@@ -231,7 +231,6 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
                 id: "log-date-end",
                 name: "log-date-end",
                 value: formattedEnd,
-                // onClick: () => handleDateInputClick("log-date-end"),
                 onChange: (val?: string) => {
                   const rawDate = val ? new Date(val) : null;
                   const date = normalizeEnd(rawDate);
