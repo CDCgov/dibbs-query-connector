@@ -16,6 +16,9 @@ import { DataContext } from "@/app/shared/DataProvider";
 import { CustomUserQuery } from "@/app/models/entities/query";
 import { getQueryList } from "@/app/backend/query-building";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
+import { checkUserQuery } from "@/app/backend/user-management"; 
+import { getSingleUserWithGroupMemberships } from "@/app/backend/user-management";
+import { useSession } from "next-auth/react";
 
 type QuerySelectionProps = {
   selectedQuery: SelectedQueryState;
@@ -37,13 +40,26 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({
   setBuildStep,
   setSelectedQuery,
 }) => {
+  const { data: session } = useSession();
+  const sesh = session?.user.username
+  console.log(sesh);
+  let getUserId = async() => {
+    const id = await checkUserQuery(sesh); //filter for super admin who can see everything regardless with getRole()
+    return id;
+  }
+  const user = !!sesh && getUserId();
+
+  let getGroupMemberships = async() => {
+    const group = await getSingleUserWithGroupMemberships(user.id);
+    return group;
+  }
   const [unauthorizedError, setUnauthorizedError] = useState(false);
   const queriesContext = useContext(DataContext);
   const [loading, setLoading] = useState(true);
 
   // Check whether custom queries exist in DB
   useEffect(() => {
-    if (queriesContext?.data === null || queriesContext?.data === undefined) {
+    if (queriesContext?.data === null || queriesContext?.data === undefined) && superAdmin {
       const fetchQueries = async () => {
         try {
           const queries = await getQueryList();
@@ -62,6 +78,8 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({
         }
       };
       fetchQueries();
+    } else {
+      fetchQueries(putrolehere);
     } else {
       setLoading(false); // Data already exists, no need to fetch again
     }

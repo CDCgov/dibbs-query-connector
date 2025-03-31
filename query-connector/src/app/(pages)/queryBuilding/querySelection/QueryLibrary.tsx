@@ -10,6 +10,7 @@ import { Button, Icon } from "@trussworks/react-uswds";
 import Table from "@/app/ui/designSystem/table/Table";
 import { ModalRef } from "@/app/ui/designSystem/modal/Modal";
 import styles from "./querySelection.module.scss";
+import { useSession } from "next-auth/react";
 
 import { BuildStep } from "@/app/shared/constants";
 import {
@@ -25,7 +26,7 @@ import classNames from "classnames";
 import { getConditionsData } from "@/app/shared/database-service";
 import { ConditionsMap } from "../utils";
 import { CustomUserQuery } from "@/app/models/entities/query";
-import { saveUserGroupMembership } from "@/app/backend/usergroup-management";
+import { checkUserQuery } from "@/app/backend/user-management"; 
 import { getSingleUserWithGroupMemberships } from "@/app/backend/user-management";
 
 interface UserQueriesDisplayProps {
@@ -52,9 +53,6 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
   setBuildStep,
 }) => {
   const queriesContext = useContext(DataContext);
-  console.log(queriesContext);
-  const group = queriesContext?.setData(getSingleUserWithGroupMemberships);
-  console.log(group);
   const [queries, setQueries] = useState<CustomUserQuery[]>(initialQueries);
   const [conditionIdToDetailsMap, setConditionIdToDetailsMap] =
     useState<ConditionsMap>();
