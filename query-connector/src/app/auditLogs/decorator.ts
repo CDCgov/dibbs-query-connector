@@ -65,7 +65,7 @@ async function generateAuditValues(
   args: unknown[],
 ) {
   const session = await auth();
-  const author = `${session?.user.username}`;
+  const author = `${session?.user?.username}`;
 
   // ? Double check: do we need more fancy mapping for actionType here, or does the
   // ? name of the method suffice?
