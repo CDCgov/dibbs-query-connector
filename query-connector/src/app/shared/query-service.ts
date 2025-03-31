@@ -292,7 +292,7 @@ class QueryService {
    * @param includeImmunization Whether to include immunization in the query execution
    * @returns A promise for an updated query response.
    */
-  @auditable(true)
+  @auditable
   static async postFhirQuery(
     queryData: QueryDataColumn,
     patientId: string,
@@ -364,7 +364,7 @@ class QueryService {
    * @param runningQueryResponse - The response object to store the patient.
    * @returns - The response body from the FHIR server.
    */
-  @auditable(true)
+  @auditable
   static async patientQuery(
     request: QueryRequest,
     fhirClient: FHIRClient,

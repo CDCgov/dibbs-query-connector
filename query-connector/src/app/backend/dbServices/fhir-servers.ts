@@ -115,7 +115,7 @@ class FhirServerConfigService {
    * @returns An object indicating success or failure with optional error message
    */
   @transaction
-  @auditable(true)
+  @auditable
   static async updateFhirServer(
     id: string,
     name: string,
@@ -214,7 +214,7 @@ class FhirServerConfigService {
    */
 
   @transaction
-  @auditable(true)
+  @auditable
   static async insertFhirServer(
     name: string,
     hostname: string,
@@ -271,7 +271,7 @@ class FhirServerConfigService {
    * @returns An object indicating success or failure with optional error message
    */
   @transaction
-  @auditable(true)
+  @auditable
   static async deleteFhirServer(id: string) {
     const deleteQuery = `
     DELETE FROM fhir_servers 

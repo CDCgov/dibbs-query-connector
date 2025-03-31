@@ -4,59 +4,65 @@ import { getDbClient } from "../backend/dbClient";
 
 /**
  * Decorator that adds audit log write logic to an annotated function
- * @param async - whether the method is async. Defaults to false
+ * @param target - reference back to the Object prototype of the class
+ * @param key - name of method
+ * @param descriptor - metadata about the functin
  * @returns The result of the function, with the args / result logged appropriately
  */
-export function auditable(async = false) {
-  return function (target: any, key: string, descriptor: PropertyDescriptor) {
-    const dbConnection = getDbClient();
-    const method = descriptor.value;
+export function auditable(
+  target: any,
+  key: string,
+  descriptor: PropertyDescriptor,
+) {
+  const dbConnection = getDbClient();
+  const method = descriptor.value;
 
-    const writeToAuditTable = async (args: any[]) => {
-      const query = `INSERT INTO 
+  const writeToAuditTable = async (args: any[]) => {
+    const query = `INSERT INTO 
         audit_logs (author, action_type, audit_checksum, audit_message) 
         VALUES ($1, $2, $3, $4)
         RETURNING id, action_type, audit_checksum`;
 
-      generateAuditValues(target, key, args)
-        .then((values) => {
-          // ? what to do with error handling here? on the event of a failure,
-          // ? probably need some retry logic to ensure we don't lose data
-          return dbConnection.query(query, values);
-        })
-        .then((v) => {
-          const auditMetadata = v.rows[0];
-          console.info(
-            `${auditMetadata.action_type} audit action with id ${auditMetadata?.id} and checksum ${auditMetadata?.audit_checksum} added to audit table`,
-          );
-        });
-    };
-
-    // need to do this check so that async vs sync returns are properly typed
-    descriptor.value = async
-      ? async function (this: unknown, ...args: unknown[]) {
-          try {
-            writeToAuditTable(args);
-
-            return await method.apply(this, args);
-          } catch (error) {
-            console.error(`Async method ${key} threw error`, error);
-            throw error;
-          }
-        }
-      : function (this: unknown, ...args: unknown[]) {
-          try {
-            writeToAuditTable(args);
-
-            return method.apply(this, args);
-          } catch (error) {
-            console.error(`Async method ${key} threw error`, error);
-            throw error;
-          }
-        };
-
-    return descriptor;
+    generateAuditValues(target, key, args)
+      .then((values) => {
+        // ? what to do with error handling here? on the event of a failure,
+        // ? probably need some retry logic to ensure we don't lose data
+        return dbConnection.query(query, values);
+      })
+      .then((v) => {
+        const auditMetadata = v.rows[0];
+        console.info(
+          `${auditMetadata.action_type} audit action with id ${auditMetadata?.id} and checksum ${auditMetadata?.audit_checksum} added to audit table`,
+        );
+      });
   };
+
+  const decoratedFunctionIsAsync = method.constructor.name === "AsyncFunction";
+
+  // need to do this check so that async vs sync returns are properly typed
+  descriptor.value = decoratedFunctionIsAsync
+    ? async function (this: unknown, ...args: unknown[]) {
+        try {
+          writeToAuditTable(args);
+
+          return await method.apply(this, args);
+        } catch (error) {
+          console.error(`Async method ${key} threw error`, error);
+          throw error;
+        }
+      }
+    : function (this: unknown, ...args: unknown[]) {
+        try {
+          writeToAuditTable(args);
+
+          return method.apply(this, args);
+        } catch (error) {
+          console.error(`Async method ${key} threw error`, error);
+          throw error;
+        }
+      };
+
+  return descriptor;
 }
 
 async function generateAuditValues(
