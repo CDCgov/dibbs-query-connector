@@ -350,14 +350,7 @@ const UserModal: React.FC<UserModalProps> = ({
   };
 
   const resetModalState = () => {
-    setNewUser({
-      id: "",
-      username: "",
-      first_name: "",
-      last_name: "",
-      qc_role: UserRole.STANDARD,
-      userGroupMemberships: [],
-    });
+    setNewUser(emptyUser);
     setErrorMessage("");
     setModalMode("closed");
   };

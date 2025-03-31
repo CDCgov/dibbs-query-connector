@@ -25,7 +25,6 @@ import { CustomUserQuery } from "@/app/models/entities/query";
 
 export type UsersTableProps = {
   role: string;
-  handleOpenModal?: (mode: UserManagementMode, data?: UserGroup | User) => void;
 };
 
 export type viewMode =
