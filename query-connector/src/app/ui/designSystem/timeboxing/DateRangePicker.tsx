@@ -213,7 +213,6 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
                 id: "log-date-start",
                 name: "log-date-start",
                 value: formattedStart,
-                // onClick: () => handleDateInputClick("log-date-start"),
                 onChange: (val?: string) => {
                   const rawDate = val ? new Date(val) : null;
                   const date = normalizeStart(rawDate);
