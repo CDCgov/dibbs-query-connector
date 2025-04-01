@@ -39,6 +39,7 @@ export type USE_CASES = keyof typeof USE_CASE_DETAILS;
 
 //Create type to specify the demographic data fields for a patient
 export type DemoDataFields = {
+  Id: string;
   FirstName: string;
   LastName: string;
   DOB: string;
@@ -48,10 +49,12 @@ export type DemoDataFields = {
 };
 
 export const DEFAULT_DEMO_FHIR_SERVER = "Aidbox";
+export const HYPER_UNLUCKY_DEFAULT_ID = "f288c654-6885-4f48-999c-48d776dc06af";
 /*
  * Common "Hyper Unlucky" patient data used for all non-newborn screening use cases
  */
 export const hyperUnluckyPatient: DemoDataFields = {
+  Id: HYPER_UNLUCKY_DEFAULT_ID,
   FirstName: "Hyper",
   LastName: "Unlucky",
   DOB: "1975-12-06",
