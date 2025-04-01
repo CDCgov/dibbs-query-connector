@@ -41,6 +41,13 @@ jobs:
           node-version: ${{env.NODE_VERSION}}
       - name: Checkout code
         uses: actions/checkout@v3
+      - name: Create .env
+        working-directory: ./query-connector
+        run: |
+          echo "AIDBOX_LICENSE=${{ secrets.AIDBOX_LICENSE }}" > .env
+          echo "DATABASE_URL=postgresql://postgres:pw@localhost:5432/tefca_db" >> .env
+          echo "AIDBOX_BASE_URL=http://aidbox:8080" >> .env
+          echo "APP_HOSTNAME=http://query-connector:3000" >> .env
       - name: Setup reporting action and run tests
         uses: ArtiomTr/jest-coverage-report-action@v2
         with:
