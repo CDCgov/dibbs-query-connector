@@ -39,8 +39,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{env.NODE_VERSION}}
-      - name: Checkout code
-        uses: actions/checkout@v3
       - name: Create .env
         working-directory: ./query-connector
         run: |

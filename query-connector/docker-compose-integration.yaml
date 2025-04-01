@@ -76,9 +76,8 @@ services:
       dockerfile: Dockerfile.aidbox-seeder
     volumes:
       - ./src/app/tests/assets/GoldenSickPatient.json:/data/GoldenSickPatient.json
-    environment:
-      - AIDBOX_BASE_URL=http://localhost:8080
-      - APP_HOSTNAME=http://host.docker.internal:3000
+    env_file:
+      - .env
     depends_on:
       db:
         condition: service_healthy
