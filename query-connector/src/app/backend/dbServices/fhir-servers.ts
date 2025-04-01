@@ -4,6 +4,7 @@ import { getDbClient } from "../dbClient";
 import { transaction } from "./decorators";
 import { FhirServerConfig } from "@/app/models/entities/fhir-servers";
 import { superAdminAccessCheck } from "@/app/utils/auth";
+import { auditable } from "@/app/auditLogs/decorator";
 
 // Define an interface for authentication data
 export interface AuthData {
@@ -110,17 +111,18 @@ class FhirServerConfigService {
    * @param hostname - The new URL/hostname of the FHIR server
    * @param disableCertValidation - Whether to disable certificate validation
    * @param lastConnectionSuccessful - Optional boolean indicating if the last connection was successful
-   * @param bearerToken - Optional bearer token for authentication
+   * @param authData - Authentication data including auth type and credentials
    * @returns An object indicating success or failure with optional error message
    */
   @transaction
+  @auditable
   static async updateFhirServer(
     id: string,
     name: string,
     hostname: string,
     disableCertValidation: boolean,
     lastConnectionSuccessful?: boolean,
-    bearerToken?: string,
+    authData?: AuthData,
   ) {
     const updateQuery = `
     UPDATE fhir_servers 
@@ -130,43 +132,47 @@ class FhirServerConfigService {
       last_connection_attempt = CURRENT_TIMESTAMP,
       last_connection_successful = $4,
       headers = $5,
-      disable_cert_validation = $6
+      disable_cert_validation = $6,
+      auth_type = $7,
+      client_id = $8,
+      client_secret = $9,
+      token_endpoint = $10,
+      scopes = $11,
+      access_token = $12,
+      token_expiry = $13
     WHERE id = $1
     RETURNING *;
   `;
 
     try {
-      // If updating with a bearer token, add it to existing headers
-      // If no bearer token provided, fetch existing headers and remove Authorization
+      // Default auth type to none if not provided
+      const authType = authData?.authType || "none";
+
+      // Prepare headers
       let headers = {};
-      if (bearerToken) {
-        // Get existing headers if any
-        const existingServer = await FhirServerConfigService.dbClient.query(
-          "SELECT headers FROM fhir_servers WHERE id = $1",
-          [id],
-        );
-        if (existingServer.rows.length > 0) {
-          // Keep existing headers and add/update Authorization
-          headers = {
-            ...existingServer.rows[0].headers,
-            Authorization: `Bearer ${bearerToken}`,
-          };
-        } else {
-          // No existing headers, just set Authorization
-          headers = { Authorization: `Bearer ${bearerToken}` };
-        }
-      } else {
-        // Get existing headers if any and remove Authorization
-        const existingServer = await FhirServerConfigService.dbClient.query(
-          "SELECT headers FROM fhir_servers WHERE id = $1",
-          [id],
-        );
-        if (existingServer.rows.length > 0) {
-          const existingHeaders = existingServer.rows[0].headers || {};
-          // Remove Authorization if it exists when switching to no auth
-          const { _, ...restHeaders } = existingHeaders;
+
+      // Get existing headers if any
+      const existingServer = await FhirServerConfigService.dbClient.query(
+        "SELECT headers FROM fhir_servers WHERE id = $1",
+        [id],
+      );
+
+      if (existingServer.rows.length > 0 && existingServer.rows[0].headers) {
+        headers = { ...existingServer.rows[0].headers };
+
+        // Remove Authorization header if it exists
+        if ("Authorization" in headers) {
+          const { Authorization, ...restHeaders } = headers;
           headers = restHeaders;
         }
+      }
+
+      // Add Authorization header for basic auth type
+      if (authType === "basic" && authData?.bearerToken) {
+        headers = {
+          ...headers,
+          Authorization: `Bearer ${authData.bearerToken}`,
+        };
       }
 
       const result = await FhirServerConfigService.dbClient.query(updateQuery, [
@@ -176,6 +182,13 @@ class FhirServerConfigService {
         lastConnectionSuccessful,
         headers,
         disableCertValidation,
+        authType,
+        authData?.clientId || null,
+        authData?.clientSecret || null,
+        authData?.tokenEndpoint || null,
+        authData?.scopes || null,
+        authData?.accessToken || null,
+        authData?.tokenExpiry || null,
       ]);
 
       // Clear the cache so the next getFhirServerConfigs call will fetch fresh data
@@ -207,16 +220,18 @@ class FhirServerConfigService {
    * @param hostname - The URL/hostname of the FHIR server
    * @param disableCertValidation - Whether to disable certificate validation
    * @param lastConnectionSuccessful - Optional boolean indicating if the last connection was successful
-   * @param bearerToken - Optional bearer token for authentication
+   * @param authData - Authentication data including auth type and credentials
    * @returns An object indicating success or failure with optional error message
    */
+
   @transaction
+  @auditable
   static async insertFhirServer(
     name: string,
     hostname: string,
     disableCertValidation: boolean,
     lastConnectionSuccessful?: boolean,
-    bearerToken?: string,
+    authData?: AuthData,
   ) {
     const insertQuery = `
     INSERT INTO fhir_servers (
@@ -225,16 +240,32 @@ class FhirServerConfigService {
       last_connection_attempt,
       last_connection_successful,
       headers,
-      disable_cert_validation
+      disable_cert_validation,
+      auth_type,
+      client_id,
+      client_secret,
+      token_endpoint,
+      scopes,
+      access_token,
+      token_expiry
     )
-    VALUES ($1, $2, $3, $4, $5, $6);
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+    RETURNING *;
   `;
 
     try {
-      // Create headers object if bearer token is provided
-      const headers = bearerToken
-        ? { Authorization: `Bearer ${bearerToken}` }
-        : {};
+      // Default auth type to none if not provided
+      const authType = authData?.authType || "none";
+
+      // Prepare headers based on auth type
+      let headers = {};
+
+      // Add Authorization header for basic auth type
+      if (authType === "basic" && authData?.bearerToken) {
+        headers = {
+          Authorization: `Bearer ${authData.bearerToken}`,
+        };
+      }
 
       const result = await FhirServerConfigService.dbClient.query(insertQuery, [
         name,
@@ -243,6 +274,13 @@ class FhirServerConfigService {
         lastConnectionSuccessful,
         headers,
         disableCertValidation,
+        authType,
+        authData?.clientId || null,
+        authData?.clientSecret || null,
+        authData?.tokenEndpoint || null,
+        authData?.scopes || null,
+        authData?.accessToken || null,
+        authData?.tokenExpiry || null,
       ]);
 
       // Clear the cache so the next getFhirServerConfigs call will fetch fresh data
@@ -267,6 +305,7 @@ class FhirServerConfigService {
    * @returns An object indicating success or failure with optional error message
    */
   @transaction
+  @auditable
   static async deleteFhirServer(id: string) {
     const deleteQuery = `
     DELETE FROM fhir_servers 
