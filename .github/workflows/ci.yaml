@@ -39,6 +39,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{env.NODE_VERSION}}
+      - name: Checkout code
+        uses: actions/checkout@v3
       - name: Create .env
         working-directory: ./query-connector
         run: |
@@ -54,7 +56,7 @@ jobs:
         with:
           test-script: npm run test:ci
           working-directory: ./query-connector
-          skip-step: none
+          skip-step: install
 
   end-to-end-tests:
     timeout-minutes: 15
