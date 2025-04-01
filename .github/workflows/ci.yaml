@@ -17,7 +17,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  NODE_VERSION: 18 # Adjust the Node.js version as needed
+  NODE_VERSION: 22 # Adjust the Node.js version as needed
 
 jobs:
   lint:
