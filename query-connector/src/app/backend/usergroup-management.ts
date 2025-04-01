@@ -338,6 +338,7 @@ export async function getAllUserGroups(): Promise<QCResponse<UserGroup>> {
       result.rows.map(async (group) => {
         const groupQueries = await getAllGroupQueries(group.id);
         group.queries = groupQueries.items;
+        await dbClient.query("COMMIT");
         return group;
       }),
     );
