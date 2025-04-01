@@ -3,14 +3,14 @@
 import { useState, useEffect, ChangeEvent, useMemo } from "react";
 import styles from "./auditLogs.module.scss";
 import classNames from "classnames";
+import {
+  DateRange,
+  DateErrors,
+} from "@/app/ui/designSystem/timeboxing/DateRangePicker";
+import DateRangePicker from "@/app/ui/designSystem/timeboxing/DateRangePicker";
 import SearchField from "@/app/ui/designSystem/searchField/SearchField";
 import Table from "@/app/ui/designSystem/table/Table";
-import {
-  Button,
-  Select,
-  Pagination,
-  DatePicker,
-} from "@trussworks/react-uswds";
+import { Button, Select, Pagination } from "@trussworks/react-uswds";
 import WithAuth from "@/app/ui/components/withAuth/WithAuth";
 
 /**
@@ -21,7 +21,8 @@ const AuditLogs: React.FC = () => {
   const [search, setSearch] = useState("");
   const [selectedName, setSelectedName] = useState("");
   const [selectedAction, setSelectedAction] = useState("");
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [dateRange, setDateRange] = useState<DateRange>({});
+  const [dateErrors, setDateErrors] = useState<DateErrors>({});
   const [currentPage, setCurrentPage] = useState(1);
   const [actionsPerPage, setActionsPerPage] = useState(10);
 
@@ -59,8 +60,12 @@ const AuditLogs: React.FC = () => {
         ...entry,
         date: new Date(entry.date.getTime() + index * 86400000),
       })),
-    ).flat();
+    )
+      .flat()
+      .sort((a, b) => b.date.getTime() - a.date.getTime());
   }, []);
+
+  const [filteredLogs, setFilteredLogs] = useState(logs);
 
   const uniqueNames = useMemo(
     () => Array.from(new Set(logs.map((log) => log.name))).sort(),
@@ -71,7 +76,6 @@ const AuditLogs: React.FC = () => {
     [logs],
   );
 
-  const [dateError, setDateError] = useState("");
   const minDate = useMemo(
     () =>
       logs.length > 0
@@ -88,19 +92,6 @@ const AuditLogs: React.FC = () => {
   );
 
   useEffect(() => {
-    const dateInput = document.getElementById("date");
-    if (dateInput) {
-      if (dateError) {
-        dateInput.classList.add(styles.bgErrorLighter, styles.borderError);
-      } else {
-        dateInput.classList.remove(styles.bgErrorLighter, styles.borderError);
-      }
-    }
-  }, [dateError]);
-
-  const [filteredLogs, setFilteredLogs] = useState(logs);
-
-  useEffect(() => {
     setFilteredLogs(
       logs.filter((log) => {
         const matchesName = selectedName ? log.name === selectedName : true;
@@ -111,16 +102,14 @@ const AuditLogs: React.FC = () => {
           search.length === 0 ||
           log.name.toLowerCase().includes(search.toLowerCase()) ||
           log.action.toLowerCase().includes(search.toLowerCase());
-        const matchesDate = selectedDate
-          ? log.date.toISOString().split("T")[0] ===
-            selectedDate.toISOString().split("T")[0]
-          : true;
-
+        const matchesDate =
+          (!dateRange.startDate || log.date >= dateRange.startDate) &&
+          (!dateRange.endDate || log.date <= dateRange.endDate);
         return matchesName && matchesAction && matchesSearch && matchesDate;
       }),
     );
     setCurrentPage(1);
-  }, [selectedName, selectedAction, selectedDate, search, logs]);
+  }, [selectedName, selectedAction, dateRange, search, logs]);
 
   const paginatedLogs = useMemo(() => {
     return filteredLogs.slice(
@@ -179,44 +168,16 @@ const AuditLogs: React.FC = () => {
             </Select>
           </div>
           <div className={classNames(styles.inputGroup)}>
-            <label htmlFor="date">Date</label>
+            <label htmlFor="dateRange">Custom date range</label>
             <div>
-              <DatePicker
-                key={selectedDate === null ? "reset" : "date-picker"}
-                id="date"
-                name="date"
-                onChange={(value) => {
-                  if (value) {
-                    const parsedDate = new Date(value);
-                    if (isNaN(parsedDate.getTime())) {
-                      setDateError(
-                        "Your entry does not match the allowed format MM/DD/YYYY.",
-                      );
-                    } else {
-                      setDateError("");
-                      setSelectedDate(parsedDate);
-                    }
-                  } else {
-                    setDateError("");
-                    setSelectedDate(null);
-                  }
-                }}
-                value={
-                  selectedDate ? selectedDate.toISOString().split("T")[0] : ""
+              <DateRangePicker
+                startDate={dateRange.startDate || null}
+                endDate={dateRange.endDate || null}
+                onChange={({ startDate, endDate }) =>
+                  setDateRange({ startDate, endDate })
                 }
-                minDate={minDate ? minDate.toISOString().split("T")[0] : ""}
-                maxDate={maxDate ? maxDate.toISOString().split("T")[0] : ""}
-                onClick={() => {
-                  const datePickerButton = document.querySelector(
-                    "button[data-testid='date-picker-button']",
-                  );
-                  if (datePickerButton) {
-                    (datePickerButton as HTMLElement).click();
-                  }
-                }}
               />
             </div>
-            {dateError && <p className={styles.errorText}>{dateError}</p>}
           </div>
           <SearchField
             id="search"
@@ -240,16 +201,8 @@ const AuditLogs: React.FC = () => {
                 setSearch("");
                 setSelectedName("");
                 setSelectedAction("");
-                setDateError("");
-                setSelectedDate(null);
-                const dateInput =
-                  document.querySelector<HTMLInputElement>("#date");
-                if (dateInput) {
-                  dateInput.value = "";
-                  dateInput.dispatchEvent(
-                    new Event("change", { bubbles: true }),
-                  );
-                }
+                setDateErrors({});
+                setDateRange({});
               }}
             >
               Clear filters
