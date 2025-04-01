@@ -75,13 +75,13 @@ export const ModalStates: ModalMap = {
   },
   "remove-user": {
     heading: "Delete user?",
-    buttonText: "Yes, Delete",
+    buttonText: "Delete",
     secondaryBtnText: "Cancel",
     prevStep: "closed",
   },
   "remove-group": {
-    heading: "Delete group?",
-    buttonText: "Yes, Delete",
+    heading: "Delete user group?",
+    buttonText: "Delete",
     secondaryBtnText: "Cancel",
     prevStep: "closed",
   },

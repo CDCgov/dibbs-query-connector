@@ -1,5 +1,5 @@
 "use client";
-import { useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { Label, TextInput } from "@trussworks/react-uswds";
 import {
@@ -85,31 +85,45 @@ const UserModal: React.FC<UserModalProps> = ({
   const [newUser, setNewUser] = useState<User>(emptyUser);
   const [newGroup, setNewGroup] = useState<UserGroup>(emptyGroup);
   const [errorMessage, setErrorMessage] = useState<string>("");
+  const [activeField, setActiveField] = useState<string>("");
   const { openEditSection } = useContext(UserManagementContext);
 
   const existingGroup = subjectData as UserGroup;
   const existingUser = subjectData as User;
   const role = getRole();
 
+  const handleOutsideModalClick = useCallback(
+    (event: MouseEvent | KeyboardEvent) => {
+      const clickTarget = (event.target as HTMLElement).getAttribute(
+        "data-testid",
+      );
+
+      if (
+        clickTarget == "modalOverlay" ||
+        (event as KeyboardEvent).key == "Escape"
+      ) {
+        handleCloseModal();
+        resetModalState();
+      }
+    },
+    [],
+  );
+
+  useEffect(() => {
+    window.addEventListener("mousedown", handleOutsideModalClick);
+    window.addEventListener("keyup", handleOutsideModalClick);
+
+    // Cleanup
+    return () => {
+      window.removeEventListener("mousedown", handleOutsideModalClick);
+      window.removeEventListener("keyup", handleOutsideModalClick);
+    };
+  }, []);
+
   useEffect(() => {
     if (modalMode === "closed") {
       handleCloseModal();
-    }
-
-    // allows us to fully delete the input value without
-    // resetting it to the existing name value, and prevents
-    // UI flicker on update
-    if (!!existingGroup && newGroup.name != "") {
-      existingGroup.name = newGroup.name;
-    }
-    if (!!existingUser && newUser.first_name != "") {
-      existingUser.first_name = newUser.first_name;
-    }
-    if (!!existingUser && newUser.last_name != "") {
-      existingUser.last_name = newUser.last_name;
-    }
-    if (!!existingUser && newUser.username != "") {
-      existingUser.username = newUser.username;
+      resetModalState();
     }
   }, [modalMode]);
 
@@ -144,6 +158,10 @@ const UserModal: React.FC<UserModalProps> = ({
   const handleButtonClick = async () => {
     if (!!errorMessage) {
       return;
+    }
+
+    if (!newUser.first_name || !newUser.last_name || !newUser.username) {
+      return setErrorMessage("Please fill out all required fields");
     }
 
     if (modalMode == "create-user") {
@@ -188,37 +206,50 @@ const UserModal: React.FC<UserModalProps> = ({
     }
 
     if (modalMode == "edit-user") {
-      const userToAdd: User = {
-        id: newUser.id,
-        first_name: newUser.first_name,
-        last_name: newUser.last_name,
-        username: newUser.username,
-        qc_role: newUser.qc_role,
+      newUser.id = existingUser.id;
+      newUser.username = existingUser.username;
+      newUser.qc_role = existingUser.qc_role;
+
+      if (
+        (newUser.first_name === "" ||
+          newUser.first_name === existingUser.first_name) &&
+        (newUser.last_name === "" ||
+          newUser.last_name === existingUser.last_name)
+      ) {
+        // we haven't changed anything; don't update the db
+        return setModalMode("closed");
+      }
+
+      // if one of first/last name is blank at this point, then
+      // we didn't update it, so we should use existing data
+      const userToAdd = {
+        ...newUser,
+        first_name:
+          newUser.first_name == ""
+            ? existingUser.first_name
+            : newUser.first_name,
+        last_name:
+          newUser.last_name == "" ? existingUser.last_name : newUser.last_name,
       };
 
-      if (userToAdd.id) {
-        if (!!errorMessage) {
-          return;
-        }
+      const updatedUser = await updateUserDetails(
+        userToAdd.id,
+        userToAdd.username,
+        userToAdd.first_name,
+        userToAdd.last_name,
+        userToAdd.qc_role,
+      );
 
-        const updatedUser = await updateUserDetails(
-          userToAdd.id,
-          userToAdd.username,
-          userToAdd.first_name,
-          userToAdd.last_name,
-          userToAdd.qc_role,
-        );
-
-        if (updatedUser) {
-          setNewUser(emptyUser);
-          refreshView("Update Users");
-          setModalMode("closed");
-        } else {
-          setModalMode("closed");
-          return setErrorMessage("Unable to add group.");
-        }
+      if (updatedUser) {
+        setNewUser(emptyUser);
+        refreshView("Update Users");
+        setModalMode("closed");
+      } else {
+        setModalMode("closed");
+        return setErrorMessage("Unable to add group.");
       }
     }
+
     if (modalMode == "select-groups") {
       if (newUser.id && !errorMessage) {
         // update db on save
@@ -350,10 +381,12 @@ const UserModal: React.FC<UserModalProps> = ({
   };
 
   const resetModalState = () => {
-    setNewUser(emptyUser);
     setErrorMessage("");
-    setModalMode("closed");
+    setActiveField("");
+    setNewUser(emptyUser);
+    setNewGroup(emptyGroup);
   };
+
   const emptyGroups = !userGroups || (userGroups && userGroups.length == 0);
 
   const getModalButtons = () => {
@@ -374,7 +407,7 @@ const UserModal: React.FC<UserModalProps> = ({
         text: ModalStates[modalMode].secondaryBtnText,
         type: "button" as const,
         id: "modal-back-button",
-        className: "usa-button usa-button--secondary",
+        className: "usa-button",
         onClick: async () =>
           setModalMode(ModalStates[modalMode].prevStep || "closed"),
       },
@@ -388,18 +421,45 @@ const UserModal: React.FC<UserModalProps> = ({
     return buttons;
   };
 
+  const validateInput = (e: React.FocusEvent<HTMLInputElement>) => {
+    const value = e.currentTarget.value;
+    const field = (e.target.previousSibling as HTMLElement).innerHTML;
+    if (value === "" && !!modalRef.current?.modalIsOpen) {
+      return setErrorMessage(`${field} cannot be blank`);
+    }
+  };
+
   const renderAddUser = () => {
     return (
       <>
+        <Label htmlFor="firstName">First name</Label>
+        <TextInput
+          id="firstName"
+          name="firstName"
+          type="text"
+          value={newUser.first_name}
+          onChange={handleUserInput("first_name")}
+          onBlur={validateInput}
+          required
+        />
+        <Label htmlFor="lastName">Last name</Label>
+        <TextInput
+          id="lastName"
+          name="lastName"
+          type="text"
+          value={newUser.last_name}
+          onChange={handleUserInput("last_name")}
+          onBlur={validateInput}
+          required
+        />
         <Label htmlFor="username">Email address</Label>
         <TextInput
           id="email"
           name="email"
           type="email"
-          value={newUser.username || existingUser?.username}
-          onChange={(e) =>
-            setNewUser({ ...newUser, ...{ username: e.target.value } })
-          }
+          value={newUser.username}
+          onChange={handleUserInput("username")}
+          onBlur={validateInput}
           required
         />
         <Label htmlFor="auth-method">Permissions</Label>
@@ -433,48 +493,37 @@ const UserModal: React.FC<UserModalProps> = ({
   const renderEditUser = () => {
     return (
       <>
-        <Label htmlFor="username">First name</Label>
+        <Label htmlFor="firstName">First name</Label>
         <TextInput
           id="firstName"
           name="firstName"
           type="text"
-          value={newUser.first_name || existingUser?.first_name}
+          value={
+            activeField == "first_name"
+              ? newUser.first_name
+              : existingUser?.first_name
+          }
           onChange={handleUserInput("first_name")}
+          onBlur={validateInput}
           required
         />
-        <Label htmlFor="username">Last name</Label>
+        <Label htmlFor="lastName">Last name</Label>
         <TextInput
           id="lastName"
           name="lastName"
           type="text"
-          value={newUser.last_name || existingUser?.last_name}
+          value={
+            activeField == "last_name"
+              ? newUser.last_name
+              : existingUser?.last_name
+          }
           onChange={handleUserInput("last_name")}
-          required
-        />
-        <Label htmlFor="username">Email address</Label>
-        <TextInput
-          id="email"
-          name="email"
-          type="email"
-          value={newUser.username || existingUser?.username}
-          onChange={handleUserInput("username")}
+          onBlur={validateInput}
           required
         />
       </>
     );
   };
-  const handleUserInput =
-    (field: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
-      setErrorMessage("");
-
-      return setNewUser({
-        ...existingUser,
-        ...{
-          [field]: e.target.value,
-          id: existingUser?.id || "",
-        },
-      });
-    };
 
   const renderSelectUserGroups = () => {
     const userGroupIds = newUser.userGroupMemberships?.flatMap(
@@ -507,19 +556,35 @@ const UserModal: React.FC<UserModalProps> = ({
     );
   };
 
+  const handleUserInput =
+    (field: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
+      setErrorMessage("");
+      setActiveField(field);
+
+      setNewUser({
+        ...newUser,
+        ...{ [field]: e.target.value },
+      });
+    };
+
   const handleInputUpdate = (e: React.ChangeEvent<HTMLInputElement>) => {
     setErrorMessage("");
+    setActiveField("group-name");
 
     return setNewGroup({
       ...newGroup,
       ...{
         name: e.target.value,
-        id: existingGroup?.id || "",
       },
     });
   };
 
   const renderAddUserGroup = () => {
+    const value =
+      modalMode == "create-group" || activeField == "group-name"
+        ? newGroup.name
+        : existingGroup?.name;
+
     return (
       <>
         <Label htmlFor="username">User group name</Label>
@@ -527,8 +592,9 @@ const UserModal: React.FC<UserModalProps> = ({
           id="group-name"
           name="group-name"
           type="text"
-          value={newGroup.name || existingGroup?.name || ""}
+          value={value}
           onChange={handleInputUpdate}
+          onBlur={validateInput}
           required
         />
       </>
@@ -538,11 +604,7 @@ const UserModal: React.FC<UserModalProps> = ({
   const renderConfirmDeleteGroup = (group: UserGroup) => {
     return (
       <>
-        Users and queries assigned to {group.name} will not be deleted, but
-        users will no longer be able to view or run {group.name}'s queries.
-        <br />
-        <br />
-        This action cannot be undone.
+        {`Would you like to delete ${group.name}? This action cannot be undone`}
       </>
     );
   };
@@ -564,9 +626,6 @@ const UserModal: React.FC<UserModalProps> = ({
   };
 
   let heading = ModalStates[modalMode].heading;
-  if (modalMode == "remove-group") {
-    heading = `Delete group '${existingGroup.name}'?`;
-  }
 
   const buttonsList = getModalButtons();
 
@@ -578,6 +637,9 @@ const UserModal: React.FC<UserModalProps> = ({
   if (modalMode == "edit-user") {
     buttonText = `Save changes`;
     buttonsList[0].text = buttonText;
+  }
+  if (modalMode == "remove-group") {
+    buttonsList[0].className = "usa-button--secondary";
   }
 
   return (
