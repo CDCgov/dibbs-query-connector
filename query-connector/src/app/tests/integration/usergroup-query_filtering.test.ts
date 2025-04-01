@@ -139,4 +139,7 @@ describe("User Group and Query Membership Tests", () => {
       true,
     );
   });
+
+  //tests for superAdmins and them seeing evertyhing 
+  //tests for other logged in users to make sure they do NOT see everything
 });

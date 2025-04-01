@@ -65,9 +65,10 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({
   // Check whether custom queries exist in DB
   useEffect(() => {
     if (queriesContext?.data === null || queriesContext?.data === undefined) {
-      const fetchQueries = async () => {
+      if (userRole == "Super Admin") { //ask Janki and Michelle if superAdmin can really see everything or if we want to go ahead and filter
+        const fetchQueries = async () => {
         try {
-          const queries = await getQueryList(); // map through groups here and pass a group to this call
+          const queries = await getQueryList();
           queriesContext?.setData(queries);
         } catch (error) {
           if (error == "Error: Unauthorized") {
@@ -82,10 +83,11 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({
           setLoading(false);
         }
       };
-      fetchQueries();
+      fetchQueries(); //getAllGroupQueries(groupId: string,) for anyone who needs filtering bc the method already does it
     } else {
       setLoading(false); // Data already exists, no need to fetch again
     }
+  }
   }, [queriesContext]);
 
   if (loading) {
