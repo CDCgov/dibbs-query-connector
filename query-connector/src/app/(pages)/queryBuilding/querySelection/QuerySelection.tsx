@@ -54,20 +54,20 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({
     const groups = await getSingleUserWithGroupMemberships(user.id);
     return groups;
   }
-
-  //TO DO figure out how to pass groups to fetchQueries below
-
+  const groups = getGroupMemberships();
+  console.log(groups);
   const userRole = getRole();
+  console.log(userRole);
   const [unauthorizedError, setUnauthorizedError] = useState(false);
   const queriesContext = useContext(DataContext);
   const [loading, setLoading] = useState(true);
 
   // Check whether custom queries exist in DB
   useEffect(() => {
-    if (queriesContext?.data === null || queriesContext?.data === undefined) && (userRole == "Super Admin") {
+    if (queriesContext?.data === null || queriesContext?.data === undefined) {
       const fetchQueries = async () => {
         try {
-          const queries = await getQueryList();
+          const queries = await getQueryList(); // map through groups here and pass a group to this call
           queriesContext?.setData(queries);
         } catch (error) {
           if (error == "Error: Unauthorized") {
@@ -83,8 +83,6 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({
         }
       };
       fetchQueries();
-    } else {
-      fetchQueries(putrolehere);
     } else {
       setLoading(false); // Data already exists, no need to fetch again
     }

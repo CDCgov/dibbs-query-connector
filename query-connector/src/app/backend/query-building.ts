@@ -20,23 +20,29 @@ const dbClient = getDbClient();
  * Each query object includes:
  * - query_id: The unique identifier for the query.
  * - query_name: The name of the query.
- * - valuesets: An array of ValueSet objects
- * - concepts: An array of Concept objects
+ * - valuesets: An array of ValueSet objects.
+ * - concepts: An array of Concept objects.
+ * - groupAssignments: An array of a user's group memberships.
  */
-export async function getCustomQueries(): Promise<CustomUserQuery[]> {
+export async function getCustomQueries(group: string | undefined): Promise<CustomUserQuery[]> {
   const query = `
     SELECT
       q.id AS query_id,
       q.query_name,
       q.query_data,
       q.conditions_list
-    FROM
-      query q;
+    FROM query q;
+    LEFT JOIN (
+        SELECT ug.id as usergroup_id, COUNT(*) AS query_count 
+        FROM usergroup_to_query 
+        GROUP BY usergroup_id
+      ) uq ON ug.id = uq.usergroup_id
+    WHERE usergroup_id = $1
   `;
   // TODO: this will eventually need to take into account user permissions and specific authors
   // We'll probably also need to refactor this to not show up in any user-facing containers
 
-  const results = await dbClient.query(query);
+  const results = await dbClient.query(query, [group]);
   const formattedData: { [key: string]: CustomUserQuery } = {};
 
   results.rows.forEach((row) => {
