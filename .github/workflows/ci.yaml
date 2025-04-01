@@ -46,6 +46,9 @@ jobs:
           echo "DATABASE_URL=postgresql://postgres:pw@localhost:5432/tefca_db" >> .env
           echo "AIDBOX_BASE_URL=http://aidbox:8080" >> .env
           echo "APP_HOSTNAME=http://query-connector:3000" >> .env
+      - name: Install dependencies
+        working-directory: ./query-connector
+        run: npm ci
       - name: Setup reporting action and run tests
         uses: ArtiomTr/jest-coverage-report-action@v2
         with:
