@@ -155,13 +155,24 @@ const UserModal: React.FC<UserModalProps> = ({
     }
   }, [newGroup]);
 
+  const updateUserFields = () => {
+    const updatedValues = Object.entries(newUser).map(([key, val]) => {
+      if (key == "qc_role") {
+        val = existingUser?.qc_role;
+      }
+      if (val === "") {
+        val = existingUser?.[key as keyof typeof newUser];
+      }
+
+      return [key, val];
+    });
+
+    return Object.fromEntries(updatedValues);
+  };
+
   const handleButtonClick = async () => {
     if (!!errorMessage) {
       return;
-    }
-
-    if (!newUser.first_name || !newUser.last_name || !newUser.username) {
-      return setErrorMessage("Please fill out all required fields");
     }
 
     if (modalMode == "create-user") {
@@ -174,9 +185,17 @@ const UserModal: React.FC<UserModalProps> = ({
         role: newUser.qc_role,
       };
 
+      const hasError = Object.entries(userToAdd).some(
+        ([key, val]) => val == "" && key != "id" && key != "email",
+      );
+
+      if (!!hasError) {
+        return setErrorMessage("Please fill out all required fields");
+      }
+
+      // if we have an ID but we're in create-user mode, we backnav'd here;
+      // we should update rather than add as a new user
       if (userToAdd.id) {
-        // if we have an ID but we're in create-user mode, we backnav'd here;
-        // we should update rather than add as a new user
         const udpatedUser = await updateUserDetails(
           userToAdd.id,
           userToAdd.username,
@@ -184,10 +203,12 @@ const UserModal: React.FC<UserModalProps> = ({
           userToAdd.lastName,
           userToAdd.role,
         );
+
         if (udpatedUser?.msg) {
           return setErrorMessage(udpatedUser.msg);
         } else {
           setNewUser({ ...newUser, ...udpatedUser });
+          setErrorMessage("");
           return setModalMode("select-groups");
         }
       }
@@ -206,38 +227,23 @@ const UserModal: React.FC<UserModalProps> = ({
     }
 
     if (modalMode == "edit-user") {
-      newUser.id = existingUser.id;
-      newUser.username = existingUser.username;
-      newUser.qc_role = existingUser.qc_role;
-
+      const userToUpdate = updateUserFields();
       if (
-        (newUser.first_name === "" ||
-          newUser.first_name === existingUser.first_name) &&
-        (newUser.last_name === "" ||
-          newUser.last_name === existingUser.last_name)
+        (userToUpdate.first_name === "" ||
+          userToUpdate.first_name === existingUser.first_name) &&
+        (userToUpdate.last_name === "" ||
+          userToUpdate.last_name === existingUser.last_name)
       ) {
         // we haven't changed anything; don't update the db
         return setModalMode("closed");
       }
 
-      // if one of first/last name is blank at this point, then
-      // we didn't update it, so we should use existing data
-      const userToAdd = {
-        ...newUser,
-        first_name:
-          newUser.first_name == ""
-            ? existingUser.first_name
-            : newUser.first_name,
-        last_name:
-          newUser.last_name == "" ? existingUser.last_name : newUser.last_name,
-      };
-
       const updatedUser = await updateUserDetails(
-        userToAdd.id,
-        userToAdd.username,
-        userToAdd.first_name,
-        userToAdd.last_name,
-        userToAdd.qc_role,
+        userToUpdate.id,
+        userToUpdate.username,
+        userToUpdate.first_name,
+        userToUpdate.last_name,
+        userToUpdate.qc_role,
       );
 
       if (updatedUser) {
@@ -377,6 +383,7 @@ const UserModal: React.FC<UserModalProps> = ({
 
   const handleCloseModal = () => {
     resetModalState();
+    setErrorMessage("");
     modalRef?.current?.toggleModal();
   };
 
@@ -424,7 +431,7 @@ const UserModal: React.FC<UserModalProps> = ({
   const validateInput = (e: React.FocusEvent<HTMLInputElement>) => {
     const value = e.currentTarget.value;
     const field = (e.target.previousSibling as HTMLElement).innerHTML;
-    if (value === "" && !!modalRef.current?.modalIsOpen) {
+    if (value.trim() === "" && !!modalRef.current?.modalIsOpen) {
       return setErrorMessage(`${field} cannot be blank`);
     }
   };
@@ -499,7 +506,7 @@ const UserModal: React.FC<UserModalProps> = ({
           name="firstName"
           type="text"
           value={
-            activeField == "first_name"
+            activeField == "first_name" || newUser.first_name !== ""
               ? newUser.first_name
               : existingUser?.first_name
           }
@@ -513,7 +520,7 @@ const UserModal: React.FC<UserModalProps> = ({
           name="lastName"
           type="text"
           value={
-            activeField == "last_name"
+            activeField == "last_name" || newUser.last_name !== ""
               ? newUser.last_name
               : existingUser?.last_name
           }
