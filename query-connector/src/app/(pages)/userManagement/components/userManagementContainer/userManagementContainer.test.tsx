@@ -120,7 +120,7 @@ describe("Super Admin view of Users Table", () => {
     await user.click(groupsTab);
     expect(groupsTab).toHaveClass("tab__active");
 
-    expect(document.body).toHaveTextContent("Assigned queries");
+    expect(document.body).toHaveTextContent("Create group");
     expect(document.body).toMatchSnapshot();
 
     jest.restoreAllMocks();
