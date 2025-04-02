@@ -56,8 +56,8 @@ const UsersTable: React.FC<UsersTableProps> = ({ role }) => {
   const setTab = (e: React.MouseEvent<HTMLElement>) => {
     const clickedTab = e.currentTarget.innerHTML;
     const tabObj = tabsForRole.filter((tab) => tab.label == clickedTab)[0];
-    setShouldRefreshView(`Load ${tabObj.label}` as viewMode);
     setActiveTab(tabObj);
+    setShouldRefreshView(`Update ${tabObj.label}` as viewMode);
   };
 
   const sections: Tab[] = [
