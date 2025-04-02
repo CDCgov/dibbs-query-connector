@@ -46,22 +46,31 @@ jobs:
           echo "AIDBOX_BASE_URL=http://aidbox:8080" >> .env
           echo "APP_HOSTNAME=http://query-connector:3000" >> .env
       - name: Run tests
+        id: run-tests
         working-directory: ./query-connector
         run: |
           npm run test:ci
+        # uncomment these next few lines and the corresponding log import
+        # in the setup script you're trying to debug if you're having trouble
+        # in CI. All the best, brave engineer (￣^￣ )ゞ
         continue-on-error: true
       - name: Upload Docker Logs
         uses: actions/upload-artifact@v4
         with:
           name: docker-logs
           path: |
-            ./query-connector/logs-before-tests.txt
-            ./query-connector/logs-after-tests.txt
+            ./logs-before-tests.txt
+            ./logs-after-tests.txt
+
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           slug: CDCgov/dibbs-query-connector
+
+      - name: Exit with proper code
+        if: steps.run_tests.outcome == 'failure'
+        run: exit 1 # Force the workflow to fail if tests failed
 
   end-to-end-tests:
     timeout-minutes: 15
