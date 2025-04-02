@@ -46,6 +46,7 @@ jobs:
           echo "AIDBOX_BASE_URL=http://aidbox:8080" >> .env
           echo "APP_HOSTNAME=http://query-connector:3000" >> .env
       - name: Install dependencies
+        working-directory: ./query-connector
         run: |
           npm ci
       - name: Run tests
