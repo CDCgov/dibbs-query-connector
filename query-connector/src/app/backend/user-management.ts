@@ -8,11 +8,17 @@ import { getDbClient } from "./dbClient";
 
 const dbClient = getDbClient();
 
-export async function checkUserQuery(username: string) {
-  const checkUserQuery = `SELECT id, username FROM users WHERE username = $1;`;
+/**
+ *
+ * @param username The identifier of the user we want to retrieve
+ * @returns A single user result
+ */
+export async function getUserByUsername(username: string) {
+  const checkUserQuery = `SELECT * FROM users WHERE username = $1;`;
   const result = await dbClient.query(checkUserQuery, [username]);
-  return result.rows;
-};
+  return result.rows[0];
+}
+
 /**
  * Adds a user to the users table if they do not already exist.
  * Uses data extracted from the JWT token.
@@ -217,14 +223,11 @@ export async function checkUserExists(
   }
 
   const userCheckQuery = {
-    text: `SELECT * FROM users WHERE username = $1;`,
+    text: `SELECT * FROM users WHERE id = $1;`,
     values: [userId],
   };
 
   const userCheckResult = await dbClient.query(userCheckQuery);
-  if (userCheckResult.rows.length === 0) {
-    return { totalItems: 0, items: [] };
-  }
 
   return {
     totalItems: userCheckResult.rowCount,
@@ -339,8 +342,6 @@ export async function getSingleUserWithGroupMemberships(
   }
 
   const userCheckResult = await checkUserExists(userId);
-  console.log(userId);
-  console.log(userCheckResult);
   if (!userCheckResult || userCheckResult?.totalItems == 0) {
     return { totalItems: 0, items: [] };
   }
