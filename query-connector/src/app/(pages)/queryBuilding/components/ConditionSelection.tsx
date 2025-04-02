@@ -75,14 +75,61 @@ export const ConditionSelection: React.FC<ConditionSelectionProps> = ({
         />
 
         {categoryToConditionsMap && (
-          <ConditionColumnDisplay
-            constructedQuery={constructedQuery}
-            handleConditionUpdate={handleConditionUpdate}
-            categoryToConditionsMap={categoryToConditionsMap}
-            searchFilter={searchFilter}
-            formError={formError}
-            setFormError={setFormError}
-          />
+          <>
+            {(() => {
+              const conditionIdToNameMap: { [id: string]: string } = {};
+              Object.values(categoryToConditionsMap)
+                .flat()
+                .forEach((c) => {
+                  conditionIdToNameMap[c.id] = c.name;
+                });
+
+              return (
+                <>
+                  <div className="margin-bottom-2 display-flex flex-column flex-align-center">
+                    {" "}
+                    {Object.entries(categoryToConditionsMap)
+                      .flatMap(([_, conditions]) => conditions)
+                      .filter((condition) =>
+                        constructedQuery.hasOwnProperty(condition.id),
+                      )
+                      .map((condition) => (
+                        <div
+                          key={condition.id}
+                          className={classNames(
+                            "display-flex flex-align-center margin-right-1 margin-bottom-1 padding-x-2 padding-y-1 border-radius-md",
+                            styles.bluePill,
+                          )}
+                        >
+                          <span className="margin-right-1">
+                            {condition.name}
+                          </span>
+                          <button
+                            type="button"
+                            className="bg-transparent border-0 cursor-pointer"
+                            onClick={() =>
+                              handleConditionUpdate(condition.id, true)
+                            }
+                            aria-label={`Remove ${condition.name}`}
+                          >
+                            ×
+                          </button>
+                        </div>
+                      ))}
+                  </div>
+
+                  <ConditionColumnDisplay
+                    constructedQuery={constructedQuery}
+                    handleConditionUpdate={handleConditionUpdate}
+                    categoryToConditionsMap={categoryToConditionsMap}
+                    searchFilter={searchFilter}
+                    formError={formError}
+                    setFormError={setFormError}
+                  />
+                </>
+              );
+            })()}
+          </>
         )}
       </div>
     </div>
