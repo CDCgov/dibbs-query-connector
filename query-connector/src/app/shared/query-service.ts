@@ -10,7 +10,6 @@ import { getSavedQueryByName } from "./database-service";
 import type { QueryDataColumn } from "../(pages)/queryBuilding/utils";
 import { getFhirServerConfigs } from "../backend/dbServices/fhir-servers";
 import { DibbsValueSet } from "../models/entities/valuesets";
-import { auditable } from "../auditLogs/decorator";
 import FHIRClient from "./fhirClient";
 import { FhirServerConfig } from "../models/entities/fhir-servers";
 
@@ -235,7 +234,6 @@ class QueryService {
    * @param includeImmunization Whether to include immunization in the query execution
    * @returns A promise for an updated query response.
    */
-  @auditable
   static async patientRecordsQuery(
     request: PatientRecordsRequest,
     valueSetOverrides?: DibbsValueSet[],
@@ -320,7 +318,6 @@ class QueryService {
    * fhir client info.
    * @returns - The response body from the FHIR server.
    */
-  @auditable
   static async patientDiscoveryQuery(
     request: PatientDiscoveryRequest,
   ): Promise<QueryResponse["Patient"]> {
