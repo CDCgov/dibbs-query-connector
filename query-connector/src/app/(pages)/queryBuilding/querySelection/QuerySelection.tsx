@@ -17,9 +17,10 @@ import { CustomUserQuery } from "@/app/models/entities/query";
 import { getRole } from "@/app/(pages)/userManagement/utils"; 
 import { getQueryList } from "@/app/backend/query-building";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
-import { checkUserQuery } from "@/app/backend/user-management"; 
-import { getSingleUserWithGroupMemberships } from "@/app/backend/user-management";
+import { getAllGroupQueries } from "@/app/backend/usergroup-management";
+import { checkUserQuery, getSingleUserWithGroupMemberships } from "@/app/backend/user-management";
 import { useSession } from "next-auth/react";
+import { Identifier } from "@trussworks/react-uswds";
 
 type QuerySelectionProps = {
   selectedQuery: SelectedQueryState;
@@ -27,6 +28,15 @@ type QuerySelectionProps = {
   setSelectedQuery: Dispatch<SetStateAction<SelectedQueryDetails>>;
 };
 
+let getUserId = async(sesh: any) => {
+  const user = await checkUserQuery(sesh);
+  return user;
+}
+
+// let getGroupMemberships = async() => {
+//   const groups = await getSingleUserWithGroupMemberships(user?.id);
+//   return groups;
+// }
 /**
  * Component for Query Building Flow
  * @param root0 - params
@@ -42,20 +52,12 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({
   setSelectedQuery,
 }) => {
   const { data: session } = useSession();
-  const sesh = session?.user.username
-  console.log(sesh);
-  let getUserId = async() => {
-    const user = await checkUserQuery(sesh);
-    return user;
-  }
-  const user = !!sesh && getUserId();
+  const sesh = session?.user?.username
+  // console.log(sesh);
+  // const user = !!sesh && await getUserId();
 
-  let getGroupMemberships = async() => {
-    const groups = await getSingleUserWithGroupMemberships(user.id);
-    return groups;
-  }
-  const groups = getGroupMemberships();
-  console.log(groups);
+  // const groups = getGroupMemberships();
+  // console.log(groups);
   const userRole = getRole();
   console.log(userRole);
   const [unauthorizedError, setUnauthorizedError] = useState(false);
@@ -64,8 +66,16 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({
 
   // Check whether custom queries exist in DB
   useEffect(() => {
+   async function fetchUser(){ 
+      const user = await getUserId(sesh);
+      return user
+    }
+    
+    console.log(fetchUser());
+    // let user = !!sesh && getUserId(sesh);
+    // console.log(user?.id);
     if (queriesContext?.data === null || queriesContext?.data === undefined) {
-      if (userRole == "Super Admin") { //ask Janki and Michelle if superAdmin can really see everything or if we want to go ahead and filter
+      if (userRole == "Super Admin") {
         const fetchQueries = async () => {
         try {
           const queries = await getQueryList();
@@ -83,7 +93,9 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({
           setLoading(false);
         }
       };
-      fetchQueries(); //getAllGroupQueries(groupId: string,) for anyone who needs filtering bc the method already does it
+      fetchQueries();
+    } else if (userRole != "SuperAdmin") {
+      groups.map(getAllGroupQueries(g));
     } else {
       setLoading(false); // Data already exists, no need to fetch again
     }
