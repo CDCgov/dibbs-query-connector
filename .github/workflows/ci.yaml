@@ -43,7 +43,6 @@ jobs:
         working-directory: ./query-connector
         run: |
           echo "AIDBOX_LICENSE=${{ secrets.AIDBOX_LICENSE }}" > .env
-          echo "DATABASE_URL=postgresql://postgres:pw@localhost:5432/tefca_db" >> .env
           echo "AIDBOX_BASE_URL=http://aidbox:8080" >> .env
           echo "APP_HOSTNAME=http://query-connector:3000" >> .env
       - name: Setup reporting action and run tests
@@ -53,13 +52,6 @@ jobs:
           working-directory: ./query-connector
           skip-step: none
         continue-on-error: true
-      - name: Upload Docker Logs
-        uses: actions/upload-artifact@v4
-        with:
-          name: docker-logs
-          path: |
-            ./query-connector/logs-before-tests.txt
-            ./query-connector/logs-after-tests.txt
 
   end-to-end-tests:
     timeout-minutes: 15
