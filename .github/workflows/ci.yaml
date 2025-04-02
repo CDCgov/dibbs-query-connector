@@ -45,13 +45,15 @@ jobs:
           echo "AIDBOX_LICENSE=${{ secrets.AIDBOX_LICENSE }}" > .env
           echo "AIDBOX_BASE_URL=http://aidbox:8080" >> .env
           echo "APP_HOSTNAME=http://query-connector:3000" >> .env
-      - name: Setup reporting action and run tests
-        uses: ArtiomTr/jest-coverage-report-action@v2
+      - name: Run tests
+        working-directory: ./query-connector
+        run: |
+          npm run test:ci
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v5
         with:
-          test-script: npm run test:ci
-          working-directory: ./query-connector
-          skip-step: none
-        continue-on-error: true
+          token: ${{ secrets.CODECOV_TOKEN }}
+          slug: CDCgov/dibbs-query-connector
 
   end-to-end-tests:
     timeout-minutes: 15
