@@ -4,6 +4,8 @@ set -e  # Exit immediately if a command exits with a non-zero status
 docker compose down --volumes --remove-orphans
 docker compose -f docker-compose-integration.yaml up -d
 
+docker compose -f  docker-compose-integration.yaml logs > test-results/logs-before-tests.txt
+
 # wait for Aidbox to finish running before...
 docker compose -f docker-compose-integration.yaml logs -f aidbox-seeder | grep -q "Finished configuring Aidbox and database."
 
@@ -17,6 +19,8 @@ else
 fi 
 eval $JEST_CMD
 JEST_EXIT_CODE=$?
+
+docker compose -f  docker-compose-integration.yaml logs > test-results/logs-after-tests.txt
 
 # Teardown containers
 docker compose -f docker-compose-integration.yaml down
