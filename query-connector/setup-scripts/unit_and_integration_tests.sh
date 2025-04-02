@@ -4,12 +4,11 @@
 docker compose down --volumes --remove-orphans
 docker compose -f docker-compose-integration.yaml up -d
 
-
 # wait for Aidbox to finish running before...
 docker compose -f docker-compose-integration.yaml logs -f aidbox-seeder | grep -q "Finished configuring Aidbox and database."
 
 # uncomment these and the corresponding block in the ci.yaml to get the logs in CI
-docker compose -f docker-compose-integration.yaml logs > logs-before-tests.txt
+docker compose -f docker-compose-integration.yaml logs > test-results/logs-before-tests.txt
 
 BASE_CMD="DATABASE_URL=postgresql://postgres:pw@localhost:5432/tefca_db TEST_TYPE=integration npx jest "
 # running our integration tests
@@ -23,10 +22,10 @@ eval $JEST_CMD
 JEST_EXIT_CODE=$?
 
 # uncomment these and the corresponding block in the ci.yaml to get the CI logs
-docker compose -f docker-compose-integration.yaml logs > logs-after-tests.txt
+docker compose -f docker-compose-integration.yaml logs > test-results/logs-after-tests.txt
 
 # Teardown containers
-docker compose -f docker-compose-integration.yaml down
+# docker compose -f docker-compose-integration.yaml down
 
 # Exit with the Jest exit code
 exit $JEST_EXIT_CODE

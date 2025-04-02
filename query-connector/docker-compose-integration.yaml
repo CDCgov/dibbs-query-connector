@@ -47,6 +47,8 @@ services:
       - aidbox_db
     ports:
       - 8080:8080
+    env_file:
+      - .env
     environment:
       AIDBOX_TERMINOLOGY_SERVICE_BASE_URL: https://tx.fhir.org/r4
       AIDBOX_FHIR_PACKAGES: hl7.fhir.r4.core#4.0.1
@@ -67,16 +69,13 @@ services:
       PGPASSWORD: gOxAmiyiz4
       PGPORT: "5432"
       BOX_SEARCH_INCLUDE_CONFORMANT: true
-      JAVA_TOOL_OPTIONS: "-XX:UseSVE=0"
-    env_file:
-      - .env
-
   aidbox-seeder:
     build:
       context: .
       dockerfile: Dockerfile.aidbox-seeder
     volumes:
       - ./src/app/tests/assets/GoldenSickPatient.json:/data/GoldenSickPatient.json
+      - ./logs:/var/log
     env_file:
       - .env
     depends_on:

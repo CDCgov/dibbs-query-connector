@@ -14,6 +14,7 @@ import { GET } from "@/app/api/route";
 import {
   PATIENT_HL7_MESSAGE,
   PATIENT_HL7_MESSAGE_NO_IDENTIFIERS,
+  suppressConsoleLogs,
 } from "./fixtures";
 
 jest.mock("next-auth");
@@ -60,10 +61,7 @@ describe("GET Health Check", () => {
 
 describe("POST Query FHIR Server", () => {
   beforeEach(() => {
-    // supress the warnings for the error endpoints and general console.logs
-    jest.spyOn(console, "error").mockImplementation(() => {});
-    jest.spyOn(console, "log").mockImplementation(() => {});
-    jest.spyOn(console, "info").mockImplementation(() => {});
+    suppressConsoleLogs();
   });
 
   afterEach(() => {

@@ -39,16 +39,16 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{env.NODE_VERSION}}
+      - name: Install dependencies
+        working-directory: ./query-connector
+        run: |
+          npm ci
       - name: Create .env
         working-directory: ./query-connector
         run: |
           echo "AIDBOX_LICENSE=${{ secrets.AIDBOX_LICENSE }}" > .env
           echo "AIDBOX_BASE_URL=http://aidbox:8080" >> .env
           echo "APP_HOSTNAME=http://query-connector:3000" >> .env
-      - name: Install dependencies
-        working-directory: ./query-connector
-        run: |
-          npm ci
       - name: Run tests
         working-directory: ./query-connector
         run: |
@@ -63,8 +63,8 @@ jobs:
         with:
           name: docker-logs
           path: |
-            ./query-connector/logs-before-tests.txt
-            ./query-connector/logs-after-tests.txt
+            ./query-connector/test-results/logs-before-tests.txt
+            ./query-connector/test-results/logs-after-tests.txt
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v5
