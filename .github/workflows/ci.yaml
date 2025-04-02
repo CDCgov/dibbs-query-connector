@@ -55,8 +55,8 @@ jobs:
         with:
           name: docker-logs
           path: |
-            ./query-connector/test-results/logs-before-tests.txt
-            ./query-connector/test-results/logs-after-tests.txt
+            ./query-connector/logs-before-tests.txt
+            ./query-connector/logs-after-tests.txt
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v5
         with:
