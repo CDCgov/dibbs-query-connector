@@ -70,6 +70,7 @@ services:
       JAVA_TOOL_OPTIONS: "-XX:UseSVE=0"
     env_file:
       - .env
+
   aidbox-seeder:
     build:
       context: .

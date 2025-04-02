@@ -1,5 +1,6 @@
 #!/bin/bash
 
+set -e
 docker compose down --volumes --remove-orphans
 docker compose -f docker-compose-e2e.yaml --env-file .env up -d --build 
 

@@ -11,7 +11,7 @@ docker compose -f docker-compose-integration.yaml logs -f aidbox-seeder | grep -
 # uncomment these and the corresponding block in the ci.yaml to get the logs in CI
 docker compose -f docker-compose-integration.yaml logs > logs-before-tests.txt
 
-BASE_CMD="DATABASE_URL=postgresql://postgres:pw@localhost:5432/tefca_db TEST_TYPE=integration jest "
+BASE_CMD="DATABASE_URL=postgresql://postgres:pw@localhost:5432/tefca_db TEST_TYPE=integration npx jest "
 # running our integration tests
 if [ "$JUST_INTEGRATION" = "true" ]; then 
     JEST_CMD="$BASE_CMD --testPathPattern=tests/integration"
