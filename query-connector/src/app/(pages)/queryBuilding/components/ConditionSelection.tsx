@@ -67,7 +67,7 @@ export const ConditionSelection: React.FC<ConditionSelectionProps> = ({
           id="conditionTemplateSearch"
           placeholder={CONDITION_DRAWER_SEARCH_PLACEHOLDER}
           className={classNames(
-            "maxw-mobile margin-x-auto margin-top-0 margin-bottom-4",
+            "maxw-mobile margin-x-auto margin-top-0 margin-bottom-2",
           )}
           onChange={(e) => {
             e.preventDefault();
@@ -88,10 +88,9 @@ export const ConditionSelection: React.FC<ConditionSelectionProps> = ({
               return (
                 <>
                   <div
-                    className="margin-bottom-2 display-flex flex-column flex-align-center"
+                    className="margin-bottom-2 display-flex flex-row flex-wrap flex-align-center flex-justify-center"
                     data-testid="selected-pill-container"
                   >
-                    {" "}
                     {Object.entries(categoryToConditionsMap)
                       .flatMap(([_, conditions]) => conditions)
                       .filter((condition) =>
