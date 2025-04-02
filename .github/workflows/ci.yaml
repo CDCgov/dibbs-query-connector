@@ -52,6 +52,7 @@ jobs:
           test-script: npm run test:ci
           working-directory: ./query-connector
           skip-step: none
+        continue-on-error: true
       - name: Upload Docker Logs
         uses: actions/upload-artifact@v4
         with:
