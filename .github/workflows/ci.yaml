@@ -54,6 +54,13 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           slug: CDCgov/dibbs-query-connector
+      - name: Upload Docker Logs
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-logs
+          path: |
+            ./query-connector/test-results/logs-before-tests.txt
+            ./query-connector/test-results/logs-after-tests.txt
 
   end-to-end-tests:
     timeout-minutes: 15
