@@ -8,6 +8,7 @@ import ConditionColumnDisplay from "../buildFromTemplates/ConditionColumnDisplay
 import SearchField from "@/app/ui/designSystem/searchField/SearchField";
 import { FormError } from "../buildFromTemplates/BuildFromTemplates";
 import { CONDITION_DRAWER_SEARCH_PLACEHOLDER } from "./utils";
+import { formatDiseaseDisplay } from "../utils";
 
 type ConditionSelectionProps = {
   categoryToConditionsMap: CategoryToConditionArrayMap;
@@ -86,7 +87,10 @@ export const ConditionSelection: React.FC<ConditionSelectionProps> = ({
 
               return (
                 <>
-                  <div className="margin-bottom-2 display-flex flex-column flex-align-center">
+                  <div
+                    className="margin-bottom-2 display-flex flex-column flex-align-center"
+                    data-testid="selected-pill-container"
+                  >
                     {" "}
                     {Object.entries(categoryToConditionsMap)
                       .flatMap(([_, conditions]) => conditions)
@@ -102,7 +106,7 @@ export const ConditionSelection: React.FC<ConditionSelectionProps> = ({
                           )}
                         >
                           <span className="margin-right-1">
-                            {condition.name}
+                            {formatDiseaseDisplay(condition.name)}
                           </span>
                           <button
                             type="button"
@@ -110,7 +114,7 @@ export const ConditionSelection: React.FC<ConditionSelectionProps> = ({
                             onClick={() =>
                               handleConditionUpdate(condition.id, true)
                             }
-                            aria-label={`Remove ${condition.name}`}
+                            aria-label={`Remove ${formatDiseaseDisplay(condition.name)}`}
                           >
                             ×
                           </button>
