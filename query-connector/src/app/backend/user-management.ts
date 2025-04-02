@@ -8,11 +8,15 @@ import { getDbClient } from "./dbClient";
 
 const dbClient = getDbClient();
 
+/**
+ *
+ * @param username
+ */
 export async function checkUserQuery(username: string) {
   const checkUserQuery = `SELECT id, username FROM users WHERE username = $1;`;
   const result = await dbClient.query(checkUserQuery, [username]);
   return result.rows;
-};
+}
 /**
  * Adds a user to the users table if they do not already exist.
  * Uses data extracted from the JWT token.

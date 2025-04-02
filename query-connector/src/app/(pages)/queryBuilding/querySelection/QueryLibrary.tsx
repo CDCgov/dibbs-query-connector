@@ -10,7 +10,6 @@ import { Button, Icon } from "@trussworks/react-uswds";
 import Table from "@/app/ui/designSystem/table/Table";
 import { ModalRef } from "@/app/ui/designSystem/modal/Modal";
 import styles from "./querySelection.module.scss";
-import { useSession } from "next-auth/react";
 
 import { BuildStep } from "@/app/shared/constants";
 import {
@@ -26,8 +25,6 @@ import classNames from "classnames";
 import { getConditionsData } from "@/app/shared/database-service";
 import { ConditionsMap } from "../utils";
 import { CustomUserQuery } from "@/app/models/entities/query";
-import { checkUserQuery } from "@/app/backend/user-management"; 
-import { getSingleUserWithGroupMemberships } from "@/app/backend/user-management";
 
 interface UserQueriesDisplayProps {
   queries: CustomUserQuery[];

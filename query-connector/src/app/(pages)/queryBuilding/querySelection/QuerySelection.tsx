@@ -14,13 +14,12 @@ import { SelectedQueryDetails, SelectedQueryState } from "./utils";
 import { BuildStep } from "@/app/shared/constants";
 import { DataContext } from "@/app/shared/DataProvider";
 import { CustomUserQuery } from "@/app/models/entities/query";
-import { getRole } from "@/app/(pages)/userManagement/utils"; 
+import { getRole } from "@/app/(pages)/userManagement/utils";
 import { getQueryList } from "@/app/backend/query-building";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import { getAllGroupQueries } from "@/app/backend/usergroup-management";
-import { checkUserQuery, getSingleUserWithGroupMemberships } from "@/app/backend/user-management";
+import { checkUserQuery } from "@/app/backend/user-management";
 import { useSession } from "next-auth/react";
-import { Identifier } from "@trussworks/react-uswds";
 
 type QuerySelectionProps = {
   selectedQuery: SelectedQueryState;
@@ -28,10 +27,10 @@ type QuerySelectionProps = {
   setSelectedQuery: Dispatch<SetStateAction<SelectedQueryDetails>>;
 };
 
-let getUserId = async(sesh: any) => {
+let getUserId = async (sesh: any) => {
   const user = await checkUserQuery(sesh);
   return user;
-}
+};
 
 // let getGroupMemberships = async() => {
 //   const groups = await getSingleUserWithGroupMemberships(user?.id);
@@ -52,7 +51,7 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({
   setSelectedQuery,
 }) => {
   const { data: session } = useSession();
-  const sesh = session?.user?.username
+  const sesh = session?.user?.username;
   // console.log(sesh);
   // const user = !!sesh && await getUserId();
 
@@ -66,40 +65,40 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({
 
   // Check whether custom queries exist in DB
   useEffect(() => {
-   async function fetchUser(){ 
+    async function fetchUser() {
       const user = await getUserId(sesh);
-      return user
+      return user;
     }
-    
+
     console.log(fetchUser());
     // let user = !!sesh && getUserId(sesh);
     // console.log(user?.id);
     if (queriesContext?.data === null || queriesContext?.data === undefined) {
       if (userRole == "Super Admin") {
         const fetchQueries = async () => {
-        try {
-          const queries = await getQueryList();
-          queriesContext?.setData(queries);
-        } catch (error) {
-          if (error == "Error: Unauthorized") {
-            setUnauthorizedError(true);
-            showToastConfirmation({
-              body: "You are not authorized to see queries.",
-              variant: "error",
-            });
+          try {
+            const queries = await getQueryList();
+            queriesContext?.setData(queries);
+          } catch (error) {
+            if (error == "Error: Unauthorized") {
+              setUnauthorizedError(true);
+              showToastConfirmation({
+                body: "You are not authorized to see queries.",
+                variant: "error",
+              });
+            }
+            console.error("Failed to fetch queries:", error);
+          } finally {
+            setLoading(false);
           }
-          console.error("Failed to fetch queries:", error);
-        } finally {
-          setLoading(false);
-        }
-      };
-      fetchQueries();
-    } else if (userRole != "SuperAdmin") {
-      groups.map(getAllGroupQueries(g));
-    } else {
-      setLoading(false); // Data already exists, no need to fetch again
+        };
+        fetchQueries();
+      } else if (userRole != "SuperAdmin") {
+        groups.map(getAllGroupQueries(g));
+      } else {
+        setLoading(false); // Data already exists, no need to fetch again
+      }
     }
-  }
   }, [queriesContext]);
 
   if (loading) {
