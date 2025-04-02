@@ -280,14 +280,18 @@ const UserModal: React.FC<UserModalProps> = ({
         query_size: existingGroup?.query_size || newGroup.query_size || 0,
       };
 
-      if (newGroup.name == "" && existingGroup?.name != "") {
+      if (newGroup.name == "" && existingGroup && existingGroup?.name != "") {
         // we haven't changed anything, but we still want to trigger
         // the drawer open with newGroup update
         setNewGroup({ ...newGroup, ...existingGroup });
         return setModalMode("closed");
       }
 
-      if (newGroup.name == "" && existingGroup?.name == "" && !errorMessage) {
+      if (
+        newGroup.name == "" &&
+        (!existingGroup || existingGroup?.name == "") &&
+        !errorMessage
+      ) {
         return setErrorMessage("Please provide a name for the group.");
       }
 
