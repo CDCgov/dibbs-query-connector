@@ -4,10 +4,14 @@ set -e  # Exit immediately if a command exits with a non-zero status
 docker compose down --volumes --remove-orphans
 docker compose -f docker-compose-integration.yaml up -d
 
-docker compose -f  docker-compose-integration.yaml logs > test-results/logs-before-tests.txt
 
 # wait for Aidbox to finish running before...
 docker compose -f docker-compose-integration.yaml logs -f aidbox-seeder | grep -q "Finished configuring Aidbox and database."
+
+mkdir test-results
+touch test-results/logs-before-tests.txt
+docker compose -f  docker-compose-integration.yaml logs > test-results/logs-before-tests.txt
+
 
 BASE_CMD="DATABASE_URL=postgresql://postgres:pw@localhost:5432/tefca_db TEST_TYPE=integration jest "
 # running our integration tests
