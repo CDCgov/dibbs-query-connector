@@ -116,7 +116,7 @@ exports[`Super Admin view of Users Table renders content on tab click 1`] = `
         Add user
       </button>
       <div
-        class="customizeTableWrapper"
+        class="userPermissionsTable customizeTableWrapper"
       >
         <table
           class="usa-table usa-table--borderless customizeTable"
@@ -138,9 +138,44 @@ exports[`Super Admin view of Users Table renders content on tab click 1`] = `
           <tbody>
             <tr>
               <td
+                class="userDisplay"
                 width="270"
               >
                 Potter, Lily 
+                <div
+                  class="actionButtons"
+                >
+                  <button
+                    class="usa-button usa-button--unstyled text-bold text-no-underline"
+                    data-testid="button"
+                    type="button"
+                  >
+                    <span
+                      class="icon-text padding-right-4 display-flex flex-align-center"
+                    >
+                      <svg
+                        aria-label="Pencil icon indicating edit ability"
+                        class="usa-icon height-3 width-3"
+                        focusable="false"
+                        height="1em"
+                        role="img"
+                        viewBox="0 0 24 24"
+                        width="1em"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a.996.996 0 0 0 0-1.41l-2.34-2.34a.996.996 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"
+                        />
+                      </svg>
+                      <span
+                        class="padding-left-05"
+                        data-testid="edit-group-456"
+                      >
+                        Edit
+                      </span>
+                    </span>
+                  </button>
+                </div>
               </td>
               <td
                 class="roleDropdown"
@@ -189,9 +224,44 @@ exports[`Super Admin view of Users Table renders content on tab click 1`] = `
             </tr>
             <tr>
               <td
+                class="userDisplay"
                 width="270"
               >
                 Potter, Harry 
+                <div
+                  class="actionButtons"
+                >
+                  <button
+                    class="usa-button usa-button--unstyled text-bold text-no-underline"
+                    data-testid="button"
+                    type="button"
+                  >
+                    <span
+                      class="icon-text padding-right-4 display-flex flex-align-center"
+                    >
+                      <svg
+                        aria-label="Pencil icon indicating edit ability"
+                        class="usa-icon height-3 width-3"
+                        focusable="false"
+                        height="1em"
+                        role="img"
+                        viewBox="0 0 24 24"
+                        width="1em"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a.996.996 0 0 0 0-1.41l-2.34-2.34a.996.996 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"
+                        />
+                      </svg>
+                      <span
+                        class="padding-left-05"
+                        data-testid="edit-group-123"
+                      >
+                        Edit
+                      </span>
+                    </span>
+                  </button>
+                </div>
               </td>
               <td
                 class="roleDropdown"
@@ -318,64 +388,22 @@ exports[`Super Admin view of Users Table renders content on tab click 2`] = `
           User groups
         </button>
       </div>
-      <button
-        class="usa-button styles.createQueryButton margin-bottom-3"
-        data-testid="button"
-        style="margin-left: 1px; background-color: rgb(0, 94, 162);"
-        type="button"
-      >
-        Create group
-      </button>
       <div
-        class="customizeTableWrapper"
+        class="empty-response"
       >
-        <table
-          class="usa-table usa-table--borderless customizeTable"
-          data-testid="table"
+        <div
+          class="empty-response display-flex flex-column flex-align-start"
         >
-          <thead>
-            <tr>
-              <th>
-                Name
-              </th>
-              <th>
-                Members
-              </th>
-              <th>
-                Assigned queries
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td
-                width="270"
-              >
-                Hogwarts
-              </td>
-              <td>
-                <button
-                  aria-description="Edit Hogwarts members"
-                  class="usa-button usa-button--unstyled drawerButton text-no-underline"
-                  data-testid="edit-member-list-0"
-                  type="button"
-                >
-                  1 member
-                </button>
-              </td>
-              <td>
-                <button
-                  aria-description="Edit Hogwarts queries"
-                  class="usa-button usa-button--unstyled text-no-underline"
-                  data-testid="edit-query-list-0"
-                  type="button"
-                >
-                  0 queries
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+          No user groups found
+          <button
+            class="usa-button styles.createQueryButton margin-bottom-3"
+            data-testid="button"
+            style="margin-left: 1px; margin-top: 1.5rem; background-color: rgb(0, 94, 162);"
+            type="button"
+          >
+            Create group
+          </button>
+        </div>
       </div>
       <div>
         Modal Mock
@@ -567,7 +595,7 @@ exports[`Super Admin view of Users Table renders table view after content is loa
         Add user
       </button>
       <div
-        class="customizeTableWrapper"
+        class="userPermissionsTable customizeTableWrapper"
       >
         <table
           class="usa-table usa-table--borderless customizeTable"
@@ -589,9 +617,44 @@ exports[`Super Admin view of Users Table renders table view after content is loa
           <tbody>
             <tr>
               <td
+                class="userDisplay"
                 width="270"
               >
                 Potter, Lily 
+                <div
+                  class="actionButtons"
+                >
+                  <button
+                    class="usa-button usa-button--unstyled text-bold text-no-underline"
+                    data-testid="button"
+                    type="button"
+                  >
+                    <span
+                      class="icon-text padding-right-4 display-flex flex-align-center"
+                    >
+                      <svg
+                        aria-label="Pencil icon indicating edit ability"
+                        class="usa-icon height-3 width-3"
+                        focusable="false"
+                        height="1em"
+                        role="img"
+                        viewBox="0 0 24 24"
+                        width="1em"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a.996.996 0 0 0 0-1.41l-2.34-2.34a.996.996 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"
+                        />
+                      </svg>
+                      <span
+                        class="padding-left-05"
+                        data-testid="edit-group-456"
+                      >
+                        Edit
+                      </span>
+                    </span>
+                  </button>
+                </div>
               </td>
               <td
                 class="roleDropdown"
@@ -640,9 +703,44 @@ exports[`Super Admin view of Users Table renders table view after content is loa
             </tr>
             <tr>
               <td
+                class="userDisplay"
                 width="270"
               >
                 Potter, Harry 
+                <div
+                  class="actionButtons"
+                >
+                  <button
+                    class="usa-button usa-button--unstyled text-bold text-no-underline"
+                    data-testid="button"
+                    type="button"
+                  >
+                    <span
+                      class="icon-text padding-right-4 display-flex flex-align-center"
+                    >
+                      <svg
+                        aria-label="Pencil icon indicating edit ability"
+                        class="usa-icon height-3 width-3"
+                        focusable="false"
+                        height="1em"
+                        role="img"
+                        viewBox="0 0 24 24"
+                        width="1em"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a.996.996 0 0 0 0-1.41l-2.34-2.34a.996.996 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"
+                        />
+                      </svg>
+                      <span
+                        class="padding-left-05"
+                        data-testid="edit-group-123"
+                      >
+                        Edit
+                      </span>
+                    </span>
+                  </button>
+                </div>
               </td>
               <td
                 class="roleDropdown"
@@ -778,7 +876,7 @@ exports[`Super Admin view of Users Table renders table view after content is loa
         Add user
       </button>
       <div
-        class="customizeTableWrapper"
+        class="userPermissionsTable customizeTableWrapper"
       >
         <table
           class="usa-table usa-table--borderless customizeTable"
@@ -800,9 +898,44 @@ exports[`Super Admin view of Users Table renders table view after content is loa
           <tbody>
             <tr>
               <td
+                class="userDisplay"
                 width="270"
               >
                 Potter, Lily 
+                <div
+                  class="actionButtons"
+                >
+                  <button
+                    class="usa-button usa-button--unstyled text-bold text-no-underline"
+                    data-testid="button"
+                    type="button"
+                  >
+                    <span
+                      class="icon-text padding-right-4 display-flex flex-align-center"
+                    >
+                      <svg
+                        aria-label="Pencil icon indicating edit ability"
+                        class="usa-icon height-3 width-3"
+                        focusable="false"
+                        height="1em"
+                        role="img"
+                        viewBox="0 0 24 24"
+                        width="1em"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a.996.996 0 0 0 0-1.41l-2.34-2.34a.996.996 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"
+                        />
+                      </svg>
+                      <span
+                        class="padding-left-05"
+                        data-testid="edit-group-456"
+                      >
+                        Edit
+                      </span>
+                    </span>
+                  </button>
+                </div>
               </td>
               <td
                 class="roleDropdown"
@@ -851,9 +984,44 @@ exports[`Super Admin view of Users Table renders table view after content is loa
             </tr>
             <tr>
               <td
+                class="userDisplay"
                 width="270"
               >
                 Potter, Harry 
+                <div
+                  class="actionButtons"
+                >
+                  <button
+                    class="usa-button usa-button--unstyled text-bold text-no-underline"
+                    data-testid="button"
+                    type="button"
+                  >
+                    <span
+                      class="icon-text padding-right-4 display-flex flex-align-center"
+                    >
+                      <svg
+                        aria-label="Pencil icon indicating edit ability"
+                        class="usa-icon height-3 width-3"
+                        focusable="false"
+                        height="1em"
+                        role="img"
+                        viewBox="0 0 24 24"
+                        width="1em"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a.996.996 0 0 0 0-1.41l-2.34-2.34a.996.996 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"
+                        />
+                      </svg>
+                      <span
+                        class="padding-left-05"
+                        data-testid="edit-group-123"
+                      >
+                        Edit
+                      </span>
+                    </span>
+                  </button>
+                </div>
               </td>
               <td
                 class="roleDropdown"
@@ -959,7 +1127,7 @@ exports[`Super Admin view of Users Table renders table view after content is loa
   </div>
   <div>
     <div
-      class="customizeTableWrapper"
+      class="userPermissionsTable customizeTableWrapper"
     >
       <table
         class="usa-table usa-table--borderless customizeTable"
@@ -981,9 +1149,44 @@ exports[`Super Admin view of Users Table renders table view after content is loa
         <tbody>
           <tr>
             <td
+              class="userDisplay"
               width="270"
             >
               Potter, Lily 
+              <div
+                class="actionButtons"
+              >
+                <button
+                  class="usa-button usa-button--unstyled text-bold text-no-underline"
+                  data-testid="button"
+                  type="button"
+                >
+                  <span
+                    class="icon-text padding-right-4 display-flex flex-align-center"
+                  >
+                    <svg
+                      aria-label="Pencil icon indicating edit ability"
+                      class="usa-icon height-3 width-3"
+                      focusable="false"
+                      height="1em"
+                      role="img"
+                      viewBox="0 0 24 24"
+                      width="1em"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a.996.996 0 0 0 0-1.41l-2.34-2.34a.996.996 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"
+                      />
+                    </svg>
+                    <span
+                      class="padding-left-05"
+                      data-testid="edit-group-456"
+                    >
+                      Edit
+                    </span>
+                  </span>
+                </button>
+              </div>
             </td>
             <td
               class="roleDropdown"
@@ -1032,9 +1235,44 @@ exports[`Super Admin view of Users Table renders table view after content is loa
           </tr>
           <tr>
             <td
+              class="userDisplay"
               width="270"
             >
               Potter, Harry 
+              <div
+                class="actionButtons"
+              >
+                <button
+                  class="usa-button usa-button--unstyled text-bold text-no-underline"
+                  data-testid="button"
+                  type="button"
+                >
+                  <span
+                    class="icon-text padding-right-4 display-flex flex-align-center"
+                  >
+                    <svg
+                      aria-label="Pencil icon indicating edit ability"
+                      class="usa-icon height-3 width-3"
+                      focusable="false"
+                      height="1em"
+                      role="img"
+                      viewBox="0 0 24 24"
+                      width="1em"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a.996.996 0 0 0 0-1.41l-2.34-2.34a.996.996 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"
+                      />
+                    </svg>
+                    <span
+                      class="padding-left-05"
+                      data-testid="edit-group-123"
+                    >
+                      Edit
+                    </span>
+                  </span>
+                </button>
+              </div>
             </td>
             <td
               class="roleDropdown"

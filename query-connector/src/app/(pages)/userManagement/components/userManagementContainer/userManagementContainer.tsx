@@ -9,10 +9,12 @@ import UserPermissionsTable from "../userPermissionsTable/userPermissionsTable";
 import { QCResponse } from "@/app/models/responses/collections";
 import { User, UserGroup, UserRole } from "../../../../models/entities/users";
 import { getAllUsers } from "@/app/backend/user-management";
+import { getCustomQueries } from "@/app/backend/query-building";
 import {
   getAllGroupMembers,
   getAllGroupQueries,
   getAllUserGroups,
+  getSingleQueryGroupAssignments,
 } from "@/app/backend/usergroup-management";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import { UserManagementMode } from "../../utils";
@@ -23,7 +25,6 @@ import { CustomUserQuery } from "@/app/models/entities/query";
 
 export type UsersTableProps = {
   role: string;
-  handleOpenModal?: (mode: UserManagementMode) => void;
 };
 
 export type viewMode =
@@ -43,7 +44,7 @@ const UsersTable: React.FC<UsersTableProps> = ({ role }) => {
   const [activeTab, setActiveTab] = useState<Tab>({ label: "" });
   const [users, setUsers] = useState<User[]>([]);
   const [allQueries, setAllQueries] = useState<CustomUserQuery[]>([]);
-
+  const [subjectData, setSubjectData] = useState<User | UserGroup>();
   const [userGroups, setUserGroups] = useState<UserGroup[]>([]);
   const [modalMode, setModalMode] = useState<UserManagementMode>("closed");
   const [shouldRefreshView, setShouldRefreshView] = useState<
@@ -55,8 +56,8 @@ const UsersTable: React.FC<UsersTableProps> = ({ role }) => {
   const setTab = (e: React.MouseEvent<HTMLElement>) => {
     const clickedTab = e.currentTarget.innerHTML;
     const tabObj = tabsForRole.filter((tab) => tab.label == clickedTab)[0];
-    setShouldRefreshView(`Load ${tabObj.label}` as viewMode);
     setActiveTab(tabObj);
+    setShouldRefreshView(`Update ${tabObj.label}` as viewMode);
   };
 
   const sections: Tab[] = [
@@ -83,6 +84,7 @@ const UsersTable: React.FC<UsersTableProps> = ({ role }) => {
             </Button>
             {users && users.length > 0 ? (
               <UserPermissionsTable
+                openModal={handleOpenModal}
                 fetchGroupMembers={fetchGroupMembers}
                 users={users}
                 setUsers={setUsers}
@@ -116,6 +118,7 @@ const UsersTable: React.FC<UsersTableProps> = ({ role }) => {
               Create group
             </Button>
             <UserGroupsTable
+              openModal={handleOpenModal}
               fetchGroupMembers={fetchGroupMembers}
               fetchGroupQueries={fetchGroupQueries}
               userGroups={userGroups}
@@ -178,6 +181,21 @@ const UsersTable: React.FC<UsersTableProps> = ({ role }) => {
     }
   }
 
+  async function fetchQueries() {
+    await getCustomQueries().then(async (queries) => {
+      const queriesResponse = await Promise.all(
+        queries.map(async (query) => {
+          const queryWithGroups = await getSingleQueryGroupAssignments(
+            query.query_id,
+          );
+          return queryWithGroups.items[0];
+        }),
+      );
+
+      setAllQueries(queriesResponse);
+    });
+  }
+
   async function fetchGroupMembers(groupId: string) {
     const groupMembers = await getAllGroupMembers(groupId);
     return groupMembers.items;
@@ -190,8 +208,11 @@ const UsersTable: React.FC<UsersTableProps> = ({ role }) => {
 
   // page load
   useEffect(() => {
-    role == UserRole.SUPER_ADMIN && users.length <= 0 && fetchUsers();
-    userGroups.length <= 0 && fetchUserGroups();
+    users.length <= 0 &&
+      fetchUsers().then(() => setShouldRefreshView("Load default"));
+    userGroups.length <= 0 &&
+      fetchUserGroups().then(() => setShouldRefreshView("Load default"));
+    fetchQueries();
   }, []);
 
   // wait for users/groups to load before setting active tab;
@@ -235,13 +256,16 @@ const UsersTable: React.FC<UsersTableProps> = ({ role }) => {
     setShouldRefreshView(false);
   }, [shouldRefreshView]);
 
-  const handleOpenModal = (mode: UserManagementMode) => {
+  const handleOpenModal = (
+    mode: UserManagementMode,
+    data?: UserGroup | User,
+  ) => {
     setModalMode(mode);
+    setSubjectData(data);
     modalRef.current?.toggleModal();
   };
 
-  const dataLoaded =
-    role == UserRole.ADMIN ? !!users && !!userGroups : !!userGroups;
+  const dataLoaded = !!users && !!userGroups;
 
   return (
     <>
@@ -256,6 +280,7 @@ const UsersTable: React.FC<UsersTableProps> = ({ role }) => {
           modalRef={modalRef}
           refreshView={setShouldRefreshView}
           userGroups={userGroups}
+          subjectData={subjectData}
         />
         <UserManagementDrawer
           users={users}

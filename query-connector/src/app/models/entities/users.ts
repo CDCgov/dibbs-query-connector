@@ -1,4 +1,4 @@
-import { QueryTableResult } from "@/app/(pages)/queryBuilding/utils";
+import { CustomUserQuery } from "./query";
 
 export enum UserRole {
   ADMIN = "Admin",
@@ -20,7 +20,7 @@ export interface UserGroup {
   member_size: number;
   query_size: number;
   members?: User[];
-  queries?: QueryTableResult[];
+  queries?: CustomUserQuery[];
 }
 
 export interface UserGroupMembership {

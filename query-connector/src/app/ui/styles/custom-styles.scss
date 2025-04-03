@@ -419,15 +419,15 @@ ul.usa-sidenav > li.usa-sidenav__item > ul.usa-sidenav__sublist > li.usa-sidenav
   text-decoration: none;
 }
 
-.usa-pagination .usa-current, 
-.usa-pagination .usa-current button, 
+.usa-pagination .usa-current,
+.usa-pagination .usa-current button,
 .usa-pagination .usa-current a {
   font-weight: 700;
   text-decoration: none;
 }
 
-.usa-pagination .usa-current:hover, 
-.usa-pagination .usa-current:focus, 
+.usa-pagination .usa-current:hover,
+.usa-pagination .usa-current:focus,
 .usa-pagination .usa-current:active {
   background-color: white;
   border-color: rgba(27, 27, 27, 0.2);
@@ -655,8 +655,8 @@ ul.usa-sidenav > li.usa-sidenav__item > ul.usa-sidenav__sublist > li.usa-sidenav
     flex-direction: row-reverse;
     justify-content: space-between;
 
-    .usa-button {
-      background-color: #005ea2;
+    .usa-button--secondary {
+      background-color: #d83933 !important;
     }
 
     .usa-button-group__item:last-child {
