@@ -88,7 +88,7 @@ export const ConditionSelection: React.FC<ConditionSelectionProps> = ({
               return (
                 <>
                   <div
-                    className="margin-bottom-2 display-flex flex-row flex-wrap flex-align-center flex-justify-center"
+                    className="margin-bottom-4 display-flex flex-row flex-wrap flex-align-center flex-justify-center"
                     data-testid="selected-pill-container"
                   >
                     {Object.entries(categoryToConditionsMap)
