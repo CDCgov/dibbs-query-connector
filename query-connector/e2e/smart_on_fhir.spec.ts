@@ -43,10 +43,11 @@ test.describe("SMART on FHIR", () => {
     ).toHaveText(/Connected/);
   });
 
-  // this integration test is stuck in the e2e because it requires connections
-  // to a fully-seeded Aidbox. That infra was deemed too much to add to the
-  // integration test docker compose at the time of this writing, so the
-  // test itself is added here
+  // This integration test is stuck in the e2e setting because of weird issues running
+  // our JWT signing library in a JSDOM environment. Trying to sign the JWT errors
+  // with type errors complaining about the payload needing to a UTF-8 array,
+  // which after some digging is an issue running the library within JSDOM.
+  // Relevant issue here: https://github.com/vitest-dev/vitest/issues/5685
   test("JWT creation generates the correct token and signing creates the right request payload", async () => {
     const tokenEndpoint = `${process.env.AIDBOX_BASE_URL}/auth/token`;
 
