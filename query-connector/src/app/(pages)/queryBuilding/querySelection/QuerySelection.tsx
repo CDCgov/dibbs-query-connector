@@ -90,7 +90,6 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({
           return groupQueries.items;
         }),
       );
-      console.log("WHOA THERE"); //was trying to figure out if we were even hitting this when we should be, and it appears not
       console.log(assignedQueries);
       return assignedQueries[0];
     }
