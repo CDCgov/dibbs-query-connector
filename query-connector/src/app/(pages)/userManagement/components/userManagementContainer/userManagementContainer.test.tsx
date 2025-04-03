@@ -10,6 +10,7 @@ import {
   mockAdmin,
   mockGroupBasic,
   mockPermissionsTab,
+  mockQueryWithGroups,
 } from "../../test-utils";
 
 jest.mock("next-auth/react");
@@ -25,6 +26,13 @@ jest.mock("@/app/backend/query-building", () => ({
 
 jest.mock("@/app/backend/usergroup-management", () => ({
   getAllUserGroups: jest.fn().mockResolvedValue({ items: [], totalItems: 0 }),
+  getSingleQueryGroupAssignments: jest
+    .fn()
+    .mockResolvedValue({ items: [], totalItems: 0 }),
+}));
+
+jest.mock("@/app/backend/query-building", () => ({
+  getCustomQueries: jest.fn().mockResolvedValue([]),
 }));
 
 jest.mock(
@@ -95,6 +103,9 @@ describe("Super Admin view of Users Table", () => {
         items: [mockGroupBasic],
         totalItems: 1,
       });
+    jest
+      .spyOn(QueryBuildingBackend, "getCustomQueries")
+      .mockResolvedValueOnce([mockQueryWithGroups]);
     const { user } = renderWithUser(
       <RootProviderMock currentPage="/userManagement">
         <UsersTable role={role} />
@@ -115,7 +126,7 @@ describe("Super Admin view of Users Table", () => {
     await user.click(groupsTab);
     expect(groupsTab).toHaveClass("tab__active");
 
-    expect(document.body).toHaveTextContent("Assigned queries");
+    expect(document.body).toHaveTextContent("Create group");
     expect(document.body).toMatchSnapshot();
 
     jest.restoreAllMocks();
