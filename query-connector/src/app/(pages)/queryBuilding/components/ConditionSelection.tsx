@@ -8,6 +8,7 @@ import ConditionColumnDisplay from "../buildFromTemplates/ConditionColumnDisplay
 import SearchField from "@/app/ui/designSystem/searchField/SearchField";
 import { FormError } from "../buildFromTemplates/BuildFromTemplates";
 import { CONDITION_DRAWER_SEARCH_PLACEHOLDER } from "./utils";
+import { formatDiseaseDisplay } from "../utils";
 
 type ConditionSelectionProps = {
   categoryToConditionsMap: CategoryToConditionArrayMap;
@@ -66,7 +67,7 @@ export const ConditionSelection: React.FC<ConditionSelectionProps> = ({
           id="conditionTemplateSearch"
           placeholder={CONDITION_DRAWER_SEARCH_PLACEHOLDER}
           className={classNames(
-            "maxw-mobile margin-x-auto margin-top-0 margin-bottom-4",
+            "maxw-mobile margin-x-auto margin-top-0 margin-bottom-2",
           )}
           onChange={(e) => {
             e.preventDefault();
@@ -75,14 +76,63 @@ export const ConditionSelection: React.FC<ConditionSelectionProps> = ({
         />
 
         {categoryToConditionsMap && (
-          <ConditionColumnDisplay
-            constructedQuery={constructedQuery}
-            handleConditionUpdate={handleConditionUpdate}
-            categoryToConditionsMap={categoryToConditionsMap}
-            searchFilter={searchFilter}
-            formError={formError}
-            setFormError={setFormError}
-          />
+          <>
+            {(() => {
+              const conditionIdToNameMap: { [id: string]: string } = {};
+              Object.values(categoryToConditionsMap)
+                .flat()
+                .forEach((c) => {
+                  conditionIdToNameMap[c.id] = c.name;
+                });
+
+              return (
+                <>
+                  <div
+                    className="margin-bottom-4 display-flex flex-row flex-wrap flex-align-center flex-justify-center"
+                    data-testid="selected-pill-container"
+                  >
+                    {Object.entries(categoryToConditionsMap)
+                      .flatMap(([_, conditions]) => conditions)
+                      .filter((condition) =>
+                        constructedQuery.hasOwnProperty(condition.id),
+                      )
+                      .map((condition) => (
+                        <div
+                          key={condition.id}
+                          className={classNames(
+                            "display-flex flex-align-center margin-right-1 margin-bottom-1 padding-x-2 padding-y-1 border-radius-md",
+                            styles.bluePill,
+                          )}
+                        >
+                          <span className="margin-right-1">
+                            {formatDiseaseDisplay(condition.name)}
+                          </span>
+                          <button
+                            type="button"
+                            className="bg-transparent border-0 cursor-pointer"
+                            onClick={() =>
+                              handleConditionUpdate(condition.id, true)
+                            }
+                            aria-label={`Remove ${formatDiseaseDisplay(condition.name)}`}
+                          >
+                            ×
+                          </button>
+                        </div>
+                      ))}
+                  </div>
+
+                  <ConditionColumnDisplay
+                    constructedQuery={constructedQuery}
+                    handleConditionUpdate={handleConditionUpdate}
+                    categoryToConditionsMap={categoryToConditionsMap}
+                    searchFilter={searchFilter}
+                    formError={formError}
+                    setFormError={setFormError}
+                  />
+                </>
+              );
+            })()}
+          </>
         )}
       </div>
     </div>
