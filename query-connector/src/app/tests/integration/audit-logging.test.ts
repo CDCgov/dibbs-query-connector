@@ -5,6 +5,8 @@ import { hyperUnluckyPatient, USE_CASE_DETAILS } from "@/app/shared/constants";
 import {
   patientDiscoveryQuery,
   PatientDiscoveryRequest,
+  patientRecordsQuery,
+  PatientRecordsRequest,
 } from "@/app/shared/query-service";
 import { getDbClient } from "@/app/backend/dbClient";
 
@@ -61,6 +63,30 @@ describe("audit log", () => {
     });
 
     expect(addedVal[0]?.action_type).toBe("patientDiscoveryQuery");
+    expect(addedVal[0]?.audit_message).toStrictEqual({
+      request: JSON.stringify(request),
+    });
+  });
+  it("patient records query should generate an audit entry", async () => {
+    const auditQuery = "SELECT * FROM audit_logs;";
+    const auditRows = await dbClient.query(auditQuery);
+
+    const request: PatientRecordsRequest = {
+      fhir_server: "Aidbox",
+      patient_id: hyperUnluckyPatient.Id,
+      query_name: USE_CASE_DETAILS.gonorrhea.queryName,
+    };
+    await patientRecordsQuery(request);
+
+    const newAuditRows = await dbClient.query(auditQuery);
+
+    const addedVal = newAuditRows.rows.filter((item) => {
+      if (!auditRows.rows.map((v) => v.id).includes(item.id)) {
+        return item;
+      }
+    });
+
+    expect(addedVal[0]?.action_type).toBe("patientRecordsQuery");
     expect(addedVal[0]?.audit_message).toStrictEqual({
       request: JSON.stringify(request),
     });
