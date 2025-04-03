@@ -20,6 +20,10 @@ jest.mock("@/app/backend/user-management", () => ({
   getUserRole: jest.fn(),
 }));
 
+jest.mock("@/app/backend/query-building", () => ({
+  getCustomQueries: jest.fn().mockResolvedValue([]),
+}));
+
 jest.mock("@/app/backend/usergroup-management", () => ({
   getAllUserGroups: jest.fn().mockResolvedValue({ items: [], totalItems: 0 }),
   getSingleQueryGroupAssignments: jest
@@ -87,6 +91,8 @@ describe("Super Admin view of Users Table", () => {
   });
 
   it("renders content on tab click", async () => {
+    jest.spyOn(QueryBuildingBackend, "getCustomQueries").mockResolvedValue([]);
+
     jest.spyOn(UserManagementBackend, "getAllUsers").mockResolvedValueOnce({
       items: [mockAdmin, mockSuperAdmin],
       totalItems: 2,
