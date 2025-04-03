@@ -17,7 +17,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  NODE_VERSION: 18 # Adjust the Node.js version as needed
+  NODE_VERSION: 22 # Adjust the Node.js version as needed
 
 jobs:
   lint:
@@ -39,14 +39,38 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{env.NODE_VERSION}}
-      - name: Checkout code
-        uses: actions/checkout@v3
-      - name: Setup reporting action and run tests
-        uses: ArtiomTr/jest-coverage-report-action@v2
+      - name: Install dependencies
+        working-directory: ./query-connector
+        run: |
+          npm ci
+      - name: Create .env
+        working-directory: ./query-connector
+        run: |
+          echo "AIDBOX_LICENSE=${{ secrets.AIDBOX_LICENSE }}" > .env
+          echo "AIDBOX_BASE_URL=http://localhost:8080" >> .env
+          echo "APP_HOSTNAME=http://localhost:3000" >> .env
+      - name: Run tests
+        working-directory: ./query-connector
+        run: |
+          npm run test:ci
+        # uncomment these next few lines and the corresponding log import
+        # in the setup script you're trying to debug if you're having trouble
+        # in CI. All the best, brave engineer (￣^￣ )ゞ
+      #   continue-on-error: true
+
+      # - name: Upload Docker Logs
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: docker-logs
+      #     path: |
+      #       ./query-connector/test-results/logs-before-tests.txt
+      #       ./query-connector/test-results/logs-after-tests.txt
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v5
         with:
-          test-script: npm run test:ci
-          working-directory: ./query-connector
-          skip-step: none
+          token: ${{ secrets.CODECOV_TOKEN }}
+          slug: CDCgov/dibbs-query-connector
 
   end-to-end-tests:
     timeout-minutes: 15
@@ -76,6 +100,18 @@ jobs:
         working-directory: ./query-connector
         run: |
           bash ./setup-scripts/e2e_tests.sh
+      # uncomment these next few lines and the corresponding log import
+      # in the setup script you're trying to debug if you're having trouble
+      # in CI. All the best, brave engineer (￣^￣ )ゞ
+      #   continue-on-error: true
+
+      # - name: Upload Docker Logs
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: docker-logs
+      #     path: |
+      #       ./query-connector/test-results/logs-before-tests.txt
+      #       ./query-connector/test-results/logs-after-tests.txt
 
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}

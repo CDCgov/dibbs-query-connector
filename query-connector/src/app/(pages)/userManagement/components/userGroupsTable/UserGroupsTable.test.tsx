@@ -12,6 +12,10 @@ jest.mock(
     ({ children }: React.PropsWithChildren) => <div>{children}</div>,
 );
 
+jest.mock("@/app/backend/query-building", () => ({
+  getCustomQueries: jest.fn(),
+}));
+
 jest.mock("@/app/backend/user-management", () => ({
   getGroupMembers: jest.fn().mockResolvedValue({ items: [], totalItems: 0 }),
   getGroupQueries: jest.fn().mockResolvedValue({ items: [], totalItems: 0 }),
@@ -65,5 +69,6 @@ describe("User Groups table", () => {
     );
 
     expect(document.body).toMatchSnapshot();
+    jest.restoreAllMocks();
   });
 });

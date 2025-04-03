@@ -1,6 +1,7 @@
 import { waitFor, screen, render } from "@testing-library/react";
 import * as UserManagementBackend from "@/app/backend/user-management";
 import * as UserGroupManagementBackend from "@/app/backend/usergroup-management";
+import * as QueryBuildingBackend from "@/app/backend/query-building";
 import { UserRole } from "@/app/models/entities/users";
 import { renderWithUser, RootProviderMock } from "@/app/tests/unit/setup";
 import UsersTable from "./userManagementContainer";
@@ -16,6 +17,10 @@ jest.mock("next-auth/react");
 jest.mock("@/app/backend/user-management", () => ({
   getAllUsers: jest.fn().mockResolvedValue({ items: [], totalItems: 0 }),
   getUserRole: jest.fn(),
+}));
+
+jest.mock("@/app/backend/query-building", () => ({
+  getCustomQueries: jest.fn().mockResolvedValue([]),
 }));
 
 jest.mock("@/app/backend/usergroup-management", () => ({
@@ -78,6 +83,8 @@ describe("Super Admin view of Users Table", () => {
   });
 
   it("renders content on tab click", async () => {
+    jest.spyOn(QueryBuildingBackend, "getCustomQueries").mockResolvedValue([]);
+
     jest.spyOn(UserManagementBackend, "getAllUsers").mockResolvedValueOnce({
       items: [mockAdmin, mockSuperAdmin],
       totalItems: 2,

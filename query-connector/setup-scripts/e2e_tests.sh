@@ -1,7 +1,12 @@
 #!/bin/bash
 
+set -e
 docker compose down --volumes --remove-orphans
 docker compose -f docker-compose-e2e.yaml --env-file .env up -d --build 
+
+# uncomment these (and the set -e line at the top!) and the block in ci.yaml to get logs in CI
+# mkdir test-results
+# docker compose -f docker-compose-e2e.yaml logs > /test-results/logs-before-tests.txt
 
 # wait for Aidbox seeder to finish running before...
 docker compose -f docker-compose-e2e.yaml logs -f aidbox-seeder | grep -q "Finished configuring Aidbox and database."
@@ -15,8 +20,12 @@ done
 
 echo -e "\nAidbox seeder finished!"
 
+
 npx dotenv -e ./.env -- npx playwright test --reporter=list
 E2E_EXIT_CODE=$?
+
+# uncomment these and the corresponding block in the ci.yaml to get the CI logs
+# docker compose -f docker-compose-e2e.yaml logs > /test-results/logs-after-tests.txt
 
 # Teardown containers
 docker compose -f docker-compose-e2e.yaml down

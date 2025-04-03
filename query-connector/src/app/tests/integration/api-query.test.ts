@@ -14,6 +14,7 @@ import { GET } from "@/app/api/route";
 import {
   PATIENT_HL7_MESSAGE,
   PATIENT_HL7_MESSAGE_NO_IDENTIFIERS,
+  suppressConsoleLogs,
 } from "./fixtures";
 
 jest.mock("next-auth");
@@ -60,9 +61,7 @@ describe("GET Health Check", () => {
 
 describe("POST Query FHIR Server", () => {
   beforeEach(() => {
-    // supress the warnings for the error endpoints and general console.logs
-    jest.spyOn(console, "error").mockImplementation(() => {});
-    jest.spyOn(console, "log").mockImplementation(() => {});
+    suppressConsoleLogs();
   });
 
   afterEach(() => {
@@ -73,9 +72,7 @@ describe("POST Query FHIR Server", () => {
   it("should return an OperationOutcome if the request body is not a Patient resource", async () => {
     const request = createNextRequest(
       { resourceType: "Observation" },
-      new URLSearchParams(
-        `id=${SYPHILIS_QUERY_ID}&fhir_server=HELIOS Meld: Direct`,
-      ),
+      new URLSearchParams(`id=${SYPHILIS_QUERY_ID}&fhir_server=Aidbox`),
     );
     const response = await POST(request);
     const body = await response.json();
@@ -88,9 +85,7 @@ describe("POST Query FHIR Server", () => {
   it("should return an OperationOutcome if there are no patient identifiers to parse from the request body", async () => {
     const request = createNextRequest(
       { resourceType: "Patient" },
-      new URLSearchParams(
-        `id=${SYPHILIS_QUERY_ID}&fhir_server=HELIOS Meld: Direct`,
-      ),
+      new URLSearchParams(`id=${SYPHILIS_QUERY_ID}&fhir_server=Aidbox`),
     );
     const response = await POST(request);
     const body = await response.json();
@@ -120,7 +115,7 @@ describe("POST Query FHIR Server", () => {
     const request = createNextRequest(
       PatientResource,
       new URLSearchParams(
-        "use_case=syphilis&fhir_server=HELIOS Meld: Direct&message_format=invalid",
+        "use_case=syphilis&fhir_server=Aidbox&message_format=invalid",
       ),
     );
     const response = await POST(request);
@@ -132,7 +127,7 @@ describe("POST Query FHIR Server", () => {
     const request = createNextRequest(
       PATIENT_HL7_MESSAGE_NO_IDENTIFIERS,
       new URLSearchParams(
-        `id=${SYPHILIS_QUERY_ID}&fhir_server=HELIOS Meld: Direct&message_format=HL7`,
+        `id=${SYPHILIS_QUERY_ID}&fhir_server=Aidbox&message_format=HL7`,
       ),
     );
     const response = await POST(request);
@@ -145,7 +140,7 @@ describe("POST Query FHIR Server", () => {
   it("should return a legitimate FHIR bundle if it uses the deprecated use_case param", async () => {
     const request = createNextRequest(
       PatientResource,
-      new URLSearchParams("use_case=syphilis&fhir_server=HELIOS Meld: Direct"),
+      new URLSearchParams("use_case=syphilis&fhir_server=Aidbox"),
     );
     const response = await POST(request);
     const body = await response.json();
@@ -154,9 +149,7 @@ describe("POST Query FHIR Server", () => {
   it("should return a legitimate FHIR bundle if the query is successful", async () => {
     const request = createNextRequest(
       PatientResource,
-      new URLSearchParams(
-        `id=${SYPHILIS_QUERY_ID}&fhir_server=HELIOS Meld: Direct`,
-      ),
+      new URLSearchParams(`id=${SYPHILIS_QUERY_ID}&fhir_server=Aidbox`),
     );
     const response = await POST(request);
     const body = await response.json();
@@ -166,7 +159,7 @@ describe("POST Query FHIR Server", () => {
     const explicitFhirRequest = createNextRequest(
       PatientResource,
       new URLSearchParams(
-        `id=${SYPHILIS_QUERY_ID}&fhir_server=HELIOS Meld: Direct&message_format=FHIR`,
+        `id=${SYPHILIS_QUERY_ID}&fhir_server=Aidbox&message_format=FHIR`,
       ),
     );
     const explicitFhirResponse = await POST(explicitFhirRequest);
@@ -177,7 +170,7 @@ describe("POST Query FHIR Server", () => {
     const request = createNextRequest(
       PATIENT_HL7_MESSAGE,
       new URLSearchParams(
-        `id=${SYPHILIS_QUERY_ID}&fhir_server=HELIOS Meld: Direct&message_format=HL7`,
+        `id=${SYPHILIS_QUERY_ID}&fhir_server=Aidbox&message_format=HL7`,
       ),
     );
     const response = await POST(request);
