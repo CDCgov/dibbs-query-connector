@@ -71,7 +71,15 @@ export function auditable(
   return descriptor;
 }
 
-async function generateAuditValues(
+/**
+ * Helper function that formats method input into the values needed by the audit
+ * log table
+ * @param methodName - name of the method to audit
+ * @param argLabels - name of the params
+ * @param args - value of the arguments
+ * @returns an array of values to be inserted into the table
+ */
+export async function generateAuditValues(
   methodName: string,
   argLabels: string[],
   args: unknown[],
@@ -84,7 +92,13 @@ async function generateAuditValues(
   return [author, methodName, auditChecksum, auditContents];
 }
 
-function generateAuditMessage(argLabels: string[], args: unknown[]) {
+/**
+ * Helper function that generates message contents
+ * @param argLabels - the name of the parameters being passed into the function
+ * @param args - the values of the parameters being passed in
+ * @returns A JSON object with {argName: argValue}
+ */
+export function generateAuditMessage(argLabels: string[], args: unknown[]) {
   // can do more fancy serialization here if needed
   const mappedArgs: { [s: string]: string } = {};
   args.forEach((obj, i) => {
@@ -101,7 +115,15 @@ function generateAuditMessage(argLabels: string[], args: unknown[]) {
   return mappedArgs;
 }
 
-function generateAuditChecksum(author: string, auditContents: Object) {
+/**
+ * Helper function that generates a checksum for audit contents based on audit
+ * contents, author, and timestamp
+ * @param author - name of the author
+ * @param auditContents - the contents of the message being stored
+ * @returns A SHA-2 strength or greater checksum
+ */
+export function generateAuditChecksum(author: string, auditContents: Object) {
+  // TODO: implement this properly
   return "result of some SHA-2 hashing algo based on author and audit contents";
 }
 
