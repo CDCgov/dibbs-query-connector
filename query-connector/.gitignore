@@ -9,3 +9,5 @@ certificates
 /coverage
 .tool-versions
 keys/
+logs-after-tests.txt
+logs-before-tests.txt

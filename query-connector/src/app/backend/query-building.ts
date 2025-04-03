@@ -20,8 +20,8 @@ const dbClient = getDbClient();
  * Each query object includes:
  * - query_id: The unique identifier for the query.
  * - query_name: The name of the query.
- * - valuesets: An array of ValueSet objects
- * - concepts: An array of Concept objects
+ * - valuesets: An array of ValueSet objects.
+ * - concepts: An array of Concept objects.
  */
 export async function getCustomQueries(): Promise<CustomUserQuery[]> {
   const query = `
@@ -30,8 +30,7 @@ export async function getCustomQueries(): Promise<CustomUserQuery[]> {
       q.query_name,
       q.query_data,
       q.conditions_list
-    FROM
-      query q;
+    FROM query q;
   `;
   // TODO: this will eventually need to take into account user permissions and specific authors
   // We'll probably also need to refactor this to not show up in any user-facing containers
