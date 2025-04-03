@@ -410,7 +410,7 @@ export async function getAllGroupQueries(
 ): Promise<QCResponse<CustomUserQuery>> {
   try {
     const selectQueriesByGroupQuery = `
-    SELECT ugtq.id as membership_id, ug.name as usergroup_name, ug.id as usergroup_id,q.id as query_id, q.query_name
+    SELECT ugtq.id as membership_id, ug.name as usergroup_name, ug.id as usergroup_id,q.id as query_id, q.query_name, q.query_data, q.conditions_list
     FROM query as q
     LEFT JOIN usergroup_to_query as ugtq ON ugtq.query_id = q.id
     LEFT JOIN usergroup ug ON ug.id = ugtq.usergroup_id 
@@ -422,7 +422,8 @@ export async function getAllGroupQueries(
       const formattedQuery: CustomUserQuery = {
         query_id: row.query_id,
         query_name: row.query_name,
-        valuesets: [],
+        valuesets: row.query_data,
+        conditions_list: row.conditions_list,
       };
       return formattedQuery;
     });
