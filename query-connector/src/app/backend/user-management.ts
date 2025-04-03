@@ -9,7 +9,6 @@ import { getDbClient } from "./dbClient";
 const dbClient = getDbClient();
 
 /**
- *
  * @param username The identifier of the user we want to retrieve
  * @returns A single user result
  */

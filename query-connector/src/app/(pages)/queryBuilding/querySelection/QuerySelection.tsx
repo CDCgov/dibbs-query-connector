@@ -31,6 +31,11 @@ type QuerySelectionProps = {
   setSelectedQuery: Dispatch<SetStateAction<SelectedQueryDetails>>;
 };
 
+let getUserId = async (sesh: any) => {
+  const user = await checkUserQuery(sesh);
+  return user;
+};
+
 /**
  * Component for Query Building Flow
  * @param root0 - params

@@ -1,6 +1,6 @@
 import {
   addQueriesToGroup,
-  getAllGroupQueries
+  getAllGroupQueries,
 } from "@/app/backend/usergroup-management";
 import { getAllUsersWithSingleGroupStatus } from "@/app/backend/user-management";
 import { getDbClient } from "@/app/backend/dbClient";
@@ -38,7 +38,7 @@ describe("User Group and Query Membership Tests", () => {
         ($2, 'mamaTroi', 'Lwaxana', 'Troi', 'Standard User'),
 
     `;
-    await dbClient.query(insertUsersQuery, [TEST_USER_1_ID, TEST_USER_2_ID,]);
+    await dbClient.query(insertUsersQuery, [TEST_USER_1_ID, TEST_USER_2_ID]);
 
     // Insert test group
     const insertGroupQuery = `
@@ -60,7 +60,7 @@ describe("User Group and Query Membership Tests", () => {
       TEST_QUERY_2_ID,
       TEST_QUERY_3_ID,
       TEST_QUERY_CONDITIONS,
-      TEST_QUERY_DATA
+      TEST_QUERY_DATA,
     ]);
   });
 
@@ -68,23 +68,23 @@ describe("User Group and Query Membership Tests", () => {
     try {
       await dbClient.query(
         "DELETE FROM usergroup_to_users WHERE usergroup_id = $1;",
-        [TEST_GROUP_ID]
+        [TEST_GROUP_ID],
       );
       await dbClient.query(
         "DELETE FROM usergroup_to_query WHERE usergroup_id = $1;",
-        [TEST_GROUP_ID]
+        [TEST_GROUP_ID],
       );
       await dbClient.query("DELETE FROM usergroup WHERE id = $1;", [
-        TEST_GROUP_ID
+        TEST_GROUP_ID,
       ]);
       await dbClient.query("DELETE FROM users WHERE id IN ($1, $2, $3);", [
         TEST_USER_1_ID,
-        TEST_USER_2_ID
+        TEST_USER_2_ID,
       ]);
       await dbClient.query("DELETE FROM query WHERE id = $1;", [
         TEST_QUERY_1_ID,
         TEST_QUERY_2_ID,
-        TEST_QUERY_3_ID
+        TEST_QUERY_3_ID,
       ]);
       await dbClient.query("ROLLBACK");
     } catch (error) {
@@ -98,7 +98,7 @@ describe("User Group and Query Membership Tests", () => {
   test("should retrieve user group memberships", async () => {
     const result: User[] =
       await getAllUsersWithSingleGroupStatus(TEST_GROUP_ID);
-      await dbClient.query("COMMIT")
+    await dbClient.query("COMMIT");
 
     expect(Array.isArray(result)).toBe(true);
     expect(result[0]).toHaveProperty("id");
@@ -123,7 +123,7 @@ describe("User Group and Query Membership Tests", () => {
       TEST_QUERY_2_ID,
       TEST_QUERY_3_ID,
     ]);
-    await dbClient.query("COMMIT")
+    await dbClient.query("COMMIT");
 
     expect(result.totalItems).toBe(2);
     expect(result.items.some((query) => query.query_id == TEST_QUERY_2_ID));
@@ -140,6 +140,6 @@ describe("User Group and Query Membership Tests", () => {
     );
   });
 
-  //tests for superAdmins and them seeing evertyhing 
+  //tests for superAdmins and them seeing evertyhing
   //tests for other logged in users to make sure they do NOT see everything
 });
