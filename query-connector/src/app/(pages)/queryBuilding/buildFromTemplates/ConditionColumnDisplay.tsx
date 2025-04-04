@@ -43,6 +43,10 @@ export const ConditionColumnDisplay: React.FC<ConditionColumnDisplayProps> = ({
     categoryToConditionsMap,
   );
 
+  const categoryDisplayMap: Record<string, string> = {
+    "Sexually Transmitted Diseases": "Sexually Transmitted Diseases (STI)",
+  };
+
   useEffect(() => {
     if (searchFilter === "") {
       setConditionsToDisplay(categoryToConditionsMap);
@@ -51,6 +55,7 @@ export const ConditionColumnDisplay: React.FC<ConditionColumnDisplayProps> = ({
       const filteredDisplay = filterSearchByCategoryAndCondition(
         searchFilter,
         categoryToConditionsMap,
+        categoryDisplayMap,
       );
       setConditionsToDisplay(filteredDisplay);
     }
@@ -90,7 +95,10 @@ export const ConditionColumnDisplay: React.FC<ConditionColumnDisplayProps> = ({
               {colsToDisplay.map(([category, arr]) => {
                 return (
                   <div key={category}>
-                    <h3 className={styles.categoryHeading}>{category}</h3>
+                    <h3 className={styles.categoryHeading}>
+                      {" "}
+                      {categoryDisplayMap[category] || category}
+                    </h3>
                     {arr.map((c) => {
                       return (
                         <ConditionOption

@@ -55,26 +55,29 @@ export const EMPTY_CONCEPT_TYPE = {
  * Filtering function that checks filtering at the category and the condition level
  * @param filterString - string to filter by
  * @param fetchedConditions - unfiltered list of conditions fetched from the backend
+ * @param categoryDisplayMap - display names for categories
  * @returns - The subset of fetched conditions that contain the filter string
  */
 export function filterSearchByCategoryAndCondition(
   filterString: string,
   fetchedConditions: CategoryToConditionArrayMap,
+  categoryDisplayMap: Record<string, string>,
 ): CategoryToConditionArrayMap {
   const result: CategoryToConditionArrayMap = {};
   const unfilteredConditions = structuredClone(fetchedConditions);
 
   Object.entries(unfilteredConditions).forEach(
     ([categoryName, conditionArray]) => {
+      const displayCategory = categoryDisplayMap[categoryName] || categoryName;
+      const filter = filterString.toLowerCase();
       if (
-        categoryName
-          .toLocaleLowerCase()
-          .includes(filterString.toLocaleLowerCase())
+        categoryName.toLowerCase().includes(filter) ||
+        displayCategory.toLowerCase().includes(filter)
       ) {
-        result[categoryName] = unfilteredConditions[categoryName];
+        result[categoryName] = conditionArray;
       } else {
         const matches = conditionArray.filter((c) =>
-          c.name.toLocaleLowerCase().includes(filterString.toLocaleLowerCase()),
+          formatDiseaseDisplay(c.name).toLowerCase().includes(filter),
         );
         if (matches.length > 0) {
           result[categoryName] = matches;
@@ -93,6 +96,9 @@ export function filterSearchByCategoryAndCondition(
  * @returns A disease display string for display
  */
 export function formatDiseaseDisplay(diseaseName: string) {
+  if (diseaseName === "Human immunodeficiency virus infection (disorder)") {
+    return "Human immunodeficiency virus infection (HIV)";
+  }
   return diseaseName.replace("(disorder)", "").trim();
 }
 
