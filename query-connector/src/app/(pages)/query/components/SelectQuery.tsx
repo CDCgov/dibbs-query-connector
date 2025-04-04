@@ -3,7 +3,10 @@ import React, { useEffect, useState } from "react";
 import CustomizeQuery from "./CustomizeQuery";
 import SelectSavedQuery from "./selectQuery/SelectSavedQuery";
 
-import { QueryResponse } from "@/app/shared/query-service";
+import {
+  PatientDiscoveryResponse,
+  PatientRecordsResponse,
+} from "@/app/shared/query-service";
 import { Patient } from "fhir/r4";
 import {
   fetchQueryResponse,
@@ -17,8 +20,10 @@ interface SelectQueryProps {
   goForward: () => void;
   goBack: () => void;
   patientForQuery: Patient | undefined;
-  resultsQueryResponse: QueryResponse;
-  setResultsQueryResponse: React.Dispatch<React.SetStateAction<QueryResponse>>;
+  patientDiscoveryResponse: PatientDiscoveryResponse | undefined;
+  setResultsQueryResponse: React.Dispatch<
+    React.SetStateAction<PatientRecordsResponse | undefined>
+  >;
   fhirServer: string;
   setFhirServer: React.Dispatch<React.SetStateAction<string>>;
   setLoading: (isLoading: boolean) => void;
@@ -36,7 +41,6 @@ interface SelectQueryProps {
  * @param root0.showCustomizeQuery - toggle to navigate to show customize query
  * @param root0.setSelectedQuery - callback function to update the selected query
  * @param root0.patientForQuery - patient to apply a particular query for
- * @param root0.resultsQueryResponse - Response of selected query
  * @param root0.setResultsQueryResponse - Callback function to update selected
  * query
  * @param root0.setShowCustomizeQuery - state function to update location of
@@ -48,7 +52,6 @@ interface SelectQueryProps {
  */
 const SelectQuery: React.FC<SelectQueryProps> = ({
   patientForQuery,
-  resultsQueryResponse,
   fhirServer,
   showCustomizeQuery,
   goForward,
@@ -118,7 +121,6 @@ const SelectQuery: React.FC<SelectQueryProps> = ({
 
       {showCustomizeQuery ? (
         <CustomizeQuery
-          fhirQueryResponse={resultsQueryResponse}
           selectedQuery={selectedQuery}
           queryValueSets={queryValueSets}
           setQueryValuesets={setQueryValueSets}
