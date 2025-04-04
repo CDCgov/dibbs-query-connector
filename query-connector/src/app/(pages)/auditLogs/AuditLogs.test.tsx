@@ -7,6 +7,34 @@ const TEST_NAME = "Rocky Balboa";
 const TEST_REPORT = "Created Report";
 const NUM_ROWS = 26;
 
+export const BASE_TEST_DATA = [
+  {
+    name: "Rocky Balboa",
+    action: "Created Report",
+    date: new Date("2025-03-10T14:30:00Z"),
+  },
+  {
+    name: "Apollo Creed",
+    action: "Edited Report",
+    date: new Date("2025-03-09T09:15:00Z"),
+  },
+  {
+    name: "Rocky Balboa",
+    action: "Deleted Entry",
+    date: new Date("2022-03-08T17:45:00Z"),
+  },
+  {
+    name: "Clubber Lang",
+    action: "Created Report",
+    date: new Date("2024-03-07T12:00:00Z"),
+  },
+  {
+    name: "Ivan Drago",
+    action: "Viewed Entry",
+    date: new Date("2025-03-06T22:10:00Z"),
+  },
+];
+
 /**
  * Creates an enhanced user event with custom helper methods.
  * @param user - The user event from renderWithUser
