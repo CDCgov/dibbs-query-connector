@@ -29,18 +29,40 @@ export function auditable(
         VALUES ($1, $2, $3, $4)
         RETURNING id, action_type, audit_checksum`;
 
-    generateAuditValues(key, argLabels, args)
-      .then((values) => {
-        // ? what to do with error handling here? on the event of a failure,
-        // ? probably need some retry logic to ensure we don't lose data
-        return dbConnection.query(query, values);
-      })
-      .then((v) => {
-        const auditMetadata = v.rows[0];
+    const MAX_RETRIES = 3;
+    let retryCounter = 0;
+
+    while (retryCounter < MAX_RETRIES) {
+      try {
+        const auditValues = await generateAuditValues(key, argLabels, args);
+        const result = await dbConnection.query(query, auditValues);
+        const auditMetadata = result.rows[0];
         console.info(
           `${auditMetadata.action_type} audit action with id ${auditMetadata?.id} and checksum ${auditMetadata?.audit_checksum} added to audit table`,
         );
-      });
+
+        return;
+      } catch (e) {
+        console.error(
+          `Audit log write attempt ${
+            retryCounter + 1
+          } failed with error: ${e}. Retrying...`,
+        );
+        retryCounter += 1;
+
+        if (retryCounter < MAX_RETRIES) {
+          // exponentially back off retry
+          await new Promise((resolve) =>
+            setTimeout(resolve, 1000 * Math.pow(2, retryCounter - 1)),
+          );
+        }
+      }
+    }
+
+    console.info(
+      `Audit log write attempt for ${key} failed after ${retryCounter} attempts.`,
+    );
+    return;
   };
 
   const decoratedFunctionIsAsync = method.constructor.name === "AsyncFunction";
@@ -63,7 +85,7 @@ export function auditable(
 
           return method.apply(this, args);
         } catch (error) {
-          console.error(`Async method ${key} threw error`, error);
+          console.error(`Method ${key} threw error`, error);
           throw error;
         }
       };
