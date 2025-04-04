@@ -23,6 +23,15 @@
   white-space: nowrap;
 }
 
+.runQueryBtn {
+  cursor: pointer;
+  background-color: #fff !important;
+  border: 2px solid #0076d6 !important;
+  border-radius: 4px !important;
+  color: #0076d6 !important;
+  white-space: nowrap;
+}
+
 .menuButton {
   cursor: pointer;
   background: none !important;
@@ -37,19 +46,19 @@
 
 .menuDropdownContainer {
   position: relative;
-  z-index:400;
-  height:0;
+  z-index: 400;
+  height: 0;
 }
 
-.menuDropdown{
+.menuDropdown {
   border-radius: 4px !important;
   padding: 0.5rem !important;
   background: $white !important;
   width: unset !important;
   box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, 0.16);
-  position:absolute;
-  right:0px;
-  top:-15px;
+  position: absolute;
+  right: 0px;
+  top: -15px;
 }
 
 .menuItem {
