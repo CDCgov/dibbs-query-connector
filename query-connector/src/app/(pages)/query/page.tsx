@@ -1,6 +1,9 @@
 "use client";
 import React, { useContext, useEffect, useState } from "react";
-import { FhirQueryResponse } from "../../shared/query-service";
+import {
+  PatientDiscoveryResponse,
+  PatientRecordsResponse,
+} from "../../shared/query-service";
 import ResultsView from "./components/ResultsView";
 import PatientSearchResults from "./components/PatientSearchResults";
 import SearchForm from "./components/searchForm/SearchForm";
@@ -54,10 +57,10 @@ const Query: React.FC = () => {
   }, [mode]);
 
   const [patientDiscoveryQueryResponse, setPatientDiscoveryQueryResponse] =
-    useState<FhirQueryResponse>({});
+    useState<PatientDiscoveryResponse>();
   const [patientForQuery, setPatientForQueryResponse] = useState<Patient>();
   const [resultsQueryResponse, setResultsQueryResponse] =
-    useState<FhirQueryResponse>({});
+    useState<PatientRecordsResponse>();
 
   const [showCustomizeQuery, setShowCustomizeQuery] = useState(false);
 
@@ -95,8 +98,10 @@ const Query: React.FC = () => {
         {/* Step 2 */}
         {mode === "patient-results" && (
           <PatientSearchResults
-            patients={patientDiscoveryQueryResponse?.Patient ?? []}
-            goBack={() => setMode("search")}
+            patients={patientDiscoveryQueryResponse ?? []}
+            goBack={() => {
+              setMode("search");
+            }}
             setMode={setMode}
             setPatientForQueryResponse={setPatientForQueryResponse}
             loading={loading}
@@ -106,10 +111,12 @@ const Query: React.FC = () => {
         {/* Step 3 */}
         {mode === "select-query" && selectedQuery && (
           <SelectQuery
-            goBack={() => setMode("patient-results")}
+            goBack={() => {
+              setMode("patient-results");
+            }}
             goForward={() => setMode("results")}
             patientForQuery={patientForQuery}
-            resultsQueryResponse={resultsQueryResponse}
+            patientDiscoveryResponse={patientDiscoveryQueryResponse}
             showCustomizeQuery={showCustomizeQuery}
             setResultsQueryResponse={setResultsQueryResponse}
             setShowCustomizeQuery={setShowCustomizeQuery}
@@ -122,10 +129,10 @@ const Query: React.FC = () => {
         )}
 
         {/* Step 4 */}
-        {mode === "results" && (
+        {mode === "results" && resultsQueryResponse && (
           <ResultsView
             selectedQuery={selectedQuery}
-            fhirQueryResponse={resultsQueryResponse}
+            patientRecordsResponse={resultsQueryResponse}
             goBack={() => {
               setMode("select-query");
             }}

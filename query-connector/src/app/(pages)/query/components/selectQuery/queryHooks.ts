@@ -1,7 +1,10 @@
 import { hyperUnluckyPatient } from "@/app/shared/constants";
 import { getSavedQueryByName } from "@/app/shared/database-service";
 import { unnestValueSetsFromQuery } from "@/app/shared/utils";
-import { FhirQueryResponse, makeFhirQuery } from "@/app/shared/query-service";
+import {
+  patientRecordsQuery,
+  PatientRecordsResponse,
+} from "@/app/shared/query-service";
 import { Patient } from "fhir/r4";
 import { DibbsValueSet } from "@/app/models/entities/valuesets";
 
@@ -43,52 +46,28 @@ export async function fetchQueryResponse(p: {
   patientForQuery: Patient | undefined;
   selectedQuery: string;
   fhirServer: string;
-  queryResponseStateCallback: SetStateCallback<FhirQueryResponse>;
+  queryResponseStateCallback: SetStateCallback<
+    PatientRecordsResponse | undefined
+  >;
   setIsLoading: (isLoading: boolean) => void;
   valueSetOverrides?: DibbsValueSet[];
 }) {
   if (p.patientForQuery && p.selectedQuery) {
-    const patientFirstName =
-      getNthElementIfDefined(p.patientForQuery.name, -1)?.given?.join(" ") ??
-      hyperUnluckyPatient.FirstName;
-    const patientLastName =
-      getNthElementIfDefined(p.patientForQuery.name, -1)?.family ??
-      hyperUnluckyPatient.LastName;
-
-    const patientMRN =
-      getNthElementIfDefined(p.patientForQuery.identifier)?.value ??
-      hyperUnluckyPatient.MRN;
-
     const newRequest = {
       query_name: p.queryName,
-      first_name: patientFirstName as string,
-      last_name: patientLastName as string,
-      dob: p.patientForQuery.birthDate as string,
-      mrn: patientMRN,
+      patient_id: p.patientForQuery.id ?? hyperUnluckyPatient.Id,
       fhir_server: p.fhirServer,
     };
     p.setIsLoading(true);
-    const queryResponse = await makeFhirQuery(
+    const queryResponse = await patientRecordsQuery(
       newRequest,
-      {
-        Patient: [p.patientForQuery],
-      },
       p.valueSetOverrides,
     );
 
-    p.queryResponseStateCallback(queryResponse);
+    p.queryResponseStateCallback({
+      Patient: [p.patientForQuery],
+      ...queryResponse,
+    });
     p.setIsLoading(false);
-  }
-}
-
-function getNthElementIfDefined<T>(
-  arr: T[] | undefined,
-  n: number = 0,
-): T | undefined {
-  if (arr && arr.length > n) {
-    const positionToCheck = n === -1 ? arr.length - 1 : n;
-    return arr[positionToCheck];
-  } else {
-    return undefined;
   }
 }
