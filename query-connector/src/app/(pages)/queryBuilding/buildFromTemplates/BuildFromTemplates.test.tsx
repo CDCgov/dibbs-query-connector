@@ -201,6 +201,47 @@ describe("tests the build from template page interactions", () => {
       screen.getByText("Malignant neoplastic disease"),
     ).toBeInTheDocument();
   });
+
+  it("removes condition pill and unchecks checkbox when pill X is clicked", async () => {
+    const { user } = renderWithUser(
+      <RootProviderMock currentPage={"/"}>
+        <BuildFromTemplates
+          buildStep="condition"
+          setBuildStep={jest.fn}
+          selectedQuery={{
+            queryName: "Test query",
+            queryId: undefined,
+          }}
+          setSelectedQuery={jest.fn}
+        />
+      </RootProviderMock>,
+    );
+
+    const DISPLAY_NAME = formatDiseaseDisplay(GONORREHEA_DETAILS.name);
+
+    // Check the checkbox
+    await user.click(await screen.findByLabelText(DISPLAY_NAME));
+
+    // Expect pill to appear
+    const pillRegion = await screen.findByTestId("selected-pill-container");
+    expect(within(pillRegion).getByText(DISPLAY_NAME)).toBeInTheDocument();
+
+    // Click the pill's X button
+    const removeBtn = screen.getByRole("button", {
+      name: `Remove ${DISPLAY_NAME}`,
+    });
+    await user.click(removeBtn);
+
+    // Checkbox should now be unchecked
+    expect(screen.getByLabelText(DISPLAY_NAME)).not.toBeChecked();
+
+    // Pill should be gone
+    await waitFor(() => {
+      expect(
+        within(pillRegion).queryByText(DISPLAY_NAME),
+      ).not.toBeInTheDocument();
+    });
+  });
 });
 
 describe("tests the valueset selection page interactions", () => {
