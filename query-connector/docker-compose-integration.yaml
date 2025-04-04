@@ -41,7 +41,7 @@ services:
       POSTGRES_PASSWORD: gOxAmiyiz4
 
   aidbox:
-    image: healthsamurai/aidboxone:edge
+    image: healthsamurai/aidboxone:stable
     pull_policy: always
     depends_on:
       - aidbox_db
