@@ -52,24 +52,44 @@ export const EMPTY_CONCEPT_TYPE = {
 };
 
 /**
+ * Utility method to get a display name for a category (if overridden),
+ * or fall back to the raw name.
+ * @param categoryName - raw category name from backend
+ * @returns display name to show in UI
+ */
+export function formatCategoryDisplay(categoryName: string): string {
+  const categoryDisplayMap: Record<string, string> = {
+    "Sexually Transmitted Diseases": "Sexually Transmitted Diseases (STI)",
+  };
+  // Add more mappings as needed
+  return categoryDisplayMap[categoryName] || categoryName;
+}
+
+/**
  * Filtering function that checks filtering at the category and the condition level
  * @param filterString - string to filter by
  * @param fetchedConditions - unfiltered list of conditions fetched from the backend
  * @param categoryDisplayMap - display names for categories
  * @returns - The subset of fetched conditions that contain the filter string
  */
+/**
+ * Filtering function that checks filtering at the category and the condition level
+ * @param filterString - string to filter by
+ * @param fetchedConditions - unfiltered list of conditions fetched from the backend
+ * @returns - The subset of fetched conditions that contain the filter string
+ */
 export function filterSearchByCategoryAndCondition(
   filterString: string,
   fetchedConditions: CategoryToConditionArrayMap,
-  categoryDisplayMap: Record<string, string>,
 ): CategoryToConditionArrayMap {
   const result: CategoryToConditionArrayMap = {};
   const unfilteredConditions = structuredClone(fetchedConditions);
 
   Object.entries(unfilteredConditions).forEach(
     ([categoryName, conditionArray]) => {
-      const displayCategory = categoryDisplayMap[categoryName] || categoryName;
+      const displayCategory = formatCategoryDisplay(categoryName);
       const filter = filterString.toLowerCase();
+
       if (
         categoryName.toLowerCase().includes(filter) ||
         displayCategory.toLowerCase().includes(filter)

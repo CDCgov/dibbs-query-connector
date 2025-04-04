@@ -3,6 +3,7 @@ import {
   CategoryToConditionArrayMap,
   NestedQuery,
   filterSearchByCategoryAndCondition,
+  formatCategoryDisplay,
 } from "../utils";
 import styles from "./conditionTemplateSelection.module.scss";
 import ConditionOption from "./ConditionOption";
@@ -43,10 +44,6 @@ export const ConditionColumnDisplay: React.FC<ConditionColumnDisplayProps> = ({
     categoryToConditionsMap,
   );
 
-  const categoryDisplayMap: Record<string, string> = {
-    "Sexually Transmitted Diseases": "Sexually Transmitted Diseases (STI)",
-  };
-
   useEffect(() => {
     if (searchFilter === "") {
       setConditionsToDisplay(categoryToConditionsMap);
@@ -55,7 +52,6 @@ export const ConditionColumnDisplay: React.FC<ConditionColumnDisplayProps> = ({
       const filteredDisplay = filterSearchByCategoryAndCondition(
         searchFilter,
         categoryToConditionsMap,
-        categoryDisplayMap,
       );
       setConditionsToDisplay(filteredDisplay);
     }
@@ -97,7 +93,7 @@ export const ConditionColumnDisplay: React.FC<ConditionColumnDisplayProps> = ({
                   <div key={category}>
                     <h3 className={styles.categoryHeading}>
                       {" "}
-                      {categoryDisplayMap[category] || category}
+                      {formatCategoryDisplay(category)}
                     </h3>
                     {arr.map((c) => {
                       return (
