@@ -65,7 +65,6 @@ export function formatCategoryDisplay(categoryName: string): string {
   return categoryDisplayMap[categoryName] || categoryName;
 }
 
-
 /**
  * Filtering function that checks filtering at the category and the condition level
  * @param filterString - string to filter by
