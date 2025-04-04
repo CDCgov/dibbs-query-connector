@@ -65,13 +65,7 @@ export function formatCategoryDisplay(categoryName: string): string {
   return categoryDisplayMap[categoryName] || categoryName;
 }
 
-/**
- * Filtering function that checks filtering at the category and the condition level
- * @param filterString - string to filter by
- * @param fetchedConditions - unfiltered list of conditions fetched from the backend
- * @param categoryDisplayMap - display names for categories
- * @returns - The subset of fetched conditions that contain the filter string
- */
+
 /**
  * Filtering function that checks filtering at the category and the condition level
  * @param filterString - string to filter by
