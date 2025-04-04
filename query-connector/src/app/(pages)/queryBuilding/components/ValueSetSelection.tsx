@@ -9,6 +9,7 @@ import {
   ConditionsMap,
   filterSearchByCategoryAndCondition,
   formatDiseaseDisplay,
+  formatCategoryDisplay,
   NestedQuery,
 } from "../utils";
 import { ConceptTypeSelectionTable } from "./SelectionTable";
@@ -77,7 +78,7 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
               highlightClassName="searchHighlight"
               searchWords={[conditionSearchFilter]}
               autoEscape={true}
-              textToHighlight={category}
+              textToHighlight={formatCategoryDisplay(category)}
             ></Highlighter>
           </div>
           <div>
