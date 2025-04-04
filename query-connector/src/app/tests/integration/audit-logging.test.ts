@@ -37,8 +37,6 @@ if (!PatientResource || PatientResource.resourceType !== "Patient") {
   throw new Error("Invalid Patient resource in the test bundle.");
 }
 
-const SYPHILIS_QUERY_ID = USE_CASE_DETAILS.syphilis.id;
-
 describe("audit log", () => {
   it("patient discovery should generate an audit entry", async () => {
     const auditQuery = "SELECT * FROM audit_logs;";
