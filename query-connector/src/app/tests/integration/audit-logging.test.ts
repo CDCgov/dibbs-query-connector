@@ -9,8 +9,19 @@ import {
   PatientRecordsRequest,
 } from "@/app/shared/query-service";
 import { getDbClient } from "@/app/backend/dbClient";
+import { AUDIT_LOG_MAX_RETRIES, auditable } from "@/app/auditLogs/decorator";
+import * as DecoratorUtils from "@/app/auditLogs/lib";
+import { suppressConsoleLogs } from "./fixtures";
 
 const dbClient = getDbClient();
+
+jest.mock("@/app/auditLogs/lib", () => {
+  const originalModule = jest.requireActual("@/app/auditLogs/lib");
+  return {
+    __esModule: true,
+    ...originalModule,
+  };
+});
 
 jest.mock("@/app/utils/auth", () => {
   return {
@@ -38,7 +49,15 @@ if (!PatientResource || PatientResource.resourceType !== "Patient") {
 }
 
 describe("audit log", () => {
-  it("patient discovery should generate an audit entry", async () => {
+  beforeAll(() => {
+    suppressConsoleLogs();
+  });
+
+  afterAll(() => {
+    jest.resetAllMocks();
+  });
+
+  it("patient discovery query should generate an audit entry", async () => {
     const auditQuery = "SELECT * FROM audit_logs;";
     const auditRows = await dbClient.query(auditQuery);
 
@@ -89,4 +108,32 @@ describe("audit log", () => {
       request: JSON.stringify(request),
     });
   });
+
+  it("an audited function should  retries successfully", async () => {
+    const auditGenerationSpy = jest.spyOn(
+      DecoratorUtils,
+      "generateAuditValues",
+    );
+
+    const querySpy = jest.spyOn(dbClient, "query");
+
+    for (let i = 0; i < AUDIT_LOG_MAX_RETRIES; i++) {
+      querySpy.mockImplementationOnce(() => {
+        throw new Error("test error");
+      });
+    }
+
+    class MockClass {
+      @auditable
+      testFunction() {
+        return;
+      }
+    }
+
+    const testObj = new MockClass();
+    testObj.testFunction();
+
+    await new Promise((r) => setTimeout(r, 6000));
+    expect(auditGenerationSpy).toHaveBeenCalledTimes(AUDIT_LOG_MAX_RETRIES);
+  }, 10000);
 });
