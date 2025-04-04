@@ -16,10 +16,9 @@ import { suppressConsoleLogs } from "./fixtures";
 const dbClient = getDbClient();
 
 jest.mock("@/app/auditLogs/lib", () => {
-  const originalModule = jest.requireActual("@/app/auditLogs/lib");
   return {
     __esModule: true,
-    ...originalModule,
+    ...jest.requireActual("@/app/auditLogs/lib"),
   };
 });
 
@@ -117,6 +116,7 @@ describe("audit log", () => {
 
     const querySpy = jest.spyOn(dbClient, "query");
 
+    // generate errors within the query write AUDIT_LOG_MAX_RETRIES - 1 times
     for (let i = 0; i < AUDIT_LOG_MAX_RETRIES; i++) {
       querySpy.mockImplementationOnce(() => {
         throw new Error("test error");
