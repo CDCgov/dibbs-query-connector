@@ -108,11 +108,15 @@ export function filterSearchByCategoryAndCondition(
  * @param diseaseName - name of the disease
  * @returns A disease display string for display
  */
-export function formatDiseaseDisplay(diseaseName: string) {
-  if (diseaseName === "Human immunodeficiency virus infection (disorder)") {
-    return "Human immunodeficiency virus infection (HIV)";
-  }
-  return diseaseName.replace("(disorder)", "").trim();
+export function formatDiseaseDisplay(diseaseName: string): string {
+  const diseaseDisplayMap: Record<string, string> = {
+    "Human immunodeficiency virus infection (disorder)":
+      "Human immunodeficiency virus infection (HIV)",
+  };
+  return (
+    diseaseDisplayMap[diseaseName] ||
+    diseaseName.replace("(disorder)", "").trim()
+  );
 }
 
 /**
