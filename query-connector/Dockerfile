@@ -23,9 +23,9 @@ ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm ci
 RUN npm run build
 
-# Download jwksetinfer tool
+# Download jwkset tool
 RUN git clone https://github.com/MicahParks/jwkset.git \
-    && cd jwkset/cmd/jwksetinfer \
+    && cd jwkset/cmd/jwkset \
     && go build
 
 # Final stage for running the app
@@ -57,7 +57,7 @@ COPY --from=installer /app/package.json .
 COPY --from=installer /app/flyway/conf/flyway.conf ../flyway/conf/flyway.conf
 COPY --from=installer /app/flyway/sql ../flyway/sql
 COPY --from=installer /app/src/app/assets ./.next/server/app/assets
-COPY --from=installer /app/jwkset/cmd/jwksetinfer/jwksetinfer /usr/local/bin/jwksetinfer
+COPY --from=installer /app/jwkset/cmd/jwkset/jwkset /usr/local/bin/jwkset
 
 # Automatically leverage output traces to reduce image size
 COPY --from=installer --chown=nextjs:nodejs /app/.next/standalone ./
