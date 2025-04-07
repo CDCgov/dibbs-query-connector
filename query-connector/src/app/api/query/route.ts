@@ -4,11 +4,11 @@ import {
   handleRequestError,
 } from "./error-handling-service";
 import {
-  makeFhirQuery,
-  QueryRequest,
   QueryResponse,
   createBundle,
   APIQueryResponse,
+  fullPatientQuery,
+  FullPatientRequest,
 } from "../../shared/query-service";
 import {
   RESPONSE_BODY_IS_NOT_PATIENT_RESOURCE,
@@ -81,7 +81,7 @@ export async function GET(request: NextRequest) {
   }
 
   // Add params & patient identifiers to QueryName
-  const QueryRequest: QueryRequest = {
+  const QueryRequest: FullPatientRequest = {
     query_name: queryResults.query_name,
     fhir_server: fhir_server,
     first_name: given,
@@ -91,7 +91,7 @@ export async function GET(request: NextRequest) {
     phone: phone,
   };
 
-  const QueryResponse: QueryResponse = await makeFhirQuery(QueryRequest);
+  const QueryResponse: QueryResponse = await fullPatientQuery(QueryRequest);
 
   // Bundle data
   const bundle: APIQueryResponse = await createBundle(QueryResponse);
@@ -133,7 +133,7 @@ export async function POST(request: NextRequest) {
     return await handleAndReturnError(INVALID_MESSAGE_FORMAT);
   }
 
-  let QueryRequest: QueryRequest;
+  let QueryRequest: FullPatientRequest;
   if (messageFormat === "HL7") {
     try {
       let requestText = await request.text();
@@ -207,7 +207,7 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  const QueryResponse: QueryResponse = await makeFhirQuery(QueryRequest);
+  const QueryResponse: QueryResponse = await fullPatientQuery(QueryRequest);
 
   // Bundle data
   const bundle: APIQueryResponse = await createBundle(QueryResponse);
