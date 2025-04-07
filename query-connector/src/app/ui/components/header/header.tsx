@@ -70,6 +70,10 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
   const landingPage: string =
     authDisabled || isLoggedIn ? PAGES.QUERY : PAGES.LANDING;
 
+  const menuPages = getPagesInSettingsMenu(userRole as UserRole).filter(
+    (page) => page.path != PAGES.QUERY,
+  );
+
   return (
     <div className={styles.headerContainer}>
       <header className="usa-header usa-header--basic">
@@ -110,25 +114,37 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
                 Sign in
               </Button>
             ) : (
-              <button
-                onClick={toggleMenuDropdown}
-                className={classNames(
-                  styles.menuButton,
-                  "usa-accordion__button",
-                  "usa-nav__link",
-                  "usa-current",
-                )}
-                aria-expanded="false"
-                aria-controls="dropdown-menu"
-                data-testid="menu-button"
-              >
-                <Icon.Settings
-                  className="usa-icon qc-settings"
-                  size={3}
-                  color="#fff"
-                  aria-label="Gear icon indicating settings menu"
-                />
-              </button>
+              <div className="display-flex flex-align-center">
+                <Link
+                  href={PAGES.QUERY}
+                  className={classNames(
+                    styles.runQueryBtn,
+                    "usa-button margin-bottom-0 margin-right-2",
+                  )}
+                  scroll={false}
+                >
+                  Run query
+                </Link>
+                <button
+                  onClick={toggleMenuDropdown}
+                  className={classNames(
+                    styles.menuButton,
+                    "usa-accordion__button",
+                    "usa-nav__link",
+                    "usa-current",
+                  )}
+                  aria-expanded="false"
+                  aria-controls="dropdown-menu"
+                  data-testid="menu-button"
+                >
+                  <Icon.Settings
+                    className="usa-icon qc-settings"
+                    size={3}
+                    color="#fff"
+                    aria-label="Gear icon indicating settings menu"
+                  />
+                </button>
+              </div>
             )}
           </div>
         </div>
@@ -139,7 +155,7 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
               data-testid="dropdown-menu"
               className={classNames("usa-nav__submenu", styles.menuDropdown)}
             >
-              {getPagesInSettingsMenu(userRole as UserRole).map((page) => (
+              {menuPages.map((page) => (
                 <li key={page.path} className={styles.subMenuItem}>
                   <Link
                     className={styles.menuItem}
