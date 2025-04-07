@@ -106,6 +106,8 @@ describe("audit log", () => {
     expect(addedVal[0]?.audit_message).toStrictEqual({
       request: JSON.stringify(request),
     });
+
+    expect(addedVal[0]?.audit_checksum).toMatch(/^[a-f0-9]{64}$/);
   });
 
   it("an audited function should  retries successfully", async () => {
