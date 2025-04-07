@@ -54,7 +54,9 @@ export function auditable(
         )
         .catch((e) => {
           console.error(
-            `Audit log write attempt ${retryCounter + 1} failed with error: ${e}. ${
+            `Audit log write attempt ${
+              retryCounter + 1
+            } failed with error: ${e}. ${
               retryCounter + 1 < AUDIT_LOG_MAX_RETRIES ? "Retrying..." : ""
             }`,
           );
