@@ -1,4 +1,5 @@
 import { auth } from "@/auth";
+import crypto from "crypto";
 
 // these functions are exported from another file into the auditable file
 //  to allow us to spy on them when calling @auditable functions
@@ -19,10 +20,10 @@ export async function generateAuditValues(
 ) {
   const session = await auth();
   const author = `${session?.user?.username}`;
-
   const auditContents = generateAuditMessage(argLabels, args);
-  const auditChecksum = generateAuditChecksum(author, auditContents);
-  return [author, methodName, auditChecksum, auditContents];
+
+  // Checksum will now be generated separately after timestamp is known
+  return [author, methodName, auditContents];
 }
 
 /**
@@ -53,11 +54,16 @@ function generateAuditMessage(argLabels: string[], args: unknown[]) {
  * contents, author, and timestamp
  * @param author - name of the author
  * @param auditContents - the contents of the message being stored
+ * @param timestamp - the time the message was created in the database
  * @returns A SHA-2 strength or greater checksum
  */
-function generateAuditChecksum(author: string, auditContents: Object) {
-  // TODO: implement this properly
-  return "result of some SHA-2 hashing algo based on author and audit contents";
+export function generateAuditChecksum(
+  author: string,
+  auditContents: Object,
+  timestamp: string,
+) {
+  const input = JSON.stringify({ author, auditContents, timestamp });
+  return crypto.createHash("sha256").update(input).digest("hex");
 }
 
 function sanitizeString(s: string) {

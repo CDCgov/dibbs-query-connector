@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { getDbClient } from "../backend/dbClient";
-import { generateAuditValues } from "./lib";
+import { generateAuditValues, generateAuditChecksum } from "./lib";
 
 export const AUDIT_LOG_MAX_RETRIES = 3;
 /**
@@ -25,20 +25,42 @@ export function auditable(
     .split(", ");
 
   const writeToAuditTable = async (args: any[]) => {
-    const query = `INSERT INTO 
-        audit_logs (author, action_type, audit_checksum, audit_message) 
-        VALUES ($1, $2, $3, $4)
-        RETURNING id, action_type, audit_checksum`;
+    const insertQuery = `INSERT INTO 
+          audit_logs (author, action_type, audit_message) 
+          VALUES ($1, $2, $3)
+          RETURNING id, author, action_type, audit_message, created_at`;
+
+    const updateQuery = `UPDATE audit_logs 
+          SET audit_checksum = $1 
+          WHERE id = $2`;
 
     // using this recursive pattern with .then's rather than async / await to
     // allow for the decorator to work on synchronous functions
     const attemptWrite = (retryCounter: number): Promise<void> => {
       return generateAuditValues(key, argLabels, args)
-        .then((auditValues) => dbConnection.query(query, auditValues))
-        .then((result) => {
-          const auditMetadata = result.rows[0];
+        .then(async ([author, methodName, auditMessage]) => {
+          // Step 1: Insert audit row without checksum
+          const result = await dbConnection.query(insertQuery, [
+            author,
+            methodName,
+            JSON.stringify(auditMessage),
+          ]);
+
+          const insertedRow = result.rows[0];
+          const timestamp = insertedRow.created_at.toISOString();
+
+          // Step 2: Compute checksum with real timestamp
+          const checksum = generateAuditChecksum(
+            insertedRow.author,
+            auditMessage,
+            timestamp,
+          );
+
+          // Step 3: Update row with checksum
+          await dbConnection.query(updateQuery, [checksum, insertedRow.id]);
+
           console.info(
-            `${auditMetadata.action_type} audit action with id ${auditMetadata?.id} and checksum ${auditMetadata?.audit_checksum} added to audit table`,
+            `${insertedRow.action_type} audit action with id ${insertedRow.id} and checksum ${checksum} added to audit table`,
           );
           return;
         })
