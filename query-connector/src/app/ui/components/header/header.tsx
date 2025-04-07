@@ -123,7 +123,7 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
                   )}
                   scroll={false}
                 >
-                  Run Query
+                  Run query
                 </Link>
                 <button
                   onClick={toggleMenuDropdown}
