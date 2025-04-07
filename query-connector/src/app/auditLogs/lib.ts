@@ -20,10 +20,10 @@ export async function generateAuditValues(
 ) {
   const session = await auth();
   const author = `${session?.user?.username}`;
+  const timestamp = new Date().toISOString();
   const auditContents = generateAuditMessage(argLabels, args);
-
-  // Checksum will now be generated separately after timestamp is known
-  return [author, methodName, auditContents];
+  const auditChecksum = generateAuditChecksum(author, auditContents, timestamp);
+  return [author, methodName, auditContents, timestamp, auditChecksum];
 }
 
 /**
@@ -38,8 +38,6 @@ function generateAuditMessage(argLabels: string[], args: unknown[]) {
   args.forEach((obj, i) => {
     if (obj) {
       const val = JSON.stringify(obj);
-      // these strings return truthy in the if(obj) so explicitly compare them
-      // to filter them on
       if (val !== "{}" && val !== "[]") {
         mappedArgs[argLabels[i]] = sanitizeString(JSON.stringify(obj));
       }
@@ -59,7 +57,7 @@ function generateAuditMessage(argLabels: string[], args: unknown[]) {
  */
 export function generateAuditChecksum(
   author: string,
-  auditContents: Object,
+  auditContents: object,
   timestamp: string,
 ) {
   const input = JSON.stringify({ author, auditContents, timestamp });

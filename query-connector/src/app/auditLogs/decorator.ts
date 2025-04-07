@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { getDbClient } from "../backend/dbClient";
-import { generateAuditValues, generateAuditChecksum } from "./lib";
+import { generateAuditValues } from "./lib";
 
 export const AUDIT_LOG_MAX_RETRIES = 3;
 /**
@@ -26,49 +26,35 @@ export function auditable(
 
   const writeToAuditTable = async (args: any[]) => {
     const insertQuery = `INSERT INTO 
-          audit_logs (author, action_type, audit_message) 
-          VALUES ($1, $2, $3)
-          RETURNING id, author, action_type, audit_message, created_at`;
-
-    const updateQuery = `UPDATE audit_logs 
-          SET audit_checksum = $1 
-          WHERE id = $2`;
+          audit_logs (author, action_type, audit_message, created_at, audit_checksum) 
+          VALUES ($1, $2, $3, $4, $5)
+          RETURNING id, author, action_type, audit_checksum`;
 
     // using this recursive pattern with .then's rather than async / await to
     // allow for the decorator to work on synchronous functions
     const attemptWrite = (retryCounter: number): Promise<void> => {
       return generateAuditValues(key, argLabels, args)
-        .then(async ([author, methodName, auditMessage]) => {
-          // Step 1: Insert audit row without checksum
-          const result = await dbConnection.query(insertQuery, [
-            author,
-            methodName,
-            JSON.stringify(auditMessage),
-          ]);
+        .then(
+          async ([author, methodName, auditMessage, timestamp, checksum]) => {
+            const result = await dbConnection.query(insertQuery, [
+              author,
+              methodName,
+              auditMessage,
+              timestamp,
+              checksum,
+            ]);
 
-          const insertedRow = result.rows[0];
-          const timestamp = insertedRow.created_at.toISOString();
+            const insertedRow = result.rows[0];
 
-          // Step 2: Compute checksum with real timestamp
-          const checksum = generateAuditChecksum(
-            insertedRow.author,
-            auditMessage,
-            timestamp,
-          );
-
-          // Step 3: Update row with checksum
-          await dbConnection.query(updateQuery, [checksum, insertedRow.id]);
-
-          console.info(
-            `${insertedRow.action_type} audit action with id ${insertedRow.id} and checksum ${checksum} added to audit table`,
-          );
-          return;
-        })
+            console.info(
+              `${insertedRow.action_type} audit action with id ${insertedRow.id} and checksum ${insertedRow.audit_checksum} added to audit table`,
+            );
+            return;
+          },
+        )
         .catch((e) => {
           console.error(
-            `Audit log write attempt ${
-              retryCounter + 1
-            } failed with error: ${e}. ${
+            `Audit log write attempt ${retryCounter + 1} failed with error: ${e}. ${
               retryCounter + 1 < AUDIT_LOG_MAX_RETRIES ? "Retrying..." : ""
             }`,
           );
