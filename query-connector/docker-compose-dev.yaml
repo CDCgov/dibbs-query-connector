@@ -1,7 +1,7 @@
 services:
   # Postgresql DB
   db:
-    image: "postgres:alpine"
+    image: "postgres:17.4"
     ports:
       - "5432:5432"
     environment:
@@ -23,8 +23,8 @@ services:
   # Flyway migrations and DB version control
   flyway:
     image: flyway/flyway:11-alpine
-    environment:
-      - JAVA_OPTS_APPEND="-XX:UseSVE=0"
+    # environment:
+    # - JAVA_OPTS_APPEND="-XX:UseSVE=0"
     command: -configFiles=/flyway/conf/flyway.conf -schemas=public -connectRetries=60 migrate
     volumes:
       - ./flyway/sql:/flyway/sql
@@ -85,7 +85,7 @@ services:
       PGPASSWORD: gOxAmiyiz4
       PGPORT: "5432"
       BOX_SEARCH_INCLUDE_CONFORMANT: true
-      JAVA_TOOL_OPTIONS: "-XX:UseSVE=0"
+      # JAVA_TOOL_OPTIONS: "-XX:UseSVE=0"
     env_file:
       - .env
   aidbox-seeder:

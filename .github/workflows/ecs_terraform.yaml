@@ -19,6 +19,14 @@ on:
           - dev
           - demo
         default: dev
+      # auth_flag:
+      #   description: "Do you want to disable authentication ?"
+      #   required: true
+      #   type: choice
+      #   options:
+      #     - true
+      #     - false
+      #   default: "false"
 
 concurrency:
   group: ${{ github.event.inputs.workspace }}-terraform
@@ -104,6 +112,13 @@ jobs:
             echo dev
           fi
           )" >> $GITHUB_OUTPUT
+      #Finish this logic up
+      - name: Set Authentication flag
+        id: set-authentication-flag
+        run: |-
+          if [[ "${{ steps.set-workspace.outputs.workspace }}" == "demo" ]]; then
+            echo "AUTH_DISABLED=true" >> $GITHUB_OUTPUT
+          else
 
       - name: Set URL format
         id: set-url-format

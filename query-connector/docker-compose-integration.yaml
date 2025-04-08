@@ -1,7 +1,7 @@
 services:
   # PostgreSQL DB for custom query and value set storage
   db:
-    image: "postgres:alpine"
+    image: "postgres:17.4"
     ports:
       - "5432:5432"
     environment:
