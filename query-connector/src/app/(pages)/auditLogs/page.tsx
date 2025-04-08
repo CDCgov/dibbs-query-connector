@@ -12,6 +12,7 @@ import SearchField from "@/app/ui/designSystem/searchField/SearchField";
 import Table from "@/app/ui/designSystem/table/Table";
 import { Button, Select, Pagination } from "@trussworks/react-uswds";
 import WithAuth from "@/app/ui/components/withAuth/WithAuth";
+import { getAuditLogs, LogEntry } from "@/app/backend/dbServices/audit-logs";
 
 /**
  * Client component for the Audit Logs page.
@@ -25,68 +26,41 @@ const AuditLogs: React.FC = () => {
   const [dateErrors, setDateErrors] = useState<DateErrors>({});
   const [currentPage, setCurrentPage] = useState(1);
   const [actionsPerPage, setActionsPerPage] = useState(10);
+  const [logs, setLogs] = useState<LogEntry[]>([]);
 
-  const logs = useMemo(() => {
-    const baseData = [
-      {
-        name: "Rocky Balboa",
-        action: "Created Report",
-        date: new Date("2025-03-10T14:30:00Z"),
-      },
-      {
-        name: "Apollo Creed",
-        action: "Edited Report",
-        date: new Date("2025-03-09T09:15:00Z"),
-      },
-      {
-        name: "Rocky Balboa",
-        action: "Deleted Entry",
-        date: new Date("2022-03-08T17:45:00Z"),
-      },
-      {
-        name: "Clubber Lang",
-        action: "Created Report",
-        date: new Date("2024-03-07T12:00:00Z"),
-      },
-      {
-        name: "Ivan Drago",
-        action: "Viewed Entry",
-        date: new Date("2025-03-06T22:10:00Z"),
-      },
-    ];
+  useEffect(() => {
+    async function fetchAuditLogs() {
+      return await getAuditLogs();
+    }
 
-    return Array.from({ length: 50 }, (_, index) =>
-      baseData.map((entry) => ({
-        ...entry,
-        date: new Date(entry.date.getTime() + index * 86400000),
-      })),
-    )
-      .flat()
-      .sort((a, b) => b.date.getTime() - a.date.getTime());
+    fetchAuditLogs().then((v) => {
+      console.log(v);
+      setLogs(v);
+    });
   }, []);
 
   const [filteredLogs, setFilteredLogs] = useState(logs);
 
   const uniqueNames = useMemo(
-    () => Array.from(new Set(logs.map((log) => log.name))).sort(),
+    () => Array.from(new Set(logs.map((log) => log.author))).sort(),
     [logs],
   );
   const uniqueActions = useMemo(
-    () => Array.from(new Set(logs.map((log) => log.action))).sort(),
+    () => Array.from(new Set(logs.map((log) => log.actionType))).sort(),
     [logs],
   );
 
   const minDate = useMemo(
     () =>
       logs.length > 0
-        ? new Date(Math.min(...logs.map((log) => log.date.getTime())))
+        ? new Date(Math.min(...logs.map((log) => log.createdAt.getTime())))
         : null,
     [logs],
   );
   const maxDate = useMemo(
     () =>
       logs.length > 0
-        ? new Date(Math.max(...logs.map((log) => log.date.getTime())))
+        ? new Date(Math.max(...logs.map((log) => log.createdAt.getTime())))
         : null,
     [logs],
   );
@@ -94,17 +68,17 @@ const AuditLogs: React.FC = () => {
   useEffect(() => {
     setFilteredLogs(
       logs.filter((log) => {
-        const matchesName = selectedName ? log.name === selectedName : true;
+        const matchesName = selectedName ? log.author === selectedName : true;
         const matchesAction = selectedAction
-          ? log.action === selectedAction
+          ? log.actionType === selectedAction
           : true;
         const matchesSearch =
           search.length === 0 ||
-          log.name.toLowerCase().includes(search.toLowerCase()) ||
-          log.action.toLowerCase().includes(search.toLowerCase());
+          log.author.toLowerCase().includes(search.toLowerCase()) ||
+          log.actionType.toLowerCase().includes(search.toLowerCase());
         const matchesDate =
-          (!dateRange.startDate || log.date >= dateRange.startDate) &&
-          (!dateRange.endDate || log.date <= dateRange.endDate);
+          (!dateRange.startDate || log.createdAt >= dateRange.startDate) &&
+          (!dateRange.endDate || log.createdAt <= dateRange.endDate);
         return matchesName && matchesAction && matchesSearch && matchesDate;
       }),
     );
@@ -216,15 +190,17 @@ const AuditLogs: React.FC = () => {
                   <tr>
                     <th className={styles.tableHeader}>Name</th>
                     <th className={styles.tableHeader}>Action</th>
+                    <th className={styles.tableHeader}>Message</th>
                     <th className={styles.tableHeader}>Date</th>
                   </tr>
                 </thead>
                 <tbody>
                   {paginatedLogs.map((log, index) => (
                     <tr className={styles.tableRows} key={index}>
-                      <td>{log.name}</td>
-                      <td>{log.action}</td>
-                      <td>{log.date.toLocaleString()}</td>
+                      <td>{log.author}</td>
+                      <td>{log.actionType}</td>
+                      <td>{JSON.stringify(log.auditMessage)}</td>
+                      <td>{log.createdAt.toLocaleString()}</td>
                     </tr>
                   ))}
                 </tbody>
