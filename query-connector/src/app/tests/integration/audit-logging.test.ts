@@ -18,10 +18,10 @@ import { suppressConsoleLogs } from "./fixtures";
 
 const dbClient = getDbClient();
 
-jest.mock("@/app/auditLogs/lib", () => {
+jest.mock("@/app/backend/auditLogs/lib", () => {
   return {
     __esModule: true,
-    ...jest.requireActual("@/app/auditLogs/lib"),
+    ...jest.requireActual("@/app/backend/auditLogs/lib"),
   };
 });
 
@@ -146,6 +146,7 @@ describe("audit log", () => {
     const auditQuery =
       "SELECT * FROM audit_logs ORDER BY created_at DESC LIMIT 1;";
     const result = await dbClient.query(auditQuery);
+    console.log(result);
 
     if (!result || !result.rows || result.rows.length === 0) {
       throw new Error(
