@@ -1,7 +1,5 @@
 "use server";
-
-import { Pool } from "pg";
-import { getDbClient } from "../dbClient";
+import dbService from "./db-service";
 
 export type LogEntry = {
   actionType: string;
@@ -11,29 +9,13 @@ export type LogEntry = {
   createdAt: Date;
 };
 
-class AuditLogService {
-  private static dbClient: Pool = getDbClient();
-
-  // @camelCaseDbColumnNames
+class AuditLogService extends dbService {
   static async getAuditLogs() {
     const auditQuery = "SELECT * FROM audit_logs ORDER BY created_at DESC;";
 
-    const results = await AuditLogService.dbClient.query(auditQuery);
-    return results.rows.map((v) => {
-      const val: Record<string, unknown> = {};
-      Object.entries(v).forEach(([k, v]) => {
-        val[underscoreToCamelCase(k)] = v;
-      });
-
-      return val as LogEntry;
-    });
+    const results = await dbService.query(auditQuery);
+    return results.rows;
   }
 }
 
 export const getAuditLogs = AuditLogService.getAuditLogs;
-
-function underscoreToCamelCase(str: string) {
-  return str.replace(/_+([a-z])/g, function (_, letter) {
-    return letter.toUpperCase();
-  });
-}
