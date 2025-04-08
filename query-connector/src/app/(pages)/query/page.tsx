@@ -73,7 +73,6 @@ const Query: React.FC = () => {
     results: "main-container__wide",
   };
 
-  console.log(mode);
   return (
     <WithAuth>
       {Object.keys(CUSTOMIZE_QUERY_STEPS).includes(mode) &&
