@@ -402,6 +402,7 @@ class QueryService {
     if (QueryService.fhirServerConfigs.length === 0) {
       QueryService.fhirServerConfigs = await getFhirServerConfigs(false);
     }
+    console.log(this.fhirServerConfigs);
 
     return new FHIRClient(fhirServer, this.fhirServerConfigs);
   }
