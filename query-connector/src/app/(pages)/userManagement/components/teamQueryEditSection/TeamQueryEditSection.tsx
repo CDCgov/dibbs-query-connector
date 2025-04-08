@@ -1,12 +1,18 @@
 "use client";
-import { Dispatch, SetStateAction, useContext } from "react";
+import {
+  Dispatch,
+  SetStateAction,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import classNames from "classnames";
 import { Checkbox } from "@trussworks/react-uswds";
 import Drawer from "@/app/ui/designSystem/drawer/Drawer";
 import { UserManagementContext } from "../UserManagementProvider";
 import style from "./TeamQueryEditSection.module.scss";
 import { User, UserGroup, UserRole } from "@/app/models/entities/users";
-import { getRole } from "../../utils";
+import { FilterableUser, filterUsers, getRole } from "../../utils";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import {
   getAllUserGroups,
@@ -49,11 +55,29 @@ const UserManagementDrawer: React.FC<UserManagementDrawerProps> = ({
   allQueries,
   setAllQueries,
 }) => {
-  const { teamQueryEditSection, closeEditSection, handleSearch } = useContext(
+  const { teamQueryEditSection, closeEditSection } = useContext(
     UserManagementContext,
   );
 
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [usersToRender, setUsersToRender] = useState<FilterableUser[]>(
+    users.map((user) => ({ ...user, render: true })), // render all by default
+  );
+  // const [queriesToRender, setQueriesToRender] = useState<
+  //   FilterableCustomUserQuery[]
+  // >(allQueries.map((query) => ({ ...query, render: true })));
+
+  useEffect(() => {
+    const updatedUsersToRender = filterUsers(
+      searchTerm,
+      users,
+    ) as FilterableUser[];
+
+    setUsersToRender(updatedUsersToRender.filter((u) => !!u.render));
+  }, [searchTerm, users]);
+
   const role = getRole();
+
   const renderQueries = (queries: CustomUserQuery[]) => {
     const groupQueries = teamQueryEditSection.subjectData as CustomUserQuery[];
 
@@ -139,7 +163,9 @@ const UserManagementDrawer: React.FC<UserManagementDrawerProps> = ({
 
   function generateContent(): JSX.Element {
     const isMemberView = teamQueryEditSection.subjectType == "Members";
-    return isMemberView ? renderUsers(users) : renderQueries(allQueries);
+    return isMemberView
+      ? renderUsers(usersToRender)
+      : renderQueries(allQueries);
   }
 
   async function handleToggleMembership(
@@ -241,6 +267,7 @@ const UserManagementDrawer: React.FC<UserManagementDrawerProps> = ({
       });
     }
   }
+
   return (
     <Drawer
       title={teamQueryEditSection.title}
@@ -249,7 +276,7 @@ const UserManagementDrawer: React.FC<UserManagementDrawerProps> = ({
       toRender={generateContent()}
       isOpen={teamQueryEditSection.isOpen}
       onSave={() => {}}
-      onSearch={() => handleSearch}
+      onSearch={(searchTerm) => setSearchTerm(searchTerm)}
       onClose={closeEditSection}
     />
   );

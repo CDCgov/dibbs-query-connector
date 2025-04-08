@@ -2,7 +2,7 @@ import { useSession } from "next-auth/react";
 import { useContext } from "react";
 import { DataContext } from "@/app/shared/DataProvider";
 import { isAuthDisabledClientCheck } from "@/app/utils/auth";
-import { UserRole } from "@/app/models/entities/users";
+import { User, UserRole } from "@/app/models/entities/users";
 
 /**
  * Function that retrieves the role value from the current session object
@@ -92,3 +92,40 @@ export const ModalStates: ModalMap = {
     prevStep: "closed",
   },
 };
+
+export type FilterableUser = User & {
+  render: boolean;
+};
+
+/**
+ * A helper function to filter a list of users
+ * @param searchFilter - the search string to filter against
+ * @param users - the user list to filter
+ * @returns a user with the appropriate render flag set for itself
+ */
+export function filterUsers(searchFilter: string, users: User[]) {
+  const casedSearchFilter = searchFilter.toLocaleLowerCase();
+  const newUsers = structuredClone(users);
+
+  return newUsers.map((user) => {
+    // if render has been set to false by a previous filter action (ie at the
+    // valueset level, skip this concept)
+
+    let fNameMatch = user.first_name
+      .toLocaleLowerCase()
+      .includes(casedSearchFilter);
+    let lNameMatch = user.last_name
+      .toLocaleLowerCase()
+      .includes(casedSearchFilter);
+    let uNameMatch = user.username
+      .toLocaleLowerCase()
+      .includes(casedSearchFilter);
+
+    if (!fNameMatch && !lNameMatch && !uNameMatch) {
+      return user;
+    } else {
+      let render = fNameMatch || lNameMatch || uNameMatch;
+      return { ...user, render } as FilterableUser;
+    }
+  });
+}
