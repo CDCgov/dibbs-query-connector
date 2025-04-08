@@ -88,9 +88,12 @@ const SessionTimeout: React.FC<SessionTimeoutProps> = ({
   useEffect(() => {
     // trigger expired token timer
     if (expiresBeforeIdle && expTimerId.current == null) {
-      expTimerId.current = setTimeout(async () => {
-        await handleLogout();
-      }, data?.expiresIn);
+      expTimerId.current = setTimeout(
+        async () => {
+          await handleLogout();
+        },
+        data?.expiresIn,
+      );
     }
 
     if (!started && status === "authenticated") {
