@@ -13,6 +13,7 @@ import Table from "@/app/ui/designSystem/table/Table";
 import { Button, Select, Pagination } from "@trussworks/react-uswds";
 import WithAuth from "@/app/ui/components/withAuth/WithAuth";
 import { getAuditLogs, LogEntry } from "@/app/backend/dbServices/audit-logs";
+import Skeleton from "react-loading-skeleton";
 
 /**
  * Client component for the Audit Logs page.
@@ -27,15 +28,20 @@ const AuditLogs: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [actionsPerPage, setActionsPerPage] = useState(10);
   const [logs, setLogs] = useState<LogEntry[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     async function fetchAuditLogs() {
-      return await getAuditLogs();
+      const logs = await getAuditLogs();
+
+      return logs;
     }
 
+    setLoading(true);
+
     fetchAuditLogs().then((v) => {
-      console.log(v);
       setLogs(v);
+      setLoading(false);
     });
   }, []);
 
@@ -164,26 +170,26 @@ const AuditLogs: React.FC = () => {
           />
         </div>
 
-        {filteredLogs.length === 0 ? (
-          <div className={styles.noResultsContainer}>
-            <h3>No results found.</h3>
-            <Button
-              type="reset"
-              outline
-              className={styles.clearFiltersButton}
-              onClick={() => {
-                setSearch("");
-                setSelectedName("");
-                setSelectedAction("");
-                setDateErrors({});
-                setDateRange({});
-              }}
-            >
-              Clear filters
-            </Button>
-          </div>
-        ) : (
-          <>
+        <>
+          {!loading && filteredLogs.length === 0 ? (
+            <div className={styles.noResultsContainer}>
+              <h3>No results found.</h3>
+              <Button
+                type="reset"
+                outline
+                className={styles.clearFiltersButton}
+                onClick={() => {
+                  setSearch("");
+                  setSelectedName("");
+                  setSelectedAction("");
+                  setDateErrors({});
+                  setDateRange({});
+                }}
+              >
+                Clear filters
+              </Button>
+            </div>
+          ) : (
             <div className={styles.auditTableContainer}>
               <Table>
                 <thead>
@@ -194,62 +200,96 @@ const AuditLogs: React.FC = () => {
                     <th className={styles.tableHeader}>Date</th>
                   </tr>
                 </thead>
-                <tbody>
-                  {paginatedLogs.map((log, index) => (
-                    <tr className={styles.tableRows} key={index}>
-                      <td>{log.author}</td>
-                      <td>{log.actionType}</td>
-                      <td>{JSON.stringify(log.auditMessage)}</td>
-                      <td>{log.createdAt.toLocaleString()}</td>
-                    </tr>
-                  ))}
-                </tbody>
+
+                {loading ? (
+                  <tbody>{LoadingTable}</tbody>
+                ) : (
+                  <tbody>
+                    {paginatedLogs.map((log, index) => (
+                      <tr className={styles.tableRows} key={index}>
+                        <td>{log.author}</td>
+                        <td>{log.actionType}</td>
+                        <td>{JSON.stringify(log.auditMessage)}</td>
+                        <td>{log.createdAt.toLocaleString()}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                )}
               </Table>
             </div>
+          )}
 
-            <div className={classNames(styles.paginationContainer)}>
-              <span>
-                Showing {(currentPage - 1) * actionsPerPage + 1}-
-                {Math.min(currentPage * actionsPerPage, filteredLogs.length)} of{" "}
-                {filteredLogs.length} actions
-              </span>
+          <div className={classNames(styles.paginationContainer)}>
+            <span>
+              Showing {(currentPage - 1) * actionsPerPage + 1}-
+              {Math.min(currentPage * actionsPerPage, filteredLogs.length)} of{" "}
+              {filteredLogs.length} actions
+            </span>
 
-              <Pagination
-                pathname="/auditLogs"
-                totalPages={totalPages}
-                currentPage={currentPage}
-                onClickNext={() =>
-                  setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-                }
-                onClickPrevious={() =>
-                  setCurrentPage((prev) => Math.max(prev - 1, 1))
-                }
-                onClickPageNumber={(event, page) => {
-                  event.preventDefault();
-                  setCurrentPage(page);
-                }}
-              />
+            <Pagination
+              pathname="/auditLogs"
+              totalPages={totalPages}
+              currentPage={currentPage}
+              onClickNext={() =>
+                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+              }
+              onClickPrevious={() =>
+                setCurrentPage((prev) => Math.max(prev - 1, 1))
+              }
+              onClickPageNumber={(event, page) => {
+                event.preventDefault();
+                setCurrentPage(page);
+              }}
+            />
 
-              <div className={styles.actionsPerPageContainer}>
-                <label htmlFor="actionsPerPage">Actions per page</label>
-                <Select
-                  name="actionsPerPage"
-                  id="actionsPerPage"
-                  value={actionsPerPage}
-                  className={styles.actionsPerPageDropdown}
-                  onChange={(e) => setActionsPerPage(Number(e.target.value))}
-                >
-                  <option value="10">10</option>
-                  <option value="25">25</option>
-                  <option value="50">50</option>
-                </Select>
-              </div>
+            <div className={styles.actionsPerPageContainer}>
+              <label htmlFor="actionsPerPage">Actions per page</label>
+              <Select
+                name="actionsPerPage"
+                id="actionsPerPage"
+                value={actionsPerPage}
+                className={styles.actionsPerPageDropdown}
+                onChange={(e) => setActionsPerPage(Number(e.target.value))}
+              >
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+              </Select>
             </div>
-          </>
-        )}
+          </div>
+        </>
       </div>
     </WithAuth>
   );
 };
 
 export default AuditLogs;
+
+const LoadingTable = (
+  <tr>
+    <td>
+      <Skeleton />
+    </td>
+    <td>
+      <Skeleton />
+    </td>
+    <td>
+      <Skeleton />
+    </td>
+    <td>
+      <Skeleton />
+    </td>
+    <td>
+      <Skeleton />
+    </td>
+    <td>
+      <Skeleton />
+    </td>
+    <td>
+      <Skeleton />
+    </td>
+    <td>
+      <Skeleton />
+    </td>
+  </tr>
+);
