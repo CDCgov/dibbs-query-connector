@@ -1,3 +1,5 @@
+$tableContainerWidth: 70rem;
+
 .mainContainerWider {
   max-width: 74rem;
   width: 100%;
@@ -15,7 +17,7 @@
   flex-grow: 1;
   justify-content: space-between;
   align-items: center;
-  width: 70rem;
+  width: $tableContainerWidth;
   padding-bottom: 1.5rem;
 }
 
@@ -123,9 +125,15 @@
 }
 
 .noResultsContainer {
+  flex-grow: 1;
+  width: $tableContainerWidth;
+}
+
+.noResultsBackground {
+  background: var(--blue-100, #e8f5ff);
+  width: 100%;
   display: flex;
   justify-content: center;
-  background: var(--blue-100, #e8f5ff);
   padding: 2rem;
   border-radius: 0.5rem;
   text-align: center;

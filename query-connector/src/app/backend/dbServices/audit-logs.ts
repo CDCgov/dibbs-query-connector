@@ -14,6 +14,7 @@ export type LogEntry = {
 class AuditLogService {
   private static dbClient: Pool = getDbClient();
 
+  // @camelCaseDbColumnNames
   static async getAuditLogs() {
     const auditQuery = "SELECT * FROM audit_logs ORDER BY created_at DESC;";
 

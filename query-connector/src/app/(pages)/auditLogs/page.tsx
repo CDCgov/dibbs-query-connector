@@ -172,21 +172,23 @@ const AuditLogs: React.FC = () => {
         <>
           {!loading && filteredLogs.length === 0 ? (
             <div className={styles.noResultsContainer}>
-              <h3>No results found.</h3>
-              <Button
-                type="reset"
-                outline
-                className={styles.clearFiltersButton}
-                onClick={() => {
-                  setSearch("");
-                  setSelectedName("");
-                  setSelectedAction("");
-                  setDateErrors({});
-                  setDateRange({});
-                }}
-              >
-                Clear filters
-              </Button>
+              <div className={styles.noResultsBackground}>
+                <h3>No results found.</h3>
+                <Button
+                  type="reset"
+                  outline
+                  className={styles.clearFiltersButton}
+                  onClick={() => {
+                    setSearch("");
+                    setSelectedName("");
+                    setSelectedAction("");
+                    setDateErrors({});
+                    setDateRange({});
+                  }}
+                >
+                  Clear filters
+                </Button>
+              </div>
             </div>
           ) : (
             <div className={styles.auditTableContainer}>
@@ -232,36 +234,44 @@ const AuditLogs: React.FC = () => {
               )}
             </span>
 
-            <Pagination
-              pathname="/auditLogs"
-              totalPages={totalPages}
-              currentPage={currentPage}
-              onClickNext={() =>
-                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-              }
-              onClickPrevious={() =>
-                setCurrentPage((prev) => Math.max(prev - 1, 1))
-              }
-              onClickPageNumber={(event, page) => {
-                event.preventDefault();
-                setCurrentPage(page);
-              }}
-            />
+            {loading ? (
+              <Skeleton width={40} height={40} />
+            ) : (
+              <Pagination
+                pathname="/auditLogs"
+                totalPages={totalPages}
+                currentPage={currentPage}
+                onClickNext={() =>
+                  setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                }
+                onClickPrevious={() =>
+                  setCurrentPage((prev) => Math.max(prev - 1, 1))
+                }
+                onClickPageNumber={(event, page) => {
+                  event.preventDefault();
+                  setCurrentPage(page);
+                }}
+              />
+            )}
 
-            <div className={styles.actionsPerPageContainer}>
-              <label htmlFor="actionsPerPage">Actions per page</label>
-              <Select
-                name="actionsPerPage"
-                id="actionsPerPage"
-                value={actionsPerPage}
-                className={styles.actionsPerPageDropdown}
-                onChange={(e) => setActionsPerPage(Number(e.target.value))}
-              >
-                <option value="10">10</option>
-                <option value="25">25</option>
-                <option value="50">50</option>
-              </Select>
-            </div>
+            {loading ? (
+              <Skeleton width={150} height={40} />
+            ) : (
+              <div className={styles.actionsPerPageContainer}>
+                <label htmlFor="actionsPerPage">Actions per page</label>
+                <Select
+                  name="actionsPerPage"
+                  id="actionsPerPage"
+                  value={actionsPerPage}
+                  className={styles.actionsPerPageDropdown}
+                  onChange={(e) => setActionsPerPage(Number(e.target.value))}
+                >
+                  <option value="10">10</option>
+                  <option value="25">25</option>
+                  <option value="50">50</option>
+                </Select>
+              </div>
+            )}
           </div>
         </>
       </div>
