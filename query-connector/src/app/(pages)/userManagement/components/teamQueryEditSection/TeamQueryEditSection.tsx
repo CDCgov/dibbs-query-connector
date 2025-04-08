@@ -12,7 +12,13 @@ import Drawer from "@/app/ui/designSystem/drawer/Drawer";
 import { UserManagementContext } from "../UserManagementProvider";
 import style from "./TeamQueryEditSection.module.scss";
 import { User, UserGroup, UserRole } from "@/app/models/entities/users";
-import { FilterableUser, filterUsers, getRole } from "../../utils";
+import {
+  FilterableCustomUserQuery,
+  FilterableUser,
+  filterQueries,
+  filterUsers,
+  getRole,
+} from "../../utils";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import {
   getAllUserGroups,
@@ -63,18 +69,27 @@ const UserManagementDrawer: React.FC<UserManagementDrawerProps> = ({
   const [usersToRender, setUsersToRender] = useState<FilterableUser[]>(
     users.map((user) => ({ ...user, render: true })), // render all by default
   );
-  // const [queriesToRender, setQueriesToRender] = useState<
-  //   FilterableCustomUserQuery[]
-  // >(allQueries.map((query) => ({ ...query, render: true })));
+  const [queriesToRender, setQueriesToRender] = useState<
+    FilterableCustomUserQuery[]
+  >(allQueries.map((query) => ({ ...query, render: true })));
 
   useEffect(() => {
-    const updatedUsersToRender = filterUsers(
-      searchTerm,
-      users,
-    ) as FilterableUser[];
+    if (teamQueryEditSection.subjectType == "Members") {
+      const updatedUsersToRender = filterUsers(
+        searchTerm,
+        users,
+      ) as FilterableUser[];
 
-    setUsersToRender(updatedUsersToRender.filter((u) => !!u.render));
-  }, [searchTerm, users]);
+      setUsersToRender(updatedUsersToRender.filter((u) => !!u.render));
+    } else {
+      const updatedQueriesToRender = filterQueries(
+        searchTerm,
+        allQueries,
+      ) as FilterableCustomUserQuery[];
+
+      setQueriesToRender(updatedQueriesToRender.filter((q) => !!q.render));
+    }
+  }, [searchTerm, users, allQueries]);
 
   const role = getRole();
 
@@ -165,7 +180,7 @@ const UserManagementDrawer: React.FC<UserManagementDrawerProps> = ({
     const isMemberView = teamQueryEditSection.subjectType == "Members";
     return isMemberView
       ? renderUsers(usersToRender)
-      : renderQueries(allQueries);
+      : renderQueries(queriesToRender);
   }
 
   async function handleToggleMembership(

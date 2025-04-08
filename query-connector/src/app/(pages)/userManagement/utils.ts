@@ -3,6 +3,7 @@ import { useContext } from "react";
 import { DataContext } from "@/app/shared/DataProvider";
 import { isAuthDisabledClientCheck } from "@/app/utils/auth";
 import { User, UserRole } from "@/app/models/entities/users";
+import { CustomUserQuery } from "@/app/models/entities/query";
 
 /**
  * Function that retrieves the role value from the current session object
@@ -97,6 +98,10 @@ export type FilterableUser = User & {
   render: boolean;
 };
 
+export type FilterableCustomUserQuery = CustomUserQuery & {
+  render: boolean;
+};
+
 /**
  * A helper function to filter a list of users
  * @param searchFilter - the search string to filter against
@@ -108,9 +113,6 @@ export function filterUsers(searchFilter: string, users: User[]) {
   const newUsers = structuredClone(users);
 
   return newUsers.map((user) => {
-    // if render has been set to false by a previous filter action (ie at the
-    // valueset level, skip this concept)
-
     let fNameMatch = user.first_name
       .toLocaleLowerCase()
       .includes(casedSearchFilter);
@@ -126,6 +128,33 @@ export function filterUsers(searchFilter: string, users: User[]) {
     } else {
       let render = fNameMatch || lNameMatch || uNameMatch;
       return { ...user, render } as FilterableUser;
+    }
+  });
+}
+
+/**
+ * A helper function to filter a list of queries
+ * @param searchFilter - the search string to filter against
+ * @param queries - the query list to filter
+ * @returns a CustomUserQuery with the appropriate render flag set for itself
+ */
+export function filterQueries(
+  searchFilter: string,
+  queries: CustomUserQuery[],
+) {
+  const casedSearchFilter = searchFilter.toLocaleLowerCase();
+  const newQueries = structuredClone(queries);
+
+  return newQueries.map((query) => {
+    let nameMatch = query.query_name
+      .toLocaleLowerCase()
+      .includes(casedSearchFilter);
+
+    if (!nameMatch) {
+      return query;
+    } else {
+      let render = !!nameMatch;
+      return { ...query, render } as FilterableCustomUserQuery;
     }
   });
 }
