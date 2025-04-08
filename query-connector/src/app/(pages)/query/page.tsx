@@ -72,6 +72,8 @@ const Query: React.FC = () => {
       : "main-container",
     results: "main-container__wide",
   };
+
+  console.log(mode);
   return (
     <WithAuth>
       {Object.keys(CUSTOMIZE_QUERY_STEPS).includes(mode) &&
@@ -129,7 +131,7 @@ const Query: React.FC = () => {
         )}
 
         {/* Step 4 */}
-        {mode === "results" && resultsQueryResponse && (
+        {mode === "results" && (
           <ResultsView
             selectedQuery={selectedQuery}
             patientRecordsResponse={resultsQueryResponse}

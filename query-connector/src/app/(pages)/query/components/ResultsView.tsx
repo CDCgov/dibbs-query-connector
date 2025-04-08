@@ -19,7 +19,7 @@ import { CustomUserQuery } from "@/app/models/entities/query";
 import Skeleton from "react-loading-skeleton";
 
 type ResultsViewProps = {
-  patientRecordsResponse: PatientRecordsResponse;
+  patientRecordsResponse: PatientRecordsResponse | undefined;
   selectedQuery: CustomUserQuery;
   goBack: () => void;
   goToBeginning: () => void;
@@ -57,14 +57,15 @@ const ResultsView: React.FC<ResultsViewProps> = ({
     patientRecordsResponse,
   );
 
-  const sideNavContent = accordionItems
-    .map((item) => {
-      if (item.content) {
-        return { title: item.title, subtitle: item?.subtitle };
-      }
-    })
-    .filter((i) => Boolean(i)) as NavSection[];
-
+  const sideNavContent =
+    accordionItems &&
+    (accordionItems
+      .map((item) => {
+        if (item.content) {
+          return { title: item.title, subtitle: item?.subtitle };
+        }
+      })
+      .filter((i) => Boolean(i)) as NavSection[]);
   return (
     <>
       <div className={`${styles.resultsBannerContent}`}>
@@ -110,8 +111,9 @@ const ResultsView: React.FC<ResultsViewProps> = ({
 export default ResultsView;
 
 function mapQueryResponseToAccordionDataStructure(
-  resultsQueryResponse: PatientRecordsResponse,
+  resultsQueryResponse: PatientRecordsResponse | undefined,
 ) {
+  if (resultsQueryResponse === undefined) return [];
   const patient =
     resultsQueryResponse.Patient && resultsQueryResponse.Patient.length === 1
       ? resultsQueryResponse.Patient[0]
