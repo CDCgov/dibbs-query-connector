@@ -31,10 +31,10 @@ type QuerySelectionProps = {
   setSelectedQuery: Dispatch<SetStateAction<SelectedQueryDetails>>;
 };
 
-let getUserId = async (sesh: any) => {
-  const user = await checkUserQuery(sesh);
-  return user;
-};
+// let getUserId = async (sesh: any) => {
+//   const user = await checkUserQuery(sesh);
+//   return user;
+// };
 
 /**
  * Component for Query Building Flow
@@ -90,6 +90,7 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({
           return groupQueries.items;
         }),
       );
+      console.log("WHOA THERE"); //was trying to figure out if we were even hitting this when we should be, and it appears not
       console.log(assignedQueries);
       return assignedQueries[0];
     }
