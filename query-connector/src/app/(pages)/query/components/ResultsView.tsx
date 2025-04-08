@@ -70,10 +70,10 @@ const ResultsView: React.FC<ResultsViewProps> = ({
     <>
       <div className={`${styles.resultsBannerContent}`}>
         {loading ? (
-          <>
+          <div data-testid={"banner-loading-skeleton"}>
             <Skeleton width={150} />
             <Skeleton width={200} height={50} />
-          </>
+          </div>
         ) : (
           <>
             <Backlink

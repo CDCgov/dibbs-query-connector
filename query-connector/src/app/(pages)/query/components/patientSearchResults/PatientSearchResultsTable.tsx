@@ -88,7 +88,7 @@ export default PatientSearchResultsTable;
 
 const LoadingTableHeader: React.FC = () => {
   return (
-    <tr>
+    <tr data-testid={"loading-table-header"}>
       {Array.from(Array(7).keys()).map((_, i) => {
         return (
           <th key={`header-${i}`}>
@@ -102,7 +102,10 @@ const LoadingTableHeader: React.FC = () => {
 
 const LoadingTableBody: React.FC = () => {
   return (
-    <tr className={classNames("tableRowWithHover_clickable")}>
+    <tr
+      data-testid={"loading-table-row"}
+      className={classNames("tableRowWithHover_clickable")}
+    >
       {Array.from(Array(7).keys()).map((_, i) => {
         return (
           <td key={`cell-${i}`}>
