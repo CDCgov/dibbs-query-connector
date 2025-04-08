@@ -33,7 +33,6 @@ const AuditLogs: React.FC = () => {
   useEffect(() => {
     async function fetchAuditLogs() {
       const logs = await getAuditLogs();
-
       return logs;
     }
 
@@ -221,9 +220,16 @@ const AuditLogs: React.FC = () => {
 
           <div className={classNames(styles.paginationContainer)}>
             <span>
-              Showing {(currentPage - 1) * actionsPerPage + 1}-
-              {Math.min(currentPage * actionsPerPage, filteredLogs.length)} of{" "}
-              {filteredLogs.length} actions
+              {loading ? (
+                <Skeleton width={150} />
+              ) : (
+                `Showing ${(currentPage - 1) * actionsPerPage + 1} -
+                  ${Math.min(
+                    currentPage * actionsPerPage,
+                    filteredLogs.length,
+                  )}  of 
+                ${filteredLogs.length} actions`
+              )}
             </span>
 
             <Pagination

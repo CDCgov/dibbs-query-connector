@@ -32,7 +32,7 @@ class AuditLogService {
 export const getAuditLogs = AuditLogService.getAuditLogs;
 
 function underscoreToCamelCase(str: string) {
-  return str.replace(/_+([a-z])/g, function (match, letter) {
+  return str.replace(/_+([a-z])/g, function (_, letter) {
     return letter.toUpperCase();
   });
 }

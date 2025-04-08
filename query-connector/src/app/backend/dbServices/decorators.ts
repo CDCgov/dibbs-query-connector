@@ -1,5 +1,6 @@
 import { adminAccessCheck, superAdminAccessCheck } from "@/app/utils/auth";
 import { getDbClient } from "../dbClient";
+import { QueryResult } from "pg";
 
 /**
  * Annotation to make a db query into a transaction. Requires all return branches
@@ -114,4 +115,55 @@ export function adminRequired(
   };
 
   return descriptor;
+}
+
+/**
+ * Annotation that camelCases any column_names coming back from DB reads
+ * @param _ - class prototype the annotation is hoisted into
+ * @param key - the name of the method
+ * @param descriptor - metadata for the method, which has restrictions on the
+ * return type
+ * @returns - objects from the database with the column names camel cased
+ */
+export function camelCaseDbColumnNames<
+  T extends QueryResult<Record<string, unknown>>,
+>(
+  _: Object,
+  key: string,
+  descriptor: TypedPropertyDescriptor<(...args: unknown[]) => Promise<T>>,
+) {
+  const method = descriptor.value;
+
+  descriptor.value = async function (...args: unknown[]) {
+    try {
+      const result = method && (await method.apply(this, args));
+
+      if (result === undefined) {
+        throw Error(
+          "Database read in camel casing formatting function returned undefined",
+        );
+      }
+
+      const vals = result?.rows.map((v) => {
+        const val: Record<string, unknown> = {};
+        Object.entries(v).forEach(([k, v]) => {
+          val[underscoreToCamelCase(k)] = v;
+        });
+
+        return val as T;
+      });
+
+      return;
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  return descriptor;
+}
+
+function underscoreToCamelCase(str: string) {
+  return str.replace(/_+([a-z])/g, function (_, letter) {
+    return letter.toUpperCase();
+  });
 }
