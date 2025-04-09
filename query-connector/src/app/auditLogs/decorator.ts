@@ -25,28 +25,36 @@ export function auditable(
     .split(", ");
 
   const writeToAuditTable = async (args: any[]) => {
-    const query = `INSERT INTO 
-        audit_logs (author, action_type, audit_checksum, audit_message) 
-        VALUES ($1, $2, $3, $4)
-        RETURNING id, action_type, audit_checksum`;
+    const insertQuery = `INSERT INTO 
+          audit_logs (author, action_type, audit_message, created_at, audit_checksum) 
+          VALUES ($1, $2, $3, $4, $5)
+          RETURNING id, author, action_type, audit_checksum`;
 
     // using this recursive pattern with .then's rather than async / await to
     // allow for the decorator to work on synchronous functions
     const attemptWrite = (retryCounter: number): Promise<void> => {
       return generateAuditValues(key, argLabels, args)
-        .then((auditValues) => dbConnection.query(query, auditValues))
-        .then((result) => {
-          const auditMetadata = result.rows[0];
-          console.info(
-            `${auditMetadata.action_type} audit action with id ${auditMetadata?.id} and checksum ${auditMetadata?.audit_checksum} added to audit table`,
-          );
-          return;
-        })
+        .then(
+          async ([author, methodName, auditMessage, timestamp, checksum]) => {
+            const result = await dbConnection.query(insertQuery, [
+              author,
+              methodName,
+              auditMessage,
+              timestamp,
+              checksum,
+            ]);
+
+            const insertedRow = result.rows[0];
+
+            console.info(
+              `${insertedRow.action_type} audit action with id ${insertedRow.id} and checksum ${insertedRow.audit_checksum} added to audit table`,
+            );
+            return;
+          },
+        )
         .catch((e) => {
           console.error(
-            `Audit log write attempt ${
-              retryCounter + 1
-            } failed with error: ${e}. ${
+            `Audit log write attempt ${retryCounter + 1} failed with error: ${e}. ${
               retryCounter + 1 < AUDIT_LOG_MAX_RETRIES ? "Retrying..." : ""
             }`,
           );
