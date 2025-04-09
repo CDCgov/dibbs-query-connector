@@ -83,6 +83,7 @@ describe("audit log", () => {
       request: JSON.stringify(request),
     });
   });
+
   it("patient records query should generate an audit entry", async () => {
     const auditQuery = "SELECT * FROM audit_logs;";
     const auditRows = await dbClient.query(auditQuery);
@@ -110,7 +111,7 @@ describe("audit log", () => {
     expect(addedVal[0]?.audit_checksum).toMatch(/^[a-f0-9]{64}$/);
   });
 
-  it("an audited function should  retries successfully", async () => {
+  it("an audited function should retries successfully", async () => {
     const auditGenerationSpy = jest.spyOn(
       DecoratorUtils,
       "generateAuditValues",
@@ -165,5 +166,33 @@ describe("audit log", () => {
       new Date(latestAudit.created_at).toISOString(),
     );
     expect(latestAudit.audit_checksum).toBe(recomputedChecksum);
+  });
+
+  it("should block UPDATEs and DELETE for audit_logs", async () => {
+    const request: PatientDiscoveryRequest = {
+      fhir_server: "Aidbox",
+      first_name: hyperUnluckyPatient.FirstName,
+      last_name: hyperUnluckyPatient.LastName,
+      dob: hyperUnluckyPatient.DOB,
+      mrn: hyperUnluckyPatient.MRN,
+      phone: hyperUnluckyPatient.Phone,
+    };
+
+    await patientDiscoveryQuery(request);
+
+    const result = await dbClient.query(
+      "SELECT * FROM audit_logs ORDER BY created_at DESC LIMIT 1",
+    );
+    const insertedId = result.rows[0].id;
+
+    await expect(
+      dbClient.query(`UPDATE audit_logs SET author = 'hacker' WHERE id = $1`, [
+        insertedId,
+      ]),
+    ).rejects.toThrow(/UPDATEs to audit_logs are not permitted/i);
+
+    await expect(
+      dbClient.query(`DELETE FROM audit_logs WHERE id = $1`, [insertedId]),
+    ).rejects.toThrow(/DELETEs from audit_logs are not permitted/i);
   });
 });
