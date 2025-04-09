@@ -24,7 +24,7 @@ interface UserManagementContext extends UserManagementData {
     subtitle: string,
     subjectType: SubjectType,
     groupId: string,
-    subjectData?: User[] | CustomUserQuery[],
+    subjectData: User[] | CustomUserQuery[],
   ) => void;
   closeEditSection: () => void;
 }
@@ -68,7 +68,7 @@ const DataProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     subtitle: string,
     subjectType: SubjectType,
     id: string,
-    subjectData?: User[] | CustomUserQuery[],
+    subjectData: User[] | CustomUserQuery[],
   ) {
     let placeholder = "";
 
@@ -77,7 +77,7 @@ const DataProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     } else {
       placeholder = "Search queries";
     }
-    const newData = subjectData ?? [];
+
     const newState: UserManagementData = {
       ...innerState,
       teamQueryEditSection: {
@@ -87,7 +87,7 @@ const DataProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
         placeholder,
         subjectType,
         groupId: id,
-        subjectData: newData,
+        subjectData,
         isOpen: true,
       },
     };

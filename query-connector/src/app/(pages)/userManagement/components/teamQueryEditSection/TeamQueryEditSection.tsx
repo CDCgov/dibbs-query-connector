@@ -33,11 +33,11 @@ import { viewMode } from "../userManagementContainer/userManagementContainer";
 export type UserManagementDrawerProps = {
   userGroups: UserGroup[];
   setUserGroups: Dispatch<SetStateAction<UserGroup[]>>;
-  users: User[];
+  users: User[] | FilterableUser[];
   setUsers: Dispatch<SetStateAction<User[]>>;
   refreshView: Dispatch<SetStateAction<boolean | viewMode>>;
   activeTabLabel: string;
-  allQueries: CustomUserQuery[];
+  allQueries: CustomUserQuery[] | FilterableCustomUserQuery[];
   setAllQueries: Dispatch<SetStateAction<CustomUserQuery[]>>;
 };
 
@@ -66,22 +66,20 @@ const UserManagementDrawer: React.FC<UserManagementDrawerProps> = ({
   );
 
   const [searchTerm, setSearchTerm] = useState<string>("");
-  const [usersToRender, setUsersToRender] = useState<FilterableUser[]>(
-    users.map((user) => ({ ...user, render: true })), // render all by default
+  const [usersToRender, setUsersToRender] = useState<FilterableUser[] | User[]>(
+    users,
   );
   const [queriesToRender, setQueriesToRender] = useState<
-    FilterableCustomUserQuery[]
-  >(allQueries.map((query) => ({ ...query, render: true })));
+    FilterableCustomUserQuery[] | CustomUserQuery[]
+  >(allQueries);
 
   useEffect(() => {
-    if (teamQueryEditSection.subjectType == "Members") {
-      const updatedUsersToRender = filterUsers(
-        searchTerm,
-        users,
-      ) as FilterableUser[];
+    setUsersToRender(users.map((user) => ({ ...user, render: true })));
+    setQueriesToRender(allQueries.map((query) => ({ ...query, render: true })));
+  }, [users, allQueries]);
 
-      setUsersToRender(updatedUsersToRender.filter((u) => !!u.render));
-    } else {
+  useEffect(() => {
+    if (teamQueryEditSection.subjectType == "Queries") {
       const updatedQueriesToRender = filterQueries(
         searchTerm,
         allQueries,
@@ -89,20 +87,28 @@ const UserManagementDrawer: React.FC<UserManagementDrawerProps> = ({
 
       setQueriesToRender(updatedQueriesToRender.filter((q) => !!q.render));
     }
+    if (teamQueryEditSection.subjectType == "Members") {
+      const updatedUsersToRender = filterUsers(
+        searchTerm,
+        users,
+      ) as FilterableUser[];
+
+      setUsersToRender(updatedUsersToRender.filter((u) => !!u.render));
+    }
   }, [searchTerm, users, allQueries]);
 
   const role = getRole();
 
-  const renderQueries = (queries: CustomUserQuery[]) => {
+  const renderQueries = (allQueries: CustomUserQuery[]) => {
     const groupQueries = teamQueryEditSection.subjectData as CustomUserQuery[];
 
-    if (queries.length > 0 && teamQueryEditSection.groupId) {
+    if (allQueries.length > 0 && teamQueryEditSection.groupId) {
       return (
         <ul
           aria-description={`queries for ${teamQueryEditSection.title}`}
           className={classNames("usa-list--unstyled", "margin-top-2")}
         >
-          {queries.map((query) => {
+          {allQueries.map((query) => {
             const isAssignedToGroup = groupQueries.some(
               (gq) => gq.query_id == query.query_id,
             );
@@ -128,7 +134,7 @@ const UserManagementDrawer: React.FC<UserManagementDrawerProps> = ({
   };
 
   const renderUsers = (users: User[]) => {
-    if (users.length > 0) {
+    if (usersToRender.length > 0) {
       return (
         <ul
           aria-description={`members of ${teamQueryEditSection.title}`}
@@ -168,18 +174,18 @@ const UserManagementDrawer: React.FC<UserManagementDrawerProps> = ({
         </ul>
       );
     } else {
-      return renderError("members");
+      return renderError("users");
     }
   };
 
   const renderError = (content: string) => {
-    return <div>{`No ${content} assigned to this group.`}</div>;
+    return <div>{`No ${content} found.`}</div>;
   };
 
   function generateContent(): JSX.Element {
     const isMemberView = teamQueryEditSection.subjectType == "Members";
     return isMemberView
-      ? renderUsers(usersToRender)
+      ? renderUsers(usersToRender.length > 0 ? usersToRender : users)
       : renderQueries(queriesToRender);
   }
 
@@ -253,24 +259,24 @@ const UserManagementDrawer: React.FC<UserManagementDrawerProps> = ({
       if (updatedQueryResponse.totalItems === 0) {
         throw "Unable to update query assignment";
       }
-
+      const updatedUserGroups = await getAllUserGroups();
+      const updatedQuery = updatedQueryResponse.items[0];
       const newQueriesList = allQueries.map((q) => {
         if (q.query_id == queryId) {
-          const groupAssignments = q.groupAssignments || [];
+          q = updatedQuery;
           return {
             ...q,
-            ...{ userGroupMemberships: groupAssignments },
+            ...{ groupAssignments: q?.groupAssignments },
           };
         } else {
           return q;
         }
       });
 
-      const updatedUserGroups = await getAllUserGroups();
-
       setAllQueries(newQueriesList);
       setUserGroups(updatedUserGroups.items); // for refreshing query count in table view
       refreshView(`Update ${activeTabLabel}` as viewMode);
+
       showToastConfirmation({
         body: alertText,
       });
@@ -282,6 +288,9 @@ const UserManagementDrawer: React.FC<UserManagementDrawerProps> = ({
       });
     }
   }
+  const handleClose = () => {
+    closeEditSection();
+  };
 
   return (
     <Drawer
@@ -292,7 +301,7 @@ const UserManagementDrawer: React.FC<UserManagementDrawerProps> = ({
       isOpen={teamQueryEditSection.isOpen}
       onSave={() => {}}
       onSearch={(searchTerm) => setSearchTerm(searchTerm)}
-      onClose={closeEditSection}
+      onClose={handleClose}
     />
   );
 };
