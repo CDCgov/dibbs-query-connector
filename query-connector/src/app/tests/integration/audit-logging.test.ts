@@ -106,6 +106,8 @@ describe("audit log", () => {
     expect(addedVal[0]?.audit_message).toStrictEqual({
       request: JSON.stringify(request),
     });
+
+    expect(addedVal[0]?.audit_checksum).toMatch(/^[a-f0-9]{64}$/);
   });
 
   it("an audited function should  retries successfully", async () => {
@@ -136,4 +138,32 @@ describe("audit log", () => {
     await new Promise((r) => setTimeout(r, 6000));
     expect(auditGenerationSpy).toHaveBeenCalledTimes(AUDIT_LOG_MAX_RETRIES);
   }, 10000);
+
+  it("should generate the correct checksum based on stored message and timestamp", async () => {
+    const auditQuery =
+      "SELECT * FROM audit_logs ORDER BY created_at DESC LIMIT 1;";
+    const result = await dbClient.query(auditQuery);
+
+    if (!result || !result.rows || result.rows.length === 0) {
+      throw new Error(
+        "No audit logs found. Ensure an audited action ran before this test.",
+      );
+    }
+
+    const latestAudit = result.rows[0];
+
+    expect(latestAudit.audit_checksum).toMatch(/^[a-f0-9]{64}$/);
+
+    const parsedMessage =
+      typeof latestAudit.audit_message === "string"
+        ? JSON.parse(latestAudit.audit_message)
+        : latestAudit.audit_message;
+
+    const recomputedChecksum = DecoratorUtils.generateAuditChecksum(
+      latestAudit.author,
+      parsedMessage,
+      new Date(latestAudit.created_at).toISOString(),
+    );
+    expect(latestAudit.audit_checksum).toBe(recomputedChecksum);
+  });
 });
