@@ -364,9 +364,7 @@ class QueryService {
     // Check for errors
     if (fhirResponse.status !== 200) {
       console.error(
-        `Patient search failed. Status: ${fhirResponse.status} \n Body: ${
-          fhirResponse.text
-        } \n Headers: ${JSON.stringify(
+        `Patient search failed. Status: ${fhirResponse.status} \n Body: ${await fhirResponse.text()} \n Headers: ${JSON.stringify(
           Object.fromEntries(fhirResponse.headers.entries()),
         )}`,
       );

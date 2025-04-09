@@ -3,6 +3,7 @@ import { FhirServerConfig } from "../models/entities/fhir-servers";
 import { AuthData } from "../backend/dbServices/fhir-servers";
 import { createSmartJwt } from "../backend/dbServices/smartOnFhir/lib";
 import { updateFhirServer } from "../backend/dbServices/fhir-servers";
+import { fetchWithoutSSL } from "./utils";
 /**
  * A client for querying a FHIR server.
  * @param server The FHIR server to query.
@@ -12,6 +13,7 @@ class FHIRClient {
   private hostname: string;
   private init: RequestInit;
   private serverConfig: FhirServerConfig;
+  private fetch: (url: string, options?: RequestInit) => Promise<Response>;
 
   constructor(server: string, configurations: FhirServerConfig[]) {
     // Find the configuration for the given server
@@ -24,19 +26,14 @@ class FHIRClient {
     this.serverConfig = config;
     this.hostname = config.hostname;
 
+    // Set up the appropriate fetch function
+    this.fetch = config.disable_cert_validation ? fetchWithoutSSL : fetch;
+
     // Set request initialization parameters
     this.init = {
       method: "GET",
       headers: config.headers ?? {},
     };
-
-    // Trust any configured server that has disabled SSL validation
-    if (config.disable_cert_validation) {
-      (this.init as RequestInit & { agent?: https.Agent }).agent =
-        new https.Agent({
-          rejectUnauthorized: false,
-        });
-    }
   }
 
   /**
@@ -244,7 +241,7 @@ class FHIRClient {
       }
 
       // IMPORTANT: Use the formData object for the actual request
-      const response = await fetch(tokenEndpoint, requestInit);
+      const response = await this.fetch(tokenEndpoint, requestInit);
       // Get response as text first for debugging
       const responseText = await response.text();
 
@@ -337,7 +334,7 @@ class FHIRClient {
           });
       }
 
-      const response = await fetch(wellKnownUrl, requestInit);
+      const response = await this.fetch(wellKnownUrl, requestInit);
 
       if (!response.ok) {
         throw new Error(
@@ -367,7 +364,7 @@ class FHIRClient {
    */
   async get(path: string): Promise<Response> {
     await this.ensureValidToken();
-    const response = await fetch(this.hostname + path, this.init);
+    const response = await this.fetch(this.hostname + path, this.init);
     return response;
   }
 
@@ -379,7 +376,7 @@ class FHIRClient {
   async getBatch(paths: string[]): Promise<Response[]> {
     await this.ensureValidToken();
     return Promise.all(
-      paths.map((path) => fetch(this.hostname + path, this.init)),
+      paths.map((path) => this.fetch(this.hostname + path, this.init)),
     );
   }
 
@@ -402,7 +399,7 @@ class FHIRClient {
       body: searchParams.toString(),
     };
 
-    return fetch(this.hostname + path, requestOptions);
+    return this.fetch(this.hostname + path, requestOptions);
   }
 }
 
