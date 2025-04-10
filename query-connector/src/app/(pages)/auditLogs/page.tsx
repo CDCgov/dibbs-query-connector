@@ -15,6 +15,10 @@ import WithAuth from "@/app/ui/components/withAuth/WithAuth";
 import { getAuditLogs, LogEntry } from "@/app/backend/dbServices/audit-logs";
 import Skeleton from "react-loading-skeleton";
 import AuditLogDrawer from "./components/auditLogDrawer";
+import {
+  actionTypeMap,
+  labelToActionType,
+} from "./components/auditLogActionType";
 
 /**
  * Client component for the Audit Logs page.
@@ -31,9 +35,7 @@ const AuditLogs: React.FC = () => {
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [selectedLogEntry, setSelectedLogEntry] = useState<LogEntry | null>(
-    null,
-  );
+  const [selectedLog, setSelectedLog] = useState<LogEntry | null>(null);
 
   useEffect(() => {
     async function fetchAuditLogs() {
@@ -52,11 +54,22 @@ const AuditLogs: React.FC = () => {
   const [filteredLogs, setFilteredLogs] = useState(logs);
 
   const uniqueNames = useMemo(
-    () => Array.from(new Set(logs.map((log) => log.author))).sort(),
+    () =>
+      Array.from(
+        new Set(logs.map((log) => `${log.firstName} ${log.lastName}`)),
+      ).sort(),
     [logs],
   );
+
   const uniqueActions = useMemo(
-    () => Array.from(new Set(logs.map((log) => log.actionType))).sort(),
+    () =>
+      Array.from(
+        new Set(
+          logs.map(
+            (log) => actionTypeMap[log.actionType]?.label || log.actionType,
+          ),
+        ),
+      ).sort(),
     [logs],
   );
 
@@ -78,14 +91,19 @@ const AuditLogs: React.FC = () => {
   useEffect(() => {
     setFilteredLogs(
       logs.filter((log) => {
-        const matchesName = selectedName ? log.author === selectedName : true;
-        const matchesAction = selectedAction
-          ? log.actionType === selectedAction
+        const matchesName = selectedName
+          ? `${log.firstName} ${log.lastName}` === selectedName
           : true;
+        const matchesAction = selectedAction
+          ? log.actionType === labelToActionType[selectedAction]
+          : true;
+        const actionLabel =
+          actionTypeMap[log.actionType]?.label?.toLowerCase() || "";
         const matchesSearch =
           search.length === 0 ||
           log.author.toLowerCase().includes(search.toLowerCase()) ||
-          log.actionType.toLowerCase().includes(search.toLowerCase());
+          log.actionType.toLowerCase().includes(search.toLowerCase()) ||
+          actionLabel.includes(search.toLowerCase());
         const matchesDate =
           (!dateRange.startDate || log.createdAt >= dateRange.startDate) &&
           (!dateRange.endDate || log.createdAt <= dateRange.endDate);
@@ -202,7 +220,6 @@ const AuditLogs: React.FC = () => {
                   <tr>
                     <th className={styles.tableHeader}>Name</th>
                     <th className={styles.tableHeader}>Action</th>
-                    <th className={styles.tableHeader}>Message</th>
                     <th className={styles.tableHeader}>Date</th>
                   </tr>
                 </thead>
@@ -216,13 +233,16 @@ const AuditLogs: React.FC = () => {
                         className={styles.tableRows}
                         key={index}
                         onClick={() => {
-                          setSelectedLogEntry(log);
+                          setSelectedLog(log);
                           setDrawerOpen(true);
                         }}
                       >
-                        <td>{log.author}</td>
-                        <td>{log.actionType}</td>
-                        <td>{JSON.stringify(log.auditMessage)}</td>
+                        <td>{`${log.firstName} ${log.lastName}`}</td>
+                        <td>
+                          {actionTypeMap[log.actionType]?.format(log)
+                            ? actionTypeMap[log.actionType].format(log)
+                            : log.actionType}
+                        </td>
                         <td>{log.createdAt.toLocaleString()}</td>
                       </tr>
                     ))}
@@ -287,7 +307,7 @@ const AuditLogs: React.FC = () => {
             <AuditLogDrawer
               isOpen={drawerOpen}
               onClose={() => setDrawerOpen(false)}
-              logEntry={selectedLogEntry}
+              log={selectedLog}
             />
           </div>
         </>

@@ -4,11 +4,12 @@ import React from "react";
 import Drawer from "@/app/ui/designSystem/drawer/Drawer";
 import { LogEntry } from "@/app/backend/dbServices/audit-logs";
 import styles from "../auditLogs.module.scss";
+import { actionTypeMap } from "./auditLogActionType";
 
 type AuditLogDrawerProps = {
   isOpen: boolean;
   onClose: () => void;
-  logEntry: LogEntry | null;
+  log: LogEntry | null;
 };
 
 type JSONPrimitive = string | number | boolean | null;
@@ -43,13 +44,13 @@ function parseNestedJSON(value: JSONValue): JSONValue {
  * @param root0 - props
  * @param root0.isOpen - Boolean to control the visibility of the drawer.
  * @param root0.onClose - Function to handle closing the drawer.
- * @param root0.logEntry - The log entry object containing name, action, and date.
+ * @param root0.log - The log entry object containing name, action, and date.
  * @returns The AuditLogDrawer component.
  */
 const AuditLogDrawer: React.FC<AuditLogDrawerProps> = ({
   isOpen,
   onClose,
-  logEntry,
+  log,
 }) => {
   return (
     <Drawer
@@ -58,21 +59,20 @@ const AuditLogDrawer: React.FC<AuditLogDrawerProps> = ({
       title="Full JSON request"
       placeholder="Search audit log entry"
       toRender={
-        logEntry ? (
+        log ? (
           <div>
             <div className={styles.auditLogDrawerTitle}>
               <div>
-                {logEntry.author} · {logEntry.actionType}
+                {log.firstName} {log.lastName} ·{" "}
+                {actionTypeMap[log.actionType]?.format(log)
+                  ? actionTypeMap[log.actionType].format(log)
+                  : log.actionType}
               </div>
-              <div>{logEntry.createdAt.toLocaleString()}</div>
+              <div>{log.createdAt.toLocaleString()}</div>
             </div>
             <div className={styles.auditLogDrawerContainer}>
               <pre className={styles.auditLogDrawerBody}>
-                {JSON.stringify(
-                  parseNestedJSON(logEntry.auditMessage),
-                  null,
-                  2,
-                )}
+                {JSON.stringify(parseNestedJSON(log.auditMessage), null, 2)}
               </pre>
             </div>
           </div>
