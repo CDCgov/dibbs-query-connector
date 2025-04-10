@@ -9,16 +9,19 @@ import {
   PatientRecordsRequest,
 } from "@/app/shared/query-service";
 import { getDbClient } from "@/app/backend/dbClient";
-import { AUDIT_LOG_MAX_RETRIES, auditable } from "@/app/auditLogs/decorator";
-import * as DecoratorUtils from "@/app/auditLogs/lib";
+import {
+  AUDIT_LOG_MAX_RETRIES,
+  auditable,
+} from "@/app/backend/auditLogs/decorator";
+import * as DecoratorUtils from "@/app/backend/auditLogs/lib";
 import { suppressConsoleLogs } from "./fixtures";
 
 const dbClient = getDbClient();
 
-jest.mock("@/app/auditLogs/lib", () => {
+jest.mock("@/app/backend/auditLogs/lib", () => {
   return {
     __esModule: true,
-    ...jest.requireActual("@/app/auditLogs/lib"),
+    ...jest.requireActual("@/app/backend/auditLogs/lib"),
   };
 });
 
