@@ -20,7 +20,6 @@ import {
   labelToActionType,
 } from "./components/auditLogActionType";
 
-
 /**
  * Client component for the Audit Logs page.
  * @returns - The AuditLogs component.

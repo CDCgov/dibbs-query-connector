@@ -9,7 +9,6 @@ export type LogEntry = {
   createdAt: Date;
   firstName: string;
   lastName: string;
-
 };
 
 class AuditLogService extends dbService {
