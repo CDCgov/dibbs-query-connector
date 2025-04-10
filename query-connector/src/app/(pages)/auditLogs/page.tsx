@@ -20,6 +20,7 @@ import {
   labelToActionType,
 } from "./components/auditLogActionType";
 
+
 /**
  * Client component for the Audit Logs page.
  * @returns - The AuditLogs component.
@@ -104,6 +105,7 @@ const AuditLogs: React.FC = () => {
           log.author.toLowerCase().includes(search.toLowerCase()) ||
           log.actionType.toLowerCase().includes(search.toLowerCase()) ||
           actionLabel.includes(search.toLowerCase());
+
         const matchesDate =
           (!dateRange.startDate || log.createdAt >= dateRange.startDate) &&
           (!dateRange.endDate || log.createdAt <= dateRange.endDate);
@@ -220,6 +222,7 @@ const AuditLogs: React.FC = () => {
                   <tr>
                     <th className={styles.tableHeader}>Name</th>
                     <th className={styles.tableHeader}>Action</th>
+                    <th className={styles.tableHeader}>Message</th>
                     <th className={styles.tableHeader}>Date</th>
                   </tr>
                 </thead>

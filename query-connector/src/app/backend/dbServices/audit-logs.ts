@@ -9,6 +9,7 @@ export type LogEntry = {
   createdAt: Date;
   firstName: string;
   lastName: string;
+
 };
 
 class AuditLogService extends dbService {
@@ -26,7 +27,6 @@ class AuditLogService extends dbService {
       LEFT JOIN users ON users.username::TEXT = audit_logs.author
       ORDER BY audit_logs.created_at DESC;
     `;
-
     const results = await dbService.query(auditQuery);
     return results.rows;
   }
