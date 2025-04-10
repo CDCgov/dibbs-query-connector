@@ -4,7 +4,7 @@ import React from "react";
 import Drawer from "@/app/ui/designSystem/drawer/Drawer";
 import { LogEntry } from "@/app/backend/dbServices/audit-logs";
 import styles from "../auditLogs.module.scss";
-import { actionTypeMap } from "./auditLogActionType";
+import { actionTypeMap, getFullNameForAuthor } from "./auditLogMaps";
 
 type AuditLogDrawerProps = {
   isOpen: boolean;
@@ -63,7 +63,7 @@ const AuditLogDrawer: React.FC<AuditLogDrawerProps> = ({
           <div>
             <div className={styles.auditLogDrawerTitle}>
               <div>
-                {log.firstName} {log.lastName} ·{" "}
+                {getFullNameForAuthor(log.author)} ·{" "}
                 {actionTypeMap[log.actionType]?.format(log)
                   ? actionTypeMap[log.actionType].format(log)
                   : log.actionType}

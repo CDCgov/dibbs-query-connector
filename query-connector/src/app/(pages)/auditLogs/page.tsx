@@ -18,7 +18,9 @@ import AuditLogDrawer from "./components/auditLogDrawer";
 import {
   actionTypeMap,
   labelToActionType,
-} from "./components/auditLogActionType";
+  getFullNameForAuthor,
+  initializeAuditLogUserMap,
+} from "./components/auditLogMaps";
 
 /**
  * Client component for the Audit Logs page.
@@ -43,6 +45,7 @@ const AuditLogs: React.FC = () => {
       return logs;
     }
 
+    initializeAuditLogUserMap();
     setLoading(true);
 
     fetchAuditLogs().then((v) => {
@@ -56,7 +59,7 @@ const AuditLogs: React.FC = () => {
   const uniqueNames = useMemo(
     () =>
       Array.from(
-        new Set(logs.map((log) => `${log.firstName} ${log.lastName}`)),
+        new Set(logs.map((log) => getFullNameForAuthor(log.author))),
       ).sort(),
     [logs],
   );
@@ -92,19 +95,23 @@ const AuditLogs: React.FC = () => {
     setFilteredLogs(
       logs.filter((log) => {
         const matchesName = selectedName
-          ? `${log.firstName} ${log.lastName}` === selectedName
+          ? getFullNameForAuthor(log.author) === selectedName
           : true;
         const matchesAction = selectedAction
           ? log.actionType === labelToActionType[selectedAction]
           : true;
         const actionLabel =
           actionTypeMap[log.actionType]?.label?.toLowerCase() || "";
+        const formattedAction =
+          actionTypeMap[log.actionType]?.format(log)?.toLowerCase() || "";
+        const fullName = getFullNameForAuthor(log.author).toLowerCase();
         const matchesSearch =
           search.length === 0 ||
           log.author.toLowerCase().includes(search.toLowerCase()) ||
+          fullName.includes(search.toLowerCase()) ||
           log.actionType.toLowerCase().includes(search.toLowerCase()) ||
-          actionLabel.includes(search.toLowerCase());
-
+          actionLabel.includes(search.toLowerCase()) ||
+          formattedAction.includes(search.toLowerCase());
         const matchesDate =
           (!dateRange.startDate || log.createdAt >= dateRange.startDate) &&
           (!dateRange.endDate || log.createdAt <= dateRange.endDate);
@@ -221,7 +228,6 @@ const AuditLogs: React.FC = () => {
                   <tr>
                     <th className={styles.tableHeader}>Name</th>
                     <th className={styles.tableHeader}>Action</th>
-                    <th className={styles.tableHeader}>Message</th>
                     <th className={styles.tableHeader}>Date</th>
                   </tr>
                 </thead>
@@ -239,7 +245,7 @@ const AuditLogs: React.FC = () => {
                           setDrawerOpen(true);
                         }}
                       >
-                        <td>{`${log.firstName} ${log.lastName}`}</td>
+                        <td>{getFullNameForAuthor(log.author)}</td>
                         <td>
                           {actionTypeMap[log.actionType]?.format(log)
                             ? actionTypeMap[log.actionType].format(log)

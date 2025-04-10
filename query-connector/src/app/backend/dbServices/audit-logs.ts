@@ -13,19 +13,7 @@ export type LogEntry = {
 
 class AuditLogService extends dbService {
   static async getAuditLogs() {
-    const auditQuery = `
-      SELECT 
-        audit_logs.action_type,
-        audit_logs.audit_checksum,
-        audit_logs.author,
-        audit_logs.audit_message,
-        audit_logs.created_at,
-        users.first_name,
-        users.last_name
-      FROM audit_logs
-      LEFT JOIN users ON users.username::TEXT = audit_logs.author
-      ORDER BY audit_logs.created_at DESC;
-    `;
+    const auditQuery = "SELECT * FROM audit_logs ORDER BY created_at DESC;";
     const results = await dbService.query(auditQuery);
     return results.rows;
   }
