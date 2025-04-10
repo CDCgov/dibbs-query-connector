@@ -16,6 +16,7 @@ export interface AuthData {
   scopes?: string;
   accessToken?: string;
   tokenExpiry?: string;
+  headers?: Record<string, string>;
 }
 
 class FhirServerConfigService {

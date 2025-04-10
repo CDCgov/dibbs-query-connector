@@ -54,7 +54,7 @@ class FHIRClient {
       name: "test",
       hostname: url,
       disable_cert_validation: disableCertValidation,
-      headers: {},
+      headers: authData?.headers || {},
     };
 
     // Add auth-related properties if auth data is provided
@@ -62,7 +62,9 @@ class FHIRClient {
       testConfig.auth_type = authData.authType;
 
       if (authData.authType === "basic" && authData.bearerToken) {
+        // Preserve existing headers while adding Authorization
         testConfig.headers = {
+          ...testConfig.headers,
           Authorization: `Bearer ${authData.bearerToken}`,
         };
       } else if (["client_credentials", "SMART"].includes(authData.authType)) {
@@ -119,12 +121,14 @@ class FHIRClient {
       }
 
       // Try to fetch the server's metadata
-      const response = await client.get("/metadata");
+      const response = await client.get("/Patient?_summary=count&_count=1");
 
       if (!response.ok) {
+        const errorText = await response.text();
+        console.error(`Error testing connection: ${errorText}`);
         return {
           success: false,
-          error: `Server returned ${response.status}: ${response.statusText}`,
+          error: `Server returned ${response.status}: ${errorText}`,
         };
       }
 
