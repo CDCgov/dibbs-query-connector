@@ -65,11 +65,9 @@ const ResultsViewSideNav: React.FC<ResultsViewSideNavProps> = ({
     <UswdsSideNav
       items={Array.from(Array(5).keys()).map((_) => {
         return (
-          <li className="usa-sidenav__item">
-            <div className="padding-1">
-              <Skeleton height={25} />
-            </div>
-          </li>
+          <div className="padding-1">
+            <Skeleton height={25} />
+          </div>
         );
       })}
     />

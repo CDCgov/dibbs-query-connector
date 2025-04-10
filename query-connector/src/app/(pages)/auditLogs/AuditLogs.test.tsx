@@ -2,38 +2,68 @@ import { screen, within, waitFor } from "@testing-library/react";
 import AuditLogs from "./page";
 import { renderWithUser, RootProviderMock } from "@/app/tests/unit/setup";
 import userEvent from "@testing-library/user-event";
+import { getAuditLogs, LogEntry } from "@/app/backend/dbServices/audit-logs";
 
 const TEST_NAME = "Rocky Balboa";
 const TEST_REPORT = "Created Report";
 const NUM_ROWS = 26;
+const CHECKSUM_INPUT =
+  "It ain't about how hard you hit, it's about how hard you can get hit and keep moving forward";
 
-export const BASE_TEST_DATA = [
+const BASE_TEST_DATA: LogEntry[] = [
   {
-    name: "Rocky Balboa",
-    action: "Created Report",
-    date: new Date("2025-03-10T14:30:00Z"),
+    author: "Rocky Balboa",
+    actionType: "Created Report",
+    auditMessage: { parameter: "value" },
+    auditChecksum: CHECKSUM_INPUT,
+    createdAt: new Date("2025-03-10T14:30:00Z"),
   },
   {
-    name: "Apollo Creed",
-    action: "Edited Report",
-    date: new Date("2025-03-09T09:15:00Z"),
+    author: "Apollo Creed",
+    actionType: "Edited Report",
+    auditMessage: { parameter: "value" },
+    auditChecksum: CHECKSUM_INPUT,
+    createdAt: new Date("2025-03-09T09:15:00Z"),
   },
   {
-    name: "Rocky Balboa",
-    action: "Deleted Entry",
-    date: new Date("2022-03-08T17:45:00Z"),
+    author: "Rocky Balboa",
+    actionType: "Deleted Entry",
+    auditMessage: { parameter: "value" },
+    auditChecksum: CHECKSUM_INPUT,
+    createdAt: new Date("2022-03-08T17:45:00Z"),
   },
   {
-    name: "Clubber Lang",
-    action: "Created Report",
-    date: new Date("2024-03-07T12:00:00Z"),
+    author: "Clubber Lang",
+    actionType: "Created Report",
+    auditMessage: { parameter: "value" },
+    auditChecksum: CHECKSUM_INPUT,
+    createdAt: new Date("2024-03-07T12:00:00Z"),
   },
   {
-    name: "Ivan Drago",
-    action: "Viewed Entry",
-    date: new Date("2025-03-06T22:10:00Z"),
+    author: "Ivan Drago",
+    actionType: "Viewed Entry",
+    auditMessage: { parameter: "value" },
+    auditChecksum: CHECKSUM_INPUT,
+    createdAt: new Date("2025-03-06T22:10:00Z"),
   },
 ];
+
+const testData = Array.from({ length: 50 }, (_, index) =>
+  BASE_TEST_DATA.map((entry) => ({
+    ...entry,
+    date: new Date(entry.createdAt.getTime() + index * 86400000),
+  })),
+)
+  .flat()
+  .sort((a, b) => b.date.getTime() - a.date.getTime());
+
+jest.mock("@/app/backend/dbServices/audit-logs", () => {
+  return {
+    __esModule: true,
+    ...jest.requireActual("@/app/backend/dbServices/audit-logs"),
+    getAuditLogs: jest.fn(),
+  };
+});
 
 /**
  * Creates an enhanced user event with custom helper methods.
@@ -66,14 +96,21 @@ const createUserWithHelpers = (user: ReturnType<typeof userEvent.setup>) => ({
 
 describe("AuditLogs Component", () => {
   let user: ReturnType<typeof createUserWithHelpers>;
+  (getAuditLogs as jest.Mock).mockResolvedValue(testData);
 
-  beforeEach(() => {
+  beforeEach(async () => {
     const renderResult = renderWithUser(
       <RootProviderMock currentPage="/auditLogs">
         <AuditLogs />
       </RootProviderMock>,
     );
     user = createUserWithHelpers(renderResult.user);
+
+    await waitFor(() => {
+      expect(
+        renderResult.getByText("Showing", { exact: false }),
+      ).toBeInTheDocument();
+    });
   });
 
   test("renders the audit logs table", async () => {

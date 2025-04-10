@@ -10,7 +10,7 @@ import { getSavedQueryByName } from "./database-service";
 import type { QueryDataColumn } from "../(pages)/queryBuilding/utils";
 import { getFhirServerConfigs } from "../backend/dbServices/fhir-servers";
 import { DibbsValueSet } from "../models/entities/valuesets";
-import { auditable } from "../auditLogs/decorator";
+import { auditable } from "../backend/auditLogs/decorator";
 import FHIRClient from "./fhirClient";
 import { FhirServerConfig } from "../models/entities/fhir-servers";
 

@@ -99,8 +99,8 @@ const SelectQuery: React.FC<SelectQueryProps> = ({
   }, [selectedQuery]);
 
   async function onSubmit() {
-    setLoading(true);
     goForward();
+    setLoading(true);
     await fetchQueryResponse({
       queryName: selectedQuery.query_name,
       patientForQuery: patientForQuery,
