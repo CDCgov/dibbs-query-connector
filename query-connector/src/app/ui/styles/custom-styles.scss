@@ -380,33 +380,6 @@ ul.usa-sidenav > li.usa-sidenav__item > ul.usa-sidenav__sublist > li.usa-sidenav
   background-color: white;
 }
 
-.usa-modal--lg {
-  background-color: #edeff0;
-  padding-top: 0;
-}
-
-.usa-modal__content {
-  padding-left: 0.5rem;
-  padding-right: 0.5rem;
-}
-
-.usa-modal__main {
-  margin: 0 auto;
-  padding-top: 0 !important;
-  padding-left: 0 !important;
-  padding-right: 0 !important;
-  padding-bottom: 2rem !important;
-}
-
-.usa-modal__heading {
-  font-family: "Public Sans", sans-serif !important;
-  font-size: 1.219rem !important;
-  font-style: normal;
-  font-weight: 700;
-  line-height: normal;
-  margin-bottom: 1rem;
-}
-
 .usa-pagination .usa-current {
   background-color: white;
   border-color: rgba(27, 27, 27, 0.2);
@@ -550,105 +523,37 @@ ul.usa-sidenav > li.usa-sidenav__item > ul.usa-sidenav__sublist > li.usa-sidenav
   font-size: 0.875rem;
 }
 
-#fhir-server-modal {
-  .usa-modal__close {
-    background-color: transparent !important;
-  }
-
-  .usa-modal__heading {
-    color: #000;
-    font-family: Merriweather !important;
-    font-size: 32px !important;
-    font-style: normal;
-    font-weight: 700;
-    line-height: normal;
-  }
-
-  .usa-modal--lg {
-    max-width: 40rem;
-
-    .usa-modal__main {
-      max-width: 34rem;
-
-      input,
-      select {
-        max-width: 100%;
-      }
-    }
-  }
-
-  .usa-button-group {
-    flex-direction: row-reverse;
-
-    .usa-button-group__item:last-child {
-      margin-right: 0.25rem;
-    }
-
-    .usa-button--secondary {
-      background-color: #d83933 !important;
-    }
-
-    #modal-cancel-button {
-      background-color: transparent;
-
-      &:hover {
-        box-shadow: none;
-      }
-    }
-
-    .usa-button-group__item:has(> #modal-delete-button) {
-      flex: 1 1 0%;
-    }
-  }
-
-  .usa-checkbox {
-    background-color: transparent;
-  }
-}
-
-#user-mgmt-modal {
-  .usa-modal {
-    border-radius: 0;
-    max-width: 31rem;
-    padding: 0 2rem;
-  }
+.qc-modal {
+  padding: 0 2rem !important;
+  max-width: 31rem;
 
   .usa-modal__content {
     padding-top: 0;
-  }
-
-  .usa-modal__close {
-    background-color: transparent !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    width: 1.5rem !important;
-    height: 1.5rem !important;
-    margin: 1rem 0rem 0px 0px !important;
-
-    .usa-icon {
-      height: 1.5rem;
-      margin: 0;
-      width: 1.5rem;
-    }
-  }
-
-  .usa-modal__heading {
-    color: #000;
-    font-family: Merriweather !important;
-    font-size: 32px !important;
-    font-style: normal;
-    font-weight: 700;
-    line-height: 40px;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
   }
 
   .usa-modal__main {
     max-width: 26rem;
     margin: 0 !important;
-
+    padding: 0 0 2rem 0 !important;
     input,
     select {
       max-width: 100%;
     }
+  }
+
+  .usa-modal__heading {
+    font-family: "Public Sans", sans-serif !important;
+    font-size: 1.219rem !important;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+    margin-bottom: 1rem;
+  }
+
+  .usa-checkbox {
+    background-color: transparent;
   }
 
   .usa-button-group {
@@ -661,26 +566,69 @@ ul.usa-sidenav > li.usa-sidenav__item > ul.usa-sidenav__sublist > li.usa-sidenav
 
     .usa-button-group__item:last-child {
       margin-right: 0.25rem;
+
+      #modal-back-button,
+      #modal-cancel-button {
+        padding-left: 0 !important;
+      }
     }
 
-    #modal-back-button {
+    #modal-back-button,
+    #modal-cancel-button {
       background-color: transparent;
       color: #005ea2;
-      padding: 0 !important;
+
       &:hover {
         box-shadow: none;
       }
     }
 
-    .usa-button-group__item:has(> #modal-delete-button) {
+    .usa-button-group__item:last-child:has(> #modal-back-button),
+    .usa-button-group__item:last-child:has(> #modal-cancel-button),
+    .usa-button-group__item:last-child:has(> #modal-delete-button) {
       flex: 1 1 0%;
     }
   }
 
-  .usa-checkbox {
-    background-color: transparent;
-  }
+  .usa-modal__close {
+    background-color: transparent !important;
+    padding: 0 !important;
+    width: 1.5rem !important;
+    height: 1.5rem !important;
+    margin: 1rem 0rem 0rem 0rem !important;
 
+    .usa-icon {
+      margin: 0;
+      height: 1.5rem;
+      width: 1.5rem;
+    }
+  }
+}
+
+.qc-modal.usa-modal--lg {
+  max-width: 40rem !important;
+
+  .usa-modal__main {
+    max-width: 35rem;
+
+    input,
+    select {
+      max-width: 100%;
+    }
+  }
+}
+
+#fhir-server-modal .usa-modal--lg {
+  background-color: #edeff0;
+}
+
+#session-timeout-modal {
+  .usa-modal__main {
+    padding-top: 2rem !important;
+  }
+}
+
+#user-mgmt-modal {
   .role-descriptions {
     background-color: #f3f3f3;
     padding: 0.5rem;

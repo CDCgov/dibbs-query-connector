@@ -182,7 +182,7 @@ const SelectSavedQuery: React.FC<SelectSavedQueryProps> = ({
               ? "usa-button"
               : "usa-button disabled"
           }
-          onClick={() => handleSubmit()}
+          onClick={handleSubmit}
         >
           Submit
         </Button>
