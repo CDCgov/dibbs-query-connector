@@ -14,7 +14,6 @@ type DrawerProps = {
   onSave: () => void;
   onClose: () => void;
   onSearch?: (searchFilter: string) => void;
-  drawerWidth?: "35%" | "60%";
 };
 
 /**
@@ -27,7 +26,6 @@ type DrawerProps = {
  * @param root0.onSearch - Function to handle search actions in the drawer.
  * @param root0.isOpen - Boolean to control the visibility of the drawer.
  * @param root0.toRender - The dynamic content to display.
- * @param root0.drawerWidth - The width of the drawer, default is 35%.
  * warning modal appears before saving
  * @returns The Drawer component.
  */
@@ -39,7 +37,6 @@ const Drawer: React.FC<DrawerProps> = ({
   onClose,
   toRender,
   onSearch,
-  drawerWidth = "35%",
 }: DrawerProps) => {
   const [searchFilter, setSearchFilter] = useState("");
 
@@ -59,11 +56,7 @@ const Drawer: React.FC<DrawerProps> = ({
   return (
     <>
       <div
-        className={classNames(
-          styles.drawer,
-          isOpen ? styles.open : styles.closed,
-          drawerWidth === "60%" ? styles.width60 : styles.width35,
-        )}
+        className={`${styles.drawer} ${isOpen ? styles.open : styles.closed}`}
         role="dialog"
         data-testid={`drawer-open-${isOpen}`}
       >

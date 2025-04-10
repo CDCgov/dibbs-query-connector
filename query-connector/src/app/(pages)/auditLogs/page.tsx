@@ -14,7 +14,6 @@ import { Button, Select, Pagination } from "@trussworks/react-uswds";
 import WithAuth from "@/app/ui/components/withAuth/WithAuth";
 import { getAuditLogs, LogEntry } from "@/app/backend/dbServices/audit-logs";
 import Skeleton from "react-loading-skeleton";
-import AuditLogDrawer from "./components/auditLogDrawer";
 
 /**
  * Client component for the Audit Logs page.
@@ -30,10 +29,6 @@ const AuditLogs: React.FC = () => {
   const [actionsPerPage, setActionsPerPage] = useState(10);
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const [selectedLogEntry, setSelectedLogEntry] = useState<LogEntry | null>(
-    null,
-  );
 
   useEffect(() => {
     async function fetchAuditLogs() {
@@ -212,14 +207,7 @@ const AuditLogs: React.FC = () => {
                 ) : (
                   <tbody>
                     {paginatedLogs.map((log, index) => (
-                      <tr
-                        className={styles.tableRows}
-                        key={index}
-                        onClick={() => {
-                          setSelectedLogEntry(log);
-                          setDrawerOpen(true);
-                        }}
-                      >
+                      <tr className={styles.tableRows} key={index}>
                         <td>{log.author}</td>
                         <td>{log.actionType}</td>
                         <td>{JSON.stringify(log.auditMessage)}</td>
@@ -284,11 +272,6 @@ const AuditLogs: React.FC = () => {
                 </Select>
               </div>
             )}
-            <AuditLogDrawer
-              isOpen={drawerOpen}
-              onClose={() => setDrawerOpen(false)}
-              logEntry={selectedLogEntry}
-            />
           </div>
         </>
       </div>

@@ -1,11 +1,11 @@
 @use "../../../ui/styles/_variables" as *;
 
-$drawerWidthDefault: 35%;
-$drawerWidthWide: 60%;
-
+$drawerWidth: 35%;
 .drawer {
   position: fixed;
   top: 0;
+  width: $drawerWidth;
+  max-width: 50%;
   height: 100%;
   padding: 0rem;
   display: flex;
@@ -19,16 +19,6 @@ $drawerWidthWide: 60%;
   background: $page-background;
   max-height: 100%;
   overflow-y: scroll;
-
-  &.width35 {
-    width: $drawerWidthDefault;
-    max-width: $drawerWidthWide;
-  }
-
-  &.width60 {
-    width: $drawerWidthWide;
-    max-width: $drawerWidthWide;
-  }
 
   input[type="search"] {
     display: flex;
@@ -46,7 +36,7 @@ $drawerWidthWide: 60%;
 }
 
 .drawer.closed {
-  right: -1 * $drawerWidthWide;
+  right: -1 * $drawerWidth;
 }
 
 .drawerContent {
