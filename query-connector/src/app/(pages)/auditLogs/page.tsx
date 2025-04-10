@@ -16,9 +16,9 @@ import { getAuditLogs, LogEntry } from "@/app/backend/dbServices/audit-logs";
 import Skeleton from "react-loading-skeleton";
 import AuditLogDrawer from "./components/auditLogDrawer";
 import {
-  actionTypeMap,
+  auditLogActionTypeMap,
   labelToActionType,
-  getFullNameForAuthor,
+  auditLogUserMap,
   initializeAuditLogUserMap,
 } from "./components/auditLogMaps";
 
@@ -59,7 +59,7 @@ const AuditLogs: React.FC = () => {
   const uniqueNames = useMemo(
     () =>
       Array.from(
-        new Set(logs.map((log) => getFullNameForAuthor(log.author))),
+        new Set(logs.map((log) => auditLogUserMap(log.author))),
       ).sort(),
     [logs],
   );
@@ -69,7 +69,8 @@ const AuditLogs: React.FC = () => {
       Array.from(
         new Set(
           logs.map(
-            (log) => actionTypeMap[log.actionType]?.label || log.actionType,
+            (log) =>
+              auditLogActionTypeMap[log.actionType]?.label || log.actionType,
           ),
         ),
       ).sort(),
@@ -95,16 +96,17 @@ const AuditLogs: React.FC = () => {
     setFilteredLogs(
       logs.filter((log) => {
         const matchesName = selectedName
-          ? getFullNameForAuthor(log.author) === selectedName
+          ? auditLogUserMap(log.author) === selectedName
           : true;
         const matchesAction = selectedAction
           ? log.actionType === labelToActionType[selectedAction]
           : true;
         const actionLabel =
-          actionTypeMap[log.actionType]?.label?.toLowerCase() || "";
+          auditLogActionTypeMap[log.actionType]?.label?.toLowerCase() || "";
         const formattedAction =
-          actionTypeMap[log.actionType]?.format(log)?.toLowerCase() || "";
-        const fullName = getFullNameForAuthor(log.author).toLowerCase();
+          auditLogActionTypeMap[log.actionType]?.format(log)?.toLowerCase() ||
+          "";
+        const fullName = auditLogUserMap(log.author).toLowerCase();
         const matchesSearch =
           search.length === 0 ||
           log.author.toLowerCase().includes(search.toLowerCase()) ||
@@ -245,10 +247,10 @@ const AuditLogs: React.FC = () => {
                           setDrawerOpen(true);
                         }}
                       >
-                        <td>{getFullNameForAuthor(log.author)}</td>
+                        <td>{auditLogUserMap(log.author)}</td>
                         <td>
-                          {actionTypeMap[log.actionType]?.format(log)
-                            ? actionTypeMap[log.actionType].format(log)
+                          {auditLogActionTypeMap[log.actionType]?.format(log)
+                            ? auditLogActionTypeMap[log.actionType].format(log)
                             : log.actionType}
                         </td>
                         <td>{log.createdAt.toLocaleString()}</td>
