@@ -27,7 +27,7 @@ exports[`Admin view of Users Table renders error message when no user groups are
         Modal Mock
       </div>
       <div
-        class="drawer closed"
+        class="drawer closed width35"
         data-testid="drawer-open-false"
         role="dialog"
       >
@@ -308,7 +308,7 @@ exports[`Super Admin view of Users Table renders content on tab click 1`] = `
         Modal Mock
       </div>
       <div
-        class="drawer closed"
+        class="drawer closed width35"
         data-testid="drawer-open-false"
         role="dialog"
       >
@@ -409,7 +409,7 @@ exports[`Super Admin view of Users Table renders content on tab click 2`] = `
         Modal Mock
       </div>
       <div
-        class="drawer closed"
+        class="drawer closed width35"
         data-testid="drawer-open-false"
         role="dialog"
       >
@@ -506,7 +506,7 @@ exports[`Super Admin view of Users Table renders error message when no users are
         Modal Mock
       </div>
       <div
-        class="drawer closed"
+        class="drawer closed width35"
         data-testid="drawer-open-false"
         role="dialog"
       >
@@ -787,7 +787,7 @@ exports[`Super Admin view of Users Table renders table view after content is loa
         Modal Mock
       </div>
       <div
-        class="drawer closed"
+        class="drawer closed width35"
         data-testid="drawer-open-false"
         role="dialog"
       >
@@ -1068,7 +1068,7 @@ exports[`Super Admin view of Users Table renders table view after content is loa
         Modal Mock
       </div>
       <div
-        class="drawer closed"
+        class="drawer closed width35"
         data-testid="drawer-open-false"
         role="dialog"
       >

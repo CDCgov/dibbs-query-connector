@@ -16,6 +16,7 @@
     "test:ci": " bash ./setup-scripts/unit_and_integration_tests.sh",
     "test:unit": "jest --testPathIgnorePatterns='/e2e/' '/integration/'",
     "test:unit:watch": "jest --watch",
+    "test:update": "jest --updateSnapshot --testPathIgnorePatterns=/e2e/",
     "test:integration": "JUST_INTEGRATION=true bash ./setup-scripts/unit_and_integration_tests.sh",
     "test:playwright": "bash ./setup-scripts/e2e_tests.sh",
     "test:playwright:ui": "bash ./setup-scripts/e2e_tests_local.sh"
