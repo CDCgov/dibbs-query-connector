@@ -27,7 +27,7 @@ export const pagesConfig: Record<string, Page> = {};
 pagesConfig[PAGES.QUERY] = {
   position: 0,
   path: PAGES.QUERY,
-  name: "Run query",
+  name: "Run a query",
   roleAccess: [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.STANDARD],
 };
 
