@@ -77,7 +77,7 @@ const UserPermissionsTable: React.FC<PermissionsProps> = ({
 
   const renderDropdown = (user: User) => {
     return (
-      <td className={styles.roleDropdown} width={270}>
+      <td className={styles.roleDropdown} width={250}>
         {isSelf(user) ? (
           user.qc_role
         ) : (
@@ -95,7 +95,7 @@ const UserPermissionsTable: React.FC<PermissionsProps> = ({
 
   const renderGroups = (user: User) => {
     return (
-      <td key={user.id}>
+      <td key={user.id} width={475}>
         {user?.userGroupMemberships && user.userGroupMemberships?.length > 0
           ? user.userGroupMemberships?.map(
               (membership: UserGroupMembership, idx: number) => {
