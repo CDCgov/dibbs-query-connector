@@ -277,7 +277,6 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
         showToastConfirmation({
           body: `${queryName} successfully ${statusMessage}`,
         });
-        goBack();
       } catch {
         showToastConfirmation({
           heading: "Something went wrong",
