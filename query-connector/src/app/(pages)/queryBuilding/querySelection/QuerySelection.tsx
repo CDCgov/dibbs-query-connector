@@ -14,14 +14,27 @@ import { SelectedQueryDetails, SelectedQueryState } from "./utils";
 import { BuildStep } from "@/app/shared/constants";
 import { DataContext } from "@/app/shared/DataProvider";
 import { CustomUserQuery } from "@/app/models/entities/query";
+import { getRole } from "@/app/(pages)/userManagement/utils";
 import { getQueryList } from "@/app/backend/query-building";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
+import { getAllGroupQueries } from "@/app/backend/usergroup-management";
+import {
+  getUserByUsername,
+  getSingleUserWithGroupMemberships,
+} from "@/app/backend/user-management";
+import { useSession } from "next-auth/react";
+import { User, UserRole } from "@/app/models/entities/users";
 
 type QuerySelectionProps = {
   selectedQuery: SelectedQueryState;
   setBuildStep: Dispatch<SetStateAction<BuildStep>>;
   setSelectedQuery: Dispatch<SetStateAction<SelectedQueryDetails>>;
 };
+
+// let getUserId = async (sesh: any) => {
+//   const user = await checkUserQuery(sesh);
+//   return user;
+// };
 
 /**
  * Component for Query Building Flow
@@ -37,17 +50,66 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({
   setBuildStep,
   setSelectedQuery,
 }) => {
-  const [unauthorizedError, setUnauthorizedError] = useState(false);
-  const queriesContext = useContext(DataContext);
-  const [loading, setLoading] = useState(true);
+  const { data: session } = useSession();
+  const sesh = session?.user?.username || "";
+  const userRole = getRole();
 
+  const [loading, setLoading] = useState(true);
+  const [unauthorizedError, setUnauthorizedError] = useState(false);
+  const [currentUser, setCurrentUser] = useState<User>();
+
+  const queriesContext = useContext(DataContext);
+
+  // Retrieve and store current logged-in user's data on page load
+  useEffect(() => {
+    const fetchCurrentUser = async () => {
+      try {
+        const currentUser = await getUserByUsername(sesh).then(async (user) => {
+          const userWithGroups = await getSingleUserWithGroupMemberships(
+            user.id,
+          );
+          return userWithGroups;
+        });
+
+        setCurrentUser(currentUser.items[0]);
+      } catch {
+        console.log("uh oh");
+      }
+    };
+
+    // since our async fynction sets the return value in the state var 'currentUser'
+    // we don't need to worry about pulling out the id, etc. before the promise resolves
+    fetchCurrentUser();
+  }, []);
+
+  async function getQueriesForUser() {
+    if (!!currentUser && currentUser.userGroupMemberships) {
+      const assignedQueries = await Promise.all(
+        currentUser.userGroupMemberships.map(async (gm) => {
+          const groupQueries = await getAllGroupQueries(gm.usergroup_id);
+          return groupQueries.items;
+        }),
+      );
+      console.log("WHOA THERE"); //was trying to figure out if we were even hitting this when we should be, and it appears not
+      console.log(assignedQueries);
+      return assignedQueries[0];
+    }
+  }
   // Check whether custom queries exist in DB
   useEffect(() => {
     if (queriesContext?.data === null || queriesContext?.data === undefined) {
       const fetchQueries = async () => {
         try {
           const queries = await getQueryList();
-          queriesContext?.setData(queries);
+
+          const queryList =
+            userRole == UserRole.SUPER_ADMIN
+              ? queries
+              : !!currentUser
+                ? await getQueriesForUser()
+                : [];
+
+          queriesContext?.setData(queryList);
         } catch (error) {
           if (error == "Error: Unauthorized") {
             setUnauthorizedError(true);
@@ -61,11 +123,12 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({
           setLoading(false);
         }
       };
-      fetchQueries();
+
+      !!currentUser && fetchQueries();
     } else {
       setLoading(false); // Data already exists, no need to fetch again
     }
-  }, [queriesContext]);
+  }, [queriesContext, currentUser]);
 
   if (loading) {
     return <LoadingView loading={true} />;

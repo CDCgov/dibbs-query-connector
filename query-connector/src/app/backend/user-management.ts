@@ -9,6 +9,16 @@ import { getDbClient } from "./dbClient";
 const dbClient = getDbClient();
 
 /**
+ * @param username The identifier of the user we want to retrieve
+ * @returns A single user result
+ */
+export async function getUserByUsername(username: string) {
+  const checkUserQuery = `SELECT * FROM users WHERE username = $1;`;
+  const result = await dbClient.query(checkUserQuery, [username]);
+  return result.rows[0];
+}
+
+/**
  * Adds a user to the users table if they do not already exist.
  * Uses data extracted from the JWT token.
  * @param userToken - The user data from the JWT token.
@@ -36,7 +46,6 @@ export async function addUserIfNotExists(userToken: {
 
   try {
     console.log("Checking if user exists.");
-
     const checkUserQuery = `SELECT id, username FROM users WHERE username = $1;`;
     const userExists = await dbClient.query(checkUserQuery, [userIdentifier]);
 
@@ -223,9 +232,6 @@ export async function checkUserExists(
   };
 
   const userCheckResult = await dbClient.query(userCheckQuery);
-  if (userCheckResult.rows.length === 0) {
-    return { totalItems: 0, items: [] };
-  }
 
   return {
     totalItems: userCheckResult.rowCount,
@@ -340,7 +346,6 @@ export async function getSingleUserWithGroupMemberships(
   }
 
   const userCheckResult = await checkUserExists(userId);
-
   if (!userCheckResult || userCheckResult?.totalItems == 0) {
     return { totalItems: 0, items: [] };
   }
@@ -359,7 +364,7 @@ export async function getSingleUserWithGroupMemberships(
   };
 
   const result = await dbClient.query(query);
-
+  console.log(result.rows);
   const memberships = result.rows.map((row) => {
     return {
       membership_id: row.membership_id,
@@ -377,7 +382,7 @@ export async function getSingleUserWithGroupMemberships(
     qc_role: userCheckResult.items[0].qc_role,
     userGroupMemberships: memberships,
   };
-
+  console.log(userWithGroups);
   return { totalItems: 1, items: [userWithGroups] };
 }
 
