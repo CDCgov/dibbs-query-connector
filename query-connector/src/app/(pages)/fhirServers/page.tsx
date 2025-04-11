@@ -6,6 +6,7 @@ import {
   updateFhirServer,
   deleteFhirServer,
   getFhirServerConfigs,
+  AuthData,
 } from "@/app/backend/dbServices/fhir-servers";
 import dynamic from "next/dynamic";
 import { useEffect, useState, useRef } from "react";
@@ -21,6 +22,7 @@ import type { ModalProps } from "../../ui/designSystem/modal/Modal";
 import WithAuth from "@/app/ui/components/withAuth/WithAuth";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import { FhirServerConfig } from "@/app/models/entities/fhir-servers";
+import { testFhirServerConnection } from "@/app/shared/testConnection";
 
 const Modal = dynamic<ModalProps>(
   () => import("../../ui/designSystem/modal/Modal").then((mod) => mod.Modal),
@@ -28,6 +30,7 @@ const Modal = dynamic<ModalProps>(
 );
 
 type ModalMode = "create" | "edit";
+type AuthMethodType = "none" | "basic" | "client_credentials" | "SMART";
 
 /**
  * Client side parent component for the FHIR servers page. It displays a list of FHIR servers
@@ -38,8 +41,12 @@ const FhirServers: React.FC = () => {
   const [fhirServers, setFhirServers] = useState<FhirServerConfig[]>([]);
   const [serverName, setServerName] = useState("");
   const [serverUrl, setServerUrl] = useState("");
-  const [authMethod, setAuthMethod] = useState<"none" | "basic">("none");
+  const [authMethod, setAuthMethod] = useState<AuthMethodType>("none");
   const [bearerToken, setBearerToken] = useState("");
+  const [clientId, setClientId] = useState("");
+  const [clientSecret, setClientSecret] = useState("");
+  const [tokenEndpoint, setTokenEndpoint] = useState("");
+  const [scopes, setScopes] = useState("");
   const [disableCertValidation, setDisableCertValidation] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState<
     "idle" | "success" | "error"
@@ -74,6 +81,10 @@ const FhirServers: React.FC = () => {
     setServerUrl("");
     setAuthMethod("none");
     setBearerToken("");
+    setClientId("");
+    setClientSecret("");
+    setTokenEndpoint("");
+    setScopes("");
     setConnectionStatus("idle");
     setErrorMessage("");
     setSelectedServer(null);
@@ -88,13 +99,26 @@ const FhirServers: React.FC = () => {
       setConnectionStatus("idle");
       setDisableCertValidation(server.disable_cert_validation);
 
-      // Set auth method and bearer token if they exist
-      if (server.headers?.Authorization?.startsWith("Bearer ")) {
+      // Set auth method and corresponding fields based on server data
+      if (server.auth_type) {
+        setAuthMethod(server.auth_type as AuthMethodType);
+
+        // Set other auth related fields
+        if (server.client_id) setClientId(server.client_id);
+        if (server.client_secret) setClientSecret(server.client_secret);
+        if (server.token_endpoint) setTokenEndpoint(server.token_endpoint);
+        if (server.scopes) setScopes(server.scopes);
+
+        // For backward compatibility with basic auth
+        if (server.auth_type === "basic" && server.headers?.Authorization) {
+          setBearerToken(server.headers.Authorization.replace("Bearer ", ""));
+        }
+      } else if (server.headers?.Authorization?.startsWith("Bearer ")) {
+        // Legacy support for servers without auth_type but with bearer token
         setAuthMethod("basic");
         setBearerToken(server.headers.Authorization.replace("Bearer ", ""));
       } else {
         setAuthMethod("none");
-        setBearerToken("");
       }
     } else {
       resetModalState();
@@ -116,27 +140,40 @@ const FhirServers: React.FC = () => {
     url: string,
   ): Promise<ConnectionTestResult> => {
     try {
-      const response = await fetch("/api/test-fhir-connection", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          url,
-          bearerToken: authMethod === "basic" ? bearerToken : undefined,
-        }),
-      });
+      // Build auth data based on selected auth method
+      const authData: AuthData = {
+        authType: authMethod,
+        headers: selectedServer?.headers || {}, // Include existing headers for editing
+      };
 
-      const result = await response.json();
-      return result;
-    } catch {
+      // Add auth-method specific properties
+      if (authMethod === "basic") {
+        authData.bearerToken = bearerToken;
+      } else if (authMethod === "client_credentials") {
+        authData.clientId = clientId;
+        authData.clientSecret = clientSecret;
+        authData.tokenEndpoint = tokenEndpoint;
+        authData.scopes = scopes;
+      } else if (authMethod === "SMART") {
+        authData.clientId = clientId;
+        authData.tokenEndpoint = tokenEndpoint;
+        authData.scopes = scopes;
+      }
+
+      const response = await testFhirServerConnection(
+        url,
+        disableCertValidation,
+        authData,
+      );
+      return response;
+    } catch (error) {
+      console.error("Error testing connection:", error);
       return {
         success: false,
         error: "Failed to test connection. Please try again.",
       };
     }
   };
-
   const handleTestConnection = async () => {
     const result = await testFhirConnection(serverUrl);
     setConnectionStatus(result.success ? "success" : "error");
@@ -146,13 +183,30 @@ const FhirServers: React.FC = () => {
   const handleSave = async () => {
     const connectionResult = await testFhirConnection(serverUrl);
 
+    // Prepare auth data based on selected auth method
+    const authData = {
+      authType: authMethod,
+      bearerToken: authMethod === "basic" ? bearerToken : undefined,
+      clientId: ["client_credentials", "SMART"].includes(authMethod)
+        ? clientId
+        : undefined,
+      clientSecret:
+        authMethod === "client_credentials" ? clientSecret : undefined,
+      tokenEndpoint: ["client_credentials", "SMART"].includes(authMethod)
+        ? tokenEndpoint
+        : undefined,
+      scopes: ["client_credentials", "SMART"].includes(authMethod)
+        ? scopes
+        : undefined,
+    };
+
     if (modalMode === "create") {
       const result = await insertFhirServer(
         serverName,
         serverUrl,
         disableCertValidation,
         connectionResult.success,
-        authMethod === "basic" ? bearerToken : undefined,
+        authData,
       );
 
       if (result.success) {
@@ -171,7 +225,7 @@ const FhirServers: React.FC = () => {
         serverUrl,
         disableCertValidation,
         connectionResult.success,
-        authMethod === "basic" ? bearerToken : undefined,
+        authData,
       );
 
       if (result.success) {
@@ -263,6 +317,119 @@ const FhirServers: React.FC = () => {
     return buttons;
   };
 
+  // Helper to render auth method specific fields
+  const renderAuthMethodFields = () => {
+    switch (authMethod) {
+      case "basic":
+        return (
+          <>
+            <Label htmlFor="bearer-token">Bearer Token</Label>
+            <TextInput
+              id="bearer-token"
+              name="bearer-token"
+              type="text"
+              value={bearerToken}
+              onChange={(e) => setBearerToken(e.target.value)}
+              required
+            />
+          </>
+        );
+      case "client_credentials":
+        return (
+          <>
+            <Label htmlFor="client-id">Client ID</Label>
+            <TextInput
+              id="client-id"
+              name="client-id"
+              type="text"
+              value={clientId}
+              onChange={(e) => setClientId(e.target.value)}
+              required
+            />
+
+            <Label htmlFor="client-secret">Client Secret</Label>
+            <TextInput
+              id="client-secret"
+              name="client-secret"
+              data-testid="client-secret"
+              type="password"
+              value={clientSecret}
+              onChange={(e) => setClientSecret(e.target.value)}
+              required
+            />
+
+            <Label htmlFor="token-endpoint">Token Endpoint</Label>
+            <TextInput
+              id="token-endpoint"
+              name="token-endpoint"
+              data-testid="token-endpoint"
+              type="url"
+              value={tokenEndpoint}
+              onChange={(e) => setTokenEndpoint(e.target.value)}
+              required
+            />
+
+            <Label htmlFor="scopes">Scopes (space separated)</Label>
+            <TextInput
+              id="scopes"
+              name="scopes"
+              data-testid="scopes"
+              type="text"
+              value={scopes}
+              onChange={(e) => setScopes(e.target.value)}
+              required
+            />
+          </>
+        );
+      case "SMART":
+        return (
+          <>
+            <Label htmlFor="client-id">Client ID</Label>
+            <TextInput
+              id="client-id"
+              name="client-id"
+              data-testid="client-id"
+              type="text"
+              value={clientId}
+              onChange={(e) => setClientId(e.target.value)}
+              required
+            />
+
+            <Label htmlFor="token-endpoint">Token Endpoint</Label>
+            <div className="usa-hint margin-bottom-1">
+              If left empty, will be discovered from the server's
+              .well-known/smart-configuration
+            </div>
+            <TextInput
+              id="token-endpoint"
+              name="token-endpoint"
+              data-testid="token-endpoint"
+              type="url"
+              value={tokenEndpoint}
+              onChange={(e) => setTokenEndpoint(e.target.value)}
+            />
+
+            <Label htmlFor="scopes">Scopes (space separated)</Label>
+            <div className="usa-hint margin-bottom-1">
+              For example: system/Patient.read system/Observation.read
+            </div>
+            <TextInput
+              id="scopes"
+              data-testid="scopes"
+              name="scopes"
+              type="text"
+              value={scopes}
+              onChange={(e) => setScopes(e.target.value)}
+              required
+            />
+          </>
+        );
+      case "none":
+      default:
+        return null;
+    }
+  };
+
   return (
     <WithAuth>
       <div className={classNames("main-container__wide", styles.mainContainer)}>
@@ -289,6 +456,7 @@ const FhirServers: React.FC = () => {
             <tr>
               <th>FHIR server</th>
               <th>URL</th>
+              <th>Auth Method</th>
               <th>Status</th>
             </tr>
           </thead>
@@ -300,6 +468,10 @@ const FhirServers: React.FC = () => {
               >
                 <td>{fhirServer.name}</td>
                 <td>{fhirServer.hostname}</td>
+                <td>
+                  {fhirServer.auth_type ||
+                    (fhirServer.headers?.Authorization ? "basic" : "none")}
+                </td>
                 <td width={480}>
                   <div className="grid-container grid-row padding-0 display-flex flex-align-center">
                     {fhirServer.last_connection_successful ? (
@@ -360,6 +532,7 @@ const FhirServers: React.FC = () => {
           <Label htmlFor="server-name">Server name</Label>
           <TextInput
             id="server-name"
+            data-testid="server-name"
             name="server-name"
             type="text"
             value={serverName}
@@ -369,6 +542,7 @@ const FhirServers: React.FC = () => {
           <Label htmlFor="server-url">URL</Label>
           <TextInput
             id="server-url"
+            data-testid="server-url"
             name="server-url"
             type="url"
             value={serverUrl}
@@ -379,31 +553,31 @@ const FhirServers: React.FC = () => {
           <select
             className="usa-select"
             id="auth-method"
+            data-testid="auth-method"
             name="auth-method"
             value={authMethod}
             onChange={(e) => {
-              setAuthMethod(e.target.value as "none" | "basic");
-              if (e.target.value === "none") {
+              setAuthMethod(e.target.value as AuthMethodType);
+              // Reset fields when changing auth method
+              if (e.target.value !== "basic") {
                 setBearerToken("");
+              }
+              if (!["client_credentials", "SMART"].includes(e.target.value)) {
+                setClientId("");
+                setClientSecret("");
+                setTokenEndpoint("");
+                setScopes("");
               }
             }}
           >
             <option value="none">None</option>
-            <option value="basic">Basic auth</option>
+            <option value="basic">Basic auth (bearer token)</option>
+            <option value="client_credentials">Client Credentials</option>
+            <option value="SMART">SMART on FHIR</option>
           </select>
-          {authMethod === "basic" && (
-            <>
-              <Label htmlFor="bearer-token">Bearer Token</Label>
-              <TextInput
-                id="bearer-token"
-                name="bearer-token"
-                type="text"
-                value={bearerToken}
-                onChange={(e) => setBearerToken(e.target.value)}
-                required
-              />
-            </>
-          )}
+
+          {renderAuthMethodFields()}
+
           <Checkbox
             id="disable-cert-validation"
             label="Disable certificate validation"

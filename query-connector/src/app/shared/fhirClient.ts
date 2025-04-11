@@ -3,6 +3,7 @@ import { FhirServerConfig } from "../models/entities/fhir-servers";
 import { AuthData } from "../backend/dbServices/fhir-servers";
 import { createSmartJwt } from "../backend/dbServices/smartOnFhir/lib";
 import { updateFhirServer } from "../backend/dbServices/fhir-servers";
+import { fetchWithoutSSL } from "./utils";
 /**
  * A client for querying a FHIR server.
  * @param server The FHIR server to query.
@@ -12,6 +13,7 @@ class FHIRClient {
   private hostname: string;
   private init: RequestInit;
   private serverConfig: FhirServerConfig;
+  private fetch: (url: string, options?: RequestInit) => Promise<Response>;
 
   constructor(server: string, configurations: FhirServerConfig[]) {
     // Find the configuration for the given server
@@ -24,19 +26,14 @@ class FHIRClient {
     this.serverConfig = config;
     this.hostname = config.hostname;
 
+    // Set up the appropriate fetch function
+    this.fetch = config.disable_cert_validation ? fetchWithoutSSL : fetch;
+
     // Set request initialization parameters
     this.init = {
       method: "GET",
       headers: config.headers ?? {},
     };
-
-    // Trust any configured server that has disabled SSL validation
-    if (config.disable_cert_validation) {
-      (this.init as RequestInit & { agent?: https.Agent }).agent =
-        new https.Agent({
-          rejectUnauthorized: false,
-        });
-    }
   }
 
   /**
@@ -57,7 +54,7 @@ class FHIRClient {
       name: "test",
       hostname: url,
       disable_cert_validation: disableCertValidation,
-      headers: {},
+      headers: authData?.headers || {},
     };
 
     // Add auth-related properties if auth data is provided
@@ -65,7 +62,9 @@ class FHIRClient {
       testConfig.auth_type = authData.authType;
 
       if (authData.authType === "basic" && authData.bearerToken) {
+        // Preserve existing headers while adding Authorization
         testConfig.headers = {
+          ...testConfig.headers,
           Authorization: `Bearer ${authData.bearerToken}`,
         };
       } else if (["client_credentials", "SMART"].includes(authData.authType)) {
@@ -122,12 +121,14 @@ class FHIRClient {
       }
 
       // Try to fetch the server's metadata
-      const response = await client.get("/metadata");
+      const response = await client.get("/Patient?_summary=count&_count=1");
 
       if (!response.ok) {
+        const errorText = await response.text();
+        console.error(`Error testing connection: ${errorText}`);
         return {
           success: false,
-          error: `Server returned ${response.status}: ${response.statusText}`,
+          error: `Server returned ${response.status}: ${errorText}`,
         };
       }
 
@@ -244,8 +245,7 @@ class FHIRClient {
       }
 
       // IMPORTANT: Use the formData object for the actual request
-      const response = await fetch(tokenEndpoint, requestInit);
-
+      const response = await this.fetch(tokenEndpoint, requestInit);
       // Get response as text first for debugging
       const responseText = await response.text();
 
@@ -291,7 +291,19 @@ class FHIRClient {
           this.serverConfig.hostname,
           this.serverConfig.disable_cert_validation,
           this.serverConfig.last_connection_successful,
-          tokenData.access_token,
+          {
+            authType: this.serverConfig.auth_type as
+              | "SMART"
+              | "client_credentials"
+              | "basic"
+              | "none",
+            clientId: this.serverConfig.client_id,
+            clientSecret: this.serverConfig.client_secret,
+            tokenEndpoint: this.serverConfig.token_endpoint,
+            scopes: this.serverConfig.scopes,
+            accessToken: tokenData.access_token, // Pass the access token
+            tokenExpiry: expiryIso, // Pass the token expiry
+          },
         );
       }
     } catch (error) {
@@ -326,7 +338,7 @@ class FHIRClient {
           });
       }
 
-      const response = await fetch(wellKnownUrl, requestInit);
+      const response = await this.fetch(wellKnownUrl, requestInit);
 
       if (!response.ok) {
         throw new Error(
@@ -356,7 +368,7 @@ class FHIRClient {
    */
   async get(path: string): Promise<Response> {
     await this.ensureValidToken();
-    const response = await fetch(this.hostname + path, this.init);
+    const response = await this.fetch(this.hostname + path, this.init);
     return response;
   }
 
@@ -368,7 +380,7 @@ class FHIRClient {
   async getBatch(paths: string[]): Promise<Response[]> {
     await this.ensureValidToken();
     return Promise.all(
-      paths.map((path) => fetch(this.hostname + path, this.init)),
+      paths.map((path) => this.fetch(this.hostname + path, this.init)),
     );
   }
 
@@ -391,7 +403,7 @@ class FHIRClient {
       body: searchParams.toString(),
     };
 
-    return fetch(this.hostname + path, requestOptions);
+    return this.fetch(this.hostname + path, requestOptions);
   }
 }
 

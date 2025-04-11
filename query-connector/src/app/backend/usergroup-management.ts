@@ -5,11 +5,12 @@ import {
   getSingleUserWithGroupMemberships,
 } from "./user-management";
 
-import { adminAccessCheck, superAdminAccessCheck } from "../utils/auth";
+import { adminAccessCheck } from "../utils/auth";
 import { getDbClient } from "./dbClient";
 import { QCResponse } from "../models/responses/collections";
 import { CustomUserQuery } from "../models/entities/query";
 import { getQueryById } from "./query-building";
+import { QueryResult } from "pg";
 
 const dbClient = getDbClient();
 
@@ -22,7 +23,7 @@ export async function createUserGroup(
   groupName: string,
 ): Promise<QCResponse<UserGroup>> {
   // TODO: https://linear.app/skylight-cdc/issue/QUE-216/refactor-user-management-code-into-service-class-pattern
-  if (!(await superAdminAccessCheck())) {
+  if (!(await adminAccessCheck())) {
     throw new Error("Unauthorized");
   }
 
@@ -68,7 +69,7 @@ export async function updateUserGroup(
   newName: string,
 ): Promise<UserGroup | string> {
   // TODO: https://linear.app/skylight-cdc/issue/QUE-216/refactor-user-management-code-into-service-class-pattern
-  if (!(await superAdminAccessCheck())) {
+  if (!(await adminAccessCheck())) {
     throw new Error("Unauthorized");
   }
 
@@ -125,7 +126,7 @@ export async function updateUserGroup(
  */
 export async function deleteUserGroup(id: string): Promise<UserGroup | string> {
   // TODO: https://linear.app/skylight-cdc/issue/QUE-216/refactor-user-management-code-into-service-class-pattern
-  if (!(await superAdminAccessCheck())) {
+  if (!(await adminAccessCheck())) {
     throw new Error("Unauthorized");
   }
 
@@ -237,6 +238,8 @@ export async function removeUsersFromGroup(
         const updatedUserWithGroups = await getSingleUserWithGroupMemberships(
           updatedUser.user_id,
         );
+        await dbClient.query("COMMIT");
+
         return updatedUserWithGroups.items[0];
       }),
     );
@@ -259,7 +262,7 @@ export async function saveUserGroupMembership(
   selectedUsers: string[],
 ): Promise<User[]> {
   // TODO: https://linear.app/skylight-cdc/issue/QUE-216/refactor-user-management-code-into-service-class-pattern
-  if (!(await superAdminAccessCheck())) {
+  if (!(await adminAccessCheck())) {
     throw new Error("Unauthorized");
   }
 
@@ -331,10 +334,18 @@ export async function getAllUserGroups(): Promise<QCResponse<UserGroup>> {
     `;
 
     const result = await dbClient.query(selectAllUserGroupQuery);
+    const groupsWithQueries = await Promise.all(
+      result.rows.map(async (group) => {
+        const groupQueries = await getAllGroupQueries(group.id);
+        group.queries = groupQueries.items;
+        await dbClient.query("COMMIT");
+        return group;
+      }),
+    );
 
     return {
       totalItems: result.rowCount,
-      items: result.rows,
+      items: groupsWithQueries,
     } as QCResponse<UserGroup>;
   } catch (error) {
     console.error("Error retrieving user groups:", error);
@@ -428,9 +439,13 @@ export async function getAllGroupQueries(
       return formattedQuery;
     });
 
+    
+    const queriesWithGroups = await fetchQueryGroupAssignmentDetails(result);
+
+    
     return {
       totalItems: result.rowCount,
-      items: groupQueries,
+      items: queriesWithGroups,
     } as QCResponse<CustomUserQuery>;
   } catch (error) {
     throw error;
@@ -481,6 +496,8 @@ export async function addQueriesToGroup(
         const updatedUserWithGroups = await getSingleQueryGroupAssignments(
           updatedQuery.query_id,
         );
+        await dbClient.query("COMMIT");
+
         return updatedUserWithGroups.items[0];
       }),
     );
@@ -521,6 +538,7 @@ export async function removeQueriesFromGroup(
         const updatedUserWithGroups = await getSingleQueryGroupAssignments(
           updatedQuery.query_id,
         );
+        await dbClient.query("COMMIT");
 
         return updatedUserWithGroups.items[0];
       }),
@@ -598,4 +616,27 @@ export async function getSingleQueryGroupAssignments(
     console.error("Error fetching groups for query:", error);
     throw error;
   }
+}
+
+/**
+ * Retrieves group assignment data for the given queries and formats it on the CustomUserQuery object
+ * @param queryList - The queries whose group assignments we are retrieving
+ * @returns The updated query record list or an error if the update fails.
+ */
+async function fetchQueryGroupAssignmentDetails(queryList: QueryResult) {
+  const queries = await Promise.all(
+    queryList.rows.map(async (query) => {
+      try {
+        const groupWithQuery = await getSingleQueryGroupAssignments(
+          query.query_id,
+        );
+        return groupWithQuery.items[0];
+      } catch (error) {
+        console.error(error);
+        throw error;
+      }
+    }),
+  );
+
+  return queries;
 }

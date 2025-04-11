@@ -55,23 +55,26 @@ const UserManagementDrawer: React.FC<UserManagementDrawerProps> = ({
 
   const role = getRole();
   const renderQueries = (queries: CustomUserQuery[]) => {
-    if (queries.length > 0) {
+    const groupQueries = teamQueryEditSection.subjectData as CustomUserQuery[];
+
+    if (queries.length > 0 && teamQueryEditSection.groupId) {
       return (
         <ul
           aria-description={`queries for ${teamQueryEditSection.title}`}
           className={classNames("usa-list--unstyled", "margin-top-2")}
         >
           {queries.map((query) => {
-            const isAssignedToGroup = query.groupAssignments?.some((q) => {
-              return q.is_member;
-            });
+            const isAssignedToGroup = groupQueries.some(
+              (gq) => gq.query_id == query.query_id,
+            );
+
             return (
               <li key={query.query_id}>
                 <Checkbox
                   id={query.query_id}
                   name={query.query_name}
                   label={`${query.query_name}`}
-                  defaultChecked={isAssignedToGroup}
+                  defaultChecked={!!isAssignedToGroup}
                   onChange={handleToggleQuery}
                   className={classNames("margin-bottom-3", style.checkbox)}
                 />
@@ -136,9 +139,7 @@ const UserManagementDrawer: React.FC<UserManagementDrawerProps> = ({
 
   function generateContent(): JSX.Element {
     const isMemberView = teamQueryEditSection.subjectType == "Members";
-    return isMemberView
-      ? renderUsers(users)
-      : renderQueries(teamQueryEditSection.subjectData as CustomUserQuery[]);
+    return isMemberView ? renderUsers(users) : renderQueries(allQueries);
   }
 
   async function handleToggleMembership(

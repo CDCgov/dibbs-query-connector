@@ -135,6 +135,8 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({
   }
 
   const queries = (queriesContext?.data || []) as CustomUserQuery[];
+  queries.sort((a, b) => (a.query_name[0] > b.query_name[0] ? 1 : -1));
+
   return (
     <>
       {queries.length === 0 && !unauthorizedError ? (

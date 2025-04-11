@@ -1,4 +1,4 @@
-import { FhirQueryResponse } from "../../../shared/query-service";
+import { PatientRecordsResponse } from "../../../shared/query-service";
 import ResultsViewSideNav, {
   NavSection,
 } from "./resultsView/ResultsViewSideNav";
@@ -19,7 +19,7 @@ import { CustomUserQuery } from "@/app/models/entities/query";
 import Skeleton from "react-loading-skeleton";
 
 type ResultsViewProps = {
-  fhirQueryResponse: FhirQueryResponse;
+  patientRecordsResponse: PatientRecordsResponse | undefined;
   selectedQuery: CustomUserQuery;
   goBack: () => void;
   goToBeginning: () => void;
@@ -35,7 +35,7 @@ export type ResultsViewAccordionItem = {
 /**
  * The QueryView component to render the query results.
  * @param props - The props for the QueryView component.
- * @param props.fhirQueryResponse - The response from the query service.
+ * @param props.patientRecordsResponse - The response from the query service.
  * @param props.goBack - The function to go back to the previous page.
  * @param props.goToBeginning - Function to return to patient discover
  * @param props.selectedQuery - query that's been selected to view for results
@@ -43,7 +43,7 @@ export type ResultsViewAccordionItem = {
  * @returns The QueryView component.
  */
 const ResultsView: React.FC<ResultsViewProps> = ({
-  fhirQueryResponse,
+  patientRecordsResponse,
   selectedQuery,
   goBack,
   goToBeginning,
@@ -53,25 +53,27 @@ const ResultsView: React.FC<ResultsViewProps> = ({
     window.scrollTo(0, 0);
   }, []);
 
-  const accordionItems =
-    mapQueryResponseToAccordionDataStructure(fhirQueryResponse);
+  const accordionItems = mapQueryResponseToAccordionDataStructure(
+    patientRecordsResponse,
+  );
 
-  const sideNavContent = accordionItems
-    .map((item) => {
-      if (item.content) {
-        return { title: item.title, subtitle: item?.subtitle };
-      }
-    })
-    .filter((i) => Boolean(i)) as NavSection[];
-
+  const sideNavContent =
+    accordionItems &&
+    (accordionItems
+      .map((item) => {
+        if (item.content) {
+          return { title: item.title, subtitle: item?.subtitle };
+        }
+      })
+      .filter((i) => Boolean(i)) as NavSection[]);
   return (
     <>
       <div className={`${styles.resultsBannerContent}`}>
         {loading ? (
-          <>
+          <div data-testid={"banner-loading-skeleton"}>
             <Skeleton width={150} />
             <Skeleton width={200} height={50} />
-          </>
+          </div>
         ) : (
           <>
             <Backlink
@@ -109,8 +111,9 @@ const ResultsView: React.FC<ResultsViewProps> = ({
 export default ResultsView;
 
 function mapQueryResponseToAccordionDataStructure(
-  resultsQueryResponse: FhirQueryResponse,
+  resultsQueryResponse: PatientRecordsResponse | undefined,
 ) {
+  if (resultsQueryResponse === undefined) return [];
   const patient =
     resultsQueryResponse.Patient && resultsQueryResponse.Patient.length === 1
       ? resultsQueryResponse.Patient[0]

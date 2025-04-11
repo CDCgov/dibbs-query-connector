@@ -4,6 +4,9 @@ import { importPKCS8, SignJWT } from "jose";
 import crypto from "crypto";
 import { generateKeyPair, exportJWK, exportPKCS8 } from "jose";
 
+export const DEFAULT_LOCAL_JWKS_HOSTNAME =
+  "http://host.docker.internal:3000/.well-known/jwks.json";
+
 /**
  * Get the JWKS data from the file system
  * @returns The JWKS data
@@ -85,7 +88,7 @@ export async function createSmartJwt(clientId: string, tokenEndpoint: string) {
     // Determine the JWKS URL - make sure this is an absolute URL that Aidbox can reach
     const jku = process.env.APP_HOSTNAME
       ? `${process.env.APP_HOSTNAME}/.well-known/jwks.json`
-      : `http://host.docker.internal:3000/.well-known/jwks.json`;
+      : DEFAULT_LOCAL_JWKS_HOSTNAME;
 
     // Create payload
     const payload = {

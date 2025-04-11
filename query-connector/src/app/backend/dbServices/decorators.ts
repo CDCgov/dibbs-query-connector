@@ -1,60 +1,6 @@
 import { adminAccessCheck, superAdminAccessCheck } from "@/app/utils/auth";
 import { getDbClient } from "../dbClient";
-
-/**
- * Decorator that adds audit log write logic to an annotated function
- * @param async - whether the method is async. Defaults to false
- * @returns The result of the function, with the args / result logged appropriately
- */
-export function auditable(async = false) {
-  return function (_: Object, key: string, descriptor: PropertyDescriptor) {
-    const dbConnection = getDbClient();
-    const method = descriptor.value;
-
-    const logAndReturnResult = (resultToLog: unknown, args?: unknown[]) => {
-      // would replace the below round trip to the DB with the actual write to
-      // the table
-      const query = "SELECT * FROM conditions";
-      const result = dbConnection.query(query);
-
-      result.then((v) => {
-        console.log(v.rows[0]); // in case we need to do anything with the db response
-        console.log("To add to audit log: ", resultToLog); // can write the result
-        if (args) {
-          console.log("Args to add to the audit log log: ", args); // or the args
-        }
-      });
-
-      return resultToLog;
-    };
-    // need to do this check so that async vs sync returns are properly typed
-    descriptor.value = async
-      ? async function (this: unknown, ...args: unknown[]) {
-          try {
-            const resultToLog = await method.apply(this, args);
-            logAndReturnResult("", args);
-
-            return resultToLog;
-          } catch (error) {
-            console.error(`Async method ${key} threw error`, error);
-            throw error;
-          }
-        }
-      : function (this: unknown, ...args: unknown[]) {
-          try {
-            const resultToLog = method.apply(this, args);
-            logAndReturnResult(resultToLog);
-
-            return resultToLog;
-          } catch (error) {
-            console.error(`Async method ${key} threw error`, error);
-            throw error;
-          }
-        };
-
-    return descriptor;
-  };
-}
+import { QueryResult } from "pg";
 
 /**
  * Annotation to make a db query into a transaction. Requires all return branches
@@ -169,4 +115,67 @@ export function adminRequired(
   };
 
   return descriptor;
+}
+
+/**
+ * Annotation that camelCases any column_names coming back from DB reads
+ * @param _ - class prototype the annotation is hoisted into
+ * @param key - the name of the method
+ * @param descriptor - metadata for the method, which has restrictions on the
+ * return type
+ * @returns - objects from the database with the column names camel cased
+ */
+export function camelCaseDbColumnNames<T extends Record<string, unknown>>(
+  _: Object,
+  key: string,
+  descriptor: TypedPropertyDescriptor<
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (...args: any[]) => Promise<QueryResult<any>>
+  >,
+) {
+  const method = descriptor.value;
+
+  descriptor.value = async function (
+    ...args: unknown[]
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ): Promise<QueryResult<any>> {
+    try {
+      const result = method && (await method.apply(this, args));
+
+      if (result === undefined || result?.rows === undefined) {
+        throw Error(
+          "Database read in camel casing formatting function returned undefined",
+        );
+      }
+
+      result.rows = result.rows.map((v) => {
+        const val: Record<string, unknown> = {};
+        Object.entries(v).forEach(([k, v]) => {
+          val[underscoreToCamelCase(k)] = v;
+        });
+
+        return val as T;
+      });
+
+      return result;
+    } catch (error) {
+      console.error(error);
+
+      return {
+        command: "",
+        rowCount: 0,
+        oid: 0,
+        rows: [] as T[],
+        fields: [],
+      };
+    }
+  };
+
+  return descriptor;
+}
+
+function underscoreToCamelCase(str: string) {
+  return str.replace(/_+([a-z])/g, function (_, letter) {
+    return letter.toUpperCase();
+  });
 }

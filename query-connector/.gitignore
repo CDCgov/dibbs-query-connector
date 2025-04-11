@@ -7,7 +7,6 @@ certificates
 /blob-report/
 /playwright/.cache/
 /coverage
-report.json
 .tool-versions
 keys/
 logs-after-tests.txt

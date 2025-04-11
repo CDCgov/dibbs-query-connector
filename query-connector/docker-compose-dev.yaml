@@ -59,7 +59,7 @@ services:
       POSTGRES_PASSWORD: gOxAmiyiz4
 
   aidbox:
-    image: healthsamurai/aidboxone:edge
+    image: healthsamurai/aidboxone:stable
     pull_policy: always
     depends_on:
       - aidbox_db
@@ -85,7 +85,7 @@ services:
       PGPASSWORD: gOxAmiyiz4
       PGPORT: "5432"
       BOX_SEARCH_INCLUDE_CONFORMANT: true
-      JAVA_TOOL_OPTIONS: "-XX:UseSVE=0"
+      JAVA_TOOL_OPTIONS: ${JAVA_TOOL_OPTIONS:-}
     env_file:
       - .env
   aidbox-seeder:
@@ -96,6 +96,7 @@ services:
       - ./src/app/tests/assets/GoldenSickPatient.json:/data/GoldenSickPatient.json
     environment:
       - AIDBOX_BASE_URL=http://localhost:8080
+      - APP_HOSTNAME=http://host.docker.internal:3000
     depends_on:
       db:
         condition: service_healthy

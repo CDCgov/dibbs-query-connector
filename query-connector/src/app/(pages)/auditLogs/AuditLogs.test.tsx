@@ -2,9 +2,68 @@ import { screen, within, waitFor } from "@testing-library/react";
 import AuditLogs from "./page";
 import { renderWithUser, RootProviderMock } from "@/app/tests/unit/setup";
 import userEvent from "@testing-library/user-event";
+import { getAuditLogs, LogEntry } from "@/app/backend/dbServices/audit-logs";
 
 const TEST_NAME = "Rocky Balboa";
 const TEST_REPORT = "Created Report";
+const NUM_ROWS = 26;
+const CHECKSUM_INPUT =
+  "It ain't about how hard you hit, it's about how hard you can get hit and keep moving forward";
+
+const BASE_TEST_DATA: LogEntry[] = [
+  {
+    author: "Rocky Balboa",
+    actionType: "Created Report",
+    auditMessage: { parameter: "value" },
+    auditChecksum: CHECKSUM_INPUT,
+    createdAt: new Date("2025-03-10T14:30:00Z"),
+  },
+  {
+    author: "Apollo Creed",
+    actionType: "Edited Report",
+    auditMessage: { parameter: "value" },
+    auditChecksum: CHECKSUM_INPUT,
+    createdAt: new Date("2025-03-09T09:15:00Z"),
+  },
+  {
+    author: "Rocky Balboa",
+    actionType: "Deleted Entry",
+    auditMessage: { parameter: "value" },
+    auditChecksum: CHECKSUM_INPUT,
+    createdAt: new Date("2022-03-08T17:45:00Z"),
+  },
+  {
+    author: "Clubber Lang",
+    actionType: "Created Report",
+    auditMessage: { parameter: "value" },
+    auditChecksum: CHECKSUM_INPUT,
+    createdAt: new Date("2024-03-07T12:00:00Z"),
+  },
+  {
+    author: "Ivan Drago",
+    actionType: "Viewed Entry",
+    auditMessage: { parameter: "value" },
+    auditChecksum: CHECKSUM_INPUT,
+    createdAt: new Date("2025-03-06T22:10:00Z"),
+  },
+];
+
+const testData = Array.from({ length: 50 }, (_, index) =>
+  BASE_TEST_DATA.map((entry) => ({
+    ...entry,
+    date: new Date(entry.createdAt.getTime() + index * 86400000),
+  })),
+)
+  .flat()
+  .sort((a, b) => b.date.getTime() - a.date.getTime());
+
+jest.mock("@/app/backend/dbServices/audit-logs", () => {
+  return {
+    __esModule: true,
+    ...jest.requireActual("@/app/backend/dbServices/audit-logs"),
+    getAuditLogs: jest.fn(),
+  };
+});
 
 /**
  * Creates an enhanced user event with custom helper methods.
@@ -37,14 +96,21 @@ const createUserWithHelpers = (user: ReturnType<typeof userEvent.setup>) => ({
 
 describe("AuditLogs Component", () => {
   let user: ReturnType<typeof createUserWithHelpers>;
+  (getAuditLogs as jest.Mock).mockResolvedValue(testData);
 
-  beforeEach(() => {
+  beforeEach(async () => {
     const renderResult = renderWithUser(
       <RootProviderMock currentPage="/auditLogs">
         <AuditLogs />
       </RootProviderMock>,
     );
     user = createUserWithHelpers(renderResult.user);
+
+    await waitFor(() => {
+      expect(
+        renderResult.getByText("Showing", { exact: false }),
+      ).toBeInTheDocument();
+    });
   });
 
   test("renders the audit logs table", async () => {
@@ -124,7 +190,7 @@ describe("AuditLogs Component", () => {
 
     await waitFor(() => {
       const rows = screen.getAllByRole("row");
-      expect(rows.length).toBe(26); // 25 logs + 1 header row
+      expect(rows.length).toBe(NUM_ROWS);
     });
   });
 
@@ -145,6 +211,98 @@ describe("AuditLogs Component", () => {
 
     await waitFor(() => {
       expect(screen.getByRole("table")).toBeInTheDocument();
+    });
+  });
+
+  test("updates start and end date inputs", async () => {
+    await screen.findByText("Audit Log");
+
+    const startInput = screen.getByRole("textbox", {
+      name: /date range input/i,
+    });
+    await user.click(startInput);
+
+    const resolvedStart = document.getElementById(
+      "log-date-start",
+    ) as HTMLInputElement;
+    const resolvedEnd = document.getElementById(
+      "log-date-end",
+    ) as HTMLInputElement;
+
+    expect(resolvedStart).toBeInTheDocument();
+    expect(resolvedEnd).toBeInTheDocument();
+
+    await user.clear(resolvedStart);
+    await user.type(resolvedStart, "02/28/2025");
+
+    await user.clear(resolvedEnd);
+    await user.type(resolvedEnd, "03/01/2025");
+
+    await waitFor(() => {
+      expect(resolvedStart.value).toBe("2/28/2025");
+      expect(resolvedEnd.value).toBe("3/1/2025");
+    });
+  });
+
+  test("clears both start and end dates when Clear is clicked", async () => {
+    await screen.findByText("Audit Log");
+
+    const input = screen.getByRole("textbox", { name: /date range input/i });
+    await user.click(input);
+
+    const resolvedStart = document.getElementById(
+      "log-date-start",
+    ) as HTMLInputElement;
+    const resolvedEnd = document.getElementById(
+      "log-date-end",
+    ) as HTMLInputElement;
+
+    await user.clear(resolvedStart);
+    await user.type(resolvedStart, "02/28/2025");
+
+    await user.clear(resolvedEnd);
+    await user.type(resolvedEnd, "03/01/2025");
+
+    const clearButton = screen.getByTestId("date-range-clear-button");
+    await user.click(clearButton);
+
+    await waitFor(() => {
+      const newStart = document.getElementById(
+        "log-date-start",
+      ) as HTMLInputElement;
+      const newEnd = document.getElementById(
+        "log-date-end",
+      ) as HTMLInputElement;
+
+      expect(newStart).toBe(null);
+      expect(newEnd).toBe(null);
+    });
+  });
+
+  test("shows validation message for invalid start date format", async () => {
+    await screen.findByText("Audit Log");
+
+    const startInput = screen.getByRole("textbox", {
+      name: /date range input/i,
+    });
+    await user.click(startInput);
+
+    const resolvedStart = document.getElementById(
+      "log-date-start",
+    ) as HTMLInputElement;
+    const resolvedEnd = document.getElementById(
+      "log-date-end",
+    ) as HTMLInputElement;
+
+    await user.clear(resolvedStart);
+    await user.type(resolvedStart, "invalid-date");
+
+    await user.clear(resolvedEnd);
+    await user.type(resolvedEnd, "03/01/2025");
+
+    await waitFor(() => {
+      const alert = screen.getByRole("alert");
+      expect(alert).toHaveTextContent("Invalid start date format");
     });
   });
 });

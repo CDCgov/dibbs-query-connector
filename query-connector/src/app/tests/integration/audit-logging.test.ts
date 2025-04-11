@@ -1,18 +1,29 @@
-import {
-  addUserIfNotExists,
-  updateUserRole,
-} from "@/app/backend/user-management";
 import { auth } from "@/auth";
 import { Bundle, BundleEntry, Patient } from "fhir/r4";
-import { getDbClient } from "@/app/backend/dbClient";
-import { POST } from "@/app/api/query/route";
 import { readJsonFile } from "../shared_utils/readJsonFile";
-import { USE_CASE_DETAILS } from "@/app/shared/constants";
-import { UserRole } from "@/app/models/entities/users";
-import { createNextRequest } from "./api-query.test";
+import { hyperUnluckyPatient, USE_CASE_DETAILS } from "@/app/shared/constants";
+import {
+  patientDiscoveryQuery,
+  PatientDiscoveryRequest,
+  patientRecordsQuery,
+  PatientRecordsRequest,
+} from "@/app/shared/query-service";
+import { getDbClient } from "@/app/backend/dbClient";
+import {
+  AUDIT_LOG_MAX_RETRIES,
+  auditable,
+} from "@/app/backend/auditLogs/decorator";
+import * as DecoratorUtils from "@/app/backend/auditLogs/lib";
 import { suppressConsoleLogs } from "./fixtures";
 
 const dbClient = getDbClient();
+
+jest.mock("@/app/backend/auditLogs/lib", () => {
+  return {
+    __esModule: true,
+    ...jest.requireActual("@/app/backend/auditLogs/lib"),
+  };
+});
 
 jest.mock("@/app/utils/auth", () => {
   return {
@@ -39,39 +50,152 @@ if (!PatientResource || PatientResource.resourceType !== "Patient") {
   throw new Error("Invalid Patient resource in the test bundle.");
 }
 
-const SYPHILIS_QUERY_ID = USE_CASE_DETAILS.syphilis.id;
-
-describe("Audit Logging Integration Tests", () => {
-  beforeAll(async () => {
+describe("audit log", () => {
+  beforeAll(() => {
     suppressConsoleLogs();
-    await dbClient.query("BEGIN");
   });
 
-  afterAll(async () => {
-    await dbClient.query("ROLLBACK");
+  afterAll(() => {
+    jest.resetAllMocks();
   });
 
-  test("should find user and know their role", async () => {
-    const result = await addUserIfNotExists(TEST_USER);
-    const createdUserId = result.id;
+  it("patient discovery query should generate an audit entry", async () => {
+    const auditQuery = "SELECT * FROM audit_logs;";
+    const auditRows = await dbClient.query(auditQuery);
 
-    const newresult = await updateUserRole(createdUserId, UserRole.SUPER_ADMIN);
-    expect(newresult.items![0]).toHaveProperty("qc_role", UserRole.SUPER_ADMIN);
+    const request: PatientDiscoveryRequest = {
+      fhir_server: "Aidbox",
+      first_name: hyperUnluckyPatient.FirstName,
+      last_name: hyperUnluckyPatient.LastName,
+      dob: hyperUnluckyPatient.DOB,
+      mrn: hyperUnluckyPatient.MRN,
+      phone: hyperUnluckyPatient.Phone,
+    };
+    await patientDiscoveryQuery(request);
+
+    const newAuditRows = await dbClient.query(auditQuery);
+
+    const addedVal = newAuditRows.rows.filter((item) => {
+      if (!auditRows.rows.map((v) => v.id).includes(item.id)) {
+        return item;
+      }
+    });
+
+    expect(addedVal[0]?.action_type).toBe("patientDiscoveryQuery");
+    expect(addedVal[0]?.audit_message).toStrictEqual({
+      request: JSON.stringify(request),
+    });
   });
-});
 
-describe("Audit Log of POST Query to FHIR Server", () => {
-  it("should create an audit log if query is successful", async () => {
-    const request = createNextRequest(
-      PatientResource,
-      new URLSearchParams(
-        `id=${SYPHILIS_QUERY_ID}&fhir_server=HELIOS Meld: Direct`,
-      ),
+  it("patient records query should generate an audit entry", async () => {
+    const auditQuery = "SELECT * FROM audit_logs;";
+    const auditRows = await dbClient.query(auditQuery);
+
+    const request: PatientRecordsRequest = {
+      fhir_server: "Aidbox",
+      patient_id: hyperUnluckyPatient.Id,
+      query_name: USE_CASE_DETAILS.gonorrhea.queryName,
+    };
+    await patientRecordsQuery(request);
+
+    const newAuditRows = await dbClient.query(auditQuery);
+
+    const addedVal = newAuditRows.rows.filter((item) => {
+      if (!auditRows.rows.map((v) => v.id).includes(item.id)) {
+        return item;
+      }
+    });
+
+    expect(addedVal[0]?.action_type).toBe("patientRecordsQuery");
+    expect(addedVal[0]?.audit_message).toStrictEqual({
+      request: JSON.stringify(request),
+    });
+
+    expect(addedVal[0]?.audit_checksum).toMatch(/^[a-f0-9]{64}$/);
+  });
+
+  it("an audited function should retries successfully", async () => {
+    const auditGenerationSpy = jest.spyOn(
+      DecoratorUtils,
+      "generateAuditValues",
     );
-    const response = await POST(request);
-    const body = await response.json();
-    expect(body.resourceType).toBe("Bundle");
-    //TO DO = once there's an actual DB write, we can check that the auditable query shows up as it should.
-    //Right now, it's generating console logs in the terminal, which doesn't make sense to test.
+
+    const querySpy = jest.spyOn(dbClient, "query");
+
+    // generate errors within the query write AUDIT_LOG_MAX_RETRIES - 1 times
+    for (let i = 0; i < AUDIT_LOG_MAX_RETRIES; i++) {
+      querySpy.mockImplementationOnce(() => {
+        throw new Error("test error");
+      });
+    }
+
+    class MockClass {
+      @auditable
+      testFunction() {
+        return;
+      }
+    }
+
+    const testObj = new MockClass();
+    testObj.testFunction();
+
+    await new Promise((r) => setTimeout(r, 6000));
+    expect(auditGenerationSpy).toHaveBeenCalledTimes(AUDIT_LOG_MAX_RETRIES);
+  }, 10000);
+
+  it("should generate the correct checksum based on stored message and timestamp", async () => {
+    const auditQuery =
+      "SELECT * FROM audit_logs ORDER BY created_at DESC LIMIT 1;";
+    const result = await dbClient.query(auditQuery);
+
+    if (!result || !result.rows || result.rows.length === 0) {
+      throw new Error(
+        "No audit logs found. Ensure an audited action ran before this test.",
+      );
+    }
+
+    const latestAudit = result.rows[0];
+
+    expect(latestAudit.audit_checksum).toMatch(/^[a-f0-9]{64}$/);
+
+    const parsedMessage =
+      typeof latestAudit.audit_message === "string"
+        ? JSON.parse(latestAudit.audit_message)
+        : latestAudit.audit_message;
+
+    const recomputedChecksum = DecoratorUtils.generateAuditChecksum(
+      latestAudit.author,
+      parsedMessage,
+      new Date(latestAudit.created_at).toISOString(),
+    );
+    expect(latestAudit.audit_checksum).toBe(recomputedChecksum);
+  });
+
+  it("should block UPDATEs and DELETE for audit_logs", async () => {
+    const request: PatientDiscoveryRequest = {
+      fhir_server: "Aidbox",
+      first_name: hyperUnluckyPatient.FirstName,
+      last_name: hyperUnluckyPatient.LastName,
+      dob: hyperUnluckyPatient.DOB,
+      mrn: hyperUnluckyPatient.MRN,
+      phone: hyperUnluckyPatient.Phone,
+    };
+
+    await patientDiscoveryQuery(request);
+
+    const result = await dbClient.query(
+      "SELECT * FROM audit_logs ORDER BY created_at DESC LIMIT 1",
+    );
+    const insertedId = result.rows[0].id;
+
+    await expect(
+      dbClient.query(`UPDATE audit_logs SET author = 'hacker' WHERE id = $1`, [
+        insertedId,
+      ]),
+    ).rejects.toThrow(/UPDATEs to audit_logs are not permitted/i);
+
+    await expect(
+      dbClient.query(`DELETE FROM audit_logs WHERE id = $1`, [insertedId]),
+    ).rejects.toThrow(/DELETEs from audit_logs are not permitted/i);
   });
 });

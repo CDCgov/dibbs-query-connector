@@ -111,8 +111,13 @@ export async function updateUserDetails(
       return { msg: "Unable to update user", userId: userId };
     }
 
-    const { username, qc_role } = userExists.rows[0];
-    if (username !== updated_userName || qc_role !== updated_role) {
+    const { username, qc_role, first_name, last_name } = userExists.rows[0];
+    if (
+      username !== updated_userName ||
+      qc_role !== updated_role ||
+      first_name !== updated_firstName ||
+      last_name !== updated_lastName
+    ) {
       const insertUserQuery = `
         UPDATE users
         SET 
@@ -389,7 +394,7 @@ export async function getSingleUserWithGroupMemberships(
 export async function getAllUsersWithSingleGroupStatus(
   groupId: string,
 ): Promise<User[]> {
-  if (!(await superAdminAccessCheck())) {
+  if (!(await adminAccessCheck())) {
     throw new Error("Unauthorized");
   }
 

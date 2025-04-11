@@ -23,9 +23,9 @@ ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm ci
 RUN npm run build
 
-# Download jwksetinfer tool
+# Download jwkset tool
 RUN git clone https://github.com/MicahParks/jwkset.git \
-    && cd jwkset/cmd/jwksetinfer \
+    && cd jwkset/cmd/jwkset \
     && go build
 
 # Final stage for running the app
@@ -43,7 +43,10 @@ RUN ln -s /flyway/flyway /usr/local/bin/flyway
 # Don't run production as root
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
-USER nextjs
+
+# Ensure writable directories
+RUN mkdir -p /app /data /logs && \
+    chown -R nextjs:nodejs /app /data /logs
 
 # Set hostname to localhost
 ENV HOSTNAME="0.0.0.0"
@@ -54,13 +57,21 @@ COPY --from=installer /app/package.json .
 COPY --from=installer /app/flyway/conf/flyway.conf ../flyway/conf/flyway.conf
 COPY --from=installer /app/flyway/sql ../flyway/sql
 COPY --from=installer /app/src/app/assets ./.next/server/app/assets
-COPY --from=installer /app/jwkset/cmd/jwksetinfer/jwksetinfer /usr/local/bin/jwksetinfer
+COPY --from=installer /app/jwkset/cmd/jwkset/jwkset /usr/local/bin/jwkset
 
 # Automatically leverage output traces to reduce image size
 COPY --from=installer --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=installer --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=installer --chown=nextjs:nodejs /app/public ./public
 COPY --from=installer --chown=nextjs:nodejs /app/start.sh ./start.sh
+COPY --from=installer --chown=nextjs:nodejs /app/keys ./keys
+
+RUN mkdir -p .next/static public && \
+    chown -R nextjs:nodejs .next/static public
+
+USER nextjs
+
+
 RUN ls -R
 # Set environment variables for Flyway and Node.js telemetry
 ENV NEXT_TELEMETRY_DISABLED=1

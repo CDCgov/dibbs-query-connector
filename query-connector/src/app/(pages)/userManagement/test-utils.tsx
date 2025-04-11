@@ -4,6 +4,7 @@ import { UserRole, User } from "@/app/models/entities/users";
 import UserPermissionsTable from "./components/userPermissionsTable/userPermissionsTable";
 import UserGroupsTable from "./components/userGroupsTable/UserGroupsTable";
 import { QueryTableResult } from "../queryBuilding/utils";
+import { CustomUserQuery } from "@/app/models/entities/query";
 
 // User Mocks
 export const mockSuperAdmin = {
@@ -90,6 +91,7 @@ export const mockPermissionsTab: Tab = {
         setUsers={jest.fn()}
         users={[mockAdmin, mockSuperAdmin]}
         fetchGroupMembers={jest.fn()}
+        openModal={jest.fn()}
       />,
     ),
 };
@@ -104,6 +106,30 @@ export const mockGroupsTab: Tab = {
         userGroups={[mockGroupBasic]}
         fetchGroupMembers={jest.fn().mockReturnValue(mockAdmin)}
         fetchGroupQueries={jest.fn()}
+        openModal={jest.fn()}
       />,
     ),
+};
+
+// Query Mocks
+export const mockQueryNoGroups: CustomUserQuery = {
+  query_id: "q1",
+  query_name: "Test Query 1",
+  conditions_list: [],
+  valuesets: [],
+};
+
+export const mockQueryWithGroups: CustomUserQuery = {
+  query_id: "q2",
+  query_name: "Test Query 2",
+  conditions_list: [],
+  valuesets: [],
+  groupAssignments: [
+    {
+      membership_id: `q2_${mockGroupSingle.id}`,
+      usergroup_name: mockGroupSingle.name,
+      usergroup_id: mockGroupSingle.id,
+      is_member: true,
+    },
+  ],
 };

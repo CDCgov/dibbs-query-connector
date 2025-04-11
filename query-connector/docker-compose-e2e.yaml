@@ -38,7 +38,7 @@ services:
       POSTGRES_PASSWORD: gOxAmiyiz4
 
   aidbox:
-    image: healthsamurai/aidboxone:edge
+    image: healthsamurai/aidboxone:stable
     pull_policy: always
     depends_on:
       - aidbox_db
@@ -76,8 +76,6 @@ services:
       - ./logs:/var/log
     env_file:
       - .env
-    environment:
-      - AIDBOX_BASE_URL=http://aidbox:8080
     depends_on:
       db:
         condition: service_healthy
