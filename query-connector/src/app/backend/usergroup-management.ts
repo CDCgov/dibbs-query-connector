@@ -440,7 +440,6 @@ export async function getAllGroupQueries(
     });
 
     const queriesWithGroups = await fetchQueryGroupAssignmentDetails(result);
-
     return {
       totalItems: result.rowCount,
       items: queriesWithGroups,
