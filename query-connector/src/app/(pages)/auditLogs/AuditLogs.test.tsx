@@ -321,4 +321,25 @@ describe("AuditLogs Component", () => {
       expect(alert).toHaveTextContent("Invalid start date format");
     });
   });
+
+  test("opens drawer on row click and closes", async () => {
+    const rows = await screen.findAllByRole("row");
+    const firstRow = rows[1];
+    await user.click(firstRow);
+
+    await waitFor(() => {
+      expect(screen.getByTestId("drawer-title")).toHaveTextContent(
+        "Full JSON request",
+      );
+    });
+
+    const closeButton = screen.getByTestId("close-drawer");
+    await user.click(closeButton);
+
+    await waitFor(() => {
+      const drawer = screen.getByTestId("drawer-open-false");
+      expect(drawer.className).toContain("closed");
+      expect(drawer.className).not.toContain("open");
+    });
+  });
 });
