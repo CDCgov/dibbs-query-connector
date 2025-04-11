@@ -7,8 +7,6 @@ export type LogEntry = {
   author: string;
   auditMessage: { [argLabel: string]: string };
   createdAt: Date;
-  firstName: string;
-  lastName: string;
 };
 
 class AuditLogService extends dbService {
