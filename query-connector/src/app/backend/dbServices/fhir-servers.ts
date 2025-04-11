@@ -4,7 +4,7 @@ import { getDbClient } from "../dbClient";
 import { transaction } from "./decorators";
 import { FhirServerConfig } from "@/app/models/entities/fhir-servers";
 import { superAdminAccessCheck } from "@/app/utils/auth";
-import { auditable } from "@/app/auditLogs/decorator";
+import { auditable } from "@/app/backend/auditLogs/decorator";
 
 // Define an interface for authentication data
 export interface AuthData {
@@ -16,6 +16,7 @@ export interface AuthData {
   scopes?: string;
   accessToken?: string;
   tokenExpiry?: string;
+  headers?: Record<string, string>;
 }
 
 class FhirServerConfigService {

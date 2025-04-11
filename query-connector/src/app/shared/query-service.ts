@@ -10,7 +10,7 @@ import { getSavedQueryByName } from "./database-service";
 import type { QueryDataColumn } from "../(pages)/queryBuilding/utils";
 import { getFhirServerConfigs } from "../backend/dbServices/fhir-servers";
 import { DibbsValueSet } from "../models/entities/valuesets";
-import { auditable } from "../auditLogs/decorator";
+import { auditable } from "../backend/auditLogs/decorator";
 import FHIRClient from "./fhirClient";
 import { FhirServerConfig } from "../models/entities/fhir-servers";
 
@@ -364,9 +364,7 @@ class QueryService {
     // Check for errors
     if (fhirResponse.status !== 200) {
       console.error(
-        `Patient search failed. Status: ${fhirResponse.status} \n Body: ${
-          fhirResponse.text
-        } \n Headers: ${JSON.stringify(
+        `Patient search failed. Status: ${fhirResponse.status} \n Body: ${await fhirResponse.text()} \n Headers: ${JSON.stringify(
           Object.fromEntries(fhirResponse.headers.entries()),
         )}`,
       );
