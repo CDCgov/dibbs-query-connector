@@ -35,8 +35,7 @@ describe("User Group and Query Membership Tests", () => {
       INSERT INTO users (id, username, first_name, last_name, qc_role)
       VALUES
         ($1, 'QtheMagnificent', 'Q', 'Omnipotent', 'Super Admin'),
-        ($2, 'mamaTroi', 'Lwaxana', 'Troi', 'Standard User'),
-
+        ($2, 'mamaTroi', 'Lwaxana', 'Troi', 'Standard User');
     `;
     await dbClient.query(insertUsersQuery, [TEST_USER_1_ID, TEST_USER_2_ID]);
 

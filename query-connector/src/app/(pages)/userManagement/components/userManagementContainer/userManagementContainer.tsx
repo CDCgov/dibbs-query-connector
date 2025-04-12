@@ -185,10 +185,11 @@ const UsersTable: React.FC<UsersTableProps> = ({ role }) => {
     await getCustomQueries().then(async (queries) => {
       const queriesResponse = await Promise.all(
         queries.map(async (query) => {
-          const queryWithGroups = await getSingleQueryGroupAssignments(
+          const groupAssignments = await getSingleQueryGroupAssignments(
             query.query_id,
           );
-          return queryWithGroups.items[0];
+          query.groupAssignments = groupAssignments.items;
+          return query;
         }),
       );
 

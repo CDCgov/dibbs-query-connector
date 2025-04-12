@@ -51,7 +51,7 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({
   setSelectedQuery,
 }) => {
   const { data: session } = useSession();
-  const sesh = session?.user?.username || "";
+  const username = session?.user?.username || "";
   const userRole = getRole();
 
   const [loading, setLoading] = useState(true);
@@ -63,22 +63,18 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({
   // Retrieve and store current logged-in user's data on page load
   useEffect(() => {
     const fetchCurrentUser = async () => {
-      try {
-        const currentUser = await getUserByUsername(sesh).then(async (user) => {
+      const currentUser = await getUserByUsername(username).then(
+        async (user) => {
           const userWithGroups = await getSingleUserWithGroupMemberships(
-            user.id,
+            user?.id,
           );
           return userWithGroups;
-        });
+        },
+      );
 
-        setCurrentUser(currentUser.items[0]);
-      } catch {
-        console.log("uh oh");
-      }
+      setCurrentUser(currentUser.items[0]);
     };
 
-    // since our async fynction sets the return value in the state var 'currentUser'
-    // we don't need to worry about pulling out the id, etc. before the promise resolves
     fetchCurrentUser();
   }, []);
 
@@ -90,23 +86,20 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({
           return groupQueries.items;
         }),
       );
-      console.log(assignedQueries);
-      return assignedQueries[0];
+      return assignedQueries.flat();
     }
   }
+
   // Check whether custom queries exist in DB
   useEffect(() => {
     if (queriesContext?.data === null || queriesContext?.data === undefined) {
       const fetchQueries = async () => {
         try {
-          const queries = await getQueryList();
-
+          const allQueries = await getQueryList();
           const queryList =
             userRole == UserRole.SUPER_ADMIN
-              ? queries
-              : !!currentUser
-                ? await getQueriesForUser()
-                : [];
+              ? allQueries
+              : await getQueriesForUser();
 
           queriesContext?.setData(queryList);
         } catch (error) {
