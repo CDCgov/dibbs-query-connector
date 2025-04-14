@@ -22,22 +22,20 @@ jest.mock(
 );
 
 describe("tests the query building steps", () => {
-  // it("renders the empty state", async () => {
-  //   jest.spyOn(queryBuilding, "getQueryList").mockResolvedValueOnce([]);
+  it("renders the empty state", async () => {
+    render(
+      <RootProviderMock currentPage="/queryBuilding" data={[]}>
+        <QueryBuilding />
+      </RootProviderMock>,
+    );
 
-  //   render(
-  //     <RootProviderMock currentPage="/queryBuilding">
-  //       <QueryBuilding />
-  //     </RootProviderMock>,
-  //   );
+    await waitFor(() => {
+      expect(screen.queryByText("Loading")).not.toBeInTheDocument();
+    });
 
-  //   await waitFor(() => {
-  //     expect(screen.queryByText("Loading")).not.toBeInTheDocument();
-  //   });
-
-  //   expect(screen.getByText("Start with Query Builder")).toBeInTheDocument();
-  //   expect(screen.getByTestId("empty-state-container")).toMatchSnapshot();
-  // });
+    expect(screen.getByText("Start with Query Builder")).toBeInTheDocument();
+    expect(screen.getByTestId("empty-state-container")).toMatchSnapshot();
+  });
 
   it("renders the default state", async () => {
     (getConditionsData as jest.Mock).mockResolvedValue({

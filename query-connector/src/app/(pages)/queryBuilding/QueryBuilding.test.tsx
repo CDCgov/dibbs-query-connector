@@ -15,6 +15,12 @@ jest.mock(
 
 describe("tests the query building steps", () => {
   const currentPage = "/";
+  process.env.AUTH_DISABLED = "true";
+
+  afterAll(() => {
+    jest.resetAllMocks();
+    delete process.env.AUTH_DISABLED;
+  });
 
   it("renders", async () => {
     (getQueryList as jest.Mock).mockResolvedValue([]);

@@ -18,10 +18,7 @@ import { getRole } from "@/app/(pages)/userManagement/utils";
 import { getQueryList } from "@/app/backend/query-building";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import { getAllGroupQueries } from "@/app/backend/usergroup-management";
-import {
-  getUserByUsername,
-  getSingleUserWithGroupMemberships,
-} from "@/app/backend/user-management";
+import { getUserByUsername } from "@/app/backend/user-management";
 import { useSession } from "next-auth/react";
 import { User, UserRole } from "@/app/models/entities/users";
 
@@ -63,16 +60,21 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({
   // Retrieve and store current logged-in user's data on page load
   useEffect(() => {
     const fetchCurrentUser = async () => {
-      const currentUser = await getUserByUsername(username).then(
-        async (user) => {
-          const userWithGroups = await getSingleUserWithGroupMemberships(
-            user?.id,
-          );
-          return userWithGroups;
-        },
-      );
-
-      setCurrentUser(currentUser.items[0]);
+      try {
+        const currentUser = await getUserByUsername(username);
+        setCurrentUser(currentUser.items[0]);
+      } catch (error) {
+        if (error == "Error: Unauthorized") {
+          setUnauthorizedError(true);
+          showToastConfirmation({
+            body: "You are not authorized to see queries.",
+            variant: "error",
+          });
+        }
+        console.error(`Failed to fetch current user: ${error}`);
+      } finally {
+        setLoading(false);
+      }
     };
 
     fetchCurrentUser();
@@ -95,6 +97,7 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({
     if (queriesContext?.data === null || queriesContext?.data === undefined) {
       const fetchQueries = async () => {
         try {
+          setLoading(true);
           const allQueries = await getQueryList();
           const queryList =
             userRole == UserRole.SUPER_ADMIN

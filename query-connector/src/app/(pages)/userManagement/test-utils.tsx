@@ -3,7 +3,6 @@ import { Tab } from "@/app/ui/designSystem/TabGroup/tabGroup";
 import { UserRole, User } from "@/app/models/entities/users";
 import UserPermissionsTable from "./components/userPermissionsTable/userPermissionsTable";
 import UserGroupsTable from "./components/userGroupsTable/UserGroupsTable";
-import { QueryTableResult } from "../queryBuilding/utils";
 import { CustomUserQuery } from "@/app/models/entities/query";
 
 // User Mocks
@@ -62,9 +61,9 @@ export const mockGroupMany = {
   query_size: 3,
   members: [{} as User, {} as User, {} as User],
   queries: [
-    {} as QueryTableResult,
-    {} as QueryTableResult,
-    {} as QueryTableResult,
+    {} as CustomUserQuery,
+    {} as CustomUserQuery,
+    {} as CustomUserQuery,
   ],
 };
 
@@ -74,7 +73,7 @@ export const mockGroupSingle = {
   member_size: 1,
   query_size: 1,
   members: [mockAdmin],
-  queries: [{} as QueryTableResult],
+  queries: [{} as CustomUserQuery],
 };
 
 export const allGroups = [mockGroupMany, mockGroupSingle];

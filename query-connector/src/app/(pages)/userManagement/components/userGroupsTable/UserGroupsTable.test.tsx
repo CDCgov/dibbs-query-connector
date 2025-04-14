@@ -28,6 +28,7 @@ describe("User Groups table", () => {
     render(
       <RootProviderMock currentPage="/userManagement">
         <UserGroupsTable
+          openModal={jest.fn()}
           userGroups={allGroups}
           fetchGroupMembers={jest.fn()}
           fetchGroupQueries={jest.fn()}

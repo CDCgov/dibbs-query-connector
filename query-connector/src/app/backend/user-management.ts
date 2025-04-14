@@ -10,12 +10,23 @@ const dbClient = getDbClient();
 
 /**
  * @param username The identifier of the user we want to retrieve
- * @returns A single user result
+ * @returns A single user result, with any applicable group membership details
  */
-export async function getUserByUsername(username: string) {
-  const checkUserQuery = `SELECT * FROM users WHERE username = $1;`;
-  const result = await dbClient.query(checkUserQuery, [username]);
-  return result.rows[0];
+export async function getUserByUsername(
+  username: string,
+): Promise<QCResponse<User>> {
+  const userQuery = `SELECT * FROM users WHERE username = $1;`;
+  const result = await dbClient.query(userQuery, [username]);
+  if (result.rowCount && result.rowCount > 0) {
+    const user = result.rows[0];
+    const userWithGroups = await getSingleUserWithGroupMemberships(user.id);
+    return {
+      totalItems: userWithGroups.totalItems,
+      items: userWithGroups.items,
+    };
+  } else {
+    return { totalItems: 0, items: [] };
+  }
 }
 
 /**
