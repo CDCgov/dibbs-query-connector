@@ -60,25 +60,14 @@ test.describe("editing an exisiting query", () => {
     expect(queryNameInput).toHaveValue(originalName);
     await queryNameInput.fill(`${originalName}-edited`);
 
-    // save edited query
+    // save edited query, stay on page
     await actionButton.click();
-
-    // validate that query name is saved
-    await page.getByTestId("createSaveQueryBtn");
-    await expect(queryNameInput).toHaveValue(`${originalName}-edited`);
+    await expect(actionButton).toHaveText("Save query");
 
     // change name back to original
-    await query.hover();
-    await expect(editBtn).toBeVisible();
-    await editBtn.click();
-
-    expect(queryNameInput).toHaveValue(`${originalName}-edited`);
     await queryNameInput.fill(originalName);
-    await expect(actionButton).toContainText("Save query");
     await actionButton.click();
-
-    await page.getByTestId("createSaveQueryBtn");
-    await expect(queryNameInput).toHaveValue(originalName);
+    await expect(actionButton).toHaveText("Save query");
   });
 
   test("edit query conditions", async ({ page }) => {
@@ -130,11 +119,14 @@ test.describe("editing an exisiting query", () => {
       .getByTestId(`close-drawer`)
       .click();
 
+    // move to next page
     await expect(actionButton).toContainText("Save query");
     await actionButton.click();
 
-    await editBtn.click();
-    await expect(actionButton).not.toBeDisabled();
+    // stay on page
+    await expect(actionButton).toHaveText("Save query");
+
+    // confirm query shows correct condition/s
     expect(
       page.getByTestId(`${ADDED_CONDITION.condition_id}-conditionCard`),
     ).toBeEnabled();
@@ -149,12 +141,9 @@ test.describe("editing an exisiting query", () => {
       .locator("path")
       .click();
 
-    await actionButton.click(); // save query
-    await expect(page.getByTestId("createSaveQueryBtn")).toBeVisible();
-
-    expect(
-      page.getByTestId(`${CANCER_CONDITION_ID}-conditionCard`),
-    ).toBeVisible();
+    // save edited query
+    await actionButton.click();
+    await expect(actionButton).toHaveText("Save query");
   });
 
   test("edit query value sets and concept codes", async ({ page }) => {
@@ -214,7 +203,7 @@ test.describe("editing an exisiting query", () => {
     const code = page
       .locator("tr", { hasText: subjectConcept.code })
       .getByTestId("checkbox");
-    await expect(code.getByRole("checkbox")).not.toBeChecked();
+    await expect(code.getByRole("checkbox")).not.toBeChecked(); // because we unchecked all codes in prev step
     await code.click();
     await expect(code.getByRole("checkbox")).toBeChecked();
 
@@ -223,8 +212,9 @@ test.describe("editing an exisiting query", () => {
     await closeBtn.click();
     await expect(openDrawer).not.toBeVisible();
 
+    // save edited query
     await actionButton.click();
-    await page.getByTestId("createSaveQueryBtn");
+    await expect(actionButton).toHaveText("Save query");
   });
 });
 
