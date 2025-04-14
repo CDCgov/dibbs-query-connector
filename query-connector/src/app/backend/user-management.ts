@@ -17,6 +17,7 @@ export async function getUserByUsername(
 ): Promise<QCResponse<User>> {
   const userQuery = `SELECT * FROM users WHERE username = $1;`;
   const result = await dbClient.query(userQuery, [username]);
+
   if (result.rowCount && result.rowCount > 0) {
     const user = result.rows[0];
     const userWithGroups = await getSingleUserWithGroupMemberships(user.id);
@@ -375,7 +376,7 @@ export async function getSingleUserWithGroupMemberships(
   };
 
   const result = await dbClient.query(query);
-  console.log(result.rows);
+
   const memberships = result.rows.map((row) => {
     return {
       membership_id: row.membership_id,
@@ -393,7 +394,7 @@ export async function getSingleUserWithGroupMemberships(
     qc_role: userCheckResult.items[0].qc_role,
     userGroupMemberships: memberships,
   };
-  console.log(userWithGroups);
+
   return { totalItems: 1, items: [userWithGroups] };
 }
 

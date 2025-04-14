@@ -21,17 +21,13 @@ import { getAllGroupQueries } from "@/app/backend/usergroup-management";
 import { getUserByUsername } from "@/app/backend/user-management";
 import { useSession } from "next-auth/react";
 import { User, UserRole } from "@/app/models/entities/users";
+import { isAuthDisabledClientCheck } from "@/app/utils/auth";
 
 type QuerySelectionProps = {
   selectedQuery: SelectedQueryState;
   setBuildStep: Dispatch<SetStateAction<BuildStep>>;
   setSelectedQuery: Dispatch<SetStateAction<SelectedQueryDetails>>;
 };
-
-// let getUserId = async (sesh: any) => {
-//   const user = await checkUserQuery(sesh);
-//   return user;
-// };
 
 /**
  * Component for Query Building Flow
@@ -91,16 +87,20 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({
       return assignedQueries.flat();
     }
   }
+  const ctx = useContext(DataContext);
 
   // Check whether custom queries exist in DB
   useEffect(() => {
+    const authDisabled =
+      isAuthDisabledClientCheck(ctx?.runtimeConfig) ||
+      userRole == UserRole.SUPER_ADMIN;
+
     if (queriesContext?.data === null || queriesContext?.data === undefined) {
       const fetchQueries = async () => {
         try {
           setLoading(true);
           const allQueries = await getQueryList();
-          const queryList =
-            userRole == UserRole.SUPER_ADMIN
+          const queryList = authDisabled
               ? allQueries
               : await getQueriesForUser();
 
@@ -119,7 +119,7 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({
         }
       };
 
-      !!currentUser && fetchQueries();
+      fetchQueries();
     } else {
       setLoading(false); // Data already exists, no need to fetch again
     }
