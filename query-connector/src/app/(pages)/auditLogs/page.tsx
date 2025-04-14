@@ -265,23 +265,14 @@ const AuditLogs: React.FC = () => {
             </div>
           )}
 
-          <div className={classNames(styles.paginationContainer)}>
-            <span>
-              {loading ? (
-                <Skeleton width={150} />
-              ) : (
-                `Showing ${(currentPage - 1) * actionsPerPage + 1} -
-                  ${Math.min(
-                    currentPage * actionsPerPage,
-                    filteredLogs.length,
-                  )}  of 
-                ${filteredLogs.length} actions`
-              )}
-            </span>
+          {!loading && totalPages >= 2 && (
+            <div className={classNames(styles.paginationContainer)}>
+              <span>
+                {`Showing ${(currentPage - 1) * actionsPerPage + 1} -
+        ${Math.min(currentPage * actionsPerPage, filteredLogs.length)} of 
+        ${filteredLogs.length} actions`}
+              </span>
 
-            {loading ? (
-              <Skeleton width={40} height={40} />
-            ) : (
               <Pagination
                 pathname="/auditLogs"
                 totalPages={totalPages}
@@ -297,11 +288,7 @@ const AuditLogs: React.FC = () => {
                   setCurrentPage(page);
                 }}
               />
-            )}
 
-            {loading ? (
-              <Skeleton width={150} height={40} />
-            ) : (
               <div className={styles.actionsPerPageContainer}>
                 <label htmlFor="actionsPerPage">Actions per page</label>
                 <Select
@@ -316,13 +303,13 @@ const AuditLogs: React.FC = () => {
                   <option value="50">50</option>
                 </Select>
               </div>
-            )}
-            <AuditLogDrawer
-              isOpen={drawerOpen}
-              onClose={() => setDrawerOpen(false)}
-              log={selectedLog}
-            />
-          </div>
+              <AuditLogDrawer
+                isOpen={drawerOpen}
+                onClose={() => setDrawerOpen(false)}
+                log={selectedLog}
+              />
+            </div>
+          )}
         </>
       </div>
     </WithAuth>

@@ -65,6 +65,7 @@ $tableContainerWidth: 70rem;
 .tableRows {
   height: 4.25rem;
   white-space: nowrap;
+  cursor: pointer;
 }
 
 .tableRows td:nth-child(3),

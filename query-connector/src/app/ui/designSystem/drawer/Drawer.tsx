@@ -108,9 +108,7 @@ const Drawer: React.FC<DrawerProps> = ({
             )}
           </div>
 
-          <div className={classNames("padding-top-2", styles.drawerBody)}>
-            {toRender}
-          </div>
+          <div className={classNames(styles.drawerBody)}>{toRender}</div>
         </div>
       </div>
 
