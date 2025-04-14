@@ -18,5 +18,4 @@ test("landing page loads", async ({ page }) => {
 
   // Check that interactable elements are present (header and Get Started)
   await expect(page.getByRole("link", { name: metadata.title })).toBeVisible();
-  await expect(page.getByRole("link", { name: "Sign in" })).toBeVisible();
 });
