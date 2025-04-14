@@ -60,7 +60,7 @@ test.describe("editing an exisiting query", () => {
     expect(queryNameInput).toHaveValue(originalName);
     await queryNameInput.fill(`${originalName}-edited`);
 
-    // save edited query, back to my queries page
+    // save edited query, stay on page
     await actionButton.click();
     await expect(
       page.getByRole("heading", {
@@ -72,20 +72,9 @@ test.describe("editing an exisiting query", () => {
     ).toBeVisible();
 
     // change name back to original
-    await query.hover();
-    await expect(editBtn).toBeVisible();
-    await editBtn.click();
-
-    expect(queryNameInput).toHaveValue(`${originalName}-edited`);
     await queryNameInput.fill(originalName);
-    await expect(actionButton).toContainText("Save query");
     await actionButton.click();
-
-    await expect(
-      page.getByRole("heading", {
-        name: QUERY_LIBRARY,
-      }),
-    ).toBeVisible();
+    await expect(actionButton).toHaveText("Save query");
   });
 
   test("edit query conditions", async ({ page }) => {
@@ -141,17 +130,10 @@ test.describe("editing an exisiting query", () => {
     await expect(actionButton).toContainText("Save query");
     await actionButton.click();
 
-    // save edited query, back to my queries page
-    await expect(
-      page.getByRole("heading", {
-        name: QUERY_LIBRARY,
-      }),
-    ).toBeVisible();
+    // stay on page
+    await expect(actionButton).toHaveText("Save query");
 
     // confirm query shows correct condition/s
-
-    await editBtn.click();
-    await expect(actionButton).not.toBeDisabled();
     expect(
       page.getByTestId(`${ADDED_CONDITION.condition_id}-conditionCard`),
     ).toBeEnabled();
@@ -166,19 +148,9 @@ test.describe("editing an exisiting query", () => {
       .locator("path")
       .click();
 
-    // save edited query, back to my queries page
-    await actionButton.click(); // save query
-    await expect(
-      page.getByRole("heading", {
-        name: QUERY_LIBRARY,
-      }),
-    ).toBeVisible();
-
-    expect(
-      page
-        .getByTestId(`query-row-${subjectQuery.query_id}`)
-        .getByRole("cell", { name: "Cancer (Leukemia)" }),
-    ).toBeVisible();
+    // save edited query
+    await actionButton.click();
+    await expect(actionButton).toHaveText("Save query");
   });
 
   test("edit query value sets and concept codes", async ({ page }) => {
@@ -247,17 +219,12 @@ test.describe("editing an exisiting query", () => {
     await closeBtn.click();
     await expect(openDrawer).not.toBeVisible();
 
-    // save edited query, back to my queries page
+    // save edited query
     await actionButton.click();
-    await expect(
-      page.getByRole("heading", {
-        name: QUERY_LIBRARY,
-      }),
-    ).toBeVisible();
+    await expect(actionButton).toHaveText("Save query");
   });
 });
 
-const QUERY_LIBRARY = "Query Library";
 const CUSTOM_QUERY = "Custom Query";
 
 const ADDED_CONDITION = {
