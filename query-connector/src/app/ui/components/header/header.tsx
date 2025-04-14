@@ -25,6 +25,8 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
   const router = useRouter();
   const { data: session, status } = useSession();
   const isLoggedIn = status === "authenticated";
+  const isProd = process.env.NODE_ENV === "production";
+
   const userRole = authDisabled
     ? UserRole.SUPER_ADMIN
     : session?.user?.role || "";
@@ -41,7 +43,6 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
 
   useEffect(() => {
     document.addEventListener("mousedown", outsideMenuClick);
-
     return () => {
       document.removeEventListener("mousedown", outsideMenuClick);
     };
@@ -67,11 +68,10 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
     setShowMenu(!showMenu);
   };
 
-  const landingPage: string =
-    authDisabled || isLoggedIn ? PAGES.QUERY : PAGES.LANDING;
+  const landingPage = authDisabled || isLoggedIn ? PAGES.QUERY : PAGES.LANDING;
 
   const menuPages = getPagesInSettingsMenu(userRole as UserRole).filter(
-    (page) => page.path != PAGES.QUERY,
+    (page) => page.path !== PAGES.QUERY,
   );
 
   return (
@@ -103,17 +103,20 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
               "flex-align-center",
             )}
           >
-            {!authDisabled && status === "unauthenticated" ? (
+            {!authDisabled &&
+            !isProd &&
+            !isLoggedIn &&
+            status === "unauthenticated" ? (
               <Button
                 className={styles.signinButton}
                 type="button"
                 id="signin-button"
-                title={"Sign in button"}
+                title="Sign in button"
                 onClick={handleSignIn}
               >
                 Sign in
               </Button>
-            ) : (
+            ) : isLoggedIn || authDisabled ? (
               <div className="display-flex flex-align-center">
                 <Link
                   href={PAGES.QUERY}
@@ -123,7 +126,7 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
                   )}
                   scroll={false}
                 >
-                  Run a query
+                  Run query
                 </Link>
                 <button
                   onClick={toggleMenuDropdown}
@@ -145,7 +148,7 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
                   />
                 </button>
               </div>
-            )}
+            ) : null}
           </div>
         </div>
         {showMenu && (
