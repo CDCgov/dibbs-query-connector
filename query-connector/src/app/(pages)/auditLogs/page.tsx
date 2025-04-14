@@ -265,7 +265,7 @@ const AuditLogs: React.FC = () => {
             </div>
           )}
 
-          {!loading && totalPages >= 2 && (
+          {!loading && filteredLogs.length > 0 && (
             <div className={classNames(styles.paginationContainer)}>
               <span>
                 {`Showing ${(currentPage - 1) * actionsPerPage + 1} -
@@ -296,7 +296,10 @@ const AuditLogs: React.FC = () => {
                   id="actionsPerPage"
                   value={actionsPerPage}
                   className={styles.actionsPerPageDropdown}
-                  onChange={(e) => setActionsPerPage(Number(e.target.value))}
+                  onChange={(e) => {
+                    setActionsPerPage(Number(e.target.value));
+                    setCurrentPage(1);
+                  }}
                 >
                   <option value="10">10</option>
                   <option value="25">25</option>
