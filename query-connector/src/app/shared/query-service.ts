@@ -232,14 +232,12 @@ class QueryService {
    * @param request Information to pass off to the FHIR server
    * @param valueSetOverrides Any valuesets from the customize query step to override
    * the default saved query for
-   * @param includeImmunization Whether to include immunization in the query execution
    * @returns A promise for an updated query response.
    */
   @auditable
   static async patientRecordsQuery(
     request: PatientRecordsRequest,
     valueSetOverrides?: DibbsValueSet[],
-    includeImmunization = false,
   ): Promise<QueryResponse> {
     const queryName = request.query_name;
     const fhirClient = await QueryService.prepareFhirClient(
@@ -251,6 +249,7 @@ class QueryService {
     if (!savedQuery) {
       throw new Error(`Unable to query of name ${request?.query_name}`);
     }
+    const includeImmunization = savedQuery.immunization;
     const queryData = valueSetOverrides
       ? reconcileSavedQueryDataWithOverrides(
           savedQuery.query_data,
