@@ -99,10 +99,10 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({
       const fetchQueries = async () => {
         try {
           setLoading(true);
-          const allQueries = await getQueryList();
+
           const queryList = authDisabled
-              ? allQueries
-              : await getQueriesForUser();
+            ? await getQueryList()
+            : await getQueriesForUser();
 
           queriesContext?.setData(queryList);
         } catch (error) {

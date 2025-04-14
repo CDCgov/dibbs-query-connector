@@ -67,7 +67,7 @@ test.describe("editing an exisiting query", () => {
         name: QUERY_LIBRARY,
       }),
     ).toBeVisible();
-    expect(
+    await expect(
       page.getByRole("cell", { name: `${subjectQuery.query_name}-edited` }),
     ).toBeVisible();
 
