@@ -10,6 +10,7 @@ import { getDbClient } from "./dbClient";
 import { QCResponse } from "../models/responses/collections";
 import { CustomUserQuery } from "../models/entities/query";
 import { QueryResult } from "pg";
+import { getQueryById } from "./query-building";
 
 const dbClient = getDbClient();
 
@@ -458,7 +459,7 @@ export async function getAllGroupQueries(
  * Adds users to a user group.
  * @param groupId - The unique identifier of the user group.
  * @param queryIds - The unique identifier of the query to add.
- * @returns The user IDs of the users added to the group.
+ * @returns The IDs of the queries added to the group.
  */
 export async function addQueriesToGroup(
   groupId: string,
@@ -494,9 +495,12 @@ export async function addQueriesToGroup(
 
     const result = await dbClient.query(insertQuery);
     const updatedQueries = await Promise.all(
-      result.rows.map(async (updatedQuery) => {
+      result.rows.map(async (result) => {
+        const updatedQuery = (await getQueryById(
+          result.query_id,
+        )) as CustomUserQuery;
         const updatedGroupAssignments = await getSingleQueryGroupAssignments(
-          updatedQuery.query_id,
+          result.query_id,
         );
         updatedQuery.groupAssignments = updatedGroupAssignments.items;
         await dbClient.query("COMMIT");
@@ -568,9 +572,6 @@ export async function getSingleQueryGroupAssignments(
   queryId: string,
 ): Promise<QCResponse<UserGroupMembership>> {
   // TODO: https://linear.app/skylight-cdc/issue/QUE-216/refactor-user-management-code-into-service-class-pattern
-  if (!(await adminAccessCheck())) {
-    throw new Error("Unauthorized");
-  }
   try {
     const query = `
     SELECT

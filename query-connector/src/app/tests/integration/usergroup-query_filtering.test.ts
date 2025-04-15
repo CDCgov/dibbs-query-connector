@@ -76,11 +76,11 @@ describe("User Group and Query Membership Tests", () => {
       await dbClient.query("DELETE FROM usergroup WHERE id = $1;", [
         TEST_GROUP_ID,
       ]);
-      await dbClient.query("DELETE FROM users WHERE id IN ($1, $2, $3);", [
+      await dbClient.query("DELETE FROM users WHERE id IN ($1, $2);", [
         TEST_USER_1_ID,
         TEST_USER_2_ID,
       ]);
-      await dbClient.query("DELETE FROM query WHERE id = $1;", [
+      await dbClient.query("DELETE FROM query WHERE id IN ($1, $2, $3);", [
         TEST_QUERY_1_ID,
         TEST_QUERY_2_ID,
         TEST_QUERY_3_ID,

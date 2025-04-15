@@ -15,7 +15,10 @@ jest.mock(
 
 describe("tests the query building steps", () => {
   const currentPage = "/";
-  process.env.AUTH_DISABLED = "true";
+
+  beforeAll(() => {
+    process.env.AUTH_DISABLED = "true";
+  });
 
   afterAll(() => {
     jest.resetAllMocks();

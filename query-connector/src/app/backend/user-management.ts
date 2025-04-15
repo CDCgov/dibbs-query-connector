@@ -353,10 +353,6 @@ export async function getAllUserGroupsForUser(
 export async function getSingleUserWithGroupMemberships(
   userId: string,
 ): Promise<QCResponse<User>> {
-  if (!(await adminAccessCheck())) {
-    throw new Error("Unauthorized");
-  }
-
   const userCheckResult = await checkUserExists(userId);
   if (!userCheckResult || userCheckResult?.totalItems == 0) {
     return { totalItems: 0, items: [] };

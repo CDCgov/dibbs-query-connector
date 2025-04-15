@@ -17,10 +17,10 @@ import { CustomUserQuery } from "@/app/models/entities/query";
 import { getRole } from "@/app/(pages)/userManagement/utils";
 import { getQueryList } from "@/app/backend/query-building";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
-import { getAllGroupQueries } from "@/app/backend/usergroup-management";
 import { getUserByUsername } from "@/app/backend/user-management";
 import { useSession } from "next-auth/react";
 import { User, UserRole } from "@/app/models/entities/users";
+import { getQueriesForUser } from "../utils";
 
 type QuerySelectionProps = {
   selectedQuery: SelectedQueryState;
@@ -75,18 +75,6 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({
     fetchCurrentUser();
   }, []);
 
-  async function getQueriesForUser() {
-    if (!!currentUser && currentUser.userGroupMemberships) {
-      const assignedQueries = await Promise.all(
-        currentUser.userGroupMemberships.map(async (gm) => {
-          const groupQueries = await getAllGroupQueries(gm.usergroup_id);
-          return groupQueries.items;
-        }),
-      );
-      return assignedQueries.flat();
-    }
-  }
-
   // Check whether custom queries exist in DB
   useEffect(() => {
     if (queriesContext?.data === null || queriesContext?.data === undefined) {
@@ -97,7 +85,7 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({
           const queryList =
             userRole == UserRole.SUPER_ADMIN
               ? await getQueryList()
-              : await getQueriesForUser();
+              : await getQueriesForUser(currentUser as User);
 
           queriesContext?.setData(queryList);
         } catch (error) {

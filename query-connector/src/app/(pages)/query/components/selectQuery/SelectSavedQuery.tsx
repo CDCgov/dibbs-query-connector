@@ -9,6 +9,11 @@ import { showToastConfirmation } from "../../../../ui/designSystem/toast/Toast";
 import { getFhirServerNames } from "@/app/backend/dbServices/fhir-servers";
 import { CustomUserQuery } from "@/app/models/entities/query";
 import { getCustomQueries } from "@/app/backend/query-building";
+import { User, UserRole } from "@/app/models/entities/users";
+import { getRole } from "@/app/(pages)/userManagement/utils";
+import { getUserByUsername } from "@/app/backend/user-management";
+import { useSession } from "next-auth/react";
+import { getQueriesForUser } from "@/app/(pages)/queryBuilding/utils";
 
 type SelectSavedQueryProps = {
   selectedQuery: CustomUserQuery;
@@ -51,21 +56,48 @@ const SelectSavedQuery: React.FC<SelectSavedQueryProps> = ({
   const [fhirServers, setFhirServers] = useState<string[]>([]);
   const [queryOptions, setQueryOptions] = useState<CustomUserQuery[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
+  const [currentUser, setCurrentUser] = useState<User>();
+
+  const { data: session } = useSession();
+  const username = session?.user?.username || "";
+  const userRole = getRole();
 
   async function fetchFHIRServers() {
     const servers = await getFhirServerNames();
     setFhirServers(servers);
   }
 
+  // Retrieve and store current logged-in user's data on page load
   useEffect(() => {
+    const fetchCurrentUser = async () => {
+      try {
+        const currentUser = await getUserByUsername(username);
+        setCurrentUser(currentUser.items[0]);
+      } catch (error) {
+        if (error == "Error: Unauthorized") {
+          showToastConfirmation({
+            body: "An error occurred. Please try again later",
+            variant: "error",
+          });
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCurrentUser();
     fetchFHIRServers();
   }, []);
 
   useEffect(() => {
     const fetchQueries = async () => {
       try {
-        const queries = await getCustomQueries();
-        setQueryOptions(queries);
+        const queries =
+          userRole == UserRole.SUPER_ADMIN
+            ? await getCustomQueries()
+            : await getQueriesForUser(currentUser as User);
+
+        !!currentUser && !!queries && setQueryOptions(queries);
       } catch (error) {
         console.error("Failed to fetch queries:", error);
       } finally {
@@ -74,7 +106,7 @@ const SelectSavedQuery: React.FC<SelectSavedQueryProps> = ({
     };
     fetchQueries();
     setLoading(false); // Data already exists, no need to fetch again
-  }, []);
+  }, [currentUser]);
 
   function handleQuerySelection(queryName: string) {
     const selectedQuery = queryOptions.filter(
@@ -131,7 +163,7 @@ const SelectSavedQuery: React.FC<SelectSavedQueryProps> = ({
           type="button"
           className="usa-button--outline bg-white margin-left-205"
           onClick={() => setShowCustomizedQuery(true)}
-          disabled={loadingQueryValueSets || !selectedQuery}
+          disabled={loadingQueryValueSets || !selectedQuery.query_name}
         >
           Customize query
         </Button>
@@ -176,7 +208,7 @@ const SelectSavedQuery: React.FC<SelectSavedQueryProps> = ({
       <div className="margin-top-5">
         <Button
           type="button"
-          disabled={!selectedQuery || loadingQueryValueSets}
+          disabled={!selectedQuery.query_name || loadingQueryValueSets}
           className={
             selectedQuery && !loadingQueryValueSets
               ? "usa-button"

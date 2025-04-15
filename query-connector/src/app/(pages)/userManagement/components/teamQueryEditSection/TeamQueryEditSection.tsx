@@ -163,10 +163,11 @@ const UserManagementDrawer: React.FC<UserManagementDrawerProps> = ({
                     className={classNames("margin-bottom-3", style.checkbox)}
                   />
                 ) : (
-                  <div
-                    key={user.id}
-                    className={"padding-bottom-2"}
-                  >{`${user.first_name} ${user.last_name}`}</div>
+                  !!isMemberOfCurrentGroup && (
+                    <div key={user.id} className={"padding-bottom-2"}>
+                      {`${user.first_name} ${user.last_name}`}
+                    </div>
+                  )
                 )}
               </li>
             );
@@ -263,17 +264,12 @@ const UserManagementDrawer: React.FC<UserManagementDrawerProps> = ({
       const updatedQuery = updatedQueryResponse.items[0];
       const newQueriesList = allQueries.map((q) => {
         if (q.query_id == queryId) {
-          q = updatedQuery;
-          return {
-            ...q,
-            ...{ groupAssignments: q?.groupAssignments },
-          };
-        } else {
-          return q;
+          q.groupAssignments = updatedQuery.groupAssignments;
         }
+        return q;
       });
 
-      setAllQueries(newQueriesList);
+      setAllQueries([...newQueriesList]);
       setUserGroups(updatedUserGroups.items); // for refreshing query count in table view
       refreshView(`Update ${activeTabLabel}` as viewMode);
 

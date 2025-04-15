@@ -108,7 +108,16 @@ export async function getQueryById(queryId: string) {
       console.error("No results found for query id:", queryId);
       return undefined;
     }
-    return result.rows[0] as unknown as CustomUserQuery;
+    const query = result.rows[0];
+    const formattedQuery = {
+      query_id: query.id,
+      query_name: query.query_name,
+      query_data: query.query_data,
+      conditions_list: query.conditions_list,
+      valuesets: [],
+    };
+
+    return formattedQuery as CustomUserQuery;
   } catch (error) {
     console.error(`Failed to retrieve query with ID ${queryId}:`, error);
     return { success: false, error: "Failed to retrieve the query." };
