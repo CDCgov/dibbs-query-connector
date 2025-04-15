@@ -13,7 +13,6 @@ import {
   saveCustomQueryHelp,
 } from "@/app/backend/dbServices/queryBuilding/lib";
 
-const QUERY_LIBRARY = "Query Library";
 const CUSTOM_QUERY = "Custom Query";
 
 test.describe("editing an exisiting query", () => {
@@ -65,14 +64,7 @@ test.describe("editing an exisiting query", () => {
 
     // save edited query, stay on page
     await actionButton.click();
-    await expect(
-      page.getByRole("heading", {
-        name: QUERY_LIBRARY,
-      }),
-    ).toBeVisible();
-    await expect(
-      page.getByRole("cell", { name: `${subjectQuery.query_name}-edited` }),
-    ).toBeVisible();
+    await expect(actionButton).toHaveText("Save query");
 
     // change name back to original
     await queryNameInput.fill(originalName);
