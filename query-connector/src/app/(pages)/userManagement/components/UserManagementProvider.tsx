@@ -24,10 +24,9 @@ interface UserManagementContext extends UserManagementData {
     subtitle: string,
     subjectType: SubjectType,
     groupId: string,
-    subjectData?: User[] | CustomUserQuery[],
+    subjectData: User[] | CustomUserQuery[],
   ) => void;
   closeEditSection: () => void;
-  handleSearch: (searchFilter: string) => void;
 }
 
 const initData: UserManagementData = {
@@ -46,7 +45,6 @@ export const UserManagementContext = createContext<UserManagementContext>({
   ...initData,
   openEditSection: () => {},
   closeEditSection: () => {},
-  handleSearch: (_searchFilter: string) => {},
 });
 
 /**
@@ -70,7 +68,7 @@ const DataProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     subtitle: string,
     subjectType: SubjectType,
     id: string,
-    subjectData?: User[] | CustomUserQuery[],
+    subjectData: User[] | CustomUserQuery[],
   ) {
     let placeholder = "";
 
@@ -79,7 +77,7 @@ const DataProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     } else {
       placeholder = "Search queries";
     }
-    const newData = subjectData ?? [];
+
     const newState: UserManagementData = {
       ...innerState,
       teamQueryEditSection: {
@@ -89,16 +87,11 @@ const DataProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
         placeholder,
         subjectType,
         groupId: id,
-        subjectData: newData,
+        subjectData,
         isOpen: true,
       },
     };
     setInnerState(newState);
-  }
-
-  function handleSearch(filter: string) {
-    // TODO data filtering
-    console.log("filtering ...", filter);
   }
 
   return (
@@ -107,7 +100,6 @@ const DataProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
         ...innerState,
         openEditSection,
         closeEditSection,
-        handleSearch,
       }}
     >
       {children}

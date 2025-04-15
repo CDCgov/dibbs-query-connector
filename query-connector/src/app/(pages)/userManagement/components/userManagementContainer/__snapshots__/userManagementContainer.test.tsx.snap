@@ -77,7 +77,7 @@ exports[`Admin view of Users Table renders error message when no user groups are
             class="padding-top-2 drawerBody"
           >
             <div>
-              No queries assigned to this group.
+              No queries found.
             </div>
           </div>
         </div>
@@ -179,7 +179,7 @@ exports[`Super Admin view of Users Table renders content on tab click 1`] = `
               </td>
               <td
                 class="roleDropdown"
-                width="270"
+                width="250"
               >
                 <label
                   class="usa-label usa-sr-only"
@@ -211,7 +211,9 @@ exports[`Super Admin view of Users Table renders content on tab click 1`] = `
                   </option>
                 </select>
               </td>
-              <td>
+              <td
+                width="475"
+              >
                 <button
                   aria-description="Edit Order of the Phoenix members"
                   class="usa-button usa-button--unstyled margin-right-2 text-no-underline"
@@ -265,7 +267,7 @@ exports[`Super Admin view of Users Table renders content on tab click 1`] = `
               </td>
               <td
                 class="roleDropdown"
-                width="270"
+                width="250"
               >
                 <label
                   class="usa-label usa-sr-only"
@@ -297,7 +299,9 @@ exports[`Super Admin view of Users Table renders content on tab click 1`] = `
                   </option>
                 </select>
               </td>
-              <td>
+              <td
+                width="475"
+              >
                 --
               </td>
             </tr>
@@ -358,7 +362,7 @@ exports[`Super Admin view of Users Table renders content on tab click 1`] = `
             class="padding-top-2 drawerBody"
           >
             <div>
-              No queries assigned to this group.
+              No queries found.
             </div>
           </div>
         </div>
@@ -459,7 +463,7 @@ exports[`Super Admin view of Users Table renders content on tab click 2`] = `
             class="padding-top-2 drawerBody"
           >
             <div>
-              No queries assigned to this group.
+              No queries found.
             </div>
           </div>
         </div>
@@ -556,7 +560,7 @@ exports[`Super Admin view of Users Table renders error message when no users are
             class="padding-top-2 drawerBody"
           >
             <div>
-              No queries assigned to this group.
+              No queries found.
             </div>
           </div>
         </div>
@@ -658,7 +662,7 @@ exports[`Super Admin view of Users Table renders table view after content is loa
               </td>
               <td
                 class="roleDropdown"
-                width="270"
+                width="250"
               >
                 <label
                   class="usa-label usa-sr-only"
@@ -690,7 +694,9 @@ exports[`Super Admin view of Users Table renders table view after content is loa
                   </option>
                 </select>
               </td>
-              <td>
+              <td
+                width="475"
+              >
                 <button
                   aria-description="Edit Order of the Phoenix members"
                   class="usa-button usa-button--unstyled margin-right-2 text-no-underline"
@@ -744,7 +750,7 @@ exports[`Super Admin view of Users Table renders table view after content is loa
               </td>
               <td
                 class="roleDropdown"
-                width="270"
+                width="250"
               >
                 <label
                   class="usa-label usa-sr-only"
@@ -776,7 +782,9 @@ exports[`Super Admin view of Users Table renders table view after content is loa
                   </option>
                 </select>
               </td>
-              <td>
+              <td
+                width="475"
+              >
                 --
               </td>
             </tr>
@@ -837,7 +845,7 @@ exports[`Super Admin view of Users Table renders table view after content is loa
             class="padding-top-2 drawerBody"
           >
             <div>
-              No queries assigned to this group.
+              No queries found.
             </div>
           </div>
         </div>
@@ -939,7 +947,7 @@ exports[`Super Admin view of Users Table renders table view after content is loa
               </td>
               <td
                 class="roleDropdown"
-                width="270"
+                width="250"
               >
                 <label
                   class="usa-label usa-sr-only"
@@ -971,7 +979,9 @@ exports[`Super Admin view of Users Table renders table view after content is loa
                   </option>
                 </select>
               </td>
-              <td>
+              <td
+                width="475"
+              >
                 <button
                   aria-description="Edit Order of the Phoenix members"
                   class="usa-button usa-button--unstyled margin-right-2 text-no-underline"
@@ -1025,7 +1035,7 @@ exports[`Super Admin view of Users Table renders table view after content is loa
               </td>
               <td
                 class="roleDropdown"
-                width="270"
+                width="250"
               >
                 <label
                   class="usa-label usa-sr-only"
@@ -1057,7 +1067,9 @@ exports[`Super Admin view of Users Table renders table view after content is loa
                   </option>
                 </select>
               </td>
-              <td>
+              <td
+                width="475"
+              >
                 --
               </td>
             </tr>
@@ -1118,7 +1130,7 @@ exports[`Super Admin view of Users Table renders table view after content is loa
             class="padding-top-2 drawerBody"
           >
             <div>
-              No queries assigned to this group.
+              No queries found.
             </div>
           </div>
         </div>
@@ -1190,7 +1202,7 @@ exports[`Super Admin view of Users Table renders table view after content is loa
             </td>
             <td
               class="roleDropdown"
-              width="270"
+              width="250"
             >
               <label
                 class="usa-label usa-sr-only"
@@ -1222,7 +1234,9 @@ exports[`Super Admin view of Users Table renders table view after content is loa
                 </option>
               </select>
             </td>
-            <td>
+            <td
+              width="475"
+            >
               <button
                 aria-description="Edit Order of the Phoenix members"
                 class="usa-button usa-button--unstyled margin-right-2 text-no-underline"
@@ -1276,7 +1290,7 @@ exports[`Super Admin view of Users Table renders table view after content is loa
             </td>
             <td
               class="roleDropdown"
-              width="270"
+              width="250"
             >
               <label
                 class="usa-label usa-sr-only"
@@ -1308,7 +1322,9 @@ exports[`Super Admin view of Users Table renders table view after content is loa
                 </option>
               </select>
             </td>
-            <td>
+            <td
+              width="475"
+            >
               --
             </td>
           </tr>
