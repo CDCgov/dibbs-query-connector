@@ -21,7 +21,6 @@ import { getAllGroupQueries } from "@/app/backend/usergroup-management";
 import { getUserByUsername } from "@/app/backend/user-management";
 import { useSession } from "next-auth/react";
 import { User, UserRole } from "@/app/models/entities/users";
-import { isAuthDisabledClientCheck } from "@/app/utils/auth";
 
 type QuerySelectionProps = {
   selectedQuery: SelectedQueryState;
@@ -87,22 +86,18 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({
       return assignedQueries.flat();
     }
   }
-  const ctx = useContext(DataContext);
 
   // Check whether custom queries exist in DB
   useEffect(() => {
-    const authDisabled =
-      isAuthDisabledClientCheck(ctx?.runtimeConfig) ||
-      userRole == UserRole.SUPER_ADMIN;
-
     if (queriesContext?.data === null || queriesContext?.data === undefined) {
       const fetchQueries = async () => {
         try {
           setLoading(true);
 
-          const queryList = authDisabled
-            ? await getQueryList()
-            : await getQueriesForUser();
+          const queryList =
+            userRole == UserRole.SUPER_ADMIN
+              ? await getQueryList()
+              : await getQueriesForUser();
 
           queriesContext?.setData(queryList);
         } catch (error) {
