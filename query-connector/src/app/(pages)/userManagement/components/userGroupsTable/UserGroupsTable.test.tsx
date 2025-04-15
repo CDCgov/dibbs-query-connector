@@ -1,7 +1,11 @@
 import React from "react";
 import { waitFor, screen, render } from "@testing-library/react";
 import UserGroupsTable from "./UserGroupsTable";
-import { mockGroupMany, mockGroupSingle, allGroups } from "../../test-utils";
+import {
+  mockGroupMany,
+  mockGroupWithSingleQuery,
+  allGroups,
+} from "../../test-utils";
 import { RootProviderMock } from "@/app/tests/unit/setup";
 
 jest.mock("next-auth/react");
@@ -41,20 +45,20 @@ describe("User Groups table", () => {
     });
 
     const singleMemberBtn = screen.getByTestId(
-      `edit-member-list-${allGroups.indexOf(mockGroupSingle)}`,
+      `edit-member-list-${allGroups.indexOf(mockGroupWithSingleQuery)}`,
     );
     const multiMemberBtn = screen.getByTestId(
       `edit-member-list-${allGroups.indexOf(mockGroupMany)}`,
     );
     const singleQueryBtn = screen.getByTestId(
-      `edit-query-list-${allGroups.indexOf(mockGroupSingle)}`,
+      `edit-query-list-${allGroups.indexOf(mockGroupWithSingleQuery)}`,
     );
     const multiQueryBtn = screen.getByTestId(
       `edit-query-list-${allGroups.indexOf(mockGroupMany)}`,
     );
 
     expect(singleMemberBtn).toHaveTextContent(
-      mockGroupSingle.member_size + " member",
+      mockGroupWithSingleQuery.member_size + " member",
     );
 
     expect(multiMemberBtn).toHaveTextContent(
@@ -62,7 +66,7 @@ describe("User Groups table", () => {
     );
 
     expect(singleQueryBtn).toHaveTextContent(
-      mockGroupSingle.query_size + " query",
+      mockGroupWithSingleQuery.query_size + " query",
     );
 
     expect(multiQueryBtn).toHaveTextContent(

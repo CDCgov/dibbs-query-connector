@@ -52,6 +52,7 @@ export const mockGroupBasic = {
   name: "Hogwarts",
   member_size: 1,
   query_size: 0,
+  valuesets: [],
 };
 
 export const mockGroupMany = {
@@ -65,15 +66,17 @@ export const mockGroupMany = {
     {} as CustomUserQuery,
     {} as CustomUserQuery,
   ],
+  valuesets: [],
 };
 
-export const mockGroupSingle = {
+const mockGroupSingle = {
   id: "789",
   name: "S.P.E.W.",
   member_size: 1,
   query_size: 1,
   members: [mockAdmin],
   queries: [{} as CustomUserQuery],
+  valuesets: [],
 };
 
 export const allGroups = [mockGroupMany, mockGroupSingle];
@@ -132,3 +135,7 @@ export const mockQueryWithGroups: CustomUserQuery = {
     },
   ],
 };
+
+mockGroupSingle.queries.push(mockQueryWithGroups);
+
+export const mockGroupWithSingleQuery = mockGroupSingle;
