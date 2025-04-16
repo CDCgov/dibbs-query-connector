@@ -103,20 +103,22 @@ const UsersTable: React.FC<UsersTableProps> = ({ role }) => {
       renderContent: () =>
         userGroups.length > 0 ? (
           <>
-            <Button
-              onClick={() => handleOpenModal("create-group")}
-              className={classNames(
-                "styles.createQueryButton",
-                "margin-bottom-3",
-              )}
-              style={{
-                marginLeft: "1px",
-                backgroundColor: "#005EA2",
-              }}
-              type="button"
-            >
-              Create group
-            </Button>
+            {role == UserRole.SUPER_ADMIN && (
+              <Button
+                onClick={() => handleOpenModal("create-group")}
+                className={classNames(
+                  "styles.createQueryButton",
+                  "margin-bottom-3",
+                )}
+                style={{
+                  marginLeft: "1px",
+                  backgroundColor: "#005EA2",
+                }}
+                type="button"
+              >
+                Create group
+              </Button>
+            )}
             <UserGroupsTable
               openModal={handleOpenModal}
               fetchGroupMembers={fetchGroupMembers}

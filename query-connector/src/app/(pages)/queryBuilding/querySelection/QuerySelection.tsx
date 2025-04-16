@@ -83,7 +83,7 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({
           setLoading(true);
 
           const queryList =
-            userRole == UserRole.SUPER_ADMIN
+            userRole == UserRole.SUPER_ADMIN || userRole == UserRole.ADMIN
               ? await getQueryList()
               : await getQueriesForUser(currentUser as User);
 

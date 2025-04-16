@@ -93,7 +93,7 @@ const SelectSavedQuery: React.FC<SelectSavedQueryProps> = ({
     const fetchQueries = async () => {
       try {
         const queries =
-          userRole == UserRole.SUPER_ADMIN
+          userRole == UserRole.SUPER_ADMIN || userRole == UserRole.ADMIN
             ? await getCustomQueries()
             : await getQueriesForUser(currentUser as User);
 
