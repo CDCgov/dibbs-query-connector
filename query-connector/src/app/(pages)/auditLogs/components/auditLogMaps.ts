@@ -17,17 +17,32 @@ type auditLogActionTypeMapping = {
 };
 
 function parseRequest(log: Record<string, unknown>): RequestPayload {
-  const raw = log?.auditMessage as { request?: unknown };
+  const msg = log.auditMessage;
+  let raw: unknown;
 
-  if (!raw?.request) return {};
-  if (typeof raw.request === "string") {
+  if (typeof msg === "object" && msg !== null && "request" in msg) {
+    raw = (msg as Record<string, unknown>).request;
+  } else {
+    raw = msg;
+  }
+
+  if (typeof raw === "string") {
     try {
-      return JSON.parse(raw.request as string) as RequestPayload;
+      raw = JSON.parse(raw);
     } catch {
       return {};
     }
   }
-  return raw.request as RequestPayload;
+
+  const dequoted: Record<string, unknown> = {};
+  for (const [key, val] of Object.entries(raw ?? {})) {
+    if (typeof val === "string") {
+      dequoted[key] = val.replace(/^"(.*)"$/, "$1");
+    } else {
+      dequoted[key] = val;
+    }
+  }
+  return dequoted;
 }
 
 function resolveFullName(
@@ -36,7 +51,7 @@ function resolveFullName(
   fallback?: string,
 ): string {
   const full = `${first ?? ""} ${last ?? ""}`.trim();
-  return full !== "" ? full : (fallback ?? "");
+  return full !== "" ? full : fallback ?? "";
 }
 
 /**
@@ -61,6 +76,27 @@ export const auditLogActionTypeMap: Record<string, auditLogActionTypeMapping> =
           log.author as string,
         );
         return `Ran patient discovery query for ${fullName}`;
+      },
+    },
+    deleteFhirServer: {
+      label: "Delete FHIR Server",
+      format: (log) => {
+        const request = parseRequest(log);
+        return `Deleted FHIR server ${request.name ?? ""}`.trim();
+      },
+    },
+    insertFhirServer: {
+      label: "Insert FHIR Server",
+      format: (log) => {
+        const request = parseRequest(log);
+        return `Inserted FHIR server ${request.name ?? ""}`.trim();
+      },
+    },
+    updateFhirServer: {
+      label: "Update FHIR Server",
+      format: (log) => {
+        const request = parseRequest(log);
+        return `Updated FHIR server ${request.name ?? ""}`.trim();
       },
     },
     // Add more as needed

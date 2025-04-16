@@ -42,10 +42,17 @@ const AuditLogs: React.FC = () => {
   useEffect(() => {
     async function fetchAuditLogs() {
       const logs = await getAuditLogs();
-      return logs.map((log) => ({
-        ...log,
-        createdAt: new Date(log.createdAt + "Z"),
-      }));
+      return logs.map((log) => {
+        let str = String(log.createdAt).trim();
+
+        if (!str.includes("T")) str = str.replace(" ", "T");
+        if (!str.endsWith("Z")) str += "Z";
+
+        return {
+          ...log,
+          createdAt: new Date(str),
+        };
+      });
     }
 
     initializeAuditLogUserMap();
