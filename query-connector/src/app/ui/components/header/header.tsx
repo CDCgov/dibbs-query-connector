@@ -25,7 +25,6 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
   const router = useRouter();
   const { data: session, status } = useSession();
   const isLoggedIn = status === "authenticated";
-  const isProd = process.env.NODE_ENV === "production";
 
   const userRole = authDisabled
     ? UserRole.SUPER_ADMIN
@@ -104,10 +103,7 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
               "flex-align-center",
             )}
           >
-            {!authDisabled &&
-            !isProd &&
-            !isLoggedIn &&
-            status === "unauthenticated" ? (
+            {!isLoggedIn ? (
               <Button
                 className={styles.signinButton}
                 type="button"

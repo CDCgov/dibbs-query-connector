@@ -5,7 +5,6 @@ import {
   ProcessListItem,
   ProcessListHeading,
 } from "@trussworks/react-uswds";
-import Link from "next/link";
 import Image from "next/image";
 import styles from "./landingPage.module.scss";
 import { signIn } from "next-auth/react";
@@ -26,23 +25,13 @@ export default function LandingPage() {
               network of healthcare providers through your existing data use
               agreements, giving you access to more complete and timely data.
             </p>
-            {process.env.NODE_ENV === "production" ? (
-              <button
-                className="usa-button next-button margin-bottom-2"
-                id="next-button"
-                onClick={() => signIn("keycloak", { redirectTo: "/query" })}
-              >
-                Sign in
-              </button>
-            ) : (
-              <Link
-                className="usa-button next-button margin-bottom-2"
-                id="next-button"
-                href="/query"
-              >
-                Try it out
-              </Link>
-            )}
+            <button
+              className="usa-button next-button margin-bottom-2"
+              id="next-button"
+              onClick={() => signIn("keycloak", { redirectTo: "/query" })}
+            >
+              Sign in
+            </button>
           </div>
           <Image
             alt="Graphic illustrating what TEFCA is"
