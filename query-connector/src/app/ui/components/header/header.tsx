@@ -1,12 +1,12 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { useSession, signIn, signOut } from "next-auth/react";
-import { Button, Icon } from "@trussworks/react-uswds";
+import { useSession, signOut } from "next-auth/react";
+import { Icon } from "@trussworks/react-uswds";
 import styles from "./header.module.scss";
 import { metadata } from "@/app/shared/constants";
 import classNames from "classnames";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { getPagesInSettingsMenu, PAGES } from "@/app/shared/page-routes";
 import { UserRole } from "@/app/models/entities/users";
@@ -29,7 +29,6 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
   const userRole = authDisabled
     ? UserRole.SUPER_ADMIN
     : session?.user?.role || "";
-  const pathname = usePathname();
 
   const outsideMenuClick = (event: MouseEvent) => {
     if (
@@ -47,14 +46,6 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
       document.removeEventListener("mousedown", outsideMenuClick);
     };
   }, [showMenu]);
-
-  const handleSignIn = () => {
-    if (authDisabled) {
-      router.push(PAGES.QUERY);
-    } else {
-      signIn("keycloak", { redirectTo: PAGES.QUERY });
-    }
-  };
 
   const handleSignOut = async () => {
     if (authDisabled) {
@@ -103,17 +94,7 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
               "flex-align-center",
             )}
           >
-            {!isLoggedIn ? (
-              <Button
-                className={styles.signinButton}
-                type="button"
-                id="signin-button"
-                title="Sign in button"
-                onClick={handleSignIn}
-              >
-                Sign in
-              </Button>
-            ) : isLoggedIn || authDisabled ? (
+            {(isLoggedIn || authDisabled) && (
               <div className="display-flex flex-align-center">
                 <Link
                   href={PAGES.QUERY}
@@ -145,7 +126,7 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
                   />
                 </button>
               </div>
-            ) : null}
+            )}
           </div>
         </div>
         {showMenu && (
