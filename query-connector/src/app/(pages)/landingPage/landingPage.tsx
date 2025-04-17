@@ -8,7 +8,7 @@ import {
 import Image from "next/image";
 import styles from "./landingPage.module.scss";
 import { signIn, useSession } from "next-auth/react";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { DataContext } from "@/app/shared/DataProvider";
 import { isAuthDisabledClientCheck } from "@/app/utils/auth";
 
@@ -20,7 +20,13 @@ export default function LandingPage() {
   const { status } = useSession();
   const ctx = useContext(DataContext);
   const isAuthDisabled = isAuthDisabledClientCheck(ctx?.runtimeConfig);
-  const isLoggedIn = status === "authenticated";
+
+  useEffect(() => {
+    if (isAuthDisabled || status === "authenticated") {
+      window.location.href = "/query";
+    }
+  }),
+    [isAuthDisabled];
 
   const handleClick = () => {
     if (isAuthDisabled) {
@@ -41,7 +47,7 @@ export default function LandingPage() {
               network of healthcare providers through your existing data use
               agreements, giving you access to more complete and timely data.
             </p>
-            {!isLoggedIn && !isAuthDisabled && (
+            {
               <button
                 className="usa-button next-button margin-bottom-2"
                 id="next-button"
@@ -49,7 +55,7 @@ export default function LandingPage() {
               >
                 Sign in
               </button>
-            )}
+            }
           </div>
           <Image
             alt="Graphic illustrating what TEFCA is"

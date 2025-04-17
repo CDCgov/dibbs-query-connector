@@ -7,6 +7,7 @@ echo "AIDBOX_BASE_URL=http://localhost:8080" >> .env.e2e
 echo "APP_HOSTNAME=http://host.docker.internal:3000" >> .env.e2e
 echo "AUTH_DISABLED=true" >> .env.e2e
 echo "AUTH_SECRET=verysecretsecret" >> .env.e2e
+echo "DEMO_MODE=true" >> .env.e2e
 
 value=$(grep "^AIDBOX_LICENSE=" .env | cut -d '=' -f2)
 

@@ -2,6 +2,8 @@ import { test, expect } from "@playwright/test";
 import { TEST_URL } from "../playwright-setup";
 import { metadata } from "@/app/shared/constants";
 
+// TODO: Rewrite tests to look at /query instead of landingPage
+
 test("landing page loads", async ({ page }) => {
   await page.goto(TEST_URL);
 
@@ -18,4 +20,5 @@ test("landing page loads", async ({ page }) => {
 
   // Check that interactable elements are present (header and Get Started)
   await expect(page.getByRole("link", { name: metadata.title })).toBeVisible();
+  await page.getByRole("button", { name: "Sign in" }).click();
 });
