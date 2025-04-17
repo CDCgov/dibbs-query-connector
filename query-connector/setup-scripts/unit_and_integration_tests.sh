@@ -7,7 +7,7 @@ docker compose -f docker-compose-integration.yaml up -d
 # wait for Aidbox to finish running before...
 docker compose -f docker-compose-integration.yaml logs -f aidbox-seeder | grep -q "Finished configuring Aidbox and database."
 
-# uncomment these and the corresponding block in ci.yaml to get logs in CI
+# uncomment these and the corresponding block in ci.yaml to get logs in CI. Make sure also to comment the set -e command at the top of this file too!
 # mkdir test-results
 # docker compose -f docker-compose-integration.yaml logs > /test-results/logs-before-tests.txt
 

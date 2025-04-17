@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e  # Exit immediately if a command exits with a non-zero status. Comment this if debugging in CI
+# set -e  # Exit immediately if a command exits with a non-zero status. Comment this if debugging in CI
 
 # setup needed .env values
 > .env.e2e
@@ -22,7 +22,7 @@ fi
 docker compose down --volumes --remove-orphans
 docker compose -f docker-compose-e2e.yaml --env-file .env.e2e up -d --build 
 
-# uncomment these and the corresponding block in ci.yaml to get logs in CI
+# uncomment these and the corresponding block in ci.yaml to get logs in CI. Make sure also to comment the set -e command at the top of this file too!
 mkdir test-results
 docker compose -f docker-compose-e2e.yaml logs > /test-results/logs-before-tests.txt
 
