@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { useSession, signIn, signOut } from "next-auth/react";
-import { Button, Icon } from "@trussworks/react-uswds";
+import { useSession, signOut } from "next-auth/react";
+import { Icon } from "@trussworks/react-uswds";
 import styles from "./header.module.scss";
 import { metadata } from "@/app/shared/constants";
 import classNames from "classnames";
@@ -42,19 +42,10 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
 
   useEffect(() => {
     document.addEventListener("mousedown", outsideMenuClick);
-
     return () => {
       document.removeEventListener("mousedown", outsideMenuClick);
     };
   }, [showMenu]);
-
-  const handleSignIn = () => {
-    if (authDisabled) {
-      router.push(PAGES.QUERY);
-    } else {
-      signIn("keycloak", { redirectTo: PAGES.QUERY });
-    }
-  };
 
   const handleSignOut = async () => {
     if (authDisabled) {
@@ -72,7 +63,7 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
     authDisabled || isLoggedIn ? PAGES.QUERY : PAGES.LANDING;
 
   const menuPages = getPagesInSettingsMenu(userRole as UserRole).filter(
-    (page) => page.path != PAGES.QUERY,
+    (page) => page.path !== PAGES.QUERY,
   );
 
   return (
@@ -97,59 +88,47 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
               </em>
             </div>
           </div>
-          <div
-            className={classNames(
-              "margin-left-auto",
-              "display-flex",
-              "flex-align-center",
-            )}
-          >
-            {!authDisabled && status === "unauthenticated" ? (
-              <Button
-                className={styles.signinButton}
-                type="button"
-                id="signin-button"
-                title={"Sign in button"}
-                onClick={handleSignIn}
-              >
-                Sign in
-              </Button>
-            ) : (
-              <div className="display-flex flex-align-center">
-                {pathname !== PAGES.QUERY && (
-                  <Link
-                    href={PAGES.QUERY}
-                    className={classNames(
-                      styles.runQueryBtn,
-                      "usa-button margin-bottom-0 margin-right-2",
-                    )}
-                    scroll={false}
-                  >
-                    Run a query
-                  </Link>
-                )}
-                <button
-                  onClick={toggleMenuDropdown}
+          {(authDisabled || isLoggedIn) && (
+            <div
+              className={classNames(
+                "margin-left-auto",
+                "display-flex",
+                "flex-align-center",
+              )}
+            >
+              {pathname !== PAGES.QUERY && (
+                <Link
+                  href={PAGES.QUERY}
                   className={classNames(
-                    styles.menuButton,
-                    "usa-accordion__button",
-                    "usa-nav__link",
-                    "usa-current",
+                    styles.runQueryBtn,
+                    "usa-button margin-bottom-0 margin-right-2",
                   )}
-                  aria-expanded="false"
-                  aria-controls="dropdown-menu"
-                  data-testid="menu-button"
+                  scroll={false}
                 >
-                  <Icon.Settings
-                    className="usa-icon qc-settings"
-                    size={3}
-                    color="#fff"
-                    aria-label="Gear icon indicating settings menu"
-                  />
-                </button>
-              </div>
-            )}
-          </div>
+                  Run a query
+                </Link>
+              )}
+              <button
+                onClick={toggleMenuDropdown}
+                className={classNames(
+                  styles.menuButton,
+                  "usa-accordion__button",
+                  "usa-nav__link",
+                  "usa-current",
+                )}
+                aria-expanded="false"
+                aria-controls="dropdown-menu"
+                data-testid="menu-button"
+              >
+                <Icon.Settings
+                  className="usa-icon qc-settings"
+                  size={3}
+                  color="#fff"
+                  aria-label="Gear icon indicating settings menu"
+                />
+              </button>
+            </div>
+          )}
         </div>
         {showMenu && (
           <div ref={menuRef} className={styles.menuDropdownContainer}>
@@ -176,7 +155,7 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
                       styles.menuItem,
                       "usa-button--unstyled",
                     )}
-                    onClick={async () => await handleSignOut()}
+                    onClick={handleSignOut}
                   >
                     Sign out
                   </button>

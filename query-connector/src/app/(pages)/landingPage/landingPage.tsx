@@ -5,15 +5,35 @@ import {
   ProcessListItem,
   ProcessListHeading,
 } from "@trussworks/react-uswds";
-import Link from "next/link";
 import Image from "next/image";
 import styles from "./landingPage.module.scss";
+import { useSession, signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 /**
  * The landing page for the TEFCA Viewer.
+ * @param root0 - props
+ * @param root0.authDisabled - The server-side read of the auth disabled environment variable.
  * @returns The LandingPage component.
  */
-export default function LandingPage() {
+export default function LandingPage({
+  authDisabled,
+}: {
+  authDisabled: boolean;
+}) {
+  const router = useRouter();
+  const { status } = useSession();
+  const isLoggedIn = status === "authenticated";
+  console.log("authDisabled", authDisabled);
+
+  const handleClick = () => {
+    if (authDisabled || isLoggedIn) {
+      router.push("/query");
+    } else {
+      signIn("keycloak", { redirectTo: "/query" });
+    }
+  };
+
   return (
     <div className="main-body display-flex flex-column flex-justify-center">
       <div className="gradient-blue-background flex-1">
@@ -25,13 +45,13 @@ export default function LandingPage() {
               network of healthcare providers through your existing data use
               agreements, giving you access to more complete and timely data.
             </p>
-            <Link
+            <button
               className="usa-button next-button margin-bottom-2"
               id="next-button"
-              href="/query"
+              onClick={handleClick}
             >
-              Try it out
-            </Link>
+              Sign in
+            </button>
           </div>
           <Image
             alt="Graphic illustrating what TEFCA is"
