@@ -167,8 +167,8 @@ describe("User Group and Query Membership Tests", () => {
    */
   test("should remove multiple users from a group", async () => {
     const users: User[] = await getAllUsersWithSingleGroupStatus(TEST_GROUP_ID);
-    const members = users.filter((user) =>
-      user.userGroupMemberships?.some((m) => m.is_member),
+    const members = users.filter(
+      (user) => user.userGroupMemberships?.some((m) => m.is_member),
     );
     expect(members.length).toBe(3);
 
@@ -204,8 +204,8 @@ describe("User Group and Query Membership Tests", () => {
     expect(result.items.length).toBe(1);
 
     const users: User[] = await getAllUsersWithSingleGroupStatus(TEST_GROUP_ID);
-    const members = users.filter((user) =>
-      user.userGroupMemberships?.some((m) => m.is_member),
+    const members = users.filter(
+      (user) => user.userGroupMemberships?.some((m) => m.is_member),
     );
 
     expect(members.length).toBe(0);
@@ -278,7 +278,6 @@ describe("User Group and Query Membership Tests", () => {
 
   test("should add a single query to a group", async () => {
     const result = await addQueriesToGroup(TEST_GROUP_ID, [TEST_QUERY_1_ID]);
-    console.log(result);
     expect(result.totalItems).toBe(1);
     expect(result.items[0].query_id).toContain(TEST_QUERY_1_ID);
     expect(result?.items[0].groupAssignments?.[0].membership_id).toContain(
