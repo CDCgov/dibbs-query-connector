@@ -91,24 +91,24 @@ jobs:
       - name: Create .env
         working-directory: ./query-connector
         run: |
-          echo "AIDBOX_LICENSE=${{ secrets.AIDBOX_LICENSE }}" > .env.e2e
+          echo "AIDBOX_LICENSE=${{ secrets.AIDBOX_LICENSE }}" > .env
       - name: Build Query Connector and Run Playwright Tests
         id: run_tests
         working-directory: ./query-connector
         run: |
           bash ./setup-scripts/e2e_tests.sh
-      # uncomment these next few lines and the corresponding log import
-      # in the setup script you're trying to debug if you're having trouble
-      # in CI. All the best, brave engineer (￣^￣ )ゞ
-      #   continue-on-error: true
+        # uncomment these next few lines and the corresponding log import
+        # in the setup script you're trying to debug if you're having trouble
+        # in CI. All the best, brave engineer (￣^￣ )ゞ
+        continue-on-error: true
 
-      # - name: Upload Docker Logs
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: docker-logs
-      #     path: |
-      #       ./query-connector/test-results/logs-before-tests.txt
-      #       ./query-connector/test-results/logs-after-tests.txt
+      - name: Upload Docker Logs
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-logs
+          path: |
+            ./query-connector/test-results/logs-before-tests.txt
+            ./query-connector/test-results/logs-after-tests.txt
 
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
