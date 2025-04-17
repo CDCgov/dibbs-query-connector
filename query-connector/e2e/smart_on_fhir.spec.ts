@@ -8,6 +8,7 @@ import {
 import { decodeJwt, decodeProtectedHeader } from "jose";
 
 test.describe("SMART on FHIR", () => {
+  // NOTE: this E2E doesn't work on local UI mode due to Docker networking issues
   test("successfully validates the e2e flow", async ({ page }) => {
     await page.goto(`${TEST_URL}/fhirServers`);
     expect(
