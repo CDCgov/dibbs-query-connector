@@ -86,7 +86,9 @@ export async function createSmartJwt(clientId: string, tokenEndpoint: string) {
     const exp = now + 300; // 5 minutes
 
     // Determine the JWKS URL - make sure this is an absolute URL that Aidbox can reach
-    const jku = DEFAULT_LOCAL_JWKS_HOSTNAME;
+    const jku = process.env.APP_HOSTNAME
+      ? `${process.env.APP_HOSTNAME}/.well-known/jwks.json`
+      : DEFAULT_LOCAL_JWKS_HOSTNAME;
 
     // Create payload
     const payload = {
