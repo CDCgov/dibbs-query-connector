@@ -21,6 +21,7 @@ import { getUserByUsername } from "@/app/backend/user-management";
 import { useSession } from "next-auth/react";
 import { User, UserRole } from "@/app/models/entities/users";
 import { getQueriesForUser } from "../utils";
+import { isAuthDisabledClientCheck } from "@/app/utils/auth";
 
 type QuerySelectionProps = {
   selectedQuery: SelectedQueryState;
@@ -49,8 +50,15 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({
   const [loading, setLoading] = useState(true);
   const [unauthorizedError, setUnauthorizedError] = useState(false);
   const [currentUser, setCurrentUser] = useState<User>();
+  const [queries, setQueries] = useState<CustomUserQuery[]>([]);
 
   const queriesContext = useContext(DataContext);
+  const authDisabled = isAuthDisabledClientCheck(queriesContext?.runtimeConfig);
+
+  const restrictedQueryList =
+    !authDisabled &&
+    userRole !== UserRole.SUPER_ADMIN &&
+    userRole !== UserRole.ADMIN;
 
   // Retrieve and store current logged-in user's data on page load
   useEffect(() => {
@@ -81,13 +89,12 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({
       const fetchQueries = async () => {
         try {
           setLoading(true);
+          const queries = restrictedQueryList
+            ? await getQueriesForUser(currentUser as User)
+            : await getQueryList();
 
-          const queryList =
-            userRole == UserRole.SUPER_ADMIN || userRole == UserRole.ADMIN
-              ? await getQueryList()
-              : await getQueriesForUser(currentUser as User);
-
-          queriesContext?.setData(queryList);
+          const loaded = queries && (authDisabled || !!currentUser);
+          !!loaded && setQueries(queries);
         } catch (error) {
           if (error == "Error: Unauthorized") {
             setUnauthorizedError(true);
@@ -112,8 +119,9 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({
     return <LoadingView loading={true} />;
   }
 
-  const queries = (queriesContext?.data || []) as CustomUserQuery[];
-  queries.sort((a, b) => (a.query_name[0] > b.query_name[0] ? 1 : -1));
+  if (queries.length > 0) {
+    queries.sort((a, b) => (a.query_name[0] > b.query_name[0] ? 1 : -1));
+  }
 
   return (
     <>

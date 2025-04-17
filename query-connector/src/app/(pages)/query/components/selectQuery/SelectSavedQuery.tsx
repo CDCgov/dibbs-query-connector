@@ -1,7 +1,7 @@
 import { Select, Button } from "@trussworks/react-uswds";
 import Backlink from "../../../../ui/designSystem/backLink/Backlink";
 import styles from "./selectQuery.module.scss";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { RETURN_LABEL } from "@/app/(pages)/query/components/stepIndicator/StepIndicator";
 import TitleBox from "../stepIndicator/TitleBox";
 import LoadingView from "../../../../ui/designSystem/LoadingView";
@@ -14,6 +14,8 @@ import { getRole } from "@/app/(pages)/userManagement/utils";
 import { getUserByUsername } from "@/app/backend/user-management";
 import { useSession } from "next-auth/react";
 import { getQueriesForUser } from "@/app/(pages)/queryBuilding/utils";
+import { isAuthDisabledClientCheck } from "@/app/utils/auth";
+import { DataContext } from "@/app/shared/DataProvider";
 
 type SelectSavedQueryProps = {
   selectedQuery: CustomUserQuery;
@@ -62,6 +64,14 @@ const SelectSavedQuery: React.FC<SelectSavedQueryProps> = ({
   const username = session?.user?.username || "";
   const userRole = getRole();
 
+  const ctx = useContext(DataContext);
+  const authDisabled = isAuthDisabledClientCheck(ctx?.runtimeConfig);
+
+  const restrictedQueryList =
+    !authDisabled &&
+    userRole !== UserRole.SUPER_ADMIN &&
+    userRole !== UserRole.ADMIN;
+
   async function fetchFHIRServers() {
     const servers = await getFhirServerNames();
     setFhirServers(servers);
@@ -92,12 +102,12 @@ const SelectSavedQuery: React.FC<SelectSavedQueryProps> = ({
   useEffect(() => {
     const fetchQueries = async () => {
       try {
-        const queries =
-          userRole == UserRole.SUPER_ADMIN || userRole == UserRole.ADMIN
-            ? await getCustomQueries()
-            : await getQueriesForUser(currentUser as User);
+        const queries = restrictedQueryList
+          ? await getQueriesForUser(currentUser as User)
+          : await getCustomQueries();
 
-        !!currentUser && !!queries && setQueryOptions(queries);
+        const loaded = queries && (authDisabled || !!currentUser);
+        !!loaded && setQueryOptions(queries);
       } catch (error) {
         console.error("Failed to fetch queries:", error);
       } finally {
