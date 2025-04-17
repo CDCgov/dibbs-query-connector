@@ -61,7 +61,6 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({
 
   // Retrieve and store current logged-in user's data on page load
   useEffect(() => {
-    console.log("???", "authDisabled", authDisabled, "userRole", userRole);
     const fetchCurrentUser = async () => {
       try {
         const currentUser = await getUserByUsername(username);
@@ -85,7 +84,6 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({
 
   // Check whether custom queries exist in DB
   useEffect(() => {
-    console.log(queriesContext?.data);
     if (queriesContext?.data === null || queriesContext?.data === undefined) {
       const fetchQueries = async () => {
         try {
@@ -93,10 +91,7 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({
           const queries = restrictedQueryList
             ? await getQueriesForUser(currentUser as User)
             : await getQueryList();
-          console.log("queries", queries);
           const loaded = queries && (authDisabled || !!currentUser);
-          console.log("loaded?", queries, authDisabled || !!currentUser);
-
           !!loaded && queriesContext?.setData(queries);
         } catch (error) {
           if (error == "Error: Unauthorized") {
