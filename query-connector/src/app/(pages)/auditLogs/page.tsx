@@ -43,6 +43,7 @@ const AuditLogs: React.FC = () => {
     async function fetchAuditLogs() {
       const logs = await getAuditLogs();
       return logs.map((log) => {
+        // Convert createdAt to Date object that works in all browsers in correct timezone
         let str = String(log.createdAt).trim();
 
         if (!str.includes("T")) str = str.replace(" ", "T");
