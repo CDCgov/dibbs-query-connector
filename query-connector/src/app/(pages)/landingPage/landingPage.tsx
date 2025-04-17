@@ -7,13 +7,29 @@ import {
 } from "@trussworks/react-uswds";
 import Image from "next/image";
 import styles from "./landingPage.module.scss";
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
+import { useContext } from "react";
+import { DataContext } from "@/app/shared/DataProvider";
+import { isAuthDisabledClientCheck } from "@/app/utils/auth";
 
 /**
  * The landing page for the TEFCA Viewer.
  * @returns The LandingPage component.
  */
 export default function LandingPage() {
+  const { status } = useSession();
+  const ctx = useContext(DataContext);
+  const isAuthDisabled = isAuthDisabledClientCheck(ctx?.runtimeConfig);
+  const isLoggedIn = status === "authenticated";
+
+  const handleClick = () => {
+    if (isAuthDisabled) {
+      window.location.href = "/query";
+    } else {
+      signIn("keycloak", { redirectTo: "/query" });
+    }
+  };
+
   return (
     <div className="main-body display-flex flex-column flex-justify-center">
       <div className="gradient-blue-background flex-1">
@@ -25,13 +41,15 @@ export default function LandingPage() {
               network of healthcare providers through your existing data use
               agreements, giving you access to more complete and timely data.
             </p>
-            <button
-              className="usa-button next-button margin-bottom-2"
-              id="next-button"
-              onClick={() => signIn("keycloak", { redirectTo: "/query" })}
-            >
-              Sign in
-            </button>
+            {!isLoggedIn && !isAuthDisabled && (
+              <button
+                className="usa-button next-button margin-bottom-2"
+                id="next-button"
+                onClick={handleClick}
+              >
+                Sign in
+              </button>
+            )}
           </div>
           <Image
             alt="Graphic illustrating what TEFCA is"
