@@ -45,7 +45,7 @@ services:
     ports:
       - 8080:8080
     env_file:
-      - .env
+      - .env.e2e
     environment:
       AIDBOX_TERMINOLOGY_SERVICE_BASE_URL: https://tx.fhir.org/r4
       AIDBOX_FHIR_PACKAGES: hl7.fhir.r4.core#4.0.1
@@ -75,7 +75,7 @@ services:
       - ./src/app/tests/assets/GoldenSickPatient.json:/data/GoldenSickPatient.json
       - ./logs:/var/log
     env_file:
-      - .env
+      - .env.e2e
     depends_on:
       db:
         condition: service_healthy
@@ -90,6 +90,8 @@ services:
       context: .
       dockerfile: Dockerfile
     tty: true
+    env_file:
+      - .env.e2e
     ports:
       - "3000:3000"
     environment:
