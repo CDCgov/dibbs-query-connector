@@ -1,8 +1,14 @@
 #!/bin/bash
-
 set -e  # Exit immediately if a command exits with a non-zero status. Comment this if debugging in CI
+
+# setup needed .env values
+> .env.e2e
+echo "DATABASE_URL=postgresql://postgres:pw@localhost:5432/tefca_db" >> .env.e2e
+echo "AIDBOX_BASE_URL=http://aidbox:8080" >> .env.e2e
+echo "APP_HOSTNAME=http://query-connector:3000" >> .env.e2e
+
 docker compose down --volumes --remove-orphans
-docker compose -f docker-compose-e2e.yaml up -d --build 
+docker compose -f docker-compose-e2e.yaml --env-file .env.e2e up -d --build 
 
 # uncomment these and the corresponding block in ci.yaml to get logs in CI
 # mkdir test-results
@@ -21,7 +27,7 @@ done
 echo -e "\nAidbox seeder finished!"
 
 
-npx dotenv -e ./.env -- npx playwright test --reporter=list
+npx dotenv -e ./.env.e2e -- npx playwright test --reporter=list
 E2E_EXIT_CODE=$?
 
 # uncomment these and the corresponding block in the ci.yaml to get the CI logs
@@ -31,3 +37,6 @@ E2E_EXIT_CODE=$?
 docker compose -f docker-compose-e2e.yaml down
 
 exit $E2E_EXIT_CODE
+
+
+

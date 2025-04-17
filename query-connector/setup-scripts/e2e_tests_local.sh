@@ -1,10 +1,16 @@
 #!/bin/bash
 
+# setup needed .env values
+> .env.e2e
+echo "DATABASE_URL=postgresql://postgres:pw@localhost:5432/tefca_db" >> .env.e2e
+echo "AIDBOX_BASE_URL=http://localhost:8080" >> .env.e2e
+echo "APP_HOSTNAME=http://host.internal.docker:3000" >> .env.e2e
+
 # pull down any exisiting docker volumes to make sure we're starting fresh
 docker compose down --volumes --remove-orphans
 
 # use the dev docker compose setup to allow for hot-reloading locally 
-docker compose -f docker-compose-dev.yaml up -d 
+docker compose -f docker-compose-dev.yaml --env-file .env.e2e up -d 
 
 # Start your command in the background
 docker compose -f docker-compose-dev.yaml logs -f aidbox-seeder | grep -q "Finished configuring Aidbox and database." &
