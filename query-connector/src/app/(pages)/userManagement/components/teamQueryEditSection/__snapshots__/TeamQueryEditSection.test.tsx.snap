@@ -4,7 +4,7 @@ exports[`User Management drawer is closed by default 1`] = `
 <body>
   <div>
     <div
-      class="drawer closed"
+      class="drawer closed width35"
       data-testid="drawer-open-false"
       role="dialog"
     >
@@ -51,7 +51,7 @@ exports[`User Management drawer is closed by default 1`] = `
           </div>
         </div>
         <div
-          class="padding-top-2 drawerBody"
+          class="drawerBody"
         >
           <div>
             No queries found.
@@ -67,7 +67,7 @@ exports[`User Management drawer renders an error message if there is no subject 
 <body>
   <div>
     <div
-      class="drawer open"
+      class="drawer open width35"
       data-testid="drawer-open-true"
       role="dialog"
     >
@@ -121,7 +121,7 @@ exports[`User Management drawer renders an error message if there is no subject 
           </div>
         </div>
         <div
-          class="padding-top-2 drawerBody"
+          class="drawerBody"
         >
           <div>
             No users found.
@@ -140,7 +140,7 @@ exports[`User Management drawer renders the list of all available queries 1`] = 
 <body>
   <div>
     <div
-      class="drawer open"
+      class="drawer open width35"
       data-testid="drawer-open-true"
       role="dialog"
     >
@@ -194,7 +194,7 @@ exports[`User Management drawer renders the list of all available queries 1`] = 
           </div>
         </div>
         <div
-          class="padding-top-2 drawerBody"
+          class="drawerBody"
         >
           <ul
             aria-description="queries for S.P.E.W."
@@ -255,7 +255,7 @@ exports[`User Management drawer renders the list of all available users 1`] = `
 <body>
   <div>
     <div
-      class="drawer open"
+      class="drawer open width35"
       data-testid="drawer-open-true"
       role="dialog"
     >
@@ -309,7 +309,7 @@ exports[`User Management drawer renders the list of all available users 1`] = `
           </div>
         </div>
         <div
-          class="padding-top-2 drawerBody"
+          class="drawerBody"
         >
           <ul
             aria-description="members of S.P.E.W."

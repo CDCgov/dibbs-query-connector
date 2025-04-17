@@ -166,36 +166,6 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
       {isOpen && (
         <div className={styles.customDateRangeWrapper}>
           <div className={styles.datePickerModal}>
-            <div className={styles.clearButtonContainer}>
-              <Button
-                unstyled
-                type="button"
-                data-testid="date-range-clear-button"
-                className={styles.clearButton}
-                onClick={() => {
-                  setStartDate(null);
-                  setEndDate(null);
-                  setDateErrors({});
-                  setIsOpen(false);
-                  onChange({ startDate: null, endDate: null });
-                  const startInput = document.getElementById(
-                    "log-date-start",
-                  ) as HTMLInputElement;
-                  const endInput = document.getElementById(
-                    "log-date-end",
-                  ) as HTMLInputElement;
-                  if (startInput) startInput.value = "";
-                  if (endInput) endInput.value = "";
-
-                  const inputField = document.getElementById(
-                    "date-range-input",
-                  ) as HTMLInputElement;
-                  if (inputField) inputField.value = "";
-                }}
-              >
-                Clear
-              </Button>
-            </div>
             <USWDSDateRangePicker
               startDateLabel="Start Date"
               endDateLabel="End Date"
@@ -242,6 +212,36 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
                 {dateErrors.start || dateErrors.end}
               </p>
             )}
+            <div className={styles.clearButtonContainer}>
+              <Button
+                unstyled
+                type="button"
+                data-testid="date-range-clear-button"
+                className={styles.clearButton}
+                onClick={() => {
+                  setStartDate(null);
+                  setEndDate(null);
+                  setDateErrors({});
+                  setIsOpen(false);
+                  onChange({ startDate: null, endDate: null });
+                  const startInput = document.getElementById(
+                    "log-date-start",
+                  ) as HTMLInputElement;
+                  const endInput = document.getElementById(
+                    "log-date-end",
+                  ) as HTMLInputElement;
+                  if (startInput) startInput.value = "";
+                  if (endInput) endInput.value = "";
+
+                  const inputField = document.getElementById(
+                    "date-range-input",
+                  ) as HTMLInputElement;
+                  if (inputField) inputField.value = "";
+                }}
+              >
+                Clear
+              </Button>
+            </div>
           </div>
         </div>
       )}

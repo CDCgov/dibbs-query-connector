@@ -4,8 +4,20 @@ import { renderWithUser, RootProviderMock } from "@/app/tests/unit/setup";
 import userEvent from "@testing-library/user-event";
 import { getAuditLogs, LogEntry } from "@/app/backend/dbServices/audit-logs";
 
+jest.mock(
+  "@/app/ui/components/withAuth/WithAuth",
+  () =>
+    ({ children }: React.PropsWithChildren) => <div>{children}</div>,
+);
+
+jest.mock("@/app/backend/user-management", () => ({
+  getAllUsers: jest.fn().mockResolvedValue({ items: [], totalItems: 0 }),
+  getUserRole: jest.fn(),
+}));
+
 const TEST_NAME = "Rocky Balboa";
-const TEST_REPORT = "Created Report";
+const TEST_REPORT = "Patient Records Query";
+const TEST_REPORT_RENDERED = "Viewed patient record for";
 const NUM_ROWS = 26;
 const CHECKSUM_INPUT =
   "It ain't about how hard you hit, it's about how hard you can get hit and keep moving forward";
@@ -13,36 +25,36 @@ const CHECKSUM_INPUT =
 const BASE_TEST_DATA: LogEntry[] = [
   {
     author: "Rocky Balboa",
-    actionType: "Created Report",
-    auditMessage: { parameter: "value" },
+    actionType: "patientRecordsQuery",
+    auditMessage: { query_name: "Test Query 1" },
     auditChecksum: CHECKSUM_INPUT,
     createdAt: new Date("2025-03-10T14:30:00Z"),
   },
   {
     author: "Apollo Creed",
-    actionType: "Edited Report",
-    auditMessage: { parameter: "value" },
+    actionType: "patientDiscoveryQuery",
+    auditMessage: { query_name: "Test Query 2" },
     auditChecksum: CHECKSUM_INPUT,
     createdAt: new Date("2025-03-09T09:15:00Z"),
   },
   {
     author: "Rocky Balboa",
-    actionType: "Deleted Entry",
-    auditMessage: { parameter: "value" },
+    actionType: "patientDiscoveryQuery",
+    auditMessage: { query_name: "Test Query 3" },
     auditChecksum: CHECKSUM_INPUT,
     createdAt: new Date("2022-03-08T17:45:00Z"),
   },
   {
     author: "Clubber Lang",
-    actionType: "Created Report",
-    auditMessage: { parameter: "value" },
+    actionType: "patientRecordsQuery",
+    auditMessage: { query_name: "Test Query 4" },
     auditChecksum: CHECKSUM_INPUT,
     createdAt: new Date("2024-03-07T12:00:00Z"),
   },
   {
     author: "Ivan Drago",
-    actionType: "Viewed Entry",
-    auditMessage: { parameter: "value" },
+    actionType: "patientDiscoveryQuery",
+    auditMessage: { query_name: "Test Query 5" },
     auditChecksum: CHECKSUM_INPUT,
     createdAt: new Date("2025-03-06T22:10:00Z"),
   },
@@ -135,7 +147,10 @@ describe("AuditLogs Component", () => {
     const rows = await screen.findAllByRole("row");
     expect(rows.length).toBeGreaterThan(1);
     rows.slice(1).forEach((row) => {
-      expect(within(row).getByText(TEST_REPORT)).toBeInTheDocument();
+      const matches = within(row).queryAllByText(
+        (_, node) => !!node?.textContent?.includes(TEST_REPORT_RENDERED),
+      );
+      expect(matches.length).toBeGreaterThan(0);
     });
 
     await user.selectDropdownOption("Action(s)", "");
@@ -147,7 +162,8 @@ describe("AuditLogs Component", () => {
     const rows = await screen.findAllByRole("row");
     expect(rows.length).toBeGreaterThan(1);
     rows.slice(1).forEach((row) => {
-      expect(within(row).getByText(/Apollo/i)).toBeInTheDocument();
+      const matches = within(row).queryAllByText(/Apollo/i);
+      expect(matches.length).toBeGreaterThan(0);
     });
   });
 
@@ -196,7 +212,7 @@ describe("AuditLogs Component", () => {
 
   test("clear filters resets empty state", async () => {
     await user.selectDropdownOption("Name(s)", "Apollo Creed");
-    await user.selectDropdownOption("Action(s)", "Created Report");
+    await user.selectDropdownOption("Action(s)", "Patient Records Query");
 
     await waitFor(() => {
       expect(
@@ -303,6 +319,27 @@ describe("AuditLogs Component", () => {
     await waitFor(() => {
       const alert = screen.getByRole("alert");
       expect(alert).toHaveTextContent("Invalid start date format");
+    });
+  });
+
+  test("opens drawer on row click and closes", async () => {
+    const rows = await screen.findAllByRole("row");
+    const firstRow = rows[1];
+    await user.click(firstRow);
+
+    await waitFor(() => {
+      expect(screen.getByTestId("drawer-title")).toHaveTextContent(
+        "Full JSON request",
+      );
+    });
+
+    const closeButton = screen.getByTestId("close-drawer");
+    await user.click(closeButton);
+
+    await waitFor(() => {
+      const drawer = screen.getByTestId("drawer-open-false");
+      expect(drawer.className).toContain("closed");
+      expect(drawer.className).not.toContain("open");
     });
   });
 });
