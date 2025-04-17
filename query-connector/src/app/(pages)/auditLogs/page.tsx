@@ -14,6 +14,13 @@ import { Button, Select, Pagination } from "@trussworks/react-uswds";
 import WithAuth from "@/app/ui/components/withAuth/WithAuth";
 import { getAuditLogs, LogEntry } from "@/app/backend/dbServices/audit-logs";
 import Skeleton from "react-loading-skeleton";
+import AuditLogDrawer from "./components/auditLogDrawer";
+import {
+  auditLogActionTypeMap,
+  labelToActionType,
+  auditLogUserMap,
+  initializeAuditLogUserMap,
+} from "./components/auditLogMaps";
 
 /**
  * Client component for the Audit Logs page.
@@ -29,13 +36,27 @@ const AuditLogs: React.FC = () => {
   const [actionsPerPage, setActionsPerPage] = useState(10);
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [selectedLog, setSelectedLog] = useState<LogEntry | null>(null);
 
   useEffect(() => {
     async function fetchAuditLogs() {
       const logs = await getAuditLogs();
-      return logs;
+      return logs.map((log) => {
+        // Convert createdAt to Date object that works in all browsers in correct timezone
+        let str = String(log.createdAt).trim();
+
+        if (!str.includes("T")) str = str.replace(" ", "T");
+        if (!str.endsWith("Z")) str += "Z";
+
+        return {
+          ...log,
+          createdAt: new Date(str),
+        };
+      });
     }
 
+    initializeAuditLogUserMap();
     setLoading(true);
 
     fetchAuditLogs().then((v) => {
@@ -47,11 +68,23 @@ const AuditLogs: React.FC = () => {
   const [filteredLogs, setFilteredLogs] = useState(logs);
 
   const uniqueNames = useMemo(
-    () => Array.from(new Set(logs.map((log) => log.author))).sort(),
+    () =>
+      Array.from(
+        new Set(logs.map((log) => auditLogUserMap(log.author))),
+      ).sort(),
     [logs],
   );
+
   const uniqueActions = useMemo(
-    () => Array.from(new Set(logs.map((log) => log.actionType))).sort(),
+    () =>
+      Array.from(
+        new Set(
+          logs.map(
+            (log) =>
+              auditLogActionTypeMap[log.actionType]?.label || log.actionType,
+          ),
+        ),
+      ).sort(),
     [logs],
   );
 
@@ -73,14 +106,25 @@ const AuditLogs: React.FC = () => {
   useEffect(() => {
     setFilteredLogs(
       logs.filter((log) => {
-        const matchesName = selectedName ? log.author === selectedName : true;
-        const matchesAction = selectedAction
-          ? log.actionType === selectedAction
+        const matchesName = selectedName
+          ? auditLogUserMap(log.author) === selectedName
           : true;
+        const matchesAction = selectedAction
+          ? log.actionType === labelToActionType[selectedAction]
+          : true;
+        const actionLabel =
+          auditLogActionTypeMap[log.actionType]?.label?.toLowerCase() || "";
+        const formattedAction =
+          auditLogActionTypeMap[log.actionType]?.format(log)?.toLowerCase() ||
+          "";
+        const fullName = auditLogUserMap(log.author).toLowerCase();
         const matchesSearch =
           search.length === 0 ||
           log.author.toLowerCase().includes(search.toLowerCase()) ||
-          log.actionType.toLowerCase().includes(search.toLowerCase());
+          fullName.includes(search.toLowerCase()) ||
+          log.actionType.toLowerCase().includes(search.toLowerCase()) ||
+          actionLabel.includes(search.toLowerCase()) ||
+          formattedAction.includes(search.toLowerCase());
         const matchesDate =
           (!dateRange.startDate || log.createdAt >= dateRange.startDate) &&
           (!dateRange.endDate || log.createdAt <= dateRange.endDate);
@@ -197,7 +241,6 @@ const AuditLogs: React.FC = () => {
                   <tr>
                     <th className={styles.tableHeader}>Name</th>
                     <th className={styles.tableHeader}>Action</th>
-                    <th className={styles.tableHeader}>Message</th>
                     <th className={styles.tableHeader}>Date</th>
                   </tr>
                 </thead>
@@ -207,10 +250,20 @@ const AuditLogs: React.FC = () => {
                 ) : (
                   <tbody>
                     {paginatedLogs.map((log, index) => (
-                      <tr className={styles.tableRows} key={index}>
-                        <td>{log.author}</td>
-                        <td>{log.actionType}</td>
-                        <td>{JSON.stringify(log.auditMessage)}</td>
+                      <tr
+                        className={styles.tableRows}
+                        key={index}
+                        onClick={() => {
+                          setSelectedLog(log);
+                          setDrawerOpen(true);
+                        }}
+                      >
+                        <td>{auditLogUserMap(log.author)}</td>
+                        <td>
+                          {auditLogActionTypeMap[log.actionType]?.format(log)
+                            ? auditLogActionTypeMap[log.actionType].format(log)
+                            : log.actionType}
+                        </td>
                         <td>{log.createdAt.toLocaleString()}</td>
                       </tr>
                     ))}
@@ -220,23 +273,14 @@ const AuditLogs: React.FC = () => {
             </div>
           )}
 
-          <div className={classNames(styles.paginationContainer)}>
-            <span>
-              {loading ? (
-                <Skeleton width={150} />
-              ) : (
-                `Showing ${(currentPage - 1) * actionsPerPage + 1} -
-                  ${Math.min(
-                    currentPage * actionsPerPage,
-                    filteredLogs.length,
-                  )}  of 
-                ${filteredLogs.length} actions`
-              )}
-            </span>
+          {!loading && filteredLogs.length > 0 && (
+            <div className={classNames(styles.paginationContainer)}>
+              <span>
+                {`Showing ${(currentPage - 1) * actionsPerPage + 1} -
+        ${Math.min(currentPage * actionsPerPage, filteredLogs.length)} of 
+        ${filteredLogs.length} actions`}
+              </span>
 
-            {loading ? (
-              <Skeleton width={40} height={40} />
-            ) : (
               <Pagination
                 pathname="/auditLogs"
                 totalPages={totalPages}
@@ -252,11 +296,7 @@ const AuditLogs: React.FC = () => {
                   setCurrentPage(page);
                 }}
               />
-            )}
 
-            {loading ? (
-              <Skeleton width={150} height={40} />
-            ) : (
               <div className={styles.actionsPerPageContainer}>
                 <label htmlFor="actionsPerPage">Actions per page</label>
                 <Select
@@ -264,15 +304,23 @@ const AuditLogs: React.FC = () => {
                   id="actionsPerPage"
                   value={actionsPerPage}
                   className={styles.actionsPerPageDropdown}
-                  onChange={(e) => setActionsPerPage(Number(e.target.value))}
+                  onChange={(e) => {
+                    setActionsPerPage(Number(e.target.value));
+                    setCurrentPage(1);
+                  }}
                 >
                   <option value="10">10</option>
                   <option value="25">25</option>
                   <option value="50">50</option>
                 </Select>
               </div>
-            )}
-          </div>
+              <AuditLogDrawer
+                isOpen={drawerOpen}
+                onClose={() => setDrawerOpen(false)}
+                log={selectedLog}
+              />
+            </div>
+          )}
         </>
       </div>
     </WithAuth>
