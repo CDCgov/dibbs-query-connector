@@ -4,7 +4,7 @@
 > .env.e2e
 echo "DATABASE_URL=postgresql://postgres:pw@localhost:5432/tefca_db" >> .env.e2e
 echo "AIDBOX_BASE_URL=http://localhost:8080" >> .env.e2e
-echo "APP_HOSTNAME=http://host.internal.docker:3000" >> .env.e2e
+echo "APP_HOSTNAME=http://host.docker.internal:3000" >> .env.e2e
 echo "AUTH_DISABLED=true" >> .env.e2e
 echo "AUTH_SECRET=verysecretsecret" >> .env.e2e
 
