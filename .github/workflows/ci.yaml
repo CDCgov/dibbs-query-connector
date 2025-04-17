@@ -92,17 +92,14 @@ jobs:
         working-directory: ./query-connector
         run: |
           echo "AIDBOX_LICENSE=${{ secrets.AIDBOX_LICENSE }}" > .env
-          echo "DATABASE_URL=postgresql://postgres:pw@localhost:5432/tefca_db" >> .env
-          echo "AIDBOX_BASE_URL=http://aidbox:8080" >> .env
-          echo "APP_HOSTNAME=http://query-connector:3000" >> .env
       - name: Build Query Connector and Run Playwright Tests
         id: run_tests
         working-directory: ./query-connector
         run: |
           bash ./setup-scripts/e2e_tests.sh
-      # uncomment these next few lines and the corresponding log import
-      # in the setup script you're trying to debug if you're having trouble
-      # in CI. All the best, brave engineer (￣^￣ )ゞ
+        # uncomment these next few lines and the corresponding log import
+        # in the setup script you're trying to debug if you're having trouble
+        # in CI. All the best, brave engineer (￣^￣ )ゞ
       #   continue-on-error: true
 
       # - name: Upload Docker Logs

@@ -152,7 +152,8 @@ Auto generate tests with Codegen.
 
 After running a test set on your local, you can also additionally type `npx playwright show-report` to view an HTML report page of different test statuses and results.
 
-Playwright is managed by an end-to-end job in the `.github/workflows/ci.yaml` file of the project root. Since it requires browser installation to effectively test, and since it operates using an independent framework from jest, it is explicitly _not_ included in the basic `npm test` scripts (specified in `package.json`).
+Playwright is managed by an end-to-end job in the `.github/workflows/ci.yaml` file of the project root. Since it requires browser installation to effectively test, and since it operates using an independent framework from jest, it's run separately from the unit and
+integration tests ran through `npm run test:ci`.
 
 ### Query Connector ERD
 
