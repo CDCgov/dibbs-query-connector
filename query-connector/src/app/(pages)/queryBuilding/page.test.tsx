@@ -4,8 +4,6 @@ import { getConditionsData } from "../../shared/database-service";
 import { conditionIdToNameMap, DEFAULT_QUERIES } from "./fixtures";
 import { RootProviderMock } from "@/app/tests/unit/setup";
 
-jest.mock("next-auth/react");
-
 jest.mock(".../../../shared/database-service", () => ({
   getConditionsData: jest.fn(),
 }));

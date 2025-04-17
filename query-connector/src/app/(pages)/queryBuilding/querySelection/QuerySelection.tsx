@@ -13,7 +13,6 @@ import MyQueriesDisplay from "./QueryLibrary";
 import { SelectedQueryDetails, SelectedQueryState } from "./utils";
 import { BuildStep } from "@/app/shared/constants";
 import { DataContext } from "@/app/shared/DataProvider";
-import { CustomUserQuery } from "@/app/models/entities/query";
 import { getRole } from "@/app/(pages)/userManagement/utils";
 import { getQueryList } from "@/app/backend/query-building";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
@@ -22,6 +21,7 @@ import { useSession } from "next-auth/react";
 import { User, UserRole } from "@/app/models/entities/users";
 import { getQueriesForUser } from "../utils";
 import { isAuthDisabledClientCheck } from "@/app/utils/auth";
+import { CustomUserQuery } from "@/app/models/entities/query";
 
 type QuerySelectionProps = {
   selectedQuery: SelectedQueryState;
@@ -50,7 +50,6 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({
   const [loading, setLoading] = useState(true);
   const [unauthorizedError, setUnauthorizedError] = useState(false);
   const [currentUser, setCurrentUser] = useState<User>();
-  const [queries, setQueries] = useState<CustomUserQuery[]>([]);
 
   const queriesContext = useContext(DataContext);
   const authDisabled = isAuthDisabledClientCheck(queriesContext?.runtimeConfig);
@@ -62,6 +61,7 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({
 
   // Retrieve and store current logged-in user's data on page load
   useEffect(() => {
+    console.log("???", "authDisabled", authDisabled, "userRole", userRole);
     const fetchCurrentUser = async () => {
       try {
         const currentUser = await getUserByUsername(username);
@@ -85,6 +85,7 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({
 
   // Check whether custom queries exist in DB
   useEffect(() => {
+    console.log(queriesContext?.data);
     if (queriesContext?.data === null || queriesContext?.data === undefined) {
       const fetchQueries = async () => {
         try {
@@ -92,9 +93,11 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({
           const queries = restrictedQueryList
             ? await getQueriesForUser(currentUser as User)
             : await getQueryList();
-
+          console.log("queries", queries);
           const loaded = queries && (authDisabled || !!currentUser);
-          !!loaded && setQueries(queries);
+          console.log("loaded?", queries, authDisabled || !!currentUser);
+
+          !!loaded && queriesContext?.setData(queries);
         } catch (error) {
           if (error == "Error: Unauthorized") {
             setUnauthorizedError(true);
@@ -119,9 +122,8 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({
     return <LoadingView loading={true} />;
   }
 
-  if (queries.length > 0) {
-    queries.sort((a, b) => (a.query_name[0] > b.query_name[0] ? 1 : -1));
-  }
+  const queries = (queriesContext?.data || []) as CustomUserQuery[];
+  queries.sort((a, b) => (a.query_name[0] > b.query_name[0] ? 1 : -1));
 
   return (
     <>
