@@ -143,34 +143,6 @@ describe("audit log", () => {
     expect(auditGenerationSpy).toHaveBeenCalledTimes(AUDIT_LOG_MAX_RETRIES);
   }, 10000);
 
-  it("should generate the correct checksum based on stored message and timestamp", async () => {
-    const auditQuery =
-      "SELECT * FROM audit_logs ORDER BY created_at DESC LIMIT 1;";
-    const result = await dbClient.query(auditQuery);
-
-    if (!result || !result.rows || result.rows.length === 0) {
-      throw new Error(
-        "No audit logs found. Ensure an audited action ran before this test.",
-      );
-    }
-
-    const latestAudit = result.rows[0];
-
-    expect(latestAudit.audit_checksum).toMatch(/^[a-f0-9]{64}$/);
-
-    const parsedMessage =
-      typeof latestAudit.audit_message === "string"
-        ? JSON.parse(latestAudit.audit_message)
-        : latestAudit.audit_message;
-
-    const recomputedChecksum = DecoratorUtils.generateAuditChecksum(
-      latestAudit.author,
-      parsedMessage,
-      new Date(latestAudit.created_at).toISOString(),
-    );
-    expect(latestAudit.audit_checksum).toBe(recomputedChecksum);
-  });
-
   it("should block UPDATEs and DELETE for audit_logs", async () => {
     const request: PatientDiscoveryRequest = {
       fhir_server: "Aidbox",
@@ -197,5 +169,42 @@ describe("audit log", () => {
     await expect(
       dbClient.query(`DELETE FROM audit_logs WHERE id = $1`, [insertedId]),
     ).rejects.toThrow(/DELETEs from audit_logs are not permitted/i);
+  });
+});
+
+describe("generateAuditChecksum", () => {
+  it("produces correct checksum for audit message with stringified request", () => {
+    const author = "WorfSonOfMogh";
+    const timestamp = "2024-04-10T17:12:45.123Z";
+
+    const audit_message = {
+      request: JSON.stringify({
+        fhir_server: "Aidbox",
+        first_name: "Testy",
+        last_name: "McTestface",
+        dob: "1970-01-01",
+        mrn: "1234567",
+        phone: "555-123-4567",
+      }),
+    };
+
+    const checksum = DecoratorUtils.generateAuditChecksum(
+      author,
+      audit_message,
+      timestamp,
+    );
+
+    const expected = require("crypto")
+      .createHash("sha256")
+      .update(
+        JSON.stringify({
+          author,
+          auditContents: audit_message,
+          timestamp,
+        }),
+      )
+      .digest("hex");
+
+    expect(checksum).toBe(expected);
   });
 });
