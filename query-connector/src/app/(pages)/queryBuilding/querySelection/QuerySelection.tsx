@@ -15,12 +15,12 @@ import { SelectedQueryDetails, SelectedQueryState } from "./utils";
 import { BuildStep } from "@/app/shared/constants";
 import { DataContext } from "@/app/shared/DataProvider";
 import { CustomUserQuery } from "@/app/models/entities/query";
-import { getQueryList } from "@/app/backend/query-building";
+import { getQueriesForUser, getQueryList } from "@/app/backend/query-building";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import { getRole } from "@/app/(pages)/userManagement/utils";
 import { getUserByUsername } from "@/app/backend/user-management";
 import { User, UserRole } from "@/app/models/entities/users";
-import { getQueriesForUser } from "../utils";
+
 import { isAuthDisabledClientCheck } from "@/app/utils/auth";
 
 type QuerySelectionProps = {
