@@ -124,7 +124,7 @@ export default function LandingPage() {
           </div>
         </div>
       ) : (
-        <>Redirecting...</>
+        <div className="margin-1">Redirecting...</div>
       )}
     </>
   );
