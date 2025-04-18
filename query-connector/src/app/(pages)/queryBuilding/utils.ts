@@ -1,7 +1,5 @@
 import { DibbsValueSet } from "@/app/models/entities/valuesets";
 import { ConceptTypeToDibbsVsMap } from "../../utils/valueSetTranslation";
-import { getAllGroupQueries } from "@/app/backend/usergroup-management";
-import { User } from "@/app/models/entities/users";
 
 // The structure of the data that's coming from the backend
 export type ConditionsMap = {
@@ -184,19 +182,3 @@ export const batchToggleConcepts = (input: DibbsValueSet) => {
 
   return input;
 };
-/**
- * @param currentUser - Method to retrieve all queries assigned to groups that
- * the given user is a member of
- * @returns an array of CustomUserQuery objects
- */
-export async function getQueriesForUser(currentUser: User) {
-  if (!!currentUser && currentUser.userGroupMemberships) {
-    const assignedQueries = await Promise.all(
-      currentUser.userGroupMemberships.map(async (gm) => {
-        const groupQueries = await getAllGroupQueries(gm.usergroup_id);
-        return groupQueries.items;
-      }),
-    );
-    return assignedQueries.flat();
-  }
-}

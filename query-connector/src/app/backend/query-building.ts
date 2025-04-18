@@ -4,6 +4,8 @@ import { getDbClient } from "./dbClient";
 import { DibbsValueSet } from "../models/entities/valuesets";
 import { adminAccessCheck } from "../utils/auth";
 import { CustomUserQuery } from "../models/entities/query";
+import { User } from "../models/entities/users";
+import { getAllGroupQueries } from "./usergroup-management";
 
 // TODO: the functionality in this file should eventually be moved into the
 // TODO: corresponding file in dbServices within the service class pattern to
@@ -148,3 +150,20 @@ export const deleteQueryById = async (queryId: string) => {
     return { success: false, error: "Failed to delete the query." };
   }
 };
+
+/**
+ * @param currentUser - Method to retrieve all queries assigned to groups that
+ * the given user is a member of
+ * @returns an array of CustomUserQuery objects
+ */
+export async function getQueriesForUser(currentUser: User) {
+  if (!!currentUser && currentUser.userGroupMemberships) {
+    const assignedQueries = await Promise.all(
+      currentUser.userGroupMemberships.map(async (gm) => {
+        const groupQueries = await getAllGroupQueries(gm.usergroup_id);
+        return groupQueries.items;
+      }),
+    );
+    return assignedQueries.flat();
+  }
+}

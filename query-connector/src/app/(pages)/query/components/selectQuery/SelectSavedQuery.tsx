@@ -8,12 +8,14 @@ import LoadingView from "../../../../ui/designSystem/LoadingView";
 import { showToastConfirmation } from "../../../../ui/designSystem/toast/Toast";
 import { getFhirServerNames } from "@/app/backend/dbServices/fhir-servers";
 import { CustomUserQuery } from "@/app/models/entities/query";
-import { getCustomQueries } from "@/app/backend/query-building";
+import {
+  getCustomQueries,
+  getQueriesForUser,
+} from "@/app/backend/query-building";
 import { User, UserRole } from "@/app/models/entities/users";
 import { getRole } from "@/app/(pages)/userManagement/utils";
 import { getUserByUsername } from "@/app/backend/user-management";
 import { useSession } from "next-auth/react";
-import { getQueriesForUser } from "@/app/(pages)/queryBuilding/utils";
 import { isAuthDisabledClientCheck } from "@/app/utils/auth";
 import { DataContext } from "@/app/shared/DataProvider";
 
