@@ -6,6 +6,7 @@ import { PAGE_TITLES } from "@/app/(pages)/query/components/stepIndicator/StepIn
 
 test("landing page loads", async ({ page }) => {
   await page.goto(TEST_URL);
+  await expect(page.getByText("Redirecting...")).not.toBeVisible();
 
   // Check that each expected text section is present
   await expect(

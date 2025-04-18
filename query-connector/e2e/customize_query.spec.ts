@@ -16,6 +16,7 @@ test.describe("querying with the Query Connector", () => {
   // Start every test by navigating to the customize query workflow
   test.beforeEach(async ({ page }) => {
     await page.goto(TEST_URL);
+    await expect(page.getByText("Redirecting...")).not.toBeVisible();
 
     // Check that the info alert is visible and contains the correct text
     if (showSiteAlert) {
@@ -29,7 +30,6 @@ test.describe("querying with the Query Connector", () => {
       }),
     ).toBeVisible();
 
-    await expect(page.getByText("Redirecting...")).not.toBeVisible();
     await page.getByRole("button", { name: "Fill fields" }).click();
     // Select FHIR server from drop down
     await page.getByRole("button", { name: "Advanced" }).click();
