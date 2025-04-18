@@ -25,15 +25,10 @@ export default function LandingPage() {
     if (isAuthDisabled || status === "authenticated") {
       window.location.href = "/query";
     }
-  }),
-    [isAuthDisabled];
+  }, [isAuthDisabled]);
 
   const handleClick = () => {
-    if (isAuthDisabled) {
-      window.location.href = "/query";
-    } else {
-      signIn("keycloak", { redirectTo: "/query" });
-    }
+    signIn("keycloak", { redirectTo: "/query" });
   };
 
   return (
