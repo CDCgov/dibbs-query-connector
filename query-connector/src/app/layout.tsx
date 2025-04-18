@@ -23,6 +23,7 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  console.log("in root layout");
   // Initializes user session on server side for the first load
   // if session does not exists then session object remains null
   const session = await auth();

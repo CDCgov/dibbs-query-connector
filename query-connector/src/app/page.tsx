@@ -4,6 +4,8 @@ import LandingPage from "./(pages)/landingPage/landingPage";
  * @returns The RootPage component.
  */
 export default function RootPage() {
+  console.log("in root page");
+
   return (
     <>
       <LandingPage />
