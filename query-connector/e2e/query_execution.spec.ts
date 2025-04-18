@@ -19,6 +19,7 @@ test.describe("querying with the Query Connector", () => {
   test.beforeEach(async ({ page }) => {
     // Start every test on our main landing page
     await page.goto(TEST_URL);
+    await expect(page.getByText("Redirecting...")).not.toBeVisible();
   });
 
   test("unsuccessful user query: no patients", async ({ page }) => {
