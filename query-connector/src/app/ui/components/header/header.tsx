@@ -1,15 +1,17 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
-import { useSession, signIn, signOut } from "next-auth/react";
-import { Button, Icon } from "@trussworks/react-uswds";
+import React, { useContext, useEffect, useRef, useState } from "react";
+import { useSession, signOut } from "next-auth/react";
+import { Icon } from "@trussworks/react-uswds";
 import styles from "./header.module.scss";
 import { metadata } from "@/app/shared/constants";
 import classNames from "classnames";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { getPagesInSettingsMenu, PAGES } from "@/app/shared/page-routes";
 import { UserRole } from "@/app/models/entities/users";
+import { isAuthDisabledClientCheck } from "@/app/utils/auth";
+import { DataContext } from "@/app/shared/DataProvider";
 
 /**
  * Produces the header.
@@ -24,11 +26,14 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
   const [showMenu, setShowMenu] = useState(false);
   const router = useRouter();
   const { data: session, status } = useSession();
-  const isLoggedIn = status === "authenticated";
+  const ctx = useContext(DataContext);
+  const isAuthDisabled = isAuthDisabledClientCheck(ctx?.runtimeConfig);
+
+  const isLoggedIn = status === "authenticated" || isAuthDisabled;
+
   const userRole = authDisabled
     ? UserRole.SUPER_ADMIN
     : session?.user?.role || "";
-  const pathname = usePathname();
 
   const outsideMenuClick = (event: MouseEvent) => {
     if (
@@ -42,19 +47,10 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
 
   useEffect(() => {
     document.addEventListener("mousedown", outsideMenuClick);
-
     return () => {
       document.removeEventListener("mousedown", outsideMenuClick);
     };
   }, [showMenu]);
-
-  const handleSignIn = () => {
-    if (authDisabled) {
-      router.push(PAGES.QUERY);
-    } else {
-      signIn("keycloak", { redirectTo: PAGES.QUERY });
-    }
-  };
 
   const handleSignOut = async () => {
     if (authDisabled) {
@@ -68,11 +64,10 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
     setShowMenu(!showMenu);
   };
 
-  const landingPage: string =
-    authDisabled || isLoggedIn ? PAGES.QUERY : PAGES.LANDING;
+  const landingPage = authDisabled || isLoggedIn ? PAGES.QUERY : PAGES.LANDING;
 
   const menuPages = getPagesInSettingsMenu(userRole as UserRole).filter(
-    (page) => page.path != PAGES.QUERY,
+    (page) => page.path !== PAGES.QUERY,
   );
 
   return (
@@ -104,30 +99,18 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
               "flex-align-center",
             )}
           >
-            {!authDisabled && status === "unauthenticated" ? (
-              <Button
-                className={styles.signinButton}
-                type="button"
-                id="signin-button"
-                title={"Sign in button"}
-                onClick={handleSignIn}
-              >
-                Sign in
-              </Button>
-            ) : (
+            {isLoggedIn && (
               <div className="display-flex flex-align-center">
-                {pathname !== PAGES.QUERY && (
-                  <Link
-                    href={PAGES.QUERY}
-                    className={classNames(
-                      styles.runQueryBtn,
-                      "usa-button margin-bottom-0 margin-right-2",
-                    )}
-                    scroll={false}
-                  >
-                    Run a query
-                  </Link>
-                )}
+                <Link
+                  href={PAGES.QUERY}
+                  className={classNames(
+                    styles.runQueryBtn,
+                    "usa-button margin-bottom-0 margin-right-2",
+                  )}
+                  scroll={false}
+                >
+                  Run a query
+                </Link>
                 <button
                   onClick={toggleMenuDropdown}
                   className={classNames(
