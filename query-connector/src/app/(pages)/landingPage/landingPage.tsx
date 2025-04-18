@@ -8,12 +8,22 @@ import {
 import Link from "next/link";
 import Image from "next/image";
 import styles from "./landingPage.module.scss";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next-nprogress-bar";
 
 /**
  * The landing page for the TEFCA Viewer.
  * @returns The LandingPage component.
  */
 export default function LandingPage() {
+  const router = useRouter();
+  const { status } = useSession();
+  const isLoggedIn = status === "authenticated";
+  // Redirect to the query page if the user is logged in
+  if (isLoggedIn) {
+    router.push("/query");
+    return null;
+  }
   return (
     <div className="main-body display-flex flex-column flex-justify-center">
       <div className="gradient-blue-background flex-1">
