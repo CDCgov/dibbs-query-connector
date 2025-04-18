@@ -94,7 +94,7 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
               "flex-align-center",
             )}
           >
-            {(isLoggedIn || authDisabled) && (
+            {isLoggedIn && (
               <div className="display-flex flex-align-center">
                 <Link
                   href={PAGES.QUERY}
