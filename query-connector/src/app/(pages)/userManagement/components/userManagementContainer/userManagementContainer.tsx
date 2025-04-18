@@ -103,20 +103,22 @@ const UsersTable: React.FC<UsersTableProps> = ({ role }) => {
       renderContent: () =>
         userGroups.length > 0 ? (
           <>
-            <Button
-              onClick={() => handleOpenModal("create-group")}
-              className={classNames(
-                "styles.createQueryButton",
-                "margin-bottom-3",
-              )}
-              style={{
-                marginLeft: "1px",
-                backgroundColor: "#005EA2",
-              }}
-              type="button"
-            >
-              Create group
-            </Button>
+            {role == UserRole.SUPER_ADMIN && (
+              <Button
+                onClick={() => handleOpenModal("create-group")}
+                className={classNames(
+                  "styles.createQueryButton",
+                  "margin-bottom-3",
+                )}
+                style={{
+                  marginLeft: "1px",
+                  backgroundColor: "#005EA2",
+                }}
+                type="button"
+              >
+                Create group
+              </Button>
+            )}
             <UserGroupsTable
               openModal={handleOpenModal}
               fetchGroupMembers={fetchGroupMembers}
@@ -185,10 +187,11 @@ const UsersTable: React.FC<UsersTableProps> = ({ role }) => {
     await getCustomQueries().then(async (queries) => {
       const queriesResponse = await Promise.all(
         queries.map(async (query) => {
-          const queryWithGroups = await getSingleQueryGroupAssignments(
+          const groupAssignments = await getSingleQueryGroupAssignments(
             query.query_id,
           );
-          return queryWithGroups.items[0];
+          query.groupAssignments = groupAssignments.items;
+          return query;
         }),
       );
 

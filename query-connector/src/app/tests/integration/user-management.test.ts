@@ -25,7 +25,7 @@ jest.mock("@/app/utils/auth", () => {
   };
 });
 
-const TEST_USER = {
+const TEST_USER_STANDARD = {
   id: "13e1efb2-5889-4157-8f34-78d7f02dbf84",
   username: "Ima User",
   email: "ima.user@example.com",
@@ -33,6 +33,13 @@ const TEST_USER = {
   lastName: "User",
 };
 
+const TEST_USER_SUPER = {
+  username: "super-admin",
+  email: "super-admin@example.com",
+  firstName: "Super",
+  lastName: "Admin",
+  qcRole: "Super Admin",
+};
 suppressConsoleLogs();
 
 describe("User Management Integration Tests", () => {
@@ -45,23 +52,35 @@ describe("User Management Integration Tests", () => {
     const insertSuperUsersQuery = `
      INSERT INTO users (username, first_name, last_name, qc_role)
      VALUES 
-       ('super-admin', 'admin', 'admin', 'Super Admin');
+       ($1, $2, $3, $4);
    `;
-    await dbClient.query(insertSuperUsersQuery);
+    await dbClient.query(insertSuperUsersQuery, [
+      TEST_USER_SUPER.username,
+      TEST_USER_SUPER.firstName,
+      TEST_USER_SUPER.lastName,
+      TEST_USER_SUPER.qcRole,
+    ]);
   });
 
   afterAll(async () => {
-    await dbClient.query("ROLLBACK");
+    try {
+      await dbClient.query("DELETE FROM users WHERE id = $1;", [
+        TEST_USER_STANDARD.id,
+      ]);
+      await dbClient.query("ROLLBACK");
+    } catch (error) {
+      console.error("Rollback failed:", error);
+    }
   });
 
   /**
    * Tests adding a new user if they do not already exist.
    */
   test("should add a user if they do not exist", async () => {
-    const result = await addUserIfNotExists(TEST_USER);
+    const result = await addUserIfNotExists(TEST_USER_STANDARD);
 
     expect(result).toHaveProperty("id");
-    expect(result).toHaveProperty("username", TEST_USER.username);
+    expect(result).toHaveProperty("username", TEST_USER_STANDARD.username);
     expect(result).toHaveProperty("qc_role", UserRole.STANDARD);
     createdUserId = result.id;
   });
@@ -79,7 +98,7 @@ describe("User Management Integration Tests", () => {
    * Tests retrieving a user's role by username.
    */
   test("should retrieve user role by username", async () => {
-    const result = await getUserRole(TEST_USER.username);
+    const result = await getUserRole(TEST_USER_STANDARD.username);
     expect(result).toBe(UserRole.SUPER_ADMIN);
   });
 

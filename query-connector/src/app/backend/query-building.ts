@@ -4,6 +4,8 @@ import { getDbClient } from "./dbClient";
 import { DibbsValueSet } from "../models/entities/valuesets";
 import { adminAccessCheck } from "../utils/auth";
 import { CustomUserQuery } from "../models/entities/query";
+import { User } from "../models/entities/users";
+import { getAllGroupQueries } from "./usergroup-management";
 
 // TODO: the functionality in this file should eventually be moved into the
 // TODO: corresponding file in dbServices within the service class pattern to
@@ -20,8 +22,8 @@ const dbClient = getDbClient();
  * Each query object includes:
  * - query_id: The unique identifier for the query.
  * - query_name: The name of the query.
- * - valuesets: An array of ValueSet objects
- * - concepts: An array of Concept objects
+ * - valuesets: An array of ValueSet objects.
+ * - concepts: An array of Concept objects.
  */
 export async function getCustomQueries(): Promise<CustomUserQuery[]> {
   const query = `
@@ -30,8 +32,7 @@ export async function getCustomQueries(): Promise<CustomUserQuery[]> {
       q.query_name,
       q.query_data,
       q.conditions_list
-    FROM
-      query q;
+    FROM query q;
   `;
   // TODO: this will eventually need to take into account user permissions and specific authors
   // We'll probably also need to refactor this to not show up in any user-facing containers
@@ -109,7 +110,16 @@ export async function getQueryById(queryId: string) {
       console.error("No results found for query id:", queryId);
       return undefined;
     }
-    return result.rows[0] as unknown as CustomUserQuery;
+    const query = result.rows[0];
+    const formattedQuery = {
+      query_id: query.id,
+      query_name: query.query_name,
+      query_data: query.query_data,
+      conditions_list: query.conditions_list,
+      valuesets: [],
+    };
+
+    return formattedQuery as CustomUserQuery;
   } catch (error) {
     console.error(`Failed to retrieve query with ID ${queryId}:`, error);
     return { success: false, error: "Failed to retrieve the query." };
@@ -140,3 +150,20 @@ export const deleteQueryById = async (queryId: string) => {
     return { success: false, error: "Failed to delete the query." };
   }
 };
+
+/**
+ * @param currentUser - Method to retrieve all queries assigned to groups that
+ * the given user is a member of
+ * @returns an array of CustomUserQuery objects
+ */
+export async function getQueriesForUser(currentUser: User) {
+  if (!!currentUser && currentUser.userGroupMemberships) {
+    const assignedQueries = await Promise.all(
+      currentUser.userGroupMemberships.map(async (gm) => {
+        const groupQueries = await getAllGroupQueries(gm.usergroup_id);
+        return groupQueries.items;
+      }),
+    );
+    return assignedQueries.flat();
+  }
+}

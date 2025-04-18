@@ -33,6 +33,7 @@ describe("tests the query building steps", () => {
     await waitFor(() => {
       expect(screen.queryByText("Loading")).not.toBeInTheDocument();
     });
+
     expect(screen.getByText("Start with Query Builder")).toBeInTheDocument();
     expect(screen.getByTestId("empty-state-container")).toMatchSnapshot();
   });

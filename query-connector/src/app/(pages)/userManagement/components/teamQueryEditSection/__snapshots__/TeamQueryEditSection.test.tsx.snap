@@ -53,7 +53,9 @@ exports[`User Management drawer is closed by default 1`] = `
         <div
           class="drawerBody"
         >
-          <div>
+          <div
+            class="margin-top-2"
+          >
             No queries found.
           </div>
         </div>
@@ -123,7 +125,9 @@ exports[`User Management drawer renders an error message if there is no subject 
         <div
           class="drawerBody"
         >
-          <div>
+          <div
+            class="margin-top-2"
+          >
             No users found.
           </div>
         </div>

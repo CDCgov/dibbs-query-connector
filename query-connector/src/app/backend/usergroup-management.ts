@@ -1,5 +1,5 @@
 "use server";
-import { User, UserGroup } from "../models/entities/users";
+import { User, UserGroup, UserGroupMembership } from "../models/entities/users";
 import {
   getAllUsersWithSingleGroupStatus,
   getSingleUserWithGroupMemberships,
@@ -9,8 +9,8 @@ import { adminAccessCheck } from "../utils/auth";
 import { getDbClient } from "./dbClient";
 import { QCResponse } from "../models/responses/collections";
 import { CustomUserQuery } from "../models/entities/query";
-import { getQueryById } from "./query-building";
 import { QueryResult } from "pg";
+import { getQueryById } from "./query-building";
 
 const dbClient = getDbClient();
 
@@ -421,18 +421,34 @@ export async function getAllGroupQueries(
 ): Promise<QCResponse<CustomUserQuery>> {
   try {
     const selectQueriesByGroupQuery = `
-    SELECT ugtq.id as membership_id, ug.name as usergroup_name, ug.id as usergroup_id,q.id as query_id, q.query_name
+    SELECT ugtq.id as membership_id, ug.name as usergroup_name, ug.id as usergroup_id,q.id as query_id, q.query_name, q.query_data, q.conditions_list
     FROM query as q
     LEFT JOIN usergroup_to_query as ugtq ON ugtq.query_id = q.id
     LEFT JOIN usergroup ug ON ug.id = ugtq.usergroup_id 
     WHERE ugtq.usergroup_id = $1;
     `;
     const result = await dbClient.query(selectQueriesByGroupQuery, [groupId]);
-    const queriesWithGroups = await fetchQueryGroupAssignmentDetails(result);
+
+    const groupQueries = await Promise.all(
+      result.rows.map(async (row) => {
+        const groupAssignments = await fetchQueryGroupAssignmentDetails(result);
+
+        const formattedQuery: CustomUserQuery = {
+          query_id: row.query_id,
+          query_name: row.query_name,
+          valuesets: row.query_data,
+          conditions_list: row.conditions_list,
+          groupAssignments: groupAssignments,
+        };
+
+        await dbClient.query("COMMIT");
+        return formattedQuery;
+      }),
+    );
 
     return {
       totalItems: result.rowCount,
-      items: queriesWithGroups,
+      items: groupQueries,
     } as QCResponse<CustomUserQuery>;
   } catch (error) {
     throw error;
@@ -443,7 +459,7 @@ export async function getAllGroupQueries(
  * Adds users to a user group.
  * @param groupId - The unique identifier of the user group.
  * @param queryIds - The unique identifier of the query to add.
- * @returns The user IDs of the users added to the group.
+ * @returns The IDs of the queries added to the group.
  */
 export async function addQueriesToGroup(
   groupId: string,
@@ -479,13 +495,17 @@ export async function addQueriesToGroup(
 
     const result = await dbClient.query(insertQuery);
     const updatedQueries = await Promise.all(
-      result.rows.map(async (updatedQuery) => {
-        const updatedUserWithGroups = await getSingleQueryGroupAssignments(
-          updatedQuery.query_id,
+      result.rows.map(async (result) => {
+        const updatedQuery = (await getQueryById(
+          result.query_id,
+        )) as CustomUserQuery;
+        const updatedGroupAssignments = await getSingleQueryGroupAssignments(
+          result.query_id,
         );
+        updatedQuery.groupAssignments = updatedGroupAssignments.items;
         await dbClient.query("COMMIT");
 
-        return updatedUserWithGroups.items[0];
+        return updatedQuery;
       }),
     );
 
@@ -520,20 +540,21 @@ export async function removeQueriesFromGroup(
 
     const result = await dbClient.query(removeQuery);
 
-    const updatedQueryWithGroupAssignments = await Promise.all(
+    const updatedQueries = await Promise.all(
       result.rows.map(async (updatedQuery) => {
-        const updatedUserWithGroups = await getSingleQueryGroupAssignments(
+        const updatedGroupAssignments = await getSingleQueryGroupAssignments(
           updatedQuery.query_id,
         );
+        updatedQuery.groupAssignments = updatedGroupAssignments.items;
         await dbClient.query("COMMIT");
 
-        return updatedUserWithGroups.items[0];
+        return updatedQuery;
       }),
     );
 
     return {
       totalItems: result.rowCount || 0,
-      items: updatedQueryWithGroupAssignments,
+      items: updatedQueries,
     };
   } catch (error) {
     console.error("Error removing query from group:", error);
@@ -549,11 +570,8 @@ export async function removeQueriesFromGroup(
  */
 export async function getSingleQueryGroupAssignments(
   queryId: string,
-): Promise<QCResponse<CustomUserQuery>> {
+): Promise<QCResponse<UserGroupMembership>> {
   // TODO: https://linear.app/skylight-cdc/issue/QUE-216/refactor-user-management-code-into-service-class-pattern
-  if (!(await adminAccessCheck())) {
-    throw new Error("Unauthorized");
-  }
   try {
     const query = `
     SELECT
@@ -582,22 +600,9 @@ export async function getSingleQueryGroupAssignments(
         };
       });
 
-      const queryWithGroups: CustomUserQuery = {
-        query_id: queryId,
-        query_name: results.rows[0].query_name,
-        valuesets: [],
-        groupAssignments,
-      };
-      return { totalItems: 1, items: [queryWithGroups] };
+      return { totalItems: groupAssignments.length, items: groupAssignments };
     } else {
-      const query = (await getQueryById(queryId)) as CustomUserQuery;
-      const formattedQuery: CustomUserQuery = {
-        query_id: queryId,
-        query_name: query.query_name,
-        valuesets: [],
-        groupAssignments: [],
-      };
-      return { totalItems: 1, items: [formattedQuery] };
+      return { totalItems: 0, items: [] };
     }
   } catch (error) {
     console.error("Error fetching groups for query:", error);
