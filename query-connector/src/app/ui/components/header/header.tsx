@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { useSession, signOut } from "next-auth/react";
 import { Icon } from "@trussworks/react-uswds";
 import styles from "./header.module.scss";
@@ -10,6 +10,8 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { getPagesInSettingsMenu, PAGES } from "@/app/shared/page-routes";
 import { UserRole } from "@/app/models/entities/users";
+import { isAuthDisabledClientCheck } from "@/app/utils/auth";
+import { DataContext } from "@/app/shared/DataProvider";
 
 /**
  * Produces the header.
@@ -24,7 +26,10 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
   const [showMenu, setShowMenu] = useState(false);
   const router = useRouter();
   const { data: session, status } = useSession();
-  const isLoggedIn = status === "authenticated";
+  const ctx = useContext(DataContext);
+  const isAuthDisabled = isAuthDisabledClientCheck(ctx?.runtimeConfig);
+
+  const isLoggedIn = status === "authenticated" || isAuthDisabled;
 
   const userRole = authDisabled
     ? UserRole.SUPER_ADMIN
