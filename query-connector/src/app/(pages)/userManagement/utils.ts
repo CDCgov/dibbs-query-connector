@@ -146,8 +146,9 @@ export function filterQueries(
   const newQueries = structuredClone(queries);
 
   return newQueries.map((query) => {
-    let nameMatch =
-      query?.query_name.toLocaleLowerCase().includes(casedSearchFilter) || "";
+    let nameMatch = query?.query_name
+      .toLocaleLowerCase()
+      .includes(casedSearchFilter);
 
     if (!nameMatch) {
       return query;

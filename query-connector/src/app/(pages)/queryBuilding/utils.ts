@@ -185,8 +185,9 @@ export const batchToggleConcepts = (input: DibbsValueSet) => {
   return input;
 };
 /**
- * @param currentUser - asdf
- * @returns asdf
+ * @param currentUser - Method to retrieve all queries assigned to groups that
+ * the given user is a member of
+ * @returns an array of CustomUserQuery objects
  */
 export async function getQueriesForUser(currentUser: User) {
   if (!!currentUser && currentUser.userGroupMemberships) {

@@ -3,6 +3,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import { getConditionsData } from "../../shared/database-service";
 import { conditionIdToNameMap, DEFAULT_QUERIES } from "./fixtures";
 import { RootProviderMock } from "@/app/tests/unit/setup";
+import { getQueryList } from "@/app/backend/query-building";
 
 jest.mock(".../../../shared/database-service", () => ({
   getConditionsData: jest.fn(),
@@ -21,8 +22,10 @@ jest.mock(
 
 describe("tests the query building steps", () => {
   it("renders the empty state", async () => {
+    (getQueryList as jest.Mock).mockResolvedValue([]);
+
     render(
-      <RootProviderMock currentPage="/queryBuilding" data={[]}>
+      <RootProviderMock currentPage="/queryBuilding">
         <QueryBuilding />
       </RootProviderMock>,
     );

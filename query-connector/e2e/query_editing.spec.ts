@@ -13,8 +13,6 @@ import {
   saveCustomQueryHelp,
 } from "@/app/backend/dbServices/queryBuilding/lib";
 
-const CUSTOM_QUERY = "Custom Query";
-
 test.describe("editing an exisiting query", () => {
   let subjectQuery: QueryTableResult;
   // Start every test by navigating to the customize query workflow
@@ -219,6 +217,8 @@ test.describe("editing an exisiting query", () => {
     await expect(actionButton).toHaveText("Save query");
   });
 });
+
+const CUSTOM_QUERY = "Custom Query";
 
 const ADDED_CONDITION = {
   name: "Disease caused by severe acute respiratory syndrome coronavirus 2",

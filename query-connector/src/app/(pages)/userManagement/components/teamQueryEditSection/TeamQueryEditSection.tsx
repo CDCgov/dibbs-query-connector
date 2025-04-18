@@ -180,7 +180,7 @@ const UserManagementDrawer: React.FC<UserManagementDrawerProps> = ({
   };
 
   const renderError = (content: string) => {
-    return <div>{`No ${content} found.`}</div>;
+    return <div className="margin-top-2">{`No ${content} found.`}</div>;
   };
 
   function generateContent(): JSX.Element {

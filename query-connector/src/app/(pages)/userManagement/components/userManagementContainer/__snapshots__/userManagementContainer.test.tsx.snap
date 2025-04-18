@@ -76,7 +76,9 @@ exports[`Admin view of Users Table renders error message when no user groups are
           <div
             class="drawerBody"
           >
-            <div>
+            <div
+              class="margin-top-2"
+            >
               No queries found.
             </div>
           </div>
@@ -361,7 +363,9 @@ exports[`Super Admin view of Users Table renders content on tab click 1`] = `
           <div
             class="drawerBody"
           >
-            <div>
+            <div
+              class="margin-top-2"
+            >
               No queries found.
             </div>
           </div>
@@ -462,7 +466,9 @@ exports[`Super Admin view of Users Table renders content on tab click 2`] = `
           <div
             class="drawerBody"
           >
-            <div>
+            <div
+              class="margin-top-2"
+            >
               No queries found.
             </div>
           </div>
@@ -559,7 +565,9 @@ exports[`Super Admin view of Users Table renders error message when no users are
           <div
             class="drawerBody"
           >
-            <div>
+            <div
+              class="margin-top-2"
+            >
               No queries found.
             </div>
           </div>
@@ -844,7 +852,9 @@ exports[`Super Admin view of Users Table renders table view after content is loa
           <div
             class="drawerBody"
           >
-            <div>
+            <div
+              class="margin-top-2"
+            >
               No queries found.
             </div>
           </div>
@@ -1129,7 +1139,9 @@ exports[`Super Admin view of Users Table renders table view after content is loa
           <div
             class="drawerBody"
           >
-            <div>
+            <div
+              class="margin-top-2"
+            >
               No queries found.
             </div>
           </div>
