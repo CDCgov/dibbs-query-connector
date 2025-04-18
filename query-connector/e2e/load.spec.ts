@@ -1,24 +1,22 @@
 import { test, expect } from "@playwright/test";
 import { TEST_URL } from "../playwright-setup";
-import { metadata } from "@/app/shared/constants";
-
-// TODO: Rewrite tests to look at /query instead of landingPage
+import { showSiteAlert } from "./constants";
+import { checkForSiteAlert } from "./utils";
+import { PAGE_TITLES } from "@/app/(pages)/query/components/stepIndicator/StepIndicator";
 
 test("landing page loads", async ({ page }) => {
   await page.goto(TEST_URL);
 
   // Check that each expected text section is present
   await expect(
-    page.getByRole("heading", { name: "Data collection made easier" }),
+    page.getByRole("heading", {
+      name: PAGE_TITLES["search"].title,
+      exact: true,
+    }),
   ).toBeVisible();
-  await expect(
-    page.getByRole("heading", { name: "What is it?" }),
-  ).toBeVisible();
-  await expect(
-    page.getByRole("heading", { name: "How does it work?" }),
-  ).toBeVisible();
-
   // Check that interactable elements are present (header and Get Started)
-  await expect(page.getByRole("link", { name: metadata.title })).toBeVisible();
-  await page.getByRole("button", { name: "Sign in" }).click();
+  // Check that the info alert is visible and contains the correct text
+  if (showSiteAlert) {
+    await checkForSiteAlert(page);
+  }
 });

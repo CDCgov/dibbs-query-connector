@@ -22,7 +22,6 @@ test.describe("querying with the Query Connector", () => {
   });
 
   test("unsuccessful user query: no patients", async ({ page }) => {
-    await page.getByRole("button", { name: "Sign in" }).click();
     await page.getByRole("button", { name: "Fill fields" }).click();
     await page.getByLabel("First name").fill("Shouldnt");
     await page.getByLabel("Last name").fill("Findanyone");
@@ -47,8 +46,6 @@ test.describe("querying with the Query Connector", () => {
   });
 
   test("successful demo user query", async ({ page }) => {
-    await page.getByRole("button", { name: "Sign in" }).click();
-
     // Check that the info alert is visible and contains the correct text
     if (showSiteAlert) {
       await checkForSiteAlert(page);
@@ -181,7 +178,6 @@ test.describe("alternate queries with the Query Connector", () => {
   test("query using form-fillable demo patient by phone number", async ({
     page,
   }) => {
-    await page.getByRole("button", { name: "Sign in" }).click();
     await page.getByRole("button", { name: "Fill fields" }).click();
 
     // Delete Last name and MRN to force phone number as one of the 3 fields
@@ -220,7 +216,6 @@ test.describe("alternate queries with the Query Connector", () => {
 
   // test("social determinants query with generalized function", async ({
   test("cancer query with generalized function", async ({ page }) => {
-    await page.getByRole("button", { name: "Sign in" }).click();
     await page.getByRole("button", { name: "Fill fields" }).click();
     // Select FHIR server from drop down
     await page.getByRole("button", { name: "Advanced" }).click();
@@ -247,7 +242,6 @@ test.describe("alternate queries with the Query Connector", () => {
   test("form-fillable STI query using generalized function", async ({
     page,
   }) => {
-    await page.getByRole("button", { name: "Sign in" }).click();
     await page.getByRole("button", { name: "Fill fields" }).click();
     // Select FHIR server from drop down
     await page.getByRole("button", { name: "Advanced" }).click();
