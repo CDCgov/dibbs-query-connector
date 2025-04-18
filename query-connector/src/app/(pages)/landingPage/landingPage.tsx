@@ -8,29 +8,25 @@ import {
 import Image from "next/image";
 import styles from "./landingPage.module.scss";
 import { signIn, useSession } from "next-auth/react";
-import { useContext, useEffect } from "react";
-import { DataContext } from "@/app/shared/DataProvider";
-import { isAuthDisabledClientCheck } from "@/app/utils/auth";
+import { useRouter } from "next-nprogress-bar";
 
 /**
  * The landing page for the TEFCA Viewer.
  * @returns The LandingPage component.
  */
 export default function LandingPage() {
+  const router = useRouter();
   const { status } = useSession();
-  const ctx = useContext(DataContext);
-  const isAuthDisabled = isAuthDisabledClientCheck(ctx?.runtimeConfig);
-
-  useEffect(() => {
-    if (isAuthDisabled || status === "authenticated") {
-      window.location.href = "/query";
-    }
-  }, [isAuthDisabled]);
+  const isLoggedIn = status === "authenticated";
+  // Redirect to the query page if the user is logged in
+  if (isLoggedIn) {
+    router.push("/query");
+    return null;
+  }
 
   const handleClick = () => {
     signIn("keycloak", { redirectTo: "/query" });
   };
-
   return (
     <div className="main-body display-flex flex-column flex-justify-center">
       <div className="gradient-blue-background flex-1">
