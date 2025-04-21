@@ -1,6 +1,4 @@
 "use server";
-import { Pool } from "pg";
-import { getDbClient } from "../dbClient";
 import { superAdminRequired, transaction } from "./decorators";
 import { FhirServerConfig } from "@/app/models/entities/fhir-servers";
 import { auditable } from "@/app/backend/auditLogs/decorator";
@@ -36,7 +34,6 @@ class FhirServerConfigServiceInternal {
 }
 
 class FhirServerConfigService extends FhirServerConfigServiceInternal {
-  private static dbClient: Pool = getDbClient();
   private static cachedFhirServerConfigs: FhirServerConfig[] | null = null;
 
   /**
@@ -82,10 +79,7 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
   `;
 
     try {
-      const result = await FhirServerConfigService.dbClient.query(updateQuery, [
-        name,
-        wasSuccessful,
-      ]);
+      const result = await dbService.query(updateQuery, [name, wasSuccessful]);
 
       // Clear the cache so the next getFhirServerConfigs call will fetch fresh data
       FhirServerConfigService.cachedFhirServerConfigs = null;
@@ -158,7 +152,7 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
       let headers = {};
 
       // Get existing headers if any
-      const existingServer = await FhirServerConfigService.dbClient.query(
+      const existingServer = await dbService.query(
         "SELECT headers FROM fhir_servers WHERE id = $1",
         [id],
       );
@@ -181,7 +175,7 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
         };
       }
 
-      const result = await FhirServerConfigService.dbClient.query(updateQuery, [
+      const result = await dbService.query(updateQuery, [
         id,
         name,
         hostname,
@@ -273,7 +267,7 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
         };
       }
 
-      const result = await FhirServerConfigService.dbClient.query(insertQuery, [
+      const result = await dbService.query(insertQuery, [
         name,
         hostname,
         new Date(),
@@ -320,9 +314,7 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
   `;
 
     try {
-      const result = await FhirServerConfigService.dbClient.query(deleteQuery, [
-        id,
-      ]);
+      const result = await dbService.query(deleteQuery, [id]);
 
       // Clear the cache so the next getFhirServerConfigs call will fetch fresh data
       FhirServerConfigService.cachedFhirServerConfigs = null;

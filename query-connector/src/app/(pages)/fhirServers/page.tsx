@@ -97,20 +97,20 @@ const FhirServers: React.FC = () => {
       setServerName(server.name);
       setServerUrl(server.hostname);
       setConnectionStatus("idle");
-      setDisableCertValidation(server.disable_cert_validation);
+      setDisableCertValidation(server.disableCertValidation);
 
       // Set auth method and corresponding fields based on server data
-      if (server.auth_type) {
-        setAuthMethod(server.auth_type as AuthMethodType);
+      if (server.authType) {
+        setAuthMethod(server.authType as AuthMethodType);
 
         // Set other auth related fields
-        if (server.client_id) setClientId(server.client_id);
-        if (server.client_secret) setClientSecret(server.client_secret);
-        if (server.token_endpoint) setTokenEndpoint(server.token_endpoint);
+        if (server.clientId) setClientId(server.clientId);
+        if (server.clientSecret) setClientSecret(server.clientSecret);
+        if (server.tokenEndpoint) setTokenEndpoint(server.tokenEndpoint);
         if (server.scopes) setScopes(server.scopes);
 
         // For backward compatibility with basic auth
-        if (server.auth_type === "basic" && server.headers?.Authorization) {
+        if (server.authType === "basic" && server.headers?.Authorization) {
           setBearerToken(server.headers.Authorization.replace("Bearer ", ""));
         }
       } else if (server.headers?.Authorization?.startsWith("Bearer ")) {
@@ -469,12 +469,12 @@ const FhirServers: React.FC = () => {
                 <td>{fhirServer.name}</td>
                 <td>{fhirServer.hostname}</td>
                 <td>
-                  {fhirServer.auth_type ||
+                  {fhirServer.authType ||
                     (fhirServer.headers?.Authorization ? "basic" : "none")}
                 </td>
                 <td width={480}>
                   <div className="grid-container grid-row padding-0 display-flex flex-align-center">
-                    {fhirServer.last_connection_successful ? (
+                    {fhirServer.lastConnectionSuccessful ? (
                       <>
                         <Icon.Check
                           size={3}
@@ -497,9 +497,9 @@ const FhirServers: React.FC = () => {
                     )}
                     <span className={styles.lastChecked}>
                       (last checked:{" "}
-                      {fhirServer.last_connection_attempt
+                      {fhirServer.lastConnectionAttempt
                         ? new Date(
-                            fhirServer.last_connection_attempt,
+                            fhirServer.lastConnectionAttempt,
                           ).toLocaleString()
                         : "unknown"}
                       )
