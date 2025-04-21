@@ -124,7 +124,10 @@ const AuditLogs: React.FC = () => {
           fullName.includes(search.toLowerCase()) ||
           log.actionType.toLowerCase().includes(search.toLowerCase()) ||
           actionLabel.includes(search.toLowerCase()) ||
-          formattedAction.includes(search.toLowerCase());
+          formattedAction.includes(search.toLowerCase()) ||
+          JSON.stringify(log.auditMessage)
+            .toLowerCase()
+            .includes(search.toLowerCase());
         const matchesDate =
           (!dateRange.startDate || log.createdAt >= dateRange.startDate) &&
           (!dateRange.endDate || log.createdAt <= dateRange.endDate);
@@ -204,7 +207,7 @@ const AuditLogs: React.FC = () => {
           </div>
           <SearchField
             id="search"
-            placeholder="Search name or action"
+            placeholder="Search name, action, or message"
             value={search}
             onChange={(e: ChangeEvent<HTMLInputElement>) =>
               setSearch(e.target.value)
