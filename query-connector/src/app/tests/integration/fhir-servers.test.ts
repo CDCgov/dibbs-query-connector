@@ -1,8 +1,10 @@
 import dbService from "@/app/backend/dbServices/db-service";
 import { suppressConsoleLogs } from "./fixtures";
 import {
+  deleteFhirServer,
   FHIR_SERVER_INSERT_QUERY,
   getFhirServerConfigs,
+  updateFhirServer,
 } from "@/app/backend/dbServices/fhir-servers";
 
 jest.mock("@/app/utils/auth", () => {
@@ -36,8 +38,8 @@ describe("FHIR Servers tests", () => {
     expect(aidbox?.name).toBe("Aidbox");
     expect(aidbox?.hostname).toBe(`${process.env.AIDBOX_BASE_URL}/fhir`);
   });
-  it("passing in refresh grabs new values", async () => {
-    const fhirServers = await getFhirServerConfigs();
+  it("refresh, update, and deletion functions work", async () => {
+    const fhirServers = await getFhirServerConfigs(true);
     expect(fhirServers.length).toBe(DEFAULT_FHIR_SERVER_LENGTH);
 
     await dbService.query(FHIR_SERVER_INSERT_QUERY, [
@@ -55,8 +57,8 @@ describe("FHIR Servers tests", () => {
       null,
       null,
     ]);
-    // Has seeded Aidbox
-    const newFhirServers = await getFhirServerConfigs(true);
+    // Has new
+    let newFhirServers = await getFhirServerConfigs(true);
     expect(newFhirServers.length).toBe(DEFAULT_FHIR_SERVER_LENGTH + 1);
     const newServer = newFhirServers.find(
       (v) => v.name === TEST_FHIR_SERVER.name,
@@ -65,17 +67,25 @@ describe("FHIR Servers tests", () => {
     expect(newServer?.hostname).toBe(TEST_FHIR_SERVER.hostname);
     expect(newServer?.authType).toBe("none");
 
-    try {
-      await dbService.query(
-        `
-            DELETE FROM fhir_servers 
-            WHERE name = $1
-            RETURNING *;
-          `,
-        [TEST_FHIR_SERVER.name],
-      );
-    } catch (error) {
-      console.error("Teardown failed:", error);
-    }
+    //update works
+    const NEW_NAME = "Kongo Jungle Two";
+    const NEW_HOSTNAME = "http://welcome-to-the-new-jungle.bananarepublic/fhir";
+    await updateFhirServer(
+      newServer?.id as string,
+      NEW_NAME,
+      NEW_HOSTNAME,
+      false,
+      true,
+    );
+    newFhirServers = await getFhirServerConfigs(true);
+    const shouldBeUpdated = newFhirServers.find((v) => v.name === NEW_NAME);
+    expect(shouldBeUpdated?.name).toBe(NEW_NAME);
+    expect(shouldBeUpdated?.hostname).toBe(NEW_HOSTNAME);
+
+    // deletion works
+    await deleteFhirServer(newServer?.id as string);
+    newFhirServers = await getFhirServerConfigs(true);
+    const shouldBeDeleted = newFhirServers.find((v) => v.id === newServer?.id);
+    expect(shouldBeDeleted).toBeUndefined();
   });
 });
