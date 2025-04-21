@@ -18,7 +18,7 @@ docker compose -f docker-compose-dev.yaml logs -f aidbox-seeder | grep -q "Finis
 command_pid=$!
 
 # Display a loading animation
-echo "This next step will take a ~30 seconds or so"
+echo "This next step will take ~30 seconds or so"
 echo -n "Waiting for Aidbox seeder to complete."
 while kill -0 $command_pid 2>/dev/null; do
     echo -n "."

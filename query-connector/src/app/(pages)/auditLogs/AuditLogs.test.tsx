@@ -21,7 +21,7 @@ const TEST_REPORT_RENDERED = "Viewed patient record for";
 const NUM_ROWS = 26;
 const CHECKSUM_INPUT =
   "It ain't about how hard you hit, it's about how hard you can get hit and keep moving forward";
-
+const PLACEHOLDER_TEXT = "Search name, action, or message";
 const BASE_TEST_DATA: LogEntry[] = [
   {
     author: "Rocky Balboa",
@@ -157,7 +157,7 @@ describe("AuditLogs Component", () => {
   });
 
   test("filters by partial search", async () => {
-    await user.typeInField("Search name or action", "Apollo");
+    await user.typeInField(PLACEHOLDER_TEXT, "Apollo");
 
     const rows = await screen.findAllByRole("row");
     expect(rows.length).toBeGreaterThan(1);
