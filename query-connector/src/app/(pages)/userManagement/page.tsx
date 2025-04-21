@@ -1,186 +1,65 @@
 "use client";
-
-import { useContext, useEffect, useState } from "react";
-import { Button } from "@trussworks/react-uswds";
 import classNames from "classnames";
-import { getUsers, updateUserRole } from "@/app/backend/user-management";
-import { QCResponse } from "@/app/models/responses/collections";
-import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
-import Table from "../../ui/designSystem/table/Table";
-import RoleDropdown from "./components/RoleDropdown";
-import { UserManagementContext } from "./components/UserManagementProvider";
-import {
-  RoleTypeValues,
-  User,
-  UserGroup,
-} from "../../models/entities/user-management";
-import { useSession } from "next-auth/react";
+import { UserRole } from "@/app/models/entities/users";
+import WithAuth from "@/app/ui/components/withAuth/WithAuth";
+import UserManagementProvider from "./components/UserManagementProvider";
+import UsersTable from "./components/userManagementContainer/userManagementContainer";
+import { getRole, RoleDescriptons } from "./utils";
 
 /**
- * User section in the user management page
- * @returns Users table
+ * @param textContent the text values to display
+ * @returns HTML element containing text descriptions for each of the User roles
+ */
+const renderRoleDescriptions = (textContent: object) => {
+  return (
+    <div
+      className={classNames(
+        "margin-x-3",
+        "margin-y-4",
+        "grid-row",
+        "flex-row",
+        "flex-no-wrap",
+        "flex-justify",
+        "grid-gap",
+      )}
+      aria-description="Available user roles"
+    >
+      {Object.entries(textContent).map(([role, description]) => (
+        <p key={`${role}`} className={classNames("grid-col-4")}>
+          <span className="text-bold">{`${role}:`}</span> {description}
+        </p>
+      ))}
+    </div>
+  );
+};
+
+/**
+ * Client side parent component for the User Management page
+ * @returns the UserManagement component
  */
 const UserManagement: React.FC = () => {
-  const { openEditSection } = useContext(UserManagementContext);
-  const [users, setUsers] = useState<User[] | null>(null);
-  const { data: session } = useSession();
+  const role = getRole();
 
-  /**
-   * Initialization
-   */
-
-  async function fetchUsers() {
-    try {
-      const userList: QCResponse<User> = await getUsers();
-      setUsers(userList.items);
-    } catch (e) {
-      showToastConfirmation({
-        body: "Unable to retrieve users. Please try again.",
-        variant: "error",
-      });
-    }
-  }
-
-  useEffect(() => {
-    fetchUsers();
-  }, []);
-
-  /**
-   * Role update
-   */
-
-  async function handleUserRoleChange(id: string, role: RoleTypeValues) {
-    try {
-      await updateUserRole(id, role);
-      showToastConfirmation({
-        body: "Role successfully updated.",
-      });
-    } catch {
-      showToastConfirmation({
-        body: "Unable to update the user role. Please try again.",
-        variant: "error",
-      });
-    }
-  }
-
-  /**
-   * DOM helpers
-   */
-
-  function renderUserRows(users: User[] | null): React.ReactNode {
-    if (users == null) {
-      return (
-        <tr>
-          <td colSpan={3}>Loading...</td>
-        </tr>
-      );
-    } else if (users.length == 0) {
-      return (
-        <tr>
-          <td colSpan={3}>No users found</td>
-        </tr>
-      );
-    } else {
-      return users.map((user: User) => (
-        <tr key={user.id}>
-          <td>
-            {`${user.last_name}, ${user.first_name}`}
-            {isSelf(user) ? <span> (self)</span> : null}
-          </td>
-          <td width={270}>
-            {isSelf(user) ? (
-              user.qc_role
-            ) : (
-              <RoleDropdown
-                id={user.id}
-                defaultValue={user.qc_role}
-                OnChange={(role: RoleTypeValues) => {
-                  handleUserRoleChange(user.id, role);
-                }}
-              />
-            )}
-          </td>
-          <td>
-            {user.userGroups && user.userGroups?.length > 0
-              ? user.userGroups?.map((group: UserGroup, idx: number) => (
-                  <Button
-                    className={classNames(
-                      "margin-right-2",
-                      "text-no-underline",
-                    )}
-                    type="button"
-                    unstyled
-                    key={group.id}
-                    aria-description={`Edit ${group.name} members`}
-                    onClick={() => {
-                      openEditSection(
-                        group.name,
-                        "Members",
-                        "Members",
-                        group.id,
-                      );
-                    }}
-                  >
-                    {group.name}
-                    {idx + 1 != user.userGroups?.length && ","}
-                  </Button>
-                ))
-              : "--"}
-          </td>
-        </tr>
-      ));
-    }
-  }
-
-  function isSelf(user: User): boolean {
-    if (user.username === session?.user.username) {
-      return true;
-    }
-
-    return false;
-  }
-
-  /**
-   * HTML
-   */
   return (
-    <>
-      <div
-        className={classNames(
-          "margin-x-3",
-          "margin-y-4",
-          "grid-row",
-          "flex-row",
-          "flex-no-wrap",
-          "flex-justify",
-        )}
-        aria-description="Available user roles"
-      >
-        <p className={classNames("grid-col-4")}>
-          <span className={classNames("text-bold")}>Super Admin:</span> Manage
-          user permissions; create and manage user groups; view audit logs;
-          configure FHIR servers; create, assign, and run queries
-        </p>
-        <p className={classNames("grid-col-4")}>
-          <span className={classNames("text-bold")}>Admin:</span> Create,
-          assign, and run queries
-        </p>
-        <p className={classNames("grid-col-3")}>
-          <span className={classNames("text-bold")}>Standard:</span> Only run
-          queries
-        </p>
+    <WithAuth>
+      <div className={classNames("main-container__wide", "user-management")}>
+        <div
+          className={classNames(
+            "grid-row",
+            "padding-0",
+            "flex-justify",
+            "flex-align-center",
+          )}
+        >
+          <h1 className="page-title">User management</h1>
+        </div>
+        <UserManagementProvider>
+          {role == UserRole.SUPER_ADMIN &&
+            renderRoleDescriptions(RoleDescriptons)}
+          <UsersTable role={role as string} />
+        </UserManagementProvider>
       </div>
-      <Table>
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Permissions</th>
-            <th>User groups</th>
-          </tr>
-        </thead>
-        <tbody>{renderUserRows(users)}</tbody>
-      </Table>
-    </>
+    </WithAuth>
   );
 };
 

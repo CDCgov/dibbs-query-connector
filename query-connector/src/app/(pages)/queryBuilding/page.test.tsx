@@ -1,68 +1,52 @@
 import QueryBuilding from "./page";
 import { render, screen, waitFor } from "@testing-library/react";
-import { DataContext } from "@/app/shared/DataProvider";
-import {
-  getConditionsData,
-  getCustomQueries,
-} from "../../shared/database-service";
+import { getConditionsData } from "../../shared/database-service";
 import { conditionIdToNameMap, DEFAULT_QUERIES } from "./fixtures";
+import { RootProviderMock } from "@/app/tests/unit/setup";
+import { getQueryList } from "@/app/backend/query-building";
 
 jest.mock(".../../../shared/database-service", () => ({
-  getCustomQueries: jest.fn(),
   getConditionsData: jest.fn(),
 }));
 
+jest.mock("@/app/backend/query-building", () => ({
+  getQueryList: jest.fn(),
+  getCustomQueries: jest.fn(),
+}));
+
+jest.mock(
+  "@/app/ui/components/withAuth/WithAuth",
+  () =>
+    ({ children }: React.PropsWithChildren) => <div>{children}</div>,
+);
+
 describe("tests the query building steps", () => {
   it("renders the empty state", async () => {
-    (getCustomQueries as jest.Mock).mockResolvedValue([]);
-
-    const mockSetData = jest.fn();
-    const mockSetCurrentPage = jest.fn();
-    const mockSetToatConfig = jest.fn();
-    const mockContextValue = {
-      data: undefined,
-      setData: mockSetData,
-      currentPage: "/queryBuilding",
-      setCurrentPage: mockSetCurrentPage,
-      toastConfig: {},
-      setToastConfig: mockSetToatConfig,
-    };
+    (getQueryList as jest.Mock).mockResolvedValue([]);
 
     render(
-      <DataContext.Provider value={mockContextValue}>
+      <RootProviderMock currentPage="/queryBuilding">
         <QueryBuilding />
-      </DataContext.Provider>,
+      </RootProviderMock>,
     );
 
     await waitFor(() => {
       expect(screen.queryByText("Loading")).not.toBeInTheDocument();
     });
+
     expect(screen.getByText("Start with Query Builder")).toBeInTheDocument();
     expect(screen.getByTestId("empty-state-container")).toMatchSnapshot();
   });
 
   it("renders the default state", async () => {
-    (getCustomQueries as jest.Mock).mockResolvedValue(DEFAULT_QUERIES);
     (getConditionsData as jest.Mock).mockResolvedValue({
       conditionIdToNameMap,
     });
 
-    const mockSetData = jest.fn();
-    const mockSetCurrentPage = jest.fn();
-    const mockSetToatConfig = jest.fn();
-    const mockContextValue = {
-      data: DEFAULT_QUERIES,
-      setData: mockSetData,
-      currentPage: "/queryBuilding",
-      setCurrentPage: mockSetCurrentPage,
-      toastConfig: {},
-      setToastConfig: mockSetToatConfig,
-    };
-
     render(
-      <DataContext.Provider value={mockContextValue}>
+      <RootProviderMock currentPage="/queryBuilding" data={DEFAULT_QUERIES}>
         <QueryBuilding />
-      </DataContext.Provider>,
+      </RootProviderMock>,
     );
 
     const expectedQueryNames = DEFAULT_QUERIES.map((q) => q.query_name);
@@ -72,6 +56,7 @@ describe("tests the query building steps", () => {
     });
 
     expect(screen.getByText("Query Library")).toBeInTheDocument();
+
     expectedQueryNames.forEach(async (name) => {
       expect(screen.getByText(name)).toBeInTheDocument();
     });

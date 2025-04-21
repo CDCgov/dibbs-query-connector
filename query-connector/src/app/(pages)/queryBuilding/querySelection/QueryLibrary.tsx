@@ -10,23 +10,21 @@ import { Button, Icon } from "@trussworks/react-uswds";
 import Table from "@/app/ui/designSystem/table/Table";
 import { ModalRef } from "@/app/ui/designSystem/modal/Modal";
 import styles from "./querySelection.module.scss";
-import { CustomUserQuery } from "@/app/shared/constants";
 
 import { BuildStep } from "@/app/shared/constants";
 import {
   SelectedQueryState,
   renderModal,
   handleDelete,
-  handleCreationConfirmation,
   confirmDelete,
   handleCopy,
   SelectedQueryDetails,
 } from "./utils";
-import LoadingView from "@/app/ui/designSystem/LoadingView";
 import { DataContext } from "@/app/shared/DataProvider";
 import classNames from "classnames";
 import { getConditionsData } from "@/app/shared/database-service";
 import { ConditionsMap } from "../utils";
+import { CustomUserQuery } from "@/app/models/entities/query";
 
 interface UserQueriesDisplayProps {
   queries: CustomUserQuery[];
@@ -53,7 +51,6 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
 }) => {
   const queriesContext = useContext(DataContext);
   const [queries, setQueries] = useState<CustomUserQuery[]>(initialQueries);
-  const [loading, setLoading] = useState(false);
   const [conditionIdToDetailsMap, setConditionIdToDetailsMap] =
     useState<ConditionsMap>();
 
@@ -63,7 +60,7 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
       queryName: queryName,
       queryId: queryId,
     });
-    setBuildStep("condition");
+    setBuildStep("valueset");
   };
 
   useEffect(() => {
@@ -85,7 +82,6 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
 
   return (
     <div>
-      {<LoadingView loading={loading} />}
       {queriesContext &&
         renderModal(
           modalRef,
@@ -100,12 +96,7 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
         <h1 className="flex-align-center">Query Library</h1>
         <div className="margin-left-auto">
           <Button
-            onClick={() =>
-              handleCreationConfirmation(
-                () => setBuildStep("condition"),
-                setLoading,
-              )
-            }
+            onClick={() => setBuildStep("condition")}
             className={styles.createQueryButton}
             type="button"
           >
@@ -123,13 +114,14 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
           </thead>
           <tbody>
             {conditionIdToDetailsMap &&
-              queries.map((query, index) => (
+              queries.map((query) => (
                 <tr
-                  key={index}
+                  key={query.query_id}
                   className={classNames(
                     styles.myQueriesRow,
                     "tableRowWithHover",
                   )}
+                  data-testid={`query-row-${query.query_id}`}
                 >
                   <td title={query.query_name}>{query.query_name}</td>
 
@@ -160,7 +152,10 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
                             className="height-3 width-3"
                             aria-label="Pencil icon indicating edit ability"
                           />
-                          <span id={query.query_id} className="padding-left-05">
+                          <span
+                            data-testid={`edit-query-${query.query_id}`}
+                            className="padding-left-05"
+                          >
                             Edit
                           </span>
                         </span>

@@ -9,11 +9,11 @@ import {
   ConditionsMap,
   filterSearchByCategoryAndCondition,
   formatDiseaseDisplay,
+  formatCategoryDisplay,
   NestedQuery,
 } from "../utils";
 import { ConceptTypeSelectionTable } from "./SelectionTable";
 import Drawer from "@/app/ui/designSystem/drawer/Drawer";
-import { DibbsConceptType, DibbsValueSet } from "@/app/shared/constants";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import SearchField from "@/app/ui/designSystem/searchField/SearchField";
 import {
@@ -21,6 +21,10 @@ import {
   VALUESET_SELECTION_SEARCH_PLACEHOLDER,
 } from "./utils";
 import Highlighter from "react-highlight-words";
+import {
+  DibbsConceptType,
+  DibbsValueSet,
+} from "@/app/models/entities/valuesets";
 
 type ConditionSelectionProps = {
   constructedQuery: NestedQuery;
@@ -61,7 +65,7 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
   useEffect(() => {
     // display the first condition's valuesets on render
     setActiveCondition(Object.keys(constructedQuery)[0]);
-  }, []);
+  }, [constructedQuery]);
 
   function generateConditionDrawerDisplay(
     categoryToConditionsMap: CategoryToConditionArrayMap,
@@ -74,7 +78,7 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
               highlightClassName="searchHighlight"
               searchWords={[conditionSearchFilter]}
               autoEscape={true}
-              textToHighlight={category}
+              textToHighlight={formatCategoryDisplay(category)}
             ></Highlighter>
           </div>
           <div>
@@ -82,6 +86,7 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
               <div
                 key={`update-${condition.id}`}
                 id={`update-${condition.id}`}
+                data-testid={`update-${condition.id}`}
                 className={styles.conditionItem}
               >
                 <span>
@@ -157,6 +162,7 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
               <div
                 className={styles.addCondition}
                 role="button"
+                data-testid={"add-condition-icon"}
                 onClick={() => setIsDrawerOpen(true)}
                 tabIndex={0}
               >
@@ -199,6 +205,7 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
                     className={classNames("usa-icon", styles.deleteIcon)}
                     size={5}
                     color="red"
+                    data-testid={`delete-condition-${conditionId}`}
                     aria-label="Trash icon indicating deletion of disease"
                     onClick={() => {
                       handleUpdateCondition(conditionId, true);

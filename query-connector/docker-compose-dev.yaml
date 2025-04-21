@@ -22,31 +22,16 @@ services:
 
   # Flyway migrations and DB version control
   flyway:
-    image: flyway/flyway:10.16-alpine
+    image: flyway/flyway:11-alpine
+    environment:
+      - JAVA_OPTS_APPEND="-XX:UseSVE=0"
     command: -configFiles=/flyway/conf/flyway.conf -schemas=public -connectRetries=60 migrate
-    platform: linux/amd64
     volumes:
       - ./flyway/sql:/flyway/sql
       - ./flyway/conf/flyway.conf:/flyway/conf/flyway.conf
     depends_on:
       db:
         condition: service_started
-
-  # HAPI FHIR Server for running e2e tests
-  hapi-fhir-server:
-    image: "hapiproject/hapi:latest"
-    ports:
-      - "8080:8080"
-  data-loader:
-    build:
-      context: .
-      dockerfile: Dockerfile.dev
-    volumes:
-      - "./src/app/tests/assets/GoldenSickPatient.json:/etc/GoldenSickPatient.json"
-      - "./post_e2e_data_hapi.sh:/post_e2e_data_hapi.sh"
-    command: ["sh", "post_e2e_data_hapi.sh"]
-    depends_on:
-      - hapi-fhir-server
 
   # Keycloak for authentication
   # Note: you must have a local .env file with a parameter AUTH_DISABLED.
@@ -61,3 +46,64 @@ services:
     command:
       - start-dev
       - --import-realm
+
+  # Aidbox
+  aidbox_db:
+    image: healthsamurai/aidboxdb:17
+    volumes:
+      - aidbox_pg_data:/var/lib/postgresql/data:delegated
+    environment:
+      POSTGRES_USER: aidbox
+      POSTGRES_PORT: "5432"
+      POSTGRES_DB: aidbox
+      POSTGRES_PASSWORD: gOxAmiyiz4
+
+  aidbox:
+    image: healthsamurai/aidboxone:stable
+    pull_policy: always
+    depends_on:
+      - aidbox_db
+    ports:
+      - 8080:8080
+    environment:
+      AIDBOX_TERMINOLOGY_SERVICE_BASE_URL: https://tx.fhir.org/r4
+      AIDBOX_FHIR_PACKAGES: hl7.fhir.r4.core#4.0.1
+      AIDBOX_FHIR_SCHEMA_VALIDATION: true
+      AIDBOX_CREATED_AT_URL: https://aidbox.app/ex/createdAt
+      AIDBOX_CLIENT_SECRET: L6AGe_5V2O
+      AIDBOX_CORRECT_AIDBOX_FORMAT: true
+      AIDBOX_ADMIN_PASSWORD: OC1MzJ5QNV
+      AIDBOX_COMPLIANCE: enabled
+      AIDBOX_SECURITY_AUDIT__LOG_ENABLED: true
+      BOX_SEARCH_FHIR__COMPARISONS: true
+      PGHOST: aidbox_db
+      BOX_COMPATIBILITY_VALIDATION_JSON__SCHEMA_REGEX: "#{:fhir-datetime}"
+      BOX_SEARCH_AUTHORIZE_INLINE_REQUESTS: true
+      PGUSER: aidbox
+      AIDBOX_PORT: 8080
+      PGDATABASE: aidbox
+      PGPASSWORD: gOxAmiyiz4
+      PGPORT: "5432"
+      BOX_SEARCH_INCLUDE_CONFORMANT: true
+      JAVA_TOOL_OPTIONS: ${JAVA_TOOL_OPTIONS:-}
+    env_file:
+      - .env
+  aidbox-seeder:
+    build:
+      context: .
+      dockerfile: Dockerfile.aidbox-seeder
+    volumes:
+      - ./src/app/tests/assets/GoldenSickPatient.json:/data/GoldenSickPatient.json
+    environment:
+      - AIDBOX_BASE_URL=http://localhost:8080
+      - APP_HOSTNAME=http://host.docker.internal:3000
+    depends_on:
+      db:
+        condition: service_healthy
+      aidbox:
+        condition: service_started
+      flyway:
+        condition: service_completed_successfully
+
+volumes:
+  aidbox_pg_data:

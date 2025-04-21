@@ -1,6 +1,5 @@
 import BuildFromTemplates from "@/app/(pages)/queryBuilding/buildFromTemplates/BuildFromTemplates";
 import {
-  DEFAULT_QUERIES,
   conditionIdToNameMap,
   categoryToConditionNameArrayMap,
   gonorreheaValueSets,
@@ -8,14 +7,12 @@ import {
   cancerValueSets,
 } from "@/app/(pages)/queryBuilding/fixtures";
 import { formatDiseaseDisplay } from "@/app/(pages)/queryBuilding/utils";
-import { getSavedQueryById } from "@/app/backend/query-building";
-import { DataContext } from "@/app/shared/DataProvider";
 import { USE_CASE_DETAILS } from "@/app/shared/constants";
 import {
   getConditionsData,
   getValueSetsAndConceptsByConditionIDs,
 } from "@/app/shared/database-service";
-import { renderWithUser } from "@/app/tests/unit/setup";
+import { renderWithUser, RootProviderMock } from "@/app/tests/unit/setup";
 import { screen, waitFor, within } from "@testing-library/dom";
 import {
   CONDITION_DRAWER_SEARCH_PLACEHOLDER,
@@ -24,6 +21,7 @@ import {
 } from "../components/utils";
 import { userEvent } from "@testing-library/user-event";
 import { render } from "@testing-library/react";
+import { getSavedQueryById } from "@/app/backend/dbServices/query-building";
 
 jest.mock("../../../shared/database-service", () => ({
   getCustomQueries: jest.fn(),
@@ -31,21 +29,11 @@ jest.mock("../../../shared/database-service", () => ({
   getValueSetsAndConceptsByConditionIDs: jest.fn(),
 }));
 
-jest.mock("../../../backend/query-building", () => ({
+jest.mock("../../../backend/dbServices/query-building", () => ({
   getSavedQueryById: jest.fn(),
 }));
-const mockSetData = jest.fn();
-const mockSetCurrentPage = jest.fn();
-const mockSetToatConfig = jest.fn();
-const mockContextValue = {
-  data: DEFAULT_QUERIES,
-  setData: mockSetData,
-  currentPage: "/",
-  setCurrentPage: mockSetCurrentPage,
-  toastConfig: {},
-  setToastConfig: mockSetToatConfig,
-};
 
+const currentPage = "/";
 const GONORREHEA_ID = 15628003;
 const GONORREHEA_DETAILS = conditionIdToNameMap[GONORREHEA_ID];
 const GONORREHEA_NAME = formatDiseaseDisplay(GONORREHEA_DETAILS.name);
@@ -64,7 +52,7 @@ const GONORREHEA_NAME = formatDiseaseDisplay(GONORREHEA_DETAILS.name);
 describe("tests the build from template page interactions", () => {
   it("customize query button is disabled unless name and individual condition are defined", async () => {
     const { user } = renderWithUser(
-      <DataContext.Provider value={mockContextValue}>
+      <RootProviderMock currentPage={currentPage}>
         <BuildFromTemplates
           buildStep={"condition"}
           setBuildStep={jest.fn}
@@ -74,7 +62,7 @@ describe("tests the build from template page interactions", () => {
           }}
           setSelectedQuery={jest.fn}
         />
-      </DataContext.Provider>,
+      </RootProviderMock>,
     );
 
     expect(screen.getByText("Customize query")).toBeDisabled();
@@ -87,7 +75,7 @@ describe("tests the build from template page interactions", () => {
 
   it("search filters by category and by condition name", async () => {
     const { user } = renderWithUser(
-      <DataContext.Provider value={mockContextValue}>
+      <RootProviderMock currentPage={currentPage}>
         <BuildFromTemplates
           buildStep={"condition"}
           setBuildStep={jest.fn}
@@ -97,7 +85,7 @@ describe("tests the build from template page interactions", () => {
           }}
           setSelectedQuery={jest.fn}
         />
-      </DataContext.Provider>,
+      </RootProviderMock>,
     );
 
     expect(await screen.findByText(GONORREHEA_NAME)).toBeInTheDocument();
@@ -134,7 +122,7 @@ describe("tests the build from template page interactions", () => {
   });
   it("search filters reset properly", async () => {
     const { user } = renderWithUser(
-      <DataContext.Provider value={mockContextValue}>
+      <RootProviderMock currentPage={currentPage}>
         <BuildFromTemplates
           buildStep={"condition"}
           setBuildStep={jest.fn}
@@ -144,7 +132,7 @@ describe("tests the build from template page interactions", () => {
           }}
           setSelectedQuery={jest.fn}
         />
-      </DataContext.Provider>,
+      </RootProviderMock>,
     );
 
     expect(await screen.findByText(GONORREHEA_NAME)).toBeInTheDocument();
@@ -213,6 +201,47 @@ describe("tests the build from template page interactions", () => {
       screen.getByText("Malignant neoplastic disease"),
     ).toBeInTheDocument();
   });
+
+  it("removes condition pill and unchecks checkbox when pill X is clicked", async () => {
+    const { user } = renderWithUser(
+      <RootProviderMock currentPage={"/"}>
+        <BuildFromTemplates
+          buildStep="condition"
+          setBuildStep={jest.fn}
+          selectedQuery={{
+            queryName: "Test query",
+            queryId: undefined,
+          }}
+          setSelectedQuery={jest.fn}
+        />
+      </RootProviderMock>,
+    );
+
+    const DISPLAY_NAME = formatDiseaseDisplay(GONORREHEA_DETAILS.name);
+
+    // Check the checkbox
+    await user.click(await screen.findByLabelText(DISPLAY_NAME));
+
+    // Expect pill to appear
+    const pillRegion = await screen.findByTestId("selected-pill-container");
+    expect(within(pillRegion).getByText(DISPLAY_NAME)).toBeInTheDocument();
+
+    // Click the pill's X button
+    const removeBtn = screen.getByRole("button", {
+      name: `Remove ${DISPLAY_NAME}`,
+    });
+    await user.click(removeBtn);
+
+    // Checkbox should now be unchecked
+    expect(screen.getByLabelText(DISPLAY_NAME)).not.toBeChecked();
+
+    // Pill should be gone
+    await waitFor(() => {
+      expect(
+        within(pillRegion).queryByText(DISPLAY_NAME),
+      ).not.toBeInTheDocument();
+    });
+  });
 });
 
 describe("tests the valueset selection page interactions", () => {
@@ -227,7 +256,7 @@ describe("tests the valueset selection page interactions", () => {
 
   beforeEach(async () => {
     render(
-      <DataContext.Provider value={mockContextValue}>
+      <RootProviderMock currentPage={currentPage}>
         <BuildFromTemplates
           buildStep={"valueset"}
           setBuildStep={jest.fn}
@@ -237,7 +266,7 @@ describe("tests the valueset selection page interactions", () => {
           }}
           setSelectedQuery={jest.fn}
         />
-      </DataContext.Provider>,
+      </RootProviderMock>,
     );
 
     await waitFor(() => {
@@ -278,13 +307,13 @@ describe("tests the valueset selection page interactions", () => {
       screen.getByTestId(`condition-drawer-added-${CANCER_ID}`),
     ).toBeInTheDocument();
     // click out of the drawer
-    await user.click(screen.getByTestId(`${CANCER_ID}-conditionCard`));
+    await user.click(screen.getByTestId(`${CANCER_ID}-conditionCard-active`));
 
     expect(
-      screen.getByTestId(`${CANCER_ID}-conditionCard`),
+      screen.getByTestId(`${CANCER_ID}-conditionCard-active`),
     ).toBeInTheDocument();
     expect(
-      screen.getByTestId(`${GONORREHEA_ID}-conditionCard-active`),
+      screen.getByTestId(`${GONORREHEA_ID}-conditionCard`),
     ).toBeInTheDocument();
   });
 

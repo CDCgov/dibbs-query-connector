@@ -1,6 +1,6 @@
-import { DibbsValueSet } from "@/app/shared/constants";
 import styles from "./customizeQuery.module.scss";
 import Checkbox from "../../../../ui/designSystem/checkbox/Checkbox";
+import { DibbsValueSet } from "@/app/models/entities/valuesets";
 
 type CustomizeQueryAccordionProps = {
   handleSelectAllChange: (groupIndex: string, checked: boolean) => void;

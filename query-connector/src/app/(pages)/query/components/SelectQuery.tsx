@@ -1,24 +1,29 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { DibbsValueSet } from "../../../shared/constants";
 import CustomizeQuery from "./CustomizeQuery";
 import SelectSavedQuery from "./selectQuery/SelectSavedQuery";
 
-import { QueryResponse } from "@/app/shared/query-service";
+import {
+  PatientDiscoveryResponse,
+  PatientRecordsResponse,
+} from "@/app/shared/query-service";
 import { Patient } from "fhir/r4";
 import {
   fetchQueryResponse,
   fetchQueryValueSets,
 } from "./selectQuery/queryHooks";
 import LoadingView from "../../../ui/designSystem/LoadingView";
-import { CustomUserQuery } from "@/app/shared/constants";
+import { CustomUserQuery } from "@/app/models/entities/query";
+import { DibbsValueSet } from "@/app/models/entities/valuesets";
 
 interface SelectQueryProps {
   goForward: () => void;
   goBack: () => void;
   patientForQuery: Patient | undefined;
-  resultsQueryResponse: QueryResponse;
-  setResultsQueryResponse: React.Dispatch<React.SetStateAction<QueryResponse>>;
+  patientDiscoveryResponse: PatientDiscoveryResponse | undefined;
+  setResultsQueryResponse: React.Dispatch<
+    React.SetStateAction<PatientRecordsResponse | undefined>
+  >;
   fhirServer: string;
   setFhirServer: React.Dispatch<React.SetStateAction<string>>;
   setLoading: (isLoading: boolean) => void;
@@ -36,18 +41,17 @@ interface SelectQueryProps {
  * @param root0.showCustomizeQuery - toggle to navigate to show customize query
  * @param root0.setSelectedQuery - callback function to update the selected query
  * @param root0.patientForQuery - patient to apply a particular query for
- * @param root0.resultsQueryResponse - Response of selected query
  * @param root0.setResultsQueryResponse - Callback function to update selected
  * query
  * @param root0.setShowCustomizeQuery - state function to update location of
  * show customize query
  * @param root0.fhirServer - the FHIR server that we're running the query against
  * @param root0.setFhirServer - callback function to update the FHIR server
+ * @param root0.setLoading - callback to set the loading state
  * @returns - The selectQuery component.
  */
 const SelectQuery: React.FC<SelectQueryProps> = ({
   patientForQuery,
-  resultsQueryResponse,
   fhirServer,
   showCustomizeQuery,
   goForward,
@@ -57,6 +61,7 @@ const SelectQuery: React.FC<SelectQueryProps> = ({
   setShowCustomizeQuery,
   selectedQuery,
   setSelectedQuery,
+  setLoading,
 }) => {
   const [queryValueSets, setQueryValueSets] = useState<DibbsValueSet[]>(
     [] as DibbsValueSet[],
@@ -94,6 +99,8 @@ const SelectQuery: React.FC<SelectQueryProps> = ({
   }, [selectedQuery]);
 
   async function onSubmit() {
+    goForward();
+    setLoading(true);
     await fetchQueryResponse({
       queryName: selectedQuery.query_name,
       patientForQuery: patientForQuery,
@@ -103,7 +110,7 @@ const SelectQuery: React.FC<SelectQueryProps> = ({
       queryResponseStateCallback: setResultsQueryResponse,
       setIsLoading: setLoadingResultResponse,
     }).catch(console.error);
-    goForward();
+    setLoading(false);
   }
 
   const displayLoading = loadingResultResponse || loadingQueryValueSets;
@@ -114,7 +121,6 @@ const SelectQuery: React.FC<SelectQueryProps> = ({
 
       {showCustomizeQuery ? (
         <CustomizeQuery
-          fhirQueryResponse={resultsQueryResponse}
           selectedQuery={selectedQuery}
           queryValueSets={queryValueSets}
           setQueryValuesets={setQueryValueSets}

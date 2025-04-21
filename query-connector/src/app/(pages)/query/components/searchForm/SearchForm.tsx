@@ -12,9 +12,9 @@ import {
   hyperUnluckyPatient,
 } from "@/app/shared/constants";
 import {
-  FhirQueryResponse,
-  QueryRequest,
-  makeFhirQuery,
+  patientDiscoveryQuery,
+  PatientDiscoveryRequest,
+  PatientDiscoveryResponse,
 } from "@/app/shared/query-service";
 import styles from "../searchForm/searchForm.module.scss";
 import { FormatPhoneAsDigits } from "@/app/shared/format-service";
@@ -22,7 +22,7 @@ import TitleBox from "../stepIndicator/TitleBox";
 
 interface SearchFormProps {
   setPatientDiscoveryQueryResponse: (
-    FhirPatientDiscoveryResponse: FhirQueryResponse,
+    patientDiscoveryResponse: PatientDiscoveryResponse,
   ) => void;
   setMode: (mode: Mode) => void;
   setLoading: (loading: boolean) => void;
@@ -82,23 +82,18 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
       return;
     }
     setLoading(true);
+    setMode("patient-results");
 
-    const originalRequest: QueryRequest = {
+    const patientDiscoveryRequest: PatientDiscoveryRequest = {
       first_name: firstName,
       last_name: lastName,
       dob: dob,
       mrn: mrn,
       fhir_server: fhirServer,
-      // we just need the patient here and don't need to cross reference
-      // our DB.
-      query_name: null,
-      just_return_patient: true,
       phone: FormatPhoneAsDigits(phone),
     };
-    const queryResponse = await makeFhirQuery(originalRequest);
+    const queryResponse = await patientDiscoveryQuery(patientDiscoveryRequest);
     setPatientDiscoveryQueryResponse(queryResponse);
-
-    setMode("patient-results");
     setLoading(false);
   }
   useEffect(() => {

@@ -1,13 +1,34 @@
 "use server";
-import {
-  RoleTypeValues,
-  User,
-  UserGroup,
-} from "../models/entities/user-management";
+
+import { QueryResult } from "pg";
+import { User, UserRole, UserGroup } from "../models/entities/users";
 import { QCResponse } from "../models/responses/collections";
 import { adminAccessCheck, superAdminAccessCheck } from "../utils/auth";
 import { getDbClient } from "./dbClient";
+
 const dbClient = getDbClient();
+
+/**
+ * @param username The identifier of the user we want to retrieve
+ * @returns A single user result, with any applicable group membership details
+ */
+export async function getUserByUsername(
+  username: string,
+): Promise<QCResponse<User>> {
+  const userQuery = `SELECT * FROM users WHERE username = $1;`;
+  const result = await dbClient.query(userQuery, [username]);
+
+  if (result.rowCount && result.rowCount > 0) {
+    const user = result.rows[0];
+    const userWithGroups = await getSingleUserWithGroupMemberships(user.id);
+    return {
+      totalItems: userWithGroups.totalItems,
+      items: userWithGroups.items,
+    };
+  } else {
+    return { totalItems: 0, items: [] };
+  }
+}
 
 /**
  * Adds a user to the users table if they do not already exist.
@@ -37,28 +58,17 @@ export async function addUserIfNotExists(userToken: {
 
   try {
     console.log("Checking if user exists.");
-
     const checkUserQuery = `SELECT id, username FROM users WHERE username = $1;`;
     const userExists = await dbClient.query(checkUserQuery, [userIdentifier]);
 
     if (userExists.rows.length > 0) {
       console.log("User already exists in users:", userExists.rows[0].id);
-      return userExists.rows[0]; // Return existing user
+      return { msg: "User already exists", user: userExists.rows[0] }; // Return existing user
     }
 
     // Default role when adding a new user, which includes Super Admin, Admin, and Standard User.
-    let qc_role = RoleTypeValues.Standard;
+    let qc_role = UserRole.STANDARD;
     console.log("User not found. Proceeding to insert.");
-
-    if (process.env.NODE_ENV !== "production") {
-      // First registered user is set as Super Admin
-      const queryUserRecordCount = `SELECT COUNT(*) FROM users`;
-      const userCount = await dbClient.query(queryUserRecordCount);
-
-      if (userCount?.rows?.[0]?.count === "0") {
-        qc_role = RoleTypeValues.SuperAdmin;
-      }
-    }
 
     const insertUserQuery = `
       INSERT INTO users (username, qc_role, first_name, last_name)
@@ -82,25 +92,115 @@ export async function addUserIfNotExists(userToken: {
 }
 
 /**
+ * Updates an existing user in the users table.
+ * @param userId - The user ID from the JWT token.
+ * @param updated_userName - The username from the JWT token.
+ * @param updated_firstName - The first name from the JWT token.
+ * @param updated_lastName - The last name from the JWT token.
+ * @param updated_role - The role from the JWT token.
+ * @returns The newly added user or an empty result if already exists.
+ */
+export async function updateUserDetails(
+  userId: string,
+  updated_userName: string,
+  updated_firstName: string,
+  updated_lastName: string,
+  updated_role: string,
+) {
+  if (!userId) {
+    console.error("Cannot update user, no ID provided.");
+    return;
+  }
+
+  try {
+    console.log("Checking if user exists.");
+
+    const checkUserQuery = `SELECT id, username, qc_role FROM users WHERE id = $1;`;
+    const userExists = await dbClient.query(checkUserQuery, [userId]);
+
+    if (userExists.rowCount == 0) {
+      console.log("User not found in Users", userId);
+      return { msg: "Unable to update user", userId: userId };
+    }
+
+    const { username, qc_role, first_name, last_name } = userExists.rows[0];
+    if (
+      username !== updated_userName ||
+      qc_role !== updated_role ||
+      first_name !== updated_firstName ||
+      last_name !== updated_lastName
+    ) {
+      const insertUserQuery = `
+        UPDATE users
+        SET 
+          username = $2,
+          first_name = $3,
+          last_name = $4,
+          qc_role = $5
+        WHERE id = $1
+        RETURNING id, username, qc_role, first_name, last_name;
+      `;
+
+      const result = await dbClient.query(insertUserQuery, [
+        userId,
+        updated_userName,
+        updated_firstName,
+        updated_lastName,
+        updated_role,
+      ]);
+
+      console.log("User updated:", result.rows[0].id);
+      return result.rows[0];
+    } else {
+      // nothing to update, carry on...
+      return;
+    }
+  } catch (error) {
+    console.error("Error updating user", error);
+    throw error;
+  }
+}
+/**
+ * Retrieves group membership data for the given users and formats it on the User object
+ * @param userList - The users whose group memberships we are retrieving
+ * @returns The updated user record or an error if the update fails.
+ */
+async function fetchUserGroupMembershipDetails(userList: QueryResult) {
+  const users = await Promise.all(
+    userList.rows.map(async (user) => {
+      try {
+        const userGroups = await getAllUserGroupsForUser(user.id);
+        user.userGroupMemberships = userGroups.items;
+        return user;
+      } catch (error) {
+        console.error(error);
+        throw error;
+      }
+    }),
+  );
+
+  return users;
+}
+/**
  * Updates the role of an existing user in the users table.
- * @param id - The user ID.
+ * @param userId - The user ID.
  * @param newRole - The new role to assign to the user.
  * @returns The updated user record or an error if the update fails.
  */
 export async function updateUserRole(
-  id: string,
-  newRole: RoleTypeValues,
+  userId: string,
+  newRole: UserRole,
 ): Promise<QCResponse<User>> {
   if (!(await superAdminAccessCheck())) {
     throw new Error("Unauthorized");
   }
 
-  if (!id || !newRole) {
+  if (!userId || !newRole) {
     throw new Error("User ID and new role are required.");
   }
 
   try {
-    console.log(`Updating role for user ID: ${id} to ${newRole}`);
+    console.log(`Updating role for user ID: ${userId} to ${newRole}`);
 
     const updateQuery = `
       UPDATE users
@@ -109,15 +209,17 @@ export async function updateUserRole(
       RETURNING id, username, qc_role, first_name, last_name;
     `;
 
-    const result = await dbClient.query(updateQuery, [newRole, id]);
+    const result = await dbClient.query(updateQuery, [newRole, userId]);
 
     if (result.rows.length === 0) {
-      console.error(`User not found: ${id}`);
-      throw new Error(`User not found: ${id}`);
+      console.error(`User not found: ${userId}`);
+      throw new Error(`User not found: ${userId}`);
     }
 
-    console.log(`User role updated successfully: ${id} -> ${newRole}`);
-    return { totalItems: 1, items: [result.rows[0]] };
+    console.log(`User role updated successfully: ${userId} -> ${newRole}`);
+    const userWithGroups = await fetchUserGroupMembershipDetails(result);
+
+    return { totalItems: 1, items: userWithGroups };
   } catch (error) {
     console.error("Error updating user role:", error);
     throw error;
@@ -125,11 +227,37 @@ export async function updateUserRole(
 }
 
 /**
+ * Checks whether a given user exists
+ * @param userId - The unique identifier for the user
+ * @returns The given user, if it exists
+ */
+export async function checkUserExists(
+  userId: string,
+): Promise<QCResponse<User>> {
+  if (!userId) {
+    return { totalItems: 0, items: [] };
+  }
+
+  const userCheckQuery = {
+    text: `SELECT * FROM users WHERE id = $1;`,
+    values: [userId],
+  };
+
+  const userCheckResult = await dbClient.query(userCheckQuery);
+
+  return {
+    totalItems: userCheckResult.rowCount,
+    items: userCheckResult.rows,
+  } as QCResponse<User>;
+}
+
+/**
  * Retrieves all registered users in query connector
  * @returns List of users registered in qc
  */
-export async function getUsers(): Promise<QCResponse<User>> {
-  if (!(await superAdminAccessCheck())) {
+export async function getAllUsers(): Promise<QCResponse<User>> {
+  if (!(await adminAccessCheck())) {
+    // admins need read access to users for group management
     throw new Error("Unauthorized");
   }
 
@@ -141,10 +269,11 @@ export async function getUsers(): Promise<QCResponse<User>> {
     `;
 
     const result = await dbClient.query(selectAllUsersQuery);
+    const usersWithGroups = await fetchUserGroupMembershipDetails(result);
 
     return {
       totalItems: result.rowCount,
-      items: result.rows,
+      items: usersWithGroups,
     } as QCResponse<User>;
   } catch (error) {
     throw error;
@@ -158,14 +287,13 @@ export async function getUsers(): Promise<QCResponse<User>> {
  */
 export async function getUserRole(username: string): Promise<string> {
   try {
-    const selectUsersQuery = `
+    const selectUserRoleQuery = `
       SELECT id, username, qc_role, first_name, last_name
       FROM users
       WHERE username = $1;
     `;
 
-    const result = await dbClient.query(selectUsersQuery, [username]);
-
+    const result = await dbClient.query(selectUserRoleQuery, [username]);
     return result?.rowCount && result.rowCount > 0
       ? result.rows?.[0].qc_role
       : "";
@@ -173,43 +301,44 @@ export async function getUserRole(username: string): Promise<string> {
     throw error;
   }
 }
-
 /**
- * Retrieves all registered user groups in query connector along with member and query counts.
- * @returns A list of user groups registered in the query connector.
+ * Retrieves the user group(s) for a given user
+ * @param userId identifier of the user whose groups we are retrieving
+ * @returns A list of UserGroup items for the given user
  */
-export async function getUserGroups(): Promise<QCResponse<UserGroup>> {
+export async function getAllUserGroupsForUser(
+  userId: string,
+): Promise<QCResponse<UserGroup[]>> {
   if (!(await adminAccessCheck())) {
     throw new Error("Unauthorized");
   }
-
   try {
-    const selectAllUserGroupQuery = `
-      SELECT 
-        ug.id, 
-        ug.name, 
-        COALESCE(member_count, 0) AS memberSize,
-        COALESCE(query_count, 0) AS querySize
-      FROM usergroup ug
-      LEFT JOIN (
-        SELECT usergroup_id, COUNT(*) AS member_count 
-        FROM usergroup_to_users 
-        GROUP BY usergroup_id
-      ) uu ON ug.id = uu.usergroup_id
-      LEFT JOIN (
-        SELECT usergroup_id, COUNT(*) AS query_count 
-        FROM usergroup_to_query 
-        GROUP BY usergroup_id
-      ) uq ON ug.id = uq.usergroup_id
-      ORDER BY ug.name ASC;
+    const selectAllUsersGroupsQuery = `
+     SELECT  u.id as user_id, ug.name as usergroup_name, ug.id as usergroup_id, 
+      COALESCE(member_count, 0) AS member_size,
+      COALESCE(query_count, 0) AS query_size
+    FROM usergroup_to_users as ugtu
+    LEFT JOIN users as u ON u.id = ugtu.user_id  
+    LEFT JOIN usergroup as ug ON ug.id = ugtu.usergroup_id
+    LEFT JOIN (
+      SELECT usergroup_id, COUNT(*) AS member_count 
+      FROM usergroup_to_users 
+      GROUP BY usergroup_id
+    ) uu ON ug.id = uu.usergroup_id
+    LEFT JOIN (
+      SELECT usergroup_id, COUNT(*) AS query_count 
+      FROM usergroup_to_query 
+      GROUP BY usergroup_id
+    ) uq ON ug.id = uq.usergroup_id
+    WHERE ugtu.user_id = $1
     `;
 
-    const result = await dbClient.query(selectAllUserGroupQuery);
+    const result = await dbClient.query(selectAllUsersGroupsQuery, [userId]);
 
     return {
       totalItems: result.rowCount,
       items: result.rows,
-    } as QCResponse<UserGroup>;
+    } as QCResponse<UserGroup[]>;
   } catch (error) {
     console.error("Error retrieving user groups:", error);
     throw error;
@@ -217,134 +346,108 @@ export async function getUserGroups(): Promise<QCResponse<UserGroup>> {
 }
 
 /**
- * Creates a new user group if it does not already exist.
- * @param groupName - The name of the user group to create.
- * @returns The created user group or an error message if it already exists.
+ * Retrieves the full user object with all group membership(s)
+ * @param userId - The unique identifier of the user.
+ * @returns A User with an updated list of UserGroupMembership items
  */
-export async function createUserGroup(
-  groupName: string,
-): Promise<UserGroup | string> {
-  if (!(await adminAccessCheck())) {
-    throw new Error("Unauthorized");
+export async function getSingleUserWithGroupMemberships(
+  userId: string,
+): Promise<QCResponse<User>> {
+  const userCheckResult = await checkUserExists(userId);
+  if (!userCheckResult || userCheckResult?.totalItems == 0) {
+    return { totalItems: 0, items: [] };
   }
 
-  try {
-    // Check if the group name already exists
-    const existingGroups = await getUserGroups();
-    const groupExists =
-      existingGroups.items?.some((group) => group.name === groupName) ?? false;
+  const query = {
+    text: `
+      SELECT  ug.id as membership_id, g.id as usergroup_id, g.name as usergroup_name
+      FROM usergroup_to_users as ug
+      LEFT JOIN users as u
+        ON u.id = ug.user_id
+      LEFT JOIN usergroup as g
+        ON g.id = ug.usergroup_id
+      WHERE ug.user_id = $1;
+    `,
+    values: [userId],
+  };
 
-    if (groupExists) {
-      console.warn(`Group with name '${groupName}' already exists.`);
-      return `Group '${groupName}' already exists.`;
-    }
+  const result = await dbClient.query(query);
 
-    const createGroupQuery = `
-      INSERT INTO usergroup (name)
-      VALUES ($1)
-      RETURNING id, name;
-    `;
-
-    const result = await dbClient.query(createGroupQuery, [groupName]);
-
+  const memberships = result.rows.map((row) => {
     return {
-      id: result.rows[0].id,
-      name: result.rows[0].name,
-      memberSize: 0,
-      querySize: 0,
+      membership_id: row.membership_id,
+      usergroup_id: row.usergroup_id,
+      usergroup_name: row.usergroup_name,
+      is_member: true,
     };
-  } catch (error) {
-    console.error("Error creating user group:", error);
-    throw error;
-  }
+  });
+
+  const userWithGroups = {
+    id: userId,
+    username: userCheckResult.items[0].username,
+    first_name: userCheckResult.items[0].first_name,
+    last_name: userCheckResult.items[0].last_name,
+    qc_role: userCheckResult.items[0].qc_role,
+    userGroupMemberships: memberships,
+  };
+
+  return { totalItems: 1, items: [userWithGroups] };
 }
 
 /**
- * Updates the name of an existing user group.
- * @param id - The unique identifier of the user group to update.
- * @param newName - The new name to assign to the user group.
- * @returns The updated user group or an error if the update fails.
+ * Retrieves the user group membership for a specific user group.
+ * @param groupId - The unique identifier of the user group.
+ * @returns A list of users with membership status for the specified group.
  */
-export async function updateUserGroup(
-  id: string,
-  newName: string,
-): Promise<UserGroup | string> {
+export async function getAllUsersWithSingleGroupStatus(
+  groupId: string,
+): Promise<User[]> {
   if (!(await adminAccessCheck())) {
     throw new Error("Unauthorized");
   }
 
-  try {
-    // Check if the new name already exists
-    const existingGroups = await getUserGroups();
-    const groupExists =
-      existingGroups.items?.some((group) => group.name === newName) ?? false;
-
-    if (groupExists) {
-      console.warn(`Group with name '${newName}' already exists.`);
-      return `Group '${newName}' already exists.`;
-    }
-
-    const updateGroupQuery = `
-      UPDATE usergroup
-      SET name = $1
-      WHERE id = $2
-      RETURNING id, name;
-    `;
-
-    const result = await dbClient.query(updateGroupQuery, [newName, id]);
-
-    if (result.rows.length === 0) {
-      throw new Error(`User group with ID '${id}' not found.`);
-    }
-
-    // Get updated memberSize and querySize from getUserGroup
-    const userGroups = await getUserGroups();
-    const updatedGroup =
-      userGroups?.items?.find((group) => group.id === id) ?? null;
-
-    return {
-      id: result.rows[0].id,
-      name: result.rows[0].name,
-      memberSize: updatedGroup?.memberSize ?? 0,
-      querySize: updatedGroup?.querySize ?? 0,
-    };
-  } catch (error) {
-    console.error("Error updating user group:", error);
-    throw error;
-  }
-}
-
-/**
- * Deletes a user group by its unique identifier.
- * @param id - The unique identifier of the user group to delete.
- * @returns The deleted user group or an error if the deletion fails.
- */
-export async function deleteUserGroup(id: string): Promise<UserGroup | string> {
-  if (!(await adminAccessCheck())) {
-    throw new Error("Unauthorized");
+  const groupCheckQuery = {
+    text: `SELECT id FROM usergroup WHERE id = $1;`,
+    values: [groupId],
+  };
+  const groupCheckResult = await dbClient.query(groupCheckQuery);
+  if (groupCheckResult.rows.length === 0) {
+    return [];
   }
 
-  try {
-    const deleteGroupQuery = `
-      DELETE FROM usergroup
-      WHERE id = $1
-      RETURNING id, name;
-    `;
+  const query = {
+    text: `
+      SELECT u.id, u.username, u.first_name, u.last_name, u.qc_role, g.name AS group_name, g.id as usergroup_id,
+        COALESCE(ug.id, '') AS membership_id,
+        CASE 
+          WHEN ug.user_id IS NOT NULL THEN TRUE
+          ELSE FALSE
+        END AS is_member
+      FROM users u
+      LEFT JOIN usergroup_to_users ug 
+        ON u.id = ug.user_id AND ug.usergroup_id = $1
+      LEFT JOIN usergroup g 
+        ON ug.usergroup_id = g.id
+        ORDER BY u.last_name, u.first_name;
+    `,
+    values: [groupId],
+  };
 
-    const result = await dbClient.query(deleteGroupQuery, [id]);
+  const result = await dbClient.query(query);
 
-    if (result.rows.length === 0) {
-      throw new Error(`User group with ID '${id}' not found.`);
-    }
-
-    return {
-      id: result.rows[0].id,
-      name: result.rows[0].name,
-      memberSize: 0,
-      querySize: 0,
-    };
-  } catch (error) {
-    console.error("Error deleting user group:", error);
-    throw error;
-  }
+  return result.rows.map((row) => ({
+    id: row.id,
+    username: row.username,
+    first_name: row.first_name,
+    last_name: row.last_name,
+    qc_role: row.qc_role,
+    userGroupMemberships: [
+      {
+        membership_id: row.membership_id,
+        usergroup_id: groupId,
+        usergroup_name: row.group_name,
+        is_member: row.is_member,
+      },
+    ],
+  }));
 }

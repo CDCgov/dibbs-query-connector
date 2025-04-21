@@ -1,8 +1,10 @@
 "use client";
 
 import { createContext, useState } from "react";
+import { User } from "@/app/models/entities/users";
+import { CustomUserQuery } from "@/app/models/entities/query";
 
-export type SubjectType = "Members" | "Query";
+export type SubjectType = "Members" | "Queries" | null;
 
 interface UserManagementData {
   teamQueryEditSection: {
@@ -10,8 +12,9 @@ interface UserManagementData {
     title: string;
     subtitle: string;
     placeholder: string;
-    subjectData: unknown;
+    groupId: string;
     subjectType: SubjectType;
+    subjectData: User[] | CustomUserQuery[];
   };
 }
 
@@ -20,12 +23,10 @@ interface UserManagementContext extends UserManagementData {
     title: string,
     subtitle: string,
     subjectType: SubjectType,
-    subjectId: string,
+    groupId: string,
+    subjectData: User[] | CustomUserQuery[],
   ) => void;
   closeEditSection: () => void;
-  handleSearch: (searchFilter: string) => void;
-  handleMemberUpdate: () => void;
-  handleQueryUpdate: () => void;
 }
 
 const initData: UserManagementData = {
@@ -34,8 +35,9 @@ const initData: UserManagementData = {
     title: "",
     subtitle: "",
     placeholder: "Search",
+    groupId: "",
+    subjectType: null,
     subjectData: [],
-    subjectType: "Members",
   },
 };
 
@@ -43,9 +45,6 @@ export const UserManagementContext = createContext<UserManagementContext>({
   ...initData,
   openEditSection: () => {},
   closeEditSection: () => {},
-  handleSearch: (_searchFilter: string) => {},
-  handleMemberUpdate: () => {},
-  handleQueryUpdate: () => {},
 });
 
 /**
@@ -61,31 +60,22 @@ const DataProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
    * Event handlers for edit section
    */
   function closeEditSection() {
-    const newState: UserManagementData = {
-      ...innerState,
-      teamQueryEditSection: {
-        ...innerState.teamQueryEditSection,
-        isOpen: false,
-      },
-    };
-    setInnerState(newState);
+    setInnerState(initData);
   }
 
   function openEditSection(
     title: string,
     subtitle: string,
     subjectType: SubjectType,
-    subjectId: string,
+    id: string,
+    subjectData: User[] | CustomUserQuery[],
   ) {
-    let subjectData = null;
     let placeholder = "";
 
     if (subjectType == "Members") {
       placeholder = "Search members";
-      subjectData = getTeamMembers(subjectId);
     } else {
       placeholder = "Search queries";
-      subjectData = getTeamQueries(subjectId);
     }
 
     const newState: UserManagementData = {
@@ -96,6 +86,7 @@ const DataProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
         subtitle,
         placeholder,
         subjectType,
+        groupId: id,
         subjectData,
         isOpen: true,
       },
@@ -103,47 +94,12 @@ const DataProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     setInnerState(newState);
   }
 
-  function handleSearch(filter: string) {
-    // TODO data filtering
-    console.log("filtering ...", filter);
-  }
-
-  function handleMemberUpdate() {
-    console.log("update team members");
-  }
-
-  function handleQueryUpdate() {
-    console.log("update team queries");
-  }
-
-  /**
-   * Data fetching
-   */
-
-  function getTeamMembers(_teamId: string): unknown {
-    // TODO retrieve member data
-    const ListOfMembers = ["Member 1", "Member 2", "Member 3"];
-    return ListOfMembers;
-  }
-
-  function getTeamQueries(_teamId: string): unknown {
-    // TODO retrieve queries data
-    const ListOfQueries = ["Query 1", "Query 2", "Query 3"];
-    return ListOfQueries;
-  }
-
-  /**
-   * HTML
-   */
   return (
     <UserManagementContext.Provider
       value={{
         ...innerState,
         openEditSection,
         closeEditSection,
-        handleSearch,
-        handleMemberUpdate,
-        handleQueryUpdate,
       }}
     >
       {children}

@@ -1,4 +1,4 @@
-import { FhirQueryResponse } from "../../../shared/query-service";
+import { PatientRecordsResponse } from "../../../shared/query-service";
 import ResultsViewSideNav, {
   NavSection,
 } from "./resultsView/ResultsViewSideNav";
@@ -15,13 +15,15 @@ import Backlink from "../../../ui/designSystem/backLink/Backlink";
 import { RETURN_LABEL } from "@/app/(pages)/query/components/stepIndicator/StepIndicator";
 import TitleBox from "./stepIndicator/TitleBox";
 import ImmunizationTable from "./resultsView/tableComponents/ImmunizationTable";
-import { CustomUserQuery } from "@/app/shared/constants";
+import { CustomUserQuery } from "@/app/models/entities/query";
+import Skeleton from "react-loading-skeleton";
 
 type ResultsViewProps = {
-  fhirQueryResponse: FhirQueryResponse;
+  patientRecordsResponse: PatientRecordsResponse | undefined;
   selectedQuery: CustomUserQuery;
   goBack: () => void;
   goToBeginning: () => void;
+  loading: boolean;
 };
 
 export type ResultsViewAccordionItem = {
@@ -33,43 +35,59 @@ export type ResultsViewAccordionItem = {
 /**
  * The QueryView component to render the query results.
  * @param props - The props for the QueryView component.
- * @param props.fhirQueryResponse - The response from the query service.
+ * @param props.patientRecordsResponse - The response from the query service.
  * @param props.goBack - The function to go back to the previous page.
  * @param props.goToBeginning - Function to return to patient discover
  * @param props.selectedQuery - query that's been selected to view for results
+ * @param props.loading -  whether the component is in a loading state
  * @returns The QueryView component.
  */
 const ResultsView: React.FC<ResultsViewProps> = ({
-  fhirQueryResponse,
+  patientRecordsResponse,
   selectedQuery,
   goBack,
   goToBeginning,
+  loading,
 }) => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
-  const accordionItems =
-    mapQueryResponseToAccordionDataStructure(fhirQueryResponse);
+  const accordionItems = mapQueryResponseToAccordionDataStructure(
+    patientRecordsResponse,
+  );
 
-  const sideNavContent = accordionItems
-    .map((item) => {
-      if (item.content) {
-        return { title: item.title, subtitle: item?.subtitle };
-      }
-    })
-    .filter((i) => Boolean(i)) as NavSection[];
-
+  const sideNavContent =
+    accordionItems &&
+    (accordionItems
+      .map((item) => {
+        if (item.content) {
+          return { title: item.title, subtitle: item?.subtitle };
+        }
+      })
+      .filter((i) => Boolean(i)) as NavSection[]);
   return (
     <>
       <div className={`${styles.resultsBannerContent}`}>
-        <Backlink onClick={() => goBack()} label={RETURN_LABEL["results"]} />
-        <button
-          className="usa-button usa-button--outline margin-left-auto"
-          onClick={() => goToBeginning()}
-        >
-          New patient search
-        </button>
+        {loading ? (
+          <div data-testid={"banner-loading-skeleton"}>
+            <Skeleton width={150} />
+            <Skeleton width={200} height={50} />
+          </div>
+        ) : (
+          <>
+            <Backlink
+              onClick={() => goBack()}
+              label={RETURN_LABEL["results"]}
+            />
+            <button
+              className="usa-button usa-button--outline"
+              onClick={() => goToBeginning()}
+            >
+              New patient search
+            </button>
+          </>
+        )}
       </div>
       <TitleBox step="results" />
       <h2 className="page-explainer margin-bottom-3-important margin-top-0-important">
@@ -81,10 +99,10 @@ const ResultsView: React.FC<ResultsViewProps> = ({
 
       <div className=" grid-container grid-row grid-gap-md padding-0 ">
         <div className="tablet:grid-col-3">
-          <ResultsViewSideNav items={sideNavContent} />
+          <ResultsViewSideNav items={sideNavContent} loading={loading} />
         </div>
         <div className="tablet:grid-col-9 ecr-content">
-          <ResultsViewTable accordionItems={accordionItems} />
+          <ResultsViewTable accordionItems={accordionItems} loading={loading} />
         </div>
       </div>
     </>
@@ -93,8 +111,9 @@ const ResultsView: React.FC<ResultsViewProps> = ({
 export default ResultsView;
 
 function mapQueryResponseToAccordionDataStructure(
-  resultsQueryResponse: FhirQueryResponse,
+  resultsQueryResponse: PatientRecordsResponse | undefined,
 ) {
+  if (resultsQueryResponse === undefined) return [];
   const patient =
     resultsQueryResponse.Patient && resultsQueryResponse.Patient.length === 1
       ? resultsQueryResponse.Patient[0]

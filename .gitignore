@@ -84,6 +84,7 @@ build/
 
 .env
 .local.env 
+.env.e2e
 
 tmp_remote_image_*
 

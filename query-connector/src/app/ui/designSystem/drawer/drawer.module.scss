@@ -1,13 +1,11 @@
 @use "../../../ui/styles/_variables" as *;
 
-$drawerWidth: 30%;
+$drawerWidthDefault: 35%;
+$drawerWidthWide: 60%;
 
 .drawer {
   position: fixed;
   top: 0;
-  right: -35rem;
-  width: $drawerWidth;
-  max-width: 35rem;
   height: 100%;
   padding: 0rem;
   display: flex;
@@ -19,8 +17,18 @@ $drawerWidth: 30%;
   z-index: 1050;
   border-left: 1px solid $border;
   background: $page-background;
-  overflow: scroll;
   max-height: 100%;
+  overflow-y: scroll;
+
+  &.width35 {
+    width: $drawerWidthDefault;
+    max-width: $drawerWidthWide;
+  }
+
+  &.width60 {
+    width: $drawerWidthWide;
+    max-width: $drawerWidthWide;
+  }
 
   input[type="search"] {
     display: flex;
@@ -38,16 +46,16 @@ $drawerWidth: 30%;
 }
 
 .drawer.closed {
-  right: -1 * $drawerWidth;
+  right: -1 * $drawerWidthWide;
 }
 
 .drawerContent {
   padding: 2rem;
-  overflow-y: auto;
   width: 100%;
 }
 
 .drawerHeader {
+  max-width: 95%;
   width: 25rem;
 }
 
@@ -77,6 +85,7 @@ $drawerWidth: 30%;
 .subtitle {
   color: $gray-600;
   display: flex;
+  padding-top: 1rem;
   padding-bottom: 1rem;
   margin: 0;
 }

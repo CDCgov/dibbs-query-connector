@@ -14,7 +14,6 @@ import {
 
 import {
   getConditionsData,
-  getCustomQueries,
   getValueSetsAndConceptsByConditionIDs,
 } from "@/app/shared/database-service";
 import {
@@ -26,23 +25,24 @@ import {
 } from "../utils";
 import { ConditionSelection } from "../components/ConditionSelection";
 import { ValueSetSelection } from "../components/ValueSetSelection";
-import {
-  BuildStep,
-  DibbsConceptType,
-  DibbsValueSet,
-} from "../../../shared/constants";
+import { BuildStep } from "../../../shared/constants";
 import LoadingView from "../../../ui/designSystem/LoadingView";
 import classNames from "classnames";
 import { groupConditionConceptsIntoValueSets } from "@/app/shared/utils";
 import { SelectedQueryDetails } from "../querySelection/utils";
 
-import {
-  getSavedQueryById,
-  saveCustomQuery,
-} from "@/app/backend/query-building";
+import { getCustomQueries } from "@/app/backend/query-building";
 import { groupValueSetsByConceptType } from "@/app/utils/valueSetTranslation";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import { DataContext } from "@/app/shared/DataProvider";
+import {
+  DibbsConceptType,
+  DibbsValueSet,
+} from "@/app/models/entities/valuesets";
+import {
+  getSavedQueryById,
+  saveCustomQuery,
+} from "@/app/backend/dbServices/query-building";
 
 export type FormError = {
   queryName: boolean;
@@ -277,7 +277,6 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
         showToastConfirmation({
           body: `${queryName} successfully ${statusMessage}`,
         });
-        goBack();
       } catch {
         showToastConfirmation({
           heading: "Something went wrong",

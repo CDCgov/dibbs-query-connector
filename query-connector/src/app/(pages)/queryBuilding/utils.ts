@@ -1,4 +1,4 @@
-import { DibbsValueSet } from "../../shared/constants";
+import { DibbsValueSet } from "@/app/models/entities/valuesets";
 import { ConceptTypeToDibbsVsMap } from "../../utils/valueSetTranslation";
 
 // The structure of the data that's coming from the backend
@@ -52,6 +52,20 @@ export const EMPTY_CONCEPT_TYPE = {
 };
 
 /**
+ * Utility method to get a display name for a category (if overridden),
+ * or fall back to the raw name.
+ * @param categoryName - raw category name from backend
+ * @returns display name to show in UI
+ */
+export function formatCategoryDisplay(categoryName: string): string {
+  const categoryDisplayMap: Record<string, string> = {
+    "Sexually Transmitted Diseases": "Sexually Transmitted Diseases (STI)",
+  };
+  // Add more mappings as needed
+  return categoryDisplayMap[categoryName] || categoryName;
+}
+
+/**
  * Filtering function that checks filtering at the category and the condition level
  * @param filterString - string to filter by
  * @param fetchedConditions - unfiltered list of conditions fetched from the backend
@@ -66,15 +80,17 @@ export function filterSearchByCategoryAndCondition(
 
   Object.entries(unfilteredConditions).forEach(
     ([categoryName, conditionArray]) => {
+      const displayCategory = formatCategoryDisplay(categoryName);
+      const filter = filterString.toLowerCase();
+
       if (
-        categoryName
-          .toLocaleLowerCase()
-          .includes(filterString.toLocaleLowerCase())
+        categoryName.toLowerCase().includes(filter) ||
+        displayCategory.toLowerCase().includes(filter)
       ) {
-        result[categoryName] = unfilteredConditions[categoryName];
+        result[categoryName] = conditionArray;
       } else {
         const matches = conditionArray.filter((c) =>
-          c.name.toLocaleLowerCase().includes(filterString.toLocaleLowerCase()),
+          formatDiseaseDisplay(c.name).toLowerCase().includes(filter),
         );
         if (matches.length > 0) {
           result[categoryName] = matches;
@@ -92,8 +108,15 @@ export function filterSearchByCategoryAndCondition(
  * @param diseaseName - name of the disease
  * @returns A disease display string for display
  */
-export function formatDiseaseDisplay(diseaseName: string) {
-  return diseaseName.replace("(disorder)", "").trim();
+export function formatDiseaseDisplay(diseaseName: string): string {
+  const diseaseDisplayMap: Record<string, string> = {
+    "Human immunodeficiency virus infection (disorder)":
+      "Human immunodeficiency virus infection (HIV)",
+  };
+  return (
+    diseaseDisplayMap[diseaseName] ||
+    diseaseName.replace("(disorder)", "").trim()
+  );
 }
 
 /**

@@ -14,10 +14,14 @@ import { GET } from "@/app/api/route";
 import {
   PATIENT_HL7_MESSAGE,
   PATIENT_HL7_MESSAGE_NO_IDENTIFIERS,
+  suppressConsoleLogs,
 } from "./fixtures";
 
+jest.mock("next-auth");
+jest.mock("next-auth/providers/keycloak");
+
 // Utility function to create a minimal NextRequest-like object
-function createNextRequest(
+export function createNextRequest(
   body: unknown,
   searchParams: URLSearchParams,
 ): NextRequest {
@@ -29,6 +33,13 @@ function createNextRequest(
     headers: new Headers(),
   } as unknown as NextRequest;
 }
+
+jest.mock("@/app/utils/auth", () => {
+  return {
+    superAdminAccessCheck: jest.fn(() => Promise.resolve(true)),
+    adminAccessCheck: jest.fn(() => Promise.resolve(true)),
+  };
+});
 
 const PatientBundle = readJsonFile("./src/app/tests/assets/BundlePatient.json");
 const PatientResource: Patient | undefined = (
@@ -50,8 +61,7 @@ describe("GET Health Check", () => {
 
 describe("POST Query FHIR Server", () => {
   beforeEach(() => {
-    // supress the console warns for the error endpoints
-    jest.spyOn(console, "error").mockImplementation(() => {});
+    suppressConsoleLogs();
   });
 
   afterEach(() => {
@@ -62,9 +72,7 @@ describe("POST Query FHIR Server", () => {
   it("should return an OperationOutcome if the request body is not a Patient resource", async () => {
     const request = createNextRequest(
       { resourceType: "Observation" },
-      new URLSearchParams(
-        `id=${SYPHILIS_QUERY_ID}&fhir_server=HELIOS Meld: Direct`,
-      ),
+      new URLSearchParams(`id=${SYPHILIS_QUERY_ID}&fhir_server=Aidbox`),
     );
     const response = await POST(request);
     const body = await response.json();
@@ -77,9 +85,7 @@ describe("POST Query FHIR Server", () => {
   it("should return an OperationOutcome if there are no patient identifiers to parse from the request body", async () => {
     const request = createNextRequest(
       { resourceType: "Patient" },
-      new URLSearchParams(
-        `id=${SYPHILIS_QUERY_ID}&fhir_server=HELIOS Meld: Direct`,
-      ),
+      new URLSearchParams(`id=${SYPHILIS_QUERY_ID}&fhir_server=Aidbox`),
     );
     const response = await POST(request);
     const body = await response.json();
@@ -109,7 +115,7 @@ describe("POST Query FHIR Server", () => {
     const request = createNextRequest(
       PatientResource,
       new URLSearchParams(
-        "use_case=syphilis&fhir_server=HELIOS Meld: Direct&message_format=invalid",
+        "use_case=syphilis&fhir_server=Aidbox&message_format=invalid",
       ),
     );
     const response = await POST(request);
@@ -121,7 +127,7 @@ describe("POST Query FHIR Server", () => {
     const request = createNextRequest(
       PATIENT_HL7_MESSAGE_NO_IDENTIFIERS,
       new URLSearchParams(
-        `id=${SYPHILIS_QUERY_ID}&fhir_server=HELIOS Meld: Direct&message_format=HL7`,
+        `id=${SYPHILIS_QUERY_ID}&fhir_server=Aidbox&message_format=HL7`,
       ),
     );
     const response = await POST(request);
@@ -134,7 +140,7 @@ describe("POST Query FHIR Server", () => {
   it("should return a legitimate FHIR bundle if it uses the deprecated use_case param", async () => {
     const request = createNextRequest(
       PatientResource,
-      new URLSearchParams("use_case=syphilis&fhir_server=HELIOS Meld: Direct"),
+      new URLSearchParams("use_case=syphilis&fhir_server=Aidbox"),
     );
     const response = await POST(request);
     const body = await response.json();
@@ -143,9 +149,7 @@ describe("POST Query FHIR Server", () => {
   it("should return a legitimate FHIR bundle if the query is successful", async () => {
     const request = createNextRequest(
       PatientResource,
-      new URLSearchParams(
-        `id=${SYPHILIS_QUERY_ID}&fhir_server=HELIOS Meld: Direct`,
-      ),
+      new URLSearchParams(`id=${SYPHILIS_QUERY_ID}&fhir_server=Aidbox`),
     );
     const response = await POST(request);
     const body = await response.json();
@@ -155,7 +159,7 @@ describe("POST Query FHIR Server", () => {
     const explicitFhirRequest = createNextRequest(
       PatientResource,
       new URLSearchParams(
-        `id=${SYPHILIS_QUERY_ID}&fhir_server=HELIOS Meld: Direct&message_format=FHIR`,
+        `id=${SYPHILIS_QUERY_ID}&fhir_server=Aidbox&message_format=FHIR`,
       ),
     );
     const explicitFhirResponse = await POST(explicitFhirRequest);
@@ -166,7 +170,7 @@ describe("POST Query FHIR Server", () => {
     const request = createNextRequest(
       PATIENT_HL7_MESSAGE,
       new URLSearchParams(
-        `id=${SYPHILIS_QUERY_ID}&fhir_server=HELIOS Meld: Direct&message_format=HL7`,
+        `id=${SYPHILIS_QUERY_ID}&fhir_server=Aidbox&message_format=HL7`,
       ),
     );
     const response = await POST(request);

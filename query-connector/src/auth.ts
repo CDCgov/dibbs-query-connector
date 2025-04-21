@@ -2,7 +2,7 @@ import NextAuth from "next-auth";
 import KeycloakProvider from "next-auth/providers/keycloak";
 import { addUserIfNotExists, getUserRole } from "@/app/backend/user-management";
 import { isAuthDisabledServerCheck } from "./app/utils/auth";
-import { RoleTypeValues } from "./app/models/entities/user-management";
+import { UserRole } from "./app/models/entities/users";
 
 function addRealm(url: string) {
   return url.endsWith("/realms/master") ? url : `${url}/realms/master`;
@@ -50,6 +50,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
      * @returns The updated JWT token with user details.
      */
     async jwt({ token, profile }) {
+      const now = Math.floor(Date.now() / 1000);
+
       if (profile) {
         const userToken = {
           id: profile.sub || "",
@@ -67,18 +69,26 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           console.error("Something went wrong in generating user token", error);
         }
 
-        if (userToken.username !== "") {
-          if (isAuthDisabledServerCheck()) {
-            userToken.role = RoleTypeValues.SuperAdmin;
-          } else {
-            const role = await getUserRole(
-              userToken.username as string,
-            ).catch();
-            userToken.role = role;
-          }
-        }
+        token = { ...token, ...userToken };
+      }
 
-        return { ...token, ...userToken };
+      // Extend token with role and time to expire
+      if (token.username && token.username !== "") {
+        if (isAuthDisabledServerCheck()) {
+          token.role = UserRole.SUPER_ADMIN;
+        } else {
+          const role = await getUserRole(token.username).catch();
+          token.role = role;
+        }
+      }
+
+      if (token.exp) {
+        token.expiresIn = token.exp - now;
+      }
+
+      // handle expired tokens
+      if (token.expiresIn && token.expiresIn <= 0) {
+        return null;
       }
 
       return token;
@@ -93,14 +103,17 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
      */
     async session({ session, token }) {
       session.user = {
-        id: typeof token.id === "string" ? token.id : "",
+        id: token.id || "",
         email: token.email || "",
-        username: typeof token.username === "string" ? token.username : "",
-        firstName: typeof token.firstName === "string" ? token.firstName : "",
-        lastName: typeof token.lastName === "string" ? token.lastName : "",
+        username: token.username || "",
+        firstName: token.firstName || "",
+        lastName: token.lastName || "",
         emailVerified: null,
-        role: typeof token.role === "string" ? token.role : "",
+        role: token.role || "",
       };
+
+      session.expiresIn = token.expiresIn;
+
       return session;
     },
   },

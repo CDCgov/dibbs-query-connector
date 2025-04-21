@@ -25,8 +25,8 @@ The containers should take a few minutes to spin up, but if all goes well, congr
 
 We recommend running the Query Connector app from a container, but if that is not feasible for a given use-case, it may also be run directly from Node using the steps below.
 
-1. Ensure that both [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) and [Node 18.x or higher](https://nodejs.org/en/download/package-manager/current) are installed.
-2. Clone the Query Connector repository with `git clone https://github.com/CDCgov/dibbs-query-connector`.
+1. Ensure that both [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) and [Node 22.x or higher](https://nodejs.org/en/download/package-manager/current) are installed.
+2. Clone the Query Connector repository with `git clone git@github.com:CDCgov/dibbs-query-connector.git`.
 3. Navigate to the source folder with `cd /query-connector/`.
 4. Install all of the Node dependencies for the Query Connector app with `npm install`.
 5. Run the Query Connector app on `localhost:3000` with `npm run dev`. If you are on a Windows Machine, you may need to run `npm run dev-win` instead.
@@ -38,7 +38,7 @@ The containers should take a few minutes to spin up, but if all goes well, congr
 To build the Docker image for the Query Connector app from source instead of downloading it from the PHDI repository follow these steps.
 
 1. Ensure that both [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) and [Docker](https://docs.docker.com/get-docker/) are installed.
-2. Clone the Query Connector repository with `git clone https://github.com/CDCgov/dibbs-query-connector.git`.
+2. Clone the Query Connector repository with `git clone git@github.com:CDCgov/dibbs-query-connector.git`.
 3. Navigate to `/query-connector`.
 4. Run `docker build -t query-connector .`.
 
@@ -62,19 +62,20 @@ In order to make the dev process as low-lift as possible, we want to avoid execu
 
 #### Obtaining an eRSD API Key
 
-Before running the Query Connector locally, you will need to obtain an API key for the electronic Reporting and Surveillance Distribution (eRSD). With the API key, you have access to 200+ pre-built queries for reportable conditions, e.g., chlamydia, influenza, hepatitis A, etc. These queries can be used and modified in the Query Connector app.
+Before running the Query Connector locally, you will need to obtain an API key for the electronic Reporting and Surveillance Distribution (eRSD), Unified Medical Language System (UMLS), and Aidbox. With the API key, you have access to 200+ pre-built queries for reportable conditions, e.g., chlamydia, influenza, hepatitis A, etc. These queries can be used and modified in the Query Connector app.
 ``
 
 To obtain the free API keys, please visit the following URLs and follow the sign up instructions.
 
 - [https://ersd.aimsplatform.org/#/api-keys](https://ersd.aimsplatform.org/#/api-keys)
 - [https://uts.nlm.nih.gov/uts/login](https://uts.nlm.nih.gov/uts/login)
+- [https://aidbox.app/](https://aidbox.app/)
 
 Next, set up your `.env` file with the following command: `cp .env.sample .env`
 
 Adjust your `DATABASE_URL` as needed.
 
-Add your API keys as an environment variables called `ERSD_API_KEY` and `UMLS_API_KEY` in the `.env` file so that they can be accessed when running the Query Connector app.
+Add your API keys as an environment variables called `ERSD_API_KEY`, `UMLS_API_KEY`, and `AIDBOX_LICENSE` in the `.env` file so that they can be accessed when running the Query Connector app.
 
 #### Running Keycloak for Authentication
 
@@ -114,9 +115,45 @@ If the above doesn't work, try replacing `localhost` with `0.0.0.0`.
 
 #### Running the e2e tests locally
 
-Our e2e's are available locally via `npm run test:playwright:local`. You'll need to have the app running locally at `localhost:3000` first (ie using `npm run dev` or running `npm run dev:db` and `npm run dev:next` in two separate terminals).
+The Query Connector uses Playwright Test as its end-to-end testing framework. Playwright is a browser-based testing library that enables tests to run against a variety of different browsers under a variety of different conditions. To manage this suite, Playwright creates some helpful files (and commands) that can be used to tweak its configuration.
 
-For flows that do queries to a FHIR server (ie `/query`), you'll need to use a DB utility to change the address of the local E2E server to whatever localhost port your dev HAPI server is living at. If you have questions, reach out to another eng on the team.
+##### Config and Directories
+
+Playwright's configuration is managed by the file `playwright.config.ts`. This file has information on which browsers to test against, configuration options for those browsers, optional mobile browser ports, retry and other utility options, and a dev webserver. Changing this file will make global changes to Playwright's operations.
+
+By default, Playwright will look for end to end tests in `/e2e`.
+
+##### Testing Commands and Demos
+
+Playwright provides a number of different ways of executing end to end tests. From the `query-connector/` directory, you can run several commands:
+
+`npm run test:playwright:ui`
+Runs the end-to-end tests locally by spawning the Playwright UI mode. This will start a dev server off localhost:3000, so make sure you don't have another app instance running off that port.
+
+You'll need to have a token for Aidbox set under AIDBOX_LICENSE in your .env for the Aidbox seeder to run correctly. You can sign up for a dev license at https://aidbox.app and use that in your local setup.
+
+`npm run test:playwright`
+Runs the end-to-end tests.
+
+`npm run test:playwright -- --project=chromium`
+Runs the tests only on Desktop Chrome.
+
+`npm run test:playwright -- example`
+Runs the tests in a specific file.
+
+`npm run test:playwright -- -g "test name"`
+Runs the test with the name "test name", e.g., Query("test name") would run here.
+
+`npm run test:playwright -- --debug`
+Runs the tests in debug mode.
+
+`npm run test:playwright -- codegen`
+Auto generate tests with Codegen.
+
+After running a test set on your local, you can also additionally type `npx playwright show-report` to view an HTML report page of different test statuses and results.
+
+Playwright is managed by an end-to-end job in the `.github/workflows/ci.yaml` file of the project root. Since it requires browser installation to effectively test, and since it operates using an independent framework from jest, it's run separately from the unit and
+integration tests ran through `npm run test:ci`.
 
 ### Query Connector ERD
 
@@ -172,3 +209,12 @@ graph TD
   class P1,P2,P3,P4,P5 pages;
   class I external;
 ```
+
+### Infrastructure Architecture Diagram
+
+**ECS Infrastructure**
+
+![ECS](./public/QC%20Architecture-ECS.jpg)
+
+**VM Infrastructure**
+![VM](./public/QC%20Architecture-VM.jpg)

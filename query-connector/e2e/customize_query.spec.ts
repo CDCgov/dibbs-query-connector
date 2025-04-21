@@ -4,7 +4,12 @@ import { test, expect } from "@playwright/test";
 import { TEST_URL } from "../playwright-setup";
 import { PAGE_TITLES } from "@/app/(pages)/query/components/stepIndicator/StepIndicator";
 
-import { TEST_PATIENT, TEST_PATIENT_NAME, showSiteAlert } from "./constants";
+import {
+  DEFAULT_FHIR_SERVER,
+  TEST_PATIENT,
+  TEST_PATIENT_NAME,
+  showSiteAlert,
+} from "./constants";
 import { checkForSiteAlert } from "./utils";
 
 test.describe("querying with the Query Connector", () => {
@@ -30,7 +35,7 @@ test.describe("querying with the Query Connector", () => {
     await page.getByRole("button", { name: "Advanced" }).click();
     await page
       .getByLabel("Healthcare Organization (HCO)")
-      .selectOption("Local e2e HAPI Server: Direct");
+      .selectOption(DEFAULT_FHIR_SERVER);
 
     await page.getByRole("button", { name: "Search for patient" }).click();
     await expect(page.getByText("Loading")).toHaveCount(0, { timeout: 20000 });

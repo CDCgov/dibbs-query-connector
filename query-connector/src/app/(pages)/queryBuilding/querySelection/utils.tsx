@@ -1,10 +1,10 @@
 import { ModalRef } from "@/app/ui/designSystem/modal/Modal";
 import { DeleteModal } from "@/app/ui/designSystem/modal/deleteModal";
 import { RefObject } from "react";
-import { CustomUserQuery } from "../../../shared/constants";
-import { deleteQueryById } from "@/app/shared/database-service";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import { DataContextValue } from "@/app/shared/DataProvider";
+import { deleteQueryById } from "@/app/backend/query-building";
+import { CustomUserQuery } from "@/app/models/entities/query";
 
 /**
  * Handles deleting a user query.
@@ -84,20 +84,6 @@ export const handleCopy = (queryName: string, queryId: string) => {
     .catch((error) => {
       console.error("Failed to copy text:", error);
     });
-};
-
-/**
- * Handles the creation of a new query by redirecting to the query building page.
- * @param goForward - method to progress the page to the next step
- * @param setLoading - Function to set the loading state.
- */
-export const handleCreationConfirmation = async (
-  goForward: () => void,
-  setLoading: React.Dispatch<React.SetStateAction<boolean>>,
-) => {
-  setLoading(true);
-  // Redirect to query updating/editing page
-  goForward();
 };
 
 /**

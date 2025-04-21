@@ -1,7 +1,8 @@
-/* eslint-disable jsdoc/require-returns, jsdoc/require-param-description */
-// __mocks__/next-auth/react.js
-const useSession = jest.fn().mockReturnValue({ data: undefined });
+const useSession = jest
+  .fn()
+  .mockReturnValue({ data: undefined, status: "loading" });
 
+const signOut = jest.fn();
 /**
  *
  * @param root0
@@ -9,4 +10,4 @@ const useSession = jest.fn().mockReturnValue({ data: undefined });
  */
 const SessionProvider = ({ children }) => <>{children}</>;
 
-export { useSession, SessionProvider };
+export { useSession, signOut, SessionProvider };

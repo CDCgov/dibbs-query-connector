@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Modal as TrussModal,
   ModalHeading,
@@ -7,6 +9,7 @@ import {
   ModalRef as TrussModalRef,
   Icon,
 } from "@trussworks/react-uswds";
+import classNames from "classnames";
 import React, { RefObject, ReactNode } from "react";
 
 export type ModalRef = TrussModalRef;
@@ -28,6 +31,8 @@ export type ModalProps = {
   buttons: ModalButton[];
   isLarge?: boolean;
   errorMessage?: string | null; // New prop for error message
+  forceAction?: boolean;
+  className?: string;
 };
 
 /**
@@ -41,6 +46,8 @@ export type ModalProps = {
  * @param props.buttons - The buttons to display in the footer.
  * @param props.isLarge - Whether the modal is large.
  * @param props.errorMessage - The error message to display in the footer.
+ * @param props.forceAction - when true the user cannot dismiss the modal unless an specific action is made.
+ * @param props.className additional classes that can be applied to the modal. The classes will be set to the most outer div element.
  * @returns - A customizable modal component
  */
 export const Modal: React.FC<ModalProps> = ({
@@ -52,6 +59,8 @@ export const Modal: React.FC<ModalProps> = ({
   buttons,
   isLarge,
   errorMessage,
+  forceAction,
+  className,
 }) => {
   return (
     <TrussModal
@@ -60,7 +69,8 @@ export const Modal: React.FC<ModalProps> = ({
       aria-labelledby={`${id}-modal-heading`}
       aria-describedby={`${id}-modal-description`}
       isLarge={isLarge}
-      className="padding-x-2"
+      forceAction={forceAction}
+      className={classNames("qc-modal", className)}
     >
       <ModalHeading id={`${id}-modal-heading`}>{heading}</ModalHeading>
       <div id={`${id}-modal-description`} className="usa-prose">

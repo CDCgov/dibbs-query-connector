@@ -1,19 +1,22 @@
 "use client";
 import React, { useContext, useEffect, useState } from "react";
-import { FhirQueryResponse } from "../../shared/query-service";
+import {
+  PatientDiscoveryResponse,
+  PatientRecordsResponse,
+} from "../../shared/query-service";
 import ResultsView from "./components/ResultsView";
 import PatientSearchResults from "./components/PatientSearchResults";
 import SearchForm from "./components/searchForm/SearchForm";
 import SelectQuery from "./components/SelectQuery";
 import { DEFAULT_DEMO_FHIR_SERVER, Mode } from "../../shared/constants";
-import LoadingView from "../../ui/designSystem/LoadingView";
 import StepIndicator, {
   CUSTOMIZE_QUERY_STEPS,
 } from "./components/stepIndicator/StepIndicator";
 import { DataContext } from "@/app/shared/DataProvider";
 import { Patient } from "fhir/r4";
-import { getFhirServerNames } from "@/app/shared/database-service";
-import { CustomUserQuery } from "../../shared/constants";
+import { getFhirServerNames } from "@/app/backend/dbServices/fhir-servers";
+import { CustomUserQuery } from "@/app/models/entities/query";
+import WithAuth from "@/app/ui/components/withAuth/WithAuth";
 
 const blankUserQuery = {
   query_id: "",
@@ -38,10 +41,13 @@ const Query: React.FC = () => {
   const [fhirServers, setFhirServers] = useState<string[]>([]);
   const ctx = useContext(DataContext);
 
+  async function fetchFHIRServerNames() {
+    const servers = await getFhirServerNames();
+    setFhirServers(servers);
+  }
+
   useEffect(() => {
-    getFhirServerNames().then((servers) => {
-      setFhirServers(servers);
-    });
+    fetchFHIRServerNames();
   }, []);
 
   // update the current page details when switching between modes,
@@ -51,10 +57,10 @@ const Query: React.FC = () => {
   }, [mode]);
 
   const [patientDiscoveryQueryResponse, setPatientDiscoveryQueryResponse] =
-    useState<FhirQueryResponse>({});
+    useState<PatientDiscoveryResponse>();
   const [patientForQuery, setPatientForQueryResponse] = useState<Patient>();
   const [resultsQueryResponse, setResultsQueryResponse] =
-    useState<FhirQueryResponse>({});
+    useState<PatientRecordsResponse>();
 
   const [showCustomizeQuery, setShowCustomizeQuery] = useState(false);
 
@@ -66,8 +72,9 @@ const Query: React.FC = () => {
       : "main-container",
     results: "main-container__wide",
   };
+
   return (
-    <>
+    <WithAuth>
       {Object.keys(CUSTOMIZE_QUERY_STEPS).includes(mode) &&
         !showCustomizeQuery && (
           <StepIndicator
@@ -92,20 +99,25 @@ const Query: React.FC = () => {
         {/* Step 2 */}
         {mode === "patient-results" && (
           <PatientSearchResults
-            patients={patientDiscoveryQueryResponse?.Patient ?? []}
-            goBack={() => setMode("search")}
+            patients={patientDiscoveryQueryResponse ?? []}
+            goBack={() => {
+              setMode("search");
+            }}
             setMode={setMode}
             setPatientForQueryResponse={setPatientForQueryResponse}
+            loading={loading}
           />
         )}
 
         {/* Step 3 */}
         {mode === "select-query" && selectedQuery && (
           <SelectQuery
-            goBack={() => setMode("patient-results")}
+            goBack={() => {
+              setMode("patient-results");
+            }}
             goForward={() => setMode("results")}
             patientForQuery={patientForQuery}
-            resultsQueryResponse={resultsQueryResponse}
+            patientDiscoveryResponse={patientDiscoveryQueryResponse}
             showCustomizeQuery={showCustomizeQuery}
             setResultsQueryResponse={setResultsQueryResponse}
             setShowCustomizeQuery={setShowCustomizeQuery}
@@ -118,21 +130,21 @@ const Query: React.FC = () => {
         )}
 
         {/* Step 4 */}
-        {mode === "results" && resultsQueryResponse && selectedQuery && (
+        {mode === "results" && (
           <ResultsView
             selectedQuery={selectedQuery}
-            fhirQueryResponse={resultsQueryResponse}
+            patientRecordsResponse={resultsQueryResponse}
             goBack={() => {
               setMode("select-query");
             }}
             goToBeginning={() => {
               setMode("search");
             }}
+            loading={loading}
           />
         )}
-        {loading && <LoadingView loading={loading} />}
       </div>
-    </>
+    </WithAuth>
   );
 };
 

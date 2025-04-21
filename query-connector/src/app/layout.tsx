@@ -2,13 +2,15 @@ import "./ui/styles/styles.scss";
 import "react-toastify/dist/ReactToastify.css";
 import Header from "./ui/components/header/header";
 import Footer from "./ui/components/footer/footer";
-import { SessionProvider } from "next-auth/react";
 import DataProvider from "./shared/DataProvider";
 import { Metadata } from "next";
-import { ToastContainer } from "react-toastify";
 import Page from "./ui/components/page/page";
 import { auth } from "@/auth";
 import { isAuthDisabledServerCheck } from "./utils/auth";
+import SessionTimeout, {
+  IDLE_TIMEOUT_MSEC,
+  PROMPT_TIMEOUT_MSEC,
+} from "./ui/components/sessionTimeout/sessionTimeout";
 
 /**
  * Establishes the layout for the application.
@@ -23,7 +25,7 @@ export default async function RootLayout({
 }) {
   // Initializes user session on server side for the first load
   // if session does not exists then session object remains null
-  await auth();
+  const session = await auth();
 
   const runtimeConfig = {
     AUTH_DISABLED: process.env.AUTH_DISABLED || "false",
@@ -31,25 +33,21 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
-      <SessionProvider>
-        <body>
-          <ToastContainer
-            position="bottom-left"
-            icon={false}
-            stacked
-            hideProgressBar
-          />
-          <div className="application-container">
+      <body>
+        <div className="application-container">
+          <DataProvider runtimeConfig={runtimeConfig} session={session}>
+            <SessionTimeout
+              idleTimeMsec={IDLE_TIMEOUT_MSEC}
+              promptTimeMsec={PROMPT_TIMEOUT_MSEC}
+            />
             <Header authDisabled={isAuthDisabledServerCheck()} />
-            <DataProvider runtimeConfig={runtimeConfig}>
-              <Page showSiteAlert={process.env.DEMO_MODE === "true"}>
-                {children}
-              </Page>
-            </DataProvider>
+            <Page showSiteAlert={process.env.DEMO_MODE === "true"}>
+              {children}
+            </Page>
             <Footer />
-          </div>
-        </body>
-      </SessionProvider>
+          </DataProvider>
+        </div>
+      </body>
     </html>
   );
 }

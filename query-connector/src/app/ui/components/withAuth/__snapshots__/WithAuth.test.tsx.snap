@@ -1,0 +1,15 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`WithAuth component (page access guard) Renders content if user is logged in and has role access 1`] = `
+<body>
+  <div>
+    Special content
+  </div>
+</body>
+`;
+
+exports[`WithAuth component (page access guard) Renders empty content while the session is being retrieved 1`] = `
+<body>
+  <div />
+</body>
+`;

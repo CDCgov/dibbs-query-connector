@@ -3,6 +3,7 @@ import {
   CategoryToConditionArrayMap,
   NestedQuery,
   filterSearchByCategoryAndCondition,
+  formatCategoryDisplay,
 } from "../utils";
 import styles from "./conditionTemplateSelection.module.scss";
 import ConditionOption from "./ConditionOption";
@@ -90,7 +91,10 @@ export const ConditionColumnDisplay: React.FC<ConditionColumnDisplayProps> = ({
               {colsToDisplay.map(([category, arr]) => {
                 return (
                   <div key={category}>
-                    <h3 className={styles.categoryHeading}>{category}</h3>
+                    <h3 className={styles.categoryHeading}>
+                      {" "}
+                      {formatCategoryDisplay(category)}
+                    </h3>
                     {arr.map((c) => {
                       return (
                         <ConditionOption

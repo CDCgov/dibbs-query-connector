@@ -4,13 +4,12 @@ import {
   handleRequestError,
 } from "./error-handling-service";
 import {
-  makeFhirQuery,
-  QueryRequest,
   QueryResponse,
   createBundle,
   APIQueryResponse,
+  fullPatientQuery,
+  FullPatientRequest,
 } from "../../shared/query-service";
-import { getSavedQueryById } from "@/app/backend/query-building";
 import {
   RESPONSE_BODY_IS_NOT_PATIENT_RESOURCE,
   MISSING_PATIENT_IDENTIFIERS,
@@ -19,13 +18,14 @@ import {
   INVALID_QUERY,
   INVALID_MESSAGE_FORMAT,
 } from "@/app/shared/constants";
-import { getFhirServerNames } from "@/app/shared/database-service";
 import {
   mapDeprecatedUseCaseToId,
   parseHL7FromRequestBody,
   parsePatientDemographics,
 } from "./parsers";
 import { Message } from "node-hl7-client";
+import { getFhirServerNames } from "@/app/backend/dbServices/fhir-servers";
+import { getSavedQueryById } from "@/app/backend/dbServices/query-building";
 
 /**
  * @param request - A GET request as described by the Swagger docs
@@ -81,7 +81,7 @@ export async function GET(request: NextRequest) {
   }
 
   // Add params & patient identifiers to QueryName
-  const QueryRequest: QueryRequest = {
+  const QueryRequest: FullPatientRequest = {
     query_name: queryResults.query_name,
     fhir_server: fhir_server,
     first_name: given,
@@ -91,7 +91,7 @@ export async function GET(request: NextRequest) {
     phone: phone,
   };
 
-  const QueryResponse: QueryResponse = await makeFhirQuery(QueryRequest);
+  const QueryResponse: QueryResponse = await fullPatientQuery(QueryRequest);
 
   // Bundle data
   const bundle: APIQueryResponse = await createBundle(QueryResponse);
@@ -133,7 +133,7 @@ export async function POST(request: NextRequest) {
     return await handleAndReturnError(INVALID_MESSAGE_FORMAT);
   }
 
-  let QueryRequest: QueryRequest;
+  let QueryRequest: FullPatientRequest;
   if (messageFormat === "HL7") {
     try {
       let requestText = await request.text();
@@ -154,7 +154,6 @@ export async function POST(request: NextRequest) {
         phone,
         dob,
       ].every((e) => e === "");
-      console.log(firstName, lastName, mrn, phone, dob);
 
       if (noPatientIdentifierDefined) {
         return await handleAndReturnError(MISSING_PATIENT_IDENTIFIERS, 400);
@@ -208,7 +207,7 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  const QueryResponse: QueryResponse = await makeFhirQuery(QueryRequest);
+  const QueryResponse: QueryResponse = await fullPatientQuery(QueryRequest);
 
   // Bundle data
   const bundle: APIQueryResponse = await createBundle(QueryResponse);

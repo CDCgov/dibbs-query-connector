@@ -2,8 +2,6 @@
 
 import React, { useState, useEffect } from "react";
 import { Button } from "@trussworks/react-uswds";
-import { DibbsConceptType, DibbsValueSet } from "../../../shared/constants";
-import { FhirQueryResponse } from "@/app/shared/query-service";
 import LoadingView from "../../../ui/designSystem/LoadingView";
 import { showToastConfirmation } from "../../../ui/designSystem/toast/Toast";
 import styles from "./customizeQuery/customizeQuery.module.scss";
@@ -14,10 +12,13 @@ import CustomizeQueryNav from "./customizeQuery/CustomizeQueryNav";
 import Backlink from "../../../ui/designSystem/backLink/Backlink";
 import { RETURN_LABEL } from "./stepIndicator/StepIndicator";
 import { generateValueSetGroupingsByDibbsConceptType } from "@/app/utils/valueSetTranslation";
-import { CustomUserQuery } from "@/app/shared/constants";
+import { CustomUserQuery } from "@/app/models/entities/query";
+import {
+  DibbsValueSet,
+  DibbsConceptType,
+} from "@/app/models/entities/valuesets";
 
 interface CustomizeQueryProps {
-  fhirQueryResponse: FhirQueryResponse;
   queryValueSets: DibbsValueSet[];
   setQueryValuesets: (queryVS: DibbsValueSet[]) => void;
   goBack: () => void;
@@ -27,7 +28,6 @@ interface CustomizeQueryProps {
 /**
  * CustomizeQuery component for displaying and customizing query details.
  * @param root0 - The properties object.
- * @param root0.fhirQueryResponse - The response from the query service.
  * @param root0.selectedQuery - The current query to be customized.
  * @param root0.queryValueSets - The pre-fetched value sets from the DB.
  * @param root0.setQueryValuesets - Function to update tracked custom query state.
@@ -35,8 +35,7 @@ interface CustomizeQueryProps {
  * @returns The CustomizeQuery component.
  */
 const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
-  fhirQueryResponse,
-  queryValueSets: queryValueSets,
+  queryValueSets,
   setQueryValuesets,
   goBack,
   selectedQuery,
@@ -168,7 +167,7 @@ const CustomizeQuery: React.FC<CustomizeQueryProps> = ({
       <div className="padding-top-3">
         <Backlink onClick={goBack} label={RETURN_LABEL["results"]} />
       </div>
-      <LoadingView loading={!fhirQueryResponse} />
+      <LoadingView loading={!queryValueSets} />
       <h1 className="page-title margin-bottom-05-important">Customize query</h1>
       <h2 className="page-explainer margin-y-0-important">
         Query: {selectedQuery.query_name}
