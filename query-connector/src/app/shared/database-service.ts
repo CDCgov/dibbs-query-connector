@@ -57,7 +57,8 @@ SELECT c.display, c.code_system, c.code, vs.name as valueset_name, vs.id as valu
 type ErsdOrVsacResponse = Bundle | Parameters | OperationOutcome;
 
 class DatabaseService {
-  private static dbClient = getDbClient();
+  private static dbClient: NonNullable<ReturnType<typeof getDbClient>> =
+    getDbClient();
 
   /**
    * Executes a search for a CustomQuery against the query-loaded Postgres
@@ -71,7 +72,10 @@ class DatabaseService {
     const values = [name];
 
     try {
-      const result = await this.dbClient.query(getQuerybyNameSQL, values);
+      const result = await DatabaseService.dbClient.query(
+        getQuerybyNameSQL,
+        values,
+      );
       if (result.rows.length === 0) {
         console.error("No results found for query named:", name);
         return undefined;
@@ -175,7 +179,7 @@ class DatabaseService {
    */
   static async getConditionsData() {
     const query = "SELECT * FROM conditions";
-    const result = await this.dbClient.query(query);
+    const result = await DatabaseService.dbClient.query(query);
     const rows = result.rows;
 
     // 1. Grouped by category with id:name pairs
@@ -217,7 +221,7 @@ class DatabaseService {
       const escapedValues = ids.map((_, i) => `$${i + 1}`).join() + ")";
       const queryString = getValueSetsByConditionIds + escapedValues;
 
-      const result = await this.dbClient.query(queryString, ids);
+      const result = await DatabaseService.dbClient.query(queryString, ids);
       if (result.rows.length === 0) {
         console.error("No results found for given condition ids", ids);
         return [];
@@ -246,7 +250,7 @@ class DatabaseService {
       FROM pg_class
       WHERE relname = 'valuesets';
     `;
-    const result = await this.dbClient.query(query);
+    const result = await DatabaseService.dbClient.query(query);
     return (
       result.rows.length > 0 && parseFloat(result.rows[0].estimated_count) > 0
     );
@@ -273,7 +277,9 @@ class DatabaseService {
     // Check that the value set itself was inserted
     const vsSql = `SELECT * FROM valuesets WHERE oid = $1;`;
     try {
-      const result = await this.dbClient.query(vsSql, [vs.valueSetExternalId]);
+      const result = await DatabaseService.dbClient.query(vsSql, [
+        vs.valueSetExternalId,
+      ]);
       const foundVS = result.rows[0];
       if (
         foundVS.version !== vs.valueSetVersion ||
@@ -293,12 +299,14 @@ class DatabaseService {
     // Check that all concepts under the value set's umbrella were inserted
     const brokenConcepts = await Promise.all(
       vs.concepts.map(async (c) => {
-        const systemPrefix = this.stripSystem(vs.system);
+        const systemPrefix = DatabaseService.stripSystem(vs.system);
         const conceptId = `${systemPrefix}_${c?.code}`;
         const conceptSql = `SELECT * FROM concepts WHERE id = $1;`;
 
         try {
-          const result = await this.dbClient.query(conceptSql, [conceptId]);
+          const result = await DatabaseService.dbClient.query(conceptSql, [
+            conceptId,
+          ]);
           const foundConcept: Concept = result.rows[0];
 
           // We accumulate the unique DIBBs concept IDs of anything that's missing
@@ -329,10 +337,12 @@ class DatabaseService {
     // Confirm that valueset_to_concepts contains all relevant FK mappings
     const mappingSql = `SELECT * FROM valueset_to_concept WHERE valueset_id = $1;`;
     try {
-      const result = await this.dbClient.query(mappingSql, [vs.valueSetId]);
+      const result = await DatabaseService.dbClient.query(mappingSql, [
+        vs.valueSetId,
+      ]);
       const rows = result.rows;
       const missingConceptsFromMappings = vs.concepts.map((c) => {
-        const systemPrefix = this.stripSystem(vs.system);
+        const systemPrefix = DatabaseService.stripSystem(vs.system);
         const conceptUniqueId = `${systemPrefix}_${c.code}`;
 
         // Accumulate unique IDs of any concept we can't find among query rows
@@ -354,7 +364,7 @@ class DatabaseService {
         "Couldn't fetch value set to concept mappings for this valueset: ",
         error,
       );
-      const systemPrefix = this.stripSystem(vs.system);
+      const systemPrefix = DatabaseService.stripSystem(vs.system);
       vs.concepts.forEach((c) => {
         const conceptUniqueId = `${systemPrefix}_${c.code}`;
         missingData.missingMappings.push(conceptUniqueId);
@@ -392,10 +402,10 @@ class DatabaseService {
   static async executeCategoryUpdates() {
     try {
       console.log("Executing category data updates on inserted conditions");
-      await this.dbClient.query(updateErsdCategorySql);
-      await this.dbClient.query(updateNewbornScreeningCategorySql);
-      await this.dbClient.query(updatedCancerCategorySql);
-      await this.dbClient.query(`DROP TABLE category_data`);
+      await DatabaseService.dbClient.query(updateErsdCategorySql);
+      await DatabaseService.dbClient.query(updateNewbornScreeningCategorySql);
+      await DatabaseService.dbClient.query(updatedCancerCategorySql);
+      await DatabaseService.dbClient.query(`DROP TABLE category_data`);
       console.log("All inserted queries cross-referenced with category data");
     } catch (error) {
       console.error(
@@ -433,7 +443,7 @@ class DatabaseService {
       vs.dibbsConceptType,
     ];
 
-    return this.dbClient.query(insertValueSetSql, valuesArray);
+    return DatabaseService.dbClient.query(insertValueSetSql, valuesArray);
   }
 
   /**
@@ -444,12 +454,12 @@ class DatabaseService {
    */
   private static generateConceptSqlPromises(vs: DibbsValueSet) {
     const insertConceptsSqlArray = vs.concepts.map((concept) => {
-      const systemPrefix = this.stripSystem(vs.system);
+      const systemPrefix = DatabaseService.stripSystem(vs.system);
       const conceptUniqueId = `${systemPrefix}_${concept.code}`;
 
       // Duplicate value set insertion is likely to percolate to the concept level
       // Apply the same logic of overwriting if unique keys are the same
-      return this.dbClient.query(insertConceptSql, [
+      return DatabaseService.dbClient.query(insertConceptSql, [
         conceptUniqueId,
         concept.code,
         vs.system,
@@ -469,10 +479,10 @@ class DatabaseService {
    */
   private static generateValuesetConceptJoinSqlPromises(vs: DibbsValueSet) {
     const insertJoins = vs.concepts.map((concept) => {
-      const systemPrefix = this.stripSystem(vs.system);
+      const systemPrefix = DatabaseService.stripSystem(vs.system);
       const conceptUniqueId = `${systemPrefix}_${concept.code}`;
 
-      return this.dbClient.query(insertValuesetToConceptSql, [
+      return DatabaseService.dbClient.query(insertValuesetToConceptSql, [
         `${vs.valueSetId}_${conceptUniqueId}`,
         vs.valueSetId,
         conceptUniqueId,
@@ -494,7 +504,7 @@ class DatabaseService {
 
     // Step 1: Insert the value set record
     try {
-      await this.generateValueSetSqlPromise(vs);
+      await DatabaseService.generateValueSetSqlPromise(vs);
     } catch (e) {
       console.error(
         `ValueSet insertion for ${vs.valueSetId}_${vs.valueSetVersion} failed`,
@@ -504,7 +514,8 @@ class DatabaseService {
     }
 
     // Step 2: Insert all the concepts associated with this value set
-    const insertConceptsPromiseArray = this.generateConceptSqlPromises(vs);
+    const insertConceptsPromiseArray =
+      DatabaseService.generateConceptSqlPromises(vs);
     const conceptInsertResults = await Promise.allSettled(
       insertConceptsPromiseArray,
     );
@@ -514,13 +525,16 @@ class DatabaseService {
     );
 
     if (!allConceptInsertsSucceed) {
-      this.logRejectedReasons(conceptInsertResults, "Concept insertion failed");
+      DatabaseService.logRejectedReasons(
+        conceptInsertResults,
+        "Concept insertion failed",
+      );
       errorArray.push("Error occured in concept insertion");
     }
 
     // Step 3: Create mappings between concepts and the value set
     const joinInsertsPromiseArray =
-      this.generateValuesetConceptJoinSqlPromises(vs);
+      DatabaseService.generateValuesetConceptJoinSqlPromises(vs);
     const joinInsertResults = await Promise.allSettled(joinInsertsPromiseArray);
 
     const allJoinInsertsSucceed = joinInsertResults.every(
@@ -528,7 +542,7 @@ class DatabaseService {
     );
 
     if (!allJoinInsertsSucceed) {
-      this.logRejectedReasons(
+      DatabaseService.logRejectedReasons(
         joinInsertResults,
         "ValueSet <> concept join insert failed",
       );
@@ -619,7 +633,7 @@ class DatabaseService {
           (struct as QueryDataStruct).time_window_unit,
         ];
       }
-      return this.dbClient.query(structInsertSql, valuesToInsert);
+      return DatabaseService.dbClient.query(structInsertSql, valuesToInsert);
     });
 
     const allStructsInserted = await Promise.allSettled(allStructPromises);
