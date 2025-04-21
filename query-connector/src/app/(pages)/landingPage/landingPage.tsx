@@ -7,34 +7,35 @@ import {
 } from "@trussworks/react-uswds";
 import Image from "next/image";
 import styles from "./landingPage.module.scss";
-import { signIn, useSession } from "next-auth/react";
-import { DataContext } from "@/app/shared/DataProvider";
-import { isAuthDisabledClientCheck } from "@/app/utils/auth";
-import { useContext, useEffect, useState } from "react";
+import { signIn } from "next-auth/react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
+interface LandingPageProps {
+  isLoggedIn: boolean;
+}
+
 /**
- * The landing page for the TEFCA Viewer.
- * @returns The LandingPage component.
+ * Description placeholder
+ * @param param0 - param
+ * @param param0.isLoggedIn - whether user is logged in
+ * @returns - the landing page
  */
-export default function LandingPage() {
+const LandingPage: React.FC<LandingPageProps> = ({ isLoggedIn }) => {
   const router = useRouter();
-  const { status } = useSession();
-  const ctx = useContext(DataContext);
-  const isAuthDisabled = isAuthDisabledClientCheck(ctx?.runtimeConfig);
 
   const [redirectStatusDetermined, setRedirectStatusDetermined] =
-    useState(false);
-  const isLoggedIn = status === "authenticated" || isAuthDisabled;
+    useState(true);
   // Redirect to the query page if the user is logged in
 
   useEffect(() => {
+    setRedirectStatusDetermined(false);
     if (isLoggedIn) {
       router.push("/query");
     } else {
       setRedirectStatusDetermined(true);
     }
-  }, [router]);
+  }, [isLoggedIn]);
 
   const handleClick = () => {
     signIn("keycloak", { redirectTo: "/query" });
@@ -128,4 +129,6 @@ export default function LandingPage() {
       )}
     </>
   );
-}
+};
+
+export default LandingPage;
