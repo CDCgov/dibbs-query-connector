@@ -146,7 +146,7 @@ export function filterQueries(
   const newQueries = structuredClone(queries);
 
   return newQueries.map((query) => {
-    let nameMatch = query.query_name
+    let nameMatch = query?.query_name
       .toLocaleLowerCase()
       .includes(casedSearchFilter);
 

@@ -1,4 +1,4 @@
-import { DibbsValueSet } from "../shared/constants";
+import { DibbsValueSet } from "../models/entities/valuesets";
 import { CANCER_DB_QUERY_VALUES } from "../tests/unit/fixtures";
 import { groupConditionConceptsIntoValueSets } from "../shared/utils";
 import {
