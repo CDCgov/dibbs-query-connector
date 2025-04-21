@@ -61,7 +61,7 @@ const FhirServers: React.FC = () => {
   // Fetch FHIR servers
   async function fetchFHIRServers() {
     try {
-      const servers = await getFhirServerConfigs(true, true);
+      const servers = await getFhirServerConfigs(true);
       setFhirServers(servers);
     } catch (e) {
       showToastConfirmation({
@@ -210,7 +210,7 @@ const FhirServers: React.FC = () => {
       );
 
       if (result.success) {
-        getFhirServerConfigs(true, true).then((servers) => {
+        getFhirServerConfigs(true).then((servers) => {
           setFhirServers(servers);
         });
         handleCloseModal();
@@ -229,7 +229,7 @@ const FhirServers: React.FC = () => {
       );
 
       if (result.success) {
-        getFhirServerConfigs(true, true).then((servers) => {
+        getFhirServerConfigs(true).then((servers) => {
           setFhirServers(servers);
         });
         handleCloseModal();
@@ -248,7 +248,7 @@ const FhirServers: React.FC = () => {
     const result = await deleteFhirServer(selectedServer.id);
 
     if (result.success) {
-      getFhirServerConfigs(true, true).then((servers) => {
+      getFhirServerConfigs(true).then((servers) => {
         setFhirServers(servers);
       });
       handleCloseModal();
