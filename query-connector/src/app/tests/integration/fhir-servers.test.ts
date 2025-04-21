@@ -2,7 +2,6 @@ import dbService from "@/app/backend/dbServices/db-service";
 import { suppressConsoleLogs } from "./fixtures";
 import {
   deleteFhirServer,
-  FHIR_SERVER_INSERT_QUERY,
   getFhirServerConfigs,
   updateFhirServer,
 } from "@/app/backend/dbServices/fhir-servers";
@@ -14,6 +13,25 @@ jest.mock("@/app/utils/auth", () => {
   };
 });
 
+export const FHIR_SERVER_INSERT_QUERY = `
+INSERT INTO fhir_servers (
+  name,
+  hostname, 
+  last_connection_attempt,
+  last_connection_successful,
+  headers,
+  disable_cert_validation,
+  auth_type,
+  client_id,
+  client_secret,
+  token_endpoint,
+  scopes,
+  access_token,
+  token_expiry
+)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+RETURNING *;
+`;
 const TEST_FHIR_SERVER = {
   name: "Kongo Jungle",
   hostname: "http://welcome-to-the-jungle.bananarepublic/fhir",

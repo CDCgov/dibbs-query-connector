@@ -4,6 +4,7 @@ import { FhirServerConfig } from "@/app/models/entities/fhir-servers";
 import { auditable } from "@/app/backend/auditLogs/decorator";
 import dbService from "./db-service";
 import FHIRClient from "@/app/shared/fhirClient";
+import { FHIR_SERVER_INSERT_QUERY } from "@/app/tests/integration/fhir-servers.test";
 
 // Define an interface for authentication data
 export interface AuthData {
@@ -341,23 +342,3 @@ export const updateFhirServer = FhirServerConfigService.updateFhirServer;
 export const insertFhirServer = FhirServerConfigService.insertFhirServer;
 export const deleteFhirServer = FhirServerConfigService.deleteFhirServer;
 export const prepareFhirClient = FhirServerConfigService.prepareFhirClient;
-
-export const FHIR_SERVER_INSERT_QUERY = `
-INSERT INTO fhir_servers (
-  name,
-  hostname, 
-  last_connection_attempt,
-  last_connection_successful,
-  headers,
-  disable_cert_validation,
-  auth_type,
-  client_id,
-  client_secret,
-  token_endpoint,
-  scopes,
-  access_token,
-  token_expiry
-)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
-RETURNING *;
-`;
