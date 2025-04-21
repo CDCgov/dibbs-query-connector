@@ -233,26 +233,6 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
     lastConnectionSuccessful?: boolean,
     authData?: AuthData,
   ) {
-    const insertQuery = `
-    INSERT INTO fhir_servers (
-      name,
-      hostname, 
-      last_connection_attempt,
-      last_connection_successful,
-      headers,
-      disable_cert_validation,
-      auth_type,
-      client_id,
-      client_secret,
-      token_endpoint,
-      scopes,
-      access_token,
-      token_expiry
-    )
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
-    RETURNING *;
-  `;
-
     try {
       // Default auth type to none if not provided
       const authType = authData?.authType || "none";
@@ -267,7 +247,7 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
         };
       }
 
-      const result = await dbService.query(insertQuery, [
+      const result = await dbService.query(FHIR_SERVER_INSERT_QUERY, [
         name,
         hostname,
         new Date(),
@@ -361,3 +341,23 @@ export const updateFhirServer = FhirServerConfigService.updateFhirServer;
 export const insertFhirServer = FhirServerConfigService.insertFhirServer;
 export const deleteFhirServer = FhirServerConfigService.deleteFhirServer;
 export const prepareFhirClient = FhirServerConfigService.prepareFhirClient;
+
+export const FHIR_SERVER_INSERT_QUERY = `
+INSERT INTO fhir_servers (
+  name,
+  hostname, 
+  last_connection_attempt,
+  last_connection_successful,
+  headers,
+  disable_cert_validation,
+  auth_type,
+  client_id,
+  client_secret,
+  token_endpoint,
+  scopes,
+  access_token,
+  token_expiry
+)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+RETURNING *;
+`;
