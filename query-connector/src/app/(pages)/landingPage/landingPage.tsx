@@ -24,16 +24,15 @@ interface LandingPageProps {
 const LandingPage: React.FC<LandingPageProps> = ({ isLoggedIn }) => {
   const router = useRouter();
 
-  const [redirectStatusDetermined, setRedirectStatusDetermined] =
-    useState(true);
-  // Redirect to the query page if the user is logged in
+  const [determiningRedirectStatus, setDeterminingRedirectStatus] =
+    useState(isLoggedIn);
 
   useEffect(() => {
-    setRedirectStatusDetermined(false);
+    setDeterminingRedirectStatus(true);
     if (isLoggedIn) {
       router.push("/query");
     } else {
-      setRedirectStatusDetermined(true);
+      setDeterminingRedirectStatus(false);
     }
   }, [isLoggedIn]);
 
@@ -43,7 +42,9 @@ const LandingPage: React.FC<LandingPageProps> = ({ isLoggedIn }) => {
 
   return (
     <>
-      {redirectStatusDetermined ? (
+      {determiningRedirectStatus ? (
+        <div className="margin-1">Redirecting...</div>
+      ) : (
         <div className="main-body display-flex flex-column flex-justify-center">
           <div className="gradient-blue-background flex-1">
             <div className="container">
@@ -124,8 +125,6 @@ const LandingPage: React.FC<LandingPageProps> = ({ isLoggedIn }) => {
             </ProcessList>
           </div>
         </div>
-      ) : (
-        <div className="margin-1">Redirecting...</div>
       )}
     </>
   );
