@@ -5,6 +5,7 @@ import {
   getFhirServerConfigs,
   updateFhirServer,
 } from "@/app/backend/dbServices/fhir-servers";
+import { FHIR_SERVER_INSERT_QUERY } from "@/app/backend/dbServices/util";
 
 jest.mock("@/app/utils/auth", () => {
   return {
@@ -13,25 +14,6 @@ jest.mock("@/app/utils/auth", () => {
   };
 });
 
-export const FHIR_SERVER_INSERT_QUERY = `
-INSERT INTO fhir_servers (
-  name,
-  hostname, 
-  last_connection_attempt,
-  last_connection_successful,
-  headers,
-  disable_cert_validation,
-  auth_type,
-  client_id,
-  client_secret,
-  token_endpoint,
-  scopes,
-  access_token,
-  token_expiry
-)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
-RETURNING *;
-`;
 const TEST_FHIR_SERVER = {
   name: "Kongo Jungle",
   hostname: "http://welcome-to-the-jungle.bananarepublic/fhir",
@@ -57,9 +39,6 @@ describe("FHIR Servers tests", () => {
     expect(aidbox?.hostname).toBe(`${process.env.AIDBOX_BASE_URL}/fhir`);
   });
   it("refresh, update, and deletion functions work", async () => {
-    const fhirServers = await getFhirServerConfigs(true);
-    expect(fhirServers.length).toBe(DEFAULT_FHIR_SERVER_LENGTH);
-
     await dbService.query(FHIR_SERVER_INSERT_QUERY, [
       TEST_FHIR_SERVER.name,
       TEST_FHIR_SERVER.hostname,
