@@ -9,6 +9,18 @@ const TEST_QUERY = {
 };
 
 describe("ResultsView", () => {
+  beforeAll(() => {
+    const windowMock = {
+      scrollTo: jest.fn(),
+    };
+
+    Object.assign(global, windowMock);
+  });
+
+  afterAll(() => {
+    jest.clearAllMocks();
+  });
+
   it("Should render a skeleton loading state when loading is true", () => {
     renderWithUser(
       <ResultsView
