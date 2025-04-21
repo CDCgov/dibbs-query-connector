@@ -9,6 +9,28 @@ import { getDbClient } from "./dbClient";
 const dbClient = getDbClient();
 
 /**
+ * @param username The identifier of the user we want to retrieve
+ * @returns A single user result, with any applicable group membership details
+ */
+export async function getUserByUsername(
+  username: string,
+): Promise<QCResponse<User>> {
+  const userQuery = `SELECT * FROM users WHERE username = $1;`;
+  const result = await dbClient.query(userQuery, [username]);
+
+  if (result.rowCount && result.rowCount > 0) {
+    const user = result.rows[0];
+    const userWithGroups = await getSingleUserWithGroupMemberships(user.id);
+    return {
+      totalItems: userWithGroups.totalItems,
+      items: userWithGroups.items,
+    };
+  } else {
+    return { totalItems: 0, items: [] };
+  }
+}
+
+/**
  * Adds a user to the users table if they do not already exist.
  * Uses data extracted from the JWT token.
  * @param userToken - The user data from the JWT token.
@@ -36,7 +58,6 @@ export async function addUserIfNotExists(userToken: {
 
   try {
     console.log("Checking if user exists.");
-
     const checkUserQuery = `SELECT id, username FROM users WHERE username = $1;`;
     const userExists = await dbClient.query(checkUserQuery, [userIdentifier]);
 
@@ -223,9 +244,6 @@ export async function checkUserExists(
   };
 
   const userCheckResult = await dbClient.query(userCheckQuery);
-  if (userCheckResult.rows.length === 0) {
-    return { totalItems: 0, items: [] };
-  }
 
   return {
     totalItems: userCheckResult.rowCount,
@@ -335,12 +353,7 @@ export async function getAllUserGroupsForUser(
 export async function getSingleUserWithGroupMemberships(
   userId: string,
 ): Promise<QCResponse<User>> {
-  if (!(await adminAccessCheck())) {
-    throw new Error("Unauthorized");
-  }
-
   const userCheckResult = await checkUserExists(userId);
-
   if (!userCheckResult || userCheckResult?.totalItems == 0) {
     return { totalItems: 0, items: [] };
   }

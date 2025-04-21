@@ -106,41 +106,45 @@ const UserGroupsTable: React.FC<UserGroupsTableProps> = ({
             {getQueryLabel(group.query_size)}
           </Button>
         </td>
-        <td className={styles.actionButtons}>
-          <Button
-            type="button"
-            className="usa-button--unstyled text-bold text-no-underline"
-            onClick={() => openModal("edit-group", group)}
-          >
-            <span className="icon-text padding-right-4 display-flex flex-align-center">
-              <Icon.Edit
-                className="height-3 width-3"
-                aria-label="Pencil icon indicating edit ability"
-              />
-              <span
-                data-testid={`edit-group-${group.id}`}
-                className="padding-left-05"
-              >
-                Edit
+        {role === UserRole.SUPER_ADMIN ? (
+          <td className={styles.actionButtons}>
+            <Button
+              type="button"
+              className="usa-button--unstyled text-bold text-no-underline"
+              onClick={() => openModal("edit-group", group)}
+            >
+              <span className="icon-text padding-right-4 display-flex flex-align-center">
+                <Icon.Edit
+                  className="height-3 width-3"
+                  aria-label="Pencil icon indicating edit ability"
+                />
+                <span
+                  data-testid={`edit-group-${group.id}`}
+                  className="padding-left-05"
+                >
+                  Edit
+                </span>
               </span>
-            </span>
-          </Button>
-          <Button
-            type="button"
-            className="usa-button--unstyled text-bold text-no-underline"
-            onClick={() => {
-              openModal("remove-group", group);
-            }}
-          >
-            <span className="icon-text padding-right-4 display-flex flex-align-center">
-              <Icon.Delete
-                className="height-3 width-3"
-                aria-label="Trash icon indicating deletion of disease"
-              />
-              <span className="padding-left-05">Delete</span>
-            </span>
-          </Button>
-        </td>
+            </Button>
+            <Button
+              type="button"
+              className="usa-button--unstyled text-bold text-no-underline"
+              onClick={() => {
+                openModal("remove-group", group);
+              }}
+            >
+              <span className="icon-text padding-right-4 display-flex flex-align-center">
+                <Icon.Delete
+                  className="height-3 width-3"
+                  aria-label="Trash icon indicating deletion of disease"
+                />
+                <span className="padding-left-05">Delete</span>
+              </span>
+            </Button>
+          </td>
+        ) : (
+          <td></td>
+        )}
       </tr>
     ));
   }

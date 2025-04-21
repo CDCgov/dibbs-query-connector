@@ -8,14 +8,20 @@ import {
   SetStateAction,
   Dispatch,
 } from "react";
+import { useSession } from "next-auth/react";
 import EmptyQueriesDisplay from "./EmptyQueriesDisplay";
 import MyQueriesDisplay from "./QueryLibrary";
 import { SelectedQueryDetails, SelectedQueryState } from "./utils";
 import { BuildStep } from "@/app/shared/constants";
 import { DataContext } from "@/app/shared/DataProvider";
 import { CustomUserQuery } from "@/app/models/entities/query";
-import { getQueryList } from "@/app/backend/query-building";
+import { getQueriesForUser, getQueryList } from "@/app/backend/query-building";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
+import { getRole } from "@/app/(pages)/userManagement/utils";
+import { getUserByUsername } from "@/app/backend/user-management";
+import { User, UserRole } from "@/app/models/entities/users";
+
+import { isAuthDisabledClientCheck } from "@/app/utils/auth";
 
 type QuerySelectionProps = {
   selectedQuery: SelectedQueryState;
@@ -37,17 +43,56 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({
   setBuildStep,
   setSelectedQuery,
 }) => {
-  const [unauthorizedError, setUnauthorizedError] = useState(false);
-  const queriesContext = useContext(DataContext);
+  const { data: session } = useSession();
+  const username = session?.user?.username || "";
+  const userRole = getRole();
+
   const [loading, setLoading] = useState(true);
+  const [unauthorizedError, setUnauthorizedError] = useState(false);
+  const [currentUser, setCurrentUser] = useState<User>();
+
+  const queriesContext = useContext(DataContext);
+  const authDisabled = isAuthDisabledClientCheck(queriesContext?.runtimeConfig);
+
+  const restrictedQueryList =
+    !authDisabled &&
+    userRole !== UserRole.SUPER_ADMIN &&
+    userRole !== UserRole.ADMIN;
+
+  // Retrieve and store current logged-in user's data on page load
+  useEffect(() => {
+    const fetchCurrentUser = async () => {
+      try {
+        const currentUser = await getUserByUsername(username);
+        setCurrentUser(currentUser.items[0]);
+      } catch (error) {
+        if (error == "Error: Unauthorized") {
+          setUnauthorizedError(true);
+          showToastConfirmation({
+            body: "You are not authorized to see queries.",
+            variant: "error",
+          });
+        }
+        console.error(`Failed to fetch current user: ${error}`);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    !authDisabled && fetchCurrentUser();
+  }, []);
 
   // Check whether custom queries exist in DB
   useEffect(() => {
     if (queriesContext?.data === null || queriesContext?.data === undefined) {
       const fetchQueries = async () => {
         try {
-          const queries = await getQueryList();
-          queriesContext?.setData(queries);
+          setLoading(true);
+          const queries = restrictedQueryList
+            ? await getQueriesForUser(currentUser as User)
+            : await getQueryList();
+          const loaded = queries && (authDisabled || !!currentUser);
+          !!loaded && queriesContext?.setData(queries);
         } catch (error) {
           if (error == "Error: Unauthorized") {
             setUnauthorizedError(true);
@@ -61,11 +106,12 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({
           setLoading(false);
         }
       };
+
       fetchQueries();
     } else {
       setLoading(false); // Data already exists, no need to fetch again
     }
-  }, [queriesContext]);
+  }, [queriesContext, currentUser]);
 
   if (loading) {
     return <LoadingView loading={true} />;
