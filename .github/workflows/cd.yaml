@@ -82,9 +82,11 @@ jobs:
             type=semver,pattern={{major}},value=${{ steps.new-version.outputs.version }}
 
       - name: Build and push
-        uses: docker/build-push-action@v6
-        with:
-          context: ./query-connector
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+        # uses: docker/build-push-action@v6
+        run: |
+          echo "Tags: ${{ steps.meta.outputs.tags }}"
+        # with:
+        #   context: ./query-connector
+        # push: true
+        # tags: ${{ steps.meta.outputs.tags }}
+        # labels: ${{ steps.meta.outputs.labels }}
