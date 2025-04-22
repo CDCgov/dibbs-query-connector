@@ -77,9 +77,10 @@ jobs:
         with:
           images: ghcr.io/${{ env.REPO }}/query-connector
           tags: |
-            type=semver,pattern={{version}},value=${{ steps.new-version.outputs.version }}
-            type=semver,pattern={{major}}.{{minor}},value=${{ steps.new-version.outputs.version }}
-            type=semver,pattern={{major}},value=${{ steps.new-version.outputs.version }}
+            type=semver,pattern={{version}},value=${{ steps.new-version.outputs.new_version }}
+            type=semver,pattern={{major}}.{{minor}},value=${{ steps.new-version.outputs.new_version }}
+            type=semver,pattern={{major}},value=${{ steps.new-version.outputs.new_version }}
+            type=raw,value=latest
 
       - name: Build and push
         # uses: docker/build-push-action@v6
