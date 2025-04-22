@@ -82,7 +82,7 @@ describe("User Management Integration Tests", () => {
 
     expect(result).toHaveProperty("id");
     expect(result).toHaveProperty("username", TEST_USER_STANDARD.username);
-    expect(result).toHaveProperty("qc_role", UserRole.STANDARD);
+    expect(result).toHaveProperty("qcRole", UserRole.STANDARD);
     createdUserId = result.id;
   });
 
@@ -92,7 +92,7 @@ describe("User Management Integration Tests", () => {
   test("should update a user's role", async () => {
     const result = await updateUserRole(createdUserId, UserRole.SUPER_ADMIN);
     expect(result.items).not.toBeNull();
-    expect(result.items![0]).toHaveProperty("qc_role", UserRole.SUPER_ADMIN);
+    expect(result.items![0]).toHaveProperty("qcRole", UserRole.SUPER_ADMIN);
   });
 
   /**
