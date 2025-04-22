@@ -77,10 +77,14 @@ jobs:
         with:
           images: ghcr.io/${{ env.REPO }}/query-connector
           tags: |
-            type=semver,pattern={{version}},value=${{ steps.new-version.outputs.new_version }}
-            type=semver,pattern={{major}}.{{minor}},value=${{ steps.new-version.outputs.new_version }}
-            type=semver,pattern={{major}},value=${{ steps.new-version.outputs.new_version }}
+            type=semver,pattern={{version}},value=${{ env.new_version }}
+            type=semver,pattern={{major}}.{{minor}},value=${{ env.new_version }}
+            type=semver,pattern={{major}},value=${{ env.new_version }}
             type=raw,value=latest
+
+      - name: Debug version output
+        run: |
+          echo "New version: ${{ env.new_version }}"
 
       - name: Build and push
         # uses: docker/build-push-action@v6
