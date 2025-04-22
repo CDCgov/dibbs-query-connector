@@ -201,7 +201,6 @@ const UsersTable: React.FC<UsersTableProps> = ({ role }) => {
 
   async function fetchGroupMembers(groupId: string) {
     const groupMembers = await getAllGroupMembers(groupId);
-    console.log(groupMembers);
     return groupMembers.items;
   }
 
