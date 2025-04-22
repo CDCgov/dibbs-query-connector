@@ -16,7 +16,7 @@ test.describe("querying with the Query Connector", () => {
   // Start every test by navigating to the customize query workflow
   test.beforeEach(async ({ page }) => {
     await page.goto(TEST_URL);
-    await page.getByRole("link", { name: "Try it out" }).click();
+    await expect(page.getByText("Redirecting...")).not.toBeVisible();
 
     // Check that the info alert is visible and contains the correct text
     if (showSiteAlert) {
