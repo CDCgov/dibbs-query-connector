@@ -8,11 +8,9 @@ import { CustomQuery } from "./CustomQuery";
 import { GetPhoneQueryFormats } from "./format-service";
 import { getSavedQueryByName } from "./database-service";
 import type { QueryDataColumn } from "../(pages)/queryBuilding/utils";
-import { getFhirServerConfigs } from "../backend/dbServices/fhir-servers";
+import { prepareFhirClient } from "../backend/dbServices/fhir-servers";
 import { DibbsValueSet } from "../models/entities/valuesets";
 import { auditable } from "../backend/auditLogs/decorator";
-import FHIRClient from "./fhirClient";
-import { FhirServerConfig } from "../models/entities/fhir-servers";
 
 /**
  * The query response when the request source is from the Viewer UI.
@@ -222,8 +220,6 @@ export async function testFhirServerConnection(
 }
 
 class QueryService {
-  private static fhirServerConfigs: FhirServerConfig[] = [];
-
   /**
    * Performs a generalized query for collections of patients matching
    * particular criteria. The query is determined by a collection of passed-in
@@ -240,9 +236,7 @@ class QueryService {
     valueSetOverrides?: DibbsValueSet[],
   ): Promise<QueryResponse> {
     const queryName = request.query_name;
-    const fhirClient = await QueryService.prepareFhirClient(
-      request.fhir_server,
-    );
+    const fhirClient = await prepareFhirClient(request.fhir_server);
 
     const savedQuery = await getSavedQueryByName(request.query_name as string);
 
@@ -323,9 +317,7 @@ class QueryService {
   static async patientDiscoveryQuery(
     request: PatientDiscoveryRequest,
   ): Promise<QueryResponse["Patient"]> {
-    const fhirClient = await QueryService.prepareFhirClient(
-      request.fhir_server,
-    );
+    const fhirClient = await prepareFhirClient(request.fhir_server);
 
     // Query for patient
     let query = "/Patient?";
@@ -363,7 +355,9 @@ class QueryService {
     // Check for errors
     if (fhirResponse.status !== 200) {
       console.error(
-        `Patient search failed. Status: ${fhirResponse.status} \n Body: ${await fhirResponse.text()} \n Headers: ${JSON.stringify(
+        `Patient search failed. Status: ${
+          fhirResponse.status
+        } \n Body: ${await fhirResponse.text()} \n Headers: ${JSON.stringify(
           Object.fromEntries(fhirResponse.headers.entries()),
         )}`,
       );
@@ -388,19 +382,6 @@ class QueryService {
       Patient: patient,
       ...patientRecords,
     };
-  }
-
-  /**
-   * Helper function that creates a FHIR client for followup queries
-   * @param fhirServer - the name of the FHIR server to query against
-   * @returns a FHIR client to make queries against
-   */
-  static async prepareFhirClient(fhirServer: string) {
-    if (QueryService.fhirServerConfigs.length === 0) {
-      QueryService.fhirServerConfigs = await getFhirServerConfigs(false);
-    }
-
-    return new FHIRClient(fhirServer, this.fhirServerConfigs);
   }
 
   /**

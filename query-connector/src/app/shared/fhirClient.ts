@@ -27,7 +27,7 @@ class FHIRClient {
     this.hostname = config.hostname;
 
     // Set up the appropriate fetch function
-    this.fetch = config.disable_cert_validation ? fetchWithoutSSL : fetch;
+    this.fetch = config.disableCertValidation ? fetchWithoutSSL : fetch;
 
     // Set request initialization parameters
     this.init = {
@@ -53,13 +53,13 @@ class FHIRClient {
       id: "test",
       name: "test",
       hostname: url,
-      disable_cert_validation: disableCertValidation,
+      disableCertValidation: disableCertValidation,
       headers: authData?.headers || {},
     };
 
     // Add auth-related properties if auth data is provided
     if (authData) {
-      testConfig.auth_type = authData.authType;
+      testConfig.authType = authData.authType;
 
       if (authData.authType === "basic" && authData.bearerToken) {
         // Preserve existing headers while adding Authorization
@@ -68,12 +68,12 @@ class FHIRClient {
           Authorization: `Bearer ${authData.bearerToken}`,
         };
       } else if (["client_credentials", "SMART"].includes(authData.authType)) {
-        testConfig.client_id = authData.clientId;
-        testConfig.token_endpoint = authData.tokenEndpoint;
+        testConfig.clientId = authData.clientId;
+        testConfig.tokenEndpoint = authData.tokenEndpoint;
         testConfig.scopes = authData.scopes;
 
         if (authData.authType === "client_credentials") {
-          testConfig.client_secret = authData.clientSecret;
+          testConfig.clientSecret = authData.clientSecret;
         }
       }
     }
@@ -151,7 +151,7 @@ class FHIRClient {
     // Only check for auth_type client_credentials or SMART
     if (
       !["client_credentials", "SMART"].includes(
-        this.serverConfig.auth_type || "",
+        this.serverConfig.authType || "",
       )
     ) {
       return;
@@ -159,16 +159,16 @@ class FHIRClient {
 
     // Check if we have a valid token that hasn't expired
     if (
-      this.serverConfig.access_token &&
-      this.serverConfig.token_expiry &&
-      new Date(this.serverConfig.token_expiry) > new Date()
+      this.serverConfig.accessToken &&
+      this.serverConfig.tokenExpiry &&
+      new Date(this.serverConfig.tokenExpiry) > new Date()
     ) {
       // Token is still valid, ensure it's in headers
       if (!this.init.headers) {
         this.init.headers = {};
       }
       (this.init.headers as Record<string, string>)["Authorization"] =
-        `Bearer ${this.serverConfig.access_token}`;
+        `Bearer ${this.serverConfig.accessToken}`;
       return;
     }
 
@@ -184,13 +184,13 @@ class FHIRClient {
    */
   private async getAccessToken(): Promise<void> {
     try {
-      if (!this.serverConfig.client_id) {
+      if (!this.serverConfig.clientId) {
         throw new Error("Client ID is required for authentication");
       }
 
       // Determine the token endpoint
-      let tokenEndpoint = this.serverConfig.token_endpoint;
-      if (!tokenEndpoint && this.serverConfig.auth_type === "SMART") {
+      let tokenEndpoint = this.serverConfig.tokenEndpoint;
+      if (!tokenEndpoint && this.serverConfig.authType === "SMART") {
         tokenEndpoint = await this.discoverTokenEndpoint();
       }
       if (!tokenEndpoint) {
@@ -200,7 +200,7 @@ class FHIRClient {
       // Create URLSearchParams for all auth types
       const formData = new URLSearchParams();
       formData.append("grant_type", "client_credentials");
-      formData.append("client_id", this.serverConfig.client_id);
+      formData.append("client_id", this.serverConfig.clientId);
 
       // Add scopes if available
       if (this.serverConfig.scopes) {
@@ -208,9 +208,9 @@ class FHIRClient {
       }
 
       // Add JWT assertion for SMART auth type
-      if (this.serverConfig.auth_type === "SMART") {
+      if (this.serverConfig.authType === "SMART") {
         const jwt = await createSmartJwt(
-          this.serverConfig.client_id,
+          this.serverConfig.clientId,
           tokenEndpoint,
         );
 
@@ -220,10 +220,10 @@ class FHIRClient {
         );
         formData.append("client_assertion", jwt);
       } else if (
-        this.serverConfig.auth_type === "client_credentials" &&
-        this.serverConfig.client_secret
+        this.serverConfig.authType === "client_credentials" &&
+        this.serverConfig.clientSecret
       ) {
-        formData.append("client_secret", this.serverConfig.client_secret);
+        formData.append("client_secret", this.serverConfig.clientSecret);
       }
 
       // Prepare the request options
@@ -237,7 +237,7 @@ class FHIRClient {
       };
 
       // If SSL validation is disabled, add the agent
-      if (this.serverConfig.disable_cert_validation) {
+      if (this.serverConfig.disableCertValidation) {
         (requestInit as RequestInit & { agent?: https.Agent }).agent =
           new https.Agent({
             rejectUnauthorized: false,
@@ -272,8 +272,8 @@ class FHIRClient {
       const expiryIso = expiryDate.toISOString();
 
       // Update local config
-      this.serverConfig.access_token = tokenData.access_token;
-      this.serverConfig.token_expiry = expiryIso;
+      this.serverConfig.accessToken = tokenData.access_token;
+      this.serverConfig.tokenExpiry = expiryIso;
 
       // Update headers for requests
       if (!this.init.headers) {
@@ -289,17 +289,17 @@ class FHIRClient {
           this.serverConfig.id,
           this.serverConfig.name,
           this.serverConfig.hostname,
-          this.serverConfig.disable_cert_validation,
-          this.serverConfig.last_connection_successful,
+          this.serverConfig.disableCertValidation,
+          this.serverConfig.lastConnectionSuccessful,
           {
-            authType: this.serverConfig.auth_type as
+            authType: this.serverConfig.authType as
               | "SMART"
               | "client_credentials"
               | "basic"
               | "none",
-            clientId: this.serverConfig.client_id,
-            clientSecret: this.serverConfig.client_secret,
-            tokenEndpoint: this.serverConfig.token_endpoint,
+            clientId: this.serverConfig.clientId,
+            clientSecret: this.serverConfig.clientSecret,
+            tokenEndpoint: this.serverConfig.tokenEndpoint,
             scopes: this.serverConfig.scopes,
             accessToken: tokenData.access_token, // Pass the access token
             tokenExpiry: expiryIso, // Pass the token expiry
@@ -331,7 +331,7 @@ class FHIRClient {
       };
 
       // If SSL validation is disabled, add the agent
-      if (this.serverConfig.disable_cert_validation) {
+      if (this.serverConfig.disableCertValidation) {
         (requestInit as RequestInit & { agent?: https.Agent }).agent =
           new https.Agent({
             rejectUnauthorized: false,
@@ -352,7 +352,7 @@ class FHIRClient {
       }
 
       // Update the server config with the discovered endpoint
-      this.serverConfig.token_endpoint = config.token_endpoint;
+      this.serverConfig.tokenEndpoint = config.token_endpoint;
 
       return config.token_endpoint;
     } catch (error) {

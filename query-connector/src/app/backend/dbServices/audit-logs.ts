@@ -9,7 +9,7 @@ export type LogEntry = {
   createdAt: Date;
 };
 
-class AuditLogService extends dbService {
+class AuditLogService {
   static async getAuditLogs() {
     const auditQuery = "SELECT * FROM audit_logs ORDER BY created_at DESC;";
     const results = await dbService.query(auditQuery);

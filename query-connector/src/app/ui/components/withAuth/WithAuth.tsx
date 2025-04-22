@@ -22,7 +22,7 @@ const WithAuth: React.FC<React.PropsWithChildren> = ({ children }) => {
   const ctx = useContext(DataContext);
   const isAuthDisabled = isAuthDisabledClientCheck(ctx?.runtimeConfig);
   const path = usePathname();
-  const access = pagesConfig[path]?.roleAccess ?? [];
+  const access = (path && pagesConfig[path]?.roleAccess) ?? [];
 
   if (
     isAuthDisabled ||

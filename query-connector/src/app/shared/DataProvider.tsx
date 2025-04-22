@@ -13,8 +13,8 @@ const REFRESH_INTERVAL_MINS = 15;
 export interface DataContextValue {
   data: unknown; // You can define a specific data type here
   setData: (data: unknown) => void;
-  currentPage: PageType | string | undefined;
-  setCurrentPage: (currentPage: PageType | string | undefined) => void;
+  currentPage: PageType | string | null;
+  setCurrentPage: (currentPage: PageType | string | null) => void;
   toastConfig: ToastConfigOptions | null;
   setToastConfig: (config: ToastConfigOptions) => void;
   runtimeConfig?: Record<string, string>;
@@ -43,9 +43,9 @@ export function DataProvider({
   session: Session | null;
 }) {
   const [data, setData] = useState<unknown | null>(null);
-  const [currentPage, setCurrentPage] = useState<
-    PageType | string | undefined
-  >();
+  const [currentPage, setCurrentPage] = useState<PageType | string | null>(
+    null,
+  );
   const [toastConfig, setToastConfig] = useState<ToastConfigOptions | null>(
     null,
   );

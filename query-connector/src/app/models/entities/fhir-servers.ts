@@ -4,14 +4,14 @@ export interface FhirServerConfig {
   name: string;
   hostname: string;
   headers?: Record<string, string>;
-  last_connection_attempt?: string;
-  last_connection_successful?: boolean;
-  disable_cert_validation: boolean;
-  auth_type?: "none" | "basic" | "client_credentials" | "SMART";
-  client_id?: string;
-  client_secret?: string;
-  token_endpoint?: string;
+  lastConnectionAttempt?: string;
+  lastConnectionSuccessful?: boolean;
+  disableCertValidation: boolean;
+  authType?: "none" | "basic" | "client_credentials" | "SMART";
+  clientId?: string;
+  clientSecret?: string;
+  tokenEndpoint?: string;
   scopes?: string;
-  access_token?: string;
-  token_expiry?: string;
+  accessToken?: string;
+  tokenExpiry?: string;
 }
