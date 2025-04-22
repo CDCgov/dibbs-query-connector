@@ -235,9 +235,9 @@ class QueryService {
     request: PatientRecordsRequest,
     valueSetOverrides?: DibbsValueSet[],
   ): Promise<QueryResponse> {
+    console.log(request);
     const queryName = request.query_name;
     const fhirClient = await prepareFhirClient(request.fhir_server);
-
     const savedQuery = await getSavedQueryByName(request.query_name as string);
 
     if (!savedQuery) {

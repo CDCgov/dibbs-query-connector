@@ -7,8 +7,9 @@ import {
   getSavedQueryByIdHelp,
   saveCustomQueryHelp,
 } from "./queryBuilding/lib";
-import dbService from "./db-service";
+import { getDbClient } from "../dbClient";
 
+const dbService = getDbClient();
 class QueryBuildingService {
   /**
    * Backend handler function for upserting a query

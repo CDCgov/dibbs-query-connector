@@ -7,6 +7,7 @@ import { DibbsValueSet } from "@/app/models/entities/valuesets";
 import { DEFAULT_TIME_WINDOW } from "@/app/shared/utils";
 import { randomUUID } from "crypto";
 import { DbService } from "../db-service";
+import { Pool } from "pg";
 
 // The underlying functionality here is reused in Playwright to do some
 // test setup, but for some DUMB reason Playwright refuses to play nicely with
@@ -27,7 +28,7 @@ export async function saveCustomQueryHelp(
   queryInput: NestedQuery,
   queryName: string,
   author: string,
-  dbClient: DbService,
+  dbClient: DbService | Pool,
   queryId?: string,
 ) {
   const queryString = `
@@ -76,7 +77,7 @@ export async function saveCustomQueryHelp(
  */
 export async function getSavedQueryByIdHelp(
   queryId: string,
-  dbClient: DbService,
+  dbClient: DbService | Pool,
 ) {
   const id = queryId;
   const queryString = `
@@ -107,7 +108,7 @@ export async function getSavedQueryByIdHelp(
  */
 export async function deleteQueryByIdHelp(
   queryId: string,
-  dbClient: DbService,
+  dbClient: DbService | Pool,
 ) {
   const deleteQuery = `
       DELETE FROM query WHERE id = $1;
