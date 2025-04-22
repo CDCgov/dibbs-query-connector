@@ -1,7 +1,5 @@
 "use server";
 
-import { Pool } from "pg";
-import { getDbClient } from "../dbClient";
 import type { NestedQuery } from "@/app/(pages)/queryBuilding/utils";
 import { adminRequired, transaction } from "./decorators";
 import {
@@ -9,10 +7,9 @@ import {
   getSavedQueryByIdHelp,
   saveCustomQueryHelp,
 } from "./queryBuilding/lib";
+import dbService from "./db-service";
 
 class QueryBuildingService {
-  private static dbClient: Pool = getDbClient();
-
   /**
    * Backend handler function for upserting a query
    * @param queryInput - frontend input for a query
@@ -32,7 +29,7 @@ class QueryBuildingService {
       queryInput,
       queryName,
       author,
-      QueryBuildingService.dbClient,
+      dbService,
       queryId,
     );
   }
@@ -43,7 +40,7 @@ class QueryBuildingService {
    * @returns The query name, data, and conditions list from the query table
    */
   static async getSavedQueryById(queryId: string) {
-    return getSavedQueryByIdHelp(queryId, QueryBuildingService.dbClient);
+    return getSavedQueryByIdHelp(queryId, dbService);
   }
 
   /**
@@ -53,7 +50,7 @@ class QueryBuildingService {
    */
   @transaction
   static async deleteQueryById(queryId: string) {
-    return deleteQueryByIdHelp(queryId, QueryBuildingService.dbClient);
+    return deleteQueryByIdHelp(queryId, dbService);
   }
 }
 

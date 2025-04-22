@@ -13,7 +13,6 @@ export function getRole() {
   const { data: session } = useSession();
   const ctx = useContext(DataContext);
   const isAuthDisabled = isAuthDisabledClientCheck(ctx?.runtimeConfig);
-
   return isAuthDisabled ? UserRole.SUPER_ADMIN : session?.user?.role;
 }
 
@@ -113,10 +112,10 @@ export function filterUsers(searchFilter: string, users: User[]) {
   const newUsers = structuredClone(users);
 
   return newUsers.map((user) => {
-    let fNameMatch = user.first_name
+    let fNameMatch = user.firstName
       .toLocaleLowerCase()
       .includes(casedSearchFilter);
-    let lNameMatch = user.last_name
+    let lNameMatch = user.lastName
       .toLocaleLowerCase()
       .includes(casedSearchFilter);
     let uNameMatch = user.username

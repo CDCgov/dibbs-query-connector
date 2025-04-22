@@ -58,7 +58,7 @@
     "@types/base-64": "^1.0.2",
     "@types/fhir": "^0.0.40",
     "@types/jest-axe": "^3.5.9",
-    "@types/node": "^22.13.9",
+    "@types/node": "^22.14.1",
     "@types/node-fetch": "^2.6.11",
     "@types/pg": "^8.11.8",
     "@types/react": "^18.3.11",

@@ -6,12 +6,12 @@ import {
   QueryTableResult,
 } from "@/app/(pages)/queryBuilding/utils";
 import { CANCER_FRONTEND_NESTED_INPUT } from "./constants";
-import { getDbClient } from "@/app/backend/dbClient";
 import {
   deleteQueryByIdHelp,
   getSavedQueryByIdHelp,
   saveCustomQueryHelp,
 } from "@/app/backend/dbServices/queryBuilding/lib";
+import { DbService } from "@/app/backend/dbServices/db-service";
 
 test.describe("editing an exisiting query", () => {
   let subjectQuery: QueryTableResult;
@@ -225,7 +225,7 @@ const ADDED_CONDITION = {
   condition_id: "840539006",
 };
 const CANCER_CONDITION_ID = "2";
-const dbClient = getDbClient();
+const dbClient = new DbService();
 
 async function createTestQuery() {
   const queryInputFixture = CANCER_FRONTEND_NESTED_INPUT as NestedQuery;

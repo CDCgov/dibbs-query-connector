@@ -51,7 +51,7 @@ function resolveFullName(
   fallback?: string,
 ): string {
   const full = `${first ?? ""} ${last ?? ""}`.trim();
-  return full !== "" ? full : (fallback ?? "");
+  return full !== "" ? full : fallback ?? "";
 }
 
 /**
@@ -63,7 +63,9 @@ export const auditLogActionTypeMap: Record<string, auditLogActionTypeMapping> =
       label: "Patient Records Query",
       format: (log) => {
         const request = parseRequest(log);
-        return `Viewed patient record for ${request.query_name ?? ""} query`.trim();
+        return `Viewed patient record for ${
+          request.query_name ?? ""
+        } query`.trim();
       },
     },
     patientDiscoveryQuery: {
@@ -121,8 +123,8 @@ export async function initializeAuditLogUserMap() {
   usernameToFullNameMap = response.items.reduce(
     (acc, user) => {
       acc[user.username] = resolveFullName(
-        user.first_name,
-        user.last_name,
+        user.firstName,
+        user.lastName,
         user.username,
       );
       return acc;
