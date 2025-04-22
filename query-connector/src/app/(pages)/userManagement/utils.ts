@@ -2,7 +2,8 @@ import { useSession } from "next-auth/react";
 import { useContext } from "react";
 import { DataContext } from "@/app/shared/DataProvider";
 import { isAuthDisabledClientCheck } from "@/app/utils/auth";
-import { UserRole } from "@/app/models/entities/users";
+import { User, UserRole } from "@/app/models/entities/users";
+import { CustomUserQuery } from "@/app/models/entities/query";
 
 /**
  * Function that retrieves the role value from the current session object
@@ -92,3 +93,68 @@ export const ModalStates: ModalMap = {
     prevStep: "closed",
   },
 };
+
+export type FilterableUser = User & {
+  render: boolean;
+};
+
+export type FilterableCustomUserQuery = CustomUserQuery & {
+  render: boolean;
+};
+
+/**
+ * A helper function to filter a list of users
+ * @param searchFilter - the search string to filter against
+ * @param users - the user list to filter
+ * @returns a user with the appropriate render flag set for itself
+ */
+export function filterUsers(searchFilter: string, users: User[]) {
+  const casedSearchFilter = searchFilter.toLocaleLowerCase();
+  const newUsers = structuredClone(users);
+
+  return newUsers.map((user) => {
+    let fNameMatch = user.first_name
+      .toLocaleLowerCase()
+      .includes(casedSearchFilter);
+    let lNameMatch = user.last_name
+      .toLocaleLowerCase()
+      .includes(casedSearchFilter);
+    let uNameMatch = user.username
+      .toLocaleLowerCase()
+      .includes(casedSearchFilter);
+
+    if (!fNameMatch && !lNameMatch && !uNameMatch) {
+      return user;
+    } else {
+      let render = fNameMatch || lNameMatch || uNameMatch;
+      return { ...user, render } as FilterableUser;
+    }
+  });
+}
+
+/**
+ * A helper function to filter a list of queries
+ * @param searchFilter - the search string to filter against
+ * @param queries - the query list to filter
+ * @returns a CustomUserQuery with the appropriate render flag set for itself
+ */
+export function filterQueries(
+  searchFilter: string,
+  queries: CustomUserQuery[],
+) {
+  const casedSearchFilter = searchFilter.toLocaleLowerCase();
+  const newQueries = structuredClone(queries);
+
+  return newQueries.map((query) => {
+    let nameMatch = query?.query_name
+      .toLocaleLowerCase()
+      .includes(casedSearchFilter);
+
+    if (!nameMatch) {
+      return query;
+    } else {
+      let render = !!nameMatch;
+      return { ...query, render } as FilterableCustomUserQuery;
+    }
+  });
+}

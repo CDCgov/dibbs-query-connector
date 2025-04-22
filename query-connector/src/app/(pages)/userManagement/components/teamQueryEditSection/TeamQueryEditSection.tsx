@@ -1,12 +1,24 @@
 "use client";
-import { Dispatch, SetStateAction, useContext } from "react";
+import {
+  Dispatch,
+  SetStateAction,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import classNames from "classnames";
 import { Checkbox } from "@trussworks/react-uswds";
 import Drawer from "@/app/ui/designSystem/drawer/Drawer";
 import { UserManagementContext } from "../UserManagementProvider";
 import style from "./TeamQueryEditSection.module.scss";
 import { User, UserGroup, UserRole } from "@/app/models/entities/users";
-import { getRole } from "../../utils";
+import {
+  FilterableCustomUserQuery,
+  FilterableUser,
+  filterQueries,
+  filterUsers,
+  getRole,
+} from "../../utils";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import {
   getAllUserGroups,
@@ -21,11 +33,11 @@ import { viewMode } from "../userManagementContainer/userManagementContainer";
 export type UserManagementDrawerProps = {
   userGroups: UserGroup[];
   setUserGroups: Dispatch<SetStateAction<UserGroup[]>>;
-  users: User[];
+  users: User[] | FilterableUser[];
   setUsers: Dispatch<SetStateAction<User[]>>;
   refreshView: Dispatch<SetStateAction<boolean | viewMode>>;
   activeTabLabel: string;
-  allQueries: CustomUserQuery[];
+  allQueries: CustomUserQuery[] | FilterableCustomUserQuery[];
   setAllQueries: Dispatch<SetStateAction<CustomUserQuery[]>>;
 };
 
@@ -49,21 +61,54 @@ const UserManagementDrawer: React.FC<UserManagementDrawerProps> = ({
   allQueries,
   setAllQueries,
 }) => {
-  const { teamQueryEditSection, closeEditSection, handleSearch } = useContext(
+  const { teamQueryEditSection, closeEditSection } = useContext(
     UserManagementContext,
   );
 
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [usersToRender, setUsersToRender] = useState<FilterableUser[] | User[]>(
+    users,
+  );
+  const [queriesToRender, setQueriesToRender] = useState<
+    FilterableCustomUserQuery[] | CustomUserQuery[]
+  >(allQueries);
+
+  useEffect(() => {
+    setUsersToRender(users.map((user) => ({ ...user, render: true })));
+    setQueriesToRender(allQueries.map((query) => ({ ...query, render: true })));
+  }, [users, allQueries]);
+
+  useEffect(() => {
+    if (teamQueryEditSection.subjectType == "Queries") {
+      const updatedQueriesToRender = filterQueries(
+        searchTerm,
+        allQueries,
+      ) as FilterableCustomUserQuery[];
+
+      setQueriesToRender(updatedQueriesToRender.filter((q) => !!q.render));
+    }
+    if (teamQueryEditSection.subjectType == "Members") {
+      const updatedUsersToRender = filterUsers(
+        searchTerm,
+        users,
+      ) as FilterableUser[];
+
+      setUsersToRender(updatedUsersToRender.filter((u) => !!u.render));
+    }
+  }, [searchTerm, users, allQueries]);
+
   const role = getRole();
-  const renderQueries = (queries: CustomUserQuery[]) => {
+
+  const renderQueries = (allQueries: CustomUserQuery[]) => {
     const groupQueries = teamQueryEditSection.subjectData as CustomUserQuery[];
 
-    if (queries.length > 0 && teamQueryEditSection.groupId) {
+    if (allQueries.length > 0 && teamQueryEditSection.groupId) {
       return (
         <ul
           aria-description={`queries for ${teamQueryEditSection.title}`}
           className={classNames("usa-list--unstyled", "margin-top-2")}
         >
-          {queries.map((query) => {
+          {allQueries.map((query) => {
             const isAssignedToGroup = groupQueries.some(
               (gq) => gq.query_id == query.query_id,
             );
@@ -89,7 +134,7 @@ const UserManagementDrawer: React.FC<UserManagementDrawerProps> = ({
   };
 
   const renderUsers = (users: User[]) => {
-    if (users.length > 0) {
+    if (usersToRender.length > 0) {
       return (
         <ul
           aria-description={`members of ${teamQueryEditSection.title}`}
@@ -118,10 +163,11 @@ const UserManagementDrawer: React.FC<UserManagementDrawerProps> = ({
                     className={classNames("margin-bottom-3", style.checkbox)}
                   />
                 ) : (
-                  <div
-                    key={user.id}
-                    className={"padding-bottom-2"}
-                  >{`${user.first_name} ${user.last_name}`}</div>
+                  !!isMemberOfCurrentGroup && (
+                    <div key={user.id} className={"padding-bottom-2"}>
+                      {`${user.first_name} ${user.last_name}`}
+                    </div>
+                  )
                 )}
               </li>
             );
@@ -129,17 +175,19 @@ const UserManagementDrawer: React.FC<UserManagementDrawerProps> = ({
         </ul>
       );
     } else {
-      return renderError("members");
+      return renderError("users");
     }
   };
 
   const renderError = (content: string) => {
-    return <div>{`No ${content} assigned to this group.`}</div>;
+    return <div className="margin-top-2">{`No ${content} found.`}</div>;
   };
 
   function generateContent(): JSX.Element {
     const isMemberView = teamQueryEditSection.subjectType == "Members";
-    return isMemberView ? renderUsers(users) : renderQueries(allQueries);
+    return isMemberView
+      ? renderUsers(usersToRender.length > 0 ? usersToRender : users)
+      : renderQueries(queriesToRender);
   }
 
   async function handleToggleMembership(
@@ -212,24 +260,19 @@ const UserManagementDrawer: React.FC<UserManagementDrawerProps> = ({
       if (updatedQueryResponse.totalItems === 0) {
         throw "Unable to update query assignment";
       }
-
+      const updatedUserGroups = await getAllUserGroups();
+      const updatedQuery = updatedQueryResponse.items[0];
       const newQueriesList = allQueries.map((q) => {
         if (q.query_id == queryId) {
-          const groupAssignments = q.groupAssignments || [];
-          return {
-            ...q,
-            ...{ userGroupMemberships: groupAssignments },
-          };
-        } else {
-          return q;
+          q.groupAssignments = updatedQuery.groupAssignments;
         }
+        return q;
       });
 
-      const updatedUserGroups = await getAllUserGroups();
-
-      setAllQueries(newQueriesList);
+      setAllQueries([...newQueriesList]);
       setUserGroups(updatedUserGroups.items); // for refreshing query count in table view
       refreshView(`Update ${activeTabLabel}` as viewMode);
+
       showToastConfirmation({
         body: alertText,
       });
@@ -241,6 +284,10 @@ const UserManagementDrawer: React.FC<UserManagementDrawerProps> = ({
       });
     }
   }
+  const handleClose = () => {
+    closeEditSection();
+  };
+
   return (
     <Drawer
       title={teamQueryEditSection.title}
@@ -249,8 +296,8 @@ const UserManagementDrawer: React.FC<UserManagementDrawerProps> = ({
       toRender={generateContent()}
       isOpen={teamQueryEditSection.isOpen}
       onSave={() => {}}
-      onSearch={() => handleSearch}
-      onClose={closeEditSection}
+      onSearch={(searchTerm) => setSearchTerm(searchTerm)}
+      onClose={handleClose}
     />
   );
 };

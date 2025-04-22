@@ -41,6 +41,10 @@
   margin-top: 0.25rem;
 }
 
+.customDateRangeWrapper :global(.usa-date-range-picker__range-start) {
+  padding-bottom: 1rem;
+}
+
 .datePickerModal {
   position: absolute;
   top: 100%;
@@ -57,7 +61,7 @@
 
 .clearButtonContainer {
   display: flex;
-  justify-content: flex-end;
+  justify-content: flex-start;
   margin-top: 0.5rem;
 }
 

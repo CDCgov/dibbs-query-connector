@@ -10,7 +10,7 @@ import { getSavedQueryByName } from "./database-service";
 import type { QueryDataColumn } from "../(pages)/queryBuilding/utils";
 import { getFhirServerConfigs } from "../backend/dbServices/fhir-servers";
 import { DibbsValueSet } from "../models/entities/valuesets";
-import { auditable } from "../auditLogs/decorator";
+import { auditable } from "../backend/auditLogs/decorator";
 import FHIRClient from "./fhirClient";
 import { FhirServerConfig } from "../models/entities/fhir-servers";
 
@@ -232,14 +232,12 @@ class QueryService {
    * @param request Information to pass off to the FHIR server
    * @param valueSetOverrides Any valuesets from the customize query step to override
    * the default saved query for
-   * @param includeImmunization Whether to include immunization in the query execution
    * @returns A promise for an updated query response.
    */
   @auditable
   static async patientRecordsQuery(
     request: PatientRecordsRequest,
     valueSetOverrides?: DibbsValueSet[],
-    includeImmunization = false,
   ): Promise<QueryResponse> {
     const queryName = request.query_name;
     const fhirClient = await QueryService.prepareFhirClient(
@@ -251,6 +249,7 @@ class QueryService {
     if (!savedQuery) {
       throw new Error(`Unable to query of name ${request?.query_name}`);
     }
+    const includeImmunization = savedQuery.immunization;
     const queryData = valueSetOverrides
       ? reconcileSavedQueryDataWithOverrides(
           savedQuery.query_data,
@@ -364,9 +363,7 @@ class QueryService {
     // Check for errors
     if (fhirResponse.status !== 200) {
       console.error(
-        `Patient search failed. Status: ${fhirResponse.status} \n Body: ${
-          fhirResponse.text
-        } \n Headers: ${JSON.stringify(
+        `Patient search failed. Status: ${fhirResponse.status} \n Body: ${await fhirResponse.text()} \n Headers: ${JSON.stringify(
           Object.fromEntries(fhirResponse.headers.entries()),
         )}`,
       );

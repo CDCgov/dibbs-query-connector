@@ -6,6 +6,7 @@ import {
   updateFhirServer,
   deleteFhirServer,
   getFhirServerConfigs,
+  AuthData,
 } from "@/app/backend/dbServices/fhir-servers";
 import dynamic from "next/dynamic";
 import { useEffect, useState, useRef } from "react";
@@ -21,6 +22,7 @@ import type { ModalProps } from "../../ui/designSystem/modal/Modal";
 import WithAuth from "@/app/ui/components/withAuth/WithAuth";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import { FhirServerConfig } from "@/app/models/entities/fhir-servers";
+import { testFhirServerConnection } from "@/app/shared/testConnection";
 
 const Modal = dynamic<ModalProps>(
   () => import("../../ui/designSystem/modal/Modal").then((mod) => mod.Modal),
@@ -139,8 +141,9 @@ const FhirServers: React.FC = () => {
   ): Promise<ConnectionTestResult> => {
     try {
       // Build auth data based on selected auth method
-      const authData: Record<string, string> = {
+      const authData: AuthData = {
         authType: authMethod,
+        headers: selectedServer?.headers || {}, // Include existing headers for editing
       };
 
       // Add auth-method specific properties
@@ -157,20 +160,12 @@ const FhirServers: React.FC = () => {
         authData.scopes = scopes;
       }
 
-      const response = await fetch("/api/test-fhir-connection", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          url,
-          disableCertValidation,
-          authData,
-        }),
-      });
-
-      const result = await response.json();
-      return result;
+      const response = await testFhirServerConnection(
+        url,
+        disableCertValidation,
+        authData,
+      );
+      return response;
     } catch (error) {
       console.error("Error testing connection:", error);
       return {
@@ -179,7 +174,6 @@ const FhirServers: React.FC = () => {
       };
     }
   };
-
   const handleTestConnection = async () => {
     const result = await testFhirConnection(serverUrl);
     setConnectionStatus(result.success ? "success" : "error");

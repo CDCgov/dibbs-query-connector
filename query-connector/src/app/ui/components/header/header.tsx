@@ -6,7 +6,7 @@ import { Button, Icon } from "@trussworks/react-uswds";
 import styles from "./header.module.scss";
 import { metadata } from "@/app/shared/constants";
 import classNames from "classnames";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { getPagesInSettingsMenu, PAGES } from "@/app/shared/page-routes";
 import { UserRole } from "@/app/models/entities/users";
@@ -28,6 +28,7 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
   const userRole = authDisabled
     ? UserRole.SUPER_ADMIN
     : session?.user?.role || "";
+  const pathname = usePathname();
 
   const outsideMenuClick = (event: MouseEvent) => {
     if (
@@ -115,16 +116,18 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
               </Button>
             ) : (
               <div className="display-flex flex-align-center">
-                <Link
-                  href={PAGES.QUERY}
-                  className={classNames(
-                    styles.runQueryBtn,
-                    "usa-button margin-bottom-0 margin-right-2",
-                  )}
-                  scroll={false}
-                >
-                  Run query
-                </Link>
+                {pathname !== PAGES.QUERY && (
+                  <Link
+                    href={PAGES.QUERY}
+                    className={classNames(
+                      styles.runQueryBtn,
+                      "usa-button margin-bottom-0 margin-right-2",
+                    )}
+                    scroll={false}
+                  >
+                    Run a query
+                  </Link>
+                )}
                 <button
                   onClick={toggleMenuDropdown}
                   className={classNames(

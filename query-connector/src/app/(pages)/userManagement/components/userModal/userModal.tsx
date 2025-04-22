@@ -26,6 +26,7 @@ import { RoleDescriptons } from "../../utils";
 import { UserManagementContext } from "../UserManagementProvider";
 import { viewMode } from "../userManagementContainer/userManagementContainer";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
+import { CustomUserQuery } from "@/app/models/entities/query";
 
 const Modal = dynamic<ModalProps>(
   () =>
@@ -133,7 +134,7 @@ const UserModal: React.FC<UserModalProps> = ({
       "Queries",
       "Queries",
       newGroup.id,
-      newGroup.queries,
+      newGroup.queries as CustomUserQuery[],
     );
   }
 
@@ -208,6 +209,7 @@ const UserModal: React.FC<UserModalProps> = ({
           return setErrorMessage(udpatedUser.msg);
         } else {
           setNewUser({ ...newUser, ...udpatedUser });
+          refreshView("Update Users");
           setErrorMessage("");
           return setModalMode("select-groups");
         }
@@ -418,7 +420,7 @@ const UserModal: React.FC<UserModalProps> = ({
         text: ModalStates[modalMode].secondaryBtnText,
         type: "button" as const,
         id: "modal-back-button",
-        className: "usa-button",
+        className: "usa-button usa-button--outline shadow-none",
         onClick: async () =>
           setModalMode(ModalStates[modalMode].prevStep || "closed"),
       },

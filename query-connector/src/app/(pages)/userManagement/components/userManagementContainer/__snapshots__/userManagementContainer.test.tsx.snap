@@ -27,7 +27,7 @@ exports[`Admin view of Users Table renders error message when no user groups are
         Modal Mock
       </div>
       <div
-        class="drawer closed"
+        class="drawer closed width35"
         data-testid="drawer-open-false"
         role="dialog"
       >
@@ -74,10 +74,12 @@ exports[`Admin view of Users Table renders error message when no user groups are
             </div>
           </div>
           <div
-            class="padding-top-2 drawerBody"
+            class="drawerBody"
           >
-            <div>
-              No queries assigned to this group.
+            <div
+              class="margin-top-2"
+            >
+              No queries found.
             </div>
           </div>
         </div>
@@ -179,7 +181,7 @@ exports[`Super Admin view of Users Table renders content on tab click 1`] = `
               </td>
               <td
                 class="roleDropdown"
-                width="270"
+                width="250"
               >
                 <label
                   class="usa-label usa-sr-only"
@@ -211,7 +213,9 @@ exports[`Super Admin view of Users Table renders content on tab click 1`] = `
                   </option>
                 </select>
               </td>
-              <td>
+              <td
+                width="475"
+              >
                 <button
                   aria-description="Edit Order of the Phoenix members"
                   class="usa-button usa-button--unstyled margin-right-2 text-no-underline"
@@ -265,7 +269,7 @@ exports[`Super Admin view of Users Table renders content on tab click 1`] = `
               </td>
               <td
                 class="roleDropdown"
-                width="270"
+                width="250"
               >
                 <label
                   class="usa-label usa-sr-only"
@@ -297,7 +301,9 @@ exports[`Super Admin view of Users Table renders content on tab click 1`] = `
                   </option>
                 </select>
               </td>
-              <td>
+              <td
+                width="475"
+              >
                 --
               </td>
             </tr>
@@ -308,7 +314,7 @@ exports[`Super Admin view of Users Table renders content on tab click 1`] = `
         Modal Mock
       </div>
       <div
-        class="drawer closed"
+        class="drawer closed width35"
         data-testid="drawer-open-false"
         role="dialog"
       >
@@ -355,10 +361,12 @@ exports[`Super Admin view of Users Table renders content on tab click 1`] = `
             </div>
           </div>
           <div
-            class="padding-top-2 drawerBody"
+            class="drawerBody"
           >
-            <div>
-              No queries assigned to this group.
+            <div
+              class="margin-top-2"
+            >
+              No queries found.
             </div>
           </div>
         </div>
@@ -409,7 +417,7 @@ exports[`Super Admin view of Users Table renders content on tab click 2`] = `
         Modal Mock
       </div>
       <div
-        class="drawer closed"
+        class="drawer closed width35"
         data-testid="drawer-open-false"
         role="dialog"
       >
@@ -456,10 +464,12 @@ exports[`Super Admin view of Users Table renders content on tab click 2`] = `
             </div>
           </div>
           <div
-            class="padding-top-2 drawerBody"
+            class="drawerBody"
           >
-            <div>
-              No queries assigned to this group.
+            <div
+              class="margin-top-2"
+            >
+              No queries found.
             </div>
           </div>
         </div>
@@ -506,7 +516,7 @@ exports[`Super Admin view of Users Table renders error message when no users are
         Modal Mock
       </div>
       <div
-        class="drawer closed"
+        class="drawer closed width35"
         data-testid="drawer-open-false"
         role="dialog"
       >
@@ -553,10 +563,12 @@ exports[`Super Admin view of Users Table renders error message when no users are
             </div>
           </div>
           <div
-            class="padding-top-2 drawerBody"
+            class="drawerBody"
           >
-            <div>
-              No queries assigned to this group.
+            <div
+              class="margin-top-2"
+            >
+              No queries found.
             </div>
           </div>
         </div>
@@ -658,7 +670,7 @@ exports[`Super Admin view of Users Table renders table view after content is loa
               </td>
               <td
                 class="roleDropdown"
-                width="270"
+                width="250"
               >
                 <label
                   class="usa-label usa-sr-only"
@@ -690,7 +702,9 @@ exports[`Super Admin view of Users Table renders table view after content is loa
                   </option>
                 </select>
               </td>
-              <td>
+              <td
+                width="475"
+              >
                 <button
                   aria-description="Edit Order of the Phoenix members"
                   class="usa-button usa-button--unstyled margin-right-2 text-no-underline"
@@ -744,7 +758,7 @@ exports[`Super Admin view of Users Table renders table view after content is loa
               </td>
               <td
                 class="roleDropdown"
-                width="270"
+                width="250"
               >
                 <label
                   class="usa-label usa-sr-only"
@@ -776,7 +790,9 @@ exports[`Super Admin view of Users Table renders table view after content is loa
                   </option>
                 </select>
               </td>
-              <td>
+              <td
+                width="475"
+              >
                 --
               </td>
             </tr>
@@ -787,7 +803,7 @@ exports[`Super Admin view of Users Table renders table view after content is loa
         Modal Mock
       </div>
       <div
-        class="drawer closed"
+        class="drawer closed width35"
         data-testid="drawer-open-false"
         role="dialog"
       >
@@ -834,10 +850,12 @@ exports[`Super Admin view of Users Table renders table view after content is loa
             </div>
           </div>
           <div
-            class="padding-top-2 drawerBody"
+            class="drawerBody"
           >
-            <div>
-              No queries assigned to this group.
+            <div
+              class="margin-top-2"
+            >
+              No queries found.
             </div>
           </div>
         </div>
@@ -939,7 +957,7 @@ exports[`Super Admin view of Users Table renders table view after content is loa
               </td>
               <td
                 class="roleDropdown"
-                width="270"
+                width="250"
               >
                 <label
                   class="usa-label usa-sr-only"
@@ -971,7 +989,9 @@ exports[`Super Admin view of Users Table renders table view after content is loa
                   </option>
                 </select>
               </td>
-              <td>
+              <td
+                width="475"
+              >
                 <button
                   aria-description="Edit Order of the Phoenix members"
                   class="usa-button usa-button--unstyled margin-right-2 text-no-underline"
@@ -1025,7 +1045,7 @@ exports[`Super Admin view of Users Table renders table view after content is loa
               </td>
               <td
                 class="roleDropdown"
-                width="270"
+                width="250"
               >
                 <label
                   class="usa-label usa-sr-only"
@@ -1057,7 +1077,9 @@ exports[`Super Admin view of Users Table renders table view after content is loa
                   </option>
                 </select>
               </td>
-              <td>
+              <td
+                width="475"
+              >
                 --
               </td>
             </tr>
@@ -1068,7 +1090,7 @@ exports[`Super Admin view of Users Table renders table view after content is loa
         Modal Mock
       </div>
       <div
-        class="drawer closed"
+        class="drawer closed width35"
         data-testid="drawer-open-false"
         role="dialog"
       >
@@ -1115,10 +1137,12 @@ exports[`Super Admin view of Users Table renders table view after content is loa
             </div>
           </div>
           <div
-            class="padding-top-2 drawerBody"
+            class="drawerBody"
           >
-            <div>
-              No queries assigned to this group.
+            <div
+              class="margin-top-2"
+            >
+              No queries found.
             </div>
           </div>
         </div>
@@ -1190,7 +1214,7 @@ exports[`Super Admin view of Users Table renders table view after content is loa
             </td>
             <td
               class="roleDropdown"
-              width="270"
+              width="250"
             >
               <label
                 class="usa-label usa-sr-only"
@@ -1222,7 +1246,9 @@ exports[`Super Admin view of Users Table renders table view after content is loa
                 </option>
               </select>
             </td>
-            <td>
+            <td
+              width="475"
+            >
               <button
                 aria-description="Edit Order of the Phoenix members"
                 class="usa-button usa-button--unstyled margin-right-2 text-no-underline"
@@ -1276,7 +1302,7 @@ exports[`Super Admin view of Users Table renders table view after content is loa
             </td>
             <td
               class="roleDropdown"
-              width="270"
+              width="250"
             >
               <label
                 class="usa-label usa-sr-only"
@@ -1308,7 +1334,9 @@ exports[`Super Admin view of Users Table renders table view after content is loa
                 </option>
               </select>
             </td>
-            <td>
+            <td
+              width="475"
+            >
               --
             </td>
           </tr>

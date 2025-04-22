@@ -70,7 +70,7 @@ export const Modal: React.FC<ModalProps> = ({
       aria-describedby={`${id}-modal-description`}
       isLarge={isLarge}
       forceAction={forceAction}
-      className={classNames("padding-x-2", className)}
+      className={classNames("qc-modal", className)}
     >
       <ModalHeading id={`${id}-modal-heading`}>{heading}</ModalHeading>
       <div id={`${id}-modal-description`} className="usa-prose">

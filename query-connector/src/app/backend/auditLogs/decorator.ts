@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { getDbClient } from "../backend/dbClient";
+import { getDbClient } from "../dbClient";
 import { generateAuditValues } from "./lib";
 
 export const AUDIT_LOG_MAX_RETRIES = 3;
@@ -54,7 +54,9 @@ export function auditable(
         )
         .catch((e) => {
           console.error(
-            `Audit log write attempt ${retryCounter + 1} failed with error: ${e}. ${
+            `Audit log write attempt ${
+              retryCounter + 1
+            } failed with error: ${e}. ${
               retryCounter + 1 < AUDIT_LOG_MAX_RETRIES ? "Retrying..." : ""
             }`,
           );

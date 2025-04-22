@@ -2,38 +2,80 @@ import { screen, within, waitFor } from "@testing-library/react";
 import AuditLogs from "./page";
 import { renderWithUser, RootProviderMock } from "@/app/tests/unit/setup";
 import userEvent from "@testing-library/user-event";
+import { getAuditLogs, LogEntry } from "@/app/backend/dbServices/audit-logs";
+
+jest.mock(
+  "@/app/ui/components/withAuth/WithAuth",
+  () =>
+    ({ children }: React.PropsWithChildren) => <div>{children}</div>,
+);
+
+jest.mock("@/app/backend/user-management", () => ({
+  getAllUsers: jest.fn().mockResolvedValue({ items: [], totalItems: 0 }),
+  getUserRole: jest.fn(),
+}));
 
 const TEST_NAME = "Rocky Balboa";
-const TEST_REPORT = "Created Report";
+const TEST_REPORT = "Patient Records Query";
+const TEST_REPORT_RENDERED = "Viewed patient record for";
 const NUM_ROWS = 26;
-
-export const BASE_TEST_DATA = [
+const CHECKSUM_INPUT =
+  "It ain't about how hard you hit, it's about how hard you can get hit and keep moving forward";
+const PLACEHOLDER_TEXT = "Search name, action, or message";
+const BASE_TEST_DATA: LogEntry[] = [
   {
-    name: "Rocky Balboa",
-    action: "Created Report",
-    date: new Date("2025-03-10T14:30:00Z"),
+    author: "Rocky Balboa",
+    actionType: "patientRecordsQuery",
+    auditMessage: { query_name: "Test Query 1" },
+    auditChecksum: CHECKSUM_INPUT,
+    createdAt: new Date("2025-03-10T14:30:00Z"),
   },
   {
-    name: "Apollo Creed",
-    action: "Edited Report",
-    date: new Date("2025-03-09T09:15:00Z"),
+    author: "Apollo Creed",
+    actionType: "patientDiscoveryQuery",
+    auditMessage: { query_name: "Test Query 2" },
+    auditChecksum: CHECKSUM_INPUT,
+    createdAt: new Date("2025-03-09T09:15:00Z"),
   },
   {
-    name: "Rocky Balboa",
-    action: "Deleted Entry",
-    date: new Date("2022-03-08T17:45:00Z"),
+    author: "Rocky Balboa",
+    actionType: "patientDiscoveryQuery",
+    auditMessage: { query_name: "Test Query 3" },
+    auditChecksum: CHECKSUM_INPUT,
+    createdAt: new Date("2022-03-08T17:45:00Z"),
   },
   {
-    name: "Clubber Lang",
-    action: "Created Report",
-    date: new Date("2024-03-07T12:00:00Z"),
+    author: "Clubber Lang",
+    actionType: "patientRecordsQuery",
+    auditMessage: { query_name: "Test Query 4" },
+    auditChecksum: CHECKSUM_INPUT,
+    createdAt: new Date("2024-03-07T12:00:00Z"),
   },
   {
-    name: "Ivan Drago",
-    action: "Viewed Entry",
-    date: new Date("2025-03-06T22:10:00Z"),
+    author: "Ivan Drago",
+    actionType: "patientDiscoveryQuery",
+    auditMessage: { query_name: "Test Query 5" },
+    auditChecksum: CHECKSUM_INPUT,
+    createdAt: new Date("2025-03-06T22:10:00Z"),
   },
 ];
+
+const testData = Array.from({ length: 50 }, (_, index) =>
+  BASE_TEST_DATA.map((entry) => ({
+    ...entry,
+    date: new Date(entry.createdAt.getTime() + index * 86400000),
+  })),
+)
+  .flat()
+  .sort((a, b) => b.date.getTime() - a.date.getTime());
+
+jest.mock("@/app/backend/dbServices/audit-logs", () => {
+  return {
+    __esModule: true,
+    ...jest.requireActual("@/app/backend/dbServices/audit-logs"),
+    getAuditLogs: jest.fn(),
+  };
+});
 
 /**
  * Creates an enhanced user event with custom helper methods.
@@ -66,14 +108,21 @@ const createUserWithHelpers = (user: ReturnType<typeof userEvent.setup>) => ({
 
 describe("AuditLogs Component", () => {
   let user: ReturnType<typeof createUserWithHelpers>;
+  (getAuditLogs as jest.Mock).mockResolvedValue(testData);
 
-  beforeEach(() => {
+  beforeEach(async () => {
     const renderResult = renderWithUser(
       <RootProviderMock currentPage="/auditLogs">
         <AuditLogs />
       </RootProviderMock>,
     );
     user = createUserWithHelpers(renderResult.user);
+
+    await waitFor(() => {
+      expect(
+        renderResult.getByText("Showing", { exact: false }),
+      ).toBeInTheDocument();
+    });
   });
 
   test("renders the audit logs table", async () => {
@@ -98,19 +147,23 @@ describe("AuditLogs Component", () => {
     const rows = await screen.findAllByRole("row");
     expect(rows.length).toBeGreaterThan(1);
     rows.slice(1).forEach((row) => {
-      expect(within(row).getByText(TEST_REPORT)).toBeInTheDocument();
+      const matches = within(row).queryAllByText(
+        (_, node) => !!node?.textContent?.includes(TEST_REPORT_RENDERED),
+      );
+      expect(matches.length).toBeGreaterThan(0);
     });
 
     await user.selectDropdownOption("Action(s)", "");
   });
 
   test("filters by partial search", async () => {
-    await user.typeInField("Search name or action", "Apollo");
+    await user.typeInField(PLACEHOLDER_TEXT, "Apollo");
 
     const rows = await screen.findAllByRole("row");
     expect(rows.length).toBeGreaterThan(1);
     rows.slice(1).forEach((row) => {
-      expect(within(row).getByText(/Apollo/i)).toBeInTheDocument();
+      const matches = within(row).queryAllByText(/Apollo/i);
+      expect(matches.length).toBeGreaterThan(0);
     });
   });
 
@@ -159,7 +212,7 @@ describe("AuditLogs Component", () => {
 
   test("clear filters resets empty state", async () => {
     await user.selectDropdownOption("Name(s)", "Apollo Creed");
-    await user.selectDropdownOption("Action(s)", "Created Report");
+    await user.selectDropdownOption("Action(s)", "Patient Records Query");
 
     await waitFor(() => {
       expect(
@@ -266,6 +319,27 @@ describe("AuditLogs Component", () => {
     await waitFor(() => {
       const alert = screen.getByRole("alert");
       expect(alert).toHaveTextContent("Invalid start date format");
+    });
+  });
+
+  test("opens drawer on row click and closes", async () => {
+    const rows = await screen.findAllByRole("row");
+    const firstRow = rows[1];
+    await user.click(firstRow);
+
+    await waitFor(() => {
+      expect(screen.getByTestId("drawer-title")).toHaveTextContent(
+        "Full JSON request",
+      );
+    });
+
+    const closeButton = screen.getByTestId("close-drawer");
+    await user.click(closeButton);
+
+    await waitFor(() => {
+      const drawer = screen.getByTestId("drawer-open-false");
+      expect(drawer.className).toContain("closed");
+      expect(drawer.className).not.toContain("open");
     });
   });
 });
