@@ -1,10 +1,10 @@
 "use server";
-import { Pool } from "pg";
-import { getDbClient } from "../dbClient";
-import { transaction } from "./decorators";
+import { superAdminRequired, transaction } from "./decorators";
 import { FhirServerConfig } from "@/app/models/entities/fhir-servers";
-import { superAdminAccessCheck } from "@/app/utils/auth";
 import { auditable } from "@/app/backend/auditLogs/decorator";
+import dbService from "./db-service";
+import FHIRClient from "@/app/shared/fhirClient";
+import { FHIR_SERVER_INSERT_QUERY } from "./util";
 
 // Define an interface for authentication data
 export interface AuthData {
@@ -19,40 +19,43 @@ export interface AuthData {
   headers?: Record<string, string>;
 }
 
-class FhirServerConfigService {
-  private static dbClient: Pool = getDbClient();
+class FhirServerConfigServiceInternal {
+  /**
+   * Internal implementation class that performs the underlying database read
+   * to the FHIR server table. This is extended by the external facade (which
+   * adds permissions checks) so that internal service code can call this method
+   * without permissions, which is required for any external code.
+   * @returns An array of the FHIR server configs
+   */
+  protected static async getFhirServerConfigs() {
+    const query = `SELECT * FROM fhir_servers;`;
+    const result = await dbService.query(query);
+    return result.rows as FhirServerConfig[];
+  }
+}
+
+class FhirServerConfigService extends FhirServerConfigServiceInternal {
   private static cachedFhirServerConfigs: FhirServerConfig[] | null = null;
 
   /**
    * Fetches the configuration for a FHIR server from the database.
-   * @param checkAdminPermissions - Whether to bypass the admin check. Set to
-   * false for internal service code where fetched configs won't be displayed
-   * to the end user
    * @param forceRefresh - Whether to flush the config cache
    * @returns The configuration for the FHIR server.
    */
-  static async getFhirServerConfigs(
-    checkAdminPermissions = true,
-    forceRefresh = false,
-  ) {
-    if (checkAdminPermissions && !(await superAdminAccessCheck())) {
-      throw new Error("Unauthorized");
-    }
-
+  @superAdminRequired
+  static async getFhirServerConfigs(forceRefresh = false) {
     if (
       forceRefresh ||
       FhirServerConfigService.cachedFhirServerConfigs === null
     ) {
-      const query = `SELECT * FROM fhir_servers;`;
-      const result = await FhirServerConfigService.dbClient.query(query);
-      const newServerConfigs = result.rows as FhirServerConfig[];
+      const newServerConfigs = await super.getFhirServerConfigs();
       FhirServerConfigService.cachedFhirServerConfigs = newServerConfigs;
     }
     return FhirServerConfigService.cachedFhirServerConfigs;
   }
 
   static async getFhirServerNames(): Promise<string[]> {
-    const configs = await getFhirServerConfigs(false);
+    const configs = await super.getFhirServerConfigs();
     return configs.map((config) => config.name);
   }
 
@@ -77,10 +80,7 @@ class FhirServerConfigService {
   `;
 
     try {
-      const result = await FhirServerConfigService.dbClient.query(updateQuery, [
-        name,
-        wasSuccessful,
-      ]);
+      const result = await dbService.query(updateQuery, [name, wasSuccessful]);
 
       // Clear the cache so the next getFhirServerConfigs call will fetch fresh data
       FhirServerConfigService.cachedFhirServerConfigs = null;
@@ -153,7 +153,7 @@ class FhirServerConfigService {
       let headers = {};
 
       // Get existing headers if any
-      const existingServer = await FhirServerConfigService.dbClient.query(
+      const existingServer = await dbService.query(
         "SELECT headers FROM fhir_servers WHERE id = $1",
         [id],
       );
@@ -176,7 +176,7 @@ class FhirServerConfigService {
         };
       }
 
-      const result = await FhirServerConfigService.dbClient.query(updateQuery, [
+      const result = await dbService.query(updateQuery, [
         id,
         name,
         hostname,
@@ -234,26 +234,6 @@ class FhirServerConfigService {
     lastConnectionSuccessful?: boolean,
     authData?: AuthData,
   ) {
-    const insertQuery = `
-    INSERT INTO fhir_servers (
-      name,
-      hostname, 
-      last_connection_attempt,
-      last_connection_successful,
-      headers,
-      disable_cert_validation,
-      auth_type,
-      client_id,
-      client_secret,
-      token_endpoint,
-      scopes,
-      access_token,
-      token_expiry
-    )
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
-    RETURNING *;
-  `;
-
     try {
       // Default auth type to none if not provided
       const authType = authData?.authType || "none";
@@ -268,7 +248,7 @@ class FhirServerConfigService {
         };
       }
 
-      const result = await FhirServerConfigService.dbClient.query(insertQuery, [
+      const result = await dbService.query(FHIR_SERVER_INSERT_QUERY, [
         name,
         hostname,
         new Date(),
@@ -315,9 +295,7 @@ class FhirServerConfigService {
   `;
 
     try {
-      const result = await FhirServerConfigService.dbClient.query(deleteQuery, [
-        id,
-      ]);
+      const result = await dbService.query(deleteQuery, [id]);
 
       // Clear the cache so the next getFhirServerConfigs call will fetch fresh data
       FhirServerConfigService.cachedFhirServerConfigs = null;
@@ -341,6 +319,18 @@ class FhirServerConfigService {
       };
     }
   }
+
+  static async prepareFhirClient(fhirServer: string) {
+    if (FhirServerConfigService.cachedFhirServerConfigs === null) {
+      FhirServerConfigService.cachedFhirServerConfigs =
+        await super.getFhirServerConfigs();
+    }
+
+    return new FHIRClient(
+      fhirServer,
+      FhirServerConfigService.cachedFhirServerConfigs,
+    );
+  }
 }
 
 export const getFhirServerConfigs =
@@ -351,3 +341,4 @@ export const updateFhirServerConnectionStatus =
 export const updateFhirServer = FhirServerConfigService.updateFhirServer;
 export const insertFhirServer = FhirServerConfigService.insertFhirServer;
 export const deleteFhirServer = FhirServerConfigService.deleteFhirServer;
+export const prepareFhirClient = FhirServerConfigService.prepareFhirClient;
