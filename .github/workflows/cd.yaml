@@ -7,6 +7,8 @@ on:
   push:
     branches:
       - main
+    tags:
+      - "v*.*.*"
   workflow_dispatch:
 
 concurrency:
@@ -41,15 +43,22 @@ jobs:
         run: |
           echo "REPO=${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV
 
+      - name: Extract current version from package.json
+        id: get-version
+        run: |
+          version=$(node -p "require('./package.json').version.replace('-snapshot', '')")
+          echo "version=$version" >> $GITHUB_OUTPUT
+          echo "VERSION=$version" >> $GITHUB_ENV
+
       - name: Extract metadata (tags, labels) for Docker
         id: meta
         uses: docker/metadata-action@v5
         with:
           images: ghcr.io/${{ env.REPO }}/query-connector
           tags: |
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=semver,pattern={{major}}
+            type=semver,pattern={{version}},value=${{ steps.get-version.outputs.version }}
+            type=semver,pattern={{major}}.{{minor}},value=${{ steps.get-version.outputs.version }}
+            type=semver,pattern={{major}},value=${{ steps.get-version.outputs.version }}
 
       - name: Build and push
         uses: docker/build-push-action@v6
