@@ -7,8 +7,6 @@ on:
   push:
     branches:
       - main
-    tags:
-      - "v*.*.*"
   workflow_dispatch:
 
 concurrency:
@@ -43,12 +41,35 @@ jobs:
         run: |
           echo "REPO=${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV
 
-      - name: Extract current version from package.json
-        id: get-version
+      - name: Set up Python (for yq)
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install yq
+        run: pip install yq semver
+
+      - name: Get current qc version
+        id: current-version
         run: |
-          version=$(node -p "require('./package.json').version.replace('-snapshot', '')")
-          echo "version=$version" >> $GITHUB_OUTPUT
-          echo "VERSION=$version" >> $GITHUB_ENV
+          CURRENT_VERSION=$(yq '.version' query-connector/app_version.yml)
+          echo "Current Query Connector Version: $CURRENT_VERSION"
+          echo "current_version=$CURRENT_VERSION" >> $GITHUB_ENV
+
+      - name: Increment qc version
+        id: increment-version
+        run: |
+          VERSION_PART=${{ github.event.inputs.bump_patch || 'patch' }}
+          echo "Debug: env.current_version=${{ env.current_version }}"  # Debug log
+          NEW_VERSION=$(python -c "from semver import VersionInfo as V; print(V.parse('${{ env.current_version }}').bump_${VERSION_PART}())")
+          echo "New Query Connector Version: $NEW_VERSION"
+          echo "new_version=$NEW_VERSION" >> $GITHUB_ENV
+
+      - name: Update app_version.yaml
+        id: new-version
+        run: |
+          yq -i -y ".version = \"${{ env.new_version }}\"" query-connector/app_version.yml
+          cat query-connector/app_version.yml
 
       - name: Extract metadata (tags, labels) for Docker
         id: meta
@@ -56,9 +77,9 @@ jobs:
         with:
           images: ghcr.io/${{ env.REPO }}/query-connector
           tags: |
-            type=semver,pattern={{version}},value=${{ steps.get-version.outputs.version }}
-            type=semver,pattern={{major}}.{{minor}},value=${{ steps.get-version.outputs.version }}
-            type=semver,pattern={{major}},value=${{ steps.get-version.outputs.version }}
+            type=semver,pattern={{version}},value=${{ steps.new-version.outputs.version }}
+            type=semver,pattern={{major}}.{{minor}},value=${{ steps.new-version.outputs.version }}
+            type=semver,pattern={{major}},value=${{ steps.new-version.outputs.version }}
 
       - name: Build and push
         uses: docker/build-push-action@v6
