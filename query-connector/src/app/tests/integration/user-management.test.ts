@@ -40,12 +40,13 @@ const TEST_USER_SUPER = {
   lastName: "Admin",
   qcRole: "Super Admin",
 };
-suppressConsoleLogs();
 
 describe("User Management Integration Tests", () => {
   let createdUserId: string;
 
   beforeAll(async () => {
+    suppressConsoleLogs();
+
     await dbClient.query("BEGIN");
 
     // Insert first user as super admin
