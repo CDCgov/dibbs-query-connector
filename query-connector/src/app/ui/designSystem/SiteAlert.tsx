@@ -29,7 +29,7 @@ const piiDisclaimer = (
 );
 
 type SiteAlertProps = {
-  page?: PageType | string;
+  page?: PageType | string | null;
 };
 
 const PageModeToSiteAlertMap: { [page in Mode]?: React.ReactNode } = {

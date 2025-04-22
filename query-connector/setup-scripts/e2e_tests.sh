@@ -1,23 +1,11 @@
 #!/bin/bash
 set -e  # Exit immediately if a command exits with a non-zero status. Comment this if debugging in CI
 
-# setup needed .env values
-> .env.e2e
-echo "DATABASE_URL=postgresql://postgres:pw@localhost:5432/tefca_db" >> .env.e2e
+chmod +x ./setup-scripts/setup_e2e_vars.sh
+bash ./setup-scripts/setup_e2e_vars.sh
+
 echo "AIDBOX_BASE_URL=http://aidbox:8080" >> .env.e2e
 echo "APP_HOSTNAME=http://query-connector:3000" >> .env.e2e
-echo "AUTH_DISABLED=true" >> .env.e2e
-echo "AUTH_SECRET=verysecretsecret" >> .env.e2e
-
-value=$(grep "^AIDBOX_LICENSE=" .env | cut -d '=' -f2)
-
-# Check if the value was found
-if [ -n "$value" ]; then
-     echo "AIDBOX_LICENSE=$value" >> .env.e2e
-  echo "Value copied successfully"
-else
-  echo "Variable not found in source file"
-fi
 
 docker compose down --volumes --remove-orphans
 docker compose -f docker-compose-e2e.yaml --env-file .env.e2e up -d --build 
