@@ -3,7 +3,7 @@ import React, { useContext, useEffect, useState } from "react";
 import {
   PatientDiscoveryResponse,
   PatientRecordsResponse,
-} from "../../shared/query-service";
+} from "../../backend/query-execution";
 import ResultsView from "./components/ResultsView";
 import PatientSearchResults from "./components/PatientSearchResults";
 import SearchForm from "./components/searchForm/SearchForm";
@@ -19,9 +19,9 @@ import { CustomUserQuery } from "@/app/models/entities/query";
 import WithAuth from "@/app/ui/components/withAuth/WithAuth";
 
 const blankUserQuery = {
-  query_id: "",
-  query_name: "",
-  conditions_list: [],
+  queryId: "",
+  queryName: "",
+  conditionsList: [],
   valuesets: [],
 };
 /**
@@ -62,27 +62,22 @@ const Query: React.FC = () => {
   const [resultsQueryResponse, setResultsQueryResponse] =
     useState<PatientRecordsResponse>();
 
-  const [showCustomizeQuery, setShowCustomizeQuery] = useState(false);
-
   const modeToCssContainerMap: { [mode in Mode]: string } = {
     search: "main-container",
     "patient-results": "main-container__wide",
-    "select-query": showCustomizeQuery
-      ? "main-container__wide"
-      : "main-container",
+    "select-query": "main-container",
     results: "main-container__wide",
   };
 
   return (
     <WithAuth>
-      {Object.keys(CUSTOMIZE_QUERY_STEPS).includes(mode) &&
-        !showCustomizeQuery && (
-          <StepIndicator
-            headingLevel="h4"
-            className="stepper-container"
-            curStep={mode}
-          />
-        )}
+      {Object.keys(CUSTOMIZE_QUERY_STEPS).includes(mode) && (
+        <StepIndicator
+          headingLevel="h4"
+          className="stepper-container"
+          curStep={mode}
+        />
+      )}
       <div className={modeToCssContainerMap[mode]}>
         {/* Step 1 */}
         {mode === "search" && (
@@ -118,9 +113,7 @@ const Query: React.FC = () => {
             goForward={() => setMode("results")}
             patientForQuery={patientForQuery}
             patientDiscoveryResponse={patientDiscoveryQueryResponse}
-            showCustomizeQuery={showCustomizeQuery}
             setResultsQueryResponse={setResultsQueryResponse}
-            setShowCustomizeQuery={setShowCustomizeQuery}
             fhirServer={fhirServer}
             setFhirServer={setFhirServer}
             setLoading={setLoading}

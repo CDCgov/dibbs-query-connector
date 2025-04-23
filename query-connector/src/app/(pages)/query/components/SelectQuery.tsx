@@ -27,8 +27,6 @@ interface SelectQueryProps {
   fhirServer: string;
   setFhirServer: React.Dispatch<React.SetStateAction<string>>;
   setLoading: (isLoading: boolean) => void;
-  showCustomizeQuery: boolean;
-  setShowCustomizeQuery: (showCustomizeQuery: boolean) => void;
   selectedQuery: CustomUserQuery;
   setSelectedQuery: React.Dispatch<React.SetStateAction<CustomUserQuery>>;
 }
@@ -38,13 +36,10 @@ interface SelectQueryProps {
  * @param root0.goBack - Callback to return to previous page
  * @param root0.goForward - Callback to go to the next page
  * @param root0.selectedQuery - query we chose for further customization
- * @param root0.showCustomizeQuery - toggle to navigate to show customize query
  * @param root0.setSelectedQuery - callback function to update the selected query
  * @param root0.patientForQuery - patient to apply a particular query for
  * @param root0.setResultsQueryResponse - Callback function to update selected
  * query
- * @param root0.setShowCustomizeQuery - state function to update location of
- * show customize query
  * @param root0.fhirServer - the FHIR server that we're running the query against
  * @param root0.setFhirServer - callback function to update the FHIR server
  * @param root0.setLoading - callback to set the loading state
@@ -53,12 +48,10 @@ interface SelectQueryProps {
 const SelectQuery: React.FC<SelectQueryProps> = ({
   patientForQuery,
   fhirServer,
-  showCustomizeQuery,
   goForward,
   goBack,
   setResultsQueryResponse,
   setFhirServer,
-  setShowCustomizeQuery,
   selectedQuery,
   setSelectedQuery,
   setLoading,
@@ -118,26 +111,15 @@ const SelectQuery: React.FC<SelectQueryProps> = ({
   return (
     <div>
       {displayLoading && <LoadingView loading={loadingResultResponse} />}
-
-      {showCustomizeQuery ? (
-        <CustomizeQuery
-          selectedQuery={selectedQuery}
-          queryValueSets={queryValueSets}
-          setQueryValuesets={setQueryValueSets}
-          goBack={() => setShowCustomizeQuery(false)}
-        ></CustomizeQuery>
-      ) : (
-        <SelectSavedQuery
-          selectedQuery={selectedQuery}
-          fhirServer={fhirServer}
-          loadingQueryValueSets={loadingQueryValueSets}
-          goBack={goBack}
-          setSelectedQuery={setSelectedQuery}
-          setShowCustomizedQuery={setShowCustomizeQuery}
-          handleSubmit={onSubmit}
-          setFhirServer={setFhirServer}
-        ></SelectSavedQuery>
-      )}
+      <SelectSavedQuery
+        selectedQuery={selectedQuery}
+        fhirServer={fhirServer}
+        loadingQueryValueSets={loadingQueryValueSets}
+        goBack={goBack}
+        setSelectedQuery={setSelectedQuery}
+        handleSubmit={onSubmit}
+        setFhirServer={setFhirServer}
+      ></SelectSavedQuery>
     </div>
   );
 };

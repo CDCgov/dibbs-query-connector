@@ -7,12 +7,12 @@ import { DataContext } from "@/app/shared/DataProvider";
 import SiteAlert from "../../designSystem/SiteAlert";
 import { ToastConfigOptions } from "../../designSystem/toast/Toast";
 import "react-loading-skeleton/dist/skeleton.css";
+import styles from "./page.module.scss";
 
 export type PageProps = {
   children: React.ReactNode;
   showSiteAlert: boolean;
 };
-import styles from "./page.module.scss";
 
 const toastDefault: ToastConfigOptions = {
   position: "bottom-left",
