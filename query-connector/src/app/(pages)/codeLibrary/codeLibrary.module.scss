@@ -1,0 +1,150 @@
+.mainContainer {
+    display: flex;
+    flex-direction: column;
+    flex: auto;
+    margin-bottom: 0 !important;
+    max-width: 70rem !important;
+    font-family: "Public Sans", sans-serif !important;
+}
+
+.header {
+    font-size: inherit;
+
+    &__title {
+        margin: 1.5rem 0 0.5rem 0;
+    }
+
+    &__subtitle {
+        margin-bottom: 10px;
+        font-size: 1rem;
+        line-height: 1.25rem;
+    }
+}
+
+.controls {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.codeLibrary__search {
+    display: flex;
+    width: 25rem;
+    height: 3rem !important;
+    align-items: center;
+    margin-top: 0;
+    background-color: white !important;
+}
+
+.button {
+    padding: 0.75rem 1.25rem 0.75rem 1.25rem;
+    line-height: 1.25rem;
+    flex-grow: 1 auto;
+}
+
+.searchFilter {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.applyFilters {
+    margin-left: 1rem;
+    display: flex;
+    align-items: center;
+    font-weight: 700;
+}
+
+.displayContent {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.itemsPerPageContainer {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    // width: 20%;
+}
+
+.itemsPerPageContainer label {
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.itemsPerPageDropdown {
+    display: flex;
+    width: 5.875rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    border-radius: 0.25rem;
+    margin-bottom: 0.5rem;
+}
+
+.paginationContainer {
+    display: flex;
+    border: 1px solid #dfe1e2;
+    border-radius: 0.5rem;
+    height: 4.5rem;
+    justify-content: space-between;
+    padding: 1rem;
+    align-items: center;
+
+    ul {
+        max-width: 50%;
+    }
+}
+.content__left,
+.content__right {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 8px;
+    border: solid 1px #f0f0f0;
+    padding: 0 1.5rem;
+    font-family: "Public Sans", sans-serif !important;
+}
+
+.content__left {
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+}
+.content__right {
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    padding: 1.5rem 1.5rem 0rem 1.5rem;
+}
+
+.vsHeader {
+    padding: 10px 0;
+    border-bottom: 1px solid #f0f0f0;
+    font-weight: 700;
+    font-size: 14px;
+    color: #5c5c5c;
+}
+
+.vsRow {
+    border-bottom: 1px solid #f0f0f0;
+    width: 512;
+    height: 82;
+    gap: 16px;
+    padding-top: 19px;
+    padding-bottom: 19px;
+}
+
+.lockedForEdits {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-evenly;
+    font-style: italic;
+    margin-bottom: 1.5rem;
+}
+
+.lockedForEdits > svg.usa-icon {
+    height: 1.25rem;
+    color: #919191 !important;
+}

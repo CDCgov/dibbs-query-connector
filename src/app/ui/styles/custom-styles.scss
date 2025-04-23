@@ -417,6 +417,10 @@ ul.usa-sidenav > li.usa-sidenav__item > ul.usa-sidenav__sublist > li.usa-sidenav
   text-decoration: none;
 }
 
+.usa-pagination__overflow {
+  align-self: center;
+}
+
 .Toastify__toast-container {
   width: calc($query-connector-wide-max-width * 0.4) !important;
 
@@ -517,6 +521,29 @@ ul.usa-sidenav > li.usa-sidenav__item > ul.usa-sidenav__sublist > li.usa-sidenav
 .custom-alert {
   margin-top: 0;
   height: $site-alert-height;
+}
+
+.info-alert {
+  width: fit-content;
+  border-left: 0;
+  margin-top: 1rem;
+  margin-bottom: 1.5rem;
+  background-color: #fff5c2;
+}
+
+.info-alert > .usa-alert__body {
+  background-color: #fff5c2;
+  width: fit-content;
+  line-height: 1.5rem;
+
+  p.usa-alert__text {
+    margin-left: 2rem;
+  }
+
+  &::before {
+    background-color: #947100;
+    mask-size: 1.5rem;
+  }
 }
 
 .usa-alert__text {
@@ -646,4 +673,13 @@ ul.usa-sidenav > li.usa-sidenav__item > ul.usa-sidenav__sublist > li.usa-sidenav
 
 .searchHighlight {
   background-color: $yellow-vivid-20v;
+}
+
+.qc-filter {
+  margin-right: 0.5rem !important;
+}
+
+.qc-lock {
+  height: 1.25rem;
+  color: #919191;
 }
