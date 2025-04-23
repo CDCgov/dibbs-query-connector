@@ -1,6 +1,5 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import CustomizeQuery from "./CustomizeQuery";
 import SelectSavedQuery from "./selectQuery/SelectSavedQuery";
 
 import {

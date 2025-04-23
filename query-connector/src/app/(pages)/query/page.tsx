@@ -1,9 +1,6 @@
 "use client";
 import React, { useContext, useEffect, useState } from "react";
-import {
-  PatientDiscoveryResponse,
-  PatientRecordsResponse,
-} from "../../backend/query-execution";
+
 import ResultsView from "./components/ResultsView";
 import PatientSearchResults from "./components/PatientSearchResults";
 import SearchForm from "./components/searchForm/SearchForm";
@@ -17,11 +14,15 @@ import { Patient } from "fhir/r4";
 import { getFhirServerNames } from "@/app/backend/dbServices/fhir-servers";
 import { CustomUserQuery } from "@/app/models/entities/query";
 import WithAuth from "@/app/ui/components/withAuth/WithAuth";
+import {
+  PatientDiscoveryResponse,
+  PatientRecordsResponse,
+} from "@/app/shared/query-service";
 
 const blankUserQuery = {
-  queryId: "",
-  queryName: "",
-  conditionsList: [],
+  query_id: "",
+  query_name: "",
+  conditions_list: [],
   valuesets: [],
 };
 /**
