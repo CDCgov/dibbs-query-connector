@@ -79,11 +79,11 @@ const UserPermissionsTable: React.FC<PermissionsProps> = ({
     return (
       <td className={styles.roleDropdown} width={250}>
         {isSelf(user) ? (
-          user.qc_role
+          user.qcRole
         ) : (
           <RoleDropdown
             id={user.id}
-            defaultValue={user.qc_role}
+            defaultValue={user.qcRole}
             OnChange={(role: UserRole) => {
               handleUserRoleChange(user.id, role);
             }}
@@ -161,8 +161,8 @@ const UserPermissionsTable: React.FC<PermissionsProps> = ({
   const renderUserRows = (users: User[] | null): React.ReactNode => {
     return users?.map((user: User) => {
       const display =
-        user.first_name && user.last_name
-          ? `${user.last_name}, ${user.first_name} ${
+        user.firstName && user.lastName
+          ? `${user.lastName}, ${user.firstName} ${
               isSelf(user) ? "(self)" : ""
             }`
           : `${user.username}`;

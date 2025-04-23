@@ -8,9 +8,9 @@ export enum UserRole {
 export interface User {
   id: string;
   username: string;
-  first_name: string;
-  last_name: string;
-  qc_role: UserRole;
+  firstName: string;
+  lastName: string;
+  qcRole: UserRole;
   userGroupMemberships?: UserGroupMembership[];
 }
 
@@ -28,6 +28,10 @@ export interface UserGroupMembership {
   usergroup_name: string;
   usergroup_id: string;
   is_member: boolean;
+  membershipId?: string;
+  usergroupName?: string;
+  usergroupId?: string;
+  isMember?: boolean;
 }
 
 export interface Query {

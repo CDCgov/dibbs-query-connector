@@ -8,7 +8,6 @@ import { Button } from "@trussworks/react-uswds";
 import UserPermissionsTable from "../userPermissionsTable/userPermissionsTable";
 import { QCResponse } from "@/app/models/responses/collections";
 import { User, UserGroup, UserRole } from "../../../../models/entities/users";
-import { getAllUsers } from "@/app/backend/user-management";
 import { getCustomQueries } from "@/app/backend/query-building";
 import {
   getAllGroupMembers,
@@ -22,6 +21,7 @@ import classNames from "classnames";
 import type { ModalRef } from "../../../../ui/designSystem/modal/Modal";
 import UserModal from "../userModal/userModal";
 import { CustomUserQuery } from "@/app/models/entities/query";
+import { getAllUsers } from "@/app/backend/user-management";
 
 export type UsersTableProps = {
   role: string;
