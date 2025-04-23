@@ -149,8 +149,6 @@ class UserManagementService {
           updated_role,
         ]);
 
-        console.log(result);
-
         console.log("User updated:", result.rows[0].id);
         return result.rows[0];
       } else {

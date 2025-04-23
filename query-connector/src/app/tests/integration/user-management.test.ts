@@ -138,7 +138,6 @@ describe("User Management Integration Tests", () => {
    */
   test("should retrieve user role by username", async () => {
     const result = await getUserRole(TEST_USER_SUPER.username);
-    console.log(result);
     expect(result).toBe(UserRole.SUPER_ADMIN);
   });
 
