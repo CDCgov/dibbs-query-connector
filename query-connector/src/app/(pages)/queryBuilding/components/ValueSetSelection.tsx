@@ -3,7 +3,7 @@
 import styles from "../buildFromTemplates/conditionTemplateSelection.module.scss";
 import { useEffect, useState } from "react";
 import classNames from "classnames";
-import { Icon } from "@trussworks/react-uswds";
+import { Button, Icon } from "@trussworks/react-uswds";
 import {
   CategoryToConditionArrayMap,
   ConditionsMap,
@@ -64,7 +64,7 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
 
   useEffect(() => {
     // display the first condition's valuesets on render
-    setActiveCondition(Object.keys(constructedQuery)[0]);
+    setActiveCondition(Object.keys(constructedQuery)[0] || "custom");
   }, [constructedQuery]);
 
   function generateConditionDrawerDisplay(
@@ -154,94 +154,144 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
     >
       <div className={styles.valueSetTemplateContainer__inner}>
         <div className={styles.valueSetTemplate__left}>
-          <div className={styles.conditionList}>
-            <div className={styles.controls}>
-              <div className={styles.conditionsTitle}>
-                {"Conditions".toLocaleUpperCase()}
-              </div>
-              <div
-                className={styles.addCondition}
-                role="button"
-                data-testid={"add-condition-icon"}
-                onClick={() => setIsDrawerOpen(true)}
-                tabIndex={0}
-              >
-                <Icon.Add
-                  aria-label="Plus sign icon indicating addition"
-                  className="usa-icon"
-                  size={3}
-                  color="#005EA2"
-                />
-                <span data-testid="add-left-rail">ADD</span>
-              </div>
-            </div>
+          <div className={styles.sideBarMenu}>
+            <div className={styles.sideBarMenu__content}>
+              <div className={styles.section_templates}>
+                <div className={styles.sectionTitle}>
+                  <div>{"Templates".toLocaleUpperCase()}</div>
+                  <div
+                    className={styles.addCondition}
+                    role="button"
+                    data-testid={"add-condition-icon"}
+                    onClick={() => setIsDrawerOpen(true)}
+                    tabIndex={0}
+                  >
+                    <Icon.Add
+                      aria-label="Plus sign icon indicating addition"
+                      className="usa-icon"
+                      size={3}
+                      color="#005EA2"
+                    />
+                    <span data-testid="add-left-rail">ADD</span>
+                  </div>
+                </div>
 
-            {Object.keys(constructedQuery).map((conditionId) => {
-              const condition = conditionsMap[conditionId];
-              return (
+                {Object.keys(constructedQuery).map((conditionId) => {
+                  const condition = conditionsMap[conditionId];
+                  return (
+                    <div
+                      key={conditionId}
+                      data-testid={
+                        activeCondition == conditionId
+                          ? `${conditionId}-card-active`
+                          : `${conditionId}-card`
+                      }
+                      className={classNames(
+                        "align-items-center",
+                        activeCondition == conditionId
+                          ? `${styles.card} ${styles.active}`
+                          : styles.card,
+                      )}
+                    >
+                      <div
+                        key={`tab-${conditionId}`}
+                        id={`tab-${conditionId}`}
+                        onClick={() => handleConditionToggle(conditionId)}
+                        tabIndex={0}
+                      >
+                        {formatDiseaseDisplay(condition.name)}
+                      </div>
+                      <Icon.Delete
+                        className={classNames("usa-icon", styles.deleteIcon)}
+                        size={5}
+                        color="red"
+                        data-testid={`delete-condition-${conditionId}`}
+                        aria-label="Trash icon indicating deletion of disease"
+                        onClick={() => {
+                          handleUpdateCondition(conditionId, true);
+                          handleConditionToggle(
+                            Object.keys(constructedQuery)[0],
+                          );
+                        }}
+                      ></Icon.Delete>
+                    </div>
+                  );
+                })}
+              </div>
+              <div className={styles.section_custom}>
+                <div className={classNames(styles.sectionTitle)}>
+                  {"Custom".toLocaleUpperCase()}
+                </div>
                 <div
-                  key={conditionId}
-                  data-testid={
-                    activeCondition == conditionId
-                      ? `${conditionId}-conditionCard-active`
-                      : `${conditionId}-conditionCard`
-                  }
                   className={classNames(
                     "align-items-center",
-                    activeCondition == conditionId
-                      ? `${styles.conditionCard} ${styles.active}`
-                      : styles.conditionCard,
+                    activeCondition == "custom"
+                      ? `${styles.card} ${styles.active}`
+                      : styles.card,
                   )}
                 >
                   <div
-                    key={`tab-${conditionId}`}
-                    id={`tab-${conditionId}`}
-                    onClick={() => handleConditionToggle(conditionId)}
+                    id={`tab-custom`}
+                    onClick={() => setActiveCondition("custom")}
                     tabIndex={0}
+                    role="button"
                   >
-                    {formatDiseaseDisplay(condition.name)}
+                    Additional codes from library
                   </div>
-                  <Icon.Delete
-                    className={classNames("usa-icon", styles.deleteIcon)}
-                    size={5}
-                    color="red"
-                    data-testid={`delete-condition-${conditionId}`}
-                    aria-label="Trash icon indicating deletion of disease"
-                    onClick={() => {
-                      handleUpdateCondition(conditionId, true);
-                      handleConditionToggle(Object.keys(constructedQuery)[0]);
-                    }}
-                  ></Icon.Delete>
-                </div>
-              );
-            })}
+                </div>{" "}
+              </div>
+            </div>
           </div>
         </div>
         <div className={styles.valueSetTemplate__right}>
-          <div className={styles.valueSetTemplate__search}>
-            <SearchField
-              id="valueSetTemplateSearch"
-              placeholder={VALUESET_SELECTION_SEARCH_PLACEHOLDER}
-              className={styles.valueSetSearch}
-              onChange={(e) => {
-                e.preventDefault();
-                setValueSetSearchFilter(e.target.value);
-              }}
-              value={valueSetSearchFilter}
-            />
-          </div>
-          <div>
-            {activeConditionValueSets && (
-              <ConceptTypeSelectionTable
-                vsTypeLevelOptions={activeConditionValueSets}
-                handleVsTypeLevelUpdate={handleSelectedValueSetUpdate(
-                  activeCondition,
-                )}
-                searchFilter={valueSetSearchFilter}
-                setSearchFilter={setValueSetSearchFilter}
+          {activeCondition !== "custom" && (
+            <div className={styles.valueSetTemplate__search}>
+              <SearchField
+                id="valueSetTemplateSearch"
+                placeholder={VALUESET_SELECTION_SEARCH_PLACEHOLDER}
+                className={styles.valueSetSearch}
+                onChange={(e) => {
+                  e.preventDefault();
+                  setValueSetSearchFilter(e.target.value);
+                }}
+                value={valueSetSearchFilter}
               />
-            )}
-          </div>
+            </div>
+          )}
+
+          {activeConditionValueSets && activeCondition !== "custom" && (
+            <ConceptTypeSelectionTable
+              vsTypeLevelOptions={activeConditionValueSets}
+              handleVsTypeLevelUpdate={handleSelectedValueSetUpdate(
+                activeCondition,
+              )}
+              searchFilter={valueSetSearchFilter}
+              setSearchFilter={setValueSetSearchFilter}
+            />
+          )}
+          {activeCondition == "custom" && (
+            <div className={styles.codeLibrary__empty}>
+              <Icon.GridView
+                aria-label="Stylized icon showing four squares in a grid"
+                className={classNames("usa-icon", styles.icon)}
+                color="#919191"
+              />
+              <p className={styles.codeLibrary__emptyText}>
+                <strong>
+                  This is a space for you to pull in individual value sets
+                </strong>
+              </p>
+              <p className={styles.codeLibrary__emptyText}>
+                <strong>
+                  These can be official value sets from CSTE, or ones that you
+                  have created in the code library.
+                </strong>
+              </p>
+              <Button className={styles.codeLibrary__button} type="button">
+                Add from code library
+              </Button>
+            </div>
+          )}
         </div>
       </div>
 

@@ -128,13 +128,11 @@ test.describe("editing an exisiting query", () => {
 
     // confirm query shows correct condition/s
     expect(
-      page.getByTestId(`${ADDED_CONDITION.condition_id}-conditionCard`),
+      page.getByTestId(`${ADDED_CONDITION.condition_id}-card`),
     ).toBeEnabled();
 
     // remove added condition
-    await page
-      .getByTestId(`${ADDED_CONDITION.condition_id}-conditionCard`)
-      .hover();
+    await page.getByTestId(`${ADDED_CONDITION.condition_id}-card`).hover();
 
     await page
       .getByTestId(`delete-condition-${ADDED_CONDITION.condition_id}`)

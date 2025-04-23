@@ -9,6 +9,7 @@ import SearchField from "@/app/ui/designSystem/searchField/SearchField";
 import { FormError } from "../buildFromTemplates/BuildFromTemplates";
 import { CONDITION_DRAWER_SEARCH_PLACEHOLDER } from "./utils";
 import { formatDiseaseDisplay } from "../utils";
+import Link from "next/link";
 
 type ConditionSelectionProps = {
   categoryToConditionsMap: CategoryToConditionArrayMap;
@@ -56,15 +57,21 @@ export const ConditionSelection: React.FC<ConditionSelectionProps> = ({
     <div
       className={classNames(
         "bg-gray-5 margin-top-4 ",
-        styles.conditionTemplateContainer,
+        styles.templateContainer,
       )}
     >
-      <div className="display-flex flex-justify flex-align-end margin-bottom-3 width-full">
-        <h2 className="margin-y-0-important">Select condition template(s)</h2>
+      <div className="display-flex flex-column flex-align-center margin-bottom-3 width-full">
+        <h2 className="margin-y-0-important">Start from template(s)</h2>
+        <p>
+          Don't see what you're looking for? You can also{" "}
+          <Link href={""} title={""} className="text-bold text-no-underline">
+            start from scratch.
+          </Link>
+        </p>
       </div>
       <div className={classNames(styles.conditionSelectionForm, "radius-lg")}>
         <SearchField
-          id="conditionTemplateSearch"
+          id="templateSearch"
           placeholder={CONDITION_DRAWER_SEARCH_PLACEHOLDER}
           className={classNames(
             "maxw-mobile margin-x-auto margin-top-0 margin-bottom-2",
@@ -113,7 +120,9 @@ export const ConditionSelection: React.FC<ConditionSelectionProps> = ({
                             onClick={() =>
                               handleConditionUpdate(condition.id, true)
                             }
-                            aria-label={`Remove ${formatDiseaseDisplay(condition.name)}`}
+                            aria-label={`Remove ${formatDiseaseDisplay(
+                              condition.name,
+                            )}`}
                           >
                             ×
                           </button>

@@ -6,7 +6,7 @@ import { TEST_URL } from "../playwright-setup";
 // consts
 const QUERY_LIBRARY = "Query Library";
 const CUSTOM_QUERY = "Custom Query";
-const SELECT_TEMPLATES = "Select condition template(s)";
+const SELECT_TEMPLATES = "Start from template(s)";
 const BACKLINK_MY_QUERIES = "Back to My queries";
 const BACKLINK_CONDITIONS = "Back to condition selection";
 

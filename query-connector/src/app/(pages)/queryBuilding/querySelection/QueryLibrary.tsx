@@ -93,7 +93,7 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
           setSelectedQuery,
         )}
       <div className="display-flex flex-justify-between flex-align-center width-full margin-bottom-4">
-        <h1 className="flex-align-center">Query Library</h1>
+        <h1 className="flex-align-center margin-0">Query Library</h1>
         <div className="margin-left-auto">
           <Button
             onClick={() => setBuildStep("condition")}

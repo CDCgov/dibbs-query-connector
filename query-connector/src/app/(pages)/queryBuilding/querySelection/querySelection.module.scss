@@ -52,6 +52,9 @@ $conditionColumnSpacing: 2fr 3fr 3fr;
 .createQueryButton {
   width: fit-content;
   padding: 1rem !important;
+  margin: 0;
+  font-size: 1.25rem;
+  line-height: 1.5rem;
 }
 
 .customQueryTable {

@@ -7,11 +7,12 @@
   flex-direction: column;
   flex: auto;
   margin-bottom: 0 !important;
+  max-width: 70rem !important;
 }
 
 // Condition styles
 
-.conditionTemplateContainer {
+.templateContainer {
   padding: 3.5rem 5rem;
   border-radius: 4px;
   min-height: 30rem;
@@ -32,7 +33,7 @@
   min-width: 53rem;
 }
 
-#conditionTemplateSearch:first-child {
+#templateSearch:first-child {
   flex: 1;
 }
 
@@ -60,7 +61,7 @@
 }
 
 .bluePill {
-  background-color:#E8F5FF;
+  background-color: #e8f5ff;
   font-size: 0.875rem;
   border-radius: 0.25rem;
 }
@@ -80,6 +81,25 @@
   justify-content: space-between;
 }
 
+.customQuery__name {
+  .inputLabel {
+    line-height: 1.375rem !important;
+    margin-top: 0 !important;
+  }
+
+  .input {
+    width: 20.75rem;
+    height: 2.875rem;
+  }
+}
+
+.queryBuildingButton {
+  line-height: 28px;
+  height: 3.75rem;
+  font-size: 1.25rem;
+  padding: 1rem 1.5rem;
+}
+
 .valueSetSearch {
   width: 25rem !important;
   padding: 0.75rem 0.75rem 0.75rem 2.25rem !important;
@@ -91,16 +111,44 @@
   display: flex;
   flex-direction: row;
   width: 18rem;
+  min-width: 25%;
   justify-content: space-between;
-  padding: 0.5rem !important;
+  padding: 1rem 0 0 0.5rem !important;
 }
 
 .valueSetTemplate__right {
   background-color: #fff;
-  width: 88%;
+  width: 50rem;
+  min-width: 70%;
   border-radius: 8px;
   margin-left: 0.5rem;
   min-height: 50rem;
+
+  .codeLibrary__empty {
+    display: flex;
+    flex-direction: column;
+    padding: 2.5rem;
+    gap: 1.5rem;
+  }
+
+  .icon {
+    height: 10rem;
+    width: 10rem;
+  }
+
+  .codeLibrary__emptyText {
+    font-weight: 700;
+    font-size: 1.25rem;
+    line-height: 1.2;
+    margin: 0;
+  }
+
+  .codeLibrary__button {
+    width: 16.75rem;
+    padding: 1rem 1.5rem;
+    font-size: 1.25rem;
+    line-height: 26px;
+  }
 }
 
 .valueSetTemplate__search {
@@ -177,21 +225,31 @@
   padding: 1rem 1.5rem;
 }
 
-.conditionList {
-  display: flex;
-  flex-direction: column;
-  padding: 0.5rem;
+.sideBarMenu {
   width: 100%;
 
-  .controls {
-    justify-content: space-between;
-    padding: 0.5rem;
+  &__content {
     display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding-top: 0.5rem;
+    gap: 2rem;
 
-    .conditionsTitle {
-      width: 104px;
+    .section_templates,
+    .section_custom {
+      gap: 1rem;
+      display: flex;
+      flex-direction: column;
+    }
+    .sectionTitle {
+      width: 100%;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
       color: #919191;
-      font-size: 19px;
+      font-size: 1rem;
+      line-height: 1.2;
     }
 
     .addCondition {
@@ -215,12 +273,11 @@
     display: none;
   }
 
-  .conditionCard {
+  .card {
     background: transparent;
     border-radius: 4px;
     padding: 1rem;
     line-height: 22px;
-    margin-top: 0.5rem;
     color: #111111;
     cursor: pointer;
     position: relative;
@@ -329,10 +386,14 @@ div.accordionBodyExpanded:last-of-type {
   justify-content: flex-end;
 }
 
+.customQuery__header > h1 {
+  line-height: 2.5rem !important;
+}
+
 .customQuery__controls {
   display: flex;
   flex-direction: row;
-  align-items: flex-end;
+  align-items: center;
   justify-content: space-between;
 }
 
