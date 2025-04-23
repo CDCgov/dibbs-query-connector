@@ -3,7 +3,7 @@ import { superAdminRequired, transaction } from "./decorators";
 import { FhirServerConfig } from "@/app/models/entities/fhir-servers";
 import { auditable } from "@/app/backend/auditLogs/decorator";
 import dbService from "./db-service";
-import FHIRClient from "@/app/shared/fhirClient";
+import FHIRClient from "@/app/backend/queryExecution/fhirClient";
 import { FHIR_SERVER_INSERT_QUERY } from "./util";
 
 // Define an interface for authentication data

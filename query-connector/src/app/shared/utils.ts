@@ -10,10 +10,10 @@ import { DibbsValueSet } from "../models/entities/valuesets";
  * @returns A list of ValueSets, which hold the Concepts pulled from the DB.
  */
 export function unnestValueSetsFromQuery<
-  T extends { query_data: QueryDataColumn },
+  T extends { queryData: QueryDataColumn },
 >(result: T): DibbsValueSet[] {
   // Unest the {condition: valuesetId: valueSet} nesting in an array of valueSets
-  return Object.values(result.query_data)
+  return Object.values(result.queryData)
     .map((valById) => {
       return Object.values(valById);
     })

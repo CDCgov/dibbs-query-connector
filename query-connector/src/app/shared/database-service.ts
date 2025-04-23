@@ -33,6 +33,7 @@ import {
 import { getDbClient } from "../backend/dbClient";
 import { DibbsValueSet } from "../models/entities/valuesets";
 import { Concept } from "../models/entities/concepts";
+import dbService from "../backend/dbServices/db-service";
 
 const getQuerybyNameSQL = `
 select q.query_name, q.id, q.query_data, q.conditions_list, q.immunization
@@ -63,7 +64,7 @@ export const getSavedQueryByName = async (name: string) => {
   const values = [name];
 
   try {
-    const result = await dbClient.query(getQuerybyNameSQL, values);
+    const result = await dbService.query(getQuerybyNameSQL, values);
     if (result.rows.length === 0) {
       console.error("No results found for query named:", name);
       return undefined;

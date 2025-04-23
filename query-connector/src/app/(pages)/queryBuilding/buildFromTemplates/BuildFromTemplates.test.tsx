@@ -246,7 +246,7 @@ describe("tests the build from template page interactions", () => {
 
 describe("tests the valueset selection page interactions", () => {
   const GONORREHEA_VALUESET_MAP = Object.values(
-    gonorreheaSavedQuery.query_data,
+    gonorreheaSavedQuery.queryData,
   )[0];
   const GONORREHEA_VALUESET_IDS = Object.keys(GONORREHEA_VALUESET_MAP);
 

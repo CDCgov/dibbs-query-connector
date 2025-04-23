@@ -5,7 +5,7 @@ import SelectSavedQuery from "./selectQuery/SelectSavedQuery";
 import {
   PatientDiscoveryResponse,
   PatientRecordsResponse,
-} from "@/app/shared/query-service";
+} from "@/app/backend/query-execution";
 import { Patient } from "fhir/r4";
 import {
   fetchQueryResponse,
@@ -71,8 +71,8 @@ const SelectQuery: React.FC<SelectQueryProps> = ({
 
     const fetchDataAndUpdateState = async () => {
       setLoadingQueryValueSets(true);
-      if (selectedQuery && selectedQuery.query_name) {
-        const queryName = selectedQuery.query_name;
+      if (selectedQuery && selectedQuery.queryName) {
+        const queryName = selectedQuery.queryName;
         const valueSets = await fetchQueryValueSets(queryName);
         // Only update if the fetch hasn't altered state yet
         if (isSubscribed) {
@@ -94,9 +94,9 @@ const SelectQuery: React.FC<SelectQueryProps> = ({
     goForward();
     setLoading(true);
     await fetchQueryResponse({
-      queryName: selectedQuery.query_name,
+      queryName: selectedQuery.queryName,
       patientForQuery: patientForQuery,
-      selectedQuery: selectedQuery.query_name,
+      selectedQuery: selectedQuery.queryName,
       fhirServer: fhirServer,
       valueSetOverrides: queryValueSets,
       queryResponseStateCallback: setResultsQueryResponse,
