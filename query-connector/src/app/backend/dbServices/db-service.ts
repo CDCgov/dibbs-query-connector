@@ -2,13 +2,13 @@ import { Pool } from "pg";
 import { getDbClient } from "../dbClient";
 import { camelCaseDbColumnNames } from "./decorators";
 
-class dbService {
-  private static dbClient: Pool = getDbClient();
+export class DbService {
+  private dbClient: Pool = getDbClient();
 
   @camelCaseDbColumnNames
-  static async query(querySql: string, values?: unknown[]) {
-    return await dbService.dbClient.query(querySql, values);
+  async query(querySql: string, values?: unknown[]) {
+    return await this.dbClient.query(querySql, values);
   }
 }
-
+const dbService = new DbService();
 export default dbService;

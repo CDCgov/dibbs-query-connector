@@ -3,6 +3,8 @@ import {
   updateUserRole,
   getAllUsers,
   getUserRole,
+  getUserByUsername,
+  updateUserDetails,
 } from "@/app/backend/user-management";
 
 import {
@@ -27,34 +29,38 @@ jest.mock("@/app/utils/auth", () => {
 
 const TEST_USER_STANDARD = {
   id: "13e1efb2-5889-4157-8f34-78d7f02dbf84",
-  username: "Ima User",
-  email: "ima.user@example.com",
-  firstName: "Ima",
-  lastName: "User",
+  username: "yoshi",
+  email: "green.yoshi@yoshiisland.com",
+  firstName: "Green",
+  lastName: "Yoshi",
+  qcRole: "Standard",
 };
 
 const TEST_USER_SUPER = {
-  username: "super-admin",
-  email: "super-admin@example.com",
-  firstName: "Super",
-  lastName: "Admin",
+  id: "7dd8b2a7-658c-4152-afcd-8b514fb5343b",
+  username: "luigi",
+  email: "luigi.mario@mushroomkingdom.com",
+  firstName: "Lugi",
+  lastName: "Mario",
   qcRole: "Super Admin",
 };
-suppressConsoleLogs();
 
 describe("User Management Integration Tests", () => {
   let createdUserId: string;
 
   beforeAll(async () => {
+    suppressConsoleLogs();
+
     await dbClient.query("BEGIN");
 
     // Insert first user as super admin
     const insertSuperUsersQuery = `
-     INSERT INTO users (username, first_name, last_name, qc_role)
+     INSERT INTO users (id, username, first_name, last_name, qc_role)
      VALUES 
-       ($1, $2, $3, $4);
+       ($1, $2, $3, $4, $5);
    `;
     await dbClient.query(insertSuperUsersQuery, [
+      TEST_USER_SUPER.id,
       TEST_USER_SUPER.username,
       TEST_USER_SUPER.firstName,
       TEST_USER_SUPER.lastName,
@@ -81,8 +87,20 @@ describe("User Management Integration Tests", () => {
 
     expect(result).toHaveProperty("id");
     expect(result).toHaveProperty("username", TEST_USER_STANDARD.username);
-    expect(result).toHaveProperty("qc_role", UserRole.STANDARD);
+    expect(result).toHaveProperty("qcRole", UserRole.STANDARD);
     createdUserId = result.id;
+  });
+  /**
+   * Tests getting a user by username.
+   */
+  test("get user by username", async () => {
+    await addUserIfNotExists(TEST_USER_STANDARD);
+    const result = await getUserByUsername(TEST_USER_STANDARD.username);
+
+    const user = result.items[0];
+    expect(user).toHaveProperty("id");
+    expect(user).toHaveProperty("username", TEST_USER_STANDARD.username);
+    expect(user).toHaveProperty("qcRole", UserRole.STANDARD);
   });
 
   /**
@@ -91,14 +109,35 @@ describe("User Management Integration Tests", () => {
   test("should update a user's role", async () => {
     const result = await updateUserRole(createdUserId, UserRole.SUPER_ADMIN);
     expect(result.items).not.toBeNull();
-    expect(result.items![0]).toHaveProperty("qc_role", UserRole.SUPER_ADMIN);
+    expect(result.items![0]).toHaveProperty("qcRole", UserRole.SUPER_ADMIN);
+  });
+  /**
+   * Tests updating the details of an existing user.
+   */
+  test("should update a user's details", async () => {
+    const initial = await getUserByUsername(TEST_USER_SUPER.username);
+    expect(initial.items[0]).toHaveProperty(
+      "lastName",
+      TEST_USER_SUPER.lastName,
+    );
+
+    const result = await updateUserDetails(
+      TEST_USER_SUPER.id,
+      TEST_USER_SUPER.username,
+      TEST_USER_SUPER.firstName,
+      "Its A Me",
+      UserRole.SUPER_ADMIN,
+    );
+
+    expect(result).toHaveProperty("username", TEST_USER_SUPER.username);
+    expect(result).toHaveProperty("lastName", "Its A Me");
   });
 
   /**
    * Tests retrieving a user's role by username.
    */
   test("should retrieve user role by username", async () => {
-    const result = await getUserRole(TEST_USER_STANDARD.username);
+    const result = await getUserRole(TEST_USER_SUPER.username);
     expect(result).toBe(UserRole.SUPER_ADMIN);
   });
 
