@@ -10,6 +10,7 @@ export enum PAGES {
   FHIR_SERVERS = "/fhirServers",
   USER_MANAGEMENT = "/userManagement",
   AUDIT_LOGS = "/auditLogs",
+  CODE_LIBRARY = "/codeLibrary",
 }
 
 interface Page {
@@ -57,6 +58,13 @@ pagesConfig[PAGES.AUDIT_LOGS] = {
   path: PAGES.AUDIT_LOGS,
   name: "Audit logs",
   roleAccess: [UserRole.SUPER_ADMIN],
+};
+
+pagesConfig[PAGES.CODE_LIBRARY] = {
+  position: 4,
+  path: PAGES.CODE_LIBRARY,
+  name: "Code library",
+  roleAccess: [UserRole.SUPER_ADMIN, UserRole.ADMIN],
 };
 
 /**

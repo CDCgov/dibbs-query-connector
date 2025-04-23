@@ -26,6 +26,7 @@
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
+    margin-bottom: 1.5rem;
 }
 
 .codeLibrary__search {
@@ -60,6 +61,19 @@
     display: flex;
     justify-content: center;
     flex-direction: column;
+    height: 100%;
+    align-items: center;
+}
+
+.valueSetList {
+    height: 40rem;
+    overflow-y: scroll;
+}
+
+.resultsContainer {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
 }
 
 .itemsPerPageContainer {
@@ -92,6 +106,7 @@
     justify-content: space-between;
     padding: 1rem;
     align-items: center;
+    width: 74rem;
 
     ul {
         max-width: 50%;
@@ -111,6 +126,7 @@
 .content__left {
     border-top-left-radius: 5px;
     border-bottom-left-radius: 5px;
+    padding: 0 0 0 1.5rem;
 }
 .content__right {
     border-top-right-radius: 5px;

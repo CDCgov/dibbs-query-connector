@@ -1,5 +1,6 @@
 "use client";
 import {
+  useMemo,
   //  useRef,
   useState,
 } from "react";
@@ -18,7 +19,8 @@ import {
   Select,
 } from "@trussworks/react-uswds";
 import SearchField from "@/app/ui/designSystem/searchField/SearchField";
-import { ValueSet } from "fhir/r4";
+import { getAllValueSets } from "@/app/shared/database-service";
+import { DibbsValueSet } from "@/app/models/entities/valuesets";
 
 /**
  * Component for Query Building Flow
@@ -30,10 +32,11 @@ const QueryBuilding: React.FC = () => {
 
   const [loading, setLoading] = useState<boolean>(false);
   const [mode, setMode] = useState<Mode>("manage");
+  const [search, setSearch] = useState<string>();
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
-  const [valueSets, setValueSets] = useState<ValueSet[]>([]);
-  const [filteredValueSets, setFilteredValueSets] = useState([]);
+  const [valueSets, setValueSets] = useState<DibbsValueSet[]>([]);
+  const [filteredValueSets, setFilteredValueSets] = useState(valueSets);
 
   const ctx = useContext(DataContext);
 
@@ -50,7 +53,41 @@ const QueryBuilding: React.FC = () => {
       stacked: true,
       hideProgressBar: true,
     });
+    fetchValueSets();
   }, []);
+
+  useEffect(() => {
+    // console.log(valueSets);
+    setFilteredValueSets(valueSets);
+  }, [valueSets]);
+
+  useEffect(() => {
+    if (search !== "") {
+      setFilteredValueSets(
+        valueSets.filter((vs) => {
+          const matchesSearch = vs.display
+            .toLocaleLowerCase()
+            .includes(search?.toLocaleLowerCase());
+          return matchesSearch;
+        }),
+      );
+    } else {
+      setFilteredValueSets(valueSets);
+    }
+    setCurrentPage(1);
+  }, [search]);
+
+  const paginatedValueSets = useMemo(() => {
+    return filteredValueSets.slice(
+      (currentPage - 1) * itemsPerPage,
+      currentPage * itemsPerPage,
+    );
+  }, [filteredValueSets, currentPage, itemsPerPage]);
+
+  async function fetchValueSets() {
+    const vs = await getAllValueSets();
+    setValueSets(vs.items);
+  }
 
   function goBack() {
     // resetQueryState();
@@ -90,7 +127,7 @@ const QueryBuilding: React.FC = () => {
               className={styles.codeLibrary__search}
               onChange={(e) => {
                 e.preventDefault();
-                console.log(e.target.value);
+                setSearch(e.target.value);
               }}
             />
             <div className={styles.applyFilters}>
@@ -98,6 +135,7 @@ const QueryBuilding: React.FC = () => {
                 className="usa-icon qc-filter"
                 size={3}
                 aria-label="Icon indicating a menu with filter options"
+                role="icon"
               />
               Filters
             </div>
@@ -107,62 +145,61 @@ const QueryBuilding: React.FC = () => {
           </Button>
         </div>
         <div className={styles.displayContent}>
-          <div className="display-flex margin-top-2">
+          <div className={styles.resultsContainer}>
             <div className={styles.content__left}>
               <div className={styles.vsHeader}>
                 {"Value set".toLocaleUpperCase()}
               </div>
-              <div className={styles.vsRow}>
-                <div
-                  style={{
-                    color: "#111111",
-                  }}
-                >
-                  Chlamydia species (Organism or Substance in Lab Results)
-                </div>
-                <div style={{ color: "#5C5C5C" }}>
-                  Chlamydia trachomatis infection · Labs · SNOMED
-                </div>
-              </div>
-              <div className={styles.vsRow}>
-                {" "}
-                <div
-                  style={{
-                    color: "#111111",
-                  }}
-                >
-                  Chlamydia species (Organism or Substance in Lab Results)
-                </div>
-                <div style={{ color: "#5C5C5C" }}>
-                  Chlamydia trachomatis infection · Labs · SNOMED
-                </div>
-              </div>
-              <div className={styles.vsRow}>
-                {" "}
-                <div
-                  style={{
-                    color: "#111111",
-                  }}
-                >
-                  Chlamydia species (Organism or Substance in Lab Results)
-                </div>
-                <div style={{ color: "#5C5C5C" }}>
-                  Chlamydia trachomatis infection · Labs · SNOMED
-                </div>
-                <div
-                  style={{
-                    fontWeight: 700,
-                    color: "#5C5C5C",
-                    fontStyle: "italic",
-                  }}
-                >
-                  Created by Haley Blake
-                </div>
+              <div className={styles.valueSetList}>
+                {paginatedValueSets.length > 0 ? (
+                  paginatedValueSets.map((vs, index) => {
+                    return (
+                      <div key={index} className={styles.vsRow}>
+                        <div
+                          style={{
+                            color: "#111111",
+                          }}
+                        >
+                          {vs.display}
+                        </div>
+                        <div style={{ color: "#5C5C5C" }}>
+                          {vs.valueset_name} · {vs.dibbs_concept_type} ·{" "}
+                          {vs.author}
+                        </div>
+
+                        {index % 7 ? (
+                          <div
+                            style={{
+                              fontWeight: 700,
+                              color: "#5C5C5C",
+                              fontStyle: "italic",
+                            }}
+                          >
+                            Created by Haley Blake
+                          </div>
+                        ) : (
+                          ""
+                        )}
+                      </div>
+                    );
+                  })
+                ) : (
+                  <div key={1} className={styles.vsRow}>
+                    <div
+                      style={{
+                        color: "#111111",
+                      }}
+                    >
+                      No results found.
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
+
             <div className={styles.content__right}>
               <div className={styles.lockedForEdits}>
-                <Icon.Lock className="qc-lock"></Icon.Lock>
+                <Icon.Lock role="icon" className="qc-lock"></Icon.Lock>
                 This value set comes from the CSTE and cannot be modified.
               </div>
               <div
@@ -172,7 +209,11 @@ const QueryBuilding: React.FC = () => {
                 <div style={{ width: "7.5rem" }}>Code</div>
                 <div>Name</div>
               </div>
-              <div className="display-flex flex-row margin-bottom-2">
+              {/* <div className="display-flex flex-row margin-bottom-2">
+                <div style={{ width: "7.5rem" }}>103514009</div>
+                <div>Chlamydophila pneumoniae (organism)</div>
+              </div>{" "} */}
+              {/* <div className="display-flex flex-row margin-bottom-2">
                 <div style={{ width: "7.5rem" }}>103514009</div>
                 <div>Chlamydophila pneumoniae (organism)</div>
               </div>{" "}
@@ -195,11 +236,7 @@ const QueryBuilding: React.FC = () => {
               <div className="display-flex flex-row margin-bottom-2">
                 <div style={{ width: "7.5rem" }}>103514009</div>
                 <div>Chlamydophila pneumoniae (organism)</div>
-              </div>{" "}
-              <div className="display-flex flex-row margin-bottom-2">
-                <div style={{ width: "7.5rem" }}>103514009</div>
-                <div>Chlamydophila pneumoniae (organism)</div>
-              </div>{" "}
+              </div>{" "} */}
             </div>
           </div>
 
@@ -212,7 +249,7 @@ const QueryBuilding: React.FC = () => {
             <Pagination
               className={styles.pagination}
               pathname="/codeLibrary"
-              totalPages={10}
+              totalPages={Math.ceil(filteredValueSets.length / itemsPerPage)}
               currentPage={currentPage}
               onClickNext={() =>
                 setCurrentPage((prev) => Math.min(prev + 1, totalPages))
