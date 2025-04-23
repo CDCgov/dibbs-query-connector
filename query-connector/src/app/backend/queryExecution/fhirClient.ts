@@ -1,3 +1,5 @@
+"use server";
+
 import https from "https";
 import { FhirServerConfig } from "../../models/entities/fhir-servers";
 import { AuthData } from "../dbServices/fhir-servers";

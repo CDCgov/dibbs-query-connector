@@ -14,7 +14,7 @@ export const DEFAULT_CHLAMYDIA_QUERY = queryTableDefaults.query.find((v) =>
 
 const CHLAMYDIA_CONDITION_ID = 240589008;
 export const EXPECTED_CHLAMYDIA_VALUESET_LENGTH = Object.values(
-  DEFAULT_CHLAMYDIA_QUERY.query_data[CHLAMYDIA_CONDITION_ID],
+  DEFAULT_CHLAMYDIA_QUERY.queryData[CHLAMYDIA_CONDITION_ID],
 ).length;
 
 export const CANCER_DB_QUERY_VALUES = [

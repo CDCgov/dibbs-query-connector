@@ -126,7 +126,7 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
       }
       const initialState: NestedQuery = {};
 
-      Object.entries(savedQuery.query_data).forEach(
+      Object.entries(savedQuery.queryData).forEach(
         ([conditionId, valueSetMap]) => {
           initialState[conditionId] = structuredClone(EMPTY_CONCEPT_TYPE);
 
