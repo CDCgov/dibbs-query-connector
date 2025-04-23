@@ -12,6 +12,7 @@ import { DibbsValueSet } from "../models/entities/valuesets";
 export function unnestValueSetsFromQuery<
   T extends { queryData: QueryDataColumn },
 >(result: T): DibbsValueSet[] {
+  console.log(result);
   // Unest the {condition: valuesetId: valueSet} nesting in an array of valueSets
   return Object.values(result.queryData)
     .map((valById) => {
