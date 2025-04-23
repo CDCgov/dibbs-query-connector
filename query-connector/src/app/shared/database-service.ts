@@ -440,7 +440,6 @@ class DatabaseService {
    * @param vs - a ValueSet in of the shape of our internal data model to insert
    * @returns success / failure information, as well as errors as appropriate
    */
-  @transaction
   @auditable
   static async insertValueSet(
     vs: DibbsValueSet,
