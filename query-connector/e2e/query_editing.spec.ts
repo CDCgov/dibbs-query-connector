@@ -11,7 +11,7 @@ import {
   getSavedQueryByIdHelp,
   saveCustomQueryHelp,
 } from "@/app/backend/dbServices/queryBuilding/lib";
-import { DbService } from "@/app/backend/dbServices/db-service";
+import { getDbClient } from "@/app/backend/dbClient";
 
 test.describe("editing an exisiting query", () => {
   let subjectQuery: QueryTableResult;
@@ -225,7 +225,7 @@ const ADDED_CONDITION = {
   condition_id: "840539006",
 };
 const CANCER_CONDITION_ID = "2";
-const dbClient = new DbService();
+const dbClient = getDbClient();
 
 async function createTestQuery() {
   const queryInputFixture = CANCER_FRONTEND_NESTED_INPUT as NestedQuery;
