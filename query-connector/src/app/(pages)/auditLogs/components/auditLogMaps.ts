@@ -47,7 +47,19 @@ function parseRequest(log: Record<string, unknown>): RequestPayload {
   const dequoted: Record<string, unknown> = {};
   for (const [key, val] of Object.entries(raw ?? {})) {
     if (typeof val === "string") {
-      dequoted[key] = val.replace(/^"(.*)"$/, "$1");
+      const trimmed = val.trim();
+      try {
+        if (
+          (trimmed.startsWith("{") && trimmed.endsWith("}")) ||
+          (trimmed.startsWith("[") && trimmed.endsWith("]"))
+        ) {
+          dequoted[key] = JSON.parse(trimmed);
+        } else {
+          dequoted[key] = val.replace(/^"(.*)"$/, "$1");
+        }
+      } catch {
+        dequoted[key] = val;
+      }
     } else {
       dequoted[key] = val;
     }
@@ -126,7 +138,10 @@ export const auditLogActionTypeMap: Record<string, auditLogActionTypeMapping> =
       label: "Insert database table structure array",
       format: (log) => {
         const request = parseRequest(log);
-        return `Inserted database rows for ${request.undefined ?? ""}`;
+        const table = request.undefined ?? "unknown";
+        const length =
+          Object.values(request).find((v) => Array.isArray(v))?.length ?? 0;
+        return `Inserted ${length} database rows for ${table} table`;
       },
     },
     // Add more as needed
