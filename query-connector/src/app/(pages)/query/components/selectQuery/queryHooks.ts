@@ -59,7 +59,10 @@ export async function fetchQueryResponse(p: {
       fhir_server: p.fhirServer,
     };
     p.setIsLoading(true);
-    const queryResponse = await patientRecordsQuery(newRequest);
+    const queryResponse = await patientRecordsQuery(
+      newRequest,
+      p.valueSetOverrides,
+    );
 
     p.queryResponseStateCallback({
       Patient: [p.patientForQuery],
