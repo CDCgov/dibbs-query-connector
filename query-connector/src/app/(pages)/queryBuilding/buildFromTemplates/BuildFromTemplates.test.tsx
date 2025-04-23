@@ -273,9 +273,7 @@ describe("tests the valueset selection page interactions", () => {
       screen.getByText("Save query");
     });
 
-    await user.click(
-      screen.getByTestId("15628003-conditionCard", { exact: false }),
-    );
+    await user.click(screen.getByTestId("15628003-card", { exact: false }));
     await user.click(
       screen.getByTestId("accordionButton_labs", { exact: false }),
     );
@@ -307,14 +305,10 @@ describe("tests the valueset selection page interactions", () => {
       screen.getByTestId(`condition-drawer-added-${CANCER_ID}`),
     ).toBeInTheDocument();
     // click out of the drawer
-    await user.click(screen.getByTestId(`${CANCER_ID}-conditionCard-active`));
+    await user.click(screen.getByTestId(`${CANCER_ID}-card-active`));
 
-    expect(
-      screen.getByTestId(`${CANCER_ID}-conditionCard-active`),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByTestId(`${GONORREHEA_ID}-conditionCard`),
-    ).toBeInTheDocument();
+    expect(screen.getByTestId(`${CANCER_ID}-card-active`)).toBeInTheDocument();
+    expect(screen.getByTestId(`${GONORREHEA_ID}-card`)).toBeInTheDocument();
   });
 
   it("filters search on the valueset selection drawer appropriately", async () => {

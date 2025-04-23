@@ -142,13 +142,15 @@ const UserManagementDrawer: React.FC<UserManagementDrawerProps> = ({
         >
           {users.map((user) => {
             const display =
-              user.first_name && user.last_name
-                ? `${user.first_name} ${user.last_name}`
+              user.firstName && user.lastName
+                ? `${user.firstName} ${user.lastName}`
                 : `${user.username}`;
 
             const isMemberOfCurrentGroup = user.userGroupMemberships?.filter(
               (membership) =>
-                membership?.usergroup_id == teamQueryEditSection?.groupId,
+                // TODO: remove the snake cased check here once the group PR is in
+                membership?.usergroup_id == teamQueryEditSection?.groupId ||
+                membership?.usergroupId == teamQueryEditSection?.groupId,
             )[0];
 
             return (
@@ -165,7 +167,7 @@ const UserManagementDrawer: React.FC<UserManagementDrawerProps> = ({
                 ) : (
                   !!isMemberOfCurrentGroup && (
                     <div key={user.id} className={"padding-bottom-2"}>
-                      {`${user.first_name} ${user.last_name}`}
+                      {`${user.firstName} ${user.lastName}`}
                     </div>
                   )
                 )}

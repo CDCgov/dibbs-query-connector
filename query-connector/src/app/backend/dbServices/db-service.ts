@@ -2,7 +2,7 @@ import { Pool } from "pg";
 import { getDbClient } from "../dbClient";
 import { camelCaseDbColumnNames } from "./decorators";
 
-class DbService {
+export class DbService {
   private dbClient: Pool = getDbClient();
 
   @camelCaseDbColumnNames

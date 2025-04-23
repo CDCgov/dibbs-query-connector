@@ -9,17 +9,17 @@ import { CustomUserQuery } from "@/app/models/entities/query";
 export const mockSuperAdmin = {
   id: "123",
   username: "harrypotter",
-  first_name: "Harry",
-  last_name: "Potter",
-  qc_role: UserRole.SUPER_ADMIN,
+  firstName: "Harry",
+  lastName: "Potter",
+  qcRole: UserRole.SUPER_ADMIN,
 };
 
 export const mockAdmin = {
   id: "456",
   username: "lilypotter",
-  first_name: "Lily",
-  last_name: "Potter",
-  qc_role: UserRole.ADMIN,
+  firstName: "Lily",
+  lastName: "Potter",
+  qcRole: UserRole.ADMIN,
   userGroupMemberships: [
     {
       membership_id: "456_876",
@@ -33,9 +33,9 @@ export const mockAdmin = {
 export const mockStandard = {
   id: "789",
   username: "hermionegranger",
-  first_name: "Hermione",
-  last_name: "Granger",
-  qc_role: UserRole.ADMIN,
+  firstName: "Hermione",
+  lastName: "Granger",
+  qcRole: UserRole.ADMIN,
   userroupMemberships: [
     {
       membership_id: "789_012",

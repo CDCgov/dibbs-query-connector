@@ -6,12 +6,12 @@ import {
   QueryTableResult,
 } from "@/app/(pages)/queryBuilding/utils";
 import { CANCER_FRONTEND_NESTED_INPUT } from "./constants";
-import { getDbClient } from "@/app/backend/dbClient";
 import {
   deleteQueryByIdHelp,
   getSavedQueryByIdHelp,
   saveCustomQueryHelp,
 } from "@/app/backend/dbServices/queryBuilding/lib";
+import { getDbClient } from "@/app/backend/dbClient";
 
 test.describe("editing an exisiting query", () => {
   let subjectQuery: QueryTableResult;
@@ -128,13 +128,11 @@ test.describe("editing an exisiting query", () => {
 
     // confirm query shows correct condition/s
     expect(
-      page.getByTestId(`${ADDED_CONDITION.condition_id}-conditionCard`),
+      page.getByTestId(`${ADDED_CONDITION.condition_id}-card`),
     ).toBeEnabled();
 
     // remove added condition
-    await page
-      .getByTestId(`${ADDED_CONDITION.condition_id}-conditionCard`)
-      .hover();
+    await page.getByTestId(`${ADDED_CONDITION.condition_id}-card`).hover();
 
     await page
       .getByTestId(`delete-condition-${ADDED_CONDITION.condition_id}`)

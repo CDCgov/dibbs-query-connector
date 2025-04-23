@@ -69,9 +69,9 @@ const UserModal: React.FC<UserModalProps> = ({
   const emptyUser = {
     id: "",
     username: "",
-    first_name: "",
-    last_name: "",
-    qc_role: UserRole.STANDARD,
+    firstName: "",
+    lastName: "",
+    qcRole: UserRole.STANDARD,
     userGroupMemberships: [],
   };
   const emptyGroup = {
@@ -158,8 +158,8 @@ const UserModal: React.FC<UserModalProps> = ({
 
   const updateUserFields = () => {
     const updatedValues = Object.entries(newUser).map(([key, val]) => {
-      if (key == "qc_role") {
-        val = existingUser?.qc_role;
+      if (key == "qcRole") {
+        val = existingUser?.qcRole;
       }
       if (val === "") {
         val = existingUser?.[key as keyof typeof newUser];
@@ -181,9 +181,9 @@ const UserModal: React.FC<UserModalProps> = ({
         id: newUser.id || "",
         email: "",
         username: newUser.username,
-        firstName: newUser.first_name,
-        lastName: newUser.last_name,
-        role: newUser.qc_role,
+        firstName: newUser.firstName,
+        lastName: newUser.lastName,
+        role: newUser.qcRole,
       };
 
       const hasError = Object.entries(userToAdd).some(
@@ -231,10 +231,10 @@ const UserModal: React.FC<UserModalProps> = ({
     if (modalMode == "edit-user") {
       const userToUpdate = updateUserFields();
       if (
-        (userToUpdate.first_name === "" ||
-          userToUpdate.first_name === existingUser.first_name) &&
-        (userToUpdate.last_name === "" ||
-          userToUpdate.last_name === existingUser.last_name)
+        (userToUpdate.firstName === "" ||
+          userToUpdate.firstName === existingUser.firstName) &&
+        (userToUpdate.lastName === "" ||
+          userToUpdate.lastName === existingUser.lastName)
       ) {
         // we haven't changed anything; don't update the db
         return setModalMode("closed");
@@ -243,9 +243,9 @@ const UserModal: React.FC<UserModalProps> = ({
       const updatedUser = await updateUserDetails(
         userToUpdate.id,
         userToUpdate.username,
-        userToUpdate.first_name,
-        userToUpdate.last_name,
-        userToUpdate.qc_role,
+        userToUpdate.firstName,
+        userToUpdate.lastName,
+        userToUpdate.qcRole,
       );
 
       if (updatedUser) {
@@ -450,8 +450,8 @@ const UserModal: React.FC<UserModalProps> = ({
           id="firstName"
           name="firstName"
           type="text"
-          value={newUser.first_name}
-          onChange={handleUserInput("first_name")}
+          value={newUser.firstName}
+          onChange={handleUserInput("firstName")}
           onBlur={validateInput}
           required
         />
@@ -460,8 +460,8 @@ const UserModal: React.FC<UserModalProps> = ({
           id="lastName"
           name="lastName"
           type="text"
-          value={newUser.last_name}
-          onChange={handleUserInput("last_name")}
+          value={newUser.lastName}
+          onChange={handleUserInput("lastName")}
           onBlur={validateInput}
           required
         />
@@ -480,11 +480,11 @@ const UserModal: React.FC<UserModalProps> = ({
           className="usa-select"
           id="user-role"
           name="user-role"
-          value={newUser.qc_role}
+          value={newUser.qcRole}
           onChange={(e) =>
             setNewUser({
               ...newUser,
-              ...{ qc_role: e.target.value as UserRole },
+              ...{ qcRole: e.target.value as UserRole },
             })
           }
         >
@@ -512,11 +512,11 @@ const UserModal: React.FC<UserModalProps> = ({
           name="firstName"
           type="text"
           value={
-            activeField == "first_name" || newUser.first_name !== ""
-              ? newUser.first_name
-              : existingUser?.first_name
+            activeField == "firstName" || newUser.firstName !== ""
+              ? newUser.firstName
+              : existingUser?.firstName
           }
-          onChange={handleUserInput("first_name")}
+          onChange={handleUserInput("firstName")}
           onBlur={validateInput}
           required
         />
@@ -526,11 +526,11 @@ const UserModal: React.FC<UserModalProps> = ({
           name="lastName"
           type="text"
           value={
-            activeField == "last_name" || newUser.last_name !== ""
-              ? newUser.last_name
-              : existingUser?.last_name
+            activeField == "lastName" || newUser.lastName !== ""
+              ? newUser.lastName
+              : existingUser?.lastName
           }
-          onChange={handleUserInput("last_name")}
+          onChange={handleUserInput("lastName")}
           onBlur={validateInput}
           required
         />

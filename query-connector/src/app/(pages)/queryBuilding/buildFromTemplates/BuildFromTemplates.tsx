@@ -301,14 +301,11 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
           <Backlink onClick={goBack} label={"Back to My queries"} />
         )}
 
-        <div className="customQuery__header">
+        <div className={styles.customQuery__header}>
           <h1 className={styles.queryTitle}>Custom query</h1>
           <div className={styles.customQuery__controls}>
             <div className={styles.customQuery__name}>
-              <Label
-                htmlFor="queryNameInput"
-                className="margin-top-0-important"
-              >
+              <Label htmlFor="queryNameInput" className={styles.inputLabel}>
                 Query name <span style={{ color: "#919191" }}>(required)</span>
               </Label>
               <TextInput
@@ -316,7 +313,7 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
                 id="queryNameInput"
                 name="queryNameInput"
                 type="text"
-                className="width-mobile"
+                className={styles.input}
                 defaultValue={queryName ?? ""}
                 required
                 onChange={(event) => {
@@ -327,7 +324,7 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
             </div>
             <div className={styles.customQuery__saveButton}>
               <Button
-                className="margin-0"
+                className={classNames(styles.queryBuildingButton, "margin-0")}
                 type={"button"}
                 title={
                   buildStep === "valueset"
