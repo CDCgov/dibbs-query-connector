@@ -1,225 +1,23 @@
 "use server";
-import https from "https";
-import { Bundle, FhirResource, Patient } from "fhir/r4";
+import { FhirResource, Patient } from "fhir/r4";
 
 import { isFhirResource } from "../shared/constants";
 
-import { CustomQuery } from "./CustomQuery";
-import { GetPhoneQueryFormats } from "./format-service";
-import { getSavedQueryByName } from "./database-service";
+import { CustomQuery } from "./queryExecution/customQuery";
+import { GetPhoneQueryFormats } from "../shared/format-service";
+import { getSavedQueryByName } from "../shared/database-service";
 import type { QueryDataColumn } from "../(pages)/queryBuilding/utils";
-import { prepareFhirClient } from "../backend/dbServices/fhir-servers";
+import { prepareFhirClient } from "./dbServices/fhir-servers";
 import { DibbsValueSet } from "../models/entities/valuesets";
-import { auditable } from "../backend/auditLogs/decorator";
+import { auditable } from "./auditLogs/decorator";
+import type {
+  PatientRecordsRequest,
+  QueryResponse,
+  PatientDiscoveryRequest,
+  FullPatientRequest,
+} from "../models/entities/query";
 
-/**
- * The query response when the request source is from the Viewer UI.
- */
-export type QueryResponse = {
-  [R in FhirResource as R["resourceType"]]?: R[];
-};
-
-export type APIQueryResponse = Bundle;
-
-export type PatientDiscoveryRequest = {
-  fhir_server: string;
-  first_name?: string;
-  last_name?: string;
-  dob?: string;
-  mrn?: string;
-  phone?: string;
-};
-export type PatientRecordsRequest = {
-  patient_id: string;
-  fhir_server: string;
-  query_name: string;
-};
-
-export type FullPatientRequest = PatientDiscoveryRequest &
-  Omit<PatientRecordsRequest, "patient_id">;
-
-// Helper function that integrates the selections from the CustomizeQuery page
-// into the saved valuesets from build query. Can be deleted if / when we remove
-// CustomizeQuery fully
-function reconcileSavedQueryDataWithOverrides(
-  savedQuery: QueryDataColumn,
-  valueSetOverrides: DibbsValueSet[],
-) {
-  const reconciledQuery: QueryDataColumn = {};
-
-  Object.entries(savedQuery).forEach(([conditionId, valueSetMap]) => {
-    reconciledQuery[conditionId] = {};
-    Object.entries(valueSetMap).forEach(([vsId, vs]) => {
-      const matchedValueSet = valueSetOverrides.find(
-        (v) => v.valueSetId === vsId,
-      );
-      if (matchedValueSet && matchedValueSet.includeValueSet) {
-        const filteredValueSet = matchedValueSet;
-        filteredValueSet.concepts = matchedValueSet.concepts.filter(
-          (c) => c.include,
-        );
-        reconciledQuery[conditionId][vsId] = filteredValueSet;
-      }
-      if (matchedValueSet === undefined) {
-        reconciledQuery[conditionId][vsId] = vs;
-      }
-    });
-  });
-
-  return reconciledQuery;
-}
-
-/**
- * Create a FHIR Bundle from the query response.
- * @param queryResponse - The response object to store the results.
- * @returns - The FHIR Bundle of queried data.
- */
-export async function createBundle(
-  queryResponse: QueryResponse,
-): Promise<APIQueryResponse> {
-  const bundle: Bundle = {
-    resourceType: "Bundle",
-    type: "searchset",
-    total: 0,
-    entry: [],
-  };
-
-  Object.entries(queryResponse).forEach(([_, resources]) => {
-    if (Array.isArray(resources)) {
-      resources.forEach((resource) => {
-        bundle.entry?.push({ resource });
-        bundle.total = (bundle.total || 0) + 1;
-      });
-    }
-  });
-
-  return bundle;
-}
-
-/**
- * Tests a connection to a FHIR server from the backend to avoid CORS issues
- * @param url - The URL of the FHIR server to test
- * @param bearerToken - Optional bearer token for authentication
- * @returns Object indicating success/failure and any error messages
- */
-export async function testFhirServerConnection(
-  url: string,
-  bearerToken?: string,
-) {
-  try {
-    const baseUrl = url.replace(/\/$/, "");
-    const searchParams = new URLSearchParams({
-      given: "Hyper",
-      family: "Unlucky",
-      birthdate: "1975-12-06",
-      identifier: "8692756",
-    });
-    const patientSearchUrl = `${baseUrl}/Patient?${searchParams.toString()}`;
-
-    const headers: HeadersInit = {
-      Accept: "application/fhir+json",
-    };
-
-    if (bearerToken) {
-      headers.Authorization = `Bearer ${bearerToken}`;
-    }
-
-    const httpsAgent = new https.Agent({
-      rejectUnauthorized: false,
-    });
-
-    try {
-      const response = await fetch(patientSearchUrl, {
-        method: "GET",
-        headers,
-        // @ts-ignore - Node's fetch types don't include agent, but it works
-        agent: httpsAgent,
-      });
-
-      const responseText = await response.text(); // Get raw response text
-
-      if (response.ok) {
-        try {
-          const data = JSON.parse(responseText);
-
-          if (data.resourceType === "Bundle" && data.type === "searchset") {
-            return { success: true };
-          } else {
-            console.log(
-              "Invalid response structure. Expected Bundle/searchset, got:",
-              {
-                resourceType: data.resourceType,
-                type: data.type,
-              },
-            );
-            return {
-              success: false,
-              error:
-                "Invalid FHIR server response: Server did not return a valid search Bundle",
-            };
-          }
-        } catch (parseError) {
-          console.error("Error parsing JSON response:", parseError);
-          return {
-            success: false,
-            error: "Failed to parse server response as JSON",
-          };
-        }
-      } else {
-        let errorMessage: string;
-        switch (response.status) {
-          case 401:
-            errorMessage =
-              "Connection failed: Authentication required. Please check your credentials.";
-            break;
-          case 403:
-            errorMessage =
-              "Connection failed: Access forbidden. You do not have permission to access this FHIR server.";
-            break;
-          case 404:
-            errorMessage =
-              "Connection failed: The FHIR server endpoint was not found. Please verify the URL.";
-            break;
-          case 408:
-            errorMessage =
-              "Connection failed: The request timed out. The FHIR server took too long to respond.";
-            break;
-          case 500:
-            errorMessage =
-              "Connection failed: Internal server error. The FHIR server encountered an unexpected condition.";
-            break;
-          case 502:
-            errorMessage =
-              "Connection failed: Bad gateway. The FHIR server received an invalid response from upstream.";
-            break;
-          case 503:
-            errorMessage =
-              "Connection failed: The FHIR server is temporarily unavailable or under maintenance.";
-            break;
-          case 504:
-            errorMessage =
-              "Connection failed: Gateway timeout. The upstream server did not respond in time.";
-            break;
-          default:
-            errorMessage = `Connection failed: The FHIR server returned an error. (${response.status} ${response.statusText})`;
-        }
-        return { success: false, error: errorMessage };
-      }
-    } catch (fetchError) {
-      console.error("Fetch error:", fetchError);
-      throw fetchError; // Re-throw to be caught by outer try-catch
-    }
-  } catch (error) {
-    console.error("Overall error in testFhirServerConnection:", error);
-    return {
-      success: false,
-      error:
-        "Connection failed: Unable to reach the FHIR server. Please check if the URL is correct and the server is accessible.",
-    };
-  }
-}
-
-class QueryService {
+class QueryExecutionService {
   /**
    * Performs a generalized query for collections of patients matching
    * particular criteria. The query is determined by a collection of passed-in
@@ -235,6 +33,7 @@ class QueryService {
     request: PatientRecordsRequest,
     valueSetOverrides?: DibbsValueSet[],
   ): Promise<QueryResponse> {
+    console.log(request);
     const queryName = request.query_name;
     const fhirClient = await prepareFhirClient(request.fhir_server);
     const savedQuery = await getSavedQueryByName(request.query_name as string);
@@ -245,10 +44,10 @@ class QueryService {
     const includeImmunization = savedQuery.immunization;
     const queryData = valueSetOverrides
       ? reconcileSavedQueryDataWithOverrides(
-          savedQuery.query_data,
+          savedQuery.queryData,
           valueSetOverrides,
         )
-      : savedQuery.query_data;
+      : savedQuery.queryData;
 
     const builtQuery = new CustomQuery(
       queryData,
@@ -266,7 +65,8 @@ class QueryService {
         fetchString += `?${k}=${v}`;
       });
       response = await fhirClient.get(fetchString);
-      const queryResponse = await QueryService.parseFhirSearch(response);
+      const queryResponse =
+        await QueryExecutionService.parseFhirSearch(response);
       return queryResponse;
     }
 
@@ -301,7 +101,7 @@ class QueryService {
       .filter((v): v is Response => !!v);
 
     response = successfulResults;
-    const queryResponse = await QueryService.parseFhirSearch(response);
+    const queryResponse = await QueryExecutionService.parseFhirSearch(response);
     return queryResponse;
   }
 
@@ -361,7 +161,8 @@ class QueryService {
         )}`,
       );
     }
-    const newResponse = await QueryService.parseFhirSearch(fhirResponse);
+    const newResponse =
+      await QueryExecutionService.parseFhirSearch(fhirResponse);
     return newResponse["Patient"] as Patient[];
   }
 
@@ -456,11 +257,12 @@ class QueryService {
   }
 }
 
-export const patientRecordsQuery = QueryService.patientRecordsQuery;
-export const patientDiscoveryQuery = QueryService.patientDiscoveryQuery;
-export const parseFhirSearch = QueryService.parseFhirSearch;
-export const processFhirResponse = QueryService.processFhirResponse;
-export const fullPatientQuery = QueryService.fullPatientQuery;
+export const patientRecordsQuery = QueryExecutionService.patientRecordsQuery;
+export const patientDiscoveryQuery =
+  QueryExecutionService.patientDiscoveryQuery;
+export const parseFhirSearch = QueryExecutionService.parseFhirSearch;
+export const processFhirResponse = QueryExecutionService.processFhirResponse;
+export const fullPatientQuery = QueryExecutionService.fullPatientQuery;
 
 // Expected responses from the FHIR server
 export type PatientRecordsResponse = Awaited<
@@ -469,3 +271,34 @@ export type PatientRecordsResponse = Awaited<
 export type PatientDiscoveryResponse = Awaited<
   ReturnType<typeof patientDiscoveryQuery>
 >;
+
+// Helper function that integrates the selections from the CustomizeQuery page
+// into the saved valuesets from build query. Can be deleted if / when we remove
+// CustomizeQuery fully
+function reconcileSavedQueryDataWithOverrides(
+  savedQuery: QueryDataColumn,
+  valueSetOverrides: DibbsValueSet[],
+) {
+  const reconciledQuery: QueryDataColumn = {};
+
+  Object.entries(savedQuery).forEach(([conditionId, valueSetMap]) => {
+    reconciledQuery[conditionId] = {};
+    Object.entries(valueSetMap).forEach(([vsId, vs]) => {
+      const matchedValueSet = valueSetOverrides.find(
+        (v) => v.valueSetId === vsId,
+      );
+      if (matchedValueSet && matchedValueSet.includeValueSet) {
+        const filteredValueSet = matchedValueSet;
+        filteredValueSet.concepts = matchedValueSet.concepts.filter(
+          (c) => c.include,
+        );
+        reconciledQuery[conditionId][vsId] = filteredValueSet;
+      }
+      if (matchedValueSet === undefined) {
+        reconciledQuery[conditionId][vsId] = vs;
+      }
+    });
+  });
+
+  return reconciledQuery;
+}

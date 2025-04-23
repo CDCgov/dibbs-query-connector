@@ -34,8 +34,6 @@ export async function getCustomQueries(): Promise<CustomUserQuery[]> {
       q.conditions_list
     FROM query q;
   `;
-  // TODO: this will eventually need to take into account user permissions and specific authors
-  // We'll probably also need to refactor this to not show up in any user-facing containers
 
   const results = await dbClient.query(query);
   const formattedData: { [key: string]: CustomUserQuery } = {};

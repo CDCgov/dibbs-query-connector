@@ -1,4 +1,4 @@
-import { QueryDataColumn } from "../(pages)/queryBuilding/utils";
+import { QueryDataColumn } from "../../(pages)/queryBuilding/utils";
 
 /**
  * A Data Class designed to store and manipulate various code values used

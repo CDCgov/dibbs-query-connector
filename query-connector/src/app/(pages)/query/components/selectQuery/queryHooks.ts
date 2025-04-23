@@ -4,7 +4,7 @@ import { unnestValueSetsFromQuery } from "@/app/shared/utils";
 import {
   patientRecordsQuery,
   PatientRecordsResponse,
-} from "@/app/shared/query-service";
+} from "@/app/backend/query-execution";
 import { Patient } from "fhir/r4";
 import { DibbsValueSet } from "@/app/models/entities/valuesets";
 

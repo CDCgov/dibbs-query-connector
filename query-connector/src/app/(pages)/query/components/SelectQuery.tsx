@@ -6,7 +6,7 @@ import SelectSavedQuery from "./selectQuery/SelectSavedQuery";
 import {
   PatientDiscoveryResponse,
   PatientRecordsResponse,
-} from "@/app/shared/query-service";
+} from "@/app/backend/query-execution";
 import { Patient } from "fhir/r4";
 import {
   fetchQueryResponse,

@@ -22,7 +22,7 @@ import type { ModalProps } from "../../ui/designSystem/modal/Modal";
 import WithAuth from "@/app/ui/components/withAuth/WithAuth";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import { FhirServerConfig } from "@/app/models/entities/fhir-servers";
-import { testFhirServerConnection } from "@/app/shared/testConnection";
+import { testFhirServerConnection } from "@/app/backend/queryExecution/fhirClient";
 
 const Modal = dynamic<ModalProps>(
   () => import("../../ui/designSystem/modal/Modal").then((mod) => mod.Modal),

@@ -1,9 +1,9 @@
 import https from "https";
-import { FhirServerConfig } from "../models/entities/fhir-servers";
-import { AuthData } from "../backend/dbServices/fhir-servers";
-import { createSmartJwt } from "../backend/dbServices/smartOnFhir/lib";
-import { updateFhirServer } from "../backend/dbServices/fhir-servers";
-import { fetchWithoutSSL } from "./utils";
+import { FhirServerConfig } from "../../models/entities/fhir-servers";
+import { AuthData } from "../dbServices/fhir-servers";
+import { createSmartJwt } from "../dbServices/smartOnFhir/lib";
+import { updateFhirServer } from "../dbServices/fhir-servers";
+import { fetchWithoutSSL } from "../../shared/utils";
 /**
  * A client for querying a FHIR server.
  * @param server The FHIR server to query.
@@ -408,3 +408,4 @@ class FHIRClient {
 }
 
 export default FHIRClient;
+export const testFhirServerConnection = FHIRClient.testConnection;
