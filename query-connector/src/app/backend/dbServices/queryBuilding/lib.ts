@@ -6,6 +6,7 @@ import {
 import { DibbsValueSet } from "@/app/models/entities/valuesets";
 import { DEFAULT_TIME_WINDOW } from "@/app/shared/utils";
 import { randomUUID } from "crypto";
+import { DbService } from "../db-service";
 import { Pool } from "pg";
 
 // The underlying functionality here is reused in Playwright to do some
@@ -27,7 +28,7 @@ export async function saveCustomQueryHelp(
   queryInput: NestedQuery,
   queryName: string,
   author: string,
-  dbClient: Pool,
+  dbClient: DbService | Pool,
   queryId?: string,
 ) {
   const queryString = `
@@ -74,7 +75,10 @@ export async function saveCustomQueryHelp(
  * @param dbClient - the DB client to execute queries against
  * @returns The query name, data, and conditions list from the query table
  */
-export async function getSavedQueryByIdHelp(queryId: string, dbClient: Pool) {
+export async function getSavedQueryByIdHelp(
+  queryId: string,
+  dbClient: DbService | Pool,
+) {
   const id = queryId;
   const queryString = `
       select q.query_name, q.id AS query_id, q.query_data, q.conditions_list, q.immunization
@@ -102,7 +106,10 @@ export async function getSavedQueryByIdHelp(queryId: string, dbClient: Pool) {
  * @param dbClient - the DB client to execute queries against
  * @returns A success or error response indicating the result.
  */
-export async function deleteQueryByIdHelp(queryId: string, dbClient: Pool) {
+export async function deleteQueryByIdHelp(
+  queryId: string,
+  dbClient: DbService | Pool,
+) {
   const deleteQuery = `
       DELETE FROM query WHERE id = $1;
     `;

@@ -237,7 +237,6 @@ class QueryService {
   ): Promise<QueryResponse> {
     const queryName = request.query_name;
     const fhirClient = await prepareFhirClient(request.fhir_server);
-
     const savedQuery = await getSavedQueryByName(request.query_name as string);
 
     if (!savedQuery) {

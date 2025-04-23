@@ -65,7 +65,7 @@ describe("User Management: User tab", () => {
         items: [
           {
             ...mockAdmin,
-            qc_role: UserRole.SUPER_ADMIN,
+            qcRole: UserRole.SUPER_ADMIN,
           },
         ],
       });
