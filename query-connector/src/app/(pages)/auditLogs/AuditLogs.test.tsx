@@ -212,7 +212,7 @@ describe("AuditLogs Component", () => {
 
   test("clear filters resets empty state", async () => {
     await user.selectDropdownOption("Name(s)", "Apollo Creed");
-    await user.selectDropdownOption("Action(s)", "Patient Records Query");
+    await user.selectDropdownOption("Action(s)", TEST_REPORT);
 
     await waitFor(() => {
       expect(
