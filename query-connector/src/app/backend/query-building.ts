@@ -34,8 +34,6 @@ export async function getCustomQueries(): Promise<CustomUserQuery[]> {
       q.conditions_list
     FROM query q;
   `;
-  // TODO: this will eventually need to take into account user permissions and specific authors
-  // We'll probably also need to refactor this to not show up in any user-facing containers
 
   const results = await dbClient.query(query);
   const formattedData: { [key: string]: CustomUserQuery } = {};
@@ -46,9 +44,9 @@ export async function getCustomQueries(): Promise<CustomUserQuery[]> {
     // Initialize query structure if it doesn't exist
     if (!formattedData[query_id]) {
       formattedData[query_id] = {
-        query_id,
-        query_name,
-        conditions_list,
+        queryId: query_id,
+        queryName: query_name,
+        conditionsList: conditions_list,
         valuesets: [],
       };
     }
@@ -112,10 +110,10 @@ export async function getQueryById(queryId: string) {
     }
     const query = result.rows[0];
     const formattedQuery = {
-      query_id: query.id,
-      query_name: query.query_name,
-      query_data: query.query_data,
-      conditions_list: query.conditions_list,
+      queryId: query.id,
+      queryName: query.query_name,
+      queryData: query.query_data,
+      conditionsList: query.conditions_list,
       valuesets: [],
     };
 

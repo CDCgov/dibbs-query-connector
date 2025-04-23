@@ -151,7 +151,7 @@ export function camelCaseDbColumnNames<T extends Record<string, unknown>>(
       result.rows = result.rows.map((v) => {
         const val: Record<string, unknown> = {};
         Object.entries(v).forEach(([k, v]) => {
-          val[underscoreToCamelCase(k)] = v;
+          val[translateSnakeStringToCamelCase(k)] = v;
         });
 
         return val as T;
@@ -174,7 +174,12 @@ export function camelCaseDbColumnNames<T extends Record<string, unknown>>(
   return descriptor;
 }
 
-function underscoreToCamelCase(str: string) {
+/**
+ * Function to take a snake_cased string and translate it to camelCase
+ * @param str string to format
+ * @returns camelCased string
+ */
+export function translateSnakeStringToCamelCase(str: string) {
   return str.replace(/_+([a-z])/g, function (_, letter) {
     return letter.toUpperCase();
   });

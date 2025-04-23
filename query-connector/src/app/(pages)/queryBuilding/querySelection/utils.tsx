@@ -30,7 +30,7 @@ export const handleDelete = async (
         duration: 2000,
       });
       const updatedQueries = queries.filter(
-        (query) => query.query_id !== queryId,
+        (query) => query.queryId !== queryId,
       );
       setQueries(updatedQueries);
 

@@ -606,10 +606,10 @@ export const cancerValueSets = [
 ];
 
 export const gonorreheaSavedQuery: QueryTableResult = {
-  query_id: "73e1a777-49cb-4e19-bc71-8c3fd3ffda64",
-  query_name: "Gonorrhea case investigation",
-  conditions_list: ["15628003"],
-  query_data: {
+  queryId: "73e1a777-49cb-4e19-bc71-8c3fd3ffda64",
+  queryName: "Gonorrhea case investigation",
+  conditionsList: ["15628003"],
+  queryData: {
     "15628003": {
       "2.16.840.1.113762.1.4.1146.1036_20190605": {
         valueSetId: "2.16.840.1.113762.1.4.1146.1036_20190605",
