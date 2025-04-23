@@ -440,9 +440,8 @@ class DatabaseService {
    * @param vs - a ValueSet in of the shape of our internal data model to insert
    * @returns success / failure information, as well as errors as appropriate
    */
-  // TODO: We should consider using a transaction here to ensure that all valuesets are tracked, but running into DB locks
-  // @transaction
-  // @auditable
+  @transaction
+  @auditable
   static async insertValueSet(
     vs: DibbsValueSet,
   ): Promise<{ success: boolean; error?: string }> {
