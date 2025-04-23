@@ -67,7 +67,7 @@ class UserManagementService {
       }
 
       // Default role when adding a new user, which includes Super Admin, Admin, and Standard User.
-      let qc_role = UserRole.STANDARD;
+      let qcRole = UserRole.STANDARD;
       console.log("User not found. Proceeding to insert.");
 
       const insertUserQuery = `
@@ -78,7 +78,7 @@ class UserManagementService {
 
       const result = await dbService.query(insertUserQuery, [
         userIdentifier,
-        qc_role,
+        qcRole,
         firstName,
         lastName,
       ]);
@@ -148,6 +148,8 @@ class UserManagementService {
           updated_lastName,
           updated_role,
         ]);
+
+        console.log(result);
 
         console.log("User updated:", result.rows[0].id);
         return result.rows[0];
