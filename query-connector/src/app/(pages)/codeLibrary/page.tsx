@@ -1,16 +1,6 @@
 "use client";
-import {
-  useMemo,
-  //  useRef,
-  useState,
-} from "react";
-import { useContext, useEffect } from "react";
-import { DataContext } from "@/app/shared/DataProvider";
-import WithAuth from "@/app/ui/components/withAuth/WithAuth";
-import LoadingView from "@/app/ui/designSystem/LoadingView";
+import { useContext, useEffect, useMemo, useState } from "react";
 import classNames from "classnames";
-import styles from "./codeLibrary.module.scss";
-import Backlink from "@/app/ui/designSystem/backLink/Backlink";
 import {
   Alert,
   Button,
@@ -18,7 +8,14 @@ import {
   Pagination,
   Select,
 } from "@trussworks/react-uswds";
+import styles from "./codeLibrary.module.scss";
+import { DataContext } from "@/app/shared/DataProvider";
+import WithAuth from "@/app/ui/components/withAuth/WithAuth";
+import Backlink from "@/app/ui/designSystem/backLink/Backlink";
+import LoadingView from "@/app/ui/designSystem/LoadingView";
 import SearchField from "@/app/ui/designSystem/searchField/SearchField";
+import Table from "@/app/ui/designSystem/table/Table";
+import { groupConditionConceptsIntoValueSets } from "@/app/shared/utils";
 import { getAllValueSets } from "@/app/shared/database-service";
 import { DibbsValueSet } from "@/app/models/entities/valuesets";
 
@@ -32,8 +29,11 @@ const QueryBuilding: React.FC = () => {
 
   const [loading, setLoading] = useState<boolean>(false);
   const [mode, setMode] = useState<Mode>("manage");
-  const [search, setSearch] = useState<string>();
+  const [search, setSearch] = useState<string>("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [activeValueSet, setActiveValueSet] = useState<DibbsValueSet | null>(
+    null,
+  );
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [valueSets, setValueSets] = useState<DibbsValueSet[]>([]);
   const [filteredValueSets, setFilteredValueSets] = useState(valueSets);
@@ -57,7 +57,6 @@ const QueryBuilding: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    // console.log(valueSets);
     setFilteredValueSets(valueSets);
   }, [valueSets]);
 
@@ -65,9 +64,9 @@ const QueryBuilding: React.FC = () => {
     if (search !== "") {
       setFilteredValueSets(
         valueSets.filter((vs) => {
-          const matchesSearch = vs.display
+          const matchesSearch = vs.valueSetName
             .toLocaleLowerCase()
-            .includes(search?.toLocaleLowerCase());
+            .includes(search.toLocaleLowerCase());
           return matchesSearch;
         }),
       );
@@ -86,7 +85,10 @@ const QueryBuilding: React.FC = () => {
 
   async function fetchValueSets() {
     const vs = await getAllValueSets();
-    setValueSets(vs.items);
+    const formattedVs =
+      vs.items && groupConditionConceptsIntoValueSets(vs.items);
+
+    setValueSets(formattedVs);
   }
 
   function goBack() {
@@ -98,13 +100,12 @@ const QueryBuilding: React.FC = () => {
   return (
     <WithAuth>
       <div className={classNames("main-container__wide", styles.mainContainer)}>
-        {mode === "manage" ? (
-          <Backlink onClick={() => {}} label={"Back to Query library"} />
-        ) : (
-          <Backlink onClick={goBack} label={"Back to My queries"} />
-        )}
-
         <div className={styles.header}>
+          {mode === "manage" ? (
+            <Backlink onClick={() => {}} label={"Back to Query library"} />
+          ) : (
+            <Backlink onClick={goBack} label={"Back to My queries"} />
+          )}
           <h1 className={styles.header__title}>Manage codes</h1>
           <div className={styles.header__subtitle}>
             Click on the checkbox to delete the value set or code
@@ -144,99 +145,131 @@ const QueryBuilding: React.FC = () => {
             Add value set
           </Button>
         </div>
-        <div className={styles.displayContent}>
+        <div className={styles.content}>
           <div className={styles.resultsContainer}>
             <div className={styles.content__left}>
-              <div className={styles.vsHeader}>
-                {"Value set".toLocaleUpperCase()}
-              </div>
-              <div className={styles.valueSetList}>
-                {paginatedValueSets.length > 0 ? (
-                  paginatedValueSets.map((vs, index) => {
-                    return (
-                      <div key={index} className={styles.vsRow}>
-                        <div
-                          style={{
-                            color: "#111111",
-                          }}
-                        >
-                          {vs.display}
-                        </div>
-                        <div style={{ color: "#5C5C5C" }}>
-                          {vs.valueset_name} · {vs.dibbs_concept_type} ·{" "}
-                          {vs.author}
-                        </div>
-
-                        {index % 7 ? (
-                          <div
-                            style={{
-                              fontWeight: 700,
-                              color: "#5C5C5C",
-                              fontStyle: "italic",
-                            }}
-                          >
-                            Created by Haley Blake
-                          </div>
-                        ) : (
-                          ""
-                        )}
-                      </div>
-                    );
-                  })
-                ) : (
-                  <div key={1} className={styles.vsRow}>
-                    <div
-                      style={{
-                        color: "#111111",
-                      }}
-                    >
-                      No results found.
-                    </div>
-                  </div>
+              <Table
+                className={classNames(
+                  "display-flex flex-row",
+                  styles.valueSetTable,
                 )}
-              </div>
+              >
+                <thead
+                  className={classNames(
+                    "display-flex flex-column",
+                    styles.valueSetTable__header,
+                  )}
+                >
+                  <tr className={styles.valueSetTable__header_sectionHeader}>
+                    <th>{"Value set".toLocaleUpperCase()}</th>
+                  </tr>
+                </thead>
+                <tbody
+                  className={classNames(
+                    styles.overflowScroll,
+                    styles.valueSetTable__tableBody,
+                  )}
+                >
+                  {paginatedValueSets.length > 0 ? (
+                    paginatedValueSets.map((vs, index) => {
+                      return (
+                        <tr
+                          key={index}
+                          className={classNames(
+                            styles.valueSetTable__tableBody_row,
+                            vs?.valueSetId == activeValueSet?.valueSetId
+                              ? styles.activeValueSet
+                              : "",
+                          )}
+                          onClick={() => setActiveValueSet(vs)}
+                        >
+                          <td>{vs.valueSetName}</td>
+                          <td>
+                            {vs.valueSetName} · {vs.dibbsConceptType} ·{" "}
+                            {vs.author}
+                          </td>
+
+                          {index % 7 ? (
+                            <td
+                              className={
+                                styles.valueSetTable__tableBody_row_customValueSet
+                              }
+                            >
+                              Created by Haley Blake
+                            </td>
+                          ) : (
+                            ""
+                          )}
+                        </tr>
+                      );
+                    })
+                  ) : (
+                    <tr className={styles.valueSetTable__tableBody_row}>
+                      <td>No results found.</td>
+                    </tr>
+                  )}
+                </tbody>
+              </Table>
             </div>
 
             <div className={styles.content__right}>
-              <div className={styles.lockedForEdits}>
-                <Icon.Lock role="icon" className="qc-lock"></Icon.Lock>
-                This value set comes from the CSTE and cannot be modified.
-              </div>
-              <div
-                className="display-flex flex-row"
-                style={{ color: "#111111", fontWeight: 700 }}
-              >
-                <div style={{ width: "7.5rem" }}>Code</div>
-                <div>Name</div>
-              </div>
-              {/* <div className="display-flex flex-row margin-bottom-2">
-                <div style={{ width: "7.5rem" }}>103514009</div>
-                <div>Chlamydophila pneumoniae (organism)</div>
-              </div>{" "} */}
-              {/* <div className="display-flex flex-row margin-bottom-2">
-                <div style={{ width: "7.5rem" }}>103514009</div>
-                <div>Chlamydophila pneumoniae (organism)</div>
-              </div>{" "}
-              <div className="display-flex flex-row margin-bottom-2">
-                <div style={{ width: "7.5rem" }}>103514009</div>
-                <div>Chlamydophila pneumoniae (organism)</div>
-              </div>{" "}
-              <div className="display-flex flex-row margin-bottom-2">
-                <div style={{ width: "7.5rem" }}>103514009</div>
-                <div>Chlamydophila pneumoniae (organism)</div>
-              </div>{" "}
-              <div className="display-flex flex-row margin-bottom-2">
-                <div style={{ width: "7.5rem" }}>103514009</div>
-                <div>Chlamydophila pneumoniae (organism)</div>
-              </div>{" "}
-              <div className="display-flex flex-row margin-bottom-2">
-                <div style={{ width: "7.5rem" }}>103514009</div>
-                <div>Chlamydophila pneumoniae (organism)</div>
-              </div>{" "}
-              <div className="display-flex flex-row margin-bottom-2">
-                <div style={{ width: "7.5rem" }}>103514009</div>
-                <div>Chlamydophila pneumoniae (organism)</div>
-              </div>{" "} */}
+              {activeValueSet && (
+                <Table
+                  className={classNames(
+                    "display-flex flex-row",
+                    styles.conceptsTable,
+                  )}
+                >
+                  <thead
+                    className={classNames(
+                      "display-flex flex-column",
+                      styles.conceptsTable__header,
+                    )}
+                  >
+                    {true ? (
+                      <tr className={styles.lockedForEdits}>
+                        <th>
+                          {" "}
+                          <Icon.Lock
+                            role="icon"
+                            className="qc-lock"
+                          ></Icon.Lock>
+                          This value set comes from the CSTE and cannot be
+                          modified.
+                        </th>
+                      </tr>
+                    ) : (
+                      <tr
+                        className={styles.conceptsTable__header_sectionHeader}
+                      >
+                        <th> {"Codes".toLocaleUpperCase()}</th>
+                      </tr>
+                    )}
+                    <tr className={styles.columnHeaders}>
+                      <th>Code</th>
+                      <th>Name</th>
+                    </tr>
+                  </thead>
+                  <tbody
+                    className={classNames(
+                      styles.overflowScroll,
+                      styles.conceptsTable__tableBody,
+                    )}
+                  >
+                    {activeValueSet?.concepts.map((vs) => (
+                      <tr
+                        key={vs.code}
+                        className={classNames(
+                          styles.conceptsTable__tableBody_row,
+                        )}
+                      >
+                        <td className={styles.valueSetCode}>{vs.code}</td>
+                        <td>{vs.display}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </Table>
+              )}
             </div>
           </div>
 
@@ -267,10 +300,10 @@ const QueryBuilding: React.FC = () => {
               <Select
                 name="valeSetsPerPage"
                 id="valeSetsPerPage"
-                value={10}
+                value={itemsPerPage}
                 className={styles.itemsPerPageDropdown}
                 onChange={(e) => {
-                  // setActionsPerPage(Number(e.target.value));
+                  setItemsPerPage(Number(e.target.value));
                   setCurrentPage(1);
                 }}
               >
@@ -282,10 +315,9 @@ const QueryBuilding: React.FC = () => {
           </div>
         </div>
 
-        <div className="display-flex flex-auto">
-          {/* Step Two: Select ValueSets */}
+        {/* <div className="display-flex flex-auto">
           {mode == "select" && <div>Select view of the same thing</div>}
-        </div>
+        </div> */}
         {loading && <LoadingView loading={loading} />}
       </div>
     </WithAuth>
