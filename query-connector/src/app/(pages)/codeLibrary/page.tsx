@@ -16,8 +16,13 @@ import LoadingView from "@/app/ui/designSystem/LoadingView";
 import SearchField from "@/app/ui/designSystem/searchField/SearchField";
 import Table from "@/app/ui/designSystem/table/Table";
 import { groupConditionConceptsIntoValueSets } from "@/app/shared/utils";
-import { getAllValueSets } from "@/app/shared/database-service";
+import {
+  getAllValueSets,
+  getConditionsData,
+} from "@/app/shared/database-service";
 import { DibbsValueSet } from "@/app/models/entities/valuesets";
+import { formatSystem } from "./utils";
+import { ConditionsMap, formatDiseaseDisplay } from "../queryBuilding/utils";
 
 /**
  * Component for Query Building Flow
@@ -31,6 +36,9 @@ const QueryBuilding: React.FC = () => {
   const [mode, setMode] = useState<Mode>("manage");
   const [search, setSearch] = useState<string>("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [conditionDetailsMap, setConditionsDetailsMap] =
+    useState<ConditionsMap>();
+
   const [activeValueSet, setActiveValueSet] = useState<DibbsValueSet | null>(
     null,
   );
@@ -41,6 +49,11 @@ const QueryBuilding: React.FC = () => {
   const ctx = useContext(DataContext);
 
   const totalPages = Math.ceil(filteredValueSets.length / itemsPerPage);
+
+  async function fetchConditions() {
+    const { conditionIdToNameMap } = await getConditionsData();
+    setConditionsDetailsMap(conditionIdToNameMap);
+  }
 
   // update the current page details when switching between build steps
   useEffect(() => {
@@ -54,6 +67,7 @@ const QueryBuilding: React.FC = () => {
       hideProgressBar: true,
     });
     fetchValueSets();
+    fetchConditions();
   }, []);
 
   useEffect(() => {
@@ -96,6 +110,36 @@ const QueryBuilding: React.FC = () => {
     // setBuildStep("selection");
     console.log("do a backnav thing");
   }
+
+  const formatConceptType = (conceptType: string) => {
+    return conceptType.replace(
+      conceptType.charAt(0),
+      conceptType.charAt(0).toLocaleUpperCase(),
+    );
+  };
+
+  const formatConditionDisplay = (conditionId: string | undefined) => {
+    const conditionDetails =
+      conditionId && conditionDetailsMap?.[conditionId].name;
+
+    return conditionDetails ? formatDiseaseDisplay(conditionDetails) : "";
+  };
+
+  const formatValueSetDetails = (vs: DibbsValueSet) => {
+    const system = formatSystem(vs.system) || "";
+
+    const conceptType = vs.dibbsConceptType
+      ? `${formatConceptType(vs.dibbsConceptType)} ${!!system ? " • " : ""}`
+      : "";
+
+    const condition = vs.conditionId
+      ? `${formatConditionDisplay(vs.conditionId)} ${
+          !!conceptType ? " • " : ""
+        } `
+      : "";
+
+    return `${condition} ${conceptType} ${system}`;
+  };
 
   return (
     <WithAuth>
@@ -184,21 +228,16 @@ const QueryBuilding: React.FC = () => {
                           onClick={() => setActiveValueSet(vs)}
                         >
                           <td>{vs.valueSetName}</td>
-                          <td>
-                            {vs.valueSetName} · {vs.dibbsConceptType} ·{" "}
-                            {vs.author}
-                          </td>
-
-                          {index % 7 ? (
+                          <td>{formatValueSetDetails(vs)}</td>
+                          {/* TODO: render based on the user_created column once that is added*/}
+                          {false && (
                             <td
                               className={
                                 styles.valueSetTable__tableBody_row_customValueSet
                               }
                             >
-                              Created by Haley Blake
+                              Created by {vs.author}
                             </td>
-                          ) : (
-                            ""
                           )}
                         </tr>
                       );
