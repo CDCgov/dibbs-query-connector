@@ -44,7 +44,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v3
         with:
-          context: ./query-connector
+          context: .
           file: ./Dockerfile.keycloak
           push: true
           tags: |
