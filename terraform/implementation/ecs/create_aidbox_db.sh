@@ -62,7 +62,7 @@ echo "Loading GoldenSickPatient data into Aidbox..."
 curl -X POST \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer ${TOKEN}" \
-  -d @"../../../query-connector/src/app/tests/assets/GoldenSickPatient.json" \
+  -d @"../../../src/app/tests/assets/GoldenSickPatient.json" \
   ${BASE_URL}/aidboxone/fhir
 
 echo "GoldenSickPatient data loaded successfully."

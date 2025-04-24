@@ -19,7 +19,7 @@ Docker version 20.10.21, build baeda1f
    1. If you're using an M1 Mac, you'll need to tell Docker to pull the non-Apple Silicon image using `docker pull --platform linux/amd64 ghcr.io/cdcgov/dibbs-query-connector/query-connector:latest` since we don't have a image for Apple Silicon. If you're using this setup, there might be some issues with architecture incompatability that the team hasn't run into, so please flag if you run into something!
 2. Run the service with `docker run -p 3000:3000 query-connector:latest`. If you're on a Windows machine, you may need to run `docker run -p 3000:3000 ghcr.io/cdcgov/phdi/query-connector:latest` instead.
 
-The containers should take a few minutes to spin up, but if all goes well, congratulations, the Query Connector app should now be running on `localhost:3000/query-connector`!
+The containers should take a few minutes to spin up, but if all goes well, congratulations, the Query Connector app should now be running on `localhost:3000`!
 
 #### Running from Dev Mode via the Node.js Source Code
 
@@ -27,7 +27,7 @@ We recommend running the Query Connector app from a container, but if that is no
 
 1. Ensure that both [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) and [Node 22.x or higher](https://nodejs.org/en/download/package-manager/current) are installed.
 2. Clone the Query Connector repository with `git clone git@github.com:CDCgov/dibbs-query-connector.git`.
-3. Navigate to the source folder with `cd /query-connector/`.
+3. Navigate to the source folder with `cd dibbs-query-connector`.
 4. Install all of the Node dependencies for the Query Connector app with `npm install`.
 5. Run the Query Connector app on `localhost:3000` with `npm run dev`. If you are on a Windows Machine, you may need to run `npm run dev-win` instead.
 
@@ -39,7 +39,7 @@ To build the Docker image for the Query Connector app from source instead of dow
 
 1. Ensure that both [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) and [Docker](https://docs.docker.com/get-docker/) are installed.
 2. Clone the Query Connector repository with `git clone git@github.com:CDCgov/dibbs-query-connector.git`.
-3. Navigate to `/query-connector`.
+3. Navigate to the source folder with `cd dibbs-query-connector`.
 4. Run `docker build -t query-connector .`.
 
 ### Running via docker-compose (WIP)
@@ -94,7 +94,7 @@ Next, run the app with `npm run dev` or `npm run dev-win`. You should see a sign
 
 ### Developer Documentation
 
-A Postman collection demonstrating use of the API can be found [here](https://github.com/CDCgov/dibbs-query-connector/blob/main/query-connector/src/app/assets/DIBBs_Query_Connector_API.postman_collection.json).
+A Postman collection demonstrating use of the API can be found [here](https://github.com/CDCgov/dibbs-query-connector/blob/main/src/app/assets/DIBBs_Query_Connector_API.postman_collection.json).
 
 #### Updating the pg_dump
 
@@ -125,7 +125,7 @@ By default, Playwright will look for end to end tests in `/e2e`.
 
 ##### Testing Commands and Demos
 
-Playwright provides a number of different ways of executing end to end tests. From the `query-connector/` directory, you can run several commands:
+Playwright provides a number of different ways of executing end to end tests. From the root directory, you can run several commands:
 
 `npm run test:playwright:ui`
 Runs the end-to-end tests locally by spawning the Playwright UI mode. This will start a dev server off localhost:3000, so make sure you don't have another app instance running off that port.

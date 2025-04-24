@@ -94,3 +94,15 @@ tmp_remote_image_*
 terraform/implementation/ecs/.terraform/*
 .terraform.lock.hcl
 terraform.tfvars
+
+node_modules
+.next/
+*.local
+certificates
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/coverage
+.tool-versions
+keys/
