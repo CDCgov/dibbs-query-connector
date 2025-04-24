@@ -83,7 +83,7 @@
               "text": "Medical Record Number"
             },
             "assigner": {
-              "display": "St. Worrywart’s Hospital"
+              "display": "St. Worrywart\u2019s Hospital"
             },
             "system": "http://hospital.smarthealthit.org",
             "value": "8692756"
@@ -111,7 +111,10 @@
         "name": [
           {
             "family": "Unlucky",
-            "given": ["Hyper", "A."],
+            "given": [
+              "Hyper",
+              "A."
+            ],
             "period": {
               "start": "1975-12-06",
               "end": "2020-01-22"
@@ -133,7 +136,9 @@
         "birthDate": "1975-12-06",
         "address": [
           {
-            "line": ["49 Meadow St"],
+            "line": [
+              "49 Meadow St"
+            ],
             "city": "Lansing",
             "state": "MI",
             "postalCode": "48864",
@@ -144,7 +149,9 @@
             }
           },
           {
-            "line": ["183 Mountain View St"],
+            "line": [
+              "183 Mountain View St"
+            ],
             "city": "Lansing",
             "state": "MI",
             "postalCode": "48901",
@@ -193,14 +200,20 @@
         "name": [
           {
             "family": "Pocondriac",
-            "given": ["Hai"],
-            "prefix": ["Dr"]
+            "given": [
+              "Hai"
+            ],
+            "prefix": [
+              "Dr"
+            ]
           }
         ],
         "address": [
           {
             "use": "home",
-            "line": ["4531 Marketplace Drive"],
+            "line": [
+              "4531 Marketplace Drive"
+            ],
             "city": "Lansing",
             "state": "MI",
             "postalCode": "48893"
@@ -273,7 +286,9 @@
         ],
         "address": [
           {
-            "line": ["2034 West Main St"],
+            "line": [
+              "2034 West Main St"
+            ],
             "city": "Hamersville",
             "state": "OH",
             "postalCode": "45130",
@@ -335,7 +350,6 @@
         "url": "Condition/c7ae0606-d0df-4ffd-a535-91697eabf9d5"
       }
     },
-
     {
       "fullUrl": "Observation/0a33326b-fbf2-4a59-a785-ad9ba5c40ce0",
       "resource": {
@@ -531,7 +545,6 @@
         "url": "Coverage/d91140ee-684a-487e-894f-2791f82e1888"
       }
     },
-
     {
       "fullUrl": "Account/6443687a-442e-4737-a247-c08c7bb3179c",
       "resource": {
@@ -2148,7 +2161,6 @@
           "start": "2020-03-02",
           "end": "2020-03-03"
         },
-
         "created": "2020-03-10",
         "enterer": {
           "reference": "Practitioner/8085737b-28ec-4b23-8604-83fd20076933",
@@ -3069,7 +3081,6 @@
         "insurance": [
           {
             "focal": true,
-
             "sequence": 1,
             "coverage": {
               "reference": "Coverage/d91140ee-684a-487e-894f-2791f82e1888",
@@ -3774,7 +3785,6 @@
         "url": "Claim/c505eb9a-a5df-433f-a24c-c197c7c40d05"
       }
     },
-
     {
       "fullUrl": "ClaimResponse/8f7d38e5-2e5c-4d9a-b3c7-9f42f3d9e1b2",
       "resource": {
@@ -5486,7 +5496,6 @@
         "url": "Observation/3ca6505d-aa78-466d-ac22-8b51dbf39b52"
       }
     },
-
     {
       "fullUrl": "Condition/a2313732-4abd-42cb-8bbf-dd777e5e3b20",
       "resource": {
@@ -6050,7 +6059,6 @@
         "url": "ServiceRequest/6af1f84c-9592-4f82-bec8-963ab55f5e89"
       }
     },
-
     {
       "fullUrl": "Observation/3bc88f73-c57e-4c0f-b02b-89a46f5b6759",
       "resource": {
@@ -6794,7 +6802,6 @@
         "url": "Condition/6bbcfd78-deb7-4715-9dfc-68e1f0918ad2"
       }
     },
-
     {
       "fullUrl": "MedicationRequest/41e37368-1036-4abb-adf7-f7157cfa5a0f",
       "resource": {
@@ -10031,7 +10038,6 @@
         "url": "Observation/e56ccb10-890c-414d-9e19-3dfc22136b3c"
       }
     },
-
     {
       "fullUrl": "QuestionnaireResponse/b9715ab2-2a6c-4b8a-8c13-b19b3da5cd6e",
       "resource": {
@@ -10437,7 +10443,6 @@
         "url": "Observation/bb44b956-bfa3-40a1-8898-7c8757b42c5f"
       }
     },
-
     {
       "fullUrl": "Encounter/c84e5053-2231-4bd1-ad3a-6062a0684bc4",
       "resource": {
