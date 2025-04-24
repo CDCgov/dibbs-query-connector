@@ -10,7 +10,7 @@ BRANCH_NAME=$1
 
 # Function to check if a command exists
 command_exists() {
-    command -v "$1" &> /dev/null
+    command -v "$1" &>/dev/null
 }
 
 # Install Homebrew if it's not already installed
@@ -35,7 +35,7 @@ fi
 # Start Docker
 open /Applications/Docker.app
 echo "Waiting for Docker to launch..."
-while ! docker system info > /dev/null 2>&1; do
+while ! docker system info >/dev/null 2>&1; do
     sleep 1
 done
 
@@ -56,8 +56,6 @@ else
     git pull
 fi
 
-cd ./query-connector
-
 # Checkout the specified branch
 git checkout $BRANCH_NAME
 
@@ -70,7 +68,6 @@ while ! curl -s -o /dev/null -w "%{http_code}" "$URL" | grep -q "200"; do
     echo "Waiting for $URL to be available..."
     sleep 5
 done
-
 
 # Open in default browser
 open http://localhost:3000/
