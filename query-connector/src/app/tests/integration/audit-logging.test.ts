@@ -64,9 +64,9 @@ describe("audit log", () => {
     const auditRows = await dbClient.query(auditQuery);
 
     const request: PatientDiscoveryRequest = {
-      fhir_server: "Aidbox",
-      first_name: hyperUnluckyPatient.FirstName,
-      last_name: hyperUnluckyPatient.LastName,
+      fhirServer: "Aidbox",
+      firstName: hyperUnluckyPatient.FirstName,
+      lastName: hyperUnluckyPatient.LastName,
       dob: hyperUnluckyPatient.DOB,
       mrn: hyperUnluckyPatient.MRN,
       phone: hyperUnluckyPatient.Phone,
@@ -92,9 +92,9 @@ describe("audit log", () => {
     const auditRows = await dbClient.query(auditQuery);
 
     const request: PatientRecordsRequest = {
-      fhir_server: "Aidbox",
-      patient_id: hyperUnluckyPatient.Id,
-      query_name: USE_CASE_DETAILS.gonorrhea.queryName,
+      fhirServer: "Aidbox",
+      patientId: hyperUnluckyPatient.Id,
+      queryName: USE_CASE_DETAILS.gonorrhea.queryName,
     };
     await patientRecordsQuery(request);
 
@@ -145,9 +145,9 @@ describe("audit log", () => {
 
   it("should block UPDATEs and DELETE for audit_logs", async () => {
     const request: PatientDiscoveryRequest = {
-      fhir_server: "Aidbox",
-      first_name: hyperUnluckyPatient.FirstName,
-      last_name: hyperUnluckyPatient.LastName,
+      fhirServer: "Aidbox",
+      firstName: hyperUnluckyPatient.FirstName,
+      lastName: hyperUnluckyPatient.LastName,
       dob: hyperUnluckyPatient.DOB,
       mrn: hyperUnluckyPatient.MRN,
       phone: hyperUnluckyPatient.Phone,

@@ -23,7 +23,6 @@ type SelectSavedQueryProps = {
   selectedQuery: CustomUserQuery;
   setSelectedQuery: React.Dispatch<React.SetStateAction<CustomUserQuery>>;
   fhirServer: string;
-  loadingQueryValueSets: boolean;
   goBack: () => void;
   handleSubmit: () => void;
   setFhirServer: React.Dispatch<React.SetStateAction<string>>;
@@ -39,14 +38,11 @@ type SelectSavedQueryProps = {
  * @param root0.handleSubmit - submit handler
  * @param root0.fhirServer - fhir server to apply a query against
  * @param root0.setFhirServer - function to update the fhir server
- * @param root0.loadingQueryValueSets - flag for whether the value sets are
- * still being fetched from the db
  * @returns SelectedSavedQuery component
  */
 const SelectSavedQuery: React.FC<SelectSavedQueryProps> = ({
   selectedQuery,
   fhirServer,
-  loadingQueryValueSets,
   goBack,
   setSelectedQuery,
   handleSubmit,
@@ -206,12 +202,8 @@ const SelectSavedQuery: React.FC<SelectSavedQueryProps> = ({
       <div className="margin-top-5">
         <Button
           type="button"
-          disabled={!selectedQuery.query_name || loadingQueryValueSets}
-          className={
-            selectedQuery && !loadingQueryValueSets
-              ? "usa-button"
-              : "usa-button disabled"
-          }
+          disabled={!selectedQuery.query_name}
+          className={selectedQuery ? "usa-button" : "usa-button disabled"}
           onClick={handleSubmit}
         >
           Submit

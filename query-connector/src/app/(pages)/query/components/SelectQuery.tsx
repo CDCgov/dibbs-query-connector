@@ -1,19 +1,16 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import SelectSavedQuery from "./selectQuery/SelectSavedQuery";
 
 import {
   PatientDiscoveryResponse,
+  patientRecordsQuery,
   PatientRecordsResponse,
 } from "@/app/shared/query-service";
 import { Patient } from "fhir/r4";
-import {
-  fetchQueryResponse,
-  fetchQueryValueSets,
-} from "./selectQuery/queryHooks";
 import LoadingView from "../../../ui/designSystem/LoadingView";
 import { CustomUserQuery } from "@/app/models/entities/query";
-import { DibbsValueSet } from "@/app/models/entities/valuesets";
+import { hyperUnluckyPatient } from "@/app/shared/constants";
 
 interface SelectQueryProps {
   goForward: () => void;
@@ -55,57 +52,43 @@ const SelectQuery: React.FC<SelectQueryProps> = ({
   setSelectedQuery,
   setLoading,
 }) => {
-  const [queryValueSets, setQueryValueSets] = useState<DibbsValueSet[]>(
-    [] as DibbsValueSet[],
-  );
-  const [loadingQueryValueSets, setLoadingQueryValueSets] =
-    useState<boolean>(true);
-
   const [loadingResultResponse, setLoadingResultResponse] =
     useState<boolean>(false);
 
-  useEffect(() => {
-    // Gate whether we actually update state after fetching so we
-    // avoid name-change race conditions
-    let isSubscribed = true;
+  async function fetchQueryResponse(
+    queryName: string,
+    patientForQuery: Patient | undefined,
+    fhirServer: string,
+  ) {
+    if (patientForQuery) {
+      const newRequest = {
+        queryName: queryName,
+        patientId: patientForQuery.id ?? hyperUnluckyPatient.Id,
+        fhirServer: fhirServer,
+      };
+      setLoadingResultResponse(true);
+      const queryResponse = await patientRecordsQuery(newRequest);
 
-    const fetchDataAndUpdateState = async () => {
-      setLoadingQueryValueSets(true);
-      if (selectedQuery && selectedQuery.query_name) {
-        const queryName = selectedQuery.query_name;
-        const valueSets = await fetchQueryValueSets(queryName);
-        // Only update if the fetch hasn't altered state yet
-        if (isSubscribed) {
-          setQueryValueSets(valueSets);
-        }
-      }
-      setLoadingQueryValueSets(false);
-    };
-
-    fetchDataAndUpdateState().catch(console.error);
-
-    // Destructor hook to prevent future state updates
-    return () => {
-      isSubscribed = false;
-    };
-  }, [selectedQuery]);
+      setResultsQueryResponse({
+        Patient: [patientForQuery],
+        ...queryResponse,
+      });
+      setLoadingResultResponse(false);
+    }
+  }
 
   async function onSubmit() {
     goForward();
     setLoading(true);
-    await fetchQueryResponse({
-      queryName: selectedQuery.query_name,
-      patientForQuery: patientForQuery,
-      selectedQuery: selectedQuery.query_name,
-      fhirServer: fhirServer,
-      valueSetOverrides: queryValueSets,
-      queryResponseStateCallback: setResultsQueryResponse,
-      setIsLoading: setLoadingResultResponse,
-    }).catch(console.error);
+    await fetchQueryResponse(
+      selectedQuery.query_name,
+      patientForQuery,
+      fhirServer,
+    ).catch(console.error);
     setLoading(false);
   }
 
-  const displayLoading = loadingResultResponse || loadingQueryValueSets;
+  const displayLoading = loadingResultResponse;
 
   return (
     <div>
@@ -113,7 +96,6 @@ const SelectQuery: React.FC<SelectQueryProps> = ({
       <SelectSavedQuery
         selectedQuery={selectedQuery}
         fhirServer={fhirServer}
-        loadingQueryValueSets={loadingQueryValueSets}
         goBack={goBack}
         setSelectedQuery={setSelectedQuery}
         handleSubmit={onSubmit}

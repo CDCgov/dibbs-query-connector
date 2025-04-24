@@ -5,9 +5,9 @@ type AuditLogActionTypeFormatter = (
 ) => string;
 
 type RequestPayload = {
-  query_name?: string;
-  first_name?: string;
-  last_name?: string;
+  queryName?: string;
+  firstName?: string;
+  lastName?: string;
   [key: string]: unknown;
 };
 
@@ -51,7 +51,7 @@ function resolveFullName(
   fallback?: string,
 ): string {
   const full = `${first ?? ""} ${last ?? ""}`.trim();
-  return full !== "" ? full : (fallback ?? "");
+  return full !== "" ? full : fallback ?? "";
 }
 
 /**
@@ -59,22 +59,22 @@ function resolveFullName(
  */
 export const auditLogActionTypeMap: Record<string, auditLogActionTypeMapping> =
   {
-    patientRecordsQuery: {
+    makePatientRecordsRequest: {
       label: "Patient Records Query",
       format: (log) => {
         const request = parseRequest(log);
         return `Viewed patient record for ${
-          request.query_name ?? ""
+          request.queryName ?? ""
         } query`.trim();
       },
     },
-    patientDiscoveryQuery: {
+    makePatientDiscoveryRequest: {
       label: "Patient Discovery Query",
       format: (log) => {
         const request = parseRequest(log);
         const fullName = resolveFullName(
-          request.first_name,
-          request.last_name,
+          request.firstName,
+          request.lastName,
           log.author as string,
         );
         return `Ran patient discovery query for ${fullName}`;
