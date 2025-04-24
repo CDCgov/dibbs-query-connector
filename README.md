@@ -5,15 +5,13 @@
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![Test github badge](https://github.com/CDCgov/phdi/actions/workflows/test.yaml/badge.svg)](https://github.com/CDCgov/phdi/actions/workflows/test.yaml)
 
-**General disclaimer** This repository was created for use by CDC programs to collaborate on public health related projects in support of the [CDC mission](https://www.cdc.gov/about/organization/mission.htm). GitHub is not hosted by the CDC, but is a third party website used by CDC and its partners to share information and collaborate on software. CDC use of GitHub does not imply an endorsement of any one particular service, product, or enterprise.
-
 ## Overview
 
-This repository is a part of the CDC/USDS [PHDI project](https://cdcgov.github.io/phdi-site/) and seeks to build the DIBBs Query Connector.
+This repository is a part of the CDC/USDS [DIBBs project](https://cdcgov.github.io/dibbs-site/) and seeks to build the DIBBs Query Connector.
 
 The DIBBs Query Connector app offers a REST API and comprehensive UI for public health staff to query a wide network of healthcare organizations (HCOs), providing access to more complete and timely data.
 
-The Query Connector is a tool for public health practitioners to quickly retrieve patient records and relevant case information from HCOs. The tool works by connecting to Qualified Health Information Networks (QHINs) within the Trusted Exchange Framework and Common Agreement (TEFCA), ensuring immediate access to essential health data and facilitating timely public health decisions and interventions. Public health staff can interact with the Query Connector manually by entering simple patient details — such as name, date of birth, or medical identifiers — into a web-based search form. The tool also allows for automated queries via integration engines like Rhapsody and Mirth.
+The Query Connector is a tool for public health practitioners to quickly retrieve patient records and relevant case information from HCOs. The tool works either by making direct FHIR queries or by connecting to Qualified Health Information Networks (QHINs) within the Trusted Exchange Framework and Common Agreement (TEFCA), ensuring immediate access to essential health data and facilitating timely public health decisions and interventions. Public health staff can interact with the Query Connector manually by entering simple patient details — such as name, date of birth, or medical identifiers — into a web-based search form. The tool also allows for automated queries via integration engines like Rhapsody and Mirth.
 
 ### Problem Scope
 
@@ -23,9 +21,17 @@ The current methods that public health jurisdictions use to collect data from HC
 
 DIBBs Query Connector is a sibling project to
 
-- [PHDI](https://github.com/CDCgov/phdi) to further help display, access, and interpret publich health data;
+- [DIBBs ECR Viewer](https://github.com/CDCgov/dibbs-ecr-viewer/) to further help display, access, and interpret public health data;
 - [PRIME ReportStream](https://reportstream.cdc.gov), which focuses on improving the delivery of COVID-19 test data to public health departments; and
 - [PRIME SimpleReport](https://simplereport.gov), which provides a better way for organizations and testing facilities to report COVID-19 rapid tests to public health departments.
+
+## Documentation
+
+DIBBs Query Connector documentation, including instructions on how to install dependencies and run locally, is currently hosted within the repository, [here](docs/getting_started.md).
+
+Access to the demo instance of the latest official release DIBBs Query Connector is available at [demo.queryconnector.dev](https://demo.queryconnector.dev).
+
+Access to the dev instance of the main branch of DIBBs Query Connector is available at [queryconnector.dev](https://queryconnector.dev).
 
 ## Implementation
 
@@ -34,21 +40,12 @@ DIBBs Query Connector is a sibling project to
 - **Examples** - Forthcoming!
 - **Tutorials** - Forthcoming!
 
-## Documentation
-
-DIBBs Query Connector documentation, including instructions on how to install dependencies and run locally, is currently hosted within the repository, [here](https://github.com/CDCgov/dibbs-query-connector/blob/main/query-connector/README.md).
-
-Access to the demo instance of the DIBBs Query Connector is available at [dibbs.cloud/query-connector]().
-
 ## Additional Acknowledgments
 
-We mapped the rootnames of the PHDI database to nicknames produced by the aggregation and synthesis of open source work from a number of projects. While we do not employ the packages and wrappers used by the various projects (merely their open source data), we wish to give credit to their various works building collections of nickname mappings. These projects are:
+The Query Connector uses condition mappings and value sets from the electronic Reporting and Surveillance Distribution (eRSD) from the Association of Public Health Laboratories (APHL), and retrieves value set information from the Unified Medical Language System (UMLS) API from the National Institutes of Health (NIH).
 
-- [Secure Enterprise Master Patient Index](https://github.com/MrCsabaToth/SOEMPI), based on OpenEMPI, conducted by Vanderbilt University
-- [Curated Nicknames](https://github.com/carltonnorthern/nicknames), scraped from genealogy webpages and run by Old Dominion University Web Science and Digital Libraries Research Group
-- [Simple Public Domain Nickname Mappings](https://github.com/onyxrev/common_nickname_csv), hand collected using various sources
-- [Lingua En Nickname](https://github.com/brianary/Lingua-EN-Nickname), collected from a series of GenWeb projects
-- [diminutives.db](https://github.com/HaJongler/diminutives.db), compiled via a nickname extract using Wikipedia and Wiktionary
+- [eRSD](https://ecr.aimsplatform.org/ehr-implementers/triggering/)
+- [UMLS](https://www.nlm.nih.gov/research/umls/index.html)
 
 ## Standard Notices
 
@@ -75,7 +72,7 @@ unless pursuant to an existing contract or agreement.
 
 This repository contains only non-sensitive, publicly available data and
 information. All material and community participation is covered by the
-[Disclaimer](https://github.com/CDCgov/template/blob/master/DISCLAIMER.md)
+[Disclaimer](docs/disclaimer.md)
 and [Code of Conduct](https://github.com/CDCgov/template/blob/master/code-of-conduct.md).
 For more information about CDC's privacy policy, please visit [http://www.cdc.gov/other/privacy.html](https://www.cdc.gov/other/privacy.html).
 
@@ -92,7 +89,7 @@ later.
 All comments, messages, pull requests, and other submissions received through
 CDC including this GitHub page may be subject to applicable federal law, including but not limited to the Federal Records Act, and may be archived. Learn more at [http://www.cdc.gov/other/privacy.html](http://www.cdc.gov/other/privacy.html).
 
-See [CONTRIBUTING.md](docs/CONTRIBUTING.md) for more information.
+See [CONTRIBUTING.md](docs/contributing.md) for more information.
 
 ### Records Management Standard Notice
 
@@ -102,11 +99,8 @@ published through the [CDC web site](http://www.cdc.gov).
 
 ### Related documents
 
-- [Open Practices](docs/open_practices.md)
-- [Rules of Behavior](docs/rules_of_behavior.md)
-- [Disclaimer](docs/DISCLAIMER.md)g
-- [Contribution Notice](docs/CONTRIBUTING.md)
-- [Code of Conduct](docs/code-of-conduct.md)
+- [Disclaimer](docs/disclaimer.md)
+- [Contribution Notice](docs/contributing.md)
 
 ### Additional Standard Notices
 
@@ -114,3 +108,5 @@ Please refer to [CDC&#39;s Template Repository](https://github.com/CDCgov/templa
 for more information about [contributing to this repository](https://github.com/CDCgov/template/blob/master/CONTRIBUTING.md),
 [public domain notices and disclaimers](https://github.com/CDCgov/template/blob/master/DISCLAIMER.md),
 and [code of conduct](https://github.com/CDCgov/template/blob/master/code-of-conduct.md).
+
+**General disclaimer** This repository was created for use by CDC programs to collaborate on public health related projects in support of the [CDC mission](https://www.cdc.gov/about/organization/mission.htm). GitHub is not hosted by the CDC, but is a third party website used by CDC and its partners to share information and collaborate on software. CDC use of GitHub does not imply an endorsement of any one particular service, product, or enterprise.

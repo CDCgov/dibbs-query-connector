@@ -4,29 +4,33 @@ const tabbable = {
   ...lib,
   /**
    *
-   * @param node
-   * @param options
+   * @param node - node
+   * @param options - options
+   * @returns - Array
    */
   tabbable: (node, options) =>
     lib.tabbable(node, { ...options, displayCheck: "none" }),
   /**
    *
-   * @param node
-   * @param options
+   * @param node - node
+   * @param options - options
+   * @returns - Array
    */
   focusable: (node, options) =>
     lib.focusable(node, { ...options, displayCheck: "none" }),
   /**
    *
-   * @param node
-   * @param options
+   * @param node - node
+   * @param options - options
+   * @returns - Array
    */
   isFocusable: (node, options) =>
     lib.isFocusable(node, { ...options, displayCheck: "none" }),
   /**
    *
-   * @param node
-   * @param options
+   * @param node - node
+   * @param options - options
+   * @returns - Array
    */
   isTabbable: (node, options) =>
     lib.isTabbable(node, { ...options, displayCheck: "none" }),
