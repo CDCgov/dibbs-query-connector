@@ -210,8 +210,8 @@ describe("AuditLogs Component", () => {
   });
 
   test("clear filters resets empty state", async () => {
-    await user.selectDropdownOption("Name(s)", "Luigi Mario");
-    await user.selectDropdownOption("Action(s)", "Patient Records Query");
+    await user.selectDropdownOption("Name(s)", TEST_NAME);
+    await user.selectDropdownOption("Action(s)", TEST_REPORT);
 
     await waitFor(() => {
       expect(

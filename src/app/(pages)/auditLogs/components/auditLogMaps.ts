@@ -26,6 +26,16 @@ function parseRequest(log: Record<string, unknown>): RequestPayload {
     raw = msg;
   }
 
+  if (
+    raw &&
+    typeof raw === "object" &&
+    !Array.isArray(raw) &&
+    Object.keys(raw).length === 1
+  ) {
+    const onlyKey = Object.keys(raw)[0];
+    raw = (raw as Record<string, unknown>)[onlyKey];
+  }
+
   if (typeof raw === "string") {
     try {
       raw = JSON.parse(raw);
@@ -37,7 +47,19 @@ function parseRequest(log: Record<string, unknown>): RequestPayload {
   const dequoted: Record<string, unknown> = {};
   for (const [key, val] of Object.entries(raw ?? {})) {
     if (typeof val === "string") {
-      dequoted[key] = val.replace(/^"(.*)"$/, "$1");
+      const trimmed = val.trim();
+      try {
+        if (
+          (trimmed.startsWith("{") && trimmed.endsWith("}")) ||
+          (trimmed.startsWith("[") && trimmed.endsWith("]"))
+        ) {
+          dequoted[key] = JSON.parse(trimmed);
+        } else {
+          dequoted[key] = val.replace(/^"(.*)"$/, "$1");
+        }
+      } catch {
+        dequoted[key] = val;
+      }
     } else {
       dequoted[key] = val;
     }
@@ -51,7 +73,7 @@ function resolveFullName(
   fallback?: string,
 ): string {
   const full = `${first ?? ""} ${last ?? ""}`.trim();
-  return full !== "" ? full : (fallback ?? "");
+  return full !== "" ? full : fallback ?? "";
 }
 
 /**
@@ -59,8 +81,8 @@ function resolveFullName(
  */
 export const auditLogActionTypeMap: Record<string, auditLogActionTypeMapping> =
   {
-    makePatientRecordsRequest: {
-      label: "Patient Records Query",
+    patientRecordsQuery: {
+      label: "Patient records query",
       format: (log) => {
         const request = parseRequest(log);
         return `Viewed patient record for ${
@@ -68,8 +90,8 @@ export const auditLogActionTypeMap: Record<string, auditLogActionTypeMapping> =
         } query`.trim();
       },
     },
-    makePatientDiscoveryRequest: {
-      label: "Patient Discovery Query",
+    patientDiscoveryQuery: {
+      label: "Patient discovery query",
       format: (log) => {
         const request = parseRequest(log);
         const fullName = resolveFullName(
@@ -81,24 +103,49 @@ export const auditLogActionTypeMap: Record<string, auditLogActionTypeMapping> =
       },
     },
     deleteFhirServer: {
-      label: "Delete FHIR Server",
+      label: "Delete FHIR server",
       format: (log) => {
         const request = parseRequest(log);
         return `Deleted FHIR server ${request.name ?? ""}`.trim();
       },
     },
     insertFhirServer: {
-      label: "Insert FHIR Server",
+      label: "Insert FHIR server",
       format: (log) => {
         const request = parseRequest(log);
         return `Inserted FHIR server ${request.name ?? ""}`.trim();
       },
     },
     updateFhirServer: {
-      label: "Update FHIR Server",
+      label: "Update FHIR server",
       format: (log) => {
         const request = parseRequest(log);
         return `Updated FHIR server ${request.name ?? ""}`.trim();
+      },
+    },
+    insertValueSet: {
+      label: "Insert value set",
+      format: (log) => {
+        const request = parseRequest(log);
+        return `Inserted value set ${
+          request.valueSetName ?? request.valueSetId ?? ""
+        }`.trim();
+      },
+    },
+    executeCategoryUpdates: {
+      label: "Execute category updates",
+      format: (log) => {
+        return `Executed category updates`;
+      },
+    },
+    insertDBStructArray: {
+      label: "Insert database table structure array",
+      format: (log) => {
+        const request = parseRequest(log);
+        const table = request.undefined ?? "unknown";
+        const length =
+          Object.values(request).find((v) => Array.isArray(v))?.length ?? 0;
+        return `Inserted ${length} database rows for ${table} table`;
       },
     },
     // Add more as needed
