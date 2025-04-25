@@ -90,7 +90,7 @@ curl -L -X PUT \
       "client_credentials"
     ]
   }' \
-  ${NETWORK_URL}/Client/e2e-smart-test-client
+  ${NETWORK_URL}/Client/query-connector
 
 echo "Client information data loaded successfully."
 
@@ -103,12 +103,12 @@ curl -L -X PUT \
       "engine": "allow",
       "link": [
         {
-          "id": "e2e-smart-test-client",
+          "id": "query-connector",
           "resourceType": "Client"
         }
       ]
     }' \
-  ${NETWORK_URL}/AccessPolicy/e2e-smart-test-client
+  ${NETWORK_URL}/AccessPolicy/query-connector
 
 echo "Access policy information data loaded successfully."
 

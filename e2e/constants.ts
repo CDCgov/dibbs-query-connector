@@ -126,5 +126,5 @@ export const CANCER_FRONTEND_NESTED_INPUT = {
 
 // note: values here are also hard-coded in the seed script at seed_aidbox.sh,
 // so change them there as well if you change it here
-export const E2E_SMART_TEST_CLIENT_ID = "e2e-smart-test-client";
+export const E2E_SMART_TEST_CLIENT_ID = "query-connector";
 export const E2E_SMART_TEST_CLIENT_SCOPES = "system/*.read";
