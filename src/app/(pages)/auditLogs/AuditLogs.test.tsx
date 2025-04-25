@@ -3,6 +3,7 @@ import AuditLogs from "./page";
 import { renderWithUser, RootProviderMock } from "@/app/tests/unit/setup";
 import userEvent from "@testing-library/user-event";
 import { getAuditLogs, LogEntry } from "@/app/backend/dbServices/audit-logs";
+import { auditLogActionTypeMap } from "./components/auditLogMaps";
 
 jest.mock(
   "@/app/ui/components/withAuth/WithAuth",
@@ -16,7 +17,8 @@ jest.mock("@/app/backend/user-management", () => ({
 }));
 
 const TEST_NAME = "Mario Mario";
-const TEST_REPORT = "Patient Records Query";
+const TEST_ACTION = "makePatientRecordsRequest";
+const TEST_REPORT = auditLogActionTypeMap[TEST_ACTION].label;
 const TEST_REPORT_RENDERED = "Viewed patient record for";
 const NUM_ROWS = 26;
 const CHECKSUM_INPUT = "It's-a-me. Mario!";
@@ -210,7 +212,7 @@ describe("AuditLogs Component", () => {
   });
 
   test("clear filters resets empty state", async () => {
-    await user.selectDropdownOption("Name(s)", TEST_NAME);
+    await user.selectDropdownOption("Name(s)", "Luigi Mario");
     await user.selectDropdownOption("Action(s)", TEST_REPORT);
 
     await waitFor(() => {

@@ -81,7 +81,7 @@ function resolveFullName(
  */
 export const auditLogActionTypeMap: Record<string, auditLogActionTypeMapping> =
   {
-    patientRecordsQuery: {
+    makePatientRecordsRequest: {
       label: "Patient records query",
       format: (log) => {
         const request = parseRequest(log);
@@ -90,7 +90,7 @@ export const auditLogActionTypeMap: Record<string, auditLogActionTypeMapping> =
         } query`.trim();
       },
     },
-    patientDiscoveryQuery: {
+    makePatientDiscoveryRequest: {
       label: "Patient discovery query",
       format: (log) => {
         const request = parseRequest(log);
