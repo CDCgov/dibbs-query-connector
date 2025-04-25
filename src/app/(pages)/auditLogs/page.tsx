@@ -31,7 +31,7 @@ const AuditLogs: React.FC = () => {
   const [selectedName, setSelectedName] = useState("");
   const [selectedAction, setSelectedAction] = useState("");
   const [dateRange, setDateRange] = useState<DateRange>({});
-  const [dateErrors, setDateErrors] = useState<DateErrors>({});
+  const [_, setDateErrors] = useState<DateErrors>({});
   const [currentPage, setCurrentPage] = useState(1);
   const [actionsPerPage, setActionsPerPage] = useState(10);
   const [logs, setLogs] = useState<LogEntry[]>([]);
@@ -102,6 +102,9 @@ const AuditLogs: React.FC = () => {
         : null,
     [logs],
   );
+
+  console.log("minDate", minDate);
+  console.log("maxDate", maxDate);
 
   useEffect(() => {
     setFilteredLogs(

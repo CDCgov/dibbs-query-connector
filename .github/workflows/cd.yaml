@@ -52,7 +52,7 @@ jobs:
       - name: Get current qc version
         id: current-version
         run: |
-          CURRENT_VERSION=$(yq '.version' query-connector/app_version.yml)
+          CURRENT_VERSION=$(yq '.version' app_version.yml)
           echo "Current Query Connector Version: $CURRENT_VERSION"
           echo "current_version=$CURRENT_VERSION" >> $GITHUB_ENV
 
@@ -68,8 +68,8 @@ jobs:
       - name: Update app_version.yaml
         id: new-version
         run: |
-          yq -i -y ".version = \"${{ env.new_version }}\"" query-connector/app_version.yml
-          cat query-connector/app_version.yml
+          yq -i -y ".version = \"${{ env.new_version }}\"" app_version.yml
+          cat app_version.yml
 
       - name: Extract metadata (tags, labels) for Docker
         id: meta
@@ -82,7 +82,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
-          context: ./query-connector
+          context: .
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
