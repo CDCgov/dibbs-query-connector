@@ -16,7 +16,7 @@ jest.mock("@/app/backend/user-management", () => ({
 }));
 
 const TEST_NAME = "Rocky Balboa";
-const TEST_REPORT = "Patient Records Query";
+const TEST_REPORT = "Patient records query";
 const TEST_REPORT_RENDERED = "Viewed patient record for";
 const NUM_ROWS = 26;
 const CHECKSUM_INPUT =
@@ -212,7 +212,7 @@ describe("AuditLogs Component", () => {
 
   test("clear filters resets empty state", async () => {
     await user.selectDropdownOption("Name(s)", "Apollo Creed");
-    await user.selectDropdownOption("Action(s)", "Patient Records Query");
+    await user.selectDropdownOption("Action(s)", TEST_REPORT);
 
     await waitFor(() => {
       expect(
