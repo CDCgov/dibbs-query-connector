@@ -2,7 +2,6 @@
 
 [![codecov](https://codecov.io/gh/CDCgov/dibbs-query-connector/branch/main/graph/badge.svg)](https://codecov.io/gh/CDCgov/dibbs-query-connector)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
-[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![Test github badge](https://img.shields.io/github/actions/workflow/status/CDCgov/dibbs-query-connector/ci.yaml
 )](https://github.com/CDCgov/dibbs-query-connector/actions/workflows/ci.yaml)
 [![Dev site](https://img.shields.io/website?url=https%3A%2F%2Fqueryconnector.dev&label=queryconnector.dev)](https://queryconnector.dev)
