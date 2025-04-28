@@ -85,11 +85,11 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
     setMode("patient-results");
 
     const patientDiscoveryRequest: PatientDiscoveryRequest = {
-      first_name: firstName,
-      last_name: lastName,
-      dob: dob,
-      mrn: mrn,
-      fhir_server: fhirServer,
+      firstName,
+      lastName,
+      dob,
+      mrn,
+      fhirServer,
       phone: FormatPhoneAsDigits(phone),
     };
     const queryResponse = await patientDiscoveryQuery(patientDiscoveryRequest);

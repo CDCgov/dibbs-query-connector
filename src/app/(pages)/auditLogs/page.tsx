@@ -103,9 +103,6 @@ const AuditLogs: React.FC = () => {
     [logs],
   );
 
-  console.log("minDate", minDate);
-  console.log("maxDate", maxDate);
-
   useEffect(() => {
     setFilteredLogs(
       logs.filter((log) => {

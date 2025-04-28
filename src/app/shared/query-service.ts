@@ -7,10 +7,9 @@ import { isFhirResource } from "../shared/constants";
 import { CustomQuery } from "./CustomQuery";
 import { GetPhoneQueryFormats } from "./format-service";
 import { getSavedQueryByName } from "./database-service";
-import type { QueryDataColumn } from "../(pages)/queryBuilding/utils";
 import { prepareFhirClient } from "../backend/dbServices/fhir-servers";
-import { DibbsValueSet } from "../models/entities/valuesets";
 import { auditable } from "../backend/auditLogs/decorator";
+import type { QueryDataColumn } from "../(pages)/queryBuilding/utils";
 
 /**
  * The query response when the request source is from the Viewer UI.
@@ -22,52 +21,21 @@ export type QueryResponse = {
 export type APIQueryResponse = Bundle;
 
 export type PatientDiscoveryRequest = {
-  fhir_server: string;
-  first_name?: string;
-  last_name?: string;
+  fhirServer: string;
+  firstName?: string;
+  lastName?: string;
   dob?: string;
   mrn?: string;
   phone?: string;
 };
 export type PatientRecordsRequest = {
-  patient_id: string;
-  fhir_server: string;
-  query_name: string;
+  patientId: string;
+  fhirServer: string;
+  queryName: string;
 };
 
 export type FullPatientRequest = PatientDiscoveryRequest &
-  Omit<PatientRecordsRequest, "patient_id">;
-
-// Helper function that integrates the selections from the CustomizeQuery page
-// into the saved valuesets from build query. Can be deleted if / when we remove
-// CustomizeQuery fully
-function reconcileSavedQueryDataWithOverrides(
-  savedQuery: QueryDataColumn,
-  valueSetOverrides: DibbsValueSet[],
-) {
-  const reconciledQuery: QueryDataColumn = {};
-
-  Object.entries(savedQuery).forEach(([conditionId, valueSetMap]) => {
-    reconciledQuery[conditionId] = {};
-    Object.entries(valueSetMap).forEach(([vsId, vs]) => {
-      const matchedValueSet = valueSetOverrides.find(
-        (v) => v.valueSetId === vsId,
-      );
-      if (matchedValueSet && matchedValueSet.includeValueSet) {
-        const filteredValueSet = matchedValueSet;
-        filteredValueSet.concepts = matchedValueSet.concepts.filter(
-          (c) => c.include,
-        );
-        reconciledQuery[conditionId][vsId] = filteredValueSet;
-      }
-      if (matchedValueSet === undefined) {
-        reconciledQuery[conditionId][vsId] = vs;
-      }
-    });
-  });
-
-  return reconciledQuery;
-}
+  Omit<PatientRecordsRequest, "patientId">;
 
 /**
  * Create a FHIR Bundle from the query response.
@@ -221,41 +189,30 @@ export async function testFhirServerConnection(
 
 class QueryService {
   /**
-   * Performs a generalized query for collections of patients matching
-   * particular criteria. The query is determined by a collection of passed-in
-   * valuesets to include in the query results, and any patients found must
-   * have eCR data interseecting with these valuesets.
-   * @param request Information to pass off to the FHIR server
-   * @param valueSetOverrides Any valuesets from the customize query step to override
-   * the default saved query for
-   * @returns A promise for an updated query response.
+   * Method that coordinates user input and relevant DB config information to make
+   * an outgoing FHIR query for patient records
+   * @param queryName - name of the stored query
+   * @param queryData - JSON blob with mapped valueset information
+   * to pull back the relevant FHIR resources
+   * @param patientId - ID of the referenced patient
+   * @param fhirServer - name of the FHIR server
+   * @param  includeImmunization - whether to include immunizations
+   * @returns a Response with FHIR information for further processing.
    */
   @auditable
-  static async patientRecordsQuery(
-    request: PatientRecordsRequest,
-    valueSetOverrides?: DibbsValueSet[],
-  ): Promise<QueryResponse> {
-    const queryName = request.query_name;
-    const fhirClient = await prepareFhirClient(request.fhir_server);
-    const savedQuery = await getSavedQueryByName(request.query_name as string);
-
-    if (!savedQuery) {
-      throw new Error(`Unable to query of name ${request?.query_name}`);
-    }
-    const includeImmunization = savedQuery.immunization;
-    const queryData = valueSetOverrides
-      ? reconcileSavedQueryDataWithOverrides(
-          savedQuery.query_data,
-          valueSetOverrides,
-        )
-      : savedQuery.query_data;
-
+  private static async makePatientRecordsRequest(
+    queryName: string,
+    queryData: QueryDataColumn,
+    patientId: string,
+    fhirServer: string,
+    includeImmunization: boolean,
+  ) {
+    const fhirClient = await prepareFhirClient(fhirServer);
     const builtQuery = new CustomQuery(
       queryData,
-      request.patient_id,
+      patientId,
       includeImmunization,
     );
-    let response: Response | Response[];
 
     // handle the immunization query using "get" separately since posting against
     // the dev IZ gateway endpoint results in auth errors
@@ -265,9 +222,7 @@ class QueryService {
       Object.entries(params).forEach(([k, v]) => {
         fetchString += `?${k}=${v}`;
       });
-      response = await fhirClient.get(fetchString);
-      const queryResponse = await QueryService.parseFhirSearch(response);
-      return queryResponse;
+      return await fhirClient.get(fetchString);
     }
 
     const postPromises = builtQuery.compileAllPostRequests().map((req) => {
@@ -300,42 +255,34 @@ class QueryService {
       })
       .filter((v): v is Response => !!v);
 
-    response = successfulResults;
-    const queryResponse = await QueryService.parseFhirSearch(response);
-    return queryResponse;
+    return successfulResults;
   }
 
-  /**
-   * Query a FHIR server for a patient based on demographics provided in the request. If
-   * a patient is found, store in the queryResponse object.
-   * @param request - The request object containing the patient demographics and
-   * fhir client info.
-   * @returns - The response body from the FHIR server.
-   */
   @auditable
-  static async patientDiscoveryQuery(
+  private static async makePatientDiscoveryRequest(
     request: PatientDiscoveryRequest,
-  ): Promise<QueryResponse["Patient"]> {
-    const fhirClient = await prepareFhirClient(request.fhir_server);
+  ) {
+    const { fhirServer, firstName, lastName, dob, mrn, phone } = request;
+    const fhirClient = await prepareFhirClient(fhirServer);
 
     // Query for patient
     let query = "/Patient?";
-    if (request.first_name) {
-      query += `given=${request.first_name}&`;
+    if (firstName) {
+      query += `given=${firstName}&`;
     }
-    if (request.last_name) {
-      query += `family=${request.last_name}&`;
+    if (lastName) {
+      query += `family=${lastName}&`;
     }
-    if (request.dob) {
-      query += `birthdate=${request.dob}&`;
+    if (dob) {
+      query += `birthdate=${dob}&`;
     }
-    if (request.mrn) {
-      query += `identifier=${request.mrn}&`;
+    if (mrn) {
+      query += `identifier=${mrn}&`;
     }
-    if (request.phone) {
+    if (phone) {
       // We might have multiple phone numbers if we're coming from the API
       // side, since we parse *all* telecom structs
-      const phonesToSearch = request.phone.split(";");
+      const phonesToSearch = phone.split(";");
       let phonePossibilities: string[] = [];
       for (const phone of phonesToSearch) {
         let possibilities = await GetPhoneQueryFormats(phone);
@@ -361,6 +308,54 @@ class QueryService {
         )}`,
       );
     }
+
+    return fhirResponse;
+  }
+
+  /**
+   * Performs a generalized query for collections of patients matching
+   * particular criteria. The query is determined by a collection of passed-in
+   * valuesets to include in the query results, and any patients found must
+   * have eCR data interseecting with these valuesets.
+   * @param request Information to pass off to the FHIR server
+   * @returns A promise for an updated query response.
+   */
+  static async patientRecordsQuery(
+    request: PatientRecordsRequest,
+  ): Promise<QueryResponse> {
+    const savedQuery = await getSavedQueryByName(request.queryName as string);
+
+    if (!savedQuery) {
+      throw new Error(`Unable to query of name ${request?.queryName}`);
+    }
+    const includeImmunization = savedQuery.immunization;
+    const queryData = savedQuery.query_data;
+
+    let response: Response | Response[] =
+      await QueryService.makePatientRecordsRequest(
+        request.queryName,
+        queryData,
+        request.patientId,
+        request.fhirServer,
+        includeImmunization,
+      );
+
+    const queryResponse = await QueryService.parseFhirSearch(response);
+    return queryResponse;
+  }
+
+  /**
+   * Query a FHIR server for a patient based on demographics provided in the request. If
+   * a patient is found, store in the queryResponse object.
+   * @param request - The request object containing the patient demographics and
+   * fhir client info.
+   * @returns - The response body from the FHIR server.
+   */
+  static async patientDiscoveryQuery(
+    request: PatientDiscoveryRequest,
+  ): Promise<QueryResponse["Patient"]> {
+    const fhirResponse =
+      await QueryService.makePatientDiscoveryRequest(request);
     const newResponse = await QueryService.parseFhirSearch(fhirResponse);
     return newResponse["Patient"] as Patient[];
   }
@@ -374,7 +369,7 @@ class QueryService {
     }
 
     const patientRecords = await patientRecordsQuery({
-      patient_id: patient[0].id as string,
+      patientId: patient[0].id as string,
       ...queryRequest,
     });
     return {

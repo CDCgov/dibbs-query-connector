@@ -3,6 +3,7 @@ import AuditLogs from "./page";
 import { renderWithUser, RootProviderMock } from "@/app/tests/unit/setup";
 import userEvent from "@testing-library/user-event";
 import { getAuditLogs, LogEntry } from "@/app/backend/dbServices/audit-logs";
+import { auditLogActionTypeMap } from "./components/auditLogMaps";
 
 jest.mock(
   "@/app/ui/components/withAuth/WithAuth",
@@ -15,45 +16,45 @@ jest.mock("@/app/backend/user-management", () => ({
   getUserRole: jest.fn(),
 }));
 
-const TEST_NAME = "Rocky Balboa";
-const TEST_REPORT = "Patient records query";
+const TEST_NAME = "Mario Mario";
+const TEST_ACTION = "makePatientRecordsRequest";
+const TEST_REPORT = auditLogActionTypeMap[TEST_ACTION].label;
 const TEST_REPORT_RENDERED = "Viewed patient record for";
 const NUM_ROWS = 26;
-const CHECKSUM_INPUT =
-  "It ain't about how hard you hit, it's about how hard you can get hit and keep moving forward";
+const CHECKSUM_INPUT = "It's-a-me. Mario!";
 const PLACEHOLDER_TEXT = "Search name, action, or message";
 const BASE_TEST_DATA: LogEntry[] = [
   {
-    author: "Rocky Balboa",
-    actionType: "patientRecordsQuery",
+    actionType: "makePatientRecordsRequest",
+    author: "Mario Mario",
     auditMessage: { query_name: "Test Query 1" },
     auditChecksum: CHECKSUM_INPUT,
     createdAt: new Date("2025-03-10T14:30:00Z"),
   },
   {
-    author: "Apollo Creed",
-    actionType: "patientDiscoveryQuery",
+    actionType: "makePatientDiscoveryRequest",
+    author: "Luigi Mario",
     auditMessage: { query_name: "Test Query 2" },
     auditChecksum: CHECKSUM_INPUT,
     createdAt: new Date("2025-03-09T09:15:00Z"),
   },
   {
-    author: "Rocky Balboa",
-    actionType: "patientDiscoveryQuery",
+    actionType: "makePatientDiscoveryRequest",
+    author: "Mario Mario",
     auditMessage: { query_name: "Test Query 3" },
     auditChecksum: CHECKSUM_INPUT,
     createdAt: new Date("2022-03-08T17:45:00Z"),
   },
   {
-    author: "Clubber Lang",
-    actionType: "patientRecordsQuery",
+    actionType: "makePatientRecordsRequest",
+    author: "Princess Peach",
     auditMessage: { query_name: "Test Query 4" },
     auditChecksum: CHECKSUM_INPUT,
     createdAt: new Date("2024-03-07T12:00:00Z"),
   },
   {
-    author: "Ivan Drago",
-    actionType: "patientDiscoveryQuery",
+    actionType: "makePatientDiscoveryRequest",
+    author: "Toad Toadstool",
     auditMessage: { query_name: "Test Query 5" },
     auditChecksum: CHECKSUM_INPUT,
     createdAt: new Date("2025-03-06T22:10:00Z"),
@@ -157,12 +158,12 @@ describe("AuditLogs Component", () => {
   });
 
   test("filters by partial search", async () => {
-    await user.typeInField(PLACEHOLDER_TEXT, "Apollo");
+    await user.typeInField(PLACEHOLDER_TEXT, "Mario");
 
     const rows = await screen.findAllByRole("row");
     expect(rows.length).toBeGreaterThan(1);
     rows.slice(1).forEach((row) => {
-      const matches = within(row).queryAllByText(/Apollo/i);
+      const matches = within(row).queryAllByText(/Mario/i);
       expect(matches.length).toBeGreaterThan(0);
     });
   });
@@ -211,7 +212,7 @@ describe("AuditLogs Component", () => {
   });
 
   test("clear filters resets empty state", async () => {
-    await user.selectDropdownOption("Name(s)", "Apollo Creed");
+    await user.selectDropdownOption("Name(s)", "Luigi Mario");
     await user.selectDropdownOption("Action(s)", TEST_REPORT);
 
     await waitFor(() => {

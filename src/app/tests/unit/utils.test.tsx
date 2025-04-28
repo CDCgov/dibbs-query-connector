@@ -1,14 +1,9 @@
-import {
-  groupConditionConceptsIntoValueSets,
-  unnestValueSetsFromQuery,
-} from "../../shared/utils";
+import { groupConditionConceptsIntoValueSets } from "../../shared/utils";
 
 import { filterSearchByCategoryAndCondition } from "@/app/(pages)/queryBuilding/utils";
 import {
   CANCER_DB_QUERY_VALUES,
   CATEGORY_TO_CONDITION_ARRAY_MAP,
-  DEFAULT_CHLAMYDIA_QUERY,
-  EXPECTED_CHLAMYDIA_VALUESET_LENGTH,
 } from "./fixtures";
 
 describe("data util methods for query building", () => {
@@ -37,11 +32,6 @@ describe("data util methods for query building", () => {
       ).flatMap((e) => Object.values(e).length);
       expect(countOfResults[0] + countOfResults[1]).toBe(8);
     });
-  });
-
-  describe("unnestValueSetsFromQuery", () => {
-    const unnestedVals = unnestValueSetsFromQuery(DEFAULT_CHLAMYDIA_QUERY);
-    expect(unnestedVals.length).toBe(EXPECTED_CHLAMYDIA_VALUESET_LENGTH);
   });
 
   describe("groupConditionConceptsByValueSetId", () => {
