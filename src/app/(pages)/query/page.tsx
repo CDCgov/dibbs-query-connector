@@ -17,7 +17,7 @@ import WithAuth from "@/app/ui/components/withAuth/WithAuth";
 import {
   PatientDiscoveryResponse,
   PatientRecordsResponse,
-} from "@/app/shared/query-service";
+} from "@/app/backend/query-execution";
 
 const blankUserQuery = {
   query_id: "",

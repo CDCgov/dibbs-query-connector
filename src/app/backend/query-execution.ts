@@ -4,38 +4,19 @@ import { Bundle, FhirResource, Patient } from "fhir/r4";
 
 import { isFhirResource } from "../shared/constants";
 
-import { CustomQuery } from "./CustomQuery";
-import { GetPhoneQueryFormats } from "./format-service";
-import { getSavedQueryByName } from "./database-service";
-import { prepareFhirClient } from "../backend/dbServices/fhir-servers";
-import { auditable } from "../backend/auditLogs/decorator";
+import { CustomQuery } from "../shared/CustomQuery";
+import { GetPhoneQueryFormats } from "../shared/format-service";
+import { getSavedQueryByName } from "../shared/database-service";
+import { prepareFhirClient } from "./dbServices/fhir-servers";
+import { auditable } from "./auditLogs/decorator";
 import type { QueryDataColumn } from "../(pages)/queryBuilding/utils";
-
-/**
- * The query response when the request source is from the Viewer UI.
- */
-export type QueryResponse = {
-  [R in FhirResource as R["resourceType"]]?: R[];
-};
-
-export type APIQueryResponse = Bundle;
-
-export type PatientDiscoveryRequest = {
-  fhirServer: string;
-  firstName?: string;
-  lastName?: string;
-  dob?: string;
-  mrn?: string;
-  phone?: string;
-};
-export type PatientRecordsRequest = {
-  patientId: string;
-  fhirServer: string;
-  queryName: string;
-};
-
-export type FullPatientRequest = PatientDiscoveryRequest &
-  Omit<PatientRecordsRequest, "patientId">;
+import type {
+  QueryResponse,
+  APIQueryResponse,
+  PatientDiscoveryRequest,
+  PatientRecordsRequest,
+  FullPatientRequest,
+} from "../models/entities/query";
 
 /**
  * Create a FHIR Bundle from the query response.

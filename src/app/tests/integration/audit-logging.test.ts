@@ -7,7 +7,7 @@ import {
   PatientDiscoveryRequest,
   patientRecordsQuery,
   PatientRecordsRequest,
-} from "@/app/shared/query-service";
+} from "@/app/backend/query-execution";
 import { getDbClient } from "@/app/backend/dbClient";
 import {
   AUDIT_LOG_MAX_RETRIES,

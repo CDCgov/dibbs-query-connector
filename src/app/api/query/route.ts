@@ -9,7 +9,7 @@ import {
   APIQueryResponse,
   fullPatientQuery,
   FullPatientRequest,
-} from "../../shared/query-service";
+} from "../../backend/query-execution";
 import {
   RESPONSE_BODY_IS_NOT_PATIENT_RESOURCE,
   MISSING_PATIENT_IDENTIFIERS,
