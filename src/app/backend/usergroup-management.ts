@@ -11,6 +11,7 @@ import { QCResponse } from "../models/responses/collections";
 import { CustomUserQuery } from "../models/entities/query";
 import { QueryResult } from "pg";
 import { getQueryById } from "./query-building";
+import dbService from "./dbServices/db-service";
 
 const dbClient = getDbClient();
 
@@ -427,17 +428,18 @@ export async function getAllGroupQueries(
     LEFT JOIN usergroup ug ON ug.id = ugtq.usergroup_id 
     WHERE ugtq.usergroup_id = $1;
     `;
-    const result = await dbClient.query(selectQueriesByGroupQuery, [groupId]);
+    const result = await dbService.query(selectQueriesByGroupQuery, [groupId]);
 
     const groupQueries = await Promise.all(
       result.rows.map(async (row) => {
         const groupAssignments = await fetchQueryGroupAssignmentDetails(result);
+        const { queryId, queryName, queryData, conditionsList } = row;
 
         const formattedQuery: CustomUserQuery = {
-          query_id: row.query_id,
-          query_name: row.query_name,
-          valuesets: row.query_data,
-          conditions_list: row.conditions_list,
+          queryId,
+          queryName,
+          valuesets: queryData,
+          conditionsList,
           groupAssignments: groupAssignments,
         };
 

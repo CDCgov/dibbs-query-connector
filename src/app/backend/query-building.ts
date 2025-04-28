@@ -1,32 +1,27 @@
 "use server";
 
-import { getDbClient } from "./dbClient";
 import { DibbsValueSet } from "../models/entities/valuesets";
-import { adminAccessCheck } from "../utils/auth";
 import { CustomUserQuery } from "../models/entities/query";
 import { User } from "../models/entities/users";
 import { getAllGroupQueries } from "./usergroup-management";
+import dbService from "./dbServices/db-service";
+import { adminRequired, transaction } from "./dbServices/decorators";
 
-// TODO: the functionality in this file should eventually be moved into the
-// TODO: corresponding file in dbServices within the service class pattern to
-// TODO: take advantage of our decorator patterns
-
-const dbClient = getDbClient();
-
-/**
- * Fetches and structures custom user queries from the database.
- * Executes a SQL query to join query information with related valueset and concept data,
- * and then structures the result into a nested JSON format. The JSON format groups
- * valuesets and their nested concepts under each query.
- * @returns customUserQueriesArray - An array of objects where each object represents a query.
- * Each query object includes:
- * - query_id: The unique identifier for the query.
- * - query_name: The name of the query.
- * - valuesets: An array of ValueSet objects.
- * - concepts: An array of Concept objects.
- */
-export async function getCustomQueries(): Promise<CustomUserQuery[]> {
-  const query = `
+class QueryBuilding {
+  /**
+   * Fetches and structures custom user queries from the database.
+   * Executes a SQL query to join query information with related valueset and concept data,
+   * and then structures the result into a nested JSON format. The JSON format groups
+   * valuesets and their nested concepts under each query.
+   * @returns customUserQueriesArray - An array of objects where each object represents a query.
+   * Each query object includes:
+   * - query_id: The unique identifier for the query.
+   * - query_name: The name of the query.
+   * - valuesets: An array of ValueSet objects.
+   * - concepts: An array of Concept objects.
+   */
+  static async getCustomQueries(): Promise<CustomUserQuery[]> {
+    const query = `
     SELECT
       q.id AS query_id,
       q.query_name,
@@ -34,136 +29,126 @@ export async function getCustomQueries(): Promise<CustomUserQuery[]> {
       q.conditions_list
     FROM query q;
   `;
-  // TODO: this will eventually need to take into account user permissions and specific authors
-  // We'll probably also need to refactor this to not show up in any user-facing containers
 
-  const results = await dbClient.query(query);
-  const formattedData: { [key: string]: CustomUserQuery } = {};
+    const results = await dbService.query(query);
+    const formattedData: { [key: string]: CustomUserQuery } = {};
 
-  results.rows.forEach((row) => {
-    const { query_id, query_name, query_data, conditions_list } = row;
+    results.rows.forEach((row) => {
+      const { queryId, queryName, queryData, conditionsList } = row;
 
-    // Initialize query structure if it doesn't exist
-    if (!formattedData[query_id]) {
-      formattedData[query_id] = {
-        query_id,
-        query_name,
-        conditions_list,
-        valuesets: [],
-      };
-    }
+      // Initialize query structure if it doesn't exist
+      if (!formattedData[queryId]) {
+        formattedData[queryId] = {
+          queryId,
+          queryName,
+          conditionsList,
+          valuesets: [],
+        };
+      }
 
-    Object.entries(
-      query_data as {
-        [condition: string]: { [valueSetId: string]: DibbsValueSet };
-      },
-    ).forEach(([_, includedValueSets]) => {
-      Object.entries(includedValueSets).forEach(
-        ([valueSetId, valueSetData]) => {
-          // Check if the valueSetId already exists in the valuesets array
-          let valueset = formattedData[query_id].valuesets.find(
-            (v) => v.valueSetId === valueSetId,
-          );
-
-          // If valueSetId doesn't exist, add it
-          if (!valueset) {
-            formattedData[query_id].valuesets.push(valueSetData);
-          }
+      Object.entries(
+        queryData as {
+          [condition: string]: { [valueSetId: string]: DibbsValueSet };
         },
-      );
+      ).forEach(([_, includedValueSets]) => {
+        Object.entries(includedValueSets).forEach(
+          ([valueSetId, valueSetData]) => {
+            // Check if the valueSetId already exists in the valuesets array
+            let valueset = formattedData[queryId].valuesets.find(
+              (v) => v.valueSetId === valueSetId,
+            );
+
+            // If valueSetId doesn't exist, add it
+            if (!valueset) {
+              formattedData[queryId].valuesets.push(valueSetData);
+            }
+          },
+        );
+      });
     });
-  });
 
-  return Object.values(formattedData);
-}
-
-/**
- * Retrieves the query list to populate the query building page.
- * This method performs role checks before retrieving the data.
- * @returns Available custom queries.
- */
-export async function getQueryList(): Promise<CustomUserQuery[]> {
-  if (!(await adminAccessCheck())) {
-    throw new Error("Unauthorized");
+    return Object.values(formattedData);
   }
 
-  return getCustomQueries();
-}
-
-/**
- * Retrieves a query from the database by its unique ID.
- * @param queryId - The unique identifier of the query to retrieve.
- * @returns A success or error response indicating the result.
- */
-export async function getQueryById(queryId: string) {
-  if (!(await adminAccessCheck())) {
-    throw new Error("Unauthorized");
+  @adminRequired
+  static async getQueryList(): Promise<CustomUserQuery[]> {
+    return QueryBuilding.getCustomQueries();
   }
 
-  try {
-    const getQuery = `
+  /**
+   * Retrieves a query from the database by its unique ID.
+   * @param queryId - The unique identifier of the query to retrieve.
+   * @returns A success or error response indicating the result.
+   */
+  @adminRequired
+  static async getQueryById(queryId: string) {
+    try {
+      const getQuery = `
     SELECT * FROM query WHERE id = $1;
   `;
-    const result = await dbClient.query(getQuery, [queryId]);
+      const result = await dbService.query(getQuery, [queryId]);
 
-    if (result.rows.length === 0) {
-      console.error("No results found for query id:", queryId);
-      return undefined;
+      if (!result.rows || result.rows.length === 0) {
+        console.error("No results found for query id:", queryId);
+        return undefined;
+      }
+
+      const { queryName, queryData, conditionsList } = result.rows[0];
+
+      const formattedQuery = {
+        queryId,
+        queryName,
+        queryData,
+        conditionsList,
+        valuesets: [],
+      };
+
+      return formattedQuery as CustomUserQuery;
+    } catch (error) {
+      console.error(`Failed to retrieve query with ID ${queryId}:`, error);
+      return { success: false, error: "Failed to retrieve the query." };
     }
-    const query = result.rows[0];
-    const formattedQuery = {
-      query_id: query.id,
-      query_name: query.query_name,
-      query_data: query.query_data,
-      conditions_list: query.conditions_list,
-      valuesets: [],
-    };
-
-    return formattedQuery as CustomUserQuery;
-  } catch (error) {
-    console.error(`Failed to retrieve query with ID ${queryId}:`, error);
-    return { success: false, error: "Failed to retrieve the query." };
-  }
-}
-
-/**
- * Deletes a query from the database by its unique ID.
- * @param queryId - The unique identifier of the query to delete.
- * @returns A success or error response indicating the result.
- */
-export const deleteQueryById = async (queryId: string) => {
-  if (!(await adminAccessCheck())) {
-    throw new Error("Unauthorized");
   }
 
-  const deleteQuery = `
+  /**
+   * Deletes a query from the database by its unique ID.
+   * @param queryId - The unique identifier of the query to delete.
+   * @returns A success or error response indicating the result.
+   */
+  @adminRequired
+  @transaction
+  static async deleteQueryById(queryId: string) {
+    const deleteQuery = `
     DELETE FROM query WHERE id = $1;
   `;
-  try {
-    await dbClient.query("BEGIN");
-    await dbClient.query(deleteQuery, [queryId]);
-    await dbClient.query("COMMIT");
-    return { success: true };
-  } catch (error) {
-    await dbClient.query("ROLLBACK");
-    console.error(`Failed to delete query with ID ${queryId}:`, error);
-    return { success: false, error: "Failed to delete the query." };
+    try {
+      await dbService.query(deleteQuery, [queryId]);
+      return { success: true, id: queryId };
+    } catch (error) {
+      console.error(`Failed to delete query with ID ${queryId}:`, error);
+      return { success: false, error: "Failed to delete the query." };
+    }
   }
-};
 
-/**
- * @param currentUser - Method to retrieve all queries assigned to groups that
- * the given user is a member of
- * @returns an array of CustomUserQuery objects
- */
-export async function getQueriesForUser(currentUser: User) {
-  if (!!currentUser && currentUser.userGroupMemberships) {
-    const assignedQueries = await Promise.all(
-      currentUser.userGroupMemberships.map(async (gm) => {
-        const groupQueries = await getAllGroupQueries(gm.usergroup_id);
-        return groupQueries.items;
-      }),
-    );
-    return assignedQueries.flat();
+  /**
+   * @param currentUser - Method to retrieve all queries assigned to groups that
+   * the given user is a member of
+   * @returns an array of CustomUserQuery objects
+   */
+  static async getQueriesForUser(currentUser: User) {
+    if (!!currentUser && currentUser.userGroupMemberships) {
+      const assignedQueries = await Promise.all(
+        currentUser.userGroupMemberships.map(async (gm) => {
+          const groupQueries = await getAllGroupQueries(gm.usergroup_id);
+          return groupQueries.items;
+        }),
+      );
+      return assignedQueries.flat();
+    }
   }
 }
+
+export const getCustomQueries = QueryBuilding.getCustomQueries;
+export const getQueryList = QueryBuilding.getQueryList;
+export const getQueryById = QueryBuilding.getQueryById;
+export const deleteQueryById = QueryBuilding.deleteQueryById;
