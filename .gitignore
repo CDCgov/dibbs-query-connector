@@ -41,7 +41,7 @@ _build
 doctrees
 
 # Python-Coverage
-.coverage
+coverage/
 coverage.xml
 
 # PyPI
@@ -100,7 +100,7 @@ node_modules
 *.local
 certificates
 /test-results/
-/playwright-report/
+playwright-report/
 /blob-report/
 /playwright/.cache/
 /coverage
