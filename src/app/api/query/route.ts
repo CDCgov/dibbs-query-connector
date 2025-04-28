@@ -82,13 +82,13 @@ export async function GET(request: NextRequest) {
 
   // Add params & patient identifiers to QueryName
   const QueryRequest: FullPatientRequest = {
-    query_name: queryResults.query_name,
-    fhir_server: fhir_server,
-    first_name: given,
-    last_name: family,
-    dob: dob,
-    mrn: mrn,
-    phone: phone,
+    queryName: queryResults.query_name,
+    fhirServer: fhir_server,
+    firstName: given,
+    lastName: family,
+    dob,
+    mrn,
+    phone,
   };
 
   const QueryResponse: QueryResponse = await fullPatientQuery(QueryRequest);
@@ -160,13 +160,13 @@ export async function POST(request: NextRequest) {
       }
 
       QueryRequest = {
-        query_name: queryResults?.query_name,
-        fhir_server: fhir_server,
-        first_name: firstName,
-        last_name: lastName,
-        dob: dob,
-        mrn: mrn,
-        phone: phone,
+        queryName: queryResults?.query_name,
+        fhirServer: fhir_server,
+        firstName,
+        lastName,
+        dob,
+        mrn,
+        phone,
       };
     } catch (error: unknown) {
       return await handleAndReturnError(error);
@@ -194,10 +194,10 @@ export async function POST(request: NextRequest) {
 
       // Add params & patient identifiers to QueryName
       QueryRequest = {
-        query_name: queryResults.query_name,
-        fhir_server: fhir_server,
-        first_name: PatientIdentifiers?.first_name,
-        last_name: PatientIdentifiers?.last_name,
+        queryName: queryResults.query_name,
+        fhirServer: fhir_server,
+        firstName: PatientIdentifiers?.first_name,
+        lastName: PatientIdentifiers?.last_name,
         dob: PatientIdentifiers?.dob,
         mrn: PatientIdentifiers?.mrn,
         phone: PatientIdentifiers?.phone,

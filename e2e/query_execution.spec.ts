@@ -77,21 +77,6 @@ test.describe("querying with the Query Connector", () => {
       .getByTestId("Select")
       .selectOption("Chlamydia case investigation");
 
-    // For some reason only in Chromium (ie not in firefox / webkit) there were
-    // issues connecting to the database for the cancer use case, which was resulting
-    // in errors on the results view screen when checking for the query result.
-    // Switching to chlymdia seemed to solve the issue, but leaving this check
-    // in just in case something similar happens in the future so the unlucky
-    // dev can have a note to help debug.
-    await page.getByRole("button", { name: "Customize Query" }).click();
-    await expect(
-      page.getByRole("heading", { name: "Customize Query" }),
-    ).toBeVisible();
-    await expect(
-      page.getByText("0 labs found, 0 medications found, 0 conditions found."),
-    ).not.toBeVisible();
-    await page.getByText("Return to Select query").click();
-
     await page.getByRole("button", { name: "Submit" }).click();
     await expect(page.getByText("Loading")).toHaveCount(0, { timeout: 10000 });
 

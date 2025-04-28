@@ -15,6 +15,7 @@ import {
 } from "@/app/backend/auditLogs/decorator";
 import * as DecoratorUtils from "@/app/backend/auditLogs/lib";
 import { suppressConsoleLogs } from "./fixtures";
+import { DEFAULT_CHLAMYDIA_QUERY } from "../unit/fixtures";
 
 const dbClient = getDbClient();
 
@@ -64,9 +65,9 @@ describe("audit log", () => {
     const auditRows = await dbClient.query(auditQuery);
 
     const request: PatientDiscoveryRequest = {
-      fhir_server: "Aidbox",
-      first_name: hyperUnluckyPatient.FirstName,
-      last_name: hyperUnluckyPatient.LastName,
+      fhirServer: "Aidbox",
+      firstName: hyperUnluckyPatient.FirstName,
+      lastName: hyperUnluckyPatient.LastName,
       dob: hyperUnluckyPatient.DOB,
       mrn: hyperUnluckyPatient.MRN,
       phone: hyperUnluckyPatient.Phone,
@@ -81,7 +82,7 @@ describe("audit log", () => {
       }
     });
 
-    expect(addedVal[0]?.action_type).toBe("patientDiscoveryQuery");
+    expect(addedVal[0]?.action_type).toBe("makePatientDiscoveryRequest");
     expect(addedVal[0]?.audit_message).toStrictEqual({
       request: JSON.stringify(request),
     });
@@ -90,27 +91,31 @@ describe("audit log", () => {
   it("patient records query should generate an audit entry", async () => {
     const auditQuery = "SELECT * FROM audit_logs;";
     const auditRows = await dbClient.query(auditQuery);
+    const auditRowIds = auditRows.rows.map((v) => v.id);
 
     const request: PatientRecordsRequest = {
-      fhir_server: "Aidbox",
-      patient_id: hyperUnluckyPatient.Id,
-      query_name: USE_CASE_DETAILS.gonorrhea.queryName,
+      fhirServer: "Aidbox",
+      patientId: hyperUnluckyPatient.Id,
+      queryName: USE_CASE_DETAILS.chlamydia.queryName,
     };
     await patientRecordsQuery(request);
 
     const newAuditRows = await dbClient.query(auditQuery);
 
     const addedVal = newAuditRows.rows.filter((item) => {
-      if (!auditRows.rows.map((v) => v.id).includes(item.id)) {
-        return item;
-      }
+      return !auditRowIds.includes(item.id);
     });
 
-    expect(addedVal[0]?.action_type).toBe("patientRecordsQuery");
-    expect(addedVal[0]?.audit_message).toStrictEqual({
-      request: JSON.stringify(request),
-    });
-
+    expect(addedVal[0]?.action_type).toBe("makePatientRecordsRequest");
+    expect(JSON.parse(addedVal[0]?.audit_message?.fhirServer)).toBe(
+      request.fhirServer,
+    );
+    expect(JSON.parse(addedVal[0]?.audit_message?.patientId)).toBe(
+      request.patientId,
+    );
+    expect(JSON.parse(addedVal[0]?.audit_message?.queryData)).toStrictEqual(
+      DEFAULT_CHLAMYDIA_QUERY.query_data,
+    );
     expect(addedVal[0]?.audit_checksum).toMatch(/^[a-f0-9]{64}$/);
   });
 
@@ -145,9 +150,9 @@ describe("audit log", () => {
 
   it("should block UPDATEs and DELETE for audit_logs", async () => {
     const request: PatientDiscoveryRequest = {
-      fhir_server: "Aidbox",
-      first_name: hyperUnluckyPatient.FirstName,
-      last_name: hyperUnluckyPatient.LastName,
+      fhirServer: "Aidbox",
+      firstName: hyperUnluckyPatient.FirstName,
+      lastName: hyperUnluckyPatient.LastName,
       dob: hyperUnluckyPatient.DOB,
       mrn: hyperUnluckyPatient.MRN,
       phone: hyperUnluckyPatient.Phone,
