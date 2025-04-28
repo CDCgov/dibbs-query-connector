@@ -15,7 +15,7 @@ import {
   patientDiscoveryQuery,
   PatientDiscoveryRequest,
   PatientDiscoveryResponse,
-} from "@/app/shared/query-service";
+} from "@/app/backend/query-execution";
 import styles from "../searchForm/searchForm.module.scss";
 import { FormatPhoneAsDigits } from "@/app/shared/format-service";
 import TitleBox from "../stepIndicator/TitleBox";
