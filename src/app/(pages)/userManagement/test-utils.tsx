@@ -115,16 +115,16 @@ export const mockGroupsTab: Tab = {
 
 // Query Mocks
 export const mockQueryNoGroups: CustomUserQuery = {
-  query_id: "q1",
-  query_name: "Test Query 1",
-  conditions_list: [],
+  queryId: "q1",
+  queryName: "Test Query 1",
+  conditionsList: [],
   valuesets: [],
 };
 
 export const mockQueryWithGroups: CustomUserQuery = {
-  query_id: "q2",
-  query_name: "Test Query 2",
-  conditions_list: [],
+  queryId: "q2",
+  queryName: "Test Query 2",
+  conditionsList: [],
   valuesets: [],
   groupAssignments: [
     {

@@ -93,7 +93,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({
       <h2 className="page-explainer margin-bottom-3-important margin-top-0-important">
         <strong>Query: </strong>
         <span className="text-normal display-inline-block">
-          {selectedQuery.query_name}
+          {selectedQuery.queryName}
         </span>
       </h2>
 

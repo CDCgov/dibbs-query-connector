@@ -152,3 +152,4 @@ export const getCustomQueries = QueryBuilding.getCustomQueries;
 export const getQueryList = QueryBuilding.getQueryList;
 export const getQueryById = QueryBuilding.getQueryById;
 export const deleteQueryById = QueryBuilding.deleteQueryById;
+export const getQueriesForUser = QueryBuilding.getQueriesForUser;
