@@ -3,13 +3,7 @@ import {
   handleAndReturnError,
   handleRequestError,
 } from "./error-handling-service";
-import {
-  QueryResponse,
-  createBundle,
-  APIQueryResponse,
-  fullPatientQuery,
-  FullPatientRequest,
-} from "../../backend/query-execution";
+import { fullPatientQuery } from "../../backend/query-execution";
 import {
   RESPONSE_BODY_IS_NOT_PATIENT_RESOURCE,
   MISSING_PATIENT_IDENTIFIERS,
@@ -26,6 +20,12 @@ import {
 import { Message } from "node-hl7-client";
 import { getFhirServerNames } from "@/app/backend/dbServices/fhir-servers";
 import { getSavedQueryById } from "@/app/backend/dbServices/query-building";
+import { Bundle } from "fhir/r4";
+import {
+  FullPatientRequest,
+  APIQueryResponse,
+  QueryResponse,
+} from "@/app/models/entities/query";
 
 /**
  * @param request - A GET request as described by the Swagger docs
@@ -215,4 +215,31 @@ export async function POST(request: NextRequest) {
   return NextResponse.json(bundle, {
     status: 200,
   });
+}
+
+/**
+ * Create a FHIR Bundle from the query response.
+ * @param queryResponse - The response object to store the results.
+ * @returns - The FHIR Bundle of queried data.
+ */
+async function createBundle(
+  queryResponse: QueryResponse,
+): Promise<APIQueryResponse> {
+  const bundle: Bundle = {
+    resourceType: "Bundle",
+    type: "searchset",
+    total: 0,
+    entry: [],
+  };
+
+  Object.entries(queryResponse).forEach(([_, resources]) => {
+    if (Array.isArray(resources)) {
+      resources.forEach((resource) => {
+        bundle.entry?.push({ resource });
+        bundle.total = (bundle.total || 0) + 1;
+      });
+    }
+  });
+
+  return bundle;
 }
