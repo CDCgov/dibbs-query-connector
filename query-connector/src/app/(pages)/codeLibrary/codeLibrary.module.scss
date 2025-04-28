@@ -281,3 +281,12 @@
     overflow-y: scroll;
     display: block;
 }
+
+.skeletonContainer {
+    margin-top: 1.5rem;
+}
+
+.skeleton {
+    height: 3.5rem;
+    display: flex;
+}
