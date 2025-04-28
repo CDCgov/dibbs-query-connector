@@ -1,4 +1,7 @@
-import { deleteQueryById } from "@/app/backend/query-building";
+import {
+  deleteQueryById,
+  getCustomQueries,
+} from "@/app/backend/query-building";
 import { createTestCancerQuery } from "../../../../e2e/utils";
 import { getSavedQueryById } from "@/app/backend/dbServices/query-building";
 jest.mock("@/app/utils/auth", () => {
@@ -20,6 +23,23 @@ describe("Saving a custom query", () => {
     await deleteQueryById(testQuery.queryId);
 
     const shouldReturnEmptyArray = await getSavedQueryById(testQuery.queryId);
-    expect(shouldReturnEmptyArray).toStrictEqual([]);
+    expect(shouldReturnEmptyArray).toStrictEqual(undefined);
+  });
+
+  it("get custom queries grabs a new query", async () => {
+    const initialList = await getCustomQueries();
+    const initialListIds = initialList.map((q) => q.queryId);
+
+    // insert new query
+    const testQuery = await createTestCancerQuery();
+
+    // requerying the DB should give us the new query
+    const followupList = await getCustomQueries();
+
+    const diffId = followupList.filter((q) => {
+      return !initialListIds.includes(q.queryId);
+    });
+    expect(diffId.length).toBe(1); // we've inserted one extra query, so followup and initial should differ by one query
+    expect(diffId[0].queryId).toBe(testQuery.queryId);
   });
 });

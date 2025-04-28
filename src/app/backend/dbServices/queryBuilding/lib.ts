@@ -91,7 +91,7 @@ export async function getSavedQueryByIdHelp(
 
     if (result.rows.length === 0) {
       console.info("No results found for query id:", id);
-      return [];
+      return undefined;
     }
     return result.rows[0] as unknown as QueryTableResult;
   } catch (error) {
