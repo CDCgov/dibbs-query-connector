@@ -2,10 +2,7 @@ import {
   addQueriesToGroup,
   getAllGroupQueries,
 } from "@/app/backend/usergroup-management";
-import {
-  getAllUsersWithSingleGroupStatus,
-  getUserByUsername,
-} from "@/app/backend/user-management";
+import { getAllUsersWithSingleGroupStatus } from "@/app/backend/user-management";
 import { getDbClient } from "@/app/backend/dbClient";
 import { User } from "@/app/models/entities/users";
 import { suppressConsoleLogs } from "./fixtures";
@@ -31,7 +28,7 @@ const TEST_QUERY_DATA: QueryDataColumn = {};
 
 describe("User Group and Query Membership Tests", () => {
   beforeAll(async () => {
-    // suppressConsoleLogs();
+    suppressConsoleLogs();
 
     await dbClient.query("BEGIN");
 
