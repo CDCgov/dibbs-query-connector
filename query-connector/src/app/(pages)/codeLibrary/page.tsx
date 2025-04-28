@@ -187,50 +187,64 @@ const QueryBuilding: React.FC = () => {
           onClick={() => setActiveValueSet(vs)}
         >
           <td>
-            <Highlighter
-              highlightClassName="searchHighlight"
-              searchWords={[search]}
-              autoEscape={true}
-              textToHighlight={vs.valueSetName}
-            />
+            <div className={styles.valueSetTable__tableBody_row_details}>
+              <Highlighter
+                className={styles.valueSetTable__tableBody_row_valueSetName}
+                highlightClassName="searchHighlight"
+                searchWords={[search]}
+                autoEscape={true}
+                textToHighlight={vs.valueSetName}
+              />
+              <Highlighter
+                className={styles.valueSetTable__tableBody_row_valueSetDetails}
+                highlightClassName="searchHighlight"
+                searchWords={[search]}
+                autoEscape={true}
+                textToHighlight={formatValueSetDetails(vs)}
+              />
+
+              {/* TODO: render based on the user_created column once that is added*/}
+              {false && (
+                <Highlighter
+                  className={styles.valueSetTable__tableBody_row_customValueSet}
+                  highlightClassName="searchHighlight"
+                  searchWords={[search]}
+                  autoEscape={true}
+                  textToHighlight={`Created by ${vs.author}`}
+                />
+              )}
+            </div>
+
+            {/* TODO: build out to include search on code terms within a value set? */}
+            {/* {condition ? ( 
+                <td className={styles.valueSetTable__tableBody_row_customValueSet}>
+                  <strong>
+                    Includes:{" "}
+                      {filteredValueSets.length <
+                        SUMMARIZE_CODE_RENDER_LIMIT ? (
+                          // render the individual code matches
+                          <span className="searchHighlight">
+                            {codesToRender
+                              .map((c) => c.code)
+                              .join(", ")}
+                          </span>
+                        ) : ( 
+                    //  past this many matches, don't render the individual codes in favor of a
+                    // "this many matches" string 
+                    <span className="searchHighlight">{`${1} codes`}</span> 
+                    )} 
+                  </strong>
+                </td>
+                ) : ( 
+                "" 
+              )} */}
+            <div>
+              <Icon.NavigateNext
+                aria-label="Chevron indicating additional content"
+                size={4}
+              />
+            </div>
           </td>
-          <td>
-            <Highlighter
-              highlightClassName="searchHighlight"
-              searchWords={[search]}
-              autoEscape={true}
-              textToHighlight={formatValueSetDetails(vs)}
-            />
-          </td>
-          {/* TODO: render based on the user_created column once that is added*/}
-          {false && (
-            <td className={styles.valueSetTable__tableBody_row_customValueSet}>
-              Created by {vs.author}
-            </td>
-          )}
-          {/* TODO: build out to include search on code terms within a value set? */}
-          {/* {condition ? ( 
-          <td className={styles.valueSetTable__tableBody_row_customValueSet}>
-            <strong>
-              Includes:{" "}
-                 {filteredValueSets.length <
-                  SUMMARIZE_CODE_RENDER_LIMIT ? (
-                    // render the individual code matches
-                    <span className="searchHighlight">
-                      {codesToRender
-                        .map((c) => c.code)
-                        .join(", ")}
-                    </span>
-                  ) : ( 
-               //  past this many matches, don't render the individual codes in favor of a
-               // "this many matches" string 
-               <span className="searchHighlight">{`${1} codes`}</span> 
-               )} 
-            </strong>
-          </td>
-           ) : ( 
-           "" 
-           )} */}
         </tr>
       );
     });

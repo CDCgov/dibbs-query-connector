@@ -147,11 +147,6 @@
     max-height: 60vh;
     overflow-y: auto;
 
-    table {
-        display: flex;
-        flex-direction: column;
-    }
-
     &__header {
         display: flex;
         padding: 1.5rem 0rem 0rem 1.5rem !important;
@@ -205,10 +200,10 @@
 
     &__tableBody {
         padding: 0rem !important;
-
+        display: flex;
+        flex-direction: column;
         &_row {
             display: flex !important;
-            flex-direction: column !important;
             padding: 0 0 0 1.5rem !important;
 
             &:hover {
@@ -243,25 +238,32 @@
 
 .valueSetTable__tableBody {
     &_row {
-        padding: 0 1.5rem !important;
-        &:last-child {
-            td:last-child {
-                border: none !important;
-            }
+        &:hover {
+            cursor: pointer;
         }
         td {
             padding: 0 !important;
+            margin-right: 1.5rem;
+            border-bottom: 1px solid #f0f0f0 !important;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
             color: #5c5c5c;
-
-            &:first-child {
-                color: #111111;
-                padding-top: 0.75rem !important;
-            }
-            &:last-child {
-                padding-bottom: 0.75rem !important;
-                border-bottom: 1px solid #f0f0f0 !important;
-            }
+            padding-bottom: 0.75rem !important;
+            padding-top: 0.75rem !important;
         }
+
+        &_details {
+            display: flex;
+            flex-direction: column !important;
+            width: 85%;
+        }
+
+        &_valueSetName {
+            color: #111;
+        }
+
         &_customValueSet {
             font-weight: 700 !important;
             color: #5c5c5c;
