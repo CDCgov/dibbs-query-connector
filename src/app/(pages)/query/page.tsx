@@ -20,9 +20,9 @@ import {
 } from "@/app/backend/query-execution";
 
 const blankUserQuery = {
-  query_id: "",
-  query_name: "",
-  conditions_list: [],
+  queryId: "",
+  queryName: "",
+  conditionsList: [],
   valuesets: [],
 };
 /**

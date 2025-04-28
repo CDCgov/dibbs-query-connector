@@ -158,7 +158,7 @@ class QueryService {
       throw new Error(`Unable to query of name ${request?.queryName}`);
     }
     const includeImmunization = savedQuery.immunization;
-    const queryData = savedQuery.query_data;
+    const queryData = savedQuery.queryData;
 
     let response: Response | Response[] =
       await QueryService.makePatientRecordsRequest(

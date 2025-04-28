@@ -125,16 +125,16 @@ describe("User Group and Query Membership Tests", () => {
     await dbClient.query("COMMIT");
 
     expect(result.totalItems).toBe(2);
-    expect(result.items.some((query) => query.query_id == TEST_QUERY_2_ID));
-    expect(result.items.some((query) => query.query_id == TEST_QUERY_3_ID));
+    expect(result.items.some((query) => query.queryId == TEST_QUERY_2_ID));
+    expect(result.items.some((query) => query.queryId == TEST_QUERY_3_ID));
 
     const queriesList = (await getAllGroupQueries(TEST_GROUP_ID)).items;
 
     expect(queriesList.length).toBe(2);
-    expect(queriesList.some((query) => query.query_id == TEST_QUERY_2_ID)).toBe(
+    expect(queriesList.some((query) => query.queryId == TEST_QUERY_2_ID)).toBe(
       true,
     );
-    expect(queriesList.some((query) => query.query_id == TEST_QUERY_3_ID)).toBe(
+    expect(queriesList.some((query) => query.queryId == TEST_QUERY_3_ID)).toBe(
       true,
     );
   });

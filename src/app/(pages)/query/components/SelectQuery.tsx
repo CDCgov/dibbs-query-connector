@@ -82,7 +82,7 @@ const SelectQuery: React.FC<SelectQueryProps> = ({
     goForward();
     setLoading(true);
     await fetchQueryResponse(
-      selectedQuery.query_name,
+      selectedQuery.queryName,
       patientForQuery,
       fhirServer,
     ).catch(console.error);

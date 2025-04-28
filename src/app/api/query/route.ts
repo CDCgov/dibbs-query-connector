@@ -82,7 +82,7 @@ export async function GET(request: NextRequest) {
 
   // Add params & patient identifiers to QueryName
   const QueryRequest: FullPatientRequest = {
-    queryName: queryResults.query_name,
+    queryName: queryResults.queryName,
     fhirServer: fhir_server,
     firstName: given,
     lastName: family,
@@ -160,7 +160,7 @@ export async function POST(request: NextRequest) {
       }
 
       QueryRequest = {
-        queryName: queryResults?.query_name,
+        queryName: queryResults?.queryName,
         fhirServer: fhir_server,
         firstName,
         lastName,
@@ -194,7 +194,7 @@ export async function POST(request: NextRequest) {
 
       // Add params & patient identifiers to QueryName
       QueryRequest = {
-        queryName: queryResults.query_name,
+        queryName: queryResults.queryName,
         fhirServer: fhir_server,
         firstName: PatientIdentifiers?.first_name,
         lastName: PatientIdentifiers?.last_name,

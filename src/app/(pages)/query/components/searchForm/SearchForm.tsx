@@ -13,12 +13,12 @@ import {
 } from "@/app/shared/constants";
 import {
   patientDiscoveryQuery,
-  PatientDiscoveryRequest,
   PatientDiscoveryResponse,
 } from "@/app/backend/query-execution";
 import styles from "../searchForm/searchForm.module.scss";
 import { FormatPhoneAsDigits } from "@/app/shared/format-service";
 import TitleBox from "../stepIndicator/TitleBox";
+import { PatientDiscoveryRequest } from "@/app/models/entities/query";
 
 interface SearchFormProps {
   setPatientDiscoveryQueryResponse: (
