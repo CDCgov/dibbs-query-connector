@@ -1,6 +1,6 @@
 ### Query Connector ERD
 
-![Query Connector Database Structure](public/Query%20Connector%20ERD.drawio.svg)
+![Query Connector Database Structure](../public/Query%20Connector%20ERD.drawio.svg)
 
 ### Architecture Diagram
 
@@ -57,7 +57,7 @@ graph TD
 
 **ECS Infrastructure**
 
-![ECS](./public/QC%20Architecture-ECS.jpg)
+![ECS](../public/QC%20Architecture-ECS.jpg)
 
 **VM Infrastructure**
-![VM](./public/QC%20Architecture-VM.jpg)
+![VM](../public/QC%20Architecture-VM.jpg)
