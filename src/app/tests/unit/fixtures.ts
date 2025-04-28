@@ -4,13 +4,23 @@ import {
   CategoryToConditionArrayMap,
   QueryTableResult,
 } from "@/app/(pages)/queryBuilding/utils";
+import { translateSnakeStringToCamelCase } from "@/app/backend/dbServices/decorators";
 
 export const CATEGORY_TO_CONDITION_ARRAY_MAP =
   categoryToConditionArrayMap as unknown as CategoryToConditionArrayMap;
 
-export const DEFAULT_CHLAMYDIA_QUERY = queryTableDefaults.query.find((v) =>
+export const CHLAMYDIA_DB_VALUES = queryTableDefaults.query.find((v) =>
   v.query_name.includes("Chlamydia case investigation"),
-) as unknown as QueryTableResult;
+) as unknown as Record<string, string>;
+
+const emptyChlamydiaDict: { [k: string]: string } = {};
+
+Object.entries(CHLAMYDIA_DB_VALUES).forEach(([k, v]) => {
+  emptyChlamydiaDict[translateSnakeStringToCamelCase(k)] = v;
+});
+
+export const DEFAULT_CHLAMYDIA_QUERY =
+  emptyChlamydiaDict as unknown as QueryTableResult;
 
 const CHLAMYDIA_CONDITION_ID = 240589008;
 export const EXPECTED_CHLAMYDIA_VALUESET_LENGTH = Object.values(

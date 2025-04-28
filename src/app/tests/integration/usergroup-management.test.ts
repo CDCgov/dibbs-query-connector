@@ -20,8 +20,6 @@ jest.mock("@/app/utils/auth", () => ({
   adminAccessCheck: jest.fn(() => Promise.resolve(true)),
 }));
 
-suppressConsoleLogs();
-
 const TEST_GROUP_ID = "00000000-0000-0000-0000-000000000001";
 const TEST_USER_1_ID = "00000000-0000-0000-0000-000000000002";
 const TEST_USER_2_ID = "00000000-0000-0000-0000-000000000003";
@@ -34,6 +32,7 @@ const TEST_QUERY_DATA: QueryDataColumn = {};
 
 describe("User Group and Query Membership Tests", () => {
   beforeAll(async () => {
+    suppressConsoleLogs();
     await dbClient.query("BEGIN");
 
     // Insert test users
