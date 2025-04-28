@@ -17,3 +17,14 @@ INSERT INTO fhir_servers (
 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
 RETURNING *;
 `;
+
+/**
+ * Function that takes Postgres default snake case strings and camel cases them
+ * @param str to transform
+ * @returns a camel cased string
+ */
+export function translateSnakeStringToCamelCase(str: string) {
+  return str.replace(/_+([a-z])/g, function (_, letter) {
+    return letter.toUpperCase();
+  });
+}

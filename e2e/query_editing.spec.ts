@@ -12,6 +12,7 @@ import {
   saveCustomQueryHelp,
 } from "@/app/backend/dbServices/queryBuilding/lib";
 import { getDbClient } from "@/app/backend/dbClient";
+import { translateSnakeStringToCamelCase } from "@/app/backend/dbServices/util";
 
 test.describe("editing an exisiting query", () => {
   let subjectQuery: QueryTableResult;
@@ -237,8 +238,15 @@ async function createTestQuery() {
   );
   if (result === undefined) throw Error("Failed to set up test query");
 
-  return (await getSavedQueryByIdHelp(
+  const queryResult = (await getSavedQueryByIdHelp(
     result[0].id,
     dbClient,
   )) as QueryTableResult;
+
+  const val: Record<string, unknown> = {};
+  Object.entries(queryResult).forEach(([k, v]) => {
+    val[translateSnakeStringToCamelCase(k)] = v;
+  });
+
+  return val as unknown as QueryTableResult;
 }

@@ -1,6 +1,7 @@
 import { adminAccessCheck, superAdminAccessCheck } from "@/app/utils/auth";
 import { getDbClient } from "../dbClient";
 import { QueryResult } from "pg";
+import { translateSnakeStringToCamelCase } from "./util";
 
 /**
  * Annotation to make a db query into a transaction. Requires all return branches
@@ -172,15 +173,4 @@ export function camelCaseDbColumnNames<T extends Record<string, unknown>>(
   };
 
   return descriptor;
-}
-
-/**
- * Function that takes Postgres default snake case strings and camel cases them
- * @param str to transform
- * @returns a camel cased string
- */
-export function translateSnakeStringToCamelCase(str: string) {
-  return str.replace(/_+([a-z])/g, function (_, letter) {
-    return letter.toUpperCase();
-  });
 }

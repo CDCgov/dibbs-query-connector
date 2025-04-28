@@ -4,7 +4,7 @@ import {
   CategoryToConditionArrayMap,
   QueryTableResult,
 } from "@/app/(pages)/queryBuilding/utils";
-import { translateSnakeStringToCamelCase } from "@/app/backend/dbServices/decorators";
+import { translateSnakeStringToCamelCase } from "@/app/backend/dbServices/util";
 
 export const CATEGORY_TO_CONDITION_ARRAY_MAP =
   categoryToConditionArrayMap as unknown as CategoryToConditionArrayMap;
