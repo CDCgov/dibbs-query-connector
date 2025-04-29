@@ -23,9 +23,7 @@ type SelectSavedQueryProps = {
   selectedQuery: CustomUserQuery;
   setSelectedQuery: React.Dispatch<React.SetStateAction<CustomUserQuery>>;
   fhirServer: string;
-  loadingQueryValueSets: boolean;
   goBack: () => void;
-  setShowCustomizedQuery: (showCustomize: boolean) => void;
   handleSubmit: () => void;
   setFhirServer: React.Dispatch<React.SetStateAction<string>>;
 };
@@ -37,22 +35,16 @@ type SelectSavedQueryProps = {
  * @param root0.selectedQuery - specified query for future customization /
  * application
  * @param root0.setSelectedQuery - callback function for specified query
- * @param root0.setShowCustomizedQuery - toggle to switch to customization
- * view
  * @param root0.handleSubmit - submit handler
  * @param root0.fhirServer - fhir server to apply a query against
  * @param root0.setFhirServer - function to update the fhir server
- * @param root0.loadingQueryValueSets - flag for whether the value sets are
- * still being fetched from the db
  * @returns SelectedSavedQuery component
  */
 const SelectSavedQuery: React.FC<SelectSavedQueryProps> = ({
   selectedQuery,
   fhirServer,
-  loadingQueryValueSets,
   goBack,
   setSelectedQuery,
-  setShowCustomizedQuery,
   handleSubmit,
   setFhirServer,
 }) => {
@@ -169,16 +161,6 @@ const SelectSavedQuery: React.FC<SelectSavedQueryProps> = ({
             ))}
           </Select>
         )}
-
-        {/* Customize Query Button */}
-        <Button
-          type="button"
-          className="usa-button--outline bg-white margin-left-205"
-          onClick={() => setShowCustomizedQuery(true)}
-          disabled={loadingQueryValueSets || !selectedQuery.query_name}
-        >
-          Customize query
-        </Button>
       </div>
 
       {showAdvanced && (
@@ -220,12 +202,8 @@ const SelectSavedQuery: React.FC<SelectSavedQueryProps> = ({
       <div className="margin-top-5">
         <Button
           type="button"
-          disabled={!selectedQuery.query_name || loadingQueryValueSets}
-          className={
-            selectedQuery && !loadingQueryValueSets
-              ? "usa-button"
-              : "usa-button disabled"
-          }
+          disabled={!selectedQuery.query_name}
+          className={selectedQuery ? "usa-button" : "usa-button disabled"}
           onClick={handleSubmit}
         >
           Submit

@@ -5,9 +5,9 @@ type AuditLogActionTypeFormatter = (
 ) => string;
 
 type RequestPayload = {
-  query_name?: string;
-  first_name?: string;
-  last_name?: string;
+  queryName?: string;
+  firstName?: string;
+  lastName?: string;
   [key: string]: unknown;
 };
 
@@ -81,22 +81,22 @@ function resolveFullName(
  */
 export const auditLogActionTypeMap: Record<string, auditLogActionTypeMapping> =
   {
-    patientRecordsQuery: {
+    makePatientRecordsRequest: {
       label: "Patient records query",
       format: (log) => {
         const request = parseRequest(log);
         return `Viewed patient record for ${
-          request.query_name ?? ""
+          request.queryName ?? ""
         } query`.trim();
       },
     },
-    patientDiscoveryQuery: {
+    makePatientDiscoveryRequest: {
       label: "Patient discovery query",
       format: (log) => {
         const request = parseRequest(log);
         const fullName = resolveFullName(
-          request.first_name,
-          request.last_name,
+          request.firstName,
+          request.lastName,
           log.author as string,
         );
         return `Ran patient discovery query for ${fullName}`;
@@ -127,7 +127,9 @@ export const auditLogActionTypeMap: Record<string, auditLogActionTypeMapping> =
       label: "Insert value set",
       format: (log) => {
         const request = parseRequest(log);
-        return `Inserted value set ${request.valueSetName ?? request.valueSetId ?? ""}`.trim();
+        return `Inserted value set ${
+          request.valueSetName ?? request.valueSetId ?? ""
+        }`.trim();
       },
     },
     executeCategoryUpdates: {

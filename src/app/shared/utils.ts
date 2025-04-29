@@ -1,24 +1,6 @@
 import { QueryResultRow } from "pg";
-import { QueryDataColumn } from "../(pages)/queryBuilding/utils";
 import { DibbsValueSet } from "../models/entities/valuesets";
 
-/**
- * Maps the results returned from the DIBBs query table into their associated
- * valueSets, each containing one or more Concepts build out
- * of the coding information in the DB.
- * @param result The Rows returned from the ValueSet table.
- * @returns A list of ValueSets, which hold the Concepts pulled from the DB.
- */
-export function unnestValueSetsFromQuery<
-  T extends { query_data: QueryDataColumn },
->(result: T): DibbsValueSet[] {
-  // Unest the {condition: valuesetId: valueSet} nesting in an array of valueSets
-  return Object.values(result.query_data)
-    .map((valById) => {
-      return Object.values(valById);
-    })
-    .flat();
-}
 /**
  * Maps the results returned from the DIBBs value set and coding system database
  * into a collection of value sets, each containing one or more Concepts build out
@@ -86,6 +68,7 @@ function mapStoredValueSetIntoInternalValueset(
         include: c["include"] ?? true,
       };
     }),
+    userCreated: storedConcept["user_created"] ?? false,
   };
   const conditionId = storedConcept["condition_id"];
   if (conditionId) {
