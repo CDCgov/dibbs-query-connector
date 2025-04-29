@@ -1,7 +1,7 @@
-# PHDI Release Documentation
+# Query Connector Release Documentation
 
 ## Release Methodology: Semantic Versioning
-API documentation is published automatically with Sphinx and hosted via GitHub pages. PHDI updates are released to the Python Package Index (PyPI) according to the guidelines set out in [Semantic Versioning 2.0.0](https://semver.org/) with each release's version following the pattern of MAJOR.MINOR.PATCH. The following core tenets describe when each element of a release's version would be updated.
+API documentation is published automatically with Sphinx and hosted via GitHub pages. Query Connector updates are released to the GitHub Container Registry (GHCR) according to the guidelines set out in [Semantic Versioning 2.0.0](https://semver.org/) with each release's version following the pattern of MAJOR.MINOR.PATCH. The following core tenets describe when each element of a release's version would be updated.
 
 * **MAJOR** versions introduce breaking changes.
 
@@ -32,7 +32,7 @@ API documentation is published automatically with Sphinx and hosted via GitHub p
   Releases that _only_ contain fixes are released as patches.
 
 
-## PHDI Release Process
+## Query Connector Release Process
 
 ### Determine New Version Number
 The first step in a release is defining the release's new version number. The previous section describes the different components of Semantic Versioning that should be used in the definition process. In general:
@@ -48,7 +48,7 @@ Any time a new release needs to go out, you should check with the broader team t
 Once the new version number is defined and all desired functionality is merged into the `main` branch of the github repository, you can safely begin executing the release process. First, create a new branch off of `main` called `release-MAJOR.MINOR.PATCH` (replace each of the SemVer components with the appropriate number in the new release version).
 
 ### Update Versioning Files
-On the release branch, navigate to the `phdi/__init__.py` file. Replace the version number there with the new release's version number. Then, navigate to the `pyproject.toml` file and do the same thing with the `version` keyword on line 3.
+On the release branch, navigate to the `app_version.yml` and `package.json` files. Replace the version number there with the new release's version number.
 
 ### Open Pull Request
 Commit the versioning changes to the branch, then open a new Pull Request for the release. This PR *must* be titled **[RELEASE]-MAJOR.MINOR.PATCH**, including the brackets around "RELEASE" (for example, `[RELEASE]-1.4.4` is a valid PR title, but `RELEASE-1.2.5` is not). Once this PR is approved, you can safely merge it using the merge queue.
@@ -57,9 +57,4 @@ Commit the versioning changes to the branch, then open a new Pull Request for th
 GitHub Actions will automatically take care of a number of things once the release PR is merged.
 
 * It creates the appropriate containers for the release and publishes their images to the Docker registry
-* It deploys the newly updated release to PyPi
-
-If you're going to deploy the new release to AWS (so that it's usable from `dibbs.cloud`, for example), make sure to wait until both of these steps complete. Otherwise, Terraform won't be able to find or pull the new container images for the public services.
-
-### Deploy to AWS
-After these steps finish, it's time to send the new release out into the wild. Navigate to the GitHub Actions tab of the `phdi-playground` repo, then click on the `AWS Deployment` option on the left side. Run the deployment from the `main` branch. Congratulations! Once that worklow finishes, the new code is usable at `dibbs.cloud`.
+* It deploys the newly updated release to our demo environment (https://demo.queryconnector.dev)
