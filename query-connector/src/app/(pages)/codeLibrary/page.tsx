@@ -19,11 +19,16 @@ import {
   getAllValueSets,
   getConditionsData,
 } from "@/app/shared/database-service";
-import { DibbsValueSet } from "@/app/models/entities/valuesets";
+import {
+  DibbsValueSet,
+  DibbsConceptType,
+} from "@/app/models/entities/valuesets";
 import { formatSystem } from "./utils";
 import { ConditionsMap, formatDiseaseDisplay } from "../queryBuilding/utils";
 import Highlighter from "react-highlight-words";
 import Skeleton from "react-loading-skeleton";
+import { formatStringToSentenceCase } from "@/app/shared/format-service";
+import DropdownFilter, { FilterCategories } from "./DropdownFilter";
 
 /**
  * Component for Query Building Flow
@@ -31,60 +36,64 @@ import Skeleton from "react-loading-skeleton";
  */
 const QueryBuilding: React.FC = () => {
   type Mode = "manage" | "select";
-  // const focusRef = useRef<HTMLInputElement | null>(null);
 
   const [loading, setLoading] = useState<boolean>(true);
   const [mode, setMode] = useState<Mode>("manage");
-  const [search, setSearch] = useState<string>("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+
+  const [textSearch, setTextSearch] = useState<string>("");
+  const [filterSearch, setFilterSearch] = useState<FilterCategories>({
+    category: "" as DibbsConceptType,
+    codeSystem: "",
+    creator: "",
+  });
+  const [showFilters, setShowFilters] = useState(false);
+  const filterCount = Object.values(filterSearch).filter(
+    (item) => item !== "",
+  ).length;
+
   const [conditionDetailsMap, setConditionsDetailsMap] =
     useState<ConditionsMap>();
-
+  const [valueSets, setValueSets] = useState<DibbsValueSet[]>([]);
+  const [filteredValueSets, setFilteredValueSets] = useState(valueSets);
   const [activeValueSet, setActiveValueSet] = useState<DibbsValueSet | null>(
     null,
   );
-  const [itemsPerPage, setItemsPerPage] = useState(10);
-  const [valueSets, setValueSets] = useState<DibbsValueSet[]>([]);
-  const [filteredValueSets, setFilteredValueSets] = useState(valueSets);
 
   const ctx = useContext(DataContext);
 
   const totalPages = Math.ceil(filteredValueSets.length / itemsPerPage);
 
-  function vsTextSearch() {
-    let matchingCodes = {};
-    const vs = valueSets.filter((vs) => {
-      const matchesName = vs.valueSetName
+  const handleTextSearch = (vs: DibbsValueSet) => {
+    const matchesName = vs.valueSetName
+      .toLocaleLowerCase()
+      .includes(textSearch.toLocaleLowerCase());
+    const conditionName =
+      vs.conditionId && conditionDetailsMap?.[vs.conditionId].name;
+    const matchesConditionName =
+      conditionName &&
+      conditionName
         .toLocaleLowerCase()
-        .includes(search.toLocaleLowerCase());
-      const conditionName =
-        vs.conditionId && conditionDetailsMap?.[vs.conditionId].name;
-      const matchesConditionName =
-        conditionName &&
-        conditionName.toLocaleLowerCase().includes(search.toLocaleLowerCase());
-      const matchesConceptType = vs.dibbsConceptType
-        .toLocaleLowerCase()
-        .includes(search.toLocaleLowerCase());
-      const matchesSystem = vs.system
-        .toLocaleLowerCase()
-        .includes(search.toLocaleLowerCase());
+        .includes(textSearch.toLocaleLowerCase());
+    const matchesConceptType = vs.dibbsConceptType
+      .toLocaleLowerCase()
+      .includes(textSearch.toLocaleLowerCase());
+    const matchesSystem = vs.system
+      .toLocaleLowerCase()
+      .includes(textSearch.toLocaleLowerCase());
 
-      return (
-        matchesName ||
-        matchesConditionName ||
-        matchesConceptType ||
-        matchesSystem
-      );
-    });
-    console.log(matchingCodes);
-    return vs;
-  }
+    return (
+      matchesName || matchesConditionName || matchesConceptType || matchesSystem
+    );
+  };
 
   // update the current page details when switching between build steps
   useEffect(() => {
     ctx?.setCurrentPage(mode);
   }, [mode]);
 
+  // fetch value sets on page load
   useEffect(() => {
     ctx?.setToastConfig({
       position: "bottom-left",
@@ -92,7 +101,7 @@ const QueryBuilding: React.FC = () => {
       hideProgressBar: true,
     });
 
-    const fetchValueSetsAndConditions = async () => {
+    async function fetchValueSetsAndConditions() {
       try {
         const { conditionIdToNameMap } = await getConditionsData();
         const vs = await getAllValueSets();
@@ -104,13 +113,14 @@ const QueryBuilding: React.FC = () => {
       } catch (error) {
         console.error(`Failed to fetch: ${error}`);
       }
-    };
+    }
 
     fetchValueSetsAndConditions();
   }, []);
 
   useEffect(() => {
     setFilteredValueSets(valueSets);
+
     if (
       filteredValueSets.length > 0 &&
       conditionDetailsMap &&
@@ -121,14 +131,28 @@ const QueryBuilding: React.FC = () => {
   }, [valueSets, conditionDetailsMap]);
 
   useEffect(() => {
-    if (search !== "") {
-      const filteredVS = vsTextSearch();
-      setFilteredValueSets(filteredVS);
-    } else {
-      setFilteredValueSets(valueSets);
-    }
+    const matchCategory = (vs: DibbsValueSet) => {
+      return filterSearch.category
+        ? vs.dibbsConceptType === filterSearch.category
+        : vs;
+    };
+
+    const matchCodeSystem = (vs: DibbsValueSet) =>
+      filterSearch.codeSystem ? vs.system == filterSearch.codeSystem : vs;
+
+    const matchCreator = (vs: DibbsValueSet) =>
+      filterSearch.creator ? vs.author == filterSearch.creator : vs;
+
+    setFilteredValueSets(
+      valueSets
+        .filter(handleTextSearch)
+        .filter(matchCategory)
+        .filter(matchCodeSystem)
+        .filter(matchCreator),
+    );
+
     setCurrentPage(1);
-  }, [search]);
+  }, [textSearch, filterSearch]);
 
   const paginatedValueSets = useMemo(() => {
     return filteredValueSets.slice(
@@ -138,17 +162,13 @@ const QueryBuilding: React.FC = () => {
   }, [filteredValueSets, currentPage, itemsPerPage]);
 
   function goBack() {
-    // resetQueryState();
-    // setBuildStep("selection");
+    // TODO: this will need to be handled differently
+    // depending on how we arrived at this page:
+    // from gear menu: no backnav
+    // from "start from scratch": back to templates
+    // from hybrid/query building: back to query
     console.log("do a backnav thing");
   }
-
-  const formatConceptType = (conceptType: string) => {
-    return conceptType.replace(
-      conceptType.charAt(0),
-      conceptType.charAt(0).toLocaleUpperCase(),
-    );
-  };
 
   const formatConditionDisplay = (conditionId: string | undefined) => {
     const conditionDetails =
@@ -161,7 +181,9 @@ const QueryBuilding: React.FC = () => {
     const system = formatSystem(vs.system) || "";
 
     const conceptType = vs.dibbsConceptType
-      ? `${formatConceptType(vs.dibbsConceptType)} ${!!system ? " • " : ""}`
+      ? `${formatStringToSentenceCase(vs.dibbsConceptType)} ${
+          !!system ? " • " : ""
+        }`
       : "";
 
     const condition = vs.conditionId
@@ -174,80 +196,54 @@ const QueryBuilding: React.FC = () => {
   };
 
   const renderValueSetRows = () => {
-    return paginatedValueSets.map((vs, index) => {
-      return (
-        <tr
-          key={index}
-          className={classNames(
-            styles.valueSetTable__tableBody_row,
-            vs?.valueSetId == activeValueSet?.valueSetId
-              ? styles.activeValueSet
-              : "",
-          )}
-          onClick={() => setActiveValueSet(vs)}
-        >
-          <td>
-            <div className={styles.valueSetTable__tableBody_row_details}>
+    return paginatedValueSets.map((vs, index) => (
+      <tr
+        key={index}
+        className={classNames(
+          styles.valueSetTable__tableBody_row,
+          vs?.valueSetId == activeValueSet?.valueSetId
+            ? styles.activeValueSet
+            : "",
+        )}
+        onClick={() => setActiveValueSet(vs)}
+      >
+        <td>
+          {/* TODO: build out search to include match on code terms within a value set? */}
+          <div className={styles.valueSetTable__tableBody_row_details}>
+            <Highlighter
+              className={styles.valueSetTable__tableBody_row_valueSetName}
+              highlightClassName="searchHighlight"
+              searchWords={[textSearch]}
+              autoEscape={true}
+              textToHighlight={vs.valueSetName}
+            />
+            <Highlighter
+              className={styles.valueSetTable__tableBody_row_valueSetDetails}
+              highlightClassName="searchHighlight"
+              searchWords={[textSearch]}
+              autoEscape={true}
+              textToHighlight={formatValueSetDetails(vs)}
+            />
+            {/* TODO: render based on the user_created column once that is added */}
+            {false && (
               <Highlighter
-                className={styles.valueSetTable__tableBody_row_valueSetName}
+                className={styles.valueSetTable__tableBody_row_customValueSet}
                 highlightClassName="searchHighlight"
-                searchWords={[search]}
+                searchWords={[textSearch]}
                 autoEscape={true}
-                textToHighlight={vs.valueSetName}
+                textToHighlight={`Created by ${vs.author}`}
               />
-              <Highlighter
-                className={styles.valueSetTable__tableBody_row_valueSetDetails}
-                highlightClassName="searchHighlight"
-                searchWords={[search]}
-                autoEscape={true}
-                textToHighlight={formatValueSetDetails(vs)}
-              />
-
-              {/* TODO: render based on the user_created column once that is added*/}
-              {false && (
-                <Highlighter
-                  className={styles.valueSetTable__tableBody_row_customValueSet}
-                  highlightClassName="searchHighlight"
-                  searchWords={[search]}
-                  autoEscape={true}
-                  textToHighlight={`Created by ${vs.author}`}
-                />
-              )}
-            </div>
-
-            {/* TODO: build out to include search on code terms within a value set? */}
-            {/* {condition ? ( 
-                <td className={styles.valueSetTable__tableBody_row_customValueSet}>
-                  <strong>
-                    Includes:{" "}
-                      {filteredValueSets.length <
-                        SUMMARIZE_CODE_RENDER_LIMIT ? (
-                          // render the individual code matches
-                          <span className="searchHighlight">
-                            {codesToRender
-                              .map((c) => c.code)
-                              .join(", ")}
-                          </span>
-                        ) : ( 
-                    //  past this many matches, don't render the individual codes in favor of a
-                    // "this many matches" string 
-                    <span className="searchHighlight">{`${1} codes`}</span> 
-                    )} 
-                  </strong>
-                </td>
-                ) : ( 
-                "" 
-              )} */}
-            <div>
-              <Icon.NavigateNext
-                aria-label="Chevron indicating additional content"
-                size={4}
-              />
-            </div>
-          </td>
-        </tr>
-      );
-    });
+            )}
+          </div>
+          <div>
+            <Icon.NavigateNext
+              aria-label="Right chevron indicating additional content"
+              size={4}
+            />
+          </div>
+        </td>
+      </tr>
+    ));
   };
 
   return (
@@ -278,26 +274,50 @@ const QueryBuilding: React.FC = () => {
             <SearchField
               id="librarySearch"
               placeholder={"Search"}
-              className={styles.codeLibrary__search}
+              className={styles.search}
               onChange={(e) => {
                 e.preventDefault();
-                setSearch(e.target.value);
+                setTextSearch(e.target.value);
               }}
             />
-            <div className={styles.applyFilters}>
+            <div
+              role="button"
+              tabIndex={0}
+              className={classNames(
+                styles.applyFilters,
+                filterCount > 0 ? styles.applyFilters_active : "",
+              )}
+              onClick={() => setShowFilters(true)}
+            >
               <Icon.FilterList
                 className="usa-icon qc-filter"
                 size={3}
                 aria-label="Icon indicating a menu with filter options"
                 role="icon"
               />
-              Filters
+              {filterCount <= 0
+                ? "Filters"
+                : `${filterCount} ${
+                    filterCount > 1 ? `filters` : `filter`
+                  } applied`}
+              {showFilters && (
+                <DropdownFilter
+                  filterCount={filterCount}
+                  loading={loading}
+                  setShowFilters={setShowFilters}
+                  filterSearch={filterSearch}
+                  setFilterSearch={setFilterSearch}
+                  valueSets={valueSets}
+                />
+              )}{" "}
             </div>
           </div>
+
           <Button type="button" className={styles.button}>
             Add value set
           </Button>
         </div>
+
         <div className={styles.content}>
           <div className={styles.resultsContainer}>
             <div className={styles.content__left}>
@@ -361,7 +381,6 @@ const QueryBuilding: React.FC = () => {
                     {true ? (
                       <tr className={styles.lockedForEdits}>
                         <th>
-                          {" "}
                           <Icon.Lock
                             role="icon"
                             className="qc-lock"
@@ -398,7 +417,7 @@ const QueryBuilding: React.FC = () => {
                         <td className={styles.valueSetCode}>
                           <Highlighter
                             highlightClassName="searchHighlight"
-                            searchWords={[search]}
+                            searchWords={[textSearch]}
                             autoEscape={true}
                             textToHighlight={vs.code}
                           />
@@ -406,7 +425,7 @@ const QueryBuilding: React.FC = () => {
                         <td>
                           <Highlighter
                             highlightClassName="searchHighlight"
-                            searchWords={[search]}
+                            searchWords={[textSearch]}
                             autoEscape={true}
                             textToHighlight={vs.display}
                           />

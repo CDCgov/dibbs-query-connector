@@ -5,7 +5,6 @@
     flex-direction: column;
     flex: auto;
     margin-bottom: 0 !important;
-    max-width: 70rem !important;
     font-family: "Public Sans", sans-serif !important;
 
     .header {
@@ -28,9 +27,11 @@
         align-items: center;
         justify-content: space-between;
         margin-bottom: 1.5rem;
+        height: 3rem;
 
-        .codeLibrary__search {
+        .search {
             display: flex;
+            min-width: 35%;
             width: 25rem;
             height: 3rem !important;
             align-items: center;
@@ -48,6 +49,7 @@
             display: flex;
             flex-direction: row;
             align-items: center;
+            min-width: 35%;
         }
 
         .applyFilters {
@@ -55,6 +57,15 @@
             display: flex;
             align-items: center;
             font-weight: 700;
+            position: relative;
+
+            &_active {
+                color: #0076d6;
+            }
+
+            &:hover {
+                cursor: pointer;
+            }
         }
     }
 
@@ -88,9 +99,73 @@
     }
 }
 
-.activeValueSet,
-.activeValueSet td {
-    background-color: #e8f5ff;
+.filtersDropdown {
+    padding: 1.25rem;
+    background: #fff;
+    border-radius: 4px;
+    position: absolute;
+    width: 27.5rem;
+    top: 2.5rem;
+    color: #111;
+    font-weight: 400;
+    z-index: 400;
+    border: 1px solid #919191;
+    gap: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    line-height: 1.375rem;
+
+    div.filterOptions:first-child {
+        height: 266px;
+    }
+
+    .filterOptions {
+        justify-content: space-between;
+        display: flex;
+        flex-direction: column;
+
+        &_grouping {
+            height: 4.875rem !important;
+        }
+    }
+    .filtersSelect {
+        height: 3rem;
+
+        &:disabled:hover,
+        &:disabled {
+            background-color: #f3f3f3 !important;
+        }
+    }
+    .clearFiltersBtn {
+        background-color: #fff !important;
+        border: 2px solid #0076d6 !important;
+        border-radius: 4px !important;
+        color: #0076d6 !important;
+        white-space: nowrap;
+        margin: 0 !important;
+        width: fit-content;
+    }
+
+    .shortcuts {
+        display: flex;
+        justify-content: flex-end;
+
+        span:first-child {
+            flex: 1;
+        }
+
+        button {
+            font-weight: 700;
+            border: none !important;
+            color: #0076d6;
+            background: transparent;
+            margin-left: 0.5rem;
+
+            &:hover {
+                cursor: pointer;
+            }
+        }
+    }
 }
 
 .resultsContainer {
@@ -110,7 +185,7 @@
     justify-content: space-between;
     padding: 1rem;
     align-items: center;
-    width: 74rem;
+    width: calc($query-connector-content-width-wide + 4rem);
 
     ul {
         max-width: 50%;
@@ -144,8 +219,6 @@
     border: none !important;
     box-shadow: none !important;
     padding: 0 !important;
-    max-height: 60vh;
-    overflow-y: auto;
 
     &__header {
         display: flex;
@@ -234,12 +307,23 @@
             background-color: transparent !important;
         }
     }
+
+    .valueSetCode {
+        min-width: 7.5rem;
+        word-wrap: break-word;
+        padding-right: 1rem;
+        max-width: 7.5rem;
+    }
 }
 
 .valueSetTable__tableBody {
     &_row {
         &:hover {
             cursor: pointer;
+        }
+        &:has(span.skeletonContainer):hover {
+            background-color: transparent !important;
+            cursor: default;
         }
         td {
             padding: 0 !important;
@@ -270,25 +354,24 @@
             font-style: italic;
         }
     }
-}
 
-.valueSetCode {
-    min-width: 7.5rem;
-    word-wrap: break-word;
-    padding-right: 1rem;
-    max-width: 7.5rem;
+    .activeValueSet,
+    .activeValueSet td {
+        background-color: #e8f5ff;
+    }
 }
 
 .overflowScroll {
     overflow-y: scroll;
-    display: block;
+    display: flex;
+    max-height: 60vh;
 }
 
 .skeletonContainer {
-    margin-top: 1.5rem;
-}
+    width: 100%;
 
-.skeleton {
-    height: 3.5rem;
-    display: flex;
+    .skeleton {
+        height: 3.5rem;
+        display: flex;
+    }
 }

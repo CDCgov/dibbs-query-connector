@@ -12,6 +12,8 @@ export const formatSystem = (system: string) => {
       return "ICD-10";
     case system.includes("http://loinc.org"):
       return "LOINC";
+    case system.includes("http://hl7.org/fhir/sid/cvx"):
+      return "CVX";
     default:
       return system;
   }
