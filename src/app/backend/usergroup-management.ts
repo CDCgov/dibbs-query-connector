@@ -615,6 +615,9 @@ export const createUserGroup = UserGroupManagementService.createUserGroup;
 export const updateUserGroup = UserGroupManagementService.updateUserGroup;
 export const deleteUserGroup = UserGroupManagementService.deleteUserGroup;
 export const addUsersToGroup = UserGroupManagementService.addUsersToGroup;
+export const getAllGroupMembers = UserGroupManagementService.getAllGroupMembers;
+export const removeQueriesFromGroup =
+  UserGroupManagementService.removeQueriesFromGroup;
 export const removeUsersFromGroup =
   UserGroupManagementService.removeUsersFromGroup;
 export const saveUserGroupMembership =

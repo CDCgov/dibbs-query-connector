@@ -175,8 +175,8 @@ describe("User Group Integration Tests", () => {
 
     expect(result).toHaveProperty("id");
     expect(result).toHaveProperty("name", groupName);
-    expect(result).toHaveProperty("member_size", 0);
-    expect(result).toHaveProperty("query_size", 0);
+    expect(result).toHaveProperty("memberSize", 0);
+    expect(result).toHaveProperty("querySize", 0);
 
     if (typeof result === "string") {
       throw new Error(`Failed to create Pilot Group: ${result}`);
