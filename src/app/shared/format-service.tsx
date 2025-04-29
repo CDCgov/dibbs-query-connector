@@ -306,6 +306,7 @@ export function formatSex(sex: string | undefined): string {
       return "";
   }
 }
+
 /**
  * Formats a string in sentence case
  * @param string the string to format
