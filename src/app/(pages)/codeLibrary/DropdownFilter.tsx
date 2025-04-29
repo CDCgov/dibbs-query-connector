@@ -66,7 +66,6 @@ const DropdownFilter: React.FC<DropdownFilterProps> = ({
     });
 
   const handleOutsideClick = (ref: RefObject<HTMLFormElement>) => {
-    console.log("clicky");
     useEffect(() => {
       function handleClickOutside(event: MouseEvent | KeyboardEvent) {
         if (
