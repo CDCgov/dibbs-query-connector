@@ -19,6 +19,7 @@ export const CANCER_FRONTEND_NESTED_INPUT = {
         ersdConceptType: "lrtc",
         dibbsConceptType: "labs",
         includeValueSet: true,
+        userCreated: false,
         concepts: [
           {
             code: "9484.100004300",
@@ -50,6 +51,7 @@ export const CANCER_FRONTEND_NESTED_INPUT = {
         system: "http://snomed.info/sct",
         ersdConceptType: "sdtc",
         dibbsConceptType: "conditions",
+        userCreated: false,
         includeValueSet: true,
         concepts: [
           {
@@ -70,6 +72,7 @@ export const CANCER_FRONTEND_NESTED_INPUT = {
         ersdConceptType: "dxtc",
         dibbsConceptType: "conditions",
         includeValueSet: true,
+        userCreated: false,
         concepts: [
           {
             code: "36929009",
@@ -111,6 +114,7 @@ export const CANCER_FRONTEND_NESTED_INPUT = {
         ersdConceptType: "mrtc",
         dibbsConceptType: "medications",
         includeValueSet: true,
+        userCreated: false,
         concepts: [
           {
             code: "828265",

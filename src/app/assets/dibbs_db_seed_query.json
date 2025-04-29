@@ -21,6 +21,7 @@
             "ersdConceptType": "lrtc",
             "dibbsConceptType": "labs",
             "includeValueSet": true,
+            "userCreated": false,
             "concepts": [
               {
                 "code": "1255068005",
@@ -49,6 +50,7 @@
             "ersdConceptType": "dxtc",
             "dibbsConceptType": "conditions",
             "includeValueSet": true,
+            "userCreated": false,
             "concepts": [
               {
                 "code": "21908-9",
@@ -87,6 +89,7 @@
             "ersdConceptType": "sdtc",
             "dibbsConceptType": "conditions",
             "includeValueSet": true,
+            "userCreated": false,
             "concepts": [
               {
                 "code": "363346000",
@@ -105,6 +108,7 @@
             "ersdConceptType": "mrtc",
             "dibbsConceptType": "medications",
             "includeValueSet": true,
+            "userCreated": false,
             "concepts": [
               {
                 "code": "828265",
@@ -137,6 +141,7 @@
             "ersdConceptType": "labs",
             "dibbsConceptType": "labs",
             "includeValueSet": true,
+            "userCreated": false,
             "concepts": [
               {
                 "code": "115289001",
@@ -340,6 +345,7 @@
             "ersdConceptType": "labs",
             "dibbsConceptType": "labs",
             "includeValueSet": true,
+            "userCreated": false,
             "concepts": [
               {
                 "code": "115292002",
@@ -488,6 +494,7 @@
             "ersdConceptType": "labs",
             "dibbsConceptType": "labs",
             "includeValueSet": true,
+            "userCreated": false,
             "concepts": [
               {
                 "code": "14507-8",
@@ -681,6 +688,7 @@
             "ersdConceptType": "labs",
             "dibbsConceptType": "labs",
             "includeValueSet": true,
+            "userCreated": false,
             "concepts": [
               {
                 "code": "14462-6",
@@ -764,6 +772,7 @@
             "ersdConceptType": "labs",
             "dibbsConceptType": "labs",
             "includeValueSet": true,
+            "userCreated": false,
             "concepts": [
               {
                 "code": "16600-9",
@@ -1082,6 +1091,7 @@
             "ersdConceptType": "labs",
             "dibbsConceptType": "labs",
             "includeValueSet": true,
+            "userCreated": false,
             "concepts": [
               {
                 "code": "556-1",
@@ -1155,6 +1165,7 @@
             "ersdConceptType": "labs",
             "dibbsConceptType": "labs",
             "includeValueSet": true,
+            "userCreated": false,
             "concepts": [
               {
                 "code": "20755-5",
@@ -1333,6 +1344,7 @@
             "ersdConceptType": "lrtc",
             "dibbsConceptType": "labs",
             "includeValueSet": true,
+            "userCreated": false,
             "concepts": [
               {
                 "code": "24111-7",
@@ -1376,6 +1388,7 @@
             "ersdConceptType": "labs",
             "dibbsConceptType": "labs",
             "includeValueSet": true,
+            "userCreated": false,
             "concepts": [
               {
                 "code": "35412-6",
@@ -1504,6 +1517,7 @@
             "ersdConceptType": "conditions",
             "dibbsConceptType": "conditions",
             "includeValueSet": true,
+            "userCreated": false,
             "concepts": [
               {
                 "code": "1163085006",
@@ -1787,6 +1801,7 @@
             "ersdConceptType": "conditions",
             "dibbsConceptType": "conditions",
             "includeValueSet": true,
+            "userCreated": false,
             "concepts": [
               {
                 "code": "A56.0",
@@ -1900,6 +1915,7 @@
             "ersdConceptType": "conditions",
             "dibbsConceptType": "conditions",
             "includeValueSet": true,
+            "userCreated": false,
             "concepts": [
               {
                 "code": "231861005",
@@ -1943,6 +1959,7 @@
             "ersdConceptType": "conditions",
             "dibbsConceptType": "conditions",
             "includeValueSet": true,
+            "userCreated": false,
             "concepts": [
               {
                 "code": "A55",
@@ -1966,6 +1983,7 @@
             "ersdConceptType": "conditions",
             "dibbsConceptType": "conditions",
             "includeValueSet": true,
+            "userCreated": false,
             "concepts": [
               {
                 "code": "29976007",
@@ -2009,6 +2027,7 @@
             "ersdConceptType": "conditions",
             "dibbsConceptType": "conditions",
             "includeValueSet": true,
+            "userCreated": false,
             "concepts": [
               {
                 "code": "236683007",
@@ -2062,6 +2081,7 @@
             "ersdConceptType": "conditions",
             "dibbsConceptType": "conditions",
             "includeValueSet": true,
+            "userCreated": false,
             "concepts": [
               {
                 "code": "A74.0",
@@ -2080,6 +2100,7 @@
             "ersdConceptType": "conditions",
             "dibbsConceptType": "conditions",
             "includeValueSet": true,
+            "userCreated": false,
             "concepts": [
               {
                 "code": "A71.1",
@@ -2118,6 +2139,7 @@
             "ersdConceptType": "sdtc",
             "dibbsConceptType": "conditions",
             "includeValueSet": true,
+            "userCreated": false,
             "concepts": [
               {
                 "code": "2339001",
@@ -2141,6 +2163,7 @@
             "ersdConceptType": "mrtc",
             "dibbsConceptType": "medications",
             "includeValueSet": true,
+            "userCreated": false,
             "concepts": [
               {
                 "code": "1649987",
@@ -2187,6 +2210,7 @@
             "ersdConceptType": "labs",
             "dibbsConceptType": "labs",
             "includeValueSet": true,
+            "userCreated": false,
             "concepts": [
               {
                 "code": "44106000",
@@ -2230,6 +2254,7 @@
             "ersdConceptType": "labs",
             "dibbsConceptType": "labs",
             "includeValueSet": true,
+            "userCreated": false,
             "concepts": [
               {
                 "code": "49799-0",
@@ -2273,6 +2298,7 @@
             "ersdConceptType": "labs",
             "dibbsConceptType": "labs",
             "includeValueSet": true,
+            "userCreated": false,
             "concepts": [
               {
                 "code": "29310-0",
@@ -2291,6 +2317,7 @@
             "ersdConceptType": "labs",
             "dibbsConceptType": "labs",
             "includeValueSet": true,
+            "userCreated": false,
             "concepts": [
               {
                 "code": "11597-2",
@@ -2724,6 +2751,7 @@
             "ersdConceptType": "conditions",
             "dibbsConceptType": "conditions",
             "includeValueSet": true,
+            "userCreated": false,
             "concepts": [
               {
                 "code": "A50",
@@ -2927,6 +2955,7 @@
             "ersdConceptType": "conditions",
             "dibbsConceptType": "conditions",
             "includeValueSet": true,
+            "userCreated": false,
             "concepts": [
               {
                 "code": "109436001",
@@ -3135,6 +3164,7 @@
             "ersdConceptType": "dxtc",
             "dibbsConceptType": "conditions",
             "includeValueSet": true,
+            "userCreated": false,
             "concepts": [
               {
                 "code": "76272004",
@@ -3153,6 +3183,7 @@
             "ersdConceptType": "sdtc",
             "dibbsConceptType": "conditions",
             "includeValueSet": true,
+            "userCreated": false,
             "concepts": [
               {
                 "code": "186647001",
@@ -3171,6 +3202,7 @@
             "ersdConceptType": "medications",
             "dibbsConceptType": "medications",
             "includeValueSet": true,
+            "userCreated": false,
             "concepts": [
               {
                 "code": "1050115",
@@ -3244,6 +3276,7 @@
             "ersdConceptType": "medications",
             "dibbsConceptType": "medications",
             "includeValueSet": true,
+            "userCreated": false,
             "concepts": [
               {
                 "code": "863538",
@@ -3287,6 +3320,7 @@
             "ersdConceptType": "mrtc",
             "dibbsConceptType": "medications",
             "includeValueSet": true,
+            "userCreated": false,
             "concepts": [
               {
                 "code": "2671695",
@@ -3305,6 +3339,7 @@
             "ersdConceptType": "medications",
             "dibbsConceptType": "medications",
             "includeValueSet": true,
+            "userCreated": false,
             "concepts": [
               {
                 "code": "731568",
@@ -3372,6 +3407,7 @@
             "ersdConceptType": "labs",
             "dibbsConceptType": "labs",
             "includeValueSet": true,
+            "userCreated": false,
             "concepts": [
               {
                 "code": "715869002",
@@ -3405,6 +3441,7 @@
             "ersdConceptType": "labs",
             "dibbsConceptType": "labs",
             "includeValueSet": true,
+            "userCreated": false,
             "concepts": [
               {
                 "code": "277504006",
@@ -3478,6 +3515,7 @@
             "ersdConceptType": "labs",
             "dibbsConceptType": "labs",
             "includeValueSet": true,
+            "userCreated": false,
             "concepts": [
               {
                 "code": "691-6",
@@ -3561,6 +3599,7 @@
             "ersdConceptType": "labs",
             "dibbsConceptType": "labs",
             "includeValueSet": true,
+            "userCreated": false,
             "concepts": [
               {
                 "code": "21414-8",
@@ -3814,6 +3853,7 @@
             "ersdConceptType": "labs",
             "dibbsConceptType": "labs",
             "includeValueSet": true,
+            "userCreated": false,
             "concepts": [
               {
                 "code": "43386-2",
@@ -3862,6 +3902,7 @@
             "ersdConceptType": "lotc",
             "dibbsConceptType": "labs",
             "includeValueSet": true,
+            "userCreated": false,
             "concepts": [
               {
                 "code": "11350-6",
@@ -3880,6 +3921,7 @@
             "ersdConceptType": "lrtc",
             "dibbsConceptType": "labs",
             "includeValueSet": true,
+            "userCreated": false,
             "concepts": [
               {
                 "code": "21613-5",
@@ -3908,6 +3950,7 @@
             "ersdConceptType": "conditions",
             "dibbsConceptType": "conditions",
             "includeValueSet": true,
+            "userCreated": false,
             "concepts": [
               {
                 "code": "A54.00",
@@ -3946,6 +3989,7 @@
             "ersdConceptType": "conditions",
             "dibbsConceptType": "conditions",
             "includeValueSet": true,
+            "userCreated": false,
             "concepts": [
               {
                 "code": "50970007",
@@ -4019,6 +4063,7 @@
             "ersdConceptType": "conditions",
             "dibbsConceptType": "conditions",
             "includeValueSet": true,
+            "userCreated": false,
             "concepts": [
               {
                 "code": "A54.09",
@@ -4242,6 +4287,7 @@
             "ersdConceptType": "conditions",
             "dibbsConceptType": "conditions",
             "includeValueSet": true,
+            "userCreated": false,
             "concepts": [
               {
                 "code": "A54.30",
@@ -4265,6 +4311,7 @@
             "ersdConceptType": "conditions",
             "dibbsConceptType": "conditions",
             "includeValueSet": true,
+            "userCreated": false,
             "concepts": [
               {
                 "code": "35876006",
@@ -4308,6 +4355,7 @@
             "ersdConceptType": "conditions",
             "dibbsConceptType": "conditions",
             "includeValueSet": true,
+            "userCreated": false,
             "concepts": [
               {
                 "code": "1052287002",
@@ -4856,6 +4904,7 @@
             "ersdConceptType": "dxtc",
             "dibbsConceptType": "conditions",
             "includeValueSet": true,
+            "userCreated": false,
             "concepts": [
               {
                 "code": "72531000052105 ",
@@ -4879,6 +4928,7 @@
             "ersdConceptType": "mrtc",
             "dibbsConceptType": "medications",
             "includeValueSet": true,
+            "userCreated": false,
             "concepts": [
               {
                 "code": "1665005",
@@ -4916,6 +4966,7 @@
             "ersdConceptType": "lotc",
             "dibbsConceptType": "labs",
             "includeValueSet": true,
+            "userCreated": false,
             "concepts": [
               {
                 "code": "57700-7",
@@ -4979,6 +5030,7 @@
             "ersdConceptType": "lrtc",
             "dibbsConceptType": "labs",
             "includeValueSet": true,
+            "userCreated": false,
             "concepts": [
               {
                 "code": "30551-6",

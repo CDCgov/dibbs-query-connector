@@ -68,6 +68,7 @@ function mapStoredValueSetIntoInternalValueset(
         include: c["include"] ?? true,
       };
     }),
+    userCreated: storedConcept["user_created"] ?? false,
   };
   const conditionId = storedConcept["condition_id"];
   if (conditionId) {

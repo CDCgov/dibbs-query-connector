@@ -6,6 +6,7 @@ export type ValuesetStruct = {
   author: string;
   type: string;
   dibbs_concept_type: string;
+  user_created: string;
 };
 
 export type ConceptStruct = {
@@ -65,7 +66,7 @@ export type dbInsertStruct =
 
 export const insertValueSetSql = `
 INSERT INTO valuesets
-    VALUES($1,$2,$3,$4,$5,$6,$7)
+    VALUES($1,$2,$3,$4,$5,$6,$7,$8)
     ON CONFLICT(id)
     DO UPDATE SET
       id = EXCLUDED.id,
@@ -74,7 +75,8 @@ INSERT INTO valuesets
       name = EXCLUDED.name,
       author = EXCLUDED.author,
       type = EXCLUDED.type,
-      dibbs_concept_type = EXCLUDED.dibbs_concept_type
+      dibbs_concept_type = EXCLUDED.dibbs_concept_type,
+      user_created = EXCLUDED.user_created
     RETURNING id;
 `;
 
