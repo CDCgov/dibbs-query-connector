@@ -77,11 +77,11 @@ describe("User Group and Query Membership Tests", () => {
   afterAll(async () => {
     try {
       await dbClient.query(
-        "DELETE FROM usergroup_to_users WHERE usergroup_id = $1;",
+        "DELETE FROM usergroup_to_users WHERE usergroupId = $1;",
         [TEST_GROUP_ID],
       );
       await dbClient.query(
-        "DELETE FROM usergroup_to_query WHERE usergroup_id = $1;",
+        "DELETE FROM usergroup_to_query WHERE usergroupId = $1;",
         [TEST_GROUP_ID],
       );
       await dbClient.query("DELETE FROM usergroup WHERE id = $1;", [
@@ -116,13 +116,13 @@ describe("User Group and Query Membership Tests", () => {
     expect(result[0]).toHaveProperty("userGroupMemberships");
 
     const membership = result[0].userGroupMemberships?.find(
-      (m: { usergroup_id: string; usergroup_name: string }) =>
-        m.usergroup_id === TEST_GROUP_ID,
-      (m: { usergroup_id: string; usergroup_name: string }) =>
-        m.usergroup_name === "Test Group",
+      (m: { usergroupId: string; usergroupName: string }) =>
+        m.usergroupId === TEST_GROUP_ID,
+      (m: { usergroupId: string; usergroupName: string }) =>
+        m.usergroupName === "Test Group",
     );
     expect(membership).toBeDefined();
-    expect(membership?.is_member).toBeDefined();
+    expect(membership?.isMember).toBeDefined();
   });
 
   /**
@@ -149,7 +149,7 @@ describe("User Group and Query Membership Tests", () => {
     const result = await addUsersToGroup(TEST_GROUP_ID, [TEST_USER_3_ID]);
     expect(result.totalItems).toBe(1);
     expect(result.items[0].id).toContain(TEST_USER_3_ID);
-    expect(result?.items[0].userGroupMemberships?.[0].membership_id).toContain(
+    expect(result?.items[0].userGroupMemberships?.[0].membershipId).toContain(
       TEST_GROUP_ID,
     );
   });
@@ -167,7 +167,7 @@ describe("User Group and Query Membership Tests", () => {
   test("should remove multiple users from a group", async () => {
     const users: User[] = await getAllUsersWithSingleGroupStatus(TEST_GROUP_ID);
     const members = users.filter(
-      (user) => user.userGroupMemberships?.some((m) => m.is_member),
+      (user) => user.userGroupMemberships?.some((m) => m.isMember),
     );
     expect(members.length).toBe(3);
 
@@ -186,14 +186,14 @@ describe("User Group and Query Membership Tests", () => {
       updatedMembers.items.some(
         (user) =>
           user.id === TEST_USER_1_ID &&
-          user.userGroupMemberships?.some((m) => m.is_member),
+          user.userGroupMemberships?.some((m) => m.isMember),
       ),
     ).toBe(false);
     expect(
       updatedMembers.items.some(
         (user) =>
           user.id === TEST_USER_2_ID &&
-          user.userGroupMemberships?.some((m) => m.is_member),
+          user.userGroupMemberships?.some((m) => m.isMember),
       ),
     ).toBe(false);
   });
@@ -204,7 +204,7 @@ describe("User Group and Query Membership Tests", () => {
 
     const users: User[] = await getAllUsersWithSingleGroupStatus(TEST_GROUP_ID);
     const members = users.filter(
-      (user) => user.userGroupMemberships?.some((m) => m.is_member),
+      (user) => user.userGroupMemberships?.some((m) => m.isMember),
     );
 
     expect(members.length).toBe(0);
@@ -212,7 +212,7 @@ describe("User Group and Query Membership Tests", () => {
       users.some(
         (user) =>
           user.id === TEST_USER_3_ID &&
-          user.userGroupMemberships?.some((m) => m.is_member),
+          user.userGroupMemberships?.some((m) => m.isMember),
       ),
     ).toBe(false);
   });
@@ -239,14 +239,14 @@ describe("User Group and Query Membership Tests", () => {
       updatedUsers.some(
         (user) =>
           user.id === TEST_USER_1_ID &&
-          user.userGroupMemberships?.some((m) => m.is_member),
+          user.userGroupMemberships?.some((m) => m.isMember),
       ),
     ).toBe(true);
     expect(
       updatedUsers.some(
         (user) =>
           user.id === TEST_USER_2_ID &&
-          user.userGroupMemberships?.some((m) => m.is_member),
+          user.userGroupMemberships?.some((m) => m.isMember),
       ),
     ).toBe(false);
   });
@@ -279,7 +279,7 @@ describe("User Group and Query Membership Tests", () => {
     const result = await addQueriesToGroup(TEST_GROUP_ID, [TEST_QUERY_1_ID]);
     expect(result.totalItems).toBe(1);
     expect(result.items[0].queryId).toContain(TEST_QUERY_1_ID);
-    expect(result?.items[0].groupAssignments?.[0].membership_id).toContain(
+    expect(result?.items[0].groupAssignments?.[0].membershipId).toContain(
       TEST_GROUP_ID,
     );
   });
@@ -310,7 +310,7 @@ describe("User Group and Query Membership Tests", () => {
       updatedQueries.items.some(
         (query) =>
           query.queryId === TEST_USER_2_ID &&
-          query.groupAssignments?.some((q) => q.is_member),
+          query.groupAssignments?.some((q) => q.isMember),
       ),
     ).toBe(false);
 
@@ -318,7 +318,7 @@ describe("User Group and Query Membership Tests", () => {
       updatedQueries.items.some(
         (query) =>
           query.queryId === TEST_USER_3_ID &&
-          query.groupAssignments?.some((q) => q.is_member),
+          query.groupAssignments?.some((q) => q.isMember),
       ),
     ).toBe(false);
   });
@@ -335,7 +335,7 @@ describe("User Group and Query Membership Tests", () => {
       updatedQueries.items.some(
         (query) =>
           query.queryId === TEST_QUERY_1_ID &&
-          query.groupAssignments?.some((q) => q.is_member),
+          query.groupAssignments?.some((q) => q.isMember),
       ),
     ).toBe(false);
   });
