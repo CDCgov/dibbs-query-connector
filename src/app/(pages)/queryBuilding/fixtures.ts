@@ -4,7 +4,7 @@ import { QueryTableResult } from "./utils";
 export const DEFAULT_QUERIES = [
   {
     query_id: "cf580d8d-cc7b-4eae-8a0d-96c36f9222e3",
-    userCreated: true,
+    userCreated: false,
     query_name: "Cancer case investigation",
     conditions_list: ["2"],
     valuesets: [
