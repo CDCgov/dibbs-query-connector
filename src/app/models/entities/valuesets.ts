@@ -14,4 +14,5 @@ export interface DibbsValueSet {
   includeValueSet: boolean;
   concepts: Concept[];
   conditionId?: string;
+  userCreated: boolean;
 }

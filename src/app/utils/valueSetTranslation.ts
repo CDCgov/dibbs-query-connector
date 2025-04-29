@@ -55,6 +55,7 @@ export function groupValueSetsByVsId(
         ersdConceptType: row.ersdConceptType,
         dibbsConceptType: row.dibbsConceptType,
         includeValueSet: row.includeValueSet,
+        userCreated: row.userCreated,
         concepts: row.concepts.map((c) => {
           return { ...c };
         }),

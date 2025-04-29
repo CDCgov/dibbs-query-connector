@@ -50,7 +50,7 @@ class DatabaseService {
   `;
 
   private static getValueSetsByConditionIds = `
-    SELECT c.display, c.code_system, c.code, vs.name as valueset_name, vs.id as valueset_id, vs.oid as valueset_external_id, vs.version, vs.author as author, vs.type, vs.dibbs_concept_type as dibbs_concept_type, ctvs.condition_id
+    SELECT c.display, c.code_system, c.code, vs.name as valueset_name, vs.id as valueset_id, vs.oid as valueset_external_id, vs.version, vs.author as author, vs.type, vs.dibbs_concept_type as dibbs_concept_type, vs.user_created as user_created, ctvs.condition_id
     FROM valuesets vs 
     LEFT JOIN condition_to_valueset ctvs on vs.id = ctvs.valueset_id 
     LEFT JOIN valueset_to_concept vstc on vs.id = vstc.valueset_id
@@ -359,6 +359,7 @@ class DatabaseService {
             (struct as ValuesetStruct).author,
             (struct as ValuesetStruct).type,
             (struct as ValuesetStruct).dibbs_concept_type,
+            (struct as ValuesetStruct).user_created,
           ];
           break;
         case "concepts":
@@ -605,6 +606,7 @@ class DatabaseService {
       vs.author,
       vs.dibbsConceptType,
       vs.dibbsConceptType,
+      vs.userCreated ?? false,
     ];
     return DatabaseService.dbClient.query(insertValueSetSql, valuesArray);
   }
