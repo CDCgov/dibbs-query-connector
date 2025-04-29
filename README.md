@@ -1,13 +1,18 @@
 # DIBBs Query Connector
 
-[![codecov](https://codecov.io/gh/CDCgov/phdi/branch/main/graph/badge.svg)](https://codecov.io/gh/CDCgov/phdi)
+[![codecov](https://codecov.io/gh/CDCgov/dibbs-query-connector/branch/main/graph/badge.svg)](https://codecov.io/gh/CDCgov/dibbs-query-connector)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
-[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
-[![Test github badge](https://github.com/CDCgov/phdi/actions/workflows/test.yaml/badge.svg)](https://github.com/CDCgov/phdi/actions/workflows/test.yaml)
+[![Test github badge](https://img.shields.io/github/actions/workflow/status/CDCgov/dibbs-query-connector/ci.yaml
+)](https://github.com/CDCgov/dibbs-query-connector/actions/workflows/ci.yaml)
+[![Dev site](https://img.shields.io/website?url=https%3A%2F%2Fqueryconnector.dev&label=queryconnector.dev)](https://queryconnector.dev)
+[![Demo site](https://img.shields.io/website?url=https%3A%2F%2Fdemo.queryconnector.dev&label=demo.queryconnector.dev)](https://demo.queryconnector.dev)
+
+
+![Query Connector Screenshot](./docs/images/query-connector-screenshot.png)
 
 ## Overview
 
-This repository is a part of the CDC/USDS [DIBBs project](https://cdcgov.github.io/dibbs-site/) and seeks to build the DIBBs Query Connector.
+This repository is a part of the CDC [DIBBs project](https://cdcgov.github.io/dibbs-site/) and seeks to build the DIBBs Query Connector.
 
 The DIBBs Query Connector app offers a REST API and comprehensive UI for public health staff to query a wide network of healthcare organizations (HCOs), providing access to more complete and timely data.
 
@@ -27,18 +32,24 @@ DIBBs Query Connector is a sibling project to
 
 ## Documentation
 
-DIBBs Query Connector documentation, including instructions on how to install dependencies and run locally, is currently hosted within the repository, [here](docs/getting_started.md).
+You can find more detailed documentation, guides, and tutorials here:
 
-Access to the demo instance of the latest official release DIBBs Query Connector is available at [demo.queryconnector.dev](https://demo.queryconnector.dev).
+- For developers:
+    - [Local development](docs/development.md)
+    - [Contributing changes](docs/contributing.md)
+    - [Release process](docs/release.md)
+- For public health IT staff:
+    - [Architecture](docs/architecture.md)
+    - [Deploying Query Connector](docs/deployment.md)
+    - [API Docs](docs/api.md)
+- For public health case investigators: 
+    - [Query Connector User Guide](docs/user_guide.md)
 
-Access to the dev instance of the main branch of DIBBs Query Connector is available at [queryconnector.dev](https://queryconnector.dev).
+## Try it out!
 
-## Implementation
+Access to the demo instance of the latest official release DIBBs Query Connector is available at [https://demo.queryconnector.dev](https://demo.queryconnector.dev).
 
-**Implementation Support** - Resources to help users implement DIBBs Query Connector tools to manage their data.
-
-- **Examples** - Forthcoming!
-- **Tutorials** - Forthcoming!
+Access to the dev instance of the main branch of DIBBs Query Connector is available at [https://queryconnector.dev](https://queryconnector.dev).
 
 ## Additional Acknowledgments
 
