@@ -553,7 +553,7 @@ export const categoryToConditionNameArrayMap = {
   ],
 };
 
-export const gonorreheaValueSets = [
+export const gonorrheaValueSets = [
   {
     display: "azithromycin 1000 MG",
     code_system: "http://www.nlm.nih.gov/research/umls/rxnorm",
@@ -612,7 +612,7 @@ export const cancerValueSets = [
   },
 ];
 
-export const gonorreheaSavedQuery: QueryTableResult = {
+export const gonorrheaSavedQuery: QueryTableResult = {
   queryId: "73e1a777-49cb-4e19-bc71-8c3fd3ffda64",
   queryName: "Gonorrhea case investigation",
   conditionsList: ["15628003"],

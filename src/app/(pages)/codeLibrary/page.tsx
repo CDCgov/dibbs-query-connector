@@ -34,7 +34,7 @@ import DropdownFilter, { FilterCategories } from "./DropdownFilter";
  * Component for Query Building Flow
  * @returns The Query Building component flow
  */
-const QueryBuilding: React.FC = () => {
+const CodeLibrary: React.FC = () => {
   type Mode = "manage" | "select";
 
   const [loading, setLoading] = useState<boolean>(true);
@@ -62,8 +62,7 @@ const QueryBuilding: React.FC = () => {
   );
 
   const ctx = useContext(DataContext);
-
-  const totalPages = Math.ceil(filteredValueSets.length / itemsPerPage);
+  let totalPages = 0;
 
   const handleTextSearch = (vs: DibbsValueSet) => {
     const matchesName = vs.valueSetName
@@ -120,6 +119,7 @@ const QueryBuilding: React.FC = () => {
 
   useEffect(() => {
     setFilteredValueSets(valueSets);
+    totalPages = Math.ceil(filteredValueSets.length / itemsPerPage);
 
     if (
       filteredValueSets.length > 0 &&
@@ -159,7 +159,7 @@ const QueryBuilding: React.FC = () => {
       (currentPage - 1) * itemsPerPage,
       currentPage * itemsPerPage,
     );
-  }, [filteredValueSets, currentPage, itemsPerPage]);
+  }, [valueSets, filteredValueSets, currentPage, itemsPerPage]);
 
   function goBack() {
     // TODO: this will need to be handled differently
@@ -344,7 +344,10 @@ const QueryBuilding: React.FC = () => {
                   )}
                 >
                   {loading && paginatedValueSets.length <= 0 ? (
-                    <tr className={styles.valueSetTable__tableBody_row}>
+                    <tr
+                      className={styles.valueSetTable__tableBody_row}
+                      data-testid={"loading-skeleton"}
+                    >
                       <td>
                         <Skeleton
                           containerClassName={styles.skeletonContainer}
@@ -488,4 +491,4 @@ const QueryBuilding: React.FC = () => {
   );
 };
 
-export default QueryBuilding;
+export default CodeLibrary;
