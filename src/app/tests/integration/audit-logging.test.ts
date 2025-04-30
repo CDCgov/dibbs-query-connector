@@ -78,10 +78,14 @@ describe("audit log", () => {
     const actionTypeToCheck = "makePatientDiscoveryRequest";
     const newAuditRows = await dbService.query(GET_ALL_AUDIT_ROWS);
     const auditEntry = newAuditRows.rows.filter((r) => {
-      return r.actionType === actionTypeToCheck && !r.id.includes(oldAuditIds);
+      return (
+        r.author === TEST_USER.user.username &&
+        r.actionType === actionTypeToCheck &&
+        !oldAuditIds.includes(r.id)
+      );
     })[0];
 
-    expect(auditEntry?.actionType).toBe("makePatientDiscoveryRequest");
+    expect(auditEntry?.actionType).toBe(actionTypeToCheck);
     expect(auditEntry?.auditMessage).toStrictEqual({
       request: JSON.stringify(request),
     });
@@ -101,7 +105,11 @@ describe("audit log", () => {
     const actionTypeToCheck = "makePatientRecordsRequest";
     const newAuditRows = await dbService.query(GET_ALL_AUDIT_ROWS);
     const auditEntry = newAuditRows.rows.filter((r) => {
-      return r.actionType === actionTypeToCheck && !r.id.includes(oldAuditIds);
+      return (
+        r.author === TEST_USER.user.username &&
+        r.actionType === actionTypeToCheck &&
+        !oldAuditIds.includes(r.id)
+      );
     })[0];
 
     expect(auditEntry?.actionType).toBe(actionTypeToCheck);
@@ -116,7 +124,7 @@ describe("audit log", () => {
     );
   });
 
-  it("an audited function should retries successfully", async () => {
+  it("an audited function should retry successfully", async () => {
     const auditGenerationSpy = jest.spyOn(
       DecoratorUtils,
       "generateAuditValues",
