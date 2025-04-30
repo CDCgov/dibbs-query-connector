@@ -187,7 +187,7 @@ class UserGroupManagementService {
             updatedUser.userId,
           );
 
-          // await dbService.query("COMMIT");
+          await dbService.query("COMMIT");
 
           return updatedUserWithGroups.items[0];
         }),
@@ -227,7 +227,8 @@ class UserGroupManagementService {
           const updatedUserWithGroups = await getSingleUserWithGroupMemberships(
             updatedUser.userId,
           );
-          // await dbService.query("COMMIT");
+
+          await dbService.query("COMMIT");
 
           return updatedUserWithGroups.items[0];
         }),
