@@ -10,6 +10,7 @@ export const DEFAULT_QUERIES: CustomUserQuery[] = [
     valuesets: [
       {
         valueSetId: "14_20240923",
+        userCreated: false,
         valueSetVersion: "20240923",
         valueSetName: "Cancer (Leukemia) Lab Result",
         valueSetExternalId: "14",
@@ -46,6 +47,7 @@ export const DEFAULT_QUERIES: CustomUserQuery[] = [
     valuesets: [
       {
         valueSetId: "2.16.840.1.113762.1.4.1146.999_20230602",
+        userCreated: false,
         valueSetVersion: "20230602",
         valueSetName:
           "Chlamydia species (Organism or Substance in Lab Results)",
@@ -260,6 +262,7 @@ export const DEFAULT_QUERIES: CustomUserQuery[] = [
     valuesets: [
       {
         valueSetId: "2.16.840.1.113762.1.4.1146.554_20191227",
+        userCreated: false,
         valueSetVersion: "20191227",
         valueSetName: "Syphilis (Organism or Substance in Lab Results)",
         valueSetExternalId: "2.16.840.1.113762.1.4.1146.554",
@@ -310,6 +313,7 @@ export const DEFAULT_QUERIES: CustomUserQuery[] = [
     valuesets: [
       {
         valueSetId: "2.16.840.1.113762.1.4.1146.1036_20190605",
+        userCreated: false,
         valueSetVersion: "20190605",
         valueSetName:
           "Gonorrhea [Neisseria species Unspecified] (Organism or Substance in Lab Results)",
@@ -345,6 +349,7 @@ export const DEFAULT_QUERIES: CustomUserQuery[] = [
       },
       {
         valueSetId: "2.16.840.1.113762.1.4.1146.169_20230602",
+        userCreated: false,
         valueSetVersion: "20230602",
         valueSetName:
           "Gonorrhea [Neisseria gonorrhoeae] (Organism or Substance in Lab Results)",
@@ -430,6 +435,7 @@ export const DEFAULT_QUERIES: CustomUserQuery[] = [
     valuesets: [
       {
         valueSetId: "1_20240909",
+        userCreated: false,
         valueSetVersion: "20240909",
         valueSetName: "Newborn Screening",
         valueSetExternalId: "1",
@@ -614,6 +620,7 @@ export const gonorreheaSavedQuery: QueryTableResult = {
     "15628003": {
       "2.16.840.1.113762.1.4.1146.1036_20190605": {
         valueSetId: "2.16.840.1.113762.1.4.1146.1036_20190605",
+        userCreated: false,
         valueSetVersion: "20190605",
         valueSetName:
           "Gonorrhea [Neisseria species Unspecified] (Organism or Substance in Lab Results)",
@@ -649,6 +656,7 @@ export const gonorreheaSavedQuery: QueryTableResult = {
       },
       "2.16.840.1.113762.1.4.1146.169_20230602": {
         valueSetId: "2.16.840.1.113762.1.4.1146.169_20230602",
+        userCreated: false,
         valueSetVersion: "20230602",
         valueSetName:
           "Gonorrhea [Neisseria gonorrhoeae] (Organism or Substance in Lab Results)",
