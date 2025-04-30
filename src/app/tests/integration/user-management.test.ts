@@ -46,10 +46,8 @@ const TEST_USER_SUPER = {
 };
 
 describe("User Management Integration Tests", () => {
-  beforeAll(async () => {
+  beforeEach(async () => {
     suppressConsoleLogs();
-
-    await dbClient.query("BEGIN");
 
     // Insert first user as super admin
     const insertSuperUsersQuery = `
@@ -68,8 +66,11 @@ describe("User Management Integration Tests", () => {
 
   afterEach(async () => {
     try {
-      await dbClient.query("DELETE FROM users WHERE id = $1;", [
-        TEST_USER_STANDARD.id,
+      await dbClient.query("DELETE FROM users WHERE username = $1;", [
+        TEST_USER_STANDARD.username,
+      ]);
+      await dbClient.query("DELETE FROM users WHERE username = $1;", [
+        TEST_USER_SUPER.username,
       ]);
       await dbClient.query("DELETE FROM users WHERE id = $1;", [
         TEST_USER_SUPER.id,
@@ -175,8 +176,8 @@ describe("User Group Integration Tests", () => {
 
     expect(result).toHaveProperty("id");
     expect(result).toHaveProperty("name", groupName);
-    expect(result).toHaveProperty("member_size", 0);
-    expect(result).toHaveProperty("query_size", 0);
+    expect(result).toHaveProperty("memberSize", 0);
+    expect(result).toHaveProperty("querySize", 0);
 
     if (typeof result === "string") {
       throw new Error(`Failed to create Pilot Group: ${result}`);

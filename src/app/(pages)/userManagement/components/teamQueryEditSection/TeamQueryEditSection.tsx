@@ -148,8 +148,6 @@ const UserManagementDrawer: React.FC<UserManagementDrawerProps> = ({
 
             const isMemberOfCurrentGroup = user.userGroupMemberships?.filter(
               (membership) =>
-                // TODO: remove the snake cased check here once the group PR is in
-                membership?.usergroup_id == teamQueryEditSection?.groupId ||
                 membership?.usergroupId == teamQueryEditSection?.groupId,
             )[0];
 
