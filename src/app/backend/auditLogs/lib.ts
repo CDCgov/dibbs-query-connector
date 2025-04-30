@@ -19,7 +19,7 @@ export async function generateAuditValues(
   args: unknown[],
 ) {
   const session = await auth();
-  const author = `${session?.user?.username}`;
+  const author = session?.user?.username || "Unknown";
   const timestamp = new Date().toISOString();
   const auditContents = generateAuditMessage(argLabels, args);
   const auditChecksum = generateAuditChecksum(author, auditContents, timestamp);

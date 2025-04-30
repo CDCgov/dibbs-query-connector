@@ -77,8 +77,8 @@ const UserModal: React.FC<UserModalProps> = ({
   const emptyGroup = {
     id: "",
     name: "",
-    member_size: 0,
-    query_size: 0,
+    memberSize: 0,
+    querySize: 0,
     queries: [],
     members: [],
   };
@@ -262,7 +262,7 @@ const UserModal: React.FC<UserModalProps> = ({
       if (newUser.id && !errorMessage) {
         // update db on save
         newUser.userGroupMemberships?.forEach(async (membership) => {
-          await addUsersToGroup(membership.usergroup_id, [newUser.id]);
+          await addUsersToGroup(membership.usergroupId, [newUser.id]);
         });
 
         refreshView("Update Users");
@@ -278,8 +278,8 @@ const UserModal: React.FC<UserModalProps> = ({
       const groupToAdd = {
         id: existingGroup?.id || newGroup.id,
         name: newGroup.name,
-        member_size: existingGroup?.member_size || newGroup.member_size || 0,
-        query_size: existingGroup?.query_size || newGroup.query_size || 0,
+        memberSize: existingGroup?.memberSize || newGroup.memberSize || 0,
+        querySize: existingGroup?.querySize || newGroup.querySize || 0,
       };
 
       if (newGroup.name == "" && existingGroup && existingGroup?.name != "") {
@@ -363,10 +363,10 @@ const UserModal: React.FC<UserModalProps> = ({
 
     if (checked) {
       const newGroupMembership: UserGroupMembership = {
-        membership_id: "",
-        usergroup_name: groupName,
-        usergroup_id: groupId,
-        is_member: checked,
+        membershipId: "",
+        usergroupName: groupName,
+        usergroupId: groupId,
+        isMember: checked,
       };
       newUser?.userGroupMemberships?.push(newGroupMembership);
 
@@ -378,7 +378,7 @@ const UserModal: React.FC<UserModalProps> = ({
 
     const currentGroups = newUser.userGroupMemberships;
     const updatedGroupMemberships = currentGroups?.filter((g) => {
-      return g.usergroup_id !== groupId;
+      return g.usergroupId !== groupId;
     });
 
     return setNewUser({
@@ -540,7 +540,7 @@ const UserModal: React.FC<UserModalProps> = ({
 
   const renderSelectUserGroups = () => {
     const userGroupIds = newUser.userGroupMemberships?.flatMap(
-      (membership) => membership.usergroup_id,
+      (membership) => membership.usergroupId,
     );
 
     return (

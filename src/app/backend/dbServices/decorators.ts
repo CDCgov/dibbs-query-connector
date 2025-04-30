@@ -69,17 +69,13 @@ export function superAdminRequired(
 
   // eslint-disable-next-line  @typescript-eslint/no-explicit-any
   descriptor.value = async function (...args: any[]) {
-    try {
-      const methodAllowed = await superAdminAccessCheck();
-      if (!methodAllowed) {
-        throw Error(`Super admin permission check for ${key} failed`);
-      }
-
-      const result = method && (await method.apply(this, args));
-      return result;
-    } catch (error) {
-      console.error(error);
+    const methodAllowed = await superAdminAccessCheck();
+    if (!methodAllowed) {
+      throw Error(`Super admin permission check for ${key} failed`);
     }
+
+    const result = method && (await method.apply(this, args));
+    return result;
   };
 
   return descriptor;
@@ -102,17 +98,13 @@ export function adminRequired(
 
   // eslint-disable-next-line  @typescript-eslint/no-explicit-any
   descriptor.value = async function (...args: any[]) {
-    try {
-      const methodAllowed = await adminAccessCheck();
-      if (!methodAllowed) {
-        throw Error(`Admin permission check for ${key} failed`);
-      }
-
-      const result = method && (await method.apply(this, args));
-      return result;
-    } catch (error) {
-      console.error(error);
+    const methodAllowed = await adminAccessCheck();
+    if (!methodAllowed) {
+      throw Error(`Admin permission check for ${key} failed`);
     }
+
+    const result = method && (await method.apply(this, args));
+    return result;
   };
 
   return descriptor;
