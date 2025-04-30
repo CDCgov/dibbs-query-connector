@@ -62,7 +62,12 @@ const CodeLibrary: React.FC = () => {
   );
 
   const ctx = useContext(DataContext);
-  let totalPages = 0;
+  let totalPages = Math.ceil(filteredValueSets.length / itemsPerPage);
+  console.log(
+    filteredValueSets.length,
+    itemsPerPage,
+    Math.ceil(filteredValueSets.length / itemsPerPage),
+  );
 
   const handleTextSearch = (vs: DibbsValueSet) => {
     const matchesName = vs.valueSetName
@@ -119,7 +124,6 @@ const CodeLibrary: React.FC = () => {
 
   useEffect(() => {
     setFilteredValueSets(valueSets);
-    totalPages = Math.ceil(filteredValueSets.length / itemsPerPage);
 
     if (
       filteredValueSets.length > 0 &&
@@ -245,6 +249,12 @@ const CodeLibrary: React.FC = () => {
       </tr>
     ));
   };
+
+  const paginationText = `Showing ${
+    totalPages === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1
+  } -
+  ${Math.min(currentPage * itemsPerPage, filteredValueSets.length)} of 
+  ${filteredValueSets.length} value sets`;
 
   return (
     <WithAuth>
@@ -442,15 +452,11 @@ const CodeLibrary: React.FC = () => {
           </div>
 
           <div className={styles.paginationContainer}>
-            <span>
-              {`Showing ${(currentPage - 1) * itemsPerPage + 1} -
-        ${Math.min(currentPage * itemsPerPage, filteredValueSets.length)} of 
-        ${filteredValueSets.length} value sets`}
-            </span>
+            <span>{paginationText}</span>
             <Pagination
               className={styles.pagination}
               pathname="/codeLibrary"
-              totalPages={Math.ceil(filteredValueSets.length / itemsPerPage)}
+              totalPages={totalPages <= 0 ? 1 : totalPages}
               currentPage={currentPage}
               onClickNext={() =>
                 setCurrentPage((prev) => Math.min(prev + 1, totalPages))
