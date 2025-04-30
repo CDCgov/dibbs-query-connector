@@ -4,10 +4,8 @@ import { readJsonFile } from "../shared_utils/readJsonFile";
 import { hyperUnluckyPatient, USE_CASE_DETAILS } from "@/app/shared/constants";
 import {
   patientDiscoveryQuery,
-  PatientDiscoveryRequest,
   patientRecordsQuery,
-  PatientRecordsRequest,
-} from "@/app/shared/query-service";
+} from "@/app/backend/query-execution";
 import { getDbClient } from "@/app/backend/dbClient";
 import {
   AUDIT_LOG_MAX_RETRIES,
@@ -16,6 +14,10 @@ import {
 import * as DecoratorUtils from "@/app/backend/auditLogs/lib";
 import { suppressConsoleLogs } from "./fixtures";
 import { DEFAULT_CHLAMYDIA_QUERY } from "../unit/fixtures";
+import {
+  PatientDiscoveryRequest,
+  PatientRecordsRequest,
+} from "@/app/models/entities/query";
 
 const dbClient = getDbClient();
 
@@ -114,7 +116,7 @@ describe("audit log", () => {
       request.patientId,
     );
     expect(JSON.parse(addedVal[0]?.audit_message?.queryData)).toStrictEqual(
-      DEFAULT_CHLAMYDIA_QUERY.query_data,
+      DEFAULT_CHLAMYDIA_QUERY.queryData,
     );
     expect(addedVal[0]?.audit_checksum).toMatch(/^[a-f0-9]{64}$/);
   });

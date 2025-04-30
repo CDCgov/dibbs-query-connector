@@ -2,7 +2,7 @@ import {
   QueryResponse,
   processFhirResponse,
   parseFhirSearch,
-} from "@/app/shared/query-service";
+} from "@/app/backend/query-execution";
 import { isFhirResource } from "@/app/shared/constants";
 import { readJsonFile } from "../shared_utils/readJsonFile";
 import { DiagnosticReport, Observation } from "fhir/r4";

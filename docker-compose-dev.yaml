@@ -42,6 +42,8 @@ services:
       - 8081:8080
     volumes:
       - ./keycloak:/opt/keycloak/data/import
+    environment:
+      JAVA_TOOL_OPTIONS: ${JAVA_TOOL_OPTIONS:-}
     restart: always
     command:
       - start-dev
