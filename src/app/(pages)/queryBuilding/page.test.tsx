@@ -49,7 +49,7 @@ describe("tests the query building steps", () => {
       </RootProviderMock>,
     );
 
-    const expectedQueryNames = DEFAULT_QUERIES.map((q) => q.query_name);
+    const expectedQueryNames = DEFAULT_QUERIES.map((q) => q.queryName);
 
     await waitFor(() => {
       expect(screen.queryByText("Loading")).not.toBeInTheDocument();

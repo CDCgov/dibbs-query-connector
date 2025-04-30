@@ -1,6 +1,7 @@
 import { adminAccessCheck, superAdminAccessCheck } from "@/app/utils/auth";
 import { getDbClient } from "../dbClient";
 import { QueryResult } from "pg";
+import { translateSnakeStringToCamelCase } from "./util";
 
 /**
  * Annotation to make a db query into a transaction. Requires all return branches
@@ -151,7 +152,7 @@ export function camelCaseDbColumnNames<T extends Record<string, unknown>>(
       result.rows = result.rows.map((v) => {
         const val: Record<string, unknown> = {};
         Object.entries(v).forEach(([k, v]) => {
-          val[underscoreToCamelCase(k)] = v;
+          val[translateSnakeStringToCamelCase(k)] = v;
         });
 
         return val as T;
@@ -172,10 +173,4 @@ export function camelCaseDbColumnNames<T extends Record<string, unknown>>(
   };
 
   return descriptor;
-}
-
-function underscoreToCamelCase(str: string) {
-  return str.replace(/_+([a-z])/g, function (_, letter) {
-    return letter.toUpperCase();
-  });
 }
