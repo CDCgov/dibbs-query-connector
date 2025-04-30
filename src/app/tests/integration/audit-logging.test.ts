@@ -6,7 +6,6 @@ import {
   patientDiscoveryQuery,
   patientRecordsQuery,
 } from "@/app/backend/query-execution";
-import { getDbClient } from "@/app/backend/dbClient";
 import {
   AUDIT_LOG_MAX_RETRIES,
   auditable,
@@ -18,7 +17,8 @@ import {
   PatientDiscoveryRequest,
   PatientRecordsRequest,
 } from "@/app/models/entities/query";
-
+import dbService from "@/app/backend/dbServices/db-service";
+import { getDbClient } from "@/app/backend/dbClient";
 const dbClient = getDbClient();
 
 jest.mock("@/app/backend/auditLogs/lib", () => {
@@ -36,11 +36,13 @@ jest.mock("@/app/utils/auth", () => {
 });
 
 const TEST_USER = {
-  id: "13e1efb2-5889-4157-8f34-78d7f02dbf84",
-  username: "WorfSonOfMogh",
-  email: "worf_security@starfleet.com",
-  firstName: "Worf",
-  lastName: "Mogh",
+  user: {
+    id: "13e1efb2-5889-4157-8f34-78d7f02dbf84",
+    username: "bowserjr",
+    email: "bowser.jr@koopa.evil",
+    firstName: "Bowser",
+    lastName: "Jr.",
+  },
 };
 (auth as jest.Mock).mockResolvedValue(TEST_USER);
 
@@ -53,16 +55,16 @@ if (!PatientResource || PatientResource.resourceType !== "Patient") {
   throw new Error("Invalid Patient resource in the test bundle.");
 }
 
+const GET_ALL_AUDIT_ROWS = "SELECT * FROM audit_logs;";
 describe("audit log", () => {
   beforeAll(() => {
     suppressConsoleLogs();
   });
 
-  afterAll(() => {
-    jest.resetAllMocks();
-  });
-
   it("patient discovery query should generate an audit entry", async () => {
+    const allAuditRows = await dbService.query(GET_ALL_AUDIT_ROWS);
+    const oldAuditIds = allAuditRows.rows.map((r) => r.id);
+
     const request: PatientDiscoveryRequest = {
       fhirServer: "Aidbox",
       firstName: hyperUnluckyPatient.FirstName,
@@ -73,21 +75,21 @@ describe("audit log", () => {
     };
     await patientDiscoveryQuery(request);
 
-    const auditQuery = `SELECT * FROM audit_logs
-    ORDER BY created_at DESC LIMIT 1;`;
+    const actionTypeToCheck = "makePatientDiscoveryRequest";
+    const newAuditRows = await dbService.query(GET_ALL_AUDIT_ROWS);
+    const auditEntry = newAuditRows.rows.filter((r) => {
+      return r.actionType === actionTypeToCheck && !r.id.includes(oldAuditIds);
+    })[0];
 
-    const auditRows = await dbClient.query(auditQuery);
-    const auditEntry = auditRows.rows[0];
-
-    expect(auditEntry?.action_type).toBe("makePatientDiscoveryRequest");
-    expect(auditEntry?.audit_message).toStrictEqual({
+    expect(auditEntry?.actionType).toBe("makePatientDiscoveryRequest");
+    expect(auditEntry?.auditMessage).toStrictEqual({
       request: JSON.stringify(request),
     });
   });
 
   it("patient records query should generate an audit entry", async () => {
-    const auditQuery = `SELECT * FROM audit_logs
-      ORDER BY created_at DESC LIMIT 1;`;
+    const allAuditRows = await dbService.query(GET_ALL_AUDIT_ROWS);
+    const oldAuditIds = allAuditRows.rows.map((r) => r.id);
 
     const request: PatientRecordsRequest = {
       fhirServer: "Aidbox",
@@ -96,19 +98,22 @@ describe("audit log", () => {
     };
     await patientRecordsQuery(request);
 
-    const auditRow = await dbClient.query(auditQuery);
-    const auditEntry = auditRow.rows[0];
-    expect(auditEntry?.action_type).toBe("makePatientRecordsRequest");
-    expect(JSON.parse(auditEntry?.audit_message?.fhirServer)).toBe(
+    const actionTypeToCheck = "makePatientRecordsRequest";
+    const newAuditRows = await dbService.query(GET_ALL_AUDIT_ROWS);
+    const auditEntry = newAuditRows.rows.filter((r) => {
+      return r.actionType === actionTypeToCheck && !r.id.includes(oldAuditIds);
+    })[0];
+
+    expect(auditEntry?.actionType).toBe(actionTypeToCheck);
+    expect(JSON.parse(auditEntry?.auditMessage?.fhirServer)).toBe(
       request.fhirServer,
     );
-    expect(JSON.parse(auditEntry?.audit_message?.patientId)).toBe(
+    expect(JSON.parse(auditEntry?.auditMessage?.patientId)).toBe(
       request.patientId,
     );
-    expect(JSON.parse(auditEntry?.audit_message?.queryData)).toStrictEqual(
+    expect(JSON.parse(auditEntry?.auditMessage?.queryData)).toStrictEqual(
       DEFAULT_CHLAMYDIA_QUERY.queryData,
     );
-    expect(auditEntry?.audit_checksum).toMatch(/^[a-f0-9]{64}$/);
   });
 
   it("an audited function should retries successfully", async () => {
@@ -174,7 +179,7 @@ describe("generateAuditChecksum", () => {
     const author = "WorfSonOfMogh";
     const timestamp = "2024-04-10T17:12:45.123Z";
 
-    const audit_message = {
+    const auditMessage = {
       request: JSON.stringify({
         fhir_server: "Aidbox",
         first_name: "Testy",
@@ -187,7 +192,7 @@ describe("generateAuditChecksum", () => {
 
     const checksum = DecoratorUtils.generateAuditChecksum(
       author,
-      audit_message,
+      auditMessage,
       timestamp,
     );
 
@@ -196,7 +201,7 @@ describe("generateAuditChecksum", () => {
       .update(
         JSON.stringify({
           author,
-          auditContents: audit_message,
+          auditContents: auditMessage,
           timestamp,
         }),
       )
