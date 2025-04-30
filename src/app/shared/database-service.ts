@@ -33,11 +33,12 @@ import {
 import { getDbClient } from "../backend/dbClient";
 import type { DibbsValueSet } from "../models/entities/valuesets";
 import { Concept } from "../models/entities/concepts";
-import { transaction } from "@/app/backend/dbServices/decorators";
+import {
+  adminRequired,
+  transaction,
+} from "@/app/backend/dbServices/decorators";
 import { auditable } from "@/app/backend/auditLogs/decorator";
 import { QCResponse } from "../models/responses/collections";
-import { adminAccessCheck } from "../utils/auth";
-import dbService from "../backend/dbServices/db-service";
 
 type ErsdOrVsacResponse = Bundle | Parameters | OperationOutcome;
 
@@ -73,7 +74,7 @@ class DatabaseService {
     const values = [name];
 
     try {
-      const result = await dbService.query(
+      const result = await DatabaseService.dbClient.query(
         DatabaseService.getQuerybyNameSQL,
         values,
       );
@@ -569,11 +570,8 @@ class DatabaseService {
    * Retrieves all available value sets in Query Connector.
    * @returns A list of value sets registered in the query connector.
    */
+  @adminRequired
   static async getAllValueSets(): Promise<QCResponse<DibbsValueSet>> {
-    if (!(await adminAccessCheck())) {
-      throw new Error("Unauthorized");
-    }
-
     try {
       const selectAllVSQuery = `
     SELECT c.display, c.code_system, c.code, vs.name as valueset_name, vs.id as valueset_id, vs.oid as valueset_external_id, vs.version, vs.author as author, vs.type, vs.dibbs_concept_type as dibbs_concept_type, ctvs.condition_id
