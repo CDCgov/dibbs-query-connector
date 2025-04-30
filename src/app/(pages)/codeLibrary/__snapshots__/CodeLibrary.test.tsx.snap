@@ -195,9 +195,9 @@ exports[`Code library loading view renders a skeleton loading state when loading
             class="paginationContainer"
           >
             <span>
-              Showing 1 -
-        0 of 
-        0 value sets
+              Showing 0 -
+  0 of 
+  0 value sets
             </span>
             <nav
               aria-label="Pagination"
@@ -217,92 +217,6 @@ exports[`Code library loading view renders a skeleton loading state when loading
                     type="button"
                   >
                     1
-                  </button>
-                </li>
-                <li
-                  class="usa-pagination__item usa-pagination__page-no"
-                >
-                  <button
-                    aria-label="Page 2"
-                    class="usa-button usa-button--unstyled usa-pagination__button"
-                    data-testid="pagination-page-number"
-                    type="button"
-                  >
-                    2
-                  </button>
-                </li>
-                <li
-                  class="usa-pagination__item usa-pagination__page-no"
-                >
-                  <button
-                    aria-label="Page 3"
-                    class="usa-button usa-button--unstyled usa-pagination__button"
-                    data-testid="pagination-page-number"
-                    type="button"
-                  >
-                    3
-                  </button>
-                </li>
-                <li
-                  class="usa-pagination__item usa-pagination__page-no"
-                >
-                  <button
-                    aria-label="Page 4"
-                    class="usa-button usa-button--unstyled usa-pagination__button"
-                    data-testid="pagination-page-number"
-                    type="button"
-                  >
-                    4
-                  </button>
-                </li>
-                <li
-                  class="usa-pagination__item usa-pagination__page-no"
-                >
-                  <button
-                    aria-label="Page 5"
-                    class="usa-button usa-button--unstyled usa-pagination__button"
-                    data-testid="pagination-page-number"
-                    type="button"
-                  >
-                    5
-                  </button>
-                </li>
-                <li
-                  aria-label="ellipsis indicating non-visible pages"
-                  class="usa-pagination__item usa-pagination__overflow"
-                >
-                  <span>
-                    …
-                  </span>
-                </li>
-                <li
-                  class="usa-pagination__item usa-pagination__arrow"
-                >
-                  <button
-                    aria-label="Next page"
-                    class="usa-button usa-button--unstyled usa-pagination__link usa-pagination__next-page"
-                    data-testid="pagination-next"
-                    type="button"
-                  >
-                    <span
-                      class="usa-pagination__link-text"
-                    >
-                      Next
-                    </span>
-                    <svg
-                      aria-hidden="true"
-                      class="usa-icon"
-                      focusable="false"
-                      height="1em"
-                      role="img"
-                      viewBox="0 0 24 24"
-                      width="1em"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"
-                      />
-                    </svg>
                   </button>
                 </li>
               </ul>
@@ -617,7 +531,7 @@ exports[`Code library rendered view renders concept codes for the value set when
                     </tr>
                   </thead>
                   <tbody
-                    class="overflowScroll conceptsTable__tableBody"
+                    class="overflowScroll_headerLocked conceptsTable__tableBody"
                   >
                     <tr
                       class="conceptsTable__tableBody_row"
@@ -677,8 +591,8 @@ exports[`Code library rendered view renders concept codes for the value set when
           >
             <span>
               Showing 1 -
-        2 of 
-        2 value sets
+  2 of 
+  2 value sets
             </span>
             <nav
               aria-label="Pagination"
@@ -976,8 +890,8 @@ exports[`Code library rendered view renders the correct content 1`] = `
           >
             <span>
               Showing 1 -
-        2 of 
-        2 value sets
+  2 of 
+  2 value sets
             </span>
             <nav
               aria-label="Pagination"
