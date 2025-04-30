@@ -63,11 +63,6 @@ const CodeLibrary: React.FC = () => {
 
   const ctx = useContext(DataContext);
   let totalPages = Math.ceil(filteredValueSets.length / itemsPerPage);
-  console.log(
-    filteredValueSets.length,
-    itemsPerPage,
-    Math.ceil(filteredValueSets.length / itemsPerPage),
-  );
 
   const handleTextSearch = (vs: DibbsValueSet) => {
     const matchesName = vs.valueSetName
