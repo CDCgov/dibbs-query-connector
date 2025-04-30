@@ -72,6 +72,9 @@ describe("User Management Integration Tests", () => {
       await dbClient.query("DELETE FROM users WHERE username = $1;", [
         TEST_USER_SUPER.username,
       ]);
+      await dbClient.query("DELETE FROM users WHERE id = $1;", [
+        TEST_USER_SUPER.id,
+      ]);
     } catch (error) {
       console.error("Rollback failed:", error);
     }
