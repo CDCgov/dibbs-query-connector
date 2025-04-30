@@ -362,11 +362,15 @@
 }
 
 .overflowScroll {
-    overflow-y: scroll;
     display: flex;
-    max-height: 60vh;
-}
+    max-height: 32.5rem;
+    overflow-y: scroll;
 
+    &_headerLocked {
+        max-height: 30rem !important;
+        overflow-y: scroll;
+    }
+}
 .skeletonContainer {
     width: 100%;
 

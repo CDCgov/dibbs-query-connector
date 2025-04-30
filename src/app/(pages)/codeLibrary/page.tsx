@@ -386,7 +386,7 @@ const CodeLibrary: React.FC = () => {
                       styles.conceptsTable__header,
                     )}
                   >
-                    {true ? (
+                    {!activeValueSet.userCreated ? (
                       <tr className={styles.lockedForEdits}>
                         <th>
                           <Icon.Lock
@@ -411,7 +411,9 @@ const CodeLibrary: React.FC = () => {
                   </thead>
                   <tbody
                     className={classNames(
-                      styles.overflowScroll,
+                      activeValueSet?.userCreated
+                        ? styles.overflowScroll
+                        : styles.overflowScroll_headerLocked,
                       styles.conceptsTable__tableBody,
                     )}
                   >
