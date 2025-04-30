@@ -61,7 +61,7 @@ class UserManagementService {
 
     try {
       console.log("Checking if user exists.");
-      const checkUserQuery = `SELECT id, username FROM users WHERE username = $1;`;
+      const checkUserQuery = `SELECT id, username, qc_Role, first_name, last_name FROM users WHERE username = $1;`;
       const userExists = await dbService.query(checkUserQuery, [
         userIdentifier,
       ]);

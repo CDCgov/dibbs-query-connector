@@ -33,7 +33,6 @@ const TEST_QUERY_DATA: QueryDataColumn = {};
 describe("User Group and Query Membership Tests", () => {
   beforeAll(async () => {
     suppressConsoleLogs();
-    await dbClient.query("BEGIN");
 
     // Insert test users
     const insertUsersQuery = `
@@ -41,8 +40,8 @@ describe("User Group and Query Membership Tests", () => {
       VALUES
         ($1, 'testuser1', 'Test', 'User1', 'Standard User'),
         ($2, 'testuser2', 'Test', 'User2', 'Standard User'),
-        ($3, 'testuser3', 'Test', 'User3', 'Standard User');
-
+        ($3, 'testuser3', 'Test', 'User3', 'Standard User')
+      ON CONFLICT DO NOTHING;
     `;
     await dbClient.query(insertUsersQuery, [
       TEST_USER_1_ID,
@@ -53,7 +52,8 @@ describe("User Group and Query Membership Tests", () => {
     // Insert test group
     const insertGroupQuery = `
       INSERT INTO usergroup (id, name)
-      VALUES ($1, 'Test Group');
+      VALUES ($1, 'Test Group')
+      ON CONFLICT DO NOTHING;
     `;
     await dbClient.query(insertGroupQuery, [TEST_GROUP_ID]);
 
@@ -62,7 +62,9 @@ describe("User Group and Query Membership Tests", () => {
     VALUES
       ($1, 'Test Query 1', $4, $5),
       ($2, 'Test Query 2', $4, $5),
-      ($3, 'Test Query 3', $4, $5);
+      ($3, 'Test Query 3', $4, $5)
+      ON CONFLICT DO NOTHING;
+
     `;
 
     await dbClient.query(insertQueryQuery, [
@@ -77,11 +79,11 @@ describe("User Group and Query Membership Tests", () => {
   afterAll(async () => {
     try {
       await dbClient.query(
-        "DELETE FROM usergroup_to_users WHERE usergroupId = $1;",
+        "DELETE FROM usergroup_to_users WHERE usergroup_id = $1;",
         [TEST_GROUP_ID],
       );
       await dbClient.query(
-        "DELETE FROM usergroup_to_query WHERE usergroupId = $1;",
+        "DELETE FROM usergroup_to_query WHERE usergroup_id = $1;",
         [TEST_GROUP_ID],
       );
       await dbClient.query("DELETE FROM usergroup WHERE id = $1;", [
@@ -97,7 +99,6 @@ describe("User Group and Query Membership Tests", () => {
         TEST_QUERY_2_ID,
         TEST_QUERY_3_ID,
       ]);
-      await dbClient.query("ROLLBACK");
     } catch (error) {
       console.error("Rollback failed:", error);
     }

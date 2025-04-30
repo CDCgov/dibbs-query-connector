@@ -29,6 +29,9 @@ class UserGroupManagementService {
         existingGroups.items?.some((group) => group.name === groupName) ??
         false;
 
+      console.log(existingGroups);
+      console.log(groupExists);
+
       if (groupExists) {
         throw new Error(`User group '${groupName}' already exists.`);
       }
@@ -181,9 +184,10 @@ class UserGroupManagementService {
       const updatedUsers = await Promise.all(
         result.rows.map(async (updatedUser) => {
           const updatedUserWithGroups = await getSingleUserWithGroupMemberships(
-            updatedUser.user_id,
+            updatedUser.userId,
           );
-          await dbService.query("COMMIT");
+
+          // await dbService.query("COMMIT");
 
           return updatedUserWithGroups.items[0];
         }),
@@ -221,9 +225,9 @@ class UserGroupManagementService {
       const updatedUsers = await Promise.all(
         result.rows.map(async (updatedUser) => {
           const updatedUserWithGroups = await getSingleUserWithGroupMemberships(
-            updatedUser.user_id,
+            updatedUser.userId,
           );
-          await dbService.query("COMMIT");
+          // await dbService.query("COMMIT");
 
           return updatedUserWithGroups.items[0];
         }),
@@ -520,7 +524,7 @@ class UserGroupManagementService {
       const updatedQueries = await Promise.all(
         result.rows.map(async (updatedQuery) => {
           const updatedGroupAssignments = await getSingleQueryGroupAssignments(
-            updatedQuery.query_id,
+            updatedQuery.queryId,
           );
           updatedQuery.groupAssignments = updatedGroupAssignments.items;
           await dbService.query("COMMIT");

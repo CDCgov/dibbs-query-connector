@@ -63,9 +63,6 @@ describe("audit log", () => {
   });
 
   it("patient discovery query should generate an audit entry", async () => {
-    const auditQuery = "SELECT * FROM audit_logs;";
-    const auditRows = await dbClient.query(auditQuery);
-
     const request: PatientDiscoveryRequest = {
       fhirServer: "Aidbox",
       firstName: hyperUnluckyPatient.FirstName,
@@ -76,24 +73,21 @@ describe("audit log", () => {
     };
     await patientDiscoveryQuery(request);
 
-    const newAuditRows = await dbClient.query(auditQuery);
+    const auditQuery = `SELECT * FROM audit_logs
+    ORDER BY created_at DESC LIMIT 1;`;
 
-    const addedVal = newAuditRows.rows.filter((item) => {
-      if (!auditRows.rows.map((v) => v.id).includes(item.id)) {
-        return item;
-      }
-    });
+    const auditRows = await dbClient.query(auditQuery);
+    const auditEntry = auditRows.rows[0];
 
-    expect(addedVal[0]?.action_type).toBe("makePatientDiscoveryRequest");
-    expect(addedVal[0]?.audit_message).toStrictEqual({
+    expect(auditEntry?.action_type).toBe("makePatientDiscoveryRequest");
+    expect(auditEntry?.audit_message).toStrictEqual({
       request: JSON.stringify(request),
     });
   });
 
   it("patient records query should generate an audit entry", async () => {
-    const auditQuery = "SELECT * FROM audit_logs;";
-    const auditRows = await dbClient.query(auditQuery);
-    const auditRowIds = auditRows.rows.map((v) => v.id);
+    const auditQuery = `SELECT * FROM audit_logs
+      ORDER BY created_at DESC LIMIT 1;`;
 
     const request: PatientRecordsRequest = {
       fhirServer: "Aidbox",
@@ -102,23 +96,19 @@ describe("audit log", () => {
     };
     await patientRecordsQuery(request);
 
-    const newAuditRows = await dbClient.query(auditQuery);
-
-    const addedVal = newAuditRows.rows.filter((item) => {
-      return !auditRowIds.includes(item.id);
-    });
-
-    expect(addedVal[0]?.action_type).toBe("makePatientRecordsRequest");
-    expect(JSON.parse(addedVal[0]?.audit_message?.fhirServer)).toBe(
+    const auditRow = await dbClient.query(auditQuery);
+    const auditEntry = auditRow.rows[0];
+    expect(auditEntry?.action_type).toBe("makePatientRecordsRequest");
+    expect(JSON.parse(auditEntry?.audit_message?.fhirServer)).toBe(
       request.fhirServer,
     );
-    expect(JSON.parse(addedVal[0]?.audit_message?.patientId)).toBe(
+    expect(JSON.parse(auditEntry?.audit_message?.patientId)).toBe(
       request.patientId,
     );
-    expect(JSON.parse(addedVal[0]?.audit_message?.queryData)).toStrictEqual(
+    expect(JSON.parse(auditEntry?.audit_message?.queryData)).toStrictEqual(
       DEFAULT_CHLAMYDIA_QUERY.queryData,
     );
-    expect(addedVal[0]?.audit_checksum).toMatch(/^[a-f0-9]{64}$/);
+    expect(auditEntry?.audit_checksum).toMatch(/^[a-f0-9]{64}$/);
   });
 
   it("an audited function should retries successfully", async () => {

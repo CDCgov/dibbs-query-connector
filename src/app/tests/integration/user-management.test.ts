@@ -46,10 +46,8 @@ const TEST_USER_SUPER = {
 };
 
 describe("User Management Integration Tests", () => {
-  beforeAll(async () => {
+  beforeEach(async () => {
     suppressConsoleLogs();
-
-    await dbClient.query("BEGIN");
 
     // Insert first user as super admin
     const insertSuperUsersQuery = `
@@ -68,11 +66,11 @@ describe("User Management Integration Tests", () => {
 
   afterEach(async () => {
     try {
-      await dbClient.query("DELETE FROM users WHERE id = $1;", [
-        TEST_USER_STANDARD.id,
+      await dbClient.query("DELETE FROM users WHERE username = $1;", [
+        TEST_USER_STANDARD.username,
       ]);
-      await dbClient.query("DELETE FROM users WHERE id = $1;", [
-        TEST_USER_SUPER.id,
+      await dbClient.query("DELETE FROM users WHERE username = $1;", [
+        TEST_USER_SUPER.username,
       ]);
     } catch (error) {
       console.error("Rollback failed:", error);
