@@ -35,6 +35,9 @@ jest.mock("@/app/utils/auth", () => {
   };
 });
 
+// don't export / reuse this test user elsewhere since we're filtering
+// the audit entry results off this user's authorship. Otherwise, the
+// selection from the audit entry table is susceptible to race condition issues
 const TEST_USER = {
   user: {
     id: "13e1efb2-5889-4157-8f34-78d7f02dbf84",
