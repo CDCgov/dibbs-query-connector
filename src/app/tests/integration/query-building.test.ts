@@ -4,6 +4,7 @@ import {
 } from "@/app/backend/query-building";
 import { createTestCancerQuery } from "../../../../e2e/utils";
 import { getSavedQueryById } from "@/app/backend/dbServices/query-building";
+import { suppressConsoleLogs } from "./fixtures";
 jest.mock("@/app/utils/auth", () => {
   return {
     superAdminAccessCheck: jest.fn().mockResolvedValue(true),
@@ -12,6 +13,9 @@ jest.mock("@/app/utils/auth", () => {
 });
 
 describe("Saving a custom query", () => {
+  beforeAll(() => {
+    suppressConsoleLogs();
+  });
   it("saving a custom query", async () => {
     const testQuery = await createTestCancerQuery();
     expect(Object.keys(testQuery.queryData)).toStrictEqual(["2"]);

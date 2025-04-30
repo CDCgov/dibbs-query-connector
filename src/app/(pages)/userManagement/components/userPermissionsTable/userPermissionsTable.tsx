@@ -107,22 +107,22 @@ const UserPermissionsTable: React.FC<PermissionsProps> = ({
                     )}
                     type="button"
                     unstyled
-                    key={membership.usergroup_id}
-                    aria-description={`Edit ${membership.usergroup_name} members`}
+                    key={membership.usergroupId}
+                    aria-description={`Edit ${membership.usergroupName} members`}
                     onClick={async () => {
-                      await fetchGroupMembers(membership.usergroup_id).then(
+                      await fetchGroupMembers(membership.usergroupId).then(
                         (members) =>
                           openEditSection(
-                            membership.usergroup_name,
+                            membership.usergroupName,
                             "Members",
                             "Members",
-                            membership.usergroup_id,
+                            membership.usergroupId,
                             members,
                           ),
                       );
                     }}
                   >
-                    {membership.usergroup_name}
+                    {membership.usergroupName}
                     {idx + 1 != user.userGroupMemberships?.length && ","}
                   </Button>
                 );

@@ -139,7 +139,7 @@ class QueryBuilding {
     if (!!currentUser && currentUser.userGroupMemberships) {
       const assignedQueries = await Promise.all(
         currentUser.userGroupMemberships.map(async (gm) => {
-          const groupQueries = await getAllGroupQueries(gm.usergroup_id);
+          const groupQueries = await getAllGroupQueries(gm.usergroupId);
           return groupQueries.items;
         }),
       );

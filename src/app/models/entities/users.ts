@@ -17,21 +17,17 @@ export interface User {
 export interface UserGroup {
   id: string;
   name: string;
-  member_size: number;
-  query_size: number;
+  memberSize: number;
+  querySize: number;
   members?: User[];
   queries?: CustomUserQuery[];
 }
 
 export interface UserGroupMembership {
-  membership_id: string;
-  usergroup_name: string;
-  usergroup_id: string;
-  is_member: boolean;
-  membershipId?: string;
-  usergroupName?: string;
-  usergroupId?: string;
-  isMember?: boolean;
+  membershipId: string;
+  usergroupName: string;
+  usergroupId: string;
+  isMember: boolean;
 }
 
 export interface Query {

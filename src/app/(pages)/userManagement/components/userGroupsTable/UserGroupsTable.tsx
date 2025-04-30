@@ -59,8 +59,8 @@ const UserGroupsTable: React.FC<UserGroupsTableProps> = ({
       <tr key={group.id} className={styles.userGroupRow}>
         <td width={270}>{group.name}</td>
         <td>
-          {role != UserRole.SUPER_ADMIN && group.member_size <= 0 ? (
-            getMemberLabel(group.member_size)
+          {role != UserRole.SUPER_ADMIN && group.memberSize <= 0 ? (
+            getMemberLabel(group.memberSize)
           ) : (
             <Button
               type="button"
@@ -80,7 +80,7 @@ const UserGroupsTable: React.FC<UserGroupsTableProps> = ({
                 });
               }}
             >
-              {getMemberLabel(group.member_size)}
+              {getMemberLabel(group.memberSize)}
             </Button>
           )}
         </td>
@@ -103,7 +103,7 @@ const UserGroupsTable: React.FC<UserGroupsTableProps> = ({
               });
             }}
           >
-            {getQueryLabel(group.query_size)}
+            {getQueryLabel(group.querySize)}
           </Button>
         </td>
         {role === UserRole.SUPER_ADMIN ? (

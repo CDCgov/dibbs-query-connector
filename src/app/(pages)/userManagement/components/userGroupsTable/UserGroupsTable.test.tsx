@@ -58,19 +58,19 @@ describe("User Groups table", () => {
     );
 
     expect(singleMemberBtn).toHaveTextContent(
-      mockGroupWithSingleQuery.member_size + " member",
+      mockGroupWithSingleQuery.memberSize + " member",
     );
 
     expect(multiMemberBtn).toHaveTextContent(
-      mockGroupMany.member_size + " members",
+      mockGroupMany.memberSize + " members",
     );
 
     expect(singleQueryBtn).toHaveTextContent(
-      mockGroupWithSingleQuery.query_size + " query",
+      mockGroupWithSingleQuery.querySize + " query",
     );
 
     expect(multiQueryBtn).toHaveTextContent(
-      mockGroupMany.query_size + " queries",
+      mockGroupMany.querySize + " queries",
     );
 
     expect(document.body).toMatchSnapshot();

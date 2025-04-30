@@ -107,13 +107,13 @@ describe("User Group and Query Membership Tests", () => {
     expect(result[0]).toHaveProperty("userGroupMemberships");
 
     const membership = result[0].userGroupMemberships?.find(
-      (m: { usergroup_id: string; usergroup_name: string }) =>
-        m.usergroup_id === TEST_GROUP_ID,
-      (m: { usergroup_id: string; usergroup_name: string }) =>
-        m.usergroup_name === "Test Group",
+      (m: { usergroupId: string; usergroupName: string }) =>
+        m.usergroupId === TEST_GROUP_ID,
+      (m: { usergroupId: string; usergroupName: string }) =>
+        m.usergroupName === "Test Group",
     );
     expect(membership).toBeDefined();
-    expect(membership?.is_member).toBeDefined();
+    expect(membership?.isMember).toBeDefined();
   });
 
   /**
