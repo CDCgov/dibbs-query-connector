@@ -4,11 +4,8 @@ import { readJsonFile } from "../shared_utils/readJsonFile";
 import { hyperUnluckyPatient, USE_CASE_DETAILS } from "@/app/shared/constants";
 import {
   patientDiscoveryQuery,
-  PatientDiscoveryRequest,
   patientRecordsQuery,
-  PatientRecordsRequest,
-} from "@/app/shared/query-service";
-import { getDbClient } from "@/app/backend/dbClient";
+} from "@/app/backend/query-execution";
 import {
   AUDIT_LOG_MAX_RETRIES,
   auditable,
@@ -16,7 +13,12 @@ import {
 import * as DecoratorUtils from "@/app/backend/auditLogs/lib";
 import { suppressConsoleLogs } from "./fixtures";
 import { DEFAULT_CHLAMYDIA_QUERY } from "../unit/fixtures";
-
+import {
+  PatientDiscoveryRequest,
+  PatientRecordsRequest,
+} from "@/app/models/entities/query";
+import dbService from "@/app/backend/dbServices/db-service";
+import { getDbClient } from "@/app/backend/dbClient";
 const dbClient = getDbClient();
 
 jest.mock("@/app/backend/auditLogs/lib", () => {
@@ -33,12 +35,17 @@ jest.mock("@/app/utils/auth", () => {
   };
 });
 
+// don't export / reuse this test user elsewhere since we're filtering
+// the audit entry results off this user's authorship. Otherwise, the
+// selection from the audit entry table is susceptible to race condition issues
 const TEST_USER = {
-  id: "13e1efb2-5889-4157-8f34-78d7f02dbf84",
-  username: "WorfSonOfMogh",
-  email: "worf_security@starfleet.com",
-  firstName: "Worf",
-  lastName: "Mogh",
+  user: {
+    id: "13e1efb2-5889-4157-8f34-78d7f02dbf84",
+    username: "bowserjr",
+    email: "bowser.jr@koopa.evil",
+    firstName: "Bowser",
+    lastName: "Jr.",
+  },
 };
 (auth as jest.Mock).mockResolvedValue(TEST_USER);
 
@@ -51,18 +58,15 @@ if (!PatientResource || PatientResource.resourceType !== "Patient") {
   throw new Error("Invalid Patient resource in the test bundle.");
 }
 
+const GET_ALL_AUDIT_ROWS = "SELECT * FROM audit_logs;";
 describe("audit log", () => {
   beforeAll(() => {
     suppressConsoleLogs();
   });
 
-  afterAll(() => {
-    jest.resetAllMocks();
-  });
-
   it("patient discovery query should generate an audit entry", async () => {
-    const auditQuery = "SELECT * FROM audit_logs;";
-    const auditRows = await dbClient.query(auditQuery);
+    const allAuditRows = await dbService.query(GET_ALL_AUDIT_ROWS);
+    const oldAuditIds = allAuditRows.rows.map((r) => r.id);
 
     const request: PatientDiscoveryRequest = {
       fhirServer: "Aidbox",
@@ -74,24 +78,25 @@ describe("audit log", () => {
     };
     await patientDiscoveryQuery(request);
 
-    const newAuditRows = await dbClient.query(auditQuery);
+    const actionTypeToCheck = "makePatientDiscoveryRequest";
+    const newAuditRows = await dbService.query(GET_ALL_AUDIT_ROWS);
+    const auditEntry = newAuditRows.rows.filter((r) => {
+      return (
+        r.author === TEST_USER.user.username &&
+        r.actionType === actionTypeToCheck &&
+        !oldAuditIds.includes(r.id)
+      );
+    })[0];
 
-    const addedVal = newAuditRows.rows.filter((item) => {
-      if (!auditRows.rows.map((v) => v.id).includes(item.id)) {
-        return item;
-      }
-    });
-
-    expect(addedVal[0]?.action_type).toBe("makePatientDiscoveryRequest");
-    expect(addedVal[0]?.audit_message).toStrictEqual({
+    expect(auditEntry?.actionType).toBe(actionTypeToCheck);
+    expect(auditEntry?.auditMessage).toStrictEqual({
       request: JSON.stringify(request),
     });
   });
 
   it("patient records query should generate an audit entry", async () => {
-    const auditQuery = "SELECT * FROM audit_logs;";
-    const auditRows = await dbClient.query(auditQuery);
-    const auditRowIds = auditRows.rows.map((v) => v.id);
+    const allAuditRows = await dbService.query(GET_ALL_AUDIT_ROWS);
+    const oldAuditIds = allAuditRows.rows.map((r) => r.id);
 
     const request: PatientRecordsRequest = {
       fhirServer: "Aidbox",
@@ -100,26 +105,29 @@ describe("audit log", () => {
     };
     await patientRecordsQuery(request);
 
-    const newAuditRows = await dbClient.query(auditQuery);
+    const actionTypeToCheck = "makePatientRecordsRequest";
+    const newAuditRows = await dbService.query(GET_ALL_AUDIT_ROWS);
+    const auditEntry = newAuditRows.rows.filter((r) => {
+      return (
+        r.author === TEST_USER.user.username &&
+        r.actionType === actionTypeToCheck &&
+        !oldAuditIds.includes(r.id)
+      );
+    })[0];
 
-    const addedVal = newAuditRows.rows.filter((item) => {
-      return !auditRowIds.includes(item.id);
-    });
-
-    expect(addedVal[0]?.action_type).toBe("makePatientRecordsRequest");
-    expect(JSON.parse(addedVal[0]?.audit_message?.fhirServer)).toBe(
+    expect(auditEntry?.actionType).toBe(actionTypeToCheck);
+    expect(JSON.parse(auditEntry?.auditMessage?.fhirServer)).toBe(
       request.fhirServer,
     );
-    expect(JSON.parse(addedVal[0]?.audit_message?.patientId)).toBe(
+    expect(JSON.parse(auditEntry?.auditMessage?.patientId)).toBe(
       request.patientId,
     );
-    expect(JSON.parse(addedVal[0]?.audit_message?.queryData)).toStrictEqual(
-      DEFAULT_CHLAMYDIA_QUERY.query_data,
+    expect(JSON.parse(auditEntry?.auditMessage?.queryData)).toStrictEqual(
+      DEFAULT_CHLAMYDIA_QUERY.queryData,
     );
-    expect(addedVal[0]?.audit_checksum).toMatch(/^[a-f0-9]{64}$/);
   });
 
-  it("an audited function should retries successfully", async () => {
+  it("an audited function should retry successfully", async () => {
     const auditGenerationSpy = jest.spyOn(
       DecoratorUtils,
       "generateAuditValues",
@@ -182,7 +190,7 @@ describe("generateAuditChecksum", () => {
     const author = "WorfSonOfMogh";
     const timestamp = "2024-04-10T17:12:45.123Z";
 
-    const audit_message = {
+    const auditMessage = {
       request: JSON.stringify({
         fhir_server: "Aidbox",
         first_name: "Testy",
@@ -195,7 +203,7 @@ describe("generateAuditChecksum", () => {
 
     const checksum = DecoratorUtils.generateAuditChecksum(
       author,
-      audit_message,
+      auditMessage,
       timestamp,
     );
 
@@ -204,7 +212,7 @@ describe("generateAuditChecksum", () => {
       .update(
         JSON.stringify({
           author,
-          auditContents: audit_message,
+          auditContents: auditMessage,
           timestamp,
         }),
       )

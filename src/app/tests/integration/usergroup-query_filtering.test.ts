@@ -7,6 +7,8 @@ import { getDbClient } from "@/app/backend/dbClient";
 import { User } from "@/app/models/entities/users";
 import { suppressConsoleLogs } from "./fixtures";
 import { QueryDataColumn } from "@/app/(pages)/queryBuilding/utils";
+import { getQueriesForUser } from "@/app/backend/query-building";
+import { CustomUserQuery } from "@/app/models/entities/query";
 
 const dbClient = getDbClient();
 
@@ -14,8 +16,6 @@ jest.mock("@/app/utils/auth", () => ({
   superAdminAccessCheck: jest.fn(() => Promise.resolve(true)),
   adminAccessCheck: jest.fn(() => Promise.resolve(true)),
 }));
-
-suppressConsoleLogs();
 
 const TEST_GROUP_ID = "00000000-0000-0000-0000-000000000007";
 const TEST_USER_1_ID = "00000000-0000-0000-0000-000000000012";
@@ -28,6 +28,8 @@ const TEST_QUERY_DATA: QueryDataColumn = {};
 
 describe("User Group and Query Membership Tests", () => {
   beforeAll(async () => {
+    suppressConsoleLogs();
+
     await dbClient.query("BEGIN");
 
     // Insert test users
@@ -105,13 +107,13 @@ describe("User Group and Query Membership Tests", () => {
     expect(result[0]).toHaveProperty("userGroupMemberships");
 
     const membership = result[0].userGroupMemberships?.find(
-      (m: { usergroup_id: string; usergroup_name: string }) =>
-        m.usergroup_id === TEST_GROUP_ID,
-      (m: { usergroup_id: string; usergroup_name: string }) =>
-        m.usergroup_name === "Test Group",
+      (m: { usergroupId: string; usergroupName: string }) =>
+        m.usergroupId === TEST_GROUP_ID,
+      (m: { usergroupId: string; usergroupName: string }) =>
+        m.usergroupName === "Test Group",
     );
     expect(membership).toBeDefined();
-    expect(membership?.is_member).toBeDefined();
+    expect(membership?.isMember).toBeDefined();
   });
 
   /**
@@ -125,18 +127,40 @@ describe("User Group and Query Membership Tests", () => {
     await dbClient.query("COMMIT");
 
     expect(result.totalItems).toBe(2);
-    expect(result.items.some((query) => query.query_id == TEST_QUERY_2_ID));
-    expect(result.items.some((query) => query.query_id == TEST_QUERY_3_ID));
+    expect(result.items.some((query) => query.queryId == TEST_QUERY_2_ID));
+    expect(result.items.some((query) => query.queryId == TEST_QUERY_3_ID));
 
     const queriesList = (await getAllGroupQueries(TEST_GROUP_ID)).items;
 
     expect(queriesList.length).toBe(2);
-    expect(queriesList.some((query) => query.query_id == TEST_QUERY_2_ID)).toBe(
+    expect(queriesList.some((query) => query.queryId == TEST_QUERY_2_ID)).toBe(
       true,
     );
-    expect(queriesList.some((query) => query.query_id == TEST_QUERY_3_ID)).toBe(
+    expect(queriesList.some((query) => query.queryId == TEST_QUERY_3_ID)).toBe(
       true,
     );
+
+    // check that querying by user returns the right queries
+    const usersToCheck: User[] =
+      await getAllUsersWithSingleGroupStatus(TEST_GROUP_ID);
+
+    const testUser = usersToCheck.filter(
+      (u) => u.username === "QtheMagnificent",
+    )[0];
+    const testUserFilteredQueries = await getQueriesForUser(testUser);
+
+    expect(testUserFilteredQueries).toBeDefined();
+    expect((testUserFilteredQueries as CustomUserQuery[]).length).toBe(2);
+    expect(
+      (testUserFilteredQueries as CustomUserQuery[]).some(
+        (query) => query.queryId == TEST_QUERY_2_ID,
+      ),
+    ).toBe(true);
+    expect(
+      (testUserFilteredQueries as CustomUserQuery[]).some(
+        (query) => query.queryId == TEST_QUERY_3_ID,
+      ),
+    ).toBe(true);
   });
 
   //tests for superAdmins and them seeing evertyhing

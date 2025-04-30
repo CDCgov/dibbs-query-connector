@@ -1,15 +1,16 @@
 import { QueryTableResult } from "./utils";
+import { CustomUserQuery } from "@/app/models/entities/query";
 
 // Fixture shortened significantly for maintenance purposes
-export const DEFAULT_QUERIES = [
+export const DEFAULT_QUERIES: CustomUserQuery[] = [
   {
-    query_id: "cf580d8d-cc7b-4eae-8a0d-96c36f9222e3",
-    userCreated: false,
-    query_name: "Cancer case investigation",
-    conditions_list: ["2"],
+    queryId: "cf580d8d-cc7b-4eae-8a0d-96c36f9222e3",
+    queryName: "Cancer case investigation",
+    conditionsList: ["2"],
     valuesets: [
       {
         valueSetId: "14_20240923",
+        userCreated: false,
         valueSetVersion: "20240923",
         valueSetName: "Cancer (Leukemia) Lab Result",
         valueSetExternalId: "14",
@@ -40,13 +41,13 @@ export const DEFAULT_QUERIES = [
     ],
   },
   {
-    query_id: "6edd14a2-ef78-4d8e-8509-0f87a7228d67",
-    query_name: "Chlamydia case investigation",
-    conditions_list: ["240589008"],
-    userCreated: false,
+    queryId: "6edd14a2-ef78-4d8e-8509-0f87a7228d67",
+    queryName: "Chlamydia case investigation",
+    conditionsList: ["240589008"],
     valuesets: [
       {
         valueSetId: "2.16.840.1.113762.1.4.1146.999_20230602",
+        userCreated: false,
         valueSetVersion: "20230602",
         valueSetName:
           "Chlamydia species (Organism or Substance in Lab Results)",
@@ -255,13 +256,13 @@ export const DEFAULT_QUERIES = [
     ],
   },
   {
-    query_id: "facfefc1-dd39-4f84-9d91-e924e860ad1c",
-    query_name: "Syphilis case investigation",
-    conditions_list: ["35742006"],
-    userCreated: false,
+    queryId: "facfefc1-dd39-4f84-9d91-e924e860ad1c",
+    queryName: "Syphilis case investigation",
+    conditionsList: ["35742006"],
     valuesets: [
       {
         valueSetId: "2.16.840.1.113762.1.4.1146.554_20191227",
+        userCreated: false,
         valueSetVersion: "20191227",
         valueSetName: "Syphilis (Organism or Substance in Lab Results)",
         valueSetExternalId: "2.16.840.1.113762.1.4.1146.554",
@@ -306,13 +307,13 @@ export const DEFAULT_QUERIES = [
     ],
   },
   {
-    query_id: "73e1a777-49cb-4e19-bc71-8c3fd3ffda64",
-    query_name: "Gonorrhea case investigation",
-    userCreated: false,
-    conditions_list: ["15628003"],
+    queryId: "73e1a777-49cb-4e19-bc71-8c3fd3ffda64",
+    queryName: "Gonorrhea case investigation",
+    conditionsList: ["15628003"],
     valuesets: [
       {
         valueSetId: "2.16.840.1.113762.1.4.1146.1036_20190605",
+        userCreated: false,
         valueSetVersion: "20190605",
         valueSetName:
           "Gonorrhea [Neisseria species Unspecified] (Organism or Substance in Lab Results)",
@@ -348,6 +349,7 @@ export const DEFAULT_QUERIES = [
       },
       {
         valueSetId: "2.16.840.1.113762.1.4.1146.169_20230602",
+        userCreated: false,
         valueSetVersion: "20230602",
         valueSetName:
           "Gonorrhea [Neisseria gonorrhoeae] (Organism or Substance in Lab Results)",
@@ -427,12 +429,13 @@ export const DEFAULT_QUERIES = [
     ],
   },
   {
-    query_id: "c025a247-0129-4f0c-a2c6-7f3af08e06b4",
-    query_name: "Newborn screening follow-up",
-    conditions_list: ["1"],
+    queryId: "c025a247-0129-4f0c-a2c6-7f3af08e06b4",
+    queryName: "Newborn screening follow-up",
+    conditionsList: ["1"],
     valuesets: [
       {
         valueSetId: "1_20240909",
+        userCreated: false,
         valueSetVersion: "20240909",
         valueSetName: "Newborn Screening",
         valueSetExternalId: "1",
@@ -610,15 +613,15 @@ export const cancerValueSets = [
 ];
 
 export const gonorreheaSavedQuery: QueryTableResult = {
-  query_id: "73e1a777-49cb-4e19-bc71-8c3fd3ffda64",
-  query_name: "Gonorrhea case investigation",
-  conditions_list: ["15628003"],
-  query_data: {
+  queryId: "73e1a777-49cb-4e19-bc71-8c3fd3ffda64",
+  queryName: "Gonorrhea case investigation",
+  conditionsList: ["15628003"],
+  queryData: {
     "15628003": {
       "2.16.840.1.113762.1.4.1146.1036_20190605": {
         valueSetId: "2.16.840.1.113762.1.4.1146.1036_20190605",
-        valueSetVersion: "20190605",
         userCreated: false,
+        valueSetVersion: "20190605",
         valueSetName:
           "Gonorrhea [Neisseria species Unspecified] (Organism or Substance in Lab Results)",
         valueSetExternalId: "2.16.840.1.113762.1.4.1146.1036",
@@ -653,8 +656,8 @@ export const gonorreheaSavedQuery: QueryTableResult = {
       },
       "2.16.840.1.113762.1.4.1146.169_20230602": {
         valueSetId: "2.16.840.1.113762.1.4.1146.169_20230602",
-        valueSetVersion: "20230602",
         userCreated: false,
+        valueSetVersion: "20230602",
         valueSetName:
           "Gonorrhea [Neisseria gonorrhoeae] (Organism or Substance in Lab Results)",
         valueSetExternalId: "2.16.840.1.113762.1.4.1146.169",

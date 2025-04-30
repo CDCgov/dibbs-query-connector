@@ -6,7 +6,7 @@ import {
   PatientDiscoveryResponse,
   patientRecordsQuery,
   PatientRecordsResponse,
-} from "@/app/shared/query-service";
+} from "@/app/backend/query-execution";
 import { CustomUserQuery } from "@/app/models/entities/query";
 import { Patient } from "fhir/r4";
 
@@ -82,7 +82,7 @@ const SelectQuery: React.FC<SelectQueryProps> = ({
     goForward();
     setLoading(true);
     await fetchQueryResponse(
-      selectedQuery.query_name,
+      selectedQuery.queryName,
       patientForQuery,
       fhirServer,
     ).catch(console.error);
