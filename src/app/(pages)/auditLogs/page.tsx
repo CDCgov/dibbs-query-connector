@@ -88,21 +88,6 @@ const AuditLogs: React.FC = () => {
     [logs],
   );
 
-  const minDate = useMemo(
-    () =>
-      logs.length > 0
-        ? new Date(Math.min(...logs.map((log) => log.createdAt.getTime())))
-        : null,
-    [logs],
-  );
-  const maxDate = useMemo(
-    () =>
-      logs.length > 0
-        ? new Date(Math.max(...logs.map((log) => log.createdAt.getTime())))
-        : null,
-    [logs],
-  );
-
   useEffect(() => {
     setFilteredLogs(
       logs.filter((log) => {

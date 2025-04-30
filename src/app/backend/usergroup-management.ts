@@ -11,6 +11,7 @@ import { QCResponse } from "../models/responses/collections";
 import { CustomUserQuery } from "../models/entities/query";
 import { QueryResult } from "pg";
 import { getQueryById } from "./query-building";
+import dbService from "./dbServices/db-service";
 
 const dbClient = getDbClient();
 
@@ -427,17 +428,18 @@ export async function getAllGroupQueries(
     LEFT JOIN usergroup ug ON ug.id = ugtq.usergroup_id 
     WHERE ugtq.usergroup_id = $1;
     `;
-    const result = await dbClient.query(selectQueriesByGroupQuery, [groupId]);
+    const result = await dbService.query(selectQueriesByGroupQuery, [groupId]);
 
     const groupQueries = await Promise.all(
       result.rows.map(async (row) => {
         const groupAssignments = await fetchQueryGroupAssignmentDetails(result);
+        const { queryId, queryName, queryData, conditionsList } = row;
 
         const formattedQuery: CustomUserQuery = {
-          query_id: row.query_id,
-          query_name: row.query_name,
-          valuesets: row.query_data,
-          conditions_list: row.conditions_list,
+          queryId,
+          queryName,
+          valuesets: queryData,
+          conditionsList,
           groupAssignments: groupAssignments,
         };
 
@@ -488,22 +490,16 @@ export async function addQueriesToGroup(
         ? [membershipIds, queryIds, groupIds]
         : [membershipIds[0], queryIds[0], groupIds[0]];
 
-    const insertQuery = {
-      text: fullQuery,
-      values: values as string[],
-    };
-
-    const result = await dbClient.query(insertQuery);
+    const result = await dbService.query(fullQuery, values);
     const updatedQueries = await Promise.all(
       result.rows.map(async (result) => {
         const updatedQuery = (await getQueryById(
-          result.query_id,
+          result.queryId,
         )) as CustomUserQuery;
         const updatedGroupAssignments = await getSingleQueryGroupAssignments(
-          result.query_id,
+          result.queryId,
         );
         updatedQuery.groupAssignments = updatedGroupAssignments.items;
-        await dbClient.query("COMMIT");
 
         return updatedQuery;
       }),
@@ -529,16 +525,14 @@ export async function removeQueriesFromGroup(
   if (!queryIds || !groupId) return { items: [], totalItems: 0 };
 
   try {
-    const removeQuery = {
-      text: `
+    const removeQuery = `
       DELETE FROM usergroup_to_query 
       WHERE usergroup_id = $1 AND query_id = ANY($2)
       RETURNING query_id;
-    `,
-      values: [groupId, queryIds],
-    };
+    `;
+    const values = [groupId, queryIds];
 
-    const result = await dbClient.query(removeQuery);
+    const result = await dbService.query(removeQuery, values);
 
     const updatedQueries = await Promise.all(
       result.rows.map(async (updatedQuery) => {

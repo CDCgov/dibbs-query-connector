@@ -35,6 +35,7 @@ import type { DibbsValueSet } from "../models/entities/valuesets";
 import { Concept } from "../models/entities/concepts";
 import { transaction } from "@/app/backend/dbServices/decorators";
 import { auditable } from "@/app/backend/auditLogs/decorator";
+import dbService from "../backend/dbServices/db-service";
 
 type ErsdOrVsacResponse = Bundle | Parameters | OperationOutcome;
 
@@ -70,7 +71,7 @@ class DatabaseService {
     const values = [name];
 
     try {
-      const result = await DatabaseService.dbClient.query(
+      const result = await dbService.query(
         DatabaseService.getQuerybyNameSQL,
         values,
       );
@@ -428,7 +429,9 @@ class DatabaseService {
       } catch (e) {
         console.error(`Insert failed for ${insertType}:`, e);
         errors.push(
-          `Insert failed for ${insertType}: ${e instanceof Error ? e.message : String(e)}`,
+          `Insert failed for ${insertType}: ${
+            e instanceof Error ? e.message : String(e)
+          }`,
         );
       }
     }

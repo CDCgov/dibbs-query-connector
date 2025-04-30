@@ -20,8 +20,6 @@ jest.mock("@/app/utils/auth", () => ({
   adminAccessCheck: jest.fn(() => Promise.resolve(true)),
 }));
 
-suppressConsoleLogs();
-
 const TEST_GROUP_ID = "00000000-0000-0000-0000-000000000001";
 const TEST_USER_1_ID = "00000000-0000-0000-0000-000000000002";
 const TEST_USER_2_ID = "00000000-0000-0000-0000-000000000003";
@@ -34,6 +32,7 @@ const TEST_QUERY_DATA: QueryDataColumn = {};
 
 describe("User Group and Query Membership Tests", () => {
   beforeAll(async () => {
+    suppressConsoleLogs();
     await dbClient.query("BEGIN");
 
     // Insert test users
@@ -262,16 +261,16 @@ describe("User Group and Query Membership Tests", () => {
     ]);
 
     expect(result.totalItems).toBe(2);
-    expect(result.items.some((query) => query.query_id == TEST_QUERY_2_ID));
-    expect(result.items.some((query) => query.query_id == TEST_QUERY_3_ID));
+    expect(result.items.some((query) => query.queryId == TEST_QUERY_2_ID));
+    expect(result.items.some((query) => query.queryId == TEST_QUERY_3_ID));
 
     const queriesList = (await getAllGroupQueries(TEST_GROUP_ID)).items;
 
     expect(queriesList.length).toBe(2);
-    expect(queriesList.some((query) => query.query_id == TEST_QUERY_2_ID)).toBe(
+    expect(queriesList.some((query) => query.queryId == TEST_QUERY_2_ID)).toBe(
       true,
     );
-    expect(queriesList.some((query) => query.query_id == TEST_QUERY_3_ID)).toBe(
+    expect(queriesList.some((query) => query.queryId == TEST_QUERY_3_ID)).toBe(
       true,
     );
   });
@@ -279,7 +278,7 @@ describe("User Group and Query Membership Tests", () => {
   test("should add a single query to a group", async () => {
     const result = await addQueriesToGroup(TEST_GROUP_ID, [TEST_QUERY_1_ID]);
     expect(result.totalItems).toBe(1);
-    expect(result.items[0].query_id).toContain(TEST_QUERY_1_ID);
+    expect(result.items[0].queryId).toContain(TEST_QUERY_1_ID);
     expect(result?.items[0].groupAssignments?.[0].membership_id).toContain(
       TEST_GROUP_ID,
     );
@@ -301,8 +300,8 @@ describe("User Group and Query Membership Tests", () => {
       TEST_QUERY_3_ID,
     ]);
 
-    expect(result.items[0].query_id).toContain(TEST_QUERY_2_ID);
-    expect(result.items[1].query_id).toContain(TEST_QUERY_3_ID);
+    expect(result.items[0].queryId).toContain(TEST_QUERY_2_ID);
+    expect(result.items[1].queryId).toContain(TEST_QUERY_3_ID);
 
     const updatedQueries = await getAllGroupQueries(TEST_GROUP_ID);
 
@@ -310,7 +309,7 @@ describe("User Group and Query Membership Tests", () => {
     expect(
       updatedQueries.items.some(
         (query) =>
-          query.query_id === TEST_USER_2_ID &&
+          query.queryId === TEST_USER_2_ID &&
           query.groupAssignments?.some((q) => q.is_member),
       ),
     ).toBe(false);
@@ -318,7 +317,7 @@ describe("User Group and Query Membership Tests", () => {
     expect(
       updatedQueries.items.some(
         (query) =>
-          query.query_id === TEST_USER_3_ID &&
+          query.queryId === TEST_USER_3_ID &&
           query.groupAssignments?.some((q) => q.is_member),
       ),
     ).toBe(false);
@@ -335,7 +334,7 @@ describe("User Group and Query Membership Tests", () => {
     expect(
       updatedQueries.items.some(
         (query) =>
-          query.query_id === TEST_QUERY_1_ID &&
+          query.queryId === TEST_QUERY_1_ID &&
           query.groupAssignments?.some((q) => q.is_member),
       ),
     ).toBe(false);
@@ -362,9 +361,9 @@ describe("User Group and Query Membership Tests", () => {
   });
 
   test("should not remove non-existent query from group", async () => {
-    const INVALID_QUERY_ID = "99999999-9999-9999-9999-999999999999";
+    const INVALID_queryId = "99999999-9999-9999-9999-999999999999";
     const result = await removeQueriesFromGroup(TEST_GROUP_ID, [
-      INVALID_QUERY_ID,
+      INVALID_queryId,
     ]);
 
     expect(result.items).toEqual([]);

@@ -46,8 +46,6 @@ const TEST_USER_SUPER = {
 };
 
 describe("User Management Integration Tests", () => {
-  let createdUserId: string;
-
   beforeAll(async () => {
     suppressConsoleLogs();
 
@@ -68,12 +66,14 @@ describe("User Management Integration Tests", () => {
     ]);
   });
 
-  afterAll(async () => {
+  afterEach(async () => {
     try {
       await dbClient.query("DELETE FROM users WHERE id = $1;", [
         TEST_USER_STANDARD.id,
       ]);
-      await dbClient.query("ROLLBACK");
+      await dbClient.query("DELETE FROM users WHERE id = $1;", [
+        TEST_USER_SUPER.id,
+      ]);
     } catch (error) {
       console.error("Rollback failed:", error);
     }
@@ -83,12 +83,11 @@ describe("User Management Integration Tests", () => {
    * Tests adding a new user if they do not already exist.
    */
   test("should add a user if they do not exist", async () => {
-    const result = await addUserIfNotExists(TEST_USER_STANDARD);
+    const { user } = await addUserIfNotExists(TEST_USER_STANDARD);
 
-    expect(result).toHaveProperty("id");
-    expect(result).toHaveProperty("username", TEST_USER_STANDARD.username);
-    expect(result).toHaveProperty("qcRole", UserRole.STANDARD);
-    createdUserId = result.id;
+    expect(user).toHaveProperty("id");
+    expect(user).toHaveProperty("username", TEST_USER_STANDARD.username);
+    expect(user).toHaveProperty("qcRole", UserRole.STANDARD);
   });
   /**
    * Tests getting a user by username.
@@ -107,7 +106,9 @@ describe("User Management Integration Tests", () => {
    * Tests updating the role of an existing user.
    */
   test("should update a user's role", async () => {
-    const result = await updateUserRole(createdUserId, UserRole.SUPER_ADMIN);
+    const { user } = await addUserIfNotExists(TEST_USER_STANDARD);
+    const result = await updateUserRole(user.id, UserRole.SUPER_ADMIN);
+
     expect(result.items).not.toBeNull();
     expect(result.items![0]).toHaveProperty("qcRole", UserRole.SUPER_ADMIN);
   });
@@ -115,6 +116,8 @@ describe("User Management Integration Tests", () => {
    * Tests updating the details of an existing user.
    */
   test("should update a user's details", async () => {
+    const { user } = await addUserIfNotExists(TEST_USER_SUPER);
+
     const initial = await getUserByUsername(TEST_USER_SUPER.username);
     expect(initial.items[0]).toHaveProperty(
       "lastName",
@@ -122,7 +125,7 @@ describe("User Management Integration Tests", () => {
     );
 
     const result = await updateUserDetails(
-      TEST_USER_SUPER.id,
+      user.id,
       TEST_USER_SUPER.username,
       TEST_USER_SUPER.firstName,
       "Its A Me",
@@ -137,6 +140,8 @@ describe("User Management Integration Tests", () => {
    * Tests retrieving a user's role by username.
    */
   test("should retrieve user role by username", async () => {
+    await addUserIfNotExists(TEST_USER_SUPER);
+
     const result = await getUserRole(TEST_USER_SUPER.username);
     expect(result).toBe(UserRole.SUPER_ADMIN);
   });

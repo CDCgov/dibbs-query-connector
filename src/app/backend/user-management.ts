@@ -48,7 +48,7 @@ class UserManagementService {
   }) {
     if (!userToken || !userToken.username) {
       console.error("Invalid user token. Cannot add user.");
-      return;
+      return { user: undefined };
     }
 
     const { username, email, firstName, lastName } = userToken;
@@ -84,7 +84,7 @@ class UserManagementService {
       ]);
 
       console.log("User added to users:", result.rows[0].id);
-      return result.rows[0];
+      return { user: result.rows[0] };
     } catch (error) {
       console.error("Error adding user to users:", error);
       throw error;

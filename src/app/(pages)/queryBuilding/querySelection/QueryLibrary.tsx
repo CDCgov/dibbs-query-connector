@@ -116,23 +116,23 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
             {conditionIdToDetailsMap &&
               queries.map((query) => (
                 <tr
-                  key={query.query_id}
+                  key={query.queryId}
                   className={classNames(
                     styles.myQueriesRow,
                     "tableRowWithHover",
                   )}
-                  data-testid={`query-row-${query.query_id}`}
+                  data-testid={`query-row-${query.queryId}`}
                 >
-                  <td title={query.query_name}>{query.query_name}</td>
+                  <td title={query.queryName}>{query.queryName}</td>
 
                   <td
-                    title={query.conditions_list
+                    title={query.conditionsList
                       ?.map((id) => {
                         return conditionIdToDetailsMap[id].name;
                       })
                       .join(", ")}
                   >
-                    {query.conditions_list
+                    {query.conditionsList
                       ?.map((id) => {
                         return conditionIdToDetailsMap[id].name;
                       })
@@ -144,7 +144,7 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
                         type="button"
                         className="usa-button--unstyled text-bold text-no-underline"
                         onClick={() =>
-                          handleEdit(query.query_name, query.query_id)
+                          handleEdit(query.queryName, query.queryId)
                         }
                       >
                         <span className="icon-text padding-right-4 display-flex flex-align-center">
@@ -153,7 +153,7 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
                             aria-label="Pencil icon indicating edit ability"
                           />
                           <span
-                            data-testid={`edit-query-${query.query_id}`}
+                            data-testid={`edit-query-${query.queryId}`}
                             className="padding-left-05"
                           >
                             Edit
@@ -165,8 +165,8 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
                         className="usa-button--unstyled text-bold text-no-underline"
                         onClick={() =>
                           confirmDelete(
-                            query.query_name,
-                            query.query_id,
+                            query.queryName,
+                            query.queryId,
                             setSelectedQuery,
                             modalRef,
                           )
@@ -184,9 +184,9 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
                         type="button"
                         className="usa-button--unstyled text-bold text-no-underline"
                         onClick={() =>
-                          handleCopy(query.query_name, query.query_id)
+                          handleCopy(query.queryName, query.queryId)
                         }
-                        data-testid={`copy-${query.query_id}`}
+                        data-testid={`copy-${query.queryId}`}
                       >
                         <span className="icon-text padding-right-1 display-flex flex-align-center">
                           <Icon.ContentCopy

@@ -113,9 +113,7 @@ const SelectSavedQuery: React.FC<SelectSavedQueryProps> = ({
   }, [currentUser]);
 
   function handleQuerySelection(queryName: string) {
-    const selectedQuery = queryOptions.filter(
-      (q) => q.query_name === queryName,
-    );
+    const selectedQuery = queryOptions.filter((q) => q.queryName === queryName);
     if (selectedQuery[0]) {
       setSelectedQuery(selectedQuery[0]);
     } else {
@@ -144,7 +142,7 @@ const SelectSavedQuery: React.FC<SelectSavedQueryProps> = ({
           <Select
             id="querySelect"
             name="query"
-            value={selectedQuery.query_name}
+            value={selectedQuery.queryName}
             onChange={(e) => {
               handleQuerySelection(e.target.value);
             }}
@@ -155,8 +153,8 @@ const SelectSavedQuery: React.FC<SelectSavedQueryProps> = ({
               Select query
             </option>
             {queryOptions.map((query) => (
-              <option key={query.query_id} value={query.query_name}>
-                {query.query_name}
+              <option key={query.queryId} value={query.queryName}>
+                {query.queryName}
               </option>
             ))}
           </Select>
@@ -202,7 +200,7 @@ const SelectSavedQuery: React.FC<SelectSavedQueryProps> = ({
       <div className="margin-top-5">
         <Button
           type="button"
-          disabled={!selectedQuery.query_name}
+          disabled={!selectedQuery.queryName}
           className={selectedQuery ? "usa-button" : "usa-button disabled"}
           onClick={handleSubmit}
         >
