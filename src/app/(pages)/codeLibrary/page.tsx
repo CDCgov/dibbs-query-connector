@@ -29,16 +29,17 @@ import Highlighter from "react-highlight-words";
 import Skeleton from "react-loading-skeleton";
 import { formatStringToSentenceCase } from "@/app/shared/format-service";
 import DropdownFilter, { FilterCategories } from "./DropdownFilter";
+import AddValueSets from "./AddValueSet";
 
 /**
  * Component for Query Building Flow
  * @returns The Query Building component flow
  */
 const CodeLibrary: React.FC = () => {
-  type Mode = "manage" | "select";
+  type Mode = "manage" | "select" | "addValueSet";
 
   const [loading, setLoading] = useState<boolean>(true);
-  const [mode, setMode] = useState<Mode>("manage");
+  const [mode, setMode] = useState<Mode>("addValueSet");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
@@ -272,248 +273,252 @@ const CodeLibrary: React.FC = () => {
 
   return (
     <WithAuth>
-      <div className={classNames("main-container__wide", styles.mainContainer)}>
-        <div className={styles.header}>
-          {mode === "manage" ? (
-            <Backlink onClick={() => {}} label={"Back to Query library"} />
-          ) : (
-            <Backlink onClick={goBack} label={"Back to My queries"} />
-          )}
-          <h1 className={styles.header__title}>Manage codes</h1>
-          <div className={styles.header__subtitle}>
-            Click on the checkbox to delete the value set or code
-          </div>
-          <Alert
-            type="info"
-            headingLevel="h4"
-            noIcon={false}
-            className={classNames("info-alert")}
-          >
-            Value sets are an organizational structure for easy management of
-            codes. Every code belongs to a value set.
-          </Alert>
-        </div>
-        <div className={classNames(styles.controls)}>
-          <div className={styles.searchFilter}>
-            <SearchField
-              id="librarySearch"
-              placeholder={"Search"}
-              className={styles.search}
-              onChange={(e) => {
-                e.preventDefault();
-                setTextSearch(e.target.value);
-              }}
-            />
-            <div
-              role="button"
-              tabIndex={0}
-              className={classNames(
-                styles.applyFilters,
-                filterCount > 0 ? styles.applyFilters_active : "",
-              )}
-              onClick={() => setShowFilters(true)}
+      {mode == "manage" && (
+        <div
+          className={classNames("main-container__wide", styles.mainContainer)}
+        >
+          <div className={styles.header}>
+            {mode === "manage" ? (
+              <Backlink onClick={() => {}} label={"Back to Query library"} />
+            ) : (
+              <Backlink onClick={goBack} label={"Back to My queries"} />
+            )}
+            <h1 className={styles.header__title}>Manage codes</h1>
+            <div className={styles.header__subtitle}>
+              Click on the checkbox to delete the value set or code
+            </div>
+            <Alert
+              type="info"
+              headingLevel="h4"
+              noIcon={false}
+              className={classNames("info-alert")}
             >
-              <Icon.FilterList
-                className="usa-icon qc-filter"
-                size={3}
-                aria-label="Icon indicating a menu with filter options"
-                role="icon"
+              Value sets are an organizational structure for easy management of
+              codes. Every code belongs to a value set.
+            </Alert>
+          </div>
+          <div className={classNames(styles.controls)}>
+            <div className={styles.searchFilter}>
+              <SearchField
+                id="librarySearch"
+                placeholder={"Search"}
+                className={styles.search}
+                onChange={(e) => {
+                  e.preventDefault();
+                  setTextSearch(e.target.value);
+                }}
               />
-              {filterCount <= 0
-                ? "Filters"
-                : `${filterCount} ${
-                    filterCount > 1 ? `filters` : `filter`
-                  } applied`}
-              {showFilters && (
-                <DropdownFilter
-                  filterCount={filterCount}
-                  loading={loading}
-                  setShowFilters={setShowFilters}
-                  filterSearch={filterSearch}
-                  setFilterSearch={setFilterSearch}
-                  valueSets={valueSets}
+              <div
+                role="button"
+                tabIndex={0}
+                className={classNames(
+                  styles.applyFilters,
+                  filterCount > 0 ? styles.applyFilters_active : "",
+                )}
+                onClick={() => setShowFilters(true)}
+              >
+                <Icon.FilterList
+                  className="usa-icon qc-filter"
+                  size={3}
+                  aria-label="Icon indicating a menu with filter options"
+                  role="icon"
                 />
-              )}{" "}
+                {filterCount <= 0
+                  ? "Filters"
+                  : `${filterCount} ${
+                      filterCount > 1 ? `filters` : `filter`
+                    } applied`}
+                {showFilters && (
+                  <DropdownFilter
+                    filterCount={filterCount}
+                    loading={loading}
+                    setShowFilters={setShowFilters}
+                    filterSearch={filterSearch}
+                    setFilterSearch={setFilterSearch}
+                    valueSets={valueSets}
+                  />
+                )}{" "}
+              </div>
             </div>
+
+            <Button type="button" className={styles.button}>
+              Add value set
+            </Button>
           </div>
 
-          <Button type="button" className={styles.button}>
-            Add value set
-          </Button>
-        </div>
-
-        <div className={styles.content}>
-          <div className={styles.resultsContainer}>
-            <div className={styles.content__left}>
-              <Table
-                className={classNames(
-                  "display-flex flex-row",
-                  styles.valueSetTable,
-                )}
-              >
-                <thead
-                  className={classNames(
-                    "display-flex flex-column",
-                    styles.valueSetTable__header,
-                  )}
-                >
-                  <tr className={styles.valueSetTable__header_sectionHeader}>
-                    <th>{"Value set".toLocaleUpperCase()}</th>
-                  </tr>
-                </thead>
-                <tbody
-                  className={classNames(
-                    styles.overflowScroll,
-                    styles.valueSetTable__tableBody,
-                  )}
-                  data-testid="table-valuesets"
-                >
-                  {loading && paginatedValueSets.length <= 0 ? (
-                    <tr
-                      className={styles.valueSetTable__tableBody_row}
-                      data-testid={"loading-skeleton"}
-                    >
-                      <td>
-                        <Skeleton
-                          containerClassName={styles.skeletonContainer}
-                          className={styles.skeleton}
-                          count={6}
-                        />
-                      </td>
-                    </tr>
-                  ) : !loading && filteredValueSets.length === 0 ? (
-                    <tr
-                      className={styles.valueSetTable__tableBody_row_noResults}
-                    >
-                      <td>No results found.</td>
-                    </tr>
-                  ) : (
-                    renderValueSetRows()
-                  )}
-                </tbody>
-              </Table>
-            </div>
-            <div className={styles.content__right}>
-              {activeValueSet && (
+          <div className={styles.content}>
+            <div className={styles.resultsContainer}>
+              <div className={styles.content__left}>
                 <Table
                   className={classNames(
                     "display-flex flex-row",
-                    styles.conceptsTable,
+                    styles.valueSetTable,
                   )}
                 >
                   <thead
                     className={classNames(
                       "display-flex flex-column",
-                      styles.conceptsTable__header,
+                      styles.valueSetTable__header,
                     )}
                   >
-                    {!activeValueSet.userCreated ? (
-                      <tr className={styles.lockedForEdits}>
-                        <th>
-                          <Icon.Lock
-                            role="icon"
-                            className="qc-lock"
-                          ></Icon.Lock>
-                          {`This value set comes from ${valueSetSource} and cannot be
-                          modified.`}
-                        </th>
-                      </tr>
-                    ) : (
-                      <tr
-                        className={styles.conceptsTable__header_sectionHeader}
-                      >
-                        <th> {"Codes".toLocaleUpperCase()}</th>
-                      </tr>
-                    )}
-                    <tr className={styles.columnHeaders}>
-                      <th>Code</th>
-                      <th>Name</th>
+                    <tr className={styles.valueSetTable__header_sectionHeader}>
+                      <th>{"Value set".toLocaleUpperCase()}</th>
                     </tr>
                   </thead>
                   <tbody
                     className={classNames(
-                      activeValueSet?.userCreated
-                        ? styles.overflowScroll
-                        : styles.overflowScroll_headerLocked,
-                      styles.conceptsTable__tableBody,
+                      styles.overflowScroll,
+                      styles.valueSetTable__tableBody,
                     )}
-                    data-testid="table-codes"
+                    data-testid="table-valuesets"
                   >
-                    {activeValueSet?.concepts.map((vs) => (
+                    {loading && paginatedValueSets.length <= 0 ? (
                       <tr
-                        key={vs.code}
-                        className={classNames(
-                          styles.conceptsTable__tableBody_row,
-                        )}
+                        className={styles.valueSetTable__tableBody_row}
+                        data-testid={"loading-skeleton"}
                       >
-                        <td className={styles.valueSetCode}>
-                          <Highlighter
-                            highlightClassName="searchHighlight"
-                            searchWords={[textSearch]}
-                            autoEscape={true}
-                            textToHighlight={vs.code}
-                          />
-                        </td>
                         <td>
-                          <Highlighter
-                            highlightClassName="searchHighlight"
-                            searchWords={[textSearch]}
-                            autoEscape={true}
-                            textToHighlight={vs.display}
+                          <Skeleton
+                            containerClassName={styles.skeletonContainer}
+                            className={styles.skeleton}
+                            count={6}
                           />
                         </td>
                       </tr>
-                    ))}
+                    ) : !loading && filteredValueSets.length === 0 ? (
+                      <tr
+                        className={
+                          styles.valueSetTable__tableBody_row_noResults
+                        }
+                      >
+                        <td>No results found.</td>
+                      </tr>
+                    ) : (
+                      renderValueSetRows()
+                    )}
                   </tbody>
                 </Table>
-              )}
-            </div>
-          </div>
+              </div>
 
-          <div className={styles.paginationContainer}>
-            <span>{paginationText}</span>
-            {totalPages > 0 && (
-              <Pagination
-                className={styles.pagination}
-                pathname="/codeLibrary"
-                totalPages={totalPages <= 0 ? 1 : totalPages}
-                currentPage={currentPage}
-                onClickNext={() =>
-                  setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-                }
-                onClickPrevious={() =>
-                  setCurrentPage((prev) => Math.max(prev - 1, 1))
-                }
-                onClickPageNumber={(event, page) => {
-                  event.preventDefault();
-                  setCurrentPage(page);
-                }}
-              />
-            )}
-            <div className={styles.itemsPerPageContainer}>
-              <label htmlFor="actionsPerPage">Value sets per page</label>
-              <Select
-                name="valeSetsPerPage"
-                id="valeSetsPerPage"
-                value={itemsPerPage}
-                className={styles.itemsPerPageDropdown}
-                onChange={(e) => {
-                  setItemsPerPage(Number(e.target.value));
-                  setCurrentPage(1);
-                }}
-              >
-                <option value="10">10</option>
-                <option value="25">25</option>
-                <option value="50">50</option>
-              </Select>
+              <div className={styles.content__right}>
+                {activeValueSet && (
+                  <Table
+                    className={classNames(
+                      "display-flex flex-row",
+                      styles.conceptsTable,
+                    )}
+                  >
+                    <thead
+                      className={classNames(
+                        "display-flex flex-column",
+                        styles.conceptsTable__header,
+                      )}
+                    >
+                      {!activeValueSet.userCreated ? (
+                        <tr className={styles.lockedForEdits}>
+                          <th>
+                            <Icon.Lock
+                              role="icon"
+                              className="qc-lock"
+                            ></Icon.Lock>
+                            {`This value set comes from ${valueSetSource} and cannot be
+                          modified.`}
+                          </th>
+                        </tr>
+                      ) : (
+                        <tr
+                          className={styles.conceptsTable__header_sectionHeader}
+                        >
+                          <th> {"Codes".toLocaleUpperCase()}</th>
+                        </tr>
+                      )}
+                      <tr className={styles.columnHeaders}>
+                        <th>Code</th>
+                        <th>Name</th>
+                      </tr>
+                    </thead>
+                    <tbody
+                      className={classNames(
+                        activeValueSet?.userCreated
+                          ? styles.overflowScroll
+                          : styles.overflowScroll_headerLocked,
+                        styles.conceptsTable__tableBody,
+                      )}
+                      data-testid="table-codes"
+                    >
+                      {activeValueSet?.concepts.map((vs) => (
+                        <tr
+                          key={vs.code}
+                          className={classNames(
+                            styles.conceptsTable__tableBody_row,
+                          )}
+                        >
+                          <td className={styles.valueSetCode}>
+                            <Highlighter
+                              highlightClassName="searchHighlight"
+                              searchWords={[textSearch]}
+                              autoEscape={true}
+                              textToHighlight={vs.code}
+                            />
+                          </td>
+                          <td>
+                            <Highlighter
+                              highlightClassName="searchHighlight"
+                              searchWords={[textSearch]}
+                              autoEscape={true}
+                              textToHighlight={vs.display}
+                            />
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </Table>
+                )}
+              </div>
+            </div>
+
+            <div className={styles.paginationContainer}>
+              <span>{paginationText}</span>
+              {totalPages > 0 && (
+                <Pagination
+                  className={styles.pagination}
+                  pathname="/codeLibrary"
+                  totalPages={totalPages <= 0 ? 1 : totalPages}
+                  currentPage={currentPage}
+                  onClickNext={() =>
+                    setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                  }
+                  onClickPrevious={() =>
+                    setCurrentPage((prev) => Math.max(prev - 1, 1))
+                  }
+                  onClickPageNumber={(event, page) => {
+                    event.preventDefault();
+                    setCurrentPage(page);
+                  }}
+                />
+              )}
+              <div className={styles.itemsPerPageContainer}>
+                <label htmlFor="actionsPerPage">Value sets per page</label>
+                <Select
+                  name="valeSetsPerPage"
+                  id="valeSetsPerPage"
+                  value={itemsPerPage}
+                  className={styles.itemsPerPageDropdown}
+                  onChange={(e) => {
+                    setItemsPerPage(Number(e.target.value));
+                    setCurrentPage(1);
+                  }}
+                >
+                  <option value="10">10</option>
+                  <option value="25">25</option>
+                  <option value="50">50</option>
+                </Select>
+              </div>
             </div>
           </div>
         </div>
-
-        {/* <div className="display-flex flex-auto">
-          {mode == "select" && <div>Select view of the same thing</div>}
-        </div> */}
-      </div>
+      )}
+      {mode == "addValueSet" && <AddValueSets />}
     </WithAuth>
   );
 };
