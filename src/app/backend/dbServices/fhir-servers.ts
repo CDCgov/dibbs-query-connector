@@ -56,6 +56,10 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
 
   static async getFhirServerNames(): Promise<string[]> {
     const configs = await super.getFhirServerConfigs();
+    // Sort so that the default server is always first
+    configs.sort((a, b) =>
+      b.defaultServer === true ? 1 : a.defaultServer === true ? -1 : 0,
+    );
     return configs.map((config) => config.name);
   }
 
