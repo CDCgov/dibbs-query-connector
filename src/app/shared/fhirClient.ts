@@ -52,6 +52,7 @@ class FHIRClient {
       name: "test",
       hostname: url,
       disableCertValidation: disableCertValidation,
+      defaultServer: false,
       headers: authData?.headers || {},
     };
 
@@ -288,6 +289,7 @@ class FHIRClient {
           this.serverConfig.name,
           this.serverConfig.hostname,
           this.serverConfig.disableCertValidation,
+          this.serverConfig.defaultServer,
           this.serverConfig.lastConnectionSuccessful,
           {
             authType: this.serverConfig.authType as
