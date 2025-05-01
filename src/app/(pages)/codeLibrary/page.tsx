@@ -57,9 +57,7 @@ const CodeLibrary: React.FC = () => {
     useState<ConditionsMap>();
   const [valueSets, setValueSets] = useState<DibbsValueSet[]>([]);
   const [filteredValueSets, setFilteredValueSets] = useState(valueSets);
-  const [activeValueSet, setActiveValueSet] = useState<DibbsValueSet | null>(
-    null,
-  );
+  const [activeValueSet, setActiveValueSet] = useState<DibbsValueSet | null>();
 
   const ctx = useContext(DataContext);
   let totalPages = Math.ceil(filteredValueSets.length / itemsPerPage);
@@ -119,6 +117,7 @@ const CodeLibrary: React.FC = () => {
 
   useEffect(() => {
     setFilteredValueSets(valueSets);
+    setActiveValueSet(paginatedValueSets[0]);
 
     if (
       filteredValueSets.length > 0 &&
@@ -151,14 +150,24 @@ const CodeLibrary: React.FC = () => {
     );
 
     setCurrentPage(1);
+    if (textSearch == "") {
+      return setActiveValueSet(valueSets?.[0]);
+    } else {
+      return setActiveValueSet(paginatedValueSets?.[0]);
+    }
   }, [textSearch, filterSearch]);
 
   const paginatedValueSets = useMemo(() => {
+    setActiveValueSet(filteredValueSets[0]);
     return filteredValueSets.slice(
       (currentPage - 1) * itemsPerPage,
       currentPage * itemsPerPage,
     );
   }, [valueSets, filteredValueSets, currentPage, itemsPerPage]);
+
+  const isFiltered =
+    valueSets.length !== filteredValueSets.length ||
+    Object.values(filterSearch).some((filter) => filter !== "");
 
   function goBack() {
     // TODO: this will need to be handled differently
@@ -249,7 +258,7 @@ const CodeLibrary: React.FC = () => {
     totalPages === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1
   } -
   ${Math.min(currentPage * itemsPerPage, filteredValueSets.length)} of 
-  ${filteredValueSets.length} value sets`;
+  ${filteredValueSets.length} value sets ${isFiltered ? `(filtered)` : ""}`;
 
   const valueSetSource =
     activeValueSet?.author == "CSTE Steward"
@@ -369,7 +378,9 @@ const CodeLibrary: React.FC = () => {
                       </td>
                     </tr>
                   ) : !loading && filteredValueSets.length === 0 ? (
-                    <tr className={styles.valueSetTable__tableBody_row}>
+                    <tr
+                      className={styles.valueSetTable__tableBody_row_noResults}
+                    >
                       <td>No results found.</td>
                     </tr>
                   ) : (

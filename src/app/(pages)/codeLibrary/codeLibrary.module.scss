@@ -329,7 +329,9 @@
         &:hover {
             cursor: pointer;
         }
-        &:has(span.skeletonContainer):hover {
+
+        &:has(span.skeletonContainer):hover,
+        &_noResults {
             background-color: transparent !important;
             cursor: default;
         }
