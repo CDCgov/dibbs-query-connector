@@ -29,7 +29,7 @@ describe("UserCreatedValuesetService Integration", () => {
   };
 
   it("should insert valueset, concepts, and condition linkages", async () => {
-    const result = await insertCustomValueSet(testVS, "mock-vsid-0001");
+    const result = await insertCustomValueSet(testVS, "user-123");
     expect(result.success).toBe(true);
 
     const vsRes = await dbClient.query(

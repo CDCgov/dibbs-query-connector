@@ -49,9 +49,10 @@ export class UserCreatedValuesetService {
   @auditable
   static async insertCustomValueSet(
     vs: DibbsValueSet,
-    uuid: string,
+    userId: string,
   ): Promise<{ success: boolean; error?: string }> {
     const errors: string[] = [];
+    const uuid = crypto.randomUUID();
 
     const systemPrefix = UserCreatedValuesetService.getSystemPrefix(vs.system);
     const valueSetUniqueId = `${uuid}_${vs.valueSetVersion}`;
@@ -66,10 +67,10 @@ export class UserCreatedValuesetService {
     try {
       await UserCreatedValuesetService.dbClient.query(insertValueSetSql, [
         valueSetUniqueId,
-        valueSetOid,
-        vs.valueSetVersion,
+        valueSetOid, // I'm not sure if this is something we need to track
+        vs.valueSetVersion, // I'm not sure if this is something we need to track
         vs.valueSetName,
-        vs.author, // should be a user ID of the current user
+        userId, // should be a user ID of the current user
         vs.ersdConceptType ?? vs.dibbsConceptType,
         vs.dibbsConceptType,
         "true",
