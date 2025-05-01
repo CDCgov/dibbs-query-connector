@@ -209,6 +209,7 @@ const FhirServers: React.FC = () => {
         serverName,
         serverUrl,
         disableCertValidation,
+        defaultServer,
         connectionResult.success,
         authData,
       );
@@ -228,6 +229,7 @@ const FhirServers: React.FC = () => {
         serverName,
         serverUrl,
         disableCertValidation,
+        defaultServer,
         connectionResult.success,
         authData,
       );

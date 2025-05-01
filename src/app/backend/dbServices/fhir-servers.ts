@@ -115,6 +115,7 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
    * @param name - The new name of the FHIR server
    * @param hostname - The new URL/hostname of the FHIR server
    * @param disableCertValidation - Whether to disable certificate validation
+   * @param defaultServer - Whether this is the default server
    * @param lastConnectionSuccessful - Optional boolean indicating if the last connection was successful
    * @param authData - Authentication data including auth type and credentials
    * @returns An object indicating success or failure with optional error message
@@ -126,6 +127,7 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
     name: string,
     hostname: string,
     disableCertValidation: boolean,
+    defaultServer: boolean,
     lastConnectionSuccessful?: boolean,
     authData?: AuthData,
   ) {
@@ -138,13 +140,14 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
       last_connection_successful = $4,
       headers = $5,
       disable_cert_validation = $6,
-      auth_type = $7,
-      client_id = $8,
-      client_secret = $9,
-      token_endpoint = $10,
-      scopes = $11,
-      access_token = $12,
-      token_expiry = $13
+      default_server = $7,
+      auth_type = $8,
+      client_id = $9,
+      client_secret = $10,
+      token_endpoint = $11,
+      scopes = $12,
+      access_token = $13,
+      token_expiry = $14
     WHERE id = $1
     RETURNING *;
   `;
@@ -187,6 +190,7 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
         lastConnectionSuccessful,
         headers,
         disableCertValidation,
+        defaultServer,
         authType,
         authData?.clientId || null,
         authData?.clientSecret || null,
@@ -224,6 +228,7 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
    * @param name - The name of the FHIR server
    * @param hostname - The URL/hostname of the FHIR server
    * @param disableCertValidation - Whether to disable certificate validation
+   * @param defaultServer - Whether this is the default server
    * @param lastConnectionSuccessful - Optional boolean indicating if the last connection was successful
    * @param authData - Authentication data including auth type and credentials
    * @returns An object indicating success or failure with optional error message
@@ -235,6 +240,7 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
     name: string,
     hostname: string,
     disableCertValidation: boolean,
+    defaultServer: boolean,
     lastConnectionSuccessful?: boolean,
     authData?: AuthData,
   ) {
@@ -259,6 +265,7 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
         lastConnectionSuccessful,
         headers,
         disableCertValidation,
+        defaultServer,
         authType,
         authData?.clientId || null,
         authData?.clientSecret || null,
