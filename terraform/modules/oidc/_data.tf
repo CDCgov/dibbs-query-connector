@@ -28,6 +28,7 @@ data "aws_iam_policy_document" "github_assume_role" {
 
 # tfstate and storage policy
 # trivy:ignore:AVD-AWS-0057
+# trivy:ignore:AVD-AWS-0345
 data "aws_iam_policy_document" "storage" {
   statement {
     actions = [

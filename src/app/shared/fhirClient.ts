@@ -4,6 +4,7 @@ import { AuthData } from "../backend/dbServices/fhir-servers";
 import { createSmartJwt } from "../backend/dbServices/smartOnFhir/lib";
 import { updateFhirServer } from "../backend/dbServices/fhir-servers";
 import { fetchWithoutSSL } from "./utils";
+import dbService from "../backend/dbServices/db-service";
 /**
  * A client for querying a FHIR server.
  * @param server The FHIR server to query.
@@ -15,14 +16,7 @@ class FHIRClient {
   private serverConfig: FhirServerConfig;
   private fetch: (url: string, options?: RequestInit) => Promise<Response>;
 
-  constructor(server: string, configurations: FhirServerConfig[]) {
-    // Find the configuration for the given server
-    const config = configurations.find((c) => c.name === server);
-
-    if (!config) {
-      throw new Error(`No configuration found for server: ${server}`);
-    }
-
+  constructor(config: FhirServerConfig) {
     this.serverConfig = config;
     this.hostname = config.hostname;
 
@@ -34,6 +28,10 @@ class FHIRClient {
       method: "GET",
       headers: config.headers ?? {},
     };
+  }
+
+  static async refreshFhirServerConfig() {
+    dbService.query;
   }
 
   /**
@@ -79,7 +77,7 @@ class FHIRClient {
     }
 
     // Create a client with a configurations array containing only the test config
-    const client = new FHIRClient("test", [testConfig]);
+    const client = new FHIRClient(testConfig);
     return client;
   }
 
