@@ -186,6 +186,7 @@
     padding: 1rem;
     align-items: center;
     width: calc($query-connector-content-width-wide + 4rem);
+    margin-bottom: 1rem;
 
     ul {
         max-width: 50%;
@@ -237,6 +238,8 @@
 
             th {
                 padding: 0 !important;
+                display: flex;
+                align-items: center;
             }
         }
 
@@ -267,6 +270,7 @@
                 padding: 0 !important;
                 letter-spacing: 0%;
                 line-height: 1.25rem;
+                font-size: 0.875rem;
             }
         }
     }
@@ -288,6 +292,10 @@
             }
         }
     }
+}
+
+.conceptsTable__header {
+    margin-bottom: 0.5rem;
 }
 
 .conceptsTable__tableBody {
@@ -363,7 +371,7 @@
 
 .overflowScroll {
     display: flex;
-    max-height: 32.5rem;
+    max-height: 33rem;
     overflow-y: scroll;
 
     &_headerLocked {

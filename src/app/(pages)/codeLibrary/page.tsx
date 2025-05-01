@@ -251,6 +251,13 @@ const CodeLibrary: React.FC = () => {
   ${Math.min(currentPage * itemsPerPage, filteredValueSets.length)} of 
   ${filteredValueSets.length} value sets`;
 
+  const valueSetSource =
+    activeValueSet?.author == "CSTE Steward"
+      ? "the CSTE"
+      : activeValueSet?.author == "Center for Public Health Innovation"
+        ? "CPHI"
+        : activeValueSet?.author;
+
   return (
     <WithAuth>
       <div className={classNames("main-container__wide", styles.mainContainer)}>
@@ -393,8 +400,8 @@ const CodeLibrary: React.FC = () => {
                             role="icon"
                             className="qc-lock"
                           ></Icon.Lock>
-                          This value set comes from the CSTE and cannot be
-                          modified.
+                          {`This value set comes from ${valueSetSource} and cannot be
+                          modified.`}
                         </th>
                       </tr>
                     ) : (
