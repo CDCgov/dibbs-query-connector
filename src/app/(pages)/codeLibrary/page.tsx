@@ -363,6 +363,7 @@ const CodeLibrary: React.FC = () => {
                     styles.overflowScroll,
                     styles.valueSetTable__tableBody,
                   )}
+                  data-testid="table-valuesets"
                 >
                   {loading && paginatedValueSets.length <= 0 ? (
                     <tr
@@ -389,7 +390,6 @@ const CodeLibrary: React.FC = () => {
                 </tbody>
               </Table>
             </div>
-
             <div className={styles.content__right}>
               {activeValueSet && (
                 <Table
@@ -434,6 +434,7 @@ const CodeLibrary: React.FC = () => {
                         : styles.overflowScroll_headerLocked,
                       styles.conceptsTable__tableBody,
                     )}
+                    data-testid="table-codes"
                   >
                     {activeValueSet?.concepts.map((vs) => (
                       <tr

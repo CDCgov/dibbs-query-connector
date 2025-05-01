@@ -65,7 +65,7 @@ describe("Code library rendered view", () => {
       ),
     );
 
-    expect(await screen.findByTestId("table")).toBeInTheDocument();
+    expect(await screen.findByTestId("table-valuesets")).toBeInTheDocument();
   });
 
   it("renders the correct content", async () => {
@@ -77,9 +77,7 @@ describe("Code library rendered view", () => {
       "Value sets are an organizational structure for easy management of codes. Every code belongs to a value set.",
     );
 
-    const tableHead = screen.getByRole("table").childNodes[0];
-    const tableBody = screen.getByRole("table").childNodes[1];
-    expect(tableHead).toHaveTextContent("VALUE SET");
+    const tableBody = await screen.findByTestId("table-valuesets");
     expect(tableBody.childNodes[0]).toHaveTextContent(
       cancerValueSets[1].valueset_name,
     );
@@ -90,12 +88,12 @@ describe("Code library rendered view", () => {
   });
 
   it("renders concept codes for the value set when clicked", async () => {
-    const tableBody = screen.getByRole("table").childNodes[1];
+    const tableBody = await screen.findByTestId("table-codes");
     act(() => (tableBody.firstChild as HTMLElement).click());
 
     expect(
       await screen.findByText(
-        "This value set comes from the CSTE and cannot be modified.",
+        "This value set comes from DIBBs and cannot be modified.",
       ),
     ).toBeVisible();
 
