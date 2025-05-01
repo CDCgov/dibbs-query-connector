@@ -468,22 +468,24 @@ const CodeLibrary: React.FC = () => {
 
           <div className={styles.paginationContainer}>
             <span>{paginationText}</span>
-            <Pagination
-              className={styles.pagination}
-              pathname="/codeLibrary"
-              totalPages={totalPages <= 0 ? 1 : totalPages}
-              currentPage={currentPage}
-              onClickNext={() =>
-                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-              }
-              onClickPrevious={() =>
-                setCurrentPage((prev) => Math.max(prev - 1, 1))
-              }
-              onClickPageNumber={(event, page) => {
-                event.preventDefault();
-                setCurrentPage(page);
-              }}
-            />
+            {totalPages > 0 && (
+              <Pagination
+                className={styles.pagination}
+                pathname="/codeLibrary"
+                totalPages={totalPages <= 0 ? 1 : totalPages}
+                currentPage={currentPage}
+                onClickNext={() =>
+                  setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                }
+                onClickPrevious={() =>
+                  setCurrentPage((prev) => Math.max(prev - 1, 1))
+                }
+                onClickPageNumber={(event, page) => {
+                  event.preventDefault();
+                  setCurrentPage(page);
+                }}
+              />
+            )}
             <div className={styles.itemsPerPageContainer}>
               <label htmlFor="actionsPerPage">Value sets per page</label>
               <Select
