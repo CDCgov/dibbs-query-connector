@@ -38,6 +38,7 @@ import {
   transaction,
 } from "@/app/backend/dbServices/decorators";
 import { auditable } from "@/app/backend/auditLogs/decorator";
+import dbService from "../backend/dbServices/db-service";
 import { QCResponse } from "../models/responses/collections";
 
 type ErsdOrVsacResponse = Bundle | Parameters | OperationOutcome;
@@ -74,7 +75,7 @@ class DatabaseService {
     const values = [name];
 
     try {
-      const result = await DatabaseService.dbClient.query(
+      const result = await dbService.query(
         DatabaseService.getQuerybyNameSQL,
         values,
       );
