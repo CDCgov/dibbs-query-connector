@@ -28,9 +28,7 @@ export class UserCreatedValuesetService {
     return match ? match[1] : system;
   }
 
-  private static async ensureCustomCodeCondition(
-    system: string,
-  ): Promise<string> {
+  static async addCustomCodeCondition(system: string): Promise<string> {
     const conditionId = "custom_condition"; // This should be a unique identifier for the condition, we could just call it '0', but we will need some way to exclude it from certain screens, so that's why I lean toward it being hardcoded.
     const checkSql = `SELECT id FROM conditions WHERE id = $1`;
     const result = await this.dbClient.query(checkSql, [conditionId]);
@@ -59,7 +57,7 @@ export class UserCreatedValuesetService {
     const valueSetOid = vs.valueSetExternalId || uuid;
 
     // Insert Custom Code Condition if not already present
-    const conditionId = await this.ensureCustomCodeCondition(vs.system);
+    const conditionId = await this.addCustomCodeCondition(vs.system);
 
     // Insert ValueSet
     try {
@@ -68,7 +66,7 @@ export class UserCreatedValuesetService {
         valueSetOid,
         vs.valueSetVersion,
         vs.valueSetName,
-        vs.author,
+        vs.author, // should be a user ID of the current user
         vs.ersdConceptType ?? vs.dibbsConceptType,
         vs.dibbsConceptType,
         "true",
@@ -127,3 +125,8 @@ export class UserCreatedValuesetService {
       : { success: false, error: errors.join(", ") };
   }
 }
+
+export const getCustomCodeCondition =
+  UserCreatedValuesetService.addCustomCodeCondition;
+export const insertCustomValueSet =
+  UserCreatedValuesetService.insertCustomValueSet;
