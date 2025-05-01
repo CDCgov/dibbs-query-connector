@@ -28,23 +28,6 @@ describe("UserCreatedValuesetService Integration", () => {
     userCreated: true,
   };
 
-  afterAll(async () => {
-    await dbClient.query(
-      `DELETE FROM valueset_to_concept WHERE valueset_id = $1`,
-      [`${testUUID}%`],
-    );
-    await dbClient.query(
-      `DELETE FROM condition_to_valueset WHERE valueset_id = $1`,
-      [`${testUUID}%`],
-    );
-    await dbClient.query(
-      `DELETE FROM concepts WHERE code IN ('1234-5', '5678-9')`,
-    );
-    await dbClient.query(`DELETE FROM valuesets WHERE id LIKE $1`, [
-      `${testUUID}%`,
-    ]);
-  });
-
   it("should insert valueset, concepts, and condition linkages", async () => {
     const result = await insertCustomValueSet(testVS, "mock-vsid-0001");
     expect(result.success).toBe(true);
