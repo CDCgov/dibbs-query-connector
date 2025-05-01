@@ -1,6 +1,5 @@
 "use server";
 
-import { v4 as uuidv4 } from "uuid";
 import { transaction } from "@/app/backend/dbServices/decorators";
 import { auditable } from "@/app/backend/auditLogs/decorator";
 import { getDbClient } from "../backend/dbClient";
@@ -48,11 +47,11 @@ export class UserCreatedValuesetService {
   @auditable
   static async insertCustomValueSet(
     vs: DibbsValueSet,
+    uuid: string,
   ): Promise<{ success: boolean; error?: string }> {
     const errors: string[] = [];
 
     const systemPrefix = this.getSystemPrefix(vs.system);
-    const uuid = uuidv4();
     const valueSetUniqueId = `${uuid}_${vs.valueSetVersion}`;
     const valueSetOid = vs.valueSetExternalId || uuid;
 

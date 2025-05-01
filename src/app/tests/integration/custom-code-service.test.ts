@@ -5,11 +5,10 @@ import {
 import { getDbClient } from "@/app/backend/dbClient";
 import { DibbsValueSet } from "@/app/models/entities/valuesets";
 
-const { v4: uuidv4 } = require("uuid");
 const dbClient = getDbClient();
 
 describe("UserCreatedValuesetService Integration", () => {
-  const testUUID = uuidv4();
+  const testUUID = "mock-vsid-0001";
   const vsVersion = "1.0.0";
   const vsName = "Cooties test";
   const authorId = "user-123";
@@ -47,7 +46,7 @@ describe("UserCreatedValuesetService Integration", () => {
   });
 
   it("should insert valueset, concepts, and condition linkages", async () => {
-    const result = await insertCustomValueSet(testVS);
+    const result = await insertCustomValueSet(testVS, "mock-vsid-0001");
     expect(result.success).toBe(true);
 
     const vsRes = await dbClient.query(
