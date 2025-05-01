@@ -30,9 +30,11 @@ export class UserCreatedValuesetService {
   static async addCustomCodeCondition(system: string): Promise<string> {
     const conditionId = "custom_condition"; // This should be a unique identifier for the condition, we could just call it '0', but we will need some way to exclude it from certain screens, so that's why I lean toward it being hardcoded.
     const checkSql = `SELECT id FROM conditions WHERE id = $1`;
-    const result = await this.dbClient.query(checkSql, [conditionId]);
+    const result = await UserCreatedValuesetService.dbClient.query(checkSql, [
+      conditionId,
+    ]);
     if (result.rows.length === 0) {
-      await this.dbClient.query(insertConditionSql, [
+      await UserCreatedValuesetService.dbClient.query(insertConditionSql, [
         conditionId,
         system,
         "Custom Code Condition",
@@ -51,16 +53,18 @@ export class UserCreatedValuesetService {
   ): Promise<{ success: boolean; error?: string }> {
     const errors: string[] = [];
 
-    const systemPrefix = this.getSystemPrefix(vs.system);
+    const systemPrefix = UserCreatedValuesetService.getSystemPrefix(vs.system);
     const valueSetUniqueId = `${uuid}_${vs.valueSetVersion}`;
     const valueSetOid = vs.valueSetExternalId || uuid;
 
     // Insert Custom Code Condition if not already present
-    const conditionId = await this.addCustomCodeCondition(vs.system);
+    const conditionId = await UserCreatedValuesetService.addCustomCodeCondition(
+      vs.system,
+    );
 
     // Insert ValueSet
     try {
-      await this.dbClient.query(insertValueSetSql, [
+      await UserCreatedValuesetService.dbClient.query(insertValueSetSql, [
         valueSetUniqueId,
         valueSetOid,
         vs.valueSetVersion,
@@ -79,7 +83,7 @@ export class UserCreatedValuesetService {
     for (const concept of vs.concepts) {
       const conceptId = `${systemPrefix}_${concept.code}`;
       try {
-        await this.dbClient.query(insertConceptSql, [
+        await UserCreatedValuesetService.dbClient.query(insertConceptSql, [
           conceptId,
           concept.code,
           vs.system,
@@ -94,11 +98,10 @@ export class UserCreatedValuesetService {
 
       const vstcId = `${valueSetUniqueId}_${conceptId}`;
       try {
-        await this.dbClient.query(insertValuesetToConceptSql, [
-          vstcId,
-          valueSetUniqueId,
-          conceptId,
-        ]);
+        await UserCreatedValuesetService.dbClient.query(
+          insertValuesetToConceptSql,
+          [vstcId, valueSetUniqueId, conceptId],
+        );
       } catch (e) {
         console.error("Insert failed for valueset_to_concept:", e);
         errors.push(`VS↔Concept join failed: ${vstcId}`);
@@ -108,12 +111,10 @@ export class UserCreatedValuesetService {
     // Insert condition_to_valueset
     const ctvsId = `${conditionId}_${valueSetUniqueId}`;
     try {
-      await this.dbClient.query(insertConditionToValuesetSql, [
-        ctvsId,
-        conditionId,
-        valueSetUniqueId,
-        "User",
-      ]);
+      await UserCreatedValuesetService.dbClient.query(
+        insertConditionToValuesetSql,
+        [ctvsId, conditionId, valueSetUniqueId, "User"],
+      );
     } catch (e) {
       console.error("Insert failed for condition_to_valueset:", e);
       errors.push(`Condition↔VS join failed: ${ctvsId}`);

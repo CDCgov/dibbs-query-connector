@@ -30,11 +30,11 @@ describe("UserCreatedValuesetService Integration", () => {
 
   afterAll(async () => {
     await dbClient.query(
-      `DELETE FROM valueset_to_concept WHERE valueset_id LIKE $1`,
+      `DELETE FROM valueset_to_concept WHERE valueset_id = $1`,
       [`${testUUID}%`],
     );
     await dbClient.query(
-      `DELETE FROM condition_to_valueset WHERE valueset_id LIKE $1`,
+      `DELETE FROM condition_to_valueset WHERE valueset_id = $1`,
       [`${testUUID}%`],
     );
     await dbClient.query(
@@ -77,6 +77,9 @@ describe("UserCreatedValuesetService Integration", () => {
   });
 
   it("should create the Custom Code Condition if missing", async () => {
+    await dbClient.query(
+      `DELETE FROM condition_to_valueset WHERE condition_id = 'custom_condition'`,
+    );
     await dbClient.query(
       `DELETE FROM conditions WHERE id = 'custom_condition'`,
     );
