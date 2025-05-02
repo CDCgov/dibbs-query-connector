@@ -12,6 +12,7 @@ import {
   saveCustomQueryHelp,
 } from "@/app/backend/dbServices/queryBuilding/lib";
 import { getDbClient } from "@/app/backend/dbClient";
+import { translateSnakeStringToCamelCase } from "@/app/backend/dbServices/util";
 
 test.describe("editing an exisiting query", () => {
   let subjectQuery: QueryTableResult;
@@ -29,17 +30,17 @@ test.describe("editing an exisiting query", () => {
   });
 
   test.afterEach(async () => {
-    await deleteQueryByIdHelp(subjectQuery.query_id, dbClient);
+    await deleteQueryByIdHelp(subjectQuery.queryId, dbClient);
   });
 
   test("edit query name", async ({ page }) => {
-    const originalName = structuredClone(subjectQuery.query_name);
+    const originalName = structuredClone(subjectQuery.queryName);
     const query = page.getByTitle(originalName);
     await expect(query).toBeVisible();
 
     // click edit
     await query.hover();
-    const editBtn = page.getByTestId(`edit-query-${subjectQuery.query_id}`);
+    const editBtn = page.getByTestId(`edit-query-${subjectQuery.queryId}`);
     await expect(editBtn).toBeVisible();
     await editBtn.click();
 
@@ -72,14 +73,14 @@ test.describe("editing an exisiting query", () => {
 
   test("edit query conditions", async ({ page }) => {
     const query = page.locator("tr", {
-      has: page.getByTitle(subjectQuery.query_name),
+      has: page.getByTitle(subjectQuery.queryName),
     });
 
     await expect(query).toBeVisible();
 
     // click edit
     await query.hover();
-    const editBtn = query.getByTestId(`edit-query-${subjectQuery.query_id}`);
+    const editBtn = query.getByTestId(`edit-query-${subjectQuery.queryId}`);
 
     await expect(editBtn).toBeVisible();
     await editBtn.click();
@@ -146,20 +147,20 @@ test.describe("editing an exisiting query", () => {
 
   test("edit query value sets and concept codes", async ({ page }) => {
     const subjectVS = Object.values(
-      subjectQuery.query_data[CANCER_CONDITION_ID],
+      subjectQuery.queryData[CANCER_CONDITION_ID],
     )[0];
 
     const subjectConcept = subjectVS.concepts[0];
 
     const query = page.locator("tr", {
-      has: page.getByTitle(subjectQuery.query_name),
+      has: page.getByTitle(subjectQuery.queryName),
     });
 
     await expect(query).toBeVisible();
 
     // click edit
     await query.hover();
-    const editBtn = query.getByTestId(`edit-query-${subjectQuery.query_id}`);
+    const editBtn = query.getByTestId(`edit-query-${subjectQuery.queryId}`);
     await expect(editBtn).toBeVisible();
     await editBtn.click();
 
@@ -237,8 +238,15 @@ async function createTestQuery() {
   );
   if (result === undefined) throw Error("Failed to set up test query");
 
-  return (await getSavedQueryByIdHelp(
+  const queryResult = (await getSavedQueryByIdHelp(
     result[0].id,
     dbClient,
   )) as QueryTableResult;
+
+  const val: Record<string, unknown> = {};
+  Object.entries(queryResult).forEach(([k, v]) => {
+    val[translateSnakeStringToCamelCase(k)] = v;
+  });
+
+  return val as unknown as QueryTableResult;
 }

@@ -110,15 +110,15 @@ const UserManagementDrawer: React.FC<UserManagementDrawerProps> = ({
         >
           {allQueries.map((query) => {
             const isAssignedToGroup = groupQueries.some(
-              (gq) => gq.query_id == query.query_id,
+              (gq) => gq.queryId == query.queryId,
             );
 
             return (
-              <li key={query.query_id}>
+              <li key={query.queryId}>
                 <Checkbox
-                  id={query.query_id}
-                  name={query.query_name}
-                  label={`${query.query_name}`}
+                  id={query.queryId}
+                  name={query.queryName}
+                  label={`${query.queryName}`}
                   defaultChecked={!!isAssignedToGroup}
                   onChange={handleToggleQuery}
                   className={classNames("margin-bottom-3", style.checkbox)}
@@ -148,8 +148,6 @@ const UserManagementDrawer: React.FC<UserManagementDrawerProps> = ({
 
             const isMemberOfCurrentGroup = user.userGroupMemberships?.filter(
               (membership) =>
-                // TODO: remove the snake cased check here once the group PR is in
-                membership?.usergroup_id == teamQueryEditSection?.groupId ||
                 membership?.usergroupId == teamQueryEditSection?.groupId,
             )[0];
 
@@ -265,7 +263,7 @@ const UserManagementDrawer: React.FC<UserManagementDrawerProps> = ({
       const updatedUserGroups = await getAllUserGroups();
       const updatedQuery = updatedQueryResponse.items[0];
       const newQueriesList = allQueries.map((q) => {
-        if (q.query_id == queryId) {
+        if (q.queryId == queryId) {
           q.groupAssignments = updatedQuery.groupAssignments;
         }
         return q;

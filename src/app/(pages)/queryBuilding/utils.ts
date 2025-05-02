@@ -33,10 +33,10 @@ export type QueryDataColumn = {
   [conditionId: string]: { [valueSetId: string]: DibbsValueSet };
 };
 export type QueryTableResult = {
-  query_name: string;
-  query_id: string;
-  query_data: QueryDataColumn;
-  conditions_list: string[];
+  queryName: string;
+  queryId: string;
+  queryData: QueryDataColumn;
+  conditionsList: string[];
   immunization: boolean;
 };
 

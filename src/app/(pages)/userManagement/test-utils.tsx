@@ -1,6 +1,6 @@
 import React from "react";
 import { Tab } from "@/app/ui/designSystem/TabGroup/tabGroup";
-import { UserRole, User } from "@/app/models/entities/users";
+import { UserRole, User, UserGroup } from "@/app/models/entities/users";
 import UserPermissionsTable from "./components/userPermissionsTable/userPermissionsTable";
 import UserGroupsTable from "./components/userGroupsTable/UserGroupsTable";
 import { CustomUserQuery } from "@/app/models/entities/query";
@@ -14,7 +14,7 @@ export const mockSuperAdmin = {
   qcRole: UserRole.SUPER_ADMIN,
 };
 
-export const mockAdmin = {
+export const mockAdmin: User = {
   id: "456",
   username: "lilypotter",
   firstName: "Lily",
@@ -22,61 +22,58 @@ export const mockAdmin = {
   qcRole: UserRole.ADMIN,
   userGroupMemberships: [
     {
-      membership_id: "456_876",
-      usergroup_name: "Order of the Phoenix",
-      usergroup_id: "876",
-      is_member: true,
+      membershipId: "456_876",
+      usergroupName: "Order of the Phoenix",
+      usergroupId: "876",
+      isMember: true,
     },
   ],
 };
 
-export const mockStandard = {
+export const mockStandard: User = {
   id: "789",
   username: "hermionegranger",
   firstName: "Hermione",
   lastName: "Granger",
   qcRole: UserRole.ADMIN,
-  userroupMemberships: [
+  userGroupMemberships: [
     {
-      membership_id: "789_012",
-      usergroup_name: "S.P.E.W.",
-      usergroup_id: "012",
-      is_member: true,
+      membershipId: "789_012",
+      usergroupName: "S.P.E.W.",
+      usergroupId: "012",
+      isMember: true,
     },
   ],
 };
 
 // UserGroup Mocks
-export const mockGroupBasic = {
+export const mockGroupBasic: UserGroup = {
   id: "123",
   name: "Hogwarts",
-  member_size: 1,
-  query_size: 0,
-  valuesets: [],
+  memberSize: 1,
+  querySize: 0,
 };
 
-export const mockGroupMany = {
+export const mockGroupMany: UserGroup = {
   id: "456",
   name: "Order of the Phoenix",
-  member_size: 3,
-  query_size: 3,
+  memberSize: 3,
+  querySize: 3,
   members: [{} as User, {} as User, {} as User],
   queries: [
     {} as CustomUserQuery,
     {} as CustomUserQuery,
     {} as CustomUserQuery,
   ],
-  valuesets: [],
 };
 
 const mockGroupSingle = {
   id: "789",
   name: "S.P.E.W.",
-  member_size: 1,
-  query_size: 1,
+  memberSize: 1,
+  querySize: 1,
   members: [mockAdmin],
   queries: [{} as CustomUserQuery],
-  valuesets: [],
 };
 
 export const allGroups = [mockGroupMany, mockGroupSingle];
@@ -115,23 +112,23 @@ export const mockGroupsTab: Tab = {
 
 // Query Mocks
 export const mockQueryNoGroups: CustomUserQuery = {
-  query_id: "q1",
-  query_name: "Test Query 1",
-  conditions_list: [],
+  queryId: "q1",
+  queryName: "Test Query 1",
+  conditionsList: [],
   valuesets: [],
 };
 
 export const mockQueryWithGroups: CustomUserQuery = {
-  query_id: "q2",
-  query_name: "Test Query 2",
-  conditions_list: [],
+  queryId: "q2",
+  queryName: "Test Query 2",
+  conditionsList: [],
   valuesets: [],
   groupAssignments: [
     {
-      membership_id: `q2_${mockGroupSingle.id}`,
-      usergroup_name: mockGroupSingle.name,
-      usergroup_id: mockGroupSingle.id,
-      is_member: true,
+      membershipId: `q2_${mockGroupSingle.id}`,
+      usergroupName: mockGroupSingle.name,
+      usergroupId: mockGroupSingle.id,
+      isMember: true,
     },
   ],
 };

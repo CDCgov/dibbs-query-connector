@@ -20,8 +20,6 @@ jest.mock("@/app/utils/auth", () => ({
   adminAccessCheck: jest.fn(() => Promise.resolve(true)),
 }));
 
-suppressConsoleLogs();
-
 const TEST_GROUP_ID = "00000000-0000-0000-0000-000000000001";
 const TEST_USER_1_ID = "00000000-0000-0000-0000-000000000002";
 const TEST_USER_2_ID = "00000000-0000-0000-0000-000000000003";
@@ -34,7 +32,7 @@ const TEST_QUERY_DATA: QueryDataColumn = {};
 
 describe("User Group and Query Membership Tests", () => {
   beforeAll(async () => {
-    await dbClient.query("BEGIN");
+    suppressConsoleLogs();
 
     // Insert test users
     const insertUsersQuery = `
@@ -42,8 +40,8 @@ describe("User Group and Query Membership Tests", () => {
       VALUES
         ($1, 'testuser1', 'Test', 'User1', 'Standard User'),
         ($2, 'testuser2', 'Test', 'User2', 'Standard User'),
-        ($3, 'testuser3', 'Test', 'User3', 'Standard User');
-
+        ($3, 'testuser3', 'Test', 'User3', 'Standard User')
+      ON CONFLICT DO NOTHING;
     `;
     await dbClient.query(insertUsersQuery, [
       TEST_USER_1_ID,
@@ -54,7 +52,8 @@ describe("User Group and Query Membership Tests", () => {
     // Insert test group
     const insertGroupQuery = `
       INSERT INTO usergroup (id, name)
-      VALUES ($1, 'Test Group');
+      VALUES ($1, 'Test Group')
+      ON CONFLICT DO NOTHING;
     `;
     await dbClient.query(insertGroupQuery, [TEST_GROUP_ID]);
 
@@ -63,7 +62,9 @@ describe("User Group and Query Membership Tests", () => {
     VALUES
       ($1, 'Test Query 1', $4, $5),
       ($2, 'Test Query 2', $4, $5),
-      ($3, 'Test Query 3', $4, $5);
+      ($3, 'Test Query 3', $4, $5)
+      ON CONFLICT DO NOTHING;
+
     `;
 
     await dbClient.query(insertQueryQuery, [
@@ -98,7 +99,6 @@ describe("User Group and Query Membership Tests", () => {
         TEST_QUERY_2_ID,
         TEST_QUERY_3_ID,
       ]);
-      await dbClient.query("ROLLBACK");
     } catch (error) {
       console.error("Rollback failed:", error);
     }
@@ -117,13 +117,13 @@ describe("User Group and Query Membership Tests", () => {
     expect(result[0]).toHaveProperty("userGroupMemberships");
 
     const membership = result[0].userGroupMemberships?.find(
-      (m: { usergroup_id: string; usergroup_name: string }) =>
-        m.usergroup_id === TEST_GROUP_ID,
-      (m: { usergroup_id: string; usergroup_name: string }) =>
-        m.usergroup_name === "Test Group",
+      (m: { usergroupId: string; usergroupName: string }) =>
+        m.usergroupId === TEST_GROUP_ID,
+      (m: { usergroupId: string; usergroupName: string }) =>
+        m.usergroupName === "Test Group",
     );
     expect(membership).toBeDefined();
-    expect(membership?.is_member).toBeDefined();
+    expect(membership?.isMember).toBeDefined();
   });
 
   /**
@@ -150,7 +150,7 @@ describe("User Group and Query Membership Tests", () => {
     const result = await addUsersToGroup(TEST_GROUP_ID, [TEST_USER_3_ID]);
     expect(result.totalItems).toBe(1);
     expect(result.items[0].id).toContain(TEST_USER_3_ID);
-    expect(result?.items[0].userGroupMemberships?.[0].membership_id).toContain(
+    expect(result?.items[0].userGroupMemberships?.[0].membershipId).toContain(
       TEST_GROUP_ID,
     );
   });
@@ -168,7 +168,7 @@ describe("User Group and Query Membership Tests", () => {
   test("should remove multiple users from a group", async () => {
     const users: User[] = await getAllUsersWithSingleGroupStatus(TEST_GROUP_ID);
     const members = users.filter((user) =>
-      user.userGroupMemberships?.some((m) => m.is_member),
+      user.userGroupMemberships?.some((m) => m.isMember),
     );
     expect(members.length).toBe(3);
 
@@ -187,14 +187,14 @@ describe("User Group and Query Membership Tests", () => {
       updatedMembers.items.some(
         (user) =>
           user.id === TEST_USER_1_ID &&
-          user.userGroupMemberships?.some((m) => m.is_member),
+          user.userGroupMemberships?.some((m) => m.isMember),
       ),
     ).toBe(false);
     expect(
       updatedMembers.items.some(
         (user) =>
           user.id === TEST_USER_2_ID &&
-          user.userGroupMemberships?.some((m) => m.is_member),
+          user.userGroupMemberships?.some((m) => m.isMember),
       ),
     ).toBe(false);
   });
@@ -205,7 +205,7 @@ describe("User Group and Query Membership Tests", () => {
 
     const users: User[] = await getAllUsersWithSingleGroupStatus(TEST_GROUP_ID);
     const members = users.filter((user) =>
-      user.userGroupMemberships?.some((m) => m.is_member),
+      user.userGroupMemberships?.some((m) => m.isMember),
     );
 
     expect(members.length).toBe(0);
@@ -213,7 +213,7 @@ describe("User Group and Query Membership Tests", () => {
       users.some(
         (user) =>
           user.id === TEST_USER_3_ID &&
-          user.userGroupMemberships?.some((m) => m.is_member),
+          user.userGroupMemberships?.some((m) => m.isMember),
       ),
     ).toBe(false);
   });
@@ -230,7 +230,7 @@ describe("User Group and Query Membership Tests", () => {
     const selectedUsers = [TEST_USER_1_ID];
 
     // Add and remove users in one call
-    const updatedUsers = await saveUserGroupMembership(
+    const { users: updatedUsers } = await saveUserGroupMembership(
       TEST_GROUP_ID,
       selectedUsers,
     );
@@ -240,14 +240,14 @@ describe("User Group and Query Membership Tests", () => {
       updatedUsers.some(
         (user) =>
           user.id === TEST_USER_1_ID &&
-          user.userGroupMemberships?.some((m) => m.is_member),
+          user.userGroupMemberships?.some((m) => m.isMember),
       ),
     ).toBe(true);
     expect(
       updatedUsers.some(
         (user) =>
           user.id === TEST_USER_2_ID &&
-          user.userGroupMemberships?.some((m) => m.is_member),
+          user.userGroupMemberships?.some((m) => m.isMember),
       ),
     ).toBe(false);
   });
@@ -262,16 +262,16 @@ describe("User Group and Query Membership Tests", () => {
     ]);
 
     expect(result.totalItems).toBe(2);
-    expect(result.items.some((query) => query.query_id == TEST_QUERY_2_ID));
-    expect(result.items.some((query) => query.query_id == TEST_QUERY_3_ID));
+    expect(result.items.some((query) => query.queryId == TEST_QUERY_2_ID));
+    expect(result.items.some((query) => query.queryId == TEST_QUERY_3_ID));
 
     const queriesList = (await getAllGroupQueries(TEST_GROUP_ID)).items;
 
     expect(queriesList.length).toBe(2);
-    expect(queriesList.some((query) => query.query_id == TEST_QUERY_2_ID)).toBe(
+    expect(queriesList.some((query) => query.queryId == TEST_QUERY_2_ID)).toBe(
       true,
     );
-    expect(queriesList.some((query) => query.query_id == TEST_QUERY_3_ID)).toBe(
+    expect(queriesList.some((query) => query.queryId == TEST_QUERY_3_ID)).toBe(
       true,
     );
   });
@@ -279,8 +279,8 @@ describe("User Group and Query Membership Tests", () => {
   test("should add a single query to a group", async () => {
     const result = await addQueriesToGroup(TEST_GROUP_ID, [TEST_QUERY_1_ID]);
     expect(result.totalItems).toBe(1);
-    expect(result.items[0].query_id).toContain(TEST_QUERY_1_ID);
-    expect(result?.items[0].groupAssignments?.[0].membership_id).toContain(
+    expect(result.items[0].queryId).toContain(TEST_QUERY_1_ID);
+    expect(result?.items[0].groupAssignments?.[0].membershipId).toContain(
       TEST_GROUP_ID,
     );
   });
@@ -301,8 +301,8 @@ describe("User Group and Query Membership Tests", () => {
       TEST_QUERY_3_ID,
     ]);
 
-    expect(result.items[0].query_id).toContain(TEST_QUERY_2_ID);
-    expect(result.items[1].query_id).toContain(TEST_QUERY_3_ID);
+    expect(result.items[0].queryId).toContain(TEST_QUERY_2_ID);
+    expect(result.items[1].queryId).toContain(TEST_QUERY_3_ID);
 
     const updatedQueries = await getAllGroupQueries(TEST_GROUP_ID);
 
@@ -310,16 +310,16 @@ describe("User Group and Query Membership Tests", () => {
     expect(
       updatedQueries.items.some(
         (query) =>
-          query.query_id === TEST_USER_2_ID &&
-          query.groupAssignments?.some((q) => q.is_member),
+          query.queryId === TEST_USER_2_ID &&
+          query.groupAssignments?.some((q) => q.isMember),
       ),
     ).toBe(false);
 
     expect(
       updatedQueries.items.some(
         (query) =>
-          query.query_id === TEST_USER_3_ID &&
-          query.groupAssignments?.some((q) => q.is_member),
+          query.queryId === TEST_USER_3_ID &&
+          query.groupAssignments?.some((q) => q.isMember),
       ),
     ).toBe(false);
   });
@@ -335,8 +335,8 @@ describe("User Group and Query Membership Tests", () => {
     expect(
       updatedQueries.items.some(
         (query) =>
-          query.query_id === TEST_QUERY_1_ID &&
-          query.groupAssignments?.some((q) => q.is_member),
+          query.queryId === TEST_QUERY_1_ID &&
+          query.groupAssignments?.some((q) => q.isMember),
       ),
     ).toBe(false);
   });
@@ -362,9 +362,9 @@ describe("User Group and Query Membership Tests", () => {
   });
 
   test("should not remove non-existent query from group", async () => {
-    const INVALID_QUERY_ID = "99999999-9999-9999-9999-999999999999";
+    const INVALID_queryId = "99999999-9999-9999-9999-999999999999";
     const result = await removeQueriesFromGroup(TEST_GROUP_ID, [
-      INVALID_QUERY_ID,
+      INVALID_queryId,
     ]);
 
     expect(result.items).toEqual([]);

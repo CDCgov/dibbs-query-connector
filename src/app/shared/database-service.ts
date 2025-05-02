@@ -35,6 +35,7 @@ import type { DibbsValueSet } from "../models/entities/valuesets";
 import { Concept } from "../models/entities/concepts";
 import { transaction } from "@/app/backend/dbServices/decorators";
 import { auditable } from "@/app/backend/auditLogs/decorator";
+import dbService from "../backend/dbServices/db-service";
 
 type ErsdOrVsacResponse = Bundle | Parameters | OperationOutcome;
 
@@ -50,7 +51,7 @@ class DatabaseService {
   `;
 
   private static getValueSetsByConditionIds = `
-    SELECT c.display, c.code_system, c.code, vs.name as valueset_name, vs.id as valueset_id, vs.oid as valueset_external_id, vs.version, vs.author as author, vs.type, vs.dibbs_concept_type as dibbs_concept_type, ctvs.condition_id
+    SELECT c.display, c.code_system, c.code, vs.name as valueset_name, vs.id as valueset_id, vs.oid as valueset_external_id, vs.version, vs.author as author, vs.type, vs.dibbs_concept_type as dibbs_concept_type, vs.user_created as user_created, ctvs.condition_id
     FROM valuesets vs 
     LEFT JOIN condition_to_valueset ctvs on vs.id = ctvs.valueset_id 
     LEFT JOIN valueset_to_concept vstc on vs.id = vstc.valueset_id
@@ -70,7 +71,7 @@ class DatabaseService {
     const values = [name];
 
     try {
-      const result = await DatabaseService.dbClient.query(
+      const result = await dbService.query(
         DatabaseService.getQuerybyNameSQL,
         values,
       );
@@ -359,6 +360,7 @@ class DatabaseService {
             (struct as ValuesetStruct).author,
             (struct as ValuesetStruct).type,
             (struct as ValuesetStruct).dibbs_concept_type,
+            (struct as ValuesetStruct).user_created,
           ];
           break;
         case "concepts":
@@ -427,7 +429,9 @@ class DatabaseService {
       } catch (e) {
         console.error(`Insert failed for ${insertType}:`, e);
         errors.push(
-          `Insert failed for ${insertType}: ${e instanceof Error ? e.message : String(e)}`,
+          `Insert failed for ${insertType}: ${
+            e instanceof Error ? e.message : String(e)
+          }`,
         );
       }
     }
@@ -605,6 +609,7 @@ class DatabaseService {
       vs.author,
       vs.dibbsConceptType,
       vs.dibbsConceptType,
+      vs.userCreated ?? false,
     ];
     return DatabaseService.dbClient.query(insertValueSetSql, valuesArray);
   }

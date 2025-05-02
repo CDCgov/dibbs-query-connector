@@ -1,7 +1,12 @@
 "use server";
 
 import { QueryResult } from "pg";
-import { User, UserRole, UserGroup } from "../models/entities/users";
+import {
+  User,
+  UserRole,
+  UserGroup,
+  UserGroupMembership,
+} from "../models/entities/users";
 import { QCResponse } from "../models/responses/collections";
 import dbService from "./dbServices/db-service";
 import { adminRequired, superAdminRequired } from "./dbServices/decorators";
@@ -48,7 +53,7 @@ class UserManagementService {
   }) {
     if (!userToken || !userToken.username) {
       console.error("Invalid user token. Cannot add user.");
-      return;
+      return { user: undefined };
     }
 
     const { username, email, firstName, lastName } = userToken;
@@ -56,7 +61,7 @@ class UserManagementService {
 
     try {
       console.log("Checking if user exists.");
-      const checkUserQuery = `SELECT id, username FROM users WHERE username = $1;`;
+      const checkUserQuery = `SELECT id, username, qc_Role, first_name, last_name FROM users WHERE username = $1;`;
       const userExists = await dbService.query(checkUserQuery, [
         userIdentifier,
       ]);
@@ -84,7 +89,7 @@ class UserManagementService {
       ]);
 
       console.log("User added to users:", result.rows[0].id);
-      return result.rows[0];
+      return { user: result.rows[0] };
     } catch (error) {
       console.error("Error adding user to users:", error);
       throw error;
@@ -354,12 +359,13 @@ class UserManagementService {
 
     const result = await dbService.query(query, [userId]);
 
-    const memberships = result.rows.map((row) => {
+    const memberships: UserGroupMembership[] = result.rows.map((row) => {
+      const { membershipId, usergroupId, usergroupName } = row;
       return {
-        membership_id: row.membershipId,
-        usergroup_id: row.usergroupId,
-        usergroup_name: row.usergroupName,
-        is_member: true,
+        membershipId,
+        usergroupId,
+        usergroupName,
+        isMember: true,
       };
     });
 
@@ -414,10 +420,10 @@ class UserManagementService {
       qcRole: row.qcRole,
       userGroupMemberships: [
         {
-          membership_id: row.membershipId,
-          usergroup_id: groupId,
-          usergroup_name: row.groupName,
-          is_member: row.isMember,
+          membershipId: row.membershipId,
+          usergroupId: groupId,
+          usergroupName: row.groupName,
+          isMember: row.isMember,
         },
       ],
     }));

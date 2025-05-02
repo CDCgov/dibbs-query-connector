@@ -13,12 +13,12 @@ import {
 } from "@/app/shared/constants";
 import {
   patientDiscoveryQuery,
-  PatientDiscoveryRequest,
   PatientDiscoveryResponse,
-} from "@/app/shared/query-service";
+} from "@/app/backend/query-execution";
 import styles from "../searchForm/searchForm.module.scss";
 import { FormatPhoneAsDigits } from "@/app/shared/format-service";
 import TitleBox from "../stepIndicator/TitleBox";
+import { PatientDiscoveryRequest } from "@/app/models/entities/query";
 
 interface SearchFormProps {
   setPatientDiscoveryQueryResponse: (
@@ -61,15 +61,24 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
   const [autofilled, setAutofilled] = useState(false); // boolean indicating if the form was autofilled, changes color if true
 
   // Fills fields with sample data based on the selected
-  const fillFields = useCallback((highlightAutofilled = true) => {
-    setFirstName(hyperUnluckyPatient.FirstName);
-    setLastName(hyperUnluckyPatient.LastName);
-    setDOB(hyperUnluckyPatient.DOB);
-    setMRN(hyperUnluckyPatient.MRN);
-    setPhone(hyperUnluckyPatient.Phone);
-    setFhirServer(hyperUnluckyPatient.FhirServer as string);
-    setAutofilled(highlightAutofilled);
-  }, []);
+  const fillFields = useCallback(
+    (highlightAutofilled = true) => {
+      const defaultFhirServer = fhirServers.includes(
+        hyperUnluckyPatient.FhirServer,
+      )
+        ? hyperUnluckyPatient.FhirServer
+        : fhirServers[0];
+
+      setFirstName(hyperUnluckyPatient.FirstName);
+      setLastName(hyperUnluckyPatient.LastName);
+      setDOB(hyperUnluckyPatient.DOB);
+      setMRN(hyperUnluckyPatient.MRN);
+      setPhone(hyperUnluckyPatient.Phone);
+      setFhirServer(defaultFhirServer);
+      setAutofilled(highlightAutofilled);
+    },
+    [fhirServers],
+  );
 
   const nameRegex = "^[A-Za-z\u00C0-\u024F\u1E00-\u1EFF\\-'. ]+$";
   const nameRuleHint =
