@@ -15,6 +15,7 @@ import {
   INTENTIONAL_EMPTY_STRING_FOR_GEM_CODE,
 } from "./constants";
 import type { DibbsValueSet } from "../models/entities/valuesets";
+import crypto from "crypto";
 
 export class UserCreatedValuesetService {
   private static get dbClient() {
@@ -42,6 +43,7 @@ export class UserCreatedValuesetService {
         "User-Created",
       ]);
     }
+    // TODO: We may need to also load custom code conditions to have all existing valuesets, with their inclusion set to false; this might be the easiet way to carry a custom code tied to a new query back to the custom query screen
     return conditionId;
   }
 
@@ -68,7 +70,7 @@ export class UserCreatedValuesetService {
       await UserCreatedValuesetService.dbClient.query(insertValueSetSql, [
         valueSetUniqueId,
         valueSetOid, // I'm not sure if this is something we need to track
-        vs.valueSetVersion, // I'm not sure if this is something we need to track
+        vs.valueSetVersion, // I'm not sure if this is something we need to track, could be a timestamp or an optional user param for them to track versioning
         vs.valueSetName,
         userId, // should be a user ID of the current user
         vs.ersdConceptType ?? vs.dibbsConceptType,
@@ -82,6 +84,7 @@ export class UserCreatedValuesetService {
 
     // Insert Concepts and Linkages
     for (const concept of vs.concepts) {
+      // TODO: We will need to do an UPDATE display if system prefix and code already exist
       const conceptId = `${systemPrefix}_${concept.code}`;
       try {
         await UserCreatedValuesetService.dbClient.query(insertConceptSql, [
