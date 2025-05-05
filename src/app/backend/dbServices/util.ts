@@ -28,3 +28,56 @@ export function translateSnakeStringToCamelCase(str: string) {
     return letter.toUpperCase();
   });
 }
+
+/**
+ * Utility function that camel cases the keys of objects, handling nested objects
+ * as well
+ * @param obj - the object to format
+ * @param seen - Weekset to protect against circular references
+ * @returns An object whose keys are camel cased
+ */
+export function translateNestedObjectKeysIntoCamelCase(
+  obj: object,
+  seen: WeakSet<object> = new WeakSet(),
+): object {
+  if (obj === null || typeof obj !== "object") {
+    return obj;
+  }
+
+  // guard against arrays
+  if (Array.isArray(obj)) {
+    return obj.map((item) =>
+      typeof item === "object" && item !== null
+        ? translateNestedObjectKeysIntoCamelCase(item, seen)
+        : item,
+    );
+  }
+
+  // Prevent circular references
+  if (seen.has(obj)) {
+    return obj;
+  }
+  seen.add(obj);
+
+  const formatedObj: Record<string, unknown> = {};
+  Object.entries(obj).forEach(([k, v]) => {
+    let valueToSet = v;
+
+    if (typeof v === "string") {
+      try {
+        const parsedObject = JSON.parse(v);
+        if (parsedObject && typeof parsedObject === "object") {
+          valueToSet = JSON.stringify(
+            translateNestedObjectKeysIntoCamelCase(parsedObject),
+          );
+        }
+      } catch {}
+    } else if (typeof v === "object" && v !== null) {
+      valueToSet = translateNestedObjectKeysIntoCamelCase(v);
+    }
+
+    formatedObj[translateSnakeStringToCamelCase(k)] = valueToSet;
+  });
+
+  return formatedObj;
+}

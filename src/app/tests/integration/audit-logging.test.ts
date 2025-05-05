@@ -21,6 +21,9 @@ import {
   logSignInToAuditTable,
   signOut,
 } from "@/app/backend/session-management";
+
+import * as AuditableDecorators from "@/app/backend/auditLogs/lib";
+import { waitFor } from "@testing-library/dom";
 const dbClient = getDbClient();
 
 jest.mock("@/app/backend/auditLogs/lib", () => {
@@ -102,9 +105,7 @@ describe("audit log", () => {
     const newAuditRows = await dbService.query(GET_ALL_AUDIT_ROWS);
     const auditEntry = newAuditRows.rows.filter((r) => {
       return (
-        r.author === TEST_USER.user.username &&
-        r.actionType === actionTypeToCheck &&
-        !oldAuditIds.includes(r.id)
+        r.author === TEST_USER.user.username && !oldAuditIds.includes(r.id)
       );
     })[0];
 
@@ -120,82 +121,26 @@ describe("audit log", () => {
     );
   });
 
-  it("sign out should generate an audit entry", async () => {
-    const allAuditRows = await dbService.query(GET_ALL_AUDIT_ROWS);
-    const oldAuditIds = allAuditRows.rows.map((r) => r.id);
-
-    await signOut();
-
-    const actionTypeToCheck = "auditableSignOut";
-    const newAuditRows = await dbService.query(GET_ALL_AUDIT_ROWS);
-    const auditEntry = newAuditRows.rows.filter((r) => {
-      return (
-        r.author === TEST_USER.user.username &&
-        r.actionType === actionTypeToCheck &&
-        !oldAuditIds.includes(r.id)
-      );
-    })[0];
-    const userInfo = JSON.parse(auditEntry?.auditMessage?.sessionParams).session
-      .user;
-
-    expect(auditEntry?.actionType).toBe(actionTypeToCheck);
-    expect(userInfo.username).toBe(TEST_USER.user.username);
-    expect(userInfo.firstName).toBe(TEST_USER.user.firstName);
-    expect(userInfo.lastName).toBe(TEST_USER.user.lastName);
-  });
-
-  it("sign in should generate an audit entry", async () => {
-    const allAuditRows = await dbService.query(GET_ALL_AUDIT_ROWS);
-    const oldAuditIds = allAuditRows.rows.map((r) => r.id);
-
-    await logSignInToAuditTable({
-      preferred_username: TEST_USER.user.username,
-      given_name: TEST_USER.user.firstName,
-      family_name: TEST_USER.user.lastName,
-    });
-
-    const actionTypeToCheck = "auditableSignIn";
-    const newAuditRows = await dbService.query(GET_ALL_AUDIT_ROWS);
-    const auditEntry = newAuditRows.rows.filter((r) => {
-      return (
-        r.author === TEST_USER.user.username &&
-        r.actionType === actionTypeToCheck &&
-        !oldAuditIds.includes(r.id)
-      );
-    })[0];
-    const userInfo = JSON.parse(auditEntry?.auditMessage?.profile);
-
-    expect(auditEntry?.actionType).toBe(actionTypeToCheck);
-    expect(userInfo.preferred_username).toBe(TEST_USER.user.username);
-    expect(userInfo.given_name).toBe(TEST_USER.user.firstName);
-    expect(userInfo.family_name).toBe(TEST_USER.user.lastName);
-  });
-
   it("an audited function should retry successfully", async () => {
     const auditGenerationSpy = jest.spyOn(
       DecoratorUtils,
       "generateAuditValues",
     );
-
     const querySpy = jest.spyOn(dbClient, "query");
-
     // generate errors within the query write AUDIT_LOG_MAX_RETRIES - 1 times
     for (let i = 0; i < AUDIT_LOG_MAX_RETRIES; i++) {
       querySpy.mockImplementationOnce(() => {
         throw new Error("test error");
       });
     }
-
     class MockClass {
       @auditable
       testFunction() {
         return;
       }
     }
-
     const testObj = new MockClass();
     testObj.testFunction();
-
     await new Promise((r) => setTimeout(r, 6000));
     expect(auditGenerationSpy).toHaveBeenCalledTimes(AUDIT_LOG_MAX_RETRIES);
   }, 10000);
@@ -209,23 +154,88 @@ describe("audit log", () => {
       mrn: hyperUnluckyPatient.MRN,
       phone: hyperUnluckyPatient.Phone,
     };
-
     await patientDiscoveryQuery(request);
-
     const result = await dbClient.query(
       "SELECT * FROM audit_logs ORDER BY created_at DESC LIMIT 1",
     );
     const insertedId = result.rows[0].id;
-
     await expect(
       dbClient.query(`UPDATE audit_logs SET author = 'hacker' WHERE id = $1`, [
         insertedId,
       ]),
     ).rejects.toThrow(/UPDATEs to audit_logs are not permitted/i);
-
     await expect(
       dbClient.query(`DELETE FROM audit_logs WHERE id = $1`, [insertedId]),
     ).rejects.toThrow(/DELETEs from audit_logs are not permitted/i);
+  });
+});
+
+describe("sign in and out", () => {
+  it("sign out should generate an audit entry", async () => {
+    const auditCompletionSpy = jest.spyOn(
+      AuditableDecorators,
+      "generateAuditSuccessMessage",
+    );
+    const allAuditRows = await dbService.query(GET_ALL_AUDIT_ROWS);
+    const oldAuditIds = allAuditRows.rows.map((r) => r.id);
+
+    await signOut();
+    await waitFor(() => {
+      expect(auditCompletionSpy).toHaveBeenCalled();
+    });
+
+    const actionTypeToCheck = "auditableSignOut";
+    const newAuditRows = await dbService.query(GET_ALL_AUDIT_ROWS);
+    const auditEntry = newAuditRows.rows.filter((r) => {
+      return (
+        r.author === TEST_USER.user.username && !oldAuditIds.includes(r.id)
+      );
+    })[0];
+    const userInfo = JSON.parse(auditEntry?.auditMessage?.sessionParams).session
+      .user;
+
+    expect(auditEntry?.actionType).toBe(actionTypeToCheck);
+    expect(userInfo.username).toBe(TEST_USER.user.username);
+    expect(userInfo.firstName).toBe(TEST_USER.user.firstName);
+    expect(userInfo.lastName).toBe(TEST_USER.user.lastName);
+  });
+
+  it("sign in should generate an audit entry", async () => {
+    const auditCompletionSpy = jest.spyOn(
+      AuditableDecorators,
+      "generateAuditSuccessMessage",
+    );
+
+    const allAuditRows = await dbService.query(GET_ALL_AUDIT_ROWS);
+    const oldAuditIds = allAuditRows.rows.map((r) => r.id);
+
+    await logSignInToAuditTable({
+      preferred_username: TEST_USER.user.username,
+      given_name: TEST_USER.user.firstName,
+      family_name: TEST_USER.user.lastName,
+    });
+    const actionTypeToCheck = "auditableSignIn";
+    await waitFor(() => {
+      expect(auditCompletionSpy).toHaveBeenCalled();
+    });
+
+    const newAuditRows = await dbService.query(GET_ALL_AUDIT_ROWS);
+
+    const auditResults = newAuditRows.rows.filter((r) => {
+      return (
+        r.author === TEST_USER.user.username &&
+        r.actionType === actionTypeToCheck &&
+        !oldAuditIds.includes(r.id)
+      );
+    });
+
+    const auditEntry = auditResults[0];
+    const userInfo = JSON.parse(auditEntry?.auditMessage?.profile);
+
+    expect(auditEntry?.actionType).toBe(actionTypeToCheck);
+    expect(userInfo.preferredUsername).toBe(TEST_USER.user.username);
+    expect(userInfo.givenName).toBe(TEST_USER.user.firstName);
+    expect(userInfo.familyName).toBe(TEST_USER.user.lastName);
   });
 });
 

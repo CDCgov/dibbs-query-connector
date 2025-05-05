@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { getDbClient } from "../dbClient";
-import { generateAuditValues } from "./lib";
+import { generateAuditSuccessMessage, generateAuditValues } from "./lib";
 
 export const AUDIT_LOG_MAX_RETRIES = 3;
 /**
@@ -35,22 +35,28 @@ export function auditable(
     const attemptWrite = (retryCounter: number): Promise<void> => {
       return generateAuditValues(key, argLabels, args)
         .then(
-          async ([author, methodName, auditMessage, timestamp, checksum]) => {
-            console.log(auditMessage);
-
+          async ([
+            author,
+            methodName,
+            auditMessage,
+            timestamp,
+            auditChecksum,
+          ]) => {
             const result = await dbConnection.query(insertQuery, [
               author,
               methodName,
               auditMessage,
               timestamp,
-              checksum,
+              auditChecksum,
             ]);
 
             const insertedRow = result.rows[0];
-
-            console.info(
-              `${insertedRow.action_type} audit action with id ${insertedRow.id} and checksum ${insertedRow.audit_checksum} added to audit table`,
+            const successMessage = generateAuditSuccessMessage(
+              insertedRow.action_type,
+              insertedRow.id,
+              auditChecksum as string,
             );
+            console.info(successMessage);
             return;
           },
         )
