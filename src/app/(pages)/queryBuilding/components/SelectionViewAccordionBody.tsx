@@ -162,7 +162,11 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
             <div onClick={(e) => e.stopPropagation()}>
               <Checkbox
                 className={styles.valueSetTemplate__checkbox}
-                label=""
+                label={checkboxLabel(
+                  dibbsVs,
+                  tableSearchFilter,
+                  areItemsFiltered,
+                )}
                 onChange={(e: ChangeEvent<HTMLInputElement>) => {
                   handleBulkToggle(e, isMinusState);
                 }}
@@ -172,7 +176,6 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
                 data-testid={`selectValueset-${dibbsVs.valueSetId}`}
               />
             </div>
-            {checkboxLabel(dibbsVs, tableSearchFilter, areItemsFiltered)}
           </>
         );
         return (

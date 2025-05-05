@@ -326,6 +326,7 @@
   background-color: #fff;
   display: flex;
   justify-content: space-between;
+  cursor: pointer;
 }
 
 .accordionBodyExpanded {
@@ -334,13 +335,21 @@
     align-items: center;
     gap: 1rem;
   }
-    
+
   &:hover {
     background-color: rgba(217, 232, 246, 0.5) !important;
 
     .valueSetTemplate__checkbox {
       background-color: unset;
     }
+    .valueSetTemplate__checkbox:hover {
+      label::before {
+        outline: 0.25rem solid $hover-active;
+        outline-offset: 0.25rem;
+        border-radius: 0.05rem;
+      }
+    }
+
     .viewCodesBtn {
       display: block;
       text-align: right;
@@ -363,6 +372,7 @@
 
 div.accordionBodyExpanded:last-of-type {
   border-bottom: 1px #dfe1e2 solid;
+  width: 100%;
 
   .accordionExpandedInner {
     border-bottom: none !important;
