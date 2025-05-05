@@ -1,5 +1,6 @@
 import { QueryTableResult } from "./utils";
 import { CustomUserQuery } from "@/app/models/entities/query";
+import { DibbsValueSet } from "@/app/models/entities/valuesets";
 
 // Fixture shortened significantly for maintenance purposes
 export const DEFAULT_QUERIES: CustomUserQuery[] = [
@@ -737,3 +738,42 @@ export const gonorrheaSavedQuery: QueryTableResult = {
   },
   immunization: false,
 };
+
+export const mockDibbsValueSets: DibbsValueSet[] = [
+  {
+    valueSetId: "1",
+    valueSetName: "Mock Lab",
+    valueSetVersion: "1",
+    valueSetExternalId: "1",
+    author: "Testing Fixtures",
+    system: "http://test.com/test",
+    dibbsConceptType: "labs",
+    includeValueSet: false,
+    concepts: [],
+    userCreated: false,
+  },
+  {
+    valueSetId: "2",
+    valueSetName: "Mock Condition",
+    valueSetVersion: "2",
+    valueSetExternalId: "2",
+    author: "Testing Fixtures",
+    system: "http://test.com/test",
+    dibbsConceptType: "conditions",
+    includeValueSet: true,
+    concepts: [],
+    userCreated: false,
+  },
+  {
+    valueSetId: "3",
+    valueSetName: "Mock Medication",
+    valueSetVersion: "3",
+    valueSetExternalId: "3",
+    author: "Testing Fixtures",
+    system: "http://test.com/test",
+    dibbsConceptType: "medications",
+    includeValueSet: false,
+    concepts: [],
+    userCreated: true,
+  },
+];

@@ -19,6 +19,7 @@ export const formatSystem = (system: string) => {
       return result.toLocaleUpperCase();
 
     case "www":
+    case "cap":
       const rxArr = system.split("/");
       return rxArr[rxArr?.length - 1].toLocaleUpperCase();
 
