@@ -1,6 +1,4 @@
 import { auth } from "@/auth";
-import { Bundle, BundleEntry, Patient } from "fhir/r4";
-import { readJsonFile } from "../shared_utils/readJsonFile";
 import { hyperUnluckyPatient, USE_CASE_DETAILS } from "@/app/shared/constants";
 import {
   patientDiscoveryQuery,
@@ -19,6 +17,10 @@ import {
 } from "@/app/models/entities/query";
 import dbService from "@/app/backend/dbServices/db-service";
 import { getDbClient } from "@/app/backend/dbClient";
+import {
+  logSignInToAuditTable,
+  signOut,
+} from "@/app/backend/session-management";
 const dbClient = getDbClient();
 
 jest.mock("@/app/backend/auditLogs/lib", () => {
@@ -48,15 +50,6 @@ const TEST_USER = {
   },
 };
 (auth as jest.Mock).mockResolvedValue(TEST_USER);
-
-const PatientBundle = readJsonFile("./src/app/tests/assets/BundlePatient.json");
-const PatientResource: Patient | undefined = (
-  (PatientBundle as Bundle).entry as BundleEntry[]
-)[0]?.resource as Patient;
-
-if (!PatientResource || PatientResource.resourceType !== "Patient") {
-  throw new Error("Invalid Patient resource in the test bundle.");
-}
 
 const GET_ALL_AUDIT_ROWS = "SELECT * FROM audit_logs;";
 describe("audit log", () => {
@@ -125,6 +118,57 @@ describe("audit log", () => {
     expect(JSON.parse(auditEntry?.auditMessage?.queryData)).toStrictEqual(
       DEFAULT_CHLAMYDIA_QUERY.queryData,
     );
+  });
+
+  it("sign out should generate an audit entry", async () => {
+    const allAuditRows = await dbService.query(GET_ALL_AUDIT_ROWS);
+    const oldAuditIds = allAuditRows.rows.map((r) => r.id);
+
+    await signOut();
+
+    const actionTypeToCheck = "auditableSignOut";
+    const newAuditRows = await dbService.query(GET_ALL_AUDIT_ROWS);
+    const auditEntry = newAuditRows.rows.filter((r) => {
+      return (
+        r.author === TEST_USER.user.username &&
+        r.actionType === actionTypeToCheck &&
+        !oldAuditIds.includes(r.id)
+      );
+    })[0];
+    const userInfo = JSON.parse(auditEntry?.auditMessage?.sessionParams).session
+      .user;
+
+    expect(auditEntry?.actionType).toBe(actionTypeToCheck);
+    expect(userInfo.username).toBe(TEST_USER.user.username);
+    expect(userInfo.firstName).toBe(TEST_USER.user.firstName);
+    expect(userInfo.lastName).toBe(TEST_USER.user.lastName);
+  });
+
+  it("sign in should generate an audit entry", async () => {
+    const allAuditRows = await dbService.query(GET_ALL_AUDIT_ROWS);
+    const oldAuditIds = allAuditRows.rows.map((r) => r.id);
+
+    await logSignInToAuditTable({
+      preferred_username: TEST_USER.user.username,
+      given_name: TEST_USER.user.firstName,
+      family_name: TEST_USER.user.lastName,
+    });
+
+    const actionTypeToCheck = "auditableSignIn";
+    const newAuditRows = await dbService.query(GET_ALL_AUDIT_ROWS);
+    const auditEntry = newAuditRows.rows.filter((r) => {
+      return (
+        r.author === TEST_USER.user.username &&
+        r.actionType === actionTypeToCheck &&
+        !oldAuditIds.includes(r.id)
+      );
+    })[0];
+    const userInfo = JSON.parse(auditEntry?.auditMessage?.profile);
+
+    expect(auditEntry?.actionType).toBe(actionTypeToCheck);
+    expect(userInfo.preferred_username).toBe(TEST_USER.user.username);
+    expect(userInfo.given_name).toBe(TEST_USER.user.firstName);
+    expect(userInfo.family_name).toBe(TEST_USER.user.lastName);
   });
 
   it("an audited function should retry successfully", async () => {

@@ -36,6 +36,8 @@ export function auditable(
       return generateAuditValues(key, argLabels, args)
         .then(
           async ([author, methodName, auditMessage, timestamp, checksum]) => {
+            console.log(auditMessage);
+
             const result = await dbConnection.query(insertQuery, [
               author,
               methodName,
