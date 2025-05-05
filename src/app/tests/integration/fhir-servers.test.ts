@@ -20,6 +20,7 @@ const TEST_FHIR_SERVER = {
   headers: null,
   lastConnectionSuccessful: true,
   disableCertValidation: false,
+  defaultServer: false,
 };
 
 const DEFAULT_FHIR_SERVER_LENGTH = 10;
@@ -46,6 +47,8 @@ describe("FHIR Servers tests", () => {
       TEST_FHIR_SERVER.lastConnectionSuccessful,
       {},
       TEST_FHIR_SERVER.disableCertValidation,
+      TEST_FHIR_SERVER.defaultServer,
+
       "none",
       null,
       null,
