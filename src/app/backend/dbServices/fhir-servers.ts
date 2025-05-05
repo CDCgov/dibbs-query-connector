@@ -320,16 +320,33 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
     }
   }
 
-  static async prepareFhirClient(fhirServer: string) {
+  static async prepareFhirClient(serverName: string) {
     if (FhirServerConfigService.cachedFhirServerConfigs === null) {
       FhirServerConfigService.cachedFhirServerConfigs =
         await super.getFhirServerConfigs();
     }
 
-    return new FHIRClient(
-      fhirServer,
-      FhirServerConfigService.cachedFhirServerConfigs,
+    let config = FhirServerConfigService.cachedFhirServerConfigs.find(
+      (c) => c.name === serverName,
     );
+
+    if (!config) {
+      // fallback retry in case we have a cache miss
+      FhirServerConfigService.cachedFhirServerConfigs =
+        await super.getFhirServerConfigs();
+      const followupConfig =
+        FhirServerConfigService.cachedFhirServerConfigs.find(
+          (c) => c.name === serverName,
+        );
+
+      if (!followupConfig)
+        throw Error(`No server config found for ${serverName}`);
+      else {
+        config = followupConfig;
+      }
+    }
+
+    return new FHIRClient(config);
   }
 }
 
