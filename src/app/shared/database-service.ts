@@ -579,7 +579,8 @@ class DatabaseService {
     FROM valuesets vs 
     LEFT JOIN condition_to_valueset ctvs on vs.id = ctvs.valueset_id 
     LEFT JOIN valueset_to_concept vstc on vs.id = vstc.valueset_id
-    LEFT JOIN concepts c on vstc.concept_id = c.id;
+    LEFT JOIN concepts c on vstc.concept_id = c.id
+    ORDER BY name ASC;
   `;
 
       const result = await DatabaseService.dbClient.query(selectAllVSQuery);

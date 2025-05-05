@@ -186,14 +186,17 @@ const CodeLibrary: React.FC = () => {
   };
 
   const formatValueSetDetails = (vs: DibbsValueSet) => {
+    // extracts the system name from its url
     const system = formatSystem(vs.system) || "";
 
+    // capitalizes the first letter and removes the last 's' from the type
     const conceptType = vs.dibbsConceptType
-      ? `${formatStringToSentenceCase(vs.dibbsConceptType)} ${
+      ? `${formatStringToSentenceCase(vs.dibbsConceptType).slice(0, -1)} ${
           !!system ? " • " : ""
         }`
       : "";
 
+    // matches conditionId to its string value and strips (disease) from the end of the name
     const condition = vs.conditionId
       ? `${formatConditionDisplay(vs.conditionId)} ${
           !!conceptType ? " • " : ""
