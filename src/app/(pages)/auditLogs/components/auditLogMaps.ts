@@ -57,7 +57,7 @@ function resolveFullName(
   fallback?: string,
 ): string {
   const full = `${first ?? ""} ${last ?? ""}`.trim();
-  return full !== "" ? full : (fallback ?? "");
+  return full !== "" ? full : fallback ?? "";
 }
 
 /**
@@ -162,7 +162,7 @@ export const auditLogActionTypeMap: Record<string, auditLogActionTypeMapping> =
       label: "User sign in",
       format: (log) => {
         const request = parseRequest(log) as { profile: Profile };
-        const username = request?.profile.preferred_username;
+        const username = request?.profile.preferredUsername;
         return `Sign in of user with username ${username}`;
       },
     },
@@ -170,7 +170,8 @@ export const auditLogActionTypeMap: Record<string, auditLogActionTypeMapping> =
       label: "User configured",
       format: (log) => {
         const request = parseRequest(log);
-        const username = Object.values(request)[0];
+        const username = (Object.values(request)[0] as { username: string })
+          ?.username;
         return `User configured with username ${username}`;
       },
     },

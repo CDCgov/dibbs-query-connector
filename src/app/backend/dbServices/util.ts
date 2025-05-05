@@ -41,6 +41,7 @@ export function translateNestedObjectKeysIntoCamelCase(
   seen: WeakSet<object> = new WeakSet(),
 ): object {
   if (obj === null || typeof obj !== "object") {
+    console.log("in term: ", obj);
     return obj;
   }
 
@@ -72,12 +73,20 @@ export function translateNestedObjectKeysIntoCamelCase(
           );
         }
       } catch {}
-    } else if (typeof v === "object" && v !== null) {
-      valueToSet = translateNestedObjectKeysIntoCamelCase(v);
+    } else if (isPlainObject(v)) {
+      valueToSet = translateNestedObjectKeysIntoCamelCase(v, seen);
     }
 
     formatedObj[translateSnakeStringToCamelCase(k)] = valueToSet;
   });
 
   return formatedObj;
+}
+
+function isPlainObject(obj: unknown): obj is Record<string, unknown> {
+  return (
+    typeof obj === "object" &&
+    obj !== null &&
+    Object.getPrototypeOf(obj) === Object.prototype
+  );
 }

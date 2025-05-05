@@ -34,7 +34,6 @@ class SessionManagementService extends SessionManagementServiceAuditables {
   }
 
   static async signIn(...args: NextAuthSignInParams) {
-    console.log("in service class");
     return await nextAuthSignIn(...args);
   }
 }
