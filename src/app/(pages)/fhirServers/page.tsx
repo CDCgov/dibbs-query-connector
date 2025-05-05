@@ -470,12 +470,17 @@ const FhirServers: React.FC = () => {
             {fhirServers
               .slice()
               .sort((a, b) =>
+                a.name.localeCompare(b.name, undefined, {
+                  sensitivity: "base",
+                }),
+              ) // Sort by name
+              .sort((a, b) =>
                 b.defaultServer === true
                   ? 1
                   : a.defaultServer === true
                     ? -1
                     : 0,
-              )
+              ) // Sort default server to the top
               .map((fhirServer) => (
                 <tr
                   key={fhirServer.id}
