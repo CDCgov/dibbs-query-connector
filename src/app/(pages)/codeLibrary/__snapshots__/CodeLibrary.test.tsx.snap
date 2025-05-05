@@ -396,7 +396,7 @@ exports[`Code library rendered view renders concept codes for the value set when
                             <span
                               class=""
                             >
-                              Cancer (Leukemia)  •   Labs  •  http://cap.org/eCC
+                              Cancer (Leukemia)  •   Lab  •  ECC
                             </span>
                           </span>
                         </div>
@@ -440,7 +440,7 @@ exports[`Code library rendered view renders concept codes for the value set when
                             <span
                               class=""
                             >
-                              Gonorrhea  •   Medications  •  RXNORM
+                              Gonorrhea  •   Medication  •  RXNORM
                             </span>
                           </span>
                         </div>
@@ -794,7 +794,7 @@ exports[`Code library rendered view renders the correct content 1`] = `
                             <span
                               class=""
                             >
-                              Cancer (Leukemia)  •   Labs  •  http://cap.org/eCC
+                              Cancer (Leukemia)  •   Lab  •  ECC
                             </span>
                           </span>
                         </div>
@@ -838,7 +838,7 @@ exports[`Code library rendered view renders the correct content 1`] = `
                             <span
                               class=""
                             >
-                              Gonorrhea  •   Medications  •  RXNORM
+                              Gonorrhea  •   Medication  •  RXNORM
                             </span>
                           </span>
                         </div>
