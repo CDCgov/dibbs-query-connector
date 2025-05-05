@@ -5,8 +5,8 @@ on:
     branches:
       - main
     paths:
-      - "query-connector/Dockerfile.keycloak"
-      - "query-connector/keycloak/**"
+      - "Dockerfile.keycloak"
+      - "keycloak/**"
   workflow_dispatch:
 
 concurrency:
@@ -44,8 +44,8 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v3
         with:
-          context: ./query-connector
-          file: ./query-connector/Dockerfile.keycloak
+          context: .
+          file: ./Dockerfile.keycloak
           push: true
           tags: |
             ghcr.io/${{ env.REPO }}/keycloak:main, ghcr.io/${{ env.REPO }}/keycloak:latest
