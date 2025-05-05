@@ -18,7 +18,7 @@ import type { DibbsValueSet } from "../models/entities/valuesets";
 import crypto from "crypto";
 import dbService from "@/app/backend/dbServices/db-service";
 
-export class UserCreatedValuesetService {
+class UserCreatedValuesetService {
   private static get dbClient() {
     return getDbClient();
   }

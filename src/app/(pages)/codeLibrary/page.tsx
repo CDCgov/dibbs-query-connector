@@ -31,15 +31,15 @@ import { formatStringToSentenceCase } from "@/app/shared/format-service";
 import DropdownFilter, { FilterCategories } from "./DropdownFilter";
 import AddValueSets from "./AddValueSet";
 
+export type CustomCodeMode = "manage" | "select" | "addValueSet";
+
 /**
  * Component for Query Building Flow
  * @returns The Query Building component flow
  */
 const CodeLibrary: React.FC = () => {
-  type Mode = "manage" | "select" | "addValueSet";
-
   const [loading, setLoading] = useState<boolean>(true);
-  const [mode, setMode] = useState<Mode>("addValueSet");
+  const [mode, setMode] = useState<CustomCodeMode>("manage");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
@@ -53,7 +53,6 @@ const CodeLibrary: React.FC = () => {
   const filterCount = Object.values(filterSearch).filter(
     (item) => item !== "",
   ).length;
-
   const [conditionDetailsMap, setConditionsDetailsMap] =
     useState<ConditionsMap>();
   const [valueSets, setValueSets] = useState<DibbsValueSet[]>([]);
@@ -237,7 +236,7 @@ const CodeLibrary: React.FC = () => {
               textToHighlight={formatValueSetDetails(vs)}
             />
             {/* TODO: render based on the user_created column once that is added */}
-            {false && (
+            {vs.userCreated && (
               <Highlighter
                 className={styles.valueSetTable__tableBody_row_customValueSet}
                 highlightClassName="searchHighlight"
@@ -341,7 +340,11 @@ const CodeLibrary: React.FC = () => {
               </div>
             </div>
 
-            <Button type="button" className={styles.button}>
+            <Button
+              type="button"
+              className={styles.button}
+              onClick={() => setMode("addValueSet")}
+            >
               Add value set
             </Button>
           </div>
@@ -518,7 +521,7 @@ const CodeLibrary: React.FC = () => {
           </div>
         </div>
       )}
-      {mode == "addValueSet" && <AddValueSets />}
+      {mode == "addValueSet" && <AddValueSets setMode={setMode} />}
     </WithAuth>
   );
 };
