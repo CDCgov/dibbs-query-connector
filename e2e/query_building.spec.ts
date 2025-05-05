@@ -104,30 +104,29 @@ test.describe("building a new query", () => {
 
     // customize value sets:
     await labsHeader.click();
-    const expandedLabValueSet = page.getByText(
-      CLICKED_CONDITION.sampleLabValueSet,
-      { exact: true },
-    );
-    expect(expandedLabValueSet).toBeVisible();
-    expect(expandedLabValueSet).toBeChecked();
+    const labCheckbox = page
+      .locator(
+        `[data-testid="container-${CLICKED_CONDITION.sampleLabValueSetID}"]`,
+      )
+      .getByRole("checkbox");
+    await expect(labCheckbox).toBeChecked();
 
-    await expandedLabValueSet.click();
-    await expect(expandedLabValueSet).not.toBeChecked();
+    await labCheckbox.click();
+    await expect(labCheckbox).not.toBeChecked();
 
     await medicationsHeader.click();
-    const expandedMedValueSet = page.getByText(
-      CLICKED_CONDITION.sampleMedValueSet,
-      { exact: true },
-    );
-    expect(expandedLabValueSet).not.toBeVisible();
-    expect(expandedMedValueSet).toBeVisible();
-    expect(expandedMedValueSet).toBeChecked();
+    const medCheckbox = page
+      .locator(
+        `[data-testid="container-${CLICKED_CONDITION.sampleMedValueSetID}"]`,
+      )
+      .getByRole("checkbox");
+    await expect(medCheckbox).toBeVisible();
+    await expect(medCheckbox).toBeChecked();
 
     // customize codes:
     const openDrawer = page.getByTestId("drawer-open-true");
     await expect(openDrawer).not.toBeVisible();
 
-    await expandedMedValueSet.hover();
     await page
       .getByTestId(`viewCodes-${CLICKED_CONDITION.sampleMedValueSetID}`)
       .click();
