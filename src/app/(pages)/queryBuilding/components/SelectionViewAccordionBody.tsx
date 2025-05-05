@@ -157,6 +157,24 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
         const isMinusState =
           selectedCount !== totalCount && selectedCount !== 0;
         const checked = selectedCount == totalCount && selectedCount > 0;
+        const checkboxToRender = (
+          <>
+            <div onClick={(e) => e.stopPropagation()}>
+              <Checkbox
+                className={styles.valueSetTemplate__checkbox}
+                label=""
+                onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                  handleBulkToggle(e, isMinusState);
+                }}
+                id={dibbsVs.valueSetId}
+                checked={checked}
+                isMinusState={isMinusState}
+                data-testid={`selectValueset-${dibbsVs.valueSetId}`}
+              />
+            </div>
+            {checkboxLabel(dibbsVs, tableSearchFilter, areItemsFiltered)}
+          </>
+        );
         return (
           <div
             className={styles.accordionBodyExpanded}
@@ -168,20 +186,7 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
           >
             <div className={styles.accordionExpandedInner}>
               <div className={styles.valueSetTemplate__checkboxWrapper}>
-                <div onClick={(e) => e.stopPropagation()}>
-                  <Checkbox
-                    className={styles.valueSetTemplate__checkbox}
-                    label=""
-                    onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                      handleBulkToggle(e, isMinusState);
-                    }}
-                    id={dibbsVs.valueSetId}
-                    checked={checked}
-                    isMinusState={isMinusState}
-                    data-testid={`selectValueset-${dibbsVs.valueSetId}`}
-                  />
-                </div>
-                <div>
+                <div className={styles.valueSetTemplate__checkboxWrapper}>
                   {areItemsFiltered ? (
                     <Tooltip<TooltipWrapperProps>
                       label={`This will only change these ${
@@ -190,21 +195,20 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
                       asCustom={TooltipWrapper}
                       position="left"
                     >
-                      {checkboxLabel(
-                        dibbsVs,
-                        tableSearchFilter,
-                        areItemsFiltered,
-                      )}
+                      {checkboxToRender}
                     </Tooltip>
                   ) : (
-                    checkboxLabel(dibbsVs, tableSearchFilter, areItemsFiltered)
+                    checkboxToRender
                   )}
                 </div>
               </div>
             </div>
 
             <div className={styles.accordionBodyExpanded__right}>
-              <div className={styles.displayCount}>
+              <div
+                className={styles.displayCount}
+                data-testid={`displayCount-${dibbsVs.valueSetId}`}
+              >
                 {selectedCount}/{totalCount}
               </div>
               <div
