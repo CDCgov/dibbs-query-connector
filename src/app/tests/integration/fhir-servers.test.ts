@@ -75,7 +75,7 @@ describe("FHIR Servers tests", () => {
       NEW_NAME,
       NEW_HOSTNAME,
       false,
-      true,
+      false,
     );
     newFhirServers = await getFhirServerConfigs(true);
     const shouldBeUpdated = newFhirServers.find((v) => v.name === NEW_NAME);
