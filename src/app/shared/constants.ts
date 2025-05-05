@@ -45,10 +45,8 @@ export type DemoDataFields = {
   DOB: string;
   MRN: string;
   Phone: string;
-  FhirServer: string;
 };
 
-export const DEFAULT_DEMO_FHIR_SERVER = "Aidbox";
 export const HYPER_UNLUCKY_DEFAULT_ID = "f288c654-6885-4f48-999c-48d776dc06af";
 /*
  * Common "Hyper Unlucky" patient data used for all non-newborn screening use cases
@@ -60,7 +58,6 @@ export const hyperUnluckyPatient: DemoDataFields = {
   DOB: "1975-12-06",
   MRN: "8692756",
   Phone: "517-425-1398",
-  FhirServer: DEFAULT_DEMO_FHIR_SERVER,
 };
 
 /*Labels and values for the state options dropdown on the query page*/

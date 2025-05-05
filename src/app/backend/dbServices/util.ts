@@ -6,6 +6,7 @@ INSERT INTO fhir_servers (
   last_connection_successful,
   headers,
   disable_cert_validation,
+  default_server,
   auth_type,
   client_id,
   client_secret,
@@ -14,7 +15,7 @@ INSERT INTO fhir_servers (
   access_token,
   token_expiry
 )
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
 RETURNING *;
 `;
 

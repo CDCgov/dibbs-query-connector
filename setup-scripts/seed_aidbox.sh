@@ -133,14 +133,16 @@ INSERT INTO fhir_servers (
   headers,
   last_connection_attempt,
   last_connection_successful,
-  disable_cert_validation
+  disable_cert_validation,
+  default_server
 ) VALUES (
   'Aidbox',
   '${BASE_URL}/fhir',
   '{"Authorization": "Bearer ${TOKEN}"}'::jsonb,
   '${CURRENT_DATETIME}'::timestamp,
   true,
-  false
+  false,
+  true
 )
 ON CONFLICT(name)
 DO UPDATE SET
