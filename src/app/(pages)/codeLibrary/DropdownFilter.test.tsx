@@ -1,5 +1,5 @@
-import { act, render, screen, waitFor } from "@testing-library/react";
-import { renderWithUser, RootProviderMock } from "@/app/tests/unit/setup";
+import { render, screen } from "@testing-library/react";
+import { RootProviderMock } from "@/app/tests/unit/setup";
 import { mockDibbsValueSets } from "../queryBuilding/fixtures";
 import DropdownFilter from "./DropdownFilter";
 
