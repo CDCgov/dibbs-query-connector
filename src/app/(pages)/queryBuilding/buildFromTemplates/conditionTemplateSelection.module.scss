@@ -326,6 +326,7 @@
   background-color: #fff;
   display: flex;
   justify-content: space-between;
+  cursor: pointer;
 }
 
 .accordionBodyExpanded {
@@ -334,26 +335,24 @@
     align-items: center;
     gap: 1rem;
   }
-    
-  &:hover {
-    background-color: rgba(217, 232, 246, 0.5) !important;
 
+  &:hover {
     .valueSetTemplate__checkbox {
       background-color: unset;
     }
+    .valueSetTemplate__checkbox:hover {
+      label::before {
+        outline: 0.25rem solid $hover-active;
+        outline-offset: 0.25rem;
+        border-radius: 0.05rem;
+      }
+    }
+
     .viewCodesBtn {
       display: block;
-      text-align: right;
-      width: 4rem;
-      line-height: normal;
-      font-weight: 700;
+      width: 10rem;
       font-size: 14px;
-      color: $text-blue;
-
-      &:hover {
-        cursor: pointer;
-        text-decoration: underline;
-      }
+      margin: 0;
     }
     .displayCount {
       display: none;
@@ -361,8 +360,14 @@
   }
 }
 
+.viewCodesBtn {
+  // toggle to block on hover
+  display: none;
+}
+
 div.accordionBodyExpanded:last-of-type {
   border-bottom: 1px #dfe1e2 solid;
+  width: 100%;
 
   .accordionExpandedInner {
     border-bottom: none !important;
@@ -399,7 +404,6 @@ div.accordionBodyExpanded:last-of-type {
   display: flex;
   align-items: center;
   min-width: 4rem;
-  justify-content: flex-end;
 }
 
 .customQuery__header > h1 {
@@ -411,10 +415,6 @@ div.accordionBodyExpanded:last-of-type {
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-}
-
-.viewCodesBtn {
-  display: none;
 }
 
 .conceptSelectionTable {
