@@ -4,22 +4,8 @@ import {
   updateFhirServer,
   deleteFhirServer,
 } from "@/app/backend/dbServices/fhir-servers";
-import { waitFor } from "@testing-library/dom";
-import * as AuditableDecorators from "@/app/backend/auditLogs/lib";
 import { auth } from "@/auth";
-
-jest.mock("@/app/backend/auditLogs/lib", () => {
-  return {
-    __esModule: true,
-    ...jest.requireActual("@/app/backend/auditLogs/lib"),
-  };
-});
-
-const GET_ALL_AUDIT_ROWS = "SELECT * FROM audit_logs;";
-const auditCompletionSpy = jest.spyOn(
-  AuditableDecorators,
-  "generateAuditSuccessMessage",
-);
+import { GET_ALL_AUDIT_ROWS, waitForAuditSuccess } from "./utils";
 
 // don't export / reuse this test user elsewhere since we're filtering
 // the audit entry results off this user's authorship. Otherwise, the
@@ -57,14 +43,7 @@ describe("fhir server", () => {
       TEST_FHIR_SERVER.lastConnectionSuccessful,
     );
     const actionTypeToCheck = "insertFhirServer";
-
-    await waitFor(() => {
-      expect(auditCompletionSpy).toHaveBeenCalledWith(
-        actionTypeToCheck,
-        expect.anything(),
-        expect.anything(),
-      );
-    });
+    await waitForAuditSuccess(actionTypeToCheck);
 
     const newAuditRows = await dbService.query(GET_ALL_AUDIT_ROWS);
 
@@ -93,13 +72,8 @@ describe("fhir server", () => {
       false,
     );
     const updateTypeToCheck = "updateFhirServer";
-    await waitFor(() => {
-      expect(auditCompletionSpy).toHaveBeenCalledWith(
-        updateTypeToCheck,
-        expect.anything(),
-        expect.anything(),
-      );
-    });
+    await waitForAuditSuccess(updateTypeToCheck);
+
     const updateAuditRows = await dbService.query(GET_ALL_AUDIT_ROWS);
     const updateRows = updateAuditRows.rows.filter((r) => {
       return (
@@ -114,14 +88,8 @@ describe("fhir server", () => {
     // delete
     await deleteFhirServer(result.server.id);
     const finalTypeToCheck = "deleteFhirServer";
+    await waitForAuditSuccess(finalTypeToCheck);
 
-    await waitFor(() => {
-      expect(auditCompletionSpy).toHaveBeenCalledWith(
-        finalTypeToCheck,
-        expect.anything(),
-        expect.anything(),
-      );
-    });
     const finalAuditRows = await dbService.query(GET_ALL_AUDIT_ROWS);
 
     const finalAuditResults = finalAuditRows.rows.filter((r) => {

@@ -17,7 +17,7 @@ import {
 } from "@/app/backend/session-management";
 
 import * as AuditableDecorators from "@/app/backend/auditLogs/lib";
-import { waitFor } from "@testing-library/dom";
+import { waitForAuditSuccess } from "./utils";
 
 jest.mock("@/app/utils/auth", () => {
   return {
@@ -72,13 +72,7 @@ describe("patient queries", () => {
       phone: hyperUnluckyPatient.Phone,
     };
     await patientDiscoveryQuery(request);
-    await waitFor(() => {
-      expect(auditCompletionSpy).toHaveBeenCalledWith(
-        actionTypeToCheck,
-        expect.anything(),
-        expect.anything(),
-      );
-    });
+    await waitForAuditSuccess(actionTypeToCheck);
 
     const newAuditRows = await dbService.query(GET_ALL_AUDIT_ROWS);
     const auditEntry = newAuditRows.rows.filter((r) => {
@@ -106,13 +100,8 @@ describe("patient queries", () => {
       queryName: USE_CASE_DETAILS.chlamydia.queryName,
     };
     await patientRecordsQuery(request);
-    await waitFor(() => {
-      expect(auditCompletionSpy).toHaveBeenCalledWith(
-        actionTypeToCheck,
-        expect.anything(),
-        expect.anything(),
-      );
-    });
+    await waitForAuditSuccess(actionTypeToCheck);
+
     const newAuditRows = await dbService.query(GET_ALL_AUDIT_ROWS);
     const auditEntry = newAuditRows.rows.filter((r) => {
       return (
@@ -142,13 +131,7 @@ describe("sign in and out", () => {
     const actionTypeToCheck = "auditableSignOut";
 
     await signOut();
-    await waitFor(() => {
-      expect(auditCompletionSpy).toHaveBeenCalledWith(
-        actionTypeToCheck,
-        expect.anything(),
-        expect.anything(),
-      );
-    });
+    await waitForAuditSuccess(actionTypeToCheck);
 
     const newAuditRows = await dbService.query(GET_ALL_AUDIT_ROWS);
     const auditEntry = newAuditRows.rows.filter((r) => {
@@ -175,13 +158,7 @@ describe("sign in and out", () => {
       given_name: TEST_USER.user.firstName,
       family_name: TEST_USER.user.lastName,
     });
-    await waitFor(() => {
-      expect(auditCompletionSpy).toHaveBeenCalledWith(
-        actionTypeToCheck,
-        expect.anything(),
-        expect.anything(),
-      );
-    });
+    await waitForAuditSuccess(actionTypeToCheck);
 
     const newAuditRows = await dbService.query(GET_ALL_AUDIT_ROWS);
 
