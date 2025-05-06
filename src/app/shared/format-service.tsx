@@ -306,3 +306,12 @@ export function formatSex(sex: string | undefined): string {
       return "";
   }
 }
+
+/**
+ * Formats a string in sentence case
+ * @param string the string to format
+ * @returns the given string with the first character capitalized
+ */
+export function formatStringToSentenceCase(string: string) {
+  return string.replace(string.charAt(0), string.charAt(0).toLocaleUpperCase());
+}

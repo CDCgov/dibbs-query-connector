@@ -64,7 +64,8 @@ export const ConditionSelection: React.FC<ConditionSelectionProps> = ({
         <h2 className="margin-y-0-important">Start from template(s)</h2>
         <p>
           Don't see what you're looking for? You can also{" "}
-          <Link href={""} title={""} className="text-bold text-no-underline">
+          {/* TODO: link to "Select" mode of Code library page */}
+          <Link href={""} title={""} className={styles.startFromScratchLink}>
             start from scratch.
           </Link>
         </p>

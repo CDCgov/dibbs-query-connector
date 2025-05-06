@@ -19,6 +19,16 @@
   min-width: 100%;
 }
 
+.startFromScratchLink {
+  font-weight: 700;
+  text-decoration: none;
+
+  &:active,
+  &:visited {
+    color: #0076d6;
+  }
+}
+
 .conditionSelectionForm {
   background-color: #fff;
   padding: 2rem;

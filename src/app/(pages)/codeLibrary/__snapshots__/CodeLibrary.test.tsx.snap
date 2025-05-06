@@ -1,0 +1,1036 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Code library loading view renders a skeleton loading state when loading is true 1`] = `
+<body>
+  <div>
+    <div>
+      <div
+        class="main-container__wide mainContainer"
+      >
+        <div
+          class="header"
+        >
+          <a
+            aria-label="Back arrow indicating ability to navigate back a page if clicked"
+            class="back-link unchanged-color-on-visit text-no-underline"
+            data-testid="backArrowLink"
+            href="#"
+          >
+            <svg
+              aria-label="Arrow point left indicating return to previous step"
+              class="usa-icon"
+              focusable="false"
+              height="1em"
+              role="img"
+              viewBox="0 0 24 24"
+              width="1em"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"
+              />
+            </svg>
+             
+            Back to Query library
+          </a>
+          <h1
+            class="header__title"
+          >
+            Manage codes
+          </h1>
+          <div
+            class="header__subtitle"
+          >
+            Click on the checkbox to delete the value set or code
+          </div>
+          <div
+            class="usa-alert usa-alert--info info-alert"
+            data-testid="alert"
+          >
+            <div
+              class="usa-alert__body"
+            >
+              <p
+                class="usa-alert__text"
+              >
+                Value sets are an organizational structure for easy management of codes. Every code belongs to a value set.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div
+          class="controls"
+        >
+          <div
+            class="searchFilter"
+          >
+            <input
+              class="usa-input searchField search"
+              data-testid="textInput"
+              id="librarySearch"
+              name="librarySearch"
+              placeholder="Search"
+              type="search"
+              value=""
+            />
+            <div
+              class="applyFilters"
+              role="button"
+              tabindex="0"
+            >
+              <svg
+                aria-label="Icon indicating a menu with filter options"
+                class="usa-icon usa-icon--size-3 usa-icon qc-filter"
+                focusable="false"
+                height="1em"
+                role="icon"
+                viewBox="0 0 24 24"
+                width="1em"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z"
+                />
+              </svg>
+              Filters
+               
+            </div>
+          </div>
+          <button
+            class="usa-button button"
+            data-testid="button"
+            type="button"
+          >
+            Add value set
+          </button>
+        </div>
+        <div
+          class="content"
+        >
+          <div
+            class="resultsContainer"
+          >
+            <div
+              class="content__left"
+            >
+              <div
+                class="display-flex flex-row valueSetTable customizeTableWrapper"
+              >
+                <table
+                  class="usa-table usa-table--borderless customizeTable"
+                  data-testid="table"
+                >
+                  <thead
+                    class="display-flex flex-column valueSetTable__header"
+                  >
+                    <tr
+                      class="valueSetTable__header_sectionHeader"
+                    >
+                      <th>
+                        VALUE SET
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody
+                    class="overflowScroll valueSetTable__tableBody"
+                    data-testid="table-valuesets"
+                  >
+                    <tr
+                      class="valueSetTable__tableBody_row"
+                      data-testid="loading-skeleton"
+                    >
+                      <td>
+                        <span
+                          aria-busy="true"
+                          aria-live="polite"
+                          class="skeletonContainer"
+                        >
+                          <span
+                            class="react-loading-skeleton skeleton"
+                          >
+                            ‌
+                          </span>
+                          <br />
+                          <span
+                            class="react-loading-skeleton skeleton"
+                          >
+                            ‌
+                          </span>
+                          <br />
+                          <span
+                            class="react-loading-skeleton skeleton"
+                          >
+                            ‌
+                          </span>
+                          <br />
+                          <span
+                            class="react-loading-skeleton skeleton"
+                          >
+                            ‌
+                          </span>
+                          <br />
+                          <span
+                            class="react-loading-skeleton skeleton"
+                          >
+                            ‌
+                          </span>
+                          <br />
+                          <span
+                            class="react-loading-skeleton skeleton"
+                          >
+                            ‌
+                          </span>
+                          <br />
+                        </span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div
+              class="content__right"
+            />
+          </div>
+          <div
+            class="paginationContainer"
+          >
+            <span>
+              Showing 0 -
+  0 of 
+  0 value sets 
+            </span>
+            <div
+              class="itemsPerPageContainer"
+            >
+              <label
+                for="actionsPerPage"
+              >
+                Value sets per page
+              </label>
+              <select
+                class="usa-select itemsPerPageDropdown"
+                data-testid="Select"
+                id="valeSetsPerPage"
+                name="valeSetsPerPage"
+              >
+                <option
+                  value="10"
+                >
+                  10
+                </option>
+                <option
+                  value="25"
+                >
+                  25
+                </option>
+                <option
+                  value="50"
+                >
+                  50
+                </option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+`;
+
+exports[`Code library rendered view renders concept codes for the value set when clicked 1`] = `
+<body>
+  <div>
+    <div>
+      <div
+        class="main-container__wide mainContainer"
+      >
+        <div
+          class="header"
+        >
+          <a
+            aria-label="Back arrow indicating ability to navigate back a page if clicked"
+            class="back-link unchanged-color-on-visit text-no-underline"
+            data-testid="backArrowLink"
+            href="#"
+          >
+            <svg
+              aria-label="Arrow point left indicating return to previous step"
+              class="usa-icon"
+              focusable="false"
+              height="1em"
+              role="img"
+              viewBox="0 0 24 24"
+              width="1em"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"
+              />
+            </svg>
+             
+            Back to Query library
+          </a>
+          <h1
+            class="header__title"
+          >
+            Manage codes
+          </h1>
+          <div
+            class="header__subtitle"
+          >
+            Click on the checkbox to delete the value set or code
+          </div>
+          <div
+            class="usa-alert usa-alert--info info-alert"
+            data-testid="alert"
+          >
+            <div
+              class="usa-alert__body"
+            >
+              <p
+                class="usa-alert__text"
+              >
+                Value sets are an organizational structure for easy management of codes. Every code belongs to a value set.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div
+          class="controls"
+        >
+          <div
+            class="searchFilter"
+          >
+            <input
+              class="usa-input searchField search"
+              data-testid="textInput"
+              id="librarySearch"
+              name="librarySearch"
+              placeholder="Search"
+              type="search"
+              value=""
+            />
+            <div
+              class="applyFilters"
+              role="button"
+              tabindex="0"
+            >
+              <svg
+                aria-label="Icon indicating a menu with filter options"
+                class="usa-icon usa-icon--size-3 usa-icon qc-filter"
+                focusable="false"
+                height="1em"
+                role="icon"
+                viewBox="0 0 24 24"
+                width="1em"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z"
+                />
+              </svg>
+              Filters
+               
+            </div>
+          </div>
+          <button
+            class="usa-button button"
+            data-testid="button"
+            type="button"
+          >
+            Add value set
+          </button>
+        </div>
+        <div
+          class="content"
+        >
+          <div
+            class="resultsContainer"
+          >
+            <div
+              class="content__left"
+            >
+              <div
+                class="display-flex flex-row valueSetTable customizeTableWrapper"
+              >
+                <table
+                  class="usa-table usa-table--borderless customizeTable"
+                  data-testid="table"
+                >
+                  <thead
+                    class="display-flex flex-column valueSetTable__header"
+                  >
+                    <tr
+                      class="valueSetTable__header_sectionHeader"
+                    >
+                      <th>
+                        VALUE SET
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody
+                    class="overflowScroll valueSetTable__tableBody"
+                    data-testid="table-valuesets"
+                  >
+                    <tr
+                      class="valueSetTable__tableBody_row activeValueSet"
+                    >
+                      <td>
+                        <div
+                          class="valueSetTable__tableBody_row_details"
+                        >
+                          <span
+                            class="valueSetTable__tableBody_row_valueSetName"
+                          >
+                            <span
+                              class=""
+                            >
+                              Cancer (Leukemia) Lab Result
+                            </span>
+                          </span>
+                          <span
+                            class="valueSetTable__tableBody_row_valueSetDetails"
+                          >
+                            <span
+                              class=""
+                            >
+                              Cancer (Leukemia)  •   Lab  •  ECC
+                            </span>
+                          </span>
+                        </div>
+                        <div>
+                          <svg
+                            aria-label="Right chevron indicating additional content"
+                            class="usa-icon usa-icon--size-4"
+                            focusable="false"
+                            height="1em"
+                            role="img"
+                            viewBox="0 0 24 24"
+                            width="1em"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"
+                            />
+                          </svg>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr
+                      class="valueSetTable__tableBody_row"
+                    >
+                      <td>
+                        <div
+                          class="valueSetTable__tableBody_row_details"
+                        >
+                          <span
+                            class="valueSetTable__tableBody_row_valueSetName"
+                          >
+                            <span
+                              class=""
+                            >
+                              Gonorrhea Medication
+                            </span>
+                          </span>
+                          <span
+                            class="valueSetTable__tableBody_row_valueSetDetails"
+                          >
+                            <span
+                              class=""
+                            >
+                              Gonorrhea  •   Medication  •  RXNORM
+                            </span>
+                          </span>
+                        </div>
+                        <div>
+                          <svg
+                            aria-label="Right chevron indicating additional content"
+                            class="usa-icon usa-icon--size-4"
+                            focusable="false"
+                            height="1em"
+                            role="img"
+                            viewBox="0 0 24 24"
+                            width="1em"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"
+                            />
+                          </svg>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div
+              class="content__right"
+            >
+              <div
+                class="display-flex flex-row conceptsTable customizeTableWrapper"
+              >
+                <table
+                  class="usa-table usa-table--borderless customizeTable"
+                  data-testid="table"
+                >
+                  <thead
+                    class="display-flex flex-column conceptsTable__header"
+                  >
+                    <tr
+                      class="lockedForEdits"
+                    >
+                      <th>
+                        <svg
+                          class="usa-icon qc-lock"
+                          focusable="false"
+                          height="1em"
+                          role="icon"
+                          viewBox="0 0 24 24"
+                          width="1em"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"
+                          />
+                        </svg>
+                        This value set comes from DIBBs and cannot be
+                          modified.
+                      </th>
+                    </tr>
+                    <tr
+                      class="columnHeaders"
+                    >
+                      <th>
+                        Code
+                      </th>
+                      <th>
+                        Name
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody
+                    class="overflowScroll_headerLocked conceptsTable__tableBody"
+                    data-testid="table-codes"
+                  >
+                    <tr
+                      class="conceptsTable__tableBody_row"
+                    >
+                      <td
+                        class="valueSetCode"
+                      >
+                        <span>
+                          <span
+                            class=""
+                          >
+                            9484.100004300
+                          </span>
+                        </span>
+                      </td>
+                      <td>
+                        <span>
+                          <span
+                            class=""
+                          >
+                            RESULTS
+                          </span>
+                        </span>
+                      </td>
+                    </tr>
+                    <tr
+                      class="conceptsTable__tableBody_row"
+                    >
+                      <td
+                        class="valueSetCode"
+                      >
+                        <span>
+                          <span
+                            class=""
+                          >
+                            1255068005
+                          </span>
+                        </span>
+                      </td>
+                      <td>
+                        <span>
+                          <span
+                            class=""
+                          >
+                            Presence of DNA mismatch repair protein MSH2 in primary malignant neoplasm of colon by immunohistochemistry (observable entity)
+                          </span>
+                        </span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <div
+            class="paginationContainer"
+          >
+            <span>
+              Showing 1 -
+  2 of 
+  2 value sets 
+            </span>
+            <nav
+              aria-label="Pagination"
+              class="usa-pagination pagination"
+            >
+              <ul
+                class="usa-pagination__list"
+              >
+                <li
+                  class="usa-pagination__item usa-pagination__page-no"
+                >
+                  <button
+                    aria-current="page"
+                    aria-label="Page 1"
+                    class="usa-button usa-button--unstyled usa-pagination__button usa-current"
+                    data-testid="pagination-page-number"
+                    type="button"
+                  >
+                    1
+                  </button>
+                </li>
+              </ul>
+            </nav>
+            <div
+              class="itemsPerPageContainer"
+            >
+              <label
+                for="actionsPerPage"
+              >
+                Value sets per page
+              </label>
+              <select
+                class="usa-select itemsPerPageDropdown"
+                data-testid="Select"
+                id="valeSetsPerPage"
+                name="valeSetsPerPage"
+              >
+                <option
+                  value="10"
+                >
+                  10
+                </option>
+                <option
+                  value="25"
+                >
+                  25
+                </option>
+                <option
+                  value="50"
+                >
+                  50
+                </option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+`;
+
+exports[`Code library rendered view renders the correct content 1`] = `
+<body>
+  <div>
+    <div>
+      <div
+        class="main-container__wide mainContainer"
+      >
+        <div
+          class="header"
+        >
+          <a
+            aria-label="Back arrow indicating ability to navigate back a page if clicked"
+            class="back-link unchanged-color-on-visit text-no-underline"
+            data-testid="backArrowLink"
+            href="#"
+          >
+            <svg
+              aria-label="Arrow point left indicating return to previous step"
+              class="usa-icon"
+              focusable="false"
+              height="1em"
+              role="img"
+              viewBox="0 0 24 24"
+              width="1em"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"
+              />
+            </svg>
+             
+            Back to Query library
+          </a>
+          <h1
+            class="header__title"
+          >
+            Manage codes
+          </h1>
+          <div
+            class="header__subtitle"
+          >
+            Click on the checkbox to delete the value set or code
+          </div>
+          <div
+            class="usa-alert usa-alert--info info-alert"
+            data-testid="alert"
+          >
+            <div
+              class="usa-alert__body"
+            >
+              <p
+                class="usa-alert__text"
+              >
+                Value sets are an organizational structure for easy management of codes. Every code belongs to a value set.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div
+          class="controls"
+        >
+          <div
+            class="searchFilter"
+          >
+            <input
+              class="usa-input searchField search"
+              data-testid="textInput"
+              id="librarySearch"
+              name="librarySearch"
+              placeholder="Search"
+              type="search"
+              value=""
+            />
+            <div
+              class="applyFilters"
+              role="button"
+              tabindex="0"
+            >
+              <svg
+                aria-label="Icon indicating a menu with filter options"
+                class="usa-icon usa-icon--size-3 usa-icon qc-filter"
+                focusable="false"
+                height="1em"
+                role="icon"
+                viewBox="0 0 24 24"
+                width="1em"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z"
+                />
+              </svg>
+              Filters
+               
+            </div>
+          </div>
+          <button
+            class="usa-button button"
+            data-testid="button"
+            type="button"
+          >
+            Add value set
+          </button>
+        </div>
+        <div
+          class="content"
+        >
+          <div
+            class="resultsContainer"
+          >
+            <div
+              class="content__left"
+            >
+              <div
+                class="display-flex flex-row valueSetTable customizeTableWrapper"
+              >
+                <table
+                  class="usa-table usa-table--borderless customizeTable"
+                  data-testid="table"
+                >
+                  <thead
+                    class="display-flex flex-column valueSetTable__header"
+                  >
+                    <tr
+                      class="valueSetTable__header_sectionHeader"
+                    >
+                      <th>
+                        VALUE SET
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody
+                    class="overflowScroll valueSetTable__tableBody"
+                    data-testid="table-valuesets"
+                  >
+                    <tr
+                      class="valueSetTable__tableBody_row activeValueSet"
+                    >
+                      <td>
+                        <div
+                          class="valueSetTable__tableBody_row_details"
+                        >
+                          <span
+                            class="valueSetTable__tableBody_row_valueSetName"
+                          >
+                            <span
+                              class=""
+                            >
+                              Cancer (Leukemia) Lab Result
+                            </span>
+                          </span>
+                          <span
+                            class="valueSetTable__tableBody_row_valueSetDetails"
+                          >
+                            <span
+                              class=""
+                            >
+                              Cancer (Leukemia)  •   Lab  •  ECC
+                            </span>
+                          </span>
+                        </div>
+                        <div>
+                          <svg
+                            aria-label="Right chevron indicating additional content"
+                            class="usa-icon usa-icon--size-4"
+                            focusable="false"
+                            height="1em"
+                            role="img"
+                            viewBox="0 0 24 24"
+                            width="1em"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"
+                            />
+                          </svg>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr
+                      class="valueSetTable__tableBody_row"
+                    >
+                      <td>
+                        <div
+                          class="valueSetTable__tableBody_row_details"
+                        >
+                          <span
+                            class="valueSetTable__tableBody_row_valueSetName"
+                          >
+                            <span
+                              class=""
+                            >
+                              Gonorrhea Medication
+                            </span>
+                          </span>
+                          <span
+                            class="valueSetTable__tableBody_row_valueSetDetails"
+                          >
+                            <span
+                              class=""
+                            >
+                              Gonorrhea  •   Medication  •  RXNORM
+                            </span>
+                          </span>
+                        </div>
+                        <div>
+                          <svg
+                            aria-label="Right chevron indicating additional content"
+                            class="usa-icon usa-icon--size-4"
+                            focusable="false"
+                            height="1em"
+                            role="img"
+                            viewBox="0 0 24 24"
+                            width="1em"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"
+                            />
+                          </svg>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div
+              class="content__right"
+            >
+              <div
+                class="display-flex flex-row conceptsTable customizeTableWrapper"
+              >
+                <table
+                  class="usa-table usa-table--borderless customizeTable"
+                  data-testid="table"
+                >
+                  <thead
+                    class="display-flex flex-column conceptsTable__header"
+                  >
+                    <tr
+                      class="lockedForEdits"
+                    >
+                      <th>
+                        <svg
+                          class="usa-icon qc-lock"
+                          focusable="false"
+                          height="1em"
+                          role="icon"
+                          viewBox="0 0 24 24"
+                          width="1em"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"
+                          />
+                        </svg>
+                        This value set comes from DIBBs and cannot be
+                          modified.
+                      </th>
+                    </tr>
+                    <tr
+                      class="columnHeaders"
+                    >
+                      <th>
+                        Code
+                      </th>
+                      <th>
+                        Name
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody
+                    class="overflowScroll_headerLocked conceptsTable__tableBody"
+                    data-testid="table-codes"
+                  >
+                    <tr
+                      class="conceptsTable__tableBody_row"
+                    >
+                      <td
+                        class="valueSetCode"
+                      >
+                        <span>
+                          <span
+                            class=""
+                          >
+                            9484.100004300
+                          </span>
+                        </span>
+                      </td>
+                      <td>
+                        <span>
+                          <span
+                            class=""
+                          >
+                            RESULTS
+                          </span>
+                        </span>
+                      </td>
+                    </tr>
+                    <tr
+                      class="conceptsTable__tableBody_row"
+                    >
+                      <td
+                        class="valueSetCode"
+                      >
+                        <span>
+                          <span
+                            class=""
+                          >
+                            1255068005
+                          </span>
+                        </span>
+                      </td>
+                      <td>
+                        <span>
+                          <span
+                            class=""
+                          >
+                            Presence of DNA mismatch repair protein MSH2 in primary malignant neoplasm of colon by immunohistochemistry (observable entity)
+                          </span>
+                        </span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <div
+            class="paginationContainer"
+          >
+            <span>
+              Showing 1 -
+  2 of 
+  2 value sets 
+            </span>
+            <nav
+              aria-label="Pagination"
+              class="usa-pagination pagination"
+            >
+              <ul
+                class="usa-pagination__list"
+              >
+                <li
+                  class="usa-pagination__item usa-pagination__page-no"
+                >
+                  <button
+                    aria-current="page"
+                    aria-label="Page 1"
+                    class="usa-button usa-button--unstyled usa-pagination__button usa-current"
+                    data-testid="pagination-page-number"
+                    type="button"
+                  >
+                    1
+                  </button>
+                </li>
+              </ul>
+            </nav>
+            <div
+              class="itemsPerPageContainer"
+            >
+              <label
+                for="actionsPerPage"
+              >
+                Value sets per page
+              </label>
+              <select
+                class="usa-select itemsPerPageDropdown"
+                data-testid="Select"
+                id="valeSetsPerPage"
+                name="valeSetsPerPage"
+              >
+                <option
+                  value="10"
+                >
+                  10
+                </option>
+                <option
+                  value="25"
+                >
+                  25
+                </option>
+                <option
+                  value="50"
+                >
+                  50
+                </option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+`;
