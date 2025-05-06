@@ -10,6 +10,7 @@ import {
 import { QCResponse } from "../models/responses/collections";
 import dbService from "./dbServices/db-service";
 import { adminRequired, superAdminRequired } from "./dbServices/decorators";
+import { auditable } from "./auditLogs/decorator";
 
 class UserManagementService {
   /**
@@ -44,6 +45,7 @@ class UserManagementService {
    * @param userToken.lastName - The last name from the JWT token.
    * @returns The newly added user or an empty result if already exists.
    */
+  @auditable
   static async addUserIfNotExists(userToken: {
     id: string;
     username: string;
@@ -105,6 +107,7 @@ class UserManagementService {
    * @param updated_role - The role from the JWT token.
    * @returns The newly added user or an empty result if already exists.
    */
+  @auditable
   static async updateUserDetails(
     userId: string,
     updated_userName: string,
@@ -195,6 +198,7 @@ class UserManagementService {
    * @returns The updated user record or an error if the update fails.
    */
   @superAdminRequired
+  @auditable
   static async updateUserRole(
     userId: string,
     newRole: UserRole,
