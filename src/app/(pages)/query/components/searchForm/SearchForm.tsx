@@ -63,18 +63,11 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
   // Fills fields with sample data based on the selected
   const fillFields = useCallback(
     (highlightAutofilled = true) => {
-      const defaultFhirServer = fhirServers.includes(
-        hyperUnluckyPatient.FhirServer,
-      )
-        ? hyperUnluckyPatient.FhirServer
-        : fhirServers[0];
-
       setFirstName(hyperUnluckyPatient.FirstName);
       setLastName(hyperUnluckyPatient.LastName);
       setDOB(hyperUnluckyPatient.DOB);
       setMRN(hyperUnluckyPatient.MRN);
       setPhone(hyperUnluckyPatient.Phone);
-      setFhirServer(defaultFhirServer);
       setAutofilled(highlightAutofilled);
     },
     [fhirServers],

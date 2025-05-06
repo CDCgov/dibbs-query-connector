@@ -7,6 +7,7 @@ export interface FhirServerConfig {
   lastConnectionAttempt?: string;
   lastConnectionSuccessful?: boolean;
   disableCertValidation: boolean;
+  defaultServer: boolean;
   authType?: "none" | "basic" | "client_credentials" | "SMART";
   clientId?: string;
   clientSecret?: string;

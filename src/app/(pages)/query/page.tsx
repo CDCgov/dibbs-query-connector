@@ -5,7 +5,7 @@ import ResultsView from "./components/ResultsView";
 import PatientSearchResults from "./components/PatientSearchResults";
 import SearchForm from "./components/searchForm/SearchForm";
 import SelectQuery from "./components/SelectQuery";
-import { DEFAULT_DEMO_FHIR_SERVER, Mode } from "../../shared/constants";
+import { Mode } from "../../shared/constants";
 import StepIndicator, {
   CUSTOMIZE_QUERY_STEPS,
 } from "./components/stepIndicator/StepIndicator";
@@ -36,15 +36,14 @@ const Query: React.FC = () => {
   );
   const [mode, setMode] = useState<Mode>("search");
   const [loading, setLoading] = useState<boolean>(false);
-  const [fhirServer, setFhirServer] = useState<string>(
-    DEFAULT_DEMO_FHIR_SERVER,
-  );
+  const [fhirServer, setFhirServer] = useState<string>("");
   const [fhirServers, setFhirServers] = useState<string[]>([]);
   const ctx = useContext(DataContext);
 
   async function fetchFHIRServerNames() {
     const servers = await getFhirServerNames();
     setFhirServers(servers);
+    setFhirServer(servers[0]);
   }
 
   useEffect(() => {
