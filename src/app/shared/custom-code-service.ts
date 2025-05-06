@@ -19,7 +19,7 @@ import type { QueryDataColumn } from "@/app/(pages)/queryBuilding/utils";
 import crypto from "crypto";
 import dbService from "@/app/backend/dbServices/db-service";
 
-const conditionId = "custom_condition"; // This should be a unique identifier for the condition, we could just call it '0', but we will need some way to exclude it from certain screens, so that's why I lean toward it being hardcoded.
+const CUSTOM_CONDITION_ID = "custom_condition"; // This should be a unique identifier for the condition, we could just call it '0', but we will need some way to exclude it from certain screens, so that's why I lean toward it being hardcoded.
 
 export class UserCreatedValuesetService {
   private static get dbClient() {
@@ -34,17 +34,17 @@ export class UserCreatedValuesetService {
 
   static async addCustomCodeCondition(system: string): Promise<string> {
     const checkSql = `SELECT id FROM conditions WHERE id = $1`;
-    const result = await dbService.query(checkSql, [conditionId]);
+    const result = await dbService.query(checkSql, [CUSTOM_CONDITION_ID]);
     if (result.rows.length === 0) {
       await dbService.query(insertConditionSql, [
-        conditionId,
+        CUSTOM_CONDITION_ID,
         system,
         "Custom Code Condition",
         "20250601", // Placeholder, I don't think we really need versioning for this
         "User-Created",
       ]);
     }
-    return conditionId;
+    return CUSTOM_CONDITION_ID;
   }
 
   @transaction
@@ -61,9 +61,8 @@ export class UserCreatedValuesetService {
     const valueSetOid = vs.valueSetExternalId || uuid;
 
     // Insert Custom Code Condition if not already present
-    const conditionId = await UserCreatedValuesetService.addCustomCodeCondition(
-      vs.system,
-    );
+    const CUSTOM_CONDITION_ID =
+      await UserCreatedValuesetService.addCustomCodeCondition(vs.system);
 
     // Insert ValueSet
     try {
@@ -114,11 +113,11 @@ export class UserCreatedValuesetService {
     }
 
     // Insert condition_to_valueset
-    const ctvsId = `${conditionId}_${valueSetUniqueId}`;
+    const ctvsId = `${CUSTOM_CONDITION_ID}_${valueSetUniqueId}`;
     try {
       await dbService.query(insertConditionToValuesetSql, [
         ctvsId,
-        conditionId,
+        CUSTOM_CONDITION_ID,
         valueSetUniqueId,
         "User",
       ]);
@@ -142,44 +141,43 @@ export class UserCreatedValuesetService {
     queryId?: string,
   ): Promise<{ success: boolean; queryId?: string; error?: string }> {
     try {
-      let queryData: QueryDataColumn = {};
-
-      if (queryId) {
-        // fetch current query_data to preserve other condition keys
-        const existing = await dbService.query(
-          `SELECT query_data FROM query WHERE id = $1`,
-          [queryId],
-        );
-        if (existing.rows.length > 0 && existing.rows[0].query_data) {
-          queryData = existing.rows[0].query_data as QueryDataColumn;
-        }
-      }
-
-      // ensure custom condition block exists
-      queryData[conditionId] = {
-        ...(queryData[conditionId] ?? {}),
-      };
-
-      for (const vs of customValuesets) {
-        queryData[conditionId][vs.valueSetId] = vs;
-      }
-
       if (queryId) {
         // update existing query
+        const querySql = `SELECT query_data FROM query WHERE id = $1`;
+        const result = await dbService.query(querySql, [queryId]);
+
+        let queryData: QueryDataColumn = {};
+        if (result.rows.length > 0 && result.rows[0].query_data) {
+          queryData = result.rows[0].query_data as QueryDataColumn;
+        }
+
+        queryData[CUSTOM_CONDITION_ID] = queryData[CUSTOM_CONDITION_ID] || {};
+        for (const vs of customValuesets) {
+          queryData[CUSTOM_CONDITION_ID][vs.valueSetId] = vs;
+        }
+
+        // Update the query_data with the new custom valuesets
         const updateSql = `UPDATE query SET query_data = $1, date_last_modified = NOW() WHERE id = $2`;
         await dbService.query(updateSql, [queryData, queryId]);
         return { success: true, queryId };
       } else {
-        // create a new query with minimal data
+        // create a new query with custom_condition only
         const newId = crypto.randomUUID();
-        const insertSql = `
-          INSERT INTO query (
-            id, query_name, query_data, conditions_list, author,
-            date_created, date_last_modified, time_window_number, time_window_unit
-          )
-          VALUES ($1, $2, $3, $4, $5, NOW(), NOW(), $6, $7)
-        `;
         const name = `Custom Query ${newId}`;
+        const queryData: QueryDataColumn = {
+          [CUSTOM_CONDITION_ID]: {},
+        };
+        for (const vs of customValuesets) {
+          queryData[CUSTOM_CONDITION_ID][vs.valueSetId] = vs;
+        }
+
+        const insertSql = `
+        INSERT INTO query (
+          id, query_name, query_data, conditions_list, author,
+          date_created, date_last_modified, time_window_number, time_window_unit
+        )
+        VALUES ($1, $2, $3, $4, $5, NOW(), NOW(), $6, $7)
+      `;
         await dbService.query(insertSql, [
           newId,
           name,
