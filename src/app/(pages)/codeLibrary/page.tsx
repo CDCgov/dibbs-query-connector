@@ -38,7 +38,6 @@ const emptyFilterSearch = {
   creator: "",
 };
 
-
 /**
  * Component for Query Building Flow
  * @returns The Query Building component flow
