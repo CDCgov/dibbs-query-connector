@@ -15,9 +15,8 @@ import {
   logSignInToAuditTable,
   signOut,
 } from "@/app/backend/session-management";
-
 import * as AuditableDecorators from "@/app/backend/auditLogs/lib";
-import { waitForAuditSuccess } from "./utils";
+import { GET_ALL_AUDIT_ROWS, waitForAuditSuccess } from "./utils";
 
 jest.mock("@/app/utils/auth", () => {
   return {
@@ -52,7 +51,6 @@ const TEST_USER = {
 };
 (auth as jest.Mock).mockResolvedValue(TEST_USER);
 
-const GET_ALL_AUDIT_ROWS = "SELECT * FROM audit_logs;";
 describe("patient queries", () => {
   beforeAll(() => {
     suppressConsoleLogs();
@@ -72,7 +70,7 @@ describe("patient queries", () => {
       phone: hyperUnluckyPatient.Phone,
     };
     await patientDiscoveryQuery(request);
-    await waitForAuditSuccess(actionTypeToCheck);
+    await waitForAuditSuccess(actionTypeToCheck, auditCompletionSpy);
 
     const newAuditRows = await dbService.query(GET_ALL_AUDIT_ROWS);
     const auditEntry = newAuditRows.rows.filter((r) => {
@@ -100,7 +98,7 @@ describe("patient queries", () => {
       queryName: USE_CASE_DETAILS.chlamydia.queryName,
     };
     await patientRecordsQuery(request);
-    await waitForAuditSuccess(actionTypeToCheck);
+    await waitForAuditSuccess(actionTypeToCheck, auditCompletionSpy);
 
     const newAuditRows = await dbService.query(GET_ALL_AUDIT_ROWS);
     const auditEntry = newAuditRows.rows.filter((r) => {
@@ -131,7 +129,7 @@ describe("sign in and out", () => {
     const actionTypeToCheck = "auditableSignOut";
 
     await signOut();
-    await waitForAuditSuccess(actionTypeToCheck);
+    await waitForAuditSuccess(actionTypeToCheck, auditCompletionSpy);
 
     const newAuditRows = await dbService.query(GET_ALL_AUDIT_ROWS);
     const auditEntry = newAuditRows.rows.filter((r) => {
@@ -158,7 +156,7 @@ describe("sign in and out", () => {
       given_name: TEST_USER.user.firstName,
       family_name: TEST_USER.user.lastName,
     });
-    await waitForAuditSuccess(actionTypeToCheck);
+    await waitForAuditSuccess(actionTypeToCheck, auditCompletionSpy);
 
     const newAuditRows = await dbService.query(GET_ALL_AUDIT_ROWS);
 

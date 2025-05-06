@@ -6,6 +6,7 @@ import {
 } from "@/app/backend/dbServices/fhir-servers";
 import { auth } from "@/auth";
 import { GET_ALL_AUDIT_ROWS, waitForAuditSuccess } from "./utils";
+import * as AuditableDecorators from "@/app/backend/auditLogs/lib";
 
 // don't export / reuse this test user elsewhere since we're filtering
 // the audit entry results off this user's authorship. Otherwise, the
@@ -20,6 +21,16 @@ const TEST_USER = {
   },
 };
 (auth as jest.Mock).mockResolvedValue(TEST_USER);
+jest.mock("@/app/backend/auditLogs/lib", () => {
+  return {
+    __esModule: true,
+    ...jest.requireActual("@/app/backend/auditLogs/lib"),
+  };
+});
+const auditCompletionSpy = jest.spyOn(
+  AuditableDecorators,
+  "generateAuditSuccessMessage",
+);
 
 describe("fhir server", () => {
   it("fhir server addition / deletion / update", async () => {
@@ -43,7 +54,7 @@ describe("fhir server", () => {
       TEST_FHIR_SERVER.lastConnectionSuccessful,
     );
     const actionTypeToCheck = "insertFhirServer";
-    await waitForAuditSuccess(actionTypeToCheck);
+    await waitForAuditSuccess(actionTypeToCheck, auditCompletionSpy);
 
     const newAuditRows = await dbService.query(GET_ALL_AUDIT_ROWS);
 
@@ -72,7 +83,7 @@ describe("fhir server", () => {
       false,
     );
     const updateTypeToCheck = "updateFhirServer";
-    await waitForAuditSuccess(updateTypeToCheck);
+    await waitForAuditSuccess(updateTypeToCheck, auditCompletionSpy);
 
     const updateAuditRows = await dbService.query(GET_ALL_AUDIT_ROWS);
     const updateRows = updateAuditRows.rows.filter((r) => {
@@ -88,7 +99,7 @@ describe("fhir server", () => {
     // delete
     await deleteFhirServer(result.server.id);
     const finalTypeToCheck = "deleteFhirServer";
-    await waitForAuditSuccess(finalTypeToCheck);
+    await waitForAuditSuccess(finalTypeToCheck, auditCompletionSpy);
 
     const finalAuditRows = await dbService.query(GET_ALL_AUDIT_ROWS);
 
