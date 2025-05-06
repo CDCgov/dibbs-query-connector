@@ -23,7 +23,6 @@ import {
   DibbsValueSet,
   DibbsConceptType,
 } from "@/app/models/entities/valuesets";
-
 import { CustomCodeMode, formatSystem } from "./utils";
 import { ConditionsMap, formatDiseaseDisplay } from "../queryBuilding/utils";
 import Highlighter from "react-highlight-words";
