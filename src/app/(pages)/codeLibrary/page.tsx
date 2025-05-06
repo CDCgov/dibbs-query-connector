@@ -23,6 +23,7 @@ import {
   DibbsValueSet,
   DibbsConceptType,
 } from "@/app/models/entities/valuesets";
+
 import { CustomCodeMode, formatSystem } from "./utils";
 import { ConditionsMap, formatDiseaseDisplay } from "../queryBuilding/utils";
 import Highlighter from "react-highlight-words";
@@ -37,6 +38,7 @@ const emptyFilterSearch = {
   creator: "",
 };
 
+
 /**
  * Component for Query Building Flow
  * @returns The Query Building component flow
@@ -44,16 +46,19 @@ const emptyFilterSearch = {
 const CodeLibrary: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [mode, setMode] = useState<CustomCodeMode>("manage");
+
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
   const [textSearch, setTextSearch] = useState<string>("");
   const [filterSearch, setFilterSearch] =
     useState<FilterCategories>(emptyFilterSearch);
+
   const [showFilters, setShowFilters] = useState(false);
   const filterCount = Object.values(filterSearch).filter(
     (item) => item !== "",
   ).length;
+
   const [conditionDetailsMap, setConditionsDetailsMap] =
     useState<ConditionsMap>();
   const [valueSets, setValueSets] = useState<DibbsValueSet[]>([]);
@@ -115,6 +120,7 @@ const CodeLibrary: React.FC = () => {
       console.error(`Failed to fetch: ${error}`);
     }
   }
+
   // fetch value sets on page load
   useEffect(() => {
     ctx?.setToastConfig({
@@ -239,7 +245,6 @@ const CodeLibrary: React.FC = () => {
               autoEscape={true}
               textToHighlight={formatValueSetDetails(vs)}
             />
-            {/* TODO: render based on the user_created column once that is added */}
             {vs.userCreated && (
               <Highlighter
                 className={styles.valueSetTable__tableBody_row_customValueSet}
