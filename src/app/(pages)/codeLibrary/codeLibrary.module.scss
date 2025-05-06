@@ -1,0 +1,391 @@
+@use "../../ui/styles/variables" as *;
+
+.mainContainer {
+    display: flex;
+    flex-direction: column;
+    flex: auto;
+    margin-bottom: 0 !important;
+    font-family: "Public Sans", sans-serif !important;
+
+    .header {
+        font-size: inherit;
+
+        &__title {
+            margin: 1.5rem 0 0.5rem 0;
+        }
+
+        &__subtitle {
+            margin-bottom: 10px;
+            font-size: 1rem;
+            line-height: 1.25rem;
+        }
+    }
+
+    .controls {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1.5rem;
+        height: 3rem;
+
+        .search {
+            display: flex;
+            min-width: 35%;
+            width: 25rem;
+            height: 3rem !important;
+            align-items: center;
+            margin-top: 0;
+            background-color: white !important;
+        }
+
+        .button {
+            padding: 0.75rem 1.25rem 0.75rem 1.25rem;
+            line-height: 1.25rem;
+            flex-grow: 1 auto;
+        }
+
+        .searchFilter {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            min-width: 35%;
+        }
+
+        .applyFilters {
+            margin-left: 1rem;
+            display: flex;
+            align-items: center;
+            font-weight: 700;
+            position: relative;
+
+            &_active {
+                color: #0076d6;
+            }
+
+            &:hover {
+                cursor: pointer;
+            }
+        }
+    }
+
+    .content {
+        display: flex;
+        justify-content: space-between;
+        flex-direction: column;
+        flex: 1 0 auto;
+        height: 100%;
+        align-items: center;
+
+        &__left,
+        &__right {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            gap: 8px;
+            border: solid 1px #f0f0f0;
+            font-family: "Public Sans", sans-serif !important;
+            background-color: #ffffff;
+        }
+
+        &__left {
+            border-top-left-radius: 5px;
+            border-bottom-left-radius: 5px;
+        }
+        &__right {
+            border-top-right-radius: 5px;
+            border-bottom-right-radius: 5px;
+        }
+    }
+}
+
+.filtersDropdown {
+    padding: 1.25rem;
+    background: #fff;
+    border-radius: 4px;
+    position: absolute;
+    width: 27.5rem;
+    top: 2.5rem;
+    color: #111;
+    font-weight: 400;
+    z-index: 400;
+    border: 1px solid #919191;
+    gap: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    line-height: 1.375rem;
+
+    div.filterOptions:first-child {
+        height: 266px;
+    }
+
+    .filterOptions {
+        justify-content: space-between;
+        display: flex;
+        flex-direction: column;
+
+        &_grouping {
+            height: 4.875rem !important;
+        }
+    }
+    .filtersSelect {
+        height: 3rem;
+
+        &:disabled:hover,
+        &:disabled {
+            background-color: #f3f3f3 !important;
+        }
+    }
+    .clearFiltersBtn {
+        background-color: #fff !important;
+        border: 2px solid #0076d6 !important;
+        border-radius: 4px !important;
+        color: #0076d6 !important;
+        white-space: nowrap;
+        margin: 0 !important;
+        width: fit-content;
+    }
+
+    .shortcuts {
+        display: flex;
+        justify-content: flex-end;
+
+        span:first-child {
+            flex: 1;
+        }
+
+        button {
+            font-weight: 700;
+            border: none !important;
+            color: #0076d6;
+            background: transparent;
+            margin-left: 0.5rem;
+
+            &:hover {
+                cursor: pointer;
+            }
+        }
+    }
+}
+
+.resultsContainer {
+    display: flex;
+    flex-direction: row;
+    flex-grow: 1;
+    width: 100%;
+    height: 100%;
+}
+
+.paginationContainer {
+    display: flex;
+    border: 1px solid #dfe1e2;
+    border-radius: 0.5rem;
+    background-color: #fff;
+    height: 4.5rem;
+    justify-content: space-between;
+    padding: 1rem;
+    align-items: center;
+    width: calc($query-connector-content-width-wide + 4rem);
+    margin-bottom: 1rem;
+
+    ul {
+        max-width: 50%;
+    }
+
+    .itemsPerPageContainer {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .itemsPerPageContainer label {
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+
+    .itemsPerPageDropdown {
+        display: flex;
+        width: 5.875rem;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+        border-radius: 0.25rem;
+        margin-bottom: 0.5rem;
+    }
+}
+
+.valueSetTable,
+.conceptsTable {
+    background-color: #fff !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+
+    &__header {
+        display: flex;
+        padding: 1.5rem 0rem 0rem 1.5rem !important;
+        margin: 0rem 1.5rem 0rem 0rem;
+
+        .lockedForEdits {
+            display: flex;
+            align-items: center;
+            font-style: italic;
+            font-weight: 400;
+            font-size: 14px;
+            color: #000;
+            line-height: 1.25rem;
+            margin-bottom: 0.75rem;
+
+            th {
+                padding: 0 !important;
+                display: flex;
+                align-items: center;
+            }
+        }
+
+        .columnHeaders {
+            margin-top: 0.75rem;
+
+            th {
+                padding: 0 !important;
+                background: inherit !important;
+                text-transform: none !important;
+                color: #111111 !important;
+                line-height: 1.25rem !important;
+
+                &:first-child {
+                    width: 7.5rem;
+                }
+            }
+        }
+
+        &_sectionHeader {
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #f0f0f0;
+            padding-bottom: 0.75rem;
+
+            & th {
+                color: #5c5c5c !important;
+                padding: 0 !important;
+                letter-spacing: 0%;
+                line-height: 1.25rem;
+                font-size: 0.875rem;
+            }
+        }
+    }
+
+    &__tableBody {
+        padding: 0rem !important;
+        display: flex;
+        flex-direction: column;
+        &_row {
+            display: flex !important;
+            padding: 0 0 0 1.5rem !important;
+
+            &:hover {
+                background-color: #e8f5ff !important;
+            }
+
+            &:after {
+                background: transparent !important;
+            }
+        }
+    }
+}
+
+.conceptsTable__header {
+    margin-bottom: 0.5rem;
+}
+
+.conceptsTable__tableBody {
+    &_row {
+        flex-direction: row !important;
+        border: none !important; // apply this explicitly on left table
+
+        td {
+            background: transparent !important;
+            padding: 0.75rem 0.75rem 0.75rem 0 !important;
+
+            &:last-child {
+                padding-right: 1.5rem !important;
+            }
+        }
+        &:hover {
+            background-color: transparent !important;
+        }
+    }
+
+    .valueSetCode {
+        min-width: 7.5rem;
+        word-wrap: break-word;
+        padding-right: 1rem;
+        max-width: 7.5rem;
+    }
+}
+
+.valueSetTable__tableBody {
+    &_row {
+        &:hover {
+            cursor: pointer;
+        }
+
+        &:has(span.skeletonContainer):hover,
+        &_noResults {
+            background-color: transparent !important;
+            cursor: default;
+        }
+        td {
+            padding: 0 !important;
+            margin-right: 1.5rem;
+            border-bottom: 1px solid #f0f0f0 !important;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            color: #5c5c5c;
+            padding-bottom: 0.75rem !important;
+            padding-top: 0.75rem !important;
+        }
+
+        &_details {
+            display: flex;
+            flex-direction: column !important;
+            width: 85%;
+        }
+
+        &_valueSetName {
+            color: #111;
+        }
+
+        &_customValueSet {
+            font-weight: 700 !important;
+            color: #5c5c5c;
+            font-style: italic;
+        }
+    }
+
+    .activeValueSet,
+    .activeValueSet td {
+        background-color: #e8f5ff;
+    }
+}
+
+.overflowScroll {
+    display: flex;
+    max-height: 33rem;
+    overflow-y: scroll;
+
+    &_headerLocked {
+        max-height: 30rem !important;
+        overflow-y: scroll;
+    }
+}
+.skeletonContainer {
+    width: 100%;
+
+    .skeleton {
+        height: 3.5rem;
+        display: flex;
+    }
+}
