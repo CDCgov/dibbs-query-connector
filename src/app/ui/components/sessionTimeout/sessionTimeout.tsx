@@ -1,11 +1,12 @@
 "use client";
 
-import { signOut, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import { useIdleTimer } from "react-idle-timer";
 import type { ModalProps, ModalRef } from "../../designSystem/modal/Modal";
 import { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import { PAGES } from "@/app/shared/page-routes";
+import { signOut } from "@/app/backend/session-management";
 
 const Modal = dynamic<ModalProps>(
   () => import("../../designSystem/modal/Modal").then((mod) => mod.Modal),

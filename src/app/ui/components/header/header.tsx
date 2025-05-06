@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useContext, useEffect, useRef, useState } from "react";
-import { useSession, signOut } from "next-auth/react";
 import { Icon } from "@trussworks/react-uswds";
 import styles from "./header.module.scss";
 import { metadata } from "@/app/shared/constants";
@@ -12,26 +11,28 @@ import { getPagesInSettingsMenu, PAGES } from "@/app/shared/page-routes";
 import { UserRole } from "@/app/models/entities/users";
 import { isAuthDisabledClientCheck } from "@/app/utils/auth";
 import { DataContext } from "@/app/shared/DataProvider";
+import { signOut } from "@/app/backend/session-management";
+import { Session } from "next-auth";
 
+interface HeaderProps {
+  session: Session | null;
+}
 /**
  * Produces the header.
- * @param root0 - The properties object
- * @param root0.authDisabled - The server-side read of the auth disabled environment variable.
+ * @param param0 - param
+ * @param param0.session - whether user is logged in
  * @returns The HeaderComponent component.
  */
-const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
-  authDisabled,
-}) => {
+const HeaderComponent: React.FC<HeaderProps> = ({ session }) => {
   const menuRef = useRef<HTMLDivElement>(null);
   const [showMenu, setShowMenu] = useState(false);
   const router = useRouter();
-  const { data: session, status } = useSession();
   const ctx = useContext(DataContext);
   const isAuthDisabled = isAuthDisabledClientCheck(ctx?.runtimeConfig);
 
-  const isLoggedIn = status === "authenticated" || isAuthDisabled;
+  const isLoggedIn = session !== null || isAuthDisabled;
 
-  const userRole = authDisabled
+  const userRole = isAuthDisabled
     ? UserRole.SUPER_ADMIN
     : session?.user?.role || "";
 
@@ -53,9 +54,10 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
   }, [showMenu]);
 
   const handleSignOut = async () => {
-    if (authDisabled) {
+    if (isAuthDisabled) {
       router.push(PAGES.LANDING);
     } else {
+      setShowMenu(false);
       await signOut({ redirectTo: PAGES.LANDING });
     }
   };
@@ -64,7 +66,8 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
     setShowMenu(!showMenu);
   };
 
-  const landingPage = authDisabled || isLoggedIn ? PAGES.QUERY : PAGES.LANDING;
+  const landingPage =
+    isAuthDisabled || isLoggedIn ? PAGES.QUERY : PAGES.LANDING;
 
   const menuPages = getPagesInSettingsMenu(userRole as UserRole).filter(
     (page) => page.path !== PAGES.QUERY,
@@ -152,7 +155,7 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
                   </Link>
                 </li>
               ))}
-              {!authDisabled && (
+              {!isAuthDisabled && (
                 <li className={styles.subMenuItem}>
                   <button
                     className={classNames(

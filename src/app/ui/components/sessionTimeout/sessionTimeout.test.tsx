@@ -6,9 +6,13 @@ import SessionTimeout from "./sessionTimeout";
 import { UserRole } from "@/app/models/entities/users";
 import { Session } from "next-auth";
 import { PAGES } from "@/app/shared/page-routes";
+import { signOut } from "@/app/backend/session-management";
 
 jest.mock("next-auth/react");
 jest.mock("tabbable");
+jest.mock("@/app/backend/session-management", () => ({
+  signOut: jest.fn(),
+}));
 
 describe("SessionTimeout", () => {
   it("Does not display when user is unauthenticated", async () => {
@@ -43,7 +47,6 @@ describe("SessionTimeout", () => {
     };
 
     jest.spyOn(nextAuthReact, "useSession").mockReturnValue(session);
-    const signOutSpy = jest.spyOn(nextAuthReact, "signOut");
 
     render(
       <RootProviderMock currentPage={"/"}>
@@ -55,6 +58,8 @@ describe("SessionTimeout", () => {
     await waitFor(() =>
       expect(dialog).toHaveAttribute("class", "usa-modal-wrapper is-visible"),
     );
+
+    const signOutSpy = signOut as jest.Mock;
 
     await waitFor(() =>
       expect(signOutSpy).toHaveBeenCalledWith({ redirectTo: PAGES.LANDING }),
@@ -70,7 +75,7 @@ describe("SessionTimeout", () => {
     };
 
     jest.spyOn(nextAuthReact, "useSession").mockReturnValue(session);
-    const signOutSpy = jest.spyOn(nextAuthReact, "signOut");
+    const signOutSpy = signOut as jest.Mock;
 
     const { user } = renderWithUser(
       <RootProviderMock currentPage={"/"}>
@@ -101,7 +106,7 @@ describe("SessionTimeout", () => {
     };
 
     jest.spyOn(nextAuthReact, "useSession").mockReturnValue(session);
-    const signOutSpy = jest.spyOn(nextAuthReact, "signOut");
+    const signOutSpy = signOut as jest.Mock;
 
     render(
       <RootProviderMock currentPage={"/"}>

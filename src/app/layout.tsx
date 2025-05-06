@@ -6,7 +6,6 @@ import DataProvider from "./shared/DataProvider";
 import { Metadata } from "next";
 import Page from "./ui/components/page/page";
 import { auth } from "@/auth";
-import { isAuthDisabledServerCheck } from "./utils/auth";
 import SessionTimeout, {
   IDLE_TIMEOUT_MSEC,
   PROMPT_TIMEOUT_MSEC,
@@ -40,7 +39,7 @@ export default async function RootLayout({
               idleTimeMsec={IDLE_TIMEOUT_MSEC}
               promptTimeMsec={PROMPT_TIMEOUT_MSEC}
             />
-            <Header authDisabled={isAuthDisabledServerCheck()} />
+            <Header session={session} />
             <Page showSiteAlert={process.env.DEMO_MODE === "true"}>
               {children}
             </Page>

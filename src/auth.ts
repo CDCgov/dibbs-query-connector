@@ -3,6 +3,7 @@ import { addUserIfNotExists, getUserRole } from "@/app/backend/user-management";
 import { isAuthDisabledServerCheck } from "./app/utils/auth";
 import { UserRole } from "./app/models/entities/users";
 import NextAuth from "next-auth";
+import { logSignInToAuditTable } from "./app/backend/session-management";
 
 function addRealm(url: string) {
   return url.endsWith("/realms/master") ? url : `${url}/realms/master`;
@@ -115,6 +116,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       session.expiresIn = token.expiresIn;
 
       return session;
+    },
+
+    async signIn({ profile }) {
+      logSignInToAuditTable(profile);
+      return true;
     },
   },
   // WARNING: Turning this on will log out session info (which in all likelihood)
