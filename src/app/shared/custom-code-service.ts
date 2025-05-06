@@ -153,13 +153,16 @@ export class UserCreatedValuesetService {
           queryData = result.rows[0].query_data as QueryDataColumn;
         }
 
-        queryData[CUSTOM_VALUESET_ARRAY_ID] =
-          queryData[CUSTOM_VALUESET_ARRAY_ID] || {};
+        // merge new custom codes into existing custom block, overwriting old with new
+        const existingCustomBlock = queryData[CUSTOM_VALUESET_ARRAY_ID] ?? {};
+
         for (const vs of customValuesets) {
-          queryData[CUSTOM_VALUESET_ARRAY_ID][vs.valueSetId] = vs;
+          existingCustomBlock[vs.valueSetId] = vs;
         }
 
-        // Update the query_data with the new custom valuesets
+        queryData[CUSTOM_VALUESET_ARRAY_ID] = existingCustomBlock;
+
+        // Update the query_data with the merged custom valuesets
         const updateSql = `UPDATE query SET query_data = $1, date_last_modified = NOW() WHERE id = $2`;
         await dbService.query(updateSql, [queryData, queryId]);
         return { success: true, queryId };
@@ -170,6 +173,7 @@ export class UserCreatedValuesetService {
         const queryData: QueryDataColumn = {
           [CUSTOM_VALUESET_ARRAY_ID]: {},
         };
+
         for (const vs of customValuesets) {
           queryData[CUSTOM_VALUESET_ARRAY_ID][vs.valueSetId] = vs;
         }
