@@ -337,8 +337,6 @@
   }
 
   &:hover {
-    // background-color: rgba(217, 232, 246, 0.5) !important;
-
     .valueSetTemplate__checkbox {
       background-color: unset;
     }
@@ -406,7 +404,6 @@ div.accordionBodyExpanded:last-of-type {
   display: flex;
   align-items: center;
   min-width: 4rem;
-  // justify-content: flex-end;
 }
 
 .customQuery__header > h1 {
