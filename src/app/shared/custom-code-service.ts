@@ -18,9 +18,10 @@ import type { DibbsValueSet } from "../models/entities/valuesets";
 import type { QueryDataColumn } from "@/app/(pages)/queryBuilding/utils";
 import crypto from "crypto";
 import dbService from "@/app/backend/dbServices/db-service";
-
-const CUSTOM_CONDITION_ID = "custom_condition"; // This should be a unique identifier for the condition, we could just call it '0', but we will need some way to exclude it from certain screens, so that's why I lean toward it being hardcoded.
-const CUSTOM_VALUESET_ARRAY_ID = "custom"; // This array of valuesets that are user-managed (both user-created and non-user-created), we will need to add this to the query_data table in the query table
+import {
+  CUSTOM_CONDITION_ID,
+  CUSTOM_VALUESET_ARRAY_ID,
+} from "@/app/shared/constants";
 
 export class UserCreatedValuesetService {
   private static get dbClient() {
@@ -163,14 +164,14 @@ export class UserCreatedValuesetService {
         await dbService.query(updateSql, [queryData, queryId]);
         return { success: true, queryId };
       } else {
-        // create a new query with custom_condition only
+        // create a new query with custom only
         const newId = crypto.randomUUID();
         const name = `Custom Query ${newId}`;
         const queryData: QueryDataColumn = {
-          [CUSTOM_CONDITION_ID]: {},
+          [CUSTOM_VALUESET_ARRAY_ID]: {},
         };
         for (const vs of customValuesets) {
-          queryData[CUSTOM_CONDITION_ID][vs.valueSetId] = vs;
+          queryData[CUSTOM_VALUESET_ARRAY_ID][vs.valueSetId] = vs;
         }
 
         const insertSql = `
