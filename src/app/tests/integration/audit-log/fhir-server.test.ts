@@ -12,6 +12,7 @@ import {
   waitForAuditSuccess,
 } from "./utils";
 import * as AuditableDecorators from "@/app/backend/auditLogs/lib";
+import { suppressConsoleLogs } from "../fixtures";
 
 jest.mock("@/app/backend/auditLogs/lib", () => {
   return {
@@ -26,6 +27,9 @@ const auditCompletionSpy = jest.spyOn(
 (auth as jest.Mock).mockResolvedValue(TEST_USER);
 
 describe("fhir server", () => {
+  beforeAll(() => {
+    suppressConsoleLogs();
+  });
   it("fhir server addition / deletion / update", async () => {
     const TEST_FHIR_SERVER = {
       name: "Jolly Roger Bay",
@@ -35,8 +39,9 @@ describe("fhir server", () => {
       disableCertValidation: false,
       defaultServer: false,
     };
-    const allAuditRows = await dbService.query(GET_ALL_AUDIT_ROWS);
-    const oldAuditIds = allAuditRows.rows.map((r) => r.id);
+    const oldAuditIds = (await dbService.query(GET_ALL_AUDIT_ROWS)).rows.map(
+      (r) => r.id,
+    );
 
     // insert
     const result = await insertFhirServer(

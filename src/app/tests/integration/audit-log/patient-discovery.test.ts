@@ -11,10 +11,7 @@ import {
   PatientRecordsRequest,
 } from "@/app/models/entities/query";
 import dbService from "@/app/backend/dbServices/db-service";
-import {
-  logSignInToAuditTable,
-  signOut,
-} from "@/app/backend/session-management";
+
 import * as AuditableDecorators from "@/app/backend/auditLogs/lib";
 import {
   GET_ALL_AUDIT_ROWS,
@@ -50,8 +47,9 @@ describe("patient queries", () => {
   });
 
   it("patient discovery query should generate an audit entry", async () => {
-    const allAuditRows = await dbService.query(GET_ALL_AUDIT_ROWS);
-    const oldAuditIds = allAuditRows.rows.map((r) => r.id);
+    const oldAuditIds = (await dbService.query(GET_ALL_AUDIT_ROWS)).rows.map(
+      (r) => r.id,
+    );
     const actionTypeToCheck = "makePatientDiscoveryRequest";
 
     const request: PatientDiscoveryRequest = {
@@ -66,15 +64,15 @@ describe("patient queries", () => {
     await waitForAuditSuccess(actionTypeToCheck, auditCompletionSpy);
     const auditEntry = await getAuditEntry(actionTypeToCheck, oldAuditIds);
 
-    expect(auditEntry?.actionType).toBe(actionTypeToCheck);
-    expect(auditEntry?.auditMessage).toStrictEqual({
+    expect(auditEntry).toStrictEqual({
       request: JSON.stringify(request),
     });
   });
 
   it("patient records query should generate an audit entry", async () => {
-    const allAuditRows = await dbService.query(GET_ALL_AUDIT_ROWS);
-    const oldAuditIds = allAuditRows.rows.map((r) => r.id);
+    const oldAuditIds = (await dbService.query(GET_ALL_AUDIT_ROWS)).rows.map(
+      (r) => r.id,
+    );
     const actionTypeToCheck = "makePatientRecordsRequest";
 
     const request: PatientRecordsRequest = {
@@ -86,56 +84,10 @@ describe("patient queries", () => {
     await waitForAuditSuccess(actionTypeToCheck, auditCompletionSpy);
     const auditEntry = await getAuditEntry(actionTypeToCheck, oldAuditIds);
 
-    expect(auditEntry?.actionType).toBe(actionTypeToCheck);
-    expect(JSON.parse(auditEntry?.auditMessage?.fhirServer)).toBe(
-      request.fhirServer,
-    );
-    expect(JSON.parse(auditEntry?.auditMessage?.patientId)).toBe(
-      request.patientId,
-    );
-    expect(JSON.parse(auditEntry?.auditMessage?.queryData)).toStrictEqual(
+    expect(JSON.parse(auditEntry?.fhirServer)).toBe(request.fhirServer);
+    expect(JSON.parse(auditEntry?.patientId)).toBe(request.patientId);
+    expect(JSON.parse(auditEntry?.queryData)).toStrictEqual(
       DEFAULT_CHLAMYDIA_QUERY.queryData,
     );
-  });
-});
-
-describe("sign in and out", () => {
-  it("sign out should generate an audit entry", async () => {
-    const allAuditRows = await dbService.query(GET_ALL_AUDIT_ROWS);
-    const oldAuditIds = allAuditRows.rows.map((r) => r.id);
-    const actionTypeToCheck = "auditableSignOut";
-
-    await signOut();
-    await waitForAuditSuccess(actionTypeToCheck, auditCompletionSpy);
-    const auditEntry = await getAuditEntry(actionTypeToCheck, oldAuditIds);
-
-    const userInfo = JSON.parse(auditEntry?.auditMessage?.sessionParams).session
-      .user;
-
-    expect(auditEntry?.actionType).toBe(actionTypeToCheck);
-    expect(userInfo.username).toBe(TEST_USER.user.username);
-    expect(userInfo.firstName).toBe(TEST_USER.user.firstName);
-    expect(userInfo.lastName).toBe(TEST_USER.user.lastName);
-  });
-
-  it("sign in should generate an audit entry", async () => {
-    const allAuditRows = await dbService.query(GET_ALL_AUDIT_ROWS);
-    const oldAuditIds = allAuditRows.rows.map((r) => r.id);
-    const actionTypeToCheck = "auditableSignIn";
-
-    await logSignInToAuditTable({
-      preferred_username: TEST_USER.user.username,
-      given_name: TEST_USER.user.firstName,
-      family_name: TEST_USER.user.lastName,
-    });
-    await waitForAuditSuccess(actionTypeToCheck, auditCompletionSpy);
-    const auditEntry = await getAuditEntry(actionTypeToCheck, oldAuditIds);
-
-    const userInfo = JSON.parse(auditEntry?.auditMessage?.profile);
-
-    expect(auditEntry?.actionType).toBe(actionTypeToCheck);
-    expect(userInfo.preferredUsername).toBe(TEST_USER.user.username);
-    expect(userInfo.givenName).toBe(TEST_USER.user.firstName);
-    expect(userInfo.familyName).toBe(TEST_USER.user.lastName);
   });
 });

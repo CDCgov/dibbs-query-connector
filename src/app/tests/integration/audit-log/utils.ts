@@ -34,7 +34,6 @@ export async function getAuditEntry(
   oldAuditIds: string[],
 ) {
   const newAuditRows = await dbService.query(GET_ALL_AUDIT_ROWS);
-
   const auditResults = newAuditRows.rows.filter((r) => {
     return (
       r.author === TEST_USER.user.username &&
