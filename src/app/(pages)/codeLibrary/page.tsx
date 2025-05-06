@@ -23,15 +23,19 @@ import {
   DibbsValueSet,
   DibbsConceptType,
 } from "@/app/models/entities/valuesets";
-import { formatSystem } from "./utils";
+import { CustomCodeMode, formatSystem } from "./utils";
 import { ConditionsMap, formatDiseaseDisplay } from "../queryBuilding/utils";
 import Highlighter from "react-highlight-words";
 import Skeleton from "react-loading-skeleton";
 import { formatStringToSentenceCase } from "@/app/shared/format-service";
-import DropdownFilter, { FilterCategories } from "./DropdownFilter";
-import AddValueSets from "./AddValueSet";
+import DropdownFilter, { FilterCategories } from "./components/DropdownFilter";
+import CustomValueSetForm from "./components/CustomValueSetForm";
 
-export type CustomCodeMode = "manage" | "select" | "addValueSet";
+const emptyFilterSearch = {
+  category: "" as DibbsConceptType,
+  codeSystem: "",
+  creator: "",
+};
 
 /**
  * Component for Query Building Flow
@@ -44,11 +48,8 @@ const CodeLibrary: React.FC = () => {
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
   const [textSearch, setTextSearch] = useState<string>("");
-  const [filterSearch, setFilterSearch] = useState<FilterCategories>({
-    category: "" as DibbsConceptType,
-    codeSystem: "",
-    creator: "",
-  });
+  const [filterSearch, setFilterSearch] =
+    useState<FilterCategories>(emptyFilterSearch);
   const [showFilters, setShowFilters] = useState(false);
   const filterCount = Object.values(filterSearch).filter(
     (item) => item !== "",
@@ -57,10 +58,21 @@ const CodeLibrary: React.FC = () => {
     useState<ConditionsMap>();
   const [valueSets, setValueSets] = useState<DibbsValueSet[]>([]);
   const [filteredValueSets, setFilteredValueSets] = useState(valueSets);
-  const [activeValueSet, setActiveValueSet] = useState<DibbsValueSet | null>();
+  const [activeValueSet, setActiveValueSet] = useState<
+    DibbsValueSet | undefined
+  >();
 
   const ctx = useContext(DataContext);
   let totalPages = Math.ceil(filteredValueSets.length / itemsPerPage);
+
+  function goBack() {
+    // TODO: this will need to be handled differently
+    // depending on how we arrived at this page:
+    // from gear menu: no backnav
+    // from "start from scratch": back to templates
+    // from hybrid/query building: back to query
+    console.log("do a backnav thing");
+  }
 
   const handleTextSearch = (vs: DibbsValueSet) => {
     const matchesName = vs.valueSetName
@@ -90,6 +102,19 @@ const CodeLibrary: React.FC = () => {
     ctx?.setCurrentPage(mode);
   }, [mode]);
 
+  async function fetchValueSetsAndConditions() {
+    try {
+      const { conditionIdToNameMap } = await getConditionsData();
+      const vs = await getAllValueSets();
+      const formattedVs =
+        vs.items && groupConditionConceptsIntoValueSets(vs.items);
+
+      setValueSets(formattedVs);
+      setConditionsDetailsMap(conditionIdToNameMap);
+    } catch (error) {
+      console.error(`Failed to fetch: ${error}`);
+    }
+  }
   // fetch value sets on page load
   useEffect(() => {
     ctx?.setToastConfig({
@@ -98,23 +123,10 @@ const CodeLibrary: React.FC = () => {
       hideProgressBar: true,
     });
 
-    async function fetchValueSetsAndConditions() {
-      try {
-        const { conditionIdToNameMap } = await getConditionsData();
-        const vs = await getAllValueSets();
-        const formattedVs =
-          vs.items && groupConditionConceptsIntoValueSets(vs.items);
-
-        setValueSets(formattedVs);
-        setConditionsDetailsMap(conditionIdToNameMap);
-      } catch (error) {
-        console.error(`Failed to fetch: ${error}`);
-      }
-    }
-
     fetchValueSetsAndConditions();
   }, []);
 
+  // organize valuesets once they've loaded
   useEffect(() => {
     setFilteredValueSets(valueSets);
     setActiveValueSet(paginatedValueSets[0]);
@@ -128,6 +140,7 @@ const CodeLibrary: React.FC = () => {
     }
   }, [valueSets, conditionDetailsMap]);
 
+  // update display based on text search and filters
   useEffect(() => {
     const matchCategory = (vs: DibbsValueSet) => {
       return filterSearch.category
@@ -168,15 +181,6 @@ const CodeLibrary: React.FC = () => {
   const isFiltered =
     valueSets.length !== filteredValueSets.length ||
     Object.values(filterSearch).some((filter) => filter !== "");
-
-  function goBack() {
-    // TODO: this will need to be handled differently
-    // depending on how we arrived at this page:
-    // from gear menu: no backnav
-    // from "start from scratch": back to templates
-    // from hybrid/query building: back to query
-    console.log("do a backnav thing");
-  }
 
   const formatConditionDisplay = (conditionId: string | undefined) => {
     const conditionDetails =
@@ -270,6 +274,19 @@ const CodeLibrary: React.FC = () => {
         ? "CPHI"
         : activeValueSet?.author;
 
+  const handleChangeMode = async (mode: CustomCodeMode) => {
+    if (mode == "manage" || mode == "select") {
+      // fetch fresh value set details if we are changing TO manage/select mode
+      await fetchValueSetsAndConditions().then(() => {
+        setTextSearch("");
+        setFilterSearch(emptyFilterSearch);
+        setMode(mode);
+      });
+    } else {
+      setMode(mode);
+    }
+  };
+
   return (
     <WithAuth>
       {mode == "manage" && (
@@ -343,7 +360,7 @@ const CodeLibrary: React.FC = () => {
             <Button
               type="button"
               className={styles.button}
-              onClick={() => setMode("addValueSet")}
+              onClick={() => handleChangeMode("create")}
             >
               Add value set
             </Button>
@@ -432,7 +449,18 @@ const CodeLibrary: React.FC = () => {
                         <tr
                           className={styles.conceptsTable__header_sectionHeader}
                         >
-                          <th> {"Codes".toLocaleUpperCase()}</th>
+                          <th>
+                            <Button
+                              className={classNames(
+                                styles.editCodesBtn,
+                                "button-secondary",
+                              )}
+                              type="button"
+                              onClick={() => handleChangeMode("edit")}
+                            >
+                              Edit codes
+                            </Button>
+                          </th>
                         </tr>
                       )}
                       <tr className={styles.columnHeaders}>
@@ -521,7 +549,13 @@ const CodeLibrary: React.FC = () => {
           </div>
         </div>
       )}
-      {mode == "addValueSet" && <AddValueSets setMode={setMode} />}
+      {(mode == "create" || mode == "edit") && (
+        <CustomValueSetForm
+          mode={mode}
+          setMode={handleChangeMode}
+          activeValueSet={activeValueSet}
+        />
+      )}
     </WithAuth>
   );
 };

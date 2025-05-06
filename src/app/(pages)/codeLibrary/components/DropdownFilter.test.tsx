@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { RootProviderMock } from "@/app/tests/unit/setup";
-import { mockDibbsValueSets } from "../queryBuilding/fixtures";
+import { mockDibbsValueSets } from "../../queryBuilding/fixtures";
 import DropdownFilter from "./DropdownFilter";
 
 jest.mock("next-auth/react");

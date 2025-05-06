@@ -1,12 +1,12 @@
 import { Dispatch, RefObject, SetStateAction, useEffect, useRef } from "react";
 import { Button, Select } from "@trussworks/react-uswds";
-import styles from "./codeLibrary.module.scss";
+import styles from "../codeLibrary.module.scss";
 import {
   DibbsConceptType,
   DibbsValueSet,
 } from "@/app/models/entities/valuesets";
 import { formatStringToSentenceCase } from "@/app/shared/format-service";
-import { formatSystem } from "./utils";
+import { formatSystem } from "../utils";
 
 export type FilterCategories = {
   category: DibbsConceptType | undefined;
