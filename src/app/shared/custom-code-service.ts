@@ -15,6 +15,7 @@ import {
   INTENTIONAL_EMPTY_STRING_FOR_GEM_CODE,
 } from "./constants";
 import type { DibbsValueSet } from "../models/entities/valuesets";
+import type { QueryDataColumn } from "@/app/(pages)/queryBuilding/utils";
 import crypto from "crypto";
 import dbService from "@/app/backend/dbServices/db-service";
 
@@ -130,9 +131,50 @@ export class UserCreatedValuesetService {
       ? { success: true }
       : { success: false, error: errors.join(", ") };
   }
+
+  // upsert the query_data JSON for a given query to include a "custom" key
+  // we append or create the "custom" key while preserving everything else in the existing query_data JSON
+  @transaction
+  @auditable
+  static async upsertCustomValuesetsIntoQuery(
+    queryId: string,
+    customValuesets: DibbsValueSet[],
+  ): Promise<{ success: boolean; error?: string }> {
+    try {
+      // fetch the current query_data
+      const querySql = `SELECT query_data FROM query WHERE id = $1`;
+      const result = await dbService.query(querySql, [queryId]);
+
+      let existingQueryData: QueryDataColumn = {};
+
+      if (result.rows.length > 0 && result.rows[0].query_data) {
+        existingQueryData = result.rows[0].query_data as QueryDataColumn;
+      }
+
+      // preserve all existing keys, just add/replace the "custom" key
+      const updatedQueryData: QueryDataColumn = {
+        ...existingQueryData,
+        custom: {},
+      };
+
+      for (const vs of customValuesets) {
+        updatedQueryData.custom[vs.valueSetId] = vs;
+      }
+
+      const updateSql = `UPDATE query SET query_data = $1, date_last_modified = NOW() WHERE id = $2`;
+      await dbService.query(updateSql, [updatedQueryData, queryId]);
+
+      return { success: true };
+    } catch (e) {
+      console.error("Failed to upsert custom valuesets into query:", e);
+      return { success: false, error: String(e) };
+    }
+  }
 }
 
 export const getCustomCodeCondition =
   UserCreatedValuesetService.addCustomCodeCondition;
 export const insertCustomValueSet =
   UserCreatedValuesetService.insertCustomValueSet;
+export const upsertCustomValuesetsIntoQuery =
+  UserCreatedValuesetService.upsertCustomValuesetsIntoQuery;
