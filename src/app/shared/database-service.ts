@@ -571,19 +571,6 @@ class DatabaseService {
     return match ? match[1] : systemURL;
   }
 
-  private static logRejectedPromiseReasons<T>(
-    resultsArray: PromiseSettledResult<T>[],
-    errorMessageString: string,
-  ) {
-    return resultsArray
-      .filter((r): r is PromiseRejectedResult => r.status === "rejected")
-      .map((r) => {
-        console.error(errorMessageString);
-        console.error(r.reason);
-        return r.reason;
-      });
-  }
-
   /**
    * Helper function that execute the category data updates for inserted conditions.
    * @param vs - The ValueSet in of the shape of our internal data model to insert

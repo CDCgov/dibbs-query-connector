@@ -1,6 +1,6 @@
 "use client";
 
-import { Icon, Label, TextInput } from "@trussworks/react-uswds";
+import { Icon, Label, Tag, TextInput } from "@trussworks/react-uswds";
 import {
   insertFhirServer,
   updateFhirServer,
@@ -48,6 +48,7 @@ const FhirServers: React.FC = () => {
   const [tokenEndpoint, setTokenEndpoint] = useState("");
   const [scopes, setScopes] = useState("");
   const [disableCertValidation, setDisableCertValidation] = useState(false);
+  const [defaultServer, setDefaultServer] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState<
     "idle" | "success" | "error"
   >("idle");
@@ -86,6 +87,8 @@ const FhirServers: React.FC = () => {
     setTokenEndpoint("");
     setScopes("");
     setConnectionStatus("idle");
+    setDisableCertValidation(false);
+    setDefaultServer(false);
     setErrorMessage("");
     setSelectedServer(null);
   };
@@ -98,6 +101,7 @@ const FhirServers: React.FC = () => {
       setServerUrl(server.hostname);
       setConnectionStatus("idle");
       setDisableCertValidation(server.disableCertValidation);
+      setDefaultServer(server.defaultServer);
 
       // Set auth method and corresponding fields based on server data
       if (server.authType) {
@@ -205,6 +209,7 @@ const FhirServers: React.FC = () => {
         serverName,
         serverUrl,
         disableCertValidation,
+        defaultServer,
         connectionResult.success,
         authData,
       );
@@ -224,6 +229,7 @@ const FhirServers: React.FC = () => {
         serverName,
         serverUrl,
         disableCertValidation,
+        defaultServer,
         connectionResult.success,
         authData,
       );
@@ -461,64 +467,83 @@ const FhirServers: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            {fhirServers.map((fhirServer) => (
-              <tr
-                key={fhirServer.id}
-                className={classNames(styles.tableRowHover)}
-              >
-                <td>{fhirServer.name}</td>
-                <td>{fhirServer.hostname}</td>
-                <td>
-                  {fhirServer.authType ||
-                    (fhirServer.headers?.Authorization ? "basic" : "none")}
-                </td>
-                <td width={480}>
-                  <div className="grid-container grid-row padding-0 display-flex flex-align-center">
-                    {fhirServer.lastConnectionSuccessful ? (
-                      <>
-                        <Icon.Check
-                          size={3}
-                          className="usa-icon margin-right-05"
-                          aria-label="Connected"
-                          color="green"
-                        />
-                        Connected
-                      </>
-                    ) : (
-                      <>
-                        <Icon.Close
-                          size={3}
-                          className="usa-icon margin-right-05"
-                          aria-label="Not connected"
-                          color="red"
-                        />
-                        Not connected
-                      </>
-                    )}
-                    <span className={styles.lastChecked}>
-                      (last checked:{" "}
-                      {fhirServer.lastConnectionAttempt
-                        ? new Date(
-                            fhirServer.lastConnectionAttempt,
-                          ).toLocaleString()
-                        : "unknown"}
-                      )
-                    </span>
-                    <button
-                      className={classNames(
-                        styles.editButton,
-                        "usa-button usa-button--unstyled",
+            {fhirServers
+              .slice()
+              .sort((a, b) =>
+                a.name.localeCompare(b.name, undefined, {
+                  sensitivity: "base",
+                }),
+              ) // Sort by name
+              .sort((a, b) =>
+                b.defaultServer === true
+                  ? 1
+                  : a.defaultServer === true
+                    ? -1
+                    : 0,
+              ) // Sort default server to the top
+              .map((fhirServer) => (
+                <tr
+                  key={fhirServer.id}
+                  className={classNames(styles.tableRowHover)}
+                >
+                  <td>
+                    {fhirServer.name}{" "}
+                    {fhirServer.defaultServer ? (
+                      <Tag className="margin-left-2">DEFAULT</Tag>
+                    ) : null}
+                  </td>
+                  <td>{fhirServer.hostname}</td>
+                  <td>
+                    {fhirServer.authType ||
+                      (fhirServer.headers?.Authorization ? "basic" : "none")}
+                  </td>
+                  <td width={480}>
+                    <div className="grid-container grid-row padding-0 display-flex flex-align-center">
+                      {fhirServer.lastConnectionSuccessful ? (
+                        <>
+                          <Icon.Check
+                            size={3}
+                            className="usa-icon margin-right-05"
+                            aria-label="Connected"
+                            color="green"
+                          />
+                          Connected
+                        </>
+                      ) : (
+                        <>
+                          <Icon.Close
+                            size={3}
+                            className="usa-icon margin-right-05"
+                            aria-label="Not connected"
+                            color="red"
+                          />
+                          Not connected
+                        </>
                       )}
-                      onClick={() => handleOpenModal("edit", fhirServer)}
-                      aria-label={`Edit ${fhirServer.name}`}
-                    >
-                      <Icon.Edit aria-label="edit" size={3} />
-                      Edit
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
+                      <span className={styles.lastChecked}>
+                        (last checked:{" "}
+                        {fhirServer.lastConnectionAttempt
+                          ? new Date(
+                              fhirServer.lastConnectionAttempt,
+                            ).toLocaleString()
+                          : "unknown"}
+                        )
+                      </span>
+                      <button
+                        className={classNames(
+                          styles.editButton,
+                          "usa-button usa-button--unstyled",
+                        )}
+                        onClick={() => handleOpenModal("edit", fhirServer)}
+                        aria-label={`Edit ${fhirServer.name}`}
+                      >
+                        <Icon.Edit aria-label="edit" size={3} />
+                        Edit
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
           </tbody>
         </Table>
         <Modal
@@ -583,6 +608,13 @@ const FhirServers: React.FC = () => {
             label="Disable certificate validation"
             checked={disableCertValidation}
             onChange={(e) => setDisableCertValidation(e.target.checked)}
+          />
+
+          <Checkbox
+            id="default-server"
+            label="Default server?"
+            checked={defaultServer}
+            onChange={(e) => setDefaultServer(e.target.checked)}
           />
         </Modal>
       </div>
