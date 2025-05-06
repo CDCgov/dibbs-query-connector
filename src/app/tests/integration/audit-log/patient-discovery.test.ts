@@ -16,7 +16,12 @@ import {
   signOut,
 } from "@/app/backend/session-management";
 import * as AuditableDecorators from "@/app/backend/auditLogs/lib";
-import { GET_ALL_AUDIT_ROWS, waitForAuditSuccess } from "./utils";
+import {
+  GET_ALL_AUDIT_ROWS,
+  getAuditEntry,
+  TEST_USER,
+  waitForAuditSuccess,
+} from "./utils";
 
 jest.mock("@/app/utils/auth", () => {
   return {
@@ -37,18 +42,6 @@ const auditCompletionSpy = jest.spyOn(
   "generateAuditSuccessMessage",
 );
 
-// don't export / reuse this test user elsewhere since we're filtering
-// the audit entry results off this user's authorship. Otherwise, the
-// selection from the audit entry table is susceptible to race condition issues
-const TEST_USER = {
-  user: {
-    id: "13e1efb2-5889-4157-8f34-78d7f02dbf84",
-    username: "bowserjr",
-    email: "bowser.jr@koopa.evil",
-    firstName: "Bowser",
-    lastName: "Jr.",
-  },
-};
 (auth as jest.Mock).mockResolvedValue(TEST_USER);
 
 describe("patient queries", () => {
@@ -71,15 +64,7 @@ describe("patient queries", () => {
     };
     await patientDiscoveryQuery(request);
     await waitForAuditSuccess(actionTypeToCheck, auditCompletionSpy);
-
-    const newAuditRows = await dbService.query(GET_ALL_AUDIT_ROWS);
-    const auditEntry = newAuditRows.rows.filter((r) => {
-      return (
-        r.author === TEST_USER.user.username &&
-        r.actionType === actionTypeToCheck &&
-        !oldAuditIds.includes(r.id)
-      );
-    })[0];
+    const auditEntry = await getAuditEntry(actionTypeToCheck, oldAuditIds);
 
     expect(auditEntry?.actionType).toBe(actionTypeToCheck);
     expect(auditEntry?.auditMessage).toStrictEqual({
@@ -99,15 +84,7 @@ describe("patient queries", () => {
     };
     await patientRecordsQuery(request);
     await waitForAuditSuccess(actionTypeToCheck, auditCompletionSpy);
-
-    const newAuditRows = await dbService.query(GET_ALL_AUDIT_ROWS);
-    const auditEntry = newAuditRows.rows.filter((r) => {
-      return (
-        r.author === TEST_USER.user.username &&
-        r.actionType === actionTypeToCheck &&
-        !oldAuditIds.includes(r.id)
-      );
-    })[0];
+    const auditEntry = await getAuditEntry(actionTypeToCheck, oldAuditIds);
 
     expect(auditEntry?.actionType).toBe(actionTypeToCheck);
     expect(JSON.parse(auditEntry?.auditMessage?.fhirServer)).toBe(
@@ -130,13 +107,8 @@ describe("sign in and out", () => {
 
     await signOut();
     await waitForAuditSuccess(actionTypeToCheck, auditCompletionSpy);
+    const auditEntry = await getAuditEntry(actionTypeToCheck, oldAuditIds);
 
-    const newAuditRows = await dbService.query(GET_ALL_AUDIT_ROWS);
-    const auditEntry = newAuditRows.rows.filter((r) => {
-      return (
-        r.author === TEST_USER.user.username && !oldAuditIds.includes(r.id)
-      );
-    })[0];
     const userInfo = JSON.parse(auditEntry?.auditMessage?.sessionParams).session
       .user;
 
@@ -157,18 +129,8 @@ describe("sign in and out", () => {
       family_name: TEST_USER.user.lastName,
     });
     await waitForAuditSuccess(actionTypeToCheck, auditCompletionSpy);
+    const auditEntry = await getAuditEntry(actionTypeToCheck, oldAuditIds);
 
-    const newAuditRows = await dbService.query(GET_ALL_AUDIT_ROWS);
-
-    const auditResults = newAuditRows.rows.filter((r) => {
-      return (
-        r.author === TEST_USER.user.username &&
-        r.actionType === actionTypeToCheck &&
-        !oldAuditIds.includes(r.id)
-      );
-    });
-
-    const auditEntry = auditResults[0];
     const userInfo = JSON.parse(auditEntry?.auditMessage?.profile);
 
     expect(auditEntry?.actionType).toBe(actionTypeToCheck);

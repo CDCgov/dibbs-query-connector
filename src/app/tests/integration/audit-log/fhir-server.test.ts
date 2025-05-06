@@ -5,22 +5,14 @@ import {
   deleteFhirServer,
 } from "@/app/backend/dbServices/fhir-servers";
 import { auth } from "@/auth";
-import { GET_ALL_AUDIT_ROWS, waitForAuditSuccess } from "./utils";
+import {
+  GET_ALL_AUDIT_ROWS,
+  getAuditEntry,
+  TEST_USER,
+  waitForAuditSuccess,
+} from "./utils";
 import * as AuditableDecorators from "@/app/backend/auditLogs/lib";
 
-// don't export / reuse this test user elsewhere since we're filtering
-// the audit entry results off this user's authorship. Otherwise, the
-// selection from the audit entry table is susceptible to race condition issues
-const TEST_USER = {
-  user: {
-    id: "13e1efb2-5889-4157-8f34-78d7f02dbf84",
-    username: "bowserjr",
-    email: "bowser.jr@koopa.evil",
-    firstName: "Bowser",
-    lastName: "Jr.",
-  },
-};
-(auth as jest.Mock).mockResolvedValue(TEST_USER);
 jest.mock("@/app/backend/auditLogs/lib", () => {
   return {
     __esModule: true,
@@ -31,6 +23,7 @@ const auditCompletionSpy = jest.spyOn(
   AuditableDecorators,
   "generateAuditSuccessMessage",
 );
+(auth as jest.Mock).mockResolvedValue(TEST_USER);
 
 describe("fhir server", () => {
   it("fhir server addition / deletion / update", async () => {
@@ -56,16 +49,7 @@ describe("fhir server", () => {
     const actionTypeToCheck = "insertFhirServer";
     await waitForAuditSuccess(actionTypeToCheck, auditCompletionSpy);
 
-    const newAuditRows = await dbService.query(GET_ALL_AUDIT_ROWS);
-
-    const auditResults = newAuditRows.rows.filter((r) => {
-      return (
-        r.author === TEST_USER.user.username &&
-        r.actionType === actionTypeToCheck &&
-        !oldAuditIds.includes(r.id)
-      );
-    });
-    const auditEntry = auditResults[0]?.auditMessage;
+    const auditEntry = await getAuditEntry(actionTypeToCheck, oldAuditIds);
 
     expect(JSON.parse(auditEntry.name)).toBe(TEST_FHIR_SERVER.name);
     expect(JSON.parse(auditEntry.hostname)).toBe(TEST_FHIR_SERVER.hostname);
@@ -84,16 +68,11 @@ describe("fhir server", () => {
     );
     const updateTypeToCheck = "updateFhirServer";
     await waitForAuditSuccess(updateTypeToCheck, auditCompletionSpy);
+    const updateAuditEntry = await getAuditEntry(
+      updateTypeToCheck,
+      oldAuditIds,
+    );
 
-    const updateAuditRows = await dbService.query(GET_ALL_AUDIT_ROWS);
-    const updateRows = updateAuditRows.rows.filter((r) => {
-      return (
-        r.author === TEST_USER.user.username &&
-        r.actionType === updateTypeToCheck &&
-        !oldAuditIds.includes(r.id)
-      );
-    });
-    const updateAuditEntry = updateRows[0]?.auditMessage;
     expect(JSON.parse(updateAuditEntry.name)).toBe(updateName);
 
     // delete
@@ -101,16 +80,7 @@ describe("fhir server", () => {
     const finalTypeToCheck = "deleteFhirServer";
     await waitForAuditSuccess(finalTypeToCheck, auditCompletionSpy);
 
-    const finalAuditRows = await dbService.query(GET_ALL_AUDIT_ROWS);
-
-    const finalAuditResults = finalAuditRows.rows.filter((r) => {
-      return (
-        r.author === TEST_USER.user.username &&
-        r.actionType === finalTypeToCheck &&
-        !oldAuditIds.includes(r.id)
-      );
-    });
-    const finalEntry = finalAuditResults[0]?.auditMessage;
+    const finalEntry = await getAuditEntry(finalTypeToCheck, oldAuditIds);
     expect(JSON.parse(finalEntry.id)).toBe(result.server.id);
   });
 });
