@@ -211,3 +211,7 @@ export const HL7_BODY_MISFORMAT =
   "Invalid HL7 request. Please add your HL7 message to the request body in between curly braces like so - { YOUR MESSAGE HERE } ";
 export const MISSING_PATIENT_IDENTIFIERS =
   "No patient identifiers to parse from requestBody.";
+
+// Constants for the code library
+export const CUSTOM_CONDITION_ID = "custom_condition"; // This should be a unique identifier for the condition, we could just call it '0', but we will need some way to exclude it from certain screens, so that's why I lean toward it being hardcoded.
+export const CUSTOM_VALUESET_ARRAY_ID = "custom"; // This array of valuesets that are user-managed (both user-created and non-user-created), we will need to add this to the query_data table in the query table
