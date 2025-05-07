@@ -1,4 +1,4 @@
-import dbService from "@/app/backend/db/client";
+import dbService from "@/app/backend/db/service";
 import { waitFor } from "@testing-library/dom";
 
 export const GET_ALL_AUDIT_ROWS = "SELECT * FROM audit_logs;";

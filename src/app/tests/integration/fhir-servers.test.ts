@@ -1,4 +1,4 @@
-import dbService from "@/app/backend/db/client";
+import dbService from "@/app/backend/db/service";
 import { suppressConsoleLogs } from "./fixtures";
 
 import { FHIR_SERVER_INSERT_QUERY } from "@/app/backend/db/util";

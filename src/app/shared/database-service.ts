@@ -35,7 +35,7 @@ import type { DibbsValueSet } from "../models/entities/valuesets";
 import { Concept } from "../models/entities/concepts";
 import { adminRequired, transaction } from "@/app/backend/db/decorators";
 import { auditable } from "@/app/backend/audit-logs/decorator";
-import dbService from "../backend/db/client";
+import dbService from "../backend/db/service";
 import { QCResponse } from "../models/responses/collections";
 
 type ErsdOrVsacResponse = Bundle | Parameters | OperationOutcome;

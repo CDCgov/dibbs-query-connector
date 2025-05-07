@@ -2,7 +2,7 @@
 import { FhirServerConfig } from "@/app/models/entities/fhir-servers";
 import { auditable } from "@/app/backend/audit-logs/decorator";
 import FHIRClient from "@/app/shared/fhirClient";
-import dbService from "./db/client";
+import dbService from "./db/service";
 import { superAdminRequired, transaction } from "./db/decorators";
 import { FHIR_SERVER_INSERT_QUERY } from "./db/util";
 

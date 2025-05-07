@@ -17,7 +17,7 @@ import {
 import type { DibbsValueSet } from "../models/entities/valuesets";
 import type { QueryDataColumn } from "@/app/(pages)/queryBuilding/utils";
 import crypto from "crypto";
-import dbService from "@/app/backend/db/client";
+import dbService from "@/app/backend/db/service";
 import {
   CUSTOM_CONDITION_ID,
   CUSTOM_VALUESET_ARRAY_ID,

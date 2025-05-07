@@ -6,7 +6,7 @@ import {
 import { DibbsValueSet } from "@/app/models/entities/valuesets";
 import { DEFAULT_TIME_WINDOW } from "@/app/shared/utils";
 import { randomUUID } from "crypto";
-import { DbService } from "../db/client";
+import { DbService } from "../db/service";
 import { Pool } from "pg";
 
 // The underlying functionality here is reused in Playwright to do some

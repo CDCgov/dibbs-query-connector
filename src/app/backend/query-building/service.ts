@@ -7,7 +7,7 @@ import {
   getSavedQueryByIdHelp,
   saveCustomQueryHelp,
 } from "./lib";
-import dbService from "../db/client";
+import dbService from "../db/service";
 import { auditable } from "../audit-logs/decorator";
 import { getAllGroupQueries } from "../usergroup-management";
 import { User } from "@/app/models/entities/users";

@@ -8,7 +8,7 @@ import {
   removeUsersFromGroup,
   updateUserGroup,
 } from "@/app/backend/usergroup-management";
-import dbService from "@/app/backend/db/client";
+import dbService from "@/app/backend/db/service";
 import {
   addUserIfNotExists,
   updateUserDetails,

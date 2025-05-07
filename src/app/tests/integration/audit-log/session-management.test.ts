@@ -1,4 +1,4 @@
-import dbService from "@/app/backend/db/client";
+import dbService from "@/app/backend/db/service";
 import {
   logSignInToAuditTable,
   signOut,

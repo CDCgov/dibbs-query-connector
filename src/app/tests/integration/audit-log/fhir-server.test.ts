@@ -1,4 +1,4 @@
-import dbService from "@/app/backend/db/client";
+import dbService from "@/app/backend/db/service";
 import { auth } from "@/auth";
 import {
   GET_ALL_AUDIT_ROWS,
