@@ -1,9 +1,5 @@
 @use "_variables" as *;
 
-header {
-  background-image: linear-gradient(to right, $blue-60v, $cyan-50v);
-}
-
 footer {
   background-color: $footer;
 }
@@ -19,21 +15,25 @@ footer {
   color: $stepper-inactive-text;
 }
 
+.usa-step-indicator__segment--current .usa-step-indicator__segment-label {
+  color: $primary-cta;
+}
+
 .usa-step-indicator__segment--current::before,
 .usa-step-indicator__segment--current::after {
-  background-color: $primary !important;
-  color: $primary !important;
+  background-color: $primary-background !important;
+  color: $primary-cta !important;
   box-shadow:
     0 0 0 0.25rem $white,
     0 0 0 0 $white !important;
 }
 
 .usa-current {
-  color: $primary !important;
+  color: $primary-cta !important;
 }
 
 .usa-current::after {
-  background-color: $primary !important;
+  background-color: $primary-cta !important;
 }
 
 .usa-accordion__button,
@@ -43,30 +43,32 @@ footer {
 }
 
 .usa-button {
-  background-color: $primary;
+  background-color: $primary-cta;
   &:hover {
-    background-color: $blue-40v;
+    background-color: $primary-cta-hover;
   }
   &:active {
-    background-color: $blue-400;
+    background-color: $primary-cta-active;
   }
 
   &--outline {
-    background-color: white;
+    background-color: $secondary-cta;
 
     &:active,
     &:hover {
-      background-color: white;
+      background-color: $secondary-cta;
     }
   }
 
   &--unstyled {
-    background-color: transparent;
+    background-color: transparent !important;
 
     &:active,
     &:hover {
-      background-color: transparent;
+      background-color: transparent !important;
     }
+
+    color: $tertiary-cta !important;
   }
 }
 

@@ -23,15 +23,6 @@
   white-space: nowrap;
 }
 
-.runQueryBtn {
-  cursor: pointer;
-  background-color: #fff !important;
-  border: 2px solid #0076d6 !important;
-  border-radius: 4px !important;
-  color: #0076d6 !important;
-  white-space: nowrap;
-}
-
 .menuButton {
   cursor: pointer;
   background: none !important;
@@ -66,6 +57,8 @@
   text-decoration: none !important;
   padding: 0.5rem 1rem !important;
   cursor: pointer;
+  border: none;
+  background-color: transparent;
 }
 
 .menuItem:hover {

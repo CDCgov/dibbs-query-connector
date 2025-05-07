@@ -24,7 +24,7 @@
 }
 
 .checkbox input:checked + label::before {
-  background-color: $primary !important;
+  background-color: $primary-cta !important;
   box-shadow: none !important;
 }
 
@@ -32,6 +32,6 @@
   background-image: url("minus.svg") !important;
   background-repeat: no-repeat;
   background-position: center;
-  background-color: $primary;
+  background-color: $primary-cta;
   box-shadow: none !important;
 }

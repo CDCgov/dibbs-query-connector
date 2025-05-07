@@ -1,11 +1,11 @@
 @use "../../../ui/styles/_variables" as *;
 
 .customizeTableWrapper {
-  border: solid 1px $table-border;
+  border: solid 1px $border;
   border-radius: 0.25rem;
   box-shadow: 0px 2px 3px 0px $drop-shadow;
   padding: 1px;
-  background-color: $white;
+  background-color: #fff;
 }
 
 .customizeTable {

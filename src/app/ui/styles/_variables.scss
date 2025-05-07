@@ -5,7 +5,9 @@ $query-connector-max-width: 45rem;
 $query-connector-wide-max-width: 90rem;
 $query-connector-content-margins: 13.75rem;
 $query-connector-content-margins-wide: 10rem;
-$query-connector-content-width-wide: calc($query-connector-wide-max-width - 2 * $query-connector-content-margins-wide);
+$query-connector-content-width-wide: calc(
+  $query-connector-wide-max-width - 2 * $query-connector-content-margins-wide
+);
 
 // Design System Fonts
 $serif-font: family("heading");
@@ -15,9 +17,6 @@ $mono-font: "Consolas", family("mono");
 // Design System Color Tokens
 
 // Primatives
-$black: #1b1b1b;
-$white: #fff;
-
 $gray-600: #5c5c5c;
 $gray-500: #919191;
 $gray-400: #dfe1e2;
@@ -136,11 +135,28 @@ $gray-70: #454545;
 $gray-80: #2e2e2e;
 $gray-90: #1b1b1b;
 
-// Semantic Tokens
-// https://www.figma.com/design/Iuw9me6kYftBF4WTCEsCZz/Query-Connector?node-id=1856-3975
+// Primatives
+$black: #0f191c;
+$white: #e7f2f5;
+
+$primary-cta: #864381;
+$primary-cta-hover: #5c395a;
+$primary-cta-active: #382936;
+
+$secondary-cta: #e7f2f5;
+$tertiary-cta: #dae9ee;
+
+$primary-background: #14333d;
+$secondary-background: #3a7d95;
+$tertiary-background: #14333d;
 
 // Pulled from the Design System Figma
+// https://www.figma.com/design/Iuw9me6kYftBF4WTCEsCZz/Query-Connector?node-id=1856-3975
+
 $border: $gray-400;
+$table-row-border: $gray-300;
+$table-header: $gray-300;
+
 $page-background: $gray-100;
 $page-background-dark: $gray-300;
 
@@ -152,19 +168,14 @@ $empty-state: $blue-100;
 $highlight: $blue-100;
 $info: $blue-100;
 
-$primary: $blue-300;
-$header: $blue-400;
-$footer: $blue-400;
+$header: #14333d;
+$footer: #14333d;
 $error: $red-300;
 
 $text-primary: $black;
 $text-secondary: $gray-500;
 $text-base-lightest: $gray-300;
 $text-blue: $blue-400;
-
-$table-border: $gray-400;
-$table-row-border: $gray-300;
-$table-header: $gray-300;
 
 $stepper-completed: $blue-500;
 

@@ -28,7 +28,7 @@ footer {
 }
 
 header {
-  background-image: linear-gradient(to right, $blue-60v, $cyan-50v) !important;
+  background-color: $header;
 }
 
 h1 {
@@ -111,7 +111,7 @@ h1 {
 }
 
 .unchanged-color-on-visit:visited {
-  color: $primary;
+  color: $tertiary-cta;
 }
 
 .content-hidden {
@@ -129,7 +129,11 @@ h1 {
 }
 
 .gradient-blue-background {
-  background: linear-gradient(109.54deg, rgba(173, 207, 220, 0.025) 8.02%, rgba(46, 98, 118, 0.5) 117.53%);
+  background: linear-gradient(
+    109.54deg,
+    rgba(173, 207, 220, 0.025) 8.02%,
+    rgba(46, 98, 118, 0.5) 117.53%
+  );
 
   padding: 0.5rem;
   /* Optional: some padding to make the background more noticeable */
@@ -324,11 +328,19 @@ hr.custom-hr {
   font-weight: bold;
 }
 
-ul.usa-sidenav > li.usa-sidenav__item > ul.usa-sidenav__sublist > li.usa-sidenav__item > a {
+ul.usa-sidenav
+  > li.usa-sidenav__item
+  > ul.usa-sidenav__sublist
+  > li.usa-sidenav__item
+  > a {
   font-weight: bold;
 }
 
-ul.usa-sidenav > li.usa-sidenav__item > ul.usa-sidenav__sublist > li.usa-sidenav__item > a.usa-current {
+ul.usa-sidenav
+  > li.usa-sidenav__item
+  > ul.usa-sidenav__sublist
+  > li.usa-sidenav__item
+  > a.usa-current {
   &::after {
     background-color: rgb(0, 94, 162);
     content: "";
@@ -343,7 +355,7 @@ ul.usa-sidenav > li.usa-sidenav__item > ul.usa-sidenav__sublist > li.usa-sidenav
 }
 
 .usa-step-indicator__current-step {
-  background-color: $primary;
+  background-color: $primary-cta;
   margin-right: 0.5rem;
   padding: 0;
   height: 2.75rem;
@@ -351,7 +363,7 @@ ul.usa-sidenav > li.usa-sidenav__item > ul.usa-sidenav__sublist > li.usa-sidenav
 }
 
 .usa-step-indicator__total-steps {
-  color: $primary;
+  color: $primary-cta;
 }
 
 .usa-step-indicator__total-steps,
@@ -589,7 +601,7 @@ ul.usa-sidenav > li.usa-sidenav__item > ul.usa-sidenav__sublist > li.usa-sidenav
     justify-content: space-between;
 
     .usa-button--secondary {
-      background-color: #d83933 !important;
+      background-color: $secondary-cta !important;
     }
 
     .usa-button-group__item:last-child {
@@ -604,7 +616,7 @@ ul.usa-sidenav > li.usa-sidenav__item > ul.usa-sidenav__sublist > li.usa-sidenav
     #modal-back-button,
     #modal-cancel-button {
       background-color: transparent;
-      color: #005ea2;
+      color: $primary-cta;
 
       &:hover {
         box-shadow: none;
