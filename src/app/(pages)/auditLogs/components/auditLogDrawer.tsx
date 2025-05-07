@@ -4,7 +4,7 @@ import React from "react";
 import Drawer from "@/app/ui/designSystem/drawer/Drawer";
 import styles from "../auditLogs.module.scss";
 import { auditLogActionTypeMap, auditLogUserMap } from "./auditLogMaps";
-import { LogEntry } from "@/app/backend/audit-logs";
+import { LogEntry } from "@/app/backend/audit-logs/service";
 
 type AuditLogDrawerProps = {
   isOpen: boolean;

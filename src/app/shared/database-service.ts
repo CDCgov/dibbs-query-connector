@@ -34,7 +34,7 @@ import { internal_getDbClient } from "../backend/db/config";
 import type { DibbsValueSet } from "../models/entities/valuesets";
 import { Concept } from "../models/entities/concepts";
 import { adminRequired, transaction } from "@/app/backend/db/decorators";
-import { auditable } from "@/app/backend/auditLogs/decorator";
+import { auditable } from "@/app/backend/audit-logs/decorator";
 import dbService from "../backend/db/client";
 import { QCResponse } from "../models/responses/collections";
 

@@ -1,6 +1,6 @@
 "use server";
 import { FhirServerConfig } from "@/app/models/entities/fhir-servers";
-import { auditable } from "@/app/backend/auditLogs/decorator";
+import { auditable } from "@/app/backend/audit-logs/decorator";
 import FHIRClient from "@/app/shared/fhirClient";
 import dbService from "./db/client";
 import { superAdminRequired, transaction } from "./db/decorators";

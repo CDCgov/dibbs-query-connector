@@ -6,7 +6,7 @@ import {
   TEST_USER,
   waitForAuditSuccess,
 } from "./utils";
-import * as AuditableDecorators from "@/app/backend/auditLogs/lib";
+import * as AuditableDecorators from "@/app/backend/audit-logs/lib";
 import { suppressConsoleLogs } from "../fixtures";
 import {
   insertFhirServer,

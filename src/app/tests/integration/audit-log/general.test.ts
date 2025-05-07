@@ -1,11 +1,11 @@
 import {
   AUDIT_LOG_MAX_RETRIES,
   auditable,
-} from "@/app/backend/auditLogs/decorator";
+} from "@/app/backend/audit-logs/decorator";
 import { patientDiscoveryQuery } from "@/app/backend/query-execution";
 import { PatientDiscoveryRequest } from "@/app/models/entities/query";
 import { hyperUnluckyPatient } from "@/app/shared/constants";
-import * as DecoratorUtils from "@/app/backend/auditLogs/lib";
+import * as DecoratorUtils from "@/app/backend/audit-logs/lib";
 import { internal_getDbClient } from "@/app/backend/db/config";
 import { suppressConsoleLogs } from "../fixtures";
 

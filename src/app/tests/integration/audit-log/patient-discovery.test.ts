@@ -12,7 +12,7 @@ import {
 } from "@/app/models/entities/query";
 import dbService from "@/app/backend/db/client";
 
-import * as AuditableDecorators from "@/app/backend/auditLogs/lib";
+import * as AuditableDecorators from "@/app/backend/audit-logs/lib";
 import {
   GET_ALL_AUDIT_ROWS,
   getAuditEntry,

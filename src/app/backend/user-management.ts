@@ -10,7 +10,7 @@ import {
 import { QCResponse } from "../models/responses/collections";
 import dbService from "./db/client";
 import { adminRequired, superAdminRequired } from "./db/decorators";
-import { auditable } from "./auditLogs/decorator";
+import { auditable } from "./audit-logs/decorator";
 
 class UserManagementService {
   /**

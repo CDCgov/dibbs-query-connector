@@ -20,7 +20,7 @@ import {
   auditLogUserMap,
   initializeAuditLogUserMap,
 } from "./components/auditLogMaps";
-import { getAuditLogs, LogEntry } from "@/app/backend/audit-logs";
+import { getAuditLogs, LogEntry } from "@/app/backend/audit-logs/service";
 
 /**
  * Client component for the Audit Logs page.

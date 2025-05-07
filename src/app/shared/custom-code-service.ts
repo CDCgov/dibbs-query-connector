@@ -1,7 +1,7 @@
 "use server";
 
 import { transaction } from "@/app/backend/db/decorators";
-import { auditable } from "@/app/backend/auditLogs/decorator";
+import { auditable } from "@/app/backend/audit-logs/decorator";
 import { internal_getDbClient } from "../backend/db/config";
 import {
   insertValueSetSql,

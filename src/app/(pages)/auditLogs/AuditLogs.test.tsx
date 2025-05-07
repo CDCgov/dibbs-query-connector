@@ -3,7 +3,7 @@ import AuditLogs from "./page";
 import { renderWithUser, RootProviderMock } from "@/app/tests/unit/setup";
 import userEvent from "@testing-library/user-event";
 import { auditLogActionTypeMap } from "./components/auditLogMaps";
-import { getAuditLogs, LogEntry } from "@/app/backend/audit-logs";
+import { getAuditLogs, LogEntry } from "@/app/backend/audit-logs/service";
 
 jest.mock(
   "@/app/ui/components/withAuth/WithAuth",

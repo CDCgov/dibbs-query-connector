@@ -9,7 +9,7 @@ import {
   getAuditEntry,
   TEST_USER,
 } from "./utils";
-import * as AuditableDecorators from "@/app/backend/auditLogs/lib";
+import * as AuditableDecorators from "@/app/backend/audit-logs/lib";
 import { auth } from "@/auth";
 import { suppressConsoleLogs } from "../fixtures";
 

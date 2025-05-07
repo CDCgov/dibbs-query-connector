@@ -8,7 +8,7 @@ import {
   saveCustomQueryHelp,
 } from "./lib";
 import dbService from "../db/client";
-import { auditable } from "../auditLogs/decorator";
+import { auditable } from "../audit-logs/decorator";
 import { getAllGroupQueries } from "../usergroup-management";
 import { User } from "@/app/models/entities/users";
 import { CustomUserQuery } from "@/app/models/entities/query";

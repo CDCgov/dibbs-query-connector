@@ -7,7 +7,7 @@ import { CustomUserQuery } from "../models/entities/query";
 import { QueryResult } from "pg";
 import dbService from "./db/client";
 import { adminRequired } from "./db/decorators";
-import { auditable } from "./auditLogs/decorator";
+import { auditable } from "./audit-logs/decorator";
 import { getQueryById } from "./query-building/service";
 
 class UserGroupManagementService {
