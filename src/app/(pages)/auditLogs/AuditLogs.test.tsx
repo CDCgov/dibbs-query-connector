@@ -70,10 +70,10 @@ const testData = Array.from({ length: 50 }, (_, index) =>
   .flat()
   .sort((a, b) => b.date.getTime() - a.date.getTime());
 
-jest.mock("@/app/backend/audit-logs", () => {
+jest.mock("@/app/backend/audit-logs/service", () => {
   return {
     __esModule: true,
-    ...jest.requireActual("@/app/backend/audit-logs"),
+    ...jest.requireActual("@/app/backend/audit-logs/service"),
     getAuditLogs: jest.fn(),
   };
 });

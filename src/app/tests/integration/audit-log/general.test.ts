@@ -9,10 +9,10 @@ import * as DecoratorUtils from "@/app/backend/audit-logs/lib";
 import { internal_getDbClient } from "@/app/backend/db/config";
 import { suppressConsoleLogs } from "../fixtures";
 
-jest.mock("@/app/backend/auditLogs/lib", () => {
+jest.mock("@/app/backend/audit-logs/lib", () => {
   return {
     __esModule: true,
-    ...jest.requireActual("@/app/backend/auditLogs/lib"),
+    ...jest.requireActual("@/app/backend/audit-logs/lib"),
   };
 });
 

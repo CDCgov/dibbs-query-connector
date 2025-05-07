@@ -27,10 +27,10 @@ jest.mock("@/app/utils/auth", () => {
   };
 });
 
-jest.mock("@/app/backend/auditLogs/lib", () => {
+jest.mock("@/app/backend/audit-logs/lib", () => {
   return {
     __esModule: true,
-    ...jest.requireActual("@/app/backend/auditLogs/lib"),
+    ...jest.requireActual("@/app/backend/audit-logs/lib"),
   };
 });
 
