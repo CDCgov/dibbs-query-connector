@@ -1,5 +1,6 @@
 import { DibbsValueSet } from "@/app/models/entities/valuesets";
 import { ConceptTypeToDibbsVsMap } from "../../utils/valueSetTranslation";
+import { DibbsConceptType } from "@/app/models/entities/valuesets";
 
 // The structure of the data that's coming from the backend
 export type ConditionsMap = {
@@ -22,6 +23,12 @@ export type ConditionIdToValueSetArrayMap = {
 
 export type NestedQuery = {
   [conditionId: string]: ConceptTypeToDibbsVsMap;
+} & {
+  custom?: {
+    [conceptType in DibbsConceptType]: {
+      [vsId: string]: DibbsValueSet;
+    };
+  };
 };
 
 export type QueryUpdateResult = {

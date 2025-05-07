@@ -25,6 +25,10 @@ import {
   DibbsConceptType,
   DibbsValueSet,
 } from "@/app/models/entities/valuesets";
+import {
+  generateValueSetGroupingsByDibbsConceptType,
+  ConceptTypeToDibbsVsMap,
+} from "@/app/utils/valueSetTranslation";
 
 type ConditionSelectionProps = {
   constructedQuery: NestedQuery;
@@ -61,10 +65,15 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
     useState<CategoryToConditionArrayMap>(categoryToConditionsMap);
   const [conditionSearchFilter, setConditionSearchFilter] = useState("");
   const [valueSetSearchFilter, setValueSetSearchFilter] = useState("");
+  const isCustom = activeCondition === "custom";
 
   useEffect(() => {
     // display the first condition's valuesets on render
-    setActiveCondition(Object.keys(constructedQuery)[0] || "custom");
+    const firstRealCondition = Object.keys(constructedQuery).find(
+      (key) => key !== "custom",
+    );
+    setActiveCondition(firstRealCondition ?? "custom");
+    console.log("Current constructedQuery (query_data):", constructedQuery);
   }, [constructedQuery]);
 
   function generateConditionDrawerDisplay(
@@ -142,8 +151,15 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
     setActiveCondition(conditionId);
     setValueSetSearchFilter("");
   }
-
-  const activeConditionValueSets = constructedQuery[activeCondition];
+  const activeConditionValueSets: ConceptTypeToDibbsVsMap | undefined = isCustom
+    ? constructedQuery["custom"]
+      ? generateValueSetGroupingsByDibbsConceptType(
+          Object.values(constructedQuery["custom"]).flatMap((vsTypeMap) =>
+            Object.values(vsTypeMap),
+          ),
+        )
+      : { labs: {}, conditions: {}, medications: {} }
+    : constructedQuery[activeCondition];
 
   return (
     <div
@@ -176,47 +192,51 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
                   </div>
                 </div>
 
-                {Object.keys(constructedQuery).map((conditionId) => {
-                  const condition = conditionsMap[conditionId];
-                  return (
-                    <div
-                      key={conditionId}
-                      data-testid={
-                        activeCondition == conditionId
-                          ? `${conditionId}-card-active`
-                          : `${conditionId}-card`
-                      }
-                      className={classNames(
-                        "align-items-center",
-                        activeCondition == conditionId
-                          ? `${styles.card} ${styles.active}`
-                          : styles.card,
-                      )}
-                    >
+                {Object.keys(constructedQuery)
+                  .filter((conditionId) => conditionId !== "custom")
+                  .map((conditionId) => {
+                    const condition = conditionsMap[conditionId];
+                    if (!condition) return null;
+                    return (
                       <div
-                        key={`tab-${conditionId}`}
-                        id={`tab-${conditionId}`}
-                        onClick={() => handleConditionToggle(conditionId)}
-                        tabIndex={0}
+                        key={conditionId}
+                        data-testid={
+                          activeCondition == conditionId
+                            ? `${conditionId}-card-active`
+                            : `${conditionId}-card`
+                        }
+                        className={classNames(
+                          "align-items-center",
+                          activeCondition == conditionId
+                            ? `${styles.card} ${styles.active}`
+                            : styles.card,
+                        )}
                       >
-                        {formatDiseaseDisplay(condition.name)}
+                        <div
+                          key={`tab-${conditionId}`}
+                          id={`tab-${conditionId}`}
+                          onClick={() => handleConditionToggle(conditionId)}
+                          tabIndex={0}
+                        >
+                          {formatDiseaseDisplay(condition.name)}
+                        </div>
+                        <Icon.Delete
+                          className={classNames("usa-icon", styles.deleteIcon)}
+                          size={5}
+                          color="red"
+                          data-testid={`delete-condition-${conditionId}`}
+                          aria-label="Trash icon indicating deletion of disease"
+                          onClick={() => {
+                            handleUpdateCondition(conditionId, true);
+                            const next = Object.keys(constructedQuery).find(
+                              (k) => k !== conditionId && k !== "custom",
+                            );
+                            handleConditionToggle(next ?? "custom");
+                          }}
+                        ></Icon.Delete>
                       </div>
-                      <Icon.Delete
-                        className={classNames("usa-icon", styles.deleteIcon)}
-                        size={5}
-                        color="red"
-                        data-testid={`delete-condition-${conditionId}`}
-                        aria-label="Trash icon indicating deletion of disease"
-                        onClick={() => {
-                          handleUpdateCondition(conditionId, true);
-                          handleConditionToggle(
-                            Object.keys(constructedQuery)[0],
-                          );
-                        }}
-                      ></Icon.Delete>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
               </div>
               <div className={styles.section_custom}>
                 <div className={classNames(styles.sectionTitle)}>
@@ -244,54 +264,63 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
           </div>
         </div>
         <div className={styles.valueSetTemplate__right}>
-          {activeCondition !== "custom" && (
-            <div className={styles.valueSetTemplate__search}>
-              <SearchField
-                id="valueSetTemplateSearch"
-                placeholder={VALUESET_SELECTION_SEARCH_PLACEHOLDER}
-                className={styles.valueSetSearch}
-                onChange={(e) => {
-                  e.preventDefault();
-                  setValueSetSearchFilter(e.target.value);
-                }}
-                value={valueSetSearchFilter}
-              />
-            </div>
-          )}
+          {(activeConditionValueSets !== undefined || isCustom) && (
+            <>
+              <div className={styles.valueSetTemplate__search}>
+                <SearchField
+                  id="valueSetTemplateSearch"
+                  placeholder={VALUESET_SELECTION_SEARCH_PLACEHOLDER}
+                  className={styles.valueSetSearch}
+                  onChange={(e) => {
+                    e.preventDefault();
+                    setValueSetSearchFilter(e.target.value);
+                  }}
+                  value={valueSetSearchFilter}
+                />
+              </div>
 
-          {activeConditionValueSets && activeCondition !== "custom" && (
-            <ConceptTypeSelectionTable
-              vsTypeLevelOptions={activeConditionValueSets}
-              handleVsTypeLevelUpdate={handleSelectedValueSetUpdate(
-                activeCondition,
-              )}
-              searchFilter={valueSetSearchFilter}
-              setSearchFilter={setValueSetSearchFilter}
-            />
-          )}
-          {activeCondition == "custom" && (
-            <div className={styles.codeLibrary__empty}>
-              <Icon.GridView
-                aria-label="Stylized icon showing four squares in a grid"
-                className={classNames("usa-icon", styles.icon)}
-                color="#919191"
+              <ConceptTypeSelectionTable
+                vsTypeLevelOptions={
+                  activeConditionValueSets ?? {
+                    labs: {},
+                    conditions: {},
+                    medications: {},
+                  }
+                }
+                handleVsTypeLevelUpdate={handleSelectedValueSetUpdate(
+                  activeCondition,
+                )}
+                searchFilter={valueSetSearchFilter}
+                setSearchFilter={setValueSetSearchFilter}
               />
-              <p className={styles.codeLibrary__emptyText}>
-                <strong>
-                  This is a space for you to pull in individual value sets
-                </strong>
-              </p>
-              <p className={styles.codeLibrary__emptyText}>
-                <strong>
-                  These can be official value sets from CSTE, or ones that you
-                  have created in the code library.
-                </strong>
-              </p>
-              <Button className={styles.codeLibrary__button} type="button">
-                Add from code library
-              </Button>
-            </div>
+            </>
           )}
+          {isCustom &&
+            Object.values(activeConditionValueSets ?? {}).every(
+              (vsMap) => Object.keys(vsMap).length === 0,
+            ) && (
+              <div className={styles.codeLibrary__empty}>
+                <Icon.GridView
+                  aria-label="Stylized icon showing four squares in a grid"
+                  className={classNames("usa-icon", styles.icon)}
+                  color="#919191"
+                />
+                <p className={styles.codeLibrary__emptyText}>
+                  <strong>
+                    This is a space for you to pull in individual value sets
+                  </strong>
+                </p>
+                <p className={styles.codeLibrary__emptyText}>
+                  <strong>
+                    These can be official value sets from CSTE, or ones that you
+                    have created in the code library.
+                  </strong>
+                </p>
+                <Button className={styles.codeLibrary__button} type="button">
+                  Add from code library
+                </Button>
+              </div>
+            )}
         </div>
       </div>
 
