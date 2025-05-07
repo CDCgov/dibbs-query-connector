@@ -57,7 +57,7 @@ function resolveFullName(
   fallback?: string,
 ): string {
   const full = `${first ?? ""} ${last ?? ""}`.trim();
-  return full !== "" ? full : (fallback ?? "");
+  return full !== "" ? full : fallback ?? "";
 }
 
 /**
@@ -251,6 +251,23 @@ export const auditLogActionTypeMap: Record<string, auditLogActionTypeMapping> =
         const groupId = Object.values(request)[0];
         const queryId = Object.values(request)[1];
         return `Query with ID ${queryId} removed from group ${groupId}`;
+      },
+    },
+    deleteQueryById: {
+      label: "Deleted query",
+      format: (log) => {
+        const request = parseRequest(log);
+        const queryId = Object.values(request)[0];
+        return `Query with ID ${queryId} deleted`;
+      },
+    },
+    saveCustomQuery: {
+      label: "Added a new query",
+      format: (log) => {
+        const request = parseRequest(log);
+        const queryName = Object.values(request)[1];
+        const author = Object.values(request)[2];
+        return `Query with name ${queryName} made by ${author}`;
       },
     },
     // Add more as needed
