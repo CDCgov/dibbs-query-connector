@@ -20,7 +20,7 @@ jest.mock("@/app/backend/user-management", () => ({
   getUserRole: jest.fn(),
 }));
 
-jest.mock("@/app/backend/dbServices/queryBuilding/service", () => ({
+jest.mock("@/app/backend/query-building/service", () => ({
   getCustomQueries: jest.fn().mockResolvedValue([]),
 }));
 
@@ -31,7 +31,7 @@ jest.mock("@/app/backend/usergroup-management", () => ({
     .mockResolvedValue({ items: [], totalItems: 0 }),
 }));
 
-jest.mock("@/app/backend/dbServices/queryBuilding/service", () => ({
+jest.mock("@/app/backend/query-building/service", () => ({
   getCustomQueries: jest.fn().mockResolvedValue([]),
 }));
 

@@ -9,7 +9,7 @@ jest.mock(".../../../shared/database-service", () => ({
   getConditionsData: jest.fn(),
 }));
 
-jest.mock("@/app/backend/dbServices/queryBuilding/service", () => ({
+jest.mock("@/app/backend/query-building/service", () => ({
   getQueryList: jest.fn(),
   getCustomQueries: jest.fn(),
 }));

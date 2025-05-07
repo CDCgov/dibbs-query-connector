@@ -3,7 +3,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import { getQueryList } from "@/app/backend/query-building/service";
 import { RootProviderMock } from "@/app/tests/unit/setup";
 
-jest.mock("@/app/backend/dbServices/queryBuilding/service", () => ({
+jest.mock("@/app/backend/query-building/service", () => ({
   getQueryList: jest.fn(),
 }));
 

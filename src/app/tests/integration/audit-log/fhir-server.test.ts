@@ -1,9 +1,4 @@
 import dbService from "@/app/backend/db/client";
-import {
-  insertFhirServer,
-  updateFhirServer,
-  deleteFhirServer,
-} from "@/app/backend/dbServices/fhir-servers";
 import { auth } from "@/auth";
 import {
   GET_ALL_AUDIT_ROWS,
@@ -13,6 +8,11 @@ import {
 } from "./utils";
 import * as AuditableDecorators from "@/app/backend/auditLogs/lib";
 import { suppressConsoleLogs } from "../fixtures";
+import {
+  insertFhirServer,
+  updateFhirServer,
+  deleteFhirServer,
+} from "@/app/backend/fhir-servers";
 
 jest.mock("@/app/backend/auditLogs/lib", () => {
   return {
