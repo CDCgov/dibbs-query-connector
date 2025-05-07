@@ -5,10 +5,10 @@ import { getSingleUserWithGroupMemberships } from "./user-management";
 import { QCResponse } from "../models/responses/collections";
 import { CustomUserQuery } from "../models/entities/query";
 import { QueryResult } from "pg";
-import { getQueryById } from "./query-building";
-import dbService from "./dbServices/db-service";
-import { adminRequired } from "./dbServices/decorators";
+import dbService from "./db/client";
+import { adminRequired } from "./db/decorators";
 import { auditable } from "./auditLogs/decorator";
+import { getQueryById } from "./query-building/service";
 
 class UserGroupManagementService {
   /**

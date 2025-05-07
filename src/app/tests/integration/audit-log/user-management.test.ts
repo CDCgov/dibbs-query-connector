@@ -8,7 +8,7 @@ import {
   removeUsersFromGroup,
   updateUserGroup,
 } from "@/app/backend/usergroup-management";
-import dbService from "@/app/backend/dbServices/db-service";
+import dbService from "@/app/backend/db/client";
 import {
   addUserIfNotExists,
   updateUserDetails,
@@ -16,7 +16,7 @@ import {
 } from "@/app/backend/user-management";
 import { UserRole } from "@/app/models/entities/users";
 import { randomUUID } from "crypto";
-import { getQueryList } from "@/app/backend/query-building";
+import { getQueryList } from "@/app/backend/query-building/service";
 import { suppressConsoleLogs } from "../fixtures";
 
 jest.mock("@/app/utils/auth", () => {

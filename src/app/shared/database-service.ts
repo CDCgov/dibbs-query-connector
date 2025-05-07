@@ -30,22 +30,19 @@ import {
   ValuesetStruct,
   ValuesetToConceptStruct,
 } from "./seedSqlStructs";
-import { getDbClient } from "../backend/dbClient";
+import { internal_getDbClient } from "../backend/db/config";
 import type { DibbsValueSet } from "../models/entities/valuesets";
 import { Concept } from "../models/entities/concepts";
-import {
-  adminRequired,
-  transaction,
-} from "@/app/backend/dbServices/decorators";
+import { adminRequired, transaction } from "@/app/backend/db/decorators";
 import { auditable } from "@/app/backend/auditLogs/decorator";
-import dbService from "../backend/dbServices/db-service";
+import dbService from "../backend/db/client";
 import { QCResponse } from "../models/responses/collections";
 
 type ErsdOrVsacResponse = Bundle | Parameters | OperationOutcome;
 
 class DatabaseService {
   private static get dbClient() {
-    return getDbClient();
+    return internal_getDbClient();
   }
 
   private static getQuerybyNameSQL = `

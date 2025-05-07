@@ -1,7 +1,7 @@
 import {
   deleteQueryById,
   getCustomQueries,
-} from "@/app/backend/query-building";
+} from "@/app/backend/query-building/service";
 import { createTestCancerQuery } from "../../../../e2e/utils";
 import { getSavedQueryById } from "@/app/backend/dbServices/query-building";
 import { suppressConsoleLogs } from "./fixtures";

@@ -16,7 +16,7 @@ jest.mock(
     ({ children }: React.PropsWithChildren) => <div>{children}</div>,
 );
 
-jest.mock("@/app/backend/query-building", () => ({
+jest.mock("@/app/backend/dbServices/queryBuilding/service", () => ({
   getCustomQueries: jest.fn(),
 }));
 

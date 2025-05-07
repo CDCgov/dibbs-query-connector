@@ -8,8 +8,8 @@ import {
   UserGroupMembership,
 } from "../models/entities/users";
 import { QCResponse } from "../models/responses/collections";
-import dbService from "./dbServices/db-service";
-import { adminRequired, superAdminRequired } from "./dbServices/decorators";
+import dbService from "./db/client";
+import { adminRequired, superAdminRequired } from "./db/decorators";
 import { auditable } from "./auditLogs/decorator";
 
 class UserManagementService {

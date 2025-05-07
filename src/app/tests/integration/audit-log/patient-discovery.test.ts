@@ -10,7 +10,7 @@ import {
   PatientDiscoveryRequest,
   PatientRecordsRequest,
 } from "@/app/models/entities/query";
-import dbService from "@/app/backend/dbServices/db-service";
+import dbService from "@/app/backend/db/client";
 
 import * as AuditableDecorators from "@/app/backend/auditLogs/lib";
 import {

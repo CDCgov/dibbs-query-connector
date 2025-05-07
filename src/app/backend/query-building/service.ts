@@ -1,13 +1,65 @@
 "use server";
 
-import { DibbsValueSet } from "../models/entities/valuesets";
-import { CustomUserQuery } from "../models/entities/query";
-import { User } from "../models/entities/users";
-import { getAllGroupQueries } from "./usergroup-management";
-import dbService from "./dbServices/db-service";
-import { adminRequired, transaction } from "./dbServices/decorators";
+import type { NestedQuery } from "@/app/(pages)/queryBuilding/utils";
+import { adminRequired, transaction } from "../db/decorators";
+import {
+  deleteQueryByIdHelp,
+  getSavedQueryByIdHelp,
+  saveCustomQueryHelp,
+} from "./lib";
+import dbService from "../db/client";
+import { auditable } from "../auditLogs/decorator";
+import { getAllGroupQueries } from "../usergroup-management";
+import { User } from "@/app/models/entities/users";
+import { CustomUserQuery } from "@/app/models/entities/query";
+import { DibbsValueSet } from "@/app/models/entities/valuesets";
 
-class QueryBuilding {
+class QueryBuildingService {
+  /**
+   * Backend handler function for upserting a query
+   * @param queryInput - frontend input for a query
+   * @param queryName - name of query
+   * @param author - author
+   * @param queryId - a queryId if previously defined
+   * @returns - all columns of the newly added row in the query table
+   */
+  @adminRequired
+  @auditable
+  static async saveCustomQuery(
+    queryInput: NestedQuery,
+    queryName: string,
+    author: string,
+    queryId?: string,
+  ) {
+    return saveCustomQueryHelp(
+      queryInput,
+      queryName,
+      author,
+      dbService,
+      queryId,
+    );
+  }
+
+  /**
+   * Getter function to grab saved query details from the DB
+   * @param queryId - Query ID to grab data from the db with
+   * @returns The query name, data, and conditions list from the query table
+   */
+  static async getSavedQueryById(queryId: string) {
+    return getSavedQueryByIdHelp(queryId, dbService);
+  }
+
+  /**
+   * Deletes a query from the database by its unique ID.
+   * @param queryId - The unique identifier of the query to delete.
+   * @returns A success or error response indicating the result.
+   */
+  @transaction
+  @auditable
+  static async deleteQueryById(queryId: string) {
+    return deleteQueryByIdHelp(queryId, dbService);
+  }
+
   /**
    * Fetches and structures custom user queries from the database.
    * Executes a SQL query to join query information with related valueset and concept data,
@@ -72,7 +124,7 @@ class QueryBuilding {
 
   @adminRequired
   static async getQueryList(): Promise<CustomUserQuery[]> {
-    return QueryBuilding.getCustomQueries();
+    return QueryBuildingService.getCustomQueries();
   }
 
   /**
@@ -111,26 +163,6 @@ class QueryBuilding {
   }
 
   /**
-   * Deletes a query from the database by its unique ID.
-   * @param queryId - The unique identifier of the query to delete.
-   * @returns A success or error response indicating the result.
-   */
-  @adminRequired
-  @transaction
-  static async deleteQueryById(queryId: string) {
-    const deleteQuery = `
-    DELETE FROM query WHERE id = $1;
-  `;
-    try {
-      await dbService.query(deleteQuery, [queryId]);
-      return { success: true, id: queryId };
-    } catch (error) {
-      console.error(`Failed to delete query with ID ${queryId}:`, error);
-      return { success: false, error: "Failed to delete the query." };
-    }
-  }
-
-  /**
    * @param currentUser - Method to retrieve all queries assigned to groups that
    * the given user is a member of
    * @returns an array of CustomUserQuery objects
@@ -148,8 +180,10 @@ class QueryBuilding {
   }
 }
 
-export const getCustomQueries = QueryBuilding.getCustomQueries;
-export const getQueryList = QueryBuilding.getQueryList;
-export const getQueryById = QueryBuilding.getQueryById;
-export const deleteQueryById = QueryBuilding.deleteQueryById;
-export const getQueriesForUser = QueryBuilding.getQueriesForUser;
+export const saveCustomQuery = QueryBuildingService.saveCustomQuery;
+export const getSavedQueryById = QueryBuildingService.getSavedQueryById;
+export const deleteQueryById = QueryBuildingService.deleteQueryById;
+export const getCustomQueries = QueryBuildingService.getCustomQueries;
+export const getQueryList = QueryBuildingService.getQueryList;
+export const getQueryById = QueryBuildingService.getQueryById;
+export const getQueriesForUser = QueryBuildingService.getQueriesForUser;

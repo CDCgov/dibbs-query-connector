@@ -12,7 +12,6 @@ import SearchField from "@/app/ui/designSystem/searchField/SearchField";
 import Table from "@/app/ui/designSystem/table/Table";
 import { Button, Select, Pagination } from "@trussworks/react-uswds";
 import WithAuth from "@/app/ui/components/withAuth/WithAuth";
-import { getAuditLogs, LogEntry } from "@/app/backend/dbServices/audit-logs";
 import Skeleton from "react-loading-skeleton";
 import AuditLogDrawer from "./components/auditLogDrawer";
 import {
@@ -21,6 +20,7 @@ import {
   auditLogUserMap,
   initializeAuditLogUserMap,
 } from "./components/auditLogMaps";
+import { getAuditLogs, LogEntry } from "@/app/backend/audit-logs";
 
 /**
  * Client component for the Audit Logs page.

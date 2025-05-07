@@ -1,7 +1,7 @@
 import { waitFor, screen, render } from "@testing-library/react";
 import * as UserManagementBackend from "@/app/backend/user-management";
 import * as UserGroupManagementBackend from "@/app/backend/usergroup-management";
-import * as QueryBuildingBackend from "@/app/backend/query-building";
+import * as QueryBuildingBackend from "@/app/backend/query-building/service";
 import { UserRole } from "@/app/models/entities/users";
 import { renderWithUser, RootProviderMock } from "@/app/tests/unit/setup";
 import UsersTable from "./userManagementContainer";
@@ -20,7 +20,7 @@ jest.mock("@/app/backend/user-management", () => ({
   getUserRole: jest.fn(),
 }));
 
-jest.mock("@/app/backend/query-building", () => ({
+jest.mock("@/app/backend/dbServices/queryBuilding/service", () => ({
   getCustomQueries: jest.fn().mockResolvedValue([]),
 }));
 
@@ -31,7 +31,7 @@ jest.mock("@/app/backend/usergroup-management", () => ({
     .mockResolvedValue({ items: [], totalItems: 0 }),
 }));
 
-jest.mock("@/app/backend/query-building", () => ({
+jest.mock("@/app/backend/dbServices/queryBuilding/service", () => ({
   getCustomQueries: jest.fn().mockResolvedValue([]),
 }));
 

@@ -1,8 +1,8 @@
 "use server";
 
-import { transaction } from "@/app/backend/dbServices/decorators";
+import { transaction } from "@/app/backend/db/decorators";
 import { auditable } from "@/app/backend/auditLogs/decorator";
-import { getDbClient } from "../backend/dbClient";
+import { internal_getDbClient } from "../backend/db/config";
 import {
   insertValueSetSql,
   insertConceptSql,
@@ -17,7 +17,7 @@ import {
 import type { DibbsValueSet } from "../models/entities/valuesets";
 import type { QueryDataColumn } from "@/app/(pages)/queryBuilding/utils";
 import crypto from "crypto";
-import dbService from "@/app/backend/dbServices/db-service";
+import dbService from "@/app/backend/db/client";
 import {
   CUSTOM_CONDITION_ID,
   CUSTOM_VALUESET_ARRAY_ID,
@@ -25,7 +25,7 @@ import {
 
 export class UserCreatedValuesetService {
   private static get dbClient() {
-    return getDbClient();
+    return internal_getDbClient();
   }
 
   // This may not be needed since these are user-created valuesets

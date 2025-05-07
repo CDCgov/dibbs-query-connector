@@ -1,5 +1,6 @@
 "use server";
-import dbService from "./db-service";
+
+import dbService from "./db/client";
 
 export type LogEntry = {
   actionType: string;
