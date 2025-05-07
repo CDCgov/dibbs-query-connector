@@ -15,8 +15,13 @@ import {
   INTENTIONAL_EMPTY_STRING_FOR_GEM_CODE,
 } from "./constants";
 import type { DibbsValueSet } from "../models/entities/valuesets";
+import type { QueryDataColumn } from "@/app/(pages)/queryBuilding/utils";
 import crypto from "crypto";
 import dbService from "@/app/backend/dbServices/db-service";
+import {
+  CUSTOM_CONDITION_ID,
+  CUSTOM_VALUESET_ARRAY_ID,
+} from "@/app/shared/constants";
 
 export class UserCreatedValuesetService {
   private static get dbClient() {
@@ -30,20 +35,18 @@ export class UserCreatedValuesetService {
   }
 
   static async addCustomCodeCondition(system: string): Promise<string> {
-    const conditionId = "custom_condition"; // This should be a unique identifier for the condition, we could just call it '0', but we will need some way to exclude it from certain screens, so that's why I lean toward it being hardcoded.
     const checkSql = `SELECT id FROM conditions WHERE id = $1`;
-    const result = await dbService.query(checkSql, [conditionId]);
+    const result = await dbService.query(checkSql, [CUSTOM_CONDITION_ID]);
     if (result.rows.length === 0) {
       await dbService.query(insertConditionSql, [
-        conditionId,
+        CUSTOM_CONDITION_ID,
         system,
         "Custom Code Condition",
         "20250601", // Placeholder, I don't think we really need versioning for this
         "User-Created",
       ]);
     }
-    // TODO: We may need to also load custom code conditions to have all existing valuesets, with their inclusion set to false; this might be the easiet way to carry a custom code tied to a new query back to the custom query screen
-    return conditionId;
+    return CUSTOM_CONDITION_ID;
   }
 
   @transaction
@@ -60,9 +63,8 @@ export class UserCreatedValuesetService {
     const valueSetOid = vs.valueSetExternalId || uuid;
 
     // Insert Custom Code Condition if not already present
-    const conditionId = await UserCreatedValuesetService.addCustomCodeCondition(
-      vs.system,
-    );
+    const CUSTOM_CONDITION_ID =
+      await UserCreatedValuesetService.addCustomCodeCondition(vs.system);
 
     // Insert ValueSet
     try {
@@ -113,11 +115,11 @@ export class UserCreatedValuesetService {
     }
 
     // Insert condition_to_valueset
-    const ctvsId = `${conditionId}_${valueSetUniqueId}`;
+    const ctvsId = `${CUSTOM_CONDITION_ID}_${valueSetUniqueId}`;
     try {
       await dbService.query(insertConditionToValuesetSql, [
         ctvsId,
-        conditionId,
+        CUSTOM_CONDITION_ID,
         valueSetUniqueId,
         "User",
       ]);
@@ -130,9 +132,83 @@ export class UserCreatedValuesetService {
       ? { success: true }
       : { success: false, error: errors.join(", ") };
   }
+
+  // insert or update query_data with a "custom" key containing these valuesets
+  // if queryId is undefined, this creates a new query record with custom only
+  @transaction
+  @auditable
+  static async insertCustomValuesetsIntoQuery(
+    userId: string,
+    customValuesets: DibbsValueSet[],
+    queryId?: string,
+  ): Promise<{ success: boolean; queryId?: string; error?: string }> {
+    try {
+      if (queryId) {
+        // update existing query
+        const querySql = `SELECT query_data FROM query WHERE id = $1`;
+        const result = await dbService.query(querySql, [queryId]);
+
+        let queryData: QueryDataColumn = {};
+        if (result.rows.length > 0 && result.rows[0].query_data) {
+          queryData = result.rows[0].query_data as QueryDataColumn;
+        }
+
+        // merge new custom codes into existing custom block, overwriting old with new
+        const existingCustomBlock = queryData[CUSTOM_VALUESET_ARRAY_ID] ?? {};
+
+        for (const vs of customValuesets) {
+          existingCustomBlock[vs.valueSetId] = vs;
+        }
+
+        queryData[CUSTOM_VALUESET_ARRAY_ID] = existingCustomBlock;
+
+        // Update the query_data with the merged custom valuesets
+        const updateSql = `UPDATE query SET query_data = $1, date_last_modified = NOW() WHERE id = $2`;
+        await dbService.query(updateSql, [queryData, queryId]);
+        return { success: true, queryId };
+      } else {
+        // create a new query with custom only
+        const newId = crypto.randomUUID();
+        const name = `Custom Query ${newId}`;
+        const queryData: QueryDataColumn = {
+          [CUSTOM_VALUESET_ARRAY_ID]: {},
+        };
+
+        for (const vs of customValuesets) {
+          queryData[CUSTOM_VALUESET_ARRAY_ID][vs.valueSetId] = vs;
+        }
+
+        const insertSql = `
+        INSERT INTO query (
+          id, query_name, query_data, conditions_list, author,
+          date_created, date_last_modified, time_window_number, time_window_unit
+        )
+        VALUES ($1, $2, $3, $4, $5, NOW(), NOW(), $6, $7)
+      `;
+        await dbService.query(insertSql, [
+          newId,
+          name,
+          queryData,
+          [],
+          userId,
+          0,
+          "",
+        ]);
+        return { success: true, queryId: newId };
+      }
+    } catch (e) {
+      console.error(
+        "Failed to insert or update query_data with custom valuesets:",
+        e,
+      );
+      return { success: false, error: String(e) };
+    }
+  }
 }
 
 export const getCustomCodeCondition =
   UserCreatedValuesetService.addCustomCodeCondition;
 export const insertCustomValueSet =
   UserCreatedValuesetService.insertCustomValueSet;
+export const insertCustomValuesetsIntoQuery =
+  UserCreatedValuesetService.insertCustomValuesetsIntoQuery;
