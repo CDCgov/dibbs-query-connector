@@ -126,17 +126,31 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
                   <td title={query.queryName}>{query.queryName}</td>
 
                   <td
-                    title={query.conditionsList
-                      ?.map((id) => {
-                        return conditionIdToDetailsMap[id].name;
-                      })
-                      .join(", ")}
+                    title={
+                      query.conditionsList?.includes("custom") &&
+                      query.conditionsList.length === 1
+                        ? "Custom valuesets"
+                        : query.conditionsList
+                            ?.map(
+                              (id) =>
+                                conditionIdToDetailsMap[id]?.name ||
+                                (id === "custom" ? "Custom valuesets" : ""),
+                            )
+                            .filter(Boolean)
+                            .join(", ")
+                    }
                   >
-                    {query.conditionsList
-                      ?.map((id) => {
-                        return conditionIdToDetailsMap[id].name;
-                      })
-                      .join(", ")}
+                    {query.conditionsList?.includes("custom") &&
+                    query.conditionsList.length === 1
+                      ? "Custom valuesets"
+                      : query.conditionsList
+                          ?.map(
+                            (id) =>
+                              conditionIdToDetailsMap[id]?.name ||
+                              (id === "custom" ? "Custom valuesets" : ""),
+                          )
+                          .filter(Boolean)
+                          .join(", ")}
                   </td>
                   <td>
                     <div className="table-cell-buttons">
