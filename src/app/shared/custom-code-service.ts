@@ -212,77 +212,76 @@ class UserCreatedValuesetService {
       ? { success: true }
       : { success: false, error: errors.join(", ") };
   }
-}
+  // insert or update query_data with a "custom" key containing these valuesets
+  // if queryId is undefined, this creates a new query record with custom only
+  @transaction
+  @auditable
+  static async insertCustomValuesetsIntoQuery(
+    userId: string,
+    customValuesets: DibbsValueSet[],
+    queryId?: string,
+  ): Promise<{ success: boolean; queryId?: string; error?: string }> {
+    try {
+      if (queryId) {
+        // update existing query
+        const querySql = `SELECT query_data FROM query WHERE id = $1`;
+        const result = await dbService.query(querySql, [queryId]);
 
-// insert or update query_data with a "custom" key containing these valuesets
-// if queryId is undefined, this creates a new query record with custom only
-@transaction
-@auditable
-static async insertCustomValuesetsIntoQuery(
-  userId: string,
-  customValuesets: DibbsValueSet[],
-  queryId?: string,
-): Promise<{ success: boolean; queryId?: string; error?: string }> {
-  try {
-    if (queryId) {
-      // update existing query
-      const querySql = `SELECT query_data FROM query WHERE id = $1`;
-      const result = await dbService.query(querySql, [queryId]);
+        let queryData: QueryDataColumn = {};
+        if (result.rows.length > 0 && result.rows[0].query_data) {
+          queryData = result.rows[0].query_data as QueryDataColumn;
+        }
 
-      let queryData: QueryDataColumn = {};
-      if (result.rows.length > 0 && result.rows[0].query_data) {
-        queryData = result.rows[0].query_data as QueryDataColumn;
-      }
+        // merge new custom codes into existing custom block, overwriting old with new
+        const existingCustomBlock = queryData[CUSTOM_VALUESET_ARRAY_ID] ?? {};
 
-      // merge new custom codes into existing custom block, overwriting old with new
-      const existingCustomBlock = queryData[CUSTOM_VALUESET_ARRAY_ID] ?? {};
+        for (const vs of customValuesets) {
+          existingCustomBlock[vs.valueSetId] = vs;
+        }
 
-      for (const vs of customValuesets) {
-        existingCustomBlock[vs.valueSetId] = vs;
-      }
+        queryData[CUSTOM_VALUESET_ARRAY_ID] = existingCustomBlock;
 
-      queryData[CUSTOM_VALUESET_ARRAY_ID] = existingCustomBlock;
+        // Update the query_data with the merged custom valuesets
+        const updateSql = `UPDATE query SET query_data = $1, date_last_modified = NOW() WHERE id = $2`;
+        await dbService.query(updateSql, [queryData, queryId]);
+        return { success: true, queryId };
+      } else {
+        // create a new query with custom only
+        const newId = crypto.randomUUID();
+        const name = `Custom Query ${newId}`;
+        const queryData: QueryDataColumn = {
+          [CUSTOM_VALUESET_ARRAY_ID]: {},
+        };
 
-      // Update the query_data with the merged custom valuesets
-      const updateSql = `UPDATE query SET query_data = $1, date_last_modified = NOW() WHERE id = $2`;
-      await dbService.query(updateSql, [queryData, queryId]);
-      return { success: true, queryId };
-    } else {
-      // create a new query with custom only
-      const newId = crypto.randomUUID();
-      const name = `Custom Query ${newId}`;
-      const queryData: QueryDataColumn = {
-        [CUSTOM_VALUESET_ARRAY_ID]: {},
-      };
+        for (const vs of customValuesets) {
+          queryData[CUSTOM_VALUESET_ARRAY_ID][vs.valueSetId] = vs;
+        }
 
-      for (const vs of customValuesets) {
-        queryData[CUSTOM_VALUESET_ARRAY_ID][vs.valueSetId] = vs;
-      }
-
-      const insertSql = `
+        const insertSql = `
       INSERT INTO query (
         id, query_name, query_data, conditions_list, author,
         date_created, date_last_modified, time_window_number, time_window_unit
       )
       VALUES ($1, $2, $3, $4, $5, NOW(), NOW(), $6, $7)
     `;
-      await dbService.query(insertSql, [
-        newId,
-        name,
-        queryData,
-        [],
-        userId,
-        0,
-        "",
-      ]);
-      return { success: true, queryId: newId };
+        await dbService.query(insertSql, [
+          newId,
+          name,
+          queryData,
+          [],
+          userId,
+          0,
+          "",
+        ]);
+        return { success: true, queryId: newId };
+      }
+    } catch (e) {
+      console.error(
+        "Failed to insert or update query_data with custom valuesets:",
+        e,
+      );
+      return { success: false, error: String(e) };
     }
-  } catch (e) {
-    console.error(
-      "Failed to insert or update query_data with custom valuesets:",
-      e,
-    );
-    return { success: false, error: String(e) };
   }
 }
 
@@ -294,4 +293,3 @@ export const deleteCustomValueSet =
   UserCreatedValuesetService.deleteCustomValueSet;
 export const insertCustomValuesetsIntoQuery =
   UserCreatedValuesetService.insertCustomValuesetsIntoQuery;
-
