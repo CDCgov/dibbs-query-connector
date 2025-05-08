@@ -72,7 +72,6 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
       (key) => key !== "custom",
     );
     setActiveCondition(firstRealCondition ?? "custom");
-    console.log("Current constructedQuery (query_data):", constructedQuery);
   }, [constructedQuery]);
 
   function generateConditionDrawerDisplay(
