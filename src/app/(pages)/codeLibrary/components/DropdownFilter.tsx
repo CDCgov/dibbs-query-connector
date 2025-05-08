@@ -5,7 +5,6 @@ import {
   useEffect,
   useRef,
   useState,
-  // useState,
 } from "react";
 import { Button, Select } from "@trussworks/react-uswds";
 import styles from "../codeLibrary.module.scss";
@@ -47,7 +46,7 @@ export type vsAuthorMap = {
  * @param root0.valueSets the value sets to apply the filter(s) to
  * @param root0.loading the loading state of the parent's value set data
  * @param root0.filterCount the number of filters currently applied to the result set
- * @param root0.currentUser the number of filters currently applied to the result set
+ * @param root0.currentUser the User object for the currently active user
  * @returns  the DropdownFilter component
  */
 const DropdownFilter: React.FC<DropdownFilterProps> = ({
@@ -65,7 +64,7 @@ const DropdownFilter: React.FC<DropdownFilterProps> = ({
       return array.indexOf(item) === index;
     });
 
-  const [myTeam, setMyTeam] = useState<User[]>();
+  const [myTeamMembers, setMyTeamMembers] = useState<User[]>();
 
   const [groupAuthors, setGroupAuthors] = useState<vsAuthorMap>({});
   const [valueSetCreators, setValueSetCreators] = useState<vsAuthorMap>({});
@@ -87,20 +86,20 @@ const DropdownFilter: React.FC<DropdownFilterProps> = ({
 
       setGroupAuthors(authors);
     }
+
     async function fetchTeammates() {
       const myGroups = currentUser.userGroupMemberships || [];
-      const team = await Promise.all(
+      const groupMembers = await Promise.all(
         myGroups &&
           myGroups
             .map(async (group) => {
               const teammates = await getAllGroupMembers(group.usergroupId);
-
               return teammates.items;
             })
             .flat(),
       );
-      const teamA = team.flat();
-      setMyTeam(teamA);
+      const myTeam = groupMembers.flat();
+      setMyTeamMembers(myTeam);
     }
     fetchTeammates();
     mapUsersToGroups();
@@ -128,7 +127,7 @@ const DropdownFilter: React.FC<DropdownFilterProps> = ({
     conditions: "conditions",
   };
 
-  const filterShortcut = (users: User[]) => {
+  const filterByShortcut = (users: User[]) => {
     const creators: vsAuthorMap = {};
     users.map((user) => {
       user.firstName && user.lastName
@@ -259,7 +258,7 @@ const DropdownFilter: React.FC<DropdownFilterProps> = ({
         <button
           onClick={(e) => {
             e.preventDefault();
-            filterShortcut([currentUser]);
+            filterByShortcut([currentUser]);
           }}
         >
           Created by me
@@ -267,7 +266,9 @@ const DropdownFilter: React.FC<DropdownFilterProps> = ({
         <button
           onClick={async (e) => {
             e.preventDefault();
-            myTeam && myTeam.length > 0 && filterShortcut(myTeam as User[]);
+            myTeamMembers &&
+              myTeamMembers.length > 0 &&
+              filterByShortcut(myTeamMembers as User[]);
           }}
         >
           Created by my team

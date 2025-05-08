@@ -39,9 +39,9 @@ type CustomCodeMap = {
 
 /**
  * @param root0 props
- * @param root0.mode -
- * @param root0.setMode -
- * @param root0.activeValueSet -
+ * @param root0.mode - controls whether to render the form for Adding a new VS or Editing an existing one
+ * @param root0.setMode - state function to set the mode prop
+ * @param root0.activeValueSet - if present, the value set to edit. Absent if creating a new value set
  * @returns  the CustomValueSetForm component
  */
 const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
@@ -71,9 +71,8 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
   function goBack() {
     // TODO: this will need to be handled differently
     // depending on how we arrived at this page:
-    // from gear menu: no backnav
-    // from "start from scratch": back to templates
-    // from hybrid/query building: back to query
+    // from Manage codes view - Back to Codes
+    // from query building - Back to query
     setLoading(true);
     setCodes({ "0": { code: "", display: "", include: false } });
     return setMode("manage");
@@ -216,6 +215,7 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
           currentUser?.id as string,
         );
 
+        //  TODO: error handling
         if (result.success == true) {
           setErrorMessage("");
           setCodes({ "0": { code: "", display: "", include: false } });
@@ -231,8 +231,6 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
         }
       } catch (error) {
         console.log(error);
-      } finally {
-        // setLoading(false);
       }
     }
   };
