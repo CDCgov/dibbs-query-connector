@@ -123,7 +123,7 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
 
             <div className={`${styles.searchCallToActionContainer}`}>
               <Button
-                className={`usa-button usa-button--outline bg-white`}
+                outline
                 type="button"
                 onClick={() => {
                   fillFields(false);

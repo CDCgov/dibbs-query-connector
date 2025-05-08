@@ -7,12 +7,12 @@
   margin-right: 1.5rem;
   text-decoration: none;
   cursor: pointer;
-  color: #757575;
+  color: $text-secondary !important;
 
   &__active {
     @extend .tab;
     font-weight: 700;
-    border-bottom: 0.25rem solid $primary-cta;
+    border-bottom: 0.25rem solid $accent-primary;
   }
 
   &:hover {

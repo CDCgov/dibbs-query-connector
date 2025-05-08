@@ -22,6 +22,7 @@ import type { ModalRef } from "../../../../ui/designSystem/modal/Modal";
 import UserModal from "../userModal/userModal";
 import { CustomUserQuery } from "@/app/models/entities/query";
 import { getAllUsers } from "@/app/backend/user-management";
+import styles from "./userManagementContainer.module.scss";
 
 export type UsersTableProps = {
   role: string;
@@ -71,13 +72,9 @@ const UsersTable: React.FC<UsersTableProps> = ({ role }) => {
             <Button
               onClick={() => handleOpenModal("create-user")}
               className={classNames(
-                "styles.createQueryButton",
+                styles.createQueryButton,
                 "margin-bottom-3",
               )}
-              style={{
-                marginLeft: "1px",
-                backgroundColor: "#005EA2",
-              }}
               type="button"
             >
               Add user
@@ -107,13 +104,9 @@ const UsersTable: React.FC<UsersTableProps> = ({ role }) => {
               <Button
                 onClick={() => handleOpenModal("create-group")}
                 className={classNames(
-                  "styles.createQueryButton",
+                  styles.createQueryButton,
                   "margin-bottom-3",
                 )}
-                style={{
-                  marginLeft: "1px",
-                  backgroundColor: "#005EA2",
-                }}
                 type="button"
               >
                 Create group

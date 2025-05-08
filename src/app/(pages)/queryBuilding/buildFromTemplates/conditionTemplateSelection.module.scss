@@ -25,18 +25,18 @@
 
   &:active,
   &:visited {
-    color: $tertiary-cta;
+    color: $accent-tertiary;
   }
 }
 
 .conditionSelectionForm {
-  background-color: #fff;
+  background-color: $white;
   padding: 2rem;
   min-height: 25rem;
 }
 
 .querySelectionFormSearch {
-  border: 1px solid #919191;
+  border: 1px solid $border;
   border-radius: 4px;
   height: 1.5rem;
   padding: 0.75rem;
@@ -57,7 +57,7 @@
 }
 
 .displayCol:first-of-type {
-  border-right: 1px solid $table-row-border;
+  border-right: 1px solid $border-light;
 }
 
 .displayCol:nth-of-type(2) {
@@ -71,7 +71,7 @@
 }
 
 .bluePill {
-  background-color: #e8f5ff;
+  background-color: $pill-background;
   font-size: 0.875rem;
   border-radius: 0.25rem;
 }
@@ -127,7 +127,7 @@
 }
 
 .valueSetTemplate__right {
-  background-color: #fff;
+  background-color: $white;
   width: 50rem;
   min-width: 70%;
   border-radius: 8px;
@@ -163,19 +163,7 @@
 
 .valueSetTemplate__search {
   padding: 1.5rem;
-  border-bottom: 1px #dfe1e2 solid;
-}
-
-.valueSetTemplate__accordion {
-  display: flex;
-  justify-content: space-between;
-  word-wrap: break-word;
-  align-items: center;
-  width: 100%;
-  box-sizing: border-box;
-  background-color: #f7f9fa;
-  padding: 1rem 1.5rem;
-  border-bottom: 1px #dfe1e2 solid;
+  border-bottom: 1px $border solid;
 }
 
 .accordionContainer {
@@ -202,7 +190,7 @@
 .accordionHeaderCount {
   font-size: 1rem !important;
   font-weight: 400 !important;
-  background-color: #f7f9fa;
+  background-color: $query-library-accordion-background;
 }
 
 .accordionInnerWrapper > h4 {
@@ -215,17 +203,17 @@
   align-items: center;
   width: 100%;
   box-sizing: border-box;
-  background-color: #f7f9fa;
+  background-color: $query-library-accordion-background;
   padding: 1rem 1.5rem;
-  border-bottom: 1px #dfe1e2 solid;
-  color: #111111;
+  border-bottom: 1px $border solid;
+  color: $black;
 
   // override default accordion hover styles (headers should not change on hover):
   &:hover {
-    background-color: #f7f9fa !important;
+    background-color: $query-library-accordion-background !important;
 
     .accordionHeaderCount {
-      color: #111111;
+      color: $black;
     }
   }
 }
@@ -257,14 +245,14 @@
       flex-direction: row;
       justify-content: space-between;
       align-items: center;
-      color: #919191;
+      color: $text-secondary;
       font-size: 1rem;
       line-height: 1.2;
     }
 
     .addCondition {
       font-size: 1rem;
-      color: $primary-cta;
+      color: $accent-primary;
       line-height: 18.8px;
       font-weight: 700;
       display: flex;
@@ -288,7 +276,7 @@
     border-radius: 4px;
     padding: 1rem;
     line-height: 22px;
-    color: #111111;
+    color: $black;
     cursor: pointer;
     position: relative;
 
@@ -301,13 +289,13 @@
   }
 
   .active {
-    background: #ffffff;
+    background: $white;
   }
 }
 
 .valueSetTemplate__titleCheckbox {
   text-transform: capitalize;
-  background-color: #f7f9fa;
+  background-color: $query-library-accordion-background;
 }
 
 .valueSetTemplate__toggleRowHeader {
@@ -323,7 +311,7 @@
 
 .accordionBodyExpanded {
   padding: 1.5rem 1.5rem 0 3rem;
-  background-color: #fff;
+  background-color: $white;
   display: flex;
   justify-content: space-between;
 }
@@ -356,7 +344,7 @@
 }
 
 div.accordionBodyExpanded:last-of-type {
-  border-bottom: 1px #dfe1e2 solid;
+  border-bottom: 1px $border solid;
 
   .accordionExpandedInner {
     border-bottom: none !important;
@@ -364,7 +352,7 @@ div.accordionBodyExpanded:last-of-type {
 }
 
 .accordionExpandedInner {
-  border-bottom: solid 1px #dfe1e2;
+  border-bottom: solid 1px $border;
   padding-bottom: 1rem;
   width: 100%;
 }
@@ -380,11 +368,11 @@ div.accordionBodyExpanded:last-of-type {
 }
 
 .vsName {
-  color: #111111;
+  color: $black;
 }
 
 .vsDetails {
-  color: #919191;
+  color: $text-secondary;
   display: flex;
 }
 

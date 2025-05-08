@@ -83,10 +83,10 @@ const HeaderComponent: React.FC<HeaderProps> = ({ session }) => {
           )}
         >
           <div className={classNames("display-flex", "flex-align-center")}>
-            <div className="usa-logo" style={{ marginLeft: "0" }}>
-              <em className="usa-logo__text text-base-lightest-important">
+            <div className={styles.siteLogo}>
+              <em className="usa-logo__text brand-lightest">
                 <Link
-                  className="font-mono-lg text-base-lightest-important font-weight-normal-important"
+                  className="font-mono-lg brand-lightest font-weight-normal-important"
                   href={landingPage}
                   title={metadata.title}
                 >

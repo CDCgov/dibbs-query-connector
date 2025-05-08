@@ -56,7 +56,7 @@ export const ConditionSelection: React.FC<ConditionSelectionProps> = ({
   return (
     <div
       className={classNames(
-        "bg-gray-5 margin-top-4 ",
+        "background-dark margin-top-4 ",
         styles.templateContainer,
       )}
     >

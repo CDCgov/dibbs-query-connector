@@ -110,9 +110,8 @@ exports[`Super Admin view of Users Table renders content on tab click 1`] = `
         </button>
       </div>
       <button
-        class="usa-button styles.createQueryButton margin-bottom-3"
+        class="usa-button createQueryButton margin-bottom-3"
         data-testid="button"
-        style="margin-left: 1px; background-color: rgb(0, 94, 162);"
         type="button"
       >
         Add user
@@ -500,9 +499,8 @@ exports[`Super Admin view of Users Table renders error message when no users are
         </button>
       </div>
       <button
-        class="usa-button styles.createQueryButton margin-bottom-3"
+        class="usa-button createQueryButton margin-bottom-3"
         data-testid="button"
-        style="margin-left: 1px; background-color: rgb(0, 94, 162);"
         type="button"
       >
         Add user
@@ -599,9 +597,8 @@ exports[`Super Admin view of Users Table renders table view after content is loa
         </button>
       </div>
       <button
-        class="usa-button styles.createQueryButton margin-bottom-3"
+        class="usa-button createQueryButton margin-bottom-3"
         data-testid="button"
-        style="margin-left: 1px; background-color: rgb(0, 94, 162);"
         type="button"
       >
         Add user
@@ -886,9 +883,8 @@ exports[`Super Admin view of Users Table renders table view after content is loa
         </button>
       </div>
       <button
-        class="usa-button styles.createQueryButton margin-bottom-3"
+        class="usa-button createQueryButton margin-bottom-3"
         data-testid="button"
-        style="margin-left: 1px; background-color: rgb(0, 94, 162);"
         type="button"
       >
         Add user

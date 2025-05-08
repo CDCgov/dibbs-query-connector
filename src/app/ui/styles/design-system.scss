@@ -12,63 +12,65 @@ footer {
 
 .usa-step-indicator__segment-label,
 .usa-step-indicator__segment:before {
-  color: $stepper-inactive-text;
+  color: $text-inactive--dark;
 }
 
 .usa-step-indicator__segment--current .usa-step-indicator__segment-label {
-  color: $primary-cta;
+  color: $accent-primary;
 }
 
 .usa-step-indicator__segment--current::before,
 .usa-step-indicator__segment--current::after {
-  background-color: $primary-background !important;
-  color: $primary-cta !important;
+  background-color: $brand-primary !important;
+  color: $accent-primary !important;
   box-shadow:
     0 0 0 0.25rem $white,
     0 0 0 0 $white !important;
 }
 
 .usa-current {
-  color: $primary-cta !important;
+  color: $accent-primary !important;
 }
 
 .usa-current::after {
-  background-color: $primary-cta !important;
+  background-color: $accent-primary !important;
 }
 
 .usa-accordion__button,
 .usa-accordion__button:hover {
-  background-color: $table-header;
+  background-color: $background-dark;
   color: $text-primary;
 }
 
 .usa-button {
-  background-color: $primary-cta;
+  background-color: $accent-primary;
   &:hover {
-    background-color: $primary-cta-hover;
+    background-color: $accent-primary--hover;
   }
   &:active {
-    background-color: $primary-cta-active;
+    background-color: $accent-primary--active;
   }
 
   &--outline {
-    background-color: $secondary-cta;
+    background-color: $accent-secondary;
 
-    &:active,
     &:hover {
-      background-color: $secondary-cta;
+      background-color: $accent-secondary--hover;
+    }
+
+    &:active {
+      background-color: $accent-secondary--active;
     }
   }
 
   &--unstyled {
     background-color: transparent !important;
+    color: $accent-tertiary !important;
 
     &:active,
     &:hover {
       background-color: transparent !important;
     }
-
-    color: $tertiary-cta !important;
   }
 }
 
