@@ -10,6 +10,7 @@ import { FormError } from "../buildFromTemplates/BuildFromTemplates";
 import { CONDITION_DRAWER_SEARCH_PLACEHOLDER } from "./utils";
 import { formatDiseaseDisplay } from "../utils";
 import Link from "next/link";
+import { CUSTOM_CONDITION_ID } from "@/app/shared/constants";
 
 type ConditionSelectionProps = {
   categoryToConditionsMap: CategoryToConditionArrayMap;
@@ -89,6 +90,7 @@ export const ConditionSelection: React.FC<ConditionSelectionProps> = ({
               const conditionIdToNameMap: { [id: string]: string } = {};
               Object.values(categoryToConditionsMap)
                 .flat()
+                .filter((c) => c.id !== CUSTOM_CONDITION_ID)
                 .forEach((c) => {
                   conditionIdToNameMap[c.id] = c.name;
                 });
@@ -101,8 +103,10 @@ export const ConditionSelection: React.FC<ConditionSelectionProps> = ({
                   >
                     {Object.entries(categoryToConditionsMap)
                       .flatMap(([_, conditions]) => conditions)
-                      .filter((condition) =>
-                        constructedQuery.hasOwnProperty(condition.id),
+                      .filter(
+                        (condition) =>
+                          constructedQuery.hasOwnProperty(condition.id) &&
+                          condition.id !== CUSTOM_CONDITION_ID,
                       )
                       .map((condition) => (
                         <div
