@@ -29,6 +29,7 @@ import {
   generateValueSetGroupingsByDibbsConceptType,
   ConceptTypeToDibbsVsMap,
 } from "@/app/utils/valueSetTranslation";
+import { CUSTOM_VALUESET_ARRAY_ID } from "@/app/shared/constants";
 
 type ConditionSelectionProps = {
   constructedQuery: NestedQuery;
@@ -69,9 +70,9 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
   useEffect(() => {
     // display the first condition's valuesets on render
     const firstRealCondition = Object.keys(constructedQuery).find(
-      (key) => key !== "custom",
+      (key) => key !== CUSTOM_VALUESET_ARRAY_ID,
     );
-    setActiveCondition(firstRealCondition ?? "custom");
+    setActiveCondition(firstRealCondition ?? CUSTOM_VALUESET_ARRAY_ID);
   }, [constructedQuery]);
 
   function generateConditionDrawerDisplay(
@@ -150,16 +151,16 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
     setValueSetSearchFilter("");
   }
 
-  // Check if the active condition is "custom"
-  const isCustomConditionTab = activeCondition === "custom";
+  // Check if the active condition is CUSTOM_VALUESET_ARRAY_ID
+  const isCustomConditionTab = activeCondition === CUSTOM_VALUESET_ARRAY_ID;
 
   // Get the value sets for the active condition, additional logic for custom condition
   const activeConditionValueSets: ConceptTypeToDibbsVsMap | undefined =
     isCustomConditionTab
-      ? constructedQuery["custom"]
+      ? constructedQuery[CUSTOM_VALUESET_ARRAY_ID]
         ? generateValueSetGroupingsByDibbsConceptType(
-            Object.values(constructedQuery["custom"]).flatMap((vsMap) =>
-              Object.values(vsMap),
+            Object.values(constructedQuery[CUSTOM_VALUESET_ARRAY_ID]).flatMap(
+              (vsMap) => Object.values(vsMap),
             ),
           )
         : { labs: {}, conditions: {}, medications: {} }
@@ -202,7 +203,9 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
                 </div>
 
                 {Object.keys(constructedQuery)
-                  .filter((conditionId) => conditionId !== "custom")
+                  .filter(
+                    (conditionId) => conditionId !== CUSTOM_VALUESET_ARRAY_ID,
+                  )
                   .map((conditionId) => {
                     const condition = conditionsMap[conditionId];
                     if (!condition) return null;
@@ -238,9 +241,13 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
                           onClick={() => {
                             handleUpdateCondition(conditionId, true);
                             const next = Object.keys(constructedQuery).find(
-                              (k) => k !== conditionId && k !== "custom",
+                              (k) =>
+                                k !== conditionId &&
+                                k !== CUSTOM_VALUESET_ARRAY_ID,
                             );
-                            handleConditionToggle(next ?? "custom");
+                            handleConditionToggle(
+                              next ?? CUSTOM_VALUESET_ARRAY_ID,
+                            );
                           }}
                         ></Icon.Delete>
                       </div>
@@ -249,19 +256,19 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
               </div>
               <div className={styles.section_custom}>
                 <div className={classNames(styles.sectionTitle)}>
-                  {"Custom".toLocaleUpperCase()}
+                  {CUSTOM_VALUESET_ARRAY_ID.toLocaleUpperCase()}
                 </div>
                 <div
                   className={classNames(
                     "align-items-center",
-                    activeCondition == "custom"
+                    activeCondition == CUSTOM_VALUESET_ARRAY_ID
                       ? `${styles.card} ${styles.active}`
                       : styles.card,
                   )}
                 >
                   <div
                     id={`tab-custom`}
-                    onClick={() => setActiveCondition("custom")}
+                    onClick={() => setActiveCondition(CUSTOM_VALUESET_ARRAY_ID)}
                     tabIndex={0}
                     role="button"
                   >
