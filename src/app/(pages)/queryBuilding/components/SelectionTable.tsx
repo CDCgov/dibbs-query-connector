@@ -125,9 +125,7 @@ export const ConceptTypeSelectionTable: React.FC<
           accordionClassName={styles.accordionInnerWrapper}
         />
       ) : (
-        <div className="padding-2">
-          <strong>No valuesets found</strong>
-        </div>
+        <></>
       )}
     </div>
   );

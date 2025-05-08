@@ -65,7 +65,6 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
     useState<CategoryToConditionArrayMap>(categoryToConditionsMap);
   const [conditionSearchFilter, setConditionSearchFilter] = useState("");
   const [valueSetSearchFilter, setValueSetSearchFilter] = useState("");
-  const isCustom = activeCondition === "custom";
 
   useEffect(() => {
     // display the first condition's valuesets on render
@@ -151,15 +150,26 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
     setActiveCondition(conditionId);
     setValueSetSearchFilter("");
   }
-  const activeConditionValueSets: ConceptTypeToDibbsVsMap | undefined = isCustom
-    ? constructedQuery["custom"]
-      ? generateValueSetGroupingsByDibbsConceptType(
-          Object.values(constructedQuery["custom"]).flatMap((vsTypeMap) =>
-            Object.values(vsTypeMap),
-          ),
-        )
-      : { labs: {}, conditions: {}, medications: {} }
-    : constructedQuery[activeCondition];
+
+  // Check if the active condition is "custom"
+  const isCustomConditionTab = activeCondition === "custom";
+
+  // Get the value sets for the active condition, additional logic for custom condition
+  const activeConditionValueSets: ConceptTypeToDibbsVsMap | undefined =
+    isCustomConditionTab
+      ? constructedQuery["custom"]
+        ? generateValueSetGroupingsByDibbsConceptType(
+            Object.values(constructedQuery["custom"]).flatMap((vsMap) =>
+              Object.values(vsMap),
+            ),
+          )
+        : { labs: {}, conditions: {}, medications: {} }
+      : constructedQuery[activeCondition];
+
+  // Check if there are any custom value sets
+  const hasCustomValueSets = Object.values(activeConditionValueSets ?? {}).some(
+    (vsMap) => Object.keys(vsMap).length > 0,
+  );
 
   return (
     <div
@@ -264,7 +274,7 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
           </div>
         </div>
         <div className={styles.valueSetTemplate__right}>
-          {(activeConditionValueSets !== undefined || isCustom) && (
+          {(activeConditionValueSets !== undefined || isCustomConditionTab) && (
             <>
               <div className={styles.valueSetTemplate__search}>
                 <SearchField
@@ -277,6 +287,17 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
                   }}
                   value={valueSetSearchFilter}
                 />
+                {isCustomConditionTab && hasCustomValueSets && (
+                  <Button
+                    type="button"
+                    outline
+                    onClick={() => {
+                      window.location.href = "/codeLibrary";
+                    }}
+                  >
+                    Add from code library
+                  </Button>
+                )}
               </div>
 
               <ConceptTypeSelectionTable
@@ -295,32 +316,29 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
               />
             </>
           )}
-          {isCustom &&
-            Object.values(activeConditionValueSets ?? {}).every(
-              (vsMap) => Object.keys(vsMap).length === 0,
-            ) && (
-              <div className={styles.codeLibrary__empty}>
-                <Icon.GridView
-                  aria-label="Stylized icon showing four squares in a grid"
-                  className={classNames("usa-icon", styles.icon)}
-                  color="#919191"
-                />
-                <p className={styles.codeLibrary__emptyText}>
-                  <strong>
-                    This is a space for you to pull in individual value sets
-                  </strong>
-                </p>
-                <p className={styles.codeLibrary__emptyText}>
-                  <strong>
-                    These can be official value sets from CSTE, or ones that you
-                    have created in the code library.
-                  </strong>
-                </p>
-                <Button className={styles.codeLibrary__button} type="button">
-                  Add from code library
-                </Button>
-              </div>
-            )}
+          {isCustomConditionTab && !hasCustomValueSets && (
+            <div className={styles.codeLibrary__empty}>
+              <Icon.GridView
+                aria-label="Stylized icon showing four squares in a grid"
+                className={classNames("usa-icon", styles.icon)}
+                color="#919191"
+              />
+              <p className={styles.codeLibrary__emptyText}>
+                <strong>
+                  This is a space for you to pull in individual value sets
+                </strong>
+              </p>
+              <p className={styles.codeLibrary__emptyText}>
+                <strong>
+                  These can be official value sets from CSTE, or ones that you
+                  have created in the code library.
+                </strong>
+              </p>
+              <Button className={styles.codeLibrary__button} type="button">
+                Add from code library
+              </Button>
+            </div>
+          )}
         </div>
       </div>
 
