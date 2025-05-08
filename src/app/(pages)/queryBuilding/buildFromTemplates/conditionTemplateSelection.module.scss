@@ -318,7 +318,7 @@
 
 .accordionBodyExpanded {
   &:hover {
-    background-color: rgba(217, 232, 246, 0.5) !important;
+    background-color: $hover-blue !important;
 
     .valueSetTemplate__checkbox {
       background-color: unset;
@@ -330,7 +330,7 @@
       line-height: normal;
       font-weight: 700;
       font-size: 14px;
-      color: $text-blue;
+      color: $accent-primary;
 
       &:hover {
         cursor: pointer;
@@ -465,7 +465,7 @@ $columnGap: 1rem;
 }
 
 .addButton {
-  color: $text-blue;
+  color: $accent-primary;
   text-transform: uppercase;
   font-weight: 700;
   cursor: pointer;

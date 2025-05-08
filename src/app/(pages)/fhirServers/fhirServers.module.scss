@@ -25,7 +25,7 @@
   border-collapse: collapse;
 
   &:hover {
-    background-color: rgba(217, 232, 246, 0.5);
+    background-color: $hover-neutral;
     cursor: default;
 
     .editButton {

@@ -38,9 +38,6 @@ $brand-primary: #14333d;
 $brand-secondary: #3a7d95;
 $brand-tertiary: #adcfdc;
 
-$border: $gray-400;
-$border-light: $gray-300;
-
 $background: $gray-100;
 $background-dark: $gray-300;
 
@@ -75,6 +72,10 @@ $spinner-progress-segment-color: #3498db;
 $table-header-color: #f0f0f0;
 $success-toast-background: #ecf3ec;
 $background-darkest: $gray-500;
+$hover-blue: rgba(217, 232, 246, 0.5);
+$border: $gray-400;
+$border-dark: $gray-500;
+$border-light: $gray-300;
 
 // Design system fonts
 $serif-font: family("heading");
@@ -85,5 +86,3 @@ $text-primary: $black;
 $text-secondary: $gray-500;
 $text-inactive: $gray-20;
 $text-inactive--dark: $gray-600;
-
-$text-blue: $blue-400;

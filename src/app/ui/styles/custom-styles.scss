@@ -36,7 +36,7 @@ h1 {
 }
 
 .main-body {
-  background-color: rgba(247, 249, 250, 1);
+  background-color: $background;
   display: flex;
   flex: 1 1 auto;
 }
@@ -126,27 +126,6 @@ h1 {
   border-top: 1px solid $border;
   margin-top: 0.5rem;
   margin-bottom: 0.5rem;
-}
-
-.gradient-blue-background {
-  background: linear-gradient(
-    109.54deg,
-    rgba(173, 207, 220, 0.025) 8.02%,
-    rgba(46, 98, 118, 0.5) 117.53%
-  );
-
-  padding: 0.5rem;
-  /* Optional: some padding to make the background more noticeable */
-  justify-content: left;
-  display: flex;
-  align-items: center;
-
-  .container {
-    display: flex;
-    margin: 0 auto; // Centers the container itself if needed
-    max-width: $query-connector-max-width;
-    column-gap: 2rem;
-  }
 }
 
 // Context classes
@@ -324,9 +303,8 @@ ul.usa-sidenav
 
 .usa-pagination .usa-current {
   background-color: $white;
-  border-color: rgba(27, 27, 27, 0.2);
   border-radius: 0.25rem;
-  border: 1px solid rgba(27, 27, 27, 0.2);
+  border: 1px solid $border;
   font-size: 1rem;
   font-weight: 700;
   line-height: 140%;
@@ -345,7 +323,7 @@ ul.usa-sidenav
 .usa-pagination .usa-current:focus,
 .usa-pagination .usa-current:active {
   background-color: white;
-  border-color: rgba(27, 27, 27, 0.2);
+  border-color: $border-dark;
   color: inherit;
   text-decoration: none;
 }

@@ -53,7 +53,7 @@
   background: $white;
   border: 1px solid $border;
   border-radius: 0.25rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 6px $drop-shadow;
   padding: 0.5rem;
   // width: max-content; // without this, the calendar looks somewhat squished
   margin-top: 0.5rem;

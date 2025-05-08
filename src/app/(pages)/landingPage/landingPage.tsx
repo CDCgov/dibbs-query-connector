@@ -46,36 +46,33 @@ const LandingPage: React.FC<LandingPageProps> = ({ isLoggedIn }) => {
         <div className="margin-1">Redirecting...</div>
       ) : (
         <div className="main-body display-flex flex-column flex-justify-center">
-          <div className="gradient-blue-background flex-1">
-            <div className="container">
-              <div className="text-holder">
-                <h1 className={styles.pageSubtitle}>
-                  Data collection made easier
-                </h1>
-                <p className={styles.pageContent}>
-                  The Query Connector allows your jurisdiction to query a wide
-                  network of healthcare providers through your existing data use
-                  agreements, giving you access to more complete and timely
-                  data.
-                </p>
-                {
-                  <button
-                    className="usa-button next-button margin-bottom-2"
-                    id="next-button"
-                    onClick={handleClick}
-                  >
-                    Sign in
-                  </button>
-                }
-              </div>
-              <Image
-                alt="Graphic illustrating what TEFCA is"
-                src="/tefca-graphic.svg"
-                width={250}
-                height={300}
-                priority
-              />
+          <div className="container">
+            <div className="text-holder">
+              <h1 className={styles.pageSubtitle}>
+                Data collection made easier
+              </h1>
+              <p className={styles.pageContent}>
+                The Query Connector allows your jurisdiction to query a wide
+                network of healthcare providers through your existing data use
+                agreements, giving you access to more complete and timely data.
+              </p>
+              {
+                <button
+                  className="usa-button next-button margin-bottom-2"
+                  id="next-button"
+                  onClick={handleClick}
+                >
+                  Sign in
+                </button>
+              }
             </div>
+            <Image
+              alt="Graphic illustrating what TEFCA is"
+              src="/tefca-graphic.svg"
+              width={250}
+              height={300}
+              priority
+            />
           </div>
           <div className="home flex-1">
             <h3 className={styles.pageSubtitle} role="heading" aria-level={2}>
