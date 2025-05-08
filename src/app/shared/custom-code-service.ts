@@ -135,83 +135,6 @@ class UserCreatedValuesetService {
       : { success: false, error: errors.join(", ") };
   }
 
-  @transaction
-  @auditable
-  static async deleteCustomValueSet(
-    vs: DibbsValueSet,
-    _userId: string, // TODO: we don't need this unless we're going to give users other than the original author edit permissions
-  ): Promise<{ success: boolean; error?: string }> {
-    const errors: string[] = [];
-
-    try {
-      const updateCustomVSQuery = `
-      DELETE FROM valuesets
-      SET name = $2, type = $3, dibbs_concept_type = $3
-      WHERE id = $1
-    `;
-
-      await dbService.query(updateCustomVSQuery, [
-        vs.valueSetId,
-        vs.valueSetName,
-        vs.dibbsConceptType,
-      ]);
-
-      // Uopdate Concepts and Linkages
-      for (const concept of vs.concepts) {
-        // TODO: We will need to do an UPDATE display if system prefix and code already exist
-        const systemPrefix = UserCreatedValuesetService.getSystemPrefix(
-          vs.system,
-        );
-        const conceptId = `${systemPrefix}_${concept.code}`;
-        try {
-          await dbService.query(insertConceptSql, [
-            conceptId,
-            concept.code,
-            vs.system,
-            concept.display,
-            INTENTIONAL_EMPTY_STRING_FOR_GEM_CODE,
-            INTENTIONAL_EMPTY_STRING_FOR_CONCEPT_VERSION,
-          ]);
-        } catch (e) {
-          console.error("Insert failed for concept:", e);
-          errors.push(`Concept insert failed: ${conceptId}`);
-        }
-
-        const vstcId = `${vs.valueSetId}_${conceptId}`;
-        try {
-          await dbService.query(insertValuesetToConceptSql, [
-            vstcId,
-            vs.valueSetId,
-            conceptId,
-          ]);
-        } catch (e) {
-          console.error("Insert failed for valueset_to_concept:", e);
-          errors.push(`VS↔Concept join failed: ${vstcId}`);
-        }
-      }
-    } catch (e) {
-      console.error("Update failed for valueset:", e);
-      errors.push("ValueSet update failed");
-    }
-
-    // Update condition_to_valueset
-    const ctvsId = `custom_condition_${vs.valueSetId}`;
-    try {
-      await dbService.query(insertConditionToValuesetSql, [
-        ctvsId,
-        "custom_condition",
-        vs.valueSetId,
-        "User",
-      ]);
-    } catch (e) {
-      console.error("Update failed for condition_to_valueset:", e);
-      errors.push(`Condition↔VS join failed: ${ctvsId}`);
-    }
-
-    return errors.length === 0
-      ? { success: true }
-      : { success: false, error: errors.join(", ") };
-  }
   // insert or update query_data with a "custom" key containing these valuesets
   // if queryId is undefined, this creates a new query record with custom only
   @transaction
@@ -289,7 +212,5 @@ export const getCustomCodeCondition =
   UserCreatedValuesetService.addCustomCodeCondition;
 export const insertCustomValueSet =
   UserCreatedValuesetService.insertCustomValueSet;
-export const deleteCustomValueSet =
-  UserCreatedValuesetService.deleteCustomValueSet;
 export const insertCustomValuesetsIntoQuery =
   UserCreatedValuesetService.insertCustomValuesetsIntoQuery;
