@@ -18,6 +18,7 @@ import {
   QueryUpdateResult,
 } from "@/app/(pages)/queryBuilding/utils";
 import { CANCER_FRONTEND_NESTED_INPUT } from "../../../../../e2e/constants";
+import { randomUUID } from "crypto";
 
 jest.mock("@/app/utils/auth", () => {
   return {
@@ -53,10 +54,12 @@ describe("query building", () => {
     const queryInputFixture = CANCER_FRONTEND_NESTED_INPUT as NestedQuery;
     const randomName = "Cancer query " + Math.random() * 100;
     const author = "Test Steward";
+    const queryId = randomUUID();
     const queryCreated = await saveCustomQuery(
       queryInputFixture,
       randomName,
       author,
+      queryId,
     );
 
     await waitForAuditSuccess(actionTypeToCheck, auditCompletionSpy);
@@ -65,7 +68,7 @@ describe("query building", () => {
       CANCER_FRONTEND_NESTED_INPUT,
     );
     expect(JSON.parse(auditEntry?.queryName)).toStrictEqual(randomName);
-    expect(JSON.parse(auditEntry?.author)).toStrictEqual(author);
+    expect(JSON.parse(auditEntry?.queryId)).toStrictEqual(queryId);
 
     const deletionAuditType = "deleteQueryById";
     const createdQueryId = (queryCreated as QueryUpdateResult[])[0].id;

@@ -162,7 +162,7 @@ export const auditLogActionTypeMap: Record<string, auditLogActionTypeMapping> =
       label: "User sign in",
       format: (log) => {
         const request = parseRequest(log) as { profile: Profile };
-        const username = request?.profile.preferredUsername;
+        const username = request?.profile?.preferredUsername;
         return `Sign in of user with username ${username}`;
       },
     },
@@ -266,8 +266,12 @@ export const auditLogActionTypeMap: Record<string, auditLogActionTypeMapping> =
       format: (log) => {
         const request = parseRequest(log);
         const queryName = Object.values(request)[1];
-        const author = Object.values(request)[2];
-        return `Query with name ${queryName} made by ${author}`;
+        const queryId = Object.values(request)[3];
+        const message = queryId
+          ? `Query with name ${queryName} and id ${queryId} saved`
+          : `Query with name ${queryName} saved`;
+
+        return message;
       },
     },
     // Add more as needed
