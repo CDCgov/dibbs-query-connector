@@ -575,7 +575,7 @@ class DatabaseService {
   static async getAllValueSets(): Promise<QCResponse<DibbsValueSet>> {
     try {
       const selectAllVSQuery = `
-      SELECT c.display, c.code_system, c.code, vs.name as valueset_name, vs.id as valueset_id, vs.oid as valueset_external_id, vs.version, vs.author as author, 
+      SELECT c.display, c.code_system, c.code, c.id as internal_id, vs.name as valueset_name, vs.id as valueset_id, vs.oid as valueset_external_id, vs.version, vs.author as author, 
         vs.type, vs.dibbs_concept_type as dibbs_concept_type, vs.user_created, ctvs.condition_id, u.first_name, u.last_name, u.username
       FROM valuesets vs 
       LEFT JOIN condition_to_valueset ctvs on vs.id = ctvs.valueset_id 
@@ -597,7 +597,7 @@ class DatabaseService {
         }
         return item;
       });
-
+      console.log(itemsWithAuthor);
       return {
         totalItems: result.rowCount,
         items: itemsWithAuthor,

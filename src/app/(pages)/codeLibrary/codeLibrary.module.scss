@@ -469,30 +469,37 @@
             }
         }
 
-        .addCodeRow {
+        .addCodeContainer {
             display: flex;
-            gap: 1.5rem;
+            flex-direction: column;
+            gap: 1rem;
 
-            div {
-                width: 25.75rem;
+            .addCodeRow {
+                display: flex;
+                gap: 1.5rem;
+                align-items: flex-end;
 
-                &:first-of-type {
-                    max-width: 13.875rem;
-                    flex: 0 auto !important;
+                div {
+                    width: 25.75rem;
+
+                    &:first-of-type {
+                        max-width: 13.875rem;
+                        flex: 0 auto !important;
+                    }
                 }
-            }
 
-            &:hover {
+                &:hover {
+                    .deleteIcon {
+                        display: block;
+                        cursor: pointer;
+                    }
+                }
+
                 .deleteIcon {
-                    display: block;
-                    cursor: pointer;
+                    margin-bottom: 0.5rem !important;
+                    color: #919191 !important;
+                    display: none;
                 }
-            }
-
-            .deleteIcon {
-                margin-bottom: 0.5rem !important;
-                color: #919191 !important;
-                display: none;
             }
         }
     }

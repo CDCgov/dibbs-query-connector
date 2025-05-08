@@ -57,7 +57,7 @@ class UserCreatedValuesetService {
 
     const systemPrefix = UserCreatedValuesetService.getSystemPrefix(vs.system);
     const valueSetUniqueId =
-      vs.valueSetId !== "" ? !!vs.valueSetId : `${uuid}_${vs.valueSetVersion}`;
+      vs.valueSetId !== "" ? vs.valueSetId : `${uuid}_${vs.valueSetVersion}`;
     const valueSetOid = vs.valueSetExternalId || uuid;
 
     // Insert Custom Code Condition if not already present
@@ -85,7 +85,8 @@ class UserCreatedValuesetService {
     // Insert Concepts and Linkages
     for (const concept of vs.concepts) {
       // TODO: We will need to do an UPDATE display if system prefix and code already exist
-      const conceptId = `${systemPrefix}_${concept.code}`;
+      const conceptId =
+        concept.internalId ?? `custom_${systemPrefix}_${concept.code}`;
       try {
         await dbService.query(insertConceptSql, [
           conceptId,

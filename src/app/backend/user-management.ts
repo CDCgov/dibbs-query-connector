@@ -35,6 +35,26 @@ class UserManagementService {
   }
 
   /**
+   * @param userId The identifier of the user we want to retrieve
+   * @returns A single user result, with any applicable group membership details
+   */
+  static async getUserById(userId: string): Promise<QCResponse<User>> {
+    const userQuery = `SELECT * FROM users WHERE id = $1;`;
+    const result = await dbService.query(userQuery, [userId]);
+
+    if (result.rowCount && result.rowCount > 0) {
+      const user = result.rows[0];
+      const userWithGroups =
+        await UserManagementService.getSingleUserWithGroupMemberships(user.id);
+      return {
+        totalItems: userWithGroups.totalItems,
+        items: userWithGroups.items,
+      };
+    } else {
+      return { totalItems: 0, items: [] };
+    }
+  }
+  /**
    * Adds a user to the users table if they do not already exist.
    * Uses data extracted from the JWT token.
    * @param userToken - The user data from the JWT token.
@@ -435,6 +455,7 @@ class UserManagementService {
 }
 
 export const getUserByUsername = UserManagementService.getUserByUsername;
+export const getUserById = UserManagementService.getUserById;
 export const addUserIfNotExists = UserManagementService.addUserIfNotExists;
 export const updateUserDetails = UserManagementService.updateUserDetails;
 export const updateUserRole = UserManagementService.updateUserRole;

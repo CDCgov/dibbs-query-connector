@@ -2,6 +2,7 @@ import {
   DibbsConceptType,
   DibbsValueSet,
 } from "@/app/models/entities/valuesets";
+import { vsAuthorMap } from "./components/DropdownFilter";
 
 /**
  * Helper method to extract the source system display name from the url string.
@@ -45,12 +46,12 @@ export const emptyValueSet: DibbsValueSet = {
   userCreated: true,
 };
 
-export const emptyCodeMapItem = {
-  "0": {
-    display: "",
-    code: "",
-    include: false,
-  },
+export const emptyVsAuthorMapItem: vsAuthorMap = { "": [""] };
+
+export const emptyFilterSearch = {
+  category: "" as DibbsConceptType,
+  codeSystem: "",
+  creators: emptyVsAuthorMapItem,
 };
 
 export const CodeSystemOptions = [

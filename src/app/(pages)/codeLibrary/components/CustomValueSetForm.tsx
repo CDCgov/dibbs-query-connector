@@ -20,7 +20,6 @@ import { formatStringToSentenceCase } from "@/app/shared/format-service";
 import {
   CodeSystemOptions,
   CustomCodeMode,
-  emptyCodeMapItem,
   emptyValueSet,
   formatSystem,
 } from "../utils";
@@ -57,10 +56,9 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
 
   const [customValueSet, setCustomValueSet] =
     useState<DibbsValueSet>(emptyValueSet);
-  const [codes, setCodes] = useState<CustomCodeMap>(
-    mode == "create" ? emptyCodeMapItem : {},
-  );
-  const nextIndexValue = Object.keys(codes).length;
+  const [codes, setCodes] = useState<CustomCodeMap>({
+    "0": { code: "", display: "", include: false },
+  });
 
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [error, setError] = useState({
@@ -77,6 +75,7 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
     // from "start from scratch": back to templates
     // from hybrid/query building: back to query
     setLoading(true);
+    setCodes({ "0": { code: "", display: "", include: false } });
     return setMode("manage");
   }
 
@@ -107,9 +106,10 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
       activeValueSet?.concepts.map((code, idx) => {
         codeMap[idx] = code;
       });
+
       setCodes(codeMap);
     } else {
-      setCodes(emptyCodeMapItem);
+      setCodes({ "0": { code: "", display: "", include: false } });
     }
 
     mode == "edit" && activeValueSet && setCustomValueSet(activeValueSet);
@@ -136,6 +136,7 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
     return Object.entries(codes).map(([idx, code]) => {
       return (
         <div
+          data-testid={"addCode-inputs"}
           className={classNames(styles.addCodeRow, styles.formSection__input)}
           key={idx}
         >
@@ -143,7 +144,7 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
             <label htmlFor="code-id">Code #</label>
             <TextInput
               type="text"
-              id={`code-id-${code}`}
+              id={`code-id-${code.internalId ?? idx}`}
               name="code-id"
               defaultValue={code.code}
               placeholder={code.code}
@@ -154,7 +155,7 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
             <label htmlFor="code-name">Code name </label>
             <TextInput
               type="text"
-              id={`code-name-${code}`}
+              id={`code-name-${code.internalId ?? idx}`}
               name="code-name"
               defaultValue={code.display}
               placeholder={code.display}
@@ -178,6 +179,7 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
   };
 
   const saveValueSet = async () => {
+    setLoading(true);
     // TODO: implement proper form validation
     const requiredFields = ["valueSetName", "system", "dibbsConceptType"];
     Object.entries(customValueSet).some(([key, val]) => {
@@ -197,26 +199,40 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
           ? `${currentUser?.firstName} ${currentUser?.lastName}`
           : currentUser?.username
         : "";
+    const codes2 = Object.values(codes).filter(
+      (codes) => codes.code != "" && codes.display !== "",
+    );
 
     const newCustomValueSet = {
       ...customValueSet,
       author: author as string,
-      concepts: Object.values(codes),
+      concepts: codes2,
     };
 
     if (!error.valueSetName) {
-      const result = await insertCustomValueSet(
-        newCustomValueSet,
-        currentUser?.id as string,
-      );
+      try {
+        const result = await insertCustomValueSet(
+          newCustomValueSet,
+          currentUser?.id as string,
+        );
 
-      if (result.success == true) {
-        setErrorMessage("");
-        return showToastConfirmation({
-          body: `Value set "${customValueSet.valueSetName}" successfully ${
-            mode == "create" ? "added" : "updated"
-          }`,
-        });
+        if (result.success == true) {
+          setErrorMessage("");
+          setCodes({ "0": { code: "", display: "", include: false } });
+
+          if (mode == "create") {
+            setMode("manage");
+          }
+          return showToastConfirmation({
+            body: `Value set "${customValueSet.valueSetName}" successfully ${
+              mode == "create" ? "added" : "updated"
+            }`,
+          });
+        }
+      } catch (error) {
+        console.log(error);
+      } finally {
+        // setLoading(false);
       }
     }
   };
@@ -375,12 +391,36 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
                 </div>
                 <button
                   className={styles.addCodeBtn}
-                  onClick={() =>
+                  onClick={(e) => {
+                    e.preventDefault();
+
+                    if (mode == "edit") {
+                      const codeMap: CustomCodeMap = {};
+                      const codeCount = activeValueSet?.concepts?.length;
+
+                      activeValueSet?.concepts.map((code, idx) => {
+                        codeMap[idx] = code;
+                      });
+                      if (codeCount) {
+                        codeMap[codeCount] = {
+                          code: "",
+                          display: "",
+                          include: false,
+                        };
+                      }
+
+                      return setCodes(codeMap);
+                    }
                     setCodes({
                       ...codes,
-                      ...{ [nextIndexValue]: { codeName: "", codeNum: "" } },
-                    })
-                  }
+                      ...{
+                        [Object.values(codes).length]: {
+                          display: "",
+                          code: "",
+                        },
+                      },
+                    });
+                  }}
                 >
                   + Add code
                 </button>
