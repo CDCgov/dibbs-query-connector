@@ -115,6 +115,9 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
     setLoading(false);
   }, [mode]);
 
+  useEffect(() => {
+    console.log(codes);
+  }, [codes]);
   const handleAddCode =
     (type: string, index: string) =>
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -131,7 +134,21 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
       setCodes({ ...codes, [index]: codeToUpdate });
     };
 
-  const renderAddCodeRow = () => {
+  const handleRemoveCode = (code: Concept, idx: string) => {
+    if (!!code.internalId) {
+      console.log(code);
+      // delete from db:
+      // - valueset to concept join
+      // - code itself
+    }
+    if (!code.internalId) {
+      delete codes[idx];
+      return setCodes({ ...codes });
+    }
+    // possibly handling of remove last code in vs...
+  };
+
+  const renderAddCodeRow = (codes: CustomCodeMap) => {
     return Object.entries(codes).map(([idx, code]) => {
       return (
         <div
@@ -167,9 +184,9 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
             color="#919191"
             data-testid={`delete-custom-code-${code}`}
             aria-label="Trash icon indicating deletion of code entry"
-            onClick={() => {
-              // TODO: implement delete
-              console.log("delete");
+            onClick={(e) => {
+              e.preventDefault();
+              handleRemoveCode(code, idx);
             }}
           ></Icon.Delete>
         </div>
@@ -385,7 +402,7 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
             ) : (
               <div className={styles.formSection__content}>
                 <div className={styles.addCodeContainer}>
-                  {renderAddCodeRow()}
+                  {renderAddCodeRow(codes)}
                 </div>
                 <button
                   className={styles.addCodeBtn}
