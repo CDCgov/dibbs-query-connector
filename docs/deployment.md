@@ -22,5 +22,7 @@ The following environment variables are required to run Query Connector. You can
 # .env
 # Required environment variables
 NEXT_PUBLIC_AUTH_PROVIDER=keycloak # or microsoft-entra-id
+AUTH_CLIENT_ID=your-client-id
+AUTH_CLIENT_SECRET=your-client-secret
+AUTH_ISSUER=idp-issuer-url
 ```
-

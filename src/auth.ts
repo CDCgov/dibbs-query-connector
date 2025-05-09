@@ -25,8 +25,8 @@ LOCAL_KEYCLOAK = addRealm(LOCAL_KEYCLOAK);
 const keycloakProvider = KeycloakProvider({
   jwks_endpoint: `${NAMED_KEYCLOAK}/protocol/openid-connect/certs`,
   wellKnown: undefined,
-  clientId: process.env.AUTH_KEYCLOAK_ID,
-  clientSecret: process.env.AUTH_KEYCLOAK_SECRET,
+  clientId: process.env.AUTH_CLIENT_ID,
+  clientSecret: process.env.AUTH_CLIENT_SECRET,
   issuer: `${LOCAL_KEYCLOAK}`,
   authorization: {
     params: {
@@ -39,9 +39,9 @@ const keycloakProvider = KeycloakProvider({
 });
 
 const entraProvider = MicrosoftEntraID({
-  clientId: process.env.AUTH_MICROSOFT_ENTRA_ID_ID,
-  clientSecret: process.env.AUTH_MICROSOFT_ENTRA_ID_SECRET,
-  issuer: process.env.AUTH_MICROSOFT_ENTRA_ID_ISSUER,
+  clientId: process.env.AUTH_CLIENT_ID,
+  clientSecret: process.env.AUTH_CLIENT_SECRET,
+  issuer: process.env.AUTH_ISSUER,
   authorization: {
     params: {
       scope: "openid email profile",
