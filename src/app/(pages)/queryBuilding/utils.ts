@@ -1,5 +1,7 @@
 import { DibbsValueSet } from "@/app/models/entities/valuesets";
 import { ConceptTypeToDibbsVsMap } from "../../utils/valueSetTranslation";
+import { DibbsConceptType } from "@/app/models/entities/valuesets";
+import { CUSTOM_CONDITION_ID } from "@/app/shared/constants";
 
 // The structure of the data that's coming from the backend
 export type ConditionsMap = {
@@ -22,6 +24,12 @@ export type ConditionIdToValueSetArrayMap = {
 
 export type NestedQuery = {
   [conditionId: string]: ConceptTypeToDibbsVsMap;
+} & {
+  custom?: {
+    [conceptType in DibbsConceptType]: {
+      [vsId: string]: DibbsValueSet;
+    };
+  };
 };
 
 export type QueryUpdateResult = {
@@ -182,3 +190,27 @@ export const batchToggleConcepts = (input: DibbsValueSet) => {
 
   return input;
 };
+
+/**
+ * Filters out CUSTOM_CONDITION_ID from a CategoryToConditionArrayMap.
+ * Used to prevent rendering the custom condition in UI elements.
+ * @param categoryMap - The map of categories to condition arrays to filter.
+ * @returns A filtered CategoryToConditionArrayMap without CUSTOM_CONDITION_ID.
+ */
+export function formatCategoryToConditionsMap(
+  categoryMap: CategoryToConditionArrayMap,
+): CategoryToConditionArrayMap {
+  const filtered: CategoryToConditionArrayMap = {};
+
+  for (const [category, conditions] of Object.entries(categoryMap)) {
+    const filteredConditions = conditions.filter(
+      (condition) => condition.id !== CUSTOM_CONDITION_ID,
+    );
+
+    if (filteredConditions.length > 0) {
+      filtered[category] = filteredConditions;
+    }
+  }
+
+  return filtered;
+}

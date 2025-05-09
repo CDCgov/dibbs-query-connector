@@ -116,19 +116,16 @@ export const ConceptTypeSelectionTable: React.FC<
     (i) => i.atLeastOneRenderedValueSet,
   );
 
-  return (
-    <div data-testid="accordion" className={styles.accordionContainer}>
-      {accordionsToRender.length > 0 ? (
-        <MultiAccordion
-          items={accordionsToRender}
-          multiselectable={false}
-          accordionClassName={styles.accordionInnerWrapper}
-        />
-      ) : (
-        <div className="padding-2">
-          <strong>No valuesets found</strong>
-        </div>
-      )}
+  return accordionsToRender.length > 0 ? (
+    <div
+      data-testid="accordion-container"
+      className={styles.accordionContainer}
+    >
+      <MultiAccordion
+        items={accordionsToRender}
+        multiselectable={false}
+        accordionClassName={styles.accordionInnerWrapper}
+      />
     </div>
-  );
+  ) : null;
 };
