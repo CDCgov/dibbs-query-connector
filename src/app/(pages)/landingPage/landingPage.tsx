@@ -7,9 +7,9 @@ import {
 } from "@trussworks/react-uswds";
 import Image from "next/image";
 import styles from "./landingPage.module.scss";
-import { signIn } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { signIn } from "@/app/backend/session-management";
 
 interface LandingPageProps {
   isLoggedIn: boolean;
@@ -36,8 +36,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ isLoggedIn }) => {
     }
   }, [isLoggedIn]);
 
-  const handleClick = () => {
-    signIn("keycloak", { redirectTo: "/query" });
+  const handleClick = async () => {
+    await signIn("keycloak", { redirectTo: "/query" });
   };
 
   return (

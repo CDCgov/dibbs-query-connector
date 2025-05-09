@@ -11,7 +11,7 @@ import {
   filterConcepts,
   filterValueSet,
 } from "./utils";
-import { Tooltip } from "@trussworks/react-uswds";
+import { Button, Tooltip } from "@trussworks/react-uswds";
 import TooltipWrapper, {
   TooltipWrapperProps,
 } from "@/app/ui/designSystem/Tooltip";
@@ -214,7 +214,8 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
               >
                 {selectedCount}/{totalCount}
               </div>
-              <div
+              <Button
+                type={"button"}
                 data-testid={`viewCodes-${dibbsVs.valueSetId}`}
                 className={styles.viewCodesBtn}
                 role="button"
@@ -223,7 +224,7 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
                 }}
               >
                 View codes
-              </div>
+              </Button>
             </div>
           </div>
         );

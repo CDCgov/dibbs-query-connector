@@ -109,9 +109,11 @@ test.describe("building a new query", () => {
         `[data-testid="container-${CLICKED_CONDITION.sampleLabValueSetID}"]`,
       )
       .getByRole("checkbox");
+
     await expect(labCheckbox).toBeChecked();
 
-    await labCheckbox.click();
+    const labLabel = labsHeader.getByText("labs");
+    await labLabel.click();
     await expect(labCheckbox).not.toBeChecked();
 
     await medicationsHeader.click();
