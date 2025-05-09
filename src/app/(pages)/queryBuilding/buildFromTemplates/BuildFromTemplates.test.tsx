@@ -21,7 +21,7 @@ import {
 } from "../components/utils";
 import { userEvent } from "@testing-library/user-event";
 import { render } from "@testing-library/react";
-import { getSavedQueryById } from "@/app/backend/dbServices/query-building";
+import { getSavedQueryById } from "@/app/backend/query-building/service";
 
 jest.mock("../../../shared/database-service", () => ({
   getCustomQueries: jest.fn(),
@@ -29,7 +29,7 @@ jest.mock("../../../shared/database-service", () => ({
   getValueSetsAndConceptsByConditionIDs: jest.fn(),
 }));
 
-jest.mock("../../../backend/dbServices/query-building", () => ({
+jest.mock("../../../backend/query-building/service", () => ({
   getSavedQueryById: jest.fn(),
 }));
 

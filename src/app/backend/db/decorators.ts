@@ -1,5 +1,5 @@
 import { adminAccessCheck, superAdminAccessCheck } from "@/app/utils/auth";
-import { getDbClient } from "../dbClient";
+import { internal_getDbClient } from "./config";
 import { QueryResult } from "pg";
 import { translateNestedObjectKeysIntoCamelCase } from "./util";
 
@@ -21,7 +21,7 @@ export function transaction<T extends { success: boolean }>(
   descriptor: TypedPropertyDescriptor<(...args: any[]) => Promise<T>>,
 ) {
   const method = descriptor.value;
-  const dbClient = getDbClient();
+  const dbClient = internal_getDbClient();
 
   // eslint-disable-next-line  @typescript-eslint/no-explicit-any
   descriptor.value = async function (...args: any[]): Promise<T> {

@@ -11,13 +11,13 @@ import StepIndicator, {
 } from "./components/stepIndicator/StepIndicator";
 import { DataContext } from "@/app/shared/DataProvider";
 import { Patient } from "fhir/r4";
-import { getFhirServerNames } from "@/app/backend/dbServices/fhir-servers";
 import { CustomUserQuery } from "@/app/models/entities/query";
 import WithAuth from "@/app/ui/components/withAuth/WithAuth";
 import {
   PatientDiscoveryResponse,
   PatientRecordsResponse,
 } from "@/app/backend/query-execution";
+import { getFhirServerNames } from "@/app/backend/fhir-servers";
 
 const blankUserQuery = {
   queryId: "",

@@ -1,4 +1,4 @@
-import dbService from "@/app/backend/dbServices/db-service";
+import dbService from "@/app/backend/db/service";
 import {
   logSignInToAuditTable,
   signOut,
@@ -9,7 +9,7 @@ import {
   getAuditEntry,
   TEST_USER,
 } from "./utils";
-import * as AuditableDecorators from "@/app/backend/auditLogs/lib";
+import * as AuditableDecorators from "@/app/backend/audit-logs/lib";
 import { auth } from "@/auth";
 import { suppressConsoleLogs } from "../fixtures";
 
@@ -20,10 +20,10 @@ jest.mock("@/app/utils/auth", () => {
   };
 });
 
-jest.mock("@/app/backend/auditLogs/lib", () => {
+jest.mock("@/app/backend/audit-logs/lib", () => {
   return {
     __esModule: true,
-    ...jest.requireActual("@/app/backend/auditLogs/lib"),
+    ...jest.requireActual("@/app/backend/audit-logs/lib"),
   };
 });
 

@@ -3,14 +3,14 @@ import {
   getAllGroupQueries,
 } from "@/app/backend/usergroup-management";
 import { getAllUsersWithSingleGroupStatus } from "@/app/backend/user-management";
-import { getDbClient } from "@/app/backend/dbClient";
+import { internal_getDbClient } from "@/app/backend/db/config";
 import { User } from "@/app/models/entities/users";
 import { suppressConsoleLogs } from "./fixtures";
 import { QueryDataColumn } from "@/app/(pages)/queryBuilding/utils";
-import { getQueriesForUser } from "@/app/backend/query-building";
+import { getQueriesForUser } from "@/app/backend/query-building/service";
 import { CustomUserQuery } from "@/app/models/entities/query";
 
-const dbClient = getDbClient();
+const dbClient = internal_getDbClient();
 
 jest.mock("@/app/utils/auth", () => ({
   superAdminAccessCheck: jest.fn(() => Promise.resolve(true)),

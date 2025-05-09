@@ -3,7 +3,7 @@ import {
   insertCustomValuesetsIntoQuery,
   getCustomCodeCondition,
 } from "@/app/shared/custom-code-service";
-import { getDbClient } from "@/app/backend/dbClient";
+import { internal_getDbClient } from "@/app/backend/db/config";
 import { DibbsValueSet } from "@/app/models/entities/valuesets";
 import { randomUUID } from "crypto";
 import {
@@ -11,7 +11,7 @@ import {
   CUSTOM_VALUESET_ARRAY_ID,
 } from "@/app/shared/constants";
 
-const dbClient = getDbClient();
+const dbClient = internal_getDbClient();
 
 describe("UserCreatedValuesetService Integration", () => {
   const testUUID = "mock-vsid-0001";

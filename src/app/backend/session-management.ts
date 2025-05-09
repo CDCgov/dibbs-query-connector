@@ -1,6 +1,6 @@
 "use server";
 import { signIn as nextAuthSignIn, signOut as nextAuthSignOut } from "@/auth";
-import { auditable } from "./auditLogs/decorator";
+import { auditable } from "./audit-logs/decorator";
 import { auth } from "@/auth";
 import type { Profile, Session } from "next-auth";
 

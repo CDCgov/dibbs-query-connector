@@ -1,6 +1,6 @@
 "use server";
 
-import { AuthData } from "../backend/dbServices/fhir-servers";
+import { AuthData } from "../backend/fhir-servers";
 import FHIRClient from "./fhirClient";
 
 /**

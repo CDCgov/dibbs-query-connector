@@ -37,5 +37,6 @@ export function translateVSACToInternalValueSet(
     dibbsConceptType: ersdToDibbsConceptMap[ersdConceptType],
     includeValueSet: false,
     concepts: concepts,
+    userCreated: false,
   } as DibbsValueSet;
 }

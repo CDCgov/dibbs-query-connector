@@ -8,7 +8,7 @@ import { Button } from "@trussworks/react-uswds";
 import UserPermissionsTable from "../userPermissionsTable/userPermissionsTable";
 import { QCResponse } from "@/app/models/responses/collections";
 import { User, UserGroup, UserRole } from "../../../../models/entities/users";
-import { getCustomQueries } from "@/app/backend/query-building";
+import { getCustomQueries } from "@/app/backend/query-building/service";
 import {
   getAllGroupMembers,
   getAllGroupQueries,
