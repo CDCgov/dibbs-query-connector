@@ -486,7 +486,7 @@ describe("custom value set behavior", () => {
         /This is a space for you to pull in individual value sets/i,
       ),
     ).toBeVisible();
-    expect(screen.queryByTestId("accordion")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("accordion-container")).not.toBeInTheDocument();
   });
 
   it("renders grouped concept accordions if custom value sets are present", async () => {
@@ -523,7 +523,7 @@ describe("custom value set behavior", () => {
       }),
     );
 
-    expect(await screen.findByTestId("accordion")).toBeVisible();
+    expect(await screen.findByTestId("accordion-container")).toBeVisible();
     expect(
       screen.queryByText(
         /This is a space for you to pull in individual value sets/i,
