@@ -72,11 +72,12 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
 
   useEffect(() => {
     // display the first condition's valuesets on render
+    if (activeCondition) return;
     const firstRealCondition = Object.keys(constructedQuery).find(
       (key) => key !== CUSTOM_VALUESET_ARRAY_ID,
     );
     setActiveCondition(firstRealCondition ?? CUSTOM_VALUESET_ARRAY_ID);
-  }, [constructedQuery]);
+  }, [constructedQuery, activeCondition]);
 
   function generateConditionDrawerDisplay(
     categoryToConditionsMap: CategoryToConditionArrayMap,
