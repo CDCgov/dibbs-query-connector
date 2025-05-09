@@ -1,4 +1,5 @@
 import KeycloakProvider from "next-auth/providers/keycloak";
+import MicrosoftEntraID from "next-auth/providers/microsoft-entra-id";
 import { addUserIfNotExists, getUserRole } from "@/app/backend/user-management";
 import { isAuthDisabledServerCheck } from "./app/utils/auth";
 import { UserRole } from "./app/models/entities/users";
@@ -21,27 +22,52 @@ if (!NAMED_KEYCLOAK || !LOCAL_KEYCLOAK) {
 NAMED_KEYCLOAK = addRealm(NAMED_KEYCLOAK);
 LOCAL_KEYCLOAK = addRealm(LOCAL_KEYCLOAK);
 
+const keycloakProvider = KeycloakProvider({
+  jwks_endpoint: `${NAMED_KEYCLOAK}/protocol/openid-connect/certs`,
+  wellKnown: undefined,
+  clientId: process.env.AUTH_CLIENT_ID,
+  clientSecret: process.env.AUTH_CLIENT_SECRET,
+  issuer: `${LOCAL_KEYCLOAK}`,
+  authorization: {
+    params: {
+      scope: "openid email profile",
+    },
+    url: `${LOCAL_KEYCLOAK}/protocol/openid-connect/auth`,
+  },
+  token: `${NAMED_KEYCLOAK}/protocol/openid-connect/token`,
+  userinfo: `${NAMED_KEYCLOAK}/protocol/openid-connect/userinfo`,
+});
+
+const entraProvider = MicrosoftEntraID({
+  clientId: process.env.AUTH_CLIENT_ID,
+  clientSecret: process.env.AUTH_CLIENT_SECRET,
+  issuer: process.env.AUTH_ISSUER,
+  authorization: {
+    params: {
+      scope: "openid email profile",
+    },
+  },
+});
+
+let providers = [];
+
+switch (process.env.NEXT_PUBLIC_AUTH_PROVIDER) {
+  case "keycloak":
+    providers = [keycloakProvider];
+    break;
+  case "microsoft-entra-id":
+    providers = [entraProvider];
+    break;
+  default:
+    providers = [keycloakProvider];
+    break;
+}
+
 export const { handlers, signIn, signOut, auth } = NextAuth({
   secret: process.env.AUTH_SECRET,
   trustHost: true,
   basePath: "/api/auth",
-  providers: [
-    KeycloakProvider({
-      jwks_endpoint: `${NAMED_KEYCLOAK}/protocol/openid-connect/certs`,
-      wellKnown: undefined,
-      clientId: process.env.AUTH_KEYCLOAK_ID,
-      clientSecret: process.env.AUTH_KEYCLOAK_SECRET,
-      issuer: `${LOCAL_KEYCLOAK}`,
-      authorization: {
-        params: {
-          scope: "openid email profile",
-        },
-        url: `${LOCAL_KEYCLOAK}/protocol/openid-connect/auth`,
-      },
-      token: `${NAMED_KEYCLOAK}/protocol/openid-connect/token`,
-      userinfo: `${NAMED_KEYCLOAK}/protocol/openid-connect/userinfo`,
-    }),
-  ],
+  providers,
   callbacks: {
     /**
      * JWT callback to store Keycloak user data in the token.

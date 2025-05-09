@@ -37,7 +37,9 @@ const LandingPage: React.FC<LandingPageProps> = ({ isLoggedIn }) => {
   }, [isLoggedIn]);
 
   const handleClick = async () => {
-    await signIn("keycloak", { redirectTo: "/query" });
+    await signIn(process.env.NEXT_PUBLIC_AUTH_PROVIDER, {
+      redirectTo: "/query",
+    });
   };
 
   return (
