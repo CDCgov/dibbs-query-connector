@@ -66,6 +66,7 @@ function mapStoredValueSetIntoInternalValueset(
         code: c["code"],
         display: c["display"],
         include: c["include"] ?? true,
+        internalId: c["internal_id"],
       };
     }),
     userCreated: storedConcept["user_created"] ?? false,

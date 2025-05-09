@@ -381,11 +381,145 @@
         overflow-y: scroll;
     }
 }
+
 .skeletonContainer {
     width: 100%;
 
     .skeleton {
         height: 3.5rem;
         display: flex;
+    }
+}
+
+.editCodesBtn {
+    background-color: #fff !important;
+    border: 2px solid #0076d6 !important;
+    color: #0076d6 !important;
+}
+
+.customValueSetForm {
+    .header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 2.875rem;
+        margin-top: 2.5rem;
+
+        .title {
+            margin: 2rem 0 1rem 0;
+
+            h2 {
+                font-size: 1.75rem;
+            }
+        }
+    }
+
+    .formSection {
+        &.__title {
+            margin: 2rem 0 1rem 0;
+
+            h2 {
+                font-size: 1.75rem;
+            }
+        }
+
+        &__content {
+            display: flex;
+            background-color: #f3f3f3;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            color: #111;
+            gap: 1rem;
+        }
+
+        &__input {
+            flex: 1;
+
+            input,
+            select {
+                border-radius: 0.25rem;
+                border: solid 1px #919191;
+            }
+        }
+    }
+
+    .vsDescription {
+        .formSection__input:first-of-type {
+            max-width: 25.75rem;
+            flex: 1 auto !important;
+        }
+    }
+
+    .codes {
+        margin-bottom: 3rem;
+
+        .formSection__content {
+            flex-direction: column;
+
+            .addCodeBtn {
+                border: none !important;
+                color: #0076d6;
+                background: transparent;
+                padding: 0 0.5rem;
+                width: fit-content;
+
+                &:hover {
+                    cursor: pointer;
+                }
+            }
+        }
+
+        .addCodeContainer {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+
+            .addCodeRow {
+                display: flex;
+                gap: 1.5rem;
+                align-items: flex-end;
+
+                div {
+                    width: 25.75rem;
+
+                    &:first-of-type {
+                        max-width: 13.875rem;
+                        flex: 0 auto !important;
+                    }
+                }
+
+                &:hover {
+                    .deleteIcon {
+                        display: block;
+                        cursor: pointer;
+                    }
+                }
+
+                .deleteIcon {
+                    margin-bottom: 0.5rem !important;
+                    color: #919191 !important;
+                    display: none;
+                }
+            }
+        }
+    }
+
+    .formValidationError {
+        div.errorMessage {
+            display: flex;
+            align-items: center;
+            color: #c31b1b;
+            justify-content: flex-start;
+            margin-top: 0.25rem;
+            line-height: 1.25rem;
+            position: relative;
+        }
+        svg {
+            margin-right: 0.25rem;
+            margin-bottom: 2.5px;
+        }
+        input {
+            border: 2px solid #c31b1b !important;
+        }
     }
 }
