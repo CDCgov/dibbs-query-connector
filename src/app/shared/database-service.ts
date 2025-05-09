@@ -33,9 +33,13 @@ import {
 import { getDbClient } from "../backend/dbClient";
 import type { DibbsValueSet } from "../models/entities/valuesets";
 import { Concept } from "../models/entities/concepts";
-import { transaction } from "@/app/backend/dbServices/decorators";
+import {
+  adminRequired,
+  transaction,
+} from "@/app/backend/dbServices/decorators";
 import { auditable } from "@/app/backend/auditLogs/decorator";
 import dbService from "../backend/dbServices/db-service";
+import { QCResponse } from "../models/responses/collections";
 
 type ErsdOrVsacResponse = Bundle | Parameters | OperationOutcome;
 
@@ -563,6 +567,34 @@ class DatabaseService {
     }
   }
 
+  /**
+   * Retrieves all available value sets in Query Connector.
+   * @returns A list of value sets registered in the query connector.
+   */
+  @adminRequired
+  static async getAllValueSets(): Promise<QCResponse<DibbsValueSet>> {
+    try {
+      const selectAllVSQuery = `
+    SELECT c.display, c.code_system, c.code, vs.name as valueset_name, vs.id as valueset_id, vs.oid as valueset_external_id, vs.version, vs.author as author, vs.type, vs.dibbs_concept_type as dibbs_concept_type, ctvs.condition_id
+    FROM valuesets vs 
+    LEFT JOIN condition_to_valueset ctvs on vs.id = ctvs.valueset_id 
+    LEFT JOIN valueset_to_concept vstc on vs.id = vstc.valueset_id
+    LEFT JOIN concepts c on vstc.concept_id = c.id
+    ORDER BY name ASC;
+  `;
+
+      const result = await DatabaseService.dbClient.query(selectAllVSQuery);
+
+      return {
+        totalItems: result.rowCount,
+        items: result.rows,
+      } as QCResponse<DibbsValueSet>;
+    } catch (error) {
+      console.error("Error retrieving user groups:", error);
+      throw error;
+    }
+  }
+
   // -------------------------------- //
   //          Helper Methods
   // -------------------------------- //
@@ -659,3 +691,4 @@ export const insertValueSet = DatabaseService.insertValueSet;
 export const getConditionsData = DatabaseService.getConditionsData;
 export const getValueSetsAndConceptsByConditionIDs =
   DatabaseService.getValueSetsAndConceptsByConditionIDs;
+export const getAllValueSets = DatabaseService.getAllValueSets;

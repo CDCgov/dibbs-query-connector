@@ -2,8 +2,8 @@ import BuildFromTemplates from "@/app/(pages)/queryBuilding/buildFromTemplates/B
 import {
   conditionIdToNameMap,
   categoryToConditionNameArrayMap,
-  gonorreheaValueSets,
-  gonorreheaSavedQuery,
+  gonorrheaValueSets,
+  gonorrheaSavedQuery,
   cancerValueSets,
 } from "@/app/(pages)/queryBuilding/fixtures";
 import { formatDiseaseDisplay } from "@/app/(pages)/queryBuilding/utils";
@@ -34,9 +34,9 @@ jest.mock("../../../backend/dbServices/query-building", () => ({
 }));
 
 const currentPage = "/";
-const GONORREHEA_ID = 15628003;
-const GONORREHEA_DETAILS = conditionIdToNameMap[GONORREHEA_ID];
-const GONORREHEA_NAME = formatDiseaseDisplay(GONORREHEA_DETAILS.name);
+const GONORRHEA_ID = 15628003;
+const GONORRHEA_DETAILS = conditionIdToNameMap[GONORRHEA_ID];
+const GONORRHEA_NAME = formatDiseaseDisplay(GONORRHEA_DETAILS.name);
 
 (getConditionsData as jest.Mock).mockResolvedValue({
   conditionIdToNameMap,
@@ -44,10 +44,10 @@ const GONORREHEA_NAME = formatDiseaseDisplay(GONORREHEA_DETAILS.name);
 });
 
 (getValueSetsAndConceptsByConditionIDs as jest.Mock).mockResolvedValue(
-  gonorreheaValueSets,
+  gonorrheaValueSets,
 );
 
-(getSavedQueryById as jest.Mock).mockResolvedValue(gonorreheaSavedQuery);
+(getSavedQueryById as jest.Mock).mockResolvedValue(gonorrheaSavedQuery);
 
 describe("tests the build from template page interactions", () => {
   it("customize query button is disabled unless name and individual condition are defined", async () => {
@@ -68,7 +68,7 @@ describe("tests the build from template page interactions", () => {
     expect(screen.getByText("Customize query")).toBeDisabled();
 
     await user.type(screen.getByTestId("queryNameInput"), "some name");
-    await user.click(screen.getByLabelText(GONORREHEA_NAME));
+    await user.click(screen.getByLabelText(GONORRHEA_NAME));
 
     expect(screen.getByText("Customize query")).not.toBeDisabled();
   });
@@ -88,7 +88,7 @@ describe("tests the build from template page interactions", () => {
       </RootProviderMock>,
     );
 
-    expect(await screen.findByText(GONORREHEA_NAME)).toBeInTheDocument();
+    expect(await screen.findByText(GONORRHEA_NAME)).toBeInTheDocument();
     expect(await screen.findByText("Cancer (Leukemia)")).toBeInTheDocument();
     expect(
       await screen.findByText("Malignant neoplastic disease"),
@@ -100,7 +100,7 @@ describe("tests the build from template page interactions", () => {
       "leukemia",
     );
     expect(screen.getByText("Cancer (Leukemia)")).toBeInTheDocument();
-    expect(screen.queryByText(GONORREHEA_NAME)).not.toBeInTheDocument();
+    expect(screen.queryByText(GONORRHEA_NAME)).not.toBeInTheDocument();
     expect(
       screen.queryByText("Malignant neoplastic disease"),
     ).not.toBeInTheDocument();
@@ -118,7 +118,7 @@ describe("tests the build from template page interactions", () => {
       screen.getByText("Malignant neoplastic disease"),
     ).toBeInTheDocument();
     expect(screen.getByText("Cancer (Leukemia)")).toBeInTheDocument();
-    expect(screen.queryByText(GONORREHEA_NAME)).not.toBeInTheDocument();
+    expect(screen.queryByText(GONORRHEA_NAME)).not.toBeInTheDocument();
   });
   it("search filters reset properly", async () => {
     const { user } = renderWithUser(
@@ -135,13 +135,13 @@ describe("tests the build from template page interactions", () => {
       </RootProviderMock>,
     );
 
-    expect(await screen.findByText(GONORREHEA_NAME)).toBeInTheDocument();
+    expect(await screen.findByText(GONORRHEA_NAME)).toBeInTheDocument();
     expect(await screen.findByText("Cancer (Leukemia)")).toBeInTheDocument();
     expect(
       await screen.findByText("Malignant neoplastic disease"),
     ).toBeInTheDocument();
 
-    // "can" (2 matches) --> "an" (3 matches, Gonorrehea matched on Sexually Transmitted)
+    // "can" (2 matches) --> "an" (3 matches, Gonorrhea matched on Sexually Transmitted)
     await user.type(
       screen.getByPlaceholderText(CONDITION_DRAWER_SEARCH_PLACEHOLDER),
       "can",
@@ -150,12 +150,12 @@ describe("tests the build from template page interactions", () => {
     expect(
       screen.getByText("Malignant neoplastic disease"),
     ).toBeInTheDocument();
-    expect(screen.queryByText(GONORREHEA_NAME)).not.toBeInTheDocument();
+    expect(screen.queryByText(GONORRHEA_NAME)).not.toBeInTheDocument();
     await user.type(
       screen.getByPlaceholderText(CONDITION_DRAWER_SEARCH_PLACEHOLDER),
       "[ArrowLeft][ArrowLeft][Backspace]",
     );
-    expect(screen.getByText(GONORREHEA_NAME)).toBeInTheDocument();
+    expect(screen.getByText(GONORRHEA_NAME)).toBeInTheDocument();
     expect(screen.getByText("Cancer (Leukemia)")).toBeInTheDocument();
     expect(
       screen.getByText("Malignant neoplastic disease"),
@@ -173,12 +173,12 @@ describe("tests the build from template page interactions", () => {
     expect(
       screen.getByText("Malignant neoplastic disease"),
     ).toBeInTheDocument();
-    expect(screen.queryByText(GONORREHEA_NAME)).not.toBeInTheDocument();
+    expect(screen.queryByText(GONORRHEA_NAME)).not.toBeInTheDocument();
     await user.type(
       screen.getByPlaceholderText(CONDITION_DRAWER_SEARCH_PLACEHOLDER),
       "[Backspace][Backspace][Backspace]",
     );
-    expect(screen.getByText(GONORREHEA_NAME)).toBeInTheDocument();
+    expect(screen.getByText(GONORRHEA_NAME)).toBeInTheDocument();
     expect(screen.getByText("Cancer (Leukemia)")).toBeInTheDocument();
     expect(
       screen.getByText("Malignant neoplastic disease"),
@@ -195,7 +195,7 @@ describe("tests the build from template page interactions", () => {
     await user.clear(
       screen.getByPlaceholderText(CONDITION_DRAWER_SEARCH_PLACEHOLDER),
     );
-    expect(screen.getByText(GONORREHEA_NAME)).toBeInTheDocument();
+    expect(screen.getByText(GONORRHEA_NAME)).toBeInTheDocument();
     expect(screen.getByText("Cancer (Leukemia)")).toBeInTheDocument();
     expect(
       screen.getByText("Malignant neoplastic disease"),
@@ -217,7 +217,7 @@ describe("tests the build from template page interactions", () => {
       </RootProviderMock>,
     );
 
-    const DISPLAY_NAME = formatDiseaseDisplay(GONORREHEA_DETAILS.name);
+    const DISPLAY_NAME = formatDiseaseDisplay(GONORRHEA_DETAILS.name);
 
     // Check the checkbox
     await user.click(await screen.findByLabelText(DISPLAY_NAME));
@@ -245,13 +245,13 @@ describe("tests the build from template page interactions", () => {
 });
 
 describe("tests the valueset selection page interactions", () => {
-  const GONORREHEA_VALUESET_MAP = Object.values(
-    gonorreheaSavedQuery.queryData,
+  const GONORRHEA_VALUESET_MAP = Object.values(
+    gonorrheaSavedQuery.queryData,
   )[0];
-  const GONORREHEA_VALUESET_IDS = Object.keys(GONORREHEA_VALUESET_MAP);
+  const GONORRHEA_VALUESET_IDS = Object.keys(GONORRHEA_VALUESET_MAP);
 
-  const TEST_ID = GONORREHEA_VALUESET_IDS[0];
-  const TEST_VALUESET = GONORREHEA_VALUESET_MAP[TEST_ID];
+  const TEST_ID = GONORRHEA_VALUESET_IDS[0];
+  const TEST_VALUESET = GONORRHEA_VALUESET_MAP[TEST_ID];
   let user = userEvent.setup();
 
   beforeEach(async () => {
@@ -308,7 +308,7 @@ describe("tests the valueset selection page interactions", () => {
     await user.click(screen.getByTestId(`${CANCER_ID}-card-active`));
 
     expect(screen.getByTestId(`${CANCER_ID}-card-active`)).toBeInTheDocument();
-    expect(screen.getByTestId(`${GONORREHEA_ID}-card`)).toBeInTheDocument();
+    expect(screen.getByTestId(`${GONORRHEA_ID}-card`)).toBeInTheDocument();
   });
 
   it("filters search on the valueset selection drawer appropriately", async () => {
