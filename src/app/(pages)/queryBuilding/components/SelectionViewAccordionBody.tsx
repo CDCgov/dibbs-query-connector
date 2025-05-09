@@ -16,7 +16,7 @@ import TooltipWrapper, {
 } from "@/app/ui/designSystem/Tooltip";
 import { DibbsValueSet } from "@/app/models/entities/valuesets";
 import { Concept } from "@/app/models/entities/concepts";
-import ValueSetBulkToggle from "./ValuesetBulkToggle";
+import ValueSetBulkToggle from "./ValueSetBulkToggle";
 
 type ConceptTypeAccordionBodyProps = {
   activeValueSets: { [vsId: string]: FilterableValueSet };
