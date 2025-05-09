@@ -73,10 +73,21 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
   useEffect(() => {
     // display the first condition's valuesets on render
     if (activeCondition) return;
-    const firstRealCondition = Object.keys(constructedQuery).find(
+
+    const queryKeys = Object.keys(constructedQuery);
+    const nonCustom = queryKeys.filter(
       (key) => key !== CUSTOM_VALUESET_ARRAY_ID,
     );
-    setActiveCondition(firstRealCondition ?? CUSTOM_VALUESET_ARRAY_ID);
+
+    const firstValid = nonCustom.find(
+      (key) => constructedQuery[key] !== undefined,
+    );
+
+    if (firstValid) {
+      setActiveCondition(firstValid);
+    } else if (queryKeys.includes(CUSTOM_VALUESET_ARRAY_ID)) {
+      setActiveCondition(CUSTOM_VALUESET_ARRAY_ID);
+    }
   }, [constructedQuery, activeCondition]);
 
   function generateConditionDrawerDisplay(
