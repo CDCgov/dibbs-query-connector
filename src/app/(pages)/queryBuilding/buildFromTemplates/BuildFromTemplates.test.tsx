@@ -425,19 +425,19 @@ describe("tests the valueset selection page interactions", () => {
     // Toggle off (should uncheck)
     await user.click(checkbox);
     expect(
-      screen.getByText((_, el) => el?.textContent === "0/2"),
+      screen.getByText((_, el) => el?.textContent === "0 / 2"),
     ).toBeInTheDocument();
 
     // Toggle on
     await user.click(checkbox);
     expect(
-      screen.getByText((_, el) => el?.textContent === "2/2"),
+      screen.getByText((_, el) => el?.textContent === "2 / 2"),
     ).toBeInTheDocument();
 
     // Toggle back off for next check to confirm filtering
     await user.click(checkbox);
     expect(
-      screen.getByText((_, el) => el?.textContent === "0/2"),
+      screen.getByText((_, el) => el?.textContent === "0 / 2"),
     ).toBeInTheDocument();
 
     await user.clear(valueSetSearch);
@@ -445,26 +445,26 @@ describe("tests the valueset selection page interactions", () => {
     // have been affected
     screen.debug();
     const displayCount = screen.getByTestId(`displayCount-${TEST_ID}`);
-    expect(displayCount).toHaveTextContent("2/4");
+    expect(displayCount).toHaveTextContent("2 / 4");
 
     // do the same for the accordidion
     await user.type(valueSetSearch, "meningitidis");
 
     await user.click(screen.getByLabelText("Labs", { exact: false }));
-    expect(screen.getByText("2/2")).toBeInTheDocument();
+    expect(screen.getByText("2 / 2")).toBeInTheDocument();
     await user.click(screen.getByLabelText("Labs", { exact: false }));
-    expect(screen.getByText("0/2")).toBeInTheDocument();
+    expect(screen.getByText("0 / 2")).toBeInTheDocument();
 
     await user.clear(valueSetSearch);
-    expect(screen.getByText("2/4")).toBeInTheDocument();
+    expect(screen.getByText("2 / 4")).toBeInTheDocument();
 
     // ... and the drawer
     await user.type(valueSetSearch, "meningitidis");
     await user.click(screen.getByText("View codes", { exact: false }));
     await user.click(screen.getByText(TEST_VALUESET.concepts[0].code));
     await user.click(screen.getByText(TEST_VALUESET.concepts[3].code));
-    expect(screen.getByText("0/2")).toBeInTheDocument();
+    expect(screen.getByText("0 / 2")).toBeInTheDocument();
     await user.clear(valueSetSearch);
-    expect(screen.getByText("2/4")).toBeInTheDocument();
+    expect(screen.getByText("2 / 4")).toBeInTheDocument();
   });
 });

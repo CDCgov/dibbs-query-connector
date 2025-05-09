@@ -1,5 +1,5 @@
 import styles from "../buildFromTemplates/conditionTemplateSelection.module.scss";
-import React, { ChangeEvent, useEffect, useRef, useState } from "react";
+import React, { ChangeEvent, useEffect, useState } from "react";
 import ConceptSelection from "./ConceptSelection";
 import Drawer from "@/app/ui/designSystem/drawer/Drawer";
 import Highlighter from "react-highlight-words";
@@ -49,19 +49,6 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
   const [curConcepts, setCurConcepts] = useState<FilterableConcept[]>([]);
   const [drawerSearchFilter, setDrawerSearchFilter] = useState<string>("");
   const areItemsFiltered = tableSearchFilter !== "";
-
-  const focusElementRef = useRef<HTMLDivElement>(null);
-
-  const setFocusOnCheckbox = () => {
-    if (focusElementRef.current) {
-      focusElementRef.current.focus();
-    }
-  };
-  const removeFocusFromCheckbox = () => {
-    if (focusElementRef.current) {
-      focusElementRef.current.blur();
-    }
-  };
 
   useEffect(() => {
     if (curValueSet) {
