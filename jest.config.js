@@ -18,7 +18,9 @@ const customJestConfig = {
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/src/$1",
   },
-  transformIgnorePatterns: ["/node_modules/(?!next-auth)"],
+  transformIgnorePatterns: [
+    "/node_modules/next-auth/providers/microsoft-entra-id.js",
+  ],
 };
 
 // createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async
