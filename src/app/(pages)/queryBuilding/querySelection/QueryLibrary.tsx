@@ -25,6 +25,10 @@ import classNames from "classnames";
 import { getConditionsData } from "@/app/shared/database-service";
 import { ConditionsMap } from "../utils";
 import { CustomUserQuery } from "@/app/models/entities/query";
+import {
+  CUSTOM_CONDITION_NAME,
+  CUSTOM_VALUESET_ARRAY_ID,
+} from "@/app/shared/constants";
 
 interface UserQueriesDisplayProps {
   queries: CustomUserQuery[];
@@ -127,27 +131,32 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
 
                   <td
                     title={
-                      query.conditionsList?.includes("custom") &&
-                      query.conditionsList.length === 1
-                        ? "Custom valuesets"
+                      query.conditionsList?.includes(
+                        CUSTOM_VALUESET_ARRAY_ID,
+                      ) && query.conditionsList.length === 1
+                        ? CUSTOM_CONDITION_NAME
                         : query.conditionsList
                             ?.map(
                               (id) =>
                                 conditionIdToDetailsMap[id]?.name ||
-                                (id === "custom" ? "Custom valuesets" : ""),
+                                (id === CUSTOM_VALUESET_ARRAY_ID
+                                  ? CUSTOM_CONDITION_NAME
+                                  : ""),
                             )
                             .filter(Boolean)
                             .join(", ")
                     }
                   >
-                    {query.conditionsList?.includes("custom") &&
+                    {query.conditionsList?.includes(CUSTOM_VALUESET_ARRAY_ID) &&
                     query.conditionsList.length === 1
-                      ? "Custom valuesets"
+                      ? CUSTOM_CONDITION_NAME
                       : query.conditionsList
                           ?.map(
                             (id) =>
                               conditionIdToDetailsMap[id]?.name ||
-                              (id === "custom" ? "Custom valuesets" : ""),
+                              (id === CUSTOM_VALUESET_ARRAY_ID
+                                ? CUSTOM_CONDITION_NAME
+                                : ""),
                           )
                           .filter(Boolean)
                           .join(", ")}

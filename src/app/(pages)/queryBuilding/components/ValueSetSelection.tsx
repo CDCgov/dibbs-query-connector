@@ -11,6 +11,7 @@ import {
   formatDiseaseDisplay,
   formatCategoryDisplay,
   NestedQuery,
+  formatCategoryToConditionsMap,
 } from "../utils";
 import { ConceptTypeSelectionTable } from "./SelectionTable";
 import Drawer from "@/app/ui/designSystem/drawer/Drawer";
@@ -63,7 +64,9 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
   const [activeCondition, setActiveCondition] = useState<string>("");
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [conditionDrawerData, setConditionDrawerData] =
-    useState<CategoryToConditionArrayMap>(categoryToConditionsMap);
+    useState<CategoryToConditionArrayMap>(
+      formatCategoryToConditionsMap(categoryToConditionsMap),
+    );
   const [conditionSearchFilter, setConditionSearchFilter] = useState("");
   const [valueSetSearchFilter, setValueSetSearchFilter] = useState("");
 
@@ -140,7 +143,7 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
   function handleConditionSearch(searchFilter: string) {
     const filteredDisplay = filterSearchByCategoryAndCondition(
       searchFilter,
-      categoryToConditionsMap,
+      formatCategoryToConditionsMap(categoryToConditionsMap),
     );
     setConditionSearchFilter(searchFilter);
     setConditionDrawerData(filteredDisplay);

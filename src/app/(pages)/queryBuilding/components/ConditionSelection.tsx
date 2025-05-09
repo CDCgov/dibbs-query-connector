@@ -8,7 +8,7 @@ import ConditionColumnDisplay from "../buildFromTemplates/ConditionColumnDisplay
 import SearchField from "@/app/ui/designSystem/searchField/SearchField";
 import { FormError } from "../buildFromTemplates/BuildFromTemplates";
 import { CONDITION_DRAWER_SEARCH_PLACEHOLDER } from "./utils";
-import { formatDiseaseDisplay } from "../utils";
+import { formatDiseaseDisplay, formatCategoryToConditionsMap } from "../utils";
 import Link from "next/link";
 import { CUSTOM_CONDITION_ID } from "@/app/shared/constants";
 
@@ -47,6 +47,9 @@ export const ConditionSelection: React.FC<ConditionSelectionProps> = ({
 }) => {
   const focusRef = useRef<HTMLInputElement | null>(null);
   const [searchFilter, setSearchFilter] = useState<string>();
+  const filteredCategoryMap = formatCategoryToConditionsMap(
+    categoryToConditionsMap,
+  );
 
   useEffect(() => {
     if (queryName == "" || queryName == undefined) {
@@ -88,9 +91,8 @@ export const ConditionSelection: React.FC<ConditionSelectionProps> = ({
           <>
             {(() => {
               const conditionIdToNameMap: { [id: string]: string } = {};
-              Object.values(categoryToConditionsMap)
+              Object.values(filteredCategoryMap)
                 .flat()
-                .filter((c) => c.id !== CUSTOM_CONDITION_ID)
                 .forEach((c) => {
                   conditionIdToNameMap[c.id] = c.name;
                 });
