@@ -125,6 +125,7 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
                     data-testid={`condition-drawer-add-${condition.id}`}
                     onClick={() => {
                       handleUpdateCondition(condition.id, false);
+                      setActiveCondition(condition.id);
                       showToastConfirmation({
                         body: `${condition.name} added to query`,
                       });
