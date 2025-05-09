@@ -34,4 +34,4 @@ async function hackJestConfig() {
   return nextJestConfig;
 }
 
-export default hackJestConfig;
+module.exports = hackJestConfig;
