@@ -317,7 +317,6 @@
   display: flex;
   align-items: center;
   margin: 0.5rem 0;
-  width: 406px;
 }
 
 .valueSetTemplate__toggleRowHeader > svg {
@@ -329,28 +328,37 @@
   background-color: #fff;
   display: flex;
   justify-content: space-between;
+  cursor: pointer;
+}
+
+.checkboxInfoContainer:focus {
+  outline: none;
+  label::before {
+    outline: 0.25rem solid $hover-active;
+    outline-offset: 0.25rem;
+    border-radius: 0.05rem;
+  }
 }
 
 .accordionBodyExpanded {
-  &:hover {
-    background-color: rgba(217, 232, 246, 0.5) !important;
+  .valueSetTemplate__checkboxWrapper {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
 
+  &:hover {
     .valueSetTemplate__checkbox {
       background-color: unset;
     }
+
     .viewCodesBtn {
       display: block;
-      text-align: right;
-      width: 4rem;
-      line-height: normal;
-      font-weight: 700;
+      width: 8rem;
+      height: 2rem;
       font-size: 14px;
-      color: $text-blue;
-
-      &:hover {
-        cursor: pointer;
-        text-decoration: underline;
-      }
+      margin: 0;
+      padding: 0.25rem 0.25rem;
     }
     .displayCount {
       display: none;
@@ -358,8 +366,14 @@
   }
 }
 
+.viewCodesBtn {
+  // toggle to block on hover
+  display: none;
+}
+
 div.accordionBodyExpanded:last-of-type {
   border-bottom: 1px #dfe1e2 solid;
+  width: 100%;
 
   .accordionExpandedInner {
     border-bottom: none !important;
@@ -370,6 +384,8 @@ div.accordionBodyExpanded:last-of-type {
   border-bottom: solid 1px #dfe1e2;
   padding-bottom: 1rem;
   width: 100%;
+  display: flex;
+  justify-content: space-between;
 }
 
 .expandedContent {
@@ -389,6 +405,7 @@ div.accordionBodyExpanded:last-of-type {
 .vsDetails {
   color: #919191;
   display: flex;
+  padding-left: 1.75rem;
 }
 
 .accordionBodyExpanded__right {
@@ -408,10 +425,6 @@ div.accordionBodyExpanded:last-of-type {
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-}
-
-.viewCodesBtn {
-  display: none;
 }
 
 .conceptSelectionTable {

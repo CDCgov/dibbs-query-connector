@@ -1,9 +1,8 @@
 import styles from "../buildFromTemplates/conditionTemplateSelection.module.scss";
-import { Icon } from "@trussworks/react-uswds";
 import { ChangeEvent } from "react";
-import Checkbox from "@/app/ui/designSystem/checkbox/Checkbox";
 import { FilterableValueSet } from "./utils";
 import { DibbsConceptType } from "@/app/models/entities/valuesets";
+import ConceptTypeBulkToggle from "./ConceptTypeBulkToggle";
 
 type ConceptTypeAccordionBodyProps = {
   activeType: DibbsConceptType;
@@ -71,31 +70,16 @@ const ConceptTypeAccordionHeader: React.FC<ConceptTypeAccordionBodyProps> = ({
     });
   }
 
-  const isMinusState = selectedCount !== totalCount && selectedCount !== 0;
-  const checked =
-    !!selectedCount && selectedCount == totalCount && selectedCount > 0;
-
   return (
     <>
       <div className={styles.accordionHeaderWrapper} key={activeType}>
-        <div className={styles.valueSetTemplate__toggleRowHeader}>
-          <Icon.ArrowDropUp
-            aria-label="Arrow indicating collapsed or expanded toggle content"
-            style={expanded ? { rotate: "180deg" } : { rotate: "90deg" }}
-            size={3}
-          />
-          <Checkbox
-            className={styles.valueSetTemplate__titleCheckbox}
-            label={activeType}
-            onChange={(e) => {
-              e.stopPropagation();
-              handleBulkToggle(e, isMinusState);
-            }}
-            id={`${activeType}`}
-            checked={checked}
-            isMinusState={isMinusState}
-          />
-        </div>
+        <ConceptTypeBulkToggle
+          activeType={activeType}
+          expanded={expanded}
+          selectedCount={selectedCount}
+          totalCount={totalCount}
+          handleBulkToggle={handleBulkToggle}
+        ></ConceptTypeBulkToggle>
         <div className={styles.accordionHeaderCount}>
           {areItemsFiltered
             ? `${
