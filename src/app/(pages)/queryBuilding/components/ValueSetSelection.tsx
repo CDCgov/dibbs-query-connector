@@ -11,6 +11,7 @@ import {
   formatDiseaseDisplay,
   formatCategoryDisplay,
   NestedQuery,
+  formatCategoryToConditionsMap,
 } from "../utils";
 import { ConceptTypeSelectionTable } from "./SelectionTable";
 import Drawer from "@/app/ui/designSystem/drawer/Drawer";
@@ -25,6 +26,11 @@ import {
   DibbsConceptType,
   DibbsValueSet,
 } from "@/app/models/entities/valuesets";
+import {
+  generateValueSetGroupingsByDibbsConceptType,
+  ConceptTypeToDibbsVsMap,
+} from "@/app/utils/valueSetTranslation";
+import { CUSTOM_VALUESET_ARRAY_ID } from "@/app/shared/constants";
 
 type ConditionSelectionProps = {
   constructedQuery: NestedQuery;
@@ -58,14 +64,31 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
   const [activeCondition, setActiveCondition] = useState<string>("");
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [conditionDrawerData, setConditionDrawerData] =
-    useState<CategoryToConditionArrayMap>(categoryToConditionsMap);
+    useState<CategoryToConditionArrayMap>(
+      formatCategoryToConditionsMap(categoryToConditionsMap),
+    );
   const [conditionSearchFilter, setConditionSearchFilter] = useState("");
   const [valueSetSearchFilter, setValueSetSearchFilter] = useState("");
 
   useEffect(() => {
     // display the first condition's valuesets on render
-    setActiveCondition(Object.keys(constructedQuery)[0] || "custom");
-  }, [constructedQuery]);
+    if (activeCondition) return;
+
+    const queryKeys = Object.keys(constructedQuery);
+    const nonCustom = queryKeys.filter(
+      (key) => key !== CUSTOM_VALUESET_ARRAY_ID,
+    );
+
+    const firstValid = nonCustom.find(
+      (key) => constructedQuery[key] !== undefined,
+    );
+
+    if (firstValid) {
+      setActiveCondition(firstValid);
+    } else if (queryKeys.includes(CUSTOM_VALUESET_ARRAY_ID)) {
+      setActiveCondition(CUSTOM_VALUESET_ARRAY_ID);
+    }
+  }, [constructedQuery, activeCondition]);
 
   function generateConditionDrawerDisplay(
     categoryToConditionsMap: CategoryToConditionArrayMap,
@@ -113,6 +136,7 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
                     data-testid={`condition-drawer-add-${condition.id}`}
                     onClick={() => {
                       handleUpdateCondition(condition.id, false);
+                      setActiveCondition(condition.id);
                       showToastConfirmation({
                         body: `${condition.name} added to query`,
                       });
@@ -132,7 +156,7 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
   function handleConditionSearch(searchFilter: string) {
     const filteredDisplay = filterSearchByCategoryAndCondition(
       searchFilter,
-      categoryToConditionsMap,
+      formatCategoryToConditionsMap(categoryToConditionsMap),
     );
     setConditionSearchFilter(searchFilter);
     setConditionDrawerData(filteredDisplay);
@@ -143,7 +167,25 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
     setValueSetSearchFilter("");
   }
 
-  const activeConditionValueSets = constructedQuery[activeCondition];
+  // Check if the active condition is CUSTOM_VALUESET_ARRAY_ID
+  const isCustomConditionTab = activeCondition === CUSTOM_VALUESET_ARRAY_ID;
+
+  // Get the value sets for the active condition, additional logic for custom condition
+  const activeConditionValueSets: ConceptTypeToDibbsVsMap | undefined =
+    isCustomConditionTab
+      ? constructedQuery[CUSTOM_VALUESET_ARRAY_ID]
+        ? generateValueSetGroupingsByDibbsConceptType(
+            Object.values(constructedQuery[CUSTOM_VALUESET_ARRAY_ID]).flatMap(
+              (vsMap) => Object.values(vsMap),
+            ),
+          )
+        : { labs: {}, conditions: {}, medications: {} }
+      : constructedQuery[activeCondition];
+
+  // Check if there are any custom value sets
+  const hasCustomValueSets = Object.values(activeConditionValueSets ?? {}).some(
+    (vsMap) => Object.keys(vsMap).length > 0,
+  );
 
   return (
     <div
@@ -176,63 +218,73 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
                   </div>
                 </div>
 
-                {Object.keys(constructedQuery).map((conditionId) => {
-                  const condition = conditionsMap[conditionId];
-                  return (
-                    <div
-                      key={conditionId}
-                      data-testid={
-                        activeCondition == conditionId
-                          ? `${conditionId}-card-active`
-                          : `${conditionId}-card`
-                      }
-                      className={classNames(
-                        "align-items-center",
-                        activeCondition == conditionId
-                          ? `${styles.card} ${styles.active}`
-                          : styles.card,
-                      )}
-                    >
+                {Object.keys(constructedQuery)
+                  .filter(
+                    (conditionId) => conditionId !== CUSTOM_VALUESET_ARRAY_ID,
+                  )
+                  .map((conditionId) => {
+                    const condition = conditionsMap[conditionId];
+                    if (!condition) return null;
+                    return (
                       <div
-                        key={`tab-${conditionId}`}
-                        id={`tab-${conditionId}`}
-                        onClick={() => handleConditionToggle(conditionId)}
-                        tabIndex={0}
+                        key={conditionId}
+                        data-testid={
+                          activeCondition == conditionId
+                            ? `${conditionId}-card-active`
+                            : `${conditionId}-card`
+                        }
+                        className={classNames(
+                          "align-items-center",
+                          activeCondition == conditionId
+                            ? `${styles.card} ${styles.active}`
+                            : styles.card,
+                        )}
                       >
-                        {formatDiseaseDisplay(condition.name)}
+                        <div
+                          key={`tab-${conditionId}`}
+                          id={`tab-${conditionId}`}
+                          onClick={() => handleConditionToggle(conditionId)}
+                          tabIndex={0}
+                        >
+                          {formatDiseaseDisplay(condition.name)}
+                        </div>
+                        <Icon.Delete
+                          className={classNames("usa-icon", styles.deleteIcon)}
+                          size={5}
+                          color="red"
+                          data-testid={`delete-condition-${conditionId}`}
+                          aria-label="Trash icon indicating deletion of disease"
+                          onClick={() => {
+                            handleUpdateCondition(conditionId, true);
+                            const next = Object.keys(constructedQuery).find(
+                              (k) =>
+                                k !== conditionId &&
+                                k !== CUSTOM_VALUESET_ARRAY_ID,
+                            );
+                            handleConditionToggle(
+                              next ?? CUSTOM_VALUESET_ARRAY_ID,
+                            );
+                          }}
+                        ></Icon.Delete>
                       </div>
-                      <Icon.Delete
-                        className={classNames("usa-icon", styles.deleteIcon)}
-                        size={5}
-                        color="red"
-                        data-testid={`delete-condition-${conditionId}`}
-                        aria-label="Trash icon indicating deletion of disease"
-                        onClick={() => {
-                          handleUpdateCondition(conditionId, true);
-                          handleConditionToggle(
-                            Object.keys(constructedQuery)[0],
-                          );
-                        }}
-                      ></Icon.Delete>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
               </div>
               <div className={styles.section_custom}>
                 <div className={classNames(styles.sectionTitle)}>
-                  {"Custom".toLocaleUpperCase()}
+                  {CUSTOM_VALUESET_ARRAY_ID.toLocaleUpperCase()}
                 </div>
                 <div
                   className={classNames(
                     "align-items-center",
-                    activeCondition == "custom"
+                    activeCondition == CUSTOM_VALUESET_ARRAY_ID
                       ? `${styles.card} ${styles.active}`
                       : styles.card,
                   )}
                 >
                   <div
                     id={`tab-custom`}
-                    onClick={() => setActiveCondition("custom")}
+                    onClick={() => setActiveCondition(CUSTOM_VALUESET_ARRAY_ID)}
                     tabIndex={0}
                     role="button"
                   >
@@ -244,32 +296,49 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
           </div>
         </div>
         <div className={styles.valueSetTemplate__right}>
-          {activeCondition !== "custom" && (
-            <div className={styles.valueSetTemplate__search}>
-              <SearchField
-                id="valueSetTemplateSearch"
-                placeholder={VALUESET_SELECTION_SEARCH_PLACEHOLDER}
-                className={styles.valueSetSearch}
-                onChange={(e) => {
-                  e.preventDefault();
-                  setValueSetSearchFilter(e.target.value);
-                }}
-                value={valueSetSearchFilter}
-              />
-            </div>
-          )}
+          {(activeConditionValueSets !== undefined || isCustomConditionTab) && (
+            <>
+              <div className={styles.valueSetTemplate__search}>
+                <SearchField
+                  id="valueSetTemplateSearch"
+                  placeholder={VALUESET_SELECTION_SEARCH_PLACEHOLDER}
+                  className={styles.valueSetSearch}
+                  onChange={(e) => {
+                    e.preventDefault();
+                    setValueSetSearchFilter(e.target.value);
+                  }}
+                  value={valueSetSearchFilter}
+                />
+                {isCustomConditionTab && hasCustomValueSets && (
+                  <Button
+                    type="button"
+                    outline
+                    onClick={() => {
+                      window.location.href = "/codeLibrary";
+                    }}
+                  >
+                    Add from code library
+                  </Button>
+                )}
+              </div>
 
-          {activeConditionValueSets && activeCondition !== "custom" && (
-            <ConceptTypeSelectionTable
-              vsTypeLevelOptions={activeConditionValueSets}
-              handleVsTypeLevelUpdate={handleSelectedValueSetUpdate(
-                activeCondition,
-              )}
-              searchFilter={valueSetSearchFilter}
-              setSearchFilter={setValueSetSearchFilter}
-            />
+              <ConceptTypeSelectionTable
+                vsTypeLevelOptions={
+                  activeConditionValueSets ?? {
+                    labs: {},
+                    conditions: {},
+                    medications: {},
+                  }
+                }
+                handleVsTypeLevelUpdate={handleSelectedValueSetUpdate(
+                  activeCondition,
+                )}
+                searchFilter={valueSetSearchFilter}
+                setSearchFilter={setValueSetSearchFilter}
+              />
+            </>
           )}
-          {activeCondition == "custom" && (
+          {isCustomConditionTab && !hasCustomValueSets && (
             <div className={styles.codeLibrary__empty}>
               <Icon.GridView
                 aria-label="Stylized icon showing four squares in a grid"

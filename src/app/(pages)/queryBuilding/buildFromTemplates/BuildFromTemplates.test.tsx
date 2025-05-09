@@ -449,3 +449,85 @@ describe("tests the valueset selection page interactions", () => {
     expect(screen.getByText("2/4")).toBeInTheDocument();
   });
 });
+
+describe("custom value set behavior", () => {
+  it("renders the empty state if no custom value sets are present", async () => {
+    const emptyCustomQuery = {
+      ...gonorrheaSavedQuery,
+      queryData: {
+        ...gonorrheaSavedQuery.queryData,
+        custom: {},
+      },
+    };
+    (getSavedQueryById as jest.Mock).mockResolvedValueOnce(emptyCustomQuery);
+
+    const { user } = renderWithUser(
+      <RootProviderMock currentPage={currentPage}>
+        <BuildFromTemplates
+          buildStep="valueset"
+          setBuildStep={jest.fn}
+          selectedQuery={{
+            queryName: emptyCustomQuery.queryName,
+            queryId: emptyCustomQuery.queryId,
+          }}
+          setSelectedQuery={jest.fn}
+        />
+      </RootProviderMock>,
+    );
+
+    await user.click(
+      await screen.findByRole("button", {
+        name: /Additional codes from library/i,
+      }),
+    );
+
+    expect(
+      await screen.findByText(
+        /This is a space for you to pull in individual value sets/i,
+      ),
+    ).toBeVisible();
+    expect(screen.queryByTestId("accordion-container")).not.toBeInTheDocument();
+  });
+
+  it("renders grouped concept accordions if custom value sets are present", async () => {
+    const customQueryWithData = {
+      ...gonorrheaSavedQuery,
+      queryData: {
+        ...gonorrheaSavedQuery.queryData,
+        custom: {
+          ...gonorrheaSavedQuery.queryData[
+            Object.keys(gonorrheaSavedQuery.queryData)[0]
+          ],
+        },
+      },
+    };
+    (getSavedQueryById as jest.Mock).mockResolvedValueOnce(customQueryWithData);
+
+    const { user } = renderWithUser(
+      <RootProviderMock currentPage={currentPage}>
+        <BuildFromTemplates
+          buildStep="valueset"
+          setBuildStep={jest.fn}
+          selectedQuery={{
+            queryName: customQueryWithData.queryName,
+            queryId: customQueryWithData.queryId,
+          }}
+          setSelectedQuery={jest.fn}
+        />
+      </RootProviderMock>,
+    );
+
+    await user.click(
+      await screen.findByRole("button", {
+        name: /Additional codes from library/i,
+      }),
+    );
+
+    expect(await screen.findByTestId("accordion-container")).toBeVisible();
+    expect(
+      screen.queryByText(
+        /This is a space for you to pull in individual value sets/i,
+      ),
+    ).not.toBeInTheDocument();
+  });
+});
