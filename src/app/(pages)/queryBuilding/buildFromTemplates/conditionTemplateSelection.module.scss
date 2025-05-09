@@ -314,7 +314,6 @@
   display: flex;
   align-items: center;
   margin: 0.5rem 0;
-  width: 406px;
 }
 
 .valueSetTemplate__toggleRowHeader > svg {
@@ -329,6 +328,15 @@
   cursor: pointer;
 }
 
+.checkboxInfoContainer:focus {
+  outline: none;
+  label::before {
+    outline: 0.25rem solid $hover-active;
+    outline-offset: 0.25rem;
+    border-radius: 0.05rem;
+  }
+}
+
 .accordionBodyExpanded {
   .valueSetTemplate__checkboxWrapper {
     display: flex;
@@ -340,19 +348,14 @@
     .valueSetTemplate__checkbox {
       background-color: unset;
     }
-    .valueSetTemplate__checkbox:hover {
-      label::before {
-        outline: 0.25rem solid $hover-active;
-        outline-offset: 0.25rem;
-        border-radius: 0.05rem;
-      }
-    }
 
     .viewCodesBtn {
       display: block;
-      width: 10rem;
+      width: 8rem;
+      height: 2rem;
       font-size: 14px;
       margin: 0;
+      padding: 0.25rem 0.25rem;
     }
     .displayCount {
       display: none;
@@ -378,6 +381,8 @@ div.accordionBodyExpanded:last-of-type {
   border-bottom: solid 1px #dfe1e2;
   padding-bottom: 1rem;
   width: 100%;
+  display: flex;
+  justify-content: space-between;
 }
 
 .expandedContent {
@@ -397,6 +402,7 @@ div.accordionBodyExpanded:last-of-type {
 .vsDetails {
   color: #919191;
   display: flex;
+  padding-left: 1.75rem;
 }
 
 .accordionBodyExpanded__right {
@@ -404,6 +410,7 @@ div.accordionBodyExpanded:last-of-type {
   display: flex;
   align-items: center;
   min-width: 4rem;
+  justify-content: flex-end;
 }
 
 .customQuery__header > h1 {

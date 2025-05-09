@@ -1,8 +1,7 @@
 import styles from "../buildFromTemplates/conditionTemplateSelection.module.scss";
-import React, { ChangeEvent, useEffect, useState } from "react";
+import React, { ChangeEvent, useEffect, useRef, useState } from "react";
 import ConceptSelection from "./ConceptSelection";
 import Drawer from "@/app/ui/designSystem/drawer/Drawer";
-import Checkbox from "@/app/ui/designSystem/checkbox/Checkbox";
 import Highlighter from "react-highlight-words";
 import {
   FilterableConcept,
@@ -17,6 +16,7 @@ import TooltipWrapper, {
 } from "@/app/ui/designSystem/Tooltip";
 import { DibbsValueSet } from "@/app/models/entities/valuesets";
 import { Concept } from "@/app/models/entities/concepts";
+import ValueSetBulkToggle from "./ValuesetBulkToggle";
 
 type ConceptTypeAccordionBodyProps = {
   activeValueSets: { [vsId: string]: FilterableValueSet };
@@ -49,6 +49,19 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
   const [curConcepts, setCurConcepts] = useState<FilterableConcept[]>([]);
   const [drawerSearchFilter, setDrawerSearchFilter] = useState<string>("");
   const areItemsFiltered = tableSearchFilter !== "";
+
+  const focusElementRef = useRef<HTMLDivElement>(null);
+
+  const setFocusOnCheckbox = () => {
+    if (focusElementRef.current) {
+      focusElementRef.current.focus();
+    }
+  };
+  const removeFocusFromCheckbox = () => {
+    if (focusElementRef.current) {
+      focusElementRef.current.blur();
+    }
+  };
 
   useEffect(() => {
     if (curValueSet) {
@@ -148,35 +161,23 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
     <div>
       {Object.values(activeValueSets).map((dibbsVs) => {
         if (areItemsFiltered && !dibbsVs.render) return;
+
         const conceptsToRender = dibbsVs.concepts;
         const selectedCount = conceptsToRender.filter(
           (c) => c.include && c.render,
         ).length;
         const totalCount = conceptsToRender.filter((c) => c.render).length;
 
-        const isMinusState =
-          selectedCount !== totalCount && selectedCount !== 0;
-        const checked = selectedCount == totalCount && selectedCount > 0;
         const checkboxToRender = (
-          <>
-            <div onClick={(e) => e.stopPropagation()}>
-              <Checkbox
-                className={styles.valueSetTemplate__checkbox}
-                label={checkboxLabel(
-                  dibbsVs,
-                  tableSearchFilter,
-                  areItemsFiltered,
-                )}
-                onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                  handleBulkToggle(e, isMinusState);
-                }}
-                id={dibbsVs.valueSetId}
-                checked={checked}
-                isMinusState={isMinusState}
-                data-testid={`selectValueset-${dibbsVs.valueSetId}`}
-              />
-            </div>
-          </>
+          <ValueSetBulkToggle
+            dibbsVs={dibbsVs}
+            selectedCount={selectedCount}
+            totalCount={totalCount}
+            tableSearchFilter={tableSearchFilter}
+            areItemsFiltered={areItemsFiltered}
+            handleBulkToggle={handleBulkToggle}
+            handleViewCodes={handleViewCodes}
+          />
         );
         return (
           <div
@@ -205,26 +206,27 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
                   )}
                 </div>
               </div>
-            </div>
 
-            <div className={styles.accordionBodyExpanded__right}>
-              <div
-                className={styles.displayCount}
-                data-testid={`displayCount-${dibbsVs.valueSetId}`}
-              >
-                {selectedCount}/{totalCount}
+              <div className={styles.accordionBodyExpanded__right}>
+                <div
+                  className={styles.displayCount}
+                  data-testid={`displayCount-${dibbsVs.valueSetId}`}
+                >
+                  {selectedCount} / {totalCount}
+                </div>
+                <Button
+                  type={"button"}
+                  data-testid={`viewCodes-${dibbsVs.valueSetId}`}
+                  className={styles.viewCodesBtn}
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => {
+                    handleViewCodes(dibbsVs);
+                  }}
+                >
+                  View codes
+                </Button>
               </div>
-              <Button
-                type={"button"}
-                data-testid={`viewCodes-${dibbsVs.valueSetId}`}
-                className={styles.viewCodesBtn}
-                role="button"
-                onClick={() => {
-                  handleViewCodes(dibbsVs);
-                }}
-              >
-                View codes
-              </Button>
             </div>
           </div>
         );
@@ -259,47 +261,6 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
         onSave={handleSaveChanges}
         onSearch={handleValueSetSearch}
       />
-    </div>
-  );
-};
-
-const checkboxLabel = (
-  dibbsVs: FilterableValueSet,
-  searchFilter = "",
-  isFilteredItem = false,
-) => {
-  const SUMMARIZE_CODE_RENDER_LIMIT = 5;
-  const codesToRender = dibbsVs.concepts.filter((c) => c.render);
-  return (
-    <div className={styles.expandedContent}>
-      <div className={styles.vsName}>
-        <Highlighter
-          highlightClassName="searchHighlight"
-          searchWords={[searchFilter]}
-          autoEscape={true}
-          textToHighlight={dibbsVs.valueSetName}
-        />
-      </div>
-      {isFilteredItem && (
-        <strong>
-          Includes:{" "}
-          {codesToRender.length < SUMMARIZE_CODE_RENDER_LIMIT ? (
-            // render the individual code matches
-            <span className="searchHighlight">
-              {codesToRender.map((c) => c.code).join(", ")}
-            </span>
-          ) : (
-            //  past this many matches, don't render the individual codes in favor of a
-            // "this many matches" string
-            <span className="searchHighlight">{`${codesToRender.length} codes`}</span>
-          )}
-        </strong>
-      )}
-
-      <div className={styles.vsDetails}>
-        <div className="padding-right-2">{`Author: ${dibbsVs.author}`}</div>
-        <div>{`System: ${dibbsVs.system.toLocaleLowerCase()}`}</div>
-      </div>
     </div>
   );
 };
