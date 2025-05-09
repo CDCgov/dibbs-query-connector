@@ -128,7 +128,9 @@ test.describe("editing an exisiting query", () => {
     await expect(actionButton).toHaveText("Save query");
 
     // confirm query shows correct condition/s
-    const addedTab = page.getByTestId(`${ADDED_CONDITION.condition_id}-card`);
+    const addedTab = page.getByTestId(
+      `${ADDED_CONDITION.condition_id}-card-active`,
+    );
     await expect(addedTab).toBeVisible();
     await expect(addedTab).toBeEnabled();
 
