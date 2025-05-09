@@ -164,6 +164,9 @@
 .valueSetTemplate__search {
   padding: 1.5rem;
   border-bottom: 1px #dfe1e2 solid;
+  display: flex;
+  justify-content: space-between;
+
 }
 
 .valueSetTemplate__accordion {

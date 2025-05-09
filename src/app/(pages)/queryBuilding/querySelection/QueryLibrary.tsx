@@ -25,6 +25,10 @@ import classNames from "classnames";
 import { getConditionsData } from "@/app/shared/database-service";
 import { ConditionsMap } from "../utils";
 import { CustomUserQuery } from "@/app/models/entities/query";
+import {
+  CUSTOM_CONDITION_NAME,
+  CUSTOM_VALUESET_ARRAY_ID,
+} from "@/app/shared/constants";
 
 interface UserQueriesDisplayProps {
   queries: CustomUserQuery[];
@@ -126,17 +130,36 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
                   <td title={query.queryName}>{query.queryName}</td>
 
                   <td
-                    title={query.conditionsList
-                      ?.map((id) => {
-                        return conditionIdToDetailsMap[id].name;
-                      })
-                      .join(", ")}
+                    title={
+                      query.conditionsList?.includes(
+                        CUSTOM_VALUESET_ARRAY_ID,
+                      ) && query.conditionsList.length === 1
+                        ? CUSTOM_CONDITION_NAME
+                        : query.conditionsList
+                            ?.map(
+                              (id) =>
+                                conditionIdToDetailsMap[id]?.name ||
+                                (id === CUSTOM_VALUESET_ARRAY_ID
+                                  ? CUSTOM_CONDITION_NAME
+                                  : ""),
+                            )
+                            .filter(Boolean)
+                            .join(", ")
+                    }
                   >
-                    {query.conditionsList
-                      ?.map((id) => {
-                        return conditionIdToDetailsMap[id].name;
-                      })
-                      .join(", ")}
+                    {query.conditionsList?.includes(CUSTOM_VALUESET_ARRAY_ID) &&
+                    query.conditionsList.length === 1
+                      ? CUSTOM_CONDITION_NAME
+                      : query.conditionsList
+                          ?.map(
+                            (id) =>
+                              conditionIdToDetailsMap[id]?.name ||
+                              (id === CUSTOM_VALUESET_ARRAY_ID
+                                ? CUSTOM_CONDITION_NAME
+                                : ""),
+                          )
+                          .filter(Boolean)
+                          .join(", ")}
                   </td>
                   <td>
                     <div className="table-cell-buttons">
