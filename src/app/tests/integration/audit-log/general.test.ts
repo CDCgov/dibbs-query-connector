@@ -1,22 +1,22 @@
 import {
   AUDIT_LOG_MAX_RETRIES,
   auditable,
-} from "@/app/backend/auditLogs/decorator";
+} from "@/app/backend/audit-logs/decorator";
 import { patientDiscoveryQuery } from "@/app/backend/query-execution";
 import { PatientDiscoveryRequest } from "@/app/models/entities/query";
 import { hyperUnluckyPatient } from "@/app/shared/constants";
-import * as DecoratorUtils from "@/app/backend/auditLogs/lib";
-import { getDbClient } from "@/app/backend/dbClient";
+import * as DecoratorUtils from "@/app/backend/audit-logs/lib";
+import { internal_getDbClient } from "@/app/backend/db/config";
 import { suppressConsoleLogs } from "../fixtures";
 
-jest.mock("@/app/backend/auditLogs/lib", () => {
+jest.mock("@/app/backend/audit-logs/lib", () => {
   return {
     __esModule: true,
-    ...jest.requireActual("@/app/backend/auditLogs/lib"),
+    ...jest.requireActual("@/app/backend/audit-logs/lib"),
   };
 });
 
-const dbClient = getDbClient();
+const dbClient = internal_getDbClient();
 describe("checks for generic audit logs", () => {
   beforeAll(() => {
     suppressConsoleLogs();
