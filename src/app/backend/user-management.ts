@@ -345,7 +345,7 @@ class UserManagementService extends UserManagementServiceInternal {
       if (result?.rowCount && result.rowCount > 0) {
         return result.rows?.[0].qcRole;
       } else {
-        // fall back to least privilege
+        // user is not found, so fall back to least privilege
         return UserRole.STANDARD;
       }
     } catch (error) {
