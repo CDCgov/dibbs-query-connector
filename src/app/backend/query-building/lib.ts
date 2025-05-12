@@ -6,7 +6,7 @@ import {
 import { DibbsValueSet } from "@/app/models/entities/valuesets";
 import { DEFAULT_TIME_WINDOW } from "@/app/shared/utils";
 import { randomUUID } from "crypto";
-import { DbService } from "../db-service";
+import { DbService } from "../db/service";
 import { Pool } from "pg";
 
 // The underlying functionality here is reused in Playwright to do some
@@ -111,10 +111,15 @@ export async function deleteQueryByIdHelp(
   dbClient: DbService | Pool,
 ) {
   const deleteQuery = `
-      DELETE FROM query WHERE id = $1;
-    `;
-  await dbClient.query(deleteQuery, [queryId]);
-  return { success: true };
+  DELETE FROM query WHERE id = $1;
+`;
+  try {
+    await dbClient.query(deleteQuery, [queryId]);
+    return { success: true, id: queryId };
+  } catch (error) {
+    console.error(`Failed to delete query with ID ${queryId}:`, error);
+    return { success: false, error: "Failed to delete the query." };
+  }
 }
 
 function formatConditionsForPostgres(arr: string[]): string {

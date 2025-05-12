@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getOrCreateKeys } from "../../../backend/dbServices/smartOnFhir/lib";
+import { getOrCreateKeys } from "../../../backend/smart-on-fhir";
 
 export async function GET() {
   try {

@@ -1,13 +1,7 @@
 "use client";
 
 import { Icon, Label, Tag, TextInput } from "@trussworks/react-uswds";
-import {
-  insertFhirServer,
-  updateFhirServer,
-  deleteFhirServer,
-  getFhirServerConfigs,
-  AuthData,
-} from "@/app/backend/dbServices/fhir-servers";
+
 import dynamic from "next/dynamic";
 import { useEffect, useState, useRef } from "react";
 import type { ModalRef } from "../../ui/designSystem/modal/Modal";
@@ -23,6 +17,13 @@ import WithAuth from "@/app/ui/components/withAuth/WithAuth";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import { FhirServerConfig } from "@/app/models/entities/fhir-servers";
 import { testFhirServerConnection } from "@/app/shared/testConnection";
+import {
+  getFhirServerConfigs,
+  AuthData,
+  insertFhirServer,
+  updateFhirServer,
+  deleteFhirServer,
+} from "@/app/backend/fhir-servers";
 
 const Modal = dynamic<ModalProps>(
   () => import("../../ui/designSystem/modal/Modal").then((mod) => mod.Modal),

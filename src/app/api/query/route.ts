@@ -18,14 +18,14 @@ import {
   parsePatientDemographics,
 } from "./parsers";
 import { Message } from "node-hl7-client";
-import { getFhirServerNames } from "@/app/backend/dbServices/fhir-servers";
-import { getSavedQueryById } from "@/app/backend/dbServices/query-building";
 import { Bundle } from "fhir/r4";
 import {
   FullPatientRequest,
   APIQueryResponse,
   QueryResponse,
 } from "@/app/models/entities/query";
+import { getFhirServerNames } from "@/app/backend/fhir-servers";
+import { getSavedQueryById } from "@/app/backend/query-building/service";
 
 /**
  * @param request - A GET request as described by the Swagger docs

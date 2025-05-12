@@ -1,6 +1,6 @@
 import { Page, expect } from "@playwright/test";
 import { CANCER_FRONTEND_NESTED_INPUT, showSiteAlert } from "./constants";
-import { getDbClient } from "@/app/backend/dbClient";
+import { internal_getDbClient } from "@/app/backend/db/config";
 import {
   NestedQuery,
   QueryTableResult,
@@ -8,8 +8,8 @@ import {
 import {
   saveCustomQueryHelp,
   getSavedQueryByIdHelp,
-} from "@/app/backend/dbServices/queryBuilding/lib";
-import { translateSnakeStringToCamelCase } from "@/app/backend/dbServices/util";
+} from "@/app/backend/query-building/lib";
+import { translateSnakeStringToCamelCase } from "@/app/backend/db/util";
 
 /**
  *
@@ -29,7 +29,7 @@ export const checkForSiteAlert = async (page: Page, matchText?: string) => {
   }
 };
 
-const dbClient = getDbClient();
+const dbClient = internal_getDbClient();
 
 /**
  * Helper function that creates a custom query and grabs it back in return

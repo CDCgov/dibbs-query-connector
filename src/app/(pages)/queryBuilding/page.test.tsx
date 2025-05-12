@@ -3,13 +3,13 @@ import { render, screen, waitFor } from "@testing-library/react";
 import { getConditionsData } from "../../shared/database-service";
 import { conditionIdToNameMap, DEFAULT_QUERIES } from "./fixtures";
 import { RootProviderMock } from "@/app/tests/unit/setup";
-import { getQueryList } from "@/app/backend/query-building";
+import { getQueryList } from "@/app/backend/query-building/service";
 
 jest.mock(".../../../shared/database-service", () => ({
   getConditionsData: jest.fn(),
 }));
 
-jest.mock("@/app/backend/query-building", () => ({
+jest.mock("@/app/backend/query-building/service", () => ({
   getQueryList: jest.fn(),
   getCustomQueries: jest.fn(),
 }));

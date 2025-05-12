@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { getDbClient } from "../dbClient";
+import { internal_getDbClient } from "../db/config";
 import { generateAuditSuccessMessage, generateAuditValues } from "./lib";
 
 export const AUDIT_LOG_MAX_RETRIES = 3;
@@ -15,7 +15,7 @@ export function auditable(
   key: string,
   descriptor: PropertyDescriptor,
 ) {
-  const dbConnection = getDbClient();
+  const dbConnection = internal_getDbClient();
   const method = descriptor.value;
   const argLabels = target[key]
     .toString()

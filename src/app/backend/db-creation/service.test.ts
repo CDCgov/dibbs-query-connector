@@ -13,6 +13,7 @@ const EXPECTED_INTERNAL_VALUESET: DibbsValueSet = {
   ersdConceptType: "ostc",
   dibbsConceptType: "labs",
   includeValueSet: false,
+  userCreated: false,
   concepts: ExampleVsacValueSet.compose.include[0].concept.map((c) => {
     return { ...c, include: false };
   }),
