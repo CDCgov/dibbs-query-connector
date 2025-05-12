@@ -2,8 +2,8 @@ import { screen, within, waitFor } from "@testing-library/react";
 import AuditLogs from "./page";
 import { renderWithUser, RootProviderMock } from "@/app/tests/unit/setup";
 import userEvent from "@testing-library/user-event";
-import { getAuditLogs, LogEntry } from "@/app/backend/dbServices/audit-logs";
 import { auditLogActionTypeMap } from "./components/auditLogMaps";
+import { getAuditLogs, LogEntry } from "@/app/backend/audit-logs/service";
 
 jest.mock(
   "@/app/ui/components/withAuth/WithAuth",
@@ -70,10 +70,10 @@ const testData = Array.from({ length: 50 }, (_, index) =>
   .flat()
   .sort((a, b) => b.date.getTime() - a.date.getTime());
 
-jest.mock("@/app/backend/dbServices/audit-logs", () => {
+jest.mock("@/app/backend/audit-logs/service", () => {
   return {
     __esModule: true,
-    ...jest.requireActual("@/app/backend/dbServices/audit-logs"),
+    ...jest.requireActual("@/app/backend/audit-logs/service"),
     getAuditLogs: jest.fn(),
   };
 });

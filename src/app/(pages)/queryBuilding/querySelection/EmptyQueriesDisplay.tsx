@@ -3,7 +3,7 @@ import { useState } from "react";
 import styles from "./querySelection.module.scss";
 import classNames from "classnames";
 import WorkSpaceSetUpView from "./WorkspaceSetUp";
-import { createDibbsDB } from "@/app/backend/dbCreation/db-creation";
+import { createDibbsDB } from "@/app/backend/db-creation/service";
 
 type EmptyQueryProps = {
   goForward: () => void;

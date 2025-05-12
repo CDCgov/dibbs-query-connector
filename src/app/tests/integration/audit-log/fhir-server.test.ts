@@ -1,9 +1,4 @@
-import dbService from "@/app/backend/dbServices/db-service";
-import {
-  insertFhirServer,
-  updateFhirServer,
-  deleteFhirServer,
-} from "@/app/backend/dbServices/fhir-servers";
+import dbService from "@/app/backend/db/service";
 import { auth } from "@/auth";
 import {
   GET_ALL_AUDIT_ROWS,
@@ -11,13 +6,18 @@ import {
   TEST_USER,
   waitForAuditSuccess,
 } from "./utils";
-import * as AuditableDecorators from "@/app/backend/auditLogs/lib";
+import * as AuditableDecorators from "@/app/backend/audit-logs/lib";
 import { suppressConsoleLogs } from "../fixtures";
+import {
+  insertFhirServer,
+  updateFhirServer,
+  deleteFhirServer,
+} from "@/app/backend/fhir-servers";
 
-jest.mock("@/app/backend/auditLogs/lib", () => {
+jest.mock("@/app/backend/audit-logs/lib", () => {
   return {
     __esModule: true,
-    ...jest.requireActual("@/app/backend/auditLogs/lib"),
+    ...jest.requireActual("@/app/backend/audit-logs/lib"),
   };
 });
 const auditCompletionSpy = jest.spyOn(
