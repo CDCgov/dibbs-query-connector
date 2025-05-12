@@ -277,10 +277,18 @@ class UserGroupManagementService {
           return group;
         }),
       );
+      const groupsWithMembersAndQueries = await Promise.all(
+        groupsWithQueries.map(async (group) => {
+          const groupMembers = await getAllGroupMembers(group.id);
+          group.members = groupMembers.items;
+          await dbService.query("COMMIT");
+          return group;
+        }),
+      );
 
       return {
         totalItems: result.rowCount,
-        items: groupsWithQueries,
+        items: groupsWithMembersAndQueries,
       } as QCResponse<UserGroup>;
     } catch (error) {
       console.error("Error retrieving user groups:", error);

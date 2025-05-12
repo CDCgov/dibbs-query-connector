@@ -24,6 +24,7 @@ exports[`DropdownFilter renders a 'clear filters' button when filters are applie
             name="category"
           >
             <option
+              disabled=""
               value=""
             />
             <option
@@ -58,8 +59,14 @@ exports[`DropdownFilter renders a 'clear filters' button when filters are applie
             name="code-system"
           >
             <option
+              disabled=""
               value=""
             />
+            <option
+              value="http://hl7.org/fhir/sid/icd-10-cm"
+            >
+              ICD-10
+            </option>
             <option
               value="http://test.com/test"
             >
@@ -82,9 +89,12 @@ exports[`DropdownFilter renders a 'clear filters' button when filters are applie
             name="creator"
           >
             <option
+              disabled=""
               value=""
             />
-            <option>
+            <option
+              value="Testing Fixtures"
+            >
               Testing Fixtures
             </option>
           </select>
@@ -141,6 +151,7 @@ exports[`DropdownFilter renders correctly 1`] = `
             name="category"
           >
             <option
+              disabled=""
               value=""
             />
             <option
@@ -175,8 +186,14 @@ exports[`DropdownFilter renders correctly 1`] = `
             name="code-system"
           >
             <option
+              disabled=""
               value=""
             />
+            <option
+              value="http://hl7.org/fhir/sid/icd-10-cm"
+            >
+              ICD-10
+            </option>
             <option
               value="http://test.com/test"
             >
@@ -199,10 +216,18 @@ exports[`DropdownFilter renders correctly 1`] = `
             name="creator"
           >
             <option
+              disabled=""
               value=""
             />
-            <option>
+            <option
+              value="Testing Fixtures"
+            >
               Testing Fixtures
+            </option>
+            <option
+              value="Hogwarts"
+            >
+              Hogwarts
             </option>
           </select>
         </div>

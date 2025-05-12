@@ -746,10 +746,13 @@ export const mockDibbsValueSets: DibbsValueSet[] = [
     valueSetVersion: "1",
     valueSetExternalId: "1",
     author: "Testing Fixtures",
-    system: "http://test.com/test",
+    system: "http://hl7.org/fhir/sid/icd-10-cm",
     dibbsConceptType: "labs",
     includeValueSet: false,
-    concepts: [],
+    concepts: [
+      { code: "1a", display: "One A", include: true },
+      { code: "2b", display: "Two B", include: true },
+    ],
     userCreated: false,
   },
   {
