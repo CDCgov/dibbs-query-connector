@@ -162,7 +162,7 @@ export const auditLogActionTypeMap: Record<string, auditLogActionTypeMapping> =
       label: "User sign in",
       format: (log) => {
         const request = parseRequest(log) as { profile: Profile };
-        const username = request?.profile.preferredUsername;
+        const username = request?.profile?.preferredUsername;
         return `Sign in of user with username ${username}`;
       },
     },
@@ -251,6 +251,27 @@ export const auditLogActionTypeMap: Record<string, auditLogActionTypeMapping> =
         const groupId = Object.values(request)[0];
         const queryId = Object.values(request)[1];
         return `Query with ID ${queryId} removed from group ${groupId}`;
+      },
+    },
+    deleteQueryById: {
+      label: "Deleted query",
+      format: (log) => {
+        const request = parseRequest(log);
+        const queryId = Object.values(request)[0];
+        return `Query with ID ${queryId} deleted`;
+      },
+    },
+    saveCustomQuery: {
+      label: "Added a new query",
+      format: (log) => {
+        const request = parseRequest(log);
+        const queryName = Object.values(request)[1];
+        const queryId = Object.values(request)[3];
+        const message = queryId
+          ? `Query with name ${queryName} and id ${queryId} saved`
+          : `Query with name ${queryName} saved`;
+
+        return message;
       },
     },
     // Add more as needed
