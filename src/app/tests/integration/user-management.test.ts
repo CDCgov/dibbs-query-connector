@@ -158,6 +158,7 @@ describe("User Management Integration Tests", () => {
 
     const adminResults = await getAllAdmins();
     expect(adminResults.includes(TEST_USER_SUPER));
+    expect(!adminResults.includes(TEST_USER_STANDARD));
   });
 });
 
