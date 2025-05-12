@@ -5,7 +5,7 @@ import { Icon } from "@trussworks/react-uswds";
 import styles from "./header.module.scss";
 import { metadata } from "@/app/shared/constants";
 import classNames from "classnames";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { getPagesInSettingsMenu, PAGES } from "@/app/shared/page-routes";
 import { UserRole } from "@/app/models/entities/users";
@@ -27,6 +27,7 @@ const HeaderComponent: React.FC<HeaderProps> = ({ session }) => {
   const menuRef = useRef<HTMLDivElement>(null);
   const [showMenu, setShowMenu] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
   const ctx = useContext(DataContext);
   const isAuthDisabled = isAuthDisabledClientCheck(ctx?.runtimeConfig);
 
@@ -146,13 +147,23 @@ const HeaderComponent: React.FC<HeaderProps> = ({ session }) => {
             >
               {menuPages.map((page) => (
                 <li key={page.path} className={styles.subMenuItem}>
-                  <Link
-                    className={styles.menuItem}
-                    href={page.path}
-                    scroll={false}
+                  <button
+                    type="button"
+                    className={classNames(
+                      styles.menuItem,
+                      "usa-button--unstyled",
+                    )}
+                    onClick={() => {
+                      if (pathname === page.path) {
+                        location.reload();
+                      } else {
+                        router.push(page.path);
+                      }
+                      setShowMenu(false);
+                    }}
                   >
                     {page.name}
-                  </Link>
+                  </button>
                 </li>
               ))}
               {!isAuthDisabled && (
