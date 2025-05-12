@@ -451,7 +451,7 @@ class UserManagementService extends UserManagementServiceInternal {
     const allUsers = await super.getAllUsers();
 
     return allUsers.items.filter((u) => {
-      return u.qcRole !== UserRole.STANDARD;
+      return u.qcRole === UserRole.ADMIN || u.qcRole === UserRole.SUPER_ADMIN;
     });
   }
 }
