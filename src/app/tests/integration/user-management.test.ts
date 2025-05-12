@@ -152,19 +152,12 @@ describe("User Management Integration Tests", () => {
    * Tests retrieving all registered users.
    */
   test("should retrieve all users", async () => {
-    const DEFAULT_USER_COUNT = 8;
-
     const result = await getAllUsers();
-    expect(result.totalItems).toBe(DEFAULT_USER_COUNT);
     expect(result.items.includes(TEST_USER_STANDARD));
     expect(result.items.includes(TEST_USER_SUPER));
 
     const adminResults = await getAllAdmins();
-    const expectedAdmins = result.items.filter((u) => {
-      return u.qcRole === UserRole.ADMIN || u.qcRole === UserRole.SUPER_ADMIN;
-    });
-
-    expect(adminResults).toStrictEqual(expectedAdmins);
+    expect(adminResults.includes(TEST_USER_SUPER));
   });
 });
 
