@@ -575,19 +575,32 @@ class DatabaseService {
   static async getAllValueSets(): Promise<QCResponse<DibbsValueSet>> {
     try {
       const selectAllVSQuery = `
-    SELECT c.display, c.code_system, c.code, vs.name as valueset_name, vs.id as valueset_id, vs.oid as valueset_external_id, vs.version, vs.author as author, vs.type, vs.dibbs_concept_type as dibbs_concept_type, ctvs.condition_id
-    FROM valuesets vs 
-    LEFT JOIN condition_to_valueset ctvs on vs.id = ctvs.valueset_id 
-    LEFT JOIN valueset_to_concept vstc on vs.id = vstc.valueset_id
-    LEFT JOIN concepts c on vstc.concept_id = c.id
-    ORDER BY name ASC;
-  `;
+      SELECT c.display, c.code_system, c.code, c.id as internal_id, vs.name as valueset_name, vs.id as valueset_id, vs.oid as valueset_external_id, vs.version, vs.author as author, 
+        vs.type, vs.dibbs_concept_type as dibbs_concept_type, vs.user_created, ctvs.condition_id, u.first_name, u.last_name, u.username
+      FROM valuesets vs 
+      LEFT JOIN condition_to_valueset ctvs on vs.id = ctvs.valueset_id 
+      LEFT JOIN valueset_to_concept vstc on vs.id = vstc.valueset_id
+      LEFT JOIN concepts c on vstc.concept_id = c.id
+      LEFT JOIN users u on vs.author = u.id::text
+      ORDER BY name ASC;
+    `;
 
       const result = await DatabaseService.dbClient.query(selectAllVSQuery);
 
+      const itemsWithAuthor = result.rows.map((item) => {
+        if (item.user_created == true) {
+          item.author =
+            item.first_name && item.last_name
+              ? `${item.first_name} ${item.last_name}`
+              : item.username;
+          return item;
+        }
+        return item;
+      });
+      console.log(itemsWithAuthor);
       return {
         totalItems: result.rowCount,
-        items: result.rows,
+        items: itemsWithAuthor,
       } as QCResponse<DibbsValueSet>;
     } catch (error) {
       console.error("Error retrieving user groups:", error);
