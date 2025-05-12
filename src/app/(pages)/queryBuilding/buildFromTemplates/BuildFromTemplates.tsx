@@ -11,7 +11,7 @@ import {
   useRef,
   useState,
 } from "react";
-
+import { useSession } from "next-auth/react";
 import {
   getConditionsData,
   getValueSetsAndConceptsByConditionIDs,
@@ -74,6 +74,7 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
   setBuildStep,
   setSelectedQuery,
 }) => {
+  const { data: session } = useSession();
   const focusRef = useRef<HTMLInputElement | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [queryName, setQueryName] = useState<string | undefined>(
@@ -174,6 +175,7 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
       await getValueSetsForSelectedConditions(conditionIdsToFetch);
 
       setBuildStep("valueset");
+      await handleSaveQuery();
       setLoading(false);
     }
   }
@@ -255,8 +257,8 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
 
   async function handleSaveQuery() {
     if (constructedQuery && queryName) {
-      // TODO: get this from the auth session
-      const userName = "DIBBS";
+      const userName = session?.user?.id || session?.user?.username || "User";
+
       try {
         const results = await saveCustomQuery(
           constructedQuery,
