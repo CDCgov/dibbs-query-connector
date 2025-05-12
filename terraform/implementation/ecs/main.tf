@@ -100,16 +100,20 @@ module "ecs" {
           value = var.auth_secret
         },
         {
-          name  = "AUTH_KEYCLOAK_ID"
-          value = var.keycloak_client_id
+          name  = "AUTH_PROVIDER"
+          value = var.auth_provider
         },
         {
-          name  = "AUTH_KEYCLOAK_SECRET"
-          value = var.keycloak_client_secret
+          name  = "AUTH_CLIENT_ID"
+          value = var.auth_client_id
         },
         {
-          name  = "AUTH_KEYCLOAK_ISSUER"
-          value = var.auth_keycloak_issuer
+          name  = "AUTH_CLIENT_SECRET"
+          value = var.auth_client_secret
+        },
+        {
+          name  = "AUTH_ISSUER"
+          value = var.auth_issuer
         },
         {
           name  = "AUTH_URL"
