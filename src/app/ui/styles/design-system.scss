@@ -1,9 +1,5 @@
 @use "_variables" as *;
 
-header {
-  background-image: linear-gradient(to right, $blue-60v, $cyan-50v);
-}
-
 footer {
   background-color: $footer;
 }
@@ -16,57 +12,69 @@ footer {
 
 .usa-step-indicator__segment-label,
 .usa-step-indicator__segment:before {
-  color: $stepper-inactive-text;
+  color: $text-inactive--dark;
+}
+
+.usa-step-indicator__segment--current .usa-step-indicator__segment-label {
+  color: $accent-primary;
 }
 
 .usa-step-indicator__segment--current::before,
 .usa-step-indicator__segment--current::after {
-  background-color: $primary !important;
-  color: $primary !important;
+  background-color: $accent-primary;
+  color: $accent-primary;
   box-shadow:
     0 0 0 0.25rem $white,
     0 0 0 0 $white !important;
 }
 
 .usa-current {
-  color: $primary !important;
+  color: $accent-primary !important;
 }
 
 .usa-current::after {
-  background-color: $primary !important;
+  background-color: $accent-primary !important;
 }
 
 .usa-accordion__button,
 .usa-accordion__button:hover {
-  background-color: $table-header;
+  background-color: $background-dark;
   color: $text-primary;
 }
 
 .usa-button {
-  background-color: $primary;
+  background-color: $accent-primary;
+
   &:hover {
-    background-color: $blue-40v;
+    background-color: $accent-primary--dark !important;
   }
+
   &:active {
-    background-color: $blue-400;
+    background-color: $accent-primary--darker !important;
   }
 
-  &--outline {
-    background-color: white;
-
-    &:active,
-    &:hover {
-      background-color: white;
-    }
+  &--secondary {
+    background-color: $brand-secondary--lighter;
+    color: $brand-secondary--dark;
+  }
+  &--secondary:hover {
+    background-color: $brand-secondary--dark !important;
+  }
+  &--secondary:active {
+    background-color: $brand-secondary--darker !important;
   }
 
   &--unstyled {
-    background-color: transparent;
-
-    &:active,
-    &:hover {
-      background-color: transparent;
-    }
+    color: $brand-secondary--lighter;
+    background-color: transparent !important;
+  }
+  &--unstyled:hover {
+    color: $brand-secondary--lighter;
+    background-color: transparent !important;
+  }
+  &--unstyled:active {
+    color: $brand-secondary--lighter;
+    background-color: transparent !important;
   }
 }
 

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useContext, useEffect, useRef, useState } from "react";
-import { Icon } from "@trussworks/react-uswds";
+import { Button, Icon } from "@trussworks/react-uswds";
 import styles from "./header.module.scss";
 import { metadata } from "@/app/shared/constants";
 import classNames from "classnames";
@@ -84,10 +84,10 @@ const HeaderComponent: React.FC<HeaderProps> = ({ session }) => {
           )}
         >
           <div className={classNames("display-flex", "flex-align-center")}>
-            <div className="usa-logo" style={{ marginLeft: "0" }}>
-              <em className="usa-logo__text text-base-lightest-important">
+            <div className={styles.siteLogo}>
+              <em className="usa-logo__text brand-lightest">
                 <Link
-                  className="font-mono-lg text-base-lightest-important font-weight-normal-important"
+                  className="font-mono-lg brand-lightest font-weight-normal-important"
                   href={landingPage}
                   title={metadata.title}
                 >
@@ -105,16 +105,16 @@ const HeaderComponent: React.FC<HeaderProps> = ({ session }) => {
           >
             {isLoggedIn && (
               <div className="display-flex flex-align-center">
-                <Link
-                  href={PAGES.QUERY}
-                  className={classNames(
-                    styles.runQueryBtn,
-                    "usa-button margin-bottom-0 margin-right-2",
-                  )}
-                  scroll={false}
+                <Button
+                  secondary
+                  onClick={() => {
+                    router.push(PAGES.QUERY);
+                  }}
+                  className={classNames("margin-bottom-0 margin-right-2")}
+                  type={"button"}
                 >
                   Run a query
-                </Link>
+                </Button>
                 <button
                   onClick={toggleMenuDropdown}
                   className={classNames(
@@ -169,10 +169,7 @@ const HeaderComponent: React.FC<HeaderProps> = ({ session }) => {
               {!isAuthDisabled && (
                 <li className={styles.subMenuItem}>
                   <button
-                    className={classNames(
-                      styles.menuItem,
-                      "usa-button--unstyled",
-                    )}
+                    className={classNames(styles.menuItem)}
                     onClick={async () => await handleSignOut()}
                   >
                     Sign out

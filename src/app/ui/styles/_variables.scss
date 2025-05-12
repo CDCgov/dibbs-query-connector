@@ -1,179 +1,95 @@
 @use "uswds-core" as *;
+@use "_tokens" as *;
 
-// taken as values from Figma
+// Pulled from the Design System Figma
+// https://www.figma.com/design/Iuw9me6kYftBF4WTCEsCZz/Query-Connector?node-id=1856-3975
+
+// Design system spacing
 $query-connector-max-width: 45rem;
 $query-connector-wide-max-width: 90rem;
 $query-connector-content-margins: 13.75rem;
 $query-connector-content-margins-wide: 10rem;
-$query-connector-content-width-wide: calc($query-connector-wide-max-width - 2 * $query-connector-content-margins-wide);
+$query-connector-content-width-wide: calc(
+  $query-connector-wide-max-width - 2 * $query-connector-content-margins-wide
+);
 
-// Design System Fonts
-$serif-font: family("heading");
-$sans-serif-font: "Public Sans Web", family("body");
-$mono-font: "Consolas", family("mono");
+$header-content-height: 3.5rem;
+$footer-content-height: 5rem;
+$default-table-padding: 1.5rem;
+$site-alert-height: 2.5rem;
 
 // Design System Color Tokens
-
-// Primatives
-$black: #1b1b1b;
+$black: #000;
 $white: #fff;
+$brand-darkest: #0f191c;
+$brand-lightest: #e7f2f5;
 
-$gray-600: #5c5c5c;
-$gray-500: #919191;
-$gray-400: #dfe1e2;
-$gray-300: #f0f0f0;
-$gray-200: #f3f3f3;
-$gray-100: #fbfcfd;
+$accent-primary: color($theme-color-accent-warm);
+$accent-primary--dark: color($theme-color-accent-warm-dark);
+$accent-primary--darker: color($theme-color-accent-warm-darker);
 
-$blue-500: #112f4e;
-$blue-400: #005ea2;
-$blue-300: #0076d6;
-$blue-200: #a1d3ff;
-$blue-100: #e8f5ff;
+$accent-secondary: color($theme-color-secondary);
+$accent-secondary--dark: color($theme-color-secondary-dark);
+$accent-secondary--darker: color($theme-color-secondary-darker);
 
-$red-300: #e41d3d;
+$brand-primary: color($theme-color-primary);
+$brand-primary--light: color($theme-color-primary-light);
+$brand-primary--lighter: color($theme-color-primary-lighter);
+$brand-primary--dark: color($theme-color-primary-dark);
+$brand-primary--darker: color($theme-color-primary-darker);
 
-$red-5v: #fff3f2;
-$red-10v: #fde0db;
-$red-20v: #fdb8ae;
-$red-30v: #ff8d7b;
-$red-40v: #fb5a47;
-$red-50v: #e52207;
-$red-60v: #b50909;
+$brand-secondary: color($theme-color-secondary-light);
+$brand-secondary--light: color($theme-color-secondary-light);
+$brand-secondary--lighter: color($theme-color-secondary-lighter);
+$brand-secondary--dark: color($theme-color-secondary-dark);
+$brand-secondary--darker: color($theme-color-secondary-darker);
 
-$gold-vivid-5v: #fef0c8;
-$gold-vivid-10v: #ffe396;
-$gold-vivid-20v: #ffbe2e;
-$gold-vivid-30v: #e5a000;
-$gold-vivid-40v: #c2850c;
-$gold-vivid-50v: #936f38;
-$gold-vivid-60v: #7a591a;
+$background: $gray-100;
+$background-dark: $gray-300;
 
-$yellow-vivid-5v: #fff5c2;
-$yellow-vivid-10v: #fee685;
-$yellow-vivid-20v: #face00;
-$yellow-vivid-30v: #ddaa01;
-$yellow-vivid-40v: #b38c00;
-$yellow-vivid-50v: #947100;
-$yellow-vivid-60v: #776017;
-
-$orange-5v: #fef2e4;
-$orange-10v: #fce2c5;
-$orange-20v: #ffbc78;
-$orange-30v: #fa9441;
-$orange-40v: #e66f0e;
-$orange-50v: #c05600;
-$orange-60v: #8c471c;
-
-$green-5v: #ddf9c7;
-$green-10v: #c5ee93;
-$green-20v: #98d035;
-$green-30v: #7fb135;
-$green-40v: #719f2a;
-$green-50v: #538200;
-$green-60v: #466c04;
-
-$mint-5v: #c9fbeb;
-$mint-10v: #83fcd4;
-$mint-20v: #0ceda6;
-$mint-30v: #04c585;
-$mint-40v: #00a871;
-$mint-50v: #008659;
-$mint-60v: #008659;
-
-$cyan-5v: #e5faff;
-$cyan-10v: #a8f2ff;
-$cyan-20v: #52daf2;
-$cyan-30v: #00bde3;
-$cyan-40v: #009ec1;
-$cyan-50v: #0081a1;
-$cyan-60v: #00687d;
-
-$blue-5v: #e8f5ff;
-$blue-10v: #cfe8ff;
-$blue-20v: #a1d3ff;
-$blue-30v: #58b4ff;
-$blue-40v: #2491ff;
-$blue-50v: #0076d6;
-$blue-60v: #005ea2;
-
-$indigo-5v: #f0f0ff;
-$indigo-10v: #e0e0ff;
-$indigo-20v: #ccceff;
-$indigo-30v: #a3a7fa;
-$indigo-40v: #8289ff;
-$indigo-50v: #656bd7;
-$indigo-60v: #4a50c4;
-
-$violet-5v: #f7f2ff;
-$violet-10v: #ede3ff;
-$violet-20v: #d5bfff;
-$violet-30v: #c39deb;
-$violet-40v: #ad79e9;
-$violet-50v: #9355dc;
-$violet-60v: #783cb9;
-
-$magenta-5v: #fff2f5;
-$magenta-10v: #ffddea;
-$magenta-20v: #ffb4cf;
-$magenta-30v: #ff87b2;
-$magenta-40v: #fd4496;
-$magenta-50v: #d72d79;
-$magenta-60v: #ab2165;
-
-$gray-1: #fcfcfc;
-$gray-2: #f9f9f9;
-$gray-3: #f6f6f6;
-$gray-4: #f3f3f3;
-$gray-5: #f0f0f0;
-$gray-10: #e6e6e6;
-$gray-20: #c9c9c9;
-$gray-30: #adadad;
-$gray-40: #919191;
-$gray-50: #757575;
-$gray-60: #5c5c5c;
-$gray-70: #454545;
-$gray-80: #2e2e2e;
-$gray-90: #1b1b1b;
-
-// Semantic Tokens
-// https://www.figma.com/design/Iuw9me6kYftBF4WTCEsCZz/Query-Connector?node-id=1856-3975
-
-// Pulled from the Design System Figma
-$border: $gray-400;
-$page-background: $gray-100;
-$page-background-dark: $gray-300;
-
-$stepper-inactive: $gray-500;
-$stepper-inactive-text: $gray-600;
 $drop-shadow: $gray-200;
 
 $empty-state: $blue-100;
 $highlight: $blue-100;
 $info: $blue-100;
 
-$primary: $blue-300;
-$header: $blue-400;
-$footer: $blue-400;
+$diabled-neutral: $gray-40;
+$hover-neutral: $gray-200;
+
+// Semantic tokens
+$header: $brand-primary--darker;
+$footer: $brand-primary--darker;
+
+$stepper-inactive: $gray-500;
+$stepper-inactive-text: $gray-600;
+$stepper-completed: $blue-500;
+
+$input-field-border: $gray-500;
+
+// TODO: DS - replace these with another brand color?
+$info-background: $yellow-vivid-5v;
+$no-results-background: #e8f5ff;
+$pill-background: #e8f5ff;
+$query-library-accordion-background: #f7f9fa;
 $error: $red-300;
+$error-border: #d73a49;
+$error-background: #fce8e8;
+$spinner-progress-segment-color: #3498db;
+$table-header-color: #f0f0f0;
+$success-toast-background: #ecf3ec;
+$background-darkest: $gray-500;
+$hover-blue: rgba(217, 232, 246, 0.5);
+$border: $gray-400;
+$border-dark: $gray-500;
+$border-light: $gray-300;
+$overlay-background: rgba(0, 0, 0, 0.5);
+
+// Design system fonts
+$serif-font: family("heading");
+$sans-serif-font: "Public Sans Web", family("body");
+$mono-font: "Consolas", family("mono");
 
 $text-primary: $black;
 $text-secondary: $gray-500;
-$text-base-lightest: $gray-300;
-$text-blue: $blue-400;
-
-$table-border: $gray-400;
-$table-row-border: $gray-300;
-$table-header: $gray-300;
-
-$stepper-completed: $blue-500;
-
-$dropdown-hover: $gray-200;
-
-$input-field-border: $gray-500;
-$checkbox-border: $gray-500;
-
-$header-content-height: 3.5rem;
-$footer-content-height: 5rem;
-$default-table-padding: 1.5rem;
-$site-alert-height: 2.5rem;
+$text-inactive: $gray-20;
+$text-inactive--dark: $gray-600;

@@ -123,7 +123,7 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
 
             <div className={`${styles.searchCallToActionContainer}`}>
               <Button
-                className={`usa-button usa-button--outline bg-white`}
+                secondary
                 type="button"
                 onClick={() => {
                   fillFields(false);
@@ -132,7 +132,8 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
                 Fill fields
               </Button>
               <Button
-                className={`usa-button--unstyled margin-left-auto`}
+                unstyled
+                className={`margin-left-auto`}
                 type="button"
                 onClick={() => {
                   setShowAdvanced(!showAdvanced);

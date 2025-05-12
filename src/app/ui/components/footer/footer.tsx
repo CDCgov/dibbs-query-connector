@@ -20,17 +20,14 @@ export default function FooterComponent() {
       </div>
       <div className={styles.cdcFooterTextContainer}>
         <div>
-          <p className="text-base-lightest-important">
+          <p className="brand-lightest">
             Centers for Disease Control and Prevention
           </p>
         </div>
         <div>
-          <p className="text-base-lightest-important">
+          <p className="brand-lightest">
             For more information about this solution, send us an email at{" "}
-            <a
-              className="text-base-lightest-important"
-              href="mailto:dibbs@cdc.gov"
-            >
+            <a className="brand-lightest" href="mailto:dibbs@cdc.gov">
               dibbs@cdc.gov
             </a>
           </p>

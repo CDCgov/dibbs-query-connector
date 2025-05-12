@@ -26,6 +26,25 @@ $ASSET_PREFIX: "";
     $theme-image-path: "../../../../../../dist/img",
 
     // Color
+    $theme-color-primary-family: "blue-cool",
+    $theme-color-primary: "blue-cool-50",
+    $theme-color-primary-dark: "blue-cool-70",
+    $theme-color-primary-darker: "blue-cool-80",
+    $theme-color-primary-light: "blue-cool-20",
+    $theme-color-primary-lighter: "blue-cool-5",
+
+    $theme-color-accent-warm-family: "violet-warm",
+    $theme-color-accent-warm: "violet-warm-60",
+    $theme-color-accent-warm-dark: "violet-warm-70",
+    $theme-color-accent-warm-darker: "violet-warm-80",
+
+    $theme-color-secondary-family: "blue-cool",
+    $theme-color-secondary: "blue-cool-50",
+    $theme-color-secondary-dark: "blue-cool-70",
+    $theme-color-secondary-darker: "blue-cool-80",
+    $theme-color-secondary-light: "blue-cool-20",
+    $theme-color-secondary-lighter: "blue-cool-5",
+
     // Component
     $theme-hero-image: "../../../../dist/img/hero.jpg",
     $theme-accordion-button-background-color: "blue-cool-60",
