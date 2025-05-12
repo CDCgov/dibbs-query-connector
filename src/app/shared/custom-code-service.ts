@@ -23,7 +23,7 @@ import {
   CUSTOM_VALUESET_ARRAY_ID,
 } from "@/app/shared/constants";
 
-export class UserCreatedValuesetService {
+class UserCreatedValuesetService {
   private static get dbClient() {
     return internal_getDbClient();
   }
@@ -59,7 +59,8 @@ export class UserCreatedValuesetService {
     const uuid = crypto.randomUUID();
 
     const systemPrefix = UserCreatedValuesetService.getSystemPrefix(vs.system);
-    const valueSetUniqueId = `${uuid}_${vs.valueSetVersion}`;
+    const valueSetUniqueId =
+      vs.valueSetId !== "" ? vs.valueSetId : `${uuid}_${vs.valueSetVersion}`;
     const valueSetOid = vs.valueSetExternalId || uuid;
 
     // Insert Custom Code Condition if not already present
@@ -86,7 +87,8 @@ export class UserCreatedValuesetService {
     // Insert Concepts and Linkages
     for (const concept of vs.concepts) {
       // TODO: We will need to do an UPDATE display if system prefix and code already exist
-      const conceptId = `${systemPrefix}_${concept.code}`;
+      const conceptId =
+        concept.internalId ?? `custom_${systemPrefix}_${concept.code}`;
       try {
         await dbService.query(insertConceptSql, [
           conceptId,
@@ -179,12 +181,12 @@ export class UserCreatedValuesetService {
         }
 
         const insertSql = `
-        INSERT INTO query (
-          id, query_name, query_data, conditions_list, author,
-          date_created, date_last_modified, time_window_number, time_window_unit
-        )
-        VALUES ($1, $2, $3, $4, $5, NOW(), NOW(), $6, $7)
-      `;
+      INSERT INTO query (
+        id, query_name, query_data, conditions_list, author,
+        date_created, date_last_modified, time_window_number, time_window_unit
+      )
+      VALUES ($1, $2, $3, $4, $5, NOW(), NOW(), $6, $7)
+    `;
         await dbService.query(insertSql, [
           newId,
           name,

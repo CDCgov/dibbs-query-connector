@@ -1,3 +1,9 @@
+import {
+  DibbsConceptType,
+  DibbsValueSet,
+} from "@/app/models/entities/valuesets";
+import { vsAuthorMap } from "./components/DropdownFilter";
+
 /**
  * Helper method to extract the source system display name from the url string.
  * Similar to DBServive.stripProtocolAndTLDFromSystemUrl, but builds in specific
@@ -27,3 +33,34 @@ export const formatSystem = (system: string) => {
       return result?.toUpperCase();
   }
 };
+
+export const emptyValueSet: DibbsValueSet = {
+  valueSetId: "",
+  valueSetName: "",
+  valueSetVersion: "",
+  author: "",
+  system: "",
+  dibbsConceptType: "" as DibbsConceptType,
+  includeValueSet: false,
+  concepts: [],
+  userCreated: true,
+};
+
+export const emptyVsAuthorMapItem: vsAuthorMap = { "": [""] };
+
+export const emptyFilterSearch = {
+  category: "" as DibbsConceptType,
+  codeSystem: "",
+  creators: emptyVsAuthorMapItem,
+};
+
+export const CodeSystemOptions = [
+  "http://hl7.org/fhir/sid/icd-10-cm",
+  "http://hl7.org/fhir/sid/cvx",
+  "http://www.nlm.nih.gov/research/umls/rxnorm",
+  "http://loinc.org",
+  "http://cap.org/eCC",
+  "http://snomed.info/sct",
+];
+
+export type CustomCodeMode = "manage" | "select" | "create" | "edit";

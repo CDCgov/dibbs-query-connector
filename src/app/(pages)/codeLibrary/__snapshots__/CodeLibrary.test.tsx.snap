@@ -93,7 +93,6 @@ exports[`Code library loading view renders a skeleton loading state when loading
                 />
               </svg>
               Filters
-               
             </div>
           </div>
           <button
@@ -198,7 +197,7 @@ exports[`Code library loading view renders a skeleton loading state when loading
             <span>
               Showing 0 -
   0 of 
-  0 value sets 
+  0 value sets (filtered)
             </span>
             <div
               class="itemsPerPageContainer"
@@ -332,7 +331,6 @@ exports[`Code library rendered view renders concept codes for the value set when
                 />
               </svg>
               Filters
-               
             </div>
           </div>
           <button
@@ -574,7 +572,7 @@ exports[`Code library rendered view renders concept codes for the value set when
             <span>
               Showing 1 -
   2 of 
-  2 value sets 
+  2 value sets (filtered)
             </span>
             <nav
               aria-label="Pagination"
@@ -730,7 +728,6 @@ exports[`Code library rendered view renders the correct content 1`] = `
                 />
               </svg>
               Filters
-               
             </div>
           </div>
           <button
@@ -972,7 +969,7 @@ exports[`Code library rendered view renders the correct content 1`] = `
             <span>
               Showing 1 -
   2 of 
-  2 value sets 
+  2 value sets (filtered)
             </span>
             <nav
               aria-label="Pagination"
