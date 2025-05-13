@@ -106,7 +106,7 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
   }, []);
 
   useEffect(() => {
-    // if we're switching from create mode to edit mode,
+    // if we're switching right from create mode to edit mode,
     // no need to load in activeValueSet data, since we've already got
     // it in state
     if (prevModeRef.current == "create" && mode == "edit") {
@@ -250,9 +250,7 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
               type="text"
               id={`code-id-${codeObj.internalId ?? idx}`}
               name="code-id"
-              value={
-                activeValueSet?.userCreated ? codeObj.code : codes[idx].code
-              }
+              value={codeObj.code}
               onChange={(e) => handleAddCode("code", id, e.target.value)}
             />
           </div>
@@ -262,11 +260,7 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
               type="text"
               id={`code-name-${codeObj.internalId ?? idx}`}
               name="code-name"
-              value={
-                activeValueSet?.userCreated
-                  ? codeObj.display
-                  : codes[idx].display
-              }
+              value={codeObj.display}
               onChange={(e) => handleAddCode("name", id, e.target.value)}
             />
           </div>
@@ -332,7 +326,7 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
         fetchUpdatedValueSet();
 
         showToastConfirmation({
-          body: `Value set "${customValueSet.valueSetName}" successfully ${
+          body: `Value set "${newCustomValueSet.valueSetName}" successfully ${
             mode == "create" ? "added" : "updated"
           }`,
         });

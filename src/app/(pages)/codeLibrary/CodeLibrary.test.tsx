@@ -99,7 +99,9 @@ describe("Code library rendered view", () => {
     );
     expect(screen.getByTestId("table-valuesets")).toBeInTheDocument();
 
-    const header = screen.getByRole("heading");
+    const header = screen
+      .getAllByRole("heading")
+      .find((heading) => heading.classList.contains("header__title"));
     const infoAlert = screen.queryAllByTestId("alert")[0];
 
     expect(header).toHaveTextContent("Manage codes");

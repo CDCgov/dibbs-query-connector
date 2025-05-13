@@ -1,5 +1,5 @@
 "use client";
-import { useContext, useEffect, useMemo, useState } from "react";
+import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import classNames from "classnames";
 import {
   Alert,
@@ -20,7 +20,7 @@ import {
   getConditionsData,
 } from "@/app/shared/database-service";
 import { DibbsValueSet } from "@/app/models/entities/valuesets";
-import { CustomCodeMode, emptyFilterSearch } from "./utils";
+import { CustomCodeMode, emptyFilterSearch, emptyValueSet } from "./utils";
 import { ConditionsMap, formatDiseaseDisplay } from "../queryBuilding/utils";
 import Highlighter from "react-highlight-words";
 import Skeleton from "react-loading-skeleton";
@@ -33,6 +33,9 @@ import CustomValueSetForm from "./components/CustomValueSetForm";
 import { User } from "@/app/models/entities/users";
 import { useSession } from "next-auth/react";
 import { getUserByUsername } from "@/app/backend/user-management";
+import { deleteCustomValueSet } from "@/app/shared/custom-code-service";
+import dynamic from "next/dynamic";
+import type { ModalProps, ModalRef } from "../../ui/designSystem/modal/Modal";
 
 /**
  * Component for Query Building Flow
@@ -68,7 +71,15 @@ const CodeLibrary: React.FC = () => {
     useState<ConditionsMap>();
   const [valueSets, setValueSets] = useState<DibbsValueSet[]>([]);
   const [filteredValueSets, setFilteredValueSets] = useState(valueSets);
-  const [activeValueSet, setActiveValueSet] = useState<DibbsValueSet>();
+  const [activeValueSet, setActiveValueSet] =
+    useState<DibbsValueSet>(emptyValueSet);
+
+  const modalRef = useRef<ModalRef>(null);
+
+  const Modal = dynamic<ModalProps>(
+    () => import("../../ui/designSystem/modal/Modal").then((mod) => mod.Modal),
+    { ssr: false },
+  );
 
   const ctx = useContext(DataContext);
   let totalPages = Math.ceil(filteredValueSets.length / itemsPerPage);
@@ -290,6 +301,28 @@ const CodeLibrary: React.FC = () => {
     ));
   };
 
+  const handleDeleteValueSet = async () => {
+    if (!activeValueSet) {
+      return;
+    }
+    setLoading(true);
+    try {
+      const result = await deleteCustomValueSet(activeValueSet);
+      console.log(result);
+      if (result.success) {
+        await fetchValueSetsAndConditions();
+        setFilterSearch(emptyFilterSearch);
+        setTextSearch("");
+      } else {
+        console.log("oh now");
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      modalRef.current?.toggleModal();
+      setLoading(false);
+    }
+  };
   const paginatedValueSets = useMemo(() => {
     setActiveValueSet(filteredValueSets[0]);
     return filteredValueSets.slice(
@@ -330,9 +363,9 @@ const CodeLibrary: React.FC = () => {
               <Backlink onClick={goBack} label={"Back to My queries"} />
             )}
             <h1 className={styles.header__title}>Manage codes</h1>
-            <div className={styles.header__subtitle}>
+            {/* <div className={styles.header__subtitle}>
               Click on the checkbox to delete the value set or code
-            </div>
+            </div> */}
             <Alert
               type="info"
               headingLevel="h4"
@@ -496,6 +529,7 @@ const CodeLibrary: React.FC = () => {
                             <Button
                               className={styles.deleteValueSet}
                               type="button"
+                              onClick={() => modalRef.current?.toggleModal()}
                             >
                               Delete value set
                             </Button>
@@ -598,9 +632,38 @@ const CodeLibrary: React.FC = () => {
         <CustomValueSetForm
           mode={mode}
           setMode={handleChangeMode}
-          activeValueSet={activeValueSet}
+          activeValueSet={
+            activeValueSet?.userCreated ? activeValueSet : emptyValueSet
+          }
         />
       )}
+      <Modal
+        id="delete-vs-modal"
+        heading="Delete value set"
+        modalRef={modalRef}
+        buttons={[
+          {
+            text: "Delete value set",
+            type: "button" as const,
+            id: "delete-vs-confirm",
+            className: classNames("usa-button", styles.modalButtonDelete),
+            onClick: handleDeleteValueSet,
+          },
+          {
+            text: "Cancel",
+            type: "button" as const,
+            id: "delete-vs-cancel",
+            className: classNames(
+              "usa-button usa-button--outline",
+              styles.modalButtonCancel,
+            ),
+            onClick: () => modalRef.current?.toggleModal(),
+          },
+        ]}
+        // errorMessage?: string | null; // New prop for error message
+      >
+        {`Are you sure you want to delete the value set "${activeValueSet?.valueSetName}?" This action cannot be undone`}
+      </Modal>
     </WithAuth>
   );
 };

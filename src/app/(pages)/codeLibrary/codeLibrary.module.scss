@@ -562,3 +562,16 @@
         }
     }
 }
+
+.modalButtonDelete {
+    background-color: #e41d3d;
+    height: 2.75rem !important;
+    &:hover {
+        background-color: #c31b1b !important;
+    }
+}
+
+.modalButtonCancel {
+    padding: 0;
+    box-shadow: none;
+}

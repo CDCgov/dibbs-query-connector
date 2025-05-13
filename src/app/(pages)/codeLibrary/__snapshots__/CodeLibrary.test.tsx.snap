@@ -1,7 +1,9 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Code library loading view renders a skeleton loading state when loading is true 1`] = `
-<body>
+<body
+  style="padding-right: 0px;"
+>
   <div>
     <div>
       <div
@@ -38,11 +40,6 @@ exports[`Code library loading view renders a skeleton loading state when loading
           >
             Manage codes
           </h1>
-          <div
-            class="header__subtitle"
-          >
-            Click on the checkbox to delete the value set or code
-          </div>
           <div
             class="usa-alert usa-alert--info info-alert"
             data-testid="alert"
@@ -235,11 +232,111 @@ exports[`Code library loading view renders a skeleton loading state when loading
       </div>
     </div>
   </div>
+  <div
+    aria-describedby="delete-vs-modal-modal-description"
+    aria-labelledby="delete-vs-modal-modal-heading"
+    class="usa-modal-wrapper is-hidden"
+    data-force-action="false"
+    id="delete-vs-modal-modal"
+    role="dialog"
+  >
+    <div
+      aria-controls="delete-vs-modal-modal"
+      class="usa-modal-overlay"
+      data-testid="modalOverlay"
+    >
+      <div
+        class="usa-modal qc-modal"
+        data-force-action="false"
+        data-testid="modalWindow"
+        tabindex="-1"
+      >
+        <div
+          class="usa-modal__content"
+        >
+          <div
+            class="usa-modal__main"
+          >
+            <h2
+              class="usa-modal__heading"
+              id="delete-vs-modal-modal-heading"
+            >
+              Delete value set
+            </h2>
+            <div
+              class="usa-prose"
+              id="delete-vs-modal-modal-description"
+            >
+              Are you sure you want to delete the value set "undefined?" This action cannot be undone
+            </div>
+            <div
+              class="usa-modal__footer"
+              data-testid="modalFooter"
+            >
+              <ul
+                class="usa-button-group"
+              >
+                <li
+                  class="usa-button-group__item"
+                >
+                  <button
+                    class="usa-button usa-button modalButtonDelete"
+                    data-testid="button"
+                    id="delete-vs-confirm"
+                    type="button"
+                  >
+                    Delete value set
+                  </button>
+                </li>
+                <li
+                  class="usa-button-group__item"
+                >
+                  <button
+                    class="usa-button usa-button usa-button--outline modalButtonCancel"
+                    data-testid="button"
+                    id="delete-vs-cancel"
+                    type="button"
+                  >
+                    Cancel
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <button
+            aria-controls="delete-vs-modal-modal"
+            aria-label="Close this window"
+            class="usa-button usa-modal__close"
+            data-close-modal="true"
+            data-testid="button"
+            type="button"
+          >
+            <svg
+              aria-hidden="true"
+              class="usa-icon"
+              focusable="false"
+              height="1em"
+              role="img"
+              viewBox="0 0 24 24"
+              width="1em"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 </body>
 `;
 
 exports[`Code library rendered view renders concept codes for the value set when clicked 1`] = `
-<body>
+<body
+  style="padding-right: 0px;"
+>
   <div>
     <div>
       <div
@@ -276,11 +373,6 @@ exports[`Code library rendered view renders concept codes for the value set when
           >
             Manage codes
           </h1>
-          <div
-            class="header__subtitle"
-          >
-            Click on the checkbox to delete the value set or code
-          </div>
           <div
             class="usa-alert usa-alert--info info-alert"
             data-testid="alert"
@@ -685,11 +777,111 @@ exports[`Code library rendered view renders concept codes for the value set when
       </div>
     </div>
   </div>
+  <div
+    aria-describedby="delete-vs-modal-modal-description"
+    aria-labelledby="delete-vs-modal-modal-heading"
+    class="usa-modal-wrapper is-hidden"
+    data-force-action="false"
+    id="delete-vs-modal-modal"
+    role="dialog"
+  >
+    <div
+      aria-controls="delete-vs-modal-modal"
+      class="usa-modal-overlay"
+      data-testid="modalOverlay"
+    >
+      <div
+        class="usa-modal qc-modal"
+        data-force-action="false"
+        data-testid="modalWindow"
+        tabindex="-1"
+      >
+        <div
+          class="usa-modal__content"
+        >
+          <div
+            class="usa-modal__main"
+          >
+            <h2
+              class="usa-modal__heading"
+              id="delete-vs-modal-modal-heading"
+            >
+              Delete value set
+            </h2>
+            <div
+              class="usa-prose"
+              id="delete-vs-modal-modal-description"
+            >
+              Are you sure you want to delete the value set "Cancer (Leukemia) Lab Result?" This action cannot be undone
+            </div>
+            <div
+              class="usa-modal__footer"
+              data-testid="modalFooter"
+            >
+              <ul
+                class="usa-button-group"
+              >
+                <li
+                  class="usa-button-group__item"
+                >
+                  <button
+                    class="usa-button usa-button modalButtonDelete"
+                    data-testid="button"
+                    id="delete-vs-confirm"
+                    type="button"
+                  >
+                    Delete value set
+                  </button>
+                </li>
+                <li
+                  class="usa-button-group__item"
+                >
+                  <button
+                    class="usa-button usa-button usa-button--outline modalButtonCancel"
+                    data-testid="button"
+                    id="delete-vs-cancel"
+                    type="button"
+                  >
+                    Cancel
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <button
+            aria-controls="delete-vs-modal-modal"
+            aria-label="Close this window"
+            class="usa-button usa-modal__close"
+            data-close-modal="true"
+            data-testid="button"
+            type="button"
+          >
+            <svg
+              aria-hidden="true"
+              class="usa-icon"
+              focusable="false"
+              height="1em"
+              role="img"
+              viewBox="0 0 24 24"
+              width="1em"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 </body>
 `;
 
 exports[`Code library rendered view renders the correct content 1`] = `
-<body>
+<body
+  style="padding-right: 0px;"
+>
   <div>
     <div>
       <div
@@ -726,11 +918,6 @@ exports[`Code library rendered view renders the correct content 1`] = `
           >
             Manage codes
           </h1>
-          <div
-            class="header__subtitle"
-          >
-            Click on the checkbox to delete the value set or code
-          </div>
           <div
             class="usa-alert usa-alert--info info-alert"
             data-testid="alert"
@@ -1131,6 +1318,104 @@ exports[`Code library rendered view renders the correct content 1`] = `
               </select>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    aria-describedby="delete-vs-modal-modal-description"
+    aria-labelledby="delete-vs-modal-modal-heading"
+    class="usa-modal-wrapper is-hidden"
+    data-force-action="false"
+    id="delete-vs-modal-modal"
+    role="dialog"
+  >
+    <div
+      aria-controls="delete-vs-modal-modal"
+      class="usa-modal-overlay"
+      data-testid="modalOverlay"
+    >
+      <div
+        class="usa-modal qc-modal"
+        data-force-action="false"
+        data-testid="modalWindow"
+        tabindex="-1"
+      >
+        <div
+          class="usa-modal__content"
+        >
+          <div
+            class="usa-modal__main"
+          >
+            <h2
+              class="usa-modal__heading"
+              id="delete-vs-modal-modal-heading"
+            >
+              Delete value set
+            </h2>
+            <div
+              class="usa-prose"
+              id="delete-vs-modal-modal-description"
+            >
+              Are you sure you want to delete the value set "Cancer (Leukemia) Lab Result?" This action cannot be undone
+            </div>
+            <div
+              class="usa-modal__footer"
+              data-testid="modalFooter"
+            >
+              <ul
+                class="usa-button-group"
+              >
+                <li
+                  class="usa-button-group__item"
+                >
+                  <button
+                    class="usa-button usa-button modalButtonDelete"
+                    data-testid="button"
+                    id="delete-vs-confirm"
+                    type="button"
+                  >
+                    Delete value set
+                  </button>
+                </li>
+                <li
+                  class="usa-button-group__item"
+                >
+                  <button
+                    class="usa-button usa-button usa-button--outline modalButtonCancel"
+                    data-testid="button"
+                    id="delete-vs-cancel"
+                    type="button"
+                  >
+                    Cancel
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <button
+            aria-controls="delete-vs-modal-modal"
+            aria-label="Close this window"
+            class="usa-button usa-modal__close"
+            data-close-modal="true"
+            data-testid="button"
+            type="button"
+          >
+            <svg
+              aria-hidden="true"
+              class="usa-icon"
+              focusable="false"
+              height="1em"
+              role="img"
+              viewBox="0 0 24 24"
+              width="1em"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+              />
+            </svg>
+          </button>
         </div>
       </div>
     </div>
