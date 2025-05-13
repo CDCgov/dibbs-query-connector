@@ -24,25 +24,16 @@ $white: #fff;
 $brand-darkest: #0f191c;
 $brand-lightest: #e7f2f5;
 
-$accent-primary: color($theme-color-accent-warm);
-$accent-primary--dark: color($theme-color-accent-warm-dark);
-$accent-primary--darker: color($theme-color-accent-warm-darker);
+$accent-primary: $violet-warm-60; // primary CTA / info color
+$accent-primary--dark: $violet-warm-70; // CTA hover
+$accent-primary--darker: $violet-warm-80; // CTA active
 
-$accent-secondary: color($theme-color-secondary);
-$accent-secondary--dark: color($theme-color-secondary-dark);
-$accent-secondary--darker: color($theme-color-secondary-darker);
-
-$brand-primary: color($theme-color-primary);
-$brand-primary--light: color($theme-color-primary-light);
-$brand-primary--lighter: color($theme-color-primary-lighter);
-$brand-primary--dark: color($theme-color-primary-dark);
-$brand-primary--darker: color($theme-color-primary-darker);
-
-$brand-secondary: color($theme-color-secondary-light);
-$brand-secondary--light: color($theme-color-secondary-light);
-$brand-secondary--lighter: color($theme-color-secondary-lighter);
-$brand-secondary--dark: color($theme-color-secondary-dark);
-$brand-secondary--darker: color($theme-color-secondary-darker);
+$brand-primary: $blue-cool-50; // branded text color
+$brand-primary--light: $blue-cool-20; // ??? is in the swatch
+$brand-primary--lighter: $blue-cool-10; // tertiary link text color
+$brand-primary--lightest: $blue-cool-5; // secondary button background
+$brand-primary--dark: $blue-cool-70; // secondary button text
+$brand-primary--darker: $blue-cool-80; // ??? is in the swatch
 
 $background: $gray-100;
 $background-dark: $gray-300;

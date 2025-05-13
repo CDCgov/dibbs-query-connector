@@ -1,4 +1,4 @@
-@use "_variables" as *;
+@use "variables" as *;
 
 footer {
   background-color: $footer;
@@ -54,26 +54,26 @@ footer {
   }
 
   &--secondary {
-    background-color: $brand-secondary--lighter;
-    color: $brand-secondary--dark;
+    background-color: $brand-primary--lightest;
+    color: $brand-primary--dark !important;
   }
   &--secondary:hover {
-    background-color: $brand-secondary--dark !important;
+    background-color: $brand-primary--lighter !important;
   }
   &--secondary:active {
-    background-color: $brand-secondary--darker !important;
+    background-color: $brand-primary--light !important;
   }
 
   &--unstyled {
-    color: $brand-secondary--lighter;
+    color: $brand-primary--lighter;
     background-color: transparent !important;
   }
   &--unstyled:hover {
-    color: $brand-secondary--lighter;
+    color: $brand-primary--lighter;
     background-color: transparent !important;
   }
   &--unstyled:active {
-    color: $brand-secondary--lighter;
+    color: $brand-primary--lighter;
     background-color: transparent !important;
   }
 }

@@ -1,5 +1,5 @@
 @use "uswds-core" as *;
-@use "_variables" as *;
+@use "variables" as *;
 
 html,
 body {
@@ -483,10 +483,6 @@ ul.usa-sidenav
   .usa-button-group {
     flex-direction: row-reverse;
     justify-content: space-between;
-
-    .usa-button--secondary {
-      background-color: $accent-secondary !important;
-    }
 
     .usa-button-group__item:last-child {
       margin-right: 0.25rem;

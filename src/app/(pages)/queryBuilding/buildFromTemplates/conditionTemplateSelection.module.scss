@@ -1,8 +1,9 @@
-@use "../../../ui/styles/_variables" as *;
+@use "../../../ui/styles/variables" as *;
 
 // Shared styles
-
 .mainContainer {
+  --variable: #{$accent-primary};
+
   display: flex;
   flex-direction: column;
   flex: auto;

@@ -212,7 +212,6 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
                       aria-label="Plus sign icon indicating addition"
                       className="usa-icon"
                       size={3}
-                      color="#005EA2"
                     />
                     <span data-testid="add-left-rail">ADD</span>
                   </div>
