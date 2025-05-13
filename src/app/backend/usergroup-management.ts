@@ -5,10 +5,10 @@ import { getSingleUserWithGroupMemberships } from "./user-management";
 import { QCResponse } from "../models/responses/collections";
 import { CustomUserQuery } from "../models/entities/query";
 import { QueryResult } from "pg";
-import { getQueryById } from "./query-building";
-import dbService from "./dbServices/db-service";
-import { adminRequired } from "./dbServices/decorators";
-import { auditable } from "./auditLogs/decorator";
+import dbService from "./db/service";
+import { adminRequired } from "./db/decorators";
+import { auditable } from "./audit-logs/decorator";
+import { getQueryById } from "./query-building/service";
 
 class UserGroupManagementService {
   /**
@@ -277,10 +277,18 @@ class UserGroupManagementService {
           return group;
         }),
       );
+      const groupsWithMembersAndQueries = await Promise.all(
+        groupsWithQueries.map(async (group) => {
+          const groupMembers = await getAllGroupMembers(group.id);
+          group.members = groupMembers.items;
+          await dbService.query("COMMIT");
+          return group;
+        }),
+      );
 
       return {
         totalItems: result.rowCount,
-        items: groupsWithQueries,
+        items: groupsWithMembersAndQueries,
       } as QCResponse<UserGroup>;
     } catch (error) {
       console.error("Error retrieving user groups:", error);

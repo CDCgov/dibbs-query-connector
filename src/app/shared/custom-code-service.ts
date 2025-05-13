@@ -1,8 +1,8 @@
 "use server";
 
-import { transaction } from "@/app/backend/dbServices/decorators";
-import { auditable } from "@/app/backend/auditLogs/decorator";
-import { getDbClient } from "../backend/dbClient";
+import { transaction } from "@/app/backend/db/decorators";
+import { auditable } from "@/app/backend/audit-logs/decorator";
+import { internal_getDbClient } from "../backend/db/config";
 import {
   insertValueSetSql,
   insertConceptSql,
@@ -17,15 +17,15 @@ import {
 import type { DibbsValueSet } from "../models/entities/valuesets";
 import type { QueryDataColumn } from "@/app/(pages)/queryBuilding/utils";
 import crypto from "crypto";
-import dbService from "@/app/backend/dbServices/db-service";
+import dbService from "@/app/backend/db/service";
 import {
   CUSTOM_CONDITION_ID,
   CUSTOM_VALUESET_ARRAY_ID,
 } from "@/app/shared/constants";
 
-export class UserCreatedValuesetService {
+class UserCreatedValuesetService {
   private static get dbClient() {
-    return getDbClient();
+    return internal_getDbClient();
   }
 
   // This may not be needed since these are user-created valuesets
@@ -59,7 +59,8 @@ export class UserCreatedValuesetService {
     const uuid = crypto.randomUUID();
 
     const systemPrefix = UserCreatedValuesetService.getSystemPrefix(vs.system);
-    const valueSetUniqueId = `${uuid}_${vs.valueSetVersion}`;
+    const valueSetUniqueId =
+      vs.valueSetId !== "" ? vs.valueSetId : `${uuid}_${vs.valueSetVersion}`;
     const valueSetOid = vs.valueSetExternalId || uuid;
 
     // Insert Custom Code Condition if not already present
@@ -86,7 +87,8 @@ export class UserCreatedValuesetService {
     // Insert Concepts and Linkages
     for (const concept of vs.concepts) {
       // TODO: We will need to do an UPDATE display if system prefix and code already exist
-      const conceptId = `${systemPrefix}_${concept.code}`;
+      const conceptId =
+        concept.internalId ?? `custom_${systemPrefix}_${concept.code}`;
       try {
         await dbService.query(insertConceptSql, [
           conceptId,
@@ -179,12 +181,12 @@ export class UserCreatedValuesetService {
         }
 
         const insertSql = `
-        INSERT INTO query (
-          id, query_name, query_data, conditions_list, author,
-          date_created, date_last_modified, time_window_number, time_window_unit
-        )
-        VALUES ($1, $2, $3, $4, $5, NOW(), NOW(), $6, $7)
-      `;
+      INSERT INTO query (
+        id, query_name, query_data, conditions_list, author,
+        date_created, date_last_modified, time_window_number, time_window_unit
+      )
+      VALUES ($1, $2, $3, $4, $5, NOW(), NOW(), $6, $7)
+    `;
         await dbService.query(insertSql, [
           newId,
           name,

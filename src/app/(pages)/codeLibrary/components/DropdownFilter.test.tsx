@@ -1,8 +1,15 @@
 import { render, screen } from "@testing-library/react";
 import { RootProviderMock } from "@/app/tests/unit/setup";
-import { mockDibbsValueSets } from "../queryBuilding/fixtures";
+import { mockDibbsValueSets } from "../../queryBuilding/fixtures";
 import DropdownFilter from "./DropdownFilter";
-
+import {
+  mockAdmin,
+  mockGroupBasic,
+  mockStandard,
+  mockSuperAdmin,
+} from "../../userManagement/test-utils";
+import { emptyVsAuthorMapItem } from "../utils";
+import * as UserGroupManagementBackend from "@/app/backend/usergroup-management";
 jest.mock("next-auth/react");
 
 jest.mock(
@@ -11,16 +18,33 @@ jest.mock(
     ({ children }: React.PropsWithChildren) => <div>{children}</div>,
 );
 
+jest.mock("@/app/backend/usergroup-management", () => ({
+  getAllUserGroups: jest.fn().mockResolvedValue({ items: [], totalItems: 0 }),
+  getAllGroupMembers: jest.fn().mockResolvedValue({ items: [], totalItems: 0 }),
+}));
+
 describe("DropdownFilter", () => {
-  beforeAll(() => {});
   it("renders correctly", async () => {
+    jest
+      .spyOn(UserGroupManagementBackend, "getAllGroupMembers")
+      .mockResolvedValueOnce({
+        items: [mockAdmin, mockStandard, mockSuperAdmin],
+        totalItems: 3,
+      });
+    jest
+      .spyOn(UserGroupManagementBackend, "getAllUserGroups")
+      .mockResolvedValueOnce({
+        items: [mockGroupBasic],
+        totalItems: 1,
+      });
     render(
-      <RootProviderMock currentPage="/auditLogs">
+      <RootProviderMock currentPage="/codeLibrary">
         <DropdownFilter
+          currentUser={mockAdmin}
           filterSearch={{
             category: undefined,
             codeSystem: "",
-            creator: "",
+            creators: emptyVsAuthorMapItem,
           }}
           setFilterSearch={jest.fn()}
           setShowFilters={jest.fn()}
@@ -47,10 +71,11 @@ describe("DropdownFilter", () => {
     render(
       <RootProviderMock currentPage="/auditLogs">
         <DropdownFilter
+          currentUser={mockAdmin}
           filterSearch={{
             category: "labs",
             codeSystem: "",
-            creator: "",
+            creators: emptyVsAuthorMapItem,
           }}
           setFilterSearch={jest.fn()}
           setShowFilters={jest.fn()}

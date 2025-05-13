@@ -139,21 +139,27 @@ variable "auth_secret" {
   sensitive   = true
 }
 
-variable "keycloak_client_id" {
+variable "auth_provider" {
+  type        = string
+  description = "Which auth provider to use"
+  sensitive   = true
+}
+
+variable "auth_client_id" {
   type        = string
   description = "Client ID for Keycloak"
   sensitive   = true
 }
 
-variable "keycloak_client_secret" {
+variable "auth_client_secret" {
   type        = string
   description = "Client Secret for Keycloak"
   sensitive   = true
 }
 
-variable "auth_keycloak_issuer" {
+variable "auth_issuer" {
   type        = string
-  description = "URL for Keycloak"
+  description = "URL for the Auth issuer"
   sensitive   = true
 }
 
