@@ -61,13 +61,13 @@ export const confirmDelete = (
   queryId: string,
   modalRef: RefObject<ModalRef>,
 ) => {
-  const ctx = useContext(DataContext);
-  if (!ctx?.setSelectedQuery) {
+  const queryContext = useContext(DataContext);
+  if (!queryContext?.setSelectedQuery) {
     throw new Error(
       "confirmDelete must be used within a DataProvider with selectedQuery set",
     );
   }
-  ctx.setSelectedQuery({ queryName, queryId });
+  queryContext.setSelectedQuery({ queryName, queryId });
   modalRef.current?.toggleModal();
 };
 
@@ -103,14 +103,14 @@ export const renderModal = (
   queries: CustomUserQuery[],
   setQueries: React.Dispatch<React.SetStateAction<CustomUserQuery[]>>,
 ): JSX.Element => {
-  const ctx = useContext(DataContext);
-  if (!ctx?.selectedQuery || !ctx?.setSelectedQuery) {
+  const queryContext = useContext(DataContext);
+  if (!queryContext?.selectedQuery || !queryContext?.setSelectedQuery) {
     throw new Error(
       "renderModal must be used within a DataProvider with selectedQuery set",
     );
   }
-  const selectedQuery = ctx.selectedQuery;
-  const setSelectedQuery = ctx.setSelectedQuery;
+  const selectedQuery = queryContext.selectedQuery;
+  const setSelectedQuery = queryContext.setSelectedQuery;
 
   return (
     <DeleteModal
@@ -126,7 +126,7 @@ export const renderModal = (
             selectedQuery.queryId,
             queries,
             setQueries,
-            ctx as DataContextValue,
+            queryContext as DataContextValue,
           );
           setSelectedQuery({ queryName: undefined, queryId: undefined });
         }

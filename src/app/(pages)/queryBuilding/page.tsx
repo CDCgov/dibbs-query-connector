@@ -12,19 +12,19 @@ import WithAuth from "@/app/ui/components/withAuth/WithAuth";
  * @returns The Query Building component flow
  */
 const QueryBuilding: React.FC = () => {
-  const ctx = useContext(DataContext);
-  if (!ctx || !ctx.setSelectedQuery) {
+  const queryContext = useContext(DataContext);
+  if (!queryContext || !queryContext.setSelectedQuery) {
     throw new Error("QueryBuilding must be used within a DataProvider");
   }
 
   const [buildStep, setBuildStep] = useState<BuildStep>("selection");
 
   useEffect(() => {
-    ctx.setCurrentPage(buildStep);
+    queryContext.setCurrentPage(buildStep);
   }, [buildStep]);
 
   useEffect(() => {
-    ctx.setToastConfig({
+    queryContext.setToastConfig({
       position: "bottom-left",
       stacked: true,
       hideProgressBar: true,

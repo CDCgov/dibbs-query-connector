@@ -66,12 +66,16 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
   buildStep,
   setBuildStep,
 }) => {
-  const ctx = useContext(DataContext);
-  if (!ctx || !ctx.selectedQuery || !ctx.setSelectedQuery) {
+  const queryContext = useContext(DataContext);
+  if (
+    !queryContext ||
+    !queryContext.selectedQuery ||
+    !queryContext.setSelectedQuery
+  ) {
     throw new Error("BuildFromTemplates must be used within a DataProvider");
   }
-  const selectedQuery = ctx.selectedQuery;
-  const setSelectedQuery = ctx.setSelectedQuery;
+  const selectedQuery = queryContext.selectedQuery;
+  const setSelectedQuery = queryContext.setSelectedQuery;
 
   const { data: session } = useSession();
   const focusRef = useRef<HTMLInputElement | null>(null);
