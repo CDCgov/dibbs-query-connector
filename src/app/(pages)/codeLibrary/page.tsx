@@ -323,7 +323,7 @@ const CodeLibrary: React.FC = () => {
       setLoading(false);
     }
   };
-    
+
   const paginatedValueSets = useMemo(() => {
     setActiveValueSet(filteredValueSets[0]);
     return filteredValueSets.slice(
@@ -665,7 +665,6 @@ const CodeLibrary: React.FC = () => {
       >
         {`Are you sure you want to delete the value set "${activeValueSet?.valueSetName}?" This action cannot be undone`}
       </Modal>
-
     </WithAuth>
   );
 };

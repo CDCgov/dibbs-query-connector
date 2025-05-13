@@ -30,7 +30,6 @@ describe("CustomValueSetForm", () => {
       totalItems: 0,
     });
     (getUserByUsername as jest.Mock).mockResolvedValue({ items: [mockAdmin] });
-
   });
 
   it("renders an empty form to add a new value set", async () => {

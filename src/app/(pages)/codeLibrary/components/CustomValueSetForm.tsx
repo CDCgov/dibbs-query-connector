@@ -43,7 +43,6 @@ const getEmptyCodeMap = (): CustomCodeMap => ({
   "0": { display: "", code: "", include: false },
 });
 
-
 /**
  * @param root0 props
  * @param root0.mode - controls whether to render the form for Adding a new VS or Editing an existing one
@@ -295,7 +294,7 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
           setError({ ...error, [key]: true });
         }
       });
-      
+
     Object.entries(error).map(([field, value]) => {
       if (value == true) {
         console.log("error!", field);
