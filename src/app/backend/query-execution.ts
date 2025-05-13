@@ -6,8 +6,7 @@ import { isFhirResource } from "../shared/constants";
 import { CustomQuery } from "../shared/CustomQuery";
 import { GetPhoneQueryFormats } from "../shared/format-service";
 import { getSavedQueryByName } from "../shared/database-service";
-import { prepareFhirClient } from "./dbServices/fhir-servers";
-import { auditable } from "./auditLogs/decorator";
+import { auditable } from "./audit-logs/decorator";
 import type { QueryDataColumn } from "../(pages)/queryBuilding/utils";
 import type {
   QueryResponse,
@@ -15,6 +14,7 @@ import type {
   PatientRecordsRequest,
   FullPatientRequest,
 } from "../models/entities/query";
+import { prepareFhirClient } from "./fhir-servers";
 
 class QueryService {
   /**
