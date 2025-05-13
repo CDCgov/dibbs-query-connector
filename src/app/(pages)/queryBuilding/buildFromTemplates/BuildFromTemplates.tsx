@@ -11,7 +11,6 @@ import {
   useRef,
   useState,
 } from "react";
-
 import {
   getConditionsData,
   getValueSetsAndConceptsByConditionIDs,
@@ -75,6 +74,7 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
   setBuildStep,
   setSelectedQuery,
 }) => {
+  const { data: session } = useSession();
   const focusRef = useRef<HTMLInputElement | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [queryName, setQueryName] = useState<string | undefined>(
@@ -91,7 +91,6 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
   });
 
   const [constructedQuery, setConstructedQuery] = useState<NestedQuery>({});
-  const { data: session } = useSession();
 
   function resetQueryState() {
     setQueryName(undefined);
@@ -176,6 +175,7 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
       await getValueSetsForSelectedConditions(conditionIdsToFetch);
 
       setBuildStep("valueset");
+      await handleSaveQuery();
       setLoading(false);
     }
   }
