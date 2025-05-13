@@ -25,7 +25,9 @@ export default function FooterComponent() {
         <div>
           <p>
             For more information about this solution, send us an email at{" "}
-            <a href="mailto:dibbs@cdc.gov">dibbs@cdc.gov</a>
+            <a className="text-white" href="mailto:dibbs@cdc.gov">
+              dibbs@cdc.gov
+            </a>
           </p>
         </div>
       </div>
