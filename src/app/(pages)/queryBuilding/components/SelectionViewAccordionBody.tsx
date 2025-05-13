@@ -114,7 +114,9 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
     ).length;
 
     showToastConfirmation({
-      body: `${affectedCount} code(s) successfully ${includeStatus ? "added" : "removed"}`,
+      body: `${affectedCount} code(s) successfully ${
+        includeStatus ? "added" : "removed"
+      }`,
       variant: "success",
       hideProgressBar: true,
     });
@@ -289,7 +291,9 @@ const checkboxLabel = (
 
       <div className={styles.vsDetails}>
         <div className="padding-right-2">{`Author: ${dibbsVs.author}`}</div>
-        <div>{`System: ${dibbsVs.system.toLocaleLowerCase()}`}</div>
+        <div>{`System: ${
+          dibbsVs?.system ? dibbsVs.system.toLocaleLowerCase() : ""
+        }`}</div>
       </div>
     </div>
   );
