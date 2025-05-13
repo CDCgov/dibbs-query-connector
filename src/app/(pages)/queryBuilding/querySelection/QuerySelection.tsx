@@ -15,7 +15,10 @@ import { SelectedQueryDetails, SelectedQueryState } from "./utils";
 import { BuildStep } from "@/app/shared/constants";
 import { DataContext } from "@/app/shared/DataProvider";
 import { CustomUserQuery } from "@/app/models/entities/query";
-import { getQueriesForUser, getQueryList } from "@/app/backend/query-building";
+import {
+  getQueriesForUser,
+  getQueryList,
+} from "@/app/backend/query-building/service";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import { getRole } from "@/app/(pages)/userManagement/utils";
 import { getUserByUsername } from "@/app/backend/user-management";

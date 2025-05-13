@@ -10,9 +10,9 @@ import {
   deleteQueryByIdHelp,
   getSavedQueryByIdHelp,
   saveCustomQueryHelp,
-} from "@/app/backend/dbServices/queryBuilding/lib";
-import { getDbClient } from "@/app/backend/dbClient";
-import { translateSnakeStringToCamelCase } from "@/app/backend/dbServices/util";
+} from "@/app/backend/query-building/lib";
+import { internal_getDbClient } from "@/app/backend/db/config";
+import { translateSnakeStringToCamelCase } from "@/app/backend/db/util";
 
 test.describe("editing an exisiting query", () => {
   let subjectQuery: QueryTableResult;
@@ -128,12 +128,14 @@ test.describe("editing an exisiting query", () => {
     await expect(actionButton).toHaveText("Save query");
 
     // confirm query shows correct condition/s
-    expect(
-      page.getByTestId(`${ADDED_CONDITION.condition_id}-card`),
-    ).toBeEnabled();
+    const addedTab = page.getByTestId(
+      `${ADDED_CONDITION.condition_id}-card-active`,
+    );
+    await expect(addedTab).toBeVisible();
+    await expect(addedTab).toBeEnabled();
 
     // remove added condition
-    await page.getByTestId(`${ADDED_CONDITION.condition_id}-card`).hover();
+    await addedTab.hover();
 
     await page
       .getByTestId(`delete-condition-${ADDED_CONDITION.condition_id}`)
@@ -224,7 +226,7 @@ const ADDED_CONDITION = {
   condition_id: "840539006",
 };
 const CANCER_CONDITION_ID = "2";
-const dbClient = getDbClient();
+const dbClient = internal_getDbClient();
 
 async function createTestQuery() {
   const queryInputFixture = CANCER_FRONTEND_NESTED_INPUT as NestedQuery;

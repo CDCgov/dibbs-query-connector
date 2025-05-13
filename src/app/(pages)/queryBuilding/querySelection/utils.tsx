@@ -3,7 +3,7 @@ import { DeleteModal } from "@/app/ui/designSystem/modal/deleteModal";
 import { RefObject } from "react";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import { DataContextValue } from "@/app/shared/DataProvider";
-import { deleteQueryById } from "@/app/backend/query-building";
+import { deleteQueryById } from "@/app/backend/query-building/service";
 import { CustomUserQuery } from "@/app/models/entities/query";
 
 /**

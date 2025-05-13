@@ -4,6 +4,7 @@ import { ChangeEvent } from "react";
 import Checkbox from "@/app/ui/designSystem/checkbox/Checkbox";
 import { FilterableValueSet } from "./utils";
 import { DibbsConceptType } from "@/app/models/entities/valuesets";
+import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 
 type ConceptTypeAccordionBodyProps = {
   activeType: DibbsConceptType;
@@ -57,17 +58,35 @@ const ConceptTypeAccordionHeader: React.FC<ConceptTypeAccordionBodyProps> = ({
     e: ChangeEvent<HTMLInputElement>,
     isMinusState: boolean,
   ) {
+    const bulkIncludeValue = isMinusState ? false : e.target.checked;
+    let updatedCount = 0;
+
     Object.entries(activeTypeValueSets).forEach(([vsId, activeValueSets]) => {
       const handleValueSetUpdate = handleVsNameLevelUpdate(vsId);
-      const bulkIncludeValue = isMinusState ? false : e.target.checked;
-      activeValueSets.includeValueSet = bulkIncludeValue;
-      activeValueSets.concepts.map((c) => {
+      const conceptsUpdated = activeValueSets.concepts.map((c) => {
         if (c.render) {
           c.include = bulkIncludeValue;
         }
         return c;
       });
-      handleValueSetUpdate(activeValueSets);
+
+      const wasIncluded = activeValueSets.includeValueSet;
+      activeValueSets.includeValueSet = bulkIncludeValue;
+
+      handleValueSetUpdate({
+        ...activeValueSets,
+        concepts: conceptsUpdated,
+      });
+
+      if (wasIncluded !== bulkIncludeValue) {
+        updatedCount += 1;
+      }
+    });
+
+    showToastConfirmation({
+      body: `${updatedCount} value set(s) successfully ${bulkIncludeValue ? "added" : "removed"}`,
+      variant: "success",
+      hideProgressBar: true,
     });
   }
 

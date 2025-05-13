@@ -25,7 +25,6 @@ import {
   formatStringToSentenceCase,
 } from "@/app/shared/format-service";
 import { CodeSystemOptions, CustomCodeMode, emptyValueSet } from "../utils";
-
 import Skeleton from "react-loading-skeleton";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import { groupConditionConceptsIntoValueSets } from "@/app/shared/utils";
@@ -39,9 +38,11 @@ type CustomValueSetFormProps = {
 type CustomCodeMap = {
   [idx: string]: Concept;
 };
+
 const getEmptyCodeMap = (): CustomCodeMap => ({
   "0": { display: "", code: "", include: false },
 });
+
 
 /**
  * @param root0 props
@@ -75,6 +76,7 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
   });
 
   const prevModeRef = useRef<CustomCodeMode>(mode);
+
   function goBack() {
     // TODO: this will need to be handled differently
     // depending on how we arrived at this page:
@@ -82,6 +84,7 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
     // from query building - Back to query
     setLoading(true);
     setCodes(getEmptyCodeMap());
+
     return setMode("manage");
   }
 
@@ -292,6 +295,7 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
           setError({ ...error, [key]: true });
         }
       });
+      
     Object.entries(error).map(([field, value]) => {
       if (value == true) {
         console.log("error!", field);

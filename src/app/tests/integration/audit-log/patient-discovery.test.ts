@@ -10,9 +10,9 @@ import {
   PatientDiscoveryRequest,
   PatientRecordsRequest,
 } from "@/app/models/entities/query";
-import dbService from "@/app/backend/dbServices/db-service";
+import dbService from "@/app/backend/db/service";
 
-import * as AuditableDecorators from "@/app/backend/auditLogs/lib";
+import * as AuditableDecorators from "@/app/backend/audit-logs/lib";
 import {
   GET_ALL_AUDIT_ROWS,
   getAuditEntry,
@@ -27,10 +27,10 @@ jest.mock("@/app/utils/auth", () => {
   };
 });
 
-jest.mock("@/app/backend/auditLogs/lib", () => {
+jest.mock("@/app/backend/audit-logs/lib", () => {
   return {
     __esModule: true,
-    ...jest.requireActual("@/app/backend/auditLogs/lib"),
+    ...jest.requireActual("@/app/backend/audit-logs/lib"),
   };
 });
 
