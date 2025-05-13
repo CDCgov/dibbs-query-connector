@@ -12,6 +12,7 @@ import { getAllGroupQueries } from "../usergroup-management";
 import { User } from "@/app/models/entities/users";
 import { CustomUserQuery } from "@/app/models/entities/query";
 import { DibbsValueSet } from "@/app/models/entities/valuesets";
+import { auditable } from "../audit-logs/decorator";
 
 class QueryBuildingService {
   /**
@@ -23,6 +24,7 @@ class QueryBuildingService {
    * @returns - all columns of the newly added row in the query table
    */
   @adminRequired
+  @auditable
   static async saveCustomQuery(
     queryInput: NestedQuery,
     queryName: string,
@@ -53,6 +55,7 @@ class QueryBuildingService {
    * @returns A success or error response indicating the result.
    */
   @transaction
+  @auditable
   static async deleteQueryById(queryId: string) {
     return deleteQueryByIdHelp(queryId, dbService);
   }

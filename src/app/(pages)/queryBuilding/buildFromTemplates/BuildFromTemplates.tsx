@@ -43,6 +43,7 @@ import {
   getSavedQueryById,
   saveCustomQuery,
 } from "@/app/backend/query-building/service";
+import { useSession } from "next-auth/react";
 
 export type FormError = {
   queryName: boolean;
@@ -256,9 +257,8 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
   const queriesContext = useContext(DataContext);
 
   async function handleSaveQuery() {
-    if (constructedQuery && queryName) {
-      const userName = session?.user?.id || session?.user?.username || "User";
-
+    if (constructedQuery && queryName && session) {
+      const userName = session?.user?.username as string;
       try {
         const results = await saveCustomQuery(
           constructedQuery,
