@@ -28,8 +28,6 @@ import { BuildStep } from "../../../shared/constants";
 import LoadingView from "../../../ui/designSystem/LoadingView";
 import classNames from "classnames";
 import { groupConditionConceptsIntoValueSets } from "@/app/shared/utils";
-import { SelectedQueryDetails } from "../querySelection/utils";
-
 import { groupValueSetsByConceptType } from "@/app/utils/valueSetTranslation";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import { DataContext } from "@/app/shared/DataProvider";
@@ -52,28 +50,29 @@ export type FormError = {
 type BuildFromTemplatesProps = {
   buildStep: BuildStep;
   setBuildStep: Dispatch<SetStateAction<BuildStep>>;
-  selectedQuery: SelectedQueryDetails;
-  setSelectedQuery: Dispatch<SetStateAction<SelectedQueryDetails>>;
 };
 
 /**
  * The query building page
  * @param root0 params
- * @param root0.selectedQuery - the query to edit or the "create" mode if it
  * doesn't previously
  * @param root0.buildStep - the stage in the build process, used to render
  * subsequent steps
  * @param root0.setBuildStep - setter function to move the app forward
- * @param root0.setSelectedQuery - setter function to update / reset the query
  * being built
  * @returns the component for the query building page
  */
 const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
-  selectedQuery,
   buildStep,
   setBuildStep,
-  setSelectedQuery,
 }) => {
+  const ctx = useContext(DataContext);
+  if (!ctx || !ctx.selectedQuery || !ctx.setSelectedQuery) {
+    throw new Error("BuildFromTemplates must be used within a DataProvider");
+  }
+  const selectedQuery = ctx.selectedQuery;
+  const setSelectedQuery = ctx.setSelectedQuery;
+
   const { data: session } = useSession();
   const focusRef = useRef<HTMLInputElement | null>(null);
   const [loading, setLoading] = useState<boolean>(false);

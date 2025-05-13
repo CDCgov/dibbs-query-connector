@@ -5,22 +5,23 @@ import { SessionProvider } from "next-auth/react";
 import { PageType } from "./constants";
 import { ToastConfigOptions } from "../ui/designSystem/toast/Toast";
 import { Session } from "next-auth";
+import { SelectedQueryDetails } from "@/app/(pages)/queryBuilding/querySelection/utils";
+import { EMPTY_QUERY_SELECTION } from "@/app/(pages)/queryBuilding/utils";
 
-// Set session sync interval in accordance with moderate baseline controls AC-17
-// time to disconnect/revoke access no greater than 15mins.
 const REFRESH_INTERVAL_MINS = 15;
 
 export interface DataContextValue {
-  data: unknown; // You can define a specific data type here
+  data: unknown;
   setData: (data: unknown) => void;
   currentPage: PageType | string | null;
   setCurrentPage: (currentPage: PageType | string | null) => void;
   toastConfig: ToastConfigOptions | null;
   setToastConfig: (config: ToastConfigOptions) => void;
   runtimeConfig?: Record<string, string>;
+  selectedQuery?: SelectedQueryDetails;
+  setSelectedQuery?: (query: SelectedQueryDetails) => void;
 }
-// Context lets the parent component make some information available to any component in the tree below it,
-// no matter how deep, without passing it explicitly through props.
+
 export const DataContext = createContext<DataContextValue | undefined>(
   undefined,
 );
@@ -49,6 +50,9 @@ export function DataProvider({
   const [toastConfig, setToastConfig] = useState<ToastConfigOptions | null>(
     null,
   );
+  const [selectedQuery, setSelectedQuery] = useState<SelectedQueryDetails>(
+    EMPTY_QUERY_SELECTION,
+  );
 
   return (
     <DataContext.Provider
@@ -60,6 +64,8 @@ export function DataProvider({
         toastConfig,
         setToastConfig,
         runtimeConfig,
+        selectedQuery,
+        setSelectedQuery,
       }}
     >
       <SessionProvider

@@ -1,8 +1,8 @@
 import { ModalRef } from "@/app/ui/designSystem/modal/Modal";
 import { DeleteModal } from "@/app/ui/designSystem/modal/deleteModal";
-import { RefObject } from "react";
+import { RefObject, useContext } from "react";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
-import { DataContextValue } from "@/app/shared/DataProvider";
+import { DataContext, DataContextValue } from "@/app/shared/DataProvider";
 import { deleteQueryById } from "@/app/backend/query-building/service";
 import { CustomUserQuery } from "@/app/models/entities/query";
 
@@ -19,7 +19,7 @@ export const handleDelete = async (
   queryId: string | undefined,
   queries: CustomUserQuery[],
   setQueries: React.Dispatch<React.SetStateAction<CustomUserQuery[]>>,
-  context: DataContextValue | undefined,
+  context: DataContextValue,
 ) => {
   if (queryId) {
     const result = await deleteQueryById(queryId);
@@ -34,7 +34,7 @@ export const handleDelete = async (
       );
       setQueries(updatedQueries);
 
-      if (context) {
+      if (context?.setData) {
         context.setData(updatedQueries);
       }
     } else {
@@ -54,16 +54,20 @@ export const handleDelete = async (
  * Confirms the deletion of a user query by toggling a modal.
  * @param queryName - The name of the query to confirm deletion for.
  * @param queryId - The ID of the query to confirm deletion for.
- * @param setSelectedQuery - Function to set the currently selected query for deletion.
  * @param modalRef - Reference to the modal component.
  */
 export const confirmDelete = (
   queryName: string,
   queryId: string,
-  setSelectedQuery: React.Dispatch<React.SetStateAction<SelectedQueryDetails>>,
   modalRef: RefObject<ModalRef>,
 ) => {
-  setSelectedQuery({ queryName, queryId });
+  const ctx = useContext(DataContext);
+  if (!ctx?.setSelectedQuery) {
+    throw new Error(
+      "confirmDelete must be used within a DataProvider with selectedQuery set",
+    );
+  }
+  ctx.setSelectedQuery({ queryName, queryId });
   modalRef.current?.toggleModal();
 };
 
@@ -89,30 +93,25 @@ export const handleCopy = (queryName: string, queryId: string) => {
 /**
  *  Renders a modal to confirm the deletion of a user query.
  * @param modalRef - Reference to the modal component.
- * @param selectedQuery - The currently selected query for deletion.
- * @param handleDelete - Function to handle the deletion workflow.
  * clean up the internal state after deletion.
  * @param queries - The current list of user queries.
  * @param setQueries - Function to update the state of queries.
- * @param context - The data context used to update shared state.
- * @param setSelectedQuery - Function to update the currently selected query to
  * @returns The JSX element for the modal.
  */
 export const renderModal = (
   modalRef: RefObject<ModalRef>,
-  selectedQuery: SelectedQueryDetails | null,
-  handleDelete: (
-    queryName: string | undefined,
-    queryId: string | undefined,
-    queries: CustomUserQuery[],
-    setQueries: React.Dispatch<React.SetStateAction<CustomUserQuery[]>>,
-    context: DataContextValue,
-  ) => void,
   queries: CustomUserQuery[],
   setQueries: React.Dispatch<React.SetStateAction<CustomUserQuery[]>>,
-  context: DataContextValue,
-  setSelectedQuery: React.Dispatch<React.SetStateAction<SelectedQueryDetails>>,
 ): JSX.Element => {
+  const ctx = useContext(DataContext);
+  if (!ctx?.selectedQuery || !ctx?.setSelectedQuery) {
+    throw new Error(
+      "renderModal must be used within a DataProvider with selectedQuery set",
+    );
+  }
+  const selectedQuery = ctx.selectedQuery;
+  const setSelectedQuery = ctx.setSelectedQuery;
+
   return (
     <DeleteModal
       modalRef={modalRef}
@@ -127,9 +126,8 @@ export const renderModal = (
             selectedQuery.queryId,
             queries,
             setQueries,
-            context,
+            ctx as DataContextValue,
           );
-
           setSelectedQuery({ queryName: undefined, queryId: undefined });
         }
       }}
