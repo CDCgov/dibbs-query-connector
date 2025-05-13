@@ -24,15 +24,22 @@ jest.mock("@/app/backend/user-management", () => ({
 
 describe("CustomValueSetForm", () => {
   beforeAll(() => {
-    (getAllUsers as jest.Mock).mockResolvedValue([]);
-    (getAllGroupMembers as jest.Mock).mockResolvedValue([]);
-    (getUserByUsername as jest.Mock).mockResolvedValue(mockAdmin);
+    (getAllUsers as jest.Mock).mockResolvedValue({ items: [], totalItems: 0 });
+    (getAllGroupMembers as jest.Mock).mockResolvedValue({
+      items: [],
+      totalItems: 0,
+    });
+    (getUserByUsername as jest.Mock).mockResolvedValue({ items: [mockAdmin] });
   });
 
   it("renders an empty form to add a new value set", async () => {
     render(
       <RootProviderMock currentPage="/codeLibrary">
-        <CustomValueSetForm mode={"create"} setMode={jest.fn()} />
+        <CustomValueSetForm
+          mode={"create"}
+          setMode={jest.fn()}
+          activeValueSet={mockDibbsValueSets[0]}
+        />
       </RootProviderMock>,
     );
     const header = screen.getAllByRole("heading")[0];

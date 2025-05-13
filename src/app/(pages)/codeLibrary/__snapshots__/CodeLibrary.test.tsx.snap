@@ -460,6 +460,59 @@ exports[`Code library rendered view renders concept codes for the value set when
                         </div>
                       </td>
                     </tr>
+                    <tr
+                      class="valueSetTable__tableBody_row"
+                    >
+                      <td>
+                        <div
+                          class="valueSetTable__tableBody_row_details"
+                        >
+                          <span
+                            class="valueSetTable__tableBody_row_valueSetName"
+                          >
+                            <span
+                              class=""
+                            >
+                              Fruits
+                            </span>
+                          </span>
+                          <span
+                            class="valueSetTable__tableBody_row_valueSetDetails"
+                          >
+                            <span
+                              class=""
+                            >
+                              Custom Code Condition  •   Medication  •  SNOMED
+                            </span>
+                          </span>
+                          <span
+                            class="valueSetTable__tableBody_row_customValueSet"
+                          >
+                            <span
+                              class=""
+                            >
+                              Created by QC Admin
+                            </span>
+                          </span>
+                        </div>
+                        <div>
+                          <svg
+                            aria-label="Right chevron indicating additional content"
+                            class="usa-icon usa-icon--size-4"
+                            focusable="false"
+                            height="1em"
+                            role="img"
+                            viewBox="0 0 24 24"
+                            width="1em"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"
+                            />
+                          </svg>
+                        </div>
+                      </td>
+                    </tr>
                   </tbody>
                 </table>
               </div>
@@ -571,8 +624,8 @@ exports[`Code library rendered view renders concept codes for the value set when
           >
             <span>
               Showing 1 -
-  2 of 
-  2 value sets (filtered)
+  3 of 
+  3 value sets (filtered)
             </span>
             <nav
               aria-label="Pagination"
@@ -857,6 +910,59 @@ exports[`Code library rendered view renders the correct content 1`] = `
                         </div>
                       </td>
                     </tr>
+                    <tr
+                      class="valueSetTable__tableBody_row"
+                    >
+                      <td>
+                        <div
+                          class="valueSetTable__tableBody_row_details"
+                        >
+                          <span
+                            class="valueSetTable__tableBody_row_valueSetName"
+                          >
+                            <span
+                              class=""
+                            >
+                              Fruits
+                            </span>
+                          </span>
+                          <span
+                            class="valueSetTable__tableBody_row_valueSetDetails"
+                          >
+                            <span
+                              class=""
+                            >
+                              Custom Code Condition  •   Medication  •  SNOMED
+                            </span>
+                          </span>
+                          <span
+                            class="valueSetTable__tableBody_row_customValueSet"
+                          >
+                            <span
+                              class=""
+                            >
+                              Created by QC Admin
+                            </span>
+                          </span>
+                        </div>
+                        <div>
+                          <svg
+                            aria-label="Right chevron indicating additional content"
+                            class="usa-icon usa-icon--size-4"
+                            focusable="false"
+                            height="1em"
+                            role="img"
+                            viewBox="0 0 24 24"
+                            width="1em"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"
+                            />
+                          </svg>
+                        </div>
+                      </td>
+                    </tr>
                   </tbody>
                 </table>
               </div>
@@ -968,8 +1074,8 @@ exports[`Code library rendered view renders the correct content 1`] = `
           >
             <span>
               Showing 1 -
-  2 of 
-  2 value sets (filtered)
+  3 of 
+  3 value sets (filtered)
             </span>
             <nav
               aria-label="Pagination"

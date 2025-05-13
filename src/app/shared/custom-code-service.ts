@@ -15,9 +15,12 @@ import {
   INTENTIONAL_EMPTY_STRING_FOR_GEM_CODE,
 } from "./constants";
 import type { DibbsValueSet } from "../models/entities/valuesets";
+import type { Concept } from "../models/entities/concepts";
+import { QCResponse } from "../models/responses/collections";
 import type { QueryDataColumn } from "@/app/(pages)/queryBuilding/utils";
 import crypto from "crypto";
 import dbService from "@/app/backend/dbServices/db-service";
+import { formatCodeSystemPrefix } from "./format-service";
 import {
   CUSTOM_CONDITION_ID,
   CUSTOM_VALUESET_ARRAY_ID,
@@ -49,6 +52,47 @@ class UserCreatedValuesetService {
     return CUSTOM_CONDITION_ID;
   }
 
+  static async getCustomValueSetById(
+    id: string,
+  ): Promise<QCResponse<DibbsValueSet>> {
+    try {
+      const selectValueSetQuery = `
+          SELECT c.display, c.code_system, c.code, c.id as internal_id, vs.name as valueset_name, vs.id as valueset_id, vs.oid as valueset_external_id, vs.version, vs.author as author, 
+            vs.type, vs.dibbs_concept_type as dibbs_concept_type, vs.user_created, ctvs.condition_id, u.first_name, u.last_name, u.username
+          FROM valuesets vs 
+          LEFT JOIN condition_to_valueset ctvs on vs.id = ctvs.valueset_id 
+          LEFT JOIN valueset_to_concept vstc on vs.id = vstc.valueset_id
+          LEFT JOIN concepts c on vstc.concept_id = c.id
+          LEFT JOIN users u on vs.author = u.id::text
+          WHERE vs.id = $1
+          ORDER BY name ASC;
+        `;
+
+      const result = await UserCreatedValuesetService.dbClient.query(
+        selectValueSetQuery,
+        [id],
+      );
+
+      const vsWithAuthor = result.rows.map((item) => {
+        if (item.user_created == true) {
+          item.author =
+            item.first_name && item.last_name
+              ? `${item.first_name} ${item.last_name}`
+              : item.username;
+          return item;
+        }
+        return item;
+      });
+      return {
+        totalItems: result.rowCount,
+        items: vsWithAuthor,
+      } as QCResponse<DibbsValueSet>;
+    } catch (error) {
+      console.error("Error retrieving user groups:", error);
+      throw error;
+    }
+  }
+
   @transaction
   @auditable
   static async insertCustomValueSet(
@@ -58,14 +102,14 @@ class UserCreatedValuesetService {
     const errors: string[] = [];
     const uuid = crypto.randomUUID();
 
-    const systemPrefix = UserCreatedValuesetService.getSystemPrefix(vs.system);
+    const systemPrefix = vs.system ? formatCodeSystemPrefix(vs.system) : "";
     const valueSetUniqueId =
       vs.valueSetId !== "" ? vs.valueSetId : `${uuid}_${vs.valueSetVersion}`;
     const valueSetOid = vs.valueSetExternalId || uuid;
 
     // Insert Custom Code Condition if not already present
     const CUSTOM_CONDITION_ID =
-      await UserCreatedValuesetService.addCustomCodeCondition(vs.system);
+      await UserCreatedValuesetService.addCustomCodeCondition(vs.system || "");
 
     // Insert ValueSet
     try {
@@ -159,9 +203,9 @@ class UserCreatedValuesetService {
       // Uopdate Concepts and Linkages
       for (const concept of vs.concepts) {
         // TODO: We will need to do an UPDATE display if system prefix and code already exist
-        const systemPrefix = UserCreatedValuesetService.getSystemPrefix(
-          vs.system,
-        );
+        const systemPrefix = vs.system
+          ? UserCreatedValuesetService.getSystemPrefix(vs.system)
+          : "";
         const conceptId = `${systemPrefix}_${concept.code}`;
         try {
           await dbService.query(insertConceptSql, [
@@ -212,6 +256,43 @@ class UserCreatedValuesetService {
       ? { success: true }
       : { success: false, error: errors.join(", ") };
   }
+
+  @transaction
+  @auditable
+  static async deleteCustomConcept(
+    code: Concept,
+    vs: DibbsValueSet,
+  ): Promise<{ success: boolean; error?: string }> {
+    const errors: string[] = [];
+
+    try {
+      const deleteCustomConceptQuery = `
+      DELETE FROM valueset_to_concept
+      WHERE concept_id = $1 and valueset_id = $2
+    `;
+
+      let conceptId = code.internalId;
+      if (code.internalId == undefined) {
+        const systemPrefix = vs.system
+          ? UserCreatedValuesetService.getSystemPrefix(vs.system)
+          : "";
+        conceptId = `custom_${systemPrefix}_${code.code}`;
+      }
+
+      await dbService.query(deleteCustomConceptQuery, [
+        conceptId,
+        vs.valueSetId,
+      ]);
+    } catch (e) {
+      console.error("Delete failed for concept-to-valueset:", e);
+      errors.push("ValueSet update failed");
+    }
+
+    return errors.length === 0
+      ? { success: true }
+      : { success: false, error: errors.join(", ") };
+  }
+
   // insert or update query_data with a "custom" key containing these valuesets
   // if queryId is undefined, this creates a new query record with custom only
   @transaction
@@ -293,3 +374,7 @@ export const deleteCustomValueSet =
   UserCreatedValuesetService.deleteCustomValueSet;
 export const insertCustomValuesetsIntoQuery =
   UserCreatedValuesetService.insertCustomValuesetsIntoQuery;
+export const deleteCustomConcept =
+  UserCreatedValuesetService.deleteCustomConcept;
+export const getCustomValueSetById =
+  UserCreatedValuesetService.getCustomValueSetById;

@@ -20,11 +20,14 @@ import {
   getConditionsData,
 } from "@/app/shared/database-service";
 import { DibbsValueSet } from "@/app/models/entities/valuesets";
-import { CustomCodeMode, emptyFilterSearch, formatSystem } from "./utils";
+import { CustomCodeMode, emptyFilterSearch } from "./utils";
 import { ConditionsMap, formatDiseaseDisplay } from "../queryBuilding/utils";
 import Highlighter from "react-highlight-words";
 import Skeleton from "react-loading-skeleton";
-import { formatStringToSentenceCase } from "@/app/shared/format-service";
+import {
+  formatCodeSystemPrefix,
+  formatStringToSentenceCase,
+} from "@/app/shared/format-service";
 import DropdownFilter, { FilterCategories } from "./components/DropdownFilter";
 import CustomValueSetForm from "./components/CustomValueSetForm";
 import { User } from "@/app/models/entities/users";
@@ -200,16 +203,16 @@ const CodeLibrary: React.FC = () => {
     const matchesConceptType = vs.dibbsConceptType
       .toLocaleLowerCase()
       .includes(textSearch.toLocaleLowerCase());
-    const matchesSystem = vs.system
-      .toLocaleLowerCase()
-      .includes(textSearch.toLocaleLowerCase());
+    const matchesSystem =
+      vs.system &&
+      vs.system.toLocaleLowerCase().includes(textSearch.toLocaleLowerCase());
 
     return (
       matchesName || matchesConditionName || matchesConceptType || matchesSystem
     );
   };
 
-  const formatConditionDisplay = (conditionId: string | undefined) => {
+  const formatConditionDisplay = (conditionId: string) => {
     const conditionDetails =
       conditionId && conditionDetailsMap?.[conditionId].name;
 
@@ -218,7 +221,7 @@ const CodeLibrary: React.FC = () => {
 
   const formatValueSetDetails = (vs: DibbsValueSet) => {
     // extracts the system name from its url
-    const system = formatSystem(vs.system) || "";
+    const system = vs.system ? formatCodeSystemPrefix(vs.system) : "";
 
     // capitalizes the first letter and removes the last 's' from the type
     const conceptType = vs.dibbsConceptType
@@ -486,15 +489,29 @@ const CodeLibrary: React.FC = () => {
                               type="button"
                               onClick={() => handleChangeMode("edit")}
                             >
-                              Edit codes
+                              {activeValueSet.concepts?.length <= 0
+                                ? "Add codes"
+                                : "Edit codes"}
+                            </Button>
+                            <Button
+                              className={styles.deleteValueSet}
+                              type="button"
+                            >
+                              Delete value set
                             </Button>
                           </th>
                         </tr>
                       )}
-                      <tr className={styles.columnHeaders}>
-                        <th>Code</th>
-                        <th>Name</th>
-                      </tr>
+                      {activeValueSet.concepts.length == 0 ? (
+                        <tr className={styles.noCodesAvailable}>
+                          <th>There are no codes available.</th>
+                        </tr>
+                      ) : (
+                        <tr className={styles.columnHeaders}>
+                          <th>Code</th>
+                          <th>Name</th>
+                        </tr>
+                      )}
                     </thead>
                     <tbody
                       className={classNames(

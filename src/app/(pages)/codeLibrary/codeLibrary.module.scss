@@ -271,7 +271,24 @@
                 letter-spacing: 0%;
                 line-height: 1.25rem;
                 font-size: 0.875rem;
+                justify-content: space-between;
+                display: flex;
+                width: 100%;
+
+                button.deleteValueSet {
+                    background-color: transparent;
+                    color: #0076d6;
+                    padding: 0 !important;
+                    margin-right: 0;
+                    width: 126px;
+                }
             }
+        }
+
+        .noCodesAvailable > th {
+            padding: 1rem 0 !important;
+            text-transform: none;
+            color: #111111;
         }
     }
 
@@ -440,7 +457,17 @@
                 border-radius: 0.25rem;
                 border: solid 1px #919191;
             }
+
+            .skeleton {
+                line-height: 1.2 !important;
+                background-color: hotpink;
+            }
         }
+    }
+
+    .skeleton_container {
+        padding-top: 1rem;
+        padding-bottom: 1rem;
     }
 
     .vsDescription {
@@ -467,6 +494,10 @@
                     cursor: pointer;
                 }
             }
+        }
+
+        .addCodeContainer > span {
+            line-height: 1 !important;
         }
 
         .addCodeContainer {
@@ -499,6 +530,14 @@
                     margin-bottom: 0.5rem !important;
                     color: #919191 !important;
                     display: none;
+                }
+            }
+
+            .emptyCodeRow {
+                &:hover {
+                    .deleteIcon {
+                        display: none;
+                    }
                 }
             }
         }
