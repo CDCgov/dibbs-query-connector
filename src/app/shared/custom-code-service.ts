@@ -19,13 +19,14 @@ import type { Concept } from "../models/entities/concepts";
 import { QCResponse } from "../models/responses/collections";
 import type { QueryDataColumn } from "@/app/(pages)/queryBuilding/utils";
 import crypto from "crypto";
-import dbService from "@/app/backend/dbServices/db-service";
+
 import { formatCodeSystemPrefix } from "./format-service";
 
 import {
   CUSTOM_CONDITION_ID,
   CUSTOM_VALUESET_ARRAY_ID,
 } from "@/app/shared/constants";
+import dbService from "../backend/db/service";
 
 class UserCreatedValuesetService {
   private static get dbClient() {
