@@ -165,6 +165,7 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
                       <Button
                         type="button"
                         className="usa-button--unstyled text-bold text-no-underline"
+                        data-testid={`edit-query-${query.queryId}`}
                         onClick={() =>
                           handleEdit(query.queryName, query.queryId)
                         }
