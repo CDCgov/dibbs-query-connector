@@ -2,6 +2,11 @@ import { DibbsValueSet } from "@/app/models/entities/valuesets";
 import { ConceptTypeToDibbsVsMap } from "../../utils/valueSetTranslation";
 import { DibbsConceptType } from "@/app/models/entities/valuesets";
 import { CUSTOM_CONDITION_ID } from "@/app/shared/constants";
+import {
+  saveCustomQuery,
+  getCustomQueries,
+} from "@/app/backend/query-building/service";
+import { DataContextValue } from "@/app/shared/DataProvider";
 
 // The structure of the data that's coming from the backend
 export type ConditionsMap = {
@@ -213,4 +218,53 @@ export function formatCategoryToConditionsMap(
   }
 
   return filtered;
+}
+
+/**
+ * Saves a custom query and redirects the user to the code library page.
+ * @param params - The parameters for saving and redirecting.
+ * @param params.constructedQuery - The query to be saved.
+ * @param params.queryName - The name of the query.
+ * @param params.username - The username of the user saving the query.
+ * @param params.existingQueryId - The ID of an existing query to update (optional).
+ * @param params.context - The data context for managing state.
+ * @param params.router - The router object for navigation.
+ * @param params.router.push - Function to navigate to a new path.
+ * @throws If queryName or username is missing.
+ */
+export async function saveQueryAndRedirect({
+  constructedQuery,
+  queryName,
+  username,
+  existingQueryId,
+  context,
+  router,
+}: {
+  constructedQuery?: NestedQuery;
+  queryName: string;
+  username: string;
+  existingQueryId?: string;
+  context: DataContextValue;
+  router: { push: (path: string) => void };
+}): Promise<void> {
+  const safeQuery: NestedQuery = constructedQuery ?? {};
+
+  const results = await saveCustomQuery(
+    safeQuery,
+    queryName,
+    username,
+    existingQueryId,
+  );
+
+  if (!results?.[0]?.id) return;
+
+  context.setSelectedQuery?.({
+    queryId: results[0].id,
+    queryName,
+  });
+
+  const queries = await getCustomQueries();
+  context.setData?.(queries);
+
+  router.push("/codeLibrary");
 }

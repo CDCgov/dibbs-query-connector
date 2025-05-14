@@ -12,6 +12,7 @@ import {
   formatCategoryDisplay,
   NestedQuery,
   formatCategoryToConditionsMap,
+  saveQueryAndRedirect,
 } from "../utils";
 import { ConceptTypeSelectionTable } from "./SelectionTable";
 import Drawer from "@/app/ui/designSystem/drawer/Drawer";
@@ -31,6 +32,10 @@ import {
   ConceptTypeToDibbsVsMap,
 } from "@/app/utils/valueSetTranslation";
 import { CUSTOM_VALUESET_ARRAY_ID } from "@/app/shared/constants";
+import { useContext } from "react";
+import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
+import { DataContext } from "@/app/shared/DataProvider";
 
 type ConditionSelectionProps = {
   constructedQuery: NestedQuery;
@@ -187,6 +192,36 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
     (vsMap) => Object.keys(vsMap).length > 0,
   );
 
+  // add button for customLibrary redirect
+  const { data: session } = useSession();
+  const router = useRouter();
+  const context = useContext(DataContext);
+
+  if (!context || !context.selectedQuery) {
+    throw new Error("DataContext with selectedQuery is required.");
+  }
+
+  const handleStartFromScratchClick = async (
+    event: React.MouseEvent<HTMLButtonElement>,
+  ) => {
+    event.preventDefault();
+
+    const queryName = context?.selectedQuery?.queryName;
+    const existingQueryId = context?.selectedQuery?.queryId;
+    const username = session?.user?.username;
+
+    if (!username || !queryName) return;
+
+    await saveQueryAndRedirect({
+      constructedQuery,
+      queryName,
+      username,
+      existingQueryId,
+      context,
+      router,
+    });
+  };
+
   return (
     <div
       className={classNames(
@@ -313,9 +348,7 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
                   <Button
                     type="button"
                     outline
-                    onClick={() => {
-                      window.location.href = "/codeLibrary";
-                    }}
+                    onClick={handleStartFromScratchClick}
                   >
                     Add from code library
                   </Button>
@@ -356,7 +389,11 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
                   have created in the code library.
                 </strong>
               </p>
-              <Button className={styles.codeLibrary__button} type="button">
+              <Button
+                className={styles.codeLibrary__button}
+                type="button"
+                onClick={handleStartFromScratchClick}
+              >
                 Add from code library
               </Button>
             </div>

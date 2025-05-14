@@ -8,9 +8,16 @@ import ConditionColumnDisplay from "../buildFromTemplates/ConditionColumnDisplay
 import SearchField from "@/app/ui/designSystem/searchField/SearchField";
 import { FormError } from "../buildFromTemplates/BuildFromTemplates";
 import { CONDITION_DRAWER_SEARCH_PLACEHOLDER } from "./utils";
-import { formatDiseaseDisplay, formatCategoryToConditionsMap } from "../utils";
-import Link from "next/link";
+import {
+  formatDiseaseDisplay,
+  formatCategoryToConditionsMap,
+  saveQueryAndRedirect,
+} from "../utils";
 import { CUSTOM_CONDITION_ID } from "@/app/shared/constants";
+import { useContext } from "react";
+import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
+import { DataContext } from "@/app/shared/DataProvider";
 
 type ConditionSelectionProps = {
   categoryToConditionsMap: CategoryToConditionArrayMap;
@@ -50,6 +57,31 @@ export const ConditionSelection: React.FC<ConditionSelectionProps> = ({
   const filteredCategoryMap = formatCategoryToConditionsMap(
     categoryToConditionsMap,
   );
+  const { data: session } = useSession();
+  const router = useRouter();
+  const context = useContext(DataContext);
+  if (!context) {
+    throw new Error(
+      "DataContext is not provided. Ensure the component is wrapped in a DataProvider.",
+    );
+  }
+
+  const handleStartFromScratchClick = async (
+    event: React.MouseEvent<HTMLAnchorElement>,
+  ) => {
+    event.preventDefault();
+
+    if (!session?.user?.username || !queryName) return;
+
+    await saveQueryAndRedirect({
+      constructedQuery,
+      queryName,
+      username: session.user.username,
+      existingQueryId: context.selectedQuery?.queryId,
+      context,
+      router,
+    });
+  };
 
   useEffect(() => {
     if (queryName == "" || queryName == undefined) {
@@ -69,9 +101,13 @@ export const ConditionSelection: React.FC<ConditionSelectionProps> = ({
         <p>
           Don't see what you're looking for? You can also{" "}
           {/* TODO: link to "Select" mode of Code library page */}
-          <Link href={""} title={""} className={styles.startFromScratchLink}>
+          <a
+            href="#"
+            onClick={handleStartFromScratchClick}
+            className={styles.startFromScratchLink}
+          >
             start from scratch.
-          </Link>
+          </a>
         </p>
       </div>
       <div className={classNames(styles.conditionSelectionForm, "radius-lg")}>

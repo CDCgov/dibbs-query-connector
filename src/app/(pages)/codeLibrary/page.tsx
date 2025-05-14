@@ -316,6 +316,23 @@ const CodeLibrary: React.FC = () => {
   // -------------------------------- //
   return (
     <WithAuth>
+      {ctx?.selectedQuery && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            right: 0,
+            background: "#fff",
+            zIndex: 1000,
+            padding: "0.5rem",
+            fontSize: "0.75rem",
+            border: "1px solid black",
+          }}
+        >
+          <strong>Selected Query:</strong>
+          <pre>{JSON.stringify(ctx.selectedQuery, null, 2)}</pre>
+        </div>
+      )}
       {mode == "manage" && (
         <div
           className={classNames("main-container__wide", styles.mainContainer)}

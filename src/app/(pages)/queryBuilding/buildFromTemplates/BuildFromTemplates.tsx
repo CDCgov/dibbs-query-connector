@@ -273,6 +273,11 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
           throw "Result status not returned";
         }
 
+        setSelectedQuery({
+          queryId: results[0].id,
+          queryName,
+        });
+
         const queries = await getCustomQueries();
         queriesContext?.setData(queries);
         const statusMessage =
@@ -294,6 +299,23 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
   return (
     <>
       <div className={classNames("main-container__wide", styles.mainContainer)}>
+        {/* Adds a small tracker for us to use to confirm selectedQuery is initializing correctly ---TODO: remove before merging */}
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            right: 0,
+            zIndex: 9999,
+            background: "white",
+            padding: "0.5rem",
+            border: "1px solid black",
+          }}
+        >
+          <strong>selectedQuery:</strong>
+          <pre style={{ margin: 0, fontSize: "0.75rem" }}>
+            {JSON.stringify(selectedQuery, null, 2)}
+          </pre>
+        </div>
         {buildStep === "valueset" ? (
           <Backlink
             onClick={() => {
