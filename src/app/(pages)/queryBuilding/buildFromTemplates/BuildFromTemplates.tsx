@@ -300,7 +300,7 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
     <>
       <div className={classNames("main-container__wide", styles.mainContainer)}>
         {/* Adds a small tracker for us to use to confirm selectedQuery is initializing correctly ---TODO: remove before merging */}
-        <div
+        {/* <div
           style={{
             position: "fixed",
             top: 0,
@@ -315,7 +315,7 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
           <pre style={{ margin: 0, fontSize: "0.75rem" }}>
             {JSON.stringify(selectedQuery, null, 2)}
           </pre>
-        </div>
+        </div> */}
         {buildStep === "valueset" ? (
           <Backlink
             onClick={() => {

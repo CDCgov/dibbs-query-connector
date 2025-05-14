@@ -33,6 +33,13 @@ jest.mock("../../../backend/query-building/service", () => ({
   getSavedQueryById: jest.fn(),
 }));
 
+jest.mock("next/navigation", () => ({
+  useRouter: () => ({
+    push: jest.fn(),
+    prefetch: jest.fn(),
+  }),
+}));
+
 const currentPage = "/";
 const GONORRHEA_ID = 15628003;
 const GONORRHEA_DETAILS = conditionIdToNameMap[GONORRHEA_ID];

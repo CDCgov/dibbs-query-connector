@@ -316,7 +316,7 @@ const CodeLibrary: React.FC = () => {
   // -------------------------------- //
   return (
     <WithAuth>
-      {ctx?.selectedQuery && (
+      {/* {ctx?.selectedQuery && (
         <div
           style={{
             position: "fixed",
@@ -332,7 +332,7 @@ const CodeLibrary: React.FC = () => {
           <strong>Selected Query:</strong>
           <pre>{JSON.stringify(ctx.selectedQuery, null, 2)}</pre>
         </div>
-      )}
+      )} */}
       {mode == "manage" && (
         <div
           className={classNames("main-container__wide", styles.mainContainer)}
