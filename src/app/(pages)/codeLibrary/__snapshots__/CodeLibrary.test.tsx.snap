@@ -1,5 +1,573 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Code library interaction renders action buttons for custom value sets only 1`] = `
+<body
+  style="padding-right: 0px;"
+>
+  <div>
+    <div>
+      <div
+        class="main-container__wide mainContainer"
+      >
+        <div
+          class="header"
+        >
+          <a
+            aria-label="Back arrow indicating ability to navigate back a page if clicked"
+            class="back-link unchanged-color-on-visit text-no-underline"
+            data-testid="backArrowLink"
+            href="#"
+          >
+            <svg
+              aria-label="Arrow point left indicating return to previous step"
+              class="usa-icon"
+              focusable="false"
+              height="1em"
+              role="img"
+              viewBox="0 0 24 24"
+              width="1em"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"
+              />
+            </svg>
+             
+            Back to Query library
+          </a>
+          <h1
+            class="header__title"
+          >
+            Manage codes
+          </h1>
+          <div
+            class="usa-alert usa-alert--info info-alert"
+            data-testid="alert"
+          >
+            <div
+              class="usa-alert__body"
+            >
+              <p
+                class="usa-alert__text"
+              >
+                Value sets are an organizational structure for easy management of codes. Every code belongs to a value set.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div
+          class="controls"
+        >
+          <div
+            class="searchFilter"
+          >
+            <input
+              class="usa-input searchField search"
+              data-testid="textInput"
+              id="librarySearch"
+              name="librarySearch"
+              placeholder="Search"
+              type="search"
+              value=""
+            />
+            <div
+              class="applyFilters"
+              role="button"
+              tabindex="0"
+            >
+              <svg
+                aria-label="Icon indicating a menu with filter options"
+                class="usa-icon usa-icon--size-3 usa-icon qc-filter"
+                focusable="false"
+                height="1em"
+                role="icon"
+                viewBox="0 0 24 24"
+                width="1em"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z"
+                />
+              </svg>
+              Filters
+            </div>
+          </div>
+          <button
+            class="usa-button button"
+            data-testid="button"
+            type="button"
+          >
+            Add value set
+          </button>
+        </div>
+        <div
+          class="content"
+        >
+          <div
+            class="resultsContainer"
+          >
+            <div
+              class="content__left"
+            >
+              <div
+                class="display-flex flex-row valueSetTable customizeTableWrapper"
+              >
+                <table
+                  class="usa-table usa-table--borderless customizeTable"
+                  data-testid="table"
+                >
+                  <thead
+                    class="display-flex flex-column valueSetTable__header"
+                  >
+                    <tr
+                      class="valueSetTable__header_sectionHeader"
+                    >
+                      <th>
+                        VALUE SET
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody
+                    class="overflowScroll valueSetTable__tableBody"
+                    data-testid="table-valuesets"
+                  >
+                    <tr
+                      class="valueSetTable__tableBody_row"
+                    >
+                      <td>
+                        <div
+                          class="valueSetTable__tableBody_row_details"
+                        >
+                          <span
+                            class="valueSetTable__tableBody_row_valueSetName"
+                          >
+                            <span
+                              class=""
+                            >
+                              Cancer (Leukemia) Lab Result
+                            </span>
+                          </span>
+                          <span
+                            class="valueSetTable__tableBody_row_valueSetDetails"
+                          >
+                            <span
+                              class=""
+                            >
+                              Cancer (Leukemia)  •   Lab  •  ECC
+                            </span>
+                          </span>
+                        </div>
+                        <div>
+                          <svg
+                            aria-label="Right chevron indicating additional content"
+                            class="usa-icon usa-icon--size-4"
+                            focusable="false"
+                            height="1em"
+                            role="img"
+                            viewBox="0 0 24 24"
+                            width="1em"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"
+                            />
+                          </svg>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr
+                      class="valueSetTable__tableBody_row"
+                    >
+                      <td>
+                        <div
+                          class="valueSetTable__tableBody_row_details"
+                        >
+                          <span
+                            class="valueSetTable__tableBody_row_valueSetName"
+                          >
+                            <span
+                              class=""
+                            >
+                              Gonorrhea Medication
+                            </span>
+                          </span>
+                          <span
+                            class="valueSetTable__tableBody_row_valueSetDetails"
+                          >
+                            <span
+                              class=""
+                            >
+                              Gonorrhea  •   Medication  •  RXNORM
+                            </span>
+                          </span>
+                        </div>
+                        <div>
+                          <svg
+                            aria-label="Right chevron indicating additional content"
+                            class="usa-icon usa-icon--size-4"
+                            focusable="false"
+                            height="1em"
+                            role="img"
+                            viewBox="0 0 24 24"
+                            width="1em"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"
+                            />
+                          </svg>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr
+                      class="valueSetTable__tableBody_row activeValueSet"
+                    >
+                      <td>
+                        <div
+                          class="valueSetTable__tableBody_row_details"
+                        >
+                          <span
+                            class="valueSetTable__tableBody_row_valueSetName"
+                          >
+                            <span
+                              class=""
+                            >
+                              Fruits
+                            </span>
+                          </span>
+                          <span
+                            class="valueSetTable__tableBody_row_valueSetDetails"
+                          >
+                            <span
+                              class=""
+                            >
+                              Custom Code Condition  •   Medication  •  SNOMED
+                            </span>
+                          </span>
+                          <span
+                            class="valueSetTable__tableBody_row_customValueSet"
+                          >
+                            <span
+                              class=""
+                            >
+                              Created by QC Admin
+                            </span>
+                          </span>
+                        </div>
+                        <div>
+                          <svg
+                            aria-label="Right chevron indicating additional content"
+                            class="usa-icon usa-icon--size-4"
+                            focusable="false"
+                            height="1em"
+                            role="img"
+                            viewBox="0 0 24 24"
+                            width="1em"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"
+                            />
+                          </svg>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div
+              class="content__right"
+            >
+              <div
+                class="display-flex flex-row conceptsTable customizeTableWrapper"
+              >
+                <table
+                  class="usa-table usa-table--borderless customizeTable"
+                  data-testid="table"
+                >
+                  <thead
+                    class="display-flex flex-column conceptsTable__header"
+                  >
+                    <tr
+                      class="conceptsTable__header_sectionHeader"
+                    >
+                      <th>
+                        <button
+                          class="usa-button editCodesBtn button-secondary"
+                          data-testid="button"
+                          type="button"
+                        >
+                          Edit codes
+                        </button>
+                        <button
+                          class="usa-button deleteValueSet"
+                          data-testid="button"
+                          type="button"
+                        >
+                          Delete value set
+                        </button>
+                      </th>
+                    </tr>
+                    <tr
+                      class="columnHeaders"
+                    >
+                      <th>
+                        Code
+                      </th>
+                      <th>
+                        Name
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody
+                    class="overflowScroll conceptsTable__tableBody"
+                    data-testid="table-codes"
+                  >
+                    <tr
+                      class="conceptsTable__tableBody_row"
+                    >
+                      <td
+                        class="valueSetCode"
+                      >
+                        <span>
+                          <span
+                            class=""
+                          >
+                            1A
+                          </span>
+                        </span>
+                      </td>
+                      <td>
+                        <span>
+                          <span
+                            class=""
+                          >
+                            Apple
+                          </span>
+                        </span>
+                      </td>
+                    </tr>
+                    <tr
+                      class="conceptsTable__tableBody_row"
+                    >
+                      <td
+                        class="valueSetCode"
+                      >
+                        <span>
+                          <span
+                            class=""
+                          >
+                            1B
+                          </span>
+                        </span>
+                      </td>
+                      <td>
+                        <span>
+                          <span
+                            class=""
+                          >
+                            Banana
+                          </span>
+                        </span>
+                      </td>
+                    </tr>
+                    <tr
+                      class="conceptsTable__tableBody_row"
+                    >
+                      <td
+                        class="valueSetCode"
+                      >
+                        <span>
+                          <span
+                            class=""
+                          >
+                            1C
+                          </span>
+                        </span>
+                      </td>
+                      <td>
+                        <span>
+                          <span
+                            class=""
+                          >
+                            Coconut
+                          </span>
+                        </span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <div
+            class="paginationContainer"
+          >
+            <span>
+              Showing 1 -
+  3 of 
+  3 value sets (filtered)
+            </span>
+            <nav
+              aria-label="Pagination"
+              class="usa-pagination pagination"
+            >
+              <ul
+                class="usa-pagination__list"
+              >
+                <li
+                  class="usa-pagination__item usa-pagination__page-no"
+                >
+                  <button
+                    aria-current="page"
+                    aria-label="Page 1"
+                    class="usa-button usa-button--unstyled usa-pagination__button usa-current"
+                    data-testid="pagination-page-number"
+                    type="button"
+                  >
+                    1
+                  </button>
+                </li>
+              </ul>
+            </nav>
+            <div
+              class="itemsPerPageContainer"
+            >
+              <label
+                for="actionsPerPage"
+              >
+                Value sets per page
+              </label>
+              <select
+                class="usa-select itemsPerPageDropdown"
+                data-testid="Select"
+                id="valeSetsPerPage"
+                name="valeSetsPerPage"
+              >
+                <option
+                  value="10"
+                >
+                  10
+                </option>
+                <option
+                  value="25"
+                >
+                  25
+                </option>
+                <option
+                  value="50"
+                >
+                  50
+                </option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    aria-describedby="delete-vs-modal-modal-description"
+    aria-labelledby="delete-vs-modal-modal-heading"
+    class="usa-modal-wrapper is-hidden"
+    data-force-action="false"
+    id="delete-vs-modal-modal"
+    role="dialog"
+  >
+    <div
+      aria-controls="delete-vs-modal-modal"
+      class="usa-modal-overlay"
+      data-testid="modalOverlay"
+    >
+      <div
+        class="usa-modal qc-modal"
+        data-force-action="false"
+        data-testid="modalWindow"
+        tabindex="-1"
+      >
+        <div
+          class="usa-modal__content"
+        >
+          <div
+            class="usa-modal__main"
+          >
+            <h2
+              class="usa-modal__heading"
+              id="delete-vs-modal-modal-heading"
+            >
+              Delete value set
+            </h2>
+            <div
+              class="usa-prose"
+              id="delete-vs-modal-modal-description"
+            >
+              Are you sure you want to delete the value set "Fruits?" This action cannot be undone
+            </div>
+            <div
+              class="usa-modal__footer"
+              data-testid="modalFooter"
+            >
+              <ul
+                class="usa-button-group"
+              >
+                <li
+                  class="usa-button-group__item"
+                >
+                  <button
+                    class="usa-button usa-button modalButtonDelete"
+                    data-testid="button"
+                    id="delete-vs-confirm"
+                    type="button"
+                  >
+                    Delete value set
+                  </button>
+                </li>
+                <li
+                  class="usa-button-group__item"
+                >
+                  <button
+                    class="usa-button usa-button usa-button--outline modalButtonCancel"
+                    data-testid="button"
+                    id="delete-vs-cancel"
+                    type="button"
+                  >
+                    Cancel
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <button
+            aria-controls="delete-vs-modal-modal"
+            aria-label="Close this window"
+            class="usa-button usa-modal__close"
+            data-close-modal="true"
+            data-testid="button"
+            type="button"
+          >
+            <svg
+              aria-hidden="true"
+              class="usa-icon"
+              focusable="false"
+              height="1em"
+              role="img"
+              viewBox="0 0 24 24"
+              width="1em"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+`;
+
 exports[`Code library loading view renders a skeleton loading state when loading is true 1`] = `
 <body
   style="padding-right: 0px;"
