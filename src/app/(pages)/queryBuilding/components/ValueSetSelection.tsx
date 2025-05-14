@@ -12,7 +12,6 @@ import {
   formatCategoryDisplay,
   NestedQuery,
   formatCategoryToConditionsMap,
-  saveQueryAndRedirect,
 } from "../utils";
 import { ConceptTypeSelectionTable } from "./SelectionTable";
 import Drawer from "@/app/ui/designSystem/drawer/Drawer";
@@ -32,10 +31,7 @@ import {
   ConceptTypeToDibbsVsMap,
 } from "@/app/utils/valueSetTranslation";
 import { CUSTOM_VALUESET_ARRAY_ID } from "@/app/shared/constants";
-import { useContext } from "react";
-import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
-import { DataContext } from "@/app/shared/DataProvider";
+import { useSaveQueryAndRedirect } from "./useSaveQueryAndRedirect";
 
 type ConditionSelectionProps = {
   constructedQuery: NestedQuery;
@@ -193,34 +189,7 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
   );
 
   // add button for customLibrary redirect
-  const { data: session } = useSession();
-  const router = useRouter();
-  const context = useContext(DataContext);
-
-  if (!context || !context.selectedQuery) {
-    throw new Error("DataContext with selectedQuery is required.");
-  }
-
-  const handleStartFromScratchClick = async (
-    event: React.MouseEvent<HTMLButtonElement>,
-  ) => {
-    event.preventDefault();
-
-    const queryName = context?.selectedQuery?.queryName;
-    const existingQueryId = context?.selectedQuery?.queryId;
-    const username = session?.user?.username;
-
-    if (!username || !queryName) return;
-
-    await saveQueryAndRedirect({
-      constructedQuery,
-      queryName,
-      username,
-      existingQueryId,
-      context,
-      router,
-    });
-  };
+  const saveQueryAndRedirect = useSaveQueryAndRedirect();
 
   return (
     <div
@@ -348,7 +317,9 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
                   <Button
                     type="button"
                     outline
-                    onClick={handleStartFromScratchClick}
+                    onClick={() =>
+                      saveQueryAndRedirect(constructedQuery, "/codeLibrary")
+                    }
                   >
                     Add from code library
                   </Button>
@@ -392,7 +363,9 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
               <Button
                 className={styles.codeLibrary__button}
                 type="button"
-                onClick={handleStartFromScratchClick}
+                onClick={() =>
+                  saveQueryAndRedirect(constructedQuery, "/codeLibrary")
+                }
               >
                 Add from code library
               </Button>

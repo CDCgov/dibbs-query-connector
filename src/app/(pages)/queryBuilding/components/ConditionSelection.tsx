@@ -8,16 +8,9 @@ import ConditionColumnDisplay from "../buildFromTemplates/ConditionColumnDisplay
 import SearchField from "@/app/ui/designSystem/searchField/SearchField";
 import { FormError } from "../buildFromTemplates/BuildFromTemplates";
 import { CONDITION_DRAWER_SEARCH_PLACEHOLDER } from "./utils";
-import {
-  formatDiseaseDisplay,
-  formatCategoryToConditionsMap,
-  saveQueryAndRedirect,
-} from "../utils";
+import { formatDiseaseDisplay, formatCategoryToConditionsMap } from "../utils";
 import { CUSTOM_CONDITION_ID } from "@/app/shared/constants";
-import { useContext } from "react";
-import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
-import { DataContext } from "@/app/shared/DataProvider";
+import { useSaveQueryAndRedirect } from "./useSaveQueryAndRedirect";
 
 type ConditionSelectionProps = {
   categoryToConditionsMap: CategoryToConditionArrayMap;
@@ -57,31 +50,8 @@ export const ConditionSelection: React.FC<ConditionSelectionProps> = ({
   const filteredCategoryMap = formatCategoryToConditionsMap(
     categoryToConditionsMap,
   );
-  const { data: session } = useSession();
-  const router = useRouter();
-  const context = useContext(DataContext);
-  if (!context) {
-    throw new Error(
-      "DataContext is not provided. Ensure the component is wrapped in a DataProvider.",
-    );
-  }
-
-  const handleStartFromScratchClick = async (
-    event: React.MouseEvent<HTMLAnchorElement>,
-  ) => {
-    event.preventDefault();
-
-    if (!session?.user?.username || !queryName) return;
-
-    await saveQueryAndRedirect({
-      constructedQuery,
-      queryName,
-      username: session.user.username,
-      existingQueryId: context.selectedQuery?.queryId,
-      context,
-      router,
-    });
-  };
+  // add button for customLibrary redirect
+  const saveQueryAndRedirect = useSaveQueryAndRedirect();
 
   useEffect(() => {
     if (queryName == "" || queryName == undefined) {
@@ -103,7 +73,9 @@ export const ConditionSelection: React.FC<ConditionSelectionProps> = ({
           {/* TODO: link to "Select" mode of Code library page */}
           <a
             href="#"
-            onClick={handleStartFromScratchClick}
+            onClick={() =>
+              saveQueryAndRedirect(constructedQuery, "/codeLibrary")
+            }
             className={styles.startFromScratchLink}
           >
             start from scratch.
