@@ -49,198 +49,176 @@ const GONORRHEA_NAME = formatDiseaseDisplay(GONORRHEA_DETAILS.name);
 
 (getSavedQueryById as jest.Mock).mockResolvedValue(gonorrheaSavedQuery);
 
-describe("tests the build from template page interactions", () => {
-  it("customize query button is disabled unless name and individual condition are defined", async () => {
-    const { user } = renderWithUser(
-      <RootProviderMock currentPage={currentPage}>
-        <BuildFromTemplates
-          buildStep={"condition"}
-          setBuildStep={jest.fn}
-          selectedQuery={{
-            queryName: undefined,
-            queryId: undefined,
-          }}
-          setSelectedQuery={jest.fn}
-        />
-      </RootProviderMock>,
-    );
+it("customize query button is disabled unless name and individual condition are defined", async () => {
+  const { user } = renderWithUser(
+    <RootProviderMock
+      currentPage={currentPage}
+      initialQuery={{
+        queryName: undefined,
+        queryId: undefined,
+      }}
+    >
+      <BuildFromTemplates buildStep={"condition"} setBuildStep={jest.fn} />
+    </RootProviderMock>,
+  );
 
-    expect(screen.getByText("Customize query")).toBeDisabled();
+  expect(screen.getByText("Customize query")).toBeDisabled();
 
-    await user.type(screen.getByTestId("queryNameInput"), "some name");
-    await user.click(screen.getByLabelText(GONORRHEA_NAME));
+  await user.type(screen.getByTestId("queryNameInput"), "some name");
+  await user.click(screen.getByLabelText(GONORRHEA_NAME));
 
-    expect(screen.getByText("Customize query")).not.toBeDisabled();
+  expect(screen.getByText("Customize query")).not.toBeDisabled();
+});
+
+it("search filters by category and by condition name", async () => {
+  const { user } = renderWithUser(
+    <RootProviderMock
+      currentPage={currentPage}
+      initialQuery={{
+        queryName: undefined,
+        queryId: undefined,
+      }}
+    >
+      <BuildFromTemplates buildStep={"condition"} setBuildStep={jest.fn} />
+    </RootProviderMock>,
+  );
+
+  expect(await screen.findByText(GONORRHEA_NAME)).toBeInTheDocument();
+  expect(await screen.findByText("Cancer (Leukemia)")).toBeInTheDocument();
+  expect(
+    await screen.findByText("Malignant neoplastic disease"),
+  ).toBeInTheDocument();
+
+  // Name match
+  await user.type(
+    screen.getByPlaceholderText(CONDITION_DRAWER_SEARCH_PLACEHOLDER),
+    "leukemia",
+  );
+  expect(screen.getByText("Cancer (Leukemia)")).toBeInTheDocument();
+  expect(screen.queryByText(GONORRHEA_NAME)).not.toBeInTheDocument();
+  expect(
+    screen.queryByText("Malignant neoplastic disease"),
+  ).not.toBeInTheDocument();
+
+  // Category match
+  await user.clear(
+    screen.getByPlaceholderText(CONDITION_DRAWER_SEARCH_PLACEHOLDER),
+  );
+  await user.type(
+    screen.getByPlaceholderText(CONDITION_DRAWER_SEARCH_PLACEHOLDER),
+    "can",
+  );
+
+  expect(screen.getByText("Malignant neoplastic disease")).toBeInTheDocument();
+  expect(screen.getByText("Cancer (Leukemia)")).toBeInTheDocument();
+  expect(screen.queryByText(GONORRHEA_NAME)).not.toBeInTheDocument();
+});
+it("search filters reset properly", async () => {
+  const { user } = renderWithUser(
+    <RootProviderMock
+      currentPage={currentPage}
+      initialQuery={{
+        queryName: undefined,
+        queryId: undefined,
+      }}
+    >
+      <BuildFromTemplates buildStep={"condition"} setBuildStep={jest.fn} />
+    </RootProviderMock>,
+  );
+
+  expect(await screen.findByText(GONORRHEA_NAME)).toBeInTheDocument();
+  expect(await screen.findByText("Cancer (Leukemia)")).toBeInTheDocument();
+  expect(
+    await screen.findByText("Malignant neoplastic disease"),
+  ).toBeInTheDocument();
+
+  // "can" (2 matches) --> "an" (3 matches, Gonorrhea matched on Sexually Transmitted)
+  await user.type(
+    screen.getByPlaceholderText(CONDITION_DRAWER_SEARCH_PLACEHOLDER),
+    "can",
+  );
+  expect(screen.getByText("Cancer (Leukemia)")).toBeInTheDocument();
+  expect(screen.getByText("Malignant neoplastic disease")).toBeInTheDocument();
+  expect(screen.queryByText(GONORRHEA_NAME)).not.toBeInTheDocument();
+  await user.type(
+    screen.getByPlaceholderText(CONDITION_DRAWER_SEARCH_PLACEHOLDER),
+    "[ArrowLeft][ArrowLeft][Backspace]",
+  );
+  expect(screen.getByText(GONORRHEA_NAME)).toBeInTheDocument();
+  expect(screen.getByText("Cancer (Leukemia)")).toBeInTheDocument();
+  expect(screen.getByText("Malignant neoplastic disease")).toBeInTheDocument();
+  await user.clear(
+    screen.getByPlaceholderText(CONDITION_DRAWER_SEARCH_PLACEHOLDER),
+  );
+
+  // "can" (2 matches) --> "" (3 matches, testing the empty string case)
+  await user.type(
+    screen.getByPlaceholderText(CONDITION_DRAWER_SEARCH_PLACEHOLDER),
+    "can",
+  );
+  expect(screen.getByText("Cancer (Leukemia)")).toBeInTheDocument();
+  expect(screen.getByText("Malignant neoplastic disease")).toBeInTheDocument();
+  expect(screen.queryByText(GONORRHEA_NAME)).not.toBeInTheDocument();
+  await user.type(
+    screen.getByPlaceholderText(CONDITION_DRAWER_SEARCH_PLACEHOLDER),
+    "[Backspace][Backspace][Backspace]",
+  );
+  expect(screen.getByText(GONORRHEA_NAME)).toBeInTheDocument();
+  expect(screen.getByText("Cancer (Leukemia)")).toBeInTheDocument();
+  expect(screen.getByText("Malignant neoplastic disease")).toBeInTheDocument();
+  await user.clear(
+    screen.getByPlaceholderText(CONDITION_DRAWER_SEARCH_PLACEHOLDER),
+  );
+
+  // Reset state
+  await user.type(
+    screen.getByPlaceholderText(CONDITION_DRAWER_SEARCH_PLACEHOLDER),
+    "leuk",
+  );
+  await user.clear(
+    screen.getByPlaceholderText(CONDITION_DRAWER_SEARCH_PLACEHOLDER),
+  );
+  expect(screen.getByText(GONORRHEA_NAME)).toBeInTheDocument();
+  expect(screen.getByText("Cancer (Leukemia)")).toBeInTheDocument();
+  expect(screen.getByText("Malignant neoplastic disease")).toBeInTheDocument();
+});
+
+it("removes condition pill and unchecks checkbox when pill X is clicked", async () => {
+  const { user } = renderWithUser(
+    <RootProviderMock
+      currentPage={"/"}
+      initialQuery={{
+        queryName: "Test query",
+        queryId: undefined,
+      }}
+    >
+      <BuildFromTemplates buildStep="condition" setBuildStep={jest.fn} />
+    </RootProviderMock>,
+  );
+
+  const DISPLAY_NAME = formatDiseaseDisplay(GONORRHEA_DETAILS.name);
+
+  // Check the checkbox
+  await user.click(await screen.findByLabelText(DISPLAY_NAME));
+
+  // Expect pill to appear
+  const pillRegion = await screen.findByTestId("selected-pill-container");
+  expect(within(pillRegion).getByText(DISPLAY_NAME)).toBeInTheDocument();
+
+  // Click the pill's X button
+  const removeBtn = screen.getByRole("button", {
+    name: `Remove ${DISPLAY_NAME}`,
   });
+  await user.click(removeBtn);
 
-  it("search filters by category and by condition name", async () => {
-    const { user } = renderWithUser(
-      <RootProviderMock currentPage={currentPage}>
-        <BuildFromTemplates
-          buildStep={"condition"}
-          setBuildStep={jest.fn}
-          selectedQuery={{
-            queryName: undefined,
-            queryId: undefined,
-          }}
-          setSelectedQuery={jest.fn}
-        />
-      </RootProviderMock>,
-    );
+  // Checkbox should now be unchecked
+  expect(screen.getByLabelText(DISPLAY_NAME)).not.toBeChecked();
 
-    expect(await screen.findByText(GONORRHEA_NAME)).toBeInTheDocument();
-    expect(await screen.findByText("Cancer (Leukemia)")).toBeInTheDocument();
+  // Pill should be gone
+  await waitFor(() => {
     expect(
-      await screen.findByText("Malignant neoplastic disease"),
-    ).toBeInTheDocument();
-
-    // Name match
-    await user.type(
-      screen.getByPlaceholderText(CONDITION_DRAWER_SEARCH_PLACEHOLDER),
-      "leukemia",
-    );
-    expect(screen.getByText("Cancer (Leukemia)")).toBeInTheDocument();
-    expect(screen.queryByText(GONORRHEA_NAME)).not.toBeInTheDocument();
-    expect(
-      screen.queryByText("Malignant neoplastic disease"),
+      within(pillRegion).queryByText(DISPLAY_NAME),
     ).not.toBeInTheDocument();
-
-    // Category match
-    await user.clear(
-      screen.getByPlaceholderText(CONDITION_DRAWER_SEARCH_PLACEHOLDER),
-    );
-    await user.type(
-      screen.getByPlaceholderText(CONDITION_DRAWER_SEARCH_PLACEHOLDER),
-      "can",
-    );
-
-    expect(
-      screen.getByText("Malignant neoplastic disease"),
-    ).toBeInTheDocument();
-    expect(screen.getByText("Cancer (Leukemia)")).toBeInTheDocument();
-    expect(screen.queryByText(GONORRHEA_NAME)).not.toBeInTheDocument();
-  });
-  it("search filters reset properly", async () => {
-    const { user } = renderWithUser(
-      <RootProviderMock currentPage={currentPage}>
-        <BuildFromTemplates
-          buildStep={"condition"}
-          setBuildStep={jest.fn}
-          selectedQuery={{
-            queryName: undefined,
-            queryId: undefined,
-          }}
-          setSelectedQuery={jest.fn}
-        />
-      </RootProviderMock>,
-    );
-
-    expect(await screen.findByText(GONORRHEA_NAME)).toBeInTheDocument();
-    expect(await screen.findByText("Cancer (Leukemia)")).toBeInTheDocument();
-    expect(
-      await screen.findByText("Malignant neoplastic disease"),
-    ).toBeInTheDocument();
-
-    // "can" (2 matches) --> "an" (3 matches, Gonorrhea matched on Sexually Transmitted)
-    await user.type(
-      screen.getByPlaceholderText(CONDITION_DRAWER_SEARCH_PLACEHOLDER),
-      "can",
-    );
-    expect(screen.getByText("Cancer (Leukemia)")).toBeInTheDocument();
-    expect(
-      screen.getByText("Malignant neoplastic disease"),
-    ).toBeInTheDocument();
-    expect(screen.queryByText(GONORRHEA_NAME)).not.toBeInTheDocument();
-    await user.type(
-      screen.getByPlaceholderText(CONDITION_DRAWER_SEARCH_PLACEHOLDER),
-      "[ArrowLeft][ArrowLeft][Backspace]",
-    );
-    expect(screen.getByText(GONORRHEA_NAME)).toBeInTheDocument();
-    expect(screen.getByText("Cancer (Leukemia)")).toBeInTheDocument();
-    expect(
-      screen.getByText("Malignant neoplastic disease"),
-    ).toBeInTheDocument();
-    await user.clear(
-      screen.getByPlaceholderText(CONDITION_DRAWER_SEARCH_PLACEHOLDER),
-    );
-
-    // "can" (2 matches) --> "" (3 matches, testing the empty string case)
-    await user.type(
-      screen.getByPlaceholderText(CONDITION_DRAWER_SEARCH_PLACEHOLDER),
-      "can",
-    );
-    expect(screen.getByText("Cancer (Leukemia)")).toBeInTheDocument();
-    expect(
-      screen.getByText("Malignant neoplastic disease"),
-    ).toBeInTheDocument();
-    expect(screen.queryByText(GONORRHEA_NAME)).not.toBeInTheDocument();
-    await user.type(
-      screen.getByPlaceholderText(CONDITION_DRAWER_SEARCH_PLACEHOLDER),
-      "[Backspace][Backspace][Backspace]",
-    );
-    expect(screen.getByText(GONORRHEA_NAME)).toBeInTheDocument();
-    expect(screen.getByText("Cancer (Leukemia)")).toBeInTheDocument();
-    expect(
-      screen.getByText("Malignant neoplastic disease"),
-    ).toBeInTheDocument();
-    await user.clear(
-      screen.getByPlaceholderText(CONDITION_DRAWER_SEARCH_PLACEHOLDER),
-    );
-
-    // Reset state
-    await user.type(
-      screen.getByPlaceholderText(CONDITION_DRAWER_SEARCH_PLACEHOLDER),
-      "leuk",
-    );
-    await user.clear(
-      screen.getByPlaceholderText(CONDITION_DRAWER_SEARCH_PLACEHOLDER),
-    );
-    expect(screen.getByText(GONORRHEA_NAME)).toBeInTheDocument();
-    expect(screen.getByText("Cancer (Leukemia)")).toBeInTheDocument();
-    expect(
-      screen.getByText("Malignant neoplastic disease"),
-    ).toBeInTheDocument();
-  });
-
-  it("removes condition pill and unchecks checkbox when pill X is clicked", async () => {
-    const { user } = renderWithUser(
-      <RootProviderMock currentPage={"/"}>
-        <BuildFromTemplates
-          buildStep="condition"
-          setBuildStep={jest.fn}
-          selectedQuery={{
-            queryName: "Test query",
-            queryId: undefined,
-          }}
-          setSelectedQuery={jest.fn}
-        />
-      </RootProviderMock>,
-    );
-
-    const DISPLAY_NAME = formatDiseaseDisplay(GONORRHEA_DETAILS.name);
-
-    // Check the checkbox
-    await user.click(await screen.findByLabelText(DISPLAY_NAME));
-
-    // Expect pill to appear
-    const pillRegion = await screen.findByTestId("selected-pill-container");
-    expect(within(pillRegion).getByText(DISPLAY_NAME)).toBeInTheDocument();
-
-    // Click the pill's X button
-    const removeBtn = screen.getByRole("button", {
-      name: `Remove ${DISPLAY_NAME}`,
-    });
-    await user.click(removeBtn);
-
-    // Checkbox should now be unchecked
-    expect(screen.getByLabelText(DISPLAY_NAME)).not.toBeChecked();
-
-    // Pill should be gone
-    await waitFor(() => {
-      expect(
-        within(pillRegion).queryByText(DISPLAY_NAME),
-      ).not.toBeInTheDocument();
-    });
   });
 });
 
@@ -256,16 +234,14 @@ describe("tests the valueset selection page interactions", () => {
 
   beforeEach(async () => {
     render(
-      <RootProviderMock currentPage={currentPage}>
-        <BuildFromTemplates
-          buildStep={"valueset"}
-          setBuildStep={jest.fn}
-          selectedQuery={{
-            queryName: "Gonorrhea case investigation",
-            queryId: USE_CASE_DETAILS["gonorrhea"].id,
-          }}
-          setSelectedQuery={jest.fn}
-        />
+      <RootProviderMock
+        currentPage={currentPage}
+        initialQuery={{
+          queryName: "Gonorrhea case investigation",
+          queryId: USE_CASE_DETAILS["gonorrhea"].id,
+        }}
+      >
+        <BuildFromTemplates buildStep={"valueset"} setBuildStep={jest.fn} />
       </RootProviderMock>,
     );
 
@@ -462,16 +438,14 @@ describe("custom value set behavior", () => {
     (getSavedQueryById as jest.Mock).mockResolvedValueOnce(emptyCustomQuery);
 
     const { user } = renderWithUser(
-      <RootProviderMock currentPage={currentPage}>
-        <BuildFromTemplates
-          buildStep="valueset"
-          setBuildStep={jest.fn}
-          selectedQuery={{
-            queryName: emptyCustomQuery.queryName,
-            queryId: emptyCustomQuery.queryId,
-          }}
-          setSelectedQuery={jest.fn}
-        />
+      <RootProviderMock
+        currentPage={currentPage}
+        initialQuery={{
+          queryName: emptyCustomQuery.queryName,
+          queryId: emptyCustomQuery.queryId,
+        }}
+      >
+        <BuildFromTemplates buildStep="valueset" setBuildStep={jest.fn} />
       </RootProviderMock>,
     );
 
@@ -504,16 +478,14 @@ describe("custom value set behavior", () => {
     (getSavedQueryById as jest.Mock).mockResolvedValueOnce(customQueryWithData);
 
     const { user } = renderWithUser(
-      <RootProviderMock currentPage={currentPage}>
-        <BuildFromTemplates
-          buildStep="valueset"
-          setBuildStep={jest.fn}
-          selectedQuery={{
-            queryName: customQueryWithData.queryName,
-            queryId: customQueryWithData.queryId,
-          }}
-          setSelectedQuery={jest.fn}
-        />
+      <RootProviderMock
+        currentPage={currentPage}
+        initialQuery={{
+          queryName: customQueryWithData.queryName,
+          queryId: customQueryWithData.queryId,
+        }}
+      >
+        <BuildFromTemplates buildStep="valueset" setBuildStep={jest.fn} />
       </RootProviderMock>,
     );
 
