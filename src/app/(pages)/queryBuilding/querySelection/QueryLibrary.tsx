@@ -11,7 +11,13 @@ import Table from "@/app/ui/designSystem/table/Table";
 import { ModalRef } from "@/app/ui/designSystem/modal/Modal";
 import styles from "./querySelection.module.scss";
 import { BuildStep } from "@/app/shared/constants";
-import { renderModal, confirmDelete, handleCopy } from "./utils";
+import {
+  renderModal,
+  handleDelete,
+  SelectedQueryDetails,
+  confirmDelete,
+  handleCopy,
+} from "./utils";
 import { DataContext } from "@/app/shared/DataProvider";
 import classNames from "classnames";
 import { getConditionsData } from "@/app/shared/database-service";
@@ -56,6 +62,11 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
     setBuildStep("valueset");
   };
 
+  const [deletedQuery, setdeletedQuery] = useState<SelectedQueryDetails>({
+    queryName: undefined,
+    queryId: undefined,
+  });
+
   useEffect(() => {
     let isSubscribed = true;
 
@@ -75,7 +86,15 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
 
   return (
     <div>
-      {renderModal(modalRef, queries, setQueries)}
+      {renderModal(
+        modalRef,
+        deletedQuery,
+        handleDelete,
+        queries,
+        setQueries,
+        queryContext,
+        setdeletedQuery,
+      )}{" "}
       <div className="display-flex flex-justify-between flex-align-center width-full margin-bottom-4">
         <h1 className="flex-align-center margin-0">Query Library</h1>
         <div className="margin-left-auto">
@@ -165,6 +184,7 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
                           confirmDelete(
                             query.queryName,
                             query.queryId,
+                            setdeletedQuery,
                             modalRef,
                           )
                         }
