@@ -33,9 +33,10 @@ jest.mock("../../../backend/query-building/service", () => ({
   getSavedQueryById: jest.fn(),
 }));
 
+const mockPush = jest.fn();
 jest.mock("next/navigation", () => ({
   useRouter: () => ({
-    push: jest.fn(),
+    push: mockPush,
     prefetch: jest.fn(),
   }),
 }));

@@ -126,11 +126,6 @@ export function camelCaseDbColumnNames<T extends Record<string, unknown>>(
     (...args: any[]) => Promise<QueryResult<any>>
   >,
 ) {
-  console.log(
-    "Debug: descriptor for decorator that is breaking:",
-    key,
-    descriptor,
-  );
   const method = descriptor.value;
 
   descriptor.value = async function (
