@@ -19,7 +19,7 @@ export const handleDelete = async (
   queryId: string | undefined,
   queries: CustomUserQuery[],
   setQueries: React.Dispatch<React.SetStateAction<CustomUserQuery[]>>,
-  context: DataContextValue,
+  context: DataContextValue | undefined,
 ) => {
   if (queryId) {
     const result = await deleteQueryById(queryId);
@@ -106,7 +106,7 @@ export const renderModal = (
     queryId: string | undefined,
     queries: CustomUserQuery[],
     setQueries: React.Dispatch<React.SetStateAction<CustomUserQuery[]>>,
-    context: DataContextValue,
+    context: DataContextValue | undefined,
   ) => void,
   queries: CustomUserQuery[],
   setQueries: React.Dispatch<React.SetStateAction<CustomUserQuery[]>>,

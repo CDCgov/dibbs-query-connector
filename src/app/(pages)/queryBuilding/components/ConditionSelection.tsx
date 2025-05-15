@@ -73,13 +73,14 @@ export const ConditionSelection: React.FC<ConditionSelectionProps> = ({
           {/* TODO: link to "Select" mode of Code library page */}
           <a
             href="#"
-            onClick={() =>
-              saveQueryAndRedirect(constructedQuery, "/codeLibrary")
-            }
+            onClick={(e) => {
+              e.preventDefault();
+              saveQueryAndRedirect(constructedQuery, "/codeLibrary");
+            }}
             className={styles.startFromScratchLink}
           >
             start from scratch.
-          </a>
+          </a>{" "}
         </p>
       </div>
       <div className={classNames(styles.conditionSelectionForm, "radius-lg")}>

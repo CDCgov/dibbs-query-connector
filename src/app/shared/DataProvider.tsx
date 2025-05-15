@@ -65,7 +65,7 @@ export function DataProvider({
         setToastConfig,
         runtimeConfig,
         selectedQuery,
-        setSelectedQuery,
+        setSelectedQuery: (q) => setSelectedQuery(structuredClone(q)),
       }}
     >
       <SessionProvider

@@ -21,6 +21,7 @@ import {
   CategoryToConditionArrayMap,
   ConditionsMap,
   EMPTY_CONCEPT_TYPE,
+  EMPTY_QUERY_SELECTION,
 } from "../utils";
 import { ConditionSelection } from "../components/ConditionSelection";
 import { ValueSetSelection } from "../components/ValueSetSelection";
@@ -81,7 +82,7 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
   const focusRef = useRef<HTMLInputElement | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [queryName, setQueryName] = useState<string | undefined>(
-    selectedQuery.queryName,
+    structuredClone(selectedQuery.queryName),
   );
   const [categoryToConditionMap, setCategoryToConditionMap] =
     useState<CategoryToConditionArrayMap>();
@@ -97,11 +98,8 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
 
   function resetQueryState() {
     setQueryName(undefined);
-    setSelectedQuery({
-      queryId: undefined,
-      queryName: undefined,
-    });
-    setConstructedQuery({});
+    setSelectedQuery(structuredClone(EMPTY_QUERY_SELECTION));
+    setConstructedQuery(structuredClone({}));
   }
 
   function goBack() {
@@ -141,7 +139,7 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
       );
 
       if (isSubscribed) {
-        setConstructedQuery(initialState);
+        setConstructedQuery(structuredClone(initialState));
       }
 
       setFormError((prevError) => {
@@ -273,10 +271,12 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
           throw "Result status not returned";
         }
 
-        setSelectedQuery({
-          queryId: results[0].id,
-          queryName,
-        });
+        setSelectedQuery(
+          structuredClone({
+            queryId: results[0].id,
+            queryName,
+          }),
+        );
 
         const queries = await getCustomQueries();
         queriesContext?.setData(queries);

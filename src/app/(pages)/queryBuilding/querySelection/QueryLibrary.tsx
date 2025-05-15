@@ -18,7 +18,7 @@ import {
   confirmDelete,
   handleCopy,
 } from "./utils";
-import { DataContext } from "@/app/shared/DataProvider";
+import { DataContext, DataContextValue } from "@/app/shared/DataProvider";
 import classNames from "classnames";
 import { getConditionsData } from "@/app/shared/database-service";
 import { ConditionsMap } from "../utils";
@@ -27,6 +27,7 @@ import {
   CUSTOM_CONDITION_NAME,
   CUSTOM_VALUESET_ARRAY_ID,
 } from "@/app/shared/constants";
+import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 
 interface UserQueriesDisplayProps {
   queries: CustomUserQuery[];
@@ -45,10 +46,7 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
   queries: initialQueries,
   setBuildStep,
 }) => {
-  const queryContext = useContext(DataContext);
-  if (!queryContext?.setSelectedQuery) {
-    throw new Error("MyQueriesDisplay must be used within a DataProvider");
-  }
+  const queryContext = useContext(DataContext) || ({} as DataContextValue);
 
   const [queries, setQueries] = useState<CustomUserQuery[]>(initialQueries);
   const [conditionIdToDetailsMap, setConditionIdToDetailsMap] =
@@ -56,13 +54,24 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
   const modalRef = useRef<ModalRef>(null);
 
   const handleEdit = (queryName: string, queryId: string) => {
-    if (queryContext.setSelectedQuery) {
+    try {
+      if (!queryContext?.setSelectedQuery) {
+        throw new Error("Missing DataContext or setSelectedQuery");
+      }
+
       queryContext.setSelectedQuery({ queryName, queryId });
+      setBuildStep("valueset");
+    } catch (err) {
+      console.error("Failed to handle edit:", err);
+      showToastConfirmation({
+        heading: "Something went wrong",
+        body: `Unable to edit the query. Please refresh the page or try again.`,
+        variant: "error",
+      });
     }
-    setBuildStep("valueset");
   };
 
-  const [deletedQuery, setdeletedQuery] = useState<SelectedQueryDetails>({
+  const [deletedQuery, setDeletedQuery] = useState<SelectedQueryDetails>({
     queryName: undefined,
     queryId: undefined,
   });
@@ -93,7 +102,7 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
         queries,
         setQueries,
         queryContext,
-        setdeletedQuery,
+        setDeletedQuery,
       )}{" "}
       <div className="display-flex flex-justify-between flex-align-center width-full margin-bottom-4">
         <h1 className="flex-align-center margin-0">Query Library</h1>
@@ -185,7 +194,7 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
                           confirmDelete(
                             query.queryName,
                             query.queryId,
-                            setdeletedQuery,
+                            setDeletedQuery,
                             modalRef,
                           )
                         }
