@@ -36,12 +36,12 @@ const NoQueriesDisplay: React.FC<NoQueriesDisplayProps> = ({ userRole }) => {
       <Icon.Info aria-label="Icon" size={3} className="icon-primary" />
       <div className="margin-left-2">
         <h4 className="text-italic margin-y-0 text-normal">
-          Looks like there are no queries available
+          It looks like there are no queries available.
         </h4>
         <p className="margin-0">
           {userRole === UserRole.STANDARD
-            ? `Get started by contacting an admin: ${adminNames.join(", ")}`
-            : "Build your first query to get started"}
+            ? `Get started by contacting an admin: ${adminNames.join(", ")}.`
+            : "You can head to the query library to build the query."}
         </p>
 
         {userRole === UserRole.ADMIN || userRole === UserRole.SUPER_ADMIN ? (
