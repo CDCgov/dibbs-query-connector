@@ -31,7 +31,7 @@ import {
   ConceptTypeToDibbsVsMap,
 } from "@/app/utils/valueSetTranslation";
 import { CUSTOM_VALUESET_ARRAY_ID } from "@/app/shared/constants";
-import { useSaveQueryAndRedirect } from "./useSaveQueryAndRedirect";
+import { useSaveQueryAndRedirect } from "../../../backend/query-building/useSaveQueryAndRedirect";
 
 type ConditionSelectionProps = {
   constructedQuery: NestedQuery;

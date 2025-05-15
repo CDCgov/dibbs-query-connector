@@ -10,7 +10,7 @@ import { FormError } from "../buildFromTemplates/BuildFromTemplates";
 import { CONDITION_DRAWER_SEARCH_PLACEHOLDER } from "./utils";
 import { formatDiseaseDisplay, formatCategoryToConditionsMap } from "../utils";
 import { CUSTOM_CONDITION_ID } from "@/app/shared/constants";
-import { useSaveQueryAndRedirect } from "./useSaveQueryAndRedirect";
+import { useSaveQueryAndRedirect } from "../../../backend/query-building/useSaveQueryAndRedirect";
 
 type ConditionSelectionProps = {
   categoryToConditionsMap: CategoryToConditionArrayMap;
