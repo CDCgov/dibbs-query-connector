@@ -5,7 +5,7 @@ import { isAuthDisabledServerCheck } from "./app/utils/auth";
 import { UserRole } from "./app/models/entities/users";
 import NextAuth from "next-auth";
 import { logSignInToAuditTable } from "./app/backend/session-management";
-
+import { decodeJwt } from "jose";
 function addRealm(url: string) {
   return url.endsWith("/realms/master") ? url : `${url}/realms/master`;
 }
@@ -76,8 +76,21 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
      * @param token.profile The user profile returned from Keycloak.
      * @returns The updated JWT token with user details.
      */
-    async jwt({ token, profile }) {
+    async jwt({ token, profile, account }) {
       const now = Math.floor(Date.now() / 1000);
+      if (account?.access_token) {
+        let decodedToken = decodeJwt(account?.access_token);
+        console.log(decodedToken);
+        if (
+          decodedToken &&
+          typeof decodedToken !== "string" &&
+          decodedToken?.realm_access
+        ) {
+          // keycloak
+          const roles = decodedToken?.realm_access as Record<string, string>;
+          console.log("Includes admin: ", roles?.roles?.includes("admin"));
+        }
+      }
 
       if (profile) {
         const userToken = {
