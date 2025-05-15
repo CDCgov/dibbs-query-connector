@@ -5,6 +5,7 @@ import {
   getUserRole,
   getUserByUsername,
   updateUserDetails,
+  getAllAdmins,
 } from "@/app/backend/user-management";
 
 import {
@@ -33,7 +34,7 @@ const TEST_USER_STANDARD = {
   email: "green.yoshi@yoshiisland.com",
   firstName: "Green",
   lastName: "Yoshi",
-  qcRole: "Standard",
+  qcRole: UserRole.STANDARD,
 };
 
 const TEST_USER_SUPER = {
@@ -42,7 +43,7 @@ const TEST_USER_SUPER = {
   email: "luigi.mario@mushroomkingdom.com",
   firstName: "Lugi",
   lastName: "Mario",
-  qcRole: "Super Admin",
+  qcRole: UserRole.SUPER_ADMIN,
 };
 
 describe("User Management Integration Tests", () => {
@@ -152,7 +153,12 @@ describe("User Management Integration Tests", () => {
    */
   test("should retrieve all users", async () => {
     const result = await getAllUsers();
-    expect(result.totalItems).toBeGreaterThan(0);
+    expect(result.items.includes(TEST_USER_STANDARD));
+    expect(result.items.includes(TEST_USER_SUPER));
+
+    const adminResults = await getAllAdmins();
+    expect(adminResults.includes(TEST_USER_SUPER));
+    expect(!adminResults.includes(TEST_USER_STANDARD));
   });
 });
 
