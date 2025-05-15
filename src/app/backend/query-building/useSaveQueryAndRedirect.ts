@@ -9,7 +9,7 @@ import {
   saveCustomQuery,
   getCustomQueries,
 } from "@/app/backend/query-building/service";
-import { NestedQuery } from "../../(pages)/queryBuilding/utils";
+import { NestedQuery } from "@/app/(pages)/queryBuilding/utils";
 
 /**
  * Hook to save a custom query and redirect to a specified page.
