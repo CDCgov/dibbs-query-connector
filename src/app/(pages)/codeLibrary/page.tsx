@@ -36,6 +36,7 @@ import { getUserByUsername } from "@/app/backend/user-management";
 import { deleteCustomValueSet } from "@/app/shared/custom-code-service";
 import dynamic from "next/dynamic";
 import type { ModalProps, ModalRef } from "../../ui/designSystem/modal/Modal";
+import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 
 /**
  * Component for Query Building Flow
@@ -313,11 +314,21 @@ const CodeLibrary: React.FC = () => {
         await fetchValueSetsAndConditions();
         setFilterSearch(emptyFilterSearch);
         setTextSearch("");
+        showToastConfirmation({
+          body: `Value set "${activeValueSet.valueSetName}" successfully deleted.`,
+        });
       } else {
-        console.log("oh now");
+        showToastConfirmation({
+          variant: "error",
+          body: `Error: Could not remove value set "${activeValueSet.valueSetName}"`,
+        });
       }
     } catch (e) {
       console.error(e);
+      showToastConfirmation({
+        variant: "error",
+        body: `Error: Could not remove value set "${activeValueSet.valueSetName}"`,
+      });
     } finally {
       modalRef.current?.toggleModal();
       setLoading(false);
