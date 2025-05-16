@@ -1,6 +1,9 @@
+import { useState } from "react";
 import { DataContext, DataContextValue } from "../../shared/DataProvider";
 import { render } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { SelectedQueryDetails } from "@/app/(pages)/queryBuilding/querySelection/utils";
+import { EMPTY_QUERY_SELECTION } from "@/app/(pages)/queryBuilding/utils";
 
 // setup function
 export function renderWithUser(children: React.ReactElement) {
@@ -20,6 +23,7 @@ interface RootProviderMockProps extends React.PropsWithChildren {
   toastConfig?: unknown;
   setToastConfig?: jest.Mock;
   runtimeConfig?: Record<string, string>;
+  initialQuery?: SelectedQueryDetails;
 }
 
 export const RootProviderMock: React.FC<RootProviderMockProps> = ({
@@ -31,7 +35,12 @@ export const RootProviderMock: React.FC<RootProviderMockProps> = ({
   toastConfig,
   setToastConfig,
   runtimeConfig,
+  initialQuery,
 }) => {
+  const [selectedQuery, setSelectedQuery] = useState<SelectedQueryDetails>(
+    initialQuery ?? EMPTY_QUERY_SELECTION,
+  );
+
   const mockContextValue: DataContextValue = {
     data: data,
     setData: setData || jest.fn(),
@@ -40,6 +49,8 @@ export const RootProviderMock: React.FC<RootProviderMockProps> = ({
     toastConfig: toastConfig || {},
     setToastConfig: setToastConfig || jest.fn(),
     runtimeConfig: runtimeConfig || { AUTH_DISABLED: "true" },
+    selectedQuery,
+    setSelectedQuery,
   };
 
   return (
