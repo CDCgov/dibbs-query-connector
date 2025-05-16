@@ -24,7 +24,7 @@ import {
   formatCodeSystemPrefix,
   formatStringToSentenceCase,
 } from "@/app/shared/format-service";
-import { CodeSystemOptions, CustomCodeMode } from "../utils";
+import { CodeSystemOptions, CustomCodeMode, emptyValueSet } from "../utils";
 import Skeleton from "react-loading-skeleton";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import { groupConditionConceptsIntoValueSets } from "@/app/shared/utils";
@@ -133,7 +133,6 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
       customValueSet.concepts.map((code, idx) => {
         codeMap[idx] = code;
       });
-
       setCodesMap({ ...codeMap });
     }
 
@@ -317,6 +316,7 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
         ...customValueSet,
         concepts: storedConcepts,
       };
+
       const result = await insertCustomValueSet(
         newCustomValueSet as DibbsValueSet,
         currentUser?.id as string,
@@ -339,6 +339,7 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
         variant: "error",
         body: `Unable to dalue set "${customValueSet.valueSetName}". Please try again later.`,
       });
+
       console.log(error);
     } finally {
       setSaving(false);
@@ -465,6 +466,7 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
                   styles.formSection__input,
                   styles.dropdown,
                   !!error.system ? styles.formValidationError : "",
+
                 )}
               >
                 <label htmlFor="code-system">Code system (Required)</label>
@@ -478,7 +480,6 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
                   onChange={(e) => {
                     e.preventDefault();
                     setError({ ...error, system: false });
-
                     setCustomValueSet({
                       ...customValueSet,
                       system: e.target.value,
@@ -559,26 +560,3 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
 };
 
 export default CustomValueSetForm;
-
-// type vsErrors = {
-//   [property: string]: boolean;
-// };
-// const [error, setError] = useState<vsErrors>({
-//   valueSetName: false,
-//   system: false,
-//   dibbsConceptType: false,
-// });
-// function validateInput(
-//   field: string,
-//   input: string | boolean | Concept[] | undefined,
-// ) {
-//   if (input == "") {
-//     console.log("then why arent we setting it here", field);
-//     setError({
-//       ...error,
-//       [field]: true,
-//     });
-
-//     return setError({ ...error, [field]: true });
-//   }
-// }

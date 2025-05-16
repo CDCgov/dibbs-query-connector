@@ -31,6 +31,9 @@ import {
   ConceptTypeToDibbsVsMap,
 } from "@/app/utils/valueSetTranslation";
 import { CUSTOM_VALUESET_ARRAY_ID } from "@/app/shared/constants";
+import { useSaveQueryAndRedirect } from "../../../backend/query-building/useSaveQueryAndRedirect";
+import { useContext } from "react";
+import { DataContext } from "@/app/shared/DataProvider";
 
 type ConditionSelectionProps = {
   constructedQuery: NestedQuery;
@@ -69,6 +72,9 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
     );
   const [conditionSearchFilter, setConditionSearchFilter] = useState("");
   const [valueSetSearchFilter, setValueSetSearchFilter] = useState("");
+
+  const queryContext = useContext(DataContext);
+  const queryName = queryContext?.selectedQuery?.queryName;
 
   useEffect(() => {
     // display the first condition's valuesets on render
@@ -186,6 +192,9 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
   const hasCustomValueSets = Object.values(activeConditionValueSets ?? {}).some(
     (vsMap) => Object.keys(vsMap).length > 0,
   );
+
+  // add button for customLibrary redirect
+  const saveQueryAndRedirect = useSaveQueryAndRedirect();
 
   return (
     <div
@@ -313,9 +322,13 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
                   <Button
                     type="button"
                     outline
-                    onClick={() => {
-                      window.location.href = "/codeLibrary";
-                    }}
+                    onClick={() =>
+                      saveQueryAndRedirect(
+                        constructedQuery,
+                        queryName,
+                        "/codeLibrary",
+                      )
+                    }
                   >
                     Add from code library
                   </Button>
@@ -356,7 +369,17 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
                   have created in the code library.
                 </strong>
               </p>
-              <Button className={styles.codeLibrary__button} type="button">
+              <Button
+                className={styles.codeLibrary__button}
+                type="button"
+                onClick={() =>
+                  saveQueryAndRedirect(
+                    constructedQuery,
+                    queryName,
+                    "/codeLibrary",
+                  )
+                }
+              >
                 Add from code library
               </Button>
             </div>
