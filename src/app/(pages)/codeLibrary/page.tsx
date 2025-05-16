@@ -309,7 +309,7 @@ const CodeLibrary: React.FC = () => {
     setLoading(true);
     try {
       const result = await deleteCustomValueSet(activeValueSet);
-      console.log(result);
+
       if (result.success) {
         await fetchValueSetsAndConditions();
         setFilterSearch(emptyFilterSearch);

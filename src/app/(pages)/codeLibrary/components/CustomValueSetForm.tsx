@@ -182,7 +182,7 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
   const handleRemoveCode = async (index: string) => {
     const subjectCode = codesMap[index];
     const updatedCodes = { ...codesMap };
-    console.log(codesMap);
+
     if (!!customValueSet) {
       // remove empty codes
       const storedConcepts = Object.values(codesMap).filter(
@@ -220,7 +220,6 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
           // re-map index keys so we always start with 0
           const newCodes: CustomCodeMap = {};
           Object.values(updatedCodes).map((code, idx) => {
-            console.log(idx);
             newCodes[idx] = code;
           });
           return setCodesMap(newCodes);
@@ -340,7 +339,7 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
         body: `Unable to dalue set "${customValueSet.valueSetName}". Please try again later.`,
       });
 
-      console.log(error);
+      console.error(error);
     } finally {
       setSaving(false);
       // don't stay in "create" mode, or we'll make duplicate
