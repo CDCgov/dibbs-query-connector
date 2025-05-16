@@ -2,38 +2,35 @@ import React, {
   useState,
   useContext,
   useRef,
+  useEffect,
   Dispatch,
   SetStateAction,
-  useEffect,
 } from "react";
 import { Button, Icon } from "@trussworks/react-uswds";
 import Table from "@/app/ui/designSystem/table/Table";
 import { ModalRef } from "@/app/ui/designSystem/modal/Modal";
 import styles from "./querySelection.module.scss";
-
 import { BuildStep } from "@/app/shared/constants";
 import {
-  SelectedQueryState,
   renderModal,
   handleDelete,
+  SelectedQueryDetails,
   confirmDelete,
   handleCopy,
-  SelectedQueryDetails,
 } from "./utils";
-import { DataContext } from "@/app/shared/DataProvider";
+import { DataContext, DataContextValue } from "@/app/shared/DataProvider";
 import classNames from "classnames";
 import { getConditionsData } from "@/app/shared/database-service";
-import { ConditionsMap } from "../utils";
+import { ConditionsMap, EMPTY_QUERY_SELECTION } from "../utils";
 import { CustomUserQuery } from "@/app/models/entities/query";
 import {
   CUSTOM_CONDITION_NAME,
   CUSTOM_VALUESET_ARRAY_ID,
 } from "@/app/shared/constants";
+import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 
 interface UserQueriesDisplayProps {
   queries: CustomUserQuery[];
-  selectedQuery: SelectedQueryState;
-  setSelectedQuery: Dispatch<SetStateAction<SelectedQueryDetails>>;
   setBuildStep: Dispatch<SetStateAction<BuildStep>>;
 }
 
@@ -41,31 +38,43 @@ interface UserQueriesDisplayProps {
  * Component for query building when user-generated queries already exist
  * @param root0 - The props object.
  * @param root0.queries - Array of user-generated queries to display.
- * @param root0.selectedQuery - the query object we're building
  * @param root0.setBuildStep - setter function to progress the stage of the query
  * building flow
- * @param root0.setSelectedQuery - setter function to update the query for editing
  * @returns the UserQueriesDisplay to render the queries with edit/delete options
  */
 export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
   queries: initialQueries,
-  selectedQuery,
-  setSelectedQuery,
   setBuildStep,
 }) => {
-  const queriesContext = useContext(DataContext);
+  const queryContext = useContext(DataContext) || ({} as DataContextValue);
+
   const [queries, setQueries] = useState<CustomUserQuery[]>(initialQueries);
   const [conditionIdToDetailsMap, setConditionIdToDetailsMap] =
     useState<ConditionsMap>();
-
   const modalRef = useRef<ModalRef>(null);
+
   const handleEdit = (queryName: string, queryId: string) => {
-    setSelectedQuery({
-      queryName: queryName,
-      queryId: queryId,
-    });
-    setBuildStep("valueset");
+    try {
+      if (!queryContext?.setSelectedQuery) {
+        throw new Error("Missing DataContext or setSelectedQuery");
+      }
+
+      queryContext.setSelectedQuery({ queryName, queryId });
+      setBuildStep("valueset");
+    } catch (err) {
+      console.error("Failed to handle edit:", err);
+      showToastConfirmation({
+        heading: "Something went wrong",
+        body: `Unable to edit the query. Please refresh the page or try again.`,
+        variant: "error",
+      });
+    }
   };
+
+  const [deletedQuery, setDeletedQuery] = useState<SelectedQueryDetails>({
+    queryName: undefined,
+    queryId: undefined,
+  });
 
   useEffect(() => {
     let isSubscribed = true;
@@ -86,21 +95,26 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
 
   return (
     <div>
-      {queriesContext &&
-        renderModal(
-          modalRef,
-          selectedQuery,
-          handleDelete,
-          queries,
-          setQueries,
-          queriesContext,
-          setSelectedQuery,
-        )}
+      {renderModal(
+        modalRef,
+        deletedQuery,
+        handleDelete,
+        queries,
+        setQueries,
+        queryContext,
+        setDeletedQuery,
+      )}{" "}
       <div className="display-flex flex-justify-between flex-align-center width-full margin-bottom-4">
         <h1 className="flex-align-center margin-0">Query Library</h1>
         <div className="margin-left-auto">
           <Button
-            onClick={() => setBuildStep("condition")}
+            onClick={() => {
+              setBuildStep("condition");
+              queryContext?.setSelectedQuery?.(
+                structuredClone(EMPTY_QUERY_SELECTION),
+              );
+              queryContext?.setData?.(null);
+            }}
             className={styles.createQueryButton}
             type="button"
           >
@@ -166,6 +180,7 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
                       <Button
                         type="button"
                         className="usa-button--unstyled text-bold text-no-underline"
+                        data-testid={`edit-query-${query.queryId}`}
                         onClick={() =>
                           handleEdit(query.queryName, query.queryId)
                         }
@@ -175,12 +190,7 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
                             className="height-3 width-3"
                             aria-label="Pencil icon indicating edit ability"
                           />
-                          <span
-                            data-testid={`edit-query-${query.queryId}`}
-                            className="padding-left-05"
-                          >
-                            Edit
-                          </span>
+                          <span className="padding-left-05">Edit</span>
                         </span>
                       </Button>
                       <Button
@@ -190,7 +200,7 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
                           confirmDelete(
                             query.queryName,
                             query.queryId,
-                            setSelectedQuery,
+                            setDeletedQuery,
                             modalRef,
                           )
                         }
@@ -209,7 +219,6 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
                         onClick={() =>
                           handleCopy(query.queryName, query.queryId)
                         }
-                        data-testid={`copy-${query.queryId}`}
                       >
                         <span className="icon-text padding-right-1 display-flex flex-align-center">
                           <Icon.ContentCopy

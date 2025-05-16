@@ -11,7 +11,6 @@ import {
 import { useSession } from "next-auth/react";
 import EmptyQueriesDisplay from "./EmptyQueriesDisplay";
 import MyQueriesDisplay from "./QueryLibrary";
-import { SelectedQueryDetails, SelectedQueryState } from "./utils";
 import { BuildStep } from "@/app/shared/constants";
 import { DataContext } from "@/app/shared/DataProvider";
 import { CustomUserQuery } from "@/app/models/entities/query";
@@ -27,25 +26,17 @@ import { User, UserRole } from "@/app/models/entities/users";
 import { isAuthDisabledClientCheck } from "@/app/utils/auth";
 
 type QuerySelectionProps = {
-  selectedQuery: SelectedQueryState;
   setBuildStep: Dispatch<SetStateAction<BuildStep>>;
-  setSelectedQuery: Dispatch<SetStateAction<SelectedQueryDetails>>;
 };
 
 /**
  * Component for Query Building Flow
  * @param root0 - params
- * @param root0.selectedQuery - the query object we're building
  * @param root0.setBuildStep - setter function to progress the stage of the query
  * building flow
- * @param root0.setSelectedQuery - setter function to update the query for editing
  * @returns The Query Building component flow
  */
-const QuerySelection: React.FC<QuerySelectionProps> = ({
-  selectedQuery,
-  setBuildStep,
-  setSelectedQuery,
-}) => {
+const QuerySelection: React.FC<QuerySelectionProps> = ({ setBuildStep }) => {
   const { data: session } = useSession();
   const username = session?.user?.username || "";
   const userRole = getRole();
@@ -135,12 +126,7 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({
         </div>
       ) : (
         <div className="main-container__wide">
-          <MyQueriesDisplay
-            queries={queries}
-            selectedQuery={selectedQuery}
-            setSelectedQuery={setSelectedQuery}
-            setBuildStep={setBuildStep}
-          />
+          <MyQueriesDisplay queries={queries} setBuildStep={setBuildStep} />
         </div>
       )}
     </>

@@ -9,8 +9,8 @@ import SearchField from "@/app/ui/designSystem/searchField/SearchField";
 import { FormError } from "../buildFromTemplates/BuildFromTemplates";
 import { CONDITION_DRAWER_SEARCH_PLACEHOLDER } from "./utils";
 import { formatDiseaseDisplay, formatCategoryToConditionsMap } from "../utils";
-import Link from "next/link";
 import { CUSTOM_CONDITION_ID } from "@/app/shared/constants";
+import { useSaveQueryAndRedirect } from "../../../backend/query-building/useSaveQueryAndRedirect";
 
 type ConditionSelectionProps = {
   categoryToConditionsMap: CategoryToConditionArrayMap;
@@ -50,6 +50,8 @@ export const ConditionSelection: React.FC<ConditionSelectionProps> = ({
   const filteredCategoryMap = formatCategoryToConditionsMap(
     categoryToConditionsMap,
   );
+  // add button for customLibrary redirect
+  const saveQueryAndRedirect = useSaveQueryAndRedirect();
 
   useEffect(() => {
     if (queryName == "" || queryName == undefined) {
@@ -69,9 +71,15 @@ export const ConditionSelection: React.FC<ConditionSelectionProps> = ({
         <p>
           Don't see what you're looking for? You can also{" "}
           {/* TODO: link to "Select" mode of Code library page */}
-          <Link href={""} title={""} className={styles.startFromScratchLink}>
+          <a
+            href="#"
+            onClick={() => {
+              saveQueryAndRedirect(constructedQuery, queryName, "/codeLibrary");
+            }}
+            className={styles.startFromScratchLink}
+          >
             start from scratch.
-          </Link>
+          </a>{" "}
         </p>
       </div>
       <div className={classNames(styles.conditionSelectionForm, "radius-lg")}>

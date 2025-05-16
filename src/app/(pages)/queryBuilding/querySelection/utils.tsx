@@ -34,7 +34,7 @@ export const handleDelete = async (
       );
       setQueries(updatedQueries);
 
-      if (context) {
+      if (context?.setData) {
         context.setData(updatedQueries);
       }
     } else {
@@ -111,7 +111,7 @@ export const renderModal = (
     queryId: string | undefined,
     queries: CustomUserQuery[],
     setQueries: React.Dispatch<React.SetStateAction<CustomUserQuery[]>>,
-    context: DataContextValue,
+    context: DataContextValue | undefined,
   ) => void,
   queries: CustomUserQuery[],
   setQueries: React.Dispatch<React.SetStateAction<CustomUserQuery[]>>,
@@ -134,7 +134,6 @@ export const renderModal = (
             setQueries,
             context,
           );
-
           setSelectedQuery({ queryName: undefined, queryId: undefined });
         }
       }}
