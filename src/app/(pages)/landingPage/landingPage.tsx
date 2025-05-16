@@ -47,9 +47,11 @@ const LandingPage: React.FC<LandingPageProps> = ({ isLoggedIn }) => {
       {determiningRedirectStatus ? (
         <div className="margin-1">Redirecting...</div>
       ) : (
-        <div className="main-body display-flex flex-column flex-justify-center">
-          <div className="gradient-blue-background flex-1">
-            <div className="container">
+        <div
+          className={`"main-body display-flex flex-column flex-justify-center`}
+        >
+          <div className={styles.heroBackground}>
+            <div className={styles.heroContainer}>
               <div className="text-holder">
                 <h1 className={styles.pageSubtitle}>
                   Data collection made easier
@@ -70,6 +72,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ isLoggedIn }) => {
                   </button>
                 }
               </div>
+
               <Image
                 alt="Graphic illustrating what TEFCA is"
                 src="/tefca-graphic.svg"

@@ -13,7 +13,7 @@ const WorkSpaceSetUpView: React.FC = () => {
   return (
     <div
       className={classNames(
-        "bg-gray-5",
+        "background-dark",
         "display-flex",
         "flex-align-center",
         "flex-justify-center",

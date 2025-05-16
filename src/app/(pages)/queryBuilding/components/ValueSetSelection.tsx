@@ -199,7 +199,7 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
   return (
     <div
       className={classNames(
-        "bg-gray-5 margin-top-4 ",
+        "background-dark margin-top-4 ",
         styles.valueSetTemplateContainer,
       )}
     >
@@ -221,7 +221,6 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
                       aria-label="Plus sign icon indicating addition"
                       className="usa-icon"
                       size={3}
-                      color="#005EA2"
                     />
                     <span data-testid="add-left-rail">ADD</span>
                   </div>

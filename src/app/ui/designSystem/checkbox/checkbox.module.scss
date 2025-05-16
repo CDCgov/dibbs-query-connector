@@ -23,15 +23,9 @@
   margin: 0;
 }
 
-.checkbox input:checked + label::before {
-  background-color: $primary !important;
-  box-shadow: none !important;
-}
-
 .isMinusCheckboxState input + label::before {
   background-image: url("minus.svg") !important;
   background-repeat: no-repeat;
   background-position: center;
-  background-color: $primary;
   box-shadow: none !important;
 }

@@ -1,8 +1,4 @@
-@use "_variables" as *;
-
-header {
-  background-image: linear-gradient(to right, $blue-60v, $cyan-50v);
-}
+@use "variables" as *;
 
 footer {
   background-color: $footer;
@@ -16,57 +12,119 @@ footer {
 
 .usa-step-indicator__segment-label,
 .usa-step-indicator__segment:before {
-  color: $stepper-inactive-text;
+  color: $text-inactive--dark;
+}
+
+.usa-step-indicator__segment--current .usa-step-indicator__segment-label {
+  color: $brand-primary;
 }
 
 .usa-step-indicator__segment--current::before,
 .usa-step-indicator__segment--current::after {
-  background-color: $primary !important;
-  color: $primary !important;
+  background-color: $brand-primary;
+  color: $brand-primary;
   box-shadow:
     0 0 0 0.25rem $white,
     0 0 0 0 $white !important;
 }
 
 .usa-current {
-  color: $primary !important;
+  color: $brand-primary !important;
 }
 
 .usa-current::after {
-  background-color: $primary !important;
+  background-color: $brand-primary !important;
 }
 
 .usa-accordion__button,
 .usa-accordion__button:hover {
-  background-color: $table-header;
+  background-color: $background-dark;
   color: $text-primary;
 }
 
 .usa-button {
-  background-color: $primary;
-  &:hover {
-    background-color: $blue-40v;
+  background-color: $accent-primary;
+  box-shadow: inset 0 0 0 2px $accent-primary;
+
+  &:hover,
+  &--outline:hover {
+    box-shadow: inset 0 0 0 2px $accent-primary--dark;
+    background-color: $accent-primary--dark !important;
   }
-  &:active {
-    background-color: $blue-400;
+
+  &:active,
+  &--outline:active {
+    box-shadow: inset 0 0 0 2px $accent-primary--darker;
+    background-color: $accent-primary--darker !important;
   }
 
   &--outline {
-    background-color: white;
+    background-color: $white !important;
+    color: $accent-primary;
+  }
+  &--outline:hover {
+    background-color: $white !important;
+    color: $accent-primary--dark;
+  }
+  &--outline:active {
+    background-color: $white !important;
+    color: $accent-primary--darker;
+  }
 
-    &:active,
-    &:hover {
-      background-color: white;
-    }
+  &--secondary {
+    box-shadow: none;
+    background-color: $brand-primary--lightest;
+    color: $brand-primary--dark !important;
+  }
+  &--secondary:hover {
+    box-shadow: none;
+    background-color: $brand-primary--lighter !important;
+  }
+  &--secondary:active {
+    box-shadow: none;
+    background-color: $brand-primary--light !important;
+  }
+
+  &:disabled {
+    box-shadow: none;
+
+    cursor: not-allowed;
+    opacity: 1;
+    background-color: $diabled !important;
   }
 
   &--unstyled {
-    background-color: transparent;
+    box-shadow: none;
 
-    &:active,
-    &:hover {
-      background-color: transparent;
-    }
+    color: $accent-primary;
+    background-color: transparent !important;
+  }
+  &--unstyled:hover {
+    box-shadow: none;
+
+    color: $accent-primary;
+    background-color: transparent !important;
+  }
+  &--unstyled:active {
+    box-shadow: none;
+    color: $accent-primary;
+    background-color: transparent !important;
+  }
+
+  &--cancel {
+    box-shadow: none;
+    color: $white;
+    background-color: $destructive-primary !important;
+  }
+  &--cancel:hover {
+    box-shadow: none;
+    color: $white;
+    background-color: $destructive-primary--dark !important;
+  }
+  &--cancel:active {
+    box-shadow: none;
+    color: $white;
+    background-color: $destructive-primary--darker !important;
   }
 }
 
@@ -77,4 +135,9 @@ footer {
   &:hover {
     background-color: white;
   }
+}
+
+.usa-checkbox__input:checked + [class*="__label"]::before {
+  background-color: $accent-primary !important;
+  box-shadow: none !important;
 }

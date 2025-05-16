@@ -17,6 +17,7 @@ import TitleBox from "./stepIndicator/TitleBox";
 import ImmunizationTable from "./resultsView/tableComponents/ImmunizationTable";
 import { CustomUserQuery } from "@/app/models/entities/query";
 import Skeleton from "react-loading-skeleton";
+import { Button } from "@trussworks/react-uswds";
 
 type ResultsViewProps = {
   patientRecordsResponse: PatientRecordsResponse | undefined;
@@ -80,12 +81,9 @@ const ResultsView: React.FC<ResultsViewProps> = ({
               onClick={() => goBack()}
               label={RETURN_LABEL["results"]}
             />
-            <button
-              className="usa-button usa-button--outline"
-              onClick={() => goToBeginning()}
-            >
+            <Button secondary onClick={() => goToBeginning()} type={"button"}>
               New patient search
-            </button>
+            </Button>
           </>
         )}
       </div>
