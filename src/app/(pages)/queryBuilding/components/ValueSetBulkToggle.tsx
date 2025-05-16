@@ -104,7 +104,7 @@ const ValueSetBulkToggle: React.FC<ValueSetBulkToggleProps> = ({
         onClick={() => handleViewCodes(dibbsVs)}
       >
         <div className="padding-right-2">{`Author: ${dibbsVs.author}`}</div>
-        <div>{`System: ${dibbsVs.system.toLocaleLowerCase()}`}</div>
+        <div>{`System: ${dibbsVs?.system?.toLocaleLowerCase()}`}</div>
       </div>
     );
   };
