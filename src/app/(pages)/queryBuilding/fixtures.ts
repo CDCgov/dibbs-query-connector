@@ -525,6 +525,10 @@ export const conditionIdToNameMap = {
     name: "Gonorrhea (disorder)",
     category: "Sexually Transmitted Diseases",
   },
+  custom_condition: {
+    name: "Custom Code Condition",
+    category: "User-Created",
+  },
 };
 
 export const categoryToConditionNameArrayMap = {
@@ -552,6 +556,7 @@ export const categoryToConditionNameArrayMap = {
       name: "Gonorrhea (disorder)",
     },
   ],
+  "User-Created": [{ id: "custom_condition", name: "Custom Code Condition" }],
 };
 
 export const gonorrheaValueSets = [
@@ -610,6 +615,48 @@ export const cancerValueSets = [
     type: "lrtc",
     dibbs_concept_type: "labs",
     condition_id: "2",
+  },
+];
+
+export const customValueSets = [
+  {
+    display: "Apple",
+    code_system: "http://snomed.info/sct",
+    code: "1A",
+    valueset_name: "Fruits",
+    valueset_id: "1-test",
+    valueset_external_id: "1-test",
+    version: "1",
+    author: "QC Admin",
+    type: "medications",
+    dibbs_concept_type: "medications",
+    condition_id: "custom_condition",
+  },
+  {
+    display: "Banana",
+    code_system: "http://snomed.info/sct",
+    code: "1B",
+    valueset_name: "Fruits",
+    valueset_id: "1-test",
+    valueset_external_id: "1-test",
+    version: "1",
+    author: "QC Admin",
+    type: "medicaiton",
+    dibbs_concept_type: "medication",
+    condition_id: "custom_condition",
+  },
+  {
+    display: "Coconut",
+    code_system: "http://snomed.info/sct",
+    code: "1C",
+    valueset_name: "Fruits",
+    valueset_id: "1-test",
+    valueset_external_id: "1-test",
+    version: "1",
+    author: "QC Admin",
+    type: "medicaiton",
+    dibbs_concept_type: "medication",
+    condition_id: "custom_condition",
   },
 ];
 
@@ -741,42 +788,19 @@ export const gonorrheaSavedQuery: QueryTableResult = {
 
 export const mockDibbsValueSets: DibbsValueSet[] = [
   {
-    valueSetId: "1",
-    valueSetName: "Mock Lab",
+    valueSetId: "1-test",
+    valueSetName: "Fruits",
     valueSetVersion: "1",
-    valueSetExternalId: "1",
-    author: "Testing Fixtures",
-    system: "http://hl7.org/fhir/sid/icd-10-cm",
-    dibbsConceptType: "labs",
-    includeValueSet: false,
-    concepts: [
-      { code: "1a", display: "One A", include: true },
-      { code: "2b", display: "Two B", include: true },
-    ],
-    userCreated: false,
-  },
-  {
-    valueSetId: "2",
-    valueSetName: "Mock Condition",
-    valueSetVersion: "2",
-    valueSetExternalId: "2",
-    author: "Testing Fixtures",
-    system: "http://test.com/test",
-    dibbsConceptType: "conditions",
-    includeValueSet: true,
-    concepts: [],
-    userCreated: false,
-  },
-  {
-    valueSetId: "3",
-    valueSetName: "Mock Medication",
-    valueSetVersion: "3",
-    valueSetExternalId: "3",
-    author: "Testing Fixtures",
-    system: "http://test.com/test",
+    valueSetExternalId: "1-test",
+    author: "QC Admin",
+    system: "http://snomed.info/sct",
     dibbsConceptType: "medications",
-    includeValueSet: false,
-    concepts: [],
+    includeValueSet: true,
+    concepts: [
+      { code: "1A", display: "Apple", include: true },
+      { code: "1B", display: "Bannana", include: true },
+      { code: "1C", display: "Coconut", include: true },
+    ],
     userCreated: true,
   },
 ];

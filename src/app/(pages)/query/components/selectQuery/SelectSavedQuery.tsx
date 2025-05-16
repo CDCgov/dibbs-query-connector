@@ -4,7 +4,6 @@ import styles from "./selectQuery.module.scss";
 import { useContext, useEffect, useState } from "react";
 import { RETURN_LABEL } from "@/app/(pages)/query/components/stepIndicator/StepIndicator";
 import TitleBox from "../stepIndicator/TitleBox";
-import LoadingView from "../../../../ui/designSystem/LoadingView";
 import { showToastConfirmation } from "../../../../ui/designSystem/toast/Toast";
 import { CustomUserQuery } from "@/app/models/entities/query";
 import {
@@ -17,6 +16,9 @@ import { getUserByUsername } from "@/app/backend/user-management";
 import { useSession } from "next-auth/react";
 import { isAuthDisabledClientCheck } from "@/app/utils/auth";
 import { DataContext } from "@/app/shared/DataProvider";
+import NoQueriesDisplay from "./NoQueriesDisplay";
+import QueryRedirectInfo from "./QueryRedirectDisplay";
+import Skeleton from "react-loading-skeleton";
 import { getFhirServerNames } from "@/app/backend/fhir-servers";
 
 type SelectSavedQueryProps = {
@@ -51,8 +53,7 @@ const SelectSavedQuery: React.FC<SelectSavedQueryProps> = ({
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [fhirServers, setFhirServers] = useState<string[]>([]);
   const [queryOptions, setQueryOptions] = useState<CustomUserQuery[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
-
+  const [loading, setLoading] = useState<boolean>(true);
   const [currentUser, setCurrentUser] = useState<User>();
 
   const { data: session } = useSession();
@@ -67,17 +68,22 @@ const SelectSavedQuery: React.FC<SelectSavedQueryProps> = ({
     userRole !== UserRole.SUPER_ADMIN &&
     userRole !== UserRole.ADMIN;
 
-  async function fetchFHIRServers() {
-    const servers = await getFhirServerNames();
-    setFhirServers(servers);
-  }
-
   // Retrieve and store current logged-in user's data on page load
   useEffect(() => {
-    const fetchCurrentUser = async () => {
+    const fetchPageData = async () => {
       try {
         const currentUser = await getUserByUsername(username);
         setCurrentUser(currentUser.items[0]);
+
+        const servers = await getFhirServerNames();
+        setFhirServers(servers);
+
+        const queries = restrictedQueryList
+          ? await getQueriesForUser(currentUser.items[0] as User)
+          : await getCustomQueries();
+
+        const loaded = queries && (authDisabled || !!currentUser);
+        !!loaded && setQueryOptions(queries);
       } catch (error) {
         if (error == "Error: Unauthorized") {
           showToastConfirmation({
@@ -90,28 +96,8 @@ const SelectSavedQuery: React.FC<SelectSavedQueryProps> = ({
       }
     };
 
-    fetchCurrentUser();
-    fetchFHIRServers();
+    fetchPageData();
   }, []);
-
-  useEffect(() => {
-    const fetchQueries = async () => {
-      try {
-        const queries = restrictedQueryList
-          ? await getQueriesForUser(currentUser as User)
-          : await getCustomQueries();
-
-        const loaded = queries && (authDisabled || !!currentUser);
-        !!loaded && setQueryOptions(queries);
-      } catch (error) {
-        console.error("Failed to fetch queries:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchQueries();
-    setLoading(false); // Data already exists, no need to fetch again
-  }, [currentUser]);
 
   function handleQuerySelection(queryName: string) {
     const selectedQuery = queryOptions.filter((q) => q.queryName === queryName);
@@ -135,79 +121,91 @@ const SelectSavedQuery: React.FC<SelectSavedQueryProps> = ({
       <h2 className="page-explainer">
         We will pull relevant data for your selected patient and query.
       </h2>
-      <h3 className={styles.queryDropdownLabel}>Query</h3>
-      <div className={styles.queryRow}>
-        {loading ? (
-          <LoadingView loading={true} />
+
+      {queryOptions.length === 0 ? (
+        loading ? (
+          <>
+            <Skeleton height={100} />
+            <Skeleton className={`margin-top-2`} width={150} />
+            <Skeleton className={styles.queryRow} height={50} width={300} />
+            <Skeleton className={`margin-top-2`} width={150} />
+            <Skeleton height={34} width={175} />
+          </>
         ) : (
-          <Select
-            id="querySelect"
-            name="query"
-            value={selectedQuery.queryName}
-            onChange={(e) => {
-              handleQuerySelection(e.target.value);
-            }}
-            className={`${styles.queryDropDown}`}
-            required
-          >
-            <option value="" disabled>
-              Select query
-            </option>
-            {queryOptions.map((query) => (
-              <option key={query.queryId} value={query.queryName}>
-                {query.queryName}
+          <NoQueriesDisplay userRole={userRole} />
+        )
+      ) : (
+        <>
+          <QueryRedirectInfo userRole={userRole} />
+          <h3 className={styles.queryDropdownLabel}>Query</h3>
+          <div className={styles.queryRow}>
+            <Select
+              id="querySelect"
+              name="query"
+              value={selectedQuery.queryName}
+              onChange={(e) => {
+                handleQuerySelection(e.target.value);
+              }}
+              className={`${styles.queryDropDown}`}
+              required
+            >
+              <option value="" disabled>
+                Select query
               </option>
-            ))}
-          </Select>
-        )}
-      </div>
+              {queryOptions.map((query) => (
+                <option key={query.queryId} value={query.queryName}>
+                  {query.queryName}
+                </option>
+              ))}
+            </Select>
+          </div>
+          {showAdvanced && (
+            <div>
+              <h3 className={styles.queryDropdownLabel}>
+                Health Care Organization (HCO)
+              </h3>
+              <Select
+                id="fhir_server"
+                name="fhir_server"
+                value={fhirServer}
+                onChange={(e) => setFhirServer(e.target.value as string)}
+                required
+                className={`${styles.queryDropDown}`}
+              >
+                Select HCO
+                {fhirServers.map((fhirServer: string) => (
+                  <option key={fhirServer} value={fhirServer}>
+                    {fhirServer}
+                  </option>
+                ))}
+              </Select>
+            </div>
+          )}
+          {!showAdvanced && (
+            <div>
+              <Button
+                className={`usa-button--unstyled margin-left-auto ${styles.searchCallToActionButton}`}
+                type="button"
+                onClick={() => setShowAdvanced(true)}
+              >
+                Advanced...
+              </Button>
+            </div>
+          )}
 
-      {showAdvanced && (
-        <div>
-          <h3 className={styles.queryDropdownLabel}>
-            Health Care Organization (HCO)
-          </h3>
-          <Select
-            id="fhir_server"
-            name="fhir_server"
-            value={fhirServer}
-            onChange={(e) => setFhirServer(e.target.value as string)}
-            required
-            className={`${styles.queryDropDown}`}
-          >
-            Select HCO
-            {fhirServers.map((fhirServer: string) => (
-              <option key={fhirServer} value={fhirServer}>
-                {fhirServer}
-              </option>
-            ))}
-          </Select>
-        </div>
+          {/* Submit Button */}
+          <div className="margin-top-5">
+            <Button
+              type="button"
+              disabled={!selectedQuery.queryName}
+              className={selectedQuery ? "usa-button" : "usa-button disabled"}
+              onClick={handleSubmit}
+            >
+              Submit
+            </Button>
+          </div>
+        </>
       )}
-
-      {!showAdvanced && (
-        <div>
-          <Button
-            className={`usa-button--unstyled margin-left-auto ${styles.searchCallToActionButton}`}
-            type="button"
-            onClick={() => setShowAdvanced(true)}
-          >
-            Advanced...
-          </Button>
-        </div>
-      )}
-
-      {/* Submit Button */}
-      <div className="margin-top-5">
-        <Button
-          type="button"
-          disabled={!selectedQuery.queryName}
-          className={selectedQuery ? "usa-button" : "usa-button disabled"}
-          onClick={handleSubmit}
-        >
-          Submit
-        </Button>
-      </div>
     </form>
   );
 };

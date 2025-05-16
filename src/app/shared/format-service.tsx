@@ -315,3 +315,35 @@ export function formatSex(sex: string | undefined): string {
 export function formatStringToSentenceCase(string: string) {
   return string.replace(string.charAt(0), string.charAt(0).toLocaleUpperCase());
 }
+
+/**
+ * Extracts the source system display name from a url string.
+ * Similar to DBServive.stripProtocolAndTLDFromSystemUrl, but builds in specific
+ * checks for known string outliers
+ * @param system the url string to format
+ * @returns the display name of the system, stripped of url prefixes
+ */
+export const formatCodeSystemPrefix = (system: string) => {
+  if (!system) return;
+
+  const match = system.match(/https?:\/\/([^\.]+)/);
+  let result = match?.[1];
+
+  switch (result) {
+    case "hl7":
+      const hl7Arr = system.split("/");
+      result = hl7Arr[hl7Arr.length - 1];
+      if (result == "icd-10-cm") {
+        result = result.slice(0, result.indexOf("-cm"));
+      }
+      return result.toLocaleUpperCase();
+
+    case "www":
+    case "cap":
+      const rxArr = system.split("/");
+      return rxArr[rxArr?.length - 1].toLocaleUpperCase();
+
+    default:
+      return result?.toUpperCase();
+  }
+};

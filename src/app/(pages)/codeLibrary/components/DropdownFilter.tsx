@@ -12,8 +12,11 @@ import {
   DibbsConceptType,
   DibbsValueSet,
 } from "@/app/models/entities/valuesets";
-import { formatStringToSentenceCase } from "@/app/shared/format-service";
-import { emptyFilterSearch, formatSystem } from "../utils";
+import {
+  formatCodeSystemPrefix,
+  formatStringToSentenceCase,
+} from "@/app/shared/format-service";
+import { emptyFilterSearch } from "../utils";
 import { User } from "@/app/models/entities/users";
 import {
   getAllGroupMembers,
@@ -216,7 +219,7 @@ const DropdownFilter: React.FC<DropdownFilterProps> = ({
             {valueSetCodeSystems.map((codeSystem) => {
               return (
                 <option key={codeSystem} value={codeSystem}>
-                  {formatSystem(codeSystem)}
+                  {formatCodeSystemPrefix(codeSystem || "")}
                 </option>
               );
             })}

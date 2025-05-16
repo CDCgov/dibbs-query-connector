@@ -3,8 +3,8 @@ import ResultsView from "./ResultsView";
 import { screen } from "@testing-library/react";
 
 const TEST_QUERY = {
-  query_id: "some-query-id",
-  query_name: "some name",
+  queryId: "some-query-id",
+  queryName: "some name",
   valuesets: [],
 };
 
