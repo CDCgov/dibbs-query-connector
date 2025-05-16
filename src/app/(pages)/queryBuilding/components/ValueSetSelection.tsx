@@ -32,6 +32,8 @@ import {
 } from "@/app/utils/valueSetTranslation";
 import { CUSTOM_VALUESET_ARRAY_ID } from "@/app/shared/constants";
 import { useSaveQueryAndRedirect } from "../../../backend/query-building/useSaveQueryAndRedirect";
+import { useContext } from "react";
+import { DataContext } from "@/app/shared/DataProvider";
 
 type ConditionSelectionProps = {
   constructedQuery: NestedQuery;
@@ -70,6 +72,9 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
     );
   const [conditionSearchFilter, setConditionSearchFilter] = useState("");
   const [valueSetSearchFilter, setValueSetSearchFilter] = useState("");
+
+  const queryContext = useContext(DataContext);
+  const queryName = queryContext?.selectedQuery?.queryName;
 
   useEffect(() => {
     // display the first condition's valuesets on render
@@ -318,7 +323,11 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
                     type="button"
                     outline
                     onClick={() =>
-                      saveQueryAndRedirect(constructedQuery, "/codeLibrary")
+                      saveQueryAndRedirect(
+                        constructedQuery,
+                        queryName ?? "",
+                        "/codeLibrary",
+                      )
                     }
                   >
                     Add from code library
@@ -364,7 +373,11 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
                 className={styles.codeLibrary__button}
                 type="button"
                 onClick={() =>
-                  saveQueryAndRedirect(constructedQuery, "/codeLibrary")
+                  saveQueryAndRedirect(
+                    constructedQuery,
+                    queryName ?? "",
+                    "/codeLibrary",
+                  )
                 }
               >
                 Add from code library
