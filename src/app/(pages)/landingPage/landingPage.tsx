@@ -81,13 +81,6 @@ const LandingPage: React.FC<LandingPageProps> = ({ isLoggedIn }) => {
                 priority
               />
             </div>
-            <Image
-              alt="Graphic illustrating what TEFCA is"
-              src="/tefca-graphic.svg"
-              width={250}
-              height={300}
-              priority
-            />
           </div>
           <div className="home flex-1">
             <h3 className={styles.pageSubtitle} role="heading" aria-level={2}>

@@ -116,7 +116,7 @@ h1 {
 
 .icon-primary {
   path {
-    color: $primary;
+    color: $brand-primary;
   }
 }
 
@@ -465,6 +465,30 @@ ul.usa-sidenav
   font-size: 0.875rem;
 }
 
+.info-alert {
+  width: fit-content;
+  border-left: 0;
+  margin-top: 1rem;
+  margin-bottom: 1.5rem;
+  background-color: $info-background;
+}
+
+.info-alert > .usa-alert__body {
+  background-color: $info-background;
+  width: fit-content;
+  line-height: 1.5rem;
+
+  p.usa-alert__text {
+    margin-left: 2rem;
+    font-size: 1rem;
+  }
+
+  &::before {
+    background-color: $info-background--dark;
+    mask-size: 1.5rem;
+  }
+}
+
 .qc-modal {
   padding: 0 2rem !important;
   max-width: 31rem;
@@ -504,21 +528,6 @@ ul.usa-sidenav
 
     .usa-button-group__item:last-child {
       margin-right: 0.25rem;
-
-      #modal-back-button,
-      #modal-cancel-button {
-        padding-left: 0 !important;
-      }
-    }
-
-    #modal-back-button,
-    #modal-cancel-button {
-      background-color: transparent;
-      color: $accent-primary;
-
-      &:hover {
-        box-shadow: none;
-      }
     }
 
     .usa-button-group__item:last-child:has(> #modal-back-button),
@@ -528,8 +537,11 @@ ul.usa-sidenav
     }
   }
 
-  .usa-modal__close {
+  .usa-modal__close,
+  .usa-modal__close:hover {
     background-color: transparent !important;
+    color: $accent-primary;
+    box-shadow: none;
     padding: 0 !important;
     width: 1.5rem !important;
     height: 1.5rem !important;

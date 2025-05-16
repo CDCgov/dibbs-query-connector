@@ -132,7 +132,6 @@ const UsersTable: React.FC<UsersTableProps> = ({ role }) => {
                 style={{
                   marginLeft: "1px",
                   marginTop: "1.5rem",
-                  backgroundColor: "#005EA2",
                 }}
                 type="button"
               >

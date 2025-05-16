@@ -44,43 +44,87 @@ footer {
 
 .usa-button {
   background-color: $accent-primary;
+  box-shadow: inset 0 0 0 2px $accent-primary;
 
-  &:hover {
+  &:hover,
+  &--outline:hover {
+    box-shadow: inset 0 0 0 2px $accent-primary--dark;
     background-color: $accent-primary--dark !important;
   }
 
-  &:active {
+  &:active,
+  &--outline:active {
+    box-shadow: inset 0 0 0 2px $accent-primary--darker;
     background-color: $accent-primary--darker !important;
   }
 
+  &--outline {
+    background-color: $white !important;
+    color: $accent-primary;
+  }
+  &--outline:hover {
+    background-color: $white !important;
+    color: $accent-primary--dark;
+  }
+  &--outline:active {
+    background-color: $white !important;
+    color: $accent-primary--darker;
+  }
+
   &--secondary {
+    box-shadow: none;
     background-color: $brand-primary--lightest;
     color: $brand-primary--dark !important;
   }
   &--secondary:hover {
+    box-shadow: none;
     background-color: $brand-primary--lighter !important;
   }
   &--secondary:active {
+    box-shadow: none;
     background-color: $brand-primary--light !important;
   }
 
   &:disabled {
+    box-shadow: none;
+
     cursor: not-allowed;
     opacity: 1;
     background-color: $diabled !important;
   }
 
   &--unstyled {
+    box-shadow: none;
+
     color: $accent-primary;
     background-color: transparent !important;
   }
   &--unstyled:hover {
+    box-shadow: none;
+
     color: $accent-primary;
     background-color: transparent !important;
   }
   &--unstyled:active {
+    box-shadow: none;
     color: $accent-primary;
     background-color: transparent !important;
+  }
+
+  &--cancel {
+    box-shadow: none;
+    color: $white;
+    background-color: $destructive-primary !important;
+  }
+  &--cancel:hover {
+    box-shadow: none;
+    color: $white;
+    background-color: $destructive-primary--dark !important;
+  }
+  &--cancel:active {
+    box-shadow: none;
+    color: $white;
+    background-color: $destructive-primary--darker !important;
   }
 }
 
@@ -91,4 +135,9 @@ footer {
   &:hover {
     background-color: white;
   }
+}
+
+.usa-checkbox__input:checked + [class*="__label"]::before {
+  background-color: $accent-primary !important;
+  box-shadow: none !important;
 }
