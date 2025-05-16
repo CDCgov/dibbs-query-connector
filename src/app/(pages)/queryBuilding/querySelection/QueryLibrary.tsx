@@ -21,7 +21,7 @@ import {
 import { DataContext, DataContextValue } from "@/app/shared/DataProvider";
 import classNames from "classnames";
 import { getConditionsData } from "@/app/shared/database-service";
-import { ConditionsMap } from "../utils";
+import { ConditionsMap, EMPTY_QUERY_SELECTION } from "../utils";
 import { CustomUserQuery } from "@/app/models/entities/query";
 import {
   CUSTOM_CONDITION_NAME,
@@ -108,7 +108,13 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
         <h1 className="flex-align-center margin-0">Query Library</h1>
         <div className="margin-left-auto">
           <Button
-            onClick={() => setBuildStep("condition")}
+            onClick={() => {
+              setBuildStep("condition");
+              queryContext?.setSelectedQuery?.(
+                structuredClone(EMPTY_QUERY_SELECTION),
+              );
+              queryContext?.setData?.(null);
+            }}
             className={styles.createQueryButton}
             type="button"
           >
