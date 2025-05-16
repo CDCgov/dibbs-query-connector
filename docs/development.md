@@ -7,11 +7,12 @@ The DIBBs Query Connector app is built with the [Next.js](https://nextjs.org/) f
 #### Dependencies
 
 Query Connector depends on a few external services to work properly:
+
 - A [PostgreSQL](https://www.postgresql.org/) database, which stores information on conditions, value sets, FHIR server configuration, etc. Database migrations are managed using [Flyway](https://github.com/flyway/flyway)
 - An [OAuth](https://en.wikipedia.org/wiki/OAuth) capable identity provider for authentication. For local development, we use [Keycloak](https://www.keycloak.org/)
 - An external [FHIR](https://hl7.org/fhir/) server. For local development, we use [Aidbox](https://www.health-samurai.io/fhir-server)
 
-### Running Query Connector 
+### Running Query Connector
 
 #### Prerequisites
 
@@ -23,7 +24,7 @@ Query Connector depends on a few external services to work properly:
 
 Before running the Query Connector locally, you will need to obtain API keys for the electronic Reporting and Surveillance Distribution (eRSD) and for the Unified Medical Language System (UMLS). These API keys will be used to download information about reportable conditions (e.g., chlamydia, influenza, hepatitis A, etc), medical code value sets, and mappings between them. This information is used to build queries in the Query Connector app.
 
-Additionally, you will need a free license key for Aidbox in order to run it in dev mode for local development.
+Additionally, if you want to use Aidbox as a FHIR server for local development, you will need a free license key.
 
 To obtain the free API and license keys, please visit the following URLs and follow the sign up instructions.
 
@@ -70,8 +71,8 @@ Password: QcDev2024!
 To build the Docker image for the Query Connector app from source instead of downloading it from the GitHub repository follow these steps.
 
 1. Clone the Query Connector repository with `git clone git@github.com:CDCgov/dibbs-query-connector.git`.
-3. Navigate to the source folder with `cd dibbs-query-connector`.
-4. Run `docker build -t query-connector .`.
+2. Navigate to the source folder with `cd dibbs-query-connector`.
+3. Run `docker build -t query-connector .`.
 
 ### Query Connector Data for Query Building
 
