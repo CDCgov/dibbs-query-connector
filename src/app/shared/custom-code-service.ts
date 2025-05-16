@@ -35,7 +35,7 @@ class UserCreatedValuesetService {
 
   // This may not be needed since these are user-created valuesets
   private static getSystemPrefix(system: string) {
-    const match = system.match(/https?:\/\/([^\.]+)/);
+    const match = system?.match(/https?:\/\/([^\.]+)/);
     return match ? match[1] : system;
   }
 
