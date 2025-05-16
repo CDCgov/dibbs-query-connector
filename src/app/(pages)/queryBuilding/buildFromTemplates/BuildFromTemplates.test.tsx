@@ -391,46 +391,65 @@ describe("tests the valueset selection page interactions", () => {
     expect(
       screen.getByText("1 valueset(s) found", { exact: false }),
     ).toBeVisible();
+
     const searchResultLabel = screen.getByText(
       `${TEST_VALUESET.concepts[0].code}, ${TEST_VALUESET.concepts[3].code}`,
       { exact: false },
     );
     expect(searchResultLabel).toBeVisible();
-    await user.click(searchResultLabel);
 
     // the "total" selected values should be just the 2 search results, and since
     // we've bulk toggled them off, none of them should be selected
-    expect(screen.getByText("0/2")).toBeInTheDocument();
-    await user.click(searchResultLabel);
+    // Traverse up to the container, then query the checkbox input
+    const checkboxContainer = searchResultLabel.closest(
+      '[data-testid^="container-"]',
+    ) as HTMLElement;
+    const checkbox = within(checkboxContainer).getByRole("checkbox");
 
-    // toggle on and off again
-    expect(screen.getByText("2/2")).toBeInTheDocument();
-    await user.click(searchResultLabel);
+    // Toggle off (should uncheck)
+    await user.click(checkbox);
+    expect(
+      screen.getByText((_, el) => el?.textContent === "0 / 2"),
+    ).toBeInTheDocument();
+
+    // Toggle on
+    await user.click(checkbox);
+    expect(
+      screen.getByText((_, el) => el?.textContent === "2 / 2"),
+    ).toBeInTheDocument();
+
+    // Toggle back off for next check to confirm filtering
+    await user.click(checkbox);
+    expect(
+      screen.getByText((_, el) => el?.textContent === "0 / 2"),
+    ).toBeInTheDocument();
 
     await user.clear(valueSetSearch);
     // when we clear the search filter, the other two non-rendered codes shouldn't
     // have been affected
-    expect(screen.getByText("2/4")).toBeInTheDocument();
+    screen.debug();
+    const displayCount = screen.getByTestId(`displayCount-${TEST_ID}`);
+    expect(displayCount).toHaveTextContent("2 / 4");
 
     // do the same for the accordidion
     await user.type(valueSetSearch, "meningitidis");
 
     await user.click(screen.getByLabelText("Labs", { exact: false }));
-    expect(screen.getByText("2/2")).toBeInTheDocument();
+    expect(screen.getByText("2 / 2")).toBeInTheDocument();
     await user.click(screen.getByLabelText("Labs", { exact: false }));
-    expect(screen.getByText("0/2")).toBeInTheDocument();
+    expect(screen.getByText("0 / 2")).toBeInTheDocument();
 
     await user.clear(valueSetSearch);
-    expect(screen.getByText("2/4")).toBeInTheDocument();
+    expect(screen.getByText("2 / 4")).toBeInTheDocument();
 
     // ... and the drawer
     await user.type(valueSetSearch, "meningitidis");
     await user.click(screen.getByText("View codes", { exact: false }));
     await user.click(screen.getByText(TEST_VALUESET.concepts[0].code));
     await user.click(screen.getByText(TEST_VALUESET.concepts[3].code));
-    expect(screen.getByText("0/2")).toBeInTheDocument();
+    expect(screen.getByText("0 / 2")).toBeInTheDocument();
     await user.clear(valueSetSearch);
-    expect(screen.getByText("2/4")).toBeInTheDocument();
+    expect(screen.getByText("2 / 4")).toBeInTheDocument();
   });
 });
 
