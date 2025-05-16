@@ -21,6 +21,7 @@ import {
   CategoryToConditionArrayMap,
   ConditionsMap,
   EMPTY_CONCEPT_TYPE,
+  EMPTY_QUERY_SELECTION,
 } from "../utils";
 import { ConditionSelection } from "../components/ConditionSelection";
 import { ValueSetSelection } from "../components/ValueSetSelection";
@@ -28,8 +29,6 @@ import { BuildStep } from "../../../shared/constants";
 import LoadingView from "../../../ui/designSystem/LoadingView";
 import classNames from "classnames";
 import { groupConditionConceptsIntoValueSets } from "@/app/shared/utils";
-import { SelectedQueryDetails } from "../querySelection/utils";
-
 import { groupValueSetsByConceptType } from "@/app/utils/valueSetTranslation";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import { DataContext } from "@/app/shared/DataProvider";
@@ -52,33 +51,38 @@ export type FormError = {
 type BuildFromTemplatesProps = {
   buildStep: BuildStep;
   setBuildStep: Dispatch<SetStateAction<BuildStep>>;
-  selectedQuery: SelectedQueryDetails;
-  setSelectedQuery: Dispatch<SetStateAction<SelectedQueryDetails>>;
 };
 
 /**
  * The query building page
  * @param root0 params
- * @param root0.selectedQuery - the query to edit or the "create" mode if it
  * doesn't previously
  * @param root0.buildStep - the stage in the build process, used to render
  * subsequent steps
  * @param root0.setBuildStep - setter function to move the app forward
- * @param root0.setSelectedQuery - setter function to update / reset the query
  * being built
  * @returns the component for the query building page
  */
 const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
-  selectedQuery,
   buildStep,
   setBuildStep,
-  setSelectedQuery,
 }) => {
+  const queryContext = useContext(DataContext);
+  if (
+    !queryContext ||
+    !queryContext.selectedQuery ||
+    !queryContext.setSelectedQuery
+  ) {
+    throw new Error("BuildFromTemplates must be used within a DataProvider");
+  }
+  const selectedQuery = queryContext.selectedQuery;
+  const setSelectedQuery = queryContext.setSelectedQuery;
+
   const { data: session } = useSession();
   const focusRef = useRef<HTMLInputElement | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [queryName, setQueryName] = useState<string | undefined>(
-    selectedQuery.queryName,
+    structuredClone(selectedQuery.queryName),
   );
   const [categoryToConditionMap, setCategoryToConditionMap] =
     useState<CategoryToConditionArrayMap>();
@@ -94,11 +98,8 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
 
   function resetQueryState() {
     setQueryName(undefined);
-    setSelectedQuery({
-      queryId: undefined,
-      queryName: undefined,
-    });
-    setConstructedQuery({});
+    setSelectedQuery(structuredClone(EMPTY_QUERY_SELECTION));
+    setConstructedQuery(structuredClone({}));
   }
 
   function goBack() {
@@ -138,7 +139,7 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
       );
 
       if (isSubscribed) {
-        setConstructedQuery(initialState);
+        setConstructedQuery(structuredClone(initialState));
       }
 
       setFormError((prevError) => {
@@ -270,6 +271,13 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
           throw "Result status not returned";
         }
 
+        setSelectedQuery(
+          structuredClone({
+            queryId: results[0].id,
+            queryName,
+          }),
+        );
+
         const queries = await getCustomQueries();
         queriesContext?.setData(queries);
         const statusMessage =
@@ -318,7 +326,14 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
                 defaultValue={queryName ?? ""}
                 required
                 onChange={(event) => {
-                  setQueryName(event.target.value);
+                  const newName = event.target.value;
+                  setQueryName(newName);
+                  setSelectedQuery(
+                    structuredClone({
+                      ...selectedQuery,
+                      queryName: newName,
+                    }),
+                  );
                 }}
                 data-testid="queryNameInput"
               />
