@@ -150,9 +150,9 @@ class DatabaseService {
     // Check that all concepts under the value set's umbrella were inserted
     const brokenConcepts = await Promise.all(
       vs.concepts.map(async (c) => {
-        const systemPrefix = DatabaseService.stripProtocolAndTLDFromSystemUrl(
-          vs.system,
-        );
+        const systemPrefix = vs.system
+          ? DatabaseService.stripProtocolAndTLDFromSystemUrl(vs.system)
+          : "";
         const conceptId = `${systemPrefix}_${c?.code}`;
         const conceptSql = `SELECT * FROM concepts WHERE id = $1;`;
 
@@ -195,9 +195,9 @@ class DatabaseService {
       ]);
       const rows = result.rows;
       const missingConceptsFromMappings = vs.concepts.map((c) => {
-        const systemPrefix = DatabaseService.stripProtocolAndTLDFromSystemUrl(
-          vs.system,
-        );
+        const systemPrefix = vs.system
+          ? DatabaseService.stripProtocolAndTLDFromSystemUrl(vs.system)
+          : "";
         const conceptUniqueId = `${systemPrefix}_${c.code}`;
 
         // Accumulate unique IDs of any concept we can't find among query rows
@@ -219,9 +219,9 @@ class DatabaseService {
         "Couldn't fetch value set to concept mappings for this valueset: ",
         error,
       );
-      const systemPrefix = DatabaseService.stripProtocolAndTLDFromSystemUrl(
-        vs.system,
-      );
+      const systemPrefix = vs.system
+        ? DatabaseService.stripProtocolAndTLDFromSystemUrl(vs.system)
+        : "";
       vs.concepts.forEach((c) => {
         const conceptUniqueId = `${systemPrefix}_${c.code}`;
         missingData.missingMappings.push(conceptUniqueId);
@@ -594,7 +594,7 @@ class DatabaseService {
         }
         return item;
       });
-      console.log(itemsWithAuthor);
+
       return {
         totalItems: result.rowCount,
         items: itemsWithAuthor,
@@ -651,9 +651,9 @@ class DatabaseService {
    */
   private static generateConceptSqlPromises(vs: DibbsValueSet) {
     return vs.concepts.map((concept) => {
-      const systemPrefix = DatabaseService.stripProtocolAndTLDFromSystemUrl(
-        vs.system,
-      );
+      const systemPrefix = vs.system
+        ? DatabaseService.stripProtocolAndTLDFromSystemUrl(vs.system)
+        : "";
       const conceptUniqueId = `${systemPrefix}_${concept.code}`;
       return DatabaseService.dbClient.query(insertConceptSql, [
         conceptUniqueId,
@@ -673,9 +673,9 @@ class DatabaseService {
    */
   private static generateValuesetConceptJoinSqlPromises(vs: DibbsValueSet) {
     return vs.concepts.map((concept) => {
-      const systemPrefix = DatabaseService.stripProtocolAndTLDFromSystemUrl(
-        vs.system,
-      );
+      const systemPrefix = vs.system
+        ? DatabaseService.stripProtocolAndTLDFromSystemUrl(vs.system)
+        : "";
       const conceptUniqueId = `${systemPrefix}_${concept.code}`;
       return DatabaseService.dbClient.query(insertValuesetToConceptSql, [
         `${vs.valueSetId}_${conceptUniqueId}`,

@@ -41,6 +41,8 @@ function mapStoredValueSetIntoInternalValueset(
   // For info that should be the same at the valueset-level, just use the first
   // fetched concept to populate
   const storedConcept = conceptGroup[0];
+  const nonEmptyConcepts = conceptGroup.filter((c) => c["code"] !== null);
+
   const valueSet: DibbsValueSet = {
     valueSetId: storedConcept["valueset_id"],
     valueSetVersion: storedConcept["version"],
@@ -61,7 +63,7 @@ function mapStoredValueSetIntoInternalValueset(
       .every((v) => v === false)
       ? false
       : true,
-    concepts: conceptGroup.map((c) => {
+    concepts: nonEmptyConcepts.map((c) => {
       return {
         code: c["code"],
         display: c["display"],
@@ -71,10 +73,15 @@ function mapStoredValueSetIntoInternalValueset(
     }),
     userCreated: storedConcept["user_created"] ?? false,
   };
+
   const conditionId = storedConcept["condition_id"];
   if (conditionId) {
     valueSet["conditionId"] = conditionId;
   }
+  if (conditionId == "custom_condition") {
+    valueSet["userCreated"] = true;
+  }
+
   return valueSet;
 }
 

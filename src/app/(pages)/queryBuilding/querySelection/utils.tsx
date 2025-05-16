@@ -38,7 +38,12 @@ export const handleDelete = async (
         context.setData(updatedQueries);
       }
     } else {
-      console.error(result.error);
+      showToastConfirmation({
+        heading: `Something went wrong`,
+        body: `${queryName} couldn't be deleted. Please try again or contact us if the error persists`,
+        variant: "error",
+        duration: 2000,
+      });
     }
   } else {
     showToastConfirmation({
