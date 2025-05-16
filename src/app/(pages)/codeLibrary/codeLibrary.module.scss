@@ -499,7 +499,7 @@
         .addCodeContainer > span {
             line-height: 1 !important;
         }
-      
+
         .addCodeContainer {
             display: flex;
             flex-direction: column;
@@ -557,7 +557,8 @@
             margin-right: 0.25rem;
             margin-bottom: 2.5px;
         }
-        input {
+        input,
+        select {
             border: 2px solid #c31b1b !important;
         }
     }
