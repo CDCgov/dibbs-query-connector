@@ -73,9 +73,12 @@ export const ConditionSelection: React.FC<ConditionSelectionProps> = ({
           {/* TODO: link to "Select" mode of Code library page */}
           <a
             href="#"
-            onClick={(e) => {
-              e.preventDefault();
-              saveQueryAndRedirect(constructedQuery, "/codeLibrary");
+            onClick={() => {
+              saveQueryAndRedirect(
+                constructedQuery,
+                queryName ?? "",
+                "/codeLibrary",
+              );
             }}
             className={styles.startFromScratchLink}
           >

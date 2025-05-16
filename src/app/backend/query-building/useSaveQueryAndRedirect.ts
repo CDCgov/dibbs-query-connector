@@ -22,10 +22,11 @@ export function useSaveQueryAndRedirect() {
 
   return async function saveQueryAndRedirect(
     constructedQuery: NestedQuery,
+    newQueryName: string,
     redirectPath: string,
   ) {
     const username = session?.user?.username;
-    const queryName = context?.selectedQuery?.queryName;
+    const queryName = newQueryName || context?.selectedQuery?.queryName;
     const existingQueryId = context?.selectedQuery?.queryId;
 
     if (!username || !queryName) {
@@ -49,6 +50,7 @@ export function useSaveQueryAndRedirect() {
         queryId: results[0].id,
         queryName,
       });
+
       const queries = await getCustomQueries();
       context?.setData?.(queries);
 
