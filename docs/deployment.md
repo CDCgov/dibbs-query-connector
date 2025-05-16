@@ -218,7 +218,6 @@ If using Microsoft Entra ID:
    NEXT_PUBLIC_AUTH_PROVIDER=microsoft-entra-id
    AUTH_CLIENT_ID=your-application-id
    AUTH_CLIENT_SECRET=your-client-secret
-   AUTH_TENANT_ID=your-tenant-id
    AUTH_ISSUER=https://login.microsoftonline.com/your-tenant-id/v2.0
    ```
 
@@ -263,7 +262,7 @@ The following environment variables are required to run Query Connector. You can
 
 ```bash
 # Database connection string
-DATABASEURL=postgresql://db-user@your-db-host:5432/tefca_db
+DATABASE_URL=postgresql://db-user@your-db-host:5432/tefca_db
 
 # Authentication settings
 AUTH_DISABLED=false
