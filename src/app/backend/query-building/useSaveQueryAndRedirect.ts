@@ -22,7 +22,7 @@ export function useSaveQueryAndRedirect() {
 
   return async function saveQueryAndRedirect(
     constructedQuery: NestedQuery,
-    newQueryName: string,
+    newQueryName: string | undefined,
     redirectPath: string,
   ) {
     const username = session?.user?.username;

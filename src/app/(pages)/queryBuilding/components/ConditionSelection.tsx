@@ -74,11 +74,7 @@ export const ConditionSelection: React.FC<ConditionSelectionProps> = ({
           <a
             href="#"
             onClick={() => {
-              saveQueryAndRedirect(
-                constructedQuery,
-                queryName ?? "",
-                "/codeLibrary",
-              );
+              saveQueryAndRedirect(constructedQuery, queryName, "/codeLibrary");
             }}
             className={styles.startFromScratchLink}
           >

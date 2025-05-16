@@ -325,7 +325,7 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
                     onClick={() =>
                       saveQueryAndRedirect(
                         constructedQuery,
-                        queryName ?? "",
+                        queryName,
                         "/codeLibrary",
                       )
                     }
@@ -375,7 +375,7 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
                 onClick={() =>
                   saveQueryAndRedirect(
                     constructedQuery,
-                    queryName ?? "",
+                    queryName,
                     "/codeLibrary",
                   )
                 }

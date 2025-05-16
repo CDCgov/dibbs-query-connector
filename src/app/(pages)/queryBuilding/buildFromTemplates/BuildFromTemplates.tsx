@@ -326,7 +326,14 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
                 defaultValue={queryName ?? ""}
                 required
                 onChange={(event) => {
-                  setQueryName(event.target.value);
+                  const newName = event.target.value;
+                  setQueryName(newName);
+                  setSelectedQuery(
+                    structuredClone({
+                      ...selectedQuery,
+                      queryName: newName,
+                    }),
+                  );
                 }}
                 data-testid="queryNameInput"
               />
