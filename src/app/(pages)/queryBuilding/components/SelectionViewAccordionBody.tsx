@@ -17,6 +17,7 @@ import TooltipWrapper, {
 import { DibbsValueSet } from "@/app/models/entities/valuesets";
 import { Concept } from "@/app/models/entities/concepts";
 import ValueSetBulkToggle from "./ValueSetBulkToggle";
+import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 
 type ConceptTypeAccordionBodyProps = {
   activeValueSets: { [vsId: string]: FilterableValueSet };
@@ -107,6 +108,18 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
     });
 
     handleValueSetLevelUpdate(valueSetToUpdate);
+
+    const affectedCount = valueSetToUpdate.concepts.filter(
+      (c) => c.render,
+    ).length;
+
+    showToastConfirmation({
+      body: `${affectedCount} code(s) successfully ${
+        includeStatus ? "added" : "removed"
+      }`,
+      variant: "success",
+      hideProgressBar: true,
+    });
   }
 
   const handleSaveChanges = () => {

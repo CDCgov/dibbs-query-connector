@@ -1,11 +1,12 @@
-import dbService from "@/app/backend/dbServices/db-service";
+import dbService from "@/app/backend/db/service";
 import { suppressConsoleLogs } from "./fixtures";
+
+import { FHIR_SERVER_INSERT_QUERY } from "@/app/backend/db/util";
 import {
-  deleteFhirServer,
   getFhirServerConfigs,
   updateFhirServer,
-} from "@/app/backend/dbServices/fhir-servers";
-import { FHIR_SERVER_INSERT_QUERY } from "@/app/backend/dbServices/util";
+  deleteFhirServer,
+} from "@/app/backend/fhir-servers";
 
 jest.mock("@/app/utils/auth", () => {
   return {

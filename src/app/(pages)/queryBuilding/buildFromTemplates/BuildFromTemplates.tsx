@@ -11,7 +11,6 @@ import {
   useRef,
   useState,
 } from "react";
-
 import {
   getConditionsData,
   getValueSetsAndConceptsByConditionIDs,
@@ -31,7 +30,6 @@ import classNames from "classnames";
 import { groupConditionConceptsIntoValueSets } from "@/app/shared/utils";
 import { SelectedQueryDetails } from "../querySelection/utils";
 
-import { getCustomQueries } from "@/app/backend/query-building";
 import { groupValueSetsByConceptType } from "@/app/utils/valueSetTranslation";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import { DataContext } from "@/app/shared/DataProvider";
@@ -40,9 +38,11 @@ import {
   DibbsValueSet,
 } from "@/app/models/entities/valuesets";
 import {
+  getCustomQueries,
   getSavedQueryById,
   saveCustomQuery,
-} from "@/app/backend/dbServices/query-building";
+} from "@/app/backend/query-building/service";
+import { useSession } from "next-auth/react";
 
 export type FormError = {
   queryName: boolean;
@@ -74,6 +74,7 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
   setBuildStep,
   setSelectedQuery,
 }) => {
+  const { data: session } = useSession();
   const focusRef = useRef<HTMLInputElement | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [queryName, setQueryName] = useState<string | undefined>(
@@ -174,6 +175,7 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
       await getValueSetsForSelectedConditions(conditionIdsToFetch);
 
       setBuildStep("valueset");
+      await handleSaveQuery();
       setLoading(false);
     }
   }
@@ -254,9 +256,8 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
   const queriesContext = useContext(DataContext);
 
   async function handleSaveQuery() {
-    if (constructedQuery && queryName) {
-      // TODO: get this from the auth session
-      const userName = "DIBBS";
+    if (constructedQuery && queryName && session) {
+      const userName = session?.user?.username as string;
       try {
         const results = await saveCustomQuery(
           constructedQuery,
