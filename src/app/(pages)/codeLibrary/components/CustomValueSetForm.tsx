@@ -24,7 +24,7 @@ import {
   formatCodeSystemPrefix,
   formatStringToSentenceCase,
 } from "@/app/shared/format-service";
-import { CodeSystemOptions, CustomCodeMode, emptyValueSet } from "../utils";
+import { CodeSystemOptions, CustomCodeMode } from "../utils";
 import Skeleton from "react-loading-skeleton";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import { groupConditionConceptsIntoValueSets } from "@/app/shared/utils";
@@ -466,7 +466,6 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
                   styles.formSection__input,
                   styles.dropdown,
                   !!error.system ? styles.formValidationError : "",
-
                 )}
               >
                 <label htmlFor="code-system">Code system (Required)</label>
