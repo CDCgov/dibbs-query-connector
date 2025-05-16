@@ -68,6 +68,12 @@ $tableContainerWidth: 70rem;
   height: 4.25rem;
   white-space: nowrap;
   cursor: pointer;
+
+  td {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+  }
 }
 
 .tableRows td:nth-child(3),

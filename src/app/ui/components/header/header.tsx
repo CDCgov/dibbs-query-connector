@@ -84,17 +84,17 @@ const HeaderComponent: React.FC<HeaderProps> = ({ session }) => {
           )}
         >
           <div className={classNames("display-flex", "flex-align-center")}>
-            <div className={styles.siteLogo}>
-              <em className="usa-logo__text brand-lightest">
-                <Link
-                  className="font-mono-lg brand-lightest font-weight-normal-important"
-                  href={landingPage}
-                  title={metadata.title}
-                >
-                  {metadata.title}
-                </Link>
-              </em>
-            </div>
+            <svg
+              className={styles.siteLogoImage}
+              path="./../../styles/assets/logo.svg"
+            ></svg>
+            <Link
+              className={`${styles.siteLogoText} text-white-important text-decoration-none font-weight-normal-important`}
+              href={landingPage}
+              title={metadata.title}
+            >
+              {metadata.title}
+            </Link>
           </div>
           <div
             className={classNames(

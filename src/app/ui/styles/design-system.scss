@@ -16,24 +16,24 @@ footer {
 }
 
 .usa-step-indicator__segment--current .usa-step-indicator__segment-label {
-  color: $accent-primary;
+  color: $brand-primary;
 }
 
 .usa-step-indicator__segment--current::before,
 .usa-step-indicator__segment--current::after {
-  background-color: $accent-primary;
-  color: $accent-primary;
+  background-color: $brand-primary;
+  color: $brand-primary;
   box-shadow:
     0 0 0 0.25rem $white,
     0 0 0 0 $white !important;
 }
 
 .usa-current {
-  color: $accent-primary !important;
+  color: $brand-primary !important;
 }
 
 .usa-current::after {
-  background-color: $accent-primary !important;
+  background-color: $brand-primary !important;
 }
 
 .usa-accordion__button,
@@ -65,15 +65,15 @@ footer {
   }
 
   &--unstyled {
-    color: $brand-primary--lighter;
+    color: $accent-primary;
     background-color: transparent !important;
   }
   &--unstyled:hover {
-    color: $brand-primary--lighter;
+    color: $accent-primary;
     background-color: transparent !important;
   }
   &--unstyled:active {
-    color: $brand-primary--lighter;
+    color: $accent-primary;
     background-color: transparent !important;
   }
 }
