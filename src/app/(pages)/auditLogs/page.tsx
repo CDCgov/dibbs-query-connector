@@ -208,7 +208,6 @@ const AuditLogs: React.FC = () => {
                 <h3>No results found.</h3>
                 <Button
                   type="reset"
-                  className={styles.clearFiltersButton}
                   onClick={() => {
                     setSearch("");
                     setSelectedName("");

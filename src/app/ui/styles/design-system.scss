@@ -64,6 +64,12 @@ footer {
     background-color: $brand-primary--light !important;
   }
 
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 1;
+    background-color: $diabled !important;
+  }
+
   &--unstyled {
     color: $accent-primary;
     background-color: transparent !important;
