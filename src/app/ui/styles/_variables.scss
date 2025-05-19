@@ -33,11 +33,16 @@ $destructive-primary--dark: #b51d09; // error hover
 $destructive-primary--darker: #6f3331; // error active
 
 $success-primary: #00a91c;
+$success-light: #70e17b;
+$success-lighter: #e3f5e1;
+$success-dark: #216e1f;
+$success-darker: #19311e;
 
 $error-primary: #fb5a47;
 $error-lighter: #fff3f2;
 $error-light: #fdb8ae;
 $error-dark: #b50909;
+$error-darker: #5c1111;
 
 $warning-primary: #fee685;
 $warning-lighter: #fff5c2;
@@ -46,11 +51,11 @@ $warning-dark: #947100;
 $warning-darker: #5c4809;
 
 $brand-primary: $blue-cool-50; // branded text color
-$brand-primary--light: $blue-cool-20; // ??? is in the swatch
-$brand-primary--lighter: $blue-cool-10; // tertiary link text color
-$brand-primary--lightest: $blue-cool-5; // secondary button background
-$brand-primary--dark: $blue-cool-70; // secondary button text
-$brand-primary--darker: $blue-cool-80; // ??? is in the swatch
+$brand-light: $blue-cool-20; // ??? is in the swatch
+$brand-lighter: $blue-cool-10; // tertiary link text color
+$brand-lightest: $blue-cool-5; // secondary button background
+$brand-dark: $blue-cool-70; // secondary button text
+$brand-darker: $blue-cool-80; // ??? is in the swatch
 
 $background: $gray-100;
 $background-dark: $gray-200;
@@ -71,11 +76,10 @@ $diabled-dark: #8d9297;
 $hover-neutral: $gray-200;
 
 // Semantic tokens
-$header: $brand-primary--darker;
-$footer: $brand-primary--darker;
+$header: $brand-darker;
+$footer: $brand-darker;
 
 // TODO: DS - replace these with another brand color?
-$success-toast-background: #ecf3ec;
 $overlay-background: rgba(0, 0, 0, 0.5);
 
 // Design system fonts

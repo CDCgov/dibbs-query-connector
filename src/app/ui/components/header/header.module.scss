@@ -44,7 +44,7 @@
 .menuDropdown {
   border-radius: 4px !important;
   padding: 0.5rem !important;
-  background: $brand-primary--darker !important;
+  background: $brand-darker !important;
   width: unset !important;
   box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, 0.16);
   position: absolute;
@@ -53,7 +53,7 @@
 }
 
 .menuItem {
-  color: $brand-primary--lightest !important;
+  color: $brand-lightest !important;
   text-decoration: none !important;
   padding: 0.5rem 1rem !important;
   cursor: pointer;

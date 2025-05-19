@@ -70,7 +70,7 @@
 }
 
 .bluePill {
-  background-color: $brand-primary--lighter;
+  background-color: $brand-lighter;
   font-size: 0.875rem;
   border-radius: 0.25rem;
 }
@@ -327,7 +327,7 @@
 
 .accordionBodyExpanded {
   &:hover {
-    background-color: $brand-primary--lighter !important;
+    background-color: $brand-lighter !important;
   }
 
   &:hover {

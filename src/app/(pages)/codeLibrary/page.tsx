@@ -379,7 +379,7 @@ const CodeLibrary: React.FC = () => {
               Click on the checkbox to delete the value set or code
             </div> */}
             <Alert
-              type="info"
+              type="warning"
               headingLevel="h4"
               noIcon={false}
               className={classNames("info-alert")}
