@@ -257,9 +257,12 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
                           {formatDiseaseDisplay(condition.name)}
                         </div>
                         <Icon.Delete
-                          className={classNames("usa-icon", styles.deleteIcon)}
+                          className={classNames(
+                            "usa-icon",
+                            styles.deleteIcon,
+                            "destructive-primary",
+                          )}
                           size={5}
-                          color="red"
                           data-testid={`delete-condition-${conditionId}`}
                           aria-label="Trash icon indicating deletion of disease"
                           onClick={() => {
@@ -355,7 +358,6 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
               <Icon.GridView
                 aria-label="Stylized icon showing four squares in a grid"
                 className={classNames("usa-icon", styles.icon)}
-                color="#919191"
               />
               <p className={styles.codeLibrary__emptyText}>
                 <strong>

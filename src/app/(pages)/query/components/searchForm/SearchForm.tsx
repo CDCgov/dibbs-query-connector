@@ -58,20 +58,15 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
   const [mrn, setMRN] = useState<string>("");
 
   const [showAdvanced, setShowAdvanced] = useState(false);
-  const [autofilled, setAutofilled] = useState(false); // boolean indicating if the form was autofilled, changes color if true
 
   // Fills fields with sample data based on the selected
-  const fillFields = useCallback(
-    (highlightAutofilled = true) => {
-      setFirstName(hyperUnluckyPatient.FirstName);
-      setLastName(hyperUnluckyPatient.LastName);
-      setDOB(hyperUnluckyPatient.DOB);
-      setMRN(hyperUnluckyPatient.MRN);
-      setPhone(hyperUnluckyPatient.Phone);
-      setAutofilled(highlightAutofilled);
-    },
-    [fhirServers],
-  );
+  const fillFields = useCallback(() => {
+    setFirstName(hyperUnluckyPatient.FirstName);
+    setLastName(hyperUnluckyPatient.LastName);
+    setDOB(hyperUnluckyPatient.DOB);
+    setMRN(hyperUnluckyPatient.MRN);
+    setPhone(hyperUnluckyPatient.Phone);
+  }, [fhirServers]);
 
   const nameRegex = "^[A-Za-z\u00C0-\u024F\u1E00-\u1EFF\\-'. ]+$";
   const nameRuleHint =
@@ -126,7 +121,7 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
                 secondary
                 type="button"
                 onClick={() => {
-                  fillFields(false);
+                  fillFields();
                 }}
               >
                 Fill fields
@@ -196,10 +191,6 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
                 onChange={(event) => {
                   setFirstName(event.target.value);
                 }}
-                style={{
-                  backgroundColor:
-                    autofilled && firstName ? autofillColor : undefined,
-                }}
               />
             </div>
             <div className="tablet:grid-col-6">
@@ -215,10 +206,6 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
                 value={lastName}
                 onChange={(event) => {
                   setLastName(event.target.value);
-                }}
-                style={{
-                  backgroundColor:
-                    autofilled && lastName ? autofillColor : undefined,
                 }}
               />
             </div>
@@ -238,10 +225,6 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
                 value={phone}
                 onChange={(event) => {
                   setPhone(event.target.value);
-                }}
-                style={{
-                  backgroundColor:
-                    autofilled && phone ? autofillColor : undefined,
                 }}
               />
             </div>
@@ -263,10 +246,6 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
                   value={dob}
                   onChange={(event) => {
                     setDOB(event.target.value);
-                  }}
-                  style={{
-                    backgroundColor:
-                      autofilled && dob ? autofillColor : undefined,
                   }}
                 />
               </div>
@@ -356,10 +335,6 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
                 onChange={(event) => {
                   setMRN(event.target.value);
                 }}
-                style={{
-                  backgroundColor:
-                    autofilled && mrn ? autofillColor : undefined,
-                }}
               />
             </div>
           </div>
@@ -374,5 +349,4 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
 
 export default SearchForm;
 
-const autofillColor = "#faf3d1";
 export const STEP_ONE_PAGE_TITLE = "Step 1: Enter patient information";

@@ -4,6 +4,20 @@ footer {
   background-color: $footer;
 }
 
+.destructive-primary {
+  color: $destructive-primary;
+}
+.success-primary {
+  color: $success-primary;
+}
+.error-primary {
+  color: $error-primary;
+}
+
+.text-secondary {
+  color: $text-secondary;
+}
+
 .usa-step-indicator__segment:before {
   box-shadow:
     0 0 0 0.25rem $white,
@@ -38,7 +52,7 @@ footer {
 
 .usa-accordion__button,
 .usa-accordion__button:hover {
-  background-color: $background-dark;
+  background-color: $background-darker;
   color: $text-primary;
 }
 

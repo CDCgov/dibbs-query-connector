@@ -32,6 +32,17 @@ $destructive-primary: #d54309; // primary error / info color
 $destructive-primary--dark: #b51d09; // error hover
 $destructive-primary--darker: #6f3331; // error active
 
+$success-primary: #00a91c;
+
+$error-primary: #fb5a47;
+$error-lighter: #fff3f2;
+$error-light: #fdb8ae;
+$error-dark: #b50909;
+
+$error: $red-300;
+$error-border: #d73a49;
+$error-background: #fce8e8;
+
 $brand-primary: $blue-cool-50; // branded text color
 $brand-primary--light: $blue-cool-20; // ??? is in the swatch
 $brand-primary--lighter: $blue-cool-10; // tertiary link text color
@@ -40,14 +51,16 @@ $brand-primary--dark: $blue-cool-70; // secondary button text
 $brand-primary--darker: $blue-cool-80; // ??? is in the swatch
 
 $background: $gray-100;
-$background-dark: $gray-300;
+$background-dark: $gray-200;
+$background-darker: $gray-300;
+$background-darkest: $gray-500;
+
+$border: $gray-400;
+$border-light: $gray-300;
+$border-dark: $gray-500;
 
 $drop-shadow: $gray-200;
-
-$empty-state: $blue-100;
-$highlight: $blue-100;
-$hover-active: $blue-40v;
-$info: $blue-100;
+$focus-outline: $blue-40v;
 
 $diabled: $gray-20;
 $hover-neutral: $gray-200;
@@ -56,29 +69,11 @@ $hover-neutral: $gray-200;
 $header: $brand-primary--darker;
 $footer: $brand-primary--darker;
 
-$stepper-inactive: $gray-500;
-$stepper-inactive-text: $gray-600;
-$stepper-completed: $blue-500;
-
-$input-field-border: $gray-500;
-
 // TODO: DS - replace these with another brand color?
 $info-background: $yellow-vivid-5v;
 $info-background--dark: $yellow-vivid-50v;
-$no-results-background: #e8f5ff;
-$pill-background: #e8f5ff;
-$query-library-accordion-background: #f7f9fa;
-$error: $red-300;
-$error-border: #d73a49;
-$error-background: #fce8e8;
-$spinner-progress-segment-color: #3498db;
-$table-header-color: #f0f0f0;
+
 $success-toast-background: #ecf3ec;
-$background-darkest: $gray-500;
-$hover-blue: rgba(217, 232, 246, 0.5);
-$border: $gray-400;
-$border-dark: $gray-500;
-$border-light: $gray-300;
 $overlay-background: rgba(0, 0, 0, 0.5);
 
 // Design system fonts

@@ -1,7 +1,7 @@
 @use "../../../ui/styles/_variables" as *;
 
 .errorText {
-  color: $error;
+  color: $error-primary;
   font-size: 0.875rem;
   margin-top: 0.25rem;
   position: relative;
@@ -9,11 +9,11 @@
 }
 
 .bgErrorLighter {
-  background-color: $error-background;
+  background-color: $error-lighter;
 }
 
 .borderError {
-  border: 2px solid $error-border;
+  border: 2px solid $error-dark;
 }
 
 .textInputContainer {

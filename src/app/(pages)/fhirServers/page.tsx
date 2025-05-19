@@ -305,9 +305,8 @@ const FhirServers: React.FC = () => {
         buttons[1].text = (
           <>
             <Icon.Check
-              className="usa-icon"
+              className="usa-icon success-primary"
               aria-label="Connected"
-              color="green"
             />
             Success
           </>
@@ -504,9 +503,8 @@ const FhirServers: React.FC = () => {
                         <>
                           <Icon.Check
                             size={3}
-                            className="usa-icon margin-right-05"
+                            className="usa-icon margin-right-05 success-primary"
                             aria-label="Connected"
-                            color="green"
                           />
                           Connected
                         </>
@@ -514,9 +512,8 @@ const FhirServers: React.FC = () => {
                         <>
                           <Icon.Close
                             size={3}
-                            className="usa-icon margin-right-05"
+                            className="usa-icon margin-right-05 error-primary"
                             aria-label="Not connected"
-                            color="red"
                           />
                           Not connected
                         </>

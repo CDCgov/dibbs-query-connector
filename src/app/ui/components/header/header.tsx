@@ -128,9 +128,8 @@ const HeaderComponent: React.FC<HeaderProps> = ({ session }) => {
                   data-testid="menu-button"
                 >
                   <Icon.Settings
-                    className="usa-icon qc-settings"
+                    className="usa-icon text-white"
                     size={3}
-                    color="#fff"
                     aria-label="Gear icon indicating settings menu"
                   />
                 </button>
