@@ -32,18 +32,18 @@ There are a number of different ways you can deploy a Docker container:
 
 - Use a managed Kubernetes service like AWS [EKS](https://aws.amazon.com/eks/) or Azure [AKS](https://azure.microsoft.com/en-us/products/kubernetes-service).
 
-Here we provide a basic example of pulling the Docker image onto an EC2 instance, but we're happy to provide guidance on the other options, as well. 
+Here we provide a basic example of pulling the Docker image onto an EC2 instance, but we're happy to provide guidance on the other options, as well.
 
 To deploy Query Connector using Docker on an EC2 instance or other virtual machine with Docker installed:
 
 1. **Pull the container image**:
-   
+
    ```bash
    docker pull ghcr.io/cdcgov/dibbs-query-connector/query-connector:latest
    ```
-   
+
    Alternatively, you can use a specific version:
-   
+
    ```bash
    docker pull ghcr.io/cdcgov/dibbs-query-connector/query-connector:1.0.1
    ```
@@ -52,7 +52,7 @@ To deploy Query Connector using Docker on an EC2 instance or other virtual machi
    Create a `.env` file with all required environment variables (see the [Environment Variables section](#environment-variables) below).
 
 3. **Run the container**:
-   
+
    ```bash
    docker run -d \
      --name query-connector \
@@ -75,20 +75,20 @@ For organizations with restrictions on container usage or specific compliance re
 1. Download the provided VM image from [the dibbs-vm repository](https://github.com/CDCgov/dibbs-vm).
 
 2. Import to your hypervisor:
-   
+
    - For VMware: Import the OVA file through vSphere client or VMware Workstation
    - For Hyper-V: Import the VHDX file
    - For VirtualBox: Import the OVA file
    - For cloud providers: Convert to the appropriate format (AMI for AWS, VHD for Azure, etc.)
 
 3. Configure VM resources:
-   
+
    - For production: 4+ vCPUs, 8+ GB RAM, 50+ GB storage
    - For testing: 2+ vCPUs, 4+ GB RAM, 20+ GB storage
 
 4. Begin by initiating the bash setup script, which is called [dibbs-query-connector-wizard.sh](http://dibbs-query-connector-wizard.sh).
 
-5. Once you initiate the script, you’ll see a warning message pop up. This warning lets you know that, if you don’t have a database you’re connecting to Query Connector, there’s a development database you can deploy instead. 
+5. Once you initiate the script, you’ll see a warning message pop up. This warning lets you know that, if you don’t have a database you’re connecting to Query Connector, there’s a development database you can deploy instead.
 
 6. By default, the script will deploy an application called dibbs-query-connector tagged to the latest stable version available within the VM. Unless you want to change either of these defaults, accept both prompts by pressing Enter.
 
@@ -105,21 +105,16 @@ For organizations with restrictions on container usage or specific compliance re
 12. If you have a self-signed certificate, you can utilize it here.
 
 13. Next, you’ll be prompted to enter secrets and API keys:
-    
-    - The first one is an auth secret key. 
-    
+
+    - The first one is an auth secret key.
     - The next is your authentication endpoint.
-    
-    - Next, enter your ERSD API key. Our README files [link] have instructions for obtaining these keys – there’s no default key, because each user should use their own.
-    
+    - Next, enter your ERSD API key. [See here](development.md#obtaining-api-and-license-keys) for instructions for obtaining these keys – there’s no default key, because each user should use their own.
     - Finally, enter your UMLS API key.
 
 14. With these variables set, the following containers will be started:
-    
+
     - The Query Connector app container
-    
     - Portainer (the solution we provide for users to manage their containers out of the box)
-    
     - Docs (central location for the README file and other documentation you might need)
 
 15. Navigate to Portainer and then visit the Dashboard. Here, you can view containers, images, stack, networks, and volumes.
@@ -135,14 +130,14 @@ Currently, Query Connector requires a PostgreSQL database to store information o
 ### Setting up a production database
 
 1. **Create a managed PostgreSQL instance**:
-   
+
    - AWS: [RDS for PostgreSQL](https://aws.amazon.com/rds/postgresql/)
    - Azure: [Azure Database for PostgreSQL](https://azure.microsoft.com/en-us/products/postgresql)
    - GCP: [Cloud SQL for PostgreSQL](https://cloud.google.com/sql/docs/postgres)
    - Self-hosted: Use a high-availability PostgreSQL setup
 
 2. **Database requirements**:
-   
+
    - PostgreSQL version 13 or higher
    - At least 10GB of storage to start
    - Configure automated backups
@@ -150,7 +145,7 @@ Currently, Query Connector requires a PostgreSQL database to store information o
 
 3. **Database migrations**:
    Query Connector uses Flyway for database migrations. The app will automatically apply migrations when it starts up.
-   
+
    Ensure your `flyway.conf` file points to your production database.
 
 4. **Database connection**:
@@ -171,7 +166,7 @@ If using Keycloak:
 1. **Create a new realm** for Query Connector or use an existing one.
 
 2. **Create a new client**:
-   
+
    - Client ID: `query-connector` (or your preferred name)
    - Client Protocol: `openid-connect`
    - Access Type: `confidential`
@@ -180,12 +175,12 @@ If using Keycloak:
    - Enable "Client authentication" and check "Standard" for "Authentication flow"
 
 3. **Get client credentials**:
-   
+
    - Go to the Credentials tab for your client.
    - Copy the Secret value for use in your environment variables.
 
 4. **Configure environment variables**:
-   
+
    ```
    NEXT_PUBLIC_AUTH_PROVIDER=keycloak
    AUTH_CLIENT_ID=query-connector
@@ -198,22 +193,22 @@ If using Keycloak:
 If using Microsoft Entra ID:
 
 1. **Register a new application**:
-   
+
    - Go to Azure Portal > Microsoft Entra ID > App registrations.
    - Create a new registration.
    - Set the redirect URI to: `https://your-query-connector-url/api/auth/callback/microsoft-entra`.
 
 2. **Configure API permissions**:
-   
+
    - Add Microsoft Graph permissions (email, openid, and profile).
 
 3. **Create client secret**:
-   
+
    - Go to Certificates & Secrets.
    - Create a new client secret and note the value.
 
 4. **Configure environment variables**:
-   
+
    ```
    NEXT_PUBLIC_AUTH_PROVIDER=microsoft-entra-id
    AUTH_CLIENT_ID=your-application-id
@@ -228,14 +223,14 @@ The Query Connector needs to connect to a FHIR server to fetch patient data. Thi
 ### FHIR server configuration
 
 1. **Register Query Connector as a client**:
-   
+
    - Work with your FHIR server administrator to register Query Connector as a client.
    - Obtain client credentials (client ID and secret) or appropriate authentication tokens.
    - Ensure your Query Connector's IP address/domain is allowlisted by the FHIR server.
 
 2. **Configure connection in Query Connector**:
    Use the FHIR server configuration page in the Query Connector admin interface to add servers:
-   
+
    - Server name: A descriptive name for the server
    - Server URL: The base URL of the FHIR server (e.g., `https://fhir.example.org/R4`)
    - Authentication method: Select from the supported methods
@@ -244,12 +239,12 @@ The Query Connector needs to connect to a FHIR server to fetch patient data. Thi
      - SMART on FHIR with asymmetric key exchange
 
 3. **Testing the connection**:
-   
+
    - After configuration, test the connection using the test feature in the FHIR server configuration UI.
    - Verify that Query Connector can successfully authenticate and retrieve data.
 
 4. **For multiple FHIR servers**:
-   
+
    - Query Connector supports connecting to multiple FHIR servers.
    - Each server can be configured separately in the admin interface.
    - Users with appropriate permissions can select which server to query when running a search.
@@ -285,18 +280,18 @@ For more information on the ERSD and UMLS API keys, see [this API key documentat
 ### Backup and disaster recovery
 
 1. **Database backups**:
-   
+
    - Set up regular backups of your PostgreSQL database.
    - For managed services, enable point-in-time recovery.
    - Test restoration procedures periodically.
 
 2. **Application state**:
-   
+
    - The application itself is stateless, so focus on database backups.
    - Consider backing up your configuration files and environment variables.
 
 3. **Disaster recovery plan**:
-   
+
    - Document your team's procedures for restoring the application from backups.
    - Consider implementing redundancy for critical components.
    - Set up monitoring and alerting for early detection of issues.
@@ -304,19 +299,19 @@ For more information on the ERSD and UMLS API keys, see [this API key documentat
 ### Security recommendations
 
 1. **Network security**:
-   
+
    - Place Query Connector behind a reverse proxy or load balancer.
    - Configure proper SSL/TLS termination.
    - Implement network segmentation.
    - Set up Web Application Firewall (WAF) protection.
 
 2. **Access controls**:
-   
+
    - Use Query Connector's built-in role-based access controls.
    - Regularly audit user accounts and permissions.
 
 3. **Compliance considerations**:
-   
+
    - Ensure your deployment meets HIPAA requirements if handling PHI.
    - Use Query Connector's built-in audit logging for keeping a log of all patient data access.
    - Implement proper data retention policies.
@@ -324,14 +319,14 @@ For more information on the ERSD and UMLS API keys, see [this API key documentat
 ### Upgrading
 
 1. **Version upgrades**:
-   
+
    - Check the [release notes](docs/release.md) for breaking changes.
    - Test upgrades in a non-production environment first.
    - Back up all data before upgrading.
    - Follow semantic versioning guidelines for understanding impact.
 
 2. **Rollback procedures**:
-   
+
    - Document rollback steps for each component.
    - Maintain previous container images for quick rollback.
    - Test rollback procedures as part of your upgrade planning.
@@ -343,3 +338,7 @@ If you encounter issues during deployment or operation of Query Connector, you c
 1. Check the [GitHub repository](https://github.com/CDCgov/dibbs-query-connector) for documentation and known issues.
 2. Submit an issue on the GitHub repository.
 3. Contact the DIBBs team at [dibbs@cdc.gov](mailto:dibbs@cdc.gov).
+
+## Feedback
+
+Share your feedback [here](https://docs.google.com/forms/d/e/1FAIpQLSelXP4MFzezJpn4IlRYTSuRHV4KeM5tNhIfpkGNY1kbhTUc_w/viewform?usp=sharing&ouid=110784663264830241248) to help us improve this documentation. If you have other questions, feel free to contact our team at dibbs@cdc.gov.
