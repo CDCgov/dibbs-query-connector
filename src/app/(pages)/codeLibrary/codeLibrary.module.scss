@@ -301,7 +301,7 @@
       padding: 0 0 0 1.5rem !important;
 
       &:hover {
-        background-color: #e8f5ff !important;
+        background-color: $brand-lightest !important;
       }
 
       &:after {
@@ -384,7 +384,7 @@
 
   .activeValueSet,
   .activeValueSet td {
-    background-color: #e8f5ff;
+    background-color: $brand-lightest;
   }
 }
 
