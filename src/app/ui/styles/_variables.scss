@@ -21,8 +21,13 @@ $site-alert-height: 2.5rem;
 // Design System Color Tokens
 $black: #000;
 $white: #fff;
-$brand-darkest: #0f191c;
-$brand-lightest: #e7f2f5;
+
+$brand-primary: $blue-cool-50; // branded text color
+$brand-light: $blue-cool-20; // ??? is in the swatch
+$brand-lighter: $blue-cool-10; // tertiary link text color
+$brand-lightest: $blue-cool-5; // secondary button background
+$brand-dark: $blue-cool-70; // secondary button text
+$brand-darker: $blue-cool-80; // ??? is in the swatch
 
 $accent-primary: $violet-warm-60; // primary CTA / info color
 $accent-primary--dark: $violet-warm-70; // CTA hover
@@ -49,13 +54,6 @@ $warning-lighter: #fff5c2;
 $warning-light: #fee685;
 $warning-dark: #947100;
 $warning-darker: #5c4809;
-
-$brand-primary: $blue-cool-50; // branded text color
-$brand-light: $blue-cool-20; // ??? is in the swatch
-$brand-lighter: $blue-cool-10; // tertiary link text color
-$brand-lightest: $blue-cool-5; // secondary button background
-$brand-dark: $blue-cool-70; // secondary button text
-$brand-darker: $blue-cool-80; // ??? is in the swatch
 
 $background: $gray-100;
 $background-dark: $gray-200;
