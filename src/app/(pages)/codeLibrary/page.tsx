@@ -527,10 +527,7 @@ const CodeLibrary: React.FC = () => {
                         >
                           <th>
                             <Button
-                              className={classNames(
-                                styles.editCodesBtn,
-                                "button-secondary",
-                              )}
+                              secondary
                               type="button"
                               onClick={() => handleChangeMode("edit")}
                             >
@@ -539,7 +536,6 @@ const CodeLibrary: React.FC = () => {
                                 : "Edit codes"}
                             </Button>
                             <Button
-                              className={styles.deleteValueSet}
                               type="button"
                               onClick={() => modalRef.current?.toggleModal()}
                             >
@@ -658,7 +654,7 @@ const CodeLibrary: React.FC = () => {
             text: "Delete value set",
             type: "button" as const,
             id: "delete-vs-confirm",
-            className: classNames("usa-button", styles.modalButtonDelete),
+            className: classNames("usa-button", "usa-button--cancel"),
             onClick: handleDeleteValueSet,
           },
           {

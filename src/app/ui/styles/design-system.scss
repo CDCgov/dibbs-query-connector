@@ -109,14 +109,6 @@ h1 {
     0 0 0 0 $white !important;
 }
 
-.usa-current {
-  color: $brand-primary !important;
-}
-
-.usa-current::after {
-  background-color: $brand-primary !important;
-}
-
 .usa-accordion__button,
 .usa-accordion__button:hover {
   background-color: $background-darker;
@@ -290,29 +282,27 @@ ul.usa-sidenav
 
 .usa-pagination .usa-current {
   background-color: $white;
+  color: $accent-dark;
   border-radius: 0.25rem;
-  border: 1px solid $border;
+  border: 1px solid $border-dark !important;
   font-size: 1rem;
   font-weight: 700;
   line-height: 140%;
   margin: 0;
-  text-decoration: none;
-}
-
-.usa-pagination .usa-current,
-.usa-pagination .usa-current button,
-.usa-pagination .usa-current a {
-  font-weight: 700;
-  text-decoration: none;
+  text-decoration: underline;
 }
 
 .usa-pagination .usa-current:hover,
 .usa-pagination .usa-current:focus,
 .usa-pagination .usa-current:active {
-  background-color: white;
-  border-color: $border-dark;
-  color: inherit;
-  text-decoration: none;
+  color: $accent-darker;
+}
+
+.usa-pagination__button:hover,
+.usa-pagination__button:focus,
+.usa-pagination__button:active {
+  border: 1px solid $border !important;
+  background-color: $hover-neutral !important;
 }
 
 .usa-pagination__button,
