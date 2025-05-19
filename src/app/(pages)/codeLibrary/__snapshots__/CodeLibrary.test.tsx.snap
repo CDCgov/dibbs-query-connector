@@ -41,7 +41,7 @@ exports[`Code library interaction renders action buttons for custom value sets o
             Manage codes
           </h1>
           <div
-            class="usa-alert usa-alert--info info-alert"
+            class="usa-alert usa-alert--warning info-alert"
             data-testid="alert"
           >
             <div
@@ -609,7 +609,7 @@ exports[`Code library loading view renders a skeleton loading state when loading
             Manage codes
           </h1>
           <div
-            class="usa-alert usa-alert--info info-alert"
+            class="usa-alert usa-alert--warning info-alert"
             data-testid="alert"
           >
             <div
@@ -942,7 +942,7 @@ exports[`Code library rendered view renders concept codes for the value set when
             Manage codes
           </h1>
           <div
-            class="usa-alert usa-alert--info info-alert"
+            class="usa-alert usa-alert--warning info-alert"
             data-testid="alert"
           >
             <div
@@ -1487,7 +1487,7 @@ exports[`Code library rendered view renders the correct content 1`] = `
             Manage codes
           </h1>
           <div
-            class="usa-alert usa-alert--info info-alert"
+            class="usa-alert usa-alert--warning info-alert"
             data-testid="alert"
           >
             <div
