@@ -1,7 +1,40 @@
 @use "variables" as *;
 
+html,
+body {
+  height: 100%;
+}
+html {
+  scroll-behavior: auto;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: $sans-serif-font;
+  line-height: 1.4;
+  background-color: $background;
+}
+.application-container {
+  display: flex;
+  flex-flow: column;
+  min-height: 100%;
+}
+
+header,
 footer {
-  background-color: $footer;
+  padding: 1rem 5rem;
+  margin: 0;
+  background-color: $brand-darker;
+}
+
+h1 {
+  font-family: $serif-font;
+}
+
+.main-body {
+  background-color: $background;
+  display: flex;
+  flex: 1 1 auto;
 }
 
 .usa-alert--info {
