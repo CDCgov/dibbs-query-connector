@@ -110,14 +110,14 @@ footer {
 
   &:hover,
   &--outline:hover {
-    box-shadow: inset 0 0 0 2px $accent-primary--dark;
-    background-color: $accent-primary--dark !important;
+    box-shadow: inset 0 0 0 2px $accent-dark;
+    background-color: $accent-dark !important;
   }
 
   &:active,
   &--outline:active {
-    box-shadow: inset 0 0 0 2px $accent-primary--darker;
-    background-color: $accent-primary--darker !important;
+    box-shadow: inset 0 0 0 2px $accent-darker;
+    background-color: $accent-darker !important;
   }
 
   &--outline {
@@ -126,11 +126,11 @@ footer {
   }
   &--outline:hover {
     background-color: $white !important;
-    color: $accent-primary--dark;
+    color: $accent-dark;
   }
   &--outline:active {
     background-color: $white !important;
-    color: $accent-primary--darker;
+    color: $accent-darker;
   }
 
   &--secondary {
@@ -181,12 +181,12 @@ footer {
   &--cancel:hover {
     box-shadow: none;
     color: $white;
-    background-color: $destructive-primary--dark !important;
+    background-color: $destructive-dark !important;
   }
   &--cancel:active {
     box-shadow: none;
     color: $white;
-    background-color: $destructive-primary--darker !important;
+    background-color: $destructive-darker !important;
   }
 }
 
