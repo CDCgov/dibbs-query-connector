@@ -39,9 +39,11 @@ $error-lighter: #fff3f2;
 $error-light: #fdb8ae;
 $error-dark: #b50909;
 
-$error: $red-300;
-$error-border: #d73a49;
-$error-background: #fce8e8;
+$warning-primary: #fee685;
+$warning-lighter: #fff5c2;
+$warning-light: #fee685;
+$warning-dark: #947100;
+$warning-darker: #5c4809;
 
 $brand-primary: $blue-cool-50; // branded text color
 $brand-primary--light: $blue-cool-20; // ??? is in the swatch
@@ -62,7 +64,10 @@ $border-dark: $gray-500;
 $drop-shadow: $gray-200;
 $focus-outline: $blue-40v;
 
-$diabled: $gray-20;
+$diabled: #c6cace;
+$diabled-light: #edeff0;
+$diabled-dark: #8d9297;
+
 $hover-neutral: $gray-200;
 
 // Semantic tokens
@@ -70,9 +75,6 @@ $header: $brand-primary--darker;
 $footer: $brand-primary--darker;
 
 // TODO: DS - replace these with another brand color?
-$info-background: $yellow-vivid-5v;
-$info-background--dark: $yellow-vivid-50v;
-
 $success-toast-background: #ecf3ec;
 $overlay-background: rgba(0, 0, 0, 0.5);
 

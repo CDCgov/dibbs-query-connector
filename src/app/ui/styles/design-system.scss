@@ -18,6 +18,15 @@ footer {
   color: $text-secondary;
 }
 
+.usa-alert--info {
+  background-color: $brand-primary--lighter;
+  border-left-color: $brand-primary;
+
+  .usa-alert__body {
+    background-color: $brand-primary--lighter;
+  }
+}
+
 .usa-step-indicator__segment:before {
   box-shadow:
     0 0 0 0.25rem $white,

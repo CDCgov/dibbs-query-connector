@@ -470,11 +470,11 @@ ul.usa-sidenav
   border-left: 0;
   margin-top: 1rem;
   margin-bottom: 1.5rem;
-  background-color: $info-background;
+  background-color: $warning-lighter;
 }
 
 .info-alert > .usa-alert__body {
-  background-color: $info-background;
+  background-color: $warning-lighter;
   width: fit-content;
   line-height: 1.5rem;
 
@@ -484,7 +484,7 @@ ul.usa-sidenav
   }
 
   &::before {
-    background-color: $info-background--dark;
+    background-color: $warning-dark;
     mask-size: 1.5rem;
   }
 }
