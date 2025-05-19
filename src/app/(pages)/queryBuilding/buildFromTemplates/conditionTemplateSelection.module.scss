@@ -252,7 +252,7 @@
 
     .addCondition {
       font-size: 1rem;
-      color: $accent-primary;
+      color: $brand-primary;
       line-height: 18.8px;
       font-weight: 700;
       display: flex;
@@ -327,10 +327,6 @@
 
 .accordionBodyExpanded {
   &:hover {
-    background-color: $brand-lighter !important;
-  }
-
-  &:hover {
     .valueSetTemplate__checkbox {
       background-color: unset;
     }
@@ -340,11 +336,10 @@
       width: 8rem;
       height: 2rem;
       font-size: 14px;
-      color: $accent-primary;
+      padding: 0.5rem 1.25rem;
 
       &:hover {
         cursor: pointer;
-        text-decoration: underline;
       }
     }
     .displayCount {
@@ -395,7 +390,7 @@ div.accordionBodyExpanded:last-of-type {
 }
 
 .accordionBodyExpanded__right {
-  padding-bottom: 1rem;
+  padding-bottom: 0.5rem;
   display: flex;
   align-items: center;
   min-width: 4rem;
