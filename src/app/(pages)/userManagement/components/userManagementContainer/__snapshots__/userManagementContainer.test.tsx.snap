@@ -16,7 +16,7 @@ exports[`Admin view of Users Table renders error message when no user groups are
           <button
             class="usa-button styles.createQueryButton margin-bottom-3"
             data-testid="button"
-            style="margin-left: 1px; margin-top: 1.5rem; background-color: rgb(0, 94, 162);"
+            style="margin-left: 1px; margin-top: 1.5rem;"
             type="button"
           >
             Create group
@@ -405,7 +405,7 @@ exports[`Super Admin view of Users Table renders content on tab click 2`] = `
           <button
             class="usa-button styles.createQueryButton margin-bottom-3"
             data-testid="button"
-            style="margin-left: 1px; margin-top: 1.5rem; background-color: rgb(0, 94, 162);"
+            style="margin-left: 1px; margin-top: 1.5rem;"
             type="button"
           >
             Create group
