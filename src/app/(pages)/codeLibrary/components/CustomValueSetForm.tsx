@@ -148,8 +148,10 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
     }
   }, [codesMap]);
 
-  const fetchUpdatedValueSet = async () => {
-    const updatedVS = await getCustomValueSetById(customValueSet.valueSetId);
+  const fetchUpdatedValueSet = async (id?: string) => {
+    const updatedVS = await getCustomValueSetById(
+      id ?? customValueSet.valueSetId,
+    );
 
     if (updatedVS.totalItems <= 0) {
       return;
@@ -239,7 +241,7 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
       codes[0]?.code == "" &&
       codes[0]?.display == "";
 
-    return Object.entries(codes).map(([id, codeObj], idx) => {
+    return Object.entries(codes).map(([id, codeObj]) => {
       return loading ? (
         <Skeleton
           height={"2.5rem"}
@@ -254,13 +256,13 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
             styles.formSection__input,
             showEmptyCodePlaceholder ? styles.emptyCodeRow : "",
           )}
-          key={codeObj.internalId || idx}
+          key={id}
         >
           <div className={styles.textInput}>
             <label htmlFor="code-id">Code #</label>
             <TextInput
               type="text"
-              id={`code-id-${codeObj.internalId ?? idx}`}
+              id={`code-id-${id}`}
               name="code-id"
               value={codeObj.code}
               onChange={(e) => handleAddCode("code", id, e.target.value)}
@@ -270,7 +272,7 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
             <label htmlFor="code-name">Code name</label>
             <TextInput
               type="text"
-              id={`code-name-${codeObj.internalId ?? idx}`}
+              id={`code-name-${id}`}
               name="code-name"
               value={codeObj.display}
               onChange={(e) => handleAddCode("name", id, e.target.value)}
@@ -280,11 +282,11 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
             className={classNames("margin-bottom-1", styles.deleteIcon)}
             size={3}
             color="#919191"
-            data-testid={`delete-custom-code-${idx}`}
+            data-testid={`delete-custom-code-${id}`}
             aria-label="Trash icon indicating deletion of code entry"
             onClick={(e) => {
               e.preventDefault();
-              handleRemoveCode(idx.toString());
+              handleRemoveCode(id.toString());
             }}
           ></Icon.Delete>
         </div>
@@ -323,7 +325,7 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
 
       //  TODO: error handling
       if (result.success == true) {
-        fetchUpdatedValueSet();
+        await fetchUpdatedValueSet(result.id);
 
         showToastConfirmation({
           body: `Value set "${newCustomValueSet.valueSetName}" successfully ${
@@ -336,7 +338,7 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
     } catch (error) {
       showToastConfirmation({
         variant: "error",
-        body: `Unable to dalue set "${customValueSet.valueSetName}". Please try again later.`,
+        body: `Unable to delete value set "${customValueSet.valueSetName}". Please try again later.`,
       });
 
       console.error(error);
