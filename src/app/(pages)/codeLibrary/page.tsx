@@ -313,7 +313,6 @@ const CodeLibrary: React.FC = () => {
       const result = await deleteCustomValueSet(activeValueSet);
 
       if (result.success) {
-        console.log(filterSearch);
         await fetchValueSetsAndConditions();
         showToastConfirmation({
           body: `Value set "${activeValueSet.valueSetName}" successfully deleted.`,
