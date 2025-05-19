@@ -23,14 +23,14 @@ $serif-font: family("heading");
 $sans-serif-font: "Public Sans Web", family("body");
 $mono-font: "Consolas", family("mono");
 
+// Design System Color Tokens
+$black: #000;
+$white: #fff;
+
 $text-primary: $black;
 $text-secondary: $gray-500;
 $text-inactive: $gray-20;
 $text-inactive-dark: $gray-600;
-
-// Design System Color Tokens
-$black: #000;
-$white: #fff;
 
 $brand-primary: $blue-cool-50; // branded text color
 $brand-light: $blue-cool-20; // ??? is in the swatch
