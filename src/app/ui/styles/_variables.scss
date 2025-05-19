@@ -18,6 +18,16 @@ $footer-content-height: 5rem;
 $default-table-padding: 1.5rem;
 $site-alert-height: 2.5rem;
 
+// Design system fonts
+$serif-font: family("heading");
+$sans-serif-font: "Public Sans Web", family("body");
+$mono-font: "Consolas", family("mono");
+
+$text-primary: $black;
+$text-secondary: $gray-500;
+$text-inactive: $gray-20;
+$text-inactive--dark: $gray-600;
+
 // Design System Color Tokens
 $black: #000;
 $white: #fff;
@@ -64,28 +74,17 @@ $border: $gray-400;
 $border-light: $gray-300;
 $border-dark: $gray-500;
 
-$drop-shadow: $gray-200;
-$focus-outline: $blue-40v;
-
 $diabled: #c6cace;
 $diabled-light: #edeff0;
 $diabled-dark: #8d9297;
-
-$hover-neutral: $gray-200;
 
 // Semantic tokens
 $header: $brand-darker;
 $footer: $brand-darker;
 
-// TODO: DS - replace these with another brand color?
+$hover-neutral: $gray-200;
+
+$drop-shadow: $gray-200;
+$focus-outline: $blue-40v;
+
 $overlay-background: rgba(0, 0, 0, 0.5);
-
-// Design system fonts
-$serif-font: family("heading");
-$sans-serif-font: "Public Sans Web", family("body");
-$mono-font: "Consolas", family("mono");
-
-$text-primary: $black;
-$text-secondary: $gray-500;
-$text-inactive: $gray-20;
-$text-inactive--dark: $gray-600;
