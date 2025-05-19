@@ -24,7 +24,7 @@ import {
   formatCodeSystemPrefix,
   formatStringToSentenceCase,
 } from "@/app/shared/format-service";
-import { CodeSystemOptions, CustomCodeMode } from "../utils";
+import { CodeSystemOptions, CustomCodeMode, emptyValueSet } from "../utils";
 import Skeleton from "react-loading-skeleton";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import { groupConditionConceptsIntoValueSets } from "@/app/shared/utils";
@@ -62,8 +62,9 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
   const username = session?.user?.username || "";
   const [currentUser, setCurrentUser] = useState<User>();
 
-  const [customValueSet, setCustomValueSet] =
-    useState<DibbsValueSet>(activeValueSet);
+  const [customValueSet, setCustomValueSet] = useState<DibbsValueSet>(
+    mode == "create" ? emptyValueSet : activeValueSet,
+  );
   const [codesMap, setCodesMap] = useState<CustomCodeMap>(newEmptyCodesMap());
 
   const [error, setError] = useState<{ [field: string]: boolean }>({
