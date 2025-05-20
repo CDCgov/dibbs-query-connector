@@ -45,6 +45,13 @@ const entraProvider = MicrosoftEntraID({
   authorization: {
     params: {
       scope: "openid email profile",
+      claims: {
+        id_token: {
+          roles: { essential: true },
+          wids: { essential: true }, // Windows IDs for admin roles
+          groups: { essential: true },
+        },
+      },
     },
   },
 });
@@ -69,26 +76,29 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   basePath: "/api/auth",
   providers,
   callbacks: {
-    /**
-     * JWT callback to store Keycloak user data in the token.
-     * @param token The root object containing the JWT properties.
-     * @param token.token The current JWT token.
-     * @param token.profile The user profile returned from Keycloak.
-     * @returns The updated JWT token with user details.
-     */
     async jwt({ token, profile, account }) {
       const now = Math.floor(Date.now() / 1000);
-      if (account?.access_token) {
-        let decodedToken = decodeJwt(account?.access_token);
+      let role: string = UserRole.STANDARD;
+
+      if (account?.id_token) {
+        let decodedToken = decodeJwt(account?.id_token);
         console.log(decodedToken);
-        if (
-          decodedToken &&
-          typeof decodedToken !== "string" &&
-          decodedToken?.realm_access
-        ) {
-          // keycloak
-          const roles = decodedToken?.realm_access as Record<string, string>;
-          console.log("Includes admin: ", roles?.roles?.includes("admin"));
+        switch (process.env.NEXT_PUBLIC_AUTH_PROVIDER) {
+          case "keycloak":
+            const keycloakRoles = decodedToken?.realm_access as Record<
+              string,
+              string
+            >;
+
+            role = keycloakRoles?.roles[0];
+            break;
+          case "microsoft-entra-id":
+            const azureRoles = decodedToken?.roles as string[];
+            role = azureRoles[0];
+
+            break;
+          default:
+            break;
         }
       }
 
@@ -99,7 +109,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           email: profile.email || "",
           firstName: profile.given_name || "",
           lastName: profile.family_name || "",
-          role: "",
+          role: mapStringToUserRole(role),
         };
 
         // Ensure user is in the database **only on first login**
@@ -167,3 +177,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   // with caution
   debug: false,
 });
+
+function mapStringToUserRole(role: string) {
+  const MICROSOFT_MAP: Record<string, UserRole> = {
+    standard: UserRole.STANDARD,
+    "super-admin": UserRole.SUPER_ADMIN,
+    admin: UserRole.ADMIN,
+  };
+
+  return MICROSOFT_MAP[role] ? MICROSOFT_MAP[role] : UserRole.STANDARD;
+}

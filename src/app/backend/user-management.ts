@@ -101,6 +101,7 @@ class UserManagementService extends UserManagementServiceInternal {
    * @param userToken.email - The email from the JWT token.
    * @param userToken.firstName - The first name from the JWT token.
    * @param userToken.lastName - The last name from the JWT token.
+   * @param userToken.role - The role from the JWT token.
    * @returns The newly added user or an empty result if already exists.
    */
   @auditable
@@ -110,13 +111,14 @@ class UserManagementService extends UserManagementServiceInternal {
     email: string;
     firstName: string;
     lastName: string;
+    role: UserRole;
   }) {
     if (!userToken || !userToken.username) {
       console.error("Invalid user token. Cannot add user.");
       return { user: undefined };
     }
 
-    const { username, email, firstName, lastName } = userToken;
+    const { username, email, firstName, lastName, role } = userToken;
     const userIdentifier = username || email;
 
     try {
@@ -132,7 +134,6 @@ class UserManagementService extends UserManagementServiceInternal {
       }
 
       // Default role when adding a new user, which includes Super Admin, Admin, and Standard User.
-      let qcRole = UserRole.STANDARD;
       console.log("User not found. Proceeding to insert.");
 
       const insertUserQuery = `
@@ -143,7 +144,7 @@ class UserManagementService extends UserManagementServiceInternal {
 
       const result = await dbService.query(insertUserQuery, [
         userIdentifier,
-        qcRole,
+        role,
         firstName,
         lastName,
       ]);
