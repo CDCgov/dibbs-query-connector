@@ -339,7 +339,7 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
       <WarningModal
         modalRef={warningModalRef}
         heading="You have unsaved changes"
-        description="You’ve made changes to your query. Would you like to save before leaving?"
+        description="You've made changes to your query. Would you like to save before leaving?"
         onSave={async () => {
           await handleSaveQuery();
           pendingNavRef.current?.();
