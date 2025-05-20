@@ -2,11 +2,9 @@
 
 [![codecov](https://codecov.io/gh/CDCgov/dibbs-query-connector/branch/main/graph/badge.svg)](https://codecov.io/gh/CDCgov/dibbs-query-connector)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
-[![Test github badge](https://img.shields.io/github/actions/workflow/status/CDCgov/dibbs-query-connector/ci.yaml
-)](https://github.com/CDCgov/dibbs-query-connector/actions/workflows/ci.yaml)
+[![Test github badge](https://img.shields.io/github/actions/workflow/status/CDCgov/dibbs-query-connector/ci.yaml)](https://github.com/CDCgov/dibbs-query-connector/actions/workflows/ci.yaml)
 [![Dev site](https://img.shields.io/website?url=https%3A%2F%2Fqueryconnector.dev&label=queryconnector.dev)](https://queryconnector.dev)
 [![Demo site](https://img.shields.io/website?url=https%3A%2F%2Fdemo.queryconnector.dev&label=demo.queryconnector.dev)](https://demo.queryconnector.dev)
-
 
 ![Query Connector Screenshot](./docs/images/query-connector-screenshot.png)
 
@@ -35,15 +33,16 @@ DIBBs Query Connector is a sibling project to
 You can find more detailed documentation, guides, and tutorials here:
 
 - For developers:
-    - [Local development](docs/development.md)
-    - [Contributing changes](docs/contributing.md)
-    - [Release process](docs/release.md)
+  - [Local development](docs/development.md)
+  - [Contributing changes](docs/contributing.md)
+  - [Release process](docs/release.md)
 - For public health IT staff:
-    - [Architecture](docs/architecture.md)
-    - [Deploying Query Connector](docs/deployment.md)
-    - [API Docs](docs/api.md)
-- For public health case investigators: 
-    - [Query Connector User Guide](docs/user_guide.md)
+  - [Architecture](docs/architecture.md)
+  - [Deploying Query Connector](docs/deployment.md)
+  - [API Docs](docs/api.md)
+  - [ONC audit log compliance](docs/audit_log.md)
+- For public health case investigators:
+  - [Query Connector User Guide](docs/user_guide.md)
 
 ## Try it out!
 
