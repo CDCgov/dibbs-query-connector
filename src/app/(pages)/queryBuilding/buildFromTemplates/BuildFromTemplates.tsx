@@ -146,19 +146,14 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
     let isSubscribed = true;
 
     async function setInitialQueryState() {
-      if (selectedQuery.queryId === undefined) {
-        return;
-      }
+      if (!selectedQuery?.queryId) return;
       const savedQuery = await getSavedQueryById(selectedQuery.queryId);
-      if (savedQuery === undefined) {
-        return;
-      }
-      const initialState: NestedQuery = {};
+      if (!savedQuery) return;
 
+      const initialState: NestedQuery = {};
       Object.entries(savedQuery.queryData).forEach(
         ([conditionId, valueSetMap]) => {
           initialState[conditionId] = structuredClone(EMPTY_CONCEPT_TYPE);
-
           Object.entries(valueSetMap).forEach(([vsId, dibbsVs]) => {
             initialState[conditionId][dibbsVs.dibbsConceptType][vsId] = dibbsVs;
           });
@@ -174,15 +169,15 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
         };
       }
 
-      setFormError((prevError) => {
-        return { ...prevError, selectedConditions: false };
-      });
+      setFormError((prevError) => ({
+        ...prevError,
+        selectedConditions: false,
+      }));
     }
 
     async function fetchInitialConditions() {
       const { categoryToConditionNameArrayMap, conditionIdToNameMap } =
         await getConditionsData();
-
       if (isSubscribed) {
         setConditionsDetailsMap(conditionIdToNameMap);
         setCategoryToConditionMap(categoryToConditionNameArrayMap);
@@ -195,7 +190,7 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
     return () => {
       isSubscribed = false;
     };
-  }, []);
+  }, [selectedQuery.queryId]);
 
   async function handleCreateQueryClick(
     event: React.MouseEvent<HTMLButtonElement>,
