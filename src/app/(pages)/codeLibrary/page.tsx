@@ -103,8 +103,6 @@ const CodeLibrary: React.FC = () => {
     if (mode == "manage" || mode == "select") {
       // fetch fresh value set details if we are changing TO manage/select mode
       await fetchValueSetsAndConditions().then(() => {
-        setTextSearch("");
-        setFilterSearch(emptyFilterSearch);
         setMode(mode);
       });
     } else {
@@ -118,6 +116,7 @@ const CodeLibrary: React.FC = () => {
   // update the current page details when switching between build steps
   useEffect(() => {
     ctx?.setCurrentPage(mode);
+    applyFilters();
   }, [mode]);
 
   // fetch value sets on page load
@@ -143,7 +142,7 @@ const CodeLibrary: React.FC = () => {
 
   // organize valuesets once they've loaded
   useEffect(() => {
-    setFilteredValueSets(valueSets);
+    applyFilters();
     setActiveValueSet(paginatedValueSets[0]);
 
     if (
@@ -155,8 +154,7 @@ const CodeLibrary: React.FC = () => {
     }
   }, [valueSets, conditionDetailsMap]);
 
-  // update display based on text search and filters
-  useEffect(() => {
+  const applyFilters = async () => {
     const matchCategory = (vs: DibbsValueSet) => {
       return filterSearch.category
         ? vs.dibbsConceptType === filterSearch.category
@@ -173,16 +171,20 @@ const CodeLibrary: React.FC = () => {
         ? Object.values(filterSearch.creators).flat().includes(vs.author)
         : vs;
     };
-
-    setFilteredValueSets(
+    return setFilteredValueSets(
       valueSets
         .filter(handleTextSearch)
         .filter(matchCategory)
         .filter(matchCodeSystem)
         .filter(matchCreators),
     );
+  };
 
+  // update display based on text search and filters
+  useEffect(() => {
+    applyFilters();
     setCurrentPage(1);
+
     if (textSearch == "") {
       return setActiveValueSet(valueSets?.[0]);
     } else {
@@ -309,11 +311,9 @@ const CodeLibrary: React.FC = () => {
     setLoading(true);
     try {
       const result = await deleteCustomValueSet(activeValueSet);
-      console.log(result);
+
       if (result.success) {
         await fetchValueSetsAndConditions();
-        setFilterSearch(emptyFilterSearch);
-        setTextSearch("");
         showToastConfirmation({
           body: `Value set "${activeValueSet.valueSetName}" successfully deleted.`,
         });
