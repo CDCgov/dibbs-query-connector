@@ -107,10 +107,16 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
   const pendingNavRef = useRef<() => void>();
 
   function hasUnsavedChanges(): boolean {
+    const hasData =
+      queryName?.trim() || Object.keys(constructedQuery).length > 0;
+
+    if (!savedQueryRef.current) {
+      return Boolean(hasData); // user typed or selected something
+    }
     return (
-      JSON.stringify(savedQueryRef.current?.constructedQuery) !==
+      JSON.stringify(savedQueryRef.current.constructedQuery) !==
         JSON.stringify(constructedQuery) ||
-      savedQueryRef.current?.queryName !== queryName
+      savedQueryRef.current.queryName !== queryName
     );
   }
 
