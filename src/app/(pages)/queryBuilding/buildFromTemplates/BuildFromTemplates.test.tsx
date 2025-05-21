@@ -429,7 +429,7 @@ describe("tests the valueset selection page interactions", () => {
     // have been affected
     const displayCount = screen.getByTestId(`displayCount-${TEST_ID}`);
     expect(displayCount).toHaveTextContent("2 / 4");
-    expect(screen).toMatchSnapshot();
+    expect(document.body).toMatchSnapshot();
 
     // do the same for the accordidion
     await user.type(valueSetSearch, "meningitidis");
