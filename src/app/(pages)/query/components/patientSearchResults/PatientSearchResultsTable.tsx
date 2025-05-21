@@ -8,6 +8,7 @@ import {
 } from "@/app/shared/format-service";
 import classNames from "classnames";
 import Skeleton from "react-loading-skeleton";
+import { Button } from "@trussworks/react-uswds";
 
 type PatientSearchResultsTableProps = {
   patients: Patient[];
@@ -67,13 +68,13 @@ const PatientSearchResultsTable: React.FC<PatientSearchResultsTableProps> = ({
                 <td>{formatAddress(patient.address ?? [])}</td>
                 <td width={150}>{formatMRN(patient.identifier ?? [])}</td>
                 <td width={100}>
-                  <a
-                    href="#"
-                    className="unchanged-color-on-visit"
+                  <Button
                     onClick={() => setPatientForQueryResponse(patient)}
+                    type={"button"}
+                    unstyled
                   >
                     Select patient
-                  </a>
+                  </Button>
                 </td>
               </tr>
             ))

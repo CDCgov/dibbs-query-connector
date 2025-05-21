@@ -86,7 +86,7 @@ exports[`User Groups table renders the correct label syntax based on member/quer
                 </span>
               </button>
               <button
-                class="usa-button usa-button--unstyled text-bold text-no-underline"
+                class="usa-button usa-button--unstyled text-bold text-no-underline destructive-primary"
                 data-testid="button"
                 type="button"
               >
@@ -178,7 +178,7 @@ exports[`User Groups table renders the correct label syntax based on member/quer
                 </span>
               </button>
               <button
-                class="usa-button usa-button--unstyled text-bold text-no-underline"
+                class="usa-button usa-button--unstyled text-bold text-no-underline destructive-primary"
                 data-testid="button"
                 type="button"
               >

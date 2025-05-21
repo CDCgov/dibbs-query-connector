@@ -1,14 +1,29 @@
 .pageSubtitle {
-    margin: 2rem 0 0.5rem 0;
+  margin: 2rem 0 0.5rem 0;
 }
 
 .pageSubtitle:last-of-type {
-    margin-top: 1.5rem;
+  margin-top: 1.5rem;
 }
 
 .pageContent {
-    font-weight: 300;
-    margin-top: 0;
-    font-size: 1rem;
-    margin-bottom: 1rem;
+  font-weight: 300;
+  margin-top: 0;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+}
+
+.heroContainer {
+  max-width: 45rem;
+  display: flex;
+  margin: 0 auto;
+  column-gap: 2rem;
+}
+
+.heroBackground {
+  background: linear-gradient(
+    109.54deg,
+    rgba(173, 207, 220, 0.025) 8.02%,
+    rgba(46, 98, 118, 0.5) 117.53%
+  );
 }

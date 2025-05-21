@@ -128,7 +128,7 @@ const UserGroupsTable: React.FC<UserGroupsTableProps> = ({
             </Button>
             <Button
               type="button"
-              className="usa-button--unstyled text-bold text-no-underline"
+              className="usa-button--unstyled text-bold text-no-underline destructive-primary"
               onClick={() => {
                 openModal("remove-group", group);
               }}

@@ -7,10 +7,10 @@
 .accordionWrapper > h3 {
   font-size: 1.75rem;
   color: white !important;
-  background-color: $table-header;
+  background-color: $background-darker;
 
   &:hover {
-    background-color: $table-header;
+    background-color: $background-darker;
   }
 }
 

@@ -652,7 +652,7 @@ const UserModal: React.FC<UserModalProps> = ({
     buttonsList[0].text = buttonText;
   }
   if (modalMode == "remove-group") {
-    buttonsList[0].className = "usa-button--secondary";
+    buttonsList[0].className = "usa-button--destructive";
   }
 
   return (

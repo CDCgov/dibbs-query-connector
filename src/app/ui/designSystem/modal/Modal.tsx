@@ -96,9 +96,8 @@ export const Modal: React.FC<ModalProps> = ({
             <div className="margin-top-4 text-red display-flex">
               <Icon.Close
                 size={3}
-                className="usa-icon"
+                className="usa-icon destructive-primary"
                 aria-label="Error"
-                color="#D54309"
               />
               {errorMessage}
             </div>

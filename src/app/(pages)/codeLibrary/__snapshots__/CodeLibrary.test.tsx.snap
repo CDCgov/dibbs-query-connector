@@ -14,7 +14,7 @@ exports[`Code library interaction renders action buttons for custom value sets o
         >
           <a
             aria-label="Back arrow indicating ability to navigate back a page if clicked"
-            class="back-link unchanged-color-on-visit text-no-underline"
+            class="back-link text-no-underline"
             data-testid="backArrowLink"
             href="#"
           >
@@ -41,7 +41,7 @@ exports[`Code library interaction renders action buttons for custom value sets o
             Manage codes
           </h1>
           <div
-            class="usa-alert usa-alert--info info-alert"
+            class="usa-alert usa-alert--warning info-alert"
             data-testid="alert"
           >
             <div
@@ -294,14 +294,14 @@ exports[`Code library interaction renders action buttons for custom value sets o
                     >
                       <th>
                         <button
-                          class="usa-button editCodesBtn button-secondary"
+                          class="usa-button usa-button--secondary"
                           data-testid="button"
                           type="button"
                         >
                           Edit codes
                         </button>
                         <button
-                          class="usa-button deleteValueSet"
+                          class="usa-button"
                           data-testid="button"
                           type="button"
                         >
@@ -515,7 +515,7 @@ exports[`Code library interaction renders action buttons for custom value sets o
                   class="usa-button-group__item"
                 >
                   <button
-                    class="usa-button usa-button modalButtonDelete"
+                    class="usa-button usa-button usa-button--destructive"
                     data-testid="button"
                     id="delete-vs-confirm"
                     type="button"
@@ -582,7 +582,7 @@ exports[`Code library loading view renders a skeleton loading state when loading
         >
           <a
             aria-label="Back arrow indicating ability to navigate back a page if clicked"
-            class="back-link unchanged-color-on-visit text-no-underline"
+            class="back-link text-no-underline"
             data-testid="backArrowLink"
             href="#"
           >
@@ -609,7 +609,7 @@ exports[`Code library loading view renders a skeleton loading state when loading
             Manage codes
           </h1>
           <div
-            class="usa-alert usa-alert--info info-alert"
+            class="usa-alert usa-alert--warning info-alert"
             data-testid="alert"
           >
             <div
@@ -848,7 +848,7 @@ exports[`Code library loading view renders a skeleton loading state when loading
                   class="usa-button-group__item"
                 >
                   <button
-                    class="usa-button usa-button modalButtonDelete"
+                    class="usa-button usa-button usa-button--destructive"
                     data-testid="button"
                     id="delete-vs-confirm"
                     type="button"
@@ -915,7 +915,7 @@ exports[`Code library rendered view renders concept codes for the value set when
         >
           <a
             aria-label="Back arrow indicating ability to navigate back a page if clicked"
-            class="back-link unchanged-color-on-visit text-no-underline"
+            class="back-link text-no-underline"
             data-testid="backArrowLink"
             href="#"
           >
@@ -942,7 +942,7 @@ exports[`Code library rendered view renders concept codes for the value set when
             Manage codes
           </h1>
           <div
-            class="usa-alert usa-alert--info info-alert"
+            class="usa-alert usa-alert--warning info-alert"
             data-testid="alert"
           >
             <div
@@ -1393,7 +1393,7 @@ exports[`Code library rendered view renders concept codes for the value set when
                   class="usa-button-group__item"
                 >
                   <button
-                    class="usa-button usa-button modalButtonDelete"
+                    class="usa-button usa-button usa-button--destructive"
                     data-testid="button"
                     id="delete-vs-confirm"
                     type="button"
@@ -1460,7 +1460,7 @@ exports[`Code library rendered view renders the correct content 1`] = `
         >
           <a
             aria-label="Back arrow indicating ability to navigate back a page if clicked"
-            class="back-link unchanged-color-on-visit text-no-underline"
+            class="back-link text-no-underline"
             data-testid="backArrowLink"
             href="#"
           >
@@ -1487,7 +1487,7 @@ exports[`Code library rendered view renders the correct content 1`] = `
             Manage codes
           </h1>
           <div
-            class="usa-alert usa-alert--info info-alert"
+            class="usa-alert usa-alert--warning info-alert"
             data-testid="alert"
           >
             <div
@@ -1938,7 +1938,7 @@ exports[`Code library rendered view renders the correct content 1`] = `
                   class="usa-button-group__item"
                 >
                   <button
-                    class="usa-button usa-button modalButtonDelete"
+                    class="usa-button usa-button usa-button--destructive"
                     data-testid="button"
                     id="delete-vs-confirm"
                     type="button"

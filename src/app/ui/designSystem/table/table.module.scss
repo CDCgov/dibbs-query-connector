@@ -1,7 +1,7 @@
 @use "../../../ui/styles/_variables" as *;
 
 .customizeTableWrapper {
-  border: solid 1px $table-border;
+  border: solid 1px $border;
   border-radius: 0.25rem;
   box-shadow: 0px 2px 3px 0px $drop-shadow;
   padding: 1px;
@@ -10,6 +10,7 @@
 
 .customizeTable {
   margin: 0;
+  width: 100%;
 
   thead tr th,
   tbody tr td {
@@ -40,7 +41,7 @@
     &:after {
       display: block;
       content: "";
-      background: $table-row-border;
+      background: $border-light;
       height: 1px;
       position: absolute;
       top: 0px;
@@ -50,7 +51,7 @@
 
     /* highlight row on hover*/
     &:hover {
-      background-color: #f3f3f3;
+      background-color: $hover-neutral;
 
       td {
         background-color: inherit;

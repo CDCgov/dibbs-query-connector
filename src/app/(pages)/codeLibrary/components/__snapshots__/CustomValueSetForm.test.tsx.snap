@@ -9,7 +9,7 @@ exports[`Create custom valueSet form renders an empty form to add a new value se
       >
         <a
           aria-label="Back arrow indicating ability to navigate back a page if clicked"
-          class="back-link unchanged-color-on-visit text-no-underline"
+          class="back-link text-no-underline"
           data-testid="backArrowLink"
           href="#"
         >
@@ -221,8 +221,7 @@ exports[`Create custom valueSet form renders an empty form to add a new value se
                   </div>
                   <svg
                     aria-label="Trash icon indicating deletion of code entry"
-                    class="usa-icon usa-icon--size-3 margin-bottom-1 deleteIcon"
-                    color="#919191"
+                    class="usa-icon usa-icon--size-3 margin-bottom-1 deleteIcon destructive-primary"
                     data-testid="delete-custom-code-0"
                     focusable="false"
                     height="1em"
@@ -260,7 +259,7 @@ exports[`Create custom valueSet form switches to edit mode after saving a new va
       >
         <a
           aria-label="Back arrow indicating ability to navigate back a page if clicked"
-          class="back-link unchanged-color-on-visit text-no-underline"
+          class="back-link text-no-underline"
           data-testid="backArrowLink"
           href="#"
         >
@@ -472,8 +471,7 @@ exports[`Create custom valueSet form switches to edit mode after saving a new va
                   </div>
                   <svg
                     aria-label="Trash icon indicating deletion of code entry"
-                    class="usa-icon usa-icon--size-3 margin-bottom-1 deleteIcon"
-                    color="#919191"
+                    class="usa-icon usa-icon--size-3 margin-bottom-1 deleteIcon destructive-primary"
                     data-testid="delete-custom-code-0"
                     focusable="false"
                     height="1em"
@@ -511,7 +509,7 @@ exports[`Edit custom valueSet form renders a form to edit an existing value set 
       >
         <a
           aria-label="Back arrow indicating ability to navigate back a page if clicked"
-          class="back-link unchanged-color-on-visit text-no-underline"
+          class="back-link text-no-underline"
           data-testid="backArrowLink"
           href="#"
         >
@@ -723,8 +721,7 @@ exports[`Edit custom valueSet form renders a form to edit an existing value set 
                   </div>
                   <svg
                     aria-label="Trash icon indicating deletion of code entry"
-                    class="usa-icon usa-icon--size-3 margin-bottom-1 deleteIcon"
-                    color="#919191"
+                    class="usa-icon usa-icon--size-3 margin-bottom-1 deleteIcon destructive-primary"
                     data-testid="delete-custom-code-0"
                     focusable="false"
                     height="1em"
@@ -778,8 +775,7 @@ exports[`Edit custom valueSet form renders a form to edit an existing value set 
                   </div>
                   <svg
                     aria-label="Trash icon indicating deletion of code entry"
-                    class="usa-icon usa-icon--size-3 margin-bottom-1 deleteIcon"
-                    color="#919191"
+                    class="usa-icon usa-icon--size-3 margin-bottom-1 deleteIcon destructive-primary"
                     data-testid="delete-custom-code-1"
                     focusable="false"
                     height="1em"
@@ -833,8 +829,7 @@ exports[`Edit custom valueSet form renders a form to edit an existing value set 
                   </div>
                   <svg
                     aria-label="Trash icon indicating deletion of code entry"
-                    class="usa-icon usa-icon--size-3 margin-bottom-1 deleteIcon"
-                    color="#919191"
+                    class="usa-icon usa-icon--size-3 margin-bottom-1 deleteIcon destructive-primary"
                     data-testid="delete-custom-code-2"
                     focusable="false"
                     height="1em"

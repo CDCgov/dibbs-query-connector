@@ -1,80 +1,79 @@
 @use "../../ui/styles/_variables" as *;
 
 .roleDescriptions {
-    margin: 2rem 0;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
+  margin: 2rem 0;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
 
-    .textContainer {
-        flex: 1;
-        margin-right: 1rem;
+  .textContainer {
+    flex: 1;
+    margin-right: 1rem;
 
-        &:last-of-type {
-            margin-right: 0;
-        }
+    &:last-of-type {
+      margin-right: 0;
     }
+  }
 }
 
 .roleDropdown {
-    padding: 0.75rem !important;
+  padding: 0.75rem !important;
 
-    select {
-        margin: 0 !important;
-    }
+  select {
+    margin: 0 !important;
+  }
 }
 
 .drawerButton,
 .drawerButton:disabled,
 .drawerButton:disabled:hover {
-    text-decoration: none;
+  text-decoration: none;
 }
 
 .userGroupsTable {
-    .actionButtons {
-        display: flex;
-        align-items: center;
-        justify-content: flex-start;
-        position: absolute;
-        right: 1.5rem;
-        top: 50%;
-        transform: translateY(-50%);
-        gap: 0.5rem;
-        color: #005ea2;
-    }
+  .actionButtons {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    position: absolute;
+    right: 1.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    gap: 0.5rem;
+  }
 
-    tbody td:last-child {
-        opacity: 0;
-        text-align: right;
-        padding-right: 0 !important;
-        white-space: nowrap;
-    }
+  tbody td:last-child {
+    opacity: 0;
+    text-align: right;
+    padding-right: 0 !important;
+    white-space: nowrap;
+  }
 
-    tbody tr:hover td:last-child,
-    tbody td:last-child:hover {
-        opacity: 1;
-        pointer-events: auto;
-        max-height: inherit;
-    }
+  tbody tr:hover td:last-child,
+  tbody td:last-child:hover {
+    opacity: 1;
+    pointer-events: auto;
+    max-height: inherit;
+  }
 }
 
 .userPermissionsTable {
-    td.userDisplay {
-        display: flex;
-        justify-content: space-between;
-    }
+  td.userDisplay {
+    display: flex;
+    justify-content: space-between;
+  }
 
-    .actionButtons {
-        display: flex;
-        opacity: 0;
-        text-align: right;
-        padding-right: 0 !important;
-        white-space: nowrap;
-    }
+  .actionButtons {
+    display: flex;
+    opacity: 0;
+    text-align: right;
+    padding-right: 0 !important;
+    white-space: nowrap;
+  }
 
-    td.userDisplay:hover .actionButtons {
-        opacity: 1;
-        pointer-events: auto;
-        max-height: inherit;
-    }
+  td.userDisplay:hover .actionButtons {
+    opacity: 1;
+    pointer-events: auto;
+    max-height: inherit;
+  }
 }

@@ -46,7 +46,12 @@ export const EmptyQueriesDisplay: React.FC<EmptyQueryProps> = ({
     <div data-testid={"empty-state-container"}>
       <h1 className={styles.queryTitle}>Query Library</h1>
 
-      <div className={classNames("bg-gray-5", styles.emptyStateQueryContainer)}>
+      <div
+        className={classNames(
+          "background-dark",
+          styles.emptyStateQueryContainer,
+        )}
+      >
         <div className="display-flex flex-column flex-align-left">
           <h2 className={styles.emptyQueryTitle}>Start with Query Builder</h2>
           <h3 className={styles.emptyQuerySubtitle}>

@@ -42,7 +42,7 @@ test.describe("querying with the Query Connector", () => {
       page.getByText("No records were found for your search"),
     ).toBeVisible();
     await page
-      .getByRole("link", { name: "Revise your patient search" })
+      .getByRole("button", { name: "Revise your patient search" })
       .click();
   });
 
@@ -69,7 +69,7 @@ test.describe("querying with the Query Connector", () => {
     await page.getByRole("button", { name: "Search for patient" }).click();
     await expect(page.getByText("Loading")).toHaveCount(0, { timeout: 10000 });
 
-    await page.getByRole("link", { name: "Select patient" }).click();
+    await page.getByRole("button", { name: "Select patient" }).click();
     await expect(
       page.getByRole("heading", { name: "Select a query" }),
     ).toBeVisible();
@@ -182,7 +182,7 @@ test.describe("alternate queries with the Query Connector", () => {
     await expect(
       page.getByRole("heading", { name: PAGE_TITLES["patient-results"].title }),
     ).toBeVisible();
-    await page.getByRole("link", { name: "Select patient" }).click();
+    await page.getByRole("button", { name: "Select patient" }).click();
     await expect(
       page.getByRole("heading", { name: PAGE_TITLES["select-query"].title }),
     ).toBeVisible();
@@ -212,7 +212,7 @@ test.describe("alternate queries with the Query Connector", () => {
     await page.getByRole("button", { name: "Search for patient" }).click();
     await expect(page.getByText("Loading")).toHaveCount(0, { timeout: 10000 });
 
-    await page.getByRole("link", { name: "Select patient" }).click();
+    await page.getByRole("button", { name: "Select patient" }).click();
     await expect(
       page.getByRole("heading", { name: "Select a query" }),
     ).toBeVisible();
@@ -237,7 +237,7 @@ test.describe("alternate queries with the Query Connector", () => {
 
     await page.getByRole("button", { name: "Search for patient" }).click();
     await expect(page.getByText("Loading")).toHaveCount(0, { timeout: 10000 });
-    await page.getByRole("link", { name: "Select patient" }).click();
+    await page.getByRole("button", { name: "Select patient" }).click();
     await page
       .getByTestId("Select")
       .selectOption("Chlamydia case investigation");

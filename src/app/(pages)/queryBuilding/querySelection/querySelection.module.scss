@@ -41,7 +41,7 @@ $conditionColumnSpacing: 2fr 3fr 3fr;
 .emptyQueryIcon {
   width: 7.5rem;
   height: 7.5rem;
-  color: $gray-20;
+  color: $text-inactive;
 }
 
 .emptyQueryExplainer {
@@ -58,17 +58,6 @@ $conditionColumnSpacing: 2fr 3fr 3fr;
 }
 
 .customQueryTable {
-  .table-cell-buttons {
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    position: absolute;
-    right: 1.5rem;
-    top: 50%;
-    transform: translateY(-50%);
-    gap: 0.5rem;
-  }
-
   tbody td:last-child {
     opacity: 0;
     text-align: right;
