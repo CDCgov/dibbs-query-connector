@@ -588,11 +588,6 @@ const CodeLibrary: React.FC = () => {
                     className={styles.manageCodesLink}
                     onClick={() => {
                       handleChangeMode("manage");
-                      // saveQueryAndRedirect(
-                      //   constructedQuery,
-                      //   queryName,
-                      //   "/codeLibrary",
-                      // );
                     }}
                   >
                     Manage codes
@@ -682,76 +677,84 @@ const CodeLibrary: React.FC = () => {
                       checkedCount > 0 && checkedCount < totalCount;
 
                     return (
-                      <tr
-                        key={vs.valueSetId}
+                      <tbody
                         className={classNames(
-                          styles.valueSetTable__tableBody_row,
-                          vs.valueSetId === activeValueSet?.valueSetId
-                            ? styles.activeValueSet
-                            : "",
+                          styles.overflowScroll,
+                          styles.valueSetTable__tableBody,
                         )}
-                        onClick={() => setActiveValueSet(vs)}
+                        data-testid="table-valuesets"
                       >
-                        <td>
-                          {mode === "select" && (
-                            <Checkbox
-                              id={`valueset-checkbox-${vs.valueSetId}`}
-                              checked={allChecked}
-                              isMinusState={minusState}
-                              onChange={(e) => {
-                                e.stopPropagation();
-                                handleValueSetToggle(
-                                  vs.valueSetId,
-                                  e.target.checked,
-                                );
-                              }}
-                              aria-label={`Select value set ${vs.valueSetName}`}
-                              className={styles.valueSetCheckbox}
-                            />
+                        <tr
+                          key={vs.valueSetId}
+                          className={classNames(
+                            styles.valueSetTable__tableBody_row,
+                            vs.valueSetId === activeValueSet?.valueSetId
+                              ? styles.activeValueSet
+                              : "",
                           )}
-                          <div
-                            className={
-                              styles.valueSetTable__tableBody_row_details
-                            }
-                          >
-                            <Highlighter
+                          onClick={() => setActiveValueSet(vs)}
+                        >
+                          <td>
+                            {mode === "select" && (
+                              <Checkbox
+                                id={`valueset-checkbox-${vs.valueSetId}`}
+                                checked={allChecked}
+                                isMinusState={minusState}
+                                onChange={(e) => {
+                                  e.stopPropagation();
+                                  handleValueSetToggle(
+                                    vs.valueSetId,
+                                    e.target.checked,
+                                  );
+                                }}
+                                aria-label={`Select value set ${vs.valueSetName}`}
+                                className={styles.valueSetCheckbox}
+                              />
+                            )}
+                            <div
                               className={
-                                styles.valueSetTable__tableBody_row_valueSetName
+                                styles.valueSetTable__tableBody_row_details
                               }
-                              highlightClassName="searchHighlight"
-                              searchWords={[textSearch]}
-                              autoEscape={true}
-                              textToHighlight={vs.valueSetName}
-                            />
-                            <Highlighter
-                              className={
-                                styles.valueSetTable__tableBody_row_valueSetDetails
-                              }
-                              highlightClassName="searchHighlight"
-                              searchWords={[textSearch]}
-                              autoEscape={true}
-                              textToHighlight={formatValueSetDetails(vs)}
-                            />
-                            {vs.userCreated && (
+                            >
                               <Highlighter
                                 className={
-                                  styles.valueSetTable__tableBody_row_customValueSet
+                                  styles.valueSetTable__tableBody_row_valueSetName
                                 }
                                 highlightClassName="searchHighlight"
                                 searchWords={[textSearch]}
                                 autoEscape={true}
-                                textToHighlight={`Created by ${vs.author}`}
+                                textToHighlight={vs.valueSetName}
                               />
-                            )}
-                          </div>
-                          <div>
-                            <Icon.NavigateNext
-                              aria-label="Right chevron indicating additional content"
-                              size={4}
-                            />
-                          </div>
-                        </td>
-                      </tr>
+                              <Highlighter
+                                className={
+                                  styles.valueSetTable__tableBody_row_valueSetDetails
+                                }
+                                highlightClassName="searchHighlight"
+                                searchWords={[textSearch]}
+                                autoEscape={true}
+                                textToHighlight={formatValueSetDetails(vs)}
+                              />
+                              {vs.userCreated && (
+                                <Highlighter
+                                  className={
+                                    styles.valueSetTable__tableBody_row_customValueSet
+                                  }
+                                  highlightClassName="searchHighlight"
+                                  searchWords={[textSearch]}
+                                  autoEscape={true}
+                                  textToHighlight={`Created by ${vs.author}`}
+                                />
+                              )}
+                            </div>
+                            <div>
+                              <Icon.NavigateNext
+                                aria-label="Right chevron indicating additional content"
+                                size={4}
+                              />
+                            </div>
+                          </td>
+                        </tr>
+                      </tbody>
                     );
                   })}
                 </Table>
@@ -896,25 +899,26 @@ const CodeLibrary: React.FC = () => {
                               )}
                             >
                               <td className={styles.valueSetCode}>
-                                <Checkbox
-                                  id={`concept-checkbox-${activeValueSet.valueSetId}-${concept.code}`}
-                                  checked={checked}
-                                  onChange={(e) => {
-                                    handleConceptToggle(
-                                      activeValueSet.valueSetId,
-                                      concept.code,
-                                      e.target.checked,
-                                    );
-                                  }}
-                                  aria-label={`Select code ${concept.code}`}
-                                  className={styles.conceptCheckbox}
-                                />
-                                <Highlighter
-                                  highlightClassName="searchHighlight"
-                                  searchWords={[textSearch]}
-                                  autoEscape={true}
-                                  textToHighlight={concept.code}
-                                />
+                                <div className={styles.conceptRowInline}>
+                                  <Checkbox
+                                    id={`concept-checkbox-${activeValueSet.valueSetId}-${concept.code}`}
+                                    checked={checked}
+                                    onChange={(e) => {
+                                      handleConceptToggle(
+                                        activeValueSet.valueSetId,
+                                        concept.code,
+                                        e.target.checked,
+                                      );
+                                    }}
+                                    aria-label={`Select code ${concept.code}`}
+                                  />
+                                  <Highlighter
+                                    highlightClassName="searchHighlight"
+                                    searchWords={[textSearch]}
+                                    autoEscape={true}
+                                    textToHighlight={concept.code}
+                                  />
+                                </div>
                               </td>
                               <td>
                                 <Highlighter

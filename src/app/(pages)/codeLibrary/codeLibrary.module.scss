@@ -343,13 +343,24 @@
     }
   }
 
-  .valueSetCode {
-    min-width: 7.5rem;
-    word-wrap: break-word;
-    padding-right: 1rem;
-    max-width: 7.5rem;
-  }
+.valueSetCode {
+  min-width: 7.5rem;
+  max-width: 7.5rem;
+  padding-right: 1rem;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
 }
+
+.conceptRowInline {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem; 
+  white-space: nowrap;
+}
+}
+
 
 .valueSetTable__tableBody {
   &_row {
