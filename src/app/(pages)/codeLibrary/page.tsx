@@ -50,8 +50,11 @@ const CodeLibrary: React.FC = () => {
   // -------- component state -------- //
   // --------------------------------- //
   const [loading, setLoading] = useState<boolean>(true);
-  const [mode, setMode] = useState<CustomCodeMode>("select"); //TODO: switch back to manage after testing is done
+  const ctx = useContext(DataContext);
 
+  const [mode, setMode] = useState<CustomCodeMode>(() =>
+    ctx?.selectedQuery && ctx.selectedQuery.queryId ? "select" : "manage",
+  );
   const { data: session } = useSession();
   const username = session?.user?.username || "";
   const [currentUser, setCurrentUser] = useState<User>();
@@ -85,8 +88,6 @@ const CodeLibrary: React.FC = () => {
     () => import("../../ui/designSystem/modal/Modal").then((mod) => mod.Modal),
     { ssr: false },
   );
-
-  const ctx = useContext(DataContext);
 
   // get the query data from the context
   const selectedQuery = ctx?.selectedQuery;
@@ -153,7 +154,13 @@ const CodeLibrary: React.FC = () => {
       ctx.selectedQuery.queryId,
     );
     if (result.success) {
-      // Optionally refetch and update context
+      // Refetch the full query from the DB, so DataContext is up to date
+      const updatedQuery = await getSavedQueryById(ctx.selectedQuery.queryId);
+      if (updatedQuery) {
+        if (ctx?.setSelectedQuery) {
+          ctx.setSelectedQuery(updatedQuery);
+        }
+      }
       showToastConfirmation({ body: "Added to query" });
     } else {
       showToastConfirmation({ body: "Failed to add codes", variant: "error" });
