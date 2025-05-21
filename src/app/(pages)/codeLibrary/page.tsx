@@ -162,7 +162,6 @@ const CodeLibrary: React.FC = () => {
         ctx.setSelectedQuery(updatedQuery);
       }
       showToastConfirmation({ body: "Added to query" });
-      router.push("/queryBuilding");
     } else {
       showToastConfirmation({ body: "Failed to add codes", variant: "error" });
     }
@@ -285,6 +284,7 @@ const CodeLibrary: React.FC = () => {
     // from gear menu: no backnav
     // from "start from scratch": back to templates
     // from hybrid/query building: back to query
+    handleAddToQuery(); // This still doesn't handle state management for start from scratch
     console.log("do a backnav thing");
   }
 
@@ -457,10 +457,7 @@ const CodeLibrary: React.FC = () => {
             {mode === "manage" ? (
               <Backlink onClick={() => {}} label={"Back to Query library"} />
             ) : (
-              <Backlink
-                onClick={handleAddToQuery}
-                label={"Back to My queries"}
-              />
+              <Backlink onClick={goBack} label={"Back to My queries"} />
             )}
             <h1 className={styles.header__title}>
               {mode == "manage"
@@ -569,6 +566,7 @@ const CodeLibrary: React.FC = () => {
                   className={styles.button}
                   onClick={() => {
                     handleAddToQuery();
+                    router.push("/queryBuilding");
                   }}
                 >
                   Next: Create query
