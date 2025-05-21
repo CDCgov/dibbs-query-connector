@@ -654,7 +654,7 @@ const CodeLibrary: React.FC = () => {
             text: "Delete value set",
             type: "button" as const,
             id: "delete-vs-confirm",
-            className: classNames("usa-button", "usa-button--cancel"),
+            className: classNames("usa-button", "usa-button--destructive"),
             onClick: handleDeleteValueSet,
           },
           {

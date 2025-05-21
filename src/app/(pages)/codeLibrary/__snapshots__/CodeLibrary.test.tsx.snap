@@ -515,7 +515,7 @@ exports[`Code library interaction renders action buttons for custom value sets o
                   class="usa-button-group__item"
                 >
                   <button
-                    class="usa-button usa-button usa-button--cancel"
+                    class="usa-button usa-button usa-button--destructive"
                     data-testid="button"
                     id="delete-vs-confirm"
                     type="button"
@@ -848,7 +848,7 @@ exports[`Code library loading view renders a skeleton loading state when loading
                   class="usa-button-group__item"
                 >
                   <button
-                    class="usa-button usa-button usa-button--cancel"
+                    class="usa-button usa-button usa-button--destructive"
                     data-testid="button"
                     id="delete-vs-confirm"
                     type="button"
@@ -1393,7 +1393,7 @@ exports[`Code library rendered view renders concept codes for the value set when
                   class="usa-button-group__item"
                 >
                   <button
-                    class="usa-button usa-button usa-button--cancel"
+                    class="usa-button usa-button usa-button--destructive"
                     data-testid="button"
                     id="delete-vs-confirm"
                     type="button"
@@ -1938,7 +1938,7 @@ exports[`Code library rendered view renders the correct content 1`] = `
                   class="usa-button-group__item"
                 >
                   <button
-                    class="usa-button usa-button usa-button--cancel"
+                    class="usa-button usa-button usa-button--destructive"
                     data-testid="button"
                     id="delete-vs-confirm"
                     type="button"

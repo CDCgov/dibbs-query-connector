@@ -197,6 +197,21 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
                         type="button"
                         className="usa-button--unstyled text-bold text-no-underline"
                         onClick={() =>
+                          handleCopy(query.queryName, query.queryId)
+                        }
+                      >
+                        <span className="icon-text padding-right-1 display-flex flex-align-center">
+                          <Icon.ContentCopy
+                            className="height-3 width-3"
+                            aria-label="Stacked paper icon indidcating copy"
+                          />
+                          <span className="padding-left-05">Copy ID</span>
+                        </span>
+                      </Button>
+                      <Button
+                        type="button"
+                        className="usa-button--unstyled text-bold text-no-underline destructive-primary"
+                        onClick={() =>
                           confirmDelete(
                             query.queryName,
                             query.queryId,
@@ -211,21 +226,6 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
                             aria-label="trashcan icon indicating deletion"
                           />
                           <span className="padding-left-05">Delete</span>
-                        </span>
-                      </Button>
-                      <Button
-                        type="button"
-                        className="usa-button--unstyled text-bold text-no-underline"
-                        onClick={() =>
-                          handleCopy(query.queryName, query.queryId)
-                        }
-                      >
-                        <span className="icon-text padding-right-1 display-flex flex-align-center">
-                          <Icon.ContentCopy
-                            className="height-3 width-3"
-                            aria-label="Stacked paper icon indidcating copy"
-                          />
-                          <span className="padding-left-05">Copy ID</span>
                         </span>
                       </Button>
                     </div>

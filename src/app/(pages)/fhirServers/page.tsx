@@ -285,7 +285,7 @@ const FhirServers: React.FC = () => {
         text: "Cancel",
         type: "button" as const,
         id: "modal-cancel-button",
-        className: "usa-button usa-button--cancel",
+        className: "usa-button usa-button--destructive",
         onClick: handleCloseModal,
       },
     ];

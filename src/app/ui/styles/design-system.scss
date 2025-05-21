@@ -193,17 +193,17 @@ a:visited {
     background-color: transparent !important;
   }
 
-  &--cancel {
+  &--destructive {
     box-shadow: none;
     color: $white;
     background-color: $destructive-primary !important;
   }
-  &--cancel:hover {
+  &--destructive:hover {
     box-shadow: none;
     color: $white;
     background-color: $destructive-dark !important;
   }
-  &--cancel:active {
+  &--destructive:active {
     box-shadow: none;
     color: $white;
     background-color: $destructive-darker !important;
