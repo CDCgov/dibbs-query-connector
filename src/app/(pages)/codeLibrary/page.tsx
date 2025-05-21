@@ -38,9 +38,9 @@ import dynamic from "next/dynamic";
 import type { ModalProps, ModalRef } from "../../ui/designSystem/modal/Modal";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import { getSavedQueryById } from "@/app/backend/query-building/service";
-import { useSaveQueryAndRedirect } from "@/app/backend/query-building/useSaveQueryAndRedirect";
 import { insertCustomValuesetsIntoQuery } from "@/app/shared/custom-code-service";
 import { QueryTableResult } from "../queryBuilding/utils";
+import Checkbox from "@/app/ui/designSystem/checkbox/Checkbox";
 
 /**
  * Component for Query Building Flow
@@ -159,9 +159,6 @@ const CodeLibrary: React.FC = () => {
       showToastConfirmation({ body: "Failed to add codes", variant: "error" });
     }
   };
-
-  // save query and redirect as needed
-  const saveQueryAndRedirect = useSaveQueryAndRedirect();
 
   let totalPages = Math.ceil(filteredValueSets.length / itemsPerPage);
 
@@ -559,12 +556,7 @@ const CodeLibrary: React.FC = () => {
                   }
                   className={styles.button}
                   onClick={() => {
-                    handleChangeMode("create");
-                    // saveQueryAndRedirect(
-                    //   constructedQuery,
-                    //   queryName,
-                    //   "/queryBuilding",
-                    // );
+                    handleAddToQuery();
                   }}
                 >
                   Next: Create query
@@ -592,38 +584,112 @@ const CodeLibrary: React.FC = () => {
                       <th>{"Value set".toLocaleUpperCase()}</th>
                     </tr>
                   </thead>
-                  <tbody
-                    className={classNames(
-                      styles.overflowScroll,
-                      styles.valueSetTable__tableBody,
-                    )}
-                    data-testid="table-valuesets"
-                  >
-                    {loading && paginatedValueSets.length <= 0 ? (
-                      <tr
-                        className={styles.valueSetTable__tableBody_row}
-                        data-testid={"loading-skeleton"}
-                      >
-                        <td>
-                          <Skeleton
-                            containerClassName={styles.skeletonContainer}
-                            className={styles.skeleton}
-                            count={6}
-                          />
-                        </td>
-                      </tr>
-                    ) : !loading && filteredValueSets.length === 0 ? (
-                      <tr
-                        className={
-                          styles.valueSetTable__tableBody_row_noResults
-                        }
-                      >
-                        <td>No results found.</td>
-                      </tr>
-                    ) : (
-                      renderValueSetRows()
-                    )}
-                  </tbody>
+                  {mode == "manage" && (
+                    <tbody
+                      className={classNames(
+                        styles.overflowScroll,
+                        styles.valueSetTable__tableBody,
+                      )}
+                      data-testid="table-valuesets"
+                    >
+                      {loading && paginatedValueSets.length <= 0 ? (
+                        <tr
+                          className={styles.valueSetTable__tableBody_row}
+                          data-testid={"loading-skeleton"}
+                        >
+                          <td>
+                            <Skeleton
+                              containerClassName={styles.skeletonContainer}
+                              className={styles.skeleton}
+                              count={6}
+                            />
+                          </td>
+                        </tr>
+                      ) : !loading && filteredValueSets.length === 0 ? (
+                        <tr
+                          className={
+                            styles.valueSetTable__tableBody_row_noResults
+                          }
+                        >
+                          <td>No results found.</td>
+                        </tr>
+                      ) : (
+                        renderValueSetRows()
+                      )}
+                    </tbody>
+                  )}
+                  {mode == "select" && (
+                    <tbody>
+                      {paginatedValueSets.map((vs, _index) => (
+                        <tr
+                          key={vs.valueSetId}
+                          className={classNames(
+                            styles.valueSetTable__tableBody_row,
+                            vs.valueSetId === activeValueSet?.valueSetId
+                              ? styles.activeValueSet
+                              : "",
+                          )}
+                          onClick={() => setActiveValueSet(vs)}
+                        >
+                          <td>
+                            {mode === "select" && (
+                              <Checkbox
+                                id={`valueset-checkbox-${vs.valueSetId}`}
+                                checked={!!customCodeIds[vs.valueSetId]}
+                                onChange={(e) => {
+                                  e.stopPropagation();
+                                  handleValueSetToggle(vs, e.target.checked);
+                                }}
+                                aria-label={`Select value set ${vs.valueSetName}`}
+                                className={styles.valueSetCheckbox}
+                              />
+                            )}
+                            <div
+                              className={
+                                styles.valueSetTable__tableBody_row_details
+                              }
+                            >
+                              <Highlighter
+                                className={
+                                  styles.valueSetTable__tableBody_row_valueSetName
+                                }
+                                highlightClassName="searchHighlight"
+                                searchWords={[textSearch]}
+                                autoEscape={true}
+                                textToHighlight={vs.valueSetName}
+                              />
+                              <Highlighter
+                                className={
+                                  styles.valueSetTable__tableBody_row_valueSetDetails
+                                }
+                                highlightClassName="searchHighlight"
+                                searchWords={[textSearch]}
+                                autoEscape={true}
+                                textToHighlight={formatValueSetDetails(vs)}
+                              />
+                              {vs.userCreated && (
+                                <Highlighter
+                                  className={
+                                    styles.valueSetTable__tableBody_row_customValueSet
+                                  }
+                                  highlightClassName="searchHighlight"
+                                  searchWords={[textSearch]}
+                                  autoEscape={true}
+                                  textToHighlight={`Created by ${vs.author}`}
+                                />
+                              )}
+                            </div>
+                            <div>
+                              <Icon.NavigateNext
+                                aria-label="Right chevron indicating additional content"
+                                size={4}
+                              />
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  )}
                 </Table>
               </div>
 
@@ -705,41 +771,102 @@ const CodeLibrary: React.FC = () => {
                         </tr>
                       )}
                     </thead>
-                    <tbody
-                      className={classNames(
-                        activeValueSet?.userCreated
-                          ? styles.overflowScroll
-                          : styles.overflowScroll_headerLocked,
-                        styles.conceptsTable__tableBody,
-                      )}
-                      data-testid="table-codes"
-                    >
-                      {activeValueSet?.concepts.map((vs) => (
-                        <tr
-                          key={vs.code}
-                          className={classNames(
-                            styles.conceptsTable__tableBody_row,
-                          )}
-                        >
-                          <td className={styles.valueSetCode}>
-                            <Highlighter
-                              highlightClassName="searchHighlight"
-                              searchWords={[textSearch]}
-                              autoEscape={true}
-                              textToHighlight={vs.code}
-                            />
-                          </td>
-                          <td>
-                            <Highlighter
-                              highlightClassName="searchHighlight"
-                              searchWords={[textSearch]}
-                              autoEscape={true}
-                              textToHighlight={vs.display}
-                            />
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
+                    {mode == "manage" && (
+                      <tbody
+                        className={classNames(
+                          activeValueSet?.userCreated
+                            ? styles.overflowScroll
+                            : styles.overflowScroll_headerLocked,
+                          styles.conceptsTable__tableBody,
+                        )}
+                        data-testid="table-codes"
+                      >
+                        {activeValueSet?.concepts.map((vs) => (
+                          <tr
+                            key={vs.code}
+                            className={classNames(
+                              styles.conceptsTable__tableBody_row,
+                            )}
+                          >
+                            <td className={styles.valueSetCode}>
+                              <Highlighter
+                                highlightClassName="searchHighlight"
+                                searchWords={[textSearch]}
+                                autoEscape={true}
+                                textToHighlight={vs.code}
+                              />
+                            </td>
+                            <td>
+                              <Highlighter
+                                highlightClassName="searchHighlight"
+                                searchWords={[textSearch]}
+                                autoEscape={true}
+                                textToHighlight={vs.display}
+                              />
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    )}
+                    {mode == "select" && (
+                      <tbody
+                        className={classNames(
+                          activeValueSet?.userCreated
+                            ? styles.overflowScroll
+                            : styles.overflowScroll_headerLocked,
+                          styles.conceptsTable__tableBody,
+                        )}
+                        data-testid="table-codes"
+                      >
+                        {activeValueSet?.concepts.map((concept) => (
+                          <tr
+                            key={concept.code}
+                            className={classNames(
+                              styles.conceptsTable__tableBody_row,
+                            )}
+                          >
+                            <td className={styles.valueSetCode}>
+                              {mode === "select" && (
+                                <Checkbox
+                                  id={`concept-checkbox-${activeValueSet.valueSetId}-${concept.code}`}
+                                  checked={
+                                    !!customCodeIds[
+                                      activeValueSet.valueSetId
+                                    ]?.concepts.find(
+                                      (c) =>
+                                        c.code === concept.code && c.include,
+                                    )
+                                  }
+                                  onChange={(e) => {
+                                    handleConceptToggle(
+                                      activeValueSet.valueSetId,
+                                      concept.code,
+                                      e.target.checked,
+                                    );
+                                  }}
+                                  aria-label={`Select code ${concept.code}`}
+                                  className={styles.conceptCheckbox}
+                                />
+                              )}
+                              <Highlighter
+                                highlightClassName="searchHighlight"
+                                searchWords={[textSearch]}
+                                autoEscape={true}
+                                textToHighlight={concept.code}
+                              />
+                            </td>
+                            <td>
+                              <Highlighter
+                                highlightClassName="searchHighlight"
+                                searchWords={[textSearch]}
+                                autoEscape={true}
+                                textToHighlight={concept.display}
+                              />
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    )}
                   </Table>
                 )}
               </div>
