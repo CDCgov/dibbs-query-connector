@@ -325,19 +325,10 @@
   margin-bottom: 0.5rem;
 }
 
-$conditionColumnSpacing: 1.25rem 2fr 5fr;
-$columnGap: 1rem;
-
 .conceptsTable__tableBody {
   &_row {
     flex-direction: row !important;
     border: none !important; // apply this explicitly on left table
-  text-align: left;
-  display: grid;
-  grid-template-columns: $conditionColumnSpacing;
-  column-gap: $columnGap;
-  margin-top: 1.5rem;
-  align-items: center;
 
     td {
       background: transparent !important;
@@ -356,7 +347,6 @@ $columnGap: 1rem;
   min-width: 7.5rem;
   max-width: 7.5rem;
   padding-right: 1rem;
-  white-space: nowrap;
   display: flex;
   align-items: center;
 }
@@ -366,7 +356,7 @@ $columnGap: 1rem;
   flex-direction: row;
   align-items: center;
   gap: 0.5rem; 
-  white-space: nowrap;
+  word-break: break-word;
 }
 }
 
