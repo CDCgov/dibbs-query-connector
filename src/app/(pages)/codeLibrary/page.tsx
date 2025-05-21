@@ -38,8 +38,9 @@ import dynamic from "next/dynamic";
 import type { ModalProps, ModalRef } from "../../ui/designSystem/modal/Modal";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import { getSavedQueryById } from "@/app/backend/query-building/service";
-import { NestedQuery } from "../queryBuilding/utils";
 import { useSaveQueryAndRedirect } from "@/app/backend/query-building/useSaveQueryAndRedirect";
+import { insertCustomValuesetsIntoQuery } from "@/app/shared/custom-code-service";
+import { QueryTableResult } from "../queryBuilding/utils";
 
 /**
  * Component for Query Building Flow
@@ -89,14 +90,77 @@ const CodeLibrary: React.FC = () => {
 
   // get the query data from the context
   const selectedQuery = ctx?.selectedQuery;
-  const queryName = ctx?.selectedQuery?.queryName ?? "query";
-  const savedQuery =
-    selectedQuery && selectedQuery.queryId
-      ? getSavedQueryById(selectedQuery.queryId)
-      : undefined;
+  const queryName = selectedQuery?.queryName ?? "query";
+  // Get custom value sets from context (assume structure: queryData.custom = { [valueSetId]: DibbsValueSet })
+  const [customCodeIds, setCustomCodeIds] = useState<{
+    [vsId: string]: DibbsValueSet;
+  }>({});
+  // initialize any existing custom value sets
+  useEffect(() => {
+    if (!selectedQuery?.queryId) return;
+    getSavedQueryById(selectedQuery.queryId).then(
+      (query: QueryTableResult | undefined) => {
+        const ids =
+          (query?.queryData?.custom as { [vsId: string]: DibbsValueSet }) || {};
+        setCustomCodeIds(ids);
+      },
+    );
+  }, [selectedQuery?.queryId]);
+
+  const handleValueSetToggle = (vs: DibbsValueSet, checked: boolean) => {
+    setCustomCodeIds((prev) => {
+      const updated = { ...prev };
+      if (checked) {
+        // Add to customCodeIds; include all concepts as currently rendered in vs
+        updated[vs.valueSetId] = { ...vs, includeValueSet: true };
+      } else {
+        // Remove from customCodeIds
+        delete updated[vs.valueSetId];
+      }
+      return updated;
+    });
+  };
+
+  const handleConceptToggle = (
+    vsId: string,
+    code: string,
+    checked: boolean,
+  ) => {
+    setCustomCodeIds((prev) => {
+      const updated = { ...prev };
+      const valueSet = updated[vsId];
+      if (valueSet) {
+        updated[vsId] = {
+          ...valueSet,
+          concepts: valueSet.concepts.map((c) =>
+            c.code === code ? { ...c, include: checked } : c,
+          ),
+          includeValueSet: valueSet.concepts.some((c) =>
+            c.code === code ? checked : c.include,
+          ),
+        };
+      }
+      return updated;
+    });
+  };
+
+  const handleAddToQuery = async () => {
+    if (!ctx?.selectedQuery?.queryId || !currentUser) return;
+    const setsToAdd = Object.values(customCodeIds);
+    const result = await insertCustomValuesetsIntoQuery(
+      currentUser.id,
+      setsToAdd,
+      ctx.selectedQuery.queryId,
+    );
+    if (result.success) {
+      // Optionally refetch and update context
+      showToastConfirmation({ body: "Added to query" });
+    } else {
+      showToastConfirmation({ body: "Failed to add codes", variant: "error" });
+    }
+  };
 
   // save query and redirect as needed
-  const [constructedQuery, setConstructedQuery] = useState<NestedQuery>({});
   const saveQueryAndRedirect = useSaveQueryAndRedirect();
 
   let totalPages = Math.ceil(filteredValueSets.length / itemsPerPage);
@@ -478,11 +542,11 @@ const CodeLibrary: React.FC = () => {
                     className={styles.manageCodesLink}
                     onClick={() => {
                       handleChangeMode("manage");
-                      saveQueryAndRedirect(
-                        constructedQuery,
-                        queryName,
-                        "/codeLibrary",
-                      );
+                      // saveQueryAndRedirect(
+                      //   constructedQuery,
+                      //   queryName,
+                      //   "/codeLibrary",
+                      // );
                     }}
                   >
                     Manage codes
@@ -490,15 +554,17 @@ const CodeLibrary: React.FC = () => {
                 </p>
                 <Button
                   type="button"
-                  disabled={!savedQuery}
+                  disabled={
+                    !customCodeIds || Object.keys(customCodeIds).length <= 0
+                  }
                   className={styles.button}
                   onClick={() => {
                     handleChangeMode("create");
-                    saveQueryAndRedirect(
-                      constructedQuery,
-                      queryName,
-                      "/queryBuilding",
-                    );
+                    // saveQueryAndRedirect(
+                    //   constructedQuery,
+                    //   queryName,
+                    //   "/queryBuilding",
+                    // );
                   }}
                 >
                   Next: Create query
@@ -575,42 +641,57 @@ const CodeLibrary: React.FC = () => {
                         styles.conceptsTable__header,
                       )}
                     >
-                      {!activeValueSet.userCreated ? (
-                        <tr className={styles.lockedForEdits}>
-                          <th>
-                            <Icon.Lock
-                              role="icon"
-                              className="qc-lock"
-                            ></Icon.Lock>
-                            {`This value set comes from ${valueSetSource} and cannot be
+                      {mode == "manage" && (
+                        <>
+                          {!activeValueSet.userCreated ? (
+                            <tr className={styles.lockedForEdits}>
+                              <th>
+                                <Icon.Lock
+                                  role="icon"
+                                  className="qc-lock"
+                                ></Icon.Lock>
+                                {`This value set comes from ${valueSetSource} and cannot be
                           modified.`}
-                          </th>
-                        </tr>
-                      ) : (
+                              </th>
+                            </tr>
+                          ) : (
+                            <tr
+                              className={
+                                styles.conceptsTable__header_sectionHeader
+                              }
+                            >
+                              <th>
+                                <Button
+                                  className={classNames(
+                                    styles.editCodesBtn,
+                                    "button-secondary",
+                                  )}
+                                  type="button"
+                                  onClick={() => handleChangeMode("edit")}
+                                >
+                                  {activeValueSet.concepts?.length <= 0
+                                    ? "Add codes"
+                                    : "Edit codes"}
+                                </Button>
+                                <Button
+                                  className={styles.deleteValueSet}
+                                  type="button"
+                                  onClick={() =>
+                                    modalRef.current?.toggleModal()
+                                  }
+                                >
+                                  Delete value set
+                                </Button>
+                              </th>
+                            </tr>
+                          )}
+                        </>
+                      )}
+                      {mode == "select" && (
                         <tr
-                          className={styles.conceptsTable__header_sectionHeader}
+                          className={styles.valueSetTable__header_sectionHeader}
                         >
-                          <th>
-                            <Button
-                              className={classNames(
-                                styles.editCodesBtn,
-                                "button-secondary",
-                              )}
-                              type="button"
-                              onClick={() => handleChangeMode("edit")}
-                            >
-                              {activeValueSet.concepts?.length <= 0
-                                ? "Add codes"
-                                : "Edit codes"}
-                            </Button>
-                            <Button
-                              className={styles.deleteValueSet}
-                              type="button"
-                              onClick={() => modalRef.current?.toggleModal()}
-                            >
-                              Delete value set
-                            </Button>
-                          </th>
+                          <th>{"Codes".toLocaleUpperCase()}</th>
                         </tr>
                       )}
                       {activeValueSet.concepts.length == 0 ? (
