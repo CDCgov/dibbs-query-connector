@@ -1,81 +1,86 @@
 import KeycloakProvider from "next-auth/providers/keycloak";
 import MicrosoftEntraID from "next-auth/providers/microsoft-entra-id";
-import { addUserIfNotExists, getUserRole } from "@/app/backend/user-management";
-import { isAuthDisabledServerCheck } from "./app/utils/auth";
-import { UserRole } from "./app/models/entities/users";
+import { addUserIfNotExists } from "@/app/backend/user-management";
 import NextAuth from "next-auth";
 import { logSignInToAuditTable } from "./app/backend/session-management";
-import { decodeJwt } from "jose";
-
-function addRealm(url: string) {
-  return url.endsWith("/realms/master") ? url : `${url}/realms/master`;
-}
-
-let { NAMED_KEYCLOAK, LOCAL_KEYCLOAK } = process.env;
-if (!NAMED_KEYCLOAK || !LOCAL_KEYCLOAK) {
-  const KEYCLOAK_URL =
-    process.env.AUTH_KEYCLOAK_ISSUER || "http://localhost:8080";
-  NAMED_KEYCLOAK = KEYCLOAK_URL;
-  LOCAL_KEYCLOAK = KEYCLOAK_URL;
-}
-
-// Add /realms/master to the end of the URL if it's missing.
-NAMED_KEYCLOAK = addRealm(NAMED_KEYCLOAK);
-LOCAL_KEYCLOAK = addRealm(LOCAL_KEYCLOAK);
-
-const keycloakProvider = KeycloakProvider({
-  jwks_endpoint: `${NAMED_KEYCLOAK}/protocol/openid-connect/certs`,
-  wellKnown: undefined,
-  clientId: process.env.AUTH_CLIENT_ID,
-  clientSecret: process.env.AUTH_CLIENT_SECRET,
-  issuer: `${LOCAL_KEYCLOAK}`,
-  authorization: {
-    params: {
-      scope: "openid email profile",
-    },
-    url: `${LOCAL_KEYCLOAK}/protocol/openid-connect/auth`,
-  },
-  token: `${NAMED_KEYCLOAK}/protocol/openid-connect/token`,
-  userinfo: `${NAMED_KEYCLOAK}/protocol/openid-connect/userinfo`,
-});
-
-const entraProvider = MicrosoftEntraID({
-  clientId: process.env.AUTH_CLIENT_ID,
-  clientSecret: process.env.AUTH_CLIENT_SECRET,
-  issuer: process.env.AUTH_ISSUER,
-  authorization: {
-    params: {
-      scope: "openid email profile",
-      claims: {
-        id_token: {
-          roles: { essential: true },
-          wids: { essential: true }, // Windows IDs for admin roles
-          groups: { essential: true },
-        },
-      },
-    },
-  },
-});
+import {
+  AuthContext,
+  AuthStrategy,
+  KeycloakAuthStrategy,
+  MicrosoftEntraAuthStrategy,
+} from "./app/backend/auth/lib";
 
 let providers = [];
+let authStrategy: AuthStrategy;
 
 switch (process.env.NEXT_PUBLIC_AUTH_PROVIDER) {
   case "keycloak":
-    providers = [keycloakProvider];
+    function addRealm(url: string) {
+      return url.endsWith("/realms/master") ? url : `${url}/realms/master`;
+    }
+
+    let { NAMED_KEYCLOAK, LOCAL_KEYCLOAK } = process.env;
+    if (!NAMED_KEYCLOAK || !LOCAL_KEYCLOAK) {
+      const KEYCLOAK_URL =
+        process.env.AUTH_KEYCLOAK_ISSUER || "http://localhost:8080";
+      NAMED_KEYCLOAK = KEYCLOAK_URL;
+      LOCAL_KEYCLOAK = KEYCLOAK_URL;
+    }
+
+    // Add /realms/master to the end of the URL if it's missing.
+    NAMED_KEYCLOAK = addRealm(NAMED_KEYCLOAK);
+    LOCAL_KEYCLOAK = addRealm(LOCAL_KEYCLOAK);
+
+    providers = [
+      KeycloakProvider({
+        jwks_endpoint: `${NAMED_KEYCLOAK}/protocol/openid-connect/certs`,
+        wellKnown: undefined,
+        clientId: process.env.AUTH_CLIENT_ID,
+        clientSecret: process.env.AUTH_CLIENT_SECRET,
+        issuer: `${LOCAL_KEYCLOAK}`,
+        authorization: {
+          params: {
+            scope: "openid email profile",
+          },
+          url: `${LOCAL_KEYCLOAK}/protocol/openid-connect/auth`,
+        },
+        token: `${NAMED_KEYCLOAK}/protocol/openid-connect/token`,
+        userinfo: `${NAMED_KEYCLOAK}/protocol/openid-connect/userinfo`,
+      }),
+    ];
+    authStrategy = new KeycloakAuthStrategy();
     break;
   case "microsoft-entra-id":
-    providers = [entraProvider];
+    providers = [
+      MicrosoftEntraID({
+        clientId: process.env.AUTH_CLIENT_ID,
+        clientSecret: process.env.AUTH_CLIENT_SECRET,
+        issuer: process.env.AUTH_ISSUER,
+        authorization: {
+          params: {
+            scope: "openid email profile",
+
+            claims: {
+              userinfo: {
+                given_name: { essential: true },
+                family_name: { essential: true },
+                email: { essential: true },
+              },
+              id_token: {
+                roles: { essential: true },
+              },
+            },
+          },
+        },
+      }),
+    ];
+    authStrategy = new MicrosoftEntraAuthStrategy();
     break;
   default:
-    providers = [keycloakProvider];
-    break;
+    throw Error(
+      "Configured IdP doesn't match existing options. Please check the setup in your environment settings",
+    );
 }
-
-const ROLE_TO_ENUM_MAP: Record<string, UserRole> = {
-  standard: UserRole.STANDARD,
-  "super-admin": UserRole.SUPER_ADMIN,
-  admin: UserRole.ADMIN,
-};
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   secret: process.env.AUTH_SECRET,
@@ -84,85 +89,32 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   providers,
   callbacks: {
     async jwt({ token, profile, account }) {
-      const now = Math.floor(Date.now() / 1000);
-      let role: UserRole = UserRole.STANDARD;
-      console.log(account);
+      const authContext = new AuthContext(authStrategy);
 
-      switch (process.env.NEXT_PUBLIC_AUTH_PROVIDER) {
-        case "keycloak":
-          if (account?.access_token) {
-            let decodedToken = decodeJwt(account?.access_token);
-            const keycloakRoles = decodedToken?.realm_access as string[];
-
-            const validRoles = Object.keys(ROLE_TO_ENUM_MAP);
-            let roleFound = false;
-            keycloakRoles.forEach((r) => {
-              if (validRoles.includes(r)) {
-                role = ROLE_TO_ENUM_MAP[r];
-                roleFound = true;
-              }
-            });
-
-            if (!roleFound) {
-              console.error(
-                "No role found in Keycloak assignments. User role falling back to standard",
-              );
-            }
-            console.log("keycloak role", role);
-          } else {
-            console.error(
-              "No ID token found in account setup. User role falling back to standard",
-            );
-          }
-          break;
-        case "microsoft-entra-id":
-          const azureRoles = profile?.roles as string[];
-          role = ROLE_TO_ENUM_MAP[azureRoles[0]];
-          break;
-        default:
-          break;
+      let extendedToken = authContext.extendTokenWithExpirationTime(token);
+      // IdP response doesn't have extra user token info (ie after initial sign in).
+      // Just return token with extended expiry info
+      if (!account || !profile) {
+        return extendedToken;
       }
 
-      if (profile) {
-        const userToken = {
-          id: profile.sub || "",
-          username: profile.preferred_username || profile.email || "",
-          email: profile.email || "",
-          firstName: profile.given_name || "",
-          lastName: profile.family_name || "",
-          role: role,
-        };
+      const userToken = authContext.parseIdpResponseForUserToken(
+        account,
+        profile,
+      );
 
-        // Ensure user is in the database **only on first login**
-        try {
-          await addUserIfNotExists(userToken);
-        } catch (error) {
-          console.error("Something went wrong in generating user token", error);
-        }
-
-        token = { ...token, ...userToken };
+      try {
+        await addUserIfNotExists(userToken);
+      } catch (error) {
+        console.error(
+          "Something went wrong in user setup after JWT generation",
+          error,
+        );
       }
 
-      // Extend token with role and time to expire
-      if (token.username && token.username !== "") {
-        if (isAuthDisabledServerCheck()) {
-          token.role = UserRole.SUPER_ADMIN;
-        } else {
-          const role = await getUserRole(token.username).catch();
-          token.role = role;
-        }
-      }
+      extendedToken = authContext.extendTokenWithUserInfo(token, userToken);
 
-      if (token.exp) {
-        token.expiresIn = token.exp - now;
-      }
-
-      // handle expired tokens
-      if (token.expiresIn && token.expiresIn <= 0) {
-        return null;
-      }
-
-      return token;
+      return extendedToken;
     },
 
     /**

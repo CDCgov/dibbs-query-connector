@@ -12,6 +12,14 @@ import dbService from "./db/service";
 import { adminRequired, superAdminRequired } from "./db/decorators";
 import { auditable } from "./audit-logs/decorator";
 
+export interface UserToken {
+  id: string;
+  username: string;
+  firstName: string;
+  lastName: string;
+  role: UserRole;
+  email?: string;
+}
 class UserManagementServiceInternal {
   protected static async getAllUsers() {
     try {
@@ -105,14 +113,7 @@ class UserManagementService extends UserManagementServiceInternal {
    * @returns The newly added user or an empty result if already exists.
    */
   @auditable
-  static async addUserIfNotExists(userToken: {
-    id: string;
-    username: string;
-    email: string;
-    firstName: string;
-    lastName: string;
-    role: UserRole;
-  }) {
+  static async addUserIfNotExists(userToken: UserToken) {
     if (!userToken || !userToken.username) {
       console.error("Invalid user token. Cannot add user.");
       return { user: undefined };
