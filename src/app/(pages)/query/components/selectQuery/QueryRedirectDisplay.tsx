@@ -37,13 +37,9 @@ const QueryRedirectInfo: React.FC<QueryRedirectInfoProps> = ({ userRole }) => {
           ) : (
             <span>
               Go to the{" "}
-              <a
-                className="unchanged-color-on-visit"
-                target="_blank"
-                href={PAGES.QUERY_BUILDING}
-              >
-                query library
-              </a>{" "}
+              <a target="_blank" href={PAGES.QUERY_BUILDING}>
+                query library{" "}
+              </a>
               to build it.
             </span>
           )}

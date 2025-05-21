@@ -1,45 +1,5 @@
 @use "uswds-core" as *;
-@use "_variables" as *;
-
-html,
-body {
-  height: 100%;
-}
-html {
-  scroll-behavior: auto;
-  box-sizing: border-box;
-}
-
-body {
-  font-family: $sans-serif-font;
-  line-height: 1.4;
-  background-color: $page-background;
-}
-.application-container {
-  display: flex;
-  flex-flow: column;
-  min-height: 100%;
-}
-
-header,
-footer {
-  padding: 0 2rem;
-  margin: 0;
-}
-
-header {
-  background-image: linear-gradient(to right, $blue-60v, $cyan-50v) !important;
-}
-
-h1 {
-  font-family: $serif-font;
-}
-
-.main-body {
-  background-color: rgba(247, 249, 250, 1);
-  display: flex;
-  flex: 1 1 auto;
-}
+@use "variables" as *;
 
 .page-title {
   margin-bottom: 0.5rem;
@@ -57,6 +17,28 @@ h1 {
 // Utility classes
 // Numbers correspond to the USWDS spacing classes
 // https://designsystem.digital.gov/utilities/margin-and-padding/
+.text-white-important {
+  color: white !important;
+}
+
+.destructive-primary {
+  color: $destructive-primary !important;
+}
+.success-primary {
+  color: $success-primary;
+}
+.error-primary {
+  color: $error-primary;
+}
+
+.text-secondary {
+  color: $text-secondary;
+}
+
+.text-decoration-none {
+  text-decoration: none;
+}
+
 .margin-top-0-important {
   margin-top: 0 !important;
 }
@@ -90,25 +72,25 @@ h1 {
   padding: 0 !important;
 }
 
-.text-base-lightest-important {
-  color: $text-base-lightest !important;
+.brand-lightest {
+  color: $brand-lightest !important;
 }
 
 .font-weight-normal-important {
   font-weight: 400 !important;
 }
 
-.bg-gray-5 {
-  background-color: $page-background-dark;
+.background-dark {
+  background-color: $background-darker;
 }
 
 .bg-info {
-  background-color: $info;
+  background-color: $brand-lighter;
 }
 
 .icon-primary {
   path {
-    color: $primary;
+    color: $brand-primary;
   }
 }
 
@@ -118,10 +100,6 @@ h1 {
 
 .lh-18 {
   line-height: 18px;
-}
-
-.unchanged-color-on-visit:visited {
-  color: $primary;
 }
 
 .content-hidden {
@@ -138,55 +116,7 @@ h1 {
   margin-bottom: 0.5rem;
 }
 
-.gradient-blue-background {
-  background: linear-gradient(
-    109.54deg,
-    rgba(173, 207, 220, 0.025) 8.02%,
-    rgba(46, 98, 118, 0.5) 117.53%
-  );
-
-  padding: 0.5rem;
-  /* Optional: some padding to make the background more noticeable */
-  justify-content: left;
-  display: flex;
-  align-items: center;
-
-  .container {
-    display: flex;
-    margin: 0 auto; // Centers the container itself if needed
-    max-width: $query-connector-max-width;
-    column-gap: 2rem;
-  }
-}
-
-.blue-background-container {
-  width: 100%;
-  background-color: #e7f2f5;
-  padding: 2rem 0;
-}
-
-.blue-background-container .text-holder {
-  max-width: $query-connector-max-width;
-  margin: 0 auto;
-  text-align: left;
-  max-height: max-content;
-}
-
 // Context classes
-.clinical_info_container table {
-  @include usa-table;
-  @include usa-table--borderless;
-  width: 100%;
-  border: 1px solid;
-  margin-top: 0;
-  margin-bottom: 0;
-}
-
-.clinical_info_container table thead tr th {
-  background-color: #f0f0f0;
-  min-width: 120px;
-}
-
 .home {
   display: grid;
   grid-template-columns: 1fr; // Defines a single column
@@ -200,25 +130,6 @@ h1 {
   flex: 0 1 auto;
   width: 190px;
   font-weight: bold;
-}
-
-.test-query-filler {
-  background: #faf3d1;
-  border: 1px solid #fee685;
-  border-radius: 4px;
-
-  .usa-label {
-    margin-top: 0;
-  }
-}
-
-.usa-checkbox__label {
-  cursor: pointer;
-  display: inherit;
-  font-weight: normal;
-  margin-top: 0rem;
-  padding-left: 2rem;
-  position: relative;
 }
 
 .query-page-wrapper {
@@ -243,17 +154,15 @@ h1 {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.5);
+  background: $overlay-background;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
 .spinner {
-  border: 6px solid #f3f3f3;
-  /* Light grey */
-  border-top: 6px solid #3498db;
-  /* Blue */
+  border: 6px solid $border;
+  border-top: 6px solid $brand-primary;
   border-radius: 50%;
   width: 60px;
   height: 60px;
@@ -281,10 +190,6 @@ h1 {
 }
 
 /* Styles for the customize page */
-.usa-accordion {
-  border-radius: 4px;
-  padding: 0px;
-}
 
 .button-container {
   display: flex;
@@ -294,16 +199,6 @@ h1 {
   padding-bottom: 20px;
 }
 
-hr.custom-hr {
-  width: 100%;
-  height: 0px;
-  background-color: #ddd;
-  margin-top: -6px;
-  margin-bottom: 0;
-  border: none;
-  border-top: 1px solid #71767a;
-}
-
 .resultsViewSideNav .usa-sidenav,
 .resultsViewSideNav .usa-sidenav__item {
   border: none !important;
@@ -311,14 +206,14 @@ hr.custom-hr {
 
 .tableRowWithHover:hover,
 .tableRowWithHover:hover > td {
-  background-color: $dropdown-hover;
+  background-color: $hover-neutral;
 }
 
 .tableRowWithHover_clickable:hover,
 .tableRowWithHover_clickable:hover td,
 .tableRowWithHover_clickable:hover .usa-checkbox {
   cursor: pointer;
-  background-color: $dropdown-hover !important;
+  background-color: $hover-neutral !important;
 }
 
 .tableRowWithHover:hover,
@@ -330,192 +225,8 @@ hr.custom-hr {
 
 // Overrides
 
-.usa-step-indicator__segment-label {
-  padding-right: 0;
-}
-
-.usa-sidenav__item a:not(.usa-sidenav__sublist a) {
-  font-weight: bold;
-}
-
-ul.usa-sidenav
-  > li.usa-sidenav__item
-  > ul.usa-sidenav__sublist
-  > li.usa-sidenav__item
-  > a {
-  font-weight: bold;
-}
-
-ul.usa-sidenav
-  > li.usa-sidenav__item
-  > ul.usa-sidenav__sublist
-  > li.usa-sidenav__item
-  > a.usa-current {
-  &::after {
-    background-color: rgb(0, 94, 162);
-    content: "";
-    display: block;
-    position: absolute;
-    bottom: 0.25rem;
-    top: 0.25rem;
-    width: 0.25rem;
-    left: 0rem;
-    border-radius: 99rem;
-  }
-}
-
-.usa-step-indicator__current-step {
-  background-color: $primary;
-  margin-right: 0.5rem;
-  padding: 0;
-  height: 2.75rem;
-  width: 2.75rem;
-}
-
-.usa-step-indicator__total-steps {
-  color: $primary;
-}
-
-.usa-step-indicator__total-steps,
-.usa-step-indicator__current-step {
-  font-size: 2rem;
-}
-
-.usa-label {
-  margin-top: 1.5rem;
-}
-
-.usa-table--borderless {
-  thead tr th {
-    background-color: #f0f0f0;
-  }
-  width: 100%;
-}
-
-.usa-logo {
-  margin-top: 2rem;
-  margin-bottom: 2rem;
-}
-
-.usa-button--outline:hover,
-.usa-button--outline.usa-button--hover {
-  background-color: white;
-}
-
-.usa-pagination .usa-current {
-  background-color: white;
-  border-color: rgba(27, 27, 27, 0.2);
-  border-radius: 0.25rem;
-  border: 1px solid rgba(27, 27, 27, 0.2);
-  font-size: 1rem;
-  font-weight: 700;
-  line-height: 140%;
-  margin: 0;
-  text-decoration: none;
-}
-
-.usa-pagination .usa-current,
-.usa-pagination .usa-current button,
-.usa-pagination .usa-current a {
-  font-weight: 700;
-  text-decoration: none;
-}
-
-.usa-pagination .usa-current:hover,
-.usa-pagination .usa-current:focus,
-.usa-pagination .usa-current:active {
-  background-color: white;
-  border-color: rgba(27, 27, 27, 0.2);
-  color: inherit;
-  text-decoration: none;
-}
-
-.usa-pagination__button,
-.usa-pagination__link {
-  font-size: 1rem;
-  font-weight: 700;
-  line-height: 140%;
-  margin: 0;
-  text-decoration: none;
-}
-
-.usa-pagination__overflow {
-  align-self: center;
-}
-
-.Toastify__toast-container {
-  width: calc($query-connector-wide-max-width * 0.4) !important;
-
-  .Toastify__toast--success {
-    background-color: #ecf3ec;
-  }
-}
-
-.Toastify__toast-body {
-  margin: 0 !important;
-
-  div {
-    height: 100%;
-    border-radius: var(--toastify-toast-bd-radius);
-  }
-
-  .usa-alert__body::before {
-    mask-size: 1.5rem 1.5rem !important;
-    top: unset !important;
-  }
-
-  .usa-alert__body > * {
-    margin-left: 2rem !important;
-  }
-}
-
-.usa-alert__heading {
-  &.h1 {
-    font-size: 2.125rem;
-    font-weight: bold;
-    line-height: 1.5;
-  }
-
-  &.h2 {
-    font-size: 1.875rem;
-    font-weight: bold;
-    line-height: 1.5;
-  }
-
-  &.h3 {
-    font-size: 1.5rem;
-    font-weight: bold;
-    line-height: 1.4;
-  }
-
-  &.h4 {
-    font-size: 1.25rem;
-    font-weight: bold;
-    line-height: 1.3;
-  }
-
-  &.h5 {
-    font-size: 1.125rem;
-    font-weight: bold;
-    line-height: 1.2;
-  }
-
-  &.h6 {
-    font-size: 1rem;
-    font-weight: bold;
-    line-height: 1.2;
-  }
-}
-
 .custom-query-step-indicator .usa-step-indicator__header {
   display: none !important;
-}
-
-.usa-step-indicator__segment--current:before,
-.usa-step-indicator__segment--complete:before {
-  box-shadow:
-    inset 0 0 0 0 #919191,
-    0 0 0 0.25rem white !important;
 }
 
 .customize-accordion .usa-accordion__button[aria-expanded="true"],
@@ -550,11 +261,11 @@ ul.usa-sidenav
   border-left: 0;
   margin-top: 1rem;
   margin-bottom: 1.5rem;
-  background-color: #fff5c2;
+  background-color: $warning-lighter;
 }
 
 .info-alert > .usa-alert__body {
-  background-color: #fff5c2;
+  background-color: $warning-lighter;
   width: fit-content;
   line-height: 1.5rem;
 
@@ -564,138 +275,15 @@ ul.usa-sidenav
   }
 
   &::before {
-    background-color: #947100;
+    background-color: $warning-dark;
     mask-size: 1.5rem;
   }
-}
-
-.usa-alert__text {
-  font-size: 0.875rem;
-}
-
-.qc-modal {
-  padding: 0 2rem !important;
-  max-width: 31rem;
-
-  .usa-modal__content {
-    padding-top: 0;
-    padding-left: 0.5rem;
-    padding-right: 0.5rem;
-  }
-
-  .usa-modal__main {
-    max-width: 26rem;
-    margin: 0 !important;
-    padding: 0 0 2rem 0 !important;
-    input,
-    select {
-      max-width: 100%;
-    }
-  }
-
-  .usa-modal__heading {
-    font-family: "Public Sans", sans-serif !important;
-    font-size: 1.219rem !important;
-    font-style: normal;
-    font-weight: 700;
-    line-height: normal;
-    margin-bottom: 1rem;
-  }
-
-  .usa-checkbox {
-    background-color: transparent;
-  }
-
-  .usa-button-group {
-    flex-direction: row-reverse;
-    justify-content: space-between;
-
-    .usa-button--secondary {
-      background-color: #d83933 !important;
-    }
-
-    .usa-button-group__item:last-child {
-      margin-right: 0.25rem;
-
-      #modal-back-button,
-      #modal-cancel-button {
-        padding-left: 0 !important;
-      }
-    }
-
-    #modal-back-button,
-    #modal-cancel-button {
-      background-color: transparent;
-      color: #005ea2;
-
-      &:hover {
-        box-shadow: none;
-      }
-    }
-
-    .usa-button-group__item:last-child:has(> #modal-back-button),
-    .usa-button-group__item:last-child:has(> #modal-cancel-button),
-    .usa-button-group__item:last-child:has(> #modal-delete-button) {
-      flex: 1 1 0%;
-    }
-  }
-
-  .usa-modal__close {
-    background-color: transparent !important;
-    padding: 0 !important;
-    width: 1.5rem !important;
-    height: 1.5rem !important;
-    margin: 1rem 0rem 0rem 0rem !important;
-
-    .usa-icon {
-      margin: 0;
-      height: 1.5rem;
-      width: 1.5rem;
-    }
-  }
-}
-
-.qc-modal.usa-modal--lg {
-  max-width: 40rem !important;
-
-  .usa-modal__main {
-    max-width: 35rem;
-
-    input,
-    select {
-      max-width: 100%;
-    }
-  }
-}
-
-#fhir-server-modal .usa-modal--lg {
-  background-color: #edeff0;
 }
 
 #session-timeout-modal {
   .usa-modal__main {
     padding-top: 2rem !important;
   }
-}
-
-#user-mgmt-modal {
-  .role-descriptions {
-    background-color: #f3f3f3;
-    padding: 0.5rem;
-    line-height: 22px;
-
-    .role-description {
-      margin-bottom: 1rem;
-    }
-
-    .role-description:last-child {
-      margin-bottom: 0 !important;
-    }
-  }
-}
-
-.searchHighlight {
-  background-color: $yellow-vivid-20v;
 }
 
 .qc-filter {
@@ -706,5 +294,5 @@ ul.usa-sidenav
   height: 1.5rem !important;
   width: 1.5rem !important;
   margin-right: 0.5rem;
-  color: #919191 !important;
+  color: $diabled !important;
 }
