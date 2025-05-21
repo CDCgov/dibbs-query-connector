@@ -308,7 +308,7 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
       }
 
       const updatedCodeMap: CustomCodeMap = {};
-     
+
       // don't save empty placeholder rows
       const storedConcepts = Object.values(codesMap).filter(
         (codes) => codes.code != "" && codes.display !== "",
