@@ -59,27 +59,24 @@ export class AuthContext {
   }
 }
 
+const CLIENT_ID_NAME = process.env.AUTH_CLIENT_ID as string;
 export class KeycloakAuthStrategy implements AuthStrategy {
   public parseIdpResponseForUserToken(account: Account, profile: Profile) {
-    let role = UserRole.STANDARD;
+    let role: UserRole = UserRole.STANDARD;
+
     if (account?.access_token) {
       let decodedToken = decodeJwt(account?.access_token);
-      const keycloakRoles = (
-        decodedToken?.realm_access as { ["roles"]: string[] }
-      ).roles;
 
-      console.log(keycloakRoles);
+      const keycloakRoles = decodedToken?.resource_access as {
+        [CLIENT_ID_NAME]: {
+          ["roles"]: string[];
+        };
+      };
+      const userRoles = keycloakRoles && keycloakRoles[CLIENT_ID_NAME]?.roles;
 
-      const validRoles = Object.keys(ROLE_TO_ENUM_MAP);
-      let roleFound = false;
-      keycloakRoles.forEach((r) => {
-        if (validRoles.includes(r)) {
-          role = ROLE_TO_ENUM_MAP[r];
-          roleFound = true;
-        }
-      });
-
-      if (!roleFound) {
+      if (userRoles && userRoles[0] && ROLE_TO_ENUM_MAP[userRoles[0]]) {
+        role = ROLE_TO_ENUM_MAP[userRoles[0]];
+      } else {
         console.error(
           "No role found in Keycloak assignments. Falling back to standard access",
         );
