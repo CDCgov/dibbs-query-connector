@@ -7,6 +7,7 @@ import PatientSearchResultsTable from "./patientSearchResults/PatientSearchResul
 import NoPatientsFound from "./patientSearchResults/NoPatientsFound";
 import { RETURN_LABEL } from "@/app/(pages)/query/components/stepIndicator/StepIndicator";
 import TitleBox from "./stepIndicator/TitleBox";
+import { Button } from "@trussworks/react-uswds";
 
 /**
  * The props for the PatientSearchResults component.
@@ -65,13 +66,9 @@ const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({
       {!loading && patients.length === 0 && (
         <>
           <NoPatientsFound />
-          <a
-            href="#"
-            className="usa-link unchanged-color-on-visit"
-            onClick={goBack}
-          >
+          <Button unstyled onClick={goBack} type={"button"}>
             Revise your patient search
-          </a>
+          </Button>
         </>
       )}
     </>

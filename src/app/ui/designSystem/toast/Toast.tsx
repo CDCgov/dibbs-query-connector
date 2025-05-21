@@ -57,6 +57,7 @@ export type ToastConfigOptions = {
   bodyClassName?: string;
   pauseOnFocusLoss?: boolean;
   icon?: ToastIcon;
+  progress?: number;
 };
 
 const options: ToastConfigOptions = {

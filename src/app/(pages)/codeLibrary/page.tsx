@@ -172,14 +172,14 @@ const CodeLibrary: React.FC = () => {
         ? Object.values(filterSearch.creators).flat().includes(vs.author)
         : vs;
     };
-
-    setFilteredValueSets(
+    return setFilteredValueSets(
       valueSets
         .filter(handleTextSearch)
         .filter(matchCategory)
         .filter(matchCodeSystem)
         .filter(matchCreators),
     );
+  };
 
     const isFiltered = Object.entries(filterSearch).some(([key, val]) => {
       let filterApplied = false;
@@ -393,7 +393,7 @@ const CodeLibrary: React.FC = () => {
               Click on the checkbox to delete the value set or code
             </div> */}
             <Alert
-              type="info"
+              type="warning"
               headingLevel="h4"
               noIcon={false}
               className={classNames("info-alert")}
@@ -541,10 +541,7 @@ const CodeLibrary: React.FC = () => {
                         >
                           <th>
                             <Button
-                              className={classNames(
-                                styles.editCodesBtn,
-                                "button-secondary",
-                              )}
+                              secondary
                               type="button"
                               onClick={() => handleChangeMode("edit")}
                             >
@@ -553,7 +550,6 @@ const CodeLibrary: React.FC = () => {
                                 : "Edit codes"}
                             </Button>
                             <Button
-                              className={styles.deleteValueSet}
                               type="button"
                               onClick={() => modalRef.current?.toggleModal()}
                             >
@@ -672,7 +668,7 @@ const CodeLibrary: React.FC = () => {
             text: "Delete value set",
             type: "button" as const,
             id: "delete-vs-confirm",
-            className: classNames("usa-button", styles.modalButtonDelete),
+            className: classNames("usa-button", "usa-button--destructive"),
             onClick: handleDeleteValueSet,
           },
           {

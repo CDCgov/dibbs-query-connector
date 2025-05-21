@@ -315,7 +315,7 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
           <div className={styles.customQuery__controls}>
             <div className={styles.customQuery__name}>
               <Label htmlFor="queryNameInput" className={styles.inputLabel}>
-                Query name <span style={{ color: "#919191" }}>(required)</span>
+                Query name <span className="text-secondary">(required)</span>
               </Label>
               <TextInput
                 inputRef={focusRef}

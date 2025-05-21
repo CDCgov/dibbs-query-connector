@@ -280,9 +280,12 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
             />
           </div>
           <Icon.Delete
-            className={classNames("margin-bottom-1", styles.deleteIcon)}
+            className={classNames(
+              "margin-bottom-1",
+              styles.deleteIcon,
+              "destructive-primary",
+            )}
             size={3}
-            color="#919191"
             data-testid={`delete-custom-code-${id}`}
             aria-label="Trash icon indicating deletion of code entry"
             onClick={(e) => {
@@ -305,7 +308,7 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
       }
 
       const updatedCodeMap: CustomCodeMap = {};
-
+     
       // don't save empty placeholder rows
       const storedConcepts = Object.values(codesMap).filter(
         (codes) => codes.code != "" && codes.display !== "",
