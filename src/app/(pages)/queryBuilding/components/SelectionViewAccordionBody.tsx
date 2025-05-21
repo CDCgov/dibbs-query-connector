@@ -216,6 +216,7 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
                 </div>
                 <Button
                   type={"button"}
+                  secondary
                   data-testid={`viewCodes-${dibbsVs.valueSetId}`}
                   className={styles.viewCodesBtn}
                   role="button"
