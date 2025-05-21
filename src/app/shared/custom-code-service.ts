@@ -35,7 +35,7 @@ class UserCreatedValuesetService {
 
   // This may not be needed since these are user-created valuesets
   private static getSystemPrefix(system: string) {
-    const match = system.match(/https?:\/\/([^\.]+)/);
+    const match = system?.match(/https?:\/\/([^\.]+)/);
     return match ? match[1] : system;
   }
 
@@ -100,7 +100,7 @@ class UserCreatedValuesetService {
   static async insertCustomValueSet(
     vs: DibbsValueSet,
     userId: string,
-  ): Promise<{ success: boolean; error?: string }> {
+  ): Promise<{ success: boolean; id?: string; error?: string }> {
     const errors: string[] = [];
     const uuid = crypto.randomUUID();
 
@@ -114,8 +114,9 @@ class UserCreatedValuesetService {
       await UserCreatedValuesetService.addCustomCodeCondition(vs.system || "");
 
     // Insert ValueSet
+    let newValueSetId = "";
     try {
-      await dbService.query(insertValueSetSql, [
+      const newValueSet = await dbService.query(insertValueSetSql, [
         valueSetUniqueId,
         valueSetOid, // I'm not sure if this is something we need to track
         vs.valueSetVersion, // I'm not sure if this is something we need to track, could be a timestamp or an optional user param for them to track versioning
@@ -125,6 +126,8 @@ class UserCreatedValuesetService {
         vs.dibbsConceptType,
         "true",
       ]);
+
+      newValueSetId = newValueSet.rows[0].id;
     } catch (e) {
       console.error("Insert failed for valueset:", e);
       errors.push("ValueSet insert failed");
@@ -177,7 +180,7 @@ class UserCreatedValuesetService {
     }
 
     return errors.length === 0
-      ? { success: true }
+      ? { success: true, id: newValueSetId }
       : { success: false, error: errors.join(", ") };
   }
 

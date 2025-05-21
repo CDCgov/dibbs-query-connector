@@ -94,7 +94,6 @@ exports[`Create custom valueSet form renders an empty form to add a new value se
                 >
                   <option
                     disabled=""
-                    selected=""
                     value=""
                   />
                   <option
@@ -123,14 +122,13 @@ exports[`Create custom valueSet form renders an empty form to add a new value se
                   Code system (Required)
                 </label>
                 <select
-                  class="usa-select filtersSelect"
+                  class="usa-select"
                   data-testid="Select"
                   id="code-system"
                   name="code-system"
                 >
                   <option
                     disabled=""
-                    selected=""
                     value=""
                   />
                   <option
@@ -346,7 +344,6 @@ exports[`Create custom valueSet form switches to edit mode after saving a new va
                 >
                   <option
                     disabled=""
-                    selected=""
                     value=""
                   />
                   <option
@@ -375,14 +372,13 @@ exports[`Create custom valueSet form switches to edit mode after saving a new va
                   Code system (Required)
                 </label>
                 <select
-                  class="usa-select filtersSelect"
+                  class="usa-select"
                   data-testid="Select"
                   id="code-system"
                   name="code-system"
                 >
                   <option
                     disabled=""
-                    selected=""
                     value=""
                   />
                   <option
@@ -611,7 +607,6 @@ exports[`Edit custom valueSet form renders a form to edit an existing value set 
                     Conditions
                   </option>
                   <option
-                    selected=""
                     value="medications"
                   >
                     Medications
@@ -627,7 +622,7 @@ exports[`Edit custom valueSet form renders a form to edit an existing value set 
                   Code system (Required)
                 </label>
                 <select
-                  class="usa-select filtersSelect"
+                  class="usa-select"
                   data-testid="Select"
                   id="code-system"
                   name="code-system"
@@ -662,7 +657,6 @@ exports[`Edit custom valueSet form renders a form to edit an existing value set 
                     ECC
                   </option>
                   <option
-                    selected=""
                     value="http://snomed.info/sct"
                   >
                     SNOMED
