@@ -369,9 +369,7 @@ const CodeLibrary: React.FC = () => {
           className={classNames("main-container__wide", styles.mainContainer)}
         >
           <div className={styles.header}>
-            {mode === "manage" ? (
-              <Backlink onClick={() => {}} label={"Back to Query library"} />
-            ) : (
+            {mode !== "manage" && (
               <Backlink onClick={goBack} label={"Back to My queries"} />
             )}
             <h1 className={styles.header__title}>Manage codes</h1>
