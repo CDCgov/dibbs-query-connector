@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const path = require("path");
+const createMDX = require("@next/mdx");
 
 const nextConfig = {
   sassOptions: {
@@ -8,9 +9,13 @@ const nextConfig = {
     ],
   },
   transpilePackages: ["yaml"],
-
   output: "standalone",
   basePath: "",
+  pageExtensions: ["js", "jsx", "md", "mdx", "ts", "tsx"],
 };
 
-module.exports = nextConfig;
+const withMDX = createMDX({
+  extension: /\.(md|mdx)$/,
+});
+
+module.exports = withMDX(nextConfig);
