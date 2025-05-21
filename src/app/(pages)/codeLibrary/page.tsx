@@ -172,14 +172,13 @@ const CodeLibrary: React.FC = () => {
         ? Object.values(filterSearch.creators).flat().includes(vs.author)
         : vs;
     };
-    return setFilteredValueSets(
+    setFilteredValueSets(
       valueSets
         .filter(handleTextSearch)
         .filter(matchCategory)
         .filter(matchCodeSystem)
         .filter(matchCreators),
     );
-  };
 
     const isFiltered = Object.entries(filterSearch).some(([key, val]) => {
       let filterApplied = false;
