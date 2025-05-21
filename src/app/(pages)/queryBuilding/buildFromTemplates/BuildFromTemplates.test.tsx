@@ -427,9 +427,9 @@ describe("tests the valueset selection page interactions", () => {
     await user.clear(valueSetSearch);
     // when we clear the search filter, the other two non-rendered codes shouldn't
     // have been affected
-    screen.debug();
     const displayCount = screen.getByTestId(`displayCount-${TEST_ID}`);
     expect(displayCount).toHaveTextContent("2 / 4");
+    expect(screen).toMatchSnapshot();
 
     // do the same for the accordidion
     await user.type(valueSetSearch, "meningitidis");
