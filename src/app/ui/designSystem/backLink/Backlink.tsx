@@ -17,7 +17,7 @@ const Backlink: React.FC<BacklinkProps> = ({ onClick, label }) => {
     <a
       href="#"
       onClick={onClick}
-      className="back-link unchanged-color-on-visit text-no-underline"
+      className="back-link text-no-underline"
       aria-label="Back arrow indicating ability to navigate back a page if clicked"
       data-testid="backArrowLink"
     >

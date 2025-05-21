@@ -465,7 +465,7 @@ const CodeLibrary: React.FC = () => {
               </div>
             )}
             <Alert
-              type="info"
+              type="warning"
               headingLevel="h4"
               noIcon={false}
               className={classNames("info-alert")}
@@ -804,7 +804,7 @@ const CodeLibrary: React.FC = () => {
             text: "Delete value set",
             type: "button" as const,
             id: "delete-vs-confirm",
-            className: classNames("usa-button", styles.modalButtonDelete),
+            className: classNames("usa-button", "usa-button--destructive"),
             onClick: handleDeleteValueSet,
           },
           {

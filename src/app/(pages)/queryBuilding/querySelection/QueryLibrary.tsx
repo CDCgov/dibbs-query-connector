@@ -176,16 +176,16 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
                           .join(", ")}
                   </td>
                   <td>
-                    <div className="table-cell-buttons">
+                    <div className="display-flex flex-justify-end">
                       <Button
                         type="button"
-                        className="usa-button--unstyled text-bold text-no-underline"
+                        className="usa-button--unstyled text-bold text-no-underline padding-right-3"
                         data-testid={`edit-query-${query.queryId}`}
                         onClick={() =>
                           handleEdit(query.queryName, query.queryId)
                         }
                       >
-                        <span className="icon-text padding-right-4 display-flex flex-align-center">
+                        <span className="icon-text display-flex flex-align-center">
                           <Icon.Edit
                             className="height-3 width-3"
                             aria-label="Pencil icon indicating edit ability"
@@ -195,7 +195,22 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
                       </Button>
                       <Button
                         type="button"
-                        className="usa-button--unstyled text-bold text-no-underline"
+                        className="usa-button--unstyled text-bold text-no-underline padding-right-2"
+                        onClick={() =>
+                          handleCopy(query.queryName, query.queryId)
+                        }
+                      >
+                        <span className="icon-text display-flex flex-align-center">
+                          <Icon.ContentCopy
+                            className="height-3 width-3"
+                            aria-label="Stacked paper icon indidcating copy"
+                          />
+                          <span className="padding-left-05">Copy ID</span>
+                        </span>
+                      </Button>
+                      <Button
+                        type="button"
+                        className="usa-button--unstyled text-bold text-no-underline destructive-primary padding-right-2"
                         onClick={() =>
                           confirmDelete(
                             query.queryName,
@@ -205,27 +220,12 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
                           )
                         }
                       >
-                        <span className="icon-text padding-right-4 display-flex flex-align-center">
+                        <span className="icon-text display-flex flex-align-center">
                           <Icon.Delete
                             className="height-3 width-3"
                             aria-label="trashcan icon indicating deletion"
                           />
                           <span className="padding-left-05">Delete</span>
-                        </span>
-                      </Button>
-                      <Button
-                        type="button"
-                        className="usa-button--unstyled text-bold text-no-underline"
-                        onClick={() =>
-                          handleCopy(query.queryName, query.queryId)
-                        }
-                      >
-                        <span className="icon-text padding-right-1 display-flex flex-align-center">
-                          <Icon.ContentCopy
-                            className="height-3 width-3"
-                            aria-label="Stacked paper icon indidcating copy"
-                          />
-                          <span className="padding-left-05">Copy ID</span>
                         </span>
                       </Button>
                     </div>

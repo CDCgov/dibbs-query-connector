@@ -1,7 +1,6 @@
-@use "../../../ui/styles/_variables" as *;
+@use "../../../ui/styles/variables" as *;
 
 // Shared styles
-
 .mainContainer {
   display: flex;
   flex-direction: column;
@@ -25,18 +24,18 @@
 
   &:active,
   &:visited {
-    color: #0076d6;
+    color: $accent-primary;
   }
 }
 
 .conditionSelectionForm {
-  background-color: #fff;
+  background-color: $white;
   padding: 2rem;
   min-height: 25rem;
 }
 
 .querySelectionFormSearch {
-  border: 1px solid #919191;
+  border: 1px solid $border;
   border-radius: 4px;
   height: 1.5rem;
   padding: 0.75rem;
@@ -57,7 +56,7 @@
 }
 
 .displayCol:first-of-type {
-  border-right: 1px solid $table-row-border;
+  border-right: 1px solid $border-light;
 }
 
 .displayCol:nth-of-type(2) {
@@ -71,7 +70,7 @@
 }
 
 .bluePill {
-  background-color: #e8f5ff;
+  background-color: $brand-lighter;
   font-size: 0.875rem;
   border-radius: 0.25rem;
 }
@@ -127,7 +126,7 @@
 }
 
 .valueSetTemplate__right {
-  background-color: #fff;
+  background-color: $white;
   width: 50rem;
   min-width: 70%;
   border-radius: 8px;
@@ -144,6 +143,7 @@
   .icon {
     height: 10rem;
     width: 10rem;
+    color: $background-darkest;
   }
 
   .codeLibrary__emptyText {
@@ -163,22 +163,7 @@
 
 .valueSetTemplate__search {
   padding: 1.5rem;
-  border-bottom: 1px #dfe1e2 solid;
-  display: flex;
-  justify-content: space-between;
-
-}
-
-.valueSetTemplate__accordion {
-  display: flex;
-  justify-content: space-between;
-  word-wrap: break-word;
-  align-items: center;
-  width: 100%;
-  box-sizing: border-box;
-  background-color: #f7f9fa;
-  padding: 1rem 1.5rem;
-  border-bottom: 1px #dfe1e2 solid;
+  border-bottom: 1px $border solid;
 }
 
 .accordionContainer {
@@ -205,7 +190,7 @@
 .accordionHeaderCount {
   font-size: 1rem !important;
   font-weight: 400 !important;
-  background-color: #f7f9fa;
+  background-color: $background-dark;
 }
 
 .accordionInnerWrapper > h4 {
@@ -218,17 +203,17 @@
   align-items: center;
   width: 100%;
   box-sizing: border-box;
-  background-color: #f7f9fa;
+  background-color: $background-dark;
   padding: 1rem 1.5rem;
-  border-bottom: 1px #dfe1e2 solid;
-  color: #111111;
+  border-bottom: 1px $border solid;
+  color: $black;
 
   // override default accordion hover styles (headers should not change on hover):
   &:hover {
-    background-color: #f7f9fa !important;
+    background-color: $background-dark !important;
 
     .accordionHeaderCount {
-      color: #111111;
+      color: $black;
     }
   }
 }
@@ -260,14 +245,14 @@
       flex-direction: row;
       justify-content: space-between;
       align-items: center;
-      color: #919191;
+      color: $text-secondary;
       font-size: 1rem;
       line-height: 1.2;
     }
 
     .addCondition {
       font-size: 1rem;
-      color: #005ea2;
+      color: $brand-primary;
       line-height: 18.8px;
       font-weight: 700;
       display: flex;
@@ -280,7 +265,7 @@
   }
 
   .deleteIcon {
-    color: $error;
+    color: $error-primary;
     width: 1.5rem;
     height: 1.5rem;
     display: none;
@@ -291,7 +276,7 @@
     border-radius: 4px;
     padding: 1rem;
     line-height: 22px;
-    color: #111111;
+    color: $black;
     cursor: pointer;
     position: relative;
 
@@ -304,13 +289,13 @@
   }
 
   .active {
-    background: #ffffff;
+    background: $white;
   }
 }
 
 .valueSetTemplate__titleCheckbox {
   text-transform: capitalize;
-  background-color: #f7f9fa;
+  background-color: $background-dark;
 }
 
 .valueSetTemplate__toggleRowHeader {
@@ -325,7 +310,7 @@
 
 .accordionBodyExpanded {
   padding: 1.5rem 1.5rem 0 3rem;
-  background-color: #fff;
+  background-color: $white;
   display: flex;
   justify-content: space-between;
   cursor: pointer;
@@ -334,19 +319,13 @@
 .checkboxInfoContainer:focus {
   outline: none;
   label::before {
-    outline: 0.25rem solid $hover-active;
+    outline: 0.25rem solid $focus-outline;
     outline-offset: 0.25rem;
     border-radius: 0.05rem;
   }
 }
 
 .accordionBodyExpanded {
-  .valueSetTemplate__checkboxWrapper {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-  }
-
   &:hover {
     .valueSetTemplate__checkbox {
       background-color: unset;
@@ -357,8 +336,11 @@
       width: 8rem;
       height: 2rem;
       font-size: 14px;
-      margin: 0;
-      padding: 0.25rem 0.25rem;
+      padding: 0.5rem 1.25rem;
+
+      &:hover {
+        cursor: pointer;
+      }
     }
     .displayCount {
       display: none;
@@ -372,8 +354,7 @@
 }
 
 div.accordionBodyExpanded:last-of-type {
-  border-bottom: 1px #dfe1e2 solid;
-  width: 100%;
+  border-bottom: 1px $border solid;
 
   .accordionExpandedInner {
     border-bottom: none !important;
@@ -381,7 +362,7 @@ div.accordionBodyExpanded:last-of-type {
 }
 
 .accordionExpandedInner {
-  border-bottom: solid 1px #dfe1e2;
+  border-bottom: solid 1px $border;
   padding-bottom: 1rem;
   width: 100%;
   display: flex;
@@ -399,17 +380,17 @@ div.accordionBodyExpanded:last-of-type {
 }
 
 .vsName {
-  color: #111111;
+  color: $black;
 }
 
 .vsDetails {
-  color: #919191;
+  color: $text-secondary;
   display: flex;
   padding-left: 1.75rem;
 }
 
 .accordionBodyExpanded__right {
-  padding-bottom: 1rem;
+  padding-bottom: 0.5rem;
   display: flex;
   align-items: center;
   min-width: 4rem;
@@ -493,7 +474,7 @@ $columnGap: 1rem;
 }
 
 .addButton {
-  color: $text-blue;
+  color: $accent-primary;
   text-transform: uppercase;
   font-weight: 700;
   cursor: pointer;
