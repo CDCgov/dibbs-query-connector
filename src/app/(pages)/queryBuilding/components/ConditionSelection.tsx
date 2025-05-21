@@ -22,6 +22,7 @@ type ConditionSelectionProps = {
   formError: FormError;
   setLoading: Dispatch<SetStateAction<boolean>>;
   loading: boolean;
+  renderErrorMessage: Dispatch<SetStateAction<boolean>>;
 };
 
 /**
@@ -34,7 +35,7 @@ type ConditionSelectionProps = {
  * @param root0.queryName - current checkbox selection status
  * @param root0.formError - indicates missing or incorrect form data
  * @param root0.setFormError - state function that updates the status of the
- * condition selection form input data
+ * @param root0.renderErrorMessage - state function that renders a form validation error
  * @returns A component for display to redner on the query building page
  */
 export const ConditionSelection: React.FC<ConditionSelectionProps> = ({
@@ -44,6 +45,7 @@ export const ConditionSelection: React.FC<ConditionSelectionProps> = ({
   queryName,
   formError,
   setFormError,
+  renderErrorMessage,
 }) => {
   const focusRef = useRef<HTMLInputElement | null>(null);
   const [searchFilter, setSearchFilter] = useState<string>();
@@ -70,11 +72,17 @@ export const ConditionSelection: React.FC<ConditionSelectionProps> = ({
         <h2 className="margin-y-0-important">Start from template(s)</h2>
         <p>
           Don't see what you're looking for? You can also{" "}
-          {/* TODO: link to "Select" mode of Code library page */}
           <a
             href="#"
             onClick={() => {
-              saveQueryAndRedirect(constructedQuery, queryName, "/codeLibrary");
+              !formError.queryName
+                ? saveQueryAndRedirect(
+                    constructedQuery,
+                    queryName,
+                    "/codeLibrary",
+                    "select",
+                  )
+                : renderErrorMessage(true);
             }}
             className={styles.startFromScratchLink}
           >

@@ -329,6 +329,7 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
                         constructedQuery,
                         queryName,
                         "/codeLibrary",
+                        "select",
                       )
                     }
                   >
@@ -378,6 +379,7 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
                     constructedQuery,
                     queryName,
                     "/codeLibrary",
+                    "select",
                   )
                 }
               >
