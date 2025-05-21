@@ -1,13 +1,19 @@
 @use "../../ui/styles/variables" as *;
 
+$pageContainerHeight: calc(100vh - $header-content-height - $site-alert-height);
+$pageHeaderHeight: 12rem;
+$pageControlsHeight: 3rem;
+
 .mainContainer {
     display: flex;
     flex-direction: column;
     flex: auto;
     margin-bottom: 0 !important;
     font-family: "Public Sans", sans-serif !important;
+    height: calc($pageContainerHeight - 2.5rem);
 
     .header {
+        height: $pageHeaderHeight;
         font-size: inherit;
 
         &__title {
@@ -27,7 +33,7 @@
         align-items: center;
         justify-content: space-between;
         margin-bottom: 1.5rem;
-        height: 3rem;
+        height: $pageControlsHeight;
 
         .search {
             display: flex;
@@ -71,10 +77,10 @@
 
     .content {
         display: flex;
-        justify-content: space-between;
+        justify-content: stretch;
         flex-direction: column;
-        flex: 1 0 auto;
-        height: 100%;
+
+        height: calc(100% - 22.875rem);
         align-items: center;
 
         &__left,
@@ -174,6 +180,7 @@
     flex-grow: 1;
     width: 100%;
     height: 100%;
+    justify-content: stretch;
 }
 
 .paginationContainer {
@@ -216,10 +223,15 @@
 
 .valueSetTable,
 .conceptsTable {
+    table {
+        display: inline-flex;
+        flex-direction: column;
+    }
     background-color: #fff !important;
     border: none !important;
     box-shadow: none !important;
     padding: 0 !important;
+    height: 100%;
 
     &__header {
         display: flex;
@@ -390,12 +402,12 @@
 
 .overflowScroll {
     display: flex;
-    max-height: 33rem;
     overflow-y: scroll;
+    scrollbar-color: $gray-40 transparent;
 
     &_headerLocked {
-        max-height: 30rem !important;
         overflow-y: scroll;
+        scrollbar-color: $gray-40 transparent;
     }
 }
 
@@ -499,7 +511,7 @@
         .addCodeContainer > span {
             line-height: 1 !important;
         }
-      
+
         .addCodeContainer {
             display: flex;
             flex-direction: column;
