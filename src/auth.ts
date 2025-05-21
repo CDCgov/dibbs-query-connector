@@ -6,6 +6,7 @@ import { UserRole } from "./app/models/entities/users";
 import NextAuth from "next-auth";
 import { logSignInToAuditTable } from "./app/backend/session-management";
 import { decodeJwt } from "jose";
+
 function addRealm(url: string) {
   return url.endsWith("/realms/master") ? url : `${url}/realms/master`;
 }
@@ -70,6 +71,12 @@ switch (process.env.NEXT_PUBLIC_AUTH_PROVIDER) {
     break;
 }
 
+const ROLE_TO_ENUM_MAP: Record<string, UserRole> = {
+  standard: UserRole.STANDARD,
+  "super-admin": UserRole.SUPER_ADMIN,
+  admin: UserRole.ADMIN,
+};
+
 export const { handlers, signIn, signOut, auth } = NextAuth({
   secret: process.env.AUTH_SECRET,
   trustHost: true,
@@ -78,28 +85,42 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   callbacks: {
     async jwt({ token, profile, account }) {
       const now = Math.floor(Date.now() / 1000);
-      let role: string = UserRole.STANDARD;
+      let role: UserRole = UserRole.STANDARD;
+      console.log(account);
 
-      if (account?.id_token) {
-        let decodedToken = decodeJwt(account?.id_token);
-        console.log(decodedToken);
-        switch (process.env.NEXT_PUBLIC_AUTH_PROVIDER) {
-          case "keycloak":
-            const keycloakRoles = decodedToken?.realm_access as Record<
-              string,
-              string
-            >;
+      switch (process.env.NEXT_PUBLIC_AUTH_PROVIDER) {
+        case "keycloak":
+          if (account?.access_token) {
+            let decodedToken = decodeJwt(account?.access_token);
+            const keycloakRoles = decodedToken?.realm_access as string[];
 
-            role = keycloakRoles?.roles[0];
-            break;
-          case "microsoft-entra-id":
-            const azureRoles = decodedToken?.roles as string[];
-            role = azureRoles[0];
+            const validRoles = Object.keys(ROLE_TO_ENUM_MAP);
+            let roleFound = false;
+            keycloakRoles.forEach((r) => {
+              if (validRoles.includes(r)) {
+                role = ROLE_TO_ENUM_MAP[r];
+                roleFound = true;
+              }
+            });
 
-            break;
-          default:
-            break;
-        }
+            if (!roleFound) {
+              console.error(
+                "No role found in Keycloak assignments. User role falling back to standard",
+              );
+            }
+            console.log("keycloak role", role);
+          } else {
+            console.error(
+              "No ID token found in account setup. User role falling back to standard",
+            );
+          }
+          break;
+        case "microsoft-entra-id":
+          const azureRoles = profile?.roles as string[];
+          role = ROLE_TO_ENUM_MAP[azureRoles[0]];
+          break;
+        default:
+          break;
       }
 
       if (profile) {
@@ -109,7 +130,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           email: profile.email || "",
           firstName: profile.given_name || "",
           lastName: profile.family_name || "",
-          role: mapStringToUserRole(role),
+          role: role,
         };
 
         // Ensure user is in the database **only on first login**
@@ -177,13 +198,3 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   // with caution
   debug: false,
 });
-
-function mapStringToUserRole(role: string) {
-  const MICROSOFT_MAP: Record<string, UserRole> = {
-    standard: UserRole.STANDARD,
-    "super-admin": UserRole.SUPER_ADMIN,
-    admin: UserRole.ADMIN,
-  };
-
-  return MICROSOFT_MAP[role] ? MICROSOFT_MAP[role] : UserRole.STANDARD;
-}
