@@ -168,6 +168,16 @@
     }
 }
 
+.manageCodesLink {
+  font-weight: 700;
+  text-decoration: none;
+
+  &:active,
+  &:visited {
+    color: #0076d6;
+  }
+}
+
 .resultsContainer {
     display: flex;
     flex-direction: row;

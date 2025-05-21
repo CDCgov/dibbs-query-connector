@@ -37,6 +37,7 @@ import { deleteCustomValueSet } from "@/app/shared/custom-code-service";
 import dynamic from "next/dynamic";
 import type { ModalProps, ModalRef } from "../../ui/designSystem/modal/Modal";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
+import { getSavedQueryById } from "@/app/backend/query-building/service";
 
 /**
  * Component for Query Building Flow
@@ -46,7 +47,7 @@ const CodeLibrary: React.FC = () => {
   // -------- component state -------- //
   // --------------------------------- //
   const [loading, setLoading] = useState<boolean>(true);
-  const [mode, setMode] = useState<CustomCodeMode>("manage");
+  const [mode, setMode] = useState<CustomCodeMode>("select");
 
   const { data: session } = useSession();
   const username = session?.user?.username || "";
@@ -83,6 +84,15 @@ const CodeLibrary: React.FC = () => {
   );
 
   const ctx = useContext(DataContext);
+
+  // get the query data from the context
+  const selectedQuery = ctx?.selectedQuery;
+  const queryName = ctx?.selectedQuery?.queryName ?? "query";
+  const savedQuery =
+    selectedQuery && selectedQuery.queryId
+      ? getSavedQueryById(selectedQuery.queryId)
+      : undefined;
+
   let totalPages = Math.ceil(filteredValueSets.length / itemsPerPage);
 
   async function fetchValueSetsAndConditions() {
@@ -364,7 +374,7 @@ const CodeLibrary: React.FC = () => {
   // -------------------------------- //
   return (
     <WithAuth>
-      {mode == "manage" && (
+      {(mode == "manage" || mode == "select") && (
         <div
           className={classNames("main-container__wide", styles.mainContainer)}
         >
@@ -374,10 +384,16 @@ const CodeLibrary: React.FC = () => {
             ) : (
               <Backlink onClick={goBack} label={"Back to My queries"} />
             )}
-            <h1 className={styles.header__title}>Manage codes</h1>
-            {/* <div className={styles.header__subtitle}>
-              Click on the checkbox to delete the value set or code
-            </div> */}
+            <h1 className={styles.header__title}>
+              {mode == "manage"
+                ? "Manage codes"
+                : `Select codes for "${queryName}"`}
+            </h1>
+            {mode == "select" && (
+              <div className={styles.header__subtitle}>
+                Check the box to add the value set or code to the query.
+              </div>
+            )}
             <Alert
               type="info"
               headingLevel="h4"
@@ -408,38 +424,65 @@ const CodeLibrary: React.FC = () => {
                 )}
                 onClick={() => setShowFilters(true)}
               >
-                <Icon.FilterList
-                  className="usa-icon qc-filter"
-                  size={3}
-                  aria-label="Icon indicating a menu with filter options"
-                  role="icon"
-                />
-                {filterCount <= 0
-                  ? "Filters"
-                  : `${filterCount} ${
-                      filterCount > 1 ? `filters` : `filter`
-                    } applied`}
-                {showFilters && (
-                  <DropdownFilter
-                    filterCount={filterCount}
-                    loading={loading}
-                    setShowFilters={setShowFilters}
-                    filterSearch={filterSearch}
-                    setFilterSearch={setFilterSearch}
-                    valueSets={valueSets}
-                    currentUser={currentUser as User}
-                  />
+                {mode == "manage" && (
+                  <div>
+                    <Icon.FilterList
+                      className="usa-icon qc-filter"
+                      size={3}
+                      aria-label="Icon indicating a menu with filter options"
+                      role="icon"
+                    />
+                    {filterCount <= 0
+                      ? "Filters"
+                      : `${filterCount} ${
+                          filterCount > 1 ? `filters` : `filter`
+                        } applied`}
+                    {showFilters && (
+                      <DropdownFilter
+                        filterCount={filterCount}
+                        loading={loading}
+                        setShowFilters={setShowFilters}
+                        filterSearch={filterSearch}
+                        setFilterSearch={setFilterSearch}
+                        valueSets={valueSets}
+                        currentUser={currentUser as User}
+                      />
+                    )}
+                  </div>
                 )}
               </div>
             </div>
-
-            <Button
-              type="button"
-              className={styles.button}
-              onClick={() => handleChangeMode("create")}
-            >
-              Add value set
-            </Button>
+            {mode == "manage" && (
+              <Button
+                type="button"
+                className={styles.button}
+                onClick={() => handleChangeMode("create")}
+              >
+                Add value set
+              </Button>
+            )}
+            {mode == "select" && (
+              <>
+                <p>
+                  <em>Don't see your code listed? </em>
+                  <a
+                    href="#"
+                    onClick={() => handleChangeMode("manage")}
+                    className={styles.manageCodesLink}
+                  >
+                    Manage codes
+                  </a>{" "}
+                </p>
+                <Button
+                  type="button"
+                  disabled={!savedQuery}
+                  className={styles.button}
+                  onClick={() => handleChangeMode("create")}
+                >
+                  Next: Create query
+                </Button>
+              </>
+            )}
           </div>
 
           <div className={styles.content}>
