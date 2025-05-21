@@ -14,7 +14,7 @@ exports[`Code library interaction renders action buttons for custom value sets o
         >
           <a
             aria-label="Back arrow indicating ability to navigate back a page if clicked"
-            class="back-link unchanged-color-on-visit text-no-underline"
+            class="back-link text-no-underline"
             data-testid="backArrowLink"
             href="#"
           >
@@ -582,7 +582,7 @@ exports[`Code library loading view renders a skeleton loading state when loading
         >
           <a
             aria-label="Back arrow indicating ability to navigate back a page if clicked"
-            class="back-link unchanged-color-on-visit text-no-underline"
+            class="back-link text-no-underline"
             data-testid="backArrowLink"
             href="#"
           >
@@ -915,7 +915,7 @@ exports[`Code library rendered view renders concept codes for the value set when
         >
           <a
             aria-label="Back arrow indicating ability to navigate back a page if clicked"
-            class="back-link unchanged-color-on-visit text-no-underline"
+            class="back-link text-no-underline"
             data-testid="backArrowLink"
             href="#"
           >
@@ -1460,7 +1460,7 @@ exports[`Code library rendered view renders the correct content 1`] = `
         >
           <a
             aria-label="Back arrow indicating ability to navigate back a page if clicked"
-            class="back-link unchanged-color-on-visit text-no-underline"
+            class="back-link text-no-underline"
             data-testid="backArrowLink"
             href="#"
           >
