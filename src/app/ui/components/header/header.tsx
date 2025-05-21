@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useContext, useEffect, useRef, useState } from "react";
-import { Icon } from "@trussworks/react-uswds";
+import { Button, Icon } from "@trussworks/react-uswds";
 import styles from "./header.module.scss";
 import { metadata } from "@/app/shared/constants";
 import classNames from "classnames";
@@ -84,17 +84,17 @@ const HeaderComponent: React.FC<HeaderProps> = ({ session }) => {
           )}
         >
           <div className={classNames("display-flex", "flex-align-center")}>
-            <div className="usa-logo" style={{ marginLeft: "0" }}>
-              <em className="usa-logo__text text-base-lightest-important">
-                <Link
-                  className="font-mono-lg text-base-lightest-important font-weight-normal-important"
-                  href={landingPage}
-                  title={metadata.title}
-                >
-                  {metadata.title}
-                </Link>
-              </em>
-            </div>
+            <svg
+              className={styles.siteLogoImage}
+              path="./../../styles/assets/logo.svg"
+            ></svg>
+            <Link
+              className={`${styles.siteLogoText} text-white-important text-decoration-none font-weight-normal-important`}
+              href={landingPage}
+              title={metadata.title}
+            >
+              {metadata.title}
+            </Link>
           </div>
           <div
             className={classNames(
@@ -105,16 +105,16 @@ const HeaderComponent: React.FC<HeaderProps> = ({ session }) => {
           >
             {isLoggedIn && (
               <div className="display-flex flex-align-center">
-                <Link
-                  href={PAGES.QUERY}
-                  className={classNames(
-                    styles.runQueryBtn,
-                    "usa-button margin-bottom-0 margin-right-2",
-                  )}
-                  scroll={false}
+                <Button
+                  secondary
+                  onClick={() => {
+                    router.push(PAGES.QUERY);
+                  }}
+                  className={classNames("margin-bottom-0 margin-right-2")}
+                  type={"button"}
                 >
                   Run a query
-                </Link>
+                </Button>
                 <button
                   onClick={toggleMenuDropdown}
                   className={classNames(
@@ -128,9 +128,8 @@ const HeaderComponent: React.FC<HeaderProps> = ({ session }) => {
                   data-testid="menu-button"
                 >
                   <Icon.Settings
-                    className="usa-icon qc-settings"
+                    className="usa-icon text-white"
                     size={3}
-                    color="#fff"
                     aria-label="Gear icon indicating settings menu"
                   />
                 </button>
@@ -169,10 +168,7 @@ const HeaderComponent: React.FC<HeaderProps> = ({ session }) => {
               {!isAuthDisabled && (
                 <li className={styles.subMenuItem}>
                   <button
-                    className={classNames(
-                      styles.menuItem,
-                      "usa-button--unstyled",
-                    )}
+                    className={classNames(styles.menuItem)}
                     onClick={async () => await handleSignOut()}
                   >
                     Sign out

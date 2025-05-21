@@ -217,7 +217,6 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
                 unstyled
                 type="button"
                 data-testid="date-range-clear-button"
-                className={styles.clearButton}
                 onClick={() => {
                   setStartDate(null);
                   setEndDate(null);
