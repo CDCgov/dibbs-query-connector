@@ -38,6 +38,8 @@ import dynamic from "next/dynamic";
 import type { ModalProps, ModalRef } from "../../ui/designSystem/modal/Modal";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import { getSavedQueryById } from "@/app/backend/query-building/service";
+import { NestedQuery } from "../queryBuilding/utils";
+import { useSaveQueryAndRedirect } from "@/app/backend/query-building/useSaveQueryAndRedirect";
 
 /**
  * Component for Query Building Flow
@@ -47,7 +49,7 @@ const CodeLibrary: React.FC = () => {
   // -------- component state -------- //
   // --------------------------------- //
   const [loading, setLoading] = useState<boolean>(true);
-  const [mode, setMode] = useState<CustomCodeMode>("select");
+  const [mode, setMode] = useState<CustomCodeMode>("select"); //TODO: switch back to manage after testing is done
 
   const { data: session } = useSession();
   const username = session?.user?.username || "";
@@ -92,6 +94,10 @@ const CodeLibrary: React.FC = () => {
     selectedQuery && selectedQuery.queryId
       ? getSavedQueryById(selectedQuery.queryId)
       : undefined;
+
+  // save query and redirect as needed
+  const [constructedQuery, setConstructedQuery] = useState<NestedQuery>({});
+  const saveQueryAndRedirect = useSaveQueryAndRedirect();
 
   let totalPages = Math.ceil(filteredValueSets.length / itemsPerPage);
 
@@ -424,7 +430,9 @@ const CodeLibrary: React.FC = () => {
                 )}
                 onClick={() => setShowFilters(true)}
               >
-                {mode == "manage" && (
+                {
+                  // TODO: should we have a filter for select?
+                  // mode == "manage" &&
                   <div>
                     <Icon.FilterList
                       className="usa-icon qc-filter"
@@ -449,7 +457,7 @@ const CodeLibrary: React.FC = () => {
                       />
                     )}
                   </div>
-                )}
+                }
               </div>
             </div>
             {mode == "manage" && (
@@ -467,8 +475,15 @@ const CodeLibrary: React.FC = () => {
                   <em>Don't see your code listed? </em>
                   <a
                     href="#"
-                    onClick={() => handleChangeMode("manage")}
                     className={styles.manageCodesLink}
+                    onClick={() => {
+                      handleChangeMode("manage");
+                      saveQueryAndRedirect(
+                        constructedQuery,
+                        queryName,
+                        "/codeLibrary",
+                      );
+                    }}
                   >
                     Manage codes
                   </a>{" "}
@@ -477,7 +492,14 @@ const CodeLibrary: React.FC = () => {
                   type="button"
                   disabled={!savedQuery}
                   className={styles.button}
-                  onClick={() => handleChangeMode("create")}
+                  onClick={() => {
+                    handleChangeMode("create");
+                    saveQueryAndRedirect(
+                      constructedQuery,
+                      queryName,
+                      "/queryBuilding",
+                    );
+                  }}
                 >
                   Next: Create query
                 </Button>
