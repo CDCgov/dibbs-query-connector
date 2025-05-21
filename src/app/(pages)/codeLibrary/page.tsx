@@ -41,6 +41,7 @@ import { getSavedQueryById } from "@/app/backend/query-building/service";
 import { insertCustomValuesetsIntoQuery } from "@/app/shared/custom-code-service";
 import { QueryTableResult } from "../queryBuilding/utils";
 import Checkbox from "@/app/ui/designSystem/checkbox/Checkbox";
+import { useRouter } from "next/navigation";
 
 /**
  * Component for Query Building Flow
@@ -51,6 +52,7 @@ const CodeLibrary: React.FC = () => {
   // --------------------------------- //
   const [loading, setLoading] = useState<boolean>(true);
   const ctx = useContext(DataContext);
+  const router = useRouter();
 
   const [mode, setMode] = useState<CustomCodeMode>(() =>
     ctx?.selectedQuery && ctx.selectedQuery.queryId ? "select" : "manage",
@@ -156,12 +158,11 @@ const CodeLibrary: React.FC = () => {
     if (result.success) {
       // Refetch the full query from the DB, so DataContext is up to date
       const updatedQuery = await getSavedQueryById(ctx.selectedQuery.queryId);
-      if (updatedQuery) {
-        if (ctx?.setSelectedQuery) {
-          ctx.setSelectedQuery(updatedQuery);
-        }
+      if (updatedQuery && ctx?.setSelectedQuery) {
+        ctx.setSelectedQuery(updatedQuery);
       }
       showToastConfirmation({ body: "Added to query" });
+      router.push("/queryBuilding");
     } else {
       showToastConfirmation({ body: "Failed to add codes", variant: "error" });
     }
@@ -456,7 +457,10 @@ const CodeLibrary: React.FC = () => {
             {mode === "manage" ? (
               <Backlink onClick={() => {}} label={"Back to Query library"} />
             ) : (
-              <Backlink onClick={goBack} label={"Back to My queries"} />
+              <Backlink
+                onClick={handleAddToQuery}
+                label={"Back to My queries"}
+              />
             )}
             <h1 className={styles.header__title}>
               {mode == "manage"
@@ -558,9 +562,10 @@ const CodeLibrary: React.FC = () => {
                 </p>
                 <Button
                   type="button"
-                  disabled={
-                    !customCodeIds || Object.keys(customCodeIds).length <= 0
-                  }
+                  // TODO: What contexts should it actually be disabled?
+                  // disabled={
+                  //   !customCodeIds || Object.keys(customCodeIds).length <= 0
+                  // }
                   className={styles.button}
                   onClick={() => {
                     handleAddToQuery();
