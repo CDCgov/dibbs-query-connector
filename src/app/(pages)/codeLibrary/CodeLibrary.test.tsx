@@ -22,6 +22,17 @@ import { getCustomValueSetById } from "@/app/shared/custom-code-service";
 
 jest.mock("next-auth/react");
 
+jest.mock("next/navigation", () => ({
+  useRouter: () => ({
+    push: jest.fn(),
+    prefetch: jest.fn(),
+    replace: jest.fn(),
+    back: jest.fn(),
+    forward: jest.fn(),
+    refresh: jest.fn(),
+  }),
+}));
+
 jest.mock(
   "@/app/ui/components/withAuth/WithAuth",
   () =>
