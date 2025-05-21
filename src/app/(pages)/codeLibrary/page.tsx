@@ -94,6 +94,8 @@ const CodeLibrary: React.FC = () => {
   // get the query data from the context
   const selectedQuery = ctx?.selectedQuery;
   const queryName = selectedQuery?.queryName ?? "query";
+
+  // ---------- checkbox management state --------- //
   // Get custom value sets from context (assume structure: queryData.custom = { [valueSetId]: DibbsValueSet })
   const [customCodeIds, setCustomCodeIds] = useState<{
     [vsId: string]: DibbsValueSet;
@@ -103,24 +105,45 @@ const CodeLibrary: React.FC = () => {
     if (!selectedQuery?.queryId) return;
     getSavedQueryById(selectedQuery.queryId).then(
       (query: QueryTableResult | undefined) => {
-        const ids =
-          (query?.queryData?.custom as { [vsId: string]: DibbsValueSet }) || {};
-        setCustomCodeIds(ids);
+        // Only hydrate previous selections
+        const queryCustom =
+          (query?.queryData?.custom as {
+            [vsId: string]: DibbsValueSet & { includeValueSet?: boolean };
+          }) || {};
+        setCustomCodeIds(queryCustom);
       },
     );
   }, [selectedQuery?.queryId]);
 
-  const handleValueSetToggle = (vs: DibbsValueSet, checked: boolean) => {
+  const handleValueSetToggle = (vsId: string, checked: boolean) => {
     setCustomCodeIds((prev) => {
-      const updated = { ...prev };
-      if (checked) {
-        // Add to customCodeIds; include all concepts as currently rendered in vs
-        updated[vs.valueSetId] = { ...vs, includeValueSet: true };
+      const vs = prev[vsId];
+      if (!vs) {
+        // Seed all concepts with the checked value
+        const valueSet = valueSets.find((vs) => vs.valueSetId === vsId);
+        if (!valueSet) return prev;
+        return {
+          ...prev,
+          [vsId]: {
+            ...valueSet,
+            includeValueSet: checked,
+            concepts: valueSet.concepts.map((c) => ({
+              ...c,
+              include: checked,
+            })),
+          },
+        };
       } else {
-        // Remove from customCodeIds
-        delete updated[vs.valueSetId];
+        // Update all concepts
+        return {
+          ...prev,
+          [vsId]: {
+            ...vs,
+            includeValueSet: checked,
+            concepts: vs.concepts.map((c) => ({ ...c, include: checked })),
+          },
+        };
       }
-      return updated;
     });
   };
 
@@ -130,20 +153,38 @@ const CodeLibrary: React.FC = () => {
     checked: boolean,
   ) => {
     setCustomCodeIds((prev) => {
-      const updated = { ...prev };
-      const valueSet = updated[vsId];
-      if (valueSet) {
-        updated[vsId] = {
-          ...valueSet,
-          concepts: valueSet.concepts.map((c) =>
-            c.code === code ? { ...c, include: checked } : c,
-          ),
-          includeValueSet: valueSet.concepts.some((c) =>
-            c.code === code ? checked : c.include,
-          ),
+      const vs = prev[vsId];
+      if (!vs) {
+        // Seed only the toggled concept
+        const valueSet = valueSets.find((vs) => vs.valueSetId === vsId);
+        if (!valueSet) return prev;
+        return {
+          ...prev,
+          [vsId]: {
+            ...valueSet,
+            includeValueSet: checked,
+            concepts: valueSet.concepts.map((c) =>
+              c.code === code
+                ? { ...c, include: checked }
+                : { ...c, include: false },
+            ),
+          },
+        };
+      } else {
+        // Update only the toggled concept
+        const newConcepts = vs.concepts.map((c) =>
+          c.code === code ? { ...c, include: checked } : c,
+        );
+        const includeValueSet = newConcepts.some((c) => c.include);
+        return {
+          ...prev,
+          [vsId]: {
+            ...vs,
+            includeValueSet,
+            concepts: newConcepts,
+          },
         };
       }
-      return updated;
     });
   };
 
@@ -628,78 +669,91 @@ const CodeLibrary: React.FC = () => {
                       )}
                     </tbody>
                   )}
-                  {mode == "select" && (
-                    <tbody>
-                      {paginatedValueSets.map((vs, _index) => (
-                        <tr
-                          key={vs.valueSetId}
-                          className={classNames(
-                            styles.valueSetTable__tableBody_row,
-                            vs.valueSetId === activeValueSet?.valueSetId
-                              ? styles.activeValueSet
-                              : "",
+                  {paginatedValueSets.map((vs, _index) => {
+                    const vsState = customCodeIds[vs.valueSetId];
+                    const concepts = vsState?.concepts || [];
+                    const checkedCount = concepts.filter(
+                      (c) => c.include,
+                    ).length;
+                    const totalCount = concepts.length;
+                    const allChecked =
+                      checkedCount === totalCount && totalCount > 0;
+                    const minusState =
+                      checkedCount > 0 && checkedCount < totalCount;
+
+                    return (
+                      <tr
+                        key={vs.valueSetId}
+                        className={classNames(
+                          styles.valueSetTable__tableBody_row,
+                          vs.valueSetId === activeValueSet?.valueSetId
+                            ? styles.activeValueSet
+                            : "",
+                        )}
+                        onClick={() => setActiveValueSet(vs)}
+                      >
+                        <td>
+                          {mode === "select" && (
+                            <Checkbox
+                              id={`valueset-checkbox-${vs.valueSetId}`}
+                              checked={allChecked}
+                              isMinusState={minusState}
+                              onChange={(e) => {
+                                e.stopPropagation();
+                                handleValueSetToggle(
+                                  vs.valueSetId,
+                                  e.target.checked,
+                                );
+                              }}
+                              aria-label={`Select value set ${vs.valueSetName}`}
+                              className={styles.valueSetCheckbox}
+                            />
                           )}
-                          onClick={() => setActiveValueSet(vs)}
-                        >
-                          <td>
-                            {mode === "select" && (
-                              <Checkbox
-                                id={`valueset-checkbox-${vs.valueSetId}`}
-                                checked={!!customCodeIds[vs.valueSetId]}
-                                onChange={(e) => {
-                                  e.stopPropagation();
-                                  handleValueSetToggle(vs, e.target.checked);
-                                }}
-                                aria-label={`Select value set ${vs.valueSetName}`}
-                                className={styles.valueSetCheckbox}
+                          <div
+                            className={
+                              styles.valueSetTable__tableBody_row_details
+                            }
+                          >
+                            <Highlighter
+                              className={
+                                styles.valueSetTable__tableBody_row_valueSetName
+                              }
+                              highlightClassName="searchHighlight"
+                              searchWords={[textSearch]}
+                              autoEscape={true}
+                              textToHighlight={vs.valueSetName}
+                            />
+                            <Highlighter
+                              className={
+                                styles.valueSetTable__tableBody_row_valueSetDetails
+                              }
+                              highlightClassName="searchHighlight"
+                              searchWords={[textSearch]}
+                              autoEscape={true}
+                              textToHighlight={formatValueSetDetails(vs)}
+                            />
+                            {vs.userCreated && (
+                              <Highlighter
+                                className={
+                                  styles.valueSetTable__tableBody_row_customValueSet
+                                }
+                                highlightClassName="searchHighlight"
+                                searchWords={[textSearch]}
+                                autoEscape={true}
+                                textToHighlight={`Created by ${vs.author}`}
                               />
                             )}
-                            <div
-                              className={
-                                styles.valueSetTable__tableBody_row_details
-                              }
-                            >
-                              <Highlighter
-                                className={
-                                  styles.valueSetTable__tableBody_row_valueSetName
-                                }
-                                highlightClassName="searchHighlight"
-                                searchWords={[textSearch]}
-                                autoEscape={true}
-                                textToHighlight={vs.valueSetName}
-                              />
-                              <Highlighter
-                                className={
-                                  styles.valueSetTable__tableBody_row_valueSetDetails
-                                }
-                                highlightClassName="searchHighlight"
-                                searchWords={[textSearch]}
-                                autoEscape={true}
-                                textToHighlight={formatValueSetDetails(vs)}
-                              />
-                              {vs.userCreated && (
-                                <Highlighter
-                                  className={
-                                    styles.valueSetTable__tableBody_row_customValueSet
-                                  }
-                                  highlightClassName="searchHighlight"
-                                  searchWords={[textSearch]}
-                                  autoEscape={true}
-                                  textToHighlight={`Created by ${vs.author}`}
-                                />
-                              )}
-                            </div>
-                            <div>
-                              <Icon.NavigateNext
-                                aria-label="Right chevron indicating additional content"
-                                size={4}
-                              />
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  )}
+                          </div>
+                          <div>
+                            <Icon.NavigateNext
+                              aria-label="Right chevron indicating additional content"
+                              size={4}
+                            />
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </Table>
               </div>
 
@@ -828,25 +882,23 @@ const CodeLibrary: React.FC = () => {
                         )}
                         data-testid="table-codes"
                       >
-                        {activeValueSet?.concepts.map((concept) => (
-                          <tr
-                            key={concept.code}
-                            className={classNames(
-                              styles.conceptsTable__tableBody_row,
-                            )}
-                          >
-                            <td className={styles.valueSetCode}>
-                              {mode === "select" && (
+                        {activeValueSet.concepts.map((concept) => {
+                          const checked = !!customCodeIds[
+                            activeValueSet.valueSetId
+                          ]?.concepts?.find(
+                            (c) => c.code === concept.code && c.include,
+                          );
+                          return (
+                            <tr
+                              key={concept.code}
+                              className={classNames(
+                                styles.conceptsTable__tableBody_row,
+                              )}
+                            >
+                              <td className={styles.valueSetCode}>
                                 <Checkbox
                                   id={`concept-checkbox-${activeValueSet.valueSetId}-${concept.code}`}
-                                  checked={
-                                    !!customCodeIds[
-                                      activeValueSet.valueSetId
-                                    ]?.concepts.find(
-                                      (c) =>
-                                        c.code === concept.code && c.include,
-                                    )
-                                  }
+                                  checked={checked}
                                   onChange={(e) => {
                                     handleConceptToggle(
                                       activeValueSet.valueSetId,
@@ -857,24 +909,24 @@ const CodeLibrary: React.FC = () => {
                                   aria-label={`Select code ${concept.code}`}
                                   className={styles.conceptCheckbox}
                                 />
-                              )}
-                              <Highlighter
-                                highlightClassName="searchHighlight"
-                                searchWords={[textSearch]}
-                                autoEscape={true}
-                                textToHighlight={concept.code}
-                              />
-                            </td>
-                            <td>
-                              <Highlighter
-                                highlightClassName="searchHighlight"
-                                searchWords={[textSearch]}
-                                autoEscape={true}
-                                textToHighlight={concept.display}
-                              />
-                            </td>
-                          </tr>
-                        ))}
+                                <Highlighter
+                                  highlightClassName="searchHighlight"
+                                  searchWords={[textSearch]}
+                                  autoEscape={true}
+                                  textToHighlight={concept.code}
+                                />
+                              </td>
+                              <td>
+                                <Highlighter
+                                  highlightClassName="searchHighlight"
+                                  searchWords={[textSearch]}
+                                  autoEscape={true}
+                                  textToHighlight={concept.display}
+                                />
+                              </td>
+                            </tr>
+                          );
+                        })}
                       </tbody>
                     )}
                   </Table>
