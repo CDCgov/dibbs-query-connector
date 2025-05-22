@@ -624,7 +624,7 @@ const CodeLibrary: React.FC = () => {
                     router.push("/queryBuilding");
                   }}
                 >
-                  Next: Create query
+                  Next: Update query
                 </Button>
               </>
             )}
