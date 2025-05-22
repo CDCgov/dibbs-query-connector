@@ -565,7 +565,7 @@ exports[`Code library interaction renders action buttons for custom value sets o
             <span>
               Showing 1 -
   3 of 
-  3 value sets (filtered)
+  3 value sets 
             </span>
             <nav
               aria-label="Pagination"
@@ -922,7 +922,7 @@ exports[`Code library loading view renders a skeleton loading state when loading
             <span>
               Showing 0 -
   0 of 
-  0 value sets (filtered)
+  0 value sets 
             </span>
             <div
               class="itemsPerPageContainer"
@@ -1603,7 +1603,7 @@ exports[`Code library rendered view renders concept codes for the value set when
             <span>
               Showing 1 -
   3 of 
-  3 value sets (filtered)
+  3 value sets 
             </span>
             <nav
               aria-label="Pagination"
@@ -2306,7 +2306,7 @@ exports[`Code library rendered view renders the correct content 1`] = `
             <span>
               Showing 1 -
   3 of 
-  3 value sets (filtered)
+  3 value sets 
             </span>
             <nav
               aria-label="Pagination"
