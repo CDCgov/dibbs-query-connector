@@ -347,7 +347,7 @@ input.errorMessage {
 
     .viewCodesBtn {
       display: block;
-      width: 8rem;
+      min-width: 8rem;
       height: 2rem;
       font-size: 14px;
       padding: 0.5rem 1.25rem;
@@ -395,6 +395,7 @@ div.accordionBodyExpanded:last-of-type {
 
 .vsName {
   color: $black;
+  max-width: 40rem;
 }
 
 .vsDetails {
