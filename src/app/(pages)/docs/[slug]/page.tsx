@@ -28,6 +28,9 @@ export default async function Page({
 import * as fs from "fs";
 import * as path from "path";
 
+/**
+ *
+ */
 export function generateStaticParams() {
   const docsDir = path.join(process.cwd(), "src/docs");
   const files = fs.readdirSync(docsDir);
