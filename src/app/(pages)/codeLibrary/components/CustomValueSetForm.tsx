@@ -299,14 +299,16 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
   };
 
   const saveValueSet = async () => {
-    try {
-      const isValid = validateForm(customValueSet);
+    setSaving(true);
+    const isValid = validateForm(customValueSet);
 
+    try {
       if (!isValid) {
         return;
       }
 
       const updatedCodeMap: CustomCodeMap = {};
+
       // don't save empty placeholder rows
       const storedConcepts = Object.values(codesMap).filter(
         (codes) => codes.code != "" && codes.display !== "",
@@ -327,22 +329,20 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
         currentUser?.id as string,
       );
 
-      //  TODO: error handling
       if (result.success == true) {
         await fetchUpdatedValueSet(result.id);
+        setCodesMap(updatedCodeMap);
 
         showToastConfirmation({
           body: `Value set "${newCustomValueSet.valueSetName}" successfully ${
             mode == "create" ? "added" : "updated"
           }`,
         });
-
-        setCodesMap(updatedCodeMap);
       }
     } catch (error) {
       showToastConfirmation({
         variant: "error",
-        body: `Unable to delete value set "${customValueSet.valueSetName}". Please try again later.`,
+        body: `Unable to save value set "${customValueSet.valueSetName}". Please try again later.`,
       });
 
       console.error(error);
@@ -351,7 +351,7 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
       // don't stay in "create" mode, or we'll make duplicate
       // valuesets with each edit; should either stay on page
       // in edit mode or go back to manage view mode
-      if (mode == "create") {
+      if (mode == "create" && isValid) {
         setMode("edit");
       }
     }
