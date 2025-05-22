@@ -398,53 +398,74 @@ const CodeLibrary: React.FC = () => {
   };
 
   const renderValueSetRows = () => {
-    return paginatedValueSets.map((vs, index) => (
-      <tr
-        key={index}
-        className={classNames(
-          styles.valueSetTable__tableBody_row,
-          vs?.valueSetId == activeValueSet?.valueSetId
-            ? styles.activeValueSet
-            : "",
-        )}
-        onClick={() => setActiveValueSet(vs)}
-      >
-        <td>
-          {/* TODO: build out search to include match on code terms within a value set? */}
-          <div className={styles.valueSetTable__tableBody_row_details}>
-            <Highlighter
-              className={styles.valueSetTable__tableBody_row_valueSetName}
-              highlightClassName="searchHighlight"
-              searchWords={[textSearch]}
-              autoEscape={true}
-              textToHighlight={vs.valueSetName}
-            />
-            <Highlighter
-              className={styles.valueSetTable__tableBody_row_valueSetDetails}
-              highlightClassName="searchHighlight"
-              searchWords={[textSearch]}
-              autoEscape={true}
-              textToHighlight={formatValueSetDetails(vs)}
-            />
-            {vs.userCreated && (
+    return paginatedValueSets.map((vs, _i) => {
+      const vsState = customCodeIds[vs.valueSetId];
+      const concepts = vsState?.concepts || [];
+      const checkedCount = concepts.filter((c) => c.include).length;
+      const totalCount = concepts.length;
+      const allChecked = checkedCount === totalCount && totalCount > 0;
+      const minusState = checkedCount > 0 && checkedCount < totalCount;
+
+      return (
+        <tr
+          key={vs.valueSetId}
+          className={classNames(
+            styles.valueSetTable__tableBody_row,
+            vs?.valueSetId == activeValueSet?.valueSetId
+              ? styles.activeValueSet
+              : "",
+          )}
+          onClick={() => setActiveValueSet(vs)}
+        >
+          <td>
+            {mode === "select" && (
+              <Checkbox
+                id={`valueset-checkbox-${vs.valueSetId}`}
+                checked={allChecked}
+                isMinusState={minusState}
+                onChange={(e) => {
+                  e.stopPropagation();
+                  handleValueSetToggle(vs.valueSetId, e.target.checked);
+                }}
+                aria-label={`Select value set ${vs.valueSetName}`}
+                className={styles.valueSetCheckbox}
+              />
+            )}
+            <div className={styles.valueSetTable__tableBody_row_details}>
               <Highlighter
-                className={styles.valueSetTable__tableBody_row_customValueSet}
+                className={styles.valueSetTable__tableBody_row_valueSetName}
                 highlightClassName="searchHighlight"
                 searchWords={[textSearch]}
                 autoEscape={true}
-                textToHighlight={`Created by ${vs.author}`}
+                textToHighlight={vs.valueSetName}
               />
-            )}
-          </div>
-          <div>
-            <Icon.NavigateNext
-              aria-label="Right chevron indicating additional content"
-              size={4}
-            />
-          </div>
-        </td>
-      </tr>
-    ));
+              <Highlighter
+                className={styles.valueSetTable__tableBody_row_valueSetDetails}
+                highlightClassName="searchHighlight"
+                searchWords={[textSearch]}
+                autoEscape={true}
+                textToHighlight={formatValueSetDetails(vs)}
+              />
+              {vs.userCreated && (
+                <Highlighter
+                  className={styles.valueSetTable__tableBody_row_customValueSet}
+                  highlightClassName="searchHighlight"
+                  searchWords={[textSearch]}
+                  autoEscape={true}
+                  textToHighlight={`Created by ${vs.author}`}
+                />
+              )}
+            </div>
+            <div>
+              <Icon.NavigateNext
+                aria-label="Right chevron indicating additional content"
+                size={4}
+              />
+            </div>
+          </td>
+        </tr>
+      );
+    });
   };
 
   const handleDeleteValueSet = async () => {
@@ -644,133 +665,42 @@ const CodeLibrary: React.FC = () => {
                       <th>{"Value set".toLocaleUpperCase()}</th>
                     </tr>
                   </thead>
-                  {mode == "manage" && (
-                    <tbody
-                      className={classNames(
-                        styles.overflowScroll,
-                        styles.valueSetTable__tableBody,
-                      )}
-                      data-testid="table-valuesets-manage"
-                    >
-                      {loading && paginatedValueSets.length <= 0 ? (
-                        <tr
-                          className={styles.valueSetTable__tableBody_row}
-                          data-testid={"loading-skeleton"}
-                        >
-                          <td>
-                            <Skeleton
-                              containerClassName={styles.skeletonContainer}
-                              className={styles.skeleton}
-                              count={6}
-                            />
-                          </td>
-                        </tr>
-                      ) : !loading && filteredValueSets.length === 0 ? (
-                        <tr
-                          className={
-                            styles.valueSetTable__tableBody_row_noResults
-                          }
-                        >
-                          <td>No results found.</td>
-                        </tr>
-                      ) : (
-                        renderValueSetRows()
-                      )}
-                    </tbody>
-                  )}
-                  {paginatedValueSets.map((vs, _index) => {
-                    const vsState = customCodeIds[vs.valueSetId];
-                    const concepts = vsState?.concepts || [];
-                    const checkedCount = concepts.filter(
-                      (c) => c.include,
-                    ).length;
-                    const totalCount = concepts.length;
-                    const allChecked =
-                      checkedCount === totalCount && totalCount > 0;
-                    const minusState =
-                      checkedCount > 0 && checkedCount < totalCount;
-
-                    return (
-                      <tbody
-                        className={classNames(
-                          styles.overflowScroll,
-                          styles.valueSetTable__tableBody,
-                        )}
-                        data-testid="table-valuesets-select"
+                  <tbody
+                    className={classNames(
+                      styles.overflowScroll,
+                      styles.valueSetTable__tableBody,
+                    )}
+                    data-testid={
+                      mode === "manage"
+                        ? "table-valuesets-manage"
+                        : "table-valuesets-select"
+                    }
+                  >
+                    {loading && paginatedValueSets.length <= 0 ? (
+                      <tr
+                        className={styles.valueSetTable__tableBody_row}
+                        data-testid={"loading-skeleton"}
                       >
-                        <tr
-                          key={vs.valueSetId}
-                          className={classNames(
-                            styles.valueSetTable__tableBody_row,
-                            vs.valueSetId === activeValueSet?.valueSetId
-                              ? styles.activeValueSet
-                              : "",
-                          )}
-                          onClick={() => setActiveValueSet(vs)}
-                        >
-                          <td>
-                            {mode === "select" && (
-                              <Checkbox
-                                id={`valueset-checkbox-${vs.valueSetId}`}
-                                checked={allChecked}
-                                isMinusState={minusState}
-                                onChange={(e) => {
-                                  e.stopPropagation();
-                                  handleValueSetToggle(
-                                    vs.valueSetId,
-                                    e.target.checked,
-                                  );
-                                }}
-                                aria-label={`Select value set ${vs.valueSetName}`}
-                                className={styles.valueSetCheckbox}
-                              />
-                            )}
-                            <div
-                              className={
-                                styles.valueSetTable__tableBody_row_details
-                              }
-                            >
-                              <Highlighter
-                                className={
-                                  styles.valueSetTable__tableBody_row_valueSetName
-                                }
-                                highlightClassName="searchHighlight"
-                                searchWords={[textSearch]}
-                                autoEscape={true}
-                                textToHighlight={vs.valueSetName}
-                              />
-                              <Highlighter
-                                className={
-                                  styles.valueSetTable__tableBody_row_valueSetDetails
-                                }
-                                highlightClassName="searchHighlight"
-                                searchWords={[textSearch]}
-                                autoEscape={true}
-                                textToHighlight={formatValueSetDetails(vs)}
-                              />
-                              {vs.userCreated && (
-                                <Highlighter
-                                  className={
-                                    styles.valueSetTable__tableBody_row_customValueSet
-                                  }
-                                  highlightClassName="searchHighlight"
-                                  searchWords={[textSearch]}
-                                  autoEscape={true}
-                                  textToHighlight={`Created by ${vs.author}`}
-                                />
-                              )}
-                            </div>
-                            <div>
-                              <Icon.NavigateNext
-                                aria-label="Right chevron indicating additional content"
-                                size={4}
-                              />
-                            </div>
-                          </td>
-                        </tr>
-                      </tbody>
-                    );
-                  })}
+                        <td>
+                          <Skeleton
+                            containerClassName={styles.skeletonContainer}
+                            className={styles.skeleton}
+                            count={6}
+                          />
+                        </td>
+                      </tr>
+                    ) : !loading && filteredValueSets.length === 0 ? (
+                      <tr
+                        className={
+                          styles.valueSetTable__tableBody_row_noResults
+                        }
+                      >
+                        <td>No results found.</td>
+                      </tr>
+                    ) : (
+                      renderValueSetRows()
+                    )}
+                  </tbody>
                 </Table>
               </div>
 
