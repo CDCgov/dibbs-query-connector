@@ -14,7 +14,11 @@ export default async function Page({
   const slugWithoutExtension = slug.replace(/\.md$/, "");
   const { default: Post } = await import(`@/docs/${slugWithoutExtension}.md`);
 
-  return <Post />;
+  return (
+    <div className="main-container">
+      <Post />
+    </div>
+  );
 }
 
 /**
