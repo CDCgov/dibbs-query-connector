@@ -1,7 +1,9 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`tests the valueset selection page interactions filter bulk selection updates only the filtered valuesets 1`] = `
-<body>
+<body
+  style="padding-right: 0px;"
+>
   <div>
     <div
       class="main-container__wide mainContainer"
@@ -740,6 +742,104 @@ exports[`tests the valueset selection page interactions filter bulk selection up
               </div>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    aria-describedby="warning-confirmation-modal-modal-description"
+    aria-labelledby="warning-confirmation-modal-modal-heading"
+    class="usa-modal-wrapper is-hidden"
+    data-force-action="false"
+    id="warning-confirmation-modal-modal"
+    role="dialog"
+  >
+    <div
+      aria-controls="warning-confirmation-modal-modal"
+      class="usa-modal-overlay"
+      data-testid="modalOverlay"
+    >
+      <div
+        class="usa-modal qc-modal"
+        data-force-action="false"
+        data-testid="modalWindow"
+        tabindex="-1"
+      >
+        <div
+          class="usa-modal__content"
+        >
+          <div
+            class="usa-modal__main"
+          >
+            <h2
+              class="usa-modal__heading"
+              id="warning-confirmation-modal-modal-heading"
+            >
+              You have unsaved changes
+            </h2>
+            <div
+              class="usa-prose"
+              id="warning-confirmation-modal-modal-description"
+            >
+              <p>
+                You've made changes to your query. Would you like to save before leaving?
+              </p>
+            </div>
+            <div
+              class="usa-modal__footer"
+              data-testid="modalFooter"
+            >
+              <ul
+                class="usa-button-group"
+              >
+                <li
+                  class="usa-button-group__item"
+                >
+                  <button
+                    class="usa-button usa-button--default"
+                    data-testid="button"
+                    type="button"
+                  >
+                    Save
+                  </button>
+                </li>
+                <li
+                  class="usa-button-group__item"
+                >
+                  <button
+                    class="usa-button usa-button--outline"
+                    data-testid="button"
+                    type="button"
+                  >
+                    Dismiss
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <button
+            aria-controls="warning-confirmation-modal-modal"
+            aria-label="Close this window"
+            class="usa-button usa-modal__close"
+            data-close-modal="true"
+            data-testid="button"
+            type="button"
+          >
+            <svg
+              aria-hidden="true"
+              class="usa-icon"
+              focusable="false"
+              height="1em"
+              role="img"
+              viewBox="0 0 24 24"
+              width="1em"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+              />
+            </svg>
+          </button>
         </div>
       </div>
     </div>
