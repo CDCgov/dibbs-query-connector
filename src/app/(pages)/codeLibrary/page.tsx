@@ -583,15 +583,16 @@ const CodeLibrary: React.FC = () => {
               <>
                 <p>
                   <em>Don't see your code listed? </em>
-                  <a
-                    href="#"
+                  <Button
+                    type="button"
+                    unstyled
                     className={styles.manageCodesLink}
                     onClick={() => {
                       handleChangeMode("manage");
                     }}
                   >
                     Manage codes
-                  </a>{" "}
+                  </Button>
                 </p>
                 <Button
                   type="button"
