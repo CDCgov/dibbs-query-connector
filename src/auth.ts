@@ -59,13 +59,7 @@ switch (process.env.NEXT_PUBLIC_AUTH_PROVIDER) {
         authorization: {
           params: {
             scope: "openid email profile",
-
             claims: {
-              userinfo: {
-                given_name: { essential: true },
-                family_name: { essential: true },
-                email: { essential: true },
-              },
               id_token: {
                 roles: { essential: true },
               },
@@ -99,6 +93,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       }
 
       const userToken = authContext.parseIdpResponseForUserToken(
+        token,
         account,
         profile,
       );

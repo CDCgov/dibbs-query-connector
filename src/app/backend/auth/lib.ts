@@ -6,7 +6,11 @@ import { UserRole } from "@/app/models/entities/users";
 import { isAuthDisabledServerCheck } from "@/app/utils/auth";
 
 export interface AuthStrategy {
-  parseIdpResponseForUserToken(account: Account, profile: Profile): UserToken;
+  parseIdpResponseForUserToken(
+    token: JWT,
+    account: Account,
+    profile: Profile,
+  ): UserToken;
 }
 
 const ROLE_TO_ENUM_MAP: Record<string, UserRole> = {
@@ -52,16 +56,25 @@ export class AuthContext {
   }
 
   public parseIdpResponseForUserToken(
+    token: JWT,
     account: Account,
     profile: Profile,
   ): UserToken {
-    return this.authStrategy.parseIdpResponseForUserToken(account, profile);
+    return this.authStrategy.parseIdpResponseForUserToken(
+      token,
+      account,
+      profile,
+    );
   }
 }
 
 const CLIENT_ID_NAME = process.env.AUTH_CLIENT_ID as string;
 export class KeycloakAuthStrategy implements AuthStrategy {
-  public parseIdpResponseForUserToken(account: Account, profile: Profile) {
+  public parseIdpResponseForUserToken(
+    token: JWT,
+    account: Account,
+    profile: Profile,
+  ) {
     let role: UserRole = UserRole.STANDARD;
 
     if (account?.access_token) {
@@ -89,7 +102,7 @@ export class KeycloakAuthStrategy implements AuthStrategy {
 
     const userToken = {
       id: profile.sub || "",
-      username: profile.preferred_username || profile.email || "",
+      username: profile.preferred_username || "",
       email: profile.email || "",
       firstName: profile.given_name || "",
       lastName: profile.family_name || "",
@@ -100,24 +113,18 @@ export class KeycloakAuthStrategy implements AuthStrategy {
 }
 
 export class MicrosoftEntraAuthStrategy implements AuthStrategy {
-  public parseIdpResponseForUserToken(account: Account, profile: Profile) {
+  public parseIdpResponseForUserToken(
+    token: JWT,
+    account: Account,
+    profile: Profile,
+  ) {
     const azureRoles = profile?.roles as string[];
     const userInfo = decodeJwt(account?.id_token as string);
     let role = ROLE_TO_ENUM_MAP[azureRoles[0]];
 
     const fullName = userInfo.name as string;
-    const firstName = userInfo?.given_name ?? fullName.split(" ")[0];
-    const lastName =
-      userInfo?.last_name ?? fullName.split(" ").slice(1).join(" ");
-
-    console.log("account");
-    console.log(account);
-
-    console.log("user info");
-    console.log(userInfo);
-
-    console.log("profile");
-    console.log(profile);
+    const firstName = token.given_name ?? fullName.split(" ")[0];
+    const lastName = token.last_name ?? fullName.split(" ").slice(1).join(" ");
 
     const userToken = {
       id: profile.oid as string,
@@ -126,8 +133,6 @@ export class MicrosoftEntraAuthStrategy implements AuthStrategy {
       lastName: lastName as string,
       role: role,
     };
-
-    console.log(userToken);
 
     return userToken;
   }
