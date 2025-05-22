@@ -42,6 +42,8 @@ import {
   saveCustomQuery,
 } from "@/app/backend/query-building/service";
 import { useSession } from "next-auth/react";
+import { ModalRef } from "@/app/ui/designSystem/modal/Modal";
+import WarningModal from "@/app/ui/designSystem/modal/warningModal";
 
 export type FormError = {
   queryName: boolean;
@@ -98,6 +100,37 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
 
   const [constructedQuery, setConstructedQuery] = useState<NestedQuery>({});
 
+  const savedQueryRef = useRef<{
+    queryName: string | undefined;
+    constructedQuery: NestedQuery;
+  } | null>(null);
+
+  const warningModalRef = useRef<ModalRef>(null);
+  const pendingNavRef = useRef<() => void>();
+
+  function hasUnsavedChanges(): boolean {
+    const hasData =
+      queryName?.trim() || Object.keys(constructedQuery).length > 0;
+
+    if (!savedQueryRef.current) {
+      return Boolean(hasData); // user typed or selected something
+    }
+    return (
+      JSON.stringify(savedQueryRef.current.constructedQuery) !==
+        JSON.stringify(constructedQuery) ||
+      savedQueryRef.current.queryName !== queryName
+    );
+  }
+
+  function handleNavAway(callback: () => void) {
+    if (hasUnsavedChanges()) {
+      pendingNavRef.current = callback;
+      warningModalRef.current?.toggleModal();
+    } else {
+      callback();
+    }
+  }
+
   function resetQueryState() {
     setQueryName(undefined);
     setSelectedQuery(structuredClone(EMPTY_QUERY_SELECTION));
@@ -121,19 +154,14 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
     let isSubscribed = true;
 
     async function setInitialQueryState() {
-      if (selectedQuery.queryId === undefined) {
-        return;
-      }
+      if (!selectedQuery?.queryId) return;
       const savedQuery = await getSavedQueryById(selectedQuery.queryId);
-      if (savedQuery === undefined) {
-        return;
-      }
-      const initialState: NestedQuery = {};
+      if (!savedQuery) return;
 
+      const initialState: NestedQuery = {};
       Object.entries(savedQuery.queryData).forEach(
         ([conditionId, valueSetMap]) => {
           initialState[conditionId] = structuredClone(EMPTY_CONCEPT_TYPE);
-
           Object.entries(valueSetMap).forEach(([vsId, dibbsVs]) => {
             initialState[conditionId][dibbsVs.dibbsConceptType][vsId] = dibbsVs;
           });
@@ -141,18 +169,23 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
       );
 
       if (isSubscribed) {
-        setConstructedQuery(structuredClone(initialState));
+        const cloned = structuredClone(initialState);
+        setConstructedQuery(cloned);
+        savedQueryRef.current = {
+          queryName: savedQuery.queryName,
+          constructedQuery: cloned,
+        };
       }
 
-      setFormError((prevError) => {
-        return { ...prevError, selectedConditions: false };
-      });
+      setFormError((prevError) => ({
+        ...prevError,
+        selectedConditions: false,
+      }));
     }
 
     async function fetchInitialConditions() {
       const { categoryToConditionNameArrayMap, conditionIdToNameMap } =
         await getConditionsData();
-
       if (isSubscribed) {
         setConditionsDetailsMap(conditionIdToNameMap);
         setCategoryToConditionMap(categoryToConditionNameArrayMap);
@@ -165,7 +198,7 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
     return () => {
       isSubscribed = false;
     };
-  }, []);
+  }, [selectedQuery.queryId]);
 
   async function handleCreateQueryClick(
     event: React.MouseEvent<HTMLButtonElement>,
@@ -288,6 +321,11 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
         showToastConfirmation({
           body: `${queryName} successfully ${statusMessage}`,
         });
+
+        savedQueryRef.current = {
+          queryName,
+          constructedQuery,
+        };
       } catch {
         showToastConfirmation({
           heading: "Something went wrong",
@@ -300,16 +338,35 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
 
   return (
     <>
+      <WarningModal
+        modalRef={warningModalRef}
+        heading="You have unsaved changes"
+        description="You've made changes to your query. Would you like to save before leaving?"
+        onSave={async () => {
+          await handleSaveQuery();
+          pendingNavRef.current?.();
+        }}
+        onCancel={() => {
+          pendingNavRef.current?.();
+        }}
+      />
       <div className={classNames("main-container__wide", styles.mainContainer)}>
         {buildStep === "valueset" ? (
           <Backlink
             onClick={() => {
-              setBuildStep("condition");
+              handleNavAway(() => {
+                setBuildStep("condition");
+              });
             }}
             label={"Back to condition selection"}
           />
         ) : (
-          <Backlink onClick={goBack} label={"Back to My queries"} />
+          <Backlink
+            onClick={() => {
+              handleNavAway(goBack);
+            }}
+            label={"Back to My queries"}
+          />
         )}
 
         <div className={styles.customQuery__header}>
