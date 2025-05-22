@@ -391,7 +391,12 @@ const CodeLibrary: React.FC = () => {
         >
           <div className={styles.header}>
             {mode !== "manage" && (
-              <Backlink onClick={goBack} label={"Back to My queries"} />
+              <Backlink
+                onClick={goBack}
+                label={`Back to ${
+                  prevPage == "condition" ? "Create query" : "templates"
+                }`}
+              />
             )}
             <h1 className={styles.header__title}>Manage codes</h1>
             {/* <div className={styles.header__subtitle}>
@@ -667,9 +672,13 @@ const CodeLibrary: React.FC = () => {
       {mode == "select" && (
         <>
           <p>
-            <Backlink onClick={goBack} label={"Back to My queries"} />
+            <Backlink
+              onClick={goBack}
+              label={`Back to ${
+                prevPage == "valueset" ? "Create query" : "templates"
+              }`}
+            />
           </p>
-          <p>{`Back to previous page: ${prevPage}`}</p>
         </>
       )}
       <Modal
