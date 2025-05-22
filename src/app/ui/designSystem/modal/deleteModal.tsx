@@ -40,7 +40,7 @@ export const DeleteModal: React.FC<DeleteModalProps> = ({
           id: "modal-delete-button",
           text: "Delete",
           type: "button",
-          className: "usa-button--secondary",
+          className: "usa-button--destructive",
           onClick: () => {
             onDelete();
             modalRef.current?.toggleModal();
