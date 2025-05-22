@@ -2,16 +2,16 @@
 
 ### Query Connector ERD
 
-![Query Connector Database Structure](/Query-Connector-ERD.png)
+![Query Connector Database Structure](../../public/Query-Connector-ERD.png)
 
 ### Infrastructure Architecture Diagram
 
 **ECS Infrastructure**
 
-![ECS](/QC-Architecture-ECS.jpg)
+![ECS](../../public/QC-Architecture-ECS.jpg)
 
 **VM Infrastructure**
-![VM](/QC-Architecture-VM.jpg)
+![VM](../../public/QC-Architecture-VM.jpg)
 
 ```
 
