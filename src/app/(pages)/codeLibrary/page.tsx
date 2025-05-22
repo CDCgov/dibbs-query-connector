@@ -636,7 +636,7 @@ const CodeLibrary: React.FC = () => {
                         styles.overflowScroll,
                         styles.valueSetTable__tableBody,
                       )}
-                      data-testid="table-valuesets"
+                      data-testid="table-valuesets-manage"
                     >
                       {loading && paginatedValueSets.length <= 0 ? (
                         <tr
@@ -682,7 +682,7 @@ const CodeLibrary: React.FC = () => {
                           styles.overflowScroll,
                           styles.valueSetTable__tableBody,
                         )}
-                        data-testid="table-valuesets"
+                        data-testid="table-valuesets-select"
                       >
                         <tr
                           key={vs.valueSetId}
