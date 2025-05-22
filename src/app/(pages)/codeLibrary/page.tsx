@@ -76,6 +76,7 @@ const CodeLibrary: React.FC = () => {
     }
     return val !== "";
   }).length;
+  const [isFiltered, setIsFiltered] = useState(false);
 
   const [conditionDetailsMap, setConditionsDetailsMap] =
     useState<ConditionsMap>();
@@ -296,13 +297,29 @@ const CodeLibrary: React.FC = () => {
         ? Object.values(filterSearch.creators).flat().includes(vs.author)
         : vs;
     };
-    return setFilteredValueSets(
+    setFilteredValueSets(
       valueSets
         .filter(handleTextSearch)
         .filter(matchCategory)
         .filter(matchCodeSystem)
         .filter(matchCreators),
     );
+
+    const isFiltered = Object.entries(filterSearch).some(([key, val]) => {
+      let filterApplied = false;
+
+      if (key == "creators") {
+        filterApplied = !!val && Object.values(val).flat().length > 0;
+      } else {
+        filterApplied = val !== "";
+      }
+
+      return filterApplied;
+    });
+
+    textSearch !== "" || !!isFiltered
+      ? setIsFiltered(true)
+      : setIsFiltered(false);
   };
 
   // update display based on text search and filters
@@ -468,10 +485,6 @@ const CodeLibrary: React.FC = () => {
       currentPage * itemsPerPage,
     );
   }, [valueSets, filteredValueSets, currentPage, itemsPerPage]);
-
-  const isFiltered =
-    valueSets.length !== filteredValueSets.length ||
-    Object.values(filterSearch).some((filter) => filter !== "");
 
   const paginationText = `Showing ${
     totalPages === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1
