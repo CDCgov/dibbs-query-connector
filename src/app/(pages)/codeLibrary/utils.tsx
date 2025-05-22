@@ -21,7 +21,7 @@ export const emptyVsAuthorMapItem: vsAuthorMap = { "": [""] };
 export const emptyFilterSearch = {
   category: "" as DibbsConceptType,
   codeSystem: "",
-  creators: emptyVsAuthorMapItem,
+  creators: { "": [] },
 };
 
 export const CodeSystemOptions = [

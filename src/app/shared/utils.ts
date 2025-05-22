@@ -1,5 +1,6 @@
 import { QueryResultRow } from "pg";
 import { DibbsValueSet } from "../models/entities/valuesets";
+import { Concept } from "../models/entities/concepts";
 
 /**
  * Maps the results returned from the DIBBs value set and coding system database
@@ -14,7 +15,20 @@ export const groupConditionConceptsIntoValueSets = (rows: QueryResultRow[]) => {
     if (!(r["valueset_id"] in conceptsByVSId)) {
       conceptsByVSId[r["valueset_id"]] = [];
     }
-    conceptsByVSId[r["valueset_id"]].push(r);
+
+    // if we already added the concept, don't add it again
+    // this prevents errors that occur on the code library page
+    // due to value sets that are affiliated with multiple
+    // conditions. For query building, we call this on an already-filtered
+    // list of value sets for a single condition, so that behavior stays the same.
+    if (
+      !conceptsByVSId[r["valueset_id"]].some(
+        (item: Concept) => item.code == r.code,
+      )
+    ) {
+      conceptsByVSId[r["valueset_id"]].push(r);
+    }
+
     return conceptsByVSId;
   }, {});
 
