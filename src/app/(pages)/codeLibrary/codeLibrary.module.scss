@@ -175,11 +175,6 @@ $pageControlsHeight: 3rem;
 .manageCodesLink {
   font-weight: 700;
   text-decoration: none;
-
-  &:active,
-  &:visited {
-    color: $accent-primary;
-  }
 }
 
 .resultsContainer {
