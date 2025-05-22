@@ -1,3 +1,5 @@
+[← Back to Documentation](/docs)
+
 # Deploying Query Connector
 
 Query Connector has a simple architecture with just a few pieces:

@@ -1,3 +1,5 @@
+[← Back to Documentation](/docs)
+
 ### Query Connector ERD
 
 ![Query Connector Database Structure](../public/Query%20Connector%20ERD.drawio.svg)
@@ -61,3 +63,4 @@ graph TD
 
 **VM Infrastructure**
 ![VM](../public/QC%20Architecture-VM.jpg)
+
