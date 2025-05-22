@@ -16,6 +16,10 @@ const nextConfig = {
 
 const withMDX = createMDX({
   extension: /\.(md|mdx)$/,
+  options: {
+    remarkPlugins: [],
+    rehypePlugins: [["rehype-mermaid", { strict: true, throwOnError: true }]],
+  },
 });
 
 module.exports = withMDX(nextConfig);

@@ -114,8 +114,8 @@ published through the [CDC web site](http://www.cdc.gov).
 
 ### Related documents
 
-- [Disclaimer](docs/disclaimer.md)
-- [Contribution Notice](docs/contributing.md)
+- [Disclaimer](src/docs/disclaimer.md)
+- [Contribution Notice](src/docs/contributing.md)
 
 ### Additional Standard Notices
 
