@@ -25,8 +25,16 @@ export default async function Page({
  * A function that generates static parameters for the dynamic route.
  * @returns An array of objects containing the slug parameter.
  */
+import * as fs from "fs";
+import * as path from "path";
+
 export function generateStaticParams() {
-  return [{ slug: "deployment" }, { slug: "development" }];
+  const docsDir = path.join(process.cwd(), "src/docs");
+  const files = fs.readdirSync(docsDir);
+  const slugs = files
+    .filter((file) => file.endsWith(".md"))
+    .map((file) => ({ slug: file.replace(/\.md$/, "") }));
+  return slugs;
 }
 
 export const dynamicParams = true;

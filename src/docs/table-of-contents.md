@@ -8,17 +8,17 @@ You can find more detailed documentation, guides, and tutorials here:
 
 - For public health case investigators:
 
-  - [Query Connector User Guide](docs/user-guide)
+  - [Query Connector User Guide](/docs/user-guide)
 
 - For public health IT staff:
 
-  - [Architecture](docs/architecture)
-  - [Deploying Query Connector](docs/deployment)
-  - [API Docs](docs/api)
-  - [ONC audit log compliance](docs/audit-log)
+  - [Architecture](/docs/architecture)
+  - [Deploying Query Connector](/docs/deployment)
+  - [API Docs](/docs/api)
+  - [ONC audit log compliance](/docs/audit-log)
 
 - For developers:
 
-  - [Local development](docs/development)
-  - [Contributing changes](docs/contributing)
-  - [Release process](docs/release)
+  - [Local development](/docs/development)
+  - [Contributing changes](/docs/contributing)
+  - [Release process](/docs/release)
