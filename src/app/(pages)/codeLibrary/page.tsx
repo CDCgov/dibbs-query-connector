@@ -118,33 +118,17 @@ const CodeLibrary: React.FC = () => {
 
   const handleValueSetToggle = (vsId: string, checked: boolean) => {
     setCustomCodeIds((prev) => {
-      const vs = prev[vsId];
-      if (!vs) {
-        // Seed all concepts with the checked value
-        const valueSet = valueSets.find((vs) => vs.valueSetId === vsId);
-        if (!valueSet) return prev;
-        return {
-          ...prev,
-          [vsId]: {
-            ...valueSet,
-            includeValueSet: checked,
-            concepts: valueSet.concepts.map((c) => ({
-              ...c,
-              include: checked,
-            })),
-          },
-        };
-      } else {
-        // Update all concepts
-        return {
-          ...prev,
-          [vsId]: {
-            ...vs,
-            includeValueSet: checked,
-            concepts: vs.concepts.map((c) => ({ ...c, include: checked })),
-          },
-        };
-      }
+      const valueSet =
+        prev[vsId] ?? valueSets.find((vs) => vs.valueSetId === vsId);
+      if (!valueSet) return prev;
+      return {
+        ...prev,
+        [vsId]: {
+          ...valueSet,
+          includeValueSet: checked,
+          concepts: valueSet.concepts.map((c) => ({ ...c, include: checked })),
+        },
+      };
     });
   };
 
