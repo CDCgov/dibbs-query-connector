@@ -29,7 +29,8 @@ import * as fs from "fs";
 import * as path from "path";
 
 /**
- *
+ * Generates static parameters for the dynamic route.
+ * @returns An array of objects containing the slug parameter.
  */
 export function generateStaticParams() {
   const docsDir = path.join(process.cwd(), "src/docs");
