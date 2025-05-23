@@ -112,7 +112,7 @@ describe("Code library rendered view", () => {
         </RootProviderMock>,
       ),
     );
-    expect(screen.getByTestId("table-valuesets")).toBeInTheDocument();
+    expect(screen.getByTestId("table-valuesets-manage")).toBeInTheDocument();
 
     const header = screen
       .getAllByRole("heading")
@@ -124,7 +124,7 @@ describe("Code library rendered view", () => {
       "Value sets are an organizational structure for easy management of codes. Every code belongs to a value set.",
     );
 
-    const tableBody = screen.getByTestId("table-valuesets");
+    const tableBody = screen.getByTestId("table-valuesets-manage");
     expect(tableBody.childNodes[0]).toHaveTextContent(
       cancerValueSets[1].valueset_name,
     );
@@ -146,8 +146,8 @@ describe("Code library rendered view", () => {
       ),
     );
 
-    expect(screen.getByTestId("table-valuesets")).toBeInTheDocument();
-    const tableBody = screen.getByTestId("table-valuesets");
+    expect(screen.getByTestId("table-valuesets-manage")).toBeInTheDocument();
+    const tableBody = screen.getByTestId("table-valuesets-manage");
     () => (tableBody.firstChild as HTMLElement).click();
 
     expect(
@@ -199,9 +199,9 @@ describe("Code library interaction", () => {
         </RootProviderMock>,
       ),
     );
-    expect(screen.getByTestId("table-valuesets")).toBeInTheDocument();
+    expect(screen.getByTestId("table-valuesets-manage")).toBeInTheDocument();
 
-    const tableBody = screen.getByTestId("table-valuesets");
+    const tableBody = screen.getByTestId("table-valuesets-manage");
     const cancerVsRow = tableBody.getElementsByClassName(
       "valueSetTable__tableBody_row_details",
     )[0];
@@ -247,7 +247,7 @@ describe("Code library interaction", () => {
     );
 
     const customVsRow = screen
-      .getByTestId("table-valuesets")
+      .getByTestId("table-valuesets-manage")
       .getElementsByClassName("valueSetTable__tableBody_row_details")[2];
 
     await waitFor(async () => {
