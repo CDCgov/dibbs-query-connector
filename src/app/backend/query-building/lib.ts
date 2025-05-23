@@ -110,12 +110,19 @@ export async function deleteQueryByIdHelp(
   queryId: string,
   dbClient: DbService | Pool,
 ) {
+  const deleteUsergroupToQuery = `
+  DELETE FROM usergroup_to_query WHERE query_id = $1;
+`;
   const deleteQuery = `
   DELETE FROM query WHERE id = $1;
 `;
   try {
-    await dbClient.query(deleteQuery, [queryId]);
-    return { success: true, id: queryId };
+    await dbClient.query(deleteUsergroupToQuery, [queryId]);
+
+    const result = await dbClient.query(deleteQuery, [queryId]);
+    return result.rowCount === 0
+      ? { success: false, error: `No rows were deleted.` }
+      : { success: true, id: queryId };
   } catch (error) {
     console.error(`Failed to delete query with ID ${queryId}:`, error);
     return { success: false, error: "Failed to delete the query." };
