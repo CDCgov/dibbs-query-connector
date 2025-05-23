@@ -13,7 +13,7 @@ $pageControlsHeight: 3rem;
     height: calc($pageContainerHeight - 2.5rem);
 
     .header {
-        height: $pageHeaderHeight;
+        // height: $pageHeaderHeight;
         font-size: inherit;
 
         &__title {
@@ -170,6 +170,11 @@ $pageControlsHeight: 3rem;
             }
         }
     }
+}
+
+.manageCodesLink {
+  font-weight: 700;
+  text-decoration: none;
 }
 
 .resultsContainer {
@@ -349,7 +354,24 @@ $pageControlsHeight: 3rem;
         padding-right: 1rem;
         max-width: 7.5rem;
     }
+  }
+
+.valueSetCode {
+  min-width: 7.5rem;
+  max-width: 7.5rem;
+  padding-right: 1rem;
+  display: flex;
+  align-items: center;
 }
+
+.conceptRowInline {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem; 
+  word-break: break-word;
+}
+
 
 .valueSetTable__tableBody {
     &_row {

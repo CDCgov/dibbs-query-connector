@@ -275,8 +275,8 @@ class UserCreatedValuesetService {
         const result = await dbService.query(querySql, [queryId]);
 
         let queryData: QueryDataColumn = {};
-        if (result.rows.length > 0 && result.rows[0].query_data) {
-          queryData = result.rows[0].query_data as QueryDataColumn;
+        if (result.rows.length > 0 && result.rows[0].queryData) {
+          queryData = result.rows[0].queryData as QueryDataColumn;
         }
 
         // merge new custom codes into existing custom block, overwriting old with new
