@@ -2,7 +2,7 @@
 
 import Backlink from "@/app/ui/designSystem/backLink/Backlink";
 import styles from "./conditionTemplateSelection.module.scss";
-import { Label, TextInput, Button } from "@trussworks/react-uswds";
+import { Label, TextInput, Button, Icon } from "@trussworks/react-uswds";
 import {
   Dispatch,
   SetStateAction,
@@ -83,6 +83,8 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
   const { data: session } = useSession();
   const focusRef = useRef<HTMLInputElement | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<boolean>(false);
+
   const [queryName, setQueryName] = useState<string | undefined>(
     structuredClone(selectedQuery.queryName),
   );
@@ -379,12 +381,16 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
                 id="queryNameInput"
                 name="queryNameInput"
                 type="text"
-                className={styles.input}
+                className={classNames(
+                  styles.input,
+                  errorMessage ? styles.errorMessage : "",
+                )}
                 defaultValue={queryName ?? ""}
                 required
                 onChange={(event) => {
                   const newName = event.target.value;
                   setQueryName(newName);
+                  setErrorMessage(false);
                   setSelectedQuery(
                     structuredClone({
                       ...selectedQuery,
@@ -394,6 +400,15 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
                 }}
                 data-testid="queryNameInput"
               />
+              {errorMessage && formError.queryName && (
+                <div className={styles.errorMessage}>
+                  <Icon.Error
+                    aria-label="warning icon indicating an error is present"
+                    className={styles.errorMessage}
+                  />
+                  Enter a name for the query.
+                </div>
+              )}
             </div>
             <div className={styles.customQuery__saveButton}>
               <Button
@@ -432,6 +447,7 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
               setLoading={setLoading}
               constructedQuery={constructedQuery}
               handleConditionUpdate={handleConditionUpdate}
+              renderErrorMessage={setErrorMessage}
             />
           )}
           {/* Step Two: Select ValueSets */}
