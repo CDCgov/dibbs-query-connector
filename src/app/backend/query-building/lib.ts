@@ -114,8 +114,12 @@ export async function deleteQueryByIdHelp(
   DELETE FROM query WHERE id = $1;
 `;
   try {
-    await dbClient.query(deleteQuery, [queryId]);
-    return { success: true, id: queryId };
+    const result = await dbClient.query(deleteQuery, [queryId]);
+    console.log(result);
+    return {
+      success: result.rowCount && result.rowCount > 0 ? true : false,
+      id: queryId,
+    };
   } catch (error) {
     console.error(`Failed to delete query with ID ${queryId}:`, error);
     return { success: false, error: "Failed to delete the query." };
