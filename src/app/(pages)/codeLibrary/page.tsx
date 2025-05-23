@@ -44,7 +44,6 @@ import Checkbox from "@/app/ui/designSystem/checkbox/Checkbox";
 import { useSaveQueryAndRedirect } from "@/app/backend/query-building/useSaveQueryAndRedirect";
 import { EMPTY_CONCEPT_TYPE } from "../queryBuilding/utils";
 import { NestedQuery } from "../queryBuilding/utils";
-import { useSaveQueryAndRedirect } from "@/app/backend/query-building/useSaveQueryAndRedirect";
 
 /**
  * Component for Query Building Flow
