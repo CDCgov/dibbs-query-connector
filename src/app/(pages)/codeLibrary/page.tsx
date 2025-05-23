@@ -41,7 +41,7 @@ import { getSavedQueryById } from "@/app/backend/query-building/service";
 import { insertCustomValuesetsIntoQuery } from "@/app/shared/custom-code-service";
 import { QueryTableResult } from "../queryBuilding/utils";
 import Checkbox from "@/app/ui/designSystem/checkbox/Checkbox";
-import { useRouter } from "next/navigation";
+import { useSaveQueryAndRedirect } from "@/app/backend/query-building/useSaveQueryAndRedirect";
 
 /**
  * Component for Query Building Flow
@@ -50,13 +50,13 @@ import { useRouter } from "next/navigation";
 const CodeLibrary: React.FC = () => {
   // -------- component state -------- //
   // --------------------------------- //
-  const [loading, setLoading] = useState<boolean>(true);
   const ctx = useContext(DataContext);
-  const router = useRouter();
 
-  const [mode, setMode] = useState<CustomCodeMode>(() =>
-    ctx?.selectedQuery && ctx.selectedQuery.queryId ? "select" : "manage",
+  const [loading, setLoading] = useState<boolean>(true);
+  const [mode, setMode] = useState<CustomCodeMode>(
+    (ctx?.selectedQuery?.pageMode as CustomCodeMode) || "manage",
   );
+  const [prevPage, setPrevPage] = useState("");
   const { data: session } = useSession();
   const username = session?.user?.username || "";
   const [currentUser, setCurrentUser] = useState<User>();
@@ -225,7 +225,8 @@ const CodeLibrary: React.FC = () => {
 
   // update the current page details when switching between build steps
   useEffect(() => {
-    ctx?.setCurrentPage(mode);
+    setPrevPage(ctx?.currentPage || "");
+    setMode(mode);
     applyFilters();
   }, [mode]);
 
@@ -320,14 +321,16 @@ const CodeLibrary: React.FC = () => {
 
   // ---- page interaction/display ---- //
   // --------------------------------- //
+  const saveQueryAndRedirect = useSaveQueryAndRedirect();
+
   function goBack() {
-    // TODO: this will need to be handled differently
-    // depending on how we arrived at this page:
-    // from gear menu: no backnav
-    // from "start from scratch": back to templates
-    // from hybrid/query building: back to query
-    handleAddToQuery(); // This still doesn't handle state management for start from scratch
-    console.log("do a backnav thing");
+    ctx?.selectedQuery &&
+      saveQueryAndRedirect(
+        {},
+        ctx?.selectedQuery?.queryName,
+        "/queryBuilding",
+        prevPage,
+      );
   }
 
   const handleTextSearch = (vs: DibbsValueSet) => {
@@ -513,10 +516,13 @@ const CodeLibrary: React.FC = () => {
           className={classNames("main-container__wide", styles.mainContainer)}
         >
           <div className={styles.header}>
-            {mode === "manage" ? (
-              <Backlink onClick={() => {}} label={"Back to Query library"} />
-            ) : (
-              <Backlink onClick={goBack} label={"Back to My queries"} />
+            {mode !== "manage" && (
+              <Backlink
+                onClick={goBack}
+                label={`Back to ${
+                  prevPage == "condition" ? "Create query" : "templates"
+                }`}
+              />
             )}
             <h1 className={styles.header__title}>
               {mode == "manage"
@@ -619,7 +625,12 @@ const CodeLibrary: React.FC = () => {
                   className={styles.button}
                   onClick={() => {
                     handleAddToQuery();
-                    router.push("/queryBuilding");
+                    saveQueryAndRedirect(
+                      {},
+                      queryName,
+                      "/codeLibrary",
+                      "manage",
+                    );
                   }}
                 >
                   Next: Update query
@@ -913,6 +924,18 @@ const CodeLibrary: React.FC = () => {
             activeValueSet?.userCreated ? activeValueSet : emptyValueSet
           }
         />
+      )}
+      {mode == "select" && (
+        <>
+          <p>
+            <Backlink
+              onClick={goBack}
+              label={`Back to ${
+                prevPage == "valueset" ? "Create query" : "templates"
+              }`}
+            />
+          </p>
+        </>
       )}
       <Modal
         id="delete-vs-modal"

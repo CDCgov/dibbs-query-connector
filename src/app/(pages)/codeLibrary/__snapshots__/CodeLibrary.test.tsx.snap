@@ -12,29 +12,6 @@ exports[`Code library interaction renders action buttons for custom value sets o
         <div
           class="header"
         >
-          <a
-            aria-label="Back arrow indicating ability to navigate back a page if clicked"
-            class="back-link text-no-underline"
-            data-testid="backArrowLink"
-            href="#"
-          >
-            <svg
-              aria-label="Arrow point left indicating return to previous step"
-              class="usa-icon"
-              focusable="false"
-              height="1em"
-              role="img"
-              viewBox="0 0 24 24"
-              width="1em"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"
-              />
-            </svg>
-             
-            Back to Query library
-          </a>
           <h1
             class="header__title"
           >
@@ -582,29 +559,6 @@ exports[`Code library loading view renders a skeleton loading state when loading
         <div
           class="header"
         >
-          <a
-            aria-label="Back arrow indicating ability to navigate back a page if clicked"
-            class="back-link text-no-underline"
-            data-testid="backArrowLink"
-            href="#"
-          >
-            <svg
-              aria-label="Arrow point left indicating return to previous step"
-              class="usa-icon"
-              focusable="false"
-              height="1em"
-              role="img"
-              viewBox="0 0 24 24"
-              width="1em"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"
-              />
-            </svg>
-             
-            Back to Query library
-          </a>
           <h1
             class="header__title"
           >
@@ -917,29 +871,6 @@ exports[`Code library rendered view renders concept codes for the value set when
         <div
           class="header"
         >
-          <a
-            aria-label="Back arrow indicating ability to navigate back a page if clicked"
-            class="back-link text-no-underline"
-            data-testid="backArrowLink"
-            href="#"
-          >
-            <svg
-              aria-label="Arrow point left indicating return to previous step"
-              class="usa-icon"
-              focusable="false"
-              height="1em"
-              role="img"
-              viewBox="0 0 24 24"
-              width="1em"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"
-              />
-            </svg>
-             
-            Back to Query library
-          </a>
           <h1
             class="header__title"
           >
@@ -1464,29 +1395,6 @@ exports[`Code library rendered view renders the correct content 1`] = `
         <div
           class="header"
         >
-          <a
-            aria-label="Back arrow indicating ability to navigate back a page if clicked"
-            class="back-link text-no-underline"
-            data-testid="backArrowLink"
-            href="#"
-          >
-            <svg
-              aria-label="Arrow point left indicating return to previous step"
-              class="usa-icon"
-              focusable="false"
-              height="1em"
-              role="img"
-              viewBox="0 0 24 24"
-              width="1em"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"
-              />
-            </svg>
-             
-            Back to Query library
-          </a>
           <h1
             class="header__title"
           >
