@@ -37,6 +37,7 @@ import { deleteCustomValueSet } from "@/app/shared/custom-code-service";
 import dynamic from "next/dynamic";
 import type { ModalProps, ModalRef } from "../../ui/designSystem/modal/Modal";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
+import { useSaveQueryAndRedirect } from "@/app/backend/query-building/useSaveQueryAndRedirect";
 
 /**
  * Component for Query Building Flow
@@ -45,9 +46,13 @@ import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 const CodeLibrary: React.FC = () => {
   // -------- component state -------- //
   // --------------------------------- //
-  const [loading, setLoading] = useState<boolean>(true);
-  const [mode, setMode] = useState<CustomCodeMode>("manage");
+  const ctx = useContext(DataContext);
 
+  const [loading, setLoading] = useState<boolean>(true);
+  const [mode, setMode] = useState<CustomCodeMode>(
+    (ctx?.selectedQuery?.pageMode as CustomCodeMode) || "manage",
+  );
+  const [prevPage, setPrevPage] = useState("");
   const { data: session } = useSession();
   const username = session?.user?.username || "";
   const [currentUser, setCurrentUser] = useState<User>();
@@ -83,7 +88,6 @@ const CodeLibrary: React.FC = () => {
     { ssr: false },
   );
 
-  const ctx = useContext(DataContext);
   let totalPages = Math.ceil(filteredValueSets.length / itemsPerPage);
 
   async function fetchValueSetsAndConditions() {
@@ -116,7 +120,8 @@ const CodeLibrary: React.FC = () => {
 
   // update the current page details when switching between build steps
   useEffect(() => {
-    ctx?.setCurrentPage(mode);
+    setPrevPage(ctx?.currentPage || "");
+    setMode(mode);
     applyFilters();
   }, [mode]);
 
@@ -211,13 +216,16 @@ const CodeLibrary: React.FC = () => {
 
   // ---- page interaction/display ---- //
   // --------------------------------- //
+  const saveQueryAndRedirect = useSaveQueryAndRedirect();
+
   function goBack() {
-    // TODO: this will need to be handled differently
-    // depending on how we arrived at this page:
-    // from gear menu: no backnav
-    // from "start from scratch": back to templates
-    // from hybrid/query building: back to query
-    console.log("do a backnav thing");
+    ctx?.selectedQuery &&
+      saveQueryAndRedirect(
+        {},
+        ctx?.selectedQuery?.queryName,
+        "/queryBuilding",
+        prevPage,
+      );
   }
 
   const handleTextSearch = (vs: DibbsValueSet) => {
@@ -382,10 +390,13 @@ const CodeLibrary: React.FC = () => {
           className={classNames("main-container__wide", styles.mainContainer)}
         >
           <div className={styles.header}>
-            {mode === "manage" ? (
-              <Backlink onClick={() => {}} label={"Back to Query library"} />
-            ) : (
-              <Backlink onClick={goBack} label={"Back to My queries"} />
+            {mode !== "manage" && (
+              <Backlink
+                onClick={goBack}
+                label={`Back to ${
+                  prevPage == "condition" ? "Create query" : "templates"
+                }`}
+              />
             )}
             <h1 className={styles.header__title}>Manage codes</h1>
             {/* <div className={styles.header__subtitle}>
@@ -657,6 +668,18 @@ const CodeLibrary: React.FC = () => {
             activeValueSet?.userCreated ? activeValueSet : emptyValueSet
           }
         />
+      )}
+      {mode == "select" && (
+        <>
+          <p>
+            <Backlink
+              onClick={goBack}
+              label={`Back to ${
+                prevPage == "valueset" ? "Create query" : "templates"
+              }`}
+            />
+          </p>
+        </>
       )}
       <Modal
         id="delete-vs-modal"
