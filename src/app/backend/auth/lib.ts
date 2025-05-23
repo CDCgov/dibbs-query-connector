@@ -53,7 +53,7 @@ export class AuthContext {
     if (isAuthDisabledServerCheck()) {
       token.role = UserRole.SUPER_ADMIN;
     } else if (token.role) {
-      token.role = userToken.role;
+      token.role = userToken.qcRole;
     }
     token = { ...token, ...userToken };
     return token;
@@ -110,7 +110,7 @@ export class KeycloakAuthStrategy implements AuthStrategy {
       email: profile.email || "",
       firstName: profile.given_name || "",
       lastName: profile.family_name || "",
-      role: role,
+      qcRole: role,
     };
     return userToken;
   }
@@ -168,7 +168,7 @@ export class MicrosoftEntraAuthStrategy implements AuthStrategy {
       username: profile?.preferred_username as string,
       firstName: firstName as string,
       lastName: lastName as string,
-      role: role,
+      qcRole: role,
     };
 
     return userToken;

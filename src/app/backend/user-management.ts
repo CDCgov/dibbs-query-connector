@@ -17,7 +17,7 @@ export interface UserToken {
   username: string;
   firstName: string;
   lastName: string;
-  role: UserRole;
+  qcRole: UserRole;
   email?: string;
 }
 class UserManagementServiceInternal {
@@ -139,7 +139,7 @@ class UserManagementService extends UserManagementServiceInternal {
       return { user: undefined };
     }
 
-    const { username, email, firstName, lastName, role } = userToken;
+    const { username, email, firstName, lastName, qcRole } = userToken;
     const userIdentifier = username || email;
 
     try {
@@ -165,7 +165,7 @@ class UserManagementService extends UserManagementServiceInternal {
 
       const result = await dbService.query(insertUserQuery, [
         userIdentifier,
-        role,
+        qcRole,
         firstName,
         lastName,
       ]);
