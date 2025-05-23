@@ -559,8 +559,6 @@ const CodeLibrary: React.FC = () => {
                 onClick={() => setShowFilters(true)}
               >
                 {
-                  // TODO: should we have a filter for select?
-                  // mode == "manage" &&
                   <div>
                     <Icon.FilterList
                       className="usa-icon qc-filter"
