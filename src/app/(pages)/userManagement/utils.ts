@@ -13,6 +13,7 @@ export function getRole(): UserRole {
   const { data: session } = useSession();
   const ctx = useContext(DataContext);
   const isAuthDisabled = isAuthDisabledClientCheck(ctx?.runtimeConfig);
+
   return isAuthDisabled
     ? UserRole.SUPER_ADMIN
     : (session?.user?.role as UserRole);
