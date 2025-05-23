@@ -12,6 +12,14 @@ import dbService from "./db/service";
 import { adminRequired, superAdminRequired } from "./db/decorators";
 import { auditable } from "./audit-logs/decorator";
 
+export interface UserToken {
+  id: string;
+  username: string;
+  firstName: string;
+  lastName: string;
+  qcRole: UserRole;
+  email?: string;
+}
 class UserManagementServiceInternal {
   protected static async getAllUsers() {
     try {
@@ -121,22 +129,17 @@ class UserManagementService extends UserManagementServiceInternal {
    * @param userToken.email - The email from the JWT token.
    * @param userToken.firstName - The first name from the JWT token.
    * @param userToken.lastName - The last name from the JWT token.
+   * @param userToken.role - The role from the JWT token.
    * @returns The newly added user or an empty result if already exists.
    */
   @auditable
-  static async addUserIfNotExists(userToken: {
-    id: string;
-    username: string;
-    email: string;
-    firstName: string;
-    lastName: string;
-  }) {
+  static async addUserIfNotExists(userToken: UserToken) {
     if (!userToken || !userToken.username) {
       console.error("Invalid user token. Cannot add user.");
       return { user: undefined };
     }
 
-    const { username, email, firstName, lastName } = userToken;
+    const { username, email, firstName, lastName, qcRole } = userToken;
     const userIdentifier = username || email;
 
     try {
@@ -152,7 +155,6 @@ class UserManagementService extends UserManagementServiceInternal {
       }
 
       // Default role when adding a new user, which includes Super Admin, Admin, and Standard User.
-      let qcRole = UserRole.STANDARD;
       console.log("User not found. Proceeding to insert.");
 
       const insertUserQuery = `
