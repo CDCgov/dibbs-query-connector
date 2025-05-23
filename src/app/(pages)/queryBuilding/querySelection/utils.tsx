@@ -144,5 +144,6 @@ export const renderModal = (
 export type SelectedQueryDetails = {
   queryName?: string;
   queryId?: string;
+  pageMode?: string;
 };
 export type SelectedQueryState = SelectedQueryDetails | null;
