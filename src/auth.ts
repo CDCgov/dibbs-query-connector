@@ -56,9 +56,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         profile,
       );
 
-      console.log("user token");
-      console.log(userToken);
-
       try {
         await addUserIfNotExists(userToken);
       } catch (error) {
