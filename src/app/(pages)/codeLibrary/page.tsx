@@ -42,6 +42,8 @@ import { insertCustomValuesetsIntoQuery } from "@/app/shared/custom-code-service
 import { QueryTableResult } from "../queryBuilding/utils";
 import Checkbox from "@/app/ui/designSystem/checkbox/Checkbox";
 import { useSaveQueryAndRedirect } from "@/app/backend/query-building/useSaveQueryAndRedirect";
+import { EMPTY_CONCEPT_TYPE } from "../queryBuilding/utils";
+import { NestedQuery } from "../queryBuilding/utils";
 
 /**
  * Component for Query Building Flow
@@ -174,7 +176,7 @@ const CodeLibrary: React.FC = () => {
   };
 
   const handleAddToQuery = async () => {
-    if (!ctx?.selectedQuery?.queryId || !currentUser) return;
+    if (!ctx?.selectedQuery?.queryId || !currentUser) return null;
     const setsToAdd = Object.values(customCodeIds);
     const result = await insertCustomValuesetsIntoQuery(
       currentUser.id,
@@ -182,14 +184,31 @@ const CodeLibrary: React.FC = () => {
       ctx.selectedQuery.queryId,
     );
     if (result.success) {
-      // Refetch the full query from the DB, so DataContext is up to date
       const updatedQuery = await getSavedQueryById(ctx.selectedQuery.queryId);
+      let constructedQuery: NestedQuery = {};
+      if (updatedQuery?.queryData) {
+        Object.entries(
+          updatedQuery.queryData as Record<
+            string,
+            Record<string, DibbsValueSet>
+          >,
+        ).forEach(([conditionId, valueSetMap]) => {
+          constructedQuery[conditionId] = structuredClone(EMPTY_CONCEPT_TYPE);
+          Object.entries(valueSetMap).forEach(([vsId, dibbsVs]) => {
+            constructedQuery[conditionId][dibbsVs.dibbsConceptType][vsId] =
+              dibbsVs;
+          });
+        });
+      }
+
       if (updatedQuery && ctx?.setSelectedQuery) {
         ctx.setSelectedQuery(updatedQuery);
       }
-      showToastConfirmation({ body: "Added to query" });
+      showToastConfirmation({ body: "The query has been saved." });
+      return constructedQuery;
     } else {
       showToastConfirmation({ body: "Failed to add codes", variant: "error" });
+      return null;
     }
   };
 
@@ -623,13 +642,14 @@ const CodeLibrary: React.FC = () => {
                   //   !customCodeIds || Object.keys(customCodeIds).length <= 0
                   // }
                   className={styles.button}
-                  onClick={() => {
-                    handleAddToQuery();
-                    saveQueryAndRedirect(
-                      {},
+                  onClick={async () => {
+                    const constructedQuery = await handleAddToQuery();
+                    if (!constructedQuery) return;
+                    await saveQueryAndRedirect(
+                      constructedQuery,
                       queryName,
-                      "/codeLibrary",
-                      "manage",
+                      "/queryBuilding",
+                      "valueset",
                     );
                   }}
                 >
