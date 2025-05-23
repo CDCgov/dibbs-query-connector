@@ -1,65 +1,36 @@
-import KeycloakProvider from "next-auth/providers/keycloak";
-import MicrosoftEntraID from "next-auth/providers/microsoft-entra-id";
-import { addUserIfNotExists, getUserRole } from "@/app/backend/user-management";
-import { isAuthDisabledServerCheck } from "./app/utils/auth";
-import { UserRole } from "./app/models/entities/users";
+import { addUserIfNotExists } from "@/app/backend/user-management";
 import NextAuth from "next-auth";
 import { logSignInToAuditTable } from "./app/backend/session-management";
-
-function addRealm(url: string) {
-  return url.endsWith("/realms/master") ? url : `${url}/realms/master`;
-}
-
-let { NAMED_KEYCLOAK, LOCAL_KEYCLOAK } = process.env;
-if (!NAMED_KEYCLOAK || !LOCAL_KEYCLOAK) {
-  const KEYCLOAK_URL = process.env.AUTH_ISSUER || "http://localhost:8080";
-  NAMED_KEYCLOAK = KEYCLOAK_URL;
-  LOCAL_KEYCLOAK = KEYCLOAK_URL;
-}
-
-// Add /realms/master to the end of the URL if it's missing.
-NAMED_KEYCLOAK = addRealm(NAMED_KEYCLOAK);
-LOCAL_KEYCLOAK = addRealm(LOCAL_KEYCLOAK);
-
-const keycloakProvider = KeycloakProvider({
-  jwks_endpoint: `${NAMED_KEYCLOAK}/protocol/openid-connect/certs`,
-  wellKnown: undefined,
-  clientId: process.env.AUTH_CLIENT_ID,
-  clientSecret: process.env.AUTH_CLIENT_SECRET,
-  issuer: `${LOCAL_KEYCLOAK}`,
-  authorization: {
-    params: {
-      scope: "openid email profile",
-    },
-    url: `${LOCAL_KEYCLOAK}/protocol/openid-connect/auth`,
-  },
-  token: `${NAMED_KEYCLOAK}/protocol/openid-connect/token`,
-  userinfo: `${NAMED_KEYCLOAK}/protocol/openid-connect/userinfo`,
-});
-
-const entraProvider = MicrosoftEntraID({
-  clientId: process.env.AUTH_CLIENT_ID,
-  clientSecret: process.env.AUTH_CLIENT_SECRET,
-  issuer: process.env.AUTH_ISSUER,
-  authorization: {
-    params: {
-      scope: "openid email profile",
-    },
-  },
-});
+import {
+  AuthContext,
+  AuthStrategy,
+  KeycloakAuthStrategy,
+  MicrosoftEntraAuthStrategy,
+} from "./app/backend/auth/lib";
+import { UserRole } from "./app/models/entities/users";
 
 let providers = [];
+let authStrategy: AuthStrategy;
 
 switch (process.env.NEXT_PUBLIC_AUTH_PROVIDER) {
   case "keycloak":
-    providers = [keycloakProvider];
+    authStrategy = new KeycloakAuthStrategy();
+    const keycloakProvider = authStrategy.setUpNextAuthProvider();
+    providers.push(keycloakProvider);
     break;
   case "microsoft-entra-id":
-    providers = [entraProvider];
+    authStrategy = new MicrosoftEntraAuthStrategy();
+    const microsoftProvider = authStrategy.setUpNextAuthProvider();
+    providers.push(microsoftProvider);
     break;
   default:
-    providers = [keycloakProvider];
-    break;
+    console.error(
+      "Configured IdP doesn't match existing options. Please check the setup in your environment settings",
+    );
+    console.error("Falling back to Keycloak setup");
+    authStrategy = new KeycloakAuthStrategy();
+    const fallbackProvider = authStrategy.setUpNextAuthProvider();
+    providers.push(fallbackProvider);
 }
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
@@ -68,56 +39,35 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   basePath: "/api/auth",
   providers,
   callbacks: {
-    /**
-     * JWT callback to store Keycloak user data in the token.
-     * @param token The root object containing the JWT properties.
-     * @param token.token The current JWT token.
-     * @param token.profile The user profile returned from Keycloak.
-     * @returns The updated JWT token with user details.
-     */
-    async jwt({ token, profile }) {
-      const now = Math.floor(Date.now() / 1000);
+    async jwt({ token, profile, account }) {
+      const authContext = new AuthContext(authStrategy);
 
-      if (profile) {
-        const userToken = {
-          id: profile.sub || "",
-          username: profile.preferred_username || profile.email || "",
-          email: profile.email || "",
-          firstName: profile.given_name || "",
-          lastName: profile.family_name || "",
-          role: "",
-        };
+      let extendedToken = authContext.extendTokenWithExpirationTime(token);
+      // IdP response doesn't have extra user token info (ie after initial sign in).
+      // Just return token with extended expiry info
 
-        // Ensure user is in the database **only on first login**
-        try {
-          await addUserIfNotExists(userToken);
-        } catch (error) {
-          console.error("Something went wrong in generating user token", error);
-        }
-
-        token = { ...token, ...userToken };
+      if (!account || !profile) {
+        return extendedToken;
       }
 
-      // Extend token with role and time to expire
-      if (token.username && token.username !== "") {
-        if (isAuthDisabledServerCheck()) {
-          token.role = UserRole.SUPER_ADMIN;
-        } else {
-          const role = await getUserRole(token.username).catch();
-          token.role = role;
-        }
+      const userToken = authContext.parseIdpResponseForUserToken(
+        token,
+        account,
+        profile,
+      );
+
+      try {
+        await addUserIfNotExists(userToken);
+      } catch (error) {
+        console.error(
+          "Something went wrong in user setup after JWT generation",
+          error,
+        );
       }
 
-      if (token.exp) {
-        token.expiresIn = token.exp - now;
-      }
+      extendedToken = authContext.extendTokenWithUserInfo(token, userToken);
 
-      // handle expired tokens
-      if (token.expiresIn && token.expiresIn <= 0) {
-        return null;
-      }
-
-      return token;
+      return extendedToken;
     },
 
     /**
@@ -135,7 +85,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         firstName: token.firstName || "",
         lastName: token.lastName || "",
         emailVerified: null,
-        role: token.role || "",
+        role: (token.qcRole as UserRole) || UserRole.STANDARD,
       };
 
       session.expiresIn = token.expiresIn;
