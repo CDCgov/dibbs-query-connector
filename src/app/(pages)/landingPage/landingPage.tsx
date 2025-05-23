@@ -82,7 +82,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ isLoggedIn }) => {
               />
             </div>
           </div>
-          <div className="home flex-1">
+          <div className="home flex-1 padding-bottom-4">
             <h3 className={styles.pageSubtitle} role="heading" aria-level={2}>
               What is it?
             </h3>
@@ -128,6 +128,14 @@ const LandingPage: React.FC<LandingPageProps> = ({ isLoggedIn }) => {
                 </p>
               </ProcessListItem>
             </ProcessList>
+            <p>
+              For more information on how to use the Query Connector, please
+              refer to the{" "}
+              <a className="usa-link" href="/docs">
+                documentation
+              </a>
+              .
+            </p>
           </div>
         </div>
       )}

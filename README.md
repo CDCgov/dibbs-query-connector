@@ -6,7 +6,7 @@
 [![Dev site](https://img.shields.io/website?url=https%3A%2F%2Fqueryconnector.dev&label=queryconnector.dev)](https://queryconnector.dev)
 [![Demo site](https://img.shields.io/website?url=https%3A%2F%2Fdemo.queryconnector.dev&label=demo.queryconnector.dev)](https://demo.queryconnector.dev)
 
-![Query Connector Screenshot](./docs/images/query-connector-screenshot.png)
+![Query Connector Screenshot](./public/query-connector-screenshot.png)
 
 ## Overview
 
@@ -32,17 +32,22 @@ DIBBs Query Connector is a sibling project to
 
 You can find more detailed documentation, guides, and tutorials here:
 
-- For developers:
-  - [Local development](docs/development.md)
-  - [Contributing changes](docs/contributing.md)
-  - [Release process](docs/release.md)
-- For public health IT staff:
-  - [Architecture](docs/architecture.md)
-  - [Deploying Query Connector](docs/deployment.md)
-  - [API Docs](docs/api.md)
-  - [ONC audit log compliance](docs/audit_log.md)
 - For public health case investigators:
-  - [Query Connector User Guide](docs/user_guide.md)
+
+  - [Query Connector User Guide](src/docs/user-guide.md)
+
+- For public health IT staff:
+
+  - [Architecture](src/docs/architecture.md)
+  - [Deploying Query Connector](src/docs/deployment.md)
+  - [API Docs](src/docs/api.md)
+  - [ONC audit log compliance](src/docs/audit-log.md)
+
+- For developers:
+
+  - [Local development](src/docs/development.md)
+  - [Contributing changes](src/docs/contributing.md)
+  - [Release process](src/docs/release.md)
 
 ## Try it out!
 
@@ -99,7 +104,7 @@ later.
 All comments, messages, pull requests, and other submissions received through
 CDC including this GitHub page may be subject to applicable federal law, including but not limited to the Federal Records Act, and may be archived. Learn more at [http://www.cdc.gov/other/privacy.html](http://www.cdc.gov/other/privacy.html).
 
-See [CONTRIBUTING.md](docs/contributing.md) for more information.
+See [CONTRIBUTING.md](src/docs/contributing.md) for more information.
 
 ### Records Management Standard Notice
 
@@ -109,8 +114,8 @@ published through the [CDC web site](http://www.cdc.gov).
 
 ### Related documents
 
-- [Disclaimer](docs/disclaimer.md)
-- [Contribution Notice](docs/contributing.md)
+- [Disclaimer](src/docs/disclaimer.md)
+- [Contribution Notice](src/docs/contributing.md)
 
 ### Additional Standard Notices
 

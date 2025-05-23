@@ -1,3 +1,5 @@
+[← Back to Documentation](/docs)
+
 Below is documentation for the Query Connector's implementation of an ONC-compliant audit log.
 
 # Standards Referenced
