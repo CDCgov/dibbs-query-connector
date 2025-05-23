@@ -10,38 +10,44 @@ import WithAuth from "@/app/ui/components/withAuth/WithAuth";
 import Backlink from "@/app/ui/designSystem/backLink/Backlink";
 import { Button, Icon, Select, TextInput } from "@trussworks/react-uswds";
 import classNames from "classnames";
-import { useEffect, useState } from "react";
-import { insertCustomValueSet } from "@/app/shared/custom-code-service";
+import { useEffect, useRef, useState } from "react";
+import {
+  deleteCustomConcept,
+  getCustomValueSetById,
+  insertCustomValueSet,
+} from "@/app/shared/custom-code-service";
 import { User } from "@/app/models/entities/users";
 import { getUserByUsername } from "@/app/backend/user-management";
 import { useSession } from "next-auth/react";
 import { Concept } from "@/app/models/entities/concepts";
-import { formatStringToSentenceCase } from "@/app/shared/format-service";
 import {
-  CodeSystemOptions,
-  CustomCodeMode,
-  emptyValueSet,
-  formatSystem,
-} from "../utils";
-
+  formatCodeSystemPrefix,
+  formatStringToSentenceCase,
+} from "@/app/shared/format-service";
+import { CodeSystemOptions, CustomCodeMode, emptyValueSet } from "../utils";
 import Skeleton from "react-loading-skeleton";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
+import { groupConditionConceptsIntoValueSets } from "@/app/shared/utils";
 
 type CustomValueSetFormProps = {
   mode: CustomCodeMode;
   setMode: (mode: CustomCodeMode) => void;
-  activeValueSet?: DibbsValueSet;
+  activeValueSet: DibbsValueSet;
 };
 
 type CustomCodeMap = {
-  [id: string]: Concept;
+  [idx: string]: Concept;
 };
+
+const newEmptyCodesMap = (): CustomCodeMap => ({
+  "0": { display: "", code: "", include: false },
+});
 
 /**
  * @param root0 props
  * @param root0.mode - controls whether to render the form for Adding a new VS or Editing an existing one
  * @param root0.setMode - state function to set the mode prop
- * @param root0.activeValueSet - if present, the value set to edit. Absent if creating a new value set
+ * @param root0.activeValueSet - if present, the value set to edit. Empty if creating a new value set
  * @returns  the CustomValueSetForm component
  */
 const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
@@ -50,23 +56,24 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
   activeValueSet,
 }) => {
   const [loading, setLoading] = useState<boolean>(true);
+  const [saving, setSaving] = useState<boolean>(false); // don't render skeleton if we're just refreshing on save
+
   const { data: session } = useSession();
   const username = session?.user?.username || "";
   const [currentUser, setCurrentUser] = useState<User>();
 
-  const [customValueSet, setCustomValueSet] =
-    useState<DibbsValueSet>(emptyValueSet);
-  const [codes, setCodes] = useState<CustomCodeMap>({
-    "0": { code: "", display: "", include: false },
+  const [customValueSet, setCustomValueSet] = useState<DibbsValueSet>(
+    mode == "create" ? emptyValueSet : activeValueSet,
+  );
+  const [codesMap, setCodesMap] = useState<CustomCodeMap>(newEmptyCodesMap());
+
+  const [error, setError] = useState<{ [field: string]: boolean }>({
+    valueSetName: false,
+    dibbsConceptType: false,
+    system: false,
   });
 
-  const [errorMessage, setErrorMessage] = useState<string>("");
-  const [error, setError] = useState({
-    valueSetName: false,
-    system: false,
-    dibbsConceptType: false,
-    concepts: false,
-  });
+  const prevModeRef = useRef<CustomCodeMode>(mode);
 
   function goBack() {
     // TODO: this will need to be handled differently
@@ -74,15 +81,28 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
     // from Manage codes view - Back to Codes
     // from query building - Back to query
     setLoading(true);
-    setCodes({ "0": { code: "", display: "", include: false } });
+    setCodesMap(newEmptyCodesMap());
+
     return setMode("manage");
   }
 
-  function validateInput(e: React.ChangeEvent<HTMLInputElement>) {
-    const input = e.currentTarget.value.trim();
-    if (input == "") {
-      setError({ ...error, valueSetName: true });
-    }
+  function validateForm(valueSet: DibbsValueSet) {
+    const errorsToUpdate = { ...error };
+
+    // Check each required field
+    Object.keys(errorsToUpdate).forEach((field) => {
+      if (!valueSet[field as keyof typeof valueSet]) {
+        errorsToUpdate[field] = true;
+      } else {
+        errorsToUpdate[field] = false;
+      }
+    });
+
+    // Set applicable error status in state
+    setError(errorsToUpdate);
+
+    // Return whether the form is valid
+    return !Object.values(errorsToUpdate).some((val) => val === true);
   }
 
   useEffect(() => {
@@ -99,77 +119,178 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
   }, []);
 
   useEffect(() => {
-    if (mode == "edit") {
-      const codeMap: CustomCodeMap = {};
-
-      activeValueSet?.concepts.map((code, idx) => {
-        codeMap[idx] = code;
-      });
-
-      setCodes(codeMap);
-    } else {
-      setCodes({ "0": { code: "", display: "", include: false } });
+    // if we're switching right from create mode to edit mode,
+    // no need to load in customValueSet data, since we've already got
+    // it in state
+    if (prevModeRef.current == "create" && mode == "edit") {
+      prevModeRef.current = mode;
+      return;
     }
 
-    mode == "edit" && activeValueSet && setCustomValueSet(activeValueSet);
+    // if we're loading an existing VS from manage/select mode,
+    // map codes into the correct structure:
+    const codeMap: CustomCodeMap = {};
+    if (customValueSet?.concepts && customValueSet.concepts.length > 0) {
+      customValueSet.concepts.map((code, idx) => {
+        codeMap[idx] = code;
+      });
+      setCodesMap({ ...codeMap });
+    }
+
     setLoading(false);
   }, [mode]);
 
-  const handleAddCode =
-    (type: string, index: string) =>
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const input = e.target.value;
+  useEffect(() => {
+    if (Object.keys(codesMap).length <= 0) {
+      setCodesMap(newEmptyCodesMap());
+    } else {
+      const vsConcepts = Object.values(codesMap);
+      setCustomValueSet({ ...customValueSet, concepts: vsConcepts });
+    }
+  }, [codesMap]);
 
-      const codeToUpdate = codes[index];
+  const fetchUpdatedValueSet = async (id?: string) => {
+    const updatedVS = await getCustomValueSetById(
+      id ?? customValueSet.valueSetId,
+    );
 
-      if (type == "code") {
-        codeToUpdate.code = input;
+    if (updatedVS.totalItems <= 0) {
+      return;
+    }
+
+    const formattedVs = groupConditionConceptsIntoValueSets(updatedVS.items);
+
+    const updatedCodes: CustomCodeMap = {};
+    formattedVs[0]?.concepts?.sort().map((c, idx) => {
+      updatedCodes[idx] = c;
+    });
+
+    setCodesMap({ ...updatedCodes });
+    return setCustomValueSet(formattedVs[0]);
+  };
+
+  const handleAddCode = (type: string, index: string, input: string) => {
+    const codeToUpdate = codesMap[index];
+
+    if (type == "code") {
+      codeToUpdate.code = input;
+    } else {
+      codeToUpdate.display = input;
+    }
+
+    setCodesMap({ ...codesMap, [index]: codeToUpdate });
+    setCustomValueSet({ ...customValueSet, concepts: Object.values(codesMap) });
+  };
+
+  const handleRemoveCode = async (index: string) => {
+    const subjectCode = codesMap[index];
+    const updatedCodes = { ...codesMap };
+
+    if (!!customValueSet) {
+      // remove empty codes
+      const storedConcepts = Object.values(codesMap).filter(
+        (codes) => codes.code != "" && codes.display !== "",
+      );
+
+      // shape back into customCodeMap
+      storedConcepts.map((val, idx) => {
+        updatedCodes[idx] = val;
+      });
+
+      // add to customValueSet
+      const newCustomValueSet = {
+        ...customValueSet,
+        concepts: storedConcepts,
+      };
+
+      // save to db
+      const result = await deleteCustomConcept(subjectCode, newCustomValueSet);
+
+      if (result.success == true) {
+        // remove from local state
+        delete updatedCodes[index];
+        // remove from local valueSet object
+        customValueSet.concepts.splice(Number(index), 1);
+
+        showToastConfirmation({
+          body: `Code ${subjectCode.code} ("${subjectCode.display}") removed from value set "${customValueSet.valueSetName}"`,
+        });
+
+        // if we deleted the last item, reset to empty placeholder
+        if (Object.keys(updatedCodes).length <= 0) {
+          return setCodesMap(newEmptyCodesMap());
+        } else {
+          // re-map index keys so we always start with 0
+          const newCodes: CustomCodeMap = {};
+          Object.values(updatedCodes).map((code, idx) => {
+            newCodes[idx] = code;
+          });
+          return setCodesMap(newCodes);
+        }
       } else {
-        codeToUpdate.display = input;
+        showToastConfirmation({
+          body: `Error: Could not remove code ${subjectCode.code} ("${subjectCode.display}")."`,
+          variant: "error",
+        });
       }
+    }
+  };
 
-      setCodes({ ...codes, [index]: codeToUpdate });
-    };
+  const renderAddCodeRow = (codes: CustomCodeMap) => {
+    const showEmptyCodePlaceholder =
+      Object.keys(codes).length == 1 &&
+      codes[0]?.code == "" &&
+      codes[0]?.display == "";
 
-  const renderAddCodeRow = () => {
-    return Object.entries(codes).map(([idx, code]) => {
-      return (
+    return Object.entries(codes).map(([id, codeObj]) => {
+      return loading ? (
+        <Skeleton
+          height={"2.5rem"}
+          containerClassName={styles.skeleton_container}
+          className={styles.skeleton}
+        />
+      ) : (
         <div
           data-testid={"addCode-inputs"}
-          className={classNames(styles.addCodeRow, styles.formSection__input)}
-          key={idx}
+          className={classNames(
+            styles.addCodeRow,
+            styles.formSection__input,
+            showEmptyCodePlaceholder ? styles.emptyCodeRow : "",
+          )}
+          key={id}
         >
           <div className={styles.textInput}>
             <label htmlFor="code-id">Code #</label>
             <TextInput
               type="text"
-              id={`code-id-${code.internalId ?? idx}`}
+              id={`code-id-${id}`}
               name="code-id"
-              defaultValue={code.code}
-              placeholder={code.code}
-              onChange={handleAddCode("code", idx)}
+              value={codeObj.code}
+              onChange={(e) => handleAddCode("code", id, e.target.value)}
             />
           </div>
           <div className={styles.textInput}>
-            <label htmlFor="code-name">Code name </label>
+            <label htmlFor="code-name">Code name</label>
             <TextInput
               type="text"
-              id={`code-name-${code.internalId ?? idx}`}
+              id={`code-name-${id}`}
               name="code-name"
-              defaultValue={code.display}
-              placeholder={code.display}
-              onChange={handleAddCode("name", idx)}
+              value={codeObj.display}
+              onChange={(e) => handleAddCode("name", id, e.target.value)}
             />
           </div>
           <Icon.Delete
-            className={classNames("margin-bottom-1", styles.deleteIcon)}
+            className={classNames(
+              "margin-bottom-1",
+              styles.deleteIcon,
+              "destructive-primary",
+            )}
             size={3}
-            color="#919191"
-            data-testid={`delete-custom-code-${code}`}
+            data-testid={`delete-custom-code-${id}`}
             aria-label="Trash icon indicating deletion of code entry"
-            onClick={() => {
-              // TODO: implement delete
-              console.log("delete");
+            onClick={(e) => {
+              e.preventDefault();
+              handleRemoveCode(id.toString());
             }}
           ></Icon.Delete>
         </div>
@@ -178,59 +299,60 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
   };
 
   const saveValueSet = async () => {
-    setLoading(true);
-    // TODO: implement proper form validation
-    const requiredFields = ["valueSetName", "system", "dibbsConceptType"];
-    Object.entries(customValueSet).some(([key, val]) => {
-      if (val == "" && requiredFields.includes(key)) {
-        setError({ ...error, [key]: true });
+    setSaving(true);
+    const isValid = validateForm(customValueSet);
+
+    try {
+      if (!isValid) {
+        return;
       }
-    });
-    Object.entries(error).map(([field, value]) => {
-      if (value == true) {
-        console.log("error!", field);
+
+      const updatedCodeMap: CustomCodeMap = {};
+
+      // don't save empty placeholder rows
+      const storedConcepts = Object.values(codesMap).filter(
+        (codes) => codes.code != "" && codes.display !== "",
+      );
+
+      // shape back into CustomCodeMap
+      storedConcepts.map((val, idx) => {
+        updatedCodeMap[idx] = val;
+      });
+
+      const newCustomValueSet = {
+        ...customValueSet,
+        concepts: storedConcepts,
+      };
+
+      const result = await insertCustomValueSet(
+        newCustomValueSet as DibbsValueSet,
+        currentUser?.id as string,
+      );
+
+      if (result.success == true) {
+        await fetchUpdatedValueSet(result.id);
+        setCodesMap(updatedCodeMap);
+
+        showToastConfirmation({
+          body: `Value set "${newCustomValueSet.valueSetName}" successfully ${
+            mode == "create" ? "added" : "updated"
+          }`,
+        });
       }
-    });
+    } catch (error) {
+      showToastConfirmation({
+        variant: "error",
+        body: `Unable to save value set "${customValueSet.valueSetName}". Please try again later.`,
+      });
 
-    const author =
-      mode == "edit"
-        ? !!currentUser?.firstName && !!currentUser?.lastName
-          ? `${currentUser?.firstName} ${currentUser?.lastName}`
-          : currentUser?.username
-        : "";
-    const codes2 = Object.values(codes).filter(
-      (codes) => codes.code != "" && codes.display !== "",
-    );
-
-    const newCustomValueSet = {
-      ...customValueSet,
-      author: author as string,
-      concepts: codes2,
-    };
-
-    if (!error.valueSetName) {
-      try {
-        const result = await insertCustomValueSet(
-          newCustomValueSet,
-          currentUser?.id as string,
-        );
-
-        //  TODO: error handling
-        if (result.success == true) {
-          setErrorMessage("");
-          setCodes({ "0": { code: "", display: "", include: false } });
-
-          if (mode == "create") {
-            setMode("manage");
-          }
-          return showToastConfirmation({
-            body: `Value set "${customValueSet.valueSetName}" successfully ${
-              mode == "create" ? "added" : "updated"
-            }`,
-          });
-        }
-      } catch (error) {
-        console.log(error);
+      console.error(error);
+    } finally {
+      setSaving(false);
+      // don't stay in "create" mode, or we'll make duplicate
+      // valuesets with each edit; should either stay on page
+      // in edit mode or go back to manage view mode
+      if (mode == "create" && isValid) {
+        setMode("edit");
       }
     }
   };
@@ -251,9 +373,12 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
               {mode == "create" ? "New value set" : "Edit value set"}
             </h1>
             <Button
-              disabled={error.valueSetName}
+              disabled={!!saving}
               type="button"
-              onClick={saveValueSet}
+              onClick={(e) => {
+                e.preventDefault();
+                saveValueSet();
+              }}
             >
               {mode == "create" ? "Save value set" : "Save changes"}
             </Button>
@@ -262,161 +387,168 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
             <div className={styles.formSection__title}>
               <h2>Value set description</h2>
             </div>
-            {loading ? (
-              <Skeleton height={"7rem"} />
-            ) : (
-              <div className={styles.formSection__content}>
-                <div
-                  className={classNames(
-                    styles.formSection__input,
-                    styles.textInput,
-                    error.valueSetName == true
-                      ? styles.formValidationError
-                      : "",
-                  )}
-                >
-                  <label htmlFor="vsName">
-                    {`Value set name `}
-                    (Required)
-                  </label>
-                  <TextInput
-                    type="text"
-                    id="vsName"
-                    name="vsName"
-                    onBlur={validateInput}
-                    onChange={(e) => {
-                      setError({ ...error, valueSetName: false });
-                      return setCustomValueSet({
-                        ...customValueSet,
-                        valueSetName: e.target.value as string,
-                      });
-                    }}
-                    defaultValue={
-                      mode == "create"
-                        ? customValueSet.valueSetName || ""
-                        : activeValueSet?.valueSetName
-                    }
-                  />
-                  {error.valueSetName && (
-                    <div className={styles.errorMessage}>
-                      <Icon.Error className={styles.errorMessage} />
-                      Enter a name for the value set.
-                    </div>
-                  )}
-                </div>
-                <div
-                  className={classNames(
-                    styles.formSection__input,
-                    styles.dropdown,
-                  )}
-                >
-                  <label htmlFor="category">Category (Required)</label>
-                  <Select
-                    id="category"
-                    className={styles.filtersSelect}
-                    name="Category"
-                    onChange={(e) => {
-                      e.preventDefault();
-                      setError({ ...error, dibbsConceptType: false });
-                      setCustomValueSet({
-                        ...customValueSet,
-                        dibbsConceptType: e.target.value as DibbsConceptType,
-                      });
-                    }}
-                    defaultValue={
-                      mode == "create"
-                        ? customValueSet.dibbsConceptType || ""
-                        : activeValueSet?.dibbsConceptType
-                    }
-                  >
-                    {<option value="" disabled></option>}
-                    {["labs", "conditions", "medications"].map((category) => {
-                      return (
-                        <option key={category} value={category}>
-                          {formatStringToSentenceCase(category)}
-                        </option>
-                      );
-                    })}
-                  </Select>
-                </div>
-                <div
-                  className={classNames(
-                    styles.formSection__input,
-                    styles.dropdown,
-                  )}
-                >
-                  <label htmlFor="code-system">Code system (Required)</label>
-                  <Select
-                    id="code-system"
-                    className={styles.filtersSelect}
-                    name="code-system"
-                    onChange={(e) => {
-                      e.preventDefault();
-                      setCustomValueSet({
-                        ...customValueSet,
-                        system: e.target.value,
-                      });
-                    }}
-                    defaultValue={
-                      mode == "create"
-                        ? customValueSet.system || ""
-                        : activeValueSet?.system
-                    }
-                  >
-                    {<option value="" disabled></option>}
-                    {CodeSystemOptions.map((codeSystem) => {
-                      return (
-                        <option key={codeSystem} value={codeSystem}>
-                          {formatSystem(codeSystem)}
-                        </option>
-                      );
-                    })}
-                  </Select>
-                </div>
+            <div className={styles.formSection__content}>
+              <div
+                className={classNames(
+                  styles.formSection__input,
+                  styles.textInput,
+                  error.valueSetName ? styles.formValidationError : "",
+                )}
+              >
+                <label htmlFor="vsName">
+                  {`Value set name `}
+                  (Required)
+                </label>
+                <TextInput
+                  type="text"
+                  id="vsName"
+                  name="vsName"
+                  onChange={(e) => {
+                    setError({ ...error, valueSetName: false });
+                    return setCustomValueSet({
+                      ...customValueSet,
+                      valueSetName: e.target.value as string,
+                    });
+                  }}
+                  defaultValue={customValueSet?.valueSetName}
+                />
+                {error.valueSetName && (
+                  <div className={styles.errorMessage}>
+                    <Icon.Error
+                      aria-label="warning icon indicating an error is present"
+                      className={styles.errorMessage}
+                    />
+                    Enter a name for the value set.
+                  </div>
+                )}
               </div>
-            )}
+              <div
+                className={classNames(
+                  styles.formSection__input,
+                  styles.dropdown,
+                  !!error.dibbsConceptType ? styles.formValidationError : "",
+                )}
+              >
+                <label htmlFor="category">Category (Required)</label>
+                <Select
+                  id="category"
+                  className={classNames(
+                    styles.filtersSelect,
+                    !!error.dibbsConceptType ? styles.formValidationError : "",
+                  )}
+                  name="Category"
+                  onChange={(e) => {
+                    e.preventDefault();
+                    setError({ ...error, dibbsConceptType: false });
+                    setCustomValueSet({
+                      ...customValueSet,
+                      dibbsConceptType: e.target.value as DibbsConceptType,
+                    });
+                  }}
+                  value={customValueSet?.dibbsConceptType}
+                >
+                  {<option value="" disabled></option>}
+                  {["labs", "conditions", "medications"].map((category) => {
+                    return (
+                      <option key={category} value={category}>
+                        {formatStringToSentenceCase(category)}
+                      </option>
+                    );
+                  })}
+                </Select>
+                {error.dibbsConceptType && (
+                  <div className={styles.errorMessage}>
+                    <Icon.Error
+                      aria-label="warning icon indicating an error is present"
+                      className={styles.errorMessage}
+                    />
+                    Select a category.
+                  </div>
+                )}
+              </div>
+              <div
+                className={classNames(
+                  styles.formSection__input,
+                  styles.dropdown,
+                  !!error.system ? styles.formValidationError : "",
+                )}
+              >
+                <label htmlFor="code-system">Code system (Required)</label>
+                <Select
+                  id="code-system"
+                  className={
+                    (styles.filtersSelect,
+                    !!error.system ? styles.formValidationError : "")
+                  }
+                  name="code-system"
+                  onChange={(e) => {
+                    e.preventDefault();
+                    setError({ ...error, system: false });
+                    setCustomValueSet({
+                      ...customValueSet,
+                      system: e.target.value,
+                    });
+                  }}
+                  value={customValueSet.system || ""}
+                >
+                  {<option value="" disabled></option>}
+                  {CodeSystemOptions.map((codeSystem) => {
+                    return (
+                      <option key={codeSystem} value={codeSystem}>
+                        {formatCodeSystemPrefix(codeSystem)}
+                      </option>
+                    );
+                  })}
+                </Select>
+                {error.system && (
+                  <div className={styles.errorMessage}>
+                    <Icon.Error
+                      aria-label="warning icon indicating an error is present"
+                      className={styles.errorMessage}
+                    />
+                    Select a code system.
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
           <div className={(styles.formSection, styles.codes)}>
             <div className={styles.formSection__title}>
               <h2>Codes</h2>
             </div>
             {loading ? (
-              <Skeleton height={"7rem"} />
+              <Skeleton
+                containerClassName={styles.formSection__content}
+                count={Object.values(codesMap).length}
+                height={"4.4rem"}
+              />
             ) : (
               <div className={styles.formSection__content}>
                 <div className={styles.addCodeContainer}>
-                  {renderAddCodeRow()}
+                  {renderAddCodeRow(codesMap)}
                 </div>
                 <button
                   className={styles.addCodeBtn}
                   onClick={(e) => {
                     e.preventDefault();
 
-                    if (mode == "edit") {
-                      const codeMap: CustomCodeMap = {};
-                      const codeCount = activeValueSet?.concepts?.length;
+                    const updatedCodeMap: CustomCodeMap = {};
+                    // grab copy of codes that are stored locally
+                    Object.values(codesMap).map((val, idx) => {
+                      updatedCodeMap[idx] = val;
+                    });
 
-                      activeValueSet?.concepts.map((code, idx) => {
-                        codeMap[idx] = code;
-                      });
-                      if (codeCount) {
-                        codeMap[codeCount] = {
-                          code: "",
-                          display: "",
-                          include: false,
-                        };
-                      }
+                    const nextIndex = Object.keys(updatedCodeMap).length;
 
-                      return setCodes(codeMap);
-                    }
-                    setCodes({
-                      ...codes,
-                      ...{
-                        [Object.values(codes).length]: {
-                          display: "",
-                          code: "",
-                        },
-                      },
+                    // add new empty row to end of map
+                    updatedCodeMap[nextIndex] = {
+                      code: "",
+                      display: "",
+                      include: false,
+                    };
+
+                    return setCodesMap({
+                      ...updatedCodeMap,
                     });
                   }}
                 >

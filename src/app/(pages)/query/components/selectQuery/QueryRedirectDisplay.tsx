@@ -33,18 +33,14 @@ const QueryRedirectInfo: React.FC<QueryRedirectInfoProps> = ({ userRole }) => {
         </h4>
         <p className="margin-0">
           {userRole === UserRole.STANDARD ? (
-            `Contact an admin: ${adminNames.join(", ")}`
+            `Contact an admin: ${adminNames.join(", ")}.`
           ) : (
             <span>
               Go to the{" "}
-              <a
-                className="unchanged-color-on-visit"
-                target="_blank"
-                href={PAGES.QUERY_BUILDING}
-              >
-                query library
-              </a>{" "}
-              to build it
+              <a target="_blank" href={PAGES.QUERY_BUILDING}>
+                query library{" "}
+              </a>
+              to build it.
             </span>
           )}
         </p>

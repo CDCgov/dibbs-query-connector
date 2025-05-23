@@ -24,7 +24,6 @@ exports[`DropdownFilter renders a 'clear filters' button when filters are applie
             name="category"
           >
             <option
-              disabled=""
               value=""
             />
             <option
@@ -59,18 +58,12 @@ exports[`DropdownFilter renders a 'clear filters' button when filters are applie
             name="code-system"
           >
             <option
-              disabled=""
               value=""
             />
             <option
-              value="http://hl7.org/fhir/sid/icd-10-cm"
+              value="http://snomed.info/sct"
             >
-              ICD-10
-            </option>
-            <option
-              value="http://test.com/test"
-            >
-              TEST
+              SNOMED
             </option>
           </select>
         </div>
@@ -89,13 +82,17 @@ exports[`DropdownFilter renders a 'clear filters' button when filters are applie
             name="creator"
           >
             <option
-              disabled=""
               value=""
             />
             <option
-              value="Testing Fixtures"
+              value="QC Admin"
             >
-              Testing Fixtures
+              QC Admin
+            </option>
+            <option
+              value="My Team(s)"
+            >
+              My Team(s)
             </option>
           </select>
         </div>
@@ -151,7 +148,6 @@ exports[`DropdownFilter renders correctly 1`] = `
             name="category"
           >
             <option
-              disabled=""
               value=""
             />
             <option
@@ -186,18 +182,12 @@ exports[`DropdownFilter renders correctly 1`] = `
             name="code-system"
           >
             <option
-              disabled=""
               value=""
             />
             <option
-              value="http://hl7.org/fhir/sid/icd-10-cm"
+              value="http://snomed.info/sct"
             >
-              ICD-10
-            </option>
-            <option
-              value="http://test.com/test"
-            >
-              TEST
+              SNOMED
             </option>
           </select>
         </div>
@@ -216,18 +206,22 @@ exports[`DropdownFilter renders correctly 1`] = `
             name="creator"
           >
             <option
-              disabled=""
               value=""
             />
             <option
-              value="Testing Fixtures"
+              value="QC Admin"
             >
-              Testing Fixtures
+              QC Admin
             </option>
             <option
               value="Hogwarts"
             >
               Hogwarts
+            </option>
+            <option
+              value="My Team(s)"
+            >
+              My Team(s)
             </option>
           </select>
         </div>

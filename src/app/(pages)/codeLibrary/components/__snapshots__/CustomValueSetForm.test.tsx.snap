@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`CustomValueSetForm renders a form to edit an existing value set 1`] = `
+exports[`Create custom valueSet form renders an empty form to add a new value set 1`] = `
 <body>
   <div>
     <div>
@@ -9,319 +9,7 @@ exports[`CustomValueSetForm renders a form to edit an existing value set 1`] = `
       >
         <a
           aria-label="Back arrow indicating ability to navigate back a page if clicked"
-          class="back-link unchanged-color-on-visit text-no-underline"
-          data-testid="backArrowLink"
-          href="#"
-        >
-          <svg
-            aria-label="Arrow point left indicating return to previous step"
-            class="usa-icon"
-            focusable="false"
-            height="1em"
-            role="img"
-            viewBox="0 0 24 24"
-            width="1em"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"
-            />
-          </svg>
-           
-          Return to Codes
-        </a>
-        <form>
-          <div
-            class="header"
-          >
-            <h1
-              class="title"
-            >
-              Edit value set
-            </h1>
-            <button
-              class="usa-button"
-              data-testid="button"
-              type="button"
-            >
-              Save changes
-            </button>
-          </div>
-          <div
-            class="formSection vsDescription"
-          >
-            <div
-              class="formSection__title"
-            >
-              <h2>
-                Value set description
-              </h2>
-            </div>
-            <div
-              class="formSection__content"
-            >
-              <div
-                class="formSection__input textInput"
-              >
-                <label
-                  for="vsName"
-                >
-                  Value set name 
-                  (Required)
-                </label>
-                <input
-                  class="usa-input"
-                  data-testid="textInput"
-                  id="vsName"
-                  name="vsName"
-                  type="text"
-                  value="Mock Lab"
-                />
-              </div>
-              <div
-                class="formSection__input dropdown"
-              >
-                <label
-                  for="category"
-                >
-                  Category (Required)
-                </label>
-                <select
-                  class="usa-select filtersSelect"
-                  data-testid="Select"
-                  id="category"
-                  name="Category"
-                >
-                  <option
-                    disabled=""
-                    value=""
-                  />
-                  <option
-                    selected=""
-                    value="labs"
-                  >
-                    Labs
-                  </option>
-                  <option
-                    value="conditions"
-                  >
-                    Conditions
-                  </option>
-                  <option
-                    value="medications"
-                  >
-                    Medications
-                  </option>
-                </select>
-              </div>
-              <div
-                class="formSection__input dropdown"
-              >
-                <label
-                  for="code-system"
-                >
-                  Code system (Required)
-                </label>
-                <select
-                  class="usa-select filtersSelect"
-                  data-testid="Select"
-                  id="code-system"
-                  name="code-system"
-                >
-                  <option
-                    disabled=""
-                    value=""
-                  />
-                  <option
-                    selected=""
-                    value="http://hl7.org/fhir/sid/icd-10-cm"
-                  >
-                    ICD-10
-                  </option>
-                  <option
-                    value="http://hl7.org/fhir/sid/cvx"
-                  >
-                    CVX
-                  </option>
-                  <option
-                    value="http://www.nlm.nih.gov/research/umls/rxnorm"
-                  >
-                    RXNORM
-                  </option>
-                  <option
-                    value="http://loinc.org"
-                  >
-                    LOINC
-                  </option>
-                  <option
-                    value="http://cap.org/eCC"
-                  >
-                    ECC
-                  </option>
-                  <option
-                    value="http://snomed.info/sct"
-                  >
-                    SNOMED
-                  </option>
-                </select>
-              </div>
-            </div>
-          </div>
-          <div
-            class="codes"
-          >
-            <div
-              class="formSection__title"
-            >
-              <h2>
-                Codes
-              </h2>
-            </div>
-            <div
-              class="formSection__content"
-            >
-              <div
-                class="addCodeContainer"
-              >
-                <div
-                  class="addCodeRow formSection__input"
-                  data-testid="addCode-inputs"
-                >
-                  <div
-                    class="textInput"
-                  >
-                    <label
-                      for="code-id"
-                    >
-                      Code #
-                    </label>
-                    <input
-                      class="usa-input"
-                      data-testid="textInput"
-                      id="code-id-0"
-                      name="code-id"
-                      placeholder="1a"
-                      type="text"
-                      value="1a"
-                    />
-                  </div>
-                  <div
-                    class="textInput"
-                  >
-                    <label
-                      for="code-name"
-                    >
-                      Code name 
-                    </label>
-                    <input
-                      class="usa-input"
-                      data-testid="textInput"
-                      id="code-name-0"
-                      name="code-name"
-                      placeholder="One A"
-                      type="text"
-                      value="One A"
-                    />
-                  </div>
-                  <svg
-                    aria-label="Trash icon indicating deletion of code entry"
-                    class="usa-icon usa-icon--size-3 margin-bottom-1 deleteIcon"
-                    color="#919191"
-                    data-testid="delete-custom-code-[object Object]"
-                    focusable="false"
-                    height="1em"
-                    role="img"
-                    viewBox="0 0 24 24"
-                    width="1em"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"
-                    />
-                  </svg>
-                </div>
-                <div
-                  class="addCodeRow formSection__input"
-                  data-testid="addCode-inputs"
-                >
-                  <div
-                    class="textInput"
-                  >
-                    <label
-                      for="code-id"
-                    >
-                      Code #
-                    </label>
-                    <input
-                      class="usa-input"
-                      data-testid="textInput"
-                      id="code-id-1"
-                      name="code-id"
-                      placeholder="2b"
-                      type="text"
-                      value="2b"
-                    />
-                  </div>
-                  <div
-                    class="textInput"
-                  >
-                    <label
-                      for="code-name"
-                    >
-                      Code name 
-                    </label>
-                    <input
-                      class="usa-input"
-                      data-testid="textInput"
-                      id="code-name-1"
-                      name="code-name"
-                      placeholder="Two B"
-                      type="text"
-                      value="Two B"
-                    />
-                  </div>
-                  <svg
-                    aria-label="Trash icon indicating deletion of code entry"
-                    class="usa-icon usa-icon--size-3 margin-bottom-1 deleteIcon"
-                    color="#919191"
-                    data-testid="delete-custom-code-[object Object]"
-                    focusable="false"
-                    height="1em"
-                    role="img"
-                    viewBox="0 0 24 24"
-                    width="1em"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"
-                    />
-                  </svg>
-                </div>
-              </div>
-              <button
-                class="addCodeBtn"
-              >
-                + Add code
-              </button>
-            </div>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-</body>
-`;
-
-exports[`CustomValueSetForm renders an empty form to add a new value set 1`] = `
-<body>
-  <div>
-    <div>
-      <div
-        class="main-container__wide mainContainer customValueSetForm"
-      >
-        <a
-          aria-label="Back arrow indicating ability to navigate back a page if clicked"
-          class="back-link unchanged-color-on-visit text-no-underline"
+          class="back-link text-no-underline"
           data-testid="backArrowLink"
           href="#"
         >
@@ -406,7 +94,6 @@ exports[`CustomValueSetForm renders an empty form to add a new value set 1`] = `
                 >
                   <option
                     disabled=""
-                    selected=""
                     value=""
                   />
                   <option
@@ -435,14 +122,513 @@ exports[`CustomValueSetForm renders an empty form to add a new value set 1`] = `
                   Code system (Required)
                 </label>
                 <select
-                  class="usa-select filtersSelect"
+                  class="usa-select"
                   data-testid="Select"
                   id="code-system"
                   name="code-system"
                 >
                   <option
                     disabled=""
-                    selected=""
+                    value=""
+                  />
+                  <option
+                    value="http://hl7.org/fhir/sid/icd-10-cm"
+                  >
+                    ICD-10
+                  </option>
+                  <option
+                    value="http://hl7.org/fhir/sid/cvx"
+                  >
+                    CVX
+                  </option>
+                  <option
+                    value="http://www.nlm.nih.gov/research/umls/rxnorm"
+                  >
+                    RXNORM
+                  </option>
+                  <option
+                    value="http://loinc.org"
+                  >
+                    LOINC
+                  </option>
+                  <option
+                    value="http://cap.org/eCC"
+                  >
+                    ECC
+                  </option>
+                  <option
+                    value="http://snomed.info/sct"
+                  >
+                    SNOMED
+                  </option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div
+            class="codes"
+          >
+            <div
+              class="formSection__title"
+            >
+              <h2>
+                Codes
+              </h2>
+            </div>
+            <div
+              class="formSection__content"
+            >
+              <div
+                class="addCodeContainer"
+              >
+                <div
+                  class="addCodeRow formSection__input emptyCodeRow"
+                  data-testid="addCode-inputs"
+                >
+                  <div
+                    class="textInput"
+                  >
+                    <label
+                      for="code-id"
+                    >
+                      Code #
+                    </label>
+                    <input
+                      class="usa-input"
+                      data-testid="textInput"
+                      id="code-id-0"
+                      name="code-id"
+                      type="text"
+                      value=""
+                    />
+                  </div>
+                  <div
+                    class="textInput"
+                  >
+                    <label
+                      for="code-name"
+                    >
+                      Code name
+                    </label>
+                    <input
+                      class="usa-input"
+                      data-testid="textInput"
+                      id="code-name-0"
+                      name="code-name"
+                      type="text"
+                      value=""
+                    />
+                  </div>
+                  <svg
+                    aria-label="Trash icon indicating deletion of code entry"
+                    class="usa-icon usa-icon--size-3 margin-bottom-1 deleteIcon destructive-primary"
+                    data-testid="delete-custom-code-0"
+                    focusable="false"
+                    height="1em"
+                    role="img"
+                    viewBox="0 0 24 24"
+                    width="1em"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"
+                    />
+                  </svg>
+                </div>
+              </div>
+              <button
+                class="addCodeBtn"
+              >
+                + Add code
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</body>
+`;
+
+exports[`Create custom valueSet form switches to edit mode after saving a new value set 1`] = `
+<body>
+  <div>
+    <div>
+      <div
+        class="main-container__wide mainContainer customValueSetForm"
+      >
+        <a
+          aria-label="Back arrow indicating ability to navigate back a page if clicked"
+          class="back-link text-no-underline"
+          data-testid="backArrowLink"
+          href="#"
+        >
+          <svg
+            aria-label="Arrow point left indicating return to previous step"
+            class="usa-icon"
+            focusable="false"
+            height="1em"
+            role="img"
+            viewBox="0 0 24 24"
+            width="1em"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"
+            />
+          </svg>
+           
+          Return to Codes
+        </a>
+        <form>
+          <div
+            class="header"
+          >
+            <h1
+              class="title"
+            >
+              New value set
+            </h1>
+            <button
+              class="usa-button"
+              data-testid="button"
+              type="button"
+            >
+              Save value set
+            </button>
+          </div>
+          <div
+            class="formSection vsDescription"
+          >
+            <div
+              class="formSection__title"
+            >
+              <h2>
+                Value set description
+              </h2>
+            </div>
+            <div
+              class="formSection__content"
+            >
+              <div
+                class="formSection__input textInput"
+              >
+                <label
+                  for="vsName"
+                >
+                  Value set name 
+                  (Required)
+                </label>
+                <input
+                  class="usa-input"
+                  data-testid="textInput"
+                  id="vsName"
+                  name="vsName"
+                  type="text"
+                  value="some name"
+                />
+              </div>
+              <div
+                class="formSection__input dropdown"
+              >
+                <label
+                  for="category"
+                >
+                  Category (Required)
+                </label>
+                <select
+                  class="usa-select filtersSelect"
+                  data-testid="Select"
+                  id="category"
+                  name="Category"
+                >
+                  <option
+                    disabled=""
+                    value=""
+                  />
+                  <option
+                    value="labs"
+                  >
+                    Labs
+                  </option>
+                  <option
+                    value="conditions"
+                  >
+                    Conditions
+                  </option>
+                  <option
+                    value="medications"
+                  >
+                    Medications
+                  </option>
+                </select>
+              </div>
+              <div
+                class="formSection__input dropdown"
+              >
+                <label
+                  for="code-system"
+                >
+                  Code system (Required)
+                </label>
+                <select
+                  class="usa-select"
+                  data-testid="Select"
+                  id="code-system"
+                  name="code-system"
+                >
+                  <option
+                    disabled=""
+                    value=""
+                  />
+                  <option
+                    value="http://hl7.org/fhir/sid/icd-10-cm"
+                  >
+                    ICD-10
+                  </option>
+                  <option
+                    value="http://hl7.org/fhir/sid/cvx"
+                  >
+                    CVX
+                  </option>
+                  <option
+                    value="http://www.nlm.nih.gov/research/umls/rxnorm"
+                  >
+                    RXNORM
+                  </option>
+                  <option
+                    value="http://loinc.org"
+                  >
+                    LOINC
+                  </option>
+                  <option
+                    value="http://cap.org/eCC"
+                  >
+                    ECC
+                  </option>
+                  <option
+                    value="http://snomed.info/sct"
+                  >
+                    SNOMED
+                  </option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div
+            class="codes"
+          >
+            <div
+              class="formSection__title"
+            >
+              <h2>
+                Codes
+              </h2>
+            </div>
+            <div
+              class="formSection__content"
+            >
+              <div
+                class="addCodeContainer"
+              >
+                <div
+                  class="addCodeRow formSection__input emptyCodeRow"
+                  data-testid="addCode-inputs"
+                >
+                  <div
+                    class="textInput"
+                  >
+                    <label
+                      for="code-id"
+                    >
+                      Code #
+                    </label>
+                    <input
+                      class="usa-input"
+                      data-testid="textInput"
+                      id="code-id-0"
+                      name="code-id"
+                      type="text"
+                      value=""
+                    />
+                  </div>
+                  <div
+                    class="textInput"
+                  >
+                    <label
+                      for="code-name"
+                    >
+                      Code name
+                    </label>
+                    <input
+                      class="usa-input"
+                      data-testid="textInput"
+                      id="code-name-0"
+                      name="code-name"
+                      type="text"
+                      value=""
+                    />
+                  </div>
+                  <svg
+                    aria-label="Trash icon indicating deletion of code entry"
+                    class="usa-icon usa-icon--size-3 margin-bottom-1 deleteIcon destructive-primary"
+                    data-testid="delete-custom-code-0"
+                    focusable="false"
+                    height="1em"
+                    role="img"
+                    viewBox="0 0 24 24"
+                    width="1em"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"
+                    />
+                  </svg>
+                </div>
+              </div>
+              <button
+                class="addCodeBtn"
+              >
+                + Add code
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</body>
+`;
+
+exports[`Edit custom valueSet form renders a form to edit an existing value set 1`] = `
+<body>
+  <div>
+    <div>
+      <div
+        class="main-container__wide mainContainer customValueSetForm"
+      >
+        <a
+          aria-label="Back arrow indicating ability to navigate back a page if clicked"
+          class="back-link text-no-underline"
+          data-testid="backArrowLink"
+          href="#"
+        >
+          <svg
+            aria-label="Arrow point left indicating return to previous step"
+            class="usa-icon"
+            focusable="false"
+            height="1em"
+            role="img"
+            viewBox="0 0 24 24"
+            width="1em"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"
+            />
+          </svg>
+           
+          Return to Codes
+        </a>
+        <form>
+          <div
+            class="header"
+          >
+            <h1
+              class="title"
+            >
+              Edit value set
+            </h1>
+            <button
+              class="usa-button"
+              data-testid="button"
+              type="button"
+            >
+              Save changes
+            </button>
+          </div>
+          <div
+            class="formSection vsDescription"
+          >
+            <div
+              class="formSection__title"
+            >
+              <h2>
+                Value set description
+              </h2>
+            </div>
+            <div
+              class="formSection__content"
+            >
+              <div
+                class="formSection__input textInput"
+              >
+                <label
+                  for="vsName"
+                >
+                  Value set name 
+                  (Required)
+                </label>
+                <input
+                  class="usa-input"
+                  data-testid="textInput"
+                  id="vsName"
+                  name="vsName"
+                  type="text"
+                  value="Fruits"
+                />
+              </div>
+              <div
+                class="formSection__input dropdown"
+              >
+                <label
+                  for="category"
+                >
+                  Category (Required)
+                </label>
+                <select
+                  class="usa-select filtersSelect"
+                  data-testid="Select"
+                  id="category"
+                  name="Category"
+                >
+                  <option
+                    disabled=""
+                    value=""
+                  />
+                  <option
+                    value="labs"
+                  >
+                    Labs
+                  </option>
+                  <option
+                    value="conditions"
+                  >
+                    Conditions
+                  </option>
+                  <option
+                    value="medications"
+                  >
+                    Medications
+                  </option>
+                </select>
+              </div>
+              <div
+                class="formSection__input dropdown"
+              >
+                <label
+                  for="code-system"
+                >
+                  Code system (Required)
+                </label>
+                <select
+                  class="usa-select"
+                  data-testid="Select"
+                  id="code-system"
+                  name="code-system"
+                >
+                  <option
+                    disabled=""
                     value=""
                   />
                   <option
@@ -512,9 +698,8 @@ exports[`CustomValueSetForm renders an empty form to add a new value set 1`] = `
                       data-testid="textInput"
                       id="code-id-0"
                       name="code-id"
-                      placeholder=""
                       type="text"
-                      value=""
+                      value="1A"
                     />
                   </div>
                   <div
@@ -523,23 +708,129 @@ exports[`CustomValueSetForm renders an empty form to add a new value set 1`] = `
                     <label
                       for="code-name"
                     >
-                      Code name 
+                      Code name
                     </label>
                     <input
                       class="usa-input"
                       data-testid="textInput"
                       id="code-name-0"
                       name="code-name"
-                      placeholder=""
                       type="text"
-                      value=""
+                      value="Apple"
                     />
                   </div>
                   <svg
                     aria-label="Trash icon indicating deletion of code entry"
-                    class="usa-icon usa-icon--size-3 margin-bottom-1 deleteIcon"
-                    color="#919191"
-                    data-testid="delete-custom-code-[object Object]"
+                    class="usa-icon usa-icon--size-3 margin-bottom-1 deleteIcon destructive-primary"
+                    data-testid="delete-custom-code-0"
+                    focusable="false"
+                    height="1em"
+                    role="img"
+                    viewBox="0 0 24 24"
+                    width="1em"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"
+                    />
+                  </svg>
+                </div>
+                <div
+                  class="addCodeRow formSection__input"
+                  data-testid="addCode-inputs"
+                >
+                  <div
+                    class="textInput"
+                  >
+                    <label
+                      for="code-id"
+                    >
+                      Code #
+                    </label>
+                    <input
+                      class="usa-input"
+                      data-testid="textInput"
+                      id="code-id-1"
+                      name="code-id"
+                      type="text"
+                      value="1B"
+                    />
+                  </div>
+                  <div
+                    class="textInput"
+                  >
+                    <label
+                      for="code-name"
+                    >
+                      Code name
+                    </label>
+                    <input
+                      class="usa-input"
+                      data-testid="textInput"
+                      id="code-name-1"
+                      name="code-name"
+                      type="text"
+                      value="Bannana"
+                    />
+                  </div>
+                  <svg
+                    aria-label="Trash icon indicating deletion of code entry"
+                    class="usa-icon usa-icon--size-3 margin-bottom-1 deleteIcon destructive-primary"
+                    data-testid="delete-custom-code-1"
+                    focusable="false"
+                    height="1em"
+                    role="img"
+                    viewBox="0 0 24 24"
+                    width="1em"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"
+                    />
+                  </svg>
+                </div>
+                <div
+                  class="addCodeRow formSection__input"
+                  data-testid="addCode-inputs"
+                >
+                  <div
+                    class="textInput"
+                  >
+                    <label
+                      for="code-id"
+                    >
+                      Code #
+                    </label>
+                    <input
+                      class="usa-input"
+                      data-testid="textInput"
+                      id="code-id-2"
+                      name="code-id"
+                      type="text"
+                      value="1C"
+                    />
+                  </div>
+                  <div
+                    class="textInput"
+                  >
+                    <label
+                      for="code-name"
+                    >
+                      Code name
+                    </label>
+                    <input
+                      class="usa-input"
+                      data-testid="textInput"
+                      id="code-name-2"
+                      name="code-name"
+                      type="text"
+                      value="Coconut"
+                    />
+                  </div>
+                  <svg
+                    aria-label="Trash icon indicating deletion of code entry"
+                    class="usa-icon usa-icon--size-3 margin-bottom-1 deleteIcon destructive-primary"
+                    data-testid="delete-custom-code-2"
                     focusable="false"
                     height="1em"
                     role="img"

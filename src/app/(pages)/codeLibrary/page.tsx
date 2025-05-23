@@ -1,5 +1,5 @@
 "use client";
-import { useContext, useEffect, useMemo, useState } from "react";
+import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import classNames from "classnames";
 import {
   Alert,
@@ -20,16 +20,23 @@ import {
   getConditionsData,
 } from "@/app/shared/database-service";
 import { DibbsValueSet } from "@/app/models/entities/valuesets";
-import { CustomCodeMode, emptyFilterSearch, formatSystem } from "./utils";
+import { CustomCodeMode, emptyFilterSearch, emptyValueSet } from "./utils";
 import { ConditionsMap, formatDiseaseDisplay } from "../queryBuilding/utils";
 import Highlighter from "react-highlight-words";
 import Skeleton from "react-loading-skeleton";
-import { formatStringToSentenceCase } from "@/app/shared/format-service";
+import {
+  formatCodeSystemPrefix,
+  formatStringToSentenceCase,
+} from "@/app/shared/format-service";
 import DropdownFilter, { FilterCategories } from "./components/DropdownFilter";
 import CustomValueSetForm from "./components/CustomValueSetForm";
 import { User } from "@/app/models/entities/users";
 import { useSession } from "next-auth/react";
 import { getUserByUsername } from "@/app/backend/user-management";
+import { deleteCustomValueSet } from "@/app/shared/custom-code-service";
+import dynamic from "next/dynamic";
+import type { ModalProps, ModalRef } from "../../ui/designSystem/modal/Modal";
+import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 
 /**
  * Component for Query Building Flow
@@ -60,12 +67,21 @@ const CodeLibrary: React.FC = () => {
     }
     return val !== "";
   }).length;
+  const [isFiltered, setIsFiltered] = useState(false);
 
   const [conditionDetailsMap, setConditionsDetailsMap] =
     useState<ConditionsMap>();
   const [valueSets, setValueSets] = useState<DibbsValueSet[]>([]);
   const [filteredValueSets, setFilteredValueSets] = useState(valueSets);
-  const [activeValueSet, setActiveValueSet] = useState<DibbsValueSet>();
+  const [activeValueSet, setActiveValueSet] =
+    useState<DibbsValueSet>(emptyValueSet);
+
+  const modalRef = useRef<ModalRef>(null);
+
+  const Modal = dynamic<ModalProps>(
+    () => import("../../ui/designSystem/modal/Modal").then((mod) => mod.Modal),
+    { ssr: false },
+  );
 
   const ctx = useContext(DataContext);
   let totalPages = Math.ceil(filteredValueSets.length / itemsPerPage);
@@ -88,8 +104,6 @@ const CodeLibrary: React.FC = () => {
     if (mode == "manage" || mode == "select") {
       // fetch fresh value set details if we are changing TO manage/select mode
       await fetchValueSetsAndConditions().then(() => {
-        setTextSearch("");
-        setFilterSearch(emptyFilterSearch);
         setMode(mode);
       });
     } else {
@@ -103,6 +117,7 @@ const CodeLibrary: React.FC = () => {
   // update the current page details when switching between build steps
   useEffect(() => {
     ctx?.setCurrentPage(mode);
+    applyFilters();
   }, [mode]);
 
   // fetch value sets on page load
@@ -128,7 +143,7 @@ const CodeLibrary: React.FC = () => {
 
   // organize valuesets once they've loaded
   useEffect(() => {
-    setFilteredValueSets(valueSets);
+    applyFilters();
     setActiveValueSet(paginatedValueSets[0]);
 
     if (
@@ -140,8 +155,7 @@ const CodeLibrary: React.FC = () => {
     }
   }, [valueSets, conditionDetailsMap]);
 
-  // update display based on text search and filters
-  useEffect(() => {
+  const applyFilters = async () => {
     const matchCategory = (vs: DibbsValueSet) => {
       return filterSearch.category
         ? vs.dibbsConceptType === filterSearch.category
@@ -158,7 +172,6 @@ const CodeLibrary: React.FC = () => {
         ? Object.values(filterSearch.creators).flat().includes(vs.author)
         : vs;
     };
-
     setFilteredValueSets(
       valueSets
         .filter(handleTextSearch)
@@ -167,7 +180,28 @@ const CodeLibrary: React.FC = () => {
         .filter(matchCreators),
     );
 
+    const isFiltered = Object.entries(filterSearch).some(([key, val]) => {
+      let filterApplied = false;
+
+      if (key == "creators") {
+        filterApplied = !!val && Object.values(val).flat().length > 0;
+      } else {
+        filterApplied = val !== "";
+      }
+
+      return filterApplied;
+    });
+
+    textSearch !== "" || !!isFiltered
+      ? setIsFiltered(true)
+      : setIsFiltered(false);
+  };
+
+  // update display based on text search and filters
+  useEffect(() => {
+    applyFilters();
     setCurrentPage(1);
+
     if (textSearch == "") {
       return setActiveValueSet(valueSets?.[0]);
     } else {
@@ -200,16 +234,16 @@ const CodeLibrary: React.FC = () => {
     const matchesConceptType = vs.dibbsConceptType
       .toLocaleLowerCase()
       .includes(textSearch.toLocaleLowerCase());
-    const matchesSystem = vs.system
-      .toLocaleLowerCase()
-      .includes(textSearch.toLocaleLowerCase());
+    const matchesSystem =
+      vs.system &&
+      vs.system.toLocaleLowerCase().includes(textSearch.toLocaleLowerCase());
 
     return (
       matchesName || matchesConditionName || matchesConceptType || matchesSystem
     );
   };
 
-  const formatConditionDisplay = (conditionId: string | undefined) => {
+  const formatConditionDisplay = (conditionId: string) => {
     const conditionDetails =
       conditionId && conditionDetailsMap?.[conditionId].name;
 
@@ -218,7 +252,7 @@ const CodeLibrary: React.FC = () => {
 
   const formatValueSetDetails = (vs: DibbsValueSet) => {
     // extracts the system name from its url
-    const system = formatSystem(vs.system) || "";
+    const system = vs.system ? formatCodeSystemPrefix(vs.system) : "";
 
     // capitalizes the first letter and removes the last 's' from the type
     const conceptType = vs.dibbsConceptType
@@ -287,6 +321,37 @@ const CodeLibrary: React.FC = () => {
     ));
   };
 
+  const handleDeleteValueSet = async () => {
+    if (!activeValueSet) {
+      return;
+    }
+    setLoading(true);
+    try {
+      const result = await deleteCustomValueSet(activeValueSet);
+
+      if (result.success) {
+        await fetchValueSetsAndConditions();
+        showToastConfirmation({
+          body: `Value set "${activeValueSet.valueSetName}" successfully deleted.`,
+        });
+      } else {
+        showToastConfirmation({
+          variant: "error",
+          body: `Error: Could not remove value set "${activeValueSet.valueSetName}"`,
+        });
+      }
+    } catch (e) {
+      console.error(e);
+      showToastConfirmation({
+        variant: "error",
+        body: `Error: Could not remove value set "${activeValueSet.valueSetName}"`,
+      });
+    } finally {
+      modalRef.current?.toggleModal();
+      setLoading(false);
+    }
+  };
+
   const paginatedValueSets = useMemo(() => {
     setActiveValueSet(filteredValueSets[0]);
     return filteredValueSets.slice(
@@ -294,10 +359,6 @@ const CodeLibrary: React.FC = () => {
       currentPage * itemsPerPage,
     );
   }, [valueSets, filteredValueSets, currentPage, itemsPerPage]);
-
-  const isFiltered =
-    valueSets.length !== filteredValueSets.length ||
-    Object.values(filterSearch).some((filter) => filter !== "");
 
   const paginationText = `Showing ${
     totalPages === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1
@@ -327,11 +388,11 @@ const CodeLibrary: React.FC = () => {
               <Backlink onClick={goBack} label={"Back to My queries"} />
             )}
             <h1 className={styles.header__title}>Manage codes</h1>
-            <div className={styles.header__subtitle}>
+            {/* <div className={styles.header__subtitle}>
               Click on the checkbox to delete the value set or code
-            </div>
+            </div> */}
             <Alert
-              type="info"
+              type="warning"
               headingLevel="h4"
               noIcon={false}
               className={classNames("info-alert")}
@@ -479,22 +540,33 @@ const CodeLibrary: React.FC = () => {
                         >
                           <th>
                             <Button
-                              className={classNames(
-                                styles.editCodesBtn,
-                                "button-secondary",
-                              )}
+                              secondary
                               type="button"
                               onClick={() => handleChangeMode("edit")}
                             >
-                              Edit codes
+                              {activeValueSet.concepts?.length <= 0
+                                ? "Add codes"
+                                : "Edit codes"}
+                            </Button>
+                            <Button
+                              type="button"
+                              onClick={() => modalRef.current?.toggleModal()}
+                            >
+                              Delete value set
                             </Button>
                           </th>
                         </tr>
                       )}
-                      <tr className={styles.columnHeaders}>
-                        <th>Code</th>
-                        <th>Name</th>
-                      </tr>
+                      {activeValueSet.concepts.length == 0 ? (
+                        <tr className={styles.noCodesAvailable}>
+                          <th>There are no codes available.</th>
+                        </tr>
+                      ) : (
+                        <tr className={styles.columnHeaders}>
+                          <th>Code</th>
+                          <th>Name</th>
+                        </tr>
+                      )}
                     </thead>
                     <tbody
                       className={classNames(
@@ -581,9 +653,38 @@ const CodeLibrary: React.FC = () => {
         <CustomValueSetForm
           mode={mode}
           setMode={handleChangeMode}
-          activeValueSet={activeValueSet}
+          activeValueSet={
+            activeValueSet?.userCreated ? activeValueSet : emptyValueSet
+          }
         />
       )}
+      <Modal
+        id="delete-vs-modal"
+        heading="Delete value set"
+        modalRef={modalRef}
+        buttons={[
+          {
+            text: "Delete value set",
+            type: "button" as const,
+            id: "delete-vs-confirm",
+            className: classNames("usa-button", "usa-button--destructive"),
+            onClick: handleDeleteValueSet,
+          },
+          {
+            text: "Cancel",
+            type: "button" as const,
+            id: "delete-vs-cancel",
+            className: classNames(
+              "usa-button usa-button--outline",
+              styles.modalButtonCancel,
+            ),
+            onClick: () => modalRef.current?.toggleModal(),
+          },
+        ]}
+        // errorMessage?: string | null; // New prop for error message
+      >
+        {`Are you sure you want to delete the value set "${activeValueSet?.valueSetName}?" This action cannot be undone`}
+      </Modal>
     </WithAuth>
   );
 };

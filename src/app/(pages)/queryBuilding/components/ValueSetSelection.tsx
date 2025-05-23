@@ -31,6 +31,9 @@ import {
   ConceptTypeToDibbsVsMap,
 } from "@/app/utils/valueSetTranslation";
 import { CUSTOM_VALUESET_ARRAY_ID } from "@/app/shared/constants";
+import { useSaveQueryAndRedirect } from "../../../backend/query-building/useSaveQueryAndRedirect";
+import { useContext } from "react";
+import { DataContext } from "@/app/shared/DataProvider";
 
 type ConditionSelectionProps = {
   constructedQuery: NestedQuery;
@@ -69,6 +72,9 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
     );
   const [conditionSearchFilter, setConditionSearchFilter] = useState("");
   const [valueSetSearchFilter, setValueSetSearchFilter] = useState("");
+
+  const queryContext = useContext(DataContext);
+  const queryName = queryContext?.selectedQuery?.queryName;
 
   useEffect(() => {
     // display the first condition's valuesets on render
@@ -187,10 +193,13 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
     (vsMap) => Object.keys(vsMap).length > 0,
   );
 
+  // add button for customLibrary redirect
+  const saveQueryAndRedirect = useSaveQueryAndRedirect();
+
   return (
     <div
       className={classNames(
-        "bg-gray-5 margin-top-4 ",
+        "background-dark margin-top-4 ",
         styles.valueSetTemplateContainer,
       )}
     >
@@ -212,7 +221,6 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
                       aria-label="Plus sign icon indicating addition"
                       className="usa-icon"
                       size={3}
-                      color="#005EA2"
                     />
                     <span data-testid="add-left-rail">ADD</span>
                   </div>
@@ -249,9 +257,12 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
                           {formatDiseaseDisplay(condition.name)}
                         </div>
                         <Icon.Delete
-                          className={classNames("usa-icon", styles.deleteIcon)}
+                          className={classNames(
+                            "usa-icon",
+                            styles.deleteIcon,
+                            "destructive-primary",
+                          )}
                           size={5}
-                          color="red"
                           data-testid={`delete-condition-${conditionId}`}
                           aria-label="Trash icon indicating deletion of disease"
                           onClick={() => {
@@ -313,9 +324,13 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
                   <Button
                     type="button"
                     outline
-                    onClick={() => {
-                      window.location.href = "/codeLibrary";
-                    }}
+                    onClick={() =>
+                      saveQueryAndRedirect(
+                        constructedQuery,
+                        queryName,
+                        "/codeLibrary",
+                      )
+                    }
                   >
                     Add from code library
                   </Button>
@@ -343,7 +358,6 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
               <Icon.GridView
                 aria-label="Stylized icon showing four squares in a grid"
                 className={classNames("usa-icon", styles.icon)}
-                color="#919191"
               />
               <p className={styles.codeLibrary__emptyText}>
                 <strong>
@@ -356,7 +370,17 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
                   have created in the code library.
                 </strong>
               </p>
-              <Button className={styles.codeLibrary__button} type="button">
+              <Button
+                className={styles.codeLibrary__button}
+                type="button"
+                onClick={() =>
+                  saveQueryAndRedirect(
+                    constructedQuery,
+                    queryName,
+                    "/codeLibrary",
+                  )
+                }
+              >
                 Add from code library
               </Button>
             </div>

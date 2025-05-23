@@ -16,7 +16,7 @@ $drawerWidthWide: 60%;
   transition: right 0.3s ease;
   z-index: 1050;
   border-left: 1px solid $border;
-  background: $page-background;
+  background: $background;
   max-height: 100%;
   overflow-y: scroll;
 
@@ -36,7 +36,7 @@ $drawerWidthWide: 60%;
     align-items: center;
     gap: 0.5rem;
     border-radius: 0.25rem;
-    border: 1px solid $input-field-border;
+    border: 1px solid $border;
     background-color: $white;
   }
 }
@@ -83,7 +83,7 @@ $drawerWidthWide: 60%;
 }
 
 .subtitle {
-  color: $gray-600;
+  color: $text-secondary;
   display: flex;
   padding-top: 1rem;
   padding-bottom: 1rem;

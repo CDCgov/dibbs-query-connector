@@ -34,11 +34,16 @@ export const handleDelete = async (
       );
       setQueries(updatedQueries);
 
-      if (context) {
+      if (context?.setData) {
         context.setData(updatedQueries);
       }
     } else {
-      console.error(result.error);
+      showToastConfirmation({
+        heading: `Something went wrong`,
+        body: `${queryName} couldn't be deleted. Please try again or contact us if the error persists`,
+        variant: "error",
+        duration: 2000,
+      });
     }
   } else {
     showToastConfirmation({
@@ -106,7 +111,7 @@ export const renderModal = (
     queryId: string | undefined,
     queries: CustomUserQuery[],
     setQueries: React.Dispatch<React.SetStateAction<CustomUserQuery[]>>,
-    context: DataContextValue,
+    context: DataContextValue | undefined,
   ) => void,
   queries: CustomUserQuery[],
   setQueries: React.Dispatch<React.SetStateAction<CustomUserQuery[]>>,
@@ -129,7 +134,6 @@ export const renderModal = (
             setQueries,
             context,
           );
-
           setSelectedQuery({ queryName: undefined, queryId: undefined });
         }
       }}

@@ -12,8 +12,11 @@ import {
   DibbsConceptType,
   DibbsValueSet,
 } from "@/app/models/entities/valuesets";
-import { formatStringToSentenceCase } from "@/app/shared/format-service";
-import { emptyFilterSearch, formatSystem } from "../utils";
+import {
+  formatCodeSystemPrefix,
+  formatStringToSentenceCase,
+} from "@/app/shared/format-service";
+import { emptyFilterSearch } from "../utils";
 import { User } from "@/app/models/entities/users";
 import {
   getAllGroupMembers,
@@ -36,7 +39,7 @@ type DropdownFilterProps = {
   currentUser: User;
 };
 export type vsAuthorMap = {
-  [name: string]: string[];
+  [groupName: string]: string[];
 };
 /**
  * @param root0 props
@@ -64,7 +67,7 @@ const DropdownFilter: React.FC<DropdownFilterProps> = ({
       return array.indexOf(item) === index;
     });
 
-  const [myTeamMembers, setMyTeamMembers] = useState<User[]>();
+  const [myTeamMembers, setMyTeamMembers] = useState<vsAuthorMap>();
 
   const [groupAuthors, setGroupAuthors] = useState<vsAuthorMap>({});
   const [valueSetCreators, setValueSetCreators] = useState<vsAuthorMap>({});
@@ -73,34 +76,45 @@ const DropdownFilter: React.FC<DropdownFilterProps> = ({
     async function mapUsersToGroups() {
       const groups = await getAllUserGroups();
       const authors: vsAuthorMap = {};
-
       groups.items.map((group) => {
-        const memberIds =
+        const members =
           group.members?.map((member) =>
             member.firstName && member.lastName
               ? `${member.firstName} ${member.lastName}`
               : `${member.username}`,
           ) || [];
-        return (authors[group.name] = memberIds);
+
+        authors[group.name] = members;
+        return authors;
       });
 
       setGroupAuthors(authors);
     }
 
     async function fetchTeammates() {
+      const myTeam: {
+        [groupName: string]: string[];
+      } = {};
+
       const myGroups = currentUser.userGroupMemberships || [];
-      const groupMembers = await Promise.all(
-        myGroups &&
-          myGroups
-            .map(async (group) => {
-              const teammates = await getAllGroupMembers(group.usergroupId);
-              return teammates.items;
-            })
-            .flat(),
+
+      await Promise.all(
+        myGroups.map(async (group) => {
+          const teammates = await getAllGroupMembers(group.usergroupId);
+          const foo = teammates.items.map((user) =>
+            user.firstName && user.lastName
+              ? `${user.firstName} ${user.lastName}`
+              : `${user.username}`,
+          );
+
+          myTeam[group.usergroupName] = foo;
+          return;
+        }),
       );
-      const myTeam = groupMembers.flat();
+
       setMyTeamMembers(myTeam);
     }
+
     fetchTeammates();
     mapUsersToGroups();
   }, []);
@@ -115,6 +129,9 @@ const DropdownFilter: React.FC<DropdownFilterProps> = ({
       Object.entries(groupAuthors).forEach(([key, val]) => {
         valueSetAuthors[key] = val;
       });
+
+      valueSetAuthors["My Team(s)"] =
+        (myTeamMembers && Object.values(myTeamMembers).flat()) || [];
       setValueSetCreators(valueSetAuthors);
     }
   }, [groupAuthors]);
@@ -127,22 +144,15 @@ const DropdownFilter: React.FC<DropdownFilterProps> = ({
     conditions: "conditions",
   };
 
-  const filterByShortcut = (users: User[]) => {
-    const creators: vsAuthorMap = {};
-    users.map((user) => {
-      user.firstName && user.lastName
-        ? (creators[`${user.firstName} ${user.lastName}`] = [
-            `${user.firstName} ${user.lastName}`,
-          ])
-        : (creators[user.username] = [user.username]);
-    });
-
+  const filterByShortcut = (userIndex: string) => {
     setFilterSearch({
       ...filterSearch,
       creators:
-        Object.values(creators).length > 0
-          ? creators
-          : { "No creators to filter": ["No creators to filter"] },
+        valueSetCreators[userIndex].length > 0
+          ? { [userIndex]: valueSetCreators[userIndex] }
+          : {
+              "": ["No creators to filter"],
+            },
     });
   };
 
@@ -186,7 +196,7 @@ const DropdownFilter: React.FC<DropdownFilterProps> = ({
             value={filterSearch.category}
             disabled={!!loading}
           >
-            <option value="" disabled></option>
+            <option value=""></option>
             {Object.keys(valueSetCategories).map((category) => {
               return (
                 <option key={category} value={category}>
@@ -212,11 +222,11 @@ const DropdownFilter: React.FC<DropdownFilterProps> = ({
             value={filterSearch.codeSystem}
             disabled={!!loading}
           >
-            {<option value="" disabled></option>}
+            {<option value=""></option>}
             {valueSetCodeSystems.map((codeSystem) => {
               return (
                 <option key={codeSystem} value={codeSystem}>
-                  {formatSystem(codeSystem)}
+                  {formatCodeSystemPrefix(codeSystem || "")}
                 </option>
               );
             })}
@@ -241,7 +251,7 @@ const DropdownFilter: React.FC<DropdownFilterProps> = ({
             value={Object.keys(filterSearch.creators)[0]}
             disabled={!!loading}
           >
-            <option value="" disabled></option>
+            <option value=""></option>
             {valueSetCreators &&
               Object.keys(valueSetCreators).map((key) => {
                 return (
@@ -258,7 +268,11 @@ const DropdownFilter: React.FC<DropdownFilterProps> = ({
         <button
           onClick={(e) => {
             e.preventDefault();
-            filterByShortcut([currentUser]);
+            filterByShortcut(
+              currentUser.firstName && currentUser.lastName
+                ? `${currentUser.firstName} ${currentUser.lastName}`
+                : `${currentUser.username}`,
+            );
           }}
         >
           Created by me
@@ -266,9 +280,8 @@ const DropdownFilter: React.FC<DropdownFilterProps> = ({
         <button
           onClick={async (e) => {
             e.preventDefault();
-            myTeamMembers &&
-              myTeamMembers.length > 0 &&
-              filterByShortcut(myTeamMembers as User[]);
+
+            filterByShortcut("My Team(s)");
           }}
         >
           Created by my team

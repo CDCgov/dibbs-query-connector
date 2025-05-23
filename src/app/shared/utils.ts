@@ -1,5 +1,6 @@
 import { QueryResultRow } from "pg";
 import { DibbsValueSet } from "../models/entities/valuesets";
+import { Concept } from "../models/entities/concepts";
 
 /**
  * Maps the results returned from the DIBBs value set and coding system database
@@ -14,7 +15,20 @@ export const groupConditionConceptsIntoValueSets = (rows: QueryResultRow[]) => {
     if (!(r["valueset_id"] in conceptsByVSId)) {
       conceptsByVSId[r["valueset_id"]] = [];
     }
-    conceptsByVSId[r["valueset_id"]].push(r);
+
+    // if we already added the concept, don't add it again
+    // this prevents errors that occur on the code library page
+    // due to value sets that are affiliated with multiple
+    // conditions. For query building, we call this on an already-filtered
+    // list of value sets for a single condition, so that behavior stays the same.
+    if (
+      !conceptsByVSId[r["valueset_id"]].some(
+        (item: Concept) => item.code == r.code,
+      )
+    ) {
+      conceptsByVSId[r["valueset_id"]].push(r);
+    }
+
     return conceptsByVSId;
   }, {});
 
@@ -41,6 +55,8 @@ function mapStoredValueSetIntoInternalValueset(
   // For info that should be the same at the valueset-level, just use the first
   // fetched concept to populate
   const storedConcept = conceptGroup[0];
+  const nonEmptyConcepts = conceptGroup.filter((c) => c["code"] !== null);
+
   const valueSet: DibbsValueSet = {
     valueSetId: storedConcept["valueset_id"],
     valueSetVersion: storedConcept["version"],
@@ -61,7 +77,7 @@ function mapStoredValueSetIntoInternalValueset(
       .every((v) => v === false)
       ? false
       : true,
-    concepts: conceptGroup.map((c) => {
+    concepts: nonEmptyConcepts.map((c) => {
       return {
         code: c["code"],
         display: c["display"],
@@ -71,10 +87,15 @@ function mapStoredValueSetIntoInternalValueset(
     }),
     userCreated: storedConcept["user_created"] ?? false,
   };
+
   const conditionId = storedConcept["condition_id"];
   if (conditionId) {
     valueSet["conditionId"] = conditionId;
   }
+  if (conditionId == "custom_condition") {
+    valueSet["userCreated"] = true;
+  }
+
   return valueSet;
 }
 
