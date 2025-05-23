@@ -26,7 +26,7 @@ switch (process.env.NEXT_PUBLIC_AUTH_PROVIDER) {
     console.error(
       "Configured IdP doesn't match existing options. Please check the setup in your environment settings",
     );
-    console.error("Falling back to Keycloak strategy");
+    console.error("Falling back to Keycloak setup");
     authStrategy = new KeycloakAuthStrategy();
     const fallbackProvider = authStrategy.setUpNextAuthProvider();
     providers.push(fallbackProvider);
