@@ -7,6 +7,7 @@ import {
   KeycloakAuthStrategy,
   MicrosoftEntraAuthStrategy,
 } from "./app/backend/auth/lib";
+import { UserRole } from "./app/models/entities/users";
 
 let providers = [];
 let authStrategy: AuthStrategy;
@@ -44,6 +45,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       let extendedToken = authContext.extendTokenWithExpirationTime(token);
       // IdP response doesn't have extra user token info (ie after initial sign in).
       // Just return token with extended expiry info
+
       if (!account || !profile) {
         return extendedToken;
       }
@@ -53,6 +55,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         account,
         profile,
       );
+
+      console.log("user token");
+      console.log(userToken);
 
       try {
         await addUserIfNotExists(userToken);
@@ -83,7 +88,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         firstName: token.firstName || "",
         lastName: token.lastName || "",
         emailVerified: null,
-        role: token.role || "",
+        role: (token.qcRole as UserRole) || UserRole.STANDARD,
       };
 
       session.expiresIn = token.expiresIn;
