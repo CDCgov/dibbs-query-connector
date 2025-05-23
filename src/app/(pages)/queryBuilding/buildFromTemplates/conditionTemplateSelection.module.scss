@@ -8,7 +8,21 @@
   margin-bottom: 0 !important;
   max-width: 70rem !important;
 }
+input.errorMessage {
+  border: 2px solid $error-dark;
+}
+.errorMessage {
+  display: flex;
+  align-items: center;
+  color: $error-dark;
+  margin-top: 0.25rem;
+  line-height: 1.25rem;
 
+  svg {
+    margin-right: 0.25rem;
+    margin-bottom: 2.5px;
+  }
+}
 // Condition styles
 
 .templateContainer {
@@ -164,6 +178,9 @@
 .valueSetTemplate__search {
   padding: 1.5rem;
   border-bottom: 1px $border solid;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .accordionContainer {

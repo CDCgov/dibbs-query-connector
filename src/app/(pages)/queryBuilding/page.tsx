@@ -24,6 +24,10 @@ const QueryBuilding: React.FC = () => {
   }, [buildStep]);
 
   useEffect(() => {
+    if (queryContext.selectedQuery?.pageMode) {
+      setBuildStep(queryContext.selectedQuery.pageMode as BuildStep);
+    }
+
     queryContext.setToastConfig({
       position: "bottom-left",
       stacked: true,

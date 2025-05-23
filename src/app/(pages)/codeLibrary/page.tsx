@@ -37,6 +37,13 @@ import { deleteCustomValueSet } from "@/app/shared/custom-code-service";
 import dynamic from "next/dynamic";
 import type { ModalProps, ModalRef } from "../../ui/designSystem/modal/Modal";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
+import { getSavedQueryById } from "@/app/backend/query-building/service";
+import { insertCustomValuesetsIntoQuery } from "@/app/shared/custom-code-service";
+import { QueryTableResult } from "../queryBuilding/utils";
+import Checkbox from "@/app/ui/designSystem/checkbox/Checkbox";
+import { useSaveQueryAndRedirect } from "@/app/backend/query-building/useSaveQueryAndRedirect";
+import { EMPTY_CONCEPT_TYPE } from "../queryBuilding/utils";
+import { NestedQuery } from "../queryBuilding/utils";
 
 /**
  * Component for Query Building Flow
@@ -45,9 +52,13 @@ import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 const CodeLibrary: React.FC = () => {
   // -------- component state -------- //
   // --------------------------------- //
-  const [loading, setLoading] = useState<boolean>(true);
-  const [mode, setMode] = useState<CustomCodeMode>("manage");
+  const ctx = useContext(DataContext);
 
+  const [loading, setLoading] = useState<boolean>(true);
+  const [mode, setMode] = useState<CustomCodeMode>(
+    (ctx?.selectedQuery?.pageMode as CustomCodeMode) || "manage",
+  );
+  const [prevPage, setPrevPage] = useState("");
   const { data: session } = useSession();
   const username = session?.user?.username || "";
   const [currentUser, setCurrentUser] = useState<User>();
@@ -83,7 +94,124 @@ const CodeLibrary: React.FC = () => {
     { ssr: false },
   );
 
-  const ctx = useContext(DataContext);
+  // get the query data from the context
+  const selectedQuery = ctx?.selectedQuery;
+  const queryName = selectedQuery?.queryName ?? "query";
+
+  // ---------- checkbox management state --------- //
+  // Get custom value sets from context (assume structure: queryData.custom = { [valueSetId]: DibbsValueSet })
+  const [customCodeIds, setCustomCodeIds] = useState<{
+    [vsId: string]: DibbsValueSet;
+  }>({});
+  // initialize any existing custom value sets
+  useEffect(() => {
+    if (!selectedQuery?.queryId) return;
+    getSavedQueryById(selectedQuery.queryId).then(
+      (query: QueryTableResult | undefined) => {
+        // Only hydrate previous selections
+        const queryCustom =
+          (query?.queryData?.custom as {
+            [vsId: string]: DibbsValueSet & { includeValueSet?: boolean };
+          }) || {};
+        setCustomCodeIds(queryCustom);
+      },
+    );
+  }, [selectedQuery?.queryId]);
+
+  const handleValueSetToggle = (vsId: string, checked: boolean) => {
+    setCustomCodeIds((prev) => {
+      const valueSet =
+        prev[vsId] ?? valueSets.find((vs) => vs.valueSetId === vsId);
+      if (!valueSet) return prev;
+      return {
+        ...prev,
+        [vsId]: {
+          ...valueSet,
+          includeValueSet: checked,
+          concepts: valueSet.concepts.map((c) => ({ ...c, include: checked })),
+        },
+      };
+    });
+  };
+
+  const handleConceptToggle = (
+    vsId: string,
+    code: string,
+    checked: boolean,
+  ) => {
+    setCustomCodeIds((prev) => {
+      const vs = prev[vsId];
+      if (!vs) {
+        // Seed only the toggled concept
+        const valueSet = valueSets.find((vs) => vs.valueSetId === vsId);
+        if (!valueSet) return prev;
+        return {
+          ...prev,
+          [vsId]: {
+            ...valueSet,
+            includeValueSet: checked,
+            concepts: valueSet.concepts.map((c) =>
+              c.code === code
+                ? { ...c, include: checked }
+                : { ...c, include: false },
+            ),
+          },
+        };
+      } else {
+        // Update only the toggled concept
+        const newConcepts = vs.concepts.map((c) =>
+          c.code === code ? { ...c, include: checked } : c,
+        );
+        const includeValueSet = newConcepts.some((c) => c.include);
+        return {
+          ...prev,
+          [vsId]: {
+            ...vs,
+            includeValueSet,
+            concepts: newConcepts,
+          },
+        };
+      }
+    });
+  };
+
+  const handleAddToQuery = async () => {
+    if (!ctx?.selectedQuery?.queryId || !currentUser) return null;
+    const setsToAdd = Object.values(customCodeIds);
+    const result = await insertCustomValuesetsIntoQuery(
+      currentUser.id,
+      setsToAdd,
+      ctx.selectedQuery.queryId,
+    );
+    if (result.success) {
+      const updatedQuery = await getSavedQueryById(ctx.selectedQuery.queryId);
+      let constructedQuery: NestedQuery = {};
+      if (updatedQuery?.queryData) {
+        Object.entries(
+          updatedQuery.queryData as Record<
+            string,
+            Record<string, DibbsValueSet>
+          >,
+        ).forEach(([conditionId, valueSetMap]) => {
+          constructedQuery[conditionId] = structuredClone(EMPTY_CONCEPT_TYPE);
+          Object.entries(valueSetMap).forEach(([vsId, dibbsVs]) => {
+            constructedQuery[conditionId][dibbsVs.dibbsConceptType][vsId] =
+              dibbsVs;
+          });
+        });
+      }
+
+      if (updatedQuery && ctx?.setSelectedQuery) {
+        ctx.setSelectedQuery(updatedQuery);
+      }
+      showToastConfirmation({ body: "The query has been saved." });
+      return constructedQuery;
+    } else {
+      showToastConfirmation({ body: "Failed to add codes", variant: "error" });
+      return null;
+    }
+  };
+
   let totalPages = Math.ceil(filteredValueSets.length / itemsPerPage);
 
   async function fetchValueSetsAndConditions() {
@@ -116,7 +244,8 @@ const CodeLibrary: React.FC = () => {
 
   // update the current page details when switching between build steps
   useEffect(() => {
-    ctx?.setCurrentPage(mode);
+    setPrevPage(ctx?.currentPage || "");
+    setMode(mode);
     applyFilters();
   }, [mode]);
 
@@ -211,13 +340,16 @@ const CodeLibrary: React.FC = () => {
 
   // ---- page interaction/display ---- //
   // --------------------------------- //
+  const saveQueryAndRedirect = useSaveQueryAndRedirect();
+
   function goBack() {
-    // TODO: this will need to be handled differently
-    // depending on how we arrived at this page:
-    // from gear menu: no backnav
-    // from "start from scratch": back to templates
-    // from hybrid/query building: back to query
-    console.log("do a backnav thing");
+    ctx?.selectedQuery &&
+      saveQueryAndRedirect(
+        {},
+        ctx?.selectedQuery?.queryName,
+        "/queryBuilding",
+        prevPage,
+      );
   }
 
   const handleTextSearch = (vs: DibbsValueSet) => {
@@ -272,53 +404,74 @@ const CodeLibrary: React.FC = () => {
   };
 
   const renderValueSetRows = () => {
-    return paginatedValueSets.map((vs, index) => (
-      <tr
-        key={index}
-        className={classNames(
-          styles.valueSetTable__tableBody_row,
-          vs?.valueSetId == activeValueSet?.valueSetId
-            ? styles.activeValueSet
-            : "",
-        )}
-        onClick={() => setActiveValueSet(vs)}
-      >
-        <td>
-          {/* TODO: build out search to include match on code terms within a value set? */}
-          <div className={styles.valueSetTable__tableBody_row_details}>
-            <Highlighter
-              className={styles.valueSetTable__tableBody_row_valueSetName}
-              highlightClassName="searchHighlight"
-              searchWords={[textSearch]}
-              autoEscape={true}
-              textToHighlight={vs.valueSetName}
-            />
-            <Highlighter
-              className={styles.valueSetTable__tableBody_row_valueSetDetails}
-              highlightClassName="searchHighlight"
-              searchWords={[textSearch]}
-              autoEscape={true}
-              textToHighlight={formatValueSetDetails(vs)}
-            />
-            {vs.userCreated && (
+    return paginatedValueSets.map((vs, _i) => {
+      const vsState = customCodeIds[vs.valueSetId];
+      const concepts = vsState?.concepts || [];
+      const checkedCount = concepts.filter((c) => c.include).length;
+      const totalCount = concepts.length;
+      const allChecked = checkedCount === totalCount && totalCount > 0;
+      const minusState = checkedCount > 0 && checkedCount < totalCount;
+
+      return (
+        <tr
+          key={vs.valueSetId}
+          className={classNames(
+            styles.valueSetTable__tableBody_row,
+            vs?.valueSetId == activeValueSet?.valueSetId
+              ? styles.activeValueSet
+              : "",
+          )}
+          onClick={() => setActiveValueSet(vs)}
+        >
+          <td>
+            {mode === "select" && (
+              <Checkbox
+                id={`valueset-checkbox-${vs.valueSetId}`}
+                checked={allChecked}
+                isMinusState={minusState}
+                onChange={(e) => {
+                  e.stopPropagation();
+                  handleValueSetToggle(vs.valueSetId, e.target.checked);
+                }}
+                aria-label={`Select value set ${vs.valueSetName}`}
+                className={styles.valueSetCheckbox}
+              />
+            )}
+            <div className={styles.valueSetTable__tableBody_row_details}>
               <Highlighter
-                className={styles.valueSetTable__tableBody_row_customValueSet}
+                className={styles.valueSetTable__tableBody_row_valueSetName}
                 highlightClassName="searchHighlight"
                 searchWords={[textSearch]}
                 autoEscape={true}
-                textToHighlight={`Created by ${vs.author}`}
+                textToHighlight={vs.valueSetName}
               />
-            )}
-          </div>
-          <div>
-            <Icon.NavigateNext
-              aria-label="Right chevron indicating additional content"
-              size={4}
-            />
-          </div>
-        </td>
-      </tr>
-    ));
+              <Highlighter
+                className={styles.valueSetTable__tableBody_row_valueSetDetails}
+                highlightClassName="searchHighlight"
+                searchWords={[textSearch]}
+                autoEscape={true}
+                textToHighlight={formatValueSetDetails(vs)}
+              />
+              {vs.userCreated && (
+                <Highlighter
+                  className={styles.valueSetTable__tableBody_row_customValueSet}
+                  highlightClassName="searchHighlight"
+                  searchWords={[textSearch]}
+                  autoEscape={true}
+                  textToHighlight={`Created by ${vs.author}`}
+                />
+              )}
+            </div>
+            <div>
+              <Icon.NavigateNext
+                aria-label="Right chevron indicating additional content"
+                size={4}
+              />
+            </div>
+          </td>
+        </tr>
+      );
+    });
   };
 
   const handleDeleteValueSet = async () => {
@@ -377,20 +530,29 @@ const CodeLibrary: React.FC = () => {
   // -------------------------------- //
   return (
     <WithAuth>
-      {mode == "manage" && (
+      {(mode == "manage" || mode == "select") && (
         <div
           className={classNames("main-container__wide", styles.mainContainer)}
         >
           <div className={styles.header}>
-            {mode === "manage" ? (
-              <Backlink onClick={() => {}} label={"Back to Query library"} />
-            ) : (
-              <Backlink onClick={goBack} label={"Back to My queries"} />
+            {mode !== "manage" && (
+              <Backlink
+                onClick={goBack}
+                label={`Back to ${
+                  prevPage == "condition" ? "Create query" : "templates"
+                }`}
+              />
             )}
-            <h1 className={styles.header__title}>Manage codes</h1>
-            {/* <div className={styles.header__subtitle}>
-              Click on the checkbox to delete the value set or code
-            </div> */}
+            <h1 className={styles.header__title}>
+              {mode == "manage"
+                ? "Manage codes"
+                : `Select codes for "${queryName}"`}
+            </h1>
+            {mode == "select" && (
+              <div className={styles.header__subtitle}>
+                Check the box to add the value set or code to the query.
+              </div>
+            )}
             <Alert
               type="warning"
               headingLevel="h4"
@@ -421,38 +583,80 @@ const CodeLibrary: React.FC = () => {
                 )}
                 onClick={() => setShowFilters(true)}
               >
-                <Icon.FilterList
-                  className="usa-icon qc-filter"
-                  size={3}
-                  aria-label="Icon indicating a menu with filter options"
-                  role="icon"
-                />
-                {filterCount <= 0
-                  ? "Filters"
-                  : `${filterCount} ${
-                      filterCount > 1 ? `filters` : `filter`
-                    } applied`}
-                {showFilters && (
-                  <DropdownFilter
-                    filterCount={filterCount}
-                    loading={loading}
-                    setShowFilters={setShowFilters}
-                    filterSearch={filterSearch}
-                    setFilterSearch={setFilterSearch}
-                    valueSets={valueSets}
-                    currentUser={currentUser as User}
-                  />
-                )}
+                {
+                  <div>
+                    <Icon.FilterList
+                      className="usa-icon qc-filter"
+                      size={3}
+                      aria-label="Icon indicating a menu with filter options"
+                      role="icon"
+                    />
+                    {filterCount <= 0
+                      ? "Filters"
+                      : `${filterCount} ${
+                          filterCount > 1 ? `filters` : `filter`
+                        } applied`}
+                    {showFilters && (
+                      <DropdownFilter
+                        filterCount={filterCount}
+                        loading={loading}
+                        setShowFilters={setShowFilters}
+                        filterSearch={filterSearch}
+                        setFilterSearch={setFilterSearch}
+                        valueSets={valueSets}
+                        currentUser={currentUser as User}
+                      />
+                    )}
+                  </div>
+                }
               </div>
             </div>
-
-            <Button
-              type="button"
-              className={styles.button}
-              onClick={() => handleChangeMode("create")}
-            >
-              Add value set
-            </Button>
+            {mode == "manage" && (
+              <Button
+                type="button"
+                className={styles.button}
+                onClick={() => handleChangeMode("create")}
+              >
+                Add value set
+              </Button>
+            )}
+            {mode == "select" && (
+              <>
+                <p>
+                  <em>Don't see your code listed? </em>
+                  <Button
+                    type="button"
+                    unstyled
+                    className={styles.manageCodesLink}
+                    onClick={() => {
+                      handleChangeMode("manage");
+                    }}
+                  >
+                    Manage codes
+                  </Button>
+                </p>
+                <Button
+                  type="button"
+                  // TODO: What contexts should it actually be disabled?
+                  // disabled={
+                  //   !customCodeIds || Object.keys(customCodeIds).length <= 0
+                  // }
+                  className={styles.button}
+                  onClick={async () => {
+                    const constructedQuery = await handleAddToQuery();
+                    if (!constructedQuery) return;
+                    await saveQueryAndRedirect(
+                      constructedQuery,
+                      queryName,
+                      "/queryBuilding",
+                      "valueset",
+                    );
+                  }}
+                >
+                  Next: Update query
+                </Button>
+              </>
+            )}
           </div>
 
           <div className={styles.content}>
@@ -479,7 +683,11 @@ const CodeLibrary: React.FC = () => {
                       styles.overflowScroll,
                       styles.valueSetTable__tableBody,
                     )}
-                    data-testid="table-valuesets"
+                    data-testid={
+                      mode === "manage"
+                        ? "table-valuesets-manage"
+                        : "table-valuesets-select"
+                    }
                   >
                     {loading && paginatedValueSets.length <= 0 ? (
                       <tr
@@ -523,38 +731,57 @@ const CodeLibrary: React.FC = () => {
                         styles.conceptsTable__header,
                       )}
                     >
-                      {!activeValueSet.userCreated ? (
-                        <tr className={styles.lockedForEdits}>
-                          <th>
-                            <Icon.Lock
-                              role="icon"
-                              className="qc-lock"
-                            ></Icon.Lock>
-                            {`This value set comes from ${valueSetSource} and cannot be
+                      {mode == "manage" && (
+                        <>
+                          {!activeValueSet.userCreated ? (
+                            <tr className={styles.lockedForEdits}>
+                              <th>
+                                <Icon.Lock
+                                  role="icon"
+                                  className="qc-lock"
+                                ></Icon.Lock>
+                                {`This value set comes from ${valueSetSource} and cannot be
                           modified.`}
-                          </th>
-                        </tr>
-                      ) : (
+                              </th>
+                            </tr>
+                          ) : (
+                            <tr
+                              className={
+                                styles.conceptsTable__header_sectionHeader
+                              }
+                            >
+                              <th>
+                                <Button
+                                  className={classNames(
+                                    styles.editCodesBtn,
+                                    "button-secondary",
+                                  )}
+                                  type="button"
+                                  onClick={() => handleChangeMode("edit")}
+                                >
+                                  {activeValueSet.concepts?.length <= 0
+                                    ? "Add codes"
+                                    : "Edit codes"}
+                                </Button>
+                                <Button
+                                  className={styles.deleteValueSet}
+                                  type="button"
+                                  onClick={() =>
+                                    modalRef.current?.toggleModal()
+                                  }
+                                >
+                                  Delete value set
+                                </Button>
+                              </th>
+                            </tr>
+                          )}
+                        </>
+                      )}
+                      {mode == "select" && (
                         <tr
-                          className={styles.conceptsTable__header_sectionHeader}
+                          className={styles.valueSetTable__header_sectionHeader}
                         >
-                          <th>
-                            <Button
-                              secondary
-                              type="button"
-                              onClick={() => handleChangeMode("edit")}
-                            >
-                              {activeValueSet.concepts?.length <= 0
-                                ? "Add codes"
-                                : "Edit codes"}
-                            </Button>
-                            <Button
-                              type="button"
-                              onClick={() => modalRef.current?.toggleModal()}
-                            >
-                              Delete value set
-                            </Button>
-                          </th>
+                          <th>{"Codes".toLocaleUpperCase()}</th>
                         </tr>
                       )}
                       {activeValueSet.concepts.length == 0 ? (
@@ -568,41 +795,101 @@ const CodeLibrary: React.FC = () => {
                         </tr>
                       )}
                     </thead>
-                    <tbody
-                      className={classNames(
-                        activeValueSet?.userCreated
-                          ? styles.overflowScroll
-                          : styles.overflowScroll_headerLocked,
-                        styles.conceptsTable__tableBody,
-                      )}
-                      data-testid="table-codes"
-                    >
-                      {activeValueSet?.concepts.map((vs) => (
-                        <tr
-                          key={vs.code}
-                          className={classNames(
-                            styles.conceptsTable__tableBody_row,
-                          )}
-                        >
-                          <td className={styles.valueSetCode}>
-                            <Highlighter
-                              highlightClassName="searchHighlight"
-                              searchWords={[textSearch]}
-                              autoEscape={true}
-                              textToHighlight={vs.code}
-                            />
-                          </td>
-                          <td>
-                            <Highlighter
-                              highlightClassName="searchHighlight"
-                              searchWords={[textSearch]}
-                              autoEscape={true}
-                              textToHighlight={vs.display}
-                            />
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
+                    {mode == "manage" && (
+                      <tbody
+                        className={classNames(
+                          activeValueSet?.userCreated
+                            ? styles.overflowScroll
+                            : styles.overflowScroll_headerLocked,
+                          styles.conceptsTable__tableBody,
+                        )}
+                        data-testid="table-codes"
+                      >
+                        {activeValueSet?.concepts.map((vs) => (
+                          <tr
+                            key={vs.code}
+                            className={classNames(
+                              styles.conceptsTable__tableBody_row,
+                            )}
+                          >
+                            <td className={styles.valueSetCode}>
+                              <Highlighter
+                                highlightClassName="searchHighlight"
+                                searchWords={[textSearch]}
+                                autoEscape={true}
+                                textToHighlight={vs.code}
+                              />
+                            </td>
+                            <td>
+                              <Highlighter
+                                highlightClassName="searchHighlight"
+                                searchWords={[textSearch]}
+                                autoEscape={true}
+                                textToHighlight={vs.display}
+                              />
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    )}
+                    {mode == "select" && (
+                      <tbody
+                        className={classNames(
+                          activeValueSet?.userCreated
+                            ? styles.overflowScroll
+                            : styles.overflowScroll_headerLocked,
+                          styles.conceptsTable__tableBody,
+                        )}
+                        data-testid="table-codes"
+                      >
+                        {activeValueSet.concepts.map((concept) => {
+                          const checked = !!customCodeIds[
+                            activeValueSet.valueSetId
+                          ]?.concepts?.find(
+                            (c) => c.code === concept.code && c.include,
+                          );
+                          return (
+                            <tr
+                              key={concept.code}
+                              className={classNames(
+                                styles.conceptsTable__tableBody_row,
+                              )}
+                            >
+                              <td className={styles.valueSetCode}>
+                                <div className={styles.conceptRowInline}>
+                                  <Checkbox
+                                    id={`concept-checkbox-${activeValueSet.valueSetId}-${concept.code}`}
+                                    checked={checked}
+                                    onChange={(e) => {
+                                      handleConceptToggle(
+                                        activeValueSet.valueSetId,
+                                        concept.code,
+                                        e.target.checked,
+                                      );
+                                    }}
+                                    aria-label={`Select code ${concept.code}`}
+                                  />
+                                  <Highlighter
+                                    highlightClassName="searchHighlight"
+                                    searchWords={[textSearch]}
+                                    autoEscape={true}
+                                    textToHighlight={concept.code}
+                                  />
+                                </div>
+                              </td>
+                              <td>
+                                <Highlighter
+                                  highlightClassName="searchHighlight"
+                                  searchWords={[textSearch]}
+                                  autoEscape={true}
+                                  textToHighlight={concept.display}
+                                />
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    )}
                   </Table>
                 )}
               </div>
@@ -657,6 +944,18 @@ const CodeLibrary: React.FC = () => {
             activeValueSet?.userCreated ? activeValueSet : emptyValueSet
           }
         />
+      )}
+      {mode == "select" && (
+        <>
+          <p>
+            <Backlink
+              onClick={goBack}
+              label={`Back to ${
+                prevPage == "valueset" ? "Create query" : "templates"
+              }`}
+            />
+          </p>
+        </>
       )}
       <Modal
         id="delete-vs-modal"
