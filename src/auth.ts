@@ -1,5 +1,3 @@
-import KeycloakProvider from "next-auth/providers/keycloak";
-import MicrosoftEntraID from "next-auth/providers/microsoft-entra-id";
 import { addUserIfNotExists } from "@/app/backend/user-management";
 import NextAuth from "next-auth";
 import { logSignInToAuditTable } from "./app/backend/session-management";
@@ -15,65 +13,23 @@ let authStrategy: AuthStrategy;
 
 switch (process.env.NEXT_PUBLIC_AUTH_PROVIDER) {
   case "keycloak":
-    function addRealm(url: string) {
-      return url.endsWith("/realms/master") ? url : `${url}/realms/master`;
-    }
-
-    let { NAMED_KEYCLOAK, LOCAL_KEYCLOAK } = process.env;
-    if (!NAMED_KEYCLOAK || !LOCAL_KEYCLOAK) {
-      const KEYCLOAK_URL =
-        process.env.AUTH_KEYCLOAK_ISSUER || "http://localhost:8080";
-      NAMED_KEYCLOAK = KEYCLOAK_URL;
-      LOCAL_KEYCLOAK = KEYCLOAK_URL;
-    }
-
-    // Add /realms/master to the end of the URL if it's missing.
-    NAMED_KEYCLOAK = addRealm(NAMED_KEYCLOAK);
-    LOCAL_KEYCLOAK = addRealm(LOCAL_KEYCLOAK);
-
-    providers = [
-      KeycloakProvider({
-        jwks_endpoint: `${NAMED_KEYCLOAK}/protocol/openid-connect/certs`,
-        wellKnown: undefined,
-        clientId: process.env.AUTH_CLIENT_ID,
-        clientSecret: process.env.AUTH_CLIENT_SECRET,
-        issuer: `${LOCAL_KEYCLOAK}`,
-        authorization: {
-          params: {
-            scope: "openid email profile",
-          },
-          url: `${LOCAL_KEYCLOAK}/protocol/openid-connect/auth`,
-        },
-        token: `${NAMED_KEYCLOAK}/protocol/openid-connect/token`,
-        userinfo: `${NAMED_KEYCLOAK}/protocol/openid-connect/userinfo`,
-      }),
-    ];
     authStrategy = new KeycloakAuthStrategy();
+    const keycloakProvider = authStrategy.setUpNextAuthProvider();
+    providers.push(keycloakProvider);
     break;
   case "microsoft-entra-id":
-    providers = [
-      MicrosoftEntraID({
-        clientId: process.env.AUTH_CLIENT_ID,
-        clientSecret: process.env.AUTH_CLIENT_SECRET,
-        issuer: process.env.AUTH_ISSUER,
-        authorization: {
-          params: {
-            scope: "openid email profile",
-            claims: {
-              id_token: {
-                roles: { essential: true },
-              },
-            },
-          },
-        },
-      }),
-    ];
     authStrategy = new MicrosoftEntraAuthStrategy();
+    const microsoftProvider = authStrategy.setUpNextAuthProvider();
+    providers.push(microsoftProvider);
     break;
   default:
-    throw Error(
+    console.error(
       "Configured IdP doesn't match existing options. Please check the setup in your environment settings",
     );
+    console.error("Falling back to Keycloak strategy");
+    authStrategy = new KeycloakAuthStrategy();
+    const fallbackProvider = authStrategy.setUpNextAuthProvider();
+    providers.push(fallbackProvider);
 }
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
