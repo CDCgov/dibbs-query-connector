@@ -1,0 +1,298 @@
+@use "uswds-core" as *;
+@use "variables" as *;
+
+.page-title {
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+  font-size: 2rem;
+}
+
+.page-explainer {
+  margin: 0.5rem 0 1rem 0;
+  font-weight: 300;
+  font-size: 1.125rem;
+  line-height: 150%;
+}
+
+// Utility classes
+// Numbers correspond to the USWDS spacing classes
+// https://designsystem.digital.gov/utilities/margin-and-padding/
+.text-white-important {
+  color: white !important;
+}
+
+.destructive-primary {
+  color: $destructive-primary !important;
+}
+.success-primary {
+  color: $success-primary;
+}
+.error-primary {
+  color: $error-primary;
+}
+
+.text-secondary {
+  color: $text-secondary;
+}
+
+.text-decoration-none {
+  text-decoration: none;
+}
+
+.margin-top-0-important {
+  margin-top: 0 !important;
+}
+
+.margin-bottom-0-important {
+  margin-bottom: 0 !important;
+}
+
+.margin-y-0-important {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+.margin-bottom-05-important {
+  margin-bottom: 0.25rem !important;
+}
+
+.margin-bottom-3-important {
+  margin-bottom: 1.5rem !important;
+}
+
+.margin-left-1-important {
+  margin-left: 0.5rem !important;
+}
+
+.margin-0-important {
+  margin: 0 !important;
+}
+
+.padding-0-important {
+  padding: 0 !important;
+}
+
+.brand-lightest {
+  color: $brand-lightest !important;
+}
+
+.font-weight-normal-important {
+  font-weight: 400 !important;
+}
+
+.background-dark {
+  background-color: $background-darker;
+}
+
+.bg-info {
+  background-color: $brand-lighter;
+}
+
+.icon-primary {
+  path {
+    color: $brand-primary;
+  }
+}
+
+.maxw7 {
+  max-width: 70%;
+}
+
+.lh-18 {
+  line-height: 18px;
+}
+
+.content-hidden {
+  visibility: hidden;
+}
+
+.width-fit-content {
+  width: fit-content;
+}
+
+.section__line_gray {
+  border-top: 1px solid $border;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+// Context classes
+.home {
+  display: grid;
+  grid-template-columns: 1fr; // Defines a single column
+  justify-content: center; // Centers the column in the container
+  margin: 0 auto; // Centers the container itself if needed
+  row-gap: 0.1em; // Adjusts the gap between rows/items
+  max-width: $query-connector-max-width;
+}
+
+.data-title {
+  flex: 0 1 auto;
+  width: 190px;
+  font-weight: bold;
+}
+
+.query-page-wrapper {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.sticky-nav {
+  position: sticky;
+  top: 0;
+}
+
+.ecr-content h2:first-of-type {
+  margin-top: 0;
+  padding-top: 0;
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: $overlay-background;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.spinner {
+  border: 6px solid $border;
+  border-top: 6px solid $brand-primary;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.next-button {
+  max-width: 10em;
+}
+
+/* Styles for the customize page */
+
+.button-container {
+  display: flex;
+  justify-content: flex-start;
+  gap: 10px;
+  margin-top: 20px;
+  padding-bottom: 20px;
+}
+
+.resultsViewSideNav .usa-sidenav,
+.resultsViewSideNav .usa-sidenav__item {
+  border: none !important;
+}
+
+.tableRowWithHover:hover,
+.tableRowWithHover:hover > td {
+  background-color: $hover-neutral;
+}
+
+.tableRowWithHover_clickable:hover,
+.tableRowWithHover_clickable:hover td,
+.tableRowWithHover_clickable:hover .usa-checkbox {
+  cursor: pointer;
+  background-color: $hover-neutral !important;
+}
+
+.tableRowWithHover:hover,
+.tableRowWithHover_clickable:hover {
+  margin-left: 0;
+  margin-right: 0;
+  padding: 0 $default-table-padding;
+}
+
+// Overrides
+
+.custom-query-step-indicator .usa-step-indicator__header {
+  display: none !important;
+}
+
+.customize-accordion .usa-accordion__button[aria-expanded="true"],
+.customize-accordion .usa-accordion__button[aria-expanded="false"] {
+  background-size: 16px 10px;
+  background-position: top 24px right 20px;
+}
+
+.customize-accordion .usa-accordion__button[aria-expanded="true"] {
+  background-image: url("./assets/expandUp.svg");
+}
+
+.customize-accordion .usa-accordion__button[aria-expanded="false"] {
+  background-image: url("./assets/expandDown.svg");
+}
+
+.customize-accordion .usa-accordion__content {
+  padding: 0rem;
+}
+
+#templateSearch > div[data-testid="searchField"] {
+  flex: 1;
+}
+
+.custom-alert {
+  margin-top: 0;
+  height: $site-alert-height;
+}
+
+.info-alert {
+  width: fit-content;
+  border-left: 0;
+  margin-top: 1rem;
+  margin-bottom: 1.5rem;
+  background-color: $warning-lighter;
+}
+
+.info-alert > .usa-alert__body {
+  background-color: $warning-lighter;
+  width: fit-content;
+  line-height: 1.5rem;
+
+  p.usa-alert__text {
+    margin-left: 2rem;
+    font-size: 1rem;
+  }
+
+  &::before {
+    background-color: $warning-dark;
+    mask-size: 1.5rem;
+  }
+}
+
+#session-timeout-modal {
+  .usa-modal__main {
+    padding-top: 2rem !important;
+  }
+}
+
+.qc-filter {
+  margin-right: 0.5rem !important;
+}
+
+.qc-lock {
+  height: 1.5rem !important;
+  width: 1.5rem !important;
+  margin-right: 0.5rem;
+  color: $diabled !important;
+}

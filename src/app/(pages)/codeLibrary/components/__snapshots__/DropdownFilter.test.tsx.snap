@@ -1,0 +1,247 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`DropdownFilter renders a 'clear filters' button when filters are applied 1`] = `
+<body>
+  <div>
+    <form
+      class="filtersDropdown"
+    >
+      <div
+        class="filterOptions"
+      >
+        <div
+          class="filterOptions_grouping"
+        >
+          <label
+            for="category"
+          >
+            Category
+          </label>
+          <select
+            class="usa-select filtersSelect"
+            data-testid="Select"
+            id="category"
+            name="category"
+          >
+            <option
+              value=""
+            />
+            <option
+              value="labs"
+            >
+              Labs
+            </option>
+            <option
+              value="medications"
+            >
+              Medications
+            </option>
+            <option
+              value="conditions"
+            >
+              Conditions
+            </option>
+          </select>
+        </div>
+        <div
+          class="filterOptions_grouping"
+        >
+          <label
+            for="code-system"
+          >
+            Code system
+          </label>
+          <select
+            class="usa-select filtersSelect"
+            data-testid="Select"
+            id="code-system"
+            name="code-system"
+          >
+            <option
+              value=""
+            />
+            <option
+              value="http://snomed.info/sct"
+            >
+              SNOMED
+            </option>
+          </select>
+        </div>
+        <div
+          class="filterOptions_grouping"
+        >
+          <label
+            for="creator"
+          >
+            Creator
+          </label>
+          <select
+            class="usa-select filtersSelect"
+            data-testid="Select"
+            id="creator"
+            name="creator"
+          >
+            <option
+              value=""
+            />
+            <option
+              value="QC Admin"
+            >
+              QC Admin
+            </option>
+            <option
+              value="My Team(s)"
+            >
+              My Team(s)
+            </option>
+          </select>
+        </div>
+      </div>
+      <div
+        class="shortcuts"
+      >
+        <span
+          class="text-italic"
+        >
+          Shortcuts:
+        </span>
+        <button>
+          Created by me
+        </button>
+        <button>
+          Created by my team
+        </button>
+      </div>
+      <button
+        class="usa-button clearFiltersBtn"
+        data-testid="button"
+        type="button"
+      >
+        Clear all filters
+      </button>
+    </form>
+  </div>
+</body>
+`;
+
+exports[`DropdownFilter renders correctly 1`] = `
+<body>
+  <div>
+    <form
+      class="filtersDropdown"
+    >
+      <div
+        class="filterOptions"
+      >
+        <div
+          class="filterOptions_grouping"
+        >
+          <label
+            for="category"
+          >
+            Category
+          </label>
+          <select
+            class="usa-select filtersSelect"
+            data-testid="Select"
+            id="category"
+            name="category"
+          >
+            <option
+              value=""
+            />
+            <option
+              value="labs"
+            >
+              Labs
+            </option>
+            <option
+              value="medications"
+            >
+              Medications
+            </option>
+            <option
+              value="conditions"
+            >
+              Conditions
+            </option>
+          </select>
+        </div>
+        <div
+          class="filterOptions_grouping"
+        >
+          <label
+            for="code-system"
+          >
+            Code system
+          </label>
+          <select
+            class="usa-select filtersSelect"
+            data-testid="Select"
+            id="code-system"
+            name="code-system"
+          >
+            <option
+              value=""
+            />
+            <option
+              value="http://snomed.info/sct"
+            >
+              SNOMED
+            </option>
+          </select>
+        </div>
+        <div
+          class="filterOptions_grouping"
+        >
+          <label
+            for="creator"
+          >
+            Creator
+          </label>
+          <select
+            class="usa-select filtersSelect"
+            data-testid="Select"
+            id="creator"
+            name="creator"
+          >
+            <option
+              value=""
+            />
+            <option
+              value="QC Admin"
+            >
+              QC Admin
+            </option>
+            <option
+              value="Hogwarts"
+            >
+              Hogwarts
+            </option>
+            <option
+              value="My Team(s)"
+            >
+              My Team(s)
+            </option>
+          </select>
+        </div>
+      </div>
+      <div
+        class="shortcuts"
+      >
+        <span
+          class="text-italic"
+        >
+          Shortcuts:
+        </span>
+        <button>
+          Created by me
+        </button>
+        <button>
+          Created by my team
+        </button>
+      </div>
+    </form>
+  </div>
+</body>
+`;

@@ -1,0 +1,182 @@
+@use "../../../app/ui/styles/variables" as *;
+
+$tableContainerWidth: 70rem;
+
+.mainContainerWider {
+  max-width: 74rem;
+  width: 100%;
+  margin: auto;
+  margin-bottom: 1.5rem;
+  margin-top: 1.5rem;
+  padding: 0 !important;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.auditTableContainer {
+  flex-grow: 1;
+  justify-content: space-between;
+  align-items: center;
+  width: $tableContainerWidth;
+  padding-bottom: 1.5rem;
+}
+
+.auditTableContainer table {
+  table-layout: fixed;
+}
+
+.searchContainer {
+  display: flex;
+  width: 70rem;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.inputGroup {
+  display: flex;
+  width: 13.0625rem;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.searchField {
+  display: flex;
+  width: 25rem;
+  padding: 0.75rem;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1.75rem;
+  margin-left: 4.25rem;
+  background-color: white !important;
+}
+
+.tableHeader:first-child {
+  width: 15rem;
+}
+
+.tableHeader:nth-child(2) {
+  width: 40rem;
+}
+
+.tableHeader:nth-child(3) {
+  width: 14rem;
+}
+
+.tableRows {
+  height: 4.25rem;
+  white-space: nowrap;
+  cursor: pointer;
+
+  td {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+}
+
+.tableRows td:nth-child(3),
+.tableRows td:nth-child(2) {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.paginationContainerWrapper {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  position: absolute;
+  bottom: 1.5rem;
+  left: 0;
+  background: $white;
+  padding: 1rem 0;
+  z-index: 10;
+}
+
+.paginationContainer {
+  display: flex;
+  width: 100%;
+  padding: 1rem 1.5rem;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 0.5rem;
+  border: 1px solid $border;
+  background: $white;
+  margin-left: -2rem;
+}
+
+.actionsPerPageContainer {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.actionsPerPageContainer label {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.actionsPerPageDropdown {
+  display: flex;
+  width: 5.875rem;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+  border-radius: 0.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.noResultsContainer {
+  flex-grow: 1;
+  width: $tableContainerWidth;
+}
+
+.noResultsBackground {
+  background: $brand-lighter;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 2rem;
+  border-radius: 0.5rem;
+  text-align: center;
+  padding: 7.5rem 0rem;
+  flex-direction: column;
+  align-items: center;
+  gap: 2.5rem;
+  align-self: stretch;
+}
+
+.auditLogDrawerTitle {
+  color: $text-secondary;
+  align-self: stretch;
+  font-size: 1.25rem;
+  font-style: normal;
+  font-weight: 700;
+  line-height: normal;
+  padding-bottom: 1.5rem;
+}
+
+.auditLogDrawerContainer {
+  display: flex;
+  padding: 1rem;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0.625rem;
+  align-self: stretch;
+  border-radius: 0.25rem;
+  background: $white;
+}
+
+.auditLogDrawerBody {
+  font-size: 1rem;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 1.375rem;
+  align-self: stretch;
+  white-space: pre-wrap;
+  word-break: break-word;
+}

@@ -17,7 +17,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  NODE_VERSION: 18 # Adjust the Node.js version as needed
+  NODE_VERSION: 22 # Adjust the Node.js version as needed
 
 jobs:
   lint:
@@ -25,12 +25,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Run linting
-        working-directory: ./query-connector
         run: |
           npm ci
           npm run lint
 
-  unit-tests:
+  unit-and-integration-tests:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -40,28 +39,34 @@ jobs:
         with:
           node-version: ${{env.NODE_VERSION}}
       - name: Install dependencies
-        working-directory: ./query-connector
-        run: npm install
+        run: |
+          npm ci
+      - name: Create .env
+        run: |
+          echo "AIDBOX_LICENSE=${{ secrets.AIDBOX_LICENSE }}" > .env
+          echo "AIDBOX_BASE_URL=http://localhost:8080" >> .env
+          echo "APP_HOSTNAME=http://localhost:3000" >> .env
       - name: Run tests
-        working-directory: ./query-connector
-        run: npm run test:unit
+        run: |
+          npm run test:ci
+        # uncomment these next few lines and the corresponding log import
+        # in the setup script you're trying to debug if you're having trouble
+        # in CI. All the best, brave engineer (￣^￣ )ゞ
+      #   continue-on-error: true
 
-  integration-tests:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
+      # - name: Upload Docker Logs
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: docker-logs
+      #     path: |
+      #       ./test-results/logs-before-tests.txt
+      #       ./test-results/logs-after-tests.txt
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v5
         with:
-          node-version: ${{env.NODE_VERSION}}
-      - name: Install dependencies
-        working-directory: ./query-connector
-        run: npm install
-
-      - name: Run tests
-        working-directory: ./query-connector
-        run: npm run test:integration
+          token: ${{ secrets.CODECOV_TOKEN }}
+          slug: CDCgov/dibbs-query-connector
 
   end-to-end-tests:
     timeout-minutes: 15
@@ -74,44 +79,35 @@ jobs:
         with:
           node-version: ${{env.NODE_VERSION}}
       - name: Install dependencies
-        working-directory: ./query-connector
         run: npm ci
       - name: Install Playwright Browsers
-        working-directory: ./query-connector
         run: npx playwright install --with-deps
-      - name: Build Query Connector
-        working-directory: ./query-connector
-        run: docker compose build --no-cache
-      - name: Run Query Connector
-        working-directory: ./query-connector
-        run: docker compose -f ./docker-compose-e2e.yaml up -d
-      - name: Poll until Query Connector is ready
+      - name: Create .env
         run: |
-          until curl -s http://localhost:3000/; do
-            echo "Waiting for Query Connector to be ready before running Playwright..."
-            sleep 5
-          done
-      - name: Poll until HAPI server is ready
+          echo "AIDBOX_LICENSE=${{ secrets.AIDBOX_LICENSE }}" > .env
+      - name: Build Query Connector and Run Playwright Tests
+        id: run_tests
         run: |
-          until response=$(curl -v -s -w "HTTP_STATUS:%{http_code}" http://localhost:8080/fhir/Patient); do
-            # Extract status code from the response
-            http_status=$(echo "$response" | grep "HTTP_STATUS" | awk -F: '{print $2}')
-            echo "Waiting for HAPI server to be ready..."
-            echo "Response code: $http_status"
-            echo "Full response: $response"
-            sleep 5
-          done
-      - name: Poll until FHIR server has data
-        run: |
-          until curl -s http://localhost:8080/fhir/Patient | jq '.entry | length > 0' | grep -q 'true'; do
-            echo "Waiting for FHIR server to have data..."
-            sleep 5
-          done
-      - name: Playwright Tests
-        working-directory: ./query-connector
-        run: npx playwright test e2e --reporter=list --config playwright.config.ts
+          bash ./setup-scripts/e2e_tests.sh
+        # uncomment these next few lines and the corresponding log import
+        # in the setup script you're trying to debug if you're having trouble
+        # in CI. All the best, brave engineer (￣^￣ )ゞ
+      #   continue-on-error: true
+
+      # - name: Upload Docker Logs
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: docker-logs
+      #     path: |
+      #       ./test-results/logs-before-tests.txt
+      #       ./test-results/logs-after-tests.txt
+
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
           name: test-results
-          path: ./query-connector/test-results/
+          path: ./test-results/
+
+      - name: Exit with proper code
+        if: steps.run_tests.outcome == 'failure'
+        run: exit 1 # Force the workflow to fail if tests failed

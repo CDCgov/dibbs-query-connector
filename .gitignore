@@ -84,6 +84,7 @@ build/
 
 .env
 .local.env 
+.env.e2e
 
 tmp_remote_image_*
 
@@ -91,3 +92,17 @@ tmp_remote_image_*
 **/.terraform/*
 .terraform/modules/ecs
 terraform/implementation/ecs/.terraform/*
+.terraform.lock.hcl
+terraform.tfvars
+
+node_modules
+.next/
+*.local
+certificates
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/coverage
+.tool-versions
+keys/

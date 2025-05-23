@@ -1,0 +1,48 @@
+@use "../../../app/ui/styles/variables" as *;
+
+.mainContainer {
+  max-width: 80%;
+}
+
+.titleContainer {
+  max-width: 100%;
+  margin-left: none;
+  margin-right: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.lastChecked {
+  color: $text-secondary;
+  margin-left: 0.25rem;
+  margin-left: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.tableRowHover {
+  transition: background-color 0.2s ease;
+  border-collapse: collapse;
+
+  &:hover {
+    background-color: $hover-neutral;
+    cursor: default;
+
+    .editButton {
+      opacity: 1;
+      visibility: visible;
+    }
+  }
+
+  .editButton {
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity 0.2s ease,
+      visibility 0.2s ease;
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+}

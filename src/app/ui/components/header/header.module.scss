@@ -1,0 +1,99 @@
+@use "../../../ui/styles/_variables" as *;
+
+.dataUsagePolicyButton {
+  cursor: pointer;
+  background: none !important;
+  border: none !important;
+  color: white !important;
+  padding: 0px !important;
+  font: inherit !important;
+  margin: 0 0.5rem !important;
+  text-align: left !important;
+}
+
+.signinButton {
+  padding: 0.5rem 1.25rem !important;
+  margin: 0 !important;
+  cursor: pointer;
+  background: none !important;
+  border: 2px solid white !important;
+  border-radius: 4px !important;
+  color: white !important;
+  font: inherit !important;
+  white-space: nowrap;
+}
+
+.menuButton {
+  cursor: pointer;
+  background: none !important;
+  border: none !important;
+  color: white !important;
+  padding: 0px !important;
+  font: inherit !important;
+  margin: 0 !important;
+  height: 1.5rem !important;
+  width: 1.5rem !important;
+}
+
+.menuDropdownContainer {
+  position: relative;
+  z-index: 400;
+  height: 0;
+}
+
+.menuDropdown {
+  border-radius: 4px !important;
+  padding: 0.5rem !important;
+  background: $brand-darker !important;
+  width: unset !important;
+  box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, 0.16);
+  position: absolute;
+  right: 0px;
+  top: -15px;
+}
+
+.menuItem {
+  color: $brand-lightest !important;
+  text-decoration: none !important;
+  padding: 0.5rem 1rem !important;
+  cursor: pointer;
+  border: none;
+  background-color: transparent;
+}
+
+.menuItem:hover {
+  text-decoration: none !important;
+}
+
+.subMenuItem {
+  display: flex;
+}
+
+.headerContentContainer {
+  display: flex;
+  align-items: center !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  max-width: 100% !important;
+  height: $header-content-height;
+}
+
+.headerContainer {
+  flex: 0 1 auto;
+}
+
+.siteLogo {
+  margin: 2rem 0;
+}
+
+.siteLogoImage {
+  background-image: url("../../styles/assets/logo.svg");
+  height: 2.5rem;
+  width: 2.5rem;
+  margin-right: 0.75rem;
+}
+
+.siteLogoText {
+  font-size: 1.5rem;
+  font-family: "Merriweather", $serif-font;
+}

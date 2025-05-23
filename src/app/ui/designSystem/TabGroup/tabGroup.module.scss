@@ -1,0 +1,21 @@
+@use "../../../ui/styles/_variables" as *;
+
+.tab {
+  display: inline-block;
+  text-decoration: none;
+  padding-bottom: 0.5rem;
+  margin-right: 1.5rem;
+  text-decoration: none;
+  cursor: pointer;
+  color: $text-secondary !important;
+
+  &__active {
+    @extend .tab;
+    font-weight: 700;
+    border-bottom: 0.25rem solid $brand-primary;
+  }
+
+  &:hover {
+    text-decoration: none;
+  }
+}

@@ -83,10 +83,10 @@ variable "db_engine_version" {
   default     = "16.3"
 }
 
-variable "db_instance_class"{
-  type = string
+variable "db_instance_class" {
+  type        = string
   description = "The instance type of the RDS instance"
-  default = "db.t3.micro"
+  default     = "db.t3.micro"
 }
 
 
@@ -110,26 +110,103 @@ variable "cred_manager" {
 }
 
 variable "umls_api_key" {
-  type= string
+  type        = string
   description = "Key for the UMLS API"
-  sensitive = true
+  sensitive   = true
 }
 
 variable "ersd_api_key" {
-  type= string
+  type        = string
   description = "Key for the ERSD API"
-  sensitive = true
+  sensitive   = true
 }
 
 variable "qc_tls_key" {
-  type= string
+  type        = string
   description = "Key for the Cloudfare cert for domain: queryconnector.dev"
-  sensitive = true
+  sensitive   = true
 }
 
 variable "qc_tls_cert" {
-  type= string
+  type        = string
   description = "Certificate importing from Cloudfare: queryconnector.dev"
-  sensitive = true
+  sensitive   = true
 }
 
+variable "auth_secret" {
+  type        = string
+  description = "Secret for the Auth server"
+  sensitive   = true
+}
+
+variable "auth_provider" {
+  type        = string
+  description = "Which auth provider to use"
+  sensitive   = true
+}
+
+variable "auth_client_id" {
+  type        = string
+  description = "Client ID for Keycloak"
+  sensitive   = true
+}
+
+variable "auth_client_secret" {
+  type        = string
+  description = "Client Secret for Keycloak"
+  sensitive   = true
+}
+
+variable "auth_issuer" {
+  type        = string
+  description = "URL for the Auth issuer"
+  sensitive   = true
+}
+
+variable "auth_url" {
+  type        = string
+  description = "URL for the Auth server"
+  sensitive   = true
+}
+
+variable "aidbox_client_secret" {
+  type        = string
+  description = "Client Secret for Aidbox"
+  sensitive   = true
+}
+
+variable "aidbox_admin_password" {
+  type        = string
+  description = "Admin password for Aidbox"
+  sensitive   = true
+}
+
+variable "bastion_public_key" {
+  type        = string
+  description = "Public key for the bastion host"
+  sensitive   = true
+}
+
+variable "bastion_private_key" {
+  type        = string
+  description = "Private key for the bastion host"
+  sensitive   = true
+}
+
+variable "bastion_allowed_ips" {
+  type        = list(string)
+  description = "List of CIDR blocks to allow access to the bastion host"
+  default     = []
+}
+
+variable "aidbox_base_url" {
+  type        = string
+  description = "Base URL for Aidbox"
+  default     = ""
+}
+
+variable "aidbox_license" {
+  type        = string
+  description = "License for Aidbox"
+  sensitive   = true
+}

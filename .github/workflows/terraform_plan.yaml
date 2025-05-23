@@ -37,9 +37,6 @@ jobs:
     defaults:
       run:
         shell: bash
-        # this may need to be updated if you change the directory you are working with
-        # ./terraform/implementation/dev || ./terraform/implementation/prod for example
-        # this practice is recommended to keep the terraform code organized while reducing the risk of conflicts
         working-directory: ./terraform/implementation/ecs
     steps:
       - name: Check Out Changes
@@ -56,16 +53,48 @@ jobs:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: ${{ secrets.AWS_REGION }}
 
+      - name: Set workspace
+        id: set-workspace
+        run: |-
+          echo "workspace=$(
+          if [[ "${{ github.event.inputs.workspace }}" != "" ]]; then
+            echo ${{ github.event.inputs.workspace}}
+          else
+            echo dev
+          fi
+          )" >> $GITHUB_OUTPUT
+
+      - name: Set URL format
+        id: set-url-format
+        run: |
+          if [[ "${{ steps.set-workspace.outputs.workspace }}" == "dev" ]]; then
+            echo "base_url=https://${{ secrets.ECS_HOSTNAME }}" >> $GITHUB_OUTPUT
+          else
+            echo "base_url=https://${{ steps.set-workspace.outputs.workspace }}.${{ secrets.ECS_HOSTNAME }}" >> $GITHUB_OUTPUT
+          fi
+
       - name: Terraform
         env:
           BUCKET: ${{ secrets.TFSTATE_BUCKET }}
           DYNAMODB_TABLE: ${{ secrets.TFSTATE_DYNAMODB_TABLE }}
           REGION: ${{ vars.region }}
           WORKSPACE: ${{ env.workspace }}
-          UMLS_API_KEY: ${{ secrets.UMLS_API_KEY }}
-          ERSD_API_KEY: ${{ secrets.ERSD_API_KEY}}
-          TLS_CERT: ${{ secrets.TLS_CERT}}
-          TLS_KEY: ${{ secrets.TLS_KEY}}
+          TF_VAR_umls_api_key: ${{ secrets.UMLS_API_KEY }}
+          TF_VAR_ersd_api_key: ${{ secrets.ERSD_API_KEY}}
+          TF_VAR_qc_tls_cert: ${{ secrets.TLS_CERT}}
+          TF_VAR_qc_tls_key: ${{ secrets.TLS_KEY}}
+          TF_VAR_auth_secret: ${{ secrets.AUTH_SECRET }}
+          TF_VAR_keycloak_client_id: ${{ secrets.KEYCLOAK_CLIENT_ID }}
+          TF_VAR_keycloak_client_secret: ${{ secrets.KEYCLOAK_CLIENT_SECRET }}
+          TF_VAR_auth_keycloak_issuer: ${{ steps.set-url-format.outputs.base_url }}/keycloak
+          TF_VAR_auth_url: ${{ steps.set-url-format.outputs.base_url }}
+          TF_VAR_aidbox_base_url: ${{ steps.set-url-format.outputs.base_url }}/aidboxone
+          TF_VAR_aidbox_client_secret: ${{ secrets.AIDBOX_CLIENT_SECRET }}
+          TF_VAR_aidbox_admin_password: ${{ secrets.AIDBOX_ADMIN_PASSWORD }}
+          TF_VAR_aidbox_license: ${{ secrets.AIDBOX_LICENSE }}
+          TF_VAR_bastion_public_key: ${{ secrets.BASTION_PUBLIC_KEY }}
+          TF_VAR_bastion_private_key: ${{ secrets.BASTION_PRIVATE_KEY }}
+          TF_VAR_bastion_allowed_ips: ${{ secrets.BASTION_ALLOWED_IPS }}
         shell: bash
         run: |
           echo "Deploying to ${{ github.event.inputs.workspace }}..."
@@ -78,14 +107,6 @@ jobs:
             || (echo "terraform init failed, exiting..." && exit 1)
           terraform workspace select "$WORKSPACE"
           terraform apply -auto-approve -target=aws_acm_certificate.cloudflare_cert \
-            -var-file="$WORKSPACE.tfvars" \
-            -var "umls_api_key=${UMLS_API_KEY}" \
-            -var "ersd_api_key=${ERSD_API_KEY}" \
-            -var "qc_tls_key=${TLS_KEY}" \
-            -var "qc_tls_cert=${TLS_CERT}"          
+            -var-file="$WORKSPACE.tfvars"
           terraform plan \
-            -var-file="$WORKSPACE.tfvars" \
-            -var "umls_api_key=${UMLS_API_KEY}" \
-            -var "ersd_api_key=${ERSD_API_KEY}" \
-            -var "qc_tls_key=${TLS_KEY}" \
-            -var "qc_tls_cert=${TLS_CERT}"
+            -var-file="$WORKSPACE.tfvars"

@@ -1,0 +1,156 @@
+## Local Development
+
+### Introduction
+
+The DIBBs Query Connector app is built with the [Next.js](https://nextjs.org/) framework and offers both a UI and a REST API for searching for a patient and viewing information tied to your case investigation.
+
+#### Dependencies
+
+Query Connector depends on a few external services to work properly:
+
+- A [PostgreSQL](https://www.postgresql.org/) database, which stores information on conditions, value sets, FHIR server configuration, etc. Database migrations are managed using [Flyway](https://github.com/flyway/flyway)
+- An [OAuth](https://en.wikipedia.org/wiki/OAuth) capable identity provider for authentication. For local development, we use [Keycloak](https://www.keycloak.org/)
+- An external [FHIR](https://hl7.org/fhir/) server. For local development, we use [Aidbox](https://www.health-samurai.io/fhir-server)
+
+### Running Query Connector
+
+#### Prerequisites
+
+- [Node.js](https://nodejs.org/en/download)
+- [Docker](https://docs.docker.com/get-docker/)
+- [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+
+#### Obtaining API and License Keys
+
+Before running the Query Connector locally, you will need to obtain API keys for the electronic Reporting and Surveillance Distribution (eRSD) and for the Unified Medical Language System (UMLS). These API keys will be used to download information about reportable conditions (e.g., chlamydia, influenza, hepatitis A, etc), medical code value sets, and mappings between them. This information is used to build queries in the Query Connector app.
+
+Additionally, if you want to use Aidbox as a FHIR server for local development, you will need a free license key.
+
+To obtain the free API and license keys, please visit the following URLs and follow the sign up instructions.
+
+- [https://ersd.aimsplatform.org/#/api-keys](https://ersd.aimsplatform.org/#/api-keys)
+- [https://uts.nlm.nih.gov/uts/login](https://uts.nlm.nih.gov/uts/login)
+- [https://aidbox.app/](https://aidbox.app/)
+
+Next, set up your `.env` file with the following command: `cp .env.sample .env`
+
+Add your API keys as an environment variables called `ERSD_API_KEY`, `UMLS_API_KEY`, and `AIDBOX_LICENSE` in the `.env` file so that they can be accessed when running the Query Connector app.
+
+#### Database
+
+The default `DATABASE_URL` value in `.env.sample` assumes you will use the database container spun up by Docker Compose. It is also possible to run a PostgreSQL server on your local machine, which may lead to some modest speed increases, especially when seeding from the eRSD and UMLS APIs. If you'd like to run a local PostgreSQL server, adjust your `DATABASE_URL` as needed, e.g. `DATABASE_URL=postgresql://myuser@localhost:5432/tefca_db`. To run Flyway migrations against a local PostgreSQL server, you'll also need to adjust [flyway.conf](../flyway/conf/flyway.conf) accordingly.
+
+#### Running with Docker Compose and Node
+
+We provide a [Docker Compose file](../docker-compose-dev.yaml) that spins up all of the necessary services for Query Connector, and a simple npm script for invoking both Docker Compose and running the Next.js application.
+
+1. Ensure that both [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) and [Node 22.x or higher](https://nodejs.org/en/download) are installed.
+2. Clone the Query Connector repository with `git clone git@github.com:CDCgov/dibbs-query-connector.git`.
+3. Navigate to the source folder with `cd dibbs-query-connector`.
+4. Install all of the Node dependencies for the Query Connector app with `npm install`.
+5. Run the Query Connector app on `localhost:3000` with `npm run dev`. If you are on a Windows Machine, you may need to run `npm run dev-win` instead.
+
+The containers should take a few minutes to spin up, but if all goes well, congratulations, the Query Connector app should now be running on `localhost:3000`! You can also access Aidbox at `localhost:8080`, and Keycloak at `localhost:8081`.
+
+To login via Keycloak, make sure your `.env` is updated using `cp` command above and use the following credentials to login at `localhost:8080` after spinning up the container:
+
+```
+Username: qc-admin
+Password: QcDev2024!
+```
+
+#### Running with Docker only
+
+1. Download a copy of the Docker image from the Query Connector repository by running `docker pull ghcr.io/cdcgov/dibbs-query-connector/query-connector:latest`.
+   1. If you're using an M1 Mac, you'll need to tell Docker to pull the non-Apple Silicon image using `docker pull --platform linux/amd64 ghcr.io/cdcgov/dibbs-query-connector/query-connector:latest` since we don't have a image for Apple Silicon. If you're using this setup, there might be some issues with architecture incompatability that the team hasn't run into, so please flag if you run into something!
+2. Run the service with `docker run -p 3000:3000 query-connector:latest`. If you're on a Windows machine, you may need to run `docker run -p 3000:3000 ghcr.io/cdcgov/phdi/query-connector:latest` instead.
+3. You will need to run the supporting services with our [Docker Compose file](../docker-compose-dev.yaml) by running `docker compose -f docker-compose-dev.yaml up`.
+
+### Building the Docker Image
+
+To build the Docker image for the Query Connector app from source instead of downloading it from the GitHub repository follow these steps.
+
+1. Clone the Query Connector repository with `git clone git@github.com:CDCgov/dibbs-query-connector.git`.
+2. Navigate to the source folder with `cd dibbs-query-connector`.
+3. Run `docker build -t query-connector .`.
+
+### Query Connector Data for Query Building
+
+When initializing the backend database for the first time, the Query Connector makes the value sets associated with 200+ reportable conditions available to users tasked with building queries for their jurisdiction. To run this seeding script, you'll need to obtain the UMLS and eRSD API key's using the instructions below.
+
+To group value sets by condition and to group the conditions by type, the Query Connector obtains and organizes data from the eRSD and the VSAC in the following way:
+
+1. The Query Connector retrieves the 200+ reportable conditions from the eRSD as well as the value sets' associated IDs.
+2. Using the value set IDs from the eRSD, the Query Connector retrieves the value set's comprehensive information from the VSAC, i.e., the LOINC, SNOMED, etc. codes associated with each value set ID.
+3. The Query Connector then organizes these value sets according to the conditions with which they're associated, making the result available to users interested in building queries. The conditions are additionally organized by category, e.g., sexually transmitted diseases or respiratory conditions, using a mapping curated by HLN Consulting.
+
+#### Query Building Data in `dev` mode
+
+In order to make the dev process as low-lift as possible, we want to avoid executing the `db-creation` scripts when booting up the application in dev mode via `npm run dev` or `npm run dev-win`. To that end, we've created a `pg_dump` file containing all the value sets, concepts, and foreign key mappings that would be extracted from a fresh pull of the eRSD and processed through our creation functions. This file, `vs_dump.sql` has been mounted into the docker volume of our postgres DB when running in dev mode as an entrypoint script. This means it will be automatically executed when the DB is freshly spun up. You shouldn't need to do anything to facilitate this mounting or file running.
+
+### Updating the pg_dump
+
+If the DB extract file ever needs to be updated, you can use the following simple process:
+
+1. Start up the application on your local machine using a regular `docker compose up`, and wait for the DB to be ready.
+2. Load the eRSD and value sets into the DIBBs DB by using the `Create Query` button on the `/queryBuilding` page. Optionally, use DBeaver to verify that value sets exist in the database.
+3. In a fresh terminal window, run
+
+```
+pg_dump -U postgres -f vs_dump.sql -h localhost -p 5432 tefca_db
+```
+
+If the above doesn't work, try replacing `localhost` with `0.0.0.0`.
+
+4. Enter the DB password when prompted.
+5. The extract file, `vs_dump.sql`, should now be created. It should automatically be located in `/query-connector`, but if it isn't, put `vs_dump.sql` there.
+
+### API Documentation
+
+A Postman collection demonstrating use of the API can be found [here](https://github.com/CDCgov/dibbs-query-connector/blob/main/src/app/assets/DIBBs_Query_Connector_API.postman_collection.json).
+
+### Running the e2e tests locally
+
+The Query Connector uses Playwright Test as its end-to-end testing framework. Playwright is a browser-based testing library that enables tests to run against a variety of different browsers under a variety of different conditions. To manage this suite, Playwright creates some helpful files (and commands) that can be used to tweak its configuration.
+
+#### Config and Directories
+
+Playwright's configuration is managed by the file `playwright.config.ts`. This file has information on which browsers to test against, configuration options for those browsers, optional mobile browser ports, retry and other utility options, and a dev webserver. Changing this file will make global changes to Playwright's operations.
+
+By default, Playwright will look for end to end tests in `/e2e`.
+
+#### Testing Commands and Demos
+
+Playwright provides a number of different ways of executing end to end tests. From the root directory, you can run several commands:
+
+`npm run test:playwright:ui`
+Runs the end-to-end tests locally by spawning the Playwright UI mode. This will start a dev server off localhost:3000, so make sure you don't have another app instance running off that port.
+
+You'll need to have a token for Aidbox set under AIDBOX_LICENSE in your .env for the Aidbox seeder to run correctly. You can sign up for a dev license at https://aidbox.app and use that in your local setup.
+
+`npm run test:playwright`
+Runs the end-to-end tests.
+
+`npm run test:playwright -- --project=chromium`
+Runs the tests only on Desktop Chrome.
+
+`npm run test:playwright -- example`
+Runs the tests in a specific file.
+
+`npm run test:playwright -- -g "test name"`
+Runs the test with the name "test name", e.g., Query("test name") would run here.
+
+`npm run test:playwright -- --debug`
+Runs the tests in debug mode.
+
+`npm run test:playwright -- codegen`
+Auto generate tests with Codegen.
+
+After running a test set on your local, you can also additionally type `npx playwright show-report` to view an HTML report page of different test statuses and results.
+
+Playwright is managed by an end-to-end job in the `.github/workflows/ci.yaml` file of the project root. Since it requires browser installation to effectively test, and since it operates using an independent framework from jest, it's run separately from the unit and
+integration tests ran through `npm run test:ci`.
+
+### Architecture
+
+For more info, see [architecture.md](architecture.md).

@@ -1,0 +1,33 @@
+@use "../../../ui/styles/_variables" as *;
+
+.footerContainer {
+  flex: 0 1 $footer-content-height;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.cdcLogoContainer {
+  display: flex;
+  align-items: center;
+  margin-right: 0.5rem;
+}
+
+.cdcFooterTextContainer {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  color: $white;
+
+  p {
+    white-space: nowrap;
+    margin: 0;
+  }
+}
+
+@media (max-width: 64em) {
+  .cdcFooterTextContainer {
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+}
