@@ -55,7 +55,7 @@ describe("tests the query building steps", () => {
       expect(screen.queryByText("Loading")).not.toBeInTheDocument();
     });
 
-    expect(screen.getByText("Query Library")).toBeInTheDocument();
+    expect(screen.getByText("Query repository")).toBeInTheDocument();
 
     expectedQueryNames.forEach(async (name) => {
       expect(screen.getByText(name)).toBeInTheDocument();

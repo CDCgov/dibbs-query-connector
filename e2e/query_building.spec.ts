@@ -4,7 +4,7 @@ import { test, expect } from "@playwright/test";
 import { TEST_URL } from "../playwright-setup";
 
 // consts
-const QUERY_LIBRARY = "Query Library";
+const QUERY_REPOSITORY = "Query repository";
 const CUSTOM_QUERY = "Custom Query";
 const SELECT_TEMPLATES = "Start from template(s)";
 const BACKLINK_MY_QUERIES = "Back to My queries";
@@ -35,7 +35,7 @@ test.describe("building a new query", () => {
     await page.goto(`${TEST_URL}/queryBuilding`);
     await expect(
       page.getByRole("heading", {
-        name: QUERY_LIBRARY,
+        name: QUERY_REPOSITORY,
         exact: true,
       }),
     ).toBeVisible();
