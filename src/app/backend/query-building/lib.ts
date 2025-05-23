@@ -120,10 +120,9 @@ export async function deleteQueryByIdHelp(
     await dbClient.query(deleteUsergroupToQuery, [queryId]);
 
     const result = await dbClient.query(deleteQuery, [queryId]);
-    return {
-      success: result.rowCount && result.rowCount > 0 ? true : false,
-      id: queryId,
-    };
+    return result.rowCount === 0
+      ? { success: false, error: `No rows were deleted.` }
+      : { success: true, id: queryId };
   } catch (error) {
     console.error(`Failed to delete query with ID ${queryId}:`, error);
     return { success: false, error: "Failed to delete the query." };
