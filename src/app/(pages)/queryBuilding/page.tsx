@@ -18,14 +18,6 @@ const QueryBuilding: React.FC = () => {
   }
 
   const [buildStep, setBuildStep] = useState<BuildStep>("selection");
-  const selectedQuery = queryContext.selectedQuery;
-
-  // on initial render, if the user is coming from the code library, go to the valueset step
-  useEffect(() => {
-    if (selectedQuery?.queryId) {
-      setBuildStep("valueset");
-    }
-  }, [selectedQuery]);
 
   useEffect(() => {
     queryContext.setCurrentPage(buildStep);
