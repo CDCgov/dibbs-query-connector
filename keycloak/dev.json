@@ -555,6 +555,9 @@
         "disableableCredentialTypes": [],
         "requiredActions": [],
         "realmRoles": ["admin", "default-roles-master"],
+        "clientRoles": {
+          "query-connector": ["super-admin"]
+        },
         "notBefore": 0,
         "groups": []
       },
