@@ -2,8 +2,9 @@ import { PatientRecordsResponse } from "../../../backend/query-execution";
 import ResultsViewSideNav, {
   NavSection,
 } from "./resultsView/ResultsViewSideNav";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import ResultsViewTable from "./resultsView/ResultsViewTable";
+import ResultsViewDrawer from "./resultsView/ResultsViewDrawer";
 import styles from "./resultsView/resultsView.module.scss";
 import ConditionsTable from "./resultsView/tableComponents/ConditionsTable";
 import Demographics from "./resultsView/tableComponents/Demographics";
@@ -58,6 +59,8 @@ const ResultsView: React.FC<ResultsViewProps> = ({
     patientRecordsResponse,
   );
 
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
   const sideNavContent =
     accordionItems &&
     (accordionItems
@@ -92,6 +95,14 @@ const ResultsView: React.FC<ResultsViewProps> = ({
         <strong>Query: </strong>
         <span className="text-normal display-inline-block">
           {selectedQuery.queryName}
+          <Button
+            secondary
+            className="margin-left-2"
+            type="button"
+            onClick={() => setDrawerOpen(true)}
+          >
+            View full patient JSON
+          </Button>
         </span>
       </h2>
 
@@ -103,6 +114,11 @@ const ResultsView: React.FC<ResultsViewProps> = ({
           <ResultsViewTable accordionItems={accordionItems} loading={loading} />
         </div>
       </div>
+      <ResultsViewDrawer
+        isOpen={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        patientRecordsResponse={patientRecordsResponse}
+      />
     </>
   );
 };
