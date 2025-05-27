@@ -28,7 +28,7 @@
     "@next/mdx": "^15.3.2",
     "@scalar/nextjs-api-reference": "^0.4.106",
     "@scalar/nextjs-openapi": "^0.0.36",
-    "@trussworks/react-uswds": "^9.1.0",
+    "@trussworks/react-uswds": "^10.0.1",
     "@types/mdx": "^2.0.13",
     "@uswds/uswds": "^3.8.2",
     "base-64": "^1.0.0",
