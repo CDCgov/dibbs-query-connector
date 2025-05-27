@@ -123,17 +123,15 @@ class UserManagementService extends UserManagementServiceInternal {
   /**
    * Adds a user to the users table if they do not already exist.
    * Uses data extracted from the JWT token.
-   * @param userToken - The user data from the JWT token.
-   * @param userToken.id - The user ID from the JWT token.
-   * @param userToken.username - The username from the JWT token.
-   * @param userToken.email - The email from the JWT token.
-   * @param userToken.firstName - The first name from the JWT token.
-   * @param userToken.lastName - The last name from the JWT token.
-   * @param userToken.role - The role from the JWT token.
+   * @param userToken - Info from the user to update
+   * @param forceRefreshUser - Whether to force refresh a user if the user exists.
    * @returns The newly added user or an empty result if already exists.
    */
   @auditable
-  static async addUserIfNotExists(userToken: UserToken) {
+  static async addUserIfNotExists(
+    userToken: UserToken,
+    forceRefreshUser = false,
+  ) {
     if (!userToken || !userToken.username) {
       console.error("Invalid user token. Cannot add user.");
       return { user: undefined };
@@ -150,8 +148,20 @@ class UserManagementService extends UserManagementServiceInternal {
       ]);
 
       if (userExists.rows.length > 0) {
-        console.log("User already exists in users:", userExists.rows[0].id);
-        return { msg: "User already exists", user: userExists.rows[0] }; // Return existing user
+        if (forceRefreshUser) {
+          const existingUser = userExists.rows[0];
+          const updatedUser = await updateUserDetails(
+            existingUser.id,
+            username,
+            firstName,
+            lastName,
+            qcRole,
+          );
+          return { msg: "Existing user updated", user: updatedUser }; // Return existing user
+        } else {
+          console.log("User already exists in users:", userExists.rows[0].id);
+          return { msg: "User already exists", user: userExists.rows[0] }; // Return existing user
+        }
       }
 
       // Default role when adding a new user, which includes Super Admin, Admin, and Standard User.

@@ -57,7 +57,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       );
 
       try {
-        await addUserIfNotExists(userToken);
+        // force refresh in case something changed from the IdP
+        await addUserIfNotExists(userToken, true);
       } catch (error) {
         console.error(
           "Something went wrong in user setup after JWT generation",
