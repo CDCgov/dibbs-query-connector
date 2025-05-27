@@ -43,7 +43,8 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "node_modules/cypress/types/cypress.d.ts"
+    "node_modules/cypress/types/cypress.d.ts",
+    "src/lib/remark-image-transform.mjs"
   ],
   "exclude": [
     "node_modules",
