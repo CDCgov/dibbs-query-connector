@@ -195,7 +195,10 @@ test.describe("alternate queries with the Query Connector", () => {
     await expect(page.getByText("Patient Name")).toBeVisible();
     await expect(page.getByText(TEST_PATIENT_NAME)).toBeVisible();
     await expect(page.getByText("Contact")).toBeVisible();
-    await expect(page.getByText(TEST_PATIENT.Phone)).toBeVisible();
+    const visiblePhones = page
+      .getByText(TEST_PATIENT.Phone)
+      .filter({ has: page.locator(":visible") });
+    await expect(visiblePhones).toHaveCount(1);
     await expect(page.getByText("Patient Identifiers")).toBeVisible();
     await expect(page.getByText(TEST_PATIENT.MRN)).toBeVisible();
   });
