@@ -82,12 +82,17 @@ describe("User Management Integration Tests", () => {
   /**
    * Tests adding a new user if they do not already exist.
    */
-  test("should add a user if they do not exist", async () => {
+  test("should add a user if they do not exist and update them after if specified", async () => {
     const { user } = await addUserIfNotExists(TEST_USER_STANDARD);
 
     expect(user).toHaveProperty("id");
     expect(user).toHaveProperty("username", TEST_USER_STANDARD.username);
     expect(user).toHaveProperty("qcRole", UserRole.STANDARD);
+
+    const updatedToken = structuredClone(TEST_USER_STANDARD);
+    updatedToken.qcRole = UserRole.ADMIN;
+    const { user: newUser } = await addUserIfNotExists(updatedToken, true);
+    expect(newUser).toHaveProperty("qcRole", UserRole.ADMIN);
   });
   /**
    * Tests getting a user by username.
