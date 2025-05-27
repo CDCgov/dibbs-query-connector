@@ -53,7 +53,7 @@ const ResultsViewDrawer: React.FC<ResultsViewDrawerProps> = ({
     <Drawer
       isOpen={isOpen}
       onClose={onClose}
-      title="Full Patient Records Response"
+      title="Full patient record"
       placeholder="Search patient record"
       toRender={
         patientRecordsResponse ? (

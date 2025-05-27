@@ -92,18 +92,20 @@ const ResultsView: React.FC<ResultsViewProps> = ({
       </div>
       <TitleBox step="results" />
       <h2 className="page-explainer margin-bottom-3-important margin-top-0-important">
-        <strong>Query: </strong>
-        <span className="text-normal display-inline-block">
-          {selectedQuery.queryName}
+        <div className="display-flex flex-align-center">
+          <strong>Query:&nbsp;</strong>
+          <span className="text-normal display-inline-block">
+            {selectedQuery.queryName}
+          </span>
           <Button
             secondary
-            className="margin-left-2"
+            className="margin-left-auto"
             type="button"
             onClick={() => setDrawerOpen(true)}
           >
             View full patient JSON
           </Button>
-        </span>
+        </div>
       </h2>
 
       <div className=" grid-container grid-row grid-gap-md padding-0 ">
