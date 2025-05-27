@@ -144,6 +144,14 @@ test.describe("querying with the Query Connector", () => {
         .filter({ hasText: "azithromycin 1000 MG" }),
     ).toHaveCount(2);
 
+    // Check that the drawer works
+    await page.getByRole("button", { name: "View full patient JSON" }).click();
+    const drawer = page.getByText("Full patient record");
+    await expect(drawer).toBeVisible();
+    await expect(page.locator("pre")).toContainText("Patient");
+    await page.getByRole("button", { name: "Close drawer" }).click();
+    await expect(drawer).not.toBeVisible();
+
     // Now let's use the return to search to go back to a blank form
     await page.getByRole("button", { name: "New patient search" }).click();
     await expect(
@@ -152,15 +160,6 @@ test.describe("querying with the Query Connector", () => {
         exact: true,
       }),
     ).toBeVisible();
-
-    // Check that the drawer works
-    await page.getByRole("button", { name: "View full patient JSON" }).click();
-    const drawer = page.getByText("Full patient record");
-    await expect(drawer).toBeVisible();
-    await expect(page.getByText("Patient")).toBeVisible();
-    await expect(page.locator("pre")).toContainText("Patient");
-    await page.keyboard.press("Escape");
-    await expect(drawer).not.toBeVisible();
   });
 });
 
