@@ -197,7 +197,7 @@ test.describe("alternate queries with the Query Connector", () => {
     await expect(page.getByText("Contact")).toBeVisible();
     await expect(page.getByText(TEST_PATIENT.Phone)).toHaveCount(2);
     await expect(page.getByText("Patient Identifiers")).toBeVisible();
-    await expect(page.getByText(TEST_PATIENT.MRN)).toBeVisible();
+    await expect(page.getByText(TEST_PATIENT.MRN)).toHaveCount(2);
   });
 
   // test("social determinants query with generalized function", async ({
