@@ -10,7 +10,7 @@ import {
   Icon,
 } from "@trussworks/react-uswds";
 import classNames from "classnames";
-import React, { RefObject, ReactNode } from "react";
+import React, { RefObject, ReactNode, JSX } from "react";
 
 export type ModalRef = TrussModalRef;
 
@@ -27,7 +27,7 @@ export type ModalProps = {
   heading: string;
   description?: string;
   children?: ReactNode;
-  modalRef: RefObject<ModalRef>;
+  modalRef: RefObject<ModalRef | null>;
   buttons: ModalButton[];
   isLarge?: boolean;
   errorMessage?: string | null; // New prop for error message
