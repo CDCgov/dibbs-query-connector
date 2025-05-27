@@ -3,6 +3,7 @@ set -e  # Exit immediately if a command exits with a non-zero status. Comment th
 
 chmod +x ./setup-scripts/setup_e2e_vars.sh
 bash ./setup-scripts/setup_e2e_vars.sh
+node ./setup-scripts/gen-keys.mjs
 
 echo "AIDBOX_BASE_URL=http://aidbox:8080" >> .env.e2e
 echo "APP_HOSTNAME=http://query-connector:3000" >> .env.e2e
@@ -25,7 +26,6 @@ while kill -0 $command_pid 2>/dev/null; do
 done
 
 echo -e "\nAidbox seeder finished!"
-
 
 npx dotenv -e ./.env.e2e -- npx playwright test --reporter=list
 E2E_EXIT_CODE=$?

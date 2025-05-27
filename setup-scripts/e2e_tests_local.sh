@@ -3,6 +3,7 @@ set -e  # Exit immediately if a command exits with a non-zero status. Comment th
 
 chmod +x ./setup-scripts/setup_e2e_vars.sh
 bash ./setup-scripts/setup_e2e_vars.sh
+node ./setup-scripts/gen-keys.mjs
 
 echo "AIDBOX_BASE_URL=http://localhost:8080" >> .env.e2e
 echo "APP_HOSTNAME=http://host.docker.internal:3000" >> .env.e2e
