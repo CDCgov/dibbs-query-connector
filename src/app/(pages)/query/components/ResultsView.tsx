@@ -116,11 +116,13 @@ const ResultsView: React.FC<ResultsViewProps> = ({
           <ResultsViewTable accordionItems={accordionItems} loading={loading} />
         </div>
       </div>
-      <ResultsViewDrawer
-        isOpen={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
-        patientRecordsResponse={patientRecordsResponse}
-      />
+      <div aria-hidden={!drawerOpen}>
+        <ResultsViewDrawer
+          isOpen={drawerOpen}
+          onClose={() => setDrawerOpen(false)}
+          patientRecordsResponse={patientRecordsResponse}
+        />
+      </div>
     </>
   );
 };
