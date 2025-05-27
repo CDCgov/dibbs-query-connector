@@ -152,6 +152,15 @@ test.describe("querying with the Query Connector", () => {
         exact: true,
       }),
     ).toBeVisible();
+
+    // Check that the drawer works
+    await page.getByRole("button", { name: "View full patient JSON" }).click();
+    const drawer = page.getByText("Full Patient Records Response");
+    await expect(drawer).toBeVisible();
+    await expect(page.getByText("Patient")).toBeVisible();
+    await expect(page.locator("pre")).toContainText("Patient");
+    await page.keyboard.press("Escape");
+    await expect(drawer).not.toBeVisible();
   });
 });
 
