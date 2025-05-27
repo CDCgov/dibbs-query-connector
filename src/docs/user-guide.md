@@ -8,26 +8,21 @@ Query Connector is a tool that helps public health staff quickly get the patient
 
 Query Connector helps you find case-specific information more quickly and easily by:
 
-- Letting you **search for a specific patient** using basic details like name and date of birth
-
-- Running **custom clinical queries** (based on SNOMED, LOINC, and other standard codes) to find only the data that’s relevant to your needs
-
-- Showing results in a clear, easy-to-read format—right in your web browser
+* Letting you **search for a specific patient** using basic details like name and date of birth
+* Running **custom clinical queries** (based on SNOMED, LOINC, and other standard codes) to find only the data that’s relevant to your needs
+* Showing results in a clear, easy-to-read format—right in your web browser
 
 Behind the scenes, Query Connector is a **FHIR client**, meaning it speaks the same language many healthcare systems use to share data. It also offers:
 
-- **A web-based interface (UI)** for staff who want to search and view data manually
-
-- **An API** for jurisdictions that want to connect QC to their own tools or automate their workflows
+* **A web-based interface (UI)** for staff who want to search and view data manually
+* **An API** for jurisdictions that want to connect QC to their own tools or automate their workflows
 
 ## Why it matters
 
 With Query Connector, you get:
 
 1. **Automated workflows** – no more chasing down records by phone or email
-
 2. **Only the data you need** – no more digging through large files for one piece of information
-
 3. **Stronger privacy and security** – because queries are always focused on just one patient at a time, they return only the minimum necessary information
 
 By helping you find the right data, fast, Query Connector gives you more time to focus on what matters: investigating and protecting public health.
@@ -76,10 +71,10 @@ Once you’ve chosen the query you need, click `Submit.`
 
 The `Patient Record` page contains your patient’s medical record. The page is divided into four sections:
 
-- Patient Demographic Information
-- Observations
-- Encounters
-- Conditions
+* Patient Demographic Information
+* Observations
+* Encounters
+* Conditions
 
 Use the left navigation to skip ahead to a given section, and browse the content on this page until you find the information you need.
 
@@ -109,7 +104,7 @@ It’s possible that the template library doesn’t have the query you need; in 
 
 1. Create a query (see above) and select the `Start from scratch` link underneath `Start from template(s)`.
 2. Select the relevant checkboxes for a value set or code that you would like to add to the query. A value set is a collection of related codes for easy reference.
-3. Once you’ve selected the checkboxes for the codes you would like to add to the query, click on the `Next: Create query button` at the top-right corner.
+3. Once you’ve selected the checkboxes for the codes you would like to add to the query, click on the `Next: Update query` button at the top-right corner.
 4. You have created the query. If you would like to add additional codes, click on `Additional codes from library` on the lefthand side of the page. Then click on the `Add from code library` button in the upper-right corner.
 
 ### Managing codes
@@ -138,7 +133,7 @@ Once a user’s identity has been verified (authenticated), super admins can man
 
 Super admins can manage all users’ permissions on the `User management` page. Here, you assign each user a permission level (standard, admin, or super admin), and also assign users to a team (called a group in the app). When you create a user on this page, you can add their name and permission level, but each user will still need to authenticate with the IdP before accessing QC. By default, when a user first logs into Query Connector without this preconfiguration step, they will have the lowest permission level (standard) and not be assigned to any user groups.
 
-User groups function as an additional safeguard to manage access. Assigning users to a group simplifies the process of providing access to queries; rather than giving individual users access to queries one at a time, you can provide or revoke query access to a group, saving time. This also ensures that authenticated individuals do not have the ability to access any patient data that is not pertinent to their investigative focus.
+User groups function as an additional safeguard to manage access. Assigning users to a group simplifies the process of providing access to queries; rather than giving individual users access to queries one at a time, you can provide or revoke query access to a group, saving time.  This also ensures that authenticated individuals do not have the ability to access any patient data that is not pertinent to their investigative focus.
 
 To manage a user group, take the following steps:
 
@@ -162,7 +157,7 @@ Users with super admin privileges can configure connections to the servers the Q
 Query Connector currently supports the following three authentication methods:
 
 1. Provide a valid Auth Bearer token that Query Connector sends along with our FHIR requests
-2. Standard client_credentials OAuth flow where you provide a client ID and client secret
+2. Standard client\_credentials OAuth flow where you provide a client ID and client secret
 3. SMART on FHIR with asymmetric key exchange
 
 **Note**: The authentication method available to you is determined by the server you’re using.
@@ -172,6 +167,3 @@ Query Connector currently supports the following three authentication methods:
 Query Connector relies on external Identity Providers (IdPs) for access management and supports a wide range of IdPs, which means that your team can choose the option that works best for you.
 
 Single sign-on (SSO) is configured as one of the Identity Provider (IdP) options Query Connector supports. SSO simplifies access by allowing users to log in through their preferred, trusted Identity Provider, reducing the administrative burden of accessing Query Connector. It also improves security by centralizing permission management and minimizing the risk of unauthorized access. When a user clicks the `Sign in` button, they’ll be redirected to their organization's Identity Provider and authenticated using their existing credentials.
-
-##
-

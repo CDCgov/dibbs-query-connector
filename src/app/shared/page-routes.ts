@@ -36,7 +36,7 @@ pagesConfig[PAGES.QUERY] = {
 pagesConfig[PAGES.QUERY_BUILDING] = {
   position: 1,
   path: PAGES.QUERY_BUILDING,
-  name: "Query library",
+  name: "Query repository",
   roleAccess: [UserRole.SUPER_ADMIN, UserRole.ADMIN],
 };
 pagesConfig[PAGES.CODE_LIBRARY] = {

@@ -24,6 +24,7 @@ export function useSaveQueryAndRedirect() {
     constructedQuery: NestedQuery,
     newQueryName: string | undefined,
     redirectPath: string,
+    pageMode?: string,
   ) {
     const username = session?.user?.username;
     const queryName = newQueryName || context?.selectedQuery?.queryName;
@@ -49,6 +50,7 @@ export function useSaveQueryAndRedirect() {
       context?.setSelectedQuery?.({
         queryId: results[0].id,
         queryName,
+        pageMode,
       });
 
       const queries = await getCustomQueries();
