@@ -121,8 +121,7 @@ export class KeycloakAuthStrategy implements AuthStrategy {
 
     let { NAMED_KEYCLOAK, LOCAL_KEYCLOAK } = process.env;
     if (!NAMED_KEYCLOAK || !LOCAL_KEYCLOAK) {
-      const KEYCLOAK_URL =
-        process.env.AUTH_KEYCLOAK_ISSUER || "http://localhost:8080";
+      const KEYCLOAK_URL = process.env.AUTH_ISSUER || "http://localhost:8080";
       NAMED_KEYCLOAK = KEYCLOAK_URL;
       LOCAL_KEYCLOAK = KEYCLOAK_URL;
     }
