@@ -1,3 +1,5 @@
+[← Back to Documentation](/docs)
+
 # Deploying Query Connector
 
 Query Connector has a simple architecture with just a few pieces:
@@ -264,7 +266,8 @@ AUTH_DISABLED=false
 AUTH_SECRET="anysecretyoulike"
 
 # Keycloak - set NEXT_PUBLIC_AUTH_PROVIDER to "keycloak"
-# Entra ID - set NEXT_PUBLIC_AUTH_PROVIDER to "microsoft-entra-id" and AUTH_ISSUER to "https://login.microsoftonline.com/your-tenant-id/v2.0""
+# Entra ID - set NEXT_PUBLIC_AUTH_PROVIDER to "microsoft-entra-id" and AUTH_ISSUER to:
+# "https://login.microsoftonline.com/your-tenant-id/v2.0""
 NEXT_PUBLIC_AUTH_PROVIDER=keycloak
 AUTH_CLIENT_ID=my-client-id
 AUTH_CLIENT_SECRET=my-client-secret
