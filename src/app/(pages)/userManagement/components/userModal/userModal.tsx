@@ -183,7 +183,7 @@ const UserModal: React.FC<UserModalProps> = ({
         username: newUser.username,
         firstName: newUser.firstName,
         lastName: newUser.lastName,
-        role: newUser.qcRole,
+        qcRole: newUser.qcRole,
       };
 
       const hasError = Object.entries(userToAdd).some(
@@ -202,7 +202,7 @@ const UserModal: React.FC<UserModalProps> = ({
           userToAdd.username,
           userToAdd.firstName,
           userToAdd.lastName,
-          userToAdd.role,
+          userToAdd.qcRole,
         );
 
         if (udpatedUser?.msg) {

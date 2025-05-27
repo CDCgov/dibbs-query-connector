@@ -23,7 +23,7 @@ test.describe("editing an exisiting query", () => {
     await page.goto(`${TEST_URL}/queryBuilding`);
     await expect(
       page.getByRole("heading", {
-        name: "Query Library",
+        name: "Query repository",
         exact: true,
       }),
     ).toBeVisible();
