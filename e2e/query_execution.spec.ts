@@ -175,7 +175,7 @@ test.describe("alternate queries with the Query Connector", () => {
     await page.getByRole("button", { name: "Fill fields" }).click();
 
     // Delete Last name and MRN to force phone number as one of the 3 fields
-    await page.getByLabel("Last name").clear();
+    // await page.getByLabel("Last name").clear();
     await page.getByLabel("Medical Record Number").clear();
 
     // Select FHIR server from drop down
