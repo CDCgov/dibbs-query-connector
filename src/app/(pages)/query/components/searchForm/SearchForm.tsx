@@ -11,6 +11,7 @@ import {
   stateOptions,
   Mode,
   hyperUnluckyPatient,
+  INSUFFICIENT_PATIENT_IDENTIFIERS,
 } from "@/app/shared/constants";
 import {
   patientDiscoveryQuery,
@@ -19,7 +20,10 @@ import {
 import styles from "../searchForm/searchForm.module.scss";
 import { FormatPhoneAsDigits } from "@/app/shared/format-service";
 import TitleBox from "../stepIndicator/TitleBox";
-import { PatientDiscoveryRequest } from "@/app/models/entities/query";
+import {
+  PatientDiscoveryRequest,
+  validatedPatientSearch,
+} from "@/app/models/entities/query";
 
 interface SearchFormProps {
   setPatientDiscoveryQueryResponse: (
@@ -32,17 +36,6 @@ interface SearchFormProps {
   setFhirServer: React.Dispatch<React.SetStateAction<string>>;
 }
 
-/**
- * @param root0 - SearchFormProps
- * @param root0.setMode - The function to set the mode.
- * @param root0.setLoading - The function to set the loading state.
- * @param root0.setPatientDiscoveryQueryResponse - callback function to set the
- * patient for use in future steps
- * @param root0.selectedFhirServer - server to do the query against
- * @param root0.setFhirServer - callback function to update specified query
- * @param root0.fhirServers - list of available FHIR servers to query against, from the DB & hardcoded (for now)
- * @returns - The SearchForm component.
- */
 const SearchForm: React.FC<SearchFormProps> = function SearchForm({
   setPatientDiscoveryQueryResponse,
   setMode,
@@ -61,6 +54,7 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
   const [city, setCity] = useState<string>("");
   const [state, setState] = useState<string>("");
   const [zip, setZip] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
 
   const [showAdvanced, setShowAdvanced] = useState(false);
 
@@ -79,34 +73,37 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
   const nameRuleHint =
     "Enter a name using only letters, hyphens, apostrophes, spaces, or periods.";
 
-  function isGroupFilled() {
-    const nameFilled = !!firstName && !!lastName;
-    const addressFilled = !!street1 && !!city && !!state && !!zip;
-    const dobFilled = !!dob;
-    const phoneFilled = !!phone;
-    const mrnFilled = !!mrn;
+  function getPatientDiscoveryRequest(): PatientDiscoveryRequest {
+    return {
+      firstName,
+      lastName,
+      dob,
+      mrn,
+      fhirServer,
+      phone: FormatPhoneAsDigits(phone),
+      email,
+      address: {
+        street1,
+        city,
+        state,
+        zip,
+      },
+    };
+  }
 
-    let filledCount = 0;
-    if (nameFilled) filledCount += 1;
-    if (addressFilled) filledCount += 1;
-    if (dobFilled) filledCount += 1;
-    if (phoneFilled) filledCount += 1;
-    if (mrnFilled) filledCount += 1;
-
-    return filledCount >= 2;
+  function isValid() {
+    return validatedPatientSearch(getPatientDiscoveryRequest());
   }
 
   function getErrorMessage() {
     if (!formTouched) return null;
-    return !isGroupFilled()
-      ? "Please fully enter at least two groups of required information to search for a patient (Name, Phone number, Date of birth, Address, or MRN)."
-      : null;
+    return !isValid() ? INSUFFICIENT_PATIENT_IDENTIFIERS : null;
   }
 
   async function HandleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setFormTouched(true);
-    if (!isGroupFilled()) {
+    if (!isValid()) {
       setFormError(true);
       return;
     }
@@ -119,14 +116,7 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
     setLoading(true);
     setMode("patient-results");
 
-    const patientDiscoveryRequest: PatientDiscoveryRequest = {
-      firstName,
-      lastName,
-      dob,
-      mrn,
-      fhirServer,
-      phone: FormatPhoneAsDigits(phone),
-    };
+    const patientDiscoveryRequest = getPatientDiscoveryRequest();
     const queryResponse = await patientDiscoveryQuery(patientDiscoveryRequest);
     setPatientDiscoveryQueryResponse(queryResponse);
     setLoading(false);
@@ -256,25 +246,6 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
           </div>
           <div className="grid-row grid-gap margin-bottom-4">
             <h3 className={`"font-sans-md" ${styles.searchFormSectionLabel}`}>
-              Phone number
-            </h3>
-            <div className="grid-col-6">
-              <Label htmlFor="phone" className="margin-top-0-important">
-                Phone number
-              </Label>
-              <TextInput
-                id="phone"
-                name="phone"
-                type="tel"
-                value={phone}
-                onChange={(event) => {
-                  setPhone(event.target.value);
-                }}
-              />
-            </div>
-          </div>
-          <div className="grid-row grid-gap margin-bottom-4">
-            <h3 className={`"font-sans-md" ${styles.searchFormSectionLabel}`}>
               Date of Birth
             </h3>
             <div className="grid-col-6">
@@ -293,6 +264,25 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
                   }}
                 />
               </div>
+            </div>
+          </div>
+          <div className="grid-row grid-gap margin-bottom-4">
+            <h3 className={`"font-sans-md" ${styles.searchFormSectionLabel}`}>
+              Phone number
+            </h3>
+            <div className="grid-col-6">
+              <Label htmlFor="phone" className="margin-top-0-important">
+                Phone number
+              </Label>
+              <TextInput
+                id="phone"
+                name="phone"
+                type="tel"
+                value={phone}
+                onChange={(event) => {
+                  setPhone(event.target.value);
+                }}
+              />
             </div>
           </div>
           <div className="grid-row grid-gap margin-bottom-4">

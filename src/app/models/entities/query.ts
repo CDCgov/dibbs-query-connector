@@ -26,7 +26,18 @@ export type PatientDiscoveryRequest = {
   dob?: string;
   mrn?: string;
   phone?: string;
+  address?: Address;
+  email?: string;
 };
+
+export type Address = {
+  street1?: string;
+  line2?: string;
+  city?: string;
+  state?: string;
+  zip?: string;
+};
+
 export type PatientRecordsRequest = {
   patientId: string;
   fhirServer: string;
@@ -35,3 +46,29 @@ export type PatientRecordsRequest = {
 
 export type FullPatientRequest = PatientDiscoveryRequest &
   Omit<PatientRecordsRequest, "patientId">;
+
+/**
+ * Validates the patient search criteria for a discovery request.
+ * @param request - The patient discovery request object.
+ * @returns True if the search criteria is valid, false otherwise.
+ */
+export function validatedPatientSearch(
+  request: PatientDiscoveryRequest,
+): boolean {
+  const { firstName, lastName, dob, mrn, phone, email, address } = request;
+  if (!firstName || !lastName || !dob) {
+    return false;
+  }
+
+  const hasMRN = !!mrn;
+  const hasPhone = !!phone;
+  const hasEmail = !!email;
+
+  let hasCompleteAddress = false;
+  if (address) {
+    hasCompleteAddress =
+      !!address.street1 && !!address.city && !!address.state && !!address.zip;
+  }
+
+  return hasMRN || hasCompleteAddress || hasPhone || hasEmail;
+}
