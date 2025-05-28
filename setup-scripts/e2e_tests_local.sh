@@ -3,7 +3,7 @@ set -e  # Exit immediately if a command exits with a non-zero status. Comment th
 
 chmod +x ./setup-scripts/setup_e2e_vars.sh
 bash ./setup-scripts/setup_e2e_vars.sh
-npm ci
+npm install ts-node
 npx ts-node ./setup-scripts/gen-keys.ts
 
 echo "AIDBOX_BASE_URL=http://localhost:8080" >> .env.e2e
