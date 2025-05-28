@@ -99,4 +99,37 @@ describe("SearchForm", () => {
     expect(phone).toHaveValue("");
     expect(mrn).toHaveValue("1234");
   });
+
+  it("does not prefill fhir server with bad data", async () => {
+    const badServerName = "Fake FHIR";
+    const defaultServerName = "Default FHIR";
+    const queryParams = `server=${badServerName}`;
+
+    const formattedParams = new URLSearchParams(queryParams);
+    (useSearchParams as jest.Mock).mockReturnValue(formattedParams);
+
+    const { user } = renderWithUser(
+      <RootProviderMock currentPage={`/query?${queryParams}`}>
+        <SearchForm
+          setMode={jest.fn()}
+          setLoading={jest.fn()}
+          setPatientDiscoveryQueryResponse={jest.fn()}
+          selectedFhirServer={defaultServerName}
+          setFhirServer={jest.fn()}
+          fhirServers={[defaultServerName, "Some other server name"]}
+        ></SearchForm>
+      </RootProviderMock>,
+    );
+
+    expect(screen.getByText("Enter patient information")).toBeVisible();
+    expect(document.body).toMatchSnapshot();
+
+    const advancedOptions = await screen.findByText("Advanced");
+    await user.click(advancedOptions);
+    const selectedServer = screen.getByRole("combobox", {
+      name: "Healthcare Organization (HCO)",
+    });
+    expect(selectedServer).not.toHaveValue(badServerName);
+    expect(selectedServer).toHaveValue(defaultServerName);
+  });
 });

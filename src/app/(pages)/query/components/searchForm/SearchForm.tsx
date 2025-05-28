@@ -66,7 +66,10 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
       return;
     }
 
-    setFhirServer(params?.get("server") || fhirServer);
+    // set the fhir server only if it matches one from the list;
+    // otherwise, use default
+    const server = params?.get("server");
+    setFhirServer(server && fhirServers.includes(server) ? server : fhirServer);
     setFirstName(params?.get("first") || "");
     setLastName(params?.get("last") || "");
     setPhone(params?.get("phone") || "");
