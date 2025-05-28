@@ -121,13 +121,14 @@ export class CustomQuery {
     const medicationsFilter = this.medicationCodes.join(",");
     const conditionsFilter = this.conditionCodes.join(",");
 
-    this.fhirResourceQueries["socialHistory"] = {
-      basePath: `/Observation/_search`,
-      params: {
-        subject: `Patient/${patientId}`,
-        category: "social-history",
-      },
-    };
+    //https://skylight-hq.slack.com/archives/C05BEG226RZ/p1748446005152119
+    // this.fhirResourceQueries["socialHistory"] = {
+    //   basePath: `/Observation/_search`,
+    //   params: {
+    //     subject: `Patient/${patientId}`,
+    //     category: "social-history",
+    //   },
+    // };
 
     if (includeImmunization) {
       this.fhirResourceQueries["immunization"] = {
