@@ -14,6 +14,7 @@ import {
   showSiteAlert,
 } from "./constants";
 import { checkForSiteAlert } from "./utils";
+import { INSUFFICIENT_PATIENT_IDENTIFIERS } from "@/app/shared/constants";
 
 test.describe("querying with the Query Connector", () => {
   test.beforeEach(async ({ page }) => {
@@ -44,6 +45,20 @@ test.describe("querying with the Query Connector", () => {
     await page
       .getByRole("button", { name: "Revise your patient search" })
       .click();
+  });
+
+  test("unsuccessful user query: insufficient inputs", async ({ page }) => {
+    await page.getByRole("button", { name: "Fill fields" }).click();
+    // Clear the fields to simulate insufficient inputs
+    await page.getByLabel("First name").clear();
+    await page.getByLabel("Last name").clear();
+
+    await page.getByRole("button", { name: "Search for patient" }).click();
+
+    // Better luck next time, user!
+    await expect(
+      page.getByText(INSUFFICIENT_PATIENT_IDENTIFIERS),
+    ).toBeVisible();
   });
 
   test("successful demo user query", async ({ page }) => {
