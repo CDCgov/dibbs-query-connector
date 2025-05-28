@@ -2,9 +2,7 @@ import fs from "fs";
 import path from "path";
 import { importPKCS8, SignJWT } from "jose";
 import crypto from "crypto";
-
-export const DEFAULT_LOCAL_JWKS_HOSTNAME =
-  "http://host.docker.internal:3000/.well-known/jwks.json";
+import { DEFAULT_LOCAL_JWKS_HOSTNAME } from "../../../setup-scripts/gen-keys";
 
 /**
  * Get the JWKS data from the file system
