@@ -1,3 +1,5 @@
+[← Back to Documentation](/docs)
+
 # DISCLAIMER
 Use of this service is limited only to **non-sensitive and publicly available
 data**. Users must not use, share, or store any kind of sensitive data like

@@ -31,7 +31,6 @@ jest.mock("@/app/utils/auth", () => {
 const TEST_USER_STANDARD = {
   id: "13e1efb2-5889-4157-8f34-78d7f02dbf84",
   username: "yoshi",
-  email: "green.yoshi@yoshiisland.com",
   firstName: "Green",
   lastName: "Yoshi",
   qcRole: UserRole.STANDARD,
@@ -40,7 +39,6 @@ const TEST_USER_STANDARD = {
 const TEST_USER_SUPER = {
   id: "7dd8b2a7-658c-4152-afcd-8b514fb5343b",
   username: "luigi",
-  email: "luigi.mario@mushroomkingdom.com",
   firstName: "Lugi",
   lastName: "Mario",
   qcRole: UserRole.SUPER_ADMIN,
@@ -84,12 +82,17 @@ describe("User Management Integration Tests", () => {
   /**
    * Tests adding a new user if they do not already exist.
    */
-  test("should add a user if they do not exist", async () => {
+  test("should add a user if they do not exist and update them after if specified", async () => {
     const { user } = await addUserIfNotExists(TEST_USER_STANDARD);
 
     expect(user).toHaveProperty("id");
     expect(user).toHaveProperty("username", TEST_USER_STANDARD.username);
     expect(user).toHaveProperty("qcRole", UserRole.STANDARD);
+
+    const updatedToken = structuredClone(TEST_USER_STANDARD);
+    updatedToken.qcRole = UserRole.ADMIN;
+    const { user: newUser } = await addUserIfNotExists(updatedToken, true);
+    expect(newUser).toHaveProperty("qcRole", UserRole.ADMIN);
   });
   /**
    * Tests getting a user by username.

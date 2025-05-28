@@ -38,7 +38,7 @@ const QueryRedirectInfo: React.FC<QueryRedirectInfoProps> = ({ userRole }) => {
             <span>
               Go to the{" "}
               <a target="_blank" href={PAGES.QUERY_BUILDING}>
-                query library{" "}
+                query repository{" "}
               </a>
               to build it.
             </span>

@@ -1,3 +1,5 @@
+[← Back to Documentation](/docs)
+
 # Query Connector User Guide
 
 Query Connector is a tool that helps public health staff quickly get the patient data they need from hospitals and clinics—without having to call or fax anyone. It connects to many healthcare systems using existing agreements your jurisdiction already has in place, and follows national standards for health data sharing like DURSA and TEFCA.

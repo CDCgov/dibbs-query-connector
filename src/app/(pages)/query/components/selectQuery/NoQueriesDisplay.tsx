@@ -41,7 +41,7 @@ const NoQueriesDisplay: React.FC<NoQueriesDisplayProps> = ({ userRole }) => {
         <p className="margin-0">
           {userRole === UserRole.STANDARD
             ? `Get started by contacting an admin: ${adminNames.join(", ")}.`
-            : "You can head to the query library to build the query."}
+            : "You can head to the query repository to build the query."}
         </p>
 
         {userRole === UserRole.ADMIN || userRole === UserRole.SUPER_ADMIN ? (
@@ -50,7 +50,7 @@ const NoQueriesDisplay: React.FC<NoQueriesDisplayProps> = ({ userRole }) => {
             className="margin-top-3"
             type={"button"}
           >
-            Go to query library
+            Go to query repository
           </Button>
         ) : (
           <></>

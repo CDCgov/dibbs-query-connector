@@ -11,6 +11,7 @@ export enum PAGES {
   USER_MANAGEMENT = "/userManagement",
   AUDIT_LOGS = "/auditLogs",
   CODE_LIBRARY = "/codeLibrary",
+  DOCS = "/docs",
 }
 
 interface Page {
@@ -35,7 +36,7 @@ pagesConfig[PAGES.QUERY] = {
 pagesConfig[PAGES.QUERY_BUILDING] = {
   position: 1,
   path: PAGES.QUERY_BUILDING,
-  name: "Query library",
+  name: "Query repository",
   roleAccess: [UserRole.SUPER_ADMIN, UserRole.ADMIN],
 };
 pagesConfig[PAGES.CODE_LIBRARY] = {
@@ -63,6 +64,13 @@ pagesConfig[PAGES.AUDIT_LOGS] = {
   path: PAGES.AUDIT_LOGS,
   name: "Audit logs",
   roleAccess: [UserRole.SUPER_ADMIN],
+};
+
+pagesConfig[PAGES.DOCS] = {
+  position: 6,
+  path: PAGES.DOCS,
+  name: "Documentation",
+  roleAccess: [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.STANDARD],
 };
 
 /**

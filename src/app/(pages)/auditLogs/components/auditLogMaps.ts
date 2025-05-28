@@ -154,7 +154,7 @@ export const auditLogActionTypeMap: Record<string, auditLogActionTypeMapping> =
         };
 
         const request = parseRequest(log) as SignOutJsonBlob;
-        const userId = request?.sessionParams.session?.user?.id;
+        const userId = request?.sessionParams?.session?.user?.id;
         return `Sign out of user with ID ${userId}`;
       },
     },

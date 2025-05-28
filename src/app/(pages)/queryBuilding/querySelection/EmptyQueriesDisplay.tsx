@@ -44,7 +44,7 @@ export const EmptyQueriesDisplay: React.FC<EmptyQueryProps> = ({
 
   return (
     <div data-testid={"empty-state-container"}>
-      <h1 className={styles.queryTitle}>Query Library</h1>
+      <h1 className={styles.queryTitle}>Query repository</h1>
 
       <div
         className={classNames(
