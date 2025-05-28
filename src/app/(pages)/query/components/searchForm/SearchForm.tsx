@@ -54,7 +54,7 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
   const [city, setCity] = useState<string>("");
   const [state, setState] = useState<string>("");
   const [zip, setZip] = useState<string>("");
-  const [email, setEmail] = useState<string>("");
+  const [email, _setEmail] = useState<string>("");
 
   const [showAdvanced, setShowAdvanced] = useState(false);
 

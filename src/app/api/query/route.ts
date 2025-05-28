@@ -95,7 +95,7 @@ export async function GET(request: NextRequest) {
 
   if (!validatedPatientSearch(QueryRequest)) {
     const OperationOutcome = await handleRequestError(
-      MISSING_PATIENT_IDENTIFIERS,
+      INSUFFICIENT_PATIENT_IDENTIFIERS,
     );
     return NextResponse.json(OperationOutcome, { status: 400 });
   }
