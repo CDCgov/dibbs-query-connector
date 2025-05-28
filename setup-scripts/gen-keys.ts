@@ -1,8 +1,8 @@
 import { importPKCS8, SignJWT } from "jose";
 import { generateKeyPair, exportJWK, exportPKCS8 } from "jose";
-import path = require("path");
-import fs = require("fs");
-import crypto = require("crypto");
+import path from "path";
+import fs from "fs";
+import crypto from "crypto";
 
 // This file is here to generate the JWKS keys needed for our SMART on FHIR
 // e2e test. It's invoked in our bash scripts for our e2e's.
