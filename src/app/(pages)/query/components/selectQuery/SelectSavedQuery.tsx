@@ -54,7 +54,7 @@ const SelectSavedQuery: React.FC<SelectSavedQueryProps> = ({
   const [fhirServers, setFhirServers] = useState<string[]>([]);
   const [queryOptions, setQueryOptions] = useState<CustomUserQuery[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [currentUser, setCurrentUser] = useState<User>();
+  const [_, setCurrentUser] = useState<User>();
 
   const { data: session } = useSession();
   const username = session?.user?.username || "";
