@@ -53,6 +53,16 @@ Running a basic query has four steps:
 
 If you have super admin user privileges, you’ll also need to choose the Health Care Organization (HCO) you’d like to use; changing the HCO will change the data source you’re querying.
 
+The Patient Information page can also pre-fill certain form fields from URL parameters. Available parameters are:
+- `first` (First name)
+- `last` (Last name)
+- `dob` (Date of birth, formatted as YYYY-MM-DD)
+- `phone` (Phone number)
+- `mrn` (Medical Record Number)
+- `server` (Health Care Organization) 
+
+For example, if you navigate to `/query?first=Hyper&last=Unlucky&dob=1975-12-06`, the First name, Last name, and Date of birth fields would be pre-filled; the Phone number, Home address, and Medical Record Number fields would be blank. 
+
 3. Once you’ve completed the form on this page, click the `Search for Patient` button.
 
 ### Step 2: Select your patient
