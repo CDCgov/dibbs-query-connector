@@ -3,7 +3,8 @@ set -e  # Exit immediately if a command exits with a non-zero status. Comment th
 
 chmod +x ./setup-scripts/setup_e2e_vars.sh
 bash ./setup-scripts/setup_e2e_vars.sh
-node ./setup-scripts/gen-keys.mjs
+npm install ts-node
+npx ts-node ./setup-scripts/gen-keys.ts
 
 echo "AIDBOX_BASE_URL=http://aidbox:8080" >> .env.e2e
 echo "APP_HOSTNAME=http://query-connector:3000" >> .env.e2e
