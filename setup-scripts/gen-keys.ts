@@ -4,6 +4,9 @@ import path = require("path");
 import fs = require("fs");
 import crypto = require("crypto");
 
+// This file is here to generate the JWKS keys needed for our SMART on FHIR
+// e2e test. It's invoked in our bash scripts for our e2e's.
+
 export const DEFAULT_LOCAL_JWKS_HOSTNAME =
   "http://host.docker.internal:3000/.well-known/jwks.json";
 
