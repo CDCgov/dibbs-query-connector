@@ -145,8 +145,8 @@ test.describe("querying with the Query Connector", () => {
     ).toHaveCount(2);
 
     // Check that the drawer works
-    await page.getByRole("button", { name: "View full patient JSON" }).click();
-    const drawer = page.getByText("Full patient record");
+    await page.getByRole("button", { name: "View FHIR response" }).click();
+    const drawer = page.getByText("Full FHIR response");
     await expect(drawer).toBeVisible();
     await expect(page.locator("pre")).toContainText("Patient");
     await page.getByRole("button", { name: "Close drawer" }).click();

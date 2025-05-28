@@ -58,36 +58,40 @@ const ResultsViewDrawer: React.FC<ResultsViewDrawerProps> = ({
   function handleCopy() {
     if (!jsonStr) return;
     navigator.clipboard.writeText(jsonStr);
-    showToastConfirmation({ body: "Record copied to clipboard" });
+    showToastConfirmation({ body: "Response copied to clipboard" });
   }
 
   return (
     <Drawer
       isOpen={isOpen}
       onClose={onClose}
-      title="Full patient record"
+      title={
+        <div className="display-flex flex-align-center flex-justify">
+          <span>Full FHIR response</span>
+          <Button
+            type="button"
+            unstyled
+            className="usa-button--unstyled text-bold text-no-underline margin-left-auto"
+            onClick={handleCopy}
+            aria-label="Copy FHIR response"
+          >
+            <span className="icon-text display-flex flex-align-center">
+              <Icon.ContentCopy className="height-3 width-3" />
+              <span className="padding-left-05">Copy response</span>
+            </span>
+          </Button>
+        </div>
+      }
       placeholder="Search patient record"
       toRender={
         patientRecordsResponse ? (
           <div className={styles.resultsDrawerContainer}>
-            <div className="display-flex flex-justify-end width-full">
-              <Button
-                type="button"
-                className="usa-button--unstyled text-bold text-no-underline"
-                onClick={handleCopy}
-                aria-label="Copy JSON"
-              >
-                <span className="icon-text display-flex flex-align-center">
-                  <Icon.ContentCopy className="height-3 width-3" />
-                  <span className="padding-left-05">Copy record</span>
-                </span>
-              </Button>
-            </div>
+            <div className="display-flex flex-justify-end width-full"></div>
             <pre className={styles.resultsDrawerBody}>{jsonStr}</pre>
           </div>
         ) : (
           <div className={styles.resultsDrawerContainer}>
-            <em>No patient record loaded.</em>
+            <em>No FHIR response loaded.</em>
           </div>
         )
       }

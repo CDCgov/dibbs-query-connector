@@ -99,11 +99,12 @@ const ResultsView: React.FC<ResultsViewProps> = ({
           </span>
           <Button
             secondary
-            className="margin-left-auto"
+            data-testid="view-fhir-response-button"
+            className={`usa-button--unstyled text-bold text-no-underline margin-left-auto`}
             type="button"
             onClick={() => setDrawerOpen(true)}
           >
-            View full patient JSON
+            View FHIR response
           </Button>
         </div>
       </h2>
