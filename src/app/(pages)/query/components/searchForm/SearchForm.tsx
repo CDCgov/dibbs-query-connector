@@ -5,6 +5,7 @@ import {
   TextInput,
   Select,
   Button,
+  Icon,
 } from "@trussworks/react-uswds";
 import {
   stateOptions,
@@ -56,10 +57,16 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
   const [phone, setPhone] = useState<string>("");
   const [dob, setDOB] = useState<string>("");
   const [mrn, setMRN] = useState<string>("");
+  const [street1, setStreet1] = useState<string>("");
+  const [city, setCity] = useState<string>("");
+  const [state, setState] = useState<string>("");
+  const [zip, setZip] = useState<string>("");
 
   const [showAdvanced, setShowAdvanced] = useState(false);
 
-  // Fills fields with sample data based on the selected
+  const [formTouched, setFormTouched] = useState(false);
+  const [_formError, setFormError] = useState(false);
+
   const fillFields = useCallback(() => {
     setFirstName(hyperUnluckyPatient.FirstName);
     setLastName(hyperUnluckyPatient.LastName);
@@ -72,8 +79,39 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
   const nameRuleHint =
     "Enter a name using only letters, hyphens, apostrophes, spaces, or periods.";
 
+  function isGroupFilled() {
+    const nameFilled = !!firstName && !!lastName;
+    const addressFilled = !!street1 && !!city && !!state && !!zip;
+    const dobFilled = !!dob;
+    const phoneFilled = !!phone;
+    const mrnFilled = !!mrn;
+
+    let filledCount = 0;
+    if (nameFilled) filledCount += 1;
+    if (addressFilled) filledCount += 1;
+    if (dobFilled) filledCount += 1;
+    if (phoneFilled) filledCount += 1;
+    if (mrnFilled) filledCount += 1;
+
+    return filledCount >= 2;
+  }
+
+  function getErrorMessage() {
+    if (!formTouched) return null;
+    return !isGroupFilled()
+      ? "Please fully enter at least two groups of required information to search for a patient (Name, Phone number, Date of birth, Address, or MRN)."
+      : null;
+  }
+
   async function HandleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    setFormTouched(true);
+    if (!isGroupFilled()) {
+      setFormError(true);
+      return;
+    }
+    setFormError(false);
+
     if (!fhirServer) {
       console.error("FHIR server is required.");
       return;
@@ -93,13 +131,19 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
     setPatientDiscoveryQueryResponse(queryResponse);
     setLoading(false);
   }
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
   return (
     <>
-      <form onSubmit={HandleSubmit}>
+      <form
+        onSubmit={HandleSubmit}
+        onChange={() => {
+          if (!formTouched) setFormTouched(true);
+        }}
+      >
         <TitleBox step="search" />
         <h2 className="page-explainer">
           Enter patient information below to search for a patient. We will query
@@ -266,6 +310,8 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
                 id="street_address_1"
                 name="street_address_1"
                 type="tel"
+                value={street1}
+                onChange={(event) => setStreet1(event.target.value)}
               />
             </div>
           </div>
@@ -289,13 +335,25 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
               <Label htmlFor="city" className="margin-top-0-important">
                 City
               </Label>
-              <TextInput id="city" name="city" type="text" />
+              <TextInput
+                id="city"
+                name="city"
+                type="text"
+                value={city}
+                onChange={(event) => setCity(event.target.value)}
+              />
             </div>
             <div className="tablet:grid-col-3">
               <Label htmlFor="state" className="margin-top-0-important">
                 State
               </Label>
-              <Select id="state" name="state" defaultValue="">
+              <Select
+                id="state"
+                name="state"
+                value={state}
+                onChange={(event) => setState(event.target.value)}
+                defaultValue=""
+              >
                 <option value="" disabled>
                   Select a state
                 </option>
@@ -316,6 +374,8 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
                 name="zip"
                 type="text"
                 pattern="[\d]{5}(-[\d]{4})?"
+                value={zip}
+                onChange={(event) => setZip(event.target.value)}
               />
             </div>
           </div>
@@ -342,6 +402,15 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
         <button className="usa-button margin-top-5" type="submit">
           Search for patient
         </button>
+        {getErrorMessage() && (
+          <div className={styles.errorMessage}>
+            <Icon.Error
+              aria-label="warning icon indicating an error is present"
+              className={styles.errorMessage}
+            />
+            {getErrorMessage()}
+          </div>
+        )}
       </form>
     </>
   );
