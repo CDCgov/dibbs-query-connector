@@ -109,7 +109,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({
         </div>
       </h2>
 
-      <div className=" grid-container grid-row grid-gap-md padding-0 ">
+      <div className=" grid-container-desktop-lg grid-row grid-gap-md padding-0 ">
         <div className="tablet:grid-col-3">
           <ResultsViewSideNav items={sideNavContent} loading={loading} />
         </div>
