@@ -6,6 +6,7 @@ import {
   Select,
   Button,
 } from "@trussworks/react-uswds";
+import { useSearchParams } from "next/navigation";
 import {
   stateOptions,
   Mode,
@@ -58,6 +59,20 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
   const [mrn, setMRN] = useState<string>("");
 
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const params = useSearchParams();
+
+  const prefillFromQueryParams = () => {
+    if (params?.size <= 0) {
+      return;
+    }
+
+    setFhirServer(params?.get("server") || fhirServer);
+    setFirstName(params?.get("first") || "");
+    setLastName(params?.get("last") || "");
+    setPhone(params?.get("phone") || "");
+    setDOB(params?.get("dob") || "");
+    setMRN(params?.get("mrn") || "");
+  };
 
   // Fills fields with sample data based on the selected
   const fillFields = useCallback(() => {
@@ -95,6 +110,7 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
   }
   useEffect(() => {
     window.scrollTo(0, 0);
+    prefillFromQueryParams();
   }, []);
 
   return (
@@ -156,7 +172,7 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
                   <Select
                     id="fhir_server"
                     name="fhir_server"
-                    value={fhirServer}
+                    defaultValue={params?.get("server") || fhirServer}
                     onChange={(event) => {
                       setFhirServer(event.target.value as string);
                     }}
