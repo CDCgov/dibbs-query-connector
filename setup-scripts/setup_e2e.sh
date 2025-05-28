@@ -16,3 +16,6 @@ if [ -n "$value" ]; then
 else
   echo "Aidbox license key not found in local env file"
 fi
+
+npm install ts-node
+npx ts-node ./setup-scripts/gen-keys.ts
