@@ -4,6 +4,8 @@ import React from "react";
 import Drawer from "@/app/ui/designSystem/drawer/Drawer";
 import styles from "./resultsView.module.scss";
 import { PatientRecordsResponse } from "../../../../backend/query-execution";
+import { Icon, Button } from "@trussworks/react-uswds";
+import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 
 type ResultsViewDrawerProps = {
   isOpen: boolean;
@@ -49,6 +51,16 @@ const ResultsViewDrawer: React.FC<ResultsViewDrawerProps> = ({
   onClose,
   patientRecordsResponse,
 }) => {
+  const jsonStr = patientRecordsResponse
+    ? JSON.stringify(parseNestedJSON(patientRecordsResponse), null, 2)
+    : "";
+
+  function handleCopy() {
+    if (!jsonStr) return;
+    navigator.clipboard.writeText(jsonStr);
+    showToastConfirmation({ body: "Record copied to clipboard" });
+  }
+
   return (
     <Drawer
       isOpen={isOpen}
@@ -58,9 +70,20 @@ const ResultsViewDrawer: React.FC<ResultsViewDrawerProps> = ({
       toRender={
         patientRecordsResponse ? (
           <div className={styles.resultsDrawerContainer}>
-            <pre className={styles.resultsDrawerBody}>
-              {JSON.stringify(parseNestedJSON(patientRecordsResponse), null, 2)}
-            </pre>
+            <div className="display-flex flex-justify-end width-full">
+              <Button
+                type="button"
+                className="usa-button--unstyled text-bold text-no-underline"
+                onClick={handleCopy}
+                aria-label="Copy JSON"
+              >
+                <span className="icon-text display-flex flex-align-center">
+                  <Icon.ContentCopy className="height-3 width-3" />
+                  <span className="padding-left-05">Copy record</span>
+                </span>
+              </Button>
+            </div>
+            <pre className={styles.resultsDrawerBody}>{jsonStr}</pre>
           </div>
         ) : (
           <div className={styles.resultsDrawerContainer}>
@@ -69,7 +92,6 @@ const ResultsViewDrawer: React.FC<ResultsViewDrawerProps> = ({
         )
       }
       onSave={() => {}}
-      toastMessage=""
       drawerWidth="60%"
     />
   );
