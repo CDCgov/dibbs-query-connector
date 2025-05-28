@@ -100,7 +100,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({
           <Button
             secondary
             data-testid="view-fhir-response-button"
-            className={`usa-button--unstyled text-no-underline margin-left-auto padding-right-2`}
+            className={`usa-button--unstyled text-no-underline text-bold margin-left-auto padding-right-2`}
             type="button"
             onClick={() => setDrawerOpen(true)}
           >
