@@ -41,7 +41,6 @@
     "bruteForceProtected": false,
     "permanentLockout": false,
     "maxTemporaryLockouts": 0,
-    "bruteForceStrategy": "MULTIPLE",
     "maxFailureWaitSeconds": 900,
     "minimumQuickLoginWaitSeconds": 60,
     "waitIncrementSeconds": 60,
@@ -743,8 +742,7 @@
         "protocol": "openid-connect",
         "attributes": {
           "realm_client": "false",
-          "client.use.lightweight.access.token.enabled": "true",
-          "post.logout.redirect.uris": "+"
+          "client.use.lightweight.access.token.enabled": "true"
         },
         "authenticationFlowBindingOverrides": {},
         "fullScopeAllowed": true,
@@ -786,8 +784,7 @@
         "frontchannelLogout": false,
         "protocol": "openid-connect",
         "attributes": {
-          "realm_client": "true",
-          "post.logout.redirect.uris": "+"
+          "realm_client": "true"
         },
         "authenticationFlowBindingOverrides": {},
         "fullScopeAllowed": false,
@@ -827,10 +824,8 @@
         "serviceAccountsEnabled": false,
         "publicClient": false,
         "frontchannelLogout": false,
-        "protocol": "openid-connect",
         "attributes": {
-          "realm_client": "true",
-          "post.logout.redirect.uris": "+"
+          "realm_client": "true"
         },
         "authenticationFlowBindingOverrides": {},
         "fullScopeAllowed": false,
@@ -855,17 +850,19 @@
         "id": "d2e8ce4e-a19e-44c6-97b4-3fefa586d5e1",
         "clientId": "query-connector",
         "name": "Query Connector",
-        "description": "",
-        "rootUrl": "http://localhost:3000",
-        "adminUrl": "http://localhost:3000",
-        "baseUrl": "http://localhost:3000",
+        "description": "Dev Keycloak client for Query Connector",
+        "rootUrl": "https://queryconnector.dev",
+        "adminUrl": "https://queryconnector.dev",
+        "baseUrl": "https://queryconnector.dev",
         "surrogateAuthRequired": false,
         "enabled": true,
         "alwaysDisplayInConsole": true,
         "clientAuthenticatorType": "client-secret",
         "secret": "ZG3f7R1J3qIwBaw8QtttJnJMinpERQKs",
-        "redirectUris": ["http://localhost:3000/api/auth/callback/keycloak"],
-        "webOrigins": ["http://localhost:3000"],
+        "redirectUris": [
+          "https://queryconnector.dev/api/auth/callback/keycloak"
+        ],
+        "webOrigins": ["https://queryconnector.dev"],
         "notBefore": 0,
         "bearerOnly": false,
         "consentRequired": false,
@@ -881,7 +878,6 @@
           "oidc.ciba.grant.enabled": "false",
           "client.secret.creation.time": "1730763661",
           "backchannel.logout.session.required": "true",
-          "post.logout.redirect.uris": "+",
           "oauth2.device.authorization.grant.enabled": "false",
           "display.on.consent.screen": "false",
           "backchannel.logout.revoke.offline.tokens": "false"
@@ -898,9 +894,8 @@
             "consentRequired": false,
             "config": {
               "user.session.note": "clientHost",
-              "introspection.token.claim": "true",
-              "userinfo.token.claim": "true",
               "id.token.claim": "true",
+              "introspection.token.claim": "true",
               "access.token.claim": "true",
               "claim.name": "clientHost",
               "jsonType.label": "String"
@@ -914,9 +909,8 @@
             "consentRequired": false,
             "config": {
               "user.session.note": "client_id",
-              "introspection.token.claim": "true",
-              "userinfo.token.claim": "true",
               "id.token.claim": "true",
+              "introspection.token.claim": "true",
               "access.token.claim": "true",
               "claim.name": "client_id",
               "jsonType.label": "String"
@@ -930,9 +924,8 @@
             "consentRequired": false,
             "config": {
               "user.session.note": "clientAddress",
-              "introspection.token.claim": "true",
-              "userinfo.token.claim": "true",
               "id.token.claim": "true",
+              "introspection.token.claim": "true",
               "access.token.claim": "true",
               "claim.name": "clientAddress",
               "jsonType.label": "String"
@@ -1129,7 +1122,6 @@
             "config": {
               "user.session.note": "AUTH_TIME",
               "introspection.token.claim": "true",
-              "userinfo.token.claim": "true",
               "id.token.claim": "true",
               "access.token.claim": "true",
               "claim.name": "auth_time",
@@ -1224,65 +1216,7 @@
             "config": {
               "id.token.claim": "true",
               "introspection.token.claim": "true",
-              "access.token.claim": "true",
-              "userinfo.token.claim": "true"
-            }
-          }
-        ]
-      },
-      {
-        "id": "15d821d8-e583-4272-b1f6-b6c90ee015ee",
-        "name": "service_account",
-        "description": "Specific scope for a client enabled for service accounts",
-        "protocol": "openid-connect",
-        "attributes": {
-          "include.in.token.scope": "false",
-          "display.on.consent.screen": "false"
-        },
-        "protocolMappers": [
-          {
-            "id": "ddd39bb7-6996-4b9b-8ea5-527e91618943",
-            "name": "Client IP Address",
-            "protocol": "openid-connect",
-            "protocolMapper": "oidc-usersessionmodel-note-mapper",
-            "consentRequired": false,
-            "config": {
-              "user.session.note": "clientAddress",
-              "id.token.claim": "true",
-              "introspection.token.claim": "true",
-              "access.token.claim": "true",
-              "claim.name": "clientAddress",
-              "jsonType.label": "String"
-            }
-          },
-          {
-            "id": "ed28109d-c4d1-4e7b-9610-945582ae27f4",
-            "name": "Client Host",
-            "protocol": "openid-connect",
-            "protocolMapper": "oidc-usersessionmodel-note-mapper",
-            "consentRequired": false,
-            "config": {
-              "user.session.note": "clientHost",
-              "id.token.claim": "true",
-              "introspection.token.claim": "true",
-              "access.token.claim": "true",
-              "claim.name": "clientHost",
-              "jsonType.label": "String"
-            }
-          },
-          {
-            "id": "a8f6f997-f71d-414f-8e3d-4cb9e8d231bc",
-            "name": "Client ID",
-            "protocol": "openid-connect",
-            "protocolMapper": "oidc-usersessionmodel-note-mapper",
-            "consentRequired": false,
-            "config": {
-              "user.session.note": "client_id",
-              "id.token.claim": "true",
-              "introspection.token.claim": "true",
-              "access.token.claim": "true",
-              "claim.name": "client_id",
-              "jsonType.label": "String"
+              "access.token.claim": "true"
             }
           }
         ]
@@ -1584,13 +1518,12 @@
             "protocolMapper": "oidc-organization-membership-mapper",
             "consentRequired": false,
             "config": {
-              "introspection.token.claim": "true",
-              "multivalued": "true",
-              "userinfo.token.claim": "true",
               "id.token.claim": "true",
+              "introspection.token.claim": "true",
               "access.token.claim": "true",
               "claim.name": "organization",
-              "jsonType.label": "String"
+              "jsonType.label": "String",
+              "multivalued": "true"
             }
           }
         ]
@@ -1630,7 +1563,6 @@
             "config": {
               "introspection.token.claim": "true",
               "multivalued": "true",
-              "userinfo.token.claim": "true",
               "user.attribute": "foo",
               "id.token.claim": "true",
               "access.token.claim": "true",
@@ -2562,21 +2494,13 @@
       "cibaBackchannelTokenDeliveryMode": "poll",
       "cibaExpiresIn": "120",
       "cibaAuthRequestedUserHint": "login_hint",
-      "oauth2DeviceCodeLifespan": "600",
-      "clientOfflineSessionMaxLifespan": "0",
-      "oauth2DevicePollingInterval": "5",
-      "clientSessionIdleTimeout": "0",
       "parRequestUriLifespan": "60",
-      "clientSessionMaxLifespan": "0",
-      "clientOfflineSessionIdleTimeout": "0",
       "cibaInterval": "5",
       "realmReusableOtpCode": "false"
     },
-    "keycloakVersion": "26.1.5",
+    "keycloakVersion": "26.0.2",
     "userManagedAccessAllowed": false,
     "organizationsEnabled": false,
-    "verifiableCredentialsEnabled": false,
-    "adminPermissionsEnabled": false,
     "clientProfiles": {
       "profiles": []
     },
