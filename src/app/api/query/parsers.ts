@@ -8,6 +8,7 @@ export type PatientIdentifiers = {
   dob?: string;
   mrn?: string;
   phone?: string;
+  email?: string;
 };
 
 /**
@@ -94,6 +95,24 @@ export function parsePhoneNumbers(
         ["home", "work", "mobile"].includes(contactPoint.use || ""),
     );
     return phoneNumbers.map((contactPoint) => contactPoint.value);
+  }
+}
+
+/**
+ * Helper function that extracts all applicable email addresses from a patient resource
+ * and returns them as a list of strings, without changing the input formatting
+ * of the emails.
+ * @param patient A FHIR Patient resource.
+ * @returns A list of emails, or undefined if the patient has no email.
+ */
+export function parseEmails(
+  patient: Patient,
+): (string | undefined)[] | undefined {
+  if (patient.telecom) {
+    const emailAddresses = patient.telecom.filter(
+      (contactPoint) => contactPoint.system === "email",
+    );
+    return emailAddresses.map((contactPoint) => contactPoint.value);
   }
 }
 
