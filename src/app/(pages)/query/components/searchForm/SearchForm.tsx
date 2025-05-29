@@ -359,25 +359,6 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
           </div>
           <div className="grid-row grid-gap margin-bottom-4">
             <h3 className={`"font-sans-md" ${styles.searchFormSectionLabel}`}>
-              Phone number
-            </h3>
-            <div className="grid-col-6">
-              <Label htmlFor="phone" className="margin-top-0-important">
-                Phone number
-              </Label>
-              <TextInput
-                id="phone"
-                name="phone"
-                type="tel"
-                value={phone}
-                onChange={(event) => {
-                  setPhone(event.target.value);
-                }}
-              />
-            </div>
-          </div>
-          <div className="grid-row grid-gap margin-bottom-4">
-            <h3 className={`"font-sans-md" ${styles.searchFormSectionLabel}`}>
               Address
             </h3>
             <div className="grid-col">
