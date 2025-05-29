@@ -124,34 +124,6 @@ exports[`SearchForm does not prefill address with bad data 1`] = `
           <h3
             class=""font-sans-md" searchFormSectionLabel"
           >
-            Phone number
-          </h3>
-          <div
-            class="grid-col-6"
-          >
-            <label
-              class="usa-label margin-top-0-important"
-              data-testid="label"
-              for="phone"
-            >
-              Phone number
-            </label>
-            <input
-              class="usa-input"
-              data-testid="textInput"
-              id="phone"
-              name="phone"
-              type="tel"
-              value=""
-            />
-          </div>
-        </div>
-        <div
-          class="grid-row grid-gap margin-bottom-4"
-        >
-          <h3
-            class=""font-sans-md" searchFormSectionLabel"
-          >
             Date of Birth
           </h3>
           <div
@@ -175,6 +147,34 @@ exports[`SearchForm does not prefill address with bad data 1`] = `
                 value=""
               />
             </div>
+          </div>
+        </div>
+        <div
+          class="grid-row grid-gap margin-bottom-4"
+        >
+          <h3
+            class=""font-sans-md" searchFormSectionLabel"
+          >
+            Phone number
+          </h3>
+          <div
+            class="grid-col-6"
+          >
+            <label
+              class="usa-label margin-top-0-important"
+              data-testid="label"
+              for="phone"
+            >
+              Phone number
+            </label>
+            <input
+              class="usa-input"
+              data-testid="textInput"
+              id="phone"
+              name="phone"
+              type="tel"
+              value=""
+            />
           </div>
         </div>
         <div
@@ -774,34 +774,6 @@ exports[`SearchForm does not prefill fhir server with bad data 1`] = `
           <h3
             class=""font-sans-md" searchFormSectionLabel"
           >
-            Phone number
-          </h3>
-          <div
-            class="grid-col-6"
-          >
-            <label
-              class="usa-label margin-top-0-important"
-              data-testid="label"
-              for="phone"
-            >
-              Phone number
-            </label>
-            <input
-              class="usa-input"
-              data-testid="textInput"
-              id="phone"
-              name="phone"
-              type="tel"
-              value=""
-            />
-          </div>
-        </div>
-        <div
-          class="grid-row grid-gap margin-bottom-4"
-        >
-          <h3
-            class=""font-sans-md" searchFormSectionLabel"
-          >
             Date of Birth
           </h3>
           <div
@@ -825,6 +797,34 @@ exports[`SearchForm does not prefill fhir server with bad data 1`] = `
                 value=""
               />
             </div>
+          </div>
+        </div>
+        <div
+          class="grid-row grid-gap margin-bottom-4"
+        >
+          <h3
+            class=""font-sans-md" searchFormSectionLabel"
+          >
+            Phone number
+          </h3>
+          <div
+            class="grid-col-6"
+          >
+            <label
+              class="usa-label margin-top-0-important"
+              data-testid="label"
+              for="phone"
+            >
+              Phone number
+            </label>
+            <input
+              class="usa-input"
+              data-testid="textInput"
+              id="phone"
+              name="phone"
+              type="tel"
+              value=""
+            />
           </div>
         </div>
         <div
@@ -1424,34 +1424,6 @@ exports[`SearchForm prefills form fields from query params 1`] = `
           <h3
             class=""font-sans-md" searchFormSectionLabel"
           >
-            Phone number
-          </h3>
-          <div
-            class="grid-col-6"
-          >
-            <label
-              class="usa-label margin-top-0-important"
-              data-testid="label"
-              for="phone"
-            >
-              Phone number
-            </label>
-            <input
-              class="usa-input"
-              data-testid="textInput"
-              id="phone"
-              name="phone"
-              type="tel"
-              value=""
-            />
-          </div>
-        </div>
-        <div
-          class="grid-row grid-gap margin-bottom-4"
-        >
-          <h3
-            class=""font-sans-md" searchFormSectionLabel"
-          >
             Date of Birth
           </h3>
           <div
@@ -1475,6 +1447,34 @@ exports[`SearchForm prefills form fields from query params 1`] = `
                 value=""
               />
             </div>
+          </div>
+        </div>
+        <div
+          class="grid-row grid-gap margin-bottom-4"
+        >
+          <h3
+            class=""font-sans-md" searchFormSectionLabel"
+          >
+            Phone number
+          </h3>
+          <div
+            class="grid-col-6"
+          >
+            <label
+              class="usa-label margin-top-0-important"
+              data-testid="label"
+              for="phone"
+            >
+              Phone number
+            </label>
+            <input
+              class="usa-input"
+              data-testid="textInput"
+              id="phone"
+              name="phone"
+              type="tel"
+              value=""
+            />
           </div>
         </div>
         <div
@@ -2074,34 +2074,6 @@ exports[`SearchForm renders fhir server form options on button click 1`] = `
           <h3
             class=""font-sans-md" searchFormSectionLabel"
           >
-            Phone number
-          </h3>
-          <div
-            class="grid-col-6"
-          >
-            <label
-              class="usa-label margin-top-0-important"
-              data-testid="label"
-              for="phone"
-            >
-              Phone number
-            </label>
-            <input
-              class="usa-input"
-              data-testid="textInput"
-              id="phone"
-              name="phone"
-              type="tel"
-              value=""
-            />
-          </div>
-        </div>
-        <div
-          class="grid-row grid-gap margin-bottom-4"
-        >
-          <h3
-            class=""font-sans-md" searchFormSectionLabel"
-          >
             Date of Birth
           </h3>
           <div
@@ -2125,6 +2097,34 @@ exports[`SearchForm renders fhir server form options on button click 1`] = `
                 value=""
               />
             </div>
+          </div>
+        </div>
+        <div
+          class="grid-row grid-gap margin-bottom-4"
+        >
+          <h3
+            class=""font-sans-md" searchFormSectionLabel"
+          >
+            Phone number
+          </h3>
+          <div
+            class="grid-col-6"
+          >
+            <label
+              class="usa-label margin-top-0-important"
+              data-testid="label"
+              for="phone"
+            >
+              Phone number
+            </label>
+            <input
+              class="usa-input"
+              data-testid="textInput"
+              id="phone"
+              name="phone"
+              type="tel"
+              value=""
+            />
           </div>
         </div>
         <div
@@ -2724,34 +2724,6 @@ exports[`SearchForm renders the patient search form 1`] = `
           <h3
             class=""font-sans-md" searchFormSectionLabel"
           >
-            Phone number
-          </h3>
-          <div
-            class="grid-col-6"
-          >
-            <label
-              class="usa-label margin-top-0-important"
-              data-testid="label"
-              for="phone"
-            >
-              Phone number
-            </label>
-            <input
-              class="usa-input"
-              data-testid="textInput"
-              id="phone"
-              name="phone"
-              type="tel"
-              value=""
-            />
-          </div>
-        </div>
-        <div
-          class="grid-row grid-gap margin-bottom-4"
-        >
-          <h3
-            class=""font-sans-md" searchFormSectionLabel"
-          >
             Date of Birth
           </h3>
           <div
@@ -2775,6 +2747,34 @@ exports[`SearchForm renders the patient search form 1`] = `
                 value=""
               />
             </div>
+          </div>
+        </div>
+        <div
+          class="grid-row grid-gap margin-bottom-4"
+        >
+          <h3
+            class=""font-sans-md" searchFormSectionLabel"
+          >
+            Phone number
+          </h3>
+          <div
+            class="grid-col-6"
+          >
+            <label
+              class="usa-label margin-top-0-important"
+              data-testid="label"
+              for="phone"
+            >
+              Phone number
+            </label>
+            <input
+              class="usa-input"
+              data-testid="textInput"
+              id="phone"
+              name="phone"
+              type="tel"
+              value=""
+            />
           </div>
         </div>
         <div
