@@ -1,5 +1,5 @@
 "use client";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Dispatch, JSX, SetStateAction, useEffect, useState } from "react";
 import styles from "../buildFromTemplates/conditionTemplateSelection.module.scss";
 import { HeadingLevel } from "@trussworks/react-uswds";
 import ConceptTypeAccordionBody from "./SelectionViewAccordionBody";

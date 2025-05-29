@@ -1,6 +1,6 @@
 import { ModalRef } from "@/app/ui/designSystem/modal/Modal";
 import { DeleteModal } from "@/app/ui/designSystem/modal/deleteModal";
-import { RefObject } from "react";
+import { JSX, RefObject } from "react";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import { DataContextValue } from "@/app/shared/DataProvider";
 import { deleteQueryById } from "@/app/backend/query-building/service";
@@ -66,7 +66,7 @@ export const confirmDelete = (
   queryName: string,
   queryId: string,
   setSelectedQuery: React.Dispatch<React.SetStateAction<SelectedQueryDetails>>,
-  modalRef: RefObject<ModalRef>,
+  modalRef: RefObject<ModalRef | null>,
 ) => {
   setSelectedQuery({ queryName, queryId });
   modalRef.current?.toggleModal();
@@ -104,7 +104,7 @@ export const handleCopy = (queryName: string, queryId: string) => {
  * @returns The JSX element for the modal.
  */
 export const renderModal = (
-  modalRef: RefObject<ModalRef>,
+  modalRef: RefObject<ModalRef | null>,
   selectedQuery: SelectedQueryDetails | null,
   handleDelete: (
     queryName: string | undefined,

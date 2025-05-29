@@ -45,14 +45,15 @@ exports[`Code library interaction renders action buttons for custom value sets o
               name="librarySearch"
               placeholder="Search"
               type="search"
-              value=""
             />
             <div
               class="applyFilters"
               role="button"
               tabindex="0"
             >
-              <div>
+              <div
+                class="display-flex flex-align-center"
+              >
                 <svg
                   aria-label="Icon indicating a menu with filter options"
                   class="usa-icon usa-icon--size-3 usa-icon qc-filter"
@@ -548,9 +549,7 @@ exports[`Code library interaction renders action buttons for custom value sets o
 `;
 
 exports[`Code library loading view renders a skeleton loading state when loading is true 1`] = `
-<body
-  style="padding-right: 0px;"
->
+<body>
   <div>
     <div>
       <div
@@ -592,14 +591,15 @@ exports[`Code library loading view renders a skeleton loading state when loading
               name="librarySearch"
               placeholder="Search"
               type="search"
-              value=""
             />
             <div
               class="applyFilters"
               role="button"
               tabindex="0"
             >
-              <div>
+              <div
+                class="display-flex flex-align-center"
+              >
                 <svg
                   aria-label="Icon indicating a menu with filter options"
                   class="usa-icon usa-icon--size-3 usa-icon qc-filter"
@@ -904,14 +904,15 @@ exports[`Code library rendered view renders concept codes for the value set when
               name="librarySearch"
               placeholder="Search"
               type="search"
-              value=""
             />
             <div
               class="applyFilters"
               role="button"
               tabindex="0"
             >
-              <div>
+              <div
+                class="display-flex flex-align-center"
+              >
                 <svg
                   aria-label="Icon indicating a menu with filter options"
                   class="usa-icon usa-icon--size-3 usa-icon qc-filter"
@@ -1428,14 +1429,15 @@ exports[`Code library rendered view renders the correct content 1`] = `
               name="librarySearch"
               placeholder="Search"
               type="search"
-              value=""
             />
             <div
               class="applyFilters"
               role="button"
               tabindex="0"
             >
-              <div>
+              <div
+                class="display-flex flex-align-center"
+              >
                 <svg
                   aria-label="Icon indicating a menu with filter options"
                   class="usa-icon usa-icon--size-3 usa-icon qc-filter"

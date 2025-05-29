@@ -7,6 +7,7 @@ import {
   Button,
   Icon,
 } from "@trussworks/react-uswds";
+import { useSearchParams } from "next/navigation";
 import {
   stateOptions,
   Mode,
@@ -50,13 +51,47 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
   const [phone, setPhone] = useState<string>("");
   const [dob, setDOB] = useState<string>("");
   const [mrn, setMRN] = useState<string>("");
-  const [street1, setStreet1] = useState<string>("");
-  const [city, setCity] = useState<string>("");
-  const [state, setState] = useState<string>("");
-  const [zip, setZip] = useState<string>("");
-  const [email, _setEmail] = useState<string>("");
+  const [address, setAddress] = useState<{
+    street1: string;
+    street2: string;
+    city: string;
+    state: string;
+    zip: string;
+  }>({ street1: "", street2: "", city: "", state: "", zip: "" });
 
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const params = useSearchParams();
+
+  const prefillFromQueryParams = () => {
+    if (params?.size <= 0) {
+      return;
+    }
+
+    // set the fhir server only if it matches one from the list;
+    // otherwise, use default
+    const server = params?.get("server");
+    setFhirServer(server && fhirServers.includes(server) ? server : fhirServer);
+    setFirstName(params?.get("first") || "");
+    setLastName(params?.get("last") || "");
+    setPhone(params?.get("phone") || "");
+    setDOB(params?.get("dob") || "");
+    setMRN(params?.get("mrn") || "");
+
+    const zipAddr = params?.get("zip");
+    const stateAddr = params?.get("state") || "";
+
+    const stateMatch =
+      !!stateAddr &&
+      stateOptions?.filter((state) => state.value == stateAddr)[0]?.value;
+    setAddress({
+      ...address,
+      street1: params?.get("street") || "",
+      street2: params?.get("street2") || "",
+      city: params?.get("city") || "",
+      state: stateMatch || "",
+      zip: zipAddr?.match(/^\d{5}(?:[-\s]\d{4})?$/) ? zipAddr : "",
+    });
+  };
 
   const [formTouched, setFormTouched] = useState(false);
   const [_formError, setFormError] = useState(false);
@@ -139,6 +174,7 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
 
   useEffect(() => {
     window.scrollTo(0, 0);
+    prefillFromQueryParams();
   }, []);
 
   return (
@@ -200,7 +236,7 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
                   <Select
                     id="fhir_server"
                     name="fhir_server"
-                    value={fhirServer}
+                    value={params?.get("server") || fhirServer}
                     onChange={(event) => {
                       setFhirServer(event.target.value as string);
                     }}
@@ -313,8 +349,10 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
                 id="street_address_1"
                 name="street_address_1"
                 type="tel"
-                value={street1}
-                onChange={(event) => setStreet1(event.target.value)}
+                value={address.street1}
+                onChange={(event) => {
+                  setAddress({ ...address, street1: event.target.value });
+                }}
               />
             </div>
           </div>
@@ -330,6 +368,10 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
                 id="street_address_2"
                 name="street_address_2"
                 type="text"
+                value={address.street2}
+                onChange={(event) => {
+                  setAddress({ ...address, street2: event.target.value });
+                }}
               />
             </div>
           </div>
@@ -342,8 +384,10 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
                 id="city"
                 name="city"
                 type="text"
-                value={city}
-                onChange={(event) => setCity(event.target.value)}
+                value={address.city}
+                onChange={(event) => {
+                  setAddress({ ...address, city: event.target.value });
+                }}
               />
             </div>
             <div className="tablet:grid-col-3">
@@ -353,8 +397,10 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
               <Select
                 id="state"
                 name="state"
-                value={state}
-                onChange={(event) => setState(event.target.value)}
+                value={address.state}
+                onChange={(event) => {
+                  setAddress({ ...address, state: event.target.value });
+                }}
               >
                 <option value="" disabled>
                   Select a state
@@ -376,8 +422,10 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
                 name="zip"
                 type="text"
                 pattern="[\d]{5}(-[\d]{4})?"
-                value={zip}
-                onChange={(event) => setZip(event.target.value)}
+                value={address.zip}
+                onChange={(event) => {
+                  setAddress({ ...address, zip: event.target.value });
+                }}
               />
             </div>
           </div>
