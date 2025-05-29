@@ -55,6 +55,15 @@ export function parsePatientDemographics(patient: Patient): PatientIdentifiers {
     }
   }
 
+  const emailAddresses = parseEmails(patient);
+  if (emailAddresses && emailAddresses.length > 0) {
+    if (emailAddresses.length == 1) {
+      identifiers.email = emailAddresses[0];
+    } else if (emailAddresses.length > 1) {
+      identifiers.email = emailAddresses.join(";");
+    }
+  }
+
   return identifiers;
 }
 
@@ -99,20 +108,32 @@ export function parsePhoneNumbers(
 }
 
 /**
- * Helper function that extracts all applicable email addresses from a patient resource
+ * Validates an email address using a regular expression.
+ * @param email - The email address to validate.
+ * @returns True if the email is valid, false otherwise.
+ */
+export function validEmail(email: string | undefined): boolean {
+  if (!email) return false;
+  // RFC 5322 Official Standard email regex
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+/**
+ * Helper function that extracts all applicable, valid email addresses from a patient resource
  * and returns them as a list of strings, without changing the input formatting
  * of the emails.
  * @param patient A FHIR Patient resource.
- * @returns A list of emails, or undefined if the patient has no email.
+ * @returns A list of valid emails, or undefined if the patient has no valid email.
  */
 export function parseEmails(
   patient: Patient,
 ): (string | undefined)[] | undefined {
   if (patient.telecom) {
-    const emailAddresses = patient.telecom.filter(
-      (contactPoint) => contactPoint.system === "email",
-    );
-    return emailAddresses.map((contactPoint) => contactPoint.value);
+    const emailAddresses = patient.telecom
+      .filter((contactPoint) => contactPoint.system === "email")
+      .map((contactPoint) => contactPoint.value)
+      .filter((email) => validEmail(email));
+    return emailAddresses.length > 0 ? emailAddresses : undefined;
   }
 }
 
