@@ -354,7 +354,6 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
                   setEmail(event.target.value);
                 }}
               />
-              {renderFieldError(email)}
             </div>
           </div>
           <div className="grid-row grid-gap margin-bottom-4">
