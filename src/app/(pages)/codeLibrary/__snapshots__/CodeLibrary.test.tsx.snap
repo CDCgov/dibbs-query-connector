@@ -45,7 +45,6 @@ exports[`Code library interaction renders action buttons for custom value sets o
               name="librarySearch"
               placeholder="Search"
               type="search"
-              value=""
             />
             <div
               class="applyFilters"
@@ -550,9 +549,7 @@ exports[`Code library interaction renders action buttons for custom value sets o
 `;
 
 exports[`Code library loading view renders a skeleton loading state when loading is true 1`] = `
-<body
-  style="padding-right: 0px;"
->
+<body>
   <div>
     <div>
       <div
@@ -594,7 +591,6 @@ exports[`Code library loading view renders a skeleton loading state when loading
               name="librarySearch"
               placeholder="Search"
               type="search"
-              value=""
             />
             <div
               class="applyFilters"
@@ -908,7 +904,6 @@ exports[`Code library rendered view renders concept codes for the value set when
               name="librarySearch"
               placeholder="Search"
               type="search"
-              value=""
             />
             <div
               class="applyFilters"
@@ -1434,7 +1429,6 @@ exports[`Code library rendered view renders the correct content 1`] = `
               name="librarySearch"
               placeholder="Search"
               type="search"
-              value=""
             />
             <div
               class="applyFilters"
