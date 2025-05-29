@@ -49,6 +49,7 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
   const [firstName, setFirstName] = useState<string>("");
   const [lastName, setLastName] = useState<string>("");
   const [phone, setPhone] = useState<string>("");
+  const [email, _setEmail] = useState<string>("");
   const [dob, setDOB] = useState<string>("");
   const [mrn, setMRN] = useState<string>("");
   const [address, setAddress] = useState<{
@@ -118,10 +119,11 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
       phone: FormatPhoneAsDigits(phone),
       email,
       address: {
-        street1,
-        city,
-        state,
-        zip,
+        street1: address.street1,
+        street2: address.street2,
+        city: address.city,
+        state: address.state,
+        zip: address.zip,
       },
     };
   }
