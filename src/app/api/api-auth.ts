@@ -38,9 +38,6 @@ export async function validateServiceToken(req: NextRequest) {
           "https://login.microsoftonline.com/common/discovery/keys",
         );
         issuer = `https://sts.windows.net/${process.env.ENTRA_TENANT_ID}/`;
-        console.log("Using Entra ID validation");
-        console.log("Keys URL:", keySetUrl.toString());
-        console.log("Expected issuer:", issuer);
         break;
       case "keycloak":
         keySetUrl = new URL(
@@ -72,7 +69,6 @@ export async function validateServiceToken(req: NextRequest) {
         return { valid: true, payload };
       }
     } else {
-      // Microsoft Entra ID
       const entraPayload = payload as EntraJWTPayload;
       if (
         process.env.AUTH_CLIENT_ID &&
