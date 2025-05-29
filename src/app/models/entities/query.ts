@@ -32,7 +32,7 @@ export type PatientDiscoveryRequest = {
 
 export type Address = {
   street1?: string;
-  line2?: string;
+  street2?: string;
   city?: string;
   state?: string;
   zip?: string;
