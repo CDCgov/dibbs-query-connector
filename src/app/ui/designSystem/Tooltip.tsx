@@ -1,4 +1,4 @@
-import React from "react";
+import React, { JSX } from "react";
 
 // https://trussworks.github.io/react-uswds/?path=/docs/components-tooltip--docs#custom%20component
 

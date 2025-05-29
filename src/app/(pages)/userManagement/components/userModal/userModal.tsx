@@ -38,7 +38,7 @@ const Modal = dynamic<ModalProps>(
  * The props for the UserModal component.
  */
 export interface UserModalProps {
-  modalRef: React.RefObject<ModalRef>;
+  modalRef: React.RefObject<ModalRef | null>;
   modalMode: UserManagementMode;
   setModalMode: (arg: UserManagementMode) => void;
   refreshView: React.Dispatch<React.SetStateAction<boolean | viewMode>>;

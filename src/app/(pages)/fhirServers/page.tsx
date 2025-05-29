@@ -3,7 +3,7 @@
 import { Icon, Label, Tag, TextInput } from "@trussworks/react-uswds";
 
 import dynamic from "next/dynamic";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, JSX } from "react";
 import type { ModalRef } from "../../ui/designSystem/modal/Modal";
 import styles from "./fhirServers.module.scss";
 import classNames from "classnames";

@@ -106,7 +106,7 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
   } | null>(null);
 
   const warningModalRef = useRef<ModalRef>(null);
-  const pendingNavRef = useRef<() => void>();
+  const pendingNavRef = useRef<() => void>(() => {});
 
   function hasUnsavedChanges(): boolean {
     const hasData =

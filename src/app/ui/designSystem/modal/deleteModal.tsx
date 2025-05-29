@@ -2,7 +2,7 @@ import React, { RefObject } from "react";
 import { Modal, ModalRef } from "@/app/ui/designSystem/modal/Modal";
 
 interface DeleteModalProps {
-  modalRef: RefObject<ModalRef>;
+  modalRef: RefObject<ModalRef | null>;
   heading: string;
   description: string;
   onDelete: () => void;

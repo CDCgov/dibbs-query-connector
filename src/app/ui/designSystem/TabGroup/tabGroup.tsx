@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { JSX, useState } from "react";
 import classNames from "classnames";
 import styles from "./tabGroup.module.scss";
 import { User, UserGroup } from "@/app/models/entities/users";

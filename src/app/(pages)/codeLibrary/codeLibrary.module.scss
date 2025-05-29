@@ -1,6 +1,6 @@
 @use "../../ui/styles/variables" as *;
 
-$pageContainerHeight: calc(100vh - $header-content-height - $site-alert-height);
+$pageContainerHeight: 100vh;
 $pageHeaderHeight: 12rem;
 $pageControlsHeight: 3rem;
 
@@ -173,8 +173,8 @@ $pageControlsHeight: 3rem;
 }
 
 .manageCodesLink {
-  font-weight: 700;
-  text-decoration: none;
+    font-weight: 700;
+    text-decoration: none;
 }
 
 .resultsContainer {
@@ -196,7 +196,7 @@ $pageControlsHeight: 3rem;
     padding: 1rem;
     align-items: center;
     width: calc($query-connector-content-width-wide + 4rem);
-    margin-bottom: 1rem;
+    margin-bottom: -7rem;
 
     ul {
         max-width: 50%;
@@ -354,24 +354,23 @@ $pageControlsHeight: 3rem;
         padding-right: 1rem;
         max-width: 7.5rem;
     }
-  }
+}
 
 .valueSetCode {
-  min-width: 7.5rem;
-  max-width: 7.5rem;
-  padding-right: 1rem;
-  display: flex;
-  align-items: center;
+    min-width: 7.5rem;
+    max-width: 7.5rem;
+    padding-right: 1rem;
+    display: flex;
+    align-items: center;
 }
 
 .conceptRowInline {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 0.5rem; 
-  word-break: break-word;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+    word-break: break-word;
 }
-
 
 .valueSetTable__tableBody {
     &_row {

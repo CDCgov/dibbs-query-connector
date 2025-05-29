@@ -1,11 +1,7 @@
 {
   "compilerOptions": {
     "target": "ESNext",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
@@ -27,15 +23,9 @@
       }
     ],
     "paths": {
-      "@/*": [
-        "./src/*"
-      ],
-      "@/app/*": [
-        "./src/app/*"
-      ],
-      "@/backend/*": [
-        "./src/app/backend/*"
-      ]
+      "@/*": ["./src/*"],
+      "@/app/*": ["./src/app/*"],
+      "@/backend/*": ["./src/app/backend/*"]
     }
   },
   "include": [
@@ -44,12 +34,8 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "node_modules/cypress/types/cypress.d.ts",
-    "src/lib/remark-image-transform.mjs"
+    "src/lib/remark-image-transform.mjs",
+    "setup-scripts/gen-keys.mjs"
   ],
-  "exclude": [
-    "node_modules",
-    "./cypress.config.ts",
-    "cypress",
-    "**/*.cy.tsx"
-  ]
+  "exclude": ["node_modules", "./cypress.config.ts", "cypress", "**/*.cy.tsx"]
 }

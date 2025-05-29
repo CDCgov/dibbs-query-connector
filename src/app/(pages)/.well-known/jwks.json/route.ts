@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getOrCreateKeys } from "../../../backend/smart-on-fhir";
+import { getOrCreateKeys } from "../../../../../setup-scripts/gen-keys";
 
 export async function GET() {
   try {

@@ -214,11 +214,6 @@ exports[`DropdownFilter renders correctly 1`] = `
               QC Admin
             </option>
             <option
-              value="Hogwarts"
-            >
-              Hogwarts
-            </option>
-            <option
               value="My Team(s)"
             >
               My Team(s)

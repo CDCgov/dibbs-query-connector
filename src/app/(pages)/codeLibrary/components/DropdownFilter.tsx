@@ -156,9 +156,10 @@ const DropdownFilter: React.FC<DropdownFilterProps> = ({
     });
   };
 
-  const handleOutsideClick = (ref: RefObject<HTMLFormElement>) => {
+  const handleOutsideClick = (ref: RefObject<HTMLFormElement | null>) => {
     useEffect(() => {
       function handleClickOutside(event: MouseEvent | KeyboardEvent) {
+        if (!ref) return;
         if (
           (event as KeyboardEvent).key == "Escape" ||
           (ref.current && !ref.current.contains(event.target as Node))

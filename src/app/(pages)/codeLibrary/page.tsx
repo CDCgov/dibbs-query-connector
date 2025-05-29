@@ -584,7 +584,7 @@ const CodeLibrary: React.FC = () => {
                 onClick={() => setShowFilters(true)}
               >
                 {
-                  <div>
+                  <div className="display-flex flex-align-center">
                     <Icon.FilterList
                       className="usa-icon qc-filter"
                       size={3}
@@ -599,7 +599,7 @@ const CodeLibrary: React.FC = () => {
                     {showFilters && (
                       <DropdownFilter
                         filterCount={filterCount}
-                        loading={loading}
+                        loading={valueSets.length <= 0}
                         setShowFilters={setShowFilters}
                         filterSearch={filterSearch}
                         setFilterSearch={setFilterSearch}
