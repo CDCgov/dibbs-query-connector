@@ -58,6 +58,11 @@ The Patient Information page can also pre-fill certain form fields from URL para
 - `last` (Last name)
 - `dob` (Date of birth, formatted as YYYY-MM-DD)
 - `phone` (Phone number)
+- `street` (Street Address) 
+- `street2` (Address line 2) 
+- `city` (Address city) 
+- `state` (Address state abbreviation, e.g. MN) 
+- `zip` (Zip code) 
 - `mrn` (Medical Record Number)
 - `server` (Health Care Organization) 
 
