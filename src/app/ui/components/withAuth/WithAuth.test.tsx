@@ -56,7 +56,7 @@ describe("WithAuth component (page access guard)", () => {
       status: "authenticated",
       update: jest.fn(),
     };
-    jest.spyOn(Utils, "getRole").mockReturnValueOnce("Super Admin");
+    jest.spyOn(Utils, "getRole").mockReturnValueOnce(UserRole.SUPER_ADMIN);
     jest.spyOn(nextAuthReact, "useSession").mockReturnValueOnce(session);
 
     render(
