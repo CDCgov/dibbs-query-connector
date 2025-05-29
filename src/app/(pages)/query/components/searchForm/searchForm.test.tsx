@@ -132,4 +132,54 @@ describe("SearchForm", () => {
     expect(selectedServer).not.toHaveValue(badServerName);
     expect(selectedServer).toHaveValue(defaultServerName);
   });
+
+  it("does not prefill address with bad data", async () => {
+    const goodAddressStreet = "123 Main St";
+    const goodAddressCity = "Anytown";
+    const badAddressState = "ZZ";
+    const badAddressZip = "123abc";
+    const queryParams = `street=${goodAddressStreet}&city=${goodAddressCity}&state=${badAddressState}&zip=${badAddressZip}`;
+
+    const formattedParams = new URLSearchParams(queryParams);
+    (useSearchParams as jest.Mock).mockReturnValue(formattedParams);
+
+    renderWithUser(
+      <RootProviderMock currentPage={`/query?${queryParams}`}>
+        <SearchForm
+          setMode={jest.fn()}
+          setLoading={jest.fn()}
+          setPatientDiscoveryQueryResponse={jest.fn()}
+          selectedFhirServer={"Default server"}
+          setFhirServer={jest.fn()}
+          fhirServers={["Default server"]}
+        ></SearchForm>
+      </RootProviderMock>,
+    );
+
+    expect(screen.getByText("Enter patient information")).toBeVisible();
+    expect(document.body).toMatchSnapshot();
+
+    const streetAddress = screen.getByRole("textbox", {
+      name: "Street address",
+    });
+    const city = screen.getByRole("textbox", {
+      name: "City",
+    });
+    const state = screen.getByRole("combobox", {
+      name: "State",
+    });
+    const zip = screen.getByRole("textbox", {
+      name: "Zip code",
+    });
+    console.log(streetAddress?.textContent);
+
+    expect(streetAddress).toHaveValue(goodAddressStreet);
+    expect(city).toHaveValue(goodAddressCity);
+
+    expect(state).not.toHaveValue(badAddressState);
+    expect(state).toHaveValue("");
+
+    expect(zip).not.toHaveValue(badAddressZip);
+    expect(zip).toHaveValue("");
+  });
 });
