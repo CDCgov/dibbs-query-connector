@@ -100,6 +100,21 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
     return !isValid() ? INSUFFICIENT_PATIENT_IDENTIFIERS : null;
   }
 
+  function renderFieldError(field: string) {
+    return (
+      formTouched &&
+      !field && (
+        <div className={styles.errorMessage}>
+          <Icon.Error
+            aria-label="warning icon indicating an error is present"
+            className={styles.errorMessage}
+          />
+          Field is required.
+        </div>
+      )
+    );
+  }
+
   async function HandleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setFormTouched(true);
@@ -226,6 +241,7 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
                   setFirstName(event.target.value);
                 }}
               />
+              {renderFieldError(firstName)}
             </div>
             <div className="tablet:grid-col-6">
               <Label htmlFor="lastName" className="margin-top-0-important">
@@ -242,6 +258,7 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
                   setLastName(event.target.value);
                 }}
               />
+              {renderFieldError(lastName)}
             </div>
           </div>
           <div className="grid-row grid-gap margin-bottom-4">
@@ -264,6 +281,7 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
                   }}
                 />
               </div>
+              {renderFieldError(dob)}
             </div>
           </div>
           <div className="grid-row grid-gap margin-bottom-4">
