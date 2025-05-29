@@ -51,7 +51,9 @@ exports[`Code library interaction renders action buttons for custom value sets o
               role="button"
               tabindex="0"
             >
-              <div>
+              <div
+                class="display-flex flex-align-center"
+              >
                 <svg
                   aria-label="Icon indicating a menu with filter options"
                   class="usa-icon usa-icon--size-3 usa-icon qc-filter"
@@ -595,7 +597,9 @@ exports[`Code library loading view renders a skeleton loading state when loading
               role="button"
               tabindex="0"
             >
-              <div>
+              <div
+                class="display-flex flex-align-center"
+              >
                 <svg
                   aria-label="Icon indicating a menu with filter options"
                   class="usa-icon usa-icon--size-3 usa-icon qc-filter"
@@ -906,7 +910,9 @@ exports[`Code library rendered view renders concept codes for the value set when
               role="button"
               tabindex="0"
             >
-              <div>
+              <div
+                class="display-flex flex-align-center"
+              >
                 <svg
                   aria-label="Icon indicating a menu with filter options"
                   class="usa-icon usa-icon--size-3 usa-icon qc-filter"
@@ -1429,7 +1435,9 @@ exports[`Code library rendered view renders the correct content 1`] = `
               role="button"
               tabindex="0"
             >
-              <div>
+              <div
+                class="display-flex flex-align-center"
+              >
                 <svg
                   aria-label="Icon indicating a menu with filter options"
                   class="usa-icon usa-icon--size-3 usa-icon qc-filter"
