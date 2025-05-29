@@ -143,12 +143,7 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
 
   return (
     <>
-      <form
-        onSubmit={HandleSubmit}
-        onChange={() => {
-          if (!formTouched) setFormTouched(true);
-        }}
-      >
+      <form onSubmit={HandleSubmit} onChange={() => {}}>
         <TitleBox step="search" />
         <h2 className="page-explainer">
           Enter patient information below to search for a patient. We will query
@@ -360,7 +355,6 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
                 name="state"
                 value={state}
                 onChange={(event) => setState(event.target.value)}
-                defaultValue=""
               >
                 <option value="" disabled>
                   Select a state
