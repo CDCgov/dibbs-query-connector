@@ -278,6 +278,15 @@
               "type": "string",
               "example": "517-425-1398"
             }
+          },
+          {
+            "name": "email",
+            "in": "query",
+            "description": "Patient email adress. At least one of the patient identifier params are required",
+            "schema": {
+              "type": "string",
+              "example": "example@email.com"
+            }
           }
         ],
         "responses": {
