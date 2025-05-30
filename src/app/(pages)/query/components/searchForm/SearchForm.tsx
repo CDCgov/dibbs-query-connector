@@ -11,6 +11,7 @@ import {
   stateOptions,
   Mode,
   hyperUnluckyPatient,
+  AddressData,
 } from "@/app/shared/constants";
 import {
   patientDiscoveryQuery,
@@ -57,13 +58,13 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
   const [phone, setPhone] = useState<string>("");
   const [dob, setDOB] = useState<string>("");
   const [mrn, setMRN] = useState<string>("");
-  const [address, setAddress] = useState<{
-    street1: string;
-    street2: string;
-    city: string;
-    state: string;
-    zip: string;
-  }>({ street1: "", street2: "", city: "", state: "", zip: "" });
+  const [address, setAddress] = useState<AddressData>({
+    street1: "",
+    street2: "",
+    city: "",
+    state: "",
+    zip: "",
+  });
 
   const [showAdvanced, setShowAdvanced] = useState(false);
   const params = useSearchParams();
@@ -73,10 +74,6 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
       return;
     }
 
-    // set the fhir server only if it matches one from the list;
-    // otherwise, use default
-    const server = params?.get("server");
-    setFhirServer(server && fhirServers.includes(server) ? server : fhirServer);
     setFirstName(params?.get("first") || "");
     setLastName(params?.get("last") || "");
     setPhone(params?.get("phone") || "");
@@ -85,19 +82,26 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
 
     const zipAddr = params?.get("zip");
     const stateAddr = params?.get("state") || "";
-
     const stateMatch =
       !!stateAddr &&
       stateOptions?.filter((state) => state.value == stateAddr)[0]?.value;
+
     setAddress({
       ...address,
-      street1: params?.get("street") || "",
+      street1: params?.get("street1") || "",
       street2: params?.get("street2") || "",
       city: params?.get("city") || "",
       state: stateMatch || "",
       zip: zipAddr?.match(/^\d{5}(?:[-\s]\d{4})?$/) ? zipAddr : "",
     });
   };
+
+  useEffect(() => {
+    // set the fhir server only if it matches one from the list;
+    // otherwise, use default
+    const server = params?.get("server");
+    setFhirServer(server && fhirServers.includes(server) ? server : fhirServer);
+  }, [fhirServers]);
 
   // Fills fields with sample data based on the selected
   const fillFields = useCallback(() => {
@@ -106,6 +110,7 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
     setDOB(hyperUnluckyPatient.DOB);
     setMRN(hyperUnluckyPatient.MRN);
     setPhone(hyperUnluckyPatient.Phone);
+    setAddress({ ...hyperUnluckyPatient.Address });
   }, [fhirServers]);
 
   const nameRegex = "^[A-Za-z\u00C0-\u024F\u1E00-\u1EFF\\-'. ]+$";
@@ -127,6 +132,11 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
       dob,
       mrn,
       fhirServer,
+      street1: address.street1,
+      street2: address.street2,
+      city: address.city,
+      state: address.state,
+      zip: address.zip,
       phone: FormatPhoneAsDigits(phone),
     };
     const queryResponse = await patientDiscoveryQuery(patientDiscoveryRequest);

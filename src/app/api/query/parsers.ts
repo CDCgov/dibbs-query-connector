@@ -1,6 +1,10 @@
 import { Patient } from "fhir/r4";
 import { FormatPhoneAsDigits } from "@/app/shared/format-service";
-import { USE_CASES, USE_CASE_DETAILS } from "@/app/shared/constants";
+import {
+  AddressData,
+  USE_CASES,
+  USE_CASE_DETAILS,
+} from "@/app/shared/constants";
 
 export type PatientIdentifiers = {
   first_name?: string;
@@ -8,6 +12,11 @@ export type PatientIdentifiers = {
   dob?: string;
   mrn?: string;
   phone?: string;
+  street1?: string;
+  street2?: string;
+  city?: string;
+  state?: string;
+  zip?: string;
 };
 
 /**
@@ -54,6 +63,16 @@ export function parsePatientDemographics(patient: Patient): PatientIdentifiers {
     }
   }
 
+  const addresses = parseAddresses(patient);
+
+  if (addresses) {
+    identifiers.street1 = addresses.street1;
+    identifiers.street2 = addresses.street2;
+    identifiers.city = addresses.city;
+    identifiers.state = addresses.state;
+    identifiers.zip = addresses.zip;
+  }
+
   return identifiers;
 }
 
@@ -66,12 +85,13 @@ export function parseMRNs(
   patient: Patient,
 ): (string | undefined)[] | undefined {
   if (patient.identifier) {
-    const mrnIdentifiers = patient.identifier.filter((id) =>
-      id.type?.coding?.some(
-        (coding) =>
-          coding.system === "http://terminology.hl7.org/CodeSystem/v2-0203" &&
-          coding.code === "MR",
-      ),
+    const mrnIdentifiers = patient.identifier.filter(
+      (id) =>
+        id.type?.coding?.some(
+          (coding) =>
+            coding.system === "http://terminology.hl7.org/CodeSystem/v2-0203" &&
+            coding.code === "MR",
+        ),
     );
     return mrnIdentifiers.map((id) => id.value);
   }
@@ -94,6 +114,60 @@ export function parsePhoneNumbers(
         ["home", "work", "mobile"].includes(contactPoint.use || ""),
     );
     return phoneNumbers.map((contactPoint) => contactPoint.value);
+  }
+}
+
+/**
+ * Helper function that extracts all patient addresses from a patient resource
+ * TODO: maybe utilize the address.period property so we display the current/most recent record?
+ * @param patient A FHIR Patient resource.
+ * @returns An array of address objects, or undefined if the patient has no addresses.
+ */
+export function parseAddresses(patient: Patient): AddressData | undefined {
+  if (patient.address) {
+    const street1: string[] = [];
+    const street2: string[] = [];
+    const city: string[] = [];
+    const state: string[] = [];
+    const zip: string[] = [];
+
+    function addToArr(destination: string[], data: string) {
+      if (data && !destination.includes(data)) {
+        destination.push(data);
+      }
+    }
+
+    patient.address.forEach((address) => {
+      addToArr(zip, address.postalCode || "");
+      addToArr(state, address.state || "");
+      addToArr(city, address.city || "");
+
+      const line = address.line?.map((line) => line);
+      // if we already have city/state/zip, remove it from the address.line array
+      const removeDuplicates = line?.map((lineItem) => {
+        if (address.postalCode && lineItem.includes(address.postalCode)) {
+          lineItem = lineItem.replace(address.postalCode, "");
+        }
+        if (address.state && lineItem.includes(address.state)) {
+          lineItem = lineItem.replace(address.state, "");
+        }
+        if (address.city && lineItem.includes(address.city)) {
+          lineItem = lineItem.replace(address.city, "");
+        }
+        return lineItem.trim();
+      });
+
+      removeDuplicates?.[0] && street1.push(removeDuplicates?.[0]);
+      removeDuplicates?.[1] && street2.push(removeDuplicates?.[1]);
+    });
+
+    return {
+      street1: street1.length > 1 ? street1.join(";") : street1[0] || "",
+      street2: street2.length > 1 ? street2.join(";") : street2[0] || "",
+      city: city.join(";"),
+      state: state.join(";"),
+      zip: zip.join(";"),
+    };
   }
 }
 

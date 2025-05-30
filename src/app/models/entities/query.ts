@@ -26,6 +26,11 @@ export type PatientDiscoveryRequest = {
   dob?: string;
   mrn?: string;
   phone?: string;
+  street1?: string;
+  street2?: string;
+  city?: string;
+  state?: string;
+  zip?: string;
 };
 export type PatientRecordsRequest = {
   patientId: string;
