@@ -3,7 +3,7 @@
   "info": {
     "version": "1.0.0",
     "title": "Query Connector API - OpenAPI 3.0",
-    "description": "The DIBBs Query Connector API allows authorized systems to query healthcare organizations for patient data. Authentication is required for all query endpoints. See https://queryconnector.dev/docs/api for more information on how to set up authentication and use the API."
+    "description": "The DIBBs Query Connector API allows authorized systems to query healthcare organizations for patient data. Authentication is required for all query endpoints.\n\n## Patient Search Requirements\n\nAll patient searches must include:\n- **First Name** (given)\n- **Last Name** (family)\n- **Date of Birth** (dob)\n- **At least one of:** Complete address, email, phone number, or MRN\n\nRequests missing any of these required fields will return a 400 Bad Request error."
   },
   "servers": [
     {
@@ -317,9 +317,57 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "error": {
+                    "resourceType": {
                       "type": "string",
-                      "example": "Missing patient identifiers"
+                      "example": "OperationOutcome"
+                    },
+                    "issue": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "severity": {
+                            "type": "string",
+                            "example": "error"
+                          },
+                          "code": {
+                            "type": "string",
+                            "example": "invalid"
+                          },
+                          "diagnostics": {
+                            "type": "string",
+                            "example": "Insufficient patient identifiers. Required: firstName, lastName, DOB, and at least one of: address, email, phone, or MRN"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "examples": {
+                  "missing_required": {
+                    "summary": "Missing required fields",
+                    "value": {
+                      "resourceType": "OperationOutcome",
+                      "issue": [
+                        {
+                          "severity": "error",
+                          "code": "invalid",
+                          "diagnostics": "Insufficient patient identifiers. Required: firstName, lastName, DOB, and at least one of: address, email, phone, or MRN"
+                        }
+                      ]
+                    }
+                  },
+                  "no_identifiers": {
+                    "summary": "No patient identifiers",
+                    "value": {
+                      "resourceType": "OperationOutcome",
+                      "issue": [
+                        {
+                          "severity": "error",
+                          "code": "invalid",
+                          "diagnostics": "No patient identifiers found in request"
+                        }
+                      ]
                     }
                   }
                 }
@@ -349,7 +397,7 @@
       },
       "get": {
         "summary": "Query with Parameters",
-        "description": "Execute a query by providing patient identifiers as query parameters. At least one patient identifier is required. Requires authentication with a valid bearer token.",
+        "description": "Execute a query by providing patient identifiers as query parameters. **Required fields**: firstName (`given`), lastName (`family`), date of birth (`dob`), and at least one of: address, email, phone number, or MRN. Requires authentication with a valid bearer token.",
         "security": [
           {
             "bearerAuth": []
@@ -388,8 +436,9 @@
           },
           {
             "name": "given",
-            "description": "Patient given name. At least one patient identifier is required.",
+            "description": "Patient given/first name. **REQUIRED**",
             "in": "query",
+            "required": true,
             "schema": {
               "type": "string",
               "example": "Lee"
@@ -398,7 +447,8 @@
           {
             "name": "family",
             "in": "query",
-            "description": "Patient family name. At least one patient identifier is required.",
+            "description": "Patient family/last name. **REQUIRED**",
+            "required": true,
             "schema": {
               "type": "string",
               "example": "Shaw"
@@ -407,7 +457,8 @@
           {
             "name": "dob",
             "in": "query",
-            "description": "Patient date of birth in YYYY-MM-DD format. At least one patient identifier is required.",
+            "description": "Patient date of birth in YYYY-MM-DD format. **REQUIRED**",
+            "required": true,
             "schema": {
               "type": "string",
               "format": "date",
@@ -417,7 +468,7 @@
           {
             "name": "mrn",
             "in": "query",
-            "description": "Patient medical record number. At least one patient identifier is required.",
+            "description": "Patient medical record number. At least one of MRN, phone, email, or address is required.",
             "schema": {
               "type": "string",
               "example": "8692756"
@@ -426,10 +477,29 @@
           {
             "name": "phone",
             "in": "query",
-            "description": "Patient phone number. At least one patient identifier is required.",
+            "description": "Patient phone number. At least one of MRN, phone, email, or address is required.",
             "schema": {
               "type": "string",
               "example": "517-425-1398"
+            }
+          },
+          {
+            "name": "email",
+            "in": "query",
+            "description": "Patient email address. At least one of MRN, phone, email, or address is required.",
+            "schema": {
+              "type": "string",
+              "format": "email",
+              "example": "lee.shaw@email.com"
+            }
+          },
+          {
+            "name": "address",
+            "in": "query",
+            "description": "Patient address (complete address string). At least one of MRN, phone, email, or address is required.",
+            "schema": {
+              "type": "string",
+              "example": "183 Mountain View St, Lansing, MI 48901"
             }
           }
         ],
@@ -465,15 +535,63 @@
             }
           },
           "400": {
-            "description": "Missing patient identifiers or invalid request",
+            "description": "Bad Request - Missing required patient identifiers or invalid request",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "error": {
+                    "resourceType": {
                       "type": "string",
-                      "example": "At least one patient identifier is required"
+                      "example": "OperationOutcome"
+                    },
+                    "issue": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "severity": {
+                            "type": "string",
+                            "example": "error"
+                          },
+                          "code": {
+                            "type": "string",
+                            "example": "invalid"
+                          },
+                          "diagnostics": {
+                            "type": "string",
+                            "example": "Insufficient patient identifiers. Required: firstName, lastName, DOB, and at least one of: address, email, phone, or MRN"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "examples": {
+                  "missing_required": {
+                    "summary": "Missing required fields",
+                    "value": {
+                      "resourceType": "OperationOutcome",
+                      "issue": [
+                        {
+                          "severity": "error",
+                          "code": "invalid",
+                          "diagnostics": "Insufficient patient identifiers. Required: firstName, lastName, DOB, and at least one of: address, email, phone, or MRN"
+                        }
+                      ]
+                    }
+                  },
+                  "missing_core_fields": {
+                    "summary": "Missing firstName, lastName, or DOB",
+                    "value": {
+                      "resourceType": "OperationOutcome",
+                      "issue": [
+                        {
+                          "severity": "error",
+                          "code": "invalid",
+                          "diagnostics": "Missing required fields: family, dob"
+                        }
+                      ]
                     }
                   }
                 }
