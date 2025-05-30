@@ -5,6 +5,7 @@ import {
   TextInput,
   Select,
   Button,
+  Icon,
 } from "@trussworks/react-uswds";
 import { useSearchParams } from "next/navigation";
 import {
@@ -12,6 +13,7 @@ import {
   Mode,
   hyperUnluckyPatient,
   AddressData,
+  INSUFFICIENT_PATIENT_IDENTIFIERS,
 } from "@/app/shared/constants";
 import {
   patientDiscoveryQuery,
@@ -20,7 +22,10 @@ import {
 import styles from "../searchForm/searchForm.module.scss";
 import { FormatPhoneAsDigits } from "@/app/shared/format-service";
 import TitleBox from "../stepIndicator/TitleBox";
-import { PatientDiscoveryRequest } from "@/app/models/entities/query";
+import {
+  PatientDiscoveryRequest,
+  validatedPatientSearch,
+} from "@/app/models/entities/query";
 
 interface SearchFormProps {
   setPatientDiscoveryQueryResponse: (
@@ -33,17 +38,6 @@ interface SearchFormProps {
   setFhirServer: React.Dispatch<React.SetStateAction<string>>;
 }
 
-/**
- * @param root0 - SearchFormProps
- * @param root0.setMode - The function to set the mode.
- * @param root0.setLoading - The function to set the loading state.
- * @param root0.setPatientDiscoveryQueryResponse - callback function to set the
- * patient for use in future steps
- * @param root0.selectedFhirServer - server to do the query against
- * @param root0.setFhirServer - callback function to update specified query
- * @param root0.fhirServers - list of available FHIR servers to query against, from the DB & hardcoded (for now)
- * @returns - The SearchForm component.
- */
 const SearchForm: React.FC<SearchFormProps> = function SearchForm({
   setPatientDiscoveryQueryResponse,
   setMode,
@@ -56,6 +50,7 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
   const [firstName, setFirstName] = useState<string>("");
   const [lastName, setLastName] = useState<string>("");
   const [phone, setPhone] = useState<string>("");
+  const [email, _setEmail] = useState<string>("");
   const [dob, setDOB] = useState<string>("");
   const [mrn, setMRN] = useState<string>("");
   const [address, setAddress] = useState<AddressData>({
@@ -104,6 +99,9 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
   }, [fhirServers]);
 
   // Fills fields with sample data based on the selected
+  const [formTouched, setFormTouched] = useState(false);
+  const [_formError, setFormError] = useState(false);
+
   const fillFields = useCallback(() => {
     setFirstName(hyperUnluckyPatient.FirstName);
     setLastName(hyperUnluckyPatient.LastName);
@@ -117,8 +115,58 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
   const nameRuleHint =
     "Enter a name using only letters, hyphens, apostrophes, spaces, or periods.";
 
+  function getPatientDiscoveryRequest(): PatientDiscoveryRequest {
+    return {
+      firstName,
+      lastName,
+      dob,
+      mrn,
+      fhirServer,
+      phone: FormatPhoneAsDigits(phone),
+      email,
+      address: {
+        street1: address.street1,
+        street2: address.street2,
+        city: address.city,
+        state: address.state,
+        zip: address.zip,
+      },
+    };
+  }
+
+  function isValid() {
+    return validatedPatientSearch(getPatientDiscoveryRequest());
+  }
+
+  function getErrorMessage() {
+    if (!formTouched) return null;
+    return !isValid() ? INSUFFICIENT_PATIENT_IDENTIFIERS : null;
+  }
+
+  function renderFieldError(field: string) {
+    return (
+      formTouched &&
+      !field && (
+        <div className={styles.errorMessage}>
+          <Icon.Error
+            aria-label="warning icon indicating an error is present"
+            className={styles.errorMessage}
+          />
+          Field is required.
+        </div>
+      )
+    );
+  }
+
   async function HandleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    setFormTouched(true);
+    if (!isValid()) {
+      setFormError(true);
+      return;
+    }
+    setFormError(false);
+
     if (!fhirServer) {
       console.error("FHIR server is required.");
       return;
@@ -126,23 +174,12 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
     setLoading(true);
     setMode("patient-results");
 
-    const patientDiscoveryRequest: PatientDiscoveryRequest = {
-      firstName,
-      lastName,
-      dob,
-      mrn,
-      fhirServer,
-      street1: address.street1,
-      street2: address.street2,
-      city: address.city,
-      state: address.state,
-      zip: address.zip,
-      phone: FormatPhoneAsDigits(phone),
-    };
+    const patientDiscoveryRequest = getPatientDiscoveryRequest();
     const queryResponse = await patientDiscoveryQuery(patientDiscoveryRequest);
     setPatientDiscoveryQueryResponse(queryResponse);
     setLoading(false);
   }
+
   useEffect(() => {
     window.scrollTo(0, 0);
     prefillFromQueryParams();
@@ -150,7 +187,7 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
 
   return (
     <>
-      <form onSubmit={HandleSubmit}>
+      <form onSubmit={HandleSubmit} onChange={() => {}}>
         <TitleBox step="search" />
         <h2 className="page-explainer">
           Enter patient information below to search for a patient. We will query
@@ -243,6 +280,7 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
                   setFirstName(event.target.value);
                 }}
               />
+              {renderFieldError(firstName)}
             </div>
             <div className="tablet:grid-col-6">
               <Label htmlFor="lastName" className="margin-top-0-important">
@@ -259,25 +297,7 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
                   setLastName(event.target.value);
                 }}
               />
-            </div>
-          </div>
-          <div className="grid-row grid-gap margin-bottom-4">
-            <h3 className={`"font-sans-md" ${styles.searchFormSectionLabel}`}>
-              Phone number
-            </h3>
-            <div className="grid-col-6">
-              <Label htmlFor="phone" className="margin-top-0-important">
-                Phone number
-              </Label>
-              <TextInput
-                id="phone"
-                name="phone"
-                type="tel"
-                value={phone}
-                onChange={(event) => {
-                  setPhone(event.target.value);
-                }}
-              />
+              {renderFieldError(lastName)}
             </div>
           </div>
           <div className="grid-row grid-gap margin-bottom-4">
@@ -300,6 +320,26 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
                   }}
                 />
               </div>
+              {renderFieldError(dob)}
+            </div>
+          </div>
+          <div className="grid-row grid-gap margin-bottom-4">
+            <h3 className={`"font-sans-md" ${styles.searchFormSectionLabel}`}>
+              Phone number
+            </h3>
+            <div className="grid-col-6">
+              <Label htmlFor="phone" className="margin-top-0-important">
+                Phone number
+              </Label>
+              <TextInput
+                id="phone"
+                name="phone"
+                type="tel"
+                value={phone}
+                onChange={(event) => {
+                  setPhone(event.target.value);
+                }}
+              />
             </div>
           </div>
           <div className="grid-row grid-gap margin-bottom-4">
@@ -420,6 +460,15 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
         <button className="usa-button margin-top-5" type="submit">
           Search for patient
         </button>
+        {getErrorMessage() && (
+          <div className={styles.errorMessage}>
+            <Icon.Error
+              aria-label="warning icon indicating an error is present"
+              className={styles.errorMessage}
+            />
+            {getErrorMessage()}
+          </div>
+        )}
       </form>
     </>
   );

@@ -1,6 +1,7 @@
 import { Bundle, BundleEntry, Patient } from "fhir/r4";
 import { readJsonFile } from "../shared_utils/readJsonFile";
 import {
+  INSUFFICIENT_PATIENT_IDENTIFIERS,
   INVALID_FHIR_SERVERS,
   INVALID_MESSAGE_FORMAT,
   MISSING_API_QUERY_PARAM,
@@ -176,5 +177,23 @@ describe("POST Query FHIR Server", () => {
     const response = await POST(request);
     const body = await response.json();
     expect(body.resourceType).toBe("Bundle");
+  });
+
+  it("should return an OperationOutcome if patient search criteria do not meet validation rules (missing lastName and dob)", async () => {
+    // Only firstName and MRN provided: should fail (missing lastName, dob)
+    const invalidPatient = {
+      resourceType: "Patient",
+      name: [{ given: ["Test"] }], // no family/lastName
+      identifier: [{ value: "MRN-12345" }],
+    };
+
+    const request = createNextRequest(
+      invalidPatient,
+      new URLSearchParams(`id=${SYPHILIS_QUERY_ID}&fhir_server=Aidbox`),
+    );
+    const response = await POST(request);
+    const body = await response.json();
+    expect(body.resourceType).toBe("OperationOutcome");
+    expect(body.issue[0].diagnostics).toBe(INSUFFICIENT_PATIENT_IDENTIFIERS);
   });
 });

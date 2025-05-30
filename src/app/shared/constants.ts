@@ -227,6 +227,8 @@ export const HL7_BODY_MISFORMAT =
   "Invalid HL7 request. Please add your HL7 message to the request body in between curly braces like so - { YOUR MESSAGE HERE } ";
 export const MISSING_PATIENT_IDENTIFIERS =
   "No patient identifiers to parse from requestBody.";
+export const INSUFFICIENT_PATIENT_IDENTIFIERS =
+  "Invalid request. First name, last name, and date of birth are required, along with at least one of phone number, email, complete address, or MRN.";
 
 // Constants for the code library
 export const CUSTOM_CONDITION_ID = "custom_condition"; // This should be a unique identifier for the condition, we could just call it '0', but we will need some way to exclude it from certain screens, so that's why I lean toward it being hardcoded.
