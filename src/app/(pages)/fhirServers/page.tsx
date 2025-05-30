@@ -146,7 +146,7 @@ const FhirServers: React.FC = () => {
         clickTarget == "modalOverlay" ||
         (event as KeyboardEvent).key == "Escape"
       ) {
-        setErrorMessage("");
+        resetModalState();
       }
     },
     [],
