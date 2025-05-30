@@ -484,6 +484,51 @@
             }
           },
           {
+            "name": "street1",
+            "in": "query",
+            "description": "Patient address street name and number. At least one of the patient identifier params are required",
+            "schema": {
+              "type": "string",
+              "example": "49 Meadow St"
+            }
+          },
+          {
+            "name": "street2",
+            "in": "query",
+            "description": "Additional patient address details. At least one of the patient identifier params are required",
+            "schema": {
+              "type": "string",
+              "example": "Apt #1"
+            }
+          },
+          {
+            "name": "city",
+            "in": "query",
+            "description": "Patient address city. At least one of the patient identifier params are required",
+            "schema": {
+              "type": "string",
+              "example": "Lansing"
+            }
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "description": "Patient address state (two-letter abbreviation). At least one of the patient identifier params are required",
+            "schema": {
+              "type": "string",
+              "example": "MI"
+            }
+          },
+          {
+            "name": "zip",
+            "in": "query",
+            "description": "Patient zip code. At least one of the patient identifier params are required",
+            "schema": {
+              "type": "string",
+              "example": "48864"
+            }
+          },
+          {
             "name": "email",
             "in": "query",
             "description": "Patient email address. At least one of MRN, phone, email, or address is required.",
@@ -491,15 +536,6 @@
               "type": "string",
               "format": "email",
               "example": "lee.shaw@email.com"
-            }
-          },
-          {
-            "name": "address",
-            "in": "query",
-            "description": "Patient address (complete address string). At least one of MRN, phone, email, or address is required.",
-            "schema": {
-              "type": "string",
-              "example": "183 Mountain View St, Lansing, MI 48901"
             }
           }
         ],

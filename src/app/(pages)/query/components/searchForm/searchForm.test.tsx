@@ -138,7 +138,7 @@ describe("SearchForm", () => {
     const goodAddressCity = "Anytown";
     const badAddressState = "ZZ";
     const badAddressZip = "123abc";
-    const queryParams = `street=${goodAddressStreet}&city=${goodAddressCity}&state=${badAddressState}&zip=${badAddressZip}`;
+    const queryParams = `street1=${goodAddressStreet}&city=${goodAddressCity}&state=${badAddressState}&zip=${badAddressZip}`;
 
     const formattedParams = new URLSearchParams(queryParams);
     (useSearchParams as jest.Mock).mockReturnValue(formattedParams);
@@ -171,7 +171,6 @@ describe("SearchForm", () => {
     const zip = screen.getByRole("textbox", {
       name: "Zip code",
     });
-    console.log(streetAddress?.textContent);
 
     expect(streetAddress).toHaveValue(goodAddressStreet);
     expect(city).toHaveValue(goodAddressCity);

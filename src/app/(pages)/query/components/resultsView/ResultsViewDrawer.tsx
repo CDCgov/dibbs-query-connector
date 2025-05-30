@@ -76,7 +76,10 @@ const ResultsViewDrawer: React.FC<ResultsViewDrawerProps> = ({
             aria-label="Copy FHIR response"
           >
             <span className="icon-text display-flex flex-align-center">
-              <Icon.ContentCopy className="height-3 width-3" />
+              <Icon.ContentCopy
+                aria-label="Icon indicating content is able to be copied to the clipboard"
+                className="height-3 width-3"
+              />
               <span className="padding-left-05">Copy response</span>
             </span>
           </Button>

@@ -26,7 +26,11 @@ const QueryRedirectInfo: React.FC<QueryRedirectInfoProps> = ({ userRole }) => {
   }, []);
   return (
     <div className="padding-3 bg-info display-flex flex-align-start">
-      <Icon.Info size={3} className="icon-primary" />
+      <Icon.Info
+        aria-label="Icon indicating informational content"
+        size={3}
+        className="icon-primary"
+      />
       <div className="margin-left-2">
         <h4 className="text-italic margin-y-0 text-normal">
           Don't see the query you're looking for?
