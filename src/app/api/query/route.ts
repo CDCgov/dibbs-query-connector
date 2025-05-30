@@ -81,9 +81,24 @@ export async function GET(request: NextRequest) {
   const dob = params.get("dob") ?? "";
   const mrn = params.get("mrn") ?? "";
   const phone = params.get("phone") ?? "";
-  const noParamsDefined = [given, family, dob, mrn, phone].every(
-    (e) => e === "",
-  );
+  const street1 = params.get("street1") ?? "";
+  const street2 = params.get("street2") ?? "";
+  const city = params.get("city") ?? "";
+  const state = params.get("state") ?? "";
+  const zip = params.get("zip") ?? "";
+
+  const noParamsDefined = [
+    given,
+    family,
+    dob,
+    mrn,
+    phone,
+    street1,
+    street2,
+    city,
+    state,
+    zip,
+  ].every((e) => e === "");
 
   if (noParamsDefined) {
     const OperationOutcome = await handleRequestError(
@@ -101,6 +116,13 @@ export async function GET(request: NextRequest) {
     dob,
     mrn,
     phone,
+    address: {
+      street1,
+      street2,
+      city,
+      state,
+      zip,
+    },
   };
 
   if (!validatedPatientSearch(QueryRequest)) {
@@ -174,6 +196,11 @@ export async function POST(request: NextRequest) {
       const lastName = parsedMessage.get("PID.5.1").toString() ?? "";
       const dob = parsedMessage.get("PID.7.1").toString() ?? "";
       const mrn = parsedMessage.get("PID.3.1").toString() ?? "";
+      const street1 = parsedMessage.get("PID.11.1").toString() ?? "";
+      const street2 = parsedMessage.get("PID.11.2").toString() ?? "";
+      const city = parsedMessage.get("PID.11.3").toString() ?? "";
+      const state = parsedMessage.get("PID.11.4").toString() ?? "";
+      const zip = parsedMessage.get("PID.11.5").toString() ?? "";
       const phone = parsedMessage.get("NK1.5.1").toString() ?? "";
       const noPatientIdentifierDefined = [
         firstName,
@@ -181,6 +208,11 @@ export async function POST(request: NextRequest) {
         mrn,
         phone,
         dob,
+        street1,
+        street2,
+        city,
+        state,
+        zip,
       ].every((e) => e === "");
 
       if (noPatientIdentifierDefined) {
@@ -194,6 +226,7 @@ export async function POST(request: NextRequest) {
         lastName,
         dob,
         mrn,
+        address: { street1, street2, city, state, zip },
         phone,
       };
     } catch (error: unknown) {
@@ -228,6 +261,13 @@ export async function POST(request: NextRequest) {
         lastName: PatientIdentifiers?.last_name,
         dob: PatientIdentifiers?.dob,
         mrn: PatientIdentifiers?.mrn,
+        address: {
+          street1: PatientIdentifiers.street1,
+          street2: PatientIdentifiers.street2,
+          city: PatientIdentifiers.city,
+          state: PatientIdentifiers.state,
+          zip: PatientIdentifiers.zip,
+        },
         phone: PatientIdentifiers?.phone,
       };
     } catch (error: unknown) {

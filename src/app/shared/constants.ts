@@ -37,6 +37,14 @@ export const USE_CASE_DETAILS = {
 
 export type USE_CASES = keyof typeof USE_CASE_DETAILS;
 
+export type AddressData = {
+  street1: string;
+  street2: string;
+  city: string;
+  state: string;
+  zip: string;
+};
+
 //Create type to specify the demographic data fields for a patient
 export type DemoDataFields = {
   Id: string;
@@ -45,6 +53,7 @@ export type DemoDataFields = {
   DOB: string;
   MRN: string;
   Phone: string;
+  Address: AddressData;
 };
 
 export const HYPER_UNLUCKY_DEFAULT_ID = "f288c654-6885-4f48-999c-48d776dc06af";
@@ -58,6 +67,13 @@ export const hyperUnluckyPatient: DemoDataFields = {
   DOB: "1975-12-06",
   MRN: "8692756",
   Phone: "517-425-1398",
+  Address: {
+    street1: "49 Meadow St",
+    street2: "",
+    city: "Lansing",
+    state: "MI",
+    zip: "48864",
+  },
 };
 
 /*Labels and values for the state options dropdown on the query page*/
