@@ -3,7 +3,7 @@
 import { Icon, Label, Tag, TextInput } from "@trussworks/react-uswds";
 
 import dynamic from "next/dynamic";
-import { useEffect, useState, useRef, JSX } from "react";
+import { useEffect, useState, useRef, JSX, useCallback } from "react";
 import type { ModalRef } from "../../ui/designSystem/modal/Modal";
 import styles from "./fhirServers.module.scss";
 import classNames from "classnames";
@@ -135,6 +135,33 @@ const FhirServers: React.FC = () => {
     resetModalState();
     modalRef.current?.toggleModal();
   };
+
+  const clearErrorOnModalClose = useCallback(
+    (event: MouseEvent | KeyboardEvent) => {
+      const clickTarget = (event.target as HTMLElement).getAttribute(
+        "data-testid",
+      );
+
+      if (
+        clickTarget == "modalOverlay" ||
+        (event as KeyboardEvent).key == "Escape"
+      ) {
+        resetModalState();
+      }
+    },
+    [],
+  );
+
+  useEffect(() => {
+    window.addEventListener("mousedown", clearErrorOnModalClose);
+    window.addEventListener("keyup", clearErrorOnModalClose);
+
+    // Cleanup
+    return () => {
+      window.removeEventListener("mousedown", clearErrorOnModalClose);
+      window.removeEventListener("keyup", clearErrorOnModalClose);
+    };
+  }, []);
 
   interface ConnectionTestResult {
     success: boolean;
