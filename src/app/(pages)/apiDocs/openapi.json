@@ -526,8 +526,9 @@
             "schema": {
               "type": "string",
               "example": "48864"
-           },
-           {
+            }
+          },
+          {
             "name": "email",
             "in": "query",
             "description": "Patient email address. At least one of MRN, phone, email, or address is required.",
@@ -535,9 +536,6 @@
               "type": "string",
               "format": "email",
               "example": "lee.shaw@email.com"
-            }
-          },
-
             }
           }
         ],
