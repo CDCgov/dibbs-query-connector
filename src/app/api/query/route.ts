@@ -106,11 +106,13 @@ export async function GET(request: NextRequest) {
     dob,
     mrn,
     phone,
-    street1,
-    street2,
-    city,
-    state,
-    zip,
+    address: {
+      street1,
+      street2,
+      city,
+      state,
+      zip,
+    },
   };
 
   if (!validatedPatientSearch(QueryRequest)) {
@@ -205,11 +207,7 @@ export async function POST(request: NextRequest) {
         lastName,
         dob,
         mrn,
-        street1,
-        street2,
-        city,
-        state,
-        zip,
+        address: { street1, street2, city, state, zip },
         phone,
       };
     } catch (error: unknown) {
@@ -244,11 +242,13 @@ export async function POST(request: NextRequest) {
         lastName: PatientIdentifiers?.last_name,
         dob: PatientIdentifiers?.dob,
         mrn: PatientIdentifiers?.mrn,
-        street1: PatientIdentifiers.street1,
-        street2: PatientIdentifiers.street2,
-        city: PatientIdentifiers.city,
-        state: PatientIdentifiers.state,
-        zip: PatientIdentifiers.zip,
+        address: {
+          street1: PatientIdentifiers.street1,
+          street2: PatientIdentifiers.street2,
+          city: PatientIdentifiers.city,
+          state: PatientIdentifiers.state,
+          zip: PatientIdentifiers.zip,
+        },
         phone: PatientIdentifiers?.phone,
       };
     } catch (error: unknown) {
