@@ -141,9 +141,8 @@ export function parseAddresses(patient: Patient): AddressData | undefined {
       addToArr(state, address.state || "");
       addToArr(city, address.city || "");
 
-      const line = address.line?.map((line) => line);
       // if we already have city/state/zip, remove it from the address.line array
-      const removeDuplicates = line?.map((lineItem) => {
+      const removeDuplicates = address.line?.map((lineItem) => {
         if (address.postalCode && lineItem.includes(address.postalCode)) {
           lineItem = lineItem.replace(address.postalCode, "");
         }
