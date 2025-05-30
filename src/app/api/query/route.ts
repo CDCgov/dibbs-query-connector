@@ -28,12 +28,22 @@ import {
 } from "@/app/models/entities/query";
 import { getFhirServerNames } from "@/app/backend/fhir-servers";
 import { getSavedQueryById } from "@/app/backend/query-building/service";
+import { validateServiceToken } from "../api-auth";
 
 /**
  * @param request - A GET request as described by the Swagger docs
  * @returns Response with QueryResponse.
  */
 export async function GET(request: NextRequest) {
+  // Authenticate the request
+  const auth = await validateServiceToken(request);
+  if (!auth.valid) {
+    return NextResponse.json(
+      { error: "Unauthorized", details: auth.error },
+      { status: 401 },
+    );
+  }
+
   // Extract id and fhir_server from nextUrl
   const params = request.nextUrl.searchParams;
   //deprecated, prefer id
@@ -115,6 +125,15 @@ export async function GET(request: NextRequest) {
  * @returns Response with QueryResponse.
  */
 export async function POST(request: NextRequest) {
+  // Authenticate the request
+  const auth = await validateServiceToken(request);
+  if (!auth.valid) {
+    return NextResponse.json(
+      { error: "Unauthorized", details: auth.error },
+      { status: 401 },
+    );
+  }
+
   // Extract id and fhir_server from nextUrl
   const params = request.nextUrl.searchParams;
   //deprecated, prefer id
