@@ -155,8 +155,10 @@ export function parseAddresses(patient: Patient): AddressData | undefined {
         return lineItem.trim();
       });
 
-      removeDuplicates?.[0] && street1.push(removeDuplicates?.[0]);
-      removeDuplicates?.[1] && street2.push(removeDuplicates?.[1]);
+      const firstLine = removeDuplicates?.shift();
+      firstLine && street1.push(firstLine);
+      street2 &&
+        removeDuplicates?.forEach((lineItem) => street2.push(lineItem)); // everything else left in the array
     });
 
     return {
