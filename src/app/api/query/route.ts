@@ -71,7 +71,8 @@ export async function GET(request: NextRequest) {
   const dob = params.get("dob") ?? "";
   const mrn = params.get("mrn") ?? "";
   const phone = params.get("phone") ?? "";
-  const noParamsDefined = [given, family, dob, mrn, phone].every(
+  const email = params.get("email") ?? "";
+  const noParamsDefined = [given, family, dob, mrn, phone, email].every(
     (e) => e === "",
   );
 
@@ -91,6 +92,7 @@ export async function GET(request: NextRequest) {
     dob,
     mrn,
     phone,
+    email,
   };
 
   if (!validatedPatientSearch(QueryRequest)) {
@@ -156,12 +158,14 @@ export async function POST(request: NextRequest) {
       const dob = parsedMessage.get("PID.7.1").toString() ?? "";
       const mrn = parsedMessage.get("PID.3.1").toString() ?? "";
       const phone = parsedMessage.get("NK1.5.1").toString() ?? "";
+      const email = parsedMessage.get("PID.13.4").toString() ?? ""; //https://hl7-definition.caristix.com/v2/HL7v2.3/Fields/PID.13.4
       const noPatientIdentifierDefined = [
         firstName,
         lastName,
         mrn,
         phone,
         dob,
+        email,
       ].every((e) => e === "");
 
       if (noPatientIdentifierDefined) {
@@ -176,6 +180,7 @@ export async function POST(request: NextRequest) {
         dob,
         mrn,
         phone,
+        email,
       };
     } catch (error: unknown) {
       return await handleAndReturnError(error);
@@ -210,6 +215,7 @@ export async function POST(request: NextRequest) {
         dob: PatientIdentifiers?.dob,
         mrn: PatientIdentifiers?.mrn,
         phone: PatientIdentifiers?.phone,
+        email: PatientIdentifiers?.email,
       };
     } catch (error: unknown) {
       return await handleAndReturnError(error);
