@@ -23,6 +23,7 @@ import {
   insertFhirServer,
   updateFhirServer,
   deleteFhirServer,
+  updateFhirServerConnectionStatus,
 } from "@/app/backend/fhir-servers";
 
 const Modal = dynamic<ModalProps>(
@@ -180,11 +181,47 @@ const FhirServers: React.FC = () => {
     }
   };
   const handleTestConnection = async () => {
-    const result = await testFhirConnection(serverUrl);
+    if (!selectedServer) return;
+
+    // 1. Test the connection (returns { success, error })
+    const result = await testFhirServerConnection(
+      serverUrl,
+      disableCertValidation,
+      {
+        authType: authMethod,
+        bearerToken: authMethod === "basic" ? bearerToken : undefined,
+        clientId: ["client_credentials", "SMART"].includes(authMethod)
+          ? clientId
+          : undefined,
+        clientSecret:
+          authMethod === "client_credentials" ? clientSecret : undefined,
+        tokenEndpoint: ["client_credentials", "SMART"].includes(authMethod)
+          ? tokenEndpoint
+          : undefined,
+        scopes: ["client_credentials", "SMART"].includes(authMethod)
+          ? scopes
+          : undefined,
+      },
+    );
+
+    // 2. Update connection status in DB
+    const updateResult = await updateFhirServerConnectionStatus(
+      selectedServer.name,
+      result.success,
+    );
+
     setConnectionStatus(result.success ? "success" : "error");
     setErrorMessage(result.error);
-  };
 
+    // 3. Update the frontend server row to reflect new last checked time
+    if (updateResult.server) {
+      setFhirServers((prev) =>
+        prev.map((srv) =>
+          srv.id === updateResult.server.id ? updateResult.server : srv,
+        ),
+      );
+    }
+  };
   const handleSave = async () => {
     const connectionResult = await testFhirConnection(serverUrl);
 
