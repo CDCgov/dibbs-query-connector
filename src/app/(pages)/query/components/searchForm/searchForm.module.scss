@@ -37,3 +37,16 @@
   font-size: 1.25rem;
   font-weight: 700;
 }
+
+.errorMessage {
+  display: flex;
+  align-items: center;
+  color: $error-dark;
+  margin-top: 0.25rem;
+  line-height: 1.25rem;
+
+  svg {
+    margin-right: 0.25rem;
+    margin-bottom: 2.5px;
+  }
+}

@@ -14,6 +14,7 @@ import {
   showSiteAlert,
 } from "./constants";
 import { checkForSiteAlert } from "./utils";
+import { INSUFFICIENT_PATIENT_IDENTIFIERS } from "@/app/shared/constants";
 
 test.describe("querying with the Query Connector", () => {
   test.beforeEach(async ({ page }) => {
@@ -44,6 +45,20 @@ test.describe("querying with the Query Connector", () => {
     await page
       .getByRole("button", { name: "Revise your patient search" })
       .click();
+  });
+
+  test("unsuccessful user query: insufficient inputs", async ({ page }) => {
+    await page.getByRole("button", { name: "Fill fields" }).click();
+    // Clear the fields to simulate insufficient inputs
+    await page.getByLabel("First name").clear();
+    await page.getByLabel("Last name").clear();
+
+    await page.getByRole("button", { name: "Search for patient" }).click();
+
+    // Better luck next time, user!
+    await expect(
+      page.getByText(INSUFFICIENT_PATIENT_IDENTIFIERS),
+    ).toBeVisible();
   });
 
   test("successful demo user query", async ({ page }) => {
@@ -144,6 +159,14 @@ test.describe("querying with the Query Connector", () => {
         .filter({ hasText: "azithromycin 1000 MG" }),
     ).toHaveCount(2);
 
+    // Check that the drawer works
+    await page.getByRole("button", { name: "View FHIR response" }).click();
+    const drawer = page.getByText("Full FHIR response");
+    await expect(drawer).toBeVisible();
+    await expect(page.locator("pre")).toContainText("Patient");
+    await page.getByRole("button", { name: "Close drawer" }).click();
+    await expect(drawer).not.toBeVisible();
+
     // Now let's use the return to search to go back to a blank form
     await page.getByRole("button", { name: "New patient search" }).click();
     await expect(
@@ -167,7 +190,7 @@ test.describe("alternate queries with the Query Connector", () => {
     await page.getByRole("button", { name: "Fill fields" }).click();
 
     // Delete Last name and MRN to force phone number as one of the 3 fields
-    await page.getByLabel("Last name").clear();
+    // await page.getByLabel("Last name").clear();
     await page.getByLabel("Medical Record Number").clear();
 
     // Select FHIR server from drop down
@@ -195,9 +218,9 @@ test.describe("alternate queries with the Query Connector", () => {
     await expect(page.getByText("Patient Name")).toBeVisible();
     await expect(page.getByText(TEST_PATIENT_NAME)).toBeVisible();
     await expect(page.getByText("Contact")).toBeVisible();
-    await expect(page.getByText(TEST_PATIENT.Phone)).toBeVisible();
+    await expect(page.getByText(TEST_PATIENT.Phone)).toHaveCount(2);
     await expect(page.getByText("Patient Identifiers")).toBeVisible();
-    await expect(page.getByText(TEST_PATIENT.MRN)).toBeVisible();
+    await expect(page.getByText(TEST_PATIENT.MRN)).toHaveCount(2);
   });
 
   // test("social determinants query with generalized function", async ({

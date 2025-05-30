@@ -11,6 +11,7 @@ import {
   INVALID_FHIR_SERVERS,
   INVALID_QUERY,
   INVALID_MESSAGE_FORMAT,
+  INSUFFICIENT_PATIENT_IDENTIFIERS,
 } from "@/app/shared/constants";
 import {
   mapDeprecatedUseCaseToId,
@@ -23,6 +24,7 @@ import {
   FullPatientRequest,
   APIQueryResponse,
   QueryResponse,
+  validatedPatientSearch,
 } from "@/app/models/entities/query";
 import { getFhirServerNames } from "@/app/backend/fhir-servers";
 import { getSavedQueryById } from "@/app/backend/query-building/service";
@@ -100,6 +102,13 @@ export async function GET(request: NextRequest) {
     mrn,
     phone,
   };
+
+  if (!validatedPatientSearch(QueryRequest)) {
+    const OperationOutcome = await handleRequestError(
+      INSUFFICIENT_PATIENT_IDENTIFIERS,
+    );
+    return NextResponse.json(OperationOutcome, { status: 400 });
+  }
 
   const QueryResponse: QueryResponse = await fullPatientQuery(QueryRequest);
 
@@ -224,6 +233,10 @@ export async function POST(request: NextRequest) {
     } catch (error: unknown) {
       return await handleAndReturnError(error);
     }
+  }
+
+  if (!validatedPatientSearch(QueryRequest)) {
+    return await handleAndReturnError(INSUFFICIENT_PATIENT_IDENTIFIERS, 400);
   }
 
   const QueryResponse: QueryResponse = await fullPatientQuery(QueryRequest);

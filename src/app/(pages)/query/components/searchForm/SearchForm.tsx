@@ -5,11 +5,14 @@ import {
   TextInput,
   Select,
   Button,
+  Icon,
 } from "@trussworks/react-uswds";
+import { useSearchParams } from "next/navigation";
 import {
   stateOptions,
   Mode,
   hyperUnluckyPatient,
+  INSUFFICIENT_PATIENT_IDENTIFIERS,
 } from "@/app/shared/constants";
 import {
   patientDiscoveryQuery,
@@ -18,7 +21,10 @@ import {
 import styles from "../searchForm/searchForm.module.scss";
 import { FormatPhoneAsDigits } from "@/app/shared/format-service";
 import TitleBox from "../stepIndicator/TitleBox";
-import { PatientDiscoveryRequest } from "@/app/models/entities/query";
+import {
+  PatientDiscoveryRequest,
+  validatedPatientSearch,
+} from "@/app/models/entities/query";
 
 interface SearchFormProps {
   setPatientDiscoveryQueryResponse: (
@@ -31,17 +37,6 @@ interface SearchFormProps {
   setFhirServer: React.Dispatch<React.SetStateAction<string>>;
 }
 
-/**
- * @param root0 - SearchFormProps
- * @param root0.setMode - The function to set the mode.
- * @param root0.setLoading - The function to set the loading state.
- * @param root0.setPatientDiscoveryQueryResponse - callback function to set the
- * patient for use in future steps
- * @param root0.selectedFhirServer - server to do the query against
- * @param root0.setFhirServer - callback function to update specified query
- * @param root0.fhirServers - list of available FHIR servers to query against, from the DB & hardcoded (for now)
- * @returns - The SearchForm component.
- */
 const SearchForm: React.FC<SearchFormProps> = function SearchForm({
   setPatientDiscoveryQueryResponse,
   setMode,
@@ -54,12 +49,54 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
   const [firstName, setFirstName] = useState<string>("");
   const [lastName, setLastName] = useState<string>("");
   const [phone, setPhone] = useState<string>("");
+  const [email, _setEmail] = useState<string>("");
   const [dob, setDOB] = useState<string>("");
   const [mrn, setMRN] = useState<string>("");
+  const [address, setAddress] = useState<{
+    street1: string;
+    street2: string;
+    city: string;
+    state: string;
+    zip: string;
+  }>({ street1: "", street2: "", city: "", state: "", zip: "" });
 
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const params = useSearchParams();
 
-  // Fills fields with sample data based on the selected
+  const prefillFromQueryParams = () => {
+    if (params?.size <= 0) {
+      return;
+    }
+
+    // set the fhir server only if it matches one from the list;
+    // otherwise, use default
+    const server = params?.get("server");
+    setFhirServer(server && fhirServers.includes(server) ? server : fhirServer);
+    setFirstName(params?.get("first") || "");
+    setLastName(params?.get("last") || "");
+    setPhone(params?.get("phone") || "");
+    setDOB(params?.get("dob") || "");
+    setMRN(params?.get("mrn") || "");
+
+    const zipAddr = params?.get("zip");
+    const stateAddr = params?.get("state") || "";
+
+    const stateMatch =
+      !!stateAddr &&
+      stateOptions?.filter((state) => state.value == stateAddr)[0]?.value;
+    setAddress({
+      ...address,
+      street1: params?.get("street") || "",
+      street2: params?.get("street2") || "",
+      city: params?.get("city") || "",
+      state: stateMatch || "",
+      zip: zipAddr?.match(/^\d{5}(?:[-\s]\d{4})?$/) ? zipAddr : "",
+    });
+  };
+
+  const [formTouched, setFormTouched] = useState(false);
+  const [_formError, setFormError] = useState(false);
+
   const fillFields = useCallback(() => {
     setFirstName(hyperUnluckyPatient.FirstName);
     setLastName(hyperUnluckyPatient.LastName);
@@ -72,8 +109,58 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
   const nameRuleHint =
     "Enter a name using only letters, hyphens, apostrophes, spaces, or periods.";
 
+  function getPatientDiscoveryRequest(): PatientDiscoveryRequest {
+    return {
+      firstName,
+      lastName,
+      dob,
+      mrn,
+      fhirServer,
+      phone: FormatPhoneAsDigits(phone),
+      email,
+      address: {
+        street1: address.street1,
+        street2: address.street2,
+        city: address.city,
+        state: address.state,
+        zip: address.zip,
+      },
+    };
+  }
+
+  function isValid() {
+    return validatedPatientSearch(getPatientDiscoveryRequest());
+  }
+
+  function getErrorMessage() {
+    if (!formTouched) return null;
+    return !isValid() ? INSUFFICIENT_PATIENT_IDENTIFIERS : null;
+  }
+
+  function renderFieldError(field: string) {
+    return (
+      formTouched &&
+      !field && (
+        <div className={styles.errorMessage}>
+          <Icon.Error
+            aria-label="warning icon indicating an error is present"
+            className={styles.errorMessage}
+          />
+          Field is required.
+        </div>
+      )
+    );
+  }
+
   async function HandleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    setFormTouched(true);
+    if (!isValid()) {
+      setFormError(true);
+      return;
+    }
+    setFormError(false);
+
     if (!fhirServer) {
       console.error("FHIR server is required.");
       return;
@@ -81,25 +168,20 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
     setLoading(true);
     setMode("patient-results");
 
-    const patientDiscoveryRequest: PatientDiscoveryRequest = {
-      firstName,
-      lastName,
-      dob,
-      mrn,
-      fhirServer,
-      phone: FormatPhoneAsDigits(phone),
-    };
+    const patientDiscoveryRequest = getPatientDiscoveryRequest();
     const queryResponse = await patientDiscoveryQuery(patientDiscoveryRequest);
     setPatientDiscoveryQueryResponse(queryResponse);
     setLoading(false);
   }
+
   useEffect(() => {
     window.scrollTo(0, 0);
+    prefillFromQueryParams();
   }, []);
 
   return (
     <>
-      <form onSubmit={HandleSubmit}>
+      <form onSubmit={HandleSubmit} onChange={() => {}}>
         <TitleBox step="search" />
         <h2 className="page-explainer">
           Enter patient information below to search for a patient. We will query
@@ -156,7 +238,7 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
                   <Select
                     id="fhir_server"
                     name="fhir_server"
-                    value={fhirServer}
+                    value={params?.get("server") || fhirServer}
                     onChange={(event) => {
                       setFhirServer(event.target.value as string);
                     }}
@@ -192,6 +274,7 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
                   setFirstName(event.target.value);
                 }}
               />
+              {renderFieldError(firstName)}
             </div>
             <div className="tablet:grid-col-6">
               <Label htmlFor="lastName" className="margin-top-0-important">
@@ -208,6 +291,30 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
                   setLastName(event.target.value);
                 }}
               />
+              {renderFieldError(lastName)}
+            </div>
+          </div>
+          <div className="grid-row grid-gap margin-bottom-4">
+            <h3 className={`"font-sans-md" ${styles.searchFormSectionLabel}`}>
+              Date of Birth
+            </h3>
+            <div className="grid-col-6">
+              <Label htmlFor="dob" className="margin-top-0-important">
+                Date of Birth
+              </Label>
+              <div className="usa-date-picker">
+                <input
+                  className="usa-input"
+                  name="dob"
+                  id="dob"
+                  type="date"
+                  value={dob}
+                  onChange={(event) => {
+                    setDOB(event.target.value);
+                  }}
+                />
+              </div>
+              {renderFieldError(dob)}
             </div>
           </div>
           <div className="grid-row grid-gap margin-bottom-4">
@@ -231,28 +338,6 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
           </div>
           <div className="grid-row grid-gap margin-bottom-4">
             <h3 className={`"font-sans-md" ${styles.searchFormSectionLabel}`}>
-              Date of Birth
-            </h3>
-            <div className="grid-col-6">
-              <Label htmlFor="dob" className="margin-top-0-important">
-                Date of Birth
-              </Label>
-              <div className="usa-date-picker">
-                <input
-                  className="usa-input"
-                  name="dob"
-                  id="dob"
-                  type="date"
-                  value={dob}
-                  onChange={(event) => {
-                    setDOB(event.target.value);
-                  }}
-                />
-              </div>
-            </div>
-          </div>
-          <div className="grid-row grid-gap margin-bottom-4">
-            <h3 className={`"font-sans-md" ${styles.searchFormSectionLabel}`}>
               Address
             </h3>
             <div className="grid-col">
@@ -266,6 +351,10 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
                 id="street_address_1"
                 name="street_address_1"
                 type="tel"
+                value={address.street1}
+                onChange={(event) => {
+                  setAddress({ ...address, street1: event.target.value });
+                }}
               />
             </div>
           </div>
@@ -281,6 +370,10 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
                 id="street_address_2"
                 name="street_address_2"
                 type="text"
+                value={address.street2}
+                onChange={(event) => {
+                  setAddress({ ...address, street2: event.target.value });
+                }}
               />
             </div>
           </div>
@@ -289,13 +382,28 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
               <Label htmlFor="city" className="margin-top-0-important">
                 City
               </Label>
-              <TextInput id="city" name="city" type="text" />
+              <TextInput
+                id="city"
+                name="city"
+                type="text"
+                value={address.city}
+                onChange={(event) => {
+                  setAddress({ ...address, city: event.target.value });
+                }}
+              />
             </div>
             <div className="tablet:grid-col-3">
               <Label htmlFor="state" className="margin-top-0-important">
                 State
               </Label>
-              <Select id="state" name="state" defaultValue="">
+              <Select
+                id="state"
+                name="state"
+                value={address.state}
+                onChange={(event) => {
+                  setAddress({ ...address, state: event.target.value });
+                }}
+              >
                 <option value="" disabled>
                   Select a state
                 </option>
@@ -316,6 +424,10 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
                 name="zip"
                 type="text"
                 pattern="[\d]{5}(-[\d]{4})?"
+                value={address.zip}
+                onChange={(event) => {
+                  setAddress({ ...address, zip: event.target.value });
+                }}
               />
             </div>
           </div>
@@ -342,6 +454,15 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
         <button className="usa-button margin-top-5" type="submit">
           Search for patient
         </button>
+        {getErrorMessage() && (
+          <div className={styles.errorMessage}>
+            <Icon.Error
+              aria-label="warning icon indicating an error is present"
+              className={styles.errorMessage}
+            />
+            {getErrorMessage()}
+          </div>
+        )}
       </form>
     </>
   );
