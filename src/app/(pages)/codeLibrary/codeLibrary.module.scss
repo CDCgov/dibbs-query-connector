@@ -13,6 +13,7 @@ $pageControlsHeight: 3rem;
   height: calc($pageContainerHeight - 2.5rem);
 
   .header {
+    // height: $pageHeaderHeight;
     font-size: inherit;
 
     &__title {
