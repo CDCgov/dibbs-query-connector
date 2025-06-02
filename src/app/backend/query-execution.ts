@@ -91,7 +91,7 @@ class QueryService {
   private static async makePatientDiscoveryRequest(
     request: PatientDiscoveryRequest,
   ) {
-    const { fhirServer, firstName, lastName, dob, mrn, phone } = request;
+    const { fhirServer, firstName, lastName, dob, mrn, phone, email } = request;
     const fhirClient = await prepareFhirClient(fhirServer);
 
     // Query for patient
@@ -122,6 +122,12 @@ class QueryService {
       }
       if (phonePossibilities.length > 0) {
         query += `phone=${phonePossibilities.join(",")}&`;
+      }
+    }
+    if (email) {
+      const emailsToSearch = email.split(";");
+      if (emailsToSearch.length > 0) {
+        query += `email=${emailsToSearch.join(",")}&`;
       }
     }
 
