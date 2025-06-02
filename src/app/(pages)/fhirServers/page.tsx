@@ -104,6 +104,7 @@ const FhirServers: React.FC = () => {
       setConnectionStatus("idle");
       setDisableCertValidation(server.disableCertValidation);
       setDefaultServer(server.defaultServer);
+      setErrorMessage("");
 
       // Set auth method and corresponding fields based on server data
       if (server.authType) {
