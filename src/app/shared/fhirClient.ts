@@ -119,7 +119,7 @@ class FHIRClient {
       }
 
       // Try to fetch the server's metadata
-      const response = await client.get("/Patient?_summary=count&_count=1");
+      const response = await client.get("/metadata?_summary=true"); // https://hl7.org/fhir/http.html#capabilities
 
       if (!response.ok) {
         const errorText = await response.text();
