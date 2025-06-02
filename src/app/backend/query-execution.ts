@@ -91,7 +91,9 @@ class QueryService {
   private static async makePatientDiscoveryRequest(
     request: PatientDiscoveryRequest,
   ) {
-    const { fhirServer, firstName, lastName, dob, mrn, phone, email } = request;
+    const { fhirServer, firstName, lastName, dob, mrn, phone, address, email } =
+      request;
+
     const fhirClient = await prepareFhirClient(fhirServer);
 
     // Query for patient
@@ -123,6 +125,29 @@ class QueryService {
       if (phonePossibilities.length > 0) {
         query += `phone=${phonePossibilities.join(",")}&`;
       }
+    }
+    if (address?.street1 || address?.street2) {
+      const addressLine1 = address?.street1?.split(";");
+      const addressLine2 = address?.street2?.split(";");
+
+      const addrString = [addressLine1, addressLine2]
+        .flat()
+        .filter((addr) => addr != "")
+        .join(",");
+
+      query += `address=${addrString}&`;
+    }
+    if (address?.city) {
+      const cities = address?.city?.split(";").join(",");
+      query += `address-city=${cities}&`;
+    }
+    if (address?.state) {
+      const states = address?.state.split(";").join(",");
+      query += `address-state=${states}&`;
+    }
+    if (address?.zip) {
+      const zips = address?.zip.split(";").join(",");
+      query += `address-postalcode=${zips}&`;
     }
     if (email) {
       const emailsToSearch = email.split(";");
