@@ -13,7 +13,6 @@ $pageControlsHeight: 3rem;
   height: calc($pageContainerHeight - 2.5rem);
 
   .header {
-    // height: $pageHeaderHeight;
     font-size: inherit;
 
     &__title {
@@ -97,6 +96,7 @@ $pageControlsHeight: 3rem;
       border-top-left-radius: 5px;
       border-bottom-left-radius: 5px;
     }
+
     &__right {
       border-top-right-radius: 5px;
       border-bottom-right-radius: 5px;
@@ -133,6 +133,7 @@ $pageControlsHeight: 3rem;
       height: 4.875rem !important;
     }
   }
+
   .filtersSelect {
     height: 3rem;
 
@@ -141,6 +142,7 @@ $pageControlsHeight: 3rem;
       background-color: #f3f3f3 !important;
     }
   }
+
   .clearFiltersBtn {
     background-color: #fff !important;
     border-radius: 4px !important;
@@ -231,6 +233,7 @@ $pageControlsHeight: 3rem;
     display: inline-flex;
     flex-direction: column;
   }
+
   background-color: #fff !important;
   border: none !important;
   box-shadow: none !important;
@@ -301,7 +304,7 @@ $pageControlsHeight: 3rem;
       }
     }
 
-    .noCodesAvailable > th {
+    .noCodesAvailable>th {
       padding: 1rem 0 !important;
       text-transform: none;
       color: #111111;
@@ -312,6 +315,7 @@ $pageControlsHeight: 3rem;
     padding: 0rem !important;
     display: flex;
     flex-direction: column;
+
     &_row {
       display: flex !important;
       padding: 0 0 0 1.5rem !important;
@@ -344,6 +348,7 @@ $pageControlsHeight: 3rem;
         padding-right: 1.5rem !important;
       }
     }
+
     &:hover {
       background-color: transparent !important;
     }
@@ -354,6 +359,7 @@ $pageControlsHeight: 3rem;
     word-wrap: break-word;
     padding-right: 1rem;
     max-width: 7.5rem;
+
     span {
       text-overflow: ellipsis;
       overflow: hidden;
@@ -389,6 +395,7 @@ $pageControlsHeight: 3rem;
       background-color: transparent !important;
       cursor: default;
     }
+
     td {
       padding: 0 !important;
       margin-right: 1.5rem;
@@ -533,7 +540,7 @@ $pageControlsHeight: 3rem;
       }
     }
 
-    .addCodeContainer > span {
+    .addCodeContainer>span {
       line-height: 1 !important;
     }
 
@@ -589,10 +596,12 @@ $pageControlsHeight: 3rem;
       line-height: 1.25rem;
       position: relative;
     }
+
     svg {
       margin-right: 0.25rem;
       margin-bottom: 2.5px;
     }
+
     input {
       border: 2px solid $error-dark !important;
 
@@ -623,7 +632,7 @@ $pageControlsHeight: 3rem;
         }
       }
 
-      .addCodeContainer > span {
+      .addCodeContainer>span {
         line-height: 1 !important;
       }
 
@@ -695,10 +704,12 @@ $pageControlsHeight: 3rem;
     line-height: 1.25rem;
     position: relative;
   }
+
   svg {
     margin-right: 0.25rem;
     margin-bottom: 2.5px;
   }
+
   input,
   select {
     border: 2px solid $error-dark !important;
@@ -708,6 +719,7 @@ $pageControlsHeight: 3rem;
 .modalButtonDelete {
   background-color: $destructive-primary;
   height: 2.75rem !important;
+
   &:hover {
     background-color: $destructive-dark !important;
   }
