@@ -1,6 +1,6 @@
 @use "../../ui/styles/variables" as *;
 
-$pageContainerHeight: calc(100vh - $header-content-height - $site-alert-height);
+$pageContainerHeight: 100vh;
 $pageHeaderHeight: 12rem;
 $pageControlsHeight: 3rem;
 
@@ -205,22 +205,23 @@ $pageControlsHeight: 3rem;
   .itemsPerPageContainer {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-  }
+    width: calc($query-connector-content-width-wide + 4rem);
+    margin-bottom: -7rem;
 
-  .itemsPerPageContainer label {
-    white-space: nowrap;
-    flex-shrink: 0;
-  }
+    label {
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
 
-  .itemsPerPageDropdown {
-    display: flex;
-    width: 5.875rem;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.5rem;
-    border-radius: 0.25rem;
-    margin-bottom: 0.5rem;
+    .itemsPerPageDropdown {
+      display: flex;
+      width: 5.875rem;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
+      border-radius: 0.25rem;
+      margin-bottom: 0.5rem;
+    }
   }
 }
 

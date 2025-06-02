@@ -1,7 +1,9 @@
 import { TEST_URL } from "../playwright-setup";
 import { test, expect } from "@playwright/test";
 import { E2E_SMART_TEST_CLIENT_ID } from "./constants";
-import { createSmartJwt, getOrCreateKeys } from "@/app/backend/smart-on-fhir";
+import { createSmartJwt } from "@/app/backend/smart-on-fhir";
+import { getOrCreateKeys } from "../setup-scripts/gen-keys";
+
 import { decodeJwt, decodeProtectedHeader } from "jose";
 
 test.describe("SMART on FHIR", () => {

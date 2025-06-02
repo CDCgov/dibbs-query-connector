@@ -37,6 +37,14 @@ export const USE_CASE_DETAILS = {
 
 export type USE_CASES = keyof typeof USE_CASE_DETAILS;
 
+export type AddressData = {
+  street1: string;
+  street2: string;
+  city: string;
+  state: string;
+  zip: string;
+};
+
 //Create type to specify the demographic data fields for a patient
 export type DemoDataFields = {
   Id: string;
@@ -45,6 +53,7 @@ export type DemoDataFields = {
   DOB: string;
   MRN: string;
   Phone: string;
+  Address: AddressData;
 };
 
 export const HYPER_UNLUCKY_DEFAULT_ID = "f288c654-6885-4f48-999c-48d776dc06af";
@@ -58,6 +67,13 @@ export const hyperUnluckyPatient: DemoDataFields = {
   DOB: "1975-12-06",
   MRN: "8692756",
   Phone: "517-425-1398",
+  Address: {
+    street1: "49 Meadow St",
+    street2: "",
+    city: "Lansing",
+    state: "MI",
+    zip: "48864",
+  },
 };
 
 /*Labels and values for the state options dropdown on the query page*/
@@ -211,6 +227,8 @@ export const HL7_BODY_MISFORMAT =
   "Invalid HL7 request. Please add your HL7 message to the request body in between curly braces like so - { YOUR MESSAGE HERE } ";
 export const MISSING_PATIENT_IDENTIFIERS =
   "No patient identifiers to parse from requestBody.";
+export const INSUFFICIENT_PATIENT_IDENTIFIERS =
+  "Invalid request. First name, last name, and date of birth are required, along with at least one of phone number, email, complete address, or MRN.";
 
 // Constants for the code library
 export const CUSTOM_CONDITION_ID = "custom_condition"; // This should be a unique identifier for the condition, we could just call it '0', but we will need some way to exclude it from certain screens, so that's why I lean toward it being hardcoded.

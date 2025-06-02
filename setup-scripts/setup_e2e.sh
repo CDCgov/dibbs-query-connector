@@ -12,7 +12,10 @@ value=$(grep "^AIDBOX_LICENSE=" .env | cut -d '=' -f2)
 # Check if the value was found
 if [ -n "$value" ]; then
      echo "AIDBOX_LICENSE=$value" >> .env.e2e
-  echo "Value copied successfully"
+  echo "Aidbox license key copied successfully from local env file"
 else
-  echo "Variable not found in source file"
+  echo "Aidbox license key not found in local env file"
 fi
+
+npm install ts-node
+npx ts-node ./setup-scripts/gen-keys.ts
