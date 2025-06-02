@@ -54,6 +54,7 @@ export type DemoDataFields = {
   MRN: string;
   Phone: string;
   Address: AddressData;
+  Email: string;
 };
 
 export const HYPER_UNLUCKY_DEFAULT_ID = "f288c654-6885-4f48-999c-48d776dc06af";
@@ -74,6 +75,7 @@ export const hyperUnluckyPatient: DemoDataFields = {
     state: "MI",
     zip: "48864",
   },
+  Email: "hyper.unlucky@email.com",
 };
 
 /*Labels and values for the state options dropdown on the query page*/

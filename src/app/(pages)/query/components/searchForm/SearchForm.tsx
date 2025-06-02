@@ -50,7 +50,7 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
   const [firstName, setFirstName] = useState<string>("");
   const [lastName, setLastName] = useState<string>("");
   const [phone, setPhone] = useState<string>("");
-  const [email, _setEmail] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
   const [dob, setDOB] = useState<string>("");
   const [mrn, setMRN] = useState<string>("");
   const [address, setAddress] = useState<AddressData>({
@@ -109,6 +109,7 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
     setMRN(hyperUnluckyPatient.MRN);
     setPhone(hyperUnluckyPatient.Phone);
     setAddress({ ...hyperUnluckyPatient.Address });
+    setEmail(hyperUnluckyPatient.Email);
   }, [fhirServers]);
 
   const nameRegex = "^[A-Za-z\u00C0-\u024F\u1E00-\u1EFF\\-'. ]+$";
@@ -338,6 +339,25 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
                 value={phone}
                 onChange={(event) => {
                   setPhone(event.target.value);
+                }}
+              />
+            </div>
+          </div>
+          <div className="grid-row grid-gap margin-bottom-4">
+            <h3 className={`"font-sans-md" ${styles.searchFormSectionLabel}`}>
+              Email address
+            </h3>
+            <div className="grid-col-6">
+              <Label htmlFor="email" className="margin-top-0-important">
+                Email address
+              </Label>
+              <TextInput
+                id="email"
+                name="email"
+                type="email"
+                value={email}
+                onChange={(event) => {
+                  setEmail(event.target.value);
                 }}
               />
             </div>
