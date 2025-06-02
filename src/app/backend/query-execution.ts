@@ -91,7 +91,7 @@ class QueryService {
   private static async makePatientDiscoveryRequest(
     request: PatientDiscoveryRequest,
   ) {
-    const { fhirServer, firstName, lastName, dob, mrn, phone, address } =
+    const { fhirServer, firstName, lastName, dob, mrn, phone, address, email } =
       request;
 
     const fhirClient = await prepareFhirClient(fhirServer);
@@ -148,6 +148,12 @@ class QueryService {
     if (address?.zip) {
       const zips = address?.zip.split(";").join(",");
       query += `address-postalcode=${zips}&`;
+    }
+    if (email) {
+      const emailsToSearch = email.split(";");
+      if (emailsToSearch.length > 0) {
+        query += `email=${emailsToSearch.join(",")}&`;
+      }
     }
 
     const fhirResponse = await fhirClient.get(query);

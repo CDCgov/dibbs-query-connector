@@ -87,6 +87,7 @@ export async function GET(request: NextRequest) {
   const state = params.get("state") ?? "";
   const zip = params.get("zip") ?? "";
 
+  const email = params.get("email") ?? "";
   const noParamsDefined = [
     given,
     family,
@@ -98,6 +99,8 @@ export async function GET(request: NextRequest) {
     city,
     state,
     zip,
+    ,
+    email,
   ].every((e) => e === "");
 
   if (noParamsDefined) {
@@ -123,6 +126,7 @@ export async function GET(request: NextRequest) {
       state,
       zip,
     },
+    email,
   };
 
   if (!validatedPatientSearch(QueryRequest)) {
@@ -202,6 +206,7 @@ export async function POST(request: NextRequest) {
       const state = parsedMessage.get("PID.11.4").toString() ?? "";
       const zip = parsedMessage.get("PID.11.5").toString() ?? "";
       const phone = parsedMessage.get("NK1.5.1").toString() ?? "";
+      const email = parsedMessage.get("PID.13.4").toString() ?? ""; //https://hl7-definition.caristix.com/v2/HL7v2.3/Fields/PID.13.4
       const noPatientIdentifierDefined = [
         firstName,
         lastName,
@@ -213,6 +218,7 @@ export async function POST(request: NextRequest) {
         city,
         state,
         zip,
+        email,
       ].every((e) => e === "");
 
       if (noPatientIdentifierDefined) {
@@ -228,6 +234,7 @@ export async function POST(request: NextRequest) {
         mrn,
         address: { street1, street2, city, state, zip },
         phone,
+        email,
       };
     } catch (error: unknown) {
       return await handleAndReturnError(error);
@@ -269,6 +276,7 @@ export async function POST(request: NextRequest) {
           zip: PatientIdentifiers.zip,
         },
         phone: PatientIdentifiers?.phone,
+        email: PatientIdentifiers?.email,
       };
     } catch (error: unknown) {
       return await handleAndReturnError(error);
