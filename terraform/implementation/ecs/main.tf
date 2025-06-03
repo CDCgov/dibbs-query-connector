@@ -100,7 +100,7 @@ module "ecs" {
           value = var.auth_secret
         },
         {
-          name  = "AUTH_PROVIDER"
+          name  = "NEXT_PUBLIC_AUTH_PROVIDER"
           value = var.auth_provider
         },
         {
