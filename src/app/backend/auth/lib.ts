@@ -114,21 +114,15 @@ export class KeycloakAuthStrategy implements AuthStrategy {
     };
     return userToken;
   }
-  public setUpNextAuthProvider() {
-    function addRealm(url: string) {
-      return url.endsWith("/realms/master") ? url : `${url}/realms/master`;
-    }
 
+  public setUpNextAuthProvider() {
     let { NAMED_KEYCLOAK, LOCAL_KEYCLOAK } = process.env;
     if (!NAMED_KEYCLOAK || !LOCAL_KEYCLOAK) {
-      const KEYCLOAK_URL = process.env.AUTH_ISSUER || "http://localhost:8080";
+      const KEYCLOAK_URL =
+        process.env.AUTH_ISSUER || "http://localhost:8080/realms/master";
       NAMED_KEYCLOAK = KEYCLOAK_URL;
       LOCAL_KEYCLOAK = KEYCLOAK_URL;
     }
-
-    // Add /realms/master to the end of the URL if it's missing.
-    NAMED_KEYCLOAK = addRealm(NAMED_KEYCLOAK);
-    LOCAL_KEYCLOAK = addRealm(LOCAL_KEYCLOAK);
 
     return KeycloakProvider({
       jwks_endpoint: `${NAMED_KEYCLOAK}/protocol/openid-connect/certs`,
