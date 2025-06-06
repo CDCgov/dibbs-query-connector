@@ -134,6 +134,7 @@ INSERT INTO fhir_servers (
   last_connection_attempt,
   last_connection_successful,
   disable_cert_validation,
+  auth_type,
   default_server
 ) VALUES (
   'Aidbox',
@@ -141,7 +142,8 @@ INSERT INTO fhir_servers (
   '{"Authorization": "Bearer ${TOKEN}"}'::jsonb,
   '${CURRENT_DATETIME}'::timestamp,
   true,
-  false,
+  false,  
+  'SMART',
   true
 )
 ON CONFLICT(name)
