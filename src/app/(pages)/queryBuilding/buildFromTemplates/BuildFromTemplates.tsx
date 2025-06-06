@@ -96,7 +96,7 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
     useState<ConditionsMap>();
 
   const [medicalRecordSections, setMedicalRecordSections] =
-    useState<MedicalRecordSections>();
+    useState<MedicalRecordSections>(EMPTY_MEDICAL_RECORD_SECTIONS);
 
   const [formError, setFormError] = useState<FormError>({
     queryName: false,
@@ -307,7 +307,7 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
         const results = await saveCustomQuery(
           constructedQuery,
           queryName,
-          medicalRecordSections ?? EMPTY_MEDICAL_RECORD_SECTIONS,
+          medicalRecordSections,
           userName,
           selectedQuery.queryId,
         );

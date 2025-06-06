@@ -13,6 +13,7 @@ import {
   NestedQuery,
   formatCategoryToConditionsMap,
   MedicalRecordSections,
+  EMPTY_MEDICAL_RECORD_SECTIONS,
 } from "../utils";
 import { ConceptTypeSelectionTable } from "./SelectionTable";
 import Drawer from "@/app/ui/designSystem/drawer/Drawer";
@@ -47,7 +48,9 @@ type ConditionSelectionProps = {
     vsType: DibbsConceptType,
   ) => (vsId: string) => (dibbsValueSets: DibbsValueSet) => void;
   medicalRecordSections: MedicalRecordSections;
-  setMedicalRecordSections: (val: MedicalRecordSections) => void;
+  setMedicalRecordSections: React.Dispatch<
+    React.SetStateAction<MedicalRecordSections>
+  >;
 };
 
 /**
@@ -340,11 +343,21 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
         <div className={styles.valueSetTemplate__right}>
           {isMedicalRecordsTab ? (
             <div className={styles.medicalRecordSectionControls}>
-              {Object.keys(medicalRecordSections || {}).map((key) => (
-                <label key={key} style={{ display: "block", marginBottom: 8 }}>
+              {Object.entries(
+                medicalRecordSections ?? EMPTY_MEDICAL_RECORD_SECTIONS,
+              ).map(([key, value]) => (
+                <label
+                  key={key}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 8,
+                    marginBottom: 8,
+                  }}
+                >
                   <input
                     type="checkbox"
-                    checked={medicalRecordSections?.[key] ?? false}
+                    checked={!!value}
                     onChange={(e) =>
                       setMedicalRecordSections((prev) => ({
                         ...prev,
@@ -352,8 +365,13 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
                       }))
                     }
                     data-testid={`medical-record-section-checkbox-${key}`}
+                    style={{ marginRight: 4 }}
                   />
-                  {key.charAt(0).toUpperCase() + key.slice(1)}
+                  <span style={{ userSelect: "none" }}>
+                    {key
+                      .replace(/([A-Z])/g, " $1")
+                      .replace(/^./, (s) => s.toUpperCase())}
+                  </span>
                 </label>
               ))}
             </div>
