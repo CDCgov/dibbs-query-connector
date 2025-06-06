@@ -302,6 +302,23 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
                     Additional codes from library
                   </div>
                 </div>{" "}
+                <div
+                  className={classNames(
+                    "align-items-center",
+                    activeCondition == CUSTOM_VALUESET_ARRAY_ID
+                      ? `${styles.card} ${styles.active}`
+                      : styles.card,
+                  )}
+                >
+                  <div
+                    id={`tab-custom`}
+                    onClick={() => setActiveCondition(CUSTOM_VALUESET_ARRAY_ID)}
+                    tabIndex={0}
+                    role="button"
+                  >
+                    Medical record sections
+                  </div>
+                </div>
               </div>
             </div>
           </div>

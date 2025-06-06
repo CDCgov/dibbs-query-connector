@@ -32,6 +32,11 @@ export type NestedQuery = {
   };
 };
 
+export type MedicalRecordSections = {
+  immunization: boolean;
+  socialDeterminants: boolean;
+};
+
 export type QueryUpdateResult = {
   id: string;
   query_name: string;
