@@ -1,4 +1,5 @@
 import {
+  MedicalRecordSections,
   NestedQuery,
   QueryTableResult,
   QueryUpdateResult,
@@ -21,6 +22,7 @@ import { Pool } from "pg";
  * @param queryName - name of query
  * @param author - author
  * @param dbClient - the DB client to execute queries against
+ * @param medicalRecordSections - sections of the medical record to include in the query
  * @param queryId - a queryId if previously defined
  * @returns - all columns of the newly added row in the query table
  */
@@ -29,18 +31,20 @@ export async function saveCustomQueryHelp(
   queryName: string,
   author: string,
   dbClient: DbService | Pool,
+  medicalRecordSections: MedicalRecordSections,
   queryId?: string,
 ) {
   const queryString = `
     INSERT INTO query
-      values($1, $2, $3, $4, $5, $6, $7, $8, $9)
+      values($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
       ON CONFLICT(id)
       DO UPDATE SET
         query_name = EXCLUDED.query_name,
         conditions_list = EXCLUDED.conditions_list,
         query_data = EXCLUDED.query_data,
         author = EXCLUDED.author,
-        date_last_modified = EXCLUDED.date_last_modified
+        date_last_modified = EXCLUDED.date_last_modified,
+        medical_record_sections = EXCLUDED.medical_record_sections,
       RETURNING id, query_name,  CASE WHEN xmax = 0 THEN 'INSERT' ELSE 'UPDATE' END AS operation;
     `;
   const { queryDataInsert, conditionInsert } =
@@ -58,6 +62,7 @@ export async function saveCustomQueryHelp(
       NOW,
       DEFAULT_TIME_WINDOW.timeWindowNumber,
       DEFAULT_TIME_WINDOW.timeWindowUnit,
+      medicalRecordSections,
     ];
     const result = await dbClient.query(queryString, dataToWrite);
     if (result.rows.length > 0) {
