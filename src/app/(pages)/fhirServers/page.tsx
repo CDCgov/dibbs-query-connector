@@ -342,7 +342,6 @@ const FhirServers: React.FC = () => {
         type: "button" as const,
         id: "modal-test-connection-button",
         className: "usa-button usa-button--outline",
-        testId: "modal-test-connection-button",
         onClick: handleTestConnection,
       },
       {
