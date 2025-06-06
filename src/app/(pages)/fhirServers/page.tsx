@@ -232,7 +232,7 @@ const FhirServers: React.FC = () => {
 
     // 2. Update connection status in DB
     const updateResult = await updateFhirServerConnectionStatus(
-      selectedServer.name,
+      selectedServer?.name || serverName,
       result.success,
     );
 
