@@ -18,6 +18,10 @@ const customJestConfig = {
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/src/$1",
   },
+  globals: {
+    Uint8Array: Uint8Array,
+    ArrayBuffer: ArrayBuffer,
+  },
 };
 
 // work around https://github.com/vercel/next.js/issues/35634
