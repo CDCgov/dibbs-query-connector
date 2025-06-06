@@ -209,8 +209,6 @@ const FhirServers: React.FC = () => {
     }
   };
   const handleTestConnection = async () => {
-    if (!selectedServer) return;
-
     // 1. Test the connection (returns { success, error })
     const result = await testFhirServerConnection(
       serverUrl,
@@ -344,6 +342,7 @@ const FhirServers: React.FC = () => {
         type: "button" as const,
         id: "modal-test-connection-button",
         className: "usa-button usa-button--outline",
+        testId: "modal-test-connection-button",
         onClick: handleTestConnection,
       },
       {

@@ -34,9 +34,7 @@ test.describe("SMART on FHIR", () => {
       .fill(`${process.env.AIDBOX_BASE_URL}/auth/token`);
 
     await page.getByRole("button", { name: "Test connection" }).click();
-    await expect(page.getByRole("button", { name: "Success" })).toBeVisible({
-      timeout: 30000,
-    });
+    await expect(page.getByRole("button", { name: "Success" })).toBeVisible();
 
     await page.getByRole("button", { name: "Add server" }).click();
 
