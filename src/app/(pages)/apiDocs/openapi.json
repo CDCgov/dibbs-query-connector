@@ -3,7 +3,7 @@
   "info": {
     "version": "1.0.0",
     "title": "Query Connector API - OpenAPI 3.0",
-    "description": "The DIBBs Query Connector API allows authorized systems to query healthcare organizations for patient data. Authentication is required for all query endpoints.\n\n## Authentication\n\nUse the token endpoint below to obtain an access token, then click 'Authorize' to apply it to all requests.\n\n## Patient Search Requirements\n\nAll patient searches must include:\n- **First Name** (given)\n- **Last Name** (family)\n- **Date of Birth** (dob)\n- **At least one of:** Complete address, email, phone number, or MRN\n\nRequests missing any of these required fields will return a 400 Bad Request error.",
+    "description": "The DIBBs Query Connector API allows authorized systems to query healthcare organizations for patient data. Authentication is required for all query endpoints.\n\n## Authentication\n\nUse the authentication box to the right to obtain an access token by clicking 'Authorize' to apply it to all requests.\n\nSee below for more details about how to manually request an authorization token.\n\n## Patient Search Requirements\n\nAll patient searches must include:\n- **First Name** (given)\n- **Last Name** (family)\n- **Date of Birth** (dob)\n- **At least one of:** Complete address, email, phone number, or MRN\n\nRequests missing any of these required fields will return a 400 Bad Request error.",
     "x-logo": {
       "url": "https://queryconnector.dev/DIBBs_logo.png",
       "altText": "Query Connector API"
@@ -13,21 +13,37 @@
     {
       "url": "https://queryconnector.dev",
       "description": "Query Connector Development Server"
+    },
+    {
+      "url": "http://localhost:3000",
+      "description": "Local Development Server"
+    },
+    {
+      "url": "http://localhost:8081",
+      "description": "Local Keycloak Server"
     }
   ],
   "security": [
     {
-      "bearerAuth": []
+      "oauth2": [
+        "profile",
+        "email"
+      ]
     }
   ],
   "components": {
     "securitySchemes": {
-      "bearerAuth": {
-        "type": "http",
-        "scheme": "bearer",
-        "bearerFormat": "JWT",
-        "description": "OAuth 2.0 Bearer Token obtained via client credentials flow from Keycloak or Microsoft Entra ID",
-        "x-bearer-format": "JWT"
+      "oauth2": {
+        "type": "oauth2",
+        "flows": {
+          "clientCredentials": {
+            "tokenUrl": "https://queryconnector.dev/keycloak/realms/master/protocol/openid-connect/token",
+            "scopes": {
+              "profile": "Access to your profile info",
+              "email": "Access to your email address"
+            }
+          }
+        }
       }
     },
     "responses": {
@@ -59,7 +75,7 @@
       "description": "Obtain access tokens for API authentication"
     },
     {
-      "name": "Health",
+      "name": "Health Check",
       "description": "API health check endpoints"
     },
     {
@@ -71,7 +87,7 @@
     "/api": {
       "get": {
         "tags": [
-          "Health"
+          "Health Check"
         ],
         "summary": "Health Check",
         "description": "Returns the health status of the API. This endpoint does not require authentication.",
@@ -113,7 +129,7 @@
         "x-code-samples": [
           {
             "lang": "cURL",
-            "source": "curl -X POST 'https://queryconnector.dev/keycloak/realms/master/protocol/openid-connect/token' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -d 'grant_type=client_credentials&client_id=your-client-id&client_secret=your-client-secret'"
+            "source": "curl -X POST 'https://queryconnector.dev/keycloak/realms/master/protocol/openid-connect/token' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -d 'grant_type=client_credentials&client_id=api-docs-test-client&client_secret=eJOjhpZ2AQ3dSwbmfFpzVzF2S6nU8BuE'"
           }
         ],
         "requestBody": {
@@ -125,6 +141,7 @@
                 "properties": {
                   "grant_type": {
                     "type": "string",
+                    "required": true,
                     "enum": [
                       "client_credentials"
                     ],
@@ -133,16 +150,19 @@
                   },
                   "client_id": {
                     "type": "string",
-                    "example": "your-client-id",
+                    "required": true,
+                    "example": "api-docs-test-client",
                     "description": "Your application's client ID"
                   },
                   "client_secret": {
                     "type": "string",
-                    "example": "your-client-secret",
+                    "required": true,
+                    "example": "eJOjhpZ2AQ3dSwbmfFpzVzF2S6nU8BuE",
                     "description": "Your application's client secret"
                   },
                   "scope": {
                     "type": "string",
+                    "required": false,
                     "example": "api://query-connector-app-id/.default",
                     "description": "Required for Microsoft Entra ID only"
                   }
@@ -181,7 +201,7 @@
                     },
                     "scope": {
                       "type": "string",
-                      "example": "api://query-connector-app-id/.default",
+                      "example": "profile email",
                       "description": "Granted scopes"
                     }
                   }
@@ -250,33 +270,23 @@
         "operationId": "queryWithParameters",
         "parameters": [
           {
-            "name": "Authorization",
-            "in": "header",
-            "description": "Bearer token obtained from your identity provider",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "example": "Bearer eyJhbGciOiJSUzI1NiIsInR5cCI..."
-            }
-          },
-          {
             "name": "fhir_server",
             "in": "query",
-            "description": "Name of the FHIR server to query",
+            "description": "Name of the FHIR server to query. **REQUIRED**",
             "required": true,
             "schema": {
               "type": "string",
-              "example": "HELIOS Meld: Direct"
+              "example": "Aidbox"
             }
           },
           {
             "name": "id",
             "in": "query",
-            "description": "ID of the query to use",
+            "description": "ID of the query to use. **REQUIRED**",
             "required": true,
             "schema": {
               "type": "string",
-              "example": "cf580d8d-cc7b-4eae-8a0d-96c36f9222e3"
+              "example": "73e1a777-49cb-4e19-bc71-8c3fd3ffda64"
             }
           },
           {
@@ -314,6 +324,7 @@
             "name": "mrn",
             "in": "query",
             "description": "Patient medical record number. At least one of MRN, phone, email, or address is required.",
+            "required": true,
             "schema": {
               "type": "string",
               "example": "8692756"
@@ -514,16 +525,6 @@
         "operationId": "queryWithPatientResource",
         "parameters": [
           {
-            "name": "Authorization",
-            "in": "header",
-            "description": "Bearer token obtained from your identity provider",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "example": "Bearer eyJhbGciOiJSUzI1NiIsInR5cCI..."
-            }
-          },
-          {
             "name": "fhir_server",
             "in": "query",
             "description": "Name of the FHIR server to query",
@@ -540,7 +541,7 @@
             "required": true,
             "schema": {
               "type": "string",
-              "example": "cf580d8d-cc7b-4eae-8a0d-96c36f9222e3"
+              "example": "73e1a777-49cb-4e19-bc71-8c3fd3ffda64"
             }
           },
           {
@@ -817,13 +818,13 @@
     {
       "name": "Getting Started",
       "tags": [
+        "Health Check",
         "Authentication"
       ]
     },
     {
-      "name": "API Endpoints",
+      "name": "Query Endpoints",
       "tags": [
-        "Health",
         "Query"
       ]
     }
