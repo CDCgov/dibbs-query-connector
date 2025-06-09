@@ -188,7 +188,8 @@ class QueryService {
     if (!savedQuery) {
       throw new Error(`Unable to query of name ${request?.queryName}`);
     }
-    const includeImmunization = savedQuery.immunization;
+    const includeImmunization =
+      !!savedQuery.medicalRecordSections?.immunization;
     const queryData = savedQuery.queryData;
 
     let response: Response | Response[] =

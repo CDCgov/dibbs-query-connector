@@ -458,6 +458,7 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
               constructedQuery={constructedQuery}
               handleConditionUpdate={handleConditionUpdate}
               renderErrorMessage={setErrorMessage}
+              medicalRecordSections={medicalRecordSections}
             />
           )}
           {/* Step Two: Select ValueSets */}

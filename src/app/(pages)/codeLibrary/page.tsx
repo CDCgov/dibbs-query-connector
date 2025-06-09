@@ -349,14 +349,8 @@ const CodeLibrary: React.FC = () => {
   const saveQueryAndRedirect = useSaveQueryAndRedirect();
 
   function goBack() {
-    ctx?.selectedQuery &&
-      saveQueryAndRedirect(
-        {},
-        ctx?.selectedQuery?.queryName,
-        medicalRecordSections,
-        "/queryBuilding",
-        prevPage,
-      );
+    // TODO: Handle going back to the previous page
+    console.log(`Going back to ${prevPage}`);
   }
 
   const handleTextSearch = (vs: DibbsValueSet) => {
