@@ -105,6 +105,8 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
       setActiveCondition(firstValid);
     } else if (queryKeys.includes(CUSTOM_VALUESET_ARRAY_ID)) {
       setActiveCondition(CUSTOM_VALUESET_ARRAY_ID);
+    } else {
+      setActiveCondition(MEDICAL_RECORD_SECTIONS_ID);
     }
   }, [constructedQuery, activeCondition]);
 
@@ -343,9 +345,7 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
         <div className={styles.valueSetTemplate__right}>
           {isMedicalRecordsTab ? (
             <div className={styles.medicalRecordSectionControls}>
-              {Object.entries(
-                medicalRecordSections ?? EMPTY_MEDICAL_RECORD_SECTIONS,
-              ).map(([key, value]) => (
+              {Object.keys(EMPTY_MEDICAL_RECORD_SECTIONS).map((key) => (
                 <label
                   key={key}
                   style={{
@@ -357,7 +357,14 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
                 >
                   <input
                     type="checkbox"
-                    checked={!!value}
+                    checked={
+                      !!(
+                        medicalRecordSections &&
+                        medicalRecordSections[
+                          key as keyof MedicalRecordSections
+                        ]
+                      )
+                    }
                     onChange={(e) =>
                       setMedicalRecordSections((prev) => ({
                         ...prev,

@@ -44,7 +44,7 @@ export async function saveCustomQueryHelp(
         query_data = EXCLUDED.query_data,
         author = EXCLUDED.author,
         date_last_modified = EXCLUDED.date_last_modified,
-        medical_record_sections = EXCLUDED.medical_record_sections,
+        medical_record_sections = EXCLUDED.medical_record_sections
       RETURNING id, query_name,  CASE WHEN xmax = 0 THEN 'INSERT' ELSE 'UPDATE' END AS operation;
     `;
   const { queryDataInsert, conditionInsert } =
