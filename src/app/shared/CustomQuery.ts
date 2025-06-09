@@ -1,4 +1,7 @@
-import { QueryDataColumn } from "../(pages)/queryBuilding/utils";
+import {
+  MedicalRecordSections,
+  QueryDataColumn,
+} from "../(pages)/queryBuilding/utils";
 
 /**
  * A Data Class designed to store and manipulate various code values used
@@ -62,22 +65,19 @@ export class CustomQuery {
    * that has nested information about the conditions / valuesets / concepts
    * relevant to the query
    * @param patientId The ID of the patient to build into query strings.
-   * @param includeImmunization Whether to include immunizations in the outgoing
-   * FHIR query
+   * @param medicalRecordSections Object containing booleans for each section (e.g. immunization, socialDeterminants)
+   * @param medicalRecordSections.immunization Boolean indicating if immunization section is included
+   * @param medicalRecordSections.socialDeterminants Boolean indicating if socialDeterminants section is included
    */
   constructor(
     savedQueryJson: QueryDataColumn,
     patientId: string,
-    // this was added as a quick and dirty addition to get a previous feature
-    // working again. Should we need to extend this further, probably should
-    // extend savedQueryJson to be more flexible rather than tacking on additional
-    // config options
-    includeImmunization = false,
+    medicalRecordSections: MedicalRecordSections,
   ) {
     try {
       this.patientId = patientId;
       this.initializeQueryConceptTypes(savedQueryJson);
-      this.compileFhirResourceQueries(patientId, includeImmunization);
+      this.compileFhirResourceQueries(patientId, medicalRecordSections);
     } catch (error) {
       console.error("Could not create CustomQuery Object: ", error);
     }
@@ -110,27 +110,29 @@ export class CustomQuery {
    * the provided spec (e.g. a Newborn Screening case will have no rxnorm codes),
    * any query built using those codes' filter will be left as the empty string.
    * @param patientId The ID of the patient to query for.
-   * @param includeImmunization Whether to include immunizations in the outgoing
-   * FHIR query
+   * @param medicalRecordSections Object containing booleans for each section (e.g. immunization, socialDeterminants)
+   * @param medicalRecordSections.immunization Boolean indicating if immunization section is included
+   * @param medicalRecordSections.socialDeterminants Boolean indicating if socialDeterminants section is included
    */
   compileFhirResourceQueries(
     patientId: string,
-    includeImmunization?: boolean,
+    medicalRecordSections: MedicalRecordSections,
   ): void {
     const labsFilter = this.labCodes.join(",");
     const medicationsFilter = this.medicationCodes.join(",");
     const conditionsFilter = this.conditionCodes.join(",");
 
-    //https://skylight-hq.slack.com/archives/C05BEG226RZ/p1748446005152119
-    // this.fhirResourceQueries["socialHistory"] = {
-    //   basePath: `/Observation/_search`,
-    //   params: {
-    //     subject: `Patient/${patientId}`,
-    //     category: "social-history",
-    //   },
-    // };
+    if (medicalRecordSections && medicalRecordSections.socialDeterminants) {
+      this.fhirResourceQueries["socialHistory"] = {
+        basePath: `/Observation/_search`,
+        params: {
+          subject: `Patient/${patientId}`,
+          category: "social-history",
+        },
+      };
+    }
 
-    if (includeImmunization) {
+    if (medicalRecordSections && medicalRecordSections.immunization) {
       this.fhirResourceQueries["immunization"] = {
         basePath: `/Immunization`,
         params: {
