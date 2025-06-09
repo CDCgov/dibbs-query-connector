@@ -135,7 +135,7 @@
       }
     ],
     "client": {
-      "api-docs-test-user": [],
+      "api-docs-test-client": [],
       "security-admin-console": [],
       "query-connector": [
         {
@@ -513,12 +513,12 @@
   "users": [
     {
       "id": "b3cd87ec-029d-4416-b6dd-5467e203c095",
-      "username": "service-account-api-docs-test-user",
+      "username": "service-account-api-docs-test-client",
       "emailVerified": false,
       "createdTimestamp": 1749504674009,
       "enabled": true,
       "totp": false,
-      "serviceAccountClientId": "api-docs-test-user",
+      "serviceAccountClientId": "api-docs-test-client",
       "disableableCredentialTypes": [],
       "requiredActions": [],
       "realmRoles": [
@@ -849,7 +849,7 @@
     },
     {
       "id": "45331dd7-4276-445d-ad21-0a2b2165ac8d",
-      "clientId": "api-docs-test-user",
+      "clientId": "api-docs-test-client",
       "name": "API Docs Test User",
       "description": "",
       "rootUrl": "",
