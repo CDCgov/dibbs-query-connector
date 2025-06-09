@@ -44,13 +44,19 @@ class QueryService {
       medicalRecordSections,
     );
 
+    const medicalRecordSectionResults: Response[] = [];
     if (medicalRecordSections && medicalRecordSections.immunization) {
       const { basePath, params } = builtQuery.getQuery("immunization");
       let fetchString = basePath;
       Object.entries(params).forEach(([k, v]) => {
         fetchString += `?${k}=${v}`;
       });
-      return await fhirClient.get(fetchString);
+      medicalRecordSectionResults.push(await fhirClient.get(fetchString));
+    }
+
+    if (medicalRecordSections && medicalRecordSections.socialDeterminants) {
+      const { basePath, params } = builtQuery.getQuery("socialHistory");
+      medicalRecordSectionResults.push(await fhirClient.post(basePath, params));
     }
 
     const postPromises = builtQuery.compileAllPostRequests().map((req) => {
@@ -68,7 +74,8 @@ class QueryService {
       })
       .filter((v): v is Response => !!v);
 
-    const successfulResults = fulfilledResults
+    const allResults = [...medicalRecordSectionResults, ...fulfilledResults];
+    const successfulResults = allResults
       .map((response) => {
         if (response.status !== 200) {
           response.text().then((reason) => {
