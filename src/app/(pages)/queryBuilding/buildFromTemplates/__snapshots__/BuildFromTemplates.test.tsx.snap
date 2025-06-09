@@ -181,7 +181,21 @@ exports[`tests the valueset selection page interactions filter bulk selection up
                         Additional codes from library
                       </div>
                     </div>
-                     
+                  </div>
+                  <div
+                    class="section_custom"
+                  >
+                    <div
+                      class="align-items-center card"
+                    >
+                      <div
+                        id="tab-medical-records"
+                        role="button"
+                        tabindex="0"
+                      >
+                        Medical record sections
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
