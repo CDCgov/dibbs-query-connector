@@ -21,7 +21,11 @@ import {
 } from "@/app/shared/database-service";
 import { DibbsValueSet } from "@/app/models/entities/valuesets";
 import { CustomCodeMode, emptyFilterSearch, emptyValueSet } from "./utils";
-import { ConditionsMap, formatDiseaseDisplay } from "../queryBuilding/utils";
+import {
+  ConditionsMap,
+  EMPTY_MEDICAL_RECORD_SECTIONS,
+  formatDiseaseDisplay,
+} from "../queryBuilding/utils";
 import Highlighter from "react-highlight-words";
 import Skeleton from "react-loading-skeleton";
 import {
@@ -185,6 +189,8 @@ const CodeLibrary: React.FC = () => {
     );
     if (result.success) {
       const updatedQuery = await getSavedQueryById(ctx.selectedQuery.queryId);
+      const medicalRecordSections =
+        updatedQuery?.medicalRecordSections || EMPTY_MEDICAL_RECORD_SECTIONS;
       let constructedQuery: NestedQuery = {};
       if (updatedQuery?.queryData) {
         Object.entries(
@@ -205,7 +211,7 @@ const CodeLibrary: React.FC = () => {
         ctx.setSelectedQuery(updatedQuery);
       }
       showToastConfirmation({ body: "The query has been saved." });
-      return constructedQuery;
+      return { constructedQuery, medicalRecordSections };
     } else {
       showToastConfirmation({ body: "Failed to add codes", variant: "error" });
       return null;
@@ -347,6 +353,7 @@ const CodeLibrary: React.FC = () => {
       saveQueryAndRedirect(
         {},
         ctx?.selectedQuery?.queryName,
+        medicalRecordSections,
         "/queryBuilding",
         prevPage,
       );
@@ -643,10 +650,11 @@ const CodeLibrary: React.FC = () => {
                   // }
                   className={styles.button}
                   onClick={async () => {
-                    const constructedQuery = await handleAddToQuery();
-                    if (!constructedQuery) return;
+                    const result = await handleAddToQuery();
+                    if (!result || !result.constructedQuery) return;
                     await saveQueryAndRedirect(
-                      constructedQuery,
+                      result.constructedQuery,
+                      result.medicalRecordSections,
                       queryName,
                       "/queryBuilding",
                       "valueset",

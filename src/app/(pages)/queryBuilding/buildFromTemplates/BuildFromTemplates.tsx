@@ -306,8 +306,8 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
       try {
         const results = await saveCustomQuery(
           constructedQuery,
-          queryName,
           medicalRecordSections,
+          queryName,
           userName,
           selectedQuery.queryId,
         );

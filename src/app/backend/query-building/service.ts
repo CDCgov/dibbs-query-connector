@@ -21,8 +21,8 @@ class QueryBuildingService {
   /**
    * Backend handler function for upserting a query
    * @param queryInput - frontend input for a query
-   * @param queryName - name of query
    * @param medicalRecordSections - sections of the medical record to include in the query
+   * @param queryName - name of query
    * @param author - author
    * @param queryId - a queryId if previously defined
    * @returns - all columns of the newly added row in the query table
@@ -31,8 +31,8 @@ class QueryBuildingService {
   @auditable
   static async saveCustomQuery(
     queryInput: NestedQuery,
-    queryName: string,
     medicalRecordSections: MedicalRecordSections,
+    queryName: string,
     author: string,
     queryId?: string,
   ) {

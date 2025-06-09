@@ -86,7 +86,7 @@ export async function getSavedQueryByIdHelp(
 ) {
   const id = queryId;
   const queryString = `
-      select q.query_name, q.id AS query_id, q.query_data, q.conditions_list, q.immunization
+      select q.query_name, q.id AS query_id, q.query_data, q.conditions_list, q.medical_record_sections
           from query q 
       where q.id = $1
       `;
