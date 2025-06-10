@@ -1002,7 +1002,7 @@
       "enabled": true,
       "alwaysDisplayInConsole": true,
       "clientAuthenticatorType": "client-secret",
-      "secret": "**********",
+      "secret": "ZG3f7R1J3qIwBaw8QtttJnJMinpERQKs",
       "redirectUris": [
         "https://queryconnector.dev/api/auth/callback/keycloak"
       ],
