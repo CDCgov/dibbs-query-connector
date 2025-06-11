@@ -315,8 +315,11 @@ input.errorMessage {
   align-items: center;
   gap: 0.5rem;
   margin-bottom: 0.5rem;
-  font-weight: 700;
   padding-bottom: 1rem;
+}
+
+.medicalRecordSectionRow label {
+    font-weight: 700;
 }
 
 .valueSetTemplate__titleCheckbox {

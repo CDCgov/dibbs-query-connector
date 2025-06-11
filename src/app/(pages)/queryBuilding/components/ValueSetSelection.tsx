@@ -355,6 +355,7 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
                   <div key={key} className={styles.medicalRecordSectionRow}>
                     <Checkbox
                       id={`medical-record-section-checkbox-${key}`}
+                      label={`Includes ${key.replace(/([A-Z])/g, " $1").toLowerCase()}`}
                       checked={
                         !!(
                           medicalRecordSections &&
@@ -371,9 +372,6 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
                         }))
                       }
                     />
-                    <span>
-                      Includes {key.replace(/([A-Z])/g, " $1").toLowerCase()}
-                    </span>
                   </div>
                 ))}
               </div>
