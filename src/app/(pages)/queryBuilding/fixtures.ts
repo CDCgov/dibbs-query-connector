@@ -783,7 +783,7 @@ export const gonorrheaSavedQuery: QueryTableResult = {
       },
     },
   },
-  medicalRecordSections: { immunization: false, socialDeterminants: false },
+  medicalRecordSections: { immunizations: false, socialDeterminants: false },
 };
 
 export const mockDibbsValueSets: DibbsValueSet[] = [
