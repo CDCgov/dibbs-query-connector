@@ -67,9 +67,6 @@ data/
 *.ipynb*
 !examples/**/*.ipynb*
 
-# VS Code
-/.vscode/settings.json
-
 persistent_storage/
 
 /kubernetes/secrets.yaml
