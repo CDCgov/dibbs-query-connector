@@ -43,7 +43,7 @@ input.errorMessage {
 }
 
 .conditionSelectionForm {
-  background-color: $white;
+  background-color: white;
   padding: 2rem;
   min-height: 25rem;
 }
@@ -140,7 +140,7 @@ input.errorMessage {
 }
 
 .valueSetTemplate__right {
-  background-color: $white;
+  background-color: white;
   width: 50rem;
   min-width: 70%;
   border-radius: 8px;
@@ -223,14 +223,14 @@ input.errorMessage {
   background-color: $background-dark;
   padding: 1rem 1.5rem;
   border-bottom: 1px $border solid;
-  color: $black;
+  color: black;
 
   // override default accordion hover styles (headers should not change on hover):
   &:hover {
     background-color: $background-dark !important;
 
     .accordionHeaderCount {
-      color: $black;
+      color: black;
     }
   }
 }
@@ -293,7 +293,7 @@ input.errorMessage {
     border-radius: 4px;
     padding: 1rem;
     line-height: 22px;
-    color: $black;
+    color: black;
     cursor: pointer;
     position: relative;
 
@@ -306,7 +306,7 @@ input.errorMessage {
   }
 
   .active {
-    background: $white;
+    background: white;
   }
 }
 
@@ -327,7 +327,7 @@ input.errorMessage {
 
 .accordionBodyExpanded {
   padding: 1.5rem 1.5rem 0 3rem;
-  background-color: $white;
+  background-color: white;
   display: flex;
   justify-content: space-between;
   cursor: pointer;
@@ -397,7 +397,7 @@ div.accordionBodyExpanded:last-of-type {
 }
 
 .vsName {
-  color: $black;
+  color: black;
   max-width: 40rem;
 }
 
@@ -472,7 +472,7 @@ $columnGap: 1rem;
   border-radius: 0.25rem;
 
   &:hover {
-    background: $white;
+    background: white;
   }
   &:hover .addButton {
     display: inline-block;

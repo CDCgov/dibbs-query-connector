@@ -197,7 +197,7 @@ $pageControlsHeight: 3rem;
   justify-content: space-between;
   padding: 1rem;
   align-items: center;
-  width: calc($query-connector-content-width-wide + 4rem);
+  width: calc($application-content-width-wide + 4rem);
   margin-bottom: 1rem;
 
   ul {
@@ -207,7 +207,7 @@ $pageControlsHeight: 3rem;
   .itemsPerPageContainer {
     display: flex;
     align-items: center;
-    width: calc($query-connector-content-width-wide + 4rem);
+    width: calc($application-content-width-wide + 4rem);
     margin-bottom: -7rem;
 
     label {
