@@ -14,6 +14,7 @@ import {
   saveCustomQuery,
 } from "@/app/backend/query-building/service";
 import {
+  EMPTY_MEDICAL_RECORD_SECTIONS,
   NestedQuery,
   QueryUpdateResult,
 } from "@/app/(pages)/queryBuilding/utils";
@@ -57,6 +58,7 @@ describe("query building", () => {
     const queryId = randomUUID();
     const queryCreated = await saveCustomQuery(
       queryInputFixture,
+      EMPTY_MEDICAL_RECORD_SECTIONS,
       randomName,
       author,
       queryId,
