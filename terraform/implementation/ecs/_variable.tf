@@ -80,7 +80,7 @@ variable "db_engine_type" {
 variable "db_engine_version" {
   type        = string
   description = "Engine Version of RDS Instance"
-  default     = "16.3"
+  default     = "16.8"
 }
 
 variable "db_instance_class" {
