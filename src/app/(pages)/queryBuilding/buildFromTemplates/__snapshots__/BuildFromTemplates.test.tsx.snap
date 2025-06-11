@@ -166,7 +166,7 @@ exports[`tests the valueset selection page interactions filter bulk selection up
                     class="section_custom"
                   >
                     <div
-                      class="sectionTitle"
+                      class="sectionTitle padding-top-2"
                     >
                       CUSTOM
                     </div>
