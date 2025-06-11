@@ -207,12 +207,11 @@ $pageControlsHeight: 3rem;
   .itemsPerPageContainer {
     display: flex;
     align-items: center;
-    width: calc($query-connector-content-width-wide + 4rem);
-    margin-bottom: -7rem;
 
     label {
       white-space: nowrap;
       flex-shrink: 0;
+      margin-right: 1rem;
     }
 
     .itemsPerPageDropdown {

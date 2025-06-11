@@ -916,7 +916,7 @@ const CodeLibrary: React.FC = () => {
                 />
               )}
               <div className={styles.itemsPerPageContainer}>
-                <label htmlFor="actionsPerPage">Value sets per page</label>
+                <label htmlFor="valeSetsPerPage">Value sets per page</label>
                 <Select
                   name="valeSetsPerPage"
                   id="valeSetsPerPage"

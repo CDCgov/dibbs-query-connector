@@ -137,8 +137,10 @@ const SelectSavedQuery: React.FC<SelectSavedQueryProps> = ({
       ) : (
         <>
           <QueryRedirectInfo userRole={userRole} />
-          <h3 className={styles.queryDropdownLabel}>Query</h3>
           <div className={styles.queryRow}>
+            <label className={styles.queryDropdownLabel} htmlFor="query">
+              Query
+            </label>
             <Select
               id="querySelect"
               name="query"
