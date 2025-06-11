@@ -96,7 +96,9 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
     useState<ConditionsMap>();
 
   const [medicalRecordSections, setMedicalRecordSections] =
-    useState<MedicalRecordSections>(EMPTY_MEDICAL_RECORD_SECTIONS);
+    useState<MedicalRecordSections>(() =>
+      structuredClone(EMPTY_MEDICAL_RECORD_SECTIONS),
+    );
 
   const [formError, setFormError] = useState<FormError>({
     queryName: false,
@@ -140,7 +142,7 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
     setQueryName(undefined);
     setSelectedQuery(structuredClone(EMPTY_QUERY_SELECTION));
     setConstructedQuery(structuredClone({}));
-    setMedicalRecordSections(EMPTY_MEDICAL_RECORD_SECTIONS);
+    setMedicalRecordSections(structuredClone(EMPTY_MEDICAL_RECORD_SECTIONS));
   }
 
   function goBack() {
