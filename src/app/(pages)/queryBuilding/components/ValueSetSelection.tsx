@@ -90,23 +90,25 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
   const MEDICAL_RECORD_SECTIONS_ID = "MEDICAL_RECORD_SECTIONS";
 
   useEffect(() => {
-    // Wait for constructedQuery to be non-empty and valid
+    // display the first condition's valuesets on render
     if (!constructedQuery || Object.keys(constructedQuery).length === 0) return;
+    if (activeCondition) return;
 
-    const queryKeys = Object.keys(constructedQuery).filter(
-      (key) =>
-        key !== CUSTOM_VALUESET_ARRAY_ID && key !== MEDICAL_RECORD_SECTIONS_ID,
+    const queryKeys = Object.keys(constructedQuery);
+    const nonCustom = queryKeys.filter(
+      (key) => key !== CUSTOM_VALUESET_ARRAY_ID,
     );
 
-    // If activeCondition is not set or is not a valid key, set it to the first valid one
-    if (!activeCondition || !constructedQuery.hasOwnProperty(activeCondition)) {
-      if (queryKeys.length > 0) {
-        setActiveCondition(queryKeys[0]);
-      } else if (constructedQuery.hasOwnProperty(CUSTOM_VALUESET_ARRAY_ID)) {
-        setActiveCondition(CUSTOM_VALUESET_ARRAY_ID);
-      } else {
-        setActiveCondition(MEDICAL_RECORD_SECTIONS_ID);
-      }
+    const firstValid = nonCustom.find(
+      (key) => constructedQuery[key] !== undefined,
+    );
+
+    if (firstValid) {
+      setActiveCondition(firstValid);
+    } else if (queryKeys.includes(CUSTOM_VALUESET_ARRAY_ID)) {
+      setActiveCondition(CUSTOM_VALUESET_ARRAY_ID);
+    } else {
+      setActiveCondition(MEDICAL_RECORD_SECTIONS_ID);
     }
   }, [constructedQuery, activeCondition]);
 
