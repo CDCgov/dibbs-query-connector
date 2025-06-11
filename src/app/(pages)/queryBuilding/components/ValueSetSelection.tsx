@@ -36,6 +36,7 @@ import { CUSTOM_VALUESET_ARRAY_ID } from "@/app/shared/constants";
 import { useSaveQueryAndRedirect } from "../../../backend/query-building/useSaveQueryAndRedirect";
 import { useContext } from "react";
 import { DataContext } from "@/app/shared/DataProvider";
+import Checkbox from "@/app/ui/designSystem/checkbox/Checkbox";
 
 type ConditionSelectionProps = {
   constructedQuery: NestedQuery;
@@ -297,7 +298,9 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
                   })}
               </div>
               <div className={styles.section_custom}>
-                <div className={classNames(styles.sectionTitle)}>
+                <div
+                  className={classNames(styles.sectionTitle, "padding-top-2")}
+                >
                   {CUSTOM_VALUESET_ARRAY_ID.toLocaleUpperCase()}
                 </div>
                 <div
@@ -345,42 +348,35 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
         <div className={styles.valueSetTemplate__right}>
           {isMedicalRecordsTab ? (
             <div className={styles.medicalRecordSectionControls}>
-              {Object.keys(EMPTY_MEDICAL_RECORD_SECTIONS).map((key) => (
-                <label
-                  key={key}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 8,
-                    marginBottom: 8,
-                  }}
-                >
-                  <input
-                    type="checkbox"
-                    checked={
-                      !!(
-                        medicalRecordSections &&
-                        medicalRecordSections[
-                          key as keyof MedicalRecordSections
-                        ]
-                      )
-                    }
-                    onChange={(e) =>
-                      setMedicalRecordSections((prev) => ({
-                        ...prev,
-                        [key]: e.target.checked,
-                      }))
-                    }
-                    data-testid={`medical-record-section-checkbox-${key}`}
-                    style={{ marginRight: 4 }}
-                  />
-                  <span style={{ userSelect: "none" }}>
-                    {key
-                      .replace(/([A-Z])/g, " $1")
-                      .replace(/^./, (s) => s.toUpperCase())}
-                  </span>
-                </label>
-              ))}
+              <div
+                className={(styles.medicalRecordSectionControls, "padding-4")}
+              >
+                {Object.keys(EMPTY_MEDICAL_RECORD_SECTIONS).map((key) => (
+                  <div key={key} className={styles.medicalRecordSectionRow}>
+                    <Checkbox
+                      id={`medical-record-section-checkbox-${key}`}
+                      checked={
+                        !!(
+                          medicalRecordSections &&
+                          medicalRecordSections[
+                            key as keyof MedicalRecordSections
+                          ]
+                        )
+                      }
+                      aria-label={`Select medical recored section ${key}`}
+                      onChange={(e) =>
+                        setMedicalRecordSections((prev) => ({
+                          ...prev,
+                          [key]: e.target.checked,
+                        }))
+                      }
+                    />
+                    <span>
+                      Includes {key.replace(/([A-Z])/g, " $1").toLowerCase()}
+                    </span>
+                  </div>
+                ))}
+              </div>
             </div>
           ) : (
             <>
