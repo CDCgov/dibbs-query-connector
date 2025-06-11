@@ -132,7 +132,7 @@ export class CustomQuery {
       };
     }
 
-    if (medicalRecordSections && medicalRecordSections.immunization) {
+    if (medicalRecordSections && medicalRecordSections.immunizations) {
       this.fhirResourceQueries["immunization"] = {
         basePath: `/Immunization`,
         params: {

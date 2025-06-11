@@ -362,8 +362,8 @@ const CodeLibrary: React.FC = () => {
     ctx?.selectedQuery &&
       savedQuery &&
       saveQueryAndRedirect(
-        savedQuery,
-        medicalRecordSections,
+        savedQuery.constructedQuery,
+        savedQuery.medicalRecordSections,
         ctx?.selectedQuery?.queryName,
         "/queryBuilding",
         prevPage,

@@ -45,7 +45,7 @@ class QueryService {
     );
 
     const medicalRecordSectionResults: Response[] = [];
-    if (medicalRecordSections && medicalRecordSections.immunization) {
+    if (medicalRecordSections && medicalRecordSections.immunizations) {
       const { basePath, params } = builtQuery.getQuery("immunization");
       let fetchString = basePath;
       Object.entries(params).forEach(([k, v]) => {

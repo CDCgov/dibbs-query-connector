@@ -33,7 +33,7 @@ export type NestedQuery = {
 };
 
 export const MEDICAL_RECORD_SECTION_KEYS = [
-  "immunization",
+  "immunizations",
   "socialDeterminants",
 ] as const;
 
