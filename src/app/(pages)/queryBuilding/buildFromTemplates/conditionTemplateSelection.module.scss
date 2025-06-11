@@ -210,11 +210,11 @@ input.errorMessage {
   background-color: $background-dark;
 }
 
-.accordionInnerWrapper > h4 {
+.accordionInnerWrapper > h2 {
   margin-top: 0 !important;
 }
 
-.accordionInnerWrapper > h4 > button {
+.accordionInnerWrapper > h2 > button {
   display: flex;
   word-wrap: break-word;
   align-items: center;
