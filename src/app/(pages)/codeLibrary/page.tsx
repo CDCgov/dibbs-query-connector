@@ -181,12 +181,21 @@ const CodeLibrary: React.FC = () => {
 
   const handleAddToQuery = async () => {
     if (!ctx?.selectedQuery?.queryId || !currentUser) return null;
-    const setsToAdd = Object.values(customCodeIds);
-    const result = await insertCustomValuesetsIntoQuery(
-      currentUser.id,
-      setsToAdd,
-      ctx.selectedQuery.queryId,
+    const setsToAdd = Object.values(customCodeIds).filter(
+      (vs) => vs.includeValueSet, // don't add if we've checked and then un-checked
     );
+
+    // don't insert if there's nothing new to add
+    const result =
+      setsToAdd.length > 0
+        ? await insertCustomValuesetsIntoQuery(
+            currentUser.id,
+            setsToAdd,
+            ctx.selectedQuery.queryId,
+          )
+        : { success: true };
+
+    // even if we didn't insert new valuesets, we still need to shape and return the existing query
     if (result.success) {
       const updatedQuery = await getSavedQueryById(ctx.selectedQuery.queryId);
       const medicalRecordSections =
@@ -348,9 +357,17 @@ const CodeLibrary: React.FC = () => {
   // --------------------------------- //
   const saveQueryAndRedirect = useSaveQueryAndRedirect();
 
-  function goBack() {
-    // TODO: Handle going back to the previous page
-    console.log(`Going back to ${prevPage}`);
+  async function goBack() {
+    const savedQuery = await handleAddToQuery();
+    ctx?.selectedQuery &&
+      savedQuery &&
+      saveQueryAndRedirect(
+        savedQuery,
+        medicalRecordSections,
+        ctx?.selectedQuery?.queryName,
+        "/queryBuilding",
+        prevPage,
+      );
   }
 
   const handleTextSearch = (vs: DibbsValueSet) => {
