@@ -589,7 +589,7 @@ const CodeLibrary: React.FC = () => {
                       className="usa-icon qc-filter"
                       size={3}
                       aria-label="Icon indicating a menu with filter options"
-                      role="icon"
+                      role="button"
                     />
                     {filterCount <= 0
                       ? "Filters"
@@ -737,7 +737,7 @@ const CodeLibrary: React.FC = () => {
                             <tr className={styles.lockedForEdits}>
                               <th>
                                 <Icon.Lock
-                                  role="icon"
+                                  role="button"
                                   className="qc-lock"
                                 ></Icon.Lock>
                                 {`This value set comes from ${valueSetSource} and cannot be
