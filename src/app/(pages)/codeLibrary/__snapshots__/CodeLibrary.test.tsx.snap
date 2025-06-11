@@ -59,7 +59,7 @@ exports[`Code library interaction renders action buttons for custom value sets o
                   class="usa-icon usa-icon--size-3 usa-icon qc-filter"
                   focusable="false"
                   height="1em"
-                  role="icon"
+                  role="button"
                   viewBox="0 0 24 24"
                   width="1em"
                   xmlns="http://www.w3.org/2000/svg"
@@ -415,7 +415,7 @@ exports[`Code library interaction renders action buttons for custom value sets o
               class="itemsPerPageContainer"
             >
               <label
-                for="actionsPerPage"
+                for="valeSetsPerPage"
               >
                 Value sets per page
               </label>
@@ -605,7 +605,7 @@ exports[`Code library loading view renders a skeleton loading state when loading
                   class="usa-icon usa-icon--size-3 usa-icon qc-filter"
                   focusable="false"
                   height="1em"
-                  role="icon"
+                  role="button"
                   viewBox="0 0 24 24"
                   width="1em"
                   xmlns="http://www.w3.org/2000/svg"
@@ -726,7 +726,7 @@ exports[`Code library loading view renders a skeleton loading state when loading
               class="itemsPerPageContainer"
             >
               <label
-                for="actionsPerPage"
+                for="valeSetsPerPage"
               >
                 Value sets per page
               </label>
@@ -918,7 +918,7 @@ exports[`Code library rendered view renders concept codes for the value set when
                   class="usa-icon usa-icon--size-3 usa-icon qc-filter"
                   focusable="false"
                   height="1em"
-                  role="icon"
+                  role="button"
                   viewBox="0 0 24 24"
                   width="1em"
                   xmlns="http://www.w3.org/2000/svg"
@@ -1136,7 +1136,7 @@ exports[`Code library rendered view renders concept codes for the value set when
                           class="usa-icon qc-lock"
                           focusable="false"
                           height="1em"
-                          role="icon"
+                          role="button"
                           viewBox="0 0 24 24"
                           width="1em"
                           xmlns="http://www.w3.org/2000/svg"
@@ -1251,7 +1251,7 @@ exports[`Code library rendered view renders concept codes for the value set when
               class="itemsPerPageContainer"
             >
               <label
-                for="actionsPerPage"
+                for="valeSetsPerPage"
               >
                 Value sets per page
               </label>
@@ -1443,7 +1443,7 @@ exports[`Code library rendered view renders the correct content 1`] = `
                   class="usa-icon usa-icon--size-3 usa-icon qc-filter"
                   focusable="false"
                   height="1em"
-                  role="icon"
+                  role="button"
                   viewBox="0 0 24 24"
                   width="1em"
                   xmlns="http://www.w3.org/2000/svg"
@@ -1661,7 +1661,7 @@ exports[`Code library rendered view renders the correct content 1`] = `
                           class="usa-icon qc-lock"
                           focusable="false"
                           height="1em"
-                          role="icon"
+                          role="button"
                           viewBox="0 0 24 24"
                           width="1em"
                           xmlns="http://www.w3.org/2000/svg"
@@ -1776,7 +1776,7 @@ exports[`Code library rendered view renders the correct content 1`] = `
               class="itemsPerPageContainer"
             >
               <label
-                for="actionsPerPage"
+                for="valeSetsPerPage"
               >
                 Value sets per page
               </label>
