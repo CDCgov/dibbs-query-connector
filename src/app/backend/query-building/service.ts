@@ -84,6 +84,7 @@ class QueryBuildingService {
       q.id AS query_id,
       q.query_name,
       q.query_data,
+      q.medical_record_sections,
       q.conditions_list
     FROM query q;
   `;
@@ -92,13 +93,20 @@ class QueryBuildingService {
     const formattedData: { [key: string]: CustomUserQuery } = {};
 
     results.rows.forEach((row) => {
-      const { queryId, queryName, queryData, conditionsList } = row;
+      const {
+        queryId,
+        queryName,
+        queryData,
+        medicalRecordSections,
+        conditionsList,
+      } = row;
 
       // Initialize query structure if it doesn't exist
       if (!formattedData[queryId]) {
         formattedData[queryId] = {
           queryId,
           queryName,
+          medicalRecordSections,
           conditionsList,
           valuesets: [],
         };
@@ -151,12 +159,14 @@ class QueryBuildingService {
         return undefined;
       }
 
-      const { queryName, queryData, conditionsList } = result.rows[0];
+      const { queryName, queryData, medicalRecordSections, conditionsList } =
+        result.rows[0];
 
       const formattedQuery = {
         queryId,
         queryName,
         queryData,
+        medicalRecordSections,
         conditionsList,
         valuesets: [],
       };
