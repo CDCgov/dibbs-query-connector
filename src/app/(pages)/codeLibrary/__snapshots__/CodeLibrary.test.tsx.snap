@@ -274,14 +274,14 @@ exports[`Code library interaction renders action buttons for custom value sets o
                     >
                       <th>
                         <button
-                          class="usa-button editCodesBtn button-secondary"
+                          class="usa-button usa-button--secondary"
                           data-testid="button"
                           type="button"
                         >
                           Edit codes
                         </button>
                         <button
-                          class="usa-button deleteValueSet"
+                          class="usa-button usa-button--secondary"
                           data-testid="button"
                           type="button"
                         >
