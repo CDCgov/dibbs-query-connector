@@ -924,10 +924,10 @@ const CodeLibrary: React.FC = () => {
                 />
               )}
               <div className={styles.itemsPerPageContainer}>
-                <label htmlFor="valeSetsPerPage">Value sets per page</label>
+                <label htmlFor="valueSetsPerPage">Value sets per page</label>
                 <Select
-                  name="valeSetsPerPage"
-                  id="valeSetsPerPage"
+                  name="valueSetsPerPage"
+                  id="valueSetsPerPage"
                   value={itemsPerPage}
                   className={styles.itemsPerPageDropdown}
                   onChange={(e) => {
