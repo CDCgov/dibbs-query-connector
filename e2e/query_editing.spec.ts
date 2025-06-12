@@ -38,8 +38,10 @@ test.describe("editing an exisiting query", () => {
     const originalName = structuredClone(subjectQuery.queryName);
     const query = page.getByTitle(originalName);
     await expect(query).toBeVisible();
-    const accessibilityScanResults = await new AxeBuilder({ page }).analyze(); // 4
-    expect(accessibilityScanResults.violations).toEqual([]); // 5
+    const queryLibraryAccessibilityResults = await new AxeBuilder({
+      page,
+    }).analyze();
+    expect(queryLibraryAccessibilityResults.violations).toEqual([]);
 
     // click edit
     await query.hover();
@@ -53,6 +55,8 @@ test.describe("editing an exisiting query", () => {
         name: CUSTOM_QUERY,
       }),
     ).toBeVisible();
+    const templateBuildingResults = await new AxeBuilder({ page }).analyze();
+    expect(templateBuildingResults.violations).toEqual([]);
 
     const actionButton = page.getByTestId("createSaveQueryBtn");
     await expect(actionButton).toBeVisible();
