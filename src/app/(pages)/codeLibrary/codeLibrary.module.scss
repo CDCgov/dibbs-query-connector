@@ -293,14 +293,6 @@ $pageControlsHeight: 3rem;
         justify-content: space-between;
         display: flex;
         width: 100%;
-
-        button.deleteValueSet {
-          background-color: transparent;
-          color: $accent-primary;
-          padding: 0 !important;
-          margin-right: 0;
-          width: 126px;
-        }
       }
     }
 
@@ -452,11 +444,6 @@ $pageControlsHeight: 3rem;
   }
 }
 
-.editCodesBtn {
-  background-color: #fff !important;
-  border: 2px solid $accent-primary !important;
-  color: $accent-primary !important;
-}
 
 .customValueSetForm {
   .header {

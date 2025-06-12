@@ -763,11 +763,8 @@ const CodeLibrary: React.FC = () => {
                             >
                               <th>
                                 <Button
-                                  className={classNames(
-                                    styles.editCodesBtn,
-                                    "button-secondary",
-                                  )}
                                   type="button"
+                                  secondary
                                   onClick={() => handleChangeMode("edit")}
                                 >
                                   {activeValueSet.concepts?.length <= 0
@@ -775,8 +772,8 @@ const CodeLibrary: React.FC = () => {
                                     : "Edit codes"}
                                 </Button>
                                 <Button
-                                  className={styles.deleteValueSet}
                                   type="button"
+                                  secondary
                                   onClick={() =>
                                     modalRef.current?.toggleModal()
                                   }
