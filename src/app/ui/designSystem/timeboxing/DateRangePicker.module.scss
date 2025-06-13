@@ -1,7 +1,8 @@
 @use "../../../ui/styles/_variables" as *;
+@use "uswds-core" as *;
 
 .errorText {
-  color: $error-primary;
+  color: color($theme-color-error);
   font-size: 0.875rem;
   margin-top: 0.25rem;
   position: relative;
@@ -9,11 +10,11 @@
 }
 
 .bgErrorLighter {
-  background-color: $error-lighter;
+  background-color: color($theme-color-error-lighter);
 }
 
 .borderError {
-  border: 2px solid $error-dark;
+  border: 2px solid color($theme-color-error-dark);
 }
 
 .textInputContainer {

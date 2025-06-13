@@ -1,4 +1,5 @@
 @use "../../../ui/styles/variables" as *;
+@use "uswds-core" as *;
 
 // Shared styles
 .mainContainer {
@@ -9,12 +10,12 @@
   max-width: 70rem !important;
 }
 input.errorMessage {
-  border: 2px solid $error-dark;
+  border: 2px solid color($theme-color-error-dark);
 }
 .errorMessage {
   display: flex;
   align-items: center;
-  color: $error-dark;
+  color: color($theme-color-error-dark);
   margin-top: 0.25rem;
   line-height: 1.25rem;
 
@@ -282,7 +283,7 @@ input.errorMessage {
   }
 
   .deleteIcon {
-    color: $error-primary;
+    color: color($theme-color-error);
     width: 1.5rem;
     height: 1.5rem;
     display: none;

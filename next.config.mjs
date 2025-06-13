@@ -12,7 +12,6 @@ const nextConfig = {
   sassOptions: {
     includePaths: [
       path.join(__dirname, "./", "node_modules", "@uswds", "uswds", "packages"),
-      path.join(__dirname, "./", "node_modules", "@uswds", "uswds", "dist"),
     ],
     silenceDeprecations: ["global-builtin", "mixed-decls", "legacy-js-api"],
   },
