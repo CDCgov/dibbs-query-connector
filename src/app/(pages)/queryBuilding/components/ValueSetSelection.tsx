@@ -354,25 +354,29 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
               >
                 {Object.keys(EMPTY_MEDICAL_RECORD_SECTIONS).map((key) => (
                   <div key={key} className={styles.medicalRecordSectionRow}>
-                    <Checkbox
-                      id={`medical-record-section-checkbox-${key}`}
-                      label={`Include ${key.replace(/([A-Z])/g, " $1").toLowerCase()}`}
-                      checked={
-                        !!(
-                          medicalRecordSections &&
-                          medicalRecordSections[
-                            key as keyof MedicalRecordSections
-                          ]
-                        )
-                      }
-                      aria-label={`Select medical recored section ${key}`}
-                      onChange={(e) =>
-                        setMedicalRecordSections((prev) => ({
-                          ...prev,
-                          [key]: e.target.checked,
-                        }))
-                      }
-                    />
+                    <div
+                      data-testid={`container-medical-record-section-checkbox-${key}`}
+                    >
+                      <Checkbox
+                        id={`medical-record-section-checkbox-${key}`}
+                        label={`Include ${key.replace(/([A-Z])/g, " $1").toLowerCase()}`}
+                        checked={
+                          !!(
+                            medicalRecordSections &&
+                            medicalRecordSections[
+                              key as keyof MedicalRecordSections
+                            ]
+                          )
+                        }
+                        aria-label={`Select medical recored section ${key}`}
+                        onChange={(e) =>
+                          setMedicalRecordSections((prev) => ({
+                            ...prev,
+                            [key]: e.target.checked,
+                          }))
+                        }
+                      />
+                    </div>
                   </div>
                 ))}
               </div>

@@ -15,7 +15,7 @@ import {
 import { internal_getDbClient } from "@/app/backend/db/config";
 import { translateSnakeStringToCamelCase } from "@/app/backend/db/util";
 
-test.describe("editing an exisiting query", () => {
+test.describe("editing an existing query", () => {
   let subjectQuery: QueryTableResult;
   // Start every test by navigating to the customize query workflow
   test.beforeEach(async ({ page }) => {
@@ -215,6 +215,57 @@ test.describe("editing an exisiting query", () => {
     await expect(openDrawer).not.toBeVisible();
 
     // save edited query
+    await actionButton.click();
+    await expect(actionButton).toHaveText("Save query");
+  });
+
+  test("edit medical record section", async ({ page }) => {
+    const query = page.locator("tr", {
+      has: page.getByTitle(subjectQuery.queryName),
+    });
+
+    await expect(query).toBeVisible();
+
+    // click edit
+    await query.hover();
+    const editBtn = query.getByTestId(`edit-query-${subjectQuery.queryId}`);
+    await expect(editBtn).toBeVisible();
+    await editBtn.click();
+
+    //  customize query
+    await expect(
+      page.getByRole("heading", {
+        name: CUSTOM_QUERY,
+      }),
+    ).toBeVisible();
+
+    // click "Medical record sections" tab
+    const medRecsTab = page.getByText("Medical record sections", {
+      exact: true,
+    });
+    await expect(medRecsTab).toBeVisible();
+    await medRecsTab.click();
+
+    // checkbox for immunization section
+    const immunizationsCheckbox = page
+      .locator(
+        '[data-testid="container-medical-record-section-checkbox-immunizations"]',
+      )
+      .getByRole("checkbox");
+    await expect(immunizationsCheckbox).toBeVisible();
+
+    // check it if unchecked, or uncheck if checked, verify the state toggles
+    await expect(immunizationsCheckbox).not.toBeChecked();
+    const label = page.locator(
+      '[data-testid="container-medical-record-section-checkbox-immunizations"] label',
+    );
+    await label.click();
+    await expect(immunizationsCheckbox).toBeChecked();
+
+    // Save the query
+    const actionButton = page.getByTestId("createSaveQueryBtn");
+    await expect(actionButton).toBeVisible();
+    await expect(actionButton).not.toBeDisabled();
     await actionButton.click();
     await expect(actionButton).toHaveText("Save query");
   });
