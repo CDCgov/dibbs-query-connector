@@ -1,4 +1,5 @@
 @use "uswds-settings" as *;
+@use "uswds-core" as *;
 @use "variables" as *;
 
 .page-title {
@@ -25,10 +26,10 @@
   color: $destructive-primary !important;
 }
 .success-primary {
-  color: $success-primary;
+  color: color("success");
 }
 .error-primary {
-  color: $error-primary;
+  color: color("error");
 }
 
 .text-secondary {
@@ -123,7 +124,7 @@
   justify-content: center; // Centers the column in the container
   margin: 0 auto; // Centers the container itself if needed
   row-gap: 0.1em; // Adjusts the gap between rows/items
-  max-width: $query-connector-max-width;
+  max-width: $application-max-width;
 }
 
 .data-title {
@@ -261,11 +262,11 @@
   border-left: 0;
   margin-top: 1rem;
   margin-bottom: 1.5rem;
-  background-color: $warning-lighter;
+  background-color: color("warning-lighter");
 }
 
 .info-alert > .usa-alert__body {
-  background-color: $warning-lighter;
+  background-color: color("warning-lighter");
   width: fit-content;
   line-height: 1.5rem;
 
@@ -275,7 +276,7 @@
   }
 
   &::before {
-    background-color: $warning-dark;
+    background-color: color("warning-dark");
     mask-size: 1.5rem;
   }
 }
@@ -294,5 +295,5 @@
   height: 1.5rem !important;
   width: 1.5rem !important;
   margin-right: 0.5rem;
-  color: $diabled !important;
+  color: color("disabled") !important;
 }
