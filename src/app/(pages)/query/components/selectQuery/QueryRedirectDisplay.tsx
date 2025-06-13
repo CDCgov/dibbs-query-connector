@@ -32,7 +32,7 @@ const QueryRedirectInfo: React.FC<QueryRedirectInfoProps> = ({ userRole }) => {
         className="icon-primary"
       />
       <div className="margin-left-2">
-        <div className="h4 text-italic margin-y-0 text-normal">
+        <div className="text-italic margin-y-0 text-normal">
           Don't see the query you're looking for?
         </div>
         <p className="margin-0">
