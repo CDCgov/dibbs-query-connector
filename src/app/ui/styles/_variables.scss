@@ -2,32 +2,22 @@
 @use "_tokens" as *;
 
 // Pulled from the Design System Figma
-// https://www.figma.com/design/Iuw9me6kYftBF4WTCEsCZz/Query-Connector?node-id=1856-3975
+// https://www.figma.com/design/GHKuvdgY2CbfBRZKmetZNB/--DIBBs-Design-System?node-id=0-1&t=Mg5hMzBQIji0cBdB-1
 
 // Design system spacing
-$query-connector-max-width: 45rem;
-$query-connector-wide-max-width: 90rem;
-$query-connector-content-margins: 13.75rem;
-$query-connector-content-margins-wide: 10rem;
-$query-connector-content-width-wide: calc(
-  $query-connector-wide-max-width - 2 * $query-connector-content-margins-wide
-);
+$application-max-width: 45rem;
+$application-wide-max-width: 90rem;
+$application-content-margins: 13.75rem;
+$application-content-margins-wide: 10rem;
+$application-content-width-wide: calc($application-wide-max-width - 2 * $application-content-margins-wide);
 
 $header-content-height: 3rem;
 $footer-content-height: 5rem;
 $default-table-padding: 1.5rem;
 $site-alert-height: 2.5rem;
 
-// Design system fonts
-$serif-font: family("heading");
-$sans-serif-font: "Public Sans Web", family("body");
-$mono-font: "Consolas", family("mono");
-
 // Design System Color Tokens
-$black: #000;
-$white: #fff;
-
-$text-primary: $black;
+$text-primary: black;
 $text-secondary: $gray-500;
 $text-inactive: $gray-20;
 $text-inactive-dark: $gray-600;
@@ -47,30 +37,6 @@ $destructive-primary: #d54309; // primary error / info color
 $destructive-dark: #b51d09; // error hover
 $destructive-darker: #6f3331; // error active
 
-$info-primary: #2491ff;
-$info-light: #a1d3ff;
-$info-lighter: #a1d3ff;
-$info-dark: #005ea2;
-$info-darker: #112f4e;
-
-$success-primary: #00a91c;
-$success-light: #70e17b;
-$success-lighter: #e3f5e1;
-$success-dark: #216e1f;
-$success-darker: #19311e;
-
-$error-primary: #fb5a47;
-$error-lighter: #fff3f2;
-$error-light: #fdb8ae;
-$error-dark: #b50909;
-$error-darker: #5c1111;
-
-$warning-primary: #fee685;
-$warning-lighter: #fff5c2;
-$warning-light: #fee685;
-$warning-dark: #947100;
-$warning-darker: #5c4809;
-
 $background: $gray-100;
 $background-dark: $gray-200;
 $background-darker: $gray-300;
@@ -79,11 +45,6 @@ $background-darkest: $gray-500;
 $border: $gray-400;
 $border-light: $gray-300;
 $border-dark: $gray-500;
-
-$diabled: #c6cace;
-$diabled-light: #edeff0;
-$diabled-dark: #8d9297;
-
 // Semantic tokens
 $hover-neutral: $gray-200;
 
