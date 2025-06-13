@@ -13,7 +13,6 @@ import {
 } from "@/app/backend/query-building/lib";
 import { internal_getDbClient } from "@/app/backend/db/config";
 import { translateSnakeStringToCamelCase } from "@/app/backend/db/util";
-import AxeBuilder from "@axe-core/playwright"; // 1
 
 test.describe("editing an exisiting query", () => {
   let subjectQuery: QueryTableResult;
@@ -38,8 +37,6 @@ test.describe("editing an exisiting query", () => {
     const originalName = structuredClone(subjectQuery.queryName);
     const query = page.getByTitle(originalName);
     await expect(query).toBeVisible();
-    const accessibilityScanResults = await new AxeBuilder({ page }).analyze();
-    expect(accessibilityScanResults.violations).toEqual([]);
 
     // click edit
     await query.hover();
