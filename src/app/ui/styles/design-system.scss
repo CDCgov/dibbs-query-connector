@@ -374,7 +374,7 @@ ul.usa-sidenav > li.usa-sidenav__item > ul.usa-sidenav__sublist > li.usa-sidenav
   }
 
   .usa-modal__heading {
-    font-family: "Public Sans", sans-serif !important;
+    @include u-font-family("sans");
     font-size: 1.219rem !important;
     font-style: normal;
     font-weight: 700;

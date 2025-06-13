@@ -6,11 +6,11 @@ $pageHeaderHeight: 12rem;
 $pageControlsHeight: 3rem;
 
 .mainContainer {
+  @include u-font-family("sans");
   display: flex;
   flex-direction: column;
   flex: auto;
   margin-bottom: 0 !important;
-  font-family: "Public Sans", sans-serif !important;
   height: calc($pageContainerHeight - 2.5rem);
 
   .header {
@@ -84,12 +84,12 @@ $pageControlsHeight: 3rem;
 
     &__left,
     &__right {
+      @include u-font-family("sans");
       display: flex;
       flex-direction: column;
       width: 100%;
       gap: 8px;
       border: solid 1px #f0f0f0;
-      font-family: "Public Sans", sans-serif !important;
       background-color: #ffffff;
     }
 
@@ -444,7 +444,6 @@ $pageControlsHeight: 3rem;
     display: flex;
   }
 }
-
 
 .customValueSetForm {
   .header {

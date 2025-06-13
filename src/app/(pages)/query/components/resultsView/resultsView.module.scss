@@ -36,7 +36,7 @@
 }
 
 .accordionHeading {
-  font-family: "Source Sans Pro Web", "Helvetica Neue", "Helvetica", "Roboto", "Arial", "sans-serif" !important;
+  @include u-font-family("sans");
   font-size: 1.25rem !important;
   line-height: 1.1 !important;
 }
