@@ -65,6 +65,7 @@ const Drawer: React.FC<DrawerProps> = ({
           drawerWidth === "60%" ? styles.width60 : styles.width35,
         )}
         role="dialog"
+        aria-labelledby="drawer-title"
         data-testid={`drawer-open-${isOpen}`}
       >
         <div
@@ -83,6 +84,7 @@ const Drawer: React.FC<DrawerProps> = ({
               <Icon.Close size={3} aria-label="X icon indicating closure" />
             </button>
             <h2
+              id="drawer-title"
               data-testid={`drawer-title`}
               className={classNames(
                 "margin-0",

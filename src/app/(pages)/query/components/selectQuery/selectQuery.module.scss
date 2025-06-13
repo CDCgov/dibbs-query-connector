@@ -21,7 +21,16 @@
 
 .queryRow {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
+  flex-direction: column;
+
+  .queryDropdownLabel {
+    font-size: 1.15rem;
+    font-weight: bold;
+    line-height: 1.4;
+    margin-top: 2rem;
+    margin-bottom: 0.5rem;
+  }
 }
 
 .queryDropDown {

@@ -260,21 +260,21 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
           key={id}
         >
           <div className={styles.textInput}>
-            <label htmlFor="code-id">Code #</label>
+            <label htmlFor={`code-id-${id}`}>Code #</label>
             <TextInput
               type="text"
               id={`code-id-${id}`}
-              name="code-id"
+              name={`code-id-${id}`}
               value={codeObj.code}
               onChange={(e) => handleAddCode("code", id, e.target.value)}
             />
           </div>
           <div className={styles.textInput}>
-            <label htmlFor="code-name">Code name</label>
+            <label htmlFor={`code-name-${id}`}>Code name</label>
             <TextInput
               type="text"
               id={`code-name-${id}`}
-              name="code-name"
+              name={`code-name-${id}`}
               value={codeObj.display}
               onChange={(e) => handleAddCode("name", id, e.target.value)}
             />

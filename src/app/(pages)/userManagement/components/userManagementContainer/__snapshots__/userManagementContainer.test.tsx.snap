@@ -27,6 +27,7 @@ exports[`Admin view of Users Table renders error message when no user groups are
         Modal Mock
       </div>
       <div
+        aria-labelledby="drawer-title"
         class="drawer closed width35"
         data-testid="drawer-open-false"
         role="dialog"
@@ -60,6 +61,7 @@ exports[`Admin view of Users Table renders error message when no user groups are
             <h2
               class="margin-0 padding-bottom-2"
               data-testid="drawer-title"
+              id="drawer-title"
             />
             <div>
               <input
@@ -313,6 +315,7 @@ exports[`Super Admin view of Users Table renders content on tab click 1`] = `
         Modal Mock
       </div>
       <div
+        aria-labelledby="drawer-title"
         class="drawer closed width35"
         data-testid="drawer-open-false"
         role="dialog"
@@ -346,6 +349,7 @@ exports[`Super Admin view of Users Table renders content on tab click 1`] = `
             <h2
               class="margin-0 padding-bottom-2"
               data-testid="drawer-title"
+              id="drawer-title"
             />
             <div>
               <input
@@ -522,6 +526,7 @@ exports[`Super Admin view of Users Table renders content on tab click 2`] = `
         Modal Mock
       </div>
       <div
+        aria-labelledby="drawer-title"
         class="drawer closed width35"
         data-testid="drawer-open-false"
         role="dialog"
@@ -555,6 +560,7 @@ exports[`Super Admin view of Users Table renders content on tab click 2`] = `
             <h2
               class="margin-0 padding-bottom-2"
               data-testid="drawer-title"
+              id="drawer-title"
             />
             <div>
               <input
@@ -620,6 +626,7 @@ exports[`Super Admin view of Users Table renders error message when no users are
         Modal Mock
       </div>
       <div
+        aria-labelledby="drawer-title"
         class="drawer closed width35"
         data-testid="drawer-open-false"
         role="dialog"
@@ -653,6 +660,7 @@ exports[`Super Admin view of Users Table renders error message when no users are
             <h2
               class="margin-0 padding-bottom-2"
               data-testid="drawer-title"
+              id="drawer-title"
             />
             <div>
               <input
@@ -906,6 +914,7 @@ exports[`Super Admin view of Users Table renders table view after content is loa
         Modal Mock
       </div>
       <div
+        aria-labelledby="drawer-title"
         class="drawer closed width35"
         data-testid="drawer-open-false"
         role="dialog"
@@ -939,6 +948,7 @@ exports[`Super Admin view of Users Table renders table view after content is loa
             <h2
               class="margin-0 padding-bottom-2"
               data-testid="drawer-title"
+              id="drawer-title"
             />
             <div>
               <input
@@ -1192,6 +1202,7 @@ exports[`Super Admin view of Users Table renders table view after content is loa
         Modal Mock
       </div>
       <div
+        aria-labelledby="drawer-title"
         class="drawer closed width35"
         data-testid="drawer-open-false"
         role="dialog"
@@ -1225,6 +1236,7 @@ exports[`Super Admin view of Users Table renders table view after content is loa
             <h2
               class="margin-0 padding-bottom-2"
               data-testid="drawer-title"
+              id="drawer-title"
             />
             <div>
               <input
