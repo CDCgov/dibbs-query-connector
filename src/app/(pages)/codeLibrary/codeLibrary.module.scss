@@ -1,15 +1,16 @@
 @use "../../ui/styles/variables" as *;
+@use "uswds-core" as *;
 
 $pageContainerHeight: 100vh;
 $pageHeaderHeight: 12rem;
 $pageControlsHeight: 3rem;
 
 .mainContainer {
+  @include u-font-family("sans");
   display: flex;
   flex-direction: column;
   flex: auto;
   margin-bottom: 0 !important;
-  font-family: "Public Sans", sans-serif !important;
   height: calc($pageContainerHeight - 2.5rem);
 
   .header {
@@ -83,12 +84,12 @@ $pageControlsHeight: 3rem;
 
     &__left,
     &__right {
+      @include u-font-family("sans");
       display: flex;
       flex-direction: column;
       width: 100%;
       gap: 8px;
       border: solid 1px #f0f0f0;
-      font-family: "Public Sans", sans-serif !important;
       background-color: #ffffff;
     }
 
@@ -197,7 +198,7 @@ $pageControlsHeight: 3rem;
   justify-content: space-between;
   padding: 1rem;
   align-items: center;
-  width: calc($query-connector-content-width-wide + 4rem);
+  width: calc($application-content-width-wide + 4rem);
   margin-bottom: 1rem;
 
   ul {
@@ -443,7 +444,6 @@ $pageControlsHeight: 3rem;
   }
 }
 
-
 .customValueSetForm {
   .header {
     display: flex;
@@ -576,7 +576,7 @@ $pageControlsHeight: 3rem;
     div.errorMessage {
       display: flex;
       align-items: center;
-      color: $error-dark;
+      color: color("error-dark");
       justify-content: flex-start;
       margin-top: 0.25rem;
       line-height: 1.25rem;
@@ -589,7 +589,7 @@ $pageControlsHeight: 3rem;
     }
 
     input {
-      border: 2px solid $error-dark !important;
+      border: 2px solid color("error-dark") !important;
 
       .vsDescription {
         .formSection__input:first-of-type {
@@ -684,7 +684,7 @@ $pageControlsHeight: 3rem;
   div.errorMessage {
     display: flex;
     align-items: center;
-    color: $error-dark;
+    color: color("error-dark");
     justify-content: flex-start;
     margin-top: 0.25rem;
     line-height: 1.25rem;
@@ -698,7 +698,7 @@ $pageControlsHeight: 3rem;
 
   input,
   select {
-    border: 2px solid $error-dark !important;
+    border: 2px solid color("error-dark") !important;
   }
 }
 
