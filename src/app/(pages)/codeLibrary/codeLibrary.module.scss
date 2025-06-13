@@ -577,7 +577,7 @@ $pageControlsHeight: 3rem;
     div.errorMessage {
       display: flex;
       align-items: center;
-      color: $theme-color-error-dark;
+      color: color("error-dark");
       justify-content: flex-start;
       margin-top: 0.25rem;
       line-height: 1.25rem;
@@ -590,7 +590,7 @@ $pageControlsHeight: 3rem;
     }
 
     input {
-      border: 2px solid $theme-color-error-dark !important;
+      border: 2px solid color("error-dark") !important;
 
       .vsDescription {
         .formSection__input:first-of-type {
@@ -685,7 +685,7 @@ $pageControlsHeight: 3rem;
   div.errorMessage {
     display: flex;
     align-items: center;
-    color: $theme-color-error-dark;
+    color: color("error-dark");
     justify-content: flex-start;
     margin-top: 0.25rem;
     line-height: 1.25rem;
@@ -699,7 +699,7 @@ $pageControlsHeight: 3rem;
 
   input,
   select {
-    border: 2px solid color($theme-color-error-dark) !important;
+    border: 2px solid color("error-dark") !important;
   }
 }
 

@@ -15,7 +15,7 @@
 }
 
 .demoQueryFiller {
-  background: color($theme-color-warning-lighter);
+  background: color("warning-lighter");
   border: 1px solid $border;
   border-radius: 4px;
   display: flex;
@@ -42,7 +42,7 @@
 .errorMessage {
   display: flex;
   align-items: center;
-  color: $theme-color-error-dark;
+  color: color("error-dark");
   margin-top: 0.25rem;
   line-height: 1.25rem;
 

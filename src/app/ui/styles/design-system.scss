@@ -94,7 +94,7 @@ a:visited {
     box-shadow: none;
     cursor: not-allowed;
     opacity: 1;
-    background-color: color($theme-color-disabled-light) !important;
+    background-color: color("disabled-light") !important;
   }
 
   &--unstyled {
@@ -134,25 +134,25 @@ a:visited {
 
 .usa-alert--success {
   .usa-alert__body::before {
-    background-color: color($theme-color-success-dark);
+    background-color: color("success-dark");
   }
 }
 
 .usa-alert--info {
   .usa-alert__body::before {
-    background-color: color($theme-color-info-dark);
+    background-color: color("info-dark");
   }
 }
 
 .usa-alert--warning {
   .usa-alert__body::before {
-    background-color: color($theme-color-warning-dark);
+    background-color: color("warning-dark");
   }
 }
 
 .usa-alert--error {
   .usa-alert__body::before {
-    background-color: color($theme-color-error-dark);
+    background-color: color("error-dark");
   }
 }
 

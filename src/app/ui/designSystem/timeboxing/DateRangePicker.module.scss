@@ -2,7 +2,7 @@
 @use "uswds-core" as *;
 
 .errorText {
-  color: color($theme-color-error);
+  color: color("error");
   font-size: 0.875rem;
   margin-top: 0.25rem;
   position: relative;
@@ -10,11 +10,11 @@
 }
 
 .bgErrorLighter {
-  background-color: color($theme-color-error-lighter);
+  background-color: color("error-lighter");
 }
 
 .borderError {
-  border: 2px solid color($theme-color-error-dark);
+  border: 2px solid color("error-dark");
 }
 
 .textInputContainer {
