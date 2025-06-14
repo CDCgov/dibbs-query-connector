@@ -9,7 +9,10 @@ import {
   saveCustomQuery,
   getCustomQueries,
 } from "@/app/backend/query-building/service";
-import { NestedQuery } from "@/app/(pages)/queryBuilding/utils";
+import {
+  MedicalRecordSections,
+  NestedQuery,
+} from "@/app/(pages)/queryBuilding/utils";
 
 /**
  * Hook to save a custom query and redirect to a specified page.
@@ -22,6 +25,7 @@ export function useSaveQueryAndRedirect() {
 
   return async function saveQueryAndRedirect(
     constructedQuery: NestedQuery,
+    medicalRecordSections: MedicalRecordSections,
     newQueryName: string | undefined,
     redirectPath: string,
     pageMode?: string,
@@ -38,6 +42,7 @@ export function useSaveQueryAndRedirect() {
     try {
       const results = await saveCustomQuery(
         constructedQuery,
+        medicalRecordSections,
         queryName,
         username,
         existingQueryId,

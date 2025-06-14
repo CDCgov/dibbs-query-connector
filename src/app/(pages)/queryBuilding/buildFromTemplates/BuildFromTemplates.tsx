@@ -22,6 +22,8 @@ import {
   ConditionsMap,
   EMPTY_CONCEPT_TYPE,
   EMPTY_QUERY_SELECTION,
+  EMPTY_MEDICAL_RECORD_SECTIONS,
+  MedicalRecordSections,
 } from "../utils";
 import { ConditionSelection } from "../components/ConditionSelection";
 import { ValueSetSelection } from "../components/ValueSetSelection";
@@ -93,6 +95,11 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
   const [conditionIdToDetailsMap, setConditionsDetailsMap] =
     useState<ConditionsMap>();
 
+  const [medicalRecordSections, setMedicalRecordSections] =
+    useState<MedicalRecordSections>(() =>
+      structuredClone(EMPTY_MEDICAL_RECORD_SECTIONS),
+    );
+
   const [formError, setFormError] = useState<FormError>({
     queryName: false,
     selectedConditions: false,
@@ -135,6 +142,7 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
     setQueryName(undefined);
     setSelectedQuery(structuredClone(EMPTY_QUERY_SELECTION));
     setConstructedQuery(structuredClone({}));
+    setMedicalRecordSections(structuredClone(EMPTY_MEDICAL_RECORD_SECTIONS));
   }
 
   function goBack() {
@@ -157,6 +165,9 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
       if (!selectedQuery?.queryId) return;
       const savedQuery = await getSavedQueryById(selectedQuery.queryId);
       if (!savedQuery) return;
+
+      // Set the booleans for medical record sections
+      setMedicalRecordSections(savedQuery.medicalRecordSections);
 
       const initialState: NestedQuery = {};
       Object.entries(savedQuery.queryData).forEach(
@@ -297,6 +308,7 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
       try {
         const results = await saveCustomQuery(
           constructedQuery,
+          medicalRecordSections,
           queryName,
           userName,
           selectedQuery.queryId,
@@ -448,6 +460,7 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
               constructedQuery={constructedQuery}
               handleConditionUpdate={handleConditionUpdate}
               renderErrorMessage={setErrorMessage}
+              medicalRecordSections={medicalRecordSections}
             />
           )}
           {/* Step Two: Select ValueSets */}
@@ -460,6 +473,8 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
                 constructedQuery={constructedQuery}
                 handleSelectedValueSetUpdate={handleQueryUpdate}
                 handleUpdateCondition={handleConditionUpdate}
+                medicalRecordSections={medicalRecordSections}
+                setMedicalRecordSections={setMedicalRecordSections}
               />
             )}
         </div>
