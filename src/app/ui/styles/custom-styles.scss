@@ -297,3 +297,38 @@
   margin-right: 0.5rem;
   color: color("disabled") !important;
 }
+
+.Toastify__toast-container {
+  width: calc($application-wide-max-width * 0.4) !important;
+
+  .Toastify__toast--success {
+    background-color: color("success");
+  }
+
+  .Toastify__toast--success,
+  .Toastify__toast--stacked[data-collapsed="true"] {
+    background-color: color("success-lighter");
+  }
+
+  .Toastify__progress-bar--success {
+    background-color: color("success-lighter");
+  }
+}
+
+.Toastify__toast-body {
+  margin: 0 !important;
+
+  div {
+    height: 100%;
+    border-radius: var(--toastify-toast-bd-radius);
+  }
+
+  .usa-alert__body::before {
+    mask-size: 1.5rem 1.5rem !important;
+    top: unset !important;
+  }
+
+  .usa-alert__body > * {
+    margin-left: 2rem !important;
+  }
+}
