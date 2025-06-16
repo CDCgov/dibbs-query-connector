@@ -26,7 +26,7 @@ type VsTypeAccordion = {
   content: JSX.Element;
   expanded: boolean;
   id: string;
-  headingLevel: "h4";
+  headingLevel: HeadingLevel;
   handleToggle: (e: React.MouseEvent<HTMLButtonElement>) => void;
   atLeastOneRenderedValueSet: boolean;
 };
@@ -90,7 +90,7 @@ export const ConceptTypeSelectionTable: React.FC<
             tableSearchFilter={searchFilter}
           />
         );
-        const level: HeadingLevel = "h4";
+        const level: HeadingLevel = "h2";
 
         const handleToggle = () => {
           setCurExpanded((prevState) => {

@@ -78,7 +78,7 @@ const ConceptTypeBulkToggle: React.FC<ConceptTypeBulkToggleProps> = ({
             e.stopPropagation();
             handleBulkToggle(e, isMinusState);
           }}
-          id={`${activeType}`}
+          id={`checkbox-${activeType}`}
           checked={checked}
           isMinusState={isMinusState}
         />
