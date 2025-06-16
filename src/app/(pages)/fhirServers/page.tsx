@@ -34,6 +34,12 @@ const Modal = dynamic<ModalProps>(
 type ModalMode = "create" | "edit";
 type AuthMethodType = "none" | "basic" | "client_credentials" | "SMART";
 
+interface HeaderPair {
+  key: string;
+  value: string;
+  id: string; // For React key prop
+}
+
 /**
  * Client side parent component for the FHIR servers page. It displays a list of FHIR servers
  * @returns - The FhirServers component.
@@ -59,6 +65,7 @@ const FhirServers: React.FC = () => {
     null,
   );
   const [modalMode, setModalMode] = useState<ModalMode>("create");
+  const [headers, setHeaders] = useState<HeaderPair[]>([]);
   const modalRef = useRef<ModalRef>(null);
 
   // Fetch FHIR servers
@@ -93,6 +100,7 @@ const FhirServers: React.FC = () => {
     setDefaultServer(false);
     setErrorMessage("");
     setSelectedServer(null);
+    setHeaders([]);
   };
 
   const handleOpenModal = (mode: ModalMode, server?: FhirServerConfig) => {
@@ -105,6 +113,20 @@ const FhirServers: React.FC = () => {
       setDisableCertValidation(server.disableCertValidation);
       setDefaultServer(server.defaultServer);
       setErrorMessage("");
+
+      // Set headers
+      if (server.headers) {
+        const headerPairs: HeaderPair[] = Object.entries(server.headers)
+          .filter(([key]) => key !== "Authorization") // Filter out Authorization header
+          .map(([key, value]) => ({
+            key,
+            value,
+            id: `${Date.now()}-${Math.random()}`,
+          }));
+        setHeaders(headerPairs);
+      } else {
+        setHeaders([]);
+      }
 
       // Set auth method and corresponding fields based on server data
       if (server.authType) {
@@ -165,6 +187,35 @@ const FhirServers: React.FC = () => {
     };
   }, []);
 
+  const addHeader = () => {
+    setHeaders([
+      ...headers,
+      { key: "", value: "", id: `${Date.now()}-${Math.random()}` },
+    ]);
+  };
+
+  const updateHeader = (id: string, field: "key" | "value", value: string) => {
+    setHeaders(
+      headers.map((header) =>
+        header.id === id ? { ...header, [field]: value } : header,
+      ),
+    );
+  };
+
+  const removeHeader = (id: string) => {
+    setHeaders(headers.filter((header) => header.id !== id));
+  };
+
+  const convertHeadersToObject = (): Record<string, string> => {
+    const headerObj: Record<string, string> = {};
+    headers.forEach((header) => {
+      if (header.key && header.value) {
+        headerObj[header.key] = header.value;
+      }
+    });
+    return headerObj;
+  };
+
   interface ConnectionTestResult {
     success: boolean;
     error?: string;
@@ -177,7 +228,7 @@ const FhirServers: React.FC = () => {
       // Build auth data based on selected auth method
       const authData: AuthData = {
         authType: authMethod,
-        headers: selectedServer?.headers || {}, // Include existing headers for editing
+        headers: convertHeadersToObject(), // Include custom headers
       };
 
       // Add auth-method specific properties
@@ -208,6 +259,7 @@ const FhirServers: React.FC = () => {
       };
     }
   };
+
   const handleTestConnection = async () => {
     // 1. Test the connection (returns { success, error })
     const result = await testFhirServerConnection(
@@ -215,6 +267,7 @@ const FhirServers: React.FC = () => {
       disableCertValidation,
       {
         authType: authMethod,
+        headers: convertHeadersToObject(),
         bearerToken: authMethod === "basic" ? bearerToken : undefined,
         clientId: ["client_credentials", "SMART"].includes(authMethod)
           ? clientId
@@ -248,12 +301,14 @@ const FhirServers: React.FC = () => {
       );
     }
   };
+
   const handleSave = async () => {
     const connectionResult = await testFhirConnection(serverUrl);
 
     // Prepare auth data based on selected auth method
     const authData = {
       authType: authMethod,
+      headers: convertHeadersToObject(),
       bearerToken: authMethod === "basic" ? bearerToken : undefined,
       clientId: ["client_credentials", "SMART"].includes(authMethod)
         ? clientId
@@ -341,7 +396,7 @@ const FhirServers: React.FC = () => {
         text: "Test connection" as string | JSX.Element,
         type: "button" as const,
         id: "modal-test-connection-button",
-        className: "usa-button usa-button--outline",
+        className: "usa-button usa-button--secondary",
         onClick: handleTestConnection,
       },
       {
@@ -375,11 +430,11 @@ const FhirServers: React.FC = () => {
           </>
         );
         buttons[1].className =
-          "usa-button usa-button--outline shadow-none text-green padding-left-2 padding-right-2";
+          "usa-button usa-button--secondary shadow-none text-green padding-left-2 padding-right-2";
         break;
       default:
         buttons[1].text = "Test connection";
-        buttons[1].className = "usa-button usa-button--outline";
+        buttons[1].className = "usa-button usa-button--secondary";
         break;
     }
 
@@ -663,6 +718,63 @@ const FhirServers: React.FC = () => {
           </select>
 
           {renderAuthMethodFields()}
+
+          <div className="margin-top-3">
+            <Label htmlFor="custom-headers">Custom Headers</Label>
+            <div className="usa-hint margin-bottom-1">
+              Add custom HTTP headers to be sent with every request to this FHIR
+              server. Note: Authorization header is managed by the Auth Method
+              above.
+            </div>
+
+            {headers.map((header, index) => (
+              <div key={header.id} className="grid-row margin-bottom-2">
+                <div className="grid-col-5">
+                  <TextInput
+                    id={`header-key-${index}`}
+                    name={`header-key-${index}`}
+                    type="text"
+                    placeholder="Header name"
+                    value={header.key}
+                    onChange={(e) =>
+                      updateHeader(header.id, "key", e.target.value)
+                    }
+                  />
+                </div>
+                <div className="grid-col-5 margin-left-2">
+                  <TextInput
+                    id={`header-value-${index}`}
+                    name={`header-value-${index}`}
+                    type="text"
+                    placeholder="Header value"
+                    value={header.value}
+                    onChange={(e) =>
+                      updateHeader(header.id, "value", e.target.value)
+                    }
+                  />
+                </div>
+                <div className="grid-col margin-left-2">
+                  <button
+                    type="button"
+                    className="usa-button usa-button--unstyled margin-top-2"
+                    onClick={() => removeHeader(header.id)}
+                    aria-label={`Remove header ${header.key || "row"}`}
+                  >
+                    <Icon.Close size={3} />
+                  </button>
+                </div>
+              </div>
+            ))}
+
+            <button
+              type="button"
+              className="usa-button usa-button--secondary margin-top-1"
+              onClick={addHeader}
+            >
+              <Icon.Add size={3} />
+              Add header
+            </button>
+          </div>
 
           <Checkbox
             id="disable-cert-validation"
