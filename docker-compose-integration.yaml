@@ -85,6 +85,24 @@ services:
         condition: service_started
       flyway:
         condition: service_completed_successfully
+  
+  query-connector:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    tty: true
+    env_file:
+      - .env.e2e
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgres://postgres:pw@db:5432/tefca_db
+    depends_on:
+      db:
+        condition: service_healthy
+      aidbox-seeder:
+        condition: service_completed_successfully
 
 volumes:
   aidbox_pg_data:

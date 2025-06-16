@@ -27,6 +27,10 @@ jest.mock("@/app/api/api-auth", () => ({
 }));
 
 import { validateServiceToken } from "@/app/api/api-auth";
+import { getOrCreateKeys } from "../../../../setup-scripts/gen-keys";
+import { createSmartJwt } from "@/app/backend/smart-on-fhir";
+import { E2E_SMART_TEST_CLIENT_ID } from "../../../../e2e/constants";
+import { decodeJwt, decodeProtectedHeader } from "jose";
 
 // Utility function to create a minimal NextRequest-like object
 export function createNextRequest(
@@ -335,8 +339,6 @@ describe("POST Query FHIR Server - Authorized Requests", () => {
   });
 
   it("should include service principal information in logs when authenticated", async () => {
-    const consoleSpy = jest.spyOn(console, "log");
-
     const request = createNextRequest(
       PatientResource,
       new URLSearchParams(`id=${SYPHILIS_QUERY_ID}&fhir_server=Aidbox`),
@@ -414,5 +416,35 @@ describe("Authentication with Different Providers", () => {
     expect(response.status).toBe(200);
     const body = await response.json();
     expect(body.resourceType).toBe("Bundle");
+  });
+});
+
+describe("SMART on FHIR JWT creation", () => {
+  beforeEach(() => {
+    suppressConsoleLogs();
+    jest.clearAllMocks();
+  });
+
+  it("generates the correct token and signing creates the right request payload", async () => {
+    const tokenEndpoint = `${process.env.AIDBOX_BASE_URL}/auth/token`;
+
+    // make sure key pair exist, and create them if they don't
+    await getOrCreateKeys();
+
+    const outputJWT = await createSmartJwt(
+      E2E_SMART_TEST_CLIENT_ID,
+      tokenEndpoint,
+    );
+
+    const header = decodeProtectedHeader(outputJWT);
+    expect(header.alg).toBe("RS384");
+    expect(header.typ).toBe("JWT");
+    expect(header.jku).toBe(
+      `${process.env.APP_HOSTNAME}/.well-known/jwks.json`,
+    );
+    const claims = decodeJwt(outputJWT);
+    expect(claims.aud).toBe(tokenEndpoint);
+    expect(claims.iss).toBe(E2E_SMART_TEST_CLIENT_ID);
+    expect(claims.sub).toBe(E2E_SMART_TEST_CLIENT_ID);
   });
 });
