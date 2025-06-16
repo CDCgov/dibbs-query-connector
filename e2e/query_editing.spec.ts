@@ -90,6 +90,7 @@ test.describe("editing an exisiting query", () => {
     const editBtn = query.getByTestId(`edit-query-${subjectQuery.queryId}`);
 
     await expect(editBtn).toBeVisible();
+
     await editBtn.click();
 
     //  customize query
@@ -108,6 +109,7 @@ test.describe("editing an exisiting query", () => {
     page.getByTestId("add-condition-icon").click();
     const search = page.getByPlaceholder(CONDITION_DRAWER_SEARCH_PLACEHOLDER);
     await search.fill(ADDED_CONDITION.name);
+    await runAxeAccessibilityChecks(page);
 
     await page.getByTestId(`update-${ADDED_CONDITION.condition_id}`).hover();
     expect(
