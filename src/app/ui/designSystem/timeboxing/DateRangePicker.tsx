@@ -52,7 +52,7 @@ const addMonths = (date: Date, months: number) => {
 
 const presetOptions = [
   {
-    label: "Last day",
+    label: "Last 24 hours",
     value: "last-day",
     getRange: () => {
       const end = today();
