@@ -76,6 +76,8 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
     queryId: undefined,
   });
 
+  const MEDICAL_RECORD_SECTION_NAME = "Additional custom fields";
+
   useEffect(() => {
     let isSubscribed = true;
 
@@ -132,106 +134,101 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
           </thead>
           <tbody>
             {conditionIdToDetailsMap &&
-              queries.map((query) => (
-                <tr
-                  key={query.queryId}
-                  className={classNames(
-                    styles.myQueriesRow,
-                    "tableRowWithHover",
-                  )}
-                  data-testid={`query-row-${query.queryId}`}
-                >
-                  <td title={query.queryName}>{query.queryName}</td>
+              queries.map((query) => {
+                const hasCustomOnly =
+                  query.conditionsList?.includes(CUSTOM_VALUESET_ARRAY_ID) &&
+                  query.conditionsList.length === 1;
 
-                  <td
-                    title={
-                      query.conditionsList?.includes(
-                        CUSTOM_VALUESET_ARRAY_ID,
-                      ) && query.conditionsList.length === 1
-                        ? CUSTOM_CONDITION_NAME
-                        : query.conditionsList
-                            ?.map(
-                              (id) =>
-                                conditionIdToDetailsMap[id]?.name ||
-                                (id === CUSTOM_VALUESET_ARRAY_ID
-                                  ? CUSTOM_CONDITION_NAME
-                                  : ""),
-                            )
-                            .filter(Boolean)
-                            .join(", ")
-                    }
+                const hasMedicalSection =
+                  query.medicalRecordSections &&
+                  Object.values(query.medicalRecordSections).some(Boolean);
+
+                const conditionNames = hasCustomOnly
+                  ? [CUSTOM_CONDITION_NAME]
+                  : [
+                      ...(query.conditionsList?.map(
+                        (id) =>
+                          conditionIdToDetailsMap[id]?.name ||
+                          (id === CUSTOM_VALUESET_ARRAY_ID
+                            ? CUSTOM_CONDITION_NAME
+                            : ""),
+                      ) ?? []),
+                      ...(hasMedicalSection
+                        ? [MEDICAL_RECORD_SECTION_NAME]
+                        : []),
+                    ].filter(Boolean);
+
+                return (
+                  <tr
+                    key={query.queryId}
+                    className={classNames(
+                      styles.myQueriesRow,
+                      "tableRowWithHover",
+                    )}
+                    data-testid={`query-row-${query.queryId}`}
                   >
-                    {query.conditionsList?.includes(CUSTOM_VALUESET_ARRAY_ID) &&
-                    query.conditionsList.length === 1
-                      ? CUSTOM_CONDITION_NAME
-                      : query.conditionsList
-                          ?.map(
-                            (id) =>
-                              conditionIdToDetailsMap[id]?.name ||
-                              (id === CUSTOM_VALUESET_ARRAY_ID
-                                ? CUSTOM_CONDITION_NAME
-                                : ""),
-                          )
-                          .filter(Boolean)
-                          .join(", ")}
-                  </td>
-                  <td>
-                    <div className="display-flex flex-justify-end">
-                      <Button
-                        type="button"
-                        className="usa-button--unstyled text-bold text-no-underline padding-right-3"
-                        data-testid={`edit-query-${query.queryId}`}
-                        onClick={() =>
-                          handleEdit(query.queryName, query.queryId)
-                        }
-                      >
-                        <span className="icon-text display-flex flex-align-center">
-                          <Icon.Edit
-                            className="height-3 width-3"
-                            aria-label="Pencil icon indicating edit ability"
-                          />
-                          <span className="padding-left-05">Edit</span>
-                        </span>
-                      </Button>
-                      <Button
-                        type="button"
-                        className="usa-button--unstyled text-bold text-no-underline padding-right-2"
-                        onClick={() =>
-                          handleCopy(query.queryName, query.queryId)
-                        }
-                      >
-                        <span className="icon-text display-flex flex-align-center">
-                          <Icon.ContentCopy
-                            className="height-3 width-3"
-                            aria-label="Stacked paper icon indidcating copy"
-                          />
-                          <span className="padding-left-05">Copy ID</span>
-                        </span>
-                      </Button>
-                      <Button
-                        type="button"
-                        className="usa-button--unstyled text-bold text-no-underline destructive-primary padding-right-2"
-                        onClick={() =>
-                          confirmDelete(
-                            query.queryName,
-                            query.queryId,
-                            setDeletedQuery,
-                            modalRef,
-                          )
-                        }
-                      >
-                        <span className="icon-text display-flex flex-align-center">
-                          <Icon.Delete
-                            className="height-3 width-3"
-                            aria-label="trashcan icon indicating deletion"
-                          />
-                          <span className="padding-left-05">Delete</span>
-                        </span>
-                      </Button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+                    <td title={query.queryName}>{query.queryName}</td>
+                    <td title={conditionNames.join(", ")}>
+                      {conditionNames.join(", ")}
+                    </td>
+                    <td>
+                      <div className="display-flex flex-justify-end">
+                        <Button
+                          type="button"
+                          className="usa-button--unstyled text-bold text-no-underline padding-right-3"
+                          data-testid={`edit-query-${query.queryId}`}
+                          onClick={() =>
+                            handleEdit(query.queryName, query.queryId)
+                          }
+                        >
+                          <span className="icon-text display-flex flex-align-center">
+                            <Icon.Edit
+                              className="height-3 width-3"
+                              aria-label="Pencil icon indicating edit ability"
+                            />
+                            <span className="padding-left-05">Edit</span>
+                          </span>
+                        </Button>
+                        <Button
+                          type="button"
+                          className="usa-button--unstyled text-bold text-no-underline padding-right-2"
+                          onClick={() =>
+                            handleCopy(query.queryName, query.queryId)
+                          }
+                        >
+                          <span className="icon-text display-flex flex-align-center">
+                            <Icon.ContentCopy
+                              className="height-3 width-3"
+                              aria-label="Stacked paper icon indidcating copy"
+                            />
+                            <span className="padding-left-05">Copy ID</span>
+                          </span>
+                        </Button>
+                        <Button
+                          type="button"
+                          className="usa-button--unstyled text-bold text-no-underline destructive-primary padding-right-2"
+                          onClick={() =>
+                            confirmDelete(
+                              query.queryName,
+                              query.queryId,
+                              setDeletedQuery,
+                              modalRef,
+                            )
+                          }
+                        >
+                          <span className="icon-text display-flex flex-align-center">
+                            <Icon.Delete
+                              className="height-3 width-3"
+                              aria-label="trashcan icon indicating deletion"
+                            />
+                            <span className="padding-left-05">Delete</span>
+                          </span>
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
           </tbody>
         </Table>
       </div>

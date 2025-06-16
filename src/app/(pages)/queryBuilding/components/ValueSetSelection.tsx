@@ -12,6 +12,8 @@ import {
   formatCategoryDisplay,
   NestedQuery,
   formatCategoryToConditionsMap,
+  MedicalRecordSections,
+  EMPTY_MEDICAL_RECORD_SECTIONS,
 } from "../utils";
 import { ConceptTypeSelectionTable } from "./SelectionTable";
 import Drawer from "@/app/ui/designSystem/drawer/Drawer";
@@ -34,6 +36,7 @@ import { CUSTOM_VALUESET_ARRAY_ID } from "@/app/shared/constants";
 import { useSaveQueryAndRedirect } from "../../../backend/query-building/useSaveQueryAndRedirect";
 import { useContext } from "react";
 import { DataContext } from "@/app/shared/DataProvider";
+import Checkbox from "@/app/ui/designSystem/checkbox/Checkbox";
 
 type ConditionSelectionProps = {
   constructedQuery: NestedQuery;
@@ -45,6 +48,10 @@ type ConditionSelectionProps = {
   ) => (
     vsType: DibbsConceptType,
   ) => (vsId: string) => (dibbsValueSets: DibbsValueSet) => void;
+  medicalRecordSections: MedicalRecordSections;
+  setMedicalRecordSections: React.Dispatch<
+    React.SetStateAction<MedicalRecordSections>
+  >;
 };
 
 /**
@@ -55,6 +62,8 @@ type ConditionSelectionProps = {
  * @param root0.handleUpdateCondition - handler function for condition update
  * @param root0.conditionsMap - condition details
  * @param root0.categoryToConditionsMap - category-index condition details
+ * @param root0.medicalRecordSections - sections of the medical record to include in the query
+ * @param root0.setMedicalRecordSections - function to update the medical record sections
  * @returns A component for display to render on the query building page
  */
 export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
@@ -63,6 +72,8 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
   handleUpdateCondition,
   conditionsMap,
   categoryToConditionsMap,
+  medicalRecordSections,
+  setMedicalRecordSections,
 }) => {
   const [activeCondition, setActiveCondition] = useState<string>("");
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -76,8 +87,11 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
   const queryContext = useContext(DataContext);
   const queryName = queryContext?.selectedQuery?.queryName;
 
+  const MEDICAL_RECORD_SECTIONS_ID = "MEDICAL_RECORD_SECTIONS";
+
   useEffect(() => {
     // display the first condition's valuesets on render
+    if (!constructedQuery || Object.keys(constructedQuery).length === 0) return;
     if (activeCondition) return;
 
     const queryKeys = Object.keys(constructedQuery);
@@ -93,6 +107,8 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
       setActiveCondition(firstValid);
     } else if (queryKeys.includes(CUSTOM_VALUESET_ARRAY_ID)) {
       setActiveCondition(CUSTOM_VALUESET_ARRAY_ID);
+    } else {
+      setActiveCondition(MEDICAL_RECORD_SECTIONS_ID);
     }
   }, [constructedQuery, activeCondition]);
 
@@ -175,6 +191,7 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
 
   // Check if the active condition is CUSTOM_VALUESET_ARRAY_ID
   const isCustomConditionTab = activeCondition === CUSTOM_VALUESET_ARRAY_ID;
+  const isMedicalRecordsTab = activeCondition === MEDICAL_RECORD_SECTIONS_ID;
 
   // Get the value sets for the active condition, additional logic for custom condition
   const activeConditionValueSets: ConceptTypeToDibbsVsMap | undefined =
@@ -282,13 +299,15 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
                   })}
               </div>
               <div className={styles.section_custom}>
-                <div className={classNames(styles.sectionTitle)}>
+                <div
+                  className={classNames(styles.sectionTitle, "padding-top-2")}
+                >
                   {CUSTOM_VALUESET_ARRAY_ID.toLocaleUpperCase()}
                 </div>
                 <div
                   className={classNames(
                     "align-items-center",
-                    activeCondition == CUSTOM_VALUESET_ARRAY_ID
+                    isCustomConditionTab
                       ? `${styles.card} ${styles.active}`
                       : styles.card,
                   )}
@@ -301,13 +320,68 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
                   >
                     Additional codes from library
                   </div>
-                </div>{" "}
+                </div>
+              </div>
+              <div className={styles.section_custom}>
+                <div
+                  className={classNames(
+                    "align-items-center",
+                    isMedicalRecordsTab
+                      ? `${styles.card} ${styles.active}`
+                      : styles.card,
+                  )}
+                >
+                  <div
+                    id={`tab-medical-records`}
+                    onClick={() =>
+                      setActiveCondition(MEDICAL_RECORD_SECTIONS_ID)
+                    }
+                    tabIndex={0}
+                    role="button"
+                  >
+                    Medical record sections
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
         <div className={styles.valueSetTemplate__right}>
-          {(activeConditionValueSets !== undefined || isCustomConditionTab) && (
+          {isMedicalRecordsTab ? (
+            <div className={styles.medicalRecordSectionControls}>
+              <div
+                className={(styles.medicalRecordSectionControls, "padding-4")}
+              >
+                {Object.keys(EMPTY_MEDICAL_RECORD_SECTIONS).map((key) => (
+                  <div key={key} className={styles.medicalRecordSectionRow}>
+                    <div
+                      data-testid={`container-medical-record-section-checkbox-${key}`}
+                    >
+                      <Checkbox
+                        id={`medical-record-section-checkbox-${key}`}
+                        label={`Include ${key.replace(/([A-Z])/g, " $1").toLowerCase()}`}
+                        checked={
+                          !!(
+                            medicalRecordSections &&
+                            medicalRecordSections[
+                              key as keyof MedicalRecordSections
+                            ]
+                          )
+                        }
+                        aria-label={`Select medical recored section ${key}`}
+                        onChange={(e) =>
+                          setMedicalRecordSections((prev) => ({
+                            ...prev,
+                            [key]: e.target.checked,
+                          }))
+                        }
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
             <>
               <div className={styles.valueSetTemplate__search}>
                 <SearchField
@@ -327,6 +401,7 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
                     onClick={() =>
                       saveQueryAndRedirect(
                         constructedQuery,
+                        medicalRecordSections,
                         queryName,
                         "/codeLibrary",
                         "select",
@@ -352,40 +427,41 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
                 searchFilter={valueSetSearchFilter}
                 setSearchFilter={setValueSetSearchFilter}
               />
+              {isCustomConditionTab && !hasCustomValueSets && (
+                <div className={styles.codeLibrary__empty}>
+                  <Icon.GridView
+                    aria-label="Stylized icon showing four squares in a grid"
+                    className={classNames("usa-icon", styles.icon)}
+                  />
+                  <p className={styles.codeLibrary__emptyText}>
+                    <strong>
+                      This is a space for you to pull in individual value sets
+                    </strong>
+                  </p>
+                  <p className={styles.codeLibrary__emptyText}>
+                    <strong>
+                      These can be official value sets from CSTE, or ones that
+                      you have created in the code library.
+                    </strong>
+                  </p>
+                  <Button
+                    className={styles.codeLibrary__button}
+                    type="button"
+                    onClick={() =>
+                      saveQueryAndRedirect(
+                        constructedQuery,
+                        medicalRecordSections,
+                        queryName,
+                        "/codeLibrary",
+                        "select",
+                      )
+                    }
+                  >
+                    Add from code library
+                  </Button>
+                </div>
+              )}
             </>
-          )}
-          {isCustomConditionTab && !hasCustomValueSets && (
-            <div className={styles.codeLibrary__empty}>
-              <Icon.GridView
-                aria-label="Stylized icon showing four squares in a grid"
-                className={classNames("usa-icon", styles.icon)}
-              />
-              <p className={styles.codeLibrary__emptyText}>
-                <strong>
-                  This is a space for you to pull in individual value sets
-                </strong>
-              </p>
-              <p className={styles.codeLibrary__emptyText}>
-                <strong>
-                  These can be official value sets from CSTE, or ones that you
-                  have created in the code library.
-                </strong>
-              </p>
-              <Button
-                className={styles.codeLibrary__button}
-                type="button"
-                onClick={() =>
-                  saveQueryAndRedirect(
-                    constructedQuery,
-                    queryName,
-                    "/codeLibrary",
-                    "select",
-                  )
-                }
-              >
-                Add from code library
-              </Button>
-            </div>
           )}
         </div>
       </div>
