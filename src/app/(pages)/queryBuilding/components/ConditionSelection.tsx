@@ -3,7 +3,11 @@
 import styles from "../buildFromTemplates/conditionTemplateSelection.module.scss";
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import classNames from "classnames";
-import { CategoryToConditionArrayMap, NestedQuery } from "../utils";
+import {
+  CategoryToConditionArrayMap,
+  MedicalRecordSections,
+  NestedQuery,
+} from "../utils";
 import ConditionColumnDisplay from "../buildFromTemplates/ConditionColumnDisplay";
 import SearchField from "@/app/ui/designSystem/searchField/SearchField";
 import { FormError } from "../buildFromTemplates/BuildFromTemplates";
@@ -15,6 +19,7 @@ import { useSaveQueryAndRedirect } from "../../../backend/query-building/useSave
 type ConditionSelectionProps = {
   categoryToConditionsMap: CategoryToConditionArrayMap;
   constructedQuery: NestedQuery;
+  medicalRecordSections: MedicalRecordSections;
   handleConditionUpdate: (conditionId: string, checked: boolean) => void;
   queryName: string | undefined;
   validateForm: () => void;
@@ -29,6 +34,7 @@ type ConditionSelectionProps = {
  * Display component for a condition on the query building page
  * @param root0 - params
  * @param root0.constructedQuery - current state of the built query
+ * @param root0.medicalRecordSections - current state of the medical record sections
  * @param root0.handleConditionUpdate - update function for condition addition and
  * removal
  * @param root0.categoryToConditionsMap - ID of the condition to reference
@@ -41,6 +47,7 @@ type ConditionSelectionProps = {
 export const ConditionSelection: React.FC<ConditionSelectionProps> = ({
   categoryToConditionsMap,
   constructedQuery,
+  medicalRecordSections,
   handleConditionUpdate,
   queryName,
   formError,
@@ -78,6 +85,7 @@ export const ConditionSelection: React.FC<ConditionSelectionProps> = ({
               !formError.queryName
                 ? saveQueryAndRedirect(
                     constructedQuery,
+                    medicalRecordSections,
                     queryName,
                     "/codeLibrary",
                     "select",

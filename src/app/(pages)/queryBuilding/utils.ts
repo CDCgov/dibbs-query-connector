@@ -32,6 +32,15 @@ export type NestedQuery = {
   };
 };
 
+export const MEDICAL_RECORD_SECTION_KEYS = [
+  "immunizations",
+  "socialDeterminants",
+] as const;
+
+export type MedicalRecordSections = {
+  [K in (typeof MEDICAL_RECORD_SECTION_KEYS)[number]]: boolean;
+};
+
 export type QueryUpdateResult = {
   id: string;
   query_name: string;
@@ -45,7 +54,7 @@ export type QueryTableResult = {
   queryId: string;
   queryData: QueryDataColumn;
   conditionsList: string[];
-  immunization: boolean;
+  medicalRecordSections: MedicalRecordSections;
 };
 
 export const EMPTY_QUERY_SELECTION = {
@@ -58,6 +67,12 @@ export const EMPTY_CONCEPT_TYPE = {
   conditions: {},
   medications: {},
 };
+
+export const EMPTY_MEDICAL_RECORD_SECTIONS: MedicalRecordSections =
+  MEDICAL_RECORD_SECTION_KEYS.reduce((acc, key) => {
+    acc[key] = false;
+    return acc;
+  }, {} as MedicalRecordSections);
 
 /**
  * Utility method to get a display name for a category (if overridden),

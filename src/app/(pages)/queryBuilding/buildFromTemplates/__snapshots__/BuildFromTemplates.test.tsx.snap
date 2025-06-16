@@ -166,7 +166,7 @@ exports[`tests the valueset selection page interactions filter bulk selection up
                     class="section_custom"
                   >
                     <div
-                      class="sectionTitle"
+                      class="sectionTitle padding-top-2"
                     >
                       CUSTOM
                     </div>
@@ -181,7 +181,21 @@ exports[`tests the valueset selection page interactions filter bulk selection up
                         Additional codes from library
                       </div>
                     </div>
-                     
+                  </div>
+                  <div
+                    class="section_custom"
+                  >
+                    <div
+                      class="align-items-center card"
+                    >
+                      <div
+                        id="tab-medical-records"
+                        role="button"
+                        tabindex="0"
+                      >
+                        Medical record sections
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -211,7 +225,7 @@ exports[`tests the valueset selection page interactions filter bulk selection up
                     class="usa-accordion accordionInnerWrapper"
                     data-testid="accordion"
                   >
-                    <h4
+                    <h2
                       class="usa-accordion__heading"
                     >
                       <button
@@ -252,13 +266,13 @@ exports[`tests the valueset selection page interactions filter bulk selection up
                                 <input
                                   checked=""
                                   class="usa-checkbox__input"
-                                  id="labs"
-                                  name="labs"
+                                  id="checkbox-labs"
+                                  name="checkbox-labs"
                                   type="checkbox"
                                 />
                                 <label
                                   class="usa-checkbox__label"
-                                  for="labs"
+                                  for="checkbox-labs"
                                 >
                                   <div>
                                     labs
@@ -274,7 +288,7 @@ exports[`tests the valueset selection page interactions filter bulk selection up
                           </div>
                         </div>
                       </button>
-                    </h4>
+                    </h2>
                     <div
                       class="usa-accordion__content usa-prose"
                       data-testid="accordionItem_labs"
@@ -463,6 +477,7 @@ exports[`tests the valueset selection page interactions filter bulk selection up
                           </div>
                         </div>
                         <div
+                          aria-labelledby="drawer-title"
                           class="drawer closed width35"
                           data-testid="drawer-open-false"
                           role="dialog"
@@ -496,6 +511,7 @@ exports[`tests the valueset selection page interactions filter bulk selection up
                               <h2
                                 class="margin-0 padding-bottom-2"
                                 data-testid="drawer-title"
+                                id="drawer-title"
                               >
                                 <span />
                               </h2>
@@ -539,6 +555,7 @@ exports[`tests the valueset selection page interactions filter bulk selection up
             </div>
           </div>
           <div
+            aria-labelledby="drawer-title"
             class="drawer closed width35"
             data-testid="drawer-open-false"
             role="dialog"
@@ -572,6 +589,7 @@ exports[`tests the valueset selection page interactions filter bulk selection up
                 <h2
                   class="margin-0 padding-bottom-2"
                   data-testid="drawer-title"
+                  id="drawer-title"
                 >
                   Add Condition(s)
                 </h2>
