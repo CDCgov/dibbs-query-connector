@@ -148,7 +148,7 @@ export async function getOrCreateKeys() {
     // Keys exist, load JWKS
     const jwksContent = fs.readFileSync(jwksPath, "utf-8");
 
-    console.info("Keys exist. Returning exisiting RSA key pair and JWKS...");
+    console.info("Keys exist. Returning existing RSA key pair and JWKS...");
 
     return JSON.parse(jwksContent);
   }

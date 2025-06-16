@@ -46,7 +46,7 @@ class DatabaseService {
   }
 
   private static getQuerybyNameSQL = `
-    select q.query_name, q.id, q.query_data, q.conditions_list, q.immunization
+    select q.query_name, q.id, q.query_data, q.conditions_list, q.medical_record_sections
     from query q 
     where q.query_name = $1;
   `;

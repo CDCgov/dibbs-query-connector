@@ -14,6 +14,7 @@ import type {
   PatientRecordsRequest,
   FullPatientRequest,
 } from "../models/entities/query";
+import type { MedicalRecordSections } from "../(pages)/queryBuilding/utils";
 import { prepareFhirClient } from "./fhir-servers";
 
 class QueryService {
@@ -25,7 +26,7 @@ class QueryService {
    * to pull back the relevant FHIR resources
    * @param patientId - ID of the referenced patient
    * @param fhirServer - name of the FHIR server
-   * @param  includeImmunization - whether to include immunizations
+   * @param  medicalRecordSections - whether to include medical record sections
    * @returns a Response with FHIR information for further processing.
    */
   @auditable
@@ -34,24 +35,28 @@ class QueryService {
     queryData: QueryDataColumn,
     patientId: string,
     fhirServer: string,
-    includeImmunization: boolean,
+    medicalRecordSections: MedicalRecordSections,
   ) {
     const fhirClient = await prepareFhirClient(fhirServer);
     const builtQuery = new CustomQuery(
       queryData,
       patientId,
-      includeImmunization,
+      medicalRecordSections,
     );
 
-    // handle the immunization query using "get" separately since posting against
-    // the dev IZ gateway endpoint results in auth errors
-    if (queryName?.includes("Immunization")) {
+    const medicalRecordSectionResults: Response[] = [];
+    if (medicalRecordSections && medicalRecordSections.immunizations) {
       const { basePath, params } = builtQuery.getQuery("immunization");
       let fetchString = basePath;
       Object.entries(params).forEach(([k, v]) => {
         fetchString += `?${k}=${v}`;
       });
-      return await fhirClient.get(fetchString);
+      medicalRecordSectionResults.push(await fhirClient.get(fetchString));
+    }
+
+    if (medicalRecordSections && medicalRecordSections.socialDeterminants) {
+      const { basePath, params } = builtQuery.getQuery("socialHistory");
+      medicalRecordSectionResults.push(await fhirClient.post(basePath, params));
     }
 
     const postPromises = builtQuery.compileAllPostRequests().map((req) => {
@@ -69,7 +74,8 @@ class QueryService {
       })
       .filter((v): v is Response => !!v);
 
-    const successfulResults = fulfilledResults
+    const allResults = [...medicalRecordSectionResults, ...fulfilledResults];
+    const successfulResults = allResults
       .map((response) => {
         if (response.status !== 200) {
           response.text().then((reason) => {
@@ -188,7 +194,8 @@ class QueryService {
     if (!savedQuery) {
       throw new Error(`Unable to query of name ${request?.queryName}`);
     }
-    const includeImmunization = savedQuery.immunization;
+
+    const medicalRecordSections = savedQuery.medicalRecordSections;
     const queryData = savedQuery.queryData;
 
     let response: Response | Response[] =
@@ -197,7 +204,7 @@ class QueryService {
         queryData,
         request.patientId,
         request.fhirServer,
-        includeImmunization,
+        medicalRecordSections,
       );
 
     const queryResponse = await QueryService.parseFhirSearch(response);
