@@ -1,11 +1,13 @@
 import { Bundle, FhirResource } from "fhir/r4";
 import { UserGroupMembership } from "./users";
 import { DibbsValueSet } from "./valuesets";
+import { MedicalRecordSections } from "@/app/(pages)/queryBuilding/utils";
 
 export interface CustomUserQuery {
   queryId: string;
   queryName: string;
   conditionsList?: string[];
+  medicalRecordSections?: MedicalRecordSections;
   valuesets: DibbsValueSet[];
   groupAssignments?: UserGroupMembership[];
 }
