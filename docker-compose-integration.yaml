@@ -85,7 +85,7 @@ services:
         condition: service_started
       flyway:
         condition: service_completed_successfully
-  
+
   query-connector:
     build:
       context: .
