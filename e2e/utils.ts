@@ -10,6 +10,7 @@ import {
   getSavedQueryByIdHelp,
 } from "@/app/backend/query-building/lib";
 import { translateSnakeStringToCamelCase } from "@/app/backend/db/util";
+import AxeBuilder from "@axe-core/playwright";
 
 /**
  *
@@ -58,4 +59,16 @@ export async function createTestCancerQuery() {
   });
 
   return val as unknown as QueryTableResult;
+}
+
+/**
+ * Helper function that scans the page for any automatic Axe errors
+ * @param page - the page object generated in the test
+ * @returns - runs an Axe sweep to see if there are errors
+ */
+export async function runAxeAccessibilityChecks(page: Page) {
+  const accessiblityChecker = await new AxeBuilder({
+    page,
+  }).analyze();
+  expect(accessiblityChecker.violations).toEqual([]);
 }
