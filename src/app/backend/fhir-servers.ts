@@ -170,6 +170,7 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
 
         // Remove Authorization header if it exists
         if ("Authorization" in headers) {
+          // eslint-disable-next-line unused-imports/no-unused-vars
           const { Authorization, ...restHeaders } = headers;
           headers = restHeaders;
         }
