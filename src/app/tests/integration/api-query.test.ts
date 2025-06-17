@@ -335,7 +335,6 @@ describe("POST Query FHIR Server - Authorized Requests", () => {
   });
 
   it("should include service principal information in logs when authenticated", async () => {
-
     const request = createNextRequest(
       PatientResource,
       new URLSearchParams(`id=${SYPHILIS_QUERY_ID}&fhir_server=Aidbox`),
