@@ -9,6 +9,7 @@ import Image from "next/image";
 import styles from "./landingPage.module.scss";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { signIn } from "@/app/backend/session-management";
 
 interface LandingPageProps {
@@ -131,9 +132,9 @@ const LandingPage: React.FC<LandingPageProps> = ({ isLoggedIn }) => {
             <p>
               For more information on how to use the Query Connector, please
               refer to the{" "}
-              <a className="usa-link" href="/docs">
+              <Link className="usa-link" href="/docs">
                 documentation
-              </a>
+              </Link>
               .
             </p>
           </div>
