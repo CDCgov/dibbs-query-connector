@@ -68,11 +68,11 @@ const presetOptions = [
     label: "Last 24 hours",
     value: "last-day",
     getRange: () => {
-      const end = today();
+      const end = new Date();
       const start = addHours(end, -24);
       return {
-        startDate: normalizeStart(start),
-        endDate: normalizeEnd(end),
+        startDate: start,
+        endDate: end,
       };
     },
   },
