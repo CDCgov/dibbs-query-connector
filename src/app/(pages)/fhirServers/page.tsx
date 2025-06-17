@@ -719,7 +719,7 @@ const FhirServers: React.FC = () => {
 
           {renderAuthMethodFields()}
 
-          <div className="margin-top-3">
+          <div className="margin-top-3" data-testid="custom-headers">
             <Label htmlFor="custom-headers">Custom Headers</Label>
             <div className="usa-hint margin-bottom-1">
               Add custom HTTP headers to be sent with every request to this FHIR
