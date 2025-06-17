@@ -284,6 +284,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
         <TextInput
           type="text"
           id="date-range-input"
+          data-testid="date-range-input"
           name="date-range-input"
           aria-label="Date range input"
           value={displayText}
@@ -305,6 +306,8 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
                 <Radio
                   key={value}
                   id={`preset-${value}`}
+                  data-testid={`preset-${value}`}
+                  aria-label={`Preset value ${value} radio button`}
                   name="date-filter"
                   label={label}
                   value={value}
@@ -317,6 +320,8 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
                 id={`preset-${CUSTOM_VALUE}`}
                 name="date-filter"
                 label="Custom date range"
+                data-testid={`preset-${CUSTOM_VALUE}`}
+                aria-label="Custom date range radio button"
                 value={CUSTOM_VALUE}
                 checked={selectedPreset === CUSTOM_VALUE}
                 onChange={() => handlePresetChange(CUSTOM_VALUE)}
