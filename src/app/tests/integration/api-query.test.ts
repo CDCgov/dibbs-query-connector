@@ -335,7 +335,6 @@ describe("POST Query FHIR Server - Authorized Requests", () => {
   });
 
   it("should include service principal information in logs when authenticated", async () => {
-    // const consoleSpy = jest.spyOn(console, "log");
 
     const request = createNextRequest(
       PatientResource,
