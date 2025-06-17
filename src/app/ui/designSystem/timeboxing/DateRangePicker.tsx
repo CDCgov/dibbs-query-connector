@@ -10,6 +10,7 @@ import {
   FormGroup,
 } from "@trussworks/react-uswds";
 import styles from "./DateRangePicker.module.scss";
+import { addHours } from "date-fns";
 
 export interface DateRange {
   startDate?: Date | null;
@@ -28,10 +29,22 @@ interface DateRangePickerProps {
 }
 
 const normalizeStart = (date: Date | null) =>
-  date ? new Date(date.setHours(0, 0, 0, 0)) : null;
+  date
+    ? new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0, 0)
+    : null;
 
 const normalizeEnd = (date: Date | null) =>
-  date ? new Date(date.setHours(23, 59, 59, 999)) : null;
+  date
+    ? new Date(
+        date.getFullYear(),
+        date.getMonth(),
+        date.getDate(),
+        23,
+        59,
+        59,
+        999,
+      )
+    : null;
 
 // We probably can reuse this logic from the backend for whatever our fhir logic will be then just import it
 const today = () => {
@@ -56,7 +69,7 @@ const presetOptions = [
     value: "last-day",
     getRange: () => {
       const end = today();
-      const start = addDays(end, -1);
+      const start = addHours(end, -24);
       return {
         startDate: normalizeStart(start),
         endDate: normalizeEnd(end),
