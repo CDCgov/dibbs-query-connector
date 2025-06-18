@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e  # Exit immediately if a command exits with a non-zero status. Comment this if debugging in CI
+set -e # Exit immediately if a command exits with a non-zero status. Comment this if debugging in CI
 docker compose down --volumes --remove-orphans
 docker compose -f docker-compose-integration.yaml up -d
 
@@ -11,14 +11,14 @@ docker compose -f docker-compose-integration.yaml logs -f aidbox-seeder | grep -
 # mkdir test-results
 # docker compose -f docker-compose-integration.yaml logs > /test-results/logs-before-tests.txt
 
-BASE_CMD="DATABASE_URL=postgresql://postgres:pw@localhost:5432/tefca_db TEST_TYPE=integration npx jest "
+BASE_CMD="DATABASE_URL=postgresql://postgres:pw@localhost:5432/tefca_db TEST_TYPE=integration APP_HOSTNAME=http://query-connector npx jest "
 # running our integration tests
-if [ "$JUST_INTEGRATION" = "true" ]; then 
+if [ "$JUST_INTEGRATION" = "true" ]; then
     JEST_CMD="$BASE_CMD --testPathPattern=tests/integration"
-else 
-# assuming that the only reason we'd want to run both the unit and integration tests is in the CI context where we need to gather coverage report info
+else
+    # assuming that the only reason we'd want to run both the unit and integration tests is in the CI context where we need to gather coverage report info
     JEST_CMD="$BASE_CMD --testPathIgnorePatterns='/e2e/' --coverage"
-fi 
+fi
 eval $JEST_CMD
 JEST_EXIT_CODE=$?
 
