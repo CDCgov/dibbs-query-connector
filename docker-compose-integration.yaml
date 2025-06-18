@@ -96,6 +96,8 @@ services:
     environment:
       - NODE_ENV=production
       - DATABASE_URL=postgres://postgres:pw@db:5432/tefca_db
+    volumes:
+      - ./keys:/app/keys
     depends_on:
       db:
         condition: service_healthy
