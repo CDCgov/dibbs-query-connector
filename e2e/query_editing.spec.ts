@@ -70,7 +70,6 @@ test.describe("editing an existing query", () => {
     await expect(actionButton).toHaveText("Save query");
 
     // Nested interactive elements: https://linear.app/skylight-cdc/issue/QUE-316/query-accordion-nested-interactive-controls
-    // Contrast issue: https://linear.app/skylight-cdc/issue/QUE-314/adjust-color-contrast-on-title-text-and-table-background-in-query
     // await runAxeAccessibilityChecks(page);
 
     // change name back to original
