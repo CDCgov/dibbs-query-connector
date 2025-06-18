@@ -202,6 +202,11 @@ class FHIRClient {
       formData.append("grant_type", "client_credentials");
       formData.append("client_id", this.serverConfig.clientId);
 
+      // Add Aidbox scopes if none are defined
+      if (this.serverConfig.name == "Aidbox" && !this.serverConfig.scopes) {
+        this.serverConfig.scopes = "system/*.read";
+      }
+
       // Add scopes if available
       if (this.serverConfig.scopes) {
         formData.append("scope", this.serverConfig.scopes);
