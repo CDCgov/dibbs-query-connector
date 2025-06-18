@@ -269,7 +269,7 @@ input.errorMessage {
 
     .addCondition {
       font-size: 1rem;
-      color: $brand-dark;
+      color: $brand-darker;
       line-height: 18.8px;
       font-weight: 700;
       display: flex;
@@ -310,7 +310,6 @@ input.errorMessage {
   }
 }
 
-
 .medicalRecordSectionRow {
   display: flex;
   align-items: center;
@@ -320,7 +319,7 @@ input.errorMessage {
 }
 
 .medicalRecordSectionRow label {
-    font-weight: 700;
+  font-weight: 700;
 }
 
 .valueSetTemplate__titleCheckbox {

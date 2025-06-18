@@ -341,14 +341,14 @@ const FhirServers: React.FC = () => {
         text: "Test connection" as string | JSX.Element,
         type: "button" as const,
         id: "modal-test-connection-button",
-        className: "usa-button usa-button--outline",
+        className: "usa-button--secondary",
         onClick: handleTestConnection,
       },
       {
         text: "Cancel",
         type: "button" as const,
         id: "modal-cancel-button",
-        className: "usa-button usa-button--destructive",
+        className: "usa-button--destructive",
         onClick: handleCloseModal,
       },
     ];
@@ -375,11 +375,11 @@ const FhirServers: React.FC = () => {
           </>
         );
         buttons[1].className =
-          "usa-button usa-button--outline shadow-none text-green padding-left-2 padding-right-2";
+          "usa-button usa-button--secondary shadow-none text-green padding-left-2 padding-right-2";
         break;
       default:
         buttons[1].text = "Test connection";
-        buttons[1].className = "usa-button usa-button--outline";
+        buttons[1].className = "usa-button usa-button--secondary";
         break;
     }
 

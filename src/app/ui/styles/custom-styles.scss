@@ -91,7 +91,7 @@
 
 .icon-primary {
   path {
-    color: $brand-primary;
+    color: $brand-dark;
   }
 }
 
@@ -163,7 +163,7 @@
 
 .spinner {
   border: 6px solid $border;
-  border-top: 6px solid $brand-primary;
+  border-top: 6px solid $brand-dark;
   border-radius: 50%;
   width: 60px;
   height: 60px;
