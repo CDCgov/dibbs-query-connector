@@ -65,7 +65,7 @@ const Drawer: React.FC<DrawerProps> = ({
           drawerWidth === "60%" ? styles.width60 : styles.width35,
         )}
         role="dialog"
-        aria-labelledby="drawer-title"
+        aria-label="drawer-container"
         data-testid={`drawer-open-${isOpen}`}
       >
         <div

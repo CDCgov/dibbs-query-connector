@@ -4,7 +4,7 @@ exports[`User Management drawer is closed by default 1`] = `
 <body>
   <div>
     <div
-      aria-labelledby="drawer-title"
+      aria-label="drawer-container"
       class="drawer closed width35"
       data-testid="drawer-open-false"
       role="dialog"
@@ -71,7 +71,7 @@ exports[`User Management drawer renders an error message if there is no subject 
 <body>
   <div>
     <div
-      aria-labelledby="drawer-title"
+      aria-label="drawer-container"
       class="drawer open width35"
       data-testid="drawer-open-true"
       role="dialog"
@@ -148,7 +148,7 @@ exports[`User Management drawer renders the list of all available queries 1`] = 
 <body>
   <div>
     <div
-      aria-labelledby="drawer-title"
+      aria-label="drawer-container"
       class="drawer open width35"
       data-testid="drawer-open-true"
       role="dialog"
@@ -265,7 +265,7 @@ exports[`User Management drawer renders the list of all available users 1`] = `
 <body>
   <div>
     <div
-      aria-labelledby="drawer-title"
+      aria-label="drawer-container"
       class="drawer open width35"
       data-testid="drawer-open-true"
       role="dialog"

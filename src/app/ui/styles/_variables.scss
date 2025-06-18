@@ -18,7 +18,8 @@ $site-alert-height: 2.5rem;
 
 // Design System Color Tokens
 $text-primary: black;
-$text-secondary: $gray-500;
+$text-secondary: $gray-600;
+
 $text-inactive: $gray-20;
 $text-inactive-dark: $gray-600;
 
@@ -26,8 +27,9 @@ $brand-primary: $blue-cool-50; // branded text color
 $brand-light: $blue-cool-20; // ??? is in the swatch
 $brand-lighter: $blue-cool-10; // tertiary link text color
 $brand-lightest: $blue-cool-5; // secondary button background
-$brand-dark: $blue-cool-70; // secondary button text
-$brand-darker: $blue-cool-80; // ??? is in the swatch
+$brand-dark: $blue-cool-60; // secondary button text
+$brand-darker: $blue-cool-70; // ??? is in the swatch
+$brand-darkest: $blue-cool-80; // ??? is in the swatch
 
 $accent-primary: $violet-warm-60; // primary CTA / info color
 $accent-dark: $violet-warm-70; // CTA hover

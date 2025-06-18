@@ -93,7 +93,7 @@ const LoadingAccordion: React.FC = () => {
               <tbody>
                 {Array.from(Array(7).keys()).map((item) => (
                   <tr key={item}>
-                    <td scope="row">
+                    <td>
                       <strong>
                         <Skeleton />
                       </strong>

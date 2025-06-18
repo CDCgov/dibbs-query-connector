@@ -14,6 +14,7 @@ import {
 } from "@/app/backend/query-building/lib";
 import { internal_getDbClient } from "@/app/backend/db/config";
 import { translateSnakeStringToCamelCase } from "@/app/backend/db/util";
+import { runAxeAccessibilityChecks } from "./utils";
 
 test.describe("editing an existing query", () => {
   let subjectQuery: QueryTableResult;
@@ -38,6 +39,8 @@ test.describe("editing an existing query", () => {
     const originalName = structuredClone(subjectQuery.queryName);
     const query = page.getByTitle(originalName);
     await expect(query).toBeVisible();
+
+    await runAxeAccessibilityChecks(page);
 
     // click edit
     await query.hover();
@@ -66,6 +69,9 @@ test.describe("editing an existing query", () => {
     await actionButton.click();
     await expect(actionButton).toHaveText("Save query");
 
+    // Nested interactive elements: https://linear.app/skylight-cdc/issue/QUE-316/query-accordion-nested-interactive-controls
+    // await runAxeAccessibilityChecks(page);
+
     // change name back to original
     await queryNameInput.fill(originalName);
     await actionButton.click();
@@ -84,6 +90,7 @@ test.describe("editing an existing query", () => {
     const editBtn = query.getByTestId(`edit-query-${subjectQuery.queryId}`);
 
     await expect(editBtn).toBeVisible();
+
     await editBtn.click();
 
     //  customize query

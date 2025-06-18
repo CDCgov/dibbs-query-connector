@@ -313,7 +313,6 @@ exports[`tests the valueset selection page interactions filter bulk selection up
                                 >
                                   <div
                                     class="checkboxInfoContainer"
-                                    tabindex="0"
                                   >
                                     <div
                                       class="usa-checkbox valueSetTemplate__checkbox checkbox isMinusCheckboxState"
@@ -403,7 +402,6 @@ exports[`tests the valueset selection page interactions filter bulk selection up
                                 >
                                   <div
                                     class="checkboxInfoContainer"
-                                    tabindex="0"
                                   >
                                     <div
                                       class="usa-checkbox valueSetTemplate__checkbox checkbox"
@@ -477,7 +475,7 @@ exports[`tests the valueset selection page interactions filter bulk selection up
                           </div>
                         </div>
                         <div
-                          aria-labelledby="drawer-title"
+                          aria-label="drawer-container"
                           class="drawer closed width35"
                           data-testid="drawer-open-false"
                           role="dialog"
@@ -555,7 +553,7 @@ exports[`tests the valueset selection page interactions filter bulk selection up
             </div>
           </div>
           <div
-            aria-labelledby="drawer-title"
+            aria-label="drawer-container"
             class="drawer closed width35"
             data-testid="drawer-open-false"
             role="dialog"
