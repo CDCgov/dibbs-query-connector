@@ -2,9 +2,9 @@
 import { Dispatch, JSX, SetStateAction, useEffect, useState } from "react";
 import styles from "../buildFromTemplates/conditionTemplateSelection.module.scss";
 import { HeadingLevel } from "@trussworks/react-uswds";
-import ConceptTypeAccordionBody from "./SelectionViewAccordionBody";
+import ConceptTypeAccordionBody from "./ConceptTypeAccordionBody";
 import { ConceptTypeToDibbsVsMap } from "@/app/utils/valueSetTranslation";
-import ConceptTypeAccordionHeader from "./SelectionViewAccordionHeader";
+import ConceptTypeAccordionHeader from "./ConceptTypeAccordionHeader";
 import MultiAccordion from "@/app/ui/designSystem/MultiAccordion";
 import { filterVsTypeOptions } from "./utils";
 import {
@@ -78,7 +78,6 @@ export const ConceptTypeSelectionTable: React.FC<
             activeType={vsType}
             activeTypeValueSets={valueSetsInType}
             expanded={curExpanded === vsType}
-            handleVsNameLevelUpdate={handleVsNameLevelUpdate}
             areItemsFiltered={areItemsFiltered}
           />
         );
@@ -86,6 +85,7 @@ export const ConceptTypeSelectionTable: React.FC<
         const content = (
           <ConceptTypeAccordionBody
             activeValueSets={valueSetsInType}
+            handleVsNameLevelUpdate={handleVsNameLevelUpdate}
             handleVsIdLevelUpdate={handleVsNameLevelUpdate}
             tableSearchFilter={searchFilter}
           />

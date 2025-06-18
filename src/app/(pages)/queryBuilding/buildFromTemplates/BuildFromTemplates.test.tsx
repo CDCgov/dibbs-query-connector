@@ -379,6 +379,7 @@ describe("tests the valueset selection page interactions", () => {
       }),
     ).not.toBeInTheDocument();
   });
+
   it("filter bulk selection updates only the filtered valuesets", async () => {
     const valueSetSearch = screen.getByPlaceholderText(
       VALUESET_SELECTION_SEARCH_PLACEHOLDER,
@@ -434,12 +435,22 @@ describe("tests the valueset selection page interactions", () => {
     // do the same for the accordidion
     await user.type(valueSetSearch, "meningitidis");
 
-    await user.click(screen.getByLabelText("Labs", { exact: false }));
+    // Toggle everything visible on
+    const selectAllBtn = await screen.findByText("Select All");
+    expect(selectAllBtn).toBeInTheDocument();
+    await user.click(selectAllBtn);
     expect(screen.getByText("2 / 2")).toBeInTheDocument();
-    await user.click(screen.getByLabelText("Labs", { exact: false }));
+
+    // Toggle everything visible off
+    const deslectAllBtn = await screen.findByText("Deselect All");
+    expect(deslectAllBtn).toBeInTheDocument();
+    await user.click(deslectAllBtn);
     expect(screen.getByText("0 / 2")).toBeInTheDocument();
 
+    // Toggle everything visible back on, then clear search filter
+    await user.click(selectAllBtn);
     await user.clear(valueSetSearch);
+    console.log(displayCount.textContent);
     expect(screen.getByText("2 / 4")).toBeInTheDocument();
 
     // ... and the drawer

@@ -1,7 +1,6 @@
-import {
-  HeadingLevel,
-  Accordion as TrussAccordion,
-} from "@trussworks/react-uswds";
+import { HeadingLevel } from "@trussworks/react-uswds";
+import CustomAccordion from "./CustomAccordion";
+import classNames from "classnames";
 
 export type TrussAccordionProps = {
   title: React.ReactNode | string;
@@ -41,14 +40,12 @@ const MultiAccordion: React.FC<MultiAccordionProps> = ({
   bordered,
 }) => {
   return (
-    <div className={containerClassName}>
-      <TrussAccordion
-        items={items}
-        className={accordionClassName}
-        multiselectable={multiselectable}
-        bordered={bordered}
-      />
-    </div>
+    <CustomAccordion
+      items={items}
+      containerClassName={classNames(accordionClassName, containerClassName)}
+      multiselectable={multiselectable}
+      bordered={bordered}
+    />
   );
 };
 
