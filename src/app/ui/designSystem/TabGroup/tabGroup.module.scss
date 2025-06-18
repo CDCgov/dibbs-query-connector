@@ -12,7 +12,7 @@
   &__active {
     @extend .tab;
     font-weight: 700;
-    border-bottom: 0.25rem solid $brand-dark;
+    border-bottom: 0.25rem solid $brand-primary;
   }
 
   &:hover {
