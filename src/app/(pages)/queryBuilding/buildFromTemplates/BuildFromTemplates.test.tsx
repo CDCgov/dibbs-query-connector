@@ -448,6 +448,7 @@ describe("tests the valueset selection page interactions", () => {
 
     // Clear search filter
     await user.clear(valueSetSearch);
+    console.log(displayCount.textContent);
     expect(screen.getByText("2 / 4")).toBeInTheDocument();
 
     // ... and the drawer
