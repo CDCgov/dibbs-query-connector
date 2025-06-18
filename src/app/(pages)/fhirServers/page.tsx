@@ -756,11 +756,15 @@ const FhirServers: React.FC = () => {
                 <div className="grid-col margin-left-2">
                   <button
                     type="button"
-                    className="usa-button usa-button--unstyled margin-top-2"
+                    className="usa-button usa-modal__close margin-top-2"
                     onClick={() => removeHeader(header.id)}
                     aria-label={`Remove header ${header.key || "row"}`}
                   >
-                    <Icon.Close size={3} />
+                    <Icon.Close
+                      size={3}
+                      className="usa-icon margin-right-05"
+                      aria-label="Remove header"
+                    />
                   </button>
                 </div>
               </div>
