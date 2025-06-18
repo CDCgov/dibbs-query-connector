@@ -156,24 +156,15 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
       // Default auth type to none if not provided
       const authType = authData?.authType || "none";
 
-      // Prepare headers
-      let headers = {};
+      // Start with custom headers from authData
+      let headers = { ...(authData?.headers || {}) };
 
-      // Get existing headers if any
-      const existingServer = await dbService.query(
-        "SELECT headers FROM fhir_servers WHERE id = $1",
-        [id],
-      );
-
-      if (existingServer.rows.length > 0 && existingServer.rows[0].headers) {
-        headers = { ...existingServer.rows[0].headers };
-
-        // Remove Authorization header if it exists
-        if ("Authorization" in headers) {
-          // eslint-disable-next-line unused-imports/no-unused-vars
-          const { Authorization, ...restHeaders } = headers;
-          headers = restHeaders;
-        }
+      // Remove Authorization header from custom headers if it exists
+      // (Authorization should only be set via auth methods)
+      if ("Authorization" in headers) {
+        // eslint-disable-next-line unused-imports/no-unused-vars
+        const { Authorization, ...restHeaders } = headers;
+        headers = restHeaders;
       }
 
       // Add Authorization header for basic auth type
@@ -249,12 +240,20 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
       // Default auth type to none if not provided
       const authType = authData?.authType || "none";
 
-      // Prepare headers based on auth type
-      let headers = {};
+      // Start with custom headers from authData
+      let headers = { ...(authData?.headers || {}) };
+
+      // Remove Authorization header from custom headers if it exists
+      // (Authorization should only be set via auth methods)
+      if ("Authorization" in headers) {
+        const { Authorization, ...restHeaders } = headers;
+        headers = restHeaders;
+      }
 
       // Add Authorization header for basic auth type
       if (authType === "basic" && authData?.bearerToken) {
         headers = {
+          ...headers,
           Authorization: `Bearer ${authData.bearerToken}`,
         };
       }
