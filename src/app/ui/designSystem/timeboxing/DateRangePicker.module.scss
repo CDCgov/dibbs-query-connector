@@ -75,3 +75,35 @@
   font-size: 0.875rem;
   padding: 0;
 }
+
+
+.filterPopover {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 10;
+  background: white;
+  border: 1px solid $border;
+  border-radius: 0.25rem;
+  box-shadow: 0 4px 6px $drop-shadow;
+  padding: 0.5rem;
+  margin-top: 0.5rem;
+  width: 100%;
+}
+
+.applyButton {
+  width: 100%;
+  margin-top: 0.75rem;
+}
+
+.radioGroup {
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.legend {
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+}
