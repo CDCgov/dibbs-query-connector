@@ -775,7 +775,10 @@ const FhirServers: React.FC = () => {
               className="usa-button usa-button--secondary margin-top-1"
               onClick={addHeader}
             >
-              <Icon.Add size={3} />
+              <Icon.Add
+                aria-label="Plus button to indicate header addition"
+                size={3}
+              />
               Add header
             </button>
           </div>
