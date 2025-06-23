@@ -84,7 +84,7 @@ export const CustomAccordion = ({
         const expanded = openItems.indexOf(item.id) > -1;
 
         return (
-          <div key={`accordion-item${i}`}>
+          <fieldset key={`accordion-item${i}`}>
             <legend className={headingClasses}>
               <button
                 type="button"
@@ -108,7 +108,7 @@ export const CustomAccordion = ({
             >
               {item.content}
             </div>
-          </div>
+          </fieldset>
         );
       })}
     </div>
