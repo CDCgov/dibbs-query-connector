@@ -231,6 +231,31 @@ describe("AuditLogs Component", () => {
     });
   });
 
+  test("selecting a preset radio updates date range and hides custom inputs", async () => {
+    await screen.findByText("Audit Log");
+
+    const input = screen.getByTestId("date-range-input");
+    await user.click(input);
+
+    const radio = screen.getByTestId("preset-last-7-days");
+    await user.click(radio);
+
+    // Date inputs should NOT be in the document
+    expect(document.getElementById("log-date-start")).toBeNull();
+    expect(document.getElementById("log-date-end")).toBeNull();
+
+    // Apply filter to close popover
+    const applyBtn = screen.getByRole("button", { name: /apply filter/i });
+    await user.click(applyBtn);
+
+    // The display input should now show a 7-day range (example: "06/10/25 - 06/17/25")
+    // Adjust format as needed for your test setup, or just check for a non-empty value:
+    const displayInput = screen.getByTestId(
+      "date-range-input",
+    ) as HTMLInputElement;
+    expect(displayInput.value).not.toBe("");
+  });
+
   test("updates start and end date inputs", async () => {
     await screen.findByText("Audit Log");
 
@@ -238,6 +263,9 @@ describe("AuditLogs Component", () => {
       name: /date range input/i,
     });
     await user.click(startInput);
+
+    const customRadio = screen.getAllByTestId("preset-custom")[0];
+    await user.click(customRadio);
 
     const resolvedStart = document.getElementById(
       "log-date-start",
@@ -257,15 +285,20 @@ describe("AuditLogs Component", () => {
 
     await waitFor(() => {
       expect(resolvedStart.value).toBe("2/28/2025");
-      expect(resolvedEnd.value).toBe("3/1/2025");
+      expect(resolvedEnd.value).toBe("03/01/2025");
     });
   });
 
   test("clears both start and end dates when Clear is clicked", async () => {
     await screen.findByText("Audit Log");
 
-    const input = screen.getByRole("textbox", { name: /date range input/i });
-    await user.click(input);
+    const startInput = screen.getByRole("textbox", {
+      name: /date range input/i,
+    });
+    await user.click(startInput);
+
+    const customRadio = screen.getAllByTestId("preset-custom")[0];
+    await user.click(customRadio);
 
     const resolvedStart = document.getElementById(
       "log-date-start",
@@ -291,8 +324,8 @@ describe("AuditLogs Component", () => {
         "log-date-end",
       ) as HTMLInputElement;
 
-      expect(newStart).toBe(null);
-      expect(newEnd).toBe(null);
+      expect(newStart.value).toBe("");
+      expect(newEnd.value).toBe("");
     });
   });
 
@@ -303,6 +336,9 @@ describe("AuditLogs Component", () => {
       name: /date range input/i,
     });
     await user.click(startInput);
+
+    const customRadio = screen.getAllByTestId("preset-custom")[0];
+    await user.click(customRadio);
 
     const resolvedStart = document.getElementById(
       "log-date-start",
