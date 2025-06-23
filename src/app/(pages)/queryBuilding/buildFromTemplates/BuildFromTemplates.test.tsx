@@ -432,14 +432,13 @@ describe("tests the valueset selection page interactions", () => {
     expect(displayCount).toHaveTextContent("2 / 4");
     expect(document.body).toMatchSnapshot();
 
-    // do the same for the accordidion
-    await user.type(valueSetSearch, "meningitidis");
-
-    // Toggle everything visible on
+    // Test the accordion - toggle everything visible on
     const selectAllBtn = await screen.findByText("Select All");
     expect(selectAllBtn).toBeInTheDocument();
     await user.click(selectAllBtn);
-    expect(screen.getByText("2 / 2")).toBeInTheDocument();
+    expect(screen.getByText("4 / 4")).toBeInTheDocument();
+
+    await user.type(valueSetSearch, "meningitidis");
 
     // Toggle everything visible off
     const deslectAllBtn = await screen.findByText("Deselect All");
@@ -447,10 +446,8 @@ describe("tests the valueset selection page interactions", () => {
     await user.click(deslectAllBtn);
     expect(screen.getByText("0 / 2")).toBeInTheDocument();
 
-    // Toggle everything visible back on, then clear search filter
-    await user.click(selectAllBtn);
+    // Clear search filter
     await user.clear(valueSetSearch);
-    console.log(displayCount.textContent);
     expect(screen.getByText("2 / 4")).toBeInTheDocument();
 
     // ... and the drawer

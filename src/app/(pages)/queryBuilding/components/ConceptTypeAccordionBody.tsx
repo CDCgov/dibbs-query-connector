@@ -156,9 +156,6 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
     e: ChangeEvent<HTMLInputElement>,
     isMinusState: boolean,
   ) {
-    activeValueSets[e.target.id]?.concepts.forEach((c) =>
-      console.log("render?", c.display, c.include),
-    );
     const valueSetToUpdateId = e.target.id;
     const includeStatus = e.target.checked || isMinusState;
 
