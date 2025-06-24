@@ -51,8 +51,8 @@ jobs:
           sudo mkdir keys
           sudo chmod -R 755 keys
           sudo chown -R $USER:$USER keys
-          sudo ls -lah keys
           npm run test:ci
+          cat keys/jwks.json
         # uncomment these next few lines and the corresponding log import
         # in the setup script you're trying to debug if you're having trouble
         # in CI. All the best, brave engineer (￣^￣ )ゞ
