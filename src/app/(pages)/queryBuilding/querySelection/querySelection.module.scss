@@ -1,13 +1,5 @@
 @use "../../../ui/styles/_variables" as *;
 
-$columnGap: 0.5rem;
-$conditionColumnSpacing: 2fr 3fr 3fr;
-
-.myQueriesRow {
-  grid-template-columns: $conditionColumnSpacing;
-  gap: $columnGap;
-}
-
 .queryBuildingContainer {
   display: flex;
   flex-direction: column;
@@ -66,7 +58,9 @@ $conditionColumnSpacing: 2fr 3fr 3fr;
   }
 
   tbody tr:hover td:last-child,
-  tbody td:last-child:hover {
+  tbody tr:focus td:last-child,
+  tbody td:last-child:hover,
+  tbody td:last-child:focus-within {
     opacity: 1;
     pointer-events: auto;
   }

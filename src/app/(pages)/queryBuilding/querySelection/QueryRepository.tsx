@@ -139,7 +139,7 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
             </tr>
           </thead>
           {loading ? (
-            <tbody>
+            <tbody data-testid={"repository-loading-skeleton"}>
               <LoadingRow numCells={3} />
               <LoadingRow numCells={3} />
               <LoadingRow numCells={3} />
@@ -181,6 +181,7 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
                           styles.myQueriesRow,
                           "tableRowWithHover",
                         )}
+                        tabIndex={0}
                         data-testid={`query-row-${query.queryId}`}
                       >
                         <td title={query.queryName}>{query.queryName}</td>
@@ -190,6 +191,7 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
                         <td>
                           <div className="display-flex flex-justify-end">
                             <Button
+                              tabIndex={0}
                               type="button"
                               className="usa-button--unstyled text-bold text-no-underline padding-right-3"
                               data-testid={`edit-query-${query.queryId}`}
@@ -206,6 +208,7 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
                               </span>
                             </Button>
                             <Button
+                              tabIndex={0}
                               type="button"
                               className="usa-button--unstyled text-bold text-no-underline padding-right-2"
                               onClick={() =>
@@ -221,6 +224,7 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
                               </span>
                             </Button>
                             <Button
+                              tabIndex={0}
                               type="button"
                               className="usa-button--unstyled text-bold text-no-underline destructive-primary padding-right-2"
                               onClick={() =>

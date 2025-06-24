@@ -65,6 +65,7 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({ setBuildStep }) => {
 
       try {
         const currentUser = await getUserByUsername(username);
+
         setCurrentUser(currentUser.items[0]);
       } catch (error) {
         if (error == "Error: Unauthorized") {
@@ -80,7 +81,11 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({ setBuildStep }) => {
       }
     };
 
-    !authDisabled && fetchCurrentUser();
+    if (!authDisabled) {
+      fetchCurrentUser();
+    } else {
+      setUserLoading(false);
+    }
   }, []);
 
   // Check whether custom queries exist in DB
@@ -114,7 +119,7 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({ setBuildStep }) => {
 
   return (
     <div className="main-container__wide">
-      {!loading && queries.length === 0 ? (
+      {!loading && queries.length === 0 && !unauthorizedError ? (
         <EmptyQueriesDisplay
           goForward={() => {
             setBuildStep("condition");
