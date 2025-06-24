@@ -48,8 +48,8 @@ jobs:
           echo "APP_HOSTNAME=http://localhost:3000" >> .env
       - name: Run tests
         run: |
-          mkdir keys
-          chmod -R 666 keys
+          sudo mkdir keys
+          sudo chmod -R 666 keys
           ls -lah keys
           npm run test:ci
         # uncomment these next few lines and the corresponding log import
