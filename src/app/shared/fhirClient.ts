@@ -218,7 +218,15 @@ class FHIRClient {
           this.serverConfig.clientId,
           tokenEndpoint,
         );
-        console.debug("Generated JWT:", jwt);
+
+        // Write JWT to keys directory for debugging
+        const keysDir = path.join(process.cwd(), "keys");
+        if (!fs.existsSync(keysDir)) {
+          fs.mkdirSync(keysDir, { recursive: true });
+        }
+        const jwtFilePath = path.join(keysDir, "smart-jwt.txt");
+        fs.writeFileSync(jwtFilePath, jwt, "utf-8");
+        console.log(`JWT written to ${jwtFilePath}`);
 
         formData.append(
           "client_assertion_type",
