@@ -19,11 +19,10 @@ else
     # assuming that the only reason we'd want to run both the unit and integration tests is in the CI context where we need to gather coverage report info
     JEST_CMD="$BASE_CMD --testPathIgnorePatterns='/e2e/' --coverage"
 fi
-eval $JEST_CMD
+eval $JEST_CMD; docker compose -f docker-compose-integration.yaml logs >test-results/logs-after-tests.txt;
 JEST_EXIT_CODE=$?
 
 # uncomment these and the corresponding block in ci.yaml to get logs in CI
-docker compose -f docker-compose-integration.yaml logs >test-results/logs-after-tests.txt
 
 # Teardown containers
 docker compose -f docker-compose-integration.yaml down
