@@ -224,7 +224,7 @@ exports[`tests the valueset selection page interactions filter bulk selection up
                   class="usa-accordion accordionInnerWrapper"
                   data-testid="accordion"
                 >
-                  <div>
+                  <fieldset>
                     <legend
                       class="usa-accordion__heading"
                     >
@@ -550,7 +550,7 @@ exports[`tests the valueset selection page interactions filter bulk selection up
                         </div>
                       </div>
                     </div>
-                  </div>
+                  </fieldset>
                 </div>
               </div>
             </div>
