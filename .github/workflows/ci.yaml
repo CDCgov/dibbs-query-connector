@@ -49,7 +49,7 @@ jobs:
       - name: Run tests
         run: |
           mkdir keys
-          chmod -R 644 keys
+          chmod -R 666 keys
           npm run test:ci
         # uncomment these next few lines and the corresponding log import
         # in the setup script you're trying to debug if you're having trouble
