@@ -990,7 +990,7 @@ const CodeLibrary: React.FC = () => {
             type: "button" as const,
             id: "delete-vs-cancel",
             className: classNames(
-              "usa-button usa-button--outline",
+              "usa-button usa-button--secondary",
               styles.modalButtonCancel,
             ),
             onClick: () => modalRef.current?.toggleModal(),

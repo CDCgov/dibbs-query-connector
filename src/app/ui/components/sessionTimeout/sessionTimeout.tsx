@@ -89,9 +89,12 @@ const SessionTimeout: React.FC<SessionTimeoutProps> = ({
   useEffect(() => {
     // trigger expired token timer
     if (expiresBeforeIdle && expTimerId.current == null) {
-      expTimerId.current = setTimeout(async () => {
-        await handleLogout();
-      }, data?.expiresIn);
+      expTimerId.current = setTimeout(
+        async () => {
+          await handleLogout();
+        },
+        data?.expiresIn,
+      );
     }
 
     if (!started && status === "authenticated") {
@@ -119,7 +122,7 @@ const SessionTimeout: React.FC<SessionTimeoutProps> = ({
           text: "Sign out",
           type: "button" as const,
           id: "session-timeout-signout",
-          className: "usa-button usa-button--outline",
+          className: "usa-button usa-button--secondary",
           onClick: handleLogout,
         },
       ]}

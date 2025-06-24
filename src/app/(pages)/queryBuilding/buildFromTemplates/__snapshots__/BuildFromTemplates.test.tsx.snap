@@ -826,7 +826,7 @@ exports[`tests the valueset selection page interactions filter bulk selection up
                   class="usa-button-group__item"
                 >
                   <button
-                    class="usa-button usa-button--outline"
+                    class="usa-button usa-button--secondary"
                     data-testid="button"
                     type="button"
                   >
