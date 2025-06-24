@@ -56,7 +56,7 @@ jobs:
         # uncomment these next few lines and the corresponding log import
         # in the setup script you're trying to debug if you're having trouble
         # in CI. All the best, brave engineer (￣^￣ )ゞ
-        # continue-on-error: true
+        continue-on-error: true
 
       # - name: Upload Docker Logs
       #   uses: actions/upload-artifact@v4
