@@ -52,11 +52,14 @@ jobs:
           sudo chmod -R 755 keys
           sudo chown -R $USER:$USER keys
           npm run test:ci
-          cat keys/jwks.json
         # uncomment these next few lines and the corresponding log import
         # in the setup script you're trying to debug if you're having trouble
         # in CI. All the best, brave engineer (￣^￣ )ゞ
         continue-on-error: true
+
+      - name: Show us the jwks
+        run: |
+          cat keys/jwks.json
 
       # - name: Upload Docker Logs
       #   uses: actions/upload-artifact@v4
