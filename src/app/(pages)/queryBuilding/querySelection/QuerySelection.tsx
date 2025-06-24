@@ -1,6 +1,5 @@
 "use client";
 
-import LoadingView from "@/app/ui/designSystem/LoadingView";
 import {
   useContext,
   useState,
@@ -40,12 +39,18 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({ setBuildStep }) => {
   const { data: session } = useSession();
   const username = session?.user?.username || "";
   const userRole = getRole();
+  const queriesContext = useContext(DataContext);
 
-  const [loading, setLoading] = useState(true);
+  const [userLoading, setUserLoading] = useState(true);
+  const [queries, setQueries] = useState<CustomUserQuery[] | undefined>(
+    queriesContext?.data
+      ? (queriesContext?.data as CustomUserQuery[])
+      : undefined,
+  );
+
   const [unauthorizedError, setUnauthorizedError] = useState(false);
   const [currentUser, setCurrentUser] = useState<User>();
 
-  const queriesContext = useContext(DataContext);
   const authDisabled = isAuthDisabledClientCheck(queriesContext?.runtimeConfig);
 
   const restrictedQueryList =
@@ -56,6 +61,8 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({ setBuildStep }) => {
   // Retrieve and store current logged-in user's data on page load
   useEffect(() => {
     const fetchCurrentUser = async () => {
+      setUserLoading(true);
+
       try {
         const currentUser = await getUserByUsername(username);
         setCurrentUser(currentUser.items[0]);
@@ -69,7 +76,7 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({ setBuildStep }) => {
         }
         console.error(`Failed to fetch current user: ${error}`);
       } finally {
-        setLoading(false);
+        setUserLoading(false);
       }
     };
 
@@ -78,15 +85,15 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({ setBuildStep }) => {
 
   // Check whether custom queries exist in DB
   useEffect(() => {
-    if (queriesContext?.data === null || queriesContext?.data === undefined) {
-      const fetchQueries = async () => {
+    const fetchQueries = async () => {
+      if (queries === undefined) {
         try {
-          setLoading(true);
-          const queries = restrictedQueryList
+          const fetchedQueries = restrictedQueryList
             ? await getQueriesForUser(currentUser as User)
             : await getQueryList();
-          const loaded = queries && (authDisabled || !!currentUser);
-          !!loaded && queriesContext?.setData(queries);
+
+          setQueries(fetchedQueries);
+          queriesContext?.setData(queries);
         } catch (error) {
           if (error == "Error: Unauthorized") {
             setUnauthorizedError(true);
@@ -96,40 +103,32 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({ setBuildStep }) => {
             });
           }
           console.error("Failed to fetch queries:", error);
-        } finally {
-          setLoading(false);
         }
-      };
+      }
+    };
 
-      fetchQueries();
-    } else {
-      setLoading(false); // Data already exists, no need to fetch again
-    }
-  }, [queriesContext, currentUser]);
+    fetchQueries();
+  }, [currentUser]);
 
-  if (loading) {
-    return <LoadingView loading={true} />;
-  }
-
-  const queries = (queriesContext?.data || []) as CustomUserQuery[];
-  queries.sort((a, b) => (a.queryName[0] > b.queryName[0] ? 1 : -1));
+  const loading = userLoading || queries === undefined;
 
   return (
-    <>
-      {queries.length === 0 && !unauthorizedError ? (
-        <div className="main-container__wide">
-          <EmptyQueriesDisplay
-            goForward={() => {
-              setBuildStep("condition");
-            }}
-          />
-        </div>
+    <div className="main-container__wide">
+      {!loading && queries.length === 0 ? (
+        <EmptyQueriesDisplay
+          goForward={() => {
+            setBuildStep("condition");
+          }}
+        />
       ) : (
-        <div className="main-container__wide">
-          <MyQueriesDisplay queries={queries} setBuildStep={setBuildStep} />
-        </div>
+        <MyQueriesDisplay
+          loading={loading}
+          queries={queries || []}
+          setBuildStep={setBuildStep}
+          setQueries={setQueries}
+        />
       )}
-    </>
+    </div>
   );
 };
 
