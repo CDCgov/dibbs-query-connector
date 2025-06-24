@@ -58,6 +58,16 @@ a:visited {
   background-color: $accent-primary;
   box-shadow: inset 0 0 0 2px $accent-primary;
 
+  &:hover {
+    box-shadow: inset 0 0 0 2px $accent-dark;
+    background-color: $accent-dark !important;
+  }
+
+  &:active {
+    box-shadow: inset 0 0 0 2px $accent-darker;
+    background-color: $accent-darker !important;
+  }
+
   &--secondary {
     background-color: white;
     box-shadow: inset 0 0 0 2px $accent-primary;
