@@ -114,6 +114,7 @@ const ValueSetBulkToggle: React.FC<ValueSetBulkToggleProps> = ({
       <div
         className={styles.checkboxInfoContainer}
         ref={focusElementRef}
+        tabIndex={-1}
         onClick={(e) => e.stopPropagation()}
       >
         <Checkbox

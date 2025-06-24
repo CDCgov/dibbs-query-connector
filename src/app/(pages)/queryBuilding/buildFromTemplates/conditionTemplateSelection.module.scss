@@ -178,7 +178,6 @@ input.errorMessage {
 
 .valueSetTemplate__search {
   padding: 1.5rem;
-  border-bottom: 1px $border solid;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -186,14 +185,15 @@ input.errorMessage {
 
 .accordionContainer {
   width: 100%;
+  margin-top: 0;
 }
 
 .accordionInnerWrapper > div {
-  padding: 0 !important;
+  padding: 0;
   overflow: visible;
 }
 
-.accordionHeaderWrapper {
+.accordionHeaderContent {
   background-color: transparent;
   justify-content: space-between;
   align-items: center;
@@ -201,21 +201,34 @@ input.errorMessage {
   width: 100%;
 }
 
-.accordionBodyWrapper {
-  background-color: transparent;
+.accordionLabel {
+  text-transform: capitalize;
+  display: flex;
+  align-items: center;
 }
 
 .accordionHeaderCount {
   font-size: 1rem !important;
   font-weight: 400 !important;
-  background-color: $background-dark;
+  background-color: inherit;
 }
 
-.accordionInnerWrapper > h2 {
+.accordionBodyWrapper {
+  background-color: transparent;
+}
+
+.accordionInnerWrapper > div {
   margin-top: 0 !important;
+  &:last-child > legend {
+    border-bottom: 1px solid #dfe1e2;
+  }
 }
 
-.accordionInnerWrapper > h2 > button {
+.accordionInnerWrapper > div > legend {
+  border-top: 1px solid #dfe1e2;
+}
+
+.accordionInnerWrapper > legend > button {
   display: flex;
   word-wrap: break-word;
   align-items: center;
@@ -391,7 +404,6 @@ div.accordionBodyExpanded:last-of-type {
 }
 
 .accordionExpandedInner {
-  border-bottom: solid 1px $border;
   padding-bottom: 1rem;
   width: 100%;
   display: flex;
@@ -508,4 +520,20 @@ $columnGap: 1rem;
   text-transform: uppercase;
   font-weight: 700;
   cursor: pointer;
+}
+
+.selectAll {
+  color: #2e6276;
+  font-weight: 700;
+  text-decoration: none;
+  margin-right: 1rem;
+
+  &:hover {
+    text-decoration: none;
+  }
+}
+
+.bulkActionButtons {
+  padding: 1rem 3rem 0.5rem 3rem !important;
+  max-width: fit-content;
 }

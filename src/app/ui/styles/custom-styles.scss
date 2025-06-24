@@ -332,3 +332,13 @@
     margin-left: 2rem !important;
   }
 }
+
+legend > .usa-accordion__button[aria-expanded="true"] {
+  background-image: none;
+  padding: 1rem 1.5rem 1rem 1.25rem;
+}
+
+legend > .usa-accordion__button[aria-expanded="false"] {
+  background-image: none;
+  padding: 1rem 1.5rem 1rem 1.25rem;
+}
