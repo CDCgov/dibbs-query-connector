@@ -218,6 +218,7 @@ class FHIRClient {
           this.serverConfig.clientId,
           tokenEndpoint,
         );
+        console.warn("Generated JWT:", jwt);
 
         formData.append(
           "client_assertion_type",
