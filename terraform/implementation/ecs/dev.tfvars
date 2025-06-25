@@ -1,3 +1,3 @@
-owner = "skylight"
+owner   = "skylight"
 project = "qc"
-region = "us-east-1"
+region  = "us-east-1"

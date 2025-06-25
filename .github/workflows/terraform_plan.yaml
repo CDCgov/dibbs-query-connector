@@ -84,8 +84,6 @@ jobs:
           TF_VAR_qc_tls_cert: ${{ secrets.TLS_CERT}}
           TF_VAR_qc_tls_key: ${{ secrets.TLS_KEY}}
           TF_VAR_auth_secret: ${{ secrets.AUTH_SECRET }}
-          TF_VAR_keycloak_client_id: ${{ secrets.KEYCLOAK_CLIENT_ID }}
-          TF_VAR_keycloak_client_secret: ${{ secrets.KEYCLOAK_CLIENT_SECRET }}
           TF_VAR_auth_keycloak_issuer: ${{ steps.set-url-format.outputs.base_url }}/keycloak
           TF_VAR_auth_url: ${{ steps.set-url-format.outputs.base_url }}
           TF_VAR_aidbox_base_url: ${{ steps.set-url-format.outputs.base_url }}/aidboxone
@@ -106,7 +104,7 @@ jobs:
             -backend-config "region=$REGION" \
             || (echo "terraform init failed, exiting..." && exit 1)
           terraform workspace select "$WORKSPACE"
-          terraform apply -auto-approve -target=aws_acm_certificate.cloudflare_cert \
+          terraform apply -auto-approve -target=data.aws_acm_certificate.acm_cert \
             -var-file="$WORKSPACE.tfvars"
           terraform plan \
             -var-file="$WORKSPACE.tfvars"

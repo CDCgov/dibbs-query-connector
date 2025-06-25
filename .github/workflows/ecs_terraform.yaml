@@ -122,8 +122,6 @@ jobs:
           WORKSPACE: ${{ steps.set-workspace.outputs.workspace }}
           TF_VAR_umls_api_key: ${{ secrets.UMLS_API_KEY }}
           TF_VAR_ersd_api_key: ${{ secrets.ERSD_API_KEY}}
-          TF_VAR_qc_tls_cert: ${{ secrets.TLS_CERT}}
-          TF_VAR_qc_tls_key: ${{ secrets.TLS_KEY}}
           TF_VAR_auth_secret: ${{ secrets.AUTH_SECRET }}
           TF_VAR_auth_provider: ${{ secrets.AUTH_PROVIDER }}
           TF_VAR_auth_client_id: ${{ secrets.AUTH_CLIENT_ID }}
@@ -147,7 +145,7 @@ jobs:
             -backend-config "region=$REGION" \
             || (echo "terraform init failed, exiting..." && exit 1)
           terraform workspace select "$WORKSPACE"
-          terraform apply -auto-approve -target=aws_acm_certificate.cloudflare_cert \
+          terraform apply -auto-approve -target=data.aws_acm_certificate.acm_cert \
             -var-file="$WORKSPACE.tfvars"
           terraform plan \
             -var-file="$WORKSPACE.tfvars"
