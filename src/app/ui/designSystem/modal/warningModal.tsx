@@ -48,7 +48,7 @@ export const WarningModal: React.FC<WarningModalProps> = ({
         {
           text: "Dismiss",
           type: "button",
-          className: "usa-button--outline",
+          className: "usa-button--secondary",
           onClick: () => {
             if (onCancel) onCancel();
             modalRef.current?.toggleModal();

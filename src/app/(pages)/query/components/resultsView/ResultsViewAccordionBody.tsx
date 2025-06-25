@@ -27,7 +27,9 @@ const ResultsViewAccordionBody: React.FC<ResultsViewAccordionBodyProps> = ({
           {title}
         </h4>
       )}
-      <div className={"usa-summary-box__text"}>{content}</div>
+      <div tabIndex={0} className={"usa-summary-box__text"}>
+        {content}
+      </div>
     </>
   );
 };

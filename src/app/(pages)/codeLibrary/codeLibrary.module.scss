@@ -604,18 +604,6 @@ $pageControlsHeight: 3rem;
 
       .formSection__content {
         flex-direction: column;
-
-        .addCodeBtn {
-          border: none !important;
-          color: $brand-primary;
-          background: transparent;
-          padding: 0 0.5rem;
-          width: fit-content;
-
-          &:hover {
-            cursor: pointer;
-          }
-        }
       }
 
       .addCodeContainer > span {
@@ -709,9 +697,4 @@ $pageControlsHeight: 3rem;
   &:hover {
     background-color: $destructive-dark !important;
   }
-}
-
-.modalButtonCancel {
-  padding: 0;
-  box-shadow: none;
 }

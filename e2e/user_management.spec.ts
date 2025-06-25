@@ -1,5 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { TEST_URL } from "../playwright-setup";
+import { runAxeAccessibilityChecks } from "./utils";
 
 test.describe("User management", () => {
   test.beforeEach(async ({ page }) => {
@@ -16,5 +17,6 @@ test.describe("User management", () => {
       /tabGroup_tab__active__/,
     );
     await expect(page.getByText("Mario, Mario")).toBeVisible();
+    await runAxeAccessibilityChecks(page);
   });
 });

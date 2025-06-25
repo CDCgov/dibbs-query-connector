@@ -8,6 +8,9 @@ import { getQueryList } from "@/app/backend/query-building/service";
 jest.mock(".../../../shared/database-service", () => ({
   getConditionsData: jest.fn(),
 }));
+jest.mock("../userManagement/utils", () => ({
+  getRole: jest.fn(),
+}));
 
 jest.mock("@/app/backend/query-building/service", () => ({
   getQueryList: jest.fn(),
@@ -31,7 +34,9 @@ describe("tests the query building steps", () => {
     );
 
     await waitFor(() => {
-      expect(screen.queryByText("Loading...")).not.toBeInTheDocument();
+      expect(
+        screen.queryByTestId("repository-loading-skeleton"),
+      ).not.toBeInTheDocument();
     });
 
     expect(screen.getByText("Start with Query Builder")).toBeInTheDocument();
@@ -52,7 +57,9 @@ describe("tests the query building steps", () => {
     const expectedQueryNames = DEFAULT_QUERIES.map((q) => q.queryName);
 
     await waitFor(() => {
-      expect(screen.queryByText("Loading")).not.toBeInTheDocument();
+      expect(
+        screen.queryByTestId("repository-loading-skeleton"),
+      ).not.toBeInTheDocument();
     });
 
     expect(screen.getByText("Query repository")).toBeInTheDocument();

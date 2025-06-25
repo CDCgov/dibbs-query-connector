@@ -478,7 +478,7 @@ exports[`tests the valueset selection page interactions filter bulk selection up
                           </div>
                         </div>
                         <div
-                          aria-labelledby="drawer-title"
+                          aria-label="drawer-container"
                           class="drawer closed width35"
                           data-testid="drawer-open-false"
                           role="dialog"
@@ -556,7 +556,7 @@ exports[`tests the valueset selection page interactions filter bulk selection up
             </div>
           </div>
           <div
-            aria-labelledby="drawer-title"
+            aria-label="drawer-container"
             class="drawer closed width35"
             data-testid="drawer-open-false"
             role="dialog"
@@ -826,7 +826,7 @@ exports[`tests the valueset selection page interactions filter bulk selection up
                   class="usa-button-group__item"
                 >
                   <button
-                    class="usa-button usa-button--outline"
+                    class="usa-button usa-button--secondary"
                     data-testid="button"
                     type="button"
                   >

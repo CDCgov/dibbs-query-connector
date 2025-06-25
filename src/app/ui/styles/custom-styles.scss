@@ -161,6 +161,10 @@
   align-items: center;
 }
 
+[tabindex]:focus {
+  z-index: 1;
+}
+
 .spinner {
   border: 6px solid $border;
   border-top: 6px solid $brand-primary;

@@ -27,7 +27,7 @@ header,
 footer {
   padding: 1rem 5rem;
   margin: 0;
-  background-color: $brand-darker;
+  background-color: $brand-darkest;
 }
 
 h1 {
@@ -45,7 +45,7 @@ h4 {
 
 a,
 a:visited {
-  color: $brand-primary;
+  color: $brand-dark;
 }
 
 .main-body {
@@ -58,14 +58,12 @@ a:visited {
   background-color: $accent-primary;
   box-shadow: inset 0 0 0 2px $accent-primary;
 
-  &:hover,
-  &--outline:hover {
+  &:hover {
     box-shadow: inset 0 0 0 2px $accent-dark;
     background-color: $accent-dark !important;
   }
 
-  &:active,
-  &--outline:active {
+  &:active {
     box-shadow: inset 0 0 0 2px $accent-darker;
     background-color: $accent-darker !important;
   }
@@ -99,19 +97,19 @@ a:visited {
 
   &--unstyled {
     box-shadow: none;
-    color: $brand-primary;
+    color: $brand-dark;
     background-color: transparent !important;
   }
 
   &--unstyled:hover {
     box-shadow: none;
-    color: $brand-dark;
+    color: $brand-darker;
     background-color: transparent !important;
   }
 
   &--unstyled:active {
     box-shadow: none;
-    color: $brand-darker;
+    color: $brand-darkest;
     background-color: transparent !important;
   }
 
@@ -345,7 +343,7 @@ ul.usa-sidenav > li.usa-sidenav__item > ul.usa-sidenav__sublist > li.usa-sidenav
 .usa-step-indicator__segment--current:before,
 .usa-step-indicator__segment--complete:before {
   box-shadow:
-    inset 0 0 0 0 $brand-darker,
+    inset 0 0 0 0 $brand-darkest,
     0 0 0 0.25rem white !important;
 }
 
