@@ -18,7 +18,9 @@ export const handleDelete = async (
   queryName: string | undefined,
   queryId: string | undefined,
   queries: CustomUserQuery[],
-  setQueries: React.Dispatch<React.SetStateAction<CustomUserQuery[]>>,
+  setQueries: React.Dispatch<
+    React.SetStateAction<CustomUserQuery[] | undefined>
+  >,
   context: DataContextValue | undefined,
 ) => {
   if (queryId) {
@@ -110,11 +112,15 @@ export const renderModal = (
     queryName: string | undefined,
     queryId: string | undefined,
     queries: CustomUserQuery[],
-    setQueries: React.Dispatch<React.SetStateAction<CustomUserQuery[]>>,
+    setQueries: React.Dispatch<
+      React.SetStateAction<CustomUserQuery[] | undefined>
+    >,
     context: DataContextValue | undefined,
   ) => void,
   queries: CustomUserQuery[],
-  setQueries: React.Dispatch<React.SetStateAction<CustomUserQuery[]>>,
+  setQueries: React.Dispatch<
+    React.SetStateAction<CustomUserQuery[] | undefined>
+  >,
   context: DataContextValue,
   setSelectedQuery: React.Dispatch<React.SetStateAction<SelectedQueryDetails>>,
 ): JSX.Element => {

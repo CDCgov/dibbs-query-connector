@@ -359,7 +359,9 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
                     >
                       <Checkbox
                         id={`medical-record-section-checkbox-${key}`}
-                        label={`Include ${key.replace(/([A-Z])/g, " $1").toLowerCase()}`}
+                        label={`Include ${key
+                          .replace(/([A-Z])/g, " $1")
+                          .toLowerCase()}`}
                         checked={
                           !!(
                             medicalRecordSections &&
@@ -397,7 +399,7 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
                 {isCustomConditionTab && hasCustomValueSets && (
                   <Button
                     type="button"
-                    outline
+                    secondary
                     onClick={() =>
                       saveQueryAndRedirect(
                         constructedQuery,

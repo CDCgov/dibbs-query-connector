@@ -42,7 +42,7 @@ const Demographics: React.FC<DemographicsProps> = ({ patient }) => {
       <tbody>
         {demographicData.map((item) => (
           <tr key={item.title}>
-            <td scope="row">
+            <td>
               <strong>{item.title}</strong>
             </td>
             <td> {item.value}</td>

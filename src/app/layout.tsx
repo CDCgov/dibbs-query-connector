@@ -33,7 +33,7 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body>
-        <div className="application-container">
+        <main className="application-container">
           <DataProvider runtimeConfig={runtimeConfig} session={session}>
             <SessionTimeout
               idleTimeMsec={IDLE_TIMEOUT_MSEC}
@@ -45,7 +45,7 @@ export default async function RootLayout({
             </Page>
             <Footer />
           </DataProvider>
-        </div>
+        </main>
       </body>
     </html>
   );
