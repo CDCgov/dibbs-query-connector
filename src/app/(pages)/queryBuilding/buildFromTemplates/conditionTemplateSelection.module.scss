@@ -188,9 +188,19 @@ input.errorMessage {
   margin-top: 0;
 }
 
-.accordionInnerWrapper > div {
+.accordionInnerWrapper > fieldset {
   padding: 0;
+  margin: 0;
   overflow: visible;
+  border: none;
+}
+
+.accordionInnerWrapper > fieldset > legend {
+  width: 100%;
+}
+
+.accordionInnerWrapper > fieldset:last-of-type {
+  border-bottom: 1px solid $border;
 }
 
 .accordionHeaderContent {
@@ -219,12 +229,9 @@ input.errorMessage {
 
 .accordionInnerWrapper > div {
   margin-top: 0 !important;
-  &:last-child > legend {
-    border-bottom: 1px solid #dfe1e2;
-  }
 }
 
-.accordionInnerWrapper > div > legend {
+.accordionInnerWrapper > fieldset > legend {
   border-top: 1px solid #dfe1e2;
 }
 
@@ -395,11 +402,11 @@ input.errorMessage {
   display: none;
 }
 
-div.accordionBodyExpanded:last-of-type {
-  border-bottom: 1px $border solid;
+.accordionExpandedInner {
+  border-bottom: none !important;
 
-  .accordionExpandedInner {
-    border-bottom: none !important;
+  &:last-of-type {
+    border-bottom: 1px $border solid;
   }
 }
 
@@ -435,8 +442,9 @@ div.accordionBodyExpanded:last-of-type {
   padding-bottom: 0.5rem;
   display: flex;
   align-items: center;
-  min-width: 4rem;
+  min-width: 20%;
   justify-content: flex-end;
+  width: fit-content;
 }
 
 .customQuery__header > h1 {
