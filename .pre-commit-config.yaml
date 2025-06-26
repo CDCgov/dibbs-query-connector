@@ -6,7 +6,8 @@ repos:
         name: Pretty Format JSON
         args: [--autofix, --no-sort-keys]
 
-  - repo: "local"
+  - repo: https://github.com/pre-commit/mirrors-eslint
+    rev: "v9.29.0"
     hooks:
       - id: eslint
         name: ESLint
