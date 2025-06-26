@@ -85,30 +85,38 @@ function formatDemographics(patient: Patient): DataDisplayInfo[] {
     },
     {
       title: "Race",
-      value: evaluate(
-        patient,
-        "Patient.extension.where(url = 'http://hl7.org/fhir/us/core/StructureDefinition/us-core-race').extension.first().valueCoding.display",
+      value: (
+        evaluate(
+          patient,
+          "Patient.extension.where(url = 'http://hl7.org/fhir/us/core/StructureDefinition/us-core-race').extension.first().valueCoding.display",
+        ) as string[]
       )[0],
     },
     {
       title: "Ethnicity",
-      value: evaluate(
-        patient,
-        "Patient.extension.where(url = 'http://hl7.org/fhir/us/core/StructureDefinition/us-core-ethnicity').extension.first().valueCoding.display",
+      value: (
+        evaluate(
+          patient,
+          "Patient.extension.where(url = 'http://hl7.org/fhir/us/core/StructureDefinition/us-core-ethnicity').extension.first().valueCoding.display",
+        ) as string[]
       )[0],
     },
     {
       title: "Tribal Affiliation",
-      value: evaluate(
-        patient,
-        "Patient.extension.where(url='http: //hl7.org/fhir/us/ecr/StructureDefinition/us-ph-tribal-affiliation-extension').extension.where(url='TribeName').value.display",
+      value: (
+        evaluate(
+          patient,
+          "Patient.extension.where(url='http: //hl7.org/fhir/us/ecr/StructureDefinition/us-ph-tribal-affiliation-extension').extension.where(url='TribeName').value.display",
+        ) as string[]
       )[0],
     },
     {
       title: "Preferred Language",
-      value: evaluate(
-        patient,
-        "Patient.communication.first().language.coding.first().display",
+      value: (
+        evaluate(
+          patient,
+          "Patient.communication.first().language.coding.first().display",
+        ) as string[]
       )[0],
     },
     {
