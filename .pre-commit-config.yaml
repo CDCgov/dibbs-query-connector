@@ -7,6 +7,13 @@ repos:
         args: [--autofix, --no-sort-keys]
   - repo: "local"
     hooks:
+      - id: "dependences"
+        name: Install dependencies
+        entry: npm
+        args: ["ci"]
+
+  - repo: "local"
+    hooks:
       - id: eslint
         name: ESLint
         files: ^.*\.[jt]sx?$ # *.js, *.jsx, *.ts and *.tsx
