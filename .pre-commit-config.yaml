@@ -15,10 +15,7 @@ repos:
         additional_dependencies:
           - eslint@9.29.0
           - eslint-config-next
-          - eslint-plugin-next
           - eslint-config-prettier
-          - eslint/eslintrc
-          - eslint/js
           - eslint-plugin-unused-imports
           - eslint-plugin-import
           - eslint-plugin-jsdoc
