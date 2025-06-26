@@ -73,13 +73,13 @@
     "@types/react-dom": "19.1.5",
     "@types/react-highlight-words": "^0.20.0",
     "@types/uuid": "^9.0.8",
-    "@typescript-eslint/eslint-plugin": "^8.24.0",
-    "@typescript-eslint/parser": "^8.24.0",
+    "@typescript-eslint/eslint-plugin": "^8.35.0",
+    "@typescript-eslint/parser": "^8.35.0",
     "autoprefixer": "^10.0.1",
     "dotenv": "^16.4.7",
     "dotenv-cli": "^8.0.0",
     "eslint": "^9.29.0",
-    "eslint-config-next": "^15.3.2",
+    "eslint-config-next": "^15.3.4",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-jsdoc": "^51.2.3",
@@ -98,7 +98,7 @@
     "supertest": "^7.0.0",
     "testcontainers": "^10.23.0",
     "ts-node": "^10.9.2",
-    "typescript": "^5",
+    "typescript": "^5.8.3",
     "typescript-eslint": "^8.35.0"
   }
 }
