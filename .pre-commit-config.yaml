@@ -13,19 +13,21 @@ repos:
         files: ^.*\.[jt]sx?$ # *.js, *.jsx, *.ts and *.tsx
         types: [file]
         language: node
-        entry: npm
-        args: ["run", "lint"]
+        entry: npx
+        args: ["run", "eslint", "-c", "eslint.config.mjs", ".", "--fix"]
         additional_dependencies:
-          - typescript
-          - next
           - eslint@9.29.0
+          - eslint-config-next
+          - eslint-config-prettier
           - eslint-plugin-unused-imports
           - eslint-plugin-import
           - eslint-plugin-jsdoc
           - eslint-plugin-jsx-a11y
           - eslint-plugin-unused-imports
           - eslint-plugin-jsdoc
-
+          - "@typescript-eslint/parser"
+          - "@typescript-eslint/eslint-plugin"
+          - "@next/eslint-plugin-next"
   - repo: https://github.com/pre-commit/mirrors-prettier
     rev: v4.0.0-alpha.8
     hooks:
