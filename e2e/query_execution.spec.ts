@@ -13,7 +13,7 @@ import {
   TEST_PATIENT_NAME,
   showSiteAlert,
 } from "./constants";
-import { checkForSiteAlert } from "./utils";
+import { checkForSiteAlert, runAxeAccessibilityChecks } from "./utils";
 import { INSUFFICIENT_PATIENT_IDENTIFIERS } from "@/app/shared/constants";
 
 test.describe("querying with the Query Connector", () => {
@@ -80,10 +80,12 @@ test.describe("querying with the Query Connector", () => {
     await page
       .getByLabel("Healthcare Organization (HCO)")
       .selectOption(DEFAULT_FHIR_SERVER);
+    await runAxeAccessibilityChecks(page);
 
     await page.getByRole("button", { name: "Search for patient" }).click();
     await expect(page.getByText("Loading")).toHaveCount(0, { timeout: 10000 });
 
+    await runAxeAccessibilityChecks(page);
     await page.getByRole("button", { name: "Select patient" }).click();
     await expect(
       page.getByRole("heading", { name: "Select a query" }),
@@ -92,6 +94,7 @@ test.describe("querying with the Query Connector", () => {
       .getByTestId("Select")
       .selectOption("Chlamydia case investigation");
 
+    await runAxeAccessibilityChecks(page);
     await page.getByRole("button", { name: "Submit" }).click();
     await expect(page.getByText("Loading")).toHaveCount(0, { timeout: 10000 });
 
@@ -158,12 +161,15 @@ test.describe("querying with the Query Connector", () => {
         .getByRole("row")
         .filter({ hasText: "azithromycin 1000 MG" }),
     ).toHaveCount(2);
+    await runAxeAccessibilityChecks(page);
 
     // Check that the drawer works
     await page.getByRole("button", { name: "View FHIR response" }).click();
     const drawer = page.getByText("Full FHIR response");
     await expect(drawer).toBeVisible();
     await expect(page.locator("pre")).toContainText("Patient");
+    await runAxeAccessibilityChecks(page);
+
     await page.getByRole("button", { name: "Close drawer" }).click();
     await expect(drawer).not.toBeVisible();
 

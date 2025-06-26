@@ -396,14 +396,14 @@ const FhirServers: React.FC = () => {
         text: "Test connection" as string | JSX.Element,
         type: "button" as const,
         id: "modal-test-connection-button",
-        className: "usa-button usa-button--secondary",
+        className: "usa-button--secondary",
         onClick: handleTestConnection,
       },
       {
         text: "Cancel",
         type: "button" as const,
         id: "modal-cancel-button",
-        className: "usa-button usa-button--destructive",
+        className: "usa-button--destructive",
         onClick: handleCloseModal,
       },
     ];
@@ -775,7 +775,10 @@ const FhirServers: React.FC = () => {
               className="usa-button usa-button--secondary margin-top-1"
               onClick={addHeader}
             >
-              <Icon.Add size={3} />
+              <Icon.Add
+                aria-label="Plus button to indicate header addition"
+                size={3}
+              />
               Add header
             </button>
           </div>

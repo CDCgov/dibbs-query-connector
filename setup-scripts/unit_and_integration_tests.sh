@@ -11,7 +11,8 @@ docker compose -f docker-compose-integration.yaml logs -f aidbox-seeder | grep -
 # mkdir test-results
 # docker compose -f docker-compose-integration.yaml logs >test-results/logs-before-tests.txt
 
-BASE_CMD="DATABASE_URL=postgresql://postgres:pw@localhost:5432/tefca_db TEST_TYPE=integration NEXT_PUBLIC_AUTH_PROVIDER=keycloak APP_HOSTNAME=http://query-connector npx jest"
+BASE_CMD="DATABASE_URL=postgresql://postgres:pw@localhost:5432/tefca_db TEST_TYPE=integration NEXT_PUBLIC_AUTH_PROVIDER=keycloak APP_HOSTNAME=http://query-connector npx jest "
+
 # running our integration tests
 if [ "$JUST_INTEGRATION" = "true" ]; then
     JEST_CMD="$BASE_CMD --testPathPattern=tests/integration"

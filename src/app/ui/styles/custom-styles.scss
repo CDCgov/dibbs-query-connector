@@ -161,6 +161,10 @@
   align-items: center;
 }
 
+[tabindex]:focus {
+  z-index: 1;
+}
+
 .spinner {
   border: 6px solid $border;
   border-top: 6px solid $brand-primary;
@@ -333,12 +337,17 @@
   }
 }
 
-legend > .usa-accordion__button[aria-expanded="true"] {
+fieldset > legend > .usa-accordion__button[aria-expanded="true"] {
+  background-image: none;
+  padding: 1rem 1.5rem 1rem 1.25rem;
+  border-bottom: 1px $border solid;
+}
+
+fieldset > legend > .usa-accordion__button[aria-expanded="false"] {
   background-image: none;
   padding: 1rem 1.5rem 1rem 1.25rem;
 }
 
-legend > .usa-accordion__button[aria-expanded="false"] {
-  background-image: none;
-  padding: 1rem 1.5rem 1rem 1.25rem;
+.accordionInnerWrapper > fieldset:last-of-type {
+  border-bottom: 3px solid green;
 }
