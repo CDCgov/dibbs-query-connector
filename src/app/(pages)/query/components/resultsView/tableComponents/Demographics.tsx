@@ -14,8 +14,8 @@ import Table from "@/app/ui/designSystem/table/Table";
 
 /**
  * Displays the demographic information of a patient.
- * @param {Patient} patient - The patient to display demographic information for.
- * @returns {React.FC} The Demographics component.
+ * @param patient - The patient to display demographic information for.
+ * @returns The Demographics component.
  */
 export interface DemographicsProps {
   patient: Patient;
