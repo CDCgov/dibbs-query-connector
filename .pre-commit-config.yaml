@@ -13,7 +13,6 @@ repos:
         files: ^.*\.[jt]sx?$ # *.js, *.jsx, *.ts and *.tsx
         types: [file]
         language: node
-        additional_dependencies:
         entry: bash
         args: ["setup-scripts/lint.sh"]
 
