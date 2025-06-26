@@ -220,65 +220,46 @@ exports[`tests the valueset selection page interactions filter bulk selection up
                 class="accordionContainer"
                 data-testid="accordion-container"
               >
-                <div>
-                  <div
-                    class="usa-accordion accordionInnerWrapper"
-                    data-testid="accordion"
-                  >
-                    <h2
+                <div
+                  class="usa-accordion accordionInnerWrapper"
+                  data-testid="accordion"
+                >
+                  <fieldset>
+                    <legend
                       class="usa-accordion__heading"
                     >
                       <button
                         aria-controls="labs"
                         aria-expanded="true"
-                        class="usa-accordion__button"
+                        class="usa-accordion__button foo"
                         data-testid="accordionButton_labs"
                         type="button"
                       >
                         <div
-                          class="accordionHeaderWrapper"
+                          class="accordionHeaderContent"
                         >
                           <div
-                            class="checkboxInfoContainer"
-                            tabindex="0"
+                            class="accordionLabel"
                           >
-                            <div
-                              class="valueSetTemplate__toggleRowHeader"
+                            <svg
+                              aria-label="Arrow indicating collapsed or expanded toggle content"
+                              class="usa-icon usa-icon--size-3"
+                              focusable="false"
+                              height="1em"
+                              role="img"
+                              viewBox="0 0 24 24"
+                              width="1em"
+                              xmlns="http://www.w3.org/2000/svg"
                             >
-                              <svg
-                                aria-label="Arrow indicating collapsed or expanded toggle content"
-                                class="usa-icon usa-icon--size-3"
-                                focusable="false"
-                                height="1em"
-                                role="img"
-                                viewBox="0 0 24 24"
-                                width="1em"
-                                xmlns="http://www.w3.org/2000/svg"
-                              >
-                                <path
-                                  d="m7 14 5-5 5 5z"
-                                />
-                              </svg>
-                              <div
-                                class="usa-checkbox valueSetTemplate__titleCheckbox checkbox isMinusCheckboxState"
-                                data-testid="checkbox"
-                              >
-                                <input
-                                  checked=""
-                                  class="usa-checkbox__input"
-                                  id="checkbox-labs"
-                                  name="checkbox-labs"
-                                  type="checkbox"
-                                />
-                                <label
-                                  class="usa-checkbox__label"
-                                  for="checkbox-labs"
-                                >
-                                  <div>
-                                    labs
-                                  </div>
-                                </label>
-                              </div>
+                              <path
+                                d="m7 14 5-5 5 5z"
+                              />
+                            </svg>
+                            <div
+                              class="accordionLabel"
+                              data-testid="accordionHeader_labs"
+                            >
+                              labs
                             </div>
                           </div>
                           <div
@@ -288,13 +269,33 @@ exports[`tests the valueset selection page interactions filter bulk selection up
                           </div>
                         </div>
                       </button>
-                    </h2>
+                    </legend>
                     <div
-                      class="usa-accordion__content usa-prose"
+                      class="usa-prose accordionInnerWrapper"
                       data-testid="accordionItem_labs"
                       id="labs"
                     >
-                      <div>
+                      <div
+                        class="bulkActionButtons"
+                      >
+                        <button
+                          class="usa-button selectAll usa-button--unstyled"
+                          data-testid="button"
+                          type="button"
+                        >
+                          Select All
+                        </button>
+                        <button
+                          class="usa-button selectAll usa-button--unstyled"
+                          data-testid="button"
+                          type="button"
+                        >
+                          Deselect  All
+                        </button>
+                      </div>
+                      <div
+                        class="accordionContainer"
+                      >
                         <div
                           class="accordionBodyExpanded"
                           data-testid="container-2.16.840.1.113762.1.4.1146.1036_20190605"
@@ -313,7 +314,7 @@ exports[`tests the valueset selection page interactions filter bulk selection up
                                 >
                                   <div
                                     class="checkboxInfoContainer"
-                                    tabindex="0"
+                                    tabindex="-1"
                                   >
                                     <div
                                       class="usa-checkbox valueSetTemplate__checkbox checkbox isMinusCheckboxState"
@@ -403,7 +404,7 @@ exports[`tests the valueset selection page interactions filter bulk selection up
                                 >
                                   <div
                                     class="checkboxInfoContainer"
-                                    tabindex="0"
+                                    tabindex="-1"
                                   >
                                     <div
                                       class="usa-checkbox valueSetTemplate__checkbox checkbox"
@@ -477,7 +478,7 @@ exports[`tests the valueset selection page interactions filter bulk selection up
                           </div>
                         </div>
                         <div
-                          aria-labelledby="drawer-title"
+                          aria-label="drawer-container"
                           class="drawer closed width35"
                           data-testid="drawer-open-false"
                           role="dialog"
@@ -549,13 +550,13 @@ exports[`tests the valueset selection page interactions filter bulk selection up
                         </div>
                       </div>
                     </div>
-                  </div>
+                  </fieldset>
                 </div>
               </div>
             </div>
           </div>
           <div
-            aria-labelledby="drawer-title"
+            aria-label="drawer-container"
             class="drawer closed width35"
             data-testid="drawer-open-false"
             role="dialog"
@@ -825,7 +826,7 @@ exports[`tests the valueset selection page interactions filter bulk selection up
                   class="usa-button-group__item"
                 >
                   <button
-                    class="usa-button usa-button--outline"
+                    class="usa-button usa-button--secondary"
                     data-testid="button"
                     type="button"
                   >

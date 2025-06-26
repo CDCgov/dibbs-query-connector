@@ -5,6 +5,7 @@ import { createSmartJwt } from "@/app/backend/smart-on-fhir";
 import { getOrCreateKeys } from "../setup-scripts/gen-keys";
 
 import { decodeJwt, decodeProtectedHeader } from "jose";
+import { runAxeAccessibilityChecks } from "./utils";
 
 test.describe("SMART on FHIR", () => {
   // NOTE: this E2E doesn't work on local UI mode due to Docker networking issues
@@ -18,6 +19,8 @@ test.describe("SMART on FHIR", () => {
     await expect(
       page.getByRole("heading", { name: "New server" }),
     ).toBeVisible();
+    await runAxeAccessibilityChecks(page);
+
     const serverName = `E2E Smart on FHIR ${Math.random() * 100}`;
     await page.getByTestId("server-name").fill(serverName);
 
@@ -35,12 +38,14 @@ test.describe("SMART on FHIR", () => {
 
     await page.getByRole("button", { name: "Test connection" }).click();
     await expect(page.getByRole("button", { name: "Success" })).toBeVisible();
+    await runAxeAccessibilityChecks(page);
 
     await page.getByRole("button", { name: "Add server" }).click();
 
     await expect(
       page.getByRole("row").filter({ hasText: serverName }),
     ).toHaveText(/Connected/);
+    await runAxeAccessibilityChecks(page);
   });
 
   // This integration test is stuck in the e2e setting because of weird issues running

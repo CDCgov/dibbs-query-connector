@@ -119,7 +119,7 @@ const SessionTimeout: React.FC<SessionTimeoutProps> = ({
           text: "Sign out",
           type: "button" as const,
           id: "session-timeout-signout",
-          className: "usa-button usa-button--outline",
+          className: "usa-button usa-button--secondary",
           onClick: handleLogout,
         },
       ]}

@@ -178,7 +178,6 @@ input.errorMessage {
 
 .valueSetTemplate__search {
   padding: 1.5rem;
-  border-bottom: 1px $border solid;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -186,14 +185,25 @@ input.errorMessage {
 
 .accordionContainer {
   width: 100%;
+  margin-top: 0;
 }
 
-.accordionInnerWrapper > div {
-  padding: 0 !important;
+.accordionInnerWrapper > fieldset {
+  padding: 0;
+  margin: 0;
   overflow: visible;
+  border: none;
 }
 
-.accordionHeaderWrapper {
+.accordionInnerWrapper > fieldset > legend {
+  width: 100%;
+}
+
+.accordionInnerWrapper > fieldset:last-of-type {
+  border-bottom: 1px solid $border;
+}
+
+.accordionHeaderContent {
   background-color: transparent;
   justify-content: space-between;
   align-items: center;
@@ -201,21 +211,31 @@ input.errorMessage {
   width: 100%;
 }
 
-.accordionBodyWrapper {
-  background-color: transparent;
+.accordionLabel {
+  text-transform: capitalize;
+  display: flex;
+  align-items: center;
 }
 
 .accordionHeaderCount {
   font-size: 1rem !important;
   font-weight: 400 !important;
-  background-color: $background-dark;
+  background-color: inherit;
 }
 
-.accordionInnerWrapper > h2 {
+.accordionBodyWrapper {
+  background-color: transparent;
+}
+
+.accordionInnerWrapper > div {
   margin-top: 0 !important;
 }
 
-.accordionInnerWrapper > h2 > button {
+.accordionInnerWrapper > fieldset > legend {
+  border-top: 1px solid #dfe1e2;
+}
+
+.accordionInnerWrapper > legend > button {
   display: flex;
   word-wrap: break-word;
   align-items: center;
@@ -269,7 +289,7 @@ input.errorMessage {
 
     .addCondition {
       font-size: 1rem;
-      color: $brand-primary;
+      color: $brand-dark;
       line-height: 18.8px;
       font-weight: 700;
       display: flex;
@@ -310,7 +330,6 @@ input.errorMessage {
   }
 }
 
-
 .medicalRecordSectionRow {
   display: flex;
   align-items: center;
@@ -320,7 +339,7 @@ input.errorMessage {
 }
 
 .medicalRecordSectionRow label {
-    font-weight: 700;
+  font-weight: 700;
 }
 
 .valueSetTemplate__titleCheckbox {
@@ -383,16 +402,15 @@ input.errorMessage {
   display: none;
 }
 
-div.accordionBodyExpanded:last-of-type {
-  border-bottom: 1px $border solid;
+.accordionExpandedInner {
+  border-bottom: none !important;
 
-  .accordionExpandedInner {
-    border-bottom: none !important;
+  &:last-of-type {
+    border-bottom: 1px $border solid;
   }
 }
 
 .accordionExpandedInner {
-  border-bottom: solid 1px $border;
   padding-bottom: 1rem;
   width: 100%;
   display: flex;
@@ -424,8 +442,9 @@ div.accordionBodyExpanded:last-of-type {
   padding-bottom: 0.5rem;
   display: flex;
   align-items: center;
-  min-width: 4rem;
+  min-width: 20%;
   justify-content: flex-end;
+  width: fit-content;
 }
 
 .customQuery__header > h1 {
@@ -509,4 +528,20 @@ $columnGap: 1rem;
   text-transform: uppercase;
   font-weight: 700;
   cursor: pointer;
+}
+
+.selectAll {
+  color: #2e6276;
+  font-weight: 700;
+  text-decoration: none;
+  margin-right: 1rem;
+
+  &:hover {
+    text-decoration: none;
+  }
+}
+
+.bulkActionButtons {
+  padding: 1rem 3rem 0.5rem 3rem !important;
+  max-width: fit-content;
 }

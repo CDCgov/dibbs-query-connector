@@ -420,7 +420,7 @@ const UserModal: React.FC<UserModalProps> = ({
         text: ModalStates[modalMode].secondaryBtnText,
         type: "button" as const,
         id: "modal-back-button",
-        className: "usa-button usa-button--outline shadow-none",
+        className: "usa-button usa-button--secondary shadow-none",
         onClick: async () =>
           setModalMode(ModalStates[modalMode].prevStep || "closed"),
       },
