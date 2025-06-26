@@ -6,15 +6,26 @@ repos:
         name: Pretty Format JSON
         args: [--autofix, --no-sort-keys]
 
-  - repo: "local"
+  - repo: https://github.com/pre-commit/mirrors-eslint
+    rev: "v9.29.0"
     hooks:
       - id: eslint
         name: ESLint
         files: ^.*\.[jt]sx?$ # *.js, *.jsx, *.ts and *.tsx
         types: [file]
         language: node
-        entry: npm
-        args: ["run", "lint"]
+        additional_dependencies:
+          - eslint@9.29.0
+          - eslint-config-next
+          - eslint-config-prettier
+          - "@typescript-eslint/parser"
+          - "@typescript-eslint/eslint-plugin"
+          - typescript
+          - "@next/eslint-plugin-next"
+          - eslint-plugin-unused-imports
+          - eslint-plugin-jsdoc
+        entry: npx
+        args: ["eslint", "src", "--config=./eslint.config.mjs", "--fix"]
 
   - repo: https://github.com/pre-commit/mirrors-prettier
     rev: v4.0.0-alpha.8
