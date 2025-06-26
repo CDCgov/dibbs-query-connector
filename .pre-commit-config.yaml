@@ -13,9 +13,16 @@ repos:
         files: ^.*\.[jt]sx?$ # *.js, *.jsx, *.ts and *.tsx
         types: [file]
         additional_dependencies:
-          - eslint@8.56.0
+          - eslint@9.29.0
           - eslint-config-next
+          - eslint-plugin-next
           - eslint-config-prettier
+          - eslint/eslintrc
+          - eslint/js
+          - eslint-plugin-unused-imports
+          - eslint-plugin-import
+          - eslint-plugin-jsdoc
+          - eslint-plugin-jsx-a11y
           - "@typescript-eslint/parser"
           - "@typescript-eslint/eslint-plugin"
           - typescript
