@@ -1,4 +1,4 @@
-import { defineConfig, globalIgnores } from "eslint/config";
+import { globalIgnores } from "eslint/config";
 import typescriptEslint from "@typescript-eslint/eslint-plugin";
 import unusedImports from "eslint-plugin-unused-imports";
 import jsdoc from "eslint-plugin-jsdoc";
@@ -17,7 +17,7 @@ const compat = new FlatCompat({
   allConfig: js.configs.all,
 });
 
-export default defineConfig([
+export default [
   globalIgnores(["*/__mocks__/**/*.js", "src/app/(pages)/.well-known/**"]),
   {
     files: ["**/src/**/*.{ts,tsx}"],
@@ -80,4 +80,4 @@ export default defineConfig([
       "jsdoc/require-jsdoc": "off",
     },
   },
-]);
+];
