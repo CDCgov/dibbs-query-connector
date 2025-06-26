@@ -14,7 +14,7 @@ repos:
         types: [file]
         language: node
         entry: npx
-        args: ["run", "eslint", "-c", "eslint.config.mjs", ".", "--fix"]
+        args: ["run", "eslint", "-c", "eslint.config.mjs", "src", "--fix"]
         additional_dependencies:
           - eslint@9.29.0
           - eslint-config-next
