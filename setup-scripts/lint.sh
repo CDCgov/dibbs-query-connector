@@ -1,2 +1,2 @@
-npm install  eslint@9.29.0 eslint-config-next eslint-config-prettier "@typescript-eslint/parser" "@typescript-eslint/eslint-plugin" typescript "@next/eslint-plugin-next" eslint-plugin-unused-imports eslint-plugin-jsdoc
+npm install  eslint@9.29.0 eslint-config-next eslint-config-prettier "@typescript-eslint/parser" "@typescript-eslint/eslint-plugin" "@next/eslint-plugin-next" eslint-plugin-unused-imports eslint-plugin-jsdoc
 npx eslint src --config=eslint.config.mjs --fix
