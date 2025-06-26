@@ -92,6 +92,8 @@ const CodeLibrary: React.FC = () => {
     useState<DibbsValueSet>(emptyValueSet);
 
   const modalRef = useRef<ModalRef>(null);
+  const filterButtonRef = useRef<HTMLButtonElement>(null);
+  const dropdownRef = useRef<HTMLFormElement>(null);
 
   const Modal = dynamic<ModalProps>(
     () => import("../../ui/designSystem/modal/Modal").then((mod) => mod.Modal),
@@ -593,40 +595,52 @@ const CodeLibrary: React.FC = () => {
                 }}
               />
               <div
-                role="button"
-                tabIndex={0}
                 className={classNames(
                   styles.applyFilters,
                   filterCount > 0 ? styles.applyFilters_active : "",
                 )}
-                onClick={() => setShowFilters(true)}
               >
-                {
-                  <div className="display-flex flex-align-center">
-                    <Icon.FilterList
-                      className="usa-icon qc-filter"
-                      size={3}
-                      aria-label="Icon indicating a menu with filter options"
-                      role="button"
-                    />
-                    {filterCount <= 0
-                      ? "Filters"
-                      : `${filterCount} ${
-                          filterCount > 1 ? `filters` : `filter`
-                        } applied`}
-                    {showFilters && (
-                      <DropdownFilter
-                        filterCount={filterCount}
-                        loading={valueSets.length <= 0}
-                        setShowFilters={setShowFilters}
-                        filterSearch={filterSearch}
-                        setFilterSearch={setFilterSearch}
-                        valueSets={valueSets}
-                        currentUser={currentUser as User}
-                      />
-                    )}
-                  </div>
-                }
+                <Button
+                  type="button"
+                  ref={filterButtonRef}
+                  unstyled
+                  className={classNames(
+                    styles.applyFilters,
+                    filterCount > 0 ? styles.applyFilters_active : "",
+                  )}
+                  onClick={() => {
+                    setShowFilters(true);
+                  }}
+                >
+                  <Icon.FilterList
+                    className="usa-icon qc-filter"
+                    size={3}
+                    aria-label="Icon indicating a menu with filter options"
+                    role="button"
+                  />
+                  {filterCount <= 0
+                    ? "Filters"
+                    : `${filterCount} ${
+                        filterCount > 1 ? `filters` : `filter`
+                      } applied`}
+                </Button>
+                {showFilters && (
+                  <DropdownFilter
+                    focusRef={dropdownRef}
+                    filterCount={filterCount}
+                    loading={valueSets.length <= 0}
+                    setShowFilters={setShowFilters}
+                    filterSearch={filterSearch}
+                    setFilterSearch={setFilterSearch}
+                    valueSets={valueSets}
+                    currentUser={currentUser as User}
+                    setTriggerFocus={() => {
+                      if (filterButtonRef.current) {
+                        filterButtonRef.current.focus();
+                      }
+                    }}
+                  />
+                )}
               </div>
             </div>
             {mode == "manage" && (
