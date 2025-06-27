@@ -20,18 +20,19 @@ env:
   NODE_VERSION: 22 # Adjust the Node.js version as needed
 
 jobs:
-  pre-commit:
+  lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/setup-node@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
         with:
-          node-version: 20
-      - uses: actions/cache@v4
-        with:
-          path: node_modules
-          key: release-${{ hashFiles('package.json') }}-${{ hashFiles('package-lock.json') }}
+          node-version: ${{env.NODE_VERSION}}
       - name: Install dependencies
         run: npm ci
+      - uses: actions/setup-python@v5Add commentMore actions
+      - uses: pre-commit/action@v3.0.1
 
   unit-and-integration-tests:
     runs-on: ubuntu-latest
