@@ -20,7 +20,7 @@ const compat = new FlatCompat({
 export default defineConfig([
   globalIgnores(["*/__mocks__/**/*.js", "src/app/(pages)/.well-known/**"]),
   {
-    files: ["**/src/**/*.{ts,tsx}"],
+    files: ["src/**/*.{ts,tsx}"],
 
     extends: compat.extends("prettier", "plugin:@next/next/recommended"),
 
