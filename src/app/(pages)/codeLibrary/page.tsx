@@ -93,7 +93,7 @@ const CodeLibrary: React.FC = () => {
 
   const modalRef = useRef<ModalRef>(null);
   const filterButtonRef = useRef<HTMLButtonElement>(null);
-  const dropdownRef = useRef<HTMLFormElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const Modal = dynamic<ModalProps>(
     () => import("../../ui/designSystem/modal/Modal").then((mod) => mod.Modal),
@@ -293,12 +293,29 @@ const CodeLibrary: React.FC = () => {
     setActiveValueSet(paginatedValueSets[0]);
 
     if (
-      filteredValueSets.length > 0 &&
+      filteredValueSets.length >= 0 &&
       conditionDetailsMap &&
       Object.keys(conditionDetailsMap).length > 0
     ) {
       setLoading(false);
     }
+
+    function handleKeyboardNavigationPress(event: KeyboardEvent) {
+      if (event.key == "Enter" || event.code == "Space") {
+        const targetRow = event.target as HTMLElement;
+        const targetVS = valueSets.filter(
+          (vs) => vs.valueSetId == targetRow.id.replace("vsTableRow--", ""),
+        )[0];
+
+        setActiveValueSet(targetVS);
+      }
+    }
+
+    window.addEventListener("keyup", handleKeyboardNavigationPress);
+    // Cleanup
+    return () => {
+      window.removeEventListener("keyup", handleKeyboardNavigationPress);
+    };
   }, [valueSets, conditionDetailsMap]);
 
   const applyFilters = async () => {
@@ -434,6 +451,8 @@ const CodeLibrary: React.FC = () => {
 
       return (
         <tr
+          id={`vsTableRow--${vs.valueSetId}`}
+          tabIndex={0}
           key={vs.valueSetId}
           className={classNames(
             styles.valueSetTable__tableBody_row,
@@ -696,6 +715,7 @@ const CodeLibrary: React.FC = () => {
             <div className={styles.resultsContainer}>
               <div className={styles.content__left}>
                 <Table
+                  scrollable
                   className={classNames(
                     "display-flex flex-row",
                     styles.valueSetTable,
@@ -837,6 +857,7 @@ const CodeLibrary: React.FC = () => {
                       >
                         {activeValueSet?.concepts.map((vs) => (
                           <tr
+                            tabIndex={0}
                             key={vs.code}
                             className={classNames(
                               styles.conceptsTable__tableBody_row,
@@ -880,6 +901,7 @@ const CodeLibrary: React.FC = () => {
                           );
                           return (
                             <tr
+                              tabIndex={0}
                               key={concept.code}
                               className={classNames(
                                 styles.conceptsTable__tableBody_row,

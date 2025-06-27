@@ -38,7 +38,7 @@ type DropdownFilterProps = {
   filterCount: number;
   currentUser: User;
   setTriggerFocus: () => void;
-  focusRef: RefObject<HTMLFormElement | null>;
+  focusRef: RefObject<HTMLDivElement | null>;
 };
 
 export type vsAuthorMap = {
@@ -166,18 +166,20 @@ const DropdownFilter: React.FC<DropdownFilterProps> = ({
   };
 
   const filterByShortcut = (userIndex: string) => {
+    const results = valueSetCreators[userIndex] || [];
+
     setFilterSearch({
       ...filterSearch,
       creators:
-        valueSetCreators[userIndex].length > 0
+        results.length > 0
           ? { [userIndex]: valueSetCreators[userIndex] }
           : {
-              "": ["No creators to filter"],
+              "No creators to": ["No creators to filter"],
             },
     });
   };
 
-  const handleOutsideClick = (ref: RefObject<HTMLFormElement | null>) => {
+  const handleOutsideClick = (ref: RefObject<HTMLDivElement | null>) => {
     useEffect(() => {
       function handleClickOutside(event: MouseEvent | KeyboardEvent) {
         if (!ref) return;
@@ -204,7 +206,7 @@ const DropdownFilter: React.FC<DropdownFilterProps> = ({
   applyFocusTrap(focusRef, focusElements);
 
   return (
-    <form ref={focusRef} className={styles.filtersDropdown}>
+    <div ref={focusRef} className={styles.filtersDropdown}>
       <div className={styles.filterOptions}>
         <div className={styles.filterOptions_grouping}>
           <label htmlFor="category">Category</label>
@@ -291,7 +293,7 @@ const DropdownFilter: React.FC<DropdownFilterProps> = ({
       <div className={styles.shortcuts}>
         <span className="text-italic">Shortcuts:</span>
         <button
-          onClick={(e) => {
+          onClick={async (e) => {
             e.preventDefault();
             filterByShortcut(
               currentUser.firstName && currentUser.lastName
@@ -338,7 +340,7 @@ const DropdownFilter: React.FC<DropdownFilterProps> = ({
           Close
         </Button>
       </div>
-    </form>
+    </div>
   );
 };
 

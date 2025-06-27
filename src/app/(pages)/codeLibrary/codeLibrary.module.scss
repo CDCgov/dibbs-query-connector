@@ -96,7 +96,7 @@ $pageControlsHeight: 3rem;
       @include u-font-family("sans");
       display: flex;
       flex-direction: column;
-      width: 100%;
+      width: 50%;
       gap: 8px;
       border: solid 1px #f0f0f0;
       background-color: #ffffff;
@@ -328,11 +328,25 @@ $pageControlsHeight: 3rem;
       display: flex !important;
       padding: 0 0 0 1.5rem !important;
 
-      &:hover {
+      &:hover,
+      &:focus {
         background-color: $brand-lightest !important;
       }
 
       &:after {
+        background: transparent !important;
+      }
+    }
+
+    td {
+      background-color: transparent;
+    }
+
+    &_row_details {
+      white-space: wrap;
+
+      &:hover,
+      &:focus {
         background: transparent !important;
       }
     }
