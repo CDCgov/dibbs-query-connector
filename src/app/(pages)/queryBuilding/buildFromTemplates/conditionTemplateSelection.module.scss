@@ -317,11 +317,12 @@ input.errorMessage {
     cursor: pointer;
     position: relative;
 
+    &:focus-within .deleteIcon,
     &:hover .deleteIcon {
       display: inline-block;
       position: absolute;
-      right: 2.5%;
-      top: 25%;
+      right: 7%;
+      top: 15%;
     }
   }
 
@@ -374,14 +375,30 @@ input.errorMessage {
   }
 }
 
+.viewCodesBtn {
+  // toggle to block on hover
+  display: none;
+}
+
 .accordionBodyExpanded {
+  &:hover,
+  &:focus,
+  &:focus-within {
+    .viewCodesBtn {
+      display: block;
+    }
+
+    .displayCount {
+      display: none;
+    }
+  }
+
   &:hover {
     .valueSetTemplate__checkbox {
       background-color: unset;
     }
 
     .viewCodesBtn {
-      display: block;
       min-width: 8rem;
       height: 2rem;
       font-size: 14px;
@@ -391,15 +408,7 @@ input.errorMessage {
         cursor: pointer;
       }
     }
-    .displayCount {
-      display: none;
-    }
   }
-}
-
-.viewCodesBtn {
-  // toggle to block on hover
-  display: none;
 }
 
 .accordionExpandedInner {
