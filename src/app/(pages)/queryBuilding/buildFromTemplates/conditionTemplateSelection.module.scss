@@ -301,10 +301,10 @@ input.errorMessage {
     }
   }
 
-  .deleteIcon {
+  .deleteIconContainer {
     color: color("error");
-    width: 1.5rem;
-    height: 1.5rem;
+    width: 32px;
+    height: 32px;
     display: none;
   }
 
@@ -317,18 +317,24 @@ input.errorMessage {
     cursor: pointer;
     position: relative;
 
-    &:focus-within .deleteIcon,
-    &:hover .deleteIcon {
+    &:focus-within .deleteIconContainer,
+    &:hover .deleteIconContainer {
       display: inline-block;
       position: absolute;
       right: 7%;
-      top: 15%;
+      top: 20%;
+      height: 20px;
+      width: 15px;
     }
   }
 
   .active {
     background: white;
   }
+}
+
+.deleteIcon {
+  margin: auto;
 }
 
 .medicalRecordSectionRow {
@@ -505,21 +511,24 @@ $columnGap: 1rem;
 
 .conditionItem {
   display: flex;
-  padding-top: 1rem;
-  padding-bottom: 1rem;
+  padding: 1rem;
   justify-content: space-between;
   align-items: flex-start;
   align-self: stretch;
   border-radius: 0.25rem;
+  width: 100%;
 
-  &:hover {
+  &:hover,
+  &:focus-within {
     background: white;
   }
-  &:hover .addButton {
+  &:hover .addButton,
+  &:focus-within .addButton {
     display: inline-block;
   }
 
-  &:hover .addedStatus {
+  &:hover .addedStatus,
+  &:focus-within .addedStatus {
     display: inline-block;
   }
 }
