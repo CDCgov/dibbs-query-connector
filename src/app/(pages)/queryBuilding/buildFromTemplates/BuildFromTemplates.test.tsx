@@ -42,6 +42,7 @@ jest.mock("next/navigation", () => ({
 }));
 
 const currentPage = "/";
+const CUSTOM_CONDITION_NAME = "Custom Code Condition";
 const GONORRHEA_ID = 15628003;
 const GONORRHEA_DETAILS = conditionIdToNameMap[GONORRHEA_ID];
 const GONORRHEA_NAME = formatDiseaseDisplay(GONORRHEA_DETAILS.name);
@@ -76,6 +77,29 @@ it("customize query button is disabled unless name and individual condition are 
   await user.click(screen.getByLabelText(GONORRHEA_NAME));
 
   expect(screen.getByText("Customize query")).not.toBeDisabled();
+});
+
+it("custom query page does not have custom condition", async () => {
+  const { user } = renderWithUser(
+    <RootProviderMock
+      currentPage={"/"}
+      initialQuery={{
+        queryName: "Test query",
+        queryId: undefined,
+      }}
+    >
+      <BuildFromTemplates buildStep="condition" setBuildStep={jest.fn} />
+    </RootProviderMock>,
+  );
+
+  expect(screen.queryByText(CUSTOM_CONDITION_NAME)).not.toBeInTheDocument();
+  await screen.findByPlaceholderText(CONDITION_DRAWER_SEARCH_PLACEHOLDER);
+  await user.type(
+    screen.getByPlaceholderText(CONDITION_DRAWER_SEARCH_PLACEHOLDER),
+    "Custom",
+  );
+
+  expect(screen.queryByText(CUSTOM_CONDITION_NAME)).not.toBeInTheDocument();
 });
 
 it("search filters by category and by condition name", async () => {
