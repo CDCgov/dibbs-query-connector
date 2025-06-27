@@ -54,7 +54,7 @@ export type vsAuthorMap = {
  * @param root0.filterCount the number of filters currently applied to the result set
  * @param root0.currentUser the User object for the currently active user
  * @param root0.setTriggerFocus function to return focus to the element that triggered the opening of DropdownFilter
- * @param root0.focusRef function to return focus to the element that triggered the opening of DropdownFilter
+ * @param root0.focusRef ref for the DropdownFilter that is accessible to its parent
  * @returns  the DropdownFilter component
  */
 const DropdownFilter: React.FC<DropdownFilterProps> = ({
@@ -147,7 +147,7 @@ const DropdownFilter: React.FC<DropdownFilterProps> = ({
   const getFocusableElements = (focusRef: RefObject<HTMLElement>) => {
     const focusableElements =
       focusRef.current &&
-      focusRef.current?.querySelectorAll(
+      focusRef.current.querySelectorAll(
         'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
       );
     setFocusElements(focusableElements);
@@ -174,7 +174,7 @@ const DropdownFilter: React.FC<DropdownFilterProps> = ({
         results.length > 0
           ? { [userIndex]: valueSetCreators[userIndex] }
           : {
-              "No creators to": ["No creators to filter"],
+              "No creators to filter": ["No creators to filter"],
             },
     });
   };

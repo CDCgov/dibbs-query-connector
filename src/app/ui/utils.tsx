@@ -4,8 +4,8 @@ import { RefObject, useEffect } from "react";
  * Helper function that traps keyboard focus within a given element. Adds an
  * event listener when target element is rendered, which constricts tabbable
  * focus to the elements' child elements (either passed as param or hard-coded below).
- * @param elementRef ref for the element within which focus should be trapped
- * @param focusElements ref for the element within which focus should be trapped
+ * @param elementRef Ref for the element within which focus should be trapped
+ * @param focusElements (optional) List of HTML element types that should receive focus
  */
 export const applyFocusTrap = (
   elementRef: RefObject<HTMLElement | null>,
