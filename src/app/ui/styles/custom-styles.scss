@@ -161,7 +161,14 @@
   align-items: center;
 }
 
-[tabindex]:focus {
+input:not([disabled]):focus,
+select:not([disabled]):focus,
+textarea:not([disabled]):focus,
+button:not([disabled]):focus,
+iframe:focus,
+[href]:focus,
+[tabindex]:focus,
+[contentEditable="true"]:focus {
   z-index: 1;
 }
 
@@ -192,6 +199,16 @@
 
 .next-button {
   max-width: 10em;
+}
+
+.unstyled-button-container {
+  text-decoration: none;
+  color: $text-primary;
+  padding: 0;
+  margin: 0;
+  border: none;
+  background-color: inherit;
+  text-align: inherit;
 }
 
 /* Styles for the customize page */

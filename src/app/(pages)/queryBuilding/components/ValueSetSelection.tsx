@@ -132,10 +132,10 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
                 key={`update-${condition.id}`}
                 id={`update-${condition.id}`}
                 data-testid={`update-${condition.id}`}
-                className={styles.conditionItem}
+                className={classNames(styles.conditionItem)}
+                tabIndex={0}
               >
                 <span>
-                  {" "}
                   <Highlighter
                     highlightClassName="searchHighlight"
                     searchWords={[conditionSearchFilter]}
@@ -152,9 +152,11 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
                     Added
                   </span>
                 ) : (
-                  <span
-                    className={styles.addButton}
-                    role="button"
+                  <button
+                    className={classNames(
+                      styles.addButton,
+                      "unstyled-button-container",
+                    )}
                     data-testid={`condition-drawer-add-${condition.id}`}
                     onClick={() => {
                       handleUpdateCondition(condition.id, false);
@@ -165,7 +167,7 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
                     }}
                   >
                     ADD
-                  </span>
+                  </button>
                 )}
               </div>
             ))}
@@ -227,12 +229,13 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
               <div className={styles.section_templates}>
                 <div className={styles.sectionTitle}>
                   <div>{"Templates".toLocaleUpperCase()}</div>
-                  <div
-                    className={styles.addCondition}
-                    role="button"
+                  <button
+                    className={classNames(
+                      "unstyled-button-container",
+                      styles.addCondition,
+                    )}
                     data-testid={"add-condition-icon"}
                     onClick={() => setIsDrawerOpen(true)}
-                    tabIndex={0}
                   >
                     <Icon.Add
                       aria-label="Plus sign icon indicating addition"
@@ -240,7 +243,7 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
                       size={3}
                     />
                     <span data-testid="add-left-rail">ADD</span>
-                  </div>
+                  </button>
                 </div>
 
                 {Object.keys(constructedQuery)
@@ -265,23 +268,16 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
                             : styles.card,
                         )}
                       >
-                        <div
+                        <button
+                          type={"button"}
+                          className={"unstyled-button-container"}
                           key={`tab-${conditionId}`}
                           id={`tab-${conditionId}`}
                           onClick={() => handleConditionToggle(conditionId)}
-                          tabIndex={0}
                         >
                           {formatDiseaseDisplay(condition.name)}
-                        </div>
-                        <Icon.Delete
-                          className={classNames(
-                            "usa-icon",
-                            styles.deleteIcon,
-                            "destructive-primary",
-                          )}
-                          size={5}
-                          data-testid={`delete-condition-${conditionId}`}
-                          aria-label="Trash icon indicating deletion of disease"
+                        </button>
+                        <button
                           onClick={() => {
                             handleUpdateCondition(conditionId, true);
                             const next = Object.keys(constructedQuery).find(
@@ -293,7 +289,22 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
                               next ?? CUSTOM_VALUESET_ARRAY_ID,
                             );
                           }}
-                        ></Icon.Delete>
+                          className={classNames(
+                            "unstyled-button-container",
+                            styles.deleteIconContainer,
+                          )}
+                          data-testid={`delete-condition-${conditionId}`}
+                        >
+                          <Icon.Delete
+                            className={classNames(
+                              "usa-icon",
+                              styles.deleteIcon,
+                              "destructive-primary",
+                            )}
+                            size={4}
+                            aria-label="Trash icon indicating deletion of disease"
+                          ></Icon.Delete>
+                        </button>
                       </div>
                     );
                   })}
@@ -312,14 +323,13 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
                       : styles.card,
                   )}
                 >
-                  <div
+                  <button
                     id={`tab-custom`}
+                    className="unstyled-button-container"
                     onClick={() => setActiveCondition(CUSTOM_VALUESET_ARRAY_ID)}
-                    tabIndex={0}
-                    role="button"
                   >
                     Additional codes from library
-                  </div>
+                  </button>
                 </div>
               </div>
               <div className={styles.section_custom}>
@@ -331,16 +341,15 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
                       : styles.card,
                   )}
                 >
-                  <div
+                  <button
                     id={`tab-medical-records`}
                     onClick={() =>
                       setActiveCondition(MEDICAL_RECORD_SECTIONS_ID)
                     }
-                    tabIndex={0}
-                    role="button"
+                    className="unstyled-button-container"
                   >
                     Medical record sections
-                  </div>
+                  </button>
                 </div>
               </div>
             </div>
