@@ -4,8 +4,6 @@ import { createSmartJwt } from "../backend/smart-on-fhir";
 import { fetchWithoutSSL } from "./utils";
 import dbService from "../backend/db/service";
 import { AuthData, updateFhirServer } from "../backend/fhir-servers";
-import path from "path";
-import fs from "fs";
 /**
  * A client for querying a FHIR server.
  * @param server The FHIR server to query.
@@ -220,15 +218,6 @@ class FHIRClient {
           this.serverConfig.clientId,
           tokenEndpoint,
         );
-
-        // Write JWT to keys directory for debugging
-        const keysDir = path.join(process.cwd(), "keys");
-        if (!fs.existsSync(keysDir)) {
-          fs.mkdirSync(keysDir, { recursive: true });
-        }
-        const jwtFilePath = path.join(keysDir, "smart-jwt.txt");
-        fs.writeFileSync(jwtFilePath, jwt, "utf-8");
-        console.log(`JWT written to ${jwtFilePath}`);
 
         formData.append(
           "client_assertion_type",
