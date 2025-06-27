@@ -45,7 +45,7 @@ jobs:
         run: |
           echo "AIDBOX_LICENSE=${{ secrets.AIDBOX_LICENSE }}" > .env
           echo "AIDBOX_BASE_URL=http://localhost:8080" >> .env
-          echo "APP_HOSTNAME=http://localhost:3000" >> .env
+          echo "APP_HOSTNAME=http://query-connector:3000" >> .env
       - name: Run tests
         run: |
           sudo mkdir keys

@@ -2,7 +2,6 @@
 
 # set -e # Exit immediately if a command exits with a non-zero status. Comment this if debugging in CI
 docker compose down --volumes --remove-orphans
-echo "APP_HOSTNAME=http://query-connector:3000" >.env
 docker compose -f docker-compose-integration.yaml up -d
 
 # wait for Aidbox to finish running before...

@@ -130,7 +130,6 @@ PGPASSWORD="${DB_PASSWORD}" psql -h "${DB_ADDRESS}" -p "${DB_PORT}" -U "${DB_USE
 INSERT INTO fhir_servers (
   name,
   hostname,
-  headers,
   last_connection_attempt,
   last_connection_successful,
   disable_cert_validation,
@@ -140,7 +139,6 @@ INSERT INTO fhir_servers (
 ) VALUES (
   'Aidbox',
   '${BASE_URL}/fhir',
-  '{"Authorization": "Bearer ${TOKEN}"}'::jsonb,
   '${CURRENT_DATETIME}'::timestamp,
   true,
   false,  
