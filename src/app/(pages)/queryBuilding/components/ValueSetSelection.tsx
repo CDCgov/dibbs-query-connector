@@ -277,9 +277,7 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
                         >
                           {formatDiseaseDisplay(condition.name)}
                         </button>
-                        <Button
-                          type={"button"}
-                          unstyled
+                        <button
                           onClick={() => {
                             handleUpdateCondition(conditionId, true);
                             const next = Object.keys(constructedQuery).find(
@@ -291,7 +289,10 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
                               next ?? CUSTOM_VALUESET_ARRAY_ID,
                             );
                           }}
-                          className={styles.deleteIconContainer}
+                          className={classNames(
+                            "unstyled-button-container",
+                            styles.deleteIconContainer,
+                          )}
                           data-testid={`delete-condition-${conditionId}`}
                         >
                           <Icon.Delete
@@ -303,7 +304,7 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
                             size={4}
                             aria-label="Trash icon indicating deletion of disease"
                           ></Icon.Delete>
-                        </Button>
+                        </button>
                       </div>
                     );
                   })}
