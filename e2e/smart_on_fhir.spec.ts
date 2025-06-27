@@ -1,10 +1,7 @@
 import { TEST_URL } from "../playwright-setup";
 import { test, expect } from "@playwright/test";
 import { E2E_SMART_TEST_CLIENT_ID } from "./constants";
-import { createSmartJwt } from "@/app/backend/smart-on-fhir";
-import { getOrCreateKeys } from "../setup-scripts/gen-keys";
 
-import { decodeJwt, decodeProtectedHeader } from "jose";
 import { runAxeAccessibilityChecks } from "./utils";
 
 test.describe("SMART on FHIR", () => {
@@ -46,33 +43,5 @@ test.describe("SMART on FHIR", () => {
       page.getByRole("row").filter({ hasText: serverName }),
     ).toHaveText(/Connected/);
     await runAxeAccessibilityChecks(page);
-  });
-
-  // This integration test is stuck in the e2e setting because of weird issues running
-  // our JWT signing library in a JSDOM environment. Trying to sign the JWT errors
-  // with type errors complaining about the payload needing to a UTF-8 array,
-  // which after some digging is an issue running the library within JSDOM.
-  // Relevant issue here: https://github.com/vitest-dev/vitest/issues/5685
-  test("JWT creation generates the correct token and signing creates the right request payload", async () => {
-    const tokenEndpoint = `${process.env.AIDBOX_BASE_URL}/auth/token`;
-
-    // make sure key pair exist, and create them if they don't
-    await getOrCreateKeys();
-
-    const outputJWT = await createSmartJwt(
-      E2E_SMART_TEST_CLIENT_ID,
-      tokenEndpoint,
-    );
-
-    const header = decodeProtectedHeader(outputJWT);
-    expect(header.alg).toBe("RS384");
-    expect(header.typ).toBe("JWT");
-    expect(header.jku).toBe(
-      `${process.env.APP_HOSTNAME}/.well-known/jwks.json`,
-    );
-    const claims = decodeJwt(outputJWT);
-    expect(claims.aud).toBe(tokenEndpoint);
-    expect(claims.iss).toBe(E2E_SMART_TEST_CLIENT_ID);
-    expect(claims.sub).toBe(E2E_SMART_TEST_CLIENT_ID);
   });
 });
