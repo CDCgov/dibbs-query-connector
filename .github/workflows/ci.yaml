@@ -31,7 +31,7 @@ jobs:
           node-version: ${{env.NODE_VERSION}}
       - name: Install dependencies
         run: npm ci
-      - uses: actions/setup-python@v5Add commentMore actions
+      - uses: actions/setup-python@v5
       - uses: pre-commit/action@v3.0.1
 
   unit-and-integration-tests:
