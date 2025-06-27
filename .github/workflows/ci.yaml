@@ -23,11 +23,16 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Run linting
-        run: |
-          npm ci
-          npm run lint
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{env.NODE_VERSION}}
+      - name: Install dependencies
+        run: npm ci
+      - uses: actions/setup-python@v5
+      - uses: pre-commit/action@v3.0.1
 
   unit-and-integration-tests:
     runs-on: ubuntu-latest
@@ -84,8 +89,8 @@ jobs:
         run: npx playwright install --with-deps
       - name: Create .env
         run: |
-          echo "NEXT_PUBLIC_AUTH_PROVIDER=keycloak" > .env
           echo "AIDBOX_LICENSE=${{ secrets.AIDBOX_LICENSE }}" > .env
+          echo "NEXT_PUBLIC_AUTH_PROVIDER=keycloak" >> .env
       - name: Build Query Connector and Run Playwright Tests
         id: run_tests
         run: |

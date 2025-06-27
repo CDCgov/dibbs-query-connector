@@ -5,7 +5,7 @@ import { conditionIdToNameMap, DEFAULT_QUERIES } from "./fixtures";
 import { RootProviderMock } from "@/app/tests/unit/setup";
 import { getQueryList } from "@/app/backend/query-building/service";
 
-jest.mock(".../../../shared/database-service", () => ({
+jest.mock("@/app/shared/database-service", () => ({
   getConditionsData: jest.fn(),
 }));
 jest.mock("../userManagement/utils", () => ({
