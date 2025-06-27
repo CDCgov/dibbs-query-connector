@@ -74,7 +74,7 @@ export default defineConfig([
     plugins: {
       jsdoc: jsdoc,
     },
-    files: ["**/*.test*", "**/tests/**/*"],
+    files: ["src/**/*.test*", "src/**/tests/**/*"],
 
     rules: {
       "jsdoc/require-jsdoc": "off",

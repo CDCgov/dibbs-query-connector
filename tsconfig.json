@@ -31,8 +31,8 @@
   },
   "include": [
     "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
+    "src/**/*.ts",
+    "src/**/*.tsx",
     ".next/types/**/*.ts",
     "node_modules/cypress/types/cypress.d.ts",
     "src/lib/remark-image-transform.mjs",
