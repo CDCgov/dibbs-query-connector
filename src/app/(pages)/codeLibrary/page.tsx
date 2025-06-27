@@ -92,6 +92,8 @@ const CodeLibrary: React.FC = () => {
     useState<DibbsValueSet>(emptyValueSet);
 
   const modalRef = useRef<ModalRef>(null);
+  const filterButtonRef = useRef<HTMLButtonElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const Modal = dynamic<ModalProps>(
     () => import("../../ui/designSystem/modal/Modal").then((mod) => mod.Modal),
@@ -291,12 +293,29 @@ const CodeLibrary: React.FC = () => {
     setActiveValueSet(paginatedValueSets[0]);
 
     if (
-      filteredValueSets.length > 0 &&
+      filteredValueSets.length >= 0 &&
       conditionDetailsMap &&
       Object.keys(conditionDetailsMap).length > 0
     ) {
       setLoading(false);
     }
+
+    function handleKeyboardNavigationPress(event: KeyboardEvent) {
+      if (event.key == "Enter" || event.code == "Space") {
+        const targetRow = event.target as HTMLElement;
+        const targetVS = valueSets.filter(
+          (vs) => vs.valueSetId == targetRow.id.replace("vsTableRow--", ""),
+        )[0];
+
+        setActiveValueSet(targetVS);
+      }
+    }
+
+    window.addEventListener("keyup", handleKeyboardNavigationPress);
+    // Cleanup
+    return () => {
+      window.removeEventListener("keyup", handleKeyboardNavigationPress);
+    };
   }, [valueSets, conditionDetailsMap]);
 
   const applyFilters = async () => {
@@ -432,6 +451,8 @@ const CodeLibrary: React.FC = () => {
 
       return (
         <tr
+          id={`vsTableRow--${vs.valueSetId}`}
+          tabIndex={0}
           key={vs.valueSetId}
           className={classNames(
             styles.valueSetTable__tableBody_row,
@@ -593,40 +614,52 @@ const CodeLibrary: React.FC = () => {
                 }}
               />
               <div
-                role="button"
-                tabIndex={0}
                 className={classNames(
                   styles.applyFilters,
                   filterCount > 0 ? styles.applyFilters_active : "",
                 )}
-                onClick={() => setShowFilters(true)}
               >
-                {
-                  <div className="display-flex flex-align-center">
-                    <Icon.FilterList
-                      className="usa-icon qc-filter"
-                      size={3}
-                      aria-label="Icon indicating a menu with filter options"
-                      role="button"
-                    />
-                    {filterCount <= 0
-                      ? "Filters"
-                      : `${filterCount} ${
-                          filterCount > 1 ? `filters` : `filter`
-                        } applied`}
-                    {showFilters && (
-                      <DropdownFilter
-                        filterCount={filterCount}
-                        loading={valueSets.length <= 0}
-                        setShowFilters={setShowFilters}
-                        filterSearch={filterSearch}
-                        setFilterSearch={setFilterSearch}
-                        valueSets={valueSets}
-                        currentUser={currentUser as User}
-                      />
-                    )}
-                  </div>
-                }
+                <Button
+                  type="button"
+                  ref={filterButtonRef}
+                  unstyled
+                  className={classNames(
+                    styles.applyFilters,
+                    filterCount > 0 ? styles.applyFilters_active : "",
+                  )}
+                  onClick={() => {
+                    setShowFilters(true);
+                  }}
+                >
+                  <Icon.FilterList
+                    className="usa-icon qc-filter"
+                    size={3}
+                    aria-label="Icon indicating a menu with filter options"
+                    role="button"
+                  />
+                  {filterCount <= 0
+                    ? "Filters"
+                    : `${filterCount} ${
+                        filterCount > 1 ? `filters` : `filter`
+                      } applied`}
+                </Button>
+                {showFilters && (
+                  <DropdownFilter
+                    focusRef={dropdownRef}
+                    filterCount={filterCount}
+                    loading={valueSets.length <= 0}
+                    setShowFilters={setShowFilters}
+                    filterSearch={filterSearch}
+                    setFilterSearch={setFilterSearch}
+                    valueSets={valueSets}
+                    currentUser={currentUser as User}
+                    setTriggerFocus={() => {
+                      if (filterButtonRef.current) {
+                        filterButtonRef.current.focus();
+                      }
+                    }}
+                  />
+                )}
               </div>
             </div>
             {mode == "manage" && (
@@ -682,6 +715,7 @@ const CodeLibrary: React.FC = () => {
             <div className={styles.resultsContainer}>
               <div className={styles.content__left}>
                 <Table
+                  scrollable
                   className={classNames(
                     "display-flex flex-row",
                     styles.valueSetTable,
@@ -823,6 +857,7 @@ const CodeLibrary: React.FC = () => {
                       >
                         {activeValueSet?.concepts.map((vs) => (
                           <tr
+                            tabIndex={0}
                             key={vs.code}
                             className={classNames(
                               styles.conceptsTable__tableBody_row,
@@ -866,6 +901,7 @@ const CodeLibrary: React.FC = () => {
                           );
                           return (
                             <tr
+                              tabIndex={0}
                               key={concept.code}
                               className={classNames(
                                 styles.conceptsTable__tableBody_row,
