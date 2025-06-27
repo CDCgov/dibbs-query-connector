@@ -13,7 +13,6 @@ import SearchField from "@/app/ui/designSystem/searchField/SearchField";
 import { FormError } from "../buildFromTemplates/BuildFromTemplates";
 import { CONDITION_DRAWER_SEARCH_PLACEHOLDER } from "./utils";
 import { formatDiseaseDisplay, formatCategoryToConditionsMap } from "../utils";
-import { CUSTOM_CONDITION_ID } from "@/app/shared/constants";
 import { useSaveQueryAndRedirect } from "../../../backend/query-building/useSaveQueryAndRedirect";
 
 type ConditionSelectionProps = {
@@ -111,7 +110,7 @@ export const ConditionSelection: React.FC<ConditionSelectionProps> = ({
           }}
         />
 
-        {categoryToConditionsMap && (
+        {filteredCategoryMap && (
           <>
             {(() => {
               const conditionIdToNameMap: { [id: string]: string } = {};
@@ -127,12 +126,10 @@ export const ConditionSelection: React.FC<ConditionSelectionProps> = ({
                     className="margin-bottom-4 display-flex flex-row flex-wrap flex-align-center flex-justify-center"
                     data-testid="selected-pill-container"
                   >
-                    {Object.entries(categoryToConditionsMap)
+                    {Object.entries(filteredCategoryMap)
                       .flatMap(([_, conditions]) => conditions)
-                      .filter(
-                        (condition) =>
-                          constructedQuery.hasOwnProperty(condition.id) &&
-                          condition.id !== CUSTOM_CONDITION_ID,
+                      .filter((condition) =>
+                        constructedQuery.hasOwnProperty(condition.id),
                       )
                       .map((condition) => (
                         <div
@@ -164,7 +161,7 @@ export const ConditionSelection: React.FC<ConditionSelectionProps> = ({
                   <ConditionColumnDisplay
                     constructedQuery={constructedQuery}
                     handleConditionUpdate={handleConditionUpdate}
-                    categoryToConditionsMap={categoryToConditionsMap}
+                    categoryToConditionsMap={filteredCategoryMap}
                     searchFilter={searchFilter}
                     formError={formError}
                     setFormError={setFormError}
