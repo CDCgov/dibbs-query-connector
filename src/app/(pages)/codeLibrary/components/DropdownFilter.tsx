@@ -71,7 +71,7 @@ const DropdownFilter: React.FC<DropdownFilterProps> = ({
   const valueSetCodeSystems = valueSets
     .map((vs) => vs.system)
     .filter((item, index, array) => {
-      return array.indexOf(item) === index;
+      return !!item && array.indexOf(item) === index;
     });
 
   const [myTeamMembers, setMyTeamMembers] = useState<vsAuthorMap>();
