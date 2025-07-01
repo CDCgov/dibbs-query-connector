@@ -34,7 +34,7 @@ jest.mock("@/app/backend/user-management", () => ({
   getUserByUsername: jest.fn(),
 }));
 
-jest.mock(".../../../shared/database-service", () => ({
+jest.mock("@/app/shared/database-service", () => ({
   getAllValueSets: jest.fn().mockReturnValue({ items: [] }),
 }));
 

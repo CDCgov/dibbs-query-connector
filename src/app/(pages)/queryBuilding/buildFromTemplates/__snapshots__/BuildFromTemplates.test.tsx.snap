@@ -1,9 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`tests the valueset selection page interactions filter bulk selection updates only the filtered valuesets 1`] = `
-<body
-  style="padding-right: 0px;"
->
+<body>
   <div>
     <div
       class="main-container__wide mainContainer"
@@ -477,74 +475,77 @@ exports[`tests the valueset selection page interactions filter bulk selection up
                             </div>
                           </div>
                         </div>
-                        <div
-                          aria-label="drawer-container"
-                          class="drawer closed width35"
-                          data-testid="drawer-open-false"
-                          role="dialog"
-                        >
+                        <div>
                           <div
-                            class="drawerContent display-none"
+                            aria-label="drawer-container"
+                            class="drawer closed width35"
+                            data-testid="drawer-open-false"
+                            id="drawer-container"
+                            role="dialog"
                           >
                             <div
-                              class="drawerHeader"
+                              class="drawerContent display-none"
                             >
-                              <button
-                                aria-label="Close drawer"
-                                class="closeButton"
-                                data-testid="close-drawer"
+                              <div
+                                class="drawerHeader"
                               >
-                                <svg
-                                  aria-label="X icon indicating closure"
-                                  class="usa-icon usa-icon--size-3"
-                                  focusable="false"
-                                  height="1em"
-                                  role="img"
-                                  viewBox="0 0 24 24"
-                                  width="1em"
-                                  xmlns="http://www.w3.org/2000/svg"
+                                <button
+                                  aria-label="Close drawer"
+                                  class="closeButton"
+                                  data-testid="close-drawer"
                                 >
-                                  <path
-                                    d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
-                                  />
-                                </svg>
-                              </button>
-                              <h2
-                                class="margin-0 padding-bottom-2"
-                                data-testid="drawer-title"
-                                id="drawer-title"
-                              >
-                                <span />
-                              </h2>
-                              <div>
-                                <input
-                                  class="usa-input searchField"
-                                  data-testid="textInput"
-                                  id="searchFieldTemplate"
-                                  name="searchFieldTemplate"
-                                  placeholder="Search by code or name"
-                                  type="search"
-                                  value=""
-                                />
-                              </div>
-                            </div>
-                            <div
-                              class="drawerBody"
-                            >
-                              <table
-                                class="conceptSelectionTable"
-                              >
-                                <thead>
-                                  <tr
-                                    class="margin-top-3"
+                                  <svg
+                                    aria-label="X icon indicating closure"
+                                    class="usa-icon usa-icon--size-3"
+                                    focusable="false"
+                                    height="1em"
+                                    role="img"
+                                    viewBox="0 0 24 24"
+                                    width="1em"
+                                    xmlns="http://www.w3.org/2000/svg"
                                   >
-                                    <th>
-                                      No matching codes found
-                                    </th>
-                                  </tr>
-                                </thead>
-                                <tbody />
-                              </table>
+                                    <path
+                                      d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+                                    />
+                                  </svg>
+                                </button>
+                                <h2
+                                  class="margin-0 padding-bottom-2"
+                                  data-testid="drawer-title"
+                                  id="drawer-title"
+                                >
+                                  <span />
+                                </h2>
+                                <div>
+                                  <input
+                                    class="usa-input searchField"
+                                    data-testid="textInput"
+                                    id="searchFieldTemplate"
+                                    name="searchFieldTemplate"
+                                    placeholder="Search by code or name"
+                                    type="search"
+                                    value=""
+                                  />
+                                </div>
+                              </div>
+                              <div
+                                class="drawerBody"
+                              >
+                                <table
+                                  class="conceptSelectionTable"
+                                >
+                                  <thead>
+                                    <tr
+                                      class="margin-top-3"
+                                    >
+                                      <th>
+                                        No matching codes found
+                                      </th>
+                                    </tr>
+                                  </thead>
+                                  <tbody />
+                                </table>
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -555,209 +556,212 @@ exports[`tests the valueset selection page interactions filter bulk selection up
               </div>
             </div>
           </div>
-          <div
-            aria-label="drawer-container"
-            class="drawer closed width35"
-            data-testid="drawer-open-false"
-            role="dialog"
-          >
+          <div>
             <div
-              class="drawerContent display-none"
+              aria-label="drawer-container"
+              class="drawer closed width35"
+              data-testid="drawer-open-false"
+              id="drawer-container"
+              role="dialog"
             >
               <div
-                class="drawerHeader"
+                class="drawerContent display-none"
               >
-                <button
-                  aria-label="Close drawer"
-                  class="closeButton"
-                  data-testid="close-drawer"
+                <div
+                  class="drawerHeader"
                 >
-                  <svg
-                    aria-label="X icon indicating closure"
-                    class="usa-icon usa-icon--size-3"
-                    focusable="false"
-                    height="1em"
-                    role="img"
-                    viewBox="0 0 24 24"
-                    width="1em"
-                    xmlns="http://www.w3.org/2000/svg"
+                  <button
+                    aria-label="Close drawer"
+                    class="closeButton"
+                    data-testid="close-drawer"
                   >
-                    <path
-                      d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+                    <svg
+                      aria-label="X icon indicating closure"
+                      class="usa-icon usa-icon--size-3"
+                      focusable="false"
+                      height="1em"
+                      role="img"
+                      viewBox="0 0 24 24"
+                      width="1em"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+                      />
+                    </svg>
+                  </button>
+                  <h2
+                    class="margin-0 padding-bottom-2"
+                    data-testid="drawer-title"
+                    id="drawer-title"
+                  >
+                    Add Condition(s)
+                  </h2>
+                  <div>
+                    <input
+                      class="usa-input searchField"
+                      data-testid="textInput"
+                      id="searchFieldTemplate"
+                      name="searchFieldTemplate"
+                      placeholder="Search condition or category"
+                      type="search"
+                      value=""
                     />
-                  </svg>
-                </button>
-                <h2
-                  class="margin-0 padding-bottom-2"
-                  data-testid="drawer-title"
-                  id="drawer-title"
-                >
-                  Add Condition(s)
-                </h2>
-                <div>
-                  <input
-                    class="usa-input searchField"
-                    data-testid="textInput"
-                    id="searchFieldTemplate"
-                    name="searchFieldTemplate"
-                    placeholder="Search condition or category"
-                    type="search"
-                    value=""
-                  />
-                </div>
-              </div>
-              <div
-                class="drawerBody"
-              >
-                <div
-                  id="Cancer"
-                >
-                  <div
-                    class="conditionDrawerHeader"
-                  >
-                    <span>
-                      <span
-                        class=""
-                      >
-                        Cancer
-                      </span>
-                    </span>
-                  </div>
-                  <div>
-                    <div
-                      class="conditionItem"
-                      data-testid="update-363346000"
-                      id="update-363346000"
-                    >
-                      <span>
-                         
-                        <span>
-                          <span
-                            class=""
-                          >
-                            Malignant neoplastic disease
-                          </span>
-                        </span>
-                      </span>
-                      <span
-                        class="addButton"
-                        data-testid="condition-drawer-add-363346000"
-                        role="button"
-                      >
-                        ADD
-                      </span>
-                    </div>
-                    <div
-                      class="conditionItem"
-                      data-testid="update-2"
-                      id="update-2"
-                    >
-                      <span>
-                         
-                        <span>
-                          <span
-                            class=""
-                          >
-                            Cancer (Leukemia)
-                          </span>
-                        </span>
-                      </span>
-                      <span
-                        class="addButton"
-                        data-testid="condition-drawer-add-2"
-                        role="button"
-                      >
-                        ADD
-                      </span>
-                    </div>
                   </div>
                 </div>
                 <div
-                  id="Sexually Transmitted Diseases"
+                  class="drawerBody"
                 >
                   <div
-                    class="conditionDrawerHeader"
+                    id="Cancer"
                   >
-                    <span>
-                      <span
-                        class=""
-                      >
-                        Sexually Transmitted Diseases (STI)
-                      </span>
-                    </span>
-                  </div>
-                  <div>
                     <div
-                      class="conditionItem"
-                      data-testid="update-76272004"
-                      id="update-76272004"
+                      class="conditionDrawerHeader"
                     >
                       <span>
-                         
-                        <span>
-                          <span
-                            class=""
-                          >
-                            Syphilis
-                          </span>
+                        <span
+                          class=""
+                        >
+                          Cancer
                         </span>
-                      </span>
-                      <span
-                        class="addButton"
-                        data-testid="condition-drawer-add-76272004"
-                        role="button"
-                      >
-                        ADD
                       </span>
                     </div>
-                    <div
-                      class="conditionItem"
-                      data-testid="update-240589008"
-                      id="update-240589008"
-                    >
-                      <span>
-                         
+                    <div>
+                      <div
+                        class="conditionItem"
+                        data-testid="update-363346000"
+                        id="update-363346000"
+                      >
                         <span>
-                          <span
-                            class=""
-                          >
-                            Chlamydia trachomatis infection
+                           
+                          <span>
+                            <span
+                              class=""
+                            >
+                              Malignant neoplastic disease
+                            </span>
                           </span>
                         </span>
-                      </span>
-                      <span
-                        class="addButton"
-                        data-testid="condition-drawer-add-240589008"
-                        role="button"
+                        <span
+                          class="addButton"
+                          data-testid="condition-drawer-add-363346000"
+                          role="button"
+                        >
+                          ADD
+                        </span>
+                      </div>
+                      <div
+                        class="conditionItem"
+                        data-testid="update-2"
+                        id="update-2"
                       >
-                        ADD
-                      </span>
-                    </div>
-                    <div
-                      class="conditionItem"
-                      data-testid="update-15628003"
-                      id="update-15628003"
-                    >
-                      <span>
-                         
                         <span>
-                          <span
-                            class=""
-                          >
-                            Gonorrhea
+                           
+                          <span>
+                            <span
+                              class=""
+                            >
+                              Cancer (Leukemia)
+                            </span>
                           </span>
                         </span>
-                      </span>
-                      <span
-                        class="addedStatus"
-                        data-testid="condition-drawer-added-15628003"
-                      >
-                        Added
-                      </span>
+                        <span
+                          class="addButton"
+                          data-testid="condition-drawer-add-2"
+                          role="button"
+                        >
+                          ADD
+                        </span>
+                      </div>
                     </div>
                   </div>
+                  <div
+                    id="Sexually Transmitted Diseases"
+                  >
+                    <div
+                      class="conditionDrawerHeader"
+                    >
+                      <span>
+                        <span
+                          class=""
+                        >
+                          Sexually Transmitted Diseases (STI)
+                        </span>
+                      </span>
+                    </div>
+                    <div>
+                      <div
+                        class="conditionItem"
+                        data-testid="update-76272004"
+                        id="update-76272004"
+                      >
+                        <span>
+                           
+                          <span>
+                            <span
+                              class=""
+                            >
+                              Syphilis
+                            </span>
+                          </span>
+                        </span>
+                        <span
+                          class="addButton"
+                          data-testid="condition-drawer-add-76272004"
+                          role="button"
+                        >
+                          ADD
+                        </span>
+                      </div>
+                      <div
+                        class="conditionItem"
+                        data-testid="update-240589008"
+                        id="update-240589008"
+                      >
+                        <span>
+                           
+                          <span>
+                            <span
+                              class=""
+                            >
+                              Chlamydia trachomatis infection
+                            </span>
+                          </span>
+                        </span>
+                        <span
+                          class="addButton"
+                          data-testid="condition-drawer-add-240589008"
+                          role="button"
+                        >
+                          ADD
+                        </span>
+                      </div>
+                      <div
+                        class="conditionItem"
+                        data-testid="update-15628003"
+                        id="update-15628003"
+                      >
+                        <span>
+                           
+                          <span>
+                            <span
+                              class=""
+                            >
+                              Gonorrhea
+                            </span>
+                          </span>
+                        </span>
+                        <span
+                          class="addedStatus"
+                          data-testid="condition-drawer-added-15628003"
+                        >
+                          Added
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                   
                 </div>
-                 
               </div>
             </div>
           </div>
