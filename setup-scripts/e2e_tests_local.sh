@@ -28,7 +28,7 @@ done
 echo -e "\nAidbox seeder finished!"
 
 # Run Next dev without auth to allow the e2e's to work
-npx dotenv -e ./.env.e2e -- next dev &
+npx dotenv -e ./.env.e2e -- next dev --turbopack &
 
 echo "Waiting Next server to be healthy..."
 while ! nc -z localhost 3000; do
