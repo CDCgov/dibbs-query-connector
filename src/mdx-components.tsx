@@ -14,6 +14,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
         style={{ width: "100%", height: "auto" }}
         width={1000}
         height={1000}
+        alt-label={"Image diagram to illustrate documentation concept"}
         {...(props as ImageProps)}
       />
     ),
