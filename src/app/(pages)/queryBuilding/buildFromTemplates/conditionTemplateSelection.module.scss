@@ -386,6 +386,10 @@ input.errorMessage {
 .viewCodesBtn {
   // toggle to block on hover
   display: none;
+  min-width: 8rem;
+  height: 2rem;
+  font-size: 14px;
+  padding: 0.5rem 1.25rem;
 }
 
 .accordionBodyExpanded {
@@ -407,11 +411,6 @@ input.errorMessage {
     }
 
     .viewCodesBtn {
-      min-width: 8rem;
-      height: 2rem;
-      font-size: 14px;
-      padding: 0.5rem 1.25rem;
-
       &:hover {
         cursor: pointer;
       }
