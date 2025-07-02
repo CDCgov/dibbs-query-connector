@@ -6,6 +6,7 @@ bash ./setup-scripts/setup_e2e.sh
 
 echo "AIDBOX_BASE_URL=http://aidbox:8080" >> .env.e2e
 echo "APP_HOSTNAME=http://query-connector:3000" >> .env.e2e
+echo "NEXT_PUBLIC_AUTH_PROVIDER=keycloak" >> .env.e2e
 
 docker compose down --volumes --remove-orphans
 docker compose -f docker-compose-e2e.yaml --env-file .env.e2e up -d --build 

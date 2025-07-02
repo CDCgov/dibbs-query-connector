@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`tests the valueset selection page interactions filter bulk selection updates only the filtered valuesets 1`] = `
 <body>
@@ -245,6 +245,7 @@ exports[`tests the valueset selection page interactions filter bulk selection up
                               focusable="false"
                               height="1em"
                               role="img"
+                              style="rotate: 180deg;"
                               viewBox="0 0 24 24"
                               width="1em"
                               xmlns="http://www.w3.org/2000/svg"
