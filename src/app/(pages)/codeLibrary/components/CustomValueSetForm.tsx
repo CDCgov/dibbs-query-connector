@@ -117,9 +117,9 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
     }
 
     fetchCurrentUser();
-    if (backBtnRef.current) {
-      backBtnRef.current.focus();
-    }
+
+    const nameInput = document.getElementById(`vsName`);
+    nameInput?.focus();
   }, []);
 
   useEffect(() => {
@@ -154,10 +154,6 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
   useEffect(() => {
     if (!customValueSet.valueSetId) {
       handleAddCodeFocus();
-    }
-    if (mode == "edit") {
-      const nameInput = document.getElementById(`vsName`);
-      nameInput?.focus();
     }
   }, [Object.values(codesMap).length]);
 
@@ -381,6 +377,7 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
       if (mode == "create" && isValid) {
         setMode("edit");
       }
+      backBtnRef.current?.focus();
     }
   };
 
