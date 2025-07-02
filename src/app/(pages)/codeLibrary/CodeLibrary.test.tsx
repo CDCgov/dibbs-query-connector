@@ -39,7 +39,7 @@ jest.mock(
     ({ children }: React.PropsWithChildren) => <div>{children}</div>,
 );
 
-jest.mock(".../../../shared/database-service", () => ({
+jest.mock("@/app/shared/database-service", () => ({
   getAllValueSets: jest.fn().mockReturnValue({ items: [] }),
   getConditionsData: jest.fn().mockReturnValue({}),
   groupConditionConceptsIntoValueSets: jest.fn().mockReturnValue([]),

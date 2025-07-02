@@ -1,6 +1,10 @@
-resource "aws_acm_certificate" "cloudflare_cert" {
-  private_key      = var.qc_tls_key  # Private key from Cloudflare
-  certificate_body = var.qc_tls_cert # Public cert from Cloudflare
+
+
+data "aws_acm_certificate" "acm_cert" {
+  domain      = "queryconnector.dev"
+  statuses    = ["ISSUED"]
+  types       = ["AMAZON_ISSUED"]
+  most_recent = true
 }
 
 data "aws_caller_identity" "current" {}
@@ -266,7 +270,7 @@ module "ecs" {
   internal = var.internal
 
   # If the intent is to enable https and port 443, pass the arn of the cert in AWS certificate manager. This cert will be applied to the load balancer. (default is "")
-  certificate_arn = aws_acm_certificate.cloudflare_cert.arn
+  certificate_arn = data.aws_acm_certificate.acm_cert.arn
 
   # If the intent is to disable authentication, set ecr_viewer_app_env to "test" (default is "prod")
   # ecr_viewer_app_env = "test"

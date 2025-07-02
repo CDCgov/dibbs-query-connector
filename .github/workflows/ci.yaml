@@ -45,15 +45,24 @@ jobs:
         run: |
           echo "AIDBOX_LICENSE=${{ secrets.AIDBOX_LICENSE }}" > .env
           echo "AIDBOX_BASE_URL=http://localhost:8080" >> .env
-          echo "APP_HOSTNAME=http://localhost:3000" >> .env
+          echo "APP_HOSTNAME=http://query-connector:3000" >> .env
       - name: Run tests
         run: |
+          sudo mkdir keys
+          sudo chmod -R 755 keys
+          sudo chown -R $USER:$USER keys
           npm run test:ci
         # uncomment these next few lines and the corresponding log import
         # in the setup script you're trying to debug if you're having trouble
         # in CI. All the best, brave engineer (￣^￣ )ゞ
-      #   continue-on-error: true
+        # continue-on-error: true
 
+      # - name: Upload keys directory
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: keys
+      #     path: ./keys
+      #
       # - name: Upload Docker Logs
       #   uses: actions/upload-artifact@v4
       #   with:

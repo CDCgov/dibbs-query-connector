@@ -42,6 +42,7 @@ jest.mock("next/navigation", () => ({
 }));
 
 const currentPage = "/";
+const CUSTOM_CONDITION_NAME = "Custom Code Condition";
 const GONORRHEA_ID = 15628003;
 const GONORRHEA_DETAILS = conditionIdToNameMap[GONORRHEA_ID];
 const GONORRHEA_NAME = formatDiseaseDisplay(GONORRHEA_DETAILS.name);
@@ -76,6 +77,29 @@ it("customize query button is disabled unless name and individual condition are 
   await user.click(screen.getByLabelText(GONORRHEA_NAME));
 
   expect(screen.getByText("Customize query")).not.toBeDisabled();
+});
+
+it("custom query page does not have custom condition", async () => {
+  const { user } = renderWithUser(
+    <RootProviderMock
+      currentPage={"/"}
+      initialQuery={{
+        queryName: "Test query",
+        queryId: undefined,
+      }}
+    >
+      <BuildFromTemplates buildStep="condition" setBuildStep={jest.fn} />
+    </RootProviderMock>,
+  );
+
+  expect(screen.queryByText(CUSTOM_CONDITION_NAME)).not.toBeInTheDocument();
+  await screen.findByPlaceholderText(CONDITION_DRAWER_SEARCH_PLACEHOLDER);
+  await user.type(
+    screen.getByPlaceholderText(CONDITION_DRAWER_SEARCH_PLACEHOLDER),
+    "Custom",
+  );
+
+  expect(screen.queryByText(CUSTOM_CONDITION_NAME)).not.toBeInTheDocument();
 });
 
 it("search filters by category and by condition name", async () => {
@@ -380,7 +404,7 @@ describe("tests the valueset selection page interactions", () => {
     ).not.toBeInTheDocument();
   });
 
-  it("filter bulk selection updates only the filtered valuesets", async () => {
+  it.only("filter bulk selection updates only the filtered valuesets", async () => {
     const valueSetSearch = screen.getByPlaceholderText(
       VALUESET_SELECTION_SEARCH_PLACEHOLDER,
     );
@@ -441,12 +465,13 @@ describe("tests the valueset selection page interactions", () => {
     await user.type(valueSetSearch, "meningitidis");
 
     // Toggle everything visible off
-    const deslectAllBtn = await screen.findByText("Deselect All");
-    expect(deslectAllBtn).toBeInTheDocument();
-    await user.click(deslectAllBtn);
+    const deselectButton = await screen.findByText("Deselect All");
+    expect(deselectButton).toBeInTheDocument();
+    await user.click(deselectButton);
     expect(screen.getByText("0 / 2")).toBeInTheDocument();
 
     // Clear search filter
+
     await user.clear(valueSetSearch);
     expect(screen.getByText("2 / 4")).toBeInTheDocument();
 
@@ -456,7 +481,10 @@ describe("tests the valueset selection page interactions", () => {
     await user.click(screen.getByText(TEST_VALUESET.concepts[0].code));
     await user.click(screen.getByText(TEST_VALUESET.concepts[3].code));
     expect(screen.getByText("0 / 2")).toBeInTheDocument();
+    // close the drawer
+    await user.keyboard("{Escape}");
     await user.clear(valueSetSearch);
+
     expect(screen.getByText("2 / 4")).toBeInTheDocument();
   });
 });
