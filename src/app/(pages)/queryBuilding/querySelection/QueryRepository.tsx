@@ -125,7 +125,6 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
             }}
             className={styles.createQueryButton}
             type="button"
-            tabIndex={0}
           >
             Create query
           </Button>
@@ -150,7 +149,7 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
               {conditionIdToDetailsMap &&
                 queries
                   .sort((a, b) => (a.queryName[0] > b.queryName[0] ? 1 : -1))
-                  .map((query) => {
+                  .map((query, i) => {
                     const hasCustomOnly =
                       query.conditionsList?.includes(
                         CUSTOM_VALUESET_ARRAY_ID,
@@ -182,7 +181,7 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
                           styles.myQueriesRow,
                           "tableRowWithHover",
                         )}
-                        tabIndex={0}
+                        // tabIndex={0}
                         data-testid={`query-row-${query.queryId}`}
                       >
                         <td title={query.queryName}>{query.queryName}</td>
