@@ -24,7 +24,6 @@ export interface PatientSearchResultsProps {
  * Displays multiple patient search results in a table.
  * @param root0 - PatientSearchResults props.
  * @param root0.patients - The array of Patient resources.
- * @param root0.goBack - The function to go back to the previous page.
  * @param root0.setMode - Redirect function to handle results view routing
  * @param root0.setPatientForQueryResponse - Callback function to update the
  * patient being searched for
