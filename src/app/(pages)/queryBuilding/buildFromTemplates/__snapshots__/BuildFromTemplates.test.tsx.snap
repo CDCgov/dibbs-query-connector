@@ -1,9 +1,7 @@
 // Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`tests the valueset selection page interactions filter bulk selection updates only the filtered valuesets 1`] = `
-<body
-  style="padding-right: 0px;"
->
+<body>
   <div>
     <div
       class="main-container__wide mainContainer"

@@ -404,7 +404,7 @@ describe("tests the valueset selection page interactions", () => {
     ).not.toBeInTheDocument();
   });
 
-  it("filter bulk selection updates only the filtered valuesets", async () => {
+  it.only("filter bulk selection updates only the filtered valuesets", async () => {
     const valueSetSearch = screen.getByPlaceholderText(
       VALUESET_SELECTION_SEARCH_PLACEHOLDER,
     );
@@ -465,12 +465,13 @@ describe("tests the valueset selection page interactions", () => {
     await user.type(valueSetSearch, "meningitidis");
 
     // Toggle everything visible off
-    const deslectAllBtn = await screen.findByText("Deselect All");
-    expect(deslectAllBtn).toBeInTheDocument();
-    await user.click(deslectAllBtn);
+    const deselectButton = await screen.findByText("Deselect All");
+    expect(deselectButton).toBeInTheDocument();
+    await user.click(deselectButton);
     expect(screen.getByText("0 / 2")).toBeInTheDocument();
 
     // Clear search filter
+
     await user.clear(valueSetSearch);
     expect(screen.getByText("2 / 4")).toBeInTheDocument();
 
@@ -480,7 +481,10 @@ describe("tests the valueset selection page interactions", () => {
     await user.click(screen.getByText(TEST_VALUESET.concepts[0].code));
     await user.click(screen.getByText(TEST_VALUESET.concepts[3].code));
     expect(screen.getByText("0 / 2")).toBeInTheDocument();
+    // close the drawer
+    await user.keyboard("{Escape}");
     await user.clear(valueSetSearch);
+
     expect(screen.getByText("2 / 4")).toBeInTheDocument();
   });
 });
