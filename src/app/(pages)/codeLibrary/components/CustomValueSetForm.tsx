@@ -118,7 +118,6 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
 
     fetchCurrentUser();
     if (backBtnRef.current) {
-      console.log(backBtnRef);
       backBtnRef.current.focus();
     }
   }, []);
@@ -146,7 +145,6 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
   }, [mode]);
 
   async function handleAddCodeFocus() {
-    console.log(Object.values(codesMap));
     const indexPosition = Object.values(codesMap).length - 1;
     const addedInput = document.getElementById(`code-id-${indexPosition}`);
     addedInput?.focus();

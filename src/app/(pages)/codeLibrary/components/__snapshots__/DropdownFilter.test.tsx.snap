@@ -3,7 +3,7 @@
 exports[`DropdownFilter renders a 'clear filters' button when filters are applied 1`] = `
 <body>
   <div>
-    <form
+    <div
       class="filtersDropdown"
     >
       <div
@@ -112,14 +112,25 @@ exports[`DropdownFilter renders a 'clear filters' button when filters are applie
           Created by my team
         </button>
       </div>
-      <button
-        class="usa-button clearFiltersBtn"
-        data-testid="button"
-        type="button"
+      <div
+        class="dropdownButtons"
       >
-        Clear all filters
-      </button>
-    </form>
+        <button
+          class="usa-button clearFiltersBtn"
+          data-testid="button"
+          type="button"
+        >
+          Clear all filters
+        </button>
+        <button
+          class="usa-button clearFiltersBtn"
+          data-testid="button"
+          type="button"
+        >
+          Close
+        </button>
+      </div>
+    </div>
   </div>
 </body>
 `;
@@ -127,7 +138,7 @@ exports[`DropdownFilter renders a 'clear filters' button when filters are applie
 exports[`DropdownFilter renders correctly 1`] = `
 <body>
   <div>
-    <form
+    <div
       class="filtersDropdown"
     >
       <div
@@ -236,7 +247,18 @@ exports[`DropdownFilter renders correctly 1`] = `
           Created by my team
         </button>
       </div>
-    </form>
+      <div
+        class="dropdownButtons"
+      >
+        <button
+          class="usa-button clearFiltersBtn"
+          data-testid="button"
+          type="button"
+        >
+          Close
+        </button>
+      </div>
+    </div>
   </div>
 </body>
 `;

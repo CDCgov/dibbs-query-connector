@@ -7,8 +7,8 @@ exports[`tests the valueset selection page interactions filter bulk selection up
       class="main-container__wide mainContainer"
     >
       <a
-        aria-label="Back arrow indicating ability to navigate back a page if clicked"
-        class="back-link text-no-underline"
+        aria-label="Back arrow, Back to condition selection"
+        class="back-link text-no-underline width-fit-content"
         data-testid="backArrowLink"
         href="#"
       >
