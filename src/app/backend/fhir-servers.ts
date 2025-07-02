@@ -19,6 +19,14 @@ export interface AuthData {
   headers?: Record<string, string>;
 }
 
+// Define an interface for patient match configuration
+export interface PatientMatchData {
+  enabled: boolean;
+  onlyCertainMatches: boolean;
+  matchCount: number;
+  supportsMatch: boolean;
+}
+
 class FhirServerConfigServiceInternal {
   /**
    * Internal implementation class that performs the underlying database read
@@ -118,6 +126,7 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
    * @param defaultServer - Whether this is the default server
    * @param lastConnectionSuccessful - Optional boolean indicating if the last connection was successful
    * @param authData - Authentication data including auth type and credentials
+   * @param patientMatchConfiguration - Optional patient match configuration
    * @returns An object indicating success or failure with optional error message
    */
   @transaction
@@ -130,6 +139,7 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
     defaultServer: boolean,
     lastConnectionSuccessful?: boolean,
     authData?: AuthData,
+    patientMatchConfiguration?: PatientMatchData,
   ) {
     const updateQuery = `
     UPDATE fhir_servers 
@@ -148,6 +158,12 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
       scopes = $12,
       access_token = $13,
       token_expiry = $14
+      patient_match_configuration = jsonb_build_object(
+        'enabled', $15,
+        'only_certain_matches', $16,
+        'match_count', $17,
+        'custom_match_required', $18
+      )
     WHERE id = $1
     RETURNING *;
   `;
@@ -190,6 +206,10 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
         authData?.scopes || null,
         authData?.accessToken || null,
         authData?.tokenExpiry || null,
+        patientMatchConfiguration?.enabled || null,
+        patientMatchConfiguration?.onlyCertainMatches || null,
+        patientMatchConfiguration?.matchCount || null,
+        patientMatchConfiguration?.supportsMatch || null,
       ]);
 
       // Clear the cache so the next getFhirServerConfigs call will fetch fresh data
@@ -223,6 +243,7 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
    * @param defaultServer - Whether this is the default server
    * @param lastConnectionSuccessful - Optional boolean indicating if the last connection was successful
    * @param authData - Authentication data including auth type and credentials
+   * @param patientMatchConfiguration - Optional patient match configuration
    * @returns An object indicating success or failure with optional error message
    */
 
@@ -235,6 +256,7 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
     defaultServer: boolean,
     lastConnectionSuccessful?: boolean,
     authData?: AuthData,
+    patientMatchConfiguration?: PatientMatchData,
   ) {
     try {
       // Default auth type to none if not provided
@@ -273,6 +295,10 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
         authData?.scopes || null,
         authData?.accessToken || null,
         authData?.tokenExpiry || null,
+        patientMatchConfiguration?.enabled || null,
+        patientMatchConfiguration?.onlyCertainMatches || null,
+        patientMatchConfiguration?.matchCount || null,
+        patientMatchConfiguration?.supportsMatch || null,
       ]);
 
       // Clear the cache so the next getFhirServerConfigs call will fetch fresh data

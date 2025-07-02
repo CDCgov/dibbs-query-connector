@@ -16,10 +16,14 @@ import type { ModalProps } from "../../ui/designSystem/modal/Modal";
 import WithAuth from "@/app/ui/components/withAuth/WithAuth";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import { FhirServerConfig } from "@/app/models/entities/fhir-servers";
-import { testFhirServerConnection } from "@/app/shared/testConnection";
+import {
+  testFhirServerConnection,
+  checkFhirServerSupportsMatch,
+} from "@/app/shared/testConnection";
 import {
   getFhirServerConfigs,
   AuthData,
+  PatientMatchData,
   insertFhirServer,
   updateFhirServer,
   deleteFhirServer,
@@ -56,6 +60,8 @@ const FhirServers: React.FC = () => {
   const [tokenEndpoint, setTokenEndpoint] = useState("");
   const [scopes, setScopes] = useState("");
   const [disableCertValidation, setDisableCertValidation] = useState(false);
+  const [patientMatchData, setPatientMatchData] =
+    useState<PatientMatchData | null>(null);
   const [defaultServer, setDefaultServer] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState<
     "idle" | "success" | "error"
@@ -126,6 +132,17 @@ const FhirServers: React.FC = () => {
         setHeaders(headerPairs);
       } else {
         setHeaders([]);
+      }
+      // Set patient match data if available
+      if (server?.patientMatchConfiguration) {
+        setPatientMatchData(server.patientMatchConfiguration);
+      } else {
+        setPatientMatchData({
+          enabled: false,
+          onlyCertainMatches: false,
+          matchCount: 0,
+          supportsMatch: false,
+        });
       }
 
       // Set auth method and corresponding fields based on server data
@@ -261,38 +278,55 @@ const FhirServers: React.FC = () => {
   };
 
   const handleTestConnection = async () => {
-    // 1. Test the connection (returns { success, error })
+    // 1. Build auth data
+    const authData: AuthData = {
+      authType: authMethod,
+      headers: convertHeadersToObject(),
+      bearerToken: authMethod === "basic" ? bearerToken : undefined,
+      clientId: ["client_credentials", "SMART"].includes(authMethod)
+        ? clientId
+        : undefined,
+      clientSecret:
+        authMethod === "client_credentials" ? clientSecret : undefined,
+      tokenEndpoint: ["client_credentials", "SMART"].includes(authMethod)
+        ? tokenEndpoint
+        : undefined,
+      scopes: ["client_credentials", "SMART"].includes(authMethod)
+        ? scopes
+        : undefined,
+    };
+
+    // 2. Run connection test
     const result = await testFhirServerConnection(
       serverUrl,
       disableCertValidation,
-      {
-        authType: authMethod,
-        headers: convertHeadersToObject(),
-        bearerToken: authMethod === "basic" ? bearerToken : undefined,
-        clientId: ["client_credentials", "SMART"].includes(authMethod)
-          ? clientId
-          : undefined,
-        clientSecret:
-          authMethod === "client_credentials" ? clientSecret : undefined,
-        tokenEndpoint: ["client_credentials", "SMART"].includes(authMethod)
-          ? tokenEndpoint
-          : undefined,
-        scopes: ["client_credentials", "SMART"].includes(authMethod)
-          ? scopes
-          : undefined,
-      },
+      authData,
     );
 
-    // 2. Update connection status in DB
+    // 3. Independently check $match support
+    const supportsMatch = await checkFhirServerSupportsMatch(
+      serverUrl,
+      disableCertValidation,
+      authData,
+    );
+    console.log("Supports $match:", supportsMatch);
+
+    // 4. Update connection status in DB
     const updateResult = await updateFhirServerConnectionStatus(
       selectedServer?.name || serverName,
       result.success,
     );
 
+    // 5. Update frontend state
     setConnectionStatus(result.success ? "success" : "error");
     setErrorMessage(result.error);
+    setPatientMatchData((prev) => ({
+      enabled: prev?.enabled ?? false,
+      onlyCertainMatches: prev?.onlyCertainMatches ?? false,
+      matchCount: prev?.matchCount ?? 0,
+      supportsMatch,
+    }));
 
-    // 3. Update the frontend server row to reflect new last checked time
     if (updateResult.server) {
       setFhirServers((prev) =>
         prev.map((srv) =>
@@ -718,6 +752,56 @@ const FhirServers: React.FC = () => {
           </select>
 
           {renderAuthMethodFields()}
+
+          {!!patientMatchData?.supportsMatch && (
+            <div className="margin-top-4 border-top padding-top-2">
+              <h2 className="font-heading-lg margin-bottom-2">
+                Patient $match settings
+              </h2>
+
+              <Checkbox
+                id="match-enabled"
+                label="Enable patient matching"
+                checked={patientMatchData.enabled}
+                onChange={(e) =>
+                  setPatientMatchData((prev) => ({
+                    ...prev!,
+                    enabled: e.target.checked,
+                  }))
+                }
+              />
+
+              <Checkbox
+                id="match-only-certain"
+                label="Only include certain matches"
+                checked={patientMatchData.onlyCertainMatches}
+                onChange={(e) =>
+                  setPatientMatchData((prev) => ({
+                    ...prev!,
+                    onlyCertainMatches: e.target.checked,
+                  }))
+                }
+              />
+
+              <Label htmlFor="match-count">
+                Number of patient matches to return
+              </Label>
+              <TextInput
+                id="match-count"
+                name="match-count"
+                type="number"
+                min="1"
+                max="20"
+                value={patientMatchData.matchCount}
+                onChange={(e) =>
+                  setPatientMatchData((prev) => ({
+                    ...prev!,
+                    matchCount: Number(e.target.value),
+                  }))
+                }
+              />
+            </div>
+          )}
 
           <div className="margin-top-3" data-testid="custom-headers">
             <Label htmlFor="custom-headers">Custom Headers</Label>

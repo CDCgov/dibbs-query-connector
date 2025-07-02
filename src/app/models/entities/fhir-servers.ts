@@ -15,4 +15,10 @@ export interface FhirServerConfig {
   scopes?: string;
   accessToken?: string;
   tokenExpiry?: string;
+  patientMatchConfiguration?: {
+    enabled: boolean;
+    onlyCertainMatches: boolean;
+    matchCount: number;
+    supportsMatch: boolean;
+  };
 }
