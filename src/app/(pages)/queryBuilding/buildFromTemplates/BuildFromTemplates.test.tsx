@@ -404,7 +404,7 @@ describe("tests the valueset selection page interactions", () => {
     ).not.toBeInTheDocument();
   });
 
-  it.only("filter bulk selection updates only the filtered valuesets", async () => {
+  it("filter bulk selection updates only the filtered valuesets", async () => {
     const valueSetSearch = screen.getByPlaceholderText(
       VALUESET_SELECTION_SEARCH_PLACEHOLDER,
     );
