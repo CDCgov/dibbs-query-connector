@@ -115,6 +115,7 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
    * @param name - The new name of the FHIR server
    * @param hostname - The new URL/hostname of the FHIR server
    * @param disableCertValidation - Whether to disable certificate validation
+   * @param mutualTls - Whether to use mutual TLS
    * @param defaultServer - Whether this is the default server
    * @param lastConnectionSuccessful - Optional boolean indicating if the last connection was successful
    * @param authData - Authentication data including auth type and credentials
@@ -127,6 +128,7 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
     name: string,
     hostname: string,
     disableCertValidation: boolean,
+    mutualTls: boolean,
     defaultServer: boolean,
     lastConnectionSuccessful?: boolean,
     authData?: AuthData,
@@ -147,7 +149,8 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
       token_endpoint = $11,
       scopes = $12,
       access_token = $13,
-      token_expiry = $14
+      token_expiry = $14,
+      mutual_tls = $15
     WHERE id = $1
     RETURNING *;
   `;
@@ -190,6 +193,7 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
         authData?.scopes || null,
         authData?.accessToken || null,
         authData?.tokenExpiry || null,
+        mutualTls,
       ]);
 
       // Clear the cache so the next getFhirServerConfigs call will fetch fresh data
@@ -220,6 +224,7 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
    * @param name - The name of the FHIR server
    * @param hostname - The URL/hostname of the FHIR server
    * @param disableCertValidation - Whether to disable certificate validation
+   * @param mutualTls - Whether to use mutual TLS
    * @param defaultServer - Whether this is the default server
    * @param lastConnectionSuccessful - Optional boolean indicating if the last connection was successful
    * @param authData - Authentication data including auth type and credentials
@@ -232,6 +237,7 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
     name: string,
     hostname: string,
     disableCertValidation: boolean,
+    mutualTls: boolean,
     defaultServer: boolean,
     lastConnectionSuccessful?: boolean,
     authData?: AuthData,
@@ -258,7 +264,16 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
         };
       }
 
-      const result = await dbService.query(FHIR_SERVER_INSERT_QUERY, [
+      // Update the insert query to include mutual_tls
+      const updatedInsertQuery = FHIR_SERVER_INSERT_QUERY.replace(
+        "($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
+        "($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)",
+      ).replace(
+        "(name, hostname, last_connection_attempt, last_connection_successful, headers, disable_cert_validation, default_server, auth_type, client_id, client_secret, token_endpoint, scopes, access_token, token_expiry)",
+        "(name, hostname, last_connection_attempt, last_connection_successful, headers, disable_cert_validation, default_server, auth_type, client_id, client_secret, token_endpoint, scopes, access_token, token_expiry, mutual_tls)",
+      );
+
+      const result = await dbService.query(updatedInsertQuery, [
         name,
         hostname,
         new Date(),
@@ -273,6 +288,7 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
         authData?.scopes || null,
         authData?.accessToken || null,
         authData?.tokenExpiry || null,
+        mutualTls,
       ]);
 
       // Clear the cache so the next getFhirServerConfigs call will fetch fresh data

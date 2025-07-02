@@ -56,6 +56,7 @@ const FhirServers: React.FC = () => {
   const [tokenEndpoint, setTokenEndpoint] = useState("");
   const [scopes, setScopes] = useState("");
   const [disableCertValidation, setDisableCertValidation] = useState(false);
+  const [mutualTls, setMutualTls] = useState(false);
   const [defaultServer, setDefaultServer] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState<
     "idle" | "success" | "error"
@@ -97,6 +98,7 @@ const FhirServers: React.FC = () => {
     setScopes("");
     setConnectionStatus("idle");
     setDisableCertValidation(false);
+    setMutualTls(false);
     setDefaultServer(false);
     setErrorMessage("");
     setSelectedServer(null);
@@ -111,6 +113,7 @@ const FhirServers: React.FC = () => {
       setServerUrl(server.hostname);
       setConnectionStatus("idle");
       setDisableCertValidation(server.disableCertValidation);
+      setMutualTls(server.mutualTls || false);
       setDefaultServer(server.defaultServer);
       setErrorMessage("");
 
@@ -185,7 +188,7 @@ const FhirServers: React.FC = () => {
       window.removeEventListener("mousedown", clearErrorOnModalClose);
       window.removeEventListener("keyup", clearErrorOnModalClose);
     };
-  }, []);
+  }, [clearErrorOnModalClose]);
 
   const addHeader = () => {
     setHeaders([
@@ -248,6 +251,7 @@ const FhirServers: React.FC = () => {
       const response = await testFhirServerConnection(
         url,
         disableCertValidation,
+        mutualTls,
         authData,
       );
       return response;
@@ -265,6 +269,7 @@ const FhirServers: React.FC = () => {
     const result = await testFhirServerConnection(
       serverUrl,
       disableCertValidation,
+      mutualTls,
       {
         authType: authMethod,
         headers: convertHeadersToObject(),
@@ -328,6 +333,7 @@ const FhirServers: React.FC = () => {
         serverName,
         serverUrl,
         disableCertValidation,
+        mutualTls,
         defaultServer,
         connectionResult.success,
         authData,
@@ -348,6 +354,7 @@ const FhirServers: React.FC = () => {
         serverName,
         serverUrl,
         disableCertValidation,
+        mutualTls,
         defaultServer,
         connectionResult.success,
         authData,
@@ -609,6 +616,9 @@ const FhirServers: React.FC = () => {
                     {fhirServer.defaultServer ? (
                       <Tag className="margin-left-2">DEFAULT</Tag>
                     ) : null}
+                    {fhirServer.mutualTls ? (
+                      <Tag className="margin-left-2">mTLS</Tag>
+                    ) : null}
                   </td>
                   <td>{fhirServer.hostname}</td>
                   <td>
@@ -789,6 +799,19 @@ const FhirServers: React.FC = () => {
             checked={disableCertValidation}
             onChange={(e) => setDisableCertValidation(e.target.checked)}
           />
+
+          <Checkbox
+            id="mutual-tls"
+            label="Enable Mutual TLS"
+            checked={mutualTls}
+            onChange={(e) => setMutualTls(e.target.checked)}
+          />
+          {mutualTls && (
+            <div className="usa-hint margin-left-4 margin-top-0">
+              Mutual TLS certificates will be loaded from the keys directory or
+              MTLS_CERT and MTLS_KEY environment variables.
+            </div>
+          )}
 
           <Checkbox
             id="default-server"
