@@ -17,6 +17,7 @@ export interface FhirServerConfig {
   tokenExpiry?: string;
   patientMatchConfiguration?: {
     enabled: boolean;
+    onlySingleMatch: boolean;
     onlyCertainMatches: boolean;
     matchCount: number;
     supportsMatch: boolean;

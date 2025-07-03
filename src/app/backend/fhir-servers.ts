@@ -22,6 +22,7 @@ export interface AuthData {
 // Define an interface for patient match configuration
 export interface PatientMatchData {
   enabled: boolean;
+  onlySingleMatch: boolean;
   onlyCertainMatches: boolean;
   matchCount: number;
   supportsMatch: boolean;
@@ -207,6 +208,7 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
         authData?.accessToken || null,
         authData?.tokenExpiry || null,
         patientMatchConfiguration?.enabled || null,
+        patientMatchConfiguration?.onlySingleMatch || null,
         patientMatchConfiguration?.onlyCertainMatches || null,
         patientMatchConfiguration?.matchCount || null,
         patientMatchConfiguration?.supportsMatch || null,

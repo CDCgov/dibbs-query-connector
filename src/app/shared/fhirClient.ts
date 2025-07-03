@@ -459,20 +459,27 @@ class FHIRClient {
       await client.ensureValidToken();
 
       const response = await client.get("/metadata");
-      console.log("Response from /metadata:", response);
       if (!response.ok) return false;
 
       const json = await response.json();
 
-      return (
-        Array.isArray(json?.rest?.[0]?.resource) &&
-        json.rest[0].resource.some(
+      const rest = json?.rest?.[0];
+      // Check if the server supports $match operation in Patient resource
+      const supportsMatchInResources =
+        Array.isArray(rest?.resource) &&
+        rest.resource.some(
           (res: { type: string; operation?: { name?: string }[] }) =>
             res.type === "Patient" &&
             Array.isArray(res.operation) &&
             res.operation.some((op) => op.name === "match"),
-        )
-      );
+        );
+
+      // Check if the server supports $match operation globally
+      const supportsMatchGlobally =
+        Array.isArray(rest?.operation) &&
+        rest.operation.some((op: { name?: string }) => op.name === "match");
+
+      return supportsMatchInResources || supportsMatchGlobally;
     } catch (err) {
       console.warn("Failed $match support check:", err);
       return false;

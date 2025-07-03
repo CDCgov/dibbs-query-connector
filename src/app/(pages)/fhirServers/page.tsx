@@ -62,6 +62,13 @@ const FhirServers: React.FC = () => {
   const [disableCertValidation, setDisableCertValidation] = useState(false);
   const [patientMatchData, setPatientMatchData] =
     useState<PatientMatchData | null>(null);
+  const DEFAULT_PATIENT_MATCH_DATA = {
+    enabled: false,
+    onlySingleMatch: false,
+    onlyCertainMatches: false,
+    matchCount: 0,
+    supportsMatch: false,
+  } as PatientMatchData;
   const [defaultServer, setDefaultServer] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState<
     "idle" | "success" | "error"
@@ -107,6 +114,7 @@ const FhirServers: React.FC = () => {
     setErrorMessage("");
     setSelectedServer(null);
     setHeaders([]);
+    setPatientMatchData(DEFAULT_PATIENT_MATCH_DATA);
   };
 
   const handleOpenModal = (mode: ModalMode, server?: FhirServerConfig) => {
@@ -137,12 +145,7 @@ const FhirServers: React.FC = () => {
       if (server?.patientMatchConfiguration) {
         setPatientMatchData(server.patientMatchConfiguration);
       } else {
-        setPatientMatchData({
-          enabled: false,
-          onlyCertainMatches: false,
-          matchCount: 0,
-          supportsMatch: false,
-        });
+        setPatientMatchData(DEFAULT_PATIENT_MATCH_DATA);
       }
 
       // Set auth method and corresponding fields based on server data
@@ -322,6 +325,7 @@ const FhirServers: React.FC = () => {
     setErrorMessage(result.error);
     setPatientMatchData((prev) => ({
       enabled: prev?.enabled ?? false,
+      onlySingleMatch: prev?.onlySingleMatch ?? false,
       onlyCertainMatches: prev?.onlyCertainMatches ?? false,
       matchCount: prev?.matchCount ?? 0,
       supportsMatch,
