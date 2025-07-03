@@ -158,13 +158,8 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
       token_endpoint = $11,
       scopes = $12,
       access_token = $13,
-      token_expiry = $14
-      patient_match_configuration = jsonb_build_object(
-        'enabled', $15,
-        'only_certain_matches', $16,
-        'match_count', $17,
-        'custom_match_required', $18
-      )
+      token_expiry = $14,
+      patient_match_configuration = $15
     WHERE id = $1
     RETURNING *;
   `;
@@ -192,6 +187,20 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
         };
       }
 
+      // Patient match configuration defaults
+      const patientMatchConfigObject =
+        patientMatchConfiguration != null
+          ? {
+              enabled: patientMatchConfiguration.enabled ?? false,
+              only_single_match:
+                patientMatchConfiguration.onlySingleMatch ?? false,
+              only_certain_matches:
+                patientMatchConfiguration.onlyCertainMatches ?? false,
+              match_count: patientMatchConfiguration.matchCount ?? 0,
+              supports_match: patientMatchConfiguration.supportsMatch ?? false,
+            }
+          : null;
+
       const result = await dbService.query(updateQuery, [
         id,
         name,
@@ -207,11 +216,7 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
         authData?.scopes || null,
         authData?.accessToken || null,
         authData?.tokenExpiry || null,
-        patientMatchConfiguration?.enabled || null,
-        patientMatchConfiguration?.onlySingleMatch || null,
-        patientMatchConfiguration?.onlyCertainMatches || null,
-        patientMatchConfiguration?.matchCount || null,
-        patientMatchConfiguration?.supportsMatch || null,
+        patientMatchConfigObject,
       ]);
 
       // Clear the cache so the next getFhirServerConfigs call will fetch fresh data
@@ -282,6 +287,20 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
         };
       }
 
+      // Patient match configuration defaults
+      const patientMatchConfigObject =
+        patientMatchConfiguration != null
+          ? {
+              enabled: patientMatchConfiguration.enabled ?? false,
+              only_single_match:
+                patientMatchConfiguration.onlySingleMatch ?? false,
+              only_certain_matches:
+                patientMatchConfiguration.onlyCertainMatches ?? false,
+              match_count: patientMatchConfiguration.matchCount ?? 0,
+              supports_match: patientMatchConfiguration.supportsMatch ?? false,
+            }
+          : null;
+
       const result = await dbService.query(FHIR_SERVER_INSERT_QUERY, [
         name,
         hostname,
@@ -297,10 +316,7 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
         authData?.scopes || null,
         authData?.accessToken || null,
         authData?.tokenExpiry || null,
-        patientMatchConfiguration?.enabled || null,
-        patientMatchConfiguration?.onlyCertainMatches || null,
-        patientMatchConfiguration?.matchCount || null,
-        patientMatchConfiguration?.supportsMatch || null,
+        patientMatchConfigObject,
       ]);
 
       // Clear the cache so the next getFhirServerConfigs call will fetch fresh data

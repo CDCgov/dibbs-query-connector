@@ -369,6 +369,7 @@ const FhirServers: React.FC = () => {
         defaultServer,
         connectionResult.success,
         authData,
+        patientMatchData || DEFAULT_PATIENT_MATCH_DATA,
       );
 
       if (result.success) {
@@ -389,6 +390,7 @@ const FhirServers: React.FC = () => {
         defaultServer,
         connectionResult.success,
         authData,
+        patientMatchData || DEFAULT_PATIENT_MATCH_DATA,
       );
 
       if (result.success) {
