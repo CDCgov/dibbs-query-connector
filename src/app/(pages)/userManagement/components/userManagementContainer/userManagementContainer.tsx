@@ -121,6 +121,7 @@ const UserManagementContainer: React.FC<UserManagementContainerProps> = ({
               fetchGroupMembers={fetchGroupMembers}
               fetchGroupQueries={fetchGroupQueries}
               userGroups={userGroups}
+              triggerFocusRefs={triggerFocusRefs}
             />
           </>
         ) : (

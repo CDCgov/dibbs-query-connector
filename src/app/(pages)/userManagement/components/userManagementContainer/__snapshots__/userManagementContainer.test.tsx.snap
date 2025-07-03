@@ -146,45 +146,47 @@ exports[`Super Admin view of Users Table renders content on tab click 1`] = `
               class="tableBody__row"
               tabindex="0"
             >
-              <td
-                class="userDisplay"
-                width="270"
-              >
-                Potter, Lily 
-                <button
-                  class="usa-button usa-button--unstyled editBtn unstyled-button-container usa-button--unstyled text-bold text-no-underline"
-                  data-testid="button"
-                  type="button"
+              <td>
+                <div
+                  class="userDisplay"
                 >
-                  <span
-                    class="icon-text padding-right-4 display-flex flex-align-center"
-                  >
-                    <svg
-                      aria-label="Pencil icon indicating edit ability"
-                      class="usa-icon height-3 width-3"
-                      focusable="false"
-                      height="1em"
-                      role="img"
-                      viewBox="0 0 24 24"
-                      width="1em"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a.996.996 0 0 0 0-1.41l-2.34-2.34a.996.996 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"
-                      />
-                    </svg>
-                    <span
-                      class="padding-left-05"
-                      data-testid="edit-group-456"
-                    >
-                      Edit
-                    </span>
+                  <span>
+                    Potter, Lily 
                   </span>
-                </button>
+                  <button
+                    class="usa-button usa-button--unstyled editBtn unstyled-button-container usa-button--unstyled text-bold text-no-underline"
+                    data-testid="button"
+                    type="button"
+                  >
+                    <span
+                      class="icon-text padding-right-4 display-flex flex-align-center"
+                    >
+                      <svg
+                        aria-label="Pencil icon indicating edit ability"
+                        class="usa-icon height-3 width-3"
+                        focusable="false"
+                        height="1em"
+                        role="img"
+                        viewBox="0 0 24 24"
+                        width="1em"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a.996.996 0 0 0 0-1.41l-2.34-2.34a.996.996 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"
+                        />
+                      </svg>
+                      <span
+                        class="padding-left-05"
+                        data-testid="edit-group-456"
+                      >
+                        Edit
+                      </span>
+                    </span>
+                  </button>
+                </div>
               </td>
               <td
                 class="roleDropdown"
-                width="250"
               >
                 <label
                   class="usa-label usa-sr-only"
@@ -216,16 +218,16 @@ exports[`Super Admin view of Users Table renders content on tab click 1`] = `
                   </option>
                 </select>
               </td>
-              <td
-                width="475"
-              >
+              <td>
                 <button
                   aria-description="Edit Order of the Phoenix members"
                   class="usa-button usa-button--unstyled margin-right-2 text-no-underline"
                   data-testid="button"
                   type="button"
                 >
-                  Order of the Phoenix
+                  <span>
+                    Order of the Phoenix
+                  </span>
                 </button>
               </td>
             </tr>
@@ -233,45 +235,47 @@ exports[`Super Admin view of Users Table renders content on tab click 1`] = `
               class="tableBody__row"
               tabindex="0"
             >
-              <td
-                class="userDisplay"
-                width="270"
-              >
-                Potter, Harry 
-                <button
-                  class="usa-button usa-button--unstyled editBtn unstyled-button-container usa-button--unstyled text-bold text-no-underline"
-                  data-testid="button"
-                  type="button"
+              <td>
+                <div
+                  class="userDisplay"
                 >
-                  <span
-                    class="icon-text padding-right-4 display-flex flex-align-center"
-                  >
-                    <svg
-                      aria-label="Pencil icon indicating edit ability"
-                      class="usa-icon height-3 width-3"
-                      focusable="false"
-                      height="1em"
-                      role="img"
-                      viewBox="0 0 24 24"
-                      width="1em"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a.996.996 0 0 0 0-1.41l-2.34-2.34a.996.996 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"
-                      />
-                    </svg>
-                    <span
-                      class="padding-left-05"
-                      data-testid="edit-group-123"
-                    >
-                      Edit
-                    </span>
+                  <span>
+                    Potter, Harry 
                   </span>
-                </button>
+                  <button
+                    class="usa-button usa-button--unstyled editBtn unstyled-button-container usa-button--unstyled text-bold text-no-underline"
+                    data-testid="button"
+                    type="button"
+                  >
+                    <span
+                      class="icon-text padding-right-4 display-flex flex-align-center"
+                    >
+                      <svg
+                        aria-label="Pencil icon indicating edit ability"
+                        class="usa-icon height-3 width-3"
+                        focusable="false"
+                        height="1em"
+                        role="img"
+                        viewBox="0 0 24 24"
+                        width="1em"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a.996.996 0 0 0 0-1.41l-2.34-2.34a.996.996 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"
+                        />
+                      </svg>
+                      <span
+                        class="padding-left-05"
+                        data-testid="edit-group-123"
+                      >
+                        Edit
+                      </span>
+                    </span>
+                  </button>
+                </div>
               </td>
               <td
                 class="roleDropdown"
-                width="250"
               >
                 <label
                   class="usa-label usa-sr-only"
@@ -303,9 +307,7 @@ exports[`Super Admin view of Users Table renders content on tab click 1`] = `
                   </option>
                 </select>
               </td>
-              <td
-                width="475"
-              >
+              <td>
                 --
               </td>
             </tr>
@@ -433,10 +435,9 @@ exports[`Super Admin view of Users Table renders content on tab click 2`] = `
           <tbody>
             <tr
               class="userGroupRow"
+              tabindex="0"
             >
-              <td
-                width="270"
-              >
+              <td>
                 Hogwarts
               </td>
               <td>
@@ -459,68 +460,70 @@ exports[`Super Admin view of Users Table renders content on tab click 2`] = `
                   0 queries
                 </button>
               </td>
-              <td
-                class="actionButtons"
-              >
-                <button
-                  class="usa-button usa-button--unstyled text-bold text-no-underline"
-                  data-testid="button"
-                  type="button"
+              <td>
+                <div
+                  class="actionButtons"
                 >
-                  <span
-                    class="icon-text padding-right-4 display-flex flex-align-center"
+                  <button
+                    class="usa-button usa-button--unstyled editBtn unstyled-button-container usa-button--unstyled text-bold text-no-underline"
+                    data-testid="button"
+                    type="button"
                   >
-                    <svg
-                      aria-label="Pencil icon indicating edit ability"
-                      class="usa-icon height-3 width-3"
-                      focusable="false"
-                      height="1em"
-                      role="img"
-                      viewBox="0 0 24 24"
-                      width="1em"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a.996.996 0 0 0 0-1.41l-2.34-2.34a.996.996 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"
-                      />
-                    </svg>
                     <span
-                      class="padding-left-05"
-                      data-testid="edit-group-123"
+                      class="icon-text padding-right-4 display-flex flex-align-center"
                     >
-                      Edit
+                      <svg
+                        aria-label="Pencil icon indicating edit ability"
+                        class="usa-icon height-3 width-3"
+                        focusable="false"
+                        height="1em"
+                        role="img"
+                        viewBox="0 0 24 24"
+                        width="1em"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a.996.996 0 0 0 0-1.41l-2.34-2.34a.996.996 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"
+                        />
+                      </svg>
+                      <span
+                        class="padding-left-05"
+                        data-testid="edit-group-123"
+                      >
+                        Edit
+                      </span>
                     </span>
-                  </span>
-                </button>
-                <button
-                  class="usa-button usa-button--unstyled text-bold text-no-underline destructive-primary"
-                  data-testid="button"
-                  type="button"
-                >
-                  <span
-                    class="icon-text padding-right-4 display-flex flex-align-center"
+                  </button>
+                  <button
+                    class="usa-button deleteBtn unstyled-button-container usa-button--unstyled text-bold text-no-underline destructive-primary"
+                    data-testid="button"
+                    type="button"
                   >
-                    <svg
-                      aria-label="Trash icon indicating deletion of disease"
-                      class="usa-icon height-3 width-3"
-                      focusable="false"
-                      height="1em"
-                      role="img"
-                      viewBox="0 0 24 24"
-                      width="1em"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"
-                      />
-                    </svg>
                     <span
-                      class="padding-left-05"
+                      class="icon-text padding-right-4 display-flex flex-align-center"
                     >
-                      Delete
+                      <svg
+                        aria-label="Trash icon indicating deletion of disease"
+                        class="usa-icon height-3 width-3"
+                        focusable="false"
+                        height="1em"
+                        role="img"
+                        viewBox="0 0 24 24"
+                        width="1em"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"
+                        />
+                      </svg>
+                      <span
+                        class="padding-left-05"
+                      >
+                        Delete
+                      </span>
                     </span>
-                  </span>
-                </button>
+                  </button>
+                </div>
               </td>
             </tr>
           </tbody>
@@ -929,45 +932,47 @@ exports[`Super Admin view of Users Table renders table view after content is loa
             class="tableBody__row"
             tabindex="0"
           >
-            <td
-              class="userDisplay"
-              width="270"
-            >
-              Potter, Lily 
-              <button
-                class="usa-button usa-button--unstyled editBtn unstyled-button-container usa-button--unstyled text-bold text-no-underline"
-                data-testid="button"
-                type="button"
+            <td>
+              <div
+                class="userDisplay"
               >
-                <span
-                  class="icon-text padding-right-4 display-flex flex-align-center"
-                >
-                  <svg
-                    aria-label="Pencil icon indicating edit ability"
-                    class="usa-icon height-3 width-3"
-                    focusable="false"
-                    height="1em"
-                    role="img"
-                    viewBox="0 0 24 24"
-                    width="1em"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a.996.996 0 0 0 0-1.41l-2.34-2.34a.996.996 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"
-                    />
-                  </svg>
-                  <span
-                    class="padding-left-05"
-                    data-testid="edit-group-456"
-                  >
-                    Edit
-                  </span>
+                <span>
+                  Potter, Lily 
                 </span>
-              </button>
+                <button
+                  class="usa-button usa-button--unstyled editBtn unstyled-button-container usa-button--unstyled text-bold text-no-underline"
+                  data-testid="button"
+                  type="button"
+                >
+                  <span
+                    class="icon-text padding-right-4 display-flex flex-align-center"
+                  >
+                    <svg
+                      aria-label="Pencil icon indicating edit ability"
+                      class="usa-icon height-3 width-3"
+                      focusable="false"
+                      height="1em"
+                      role="img"
+                      viewBox="0 0 24 24"
+                      width="1em"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a.996.996 0 0 0 0-1.41l-2.34-2.34a.996.996 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"
+                      />
+                    </svg>
+                    <span
+                      class="padding-left-05"
+                      data-testid="edit-group-456"
+                    >
+                      Edit
+                    </span>
+                  </span>
+                </button>
+              </div>
             </td>
             <td
               class="roleDropdown"
-              width="250"
             >
               <label
                 class="usa-label usa-sr-only"
@@ -999,16 +1004,16 @@ exports[`Super Admin view of Users Table renders table view after content is loa
                 </option>
               </select>
             </td>
-            <td
-              width="475"
-            >
+            <td>
               <button
                 aria-description="Edit Order of the Phoenix members"
                 class="usa-button usa-button--unstyled margin-right-2 text-no-underline"
                 data-testid="button"
                 type="button"
               >
-                Order of the Phoenix
+                <span>
+                  Order of the Phoenix
+                </span>
               </button>
             </td>
           </tr>
@@ -1016,45 +1021,47 @@ exports[`Super Admin view of Users Table renders table view after content is loa
             class="tableBody__row"
             tabindex="0"
           >
-            <td
-              class="userDisplay"
-              width="270"
-            >
-              Potter, Harry 
-              <button
-                class="usa-button usa-button--unstyled editBtn unstyled-button-container usa-button--unstyled text-bold text-no-underline"
-                data-testid="button"
-                type="button"
+            <td>
+              <div
+                class="userDisplay"
               >
-                <span
-                  class="icon-text padding-right-4 display-flex flex-align-center"
-                >
-                  <svg
-                    aria-label="Pencil icon indicating edit ability"
-                    class="usa-icon height-3 width-3"
-                    focusable="false"
-                    height="1em"
-                    role="img"
-                    viewBox="0 0 24 24"
-                    width="1em"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a.996.996 0 0 0 0-1.41l-2.34-2.34a.996.996 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"
-                    />
-                  </svg>
-                  <span
-                    class="padding-left-05"
-                    data-testid="edit-group-123"
-                  >
-                    Edit
-                  </span>
+                <span>
+                  Potter, Harry 
                 </span>
-              </button>
+                <button
+                  class="usa-button usa-button--unstyled editBtn unstyled-button-container usa-button--unstyled text-bold text-no-underline"
+                  data-testid="button"
+                  type="button"
+                >
+                  <span
+                    class="icon-text padding-right-4 display-flex flex-align-center"
+                  >
+                    <svg
+                      aria-label="Pencil icon indicating edit ability"
+                      class="usa-icon height-3 width-3"
+                      focusable="false"
+                      height="1em"
+                      role="img"
+                      viewBox="0 0 24 24"
+                      width="1em"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a.996.996 0 0 0 0-1.41l-2.34-2.34a.996.996 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"
+                      />
+                    </svg>
+                    <span
+                      class="padding-left-05"
+                      data-testid="edit-group-123"
+                    >
+                      Edit
+                    </span>
+                  </span>
+                </button>
+              </div>
             </td>
             <td
               class="roleDropdown"
-              width="250"
             >
               <label
                 class="usa-label usa-sr-only"
@@ -1086,9 +1093,7 @@ exports[`Super Admin view of Users Table renders table view after content is loa
                 </option>
               </select>
             </td>
-            <td
-              width="475"
-            >
+            <td>
               --
             </td>
           </tr>

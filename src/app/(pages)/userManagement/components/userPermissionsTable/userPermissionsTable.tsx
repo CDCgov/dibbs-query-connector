@@ -91,7 +91,7 @@ const UserPermissionsTable: React.FC<PermissionsProps> = ({
 
   const renderDropdown = (user: User) => {
     return (
-      <td className={styles.roleDropdown} width={250}>
+      <td className={styles.roleDropdown}>
         {isSelf(user) ? (
           user.qcRole
         ) : (
@@ -109,7 +109,7 @@ const UserPermissionsTable: React.FC<PermissionsProps> = ({
 
   const renderGroups = (user: User) => {
     return (
-      <td key={user.id} width={475}>
+      <td key={user.id}>
         {user?.userGroupMemberships && user.userGroupMemberships?.length > 0
           ? user.userGroupMemberships?.map(
               (membership: UserGroupMembership, idx: number) => {
@@ -136,8 +136,10 @@ const UserPermissionsTable: React.FC<PermissionsProps> = ({
                       );
                     }}
                   >
-                    {membership.usergroupName}
-                    {idx + 1 != user.userGroupMemberships?.length && ","}
+                    <span>
+                      {membership.usergroupName}
+                      {idx + 1 != user.userGroupMemberships?.length && ","}
+                    </span>
                   </Button>
                 );
               },
@@ -199,9 +201,12 @@ const UserPermissionsTable: React.FC<PermissionsProps> = ({
           key={user.id}
           tabIndex={0}
         >
-          <td width={270} className={styles.userDisplay}>
-            {display}
-            {renderActionButtons(user, triggerFocusRefs?.current?.[i])}
+          <td>
+            <div className={styles.userDisplay}>
+              <span>{display}</span>
+
+              {renderActionButtons(user, triggerFocusRefs?.current?.[i])}
+            </div>
           </td>
           {renderDropdown(user)}
           {renderGroups(user)}
