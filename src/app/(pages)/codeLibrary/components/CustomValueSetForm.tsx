@@ -74,6 +74,7 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
   });
 
   const prevModeRef = useRef<CustomCodeMode>(mode);
+  const backBtnRef = useRef<HTMLAnchorElement>(null);
 
   function goBack() {
     // TODO: this will need to be handled differently
@@ -116,6 +117,9 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
     }
 
     fetchCurrentUser();
+
+    const nameInput = document.getElementById(`vsName`);
+    nameInput?.focus();
   }, []);
 
   useEffect(() => {
@@ -139,6 +143,19 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
 
     setLoading(false);
   }, [mode]);
+
+  async function handleAddCodeFocus() {
+    const indexPosition = Object.values(codesMap).length - 1;
+    const addedInput = document.getElementById(`code-id-${indexPosition}`);
+    addedInput?.focus();
+  }
+
+  // set focus to last code # input after adding/deleting a custom code row
+  useEffect(() => {
+    if (!customValueSet.valueSetId) {
+      handleAddCodeFocus();
+    }
+  }, [Object.values(codesMap).length]);
 
   useEffect(() => {
     if (Object.keys(codesMap).length <= 0) {
@@ -279,20 +296,26 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
               onChange={(e) => handleAddCode("name", id, e.target.value)}
             />
           </div>
-          <Icon.Delete
-            className={classNames(
-              "margin-bottom-1",
-              styles.deleteIcon,
-              "destructive-primary",
-            )}
-            size={3}
-            data-testid={`delete-custom-code-${id}`}
-            aria-label="Trash icon indicating deletion of code entry"
+          <Button
+            unstyled
+            type="button"
+            className="unstyled-button-container"
             onClick={(e) => {
               e.preventDefault();
               handleRemoveCode(id.toString());
             }}
-          ></Icon.Delete>
+          >
+            <Icon.Delete
+              className={classNames(
+                "margin-bottom-1",
+                styles.deleteIcon,
+                "destructive-primary",
+              )}
+              size={3}
+              data-testid={`delete-custom-code-${id}`}
+              aria-label="Trash icon indicating deletion of code entry"
+            ></Icon.Delete>
+          </Button>
         </div>
       );
     });
@@ -354,6 +377,7 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
       if (mode == "create" && isValid) {
         setMode("edit");
       }
+      backBtnRef.current?.focus();
     }
   };
 
@@ -366,7 +390,7 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
           styles.customValueSetForm,
         )}
       >
-        <Backlink onClick={goBack} label={"Return to Codes"} />
+        <Backlink ref={backBtnRef} onClick={goBack} label={"Return to Codes"} />
         <form>
           <div className={styles.header}>
             <h1 className={styles.title}>
@@ -392,7 +416,7 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
                 className={classNames(
                   styles.formSection__input,
                   styles.textInput,
-                  error.valueSetName ? styles.formValidationError : "",
+                  !!error.valueSetName ? styles.formValidationError : "",
                 )}
               >
                 <label htmlFor="vsName">

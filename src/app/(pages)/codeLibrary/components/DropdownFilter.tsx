@@ -3,7 +3,6 @@ import {
   RefObject,
   SetStateAction,
   useEffect,
-  useRef,
   useState,
 } from "react";
 import { Button, Select } from "@trussworks/react-uswds";
@@ -22,6 +21,7 @@ import {
   getAllGroupMembers,
   getAllUserGroups,
 } from "@/app/backend/usergroup-management";
+import { applyFocusTrap } from "@/app/ui/utils";
 
 export type FilterCategories = {
   category: DibbsConceptType | undefined;
@@ -37,7 +37,10 @@ type DropdownFilterProps = {
   loading: boolean;
   filterCount: number;
   currentUser: User;
+  setTriggerFocus: () => void;
+  focusRef: RefObject<HTMLDivElement | null>;
 };
+
 export type vsAuthorMap = {
   [groupName: string]: string[];
 };
@@ -50,6 +53,8 @@ export type vsAuthorMap = {
  * @param root0.loading the loading state of the parent's value set data
  * @param root0.filterCount the number of filters currently applied to the result set
  * @param root0.currentUser the User object for the currently active user
+ * @param root0.setTriggerFocus function to return focus to the element that triggered the opening of DropdownFilter
+ * @param root0.focusRef ref for the DropdownFilter that is accessible to its parent
  * @returns  the DropdownFilter component
  */
 const DropdownFilter: React.FC<DropdownFilterProps> = ({
@@ -60,17 +65,20 @@ const DropdownFilter: React.FC<DropdownFilterProps> = ({
   loading,
   filterCount,
   currentUser,
+  setTriggerFocus,
+  focusRef,
 }) => {
   const valueSetCodeSystems = valueSets
     .map((vs) => vs.system)
     .filter((item, index, array) => {
-      return array.indexOf(item) === index;
+      return !!item && array.indexOf(item) === index;
     });
 
   const [myTeamMembers, setMyTeamMembers] = useState<vsAuthorMap>();
 
   const [groupAuthors, setGroupAuthors] = useState<vsAuthorMap>({});
   const [valueSetCreators, setValueSetCreators] = useState<vsAuthorMap>({});
+  const [focusElements, setFocusElements] = useState<NodeListOf<Element>>();
 
   useEffect(() => {
     async function mapUsersToGroups() {
@@ -136,6 +144,19 @@ const DropdownFilter: React.FC<DropdownFilterProps> = ({
     }
   }, [groupAuthors]);
 
+  const getFocusableElements = (focusRef: RefObject<HTMLElement>) => {
+    const focusableElements =
+      focusRef.current &&
+      focusRef.current.querySelectorAll(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+      );
+    setFocusElements(focusableElements);
+  };
+
+  useEffect(() => {
+    getFocusableElements(focusRef as RefObject<HTMLElement>);
+  }, [filterCount]);
+
   const valueSetCategories: {
     [dibbsConceptType in DibbsConceptType]: dibbsConceptType;
   } = {
@@ -145,25 +166,30 @@ const DropdownFilter: React.FC<DropdownFilterProps> = ({
   };
 
   const filterByShortcut = (userIndex: string) => {
+    const results = valueSetCreators[userIndex] || [];
+
     setFilterSearch({
       ...filterSearch,
       creators:
-        valueSetCreators[userIndex].length > 0
+        results.length > 0
           ? { [userIndex]: valueSetCreators[userIndex] }
           : {
-              "": ["No creators to filter"],
+              "No creators to filter": ["No creators to filter"],
             },
     });
   };
 
-  const handleOutsideClick = (ref: RefObject<HTMLFormElement | null>) => {
+  const handleOutsideClick = (ref: RefObject<HTMLDivElement | null>) => {
     useEffect(() => {
       function handleClickOutside(event: MouseEvent | KeyboardEvent) {
         if (!ref) return;
         if (
           (event as KeyboardEvent).key == "Escape" ||
-          (ref.current && !ref.current.contains(event.target as Node))
+          (event.type == "mousedown" &&
+            ref.current &&
+            !ref.current.contains(event.target as Node))
         ) {
+          setTriggerFocus();
           return setShowFilters(false);
         }
       }
@@ -176,11 +202,11 @@ const DropdownFilter: React.FC<DropdownFilterProps> = ({
     }, [ref]);
   };
 
-  const dropdownRef = useRef<HTMLFormElement>(null);
-  handleOutsideClick(dropdownRef);
+  handleOutsideClick(focusRef);
+  applyFocusTrap(focusRef, focusElements);
 
   return (
-    <form ref={dropdownRef} className={styles.filtersDropdown}>
+    <div ref={focusRef} className={styles.filtersDropdown}>
       <div className={styles.filterOptions}>
         <div className={styles.filterOptions_grouping}>
           <label htmlFor="category">Category</label>
@@ -267,7 +293,7 @@ const DropdownFilter: React.FC<DropdownFilterProps> = ({
       <div className={styles.shortcuts}>
         <span className="text-italic">Shortcuts:</span>
         <button
-          onClick={(e) => {
+          onClick={async (e) => {
             e.preventDefault();
             filterByShortcut(
               currentUser.firstName && currentUser.lastName
@@ -288,16 +314,33 @@ const DropdownFilter: React.FC<DropdownFilterProps> = ({
           Created by my team
         </button>
       </div>
-      {filterCount > 0 && (
+      <div className={styles.dropdownButtons}>
+        {filterCount > 0 && (
+          <Button
+            onClick={() => {
+              setFilterSearch(emptyFilterSearch);
+              if (focusElements?.[0]) {
+                (focusElements[0] as HTMLElement).focus();
+              }
+            }}
+            className={styles.clearFiltersBtn}
+            type="button"
+          >
+            Clear all filters
+          </Button>
+        )}
         <Button
-          onClick={() => setFilterSearch(emptyFilterSearch)}
+          onClick={() => {
+            setShowFilters(false);
+            setTriggerFocus();
+          }}
           className={styles.clearFiltersBtn}
           type="button"
         >
-          Clear all filters
+          Close
         </Button>
-      )}
-    </form>
+      </div>
+    </div>
   );
 };
 
