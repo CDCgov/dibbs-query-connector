@@ -1,10 +1,12 @@
+import "@testing-library/jest-dom";
 import { waitFor, screen, render } from "@testing-library/react";
 import * as UserManagementBackend from "@/app/backend/user-management";
 import * as UserGroupManagementBackend from "@/app/backend/usergroup-management";
 import * as QueryBuildingBackend from "@/app/backend/query-building/service";
 import { UserRole } from "@/app/models/entities/users";
 import { renderWithUser, RootProviderMock } from "@/app/tests/unit/setup";
-import UsersTable from "./userManagementContainer";
+import UserManagementContainer from "./userManagementContainer";
+
 import {
   mockSuperAdmin,
   mockAdmin,
@@ -50,13 +52,9 @@ describe("Super Admin view of Users Table", () => {
   it("renders error message when no users are found", async () => {
     render(
       <RootProviderMock currentPage="/userManagement">
-        <UsersTable role={role} />
+        <UserManagementContainer role={role} />
       </RootProviderMock>,
     );
-
-    await waitFor(() => {
-      expect(screen.queryByText("Loading")).not.toBeInTheDocument();
-    });
 
     expect(screen.getByText("No users found")).toBeInTheDocument();
     expect(document.body).toMatchSnapshot();
@@ -70,12 +68,9 @@ describe("Super Admin view of Users Table", () => {
 
     render(
       <RootProviderMock currentPage="/userManagement">
-        <UsersTable role={role} />
+        <UserManagementContainer role={role} />
       </RootProviderMock>,
     );
-    await waitFor(() => {
-      expect(screen.queryByText("Loading")).not.toBeInTheDocument();
-    });
 
     expect(document.body).toMatchSnapshot();
 
@@ -108,7 +103,7 @@ describe("Super Admin view of Users Table", () => {
       .mockResolvedValueOnce([mockQueryWithGroups]);
     const { user } = renderWithUser(
       <RootProviderMock currentPage="/userManagement">
-        <UsersTable role={role} />
+        <UserManagementContainer role={role} />
       </RootProviderMock>,
     );
     await waitFor(() => {
@@ -138,7 +133,7 @@ describe("Admin view of Users Table", () => {
   it("renders error message when no user groups are found", async () => {
     render(
       <RootProviderMock currentPage="/userManagement">
-        <UsersTable role={role} />
+        <UserManagementContainer role={role} />
       </RootProviderMock>,
     );
 

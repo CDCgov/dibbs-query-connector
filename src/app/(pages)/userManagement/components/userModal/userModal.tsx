@@ -101,7 +101,8 @@ const UserModal: React.FC<UserModalProps> = ({
 
       if (
         clickTarget == "modalOverlay" ||
-        (event as KeyboardEvent).key == "Escape"
+        (!!modalRef.current?.modalIsOpen &&
+          (event as KeyboardEvent).key == "Escape")
       ) {
         handleCloseModal();
         resetModalState();
@@ -112,12 +113,10 @@ const UserModal: React.FC<UserModalProps> = ({
 
   useEffect(() => {
     window.addEventListener("mousedown", handleOutsideModalClick);
-    window.addEventListener("keyup", handleOutsideModalClick);
 
     // Cleanup
     return () => {
       window.removeEventListener("mousedown", handleOutsideModalClick);
-      window.removeEventListener("keyup", handleOutsideModalClick);
     };
   }, []);
 

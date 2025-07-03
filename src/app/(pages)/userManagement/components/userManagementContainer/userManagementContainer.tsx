@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, RefObject } from "react";
 import UserManagementDrawer from "../teamQueryEditSection/TeamQueryEditSection";
 import UserGroupsTable from "../userGroupsTable/UserGroupsTable";
 import TabGroup, { Tab } from "@/app/ui/designSystem/TabGroup/tabGroup";
@@ -24,7 +24,7 @@ import { CustomUserQuery } from "@/app/models/entities/query";
 import { getAllUsers } from "@/app/backend/user-management";
 import styles from "./userManagementContainer.module.scss";
 
-export type UsersTableProps = {
+export type UserManagementContainerProps = {
   role: string;
 };
 
@@ -36,12 +36,14 @@ export type viewMode =
   | "Update User groups";
 
 /**
- * UsersTable container component
- * @param root0 - UsersTable container props
+ * UserManagementContainer component
+ * @param root0 - UserManagementContainer props
  * @param root0.role - The permissions role of the current logged-in user
- * @returns The UsersTable container component
+ * @returns The UserManagementContainer component
  */
-const UsersTable: React.FC<UsersTableProps> = ({ role }) => {
+const UserManagementContainer: React.FC<UserManagementContainerProps> = ({
+  role,
+}) => {
   const [activeTab, setActiveTab] = useState<Tab>({ label: "" });
   const [users, setUsers] = useState<User[]>([]);
   const [allQueries, setAllQueries] = useState<CustomUserQuery[]>([]);
@@ -53,6 +55,7 @@ const UsersTable: React.FC<UsersTableProps> = ({ role }) => {
   >("Load default");
 
   const modalRef = useRef<ModalRef>(null);
+  const triggerFocusRefs = useRef<RefObject<HTMLTableRowElement | null>[]>([]);
 
   const setTab = (e: React.MouseEvent<HTMLElement>) => {
     const clickedTab = e.currentTarget.innerHTML;
@@ -85,6 +88,7 @@ const UsersTable: React.FC<UsersTableProps> = ({ role }) => {
                 fetchGroupMembers={fetchGroupMembers}
                 users={users}
                 setUsers={setUsers}
+                triggerFocusRefs={triggerFocusRefs}
               />
             ) : (
               <div className="empty-response">No users found</div>
@@ -251,13 +255,15 @@ const UsersTable: React.FC<UsersTableProps> = ({ role }) => {
     setShouldRefreshView(false);
   }, [shouldRefreshView]);
 
-  const handleOpenModal = (
+  const handleOpenModal = async (
     mode: UserManagementMode,
     data?: UserGroup | User,
+    ref?: RefObject<HTMLTableRowElement | null> | null,
   ) => {
     setModalMode(mode);
     setSubjectData(data);
     modalRef.current?.toggleModal();
+    ref?.current?.focus();
   };
 
   const dataLoaded = !!users && !!userGroups;
@@ -292,4 +298,4 @@ const UsersTable: React.FC<UsersTableProps> = ({ role }) => {
   );
 };
 
-export default UsersTable;
+export default UserManagementContainer;

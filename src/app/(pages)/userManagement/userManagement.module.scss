@@ -58,6 +58,18 @@
 }
 
 .userPermissionsTable {
+  tr {
+    .editBtn {
+      display: none;
+    }
+
+    &:hover .editBtn,
+    &:focus-within .editBtn {
+      display: block;
+      cursor: pointer;
+    }
+  }
+
   td.userDisplay {
     display: flex;
     justify-content: space-between;

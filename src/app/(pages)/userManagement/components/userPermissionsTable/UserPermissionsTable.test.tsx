@@ -8,6 +8,7 @@ import {
   mockSuperAdmin,
   mockPermissionsTab,
 } from "../../test-utils";
+import { createRef, RefObject } from "react";
 
 jest.mock("next-auth/react");
 
@@ -23,6 +24,9 @@ jest.mock("@/app/backend/user-management", () => ({
   updateUserRole: jest.fn(),
 }));
 
+const mockRefs = createRef<RefObject<HTMLTableRowElement | null>[]>();
+mockRefs.current = [];
+
 describe("User Management: User tab", () => {
   it("Loads user list successfully", async () => {
     jest.spyOn(UserManagementBackend, "getAllUsers").mockResolvedValue({
@@ -37,6 +41,7 @@ describe("User Management: User tab", () => {
           setUsers={jest.fn()}
           users={[mockAdmin, mockSuperAdmin]}
           fetchGroupMembers={jest.fn()}
+          triggerFocusRefs={mockRefs}
         />
       </RootProviderMock>,
     );
@@ -48,7 +53,7 @@ describe("User Management: User tab", () => {
       render(mockPermissionsTab.renderContent());
     }
     expect(screen.queryAllByText("Potter, Harry")).toBeTruthy();
-    expect(screen.queryAllByText("Potter, Lilt")).toBeTruthy();
+    expect(screen.queryAllByText("Potter, Lily")).toBeTruthy();
     expect(document.body).toMatchSnapshot();
   });
 
@@ -77,6 +82,7 @@ describe("User Management: User tab", () => {
           setUsers={jest.fn()}
           users={[mockAdmin, mockSuperAdmin]}
           fetchGroupMembers={jest.fn()}
+          triggerFocusRefs={mockRefs}
         />
       </RootProviderMock>,
     );
