@@ -48,11 +48,11 @@ exports[`Code library interaction renders action buttons for custom value sets o
             />
             <div
               class="applyFilters"
-              role="button"
-              tabindex="0"
             >
-              <div
-                class="display-flex flex-align-center"
+              <button
+                class="usa-button usa-button--unstyled applyFilters"
+                data-testid="button"
+                type="button"
               >
                 <svg
                   aria-label="Icon indicating a menu with filter options"
@@ -69,7 +69,7 @@ exports[`Code library interaction renders action buttons for custom value sets o
                   />
                 </svg>
                 Filters
-              </div>
+              </button>
             </div>
           </div>
           <button
@@ -92,168 +92,180 @@ exports[`Code library interaction renders action buttons for custom value sets o
               <div
                 class="display-flex flex-row valueSetTable customizeTableWrapper"
               >
-                <table
-                  class="usa-table usa-table--borderless customizeTable"
-                  data-testid="table"
+                <div
+                  class="usa-table-container--scrollable"
+                  data-testid="scrollable-table-container"
+                  tabindex="0"
                 >
-                  <thead
-                    class="display-flex flex-column valueSetTable__header"
+                  <table
+                    class="usa-table usa-table--borderless customizeTable"
+                    data-testid="table"
                   >
-                    <tr
-                      class="valueSetTable__header_sectionHeader"
+                    <thead
+                      class="display-flex flex-column valueSetTable__header"
                     >
-                      <th>
-                        VALUE SET
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody
-                    class="overflowScroll valueSetTable__tableBody"
-                    data-testid="table-valuesets-manage"
-                  >
-                    <tr
-                      class="valueSetTable__tableBody_row"
+                      <tr
+                        class="valueSetTable__header_sectionHeader"
+                      >
+                        <th>
+                          VALUE SET
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody
+                      class="overflowScroll valueSetTable__tableBody"
+                      data-testid="table-valuesets-manage"
                     >
-                      <td>
-                        <div
-                          class="valueSetTable__tableBody_row_details"
-                        >
-                          <span
-                            class="valueSetTable__tableBody_row_valueSetName"
+                      <tr
+                        class="valueSetTable__tableBody_row"
+                        id="vsTableRow--14_20240923"
+                        tabindex="0"
+                      >
+                        <td>
+                          <div
+                            class="valueSetTable__tableBody_row_details"
                           >
                             <span
-                              class=""
+                              class="valueSetTable__tableBody_row_valueSetName"
                             >
-                              Cancer (Leukemia) Lab Result
+                              <span
+                                class=""
+                              >
+                                Cancer (Leukemia) Lab Result
+                              </span>
                             </span>
-                          </span>
-                          <span
-                            class="valueSetTable__tableBody_row_valueSetDetails"
+                            <span
+                              class="valueSetTable__tableBody_row_valueSetDetails"
+                            >
+                              <span
+                                class=""
+                              >
+                                Cancer (Leukemia)  •   Lab  •  ECC
+                              </span>
+                            </span>
+                          </div>
+                          <div>
+                            <svg
+                              aria-label="Right chevron indicating additional content"
+                              class="usa-icon usa-icon--size-4"
+                              focusable="false"
+                              height="1em"
+                              role="img"
+                              viewBox="0 0 24 24"
+                              width="1em"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"
+                              />
+                            </svg>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr
+                        class="valueSetTable__tableBody_row"
+                        id="vsTableRow--7_20240909"
+                        tabindex="0"
+                      >
+                        <td>
+                          <div
+                            class="valueSetTable__tableBody_row_details"
                           >
                             <span
-                              class=""
+                              class="valueSetTable__tableBody_row_valueSetName"
                             >
-                              Cancer (Leukemia)  •   Lab  •  ECC
+                              <span
+                                class=""
+                              >
+                                Gonorrhea Medication
+                              </span>
                             </span>
-                          </span>
-                        </div>
-                        <div>
-                          <svg
-                            aria-label="Right chevron indicating additional content"
-                            class="usa-icon usa-icon--size-4"
-                            focusable="false"
-                            height="1em"
-                            role="img"
-                            viewBox="0 0 24 24"
-                            width="1em"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              d="M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"
-                            />
-                          </svg>
-                        </div>
-                      </td>
-                    </tr>
-                    <tr
-                      class="valueSetTable__tableBody_row"
-                    >
-                      <td>
-                        <div
-                          class="valueSetTable__tableBody_row_details"
-                        >
-                          <span
-                            class="valueSetTable__tableBody_row_valueSetName"
+                            <span
+                              class="valueSetTable__tableBody_row_valueSetDetails"
+                            >
+                              <span
+                                class=""
+                              >
+                                Gonorrhea  •   Medication  •  RXNORM
+                              </span>
+                            </span>
+                          </div>
+                          <div>
+                            <svg
+                              aria-label="Right chevron indicating additional content"
+                              class="usa-icon usa-icon--size-4"
+                              focusable="false"
+                              height="1em"
+                              role="img"
+                              viewBox="0 0 24 24"
+                              width="1em"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"
+                              />
+                            </svg>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr
+                        class="valueSetTable__tableBody_row activeValueSet"
+                        id="vsTableRow--1-test"
+                        tabindex="0"
+                      >
+                        <td>
+                          <div
+                            class="valueSetTable__tableBody_row_details"
                           >
                             <span
-                              class=""
+                              class="valueSetTable__tableBody_row_valueSetName"
                             >
-                              Gonorrhea Medication
+                              <span
+                                class=""
+                              >
+                                Fruits
+                              </span>
                             </span>
-                          </span>
-                          <span
-                            class="valueSetTable__tableBody_row_valueSetDetails"
-                          >
                             <span
-                              class=""
+                              class="valueSetTable__tableBody_row_valueSetDetails"
                             >
-                              Gonorrhea  •   Medication  •  RXNORM
+                              <span
+                                class=""
+                              >
+                                Custom Code Condition  •   Medication  •  SNOMED
+                              </span>
                             </span>
-                          </span>
-                        </div>
-                        <div>
-                          <svg
-                            aria-label="Right chevron indicating additional content"
-                            class="usa-icon usa-icon--size-4"
-                            focusable="false"
-                            height="1em"
-                            role="img"
-                            viewBox="0 0 24 24"
-                            width="1em"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              d="M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"
-                            />
-                          </svg>
-                        </div>
-                      </td>
-                    </tr>
-                    <tr
-                      class="valueSetTable__tableBody_row activeValueSet"
-                    >
-                      <td>
-                        <div
-                          class="valueSetTable__tableBody_row_details"
-                        >
-                          <span
-                            class="valueSetTable__tableBody_row_valueSetName"
-                          >
                             <span
-                              class=""
+                              class="valueSetTable__tableBody_row_customValueSet"
                             >
-                              Fruits
+                              <span
+                                class=""
+                              >
+                                Created by QC Admin
+                              </span>
                             </span>
-                          </span>
-                          <span
-                            class="valueSetTable__tableBody_row_valueSetDetails"
-                          >
-                            <span
-                              class=""
+                          </div>
+                          <div>
+                            <svg
+                              aria-label="Right chevron indicating additional content"
+                              class="usa-icon usa-icon--size-4"
+                              focusable="false"
+                              height="1em"
+                              role="img"
+                              viewBox="0 0 24 24"
+                              width="1em"
+                              xmlns="http://www.w3.org/2000/svg"
                             >
-                              Custom Code Condition  •   Medication  •  SNOMED
-                            </span>
-                          </span>
-                          <span
-                            class="valueSetTable__tableBody_row_customValueSet"
-                          >
-                            <span
-                              class=""
-                            >
-                              Created by QC Admin
-                            </span>
-                          </span>
-                        </div>
-                        <div>
-                          <svg
-                            aria-label="Right chevron indicating additional content"
-                            class="usa-icon usa-icon--size-4"
-                            focusable="false"
-                            height="1em"
-                            role="img"
-                            viewBox="0 0 24 24"
-                            width="1em"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              d="M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"
-                            />
-                          </svg>
-                        </div>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
+                              <path
+                                d="M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"
+                              />
+                            </svg>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
             <div
@@ -306,6 +318,7 @@ exports[`Code library interaction renders action buttons for custom value sets o
                   >
                     <tr
                       class="conceptsTable__tableBody_row"
+                      tabindex="0"
                     >
                       <td
                         class="valueSetCode"
@@ -330,6 +343,7 @@ exports[`Code library interaction renders action buttons for custom value sets o
                     </tr>
                     <tr
                       class="conceptsTable__tableBody_row"
+                      tabindex="0"
                     >
                       <td
                         class="valueSetCode"
@@ -354,6 +368,7 @@ exports[`Code library interaction renders action buttons for custom value sets o
                     </tr>
                     <tr
                       class="conceptsTable__tableBody_row"
+                      tabindex="0"
                     >
                       <td
                         class="valueSetCode"
@@ -594,11 +609,11 @@ exports[`Code library loading view renders a skeleton loading state when loading
             />
             <div
               class="applyFilters"
-              role="button"
-              tabindex="0"
             >
-              <div
-                class="display-flex flex-align-center"
+              <button
+                class="usa-button usa-button--unstyled applyFilters"
+                data-testid="button"
+                type="button"
               >
                 <svg
                   aria-label="Icon indicating a menu with filter options"
@@ -615,7 +630,7 @@ exports[`Code library loading view renders a skeleton loading state when loading
                   />
                 </svg>
                 Filters
-              </div>
+              </button>
             </div>
           </div>
           <button
@@ -638,76 +653,82 @@ exports[`Code library loading view renders a skeleton loading state when loading
               <div
                 class="display-flex flex-row valueSetTable customizeTableWrapper"
               >
-                <table
-                  class="usa-table usa-table--borderless customizeTable"
-                  data-testid="table"
+                <div
+                  class="usa-table-container--scrollable"
+                  data-testid="scrollable-table-container"
+                  tabindex="0"
                 >
-                  <thead
-                    class="display-flex flex-column valueSetTable__header"
+                  <table
+                    class="usa-table usa-table--borderless customizeTable"
+                    data-testid="table"
                   >
-                    <tr
-                      class="valueSetTable__header_sectionHeader"
+                    <thead
+                      class="display-flex flex-column valueSetTable__header"
                     >
-                      <th>
-                        VALUE SET
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody
-                    class="overflowScroll valueSetTable__tableBody"
-                    data-testid="table-valuesets-manage"
-                  >
-                    <tr
-                      class="valueSetTable__tableBody_row"
-                      data-testid="loading-skeleton"
+                      <tr
+                        class="valueSetTable__header_sectionHeader"
+                      >
+                        <th>
+                          VALUE SET
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody
+                      class="overflowScroll valueSetTable__tableBody"
+                      data-testid="table-valuesets-manage"
                     >
-                      <td>
-                        <span
-                          aria-busy="true"
-                          aria-live="polite"
-                          class="skeletonContainer"
-                        >
+                      <tr
+                        class="valueSetTable__tableBody_row"
+                        data-testid="loading-skeleton"
+                      >
+                        <td>
                           <span
-                            class="react-loading-skeleton skeleton"
+                            aria-busy="true"
+                            aria-live="polite"
+                            class="skeletonContainer"
                           >
-                            ‌
+                            <span
+                              class="react-loading-skeleton skeleton"
+                            >
+                              ‌
+                            </span>
+                            <br />
+                            <span
+                              class="react-loading-skeleton skeleton"
+                            >
+                              ‌
+                            </span>
+                            <br />
+                            <span
+                              class="react-loading-skeleton skeleton"
+                            >
+                              ‌
+                            </span>
+                            <br />
+                            <span
+                              class="react-loading-skeleton skeleton"
+                            >
+                              ‌
+                            </span>
+                            <br />
+                            <span
+                              class="react-loading-skeleton skeleton"
+                            >
+                              ‌
+                            </span>
+                            <br />
+                            <span
+                              class="react-loading-skeleton skeleton"
+                            >
+                              ‌
+                            </span>
+                            <br />
                           </span>
-                          <br />
-                          <span
-                            class="react-loading-skeleton skeleton"
-                          >
-                            ‌
-                          </span>
-                          <br />
-                          <span
-                            class="react-loading-skeleton skeleton"
-                          >
-                            ‌
-                          </span>
-                          <br />
-                          <span
-                            class="react-loading-skeleton skeleton"
-                          >
-                            ‌
-                          </span>
-                          <br />
-                          <span
-                            class="react-loading-skeleton skeleton"
-                          >
-                            ‌
-                          </span>
-                          <br />
-                          <span
-                            class="react-loading-skeleton skeleton"
-                          >
-                            ‌
-                          </span>
-                          <br />
-                        </span>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
             <div
@@ -907,11 +928,11 @@ exports[`Code library rendered view renders concept codes for the value set when
             />
             <div
               class="applyFilters"
-              role="button"
-              tabindex="0"
             >
-              <div
-                class="display-flex flex-align-center"
+              <button
+                class="usa-button usa-button--unstyled applyFilters"
+                data-testid="button"
+                type="button"
               >
                 <svg
                   aria-label="Icon indicating a menu with filter options"
@@ -928,7 +949,7 @@ exports[`Code library rendered view renders concept codes for the value set when
                   />
                 </svg>
                 Filters
-              </div>
+              </button>
             </div>
           </div>
           <button
@@ -951,168 +972,180 @@ exports[`Code library rendered view renders concept codes for the value set when
               <div
                 class="display-flex flex-row valueSetTable customizeTableWrapper"
               >
-                <table
-                  class="usa-table usa-table--borderless customizeTable"
-                  data-testid="table"
+                <div
+                  class="usa-table-container--scrollable"
+                  data-testid="scrollable-table-container"
+                  tabindex="0"
                 >
-                  <thead
-                    class="display-flex flex-column valueSetTable__header"
+                  <table
+                    class="usa-table usa-table--borderless customizeTable"
+                    data-testid="table"
                   >
-                    <tr
-                      class="valueSetTable__header_sectionHeader"
+                    <thead
+                      class="display-flex flex-column valueSetTable__header"
                     >
-                      <th>
-                        VALUE SET
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody
-                    class="overflowScroll valueSetTable__tableBody"
-                    data-testid="table-valuesets-manage"
-                  >
-                    <tr
-                      class="valueSetTable__tableBody_row activeValueSet"
+                      <tr
+                        class="valueSetTable__header_sectionHeader"
+                      >
+                        <th>
+                          VALUE SET
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody
+                      class="overflowScroll valueSetTable__tableBody"
+                      data-testid="table-valuesets-manage"
                     >
-                      <td>
-                        <div
-                          class="valueSetTable__tableBody_row_details"
-                        >
-                          <span
-                            class="valueSetTable__tableBody_row_valueSetName"
+                      <tr
+                        class="valueSetTable__tableBody_row activeValueSet"
+                        id="vsTableRow--14_20240923"
+                        tabindex="0"
+                      >
+                        <td>
+                          <div
+                            class="valueSetTable__tableBody_row_details"
                           >
                             <span
-                              class=""
+                              class="valueSetTable__tableBody_row_valueSetName"
                             >
-                              Cancer (Leukemia) Lab Result
+                              <span
+                                class=""
+                              >
+                                Cancer (Leukemia) Lab Result
+                              </span>
                             </span>
-                          </span>
-                          <span
-                            class="valueSetTable__tableBody_row_valueSetDetails"
+                            <span
+                              class="valueSetTable__tableBody_row_valueSetDetails"
+                            >
+                              <span
+                                class=""
+                              >
+                                Cancer (Leukemia)  •   Lab  •  ECC
+                              </span>
+                            </span>
+                          </div>
+                          <div>
+                            <svg
+                              aria-label="Right chevron indicating additional content"
+                              class="usa-icon usa-icon--size-4"
+                              focusable="false"
+                              height="1em"
+                              role="img"
+                              viewBox="0 0 24 24"
+                              width="1em"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"
+                              />
+                            </svg>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr
+                        class="valueSetTable__tableBody_row"
+                        id="vsTableRow--7_20240909"
+                        tabindex="0"
+                      >
+                        <td>
+                          <div
+                            class="valueSetTable__tableBody_row_details"
                           >
                             <span
-                              class=""
+                              class="valueSetTable__tableBody_row_valueSetName"
                             >
-                              Cancer (Leukemia)  •   Lab  •  ECC
+                              <span
+                                class=""
+                              >
+                                Gonorrhea Medication
+                              </span>
                             </span>
-                          </span>
-                        </div>
-                        <div>
-                          <svg
-                            aria-label="Right chevron indicating additional content"
-                            class="usa-icon usa-icon--size-4"
-                            focusable="false"
-                            height="1em"
-                            role="img"
-                            viewBox="0 0 24 24"
-                            width="1em"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              d="M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"
-                            />
-                          </svg>
-                        </div>
-                      </td>
-                    </tr>
-                    <tr
-                      class="valueSetTable__tableBody_row"
-                    >
-                      <td>
-                        <div
-                          class="valueSetTable__tableBody_row_details"
-                        >
-                          <span
-                            class="valueSetTable__tableBody_row_valueSetName"
+                            <span
+                              class="valueSetTable__tableBody_row_valueSetDetails"
+                            >
+                              <span
+                                class=""
+                              >
+                                Gonorrhea  •   Medication  •  RXNORM
+                              </span>
+                            </span>
+                          </div>
+                          <div>
+                            <svg
+                              aria-label="Right chevron indicating additional content"
+                              class="usa-icon usa-icon--size-4"
+                              focusable="false"
+                              height="1em"
+                              role="img"
+                              viewBox="0 0 24 24"
+                              width="1em"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"
+                              />
+                            </svg>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr
+                        class="valueSetTable__tableBody_row"
+                        id="vsTableRow--1-test"
+                        tabindex="0"
+                      >
+                        <td>
+                          <div
+                            class="valueSetTable__tableBody_row_details"
                           >
                             <span
-                              class=""
+                              class="valueSetTable__tableBody_row_valueSetName"
                             >
-                              Gonorrhea Medication
+                              <span
+                                class=""
+                              >
+                                Fruits
+                              </span>
                             </span>
-                          </span>
-                          <span
-                            class="valueSetTable__tableBody_row_valueSetDetails"
-                          >
                             <span
-                              class=""
+                              class="valueSetTable__tableBody_row_valueSetDetails"
                             >
-                              Gonorrhea  •   Medication  •  RXNORM
+                              <span
+                                class=""
+                              >
+                                Custom Code Condition  •   Medication  •  SNOMED
+                              </span>
                             </span>
-                          </span>
-                        </div>
-                        <div>
-                          <svg
-                            aria-label="Right chevron indicating additional content"
-                            class="usa-icon usa-icon--size-4"
-                            focusable="false"
-                            height="1em"
-                            role="img"
-                            viewBox="0 0 24 24"
-                            width="1em"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              d="M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"
-                            />
-                          </svg>
-                        </div>
-                      </td>
-                    </tr>
-                    <tr
-                      class="valueSetTable__tableBody_row"
-                    >
-                      <td>
-                        <div
-                          class="valueSetTable__tableBody_row_details"
-                        >
-                          <span
-                            class="valueSetTable__tableBody_row_valueSetName"
-                          >
                             <span
-                              class=""
+                              class="valueSetTable__tableBody_row_customValueSet"
                             >
-                              Fruits
+                              <span
+                                class=""
+                              >
+                                Created by QC Admin
+                              </span>
                             </span>
-                          </span>
-                          <span
-                            class="valueSetTable__tableBody_row_valueSetDetails"
-                          >
-                            <span
-                              class=""
+                          </div>
+                          <div>
+                            <svg
+                              aria-label="Right chevron indicating additional content"
+                              class="usa-icon usa-icon--size-4"
+                              focusable="false"
+                              height="1em"
+                              role="img"
+                              viewBox="0 0 24 24"
+                              width="1em"
+                              xmlns="http://www.w3.org/2000/svg"
                             >
-                              Custom Code Condition  •   Medication  •  SNOMED
-                            </span>
-                          </span>
-                          <span
-                            class="valueSetTable__tableBody_row_customValueSet"
-                          >
-                            <span
-                              class=""
-                            >
-                              Created by QC Admin
-                            </span>
-                          </span>
-                        </div>
-                        <div>
-                          <svg
-                            aria-label="Right chevron indicating additional content"
-                            class="usa-icon usa-icon--size-4"
-                            focusable="false"
-                            height="1em"
-                            role="img"
-                            viewBox="0 0 24 24"
-                            width="1em"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              d="M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"
-                            />
-                          </svg>
-                        </div>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
+                              <path
+                                d="M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"
+                              />
+                            </svg>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
             <div
@@ -1166,6 +1199,7 @@ exports[`Code library rendered view renders concept codes for the value set when
                   >
                     <tr
                       class="conceptsTable__tableBody_row"
+                      tabindex="0"
                     >
                       <td
                         class="valueSetCode"
@@ -1190,6 +1224,7 @@ exports[`Code library rendered view renders concept codes for the value set when
                     </tr>
                     <tr
                       class="conceptsTable__tableBody_row"
+                      tabindex="0"
                     >
                       <td
                         class="valueSetCode"
@@ -1432,11 +1467,11 @@ exports[`Code library rendered view renders the correct content 1`] = `
             />
             <div
               class="applyFilters"
-              role="button"
-              tabindex="0"
             >
-              <div
-                class="display-flex flex-align-center"
+              <button
+                class="usa-button usa-button--unstyled applyFilters"
+                data-testid="button"
+                type="button"
               >
                 <svg
                   aria-label="Icon indicating a menu with filter options"
@@ -1453,7 +1488,7 @@ exports[`Code library rendered view renders the correct content 1`] = `
                   />
                 </svg>
                 Filters
-              </div>
+              </button>
             </div>
           </div>
           <button
@@ -1476,168 +1511,180 @@ exports[`Code library rendered view renders the correct content 1`] = `
               <div
                 class="display-flex flex-row valueSetTable customizeTableWrapper"
               >
-                <table
-                  class="usa-table usa-table--borderless customizeTable"
-                  data-testid="table"
+                <div
+                  class="usa-table-container--scrollable"
+                  data-testid="scrollable-table-container"
+                  tabindex="0"
                 >
-                  <thead
-                    class="display-flex flex-column valueSetTable__header"
+                  <table
+                    class="usa-table usa-table--borderless customizeTable"
+                    data-testid="table"
                   >
-                    <tr
-                      class="valueSetTable__header_sectionHeader"
+                    <thead
+                      class="display-flex flex-column valueSetTable__header"
                     >
-                      <th>
-                        VALUE SET
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody
-                    class="overflowScroll valueSetTable__tableBody"
-                    data-testid="table-valuesets-manage"
-                  >
-                    <tr
-                      class="valueSetTable__tableBody_row activeValueSet"
+                      <tr
+                        class="valueSetTable__header_sectionHeader"
+                      >
+                        <th>
+                          VALUE SET
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody
+                      class="overflowScroll valueSetTable__tableBody"
+                      data-testid="table-valuesets-manage"
                     >
-                      <td>
-                        <div
-                          class="valueSetTable__tableBody_row_details"
-                        >
-                          <span
-                            class="valueSetTable__tableBody_row_valueSetName"
+                      <tr
+                        class="valueSetTable__tableBody_row activeValueSet"
+                        id="vsTableRow--14_20240923"
+                        tabindex="0"
+                      >
+                        <td>
+                          <div
+                            class="valueSetTable__tableBody_row_details"
                           >
                             <span
-                              class=""
+                              class="valueSetTable__tableBody_row_valueSetName"
                             >
-                              Cancer (Leukemia) Lab Result
+                              <span
+                                class=""
+                              >
+                                Cancer (Leukemia) Lab Result
+                              </span>
                             </span>
-                          </span>
-                          <span
-                            class="valueSetTable__tableBody_row_valueSetDetails"
+                            <span
+                              class="valueSetTable__tableBody_row_valueSetDetails"
+                            >
+                              <span
+                                class=""
+                              >
+                                Cancer (Leukemia)  •   Lab  •  ECC
+                              </span>
+                            </span>
+                          </div>
+                          <div>
+                            <svg
+                              aria-label="Right chevron indicating additional content"
+                              class="usa-icon usa-icon--size-4"
+                              focusable="false"
+                              height="1em"
+                              role="img"
+                              viewBox="0 0 24 24"
+                              width="1em"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"
+                              />
+                            </svg>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr
+                        class="valueSetTable__tableBody_row"
+                        id="vsTableRow--7_20240909"
+                        tabindex="0"
+                      >
+                        <td>
+                          <div
+                            class="valueSetTable__tableBody_row_details"
                           >
                             <span
-                              class=""
+                              class="valueSetTable__tableBody_row_valueSetName"
                             >
-                              Cancer (Leukemia)  •   Lab  •  ECC
+                              <span
+                                class=""
+                              >
+                                Gonorrhea Medication
+                              </span>
                             </span>
-                          </span>
-                        </div>
-                        <div>
-                          <svg
-                            aria-label="Right chevron indicating additional content"
-                            class="usa-icon usa-icon--size-4"
-                            focusable="false"
-                            height="1em"
-                            role="img"
-                            viewBox="0 0 24 24"
-                            width="1em"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              d="M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"
-                            />
-                          </svg>
-                        </div>
-                      </td>
-                    </tr>
-                    <tr
-                      class="valueSetTable__tableBody_row"
-                    >
-                      <td>
-                        <div
-                          class="valueSetTable__tableBody_row_details"
-                        >
-                          <span
-                            class="valueSetTable__tableBody_row_valueSetName"
+                            <span
+                              class="valueSetTable__tableBody_row_valueSetDetails"
+                            >
+                              <span
+                                class=""
+                              >
+                                Gonorrhea  •   Medication  •  RXNORM
+                              </span>
+                            </span>
+                          </div>
+                          <div>
+                            <svg
+                              aria-label="Right chevron indicating additional content"
+                              class="usa-icon usa-icon--size-4"
+                              focusable="false"
+                              height="1em"
+                              role="img"
+                              viewBox="0 0 24 24"
+                              width="1em"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"
+                              />
+                            </svg>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr
+                        class="valueSetTable__tableBody_row"
+                        id="vsTableRow--1-test"
+                        tabindex="0"
+                      >
+                        <td>
+                          <div
+                            class="valueSetTable__tableBody_row_details"
                           >
                             <span
-                              class=""
+                              class="valueSetTable__tableBody_row_valueSetName"
                             >
-                              Gonorrhea Medication
+                              <span
+                                class=""
+                              >
+                                Fruits
+                              </span>
                             </span>
-                          </span>
-                          <span
-                            class="valueSetTable__tableBody_row_valueSetDetails"
-                          >
                             <span
-                              class=""
+                              class="valueSetTable__tableBody_row_valueSetDetails"
                             >
-                              Gonorrhea  •   Medication  •  RXNORM
+                              <span
+                                class=""
+                              >
+                                Custom Code Condition  •   Medication  •  SNOMED
+                              </span>
                             </span>
-                          </span>
-                        </div>
-                        <div>
-                          <svg
-                            aria-label="Right chevron indicating additional content"
-                            class="usa-icon usa-icon--size-4"
-                            focusable="false"
-                            height="1em"
-                            role="img"
-                            viewBox="0 0 24 24"
-                            width="1em"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              d="M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"
-                            />
-                          </svg>
-                        </div>
-                      </td>
-                    </tr>
-                    <tr
-                      class="valueSetTable__tableBody_row"
-                    >
-                      <td>
-                        <div
-                          class="valueSetTable__tableBody_row_details"
-                        >
-                          <span
-                            class="valueSetTable__tableBody_row_valueSetName"
-                          >
                             <span
-                              class=""
+                              class="valueSetTable__tableBody_row_customValueSet"
                             >
-                              Fruits
+                              <span
+                                class=""
+                              >
+                                Created by QC Admin
+                              </span>
                             </span>
-                          </span>
-                          <span
-                            class="valueSetTable__tableBody_row_valueSetDetails"
-                          >
-                            <span
-                              class=""
+                          </div>
+                          <div>
+                            <svg
+                              aria-label="Right chevron indicating additional content"
+                              class="usa-icon usa-icon--size-4"
+                              focusable="false"
+                              height="1em"
+                              role="img"
+                              viewBox="0 0 24 24"
+                              width="1em"
+                              xmlns="http://www.w3.org/2000/svg"
                             >
-                              Custom Code Condition  •   Medication  •  SNOMED
-                            </span>
-                          </span>
-                          <span
-                            class="valueSetTable__tableBody_row_customValueSet"
-                          >
-                            <span
-                              class=""
-                            >
-                              Created by QC Admin
-                            </span>
-                          </span>
-                        </div>
-                        <div>
-                          <svg
-                            aria-label="Right chevron indicating additional content"
-                            class="usa-icon usa-icon--size-4"
-                            focusable="false"
-                            height="1em"
-                            role="img"
-                            viewBox="0 0 24 24"
-                            width="1em"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              d="M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"
-                            />
-                          </svg>
-                        </div>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
+                              <path
+                                d="M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"
+                              />
+                            </svg>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
             <div
@@ -1691,6 +1738,7 @@ exports[`Code library rendered view renders the correct content 1`] = `
                   >
                     <tr
                       class="conceptsTable__tableBody_row"
+                      tabindex="0"
                     >
                       <td
                         class="valueSetCode"
@@ -1715,6 +1763,7 @@ exports[`Code library rendered view renders the correct content 1`] = `
                     </tr>
                     <tr
                       class="conceptsTable__tableBody_row"
+                      tabindex="0"
                     >
                       <td
                         class="valueSetCode"

@@ -92,6 +92,9 @@ const CodeLibrary: React.FC = () => {
     useState<DibbsValueSet>(emptyValueSet);
 
   const modalRef = useRef<ModalRef>(null);
+  const filterButtonRef = useRef<HTMLButtonElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const activeRowRef = useRef<HTMLElement>(null);
 
   const Modal = dynamic<ModalProps>(
     () => import("../../ui/designSystem/modal/Modal").then((mod) => mod.Modal),
@@ -291,7 +294,7 @@ const CodeLibrary: React.FC = () => {
     setActiveValueSet(paginatedValueSets[0]);
 
     if (
-      filteredValueSets.length > 0 &&
+      filteredValueSets.length >= 0 &&
       conditionDetailsMap &&
       Object.keys(conditionDetailsMap).length > 0
     ) {
@@ -421,6 +424,30 @@ const CodeLibrary: React.FC = () => {
     return `${condition} ${conceptType} ${system}`;
   };
 
+  const handleListenerEvents = (vs: DibbsValueSet) => {
+    function handleKeyPress(event: KeyboardEvent) {
+      if (event.key == "Enter" || event.code == "Space") {
+        const targetRow = event.target as HTMLElement;
+        const targetVS = valueSets.filter(
+          (vs) => vs.valueSetId == targetRow.id.replace("vsTableRow--", ""),
+        )[0];
+
+        setActiveValueSet(targetVS);
+      }
+    }
+
+    activeRowRef.current = document.getElementById(
+      `vsTableRow--${vs.valueSetId}`,
+    );
+
+    activeRowRef.current?.addEventListener("keyup", handleKeyPress);
+
+    // Cleanup
+    return () => {
+      activeRowRef.current?.removeEventListener("keyup", handleKeyPress);
+    };
+  };
+
   const renderValueSetRows = () => {
     return paginatedValueSets.map((vs, _i) => {
       const vsState = customCodeIds[vs.valueSetId];
@@ -432,6 +459,8 @@ const CodeLibrary: React.FC = () => {
 
       return (
         <tr
+          id={`vsTableRow--${vs.valueSetId}`}
+          tabIndex={0}
           key={vs.valueSetId}
           className={classNames(
             styles.valueSetTable__tableBody_row,
@@ -439,6 +468,7 @@ const CodeLibrary: React.FC = () => {
               ? styles.activeValueSet
               : "",
           )}
+          onFocus={() => handleListenerEvents(vs)}
           onClick={() => setActiveValueSet(vs)}
         >
           <td>
@@ -593,40 +623,52 @@ const CodeLibrary: React.FC = () => {
                 }}
               />
               <div
-                role="button"
-                tabIndex={0}
                 className={classNames(
                   styles.applyFilters,
                   filterCount > 0 ? styles.applyFilters_active : "",
                 )}
-                onClick={() => setShowFilters(true)}
               >
-                {
-                  <div className="display-flex flex-align-center">
-                    <Icon.FilterList
-                      className="usa-icon qc-filter"
-                      size={3}
-                      aria-label="Icon indicating a menu with filter options"
-                      role="button"
-                    />
-                    {filterCount <= 0
-                      ? "Filters"
-                      : `${filterCount} ${
-                          filterCount > 1 ? `filters` : `filter`
-                        } applied`}
-                    {showFilters && (
-                      <DropdownFilter
-                        filterCount={filterCount}
-                        loading={valueSets.length <= 0}
-                        setShowFilters={setShowFilters}
-                        filterSearch={filterSearch}
-                        setFilterSearch={setFilterSearch}
-                        valueSets={valueSets}
-                        currentUser={currentUser as User}
-                      />
-                    )}
-                  </div>
-                }
+                <Button
+                  type="button"
+                  ref={filterButtonRef}
+                  unstyled
+                  className={classNames(
+                    styles.applyFilters,
+                    filterCount > 0 ? styles.applyFilters_active : "",
+                  )}
+                  onClick={() => {
+                    setShowFilters(true);
+                  }}
+                >
+                  <Icon.FilterList
+                    className="usa-icon qc-filter"
+                    size={3}
+                    aria-label="Icon indicating a menu with filter options"
+                    role="button"
+                  />
+                  {filterCount <= 0
+                    ? "Filters"
+                    : `${filterCount} ${
+                        filterCount > 1 ? `filters` : `filter`
+                      } applied`}
+                </Button>
+                {showFilters && (
+                  <DropdownFilter
+                    focusRef={dropdownRef}
+                    filterCount={filterCount}
+                    loading={valueSets.length <= 0}
+                    setShowFilters={setShowFilters}
+                    filterSearch={filterSearch}
+                    setFilterSearch={setFilterSearch}
+                    valueSets={valueSets}
+                    currentUser={currentUser as User}
+                    setTriggerFocus={() => {
+                      if (filterButtonRef.current) {
+                        filterButtonRef.current.focus();
+                      }
+                    }}
+                  />
+                )}
               </div>
             </div>
             {mode == "manage" && (
@@ -677,11 +719,11 @@ const CodeLibrary: React.FC = () => {
               </>
             )}
           </div>
-
           <div className={styles.content}>
             <div className={styles.resultsContainer}>
               <div className={styles.content__left}>
                 <Table
+                  scrollable
                   className={classNames(
                     "display-flex flex-row",
                     styles.valueSetTable,
@@ -811,18 +853,19 @@ const CodeLibrary: React.FC = () => {
                         </tr>
                       )}
                     </thead>
-                    {mode == "manage" && (
-                      <tbody
-                        className={classNames(
-                          activeValueSet?.userCreated
-                            ? styles.overflowScroll
-                            : styles.overflowScroll_headerLocked,
-                          styles.conceptsTable__tableBody,
-                        )}
-                        data-testid="table-codes"
-                      >
-                        {activeValueSet?.concepts.map((vs) => (
+                    <tbody
+                      className={classNames(
+                        activeValueSet?.userCreated
+                          ? styles.overflowScroll
+                          : styles.overflowScroll_headerLocked,
+                        styles.conceptsTable__tableBody,
+                      )}
+                      data-testid="table-codes"
+                    >
+                      {mode == "manage" &&
+                        activeValueSet?.concepts.map((vs) => (
                           <tr
+                            tabIndex={0}
                             key={vs.code}
                             className={classNames(
                               styles.conceptsTable__tableBody_row,
@@ -846,19 +889,8 @@ const CodeLibrary: React.FC = () => {
                             </td>
                           </tr>
                         ))}
-                      </tbody>
-                    )}
-                    {mode == "select" && (
-                      <tbody
-                        className={classNames(
-                          activeValueSet?.userCreated
-                            ? styles.overflowScroll
-                            : styles.overflowScroll_headerLocked,
-                          styles.conceptsTable__tableBody,
-                        )}
-                        data-testid="table-codes"
-                      >
-                        {activeValueSet.concepts.map((concept) => {
+                      {mode == "select" &&
+                        activeValueSet.concepts.map((concept) => {
                           const checked = !!customCodeIds[
                             activeValueSet.valueSetId
                           ]?.concepts?.find(
@@ -866,6 +898,7 @@ const CodeLibrary: React.FC = () => {
                           );
                           return (
                             <tr
+                              tabIndex={0}
                               key={concept.code}
                               className={classNames(
                                 styles.conceptsTable__tableBody_row,
@@ -904,8 +937,7 @@ const CodeLibrary: React.FC = () => {
                             </tr>
                           );
                         })}
-                      </tbody>
-                    )}
+                    </tbody>
                   </Table>
                 )}
               </div>
@@ -961,18 +993,6 @@ const CodeLibrary: React.FC = () => {
           }
         />
       )}
-      {mode == "select" && (
-        <>
-          <p>
-            <Backlink
-              onClick={goBack}
-              label={`Back to ${
-                prevPage == "valueset" ? "Create query" : "templates"
-              }`}
-            />
-          </p>
-        </>
-      )}
       <Modal
         id="delete-vs-modal"
         heading="Delete value set"
@@ -993,7 +1013,6 @@ const CodeLibrary: React.FC = () => {
             onClick: () => modalRef.current?.toggleModal(),
           },
         ]}
-        // errorMessage?: string | null; // New prop for error message
       >
         {`Are you sure you want to delete the value set "${activeValueSet?.valueSetName}?" This action cannot be undone`}
       </Modal>

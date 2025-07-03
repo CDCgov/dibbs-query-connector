@@ -10,6 +10,8 @@ import {
 } from "../../userManagement/test-utils";
 import { emptyVsAuthorMapItem } from "../utils";
 import * as UserGroupManagementBackend from "@/app/backend/usergroup-management";
+import React, { createRef } from "react";
+
 jest.mock("next-auth/react");
 
 jest.mock(
@@ -22,6 +24,8 @@ jest.mock("@/app/backend/usergroup-management", () => ({
   getAllUserGroups: jest.fn().mockResolvedValue({ items: [], totalItems: 0 }),
   getAllGroupMembers: jest.fn().mockResolvedValue({ items: [], totalItems: 0 }),
 }));
+
+const mockRef = createRef<HTMLDivElement>();
 
 describe("DropdownFilter", () => {
   it("renders correctly", async () => {
@@ -37,6 +41,7 @@ describe("DropdownFilter", () => {
         items: [mockGroupBasic],
         totalItems: 1,
       });
+
     render(
       <RootProviderMock currentPage="/codeLibrary">
         <DropdownFilter
@@ -51,6 +56,8 @@ describe("DropdownFilter", () => {
           valueSets={mockDibbsValueSets}
           loading={false}
           filterCount={0}
+          setTriggerFocus={jest.fn()}
+          focusRef={mockRef}
         />
       </RootProviderMock>,
     );
@@ -61,9 +68,10 @@ describe("DropdownFilter", () => {
     expect(selectDropdowns[2].id).toBe("creator");
 
     const buttons = screen.getAllByRole("button");
-    expect(buttons).toHaveLength(2);
+    expect(buttons).toHaveLength(3);
     expect(buttons[0]).toHaveTextContent("Created by me");
     expect(buttons[1]).toHaveTextContent("Created by my team");
+    expect(buttons[2]).toHaveTextContent("Close");
     expect(document.body).toMatchSnapshot();
   });
 
@@ -82,6 +90,8 @@ describe("DropdownFilter", () => {
           valueSets={mockDibbsValueSets}
           loading={false}
           filterCount={1}
+          setTriggerFocus={jest.fn()}
+          focusRef={mockRef}
         />
       </RootProviderMock>,
     );
@@ -92,7 +102,7 @@ describe("DropdownFilter", () => {
     expect(selectDropdowns[2].id).toBe("creator");
 
     const buttons = screen.getAllByRole("button");
-    expect(buttons).toHaveLength(3);
+    expect(buttons).toHaveLength(4);
     expect(buttons[2]).toHaveTextContent("Clear all filters");
 
     expect(document.body).toMatchSnapshot();
