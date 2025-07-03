@@ -1,7 +1,9 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`tests the valueset selection page interactions filter bulk selection updates only the filtered valuesets 1`] = `
-<body>
+<body
+  style="padding-right: 0px;"
+>
   <div>
     <div
       class="main-container__wide mainContainer"
@@ -106,11 +108,9 @@ exports[`tests the valueset selection page interactions filter bulk selection up
                       <div>
                         TEMPLATES
                       </div>
-                      <div
-                        class="addCondition"
+                      <button
+                        class="unstyled-button-container addCondition"
                         data-testid="add-condition-icon"
-                        role="button"
-                        tabindex="0"
                       >
                         <svg
                           aria-label="Plus sign icon indicating addition"
@@ -131,33 +131,38 @@ exports[`tests the valueset selection page interactions filter bulk selection up
                         >
                           ADD
                         </span>
-                      </div>
+                      </button>
                     </div>
                     <div
                       class="align-items-center card active"
                       data-testid="15628003-card-active"
                     >
-                      <div
+                      <button
+                        class="unstyled-button-container"
                         id="tab-15628003"
-                        tabindex="0"
+                        type="button"
                       >
                         Gonorrhea
-                      </div>
-                      <svg
-                        aria-label="Trash icon indicating deletion of disease"
-                        class="usa-icon usa-icon--size-5 usa-icon deleteIcon destructive-primary"
+                      </button>
+                      <button
+                        class="unstyled-button-container deleteIconContainer"
                         data-testid="delete-condition-15628003"
-                        focusable="false"
-                        height="1em"
-                        role="img"
-                        viewBox="0 0 24 24"
-                        width="1em"
-                        xmlns="http://www.w3.org/2000/svg"
                       >
-                        <path
-                          d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"
-                        />
-                      </svg>
+                        <svg
+                          aria-label="Trash icon indicating deletion of disease"
+                          class="usa-icon usa-icon--size-4 usa-icon deleteIcon destructive-primary"
+                          focusable="false"
+                          height="1em"
+                          role="img"
+                          viewBox="0 0 24 24"
+                          width="1em"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"
+                          />
+                        </svg>
+                      </button>
                     </div>
                   </div>
                   <div
@@ -171,13 +176,12 @@ exports[`tests the valueset selection page interactions filter bulk selection up
                     <div
                       class="align-items-center card"
                     >
-                      <div
+                      <button
+                        class="unstyled-button-container"
                         id="tab-custom"
-                        role="button"
-                        tabindex="0"
                       >
                         Additional codes from library
-                      </div>
+                      </button>
                     </div>
                   </div>
                   <div
@@ -186,13 +190,12 @@ exports[`tests the valueset selection page interactions filter bulk selection up
                     <div
                       class="align-items-center card"
                     >
-                      <div
+                      <button
+                        class="unstyled-button-container"
                         id="tab-medical-records"
-                        role="button"
-                        tabindex="0"
                       >
                         Medical record sections
-                      </div>
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -245,6 +248,7 @@ exports[`tests the valueset selection page interactions filter bulk selection up
                               focusable="false"
                               height="1em"
                               role="img"
+                              style="rotate: 180deg;"
                               viewBox="0 0 24 24"
                               width="1em"
                               xmlns="http://www.w3.org/2000/svg"
@@ -631,9 +635,9 @@ exports[`tests the valueset selection page interactions filter bulk selection up
                         class="conditionItem"
                         data-testid="update-363346000"
                         id="update-363346000"
+                        tabindex="0"
                       >
                         <span>
-                           
                           <span>
                             <span
                               class=""
@@ -642,21 +646,20 @@ exports[`tests the valueset selection page interactions filter bulk selection up
                             </span>
                           </span>
                         </span>
-                        <span
-                          class="addButton"
+                        <button
+                          class="addButton unstyled-button-container"
                           data-testid="condition-drawer-add-363346000"
-                          role="button"
                         >
                           ADD
-                        </span>
+                        </button>
                       </div>
                       <div
                         class="conditionItem"
                         data-testid="update-2"
                         id="update-2"
+                        tabindex="0"
                       >
                         <span>
-                           
                           <span>
                             <span
                               class=""
@@ -665,13 +668,12 @@ exports[`tests the valueset selection page interactions filter bulk selection up
                             </span>
                           </span>
                         </span>
-                        <span
-                          class="addButton"
+                        <button
+                          class="addButton unstyled-button-container"
                           data-testid="condition-drawer-add-2"
-                          role="button"
                         >
                           ADD
-                        </span>
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -694,9 +696,9 @@ exports[`tests the valueset selection page interactions filter bulk selection up
                         class="conditionItem"
                         data-testid="update-76272004"
                         id="update-76272004"
+                        tabindex="0"
                       >
                         <span>
-                           
                           <span>
                             <span
                               class=""
@@ -705,21 +707,20 @@ exports[`tests the valueset selection page interactions filter bulk selection up
                             </span>
                           </span>
                         </span>
-                        <span
-                          class="addButton"
+                        <button
+                          class="addButton unstyled-button-container"
                           data-testid="condition-drawer-add-76272004"
-                          role="button"
                         >
                           ADD
-                        </span>
+                        </button>
                       </div>
                       <div
                         class="conditionItem"
                         data-testid="update-240589008"
                         id="update-240589008"
+                        tabindex="0"
                       >
                         <span>
-                           
                           <span>
                             <span
                               class=""
@@ -728,21 +729,20 @@ exports[`tests the valueset selection page interactions filter bulk selection up
                             </span>
                           </span>
                         </span>
-                        <span
-                          class="addButton"
+                        <button
+                          class="addButton unstyled-button-container"
                           data-testid="condition-drawer-add-240589008"
-                          role="button"
                         >
                           ADD
-                        </span>
+                        </button>
                       </div>
                       <div
                         class="conditionItem"
                         data-testid="update-15628003"
                         id="update-15628003"
+                        tabindex="0"
                       >
                         <span>
-                           
                           <span>
                             <span
                               class=""

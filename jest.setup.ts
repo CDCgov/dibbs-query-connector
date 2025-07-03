@@ -1,4 +1,4 @@
-import { internal_getDbClient } from "@/app/backend/db/config";
+import { internal_getDbClient } from "@/backend/db/config";
 import "@testing-library/jest-dom";
 import { toHaveNoViolations } from "jest-axe";
 import * as matchers from "jest-extended";

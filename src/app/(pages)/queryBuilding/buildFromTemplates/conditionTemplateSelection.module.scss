@@ -302,9 +302,14 @@ input.errorMessage {
   }
 
   .deleteIcon {
+    &:hover {
+      cursor: pointer;
+    }
+  }
+  .deleteIconContainer {
     color: color("error");
-    width: 1.5rem;
-    height: 1.5rem;
+    width: 32px;
+    height: 32px;
     display: none;
   }
 
@@ -317,11 +322,15 @@ input.errorMessage {
     cursor: pointer;
     position: relative;
 
-    &:hover .deleteIcon {
+    &:focus-within .deleteIconContainer,
+    &:hover .deleteIconContainer {
       display: inline-block;
       position: absolute;
-      right: 2.5%;
-      top: 25%;
+      right: 3%;
+      top: 20%;
+      height: fit-content;
+      width: fit-content;
+      background-color: inherit;
     }
   }
 
@@ -374,32 +383,39 @@ input.errorMessage {
   }
 }
 
+.viewCodesBtn {
+  // toggle to block on hover
+  display: none;
+  min-width: 8rem;
+  height: 2rem;
+  font-size: 14px;
+  padding: 0.5rem 1.25rem;
+}
+
 .accordionBodyExpanded {
+  &:hover,
+  &:focus,
+  &:focus-within {
+    .viewCodesBtn {
+      display: block;
+    }
+
+    .displayCount {
+      display: none;
+    }
+  }
+
   &:hover {
     .valueSetTemplate__checkbox {
       background-color: unset;
     }
 
     .viewCodesBtn {
-      display: block;
-      min-width: 8rem;
-      height: 2rem;
-      font-size: 14px;
-      padding: 0.5rem 1.25rem;
-
       &:hover {
         cursor: pointer;
       }
     }
-    .displayCount {
-      display: none;
-    }
   }
-}
-
-.viewCodesBtn {
-  // toggle to block on hover
-  display: none;
 }
 
 .accordionExpandedInner {
@@ -496,21 +512,24 @@ $columnGap: 1rem;
 
 .conditionItem {
   display: flex;
-  padding-top: 1rem;
-  padding-bottom: 1rem;
+  padding: 1rem;
   justify-content: space-between;
   align-items: flex-start;
   align-self: stretch;
   border-radius: 0.25rem;
+  width: 100%;
 
-  &:hover {
+  &:hover,
+  &:focus-within {
     background: white;
   }
-  &:hover .addButton {
+  &:hover .addButton,
+  &:focus-within .addButton {
     display: inline-block;
   }
 
-  &:hover .addedStatus {
+  &:hover .addedStatus,
+  &:focus-within .addedStatus {
     display: inline-block;
   }
 }
