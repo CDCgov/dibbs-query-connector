@@ -759,16 +759,19 @@ const FhirServers: React.FC = () => {
 
           {renderAuthMethodFields()}
 
-          {!!patientMatchData?.supportsMatch && (
-            <div className="margin-top-4 border-top padding-top-2">
+          {/* TODO: REMOVE "!" before merge; only exposing for purpose of testing/review */}
+          {!patientMatchData?.supportsMatch && (
+            <div className="margin-top-4 border-top padding-top-1">
               <h2 className="font-heading-lg margin-bottom-2">
                 Patient $match settings
               </h2>
 
               <Checkbox
                 id="match-enabled"
+                aria-label="Enable patient matching"
                 label="Enable patient matching"
-                checked={patientMatchData.enabled}
+                className="margin-bottom-1"
+                checked={patientMatchData?.enabled}
                 onChange={(e) =>
                   setPatientMatchData((prev) => ({
                     ...prev!,
@@ -776,36 +779,56 @@ const FhirServers: React.FC = () => {
                   }))
                 }
               />
+              {patientMatchData?.enabled && (
+                <>
+                  <Checkbox
+                    id="match-only-single"
+                    aria-label="Only include single matches"
+                    label="Only include single matches"
+                    className="margin-bottom-1"
+                    checked={patientMatchData?.onlySingleMatch}
+                    onChange={(e) =>
+                      setPatientMatchData((prev) => ({
+                        ...prev!,
+                        onlySingleMatch: e.target.checked,
+                      }))
+                    }
+                  />
 
-              <Checkbox
-                id="match-only-certain"
-                label="Only include certain matches"
-                checked={patientMatchData.onlyCertainMatches}
-                onChange={(e) =>
-                  setPatientMatchData((prev) => ({
-                    ...prev!,
-                    onlyCertainMatches: e.target.checked,
-                  }))
-                }
-              />
+                  <Checkbox
+                    id="match-only-certain"
+                    aria-label="Only include certain matches"
+                    label="Only include certain matches"
+                    className="margin-bottom-1"
+                    checked={patientMatchData?.onlyCertainMatches}
+                    onChange={(e) =>
+                      setPatientMatchData((prev) => ({
+                        ...prev!,
+                        onlyCertainMatches: e.target.checked,
+                      }))
+                    }
+                  />
 
-              <Label htmlFor="match-count">
-                Number of patient matches to return
-              </Label>
-              <TextInput
-                id="match-count"
-                name="match-count"
-                type="number"
-                min="1"
-                max="20"
-                value={patientMatchData.matchCount}
-                onChange={(e) =>
-                  setPatientMatchData((prev) => ({
-                    ...prev!,
-                    matchCount: Number(e.target.value),
-                  }))
-                }
-              />
+                  <Label htmlFor="match-count">
+                    Number of maximum patient matches to return
+                  </Label>
+                  <TextInput
+                    id="match-count"
+                    name="match-count"
+                    aria-label="Number of maximum patient matches to return"
+                    type="number"
+                    min="0"
+                    max="200"
+                    value={patientMatchData?.matchCount}
+                    onChange={(e) =>
+                      setPatientMatchData((prev) => ({
+                        ...prev!,
+                        matchCount: Number(e.target.value),
+                      }))
+                    }
+                  />
+                </>
+              )}
             </div>
           )}
 
