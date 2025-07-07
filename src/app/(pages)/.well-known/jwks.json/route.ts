@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 import { getOrCreateKeys } from "../../../../../setup-scripts/gen-keys";
 
+/**
+ * API endpoint for the SMART on FHIR auth flow
+ * @returns the JWKS key set needed for auth
+ */
 export async function GET() {
   try {
     // Get or create JWKS
