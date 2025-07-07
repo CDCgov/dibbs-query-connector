@@ -248,15 +248,29 @@ const FhirServers: React.FC = () => {
     error?: string;
   }
 
+  const getAuthData = (): AuthData => ({
+    authType: authMethod,
+    headers: convertHeadersToObject(),
+    bearerToken: authMethod === "basic" ? bearerToken : undefined,
+    clientId: ["client_credentials", "SMART"].includes(authMethod)
+      ? clientId
+      : undefined,
+    clientSecret:
+      authMethod === "client_credentials" ? clientSecret : undefined,
+    tokenEndpoint: ["client_credentials", "SMART"].includes(authMethod)
+      ? tokenEndpoint
+      : undefined,
+    scopes: ["client_credentials", "SMART"].includes(authMethod)
+      ? scopes
+      : undefined,
+  });
+
   const testFhirConnection = async (
     url: string,
   ): Promise<ConnectionTestResult> => {
     try {
       // Build auth data based on selected auth method
-      const authData: AuthData = {
-        authType: authMethod,
-        headers: convertHeadersToObject(), // Include custom headers
-      };
+      const authData = getAuthData();
 
       // Add auth-method specific properties
       if (authMethod === "basic") {
@@ -285,23 +299,6 @@ const FhirServers: React.FC = () => {
         error: "Failed to test connection. Please try again.",
       };
     }
-  };
-
-  const authData: AuthData = {
-    authType: authMethod,
-    headers: convertHeadersToObject(),
-    bearerToken: authMethod === "basic" ? bearerToken : undefined,
-    clientId: ["client_credentials", "SMART"].includes(authMethod)
-      ? clientId
-      : undefined,
-    clientSecret:
-      authMethod === "client_credentials" ? clientSecret : undefined,
-    tokenEndpoint: ["client_credentials", "SMART"].includes(authMethod)
-      ? tokenEndpoint
-      : undefined,
-    scopes: ["client_credentials", "SMART"].includes(authMethod)
-      ? scopes
-      : undefined,
   };
 
   const handlePatientMatchChange = async (authData: AuthData) => {
@@ -425,7 +422,7 @@ const FhirServers: React.FC = () => {
     }
   };
 
-  const getModalButtons = (authData: AuthData) => {
+  const getModalButtons = () => {
     const buttons = [
       {
         text: modalMode === "create" ? "Add server" : "Save changes",
@@ -433,7 +430,7 @@ const FhirServers: React.FC = () => {
         id: "modal-save-button",
         className: "usa-button",
         onClick: () => {
-          void handleSave(authData);
+          void handleSave(getAuthData());
         },
       },
       {
@@ -442,7 +439,7 @@ const FhirServers: React.FC = () => {
         id: "modal-test-connection-button",
         className: "usa-button--secondary",
         onClick: () => {
-          void handleTestConnection(authData);
+          void handleTestConnection(getAuthData());
         },
       },
       {
@@ -804,7 +801,7 @@ const FhirServers: React.FC = () => {
                         )}
                         onClick={() => {
                           handleOpenModal("edit", fhirServer);
-                          handlePatientMatchChange(authData);
+                          handlePatientMatchChange(getAuthData());
                         }}
                         aria-label={`Edit ${fhirServer.name}`}
                       >
@@ -821,7 +818,7 @@ const FhirServers: React.FC = () => {
           id="fhir-server"
           heading={modalMode === "create" ? "New server" : "Edit server"}
           modalRef={modalRef}
-          buttons={getModalButtons(authData)}
+          buttons={getModalButtons()}
           errorMessage={errorMessage}
           isLarge
         >
