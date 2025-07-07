@@ -23,7 +23,7 @@ const nextConfig = {
 };
 
 const withMDX = createMDX({
-  extension: /\.(md|mdx)$/,
+  extension: [".md", ".mdx"],
   options: {
     remarkPlugins: [remarkImageTransform],
   },
