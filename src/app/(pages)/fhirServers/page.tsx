@@ -360,26 +360,8 @@ const FhirServers: React.FC = () => {
     }
   };
 
-  const handleSave = async () => {
+  const handleSave = async (authData: AuthData) => {
     const connectionResult = await testFhirConnection(serverUrl);
-
-    // Prepare auth data based on selected auth method
-    const authData = {
-      authType: authMethod,
-      headers: convertHeadersToObject(),
-      bearerToken: authMethod === "basic" ? bearerToken : undefined,
-      clientId: ["client_credentials", "SMART"].includes(authMethod)
-        ? clientId
-        : undefined,
-      clientSecret:
-        authMethod === "client_credentials" ? clientSecret : undefined,
-      tokenEndpoint: ["client_credentials", "SMART"].includes(authMethod)
-        ? tokenEndpoint
-        : undefined,
-      scopes: ["client_credentials", "SMART"].includes(authMethod)
-        ? scopes
-        : undefined,
-    };
 
     if (modalMode === "create") {
       const result = await insertFhirServer(
@@ -451,7 +433,7 @@ const FhirServers: React.FC = () => {
         id: "modal-save-button",
         className: "usa-button",
         onClick: () => {
-          void handleSave();
+          void handleSave(authData);
         },
       },
       {
@@ -657,6 +639,7 @@ const FhirServers: React.FC = () => {
                     ...prev!,
                     onlyCertainMatches: false,
                     onlySingleMatch: true,
+                    matchCount: 1,
                   }))
                 }
               />
@@ -680,8 +663,8 @@ const FhirServers: React.FC = () => {
                 name="match-type"
                 value="all"
                 defaultChecked={
-                  !patientMatchData?.onlyCertainMatches &&
-                  !patientMatchData?.onlySingleMatch
+                  !patientMatchData?.onlyCertainMatches === false &&
+                  !patientMatchData?.onlySingleMatch === false
                 }
                 label="Include all matches"
                 aria-label="Include all matches"
