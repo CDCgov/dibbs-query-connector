@@ -301,9 +301,13 @@ const FhirServers: React.FC = () => {
     }
   };
 
-  const handlePatientMatchChange = async (authData: AuthData) => {
+  const handlePatientMatchChange = async (
+    hostname: string,
+    disableCertValidation: boolean,
+    authData: AuthData,
+  ) => {
     const supportsMatch = await checkFhirServerSupportsMatch(
-      serverUrl,
+      hostname,
       disableCertValidation,
       authData,
     );
@@ -801,7 +805,11 @@ const FhirServers: React.FC = () => {
                         )}
                         onClick={() => {
                           handleOpenModal("edit", fhirServer);
-                          handlePatientMatchChange(getAuthData());
+                          handlePatientMatchChange(
+                            fhirServer.hostname,
+                            fhirServer.disableCertValidation,
+                            getAuthData(),
+                          );
                         }}
                         aria-label={`Edit ${fhirServer.name}`}
                       >
