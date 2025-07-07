@@ -2,6 +2,7 @@
 import path from "path";
 import { fileURLToPath } from "url";
 import createMDX from "@next/mdx";
+import withBundleAnalyzer from "@next/mdx";
 import { remarkImageTransform } from "./src/lib/remark-image-transform.mjs";
 
 // Get __dirname equivalent in ES modules
@@ -10,6 +11,7 @@ const __dirname = path.dirname(__filename);
 
 const nextConfig = {
   sassOptions: {
+    implementation: "sass-embedded",
     includePaths: [
       path.join(__dirname, "./", "node_modules", "@uswds", "uswds", "packages"),
     ],
@@ -28,4 +30,8 @@ const withMDX = createMDX({
   },
 });
 
-export default withMDX(nextConfig);
+const bundleAnalyzer = withBundleAnalyzer({
+  enabled: process.env.ANALYZE === "true",
+});
+
+export default bundleAnalyzer(withMDX(nextConfig));
