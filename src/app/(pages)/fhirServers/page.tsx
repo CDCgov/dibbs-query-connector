@@ -1,6 +1,13 @@
 "use client";
 
-import { Icon, Label, Tag, TextInput } from "@trussworks/react-uswds";
+import {
+  Fieldset,
+  Icon,
+  Label,
+  Radio,
+  Tag,
+  TextInput,
+} from "@trussworks/react-uswds";
 
 import dynamic from "next/dynamic";
 import { useEffect, useState, useRef, JSX, useCallback } from "react";
@@ -66,7 +73,7 @@ const FhirServers: React.FC = () => {
     enabled: false,
     onlySingleMatch: false,
     onlyCertainMatches: false,
-    matchCount: 0,
+    matchCount: 1,
     supportsMatch: false,
   } as PatientMatchData;
   const [defaultServer, setDefaultServer] = useState(false);
@@ -280,47 +287,60 @@ const FhirServers: React.FC = () => {
     }
   };
 
-  const handleTestConnection = async () => {
-    // 1. Build auth data
-    const authData: AuthData = {
-      authType: authMethod,
-      headers: convertHeadersToObject(),
-      bearerToken: authMethod === "basic" ? bearerToken : undefined,
-      clientId: ["client_credentials", "SMART"].includes(authMethod)
-        ? clientId
-        : undefined,
-      clientSecret:
-        authMethod === "client_credentials" ? clientSecret : undefined,
-      tokenEndpoint: ["client_credentials", "SMART"].includes(authMethod)
-        ? tokenEndpoint
-        : undefined,
-      scopes: ["client_credentials", "SMART"].includes(authMethod)
-        ? scopes
-        : undefined,
-    };
+  const authData: AuthData = {
+    authType: authMethod,
+    headers: convertHeadersToObject(),
+    bearerToken: authMethod === "basic" ? bearerToken : undefined,
+    clientId: ["client_credentials", "SMART"].includes(authMethod)
+      ? clientId
+      : undefined,
+    clientSecret:
+      authMethod === "client_credentials" ? clientSecret : undefined,
+    tokenEndpoint: ["client_credentials", "SMART"].includes(authMethod)
+      ? tokenEndpoint
+      : undefined,
+    scopes: ["client_credentials", "SMART"].includes(authMethod)
+      ? scopes
+      : undefined,
+  };
 
-    // 2. Run connection test
+  const handlePatientMatchChange = async (authData: AuthData) => {
+    const supportsMatch = await checkFhirServerSupportsMatch(
+      serverUrl,
+      disableCertValidation,
+      authData,
+    );
+    setPatientMatchData((prev) => ({
+      enabled: prev?.enabled ?? false,
+      onlySingleMatch: prev?.onlySingleMatch ?? false,
+      onlyCertainMatches: prev?.onlyCertainMatches ?? false,
+      matchCount: prev?.matchCount ?? 0,
+      supportsMatch,
+    }));
+  };
+
+  const handleTestConnection = async (authData: AuthData) => {
+    // 1. Run connection test
     const result = await testFhirServerConnection(
       serverUrl,
       disableCertValidation,
       authData,
     );
 
-    // 3. Independently check $match support
+    // 2. Independently check $match support
     const supportsMatch = await checkFhirServerSupportsMatch(
       serverUrl,
       disableCertValidation,
       authData,
     );
-    console.log("Supports $match:", supportsMatch);
 
-    // 4. Update connection status in DB
+    // 3. Update connection status in DB
     const updateResult = await updateFhirServerConnectionStatus(
       selectedServer?.name || serverName,
       result.success,
     );
 
-    // 5. Update frontend state
+    // 4. Update frontend state
     setConnectionStatus(result.success ? "success" : "error");
     setErrorMessage(result.error);
     setPatientMatchData((prev) => ({
@@ -423,21 +443,25 @@ const FhirServers: React.FC = () => {
     }
   };
 
-  const getModalButtons = () => {
+  const getModalButtons = (authData: AuthData) => {
     const buttons = [
       {
         text: modalMode === "create" ? "Add server" : "Save changes",
         type: "submit" as const,
         id: "modal-save-button",
         className: "usa-button",
-        onClick: handleSave,
+        onClick: () => {
+          void handleSave();
+        },
       },
       {
         text: "Test connection" as string | JSX.Element,
         type: "button" as const,
         id: "modal-test-connection-button",
         className: "usa-button--secondary",
-        onClick: handleTestConnection,
+        onClick: () => {
+          void handleTestConnection(authData);
+        },
       },
       {
         text: "Cancel",
@@ -454,7 +478,9 @@ const FhirServers: React.FC = () => {
         type: "button" as const,
         id: "modal-delete-button",
         className: "usa-button usa-button--secondary",
-        onClick: handleDeleteServer,
+        onClick: () => {
+          void handleDeleteServer();
+        },
       });
     }
 
@@ -604,6 +630,7 @@ const FhirServers: React.FC = () => {
 
         <Checkbox
           id="match-enabled"
+          data-testid="match-enabled"
           aria-label="Enable patient matching"
           label="Enable patient matching"
           className="margin-bottom-1"
@@ -617,43 +644,71 @@ const FhirServers: React.FC = () => {
         />
         {patientMatchData?.enabled && (
           <>
-            <Checkbox
-              id="match-only-single"
-              aria-label="Only include single matches"
-              label="Only include single matches"
-              className="margin-bottom-1"
-              checked={patientMatchData?.onlySingleMatch}
-              onChange={(e) =>
-                setPatientMatchData((prev) => ({
-                  ...prev!,
-                  onlySingleMatch: e.target.checked,
-                }))
-              }
-            />
-
-            <Checkbox
-              id="match-only-certain"
-              aria-label="Only include certain matches"
-              label="Only include certain matches"
-              className="margin-bottom-1"
-              checked={patientMatchData?.onlyCertainMatches}
-              onChange={(e) =>
-                setPatientMatchData((prev) => ({
-                  ...prev!,
-                  onlyCertainMatches: e.target.checked,
-                }))
-              }
-            />
+            <Fieldset>
+              <Radio
+                id="match-type-single"
+                name="match-type"
+                value="single"
+                defaultChecked={patientMatchData?.onlySingleMatch}
+                label="Only include single matches"
+                aria-label="Only include single matches"
+                onChange={() =>
+                  setPatientMatchData((prev) => ({
+                    ...prev!,
+                    onlyCertainMatches: false,
+                    onlySingleMatch: true,
+                  }))
+                }
+              />
+              <Radio
+                id="match-type-multiple"
+                name="match-type"
+                value="multiple"
+                defaultChecked={patientMatchData?.onlyCertainMatches}
+                label="Only include certain matches"
+                aria-label="Only include certain matches"
+                onChange={() =>
+                  setPatientMatchData((prev) => ({
+                    ...prev!,
+                    onlySingleMatch: false,
+                    onlyCertainMatches: true,
+                  }))
+                }
+              />
+              <Radio
+                id="match-type-all"
+                name="match-type"
+                value="all"
+                defaultChecked={
+                  !patientMatchData?.onlyCertainMatches &&
+                  !patientMatchData?.onlySingleMatch
+                }
+                label="Include all matches"
+                aria-label="Include all matches"
+                onChange={() =>
+                  setPatientMatchData((prev) => ({
+                    ...prev!,
+                    onlyCertainMatches: false,
+                    onlySingleMatch: false,
+                  }))
+                }
+              />
+            </Fieldset>
 
             <Label htmlFor="match-count">
               Number of maximum patient matches to return
             </Label>
             <TextInput
               id="match-count"
+              disabled={
+                patientMatchData?.onlySingleMatch ||
+                !patientMatchData?.onlyCertainMatches
+              }
+              data-testid="match-count"
               name="match-count"
               aria-label="Number of maximum patient matches to return"
               type="number"
-              min="0"
+              min="1"
               max="200"
               value={patientMatchData?.matchCount}
               onChange={(e) =>
@@ -764,7 +819,10 @@ const FhirServers: React.FC = () => {
                           styles.editButton,
                           "usa-button usa-button--unstyled",
                         )}
-                        onClick={() => handleOpenModal("edit", fhirServer)}
+                        onClick={() => {
+                          handleOpenModal("edit", fhirServer);
+                          handlePatientMatchChange(authData);
+                        }}
                         aria-label={`Edit ${fhirServer.name}`}
                       >
                         <Icon.Edit aria-label="edit" size={3} />
@@ -780,7 +838,7 @@ const FhirServers: React.FC = () => {
           id="fhir-server"
           heading={modalMode === "create" ? "New server" : "Edit server"}
           modalRef={modalRef}
-          buttons={getModalButtons()}
+          buttons={getModalButtons(authData)}
           errorMessage={errorMessage}
           isLarge
         >
