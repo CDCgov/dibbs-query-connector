@@ -2,7 +2,6 @@
 import path from "path";
 import { fileURLToPath } from "url";
 import createMDX from "@next/mdx";
-import withBundleAnalyzer from "@next/mdx";
 import { remarkImageTransform } from "./src/lib/remark-image-transform.mjs";
 
 // Get __dirname equivalent in ES modules
@@ -30,8 +29,12 @@ const withMDX = createMDX({
   },
 });
 
-const bundleAnalyzer = withBundleAnalyzer({
-  enabled: process.env.ANALYZE === "true",
-});
+// uncomment this in order to run the Next trace package with
+// next internal turbo-trace-server .next/trace-turbopack
 
-export default bundleAnalyzer(withMDX(nextConfig));
+// import createBundleAnalyzer from "@next/mdx";
+// const withBundleAnalyzer = createBundleAnalyzer({
+//   enabled: process.env.ANALYZE === "true",
+// });
+
+export default withMDX(nextConfig);
