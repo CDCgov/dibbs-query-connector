@@ -30,12 +30,17 @@ const withMDX = createMDX({
   },
 });
 
-// uncomment this in order to run the Next trace package with
-// next internal turbo-trace-server .next/trace-turbopack
+// uncomment this in order to run the Next trace package by
+// 1. running dev with NEXT_TURBOPACK_TRACING=1 npm run dev
+// 2. clicking around the problematic pages
+// 3. in a separate terminal, running next internal turbo-trace-server .next/trace-turbopack
+// and opening the generated file at trace.nextjs.org
 
 // import createBundleAnalyzer from "@next/mdx";
 // const withBundleAnalyzer = createBundleAnalyzer({
 //   enabled: process.env.ANALYZE === "true",
 // });
+//
+// export default withBundleAnalyzer(withMDX(nextConfig));
 
 export default withMDX(nextConfig);
