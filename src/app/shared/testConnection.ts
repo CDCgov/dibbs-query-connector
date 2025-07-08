@@ -24,3 +24,18 @@ export async function testFhirServerConnection(
     authData,
   );
 }
+
+/**
+ * Checks if a FHIR server supports the $match operation.
+ * @param url - FHIR server base URL
+ * @param disableCertValidation - Whether to disable SSL certificate validation
+ * @param authData - Optional authentication and header data
+ * @returns True if $match is supported, false otherwise
+ */
+export async function checkFhirServerSupportsMatch(
+  url: string,
+  disableCertValidation: boolean = false,
+  authData?: AuthData,
+): Promise<boolean> {
+  return FHIRClient.checkSupportsMatch(url, disableCertValidation, authData);
+}

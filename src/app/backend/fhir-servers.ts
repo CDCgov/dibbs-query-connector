@@ -19,6 +19,15 @@ export interface AuthData {
   headers?: Record<string, string>;
 }
 
+// Define an interface for patient match configuration
+export interface PatientMatchData {
+  enabled: boolean;
+  onlySingleMatch: boolean;
+  onlyCertainMatches: boolean;
+  matchCount: number;
+  supportsMatch: boolean;
+}
+
 class FhirServerConfigServiceInternal {
   /**
    * Internal implementation class that performs the underlying database read
@@ -119,6 +128,7 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
    * @param defaultServer - Whether this is the default server
    * @param lastConnectionSuccessful - Optional boolean indicating if the last connection was successful
    * @param authData - Authentication data including auth type and credentials
+   * @param patientMatchConfiguration - Optional patient match configuration
    * @returns An object indicating success or failure with optional error message
    */
   @transaction
@@ -132,6 +142,7 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
     defaultServer: boolean,
     lastConnectionSuccessful?: boolean,
     authData?: AuthData,
+    patientMatchConfiguration?: PatientMatchData,
   ) {
     const updateQuery = `
     UPDATE fhir_servers 
@@ -150,7 +161,8 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
       scopes = $12,
       access_token = $13,
       token_expiry = $14,
-      mutual_tls = $15
+      patient_match_configuration = $15,
+      mutual_tls = $16
     WHERE id = $1
     RETURNING *;
   `;
@@ -178,6 +190,20 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
         };
       }
 
+      // Patient match configuration defaults
+      const patientMatchConfigObject =
+        patientMatchConfiguration != null
+          ? {
+              enabled: patientMatchConfiguration.enabled ?? false,
+              only_single_match:
+                patientMatchConfiguration.onlySingleMatch ?? false,
+              only_certain_matches:
+                patientMatchConfiguration.onlyCertainMatches ?? false,
+              match_count: patientMatchConfiguration.matchCount ?? 1,
+              supports_match: patientMatchConfiguration.supportsMatch ?? false,
+            }
+          : null;
+
       const result = await dbService.query(updateQuery, [
         id,
         name,
@@ -193,6 +219,7 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
         authData?.scopes || null,
         authData?.accessToken || null,
         authData?.tokenExpiry || null,
+        patientMatchConfigObject,
         mutualTls,
       ]);
 
@@ -228,6 +255,7 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
    * @param defaultServer - Whether this is the default server
    * @param lastConnectionSuccessful - Optional boolean indicating if the last connection was successful
    * @param authData - Authentication data including auth type and credentials
+   * @param patientMatchConfiguration - Optional patient match configuration
    * @returns An object indicating success or failure with optional error message
    */
 
@@ -241,6 +269,7 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
     defaultServer: boolean,
     lastConnectionSuccessful?: boolean,
     authData?: AuthData,
+    patientMatchConfiguration?: PatientMatchData,
   ) {
     try {
       // Default auth type to none if not provided
@@ -264,16 +293,21 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
         };
       }
 
-      // Update the insert query to include mutual_tls
-      const updatedInsertQuery = FHIR_SERVER_INSERT_QUERY.replace(
-        "($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
-        "($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)",
-      ).replace(
-        "(name, hostname, last_connection_attempt, last_connection_successful, headers, disable_cert_validation, default_server, auth_type, client_id, client_secret, token_endpoint, scopes, access_token, token_expiry)",
-        "(name, hostname, last_connection_attempt, last_connection_successful, headers, disable_cert_validation, default_server, auth_type, client_id, client_secret, token_endpoint, scopes, access_token, token_expiry, mutual_tls)",
-      );
+      // Patient match configuration defaults
+      const patientMatchConfigObject =
+        patientMatchConfiguration != null
+          ? {
+              enabled: patientMatchConfiguration.enabled ?? false,
+              only_single_match:
+                patientMatchConfiguration.onlySingleMatch ?? false,
+              only_certain_matches:
+                patientMatchConfiguration.onlyCertainMatches ?? false,
+              match_count: patientMatchConfiguration.matchCount ?? 1,
+              supports_match: patientMatchConfiguration.supportsMatch ?? false,
+            }
+          : null;
 
-      const result = await dbService.query(updatedInsertQuery, [
+      const result = await dbService.query(FHIR_SERVER_INSERT_QUERY, [
         name,
         hostname,
         new Date(),
@@ -288,6 +322,7 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
         authData?.scopes || null,
         authData?.accessToken || null,
         authData?.tokenExpiry || null,
+        patientMatchConfigObject,
         mutualTls,
       ]);
 

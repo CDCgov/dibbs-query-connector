@@ -488,6 +488,80 @@ class FHIRClient {
 
     return this.fetch(this.hostname + path, requestOptions);
   }
+
+  /**
+   * Checks whether a FHIR server supports $match by inspecting its metadata
+   * @param url The FHIR server base URL
+   * @param disableCertValidation Whether to disable cert validation
+   * @param authData Optional auth and header configuration
+   * @returns True if $match is supported, false otherwise
+   */
+  static async checkSupportsMatch(
+    url: string,
+    disableCertValidation: boolean = false,
+    authData?: AuthData,
+  ): Promise<boolean> {
+    try {
+      const testConfig: FhirServerConfig = {
+        id: "test",
+        name: "test",
+        hostname: url,
+        disableCertValidation,
+        defaultServer: false,
+        headers: authData?.headers || {},
+      };
+
+      if (authData) {
+        testConfig.authType = authData.authType;
+
+        if (authData.authType === "basic" && authData.bearerToken) {
+          testConfig.headers = {
+            ...testConfig.headers,
+            Authorization: `Bearer ${authData.bearerToken}`,
+          };
+        } else if (
+          ["client_credentials", "SMART"].includes(authData.authType)
+        ) {
+          testConfig.clientId = authData.clientId;
+          testConfig.tokenEndpoint = authData.tokenEndpoint;
+          testConfig.scopes = authData.scopes;
+
+          if (authData.authType === "client_credentials") {
+            testConfig.clientSecret = authData.clientSecret;
+          }
+        }
+      }
+
+      const client = new FHIRClient(testConfig);
+      await client.ensureValidToken();
+
+      const response = await client.get("/metadata");
+      if (!response.ok) return false;
+
+      const json = await response.json();
+
+      const rest = json?.rest?.[0];
+      // Check if the server supports $match operation in Patient resource
+      const supportsMatchInResources =
+        Array.isArray(rest?.resource) &&
+        rest.resource.some(
+          (res: { type: string; operation?: { name?: string }[] }) =>
+            res.type === "Patient" &&
+            Array.isArray(res.operation) &&
+            res.operation.some((op) => op.name === "match"),
+        );
+
+      // Check if the server supports $match operation globally
+      const supportsMatchGlobally =
+        Array.isArray(rest?.operation) &&
+        rest.operation.some((op: { name?: string }) => op.name === "match");
+
+      return supportsMatchInResources || supportsMatchGlobally;
+    } catch (err) {
+      console.warn("Failed $match support check:", err);
+      return false;
+    }
+  }
 }
 
 export default FHIRClient;
