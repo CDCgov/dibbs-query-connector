@@ -462,7 +462,7 @@ class FHIRClient {
         method: "GET",
         headers: {
           Accept: "application/json",
-          ...(client.init.headers || {}),
+          ...(authData?.headers || {}),
         },
       });
       if (!response.ok) return false;
