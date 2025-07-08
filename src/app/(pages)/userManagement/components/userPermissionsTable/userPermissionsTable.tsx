@@ -30,9 +30,9 @@ type PermissionsProps = {
   openModal: (
     mode: UserManagementMode,
     user: User,
-    ref?: RefObject<HTMLTableRowElement | null> | null,
+    ref?: RefObject<HTMLTableRowElement | HTMLButtonElement | null>,
   ) => void;
-  triggerFocusRefs: RefObject<RefObject<HTMLTableRowElement | null>[] | null>;
+  rowFocusRefs: RefObject<RefObject<HTMLTableRowElement | null>[] | null>;
 };
 
 /**
@@ -42,7 +42,7 @@ type PermissionsProps = {
  * @param root0.setUsers State function to update the list of users
  * @param root0.fetchGroupMembers Function to retrieve a group's list of users
  * @param root0.openModal Function to retrieve a group's list of assigned queries
- * @param root0.triggerFocusRefs ref array for the table row buttons that can open the user modal
+ * @param root0.rowFocusRefs ref array for the table row buttons that can open the user modal
  * @returns Users table   
  
  */
@@ -51,7 +51,7 @@ const UserPermissionsTable: React.FC<PermissionsProps> = ({
   setUsers,
   fetchGroupMembers,
   openModal,
-  triggerFocusRefs,
+  rowFocusRefs,
 }) => {
   const { openEditSection } = useContext(UserManagementContext);
   const { data: session } = useSession();
@@ -132,6 +132,7 @@ const UserPermissionsTable: React.FC<PermissionsProps> = ({
                             "Members",
                             membership.usergroupId,
                             members,
+                            "Users",
                           ),
                       );
                     }}
@@ -149,10 +150,7 @@ const UserPermissionsTable: React.FC<PermissionsProps> = ({
     );
   };
 
-  const renderActionButtons = (
-    user: User,
-    ref?: RefObject<HTMLTableRowElement | null> | null,
-  ) => {
+  const renderActionButtons = (user: User) => {
     return (
       <Button
         unstyled
@@ -163,7 +161,12 @@ const UserPermissionsTable: React.FC<PermissionsProps> = ({
         )}
         type="button"
         onClick={() => {
-          openModal("edit-user", user, ref);
+          const row = rowFocusRefs?.current?.filter(
+            (tr) => tr.current?.id == user?.id,
+          )[0];
+          row?.current?.focus();
+
+          openModal("edit-user", user);
         }}
       >
         <span className="icon-text padding-right-4 display-flex flex-align-center">
@@ -184,8 +187,8 @@ const UserPermissionsTable: React.FC<PermissionsProps> = ({
 
   const renderUserRows = (users: User[] | null): React.ReactNode => {
     return users?.map((user: User, i: number) => {
-      if (triggerFocusRefs && triggerFocusRefs.current) {
-        triggerFocusRefs.current[i] = createRef();
+      if (rowFocusRefs && rowFocusRefs.current) {
+        rowFocusRefs.current[i] = createRef();
       }
       const display =
         user.firstName && user.lastName
@@ -196,16 +199,17 @@ const UserPermissionsTable: React.FC<PermissionsProps> = ({
 
       return (
         <tr
-          ref={triggerFocusRefs?.current?.[i] || null}
+          ref={rowFocusRefs?.current?.[i] || null}
           className={styles.tableBody__row}
           key={user.id}
           tabIndex={0}
+          id={user.id}
         >
           <td>
             <div className={styles.userDisplay}>
               <span>{display}</span>
 
-              {renderActionButtons(user, triggerFocusRefs?.current?.[i])}
+              {renderActionButtons(user)}
             </div>
           </td>
           {renderDropdown(user)}

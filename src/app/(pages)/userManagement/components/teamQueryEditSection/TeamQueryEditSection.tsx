@@ -2,6 +2,7 @@
 import {
   Dispatch,
   JSX,
+  RefObject,
   SetStateAction,
   useContext,
   useEffect,
@@ -40,6 +41,7 @@ export type UserManagementDrawerProps = {
   activeTabLabel: string;
   allQueries: CustomUserQuery[] | FilterableCustomUserQuery[];
   setAllQueries: Dispatch<SetStateAction<CustomUserQuery[]>>;
+  activeTabRef?: RefObject<HTMLElement | null>;
 };
 
 /**
@@ -51,7 +53,9 @@ export type UserManagementDrawerProps = {
  * @param root0.setAllQueries State function that updates CustomUserQuery data
  * @param root0.refreshView - State function that triggers a refresh of User or Group data
  * @param root0.activeTabLabel - The string label name of the active Tab
- * @returns TeamQueryEditSection component which is the collapsible section that allows to edit members and queries of a team
+ * @param root0.activeTabRef - The string label name of the active Tab
+
+* @returns UserManagementDrawer component which allows editing of a team's members and queries
  */
 const UserManagementDrawer: React.FC<UserManagementDrawerProps> = ({
   setUserGroups,
@@ -61,6 +65,7 @@ const UserManagementDrawer: React.FC<UserManagementDrawerProps> = ({
   activeTabLabel,
   allQueries,
   setAllQueries,
+  activeTabRef,
 }) => {
   const { teamQueryEditSection, closeEditSection } = useContext(
     UserManagementContext,
@@ -286,7 +291,10 @@ const UserManagementDrawer: React.FC<UserManagementDrawerProps> = ({
     }
   }
   const handleClose = () => {
-    closeEditSection();
+    console.log("outer handle close");
+
+    console.log("teamQueryEditSection.referrer", teamQueryEditSection.referrer);
+    closeEditSection(teamQueryEditSection.referrer);
   };
 
   return (
@@ -298,7 +306,8 @@ const UserManagementDrawer: React.FC<UserManagementDrawerProps> = ({
       isOpen={teamQueryEditSection.isOpen}
       onSave={() => {}}
       onSearch={(searchTerm) => setSearchTerm(searchTerm)}
-      onClose={handleClose}
+      onClose={() => handleClose()}
+      returnFocusElement={teamQueryEditSection.referrer}
     />
   );
 };

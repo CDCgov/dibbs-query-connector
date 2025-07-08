@@ -16,6 +16,7 @@ type DrawerProps = {
   onClose: () => void;
   onSearch?: (searchFilter: string) => void;
   drawerWidth?: "35%" | "60%";
+  returnFocusElement?: HTMLElement | null;
 };
 
 /**
@@ -29,6 +30,7 @@ type DrawerProps = {
  * @param root0.isOpen - Boolean to control the visibility of the drawer.
  * @param root0.toRender - The dynamic content to display.
  * @param root0.drawerWidth - The width of the drawer, default is 35%.
+ * @param root0.returnFocusElement - The width of the drawer, default is 35%.
  * warning modal appears before saving
  * @returns The Drawer component.
  */
@@ -41,6 +43,7 @@ const Drawer: React.FC<DrawerProps> = ({
   toRender,
   onSearch,
   drawerWidth = "35%",
+  returnFocusElement,
 }: DrawerProps) => {
   const [searchFilter, setSearchFilter] = useState("");
 
@@ -53,16 +56,24 @@ const Drawer: React.FC<DrawerProps> = ({
   }, [searchFilter]);
 
   function handleClose() {
+    console.log("innermost handle close");
     setSearchFilter("");
     onClose();
   }
 
-  document.onkeydown = function (evt) {
-    evt = evt || window.event;
-    if (evt.key === "Escape" || evt.key === "Esc") {
-      handleClose();
-    }
-  };
+  // useEffect(() => {
+  //   const handleEscape = (evt: KeyboardEvent) => {
+  //     evt = evt || window.event;
+  //     if (isOpen && (evt.key === "Escape" || evt.key === "Esc")) {
+  //       handleClose();
+  //     }
+  //   };
+  //   window.addEventListener("keyup", handleEscape);
+  //   // Cleanup
+  //   return () => {
+  //     window.removeEventListener("keyup", handleEscape);
+  //   };
+  // }, []);
 
   return (
     <FocusTrap
@@ -70,6 +81,10 @@ const Drawer: React.FC<DrawerProps> = ({
       focusTrapOptions={{
         onDeactivate: handleClose,
         escapeDeactivates: true,
+        setReturnFocus(nodeFocusedBeforeActivation) {
+          console.log(returnFocusElement);
+          return returnFocusElement ?? nodeFocusedBeforeActivation;
+        },
       }}
     >
       <div>
@@ -93,7 +108,7 @@ const Drawer: React.FC<DrawerProps> = ({
             <div className={styles.drawerHeader}>
               <button
                 className={styles.closeButton}
-                onClick={handleClose}
+                onClick={() => handleClose()}
                 aria-label="Close drawer"
                 data-testid={"close-drawer"}
               >

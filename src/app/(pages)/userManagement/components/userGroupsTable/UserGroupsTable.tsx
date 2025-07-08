@@ -1,6 +1,6 @@
 "use client";
 
-import { createRef, RefObject, useContext } from "react";
+import { createRef, RefObject, useContext, useEffect } from "react";
 import classNames from "classnames";
 import { Button } from "@trussworks/react-uswds";
 import { Icon } from "@trussworks/react-uswds";
@@ -22,7 +22,8 @@ type UserGroupsTableProps = {
     data?: UserGroup | User,
     ref?: RefObject<HTMLTableRowElement | null>,
   ) => void;
-  triggerFocusRefs: RefObject<RefObject<HTMLTableRowElement | null>[] | null>;
+  rowFocusRefs?: RefObject<RefObject<HTMLTableRowElement | null>[]>;
+  tabFocusRef?: RefObject<HTMLButtonElement | null>;
 };
 
 /**
@@ -32,7 +33,8 @@ type UserGroupsTableProps = {
  * @param root0.fetchGroupMembers Function to retrieve a group's list of users
  * @param root0.fetchGroupQueries Function to retrieve a group's list of assigned queries
  * @param root0.openModal Function to retrieve a group's list of assigned queries
- * @param root0.triggerFocusRefs ref array for the table row buttons that can open the user modal
+ * @param root0.rowFocusRefs ref array for the table row buttons that can open the user modal
+ * @param root0.tabFocusRef ref array for the table row buttons that can open the user modal
  * @returns The user groups table
  */
 const UserGroupsTable: React.FC<UserGroupsTableProps> = ({
@@ -40,8 +42,13 @@ const UserGroupsTable: React.FC<UserGroupsTableProps> = ({
   fetchGroupQueries,
   fetchGroupMembers,
   openModal,
-  triggerFocusRefs,
+  rowFocusRefs,
+  tabFocusRef,
 }) => {
+  useEffect(() => {
+    tabFocusRef?.current?.focus();
+  }, [userGroups]);
+
   const { openEditSection } = useContext(UserManagementContext);
   const role = getRole();
 
@@ -63,16 +70,17 @@ const UserGroupsTable: React.FC<UserGroupsTableProps> = ({
     }
 
     return userGroups.map((group: UserGroup, idx: number) => {
-      if (triggerFocusRefs && triggerFocusRefs.current) {
-        triggerFocusRefs.current[idx] = createRef();
+      if (rowFocusRefs && rowFocusRefs.current) {
+        rowFocusRefs.current[idx] = createRef();
       }
 
       return (
         <tr
-          ref={triggerFocusRefs?.current?.[idx]}
+          ref={rowFocusRefs?.current?.[idx]}
           tabIndex={0}
           key={group.id}
           className={styles.userGroupRow}
+          id={group.name}
         >
           <td>{group.name}</td>
           <td>
@@ -93,6 +101,7 @@ const UserGroupsTable: React.FC<UserGroupsTableProps> = ({
                       "Members",
                       group.id,
                       members,
+                      null,
                     );
                   });
                 }}
@@ -116,6 +125,7 @@ const UserGroupsTable: React.FC<UserGroupsTableProps> = ({
                     "Queries",
                     group.id,
                     groupQueries,
+                    null,
                   );
                 });
               }}
@@ -135,11 +145,7 @@ const UserGroupsTable: React.FC<UserGroupsTableProps> = ({
                     "usa-button--unstyled text-bold text-no-underline",
                   )}
                   onClick={() =>
-                    openModal(
-                      "edit-group",
-                      group,
-                      triggerFocusRefs?.current?.[idx],
-                    )
+                    openModal("edit-group", group, rowFocusRefs?.current?.[idx])
                   }
                 >
                   <span className="icon-text padding-right-4 display-flex flex-align-center">
@@ -163,11 +169,13 @@ const UserGroupsTable: React.FC<UserGroupsTableProps> = ({
                     "usa-button--unstyled text-bold text-no-underline destructive-primary",
                   )}
                   onClick={() => {
-                    openModal(
-                      "remove-group",
-                      group,
-                      triggerFocusRefs?.current?.[idx],
-                    );
+                    // return focus to row if modal is cxl'd; to tab if delete confirmed
+                    const rowRef = rowFocusRefs?.current?.[idx];
+                    rowRef?.current
+                      ? rowRef.current.focus()
+                      : tabFocusRef?.current?.focus();
+
+                    openModal("remove-group", group);
                   }}
                 >
                   <span className="icon-text padding-right-4 display-flex flex-align-center">

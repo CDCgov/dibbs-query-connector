@@ -55,7 +55,9 @@ const UserManagementContainer: React.FC<UserManagementContainerProps> = ({
   >("Load default");
 
   const modalRef = useRef<ModalRef>(null);
-  const triggerFocusRefs = useRef<RefObject<HTMLTableRowElement | null>[]>([]);
+  const rowFocusRefs = useRef<RefObject<HTMLTableRowElement | null>[]>([]);
+  const groupsTabRef = useRef<HTMLButtonElement>(null);
+  const usersTabRef = useRef<HTMLButtonElement>(null);
 
   const setTab = (e: React.MouseEvent<HTMLElement>) => {
     const clickedTab = e.currentTarget.innerHTML;
@@ -66,6 +68,7 @@ const UserManagementContainer: React.FC<UserManagementContainerProps> = ({
 
   const sections: Tab[] = [
     {
+      tabFocusRef: usersTabRef,
       label: "Users",
       access: [UserRole.SUPER_ADMIN],
       onClick: setTab,
@@ -88,7 +91,7 @@ const UserManagementContainer: React.FC<UserManagementContainerProps> = ({
                 fetchGroupMembers={fetchGroupMembers}
                 users={users}
                 setUsers={setUsers}
-                triggerFocusRefs={triggerFocusRefs}
+                rowFocusRefs={rowFocusRefs}
               />
             ) : (
               <div className="empty-response">No users found</div>
@@ -98,6 +101,7 @@ const UserManagementContainer: React.FC<UserManagementContainerProps> = ({
       },
     },
     {
+      tabFocusRef: groupsTabRef,
       label: "User groups",
       access: [UserRole.SUPER_ADMIN, UserRole.ADMIN],
       onClick: setTab,
@@ -121,7 +125,8 @@ const UserManagementContainer: React.FC<UserManagementContainerProps> = ({
               fetchGroupMembers={fetchGroupMembers}
               fetchGroupQueries={fetchGroupQueries}
               userGroups={userGroups}
-              triggerFocusRefs={triggerFocusRefs}
+              rowFocusRefs={rowFocusRefs}
+              tabFocusRef={groupsTabRef}
             />
           </>
         ) : (
@@ -259,7 +264,7 @@ const UserManagementContainer: React.FC<UserManagementContainerProps> = ({
   const handleOpenModal = async (
     mode: UserManagementMode,
     data?: UserGroup | User,
-    ref?: RefObject<HTMLTableRowElement | null> | null,
+    ref?: RefObject<HTMLTableRowElement | HTMLButtonElement | null> | null,
   ) => {
     setModalMode(mode);
     setSubjectData(data);
@@ -283,6 +288,8 @@ const UserManagementContainer: React.FC<UserManagementContainerProps> = ({
           refreshView={setShouldRefreshView}
           userGroups={userGroups}
           subjectData={subjectData}
+          tabFocusRef={groupsTabRef}
+          rowFocusRefs={rowFocusRefs}
         />
         <UserManagementDrawer
           users={users}
@@ -291,6 +298,7 @@ const UserManagementContainer: React.FC<UserManagementContainerProps> = ({
           setUserGroups={setUserGroups}
           refreshView={setShouldRefreshView}
           activeTabLabel={activeTab.label}
+          activeTabRef={activeTab.tabFocusRef}
           allQueries={allQueries}
           setAllQueries={setAllQueries}
         />
