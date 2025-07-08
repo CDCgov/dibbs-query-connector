@@ -624,7 +624,7 @@ const FhirServers: React.FC = () => {
             }))
           }
         />
-        {patientMatchData?.enabled && (
+        {!patientMatchData?.enabled && (
           <>
             <Fieldset>
               <Radio
