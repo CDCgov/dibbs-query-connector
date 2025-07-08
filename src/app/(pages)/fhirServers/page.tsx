@@ -315,7 +315,7 @@ const FhirServers: React.FC = () => {
       enabled: prev?.enabled ?? false,
       onlySingleMatch: prev?.onlySingleMatch ?? false,
       onlyCertainMatches: prev?.onlyCertainMatches ?? false,
-      matchCount: prev?.matchCount ?? 0,
+      matchCount: prev?.matchCount ?? 1,
       supportsMatch,
     }));
   };
@@ -348,7 +348,7 @@ const FhirServers: React.FC = () => {
       enabled: prev?.enabled ?? false,
       onlySingleMatch: prev?.onlySingleMatch ?? false,
       onlyCertainMatches: prev?.onlyCertainMatches ?? false,
-      matchCount: prev?.matchCount ?? 0,
+      matchCount: prev?.matchCount ?? 1,
       supportsMatch,
     }));
 
@@ -604,8 +604,7 @@ const FhirServers: React.FC = () => {
   };
 
   const renderPatientMatchFields = () =>
-    // TODO: REMOVE "!" before merge; only exposing for purpose of testing/review
-    !patientMatchData?.supportsMatch && (
+    patientMatchData?.supportsMatch && (
       <div className="margin-top-4 border-top padding-top-1">
         <h2 className="font-heading-lg margin-bottom-2">
           Patient $match settings

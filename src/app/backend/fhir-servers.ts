@@ -196,7 +196,7 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
                 patientMatchConfiguration.onlySingleMatch ?? false,
               only_certain_matches:
                 patientMatchConfiguration.onlyCertainMatches ?? false,
-              match_count: patientMatchConfiguration.matchCount ?? 0,
+              match_count: patientMatchConfiguration.matchCount ?? 1,
               supports_match: patientMatchConfiguration.supportsMatch ?? false,
             }
           : null;
@@ -296,7 +296,7 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
                 patientMatchConfiguration.onlySingleMatch ?? false,
               only_certain_matches:
                 patientMatchConfiguration.onlyCertainMatches ?? false,
-              match_count: patientMatchConfiguration.matchCount ?? 0,
+              match_count: patientMatchConfiguration.matchCount ?? 1,
               supports_match: patientMatchConfiguration.supportsMatch ?? false,
             }
           : null;
