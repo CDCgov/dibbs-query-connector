@@ -2,7 +2,6 @@
 import path from "path";
 import { fileURLToPath } from "url";
 import createMDX from "@next/mdx";
-import { remarkImageTransform } from "./src/lib/remark-image-transform.mjs";
 
 // Get __dirname equivalent in ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -23,9 +22,11 @@ const nextConfig = {
 };
 
 const withMDX = createMDX({
-  extension: [".md", ".mdx"],
+  extension: /\.(md|mdx)$/,
   options: {
-    remarkPlugins: [remarkImageTransform],
+    // Turbopack doesn't seem to play nice with Remark plugins
+    remarkPlugins: [],
+    rehypePlugins: [],
   },
 });
 
