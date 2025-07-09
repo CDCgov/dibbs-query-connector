@@ -1,4 +1,3 @@
-@use "uswds-settings" as *;
 @use "uswds-core" as *;
 @use "variables" as *;
 
@@ -363,4 +362,24 @@ fieldset > legend > .usa-accordion__button[aria-expanded="false"] {
 
 .accordionInnerWrapper > fieldset:last-of-type {
   border-bottom: 3px solid green;
+}
+
+.main-container {
+  max-width: $application-max-width;
+  width: 100%;
+  margin: auto;
+  margin-bottom: 5rem;
+  margin-top: 1.5rem;
+  padding: 0 !important;
+  flex: 1 1 auto;
+
+  &__wide {
+    @extend .main-container;
+    max-width: calc($application-wide-max-width - 2 * $application-content-margins-wide);
+  }
+}
+
+.stepper-container {
+  margin: 2rem auto 0 auto !important;
+  width: calc($application-wide-max-width - 2 * $application-content-margins);
 }

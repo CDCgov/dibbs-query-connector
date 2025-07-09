@@ -59,6 +59,7 @@ describe("FHIR Servers tests", () => {
       null,
       null,
       null,
+      null,
     ]);
     // Has new
     let newFhirServers = await getFhirServerConfigs(true);

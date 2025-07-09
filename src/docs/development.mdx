@@ -156,3 +156,11 @@ integration tests ran through `npm run test:ci`.
 ### Architecture
 
 For more info, see [architecture.md](architecture.md).
+
+### Design System
+
+Our frontend components implement the [United States Web Design System](https://designsystem.digital.gov/), with some additional customizations for our [DIBBs brand that is maintained in a separate repo.](https://github.com/CDCgov/dibbs-design-system).
+
+To help with local development compile times, we import the individual package sources we use for USWDS in `/ui/styles/styles.scss`. This follows guidance outlined [here](https://designsystem.digital.gov/components/packages/#:~:text=If%20you%20suffer%20from%20slow%20compiles%2C%20it%20may%20be%20worth%20experimenting%20with%20source%20forwarding) from the USWDS team
+
+**Any additional components not currently imported need to be added here in order to take advantage of USWDS styling**.
