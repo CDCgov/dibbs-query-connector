@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef, RefObject, useContext } from "react";
+import { useEffect, useState, useRef, RefObject } from "react";
 import UserManagementDrawer from "../teamQueryEditSection/TeamQueryEditSection";
 import UserGroupsTable from "../userGroupsTable/UserGroupsTable";
 import TabGroup, { Tab } from "@/app/ui/designSystem/TabGroup/tabGroup";
