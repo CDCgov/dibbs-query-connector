@@ -1,0 +1,101 @@
+# Query Connector IDP Configuration
+
+The Query Connector delegates user authentication and authorization assignment to your organization’s identity provider (IdP). This ensures user access to protected parts of the application have the same level of protection as the rest of your enterprise applications.
+
+Before using the Query Connector, a member of your IT Admin team who has access to your IdP will need to create and assign users to the correct application roles. Following are instructions for the IdPs the Query Connector supports.
+
+**Keycloak**
+
+Keycloak allows you to isolate role assignment to individual applications via client scopes. This will ensure the Query Connector role assignments don’t conflict with assignments in your other application clients or Keycloak realms.
+
+1. Follow the [deployment instructions](https://queryconnector.dev/docs/deployment) to set up Keycloak as your IdP for the Query Connector.
+2. Log into the Keycloak security admin console with an account that has `admin` role access.
+3. Open the side navigation panel and navigate to Clients \> `query_connector`
+
+![Keycloak navigation panel](/idp-config/keycloak_1.svg)
+
+4. Select the `Roles` tab and create the following three roles (case sensitive). For a detailed explanation for each role, refer to our [user guide](https://queryconnector.dev/docs/user-guide). You can add a description if you wish to make the roles understandable to other members of your organization.
+
+   1. `super-admin` (notice the hyphen)
+   2. `admin`
+   3. `standard`
+
+   ![](/idp-config/keycloak_2.svg)
+
+   After creation, you should have the following three roles available for assignment: super admin, admin, and standard.
+
+   ![](/idp-config/keycloak_3.svg)
+
+5. Navigate to the Users tab in the left side nav: you should see a list of all the users within your organization that have access to Keycloak. Based on your organization’s structure, assign users to the role they should have within the Query Connector by selecting a user, navigating to the `Role mapping` tab, clicking `Assign role`, and filling out the associated details.
+
+   ![](/idp-config/keycloak_4.svg)
+
+   ![](/idp-config/keycloak_5.svg)
+
+   ![](/idp-config/keycloak_6.svg)
+
+6. Your users should be properly configured\! To verify, have your users log in and check that they have appropriate permissions in the application.
+
+- Standard users should only have access to the query execution flow.
+
+![](/idp-config/menu_standard.svg)
+
+- Admin users should have access to all the pages standard users do, and also have access to the query and code libraries and the user management page.
+
+  ![](/idp-config/menu_admin.svg)
+
+- Super admin users should have access to all the pages admin users do, and should also have access to the FHIR server configuration page and the audit log.
+
+  ![](/idp-config/menu_superadmin.svg)
+
+  **Microsoft Entra ID**
+
+  Microsoft Entra allows you to isolate role assignment to individual enterprise applications. This will ensure that Query Connector role assignments don’t conflict with assignments in your other application clients or overall Azure organization.
+
+1.  Follow the [deployment instructions](https://queryconnector.dev/docs/deployment) to set up Entra as your IdP for the Query Connector.
+2.  Navigate to the [Entra admin console](https://entra.microsoft.com/) for your organization. There are two places you’ll need to configure access. Make sure that the account that you’re using is an owner in the Enterprise application (this will allow you to assign roles).
+
+    ![](/idp-config/azure_1.svg)
+
+    And the app registration (which will allow you to create roles).![](/idp-config/azure_2.svg)
+
+    ![](/idp-config/azure_3.svg)
+
+3.  Navigate to the `App registrations` page under applications and click on the `App roles` tab. Create the following three roles by clicking `Create app role` at the top of the screen with the following values:![](/idp-config/azure_4.svg)
+    1.  Super Admin
+        1. Display name \- `Super admin`
+        2. Allowed member types \- `Users / Groups`
+        3. Value \- `super-admin` (case sensitive, with the hyphen)
+        4. Description \- Add a description that’ll help you remember what the role can do.
+    2.  Admin
+        1. Display name \- `Admin`
+        2. Allowed member types \- `Users / Groups`
+        3. Value \- `admin` (case sensitive)
+        4. Description \- Add a description that’ll help you remember what the role can do.
+    3.  Standard
+        1. Display name \- `Standard`
+        2. Allowed member types \- `Users / Groups`
+        3. Value \- `standard` (case sensitive)
+        4. Description \- Add a description that’ll help you remember what the role can do.
+4.  Navigate to `Applications > Enterprise applications` and select `Manage > Users and Groups`. Start the role assignment for each user by checking the box next to their name and then clicking `Edit Assignment`
+
+    ![](/idp-config/azure_5.svg)
+
+5.  Assign roles by selecting the `None selected` link on the pane that appears and then selecting the correct role based on your organization’s structure. Save the selection by hitting `Assign` after the selection. ![](/idp-config/azure_6.svg)  
+    Azure should give you a confirmation after the assignment succeeds.
+
+    ![](/idp-config/azure_7.svg)
+
+6.  Your users should be properly configured\! To verify, have your users log in and check that they have appropriate permissions in the application.
+
+    - Standard users should only have access to the query execution flow.
+
+    ![](/idp-config/menu_standard.svg)
+
+    - Admin users should have access to all the pages standard users do, and should also have access to the query and code libraries and user management page.
+
+      ![](/idp-config/menu_admin.svg)
+
+    - Super admin users should have access to all the pages admin users do, and should also have access to the FHIR server configuration page and the audit log.
+
+    ![](/idp-config/menu_superadmin.svg)
