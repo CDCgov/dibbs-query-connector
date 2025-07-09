@@ -3,7 +3,7 @@
  * @returns A React component that renders the Markdown file.
  */
 export default async function Page() {
-  const { default: Post } = await import(`@/docs/table-of-contents.md`);
+  const { default: Post } = await import(`@/docs/table-of-contents.mdx`);
 
   return (
     <div className="main-container">
