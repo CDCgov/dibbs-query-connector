@@ -37,7 +37,7 @@ export function generateStaticParams() {
   const files = fs.readdirSync(docsDir);
   const slugs = files
     .filter((file) => file.endsWith(".mdx"))
-    .map((file) => ({ slug: file.replace(/\.mdx$/, "") }));
+    .map((file) => ({ slug: file.replace(/\.mdx?$/, "") }));
   return slugs;
 }
 
