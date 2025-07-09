@@ -298,7 +298,6 @@ const UserManagementContainer: React.FC<UserManagementContainerProps> = ({
           setUserGroups={setUserGroups}
           refreshView={setShouldRefreshView}
           activeTabLabel={activeTab.label}
-          activeTabRef={activeTab.tabFocusRef}
           allQueries={allQueries}
           setAllQueries={setAllQueries}
         />

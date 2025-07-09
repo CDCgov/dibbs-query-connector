@@ -144,6 +144,7 @@ exports[`Super Admin view of Users Table renders content on tab click 1`] = `
           <tbody>
             <tr
               class="tableBody__row"
+              id="456"
               tabindex="0"
             >
               <td>
@@ -233,6 +234,7 @@ exports[`Super Admin view of Users Table renders content on tab click 1`] = `
             </tr>
             <tr
               class="tableBody__row"
+              id="123"
               tabindex="0"
             >
               <td>
@@ -435,6 +437,7 @@ exports[`Super Admin view of Users Table renders content on tab click 2`] = `
           <tbody>
             <tr
               class="userGroupRow"
+              id="Hogwarts"
               tabindex="0"
             >
               <td>
@@ -834,9 +837,199 @@ exports[`Super Admin view of Users Table renders table view after content is loa
         Add user
       </button>
       <div
-        class="empty-response"
+        class="userPermissionsTable customizeTableWrapper"
       >
-        No users found
+        <table
+          class="usa-table usa-table--borderless customizeTable"
+          data-testid="table"
+        >
+          <thead>
+            <tr>
+              <th>
+                Name
+              </th>
+              <th>
+                Permissions
+              </th>
+              <th>
+                User groups
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              class="tableBody__row"
+              id="456"
+              tabindex="0"
+            >
+              <td>
+                <div
+                  class="userDisplay"
+                >
+                  <span>
+                    Potter, Lily 
+                  </span>
+                  <button
+                    class="usa-button usa-button--unstyled editBtn unstyled-button-container usa-button--unstyled text-bold text-no-underline"
+                    data-testid="button"
+                    type="button"
+                  >
+                    <span
+                      class="icon-text padding-right-4 display-flex flex-align-center"
+                    >
+                      <svg
+                        aria-label="Pencil icon indicating edit ability"
+                        class="usa-icon height-3 width-3"
+                        focusable="false"
+                        height="1em"
+                        role="img"
+                        viewBox="0 0 24 24"
+                        width="1em"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a.996.996 0 0 0 0-1.41l-2.34-2.34a.996.996 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"
+                        />
+                      </svg>
+                      <span
+                        class="padding-left-05"
+                        data-testid="edit-group-456"
+                      >
+                        Edit
+                      </span>
+                    </span>
+                  </button>
+                </div>
+              </td>
+              <td
+                class="roleDropdown"
+              >
+                <label
+                  class="usa-label usa-sr-only"
+                  data-testid="label"
+                  for="role-select-456"
+                >
+                  User role
+                </label>
+                <select
+                  class="usa-select"
+                  data-testid="role-select-456"
+                  id="role-select-456"
+                >
+                  <option
+                    value="Super Admin"
+                  >
+                    Super Admin
+                  </option>
+                  <option
+                    selected=""
+                    value="Admin"
+                  >
+                    Admin
+                  </option>
+                  <option
+                    value="Standard"
+                  >
+                    Standard
+                  </option>
+                </select>
+              </td>
+              <td>
+                <button
+                  aria-description="Edit Order of the Phoenix members"
+                  class="usa-button usa-button--unstyled margin-right-2 text-no-underline"
+                  data-testid="button"
+                  type="button"
+                >
+                  <span>
+                    Order of the Phoenix
+                  </span>
+                </button>
+              </td>
+            </tr>
+            <tr
+              class="tableBody__row"
+              id="123"
+              tabindex="0"
+            >
+              <td>
+                <div
+                  class="userDisplay"
+                >
+                  <span>
+                    Potter, Harry 
+                  </span>
+                  <button
+                    class="usa-button usa-button--unstyled editBtn unstyled-button-container usa-button--unstyled text-bold text-no-underline"
+                    data-testid="button"
+                    type="button"
+                  >
+                    <span
+                      class="icon-text padding-right-4 display-flex flex-align-center"
+                    >
+                      <svg
+                        aria-label="Pencil icon indicating edit ability"
+                        class="usa-icon height-3 width-3"
+                        focusable="false"
+                        height="1em"
+                        role="img"
+                        viewBox="0 0 24 24"
+                        width="1em"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a.996.996 0 0 0 0-1.41l-2.34-2.34a.996.996 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"
+                        />
+                      </svg>
+                      <span
+                        class="padding-left-05"
+                        data-testid="edit-group-123"
+                      >
+                        Edit
+                      </span>
+                    </span>
+                  </button>
+                </div>
+              </td>
+              <td
+                class="roleDropdown"
+              >
+                <label
+                  class="usa-label usa-sr-only"
+                  data-testid="label"
+                  for="role-select-123"
+                >
+                  User role
+                </label>
+                <select
+                  class="usa-select"
+                  data-testid="role-select-123"
+                  id="role-select-123"
+                >
+                  <option
+                    selected=""
+                    value="Super Admin"
+                  >
+                    Super Admin
+                  </option>
+                  <option
+                    value="Admin"
+                  >
+                    Admin
+                  </option>
+                  <option
+                    value="Standard"
+                  >
+                    Standard
+                  </option>
+                </select>
+              </td>
+              <td>
+                --
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
       <div>
         Modal Mock
@@ -930,6 +1123,7 @@ exports[`Super Admin view of Users Table renders table view after content is loa
         <tbody>
           <tr
             class="tableBody__row"
+            id="456"
             tabindex="0"
           >
             <td>
@@ -1019,6 +1213,7 @@ exports[`Super Admin view of Users Table renders table view after content is loa
           </tr>
           <tr
             class="tableBody__row"
+            id="123"
             tabindex="0"
           >
             <td>

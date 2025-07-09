@@ -57,9 +57,9 @@ export interface UserModalProps {
  * @param root0.setModalMode - State function to control which content the modal should render
  * @param root0.refreshView - State function that indicates if the list of Users should be refreshed
  * @param root0.userGroups - List of UserGroups, to display when adding a new User
- * @param root0.subjectData - List of UserGroups, to display when adding a new User
- * @param root0.tabFocusRef - List of UserGroups, to display when adding a new User
- * @param root0.rowFocusRefs - List of UserGroups, to display when adding a new User
+ * @param root0.subjectData - The UserGroup or User subject
+ * @param root0.tabFocusRef - Ref to return focus to the Users/User Groups table tab
+ * @param root0.rowFocusRefs - Refs for each row of table data, for focus control
  * @returns - The UserModal component.
  */
 const UserModal: React.FC<UserModalProps> = ({

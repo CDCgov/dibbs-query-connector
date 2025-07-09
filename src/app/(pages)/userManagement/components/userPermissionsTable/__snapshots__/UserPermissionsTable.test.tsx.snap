@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+// Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`User Management: User tab Loads user list successfully 1`] = `
 <body>
@@ -26,6 +26,7 @@ exports[`User Management: User tab Loads user list successfully 1`] = `
         <tbody>
           <tr
             class="tableBody__row"
+            id="456"
             tabindex="0"
           >
             <td>
@@ -115,6 +116,7 @@ exports[`User Management: User tab Loads user list successfully 1`] = `
           </tr>
           <tr
             class="tableBody__row"
+            id="123"
             tabindex="0"
           >
             <td>
@@ -221,6 +223,7 @@ exports[`User Management: User tab Loads user list successfully 1`] = `
         <tbody>
           <tr
             class="tableBody__row"
+            id="456"
             tabindex="0"
           >
             <td>
@@ -310,6 +313,7 @@ exports[`User Management: User tab Loads user list successfully 1`] = `
           </tr>
           <tr
             class="tableBody__row"
+            id="123"
             tabindex="0"
           >
             <td>

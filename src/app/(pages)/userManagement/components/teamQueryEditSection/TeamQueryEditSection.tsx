@@ -41,7 +41,6 @@ export type UserManagementDrawerProps = {
   activeTabLabel: string;
   allQueries: CustomUserQuery[] | FilterableCustomUserQuery[];
   setAllQueries: Dispatch<SetStateAction<CustomUserQuery[]>>;
-  activeTabRef?: RefObject<HTMLElement | null>;
 };
 
 /**
@@ -53,7 +52,6 @@ export type UserManagementDrawerProps = {
  * @param root0.setAllQueries State function that updates CustomUserQuery data
  * @param root0.refreshView - State function that triggers a refresh of User or Group data
  * @param root0.activeTabLabel - The string label name of the active Tab
- * @param root0.activeTabRef - The string label name of the active Tab
 
 * @returns UserManagementDrawer component which allows editing of a team's members and queries
  */
@@ -65,7 +63,6 @@ const UserManagementDrawer: React.FC<UserManagementDrawerProps> = ({
   activeTabLabel,
   allQueries,
   setAllQueries,
-  activeTabRef,
 }) => {
   const { teamQueryEditSection, closeEditSection } = useContext(
     UserManagementContext,
@@ -303,7 +300,7 @@ const UserManagementDrawer: React.FC<UserManagementDrawerProps> = ({
       isOpen={teamQueryEditSection.isOpen}
       onSave={() => {}}
       onSearch={(searchTerm) => setSearchTerm(searchTerm)}
-      onClose={() => handleClose()}
+      onClose={handleClose}
     />
   );
 };

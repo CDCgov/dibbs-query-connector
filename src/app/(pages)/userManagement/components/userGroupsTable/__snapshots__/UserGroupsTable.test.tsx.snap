@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+// Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`User Groups table renders the correct label syntax based on member/query size 1`] = `
 <body>
@@ -26,6 +26,7 @@ exports[`User Groups table renders the correct label syntax based on member/quer
         <tbody>
           <tr
             class="userGroupRow"
+            id="Order of the Phoenix"
             tabindex="0"
           >
             <td>
@@ -119,6 +120,7 @@ exports[`User Groups table renders the correct label syntax based on member/quer
           </tr>
           <tr
             class="userGroupRow"
+            id="S.P.E.W."
             tabindex="0"
           >
             <td>

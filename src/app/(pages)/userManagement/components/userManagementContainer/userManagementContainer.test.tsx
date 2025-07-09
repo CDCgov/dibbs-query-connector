@@ -47,6 +47,7 @@ jest.mock(
   "@/app/(pages)/userManagement/components/userModal/userModal",
   () => () => <div>Modal Mock</div>,
 );
+
 describe("Super Admin view of Users Table", () => {
   const role = UserRole.SUPER_ADMIN;
   it("renders error message when no users are found", async () => {
@@ -56,7 +57,10 @@ describe("Super Admin view of Users Table", () => {
       </RootProviderMock>,
     );
 
-    expect(screen.getByText("No users found")).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.queryByText("No users found")).toBeInTheDocument();
+    });
+
     expect(document.body).toMatchSnapshot();
   });
 
@@ -77,6 +81,10 @@ describe("Super Admin view of Users Table", () => {
     if (mockPermissionsTab.renderContent) {
       render(mockPermissionsTab.renderContent());
     }
+
+    await waitFor(() => {
+      expect(screen.queryByText("Loading")).not.toBeInTheDocument();
+    });
 
     expect(document.body).toHaveTextContent("Potter, Harry");
     expect(document.body).toHaveTextContent("Order of the Phoenix");

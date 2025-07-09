@@ -41,7 +41,7 @@ describe("User Management: User tab", () => {
           setUsers={jest.fn()}
           users={[mockAdmin, mockSuperAdmin]}
           fetchGroupMembers={jest.fn()}
-          triggerFocusRefs={mockRefs}
+          rowFocusRefs={mockRefs}
         />
       </RootProviderMock>,
     );
@@ -82,7 +82,7 @@ describe("User Management: User tab", () => {
           setUsers={jest.fn()}
           users={[mockAdmin, mockSuperAdmin]}
           fetchGroupMembers={jest.fn()}
-          triggerFocusRefs={mockRefs}
+          rowFocusRefs={mockRefs}
         />
       </RootProviderMock>,
     );
