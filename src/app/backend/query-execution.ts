@@ -102,19 +102,29 @@ class QueryService {
 
     const fhirClient = await prepareFhirClient(fhirServer);
 
-    // Query for patient
-    let query = "/Patient?";
+    // Get the server config to check for mutual TLS
+    const { getFhirServerConfigs } = await import("./fhir-servers");
+    const serverConfigs = await getFhirServerConfigs();
+    const serverConfig = serverConfigs.find(
+      (config) => config.name === fhirServer,
+    );
+
+    // Check if this server has mutual TLS enabled
+    const isMutualTlsEnabled = serverConfig?.mutualTls === true;
+
+    // Build patient search query
+    let patientQuery = "Patient?";
     if (firstName) {
-      query += `given=${firstName}&`;
+      patientQuery += `given=${firstName}&`;
     }
     if (lastName) {
-      query += `family=${lastName}&`;
+      patientQuery += `family=${lastName}&`;
     }
     if (dob) {
-      query += `birthdate=${dob}&`;
+      patientQuery += `birthdate=${dob}&`;
     }
     if (mrn) {
-      query += `identifier=${mrn}&`;
+      patientQuery += `identifier=${mrn}&`;
     }
     if (phone) {
       // We might have multiple phone numbers if we're coming from the API
@@ -129,7 +139,7 @@ class QueryService {
         }
       }
       if (phonePossibilities.length > 0) {
-        query += `phone=${phonePossibilities.join(",")}&`;
+        patientQuery += `phone=${phonePossibilities.join(",")}&`;
       }
     }
     if (address?.street1 || address?.street2) {
@@ -141,28 +151,91 @@ class QueryService {
         .filter((addr) => addr != "")
         .join(",");
 
-      query += `address=${addrString}&`;
+      patientQuery += `address=${addrString}&`;
     }
     if (address?.city) {
       const cities = address?.city?.split(";").join(",");
-      query += `address-city=${cities}&`;
+      patientQuery += `address-city=${cities}&`;
     }
     if (address?.state) {
       const states = address?.state.split(";").join(",");
-      query += `address-state=${states}&`;
+      patientQuery += `address-state=${states}&`;
     }
     if (address?.zip) {
       const zips = address?.zip.split(";").join(",");
-      query += `address-postalcode=${zips}&`;
+      patientQuery += `address-postalcode=${zips}&`;
     }
     if (email) {
       const emailsToSearch = email.split(";");
       if (emailsToSearch.length > 0) {
-        query += `email=${emailsToSearch.join(",")}&`;
+        patientQuery += `email=${emailsToSearch.join(",")}&`;
       }
     }
 
-    const fhirResponse = await fhirClient.get(query);
+    let fhirResponse: Response;
+
+    if (isMutualTlsEnabled) {
+      // For mutual TLS enabled servers, send POST to /Task
+      const taskBody = {
+        resourceType: "Task",
+        status: "requested",
+        intent: "order",
+        code: {
+          coding: [
+            {
+              system:
+                "http://hl7.org/fhir/us/davinci-cdex/CodeSystem/cdex-temp",
+              code: "data-request-query",
+            },
+          ],
+        },
+        authoredOn: new Date().toISOString(),
+        lastModified: new Date().toISOString(),
+        input: [
+          {
+            type: {
+              coding: [
+                {
+                  system:
+                    "http://hl7.org/fhir/us/davinci-hrex/CodeSystem/hrex-temp",
+                  code: "data-query-patient-fhir-fanout",
+                },
+              ],
+            },
+            valueString: patientQuery,
+          },
+          {
+            type: {
+              coding: [
+                {
+                  system:
+                    "http://hl7.org/fhir/us/davinci-cdex/CodeSystem/cdex-temp",
+                  code: "purpose-of-use",
+                },
+              ],
+            },
+            valueCodeableConcept: {
+              coding: [
+                {
+                  system: "2.16.840.1.113883.3.18.7.1",
+                  code: "PUBLICHEALTH",
+                },
+              ],
+            },
+          },
+        ],
+      };
+
+      fhirResponse = await fhirClient.postJson("/Task", taskBody);
+      // log the response for debugging
+      console.log(
+        `FHIR Task POST response: ${fhirResponse.status} - ${await fhirResponse.text()}`,
+      );
+    } else {
+      // For non-mutual TLS servers, use the original GET to /Patient
+      const query = "/" + patientQuery;
+      fhirResponse = await fhirClient.get(query);
+    }
 
     // Check for errors
     if (fhirResponse.status !== 200) {

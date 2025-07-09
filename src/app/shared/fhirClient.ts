@@ -19,7 +19,6 @@ function fetchWithMutualTLS(
   disableCertValidation: boolean = false,
 ) {
   return async (url: string, options?: RequestInit): Promise<Response> => {
-    const { default: fetch } = await import("node-fetch");
     const agent = new https.Agent({
       cert,
       key,
@@ -28,8 +27,9 @@ function fetchWithMutualTLS(
 
     return fetch(url, {
       ...options,
+      // @ts-ignore - Node.js fetch supports agent option
       agent,
-    }) as unknown as Promise<Response>;
+    });
   };
 }
 
@@ -484,6 +484,27 @@ class FHIRClient {
         ...this.init.headers,
       },
       body: searchParams.toString(),
+    };
+
+    return this.fetch(this.hostname + path, requestOptions);
+  }
+
+  /**
+   * Sends a POST request with JSON body to the specified path.
+   * @param path - The request path.
+   * @param body - The JSON request body.
+   * @returns The response from the server.
+   */
+  async postJson(path: string, body: any): Promise<Response> {
+    await this.ensureValidToken();
+
+    const requestOptions: RequestInit = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...this.init.headers,
+      },
+      body: JSON.stringify(body),
     };
 
     return this.fetch(this.hostname + path, requestOptions);
