@@ -624,85 +624,85 @@ const FhirServers: React.FC = () => {
             }))
           }
         />
-        {/* {patientMatchData?.enabled && ( */}
-        <>
-          <Fieldset>
-            <Radio
-              id="match-type-single"
-              name="match-type"
-              value="single"
-              defaultChecked={patientMatchData?.onlySingleMatch}
-              label="Only include single matches"
-              aria-label="Only include single matches"
-              onChange={() =>
-                setPatientMatchData((prev) => ({
-                  ...prev!,
-                  onlyCertainMatches: false,
-                  onlySingleMatch: true,
-                  matchCount: 1,
-                }))
-              }
-            />
-            <Radio
-              id="match-type-multiple"
-              name="match-type"
-              value="multiple"
-              defaultChecked={patientMatchData?.onlyCertainMatches}
-              label="Only include certain matches"
-              aria-label="Only include certain matches"
-              onChange={() =>
-                setPatientMatchData((prev) => ({
-                  ...prev!,
-                  onlySingleMatch: false,
-                  onlyCertainMatches: true,
-                }))
-              }
-            />
-            <Radio
-              id="match-type-all"
-              name="match-type"
-              value="all"
-              defaultChecked={
-                !patientMatchData?.onlyCertainMatches === false &&
-                !patientMatchData?.onlySingleMatch === false
-              }
-              label="Include all matches"
-              aria-label="Include all matches"
-              onChange={() =>
-                setPatientMatchData((prev) => ({
-                  ...prev!,
-                  onlyCertainMatches: false,
-                  onlySingleMatch: false,
-                }))
-              }
-            />
-          </Fieldset>
+        {patientMatchData?.enabled && (
+          <>
+            <Fieldset>
+              <Radio
+                id="match-type-single"
+                name="match-type"
+                value="single"
+                defaultChecked={patientMatchData?.onlySingleMatch}
+                label="Only include single matches"
+                aria-label="Only include single matches"
+                onChange={() =>
+                  setPatientMatchData((prev) => ({
+                    ...prev!,
+                    onlyCertainMatches: false,
+                    onlySingleMatch: true,
+                    matchCount: 1,
+                  }))
+                }
+              />
+              <Radio
+                id="match-type-multiple"
+                name="match-type"
+                value="multiple"
+                defaultChecked={patientMatchData?.onlyCertainMatches}
+                label="Only include certain matches"
+                aria-label="Only include certain matches"
+                onChange={() =>
+                  setPatientMatchData((prev) => ({
+                    ...prev!,
+                    onlySingleMatch: false,
+                    onlyCertainMatches: true,
+                  }))
+                }
+              />
+              <Radio
+                id="match-type-all"
+                name="match-type"
+                value="all"
+                defaultChecked={
+                  !patientMatchData?.onlyCertainMatches === false &&
+                  !patientMatchData?.onlySingleMatch === false
+                }
+                label="Include all matches"
+                aria-label="Include all matches"
+                onChange={() =>
+                  setPatientMatchData((prev) => ({
+                    ...prev!,
+                    onlyCertainMatches: false,
+                    onlySingleMatch: false,
+                  }))
+                }
+              />
+            </Fieldset>
 
-          <Label htmlFor="match-count">
-            Number of maximum patient matches to return
-          </Label>
-          <TextInput
-            id="match-count"
-            disabled={
-              patientMatchData?.onlySingleMatch ||
-              !patientMatchData?.onlyCertainMatches
-            }
-            data-testid="match-count"
-            name="match-count"
-            aria-label="Number of maximum patient matches to return"
-            type="number"
-            min="1"
-            max="200"
-            value={patientMatchData?.matchCount}
-            onChange={(e) =>
-              setPatientMatchData((prev) => ({
-                ...prev!,
-                matchCount: Number(e.target.value),
-              }))
-            }
-          />
-        </>
-        {/* )} */}
+            <Label htmlFor="match-count">
+              Number of maximum patient matches to return
+            </Label>
+            <TextInput
+              id="match-count"
+              disabled={
+                patientMatchData?.onlySingleMatch ||
+                !patientMatchData?.onlyCertainMatches
+              }
+              data-testid="match-count"
+              name="match-count"
+              aria-label="Number of maximum patient matches to return"
+              type="number"
+              min="1"
+              max="200"
+              value={patientMatchData?.matchCount}
+              onChange={(e) =>
+                setPatientMatchData((prev) => ({
+                  ...prev!,
+                  matchCount: Number(e.target.value),
+                }))
+              }
+            />
+          </>
+        )}
       </div>
     );
 
