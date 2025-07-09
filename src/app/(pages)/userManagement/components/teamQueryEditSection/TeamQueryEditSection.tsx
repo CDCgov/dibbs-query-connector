@@ -291,10 +291,7 @@ const UserManagementDrawer: React.FC<UserManagementDrawerProps> = ({
     }
   }
   const handleClose = () => {
-    console.log("outer handle close");
-
-    console.log("teamQueryEditSection.referrer", teamQueryEditSection.referrer);
-    closeEditSection(teamQueryEditSection.referrer);
+    closeEditSection();
   };
 
   return (
@@ -307,7 +304,6 @@ const UserManagementDrawer: React.FC<UserManagementDrawerProps> = ({
       onSave={() => {}}
       onSearch={(searchTerm) => setSearchTerm(searchTerm)}
       onClose={() => handleClose()}
-      returnFocusElement={teamQueryEditSection.referrer}
     />
   );
 };

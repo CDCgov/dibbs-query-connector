@@ -147,7 +147,6 @@ const UserModal: React.FC<UserModalProps> = ({
       listType == "Queries"
         ? (newGroup.queries as CustomUserQuery[])
         : (newGroup.members as User[]),
-      rowFocusRefs?.current[0].current ?? null,
     );
   }
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useEffect, useState } from "react";
+import { createContext, useState } from "react";
 import { User } from "@/app/models/entities/users";
 import { CustomUserQuery } from "@/app/models/entities/query";
 
@@ -15,7 +15,6 @@ interface UserManagementData {
     groupId: string;
     subjectType: SubjectType;
     subjectData: User[] | CustomUserQuery[];
-    referrer?: HTMLElement | null;
   };
 }
 
@@ -26,9 +25,8 @@ interface UserManagementContext extends UserManagementData {
     subjectType: SubjectType,
     groupId: string,
     subjectData: User[] | CustomUserQuery[],
-    referrer?: HTMLElement | null,
   ) => void;
-  closeEditSection: (referrer?: HTMLElement | null) => void;
+  closeEditSection: () => void;
 }
 
 const initData: UserManagementData = {
@@ -57,30 +55,12 @@ export const UserManagementContext = createContext<UserManagementContext>({
  */
 const DataProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
   const [innerState, setInnerState] = useState<UserManagementData>(initData);
-  useEffect(() => {
-    console.log(
-      "provider loaded, initial referrer:",
-      innerState.teamQueryEditSection.referrer,
-    );
-  }, []);
+
   /**
    * Event handlers for edit section
-   * @param referrer asdf
    */
-  function closeEditSection(referrer?: HTMLElement | null) {
-    console.log("element to focus", referrer);
-    const newData: UserManagementData = {
-      ...initData,
-      teamQueryEditSection: {
-        ...initData.teamQueryEditSection,
-        referrer,
-      },
-    };
-    console.log(
-      "setting referrer in context (provider)",
-      newData.teamQueryEditSection.referrer,
-    );
-    setInnerState(newData);
+  function closeEditSection() {
+    setInnerState(initData);
   }
 
   function openEditSection(
@@ -89,10 +69,9 @@ const DataProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     subjectType: SubjectType,
     id: string,
     subjectData: User[] | CustomUserQuery[],
-    referrer?: HTMLElement | null,
   ) {
     let placeholder = "";
-    console.log("element to focus on close:", referrer);
+
     if (subjectType == "Members") {
       placeholder = "Search members";
     } else {
@@ -110,7 +89,6 @@ const DataProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
         groupId: id,
         subjectData,
         isOpen: true,
-        referrer,
       },
     };
     setInnerState(newState);

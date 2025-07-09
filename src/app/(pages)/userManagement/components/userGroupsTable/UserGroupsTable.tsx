@@ -101,7 +101,6 @@ const UserGroupsTable: React.FC<UserGroupsTableProps> = ({
                       "Members",
                       group.id,
                       members,
-                      null,
                     );
                   });
                 }}
@@ -125,7 +124,6 @@ const UserGroupsTable: React.FC<UserGroupsTableProps> = ({
                     "Queries",
                     group.id,
                     groupQueries,
-                    null,
                   );
                 });
               }}

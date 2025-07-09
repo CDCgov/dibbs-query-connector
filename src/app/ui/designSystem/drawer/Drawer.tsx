@@ -56,24 +56,23 @@ const Drawer: React.FC<DrawerProps> = ({
   }, [searchFilter]);
 
   function handleClose() {
-    console.log("innermost handle close");
     setSearchFilter("");
     onClose();
   }
 
-  // useEffect(() => {
-  //   const handleEscape = (evt: KeyboardEvent) => {
-  //     evt = evt || window.event;
-  //     if (isOpen && (evt.key === "Escape" || evt.key === "Esc")) {
-  //       handleClose();
-  //     }
-  //   };
-  //   window.addEventListener("keyup", handleEscape);
-  //   // Cleanup
-  //   return () => {
-  //     window.removeEventListener("keyup", handleEscape);
-  //   };
-  // }, []);
+  useEffect(() => {
+    const handleEscape = (evt: KeyboardEvent) => {
+      evt = evt || window.event;
+      if (isOpen && (evt.key === "Escape" || evt.key === "Esc")) {
+        handleClose();
+      }
+    };
+    window.addEventListener("keyup", handleEscape);
+    // Cleanup
+    return () => {
+      window.removeEventListener("keyup", handleEscape);
+    };
+  }, []);
 
   return (
     <FocusTrap
@@ -81,10 +80,6 @@ const Drawer: React.FC<DrawerProps> = ({
       focusTrapOptions={{
         onDeactivate: handleClose,
         escapeDeactivates: true,
-        setReturnFocus(nodeFocusedBeforeActivation) {
-          console.log(returnFocusElement);
-          return returnFocusElement ?? nodeFocusedBeforeActivation;
-        },
       }}
     >
       <div>

@@ -132,7 +132,6 @@ const UserPermissionsTable: React.FC<PermissionsProps> = ({
                             "Members",
                             membership.usergroupId,
                             members,
-                            "Users",
                           ),
                       );
                     }}
