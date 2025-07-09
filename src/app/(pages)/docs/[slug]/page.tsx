@@ -10,8 +10,8 @@ export default async function Page({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  // Strip .md from slug
-  const slugWithoutExtension = slug.replace(/\.md$/, "");
+  // Strip .md / .mdx from slug
+  const slugWithoutExtension = slug.replace(/\.mdx?$/, "");
   const { default: Post } = await import(`@/docs/${slugWithoutExtension}.mdx`);
 
   return (
@@ -37,7 +37,7 @@ export function generateStaticParams() {
   const files = fs.readdirSync(docsDir);
   const slugs = files
     .filter((file) => file.endsWith(".mdx"))
-    .map((file) => ({ slug: file.replace(/\.mdx$/, "") }));
+    .map((file) => ({ slug: file.replace(/\.mdx?$/, "") }));
   return slugs;
 }
 

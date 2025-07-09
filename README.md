@@ -34,20 +34,20 @@ You can find more detailed documentation, guides, and tutorials here:
 
 - For public health case investigators:
 
-  - [Query Connector User Guide](src/docs/user-guide.md)
+  - [Query Connector User Guide](src/docs/user-guide.mdx)
 
 - For public health IT staff:
 
-  - [Architecture](src/docs/architecture.md)
-  - [Deploying Query Connector](src/docs/deployment.md)
-  - [API Docs](src/docs/api.md)
-  - [ONC audit log compliance](src/docs/audit-log.md)
+  - [Architecture](src/docs/architecture.mdx)
+  - [Deploying Query Connector](src/docs/deployment.mdx)
+  - [API Docs](src/docs/api.mdx)
+  - [ONC audit log compliance](src/docs/audit-log.mdx)
 
 - For developers:
 
-  - [Local development](src/docs/development.md)
-  - [Contributing changes](src/docs/contributing.md)
-  - [Release process](src/docs/release.md)
+  - [Local development](src/docs/development.mdx)
+  - [Contributing changes](src/docs/contributing.mdx)
+  - [Release process](src/docs/release.mdx)
 
 ## Try it out!
 
@@ -87,8 +87,8 @@ unless pursuant to an existing contract or agreement.
 
 This repository contains only non-sensitive, publicly available data and
 information. All material and community participation is covered by the
-[Disclaimer](docs/disclaimer.md)
-and [Code of Conduct](https://github.com/CDCgov/template/blob/master/code-of-conduct.md).
+[Disclaimer](docs/disclaimer.mdx)
+and [Code of Conduct](https://github.com/CDCgov/template/blob/master/code-of-conduct.mdx).
 For more information about CDC's privacy policy, please visit [http://www.cdc.gov/other/privacy.html](https://www.cdc.gov/other/privacy.html).
 
 ### Contributing Standard Notice
@@ -104,7 +104,7 @@ later.
 All comments, messages, pull requests, and other submissions received through
 CDC including this GitHub page may be subject to applicable federal law, including but not limited to the Federal Records Act, and may be archived. Learn more at [http://www.cdc.gov/other/privacy.html](http://www.cdc.gov/other/privacy.html).
 
-See [CONTRIBUTING.md](src/docs/contributing.md) for more information.
+See [CONTRIBUTING.md](src/docs/contributing.mdx) for more information.
 
 ### Records Management Standard Notice
 
@@ -114,8 +114,8 @@ published through the [CDC web site](http://www.cdc.gov).
 
 ### Related documents
 
-- [Disclaimer](src/docs/disclaimer.md)
-- [Contribution Notice](src/docs/contributing.md)
+- [Disclaimer](src/docs/disclaimer.mdx)
+- [Contribution Notice](src/docs/contributing.mdx)
 
 ### Additional Standard Notices
 
