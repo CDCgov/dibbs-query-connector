@@ -2,7 +2,6 @@
 import {
   Dispatch,
   JSX,
-  RefObject,
   SetStateAction,
   useContext,
   useEffect,
