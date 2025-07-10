@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useContext, useEffect, useState } from "react";
+import { RefObject, useCallback, useContext, useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { Label, TextInput } from "@trussworks/react-uswds";
 import {
@@ -23,7 +23,7 @@ import type { ModalProps } from "../../../../ui/designSystem/modal/Modal";
 import { UserManagementMode, ModalStates, getRole } from "../../utils";
 import Checkbox from "@/app/ui/designSystem/checkbox/Checkbox";
 import { RoleDescriptons } from "../../utils";
-import { UserManagementContext } from "../UserManagementProvider";
+import { SubjectType, UserManagementContext } from "../UserManagementProvider";
 import { viewMode } from "../userManagementContainer/userManagementContainer";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import { CustomUserQuery } from "@/app/models/entities/query";
@@ -44,6 +44,8 @@ export interface UserModalProps {
   refreshView: React.Dispatch<React.SetStateAction<boolean | viewMode>>;
   userGroups?: UserGroup[] | null;
   subjectData?: UserGroup | User;
+  tabFocusRef?: RefObject<HTMLButtonElement | null>;
+  rowFocusRefs?: RefObject<RefObject<HTMLTableRowElement | null>[]>;
 }
 
 /**
@@ -55,7 +57,9 @@ export interface UserModalProps {
  * @param root0.setModalMode - State function to control which content the modal should render
  * @param root0.refreshView - State function that indicates if the list of Users should be refreshed
  * @param root0.userGroups - List of UserGroups, to display when adding a new User
- * @param root0.subjectData - List of UserGroups, to display when adding a new User
+ * @param root0.subjectData - The UserGroup or User subject
+ * @param root0.tabFocusRef - Ref to return focus to the Users/User Groups table tab
+ * @param root0.rowFocusRefs - Refs for each row of table data, for focus control
  * @returns - The UserModal component.
  */
 const UserModal: React.FC<UserModalProps> = ({
@@ -65,6 +69,8 @@ const UserModal: React.FC<UserModalProps> = ({
   refreshView,
   userGroups,
   subjectData,
+  tabFocusRef,
+  rowFocusRefs,
 }) => {
   const emptyUser = {
     id: "",
@@ -101,7 +107,8 @@ const UserModal: React.FC<UserModalProps> = ({
 
       if (
         clickTarget == "modalOverlay" ||
-        (event as KeyboardEvent).key == "Escape"
+        (!!modalRef.current?.modalIsOpen &&
+          (event as KeyboardEvent).key == "Escape")
       ) {
         handleCloseModal();
         resetModalState();
@@ -112,12 +119,10 @@ const UserModal: React.FC<UserModalProps> = ({
 
   useEffect(() => {
     window.addEventListener("mousedown", handleOutsideModalClick);
-    window.addEventListener("keyup", handleOutsideModalClick);
 
     // Cleanup
     return () => {
       window.removeEventListener("mousedown", handleOutsideModalClick);
-      window.removeEventListener("keyup", handleOutsideModalClick);
     };
   }, []);
 
@@ -128,29 +133,26 @@ const UserModal: React.FC<UserModalProps> = ({
     }
   }, [modalMode]);
 
-  async function openQueriesList() {
-    return openEditSection(
-      newGroup.name,
-      "Queries",
-      "Queries",
-      newGroup.id,
-      newGroup.queries as CustomUserQuery[],
-    );
-  }
+  async function openList(listType: SubjectType) {
+    const activeRow = rowFocusRefs?.current?.filter(
+      (tr) => tr?.current?.id == newGroup?.name,
+    )[0];
+    activeRow?.current?.focus();
 
-  async function openMembersList() {
     return openEditSection(
       newGroup.name,
-      "Members",
-      "Members",
+      listType as string,
+      listType,
       newGroup.id,
-      newGroup.members as User[],
+      listType == "Queries"
+        ? (newGroup.queries as CustomUserQuery[])
+        : (newGroup.members as User[]),
     );
   }
 
   useEffect(() => {
     if (newGroup.id !== "" && modalMode !== "edit-group") {
-      role == UserRole.SUPER_ADMIN ? openMembersList() : openQueriesList();
+      role == UserRole.SUPER_ADMIN ? openList("Members") : openList("Queries");
       refreshView("Update User groups");
       setNewGroup(emptyGroup);
     }
@@ -254,7 +256,7 @@ const UserModal: React.FC<UserModalProps> = ({
         setModalMode("closed");
       } else {
         setModalMode("closed");
-        return setErrorMessage("Unable to add group.");
+        return setErrorMessage("Unable to update user.");
       }
     }
 
@@ -286,6 +288,7 @@ const UserModal: React.FC<UserModalProps> = ({
         // we haven't changed anything, but we still want to trigger
         // the drawer open with newGroup update
         setNewGroup({ ...newGroup, ...existingGroup });
+
         return setModalMode("closed");
       }
 
@@ -349,6 +352,8 @@ const UserModal: React.FC<UserModalProps> = ({
           body: `Unable to remove group. Please try again, or contact us if the issue persists.`,
           variant: "error",
         });
+      } finally {
+        tabFocusRef?.current?.focus();
       }
     }
   };

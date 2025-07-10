@@ -24,17 +24,20 @@ exports[`User Management: User tab Loads user list successfully 1`] = `
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td
-              class="userDisplay"
-              width="270"
-            >
-              Potter, Lily 
+          <tr
+            class="tableBody__row"
+            id="456"
+            tabindex="0"
+          >
+            <td>
               <div
-                class="actionButtons"
+                class="userDisplay"
               >
+                <span>
+                  Potter, Lily 
+                </span>
                 <button
-                  class="usa-button usa-button--unstyled text-bold text-no-underline"
+                  class="usa-button usa-button--unstyled editBtn unstyled-button-container usa-button--unstyled text-bold text-no-underline"
                   data-testid="button"
                   type="button"
                 >
@@ -67,7 +70,6 @@ exports[`User Management: User tab Loads user list successfully 1`] = `
             </td>
             <td
               class="roleDropdown"
-              width="250"
             >
               <label
                 class="usa-label usa-sr-only"
@@ -99,30 +101,33 @@ exports[`User Management: User tab Loads user list successfully 1`] = `
                 </option>
               </select>
             </td>
-            <td
-              width="475"
-            >
+            <td>
               <button
                 aria-description="Edit Order of the Phoenix members"
                 class="usa-button usa-button--unstyled margin-right-2 text-no-underline"
                 data-testid="button"
                 type="button"
               >
-                Order of the Phoenix
+                <span>
+                  Order of the Phoenix
+                </span>
               </button>
             </td>
           </tr>
-          <tr>
-            <td
-              class="userDisplay"
-              width="270"
-            >
-              Potter, Harry 
+          <tr
+            class="tableBody__row"
+            id="123"
+            tabindex="0"
+          >
+            <td>
               <div
-                class="actionButtons"
+                class="userDisplay"
               >
+                <span>
+                  Potter, Harry 
+                </span>
                 <button
-                  class="usa-button usa-button--unstyled text-bold text-no-underline"
+                  class="usa-button usa-button--unstyled editBtn unstyled-button-container usa-button--unstyled text-bold text-no-underline"
                   data-testid="button"
                   type="button"
                 >
@@ -155,7 +160,6 @@ exports[`User Management: User tab Loads user list successfully 1`] = `
             </td>
             <td
               class="roleDropdown"
-              width="250"
             >
               <label
                 class="usa-label usa-sr-only"
@@ -187,9 +191,7 @@ exports[`User Management: User tab Loads user list successfully 1`] = `
                 </option>
               </select>
             </td>
-            <td
-              width="475"
-            >
+            <td>
               --
             </td>
           </tr>
@@ -219,17 +221,20 @@ exports[`User Management: User tab Loads user list successfully 1`] = `
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td
-              class="userDisplay"
-              width="270"
-            >
-              Potter, Lily 
+          <tr
+            class="tableBody__row"
+            id="456"
+            tabindex="0"
+          >
+            <td>
               <div
-                class="actionButtons"
+                class="userDisplay"
               >
+                <span>
+                  Potter, Lily 
+                </span>
                 <button
-                  class="usa-button usa-button--unstyled text-bold text-no-underline"
+                  class="usa-button usa-button--unstyled editBtn unstyled-button-container usa-button--unstyled text-bold text-no-underline"
                   data-testid="button"
                   type="button"
                 >
@@ -262,7 +267,6 @@ exports[`User Management: User tab Loads user list successfully 1`] = `
             </td>
             <td
               class="roleDropdown"
-              width="250"
             >
               <label
                 class="usa-label usa-sr-only"
@@ -294,30 +298,33 @@ exports[`User Management: User tab Loads user list successfully 1`] = `
                 </option>
               </select>
             </td>
-            <td
-              width="475"
-            >
+            <td>
               <button
                 aria-description="Edit Order of the Phoenix members"
                 class="usa-button usa-button--unstyled margin-right-2 text-no-underline"
                 data-testid="button"
                 type="button"
               >
-                Order of the Phoenix
+                <span>
+                  Order of the Phoenix
+                </span>
               </button>
             </td>
           </tr>
-          <tr>
-            <td
-              class="userDisplay"
-              width="270"
-            >
-              Potter, Harry 
+          <tr
+            class="tableBody__row"
+            id="123"
+            tabindex="0"
+          >
+            <td>
               <div
-                class="actionButtons"
+                class="userDisplay"
               >
+                <span>
+                  Potter, Harry 
+                </span>
                 <button
-                  class="usa-button usa-button--unstyled text-bold text-no-underline"
+                  class="usa-button usa-button--unstyled editBtn unstyled-button-container usa-button--unstyled text-bold text-no-underline"
                   data-testid="button"
                   type="button"
                 >
@@ -350,7 +357,6 @@ exports[`User Management: User tab Loads user list successfully 1`] = `
             </td>
             <td
               class="roleDropdown"
-              width="250"
             >
               <label
                 class="usa-label usa-sr-only"
@@ -382,9 +388,7 @@ exports[`User Management: User tab Loads user list successfully 1`] = `
                 </option>
               </select>
             </td>
-            <td
-              width="475"
-            >
+            <td>
               --
             </td>
           </tr>

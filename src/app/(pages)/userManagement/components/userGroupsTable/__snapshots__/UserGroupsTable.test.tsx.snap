@@ -26,10 +26,10 @@ exports[`User Groups table renders the correct label syntax based on member/quer
         <tbody>
           <tr
             class="userGroupRow"
+            id="Order of the Phoenix"
+            tabindex="0"
           >
-            <td
-              width="270"
-            >
+            <td>
               Order of the Phoenix
             </td>
             <td>
@@ -52,76 +52,78 @@ exports[`User Groups table renders the correct label syntax based on member/quer
                 3 queries
               </button>
             </td>
-            <td
-              class="actionButtons"
-            >
-              <button
-                class="usa-button usa-button--unstyled text-bold text-no-underline"
-                data-testid="button"
-                type="button"
+            <td>
+              <div
+                class="actionButtons"
               >
-                <span
-                  class="icon-text padding-right-4 display-flex flex-align-center"
+                <button
+                  class="usa-button usa-button--unstyled editBtn unstyled-button-container usa-button--unstyled text-bold text-no-underline"
+                  data-testid="button"
+                  type="button"
                 >
-                  <svg
-                    aria-label="Pencil icon indicating edit ability"
-                    class="usa-icon height-3 width-3"
-                    focusable="false"
-                    height="1em"
-                    role="img"
-                    viewBox="0 0 24 24"
-                    width="1em"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a.996.996 0 0 0 0-1.41l-2.34-2.34a.996.996 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"
-                    />
-                  </svg>
                   <span
-                    class="padding-left-05"
-                    data-testid="edit-group-456"
+                    class="icon-text padding-right-4 display-flex flex-align-center"
                   >
-                    Edit
+                    <svg
+                      aria-label="Pencil icon indicating edit ability"
+                      class="usa-icon height-3 width-3"
+                      focusable="false"
+                      height="1em"
+                      role="img"
+                      viewBox="0 0 24 24"
+                      width="1em"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a.996.996 0 0 0 0-1.41l-2.34-2.34a.996.996 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"
+                      />
+                    </svg>
+                    <span
+                      class="padding-left-05"
+                      data-testid="edit-group-456"
+                    >
+                      Edit
+                    </span>
                   </span>
-                </span>
-              </button>
-              <button
-                class="usa-button usa-button--unstyled text-bold text-no-underline destructive-primary"
-                data-testid="button"
-                type="button"
-              >
-                <span
-                  class="icon-text padding-right-4 display-flex flex-align-center"
+                </button>
+                <button
+                  class="usa-button deleteBtn unstyled-button-container usa-button--unstyled text-bold text-no-underline destructive-primary"
+                  data-testid="button"
+                  type="button"
                 >
-                  <svg
-                    aria-label="Trash icon indicating deletion of disease"
-                    class="usa-icon height-3 width-3"
-                    focusable="false"
-                    height="1em"
-                    role="img"
-                    viewBox="0 0 24 24"
-                    width="1em"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"
-                    />
-                  </svg>
                   <span
-                    class="padding-left-05"
+                    class="icon-text padding-right-4 display-flex flex-align-center"
                   >
-                    Delete
+                    <svg
+                      aria-label="Trash icon indicating deletion of disease"
+                      class="usa-icon height-3 width-3"
+                      focusable="false"
+                      height="1em"
+                      role="img"
+                      viewBox="0 0 24 24"
+                      width="1em"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"
+                      />
+                    </svg>
+                    <span
+                      class="padding-left-05"
+                    >
+                      Delete
+                    </span>
                   </span>
-                </span>
-              </button>
+                </button>
+              </div>
             </td>
           </tr>
           <tr
             class="userGroupRow"
+            id="S.P.E.W."
+            tabindex="0"
           >
-            <td
-              width="270"
-            >
+            <td>
               S.P.E.W.
             </td>
             <td>
@@ -144,68 +146,70 @@ exports[`User Groups table renders the correct label syntax based on member/quer
                 1 query
               </button>
             </td>
-            <td
-              class="actionButtons"
-            >
-              <button
-                class="usa-button usa-button--unstyled text-bold text-no-underline"
-                data-testid="button"
-                type="button"
+            <td>
+              <div
+                class="actionButtons"
               >
-                <span
-                  class="icon-text padding-right-4 display-flex flex-align-center"
+                <button
+                  class="usa-button usa-button--unstyled editBtn unstyled-button-container usa-button--unstyled text-bold text-no-underline"
+                  data-testid="button"
+                  type="button"
                 >
-                  <svg
-                    aria-label="Pencil icon indicating edit ability"
-                    class="usa-icon height-3 width-3"
-                    focusable="false"
-                    height="1em"
-                    role="img"
-                    viewBox="0 0 24 24"
-                    width="1em"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a.996.996 0 0 0 0-1.41l-2.34-2.34a.996.996 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"
-                    />
-                  </svg>
                   <span
-                    class="padding-left-05"
-                    data-testid="edit-group-789"
+                    class="icon-text padding-right-4 display-flex flex-align-center"
                   >
-                    Edit
+                    <svg
+                      aria-label="Pencil icon indicating edit ability"
+                      class="usa-icon height-3 width-3"
+                      focusable="false"
+                      height="1em"
+                      role="img"
+                      viewBox="0 0 24 24"
+                      width="1em"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a.996.996 0 0 0 0-1.41l-2.34-2.34a.996.996 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"
+                      />
+                    </svg>
+                    <span
+                      class="padding-left-05"
+                      data-testid="edit-group-789"
+                    >
+                      Edit
+                    </span>
                   </span>
-                </span>
-              </button>
-              <button
-                class="usa-button usa-button--unstyled text-bold text-no-underline destructive-primary"
-                data-testid="button"
-                type="button"
-              >
-                <span
-                  class="icon-text padding-right-4 display-flex flex-align-center"
+                </button>
+                <button
+                  class="usa-button deleteBtn unstyled-button-container usa-button--unstyled text-bold text-no-underline destructive-primary"
+                  data-testid="button"
+                  type="button"
                 >
-                  <svg
-                    aria-label="Trash icon indicating deletion of disease"
-                    class="usa-icon height-3 width-3"
-                    focusable="false"
-                    height="1em"
-                    role="img"
-                    viewBox="0 0 24 24"
-                    width="1em"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"
-                    />
-                  </svg>
                   <span
-                    class="padding-left-05"
+                    class="icon-text padding-right-4 display-flex flex-align-center"
                   >
-                    Delete
+                    <svg
+                      aria-label="Trash icon indicating deletion of disease"
+                      class="usa-icon height-3 width-3"
+                      focusable="false"
+                      height="1em"
+                      role="img"
+                      viewBox="0 0 24 24"
+                      width="1em"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"
+                      />
+                    </svg>
+                    <span
+                      class="padding-left-05"
+                    >
+                      Delete
+                    </span>
                   </span>
-                </span>
-              </button>
+                </button>
+              </div>
             </td>
           </tr>
         </tbody>

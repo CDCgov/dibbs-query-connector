@@ -30,7 +30,46 @@
   text-decoration: none;
 }
 
+.userGroupsTable,
+.userPermissionsTable {
+  display: table;
+  table-layout: fixed;
+  width: 100%;
+
+  tr {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  td {
+    height: 5.5rem;
+  }
+}
+
 .userGroupsTable {
+  tr {
+    .actionButtons {
+      display: none;
+    }
+
+    &:hover .actionButtons,
+    &:focus-within .actionButtons {
+      display: flex;
+      text-decoration: none;
+      cursor: pointer;
+    }
+  }
+
+  td {
+    word-wrap: normal !important;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    max-width: 0 !important;
+    width: 25%;
+  }
+
   .actionButtons {
     display: flex;
     align-items: center;
@@ -41,39 +80,72 @@
     transform: translateY(-50%);
     gap: 0.5rem;
   }
-
-  tbody td:last-child {
-    opacity: 0;
-    text-align: right;
-    padding-right: 0 !important;
-    white-space: nowrap;
-  }
-
-  tbody tr:hover td:last-child,
-  tbody td:last-child:hover {
-    opacity: 1;
-    pointer-events: auto;
-    max-height: inherit;
-  }
 }
 
 .userPermissionsTable {
-  td.userDisplay {
+  tr {
+    .editBtn {
+      display: none;
+    }
+
+    &:hover .editBtn,
+    &:focus-within .editBtn {
+      display: flex;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    &:focus-within,
+    &:hover {
+      .userDisplay {
+        span {
+          overflow: hidden;
+          text-overflow: ellipsis;
+          padding: 0 !important;
+
+          &.icon {
+            margin: 0.5rem 0;
+          }
+        }
+        button {
+          margin-right: 0.5rem;
+        }
+      }
+    }
+  }
+
+  td {
+    max-width: 0;
+    width: 25%;
+
+    &:last-of-type {
+      width: 50% !important;
+    }
+
+    button {
+      max-width: 33%;
+      white-space: nowrap;
+
+      span {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        height: 1.5rem;
+        align-content: center;
+      }
+    }
+  }
+
+  .userDisplay {
     display: flex;
+    width: 100%;
     justify-content: space-between;
-  }
+    align-items: center;
+    height: 2.5rem;
 
-  .actionButtons {
-    display: flex;
-    opacity: 0;
-    text-align: right;
-    padding-right: 0 !important;
-    white-space: nowrap;
-  }
-
-  td.userDisplay:hover .actionButtons {
-    opacity: 1;
-    pointer-events: auto;
-    max-height: inherit;
+    span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
   }
 }
