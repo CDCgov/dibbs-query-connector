@@ -57,6 +57,10 @@ const UserManagementContainer: React.FC<UserManagementContainerProps> = ({
   const [subjectData, setSubjectData] = useState<User | UserGroup>();
   const [userGroups, setUserGroups] = useState<UserGroup[]>([]);
   const [modalMode, setModalMode] = useState<UserManagementMode>("closed");
+  const [modalAction, setModalAction] = useState<UserManagementMode | string>(
+    "",
+  );
+
   const [shouldRefreshView, setShouldRefreshView] = useState<
     boolean | viewMode
   >("Load default");
@@ -99,6 +103,8 @@ const UserManagementContainer: React.FC<UserManagementContainerProps> = ({
                 users={users}
                 setUsers={setUsers}
                 rowFocusRefs={rowFocusRefs}
+                modalAction={modalAction}
+                setModalAction={setModalAction}
               />
             ) : (
               <div className="empty-response">No users found</div>
@@ -134,6 +140,7 @@ const UserManagementContainer: React.FC<UserManagementContainerProps> = ({
               userGroups={userGroups}
               rowFocusRefs={rowFocusRefs}
               tabFocusRef={groupsTabRef}
+              modalAction={modalAction}
             />
           </>
         ) : (
@@ -271,11 +278,10 @@ const UserManagementContainer: React.FC<UserManagementContainerProps> = ({
   const handleOpenModal = async (
     mode: UserManagementMode,
     data?: UserGroup | User,
-    setModalAction?: Dispatch<SetStateAction<string>>,
   ) => {
     setModalMode(mode);
     setSubjectData(data);
-    setModalAction && setModalAction(mode);
+    setModalAction(mode);
     modalRef.current?.toggleModal();
   };
 
@@ -296,7 +302,8 @@ const UserManagementContainer: React.FC<UserManagementContainerProps> = ({
           userGroups={userGroups}
           subjectData={subjectData}
           tabFocusRef={groupsTabRef}
-          rowFocusRefs={rowFocusRefs}
+          // rowFocusRefs={rowFocusRefs}
+          setModalAction={setModalAction}
         />
         <UserManagementDrawer
           users={users}

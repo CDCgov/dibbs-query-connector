@@ -23,10 +23,9 @@ import type { ModalProps } from "../../../../ui/designSystem/modal/Modal";
 import { UserManagementMode, ModalStates, getRole } from "../../utils";
 import Checkbox from "@/app/ui/designSystem/checkbox/Checkbox";
 import { RoleDescriptons } from "../../utils";
-import { SubjectType, UserManagementContext } from "../UserManagementProvider";
+import { UserManagementContext } from "../UserManagementProvider";
 import { viewMode } from "../userManagementContainer/userManagementContainer";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
-import { CustomUserQuery } from "@/app/models/entities/query";
 
 const Modal = dynamic<ModalProps>(
   () =>
@@ -45,7 +44,9 @@ export interface UserModalProps {
   userGroups?: UserGroup[] | null;
   subjectData?: UserGroup | User;
   tabFocusRef?: RefObject<HTMLButtonElement | null>;
-  rowFocusRefs?: RefObject<RefObject<HTMLTableRowElement | null>[]>;
+  setModalAction: React.Dispatch<
+    React.SetStateAction<UserManagementMode | string>
+  >;
 }
 
 /**
@@ -59,7 +60,7 @@ export interface UserModalProps {
  * @param root0.userGroups - List of UserGroups, to display when adding a new User
  * @param root0.subjectData - The UserGroup or User subject
  * @param root0.tabFocusRef - Ref to return focus to the Users/User Groups table tab
- * @param root0.rowFocusRefs - Refs for each row of table data, for focus control
+ * @param root0.setModalAction - Refs for each row of table data, for focus control
  * @returns - The UserModal component.
  */
 const UserModal: React.FC<UserModalProps> = ({
@@ -70,7 +71,7 @@ const UserModal: React.FC<UserModalProps> = ({
   userGroups,
   subjectData,
   tabFocusRef,
-  rowFocusRefs,
+  setModalAction,
 }) => {
   const emptyUser = {
     id: "",
@@ -130,6 +131,7 @@ const UserModal: React.FC<UserModalProps> = ({
     if (modalMode === "closed") {
       handleCloseModal();
       resetModalState();
+      setNewUser(emptyUser);
     }
   }, [modalMode]);
 
@@ -195,6 +197,7 @@ const UserModal: React.FC<UserModalProps> = ({
           setNewUser({ ...newUser, ...udpatedUser });
           refreshView("Update Users");
           setErrorMessage("");
+          setModalAction(udpatedUser.id);
           return setModalMode("select-groups");
         }
       }
@@ -204,8 +207,10 @@ const UserModal: React.FC<UserModalProps> = ({
       if (newUserAdded.msg) {
         return setErrorMessage(newUserAdded.msg);
       } else {
-        setNewUser({ ...newUser, ...newUserAdded });
+        setNewUser({ ...newUser, ...newUserAdded.user });
         refreshView("Update Users");
+        setModalAction(newUser.id);
+        console.log("?", newUser.id);
         return emptyGroups
           ? setModalMode("closed")
           : setModalMode("select-groups");
@@ -233,8 +238,10 @@ const UserModal: React.FC<UserModalProps> = ({
       );
 
       if (updatedUser) {
+        const id = updatedUser.id;
         setNewUser(emptyUser);
         refreshView("Update Users");
+        setModalAction(id);
         setModalMode("closed");
       } else {
         setModalMode("closed");
@@ -252,6 +259,7 @@ const UserModal: React.FC<UserModalProps> = ({
         refreshView("Update Users");
         setNewUser(emptyUser);
         setModalMode("closed");
+        return setModalAction(newUser.id);
       } else {
         setErrorMessage("Error adding user to group.");
         setModalMode("closed");
@@ -316,6 +324,7 @@ const UserModal: React.FC<UserModalProps> = ({
           setNewGroup({ ...newGroup, ...newGroupAdded.items[0] });
           refreshView("Update User groups");
           setModalMode("closed");
+          setModalAction(newGroupAdded.items[0].id);
         }
       }
     }

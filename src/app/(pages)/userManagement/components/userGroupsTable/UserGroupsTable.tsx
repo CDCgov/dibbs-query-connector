@@ -30,6 +30,7 @@ type UserGroupsTableProps = {
     data?: UserGroup | User,
     setModalAction?: Dispatch<SetStateAction<string>>,
   ) => void;
+  modalAction: UserManagementMode | string;
   rowFocusRefs?: RefObject<RefObject<HTMLTableRowElement | null>[]>;
   tabFocusRef?: RefObject<HTMLButtonElement | null>;
 };
@@ -52,14 +53,19 @@ const UserGroupsTable: React.FC<UserGroupsTableProps> = ({
   openModal,
   rowFocusRefs,
   tabFocusRef,
+  modalAction,
 }) => {
-  const [modalAction, setModalAction] = useState<string>("");
-
   useEffect(() => {
     // return focus to groups tab after deleting a group
     if (modalAction == "remove-group") {
-      tabFocusRef?.current?.focus();
+      return tabFocusRef?.current?.focus();
     }
+
+    const row = rowFocusRefs?.current?.filter(
+      (tr) => tr.current?.id == modalAction,
+    )[0];
+
+    row?.current?.focus();
   }, [userGroups.length]);
 
   const { openEditSection } = useContext(UserManagementContext);
@@ -121,7 +127,7 @@ const UserGroupsTable: React.FC<UserGroupsTableProps> = ({
             // returns focus to row if modal is cxl'd;
             // returns focus to tab if delete confirmed
             rowFocusRefs?.current?.[idx]?.current?.focus();
-            openModal("remove-group", group, setModalAction);
+            openModal("remove-group", group);
           }}
         >
           <span className="icon-text padding-right-4 display-flex flex-align-center">
@@ -155,7 +161,7 @@ const UserGroupsTable: React.FC<UserGroupsTableProps> = ({
           ref={rowFocusRefs?.current?.[idx]}
           tabIndex={0}
           key={group.id}
-          id={group.name}
+          id={group.id}
         >
           <td>
             <div className={styles.buttonHoverGroup}>

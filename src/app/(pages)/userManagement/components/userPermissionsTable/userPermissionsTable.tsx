@@ -6,6 +6,7 @@ import {
   SetStateAction,
   RefObject,
   createRef,
+  useEffect,
 } from "react";
 import { Button, Icon } from "@trussworks/react-uswds";
 import classNames from "classnames";
@@ -27,8 +28,14 @@ type PermissionsProps = {
   users: User[] | null;
   setUsers: Dispatch<SetStateAction<User[]>>;
   fetchGroupMembers: (groupId: string) => Promise<User[]>;
-  openModal: (mode: UserManagementMode, user: User) => void;
+  openModal: (
+    mode: UserManagementMode,
+    user: User,
+    setModalAction?: Dispatch<SetStateAction<string>>,
+  ) => void;
   rowFocusRefs: RefObject<RefObject<HTMLTableRowElement | null>[] | null>;
+  modalAction: UserManagementMode | string;
+  setModalAction?: Dispatch<SetStateAction<string>>;
 };
 
 /**
@@ -48,9 +55,18 @@ const UserPermissionsTable: React.FC<PermissionsProps> = ({
   fetchGroupMembers,
   openModal,
   rowFocusRefs,
+  modalAction,
 }) => {
   const { openEditSection } = useContext(UserManagementContext);
   const { data: session } = useSession();
+
+  useEffect(() => {
+    const row = rowFocusRefs?.current?.filter(
+      (tr) => tr.current?.id == modalAction,
+    )[0];
+
+    row?.current?.focus();
+  }, [modalAction]);
 
   async function handleUserRoleChange(id: string, role: UserRole) {
     try {
