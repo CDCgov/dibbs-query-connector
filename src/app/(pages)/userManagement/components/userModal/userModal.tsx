@@ -94,7 +94,6 @@ const UserModal: React.FC<UserModalProps> = ({
   const [newGroup, setNewGroup] = useState<UserGroup>(emptyGroup);
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [activeField, setActiveField] = useState<string>("");
-  const { openEditSection } = useContext(UserManagementContext);
 
   const existingGroup = subjectData as UserGroup;
   const existingUser = subjectData as User;
