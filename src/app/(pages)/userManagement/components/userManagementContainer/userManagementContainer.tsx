@@ -305,7 +305,6 @@ const UserManagementContainer: React.FC<UserManagementContainerProps> = ({
           subjectData={subjectData}
           tabFocusRef={groupsTabRef}
           setModalAction={setModalAction}
-
         />
         <UserManagementDrawer
           users={users}

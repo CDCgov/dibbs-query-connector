@@ -69,7 +69,6 @@ const UserGroupsTable: React.FC<UserGroupsTableProps> = ({
     row?.current?.focus();
   }, [userGroups.length]);
 
-
   const { openEditSection } = useContext(UserManagementContext);
   const role = getRole();
 
