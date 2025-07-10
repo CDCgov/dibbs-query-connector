@@ -3,7 +3,7 @@ import classNames from "classnames";
 import { UserRole } from "@/app/models/entities/users";
 import WithAuth from "@/app/ui/components/withAuth/WithAuth";
 import UserManagementProvider from "./components/UserManagementProvider";
-import UsersTable from "./components/userManagementContainer/userManagementContainer";
+import UserManagementContainer from "./components/userManagementContainer/userManagementContainer";
 import { getRole, RoleDescriptons } from "./utils";
 
 /**
@@ -56,7 +56,7 @@ const UserManagement: React.FC = () => {
         <UserManagementProvider>
           {role == UserRole.SUPER_ADMIN &&
             renderRoleDescriptions(RoleDescriptons)}
-          <UsersTable role={role as string} />
+          <UserManagementContainer role={role as string} />
         </UserManagementProvider>
       </div>
     </WithAuth>

@@ -57,12 +57,19 @@ const Drawer: React.FC<DrawerProps> = ({
     onClose();
   }
 
-  document.onkeydown = function (evt) {
-    evt = evt || window.event;
-    if (evt.key === "Escape" || evt.key === "Esc") {
-      handleClose();
-    }
-  };
+  useEffect(() => {
+    const handleEscape = (evt: KeyboardEvent) => {
+      evt = evt || window.event;
+      if (isOpen && (evt.key === "Escape" || evt.key === "Esc")) {
+        handleClose();
+      }
+    };
+    window.addEventListener("keyup", handleEscape);
+    // Cleanup
+    return () => {
+      window.removeEventListener("keyup", handleEscape);
+    };
+  }, []);
 
   return (
     <FocusTrap

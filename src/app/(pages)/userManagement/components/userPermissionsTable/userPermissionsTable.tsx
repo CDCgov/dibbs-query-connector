@@ -1,6 +1,12 @@
 "use client";
 
-import { useContext, Dispatch, SetStateAction } from "react";
+import {
+  useContext,
+  Dispatch,
+  SetStateAction,
+  RefObject,
+  createRef,
+} from "react";
 import { Button, Icon } from "@trussworks/react-uswds";
 import classNames from "classnames";
 import { updateUserRole } from "@/app/backend/user-management";
@@ -21,7 +27,12 @@ type PermissionsProps = {
   users: User[] | null;
   setUsers: Dispatch<SetStateAction<User[]>>;
   fetchGroupMembers: (groupId: string) => Promise<User[]>;
-  openModal: (mode: UserManagementMode, user: User) => void;
+  openModal: (
+    mode: UserManagementMode,
+    user: User,
+    ref?: RefObject<HTMLTableRowElement | HTMLButtonElement | null>,
+  ) => void;
+  rowFocusRefs: RefObject<RefObject<HTMLTableRowElement | null>[] | null>;
 };
 
 /**
@@ -31,13 +42,16 @@ type PermissionsProps = {
  * @param root0.setUsers State function to update the list of users
  * @param root0.fetchGroupMembers Function to retrieve a group's list of users
  * @param root0.openModal Function to retrieve a group's list of assigned queries
- * @returns Users table
+ * @param root0.rowFocusRefs ref array for the table row buttons that can open the user modal
+ * @returns Users table   
+ 
  */
 const UserPermissionsTable: React.FC<PermissionsProps> = ({
   users,
   setUsers,
   fetchGroupMembers,
   openModal,
+  rowFocusRefs,
 }) => {
   const { openEditSection } = useContext(UserManagementContext);
   const { data: session } = useSession();
@@ -77,7 +91,7 @@ const UserPermissionsTable: React.FC<PermissionsProps> = ({
 
   const renderDropdown = (user: User) => {
     return (
-      <td className={styles.roleDropdown} width={250}>
+      <td className={styles.roleDropdown}>
         {isSelf(user) ? (
           user.qcRole
         ) : (
@@ -95,7 +109,7 @@ const UserPermissionsTable: React.FC<PermissionsProps> = ({
 
   const renderGroups = (user: User) => {
     return (
-      <td key={user.id} width={475}>
+      <td key={user.id}>
         {user?.userGroupMemberships && user.userGroupMemberships?.length > 0
           ? user.userGroupMemberships?.map(
               (membership: UserGroupMembership, idx: number) => {
@@ -122,8 +136,10 @@ const UserPermissionsTable: React.FC<PermissionsProps> = ({
                       );
                     }}
                   >
-                    {membership.usergroupName}
-                    {idx + 1 != user.userGroupMemberships?.length && ","}
+                    <span>
+                      {membership.usergroupName}
+                      {idx + 1 != user.userGroupMemberships?.length && ","}
+                    </span>
                   </Button>
                 );
               },
@@ -135,31 +151,44 @@ const UserPermissionsTable: React.FC<PermissionsProps> = ({
 
   const renderActionButtons = (user: User) => {
     return (
-      <div className={styles.actionButtons}>
-        <Button
-          type="button"
-          className="usa-button--unstyled text-bold text-no-underline"
-          onClick={() => openModal("edit-user", user)}
-        >
-          <span className="icon-text padding-right-4 display-flex flex-align-center">
-            <Icon.Edit
-              className="height-3 width-3"
-              aria-label="Pencil icon indicating edit ability"
-            />
-            <span
-              data-testid={`edit-group-${user.id}`}
-              className="padding-left-05"
-            >
-              Edit
-            </span>
+      <Button
+        unstyled
+        className={classNames(
+          styles.editBtn,
+          "unstyled-button-container",
+          "usa-button--unstyled text-bold text-no-underline",
+        )}
+        type="button"
+        onClick={() => {
+          const row = rowFocusRefs?.current?.filter(
+            (tr) => tr.current?.id == user?.id,
+          )[0];
+          row?.current?.focus();
+
+          openModal("edit-user", user);
+        }}
+      >
+        <span className="icon-text padding-right-4 display-flex flex-align-center">
+          <Icon.Edit
+            className="height-3 width-3"
+            aria-label="Pencil icon indicating edit ability"
+          />
+          <span
+            data-testid={`edit-group-${user.id}`}
+            className="padding-left-05"
+          >
+            Edit
           </span>
-        </Button>
-      </div>
+        </span>
+      </Button>
     );
   };
 
   const renderUserRows = (users: User[] | null): React.ReactNode => {
-    return users?.map((user: User) => {
+    return users?.map((user: User, i: number) => {
+      if (rowFocusRefs && rowFocusRefs.current) {
+        rowFocusRefs.current[i] = createRef();
+      }
       const display =
         user.firstName && user.lastName
           ? `${user.lastName}, ${user.firstName} ${
@@ -168,10 +197,19 @@ const UserPermissionsTable: React.FC<PermissionsProps> = ({
           : `${user.username}`;
 
       return (
-        <tr key={user.id}>
-          <td width={270} className={styles.userDisplay}>
-            {display}
-            {renderActionButtons(user)}
+        <tr
+          ref={rowFocusRefs?.current?.[i] || null}
+          className={styles.tableBody__row}
+          key={user.id}
+          tabIndex={0}
+          id={user.id}
+        >
+          <td>
+            <div className={styles.userDisplay}>
+              <span>{display}</span>
+
+              {renderActionButtons(user)}
+            </div>
           </td>
           {renderDropdown(user)}
           {renderGroups(user)}

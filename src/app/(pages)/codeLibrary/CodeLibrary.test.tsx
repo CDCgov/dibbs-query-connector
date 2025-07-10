@@ -209,11 +209,11 @@ describe("Code library interaction", () => {
       "valueSetTable__tableBody_row_details",
     )[2];
 
-    expect(cancerVsRow.textContent).toInclude(cancerValueSets[0].valueset_name);
-    expect(customVsRow.textContent).toInclude(customValueSets[0].valueset_name);
+    expect(cancerVsRow.textContent).toContain(cancerValueSets[0].valueset_name);
+    expect(customVsRow.textContent).toContain(customValueSets[0].valueset_name);
 
-    expect(cancerVsRow.textContent).not.toInclude(cancerValueSets[0].author);
-    expect(customVsRow.textContent).toInclude(customValueSets[0].author);
+    expect(cancerVsRow.textContent).not.toContain(cancerValueSets[0].author);
+    expect(customVsRow.textContent).toContain(customValueSets[0].author);
 
     await waitFor(async () => {
       (cancerVsRow as HTMLElement).click();
