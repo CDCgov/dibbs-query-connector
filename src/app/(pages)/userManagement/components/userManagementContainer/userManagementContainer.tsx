@@ -1,6 +1,13 @@
 "use client";
 
-import { useEffect, useState, useRef, RefObject } from "react";
+import {
+  useEffect,
+  useState,
+  useRef,
+  RefObject,
+  Dispatch,
+  SetStateAction,
+} from "react";
 import UserManagementDrawer from "../teamQueryEditSection/TeamQueryEditSection";
 import UserGroupsTable from "../userGroupsTable/UserGroupsTable";
 import TabGroup, { Tab } from "@/app/ui/designSystem/TabGroup/tabGroup";
@@ -264,12 +271,12 @@ const UserManagementContainer: React.FC<UserManagementContainerProps> = ({
   const handleOpenModal = async (
     mode: UserManagementMode,
     data?: UserGroup | User,
-    ref?: RefObject<HTMLTableRowElement | HTMLButtonElement | null> | null,
+    setModalAction?: Dispatch<SetStateAction<string>>,
   ) => {
     setModalMode(mode);
     setSubjectData(data);
+    setModalAction && setModalAction(mode);
     modalRef.current?.toggleModal();
-    ref?.current?.focus();
   };
 
   const dataLoaded = !!users && !!userGroups;

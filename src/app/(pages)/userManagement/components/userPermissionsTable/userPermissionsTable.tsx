@@ -27,11 +27,7 @@ type PermissionsProps = {
   users: User[] | null;
   setUsers: Dispatch<SetStateAction<User[]>>;
   fetchGroupMembers: (groupId: string) => Promise<User[]>;
-  openModal: (
-    mode: UserManagementMode,
-    user: User,
-    ref?: RefObject<HTMLTableRowElement | HTMLButtonElement | null>,
-  ) => void;
+  openModal: (mode: UserManagementMode, user: User) => void;
   rowFocusRefs: RefObject<RefObject<HTMLTableRowElement | null>[] | null>;
 };
 
@@ -154,7 +150,7 @@ const UserPermissionsTable: React.FC<PermissionsProps> = ({
       <Button
         unstyled
         className={classNames(
-          styles.editBtn,
+          styles.hoverBtn,
           "unstyled-button-container",
           "usa-button--unstyled text-bold text-no-underline",
         )}
@@ -177,7 +173,7 @@ const UserPermissionsTable: React.FC<PermissionsProps> = ({
             data-testid={`edit-group-${user.id}`}
             className="padding-left-05"
           >
-            Edit
+            Rename
           </span>
         </span>
       </Button>
@@ -198,14 +194,13 @@ const UserPermissionsTable: React.FC<PermissionsProps> = ({
 
       return (
         <tr
-          ref={rowFocusRefs?.current?.[i] || null}
-          className={styles.tableBody__row}
+          ref={rowFocusRefs?.current?.[i]}
           key={user.id}
           tabIndex={0}
           id={user.id}
         >
           <td>
-            <div className={styles.userDisplay}>
+            <div className={styles.buttonHoverGroup}>
               <span>{display}</span>
 
               {renderActionButtons(user)}
@@ -222,9 +217,9 @@ const UserPermissionsTable: React.FC<PermissionsProps> = ({
     <Table className={styles.userPermissionsTable}>
       <thead>
         <tr>
-          <th>Name</th>
-          <th>Permissions</th>
-          <th>User groups</th>
+          <th className="grid-col-5">Name</th>
+          <th className="grid-col-3">Permissions</th>
+          <th className="grid-col-4">User groups</th>
         </tr>
       </thead>
       <tbody>{renderUserRows(users)}</tbody>

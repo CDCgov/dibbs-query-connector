@@ -72,7 +72,7 @@ export const ModalStates: ModalMap = {
   },
   "edit-group": {
     heading: "Edit user group",
-    buttonText: "Save & update members",
+    buttonText: "Save changes",
     secondaryBtnText: "Cancel",
     prevStep: "closed",
   },

@@ -133,26 +133,8 @@ const UserModal: React.FC<UserModalProps> = ({
     }
   }, [modalMode]);
 
-  async function openList(listType: SubjectType) {
-    const activeRow = rowFocusRefs?.current?.filter(
-      (tr) => tr?.current?.id == newGroup?.name,
-    )[0];
-    activeRow?.current?.focus();
-
-    return openEditSection(
-      newGroup.name,
-      listType as string,
-      listType,
-      newGroup.id,
-      listType == "Queries"
-        ? (newGroup.queries as CustomUserQuery[])
-        : (newGroup.members as User[]),
-    );
-  }
-
   useEffect(() => {
     if (newGroup.id !== "" && modalMode !== "edit-group") {
-      role == UserRole.SUPER_ADMIN ? openList("Members") : openList("Queries");
       refreshView("Update User groups");
       setNewGroup(emptyGroup);
     }
