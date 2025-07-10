@@ -46,6 +46,7 @@ type PermissionsProps = {
  * @param root0.fetchGroupMembers Function to retrieve a group's list of users
  * @param root0.openModal Function to retrieve a group's list of assigned queries
  * @param root0.rowFocusRefs ref array for the table row buttons that can open the user modal
+ * @param root0.modalAction
  * @returns Users table   
  
  */

@@ -45,6 +45,7 @@ type UserGroupsTableProps = {
  * @param root0.openModal Function to retrieve a group's list of assigned queries
  * @param root0.rowFocusRefs ref array for the table row buttons that can open the user modal
  * @param root0.tabFocusRef ref array for the table row buttons that can open the user modal
+ * @param root0.modalAction
  * @returns The user groups table
  */
 const UserGroupsTable: React.FC<UserGroupsTableProps> = ({

@@ -5,8 +5,6 @@ import {
   useState,
   useRef,
   RefObject,
-  Dispatch,
-  SetStateAction,
 } from "react";
 import UserManagementDrawer from "../teamQueryEditSection/TeamQueryEditSection";
 import UserGroupsTable from "../userGroupsTable/UserGroupsTable";
