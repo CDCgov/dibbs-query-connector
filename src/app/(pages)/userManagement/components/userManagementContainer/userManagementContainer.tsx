@@ -278,11 +278,13 @@ const UserManagementContainer: React.FC<UserManagementContainerProps> = ({
   const handleOpenModal = async (
     mode: UserManagementMode,
     data?: UserGroup | User,
+    ref?: RefObject<HTMLTableRowElement | HTMLButtonElement | null> | null,
   ) => {
     setModalMode(mode);
     setSubjectData(data);
     setModalAction(mode);
     modalRef.current?.toggleModal();
+    ref?.current?.focus();
   };
 
   const dataLoaded = !!users && !!userGroups;
@@ -302,8 +304,8 @@ const UserManagementContainer: React.FC<UserManagementContainerProps> = ({
           userGroups={userGroups}
           subjectData={subjectData}
           tabFocusRef={groupsTabRef}
-          // rowFocusRefs={rowFocusRefs}
           setModalAction={setModalAction}
+
         />
         <UserManagementDrawer
           users={users}

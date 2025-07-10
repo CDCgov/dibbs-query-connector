@@ -7,8 +7,8 @@ import {
   SetStateAction,
   useContext,
   useEffect,
-  useState,
 } from "react";
+
 import classNames from "classnames";
 import { Button } from "@trussworks/react-uswds";
 import { Icon } from "@trussworks/react-uswds";
@@ -31,6 +31,7 @@ type UserGroupsTableProps = {
     setModalAction?: Dispatch<SetStateAction<string>>,
   ) => void;
   modalAction: UserManagementMode | string;
+
   rowFocusRefs?: RefObject<RefObject<HTMLTableRowElement | null>[]>;
   tabFocusRef?: RefObject<HTMLButtonElement | null>;
 };
@@ -67,6 +68,7 @@ const UserGroupsTable: React.FC<UserGroupsTableProps> = ({
 
     row?.current?.focus();
   }, [userGroups.length]);
+
 
   const { openEditSection } = useContext(UserManagementContext);
   const role = getRole();
