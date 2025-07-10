@@ -1,5 +1,5 @@
 "use client";
-import { RefObject, useCallback, useContext, useEffect, useState } from "react";
+import { RefObject, useCallback, useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { Label, TextInput } from "@trussworks/react-uswds";
 import {
@@ -23,7 +23,6 @@ import type { ModalProps } from "../../../../ui/designSystem/modal/Modal";
 import { UserManagementMode, ModalStates, getRole } from "../../utils";
 import Checkbox from "@/app/ui/designSystem/checkbox/Checkbox";
 import { RoleDescriptons } from "../../utils";
-import { UserManagementContext } from "../UserManagementProvider";
 import { viewMode } from "../userManagementContainer/userManagementContainer";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 
