@@ -24,12 +24,6 @@
   }
 }
 
-.drawerButton,
-.drawerButton:disabled,
-.drawerButton:disabled:hover {
-  text-decoration: none;
-}
-
 .userGroupsTable,
 .userPermissionsTable {
   display: table;
@@ -37,115 +31,40 @@
   width: 100%;
 
   tr {
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: nowrap;
-  }
-
-  td {
-    height: 5.5rem;
-  }
-}
-
-.userGroupsTable {
-  tr {
-    .actionButtons {
-      display: none;
-    }
-
-    &:hover .actionButtons,
-    &:focus-within .actionButtons {
-      display: flex;
-      text-decoration: none;
-      cursor: pointer;
-    }
-  }
-
-  td {
-    word-wrap: normal !important;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: nowrap;
-    max-width: 0 !important;
-    width: 25%;
-  }
-
-  .actionButtons {
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    position: absolute;
-    right: 1.5rem;
-    top: 50%;
-    transform: translateY(-50%);
-    gap: 0.5rem;
-  }
-}
-
-.userPermissionsTable {
-  tr {
-    .editBtn {
-      display: none;
-    }
-
-    &:hover .editBtn,
-    &:focus-within .editBtn {
-      display: flex;
-      text-decoration: none;
-      cursor: pointer;
-    }
-
     &:focus-within,
     &:hover {
-      .userDisplay {
-        span {
-          overflow: hidden;
-          text-overflow: ellipsis;
-          padding: 0 !important;
-
-          &.icon {
-            margin: 0.5rem 0;
-          }
-        }
-        button {
-          margin-right: 0.5rem;
-        }
+      button.hoverBtn {
+        display: block;
       }
     }
   }
 
   td {
     max-width: 0;
-    width: 25%;
+  }
+}
 
-    &:last-of-type {
-      width: 50% !important;
-    }
+.drawerButton,
+.drawerButton:disabled,
+.drawerButton:disabled:hover {
+  text-decoration: none !important;
+  margin: 0 !important;
+}
 
-    button {
-      max-width: 33%;
-      white-space: nowrap;
+.buttonHoverGroup {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+  height: 2.5rem;
 
-      span {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        height: 1.5rem;
-        align-content: center;
-      }
-    }
+  button.hoverBtn {
+    display: none;
   }
 
-  .userDisplay {
-    display: flex;
-    width: 100%;
-    justify-content: space-between;
-    align-items: center;
-    height: 2.5rem;
-
-    span {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
+  span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 }

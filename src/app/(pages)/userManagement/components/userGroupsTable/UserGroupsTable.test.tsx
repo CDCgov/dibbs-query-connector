@@ -36,6 +36,7 @@ describe("User Groups table", () => {
           userGroups={allGroups}
           fetchGroupMembers={jest.fn()}
           fetchGroupQueries={jest.fn()}
+          modalData={""}
         />
       </RootProviderMock>,
     );

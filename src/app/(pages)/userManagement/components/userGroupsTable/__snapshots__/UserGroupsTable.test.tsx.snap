@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`User Groups table renders the correct label syntax based on member/query size 1`] = `
 <body>
@@ -12,52 +12,37 @@ exports[`User Groups table renders the correct label syntax based on member/quer
       >
         <thead>
           <tr>
-            <th>
+            <th
+              class="grid-col-5"
+            >
               Name
             </th>
-            <th>
+            <th
+              class="grid-col-3"
+            >
               Members
             </th>
-            <th>
+            <th
+              class="grid-col-4"
+            >
               Assigned queries
             </th>
           </tr>
         </thead>
         <tbody>
           <tr
-            class="userGroupRow"
-            id="Order of the Phoenix"
+            id="456"
             tabindex="0"
           >
             <td>
-              Order of the Phoenix
-            </td>
-            <td>
-              <button
-                aria-description="Edit Order of the Phoenix members"
-                class="usa-button usa-button--unstyled drawerButton text-no-underline"
-                data-testid="edit-member-list-0"
-                type="button"
-              >
-                3 members
-              </button>
-            </td>
-            <td>
-              <button
-                aria-description="Edit Order of the Phoenix queries"
-                class="usa-button usa-button--unstyled text-no-underline"
-                data-testid="edit-query-list-0"
-                type="button"
-              >
-                3 queries
-              </button>
-            </td>
-            <td>
               <div
-                class="actionButtons"
+                class="buttonHoverGroup"
               >
+                <span>
+                  Order of the Phoenix
+                </span>
                 <button
-                  class="usa-button usa-button--unstyled editBtn unstyled-button-container usa-button--unstyled text-bold text-no-underline"
+                  class="usa-button usa-button--unstyled hoverBtn unstyled-button-container usa-button--unstyled text-bold text-no-underline"
                   data-testid="button"
                   type="button"
                 >
@@ -82,12 +67,38 @@ exports[`User Groups table renders the correct label syntax based on member/quer
                       class="padding-left-05"
                       data-testid="edit-group-456"
                     >
-                      Edit
+                      Rename
                     </span>
                   </span>
                 </button>
+              </div>
+            </td>
+            <td>
+              <button
+                aria-description="Edit Order of the Phoenix members"
+                class="usa-button usa-button--unstyled drawerButton margin-right-2 text-no-underline"
+                data-testid="edit-member-list-0"
+                type="button"
+              >
+                3 members
+              </button>
+            </td>
+            <td
+              class="grid-col-2"
+            >
+              <div
+                class="buttonHoverGroup"
+              >
                 <button
-                  class="usa-button deleteBtn unstyled-button-container usa-button--unstyled text-bold text-no-underline destructive-primary"
+                  aria-description="Edit Order of the Phoenix queries"
+                  class="usa-button usa-button--unstyled drawerButton text-no-underline"
+                  data-testid="edit-query-list-0"
+                  type="button"
+                >
+                  3 queries
+                </button>
+                <button
+                  class="usa-button usa-button--unstyled hoverBtn unstyled-button-container usa-button--unstyled text-bold text-no-underline destructive-primary"
                   data-testid="button"
                   type="button"
                 >
@@ -119,39 +130,18 @@ exports[`User Groups table renders the correct label syntax based on member/quer
             </td>
           </tr>
           <tr
-            class="userGroupRow"
-            id="S.P.E.W."
+            id="789"
             tabindex="0"
           >
             <td>
-              S.P.E.W.
-            </td>
-            <td>
-              <button
-                aria-description="Edit S.P.E.W. members"
-                class="usa-button usa-button--unstyled drawerButton text-no-underline"
-                data-testid="edit-member-list-1"
-                type="button"
-              >
-                1 member
-              </button>
-            </td>
-            <td>
-              <button
-                aria-description="Edit S.P.E.W. queries"
-                class="usa-button usa-button--unstyled text-no-underline"
-                data-testid="edit-query-list-1"
-                type="button"
-              >
-                1 query
-              </button>
-            </td>
-            <td>
               <div
-                class="actionButtons"
+                class="buttonHoverGroup"
               >
+                <span>
+                  S.P.E.W.
+                </span>
                 <button
-                  class="usa-button usa-button--unstyled editBtn unstyled-button-container usa-button--unstyled text-bold text-no-underline"
+                  class="usa-button usa-button--unstyled hoverBtn unstyled-button-container usa-button--unstyled text-bold text-no-underline"
                   data-testid="button"
                   type="button"
                 >
@@ -176,12 +166,38 @@ exports[`User Groups table renders the correct label syntax based on member/quer
                       class="padding-left-05"
                       data-testid="edit-group-789"
                     >
-                      Edit
+                      Rename
                     </span>
                   </span>
                 </button>
+              </div>
+            </td>
+            <td>
+              <button
+                aria-description="Edit S.P.E.W. members"
+                class="usa-button usa-button--unstyled drawerButton margin-right-2 text-no-underline"
+                data-testid="edit-member-list-1"
+                type="button"
+              >
+                1 member
+              </button>
+            </td>
+            <td
+              class="grid-col-2"
+            >
+              <div
+                class="buttonHoverGroup"
+              >
                 <button
-                  class="usa-button deleteBtn unstyled-button-container usa-button--unstyled text-bold text-no-underline destructive-primary"
+                  aria-description="Edit S.P.E.W. queries"
+                  class="usa-button usa-button--unstyled drawerButton text-no-underline"
+                  data-testid="edit-query-list-1"
+                  type="button"
+                >
+                  1 query
+                </button>
+                <button
+                  class="usa-button usa-button--unstyled hoverBtn unstyled-button-container usa-button--unstyled text-bold text-no-underline destructive-primary"
                   data-testid="button"
                   type="button"
                 >

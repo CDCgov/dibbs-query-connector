@@ -6,6 +6,7 @@ import {
   SetStateAction,
   RefObject,
   createRef,
+  useEffect,
 } from "react";
 import { Button, Icon } from "@trussworks/react-uswds";
 import classNames from "classnames";
@@ -30,9 +31,11 @@ type PermissionsProps = {
   openModal: (
     mode: UserManagementMode,
     user: User,
-    ref?: RefObject<HTMLTableRowElement | HTMLButtonElement | null>,
+    setModalData?: Dispatch<SetStateAction<UserManagementMode | string>>,
   ) => void;
   rowFocusRefs: RefObject<RefObject<HTMLTableRowElement | null>[] | null>;
+  modalData: UserManagementMode | string;
+  setModalData?: Dispatch<SetStateAction<UserManagementMode | string>>;
 };
 
 /**
@@ -43,6 +46,7 @@ type PermissionsProps = {
  * @param root0.fetchGroupMembers Function to retrieve a group's list of users
  * @param root0.openModal Function to retrieve a group's list of assigned queries
  * @param root0.rowFocusRefs ref array for the table row buttons that can open the user modal
+ * @param root0.modalData 
  * @returns Users table   
  
  */
@@ -52,9 +56,18 @@ const UserPermissionsTable: React.FC<PermissionsProps> = ({
   fetchGroupMembers,
   openModal,
   rowFocusRefs,
+  modalData,
 }) => {
   const { openEditSection } = useContext(UserManagementContext);
   const { data: session } = useSession();
+
+  useEffect(() => {
+    const row = rowFocusRefs?.current?.filter(
+      (tr) => tr.current?.id == modalData,
+    )[0];
+
+    row?.current?.focus();
+  }, [modalData]);
 
   async function handleUserRoleChange(id: string, role: UserRole) {
     try {
@@ -154,7 +167,7 @@ const UserPermissionsTable: React.FC<PermissionsProps> = ({
       <Button
         unstyled
         className={classNames(
-          styles.editBtn,
+          styles.hoverBtn,
           "unstyled-button-container",
           "usa-button--unstyled text-bold text-no-underline",
         )}
@@ -177,7 +190,7 @@ const UserPermissionsTable: React.FC<PermissionsProps> = ({
             data-testid={`edit-group-${user.id}`}
             className="padding-left-05"
           >
-            Edit
+            Rename
           </span>
         </span>
       </Button>
@@ -198,14 +211,13 @@ const UserPermissionsTable: React.FC<PermissionsProps> = ({
 
       return (
         <tr
-          ref={rowFocusRefs?.current?.[i] || null}
-          className={styles.tableBody__row}
+          ref={rowFocusRefs?.current?.[i]}
           key={user.id}
           tabIndex={0}
           id={user.id}
         >
           <td>
-            <div className={styles.userDisplay}>
+            <div className={styles.buttonHoverGroup}>
               <span>{display}</span>
 
               {renderActionButtons(user)}
@@ -222,9 +234,9 @@ const UserPermissionsTable: React.FC<PermissionsProps> = ({
     <Table className={styles.userPermissionsTable}>
       <thead>
         <tr>
-          <th>Name</th>
-          <th>Permissions</th>
-          <th>User groups</th>
+          <th className="grid-col-5">Name</th>
+          <th className="grid-col-3">Permissions</th>
+          <th className="grid-col-4">User groups</th>
         </tr>
       </thead>
       <tbody>{renderUserRows(users)}</tbody>

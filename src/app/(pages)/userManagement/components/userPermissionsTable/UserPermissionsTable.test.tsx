@@ -42,6 +42,7 @@ describe("User Management: User tab", () => {
           users={[mockAdmin, mockSuperAdmin]}
           fetchGroupMembers={jest.fn()}
           rowFocusRefs={mockRefs}
+          modalData={""}
         />
       </RootProviderMock>,
     );
@@ -83,6 +84,7 @@ describe("User Management: User tab", () => {
           users={[mockAdmin, mockSuperAdmin]}
           fetchGroupMembers={jest.fn()}
           rowFocusRefs={mockRefs}
+          modalData={""}
         />
       </RootProviderMock>,
     );
