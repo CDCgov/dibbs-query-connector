@@ -208,7 +208,6 @@ const UserModal: React.FC<UserModalProps> = ({
         setNewUser({ ...newUser, ...newUserAdded.user });
         refreshView("Update Users");
         setModalAction(newUser.id);
-        console.log("?", newUser.id);
         return emptyGroups
           ? setModalMode("closed")
           : setModalMode("select-groups");
