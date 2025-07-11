@@ -95,6 +95,7 @@ export const mockPermissionsTab: Tab = {
         fetchGroupMembers={jest.fn()}
         openModal={jest.fn()}
         rowFocusRefs={mockRefs}
+        modalData={""}
       />,
     ),
 };
