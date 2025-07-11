@@ -111,6 +111,7 @@ export const mockGroupsTab: Tab = {
         fetchGroupMembers={jest.fn().mockReturnValue(mockAdmin)}
         fetchGroupQueries={jest.fn()}
         openModal={jest.fn()}
+        modalData={""}
       />,
     ),
 };
