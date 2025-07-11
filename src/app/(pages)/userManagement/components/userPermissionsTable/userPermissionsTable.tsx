@@ -31,11 +31,11 @@ type PermissionsProps = {
   openModal: (
     mode: UserManagementMode,
     user: User,
-    setModalAction?: Dispatch<SetStateAction<string>>,
+    setModalData?: Dispatch<SetStateAction<UserManagementMode | string>>,
   ) => void;
   rowFocusRefs: RefObject<RefObject<HTMLTableRowElement | null>[] | null>;
-  modalAction: UserManagementMode | string;
-  setModalAction?: Dispatch<SetStateAction<string>>;
+  modalData: UserManagementMode | string;
+  setModalData?: Dispatch<SetStateAction<UserManagementMode | string>>;
 };
 
 /**
@@ -46,7 +46,7 @@ type PermissionsProps = {
  * @param root0.fetchGroupMembers Function to retrieve a group's list of users
  * @param root0.openModal Function to retrieve a group's list of assigned queries
  * @param root0.rowFocusRefs ref array for the table row buttons that can open the user modal
- * @param root0.modalAction
+ * @param root0.modalData 
  * @returns Users table   
  
  */
@@ -56,18 +56,18 @@ const UserPermissionsTable: React.FC<PermissionsProps> = ({
   fetchGroupMembers,
   openModal,
   rowFocusRefs,
-  modalAction,
+  modalData,
 }) => {
   const { openEditSection } = useContext(UserManagementContext);
   const { data: session } = useSession();
 
   useEffect(() => {
     const row = rowFocusRefs?.current?.filter(
-      (tr) => tr.current?.id == modalAction,
+      (tr) => tr.current?.id == modalData,
     )[0];
 
     row?.current?.focus();
-  }, [modalAction]);
+  }, [modalData]);
 
   async function handleUserRoleChange(id: string, role: UserRole) {
     try {

@@ -28,9 +28,9 @@ type UserGroupsTableProps = {
   openModal: (
     mode: UserManagementMode,
     data?: UserGroup | User,
-    setModalAction?: Dispatch<SetStateAction<string>>,
+    setModalData?: Dispatch<SetStateAction<UserManagementMode | string>>,
   ) => void;
-  modalAction: UserManagementMode | string;
+  modalData: UserManagementMode | string;
 
   rowFocusRefs?: RefObject<RefObject<HTMLTableRowElement | null>[]>;
   tabFocusRef?: RefObject<HTMLButtonElement | null>;
@@ -45,7 +45,7 @@ type UserGroupsTableProps = {
  * @param root0.openModal Function to retrieve a group's list of assigned queries
  * @param root0.rowFocusRefs ref array for the table row buttons that can open the user modal
  * @param root0.tabFocusRef ref array for the table row buttons that can open the user modal
- * @param root0.modalAction
+ * @param root0.modalData information from the UserModal - either the UserManagementMode or the subject data identifier
  * @returns The user groups table
  */
 const UserGroupsTable: React.FC<UserGroupsTableProps> = ({
@@ -55,16 +55,16 @@ const UserGroupsTable: React.FC<UserGroupsTableProps> = ({
   openModal,
   rowFocusRefs,
   tabFocusRef,
-  modalAction,
+  modalData,
 }) => {
   useEffect(() => {
     // return focus to groups tab after deleting a group
-    if (modalAction == "remove-group") {
+    if (modalData == "remove-group") {
       return tabFocusRef?.current?.focus();
     }
 
     const row = rowFocusRefs?.current?.filter(
-      (tr) => tr.current?.id == modalAction,
+      (tr) => tr.current?.id == modalData,
     )[0];
 
     row?.current?.focus();

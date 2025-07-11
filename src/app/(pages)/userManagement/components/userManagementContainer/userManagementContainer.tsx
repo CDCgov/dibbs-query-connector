@@ -1,6 +1,13 @@
 "use client";
 
-import { useEffect, useState, useRef, RefObject } from "react";
+import {
+  useEffect,
+  useState,
+  useRef,
+  RefObject,
+  SetStateAction,
+  Dispatch,
+} from "react";
 import UserManagementDrawer from "../teamQueryEditSection/TeamQueryEditSection";
 import UserGroupsTable from "../userGroupsTable/UserGroupsTable";
 import TabGroup, { Tab } from "@/app/ui/designSystem/TabGroup/tabGroup";
@@ -50,9 +57,7 @@ const UserManagementContainer: React.FC<UserManagementContainerProps> = ({
   const [subjectData, setSubjectData] = useState<User | UserGroup>();
   const [userGroups, setUserGroups] = useState<UserGroup[]>([]);
   const [modalMode, setModalMode] = useState<UserManagementMode>("closed");
-  const [modalAction, setModalAction] = useState<UserManagementMode | string>(
-    "",
-  );
+  const [modalData, setModalData] = useState<UserManagementMode | string>("");
 
   const [shouldRefreshView, setShouldRefreshView] = useState<
     boolean | viewMode
@@ -96,8 +101,8 @@ const UserManagementContainer: React.FC<UserManagementContainerProps> = ({
                 users={users}
                 setUsers={setUsers}
                 rowFocusRefs={rowFocusRefs}
-                modalAction={modalAction}
-                setModalAction={setModalAction}
+                modalData={modalData}
+                setModalData={setModalData}
               />
             ) : (
               <div className="empty-response">No users found</div>
@@ -133,7 +138,7 @@ const UserManagementContainer: React.FC<UserManagementContainerProps> = ({
               userGroups={userGroups}
               rowFocusRefs={rowFocusRefs}
               tabFocusRef={groupsTabRef}
-              modalAction={modalAction}
+              modalData={modalData}
             />
           </>
         ) : (
@@ -271,13 +276,12 @@ const UserManagementContainer: React.FC<UserManagementContainerProps> = ({
   const handleOpenModal = async (
     mode: UserManagementMode,
     data?: UserGroup | User,
-    ref?: RefObject<HTMLTableRowElement | HTMLButtonElement | null> | null,
+    setModalData?: Dispatch<SetStateAction<UserManagementMode | string>>,
   ) => {
     setModalMode(mode);
     setSubjectData(data);
-    setModalAction(mode);
+    setModalData && setModalData(mode);
     modalRef.current?.toggleModal();
-    ref?.current?.focus();
   };
 
   const dataLoaded = !!users && !!userGroups;
@@ -297,7 +301,7 @@ const UserManagementContainer: React.FC<UserManagementContainerProps> = ({
           userGroups={userGroups}
           subjectData={subjectData}
           tabFocusRef={groupsTabRef}
-          setModalAction={setModalAction}
+          setModalData={setModalData}
         />
         <UserManagementDrawer
           users={users}
