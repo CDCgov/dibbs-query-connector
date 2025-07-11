@@ -130,32 +130,37 @@ exports[`Super Admin view of Users Table renders content on tab click 1`] = `
         >
           <thead>
             <tr>
-              <th>
+              <th
+                class="grid-col-5"
+              >
                 Name
               </th>
-              <th>
+              <th
+                class="grid-col-3"
+              >
                 Permissions
               </th>
-              <th>
+              <th
+                class="grid-col-4"
+              >
                 User groups
               </th>
             </tr>
           </thead>
           <tbody>
             <tr
-              class="tableBody__row"
               id="456"
               tabindex="0"
             >
               <td>
                 <div
-                  class="userDisplay"
+                  class="buttonHoverGroup"
                 >
                   <span>
                     Potter, Lily 
                   </span>
                   <button
-                    class="usa-button usa-button--unstyled editBtn unstyled-button-container usa-button--unstyled text-bold text-no-underline"
+                    class="usa-button usa-button--unstyled hoverBtn unstyled-button-container usa-button--unstyled text-bold text-no-underline"
                     data-testid="button"
                     type="button"
                   >
@@ -180,7 +185,7 @@ exports[`Super Admin view of Users Table renders content on tab click 1`] = `
                         class="padding-left-05"
                         data-testid="edit-group-456"
                       >
-                        Edit
+                        Rename
                       </span>
                     </span>
                   </button>
@@ -233,19 +238,18 @@ exports[`Super Admin view of Users Table renders content on tab click 1`] = `
               </td>
             </tr>
             <tr
-              class="tableBody__row"
               id="123"
               tabindex="0"
             >
               <td>
                 <div
-                  class="userDisplay"
+                  class="buttonHoverGroup"
                 >
                   <span>
                     Potter, Harry 
                   </span>
                   <button
-                    class="usa-button usa-button--unstyled editBtn unstyled-button-container usa-button--unstyled text-bold text-no-underline"
+                    class="usa-button usa-button--unstyled hoverBtn unstyled-button-container usa-button--unstyled text-bold text-no-underline"
                     data-testid="button"
                     type="button"
                   >
@@ -270,7 +274,7 @@ exports[`Super Admin view of Users Table renders content on tab click 1`] = `
                         class="padding-left-05"
                         data-testid="edit-group-123"
                       >
-                        Edit
+                        Rename
                       </span>
                     </span>
                   </button>
@@ -423,52 +427,37 @@ exports[`Super Admin view of Users Table renders content on tab click 2`] = `
         >
           <thead>
             <tr>
-              <th>
+              <th
+                class="grid-col-5"
+              >
                 Name
               </th>
-              <th>
+              <th
+                class="grid-col-3"
+              >
                 Members
               </th>
-              <th>
+              <th
+                class="grid-col-4"
+              >
                 Assigned queries
               </th>
             </tr>
           </thead>
           <tbody>
             <tr
-              class="userGroupRow"
-              id="Hogwarts"
+              id="123"
               tabindex="0"
             >
               <td>
-                Hogwarts
-              </td>
-              <td>
-                <button
-                  aria-description="Edit Hogwarts members"
-                  class="usa-button usa-button--unstyled drawerButton text-no-underline"
-                  data-testid="edit-member-list-0"
-                  type="button"
-                >
-                  1 member
-                </button>
-              </td>
-              <td>
-                <button
-                  aria-description="Edit Hogwarts queries"
-                  class="usa-button usa-button--unstyled text-no-underline"
-                  data-testid="edit-query-list-0"
-                  type="button"
-                >
-                  0 queries
-                </button>
-              </td>
-              <td>
                 <div
-                  class="actionButtons"
+                  class="buttonHoverGroup"
                 >
+                  <span>
+                    Hogwarts
+                  </span>
                   <button
-                    class="usa-button usa-button--unstyled editBtn unstyled-button-container usa-button--unstyled text-bold text-no-underline"
+                    class="usa-button usa-button--unstyled hoverBtn unstyled-button-container usa-button--unstyled text-bold text-no-underline"
                     data-testid="button"
                     type="button"
                   >
@@ -493,12 +482,38 @@ exports[`Super Admin view of Users Table renders content on tab click 2`] = `
                         class="padding-left-05"
                         data-testid="edit-group-123"
                       >
-                        Edit
+                        Rename
                       </span>
                     </span>
                   </button>
+                </div>
+              </td>
+              <td>
+                <button
+                  aria-description="Edit Hogwarts members"
+                  class="usa-button usa-button--unstyled drawerButton margin-right-2 text-no-underline"
+                  data-testid="edit-member-list-0"
+                  type="button"
+                >
+                  1 member
+                </button>
+              </td>
+              <td
+                class="grid-col-2"
+              >
+                <div
+                  class="buttonHoverGroup"
+                >
                   <button
-                    class="usa-button deleteBtn unstyled-button-container usa-button--unstyled text-bold text-no-underline destructive-primary"
+                    aria-description="Edit Hogwarts queries"
+                    class="usa-button usa-button--unstyled drawerButton text-no-underline"
+                    data-testid="edit-query-list-0"
+                    type="button"
+                  >
+                    0 queries
+                  </button>
+                  <button
+                    class="usa-button usa-button--unstyled hoverBtn unstyled-button-container usa-button--unstyled text-bold text-no-underline destructive-primary"
                     data-testid="button"
                     type="button"
                   >
@@ -845,32 +860,37 @@ exports[`Super Admin view of Users Table renders table view after content is loa
         >
           <thead>
             <tr>
-              <th>
+              <th
+                class="grid-col-5"
+              >
                 Name
               </th>
-              <th>
+              <th
+                class="grid-col-3"
+              >
                 Permissions
               </th>
-              <th>
+              <th
+                class="grid-col-4"
+              >
                 User groups
               </th>
             </tr>
           </thead>
           <tbody>
             <tr
-              class="tableBody__row"
               id="456"
               tabindex="0"
             >
               <td>
                 <div
-                  class="userDisplay"
+                  class="buttonHoverGroup"
                 >
                   <span>
                     Potter, Lily 
                   </span>
                   <button
-                    class="usa-button usa-button--unstyled editBtn unstyled-button-container usa-button--unstyled text-bold text-no-underline"
+                    class="usa-button usa-button--unstyled hoverBtn unstyled-button-container usa-button--unstyled text-bold text-no-underline"
                     data-testid="button"
                     type="button"
                   >
@@ -895,7 +915,7 @@ exports[`Super Admin view of Users Table renders table view after content is loa
                         class="padding-left-05"
                         data-testid="edit-group-456"
                       >
-                        Edit
+                        Rename
                       </span>
                     </span>
                   </button>
@@ -948,19 +968,18 @@ exports[`Super Admin view of Users Table renders table view after content is loa
               </td>
             </tr>
             <tr
-              class="tableBody__row"
               id="123"
               tabindex="0"
             >
               <td>
                 <div
-                  class="userDisplay"
+                  class="buttonHoverGroup"
                 >
                   <span>
                     Potter, Harry 
                   </span>
                   <button
-                    class="usa-button usa-button--unstyled editBtn unstyled-button-container usa-button--unstyled text-bold text-no-underline"
+                    class="usa-button usa-button--unstyled hoverBtn unstyled-button-container usa-button--unstyled text-bold text-no-underline"
                     data-testid="button"
                     type="button"
                   >
@@ -985,7 +1004,7 @@ exports[`Super Admin view of Users Table renders table view after content is loa
                         class="padding-left-05"
                         data-testid="edit-group-123"
                       >
-                        Edit
+                        Rename
                       </span>
                     </span>
                   </button>
@@ -1109,32 +1128,37 @@ exports[`Super Admin view of Users Table renders table view after content is loa
       >
         <thead>
           <tr>
-            <th>
+            <th
+              class="grid-col-5"
+            >
               Name
             </th>
-            <th>
+            <th
+              class="grid-col-3"
+            >
               Permissions
             </th>
-            <th>
+            <th
+              class="grid-col-4"
+            >
               User groups
             </th>
           </tr>
         </thead>
         <tbody>
           <tr
-            class="tableBody__row"
             id="456"
             tabindex="0"
           >
             <td>
               <div
-                class="userDisplay"
+                class="buttonHoverGroup"
               >
                 <span>
                   Potter, Lily 
                 </span>
                 <button
-                  class="usa-button usa-button--unstyled editBtn unstyled-button-container usa-button--unstyled text-bold text-no-underline"
+                  class="usa-button usa-button--unstyled hoverBtn unstyled-button-container usa-button--unstyled text-bold text-no-underline"
                   data-testid="button"
                   type="button"
                 >
@@ -1159,7 +1183,7 @@ exports[`Super Admin view of Users Table renders table view after content is loa
                       class="padding-left-05"
                       data-testid="edit-group-456"
                     >
-                      Edit
+                      Rename
                     </span>
                   </span>
                 </button>
@@ -1212,19 +1236,18 @@ exports[`Super Admin view of Users Table renders table view after content is loa
             </td>
           </tr>
           <tr
-            class="tableBody__row"
             id="123"
             tabindex="0"
           >
             <td>
               <div
-                class="userDisplay"
+                class="buttonHoverGroup"
               >
                 <span>
                   Potter, Harry 
                 </span>
                 <button
-                  class="usa-button usa-button--unstyled editBtn unstyled-button-container usa-button--unstyled text-bold text-no-underline"
+                  class="usa-button usa-button--unstyled hoverBtn unstyled-button-container usa-button--unstyled text-bold text-no-underline"
                   data-testid="button"
                   type="button"
                 >
@@ -1249,7 +1272,7 @@ exports[`Super Admin view of Users Table renders table view after content is loa
                       class="padding-left-05"
                       data-testid="edit-group-123"
                     >
-                      Edit
+                      Rename
                     </span>
                   </span>
                 </button>

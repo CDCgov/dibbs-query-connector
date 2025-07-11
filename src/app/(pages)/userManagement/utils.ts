@@ -66,13 +66,13 @@ export const ModalStates: ModalMap = {
   },
   "create-group": {
     heading: "Create user group",
-    buttonText: "Next: Assign members",
+    buttonText: "Save user group",
     secondaryBtnText: "Cancel",
     prevStep: "closed",
   },
   "edit-group": {
     heading: "Edit user group",
-    buttonText: "Save & update members",
+    buttonText: "Save changes",
     secondaryBtnText: "Cancel",
     prevStep: "closed",
   },

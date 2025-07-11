@@ -95,6 +95,7 @@ export const mockPermissionsTab: Tab = {
         fetchGroupMembers={jest.fn()}
         openModal={jest.fn()}
         rowFocusRefs={mockRefs}
+        modalData={""}
       />,
     ),
 };
@@ -110,6 +111,7 @@ export const mockGroupsTab: Tab = {
         fetchGroupMembers={jest.fn().mockReturnValue(mockAdmin)}
         fetchGroupQueries={jest.fn()}
         openModal={jest.fn()}
+        modalData={""}
       />,
     ),
 };
