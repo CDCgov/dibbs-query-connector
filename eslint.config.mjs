@@ -61,9 +61,6 @@ export default defineConfig([
         "error",
         {
           publicOnly: true,
-          require: {
-            FunctionDeclaration: true,
-          },
         },
       ],
 

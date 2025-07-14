@@ -296,6 +296,7 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
         prevState[conditionId] = prevState[conditionId] ?? {};
         prevState[conditionId][vsType] = prevState[conditionId][vsType] ?? {};
         prevState[conditionId][vsType][vsId] = dibbsValueSet;
+
         return structuredClone(prevState);
       });
     };
