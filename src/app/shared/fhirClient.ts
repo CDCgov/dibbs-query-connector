@@ -413,6 +413,25 @@ class FHIRClient {
   }
 
   /**
+   * Sends a POST request with JSON body to the specified path.
+   * @param path - The request path.
+   * @param body - The JSON body to send.
+   * @returns The response from the server.
+   */
+  async postJson(path: string, body: unknown): Promise<Response> {
+    await this.ensureValidToken();
+    const requestOptions: RequestInit = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/fhir+json",
+        ...this.init.headers,
+      },
+      body: JSON.stringify(body),
+    };
+    return this.fetch(this.hostname + path, requestOptions);
+  }
+
+  /**
    * Checks whether a FHIR server supports $match by inspecting its metadata
    * @param url The FHIR server base URL
    * @param disableCertValidation Whether to disable cert validation
