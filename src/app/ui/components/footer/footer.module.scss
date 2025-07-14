@@ -1,33 +1,63 @@
 @use "../../../ui/styles/_variables" as *;
+@use "uswds-core" as *;
+
+@media screen and (min-width: 992) {
+  .footerContainer__mobile {
+    display: none !important;
+  }
+  .footerContainer__desktop {
+    display: block !important;
+  }
+}
+
+@media screen and (max-width: 639) {
+  .footerContainer__mobile {
+    .stacked p {
+      white-space: wrap;
+      margin-top: 0.5rem;
+    }
+  }
+}
 
 .footerContainer {
-  flex: 0 1 $footer-content-height;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
+  padding: 0;
+
+  &__mobile {
+    display: block;
+    background-color: inherit;
+
+    .stacked {
+      align-items: center !important;
+
+      img {
+        margin-right: 0.5rem !important;
+      }
+    }
+  }
+
+  &__desktop {
+    display: none;
+    background-color: inherit;
+    width: 100%;
+    max-width: $application-content-width-wide;
+  }
 }
 
-.cdcLogoContainer {
-  display: flex;
-  align-items: center;
-  margin-right: 0.5rem;
-}
+.textContainer {
+  &__left {
+    justify-content: flex-start;
+  }
 
-.cdcFooterTextContainer {
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-  color: white;
+  &__right {
+    justify-content: flex-end;
+  }
+
+  img {
+    margin-right: 1rem;
+  }
 
   p {
     white-space: nowrap;
     margin: 0;
-  }
-}
-
-@media (max-width: 64em) {
-  .cdcFooterTextContainer {
-    flex-direction: column;
-    justify-content: flex-start;
   }
 }

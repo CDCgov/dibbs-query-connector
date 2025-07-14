@@ -9,7 +9,7 @@ $application-max-width: 45rem;
 $application-wide-max-width: 90rem;
 $application-content-margins: 13.75rem;
 $application-content-margins-wide: 10rem;
-$application-content-width-wide: calc($application-wide-max-width - 2 * $application-content-margins-wide);
+$application-content-width-wide: calc($application-wide-max-width - $application-content-margins-wide);
 
 $header-content-height: 3rem;
 $footer-content-height: 5rem;
