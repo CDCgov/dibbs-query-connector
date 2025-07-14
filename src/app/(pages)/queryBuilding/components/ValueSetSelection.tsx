@@ -132,11 +132,11 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
       <div className={styles.valueSetTemplateContainer__inner}>
         <div className={styles.valueSetTemplate__left}>
           <Sidebar
+            activeCondition={activeCondition}
             constructedQuery={constructedQuery}
-            setValueSetSearchFilter={setValueSetSearchFilter}
             categoryToConditionsMap={categoryToConditionsMap}
             conditionsMap={conditionsMap}
-            activeCondition={activeCondition}
+            setValueSetSearchFilter={setValueSetSearchFilter}
             setActiveCondition={setActiveCondition}
             handleUpdateCondition={handleUpdateCondition}
           />

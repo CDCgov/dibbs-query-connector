@@ -119,6 +119,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     setActiveCondition(conditionId);
     setValueSetSearchFilter("");
   }
+
   function handleConditionSearch(searchFilter: string) {
     const filteredDisplay = filterSearchByCategoryAndCondition(
       searchFilter,
@@ -177,6 +178,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       className={"unstyled-button-container"}
                       key={`tab-${conditionId}`}
                       id={`tab-${conditionId}`}
+                      data-testid={`tab-${conditionId}`}
                       onClick={() => handleConditionToggle(conditionId)}
                     >
                       {formatDiseaseDisplay(condition.name)}
