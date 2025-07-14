@@ -86,8 +86,12 @@ describe("tests the value set selection page", () => {
     });
 
     expect(screen.queryByTestId("tab-15628003")).not.toBeInTheDocument();
+    expect(screen.queryByText("Add Condition(s)")).not.toBeInTheDocument();
 
     await user.click(screen.getByTestId("add-left-rail"));
+    await waitFor(() => {
+      expect(screen.queryByText("Add Condition(s)")).toBeInTheDocument();
+    });
 
     await user.click(screen.getByTestId("condition-drawer-add-15628003"));
     await waitFor(() => {
@@ -96,6 +100,10 @@ describe("tests the value set selection page", () => {
       ).toBeInTheDocument();
     });
     await user.keyboard("{Escape}");
+
+    await waitFor(() => {
+      expect(screen.queryByText("Add Condition(s)")).not.toBeInTheDocument();
+    });
 
     await waitFor(() => {
       expect(screen.getByTestId("15628003-card-active")).toBeInTheDocument();
