@@ -7,23 +7,15 @@ import { Button } from "@trussworks/react-uswds";
 import {
   CategoryToConditionArrayMap,
   ConditionsMap,
-  filterSearchByCategoryAndCondition,
-  formatDiseaseDisplay,
-  formatCategoryDisplay,
   NestedQuery,
-  formatCategoryToConditionsMap,
   MedicalRecordSections,
 } from "../utils";
-import { ConceptSelectionView } from "./valueSetSelectionViews/ConceptSelection";
-import Drawer from "@/app/ui/designSystem/drawer/Drawer";
-import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
+import { ConceptSelectionView } from "./valueSetSelectionViews/ConceptSelectionView";
 import SearchField from "@/app/ui/designSystem/searchField/SearchField";
 import {
-  CONDITION_DRAWER_SEARCH_PLACEHOLDER,
   MEDICAL_RECORD_SECTIONS_ID,
   VALUESET_SELECTION_SEARCH_PLACEHOLDER,
 } from "./utils";
-import Highlighter from "react-highlight-words";
 import {
   DibbsConceptType,
   DibbsValueSet,
@@ -36,8 +28,8 @@ import { CUSTOM_VALUESET_ARRAY_ID } from "@/app/shared/constants";
 import { useSaveQueryAndRedirect } from "../../../backend/query-building/useSaveQueryAndRedirect";
 import { useContext } from "react";
 import { DataContext } from "@/app/shared/DataProvider";
-import { CustomConditionView } from "./valueSetSelectionViews/CustomCondition";
-import { MedicalRecordsView } from "./valueSetSelectionViews/MedicalRecordsSection";
+import { CustomConditionView } from "./valueSetSelectionViews/CustomConditionView";
+import { MedicalRecordsView } from "./valueSetSelectionViews/MedicalRecordsView";
 import { Sidebar } from "./valueSetSelectionViews/Sidebar";
 
 type ConditionSelectionProps = {
@@ -78,12 +70,6 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
   setMedicalRecordSections,
 }) => {
   const [activeCondition, setActiveCondition] = useState<string>("");
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [conditionDrawerData, setConditionDrawerData] =
-    useState<CategoryToConditionArrayMap>(
-      formatCategoryToConditionsMap(categoryToConditionsMap),
-    );
-  const [conditionSearchFilter, setConditionSearchFilter] = useState("");
   const [valueSetSearchFilter, setValueSetSearchFilter] = useState("");
 
   const queryContext = useContext(DataContext);
@@ -111,85 +97,6 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
       setActiveCondition(MEDICAL_RECORD_SECTIONS_ID);
     }
   }, [constructedQuery, activeCondition]);
-
-  function generateConditionDrawerDisplay(
-    categoryToConditionsMap: CategoryToConditionArrayMap,
-  ) {
-    return Object.entries(categoryToConditionsMap).map(
-      ([category, conditions]) => (
-        <div id={category} key={category}>
-          <div className={styles.conditionDrawerHeader}>
-            <Highlighter
-              highlightClassName="searchHighlight"
-              searchWords={[conditionSearchFilter]}
-              autoEscape={true}
-              textToHighlight={formatCategoryDisplay(category)}
-            ></Highlighter>
-          </div>
-          <div>
-            {Object.values(conditions).map((condition) => (
-              <div
-                key={`update-${condition.id}`}
-                id={`update-${condition.id}`}
-                data-testid={`update-${condition.id}`}
-                className={classNames(styles.conditionItem)}
-                tabIndex={0}
-              >
-                <span>
-                  <Highlighter
-                    highlightClassName="searchHighlight"
-                    searchWords={[conditionSearchFilter]}
-                    autoEscape={true}
-                    textToHighlight={formatDiseaseDisplay(condition.name)}
-                  ></Highlighter>
-                </span>
-
-                {Object.keys(constructedQuery).includes(condition.id) ? (
-                  <span
-                    className={styles.addedStatus}
-                    data-testid={`condition-drawer-added-${condition.id}`}
-                  >
-                    Added
-                  </span>
-                ) : (
-                  <button
-                    className={classNames(
-                      styles.addButton,
-                      "unstyled-button-container",
-                    )}
-                    data-testid={`condition-drawer-add-${condition.id}`}
-                    onClick={() => {
-                      handleUpdateCondition(condition.id, false);
-                      setActiveCondition(condition.id);
-                      showToastConfirmation({
-                        body: `${condition.name} added to query`,
-                      });
-                    }}
-                  >
-                    ADD
-                  </button>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      ),
-    );
-  }
-
-  function handleConditionSearch(searchFilter: string) {
-    const filteredDisplay = filterSearchByCategoryAndCondition(
-      searchFilter,
-      formatCategoryToConditionsMap(categoryToConditionsMap),
-    );
-    setConditionSearchFilter(searchFilter);
-    setConditionDrawerData(filteredDisplay);
-  }
-
-  function handleConditionToggle(conditionId: string) {
-    setActiveCondition(conditionId);
-    setValueSetSearchFilter("");
-  }
 
   // Check if the active condition is CUSTOM_VALUESET_ARRAY_ID
   const isCustomConditionTab = activeCondition === CUSTOM_VALUESET_ARRAY_ID;
@@ -226,14 +133,12 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
         <div className={styles.valueSetTemplate__left}>
           <Sidebar
             constructedQuery={constructedQuery}
-            setIsDrawerOpen={setIsDrawerOpen}
+            setValueSetSearchFilter={setValueSetSearchFilter}
+            categoryToConditionsMap={categoryToConditionsMap}
             conditionsMap={conditionsMap}
             activeCondition={activeCondition}
             setActiveCondition={setActiveCondition}
-            isCustomConditionTab={isCustomConditionTab}
-            handleConditionToggle={handleConditionToggle}
             handleUpdateCondition={handleUpdateCondition}
-            isMedicalRecordsTab={isMedicalRecordsTab}
           />
         </div>
         <div className={styles.valueSetTemplate__right}>
@@ -300,29 +205,6 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
           )}
         </div>
       </div>
-
-      <Drawer
-        title="Add Condition(s)"
-        placeholder={CONDITION_DRAWER_SEARCH_PLACEHOLDER}
-        toRender={
-          <>
-            {Object.keys(conditionDrawerData).length > 0 ? (
-              generateConditionDrawerDisplay(conditionDrawerData)
-            ) : (
-              <div>
-                <div className="padding-top-4"> No conditions found</div>
-              </div>
-            )}{" "}
-          </>
-        }
-        toastMessage="Condition has been successfully added."
-        isOpen={isDrawerOpen}
-        onClose={() => setIsDrawerOpen(false)}
-        onSave={() => {
-          handleUpdateCondition;
-        }}
-        onSearch={handleConditionSearch}
-      />
     </div>
   );
 };

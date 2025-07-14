@@ -1,6 +1,6 @@
 "use client";
 import { Dispatch, JSX, SetStateAction, useEffect, useState } from "react";
-import styles from "../buildFromTemplates/conditionTemplateSelection.module.scss";
+import styles from "../../buildFromTemplates/conditionTemplateSelection.module.scss";
 import { HeadingLevel } from "@trussworks/react-uswds";
 import ConceptTypeAccordionBody from "../ConceptTypeAccordionBody";
 import { ConceptTypeToDibbsVsMap } from "@/app/utils/valueSetTranslation";
