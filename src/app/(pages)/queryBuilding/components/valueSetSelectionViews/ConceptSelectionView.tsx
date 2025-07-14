@@ -2,17 +2,17 @@
 import { Dispatch, JSX, SetStateAction, useEffect, useState } from "react";
 import styles from "../buildFromTemplates/conditionTemplateSelection.module.scss";
 import { HeadingLevel } from "@trussworks/react-uswds";
-import ConceptTypeAccordionBody from "./ConceptTypeAccordionBody";
+import ConceptTypeAccordionBody from "../ConceptTypeAccordionBody";
 import { ConceptTypeToDibbsVsMap } from "@/app/utils/valueSetTranslation";
-import ConceptTypeAccordionHeader from "./ConceptTypeAccordionHeader";
+import ConceptTypeAccordionHeader from "../ConceptTypeAccordionHeader";
 import MultiAccordion from "@/app/ui/designSystem/MultiAccordion";
-import { filterVsTypeOptions } from "./utils";
+import { filterVsTypeOptions } from "../utils";
 import {
   DibbsConceptType,
   DibbsValueSet,
 } from "@/app/models/entities/valuesets";
 
-type ConceptTypeSelectionTableProps = {
+type ConceptSelectionViewProps = {
   vsTypeLevelOptions: ConceptTypeToDibbsVsMap;
   handleVsTypeLevelUpdate: (
     vsType: DibbsConceptType,
@@ -41,9 +41,11 @@ type VsTypeAccordion = {
  * takes a VsType and generates a VsName level setter function
  * @returns A component for display to render on the query building page
  */
-export const ConceptTypeSelectionTable: React.FC<
-  ConceptTypeSelectionTableProps
-> = ({ vsTypeLevelOptions, handleVsTypeLevelUpdate, searchFilter }) => {
+export const ConceptSelectionView: React.FC<ConceptSelectionViewProps> = ({
+  vsTypeLevelOptions,
+  handleVsTypeLevelUpdate,
+  searchFilter,
+}) => {
   const [curExpanded, setCurExpanded] = useState<string>("");
   const [accordionItems, setAccordionItems] = useState<VsTypeAccordion[]>([]);
 

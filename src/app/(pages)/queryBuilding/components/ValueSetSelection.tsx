@@ -1,9 +1,9 @@
 "use client";
 
 import styles from "../buildFromTemplates/conditionTemplateSelection.module.scss";
-import { SetStateAction, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import classNames from "classnames";
-import { Button, Icon } from "@trussworks/react-uswds";
+import { Button } from "@trussworks/react-uswds";
 import {
   CategoryToConditionArrayMap,
   ConditionsMap,
@@ -14,7 +14,7 @@ import {
   formatCategoryToConditionsMap,
   MedicalRecordSections,
 } from "../utils";
-import { ConceptTypeSelectionTable } from "./SelectionTable";
+import { ConceptSelectionView } from "./valueSetSelectionViews/ConceptSelection";
 import Drawer from "@/app/ui/designSystem/drawer/Drawer";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import SearchField from "@/app/ui/designSystem/searchField/SearchField";
@@ -274,7 +274,7 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
                 )}
               </div>
 
-              <ConceptTypeSelectionTable
+              <ConceptSelectionView
                 vsTypeLevelOptions={
                   activeConditionValueSets ?? {
                     labs: {},
