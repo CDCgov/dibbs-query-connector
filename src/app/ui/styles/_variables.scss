@@ -16,6 +16,13 @@ $footer-content-height: 5rem;
 $default-table-padding: 1.5rem;
 $site-alert-height: 2.5rem;
 
+$footer-mobile-breakpoint: 992;
+$footer-stacked-breakpoint: 639;
+$header-stacked-breakpoint: 479;
+$header-small-text-min-breakpoint: 480;
+$header-small-text-max-breakpoint: 500;
+$header-padding-breakpoint: 800;
+
 // Design System Color Tokens
 $text-primary: black;
 $text-secondary: $gray-600;

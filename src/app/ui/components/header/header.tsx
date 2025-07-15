@@ -75,42 +75,47 @@ const HeaderComponent: React.FC<HeaderProps> = ({ session }) => {
   );
 
   return (
-    <div className={styles.headerContainer}>
-      <header className="usa-header usa-header--basic">
-        <div
-          className={classNames(
-            "usa-nav-container",
-            styles.headerContentContainer,
-          )}
-        >
-          <div>
+    <header className="usa-header usa-header--basic">
+      <div
+        className={classNames(
+          "usa-nav-container grid-container",
+          styles.headerContainer,
+        )}
+      >
+        <div className={classNames("grid-row", styles.headerRow)}>
+          <div className="mobile-lg:grid-col-6">
             <Link
-              className={`${styles.siteLogoText} display-flex flex-align-center text-white-important text-decoration-none font-weight-normal-important`}
+              className={`display-flex flex-align-center text-white-important text-decoration-none font-weight-normal-important`}
               href={landingPage}
               title={metadata.title}
             >
-              <svg
-                className={styles.siteLogoImage}
-                path="./../../styles/assets/logo.svg"
-              ></svg>
-              {metadata.title}
+              <span className={styles.siteLogoImage}>
+                <svg
+                  className={styles.siteLogoImage}
+                  path="./../../styles/assets/logo.svg"
+                ></svg>
+              </span>
+              <span className={styles.siteLogoText}>{metadata.title}</span>
             </Link>
           </div>
-          <div
-            className={classNames(
-              "margin-left-auto",
-              "display-flex",
-              "flex-align-center",
-            )}
-          >
+          <div className={classNames("mobile-lg:grid-col-6 ")}>
             {isLoggedIn && (
-              <div className="display-flex flex-align-center">
+              <div
+                className={classNames(
+                  styles.buttonContainer,
+                  "display-flex flex-align-center flex-justify-end",
+                )}
+                style={{ height: "100%" }}
+              >
                 <Button
                   secondary
                   onClick={() => {
                     router.push(PAGES.QUERY);
                   }}
-                  className={classNames("margin-bottom-0 margin-right-2")}
+                  className={classNames(
+                    styles.runQueryBtn,
+                    "margin-bottom-0 margin-right-2",
+                  )}
                   type={"button"}
                 >
                   Run a query
@@ -137,49 +142,49 @@ const HeaderComponent: React.FC<HeaderProps> = ({ session }) => {
             )}
           </div>
         </div>
-        {showMenu && (
-          <div ref={menuRef} className={styles.menuDropdownContainer}>
-            <ul
-              id="dropdown-menu"
-              data-testid="dropdown-menu"
-              className={classNames("usa-nav__submenu", styles.menuDropdown)}
-            >
-              {menuPages.map((page) => (
-                <li key={page.path} className={styles.subMenuItem}>
-                  <button
-                    type="button"
-                    className={classNames(
-                      styles.menuItem,
-                      "usa-button--unstyled",
-                    )}
-                    onClick={() => {
-                      if (pathname === page.path) {
-                        location.reload();
-                      } else {
-                        router.push(page.path);
-                      }
-                      setShowMenu(false);
-                    }}
-                  >
-                    {page.name}
-                  </button>
-                </li>
-              ))}
-              {!isAuthDisabled && (
-                <li className={styles.subMenuItem}>
-                  <button
-                    className={classNames(styles.menuItem)}
-                    onClick={async () => await handleSignOut()}
-                  >
-                    Sign out
-                  </button>
-                </li>
-              )}
-            </ul>
-          </div>
-        )}
-      </header>
-    </div>
+      </div>
+      {showMenu && (
+        <div ref={menuRef} className={styles.menuDropdownContainer}>
+          <ul
+            id="dropdown-menu"
+            data-testid="dropdown-menu"
+            className={classNames("usa-nav__submenu", styles.menuDropdown)}
+          >
+            {menuPages.map((page) => (
+              <li key={page.path} className={styles.menuItem}>
+                <button
+                  type="button"
+                  className={classNames(
+                    styles.menuItem__button,
+                    "usa-button--unstyled",
+                  )}
+                  onClick={() => {
+                    if (pathname === page.path) {
+                      location.reload();
+                    } else {
+                      router.push(page.path);
+                    }
+                    setShowMenu(false);
+                  }}
+                >
+                  {page.name}
+                </button>
+              </li>
+            ))}
+            {!isAuthDisabled && (
+              <li className={styles.menuItem}>
+                <button
+                  className={classNames(styles.menuItem__button)}
+                  onClick={async () => await handleSignOut()}
+                >
+                  Sign out
+                </button>
+              </li>
+            )}
+          </ul>
+        </div>
+      )}
+    </header>
   );
 };
 

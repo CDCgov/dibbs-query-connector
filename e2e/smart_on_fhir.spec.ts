@@ -14,7 +14,9 @@ test.describe("SMART on FHIR", () => {
 
     await page.getByRole("button", { name: "New server" }).click();
     await expect(
-      page.getByRole("heading", { name: "New server" }),
+      page.getByRole("heading", {
+        name: "New server",
+      }),
     ).toBeVisible();
     await runAxeAccessibilityChecks(page);
 

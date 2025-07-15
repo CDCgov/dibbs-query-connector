@@ -14,7 +14,7 @@ test.describe("User management", () => {
     ).toBeVisible();
     // Users tab is selected by default
     await expect(page.getByRole("button", { name: "Users" })).toHaveClass(
-      /tabGroup_tab__active__/,
+      /tab__active/,
     );
     await expect(page.getByText("Mario, Mario")).toBeVisible();
     await runAxeAccessibilityChecks(page);
