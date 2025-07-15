@@ -18,7 +18,7 @@ test.describe("SMART on FHIR", () => {
         name: "New server",
       }),
     ).toBeVisible();
-    // await runAxeAccessibilityChecks(page);
+    await runAxeAccessibilityChecks(page);
 
     const serverName = `E2E Smart on FHIR ${Math.random() * 100}`;
     await page.getByTestId("server-name").fill(serverName);

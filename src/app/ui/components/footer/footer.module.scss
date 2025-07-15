@@ -20,13 +20,11 @@
 }
 
 .footerContainer {
-  padding: 0;
-  padding-top: 1.25rem;
-  padding-bottom: 1.25rem;
+  padding: 1.25rem 0;
+  background-color: $brand-darkest;
 
   &__mobile {
     display: block;
-    background-color: #14333d;
 
     .stacked {
       align-items: center !important;
@@ -39,8 +37,6 @@
 
   &__desktop {
     display: none;
-    background-color: #14333d;
-    width: 100%;
     max-width: $application-wide-max-width;
   }
 }
