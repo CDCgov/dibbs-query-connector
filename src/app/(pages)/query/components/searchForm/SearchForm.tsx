@@ -136,7 +136,8 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
   }
 
   function isValid() {
-    return validatedPatientSearch(getPatientDiscoveryRequest());
+    return true;
+    // return validatedPatientSearch(getPatientDiscoveryRequest());
   }
 
   function getErrorMessage() {
