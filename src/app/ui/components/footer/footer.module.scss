@@ -44,6 +44,8 @@
 }
 
 .textContainer {
+  align-items: center;
+
   &__left {
     justify-content: flex-start;
   }
