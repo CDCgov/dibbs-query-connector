@@ -24,7 +24,7 @@
 
   &__mobile {
     display: block;
-    background-color: inherit;
+    background-color: $brand-darkest;
 
     .stacked {
       align-items: center !important;
@@ -37,7 +37,7 @@
 
   &__desktop {
     display: none;
-    background-color: inherit;
+    background-color: $brand-darkest;
     width: 100%;
     max-width: $application-wide-max-width;
   }
