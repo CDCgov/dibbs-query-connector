@@ -12,7 +12,6 @@ export default function FooterComponent() {
       <section
         className={classNames(
           styles.footerContainer__desktop,
-          "usa-footer__secondary-section",
           "grid-container",
         )}
       >
@@ -60,11 +59,7 @@ export default function FooterComponent() {
         </div>
       </section>
       <section
-        className={classNames(
-          styles.footerContainer__mobile,
-          "usa-footer__secondary-section",
-          "grid-container",
-        )}
+        className={classNames(styles.footerContainer__mobile, "grid-container")}
       >
         <div className={classNames(styles.stacked, "grid-row")}>
           <Image
