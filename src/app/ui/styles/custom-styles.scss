@@ -384,7 +384,7 @@ fieldset > legend > .usa-accordion__button[aria-expanded="false"] {
   width: calc($application-wide-max-width - 2 * $application-content-margins);
 }
 
-@media screen and (max-width: 800) {
+@media screen and (max-width: $header-padding-breakpoint) {
   header {
     padding: 1rem 2rem !important;
   }
