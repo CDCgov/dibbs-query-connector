@@ -132,15 +132,8 @@ class FHIRClient {
 
       // 2. Upload patient to verify write access (optional)
       try {
-        const GoldenSickPatientJsonPath = new URL(
-          "../../assets/golden-sick-patient.json",
-          import.meta.url,
-        ).href;
-        const patientJson = await import(GoldenSickPatientJsonPath);
-        const uploadResponse = await client.postJson(
-          "/Patient",
-          patientJson.default ?? patientJson,
-        );
+        const patientJson = require("../test/assets/GoldenSickPatient.json");
+        const uploadResponse = await client.postJson("/Patient", patientJson);
 
         if (!uploadResponse.ok) {
           const uploadError = await uploadResponse.text();
