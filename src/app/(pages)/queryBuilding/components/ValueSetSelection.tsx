@@ -3,27 +3,19 @@
 import styles from "../buildFromTemplates/conditionTemplateSelection.module.scss";
 import { useEffect, useState } from "react";
 import classNames from "classnames";
-import { Button, Icon } from "@trussworks/react-uswds";
+import { Button } from "@trussworks/react-uswds";
 import {
   CategoryToConditionArrayMap,
   ConditionsMap,
-  filterSearchByCategoryAndCondition,
-  formatDiseaseDisplay,
-  formatCategoryDisplay,
   NestedQuery,
-  formatCategoryToConditionsMap,
   MedicalRecordSections,
-  EMPTY_MEDICAL_RECORD_SECTIONS,
 } from "../utils";
-import { ConceptTypeSelectionTable } from "./SelectionTable";
-import Drawer from "@/app/ui/designSystem/drawer/Drawer";
-import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
+import { ConceptSelectionView } from "./valueSetSelectionViews/ConceptSelectionView";
 import SearchField from "@/app/ui/designSystem/searchField/SearchField";
 import {
-  CONDITION_DRAWER_SEARCH_PLACEHOLDER,
+  MEDICAL_RECORD_SECTIONS_ID,
   VALUESET_SELECTION_SEARCH_PLACEHOLDER,
 } from "./utils";
-import Highlighter from "react-highlight-words";
 import {
   DibbsConceptType,
   DibbsValueSet,
@@ -36,7 +28,9 @@ import { CUSTOM_VALUESET_ARRAY_ID } from "@/app/shared/constants";
 import { useSaveQueryAndRedirect } from "../../../backend/query-building/useSaveQueryAndRedirect";
 import { useContext } from "react";
 import { DataContext } from "@/app/shared/DataProvider";
-import Checkbox from "@/app/ui/designSystem/checkbox/Checkbox";
+import { CustomConditionView } from "./valueSetSelectionViews/CustomConditionView";
+import { MedicalRecordsView } from "./valueSetSelectionViews/MedicalRecordsView";
+import { Sidebar } from "./valueSetSelectionViews/Sidebar";
 
 type ConditionSelectionProps = {
   constructedQuery: NestedQuery;
@@ -76,18 +70,10 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
   setMedicalRecordSections,
 }) => {
   const [activeCondition, setActiveCondition] = useState<string>("");
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [conditionDrawerData, setConditionDrawerData] =
-    useState<CategoryToConditionArrayMap>(
-      formatCategoryToConditionsMap(categoryToConditionsMap),
-    );
-  const [conditionSearchFilter, setConditionSearchFilter] = useState("");
   const [valueSetSearchFilter, setValueSetSearchFilter] = useState("");
 
   const queryContext = useContext(DataContext);
   const queryName = queryContext?.selectedQuery?.queryName;
-
-  const MEDICAL_RECORD_SECTIONS_ID = "MEDICAL_RECORD_SECTIONS";
 
   useEffect(() => {
     // display the first condition's valuesets on render
@@ -111,85 +97,6 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
       setActiveCondition(MEDICAL_RECORD_SECTIONS_ID);
     }
   }, [constructedQuery, activeCondition]);
-
-  function generateConditionDrawerDisplay(
-    categoryToConditionsMap: CategoryToConditionArrayMap,
-  ) {
-    return Object.entries(categoryToConditionsMap).map(
-      ([category, conditions]) => (
-        <div id={category} key={category}>
-          <div className={styles.conditionDrawerHeader}>
-            <Highlighter
-              highlightClassName="searchHighlight"
-              searchWords={[conditionSearchFilter]}
-              autoEscape={true}
-              textToHighlight={formatCategoryDisplay(category)}
-            ></Highlighter>
-          </div>
-          <div>
-            {Object.values(conditions).map((condition) => (
-              <div
-                key={`update-${condition.id}`}
-                id={`update-${condition.id}`}
-                data-testid={`update-${condition.id}`}
-                className={classNames(styles.conditionItem)}
-                tabIndex={0}
-              >
-                <span>
-                  <Highlighter
-                    highlightClassName="searchHighlight"
-                    searchWords={[conditionSearchFilter]}
-                    autoEscape={true}
-                    textToHighlight={formatDiseaseDisplay(condition.name)}
-                  ></Highlighter>
-                </span>
-
-                {Object.keys(constructedQuery).includes(condition.id) ? (
-                  <span
-                    className={styles.addedStatus}
-                    data-testid={`condition-drawer-added-${condition.id}`}
-                  >
-                    Added
-                  </span>
-                ) : (
-                  <button
-                    className={classNames(
-                      styles.addButton,
-                      "unstyled-button-container",
-                    )}
-                    data-testid={`condition-drawer-add-${condition.id}`}
-                    onClick={() => {
-                      handleUpdateCondition(condition.id, false);
-                      setActiveCondition(condition.id);
-                      showToastConfirmation({
-                        body: `${condition.name} added to query`,
-                      });
-                    }}
-                  >
-                    ADD
-                  </button>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      ),
-    );
-  }
-
-  function handleConditionSearch(searchFilter: string) {
-    const filteredDisplay = filterSearchByCategoryAndCondition(
-      searchFilter,
-      formatCategoryToConditionsMap(categoryToConditionsMap),
-    );
-    setConditionSearchFilter(searchFilter);
-    setConditionDrawerData(filteredDisplay);
-  }
-
-  function handleConditionToggle(conditionId: string) {
-    setActiveCondition(conditionId);
-    setValueSetSearchFilter("");
-  }
 
   // Check if the active condition is CUSTOM_VALUESET_ARRAY_ID
   const isCustomConditionTab = activeCondition === CUSTOM_VALUESET_ARRAY_ID;
@@ -224,174 +131,22 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
     >
       <div className={styles.valueSetTemplateContainer__inner}>
         <div className={styles.valueSetTemplate__left}>
-          <div className={styles.sideBarMenu}>
-            <div className={styles.sideBarMenu__content}>
-              <div className={styles.section_templates}>
-                <div className={styles.sectionTitle}>
-                  <div>{"Templates".toLocaleUpperCase()}</div>
-                  <button
-                    className={classNames(
-                      "unstyled-button-container",
-                      styles.addCondition,
-                    )}
-                    data-testid={"add-condition-icon"}
-                    onClick={() => setIsDrawerOpen(true)}
-                  >
-                    <Icon.Add
-                      aria-label="Plus sign icon indicating addition"
-                      className="usa-icon"
-                      size={3}
-                    />
-                    <span data-testid="add-left-rail">ADD</span>
-                  </button>
-                </div>
-
-                {Object.keys(constructedQuery)
-                  .filter(
-                    (conditionId) => conditionId !== CUSTOM_VALUESET_ARRAY_ID,
-                  )
-                  .map((conditionId) => {
-                    const condition = conditionsMap[conditionId];
-                    if (!condition) return null;
-                    return (
-                      <div
-                        key={conditionId}
-                        data-testid={
-                          activeCondition == conditionId
-                            ? `${conditionId}-card-active`
-                            : `${conditionId}-card`
-                        }
-                        className={classNames(
-                          "align-items-center",
-                          activeCondition == conditionId
-                            ? `${styles.card} ${styles.active}`
-                            : styles.card,
-                        )}
-                      >
-                        <button
-                          type={"button"}
-                          className={"unstyled-button-container"}
-                          key={`tab-${conditionId}`}
-                          id={`tab-${conditionId}`}
-                          onClick={() => handleConditionToggle(conditionId)}
-                        >
-                          {formatDiseaseDisplay(condition.name)}
-                        </button>
-                        <button
-                          onClick={() => {
-                            handleUpdateCondition(conditionId, true);
-                            const next = Object.keys(constructedQuery).find(
-                              (k) =>
-                                k !== conditionId &&
-                                k !== CUSTOM_VALUESET_ARRAY_ID,
-                            );
-                            handleConditionToggle(
-                              next ?? CUSTOM_VALUESET_ARRAY_ID,
-                            );
-                          }}
-                          className={classNames(
-                            "unstyled-button-container",
-                            styles.deleteIconContainer,
-                          )}
-                          data-testid={`delete-condition-${conditionId}`}
-                        >
-                          <Icon.Delete
-                            className={classNames(
-                              "usa-icon",
-                              styles.deleteIcon,
-                              "destructive-primary",
-                            )}
-                            size={4}
-                            aria-label="Trash icon indicating deletion of disease"
-                          ></Icon.Delete>
-                        </button>
-                      </div>
-                    );
-                  })}
-              </div>
-              <div className={styles.section_custom}>
-                <div
-                  className={classNames(styles.sectionTitle, "padding-top-2")}
-                >
-                  {CUSTOM_VALUESET_ARRAY_ID.toLocaleUpperCase()}
-                </div>
-                <div
-                  className={classNames(
-                    "align-items-center",
-                    isCustomConditionTab
-                      ? `${styles.card} ${styles.active}`
-                      : styles.card,
-                  )}
-                >
-                  <button
-                    id={`tab-custom`}
-                    className="unstyled-button-container"
-                    onClick={() => setActiveCondition(CUSTOM_VALUESET_ARRAY_ID)}
-                  >
-                    Additional codes from library
-                  </button>
-                </div>
-              </div>
-              <div className={styles.section_custom}>
-                <div
-                  className={classNames(
-                    "align-items-center",
-                    isMedicalRecordsTab
-                      ? `${styles.card} ${styles.active}`
-                      : styles.card,
-                  )}
-                >
-                  <button
-                    id={`tab-medical-records`}
-                    onClick={() =>
-                      setActiveCondition(MEDICAL_RECORD_SECTIONS_ID)
-                    }
-                    className="unstyled-button-container"
-                  >
-                    Medical record sections
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
+          <Sidebar
+            activeCondition={activeCondition}
+            constructedQuery={constructedQuery}
+            categoryToConditionsMap={categoryToConditionsMap}
+            conditionsMap={conditionsMap}
+            setValueSetSearchFilter={setValueSetSearchFilter}
+            setActiveCondition={setActiveCondition}
+            handleUpdateCondition={handleUpdateCondition}
+          />
         </div>
         <div className={styles.valueSetTemplate__right}>
           {isMedicalRecordsTab ? (
-            <div className={styles.medicalRecordSectionControls}>
-              <div
-                className={(styles.medicalRecordSectionControls, "padding-4")}
-              >
-                {Object.keys(EMPTY_MEDICAL_RECORD_SECTIONS).map((key) => (
-                  <div key={key} className={styles.medicalRecordSectionRow}>
-                    <div
-                      data-testid={`container-medical-record-section-checkbox-${key}`}
-                    >
-                      <Checkbox
-                        id={`medical-record-section-checkbox-${key}`}
-                        label={`Include ${key
-                          .replace(/([A-Z])/g, " $1")
-                          .toLowerCase()}`}
-                        checked={
-                          !!(
-                            medicalRecordSections &&
-                            medicalRecordSections[
-                              key as keyof MedicalRecordSections
-                            ]
-                          )
-                        }
-                        aria-label={`Select medical recored section ${key}`}
-                        onChange={(e) =>
-                          setMedicalRecordSections((prev) => ({
-                            ...prev,
-                            [key]: e.target.checked,
-                          }))
-                        }
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <MedicalRecordsView
+              medicalRecordSections={medicalRecordSections}
+              setMedicalRecordSections={setMedicalRecordSections}
+            />
           ) : (
             <>
               <div className={styles.valueSetTemplate__search}>
@@ -424,7 +179,7 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
                 )}
               </div>
 
-              <ConceptTypeSelectionTable
+              <ConceptSelectionView
                 vsTypeLevelOptions={
                   activeConditionValueSets ?? {
                     labs: {},
@@ -438,67 +193,18 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
                 searchFilter={valueSetSearchFilter}
                 setSearchFilter={setValueSetSearchFilter}
               />
+
               {isCustomConditionTab && !hasCustomValueSets && (
-                <div className={styles.codeLibrary__empty}>
-                  <Icon.GridView
-                    aria-label="Stylized icon showing four squares in a grid"
-                    className={classNames("usa-icon", styles.icon)}
-                  />
-                  <p className={styles.codeLibrary__emptyText}>
-                    <strong>
-                      This is a space for you to pull in individual value sets
-                    </strong>
-                  </p>
-                  <p className={styles.codeLibrary__emptyText}>
-                    <strong>
-                      These can be official value sets from CSTE, or ones that
-                      you have created in the code library.
-                    </strong>
-                  </p>
-                  <Button
-                    className={styles.codeLibrary__button}
-                    type="button"
-                    onClick={() =>
-                      saveQueryAndRedirect(
-                        constructedQuery,
-                        medicalRecordSections,
-                        queryName,
-                        "/codeLibrary",
-                        "select",
-                      )
-                    }
-                  >
-                    Add from code library
-                  </Button>
-                </div>
+                <CustomConditionView
+                  constructedQuery={constructedQuery}
+                  medicalRecordSections={medicalRecordSections}
+                  queryName={queryName}
+                />
               )}
             </>
           )}
         </div>
       </div>
-
-      <Drawer
-        title="Add Condition(s)"
-        placeholder={CONDITION_DRAWER_SEARCH_PLACEHOLDER}
-        toRender={
-          <>
-            {Object.keys(conditionDrawerData).length > 0 ? (
-              generateConditionDrawerDisplay(conditionDrawerData)
-            ) : (
-              <div>
-                <div className="padding-top-4"> No conditions found</div>
-              </div>
-            )}{" "}
-          </>
-        }
-        toastMessage="Condition has been successfully added."
-        isOpen={isDrawerOpen}
-        onClose={() => setIsDrawerOpen(false)}
-        onSave={() => {
-          handleUpdateCondition;
-        }}
-        onSearch={handleConditionSearch}
-      />
     </div>
   );
 };

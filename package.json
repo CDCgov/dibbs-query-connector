@@ -15,6 +15,7 @@
     "test": "npm run test:unit && npm run test:integration",
     "test:ci": " bash ./setup-scripts/unit_and_integration_tests.sh",
     "test:unit": "jest --testPathIgnorePatterns='/e2e/' '/integration/'",
+    "test:unit:file": "jest --testPathIgnorePatterns='/e2e/' '/integration/' --testPathPatterns",
     "test:unit:watch": "jest --watch",
     "test:update": "jest --updateSnapshot --testPathIgnorePatterns=/e2e/",
     "test:integration": "JUST_INTEGRATION=true bash ./setup-scripts/unit_and_integration_tests.sh",
