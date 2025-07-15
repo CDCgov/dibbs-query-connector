@@ -1,0 +1,1499 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`tests the value set selection page highlights the active tab to the side 1`] = `
+<body>
+  <div>
+    <div
+      class="main-container__wide mainContainer"
+    >
+      <a
+        aria-label="Back arrow, Back to condition selection"
+        class="back-link text-no-underline width-fit-content"
+        data-testid="backArrowLink"
+        href="#"
+      >
+        <svg
+          aria-label="Arrow point left indicating return to previous step"
+          class="usa-icon"
+          focusable="false"
+          height="1em"
+          role="img"
+          viewBox="0 0 24 24"
+          width="1em"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"
+          />
+        </svg>
+         
+        Back to condition selection
+      </a>
+      <div
+        class="customQuery__header"
+      >
+        <h1
+          class="queryTitle"
+        >
+          Custom query
+        </h1>
+        <div
+          class="customQuery__controls"
+        >
+          <div
+            class="customQuery__name"
+          >
+            <label
+              class="usa-label inputLabel"
+              data-testid="label"
+              for="queryNameInput"
+            >
+              Query name 
+              <span
+                class="text-secondary"
+              >
+                (required)
+              </span>
+            </label>
+            <input
+              class="usa-input input"
+              data-testid="queryNameInput"
+              id="queryNameInput"
+              name="queryNameInput"
+              required=""
+              type="text"
+              value=""
+            />
+          </div>
+          <div
+            class="customQuery__saveButton"
+          >
+            <button
+              class="usa-button queryBuildingButton margin-0"
+              data-testid="createSaveQueryBtn"
+              disabled=""
+              title="Save query"
+              type="button"
+            >
+              Save query
+            </button>
+          </div>
+        </div>
+      </div>
+      <div
+        class="display-flex flex-auto"
+      >
+        <div
+          class="background-dark margin-top-4  valueSetTemplateContainer"
+        >
+          <div
+            class="valueSetTemplateContainer__inner"
+          >
+            <div
+              class="valueSetTemplate__left"
+            >
+              <div
+                class="sideBarMenu"
+              >
+                <div
+                  class="sideBarMenu__content"
+                >
+                  <div
+                    class="section_templates"
+                  >
+                    <div
+                      class="sectionTitle"
+                    >
+                      <div>
+                        TEMPLATES
+                      </div>
+                      <button
+                        class="unstyled-button-container addCondition"
+                        data-testid="add-condition-icon"
+                      >
+                        <svg
+                          aria-label="Plus sign icon indicating addition"
+                          class="usa-icon usa-icon--size-3 usa-icon"
+                          focusable="false"
+                          height="1em"
+                          role="img"
+                          viewBox="0 0 24 24"
+                          width="1em"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"
+                          />
+                        </svg>
+                        <span
+                          data-testid="add-left-rail"
+                        >
+                          ADD
+                        </span>
+                      </button>
+                    </div>
+                  </div>
+                  <div
+                    class="section_custom"
+                  >
+                    <div
+                      class="sectionTitle padding-top-2"
+                    >
+                      CUSTOM
+                    </div>
+                    <div
+                      class="align-items-center card active"
+                      data-testid="tab-custom-container"
+                    >
+                      <button
+                        class="unstyled-button-container"
+                        data-testid="tab-custom"
+                        id="tab-custom"
+                      >
+                        Additional codes from library
+                      </button>
+                    </div>
+                  </div>
+                  <div
+                    class="section_custom"
+                  >
+                    <div
+                      class="align-items-center card"
+                      data-testid="tab-medical-records-container"
+                    >
+                      <button
+                        class="unstyled-button-container"
+                        data-testid="tab-medical-records"
+                        id="tab-medical-records"
+                      >
+                        Medical record sections
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <div
+                  aria-label="drawer-container"
+                  class="drawer closed width35"
+                  data-testid="drawer-open-false"
+                  id="drawer-container"
+                  role="dialog"
+                >
+                  <div
+                    class="display-none"
+                  />
+                </div>
+              </div>
+              ;
+            </div>
+            <div
+              class="valueSetTemplate__right"
+            >
+              <div>
+                <div
+                  class="valueSetTemplate__search"
+                >
+                  <input
+                    class="usa-input searchField valueSetSearch"
+                    data-testid="textInput"
+                    id="valueSetTemplateSearch"
+                    name="valueSetTemplateSearch"
+                    placeholder="Search labs, medications, conditions"
+                    type="search"
+                    value=""
+                  />
+                  <div
+                    class="datePickerContainer"
+                  >
+                    <div
+                      class="textInputContainer"
+                    >
+                      <input
+                        aria-label="Date range input"
+                        class="usa-input"
+                        data-testid="date-range-input"
+                        id="date-range-input"
+                        name="date-range-input"
+                        placeholder="Filter by date"
+                        readonly=""
+                        type="text"
+                        value=""
+                      />
+                      <svg
+                        aria-label="date-range-calendar-icon"
+                        class="usa-icon usa-icon--size-3 calendarIcon"
+                        focusable="false"
+                        height="1em"
+                        role="img"
+                        viewBox="0 0 24 24"
+                        width="1em"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M20 3h-1V1h-2v2H7V1H5v2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 18H4V8h16v13z"
+                        />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="codeLibrary__empty"
+                >
+                  <svg
+                    aria-label="Stylized icon showing four squares in a grid"
+                    class="usa-icon usa-icon icon"
+                    focusable="false"
+                    height="1em"
+                    role="img"
+                    viewBox="0 0 24 24"
+                    width="1em"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M3 3v8h8V3H3zm6 6H5V5h4v4zm-6 4v8h8v-8H3zm6 6H5v-4h4v4zm4-16v8h8V3h-8zm6 6h-4V5h4v4zm-6 4v8h8v-8h-8zm6 6h-4v-4h4v4z"
+                      fill-rule="evenodd"
+                    />
+                  </svg>
+                  <p
+                    class="codeLibrary__emptyText"
+                  >
+                    <strong>
+                      This is a space for you to pull in individual value sets
+                    </strong>
+                  </p>
+                  <p
+                    class="codeLibrary__emptyText"
+                  >
+                    <strong>
+                      These can be official value sets from CSTE, or ones that you have created in the code library.
+                    </strong>
+                  </p>
+                  <button
+                    class="usa-button codeLibrary__button"
+                    data-testid="button"
+                    type="button"
+                  >
+                    Add from code library
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    aria-describedby="warning-confirmation-modal-modal-description"
+    aria-labelledby="warning-confirmation-modal-modal-heading"
+    class="usa-modal-wrapper is-hidden"
+    data-force-action="false"
+    id="warning-confirmation-modal-modal"
+    role="dialog"
+  >
+    <div
+      aria-controls="warning-confirmation-modal-modal"
+      class="usa-modal-overlay"
+      data-testid="modalOverlay"
+    >
+      <div
+        class="usa-modal qc-modal"
+        data-force-action="false"
+        data-testid="modalWindow"
+        tabindex="-1"
+      >
+        <div
+          class="usa-modal__content"
+        >
+          <div
+            class="usa-modal__main"
+          >
+            <h2
+              class="usa-modal__heading"
+              id="warning-confirmation-modal-modal-heading"
+            >
+              You have unsaved changes
+            </h2>
+            <div
+              class="usa-prose"
+              id="warning-confirmation-modal-modal-description"
+            >
+              <p>
+                You've made changes to your query. Would you like to save before leaving?
+              </p>
+            </div>
+            <div
+              class="usa-modal__footer"
+              data-testid="modalFooter"
+            >
+              <ul
+                class="usa-button-group"
+              >
+                <li
+                  class="usa-button-group__item"
+                >
+                  <button
+                    class="usa-button usa-button--default"
+                    data-testid="button"
+                    type="button"
+                  >
+                    Save
+                  </button>
+                </li>
+                <li
+                  class="usa-button-group__item"
+                >
+                  <button
+                    class="usa-button usa-button--secondary"
+                    data-testid="button"
+                    type="button"
+                  >
+                    Dismiss
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <button
+            aria-controls="warning-confirmation-modal-modal"
+            aria-label="Close this window"
+            class="usa-button usa-modal__close"
+            data-close-modal="true"
+            data-testid="button"
+            type="button"
+          >
+            <svg
+              aria-hidden="true"
+              class="usa-icon"
+              focusable="false"
+              height="1em"
+              role="img"
+              viewBox="0 0 24 24"
+              width="1em"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+`;
+
+exports[`tests the value set selection page highlights the active tab to the side 2`] = `
+<body>
+  <div>
+    <div
+      class="main-container__wide mainContainer"
+    >
+      <a
+        aria-label="Back arrow, Back to condition selection"
+        class="back-link text-no-underline width-fit-content"
+        data-testid="backArrowLink"
+        href="#"
+      >
+        <svg
+          aria-label="Arrow point left indicating return to previous step"
+          class="usa-icon"
+          focusable="false"
+          height="1em"
+          role="img"
+          viewBox="0 0 24 24"
+          width="1em"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"
+          />
+        </svg>
+         
+        Back to condition selection
+      </a>
+      <div
+        class="customQuery__header"
+      >
+        <h1
+          class="queryTitle"
+        >
+          Custom query
+        </h1>
+        <div
+          class="customQuery__controls"
+        >
+          <div
+            class="customQuery__name"
+          >
+            <label
+              class="usa-label inputLabel"
+              data-testid="label"
+              for="queryNameInput"
+            >
+              Query name 
+              <span
+                class="text-secondary"
+              >
+                (required)
+              </span>
+            </label>
+            <input
+              class="usa-input input"
+              data-testid="queryNameInput"
+              id="queryNameInput"
+              name="queryNameInput"
+              required=""
+              type="text"
+              value=""
+            />
+          </div>
+          <div
+            class="customQuery__saveButton"
+          >
+            <button
+              class="usa-button queryBuildingButton margin-0"
+              data-testid="createSaveQueryBtn"
+              disabled=""
+              title="Save query"
+              type="button"
+            >
+              Save query
+            </button>
+          </div>
+        </div>
+      </div>
+      <div
+        class="display-flex flex-auto"
+      >
+        <div
+          class="background-dark margin-top-4  valueSetTemplateContainer"
+        >
+          <div
+            class="valueSetTemplateContainer__inner"
+          >
+            <div
+              class="valueSetTemplate__left"
+            >
+              <div
+                class="sideBarMenu"
+              >
+                <div
+                  class="sideBarMenu__content"
+                >
+                  <div
+                    class="section_templates"
+                  >
+                    <div
+                      class="sectionTitle"
+                    >
+                      <div>
+                        TEMPLATES
+                      </div>
+                      <button
+                        class="unstyled-button-container addCondition"
+                        data-testid="add-condition-icon"
+                      >
+                        <svg
+                          aria-label="Plus sign icon indicating addition"
+                          class="usa-icon usa-icon--size-3 usa-icon"
+                          focusable="false"
+                          height="1em"
+                          role="img"
+                          viewBox="0 0 24 24"
+                          width="1em"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"
+                          />
+                        </svg>
+                        <span
+                          data-testid="add-left-rail"
+                        >
+                          ADD
+                        </span>
+                      </button>
+                    </div>
+                  </div>
+                  <div
+                    class="section_custom"
+                  >
+                    <div
+                      class="sectionTitle padding-top-2"
+                    >
+                      CUSTOM
+                    </div>
+                    <div
+                      class="align-items-center card"
+                      data-testid="tab-custom-container"
+                    >
+                      <button
+                        class="unstyled-button-container"
+                        data-testid="tab-custom"
+                        id="tab-custom"
+                      >
+                        Additional codes from library
+                      </button>
+                    </div>
+                  </div>
+                  <div
+                    class="section_custom"
+                  >
+                    <div
+                      class="align-items-center card active"
+                      data-testid="tab-medical-records-container"
+                    >
+                      <button
+                        class="unstyled-button-container"
+                        data-testid="tab-medical-records"
+                        id="tab-medical-records"
+                      >
+                        Medical record sections
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <div
+                  aria-label="drawer-container"
+                  class="drawer closed width35"
+                  data-testid="drawer-open-false"
+                  id="drawer-container"
+                  role="dialog"
+                >
+                  <div
+                    class="display-none"
+                  />
+                </div>
+              </div>
+              ;
+            </div>
+            <div
+              class="valueSetTemplate__right"
+            >
+              <div
+                class="medicalRecordSectionControls"
+              >
+                <div
+                  class="padding-4"
+                >
+                  <div
+                    class="medicalRecordSectionRow"
+                  >
+                    <div
+                      data-testid="container-medical-record-section-checkbox-immunizations"
+                    >
+                      <div
+                        class="usa-checkbox"
+                        data-testid="checkbox"
+                      >
+                        <input
+                          aria-label="Select medical recored section immunizations"
+                          class="usa-checkbox__input"
+                          id="medical-record-section-checkbox-immunizations"
+                          name="medical-record-section-checkbox-immunizations"
+                          type="checkbox"
+                        />
+                        <label
+                          class="usa-checkbox__label"
+                          for="medical-record-section-checkbox-immunizations"
+                        >
+                          Include immunizations
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                  <div
+                    class="medicalRecordSectionRow"
+                  >
+                    <div
+                      data-testid="container-medical-record-section-checkbox-socialDeterminants"
+                    >
+                      <div
+                        class="usa-checkbox"
+                        data-testid="checkbox"
+                      >
+                        <input
+                          aria-label="Select medical recored section socialDeterminants"
+                          class="usa-checkbox__input"
+                          id="medical-record-section-checkbox-socialDeterminants"
+                          name="medical-record-section-checkbox-socialDeterminants"
+                          type="checkbox"
+                        />
+                        <label
+                          class="usa-checkbox__label"
+                          for="medical-record-section-checkbox-socialDeterminants"
+                        >
+                          Include social determinants
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    aria-describedby="warning-confirmation-modal-modal-description"
+    aria-labelledby="warning-confirmation-modal-modal-heading"
+    class="usa-modal-wrapper is-hidden"
+    data-force-action="false"
+    id="warning-confirmation-modal-modal"
+    role="dialog"
+  >
+    <div
+      aria-controls="warning-confirmation-modal-modal"
+      class="usa-modal-overlay"
+      data-testid="modalOverlay"
+    >
+      <div
+        class="usa-modal qc-modal"
+        data-force-action="false"
+        data-testid="modalWindow"
+        tabindex="-1"
+      >
+        <div
+          class="usa-modal__content"
+        >
+          <div
+            class="usa-modal__main"
+          >
+            <h2
+              class="usa-modal__heading"
+              id="warning-confirmation-modal-modal-heading"
+            >
+              You have unsaved changes
+            </h2>
+            <div
+              class="usa-prose"
+              id="warning-confirmation-modal-modal-description"
+            >
+              <p>
+                You've made changes to your query. Would you like to save before leaving?
+              </p>
+            </div>
+            <div
+              class="usa-modal__footer"
+              data-testid="modalFooter"
+            >
+              <ul
+                class="usa-button-group"
+              >
+                <li
+                  class="usa-button-group__item"
+                >
+                  <button
+                    class="usa-button usa-button--default"
+                    data-testid="button"
+                    type="button"
+                  >
+                    Save
+                  </button>
+                </li>
+                <li
+                  class="usa-button-group__item"
+                >
+                  <button
+                    class="usa-button usa-button--secondary"
+                    data-testid="button"
+                    type="button"
+                  >
+                    Dismiss
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <button
+            aria-controls="warning-confirmation-modal-modal"
+            aria-label="Close this window"
+            class="usa-button usa-modal__close"
+            data-close-modal="true"
+            data-testid="button"
+            type="button"
+          >
+            <svg
+              aria-hidden="true"
+              class="usa-icon"
+              focusable="false"
+              height="1em"
+              role="img"
+              viewBox="0 0 24 24"
+              width="1em"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+`;
+
+exports[`tests the value set selection page highlights the active tab to the side 3`] = `
+<body>
+  <div>
+    <div
+      class="main-container__wide mainContainer"
+    >
+      <a
+        aria-label="Back arrow, Back to condition selection"
+        class="back-link text-no-underline width-fit-content"
+        data-testid="backArrowLink"
+        href="#"
+      >
+        <svg
+          aria-label="Arrow point left indicating return to previous step"
+          class="usa-icon"
+          focusable="false"
+          height="1em"
+          role="img"
+          viewBox="0 0 24 24"
+          width="1em"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"
+          />
+        </svg>
+         
+        Back to condition selection
+      </a>
+      <div
+        class="customQuery__header"
+      >
+        <h1
+          class="queryTitle"
+        >
+          Custom query
+        </h1>
+        <div
+          class="customQuery__controls"
+        >
+          <div
+            class="customQuery__name"
+          >
+            <label
+              class="usa-label inputLabel"
+              data-testid="label"
+              for="queryNameInput"
+            >
+              Query name 
+              <span
+                class="text-secondary"
+              >
+                (required)
+              </span>
+            </label>
+            <input
+              class="usa-input input"
+              data-testid="queryNameInput"
+              id="queryNameInput"
+              name="queryNameInput"
+              required=""
+              type="text"
+              value=""
+            />
+          </div>
+          <div
+            class="customQuery__saveButton"
+          >
+            <button
+              class="usa-button queryBuildingButton margin-0"
+              data-testid="createSaveQueryBtn"
+              disabled=""
+              title="Save query"
+              type="button"
+            >
+              Save query
+            </button>
+          </div>
+        </div>
+      </div>
+      <div
+        class="display-flex flex-auto"
+      >
+        <div
+          class="background-dark margin-top-4  valueSetTemplateContainer"
+        >
+          <div
+            class="valueSetTemplateContainer__inner"
+          >
+            <div
+              class="valueSetTemplate__left"
+            >
+              <div
+                class="sideBarMenu"
+              >
+                <div
+                  class="sideBarMenu__content"
+                >
+                  <div
+                    class="section_templates"
+                  >
+                    <div
+                      class="sectionTitle"
+                    >
+                      <div>
+                        TEMPLATES
+                      </div>
+                      <button
+                        class="unstyled-button-container addCondition"
+                        data-testid="add-condition-icon"
+                      >
+                        <svg
+                          aria-label="Plus sign icon indicating addition"
+                          class="usa-icon usa-icon--size-3 usa-icon"
+                          focusable="false"
+                          height="1em"
+                          role="img"
+                          viewBox="0 0 24 24"
+                          width="1em"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"
+                          />
+                        </svg>
+                        <span
+                          data-testid="add-left-rail"
+                        >
+                          ADD
+                        </span>
+                      </button>
+                    </div>
+                    <div
+                      class="align-items-center card active"
+                      data-testid="15628003-card-active"
+                    >
+                      <button
+                        class="unstyled-button-container"
+                        data-testid="tab-15628003"
+                        id="tab-15628003"
+                        type="button"
+                      >
+                        Gonorrhea
+                      </button>
+                      <button
+                        class="unstyled-button-container deleteIconContainer"
+                        data-testid="delete-condition-15628003"
+                      >
+                        <svg
+                          aria-label="Trash icon indicating deletion of disease"
+                          class="usa-icon usa-icon--size-4 usa-icon deleteIcon destructive-primary"
+                          focusable="false"
+                          height="1em"
+                          role="img"
+                          viewBox="0 0 24 24"
+                          width="1em"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"
+                          />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                  <div
+                    class="section_custom"
+                  >
+                    <div
+                      class="sectionTitle padding-top-2"
+                    >
+                      CUSTOM
+                    </div>
+                    <div
+                      class="align-items-center card"
+                      data-testid="tab-custom-container"
+                    >
+                      <button
+                        class="unstyled-button-container"
+                        data-testid="tab-custom"
+                        id="tab-custom"
+                      >
+                        Additional codes from library
+                      </button>
+                    </div>
+                  </div>
+                  <div
+                    class="section_custom"
+                  >
+                    <div
+                      class="align-items-center card"
+                      data-testid="tab-medical-records-container"
+                    >
+                      <button
+                        class="unstyled-button-container"
+                        data-testid="tab-medical-records"
+                        id="tab-medical-records"
+                      >
+                        Medical record sections
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <div
+                  aria-label="drawer-container"
+                  class="drawer open width35"
+                  data-testid="drawer-open-true"
+                  id="drawer-container"
+                  role="dialog"
+                >
+                  <div
+                    class="drawerContent display-block"
+                  >
+                    <div
+                      class="drawerHeader"
+                    >
+                      <button
+                        aria-label="Close drawer"
+                        class="closeButton"
+                        data-testid="close-drawer"
+                      >
+                        <svg
+                          aria-label="X icon indicating closure"
+                          class="usa-icon usa-icon--size-3"
+                          focusable="false"
+                          height="1em"
+                          role="img"
+                          viewBox="0 0 24 24"
+                          width="1em"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+                          />
+                        </svg>
+                      </button>
+                      <h2
+                        class="margin-0 padding-bottom-2"
+                        data-testid="drawer-title"
+                        id="drawer-title"
+                      >
+                        Add Condition(s)
+                      </h2>
+                      <div>
+                        <input
+                          class="usa-input searchField"
+                          data-testid="textInput"
+                          id="searchFieldTemplate"
+                          name="searchFieldTemplate"
+                          placeholder="Search condition or category"
+                          type="search"
+                          value=""
+                        />
+                      </div>
+                    </div>
+                    <div
+                      class="drawerBody"
+                    >
+                      <div
+                        id="Cancer"
+                      >
+                        <div
+                          class="conditionDrawerHeader"
+                        >
+                          <span>
+                            <span
+                              class=""
+                            >
+                              Cancer
+                            </span>
+                          </span>
+                        </div>
+                        <div>
+                          <div
+                            class="conditionItem"
+                            data-testid="update-363346000"
+                            id="update-363346000"
+                            tabindex="0"
+                          >
+                            <span>
+                              <span>
+                                <span
+                                  class=""
+                                >
+                                  Malignant neoplastic disease
+                                </span>
+                              </span>
+                            </span>
+                            <button
+                              class="addButton unstyled-button-container"
+                              data-testid="condition-drawer-add-363346000"
+                            >
+                              ADD
+                            </button>
+                          </div>
+                          <div
+                            class="conditionItem"
+                            data-testid="update-2"
+                            id="update-2"
+                            tabindex="0"
+                          >
+                            <span>
+                              <span>
+                                <span
+                                  class=""
+                                >
+                                  Cancer (Leukemia)
+                                </span>
+                              </span>
+                            </span>
+                            <button
+                              class="addButton unstyled-button-container"
+                              data-testid="condition-drawer-add-2"
+                            >
+                              ADD
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                      <div
+                        id="Sexually Transmitted Diseases"
+                      >
+                        <div
+                          class="conditionDrawerHeader"
+                        >
+                          <span>
+                            <span
+                              class=""
+                            >
+                              Sexually Transmitted Diseases (STI)
+                            </span>
+                          </span>
+                        </div>
+                        <div>
+                          <div
+                            class="conditionItem"
+                            data-testid="update-76272004"
+                            id="update-76272004"
+                            tabindex="0"
+                          >
+                            <span>
+                              <span>
+                                <span
+                                  class=""
+                                >
+                                  Syphilis
+                                </span>
+                              </span>
+                            </span>
+                            <button
+                              class="addButton unstyled-button-container"
+                              data-testid="condition-drawer-add-76272004"
+                            >
+                              ADD
+                            </button>
+                          </div>
+                          <div
+                            class="conditionItem"
+                            data-testid="update-240589008"
+                            id="update-240589008"
+                            tabindex="0"
+                          >
+                            <span>
+                              <span>
+                                <span
+                                  class=""
+                                >
+                                  Chlamydia trachomatis infection
+                                </span>
+                              </span>
+                            </span>
+                            <button
+                              class="addButton unstyled-button-container"
+                              data-testid="condition-drawer-add-240589008"
+                            >
+                              ADD
+                            </button>
+                          </div>
+                          <div
+                            class="conditionItem"
+                            data-testid="update-15628003"
+                            id="update-15628003"
+                            tabindex="0"
+                          >
+                            <span>
+                              <span>
+                                <span
+                                  class=""
+                                >
+                                  Gonorrhea
+                                </span>
+                              </span>
+                            </span>
+                            <span
+                              class="addedStatus"
+                              data-testid="condition-drawer-added-15628003"
+                            >
+                              Added
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                       
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="overlay"
+                />
+              </div>
+              ;
+            </div>
+            <div
+              class="valueSetTemplate__right"
+            >
+              <div>
+                <div
+                  class="valueSetTemplate__search"
+                >
+                  <input
+                    class="usa-input searchField valueSetSearch"
+                    data-testid="textInput"
+                    id="valueSetTemplateSearch"
+                    name="valueSetTemplateSearch"
+                    placeholder="Search labs, medications, conditions"
+                    type="search"
+                    value=""
+                  />
+                  <div
+                    class="datePickerContainer"
+                  >
+                    <div
+                      class="textInputContainer"
+                    >
+                      <input
+                        aria-label="Date range input"
+                        class="usa-input"
+                        data-testid="date-range-input"
+                        id="date-range-input"
+                        name="date-range-input"
+                        placeholder="Filter by date"
+                        readonly=""
+                        type="text"
+                        value=""
+                      />
+                      <svg
+                        aria-label="date-range-calendar-icon"
+                        class="usa-icon usa-icon--size-3 calendarIcon"
+                        focusable="false"
+                        height="1em"
+                        role="img"
+                        viewBox="0 0 24 24"
+                        width="1em"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M20 3h-1V1h-2v2H7V1H5v2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 18H4V8h16v13z"
+                        />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="accordionContainer"
+                  data-testid="accordion-container"
+                >
+                  <div
+                    class="usa-accordion accordionInnerWrapper"
+                    data-testid="accordion"
+                  >
+                    <fieldset>
+                      <legend
+                        class="usa-accordion__heading"
+                      >
+                        <button
+                          aria-controls="medications"
+                          aria-expanded="false"
+                          class="usa-accordion__button foo"
+                          data-testid="accordionButton_medications"
+                          type="button"
+                        >
+                          <div
+                            class="accordionHeaderContent"
+                          >
+                            <div
+                              class="accordionLabel"
+                            >
+                              <svg
+                                aria-label="Arrow indicating collapsed or expanded toggle content"
+                                class="usa-icon usa-icon--size-3"
+                                focusable="false"
+                                height="1em"
+                                role="img"
+                                style="rotate: 90deg;"
+                                viewBox="0 0 24 24"
+                                width="1em"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path
+                                  d="m7 14 5-5 5 5z"
+                                />
+                              </svg>
+                              <div
+                                class="accordionLabel"
+                                data-testid="accordionHeader_medications"
+                              >
+                                medications
+                              </div>
+                            </div>
+                            <div
+                              class="accordionHeaderCount"
+                            >
+                              2 / 2
+                            </div>
+                          </div>
+                        </button>
+                      </legend>
+                      <div
+                        class="usa-prose accordionInnerWrapper"
+                        data-testid="accordionItem_medications"
+                        hidden=""
+                        id="medications"
+                      >
+                        <div
+                          class="bulkActionButtons"
+                        >
+                          <button
+                            class="usa-button selectAll usa-button--unstyled"
+                            data-testid="button"
+                            type="button"
+                          >
+                            Deselect  All
+                          </button>
+                        </div>
+                        <div
+                          class="accordionContainer"
+                        >
+                          <div
+                            class="accordionBodyExpanded"
+                            data-testid="container-7_20240909"
+                          >
+                            <div
+                              class="accordionExpandedInner"
+                            >
+                              <div
+                                class="valueSetTemplate__checkboxWrapper"
+                              >
+                                <div
+                                  class="valueSetTemplate__checkboxWrapper"
+                                >
+                                  <div
+                                    class="display-flex flex-column"
+                                  >
+                                    <div
+                                      class="checkboxInfoContainer"
+                                      tabindex="-1"
+                                    >
+                                      <div
+                                        class="usa-checkbox valueSetTemplate__checkbox checkbox"
+                                        data-testid="checkbox"
+                                      >
+                                        <input
+                                          checked=""
+                                          class="usa-checkbox__input"
+                                          id="7_20240909"
+                                          name="7_20240909"
+                                          type="checkbox"
+                                        />
+                                        <label
+                                          class="usa-checkbox__label"
+                                          for="7_20240909"
+                                        >
+                                          <div
+                                            class="expandedContent"
+                                          >
+                                            <div
+                                              class="vsName"
+                                            >
+                                              <span>
+                                                <span
+                                                  class=""
+                                                >
+                                                  Gonorrhea Medication
+                                                </span>
+                                              </span>
+                                            </div>
+                                          </div>
+                                        </label>
+                                      </div>
+                                    </div>
+                                    <div
+                                      class="vsDetails"
+                                    >
+                                      <div
+                                        class="padding-right-2"
+                                      >
+                                        Author: DIBBs
+                                      </div>
+                                      <div>
+                                        System: http://www.nlm.nih.gov/research/umls/rxnorm
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                              <div
+                                class="accordionBodyExpanded__right"
+                              >
+                                <div
+                                  class="displayCount"
+                                  data-testid="displayCount-7_20240909"
+                                >
+                                  2
+                                   / 
+                                  2
+                                </div>
+                                <button
+                                  class="usa-button usa-button--secondary viewCodesBtn"
+                                  data-testid="viewCodes-7_20240909"
+                                  role="button"
+                                  tabindex="0"
+                                  type="button"
+                                >
+                                  View codes
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                          <div>
+                            <div
+                              aria-label="drawer-container"
+                              class="drawer closed width35"
+                              data-testid="drawer-open-false"
+                              id="drawer-container"
+                              role="dialog"
+                            >
+                              <div
+                                class="display-none"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </fieldset>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    aria-describedby="warning-confirmation-modal-modal-description"
+    aria-labelledby="warning-confirmation-modal-modal-heading"
+    class="usa-modal-wrapper is-hidden"
+    data-force-action="false"
+    id="warning-confirmation-modal-modal"
+    role="dialog"
+  >
+    <div
+      aria-controls="warning-confirmation-modal-modal"
+      class="usa-modal-overlay"
+      data-testid="modalOverlay"
+    >
+      <div
+        class="usa-modal qc-modal"
+        data-force-action="false"
+        data-testid="modalWindow"
+        tabindex="-1"
+      >
+        <div
+          class="usa-modal__content"
+        >
+          <div
+            class="usa-modal__main"
+          >
+            <h2
+              class="usa-modal__heading"
+              id="warning-confirmation-modal-modal-heading"
+            >
+              You have unsaved changes
+            </h2>
+            <div
+              class="usa-prose"
+              id="warning-confirmation-modal-modal-description"
+            >
+              <p>
+                You've made changes to your query. Would you like to save before leaving?
+              </p>
+            </div>
+            <div
+              class="usa-modal__footer"
+              data-testid="modalFooter"
+            >
+              <ul
+                class="usa-button-group"
+              >
+                <li
+                  class="usa-button-group__item"
+                >
+                  <button
+                    class="usa-button usa-button--default"
+                    data-testid="button"
+                    type="button"
+                  >
+                    Save
+                  </button>
+                </li>
+                <li
+                  class="usa-button-group__item"
+                >
+                  <button
+                    class="usa-button usa-button--secondary"
+                    data-testid="button"
+                    type="button"
+                  >
+                    Dismiss
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <button
+            aria-controls="warning-confirmation-modal-modal"
+            aria-label="Close this window"
+            class="usa-button usa-modal__close"
+            data-close-modal="true"
+            data-testid="button"
+            type="button"
+          >
+            <svg
+              aria-hidden="true"
+              class="usa-icon"
+              focusable="false"
+              height="1em"
+              role="img"
+              viewBox="0 0 24 24"
+              width="1em"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+`;

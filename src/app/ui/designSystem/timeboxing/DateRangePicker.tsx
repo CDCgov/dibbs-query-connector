@@ -11,6 +11,7 @@ import {
 } from "@trussworks/react-uswds";
 import styles from "./DateRangePicker.module.scss";
 import { addHours } from "date-fns";
+import classNames from "classnames";
 
 export interface DateRange {
   startDate?: Date | null;
@@ -26,6 +27,7 @@ interface DateRangePickerProps {
   startDate: Date | null;
   endDate: Date | null;
   onChange: (dates: { startDate: Date | null; endDate: Date | null }) => void;
+  popoverSide?: "left" | "right";
 }
 
 const normalizeStart = (date: Date | null) =>
@@ -147,12 +149,14 @@ const CUSTOM_VALUE = "custom";
  * @param root0.startDate - The start date.
  * @param root0.endDate - The end date.
  * @param root0.onChange - The change handler.
+ * @param root0.popoverSide - Optional prop to control the side the popover's on.
  * @returns - The date range picker component.
  */
 const DateRangePicker: React.FC<DateRangePickerProps> = ({
   startDate: initialStart,
   endDate: initialEnd,
   onChange,
+  popoverSide = "right",
 }) => {
   const [selectedPreset, setSelectedPreset] = useState<string>("");
   const [customStart, setCustomStart] = useState<Date | null>(initialStart);
@@ -302,6 +306,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
           aria-label="Date range input"
           value={displayText}
           readOnly
+          placeholder="Filter by date"
           onClick={() => setIsOpen((prev) => !prev)}
         />
         <Icon.CalendarToday
@@ -311,7 +316,12 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
         />
       </div>
       {isOpen && (
-        <div className={styles.filterPopover}>
+        <div
+          className={classNames(
+            styles.filterPopover,
+            popoverSide === "left" ? styles.popoverLeft : styles.popoverRight,
+          )}
+        >
           <FormGroup className="margin-top-1">
             <fieldset className={styles.radioGroup} aria-label="Filter by">
               <legend className={styles.legend}>Filter by</legend>

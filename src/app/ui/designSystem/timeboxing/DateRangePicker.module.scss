@@ -20,6 +20,10 @@
 .textInputContainer {
   position: relative;
   display: inline-block;
+
+  input {
+    width: 12rem;
+  }
 }
 
 .calendarIcon {
@@ -35,7 +39,6 @@
 .datePickerContainer {
   position: relative;
   display: inline-block;
-  width: 100%;
 }
 
 .customDateRangeWrapper :global(.usa-form-group) {
@@ -76,11 +79,9 @@
   padding: 0;
 }
 
-
 .filterPopover {
   position: absolute;
   top: 100%;
-  left: 0;
   z-index: 10;
   background: white;
   border: 1px solid $border;
@@ -88,7 +89,15 @@
   box-shadow: 0 4px 6px $drop-shadow;
   padding: 0.5rem;
   margin-top: 0.5rem;
-  width: 100%;
+  width: 125%;
+}
+
+.popoverLeft {
+  right: 0;
+}
+
+.popoverRight {
+  left: 0;
 }
 
 .applyButton {
