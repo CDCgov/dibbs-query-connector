@@ -1,27 +1,8 @@
 @use "../../../ui/styles/_variables" as *;
 @use "uswds-core" as *;
 
-.dataUsagePolicyButton {
-  cursor: pointer;
-  background: none !important;
-  border: none !important;
-  color: white !important;
-  padding: 0px !important;
-  font: inherit !important;
-  margin: 0 0.5rem !important;
-  text-align: left !important;
-}
-
-.signinButton {
-  padding: 0.5rem 1.25rem !important;
-  margin: 0 !important;
-  cursor: pointer;
-  background: none !important;
-  border: 2px solid white !important;
-  border-radius: 4px !important;
-  color: white !important;
-  font: inherit !important;
-  white-space: nowrap;
+.runQueryBtn {
+  max-width: 16rem;
 }
 
 .menuButton {
@@ -46,45 +27,38 @@
   border-radius: 4px !important;
   padding: 0.5rem !important;
   background: $brand-darkest !important;
-  width: unset !important;
   box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, 0.16);
   position: absolute;
   right: 0px;
   top: -15px;
-}
 
-.menuItem {
-  color: $brand-lightest !important;
-  text-decoration: none !important;
-  padding: 0.5rem 1rem !important;
-  cursor: pointer;
-  border: none;
-  background-color: transparent;
-}
+  .menuItem {
+    display: flex;
 
-.menuItem:hover {
-  text-decoration: none !important;
-}
+    &__button {
+      color: $brand-lightest !important;
+      text-decoration: none !important;
+      padding: 0.5rem 1rem !important;
+      cursor: pointer;
+      border: none;
+      background-color: transparent;
 
-.subMenuItem {
-  display: flex;
-}
-
-.headerContentContainer {
-  display: flex;
-  align-items: center !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  max-width: 100% !important;
-  height: $header-content-height;
+      &:hover {
+        text-decoration: none !important;
+      }
+    }
+  }
 }
 
 .headerContainer {
-  flex: 0 1 auto;
-}
+  display: flex;
+  align-items: center !important;
+  padding: 0 !important;
+  height: $header-content-height;
 
-.siteLogo {
-  margin: 2rem 0;
+  .headerRow {
+    width: 100%;
+  }
 }
 
 .siteLogoImage {
@@ -97,4 +71,31 @@
 .siteLogoText {
   font-size: 1.5rem;
   @include u-font-family("serif");
+  line-height: 1.125;
+  white-space: nowrap;
+}
+
+@media screen and (max-width: 479) {
+  .headerRow div:last-of-type {
+    margin-top: 0.25rem;
+  }
+
+  .headerContentContainer {
+    height: fit-content !important;
+  }
+
+  .buttonContainer {
+    justify-content: space-between;
+    button.menuButton,
+    svg {
+      height: 2rem !important;
+      width: 2rem !important;
+    }
+  }
+}
+
+@media screen and (min-width: 480) and (max-width: 500) {
+  .siteLogoText {
+    font-size: 1.25rem !important;
+  }
 }

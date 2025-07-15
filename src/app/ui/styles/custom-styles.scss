@@ -274,7 +274,7 @@ iframe:focus,
 
 .custom-alert {
   margin-top: 0;
-  height: $site-alert-height;
+  height: fit-content;
 }
 
 .info-alert {
@@ -382,4 +382,14 @@ fieldset > legend > .usa-accordion__button[aria-expanded="false"] {
 .stepper-container {
   margin: 2rem auto 0 auto !important;
   width: calc($application-wide-max-width - 2 * $application-content-margins);
+}
+
+@media screen and (max-width: 800) {
+  header {
+    padding: 1rem 2rem !important;
+  }
+}
+
+header > .grid-container {
+  max-width: $application-wide-max-width;
 }
