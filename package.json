@@ -89,7 +89,7 @@
     "eslint-plugin-next": "^0.0.0",
     "eslint-plugin-unused-imports": "^4.1.4",
     "focus-trap-react": "^10.3.1",
-    "jest": "^30.0.3",
+    "jest": "^30.0.4",
     "jest-axe": "^8.0.0",
     "jest-environment-jsdom": "^30.0.2",
     "jest-extended": "^4.0.2",
