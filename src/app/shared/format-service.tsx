@@ -89,7 +89,9 @@ export function formatAddress(address: Address[]): JSX.Element {
   // else return
   return (
     <div>
-      {addr.line?.map((line, index) => <div key={index}>{line}</div>)}
+      {addr.line?.map((line, index) => (
+        <div key={index}>{line}</div>
+      ))}
       <div>
         {addr.city}
         {addr.city && ", "}
