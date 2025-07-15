@@ -75,7 +75,7 @@
   white-space: nowrap;
 }
 
-@media screen and (max-width: 479) {
+@media screen and (max-width: $header-stacked-breakpoint) {
   .headerRow div:last-of-type {
     margin-top: 0.25rem;
   }
@@ -94,7 +94,7 @@
   }
 }
 
-@media screen and (min-width: 480) and (max-width: 500) {
+@media screen and (min-width: $header-small-text-min-breakpoint) and (max-width: $header-small-text-max-breakpoint) {
   .siteLogoText {
     font-size: 1.25rem !important;
   }

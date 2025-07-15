@@ -1,7 +1,7 @@
 @use "../../../ui/styles/_variables" as *;
 @use "uswds-core" as *;
 
-@media screen and (min-width: 992) {
+@media screen and (min-width: $footer-mobile-breakpoint) {
   .footerContainer__mobile {
     display: none !important;
   }
@@ -10,7 +10,7 @@
   }
 }
 
-@media screen and (max-width: 639) {
+@media screen and (max-width: $footer-stacked-breakpoint) {
   .footerContainer__mobile {
     .stacked p {
       white-space: wrap;
