@@ -132,7 +132,7 @@ class FHIRClient {
 
       // 2. Upload patient to verify write access (optional)
       try {
-        const patientJson = require("../test/assets/GoldenSickPatient.json");
+        const patientJson = require("../../../public/GoldenSickPatient.json");
         const uploadResponse = await client.postJson("/Patient", patientJson);
 
         if (!uploadResponse.ok) {
