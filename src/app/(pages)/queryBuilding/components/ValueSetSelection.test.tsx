@@ -110,7 +110,7 @@ describe("tests the value set selection page", () => {
     });
   });
 
-  it.only("highlights the active tab to the side", async () => {
+  it("highlights the active tab to the side", async () => {
     const { user } = renderWithUser(
       <RootProviderMock
         currentPage={currentPage}
@@ -135,7 +135,7 @@ describe("tests the value set selection page", () => {
     await waitFor(() => {
       expect(screen.getByText("Add from code library")).toBeInTheDocument();
     });
-    console.log(additionalCodesTabContainer.className);
+
     expect(
       additionalCodesTabContainer.className.includes("active"),
     ).toBeTruthy();
