@@ -133,8 +133,15 @@ class FHIRClient {
       // 2. Upload patient to verify write access (optional)
       try {
         const patientJson = require("../../../public/GoldenSickPatient.json");
-        const uploadResponse = await client.postJson("/", patientJson);
-
+        const entry = patientJson.entry?.[0];
+        if (!entry?.resource || !entry?.request?.url) {
+          throw new Error("Invalid bundle");
+        }
+        const resource = entry.resource;
+        const uploadResponse = await client.putJson(
+          "/" + entry.request.url,
+          resource,
+        );
         if (!uploadResponse.ok) {
           const uploadError = await uploadResponse.text();
           console.warn("Upload failed:", uploadError);
@@ -438,6 +445,26 @@ class FHIRClient {
     await this.ensureValidToken();
     const requestOptions: RequestInit = {
       method: "POST",
+      headers: {
+        "Content-Type": "application/fhir+json",
+        ...this.init.headers,
+      },
+      body: JSON.stringify(body),
+    };
+    return this.fetch(this.hostname + path, requestOptions);
+  }
+
+  /**
+   * Sends a PUT request with JSON body to the specified path.
+   * This is typically used for updating resources in FHIR.
+   * @param path - The request path.
+   * @param body - The JSON body to send.
+   * @returns The response from the server.
+   */
+  async putJson(path: string, body: unknown): Promise<Response> {
+    await this.ensureValidToken();
+    const requestOptions: RequestInit = {
+      method: "PUT",
       headers: {
         "Content-Type": "application/fhir+json",
         ...this.init.headers,
