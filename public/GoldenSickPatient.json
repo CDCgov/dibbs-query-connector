@@ -3,10 +3,8 @@
   "type": "transaction",
   "entry": [
     {
-      "fullUrl": "urn:uuid:f288c654-6885-4f48-999c-48d776dc06af",
       "resource": {
         "resourceType": "Patient",
-        "id": "f288c654-6885-4f48-999c-48d776dc06af",
         "meta": {
           "profile": [
             "http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient"
@@ -160,8 +158,8 @@
         ]
       },
       "request": {
-        "method": "PUT",
-        "url": "Patient/f288c654-6885-4f48-999c-48d776dc06af"
+        "method": "POST",
+        "url": "Patient"
       }
     }
   ]
