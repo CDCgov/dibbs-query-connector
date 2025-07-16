@@ -7,6 +7,24 @@
   },
   "identifier": [
     {
+      "use": "usual",
+      "type": {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+            "code": "MR",
+            "display": "Medical Record Number"
+          }
+        ],
+        "text": "Medical Record Number"
+      },
+      "assigner": {
+        "display": "St. Worrywart\u2019s Hospital"
+      },
+      "system": "http://hospital.smarthealthit.org",
+      "value": "8692756"
+    },
+    {
       "use": "official",
       "type": {
         "coding": [
@@ -48,11 +66,11 @@
     {
       "use": "home",
       "line": [
-        "183 Mountain View St"
+        "49 Meadow St"
       ],
       "city": "Lansing",
       "state": "MI",
-      "postalCode": "48901",
+      "postalCode": "488864",
       "country": "US"
     }
   ]
