@@ -31,7 +31,6 @@ import { DataContext } from "@/app/shared/DataProvider";
 import { CustomConditionView } from "./valueSetSelectionViews/CustomConditionView";
 import { MedicalRecordsView } from "./valueSetSelectionViews/MedicalRecordsView";
 import { Sidebar } from "./valueSetSelectionViews/Sidebar";
-import DateRangePicker from "@/app/ui/designSystem/timeboxing/DateRangePicker";
 
 type ConditionSelectionProps = {
   constructedQuery: NestedQuery;
@@ -178,18 +177,6 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
                     Add from code library
                   </Button>
                 )}
-
-                <DateRangePicker
-                  startDate={null}
-                  endDate={null}
-                  onChange={function (dates: {
-                    startDate: Date | null;
-                    endDate: Date | null;
-                  }): void {
-                    throw new Error("Function not implemented.");
-                  }}
-                  popoverSide="left"
-                />
               </div>
 
               <ConceptSelectionView

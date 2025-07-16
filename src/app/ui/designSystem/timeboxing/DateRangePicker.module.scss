@@ -21,19 +21,33 @@
   position: relative;
   display: inline-block;
 
+  :hover {
+    cursor: pointer;
+  }
+
   input {
-    width: 12rem;
+    border-radius: 0.25rem;
+    border: 1px solid $border-dark;
   }
 }
 
 .calendarIcon {
   position: absolute;
-  right: 0.625rem;
+  left: 0.625rem;
   top: 55%;
   transform: translateY(-50%);
   pointer-events: none;
   align-items: center;
   justify-content: center;
+  color: $accent-primary;
+}
+
+.dateRangeInput {
+  padding-left: 2.5rem;
+}
+
+.dateRangeInput::placeholder {
+  color: black;
 }
 
 .datePickerContainer {
@@ -59,7 +73,7 @@
   border-radius: 0.25rem;
   box-shadow: 0 4px 6px $drop-shadow;
   padding: 0.5rem;
-  // width: max-content; // without this, the calendar looks somewhat squished
+  width: max-content; // without this, the calendar looks somewhat squished
   margin-top: 0.5rem;
 }
 
@@ -89,7 +103,7 @@
   box-shadow: 0 4px 6px $drop-shadow;
   padding: 0.5rem;
   margin-top: 0.5rem;
-  width: 125%;
+  width: 15rem;
 }
 
 .popoverLeft {
