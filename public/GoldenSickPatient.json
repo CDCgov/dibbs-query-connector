@@ -16,7 +16,6 @@
       "fullUrl": "Patient/f288c654-6885-4f48-999c-48d776dc06af",
       "resource": {
         "resourceType": "Patient",
-        "id": "f288c654-6885-4f48-999c-48d776dc06af",
         "meta": {
           "versionId": "1",
           "lastUpdated": "2024-01-16T15:08:24.000+00:00",
