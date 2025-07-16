@@ -1,7 +1,9 @@
 // Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`tests the value set selection page highlights the active tab to the side 1`] = `
-<body>
+<body
+  style="padding-right: 0px;"
+>
   <div>
     <div
       class="main-container__wide mainContainer"
@@ -203,39 +205,6 @@ exports[`tests the value set selection page highlights the active tab to the sid
                     type="search"
                     value=""
                   />
-                  <div
-                    class="datePickerContainer"
-                  >
-                    <div
-                      class="textInputContainer"
-                    >
-                      <input
-                        aria-label="Date range input"
-                        class="usa-input"
-                        data-testid="date-range-input"
-                        id="date-range-input"
-                        name="date-range-input"
-                        placeholder="Filter by date"
-                        readonly=""
-                        type="text"
-                        value=""
-                      />
-                      <svg
-                        aria-label="date-range-calendar-icon"
-                        class="usa-icon usa-icon--size-3 calendarIcon"
-                        focusable="false"
-                        height="1em"
-                        role="img"
-                        viewBox="0 0 24 24"
-                        width="1em"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M20 3h-1V1h-2v2H7V1H5v2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 18H4V8h16v13z"
-                        />
-                      </svg>
-                    </div>
-                  </div>
                 </div>
                 <div
                   class="codeLibrary__empty"
@@ -386,7 +355,9 @@ exports[`tests the value set selection page highlights the active tab to the sid
 `;
 
 exports[`tests the value set selection page highlights the active tab to the side 2`] = `
-<body>
+<body
+  style="padding-right: 0px;"
+>
   <div>
     <div
       class="main-container__wide mainContainer"
@@ -743,7 +714,9 @@ exports[`tests the value set selection page highlights the active tab to the sid
 `;
 
 exports[`tests the value set selection page highlights the active tab to the side 3`] = `
-<body>
+<body
+  style="padding-right: 0px;"
+>
   <div>
     <div
       class="main-container__wide mainContainer"
@@ -1172,39 +1145,6 @@ exports[`tests the value set selection page highlights the active tab to the sid
                     type="search"
                     value=""
                   />
-                  <div
-                    class="datePickerContainer"
-                  >
-                    <div
-                      class="textInputContainer"
-                    >
-                      <input
-                        aria-label="Date range input"
-                        class="usa-input"
-                        data-testid="date-range-input"
-                        id="date-range-input"
-                        name="date-range-input"
-                        placeholder="Filter by date"
-                        readonly=""
-                        type="text"
-                        value=""
-                      />
-                      <svg
-                        aria-label="date-range-calendar-icon"
-                        class="usa-icon usa-icon--size-3 calendarIcon"
-                        focusable="false"
-                        height="1em"
-                        role="img"
-                        viewBox="0 0 24 24"
-                        width="1em"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M20 3h-1V1h-2v2H7V1H5v2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 18H4V8h16v13z"
-                        />
-                      </svg>
-                    </div>
-                  </div>
                 </div>
                 <div
                   class="accordionContainer"
@@ -1268,15 +1208,52 @@ exports[`tests the value set selection page highlights the active tab to the sid
                         id="medications"
                       >
                         <div
-                          class="bulkActionButtons"
+                          class="accordionBulkAction"
                         >
-                          <button
-                            class="usa-button selectAll usa-button--unstyled"
-                            data-testid="button"
-                            type="button"
+                          <div
+                            class="bulkActionButtons"
                           >
-                            Deselect  All
-                          </button>
+                            <button
+                              class="usa-button selectAll usa-button--unstyled"
+                              data-testid="button"
+                              type="button"
+                            >
+                              Deselect  All
+                            </button>
+                          </div>
+                          <div
+                            class="datePickerContainer"
+                          >
+                            <div
+                              class="textInputContainer"
+                            >
+                              <svg
+                                aria-label="date-range-calendar-icon"
+                                class="usa-icon usa-icon--size-3 calendarIcon"
+                                focusable="false"
+                                height="1em"
+                                role="img"
+                                viewBox="0 0 24 24"
+                                width="1em"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path
+                                  d="M20 3h-1V1h-2v2H7V1H5v2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 18H4V8h16v13z"
+                                />
+                              </svg>
+                              <input
+                                aria-label="Date range input"
+                                class="usa-input dateRangeInput"
+                                data-testid="date-range-input"
+                                id="dateRangePicker-medications"
+                                name="date-range-input"
+                                placeholder="All dates"
+                                readonly=""
+                                type="text"
+                                value=""
+                              />
+                            </div>
+                          </div>
                         </div>
                         <div
                           class="accordionContainer"
