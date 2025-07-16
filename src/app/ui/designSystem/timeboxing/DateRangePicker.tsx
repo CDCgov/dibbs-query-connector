@@ -11,6 +11,7 @@ import {
 } from "@trussworks/react-uswds";
 import styles from "./DateRangePicker.module.scss";
 import { addHours } from "date-fns";
+import classNames from "classnames";
 
 export interface DateRange {
   startDate?: Date | null;
@@ -26,6 +27,9 @@ interface DateRangePickerProps {
   startDate: Date | null;
   endDate: Date | null;
   onChange: (dates: { startDate: Date | null; endDate: Date | null }) => void;
+  id: string;
+  popoverSide?: "left" | "right";
+  placeholderText?: string;
 }
 
 const normalizeStart = (date: Date | null) =>
@@ -146,13 +150,19 @@ const CUSTOM_VALUE = "custom";
  * @param root0 - The component props.
  * @param root0.startDate - The start date.
  * @param root0.endDate - The end date.
+ * @param root0.id - The id for the form input.
  * @param root0.onChange - The change handler.
+ * @param root0.popoverSide - Optional prop to control the side the popover's on.
+ * @param root0.placeholderText - Text to indicate the filter.
  * @returns - The date range picker component.
  */
 const DateRangePicker: React.FC<DateRangePickerProps> = ({
   startDate: initialStart,
   endDate: initialEnd,
   onChange,
+  id,
+  popoverSide = "right",
+  placeholderText = "Filter by date",
 }) => {
   const [selectedPreset, setSelectedPreset] = useState<string>("");
   const [customStart, setCustomStart] = useState<Date | null>(initialStart);
@@ -293,25 +303,37 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
 
   return (
     <div className={styles.datePickerContainer} ref={containerRef}>
-      <div className={styles.textInputContainer}>
-        <TextInput
-          type="text"
-          id="date-range-input"
-          data-testid="date-range-input"
-          name="date-range-input"
-          aria-label="Date range input"
-          value={displayText}
-          readOnly
-          onClick={() => setIsOpen((prev) => !prev)}
-        />
+      <div
+        className={classNames(
+          styles.textInputContainer,
+          displayText ? styles.textInputContainer__wide : "",
+        )}
+      >
         <Icon.CalendarToday
           size={3}
           className={styles.calendarIcon}
           aria-label="date-range-calendar-icon"
         />
+        <TextInput
+          id={id}
+          type="text"
+          className={styles.dateRangeInput}
+          data-testid="date-range-input"
+          name="date-range-input"
+          aria-label="Date range input"
+          value={displayText}
+          readOnly
+          placeholder={placeholderText}
+          onClick={() => setIsOpen((prev) => !prev)}
+        />
       </div>
       {isOpen && (
-        <div className={styles.filterPopover}>
+        <div
+          className={classNames(
+            styles.filterPopover,
+            popoverSide === "left" ? styles.popoverLeft : styles.popoverRight,
+          )}
+        >
           <FormGroup className="margin-top-1">
             <fieldset className={styles.radioGroup} aria-label="Filter by">
               <legend className={styles.legend}>Filter by</legend>

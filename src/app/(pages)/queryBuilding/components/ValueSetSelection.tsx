@@ -148,7 +148,7 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
               setMedicalRecordSections={setMedicalRecordSections}
             />
           ) : (
-            <>
+            <div>
               <div className={styles.valueSetTemplate__search}>
                 <SearchField
                   id="valueSetTemplateSearch"
@@ -201,7 +201,7 @@ export const ValueSetSelection: React.FC<ConditionSelectionProps> = ({
                   queryName={queryName}
                 />
               )}
-            </>
+            </div>
           )}
         </div>
       </div>

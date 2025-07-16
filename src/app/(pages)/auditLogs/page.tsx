@@ -182,6 +182,7 @@ const AuditLogs: React.FC = () => {
             <label htmlFor="dateRange">Custom date range</label>
             <div>
               <DateRangePicker
+                id={"auditLogDatePicker"}
                 startDate={dateRange.startDate || null}
                 endDate={dateRange.endDate || null}
                 onChange={({ startDate, endDate }) =>
