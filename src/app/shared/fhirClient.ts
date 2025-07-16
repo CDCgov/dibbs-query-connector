@@ -131,28 +131,28 @@ class FHIRClient {
       }
 
       // 2. Upload patient to verify write access (optional)
-      try {
-        const patientJson = require("../../../public/GoldenSickPatient.json");
-        const entry = patientJson.entry?.[0];
-        if (!entry?.resource || !entry?.request?.url) {
-          throw new Error("Invalid bundle");
-        }
-        const resource = entry.resource;
-        const uploadResponse = await client.postJson("/Patient", resource);
-        if (!uploadResponse.ok) {
-          const uploadError = await uploadResponse.text();
-          console.warn("Upload failed:", uploadError);
-          return {
-            success: false,
-            error: `Upload failed: ${uploadError}`,
-          };
-        }
-      } catch (uploadErr) {
-        console.warn(
-          "Skipped patient upload during testConnection:",
-          uploadErr,
-        );
-      }
+      //   try {
+      //     const patientJson = require("../../../public/GoldenSickPatient.json");
+      //     const entry = patientJson.entry?.[0];
+      //     if (!entry?.resource || !entry?.request?.url) {
+      //       throw new Error("Invalid bundle");
+      //     }
+      //     const resource = entry.resource;
+      //     const uploadResponse = await client.postJson("/Patient", resource);
+      //     if (!uploadResponse.ok) {
+      //       const uploadError = await uploadResponse.text();
+      //       console.warn("Upload failed:", uploadError);
+      //       return {
+      //         success: false,
+      //         error: `Upload failed: ${uploadError}`,
+      //       };
+      //     }
+      //   } catch (uploadErr) {
+      //     console.warn(
+      //       "Skipped patient upload during testConnection:",
+      //       uploadErr,
+      //     );
+      //   }
 
       return { success: true };
     } catch (error) {
