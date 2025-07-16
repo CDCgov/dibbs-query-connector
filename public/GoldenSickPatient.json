@@ -70,6 +70,20 @@
         ],
         "identifier": [
           {
+            "use": "official",
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "SS",
+                  "display": "Social Security Number"
+                }
+              ]
+            },
+            "system": "http://hl7.org/fhir/sid/us-ssn",
+            "value": "999-88-7777"
+          },
+          {
             "use": "usual",
             "type": {
               "coding": [
