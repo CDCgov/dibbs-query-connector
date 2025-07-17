@@ -1,0 +1,154 @@
+{
+  "resourceType": "Patient",
+  "meta": {
+    "profile": [
+      "http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient"
+    ]
+  },
+  "extension": [
+    {
+      "url": "http://hl7.org/fhir/us/core/StructureDefinition/us-core-race",
+      "extension": [
+        {
+          "url": "ombCategory",
+          "valueCoding": {
+            "system": "urn:oid:2.16.840.1.113883.6.238",
+            "code": "2106-3",
+            "display": "White"
+          }
+        },
+        {
+          "url": "text",
+          "valueString": "Mixed"
+        }
+      ]
+    },
+    {
+      "url": "http://hl7.org/fhir/us/core/StructureDefinition/us-core-ethnicity",
+      "extension": [
+        {
+          "url": "ombCategory",
+          "valueCoding": {
+            "system": "urn:oid:2.16.840.1.113883.6.238",
+            "code": "2135-2",
+            "display": "Hispanic or Latino"
+          }
+        },
+        {
+          "url": "text",
+          "valueString": "Hispanic or Latino"
+        }
+      ]
+    },
+    {
+      "url": "http://hl7.org/fhir/us/core/StructureDefinition/us-core-birthsex",
+      "valueCode": "M"
+    }
+  ],
+  "identifier": [
+    {
+      "use": "official",
+      "type": {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+            "code": "SS",
+            "display": "Social Security Number"
+          }
+        ]
+      },
+      "system": "urn:oid:2.16.840.1.113883.4.1",
+      "value": "999-88-7777"
+    },
+    {
+      "use": "usual",
+      "type": {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+            "code": "MR",
+            "display": "Medical Record Number"
+          }
+        ],
+        "text": "Medical Record Number"
+      },
+      "assigner": {
+        "display": "St. Worrywart\u2019s Hospital"
+      },
+      "system": "http://hospital.smarthealthit.org",
+      "value": "8692756"
+    },
+    {
+      "use": "usual",
+      "type": {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+            "code": "DL",
+            "display": "Driver's License"
+          }
+        ],
+        "text": "Driver's License"
+      },
+      "assigner": {
+        "display": "Michigan"
+      },
+      "system": "http://dmv.gov",
+      "value": "DL12345"
+    }
+  ],
+  "active": true,
+  "name": [
+    {
+      "family": "Unlucky",
+      "given": [
+        "Hyper",
+        "A."
+      ],
+      "period": {
+        "start": "1975-12-06",
+        "end": "2020-01-22"
+      }
+    }
+  ],
+  "telecom": [
+    {
+      "system": "phone",
+      "value": "517-425-1398",
+      "use": "home"
+    },
+    {
+      "system": "email",
+      "value": "hyper.unlucky@email.com"
+    }
+  ],
+  "gender": "male",
+  "birthDate": "1975-12-06",
+  "address": [
+    {
+      "line": [
+        "49 Meadow St"
+      ],
+      "city": "Lansing",
+      "state": "MI",
+      "postalCode": "48864",
+      "country": "US",
+      "period": {
+        "start": "2016-12-06",
+        "end": "2020-07-22"
+      }
+    },
+    {
+      "line": [
+        "183 Mountain View St"
+      ],
+      "city": "Lansing",
+      "state": "MI",
+      "postalCode": "48901",
+      "country": "US",
+      "period": {
+        "start": "2020-07-22"
+      }
+    }
+  ]
+}
