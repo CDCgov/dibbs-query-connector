@@ -138,7 +138,7 @@ class FHIRClient {
           throw new Error("Invalid bundle");
         }
         const resource = entry.resource;
-        const uploadResponse = await client.postJson("/Patient", resource);
+        const uploadResponse = await client.putJson("/Patient", resource);
         if (!uploadResponse.ok) {
           const uploadError = await uploadResponse.text();
           console.warn("Upload failed:", uploadError);
