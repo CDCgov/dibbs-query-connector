@@ -138,8 +138,8 @@ class FHIRClient {
           throw new Error("Invalid bundle");
         }
         const resource = entry.resource;
-        const uploadResponse = await client.putJson(
-          "/Patient/f288c654-6885-4f48-999c-48d776dc06af",
+        const uploadResponse = await client.postJson(
+          "/Patient?identifier=urn:oid:2.16.840.1.113883.4.1|999-88-7777",
           resource,
         );
         if (!uploadResponse.ok) {
