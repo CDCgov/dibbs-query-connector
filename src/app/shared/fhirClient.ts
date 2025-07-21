@@ -133,12 +133,7 @@ class FHIRClient {
       // 2. Upload patient to verify write access (optional)
       try {
         const patientJson = require("../../../public/GoldenSickPatient.json");
-        const entry = patientJson.entry?.[0];
-        if (!entry?.resource || !entry?.request?.url) {
-          throw new Error("Invalid bundle");
-        }
-        const resource = entry.resource;
-        const uploadResponse = await client.postJson("/Patient", resource);
+        const uploadResponse = await client.postJson("/Patient", patientJson);
         if (!uploadResponse.ok) {
           const uploadError = await uploadResponse.text();
           console.warn("Upload failed:", uploadError);
@@ -300,13 +295,6 @@ class FHIRClient {
       this.serverConfig.accessToken = tokenData.access_token;
       this.serverConfig.tokenExpiry = expiryIso;
 
-      // Update headers for requests
-      if (!this.init.headers) {
-        this.init.headers = {};
-      }
-      (this.init.headers as Record<string, string>)["Authorization"] =
-        `Bearer ${tokenData.access_token}`;
-
       // Only update database for non-test clients
       if (this.serverConfig.id !== "test") {
         // Save token to database
@@ -329,6 +317,7 @@ class FHIRClient {
             scopes: this.serverConfig.scopes,
             accessToken: tokenData.access_token, // Pass the access token
             tokenExpiry: expiryIso, // Pass the token expiry
+            headers: this.serverConfig.headers,
           },
         );
       }

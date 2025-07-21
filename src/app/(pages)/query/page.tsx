@@ -17,7 +17,11 @@ import {
   PatientDiscoveryResponse,
   PatientRecordsResponse,
 } from "@/app/backend/query-execution";
-import { getFhirServerNames } from "@/app/backend/fhir-servers";
+import {
+  getFhirServerNames,
+  getFhirServerConfigs,
+} from "@/app/backend/fhir-servers";
+import { FhirServerConfig } from "@/app/models/entities/fhir-servers";
 
 const blankUserQuery = {
   queryId: "",
@@ -25,11 +29,7 @@ const blankUserQuery = {
   conditionsList: [],
   valuesets: [],
 };
-/**
- * Client side parent component for the query page. Based on the mode, it will display the search
- * form, the results of the query, or the multiple patients view.
- * @returns - The Query component.
- */
+
 const Query: React.FC = () => {
   const [selectedQuery, setSelectedQuery] = useState<CustomUserQuery>(
     structuredClone(blankUserQuery),
@@ -38,16 +38,21 @@ const Query: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [fhirServer, setFhirServer] = useState<string>("");
   const [fhirServers, setFhirServers] = useState<string[]>([]);
+  const [fhirServerConfigs, setFhirServerConfigs] = useState<
+    FhirServerConfig[]
+  >([]);
   const ctx = useContext(DataContext);
 
-  async function fetchFHIRServerNames() {
-    const servers = await getFhirServerNames();
-    setFhirServers(servers);
-    setFhirServer(servers[0]);
+  async function fetchFHIRServerData() {
+    const names = await getFhirServerNames();
+    const configs = await getFhirServerConfigs();
+    setFhirServers(names);
+    setFhirServer(names[0]);
+    setFhirServerConfigs(configs);
   }
 
   useEffect(() => {
-    fetchFHIRServerNames();
+    fetchFHIRServerData();
   }, []);
 
   // update the current page details when switching between modes,
@@ -88,6 +93,7 @@ const Query: React.FC = () => {
             fhirServers={fhirServers}
             selectedFhirServer={fhirServer}
             setFhirServer={setFhirServer}
+            fhirServerConfigs={fhirServerConfigs}
           />
         )}
 

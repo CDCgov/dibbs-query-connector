@@ -192,12 +192,12 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
         patientMatchConfiguration != null
           ? {
               enabled: patientMatchConfiguration.enabled ?? false,
-              only_single_match:
+              onlySingleMatch:
                 patientMatchConfiguration.onlySingleMatch ?? false,
-              only_certain_matches:
+              onlyCertainMatches:
                 patientMatchConfiguration.onlyCertainMatches ?? false,
-              match_count: patientMatchConfiguration.matchCount ?? 1,
-              supports_match: patientMatchConfiguration.supportsMatch ?? false,
+              matchCount: patientMatchConfiguration.matchCount ?? 1,
+              supportsMatch: patientMatchConfiguration.supportsMatch ?? false,
             }
           : null;
 
@@ -292,12 +292,12 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
         patientMatchConfiguration != null
           ? {
               enabled: patientMatchConfiguration.enabled ?? false,
-              only_single_match:
+              onlySingleMatch:
                 patientMatchConfiguration.onlySingleMatch ?? false,
-              only_certain_matches:
+              onlyCertainMatches:
                 patientMatchConfiguration.onlyCertainMatches ?? false,
-              match_count: patientMatchConfiguration.matchCount ?? 1,
-              supports_match: patientMatchConfiguration.supportsMatch ?? false,
+              matchCount: patientMatchConfiguration.matchCount ?? 1,
+              supportsMatch: patientMatchConfiguration.supportsMatch ?? false,
             }
           : null;
 
@@ -399,6 +399,13 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
       else {
         config = followupConfig;
       }
+    }
+
+    if (config.authType === "SMART" && config.accessToken) {
+      config.headers = {
+        ...(config.headers || {}),
+        Authorization: `Bearer ${config.accessToken}`,
+      };
     }
 
     return new FHIRClient(config);
