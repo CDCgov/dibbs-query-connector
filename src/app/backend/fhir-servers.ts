@@ -275,7 +275,7 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
       // Remove Authorization header from custom headers if it exists
       // (Authorization should only be set via auth methods)
       if ("Authorization" in headers) {
-        const { _Authorization, ...restHeaders } = headers;
+        const { Authorization, ...restHeaders } = headers;
         headers = restHeaders;
       }
 
