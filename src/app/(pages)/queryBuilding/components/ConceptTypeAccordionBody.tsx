@@ -29,6 +29,7 @@ import ValueSetBulkToggle from "./ValueSetBulkToggle";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import classNames from "classnames";
 import DateRangePicker from "@/app/ui/designSystem/timeboxing/DateRangePicker";
+import { getTimeboxSetting } from "@/app/backend/query-timeboxing";
 
 type ConceptTypeAccordionBodyProps = {
   activeValueSets: { [vsId: string]: FilterableValueSet };
@@ -242,12 +243,16 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
     0,
   );
 
-  const handleTimeboxApplication = (dates: {
-    startDate: Date | null;
-    endDate: Date | null;
-  }) => {
-    console.log(dates.startDate);
-    console.log(dates.endDate);
+  const handleTimeboxApplication = async (
+    queryId: string,
+    conceptType: DibbsConceptType,
+    startDate: Date | null,
+    endDate: Date | null,
+  ) => {
+    await getTimeboxSetting(queryId, conceptType);
+
+    console.log(startDate);
+    console.log(endDate);
   };
 
   const buttons = [
@@ -294,7 +299,7 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
           id={`dateRangePicker-${accordionConceptType}`}
           startDate={null}
           endDate={null}
-          onChange={handleTimeboxApplication}
+          onChange={handleTimeboxApplication(queryId, accordionConceptType)}
           popoverSide="left"
           placeholderText="All dates"
         />
