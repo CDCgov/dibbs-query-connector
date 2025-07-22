@@ -266,6 +266,7 @@ class FHIRClient {
 
       // IMPORTANT: Use the formData object for the actual request
       const response = await this.fetch(tokenEndpoint, requestInit);
+      console.log("Response from token endpoint:", response);
       // Get response as text first for debugging
       const responseText = await response.text();
 
@@ -319,6 +320,7 @@ class FHIRClient {
             tokenExpiry: expiryIso, // Pass the token expiry
             headers: this.serverConfig.headers,
           },
+          this.serverConfig.patientMatchConfiguration,
         );
       }
     } catch (error) {
