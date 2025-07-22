@@ -35,58 +35,8 @@ exports[`Admin view of Users Table renders error message when no user groups are
           role="dialog"
         >
           <div
-            class="drawerContent display-none"
-          >
-            <div
-              class="drawerHeader"
-            >
-              <button
-                aria-label="Close drawer"
-                class="closeButton"
-                data-testid="close-drawer"
-              >
-                <svg
-                  aria-label="X icon indicating closure"
-                  class="usa-icon usa-icon--size-3"
-                  focusable="false"
-                  height="1em"
-                  role="img"
-                  viewBox="0 0 24 24"
-                  width="1em"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
-                  />
-                </svg>
-              </button>
-              <h2
-                class="margin-0 padding-bottom-2"
-                data-testid="drawer-title"
-                id="drawer-title"
-              />
-              <div>
-                <input
-                  class="usa-input searchField"
-                  data-testid="textInput"
-                  id="searchFieldTemplate"
-                  name="searchFieldTemplate"
-                  placeholder="Search"
-                  type="search"
-                  value=""
-                />
-              </div>
-            </div>
-            <div
-              class="drawerBody"
-            >
-              <div
-                class="margin-top-2"
-              >
-                No queries found.
-              </div>
-            </div>
-          </div>
+            class="display-none"
+          />
         </div>
       </div>
     </div>
@@ -130,29 +80,37 @@ exports[`Super Admin view of Users Table renders content on tab click 1`] = `
         >
           <thead>
             <tr>
-              <th>
+              <th
+                class="grid-col-5"
+              >
                 Name
               </th>
-              <th>
+              <th
+                class="grid-col-3"
+              >
                 Permissions
               </th>
-              <th>
+              <th
+                class="grid-col-4"
+              >
                 User groups
               </th>
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td
-                class="userDisplay"
-                width="270"
-              >
-                Potter, Lily 
+            <tr
+              id="456"
+              tabindex="0"
+            >
+              <td>
                 <div
-                  class="actionButtons"
+                  class="buttonHoverGroup"
                 >
+                  <span>
+                    Potter, Lily 
+                  </span>
                   <button
-                    class="usa-button usa-button--unstyled text-bold text-no-underline"
+                    class="usa-button usa-button--unstyled hoverBtn unstyled-button-container usa-button--unstyled text-bold text-no-underline"
                     data-testid="button"
                     type="button"
                   >
@@ -177,7 +135,7 @@ exports[`Super Admin view of Users Table renders content on tab click 1`] = `
                         class="padding-left-05"
                         data-testid="edit-group-456"
                       >
-                        Edit
+                        Rename
                       </span>
                     </span>
                   </button>
@@ -185,7 +143,6 @@ exports[`Super Admin view of Users Table renders content on tab click 1`] = `
               </td>
               <td
                 class="roleDropdown"
-                width="250"
               >
                 <label
                   class="usa-label usa-sr-only"
@@ -217,30 +174,32 @@ exports[`Super Admin view of Users Table renders content on tab click 1`] = `
                   </option>
                 </select>
               </td>
-              <td
-                width="475"
-              >
+              <td>
                 <button
                   aria-description="Edit Order of the Phoenix members"
                   class="usa-button usa-button--unstyled margin-right-2 text-no-underline"
                   data-testid="button"
                   type="button"
                 >
-                  Order of the Phoenix
+                  <span>
+                    Order of the Phoenix
+                  </span>
                 </button>
               </td>
             </tr>
-            <tr>
-              <td
-                class="userDisplay"
-                width="270"
-              >
-                Potter, Harry 
+            <tr
+              id="123"
+              tabindex="0"
+            >
+              <td>
                 <div
-                  class="actionButtons"
+                  class="buttonHoverGroup"
                 >
+                  <span>
+                    Potter, Harry 
+                  </span>
                   <button
-                    class="usa-button usa-button--unstyled text-bold text-no-underline"
+                    class="usa-button usa-button--unstyled hoverBtn unstyled-button-container usa-button--unstyled text-bold text-no-underline"
                     data-testid="button"
                     type="button"
                   >
@@ -265,7 +224,7 @@ exports[`Super Admin view of Users Table renders content on tab click 1`] = `
                         class="padding-left-05"
                         data-testid="edit-group-123"
                       >
-                        Edit
+                        Rename
                       </span>
                     </span>
                   </button>
@@ -273,7 +232,6 @@ exports[`Super Admin view of Users Table renders content on tab click 1`] = `
               </td>
               <td
                 class="roleDropdown"
-                width="250"
               >
                 <label
                   class="usa-label usa-sr-only"
@@ -305,9 +263,7 @@ exports[`Super Admin view of Users Table renders content on tab click 1`] = `
                   </option>
                 </select>
               </td>
-              <td
-                width="475"
-              >
+              <td>
                 --
               </td>
             </tr>
@@ -326,58 +282,8 @@ exports[`Super Admin view of Users Table renders content on tab click 1`] = `
           role="dialog"
         >
           <div
-            class="drawerContent display-none"
-          >
-            <div
-              class="drawerHeader"
-            >
-              <button
-                aria-label="Close drawer"
-                class="closeButton"
-                data-testid="close-drawer"
-              >
-                <svg
-                  aria-label="X icon indicating closure"
-                  class="usa-icon usa-icon--size-3"
-                  focusable="false"
-                  height="1em"
-                  role="img"
-                  viewBox="0 0 24 24"
-                  width="1em"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
-                  />
-                </svg>
-              </button>
-              <h2
-                class="margin-0 padding-bottom-2"
-                data-testid="drawer-title"
-                id="drawer-title"
-              />
-              <div>
-                <input
-                  class="usa-input searchField"
-                  data-testid="textInput"
-                  id="searchFieldTemplate"
-                  name="searchFieldTemplate"
-                  placeholder="Search"
-                  type="search"
-                  value=""
-                />
-              </div>
-            </div>
-            <div
-              class="drawerBody"
-            >
-              <div
-                class="margin-top-2"
-              >
-                No queries found.
-              </div>
-            </div>
-          </div>
+            class="display-none"
+          />
         </div>
       </div>
     </div>
@@ -421,108 +327,121 @@ exports[`Super Admin view of Users Table renders content on tab click 2`] = `
         >
           <thead>
             <tr>
-              <th>
+              <th
+                class="grid-col-5"
+              >
                 Name
               </th>
-              <th>
+              <th
+                class="grid-col-3"
+              >
                 Members
               </th>
-              <th>
+              <th
+                class="grid-col-4"
+              >
                 Assigned queries
               </th>
             </tr>
           </thead>
           <tbody>
             <tr
-              class="userGroupRow"
+              id="123"
+              tabindex="0"
             >
-              <td
-                width="270"
-              >
-                Hogwarts
+              <td>
+                <div
+                  class="buttonHoverGroup"
+                >
+                  <span>
+                    Hogwarts
+                  </span>
+                  <button
+                    class="usa-button usa-button--unstyled hoverBtn unstyled-button-container usa-button--unstyled text-bold text-no-underline"
+                    data-testid="button"
+                    type="button"
+                  >
+                    <span
+                      class="icon-text padding-right-4 display-flex flex-align-center"
+                    >
+                      <svg
+                        aria-label="Pencil icon indicating edit ability"
+                        class="usa-icon height-3 width-3"
+                        focusable="false"
+                        height="1em"
+                        role="img"
+                        viewBox="0 0 24 24"
+                        width="1em"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a.996.996 0 0 0 0-1.41l-2.34-2.34a.996.996 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"
+                        />
+                      </svg>
+                      <span
+                        class="padding-left-05"
+                        data-testid="edit-group-123"
+                      >
+                        Rename
+                      </span>
+                    </span>
+                  </button>
+                </div>
               </td>
               <td>
                 <button
                   aria-description="Edit Hogwarts members"
-                  class="usa-button usa-button--unstyled drawerButton text-no-underline"
+                  class="usa-button usa-button--unstyled drawerButton margin-right-2 text-no-underline"
                   data-testid="edit-member-list-0"
                   type="button"
                 >
                   1 member
                 </button>
               </td>
-              <td>
-                <button
-                  aria-description="Edit Hogwarts queries"
-                  class="usa-button usa-button--unstyled text-no-underline"
-                  data-testid="edit-query-list-0"
-                  type="button"
-                >
-                  0 queries
-                </button>
-              </td>
               <td
-                class="actionButtons"
+                class="grid-col-2"
               >
-                <button
-                  class="usa-button usa-button--unstyled text-bold text-no-underline"
-                  data-testid="button"
-                  type="button"
+                <div
+                  class="buttonHoverGroup"
                 >
-                  <span
-                    class="icon-text padding-right-4 display-flex flex-align-center"
+                  <button
+                    aria-description="Edit Hogwarts queries"
+                    class="usa-button usa-button--unstyled drawerButton text-no-underline"
+                    data-testid="edit-query-list-0"
+                    type="button"
                   >
-                    <svg
-                      aria-label="Pencil icon indicating edit ability"
-                      class="usa-icon height-3 width-3"
-                      focusable="false"
-                      height="1em"
-                      role="img"
-                      viewBox="0 0 24 24"
-                      width="1em"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a.996.996 0 0 0 0-1.41l-2.34-2.34a.996.996 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"
-                      />
-                    </svg>
-                    <span
-                      class="padding-left-05"
-                      data-testid="edit-group-123"
-                    >
-                      Edit
-                    </span>
-                  </span>
-                </button>
-                <button
-                  class="usa-button usa-button--unstyled text-bold text-no-underline destructive-primary"
-                  data-testid="button"
-                  type="button"
-                >
-                  <span
-                    class="icon-text padding-right-4 display-flex flex-align-center"
+                    0 queries
+                  </button>
+                  <button
+                    class="usa-button usa-button--unstyled hoverBtn unstyled-button-container usa-button--unstyled text-bold text-no-underline destructive-primary"
+                    data-testid="button"
+                    type="button"
                   >
-                    <svg
-                      aria-label="Trash icon indicating deletion of disease"
-                      class="usa-icon height-3 width-3"
-                      focusable="false"
-                      height="1em"
-                      role="img"
-                      viewBox="0 0 24 24"
-                      width="1em"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"
-                      />
-                    </svg>
                     <span
-                      class="padding-left-05"
+                      class="icon-text padding-right-4 display-flex flex-align-center"
                     >
-                      Delete
+                      <svg
+                        aria-label="Trash icon indicating deletion of disease"
+                        class="usa-icon height-3 width-3"
+                        focusable="false"
+                        height="1em"
+                        role="img"
+                        viewBox="0 0 24 24"
+                        width="1em"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"
+                        />
+                      </svg>
+                      <span
+                        class="padding-left-05"
+                      >
+                        Delete
+                      </span>
                     </span>
-                  </span>
-                </button>
+                  </button>
+                </div>
               </td>
             </tr>
           </tbody>
@@ -540,58 +459,8 @@ exports[`Super Admin view of Users Table renders content on tab click 2`] = `
           role="dialog"
         >
           <div
-            class="drawerContent display-none"
-          >
-            <div
-              class="drawerHeader"
-            >
-              <button
-                aria-label="Close drawer"
-                class="closeButton"
-                data-testid="close-drawer"
-              >
-                <svg
-                  aria-label="X icon indicating closure"
-                  class="usa-icon usa-icon--size-3"
-                  focusable="false"
-                  height="1em"
-                  role="img"
-                  viewBox="0 0 24 24"
-                  width="1em"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
-                  />
-                </svg>
-              </button>
-              <h2
-                class="margin-0 padding-bottom-2"
-                data-testid="drawer-title"
-                id="drawer-title"
-              />
-              <div>
-                <input
-                  class="usa-input searchField"
-                  data-testid="textInput"
-                  id="searchFieldTemplate"
-                  name="searchFieldTemplate"
-                  placeholder="Search"
-                  type="search"
-                  value=""
-                />
-              </div>
-            </div>
-            <div
-              class="drawerBody"
-            >
-              <div
-                class="margin-top-2"
-              >
-                No queries found.
-              </div>
-            </div>
-          </div>
+            class="display-none"
+          />
         </div>
       </div>
     </div>
@@ -643,58 +512,8 @@ exports[`Super Admin view of Users Table renders error message when no users are
           role="dialog"
         >
           <div
-            class="drawerContent display-none"
-          >
-            <div
-              class="drawerHeader"
-            >
-              <button
-                aria-label="Close drawer"
-                class="closeButton"
-                data-testid="close-drawer"
-              >
-                <svg
-                  aria-label="X icon indicating closure"
-                  class="usa-icon usa-icon--size-3"
-                  focusable="false"
-                  height="1em"
-                  role="img"
-                  viewBox="0 0 24 24"
-                  width="1em"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
-                  />
-                </svg>
-              </button>
-              <h2
-                class="margin-0 padding-bottom-2"
-                data-testid="drawer-title"
-                id="drawer-title"
-              />
-              <div>
-                <input
-                  class="usa-input searchField"
-                  data-testid="textInput"
-                  id="searchFieldTemplate"
-                  name="searchFieldTemplate"
-                  placeholder="Search"
-                  type="search"
-                  value=""
-                />
-              </div>
-            </div>
-            <div
-              class="drawerBody"
-            >
-              <div
-                class="margin-top-2"
-              >
-                No queries found.
-              </div>
-            </div>
-          </div>
+            class="display-none"
+          />
         </div>
       </div>
     </div>
@@ -730,197 +549,9 @@ exports[`Super Admin view of Users Table renders table view after content is loa
         Add user
       </button>
       <div
-        class="userPermissionsTable customizeTableWrapper"
+        class="empty-response"
       >
-        <table
-          class="usa-table usa-table--borderless customizeTable"
-          data-testid="table"
-        >
-          <thead>
-            <tr>
-              <th>
-                Name
-              </th>
-              <th>
-                Permissions
-              </th>
-              <th>
-                User groups
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td
-                class="userDisplay"
-                width="270"
-              >
-                Potter, Lily 
-                <div
-                  class="actionButtons"
-                >
-                  <button
-                    class="usa-button usa-button--unstyled text-bold text-no-underline"
-                    data-testid="button"
-                    type="button"
-                  >
-                    <span
-                      class="icon-text padding-right-4 display-flex flex-align-center"
-                    >
-                      <svg
-                        aria-label="Pencil icon indicating edit ability"
-                        class="usa-icon height-3 width-3"
-                        focusable="false"
-                        height="1em"
-                        role="img"
-                        viewBox="0 0 24 24"
-                        width="1em"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a.996.996 0 0 0 0-1.41l-2.34-2.34a.996.996 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"
-                        />
-                      </svg>
-                      <span
-                        class="padding-left-05"
-                        data-testid="edit-group-456"
-                      >
-                        Edit
-                      </span>
-                    </span>
-                  </button>
-                </div>
-              </td>
-              <td
-                class="roleDropdown"
-                width="250"
-              >
-                <label
-                  class="usa-label usa-sr-only"
-                  data-testid="label"
-                  for="role-select-456"
-                >
-                  User role
-                </label>
-                <select
-                  class="usa-select"
-                  data-testid="role-select-456"
-                  id="role-select-456"
-                >
-                  <option
-                    value="Super Admin"
-                  >
-                    Super Admin
-                  </option>
-                  <option
-                    selected=""
-                    value="Admin"
-                  >
-                    Admin
-                  </option>
-                  <option
-                    value="Standard"
-                  >
-                    Standard
-                  </option>
-                </select>
-              </td>
-              <td
-                width="475"
-              >
-                <button
-                  aria-description="Edit Order of the Phoenix members"
-                  class="usa-button usa-button--unstyled margin-right-2 text-no-underline"
-                  data-testid="button"
-                  type="button"
-                >
-                  Order of the Phoenix
-                </button>
-              </td>
-            </tr>
-            <tr>
-              <td
-                class="userDisplay"
-                width="270"
-              >
-                Potter, Harry 
-                <div
-                  class="actionButtons"
-                >
-                  <button
-                    class="usa-button usa-button--unstyled text-bold text-no-underline"
-                    data-testid="button"
-                    type="button"
-                  >
-                    <span
-                      class="icon-text padding-right-4 display-flex flex-align-center"
-                    >
-                      <svg
-                        aria-label="Pencil icon indicating edit ability"
-                        class="usa-icon height-3 width-3"
-                        focusable="false"
-                        height="1em"
-                        role="img"
-                        viewBox="0 0 24 24"
-                        width="1em"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a.996.996 0 0 0 0-1.41l-2.34-2.34a.996.996 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"
-                        />
-                      </svg>
-                      <span
-                        class="padding-left-05"
-                        data-testid="edit-group-123"
-                      >
-                        Edit
-                      </span>
-                    </span>
-                  </button>
-                </div>
-              </td>
-              <td
-                class="roleDropdown"
-                width="250"
-              >
-                <label
-                  class="usa-label usa-sr-only"
-                  data-testid="label"
-                  for="role-select-123"
-                >
-                  User role
-                </label>
-                <select
-                  class="usa-select"
-                  data-testid="role-select-123"
-                  id="role-select-123"
-                >
-                  <option
-                    selected=""
-                    value="Super Admin"
-                  >
-                    Super Admin
-                  </option>
-                  <option
-                    value="Admin"
-                  >
-                    Admin
-                  </option>
-                  <option
-                    value="Standard"
-                  >
-                    Standard
-                  </option>
-                </select>
-              </td>
-              <td
-                width="475"
-              >
-                --
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        No users found
       </div>
       <div>
         Modal Mock
@@ -934,58 +565,8 @@ exports[`Super Admin view of Users Table renders table view after content is loa
           role="dialog"
         >
           <div
-            class="drawerContent display-none"
-          >
-            <div
-              class="drawerHeader"
-            >
-              <button
-                aria-label="Close drawer"
-                class="closeButton"
-                data-testid="close-drawer"
-              >
-                <svg
-                  aria-label="X icon indicating closure"
-                  class="usa-icon usa-icon--size-3"
-                  focusable="false"
-                  height="1em"
-                  role="img"
-                  viewBox="0 0 24 24"
-                  width="1em"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
-                  />
-                </svg>
-              </button>
-              <h2
-                class="margin-0 padding-bottom-2"
-                data-testid="drawer-title"
-                id="drawer-title"
-              />
-              <div>
-                <input
-                  class="usa-input searchField"
-                  data-testid="textInput"
-                  id="searchFieldTemplate"
-                  name="searchFieldTemplate"
-                  placeholder="Search"
-                  type="search"
-                  value=""
-                />
-              </div>
-            </div>
-            <div
-              class="drawerBody"
-            >
-              <div
-                class="margin-top-2"
-              >
-                No queries found.
-              </div>
-            </div>
-          </div>
+            class="display-none"
+          />
         </div>
       </div>
     </div>
@@ -1029,29 +610,37 @@ exports[`Super Admin view of Users Table renders table view after content is loa
         >
           <thead>
             <tr>
-              <th>
+              <th
+                class="grid-col-5"
+              >
                 Name
               </th>
-              <th>
+              <th
+                class="grid-col-3"
+              >
                 Permissions
               </th>
-              <th>
+              <th
+                class="grid-col-4"
+              >
                 User groups
               </th>
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td
-                class="userDisplay"
-                width="270"
-              >
-                Potter, Lily 
+            <tr
+              id="456"
+              tabindex="0"
+            >
+              <td>
                 <div
-                  class="actionButtons"
+                  class="buttonHoverGroup"
                 >
+                  <span>
+                    Potter, Lily 
+                  </span>
                   <button
-                    class="usa-button usa-button--unstyled text-bold text-no-underline"
+                    class="usa-button usa-button--unstyled hoverBtn unstyled-button-container usa-button--unstyled text-bold text-no-underline"
                     data-testid="button"
                     type="button"
                   >
@@ -1076,7 +665,7 @@ exports[`Super Admin view of Users Table renders table view after content is loa
                         class="padding-left-05"
                         data-testid="edit-group-456"
                       >
-                        Edit
+                        Rename
                       </span>
                     </span>
                   </button>
@@ -1084,7 +673,6 @@ exports[`Super Admin view of Users Table renders table view after content is loa
               </td>
               <td
                 class="roleDropdown"
-                width="250"
               >
                 <label
                   class="usa-label usa-sr-only"
@@ -1116,30 +704,32 @@ exports[`Super Admin view of Users Table renders table view after content is loa
                   </option>
                 </select>
               </td>
-              <td
-                width="475"
-              >
+              <td>
                 <button
                   aria-description="Edit Order of the Phoenix members"
                   class="usa-button usa-button--unstyled margin-right-2 text-no-underline"
                   data-testid="button"
                   type="button"
                 >
-                  Order of the Phoenix
+                  <span>
+                    Order of the Phoenix
+                  </span>
                 </button>
               </td>
             </tr>
-            <tr>
-              <td
-                class="userDisplay"
-                width="270"
-              >
-                Potter, Harry 
+            <tr
+              id="123"
+              tabindex="0"
+            >
+              <td>
                 <div
-                  class="actionButtons"
+                  class="buttonHoverGroup"
                 >
+                  <span>
+                    Potter, Harry 
+                  </span>
                   <button
-                    class="usa-button usa-button--unstyled text-bold text-no-underline"
+                    class="usa-button usa-button--unstyled hoverBtn unstyled-button-container usa-button--unstyled text-bold text-no-underline"
                     data-testid="button"
                     type="button"
                   >
@@ -1164,7 +754,7 @@ exports[`Super Admin view of Users Table renders table view after content is loa
                         class="padding-left-05"
                         data-testid="edit-group-123"
                       >
-                        Edit
+                        Rename
                       </span>
                     </span>
                   </button>
@@ -1172,7 +762,6 @@ exports[`Super Admin view of Users Table renders table view after content is loa
               </td>
               <td
                 class="roleDropdown"
-                width="250"
               >
                 <label
                   class="usa-label usa-sr-only"
@@ -1204,9 +793,7 @@ exports[`Super Admin view of Users Table renders table view after content is loa
                   </option>
                 </select>
               </td>
-              <td
-                width="475"
-              >
+              <td>
                 --
               </td>
             </tr>
@@ -1225,58 +812,8 @@ exports[`Super Admin view of Users Table renders table view after content is loa
           role="dialog"
         >
           <div
-            class="drawerContent display-none"
-          >
-            <div
-              class="drawerHeader"
-            >
-              <button
-                aria-label="Close drawer"
-                class="closeButton"
-                data-testid="close-drawer"
-              >
-                <svg
-                  aria-label="X icon indicating closure"
-                  class="usa-icon usa-icon--size-3"
-                  focusable="false"
-                  height="1em"
-                  role="img"
-                  viewBox="0 0 24 24"
-                  width="1em"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
-                  />
-                </svg>
-              </button>
-              <h2
-                class="margin-0 padding-bottom-2"
-                data-testid="drawer-title"
-                id="drawer-title"
-              />
-              <div>
-                <input
-                  class="usa-input searchField"
-                  data-testid="textInput"
-                  id="searchFieldTemplate"
-                  name="searchFieldTemplate"
-                  placeholder="Search"
-                  type="search"
-                  value=""
-                />
-              </div>
-            </div>
-            <div
-              class="drawerBody"
-            >
-              <div
-                class="margin-top-2"
-              >
-                No queries found.
-              </div>
-            </div>
-          </div>
+            class="display-none"
+          />
         </div>
       </div>
     </div>
@@ -1291,29 +828,37 @@ exports[`Super Admin view of Users Table renders table view after content is loa
       >
         <thead>
           <tr>
-            <th>
+            <th
+              class="grid-col-5"
+            >
               Name
             </th>
-            <th>
+            <th
+              class="grid-col-3"
+            >
               Permissions
             </th>
-            <th>
+            <th
+              class="grid-col-4"
+            >
               User groups
             </th>
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td
-              class="userDisplay"
-              width="270"
-            >
-              Potter, Lily 
+          <tr
+            id="456"
+            tabindex="0"
+          >
+            <td>
               <div
-                class="actionButtons"
+                class="buttonHoverGroup"
               >
+                <span>
+                  Potter, Lily 
+                </span>
                 <button
-                  class="usa-button usa-button--unstyled text-bold text-no-underline"
+                  class="usa-button usa-button--unstyled hoverBtn unstyled-button-container usa-button--unstyled text-bold text-no-underline"
                   data-testid="button"
                   type="button"
                 >
@@ -1338,7 +883,7 @@ exports[`Super Admin view of Users Table renders table view after content is loa
                       class="padding-left-05"
                       data-testid="edit-group-456"
                     >
-                      Edit
+                      Rename
                     </span>
                   </span>
                 </button>
@@ -1346,7 +891,6 @@ exports[`Super Admin view of Users Table renders table view after content is loa
             </td>
             <td
               class="roleDropdown"
-              width="250"
             >
               <label
                 class="usa-label usa-sr-only"
@@ -1378,30 +922,32 @@ exports[`Super Admin view of Users Table renders table view after content is loa
                 </option>
               </select>
             </td>
-            <td
-              width="475"
-            >
+            <td>
               <button
                 aria-description="Edit Order of the Phoenix members"
                 class="usa-button usa-button--unstyled margin-right-2 text-no-underline"
                 data-testid="button"
                 type="button"
               >
-                Order of the Phoenix
+                <span>
+                  Order of the Phoenix
+                </span>
               </button>
             </td>
           </tr>
-          <tr>
-            <td
-              class="userDisplay"
-              width="270"
-            >
-              Potter, Harry 
+          <tr
+            id="123"
+            tabindex="0"
+          >
+            <td>
               <div
-                class="actionButtons"
+                class="buttonHoverGroup"
               >
+                <span>
+                  Potter, Harry 
+                </span>
                 <button
-                  class="usa-button usa-button--unstyled text-bold text-no-underline"
+                  class="usa-button usa-button--unstyled hoverBtn unstyled-button-container usa-button--unstyled text-bold text-no-underline"
                   data-testid="button"
                   type="button"
                 >
@@ -1426,7 +972,7 @@ exports[`Super Admin view of Users Table renders table view after content is loa
                       class="padding-left-05"
                       data-testid="edit-group-123"
                     >
-                      Edit
+                      Rename
                     </span>
                   </span>
                 </button>
@@ -1434,7 +980,6 @@ exports[`Super Admin view of Users Table renders table view after content is loa
             </td>
             <td
               class="roleDropdown"
-              width="250"
             >
               <label
                 class="usa-label usa-sr-only"
@@ -1466,9 +1011,7 @@ exports[`Super Admin view of Users Table renders table view after content is loa
                 </option>
               </select>
             </td>
-            <td
-              width="475"
-            >
+            <td>
               --
             </td>
           </tr>

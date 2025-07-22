@@ -17,16 +17,16 @@ describe("translation utils", () => {
       expect(Object.keys(groupedValueSets).length).toBe(4);
       expect(
         Object.values(groupedValueSets).map((v) => v.valueSetName),
-      ).toInclude("Cancer (Leukemia) Lab Result");
+      ).toContain("Cancer (Leukemia) Lab Result");
       expect(
         Object.values(groupedValueSets).map((v) => v.valueSetName),
-      ).toInclude("Cancer (Leukemia) Diagnosis Problem");
+      ).toContain("Cancer (Leukemia) Diagnosis Problem");
       expect(
         Object.values(groupedValueSets).map((v) => v.valueSetName),
-      ).toInclude("Cancer (Leukemia) Medication");
+      ).toContain("Cancer (Leukemia) Medication");
       expect(
         Object.values(groupedValueSets).map((v) => v.valueSetName),
-      ).toInclude("Suspected Cancer (Leukemia) Diagnosis");
+      ).toContain("Suspected Cancer (Leukemia) Diagnosis");
     });
   });
 

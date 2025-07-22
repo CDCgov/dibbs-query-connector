@@ -24,56 +24,47 @@
   }
 }
 
+.userGroupsTable,
+.userPermissionsTable {
+  display: table;
+  table-layout: fixed;
+  width: 100%;
+
+  tr {
+    &:focus-within,
+    &:hover {
+      button.hoverBtn {
+        display: block;
+      }
+    }
+  }
+
+  td {
+    max-width: 0;
+  }
+}
+
 .drawerButton,
 .drawerButton:disabled,
 .drawerButton:disabled:hover {
-  text-decoration: none;
+  text-decoration: none !important;
+  margin: 0 !important;
 }
 
-.userGroupsTable {
-  .actionButtons {
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    position: absolute;
-    right: 1.5rem;
-    top: 50%;
-    transform: translateY(-50%);
-    gap: 0.5rem;
+.buttonHoverGroup {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+  height: 2.5rem;
+
+  button.hoverBtn {
+    display: none;
   }
 
-  tbody td:last-child {
-    opacity: 0;
-    text-align: right;
-    padding-right: 0 !important;
+  span {
+    overflow: hidden;
+    text-overflow: ellipsis;
     white-space: nowrap;
-  }
-
-  tbody tr:hover td:last-child,
-  tbody td:last-child:hover {
-    opacity: 1;
-    pointer-events: auto;
-    max-height: inherit;
-  }
-}
-
-.userPermissionsTable {
-  td.userDisplay {
-    display: flex;
-    justify-content: space-between;
-  }
-
-  .actionButtons {
-    display: flex;
-    opacity: 0;
-    text-align: right;
-    padding-right: 0 !important;
-    white-space: nowrap;
-  }
-
-  td.userDisplay:hover .actionButtons {
-    opacity: 1;
-    pointer-events: auto;
-    max-height: inherit;
   }
 }

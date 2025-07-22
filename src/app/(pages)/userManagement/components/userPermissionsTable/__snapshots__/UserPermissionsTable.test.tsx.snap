@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`User Management: User tab Loads user list successfully 1`] = `
 <body>
@@ -12,29 +12,37 @@ exports[`User Management: User tab Loads user list successfully 1`] = `
       >
         <thead>
           <tr>
-            <th>
+            <th
+              class="grid-col-5"
+            >
               Name
             </th>
-            <th>
+            <th
+              class="grid-col-3"
+            >
               Permissions
             </th>
-            <th>
+            <th
+              class="grid-col-4"
+            >
               User groups
             </th>
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td
-              class="userDisplay"
-              width="270"
-            >
-              Potter, Lily 
+          <tr
+            id="456"
+            tabindex="0"
+          >
+            <td>
               <div
-                class="actionButtons"
+                class="buttonHoverGroup"
               >
+                <span>
+                  Potter, Lily 
+                </span>
                 <button
-                  class="usa-button usa-button--unstyled text-bold text-no-underline"
+                  class="usa-button usa-button--unstyled hoverBtn unstyled-button-container usa-button--unstyled text-bold text-no-underline"
                   data-testid="button"
                   type="button"
                 >
@@ -59,7 +67,7 @@ exports[`User Management: User tab Loads user list successfully 1`] = `
                       class="padding-left-05"
                       data-testid="edit-group-456"
                     >
-                      Edit
+                      Rename
                     </span>
                   </span>
                 </button>
@@ -67,7 +75,6 @@ exports[`User Management: User tab Loads user list successfully 1`] = `
             </td>
             <td
               class="roleDropdown"
-              width="250"
             >
               <label
                 class="usa-label usa-sr-only"
@@ -99,30 +106,32 @@ exports[`User Management: User tab Loads user list successfully 1`] = `
                 </option>
               </select>
             </td>
-            <td
-              width="475"
-            >
+            <td>
               <button
                 aria-description="Edit Order of the Phoenix members"
                 class="usa-button usa-button--unstyled margin-right-2 text-no-underline"
                 data-testid="button"
                 type="button"
               >
-                Order of the Phoenix
+                <span>
+                  Order of the Phoenix
+                </span>
               </button>
             </td>
           </tr>
-          <tr>
-            <td
-              class="userDisplay"
-              width="270"
-            >
-              Potter, Harry 
+          <tr
+            id="123"
+            tabindex="0"
+          >
+            <td>
               <div
-                class="actionButtons"
+                class="buttonHoverGroup"
               >
+                <span>
+                  Potter, Harry 
+                </span>
                 <button
-                  class="usa-button usa-button--unstyled text-bold text-no-underline"
+                  class="usa-button usa-button--unstyled hoverBtn unstyled-button-container usa-button--unstyled text-bold text-no-underline"
                   data-testid="button"
                   type="button"
                 >
@@ -147,7 +156,7 @@ exports[`User Management: User tab Loads user list successfully 1`] = `
                       class="padding-left-05"
                       data-testid="edit-group-123"
                     >
-                      Edit
+                      Rename
                     </span>
                   </span>
                 </button>
@@ -155,7 +164,6 @@ exports[`User Management: User tab Loads user list successfully 1`] = `
             </td>
             <td
               class="roleDropdown"
-              width="250"
             >
               <label
                 class="usa-label usa-sr-only"
@@ -187,9 +195,7 @@ exports[`User Management: User tab Loads user list successfully 1`] = `
                 </option>
               </select>
             </td>
-            <td
-              width="475"
-            >
+            <td>
               --
             </td>
           </tr>
@@ -207,29 +213,37 @@ exports[`User Management: User tab Loads user list successfully 1`] = `
       >
         <thead>
           <tr>
-            <th>
+            <th
+              class="grid-col-5"
+            >
               Name
             </th>
-            <th>
+            <th
+              class="grid-col-3"
+            >
               Permissions
             </th>
-            <th>
+            <th
+              class="grid-col-4"
+            >
               User groups
             </th>
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td
-              class="userDisplay"
-              width="270"
-            >
-              Potter, Lily 
+          <tr
+            id="456"
+            tabindex="0"
+          >
+            <td>
               <div
-                class="actionButtons"
+                class="buttonHoverGroup"
               >
+                <span>
+                  Potter, Lily 
+                </span>
                 <button
-                  class="usa-button usa-button--unstyled text-bold text-no-underline"
+                  class="usa-button usa-button--unstyled hoverBtn unstyled-button-container usa-button--unstyled text-bold text-no-underline"
                   data-testid="button"
                   type="button"
                 >
@@ -254,7 +268,7 @@ exports[`User Management: User tab Loads user list successfully 1`] = `
                       class="padding-left-05"
                       data-testid="edit-group-456"
                     >
-                      Edit
+                      Rename
                     </span>
                   </span>
                 </button>
@@ -262,7 +276,6 @@ exports[`User Management: User tab Loads user list successfully 1`] = `
             </td>
             <td
               class="roleDropdown"
-              width="250"
             >
               <label
                 class="usa-label usa-sr-only"
@@ -294,30 +307,32 @@ exports[`User Management: User tab Loads user list successfully 1`] = `
                 </option>
               </select>
             </td>
-            <td
-              width="475"
-            >
+            <td>
               <button
                 aria-description="Edit Order of the Phoenix members"
                 class="usa-button usa-button--unstyled margin-right-2 text-no-underline"
                 data-testid="button"
                 type="button"
               >
-                Order of the Phoenix
+                <span>
+                  Order of the Phoenix
+                </span>
               </button>
             </td>
           </tr>
-          <tr>
-            <td
-              class="userDisplay"
-              width="270"
-            >
-              Potter, Harry 
+          <tr
+            id="123"
+            tabindex="0"
+          >
+            <td>
               <div
-                class="actionButtons"
+                class="buttonHoverGroup"
               >
+                <span>
+                  Potter, Harry 
+                </span>
                 <button
-                  class="usa-button usa-button--unstyled text-bold text-no-underline"
+                  class="usa-button usa-button--unstyled hoverBtn unstyled-button-container usa-button--unstyled text-bold text-no-underline"
                   data-testid="button"
                   type="button"
                 >
@@ -342,7 +357,7 @@ exports[`User Management: User tab Loads user list successfully 1`] = `
                       class="padding-left-05"
                       data-testid="edit-group-123"
                     >
-                      Edit
+                      Rename
                     </span>
                   </span>
                 </button>
@@ -350,7 +365,6 @@ exports[`User Management: User tab Loads user list successfully 1`] = `
             </td>
             <td
               class="roleDropdown"
-              width="250"
             >
               <label
                 class="usa-label usa-sr-only"
@@ -382,9 +396,7 @@ exports[`User Management: User tab Loads user list successfully 1`] = `
                 </option>
               </select>
             </td>
-            <td
-              width="475"
-            >
+            <td>
               --
             </td>
           </tr>

@@ -11,6 +11,7 @@ export const CONDITION_DRAWER_SEARCH_PLACEHOLDER =
 export const VALUESET_SELECTION_SEARCH_PLACEHOLDER =
   "Search labs, medications, conditions";
 export const VALUESET_DRAWER_SEARCH_PLACEHOLDER = "Search by code or name";
+export const MEDICAL_RECORD_SECTIONS_ID = "MEDICAL_RECORD_SECTIONS";
 
 type ValueSetWithRender = {
   render: boolean;

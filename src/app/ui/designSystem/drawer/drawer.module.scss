@@ -8,7 +8,6 @@ $drawerWidthWide: 60%;
   top: 0;
   height: 100%;
   padding: 0rem;
-  display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: 1.5rem;
@@ -43,6 +42,7 @@ $drawerWidthWide: 60%;
 
 .drawer.open {
   right: 0;
+  display: flex;
 }
 
 .drawer.closed {
@@ -56,7 +56,6 @@ $drawerWidthWide: 60%;
 
 .drawerHeader {
   max-width: 95%;
-  // width: 25rem;
 }
 
 .overlay {
