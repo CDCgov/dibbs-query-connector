@@ -229,41 +229,64 @@ class QueryService {
     if (address?.street1) addressLines.push(...address.street1.split(";"));
     if (address?.street2) addressLines.push(...address.street2.split(";"));
 
-    const patientResource = {
+    const patientResource: Record<string, unknown> = {
       resourceType: "Patient",
-      name:
-        firstName || lastName
-          ? [
-              {
-                given: firstName ? [firstName] : [],
-                family: lastName || "",
-              },
-            ]
-          : undefined,
-      birthDate: dob || undefined,
-      telecom: telecom.length > 0 ? telecom : undefined,
-      address:
-        addressLines.length > 0 ||
-        address?.city ||
-        address?.state ||
-        address?.zip
-          ? [
-              {
-                line: addressLines.length > 0 ? addressLines : undefined,
-                city: address?.city || undefined,
-                state: address?.state || undefined,
-                postalCode: address?.zip || undefined,
-              },
-            ]
-          : undefined,
-      identifier: mrn
-        ? [
-            {
-              value: mrn,
-            },
-          ]
-        : undefined,
     };
+
+    if (firstName || lastName) {
+      patientResource["name"] = [
+        {
+          given: firstName ? [firstName] : [],
+          family: lastName || "",
+        },
+      ];
+    }
+
+    if (dob) {
+      patientResource["birthDate"] = dob;
+    }
+
+    if (telecom.length > 0) {
+      patientResource["telecom"] = telecom;
+    }
+
+    if (
+      addressLines.length > 0 ||
+      address?.city ||
+      address?.state ||
+      address?.zip
+    ) {
+      patientResource["address"] = [
+        {
+          line: addressLines.length > 0 ? addressLines : undefined,
+          city: address?.city || undefined,
+          state: address?.state || undefined,
+          postalCode: address?.zip || undefined,
+        },
+      ];
+    }
+
+    if (mrn) {
+      patientResource["identifier"] = [
+        {
+          value: mrn,
+        },
+      ];
+    }
+
+    const hasIdentifiers = [
+      "name",
+      "birthDate",
+      "telecom",
+      "address",
+      "identifier",
+    ].some((key) => patientResource[key] !== undefined);
+
+    if (!hasIdentifiers) {
+      throw new Error(
+        "Cannot run $match: Patient resource has no identifying fields.",
+      );
+    }
 
     const parameters: {
       resourceType: "Parameters";
@@ -283,12 +306,7 @@ class QueryService {
     };
 
     // Apply optional match modifiers
-    if (patientMatchConfiguration?.onlySingleMatch === true) {
-      parameters.parameter.push({
-        name: "count",
-        valueInteger: 1,
-      });
-    } else if (patientMatchConfiguration?.onlyCertainMatches === true) {
+    if (patientMatchConfiguration?.onlyCertainMatches === true) {
       parameters.parameter.push({
         name: "onlyCertainMatches",
         valueBoolean: true,
@@ -303,6 +321,11 @@ class QueryService {
           valueInteger: patientMatchConfiguration.matchCount,
         });
       }
+    } else if (patientMatchConfiguration?.onlySingleMatch === true) {
+      parameters.parameter.push({
+        name: "count",
+        valueInteger: 1,
+      });
     }
 
     const response = await fhirClient.postJson("/Patient/$match", parameters);
@@ -363,8 +386,14 @@ class QueryService {
   static async patientDiscoveryQuery(
     request: PatientDiscoveryRequest,
   ): Promise<QueryResponse["Patient"]> {
-    const fhirResponse = request.patientMatchConfiguration?.enabled
-      ? await QueryService.makePatientMatchRequest(request)
+    const fhirClient = await prepareFhirClient(request.fhirServer);
+    const matchConfig = fhirClient["serverConfig"]?.patientMatchConfiguration;
+
+    const fhirResponse = matchConfig?.enabled
+      ? await QueryService.makePatientMatchRequest({
+          ...request,
+          patientMatchConfiguration: matchConfig,
+        })
       : await QueryService.makePatientDiscoveryRequest(request);
 
     const newResponse = await QueryService.parseFhirSearch(fhirResponse);
