@@ -26,7 +26,6 @@ import {
   PatientDiscoveryRequest,
   validatedPatientSearch,
 } from "@/app/models/entities/query";
-import { FhirServerConfig } from "@/app/models/entities/fhir-servers";
 
 interface SearchFormProps {
   setPatientDiscoveryQueryResponse: (
@@ -37,7 +36,6 @@ interface SearchFormProps {
   fhirServers: string[];
   selectedFhirServer: string;
   setFhirServer: React.Dispatch<React.SetStateAction<string>>;
-  fhirServerConfigs: FhirServerConfig[];
 }
 
 const SearchForm: React.FC<SearchFormProps> = function SearchForm({
@@ -47,7 +45,6 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
   fhirServers,
   selectedFhirServer: fhirServer,
   setFhirServer,
-  fhirServerConfigs,
 }) {
   //Set the patient options based on the demoOption
   const [firstName, setFirstName] = useState<string>("");
@@ -101,10 +98,6 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
     setFhirServer(server && fhirServers.includes(server) ? server : fhirServer);
   }, [fhirServers]);
 
-  const selectedServerConfig = fhirServerConfigs.find(
-    (s) => s.hostname === fhirServer,
-  );
-
   // Fills fields with sample data based on the selected
   const [formTouched, setFormTouched] = useState(false);
   const [_formError, setFormError] = useState(false);
@@ -139,7 +132,6 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
         state: address.state,
         zip: address.zip,
       },
-      matchConfiguration: selectedServerConfig?.patientMatchConfiguration,
     };
   }
 
