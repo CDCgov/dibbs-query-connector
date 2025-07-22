@@ -364,6 +364,32 @@ const FhirServers: React.FC = () => {
   const handleSave = async (authData: AuthData) => {
     const connectionResult = await testFhirConnection(serverUrl);
 
+    if (defaultServer) {
+      await Promise.all(
+        fhirServers
+          .filter((srv) => srv.defaultServer && srv.name !== serverName)
+          .map((srv) =>
+            updateFhirServer(
+              srv.id,
+              srv.name,
+              srv.hostname,
+              srv.disableCertValidation,
+              false,
+              srv.lastConnectionSuccessful,
+              {
+                authType: srv.authType as AuthMethodType,
+                clientId: srv.clientId,
+                clientSecret: srv.clientSecret,
+                tokenEndpoint: srv.tokenEndpoint,
+                scopes: srv.scopes,
+                headers: srv.headers ?? {},
+              },
+              srv.patientMatchConfiguration ?? DEFAULT_PATIENT_MATCH_DATA,
+            ),
+          ),
+      );
+    }
+
     if (modalMode === "create") {
       const result = await insertFhirServer(
         serverName,
