@@ -8,15 +8,17 @@ class QueryTimeboxingService {
   static async updateTimeboxSettings(
     queryId: string,
     conceptType: string,
-    startDate: Date,
-    endDate: Date,
+    startDate: string,
+    endDate: string,
   ) {
     const updateUserGroupMembersQuery = `
-        UPDATE query_timeboxing
-        SET time_window_start = $4 
-        SET time_window_end = $5
-        WHERE query_id = $2 AND concept_type = $3
-        RETURNING id, name; 
+    INSERT INTO query_timeboxing (query_id, concept_type, time_window_start, time_window_end)
+      VALUES($1, $2, $3, $4)
+      ON CONFLICT(query_id, concept_type)
+      DO UPDATE SET
+        time_window_start = EXCLUDED.time_window_start,
+        time_window_end = EXCLUDED.time_window_end
+      RETURNING *;
     `;
 
     const result = await dbService.query(updateUserGroupMembersQuery, [
@@ -26,7 +28,7 @@ class QueryTimeboxingService {
       endDate,
     ]);
 
-    return result;
+    return result.rows;
   }
 
   static async getTimeboxSettings(queryId: string, conceptType: string) {
