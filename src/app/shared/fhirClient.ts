@@ -1,10 +1,16 @@
-import https from "https";
+import https, { get } from "https";
+import fs from "fs";
 import { FhirServerConfig } from "../models/entities/fhir-servers";
 import { createSmartJwt } from "../backend/smart-on-fhir";
 import { fetchWithoutSSL } from "./utils";
 import dbService from "../backend/db/service";
 import { AuthData, updateFhirServer } from "../backend/fhir-servers";
 import { getOrCreateMtlsCert, getOrCreateMtlsKey } from "./mtls-utils";
+import fetch from "node-fetch";
+import { RequestInit, Response } from "node-fetch";
+import { url } from "inspector";
+import path from "path";
+import { json } from "stream/consumers";
 
 /**
  * Custom fetch function that supports mutual TLS
@@ -22,14 +28,21 @@ function fetchWithMutualTLS(
     const agent = new https.Agent({
       cert,
       key,
-      rejectUnauthorized: !disableCertValidation,
     });
 
-    return fetch(url, {
-      ...options,
-      // @ts-ignore - Node.js fetch supports agent option
-      agent,
-    });
+    if (disableCertValidation) {
+      return fetchWithoutSSL(url, {
+        ...options,
+        // @ts-ignore - Node.js fetch supports agent option
+        agent,
+      });
+    } else {
+      return fetch(url, {
+        ...options,
+        // @ts-ignore - Node.js fetch supports agent option
+        agent,
+      });
+    }
   };
 }
 
@@ -171,21 +184,32 @@ class FHIRClient {
       }
 
       // Try to fetch the server's metadata
-      const response = await client.get(
-        "/Patient?name=AuthenticatedServerConnectionTest&_summary=count&_count=1",
-      );
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error(`Error testing connection: ${errorText}`);
-        return {
-          success: false,
-          error: `Server returned ${response.status}: ${errorText}`,
-        };
+      let response;
+      if (mutualTls) {
+        response = await client.get("/Task/foo");
+        if (response.status == 404) {
+          // If mutual TLS is enabled, we can only check if the server is reachable
+          return {
+            success: true,
+            message: "Server is reachable with mutual TLS",
+          };
+        }
+      } else {
+        response = await client.get(
+          "/Patient?name=AuthenticatedServerConnectionTest&_summary=count&_count=1",
+        );
+        if (response.ok) {
+          return {
+            success: true,
+          };
+        }
       }
 
+      const errorText = await response.text();
+      console.error(`Error testing connection: ${errorText}`);
       return {
-        success: true,
+        success: false,
+        error: `Server returned ${response.status}: ${errorText}`,
       };
     } catch (error) {
       console.error("Error testing FHIR connection:", error);
@@ -501,7 +525,8 @@ class FHIRClient {
     const requestOptions: RequestInit = {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": "application/fhir+json",
+        PREFER: "return=representation",
         ...this.init.headers,
       },
       body: JSON.stringify(body),

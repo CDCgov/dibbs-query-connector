@@ -1,6 +1,8 @@
 import { QueryResultRow } from "pg";
 import { DibbsValueSet } from "../models/entities/valuesets";
 import { Concept } from "../models/entities/concepts";
+import fetch from "node-fetch";
+import { RequestInit } from "node-fetch";
 
 /**
  * Maps the results returned from the DIBBs value set and coding system database

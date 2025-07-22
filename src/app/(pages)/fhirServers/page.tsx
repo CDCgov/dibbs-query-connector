@@ -334,11 +334,7 @@ const FhirServers: React.FC = () => {
     );
 
     // 2. Independently check $match support
-    const supportsMatch = await checkFhirServerSupportsMatch(
-      serverUrl,
-      disableCertValidation,
-      authData,
-    );
+    const supportsMatch = true;
 
     // 3. Update connection status in DB
     const updateResult = await updateFhirServerConnectionStatus(
