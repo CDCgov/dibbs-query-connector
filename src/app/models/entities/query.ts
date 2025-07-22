@@ -31,7 +31,7 @@ export type PatientDiscoveryRequest = {
   phone?: string;
   address?: Address;
   email?: string;
-  matchConfiguration?: PatientMatchData;
+  patientMatchConfiguration?: PatientMatchData;
 };
 
 export type Address = {

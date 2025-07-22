@@ -198,7 +198,7 @@ class QueryService {
       phone,
       address,
       email,
-      matchConfiguration,
+      patientMatchConfiguration,
     } = request;
 
     const fhirClient = await prepareFhirClient(fhirServer);
@@ -283,21 +283,24 @@ class QueryService {
     };
 
     // Apply optional match modifiers
-    if (matchConfiguration?.onlySingleMatch === true) {
+    if (patientMatchConfiguration?.onlySingleMatch === true) {
       parameters.parameter.push({
         name: "count",
         valueInteger: 1,
       });
-    } else if (matchConfiguration?.onlyCertainMatches === true) {
+    } else if (patientMatchConfiguration?.onlyCertainMatches === true) {
       parameters.parameter.push({
         name: "onlyCertainMatches",
         valueBoolean: true,
       });
 
-      if (matchConfiguration.matchCount && matchConfiguration.matchCount > 0) {
+      if (
+        patientMatchConfiguration.matchCount &&
+        patientMatchConfiguration.matchCount > 0
+      ) {
         parameters.parameter.push({
           name: "count",
-          valueInteger: matchConfiguration.matchCount,
+          valueInteger: patientMatchConfiguration.matchCount,
         });
       }
     }
@@ -360,7 +363,7 @@ class QueryService {
   static async patientDiscoveryQuery(
     request: PatientDiscoveryRequest,
   ): Promise<QueryResponse["Patient"]> {
-    const fhirResponse = request.matchConfiguration?.enabled
+    const fhirResponse = request.patientMatchConfiguration?.enabled
       ? await QueryService.makePatientMatchRequest(request)
       : await QueryService.makePatientDiscoveryRequest(request);
 
