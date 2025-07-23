@@ -147,6 +147,7 @@ interface DateRangePickerProps {
   endDate: Date | null;
   onChange: (...args: unknown[]) => void;
   id: string;
+  handleClear?: () => Promise<void>;
   popoverSide?: "left" | "right";
   placeholderText?: string;
 }
@@ -164,6 +165,7 @@ export type DateRangePickerRef = {
  * @param root0.id - The id for the form input.
  * @param root0.onChange - The change handler.
  * @param root0.popoverSide - Optional prop to control the side the popover's on.
+ * @param root0.handleClear - Optional prop to control the side the popover's on.
  * @param root0.placeholderText - Text to indicate the filter.
  * @returns - The date range picker component.
  */
@@ -175,6 +177,7 @@ const DateRangePicker = forwardRef<DateRangePickerRef, DateRangePickerProps>(
       endDate: initialEnd,
       onChange,
       id,
+      handleClear,
       popoverSide = "right",
       placeholderText = "Filter by date",
     },
@@ -187,16 +190,6 @@ const DateRangePicker = forwardRef<DateRangePickerRef, DateRangePickerProps>(
     const [isOpen, setIsOpen] = useState(false);
 
     const containerRef = useRef<HTMLDivElement>(null);
-
-    useEffect(() => {
-      if (initialStart) {
-        setCustomStart(initialStart);
-      }
-
-      if (initialEnd) {
-        setCustomEnd(initialEnd);
-      }
-    }, [initialStart, initialEnd]);
 
     useEffect(() => {
       const handleClickOutside = (event: MouseEvent) => {
@@ -329,9 +322,13 @@ const DateRangePicker = forwardRef<DateRangePickerRef, DateRangePickerProps>(
       setIsOpen(false);
     };
 
-    const handleClear = () => {
+    const handleClearClick = async () => {
+      if (handleClear) {
+        await handleClear();
+      }
       setCustomStart(null);
       setCustomEnd(null);
+      setSelectedPreset("");
       setDateErrors({});
     };
 
@@ -372,7 +369,19 @@ const DateRangePicker = forwardRef<DateRangePickerRef, DateRangePickerProps>(
           >
             <FormGroup className="margin-top-1">
               <fieldset className={styles.radioGroup} aria-label="Filter by">
-                <legend className={styles.legend}>Filter by</legend>
+                <div className="display-flex justify-between flex-align-baseline">
+                  <legend className={styles.legend}>Filter by</legend>
+
+                  <Button
+                    unstyled
+                    type="button"
+                    data-testid="date-range-clear-button"
+                    onClick={handleClearClick}
+                  >
+                    Clear
+                  </Button>
+                </div>
+
                 {presetOptions.map(({ label, value }) => (
                   <Radio
                     key={value}
@@ -399,6 +408,8 @@ const DateRangePicker = forwardRef<DateRangePickerRef, DateRangePickerProps>(
                 />
               </fieldset>
             </FormGroup>
+
+            <div className={styles.clearButtonContainer}></div>
             {selectedPreset === CUSTOM_VALUE && (
               <>
                 <USWDSDateRangePicker
@@ -435,16 +446,6 @@ const DateRangePicker = forwardRef<DateRangePickerRef, DateRangePickerProps>(
                     {dateErrors.start || dateErrors.end}
                   </p>
                 )}
-                <div className={styles.clearButtonContainer}>
-                  <Button
-                    unstyled
-                    type="button"
-                    data-testid="date-range-clear-button"
-                    onClick={handleClear}
-                  >
-                    Clear
-                  </Button>
-                </div>
               </>
             )}
             <Button

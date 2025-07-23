@@ -36,6 +36,7 @@ import DateRangePicker, {
 } from "@/app/ui/designSystem/timeboxing/DateRangePicker";
 import { DataContext } from "@/app/shared/DataProvider";
 import {
+  deleteTimeboxSettings,
   getTimeboxRanges,
   updateTimeboxSettings,
 } from "@/app/backend/query-timeboxing";
@@ -301,6 +302,15 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
     }
   };
 
+  const handleTimeboxClear = async () => {
+    const queryId = queryContext?.selectedQuery?.queryId;
+    const conceptType = accordionConceptType;
+
+    if (queryId) {
+      await deleteTimeboxSettings(queryId, conceptType);
+    }
+  };
+
   const buttons = [
     {
       trigger: totalCount > selectedCount,
@@ -347,6 +357,7 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
           startDate={initialTimeboxRange.startDate}
           endDate={initialTimeboxRange.endDate}
           onChange={handleTimeboxUpdate}
+          handleClear={handleTimeboxClear}
           popoverSide="left"
           placeholderText="All dates"
         />

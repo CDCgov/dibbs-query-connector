@@ -31,6 +31,19 @@ class QueryTimeboxingService {
     return result.rows;
   }
 
+  static async deleteTimeboxSettings(queryId: string, conceptType: string) {
+    const updateUserGroupMembersQuery = `
+       DELETE FROM query_timeboxing WHERE query_id = $1 AND concept_type = $2;
+    `;
+
+    const result = await dbService.query(updateUserGroupMembersQuery, [
+      queryId,
+      conceptType,
+    ]);
+
+    return result.rows;
+  }
+
   static async getTimeboxRanges(queryId: string, conceptType: string) {
     const timeboxSelectionQuery = `
         SELECT time_window_start, time_window_end FROM query_timeboxing
@@ -52,5 +65,7 @@ class QueryTimeboxingService {
 }
 
 export const getTimeboxRanges = QueryTimeboxingService.getTimeboxRanges;
+export const deleteTimeboxSettings =
+  QueryTimeboxingService.deleteTimeboxSettings;
 export const updateTimeboxSettings =
   QueryTimeboxingService.updateTimeboxSettings;
