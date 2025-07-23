@@ -31,22 +31,26 @@ class QueryTimeboxingService {
     return result.rows;
   }
 
-  static async getTimeboxSettings(queryId: string, conceptType: string) {
-    const selectTimeboxSettings = `
-        SELECT FROM query_timeboxing
-        WHERE query_id = $1
-        RETURNING *; 
+  static async getTimeboxRanges(queryId: string, conceptType: string) {
+    const timeboxSelectionQuery = `
+        SELECT time_window_start, time_window_end FROM query_timeboxing
+        WHERE query_id = $1 AND concept_type = $2;
     `;
 
-    const result = await dbService.query(selectTimeboxSettings, [
+    const result = await dbService.query(timeboxSelectionQuery, [
       queryId,
       conceptType,
     ]);
 
-    return result;
+    return result.rows.map((v) => {
+      return {
+        startDate: v.timeWindowStart,
+        endDate: v.timeWindowEnd,
+      };
+    })[0];
   }
 }
 
-export const getTimeboxSetting = QueryTimeboxingService.getTimeboxSettings;
+export const getTimeboxRanges = QueryTimeboxingService.getTimeboxRanges;
 export const updateTimeboxSettings =
   QueryTimeboxingService.updateTimeboxSettings;

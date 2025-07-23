@@ -35,7 +35,10 @@ import DateRangePicker, {
   DateRangePickerRef,
 } from "@/app/ui/designSystem/timeboxing/DateRangePicker";
 import { DataContext } from "@/app/shared/DataProvider";
-import { updateTimeboxSettings } from "@/app/backend/query-timeboxing";
+import {
+  getTimeboxRanges,
+  updateTimeboxSettings,
+} from "@/app/backend/query-timeboxing";
 
 type ConceptTypeAccordionBodyProps = {
   activeValueSets: { [vsId: string]: FilterableValueSet };
@@ -51,6 +54,11 @@ type ConceptTypeAccordionBodyProps = {
 
 export type ConceptDisplay = Concept & {
   render: boolean;
+};
+
+type DateRange = {
+  startDate: null | Date;
+  endDate: null | Date;
 };
 
 /**
@@ -74,8 +82,33 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
   const [curValueSet, setCurValueSet] = useState<DibbsValueSet>();
   const [curConcepts, setCurConcepts] = useState<FilterableConcept[]>([]);
   const [drawerSearchFilter, setDrawerSearchFilter] = useState<string>("");
+  const [initialTimeboxRange, setInitialTimeboxRange] = useState<DateRange>({
+    startDate: null,
+    endDate: null,
+  });
+
   const areItemsFiltered = tableSearchFilter !== "";
   const focusRef = useRef<HTMLButtonElement>(null);
+  const dateRef = useRef<DateRangePickerRef>(null);
+  const queryContext = useContext(DataContext);
+
+  useEffect(() => {
+    async function fetchInitialTimeboxRange() {
+      const queryId = queryContext?.selectedQuery?.queryId;
+      if (queryId) {
+        const timeRange = await getTimeboxRanges(queryId, accordionConceptType);
+        if (timeRange) {
+          setInitialTimeboxRange({
+            startDate: new Date(timeRange.startDate),
+            endDate: new Date(timeRange.endDate),
+          });
+        }
+      }
+    }
+    fetchInitialTimeboxRange().then((r) => {
+      console.log(r);
+    });
+  }, [accordionConceptType]);
 
   useEffect(() => {
     if (curValueSet) {
@@ -249,10 +282,7 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
     0,
   );
 
-  const dateRef = useRef<DateRangePickerRef>(null);
-  const queryContext = useContext(DataContext);
-
-  const handleTimeboxApplication = async () => {
+  const handleTimeboxUpdate = async () => {
     const queryId = queryContext?.selectedQuery?.queryId;
     const conceptType = accordionConceptType;
 
@@ -314,9 +344,9 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
         <DateRangePicker
           ref={dateRef}
           id={`dateRangePicker-${accordionConceptType}`}
-          startDate={null}
-          endDate={null}
-          onChange={handleTimeboxApplication}
+          startDate={initialTimeboxRange.startDate}
+          endDate={initialTimeboxRange.endDate}
+          onChange={handleTimeboxUpdate}
           popoverSide="left"
           placeholderText="All dates"
         />

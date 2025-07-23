@@ -189,6 +189,16 @@ const DateRangePicker = forwardRef<DateRangePickerRef, DateRangePickerProps>(
     const containerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
+      if (initialStart) {
+        setCustomStart(initialStart);
+      }
+
+      if (initialEnd) {
+        setCustomEnd(initialEnd);
+      }
+    }, [initialStart, initialEnd]);
+
+    useEffect(() => {
       const handleClickOutside = (event: MouseEvent) => {
         if (
           containerRef.current &&
