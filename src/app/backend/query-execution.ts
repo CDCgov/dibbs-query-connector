@@ -305,7 +305,7 @@ class QueryService {
         },
       ],
     };
-
+    console.log("Patient match configuration", patientMatchConfiguration);
     // Apply optional match modifiers
     if (patientMatchConfiguration?.onlyCertainMatches) {
       parameters.parameter.push({

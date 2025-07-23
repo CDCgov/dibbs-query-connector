@@ -435,7 +435,7 @@ class FHIRClient {
       method: "POST",
       headers: {
         "Content-Type": "application/fhir+json",
-        ...this.init.headers,
+        ...(this.init.headers as Record<string, string>),
       },
       body: JSON.stringify(body),
     };
