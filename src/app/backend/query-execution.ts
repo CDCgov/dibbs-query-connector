@@ -294,6 +294,7 @@ class QueryService {
         | { name: "resource"; resource: Record<string, unknown> }
         | { name: "count"; valueInteger: number }
         | { name: "onlyCertainMatches"; valueBoolean: true }
+        | { name: "onlySingleMatch"; valueBoolean: true }
       >;
     } = {
       resourceType: "Parameters",
@@ -306,30 +307,27 @@ class QueryService {
     };
 
     // Apply optional match modifiers
-    if (patientMatchConfiguration?.onlyCertainMatches === true) {
+    if (patientMatchConfiguration?.onlyCertainMatches) {
       parameters.parameter.push({
         name: "onlyCertainMatches",
         valueBoolean: true,
       });
-
-      if (
-        patientMatchConfiguration.matchCount &&
-        patientMatchConfiguration.matchCount > 0
-      ) {
-        parameters.parameter.push({
-          name: "count",
-          valueInteger: patientMatchConfiguration.matchCount,
-        });
-      }
-    } else if (patientMatchConfiguration?.onlySingleMatch === true) {
       parameters.parameter.push({
         name: "count",
-        valueInteger: 1,
+        valueInteger: patientMatchConfiguration.matchCount,
       });
     }
 
-    const response = await fhirClient.postJson("/Patient/$match", parameters);
+    if (patientMatchConfiguration?.onlySingleMatch) {
+      parameters.parameter.push({
+        name: "onlySingleMatch",
+        valueBoolean: true,
+      });
+    }
 
+    console.log("Parameters", JSON.stringify(parameters, null, 2));
+    const response = await fhirClient.postJson("/Patient/$match", parameters);
+    console.log("Response from $match:", response);
     if (response.status !== 200) {
       console.error(
         `FHIR $match query failed. Status: ${

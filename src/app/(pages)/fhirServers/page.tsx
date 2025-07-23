@@ -657,7 +657,7 @@ const FhirServers: React.FC = () => {
                 id="match-type-single"
                 name="match-type"
                 value="single"
-                defaultChecked={patientMatchData?.onlySingleMatch}
+                checked={patientMatchData?.onlySingleMatch}
                 label="Only include single matches"
                 aria-label="Only include single matches"
                 onChange={() =>
@@ -673,7 +673,7 @@ const FhirServers: React.FC = () => {
                 id="match-type-multiple"
                 name="match-type"
                 value="multiple"
-                defaultChecked={patientMatchData?.onlyCertainMatches}
+                checked={patientMatchData?.onlyCertainMatches}
                 label="Only include certain matches"
                 aria-label="Only include certain matches"
                 onChange={() =>
@@ -688,9 +688,9 @@ const FhirServers: React.FC = () => {
                 id="match-type-all"
                 name="match-type"
                 value="all"
-                defaultChecked={
-                  !patientMatchData?.onlyCertainMatches === false &&
-                  !patientMatchData?.onlySingleMatch === false
+                checked={
+                  !patientMatchData?.onlyCertainMatches &&
+                  !patientMatchData?.onlySingleMatch
                 }
                 label="Include all matches"
                 aria-label="Include all matches"
