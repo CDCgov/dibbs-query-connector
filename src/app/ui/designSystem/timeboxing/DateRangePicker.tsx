@@ -192,6 +192,28 @@ const DateRangePicker = forwardRef<DateRangePickerRef, DateRangePickerProps>(
     const containerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
+      if (initialStart) {
+        setCustomStart(initialStart);
+      }
+
+      if (initialEnd) {
+        setCustomEnd(initialEnd);
+      }
+
+      presetOptions.forEach((p) => {
+        const { startDate, endDate } = p.getRange();
+        console.log("start", areDatesOnSameDay(startDate, initialStart));
+        console.log("end", areDatesOnSameDay(endDate, initialEnd));
+        if (
+          areDatesOnSameDay(startDate, initialStart) &&
+          areDatesOnSameDay(endDate, initialEnd)
+        ) {
+          setSelectedPreset(p.label);
+        }
+      });
+    }, [initialStart, initialEnd]);
+
+    useEffect(() => {
       const handleClickOutside = (event: MouseEvent) => {
         if (
           containerRef.current &&
@@ -329,6 +351,7 @@ const DateRangePicker = forwardRef<DateRangePickerRef, DateRangePickerProps>(
       setCustomStart(null);
       setCustomEnd(null);
       setSelectedPreset("");
+
       setDateErrors({});
     };
 
@@ -464,3 +487,12 @@ const DateRangePicker = forwardRef<DateRangePickerRef, DateRangePickerProps>(
 );
 
 export default DateRangePicker;
+
+function areDatesOnSameDay(date1: Date | null, date2: Date | null) {
+  if (date1 === null || date2 === null) return false;
+  return (
+    date1.getFullYear() === date2.getFullYear() &&
+    date1.getMonth() === date2.getMonth() &&
+    date1.getDate() === date2.getDate()
+  );
+}

@@ -1,5 +1,7 @@
 "use server";
 
+import { QueryTableTimebox } from "../(pages)/queryBuilding/utils";
+import { DibbsConceptType } from "../models/entities/valuesets";
 import { adminRequired } from "./db/decorators";
 import dbService from "./db/service";
 
@@ -57,14 +59,31 @@ class QueryTimeboxingService {
 
     return result.rows.map((v) => {
       return {
-        startDate: v.timeWindowStart,
-        endDate: v.timeWindowEnd,
+        timeWindowStart: v.timeWindowStart,
+        timeWindowEnd: v.timeWindowEnd,
       };
     })[0];
+  }
+
+  static async linkTimeboxRangesToQuery(queryId: string) {
+    const timeboxSql = `SELECT * FROM query_timeboxing WHERE query_id=$1;`;
+
+    const relatedTimeboxes = await dbService.query(timeboxSql, [queryId]);
+    const timeboxInfo: QueryTableTimebox = {};
+    relatedTimeboxes.rows.forEach((t) => {
+      timeboxInfo[t.conceptType as DibbsConceptType] = {
+        timeWindowStart: t.timeWindowStart,
+        timeWindowEnd: t.timeWindowEnd,
+      };
+    });
+
+    return timeboxInfo;
   }
 }
 
 export const getTimeboxRanges = QueryTimeboxingService.getTimeboxRanges;
+export const linkTimeboxRangesToQuery =
+  QueryTimeboxingService.linkTimeboxRangesToQuery;
 export const deleteTimeboxSettings =
   QueryTimeboxingService.deleteTimeboxSettings;
 export const updateTimeboxSettings =

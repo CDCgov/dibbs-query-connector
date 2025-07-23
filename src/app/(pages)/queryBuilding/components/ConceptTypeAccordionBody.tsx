@@ -58,8 +58,8 @@ export type ConceptDisplay = Concept & {
 };
 
 type DateRange = {
-  startDate: null | Date;
-  endDate: null | Date;
+  timeWindowStart: null | Date;
+  timeWindowEnd: null | Date;
 };
 
 /**
@@ -84,8 +84,8 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
   const [curConcepts, setCurConcepts] = useState<FilterableConcept[]>([]);
   const [drawerSearchFilter, setDrawerSearchFilter] = useState<string>("");
   const [initialTimeboxRange, setInitialTimeboxRange] = useState<DateRange>({
-    startDate: null,
-    endDate: null,
+    timeWindowStart: null,
+    timeWindowEnd: null,
   });
 
   const areItemsFiltered = tableSearchFilter !== "";
@@ -100,8 +100,8 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
         const timeRange = await getTimeboxRanges(queryId, accordionConceptType);
         if (timeRange) {
           setInitialTimeboxRange({
-            startDate: new Date(timeRange.startDate),
-            endDate: new Date(timeRange.endDate),
+            timeWindowStart: new Date(timeRange.timeWindowStart),
+            timeWindowEnd: new Date(timeRange.timeWindowEnd),
           });
         }
       }
@@ -354,8 +354,8 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
         <DateRangePicker
           ref={dateRef}
           id={`dateRangePicker-${accordionConceptType}`}
-          startDate={initialTimeboxRange.startDate}
-          endDate={initialTimeboxRange.endDate}
+          startDate={initialTimeboxRange.timeWindowStart}
+          endDate={initialTimeboxRange.timeWindowEnd}
           onChange={handleTimeboxUpdate}
           handleClear={handleTimeboxClear}
           popoverSide="left"
