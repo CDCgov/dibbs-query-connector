@@ -28,21 +28,14 @@ function fetchWithMutualTLS(
     const agent = new https.Agent({
       cert,
       key,
+      rejectUnauthorized: !disableCertValidation,
     });
 
-    if (disableCertValidation) {
-      return fetchWithoutSSL(url, {
-        ...options,
-        // @ts-ignore - Node.js fetch supports agent option
-        agent,
-      });
-    } else {
-      return fetch(url, {
-        ...options,
-        // @ts-ignore - Node.js fetch supports agent option
-        agent,
-      });
-    }
+    return fetch(url, {
+      ...options,
+      // @ts-ignore - Node.js fetch supports agent option
+      agent,
+    });
   };
 }
 
