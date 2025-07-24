@@ -1,4 +1,3 @@
-import dbService from "@/app/backend/db/service";
 import { suppressConsoleLogs } from "../integration/fixtures";
 import {
   insertFhirServer,

@@ -1,16 +1,12 @@
-import https, { get } from "https";
-import fs from "fs";
+import https from "https";
 import { FhirServerConfig } from "../models/entities/fhir-servers";
 import { createSmartJwt } from "../backend/smart-on-fhir";
-import { fetchWithoutSSL } from "./utils";
+import { fetchWithoutSSL } from "./server-utils";
 import dbService from "../backend/db/service";
 import { AuthData, updateFhirServer } from "../backend/fhir-servers";
 import { getOrCreateMtlsCert, getOrCreateMtlsKey } from "./mtls-utils";
 import fetch from "node-fetch";
 import { RequestInit, Response } from "node-fetch";
-import { url } from "inspector";
-import path from "path";
-import { json } from "stream/consumers";
 
 /**
  * Custom fetch function that supports mutual TLS

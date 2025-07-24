@@ -1,8 +1,7 @@
 import React from "react";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import SearchForm from "@/app/(pages)/query/components/searchForm/SearchForm";
-import { FhirServerConfig } from "@/app/models/entities/fhir-servers";
 
 // Mock the query execution functions
 jest.mock("@/app/backend/query-execution", () => ({
