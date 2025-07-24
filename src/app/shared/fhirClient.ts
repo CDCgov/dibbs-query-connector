@@ -368,13 +368,6 @@ class FHIRClient {
       this.serverConfig.accessToken = tokenData.access_token;
       this.serverConfig.tokenExpiry = expiryIso;
 
-      // Update headers for requests
-      if (!this.init.headers) {
-        this.init.headers = {};
-      }
-      (this.init.headers as Record<string, string>)["Authorization"] =
-        `Bearer ${tokenData.access_token}`;
-
       // Only update database for non-test clients
       if (this.serverConfig.id !== "test") {
         // Save token to database
@@ -398,6 +391,7 @@ class FHIRClient {
             scopes: this.serverConfig.scopes,
             accessToken: tokenData.access_token, // Pass the access token
             tokenExpiry: expiryIso, // Pass the token expiry
+            headers: this.serverConfig.headers,
           },
         );
       }

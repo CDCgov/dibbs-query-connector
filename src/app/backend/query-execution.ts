@@ -173,6 +173,9 @@ class QueryService {
     let fhirResponse: Response | Bundle;
 
     if (serverConfig?.mutualTls) {
+      console.log(
+        `Mutual TLS enabled for server ${fhirServer}. Using Task resource for patient discovery.`,
+      );
       // For mutual TLS enabled servers, send POST to /Task
       const taskBody = {
         resourceType: "Task",
@@ -236,8 +239,18 @@ class QueryService {
       };
 
       const taskResponse = await fhirClient.postJson("/Task", taskBody);
-      const createdTask = (await taskResponse.json()) as Task;
-      const parentTaskId = createdTask.id;
+      const createdTask = (await taskResponse.json()) as Bundle<Task>;
+      console.log(
+        `Task created for patient discovery: ${JSON.stringify(createdTask)}`,
+      );
+      const parentTaskId = createdTask.entry?.[0]?.resource?.id;
+      if (!parentTaskId) {
+        throw new Error("Failed to create parent Task for patient discovery.");
+      }
+
+      console.log(
+        `Created Task for patient discovery with ID: ${parentTaskId}`,
+      );
 
       // Poll parent task until all child tasks are complete
       let allTasksComplete: boolean | undefined = false;
@@ -247,7 +260,10 @@ class QueryService {
         entry: [],
       };
 
-      while (!allTasksComplete) {
+      let attempts = 0;
+      const maxAttempts = 12;
+      while (!allTasksComplete && attempts < maxAttempts) {
+        attempts++;
         // Wait for a short period before polling again
         await new Promise((resolve) => setTimeout(resolve, 5000));
         // Fetch the child tasks
@@ -256,6 +272,10 @@ class QueryService {
         );
         // Check each entry in the response
         tasksBundle = (await childTasksResponse.json()) as Bundle<Task>;
+        console.log(
+          `Fetched child tasks for parent Task ${parentTaskId}. Tasks Bundle:`,
+          tasksBundle,
+        );
         allTasksComplete = tasksBundle.entry?.every((entry) => {
           return (
             entry.resource?.status === "completed" ||
@@ -263,6 +283,12 @@ class QueryService {
           );
         });
       }
+
+      // Log the completed tasks for debugging
+      console.log(
+        `All tasks completed for parent Task ${parentTaskId}. Tasks Bundle:`,
+        tasksBundle,
+      );
 
       // For each completed task, fetch the results
       const patientResults = await Promise.all(
@@ -278,6 +304,8 @@ class QueryService {
               output.valueString?.includes("Patient-Page1"),
             )?.valueString;
 
+            console.log(`Patient link found in Task output: ${patientLink}`);
+
             if (patientLink) {
               // Extract the path from the link
               const url = new URL(patientLink);
@@ -289,6 +317,8 @@ class QueryService {
               if (patientResponse.status === 200) {
                 const patientBundle =
                   (await patientResponse.json()) as Bundle<Patient>;
+                console.log(`Patient bundle: ${JSON.stringify(patientBundle)}`);
+                // Return the patient bundle
                 return patientBundle;
               } else {
                 // Wait 5 seconds for the patient resource to be available
@@ -328,22 +358,24 @@ class QueryService {
         }) || [],
       );
 
+      console.log(
+        `Patient results from Task processing: ${JSON.stringify(
+          patientResults,
+        )}`,
+      );
+
       // Format the Patient resources into a FHIR Bundle
       const bundle: Bundle = {
         resourceType: "Bundle",
         type: "searchset",
         entry: patientResults
-          .filter((bundle): bundle is Bundle<Patient> => bundle !== null)
-          .flatMap((bundle) => bundle.entry || [])
-          .map(
-            (entry): BundleEntry<FhirResource> => ({
-              fullUrl: entry.fullUrl,
-              resource: entry.resource as FhirResource,
-              search: entry.search,
-              request: entry.request,
-              response: entry.response,
-            }),
-          ),
+          .filter((result): result is Bundle<Patient> => result !== null)
+          .map((patient) => {
+            return {
+              fullUrl: `urn:uuid:${patient.id}`,
+              resource: patient,
+            } as BundleEntry;
+          }),
       };
       // Log the bundle for debugging
       console.log("FHIR Bundle created from Task results:", bundle);
@@ -456,6 +488,8 @@ class QueryService {
   ): Promise<QueryResponse> {
     let resourceArray: FhirResource[] = [];
     const resourceIds = new Set<string>();
+    const responders = new Set<string>();
+    const isFanoutSearch = QueryService.isBundle(response);
 
     // Process the responses and flatten them
     if (Array.isArray(response)) {
@@ -463,7 +497,7 @@ class QueryService {
         await Promise.all(response.map(processFhirResponse))
       ).flat();
       // if response is a Bundle, extract the resource
-    } else if (QueryService.isBundle(response)) {
+    } else if (isFanoutSearch) {
       console.log("Processing FHIR Bundle response");
 
       const resources =
@@ -482,7 +516,7 @@ class QueryService {
         [];
       // Add resources to the resourceArray
       console.log(`Found ${resources.length} resources in Bundle response`);
-      console.log(`Resources: `, resources);
+      console.log(`Resources: `, JSON.stringify(resources, null, 2));
       resourceArray = resources;
     } else {
       resourceArray = await processFhirResponse(response);
@@ -501,9 +535,22 @@ class QueryService {
       if (resource.id && !resourceIds.has(resource.id)) {
         (runningQueryResponse[resourceType] as FhirResource[]).push(resource);
         resourceIds.add(resource.id);
+      } else if (resource.id && isFanoutSearch) {
+        // If this is a fanout search, we might have multiple resources with the same ID
+        // In this case, we still want to add the resource to the response if it comes from a different server
+        const targetResponderFullUrl = (resource as Patient).identifier?.find(
+          (identifier) => identifier.system?.includes("targetResponderFullUrl"),
+        )?.value;
+        console.log(
+          `Processing resource with ID ${resource.id} and targetResponderFullUrl ${targetResponderFullUrl}`,
+        );
+        // If the targetResponderFullUrl is defined and not already in the responders set, add
+        if (targetResponderFullUrl && !responders.has(targetResponderFullUrl)) {
+          (runningQueryResponse[resourceType] as FhirResource[]).push(resource);
+          responders.add(targetResponderFullUrl);
+        }
       }
     }
-
     return runningQueryResponse;
   }
 
