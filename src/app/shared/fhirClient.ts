@@ -364,10 +364,10 @@ class FHIRClient {
           this.serverConfig.id,
           this.serverConfig.name,
           this.serverConfig.hostname,
-          this.serverConfig.disableCertValidation,
-          this.serverConfig.mutualTls,
-          this.serverConfig.defaultServer,
-          this.serverConfig.lastConnectionSuccessful,
+          this.serverConfig.disableCertValidation ?? false,
+          this.serverConfig.mutualTls ?? false,
+          this.serverConfig.defaultServer ?? false,
+          this.serverConfig.lastConnectionSuccessful ?? true,
           {
             authType: this.serverConfig.authType as
               | "SMART"
@@ -436,7 +436,7 @@ class FHIRClient {
         );
       }
 
-      const config = await response.json();
+      const config = (await response.json()) as { token_endpoint?: string };
       if (!config.token_endpoint) {
         throw new Error("Token endpoint not found in SMART configuration");
       }
@@ -502,7 +502,7 @@ class FHIRClient {
    * @param body - The JSON request body.
    * @returns The response from the server.
    */
-  async postJson(path: string, body: any): Promise<Response> {
+  async postJson(path: string, body: unknown): Promise<Response> {
     await this.ensureValidToken();
 
     const requestOptions: RequestInit = {
@@ -573,7 +573,15 @@ class FHIRClient {
       });
       if (!response.ok) return false;
 
-      const json = await response.json();
+      const json = (await response.json()) as {
+        rest?: Array<{
+          resource?: Array<{
+            type: string;
+            operation?: Array<{ name?: string }>;
+          }>;
+          operation?: Array<{ name?: string }>;
+        }>;
+      };
 
       const rest = json?.rest?.[0];
       // Check if the server supports $match operation in Patient resource

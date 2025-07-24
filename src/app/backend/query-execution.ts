@@ -471,10 +471,14 @@ class QueryService {
   /**
    * Type guard to check if an object is a FHIR Bundle
    * @param obj - The object to check
-   * @return - True if the object is a Bundle, false otherwise
+   * @returns True if the object is a Bundle, false otherwise
    */
-  static isBundle(obj: any): obj is Bundle {
-    return obj && typeof obj === "object" && obj.resourceType === "Bundle";
+  static isBundle(obj: unknown): obj is Bundle {
+    return (
+      obj !== null &&
+      typeof obj === "object" &&
+      (obj as { resourceType?: string }).resourceType === "Bundle"
+    );
   }
 
   /**
