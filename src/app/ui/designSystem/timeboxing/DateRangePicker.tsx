@@ -192,6 +192,8 @@ const DateRangePicker = forwardRef<DateRangePickerRef, DateRangePickerProps>(
     const containerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
+      if (initialStart === null || initialEnd === null) return;
+
       if (initialStart) {
         setCustomStart(initialStart);
       }
@@ -200,17 +202,22 @@ const DateRangePicker = forwardRef<DateRangePickerRef, DateRangePickerProps>(
         setCustomEnd(initialEnd);
       }
 
+      let somePresetValue = false;
       presetOptions.forEach((p) => {
         const { startDate, endDate } = p.getRange();
-        console.log("start", areDatesOnSameDay(startDate, initialStart));
-        console.log("end", areDatesOnSameDay(endDate, initialEnd));
+
         if (
           areDatesOnSameDay(startDate, initialStart) &&
           areDatesOnSameDay(endDate, initialEnd)
         ) {
-          setSelectedPreset(p.label);
+          somePresetValue = true;
+          setSelectedPreset(p.value);
         }
       });
+
+      if (!somePresetValue) {
+        setSelectedPreset(CUSTOM_VALUE);
+      }
     }, [initialStart, initialEnd]);
 
     useEffect(() => {
