@@ -319,7 +319,7 @@ const FhirServers: React.FC = () => {
       onlySingleMatch: false,
       onlyCertainMatches:
         fhirVersion && fhirVersion.startsWith("6") ? false : true,
-      matchCount: prev?.matchCount ?? 1,
+      matchCount: prev?.matchCount ?? 0,
       supportsMatch: supportsMatch ?? false,
     }));
   };
@@ -352,7 +352,7 @@ const FhirServers: React.FC = () => {
       enabled: prev?.enabled ?? false,
       onlySingleMatch: prev?.onlySingleMatch ?? false,
       onlyCertainMatches: prev?.onlyCertainMatches ?? false,
-      matchCount: prev?.matchCount ?? 1,
+      matchCount: prev?.matchCount ?? 0,
       supportsMatch: supportsMatch.supportsMatch,
     }));
 
@@ -722,9 +722,9 @@ const FhirServers: React.FC = () => {
               }
               data-testid="match-count"
               name="match-count"
-              aria-label="Number of maximum patient matches to return"
+              aria-label="Number of maximum patient matches to return. If 0, the server decides how many matches to return."
               type="number"
-              min="1"
+              min="0"
               max="200"
               value={patientMatchData?.matchCount}
               onChange={(e) =>

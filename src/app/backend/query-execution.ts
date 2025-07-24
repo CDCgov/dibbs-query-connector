@@ -201,7 +201,8 @@ class QueryService {
       patientMatchConfiguration,
     } = request;
 
-    const fhirClient = await prepareFhirClient(fhirServer, true);
+    const fhirClient = await prepareFhirClient(fhirServer);
+    await fhirClient.getAccessToken();
     const telecom: { system: string; value: string }[] = [];
 
     if (phone) {
@@ -311,10 +312,12 @@ class QueryService {
         name: "onlyCertainMatches",
         valueBoolean: true,
       });
-      parameters.parameter.push({
-        name: "count",
-        valueInteger: patientMatchConfiguration.matchCount,
-      });
+      if (patientMatchConfiguration?.matchCount > 0) {
+        parameters.parameter.push({
+          name: "count",
+          valueInteger: patientMatchConfiguration.matchCount,
+        });
+      }
     }
 
     if (patientMatchConfiguration?.onlySingleMatch) {
