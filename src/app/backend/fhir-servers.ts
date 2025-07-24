@@ -375,12 +375,14 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
     }
   }
 
-  static async prepareFhirClient(serverName: string) {
-    if (FhirServerConfigService.cachedFhirServerConfigs === null) {
+  static async prepareFhirClient(serverName: string, forceRefresh = false) {
+    if (
+      forceRefresh ||
+      FhirServerConfigService.cachedFhirServerConfigs === null
+    ) {
       FhirServerConfigService.cachedFhirServerConfigs =
         await super.getFhirServerConfigs();
     }
-
     let config = FhirServerConfigService.cachedFhirServerConfigs.find(
       (c) => c.name === serverName,
     );

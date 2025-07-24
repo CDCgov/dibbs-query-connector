@@ -57,7 +57,7 @@ function resolveFullName(
   fallback?: string,
 ): string {
   const full = `${first ?? ""} ${last ?? ""}`.trim();
-  return full !== "" ? full : (fallback ?? "");
+  return full !== "" ? full : fallback ?? "";
 }
 
 /**
@@ -87,6 +87,21 @@ export const auditLogActionTypeMap: Record<string, auditLogActionTypeMapping> =
           log.author as string,
         );
         return `Ran patient discovery query for ${fullName}`;
+      },
+    },
+    makePatientMatchRequest: {
+      label: "Patient $match query",
+      format: (log) => {
+        const request = parseRequest(log) as {
+          firstName: string;
+          lastName: string;
+        };
+        const fullName = resolveFullName(
+          request.firstName,
+          request.lastName,
+          log.author as string,
+        );
+        return `Ran patient $match query for ${fullName}`;
       },
     },
     deleteFhirServer: {

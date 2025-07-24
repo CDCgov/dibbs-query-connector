@@ -201,8 +201,7 @@ class QueryService {
       patientMatchConfiguration,
     } = request;
 
-    const fhirClient = await prepareFhirClient(fhirServer);
-
+    const fhirClient = await prepareFhirClient(fhirServer, true);
     const telecom: { system: string; value: string }[] = [];
 
     if (phone) {
@@ -327,7 +326,8 @@ class QueryService {
 
     console.log("Parameters", JSON.stringify(parameters, null, 2));
     const response = await fhirClient.postJson("/Patient/$match", parameters);
-    console.log("Response from $match:", response);
+    const jsonBody = await response.clone().json();
+    console.log("Response from $match:", JSON.stringify(jsonBody, null, 2));
     if (response.status !== 200) {
       console.error(
         `FHIR $match query failed. Status: ${
