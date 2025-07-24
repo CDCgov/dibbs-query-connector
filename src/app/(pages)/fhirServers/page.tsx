@@ -76,6 +76,7 @@ const FhirServers: React.FC = () => {
     matchCount: 1,
     supportsMatch: false,
   } as PatientMatchData;
+  const [fhirVersion, setFhirVersion] = useState<string | null>(null);
   const [defaultServer, setDefaultServer] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState<
     "idle" | "success" | "error"
@@ -306,17 +307,20 @@ const FhirServers: React.FC = () => {
     disableCertValidation: boolean,
     authData: AuthData,
   ) => {
-    const supportsMatch = await checkFhirServerSupportsMatch(
+    const { supportsMatch, fhirVersion } = await checkFhirServerSupportsMatch(
       hostname,
       disableCertValidation,
       authData,
     );
+
+    setFhirVersion(fhirVersion);
     setPatientMatchData((prev) => ({
       enabled: prev?.enabled ?? false,
-      onlySingleMatch: prev?.onlySingleMatch ?? false,
-      onlyCertainMatches: prev?.onlyCertainMatches ?? false,
+      onlySingleMatch: false,
+      onlyCertainMatches:
+        fhirVersion && fhirVersion.startsWith("6") ? false : true,
       matchCount: prev?.matchCount ?? 1,
-      supportsMatch,
+      supportsMatch: supportsMatch ?? false,
     }));
   };
 
@@ -349,7 +353,7 @@ const FhirServers: React.FC = () => {
       onlySingleMatch: prev?.onlySingleMatch ?? false,
       onlyCertainMatches: prev?.onlyCertainMatches ?? false,
       matchCount: prev?.matchCount ?? 1,
-      supportsMatch,
+      supportsMatch: supportsMatch.supportsMatch,
     }));
 
     if (updateResult.server) {
@@ -631,7 +635,7 @@ const FhirServers: React.FC = () => {
 
   const renderPatientMatchFields = () =>
     patientMatchData?.supportsMatch && (
-      <div className="margin-top-4 border-top padding-top-1">
+      <div className="margin-top-1 padding-top-1">
         <h2 className="font-heading-lg margin-bottom-2">
           Patient $match settings
         </h2>
@@ -650,59 +654,61 @@ const FhirServers: React.FC = () => {
             }))
           }
         />
-        {patientMatchData?.enabled && (
+        {
           <>
-            <Fieldset>
-              <Radio
-                id="match-type-single"
-                name="match-type"
-                value="single"
-                checked={patientMatchData?.onlySingleMatch}
-                label="Only include single matches"
-                aria-label="Only include single matches"
-                onChange={() =>
-                  setPatientMatchData((prev) => ({
-                    ...prev!,
-                    onlyCertainMatches: false,
-                    onlySingleMatch: true,
-                    matchCount: 1,
-                  }))
-                }
-              />
-              <Radio
-                id="match-type-multiple"
-                name="match-type"
-                value="multiple"
-                checked={patientMatchData?.onlyCertainMatches}
-                label="Only include certain matches"
-                aria-label="Only include certain matches"
-                onChange={() =>
-                  setPatientMatchData((prev) => ({
-                    ...prev!,
-                    onlySingleMatch: false,
-                    onlyCertainMatches: true,
-                  }))
-                }
-              />
-              <Radio
-                id="match-type-all"
-                name="match-type"
-                value="all"
-                checked={
-                  !patientMatchData?.onlyCertainMatches &&
-                  !patientMatchData?.onlySingleMatch
-                }
-                label="Include all matches"
-                aria-label="Include all matches"
-                onChange={() =>
-                  setPatientMatchData((prev) => ({
-                    ...prev!,
-                    onlyCertainMatches: false,
-                    onlySingleMatch: false,
-                  }))
-                }
-              />
-            </Fieldset>
+            {fhirVersion?.startsWith("6") && (
+              <Fieldset>
+                <Radio
+                  id="match-type-single"
+                  name="match-type"
+                  value="single"
+                  checked={patientMatchData?.onlySingleMatch}
+                  label="Only include single matches"
+                  aria-label="Only include single matches"
+                  onChange={() =>
+                    setPatientMatchData((prev) => ({
+                      ...prev!,
+                      onlyCertainMatches: false,
+                      onlySingleMatch: true,
+                      matchCount: 1,
+                    }))
+                  }
+                />
+                <Radio
+                  id="match-type-multiple"
+                  name="match-type"
+                  value="multiple"
+                  checked={patientMatchData?.onlyCertainMatches}
+                  label="Only include certain matches"
+                  aria-label="Only include certain matches"
+                  onChange={() =>
+                    setPatientMatchData((prev) => ({
+                      ...prev!,
+                      onlySingleMatch: false,
+                      onlyCertainMatches: true,
+                    }))
+                  }
+                />
+                <Radio
+                  id="match-type-all"
+                  name="match-type"
+                  value="all"
+                  checked={
+                    !patientMatchData?.onlyCertainMatches &&
+                    !patientMatchData?.onlySingleMatch
+                  }
+                  label="Include all matches"
+                  aria-label="Include all matches"
+                  onChange={() =>
+                    setPatientMatchData((prev) => ({
+                      ...prev!,
+                      onlyCertainMatches: false,
+                      onlySingleMatch: false,
+                    }))
+                  }
+                />
+              </Fieldset>
+            )}
 
             <Label htmlFor="match-count">
               Number of maximum patient matches to return
@@ -710,6 +716,7 @@ const FhirServers: React.FC = () => {
             <TextInput
               id="match-count"
               disabled={
+                !patientMatchData?.enabled ||
                 patientMatchData?.onlySingleMatch ||
                 !patientMatchData?.onlyCertainMatches
               }
@@ -728,7 +735,7 @@ const FhirServers: React.FC = () => {
               }
             />
           </>
-        )}
+        }
       </div>
     );
 

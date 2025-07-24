@@ -473,7 +473,7 @@ class FHIRClient {
     url: string,
     disableCertValidation: boolean = false,
     authData?: AuthData,
-  ): Promise<boolean> {
+  ): Promise<{ supportsMatch: boolean; fhirVersion: string | null }> {
     try {
       const testConfig: FhirServerConfig = {
         id: "test",
@@ -515,9 +515,13 @@ class FHIRClient {
           ...(authData?.headers || {}),
         },
       });
-      if (!response.ok) return false;
+      if (!response.ok) {
+        return { supportsMatch: false, fhirVersion: null };
+      }
 
       const json = await response.json();
+      const fhirVersion =
+        typeof json?.fhirVersion === "string" ? json.fhirVersion : null;
 
       const rest = json?.rest?.[0];
       // Check if the server supports $match operation in Patient resource
@@ -535,10 +539,13 @@ class FHIRClient {
         Array.isArray(rest?.operation) &&
         rest.operation.some((op: { name?: string }) => op.name === "match");
 
-      return supportsMatchInResources || supportsMatchGlobally;
+      return {
+        supportsMatch: supportsMatchInResources || supportsMatchGlobally,
+        fhirVersion,
+      };
     } catch (err) {
       console.warn("Failed $match support check:", err);
-      return false;
+      return { supportsMatch: false, fhirVersion: null };
     }
   }
 }
