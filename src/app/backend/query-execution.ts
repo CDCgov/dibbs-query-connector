@@ -334,19 +334,14 @@ class QueryService {
       }[];
     } = await response.clone().json();
 
-    if (
+    const noCertainMatch =
       jsonBody.resourceType === "OperationOutcome" &&
       jsonBody.issue?.some((i) =>
         i.details?.text?.includes("did not find a certain match"),
-      )
-    ) {
-      console.warn(
-        "FHIR $match query returned uncertain match. This may indicate multiple potential matches.",
       );
-      return new Response(JSON.stringify({ uncertainMatchError: true }), {
-        status: 200,
-        headers: { "Content-Type": "application/json" },
-      });
+
+    if (noCertainMatch) {
+      console.warn("Match failed due to uncertain results.");
     }
 
     if (response.status !== 200) {
@@ -404,20 +399,12 @@ class QueryService {
    */
   static async patientDiscoveryQuery(
     request: PatientDiscoveryRequest,
-  ): Promise<QueryResponse["Patient"] | { uncertainMatchError: true }> {
+  ): Promise<QueryResponse["Patient"]> {
     const matchConfig = request.patientMatchConfiguration;
     console.log("Patient request configuration", request);
     const fhirResponse = matchConfig?.enabled
       ? await QueryService.makePatientMatchRequest(request)
       : await QueryService.makePatientDiscoveryRequest(request);
-
-    const contentType = fhirResponse.headers.get("content-type");
-    if (contentType?.includes("application/json") && fhirResponse.ok) {
-      const body = await fhirResponse.clone().json();
-      if (body?.uncertainMatchError === true) {
-        return { uncertainMatchError: true };
-      }
-    }
 
     const newResponse = await QueryService.parseFhirSearch(fhirResponse);
     return newResponse["Patient"] as Patient[];
@@ -427,7 +414,8 @@ class QueryService {
     queryRequest: FullPatientRequest,
   ): Promise<QueryResponse> {
     const patient = await patientDiscoveryQuery(queryRequest);
-    if (patient === undefined || patient.length === 0) {
+
+    if (!Array.isArray(patient) || patient.length === 0) {
       throw Error("Patient not found in full patient discovery");
     }
 

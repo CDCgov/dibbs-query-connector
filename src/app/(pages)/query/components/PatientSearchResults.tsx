@@ -42,7 +42,6 @@ const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({
   loading,
   uncertainMatchError,
 }) => {
-  console.log("uncertainMatchError?", uncertainMatchError);
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);

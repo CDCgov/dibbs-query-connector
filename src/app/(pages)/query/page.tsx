@@ -97,7 +97,11 @@ const Query: React.FC = () => {
         {/* Step 2 */}
         {mode === "patient-results" && (
           <PatientSearchResults
-            patients={patientDiscoveryQueryResponse ?? []}
+            patients={
+              Array.isArray(patientDiscoveryQueryResponse)
+                ? patientDiscoveryQueryResponse
+                : []
+            }
             goBack={() => {
               setMode("search");
             }}

@@ -205,7 +205,6 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
       console.error("FHIR server is required.");
       return;
     }
-
     setLoading(true);
 
     const patientDiscoveryRequest = getPatientDiscoveryRequest();
@@ -216,10 +215,11 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
 
       // Check if backend returned uncertain match flag
       const isUncertainMatch =
-        queryResponse &&
-        !Array.isArray(queryResponse) &&
+        typeof queryResponse === "object" &&
+        queryResponse !== null &&
         "uncertainMatchError" in queryResponse &&
-        queryResponse?.uncertainMatchError === true;
+        (queryResponse as { uncertainMatchError?: boolean })
+          .uncertainMatchError === true;
 
       if (isUncertainMatch) {
         setPatientDiscoveryQueryResponse([]);
