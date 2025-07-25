@@ -142,48 +142,48 @@ const HeaderComponent: React.FC<HeaderProps> = ({ session }) => {
             )}
           </div>
         </div>
+        {showMenu && (
+          <div ref={menuRef} className={styles.menuDropdownContainer}>
+            <ul
+              id="dropdown-menu"
+              data-testid="dropdown-menu"
+              className={classNames("usa-nav__submenu", styles.menuDropdown)}
+            >
+              {menuPages.map((page) => (
+                <li key={page.path} className={styles.menuItem}>
+                  <button
+                    type="button"
+                    className={classNames(
+                      styles.menuItem__button,
+                      "usa-button--unstyled",
+                    )}
+                    onClick={() => {
+                      if (pathname === page.path) {
+                        location.reload();
+                      } else {
+                        router.push(page.path);
+                      }
+                      setShowMenu(false);
+                    }}
+                  >
+                    {page.name}
+                  </button>
+                </li>
+              ))}
+              {!isAuthDisabled && (
+                <li className={styles.menuItem}>
+                  <button
+                    className={classNames(styles.menuItem__button)}
+                    onClick={async () => await handleSignOut()}
+                  >
+                    Sign out
+                  </button>
+                </li>
+              )}
+            </ul>
+          </div>
+        )}
       </div>
-      {showMenu && (
-        <div ref={menuRef} className={styles.menuDropdownContainer}>
-          <ul
-            id="dropdown-menu"
-            data-testid="dropdown-menu"
-            className={classNames("usa-nav__submenu", styles.menuDropdown)}
-          >
-            {menuPages.map((page) => (
-              <li key={page.path} className={styles.menuItem}>
-                <button
-                  type="button"
-                  className={classNames(
-                    styles.menuItem__button,
-                    "usa-button--unstyled",
-                  )}
-                  onClick={() => {
-                    if (pathname === page.path) {
-                      location.reload();
-                    } else {
-                      router.push(page.path);
-                    }
-                    setShowMenu(false);
-                  }}
-                >
-                  {page.name}
-                </button>
-              </li>
-            ))}
-            {!isAuthDisabled && (
-              <li className={styles.menuItem}>
-                <button
-                  className={classNames(styles.menuItem__button)}
-                  onClick={async () => await handleSignOut()}
-                >
-                  Sign out
-                </button>
-              </li>
-            )}
-          </ul>
-        </div>
-      )}
     </header>
   );
 };

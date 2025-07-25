@@ -37,6 +37,7 @@ import { adminRequired, transaction } from "@/app/backend/db/decorators";
 import { auditable } from "@/app/backend/audit-logs/decorator";
 import dbService from "../backend/db/service";
 import { QCResponse } from "../models/responses/collections";
+import { linkTimeboxRangesToQuery } from "../backend/query-timeboxing";
 
 type ErsdOrVsacResponse = Bundle | Parameters | OperationOutcome;
 
@@ -80,7 +81,13 @@ class DatabaseService {
         console.error("No results found for query named:", name);
         return undefined;
       }
-      return result.rows[0] as unknown as QueryTableResult;
+
+      const foundQuery = result.rows[0];
+      const timeboxInfo = await linkTimeboxRangesToQuery(foundQuery.id);
+      // followup to get timeboxing information
+
+      foundQuery.timeboxWindows = timeboxInfo;
+      return foundQuery as unknown as QueryTableResult;
     } catch (error) {
       console.error("Error retrieving query:", error);
       throw error;
