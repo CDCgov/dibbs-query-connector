@@ -327,14 +327,35 @@ class QueryService {
     }
 
     const response = await fhirClient.postJson("/Patient/$match", parameters);
-    const jsonBody = await response.clone().json();
+    const jsonBody: {
+      resourceType: "OperationOutcome";
+      issue?: {
+        details?: { text?: string };
+      }[];
+    } = await response.clone().json();
+
+    if (
+      jsonBody.resourceType === "OperationOutcome" &&
+      jsonBody.issue?.some((i) =>
+        i.details?.text?.includes("did not find a certain match"),
+      )
+    ) {
+      console.warn(
+        "FHIR $match query returned uncertain match. This may indicate multiple potential matches.",
+      );
+      return new Response(JSON.stringify({ uncertainMatchError: true }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
     if (response.status !== 200) {
       console.error(
-        `FHIR $match query failed. Status: ${
-          response.status
-        } \n Body: ${await response.text()} \n Headers: ${JSON.stringify(
-          Object.fromEntries(response.headers.entries()),
-        )}`,
+        `FHIR $match query failed. Status: ${response.status}
+      \n Body: ${await response.text()}
+      \n Headers: ${JSON.stringify(
+        Object.fromEntries(response.headers.entries()),
+      )}`,
       );
     }
 
@@ -383,12 +404,20 @@ class QueryService {
    */
   static async patientDiscoveryQuery(
     request: PatientDiscoveryRequest,
-  ): Promise<QueryResponse["Patient"]> {
+  ): Promise<QueryResponse["Patient"] | { uncertainMatchError: true }> {
     const matchConfig = request.patientMatchConfiguration;
     console.log("Patient request configuration", request);
     const fhirResponse = matchConfig?.enabled
       ? await QueryService.makePatientMatchRequest(request)
       : await QueryService.makePatientDiscoveryRequest(request);
+
+    const contentType = fhirResponse.headers.get("content-type");
+    if (contentType?.includes("application/json") && fhirResponse.ok) {
+      const body = await fhirResponse.clone().json();
+      if (body?.uncertainMatchError === true) {
+        return { uncertainMatchError: true };
+      }
+    }
 
     const newResponse = await QueryService.parseFhirSearch(fhirResponse);
     return newResponse["Patient"] as Patient[];

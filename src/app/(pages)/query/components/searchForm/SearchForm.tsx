@@ -39,6 +39,7 @@ interface SearchFormProps {
   fhirServers: string[];
   selectedFhirServer: string;
   setFhirServer: React.Dispatch<React.SetStateAction<string>>;
+  setUncertainMatchError: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const SearchForm: React.FC<SearchFormProps> = function SearchForm({
@@ -48,6 +49,7 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
   fhirServers,
   selectedFhirServer: fhirServer,
   setFhirServer,
+  setUncertainMatchError,
 }) {
   //Set the patient options based on the demoOption
   const [firstName, setFirstName] = useState<string>("");
@@ -67,7 +69,6 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
   const [fhirServerConfig, setFhirServerConfig] =
     useState<FhirServerConfig | null>(null);
   const [patientMatchEnabled, setPatientMatchEnabled] = useState<boolean>();
-
   const [showAdvanced, setShowAdvanced] = useState(false);
   const params = useSearchParams();
 
@@ -204,13 +205,41 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
       console.error("FHIR server is required.");
       return;
     }
+
     setLoading(true);
-    setMode("patient-results");
 
     const patientDiscoveryRequest = getPatientDiscoveryRequest();
-    const queryResponse = await patientDiscoveryQuery(patientDiscoveryRequest);
-    setPatientDiscoveryQueryResponse(queryResponse);
-    setLoading(false);
+    try {
+      const queryResponse = await patientDiscoveryQuery(
+        patientDiscoveryRequest,
+      );
+
+      // Check if backend returned uncertain match flag
+      const isUncertainMatch =
+        queryResponse &&
+        !Array.isArray(queryResponse) &&
+        "uncertainMatchError" in queryResponse &&
+        queryResponse?.uncertainMatchError === true;
+
+      if (isUncertainMatch) {
+        setPatientDiscoveryQueryResponse([]);
+        setUncertainMatchError(true);
+        setMode("patient-results");
+        setLoading(false);
+        return;
+      }
+
+      setPatientDiscoveryQueryResponse(queryResponse);
+      setUncertainMatchError(false);
+      setMode("patient-results");
+    } catch (err) {
+      console.error("Unknown failure during patient discovery", err);
+      setPatientDiscoveryQueryResponse([]);
+      setUncertainMatchError(false);
+      setMode("patient-results");
+    } finally {
+      setLoading(false);
+    }
   }
 
   useEffect(() => {
