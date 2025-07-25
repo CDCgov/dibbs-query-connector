@@ -74,6 +74,7 @@ describe("user management tests", () => {
       email: TEST_USER.user.id,
       firstName: TEST_USER.user.id,
       lastName: TEST_USER.user.id,
+      qcRole: UserRole.STANDARD,
     };
     const actionTypeToCheck = "addUserIfNotExists";
     const { user } = await addUserIfNotExists(randomUserToken);
@@ -135,6 +136,7 @@ describe("user management tests", () => {
       email: TEST_USER.user.id,
       firstName: TEST_USER.user.id,
       lastName: TEST_USER.user.id,
+      qcRole: UserRole.STANDARD,
     };
 
     const { user } = await addUserIfNotExists(randomUserToken);

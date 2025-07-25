@@ -28,9 +28,11 @@ import { Concept } from "@/app/models/entities/concepts";
 import ValueSetBulkToggle from "./ValueSetBulkToggle";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import classNames from "classnames";
+import DateRangePicker from "@/app/ui/designSystem/timeboxing/DateRangePicker";
 
 type ConceptTypeAccordionBodyProps = {
   activeValueSets: { [vsId: string]: FilterableValueSet };
+  accordionConceptType: DibbsConceptType;
   handleVsNameLevelUpdate: (
     activeType: DibbsConceptType,
   ) => (dibbsValueSets: FilterableValueSet) => void;
@@ -47,15 +49,16 @@ export type ConceptDisplay = Concept & {
 /**
  * An accordion body fragment
  * @param param0 - params
+ * @param param0.accordionConceptType - name of the concept type associated with the accordion
  * @param param0.activeValueSets - Valuesets for display in this accordion
  * @param param0.handleVsNameLevelUpdate - curried state update function that
  * @param param0.handleVsIdLevelUpdate - curried state update function that
- * takes a valueset ID and generates a ValueSet level update
  * @param param0.tableSearchFilter - the search string from the selection table
  * @returns An accordion body component
  */
 const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
   activeValueSets,
+  accordionConceptType,
   handleVsIdLevelUpdate,
   handleVsNameLevelUpdate,
   tableSearchFilter = "",
@@ -239,6 +242,14 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
     0,
   );
 
+  const handleTimeboxApplication = (dates: {
+    startDate: Date | null;
+    endDate: Date | null;
+  }) => {
+    console.log(dates.startDate);
+    console.log(dates.endDate);
+  };
+
   const buttons = [
     {
       trigger: totalCount > selectedCount,
@@ -255,24 +266,38 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
   ];
   return (
     <>
-      <div className={styles.bulkActionButtons}>
-        {buttons
-          .filter((btn) => !!btn.trigger)
-          .map((button, idx) => {
-            return (
-              <Button
-                key={idx}
-                ref={idx == 0 ? focusRef : null}
-                className={classNames(styles.selectAll, "usa-button--unstyled")}
-                type="button"
-                onClick={(e) =>
-                  handleConceptTypeBulkToggle(e, button.includeAll)
-                }
-              >
-                {button.text}
-              </Button>
-            );
-          })}
+      <div className={styles.accordionBulkAction}>
+        <div className={styles.bulkActionButtons}>
+          {buttons
+            .filter((btn) => !!btn.trigger)
+            .map((button, idx) => {
+              return (
+                <Button
+                  key={idx}
+                  ref={idx == 0 ? focusRef : null}
+                  className={classNames(
+                    styles.selectAll,
+                    "usa-button--unstyled",
+                  )}
+                  type="button"
+                  onClick={(e) =>
+                    handleConceptTypeBulkToggle(e, button.includeAll)
+                  }
+                >
+                  {button.text}
+                </Button>
+              );
+            })}
+        </div>
+
+        <DateRangePicker
+          id={`dateRangePicker-${accordionConceptType}`}
+          startDate={null}
+          endDate={null}
+          onChange={handleTimeboxApplication}
+          popoverSide="left"
+          placeholderText="All dates"
+        />
       </div>
       <div className={styles.accordionContainer}>
         {Object.values(activeValueSets).map((dibbsVs) => {

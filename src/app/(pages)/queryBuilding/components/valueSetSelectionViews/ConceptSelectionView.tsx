@@ -86,6 +86,7 @@ export const ConceptSelectionView: React.FC<ConceptSelectionViewProps> = ({
 
         const content = (
           <ConceptTypeAccordionBody
+            accordionConceptType={vsType}
             activeValueSets={valueSetsInType}
             handleVsNameLevelUpdate={handleVsNameLevelUpdate}
             handleVsIdLevelUpdate={handleVsNameLevelUpdate}

@@ -20,22 +20,39 @@
 .textInputContainer {
   position: relative;
   display: inline-block;
+
+  :hover {
+    cursor: pointer;
+  }
+
+  input {
+    border-radius: 0.25rem;
+    border: 1px solid $border-dark;
+  }
 }
 
 .calendarIcon {
   position: absolute;
-  right: 0.625rem;
+  left: 0.625rem;
   top: 55%;
   transform: translateY(-50%);
   pointer-events: none;
   align-items: center;
   justify-content: center;
+  color: $accent-primary;
+}
+
+.dateRangeInput {
+  padding-left: 2.5rem;
+}
+
+.dateRangeInput::placeholder {
+  color: black;
 }
 
 .datePickerContainer {
   position: relative;
   display: inline-block;
-  width: 100%;
 }
 
 .customDateRangeWrapper :global(.usa-form-group) {
@@ -56,7 +73,7 @@
   border-radius: 0.25rem;
   box-shadow: 0 4px 6px $drop-shadow;
   padding: 0.5rem;
-  // width: max-content; // without this, the calendar looks somewhat squished
+  width: max-content; // without this, the calendar looks somewhat squished
   margin-top: 0.5rem;
 }
 
@@ -76,11 +93,9 @@
   padding: 0;
 }
 
-
 .filterPopover {
   position: absolute;
   top: 100%;
-  left: 0;
   z-index: 10;
   background: white;
   border: 1px solid $border;
@@ -88,7 +103,15 @@
   box-shadow: 0 4px 6px $drop-shadow;
   padding: 0.5rem;
   margin-top: 0.5rem;
-  width: 100%;
+  width: 15rem;
+}
+
+.popoverLeft {
+  right: 0;
+}
+
+.popoverRight {
+  left: 0;
 }
 
 .applyButton {
