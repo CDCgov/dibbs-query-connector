@@ -342,6 +342,10 @@ class QueryService {
 
     if (noCertainMatch) {
       console.warn("Match failed due to uncertain results.");
+      return new Response(JSON.stringify({ uncertainMatchError: true }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
     if (response.status !== 200) {
@@ -399,12 +403,23 @@ class QueryService {
    */
   static async patientDiscoveryQuery(
     request: PatientDiscoveryRequest,
-  ): Promise<QueryResponse["Patient"]> {
+  ): Promise<QueryResponse["Patient"] | { uncertainMatchError: true }> {
     const matchConfig = request.patientMatchConfiguration;
     console.log("Patient request configuration", request);
+
     const fhirResponse = matchConfig?.enabled
       ? await QueryService.makePatientMatchRequest(request)
       : await QueryService.makePatientDiscoveryRequest(request);
+
+    if (
+      fhirResponse.status === 200 &&
+      fhirResponse.headers.get("content-type")?.includes("application/json")
+    ) {
+      const body = await fhirResponse.clone().json();
+      if (body?.uncertainMatchError === true) {
+        return { uncertainMatchError: true };
+      }
+    }
 
     const newResponse = await QueryService.parseFhirSearch(fhirResponse);
     return newResponse["Patient"] as Patient[];
