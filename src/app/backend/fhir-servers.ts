@@ -192,12 +192,12 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
         patientMatchConfiguration != null
           ? {
               enabled: patientMatchConfiguration.enabled ?? false,
-              only_single_match:
+              onlySingleMatch:
                 patientMatchConfiguration.onlySingleMatch ?? false,
-              only_certain_matches:
+              onlyCertainMatches:
                 patientMatchConfiguration.onlyCertainMatches ?? false,
-              match_count: patientMatchConfiguration.matchCount ?? 1,
-              supports_match: patientMatchConfiguration.supportsMatch ?? false,
+              matchCount: patientMatchConfiguration.matchCount ?? 0,
+              supportsMatch: patientMatchConfiguration.supportsMatch ?? false,
             }
           : null;
 
@@ -292,12 +292,12 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
         patientMatchConfiguration != null
           ? {
               enabled: patientMatchConfiguration.enabled ?? false,
-              only_single_match:
+              onlySingleMatch:
                 patientMatchConfiguration.onlySingleMatch ?? false,
-              only_certain_matches:
+              onlyCertainMatches:
                 patientMatchConfiguration.onlyCertainMatches ?? false,
-              match_count: patientMatchConfiguration.matchCount ?? 1,
-              supports_match: patientMatchConfiguration.supportsMatch ?? false,
+              matchCount: patientMatchConfiguration.matchCount ?? 0,
+              supportsMatch: patientMatchConfiguration.supportsMatch ?? false,
             }
           : null;
 
@@ -376,29 +376,17 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
   }
 
   static async prepareFhirClient(serverName: string) {
-    if (FhirServerConfigService.cachedFhirServerConfigs === null) {
-      FhirServerConfigService.cachedFhirServerConfigs =
-        await super.getFhirServerConfigs();
-    }
+    const configs =
+      await FhirServerConfigServiceInternal.getFhirServerConfigs();
+    const config = configs.find((c) => c.name === serverName);
 
-    let config = FhirServerConfigService.cachedFhirServerConfigs.find(
-      (c) => c.name === serverName,
-    );
+    if (!config) throw new Error(`No server config found for ${serverName}`);
 
-    if (!config) {
-      // fallback retry in case we have a cache miss
-      FhirServerConfigService.cachedFhirServerConfigs =
-        await super.getFhirServerConfigs();
-      const followupConfig =
-        FhirServerConfigService.cachedFhirServerConfigs.find(
-          (c) => c.name === serverName,
-        );
-
-      if (!followupConfig)
-        throw Error(`No server config found for ${serverName}`);
-      else {
-        config = followupConfig;
-      }
+    if (config.authType === "SMART" && config.accessToken) {
+      config.headers = {
+        ...(config.headers || {}),
+        Authorization: `Bearer ${config.accessToken}`,
+      };
     }
 
     return new FHIRClient(config);

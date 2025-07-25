@@ -38,6 +38,8 @@ const Query: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [fhirServer, setFhirServer] = useState<string>("");
   const [fhirServers, setFhirServers] = useState<string[]>([]);
+  const [uncertainMatchError, setUncertainMatchError] =
+    useState<boolean>(false);
   const ctx = useContext(DataContext);
 
   async function fetchFHIRServerNames() {
@@ -88,19 +90,25 @@ const Query: React.FC = () => {
             fhirServers={fhirServers}
             selectedFhirServer={fhirServer}
             setFhirServer={setFhirServer}
+            setUncertainMatchError={setUncertainMatchError}
           />
         )}
 
         {/* Step 2 */}
         {mode === "patient-results" && (
           <PatientSearchResults
-            patients={patientDiscoveryQueryResponse ?? []}
+            patients={
+              Array.isArray(patientDiscoveryQueryResponse)
+                ? patientDiscoveryQueryResponse
+                : []
+            }
             goBack={() => {
               setMode("search");
             }}
             setMode={setMode}
             setPatientForQueryResponse={setPatientForQueryResponse}
             loading={loading}
+            uncertainMatchError={uncertainMatchError}
           />
         )}
 
