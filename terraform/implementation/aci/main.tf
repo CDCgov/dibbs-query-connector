@@ -36,7 +36,7 @@ resource "azurerm_subnet" "qc-aci-subnet" {
   address_prefixes     = ["10.0.3.0/24"]
   service_endpoints    = ["Microsoft.KeyVault"]
   delegation {
-    name = "fs"
+    name = "aciDelegation"
     service_delegation {
       name = "Microsoft.ContainerInstance/containerGroups"
       actions = [
@@ -78,7 +78,7 @@ resource "azurerm_container_group" "aci" {
       NEXT_PUBLIC_AUTH_PROVIDER = var.auth_provider
       AUTH_SECRET               = "${azurerm_key_vault_secret.query_connector_auth_secret.value}"
       AUTH_CLIENT_ID            = var.auth_client_id
-      # AUTH_CLIENT_SECRET        = "${data.azurerm_key_vault_secret.query_connector_auth_client_secret.value}"
+      # AUTH_CLIENT_SECRET        = "${azurerm_key_vault_secret.query_connector_auth_client_secret.value}"
       AUTH_ISSUER     = var.auth_issuer
       ENTRA_TENANT_ID = var.entra_tenant_id
       AUTH_DISABLED   = "true"

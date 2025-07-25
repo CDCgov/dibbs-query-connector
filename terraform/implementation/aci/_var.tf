@@ -4,6 +4,20 @@
 #   default     = "ghcr.io/cdcgov/dibbs-query-connector//query-connector"
 # }
 
+
+variable "project" {
+  description = "One-word identifier or code name for this project."
+  type        = string
+  default     = "query-connector"
+}
+
+variable "env" {
+  description = "One-word identifier for the target environment (e.g. dev, test, prod)."
+  type        = string
+  default     = "dev"
+}
+
+
 variable "resource_group" {
   description = "The name of the resource group to deploy to"
   type        = string
@@ -104,7 +118,7 @@ variable "auth_url" {
   type        = string
   description = "URL for the Auth server"
   sensitive   = true
-  default = "value"
+  default     = "value"
 }
 
 variable "entra_tenant_id" {
