@@ -19,6 +19,7 @@ import {
   patientDiscoveryQuery,
   PatientDiscoveryResponse,
 } from "@/app/backend/query-execution";
+import { getFhirServerConfigs } from "@/app/backend/fhir-servers";
 import styles from "../searchForm/searchForm.module.scss";
 import { FormatPhoneAsDigits } from "@/app/shared/format-service";
 import TitleBox from "../stepIndicator/TitleBox";
@@ -26,6 +27,8 @@ import {
   PatientDiscoveryRequest,
   validatedPatientSearch,
 } from "@/app/models/entities/query";
+import Checkbox from "@/app/ui/designSystem/checkbox/Checkbox";
+import { FhirServerConfig } from "@/app/models/entities/fhir-servers";
 
 interface SearchFormProps {
   setPatientDiscoveryQueryResponse: (
@@ -60,6 +63,10 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
     state: "",
     zip: "",
   });
+
+  const [fhirServerConfig, setFhirServerConfig] =
+    useState<FhirServerConfig | null>(null);
+  const [patientMatchEnabled, setPatientMatchEnabled] = useState<boolean>();
 
   const [showAdvanced, setShowAdvanced] = useState(false);
   const params = useSearchParams();
@@ -98,7 +105,20 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
     setFhirServer(server && fhirServers.includes(server) ? server : fhirServer);
   }, [fhirServers]);
 
-  // Fills fields with sample data based on the selected
+  useEffect(() => {
+    const loadConfig = async () => {
+      const configs = await getFhirServerConfigs();
+      const match = configs.find((c) => c.name === fhirServer);
+      if (match) {
+        setFhirServerConfig(match);
+        setPatientMatchEnabled(
+          match.patientMatchConfiguration?.enabled ?? true,
+        );
+      }
+    };
+    loadConfig();
+  }, [fhirServer]);
+
   const [formTouched, setFormTouched] = useState(false);
   const [_formError, setFormError] = useState(false);
 
@@ -131,6 +151,18 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
         city: address.city,
         state: address.state,
         zip: address.zip,
+      },
+      patientMatchConfiguration: {
+        enabled: patientMatchEnabled ?? false,
+        onlySingleMatch:
+          fhirServerConfig?.patientMatchConfiguration?.onlySingleMatch ?? false,
+        onlyCertainMatches:
+          fhirServerConfig?.patientMatchConfiguration?.onlyCertainMatches ??
+          false,
+        matchCount:
+          fhirServerConfig?.patientMatchConfiguration?.matchCount ?? 0,
+        supportsMatch:
+          fhirServerConfig?.patientMatchConfiguration?.supportsMatch ?? false,
       },
     };
   }
@@ -258,6 +290,18 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
                     ))}
                   </Select>
                 </div>
+                {fhirServerConfig?.patientMatchConfiguration?.supportsMatch && (
+                  <div className="padding-top-1">
+                    <Checkbox
+                      id="enable-patient-match"
+                      data-testid="enable-patient-match"
+                      label="Enable patient match"
+                      aria-label="Enable patient $match protocol for this query"
+                      checked={patientMatchEnabled}
+                      onChange={(e) => setPatientMatchEnabled(e.target.checked)}
+                    />
+                  </div>
+                )}
               </div>
             </div>
           )}

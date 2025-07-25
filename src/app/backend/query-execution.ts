@@ -202,7 +202,6 @@ class QueryService {
     } = request;
 
     const fhirClient = await prepareFhirClient(fhirServer);
-    await fhirClient.getAccessToken();
     const telecom: { system: string; value: string }[] = [];
 
     if (phone) {
@@ -305,7 +304,7 @@ class QueryService {
         },
       ],
     };
-    console.log("Patient match configuration", patientMatchConfiguration);
+
     // Apply optional match modifiers
     if (patientMatchConfiguration?.onlyCertainMatches) {
       parameters.parameter.push({
@@ -327,10 +326,8 @@ class QueryService {
       });
     }
 
-    console.log("Parameters", JSON.stringify(parameters, null, 2));
     const response = await fhirClient.postJson("/Patient/$match", parameters);
     const jsonBody = await response.clone().json();
-    console.log("Response from $match:", JSON.stringify(jsonBody, null, 2));
     if (response.status !== 200) {
       console.error(
         `FHIR $match query failed. Status: ${
@@ -387,14 +384,10 @@ class QueryService {
   static async patientDiscoveryQuery(
     request: PatientDiscoveryRequest,
   ): Promise<QueryResponse["Patient"]> {
-    const fhirClient = await prepareFhirClient(request.fhirServer);
-    const matchConfig = fhirClient["serverConfig"]?.patientMatchConfiguration;
-
+    const matchConfig = request.patientMatchConfiguration;
+    console.log("Patient request configuration", request);
     const fhirResponse = matchConfig?.enabled
-      ? await QueryService.makePatientMatchRequest({
-          ...request,
-          patientMatchConfiguration: matchConfig,
-        })
+      ? await QueryService.makePatientMatchRequest(request)
       : await QueryService.makePatientDiscoveryRequest(request);
 
     const newResponse = await QueryService.parseFhirSearch(fhirResponse);
