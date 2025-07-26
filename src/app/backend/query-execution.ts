@@ -1,5 +1,5 @@
 "use server";
-import { FhirResource, Patient } from "fhir/r4";
+import { Bundle, FhirResource, Patient, Task, BundleEntry } from "fhir/r4";
 
 import { isFhirResource } from "../shared/constants";
 
@@ -16,6 +16,7 @@ import type {
 } from "../models/entities/query";
 import type { MedicalRecordSections } from "../(pages)/queryBuilding/utils";
 import { prepareFhirClient } from "./fhir-servers";
+import type { Response } from "node-fetch";
 
 class QueryService {
   /**
@@ -102,19 +103,26 @@ class QueryService {
 
     const fhirClient = await prepareFhirClient(fhirServer);
 
-    // Query for patient
-    let query = "/Patient?";
+    // Get the server config to check for mutual TLS
+    const { getFhirServerConfigs } = await import("./fhir-servers");
+    const serverConfigs = await getFhirServerConfigs();
+    const serverConfig = serverConfigs.find(
+      (config) => config.name === fhirServer,
+    );
+
+    // Build patient search query
+    let patientQuery = "Patient?";
     if (firstName) {
-      query += `given=${firstName}&`;
+      patientQuery += `given=${firstName}&`;
     }
     if (lastName) {
-      query += `family=${lastName}&`;
+      patientQuery += `family=${lastName}&`;
     }
     if (dob) {
-      query += `birthdate=${dob}&`;
+      patientQuery += `birthdate=${dob}&`;
     }
     if (mrn) {
-      query += `identifier=${mrn}&`;
+      patientQuery += `identifier=${mrn}&`;
     }
     if (phone) {
       // We might have multiple phone numbers if we're coming from the API
@@ -129,7 +137,7 @@ class QueryService {
         }
       }
       if (phonePossibilities.length > 0) {
-        query += `phone=${phonePossibilities.join(",")}&`;
+        patientQuery += `phone=${phonePossibilities.join(",")}&`;
       }
     }
     if (address?.street1 || address?.street2) {
@@ -141,31 +149,245 @@ class QueryService {
         .filter((addr) => addr != "")
         .join(",");
 
-      query += `address=${addrString}&`;
+      patientQuery += `address=${addrString}&`;
     }
     if (address?.city) {
       const cities = address?.city?.split(";").join(",");
-      query += `address-city=${cities}&`;
-    }
-    if (address?.state) {
-      const states = address?.state.split(";").join(",");
-      query += `address-state=${states}&`;
+      patientQuery += `address-city=${cities}&`;
     }
     if (address?.zip) {
       const zips = address?.zip.split(";").join(",");
-      query += `address-postalcode=${zips}&`;
+      patientQuery += `address-postalcode=${zips}&`;
     }
     if (email) {
       const emailsToSearch = email.split(";");
       if (emailsToSearch.length > 0) {
-        query += `email=${emailsToSearch.join(",")}&`;
+        patientQuery += `email=${emailsToSearch.join(",")}&`;
       }
     }
+    if (address?.state) {
+      const states = address?.state.split(";").join(",");
+      patientQuery += `address-state=${states}`;
+    }
 
-    const fhirResponse = await fhirClient.get(query);
+    let fhirResponse: Response | Bundle;
 
-    // Check for errors
-    if (fhirResponse.status !== 200) {
+    if (serverConfig?.mutualTls) {
+      console.log(
+        `Mutual TLS enabled for server ${fhirServer}. Using Task resource for patient discovery.`,
+      );
+      // For mutual TLS enabled servers, send POST to /Task
+      const taskBody = {
+        resourceType: "Task",
+        status: "requested",
+        intent: "order",
+        basedOn: [
+          {
+            reference: "Task/bundleprofile-fdabest",
+          },
+        ],
+        code: {
+          coding: [
+            {
+              system:
+                "http://hl7.org/fhir/us/davinci-cdex/CodeSystem/cdex-temp",
+              code: "data-request-query",
+            },
+          ],
+        },
+        authoredOn: "2025-03-14T02:58:55.179Z",
+        lastModified: "2025-03-14T02:58:55.179Z",
+        requester: {
+          identifier: {
+            system: "http://ehealthexchange.org/hub/internal/hcid",
+            value: "2.16.840.1.113883.3.7204.1.2.1.1.2.1.19631120",
+          },
+        },
+        input: [
+          {
+            type: {
+              coding: [
+                {
+                  system:
+                    "http://hl7.org/fhir/us/davinci-hrex/CodeSystem/hrex-temp",
+                  code: "data-query-patient-fhir-fanout",
+                },
+              ],
+            },
+            valueString: patientQuery,
+          },
+          {
+            type: {
+              coding: [
+                {
+                  system:
+                    "http://hl7.org/fhir/us/davinci-cdex/CodeSystem/cdex-temp",
+                  code: "purpose-of-use",
+                },
+              ],
+            },
+            valueCodeableConcept: {
+              coding: [
+                {
+                  system: "2.16.840.1.113883.3.18.7.1",
+                  code: "PUBLICHEALTH",
+                },
+              ],
+            },
+          },
+        ],
+      };
+
+      const taskResponse = await fhirClient.postJson("/Task", taskBody);
+      const createdTask = (await taskResponse.json()) as Bundle<Task>;
+      console.log(
+        `Task created for patient discovery: ${JSON.stringify(createdTask)}`,
+      );
+      const parentTaskId = createdTask.entry?.[0]?.resource?.id;
+      if (!parentTaskId) {
+        throw new Error("Failed to create parent Task for patient discovery.");
+      }
+
+      console.log(
+        `Created Task for patient discovery with ID: ${parentTaskId}`,
+      );
+
+      // Poll parent task until all child tasks are complete
+      let allTasksComplete: boolean | undefined = false;
+      let tasksBundle: Bundle<Task> = {
+        resourceType: "Bundle",
+        type: "searchset",
+        entry: [],
+      };
+
+      let attempts = 0;
+      const maxAttempts = 12;
+      while (!allTasksComplete && attempts < maxAttempts) {
+        attempts++;
+        // Wait for a short period before polling again
+        await new Promise((resolve) => setTimeout(resolve, 5000));
+        // Fetch the child tasks
+        const childTasksResponse = await fhirClient.get(
+          `/Task?part-of=Task/${parentTaskId}`,
+        );
+        // Check each entry in the response
+        tasksBundle = (await childTasksResponse.json()) as Bundle<Task>;
+        console.log(
+          `Fetched child tasks for parent Task ${parentTaskId}. Tasks Bundle:`,
+          tasksBundle,
+        );
+        allTasksComplete = tasksBundle.entry?.every((entry) => {
+          return (
+            entry.resource?.status === "completed" ||
+            entry.resource?.status === "failed"
+          );
+        });
+      }
+
+      // Log the completed tasks for debugging
+      console.log(
+        `All tasks completed for parent Task ${parentTaskId}. Tasks Bundle:`,
+        tasksBundle,
+      );
+
+      // For each completed task, fetch the results
+      const patientResults = await Promise.all(
+        tasksBundle.entry?.map(async (entry) => {
+          if (
+            entry.resource?.status === "completed" &&
+            entry.resource?.output
+          ) {
+            const res = await fhirClient.get(`/Task/${entry.resource.id}`);
+            const taskDetail = (await res.json()) as Task;
+            // Find the link to the Patient resource
+            const patientLink = taskDetail.output?.find((output) =>
+              output.valueString?.includes("Patient-Page1"),
+            )?.valueString;
+
+            console.log(`Patient link found in Task output: ${patientLink}`);
+
+            if (patientLink) {
+              // Extract the path from the link
+              const url = new URL(patientLink);
+              const fullPath = url.pathname;
+              const pathParts = fullPath.split("/ndjson");
+              const patientPath = "/ndjson" + pathParts[1];
+
+              const patientResponse = await fhirClient.get(patientPath);
+              if (patientResponse.status === 200) {
+                const patientBundle =
+                  (await patientResponse.json()) as Bundle<Patient>;
+                console.log(`Patient bundle: ${JSON.stringify(patientBundle)}`);
+                // Return the patient bundle
+                return patientBundle;
+              } else {
+                // Wait 5 seconds for the patient resource to be available
+                console.warn(
+                  `Patient resource not available at ${patientLink}. Retrying...`,
+                );
+                await new Promise((resolve) => setTimeout(resolve, 5000));
+                const retryResponse = await fhirClient.get(patientPath);
+                if (retryResponse.status === 200) {
+                  const patientBundle =
+                    (await retryResponse.json()) as Bundle<Patient>;
+                  return patientBundle;
+                }
+                // If the patient resource is still not available, log an error
+                console.error(
+                  `Failed to fetch patient resource from ${patientLink}. Status: ${retryResponse.status}`,
+                );
+                return null;
+              }
+            } else {
+              console.warn(
+                `No patient link found in Task output for task ${entry.resource?.id}`,
+              );
+              return null;
+            }
+          } else if (entry.resource?.status === "completed") {
+            console.warn(
+              `Task ${entry.resource?.id} completed successfully but has no output.`,
+            );
+            return null;
+          } else {
+            console.warn(
+              `Task ${entry.resource?.id} failed with status: ${entry.resource?.status}`,
+            );
+            return null;
+          }
+        }) || [],
+      );
+
+      console.log(
+        `Patient results from Task processing: ${JSON.stringify(
+          patientResults,
+        )}`,
+      );
+
+      // Format the Patient resources into a FHIR Bundle
+      const bundle: Bundle = {
+        resourceType: "Bundle",
+        type: "searchset",
+        entry: patientResults
+          .filter((result): result is Bundle<Patient> => result !== null)
+          .map((patient) => {
+            return {
+              fullUrl: `urn:uuid:${patient.id}`,
+              resource: patient,
+            } as BundleEntry;
+          }),
+      };
+      // Log the bundle for debugging
+      console.log("FHIR Bundle created from Task results:", bundle);
+      fhirResponse = bundle;
+    } else {
+      // For non-mutual TLS servers, use the original GET to /Patient
+      const query = "/" + patientQuery;
+      fhirResponse = await fhirClient.get(query);
+    }
+
+    // Check for errors (only for Response objects)
+    if ("status" in fhirResponse && fhirResponse.status !== 200) {
       console.error(
         `Patient search failed. Status: ${
           fhirResponse.status
@@ -224,6 +446,7 @@ class QueryService {
     const fhirResponse =
       await QueryService.makePatientDiscoveryRequest(request);
     const newResponse = await QueryService.parseFhirSearch(fhirResponse);
+    console.log(`newResponse: `, newResponse);
     return newResponse["Patient"] as Patient[];
   }
 
@@ -246,22 +469,59 @@ class QueryService {
   }
 
   /**
+   * Type guard to check if an object is a FHIR Bundle
+   * @param obj - The object to check
+   * @returns True if the object is a Bundle, false otherwise
+   */
+  static isBundle(obj: unknown): obj is Bundle {
+    return (
+      obj !== null &&
+      typeof obj === "object" &&
+      (obj as { resourceType?: string }).resourceType === "Bundle"
+    );
+  }
+
+  /**
    * Parse the response from a FHIR search query. If the response is successful and
    * contains data, return an array of parsed resources.
    * @param response - The response from the FHIR server.
    * @returns - The parsed response.
    */
   static async parseFhirSearch(
-    response: Response | Array<Response>,
+    response: Response | Array<Response> | Bundle,
   ): Promise<QueryResponse> {
     let resourceArray: FhirResource[] = [];
     const resourceIds = new Set<string>();
+    const responders = new Set<string>();
+    const isFanoutSearch = QueryService.isBundle(response);
 
     // Process the responses and flatten them
     if (Array.isArray(response)) {
       resourceArray = (
         await Promise.all(response.map(processFhirResponse))
       ).flat();
+      // if response is a Bundle, extract the resource
+    } else if (isFanoutSearch) {
+      console.log("Processing FHIR Bundle response");
+
+      const resources =
+        response.entry
+          ?.map((entry) => {
+            if (entry.resource && isFhirResource(entry.resource)) {
+              return entry.resource;
+            } else {
+              console.error(
+                "Entry in FHIR Bundle response parsing was of unexpected shape",
+              );
+              return null;
+            }
+          })
+          .filter((resource): resource is FhirResource => resource !== null) ||
+        [];
+      // Add resources to the resourceArray
+      console.log(`Found ${resources.length} resources in Bundle response`);
+      console.log(`Resources: `, JSON.stringify(resources, null, 2));
+      resourceArray = resources;
     } else {
       resourceArray = await processFhirResponse(response);
     }
@@ -279,9 +539,22 @@ class QueryService {
       if (resource.id && !resourceIds.has(resource.id)) {
         (runningQueryResponse[resourceType] as FhirResource[]).push(resource);
         resourceIds.add(resource.id);
+      } else if (resource.id && isFanoutSearch) {
+        // If this is a fanout search, we might have multiple resources with the same ID
+        // In this case, we still want to add the resource to the response if it comes from a different server
+        const targetResponderFullUrl = (resource as Patient).identifier?.find(
+          (identifier) => identifier.system?.includes("targetResponderFullUrl"),
+        )?.value;
+        console.log(
+          `Processing resource with ID ${resource.id} and targetResponderFullUrl ${targetResponderFullUrl}`,
+        );
+        // If the targetResponderFullUrl is defined and not already in the responders set, add
+        if (targetResponderFullUrl && !responders.has(targetResponderFullUrl)) {
+          (runningQueryResponse[resourceType] as FhirResource[]).push(resource);
+          responders.add(targetResponderFullUrl);
+        }
       }
     }
-
     return runningQueryResponse;
   }
 
@@ -298,18 +571,19 @@ class QueryService {
     let resourceIds: string[] = [];
 
     if (response.status === 200) {
-      const body = await response.json();
+      const body = (await response.json()) as Bundle;
       if (body.entry) {
         for (const entry of body.entry) {
-          if (!isFhirResource(entry.resource)) {
+          if (entry.resource && isFhirResource(entry.resource)) {
+            // Add the resource only if the ID is unique to the resources being returned for the query
+            if (!resourceIds.includes(entry.resource.id!)) {
+              resourceIds.push(entry.resource.id!);
+              resourceArray.push(entry.resource);
+            }
+          } else {
             console.error(
               "Entry in FHIR resource response parsing was of unexpected shape",
             );
-          }
-          // Add the resource only if the ID is unique to the resources being returned for the query
-          if (!resourceIds.includes(entry.resource.id)) {
-            resourceIds.push(entry.resource.id);
-            resourceArray.push(entry.resource);
           }
         }
       }
