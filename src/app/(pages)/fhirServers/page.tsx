@@ -73,7 +73,7 @@ const FhirServers: React.FC = () => {
     enabled: false,
     onlySingleMatch: false,
     onlyCertainMatches: false,
-    matchCount: 1,
+    matchCount: 0,
     supportsMatch: false,
   } as PatientMatchData;
   const [fhirVersion, setFhirVersion] = useState<string | null>(null);
@@ -670,7 +670,7 @@ const FhirServers: React.FC = () => {
                       ...prev!,
                       onlyCertainMatches: false,
                       onlySingleMatch: true,
-                      matchCount: 1,
+                      matchCount: 0,
                     }))
                   }
                 />
@@ -711,15 +711,12 @@ const FhirServers: React.FC = () => {
             )}
 
             <Label htmlFor="match-count">
-              Number of maximum patient matches to return
+              Number of maximum patient matches to return. If 0, the server
+              decides how many matches to return.
             </Label>
             <TextInput
               id="match-count"
-              disabled={
-                !patientMatchData?.enabled ||
-                patientMatchData?.onlySingleMatch ||
-                !patientMatchData?.onlyCertainMatches
-              }
+              disabled={!patientMatchData?.enabled}
               data-testid="match-count"
               name="match-count"
               aria-label="Number of maximum patient matches to return. If 0, the server decides how many matches to return."
