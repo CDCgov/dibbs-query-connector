@@ -181,7 +181,6 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
                           styles.myQueriesRow,
                           "tableRowWithHover",
                         )}
-                        // tabIndex={0}
                         data-testid={`query-row-${query.queryId}`}
                       >
                         <td title={query.queryName}>{query.queryName}</td>
