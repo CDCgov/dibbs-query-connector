@@ -13,3 +13,19 @@ export function suppressConsoleLogs() {
   jest.spyOn(console, "error").mockImplementation(() => {});
   jest.spyOn(console, "info").mockImplementation(() => {});
 }
+
+export function createNextRequest(
+  body: unknown,
+  searchParams: URLSearchParams,
+  headers?: Record<string, string>,
+) {
+  const requestHeaders = new Headers(headers);
+
+  return {
+    json: async () => body,
+    text: async () => body,
+    nextUrl: { searchParams },
+    method: "POST",
+    headers: requestHeaders,
+  } as unknown as any;
+}

@@ -370,11 +370,13 @@ class QueryService {
         type: "searchset",
         entry: patientResults
           .filter((result): result is Bundle<Patient> => result !== null)
-          .map((patient) => {
-            return {
-              fullUrl: `urn:uuid:${patient.id}`,
-              resource: patient,
-            } as BundleEntry;
+          .flatMap((patientBundle) => {
+            return (
+              patientBundle.entry?.map((entry) => ({
+                fullUrl: entry.fullUrl || `urn:uuid:${entry.resource?.id}`,
+                resource: entry.resource,
+              })) || []
+            );
           }),
       };
       // Log the bundle for debugging
