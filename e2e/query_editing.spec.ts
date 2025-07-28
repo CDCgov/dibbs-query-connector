@@ -1,21 +1,21 @@
-import { test, expect } from "@playwright/test";
+import { test, expect, Page } from "@playwright/test";
 import { TEST_URL } from "../playwright-setup";
-import { CONDITION_DRAWER_SEARCH_PLACEHOLDER } from "@/app/(pages)/queryBuilding/components/utils";
+import { CONDITION_DRAWER_SEARCH_PLACEHOLDER } from "../src/app/(pages)/queryBuilding/components/utils";
 import {
   EMPTY_MEDICAL_RECORD_SECTIONS,
   NestedQuery,
   QueryTableResult,
-} from "@/app/(pages)/queryBuilding/utils";
-import { CANCER_FRONTEND_NESTED_INPUT } from "./constants";
+} from "../src/app/(pages)/queryBuilding/utils";
+import { CANCER_FRONTEND_NESTED_INPUT, DEFAULT_FHIR_SERVER } from "./constants";
 import {
   deleteQueryByIdHelp,
   getSavedQueryByIdHelp,
   saveCustomQueryHelp,
-} from "@/app/backend/query-building/lib";
-import { internal_getDbClient } from "@/app/backend/db/config";
-import { translateSnakeStringToCamelCase } from "@/app/backend/db/util";
+} from "../src/app/backend/query-building/lib";
+import { internal_getDbClient } from "../src/app/backend/db/config";
+import { translateSnakeStringToCamelCase } from "../src/app/backend/db/util";
 import { runAxeAccessibilityChecks } from "./utils";
-
+import { PAGE_TITLES } from "../src/app/(pages)/query/components/stepIndicator/StepIndicator";
 test.describe("editing an existing query", () => {
   let subjectQuery: QueryTableResult;
   // Start every test by navigating to the customize query workflow
@@ -277,6 +277,62 @@ test.describe("editing an existing query", () => {
   });
 });
 
+test.describe("editing an existing query", () => {
+  let subjectQuery: QueryTableResult;
+  // Start every test by navigating to the customize query workflow
+  test.beforeEach(async ({ page }) => {
+    subjectQuery = await createTestQuery();
+  });
+
+  test.afterEach(async () => {
+    await deleteQueryByIdHelp(subjectQuery.queryId, dbClient);
+  });
+
+  test.only("filtered valuesets don't show up in query execution", async ({
+    page,
+  }) => {
+    await checkForCancerMedication(page, subjectQuery.queryName, true);
+
+    // uncheck and recheck
+    await page.goto(`${TEST_URL}/queryBuilding`);
+
+    const subjectVS = Object.values(
+      subjectQuery.queryData[CANCER_CONDITION_ID],
+    )[0];
+
+    const query = page.locator("tr", {
+      has: page.getByTitle(subjectQuery.queryName),
+    });
+
+    await expect(query).toBeVisible();
+
+    // click edit
+    await query.hover();
+    const editBtn = query.getByTestId(`edit-query-${subjectQuery.queryId}`);
+    await expect(editBtn).toBeVisible();
+    await editBtn.click();
+
+    //  customize query
+    await expect(
+      page.getByRole("heading", {
+        name: CUSTOM_QUERY,
+      }),
+    ).toBeVisible();
+
+    const actionButton = page.getByTestId("createSaveQueryBtn");
+
+    // uncheck a value set
+    const medicationHeader = page.getByTestId("accordionButton_medications");
+    await expect(medicationHeader).toBeVisible();
+    await medicationHeader.click();
+
+    const medsButton = page.getByText("Cancer (Leukemia) Medication");
+    await medsButton.click();
+
+    await checkForCancerMedication(page, subjectQuery.queryName, false);
+  });
+});
+
 const CUSTOM_QUERY = "Custom Query";
 
 const ADDED_CONDITION = {
@@ -310,4 +366,52 @@ async function createTestQuery() {
   });
 
   return val as unknown as QueryTableResult;
+}
+
+async function checkForCancerMedication(
+  page: Page,
+  queryName: string,
+  medicationShouldExist = false,
+) {
+  await page.goto(`${TEST_URL}`);
+  await expect(
+    page.getByRole("heading", {
+      name: PAGE_TITLES["search"].title,
+      exact: true,
+    }),
+  ).toBeVisible();
+
+  await page.getByRole("button", { name: "Fill fields" }).click();
+  await page.getByRole("button", { name: "Search for patient" }).click();
+  await expect(page.getByText("Loading")).toHaveCount(0, { timeout: 10000 });
+  await page.getByRole("button", { name: "Select patient" }).nth(0).click();
+
+  await expect(
+    page.getByRole("heading", { name: "Select a query" }),
+  ).toBeVisible();
+  await page.getByTestId("Select").selectOption(queryName);
+
+  await page.getByRole("button", { name: "Submit" }).click();
+  await expect(page.getByText("Loading")).toHaveCount(0, { timeout: 10000 });
+
+  await expect(
+    page.getByRole("heading", { name: "Patient Record" }),
+  ).toBeVisible();
+
+  if (medicationShouldExist) {
+    await expect(
+      page.getByRole("button", { name: "Medication Requests", expanded: true }),
+    ).toBeVisible();
+
+    await expect(
+      page
+        .getByRole("table")
+        .getByRole("row")
+        .filter({ hasText: "1 ML alemtuzumab 30 MG/ML Injection" }),
+    ).toHaveCount(1);
+  } else {
+    await expect(
+      page.getByRole("button", { name: "Medication Requests", expanded: true }),
+    ).not.toBeVisible();
+  }
 }
