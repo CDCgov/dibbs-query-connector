@@ -51,7 +51,7 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
    * @param forceRefresh - Whether to flush the config cache
    * @returns The configuration for the FHIR server.
    */
-  @superAdminRequired
+  // @superAdminRequired
   static async getFhirServerConfigs(forceRefresh = false) {
     if (
       forceRefresh ||
