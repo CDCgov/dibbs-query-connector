@@ -21,6 +21,10 @@
   color: white !important;
 }
 
+.justify-between {
+  justify-content: space-between;
+}
+
 .destructive-primary {
   color: $destructive-primary !important;
 }
@@ -377,11 +381,22 @@ fieldset > legend > .usa-accordion__button[aria-expanded="false"] {
     @extend .main-container;
     max-width: calc($application-wide-max-width - 2 * $application-content-margins-wide);
   }
+
+  @media screen and (max-width: $header-padding-breakpoint) {
+    padding: 1rem !important;
+  }
 }
 
 .stepper-container {
   margin: 2rem auto 0 auto !important;
   width: calc($application-wide-max-width - 2 * $application-content-margins);
+}
+
+@media screen and (max-width: $header-padding-breakpoint) {
+  .stepper-container {
+    margin: 1rem auto 0 auto !important;
+    width: 85%;
+  }
 }
 
 @media screen and (max-width: $header-padding-breakpoint) {

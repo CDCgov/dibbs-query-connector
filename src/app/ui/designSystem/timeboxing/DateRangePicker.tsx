@@ -1,6 +1,12 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import {
+  useState,
+  useEffect,
+  useRef,
+  useImperativeHandle,
+  forwardRef,
+} from "react";
 import {
   Button,
   DateRangePicker as USWDSDateRangePicker,
@@ -11,6 +17,7 @@ import {
 } from "@trussworks/react-uswds";
 import styles from "./DateRangePicker.module.scss";
 import { addHours } from "date-fns";
+import classNames from "classnames";
 
 export interface DateRange {
   startDate?: Date | null;
@@ -20,12 +27,6 @@ export interface DateRange {
 export interface DateErrors {
   start?: string;
   end?: string;
-}
-
-interface DateRangePickerProps {
-  startDate: Date | null;
-  endDate: Date | null;
-  onChange: (dates: { startDate: Date | null; endDate: Date | null }) => void;
 }
 
 const normalizeStart = (date: Date | null) =>
@@ -141,266 +142,364 @@ const presetOptions = [
 
 const CUSTOM_VALUE = "custom";
 
+interface DateRangePickerProps {
+  startDate: Date | null;
+  endDate: Date | null;
+  onChange: (...args: unknown[]) => void;
+  id: string;
+  handleClear?: () => Promise<void>;
+  popoverSide?: "left" | "right";
+  placeholderText?: string;
+}
+
+export type DateRangePickerRef = {
+  getStartDate: () => Date | null;
+  getEndDate: () => Date | null;
+};
+
 /**
  * A date range picker component with a toggleable modal and quick preset buttons.
  * @param root0 - The component props.
  * @param root0.startDate - The start date.
  * @param root0.endDate - The end date.
+ * @param root0.id - The id for the form input.
  * @param root0.onChange - The change handler.
+ * @param root0.popoverSide - Optional prop to control the side the popover's on.
+ * @param root0.handleClear - Optional prop to control the side the popover's on.
+ * @param root0.placeholderText - Text to indicate the filter.
  * @returns - The date range picker component.
  */
-const DateRangePicker: React.FC<DateRangePickerProps> = ({
-  startDate: initialStart,
-  endDate: initialEnd,
-  onChange,
-}) => {
-  const [selectedPreset, setSelectedPreset] = useState<string>("");
-  const [customStart, setCustomStart] = useState<Date | null>(initialStart);
-  const [customEnd, setCustomEnd] = useState<Date | null>(initialEnd);
-  const [dateErrors, setDateErrors] = useState<DateErrors>({});
-  const [isOpen, setIsOpen] = useState(false);
 
-  const containerRef = useRef<HTMLDivElement>(null);
+const DateRangePicker = forwardRef<DateRangePickerRef, DateRangePickerProps>(
+  (
+    {
+      startDate: initialStart,
+      endDate: initialEnd,
+      onChange,
+      id,
+      handleClear,
+      popoverSide = "right",
+      placeholderText = "Filter by date",
+    },
+    ref,
+  ) => {
+    const [selectedPreset, setSelectedPreset] = useState<string>("");
+    const [customStart, setCustomStart] = useState<Date | null>(initialStart);
+    const [customEnd, setCustomEnd] = useState<Date | null>(initialEnd);
+    const [dateErrors, setDateErrors] = useState<DateErrors>({});
+    const [isOpen, setIsOpen] = useState(false);
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        containerRef.current &&
-        !containerRef.current.contains(event.target as Node)
-      ) {
-        setIsOpen(false);
+    const containerRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+      if (initialStart === null || initialEnd === null) return;
+
+      if (initialStart) {
+        setCustomStart(initialStart);
+      }
+
+      if (initialEnd) {
+        setCustomEnd(initialEnd);
+      }
+
+      let somePresetValue = false;
+      presetOptions.forEach((p) => {
+        const { startDate, endDate } = p.getRange();
+
+        if (
+          areDatesOnSameDay(startDate, initialStart) &&
+          areDatesOnSameDay(endDate, initialEnd)
+        ) {
+          somePresetValue = true;
+          setSelectedPreset(p.value);
+        }
+      });
+
+      if (!somePresetValue) {
+        setSelectedPreset(CUSTOM_VALUE);
+      }
+    }, [initialStart, initialEnd]);
+
+    useEffect(() => {
+      const handleClickOutside = (event: MouseEvent) => {
+        if (
+          containerRef.current &&
+          !containerRef.current.contains(event.target as Node)
+        ) {
+          setIsOpen(false);
+        }
+      };
+
+      if (isOpen) {
+        document.addEventListener("mousedown", handleClickOutside);
+      } else {
+        document.removeEventListener("mousedown", handleClickOutside);
+      }
+
+      return () =>
+        document.removeEventListener("mousedown", handleClickOutside);
+    }, [isOpen]);
+
+    useEffect(() => {
+      if (isOpen) {
+        const startInput = document.getElementById(
+          "log-date-start",
+        ) as HTMLInputElement;
+        const endInput = document.getElementById(
+          "log-date-end",
+        ) as HTMLInputElement;
+        if (startInput)
+          startInput.value = customStart
+            ? customStart.toLocaleDateString()
+            : "";
+        if (endInput)
+          endInput.value = customEnd ? customEnd.toLocaleDateString() : "";
+      }
+    }, [isOpen, customStart, customEnd]);
+
+    const getDisplayedRange = () => {
+      if (selectedPreset && selectedPreset !== CUSTOM_VALUE) {
+        const preset = presetOptions.find((p) => p.value === selectedPreset);
+        if (preset) {
+          return preset.getRange();
+        }
+      }
+      return { startDate: customStart, endDate: customEnd };
+    };
+
+    const { startDate, endDate } = getDisplayedRange();
+
+    const formattedStart = startDate ? startDate.toLocaleDateString() : "";
+    const formattedEnd = endDate ? endDate.toLocaleDateString() : "";
+
+    const displayStart = startDate
+      ? startDate.toLocaleDateString("en-US", {
+          year: "2-digit",
+          month: "2-digit",
+          day: "2-digit",
+        })
+      : "";
+
+    const displayEnd = endDate
+      ? endDate.toLocaleDateString("en-US", {
+          year: "2-digit",
+          month: "2-digit",
+          day: "2-digit",
+        })
+      : "";
+
+    const displayText =
+      formattedStart && formattedEnd ? `${displayStart} - ${displayEnd}` : "";
+
+    const validateDates = (
+      newStartDate: Date | null,
+      newEndDate: Date | null,
+    ) => {
+      const errors: DateErrors = {};
+
+      if (newStartDate && isNaN(newStartDate.getTime())) {
+        errors.start = "Invalid start date format. Use MM/DD/YYYY.";
+      }
+      if (newEndDate && isNaN(newEndDate.getTime())) {
+        errors.end = "Invalid end date format. Use MM/DD/YYYY.";
+      }
+      if (newStartDate && newEndDate && newStartDate > newEndDate) {
+        errors.start = "Start date cannot be after end date.";
+        errors.end = "End date cannot be before start date.";
+      }
+
+      document
+        .getElementById("log-date-start")
+        ?.classList.toggle(styles.bgErrorLighter, !!errors.start);
+      document
+        .getElementById("log-date-start")
+        ?.classList.toggle(styles.borderError, !!errors.start);
+      document
+        .getElementById("log-date-end")
+        ?.classList.toggle(styles.bgErrorLighter, !!errors.end);
+      document
+        .getElementById("log-date-end")
+        ?.classList.toggle(styles.borderError, !!errors.end);
+
+      setDateErrors(errors);
+      return errors;
+    };
+
+    const handlePresetChange = (value: string) => {
+      setSelectedPreset(value);
+      if (value !== CUSTOM_VALUE) {
+        setDateErrors({});
       }
     };
 
-    if (isOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-    } else {
-      document.removeEventListener("mousedown", handleClickOutside);
-    }
+    useImperativeHandle(ref, () => ({
+      getStartDate: () => startDate,
+      getEndDate: () => endDate,
+    }));
 
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [isOpen]);
+    const handleApply = () => {
+      onChange(
+        selectedPreset && selectedPreset !== CUSTOM_VALUE
+          ? presetOptions
+              .find((p) => p.value === selectedPreset)
+              ?.getRange() || {
+              startDate: null,
+              endDate: null,
+            }
+          : { startDate: customStart, endDate: customEnd },
+      );
+      setIsOpen(false);
+    };
 
-  useEffect(() => {
-    if (isOpen) {
-      const startInput = document.getElementById(
-        "log-date-start",
-      ) as HTMLInputElement;
-      const endInput = document.getElementById(
-        "log-date-end",
-      ) as HTMLInputElement;
-      if (startInput)
-        startInput.value = customStart ? customStart.toLocaleDateString() : "";
-      if (endInput)
-        endInput.value = customEnd ? customEnd.toLocaleDateString() : "";
-    }
-  }, [isOpen, customStart, customEnd]);
-
-  const getDisplayedRange = () => {
-    if (selectedPreset && selectedPreset !== CUSTOM_VALUE) {
-      const preset = presetOptions.find((p) => p.value === selectedPreset);
-      if (preset) {
-        return preset.getRange();
+    const handleClearClick = async () => {
+      if (handleClear) {
+        await handleClear();
       }
-    }
-    return { startDate: customStart, endDate: customEnd };
-  };
+      setCustomStart(null);
+      setCustomEnd(null);
+      setSelectedPreset("");
 
-  const { startDate, endDate } = getDisplayedRange();
-
-  const formattedStart = startDate ? startDate.toLocaleDateString() : "";
-  const formattedEnd = endDate ? endDate.toLocaleDateString() : "";
-
-  const displayStart = startDate
-    ? startDate.toLocaleDateString("en-US", {
-        year: "2-digit",
-        month: "2-digit",
-        day: "2-digit",
-      })
-    : "";
-
-  const displayEnd = endDate
-    ? endDate.toLocaleDateString("en-US", {
-        year: "2-digit",
-        month: "2-digit",
-        day: "2-digit",
-      })
-    : "";
-
-  const displayText =
-    formattedStart && formattedEnd ? `${displayStart} - ${displayEnd}` : "";
-
-  const validateDates = (
-    newStartDate: Date | null,
-    newEndDate: Date | null,
-  ) => {
-    const errors: DateErrors = {};
-
-    if (newStartDate && isNaN(newStartDate.getTime())) {
-      errors.start = "Invalid start date format. Use MM/DD/YYYY.";
-    }
-    if (newEndDate && isNaN(newEndDate.getTime())) {
-      errors.end = "Invalid end date format. Use MM/DD/YYYY.";
-    }
-    if (newStartDate && newEndDate && newStartDate > newEndDate) {
-      errors.start = "Start date cannot be after end date.";
-      errors.end = "End date cannot be before start date.";
-    }
-
-    document
-      .getElementById("log-date-start")
-      ?.classList.toggle(styles.bgErrorLighter, !!errors.start);
-    document
-      .getElementById("log-date-start")
-      ?.classList.toggle(styles.borderError, !!errors.start);
-    document
-      .getElementById("log-date-end")
-      ?.classList.toggle(styles.bgErrorLighter, !!errors.end);
-    document
-      .getElementById("log-date-end")
-      ?.classList.toggle(styles.borderError, !!errors.end);
-
-    setDateErrors(errors);
-    return errors;
-  };
-
-  const handlePresetChange = (value: string) => {
-    setSelectedPreset(value);
-    if (value !== CUSTOM_VALUE) {
       setDateErrors({});
-    }
-  };
+    };
 
-  const handleApply = () => {
-    onChange(
-      selectedPreset && selectedPreset !== CUSTOM_VALUE
-        ? presetOptions.find((p) => p.value === selectedPreset)?.getRange() || {
-            startDate: null,
-            endDate: null,
-          }
-        : { startDate: customStart, endDate: customEnd },
-    );
-    setIsOpen(false);
-  };
+    const disableApply = !selectedPreset;
 
-  const handleClear = () => {
-    setCustomStart(null);
-    setCustomEnd(null);
-    setDateErrors({});
-  };
-
-  const disableApply = !selectedPreset;
-
-  return (
-    <div className={styles.datePickerContainer} ref={containerRef}>
-      <div className={styles.textInputContainer}>
-        <TextInput
-          type="text"
-          id="date-range-input"
-          data-testid="date-range-input"
-          name="date-range-input"
-          aria-label="Date range input"
-          value={displayText}
-          readOnly
-          onClick={() => setIsOpen((prev) => !prev)}
-        />
-        <Icon.CalendarToday
-          size={3}
-          className={styles.calendarIcon}
-          aria-label="date-range-calendar-icon"
-        />
-      </div>
-      {isOpen && (
-        <div className={styles.filterPopover}>
-          <FormGroup className="margin-top-1">
-            <fieldset className={styles.radioGroup} aria-label="Filter by">
-              <legend className={styles.legend}>Filter by</legend>
-              {presetOptions.map(({ label, value }) => (
-                <Radio
-                  key={value}
-                  id={`preset-${value}`}
-                  data-testid={`preset-${value}`}
-                  aria-label={`Preset value ${value} radio button`}
-                  name="date-filter"
-                  label={label}
-                  value={value}
-                  checked={selectedPreset === value}
-                  onChange={() => handlePresetChange(value)}
-                />
-              ))}
-              <hr className="margin-top-2"></hr>
-              <Radio
-                id={`preset-${CUSTOM_VALUE}`}
-                name="date-filter"
-                label="Custom date range"
-                data-testid={`preset-${CUSTOM_VALUE}`}
-                aria-label="Custom date range radio button"
-                value={CUSTOM_VALUE}
-                checked={selectedPreset === CUSTOM_VALUE}
-                onChange={() => handlePresetChange(CUSTOM_VALUE)}
-              />
-            </fieldset>
-          </FormGroup>
-          {selectedPreset === CUSTOM_VALUE && (
-            <>
-              <USWDSDateRangePicker
-                startDateLabel="Start Date"
-                endDateLabel="End Date"
-                aria-label="Date range picker"
-                startDatePickerProps={{
-                  id: "log-date-start",
-                  name: "log-date-start",
-                  value: customStart ? customStart.toLocaleDateString() : "",
-                  onChange: (val?: string) => {
-                    const rawDate = val ? new Date(val) : null;
-                    const date = normalizeStart(rawDate);
-                    const errors = validateDates(date, customEnd);
-                    setDateErrors(errors);
-                    setCustomStart(date);
-                  },
-                }}
-                endDatePickerProps={{
-                  id: "log-date-end",
-                  name: "log-date-end",
-                  value: customEnd ? customEnd.toLocaleDateString() : "",
-                  onChange: (val?: string) => {
-                    const rawDate = val ? new Date(val) : null;
-                    const date = normalizeEnd(rawDate);
-                    const errors = validateDates(customStart, date);
-                    setDateErrors(errors);
-                    setCustomEnd(date);
-                  },
-                }}
-              />
-              {(dateErrors.start || dateErrors.end) && (
-                <p className={styles.errorText} role="alert">
-                  {dateErrors.start || dateErrors.end}
-                </p>
-              )}
-              <div className={styles.clearButtonContainer}>
-                <Button
-                  unstyled
-                  type="button"
-                  data-testid="date-range-clear-button"
-                  onClick={handleClear}
-                >
-                  Clear
-                </Button>
-              </div>
-            </>
+    return (
+      <div className={styles.datePickerContainer} ref={containerRef}>
+        <div
+          className={classNames(
+            styles.textInputContainer,
+            displayText ? styles.textInputContainer__wide : "",
           )}
-          <Button
-            type="button"
-            className={styles.applyButton}
-            onClick={handleApply}
-            disabled={disableApply}
-          >
-            Apply filter
-          </Button>
+        >
+          <Icon.CalendarToday
+            size={3}
+            className={styles.calendarIcon}
+            aria-label="date-range-calendar-icon"
+          />
+          <TextInput
+            id={id}
+            type="text"
+            className={styles.dateRangeInput}
+            data-testid="date-range-input"
+            name="date-range-input"
+            aria-label="Date range input"
+            value={displayText}
+            readOnly
+            placeholder={placeholderText}
+            onClick={() => setIsOpen((prev) => !prev)}
+          />
         </div>
-      )}
-    </div>
-  );
-};
+        {isOpen && (
+          <div
+            className={classNames(
+              styles.filterPopover,
+              popoverSide === "left" ? styles.popoverLeft : styles.popoverRight,
+            )}
+          >
+            <FormGroup className="margin-top-1">
+              <fieldset className={styles.radioGroup} aria-label="Filter by">
+                <div className="display-flex justify-between flex-align-baseline">
+                  <legend className={styles.legend}>Filter by</legend>
+
+                  <Button
+                    unstyled
+                    type="button"
+                    data-testid="date-range-clear-button"
+                    onClick={handleClearClick}
+                  >
+                    Clear
+                  </Button>
+                </div>
+
+                {presetOptions.map(({ label, value }) => (
+                  <Radio
+                    key={value}
+                    id={`preset-${value}`}
+                    data-testid={`preset-${value}`}
+                    aria-label={`Preset value ${value} radio button`}
+                    name="date-filter"
+                    label={label}
+                    value={value}
+                    checked={selectedPreset === value}
+                    onChange={() => handlePresetChange(value)}
+                  />
+                ))}
+                <hr className="margin-top-2"></hr>
+                <Radio
+                  id={`preset-${CUSTOM_VALUE}`}
+                  name="date-filter"
+                  label="Custom date range"
+                  data-testid={`preset-${CUSTOM_VALUE}`}
+                  aria-label="Custom date range radio button"
+                  value={CUSTOM_VALUE}
+                  checked={selectedPreset === CUSTOM_VALUE}
+                  onChange={() => handlePresetChange(CUSTOM_VALUE)}
+                />
+              </fieldset>
+            </FormGroup>
+
+            <div className={styles.clearButtonContainer}></div>
+            {selectedPreset === CUSTOM_VALUE && (
+              <>
+                <USWDSDateRangePicker
+                  startDateLabel="Start Date"
+                  endDateLabel="End Date"
+                  aria-label="Date range picker"
+                  startDatePickerProps={{
+                    id: "log-date-start",
+                    name: "log-date-start",
+                    value: customStart ? customStart.toLocaleDateString() : "",
+                    onChange: (val?: string) => {
+                      const rawDate = val ? new Date(val) : null;
+                      const date = normalizeStart(rawDate);
+                      const errors = validateDates(date, customEnd);
+                      setDateErrors(errors);
+                      setCustomStart(date);
+                    },
+                  }}
+                  endDatePickerProps={{
+                    id: "log-date-end",
+                    name: "log-date-end",
+                    value: customEnd ? customEnd.toLocaleDateString() : "",
+                    onChange: (val?: string) => {
+                      const rawDate = val ? new Date(val) : null;
+                      const date = normalizeEnd(rawDate);
+                      const errors = validateDates(customStart, date);
+                      setDateErrors(errors);
+                      setCustomEnd(date);
+                    },
+                  }}
+                />
+                {(dateErrors.start || dateErrors.end) && (
+                  <p className={styles.errorText} role="alert">
+                    {dateErrors.start || dateErrors.end}
+                  </p>
+                )}
+              </>
+            )}
+            <Button
+              type="button"
+              className={styles.applyButton}
+              onClick={handleApply}
+              disabled={disableApply}
+            >
+              Apply filter
+            </Button>
+          </div>
+        )}
+      </div>
+    );
+  },
+);
 
 export default DateRangePicker;
+
+function areDatesOnSameDay(date1: Date | null, date2: Date | null) {
+  if (date1 === null || date2 === null) return false;
+  return (
+    date1.getFullYear() === date2.getFullYear() &&
+    date1.getMonth() === date2.getMonth() &&
+    date1.getDate() === date2.getDate()
+  );
+}

@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useEffect, ChangeEvent, useMemo } from "react";
+import { useState, useEffect, ChangeEvent, useMemo, useRef } from "react";
 import styles from "./auditLogs.module.scss";
 import classNames from "classnames";
 import {
   DateRange,
   DateErrors,
+  DateRangePickerRef,
 } from "@/app/ui/designSystem/timeboxing/DateRangePicker";
 import DateRangePicker from "@/app/ui/designSystem/timeboxing/DateRangePicker";
 import SearchField from "@/app/ui/designSystem/searchField/SearchField";
@@ -38,6 +39,7 @@ const AuditLogs: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedLog, setSelectedLog] = useState<LogEntry | null>(null);
+  const datePickerRef = useRef<DateRangePickerRef>(null);
 
   useEffect(() => {
     async function fetchAuditLogs() {
@@ -182,11 +184,15 @@ const AuditLogs: React.FC = () => {
             <label htmlFor="dateRange">Custom date range</label>
             <div>
               <DateRangePicker
+                ref={datePickerRef}
+                id={"auditLogDatePicker"}
                 startDate={dateRange.startDate || null}
                 endDate={dateRange.endDate || null}
-                onChange={({ startDate, endDate }) =>
-                  setDateRange({ startDate, endDate })
-                }
+                onChange={() => {
+                  const startDate = datePickerRef.current?.getStartDate();
+                  const endDate = datePickerRef.current?.getEndDate();
+                  setDateRange({ startDate, endDate });
+                }}
               />
             </div>
           </div>
