@@ -197,7 +197,7 @@ class FHIRClient {
    * @throws Error if authentication fails.
    * @returns The new access token.
    */
-  private async getAccessToken(): Promise<void> {
+  public async getAccessToken(): Promise<void> {
     try {
       if (!this.serverConfig.clientId) {
         throw new Error("Client ID is required for authentication");

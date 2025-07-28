@@ -382,10 +382,13 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
 
     if (!config) throw new Error(`No server config found for ${serverName}`);
 
-    if (config.authType === "SMART" && config.accessToken) {
+    if (config.authType === "SMART") {
+      const client = new FHIRClient(config);
+      const token = await client.getAccessToken();
+
       config.headers = {
         ...(config.headers || {}),
-        Authorization: `Bearer ${config.accessToken}`,
+        Authorization: `Bearer ${token}`,
       };
     }
 
