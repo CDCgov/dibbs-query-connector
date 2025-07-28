@@ -317,15 +317,11 @@ describe("AuditLogs Component", () => {
     await user.click(clearButton);
 
     await waitFor(() => {
-      const newStart = document.getElementById(
-        "log-date-start",
-      ) as HTMLInputElement;
-      const newEnd = document.getElementById(
-        "log-date-end",
+      const datePickerInput = document.getElementById(
+        "auditLogDatePicker",
       ) as HTMLInputElement;
 
-      expect(newStart.value).toBe("");
-      expect(newEnd.value).toBe("");
+      expect(datePickerInput.value).toBe("");
     });
   });
 
