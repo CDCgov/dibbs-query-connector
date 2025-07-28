@@ -1,7 +1,10 @@
+"use client";
+
 import styles from "../buildFromTemplates/conditionTemplateSelection.module.scss";
 import React, {
   ChangeEvent,
   MouseEvent,
+  useContext,
   useEffect,
   useRef,
   useState,
@@ -28,7 +31,15 @@ import { Concept } from "@/app/models/entities/concepts";
 import ValueSetBulkToggle from "./ValueSetBulkToggle";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import classNames from "classnames";
-import DateRangePicker from "@/app/ui/designSystem/timeboxing/DateRangePicker";
+import DateRangePicker, {
+  DateRangePickerRef,
+} from "@/app/ui/designSystem/timeboxing/DateRangePicker";
+import { DataContext } from "@/app/shared/DataProvider";
+import {
+  deleteTimeboxSettings,
+  getTimeboxRanges,
+  updateTimeboxSettings,
+} from "@/app/backend/query-timeboxing";
 
 type ConceptTypeAccordionBodyProps = {
   activeValueSets: { [vsId: string]: FilterableValueSet };
@@ -44,6 +55,11 @@ type ConceptTypeAccordionBodyProps = {
 
 export type ConceptDisplay = Concept & {
   render: boolean;
+};
+
+type DateRange = {
+  timeWindowStart: null | Date;
+  timeWindowEnd: null | Date;
 };
 
 /**
@@ -67,8 +83,33 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
   const [curValueSet, setCurValueSet] = useState<DibbsValueSet>();
   const [curConcepts, setCurConcepts] = useState<FilterableConcept[]>([]);
   const [drawerSearchFilter, setDrawerSearchFilter] = useState<string>("");
+  const [initialTimeboxRange, setInitialTimeboxRange] = useState<DateRange>({
+    timeWindowStart: null,
+    timeWindowEnd: null,
+  });
+
   const areItemsFiltered = tableSearchFilter !== "";
   const focusRef = useRef<HTMLButtonElement>(null);
+  const dateRef = useRef<DateRangePickerRef>(null);
+  const queryContext = useContext(DataContext);
+
+  useEffect(() => {
+    async function fetchInitialTimeboxRange() {
+      const queryId = queryContext?.selectedQuery?.queryId;
+      if (queryId) {
+        const timeRange = await getTimeboxRanges(queryId, accordionConceptType);
+        if (timeRange) {
+          setInitialTimeboxRange({
+            timeWindowStart: new Date(timeRange.timeWindowStart),
+            timeWindowEnd: new Date(timeRange.timeWindowEnd),
+          });
+        }
+      }
+    }
+    fetchInitialTimeboxRange().then((r) => {
+      console.log(r);
+    });
+  }, [accordionConceptType]);
 
   useEffect(() => {
     if (curValueSet) {
@@ -242,12 +283,32 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
     0,
   );
 
-  const handleTimeboxApplication = (dates: {
-    startDate: Date | null;
-    endDate: Date | null;
-  }) => {
-    console.log(dates.startDate);
-    console.log(dates.endDate);
+  const handleTimeboxUpdate = async () => {
+    const queryId = queryContext?.selectedQuery?.queryId;
+    const conceptType = accordionConceptType;
+
+    const startDate = dateRef.current?.getStartDate();
+    const endDate = dateRef.current?.getEndDate();
+    if (queryId && startDate && endDate) {
+      const startDateString = startDate.toISOString();
+      const endDateString = endDate.toISOString();
+
+      await updateTimeboxSettings(
+        queryId,
+        conceptType,
+        startDateString,
+        endDateString,
+      );
+    }
+  };
+
+  const handleTimeboxClear = async () => {
+    const queryId = queryContext?.selectedQuery?.queryId;
+    const conceptType = accordionConceptType;
+
+    if (queryId) {
+      await deleteTimeboxSettings(queryId, conceptType);
+    }
   };
 
   const buttons = [
@@ -291,10 +352,12 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
         </div>
 
         <DateRangePicker
+          ref={dateRef}
           id={`dateRangePicker-${accordionConceptType}`}
-          startDate={null}
-          endDate={null}
-          onChange={handleTimeboxApplication}
+          startDate={initialTimeboxRange.timeWindowStart}
+          endDate={initialTimeboxRange.timeWindowEnd}
+          onChange={handleTimeboxUpdate}
+          handleClear={handleTimeboxClear}
           popoverSide="left"
           placeholderText="All dates"
         />
