@@ -288,7 +288,7 @@ test.describe("editing an existing query", () => {
     await deleteQueryByIdHelp(subjectQuery.queryId, dbClient);
   });
 
-  test.only("filtered valuesets don't show up in query execution", async ({
+  test("filtered valuesets don't show up in query execution", async ({
     page,
   }) => {
     await checkForCancerMedication(page, subjectQuery.queryName, true);
