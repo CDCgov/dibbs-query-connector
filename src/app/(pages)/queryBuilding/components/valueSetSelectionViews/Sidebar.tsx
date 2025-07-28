@@ -1,7 +1,4 @@
-import {
-  CUSTOM_CONDITION_ID,
-  CUSTOM_VALUESET_ARRAY_ID,
-} from "@/app/shared/constants";
+import { CUSTOM_VALUESET_ARRAY_ID } from "@/app/shared/constants";
 import { Icon } from "@trussworks/react-uswds";
 import classNames from "classnames";
 import styles from "../../buildFromTemplates/conditionTemplateSelection.module.scss";
@@ -219,13 +216,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <div
               className={classNames(
                 "align-items-center",
-                activeCondition === CUSTOM_CONDITION_ID
+                activeCondition === CUSTOM_VALUESET_ARRAY_ID
                   ? `${styles.card} ${styles.active}`
                   : styles.card,
               )}
+              data-testid={`tab-custom-container`}
             >
               <button
                 id={`tab-custom`}
+                data-testid={`tab-custom`}
                 className="unstyled-button-container"
                 onClick={() => setActiveCondition(CUSTOM_VALUESET_ARRAY_ID)}
               >
@@ -241,9 +240,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   ? `${styles.card} ${styles.active}`
                   : styles.card,
               )}
+              data-testid={`tab-medical-records-container`}
             >
               <button
                 id={`tab-medical-records`}
+                data-testid={`tab-medical-records`}
                 onClick={() => setActiveCondition(MEDICAL_RECORD_SECTIONS_ID)}
                 className="unstyled-button-container"
               >

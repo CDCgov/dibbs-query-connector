@@ -49,12 +49,23 @@ export type QueryUpdateResult = {
 export type QueryDataColumn = {
   [conditionId: string]: { [valueSetId: string]: DibbsValueSet };
 };
+export type QueryTableTimebox = Partial<
+  Record<
+    DibbsConceptType,
+    {
+      timeWindowStart: string;
+      timeWindowEnd: string;
+    }
+  >
+>;
+
 export type QueryTableResult = {
   queryName: string;
   queryId: string;
   queryData: QueryDataColumn;
   conditionsList: string[];
   medicalRecordSections: MedicalRecordSections;
+  timeboxWindows?: QueryTableTimebox;
 };
 
 export const EMPTY_QUERY_SELECTION = {
