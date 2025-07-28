@@ -118,9 +118,11 @@ export async function deleteQueryByIdHelp(
   const deleteUsergroupToQuery = `
   DELETE FROM usergroup_to_query WHERE query_id = $1;
 `;
+
   const deleteQuery = `
   DELETE FROM query WHERE id = $1;
 `;
+
   try {
     await dbClient.query(deleteUsergroupToQuery, [queryId]);
 

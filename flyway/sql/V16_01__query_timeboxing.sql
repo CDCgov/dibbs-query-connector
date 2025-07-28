@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS query_timeboxing (
     time_window_end TIMESTAMP,
     concept_type VARCHAR(80),
     query_id UUID,
-    FOREIGN KEY (query_id) REFERENCES query(id),
+    FOREIGN KEY (query_id) REFERENCES query(id) ON DELETE CASCADE,
     -- each query <> concept_type relationship is unique
     UNIQUE (query_id, concept_type));
     
