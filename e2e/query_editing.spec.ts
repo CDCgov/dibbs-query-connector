@@ -285,7 +285,7 @@ test.describe("editing an existing query", () => {
   });
 
   test.afterEach(async () => {
-    // await deleteQueryByIdHelp(subjectQuery.queryId, dbClient);
+    await deleteQueryByIdHelp(subjectQuery.queryId, dbClient);
   });
 
   test("filtered valuesets don't show up in query execution", async ({
