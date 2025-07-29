@@ -317,7 +317,7 @@ const FhirServers: React.FC = () => {
     setPatientMatchData((prev) => ({
       enabled: prev?.enabled ?? false,
       onlySingleMatch: false,
-      onlyCertainMatches: fhirVersion?.startsWith("6") ?? false,
+      onlyCertainMatches: fhirVersion?.startsWith("6") ?? true,
       matchCount: prev?.matchCount ?? 0,
       supportsMatch: supportsMatch ?? false,
     }));
@@ -650,6 +650,7 @@ const FhirServers: React.FC = () => {
             setPatientMatchData((prev) => ({
               ...prev!,
               enabled: e.target.checked,
+              onlyCertainMatches: true,
             }))
           }
         />
