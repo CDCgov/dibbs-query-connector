@@ -1,7 +1,8 @@
 import { auth } from "@/auth";
-import { User } from "next-auth";
+import { Session, User } from "next-auth";
 import { getUserRole } from "../backend/user-management";
 import { UserRole } from "../models/entities/users";
+import { randomUUID } from "crypto";
 
 /**
  * Checks if the property DEMO_MODE is true (Configured this way in demo env only)
@@ -65,4 +66,25 @@ export async function adminAccessCheck(): Promise<boolean> {
     role === UserRole.ADMIN ||
     isAuthDisabledServerCheck()
   );
+}
+
+/**
+ * Function return a predefined session object in cases where AUTH_DISABLED === true
+ *
+ * @returns A mock session object to use.
+ */
+export function returnPredefinedSessionObject() {
+  console.log("Auth disabled. Returning predefined session token");
+  const session: Session = {
+    expires: "100000000",
+  };
+  session.user = {
+    id: randomUUID(),
+    email: "test-runner@dibbs.tools",
+    username: "Test Runner",
+    firstName: "Test",
+    lastName: "Runner",
+    role: UserRole.SUPER_ADMIN,
+  };
+  return session;
 }

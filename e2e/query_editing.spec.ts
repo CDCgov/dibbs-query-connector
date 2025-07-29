@@ -6,7 +6,7 @@ import {
   NestedQuery,
   QueryTableResult,
 } from "../src/app/(pages)/queryBuilding/utils";
-import { CANCER_FRONTEND_NESTED_INPUT, DEFAULT_FHIR_SERVER } from "./constants";
+import { CANCER_FRONTEND_NESTED_INPUT } from "./constants";
 import {
   deleteQueryByIdHelp,
   getSavedQueryByIdHelp,
@@ -280,12 +280,12 @@ test.describe("editing an existing query", () => {
 test.describe("editing an existing query", () => {
   let subjectQuery: QueryTableResult;
   // Start every test by navigating to the customize query workflow
-  test.beforeEach(async ({ page }) => {
+  test.beforeEach(async () => {
     subjectQuery = await createTestQuery();
   });
 
   test.afterEach(async () => {
-    await deleteQueryByIdHelp(subjectQuery.queryId, dbClient);
+    // await deleteQueryByIdHelp(subjectQuery.queryId, dbClient);
   });
 
   test("filtered valuesets don't show up in query execution", async ({
@@ -293,12 +293,7 @@ test.describe("editing an existing query", () => {
   }) => {
     await checkForCancerMedication(page, subjectQuery.queryName, true);
 
-    // uncheck and recheck
     await page.goto(`${TEST_URL}/queryBuilding`);
-
-    const subjectVS = Object.values(
-      subjectQuery.queryData[CANCER_CONDITION_ID],
-    )[0];
 
     const query = page.locator("tr", {
       has: page.getByTitle(subjectQuery.queryName),
@@ -319,8 +314,6 @@ test.describe("editing an existing query", () => {
       }),
     ).toBeVisible();
 
-    const actionButton = page.getByTestId("createSaveQueryBtn");
-
     // uncheck a value set
     const medicationHeader = page.getByTestId("accordionButton_medications");
     await expect(medicationHeader).toBeVisible();
@@ -328,6 +321,16 @@ test.describe("editing an existing query", () => {
 
     const medsButton = page.getByText("Cancer (Leukemia) Medication");
     await medsButton.click();
+    await expect(
+      page.getByText(`1 code(s) successfully removed`),
+    ).toBeVisible();
+
+    const saveQuery = page.getByText("Save query");
+    await saveQuery.click();
+
+    await expect(
+      page.getByText(`${subjectQuery.queryName} successfully updated`),
+    ).toBeVisible();
 
     await checkForCancerMedication(page, subjectQuery.queryName, false);
   });
@@ -397,6 +400,8 @@ async function checkForCancerMedication(
   await expect(
     page.getByRole("heading", { name: "Patient Record" }),
   ).toBeVisible();
+
+  await expect(page.getByText("Patient Name")).toBeVisible();
 
   if (medicationShouldExist) {
     await expect(
