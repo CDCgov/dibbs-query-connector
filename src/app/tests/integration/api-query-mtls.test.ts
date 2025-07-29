@@ -63,10 +63,28 @@ jest.mock("@/app/shared/fhirClient", () => {
                 id: "test-patient-123",
                 name: [{ given: ["John"], family: "Doe" }],
                 birthDate: "1990-01-01",
+                identifier: [
+                  {
+                    type: {
+                      coding: [
+                        {
+                          system:
+                            "http://terminology.hl7.org/CodeSystem/v2-0203",
+                          code: "MR",
+                        },
+                      ],
+                    },
+                    system: "http://hospital.org/mrn",
+                    value: "MRN-12345",
+                  },
+                ],
               },
             },
           ],
         }),
+        text: async () => "",
+        headers: new Headers(),
+        url: "http://mock-server.com/fhir",
       }),
       post: jest.fn().mockResolvedValue({
         status: 200,
@@ -77,6 +95,7 @@ jest.mock("@/app/shared/fhirClient", () => {
           type: "searchset",
           entry: [],
         }),
+        headers: new Headers(),
       }),
       postJson: jest.fn().mockResolvedValue({
         status: 201,
@@ -94,6 +113,8 @@ jest.mock("@/app/shared/fhirClient", () => {
             },
           ],
         }),
+        headers: new Headers(),
+        url: "http://mock-server.com/fhir",
       }),
       getBatch: jest.fn(),
     })),
@@ -129,6 +150,78 @@ jest.mock("@/app/backend/query-building/service", () => ({
     queryData: {},
     medicalRecordSections: {},
   }),
+}));
+
+// Mock critical missing dependencies
+jest.mock("@/app/shared/format-service", () => ({
+  GetPhoneQueryFormats: jest
+    .fn()
+    .mockResolvedValue(["555-123-4567", "5551234567"]),
+}));
+
+jest.mock("@/app/shared/database-service", () => ({
+  getSavedQueryByName: jest.fn().mockResolvedValue({
+    queryName: "Syphilis",
+    queryData: {},
+    medicalRecordSections: {},
+  }),
+}));
+
+jest.mock("@/app/api/query/parsers", () => ({
+  parseHL7FromRequestBody: jest.fn().mockImplementation((body) => body),
+  parsePatientDemographics: jest.fn().mockReturnValue({
+    first_name: "John",
+    last_name: "Doe",
+    dob: "1990-01-01",
+    mrn: "MRN-12345",
+    phone: "555-123-4567",
+    street1: "123 Main St",
+    city: "Anytown",
+    state: "CA",
+    zip: "12345",
+    email: "john.doe@example.com",
+  }),
+  mapDeprecatedUseCaseToId: jest.fn().mockImplementation((useCase) => useCase),
+}));
+
+jest.mock("@/app/models/entities/query", () => ({
+  validatedPatientSearch: jest.fn().mockReturnValue(true),
+}));
+
+jest.mock("@/app/shared/CustomQuery", () => ({
+  CustomQuery: jest.fn().mockImplementation(() => ({
+    getQuery: jest.fn().mockReturnValue({
+      basePath: "/Observation",
+      params: { patient: "test-patient-123" },
+    }),
+    compileAllPostRequests: jest.fn().mockReturnValue([
+      {
+        path: "/Observation",
+        params: { patient: "test-patient-123" },
+      },
+    ]),
+  })),
+}));
+
+jest.mock("node-hl7-client", () => ({
+  Message: jest.fn().mockImplementation(({ text }) => ({
+    get: jest.fn().mockImplementation((path) => {
+      const mockData = {
+        "PID.5.2": "John",
+        "PID.5.1": "Doe",
+        "PID.7.1": "19900101",
+        "PID.3.1": "MRN-12345",
+        "PID.11.1": "123 Main St",
+        "PID.11.2": "",
+        "PID.11.3": "Anytown",
+        "PID.11.4": "CA",
+        "PID.11.5": "12345",
+        "NK1.5.1": "555-123-4567",
+        "PID.13.4": "john.doe@example.com",
+      };
+      return { toString: () => mockData[path] || "" };
+    }),
+  })),
 }));
 
 import { validateServiceToken } from "@/app/api/api-auth";
@@ -303,20 +396,6 @@ describe("API Query with Mutual TLS", () => {
       );
 
       const response = await POST(request);
-
-      // Debug logging to see actual error
-      if (response.status !== 200) {
-        try {
-          const errorBody = await response.json();
-          console.error("API Error Response:", {
-            status: response.status,
-            body: errorBody,
-          });
-        } catch (e) {
-          console.error("Failed to parse error response:", e);
-        }
-      }
-
       expect(response.status).toBe(200);
 
       const body = await response.json();
@@ -442,20 +521,6 @@ describe("API Query with Mutual TLS", () => {
       );
 
       const response = await POST(request);
-
-      // Debug logging to see actual error
-      if (response.status !== 200) {
-        try {
-          const errorBody = await response.json();
-          console.error("API Error Response:", {
-            status: response.status,
-            body: errorBody,
-          });
-        } catch (e) {
-          console.error("Failed to parse error response:", e);
-        }
-      }
-
       expect(response.status).toBe(200);
 
       const body = await response.json();
@@ -520,20 +585,6 @@ PV1|1|I|ROOM-123^BED-A^HOSP||||ATTENDING^DOCTOR^A|||||||||||ADM001||||||||||||||
       );
 
       const response = await POST(request);
-
-      // Debug logging to see actual error
-      if (response.status !== 200) {
-        try {
-          const errorBody = await response.json();
-          console.error("API Error Response:", {
-            status: response.status,
-            body: errorBody,
-          });
-        } catch (e) {
-          console.error("Failed to parse error response:", e);
-        }
-      }
-
       expect(response.status).toBe(200);
 
       const body = await response.json();
@@ -590,20 +641,6 @@ PV1|1|I|ROOM-123^BED-A^HOSP||||ATTENDING^DOCTOR^A|||||||||||ADM001||||||||||||||
       );
 
       const response = await POST(request);
-
-      // Debug logging to see actual error
-      if (response.status !== 200) {
-        try {
-          const errorBody = await response.json();
-          console.error("API Error Response:", {
-            status: response.status,
-            body: errorBody,
-          });
-        } catch (e) {
-          console.error("Failed to parse error response:", e);
-        }
-      }
-
       expect(response.status).toBe(200);
 
       const body = await response.json();
