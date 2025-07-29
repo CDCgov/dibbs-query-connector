@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# set -e # Exit immediately if a command exits with a non-zero status. Comment this if debugging in CI
+set -e # Exit immediately if a command exits with a non-zero status. Comment this if debugging in CI
 docker compose down --volumes --remove-orphans
 docker compose -f docker-compose-integration.yaml up -d
 
@@ -8,8 +8,8 @@ docker compose -f docker-compose-integration.yaml up -d
 docker compose -f docker-compose-integration.yaml logs -f aidbox-seeder | grep -q "Finished configuring Aidbox and database."
 
 # uncomment these and the corresponding block in ci.yaml to get logs in CI. Make sure also to comment the set -e command at the top of this file too!
-mkdir test-results
-docker compose -f docker-compose-integration.yaml logs > test-results/logs-before-tests.txt
+#mkdir test-results
+#docker compose -f docker-compose-integration.yaml logs > test-results/logs-before-tests.txt
 
 BASE_CMD="DATABASE_URL=postgresql://postgres:pw@localhost:5432/tefca_db TEST_TYPE=integration NEXT_PUBLIC_AUTH_PROVIDER=keycloak APP_HOSTNAME=http://query-connector:3000 npx jest "
 
@@ -24,7 +24,7 @@ eval $JEST_CMD
 JEST_EXIT_CODE=$?
 
 # uncomment these and the corresponding block in ci.yaml to get logs in CI
-docker compose -f docker-compose-integration.yaml logs > test-results/logs-after-tests.txt
+#docker compose -f docker-compose-integration.yaml logs > test-results/logs-after-tests.txt
 
 # Teardown containers
 docker compose -f docker-compose-integration.yaml down
