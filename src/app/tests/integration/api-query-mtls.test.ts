@@ -301,9 +301,12 @@ describe("API Query with Mutual TLS", () => {
       },
     });
 
-    // Mock setTimeout for polling loops
-    global.setTimeout = jest.fn((callback: any) => {
-      if (typeof callback === "function") {
+    // Mock setTimeout to avoid actual delays in tests
+    global.setTimeout = jest.fn((callback: any, delay: number) => {
+      // For polling delays, execute callback asynchronously to avoid blocking
+      if (delay >= 5000) {
+        process.nextTick(callback);
+      } else if (typeof callback === "function") {
         callback();
       }
       return 0 as any;
@@ -329,7 +332,7 @@ describe("API Query with Mutual TLS", () => {
         id: "test-mtls",
         name: "mTLS QHIN Server",
         hostname: "https://mtls.example.com/fhir",
-        mutualTls: false, // Simplified for now to avoid complex mTLS logic
+        mutualTls: true, // Enable mTLS for proper testing
         disableCertValidation: false,
         defaultServer: false,
       };
