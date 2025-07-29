@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e # Exit immediately if a command exits with a non-zero status. Comment this if debugging in CI
+# set -e # Exit immediately if a command exits with a non-zero status. Comment this if debugging in CI
 docker compose down --volumes --remove-orphans
 docker compose -f docker-compose-integration.yaml up -d
 
