@@ -57,7 +57,7 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
     "@eslint/js": "^9.29.0",
-    "@next/bundle-analyzer": "^15.3.5",
+    "@next/bundle-analyzer": "^15.4.4",
     "@next/eslint-plugin-next": "^15.3.4",
     "@playwright/test": "^1.45.2",
     "@smithy/util-stream": "^2.1.2",
