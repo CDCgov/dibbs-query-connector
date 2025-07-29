@@ -138,7 +138,11 @@ jest.mock("@/app/backend/audit-logs/decorator", () => ({
     .fn()
     .mockImplementation(
       () =>
-        (target: any, propertyName: string, descriptor: PropertyDescriptor) => {
+        (
+          target: unknown,
+          propertyName: string,
+          descriptor: PropertyDescriptor,
+        ) => {
           return descriptor;
         },
     ),
@@ -204,7 +208,7 @@ jest.mock("@/app/shared/CustomQuery", () => ({
 }));
 
 jest.mock("node-hl7-client", () => ({
-  Message: jest.fn().mockImplementation(({ text }) => ({
+  Message: jest.fn().mockImplementation(({ text: _text }) => ({
     get: jest.fn().mockImplementation((path) => {
       const mockData = {
         "PID.5.2": "John",
@@ -302,14 +306,14 @@ describe("API Query with Mutual TLS", () => {
     });
 
     // Mock setTimeout to avoid actual delays in tests
-    global.setTimeout = jest.fn((callback: any, delay: number) => {
+    global.setTimeout = jest.fn((callback: () => void, delay: number) => {
       // For polling delays, execute callback asynchronously to avoid blocking
       if (delay >= 5000) {
         process.nextTick(callback);
       } else if (typeof callback === "function") {
         callback();
       }
-      return 0 as any;
+      return 0 as NodeJS.Timeout;
     });
 
     mockFhirClient = {
@@ -317,7 +321,7 @@ describe("API Query with Mutual TLS", () => {
       post: jest.fn(),
       postJson: jest.fn(),
       getBatch: jest.fn(),
-    } as any;
+    } as jest.Mocked<FHIRClient>;
 
     (prepareFhirClient as jest.Mock).mockResolvedValue(mockFhirClient);
   });
@@ -356,7 +360,7 @@ describe("API Query with Mutual TLS", () => {
           type: "collection",
           entry: [{ resource: mockParentTask }],
         }),
-      } as any);
+      } as Response);
 
       // Mock child tasks polling - immediately completed
       mockFhirClient.get.mockResolvedValueOnce({
@@ -366,19 +370,19 @@ describe("API Query with Mutual TLS", () => {
           type: "searchset",
           entry: [{ resource: mockChildTask }],
         }),
-      } as any);
+      } as Response);
 
       // Mock task detail fetch
       mockFhirClient.get.mockResolvedValueOnce({
         status: 200,
         json: async () => mockChildTask,
-      } as any);
+      } as Response);
 
       // Mock patient results
       mockFhirClient.get.mockResolvedValueOnce({
         status: 200,
         json: async () => mockPatientBundle,
-      } as any);
+      } as Response);
 
       // Mock query execution for patient records
       mockFhirClient.post.mockResolvedValue({
@@ -388,7 +392,7 @@ describe("API Query with Mutual TLS", () => {
           type: "searchset",
           entry: [],
         }),
-      } as any);
+      } as Response);
 
       const request = createNextRequest(
         mockPatientResource,
@@ -471,7 +475,7 @@ describe("API Query with Mutual TLS", () => {
           type: "collection",
           entry: [{ resource: mockParentTask }],
         }),
-      } as any);
+      } as Response);
 
       // Mock child tasks with two completed tasks
       mockFhirClient.get.mockResolvedValueOnce({
@@ -481,29 +485,29 @@ describe("API Query with Mutual TLS", () => {
           type: "searchset",
           entry: [{ resource: mockChildTask }, { resource: mockChildTask2 }],
         }),
-      } as any);
+      } as Response);
 
       // Mock task detail fetches
       mockFhirClient.get
         .mockResolvedValueOnce({
           status: 200,
           json: async () => mockChildTask,
-        } as any)
+        } as Response)
         .mockResolvedValueOnce({
           status: 200,
           json: async () => mockChildTask2,
-        } as any);
+        } as Response);
 
       // Mock patient results fetches
       mockFhirClient.get
         .mockResolvedValueOnce({
           status: 200,
           json: async () => mockPatientBundle,
-        } as any)
+        } as Response)
         .mockResolvedValueOnce({
           status: 200,
           json: async () => mockPatientBundle2,
-        } as any);
+        } as Response);
 
       // Mock query execution
       mockFhirClient.post.mockResolvedValue({
@@ -513,7 +517,7 @@ describe("API Query with Mutual TLS", () => {
           type: "searchset",
           entry: [],
         }),
-      } as any);
+      } as Response);
 
       const request = createNextRequest(
         mockPatientResource,
@@ -531,7 +535,8 @@ describe("API Query with Mutual TLS", () => {
 
       // Should have entries from both organizations
       const patientEntries = body.entry?.filter(
-        (e: any) => e.resource?.resourceType === "Patient",
+        (e: { resource?: { resourceType?: string } }) =>
+          e.resource?.resourceType === "Patient",
       );
       expect(patientEntries).toHaveLength(2);
     });
@@ -550,7 +555,7 @@ PV1|1|I|ROOM-123^BED-A^HOSP||||ATTENDING^DOCTOR^A|||||||||||ADM001||||||||||||||
           type: "collection",
           entry: [{ resource: mockParentTask }],
         }),
-      } as any);
+      } as Response);
 
       mockFhirClient.get
         .mockResolvedValueOnce({
@@ -560,15 +565,15 @@ PV1|1|I|ROOM-123^BED-A^HOSP||||ATTENDING^DOCTOR^A|||||||||||ADM001||||||||||||||
             type: "searchset",
             entry: [{ resource: mockChildTask }],
           }),
-        } as any)
+        } as Response)
         .mockResolvedValueOnce({
           status: 200,
           json: async () => mockChildTask,
-        } as any)
+        } as Response)
         .mockResolvedValueOnce({
           status: 200,
           json: async () => mockPatientBundle,
-        } as any);
+        } as Response);
 
       mockFhirClient.post.mockResolvedValue({
         status: 200,
@@ -577,7 +582,7 @@ PV1|1|I|ROOM-123^BED-A^HOSP||||ATTENDING^DOCTOR^A|||||||||||ADM001||||||||||||||
           type: "searchset",
           entry: [],
         }),
-      } as any);
+      } as Response);
 
       const request = createNextRequest(
         hl7Message,
@@ -623,7 +628,7 @@ PV1|1|I|ROOM-123^BED-A^HOSP||||ATTENDING^DOCTOR^A|||||||||||ADM001||||||||||||||
       mockFhirClient.get.mockResolvedValueOnce({
         status: 200,
         json: async () => mockPatientBundle,
-      } as any);
+      } as Response);
 
       // Mock query execution
       mockFhirClient.post.mockResolvedValue({
@@ -633,7 +638,7 @@ PV1|1|I|ROOM-123^BED-A^HOSP||||ATTENDING^DOCTOR^A|||||||||||ADM001||||||||||||||
           type: "searchset",
           entry: [],
         }),
-      } as any);
+      } as Response);
 
       const request = createNextRequest(
         mockPatientResource,

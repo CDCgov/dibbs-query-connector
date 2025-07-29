@@ -1,5 +1,5 @@
 "use server";
-import { Bundle, FhirResource, Patient, Task, BundleEntry } from "fhir/r4";
+import { Bundle, FhirResource, Patient, Task } from "fhir/r4";
 
 import { isFhirResource } from "../shared/constants";
 
