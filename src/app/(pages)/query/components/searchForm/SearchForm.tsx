@@ -108,7 +108,7 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
 
   useEffect(() => {
     const loadConfig = async () => {
-      const configs = await getFhirServerConfigs();
+      const configs = await getFhirServerConfigs(true);
       const match = configs.find((c) => c.name === fhirServer);
       if (match) {
         setFhirServerConfig(match);
