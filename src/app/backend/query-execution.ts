@@ -32,7 +32,6 @@ class QueryService {
    */
   @auditable
   private static async makePatientRecordsRequest(
-    queryName: string,
     queryData: QueryDataColumn,
     patientId: string,
     fhirServer: string,
@@ -424,7 +423,6 @@ class QueryService {
 
     let response: Response | Response[] =
       await QueryService.makePatientRecordsRequest(
-        request.queryName,
         queryData,
         request.patientId,
         request.fhirServer,
