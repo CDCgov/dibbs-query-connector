@@ -564,3 +564,18 @@ $columnGap: 1rem;
   padding: 1rem 3rem 0.5rem 3rem !important;
   max-width: fit-content;
 }
+
+.accordionBulkAction {
+  display: flex;
+  justify-content: space-between;
+  padding-right: 1.5rem;
+
+  input {
+    width: 12.5rem;
+  }
+
+  // narrower width if the placeholder "All Dates" is shown
+  input:placeholder-shown {
+    width: 7.5rem;
+  }
+}

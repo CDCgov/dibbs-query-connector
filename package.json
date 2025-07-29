@@ -37,7 +37,7 @@
     "classnames": "^2.5.1",
     "date-fns": "^3.4.0",
     "fhirpath": "^4.4.0",
-    "html-react-parser": "^5.1.4",
+    "html-react-parser": "^5.2.5",
     "jose": "^5.2.2",
     "next": "^15.3.5",
     "next-auth": "^5.0.0-beta.25",
