@@ -116,7 +116,7 @@ class FHIRClient {
         }
       }
 
-      // 1. Test base query
+      // Test base query
       const response = await client.get(
         "/Patient?name=AuthenticatedServerConnectionTest&_summary=count&_count=1",
       );
@@ -130,25 +130,7 @@ class FHIRClient {
         };
       }
 
-      // 2. Upload patient to verify write access (optional)
-      try {
-        const patientJson = require("../../../public/GoldenSickPatient.json");
-        const uploadResponse = await client.postJson("/Patient", patientJson);
-        if (!uploadResponse.ok) {
-          const uploadError = await uploadResponse.text();
-          console.warn("Upload failed:", uploadError);
-          return {
-            success: false,
-            error: `Upload failed: ${uploadError}`,
-          };
-        }
-      } catch (uploadErr) {
-        console.warn(
-          "Skipped patient upload during testConnection:",
-          uploadErr,
-        );
-      }
-
+      // If we reach here, the connection test succeeded
       return { success: true };
     } catch (error) {
       console.error("Error testing FHIR connection:", error);
