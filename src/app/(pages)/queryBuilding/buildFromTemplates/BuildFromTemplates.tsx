@@ -316,7 +316,12 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
         );
 
         if (results === undefined) {
-          throw "Result status not returned";
+          showToastConfirmation({
+            body: `Something went wrong saving query`,
+            variant: "error",
+          });
+
+          throw "Results not defined";
         }
 
         setSelectedQuery(

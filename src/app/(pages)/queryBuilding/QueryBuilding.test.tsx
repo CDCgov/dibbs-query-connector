@@ -16,7 +16,7 @@ jest.mock(
 describe("tests the query building steps", () => {
   const currentPage = "/";
 
-  it.only("renders", async () => {
+  it("renders", async () => {
     (getQueryList as jest.Mock).mockResolvedValue([]);
 
     render(

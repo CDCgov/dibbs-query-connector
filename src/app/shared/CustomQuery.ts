@@ -86,7 +86,13 @@ export class CustomQuery {
   initializeQueryConceptTypes(queryData: QueryDataColumn) {
     Object.values(queryData).forEach((condition) => {
       Object.values(condition).forEach((valueSet) => {
-        const conceptsToParse = valueSet.concepts.map((c) => c.code);
+        if (!valueSet.includeValueSet) {
+          return;
+        }
+        const conceptsToParse = valueSet.concepts
+          .filter((c) => c.include)
+          .map((c) => c.code);
+
         switch (valueSet.dibbsConceptType) {
           case "labs":
             this.labCodes = this.labCodes.concat(conceptsToParse);

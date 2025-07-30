@@ -10,6 +10,7 @@ import SessionTimeout, {
   IDLE_TIMEOUT_MSEC,
   PROMPT_TIMEOUT_MSEC,
 } from "./ui/components/sessionTimeout/sessionTimeout";
+import { returnPredefinedSessionObject } from "./utils/auth";
 
 /**
  * Establishes the layout for the application.
@@ -24,7 +25,10 @@ export default async function RootLayout({
 }) {
   // Initializes user session on server side for the first load
   // if session does not exists then session object remains null
-  const session = await auth();
+  const session =
+    process.env.AUTH_DISABLED === "true"
+      ? returnPredefinedSessionObject()
+      : await auth();
 
   const runtimeConfig = {
     AUTH_DISABLED: process.env.AUTH_DISABLED || "false",
