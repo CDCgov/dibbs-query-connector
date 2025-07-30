@@ -314,11 +314,10 @@ class QueryService {
 
               const patientResponse = await fhirClient.get(patientPath);
               if (patientResponse.status === 200) {
-                const patientBundle =
-                  (await patientResponse.json()) as Bundle<Patient>;
-                console.log(`Patient bundle: ${JSON.stringify(patientBundle)}`);
+                const patient = (await patientResponse.json()) as Patient;
+                console.log(`Patient bundle: ${JSON.stringify(patient)}`);
                 // Return the patient bundle
-                return patientBundle;
+                return patient;
               } else {
                 // Wait 5 seconds for the patient resource to be available
                 console.warn(
@@ -368,14 +367,11 @@ class QueryService {
         resourceType: "Bundle",
         type: "searchset",
         entry: patientResults
-          .filter((result): result is Bundle<Patient> => result !== null)
-          .flatMap((patientBundle) => {
-            return (
-              patientBundle.entry?.map((entry) => ({
-                fullUrl: entry.fullUrl || `urn:uuid:${entry.resource?.id}`,
-                resource: entry.resource,
-              })) || []
-            );
+          .filter((result): result is Patient => result !== null)
+          .flatMap((patient) => {
+            return {
+              resource: patient,
+            };
           }),
       };
       // Log the bundle for debugging

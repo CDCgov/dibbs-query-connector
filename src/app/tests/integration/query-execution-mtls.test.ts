@@ -170,7 +170,7 @@ describe("Query Execution with Mutual TLS", () => {
       // Mock the patient results fetch
       mockFhirClient.get.mockResolvedValueOnce({
         status: 200,
-        json: async () => mockPatientBundle,
+        json: async () => mockPatient,
       } as Response);
 
       const request = {
@@ -237,17 +237,6 @@ describe("Query Execution with Mutual TLS", () => {
         birthDate: "1990-01-01",
       };
 
-      const mockPatientBundle2: Bundle<Patient> = {
-        resourceType: "Bundle",
-        type: "searchset",
-        entry: [
-          {
-            resource: mockPatient2,
-            fullUrl: "https://mtls2.example.com/fhir/Patient/patient-456",
-          },
-        ],
-      };
-
       // Mock Task creation
       mockFhirClient.postJson.mockResolvedValueOnce({
         status: 201,
@@ -283,11 +272,11 @@ describe("Query Execution with Mutual TLS", () => {
       mockFhirClient.get
         .mockResolvedValueOnce({
           status: 200,
-          json: async () => mockPatientBundle,
+          json: async () => mockPatient,
         } as Response)
         .mockResolvedValueOnce({
           status: 200,
-          json: async () => mockPatientBundle2,
+          json: async () => mockPatient2,
         } as Response);
 
       const request = {
@@ -343,7 +332,7 @@ describe("Query Execution with Mutual TLS", () => {
       // Mock patient results
       mockFhirClient.get.mockResolvedValueOnce({
         status: 200,
-        json: async () => mockPatientBundle,
+        json: async () => mockPatient,
       } as Response);
 
       const request = {
@@ -395,7 +384,7 @@ describe("Query Execution with Mutual TLS", () => {
         } as Response)
         .mockResolvedValueOnce({
           status: 200,
-          json: async () => mockPatientBundle,
+          json: async () => mockPatient,
         } as Response);
 
       const request = {
