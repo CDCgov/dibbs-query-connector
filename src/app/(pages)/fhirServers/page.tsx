@@ -517,6 +517,7 @@ const FhirServers: React.FC = () => {
             <TextInput
               id="client-id"
               name="client-id"
+              data-testid="client-id"
               type="text"
               value={clientId}
               onChange={(e) => setClientId(e.target.value)}
