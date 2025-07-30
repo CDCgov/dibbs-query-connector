@@ -403,7 +403,6 @@ class QueryService {
     request: PatientDiscoveryRequest,
   ): Promise<QueryResponse["Patient"] | { uncertainMatchError: true }> {
     const matchConfig = request.patientMatchConfiguration;
-    console.log("Patient request configuration", request);
 
     const fhirResponse = matchConfig?.supportsMatch
       ? await QueryService.makePatientMatchRequest(request)
