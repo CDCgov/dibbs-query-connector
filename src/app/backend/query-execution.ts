@@ -405,7 +405,7 @@ class QueryService {
     const matchConfig = request.patientMatchConfiguration;
     console.log("Patient request configuration", request);
 
-    const fhirResponse = matchConfig?.enabled
+    const fhirResponse = matchConfig?.supportsMatch
       ? await QueryService.makePatientMatchRequest(request)
       : await QueryService.makePatientDiscoveryRequest(request);
 

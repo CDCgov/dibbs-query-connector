@@ -384,11 +384,10 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
 
     if (config.authType === "SMART") {
       const client = new FHIRClient(config);
-      const token = await client.getAccessToken();
-
+      await client.ensureValidToken();
       config.headers = {
         ...(config.headers || {}),
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${config.accessToken}`,
       };
     }
 

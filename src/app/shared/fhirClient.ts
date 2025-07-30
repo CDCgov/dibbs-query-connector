@@ -144,7 +144,7 @@ class FHIRClient {
   /**
    * Checks if the current token has expired and gets a new one if needed
    */
-  private async ensureValidToken(): Promise<void> {
+  public async ensureValidToken(): Promise<void> {
     // Only check for auth_type client_credentials or SMART
     if (
       !["client_credentials", "SMART"].includes(
