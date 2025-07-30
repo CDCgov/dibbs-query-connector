@@ -73,6 +73,7 @@ const FhirServers: React.FC = () => {
     enabled: false,
     onlySingleMatch: false,
     onlyCertainMatches: false,
+// If 0, the server decides how many matches to return.
     matchCount: 0,
     supportsMatch: false,
   } as PatientMatchData;
