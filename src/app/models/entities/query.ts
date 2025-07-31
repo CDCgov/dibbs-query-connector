@@ -2,6 +2,7 @@ import { Bundle, FhirResource } from "fhir/r4";
 import { UserGroupMembership } from "./users";
 import { DibbsValueSet } from "./valuesets";
 import { MedicalRecordSections } from "@/app/(pages)/queryBuilding/utils";
+import { PatientMatchData } from "@/app/backend/fhir-servers";
 
 export interface CustomUserQuery {
   queryId: string;
@@ -30,6 +31,7 @@ export type PatientDiscoveryRequest = {
   phone?: string;
   address?: Address;
   email?: string;
+  patientMatchConfiguration?: PatientMatchData;
 };
 
 export type Address = {

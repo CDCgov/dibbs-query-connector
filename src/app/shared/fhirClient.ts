@@ -92,16 +92,14 @@ class FHIRClient {
     url: string,
     disableCertValidation: boolean = false,
     authData?: AuthData,
-  ) {
+  ): Promise<{ success: boolean; error?: string }> {
     try {
-      // Create a test client
       const client = FHIRClient.createTestClient(
         url,
         disableCertValidation,
         authData,
       );
 
-      // Try to authenticate if needed
       if (
         authData &&
         ["client_credentials", "SMART"].includes(authData.authType)
@@ -118,7 +116,7 @@ class FHIRClient {
         }
       }
 
-      // Try to fetch the server's metadata
+      // Test base query
       const response = await client.get(
         "/Patient?name=AuthenticatedServerConnectionTest&_summary=count&_count=1",
       );
@@ -132,9 +130,8 @@ class FHIRClient {
         };
       }
 
-      return {
-        success: true,
-      };
+      // If we reach here, the connection test succeeded
+      return { success: true };
     } catch (error) {
       console.error("Error testing FHIR connection:", error);
       return {
@@ -147,7 +144,7 @@ class FHIRClient {
   /**
    * Checks if the current token has expired and gets a new one if needed
    */
-  private async ensureValidToken(): Promise<void> {
+  public async ensureValidToken(): Promise<void> {
     // Only check for auth_type client_credentials or SMART
     if (
       !["client_credentials", "SMART"].includes(
@@ -182,7 +179,7 @@ class FHIRClient {
    * @throws Error if authentication fails.
    * @returns The new access token.
    */
-  private async getAccessToken(): Promise<void> {
+  public async getAccessToken(): Promise<void> {
     try {
       if (!this.serverConfig.clientId) {
         throw new Error("Client ID is required for authentication");
@@ -280,13 +277,6 @@ class FHIRClient {
       this.serverConfig.accessToken = tokenData.access_token;
       this.serverConfig.tokenExpiry = expiryIso;
 
-      // Update headers for requests
-      if (!this.init.headers) {
-        this.init.headers = {};
-      }
-      (this.init.headers as Record<string, string>)["Authorization"] =
-        `Bearer ${tokenData.access_token}`;
-
       // Only update database for non-test clients
       if (this.serverConfig.id !== "test") {
         // Save token to database
@@ -309,7 +299,9 @@ class FHIRClient {
             scopes: this.serverConfig.scopes,
             accessToken: tokenData.access_token, // Pass the access token
             tokenExpiry: expiryIso, // Pass the token expiry
+            headers: this.serverConfig.headers,
           },
+          this.serverConfig.patientMatchConfiguration,
         );
       }
     } catch (error) {
@@ -413,6 +405,45 @@ class FHIRClient {
   }
 
   /**
+   * Sends a POST request with JSON body to the specified path.
+   * @param path - The request path.
+   * @param body - The JSON body to send.
+   * @returns The response from the server.
+   */
+  async postJson(path: string, body: unknown): Promise<Response> {
+    await this.ensureValidToken();
+    const requestOptions: RequestInit = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/fhir+json",
+        ...(this.init.headers as Record<string, string>),
+      },
+      body: JSON.stringify(body),
+    };
+    return this.fetch(this.hostname + path, requestOptions);
+  }
+
+  /**
+   * Sends a PUT request with JSON body to the specified path.
+   * This is typically used for updating resources in FHIR.
+   * @param path - The request path.
+   * @param body - The JSON body to send.
+   * @returns The response from the server.
+   */
+  async putJson(path: string, body: unknown): Promise<Response> {
+    await this.ensureValidToken();
+    const requestOptions: RequestInit = {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/fhir+json",
+        ...this.init.headers,
+      },
+      body: JSON.stringify(body),
+    };
+    return this.fetch(this.hostname + path, requestOptions);
+  }
+
+  /**
    * Checks whether a FHIR server supports $match by inspecting its metadata
    * @param url The FHIR server base URL
    * @param disableCertValidation Whether to disable cert validation
@@ -423,7 +454,7 @@ class FHIRClient {
     url: string,
     disableCertValidation: boolean = false,
     authData?: AuthData,
-  ): Promise<boolean> {
+  ): Promise<{ supportsMatch: boolean; fhirVersion: string | null }> {
     try {
       const testConfig: FhirServerConfig = {
         id: "test",
@@ -465,9 +496,13 @@ class FHIRClient {
           ...(authData?.headers || {}),
         },
       });
-      if (!response.ok) return false;
+      if (!response.ok) {
+        return { supportsMatch: false, fhirVersion: null };
+      }
 
       const json = await response.json();
+      const fhirVersion =
+        typeof json?.fhirVersion === "string" ? json.fhirVersion : null;
 
       const rest = json?.rest?.[0];
       // Check if the server supports $match operation in Patient resource
@@ -485,10 +520,13 @@ class FHIRClient {
         Array.isArray(rest?.operation) &&
         rest.operation.some((op: { name?: string }) => op.name === "match");
 
-      return supportsMatchInResources || supportsMatchGlobally;
+      return {
+        supportsMatch: supportsMatchInResources || supportsMatchGlobally,
+        fhirVersion,
+      };
     } catch (err) {
       console.warn("Failed $match support check:", err);
-      return false;
+      return { supportsMatch: false, fhirVersion: null };
     }
   }
 }
