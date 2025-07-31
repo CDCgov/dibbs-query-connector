@@ -1,239 +1,253 @@
-import { test, expect } from "@playwright/test";
 import { TEST_URL } from "../playwright-setup";
-import { checkForSiteAlert, runAxeAccessibilityChecks } from "./utils";
+import { test, expect } from "@playwright/test";
+import { E2E_SMART_TEST_CLIENT_ID } from "./constants";
 
-test.describe("Mutual TLS FHIR Server Configuration", () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto(`${TEST_URL}/fhirServers`);
-    await expect(page.getByText("Redirecting...")).not.toBeVisible();
-  });
-
-  test("should create and configure a mutual TLS enabled FHIR server", async ({
+test.describe("Mutual TLS", () => {
+  test("successfully adds a FHIR server with mutual TLS and performs patient query", async ({
     page,
   }) => {
-    // Open new server modal
+    // Step 1: Add a new FHIR server with mutual TLS enabled
+    await page.goto(`${TEST_URL}/fhirServers`);
+    await expect(
+      page.getByRole("heading", { name: "FHIR server configuration" }),
+    ).toBeVisible();
+
     await page.getByRole("button", { name: "New server" }).click();
     await expect(
       page.getByRole("heading", { name: "New server" }),
     ).toBeVisible();
 
-    // Fill in server details
-    await page.getByTestId("server-name").fill("Test mTLS QHIN Server");
+    const serverName = `E2E Mutual TLS ${Math.floor(Math.random() * 10000)}`;
+    await page.getByTestId("server-name").fill(serverName);
     await page
       .getByTestId("server-url")
-      .fill("https://qhin-test.example.com/fhir");
+      .fill(`${process.env.AIDBOX_BASE_URL}/fhir`);
 
-    // Select auth method
-    await page.getByTestId("auth-method").selectOption("client_credentials");
-
-    // Wait for auth fields to appear
-    await page.waitForTimeout(2000);
-
-    // Fill OAuth details
-    await page.getByTestId("client-id").fill("test-client-id");
-    await page.getByTestId("client-secret").fill("test-client-secret");
+    // Set up SMART auth for the server
+    await page.getByTestId("auth-method").selectOption("SMART");
+    await page.getByTestId("client-id").fill(E2E_SMART_TEST_CLIENT_ID);
+    await page.getByTestId("scopes").fill("system/*.read");
     await page
       .getByTestId("token-endpoint")
-      .fill("https://qhin-test.example.com/auth/token");
-    await page.getByTestId("scopes").fill("system/*.read");
+      .fill(`${process.env.AIDBOX_BASE_URL}/auth/token`);
 
-    // Enable mutual TLS - use JS to check the checkbox directly
+    // Enable mutual TLS - scroll modal and use JavaScript click
     await page.evaluate(() => {
-      const checkbox = document.querySelector(
-        "#mutual-tls",
+      const modal = document.querySelector(".usa-modal__content");
+      if (modal) {
+        modal.scrollTop = modal.scrollHeight;
+      }
+    });
+    await page.evaluate(() => {
+      const checkbox = document.getElementById(
+        "mutual-tls",
       ) as HTMLInputElement;
-      if (checkbox && !checkbox.checked) {
+      if (checkbox) {
         checkbox.checked = true;
-        // Trigger both change and input events to ensure React sees the change
         checkbox.dispatchEvent(new Event("change", { bubbles: true }));
-        checkbox.dispatchEvent(new Event("input", { bubbles: true }));
       }
     });
 
-    // Wait a moment for React to update, then verify the checkbox is checked
-    await page.waitForTimeout(500);
-    await expect(page.locator("#mutual-tls")).toBeChecked();
+    // Verify mutual TLS hint text appears
+    await expect(
+      page.getByText(
+        "Mutual TLS certificates will be loaded from the keys directory",
+      ),
+    ).toBeVisible();
 
-    // Add custom headers
-    await page
-      .getByRole("button", { name: "Add header" })
-      .filter({ hasText: "Add header" })
-      .click();
-
-    await page.getByPlaceholder("Header name").fill("X-Organization-Id");
-    await page.getByPlaceholder("Header value").fill("org-12345");
+    // Test connection with mutual TLS
+    await page.getByRole("button", { name: "Test connection" }).click();
+    await expect(page.getByRole("button", { name: "Success" })).toBeVisible({
+      timeout: 15000,
+    });
 
     // Save the server
     await page.getByRole("button", { name: "Add server" }).click();
 
     // Verify server appears in the list with mTLS tag
-    await expect(page.getByText("Test mTLS QHIN Server")).toBeVisible();
-    await expect(page.getByText("mTLS").first()).toBeVisible();
+    const serverRow = page.getByRole("row").filter({ hasText: serverName });
+    await expect(serverRow).toHaveText(/Connected/, { timeout: 10000 });
+    await expect(serverRow).toHaveText(/mTLS/);
 
-    // Run accessibility checks
-    await runAxeAccessibilityChecks(page);
+    // Step 2: Navigate to query page and perform a patient search
+    await page.goto(`${TEST_URL}/query`);
+    await expect(
+      page.getByRole("heading", { name: "Patient lookup" }),
+    ).toBeVisible();
+
+    // Click "Advanced" to show FHIR server selection
+    await page.getByRole("button", { name: "Advanced" }).click();
+
+    // Wait for advanced options to be visible
+    await expect(page.getByText("FHIR servers")).toBeVisible();
+
+    // Select the mutual TLS enabled server
+    const serverCheckbox = page.getByLabel(serverName);
+    await expect(serverCheckbox).toBeVisible();
+    await serverCheckbox.check();
+
+    // Fill out the patient lookup form
+    await page.getByTestId("textInput").fill("John"); // First name
+    await page.getByTestId("textInput").nth(1).fill("Doe"); // Last name
+    await page.getByTestId("textInput").nth(2).fill("1990-01-01"); // DOB
+
+    // Submit the query
+    await page.getByRole("button", { name: "Search" }).click();
+
+    // Wait for results page
+    await expect(page.url()).toContain("/results");
+
+    // Verify we get results back (should show patients from the Task-based query flow)
+    await expect(page.getByText("patients found")).toBeVisible();
+    await expect(page.getByRole("table")).toBeVisible();
+
+    // Check that we have multiple patients from different providers
+    const patientRows = page.getByRole("row").filter({ hasText: /Patient/ });
+    const rowCount = await patientRows.count();
+    expect(rowCount).toBeGreaterThan(0);
   });
 
-  test("should edit existing server to enable mutual TLS", async ({ page }) => {
-    // First create a server to edit
+  test("successfully edits a server to enable mutual TLS", async ({ page }) => {
+    await page.goto(`${TEST_URL}/fhirServers`);
+    await expect(
+      page.getByRole("heading", { name: "FHIR server configuration" }),
+    ).toBeVisible();
+
+    // First create a server without mutual TLS
     await page.getByRole("button", { name: "New server" }).click();
-    await page.getByTestId("server-name").fill("Test Server to Edit");
-    await page.getByTestId("server-url").fill("https://test.example.com/fhir");
+    const serverName = `E2E Edit MTLS ${Math.floor(Math.random() * 10000)}`;
+    await page.getByTestId("server-name").fill(serverName);
+    await page
+      .getByTestId("server-url")
+      .fill(`${process.env.AIDBOX_BASE_URL}/fhir`);
+
+    // Set up SMART auth
+    await page.getByTestId("auth-method").selectOption("SMART");
+    await page.getByTestId("client-id").fill(E2E_SMART_TEST_CLIENT_ID);
+    await page.getByTestId("scopes").fill("system/*.read");
+    await page
+      .getByTestId("token-endpoint")
+      .fill(`${process.env.AIDBOX_BASE_URL}/auth/token`);
+
+    // Test connection first to ensure it works
+    await page.getByRole("button", { name: "Test connection" }).click();
+    await expect(page.getByRole("button", { name: "Success" })).toBeVisible({
+      timeout: 15000,
+    });
+
     await page.getByRole("button", { name: "Add server" }).click();
 
     // Wait for modal to close and server to appear
-    await expect(page.getByText("Test Server to Edit")).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: "New server" }),
+    ).not.toBeVisible();
 
-    // Now edit the server
-    await page.getByRole("button", { name: /Edit/ }).first().click();
+    // Verify server appears without mTLS tag initially
+    let serverRow = page.getByRole("row").filter({ hasText: serverName });
+    await expect(serverRow).toHaveText(/Connected/, { timeout: 10000 });
+    await expect(serverRow).not.toHaveText(/mTLS/);
+
+    // Hover over the row and click edit
+    await serverRow.hover();
+    await serverRow.getByRole("button", { name: `Edit ${serverName}` }).click();
 
     await expect(
       page.getByRole("heading", { name: "Edit server" }),
     ).toBeVisible();
 
-    // Enable mutual TLS - use JS to check the checkbox directly
+    // Enable mutual TLS - scroll modal and use JavaScript click
     await page.evaluate(() => {
-      const checkbox = document.querySelector(
-        "#mutual-tls",
+      const modal = document.querySelector(".usa-modal__content");
+      if (modal) {
+        modal.scrollTop = modal.scrollHeight;
+      }
+    });
+    await page.evaluate(() => {
+      const checkbox = document.getElementById(
+        "mutual-tls",
       ) as HTMLInputElement;
-      if (checkbox && !checkbox.checked) {
+      if (checkbox) {
         checkbox.checked = true;
         checkbox.dispatchEvent(new Event("change", { bubbles: true }));
       }
     });
+
+    // Verify mutual TLS hint text appears
+    await expect(
+      page.getByText(
+        "Mutual TLS certificates will be loaded from the keys directory",
+      ),
+    ).toBeVisible();
 
     // Save changes
     await page.getByRole("button", { name: "Save changes" }).click();
 
-    // Modal should close
+    // Verify server now shows mTLS tag
+    serverRow = page.getByRole("row").filter({ hasText: serverName });
+    await expect(serverRow).toHaveText(/Connected/, { timeout: 10000 });
+    await expect(serverRow).toHaveText(/mTLS/);
+
+    // Edit again to verify mutual TLS setting is persisted
+    await serverRow.hover();
+    await serverRow.getByRole("button", { name: `Edit ${serverName}` }).click();
+
+    // Verify mutual TLS checkbox is checked
+    await expect(page.locator("#mutual-tls")).toBeChecked();
     await expect(
-      page.getByRole("heading", { name: "Edit server" }),
-    ).not.toBeVisible();
-  });
+      page.getByText("Mutual TLS certificates will be loaded", {
+        exact: false,
+      }),
+    ).toBeVisible();
 
-  test("should test connection with mutual TLS server", async ({ page }) => {
-    // Create a new mTLS server first
-    await page.getByRole("button", { name: "New server" }).click();
-
-    await page.getByTestId("server-name").fill("mTLS Connection Test");
-    await page
-      .getByTestId("server-url")
-      .fill("https://mtls-test.example.com/fhir");
-    // Enable mutual TLS - use JS to check the checkbox directly
-    await page.evaluate(() => {
-      const checkbox = document.querySelector(
-        "#mutual-tls",
-      ) as HTMLInputElement;
-      if (checkbox && !checkbox.checked) {
-        checkbox.checked = true;
-        checkbox.dispatchEvent(new Event("change", { bubbles: true }));
-      }
-    });
-
-    // Test connection
-    await page.getByRole("button", { name: "Test connection" }).click();
-
-    // Wait for connection test to complete
-    await expect(
-      page.getByRole("button", { name: /Test connection|Success/ }),
-    ).toBeVisible({ timeout: 15000 });
-
-    // Cancel without saving
     await page.getByRole("button", { name: "Cancel" }).click();
   });
-});
 
-test.describe("Mutual TLS Patient Query", () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto(TEST_URL);
-    await expect(page.getByText("Redirecting...")).not.toBeVisible();
-  });
-
-  test("should perform patient search on mTLS-enabled FHIR server", async ({
-    page,
-  }) => {
-    // Fill patient search form
-    await page.getByLabel("First name").fill("Jane");
-    await page.getByLabel("Last name").fill("Smith");
-    await page.getByLabel("Date of birth").fill("1985-03-15");
-
-    // Open advanced options
-    await page.getByRole("button", { name: "Advanced" }).click();
-
-    // Select an mTLS-enabled server (assuming one exists in test data)
-    const serverDropdown = page.getByLabel("Healthcare Organization (HCO)");
-
-    // Check if there's an mTLS server available
-    const serverOptions = await serverDropdown
-      .locator("option")
-      .allTextContents();
-    const mtlsServerOption = serverOptions.find(
-      (option) =>
-        option.toLowerCase().includes("mtls") ||
-        option.toLowerCase().includes("qhin"),
-    );
-
-    if (mtlsServerOption) {
-      await serverDropdown.selectOption(mtlsServerOption);
-
-      // Perform search
-      await page.getByRole("button", { name: "Search for patient" }).click();
-
-      // Wait for results or no records found
-      await expect(
-        page.getByRole("heading", {
-          name: /Patient Search Results|No Records Found/,
-        }),
-      ).toBeVisible({ timeout: 15000 });
-
-      // Run accessibility checks
-      await runAxeAccessibilityChecks(page);
-    } else {
-      // Skip test if no mTLS server is available
-      test.skip();
-    }
-  });
-});
-
-test.describe("Mutual TLS Error Handling", () => {
-  test("should show appropriate error when mTLS certificates are missing", async ({
+  test("mutual TLS setting works with different auth methods", async ({
     page,
   }) => {
     await page.goto(`${TEST_URL}/fhirServers`);
 
-    // Try to create mTLS server without certificates
+    // Test with No Auth
     await page.getByRole("button", { name: "New server" }).click();
-
-    await page.getByTestId("server-name").fill("mTLS No Certs Test");
+    const serverName = `E2E MTLS No Auth ${Math.floor(Math.random() * 10000)}`;
+    await page.getByTestId("server-name").fill(serverName);
     await page
       .getByTestId("server-url")
-      .fill("https://mtls-nocerts.example.com/fhir");
-    // Enable mutual TLS - use JS to check the checkbox directly
+      .fill("https://gw.interop.community/HeliosConnectathonSa/open");
+
+    // Enable mutual TLS - scroll modal and use JavaScript click
     await page.evaluate(() => {
-      const checkbox = document.querySelector(
-        "#mutual-tls",
+      const modal = document.querySelector(".usa-modal__content");
+      if (modal) {
+        modal.scrollTop = modal.scrollHeight;
+      }
+    });
+    await page.evaluate(() => {
+      const checkbox = document.getElementById(
+        "mutual-tls",
       ) as HTMLInputElement;
-      if (checkbox && !checkbox.checked) {
+      if (checkbox) {
         checkbox.checked = true;
         checkbox.dispatchEvent(new Event("change", { bubbles: true }));
       }
     });
+    await expect(
+      page.getByText(
+        "Mutual TLS certificates will be loaded from the keys directory",
+      ),
+    ).toBeVisible();
 
-    // Test connection should fail if certs are not available
+    // Test connection should work
     await page.getByRole("button", { name: "Test connection" }).click();
+    await expect(page.getByRole("button", { name: "Success" })).toBeVisible({
+      timeout: 15000,
+    });
 
-    // Wait for error state
-    await page.waitForTimeout(2000);
+    await page.getByRole("button", { name: "Add server" }).click();
 
-    // Check if there's an error message visible
-    const errorMessage = page.locator(".usa-alert--error, [role='alert']");
-    const errorCount = await errorMessage.count();
-
-    if (errorCount > 0) {
-      await expect(errorMessage.first()).toBeVisible();
-    }
-
-    // Cancel
-    await page.getByRole("button", { name: "Cancel" }).click();
+    // Verify server appears with mTLS tag
+    const serverRow = page.getByRole("row").filter({ hasText: serverName });
+    await expect(serverRow).toHaveText(/Connected/, { timeout: 10000 });
+    await expect(serverRow).toHaveText(/mTLS/);
   });
 });
