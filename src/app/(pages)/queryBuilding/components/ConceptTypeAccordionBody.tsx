@@ -106,9 +106,7 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
         }
       }
     }
-    fetchInitialTimeboxRange().then((r) => {
-      console.log(r);
-    });
+    fetchInitialTimeboxRange();
   }, [accordionConceptType]);
 
   useEffect(() => {
