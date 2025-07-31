@@ -17,8 +17,382 @@ import type {
 import type { MedicalRecordSections } from "../(pages)/queryBuilding/utils";
 import { prepareFhirClient } from "./fhir-servers";
 import type { Response } from "node-fetch";
+import type FHIRClient from "../shared/fhirClient";
+
+interface TaskPollingResult {
+  tasksBundle: Bundle<Task>;
+  parentTaskId: string;
+}
+
+interface PatientSearchParams {
+  firstName?: string;
+  lastName?: string;
+  dob?: string;
+  mrn?: string;
+  phone?: string;
+  address?: {
+    street1?: string;
+    street2?: string;
+    city?: string;
+    state?: string;
+    zip?: string;
+  };
+  email?: string;
+}
+
+// Constants for configuration
+const TASK_POLLING = {
+  MAX_ATTEMPTS: 12,
+  DELAY_MS: 5000,
+  RETRY_DELAY_MS: 5000,
+} as const;
+
+const TASK_TEMPLATE: Partial<Task> = {
+  resourceType: "Task",
+  status: "requested",
+  intent: "order",
+  basedOn: [{ reference: "Task/bundleprofile-fdabest" }],
+  code: {
+    coding: [
+      {
+        system: "http://hl7.org/fhir/us/davinci-cdex/CodeSystem/cdex-temp",
+        code: "data-request-query",
+      },
+    ],
+  },
+  authoredOn: "2025-03-14T02:58:55.179Z",
+  lastModified: "2025-03-14T02:58:55.179Z",
+  requester: {
+    identifier: {
+      system: "http://ehealthexchange.org/hub/internal/hcid",
+      value: "2.16.840.1.113883.3.7204.1.2.1.1.2.1.19631120",
+    },
+  },
+};
 
 class QueryService {
+  /**
+   * Builds a FHIR patient search query string from provided parameters
+   * @param params - Patient search parameters
+   * @returns Promise resolving to a formatted query string
+   */
+  private static async buildPatientSearchQuery(
+    params: PatientSearchParams,
+  ): Promise<string> {
+    const { firstName, lastName, dob, mrn, phone, address, email } = params;
+    let patientQuery = "Patient?";
+
+    if (firstName) patientQuery += `given=${firstName}&`;
+    if (lastName) patientQuery += `family=${lastName}&`;
+    if (dob) patientQuery += `birthdate=${dob}&`;
+    if (mrn) patientQuery += `identifier=${mrn}&`;
+
+    if (phone) {
+      const phonesToSearch = phone.split(";");
+      const phonePossibilities: string[] = [];
+
+      for (const phoneNumber of phonesToSearch) {
+        const possibilities = (await GetPhoneQueryFormats(phoneNumber)).filter(
+          (p) => p !== "",
+        );
+        if (possibilities.length > 0) {
+          phonePossibilities.push(...possibilities);
+        }
+      }
+
+      if (phonePossibilities.length > 0) {
+        patientQuery += `phone=${phonePossibilities.join(",")}&`;
+      }
+    }
+
+    if (address) {
+      if (address.street1 || address.street2) {
+        const addressLine1 = address.street1?.split(";");
+        const addressLine2 = address.street2?.split(";");
+        const addrString = [addressLine1, addressLine2]
+          .flat()
+          .filter((addr) => addr !== "")
+          .join(",");
+        patientQuery += `address=${addrString}&`;
+      }
+
+      if (address.city) {
+        const cities = address.city.split(";").join(",");
+        patientQuery += `address-city=${cities}&`;
+      }
+
+      if (address.zip) {
+        const zips = address.zip.split(";").join(",");
+        patientQuery += `address-postalcode=${zips}&`;
+      }
+
+      if (address.state) {
+        const states = address.state.split(";").join(",");
+        patientQuery += `address-state=${states}`;
+      }
+    }
+
+    if (email) {
+      const emailsToSearch = email.split(";");
+      if (emailsToSearch.length > 0) {
+        patientQuery += `email=${emailsToSearch.join(",")}&`;
+      }
+    }
+
+    return patientQuery.replace(/&$/, ""); // Remove trailing &
+  }
+
+  /**
+   * Creates a FHIR Task for patient discovery using mutual TLS
+   * @param patientQuery - The patient search query string
+   * @returns A FHIR Task resource for patient discovery
+   */
+  private static createPatientDiscoveryTask(patientQuery: string): Task {
+    return {
+      ...TASK_TEMPLATE,
+      input: [
+        {
+          type: {
+            coding: [
+              {
+                system:
+                  "http://hl7.org/fhir/us/davinci-hrex/CodeSystem/hrex-temp",
+                code: "data-query-patient-fhir-fanout",
+              },
+            ],
+          },
+          valueString: patientQuery,
+        },
+        {
+          type: {
+            coding: [
+              {
+                system:
+                  "http://hl7.org/fhir/us/davinci-cdex/CodeSystem/cdex-temp",
+                code: "purpose-of-use",
+              },
+            ],
+          },
+          valueCodeableConcept: {
+            coding: [
+              {
+                system: "2.16.840.1.113883.3.18.7.1",
+                code: "PUBLICHEALTH",
+              },
+            ],
+          },
+        },
+      ],
+    } as Task;
+  }
+
+  /**
+   * Polls for task completion and returns the completed tasks bundle
+   * @param fhirClient - The FHIR client instance
+   * @param parentTaskId - The ID of the parent task to poll
+   * @returns Promise resolving to task polling result
+   */
+  private static async pollTaskCompletion(
+    fhirClient: FHIRClient,
+    parentTaskId: string,
+  ): Promise<TaskPollingResult> {
+    let allTasksComplete = false;
+    let tasksBundle: Bundle<Task> = {
+      resourceType: "Bundle",
+      type: "searchset",
+      entry: [],
+    };
+
+    let attempts = 0;
+    while (!allTasksComplete && attempts < TASK_POLLING.MAX_ATTEMPTS) {
+      attempts++;
+      await new Promise((resolve) =>
+        setTimeout(resolve, TASK_POLLING.DELAY_MS),
+      );
+
+      const childTasksResponse = await fhirClient.get(
+        `/Task?part-of=Task/${parentTaskId}`,
+      );
+      tasksBundle = (await childTasksResponse.json()) as Bundle<Task>;
+
+      console.log(
+        `Fetched child tasks for parent Task ${parentTaskId}. Attempt ${attempts}/${TASK_POLLING.MAX_ATTEMPTS}`,
+      );
+
+      allTasksComplete =
+        tasksBundle.entry?.every(
+          (entry) =>
+            entry.resource?.status === "completed" ||
+            entry.resource?.status === "failed",
+        ) ?? false;
+    }
+
+    if (!allTasksComplete) {
+      console.warn(
+        `Task polling timed out after ${TASK_POLLING.MAX_ATTEMPTS} attempts`,
+      );
+    }
+
+    return { tasksBundle, parentTaskId };
+  }
+
+  /**
+   * Fetches patient data from a completed task
+   * @param fhirClient - The FHIR client instance
+   * @param task - The completed Task resource
+   * @returns Promise resolving to Patient resource or null if failed
+   */
+  private static async fetchPatientFromTask(
+    fhirClient: FHIRClient,
+    task: Task,
+  ): Promise<Patient | null> {
+    if (task.status !== "completed" || !task.output) {
+      if (task.status === "failed") {
+        console.warn(`Task ${task.id} failed`);
+      } else {
+        console.warn(
+          `Task ${task.id} completed successfully but has no output`,
+        );
+      }
+      return null;
+    }
+
+    try {
+      const taskDetailResponse = await fhirClient.get(`/Task/${task.id}`);
+      const taskDetail = (await taskDetailResponse.json()) as Task;
+
+      const patientLink = taskDetail.output?.find((output) =>
+        output.valueString?.includes("Patient-Page1"),
+      )?.valueString;
+
+      if (!patientLink) {
+        console.warn(
+          `No patient link found in Task output for task ${task.id}`,
+        );
+        return null;
+      }
+
+      console.log(`Patient link found in Task output: ${patientLink}`);
+
+      const url = new URL(patientLink);
+      const fullPath = url.pathname;
+      const pathParts = fullPath.split("/ndjson");
+      const patientPath = "/ndjson" + pathParts[1];
+
+      // Try to fetch patient data with retry logic
+      let patientResponse = await fhirClient.get(patientPath);
+
+      if (patientResponse.status !== 200) {
+        console.warn(
+          `Patient resource not available at ${patientLink}. Retrying...`,
+        );
+        await new Promise((resolve) =>
+          setTimeout(resolve, TASK_POLLING.RETRY_DELAY_MS),
+        );
+        patientResponse = await fhirClient.get(patientPath);
+      }
+
+      if (patientResponse.status === 200) {
+        const patient = (await patientResponse.json()) as Patient;
+        console.log(`Successfully fetched patient from task ${task.id}`);
+        return patient;
+      } else {
+        console.error(
+          `Failed to fetch patient resource from ${patientLink}. Status: ${patientResponse.status}`,
+        );
+        return null;
+      }
+    } catch (error) {
+      console.error(`Error fetching patient from task ${task.id}:`, error);
+      return null;
+    }
+  }
+
+  /**
+   * Processes completed tasks to extract patient data
+   * @param fhirClient - The FHIR client instance
+   * @param tasksBundle - Bundle containing completed tasks
+   * @returns Promise resolving to a Bundle with patient results
+   */
+  private static async processTaskResults(
+    fhirClient: FHIRClient,
+    tasksBundle: Bundle<Task>,
+  ): Promise<Bundle> {
+    const patientResults = await Promise.all(
+      tasksBundle.entry?.map((entry) =>
+        entry.resource
+          ? this.fetchPatientFromTask(fhirClient, entry.resource)
+          : null,
+      ) || [],
+    );
+
+    const validPatients = patientResults.filter(
+      (result): result is Patient => result !== null,
+    );
+
+    console.log(
+      `Successfully processed ${validPatients.length} patients from ${tasksBundle.entry?.length || 0} tasks`,
+    );
+
+    return {
+      resourceType: "Bundle",
+      type: "searchset",
+      entry: validPatients.map((patient) => ({ resource: patient })),
+    };
+  }
+
+  /**
+   * Handles mutual TLS patient discovery using Task-based workflow
+   * @param fhirClient - The FHIR client instance
+   * @param patientQuery - The patient search query string
+   * @param fhirServer - The name of the FHIR server
+   * @returns Promise resolving to a Bundle with patient discovery results
+   */
+  private static async handleMutualTlsDiscovery(
+    fhirClient: FHIRClient,
+    patientQuery: string,
+    fhirServer: string,
+  ): Promise<Bundle> {
+    console.log(
+      `Mutual TLS enabled for server ${fhirServer}. Using Task resource for patient discovery.`,
+    );
+
+    // Create and submit the task
+    const taskBody = this.createPatientDiscoveryTask(patientQuery);
+    const taskResponse = await fhirClient.postJson("/Task", taskBody);
+    const createdTask = (await taskResponse.json()) as Bundle<Task>;
+
+    const parentTaskId = createdTask.entry?.[0]?.resource?.id;
+    if (!parentTaskId) {
+      throw new Error("Failed to create parent Task for patient discovery.");
+    }
+
+    console.log(`Created Task for patient discovery with ID: ${parentTaskId}`);
+
+    // Poll for completion
+    const { tasksBundle } = await this.pollTaskCompletion(
+      fhirClient,
+      parentTaskId,
+    );
+
+    // Process results
+    return await this.processTaskResults(fhirClient, tasksBundle);
+  }
+
+  /**
+   * Handles standard patient discovery using direct FHIR search
+   * @param fhirClient - The FHIR client instance
+   * @param patientQuery - The patient search query string
+   * @returns Promise resolving to the FHIR search response
+   */
+  private static async handleStandardDiscovery(
+    fhirClient: FHIRClient,
+    patientQuery: string,
+  ): Promise<Response> {
+    const query = "/" + patientQuery;
+    return await fhirClient.get(query);
+  }
+
   /**
    * Method that coordinates user input and relevant DB config information to make
    * an outgoing FHIR query for patient records
@@ -96,10 +470,8 @@ class QueryService {
   @auditable
   private static async makePatientDiscoveryRequest(
     request: PatientDiscoveryRequest,
-  ) {
-    const { fhirServer, firstName, lastName, dob, mrn, phone, address, email } =
-      request;
-
+  ): Promise<Response | Bundle> {
+    const { fhirServer } = request;
     const fhirClient = await prepareFhirClient(fhirServer);
 
     // Get the server config to check for mutual TLS
@@ -110,291 +482,32 @@ class QueryService {
     );
 
     // Build patient search query
-    let patientQuery = "Patient?";
-    if (firstName) {
-      patientQuery += `given=${firstName}&`;
-    }
-    if (lastName) {
-      patientQuery += `family=${lastName}&`;
-    }
-    if (dob) {
-      patientQuery += `birthdate=${dob}&`;
-    }
-    if (mrn) {
-      patientQuery += `identifier=${mrn}&`;
-    }
-    if (phone) {
-      // We might have multiple phone numbers if we're coming from the API
-      // side, since we parse *all* telecom structs
-      const phonesToSearch = phone.split(";");
-      let phonePossibilities: string[] = [];
-      for (const phone of phonesToSearch) {
-        let possibilities = await GetPhoneQueryFormats(phone);
-        possibilities = possibilities.filter((phone) => phone !== "");
-        if (possibilities.length !== 0) {
-          phonePossibilities.push(...possibilities);
-        }
-      }
-      if (phonePossibilities.length > 0) {
-        patientQuery += `phone=${phonePossibilities.join(",")}&`;
-      }
-    }
-    if (address?.street1 || address?.street2) {
-      const addressLine1 = address?.street1?.split(";");
-      const addressLine2 = address?.street2?.split(";");
+    const patientQuery = await this.buildPatientSearchQuery(request);
 
-      const addrString = [addressLine1, addressLine2]
-        .flat()
-        .filter((addr) => addr != "")
-        .join(",");
-
-      patientQuery += `address=${addrString}&`;
-    }
-    if (address?.city) {
-      const cities = address?.city?.split(";").join(",");
-      patientQuery += `address-city=${cities}&`;
-    }
-    if (address?.zip) {
-      const zips = address?.zip.split(";").join(",");
-      patientQuery += `address-postalcode=${zips}&`;
-    }
-    if (email) {
-      const emailsToSearch = email.split(";");
-      if (emailsToSearch.length > 0) {
-        patientQuery += `email=${emailsToSearch.join(",")}&`;
-      }
-    }
-    if (address?.state) {
-      const states = address?.state.split(";").join(",");
-      patientQuery += `address-state=${states}`;
-    }
-
-    let fhirResponse: Response | Bundle;
-
+    // Handle discovery based on server configuration
     if (serverConfig?.mutualTls) {
-      console.log(
-        `Mutual TLS enabled for server ${fhirServer}. Using Task resource for patient discovery.`,
+      return await this.handleMutualTlsDiscovery(
+        fhirClient,
+        patientQuery,
+        fhirServer,
       );
-      // For mutual TLS enabled servers, send POST to /Task
-      const taskBody = {
-        resourceType: "Task",
-        status: "requested",
-        intent: "order",
-        basedOn: [
-          {
-            reference: "Task/bundleprofile-fdabest",
-          },
-        ],
-        code: {
-          coding: [
-            {
-              system:
-                "http://hl7.org/fhir/us/davinci-cdex/CodeSystem/cdex-temp",
-              code: "data-request-query",
-            },
-          ],
-        },
-        authoredOn: "2025-03-14T02:58:55.179Z",
-        lastModified: "2025-03-14T02:58:55.179Z",
-        requester: {
-          identifier: {
-            system: "http://ehealthexchange.org/hub/internal/hcid",
-            value: "2.16.840.1.113883.3.7204.1.2.1.1.2.1.19631120",
-          },
-        },
-        input: [
-          {
-            type: {
-              coding: [
-                {
-                  system:
-                    "http://hl7.org/fhir/us/davinci-hrex/CodeSystem/hrex-temp",
-                  code: "data-query-patient-fhir-fanout",
-                },
-              ],
-            },
-            valueString: patientQuery,
-          },
-          {
-            type: {
-              coding: [
-                {
-                  system:
-                    "http://hl7.org/fhir/us/davinci-cdex/CodeSystem/cdex-temp",
-                  code: "purpose-of-use",
-                },
-              ],
-            },
-            valueCodeableConcept: {
-              coding: [
-                {
-                  system: "2.16.840.1.113883.3.18.7.1",
-                  code: "PUBLICHEALTH",
-                },
-              ],
-            },
-          },
-        ],
-      };
-
-      const taskResponse = await fhirClient.postJson("/Task", taskBody);
-      const createdTask = (await taskResponse.json()) as Bundle<Task>;
-      console.log(
-        `Task created for patient discovery: ${JSON.stringify(createdTask)}`,
-      );
-      const parentTaskId = createdTask.entry?.[0]?.resource?.id;
-      if (!parentTaskId) {
-        throw new Error("Failed to create parent Task for patient discovery.");
-      }
-
-      console.log(
-        `Created Task for patient discovery with ID: ${parentTaskId}`,
-      );
-
-      // Poll parent task until all child tasks are complete
-      let allTasksComplete: boolean | undefined = false;
-      let tasksBundle: Bundle<Task> = {
-        resourceType: "Bundle",
-        type: "searchset",
-        entry: [],
-      };
-
-      let attempts = 0;
-      const maxAttempts = 12;
-      while (!allTasksComplete && attempts < maxAttempts) {
-        attempts++;
-        // Wait for a short period before polling again
-        await new Promise((resolve) => setTimeout(resolve, 5000));
-        // Fetch the child tasks
-        const childTasksResponse = await fhirClient.get(
-          `/Task?part-of=Task/${parentTaskId}`,
-        );
-        // Check each entry in the response
-        tasksBundle = (await childTasksResponse.json()) as Bundle<Task>;
-        console.log(
-          `Fetched child tasks for parent Task ${parentTaskId}. Tasks Bundle:`,
-          tasksBundle,
-        );
-        allTasksComplete = tasksBundle.entry?.every((entry) => {
-          return (
-            entry.resource?.status === "completed" ||
-            entry.resource?.status === "failed"
-          );
-        });
-      }
-
-      // Log the completed tasks for debugging
-      console.log(
-        `All tasks completed for parent Task ${parentTaskId}. Tasks Bundle:`,
-        tasksBundle,
-      );
-
-      // For each completed task, fetch the results
-      const patientResults = await Promise.all(
-        tasksBundle.entry?.map(async (entry) => {
-          if (
-            entry.resource?.status === "completed" &&
-            entry.resource?.output
-          ) {
-            const res = await fhirClient.get(`/Task/${entry.resource.id}`);
-            const taskDetail = (await res.json()) as Task;
-            // Find the link to the Patient resource
-            const patientLink = taskDetail.output?.find((output) =>
-              output.valueString?.includes("Patient-Page1"),
-            )?.valueString;
-
-            console.log(`Patient link found in Task output: ${patientLink}`);
-
-            if (patientLink) {
-              // Extract the path from the link
-              const url = new URL(patientLink);
-              const fullPath = url.pathname;
-              const pathParts = fullPath.split("/ndjson");
-              const patientPath = "/ndjson" + pathParts[1];
-
-              const patientResponse = await fhirClient.get(patientPath);
-              if (patientResponse.status === 200) {
-                const patient = (await patientResponse.json()) as Patient;
-                console.log(`Patient bundle: ${JSON.stringify(patient)}`);
-                // Return the patient bundle
-                return patient;
-              } else {
-                // Wait 5 seconds for the patient resource to be available
-                console.warn(
-                  `Patient resource not available at ${patientLink}. Retrying...`,
-                );
-                await new Promise((resolve) => setTimeout(resolve, 5000));
-                const retryResponse = await fhirClient.get(patientPath);
-                if (retryResponse.status === 200) {
-                  const patientBundle =
-                    (await retryResponse.json()) as Bundle<Patient>;
-                  return patientBundle;
-                }
-                // If the patient resource is still not available, log an error
-                console.error(
-                  `Failed to fetch patient resource from ${patientLink}. Status: ${retryResponse.status}`,
-                );
-                return null;
-              }
-            } else {
-              console.warn(
-                `No patient link found in Task output for task ${entry.resource?.id}`,
-              );
-              return null;
-            }
-          } else if (entry.resource?.status === "completed") {
-            console.warn(
-              `Task ${entry.resource?.id} completed successfully but has no output.`,
-            );
-            return null;
-          } else {
-            console.warn(
-              `Task ${entry.resource?.id} failed with status: ${entry.resource?.status}`,
-            );
-            return null;
-          }
-        }) || [],
-      );
-
-      console.log(
-        `Patient results from Task processing: ${JSON.stringify(
-          patientResults,
-        )}`,
-      );
-
-      // Format the Patient resources into a FHIR Bundle
-      const bundle: Bundle = {
-        resourceType: "Bundle",
-        type: "searchset",
-        entry: patientResults
-          .filter((result): result is Patient => result !== null)
-          .flatMap((patient) => {
-            return {
-              resource: patient,
-            };
-          }),
-      };
-      // Log the bundle for debugging
-      console.log("FHIR Bundle created from Task results:", bundle);
-      fhirResponse = bundle;
     } else {
-      // For non-mutual TLS servers, use the original GET to /Patient
-      const query = "/" + patientQuery;
-      fhirResponse = await fhirClient.get(query);
-    }
-
-    // Check for errors (only for Response objects)
-    if ("status" in fhirResponse && fhirResponse.status !== 200) {
-      console.error(
-        `Patient search failed. Status: ${
-          fhirResponse.status
-        } \n Body: ${await fhirResponse.text()} \n Headers: ${JSON.stringify(
-          Object.fromEntries(fhirResponse.headers.entries()),
-        )}`,
+      const response = await this.handleStandardDiscovery(
+        fhirClient,
+        patientQuery,
       );
-    }
 
-    return fhirResponse;
+      // Check for errors
+      if (response.status !== 200) {
+        console.error(
+          `Patient search failed. Status: ${response.status} \n Body: ${await response.text()} \n Headers: ${JSON.stringify(
+            Object.fromEntries(response.headers.entries()),
+          )}`,
+        );
+      }
+
+      return response;
+    }
   }
 
   /**
