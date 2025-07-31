@@ -1,20 +1,21 @@
 
 
 locals {
-  qc_vault_name     = "keyvault123456qc" # TODO: Change this to match the key vault that was created during Prerequisites
-  qc_resource_group = "dev-qc-rg"        # TODO: Change this to match the resource group that was created during Prerequisites
-  location          = "West US 2"        # TODO: Change to match same as the resource group
-  docker_image    = "yourdockerhubuser/yourapp:latest"
-  fhir_url        = "undefined"
-  cred_manager    = "undefined"
-  umls_api_key    = "value"                                                 # TODO: Change to your UMLS API Key
-  ersd_api_key    = "value"                                                 # TODO: Change to you ERSD API Key
-  auth_provider   = "microsoft-entra-id"                                    # TODO
-  auth_client_id  = "query-connector"                                       # TODO: "Client ID"
-  auth_issuer     = "https://login.microsoftonline.com/your-tenant-id/v2.0" # TODO: URL for the Auth issuer for Entra (https://login.microsoftonline.com/<your-tenant-id>/v2.0 or keycloak)
-  auth_url        = "value"                                                 # TODO: Change to URL for the Auth server
-  entra_tenant_id = "value"                                                 # TODO: Change to Tenant ID if using Entra
-  database_name   = "qc_db"
+  qc_vault_name     = "qcdevkeyvault" # TODO: Change this to match the key vault that was created during Prerequisites
+  qc_resource_group = "qc-aca-rg"     # TODO: Change this to match the resource group that was created during Prerequisites
+  location          = "East US 2"     # TODO: Change to match same as the resource group
+  project           = "qc"            #TODO: Change this to match naming convention that will be added to resources
+  docker_image      = "yourdockerhubuser/yourapp:latest"
+  fhir_url          = "undefined"
+  cred_manager      = "undefined"
+  umls_api_key      = "value"                                                 # TODO: Change to your UMLS API Key
+  ersd_api_key      = "value"                                                 # TODO: Change to you ERSD API Key
+  auth_provider     = "microsoft-entra-id"                                    # TODO
+  auth_client_id    = "query-connector"                                       # TODO: "Client ID"
+  auth_issuer       = "https://login.microsoftonline.com/your-tenant-id/v2.0" # TODO: URL for the Auth issuer for Entra (https://login.microsoftonline.com/<your-tenant-id>/v2.0 or keycloak)
+  auth_url          = "http://localhost:3000"                                 # TODO: Change to URL for the Auth server
+  entra_tenant_id   = "value"                                                 # TODO: Change to Tenant ID if using Entra
+  database_name     = "qc_db"
 
 }
 
@@ -94,7 +95,7 @@ resource "azurerm_subnet" "pg_subnet" {
 
 # PostgreSQL Flexible Server
 resource "azurerm_postgresql_flexible_server" "postgres_qc" {
-  name                          = "pgflexserverdemo-${random_string.db_suffix.result}"
+  name                          = "pgflexserver-${local.project}-${random_string.db_suffix.result}"
   location                      = local.location
   resource_group_name           = data.azurerm_resource_group.qc_rg.name
   administrator_login           = azurerm_key_vault_secret.query_connector_db_username.value
@@ -110,10 +111,10 @@ resource "azurerm_postgresql_flexible_server" "postgres_qc" {
 }
 
 resource "random_string" "db_suffix" {
- length  = 8
+  length  = 8
   upper   = false
   lower   = true
-  numeric  = true
+  numeric = true
   special = false
 }
 
@@ -125,6 +126,11 @@ resource "azurerm_postgresql_flexible_server_database" "qc_db" {
 
 }
 
+resource "azurerm_postgresql_flexible_server_configuration" "qc_db_configs" {
+  name      = "azure.extensions"
+  server_id = azurerm_postgresql_flexible_server.postgres_qc.id
+  value     = "uuid-ossp"
+}
 
 # PostgreSQL Private DNS Zone
 resource "azurerm_private_dns_zone" "pg_dns" {
@@ -159,7 +165,7 @@ resource "random_string" "webapp_suffix" {
 }
 
 resource "azurerm_linux_web_app" "webapp" {
-  name                = "webapp-private-demo-${random_string.webapp_suffix.result}"
+  name                = "webapp-private-${local.project}-${random_string.webapp_suffix.result}"
   location            = local.location
   resource_group_name = data.azurerm_resource_group.qc_rg.name
   service_plan_id     = azurerm_service_plan.plan.id
@@ -208,7 +214,7 @@ resource "azurerm_linux_web_app" "webapp" {
 resource "azurerm_app_service_virtual_network_swift_connection" "qc_app" {
   app_service_id = azurerm_linux_web_app.webapp.id
   subnet_id      = azurerm_subnet.webapp_subnet.id
-  
+
 }
 
 # Private DNS Zone for App Service
