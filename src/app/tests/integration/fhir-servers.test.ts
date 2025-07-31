@@ -51,7 +51,6 @@ describe("FHIR Servers tests", () => {
       {},
       TEST_FHIR_SERVER.disableCertValidation,
       TEST_FHIR_SERVER.defaultServer,
-
       "none",
       null,
       null,
@@ -60,6 +59,7 @@ describe("FHIR Servers tests", () => {
       null,
       null,
       null,
+      false, // mutual_tls parameter
     ]);
     // Has new
     let newFhirServers = await getFhirServerConfigs(true);
@@ -78,6 +78,7 @@ describe("FHIR Servers tests", () => {
       newServer?.id as string,
       NEW_NAME,
       NEW_HOSTNAME,
+      false,
       false,
       false,
     );
@@ -104,6 +105,7 @@ describe("FHIR Servers tests", () => {
       const result = await insertFhirServer(
         "Test Server With Headers",
         "http://test-server.com/fhir",
+        false,
         false,
         false,
         true,
@@ -139,6 +141,7 @@ describe("FHIR Servers tests", () => {
       const result = await insertFhirServer(
         "Test Server Basic Auth",
         "http://test-basic-auth.com/fhir",
+        false,
         false,
         false,
         true,
@@ -177,6 +180,7 @@ describe("FHIR Servers tests", () => {
         "http://test-update.com/fhir",
         false,
         false,
+        false,
         true,
         {
           authType: "none",
@@ -199,6 +203,7 @@ describe("FHIR Servers tests", () => {
         serverId,
         "Test Server For Update",
         "http://test-update.com/fhir",
+        false,
         false,
         false,
         true,
@@ -224,6 +229,7 @@ describe("FHIR Servers tests", () => {
       const result = await insertFhirServer(
         "Test Server No Headers",
         "http://test-no-headers.com/fhir",
+        false,
         false,
         false,
         true,
@@ -261,6 +267,7 @@ describe("FHIR Servers tests", () => {
         "http://test-preserve.com/fhir",
         false,
         false,
+        false,
         true,
         {
           authType: "none",
@@ -275,6 +282,7 @@ describe("FHIR Servers tests", () => {
         serverId,
         "Test Server Preserve Headers",
         "http://test-preserve-updated.com/fhir",
+        false,
         false,
         false,
         true,
@@ -307,6 +315,7 @@ describe("FHIR Servers tests", () => {
       const result = await insertFhirServer(
         "Test Server Client Creds",
         "http://test-client-creds.com/fhir",
+        false,
         false,
         false,
         true,
@@ -349,6 +358,7 @@ describe("FHIR Servers tests", () => {
       const result = await insertFhirServer(
         "Test Server SMART",
         "http://test-smart.com/fhir",
+        false,
         false,
         false,
         true,

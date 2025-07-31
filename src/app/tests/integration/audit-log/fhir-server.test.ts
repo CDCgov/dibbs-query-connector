@@ -37,6 +37,7 @@ describe("fhir server", () => {
       headers: null,
       lastConnectionSuccessful: true,
       disableCertValidation: false,
+      mutualTls: false,
       defaultServer: false,
     };
     const oldAuditIds = (await dbService.query(GET_ALL_AUDIT_ROWS)).rows.map(
@@ -48,6 +49,7 @@ describe("fhir server", () => {
       TEST_FHIR_SERVER.name,
       TEST_FHIR_SERVER.hostname,
       TEST_FHIR_SERVER.disableCertValidation,
+      TEST_FHIR_SERVER.mutualTls,
       TEST_FHIR_SERVER.defaultServer,
       TEST_FHIR_SERVER.lastConnectionSuccessful,
     );
@@ -69,6 +71,7 @@ describe("fhir server", () => {
       updateName,
       TEST_FHIR_SERVER.hostname,
       TEST_FHIR_SERVER.disableCertValidation,
+      TEST_FHIR_SERVER.mutualTls,
       false,
     );
     const updateTypeToCheck = "updateFhirServer";

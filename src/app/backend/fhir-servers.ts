@@ -124,6 +124,7 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
    * @param name - The new name of the FHIR server
    * @param hostname - The new URL/hostname of the FHIR server
    * @param disableCertValidation - Whether to disable certificate validation
+   * @param mutualTls - Whether to use mutual TLS
    * @param defaultServer - Whether this is the default server
    * @param lastConnectionSuccessful - Optional boolean indicating if the last connection was successful
    * @param authData - Authentication data including auth type and credentials
@@ -137,6 +138,7 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
     name: string,
     hostname: string,
     disableCertValidation: boolean,
+    mutualTls: boolean,
     defaultServer: boolean,
     lastConnectionSuccessful?: boolean,
     authData?: AuthData,
@@ -159,7 +161,8 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
       scopes = $12,
       access_token = $13,
       token_expiry = $14,
-      patient_match_configuration = $15
+      patient_match_configuration = $15,
+      mutual_tls = $16
     WHERE id = $1
     RETURNING *;
   `;
@@ -217,6 +220,7 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
         authData?.accessToken || null,
         authData?.tokenExpiry || null,
         patientMatchConfigObject,
+        mutualTls,
       ]);
 
       // Clear the cache so the next getFhirServerConfigs call will fetch fresh data
@@ -247,6 +251,7 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
    * @param name - The name of the FHIR server
    * @param hostname - The URL/hostname of the FHIR server
    * @param disableCertValidation - Whether to disable certificate validation
+   * @param mutualTls - Whether to use mutual TLS
    * @param defaultServer - Whether this is the default server
    * @param lastConnectionSuccessful - Optional boolean indicating if the last connection was successful
    * @param authData - Authentication data including auth type and credentials
@@ -260,6 +265,7 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
     name: string,
     hostname: string,
     disableCertValidation: boolean,
+    mutualTls: boolean,
     defaultServer: boolean,
     lastConnectionSuccessful?: boolean,
     authData?: AuthData,
@@ -317,6 +323,7 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
         authData?.accessToken || null,
         authData?.tokenExpiry || null,
         patientMatchConfigObject,
+        mutualTls,
       ]);
 
       // Clear the cache so the next getFhirServerConfigs call will fetch fresh data
