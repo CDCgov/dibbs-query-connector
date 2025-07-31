@@ -350,8 +350,8 @@ const FhirServers: React.FC = () => {
     setErrorMessage(result.error);
     setPatientMatchData((prev) => ({
       enabled: prev?.enabled ?? false,
-      onlySingleMatch: false,
-      onlyCertainMatches: fhirVersion?.startsWith("6") ?? true,
+      onlySingleMatch: prev?.onlySingleMatch ?? false,
+      onlyCertainMatches: prev?.onlyCertainMatches ?? false,
       matchCount: prev?.matchCount ?? 0,
       supportsMatch: supportsMatch.supportsMatch,
     }));
