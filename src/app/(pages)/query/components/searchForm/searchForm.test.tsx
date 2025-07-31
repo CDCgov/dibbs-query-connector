@@ -28,6 +28,7 @@ describe("SearchForm", () => {
           selectedFhirServer=""
           setFhirServer={jest.fn()}
           fhirServers={[]}
+          setUncertainMatchError={jest.fn()}
         ></SearchForm>
       </RootProviderMock>,
     );
@@ -45,6 +46,7 @@ describe("SearchForm", () => {
           selectedFhirServer=""
           setFhirServer={jest.fn()}
           fhirServers={[]}
+          setUncertainMatchError={jest.fn()}
         ></SearchForm>
       </RootProviderMock>,
     );
@@ -74,6 +76,7 @@ describe("SearchForm", () => {
           selectedFhirServer="Default server"
           setFhirServer={jest.fn()}
           fhirServers={[]}
+          setUncertainMatchError={jest.fn()}
         ></SearchForm>
       </RootProviderMock>,
     );
@@ -117,6 +120,7 @@ describe("SearchForm", () => {
           selectedFhirServer={defaultServerName}
           setFhirServer={jest.fn()}
           fhirServers={[defaultServerName, "Some other server name"]}
+          setUncertainMatchError={jest.fn()}
         ></SearchForm>
       </RootProviderMock>,
     );
@@ -152,6 +156,7 @@ describe("SearchForm", () => {
           selectedFhirServer={"Default server"}
           setFhirServer={jest.fn()}
           fhirServers={["Default server"]}
+          setUncertainMatchError={jest.fn()}
         ></SearchForm>
       </RootProviderMock>,
     );

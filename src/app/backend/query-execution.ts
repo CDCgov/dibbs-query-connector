@@ -178,6 +178,189 @@ class QueryService {
   }
 
   /**
+   * Sends a FHIR $match operation to the configured FHIR server using patient demographic data.
+   * Constructs a Parameters resource containing a Patient resource with identifying fields.
+   * Supports optional configuration for match count and match certainty (single/certain).
+   * @param request - A PatientDiscoveryRequest object containing demographics and match config
+   * @returns A raw FHIR Response from the server (Bundle of potential patient matches)
+   */
+  @auditable
+  private static async makePatientMatchRequest(
+    request: PatientDiscoveryRequest,
+  ) {
+    const {
+      fhirServer,
+      firstName,
+      lastName,
+      dob,
+      mrn,
+      phone,
+      address,
+      email,
+      patientMatchConfiguration,
+    } = request;
+
+    const fhirClient = await prepareFhirClient(fhirServer);
+    const telecom: { system: string; value: string }[] = [];
+
+    if (phone) {
+      const phonesToSearch = phone.split(";");
+      for (const phone of phonesToSearch) {
+        let possibilities = await GetPhoneQueryFormats(phone);
+        possibilities = possibilities.filter((p) => p !== "");
+        if (possibilities.length !== 0) {
+          telecom.push(
+            ...possibilities.map((p) => ({ system: "phone", value: p })),
+          );
+        }
+      }
+    }
+
+    if (email) {
+      const emailsToSearch = email.split(";").filter(Boolean);
+      telecom.push(
+        ...emailsToSearch.map((e) => ({ system: "email", value: e })),
+      );
+    }
+
+    const addressLines: string[] = [];
+    if (address?.street1) addressLines.push(...address.street1.split(";"));
+    if (address?.street2) addressLines.push(...address.street2.split(";"));
+
+    const patientResource: Record<string, unknown> = {
+      resourceType: "Patient",
+    };
+
+    if (firstName || lastName) {
+      patientResource["name"] = [
+        {
+          given: firstName ? [firstName] : [],
+          family: lastName || "",
+        },
+      ];
+    }
+
+    if (dob) {
+      patientResource["birthDate"] = dob;
+    }
+
+    if (telecom.length > 0) {
+      patientResource["telecom"] = telecom;
+    }
+
+    if (
+      addressLines.length > 0 ||
+      address?.city ||
+      address?.state ||
+      address?.zip
+    ) {
+      patientResource["address"] = [
+        {
+          line: addressLines.length > 0 ? addressLines : undefined,
+          city: address?.city || undefined,
+          state: address?.state || undefined,
+          postalCode: address?.zip || undefined,
+        },
+      ];
+    }
+
+    if (mrn) {
+      patientResource["identifier"] = [
+        {
+          value: mrn,
+        },
+      ];
+    }
+
+    const hasIdentifiers = [
+      "name",
+      "birthDate",
+      "telecom",
+      "address",
+      "identifier",
+    ].some((key) => patientResource[key] !== undefined);
+
+    if (!hasIdentifiers) {
+      throw new Error(
+        "Cannot run $match: Patient resource has no identifying fields.",
+      );
+    }
+
+    const parameters: {
+      resourceType: "Parameters";
+      parameter: Array<
+        | { name: "resource"; resource: Record<string, unknown> }
+        | { name: "count"; valueInteger: number }
+        | { name: "onlyCertainMatches"; valueBoolean: true }
+        | { name: "onlySingleMatch"; valueBoolean: true }
+      >;
+    } = {
+      resourceType: "Parameters",
+      parameter: [
+        {
+          name: "resource",
+          resource: patientResource,
+        },
+      ],
+    };
+
+    // Apply optional match modifiers
+    if (patientMatchConfiguration?.onlyCertainMatches) {
+      parameters.parameter.push({
+        name: "onlyCertainMatches",
+        valueBoolean: true,
+      });
+      if (patientMatchConfiguration?.matchCount > 0) {
+        parameters.parameter.push({
+          name: "count",
+          valueInteger: patientMatchConfiguration.matchCount,
+        });
+      }
+    }
+
+    if (patientMatchConfiguration?.onlySingleMatch) {
+      parameters.parameter.push({
+        name: "onlySingleMatch",
+        valueBoolean: true,
+      });
+    }
+
+    const response = await fhirClient.postJson("/Patient/$match", parameters);
+    const jsonBody: {
+      resourceType: "OperationOutcome";
+      issue?: {
+        details?: { text?: string };
+      }[];
+    } = await response.clone().json();
+
+    const noCertainMatch =
+      jsonBody.resourceType === "OperationOutcome" &&
+      jsonBody.issue?.some((i) =>
+        i.details?.text?.includes("did not find a certain match"),
+      );
+
+    if (noCertainMatch) {
+      console.warn("Match failed due to uncertain results.");
+      return new Response(JSON.stringify({ uncertainMatchError: true }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
+    if (response.status !== 200) {
+      console.error(
+        `FHIR $match query failed. Status: ${response.status}
+      \n Body: ${await response.text()}
+      \n Headers: ${JSON.stringify(
+        Object.fromEntries(response.headers.entries()),
+      )}`,
+      );
+    }
+
+    return response;
+  }
+
+  /**
    * Performs a generalized query for collections of patients matching
    * particular criteria. The query is determined by a collection of passed-in
    * valuesets to include in the query results, and any patients found must
@@ -218,9 +401,23 @@ class QueryService {
    */
   static async patientDiscoveryQuery(
     request: PatientDiscoveryRequest,
-  ): Promise<QueryResponse["Patient"]> {
-    const fhirResponse =
-      await QueryService.makePatientDiscoveryRequest(request);
+  ): Promise<QueryResponse["Patient"] | { uncertainMatchError: true }> {
+    const matchConfig = request.patientMatchConfiguration;
+
+    const fhirResponse = matchConfig?.supportsMatch
+      ? await QueryService.makePatientMatchRequest(request)
+      : await QueryService.makePatientDiscoveryRequest(request);
+
+    if (
+      fhirResponse.status === 200 &&
+      fhirResponse.headers.get("content-type")?.includes("application/json")
+    ) {
+      const body = await fhirResponse.clone().json();
+      if (body?.uncertainMatchError === true) {
+        return { uncertainMatchError: true };
+      }
+    }
+
     const newResponse = await QueryService.parseFhirSearch(fhirResponse);
     return newResponse["Patient"] as Patient[];
   }
@@ -229,10 +426,13 @@ class QueryService {
     queryRequest: FullPatientRequest,
   ): Promise<QueryResponse> {
     const patient = await patientDiscoveryQuery(queryRequest);
-    if (patient === undefined || patient.length === 0) {
+
+    if (!Array.isArray(patient) || patient.length === 0) {
       throw Error("Patient not found in full patient discovery");
     }
 
+    // TODO: First patient is assumed to be the correct one.
+    // This should be handled by the UI, where the user can select the correct patient, but what about the API?
     const patientRecords = await patientRecordsQuery({
       patientId: patient[0].id as string,
       ...queryRequest,
