@@ -1,21 +1,22 @@
 
 
 locals {
-  qc_vault_name     = "qcdevkeyvault" # TODO: Change this to match the key vault that was created during Prerequisites
-  qc_resource_group = "qc-aca-rg"     # TODO: Change this to match the resource group that was created during Prerequisites
-  location          = "East US 2"     # TODO: Change to match same as the resource group
-  project           = "qc"            #TODO: Change this to match naming convention that will be added to resources
-  docker_image      = "yourdockerhubuser/yourapp:latest"
-  fhir_url          = "undefined"
-  cred_manager      = "undefined"
-  umls_api_key      = "value"                                                 # TODO: Change to your UMLS API Key
-  ersd_api_key      = "value"                                                 # TODO: Change to you ERSD API Key
-  auth_provider     = "microsoft-entra-id"                                    # TODO
-  auth_client_id    = "query-connector"                                       # TODO: "Client ID"
-  auth_issuer       = "https://login.microsoftonline.com/your-tenant-id/v2.0" # TODO: URL for the Auth issuer for Entra (https://login.microsoftonline.com/<your-tenant-id>/v2.0 or keycloak)
-  auth_url          = "http://localhost:3000"                                 # TODO: Change to URL for the Auth server
-  entra_tenant_id   = "value"                                                 # TODO: Change to Tenant ID if using Entra
-  database_name     = "qc_db"
+  qc_vault_name           = "qcdevkeyvault"                                # TODO: Change this to match the key vault that was created during Prerequisites
+  qc_resource_group       = "qc-aca-rg"                                    # TODO: Change this to match the resource group that was created during Prerequisites
+  location                = "East US 2"                                    # TODO: Change to match same as the resource group
+  project                 = "qc"                                           #TODO: Change this to match naming convention that will be added to resources
+  qc_docker_image_name    = "cdcgov/dibbs-query-connector/query-connector" #TODO: Change this if image name has been changed
+  qc_docker_registry_name = "https://ghcr.io"                              #TODO: Change this if the image is not hosted in Github Container registry 
+  fhir_url                = "undefined"
+  cred_manager            = "undefined"
+  umls_api_key            = "value"                                                 # TODO: Change to your UMLS API Key
+  ersd_api_key            = "value"                                                 # TODO: Change to you ERSD API Key
+  auth_provider           = "microsoft-entra-id"                                    # TODO
+  auth_client_id          = "query-connector"                                       # TODO: "Client ID"
+  auth_issuer             = "https://login.microsoftonline.com/your-tenant-id/v2.0" # TODO: URL for the Auth issuer for Entra (https://login.microsoftonline.com/<your-tenant-id>/v2.0 or keycloak)
+  auth_url                = "http://localhost:3000"                                 # TODO: Change to URL for the Auth server
+  entra_tenant_id         = "value"                                                 # TODO: Change to Tenant ID if using Entra
+  database_name           = "qc_db"
 
 }
 
@@ -175,8 +176,8 @@ resource "azurerm_linux_web_app" "webapp" {
   }
   site_config {
     application_stack {
-      docker_image_name   = "cdcgov/dibbs-query-connector/query-connector:${var.app_version}"
-      docker_registry_url = "https://ghcr.io"
+      docker_image_name   = "${local.qc_docker_image_name}:${var.app_version}"
+      docker_registry_url = "${local.qc_docker_registry_name}"
     }
     always_on                         = true
     health_check_path                 = "/"
