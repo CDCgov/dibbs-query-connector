@@ -38,16 +38,8 @@ test.describe("Mutual TLS", () => {
         modal.scrollTop = modal.scrollHeight;
       }
     });
-    await page.evaluate(() => {
-      const checkbox = document.getElementById(
-        "mutual-tls",
-      ) as HTMLInputElement;
-      if (checkbox) {
-        checkbox.checked = true;
-        checkbox.dispatchEvent(new Event("change", { bubbles: true }));
-      }
-    });
 
+    await page.getByText("Mutual TLS").click();
     // Verify mutual TLS hint text appears
     await expect(
       page.getByText(
@@ -162,15 +154,8 @@ test.describe("Mutual TLS", () => {
         modal.scrollTop = modal.scrollHeight;
       }
     });
-    await page.evaluate(() => {
-      const checkbox = document.getElementById(
-        "mutual-tls",
-      ) as HTMLInputElement;
-      if (checkbox) {
-        checkbox.checked = true;
-        checkbox.dispatchEvent(new Event("change", { bubbles: true }));
-      }
-    });
+
+    await page.getByText("Mutual TLS").click();
 
     // Verify mutual TLS hint text appears
     await expect(
@@ -222,15 +207,9 @@ test.describe("Mutual TLS", () => {
         modal.scrollTop = modal.scrollHeight;
       }
     });
-    await page.evaluate(() => {
-      const checkbox = document.getElementById(
-        "mutual-tls",
-      ) as HTMLInputElement;
-      if (checkbox) {
-        checkbox.checked = true;
-        checkbox.dispatchEvent(new Event("change", { bubbles: true }));
-      }
-    });
+
+    await page.getByText("Mutual TLS").click();
+
     await expect(
       page.getByText(
         "Mutual TLS certificates will be loaded from the keys directory",
