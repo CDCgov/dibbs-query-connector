@@ -16,7 +16,6 @@ import type {
 } from "../models/entities/query";
 import type { MedicalRecordSections } from "../(pages)/queryBuilding/utils";
 import { prepareFhirClient } from "./fhir-servers";
-import type { Response } from "node-fetch";
 import type FHIRClient from "../shared/fhirClient";
 
 interface TaskPollingResult {
@@ -261,8 +260,8 @@ class QueryService {
       const taskDetailResponse = await fhirClient.get(`/Task/${task.id}`);
       const taskDetail = (await taskDetailResponse.json()) as Task;
 
-      const patientLink = taskDetail.output?.find((output) =>
-        output.valueString?.includes("Patient-Page1"),
+      const patientLink = taskDetail.output?.find(
+        (output) => output.valueString?.includes("Patient-Page1"),
       )?.valueString;
 
       if (!patientLink) {
@@ -331,7 +330,9 @@ class QueryService {
     );
 
     console.log(
-      `Successfully processed ${validPatients.length} patients from ${tasksBundle.entry?.length || 0} tasks`,
+      `Successfully processed ${validPatients.length} patients from ${
+        tasksBundle.entry?.length || 0
+      } tasks`,
     );
 
     return {
@@ -470,7 +471,7 @@ class QueryService {
   @auditable
   private static async makePatientDiscoveryRequest(
     request: PatientDiscoveryRequest,
-  ): Promise<Response | Bundle> {
+  ): Promise<Response> {
     const { fhirServer } = request;
     const fhirClient = await prepareFhirClient(fhirServer);
 
@@ -485,29 +486,31 @@ class QueryService {
     const patientQuery = await this.buildPatientSearchQuery(request);
 
     // Handle discovery based on server configuration
+    let response: Response;
     if (serverConfig?.mutualTls) {
-      return await this.handleMutualTlsDiscovery(
+      const tlsDiscoveryResult = await this.handleMutualTlsDiscovery(
         fhirClient,
         patientQuery,
         fhirServer,
       );
+
+      response = new Response(JSON.stringify(tlsDiscoveryResult));
     } else {
-      const response = await this.handleStandardDiscovery(
-        fhirClient,
-        patientQuery,
-      );
-
-      // Check for errors
-      if (response.status !== 200) {
-        console.error(
-          `Patient search failed. Status: ${response.status} \n Body: ${await response.text()} \n Headers: ${JSON.stringify(
-            Object.fromEntries(response.headers.entries()),
-          )}`,
-        );
-      }
-
-      return response;
+      response = await this.handleStandardDiscovery(fhirClient, patientQuery);
     }
+
+    // Check for errors
+    if (response.status !== 200) {
+      console.error(
+        `Patient search failed. Status: ${
+          response.status
+        } \n Body: ${await response.text()} \n Headers: ${JSON.stringify(
+          Object.fromEntries(response.headers.entries()),
+        )}`,
+      );
+    }
+
+    return response;
   }
 
   /**
@@ -668,8 +671,8 @@ class QueryService {
 
     const noCertainMatch =
       jsonBody.resourceType === "OperationOutcome" &&
-      jsonBody.issue?.some((i) =>
-        i.details?.text?.includes("did not find a certain match"),
+      jsonBody.issue?.some(
+        (i) => i.details?.text?.includes("did not find a certain match"),
       );
 
     if (noCertainMatch) {

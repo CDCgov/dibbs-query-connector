@@ -13,12 +13,10 @@ jest.mock("@/app/backend/smart-on-fhir", () => ({
 }));
 
 // Mock node-fetch
-jest.mock("node-fetch", () => jest.fn());
-const mockFetch = require("node-fetch") as jest.MockedFunction<
-  typeof import("node-fetch").default
+jest.mock("fetch", () => jest.fn());
+const mockFetch = require("fetch") as jest.MockedFunction<
+  typeof import("fetch").default
 >;
-
-import fetch from "node-fetch";
 
 describe("FHIRClient with Mutual TLS", () => {
   const mockCert =

@@ -1,12 +1,11 @@
 import {
-  QueryResponse,
   processFhirResponse,
   parseFhirSearch,
 } from "@/app/backend/query-execution";
 import { isFhirResource } from "@/app/shared/constants";
 import { readJsonFile } from "../shared_utils/readJsonFile";
 import { DiagnosticReport, Observation } from "fhir/r4";
-import fetch from "node-fetch";
+import { QueryResponse } from "@/app/models/entities/query";
 
 jest.mock("@/app/utils/auth", () => ({
   superAdminAccessCheck: jest.fn().mockReturnValue(true),
@@ -37,7 +36,7 @@ describe("process response", () => {
     const response = {
       status: 200,
       json: async () => patientBundle,
-    } as unknown as fetch.Response;
+    } as unknown as Response;
     const resourceArray = await processFhirResponse(response);
 
     // Using isFhirResource
@@ -81,7 +80,7 @@ describe("parse fhir search", () => {
     const response = {
       status: 200,
       json: async () => patientBundle,
-    } as unknown as fetch.Response;
+    } as unknown as Response;
     const queryResponse: QueryResponse = await parseFhirSearch(response);
 
     // Using isFhirResource

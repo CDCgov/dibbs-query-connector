@@ -1,4 +1,4 @@
-import fetch, { RequestInit } from "node-fetch";
+import { Agent } from "undici";
 
 /**
  * Fetches a URL without SSL verification. This is useful for
@@ -8,18 +8,20 @@ import fetch, { RequestInit } from "node-fetch";
  * @returns The response from the fetch function.
  */
 export async function fetchWithoutSSL(url: string, options: RequestInit = {}) {
-  const originalValue = process.env.NODE_TLS_REJECT_UNAUTHORIZED;
-  process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+  const agent = new Agent({ connect: { rejectUnauthorized: false } });
 
   try {
-    const response = await fetch(url, options);
+    const response = await fetch(url, {
+      ...options,
+      // @ts-ignore - Node.js fetch supports agent option
+      dispatcher: agent,
+    });
     return response;
-  } finally {
-    // Restore the original environment variable value
-    if (originalValue === undefined) {
-      delete process.env.NODE_TLS_REJECT_UNAUTHORIZED;
-    } else {
-      process.env.NODE_TLS_REJECT_UNAUTHORIZED = originalValue;
-    }
+  } catch (error) {
+    const message =
+      error instanceof Error
+        ? error.message
+        : "Unknown error during fetchWithoutSSL";
+    throw new Error(`Failed to fetch URL without SSL verification: ${message}`);
   }
 }
