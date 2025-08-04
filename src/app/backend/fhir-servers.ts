@@ -3,7 +3,7 @@ import { FhirServerConfig } from "@/app/models/entities/fhir-servers";
 import { auditable } from "@/app/backend/audit-logs/decorator";
 import FHIRClient from "@/app/shared/fhirClient";
 import dbService from "./db/service";
-import { superAdminRequired, transaction } from "./db/decorators";
+import { transaction } from "./db/decorators";
 import { FHIR_SERVER_INSERT_QUERY } from "./db/util";
 
 // Define an interface for authentication data
@@ -51,7 +51,7 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
    * @param forceRefresh - Whether to flush the config cache
    * @returns The configuration for the FHIR server.
    */
-  @superAdminRequired
+  // @superAdminRequired
   static async getFhirServerConfigs(forceRefresh = false) {
     if (
       forceRefresh ||
@@ -120,30 +120,43 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
 
   /**
    * Updates an existing FHIR server configuration in the database.
-   * @param id - The ID of the FHIR server to update
-   * @param name - The new name of the FHIR server
-   * @param hostname - The new URL/hostname of the FHIR server
-   * @param disableCertValidation - Whether to disable certificate validation
-   * @param mutualTls - Whether to use mutual TLS
-   * @param defaultServer - Whether this is the default server
-   * @param lastConnectionSuccessful - Optional boolean indicating if the last connection was successful
-   * @param authData - Authentication data including auth type and credentials
-   * @param patientMatchConfiguration - Optional patient match configuration
+   * @param d - update details
+   * @param d.id - The ID of the FHIR server to update
+   * @param d.name - The new name of the FHIR server
+   * @param d.hostname - The new URL/hostname of the FHIR server
+   * @param d.disableCertValidation - Whether to disable certificate validation
+   * @param d.mutualTls - Whether to use mutual TLS
+   * @param d.defaultServer - Whether this is the default server
+   * @param d.lastConnectionSuccessful - Optional boolean indicating if the last connection was successful
+   * @param d.authData - Authentication data including auth type and credentials
+   * @param d.patientMatchConfiguration - Optional patient match configuration
    * @returns An object indicating success or failure with optional error message
    */
   @transaction
   @auditable
-  static async updateFhirServer(
-    id: string,
-    name: string,
-    hostname: string,
-    disableCertValidation: boolean,
-    mutualTls: boolean,
-    defaultServer: boolean,
-    lastConnectionSuccessful?: boolean,
-    authData?: AuthData,
-    patientMatchConfiguration?: PatientMatchData,
-  ) {
+  static async updateFhirServer(d: {
+    id: string;
+    name: string;
+    hostname: string;
+    disableCertValidation: boolean;
+    mutualTls: boolean;
+    defaultServer: boolean;
+    lastConnectionSuccessful?: boolean;
+    authData?: AuthData;
+    patientMatchConfiguration?: PatientMatchData;
+  }) {
+    const {
+      id,
+      name,
+      hostname,
+      disableCertValidation,
+      mutualTls,
+      defaultServer,
+      lastConnectionSuccessful,
+      authData,
+      patientMatchConfiguration,
+    } = d;
+
     const updateQuery = `
     UPDATE fhir_servers 
     SET 
@@ -195,12 +208,12 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
         patientMatchConfiguration != null
           ? {
               enabled: patientMatchConfiguration.enabled ?? false,
-              only_single_match:
+              onlySingleMatch:
                 patientMatchConfiguration.onlySingleMatch ?? false,
-              only_certain_matches:
+              onlyCertainMatches:
                 patientMatchConfiguration.onlyCertainMatches ?? false,
-              match_count: patientMatchConfiguration.matchCount ?? 1,
-              supports_match: patientMatchConfiguration.supportsMatch ?? false,
+              matchCount: patientMatchConfiguration.matchCount ?? 0,
+              supportsMatch: patientMatchConfiguration.supportsMatch ?? false,
             }
           : null;
 
@@ -298,12 +311,12 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
         patientMatchConfiguration != null
           ? {
               enabled: patientMatchConfiguration.enabled ?? false,
-              only_single_match:
+              onlySingleMatch:
                 patientMatchConfiguration.onlySingleMatch ?? false,
-              only_certain_matches:
+              onlyCertainMatches:
                 patientMatchConfiguration.onlyCertainMatches ?? false,
-              match_count: patientMatchConfiguration.matchCount ?? 1,
-              supports_match: patientMatchConfiguration.supportsMatch ?? false,
+              matchCount: patientMatchConfiguration.matchCount ?? 0,
+              supportsMatch: patientMatchConfiguration.supportsMatch ?? false,
             }
           : null;
 
@@ -383,29 +396,19 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
   }
 
   static async prepareFhirClient(serverName: string) {
-    if (FhirServerConfigService.cachedFhirServerConfigs === null) {
-      FhirServerConfigService.cachedFhirServerConfigs =
-        await super.getFhirServerConfigs();
-    }
+    const configs =
+      await FhirServerConfigServiceInternal.getFhirServerConfigs();
+    const config = configs.find((c) => c.name === serverName);
 
-    let config = FhirServerConfigService.cachedFhirServerConfigs.find(
-      (c) => c.name === serverName,
-    );
+    if (!config) throw new Error(`No server config found for ${serverName}`);
 
-    if (!config) {
-      // fallback retry in case we have a cache miss
-      FhirServerConfigService.cachedFhirServerConfigs =
-        await super.getFhirServerConfigs();
-      const followupConfig =
-        FhirServerConfigService.cachedFhirServerConfigs.find(
-          (c) => c.name === serverName,
-        );
-
-      if (!followupConfig)
-        throw Error(`No server config found for ${serverName}`);
-      else {
-        config = followupConfig;
-      }
+    if (config.authType === "SMART") {
+      const client = new FHIRClient(config);
+      await client.ensureValidToken();
+      config.headers = {
+        ...(config.headers || {}),
+        Authorization: `Bearer ${config.accessToken}`,
+      };
     }
 
     return new FHIRClient(config);

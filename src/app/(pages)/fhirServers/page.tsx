@@ -73,10 +73,12 @@ const FhirServers: React.FC = () => {
     enabled: false,
     onlySingleMatch: false,
     onlyCertainMatches: false,
-    matchCount: 1,
+    // If 0, the server decides how many matches to return.
+    matchCount: 0,
     supportsMatch: false,
   } as PatientMatchData;
   const [mutualTls, setMutualTls] = useState(false);
+  const [fhirVersion, setFhirVersion] = useState<string | null>(null);
   const [defaultServer, setDefaultServer] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState<
     "idle" | "success" | "error"
@@ -310,17 +312,19 @@ const FhirServers: React.FC = () => {
     disableCertValidation: boolean,
     authData: AuthData,
   ) => {
-    const supportsMatch = await checkFhirServerSupportsMatch(
+    const { supportsMatch, fhirVersion } = await checkFhirServerSupportsMatch(
       hostname,
       disableCertValidation,
       authData,
     );
+
+    setFhirVersion(fhirVersion);
     setPatientMatchData((prev) => ({
       enabled: prev?.enabled ?? false,
-      onlySingleMatch: prev?.onlySingleMatch ?? false,
-      onlyCertainMatches: prev?.onlyCertainMatches ?? false,
-      matchCount: prev?.matchCount ?? 1,
-      supportsMatch,
+      onlySingleMatch: false,
+      onlyCertainMatches: fhirVersion?.startsWith("6") ?? true,
+      matchCount: prev?.matchCount ?? 0,
+      supportsMatch: supportsMatch ?? false,
     }));
   };
 
@@ -334,7 +338,11 @@ const FhirServers: React.FC = () => {
     );
 
     // 2. Independently check $match support
-    const supportsMatch = true;
+    const supportsMatch = await checkFhirServerSupportsMatch(
+      serverUrl,
+      disableCertValidation,
+      authData,
+    );
 
     // 3. Update connection status in DB
     const updateResult = await updateFhirServerConnectionStatus(
@@ -349,8 +357,8 @@ const FhirServers: React.FC = () => {
       enabled: prev?.enabled ?? false,
       onlySingleMatch: prev?.onlySingleMatch ?? false,
       onlyCertainMatches: prev?.onlyCertainMatches ?? false,
-      matchCount: prev?.matchCount ?? 1,
-      supportsMatch,
+      matchCount: prev?.matchCount ?? 0,
+      supportsMatch: supportsMatch.supportsMatch,
     }));
 
     if (updateResult.server) {
@@ -364,6 +372,34 @@ const FhirServers: React.FC = () => {
 
   const handleSave = async (authData: AuthData) => {
     const connectionResult = await testFhirConnection(serverUrl);
+
+    if (defaultServer) {
+      await Promise.all(
+        fhirServers
+          .filter((srv) => srv.defaultServer && srv.name !== serverName)
+          .map((srv) =>
+            updateFhirServer({
+              id: srv.id,
+              name: srv.name,
+              hostname: srv.hostname,
+              disableCertValidation: srv.disableCertValidation,
+              mutualTls: false,
+              defaultServer: srv.defaultServer,
+              lastConnectionSuccessful: srv.lastConnectionSuccessful ?? false,
+              authData: {
+                authType: srv.authType as AuthMethodType,
+                clientId: srv.clientId,
+                clientSecret: srv.clientSecret,
+                tokenEndpoint: srv.tokenEndpoint,
+                scopes: srv.scopes,
+                headers: srv.headers ?? {},
+              },
+              patientMatchConfiguration:
+                srv.patientMatchConfiguration ?? DEFAULT_PATIENT_MATCH_DATA,
+            }),
+          ),
+      );
+    }
 
     if (modalMode === "create") {
       const result = await insertFhirServer(
@@ -387,17 +423,18 @@ const FhirServers: React.FC = () => {
         setErrorMessage(result.error);
       }
     } else if (selectedServer) {
-      const result = await updateFhirServer(
-        selectedServer.id,
-        serverName,
-        serverUrl,
-        disableCertValidation,
-        mutualTls,
-        defaultServer,
-        connectionResult.success,
-        authData,
-        patientMatchData || DEFAULT_PATIENT_MATCH_DATA,
-      );
+      const result = await updateFhirServer({
+        id: selectedServer.id,
+        name: serverName,
+        hostname: serverUrl,
+        disableCertValidation: disableCertValidation,
+        mutualTls: mutualTls,
+        defaultServer: defaultServer,
+        lastConnectionSuccessful: connectionResult.success,
+        authData: authData,
+        patientMatchConfiguration:
+          patientMatchData || DEFAULT_PATIENT_MATCH_DATA,
+      });
 
       if (result.success) {
         getFhirServerConfigs(true).then((servers) => {
@@ -609,7 +646,7 @@ const FhirServers: React.FC = () => {
 
   const renderPatientMatchFields = () =>
     patientMatchData?.supportsMatch && (
-      <div className="margin-top-4 border-top padding-top-1">
+      <div className="margin-top-1 padding-top-1">
         <h2 className="font-heading-lg margin-bottom-2">
           Patient $match settings
         </h2>
@@ -625,77 +662,78 @@ const FhirServers: React.FC = () => {
             setPatientMatchData((prev) => ({
               ...prev!,
               enabled: e.target.checked,
+              onlyCertainMatches: true,
             }))
           }
         />
-        {patientMatchData?.enabled && (
+        {
           <>
-            <Fieldset>
-              <Radio
-                id="match-type-single"
-                name="match-type"
-                value="single"
-                defaultChecked={patientMatchData?.onlySingleMatch}
-                label="Only include single matches"
-                aria-label="Only include single matches"
-                onChange={() =>
-                  setPatientMatchData((prev) => ({
-                    ...prev!,
-                    onlyCertainMatches: false,
-                    onlySingleMatch: true,
-                    matchCount: 1,
-                  }))
-                }
-              />
-              <Radio
-                id="match-type-multiple"
-                name="match-type"
-                value="multiple"
-                defaultChecked={patientMatchData?.onlyCertainMatches}
-                label="Only include certain matches"
-                aria-label="Only include certain matches"
-                onChange={() =>
-                  setPatientMatchData((prev) => ({
-                    ...prev!,
-                    onlySingleMatch: false,
-                    onlyCertainMatches: true,
-                  }))
-                }
-              />
-              <Radio
-                id="match-type-all"
-                name="match-type"
-                value="all"
-                defaultChecked={
-                  !patientMatchData?.onlyCertainMatches === false &&
-                  !patientMatchData?.onlySingleMatch === false
-                }
-                label="Include all matches"
-                aria-label="Include all matches"
-                onChange={() =>
-                  setPatientMatchData((prev) => ({
-                    ...prev!,
-                    onlyCertainMatches: false,
-                    onlySingleMatch: false,
-                  }))
-                }
-              />
-            </Fieldset>
+            {fhirVersion?.startsWith("6") && (
+              <Fieldset>
+                <Radio
+                  id="match-type-single"
+                  name="match-type"
+                  value="single"
+                  checked={patientMatchData?.onlySingleMatch}
+                  label="Only include single matches"
+                  aria-label="Only include single matches"
+                  onChange={() =>
+                    setPatientMatchData((prev) => ({
+                      ...prev!,
+                      onlyCertainMatches: false,
+                      onlySingleMatch: true,
+                      matchCount: 0,
+                    }))
+                  }
+                />
+                <Radio
+                  id="match-type-multiple"
+                  name="match-type"
+                  value="multiple"
+                  checked={patientMatchData?.onlyCertainMatches}
+                  label="Only include certain matches"
+                  aria-label="Only include certain matches"
+                  onChange={() =>
+                    setPatientMatchData((prev) => ({
+                      ...prev!,
+                      onlySingleMatch: false,
+                      onlyCertainMatches: true,
+                    }))
+                  }
+                />
+                <Radio
+                  id="match-type-all"
+                  name="match-type"
+                  value="all"
+                  checked={
+                    !patientMatchData?.onlyCertainMatches &&
+                    !patientMatchData?.onlySingleMatch
+                  }
+                  label="Include all matches"
+                  aria-label="Include all matches"
+                  onChange={() =>
+                    setPatientMatchData((prev) => ({
+                      ...prev!,
+                      onlyCertainMatches: false,
+                      onlySingleMatch: false,
+                    }))
+                  }
+                />
+              </Fieldset>
+            )}
 
             <Label htmlFor="match-count">
-              Number of maximum patient matches to return
+              Number of maximum patient matches to return. If 0, the server
+              decides how many matches to return.
             </Label>
             <TextInput
               id="match-count"
-              disabled={
-                patientMatchData?.onlySingleMatch ||
-                !patientMatchData?.onlyCertainMatches
-              }
+              disabled={!patientMatchData?.enabled}
               data-testid="match-count"
               name="match-count"
-              aria-label="Number of maximum patient matches to return"
+              aria-label="Number of maximum patient matches to return. If 0, the server decides how many matches to return."
               type="number"
-              min="1"
+              min="0"
               max="200"
               value={patientMatchData?.matchCount}
               onChange={(e) =>
@@ -706,7 +744,7 @@ const FhirServers: React.FC = () => {
               }
             />
           </>
-        )}
+        }
       </div>
     );
 
