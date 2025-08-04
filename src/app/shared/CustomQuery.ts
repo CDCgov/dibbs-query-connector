@@ -1,7 +1,21 @@
 import {
   MedicalRecordSections,
   QueryDataColumn,
+  QueryTableResult,
+  QueryTableTimebox,
+  TimeWindow,
 } from "../(pages)/queryBuilding/utils";
+
+function formatTimeFilter(timeWindow: TimeWindow | undefined) {
+  if (!timeWindow) return "";
+  const startString = timeWindow.timeWindowStart.substring(0, 10);
+  const endString = timeWindow.timeWindowEnd.substring(0, 10);
+
+  const filterString = `?lastUpdated=ge${startString}&lastUpdated=le${endString}`;
+
+  console.log(filterString);
+  return filterString;
+}
 
 /**
  * A Data Class designed to store and manipulate various code values used
@@ -61,23 +75,24 @@ export class CustomQuery {
    * DIBBs-defined JSON structure consisting of four keys corresponding to
    * the four types of codes this data class encompasses. These Specs are
    * currently located in the `customQueries` directory of the app.
-   * @param savedQueryJson A entry from the query_data column of our query table
+   * @param savedQuery A entry from the query table
    * that has nested information about the conditions / valuesets / concepts
    * relevant to the query
    * @param patientId The ID of the patient to build into query strings.
-   * @param medicalRecordSections Object containing booleans for each section (e.g. immunization, socialDeterminants)
-   * @param medicalRecordSections.immunization Boolean indicating if immunization section is included
-   * @param medicalRecordSections.socialDeterminants Boolean indicating if socialDeterminants section is included
    */
-  constructor(
-    savedQueryJson: QueryDataColumn,
-    patientId: string,
-    medicalRecordSections: MedicalRecordSections,
-  ) {
+  constructor(savedQuery: QueryTableResult, patientId: string) {
     try {
       this.patientId = patientId;
-      this.initializeQueryConceptTypes(savedQueryJson);
-      this.compileFhirResourceQueries(patientId, medicalRecordSections);
+      const queryData = savedQuery.queryData;
+      const medicalRecordSection = savedQuery.medicalRecordSections;
+      const timeboxInfo = savedQuery.timeboxWindows;
+
+      this.initializeQueryConceptTypes(queryData);
+      this.compileFhirResourceQueries(
+        patientId,
+        medicalRecordSection,
+        timeboxInfo,
+      );
     } catch (error) {
       console.error("Could not create CustomQuery Object: ", error);
     }
@@ -119,14 +134,23 @@ export class CustomQuery {
    * @param medicalRecordSections Object containing booleans for each section (e.g. immunization, socialDeterminants)
    * @param medicalRecordSections.immunization Boolean indicating if immunization section is included
    * @param medicalRecordSections.socialDeterminants Boolean indicating if socialDeterminants section is included
+   * @param timeboxInfo Time filtering information
    */
   compileFhirResourceQueries(
     patientId: string,
     medicalRecordSections: MedicalRecordSections,
+    timeboxInfo?: QueryTableTimebox,
   ): void {
     const labsFilter = this.labCodes.join(",");
     const medicationsFilter = this.medicationCodes.join(",");
     const conditionsFilter = this.conditionCodes.join(",");
+
+    const labsTimeFilter = formatTimeFilter(timeboxInfo?.labs);
+    const conditionsTimeFilter = formatTimeFilter(timeboxInfo?.conditions);
+    const medicationsTimeFilter = formatTimeFilter(timeboxInfo?.medications);
+
+    console.log(labsTimeFilter);
+    console.log(conditionsTimeFilter);
 
     if (medicalRecordSections && medicalRecordSections.socialDeterminants) {
       this.fhirResourceQueries["socialHistory"] = {
@@ -149,7 +173,7 @@ export class CustomQuery {
 
     if (labsFilter !== "") {
       this.fhirResourceQueries["observation"] = {
-        basePath: `/Observation/_search`,
+        basePath: `/Observation/_search${labsTimeFilter}`,
         params: {
           subject: `Patient/${patientId}`,
           code: labsFilter,
@@ -157,7 +181,7 @@ export class CustomQuery {
       };
 
       this.fhirResourceQueries["diagnosticReport"] = {
-        basePath: `/DiagnosticReport/_search`,
+        basePath: `/DiagnosticReport/_search${labsTimeFilter}`,
         params: {
           subject: `Patient/${patientId}`,
           code: labsFilter,
@@ -167,14 +191,14 @@ export class CustomQuery {
 
     if (conditionsFilter !== "") {
       this.fhirResourceQueries["encounter"] = {
-        basePath: `/Encounter/_search`,
+        basePath: `/Encounter/_search${conditionsTimeFilter}`,
         params: {
           subject: `Patient/${patientId}`,
           "reason-code": conditionsFilter,
         },
       };
       this.fhirResourceQueries["condition"] = {
-        basePath: `/Condition/_search`,
+        basePath: `/Condition/_search${conditionsTimeFilter}`,
         params: {
           subject: `Patient/${patientId}`,
           code: conditionsFilter,
@@ -189,7 +213,7 @@ export class CustomQuery {
       // for the request <> admin relationship
 
       this.fhirResourceQueries["medicationRequest"] = {
-        basePath: `/MedicationRequest/_search`,
+        basePath: `/MedicationRequest/_search${medicationsTimeFilter}`,
         params: {
           subject: `Patient/${patientId}`,
           code: medicationsFilter,

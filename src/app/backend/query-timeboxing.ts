@@ -72,8 +72,8 @@ class QueryTimeboxingService {
     const timeboxInfo: QueryTableTimebox = {};
     relatedTimeboxes.rows.forEach((t) => {
       timeboxInfo[t.conceptType as DibbsConceptType] = {
-        timeWindowStart: t.timeWindowStart,
-        timeWindowEnd: t.timeWindowEnd,
+        timeWindowStart: t.timeWindowStart.toISOString(),
+        timeWindowEnd: t.timeWindowEnd.toISOString(),
       };
     });
 
