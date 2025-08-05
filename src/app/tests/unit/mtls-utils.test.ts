@@ -5,6 +5,7 @@ import {
   getOrCreateMtlsKey,
   isMtlsAvailable,
 } from "@/app/shared/mtls-utils";
+import { suppressConsoleLogs } from "../integration/fixtures";
 
 // Mock fs module
 jest.mock("fs");
@@ -19,6 +20,7 @@ describe("Mutual TLS Utilities", () => {
   const keyPath = path.join(keysDir, "mtls-key.pem");
 
   beforeEach(() => {
+    suppressConsoleLogs();
     jest.clearAllMocks();
     // Reset environment variables
     delete process.env.MTLS_CERT;

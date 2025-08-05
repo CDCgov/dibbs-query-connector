@@ -4,6 +4,9 @@ import SearchForm from "./SearchForm";
 import { useSearchParams } from "next/navigation";
 
 jest.mock("next/navigation");
+jest.mock("@/app/backend/fhir-servers", () => ({
+  getFhirServerConfigs: jest.fn().mockResolvedValue([]),
+}));
 
 describe("SearchForm", () => {
   beforeAll(() => {

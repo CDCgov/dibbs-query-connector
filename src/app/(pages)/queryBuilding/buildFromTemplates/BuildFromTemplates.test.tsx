@@ -33,6 +33,10 @@ jest.mock("../../../backend/query-building/service", () => ({
   getSavedQueryById: jest.fn(),
 }));
 
+jest.mock("../../../backend/query-timeboxing", () => ({
+  getTimeboxRanges: jest.fn(),
+}));
+
 const mockPush = jest.fn();
 jest.mock("next/navigation", () => ({
   useRouter: () => ({

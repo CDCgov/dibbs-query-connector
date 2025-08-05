@@ -6,6 +6,7 @@ import { isFhirResource } from "@/app/shared/constants";
 import { readJsonFile } from "../shared_utils/readJsonFile";
 import { DiagnosticReport, Observation } from "fhir/r4";
 import { QueryResponse } from "@/app/models/entities/query";
+import { suppressConsoleLogs } from "../integration/fixtures";
 
 jest.mock("@/app/utils/auth", () => ({
   superAdminAccessCheck: jest.fn().mockReturnValue(true),
@@ -13,6 +14,9 @@ jest.mock("@/app/utils/auth", () => ({
 
 // Test case for processResponse
 describe("process response", () => {
+  beforeAll(() => {
+    suppressConsoleLogs();
+  });
   it("should unpack a response from the server into an array of resources", async () => {
     const patientBundle = readJsonFile(
       "./src/app/tests/assets/BundlePatient.json",
@@ -57,6 +61,9 @@ describe("process response", () => {
 
 // Test case for parseFhirSearch
 describe("parse fhir search", () => {
+  beforeAll(() => {
+    suppressConsoleLogs();
+  });
   it("should turn the FHIR server's response into a QueryResponse struct", async () => {
     const patientBundle = readJsonFile(
       "./src/app/tests/assets/BundlePatient.json",
