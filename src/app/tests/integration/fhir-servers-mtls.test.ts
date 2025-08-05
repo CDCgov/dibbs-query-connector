@@ -202,7 +202,7 @@ describe("FHIR Servers Mutual TLS Tests", () => {
       const updateResult = await updateFhirServer({
         id: serverId,
         name: "Test mTLS Update Server",
-        hostname: "https://test-update.example.com/fhir",
+        hostname: "https://test-preserve-updated.example.com/fhir",
         disableCertValidation: false,
         mutualTls: true, // mutualTls still enabled
         defaultServer: false,

@@ -23,25 +23,34 @@ jest.mock("@/app/utils/auth", () => ({
   ...jest.requireActual("@/app/utils/auth"),
   superAdminAccessCheck: jest.fn().mockResolvedValue(true),
 }));
+const mockBody = {
+  resourceType: "Bundle",
+  entry: [
+    {
+      resource: {
+        resourceType: "Patient",
+        id: "test-patient-123",
+        name: [{ given: ["Test"], family: "Patient" }],
+        identifier: [{ value: "MRN-12345" }],
+      },
+    },
+  ],
+};
+const mockResponse = {
+  status: 200,
+  statusText: "OK",
+  headers: new Headers({ "content-type": "application/json" }),
+  clone: () => mockResponse,
+  json: async () => mockBody,
+  ...mockBody,
+};
 
 // Mock the FHIRClient to prevent real authentication requests
 jest.mock("@/app/shared/fhirClient", () => {
   return {
     __esModule: true,
     default: jest.fn().mockImplementation(() => ({
-      get: jest.fn().mockResolvedValue({
-        resourceType: "Bundle",
-        entry: [
-          {
-            resource: {
-              resourceType: "Patient",
-              id: "test-patient-123",
-              name: [{ given: ["Test"], family: "Patient" }],
-              identifier: [{ value: "MRN-12345" }],
-            },
-          },
-        ],
-      }),
+      get: jest.fn().mockResolvedValue(mockResponse),
       post: jest.fn().mockResolvedValue({
         status: 200,
         url: "http://mock-server.com/fhir",
@@ -62,7 +71,7 @@ jest.mock("@/app/shared/fhirClient", () => {
 const dbClient = internal_getDbClient();
 describe("checks for generic audit logs", () => {
   beforeAll(() => {
-    suppressConsoleLogs();
+    // suppressConsoleLogs();
   });
 
   it("produces correct checksum for audit message with stringified request", () => {
