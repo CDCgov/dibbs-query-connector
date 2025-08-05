@@ -71,7 +71,7 @@ jest.mock("@/app/shared/fhirClient", () => {
 const dbClient = internal_getDbClient();
 describe("checks for generic audit logs", () => {
   beforeAll(() => {
-    // suppressConsoleLogs();
+    suppressConsoleLogs();
   });
 
   it("produces correct checksum for audit message with stringified request", () => {

@@ -316,6 +316,8 @@ describe("Query Execution with Mutual TLS", () => {
       // Mock child tasks with one failed and one completed
       mockFhirClient.get.mockResolvedValueOnce({
         status: 200,
+        headers: new Headers({ "content-type": "application/json" }),
+
         json: async () => ({
           resourceType: "Bundle",
           type: "searchset",
@@ -421,10 +423,13 @@ describe("Query Execution with Mutual TLS", () => {
       ]);
 
       // Mock standard patient search response
-      mockFhirClient.get.mockResolvedValueOnce({
+      const standardPatientResponse = {
         status: 200,
+        headers: new Headers({ "content-type": "application/json" }),
         json: async () => mockPatientBundle,
-      } as Response);
+        clone: () => standardPatientResponse,
+      } as Response;
+      mockFhirClient.get.mockResolvedValueOnce(standardPatientResponse);
 
       const request = {
         fhirServer: "Test mTLS Server",
@@ -438,7 +443,7 @@ describe("Query Execution with Mutual TLS", () => {
       // Should use GET to /Patient instead of POST to /Task
       expect(mockFhirClient.postJson).not.toHaveBeenCalled();
       expect(mockFhirClient.get).toHaveBeenCalledWith(
-        "/Patient?given=John&family=Doe&birthdate=1990-01-01&",
+        "/Patient?given=John&family=Doe&birthdate=1990-01-01",
       );
 
       expect(result).toHaveLength(1);

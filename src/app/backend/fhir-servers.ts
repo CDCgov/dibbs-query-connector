@@ -120,21 +120,21 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
 
   /**
    * Updates an existing FHIR server configuration in the database.
-   * @param d - update details
-   * @param d.id - The ID of the FHIR server to update
-   * @param d.name - The new name of the FHIR server
-   * @param d.hostname - The new URL/hostname of the FHIR server
-   * @param d.disableCertValidation - Whether to disable certificate validation
-   * @param d.mutualTls - Whether to use mutual TLS
-   * @param d.defaultServer - Whether this is the default server
-   * @param d.lastConnectionSuccessful - Optional boolean indicating if the last connection was successful
-   * @param d.authData - Authentication data including auth type and credentials
-   * @param d.patientMatchConfiguration - Optional patient match configuration
+   * @param updateDetails - update details
+   * @param updateDetails.id - The ID of the FHIR server to update
+   * @param updateDetails.name - The new name of the FHIR server
+   * @param updateDetails.hostname - The new URL/hostname of the FHIR server
+   * @param updateDetails.disableCertValidation - Whether to disable certificate validation
+   * @param updateDetails.mutualTls - Whether to use mutual TLS
+   * @param updateDetails.defaultServer - Whether this is the default server
+   * @param updateDetails.lastConnectionSuccessful - Optional boolean indicating if the last connection was successful
+   * @param updateDetails.authData - Authentication data including auth type and credentials
+   * @param updateDetails.patientMatchConfiguration - Optional patient match configuration
    * @returns An object indicating success or failure with optional error message
    */
   @transaction
   @auditable
-  static async updateFhirServer(d: {
+  static async updateFhirServer(updateDetails: {
     id: string;
     name: string;
     hostname: string;
@@ -155,7 +155,7 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
       lastConnectionSuccessful,
       authData,
       patientMatchConfiguration,
-    } = d;
+    } = updateDetails;
 
     const updateQuery = `
     UPDATE fhir_servers 

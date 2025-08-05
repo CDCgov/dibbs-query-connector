@@ -74,14 +74,17 @@ describe("FHIR Servers tests", () => {
     //update works
     const NEW_NAME = "Kongo Jungle Two";
     const NEW_HOSTNAME = "http://welcome-to-the-new-jungle.bananarepublic/fhir";
-    await updateFhirServer(
-      newServer?.id as string,
-      NEW_NAME,
-      NEW_HOSTNAME,
-      false,
-      false,
-      false,
-    );
+    await updateFhirServer({
+      id: newServer?.id as string,
+      name: NEW_NAME,
+      hostname: NEW_HOSTNAME,
+      disableCertValidation: false,
+      mutualTls: false,
+      defaultServer: false,
+      authData: {
+        authType: "none",
+      },
+    });
     newFhirServers = await getFhirServerConfigs(true);
     const shouldBeUpdated = newFhirServers.find((v) => v.name === NEW_NAME);
     expect(shouldBeUpdated?.name).toBe(NEW_NAME);
@@ -199,19 +202,19 @@ describe("FHIR Servers tests", () => {
         "X-New-Header": "new-value",
       };
 
-      const updateResult = await updateFhirServer(
-        serverId,
-        "Test Server For Update",
-        "http://test-update.com/fhir",
-        false,
-        false,
-        false,
-        true,
-        {
+      const updateResult = await updateFhirServer({
+        id: serverId,
+        name: "Test Server For Update",
+        hostname: "http://test-update.com/fhir",
+        disableCertValidation: false,
+        mutualTls: false,
+        defaultServer: false,
+        lastConnectionSuccessful: true,
+        authData: {
           authType: "none",
           headers: newHeaders,
         },
-      );
+      });
 
       expect(updateResult.success).toBe(true);
 
@@ -278,19 +281,19 @@ describe("FHIR Servers tests", () => {
       const serverId = insertResult.server.id;
 
       // Update only the URL, headers should be preserved
-      const updateResult = await updateFhirServer(
-        serverId,
-        "Test Server Preserve Headers",
-        "http://test-preserve-updated.com/fhir",
-        false,
-        false,
-        false,
-        true,
-        {
+      const updateResult = await updateFhirServer({
+        id: serverId,
+        name: "Test Server Preserve Headers",
+        hostname: "http://test-preserve-updated.com/fhir",
+        disableCertValidation: false,
+        mutualTls: false,
+        defaultServer: false,
+        lastConnectionSuccessful: true,
+        authData: {
           authType: "none",
           headers: customHeaders,
         },
-      );
+      });
 
       expect(updateResult.success).toBe(true);
 
