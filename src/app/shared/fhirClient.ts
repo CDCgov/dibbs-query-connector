@@ -50,37 +50,35 @@ class FHIRClient {
       id: "test",
       name: "test",
       hostname: url,
-      disableCertValidation,
+      disableCertValidation: disableCertValidation,
       defaultServer: false,
       headers: authData?.headers || {},
     };
 
-    if (!authData) return new FHIRClient(testConfig);
+    // Add auth-related properties if auth data is provided
+    if (authData) {
+      testConfig.authType = authData.authType;
 
-    const { authType } = authData;
+      if (authData.authType === "basic" && authData.bearerToken) {
+        // Preserve existing headers while adding Authorization
+        testConfig.headers = {
+          ...testConfig.headers,
+          Authorization: `Bearer ${authData.bearerToken}`,
+        };
+      } else if (["client_credentials", "SMART"].includes(authData.authType)) {
+        testConfig.clientId = authData.clientId;
+        testConfig.tokenEndpoint = authData.tokenEndpoint;
+        testConfig.scopes = authData.scopes;
 
-    if (authType === "basic" && authData.bearerToken) {
-      testConfig.authType = "basic";
-      testConfig.headers = {
-        ...testConfig.headers,
-        Authorization: `Bearer ${authData.bearerToken}`,
-      };
-    } else if (authType === "client_credentials") {
-      testConfig.authType = "client_credentials";
-      testConfig.clientId = authData.clientId;
-      testConfig.clientSecret = authData.clientSecret;
-      testConfig.tokenEndpoint = authData.tokenEndpoint;
-      testConfig.scopes = authData.scopes;
-    } else if (authType === "SMART") {
-      testConfig.authType = "SMART";
-      testConfig.clientId = authData.clientId;
-      testConfig.tokenEndpoint = authData.tokenEndpoint;
-      testConfig.scopes = authData.scopes;
-    } else {
-      testConfig.authType = "none";
+        if (authData.authType === "client_credentials") {
+          testConfig.clientSecret = authData.clientSecret;
+        }
+      }
     }
 
-    return new FHIRClient(testConfig);
+    // Create a client with a configurations array containing only the test config
+    const client = new FHIRClient(testConfig);
+    return client;
   }
 
   /**
@@ -147,46 +145,32 @@ class FHIRClient {
    * Checks if the current token has expired and gets a new one if needed
    */
   public async ensureValidToken(): Promise<void> {
-    const { authType, clientId, clientSecret, tokenEndpoint } =
-      this.serverConfig;
-
+    // Only check for auth_type client_credentials or SMART
     if (
-      authType === "client_credentials" &&
-      clientId &&
-      clientSecret &&
-      tokenEndpoint
+      !["client_credentials", "SMART"].includes(
+        this.serverConfig.authType || "",
+      )
     ) {
-      if (
-        this.serverConfig.accessToken &&
-        this.serverConfig.tokenExpiry &&
-        new Date(this.serverConfig.tokenExpiry) > new Date()
-      ) {
-        this.init.headers = {
-          ...(this.init.headers || {}),
-          Authorization: `Bearer ${this.serverConfig.accessToken}`,
-        };
-        return;
-      }
-
-      await this.getAccessToken();
-    } else if (authType === "SMART" && clientId && tokenEndpoint) {
-      if (
-        this.serverConfig.accessToken &&
-        this.serverConfig.tokenExpiry &&
-        new Date(this.serverConfig.tokenExpiry) > new Date()
-      ) {
-        this.init.headers = {
-          ...(this.init.headers || {}),
-          Authorization: `Bearer ${this.serverConfig.accessToken}`,
-        };
-        return;
-      }
-
-      await this.getAccessToken();
-    } else {
-      // no-op: nothing to validate for non-auth servers
       return;
     }
+
+    // Check if we have a valid token that hasn't expired
+    if (
+      this.serverConfig.accessToken &&
+      this.serverConfig.tokenExpiry &&
+      new Date(this.serverConfig.tokenExpiry) > new Date()
+    ) {
+      // Token is still valid, ensure it's in headers
+      if (!this.init.headers) {
+        this.init.headers = {};
+      }
+      (this.init.headers as Record<string, string>)["Authorization"] =
+        `Bearer ${this.serverConfig.accessToken}`;
+      return;
+    }
+
+    // Need to get a new token
+    await this.getAccessToken();
   }
 
   /**
@@ -481,37 +465,25 @@ class FHIRClient {
         headers: authData?.headers || {},
       };
 
-      if (authData?.authType === "basic" && authData.bearerToken) {
-        testConfig.authType = "basic";
-        testConfig.headers = {
-          ...testConfig.headers,
-          Authorization: `Bearer ${authData.bearerToken}`,
-        };
-      } else if (authData?.authType === "client_credentials") {
-        if (
-          !authData.clientId ||
-          !authData.clientSecret ||
-          !authData.tokenEndpoint
+      if (authData) {
+        testConfig.authType = authData.authType;
+
+        if (authData.authType === "basic" && authData.bearerToken) {
+          testConfig.headers = {
+            ...testConfig.headers,
+            Authorization: `Bearer ${authData.bearerToken}`,
+          };
+        } else if (
+          ["client_credentials", "SMART"].includes(authData.authType)
         ) {
-          testConfig.authType = "none";
-        } else {
-          testConfig.authType = "client_credentials";
-          testConfig.clientId = authData.clientId;
-          testConfig.clientSecret = authData.clientSecret;
-          testConfig.tokenEndpoint = authData.tokenEndpoint;
-          testConfig.scopes = authData.scopes;
-        }
-      } else if (authData?.authType === "SMART") {
-        if (!authData.clientId || !authData.tokenEndpoint) {
-          testConfig.authType = "none";
-        } else {
-          testConfig.authType = "SMART";
           testConfig.clientId = authData.clientId;
           testConfig.tokenEndpoint = authData.tokenEndpoint;
           testConfig.scopes = authData.scopes;
+
+          if (authData.authType === "client_credentials") {
+            testConfig.clientSecret = authData.clientSecret;
+          }
         }
-      } else {
-        testConfig.authType = "none";
       }
 
       const client = new FHIRClient(testConfig);
