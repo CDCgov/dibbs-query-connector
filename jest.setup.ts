@@ -42,3 +42,6 @@ if (process.env.TEST_TYPE === "integration") {
 
   global.TextEncoder = ESBuildAndJSDOMCompatibleTextEncoder;
 }
+if (process.env.TEST_TYPE === "unit") {
+  global.MessagePort = require("node:worker_threads").MessagePort;
+}
