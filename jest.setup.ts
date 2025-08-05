@@ -6,6 +6,7 @@ import { Pool } from "pg";
 
 expect.extend(toHaveNoViolations);
 expect.extend(matchers);
+global.MessagePort = require("node:worker_threads").MessagePort;
 
 if (process.env.TEST_TYPE === "integration") {
   let dbClient: Pool | null = null;
@@ -41,7 +42,4 @@ if (process.env.TEST_TYPE === "integration") {
   }
 
   global.TextEncoder = ESBuildAndJSDOMCompatibleTextEncoder;
-}
-if (process.env.TEST_TYPE === "unit") {
-  global.MessagePort = require("node:worker_threads").MessagePort;
 }
