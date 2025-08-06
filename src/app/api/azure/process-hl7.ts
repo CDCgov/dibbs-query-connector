@@ -7,8 +7,8 @@ const endpoint = process.env.QUERY_CONNECTOR_ENDPOINT;
 
 interface BlobTriggerContext {
   log: {
-    (message: string, ...args: any[]): void;
-    error: (message: string, ...args: any[]) => void;
+    (message: string, ...args: unknown[]): void;
+    error: (message: string, ...args: unknown[]) => void;
   };
 }
 
@@ -42,7 +42,7 @@ const blobTrigger = async function (
     } else {
       context.log("HL7 POST succeeded");
     }
-  } catch (err) {
+  } catch (err: unknown) {
     context.log.error("Exception during HL7 POST:", err);
   }
 };
