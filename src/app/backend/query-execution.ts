@@ -112,6 +112,7 @@ class QueryService {
           .flat()
           .filter((addr) => addr !== "")
           .join(",");
+
         patientQuery += `address=${addrString}&`;
       }
 
@@ -127,7 +128,7 @@ class QueryService {
 
       if (address.state) {
         const states = address.state.split(";").join(",");
-        patientQuery += `address-state=${states}`;
+        patientQuery += `address-state=${states}&`;
       }
     }
 
@@ -483,7 +484,6 @@ class QueryService {
 
     // Build patient search query
     const patientQuery = await this.buildPatientSearchQuery(request);
-
     // Handle discovery based on server configuration
     let response: Response;
     if (serverConfig?.mutualTls) {
@@ -758,8 +758,8 @@ class QueryService {
   static async patientDiscoveryQuery(
     request: PatientDiscoveryRequest,
   ): Promise<QueryResponse["Patient"] | { uncertainMatchError: true }> {
+    console.log(request);
     const matchConfig = request?.patientMatchConfiguration;
-
     const fhirResponse = matchConfig?.supportsMatch
       ? await QueryService.makePatientMatchRequest(request)
       : await QueryService.makePatientDiscoveryRequest(request);
@@ -769,6 +769,7 @@ class QueryService {
       fhirResponse.headers.get("content-type")?.includes("application/json")
     ) {
       const body = await fhirResponse.clone().json();
+
       if (body?.uncertainMatchError === true) {
         return { uncertainMatchError: true };
       }
