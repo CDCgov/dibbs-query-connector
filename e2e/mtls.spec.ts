@@ -39,7 +39,7 @@ test.describe("Mutual TLS", () => {
       }
     });
 
-    await page.getByText("Mutual TLS").click();
+    await page.getByText("Enable Mutual TLS").click();
     // Verify mutual TLS hint text appears
     await expect(
       page.getByText(
@@ -155,7 +155,7 @@ test.describe("Mutual TLS", () => {
       }
     });
 
-    await page.getByText("Mutual TLS").click();
+    await page.getByText("Enable Mutual TLS").click();
 
     // Verify mutual TLS hint text appears
     await expect(
