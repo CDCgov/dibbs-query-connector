@@ -1,4 +1,4 @@
-import { postHL7 } from "./postHl7";
+import { postHL7 } from "./post-hl7";
 
 const queryId = process.env.QUERY_ID!;
 const fhirServer = process.env.FHIR_SERVER!;
