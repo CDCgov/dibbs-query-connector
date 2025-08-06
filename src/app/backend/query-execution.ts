@@ -15,8 +15,7 @@ import type {
   FullPatientRequest,
 } from "../models/entities/query";
 import type { MedicalRecordSections } from "../(pages)/queryBuilding/utils";
-import { prepareFhirClient } from "./fhir-servers";
-import type { Response } from "node-fetch";
+import { getFhirServerConfigs, prepareFhirClient } from "./fhir-servers";
 import type FHIRClient from "../shared/fhirClient";
 
 interface TaskPollingResult {
@@ -113,6 +112,7 @@ class QueryService {
           .flat()
           .filter((addr) => addr !== "")
           .join(",");
+
         patientQuery += `address=${addrString}&`;
       }
 
@@ -128,7 +128,7 @@ class QueryService {
 
       if (address.state) {
         const states = address.state.split(";").join(",");
-        patientQuery += `address-state=${states}`;
+        patientQuery += `address-state=${states}&`;
       }
     }
 
@@ -331,7 +331,9 @@ class QueryService {
     );
 
     console.log(
-      `Successfully processed ${validPatients.length} patients from ${tasksBundle.entry?.length || 0} tasks`,
+      `Successfully processed ${validPatients.length} patients from ${
+        tasksBundle.entry?.length || 0
+      } tasks`,
     );
 
     return {
@@ -470,12 +472,11 @@ class QueryService {
   @auditable
   private static async makePatientDiscoveryRequest(
     request: PatientDiscoveryRequest,
-  ): Promise<Response | Bundle> {
+  ): Promise<Response> {
     const { fhirServer } = request;
     const fhirClient = await prepareFhirClient(fhirServer);
 
     // Get the server config to check for mutual TLS
-    const { getFhirServerConfigs } = await import("./fhir-servers");
     const serverConfigs = await getFhirServerConfigs();
     const serverConfig = serverConfigs.find(
       (config) => config.name === fhirServer,
@@ -483,31 +484,44 @@ class QueryService {
 
     // Build patient search query
     const patientQuery = await this.buildPatientSearchQuery(request);
-
     // Handle discovery based on server configuration
+    let response: Response;
     if (serverConfig?.mutualTls) {
-      return await this.handleMutualTlsDiscovery(
+      const tlsDiscoveryResult = await this.handleMutualTlsDiscovery(
         fhirClient,
         patientQuery,
         fhirServer,
       );
+
+      response = new Response(JSON.stringify(tlsDiscoveryResult), {
+        status: 200,
+        statusText: "OK",
+      });
     } else {
-      const response = await this.handleStandardDiscovery(
-        fhirClient,
-        patientQuery,
-      );
-
-      // Check for errors
-      if (response.status !== 200) {
-        console.error(
-          `Patient search failed. Status: ${response.status} \n Body: ${await response.text()} \n Headers: ${JSON.stringify(
-            Object.fromEntries(response.headers.entries()),
-          )}`,
-        );
-      }
-
-      return response;
+      response = await this.handleStandardDiscovery(fhirClient, patientQuery);
     }
+
+    // Check for errors
+    if (response.status !== 200) {
+      let errorText = "Match request failed for unknown reason";
+      let headerText = "Match request failed with unknown headers";
+
+      try {
+        errorText = await response.text();
+      } catch {}
+
+      try {
+        headerText = JSON.stringify(
+          Object.fromEntries(response.headers.entries()),
+        );
+      } catch {}
+
+      console.error(
+        `Patient search failed. Status: ${response.status} \n Body: ${errorText} \n Headers: ${headerText}`,
+      );
+    }
+
+    return response;
   }
 
   /**
@@ -681,12 +695,21 @@ class QueryService {
     }
 
     if (response.status !== 200) {
+      let errorText = "Match request failed for unknown reason";
+      let headerText = "Match request failed with unknown headers";
+
+      try {
+        errorText = await response.text();
+      } catch {}
+
+      try {
+        headerText = JSON.stringify(
+          Object.fromEntries(response.headers.entries()),
+        );
+      } catch {}
+
       console.error(
-        `FHIR $match query failed. Status: ${response.status}
-      \n Body: ${await response.text()}
-      \n Headers: ${JSON.stringify(
-        Object.fromEntries(response.headers.entries()),
-      )}`,
+        `Patient search failed. Status: ${response.status} \n Body: ${errorText} \n Headers: ${headerText}`,
       );
     }
 
@@ -735,8 +758,8 @@ class QueryService {
   static async patientDiscoveryQuery(
     request: PatientDiscoveryRequest,
   ): Promise<QueryResponse["Patient"] | { uncertainMatchError: true }> {
-    const matchConfig = request.patientMatchConfiguration;
-
+    console.log(request);
+    const matchConfig = request?.patientMatchConfiguration;
     const fhirResponse = matchConfig?.supportsMatch
       ? await QueryService.makePatientMatchRequest(request)
       : await QueryService.makePatientDiscoveryRequest(request);
@@ -746,13 +769,13 @@ class QueryService {
       fhirResponse.headers.get("content-type")?.includes("application/json")
     ) {
       const body = await fhirResponse.clone().json();
+
       if (body?.uncertainMatchError === true) {
         return { uncertainMatchError: true };
       }
     }
 
     const newResponse = await QueryService.parseFhirSearch(fhirResponse);
-    console.log(`newResponse: `, newResponse);
     return newResponse["Patient"] as Patient[];
   }
 
@@ -811,8 +834,6 @@ class QueryService {
       ).flat();
       // if response is a Bundle, extract the resource
     } else if (isFanoutSearch) {
-      console.log("Processing FHIR Bundle response");
-
       const resources =
         response.entry
           ?.map((entry) => {
@@ -828,8 +849,6 @@ class QueryService {
           .filter((resource): resource is FhirResource => resource !== null) ||
         [];
       // Add resources to the resourceArray
-      console.log(`Found ${resources.length} resources in Bundle response`);
-      console.log(`Resources: `, JSON.stringify(resources, null, 2));
       resourceArray = resources;
     } else {
       resourceArray = await processFhirResponse(response);

@@ -66,14 +66,18 @@ describe("fhir server", () => {
 
     // update
     const updateName = "Dire Dire Docks";
-    await updateFhirServer(
-      result.server.id,
-      updateName,
-      TEST_FHIR_SERVER.hostname,
-      TEST_FHIR_SERVER.disableCertValidation,
-      TEST_FHIR_SERVER.mutualTls,
-      false,
-    );
+    await updateFhirServer({
+      id: result.server.id,
+      name: updateName,
+      hostname: TEST_FHIR_SERVER.hostname,
+      defaultServer: false,
+      disableCertValidation: TEST_FHIR_SERVER.disableCertValidation,
+      mutualTls: TEST_FHIR_SERVER.mutualTls,
+      lastConnectionSuccessful: false,
+      authData: {
+        authType: "none",
+      },
+    });
     const updateTypeToCheck = "updateFhirServer";
     await waitForAuditSuccess(updateTypeToCheck, auditCompletionSpy);
     const updateAuditEntry = await getAuditEntry(
@@ -81,7 +85,7 @@ describe("fhir server", () => {
       oldAuditIds,
     );
 
-    expect(JSON.parse(updateAuditEntry.name)).toBe(updateName);
+    expect(JSON.parse(updateAuditEntry.updateDetails).name).toBe(updateName);
 
     // delete
     await deleteFhirServer(result.server.id);

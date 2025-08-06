@@ -209,6 +209,8 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
 
     const patientDiscoveryRequest = getPatientDiscoveryRequest();
     try {
+      setMode("patient-results");
+
       const queryResponse = await patientDiscoveryQuery(
         patientDiscoveryRequest,
       );
@@ -224,7 +226,6 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
       if (isUncertainMatch) {
         setPatientDiscoveryQueryResponse([]);
         setUncertainMatchError(true);
-        setMode("patient-results");
         setLoading(false);
         return;
       }

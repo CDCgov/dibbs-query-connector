@@ -5,8 +5,7 @@ import { fetchWithoutSSL } from "./server-utils";
 import dbService from "../backend/db/service";
 import { AuthData, updateFhirServer } from "../backend/fhir-servers";
 import { getOrCreateMtlsCert, getOrCreateMtlsKey } from "./mtls-utils";
-import fetch from "node-fetch";
-import { RequestInit, Response } from "node-fetch";
+import { Agent } from "undici";
 
 /**
  * Custom fetch function that supports mutual TLS
@@ -21,16 +20,16 @@ function fetchWithMutualTLS(
   disableCertValidation: boolean = false,
 ) {
   return async (url: string, options?: RequestInit): Promise<Response> => {
-    const agent = new https.Agent({
-      cert,
-      key,
-      rejectUnauthorized: !disableCertValidation,
-    });
-
     return fetch(url, {
       ...options,
-      // @ts-ignore - Node.js fetch supports agent option
-      agent,
+      // @ts-ignore
+      dispatcher: new Agent({
+        connect: {
+          cert: cert,
+          key: key,
+          rejectUnauthorized: !disableCertValidation,
+        },
+      }),
     });
   };
 }
@@ -469,6 +468,7 @@ class FHIRClient {
   async get(path: string): Promise<Response> {
     await this.ensureValidToken();
     const response = await this.fetch(this.hostname + path, this.init);
+
     return response;
   }
 

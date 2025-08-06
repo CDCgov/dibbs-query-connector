@@ -1,4 +1,4 @@
-import { suppressConsoleLogs } from "../integration/fixtures";
+import { suppressConsoleLogs } from "./fixtures";
 import {
   insertFhirServer,
   updateFhirServer,
@@ -72,18 +72,18 @@ describe("FHIR Servers Mutual TLS Tests", () => {
       const serverId = insertResult.server.id;
 
       // Update to enable mTLS
-      const updateResult = await updateFhirServer(
-        serverId,
-        "Test mTLS Update Server",
-        "https://test-update.example.com/fhir",
-        false,
-        true, // mutualTls enabled
-        false,
-        true,
-        {
+      const updateResult = await updateFhirServer({
+        id: serverId,
+        name: "Test mTLS Update Server",
+        hostname: "https://test-update.example.com/fhir",
+        disableCertValidation: false,
+        mutualTls: true, // mutualTls enabled
+        defaultServer: false,
+        lastConnectionSuccessful: true,
+        authData: {
           authType: "none",
         },
-      );
+      });
 
       expect(updateResult.success).toBe(true);
 
@@ -199,18 +199,18 @@ describe("FHIR Servers Mutual TLS Tests", () => {
       const serverId = insertResult.server.id;
 
       // Update only the URL
-      const updateResult = await updateFhirServer(
-        serverId,
-        "Test mTLS Preserve Server",
-        "https://test-preserve-updated.example.com/fhir",
-        false,
-        true, // mutualTls still enabled
-        false,
-        true,
-        {
+      const updateResult = await updateFhirServer({
+        id: serverId,
+        name: "Test mTLS Update Server",
+        hostname: "https://test-preserve-updated.example.com/fhir",
+        disableCertValidation: false,
+        mutualTls: true, // mutualTls still enabled
+        defaultServer: false,
+        lastConnectionSuccessful: true,
+        authData: {
           authType: "none",
         },
-      );
+      });
 
       expect(updateResult.success).toBe(true);
 
