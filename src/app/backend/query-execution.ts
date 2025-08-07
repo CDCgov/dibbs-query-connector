@@ -261,8 +261,8 @@ class QueryService {
       const taskDetailResponse = await fhirClient.get(`/Task/${task.id}`);
       const taskDetail = (await taskDetailResponse.json()) as Task;
 
-      const patientLink = taskDetail.output?.find((output) =>
-        output.valueString?.includes("Patient-Page1"),
+      const patientLink = taskDetail.output?.find(
+        (output) => output.valueString?.includes("Patient-Page1"),
       )?.valueString;
 
       if (!patientLink) {
@@ -331,7 +331,9 @@ class QueryService {
     );
 
     console.log(
-      `Successfully processed ${validPatients.length} patients from ${tasksBundle.entry?.length || 0} tasks`,
+      `Successfully processed ${validPatients.length} patients from ${
+        tasksBundle.entry?.length || 0
+      } tasks`,
     );
 
     return {
@@ -361,6 +363,8 @@ class QueryService {
     const taskBody = this.createPatientDiscoveryTask(patientQuery);
     const taskResponse = await fhirClient.postJson("/Task", taskBody);
     const createdTask = (await taskResponse.json()) as Bundle<Task>;
+
+    console.log((createdTask?.issue)[0]);
 
     const parentTaskId = createdTask.entry?.[0]?.resource?.id;
     if (!parentTaskId) {
@@ -500,7 +504,9 @@ class QueryService {
       // Check for errors
       if (response.status !== 200) {
         console.error(
-          `Patient search failed. Status: ${response.status} \n Body: ${await response.text()} \n Headers: ${JSON.stringify(
+          `Patient search failed. Status: ${
+            response.status
+          } \n Body: ${await response.text()} \n Headers: ${JSON.stringify(
             Object.fromEntries(response.headers.entries()),
           )}`,
         );

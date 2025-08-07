@@ -27,6 +27,8 @@ function fetchWithMutualTLS(
       rejectUnauthorized: !disableCertValidation,
     });
 
+    console.log;
+
     return fetch(url, {
       ...options,
       // @ts-ignore - Node.js fetch supports agent option
@@ -55,6 +57,9 @@ class FHIRClient {
       try {
         const cert = getOrCreateMtlsCert();
         const key = getOrCreateMtlsKey();
+
+        console.log("setting up mutual TLS");
+
         this.fetch = fetchWithMutualTLS(
           cert,
           key,
@@ -175,6 +180,7 @@ class FHIRClient {
       // Try to fetch the server's metadata
       let response;
       if (mutualTls) {
+        console.log("setting up task connection");
         response = await client.get("/Task/foo");
         if (response.status == 404) {
           // If mutual TLS is enabled, we can only check if the server is reachable
@@ -458,6 +464,8 @@ class FHIRClient {
    */
   async get(path: string): Promise<Response> {
     await this.ensureValidToken();
+
+    console.log(this.hostname + path);
     const response = await this.fetch(this.hostname + path, this.init);
     return response;
   }
@@ -514,7 +522,7 @@ class FHIRClient {
       },
       body: JSON.stringify(body),
     };
-
+    console.log(this.hostname + path);
     return this.fetch(this.hostname + path, requestOptions);
   }
 

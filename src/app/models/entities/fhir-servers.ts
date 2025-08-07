@@ -1,5 +1,10 @@
 // Add this to your FhirServerConfig interface in models/entities/fhir-servers.ts
-
+export type AuthType =
+  | "none"
+  | "basic"
+  | "client_credentials"
+  | "SMART"
+  | "mutual_tls";
 export interface FhirServerConfig {
   id: string;
   name: string;
@@ -10,7 +15,7 @@ export interface FhirServerConfig {
   lastConnectionSuccessful?: boolean;
   lastConnectionAttempt?: string;
   headers?: Record<string, string>;
-  authType?: "none" | "basic" | "client_credentials" | "SMART";
+  authType?: AuthType;
   clientId?: string;
   clientSecret?: string;
   tokenEndpoint?: string;

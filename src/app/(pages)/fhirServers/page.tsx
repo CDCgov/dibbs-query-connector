@@ -22,7 +22,7 @@ import type { ModalProps } from "../../ui/designSystem/modal/Modal";
 
 import WithAuth from "@/app/ui/components/withAuth/WithAuth";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
-import { FhirServerConfig } from "@/app/models/entities/fhir-servers";
+import { AuthType, FhirServerConfig } from "@/app/models/entities/fhir-servers";
 import {
   testFhirServerConnection,
   checkFhirServerSupportsMatch,
@@ -43,7 +43,6 @@ const Modal = dynamic<ModalProps>(
 );
 
 type ModalMode = "create" | "edit";
-type AuthMethodType = "none" | "basic" | "client_credentials" | "SMART";
 
 interface HeaderPair {
   key: string;
@@ -60,7 +59,7 @@ const FhirServers: React.FC = () => {
   const [fhirServers, setFhirServers] = useState<FhirServerConfig[]>([]);
   const [serverName, setServerName] = useState("");
   const [serverUrl, setServerUrl] = useState("");
-  const [authMethod, setAuthMethod] = useState<AuthMethodType>("none");
+  const [authMethod, setAuthMethod] = useState<AuthType>("none");
   const [bearerToken, setBearerToken] = useState("");
   const [clientId, setClientId] = useState("");
   const [clientSecret, setClientSecret] = useState("");
