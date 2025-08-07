@@ -3,6 +3,8 @@ import { Agent } from "undici";
 /**
  * Fetches a URL without SSL verification. This is useful for
  * FHIR servers that are not using SSL or have self-signed certificates.
+ *
+ * WARNING: YOU SHOULD ONLY BE USING THIS LOCALLY OR IN CONTROLLED ENVIRONMENTS.
  * @param url The URL to fetch.
  * @param options The options to pass to the fetch function.
  * @returns The response from the fetch function.

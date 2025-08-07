@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e  # Exit immediately if a command exits with a non-zero status. Comment this if debugging in CI
+# set -e  # Exit immediately if a command exits with a non-zero status. Comment this if debugging in CI
 
 chmod +x ./setup-scripts/setup_e2e.sh
 bash ./setup-scripts/setup_e2e.sh
