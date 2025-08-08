@@ -379,4 +379,45 @@ describe("FHIR Servers tests", () => {
       }
     });
   });
+
+  it("should insert a FHIR server with patientMatchConfiguration", async () => {
+    const matchableServerName = "Test Server With $match";
+    const result = await insertFhirServer(
+      matchableServerName,
+      "http://test-server-match.com/fhir",
+      false,
+      false,
+      true,
+      {
+        authType: "none",
+      },
+      {
+        enabled: true,
+        onlySingleMatch: false,
+        onlyCertainMatches: true,
+        matchCount: 5,
+        supportsMatch: true,
+      },
+    );
+
+    expect(result.success).toBe(true);
+    expect(result.server).toBeDefined();
+
+    const servers = await getFhirServerConfigs(true);
+    const insertedServer = servers.find((s) => s.name === matchableServerName);
+
+    expect(insertedServer).toBeDefined();
+    expect(insertedServer?.patientMatchConfiguration).toMatchObject({
+      enabled: true,
+      onlySingleMatch: false,
+      onlyCertainMatches: true,
+      matchCount: 5,
+      supportsMatch: true,
+    });
+
+    // Cleanup
+    if (insertedServer?.id) {
+      await deleteFhirServer(insertedServer.id);
+    }
+  });
 });
