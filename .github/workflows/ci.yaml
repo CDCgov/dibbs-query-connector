@@ -92,13 +92,19 @@ jobs:
         run: npm ci
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
-      - name: Create .env
-        run: |
-          echo "AIDBOX_LICENSE=${{ secrets.AIDBOX_LICENSE }}" > .env
-          echo "MTLS_CERT=$(echo '${{ secrets.MTLS_CERT_B64 }}' | base64 -d)" >> .env
-          echo "MTLS_key=$(echo '${{ secrets.MTLS_KEY_B64 }}' | base64 -d)" >> .env
-          echo "NEXT_PUBLIC_AUTH_PROVIDER=keycloak" >> .env
 
+      - name: Create .env
+        env:
+          AIDBOX_LICENSE: ${{ secrets.AIDBOX_LICENSE }}
+          MTLS_CERT_B64: ${{ secrets.MTLS_CERT_B64 }}
+          MTLS_KEY_B64: ${{ secrets.MTLS_KEY_B64 }}
+        run: |
+          {
+            echo "AIDBOX_LICENSE=$AIDBOX_LICENSE"
+            echo "MTLS_CERT=$(echo "$MTLS_CERT_B64" | base64 -d)"
+            echo "MTLS_KEY=$(echo "$MTLS_KEY_B64" | base64 -d)"
+            echo "NEXT_PUBLIC_AUTH_PROVIDER=keycloak"
+          } > .env
       - name: Build Query Connector and Run Playwright Tests
         id: run_tests
         run: |
