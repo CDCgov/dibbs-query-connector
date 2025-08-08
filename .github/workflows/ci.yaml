@@ -101,8 +101,8 @@ jobs:
         run: |
           {
             echo "AIDBOX_LICENSE=$AIDBOX_LICENSE"
-            echo "MTLS_CERT=$(echo "$MTLS_CERT_B64" | base64 -d)"
-            echo "MTLS_KEY=$(echo "$MTLS_KEY_B64" | base64 -d)"
+            echo "MTLS_CERT=$MTLS_CERT_B64"
+            echo "MTLS_KEY=$MTLS_KEY_B64"
             echo "NEXT_PUBLIC_AUTH_PROVIDER=keycloak"
           } > .env
       - name: Build Query Connector and Run Playwright Tests

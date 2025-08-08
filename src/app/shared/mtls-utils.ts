@@ -33,9 +33,10 @@ export function getOrCreateMtlsCert(): string {
       "Mutual TLS certificate not found in keys directory and MTLS_CERT environment variable is not set",
     );
   }
+  const decodedCert = Buffer.from(certFromEnv, "base64").toString("utf-8");
 
   // Write cert from environment variable
-  fs.writeFileSync(certPath, certFromEnv, { mode: 0o600 });
+  fs.writeFileSync(certPath, decodedCert, { mode: 0o600 });
   console.info("Mutual TLS certificate written from environment variable");
 
   return certFromEnv;
@@ -61,9 +62,10 @@ export function getOrCreateMtlsKey(): string {
       "Mutual TLS key not found in keys directory and MTLS_KEY environment variable is not set",
     );
   }
+  const decodedKey = Buffer.from(keyFromEnv, "base64").toString("utf-8");
 
   // Write key from environment variable
-  fs.writeFileSync(keyPath, keyFromEnv, { mode: 0o600 });
+  fs.writeFileSync(keyPath, decodedKey, { mode: 0o600 });
   console.info("Mutual TLS key written from environment variable");
 
   return keyFromEnv;
