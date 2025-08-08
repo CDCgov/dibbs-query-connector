@@ -31,14 +31,16 @@ The application looks for certificates in two places:
 
 2. **Environment Variables** (preferred for production):
 
+   - For ease of configuration, the env vars are required to be base-64 encoded.
+   - Configure your env vars according to the below:
    ```bash
-   export MTLS_CERT="-----BEGIN CERTIFICATE-----
+   export MTLS_CERT="base64Encode(-----BEGIN CERTIFICATE-----
    [certificate content]
-   -----END CERTIFICATE-----"
+   -----END CERTIFICATE-----)"
 
-   export MTLS_KEY="-----BEGIN PRIVATE KEY-----
+   export MTLS_KEY="base64Encode(-----BEGIN PRIVATE KEY-----
    [private key content]
-   -----END PRIVATE KEY-----"
+   -----END PRIVATE KEY-----)"
 ````
 
 ## Running Tests
