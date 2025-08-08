@@ -2,9 +2,7 @@ import { ApiReference } from "@scalar/nextjs-api-reference";
 import content from "./openapi.json";
 
 const config = {
-  spec: {
-    content: content,
-  },
+  content: JSON.stringify(content),
   authentication: {
     preferredSecurityScheme: "oauth2",
     securitySchemes: {
@@ -26,4 +24,5 @@ const config = {
   darkMode: true,
   defaultOpenAllTags: true,
 };
+
 export const GET = ApiReference(config);
