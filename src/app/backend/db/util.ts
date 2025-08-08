@@ -43,7 +43,6 @@ export function translateNestedObjectKeysIntoCamelCase(
   seen: WeakSet<object> = new WeakSet(),
 ): object {
   if (obj === null || typeof obj !== "object") {
-    console.log("in term: ", obj);
     return obj;
   }
 

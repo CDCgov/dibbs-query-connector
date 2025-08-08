@@ -388,9 +388,8 @@ class FHIRClient {
    * @param params - The request parameters.
    * @returns The response from the server.
    */
-  async post(path: string, params: Record<string, string>): Promise<Response> {
+  async post(path: string, params: URLSearchParams): Promise<Response> {
     await this.ensureValidToken();
-    const searchParams = new URLSearchParams(params);
 
     const requestOptions: RequestInit = {
       method: "POST",
@@ -398,9 +397,8 @@ class FHIRClient {
         "Content-Type": "application/x-www-form-urlencoded",
         ...this.init.headers,
       },
-      body: searchParams.toString(),
+      body: params.toString(),
     };
-
     return this.fetch(this.hostname + path, requestOptions);
   }
 
