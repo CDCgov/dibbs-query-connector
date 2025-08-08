@@ -330,8 +330,8 @@ class QueryService {
 
     const noCertainMatch =
       jsonBody.resourceType === "OperationOutcome" &&
-      jsonBody.issue?.some(
-        (i) => i.details?.text?.includes("did not find a certain match"),
+      jsonBody.issue?.some((i) =>
+        i.details?.text?.includes("did not find a certain match"),
       );
 
     if (noCertainMatch) {
