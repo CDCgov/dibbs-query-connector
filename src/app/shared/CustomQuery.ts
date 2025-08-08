@@ -7,13 +7,14 @@ import {
 } from "../(pages)/queryBuilding/utils";
 
 function formatTimeFilter(timeWindow: TimeWindow | undefined) {
-  if (!timeWindow) return "";
+  if (!timeWindow) return undefined;
   const startString = timeWindow.timeWindowStart.substring(0, 10);
   const endString = timeWindow.timeWindowEnd.substring(0, 10);
 
-  const filterString = `?date=ge${startString}&date=le${endString}`;
-  console.log(filterString);
-  return filterString;
+  return {
+    startDate: `ge${startString}`,
+    endDate: `le${endString}`,
+  };
 }
 
 /**
@@ -34,40 +35,12 @@ export class CustomQuery {
   classTypeCodes: string[] = [];
 
   // initialize the query struct
-  fhirResourceQueries = {
-    observation: {
-      basePath: "",
-      params: {} as { [paramName: string]: string },
-    },
-    diagnosticReport: {
-      basePath: "",
-      params: {} as { [paramName: string]: string },
-    },
-    condition: {
-      basePath: "",
-      params: {} as { [paramName: string]: string },
-    },
-    medicationRequest: {
-      basePath: "",
-      params: {} as { [paramName: string]: string },
-    },
-    socialHistory: {
-      basePath: "",
-      params: {} as { [paramName: string]: string },
-    },
-    encounter: {
-      basePath: "",
-      params: {} as { [paramName: string]: string },
-    },
-    encounterClass: {
-      basePath: "",
-      params: {} as { [paramName: string]: string },
-    },
-    immunization: {
-      basePath: "",
-      params: {} as { [paramName: string]: string },
-    },
-  };
+  fhirResourceQueries: {
+    [key: string]: {
+      basePath: string;
+      params: URLSearchParams;
+    };
+  } = {};
 
   /**
    * Creates a CustomQuery Object. The constructor accepts a JSONspec, a
@@ -149,56 +122,73 @@ export class CustomQuery {
     const medicationsTimeFilter = formatTimeFilter(timeboxInfo?.medications);
 
     if (medicalRecordSections && medicalRecordSections.socialDeterminants) {
+      const formattedParams = new URLSearchParams();
+      formattedParams.append("subject", `Patient/${patientId}`);
+      formattedParams.append("category", `social-history`);
+
       this.fhirResourceQueries["socialHistory"] = {
         basePath: `/Observation/_search`,
-        params: {
-          subject: `Patient/${patientId}`,
-          category: "social-history",
-        },
+        params: formattedParams,
       };
     }
 
     if (medicalRecordSections && medicalRecordSections.immunizations) {
+      const formattedParams = new URLSearchParams();
+      formattedParams.append("subject", `Patient/${patientId}`);
+
       this.fhirResourceQueries["immunization"] = {
         basePath: `/Immunization`,
-        params: {
-          patient: patientId,
-        },
+        params: formattedParams,
       };
     }
 
     if (labsFilter !== "") {
+      const formattedParams = new URLSearchParams();
+      formattedParams.append("subject", `Patient/${patientId}`);
+      formattedParams.append("code", labsFilter);
+
+      if (labsTimeFilter) {
+        formattedParams.append("date", labsTimeFilter.startDate);
+        formattedParams.append("date", labsTimeFilter.endDate);
+      }
+
       this.fhirResourceQueries["observation"] = {
-        basePath: `/Observation/_search${labsTimeFilter}`,
-        params: {
-          subject: `Patient/${patientId}`,
-          code: labsFilter,
-        },
+        basePath: `/Observation/_search`,
+        params: formattedParams,
       };
 
       this.fhirResourceQueries["diagnosticReport"] = {
-        basePath: `/DiagnosticReport/_search${labsTimeFilter}`,
-        params: {
-          subject: `Patient/${patientId}`,
-          code: labsFilter,
-        },
+        basePath: `/DiagnosticReport/_search`,
+        params: formattedParams,
       };
     }
 
     if (conditionsFilter !== "") {
+      const encounterParams = new URLSearchParams();
+      encounterParams.append("subject", `Patient/${patientId}`);
+      encounterParams.append("reason-code", conditionsFilter);
+
+      if (conditionsTimeFilter) {
+        encounterParams.append("date", conditionsTimeFilter.startDate);
+        encounterParams.append("date", conditionsTimeFilter.endDate);
+      }
+
       this.fhirResourceQueries["encounter"] = {
-        basePath: `/Encounter/_search${conditionsTimeFilter}`,
-        params: {
-          subject: `Patient/${patientId}`,
-          "reason-code": conditionsFilter,
-        },
+        basePath: `/Encounter/_search`,
+        params: encounterParams,
       };
+
+      const conditionParams = new URLSearchParams();
+      conditionParams.append("subject", `Patient/${patientId}`);
+      conditionParams.append("code", conditionsFilter);
+      if (conditionsTimeFilter) {
+        conditionParams.append("onset-date", conditionsTimeFilter.startDate);
+        conditionParams.append("onset-date", conditionsTimeFilter.endDate);
+      }
+
       this.fhirResourceQueries["condition"] = {
-        basePath: `/Condition/_search${conditionsTimeFilter}`,
-        params: {
-          subject: `Patient/${patientId}`,
-          code: conditionsFilter,
-        },
+        basePath: `/Condition/_search`,
+        params: conditionParams,
       };
     }
 
@@ -207,23 +197,25 @@ export class CustomQuery {
       // Sometimes we need the extra info from the medication to display in the
       // UI: that's what the ":medication" is doing and similarly for revinclude
       // for the request <> admin relationship
+      const formattedParams = new URLSearchParams();
+      formattedParams.append("subject", `Patient/${patientId}`);
+      formattedParams.append("code", medicationsFilter);
+      formattedParams.append("_include", "MedicationRequest:medication");
+      formattedParams.append("_revinclude", "MedicationAdministration:request");
+
+      if (medicationsTimeFilter) {
+        formattedParams.append("authoredon", medicationsTimeFilter.startDate);
+        formattedParams.append("authoredon", medicationsTimeFilter.endDate);
+      }
 
       this.fhirResourceQueries["medicationRequest"] = {
-        basePath: `/MedicationRequest/_search${medicationsTimeFilter}`,
-        params: {
-          subject: `Patient/${patientId}`,
-          code: medicationsFilter,
-          _include: "MedicationRequest:medication",
-          _revinclude: "MedicationAdministration:request",
-        },
+        basePath: `/MedicationRequest/_search`,
+        params: formattedParams,
       };
     }
   }
 
-  compilePostRequest(resource: {
-    basePath: string;
-    params: Record<string, string>;
-  }) {
+  compilePostRequest(resource: { basePath: string; params: URLSearchParams }) {
     return {
       path: resource.basePath,
       params: resource.params,
@@ -246,11 +238,11 @@ export class CustomQuery {
    */
   getQuery(desiredQuery: string): {
     basePath: string;
-    params: Record<string, string>;
+    params: URLSearchParams;
   } {
     const availableKeys = Object.keys(this.fhirResourceQueries);
     if (!availableKeys.includes(desiredQuery)) {
-      return { basePath: "", params: {} };
+      return { basePath: "", params: new URLSearchParams() };
     }
 
     return this.fhirResourceQueries[
