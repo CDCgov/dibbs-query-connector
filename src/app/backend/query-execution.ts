@@ -261,8 +261,8 @@ class QueryService {
       const taskDetailResponse = await fhirClient.get(`/Task/${task.id}`);
       const taskDetail = (await taskDetailResponse.json()) as Task;
 
-      const patientLink = taskDetail.output?.find((output) =>
-        output.valueString?.includes("Patient-Page1"),
+      const patientLink = taskDetail.output?.find(
+        (output) => output.valueString?.includes("Patient-Page1"),
       )?.valueString;
 
       if (!patientLink) {
@@ -682,8 +682,8 @@ class QueryService {
 
     const noCertainMatch =
       jsonBody.resourceType === "OperationOutcome" &&
-      jsonBody.issue?.some((i) =>
-        i.details?.text?.includes("did not find a certain match"),
+      jsonBody.issue?.some(
+        (i) => i.details?.text?.includes("did not find a certain match"),
       );
 
     if (noCertainMatch) {
@@ -758,11 +758,12 @@ class QueryService {
   static async patientDiscoveryQuery(
     request: PatientDiscoveryRequest,
   ): Promise<QueryResponse["Patient"] | { uncertainMatchError: true }> {
-    console.log(request);
-    const matchConfig = request?.patientMatchConfiguration;
-    const fhirResponse = matchConfig?.supportsMatch
-      ? await QueryService.makePatientMatchRequest(request)
-      : await QueryService.makePatientDiscoveryRequest(request);
+    const matchConfig = request.patientMatchConfiguration;
+
+    const fhirResponse =
+      matchConfig?.supportsMatch && matchConfig.enabled
+        ? await QueryService.makePatientMatchRequest(request)
+        : await QueryService.makePatientDiscoveryRequest(request);
 
     if (
       fhirResponse.status === 200 &&
