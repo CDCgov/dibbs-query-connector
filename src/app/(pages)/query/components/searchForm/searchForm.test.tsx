@@ -6,9 +6,6 @@ import { getFhirServerConfigs } from "@/app/backend/fhir-servers";
 
 jest.mock("next/navigation");
 jest.mock("@/app/backend/fhir-servers", () => ({
-  getFhirServerConfigs: jest.fn(),
-}));
-jest.mock("@/app/backend/fhir-servers", () => ({
   getFhirServerConfigs: jest.fn().mockResolvedValue([
     {
       name: "Matching Server",

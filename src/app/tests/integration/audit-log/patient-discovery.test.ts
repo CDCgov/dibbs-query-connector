@@ -20,12 +20,45 @@ import {
   waitForAuditSuccess,
 } from "./utils";
 
-jest.mock("@/app/utils/auth", () => {
+// Mock the FHIRClient to prevent real authentication requests
+jest.mock("@/app/shared/fhirClient", () => {
   return {
-    superAdminAccessCheck: jest.fn(() => Promise.resolve(true)),
-    adminAccessCheck: jest.fn(() => Promise.resolve(true)),
+    __esModule: true,
+    default: jest.fn().mockImplementation(() => ({
+      get: jest.fn().mockResolvedValue({
+        resourceType: "Bundle",
+        entry: [
+          {
+            resource: {
+              resourceType: "Patient",
+              id: "test-patient-123",
+              name: [{ given: ["Test"], family: "Patient" }],
+              identifier: [{ value: "MRN-12345" }],
+            },
+          },
+        ],
+      }),
+      post: jest.fn().mockResolvedValue({
+        status: 200,
+        url: "http://mock-server.com/fhir",
+        text: jest.fn().mockResolvedValue(""),
+        json: jest.fn().mockResolvedValue({
+          resourceType: "Bundle",
+          entry: [],
+        }),
+      }),
+      getAccessToken: jest.fn().mockResolvedValue("mock-token"),
+      ensureValidToken: jest.fn().mockResolvedValue(undefined),
+    })),
   };
 });
+
+// Mock auth functions
+jest.mock("@/app/utils/auth", () => ({
+  ...jest.requireActual("@/app/utils/auth"),
+  superAdminAccessCheck: jest.fn().mockResolvedValue(true),
+  adminAccessCheck: jest.fn().mockResolvedValue(true),
+}));
 
 jest.mock("@/app/backend/audit-logs/lib", () => {
   return {
