@@ -11,8 +11,7 @@ function formatTimeFilter(timeWindow: TimeWindow | undefined) {
   const startString = timeWindow.timeWindowStart.substring(0, 10);
   const endString = timeWindow.timeWindowEnd.substring(0, 10);
 
-  const filterString = `?lastUpdated=ge${startString}&lastUpdated=le${endString}`;
-
+  const filterString = `?date=ge${startString}&date=le${endString}`;
   console.log(filterString);
   return filterString;
 }
