@@ -400,7 +400,8 @@ describe("FHIR Servers tests", () => {
       "http://test-server-match.com/fhir",
       false,
       false,
-      true,
+      false,
+      false,
       {
         authType: "none",
       },
