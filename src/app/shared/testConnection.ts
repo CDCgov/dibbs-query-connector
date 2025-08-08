@@ -52,12 +52,15 @@ function validateFhirServerUrl(urlString: string): void {
     throw new Error("Invalid URL format");
   }
 
-  if (url.protocol !== "https:") {
-    throw new Error("Only HTTPS protocol is allowed for FHIR server URLs.");
-  }
-
   const hostname = url.hostname;
-  if (!process.env.APP_HOSTNAME?.includes("localhost")) {
+  if (
+    !process.env.APP_HOSTNAME?.includes("localhost") ||
+    process.env.DEMO_MODE !== "true"
+  ) {
+    if (url.protocol !== "https:") {
+      throw new Error("Only HTTPS protocol is allowed for FHIR server URLs.");
+    }
+
     if (
       hostname === "localhost" ||
       hostname == "127.0.0.1" ||
