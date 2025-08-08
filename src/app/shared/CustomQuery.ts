@@ -148,9 +148,6 @@ export class CustomQuery {
     const conditionsTimeFilter = formatTimeFilter(timeboxInfo?.conditions);
     const medicationsTimeFilter = formatTimeFilter(timeboxInfo?.medications);
 
-    console.log(labsTimeFilter);
-    console.log(conditionsTimeFilter);
-
     if (medicalRecordSections && medicalRecordSections.socialDeterminants) {
       this.fhirResourceQueries["socialHistory"] = {
         basePath: `/Observation/_search`,

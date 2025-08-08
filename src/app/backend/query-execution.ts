@@ -53,7 +53,6 @@ class QueryService {
     }
 
     const postPromises = builtQuery.compileAllPostRequests().map((req) => {
-      console.log(req.path);
       return fhirClient.post(req.path, req.params);
     });
 
