@@ -7,14 +7,13 @@ import { CustomQuery } from "../shared/CustomQuery";
 import { GetPhoneQueryFormats } from "../shared/format-service";
 import { getSavedQueryByName } from "../shared/database-service";
 import { auditable } from "./audit-logs/decorator";
-import type { QueryDataColumn } from "../(pages)/queryBuilding/utils";
+import type { QueryTableResult } from "../(pages)/queryBuilding/utils";
 import type {
   QueryResponse,
   PatientDiscoveryRequest,
   PatientRecordsRequest,
   FullPatientRequest,
 } from "../models/entities/query";
-import type { MedicalRecordSections } from "../(pages)/queryBuilding/utils";
 import { getFhirServerConfigs, prepareFhirClient } from "./fhir-servers";
 import type FHIRClient from "../shared/fhirClient";
 
@@ -261,8 +260,8 @@ class QueryService {
       const taskDetailResponse = await fhirClient.get(`/Task/${task.id}`);
       const taskDetail = (await taskDetailResponse.json()) as Task;
 
-      const patientLink = taskDetail.output?.find((output) =>
-        output.valueString?.includes("Patient-Page1"),
+      const patientLink = taskDetail.output?.find(
+        (output) => output.valueString?.includes("Patient-Page1"),
       )?.valueString;
 
       if (!patientLink) {
@@ -399,8 +398,7 @@ class QueryService {
    * Method that coordinates user input and relevant DB config information to make
    * an outgoing FHIR query for patient records
    * @param queryName - name of the stored query
-   * @param queryData - JSON blob with mapped valueset information
-   * to pull back the relevant FHIR resources
+   * @param savedQuery - Table row from the query database
    * @param patientId - ID of the referenced patient
    * @param fhirServer - name of the FHIR server
    * @param  medicalRecordSections - whether to include medical record sections
@@ -408,17 +406,13 @@ class QueryService {
    */
   @auditable
   private static async makePatientRecordsRequest(
-    queryData: QueryDataColumn,
+    savedQuery: QueryTableResult,
     patientId: string,
     fhirServer: string,
-    medicalRecordSections: MedicalRecordSections,
   ) {
     const fhirClient = await prepareFhirClient(fhirServer);
-    const builtQuery = new CustomQuery(
-      queryData,
-      patientId,
-      medicalRecordSections,
-    );
+    const medicalRecordSections = savedQuery.medicalRecordSections;
+    const builtQuery = new CustomQuery(savedQuery, patientId);
 
     const medicalRecordSectionResults: Response[] = [];
     if (medicalRecordSections && medicalRecordSections.immunizations) {
@@ -682,8 +676,8 @@ class QueryService {
 
     const noCertainMatch =
       jsonBody.resourceType === "OperationOutcome" &&
-      jsonBody.issue?.some((i) =>
-        i.details?.text?.includes("did not find a certain match"),
+      jsonBody.issue?.some(
+        (i) => i.details?.text?.includes("did not find a certain match"),
       );
 
     if (noCertainMatch) {
@@ -733,15 +727,11 @@ class QueryService {
       throw new Error(`Unable to query of name ${request?.queryName}`);
     }
 
-    const medicalRecordSections = savedQuery.medicalRecordSections;
-    const queryData = savedQuery.queryData;
-
     let response: Response | Response[] =
       await QueryService.makePatientRecordsRequest(
-        queryData,
+        savedQuery,
         request.patientId,
         request.fhirServer,
-        medicalRecordSections,
       );
 
     const queryResponse = await QueryService.parseFhirSearch(response);

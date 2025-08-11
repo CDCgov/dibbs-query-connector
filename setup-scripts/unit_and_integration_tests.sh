@@ -14,10 +14,10 @@ docker compose -f docker-compose-integration.yaml logs -f aidbox-seeder | grep -
 BASE_CMD="DATABASE_URL=postgresql://postgres:pw@localhost:5432/tefca_db DEMO_MODE=true TEST_TYPE=integration NEXT_PUBLIC_AUTH_PROVIDER=keycloak APP_HOSTNAME=http://query-connector:3000 npx jest "
 
 # running our integration tests
-if [ "$JUST_INTEGRATION" = "true" ]; then
-    JEST_CMD="$BASE_CMD --testPathPatterns=tests/integration/fhir-servers.test"
-else
-    # assuming that the only reason we'd want to run both the unit and integration tests is in the CI context where we need to gather coverage report info
+if [ "$JUST_INTEGRATION" = "true" ]; then 
+    JEST_CMD="$BASE_CMD --testPathPatterns=tests/integration/"
+else 
+# assuming that the only reason we'd want to run both the unit and integration tests is in the CI context where we need to gather coverage report info
     JEST_CMD="$BASE_CMD --testPathIgnorePatterns='/e2e/' --coverage"
 fi
 eval $JEST_CMD

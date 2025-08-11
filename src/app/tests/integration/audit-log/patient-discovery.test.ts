@@ -119,7 +119,7 @@ describe("patient queries", () => {
 
     expect(JSON.parse(auditEntry?.fhirServer)).toBe(request.fhirServer);
     expect(JSON.parse(auditEntry?.patientId)).toBe(request.patientId);
-    expect(JSON.parse(auditEntry?.queryData)).toStrictEqual(
+    expect(JSON.parse(auditEntry?.savedQuery).queryData).toStrictEqual(
       DEFAULT_CHLAMYDIA_QUERY.queryData,
     );
   });
