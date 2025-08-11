@@ -131,7 +131,6 @@ describe("tests the value set selection page", () => {
       "tab-custom-container",
     );
     await user.click(screen.getByTestId("tab-custom"));
-    screen.logTestingPlaygroundURL();
     await waitFor(() => {
       expect(screen.getByText("Add from code library")).toBeInTheDocument();
     });
