@@ -39,7 +39,7 @@ import {
   deleteTimeboxSettings,
   getTimeboxRanges,
   updateTimeboxSettings,
-} from "@/app/backend/query-timeboxing";
+} from "@/app/backend/query-timefiltering";
 
 type ConceptTypeAccordionBodyProps = {
   activeValueSets: { [vsId: string]: FilterableValueSet };
