@@ -33,7 +33,7 @@ jest.mock("../../../backend/query-building/service", () => ({
   getSavedQueryById: jest.fn(),
 }));
 
-jest.mock("../../../backend/query-timeboxing", () => ({
+jest.mock("../../../backend/query-timefiltering", () => ({
   getTimeboxRanges: jest.fn(),
 }));
 
