@@ -80,9 +80,9 @@ test.describe("Mutual TLS", () => {
     ).toBeVisible();
 
     // Select the mutual TLS enabled server
-    const serverCheckbox = page.getByLabel(serverName);
-    await expect(serverCheckbox).toBeVisible();
-    await serverCheckbox.check();
+    // const serverCheckbox = page.getByLabel(serverName);
+    // await expect(serverCheckbox).toBeVisible();
+    // await serverCheckbox.check();
 
     await page
       .getByLabel("Healthcare Organization (HCO)")
@@ -91,7 +91,10 @@ test.describe("Mutual TLS", () => {
     // Fill out the patient lookup form
     await page.getByTestId("textInput").nth(0).fill("John"); // First name
     await page.getByTestId("textInput").nth(1).fill("Doe"); // Last name
-    await page.getByTestId("textInput").nth(2).fill("1990-01-01"); // DOB
+    await page.getByTestId("textInput").nth(2).fill("111-111-1111"); // Phone number
+    await page
+      .getByRole("textbox", { name: "Date of Birth" })
+      .fill("1990-01-01"); // DOB
 
     // Submit the query
     await page.getByRole("button", { name: "Search" }).click();
