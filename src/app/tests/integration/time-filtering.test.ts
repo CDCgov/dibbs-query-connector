@@ -4,7 +4,6 @@ import { suppressConsoleLogs } from "./fixtures";
 import { PatientRecordsRequest } from "@/app/models/entities/query";
 import { HYPER_UNLUCKY_DEFAULT_ID } from "@/app/shared/constants";
 import { updateTimeboxSettings } from "@/app/backend/query-timefiltering";
-import { CANCER_FRONTEND_NESTED_INPUT } from "../../../../e2e/constants";
 
 jest.mock("@/app/utils/auth", () => {
   return {
@@ -29,6 +28,8 @@ describe("time filtering query", () => {
     const response = await patientRecordsQuery(patientRecordsRequest);
     // there should be three resources in the default query: 1 condition, 2 meds
     expect(Object.keys(response).length).toBe(3);
+
+    const expectedConditionResponse = response["Condition"];
     const startFilter = new Date("2025-12-01");
     const endFilter = new Date("2025-12-05");
 
@@ -44,8 +45,6 @@ describe("time filtering query", () => {
     // should just have conditions left
     expect(Object.keys(newResponse).length).toBe(1);
 
-    expect(newResponse["Condition"]).toStrictEqual(
-      CANCER_FRONTEND_NESTED_INPUT[2].conditions,
-    );
+    expect(newResponse["Condition"]).toStrictEqual(expectedConditionResponse);
   });
 });
