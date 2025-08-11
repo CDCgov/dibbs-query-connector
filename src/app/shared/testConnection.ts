@@ -55,7 +55,7 @@ function validateFhirServerUrl(urlString: string): void {
   const hostname = url.hostname;
   if (
     !process.env.APP_HOSTNAME?.includes("localhost") ||
-    process.env.AUTH_DISABLED
+    !process.env.AUTH_DISABLED
   ) {
     if (url.protocol !== "https:") {
       throw new Error("Only HTTPS protocol is allowed for FHIR server URLs.");
