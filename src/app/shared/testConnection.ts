@@ -54,7 +54,8 @@ function validateFhirServerUrl(urlString: string): void {
 
   const hostname = url.hostname;
   if (
-    !process.env.APP_HOSTNAME?.includes("localhost") ||
+    !process.env.APP_HOSTNAME?.includes("localhost") &&
+    process.env.DEMO_MODE !== "true" &&
     !process.env.AUTH_DISABLED
   ) {
     if (url.protocol !== "https:") {
