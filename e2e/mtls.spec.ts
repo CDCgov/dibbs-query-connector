@@ -80,9 +80,9 @@ test.describe("Mutual TLS", () => {
     ).toBeVisible();
 
     // Select the mutual TLS enabled server
-    // const serverCheckbox = page.getByLabel(serverName);
-    // await expect(serverCheckbox).toBeVisible();
-    // await serverCheckbox.check();
+    const serverCheckbox = page.getByLabel(serverName);
+    await expect(serverCheckbox).toBeVisible();
+    await serverCheckbox.check();
 
     await page
       .getByLabel("Healthcare Organization (HCO)")
