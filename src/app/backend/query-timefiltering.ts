@@ -5,7 +5,7 @@ import { DibbsConceptType } from "../models/entities/valuesets";
 import { adminRequired } from "./db/decorators";
 import dbService from "./db/service";
 
-class QueryTimeboxingService {
+class QueryTimefilteringService {
   @adminRequired
   static async updateTimeboxSettings(
     queryId: string,
@@ -81,10 +81,10 @@ class QueryTimeboxingService {
   }
 }
 
-export const getTimeboxRanges = QueryTimeboxingService.getTimeboxRanges;
+export const getTimeboxRanges = QueryTimefilteringService.getTimeboxRanges;
 export const linkTimeboxRangesToQuery =
-  QueryTimeboxingService.linkTimeboxRangesToQuery;
+  QueryTimefilteringService.linkTimeboxRangesToQuery;
 export const deleteTimeboxSettings =
-  QueryTimeboxingService.deleteTimeboxSettings;
+  QueryTimefilteringService.deleteTimeboxSettings;
 export const updateTimeboxSettings =
-  QueryTimeboxingService.updateTimeboxSettings;
+  QueryTimefilteringService.updateTimeboxSettings;
