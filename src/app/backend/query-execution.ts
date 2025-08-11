@@ -404,9 +404,10 @@ class QueryService {
   ): Promise<QueryResponse["Patient"] | { uncertainMatchError: true }> {
     const matchConfig = request.patientMatchConfiguration;
 
-    const fhirResponse = matchConfig?.supportsMatch
-      ? await QueryService.makePatientMatchRequest(request)
-      : await QueryService.makePatientDiscoveryRequest(request);
+    const fhirResponse =
+      matchConfig?.supportsMatch && matchConfig.enabled
+        ? await QueryService.makePatientMatchRequest(request)
+        : await QueryService.makePatientDiscoveryRequest(request);
 
     if (
       fhirResponse.status === 200 &&
