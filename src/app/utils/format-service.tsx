@@ -8,23 +8,6 @@ import {
   Immunization,
   Coding,
 } from "fhir/r4";
-/**
- * Formats a string.
- * @param input - The string to format.
- * @returns The formatted string.
- */
-export const formatString = (input: string): string => {
-  // Convert to lowercase
-  let result = input.toLowerCase();
-
-  // Replace spaces with dashes
-  result = result.replace(/\s+/g, "-");
-
-  // Remove all special characters except dashes
-  result = result.replace(/[^a-z0-9\-]/g, "");
-
-  return result;
-};
 
 /**
  * Formats a CodeableConcept object for display. If the object has a coding array,
@@ -89,9 +72,7 @@ export function formatAddress(address: Address[]): JSX.Element {
   // else return
   return (
     <div>
-      {addr.line?.map((line, index) => (
-        <div key={index}>{line}</div>
-      ))}
+      {addr.line?.map((line, index) => <div key={index}>{line}</div>)}
       <div>
         {addr.city}
         {addr.city && ", "}

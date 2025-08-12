@@ -15,11 +15,11 @@ import { getRole } from "@/app/(pages)/userManagement/utils";
 import { getUserByUsername } from "@/app/backend/user-management";
 import { useSession } from "next-auth/react";
 import { isAuthDisabledClientCheck } from "@/app/utils/auth";
-import { DataContext } from "@/app/shared/DataProvider";
+import { DataContext } from "@/app/utils/DataProvider";
 import NoQueriesDisplay from "./NoQueriesDisplay";
 import QueryRedirectInfo from "./QueryRedirectDisplay";
 import Skeleton from "react-loading-skeleton";
-import { getFhirServerNames } from "@/app/backend/fhir-servers";
+import { getFhirServerNames } from "@/app/backend/fhir-servers/service";
 
 type SelectSavedQueryProps = {
   selectedQuery: CustomUserQuery;

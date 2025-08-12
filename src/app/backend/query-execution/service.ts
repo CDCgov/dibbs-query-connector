@@ -1,20 +1,20 @@
 "use server";
 import { FhirResource, Patient } from "fhir/r4";
 
-import { isFhirResource } from "../shared/constants";
+import { isFhirResource } from "../../constants";
 
-import { CustomQuery } from "../shared/CustomQuery";
-import { GetPhoneQueryFormats } from "../shared/format-service";
-import { getSavedQueryByName } from "../shared/database-service";
-import { auditable } from "./audit-logs/decorator";
-import type { QueryTableResult } from "../(pages)/queryBuilding/utils";
+import { CustomQuery } from "./custom-query";
+import { GetPhoneQueryFormats } from "../../utils/format-service";
+import { getSavedQueryByName } from "../seeding/service";
+import { auditable } from "../audit-logs/decorator";
+import type { QueryTableResult } from "../../(pages)/queryBuilding/utils";
 import type {
   QueryResponse,
   PatientDiscoveryRequest,
   PatientRecordsRequest,
   FullPatientRequest,
-} from "../models/entities/query";
-import { prepareFhirClient } from "./fhir-servers";
+} from "../../models/entities/query";
+import { prepareFhirClient } from "../fhir-servers/service";
 
 class QueryService {
   /**
@@ -329,8 +329,8 @@ class QueryService {
 
     const noCertainMatch =
       jsonBody.resourceType === "OperationOutcome" &&
-      jsonBody.issue?.some((i) =>
-        i.details?.text?.includes("did not find a certain match"),
+      jsonBody.issue?.some(
+        (i) => i.details?.text?.includes("did not find a certain match"),
       );
 
     if (noCertainMatch) {

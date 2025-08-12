@@ -11,14 +11,14 @@ import CodeLibrary from "./page";
 import {
   getAllValueSets,
   getConditionsData,
-} from "@/app/shared/database-service";
+} from "@/app/backend/seeding/service";
 import { getAllUsers, getUserByUsername } from "@/app/backend/user-management";
 import {
   getAllGroupMembers,
   getAllUserGroups,
 } from "@/app/backend/usergroup-management";
 import { mockAdmin } from "../userManagement/test-utils";
-import { getCustomValueSetById } from "@/app/shared/custom-code-service";
+import { getCustomValueSetById } from "@/app/backend/custom-code-service";
 
 jest.mock("next-auth/react");
 
@@ -39,10 +39,10 @@ jest.mock(
     ({ children }: React.PropsWithChildren) => <div>{children}</div>,
 );
 
-jest.mock("@/app/shared/database-service", () => ({
+jest.mock("@/app/backend/seeding/service", () => ({
   getAllValueSets: jest.fn().mockReturnValue({ items: [] }),
-  getConditionsData: jest.fn().mockReturnValue({}),
   groupConditionConceptsIntoValueSets: jest.fn().mockReturnValue([]),
+  getConditionsData: jest.fn(),
 }));
 
 jest.mock("@/app/backend/usergroup-management", () => ({
@@ -55,13 +55,16 @@ jest.mock("@/app/backend/user-management", () => ({
   getUserByUsername: jest.fn(),
 }));
 
-jest.mock("@/app/shared/custom-code-service", () => ({
+jest.mock("@/app/backend/custom-code-service", () => ({
   getCustomValueSetById: jest.fn(),
 }));
 
 describe("Code library loading view", () => {
   beforeAll(() => {
     (getUserByUsername as jest.Mock).mockResolvedValue({ items: [mockAdmin] });
+    (getConditionsData as jest.Mock).mockResolvedValue({
+      conditionIdToNameMap: {},
+    });
   });
   it("renders a skeleton loading state when loading is true", async () => {
     await act(async () =>

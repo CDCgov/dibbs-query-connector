@@ -5,7 +5,7 @@ import { useIdleTimer } from "react-idle-timer";
 import type { ModalProps, ModalRef } from "../../designSystem/modal/Modal";
 import { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
-import { PAGES } from "@/app/shared/page-routes";
+import { PAGES } from "@/app/utils/page-routes";
 import { signOut } from "@/app/backend/session-management";
 
 const Modal = dynamic<ModalProps>(
@@ -89,9 +89,12 @@ const SessionTimeout: React.FC<SessionTimeoutProps> = ({
   useEffect(() => {
     // trigger expired token timer
     if (expiresBeforeIdle && expTimerId.current == null) {
-      expTimerId.current = setTimeout(async () => {
-        await handleLogout();
-      }, data?.expiresIn);
+      expTimerId.current = setTimeout(
+        async () => {
+          await handleLogout();
+        },
+        data?.expiresIn,
+      );
     }
 
     if (!started && status === "authenticated") {

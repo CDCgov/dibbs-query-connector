@@ -1,8 +1,8 @@
-import { patientRecordsQuery } from "@/app/backend/query-execution";
+import { patientRecordsQuery } from "@/app/backend/query-execution/service";
 import { createTestCancerQuery } from "../../../../e2e/utils";
 import { suppressConsoleLogs } from "./fixtures";
 import { PatientRecordsRequest } from "@/app/models/entities/query";
-import { HYPER_UNLUCKY_DEFAULT_ID } from "@/app/shared/constants";
+import { HYPER_UNLUCKY_DEFAULT_ID } from "@/app/constants";
 import { updateTimeboxSettings } from "@/app/backend/query-timefiltering";
 
 jest.mock("@/app/utils/auth", () => {

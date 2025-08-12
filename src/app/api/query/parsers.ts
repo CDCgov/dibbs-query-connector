@@ -1,10 +1,6 @@
 import { Patient } from "fhir/r4";
-import { FormatPhoneAsDigits } from "@/app/shared/format-service";
-import {
-  AddressData,
-  USE_CASES,
-  USE_CASE_DETAILS,
-} from "@/app/shared/constants";
+import { FormatPhoneAsDigits } from "@/app/utils/format-service";
+import { AddressData, USE_CASES, USE_CASE_DETAILS } from "@/app/constants";
 
 export type PatientIdentifiers = {
   first_name?: string;
@@ -95,12 +91,13 @@ export function parseMRNs(
   patient: Patient,
 ): (string | undefined)[] | undefined {
   if (patient.identifier) {
-    const mrnIdentifiers = patient.identifier.filter((id) =>
-      id.type?.coding?.some(
-        (coding) =>
-          coding.system === "http://terminology.hl7.org/CodeSystem/v2-0203" &&
-          coding.code === "MR",
-      ),
+    const mrnIdentifiers = patient.identifier.filter(
+      (id) =>
+        id.type?.coding?.some(
+          (coding) =>
+            coding.system === "http://terminology.hl7.org/CodeSystem/v2-0203" &&
+            coding.code === "MR",
+        ),
     );
     return mrnIdentifiers.map((id) => id.value);
   }
