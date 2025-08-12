@@ -28,6 +28,7 @@ import { CodeSystemOptions, CustomCodeMode, emptyValueSet } from "../utils";
 import Skeleton from "react-loading-skeleton";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import { groupConditionConceptsIntoValueSets } from "@/app/shared/utils";
+import { csvRow } from "@/app/api/csv/route";
 
 type CustomValueSetFormProps = {
   mode: CustomCodeMode;
@@ -381,6 +382,26 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
     }
   };
 
+  const csvInputRef = useRef<HTMLInputElement>(null);
+  const [csvError, setCsvError] = useState<string>("");
+
+  async function handleCsvFile(file: File) {
+    setCsvError("");
+    const fd = new FormData();
+    fd.append("file", file);
+    const res = await fetch("/api/csv/", { method: "POST", body: fd });
+    const json: { rows?: csvRow[]; error?: string } = await res.json();
+    if (!res.ok || !json.rows) {
+      setCsvError(json.error || "Failed to parse CSV");
+      return;
+    }
+    console.log("Parsed CSV rows:", json.rows);
+  }
+
+  function triggerCsvPicker() {
+    csvInputRef.current?.click();
+  }
+
   return (
     <WithAuth>
       <div
@@ -407,6 +428,40 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
               {mode == "create" ? "Save value set" : "Save changes"}
             </Button>
           </div>
+          <div className="padding-top-2">
+            <input
+              ref={csvInputRef}
+              type="file"
+              accept=".csv,text/csv"
+              style={{ display: "none" }}
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                if (f) {
+                  void handleCsvFile(f);
+                  e.currentTarget.value = "";
+                }
+              }}
+            />
+            <Button
+              type="button"
+              secondary
+              onClick={(e) => {
+                e.preventDefault();
+                triggerCsvPicker();
+              }}
+            >
+              Upload CSV
+            </Button>
+          </div>
+          {csvError && (
+            <div className={styles.errorMessage} role="alert">
+              <Icon.Error
+                aria-label="warning icon indicating an error is present"
+                className={styles.errorMessage}
+              />
+              {csvError}
+            </div>
+          )}
           <div className={classNames(styles.formSection, styles.vsDescription)}>
             <div className={styles.formSection__title}>
               <h2>Value set description</h2>
