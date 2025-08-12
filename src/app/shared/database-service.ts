@@ -37,7 +37,7 @@ import { adminRequired, transaction } from "@/app/backend/db/decorators";
 import { auditable } from "@/app/backend/audit-logs/decorator";
 import dbService from "../backend/db/service";
 import { QCResponse } from "../models/responses/collections";
-import { linkTimeboxRangesToQuery } from "../backend/query-timeboxing";
+import { linkTimeboxRangesToQuery } from "../backend/query-timefiltering";
 
 type ErsdOrVsacResponse = Bundle | Parameters | OperationOutcome;
 

@@ -49,15 +49,13 @@ export type QueryUpdateResult = {
 export type QueryDataColumn = {
   [conditionId: string]: { [valueSetId: string]: DibbsValueSet };
 };
-export type QueryTableTimebox = Partial<
-  Record<
-    DibbsConceptType,
-    {
-      timeWindowStart: string;
-      timeWindowEnd: string;
-    }
-  >
->;
+
+export type TimeWindow = {
+  timeWindowStart: string;
+  timeWindowEnd: string;
+};
+
+export type QueryTableTimebox = Partial<Record<DibbsConceptType, TimeWindow>>;
 
 export type QueryTableResult = {
   queryName: string;

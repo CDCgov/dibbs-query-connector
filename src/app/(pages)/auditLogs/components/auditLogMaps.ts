@@ -89,6 +89,21 @@ export const auditLogActionTypeMap: Record<string, auditLogActionTypeMapping> =
         return `Ran patient discovery query for ${fullName}`;
       },
     },
+    makePatientMatchRequest: {
+      label: "Patient $match query",
+      format: (log) => {
+        const request = parseRequest(log) as {
+          firstName: string;
+          lastName: string;
+        };
+        const fullName = resolveFullName(
+          request.firstName,
+          request.lastName,
+          log.author as string,
+        );
+        return `Ran patient $match query for ${fullName}`;
+      },
+    },
     deleteFhirServer: {
       label: "Delete FHIR server",
       format: (log) => {

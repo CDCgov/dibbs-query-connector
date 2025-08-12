@@ -8,6 +8,7 @@ import {
   MicrosoftEntraAuthStrategy,
 } from "./app/backend/auth/lib";
 import { UserRole } from "./app/models/entities/users";
+import { returnPredefinedSessionObject } from "./app/utils/auth";
 
 let providers = [];
 let authStrategy: AuthStrategy;
@@ -79,6 +80,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
      * @returns The updated session object with user details.
      */
     async session({ session, token }) {
+      if (process.env.AUTH_DISABLED === "true") {
+        console.log("Auth disabled. Returning predefined session token");
+        return returnPredefinedSessionObject();
+      }
+
       session.user = {
         id: token.id || "",
         email: token.email || "",

@@ -613,28 +613,34 @@ PV1|1|I|ROOM-123^BED-A^HOSP||||ATTENDING^DOCTOR^A|||||||||||ADM001||||||||||||||
     });
 
     it("should use standard Patient query for non-mTLS servers", async () => {
-      // Mock standard patient search
-      mockFhirClient.get.mockResolvedValueOnce({
+      const standardPatientResponse = {
         status: 200,
+        headers: new Headers({ "content-type": "application/json" }),
         json: async () => mockPatientBundle,
-      } as Response);
+        clone: () => standardPatientResponse,
+      } as Response;
+      // Mock standard patient search
+      mockFhirClient.get.mockResolvedValueOnce(standardPatientResponse);
 
-      // Mock query execution
-      mockFhirClient.post.mockResolvedValue({
+      const mockQueryExecution = {
         status: 200,
+        headers: new Headers({ "content-type": "application/json" }),
+        clone: () => mockQueryExecution,
         json: async () => ({
           resourceType: "Bundle",
           type: "searchset",
           entry: [],
         }),
-      } as Response);
+      } as Response;
+      // Mock query execution
+      mockFhirClient.post.mockResolvedValue(mockQueryExecution);
 
       const request = createNextRequest(
         mockPatientResource,
         new URLSearchParams(
           `id=${SYPHILIS_QUERY_ID}&fhir_server=Regular FHIR Server`,
         ),
-        { Authorization: VALID_TOKEN },
+        { Authorization: VALID_TOKEN, "content-type": "application/json" },
       );
 
       const response = await POST(request);

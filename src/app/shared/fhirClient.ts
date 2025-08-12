@@ -5,8 +5,7 @@ import { fetchWithoutSSL } from "./server-utils";
 import dbService from "../backend/db/service";
 import { AuthData, updateFhirServer } from "../backend/fhir-servers";
 import { getOrCreateMtlsCert, getOrCreateMtlsKey } from "./mtls-utils";
-import fetch from "node-fetch";
-import { RequestInit, Response } from "node-fetch";
+import { Agent } from "undici";
 
 /**
  * Custom fetch function that supports mutual TLS
@@ -21,18 +20,16 @@ function fetchWithMutualTLS(
   disableCertValidation: boolean = false,
 ) {
   return async (url: string, options?: RequestInit): Promise<Response> => {
-    const agent = new https.Agent({
-      cert,
-      key,
-      rejectUnauthorized: !disableCertValidation,
-    });
-
-    console.log;
-
     return fetch(url, {
       ...options,
-      // @ts-ignore - Node.js fetch supports agent option
-      agent,
+      // @ts-ignore
+      dispatcher: new Agent({
+        connect: {
+          cert: cert,
+          key: key,
+          rejectUnauthorized: !disableCertValidation,
+        },
+      }),
     });
   };
 }
@@ -150,9 +147,8 @@ class FHIRClient {
     disableCertValidation: boolean = false,
     mutualTls: boolean = false,
     authData?: AuthData,
-  ) {
+  ): Promise<{ success: boolean; message?: string; error?: string }> {
     try {
-      // Create a test client
       const client = FHIRClient.createTestClient(
         url,
         disableCertValidation,
@@ -160,7 +156,6 @@ class FHIRClient {
         authData,
       );
 
-      // Try to authenticate if needed
       if (
         authData &&
         ["client_credentials", "SMART"].includes(authData.authType)
@@ -190,14 +185,22 @@ class FHIRClient {
           };
         }
       } else {
-        response = await client.get(
+        // Test base query
+        const response = await client.get(
           "/Patient?name=AuthenticatedServerConnectionTest&_summary=count&_count=1",
         );
-        if (response.ok) {
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error(`Error testing connection: ${errorText}`);
           return {
-            success: true,
+            success: false,
+            error: `Server returned ${response.status}: ${errorText}`,
           };
         }
+
+        // If we reach here, the connection test succeeded
+        return { success: true };
       }
 
       const errorText = await response.text();
@@ -218,7 +221,7 @@ class FHIRClient {
   /**
    * Checks if the current token has expired and gets a new one if needed
    */
-  private async ensureValidToken(): Promise<void> {
+  public async ensureValidToken(): Promise<void> {
     // Only check for auth_type client_credentials or SMART
     if (
       !["client_credentials", "SMART"].includes(
@@ -253,7 +256,7 @@ class FHIRClient {
    * @throws Error if authentication fails.
    * @returns The new access token.
    */
-  private async getAccessToken(): Promise<void> {
+  public async getAccessToken(): Promise<void> {
     try {
       if (!this.serverConfig.clientId) {
         throw new Error("Client ID is required for authentication");
@@ -366,15 +369,17 @@ class FHIRClient {
       // Only update database for non-test clients
       if (this.serverConfig.id !== "test") {
         // Save token to database
-        await updateFhirServer(
-          this.serverConfig.id,
-          this.serverConfig.name,
-          this.serverConfig.hostname,
-          this.serverConfig.disableCertValidation ?? false,
-          this.serverConfig.mutualTls ?? false,
-          this.serverConfig.defaultServer ?? false,
-          this.serverConfig.lastConnectionSuccessful ?? true,
-          {
+        await updateFhirServer({
+          id: this.serverConfig.id,
+          name: this.serverConfig.name,
+          hostname: this.serverConfig.hostname,
+          disableCertValidation:
+            this.serverConfig.disableCertValidation ?? false,
+          mutualTls: this.serverConfig.mutualTls ?? false,
+          defaultServer: this.serverConfig.defaultServer ?? false,
+          lastConnectionSuccessful:
+            this.serverConfig.lastConnectionSuccessful ?? true,
+          authData: {
             authType: this.serverConfig.authType as
               | "SMART"
               | "client_credentials"
@@ -388,7 +393,9 @@ class FHIRClient {
             tokenExpiry: expiryIso, // Pass the token expiry
             headers: this.serverConfig.headers,
           },
-        );
+          patientMatchConfiguration:
+            this.serverConfig.patientMatchConfiguration,
+        });
       }
     } catch (error) {
       console.error("Error getting access token:", error);
@@ -467,6 +474,7 @@ class FHIRClient {
 
     console.log(this.hostname + path);
     const response = await this.fetch(this.hostname + path, this.init);
+
     return response;
   }
 
@@ -488,9 +496,8 @@ class FHIRClient {
    * @param params - The request parameters.
    * @returns The response from the server.
    */
-  async post(path: string, params: Record<string, string>): Promise<Response> {
+  async post(path: string, params: URLSearchParams): Promise<Response> {
     await this.ensureValidToken();
-    const searchParams = new URLSearchParams(params);
 
     const requestOptions: RequestInit = {
       method: "POST",
@@ -498,21 +505,19 @@ class FHIRClient {
         "Content-Type": "application/x-www-form-urlencoded",
         ...this.init.headers,
       },
-      body: searchParams.toString(),
+      body: params.toString(),
     };
-
     return this.fetch(this.hostname + path, requestOptions);
   }
 
   /**
    * Sends a POST request with JSON body to the specified path.
    * @param path - The request path.
-   * @param body - The JSON request body.
+   * @param body - The JSON body to send.
    * @returns The response from the server.
    */
   async postJson(path: string, body: unknown): Promise<Response> {
     await this.ensureValidToken();
-
     const requestOptions: RequestInit = {
       method: "POST",
       headers: {
@@ -521,8 +526,28 @@ class FHIRClient {
         ...this.init.headers,
       },
       body: JSON.stringify(body),
+      ...(this.init.headers as Record<string, string>),
     };
-    console.log(this.hostname + path);
+    return this.fetch(this.hostname + path, requestOptions);
+  }
+
+  /**
+   * Sends a PUT request with JSON body to the specified path.
+   * This is typically used for updating resources in FHIR.
+   * @param path - The request path.
+   * @param body - The JSON body to send.
+   * @returns The response from the server.
+   */
+  async putJson(path: string, body: unknown): Promise<Response> {
+    await this.ensureValidToken();
+    const requestOptions: RequestInit = {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/fhir+json",
+        ...this.init.headers,
+      },
+      body: JSON.stringify(body),
+    };
     return this.fetch(this.hostname + path, requestOptions);
   }
 
@@ -537,7 +562,7 @@ class FHIRClient {
     url: string,
     disableCertValidation: boolean = false,
     authData?: AuthData,
-  ): Promise<boolean> {
+  ): Promise<{ supportsMatch: boolean; fhirVersion: string | null }> {
     try {
       const testConfig: FhirServerConfig = {
         id: "test",
@@ -579,7 +604,9 @@ class FHIRClient {
           ...(authData?.headers || {}),
         },
       });
-      if (!response.ok) return false;
+      if (!response.ok) {
+        return { supportsMatch: false, fhirVersion: null };
+      }
 
       const json = (await response.json()) as {
         rest?: Array<{
@@ -589,7 +616,10 @@ class FHIRClient {
           }>;
           operation?: Array<{ name?: string }>;
         }>;
+        fhirVersion?: string;
       };
+      const fhirVersion =
+        typeof json?.fhirVersion === "string" ? json.fhirVersion : null;
 
       const rest = json?.rest?.[0];
       // Check if the server supports $match operation in Patient resource
@@ -607,10 +637,13 @@ class FHIRClient {
         Array.isArray(rest?.operation) &&
         rest.operation.some((op: { name?: string }) => op.name === "match");
 
-      return supportsMatchInResources || supportsMatchGlobally;
+      return {
+        supportsMatch: supportsMatchInResources || supportsMatchGlobally,
+        fhirVersion,
+      };
     } catch (err) {
       console.warn("Failed $match support check:", err);
-      return false;
+      return { supportsMatch: false, fhirVersion: null };
     }
   }
 }

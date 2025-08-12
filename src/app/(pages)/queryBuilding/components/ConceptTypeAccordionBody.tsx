@@ -39,7 +39,7 @@ import {
   deleteTimeboxSettings,
   getTimeboxRanges,
   updateTimeboxSettings,
-} from "@/app/backend/query-timeboxing";
+} from "@/app/backend/query-timefiltering";
 
 type ConceptTypeAccordionBodyProps = {
   activeValueSets: { [vsId: string]: FilterableValueSet };
@@ -106,9 +106,7 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
         }
       }
     }
-    fetchInitialTimeboxRange().then((r) => {
-      console.log(r);
-    });
+    fetchInitialTimeboxRange();
   }, [accordionConceptType]);
 
   useEffect(() => {

@@ -7,16 +7,14 @@ import { CustomQuery } from "../shared/CustomQuery";
 import { GetPhoneQueryFormats } from "../shared/format-service";
 import { getSavedQueryByName } from "../shared/database-service";
 import { auditable } from "./audit-logs/decorator";
-import type { QueryDataColumn } from "../(pages)/queryBuilding/utils";
+import type { QueryTableResult } from "../(pages)/queryBuilding/utils";
 import type {
   QueryResponse,
   PatientDiscoveryRequest,
   PatientRecordsRequest,
   FullPatientRequest,
 } from "../models/entities/query";
-import type { MedicalRecordSections } from "../(pages)/queryBuilding/utils";
-import { prepareFhirClient } from "./fhir-servers";
-import type { Response } from "node-fetch";
+import { getFhirServerConfigs, prepareFhirClient } from "./fhir-servers";
 import type FHIRClient from "../shared/fhirClient";
 
 interface TaskPollingResult {
@@ -113,6 +111,7 @@ class QueryService {
           .flat()
           .filter((addr) => addr !== "")
           .join(",");
+
         patientQuery += `address=${addrString}&`;
       }
 
@@ -128,7 +127,7 @@ class QueryService {
 
       if (address.state) {
         const states = address.state.split(";").join(",");
-        patientQuery += `address-state=${states}`;
+        patientQuery += `address-state=${states}&`;
       }
     }
 
@@ -364,8 +363,6 @@ class QueryService {
     const taskResponse = await fhirClient.postJson("/Task", taskBody);
     const createdTask = (await taskResponse.json()) as Bundle<Task>;
 
-    console.log((createdTask?.issue)[0]);
-
     const parentTaskId = createdTask.entry?.[0]?.resource?.id;
     if (!parentTaskId) {
       throw new Error("Failed to create parent Task for patient discovery.");
@@ -401,8 +398,7 @@ class QueryService {
    * Method that coordinates user input and relevant DB config information to make
    * an outgoing FHIR query for patient records
    * @param queryName - name of the stored query
-   * @param queryData - JSON blob with mapped valueset information
-   * to pull back the relevant FHIR resources
+   * @param savedQuery - Table row from the query database
    * @param patientId - ID of the referenced patient
    * @param fhirServer - name of the FHIR server
    * @param  medicalRecordSections - whether to include medical record sections
@@ -410,17 +406,13 @@ class QueryService {
    */
   @auditable
   private static async makePatientRecordsRequest(
-    queryData: QueryDataColumn,
+    savedQuery: QueryTableResult,
     patientId: string,
     fhirServer: string,
-    medicalRecordSections: MedicalRecordSections,
   ) {
     const fhirClient = await prepareFhirClient(fhirServer);
-    const builtQuery = new CustomQuery(
-      queryData,
-      patientId,
-      medicalRecordSections,
-    );
+    const medicalRecordSections = savedQuery.medicalRecordSections;
+    const builtQuery = new CustomQuery(savedQuery, patientId);
 
     const medicalRecordSectionResults: Response[] = [];
     if (medicalRecordSections && medicalRecordSections.immunizations) {
@@ -474,12 +466,11 @@ class QueryService {
   @auditable
   private static async makePatientDiscoveryRequest(
     request: PatientDiscoveryRequest,
-  ): Promise<Response | Bundle> {
+  ): Promise<Response> {
     const { fhirServer } = request;
     const fhirClient = await prepareFhirClient(fhirServer);
 
     // Get the server config to check for mutual TLS
-    const { getFhirServerConfigs } = await import("./fhir-servers");
     const serverConfigs = await getFhirServerConfigs();
     const serverConfig = serverConfigs.find(
       (config) => config.name === fhirServer,
@@ -487,33 +478,236 @@ class QueryService {
 
     // Build patient search query
     const patientQuery = await this.buildPatientSearchQuery(request);
-
     // Handle discovery based on server configuration
+    let response: Response;
     if (serverConfig?.mutualTls) {
-      return await this.handleMutualTlsDiscovery(
+      const tlsDiscoveryResult = await this.handleMutualTlsDiscovery(
         fhirClient,
         patientQuery,
         fhirServer,
       );
+
+      response = new Response(JSON.stringify(tlsDiscoveryResult), {
+        status: 200,
+        statusText: "OK",
+      });
     } else {
-      const response = await this.handleStandardDiscovery(
-        fhirClient,
-        patientQuery,
+      response = await this.handleStandardDiscovery(fhirClient, patientQuery);
+    }
+
+    // Check for errors
+    if (response.status !== 200) {
+      let errorText = "Match request failed for unknown reason";
+      let headerText = "Match request failed with unknown headers";
+
+      try {
+        errorText = await response.text();
+      } catch {}
+
+      try {
+        headerText = JSON.stringify(
+          Object.fromEntries(response.headers.entries()),
+        );
+      } catch {}
+
+      console.error(
+        `Patient search failed. Status: ${response.status} \n Body: ${errorText} \n Headers: ${headerText}`,
+      );
+    }
+
+    return response;
+  }
+
+  /**
+   * Sends a FHIR $match operation to the configured FHIR server using patient demographic data.
+   * Constructs a Parameters resource containing a Patient resource with identifying fields.
+   * Supports optional configuration for match count and match certainty (single/certain).
+   * @param request - A PatientDiscoveryRequest object containing demographics and match config
+   * @returns A raw FHIR Response from the server (Bundle of potential patient matches)
+   */
+  @auditable
+  private static async makePatientMatchRequest(
+    request: PatientDiscoveryRequest,
+  ) {
+    const {
+      fhirServer,
+      firstName,
+      lastName,
+      dob,
+      mrn,
+      phone,
+      address,
+      email,
+      patientMatchConfiguration,
+    } = request;
+
+    const fhirClient = await prepareFhirClient(fhirServer);
+    const telecom: { system: string; value: string }[] = [];
+
+    if (phone) {
+      const phonesToSearch = phone.split(";");
+      for (const phone of phonesToSearch) {
+        let possibilities = await GetPhoneQueryFormats(phone);
+        possibilities = possibilities.filter((p) => p !== "");
+        if (possibilities.length !== 0) {
+          telecom.push(
+            ...possibilities.map((p) => ({ system: "phone", value: p })),
+          );
+        }
+      }
+    }
+
+    if (email) {
+      const emailsToSearch = email.split(";").filter(Boolean);
+      telecom.push(
+        ...emailsToSearch.map((e) => ({ system: "email", value: e })),
+      );
+    }
+
+    const addressLines: string[] = [];
+    if (address?.street1) addressLines.push(...address.street1.split(";"));
+    if (address?.street2) addressLines.push(...address.street2.split(";"));
+
+    const patientResource: Record<string, unknown> = {
+      resourceType: "Patient",
+    };
+
+    if (firstName || lastName) {
+      patientResource["name"] = [
+        {
+          given: firstName ? [firstName] : [],
+          family: lastName || "",
+        },
+      ];
+    }
+
+    if (dob) {
+      patientResource["birthDate"] = dob;
+    }
+
+    if (telecom.length > 0) {
+      patientResource["telecom"] = telecom;
+    }
+
+    if (
+      addressLines.length > 0 ||
+      address?.city ||
+      address?.state ||
+      address?.zip
+    ) {
+      patientResource["address"] = [
+        {
+          line: addressLines.length > 0 ? addressLines : undefined,
+          city: address?.city || undefined,
+          state: address?.state || undefined,
+          postalCode: address?.zip || undefined,
+        },
+      ];
+    }
+
+    if (mrn) {
+      patientResource["identifier"] = [
+        {
+          value: mrn,
+        },
+      ];
+    }
+
+    const hasIdentifiers = [
+      "name",
+      "birthDate",
+      "telecom",
+      "address",
+      "identifier",
+    ].some((key) => patientResource[key] !== undefined);
+
+    if (!hasIdentifiers) {
+      throw new Error(
+        "Cannot run $match: Patient resource has no identifying fields.",
+      );
+    }
+
+    const parameters: {
+      resourceType: "Parameters";
+      parameter: Array<
+        | { name: "resource"; resource: Record<string, unknown> }
+        | { name: "count"; valueInteger: number }
+        | { name: "onlyCertainMatches"; valueBoolean: true }
+        | { name: "onlySingleMatch"; valueBoolean: true }
+      >;
+    } = {
+      resourceType: "Parameters",
+      parameter: [
+        {
+          name: "resource",
+          resource: patientResource,
+        },
+      ],
+    };
+
+    // Apply optional match modifiers
+    if (patientMatchConfiguration?.onlyCertainMatches) {
+      parameters.parameter.push({
+        name: "onlyCertainMatches",
+        valueBoolean: true,
+      });
+      if (patientMatchConfiguration?.matchCount > 0) {
+        parameters.parameter.push({
+          name: "count",
+          valueInteger: patientMatchConfiguration.matchCount,
+        });
+      }
+    }
+
+    if (patientMatchConfiguration?.onlySingleMatch) {
+      parameters.parameter.push({
+        name: "onlySingleMatch",
+        valueBoolean: true,
+      });
+    }
+
+    const response = await fhirClient.postJson("/Patient/$match", parameters);
+    const jsonBody: {
+      resourceType: "OperationOutcome";
+      issue?: {
+        details?: { text?: string };
+      }[];
+    } = await response.clone().json();
+
+    const noCertainMatch =
+      jsonBody.resourceType === "OperationOutcome" &&
+      jsonBody.issue?.some(
+        (i) => i.details?.text?.includes("did not find a certain match"),
       );
 
-      // Check for errors
-      if (response.status !== 200) {
-        console.error(
-          `Patient search failed. Status: ${
-            response.status
-          } \n Body: ${await response.text()} \n Headers: ${JSON.stringify(
-            Object.fromEntries(response.headers.entries()),
-          )}`,
-        );
-      }
-
-      return response;
+    if (noCertainMatch) {
+      console.warn("Match failed due to uncertain results.");
+      return new Response(JSON.stringify({ uncertainMatchError: true }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      });
     }
+
+    if (response.status !== 200) {
+      let errorText = "Match request failed for unknown reason";
+      let headerText = "Match request failed with unknown headers";
+
+      try {
+        errorText = await response.text();
+      } catch {}
+
+      try {
+        headerText = JSON.stringify(
+          Object.fromEntries(response.headers.entries()),
+        );
+      } catch {}
+
+      console.error(
+        `Patient search failed. Status: ${response.status} \n Body: ${errorText} \n Headers: ${headerText}`,
+      );
+    }
+
+    return response;
   }
 
   /**
@@ -533,15 +727,11 @@ class QueryService {
       throw new Error(`Unable to query of name ${request?.queryName}`);
     }
 
-    const medicalRecordSections = savedQuery.medicalRecordSections;
-    const queryData = savedQuery.queryData;
-
     let response: Response | Response[] =
       await QueryService.makePatientRecordsRequest(
-        queryData,
+        savedQuery,
         request.patientId,
         request.fhirServer,
-        medicalRecordSections,
       );
 
     const queryResponse = await QueryService.parseFhirSearch(response);
@@ -557,11 +747,26 @@ class QueryService {
    */
   static async patientDiscoveryQuery(
     request: PatientDiscoveryRequest,
-  ): Promise<QueryResponse["Patient"]> {
+  ): Promise<QueryResponse["Patient"] | { uncertainMatchError: true }> {
+    const matchConfig = request.patientMatchConfiguration;
+
     const fhirResponse =
-      await QueryService.makePatientDiscoveryRequest(request);
+      matchConfig?.supportsMatch && matchConfig.enabled
+        ? await QueryService.makePatientMatchRequest(request)
+        : await QueryService.makePatientDiscoveryRequest(request);
+
+    if (
+      fhirResponse.status === 200 &&
+      fhirResponse.headers.get("content-type")?.includes("application/json")
+    ) {
+      const body = await fhirResponse.clone().json();
+
+      if (body?.uncertainMatchError === true) {
+        return { uncertainMatchError: true };
+      }
+    }
+
     const newResponse = await QueryService.parseFhirSearch(fhirResponse);
-    console.log(`newResponse: `, newResponse);
     return newResponse["Patient"] as Patient[];
   }
 
@@ -569,10 +774,13 @@ class QueryService {
     queryRequest: FullPatientRequest,
   ): Promise<QueryResponse> {
     const patient = await patientDiscoveryQuery(queryRequest);
-    if (patient === undefined || patient.length === 0) {
+
+    if (!Array.isArray(patient) || patient.length === 0) {
       throw Error("Patient not found in full patient discovery");
     }
 
+    // TODO: First patient is assumed to be the correct one.
+    // This should be handled by the UI, where the user can select the correct patient, but what about the API?
     const patientRecords = await patientRecordsQuery({
       patientId: patient[0].id as string,
       ...queryRequest,
@@ -617,8 +825,6 @@ class QueryService {
       ).flat();
       // if response is a Bundle, extract the resource
     } else if (isFanoutSearch) {
-      console.log("Processing FHIR Bundle response");
-
       const resources =
         response.entry
           ?.map((entry) => {
@@ -634,8 +840,6 @@ class QueryService {
           .filter((resource): resource is FhirResource => resource !== null) ||
         [];
       // Add resources to the resourceArray
-      console.log(`Found ${resources.length} resources in Bundle response`);
-      console.log(`Resources: `, JSON.stringify(resources, null, 2));
       resourceArray = resources;
     } else {
       resourceArray = await processFhirResponse(response);

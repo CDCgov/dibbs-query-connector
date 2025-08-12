@@ -2,11 +2,11 @@
 
 import { test, expect } from "@playwright/test";
 import { TEST_URL } from "../playwright-setup";
-import { PAGE_TITLES } from "@/app/(pages)/query/components/stepIndicator/StepIndicator";
+import { PAGE_TITLES } from "../src/app/(pages)/query/components/stepIndicator/StepIndicator";
 import {
   CONTACT_US_DISCLAIMER_EMAIL,
   CONTACT_US_DISCLAIMER_TEXT,
-} from "@/app/ui/designSystem/SiteAlert";
+} from "../src/app/ui/designSystem/SiteAlert";
 import {
   DEFAULT_FHIR_SERVER,
   TEST_PATIENT,
@@ -14,7 +14,7 @@ import {
   showSiteAlert,
 } from "./constants";
 import { checkForSiteAlert, runAxeAccessibilityChecks } from "./utils";
-import { INSUFFICIENT_PATIENT_IDENTIFIERS } from "@/app/shared/constants";
+import { INSUFFICIENT_PATIENT_IDENTIFIERS } from "../src/app/shared/constants";
 
 test.describe("querying with the Query Connector", () => {
   test.beforeEach(async ({ page }) => {
@@ -86,7 +86,7 @@ test.describe("querying with the Query Connector", () => {
     await expect(page.getByText("Loading")).toHaveCount(0, { timeout: 10000 });
 
     await runAxeAccessibilityChecks(page);
-    await page.getByRole("button", { name: "Select patient" }).click();
+    await page.getByRole("button", { name: "Select patient" }).nth(0).click();
     await expect(
       page.getByRole("heading", { name: "Select a query" }),
     ).toBeVisible();
@@ -211,7 +211,7 @@ test.describe("alternate queries with the Query Connector", () => {
     await expect(
       page.getByRole("heading", { name: PAGE_TITLES["patient-results"].title }),
     ).toBeVisible();
-    await page.getByRole("button", { name: "Select patient" }).click();
+    await page.getByRole("button", { name: "Select patient" }).nth(0).click();
     await expect(
       page.getByRole("heading", { name: PAGE_TITLES["select-query"].title }),
     ).toBeVisible();
@@ -241,7 +241,7 @@ test.describe("alternate queries with the Query Connector", () => {
     await page.getByRole("button", { name: "Search for patient" }).click();
     await expect(page.getByText("Loading")).toHaveCount(0, { timeout: 10000 });
 
-    await page.getByRole("button", { name: "Select patient" }).click();
+    await page.getByRole("button", { name: "Select patient" }).nth(0).click();
     await expect(
       page.getByRole("heading", { name: "Select a query" }),
     ).toBeVisible();
@@ -266,7 +266,7 @@ test.describe("alternate queries with the Query Connector", () => {
 
     await page.getByRole("button", { name: "Search for patient" }).click();
     await expect(page.getByText("Loading")).toHaveCount(0, { timeout: 10000 });
-    await page.getByRole("button", { name: "Select patient" }).click();
+    await page.getByRole("button", { name: "Select patient" }).nth(0).click();
     await page
       .getByTestId("Select")
       .selectOption("Chlamydia case investigation");

@@ -5,6 +5,7 @@ import {
   getOrCreateMtlsKey,
   isMtlsAvailable,
 } from "@/app/shared/mtls-utils";
+import { suppressConsoleLogs } from "../integration/fixtures";
 
 // Mock fs module
 jest.mock("fs");
@@ -19,6 +20,7 @@ describe("Mutual TLS Utilities", () => {
   const keyPath = path.join(keysDir, "mtls-key.pem");
 
   beforeEach(() => {
+    suppressConsoleLogs();
     jest.clearAllMocks();
     // Reset environment variables
     delete process.env.MTLS_CERT;
@@ -50,9 +52,10 @@ describe("Mutual TLS Utilities", () => {
       (fs.writeFileSync as jest.Mock).mockImplementation(() => {});
 
       const result = getOrCreateMtlsCert();
+      const decodedCert = Buffer.from(mockCert, "base64").toString("utf-8");
 
       expect(result).toBe(mockCert);
-      expect(fs.writeFileSync).toHaveBeenCalledWith(certPath, mockCert, {
+      expect(fs.writeFileSync).toHaveBeenCalledWith(certPath, decodedCert, {
         mode: 0o600,
       });
     });
@@ -107,9 +110,10 @@ describe("Mutual TLS Utilities", () => {
       (fs.writeFileSync as jest.Mock).mockImplementation(() => {});
 
       const result = getOrCreateMtlsKey();
+      const decodedKey = Buffer.from(mockKey, "base64").toString("utf-8");
 
       expect(result).toBe(mockKey);
-      expect(fs.writeFileSync).toHaveBeenCalledWith(keyPath, mockKey, {
+      expect(fs.writeFileSync).toHaveBeenCalledWith(keyPath, decodedKey, {
         mode: 0o600,
       });
     });

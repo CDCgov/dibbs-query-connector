@@ -3,6 +3,7 @@ import { FhirServerConfig } from "@/app/models/entities/fhir-servers";
 import * as mtlsUtils from "@/app/shared/mtls-utils";
 import { testFhirServerConnection } from "@/app/shared/testConnection";
 import https from "https";
+import { Agent } from "undici";
 
 // Mock the mtls-utils module
 jest.mock("@/app/shared/mtls-utils");
@@ -12,13 +13,8 @@ jest.mock("@/app/backend/smart-on-fhir", () => ({
   createSmartJwt: jest.fn().mockResolvedValue("mocked-jwt-token"),
 }));
 
-// Mock node-fetch
-jest.mock("node-fetch", () => jest.fn());
-const mockFetch = require("node-fetch") as jest.MockedFunction<
-  typeof import("node-fetch").default
->;
-
-import fetch from "node-fetch";
+global.fetch = jest.fn();
+const mockFetch = global.fetch as jest.Mock;
 
 describe("FHIRClient with Mutual TLS", () => {
   const mockCert =
@@ -27,6 +23,8 @@ describe("FHIRClient with Mutual TLS", () => {
     "-----BEGIN PRIVATE KEY-----\nMOCK_KEY\n-----END PRIVATE KEY-----";
 
   beforeEach(() => {
+    mockFetch.mockClear();
+
     jest.clearAllMocks();
     (mtlsUtils.getOrCreateMtlsCert as jest.Mock).mockReturnValue(mockCert);
     (mtlsUtils.getOrCreateMtlsKey as jest.Mock).mockReturnValue(mockKey);
@@ -119,17 +117,24 @@ describe("FHIRClient with Mutual TLS", () => {
         expect.objectContaining({
           method: "GET",
           headers: {},
-          // Verify that agent is passed with cert and key
-          agent: expect.any(https.Agent),
+          dispatcher: expect.any(Agent),
         }),
       );
 
       // Verify the agent has the correct properties
-      const callArgs = mockFetch.mock.calls[0];
-      const agent = (callArgs[1] as { agent: https.Agent }).agent;
-      expect(agent).toBeInstanceOf(https.Agent);
-      expect(agent.options.cert).toBe(mockCert);
-      expect(agent.options.key).toBe(mockKey);
+      const dispatcher: Agent = mockFetch.mock.calls[0][1].dispatcher;
+      const constructOptions = Object.getOwnPropertySymbols(dispatcher).find(
+        (s) => s.description === "options",
+      ) as keyof Agent;
+      const dispatcherOptions = dispatcher[constructOptions];
+
+      expect(dispatcherOptions).toStrictEqual({
+        connect: {
+          cert: mockCert,
+          key: mockKey,
+          rejectUnauthorized: true,
+        },
+      });
     });
 
     it("should make POST JSON request with mTLS certificates", async () => {
@@ -168,7 +173,7 @@ describe("FHIRClient with Mutual TLS", () => {
             PREFER: "return=representation",
           }),
           body: JSON.stringify(taskData),
-          agent: expect.any(https.Agent),
+          dispatcher: expect.any(Agent),
         }),
       );
     });
@@ -194,13 +199,20 @@ describe("FHIRClient with Mutual TLS", () => {
       const client = new FHIRClient(config);
       await client.get("/Patient");
 
-      const callArgs = mockFetch.mock.calls[0];
-      const agent = (callArgs[1] as { agent: https.Agent }).agent;
+      // Verify the agent has the correct properties
+      const dispatcher: Agent = mockFetch.mock.calls[0][1].dispatcher;
+      const constructOptions = Object.getOwnPropertySymbols(dispatcher).find(
+        (s) => s.description === "options",
+      ) as keyof Agent;
+      const dispatcherOptions = dispatcher[constructOptions];
 
-      // Should have both mTLS certs and rejectUnauthorized set to false
-      expect(agent.options.cert).toBe(mockCert);
-      expect(agent.options.key).toBe(mockKey);
-      expect(agent.options.rejectUnauthorized).toBe(false);
+      expect(dispatcherOptions).toStrictEqual({
+        connect: {
+          cert: mockCert,
+          key: mockKey,
+          rejectUnauthorized: false,
+        },
+      });
     });
   });
 

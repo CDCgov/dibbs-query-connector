@@ -22,6 +22,7 @@ describe("PatientSearchResults", () => {
         goBack={() => {}}
         setMode={() => {}}
         setPatientForQueryResponse={() => {}}
+        uncertainMatchError={false}
         loading={true}
       ></PatientSearchResults>,
     );

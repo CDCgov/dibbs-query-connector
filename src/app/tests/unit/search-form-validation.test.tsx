@@ -11,6 +11,10 @@ jest.mock("@/app/backend/query-execution", () => ({
   }),
 }));
 
+jest.mock("@/app/backend/fhir-servers", () => ({
+  getFhirServerConfigs: jest.fn().mockResolvedValue([]),
+}));
+
 // Mock auth functions
 jest.mock("@/app/utils/auth", () => ({
   superAdminAccessCheck: jest.fn().mockResolvedValue(true),
