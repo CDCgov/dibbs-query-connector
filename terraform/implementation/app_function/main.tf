@@ -1,10 +1,10 @@
 
 locals {
   qc_resource_group = "qc-aca-rg"
-  location                = "East US 2"
-  project                 = "qc"
-  environment = "dev"
-  storage_account = "qcacastorageaccount" 
+  location          = "East US 2"
+  project           = "qc"
+  environment       = "dev"
+  storage_account   = "qcacastorageaccount"
 }
 
 
@@ -13,9 +13,33 @@ data "azurerm_resource_group" "qc_rg" {
 }
 
 data "azurerm_storage_account" "qc_storage_account" {
-    name = local.storage_account
-    resource_group_name = local.qc_resource_group
+  name                = local.storage_account
+  resource_group_name = local.qc_resource_group
 }
+
+
+
+locals {
+  app_files = fileset("${path.module}/function", "**")
+  app_hash  = md5(join("", [for f in local.app_files : filemd5("${path.module}/function/${f}")]))
+}
+
+resource "null_resource" "build" {
+  triggers = { app = local.app_hash }
+  provisioner "local-exec" {
+    working_dir = "${path.module}/function"
+    command     = "npm ci && npm run build && npm prune --omit=dev"
+  }
+}
+
+data "archive_file" "zip" {
+  type        = "zip"
+  source_dir  = "${path.module}/function"
+  output_path = "${path.module}/dist/functionapp.zip"
+  depends_on  = [null_resource.build]
+}
+
+
 
 # App Service Plan & Function App
 resource "azurerm_service_plan" "qc_plan" {
@@ -28,14 +52,71 @@ resource "azurerm_service_plan" "qc_plan" {
   depends_on = [data.azurerm_resource_group.qc_rg]
 }
 
+#Manages container within an Azure Storage Account
+resource "azurerm_storage_container" "pkg" {
+  name                  = "function-releases"
+  storage_account_name  = data.azurerm_storage_account.qc_storage_account.name
+  container_access_type = "private"
+}
+
+#Manages a Blob within the Storage container
+resource "azurerm_storage_blob" "pkgzip" {
+  name                   = "functionapp-${formatdate("YYYYMMDDHHmmss", timestamp())}.zip"
+  storage_account_name   = data.azurerm_storage_account.qc_storage_account.name
+  storage_container_name = azurerm_storage_container.pkg.name
+  type                   = "Block"
+  source                 = data.archive_file.zip.output_path #TO DO BY ME
+  content_type           = "application/zip"
+}
+
+
+
+# Shared Access Token (SAS) URL for the package
+data "azurerm_storage_account_sas" "pkg" {
+  connection_string = data.azurerm_storage_account.qc_storage_account.primary_connection_string
+  https_only        = true
+  start             = timeadd(timestamp(), "-5m")
+  expiry            = timeadd(timestamp(), "168h") # 7 days; extend if needed
+
+  resource_types {
+    service   = false
+    container = true
+    object    = true
+  }
+  services {
+    blob  = true
+    queue = false
+    table = false
+    file  = false
+  }
+  permissions {
+    read    = true
+    write   = false
+    delete  = false
+    list    = false
+    add     = false
+    create  = false
+    update  = false
+    process = false
+    tag     = false
+    filter  = false
+  }
+}
+
+resource "azurerm_storage_container" "message" {
+  name                  = "hl7-message"
+  storage_account_name  = data.azurerm_storage_account.qc_storage_account.name
+  container_access_type = "private"
+}
+
 resource "azurerm_linux_function_app" "qc_linux_function_app" {
   name                = "qc-linux-function-app"
   location            = local.location
   resource_group_name = data.azurerm_resource_group.qc_rg.name
   service_plan_id     = azurerm_service_plan.qc_plan.id
 
-  storage_account_name       = data.azurerm_storage_account.qc_storage_account.name
-  storage_account_access_key = data.azurerm_storage_account.qc_storage_account.primary_access_key
+  storage_account_name        = data.azurerm_storage_account.qc_storage_account.name
+  storage_account_access_key  = data.azurerm_storage_account.qc_storage_account.primary_access_key
   functions_extension_version = "~4"
   https_only                  = true
   identity {
@@ -47,14 +128,19 @@ resource "azurerm_linux_function_app" "qc_linux_function_app" {
     }
   }
 
-   app_settings = {
+  app_settings = {
     FUNCTIONS_EXTENSION_VERSION = "~4"
     FUNCTIONS_WORKER_RUNTIME    = "node"
     AzureWebJobsStorage         = data.azurerm_storage_account.qc_storage_account.primary_connection_string
+
+    # Zip Deploy (Run From Package)
+    # WEBSITE_RUN_FROM_PACKAGE = "https://${data.azurerm_storage_account.qc_storage_account.name}.blob.core.windows.net/${azurerm_storage_container.pkg.name}/${azurerm_storage_blob.pkgzip.name}${data.azurerm_storage_account_sas.pkg.sas}"
   }
 
-  # If you want Terraform to push your ZIP directly:
-  # zip_deploy_file = "${path.module}/dist/app.zip"
+  # Deploy code in a writable way so Terraform can add function.json
+  zip_deploy_file = data.archive_file.zip.output_path
+
+  depends_on = [azurerm_storage_blob.pkgzip]
 }
 
 
@@ -63,12 +149,12 @@ resource "azurerm_linux_function_app" "qc_linux_function_app" {
 resource "azurerm_function_app_function" "qc_app_function" {
   name            = "${local.project}-${local.environment}-function-app"
   function_app_id = azurerm_linux_function_app.qc_linux_function_app.id
-  language = "TypeScript"
+  language        = "TypeScript"
 
   config_json = jsonencode({
     bindings = [
-      { type = "httpTrigger", authLevel = "function", direction = "in",  name = "req" },
-      { type = "http",        direction = "out",       name = "res" }
+      { type = "blobTrigger", direction = "in", name = "BlobTriggerContext", connection = "AzureWebJobsStorage", path = "hl7-message/{name}" }, #The name should be the param the typescript code receives
+      { type = "http", direction = "out", name = "res" }
     ]
   })
 }

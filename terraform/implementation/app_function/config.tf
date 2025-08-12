@@ -7,9 +7,9 @@
  */
 terraform {
   backend "azurerm" {
-    resource_group_name  = "qc-aca-rg"             // TODO: Change this to match the resource group that contains your storage account for Terraform state storage.
-    storage_account_name = "qcacastorageaccount"   // TODO: Change this to match the storage account that contains/will contain your Terraform state files.
-    container_name       = "tfstate"               // We recommend leaving this alone, to keep state files separate from the rest of your resources.
+    resource_group_name  = "qc-aca-rg"                      // TODO: Change this to match the resource group that contains your storage account for Terraform state storage.
+    storage_account_name = "qcacastorageaccount"            // TODO: Change this to match the storage account that contains/will contain your Terraform state files.
+    container_name       = "tfstate"                        // We recommend leaving this alone, to keep state files separate from the rest of your resources.
     key                  = "dev/app_func/terraform.tfstate" // TODO: Change the prefix to match the environment you are working in.
   }
   required_providers {
