@@ -1,0 +1,89 @@
+# Azure Console Setup Instructions for Terraform Deployment
+
+To prepare your Azure subscription for Terraform deployments, follow the steps below to create and configure the necessary resources.
+
+---
+
+## ✅ Prerequisites
+
+Ensure that the following are in place:
+
+- Access to the Azure portal: https://portal.azure.com
+- Appropriate permissions to create and manage Azure resources
+- Azure CLI (optional, but useful for automation): [Install Azure CLI](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli)
+
+---
+
+## 1. Create a Resource Group and Storage Account
+
+These will be used to store Terraform state files.
+
+### Step 1: Create a Resource Group
+
+1. Navigate to **Resource groups**.
+2. Click **+ Create**.
+3. Provide:
+   - **Subscription**: Your target subscription
+   - **Resource Group Name**: e.g., `terraform-rg`
+   - **Region**: e.g., `East US`
+4. Click **Review + Create**, then **Create**.
+
+### Step 2: Create a Storage Account
+
+1. Go to **Storage accounts**.
+2. Click **+ Create**.
+3. Provide:
+   - **Subscription**: Same as above
+   - **Resource Group**: Select the one created earlier
+   - **Storage account name**: e.g., `tfstate12345` (must be globally unique)
+   - **Region**: Same as the resource group
+   - **Performance**: Standard
+   - **Redundancy**: Locally-redundant storage (LRS)
+4. Click **Review + Add Create**, then **Create**.
+
+### Step 3: Create a Blob Container
+
+1. Open the created storage account.
+2. Navigate to **Containers** under **Data storage**.
+3. Click **+ Container**.
+4. Enter a name (e.g., `tfstate`) and set **Public access level** to **Private**.
+5. Click **Create**.
+
+---
+
+## 2. Engineer Access
+
+This allows Terraform to authenticate against Azure.
+
+###  Use an Existing Engineer Account
+
+If running Terraform locally, ensure your Azure account has at least **Contributor** access to the target resource group.
+
+---
+
+## 3. Register Required Azure Resource Providers
+
+Ensure that all necessary resource providers are registered, especially if deploying services like App Gateway or Container Apps.
+
+### Steps:
+
+1. Go to **Subscriptions** in the Azure portal.
+2. Select your subscription.
+3. Click **Resource providers** in the left menu.
+4. Search for and register the following (examples):
+   - `Microsoft.App`
+   - `Microsoft.ContainerInstance`
+   - `Microsoft.Network`
+   - `Microsoft.OperationalInsights`
+5. Click **Register** for each as needed.
+
+---
+
+## ✅ Summary
+
+You should now have:
+- A resource group and storage account for Terraform state
+- An Engineer that has access with Contributor rights
+- All required resource providers registered
+
+You’re ready to deploy with Terraform!
