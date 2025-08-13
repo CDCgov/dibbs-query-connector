@@ -27,7 +27,7 @@ import {
 import { CodeSystemOptions, CustomCodeMode, emptyValueSet } from "../utils";
 import Skeleton from "react-loading-skeleton";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
-import { groupConditionConceptsIntoValueSets } from "@/app/shared/utils";
+import { groupConditionConceptsIntoValueSets } from "@/app/utils/valueSetTranslation";
 import { csvRow } from "@/app/api/csv/route";
 
 type CustomValueSetFormProps = {
@@ -388,8 +388,6 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
   function triggerCsvPicker() {
     csvInputRef.current?.click();
   }
-
-  // ===== STRICT CSV IMPORT (no any) =====
 
   type ImportGroupKey = string; // `${vsName}||${category}||${systemLabel}`
 
