@@ -3,7 +3,7 @@
 import React from "react";
 import Drawer from "@/app/ui/designSystem/drawer/Drawer";
 import styles from "./resultsView.module.scss";
-import { PatientRecordsResponse } from "../../../../backend/query-execution/service";
+import { PatientRecordsResponse } from "../../../../backend/query-execution";
 import { Icon, Button } from "@trussworks/react-uswds";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 

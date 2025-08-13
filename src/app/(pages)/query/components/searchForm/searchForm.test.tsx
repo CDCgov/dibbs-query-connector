@@ -2,12 +2,13 @@ import { renderWithUser, RootProviderMock } from "@/app/tests/unit/setup";
 import { screen } from "@testing-library/react";
 import SearchForm from "./SearchForm";
 import { useSearchParams } from "next/navigation";
-import { getFhirServerConfigs } from "@/app/backend/fhir-servers/service";
-import { getConditionsData } from "@/app/backend/seeding/service";
+import { getFhirServerConfigs } from "@/app/backend/fhir-servers";
 
 jest.mock("next/navigation");
-
-jest.mock("@/app/backend/fhir-servers/service", () => ({
+jest.mock("@/app/backend/fhir-servers", () => ({
+  getFhirServerConfigs: jest.fn(),
+}));
+jest.mock("@/app/backend/fhir-servers", () => ({
   getFhirServerConfigs: jest.fn().mockResolvedValue([
     {
       name: "Matching Server",
@@ -23,14 +24,6 @@ jest.mock("@/app/backend/fhir-servers/service", () => ({
     },
   ]),
 }));
-
-jest.mock("@/app/backend/seeding/service", () => ({
-  getConditionsData: jest.fn(),
-}));
-
-(getConditionsData as jest.Mock).mockResolvedValue({
-  conditionIdToNameMap: {},
-});
 
 describe("SearchForm", () => {
   beforeAll(() => {

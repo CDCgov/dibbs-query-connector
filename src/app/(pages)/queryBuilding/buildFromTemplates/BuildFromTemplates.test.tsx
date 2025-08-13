@@ -7,11 +7,11 @@ import {
   cancerValueSets,
 } from "@/app/(pages)/queryBuilding/fixtures";
 import { formatDiseaseDisplay } from "@/app/(pages)/queryBuilding/utils";
-import { USE_CASE_DETAILS } from "@/app/constants";
+import { USE_CASE_DETAILS } from "@/app/shared/constants";
 import {
   getConditionsData,
   getValueSetsAndConceptsByConditionIDs,
-} from "@/app/backend/seeding/service";
+} from "@/app/shared/database-service";
 import { renderWithUser, RootProviderMock } from "@/app/tests/unit/setup";
 import { screen, waitFor, within } from "@testing-library/dom";
 import {
@@ -22,16 +22,11 @@ import {
 import { userEvent } from "@testing-library/user-event";
 import { render } from "@testing-library/react";
 import { getSavedQueryById } from "@/app/backend/query-building/service";
-import { getTimeboxRanges } from "@/app/backend/query-timefiltering";
 
-jest.mock("../../../backend/seeding/service", () => ({
+jest.mock("../../../shared/database-service", () => ({
   getCustomQueries: jest.fn(),
   getConditionsData: jest.fn(),
   getValueSetsAndConceptsByConditionIDs: jest.fn(),
-}));
-
-jest.mock("../../../backend/query-timefiltering", () => ({
-  getTimeboxRanges: jest.fn(),
 }));
 
 jest.mock("../../../backend/query-building/service", () => ({
@@ -62,8 +57,6 @@ const GONORRHEA_NAME = formatDiseaseDisplay(GONORRHEA_DETAILS.name);
 );
 
 (getSavedQueryById as jest.Mock).mockResolvedValue(gonorrheaSavedQuery);
-
-(getTimeboxRanges as jest.Mock).mockResolvedValue(undefined);
 
 it("customize query button is disabled unless name and individual condition are defined", async () => {
   const { user } = renderWithUser(

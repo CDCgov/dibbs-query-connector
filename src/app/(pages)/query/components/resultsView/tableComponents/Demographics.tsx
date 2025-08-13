@@ -9,7 +9,7 @@ import {
   formatIdentifier,
   formatDate,
   formatSex,
-} from "../../../../../utils/format-service";
+} from "../../../../../shared/format-service";
 import Table from "@/app/ui/designSystem/table/Table";
 
 /**

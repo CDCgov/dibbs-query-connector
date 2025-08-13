@@ -4,7 +4,7 @@ import { MedicationRequest } from "fhir/r4";
 import {
   formatCodeableConcept,
   formatDate,
-} from "../../../../../utils/format-service";
+} from "../../../../../shared/format-service";
 import styles from "./resultsTables.module.scss";
 import { checkIfSomeElementWithPropertyExists } from "./utils";
 import classNames from "classnames";

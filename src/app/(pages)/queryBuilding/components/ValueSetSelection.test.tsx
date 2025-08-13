@@ -6,7 +6,7 @@ import { getSavedQueryById } from "@/app/backend/query-building/service";
 import {
   getConditionsData,
   getValueSetsAndConceptsByConditionIDs,
-} from "@/app/backend/seeding/service";
+} from "@/app/shared/database-service";
 import {
   conditionIdToNameMap,
   categoryToConditionNameArrayMap,
@@ -15,7 +15,7 @@ import {
 } from "../fixtures";
 
 const currentPage = "/";
-jest.mock("../../../backend/seeding/service", () => ({
+jest.mock("../../../shared/database-service", () => ({
   getCustomQueries: jest.fn(),
   getConditionsData: jest.fn(),
   getValueSetsAndConceptsByConditionIDs: jest.fn(),

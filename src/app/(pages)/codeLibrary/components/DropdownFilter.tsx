@@ -14,7 +14,7 @@ import {
 import {
   formatCodeSystemPrefix,
   formatStringToSentenceCase,
-} from "@/app/utils/format-service";
+} from "@/app/shared/format-service";
 import { emptyFilterSearch } from "../utils";
 import { User } from "@/app/models/entities/users";
 import {

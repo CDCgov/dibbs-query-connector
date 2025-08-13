@@ -15,7 +15,7 @@ import {
   deleteCustomConcept,
   getCustomValueSetById,
   insertCustomValueSet,
-} from "@/app/backend/custom-code-service";
+} from "@/app/shared/custom-code-service";
 import { User } from "@/app/models/entities/users";
 import { getUserByUsername } from "@/app/backend/user-management";
 import { useSession } from "next-auth/react";
@@ -23,11 +23,11 @@ import { Concept } from "@/app/models/entities/concepts";
 import {
   formatCodeSystemPrefix,
   formatStringToSentenceCase,
-} from "@/app/utils/format-service";
+} from "@/app/shared/format-service";
 import { CodeSystemOptions, CustomCodeMode, emptyValueSet } from "../utils";
 import Skeleton from "react-loading-skeleton";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
-import { groupConditionConceptsIntoValueSets } from "@/app/utils/valueSetTranslation";
+import { groupConditionConceptsIntoValueSets } from "@/app/shared/utils";
 
 type CustomValueSetFormProps = {
   mode: CustomCodeMode;

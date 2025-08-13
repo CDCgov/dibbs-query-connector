@@ -1,7 +1,7 @@
 "use server";
 
-import { AuthData } from "./service";
-import FHIRClient from "./fhir-client";
+import { AuthData } from "../backend/fhir-servers";
+import FHIRClient from "./fhirClient";
 
 /**
  * Test the connection to a FHIR server

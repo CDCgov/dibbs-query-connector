@@ -1,9 +1,9 @@
 import { auth } from "@/auth";
-import { hyperUnluckyPatient, USE_CASE_DETAILS } from "@/app/constants";
+import { hyperUnluckyPatient, USE_CASE_DETAILS } from "@/app/shared/constants";
 import {
   patientDiscoveryQuery,
   patientRecordsQuery,
-} from "@/app/backend/query-execution/service";
+} from "@/app/backend/query-execution";
 import { suppressConsoleLogs } from "../fixtures";
 import { DEFAULT_CHLAMYDIA_QUERY } from "../../unit/fixtures";
 import {

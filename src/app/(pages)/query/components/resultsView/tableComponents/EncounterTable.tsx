@@ -5,7 +5,7 @@ import {
   formatCodeableConcept,
   formatCoding,
   formatDate,
-} from "../../../../../utils/format-service";
+} from "../../../../../shared/format-service";
 import { checkIfSomeElementWithPropertyExists } from "./utils";
 
 /**

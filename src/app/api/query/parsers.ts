@@ -1,6 +1,10 @@
 import { Patient } from "fhir/r4";
-import { FormatPhoneAsDigits } from "@/app/utils/format-service";
-import { AddressData, USE_CASES, USE_CASE_DETAILS } from "@/app/constants";
+import { FormatPhoneAsDigits } from "@/app/shared/format-service";
+import {
+  AddressData,
+  USE_CASES,
+  USE_CASE_DETAILS,
+} from "@/app/shared/constants";
 
 export type PatientIdentifiers = {
   first_name?: string;

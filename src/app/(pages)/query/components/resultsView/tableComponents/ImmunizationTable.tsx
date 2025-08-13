@@ -4,7 +4,7 @@ import { Immunization } from "fhir/r4";
 import {
   formatDate,
   formatImmunizationRoute,
-} from "../../../../../utils/format-service";
+} from "../../../../../shared/format-service";
 
 /**
  * The props for the ImmunizationTable component.
