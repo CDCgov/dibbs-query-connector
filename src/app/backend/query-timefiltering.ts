@@ -77,12 +77,13 @@ class QueryTimefilteringService {
     const relatedTimeboxes = await dbService.query(timeboxSql, [queryId]);
     const timeboxInfo: QueryTableTimebox = {};
     relatedTimeboxes.rows.forEach((t) => {
-      let timeWindowStart = t.timeWindowStart.toISOString();
-      let timeWindowEnd = t.timeWindowEnd.toISOString();
+      let timeWindowStart = t.timeWindowStart;
+      let timeWindowEnd = t.timeWindowEnd;
+
       if (t.isRelativeRange) {
         // we want the relative ranges, so take the time delta and apply it to the current date
-        const endDate = new Date(t.timeWindowEnd.toISOString());
-        const startDate = new Date(t.timeWindowStart.toISOString());
+        const endDate = new Date(timeWindowEnd);
+        const startDate = new Date(timeWindowStart);
         const timeDeltaMilliseconds = endDate.getTime() - startDate.getTime();
 
         timeWindowEnd = new Date();
@@ -91,10 +92,9 @@ class QueryTimefilteringService {
           timeWindowEnd.getTime() - timeDeltaMilliseconds,
         );
       }
-
       return (timeboxInfo[t.conceptType as DibbsConceptType] = {
-        timeWindowStart: t.timeWindowStart.toISOString(),
-        timeWindowEnd: t.timeWindowEnd.toISOString(),
+        timeWindowStart: timeWindowStart.toISOString(),
+        timeWindowEnd: timeWindowEnd.toISOString(),
       });
     });
 
