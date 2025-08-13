@@ -14,14 +14,14 @@ import {
   hyperUnluckyPatient,
   AddressData,
   INSUFFICIENT_PATIENT_IDENTIFIERS,
-} from "@/app/shared/constants";
+} from "@/app/constants";
 import {
   patientDiscoveryQuery,
   PatientDiscoveryResponse,
-} from "@/app/backend/query-execution";
-import { getFhirServerConfigs } from "@/app/backend/fhir-servers";
+} from "@/app/backend/query-execution/service";
+import { getFhirServerConfigs } from "@/app/backend/fhir-servers/service";
 import styles from "../searchForm/searchForm.module.scss";
-import { FormatPhoneAsDigits } from "@/app/shared/format-service";
+import { FormatPhoneAsDigits } from "@/app/utils/format-service";
 import TitleBox from "../stepIndicator/TitleBox";
 import {
   PatientDiscoveryRequest,

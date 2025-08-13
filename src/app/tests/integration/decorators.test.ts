@@ -1,6 +1,6 @@
 import { internal_getDbClient } from "@/app/backend/db/config";
 import { suppressConsoleLogs } from "./fixtures";
-import { insertFhirServer } from "@/app/backend/fhir-servers";
+import { insertFhirServer } from "@/app/backend/fhir-servers/service";
 
 const dbClientQuery = jest.spyOn(internal_getDbClient(), "query");
 suppressConsoleLogs();
