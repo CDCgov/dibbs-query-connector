@@ -382,6 +382,7 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
     }
   };
 
+  // CSV upload handling
   const csvInputRef = useRef<HTMLInputElement>(null);
   const [csvError, setCsvError] = useState<string>("");
 
