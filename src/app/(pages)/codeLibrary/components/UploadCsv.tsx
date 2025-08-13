@@ -7,6 +7,11 @@ type Props = {
   onParsed: (rows: csvRow[]) => void;
 };
 
+/**
+ *
+ * @param root0
+ * @param root0.onParsed
+ */
 export default function UploadCsv({ onParsed }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [filename, setFilename] = useState<string>("");

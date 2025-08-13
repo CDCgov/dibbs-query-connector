@@ -24,6 +24,10 @@ function parseCsvStream(nodeStream: Readable): Promise<csvRow[]> {
   });
 }
 
+/**
+ *
+ * @param req
+ */
 export async function POST(req: NextRequest) {
   const form = await req.formData();
   const file = form.get("file") as File | null;
