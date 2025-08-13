@@ -385,6 +385,215 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
   const csvInputRef = useRef<HTMLInputElement>(null);
   const [csvError, setCsvError] = useState<string>("");
 
+  function triggerCsvPicker() {
+    csvInputRef.current?.click();
+  }
+
+  type ImportGroupKey = string; // `${vsName}||${category}||${systemLabel}`
+
+  function normalizeHeaderKey(s: string) {
+    return (s || "").trim().toLowerCase();
+  }
+
+  function toTypeStrict(label: string): DibbsConceptType | undefined {
+    const t = (label || "").trim().toLowerCase();
+    if (t === "labs") return "labs";
+    if (t === "conditions") return "conditions";
+    if (t === "medications") return "medications";
+    return undefined;
+  }
+
+  function toSystemUri(label: string) {
+    const t = (label || "").trim().toLowerCase();
+    const sysMap: Record<string, string> = {
+      loinc: "http://loinc.org",
+      rxnorm: "http://www.nlm.nih.gov/research/umls/rxnorm",
+      "icd-10-cm": "http://hl7.org/fhir/sid/icd-10-cm",
+      cvx: "http://hl7.org/fhir/sid/cvx",
+      snomed: "http://snomed.info/sct",
+      "snomed ct": "http://snomed.info/sct",
+      "cap ecc": "http://cap.org/eCC",
+    };
+    if (sysMap[t]) return sysMap[t];
+    const fromOptions = CodeSystemOptions.find((uri) =>
+      uri.toLowerCase().includes(t),
+    );
+    return fromOptions || label;
+  }
+
+  function validateCsvHeaders(rows: csvRow[]): {
+    ok: boolean;
+    error?: string;
+    keys?: {
+      vsNameKey: string;
+      catKey: string;
+      sysKey: string;
+      codeKey: string;
+      dispKey: string;
+    };
+  } {
+    if (!rows || rows.length === 0)
+      return { ok: false, error: "CSV contained no rows" };
+    const first = rows[0] as Record<string, string>;
+    const keys = Object.keys(first);
+
+    const vsNameKey = keys.find(
+      (k) => normalizeHeaderKey(k) === "value set name",
+    );
+    const catKey = keys.find((k) => normalizeHeaderKey(k) === "category");
+    const sysKey = keys.find((k) => normalizeHeaderKey(k) === "code system");
+    const codeKey = keys.find((k) => normalizeHeaderKey(k) === "code");
+    const dispKey = keys.find((k) => normalizeHeaderKey(k) === "display");
+
+    if (!vsNameKey || !catKey || !sysKey || !codeKey || !dispKey) {
+      return {
+        ok: false,
+        error:
+          "CSV headers must include: value set name, category, code system, code, display",
+      };
+    }
+    return { ok: true, keys: { vsNameKey, catKey, sysKey, codeKey, dispKey } };
+  }
+
+  function groupRowsIntoValueSets(
+    rows: csvRow[],
+    keys: {
+      vsNameKey: string;
+      catKey: string;
+      sysKey: string;
+      codeKey: string;
+      dispKey: string;
+    },
+  ) {
+    const groups = new Map<
+      ImportGroupKey,
+      { vsName: string; cat: string; sysLabel: string; concepts: Concept[] }
+    >();
+    const norm = (s: string) => (s || "").trim();
+
+    for (const r of rows) {
+      const vsName = norm((r as any)[keys.vsNameKey] as string);
+      const cat = norm((r as any)[keys.catKey] as string);
+      const sys = norm((r as any)[keys.sysKey] as string);
+      const code = norm((r as any)[keys.codeKey] as string);
+      const display = norm((r as any)[keys.dispKey] as string);
+
+      if (!vsName || !cat || !sys) {
+        // skip incomplete value set identifiers; could collect errors if you want
+        continue;
+      }
+      if (!code && !display) {
+        // skip empty concept rows
+        continue;
+      }
+
+      const k: ImportGroupKey = `${vsName}||${cat}||${sys}`;
+      const entry = groups.get(k) ?? {
+        vsName,
+        cat,
+        sysLabel: sys,
+        concepts: [],
+      };
+      entry.concepts.push({ code, display, include: false });
+      groups.set(k, entry);
+    }
+
+    // Build DibbsValueSet objects; drop groups that can't be typed/system-mapped
+    const valueSets: DibbsValueSet[] = [];
+    for (const g of groups.values()) {
+      const t = toTypeStrict(g.cat);
+      const sysUri = toSystemUri(g.sysLabel);
+      if (!t || !sysUri || g.concepts.length === 0) {
+        continue;
+      }
+      valueSets.push({
+        ...emptyValueSet,
+        valueSetName: g.vsName,
+        dibbsConceptType: t,
+        system: sysUri,
+        concepts: g.concepts,
+      });
+    }
+    return valueSets;
+  }
+
+  async function importCsvValueSets(rows: csvRow[]) {
+    // 1) Validate headers
+    const v = validateCsvHeaders(rows);
+    if (!v.ok || !v.keys) {
+      setCsvError(v.error || "Invalid CSV");
+      return;
+    }
+
+    // 2) Group & build value sets
+    const valueSets = groupRowsIntoValueSets(rows, v.keys);
+    if (valueSets.length === 0) {
+      setCsvError("No valid value sets found in CSV");
+      return;
+    }
+
+    // 3) Confirm
+    const totalConcepts = valueSets.reduce(
+      (acc, vs) => acc + (vs.concepts?.length || 0),
+      0,
+    );
+    const proceed = window.confirm(
+      `Import ${valueSets.length} value set(s), ${totalConcepts} concept(s) total?`,
+    );
+    if (!proceed) return;
+
+    // 4) Save each valueset via existing insertCustomValueSet
+    const results: {
+      name: string;
+      ok: boolean;
+      id?: string;
+      error?: string;
+    }[] = [];
+    for (const vs of valueSets) {
+      try {
+        const res = await insertCustomValueSet(
+          vs as DibbsValueSet,
+          currentUser?.id as string,
+        );
+        results.push({
+          name: vs.valueSetName,
+          ok: !!res.success,
+          id: res.id,
+          error: res.success ? undefined : "Failed to save",
+        });
+      } catch (e: any) {
+        results.push({
+          name: vs.valueSetName,
+          ok: false,
+          error: e?.message || "Failed to save",
+        });
+      }
+    }
+
+    const okCount = results.filter((r) => r.ok).length;
+    const failCount = results.length - okCount;
+
+    if (okCount > 0) {
+      showToastConfirmation({
+        body: `Imported ${okCount}/${results.length} value set(s) successfully.`,
+      });
+    }
+    if (failCount > 0) {
+      showToastConfirmation({
+        body: `Failed to import ${failCount} value set(s).`,
+        variant: "error",
+      });
+      // Optionally: log details
+      console.warn(
+        "Import failures:",
+        results.filter((r) => !r.ok),
+      );
+    }
+
+    // 5) After import, go back to manage view (single-form UI isn't built for multi-preview)
+    setMode("manage");
+  }
+
   async function handleCsvFile(file: File) {
     setCsvError("");
     const fd = new FormData();
@@ -395,11 +604,7 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
       setCsvError(json.error || "Failed to parse CSV");
       return;
     }
-    console.log("Parsed CSV rows:", json.rows);
-  }
-
-  function triggerCsvPicker() {
-    csvInputRef.current?.click();
+    await importCsvValueSets(json.rows);
   }
 
   return (

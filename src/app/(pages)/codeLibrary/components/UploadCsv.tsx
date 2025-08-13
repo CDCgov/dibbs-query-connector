@@ -8,9 +8,9 @@ type Props = {
 };
 
 /**
- *
- * @param root0
- * @param root0.onParsed
+ * Component for uploading and parsing a CSV file.
+ * @param root0 - props
+ * @param root0.onParsed - callback function invoked with parsed CSV rows
  */
 export default function UploadCsv({ onParsed }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -22,7 +22,7 @@ export default function UploadCsv({ onParsed }: Props) {
     setFilename(file.name);
     const fd = new FormData();
     fd.append("file", file);
-    const res = await fetch("/api/csv/parse", { method: "POST", body: fd });
+    const res = await fetch("/api/csv/", { method: "POST", body: fd });
     const json: { rows?: csvRow[]; error?: string } = await res.json();
     if (!res.ok || !json.rows) {
       setError(json.error || "Failed to parse CSV");
