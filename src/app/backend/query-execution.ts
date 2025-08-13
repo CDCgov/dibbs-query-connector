@@ -245,6 +245,8 @@ class QueryService {
     fhirClient: FHIRClient,
     task: Task,
   ): Promise<Patient | null> {
+    console.log(`Processing Task ${task.id} for patient discovery`);
+    console.log(`Task: ${JSON.stringify(task, null, 2)}`);
     if (task.status !== "completed" || !task.output) {
       if (task.status === "failed") {
         console.warn(`Task ${task.id} failed`);
@@ -257,10 +259,7 @@ class QueryService {
     }
 
     try {
-      const taskDetailResponse = await fhirClient.get(`/Task/${task.id}`);
-      const taskDetail = (await taskDetailResponse.json()) as Task;
-
-      const patientLink = taskDetail.output?.find((output) =>
+      const patientLink = task.output?.find((output) =>
         output.valueString?.includes("Patient-Page1"),
       )?.valueString;
 
