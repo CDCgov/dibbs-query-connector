@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { Patient } from "fhir/r4";
 
-import { Mode } from "@/app/shared/constants";
+import { Mode } from "@/app/constants";
 import Backlink from "../../../ui/designSystem/backLink/Backlink";
 import PatientSearchResultsTable from "./patientSearchResults/PatientSearchResultsTable";
 import NoPatientsFound from "./patientSearchResults/NoPatientsFound";

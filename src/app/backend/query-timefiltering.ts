@@ -59,12 +59,16 @@ class QueryTimefilteringService {
       conceptType,
     ]);
 
-    return result.rows.map((v) => {
-      return {
-        timeWindowStart: v.timeWindowStart,
-        timeWindowEnd: v.timeWindowEnd,
-      };
-    })[0];
+    if (result) {
+      return result.rows.map((v) => {
+        return {
+          timeWindowStart: v.timeWindowStart,
+          timeWindowEnd: v.timeWindowEnd,
+        };
+      })[0];
+    }
+
+    return undefined;
   }
 
   static async linkTimeboxRangesToQuery(queryId: string) {

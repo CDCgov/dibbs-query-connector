@@ -2,33 +2,30 @@
 
 import { transaction } from "@/app/backend/db/decorators";
 import { auditable } from "@/app/backend/audit-logs/decorator";
-import { internal_getDbClient } from "../backend/db/config";
+import { internal_getDbClient } from "./db/config";
 import {
   insertValueSetSql,
   insertConceptSql,
   insertValuesetToConceptSql,
   insertConditionSql,
   insertConditionToValuesetSql,
-} from "./seedSqlStructs";
+} from "./seeding/seedSqlStructs";
 import {
   INTENTIONAL_EMPTY_STRING_FOR_CONCEPT_VERSION,
   INTENTIONAL_EMPTY_STRING_FOR_GEM_CODE,
-} from "./constants";
+} from "../constants";
 import type { DibbsValueSet } from "../models/entities/valuesets";
 import type { Concept } from "../models/entities/concepts";
 import { QCResponse } from "../models/responses/collections";
 import type { QueryDataColumn } from "@/app/(pages)/queryBuilding/utils";
 import crypto from "crypto";
 
-import { formatCodeSystemPrefix } from "./format-service";
+import { formatCodeSystemPrefix } from "../utils/format-service";
 
-import {
-  CUSTOM_CONDITION_ID,
-  CUSTOM_VALUESET_ARRAY_ID,
-} from "@/app/shared/constants";
-import dbService from "../backend/db/service";
+import { CUSTOM_CONDITION_ID, CUSTOM_VALUESET_ARRAY_ID } from "@/app/constants";
+import dbService from "./db/service";
 
-class UserCreatedValuesetService {
+class CustomCodeService {
   private static get dbClient() {
     return internal_getDbClient();
   }
@@ -70,7 +67,7 @@ class UserCreatedValuesetService {
           ORDER BY name ASC;
         `;
 
-      const result = await UserCreatedValuesetService.dbClient.query(
+      const result = await CustomCodeService.dbClient.query(
         selectValueSetQuery,
         [id],
       );
@@ -110,8 +107,9 @@ class UserCreatedValuesetService {
     const valueSetOid = vs.valueSetExternalId || uuid;
 
     // Insert Custom Code Condition if not already present
-    const CUSTOM_CONDITION_ID =
-      await UserCreatedValuesetService.addCustomCodeCondition(vs.system || "");
+    const CUSTOM_CONDITION_ID = await CustomCodeService.addCustomCodeCondition(
+      vs.system || "",
+    );
 
     // Insert ValueSet
     let newValueSetId = "";
@@ -240,7 +238,7 @@ class UserCreatedValuesetService {
       let conceptId = code.internalId;
       if (code.internalId == undefined) {
         const systemPrefix = vs.system
-          ? UserCreatedValuesetService.getSystemPrefix(vs.system)
+          ? CustomCodeService.getSystemPrefix(vs.system)
           : "";
         conceptId = `custom_${systemPrefix}_${code.code}`;
       }
@@ -332,15 +330,10 @@ class UserCreatedValuesetService {
   }
 }
 
-export const getCustomCodeCondition =
-  UserCreatedValuesetService.addCustomCodeCondition;
-export const insertCustomValueSet =
-  UserCreatedValuesetService.insertCustomValueSet;
-export const deleteCustomValueSet =
-  UserCreatedValuesetService.deleteCustomValueSet;
+export const getCustomCodeCondition = CustomCodeService.addCustomCodeCondition;
+export const insertCustomValueSet = CustomCodeService.insertCustomValueSet;
+export const deleteCustomValueSet = CustomCodeService.deleteCustomValueSet;
 export const insertCustomValuesetsIntoQuery =
-  UserCreatedValuesetService.insertCustomValuesetsIntoQuery;
-export const deleteCustomConcept =
-  UserCreatedValuesetService.deleteCustomConcept;
-export const getCustomValueSetById =
-  UserCreatedValuesetService.getCustomValueSetById;
+  CustomCodeService.insertCustomValuesetsIntoQuery;
+export const deleteCustomConcept = CustomCodeService.deleteCustomConcept;
+export const getCustomValueSetById = CustomCodeService.getCustomValueSetById;

@@ -3,7 +3,7 @@
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useContext } from "react";
-import { DataContext } from "@/app/shared/DataProvider";
+import { DataContext } from "@/app/utils/DataProvider";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import {
   saveCustomQuery,
