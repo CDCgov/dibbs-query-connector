@@ -11,6 +11,7 @@ type Props = {
  * Component for uploading and parsing a CSV file.
  * @param root0 - props
  * @param root0.onParsed - callback function invoked with parsed CSV rows
+ * @return A button to upload a CSV file and display the filename or error message
  */
 export default function UploadCsv({ onParsed }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);

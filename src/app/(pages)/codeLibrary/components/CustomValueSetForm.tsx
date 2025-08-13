@@ -389,11 +389,9 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
     csvInputRef.current?.click();
   }
 
-  type ImportGroupKey = string; // `${vsName}||${category}||${systemLabel}`
+  // ===== STRICT CSV IMPORT (no any) =====
 
-  function normalizeHeaderKey(s: string) {
-    return (s || "").trim().toLowerCase();
-  }
+  type ImportGroupKey = string; // `${vsName}||${category}||${systemLabel}`
 
   function toTypeStrict(label: string): DibbsConceptType | undefined {
     const t = (label || "").trim().toLowerCase();
@@ -421,88 +419,96 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
     return fromOptions || label;
   }
 
-  function validateCsvHeaders(rows: csvRow[]): {
-    ok: boolean;
-    error?: string;
-    keys?: {
-      vsNameKey: string;
-      catKey: string;
-      sysKey: string;
-      codeKey: string;
-      dispKey: string;
-    };
-  } {
+  // exact, strongly-typed CSV row after normalization
+  type NormalizedRow = {
+    "value set name": string;
+    category: string;
+    "code system": string;
+    code: string;
+    display: string;
+  };
+
+  const normalizedConstant = (s: string) => s.trim().toLowerCase();
+  const normStr = (s: string | undefined) => (s ?? "").trim();
+
+  function normalizeCsvRows(
+    rows: csvRow[],
+  ): { ok: true; rows: NormalizedRow[] } | { ok: false; error: string } {
     if (!rows || rows.length === 0)
       return { ok: false, error: "CSV contained no rows" };
-    const first = rows[0] as Record<string, string>;
+
+    const first = rows[0];
     const keys = Object.keys(first);
 
-    const vsNameKey = keys.find(
-      (k) => normalizeHeaderKey(k) === "value set name",
-    );
-    const catKey = keys.find((k) => normalizeHeaderKey(k) === "category");
-    const sysKey = keys.find((k) => normalizeHeaderKey(k) === "code system");
-    const codeKey = keys.find((k) => normalizeHeaderKey(k) === "code");
-    const dispKey = keys.find((k) => normalizeHeaderKey(k) === "display");
+    const map: Record<keyof NormalizedRow, string> = {
+      "value set name": "",
+      category: "",
+      "code system": "",
+      code: "",
+      display: "",
+    };
 
-    if (!vsNameKey || !catKey || !sysKey || !codeKey || !dispKey) {
+    for (const k of keys) {
+      const kn = normalizedConstant(k);
+      if (kn === "value set name") map["value set name"] = k;
+      else if (kn === "category") map["category"] = k;
+      else if (kn === "code system") map["code system"] = k;
+      else if (kn === "code") map["code"] = k;
+      else if (kn === "display") map["display"] = k;
+    }
+
+    if (
+      !map["value set name"] ||
+      !map["category"] ||
+      !map["code system"] ||
+      !map["code"] ||
+      !map["display"]
+    ) {
       return {
         ok: false,
         error:
           "CSV headers must include: value set name, category, code system, code, display",
       };
     }
-    return { ok: true, keys: { vsNameKey, catKey, sysKey, codeKey, dispKey } };
+
+    const out: NormalizedRow[] = rows.map((r) => ({
+      "value set name": normStr(r[map["value set name"]]),
+      category: normStr(r[map["category"]]),
+      "code system": normStr(r[map["code system"]]),
+      code: normStr(r[map["code"]]),
+      display: normStr(r[map["display"]]),
+    }));
+
+    return { ok: true, rows: out };
   }
 
-  function groupRowsIntoValueSets(
-    rows: csvRow[],
-    keys: {
-      vsNameKey: string;
-      catKey: string;
-      sysKey: string;
-      codeKey: string;
-      dispKey: string;
-    },
-  ) {
+  function groupNormalizedRows(rows: NormalizedRow[]) {
     const groups = new Map<
       ImportGroupKey,
-      { vsName: string; cat: string; sysLabel: string; concepts: Concept[] }
+      { vsName: string; cat: string; sys: string; concepts: Concept[] }
     >();
-    const norm = (s: string) => (s || "").trim();
 
     for (const r of rows) {
-      const vsName = norm((r as any)[keys.vsNameKey] as string);
-      const cat = norm((r as any)[keys.catKey] as string);
-      const sys = norm((r as any)[keys.sysKey] as string);
-      const code = norm((r as any)[keys.codeKey] as string);
-      const display = norm((r as any)[keys.dispKey] as string);
+      const vsName = r["value set name"];
+      const cat = r["category"];
+      const sys = r["code system"];
+      const code = r["code"];
+      const display = r["display"];
 
-      if (!vsName || !cat || !sys) {
-        // skip incomplete value set identifiers; could collect errors if you want
-        continue;
-      }
-      if (!code && !display) {
-        // skip empty concept rows
-        continue;
-      }
+      if (!vsName || !cat || !sys) continue;
+      if (!code && !display) continue;
 
-      const k: ImportGroupKey = `${vsName}||${cat}||${sys}`;
-      const entry = groups.get(k) ?? {
-        vsName,
-        cat,
-        sysLabel: sys,
-        concepts: [],
-      };
-      entry.concepts.push({ code, display, include: false });
-      groups.set(k, entry);
+      const key: ImportGroupKey = `${vsName}||${cat}||${sys}`;
+      const entry = groups.get(key) ?? { vsName, cat, sys, concepts: [] };
+      entry.concepts.push({ code, display, include: true });
+      groups.set(key, entry);
     }
 
     // Build DibbsValueSet objects; drop groups that can't be typed/system-mapped
     const valueSets: DibbsValueSet[] = [];
     for (const g of groups.values()) {
       const t = toTypeStrict(g.cat);
-      const sysUri = toSystemUri(g.sysLabel);
+      const sysUri = toSystemUri(g.sys);
       if (!t || !sysUri || g.concepts.length === 0) {
         continue;
       }
@@ -518,15 +524,15 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
   }
 
   async function importCsvValueSets(rows: csvRow[]) {
-    // 1) Validate headers
-    const v = validateCsvHeaders(rows);
-    if (!v.ok || !v.keys) {
-      setCsvError(v.error || "Invalid CSV");
+    // 1) Normalize headers/rows into a strict shape
+    const normalized = normalizeCsvRows(rows);
+    if (!normalized.ok) {
+      setCsvError(normalized.error);
       return;
     }
 
-    // 2) Group & build value sets
-    const valueSets = groupRowsIntoValueSets(rows, v.keys);
+    // 2) Group & build value sets (strictly typed)
+    const valueSets = groupNormalizedRows(normalized.rows);
     if (valueSets.length === 0) {
       setCsvError("No valid value sets found in CSV");
       return;
@@ -561,11 +567,12 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
           id: res.id,
           error: res.success ? undefined : "Failed to save",
         });
-      } catch (e: any) {
+      } catch (e: unknown) {
+        const message = e instanceof Error ? e.message : String(e);
         results.push({
           name: vs.valueSetName,
           ok: false,
-          error: e?.message || "Failed to save",
+          error: message,
         });
       }
     }
