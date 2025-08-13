@@ -30,7 +30,6 @@ import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import { groupConditionConceptsIntoValueSets } from "@/app/shared/utils";
 import { csvRow } from "@/app/api/csv/route";
 
-
 type CustomValueSetFormProps = {
   mode: CustomCodeMode;
   setMode: (mode: CustomCodeMode) => void;
