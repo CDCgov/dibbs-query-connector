@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`Create custom valueSet form renders an empty form to add a new value set 1`] = `
 <body>
@@ -46,6 +46,34 @@ exports[`Create custom valueSet form renders an empty form to add a new value se
             >
               Save value set
             </button>
+          </div>
+          <div
+            class="padding-top-2 flex flex-column"
+          >
+            <input
+              accept=".csv,text/csv"
+              style="display: none;"
+              type="file"
+            />
+            <button
+              class="usa-button usa-button--secondary"
+              data-testid="button"
+              type="button"
+            >
+              Upload CSV
+            </button>
+            <div
+              class="padding-top-1"
+            >
+              <button
+                aria-label="Download sample CSV"
+                class="usa-button usa-button--unstyled"
+                data-testid="button"
+                type="button"
+              >
+                Download sample CSV
+              </button>
+            </div>
           </div>
           <div
             class="formSection vsDescription"
@@ -304,6 +332,34 @@ exports[`Create custom valueSet form switches to edit mode after saving a new va
             </button>
           </div>
           <div
+            class="padding-top-2 flex flex-column"
+          >
+            <input
+              accept=".csv,text/csv"
+              style="display: none;"
+              type="file"
+            />
+            <button
+              class="usa-button usa-button--secondary"
+              data-testid="button"
+              type="button"
+            >
+              Upload CSV
+            </button>
+            <div
+              class="padding-top-1"
+            >
+              <button
+                aria-label="Download sample CSV"
+                class="usa-button usa-button--unstyled"
+                data-testid="button"
+                type="button"
+              >
+                Download sample CSV
+              </button>
+            </div>
+          </div>
+          <div
             class="formSection vsDescription"
           >
             <div
@@ -558,6 +614,34 @@ exports[`Edit custom valueSet form renders a form to edit an existing value set 
             >
               Save changes
             </button>
+          </div>
+          <div
+            class="padding-top-2 flex flex-column"
+          >
+            <input
+              accept=".csv,text/csv"
+              style="display: none;"
+              type="file"
+            />
+            <button
+              class="usa-button usa-button--secondary"
+              data-testid="button"
+              type="button"
+            >
+              Upload CSV
+            </button>
+            <div
+              class="padding-top-1"
+            >
+              <button
+                aria-label="Download sample CSV"
+                class="usa-button usa-button--unstyled"
+                data-testid="button"
+                type="button"
+              >
+                Download sample CSV
+              </button>
+            </div>
           </div>
           <div
             class="formSection vsDescription"

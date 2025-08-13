@@ -25,8 +25,9 @@ function parseCsvStream(nodeStream: Readable): Promise<csvRow[]> {
 }
 
 /**
- *
- * @param req
+ * Handles CSV file upload and parsing.
+ * @param req - The NextRequest object containing the uploaded CSV file in form data.
+ * @returns - A JSON response containing the parsed rows or an error message.
  */
 export async function POST(req: NextRequest) {
   const form = await req.formData();

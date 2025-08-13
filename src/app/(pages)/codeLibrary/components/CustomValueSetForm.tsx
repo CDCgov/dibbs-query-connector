@@ -452,15 +452,17 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
             >
               Upload CSV
             </Button>
-            <div>
-              <span className={styles.csvSampleLink}>
-                <a
-                  href="/CustomValueSetSample.csv"
-                  download="CustomValueSetSample.csv"
-                >
-                  Download sample CSV
-                </a>
-              </span>
+            <div className="padding-top-1">
+              <Button
+                type="button"
+                unstyled
+                aria-label="Download sample CSV"
+                onClick={() => {
+                  window.open("/CustomValueSetSample.csv", "_blank");
+                }}
+              >
+                Download sample CSV
+              </Button>
             </div>
           </div>
           {csvError && (
