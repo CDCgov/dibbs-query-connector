@@ -428,7 +428,7 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
               {mode == "create" ? "Save value set" : "Save changes"}
             </Button>
           </div>
-          <div className="padding-top-2">
+          <div className="padding-top-2 flex flex-column">
             <input
               ref={csvInputRef}
               type="file"
@@ -452,6 +452,16 @@ const CustomValueSetForm: React.FC<CustomValueSetFormProps> = ({
             >
               Upload CSV
             </Button>
+            <div>
+              <span className={styles.csvSampleLink}>
+                <a
+                  href="/CustomValueSetSample.csv"
+                  download="CustomValueSetSample.csv"
+                >
+                  Download sample CSV
+                </a>
+              </span>
+            </div>
           </div>
           {csvError && (
             <div className={styles.errorMessage} role="alert">
