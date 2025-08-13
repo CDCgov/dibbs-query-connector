@@ -1,5 +1,5 @@
 import { FhirResource } from "fhir/r4";
-import { DibbsConceptType } from "../models/entities/valuesets";
+import { DibbsConceptType } from "./models/entities/valuesets";
 
 export const USE_CASE_DETAILS = {
   "newborn-screening": {

@@ -1,4 +1,4 @@
-import { PatientRecordsResponse } from "../../../backend/query-execution";
+import { PatientRecordsResponse } from "../../../backend/query-execution/service";
 import ResultsViewSideNav, {
   NavSection,
 } from "./resultsView/ResultsViewSideNav";
