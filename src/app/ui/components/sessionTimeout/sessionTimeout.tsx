@@ -5,7 +5,7 @@ import { useIdleTimer } from "react-idle-timer";
 import type { ModalProps, ModalRef } from "../../designSystem/modal/Modal";
 import { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
-import { PAGES } from "@/app/shared/page-routes";
+import { PAGES } from "@/app/utils/page-routes";
 import { signOut } from "@/app/backend/session-management";
 
 const Modal = dynamic<ModalProps>(

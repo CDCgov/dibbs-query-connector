@@ -1,10 +1,10 @@
 "use server";
 import { FhirServerConfig } from "@/app/models/entities/fhir-servers";
 import { auditable } from "@/app/backend/audit-logs/decorator";
-import FHIRClient from "@/app/shared/fhirClient";
-import dbService from "./db/service";
-import { transaction } from "./db/decorators";
-import { FHIR_SERVER_INSERT_QUERY } from "./db/util";
+import FHIRClient from "@/app/backend/fhir-servers/fhir-client";
+import dbService from "../db/service";
+import { transaction } from "../db/decorators";
+import { FHIR_SERVER_INSERT_QUERY } from "../db/util";
 
 // Define an interface for authentication data
 export interface AuthData {

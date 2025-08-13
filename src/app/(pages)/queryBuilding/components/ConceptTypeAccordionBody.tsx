@@ -34,7 +34,7 @@ import classNames from "classnames";
 import DateRangePicker, {
   DateRangePickerRef,
 } from "@/app/ui/designSystem/timeboxing/DateRangePicker";
-import { DataContext } from "@/app/shared/DataProvider";
+import { DataContext } from "@/app/utils/DataProvider";
 import {
   deleteTimeboxSettings,
   getTimeboxRanges,

@@ -4,7 +4,7 @@ import { DiagnosticReport } from "fhir/r4";
 import {
   formatCodeableConcept,
   formatDate,
-} from "../../../../../shared/format-service";
+} from "../../../../../utils/format-service";
 
 /**
  * The props for the DiagnosticReportTable component.

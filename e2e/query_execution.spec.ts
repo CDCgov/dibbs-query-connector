@@ -14,7 +14,7 @@ import {
   showSiteAlert,
 } from "./constants";
 import { checkForSiteAlert, runAxeAccessibilityChecks } from "./utils";
-import { INSUFFICIENT_PATIENT_IDENTIFIERS } from "../src/app/shared/constants";
+import { INSUFFICIENT_PATIENT_IDENTIFIERS } from "../src/app/constants";
 
 test.describe("querying with the Query Connector", () => {
   test.beforeEach(async ({ page }) => {

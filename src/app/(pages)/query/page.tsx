@@ -5,19 +5,19 @@ import ResultsView from "./components/ResultsView";
 import PatientSearchResults from "./components/PatientSearchResults";
 import SearchForm from "./components/searchForm/SearchForm";
 import SelectQuery from "./components/SelectQuery";
-import { Mode } from "@/app/shared/constants";
+import { Mode } from "@/app/constants";
 import StepIndicator, {
   CUSTOMIZE_QUERY_STEPS,
 } from "./components/stepIndicator/StepIndicator";
-import { DataContext } from "@/app/shared/DataProvider";
+import { DataContext } from "@/app/utils/DataProvider";
 import { Patient } from "fhir/r4";
 import { CustomUserQuery } from "@/app/models/entities/query";
 import WithAuth from "@/app/ui/components/withAuth/WithAuth";
 import {
   PatientDiscoveryResponse,
   PatientRecordsResponse,
-} from "@/app/backend/query-execution";
-import { getFhirServerNames } from "@/app/backend/fhir-servers";
+} from "@/app/backend/query-execution/service";
+import { getFhirServerNames } from "@/app/backend/fhir-servers/service";
 
 const blankUserQuery = {
   queryId: "",

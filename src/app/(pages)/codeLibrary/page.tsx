@@ -9,16 +9,15 @@ import {
   Select,
 } from "@trussworks/react-uswds";
 import styles from "./codeLibrary.module.scss";
-import { DataContext } from "@/app/shared/DataProvider";
+import { DataContext } from "@/app/utils/DataProvider";
 import WithAuth from "@/app/ui/components/withAuth/WithAuth";
 import Backlink from "@/app/ui/designSystem/backLink/Backlink";
 import SearchField from "@/app/ui/designSystem/searchField/SearchField";
 import Table from "@/app/ui/designSystem/table/Table";
-import { groupConditionConceptsIntoValueSets } from "@/app/shared/utils";
 import {
   getAllValueSets,
   getConditionsData,
-} from "@/app/shared/database-service";
+} from "@/app/backend/seeding/service";
 import { DibbsValueSet } from "@/app/models/entities/valuesets";
 import { CustomCodeMode, emptyFilterSearch, emptyValueSet } from "./utils";
 import {
@@ -31,23 +30,24 @@ import Skeleton from "react-loading-skeleton";
 import {
   formatCodeSystemPrefix,
   formatStringToSentenceCase,
-} from "@/app/shared/format-service";
+} from "@/app/utils/format-service";
 import DropdownFilter, { FilterCategories } from "./components/DropdownFilter";
 import CustomValueSetForm from "./components/CustomValueSetForm";
 import { User } from "@/app/models/entities/users";
 import { useSession } from "next-auth/react";
 import { getUserByUsername } from "@/app/backend/user-management";
-import { deleteCustomValueSet } from "@/app/shared/custom-code-service";
+import { deleteCustomValueSet } from "@/app/backend/custom-code-service";
 import dynamic from "next/dynamic";
 import type { ModalProps, ModalRef } from "../../ui/designSystem/modal/Modal";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import { getSavedQueryById } from "@/app/backend/query-building/service";
-import { insertCustomValuesetsIntoQuery } from "@/app/shared/custom-code-service";
+import { insertCustomValuesetsIntoQuery } from "@/app/backend/custom-code-service";
 import { QueryTableResult } from "../queryBuilding/utils";
 import Checkbox from "@/app/ui/designSystem/checkbox/Checkbox";
 import { useSaveQueryAndRedirect } from "@/app/backend/query-building/useSaveQueryAndRedirect";
 import { EMPTY_CONCEPT_TYPE } from "../queryBuilding/utils";
 import { NestedQuery } from "../queryBuilding/utils";
+import { groupConditionConceptsIntoValueSets } from "@/app/utils/valueSetTranslation";
 
 /**
  * Component for Query Building Flow
@@ -235,6 +235,7 @@ const CodeLibrary: React.FC = () => {
   async function fetchValueSetsAndConditions() {
     try {
       const { conditionIdToNameMap } = await getConditionsData();
+
       const vs = await getAllValueSets();
       const formattedVs =
         vs.items && groupConditionConceptsIntoValueSets(vs.items);

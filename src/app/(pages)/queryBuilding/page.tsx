@@ -1,10 +1,10 @@
 "use client";
 
 import QuerySelection from "./querySelection/QuerySelection";
-import { BuildStep } from "../../shared/constants";
+import { BuildStep } from "../../constants";
 import { useState, useContext, useEffect } from "react";
 import BuildFromTemplates from "./buildFromTemplates/BuildFromTemplates";
-import { DataContext } from "@/app/shared/DataProvider";
+import { DataContext } from "@/app/utils/DataProvider";
 import WithAuth from "@/app/ui/components/withAuth/WithAuth";
 
 /**

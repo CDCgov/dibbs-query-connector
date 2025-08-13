@@ -1,7 +1,7 @@
 import { DibbsValueSet } from "@/app/models/entities/valuesets";
 import { ConceptTypeToDibbsVsMap } from "../../utils/valueSetTranslation";
 import { DibbsConceptType } from "@/app/models/entities/valuesets";
-import { CUSTOM_CONDITION_ID } from "@/app/shared/constants";
+import { CUSTOM_CONDITION_ID } from "@/app/constants";
 
 // The structure of the data that's coming from the backend
 export type ConditionsMap = {

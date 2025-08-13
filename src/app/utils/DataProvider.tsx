@@ -2,7 +2,7 @@
 
 import { createContext, ReactNode, useState } from "react";
 import { SessionProvider } from "next-auth/react";
-import { PageType } from "./constants";
+import { PageType } from "../constants";
 import { ToastConfigOptions } from "../ui/designSystem/toast/Toast";
 import { Session } from "next-auth";
 import { SelectedQueryDetails } from "@/app/(pages)/queryBuilding/querySelection/utils";

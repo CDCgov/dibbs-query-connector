@@ -3,7 +3,7 @@ import {
   handleAndReturnError,
   handleRequestError,
 } from "./error-handling-service";
-import { fullPatientQuery } from "../../backend/query-execution";
+import { fullPatientQuery } from "../../backend/query-execution/service";
 import {
   RESPONSE_BODY_IS_NOT_PATIENT_RESOURCE,
   MISSING_PATIENT_IDENTIFIERS,
@@ -12,7 +12,7 @@ import {
   INVALID_QUERY,
   INVALID_MESSAGE_FORMAT,
   INSUFFICIENT_PATIENT_IDENTIFIERS,
-} from "@/app/shared/constants";
+} from "@/app/constants";
 import {
   mapDeprecatedUseCaseToId,
   parseHL7FromRequestBody,
@@ -26,7 +26,7 @@ import {
   QueryResponse,
   validatedPatientSearch,
 } from "@/app/models/entities/query";
-import { getFhirServerNames } from "@/app/backend/fhir-servers";
+import { getFhirServerNames } from "@/app/backend/fhir-servers/service";
 import { getSavedQueryById } from "@/app/backend/query-building/service";
 import { validateServiceToken } from "../api-auth";
 

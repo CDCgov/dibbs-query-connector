@@ -24,10 +24,10 @@ import {
   generateValueSetGroupingsByDibbsConceptType,
   ConceptTypeToDibbsVsMap,
 } from "@/app/utils/valueSetTranslation";
-import { CUSTOM_VALUESET_ARRAY_ID } from "@/app/shared/constants";
+import { CUSTOM_VALUESET_ARRAY_ID } from "@/app/constants";
 import { useSaveQueryAndRedirect } from "../../../backend/query-building/useSaveQueryAndRedirect";
 import { useContext } from "react";
-import { DataContext } from "@/app/shared/DataProvider";
+import { DataContext } from "@/app/utils/DataProvider";
 import { CustomConditionView } from "./valueSetSelectionViews/CustomConditionView";
 import { MedicalRecordsView } from "./valueSetSelectionViews/MedicalRecordsView";
 import { Sidebar } from "./valueSetSelectionViews/Sidebar";

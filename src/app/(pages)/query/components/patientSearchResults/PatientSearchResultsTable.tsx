@@ -5,7 +5,7 @@ import {
   formatContact,
   formatMRN,
   formatName,
-} from "@/app/shared/format-service";
+} from "@/app/utils/format-service";
 import classNames from "classnames";
 import Skeleton from "react-loading-skeleton";
 import { Button } from "@trussworks/react-uswds";

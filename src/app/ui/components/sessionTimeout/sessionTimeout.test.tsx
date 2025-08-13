@@ -5,7 +5,7 @@ import * as nextAuthReact from "next-auth/react";
 import SessionTimeout from "./sessionTimeout";
 import { UserRole } from "@/app/models/entities/users";
 import { Session } from "next-auth";
-import { PAGES } from "@/app/shared/page-routes";
+import { PAGES } from "@/app/utils/page-routes";
 import { signOut } from "@/app/backend/session-management";
 
 jest.mock("next-auth/react");

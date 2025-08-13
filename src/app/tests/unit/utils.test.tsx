@@ -1,10 +1,9 @@
-import { groupConditionConceptsIntoValueSets } from "../../shared/utils";
-
 import { filterSearchByCategoryAndCondition } from "@/app/(pages)/queryBuilding/utils";
 import {
   CANCER_DB_QUERY_VALUES,
   CATEGORY_TO_CONDITION_ARRAY_MAP,
 } from "./fixtures";
+import { groupConditionConceptsIntoValueSets } from "@/app/utils/valueSetTranslation";
 
 describe("data util methods for query building", () => {
   describe("filterSearchByCategoryAndCondition", () => {

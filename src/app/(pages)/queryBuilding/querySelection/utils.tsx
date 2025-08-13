@@ -2,7 +2,7 @@ import { ModalRef } from "@/app/ui/designSystem/modal/Modal";
 import { DeleteModal } from "@/app/ui/designSystem/modal/deleteModal";
 import { JSX, RefObject } from "react";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
-import { DataContextValue } from "@/app/shared/DataProvider";
+import { DataContextValue } from "@/app/utils/DataProvider";
 import { deleteQueryById } from "@/app/backend/query-building/service";
 import { CustomUserQuery } from "@/app/models/entities/query";
 

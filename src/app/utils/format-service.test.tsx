@@ -8,10 +8,9 @@ import {
   formatIdentifier,
   formatName,
   formatMRN,
-  formatString,
   FormatPhoneAsDigits,
   GetPhoneQueryFormats,
-} from "@/app/shared/format-service";
+} from "@/app/utils/format-service";
 import {
   Address,
   HumanName,
@@ -259,29 +258,6 @@ describe("formatIdentifier", () => {
     const identifiers: Identifier[] = [];
     const { container } = render(formatIdentifier(identifiers));
     expect(container).toBeEmptyDOMElement();
-  });
-});
-
-describe("formatString", () => {
-  it("should convert all character to lower case", () => {
-    const inputString = "TestOfSomeCAPITALS";
-    const expectedString = "testofsomecapitals";
-    const result = formatString(inputString);
-    expect(result).toEqual(expectedString);
-  });
-
-  it("should also replace all spaces with underscores", () => {
-    const inputString = "JoHn ShEpArD";
-    const expectedString = "john-shepard";
-    const result = formatString(inputString);
-    expect(result).toEqual(expectedString);
-  });
-
-  it("should remove all non alpha-numeric characters", () => {
-    const inputString = "*C0MPL3X_$TR!NG*";
-    const expectedString = "c0mpl3xtrng";
-    const result = formatString(inputString);
-    expect(result).toEqual(expectedString);
   });
 });
 

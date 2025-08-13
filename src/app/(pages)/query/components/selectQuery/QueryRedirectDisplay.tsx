@@ -1,6 +1,6 @@
 import { getAllAdmins } from "@/app/backend/user-management";
 import { UserRole } from "@/app/models/entities/users";
-import { PAGES } from "@/app/shared/page-routes";
+import { PAGES } from "@/app/utils/page-routes";
 import { Icon } from "@trussworks/react-uswds";
 import { useState, useEffect } from "react";
 

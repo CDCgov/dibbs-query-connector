@@ -6,12 +6,12 @@ import {
   PatientDiscoveryResponse,
   patientRecordsQuery,
   PatientRecordsResponse,
-} from "@/app/backend/query-execution";
+} from "@/app/backend/query-execution/service";
 import { CustomUserQuery } from "@/app/models/entities/query";
 import { Patient } from "fhir/r4";
 
 import LoadingView from "../../../ui/designSystem/LoadingView";
-import { hyperUnluckyPatient } from "../../../shared/constants";
+import { hyperUnluckyPatient } from "../../../constants";
 
 interface SelectQueryProps {
   goForward: () => void;

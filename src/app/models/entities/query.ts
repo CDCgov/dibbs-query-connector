@@ -2,7 +2,7 @@ import { Bundle, FhirResource } from "fhir/r4";
 import { UserGroupMembership } from "./users";
 import { DibbsValueSet } from "./valuesets";
 import { MedicalRecordSections } from "@/app/(pages)/queryBuilding/utils";
-import { PatientMatchData } from "@/app/backend/fhir-servers";
+import { PatientMatchData } from "@/app/backend/fhir-servers/service";
 
 export interface CustomUserQuery {
   queryId: string;

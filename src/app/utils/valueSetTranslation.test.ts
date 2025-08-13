@@ -1,8 +1,8 @@
 import { DibbsValueSet } from "../models/entities/valuesets";
 import { CANCER_DB_QUERY_VALUES } from "../tests/unit/fixtures";
-import { groupConditionConceptsIntoValueSets } from "../shared/utils";
 import {
   generateValueSetGroupingsByDibbsConceptType,
+  groupConditionConceptsIntoValueSets,
   groupValueSetsByConceptType,
   groupValueSetsByVsId,
 } from "./valueSetTranslation";

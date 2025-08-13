@@ -4,7 +4,7 @@ import {
   QueryTableResult,
   QueryTableTimebox,
   TimeWindow,
-} from "../(pages)/queryBuilding/utils";
+} from "../../(pages)/queryBuilding/utils";
 
 function formatTimeFilter(timeWindow: TimeWindow | undefined) {
   if (!timeWindow) return undefined;

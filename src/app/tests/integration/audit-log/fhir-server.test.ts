@@ -12,7 +12,7 @@ import {
   insertFhirServer,
   updateFhirServer,
   deleteFhirServer,
-} from "@/app/backend/fhir-servers";
+} from "@/app/backend/fhir-servers/service";
 
 jest.mock("@/app/backend/audit-logs/lib", () => {
   return {
