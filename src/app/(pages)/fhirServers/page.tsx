@@ -26,7 +26,7 @@ import { FhirServerConfig } from "@/app/models/entities/fhir-servers";
 import {
   testFhirServerConnection,
   checkFhirServerSupportsMatch,
-} from "@/app/shared/testConnection";
+} from "@/app/backend/fhir-servers/test-utils";
 import {
   getFhirServerConfigs,
   AuthData,
@@ -35,7 +35,7 @@ import {
   updateFhirServer,
   deleteFhirServer,
   updateFhirServerConnectionStatus,
-} from "@/app/backend/fhir-servers";
+} from "@/app/backend/fhir-servers/service";
 
 const Modal = dynamic<ModalProps>(
   () => import("../../ui/designSystem/modal/Modal").then((mod) => mod.Modal),

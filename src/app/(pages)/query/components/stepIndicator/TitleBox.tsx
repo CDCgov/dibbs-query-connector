@@ -1,4 +1,4 @@
-import { Mode } from "@/app/shared/constants";
+import { Mode } from "@/app/constants";
 import { PAGE_TITLES } from "./StepIndicator";
 
 type TitleBoxProps = {

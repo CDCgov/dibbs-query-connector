@@ -1,9 +1,9 @@
 import { auth } from "@/auth";
-import { hyperUnluckyPatient, USE_CASE_DETAILS } from "@/app/shared/constants";
+import { hyperUnluckyPatient, USE_CASE_DETAILS } from "@/app/constants";
 import {
   patientDiscoveryQuery,
   patientRecordsQuery,
-} from "@/app/backend/query-execution";
+} from "@/app/backend/query-execution/service";
 import { suppressConsoleLogs } from "../fixtures";
 import { DEFAULT_CHLAMYDIA_QUERY } from "../../unit/fixtures";
 import {
@@ -86,7 +86,7 @@ describe("patient queries", () => {
 
     expect(JSON.parse(auditEntry?.fhirServer)).toBe(request.fhirServer);
     expect(JSON.parse(auditEntry?.patientId)).toBe(request.patientId);
-    expect(JSON.parse(auditEntry?.queryData)).toStrictEqual(
+    expect(JSON.parse(auditEntry?.savedQuery).queryData).toStrictEqual(
       DEFAULT_CHLAMYDIA_QUERY.queryData,
     );
   });
