@@ -737,17 +737,7 @@ const CodeLibrary: React.FC = () => {
       return;
     }
 
-    // 3) Confirm
-    const totalConcepts = valueSets.reduce(
-      (acc, vs) => acc + (vs.concepts?.length || 0),
-      0,
-    );
-    const proceed = window.confirm(
-      `Import ${valueSets.length} value set(s), ${totalConcepts} concept(s) total?`,
-    );
-    if (!proceed) return;
-
-    // 4) Save each valueset via existing insertCustomValueSet
+    // 3) Save each valueset via existing insertCustomValueSet
     const results: {
       name: string;
       ok: boolean;
@@ -781,7 +771,7 @@ const CodeLibrary: React.FC = () => {
 
     if (okCount > 0) {
       showToastConfirmation({
-        body: `Imported ${okCount}/${results.length} value set(s) successfully.`,
+        body: `Imported ${okCount} of ${results.length} value set(s) successfully.`,
       });
 
       await fetchValueSetsAndConditions();
@@ -801,14 +791,13 @@ const CodeLibrary: React.FC = () => {
         body: `Failed to import ${failCount} value set(s).`,
         variant: "error",
       });
-      // Optionally: log details
       console.warn(
         "Import failures:",
         results.filter((r) => !r.ok),
       );
     }
 
-    // 5) After import, go back to manage view (single-form UI isn't built for multi-preview)
+    // 4) After import, go back to manage view (single-form UI isn't built for multi-preview)
     const me =
       currentUser?.firstName && currentUser?.lastName
         ? `${currentUser.firstName} ${currentUser.lastName}`
