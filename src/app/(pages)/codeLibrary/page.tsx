@@ -783,7 +783,19 @@ const CodeLibrary: React.FC = () => {
       showToastConfirmation({
         body: `Imported ${okCount}/${results.length} value set(s) successfully.`,
       });
+
+      await fetchValueSetsAndConditions();
+      const me =
+        currentUser?.firstName && currentUser?.lastName
+          ? `${currentUser.firstName} ${currentUser.lastName}`
+          : `${currentUser?.username ?? ""}`;
+
+      setFilterSearch({
+        ...emptyFilterSearch,
+        creators: me ? { [me]: [me] } : {},
+      });
     }
+
     if (failCount > 0) {
       showToastConfirmation({
         body: `Failed to import ${failCount} value set(s).`,
@@ -797,6 +809,15 @@ const CodeLibrary: React.FC = () => {
     }
 
     // 5) After import, go back to manage view (single-form UI isn't built for multi-preview)
+    const me =
+      currentUser?.firstName && currentUser?.lastName
+        ? `${currentUser.firstName} ${currentUser.lastName}`
+        : `${currentUser?.username ?? ""}`;
+
+    setFilterSearch({
+      ...emptyFilterSearch,
+      creators: me ? { [me]: [me] } : {},
+    });
     setMode("manage");
   }
 
