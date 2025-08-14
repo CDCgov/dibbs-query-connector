@@ -935,6 +935,7 @@ const CodeLibrary: React.FC = () => {
                 <Button
                   type="button"
                   secondary
+                  className={styles.button}
                   onClick={(e) => {
                     e.preventDefault();
                     triggerCsvPicker();
@@ -942,11 +943,11 @@ const CodeLibrary: React.FC = () => {
                 >
                   Upload CSV
                 </Button>
-                <div className="padding-top-1">
+                <div className="padding-top-1 padding-right-1 display-flex flex-justify-end">
                   <Button
                     type="button"
                     unstyled
-                    aria-label="Download sample CSV"
+                    aria-label="Download sample CSV."
                     onClick={() => {
                       window.open("/CustomValueSetSample.csv", "_blank");
                     }}
