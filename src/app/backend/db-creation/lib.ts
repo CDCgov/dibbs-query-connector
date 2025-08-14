@@ -1,7 +1,7 @@
 // Lib file for any code that doesn't need to be async, which is a requirement
 // to export out the db-creation server component file
 import { Concept } from "@/app/models/entities/concepts";
-import { ErsdConceptType, ersdToDibbsConceptMap } from "../../shared/constants";
+import { ErsdConceptType, ersdToDibbsConceptMap } from "../../constants";
 import { ValueSet as FhirValueSet } from "fhir/r4";
 import { DibbsValueSet } from "@/app/models/entities/valuesets";
 /**

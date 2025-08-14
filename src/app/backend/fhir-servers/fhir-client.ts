@@ -1,9 +1,9 @@
 import https from "https";
-import { FhirServerConfig } from "../models/entities/fhir-servers";
-import { createSmartJwt } from "../backend/smart-on-fhir";
-import { fetchWithoutSSL } from "./utils";
-import dbService from "../backend/db/service";
-import { AuthData, updateFhirServer } from "../backend/fhir-servers";
+import { FhirServerConfig } from "../../models/entities/fhir-servers";
+import { createSmartJwt } from "../smart-on-fhir";
+import { fetchWithoutSSL } from "../../utils/utils";
+import dbService from "../db/service";
+import { AuthData, updateFhirServer } from "./service";
 /**
  * A client for querying a FHIR server.
  * @param server The FHIR server to query.
