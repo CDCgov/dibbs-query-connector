@@ -155,6 +155,7 @@ interface DateRangePickerProps {
 export type DateRangePickerRef = {
   getStartDate: () => Date | null;
   getEndDate: () => Date | null;
+  getIsRelativeRange: () => boolean | null;
 };
 
 /**
@@ -335,6 +336,7 @@ const DateRangePicker = forwardRef<DateRangePickerRef, DateRangePickerProps>(
     useImperativeHandle(ref, () => ({
       getStartDate: () => startDate,
       getEndDate: () => endDate,
+      getIsRelativeRange: () => selectedPreset !== CUSTOM_VALUE,
     }));
 
     const handleApply = () => {

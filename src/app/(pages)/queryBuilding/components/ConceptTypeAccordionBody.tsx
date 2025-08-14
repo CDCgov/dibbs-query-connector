@@ -287,6 +287,7 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
 
     const startDate = dateRef.current?.getStartDate();
     const endDate = dateRef.current?.getEndDate();
+    const isRelativeRange = dateRef.current?.getIsRelativeRange();
     if (queryId && startDate && endDate) {
       const startDateString = startDate.toISOString();
       const endDateString = endDate.toISOString();
@@ -296,6 +297,7 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
         conceptType,
         startDateString,
         endDateString,
+        isRelativeRange ?? true,
       );
     }
   };
