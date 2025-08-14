@@ -5,7 +5,6 @@ import { isFhirResource } from "../../constants";
 
 import { CustomQuery } from "./custom-query";
 import { GetPhoneQueryFormats } from "../../utils/format-service";
-import { getSavedQueryByName } from "../seeding/service";
 import { auditable } from "../audit-logs/decorator";
 import type { QueryTableResult } from "../../(pages)/queryBuilding/utils";
 import type {
@@ -15,6 +14,7 @@ import type {
   FullPatientRequest,
 } from "../../models/entities/query";
 import { prepareFhirClient } from "../fhir-servers/service";
+import { getSavedQueryByName } from "../query-building/service";
 
 class QueryService {
   /**
@@ -329,8 +329,8 @@ class QueryService {
 
     const noCertainMatch =
       jsonBody.resourceType === "OperationOutcome" &&
-      jsonBody.issue?.some((i) =>
-        i.details?.text?.includes("did not find a certain match"),
+      jsonBody.issue?.some(
+        (i) => i.details?.text?.includes("did not find a certain match"),
       );
 
     if (noCertainMatch) {
