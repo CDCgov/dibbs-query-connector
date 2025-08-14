@@ -1,0 +1,7 @@
+{
+  "queryId": "abc-123",
+  "fhirServer": "https://example-fhir-server.com",
+  "serviceToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "hl7Message": "MSH|^~\\&|HIS|RIH|EKG|EKG|200202150930||ADT^A01|MSG00001|P|2.4",
+  "endpoint": "custom/hl7"
+}

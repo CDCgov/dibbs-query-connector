@@ -5,6 +5,11 @@ locals {
   project           = "qc"
   environment       = "dev"
   storage_account   = "qcacastorageaccount"
+  auth_provider           = "microsoft-entra-id"                                    # TODO
+  auth_client_id          = "query-connector"                                       # TODO: "Client ID"
+  auth_issuer             = "https://login.microsoftonline.com/your-tenant-id/v2.0" # TODO: URL for the Auth issuer for Entra (https://login.microsoftonline.com/<your-tenant-id>/v2.0 or keycloak)
+  auth_url                = "http://localhost:3000"                                 # TODO: Change to URL for the Auth server
+  entra_tenant_id         = "value"   
 }
 
 
@@ -17,7 +22,10 @@ data "azurerm_storage_account" "qc_storage_account" {
   resource_group_name = local.qc_resource_group
 }
 
-
+data "azurerm_application_insights" "qc-function-insight" {
+  name                = "qc-linux-function-app-insights"
+  resource_group_name = data.azurerm_resource_group.qc_rg.name
+}
 
 locals {
   app_files = fileset("${path.module}/function", "**")
@@ -93,11 +101,11 @@ data "azurerm_storage_account_sas" "pkg" {
     read    = true
     write   = false
     delete  = false
-    list    = false
+    list    = true
     add     = false
     create  = false
-    update  = false
-    process = false
+    update  = true
+    process = true
     tag     = false
     filter  = false
   }
@@ -118,6 +126,7 @@ resource "azurerm_linux_function_app" "qc_linux_function_app" {
   storage_account_name        = data.azurerm_storage_account.qc_storage_account.name
   storage_account_access_key  = data.azurerm_storage_account.qc_storage_account.primary_access_key
   functions_extension_version = "~4"
+  
   https_only                  = true
   identity {
     type = "SystemAssigned"
@@ -129,10 +138,19 @@ resource "azurerm_linux_function_app" "qc_linux_function_app" {
   }
 
   app_settings = {
-    FUNCTIONS_EXTENSION_VERSION = "~4"
+    FUNCTIONS_EXTENSION_VERSION = ""
     FUNCTIONS_WORKER_RUNTIME    = "node"
     AzureWebJobsStorage         = data.azurerm_storage_account.qc_storage_account.primary_connection_string
+    APPLICATIONINSIGHTS_CONNECTION_STRING = data.azurerm_application_insights.qc-function-insight.connection_string
 
+    QUERY_CONNECTOR_ENDPOINT = "https://queryconnector.dev/api/query"   # <- set target endpoint
+    
+    AUTH_CLIENT_ID            = local.auth_client_id
+    AUTH_ISSUER               = local.auth_issuer
+    ENTRA_TENANT_ID           = local.entra_tenant_id
+    AUTH_DISABLED             = "true"
+    AUTH_URL                  = local.auth_url
+    NEXT_PUBLIC_AUTH_PROVIDER = local.auth_provider
     # Zip Deploy (Run From Package)
     # WEBSITE_RUN_FROM_PACKAGE = "https://${data.azurerm_storage_account.qc_storage_account.name}.blob.core.windows.net/${azurerm_storage_container.pkg.name}/${azurerm_storage_blob.pkgzip.name}${data.azurerm_storage_account_sas.pkg.sas}"
   }
@@ -146,6 +164,7 @@ resource "azurerm_linux_function_app" "qc_linux_function_app" {
 
 
 
+
 resource "azurerm_function_app_function" "qc_app_function" {
   name            = "${local.project}-${local.environment}-function-app"
   function_app_id = azurerm_linux_function_app.qc_linux_function_app.id
@@ -153,8 +172,8 @@ resource "azurerm_function_app_function" "qc_app_function" {
 
   config_json = jsonencode({
     bindings = [
-      { type = "blobTrigger", direction = "in", name = "BlobTriggerContext", connection = "AzureWebJobsStorage", path = "hl7-message/{name}" }, #The name should be the param the typescript code receives
-      { type = "http", direction = "out", name = "res" }
+      { type = "blobTrigger", direction = "in", name = "blobTrigger", connection = "AzureWebJobsStorage", path = "hl7-message/{name}" }, #The name should be the param the typescript code receives
+
     ]
   })
 }

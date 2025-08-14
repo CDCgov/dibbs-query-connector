@@ -8,6 +8,7 @@
     "skipLibCheck": true
   },
   "include": [
-    "function/**/*.ts"
+    "**/*.ts",
+    "../dist/**/*.d.ts"
   ]
 }
