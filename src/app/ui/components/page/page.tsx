@@ -3,7 +3,7 @@ import { useEffect, useContext } from "react";
 import { ToastContainer } from "react-toastify";
 import { usePathname } from "next/navigation";
 import { AppProgressBar as ProgressBar } from "next-nprogress-bar";
-import { DataContext } from "@/app/shared/DataProvider";
+import { DataContext } from "@/app/utils/DataProvider";
 import SiteAlert from "../../designSystem/SiteAlert";
 import { ToastConfigOptions } from "../../designSystem/toast/Toast";
 import "react-loading-skeleton/dist/skeleton.css";

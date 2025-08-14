@@ -3,13 +3,13 @@ import { Bundle, OperationOutcome, Parameters } from "fhir/r4";
 import {
   INTENTIONAL_EMPTY_STRING_FOR_CONCEPT_VERSION,
   INTENTIONAL_EMPTY_STRING_FOR_GEM_CODE,
-} from "./constants";
+} from "../../constants";
 import { encode } from "base-64";
 import {
   CategoryToConditionArrayMap,
   ConditionsMap,
   QueryTableResult,
-} from "../(pages)/queryBuilding/utils";
+} from "../../(pages)/queryBuilding/utils";
 import {
   CategoryStruct,
   ConceptStruct,
@@ -30,14 +30,14 @@ import {
   ValuesetStruct,
   ValuesetToConceptStruct,
 } from "./seedSqlStructs";
-import { internal_getDbClient } from "../backend/db/config";
-import type { DibbsValueSet } from "../models/entities/valuesets";
-import { Concept } from "../models/entities/concepts";
+import { internal_getDbClient } from "../db/config";
+import type { DibbsValueSet } from "../../models/entities/valuesets";
+import { Concept } from "../../models/entities/concepts";
 import { adminRequired, transaction } from "@/app/backend/db/decorators";
 import { auditable } from "@/app/backend/audit-logs/decorator";
-import dbService from "../backend/db/service";
-import { QCResponse } from "../models/responses/collections";
-import { linkTimeboxRangesToQuery } from "../backend/query-timeboxing";
+import dbService from "../db/service";
+import { QCResponse } from "../../models/responses/collections";
+import { linkTimeboxRangesToQuery } from "../query-timefiltering";
 
 type ErsdOrVsacResponse = Bundle | Parameters | OperationOutcome;
 

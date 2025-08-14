@@ -5,7 +5,6 @@ import {
   QueryUpdateResult,
 } from "@/app/(pages)/queryBuilding/utils";
 import { DibbsValueSet } from "@/app/models/entities/valuesets";
-import { DEFAULT_TIME_WINDOW } from "@/app/shared/utils";
 import { randomUUID } from "crypto";
 import { DbService } from "../db/service";
 import { Pool } from "pg";
@@ -49,6 +48,11 @@ export async function saveCustomQueryHelp(
     `;
   const { queryDataInsert, conditionInsert } =
     formatQueryDataForDatabase(queryInput);
+
+  const DEFAULT_TIME_WINDOW = {
+    timeWindowNumber: 1,
+    timeWindowUnit: "day",
+  };
 
   const NOW = new Date().toISOString();
   try {
