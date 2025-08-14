@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { DataContext, DataContextValue } from "../../shared/DataProvider";
+import { DataContext, DataContextValue } from "../../utils/DataProvider";
 import { render } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { SelectedQueryDetails } from "@/app/(pages)/queryBuilding/querySelection/utils";

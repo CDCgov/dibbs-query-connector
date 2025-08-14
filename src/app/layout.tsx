@@ -2,7 +2,7 @@ import "./ui/styles/styles.scss";
 import "react-toastify/dist/ReactToastify.css";
 import Header from "./ui/components/header/header";
 import Footer from "./ui/components/footer/footer";
-import DataProvider from "./shared/DataProvider";
+import DataProvider from "./utils/DataProvider";
 import { Metadata } from "next";
 import Page from "./ui/components/page/page";
 import { auth } from "@/auth";

@@ -6,7 +6,7 @@ import { getSavedQueryById } from "@/app/backend/query-building/service";
 import {
   getConditionsData,
   getValueSetsAndConceptsByConditionIDs,
-} from "@/app/shared/database-service";
+} from "@/app/backend/seeding/service";
 import {
   conditionIdToNameMap,
   categoryToConditionNameArrayMap,
@@ -15,7 +15,7 @@ import {
 } from "../fixtures";
 
 const currentPage = "/";
-jest.mock("../../../shared/database-service", () => ({
+jest.mock("../../../backend/seeding/service", () => ({
   getCustomQueries: jest.fn(),
   getConditionsData: jest.fn(),
   getValueSetsAndConceptsByConditionIDs: jest.fn(),
@@ -131,7 +131,6 @@ describe("tests the value set selection page", () => {
       "tab-custom-container",
     );
     await user.click(screen.getByTestId("tab-custom"));
-    screen.logTestingPlaygroundURL();
     await waitFor(() => {
       expect(screen.getByText("Add from code library")).toBeInTheDocument();
     });
