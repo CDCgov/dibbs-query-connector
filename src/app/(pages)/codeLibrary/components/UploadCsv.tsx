@@ -57,6 +57,9 @@ export default function UploadCsv({ onParsed }: Props) {
 const csvInputRef = useRef<HTMLInputElement>(null);
 const [csvError, setCsvError] = useState<string>("");
 
+/**
+ *
+ */
 export function triggerCsvPicker() {
   csvInputRef.current?.click();
 }
