@@ -35,14 +35,14 @@ locals {
 resource "null_resource" "build" {
   triggers = { app = local.app_hash }
   provisioner "local-exec" {
-    working_dir = "${path.module}/function"
+    working_dir = "${path.module}/src/functions"
     command     = "npm ci && npm run build && npm prune --omit=dev"
   }
 }
 
 data "archive_file" "zip" {
   type        = "zip"
-  source_dir  = "${path.module}/function"
+  source_dir  = "${path.module}/src/functions"
   output_path = "${path.module}/dist/functionapp.zip"
   depends_on  = [null_resource.build]
 }
