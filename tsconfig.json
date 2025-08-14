@@ -35,9 +35,6 @@
       ],
       "@/backend/*": [
         "./src/app/backend/*"
-      ],
-      "@/shared/*": [
-        "./src/app/shared/*"
       ]
     }
   },
