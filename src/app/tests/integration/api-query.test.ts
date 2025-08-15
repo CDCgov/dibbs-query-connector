@@ -8,7 +8,7 @@ import {
   MISSING_PATIENT_IDENTIFIERS,
   RESPONSE_BODY_IS_NOT_PATIENT_RESOURCE,
   USE_CASE_DETAILS,
-} from "@/app/shared/constants";
+} from "@/app/constants";
 import { NextRequest } from "next/server";
 import { POST } from "@/app/api/query/route";
 import { GET } from "@/app/api/route";

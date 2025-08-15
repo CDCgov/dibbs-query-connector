@@ -1,7 +1,7 @@
 "use server";
 
-import { AuthData } from "../backend/fhir-servers";
-import FHIRClient from "./fhirClient";
+import { AuthData } from "./service";
+import FHIRClient from "./fhir-client";
 import { isIP } from "net";
 
 /**

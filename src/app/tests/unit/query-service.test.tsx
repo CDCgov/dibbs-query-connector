@@ -1,8 +1,8 @@
 import {
   processFhirResponse,
   parseFhirSearch,
-} from "@/app/backend/query-execution";
-import { isFhirResource } from "@/app/shared/constants";
+} from "@/app/backend/query-execution/service";
+import { isFhirResource } from "@/app/constants";
 import { readJsonFile } from "../shared_utils/readJsonFile";
 import { DiagnosticReport, Observation } from "fhir/r4";
 import { QueryResponse } from "@/app/models/entities/query";

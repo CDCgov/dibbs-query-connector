@@ -34,7 +34,7 @@ import classNames from "classnames";
 import DateRangePicker, {
   DateRangePickerRef,
 } from "@/app/ui/designSystem/timeboxing/DateRangePicker";
-import { DataContext } from "@/app/shared/DataProvider";
+import { DataContext } from "@/app/utils/DataProvider";
 import {
   deleteTimeboxSettings,
   getTimeboxRanges,
@@ -287,6 +287,7 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
 
     const startDate = dateRef.current?.getStartDate();
     const endDate = dateRef.current?.getEndDate();
+    const isRelativeRange = dateRef.current?.getIsRelativeRange();
     if (queryId && startDate && endDate) {
       const startDateString = startDate.toISOString();
       const endDateString = endDate.toISOString();
@@ -296,6 +297,7 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
         conceptType,
         startDateString,
         endDateString,
+        isRelativeRange ?? true,
       );
     }
   };

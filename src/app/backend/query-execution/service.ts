@@ -1,21 +1,24 @@
 "use server";
 import { Bundle, FhirResource, Patient, Task } from "fhir/r4";
 
-import { isFhirResource } from "../shared/constants";
+import { isFhirResource } from "../../constants";
 
-import { CustomQuery } from "../shared/CustomQuery";
-import { GetPhoneQueryFormats } from "../shared/format-service";
-import { getSavedQueryByName } from "../shared/database-service";
-import { auditable } from "./audit-logs/decorator";
-import type { QueryTableResult } from "../(pages)/queryBuilding/utils";
+import { CustomQuery } from "./custom-query";
+import { GetPhoneQueryFormats } from "../../utils/format-service";
+import { getSavedQueryByName } from "../seeding/service";
+import { auditable } from "../audit-logs/decorator";
+import type { QueryTableResult } from "../../(pages)/queryBuilding/utils";
 import type {
   QueryResponse,
   PatientDiscoveryRequest,
   PatientRecordsRequest,
   FullPatientRequest,
-} from "../models/entities/query";
-import { getFhirServerConfigs, prepareFhirClient } from "./fhir-servers";
-import type FHIRClient from "../shared/fhirClient";
+} from "../../models/entities/query";
+import {
+  getFhirServerConfigs,
+  prepareFhirClient,
+} from "../fhir-servers/service";
+import type FHIRClient from "@/backend/fhir-servers/fhir-client";
 
 interface TaskPollingResult {
   tasksBundle: Bundle<Task>;

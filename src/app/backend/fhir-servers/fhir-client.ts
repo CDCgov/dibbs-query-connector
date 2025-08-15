@@ -1,10 +1,13 @@
 import https from "https";
-import { FhirServerConfig } from "../models/entities/fhir-servers";
-import { createSmartJwt } from "../backend/smart-on-fhir";
-import { fetchWithoutSSL } from "./server-utils";
-import dbService from "../backend/db/service";
-import { AuthData, updateFhirServer } from "../backend/fhir-servers";
-import { getOrCreateMtlsCert, getOrCreateMtlsKey } from "./mtls-utils";
+import { FhirServerConfig } from "../../models/entities/fhir-servers";
+import { createSmartJwt } from "../smart-on-fhir";
+import { fetchWithoutSSL } from "../../utils/utils";
+import dbService from "../db/service";
+import { AuthData, updateFhirServer } from "./service";
+import {
+  getOrCreateMtlsCert,
+  getOrCreateMtlsKey,
+} from "../../utils/mtls-utils";
 import { Agent } from "undici";
 
 /**
