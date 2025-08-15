@@ -27,7 +27,7 @@ jest.mock("@/app/api/api-auth", () => ({
 }));
 
 // Mock the FHIRClient to prevent real authentication requests
-jest.mock("@/app/shared/fhirClient", () => {
+jest.mock("@/app/backend/fhir-servers/fhir-client", () => {
   return {
     __esModule: true,
     default: jest.fn().mockImplementation(() => ({

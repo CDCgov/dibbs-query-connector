@@ -8,7 +8,7 @@ jest.mock("@/app/backend/query-building/service", () => ({
   getQueryList: jest.fn(),
 }));
 
-jest.mock("@/app/shared/database-service", () => ({
+jest.mock("@/app/backend/seeding/service", () => ({
   getConditionsData: jest.fn().mockResolvedValue({
     // here to prevent a distracting error log from showing up in test
     conditionIdToNameMap: {},
@@ -20,14 +20,6 @@ jest.mock(
   () =>
     ({ children }: React.PropsWithChildren) => <div>{children}</div>,
 );
-
-jest.mock("@/app/backend/seeding/service", () => ({
-  getConditionsData: jest.fn(),
-}));
-
-(getConditionsData as jest.Mock).mockResolvedValue({
-  conditionIdToNameMap: {},
-});
 
 describe("tests the query building steps", () => {
   const currentPage = "/";

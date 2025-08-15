@@ -2,9 +2,9 @@ import { Bundle, Task, Patient } from "fhir/r4";
 import { NextRequest } from "next/server";
 import { POST } from "@/app/api/query/route";
 import { suppressConsoleLogs } from "./fixtures";
-import { USE_CASE_DETAILS } from "@/app/shared/constants";
-import { prepareFhirClient } from "@/app/backend/fhir-servers";
-import FHIRClient from "@/app/shared/fhirClient";
+import { USE_CASE_DETAILS } from "@/app/constants";
+import { prepareFhirClient } from "@/app/backend/fhir-servers/service";
+import FHIRClient from "@/app/backend/fhir-servers/fhir-client";
 
 // Utility function to create a minimal NextRequest-like object
 function createNextRequest(
@@ -47,7 +47,7 @@ jest.mock("@/app/utils/auth", () => {
   };
 });
 
-jest.mock("@/app/shared/fhirClient", () => {
+jest.mock("@/app/backend/fhir-servers/fhir-client", () => {
   return {
     __esModule: true,
     default: jest.fn().mockImplementation(() => ({
@@ -121,13 +121,13 @@ jest.mock("@/app/shared/fhirClient", () => {
   };
 });
 
-jest.mock("@/app/backend/fhir-servers", () => ({
+jest.mock("@/app/backend/fhir-servers/service", () => ({
   prepareFhirClient: jest.fn(),
   getFhirServerConfigs: jest.fn(),
   getFhirServerNames: jest.fn(),
 }));
 
-jest.mock("@/app/shared/mtls-utils", () => ({
+jest.mock("@/app/utils/mtls-utils", () => ({
   getOrCreateMtlsCert: jest.fn().mockReturnValue("mock-cert"),
   getOrCreateMtlsKey: jest.fn().mockReturnValue("mock-key"),
   isMtlsAvailable: jest.fn().mockReturnValue(true),
@@ -157,13 +157,13 @@ jest.mock("@/app/backend/query-building/service", () => ({
 }));
 
 // Mock critical missing dependencies
-jest.mock("@/app/shared/format-service", () => ({
+jest.mock("@/app/utils/format-service", () => ({
   GetPhoneQueryFormats: jest
     .fn()
     .mockResolvedValue(["555-123-4567", "5551234567"]),
 }));
 
-jest.mock("@/app/shared/database-service", () => ({
+jest.mock("@/app/backend/seeding/service", () => ({
   getSavedQueryByName: jest.fn().mockResolvedValue({
     queryName: "Syphilis",
     queryData: {},
@@ -192,7 +192,7 @@ jest.mock("@/app/models/entities/query", () => ({
   validatedPatientSearch: jest.fn().mockReturnValue(true),
 }));
 
-jest.mock("@/app/shared/CustomQuery", () => ({
+jest.mock("@/app/backend/query-execution/custom-query", () => ({
   CustomQuery: jest.fn().mockImplementation(() => ({
     getQuery: jest.fn().mockReturnValue({
       basePath: "/Observation",

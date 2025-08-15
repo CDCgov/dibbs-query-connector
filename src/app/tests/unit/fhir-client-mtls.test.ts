@@ -1,12 +1,12 @@
-import FHIRClient from "@/app/shared/fhirClient";
+import FHIRClient from "@/app/backend/fhir-servers/fhir-client";
 import { FhirServerConfig } from "@/app/models/entities/fhir-servers";
-import * as mtlsUtils from "@/app/shared/mtls-utils";
-import { testFhirServerConnection } from "@/app/shared/testConnection";
+import * as mtlsUtils from "@/app/utils/mtls-utils";
+import { testFhirServerConnection } from "@/app/backend/fhir-servers/test-utils";
 import https from "https";
 import { Agent } from "undici";
 
 // Mock the mtls-utils module
-jest.mock("@/app/shared/mtls-utils");
+jest.mock("@/app/utils/mtls-utils");
 
 // Mock the smart-on-fhir module
 jest.mock("@/app/backend/smart-on-fhir", () => ({

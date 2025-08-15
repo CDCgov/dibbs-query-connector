@@ -24,7 +24,7 @@ jest.mock("@/app/backend/user-management", () => ({
   updateUserRole: jest.fn(),
 }));
 
-jest.mock("@/app/shared/database-service", () => ({
+jest.mock("@/app/backend/seeding/service", () => ({
   getConditionsData: jest.fn(),
 }));
 

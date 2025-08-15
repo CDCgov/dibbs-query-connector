@@ -1,20 +1,20 @@
 import { Task, Bundle, Patient } from "fhir/r4";
-import { patientDiscoveryQuery } from "@/app/backend/query-execution";
-import { prepareFhirClient } from "@/app/backend/fhir-servers";
-import FHIRClient from "@/app/shared/fhirClient";
+import { patientDiscoveryQuery } from "@/app/backend/query-execution/service";
+import { prepareFhirClient } from "@/app/backend/fhir-servers/service";
+import FHIRClient from "@/app/backend/fhir-servers/fhir-client";
 import { suppressConsoleLogs } from "./fixtures";
 
 jest.mock("@/app/utils/auth", () => ({
   superAdminAccessCheck: jest.fn().mockReturnValue(true),
 }));
 
-jest.mock("@/app/backend/fhir-servers", () => ({
+jest.mock("@/app/backend/fhir-servers/service", () => ({
   prepareFhirClient: jest.fn(),
   getFhirServerConfigs: jest.fn(),
   getFhirServerNames: jest.fn(),
 }));
 
-jest.mock("@/app/shared/mtls-utils", () => ({
+jest.mock("@/app/utils/mtls-utils", () => ({
   getOrCreateMtlsCert: jest.fn().mockReturnValue("mock-cert"),
   getOrCreateMtlsKey: jest.fn().mockReturnValue("mock-key"),
   isMtlsAvailable: jest.fn().mockReturnValue(true),
