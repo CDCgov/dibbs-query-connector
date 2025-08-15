@@ -4,9 +4,9 @@ import { useState, useEffect, ChangeEvent, useMemo, useRef } from "react";
 import styles from "./auditLogs.module.scss";
 import classNames from "classnames";
 import {
-  DateRange,
   DateErrors,
   DateRangePickerRef,
+  DateRange,
 } from "@/app/ui/designSystem/timeboxing/DateRangePicker";
 import DateRangePicker from "@/app/ui/designSystem/timeboxing/DateRangePicker";
 import SearchField from "@/app/ui/designSystem/searchField/SearchField";
@@ -188,6 +188,7 @@ const AuditLogs: React.FC = () => {
                 id={"auditLogDatePicker"}
                 startDate={dateRange.startDate || null}
                 endDate={dateRange.endDate || null}
+                isRelativeRange={false}
                 onChange={() => {
                   const startDate = datePickerRef.current?.getStartDate();
                   const endDate = datePickerRef.current?.getEndDate();

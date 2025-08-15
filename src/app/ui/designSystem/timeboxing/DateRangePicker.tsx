@@ -24,6 +24,10 @@ export interface DateRange {
   endDate?: Date | null;
 }
 
+export interface DateRangeInfo extends DateRange {
+  isRelativeRange: boolean;
+}
+
 export interface DateErrors {
   start?: string;
   end?: string;
@@ -131,27 +135,30 @@ const PRESET_TIMERANGE_OPTIONS: PresetOptions[] = [
 /**
  * @param initialStart - initial start date
  * @param  initialEnd - initial end date
+ * @param  isRelativeRange - whether we know the range is relative
  * @returns value of the label to match to the preset option
  */
 export function matchTimeRangeToOptionValue(
   initialStart: Date,
   initialEnd: Date,
+  isRelativeRange: boolean,
 ): { value: string; label: string; isPreset: boolean } {
   let displayValue = "";
-  let isPreset = false;
+  let isPreset = isRelativeRange;
   let displayLabel = DEFAULT_DATE_DISPLAY_TEXT;
 
-  PRESET_TIMERANGE_OPTIONS.forEach((p) => {
-    const { startDate, endDate } = p.getRange();
-    if (
-      areDatesOnSameDay(startDate, initialStart) &&
-      areDatesOnSameDay(endDate, initialEnd)
-    ) {
-      displayValue = p.value;
-      displayLabel = p.label;
-      isPreset = true;
-    }
-  });
+  isRelativeRange &&
+    PRESET_TIMERANGE_OPTIONS.forEach((p) => {
+      const { startDate, endDate } = p.getRange();
+      if (
+        areDatesOnSameDay(startDate, initialStart) &&
+        areDatesOnSameDay(endDate, initialEnd)
+      ) {
+        displayValue = p.value;
+        displayLabel = p.label;
+        isPreset = true;
+      }
+    });
   return {
     value: displayValue,
     label: displayLabel,
@@ -159,11 +166,13 @@ export function matchTimeRangeToOptionValue(
   };
 }
 
-const CUSTOM_VALUE = "custom";
+const ABSOLUTE_VALUE = "absolute";
+const ABSOLUTE_DISPLAY_LABEL = "Absolute date range";
 
 interface DateRangePickerProps {
   startDate: Date | null | undefined;
   endDate: Date | null | undefined;
+  isRelativeRange: boolean;
   onChange: (...args: unknown[]) => void;
   id: string;
   handleClear?: () => Promise<void>;
@@ -185,6 +194,7 @@ const DEFAULT_DATE_DISPLAY_TEXT = "All dates";
  * @param root0.endDate - The end date.
  * @param root0.id - The id for the form input.
  * @param root0.onChange - The change handler.
+ * @param root0.isRelativeRange - whether the range is relative.
  * @param root0.popoverSide - Optional prop to control the side the popover's on.
  * @param root0.handleClear - Optional prop to control the side the popover's on.
  * @param root0.placeholderText - Text to indicate the filter.
@@ -196,6 +206,7 @@ const DateRangePicker = forwardRef<DateRangePickerRef, DateRangePickerProps>(
     {
       startDate: initialStart,
       endDate: initialEnd,
+      isRelativeRange: initialIsRelative,
       onChange,
       id,
       handleClear,
@@ -205,12 +216,13 @@ const DateRangePicker = forwardRef<DateRangePickerRef, DateRangePickerProps>(
     ref,
   ) => {
     const [selectedPreset, setSelectedPreset] = useState<string>("");
-    const [customStart, setCustomStart] = useState<Date | null | undefined>(
+    const [startDate, setStartDate] = useState<Date | null | undefined>(
       initialStart,
     );
-    const [customEnd, setCustomEnd] = useState<Date | null | undefined>(
-      initialEnd,
-    );
+    const [endDate, setEndDate] = useState<Date | null | undefined>(initialEnd);
+    const [isRelativeRange, setIsRelativeRange] =
+      useState<boolean>(initialIsRelative);
+
     const [dateErrors, setDateErrors] = useState<DateErrors>({});
     const [isOpen, setIsOpen] = useState(false);
     const [displayText, setDisplayText] = useState(DEFAULT_DATE_DISPLAY_TEXT);
@@ -218,9 +230,9 @@ const DateRangePicker = forwardRef<DateRangePickerRef, DateRangePickerProps>(
     const containerRef = useRef<HTMLDivElement>(null);
     useImperativeHandle(ref, () => ({
       // these hooks are available through the ref in the onChange value passed in
-      getStartDate: () => customStart,
-      getEndDate: () => customEnd,
-      getIsRelativeRange: () => selectedPreset !== CUSTOM_VALUE,
+      getStartDate: () => startDate,
+      getEndDate: () => endDate,
+      getIsRelativeRange: () => isRelativeRange,
     }));
 
     const validateDates = (
@@ -259,9 +271,10 @@ const DateRangePicker = forwardRef<DateRangePickerRef, DateRangePickerProps>(
 
     const handlePresetChange = (value: string) => {
       setSelectedPreset(value);
-      if (value !== CUSTOM_VALUE) {
+      if (value !== ABSOLUTE_VALUE) {
         setDateErrors({});
       }
+      setIsRelativeRange(value !== ABSOLUTE_VALUE);
     };
 
     const handleApply = () => {
@@ -273,8 +286,8 @@ const DateRangePicker = forwardRef<DateRangePickerRef, DateRangePickerProps>(
       if (handleClear) {
         await handleClear();
       }
-      setCustomStart(null);
-      setCustomEnd(null);
+      setStartDate(null);
+      setEndDate(null);
       setSelectedPreset("");
       setDateErrors({});
       setDisplayText(DEFAULT_DATE_DISPLAY_TEXT);
@@ -286,20 +299,22 @@ const DateRangePicker = forwardRef<DateRangePickerRef, DateRangePickerProps>(
       const matchingValue = matchTimeRangeToOptionValue(
         initialStart,
         initialEnd,
+        initialIsRelative,
       );
       if (matchingValue.isPreset) {
         setDisplayText(matchingValue.label);
         setSelectedPreset(matchingValue.value);
       } else {
         // we didn't hit a match but the start / end are defined, so we're in the custom value
-        setCustomStart(initialStart);
-        setCustomEnd(initialEnd);
-        setSelectedPreset(CUSTOM_VALUE);
+        setStartDate(initialStart);
+        setEndDate(initialEnd);
+        setSelectedPreset(ABSOLUTE_VALUE);
         setDisplayText(
-          formatDateRangeToMMDDYY(initialStart, initialEnd) ?? "Custom range",
+          formatDateRangeToMMDDYY(initialStart, initialEnd) ??
+            ABSOLUTE_DISPLAY_LABEL,
         );
       }
-    }, [initialStart, initialEnd]);
+    }, [initialStart, initialEnd, initialIsRelative]);
 
     useEffect(() => {
       const handleClickOutside = (event: MouseEvent) => {
@@ -324,11 +339,12 @@ const DateRangePicker = forwardRef<DateRangePickerRef, DateRangePickerProps>(
     useEffect(() => {
       if (!selectedPreset) {
         setDisplayText(DEFAULT_DATE_DISPLAY_TEXT);
-      } else if (selectedPreset === CUSTOM_VALUE) {
+      } else if (selectedPreset === ABSOLUTE_VALUE) {
         const displayDateRange =
-          formatDateRangeToMMDDYY(customStart, customEnd) ?? "Custom range";
-        setCustomStart(customStart);
-        setCustomEnd(customEnd);
+          formatDateRangeToMMDDYY(startDate, endDate) ?? ABSOLUTE_DISPLAY_LABEL;
+        setIsRelativeRange(false);
+        setStartDate(startDate);
+        setEndDate(endDate);
         setDisplayText(displayDateRange);
       } else {
         const selectedLabel =
@@ -341,13 +357,15 @@ const DateRangePicker = forwardRef<DateRangePickerRef, DateRangePickerProps>(
           ) as PresetOptions
         ).getRange();
 
-        setCustomStart(rangeValues.startDate);
-        setCustomEnd(rangeValues.endDate);
+        setIsRelativeRange(true);
+        setStartDate(rangeValues.startDate);
+        setEndDate(rangeValues.endDate);
         setDisplayText(selectedLabel);
       }
     }, [selectedPreset]);
 
     const disableApply = !selectedPreset;
+    console.log(isRelativeRange);
 
     return (
       <div className={styles.datePickerContainer} ref={containerRef}>
@@ -364,9 +382,9 @@ const DateRangePicker = forwardRef<DateRangePickerRef, DateRangePickerProps>(
               styles.dateRangeInput,
               !selectedPreset && styles.datePicker__narrow,
               selectedPreset &&
-                selectedPreset !== CUSTOM_VALUE &&
+                selectedPreset !== ABSOLUTE_VALUE &&
                 styles.datePicker,
-              selectedPreset === CUSTOM_VALUE && styles.datePicker__wide,
+              selectedPreset === ABSOLUTE_VALUE && styles.datePicker__wide,
             )}
             data-testid="date-range-input"
             name="date-range-input"
@@ -414,20 +432,20 @@ const DateRangePicker = forwardRef<DateRangePickerRef, DateRangePickerProps>(
                 ))}
                 <hr className="margin-top-2"></hr>
                 <Radio
-                  id={`preset-${CUSTOM_VALUE}`}
+                  id={`preset-${ABSOLUTE_VALUE}`}
                   name="date-filter"
-                  label="Custom date range"
-                  data-testid={`preset-${CUSTOM_VALUE}`}
-                  aria-label="Custom date range radio button"
-                  value={CUSTOM_VALUE}
-                  checked={selectedPreset === CUSTOM_VALUE}
-                  onChange={() => handlePresetChange(CUSTOM_VALUE)}
+                  label={ABSOLUTE_DISPLAY_LABEL}
+                  data-testid={`preset-${ABSOLUTE_VALUE}`}
+                  aria-label="Absolute date range radio button"
+                  value={ABSOLUTE_VALUE}
+                  checked={selectedPreset === ABSOLUTE_VALUE}
+                  onChange={() => handlePresetChange(ABSOLUTE_VALUE)}
                 />
               </fieldset>
             </FormGroup>
 
             <div className={styles.clearButtonContainer}></div>
-            {selectedPreset === CUSTOM_VALUE && (
+            {selectedPreset === ABSOLUTE_VALUE && (
               <>
                 <USWDSDateRangePicker
                   startDateLabel="Start Date"
@@ -436,25 +454,25 @@ const DateRangePicker = forwardRef<DateRangePickerRef, DateRangePickerProps>(
                   startDatePickerProps={{
                     id: "log-date-start",
                     name: "log-date-start",
-                    defaultValue: customStart ? customStart.toISOString() : "",
+                    defaultValue: startDate ? startDate.toISOString() : "",
                     onChange: (val?: string) => {
                       const rawDate = val ? new Date(val) : null;
                       const date = rawDate;
-                      const errors = validateDates(date, customEnd);
+                      const errors = validateDates(date, endDate);
                       setDateErrors(errors);
-                      setCustomStart(date);
+                      setStartDate(date);
                     },
                   }}
                   endDatePickerProps={{
                     id: "log-date-end",
                     name: "log-date-end",
-                    defaultValue: customEnd ? customEnd.toISOString() : "",
+                    defaultValue: endDate ? endDate.toISOString() : "",
                     onChange: (val?: string) => {
                       const rawDate = val ? new Date(val) : null;
                       const date = rawDate;
-                      const errors = validateDates(customStart, date);
+                      const errors = validateDates(startDate, date);
                       setDateErrors(errors);
-                      setCustomEnd(date);
+                      setEndDate(date);
                     },
                   }}
                 />

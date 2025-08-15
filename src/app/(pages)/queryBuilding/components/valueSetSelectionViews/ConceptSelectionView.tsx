@@ -20,7 +20,7 @@ import {
 } from "@/app/models/entities/valuesets";
 import { getQueryTimeboxRanges } from "@/app/backend/query-timefiltering";
 import { DataContext } from "@/app/utils/DataProvider";
-import { DateRange } from "@/app/ui/designSystem/timeboxing/DateRangePicker";
+import { DateRangeInfo } from "@/app/ui/designSystem/timeboxing/DateRangePicker";
 
 type ConceptSelectionViewProps = {
   vsTypeLevelOptions: ConceptTypeToDibbsVsMap;
@@ -60,7 +60,7 @@ export const ConceptSelectionView: React.FC<ConceptSelectionViewProps> = ({
   const [accordionItems, setAccordionItems] = useState<VsTypeAccordion[]>([]);
   const [timeboxRanges, setTimeboxRanges] = useState<
     Partial<{
-      [conceptType in DibbsConceptType]: DateRange | undefined;
+      [conceptType in DibbsConceptType]: DateRangeInfo | undefined;
     }>
   >({});
 
@@ -98,7 +98,7 @@ export const ConceptSelectionView: React.FC<ConceptSelectionViewProps> = ({
           .some(Boolean);
 
         const vsType = k as DibbsConceptType;
-        const updateConceptTimebox = (newTimebox: DateRange) =>
+        const updateConceptTimebox = (newTimebox: DateRangeInfo) =>
           setTimeboxRanges((prev) => {
             return {
               ...prev,
@@ -107,14 +107,18 @@ export const ConceptSelectionView: React.FC<ConceptSelectionViewProps> = ({
           });
 
         const handleVsNameLevelUpdate = handleVsTypeLevelUpdate(vsType);
-        const timeRange = timeboxRanges[vsType];
-        const initialTimeboxRange =
-          timeRange && timeRange?.startDate && timeRange?.endDate
-            ? {
-                startDate: new Date(timeRange.startDate),
-                endDate: new Date(timeRange.endDate),
-              }
-            : undefined;
+        const conceptTimeboxRange = timeboxRanges[vsType];
+        const initialTimeboxRange: DateRangeInfo = conceptTimeboxRange
+          ? {
+              startDate: conceptTimeboxRange.startDate,
+              endDate: conceptTimeboxRange.endDate,
+              isRelativeRange: conceptTimeboxRange.isRelativeRange,
+            }
+          : {
+              startDate: null,
+              endDate: null,
+              isRelativeRange: false,
+            };
 
         const title = (
           <ConceptTypeAccordionHeader

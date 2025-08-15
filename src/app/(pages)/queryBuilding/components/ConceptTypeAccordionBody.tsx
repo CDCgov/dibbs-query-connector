@@ -32,7 +32,7 @@ import ValueSetBulkToggle from "./ValueSetBulkToggle";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import classNames from "classnames";
 import DateRangePicker, {
-  DateRange,
+  DateRangeInfo,
   DateRangePickerRef,
 } from "@/app/ui/designSystem/timeboxing/DateRangePicker";
 import { DataContext } from "@/app/utils/DataProvider";
@@ -50,8 +50,8 @@ type ConceptTypeAccordionBodyProps = {
   handleVsIdLevelUpdate: (
     vsId: string,
   ) => (dibbsValueSets: DibbsValueSet) => void;
-  initialTimeboxRange?: DateRange;
-  updateTimeboxRange: (newTimebox: DateRange) => void;
+  initialTimeboxRange: DateRangeInfo;
+  updateTimeboxRange: (newTimebox: DateRangeInfo) => void;
   tableSearchFilter?: string;
 };
 
@@ -270,7 +270,12 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
     const endDate = dateRef.current?.getEndDate();
     const isRelativeRange = dateRef.current?.getIsRelativeRange();
 
-    if (queryId && startDate && endDate) {
+    if (
+      queryId &&
+      startDate &&
+      endDate &&
+      typeof isRelativeRange === "boolean"
+    ) {
       const startDateString = startDate.toISOString();
       const endDateString = endDate.toISOString();
       await updateTimeboxSettings(
@@ -278,11 +283,13 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
         conceptType,
         startDateString,
         endDateString,
-        isRelativeRange ?? true,
+        isRelativeRange,
       );
+
       updateTimeboxRange({
         startDate: startDate,
         endDate: endDate,
+        isRelativeRange: isRelativeRange,
       });
     }
 
@@ -302,6 +309,7 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
     updateTimeboxRange({
       startDate: null,
       endDate: null,
+      isRelativeRange: true,
     });
   };
 
@@ -348,6 +356,7 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
         <DateRangePicker
           ref={dateRef}
           id={`dateRangePicker-${accordionConceptType}`}
+          isRelativeRange={initialTimeboxRange?.isRelativeRange}
           startDate={initialTimeboxRange?.startDate}
           endDate={initialTimeboxRange?.endDate}
           onChange={handleTimeboxUpdate}

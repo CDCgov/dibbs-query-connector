@@ -2,7 +2,7 @@
 
 import { QueryTableTimebox } from "../(pages)/queryBuilding/utils";
 import { DibbsConceptType } from "../models/entities/valuesets";
-import { DateRange } from "../ui/designSystem/timeboxing/DateRangePicker";
+import { DateRangeInfo } from "../ui/designSystem/timeboxing/DateRangePicker";
 import { adminRequired } from "./db/decorators";
 import dbService from "./db/service";
 
@@ -51,7 +51,7 @@ class QueryTimefilteringService {
 
   static async getTimeboxRanges(queryId: string, conceptType: string) {
     const timeboxSelectionQuery = `
-        SELECT time_window_start, time_window_end FROM query_timeboxing
+        SELECT time_window_start, time_window_end, is_relative_range FROM query_timeboxing
         WHERE query_id = $1 AND concept_type = $2;
     `;
 
@@ -65,6 +65,7 @@ class QueryTimefilteringService {
         return {
           startDate: v.timeWindowStart,
           endDate: v.timeWindowEnd,
+          isRelativeRange: v.isRelativeRange,
         };
       })[0];
     }
@@ -73,14 +74,14 @@ class QueryTimefilteringService {
   }
   static async getQueryTimeboxRanges(queryId: string) {
     const timeboxSelectionQuery = `
-        SELECT time_window_start, time_window_end, concept_type FROM query_timeboxing
+        SELECT time_window_start, time_window_end, concept_type, is_relative_range FROM query_timeboxing
         WHERE query_id = $1;
     `;
 
     const result = await dbService.query(timeboxSelectionQuery, [queryId]);
 
     const conceptTimebox: Partial<{
-      [conceptType in DibbsConceptType]: DateRange;
+      [conceptType in DibbsConceptType]: DateRangeInfo;
     }> = {};
 
     if (result) {
@@ -88,6 +89,7 @@ class QueryTimefilteringService {
         conceptTimebox[v.conceptType as DibbsConceptType] = {
           startDate: v.timeWindowStart,
           endDate: v.timeWindowEnd,
+          isRelativeRange: v.isRelativeRange,
         };
       });
     }

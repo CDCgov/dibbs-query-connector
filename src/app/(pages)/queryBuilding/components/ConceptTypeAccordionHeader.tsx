@@ -4,7 +4,7 @@ import styles from "../buildFromTemplates/conditionTemplateSelection.module.scss
 import { FilterableValueSet } from "./utils";
 import { DibbsConceptType } from "@/app/models/entities/valuesets";
 import {
-  DateRange,
+  DateRangeInfo,
   formatDateRangeToMMDDYY,
   matchTimeRangeToOptionValue,
 } from "@/app/ui/designSystem/timeboxing/DateRangePicker";
@@ -14,7 +14,7 @@ type ConceptTypeAccordionBodyProps = {
   activeType: DibbsConceptType;
   activeTypeValueSets: { [vsId: string]: FilterableValueSet };
   expanded: boolean;
-  initialTimeboxRange?: DateRange;
+  initialTimeboxRange?: DateRangeInfo;
   areItemsFiltered?: boolean;
 };
 
@@ -61,6 +61,7 @@ const ConceptTypeAccordionHeader: React.FC<ConceptTypeAccordionBodyProps> = ({
     const displayValues = matchTimeRangeToOptionValue(
       initialTimeboxRange?.startDate,
       initialTimeboxRange?.endDate,
+      initialTimeboxRange.isRelativeRange,
     );
 
     displayValues.isPreset
