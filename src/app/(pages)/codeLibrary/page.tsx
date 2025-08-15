@@ -922,13 +922,6 @@ const CodeLibrary: React.FC = () => {
             </div>
             {mode == "manage" && (
               <div>
-                <Button
-                  type="button"
-                  className={styles.button}
-                  onClick={() => handleChangeMode("create")}
-                >
-                  Add value set
-                </Button>
                 <input
                   ref={csvInputRef}
                   type="file"
@@ -952,6 +945,13 @@ const CodeLibrary: React.FC = () => {
                   }}
                 >
                   Upload CSV
+                </Button>
+                <Button
+                  type="button"
+                  className={styles.button}
+                  onClick={() => handleChangeMode("create")}
+                >
+                  Add value set
                 </Button>
                 <div className="padding-top-1 padding-right-1 display-flex flex-justify-end">
                   <Button
@@ -1119,7 +1119,7 @@ const CodeLibrary: React.FC = () => {
                                 </Button>
                                 <Button
                                   type="button"
-                                  secondary
+                                  unstyled
                                   onClick={() =>
                                     modalRef.current?.toggleModal()
                                   }
