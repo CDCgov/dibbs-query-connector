@@ -73,13 +73,6 @@ exports[`Code library interaction renders action buttons for custom value sets o
             </div>
           </div>
           <div>
-            <button
-              class="usa-button button"
-              data-testid="button"
-              type="button"
-            >
-              Add value set
-            </button>
             <input
               accept=".csv,text/csv"
               style="display: none;"
@@ -91,6 +84,13 @@ exports[`Code library interaction renders action buttons for custom value sets o
               type="button"
             >
               Upload CSV
+            </button>
+            <button
+              class="usa-button button"
+              data-testid="button"
+              type="button"
+            >
+              Add value set
             </button>
             <div
               class="padding-top-1 padding-right-1 display-flex flex-justify-end"
@@ -319,7 +319,7 @@ exports[`Code library interaction renders action buttons for custom value sets o
                           Edit codes
                         </button>
                         <button
-                          class="usa-button usa-button--secondary"
+                          class="usa-button usa-button--unstyled"
                           data-testid="button"
                           type="button"
                         >
@@ -660,13 +660,6 @@ exports[`Code library loading view renders a skeleton loading state when loading
             </div>
           </div>
           <div>
-            <button
-              class="usa-button button"
-              data-testid="button"
-              type="button"
-            >
-              Add value set
-            </button>
             <input
               accept=".csv,text/csv"
               style="display: none;"
@@ -678,6 +671,13 @@ exports[`Code library loading view renders a skeleton loading state when loading
               type="button"
             >
               Upload CSV
+            </button>
+            <button
+              class="usa-button button"
+              data-testid="button"
+              type="button"
+            >
+              Add value set
             </button>
             <div
               class="padding-top-1 padding-right-1 display-flex flex-justify-end"
@@ -1005,13 +1005,6 @@ exports[`Code library rendered view renders concept codes for the value set when
             </div>
           </div>
           <div>
-            <button
-              class="usa-button button"
-              data-testid="button"
-              type="button"
-            >
-              Add value set
-            </button>
             <input
               accept=".csv,text/csv"
               style="display: none;"
@@ -1023,6 +1016,13 @@ exports[`Code library rendered view renders concept codes for the value set when
               type="button"
             >
               Upload CSV
+            </button>
+            <button
+              class="usa-button button"
+              data-testid="button"
+              type="button"
+            >
+              Add value set
             </button>
             <div
               class="padding-top-1 padding-right-1 display-flex flex-justify-end"
@@ -1570,13 +1570,6 @@ exports[`Code library rendered view renders the correct content 1`] = `
             </div>
           </div>
           <div>
-            <button
-              class="usa-button button"
-              data-testid="button"
-              type="button"
-            >
-              Add value set
-            </button>
             <input
               accept=".csv,text/csv"
               style="display: none;"
@@ -1588,6 +1581,13 @@ exports[`Code library rendered view renders the correct content 1`] = `
               type="button"
             >
               Upload CSV
+            </button>
+            <button
+              class="usa-button button"
+              data-testid="button"
+              type="button"
+            >
+              Add value set
             </button>
             <div
               class="padding-top-1 padding-right-1 display-flex flex-justify-end"
