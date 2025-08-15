@@ -120,28 +120,43 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
 
   /**
    * Updates an existing FHIR server configuration in the database.
-   * @param id - The ID of the FHIR server to update
-   * @param name - The new name of the FHIR server
-   * @param hostname - The new URL/hostname of the FHIR server
-   * @param disableCertValidation - Whether to disable certificate validation
-   * @param defaultServer - Whether this is the default server
-   * @param lastConnectionSuccessful - Optional boolean indicating if the last connection was successful
-   * @param authData - Authentication data including auth type and credentials
-   * @param patientMatchConfiguration - Optional patient match configuration
+   * @param updateDetails - update details
+   * @param updateDetails.id - The ID of the FHIR server to update
+   * @param updateDetails.name - The new name of the FHIR server
+   * @param updateDetails.hostname - The new URL/hostname of the FHIR server
+   * @param updateDetails.disableCertValidation - Whether to disable certificate validation
+   * @param updateDetails.mutualTls - Whether to use mutual TLS
+   * @param updateDetails.defaultServer - Whether this is the default server
+   * @param updateDetails.lastConnectionSuccessful - Optional boolean indicating if the last connection was successful
+   * @param updateDetails.authData - Authentication data including auth type and credentials
+   * @param updateDetails.patientMatchConfiguration - Optional patient match configuration
    * @returns An object indicating success or failure with optional error message
    */
   @transaction
   @auditable
-  static async updateFhirServer(
-    id: string,
-    name: string,
-    hostname: string,
-    disableCertValidation: boolean,
-    defaultServer: boolean,
-    lastConnectionSuccessful?: boolean,
-    authData?: AuthData,
-    patientMatchConfiguration?: PatientMatchData,
-  ) {
+  static async updateFhirServer(updateDetails: {
+    id: string;
+    name: string;
+    hostname: string;
+    disableCertValidation: boolean;
+    mutualTls: boolean;
+    defaultServer: boolean;
+    lastConnectionSuccessful?: boolean;
+    authData?: AuthData;
+    patientMatchConfiguration?: PatientMatchData;
+  }) {
+    const {
+      id,
+      name,
+      hostname,
+      disableCertValidation,
+      mutualTls,
+      defaultServer,
+      lastConnectionSuccessful,
+      authData,
+      patientMatchConfiguration,
+    } = updateDetails;
+
     const updateQuery = `
     UPDATE fhir_servers 
     SET 
@@ -159,7 +174,8 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
       scopes = $12,
       access_token = $13,
       token_expiry = $14,
-      patient_match_configuration = $15
+      patient_match_configuration = $15,
+      mutual_tls = $16
     WHERE id = $1
     RETURNING *;
   `;
@@ -217,6 +233,7 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
         authData?.accessToken || null,
         authData?.tokenExpiry || null,
         patientMatchConfigObject,
+        mutualTls,
       ]);
 
       // Clear the cache so the next getFhirServerConfigs call will fetch fresh data
@@ -247,6 +264,7 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
    * @param name - The name of the FHIR server
    * @param hostname - The URL/hostname of the FHIR server
    * @param disableCertValidation - Whether to disable certificate validation
+   * @param mutualTls - Whether to use mutual TLS
    * @param defaultServer - Whether this is the default server
    * @param lastConnectionSuccessful - Optional boolean indicating if the last connection was successful
    * @param authData - Authentication data including auth type and credentials
@@ -260,6 +278,7 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
     name: string,
     hostname: string,
     disableCertValidation: boolean,
+    mutualTls: boolean,
     defaultServer: boolean,
     lastConnectionSuccessful?: boolean,
     authData?: AuthData,
@@ -317,6 +336,7 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
         authData?.accessToken || null,
         authData?.tokenExpiry || null,
         patientMatchConfigObject,
+        mutualTls,
       ]);
 
       // Clear the cache so the next getFhirServerConfigs call will fetch fresh data

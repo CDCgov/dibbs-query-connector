@@ -92,10 +92,19 @@ jobs:
         run: npm ci
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
+
       - name: Create .env
+        env:
+          AIDBOX_LICENSE: ${{ secrets.AIDBOX_LICENSE }}
+          MTLS_CERT_B64: ${{ secrets.MTLS_CERT_B64 }}
+          MTLS_KEY_B64: ${{ secrets.MTLS_KEY_B64 }}
         run: |
-          echo "AIDBOX_LICENSE=${{ secrets.AIDBOX_LICENSE }}" > .env
-          echo "NEXT_PUBLIC_AUTH_PROVIDER=keycloak" >> .env
+          {
+            echo "AIDBOX_LICENSE=$AIDBOX_LICENSE"
+            echo "MTLS_CERT=$MTLS_CERT_B64"
+            echo "MTLS_KEY=$MTLS_KEY_B64"
+            echo "NEXT_PUBLIC_AUTH_PROVIDER=keycloak"
+          } > .env
       - name: Build Query Connector and Run Playwright Tests
         id: run_tests
         run: |
@@ -113,11 +122,11 @@ jobs:
       #       ./test-results/logs-before-tests.txt
       #       ./test-results/logs-after-tests.txt
 
-      - uses: actions/upload-artifact@v4
-        if: ${{ !cancelled() }}
-        with:
-          name: test-results
-          path: ./test-results/
+      # - uses: actions/upload-artifact@v4
+      #   if: ${{ !cancelled() }}
+      #   with:
+      #     name: test-results
+      #     path: ./test-results/
 
       - name: Exit with proper code
         if: steps.run_tests.outcome == 'failure'

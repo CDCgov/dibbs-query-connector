@@ -11,6 +11,18 @@ import SessionTimeout, {
   PROMPT_TIMEOUT_MSEC,
 } from "./ui/components/sessionTimeout/sessionTimeout";
 import { returnPredefinedSessionObject } from "./utils/auth";
+import { headers } from "next/headers";
+
+// Intercept mocked requests in e2e tests
+if (
+  process.env.NEXT_RUNTIME === "nodejs" &&
+  process.env.NODE_ENV !== "production"
+) {
+  const { setupFetchInterceptor } = await import(
+    "request-mocking-protocol/fetch"
+  );
+  setupFetchInterceptor(() => headers());
+}
 
 /**
  * Establishes the layout for the application.
