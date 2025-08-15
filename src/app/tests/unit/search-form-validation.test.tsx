@@ -3,14 +3,6 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import SearchForm from "@/app/(pages)/query/components/searchForm/SearchForm";
 
-// Mock the query execution functions
-jest.mock("@/app/backend/query-execution", () => ({
-  executePatientDiscoveryQuery: jest.fn().mockResolvedValue({
-    success: true,
-    results: [],
-  }),
-}));
-
 jest.mock("@/app/backend/fhir-servers", () => ({
   getFhirServerConfigs: jest.fn().mockResolvedValue([]),
 }));

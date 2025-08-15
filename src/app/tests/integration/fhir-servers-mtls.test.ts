@@ -4,7 +4,7 @@ import {
   updateFhirServer,
   getFhirServerConfigs,
   deleteFhirServer,
-} from "@/app/backend/fhir-servers";
+} from "@/app/backend/fhir-servers/service";
 
 jest.mock("@/app/utils/auth", () => {
   return {

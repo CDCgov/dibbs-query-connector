@@ -344,7 +344,7 @@ describe("API Query with Mutual TLS", () => {
       const {
         getFhirServerConfigs,
         getFhirServerNames,
-      } = require("@/app/backend/fhir-servers");
+      } = require("@/app/backend/fhir-servers/service");
       (getFhirServerConfigs as jest.Mock).mockResolvedValue([
         mockMtlsServerConfig,
       ]);
@@ -603,7 +603,7 @@ PV1|1|I|ROOM-123^BED-A^HOSP||||ATTENDING^DOCTOR^A|||||||||||ADM001||||||||||||||
       const {
         getFhirServerConfigs,
         getFhirServerNames,
-      } = require("@/app/backend/fhir-servers");
+      } = require("@/app/backend/fhir-servers/service");
       (getFhirServerConfigs as jest.Mock).mockResolvedValue([
         mockNonMtlsServerConfig,
       ]);

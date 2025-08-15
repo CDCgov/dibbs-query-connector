@@ -116,7 +116,7 @@ describe("Query Execution with Mutual TLS", () => {
       const {
         getFhirServerConfigs,
         getFhirServerNames,
-      } = require("@/app/backend/fhir-servers");
+      } = require("@/app/backend/fhir-servers/service");
       (getFhirServerConfigs as jest.Mock).mockResolvedValue([mockServerConfig]);
       (getFhirServerNames as jest.Mock).mockResolvedValue([
         mockServerConfig.name,

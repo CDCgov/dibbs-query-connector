@@ -4,7 +4,7 @@ import {
   getOrCreateMtlsCert,
   getOrCreateMtlsKey,
   isMtlsAvailable,
-} from "@/app/shared/mtls-utils";
+} from "@/app/utils/mtls-utils";
 import { suppressConsoleLogs } from "../integration/fixtures";
 
 // Mock fs module
