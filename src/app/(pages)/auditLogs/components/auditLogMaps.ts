@@ -289,6 +289,36 @@ export const auditLogActionTypeMap: Record<string, auditLogActionTypeMapping> =
         return message;
       },
     },
+    insertCustomValueSet: {
+      label: "Custom value set saved",
+      format: (log) => {
+        const request = parseRequest(log);
+        const firstValue = Object.values(request)[0];
+        const valueSetName =
+          typeof firstValue === "object" &&
+          firstValue !== null &&
+          "valueSetName" in firstValue
+            ? (firstValue as { valueSetName: string }).valueSetName
+            : "";
+        const message = `Value set with name ${valueSetName} saved`;
+        return message;
+      },
+    },
+    deleteCustomValueSet: {
+      label: "Custom value set deleted",
+      format: (log) => {
+        const request = parseRequest(log);
+        const firstValue = Object.values(request)[0];
+        const valueSetName =
+          typeof firstValue === "object" &&
+          firstValue !== null &&
+          "valueSetName" in firstValue
+            ? (firstValue as { valueSetName: string }).valueSetName
+            : "";
+        const message = `Value set with name ${valueSetName} deleted`;
+        return message;
+      },
+    },
     // Add more as needed
   };
 
