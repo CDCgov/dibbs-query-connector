@@ -53,7 +53,7 @@ import { NestedQuery } from "../queryBuilding/utils";
 import { groupConditionConceptsIntoValueSets } from "@/app/utils/valueSetTranslation";
 import { csvRow } from "@/app/api/csv/route";
 import { DibbsConceptType } from "@/app/models/entities/valuesets";
-import { CodeSystemOptions } from "./utils";
+import { CodeSystemOptions, CodeSystemOptionsMap } from "./utils";
 import { Concept } from "@/app/models/entities/concepts";
 
 /**
@@ -600,22 +600,11 @@ const CodeLibrary: React.FC = () => {
     return undefined;
   }
 
-  function toSystemUri(label: string) {
+  function toSystemUri(label: string): string | null {
     const t = (label || "").trim().toLowerCase();
-    const sysMap: Record<string, string> = {
-      loinc: "http://loinc.org",
-      rxnorm: "http://www.nlm.nih.gov/research/umls/rxnorm",
-      "icd-10-cm": "http://hl7.org/fhir/sid/icd-10-cm",
-      cvx: "http://hl7.org/fhir/sid/cvx",
-      snomed: "http://snomed.info/sct",
-      "snomed ct": "http://snomed.info/sct",
-      "cap ecc": "http://cap.org/eCC",
-    };
-    if (sysMap[t]) return sysMap[t];
-    const fromOptions = CodeSystemOptions.find((uri) =>
-      uri.toLowerCase().includes(t),
-    );
-    return fromOptions || label;
+    if (CodeSystemOptionsMap[t]) return CodeSystemOptionsMap[t];
+    const exact = CodeSystemOptions.find((uri) => uri.toLowerCase() === t);
+    return exact ?? null;
   }
 
   // exact, strongly-typed CSV row after normalization
@@ -703,7 +692,6 @@ const CodeLibrary: React.FC = () => {
       groups.set(key, entry);
     }
 
-    // Build DibbsValueSet objects; drop groups that can't be typed/system-mapped
     const valueSets: DibbsValueSet[] = [];
     for (const g of groups.values()) {
       const t = toTypeStrict(g.cat);
@@ -731,6 +719,37 @@ const CodeLibrary: React.FC = () => {
     }
 
     // 2) Group & build value sets (strictly typed)
+    const errors: string[] = [];
+    normalized.rows.forEach((r, i) => {
+      const rowNo = i + 2;
+      if (!toTypeStrict(r.category)) {
+        errors.push(
+          `Row ${rowNo}: unsupported category "${r.category}" (labs, conditions, medications).`,
+        );
+      }
+      if (!toSystemUri(r["code system"])) {
+        errors.push(
+          `Row ${rowNo}: unsupported code system "${r["code system"]}" (use one of: ${Object.keys(
+            CodeSystemOptionsMap,
+          ).join(", ")} or an exact supported URI).`,
+        );
+      }
+      if (!r.code) {
+        errors.push(`Row ${rowNo}: must include "code"`);
+      }
+    });
+
+    if (errors.length) {
+      setCsvError(
+        `Your CSV contains unsupported values:\n- ${errors.join("\n- ")}`,
+      );
+      showToastConfirmation({
+        body: "CSV contains unsupported values. No value sets were imported.",
+        variant: "error",
+      });
+      return;
+    }
+
     const valueSets = groupNormalizedRows(normalized.rows);
     if (valueSets.length === 0) {
       setCsvError("No valid value sets found in CSV");
