@@ -3,12 +3,14 @@ import styles from "../buildFromTemplates/conditionTemplateSelection.module.scss
 
 import { FilterableValueSet } from "./utils";
 import { DibbsConceptType } from "@/app/models/entities/valuesets";
+import { DateRange } from "@/app/ui/designSystem/timeboxing/DateRangePicker";
 // import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 
 type ConceptTypeAccordionBodyProps = {
   activeType: DibbsConceptType;
   activeTypeValueSets: { [vsId: string]: FilterableValueSet };
   expanded: boolean;
+  initialTimeboxRange?: DateRange;
   areItemsFiltered?: boolean;
 };
 
@@ -17,6 +19,7 @@ type ConceptTypeAccordionBodyProps = {
  * @param param0 - params
  * @param param0.activeType - DibbsactiveValueSetType (labs, conditions, medications)
  * @param param0.activeTypeValueSets - ValueSets for a given activeValueSetType
+ * @param param0.initialTimeboxRange - Timebox ranges
  * @param param0.expanded - Boolean for managing icon orientation
  * takes a VsName and generatesa ValueSet level update
  * @param param0.areItemsFiltered - whether the activeValueSets are filtered to
@@ -27,6 +30,7 @@ const ConceptTypeAccordionHeader: React.FC<ConceptTypeAccordionBodyProps> = ({
   activeType,
   activeTypeValueSets,
   expanded,
+  initialTimeboxRange,
   areItemsFiltered = false,
 }) => {
   const selectedCount = Object.values(activeTypeValueSets).reduce(
@@ -48,6 +52,25 @@ const ConceptTypeAccordionHeader: React.FC<ConceptTypeAccordionBodyProps> = ({
     0,
   );
 
+  const displayStart = initialTimeboxRange?.startDate
+    ? initialTimeboxRange?.startDate.toLocaleDateString("en-US", {
+        year: "2-digit",
+        month: "2-digit",
+        day: "2-digit",
+      })
+    : "";
+
+  const displayEnd = initialTimeboxRange?.endDate
+    ? initialTimeboxRange?.endDate.toLocaleDateString("en-US", {
+        year: "2-digit",
+        month: "2-digit",
+        day: "2-digit",
+      })
+    : "";
+
+  const displayDateRange =
+    displayStart && displayEnd ? `${displayStart} - ${displayEnd}` : "";
+
   return (
     <>
       <div className={styles.accordionHeaderContent} key={activeType}>
@@ -65,6 +88,7 @@ const ConceptTypeAccordionHeader: React.FC<ConceptTypeAccordionBodyProps> = ({
           </div>
         </div>
         <div className={styles.accordionHeaderCount}>
+          {displayDateRange ? `${displayDateRange} - ` : " "}
           {areItemsFiltered
             ? `${
                 Object.values(activeTypeValueSets).filter((v) => v.render)

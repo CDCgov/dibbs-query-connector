@@ -32,12 +32,12 @@ import ValueSetBulkToggle from "./ValueSetBulkToggle";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import classNames from "classnames";
 import DateRangePicker, {
+  DateRange,
   DateRangePickerRef,
 } from "@/app/ui/designSystem/timeboxing/DateRangePicker";
 import { DataContext } from "@/app/utils/DataProvider";
 import {
   deleteTimeboxSettings,
-  getTimeboxRanges,
   updateTimeboxSettings,
 } from "@/app/backend/query-timefiltering";
 
@@ -50,16 +50,12 @@ type ConceptTypeAccordionBodyProps = {
   handleVsIdLevelUpdate: (
     vsId: string,
   ) => (dibbsValueSets: DibbsValueSet) => void;
+  initialTimeboxRange?: DateRange;
   tableSearchFilter?: string;
 };
 
 export type ConceptDisplay = Concept & {
   render: boolean;
-};
-
-type DateRange = {
-  timeWindowStart: null | Date;
-  timeWindowEnd: null | Date;
 };
 
 /**
@@ -70,6 +66,7 @@ type DateRange = {
  * @param param0.handleVsNameLevelUpdate - curried state update function that
  * @param param0.handleVsIdLevelUpdate - curried state update function that
  * @param param0.tableSearchFilter - the search string from the selection table
+ * @param param0.initialTimeboxRange - time filter range for the concept type
  * @returns An accordion body component
  */
 const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
@@ -77,37 +74,18 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
   accordionConceptType,
   handleVsIdLevelUpdate,
   handleVsNameLevelUpdate,
+  initialTimeboxRange,
   tableSearchFilter = "",
 }) => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [curValueSet, setCurValueSet] = useState<DibbsValueSet>();
   const [curConcepts, setCurConcepts] = useState<FilterableConcept[]>([]);
   const [drawerSearchFilter, setDrawerSearchFilter] = useState<string>("");
-  const [initialTimeboxRange, setInitialTimeboxRange] = useState<DateRange>({
-    timeWindowStart: null,
-    timeWindowEnd: null,
-  });
 
   const areItemsFiltered = tableSearchFilter !== "";
   const focusRef = useRef<HTMLButtonElement>(null);
   const dateRef = useRef<DateRangePickerRef>(null);
   const queryContext = useContext(DataContext);
-
-  useEffect(() => {
-    async function fetchInitialTimeboxRange() {
-      const queryId = queryContext?.selectedQuery?.queryId;
-      if (queryId) {
-        const timeRange = await getTimeboxRanges(queryId, accordionConceptType);
-        if (timeRange) {
-          setInitialTimeboxRange({
-            timeWindowStart: new Date(timeRange.timeWindowStart),
-            timeWindowEnd: new Date(timeRange.timeWindowEnd),
-          });
-        }
-      }
-    }
-    fetchInitialTimeboxRange();
-  }, [accordionConceptType]);
 
   useEffect(() => {
     if (curValueSet) {
@@ -354,8 +332,8 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
         <DateRangePicker
           ref={dateRef}
           id={`dateRangePicker-${accordionConceptType}`}
-          startDate={initialTimeboxRange.timeWindowStart}
-          endDate={initialTimeboxRange.timeWindowEnd}
+          startDate={initialTimeboxRange?.startDate}
+          endDate={initialTimeboxRange?.endDate}
           onChange={handleTimeboxUpdate}
           handleClear={handleTimeboxClear}
           popoverSide="left"

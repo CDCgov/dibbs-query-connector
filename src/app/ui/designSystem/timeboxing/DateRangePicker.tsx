@@ -143,8 +143,8 @@ const presetOptions = [
 const CUSTOM_VALUE = "custom";
 
 interface DateRangePickerProps {
-  startDate: Date | null;
-  endDate: Date | null;
+  startDate: Date | null | undefined;
+  endDate: Date | null | undefined;
   onChange: (...args: unknown[]) => void;
   id: string;
   handleClear?: () => Promise<void>;
@@ -153,11 +153,12 @@ interface DateRangePickerProps {
 }
 
 export type DateRangePickerRef = {
-  getStartDate: () => Date | null;
-  getEndDate: () => Date | null;
+  getStartDate: () => Date | null | undefined;
+  getEndDate: () => Date | null | undefined;
   getIsRelativeRange: () => boolean | null;
 };
 
+const DEFAULT_DATE_DISPLAY_TEXT = "All dates";
 /**
  * A date range picker component with a toggleable modal and quick preset buttons.
  * @param root0 - The component props.
@@ -185,10 +186,15 @@ const DateRangePicker = forwardRef<DateRangePickerRef, DateRangePickerProps>(
     ref,
   ) => {
     const [selectedPreset, setSelectedPreset] = useState<string>("");
-    const [customStart, setCustomStart] = useState<Date | null>(initialStart);
-    const [customEnd, setCustomEnd] = useState<Date | null>(initialEnd);
+    const [customStart, setCustomStart] = useState<Date | null | undefined>(
+      initialStart,
+    );
+    const [customEnd, setCustomEnd] = useState<Date | null | undefined>(
+      initialEnd,
+    );
     const [dateErrors, setDateErrors] = useState<DateErrors>({});
     const [isOpen, setIsOpen] = useState(false);
+    const [displayText, setDisplayText] = useState(DEFAULT_DATE_DISPLAY_TEXT);
 
     const containerRef = useRef<HTMLDivElement>(null);
 
@@ -258,43 +264,41 @@ const DateRangePicker = forwardRef<DateRangePickerRef, DateRangePickerProps>(
       }
     }, [isOpen, customStart, customEnd]);
 
-    const getDisplayedRange = () => {
-      if (selectedPreset && selectedPreset !== CUSTOM_VALUE) {
-        const preset = presetOptions.find((p) => p.value === selectedPreset);
-        if (preset) {
-          return preset.getRange();
-        }
+    useEffect(() => {
+      if (selectedPreset === CUSTOM_VALUE) {
+        const displayStart = customStart
+          ? customStart.toLocaleDateString("en-US", {
+              year: "2-digit",
+              month: "2-digit",
+              day: "2-digit",
+            })
+          : "";
+
+        const displayEnd = customEnd
+          ? customEnd.toLocaleDateString("en-US", {
+              year: "2-digit",
+              month: "2-digit",
+              day: "2-digit",
+            })
+          : "";
+
+        const displayDateRange =
+          displayStart && displayEnd
+            ? `${displayStart} - ${displayEnd}`
+            : "Custom range";
+
+        setDisplayText(displayDateRange);
+      } else {
+        const selectedLabel =
+          presetOptions.find((v) => v.value === selectedPreset)?.label ?? "";
+
+        setDisplayText(selectedLabel);
       }
-      return { startDate: customStart, endDate: customEnd };
-    };
-
-    const { startDate, endDate } = getDisplayedRange();
-
-    const formattedStart = startDate ? startDate.toLocaleDateString() : "";
-    const formattedEnd = endDate ? endDate.toLocaleDateString() : "";
-
-    const displayStart = startDate
-      ? startDate.toLocaleDateString("en-US", {
-          year: "2-digit",
-          month: "2-digit",
-          day: "2-digit",
-        })
-      : "";
-
-    const displayEnd = endDate
-      ? endDate.toLocaleDateString("en-US", {
-          year: "2-digit",
-          month: "2-digit",
-          day: "2-digit",
-        })
-      : "";
-
-    const displayText =
-      formattedStart && formattedEnd ? `${displayStart} - ${displayEnd}` : "";
+    }, [selectedPreset, customStart, customEnd]);
 
     const validateDates = (
-      newStartDate: Date | null,
-      newEndDate: Date | null,
+      newStartDate: Date | null | undefined,
+      newEndDate: Date | null | undefined,
     ) => {
       const errors: DateErrors = {};
 
@@ -334,8 +338,8 @@ const DateRangePicker = forwardRef<DateRangePickerRef, DateRangePickerProps>(
     };
 
     useImperativeHandle(ref, () => ({
-      getStartDate: () => startDate,
-      getEndDate: () => endDate,
+      getStartDate: () => customStart,
+      getEndDate: () => customEnd,
       getIsRelativeRange: () => selectedPreset !== CUSTOM_VALUE,
     }));
 
@@ -360,8 +364,8 @@ const DateRangePicker = forwardRef<DateRangePickerRef, DateRangePickerProps>(
       setCustomStart(null);
       setCustomEnd(null);
       setSelectedPreset("");
-
       setDateErrors({});
+      setDisplayText(DEFAULT_DATE_DISPLAY_TEXT);
     };
 
     const disableApply = !selectedPreset;
@@ -382,7 +386,12 @@ const DateRangePicker = forwardRef<DateRangePickerRef, DateRangePickerProps>(
           <TextInput
             id={id}
             type="text"
-            className={styles.dateRangeInput}
+            className={classNames(
+              styles.dateRangeInput,
+              selectedPreset === CUSTOM_VALUE && customStart && customEnd
+                ? styles.datePicker__wide
+                : styles.datePicker,
+            )}
             data-testid="date-range-input"
             name="date-range-input"
             aria-label="Date range input"
@@ -497,8 +506,11 @@ const DateRangePicker = forwardRef<DateRangePickerRef, DateRangePickerProps>(
 
 export default DateRangePicker;
 
-function areDatesOnSameDay(date1: Date | null, date2: Date | null) {
-  if (date1 === null || date2 === null) return false;
+function areDatesOnSameDay(
+  date1: Date | null | undefined,
+  date2: Date | null | undefined,
+) {
+  if (!date1 || !date2) return false;
   return (
     date1.getFullYear() === date2.getFullYear() &&
     date1.getMonth() === date2.getMonth() &&

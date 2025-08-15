@@ -62,10 +62,30 @@ class QueryTimefilteringService {
     if (result) {
       return result.rows.map((v) => {
         return {
-          timeWindowStart: v.timeWindowStart,
-          timeWindowEnd: v.timeWindowEnd,
+          startDate: v.timeWindowStart,
+          endDate: v.timeWindowEnd,
         };
       })[0];
+    }
+
+    return undefined;
+  }
+  static async getQueryTimeboxRanges(queryId: string) {
+    const timeboxSelectionQuery = `
+        SELECT time_window_start, time_window_end, concept_type FROM query_timeboxing
+        WHERE query_id = $1;
+    `;
+
+    const result = await dbService.query(timeboxSelectionQuery, [queryId]);
+
+    if (result) {
+      return result.rows.map((v) => {
+        return {
+          startDate: v.timeWindowStart,
+          endDate: v.timeWindowEnd,
+          conceptType: v.conceptType,
+        };
+      });
     }
 
     return undefined;
@@ -103,6 +123,8 @@ class QueryTimefilteringService {
 }
 
 export const getTimeboxRanges = QueryTimefilteringService.getTimeboxRanges;
+export const getQueryTimeboxRanges =
+  QueryTimefilteringService.getQueryTimeboxRanges;
 export const linkTimeboxRangesToQuery =
   QueryTimefilteringService.linkTimeboxRangesToQuery;
 export const deleteTimeboxSettings =
