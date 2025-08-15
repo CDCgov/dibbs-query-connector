@@ -29,24 +29,6 @@ export interface DateErrors {
   end?: string;
 }
 
-const normalizeStart = (date: Date | null) =>
-  date
-    ? new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0, 0)
-    : null;
-
-const normalizeEnd = (date: Date | null) =>
-  date
-    ? new Date(
-        date.getFullYear(),
-        date.getMonth(),
-        date.getDate(),
-        23,
-        59,
-        59,
-        999,
-      )
-    : null;
-
 // We probably can reuse this logic from the backend for whatever our fhir logic will be then just import it
 const today = () => {
   const d = new Date();
@@ -64,7 +46,13 @@ const addMonths = (date: Date, months: number) => {
   return d;
 };
 
-const presetOptions = [
+type PresetOptions = {
+  label: string;
+  value: string;
+  getRange: () => DateRange;
+};
+
+const PRESET_TIMERANGE_OPTIONS: PresetOptions[] = [
   {
     label: "Last 24 hours",
     value: "last-day",
@@ -84,8 +72,8 @@ const presetOptions = [
       const end = today();
       const start = addDays(end, -7);
       return {
-        startDate: normalizeStart(start),
-        endDate: normalizeEnd(end),
+        startDate: start,
+        endDate: end,
       };
     },
   },
@@ -96,8 +84,8 @@ const presetOptions = [
       const end = today();
       const start = addDays(end, -30);
       return {
-        startDate: normalizeStart(start),
-        endDate: normalizeEnd(end),
+        startDate: start,
+        endDate: end,
       };
     },
   },
@@ -108,8 +96,8 @@ const presetOptions = [
       const end = today();
       const start = addMonths(end, -3);
       return {
-        startDate: normalizeStart(start),
-        endDate: normalizeEnd(end),
+        startDate: start,
+        endDate: end,
       };
     },
   },
@@ -120,8 +108,8 @@ const presetOptions = [
       const end = today();
       const start = addMonths(end, -6);
       return {
-        startDate: normalizeStart(start),
-        endDate: normalizeEnd(end),
+        startDate: start,
+        endDate: end,
       };
     },
   },
@@ -133,12 +121,43 @@ const presetOptions = [
       const start = new Date(end);
       start.setFullYear(end.getFullYear() - 1);
       return {
-        startDate: normalizeStart(start),
-        endDate: normalizeEnd(end),
+        startDate: start,
+        endDate: end,
       };
     },
   },
 ];
+
+/**
+ * @param initialStart - initial start date
+ * @param  initialEnd - initial end date
+ * @returns value of the label to match to the preset option
+ */
+export function matchTimeRangeToOptionValue(
+  initialStart: Date,
+  initialEnd: Date,
+): { value: string; label: string; isPreset: boolean } {
+  let displayValue = "";
+  let isPreset = false;
+  let displayLabel = DEFAULT_DATE_DISPLAY_TEXT;
+
+  PRESET_TIMERANGE_OPTIONS.forEach((p) => {
+    const { startDate, endDate } = p.getRange();
+    if (
+      areDatesOnSameDay(startDate, initialStart) &&
+      areDatesOnSameDay(endDate, initialEnd)
+    ) {
+      displayValue = p.value;
+      displayLabel = p.label;
+      isPreset = true;
+    }
+  });
+  return {
+    value: displayValue,
+    label: displayLabel,
+    isPreset: isPreset,
+  };
+}
 
 const CUSTOM_VALUE = "custom";
 
@@ -197,104 +216,12 @@ const DateRangePicker = forwardRef<DateRangePickerRef, DateRangePickerProps>(
     const [displayText, setDisplayText] = useState(DEFAULT_DATE_DISPLAY_TEXT);
 
     const containerRef = useRef<HTMLDivElement>(null);
-
-    useEffect(() => {
-      if (initialStart === null || initialEnd === null) return;
-
-      if (initialStart) {
-        setCustomStart(initialStart);
-      }
-
-      if (initialEnd) {
-        setCustomEnd(initialEnd);
-      }
-
-      let somePresetValue = false;
-      presetOptions.forEach((p) => {
-        const { startDate, endDate } = p.getRange();
-
-        if (
-          areDatesOnSameDay(startDate, initialStart) &&
-          areDatesOnSameDay(endDate, initialEnd)
-        ) {
-          somePresetValue = true;
-          setSelectedPreset(p.value);
-        }
-      });
-
-      if (!somePresetValue) {
-        setSelectedPreset(CUSTOM_VALUE);
-      }
-    }, [initialStart, initialEnd]);
-
-    useEffect(() => {
-      const handleClickOutside = (event: MouseEvent) => {
-        if (
-          containerRef.current &&
-          !containerRef.current.contains(event.target as Node)
-        ) {
-          setIsOpen(false);
-        }
-      };
-
-      if (isOpen) {
-        document.addEventListener("mousedown", handleClickOutside);
-      } else {
-        document.removeEventListener("mousedown", handleClickOutside);
-      }
-
-      return () =>
-        document.removeEventListener("mousedown", handleClickOutside);
-    }, [isOpen]);
-
-    useEffect(() => {
-      if (isOpen) {
-        const startInput = document.getElementById(
-          "log-date-start",
-        ) as HTMLInputElement;
-        const endInput = document.getElementById(
-          "log-date-end",
-        ) as HTMLInputElement;
-        if (startInput)
-          startInput.value = customStart
-            ? customStart.toLocaleDateString()
-            : "";
-        if (endInput)
-          endInput.value = customEnd ? customEnd.toLocaleDateString() : "";
-      }
-    }, [isOpen, customStart, customEnd]);
-
-    useEffect(() => {
-      if (selectedPreset === CUSTOM_VALUE) {
-        const displayStart = customStart
-          ? customStart.toLocaleDateString("en-US", {
-              year: "2-digit",
-              month: "2-digit",
-              day: "2-digit",
-            })
-          : "";
-
-        const displayEnd = customEnd
-          ? customEnd.toLocaleDateString("en-US", {
-              year: "2-digit",
-              month: "2-digit",
-              day: "2-digit",
-            })
-          : "";
-
-        const displayDateRange =
-          displayStart && displayEnd
-            ? `${displayStart} - ${displayEnd}`
-            : "Custom range";
-
-        setDisplayText(displayDateRange);
-      } else {
-        const selectedLabel =
-          presetOptions.find((v) => v.value === selectedPreset)?.label ?? "";
-
-        setDisplayText(selectedLabel);
-      }
-    }, [selectedPreset, customStart, customEnd]);
+    useImperativeHandle(ref, () => ({
+      // these hooks are available through the ref in the onChange value passed in
+      getStartDate: () => customStart,
+      getEndDate: () => customEnd,
+      getIsRelativeRange: () => selectedPreset !== CUSTOM_VALUE,
+    }));
 
     const validateDates = (
       newStartDate: Date | null | undefined,
@@ -337,23 +264,8 @@ const DateRangePicker = forwardRef<DateRangePickerRef, DateRangePickerProps>(
       }
     };
 
-    useImperativeHandle(ref, () => ({
-      getStartDate: () => customStart,
-      getEndDate: () => customEnd,
-      getIsRelativeRange: () => selectedPreset !== CUSTOM_VALUE,
-    }));
-
     const handleApply = () => {
-      onChange(
-        selectedPreset && selectedPreset !== CUSTOM_VALUE
-          ? presetOptions
-              .find((p) => p.value === selectedPreset)
-              ?.getRange() || {
-              startDate: null,
-              endDate: null,
-            }
-          : { startDate: customStart, endDate: customEnd },
-      );
+      onChange();
       setIsOpen(false);
     };
 
@@ -368,16 +280,78 @@ const DateRangePicker = forwardRef<DateRangePickerRef, DateRangePickerProps>(
       setDisplayText(DEFAULT_DATE_DISPLAY_TEXT);
     };
 
+    useEffect(() => {
+      if (initialStart == null || initialEnd == null) return;
+
+      const matchingValue = matchTimeRangeToOptionValue(
+        initialStart,
+        initialEnd,
+      );
+      if (matchingValue.isPreset) {
+        setDisplayText(matchingValue.label);
+        setSelectedPreset(matchingValue.value);
+      } else {
+        // we didn't hit a match but the start / end are defined, so we're in the custom value
+        setCustomStart(initialStart);
+        setCustomEnd(initialEnd);
+        setSelectedPreset(CUSTOM_VALUE);
+        setDisplayText(
+          formatDateRangeToMMDDYY(initialStart, initialEnd) ?? "Custom range",
+        );
+      }
+    }, [initialStart, initialEnd]);
+
+    useEffect(() => {
+      const handleClickOutside = (event: MouseEvent) => {
+        if (
+          containerRef.current &&
+          !containerRef.current.contains(event.target as Node)
+        ) {
+          setIsOpen(false);
+        }
+      };
+
+      if (isOpen) {
+        document.addEventListener("mousedown", handleClickOutside);
+      } else {
+        document.removeEventListener("mousedown", handleClickOutside);
+      }
+
+      return () =>
+        document.removeEventListener("mousedown", handleClickOutside);
+    }, [isOpen]);
+
+    useEffect(() => {
+      if (!selectedPreset) {
+        setDisplayText(DEFAULT_DATE_DISPLAY_TEXT);
+      } else if (selectedPreset === CUSTOM_VALUE) {
+        const displayDateRange =
+          formatDateRangeToMMDDYY(customStart, customEnd) ?? "Custom range";
+        setCustomStart(customStart);
+        setCustomEnd(customEnd);
+        setDisplayText(displayDateRange);
+      } else {
+        const selectedLabel =
+          PRESET_TIMERANGE_OPTIONS.find((v) => v.value === selectedPreset)
+            ?.label ?? "";
+
+        const rangeValues = (
+          PRESET_TIMERANGE_OPTIONS.find(
+            (p) => p.value === selectedPreset,
+          ) as PresetOptions
+        ).getRange();
+
+        setCustomStart(rangeValues.startDate);
+        setCustomEnd(rangeValues.endDate);
+        setDisplayText(selectedLabel);
+      }
+    }, [selectedPreset]);
+
     const disableApply = !selectedPreset;
 
     return (
       <div className={styles.datePickerContainer} ref={containerRef}>
-        <div
-          className={classNames(
-            styles.textInputContainer,
-            displayText ? styles.textInputContainer__wide : "",
-          )}
-        >
+        <div className={classNames(styles.textInputContainer)}>
           <Icon.CalendarToday
             size={3}
             className={styles.calendarIcon}
@@ -388,9 +362,11 @@ const DateRangePicker = forwardRef<DateRangePickerRef, DateRangePickerProps>(
             type="text"
             className={classNames(
               styles.dateRangeInput,
-              selectedPreset === CUSTOM_VALUE && customStart && customEnd
-                ? styles.datePicker__wide
-                : styles.datePicker,
+              !selectedPreset && styles.datePicker__narrow,
+              selectedPreset &&
+                selectedPreset !== CUSTOM_VALUE &&
+                styles.datePicker,
+              selectedPreset === CUSTOM_VALUE && styles.datePicker__wide,
             )}
             data-testid="date-range-input"
             name="date-range-input"
@@ -423,7 +399,7 @@ const DateRangePicker = forwardRef<DateRangePickerRef, DateRangePickerProps>(
                   </Button>
                 </div>
 
-                {presetOptions.map(({ label, value }) => (
+                {PRESET_TIMERANGE_OPTIONS.map(({ label, value }) => (
                   <Radio
                     key={value}
                     id={`preset-${value}`}
@@ -460,10 +436,10 @@ const DateRangePicker = forwardRef<DateRangePickerRef, DateRangePickerProps>(
                   startDatePickerProps={{
                     id: "log-date-start",
                     name: "log-date-start",
-                    value: customStart ? customStart.toLocaleDateString() : "",
+                    defaultValue: customStart ? customStart.toISOString() : "",
                     onChange: (val?: string) => {
                       const rawDate = val ? new Date(val) : null;
-                      const date = normalizeStart(rawDate);
+                      const date = rawDate;
                       const errors = validateDates(date, customEnd);
                       setDateErrors(errors);
                       setCustomStart(date);
@@ -472,10 +448,10 @@ const DateRangePicker = forwardRef<DateRangePickerRef, DateRangePickerProps>(
                   endDatePickerProps={{
                     id: "log-date-end",
                     name: "log-date-end",
-                    value: customEnd ? customEnd.toLocaleDateString() : "",
+                    defaultValue: customEnd ? customEnd.toISOString() : "",
                     onChange: (val?: string) => {
                       const rawDate = val ? new Date(val) : null;
-                      const date = normalizeEnd(rawDate);
+                      const date = rawDate;
                       const errors = validateDates(customStart, date);
                       setDateErrors(errors);
                       setCustomEnd(date);
@@ -516,4 +492,35 @@ function areDatesOnSameDay(
     date1.getMonth() === date2.getMonth() &&
     date1.getDate() === date2.getDate()
   );
+}
+/**
+ *
+ * @param startDate - start date
+ * @param endDate - end date
+ * @returns formatted start / end
+ */
+export function formatDateRangeToMMDDYY(
+  startDate: Date | undefined | null,
+  endDate: Date | undefined | null,
+) {
+  const displayStart = startDate
+    ? startDate.toLocaleDateString("en-US", {
+        year: "2-digit",
+        month: "2-digit",
+        day: "2-digit",
+      })
+    : "";
+
+  const displayEnd = endDate
+    ? endDate.toLocaleDateString("en-US", {
+        year: "2-digit",
+        month: "2-digit",
+        day: "2-digit",
+      })
+    : "";
+
+  const displayDateRange =
+    displayStart && displayEnd ? `${displayStart} - ${displayEnd}` : undefined;
+
+  return displayDateRange;
 }

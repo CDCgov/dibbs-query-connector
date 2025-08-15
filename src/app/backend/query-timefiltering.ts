@@ -2,6 +2,7 @@
 
 import { QueryTableTimebox } from "../(pages)/queryBuilding/utils";
 import { DibbsConceptType } from "../models/entities/valuesets";
+import { DateRange } from "../ui/designSystem/timeboxing/DateRangePicker";
 import { adminRequired } from "./db/decorators";
 import dbService from "./db/service";
 
@@ -78,17 +79,20 @@ class QueryTimefilteringService {
 
     const result = await dbService.query(timeboxSelectionQuery, [queryId]);
 
+    const conceptTimebox: Partial<{
+      [conceptType in DibbsConceptType]: DateRange;
+    }> = {};
+
     if (result) {
-      return result.rows.map((v) => {
-        return {
+      result.rows.forEach((v) => {
+        conceptTimebox[v.conceptType as DibbsConceptType] = {
           startDate: v.timeWindowStart,
           endDate: v.timeWindowEnd,
-          conceptType: v.conceptType,
         };
       });
     }
 
-    return undefined;
+    return conceptTimebox;
   }
 
   static async linkTimeboxRangesToQuery(queryId: string) {

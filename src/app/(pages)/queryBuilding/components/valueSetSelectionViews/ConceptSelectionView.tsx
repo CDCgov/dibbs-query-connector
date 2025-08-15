@@ -20,6 +20,7 @@ import {
 } from "@/app/models/entities/valuesets";
 import { getQueryTimeboxRanges } from "@/app/backend/query-timefiltering";
 import { DataContext } from "@/app/utils/DataProvider";
+import { DateRange } from "@/app/ui/designSystem/timeboxing/DateRangePicker";
 
 type ConceptSelectionViewProps = {
   vsTypeLevelOptions: ConceptTypeToDibbsVsMap;
@@ -40,12 +41,6 @@ type VsTypeAccordion = {
   atLeastOneRenderedValueSet: boolean;
 };
 
-type QueryTimeRange = {
-  startDate: Date | undefined | null;
-  endDate: Date | undefined | null;
-  conceptType: DibbsConceptType;
-}[];
-
 /**
  * Component that displays ValueSetGroupings sorted by VsType (DibbsConceptType)
  * for the active condition selected
@@ -63,37 +58,36 @@ export const ConceptSelectionView: React.FC<ConceptSelectionViewProps> = ({
 }) => {
   const [curExpanded, setCurExpanded] = useState<string>("");
   const [accordionItems, setAccordionItems] = useState<VsTypeAccordion[]>([]);
+  const [timeboxRanges, setTimeboxRanges] = useState<
+    Partial<{
+      [conceptType in DibbsConceptType]: DateRange | undefined;
+    }>
+  >({});
+
   const queryContext = useContext(DataContext);
+  const queryId = queryContext?.selectedQuery?.queryId;
 
   useEffect(() => {
-    const queryId = queryContext?.selectedQuery?.queryId;
-    async function fetchInitialTimeboxRange() {
-      if (queryId) {
-        const timeRange = await getQueryTimeboxRanges(queryId);
-        if (timeRange) {
-          setAccordionItems(
-            generateTypeLevelAccordionItems(
-              vsTypeLevelOptions,
-              searchFilter,
-              timeRange,
-            ),
-          );
-        }
-      }
+    async function fetchInitialRanges() {
+      if (!queryId) return;
+      const initialTimeboxes = await getQueryTimeboxRanges(queryId);
+      setTimeboxRanges(initialTimeboxes);
     }
 
-    fetchInitialTimeboxRange();
-  }, [vsTypeLevelOptions, searchFilter, curExpanded]);
+    fetchInitialRanges();
+  }, []);
 
-  const generateTypeLevelAccordionItems = (
+  const generateTypeLevelAccordions = (
     vsTypeLevelOptions: ConceptTypeToDibbsVsMap,
     searchFilter: string,
-    timeboxRanges: QueryTimeRange,
   ) => {
+    if (!queryId) return [];
+
     const accordionDataToDisplay = filterVsTypeOptions(
       vsTypeLevelOptions,
       searchFilter,
     );
+
     const areItemsFiltered = searchFilter !== "";
 
     return Object.entries(accordionDataToDisplay).map(
@@ -104,13 +98,21 @@ export const ConceptSelectionView: React.FC<ConceptSelectionViewProps> = ({
           .some(Boolean);
 
         const vsType = k as DibbsConceptType;
+        const updateConceptTimebox = (newTimebox: DateRange) =>
+          setTimeboxRanges((prev) => {
+            return {
+              ...prev,
+              [vsType]: newTimebox,
+            };
+          });
+
         const handleVsNameLevelUpdate = handleVsTypeLevelUpdate(vsType);
-        const timeRange = timeboxRanges.find((v) => v.conceptType === vsType);
+        const timeRange = timeboxRanges[vsType];
         const initialTimeboxRange =
-          timeRange?.startDate && timeRange?.endDate
+          timeRange && timeRange?.startDate && timeRange?.endDate
             ? {
-                startDate: timeRange.startDate,
-                endDate: timeRange.endDate,
+                startDate: new Date(timeRange.startDate),
+                endDate: new Date(timeRange.endDate),
               }
             : undefined;
 
@@ -126,6 +128,7 @@ export const ConceptSelectionView: React.FC<ConceptSelectionViewProps> = ({
 
         const content = (
           <ConceptTypeAccordionBody
+            updateTimeboxRange={updateConceptTimebox}
             accordionConceptType={vsType}
             activeValueSets={valueSetsInType}
             handleVsNameLevelUpdate={handleVsNameLevelUpdate}
@@ -155,6 +158,14 @@ export const ConceptSelectionView: React.FC<ConceptSelectionViewProps> = ({
       },
     );
   };
+
+  useEffect(() => {
+    const accordions = generateTypeLevelAccordions(
+      vsTypeLevelOptions,
+      searchFilter,
+    );
+    setAccordionItems(accordions);
+  }, [vsTypeLevelOptions, searchFilter, curExpanded, timeboxRanges]);
 
   const accordionsToRender = accordionItems.filter(
     (i) => i.atLeastOneRenderedValueSet,

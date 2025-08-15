@@ -51,6 +51,7 @@ type ConceptTypeAccordionBodyProps = {
     vsId: string,
   ) => (dibbsValueSets: DibbsValueSet) => void;
   initialTimeboxRange?: DateRange;
+  updateTimeboxRange: (newTimebox: DateRange) => void;
   tableSearchFilter?: string;
 };
 
@@ -67,6 +68,7 @@ export type ConceptDisplay = Concept & {
  * @param param0.handleVsIdLevelUpdate - curried state update function that
  * @param param0.tableSearchFilter - the search string from the selection table
  * @param param0.initialTimeboxRange - time filter range for the concept type
+ * @param param0.updateTimeboxRange - update function that changes the concept type timebox
  * @returns An accordion body component
  */
 const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
@@ -75,6 +77,7 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
   handleVsIdLevelUpdate,
   handleVsNameLevelUpdate,
   initialTimeboxRange,
+  updateTimeboxRange,
   tableSearchFilter = "",
 }) => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -266,10 +269,10 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
     const startDate = dateRef.current?.getStartDate();
     const endDate = dateRef.current?.getEndDate();
     const isRelativeRange = dateRef.current?.getIsRelativeRange();
+
     if (queryId && startDate && endDate) {
       const startDateString = startDate.toISOString();
       const endDateString = endDate.toISOString();
-
       await updateTimeboxSettings(
         queryId,
         conceptType,
@@ -277,7 +280,15 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
         endDateString,
         isRelativeRange ?? true,
       );
+      updateTimeboxRange({
+        startDate: startDate,
+        endDate: endDate,
+      });
     }
+
+    showToastConfirmation({
+      body: `${queryContext?.selectedQuery?.queryName} filter on ${conceptType} successfully applied`,
+    });
   };
 
   const handleTimeboxClear = async () => {
@@ -287,6 +298,11 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
     if (queryId) {
       await deleteTimeboxSettings(queryId, conceptType);
     }
+
+    updateTimeboxRange({
+      startDate: null,
+      endDate: null,
+    });
   };
 
   const buttons = [

@@ -3,7 +3,11 @@ import styles from "../buildFromTemplates/conditionTemplateSelection.module.scss
 
 import { FilterableValueSet } from "./utils";
 import { DibbsConceptType } from "@/app/models/entities/valuesets";
-import { DateRange } from "@/app/ui/designSystem/timeboxing/DateRangePicker";
+import {
+  DateRange,
+  formatDateRangeToMMDDYY,
+  matchTimeRangeToOptionValue,
+} from "@/app/ui/designSystem/timeboxing/DateRangePicker";
 // import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 
 type ConceptTypeAccordionBodyProps = {
@@ -52,24 +56,20 @@ const ConceptTypeAccordionHeader: React.FC<ConceptTypeAccordionBodyProps> = ({
     0,
   );
 
-  const displayStart = initialTimeboxRange?.startDate
-    ? initialTimeboxRange?.startDate.toLocaleDateString("en-US", {
-        year: "2-digit",
-        month: "2-digit",
-        day: "2-digit",
-      })
-    : "";
+  let dateRangeLabel;
+  if (initialTimeboxRange?.endDate && initialTimeboxRange.startDate) {
+    const displayValues = matchTimeRangeToOptionValue(
+      initialTimeboxRange?.startDate,
+      initialTimeboxRange?.endDate,
+    );
 
-  const displayEnd = initialTimeboxRange?.endDate
-    ? initialTimeboxRange?.endDate.toLocaleDateString("en-US", {
-        year: "2-digit",
-        month: "2-digit",
-        day: "2-digit",
-      })
-    : "";
-
-  const displayDateRange =
-    displayStart && displayEnd ? `${displayStart} - ${displayEnd}` : "";
+    displayValues.isPreset
+      ? (dateRangeLabel = displayValues.label)
+      : (dateRangeLabel = formatDateRangeToMMDDYY(
+          initialTimeboxRange.startDate,
+          initialTimeboxRange.endDate,
+        )); // is an absolute / custom range, so display the dates
+  }
 
   return (
     <>
@@ -84,11 +84,13 @@ const ConceptTypeAccordionHeader: React.FC<ConceptTypeAccordionBodyProps> = ({
             data-testid={`accordionHeader_${activeType}`}
             className={styles.accordionLabel}
           >
-            {activeType}
+            {dateRangeLabel ? `${activeType}:` : activeType}
+            <span className="text-normal padding-left-05">
+              {dateRangeLabel ? `${dateRangeLabel}` : " "}
+            </span>
           </div>
         </div>
         <div className={styles.accordionHeaderCount}>
-          {displayDateRange ? `${displayDateRange} - ` : " "}
           {areItemsFiltered
             ? `${
                 Object.values(activeTypeValueSets).filter((v) => v.render)
