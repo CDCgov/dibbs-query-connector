@@ -19,6 +19,8 @@ import {
 } from "@/app/backend/usergroup-management";
 import { mockAdmin } from "../userManagement/test-utils";
 import { getCustomValueSetById } from "@/app/backend/custom-code-service";
+import { renderWithUser } from "@/app/tests/unit/setup";
+import { insertCustomValueSet } from "@/app/backend/custom-code-service";
 
 jest.mock("next-auth/react");
 
@@ -57,6 +59,9 @@ jest.mock("@/app/backend/user-management", () => ({
 
 jest.mock("@/app/backend/custom-code-service", () => ({
   getCustomValueSetById: jest.fn(),
+  insertCustomValueSet: jest.fn(),
+  insertCustomValuesetsIntoQuery: jest.fn(),
+  deleteCustomValueSet: jest.fn(),
 }));
 
 describe("Code library loading view", () => {
@@ -269,5 +274,92 @@ describe("Code library interaction", () => {
         `Are you sure you want to delete the value set "${customValueSets[0].valueset_name}?"`,
       );
     });
+  });
+});
+
+describe("Code library CSV upload", () => {
+  const adminUser = {
+    id: "user-1",
+    username: "qcadmin",
+    firstName: "QC",
+    lastName: "Admin",
+  };
+
+  const rows = [
+    {
+      "value set name": "Cooties Vaccine",
+      category: "labs",
+      "code system": "LOINC",
+      code: "12345",
+      display: "Circle Circle",
+    },
+    {
+      "value set name": "Cooties Vaccine",
+      category: "labs",
+      "code system": "LOINC",
+      code: "67890",
+      display: "Dot Dot",
+    },
+  ];
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+
+    (getUserByUsername as jest.Mock).mockResolvedValue({ items: [adminUser] });
+    (getConditionsData as jest.Mock).mockResolvedValue({
+      conditionIdToNameMap: {},
+    });
+    (getAllValueSets as jest.Mock).mockResolvedValue({ items: [] });
+    (insertCustomValueSet as jest.Mock).mockResolvedValue({
+      success: true,
+      id: "vs-1",
+    });
+
+    (global as any).fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ rows }),
+    });
+  });
+  afterEach(() => {
+    (global.fetch as jest.Mock).mockReset();
+    (insertCustomValueSet as jest.Mock).mockReset();
+    (getAllValueSets as jest.Mock).mockReset();
+  });
+
+  it("uploads CSV, saves value set(s), refetches, and applies Created by me filter", async () => {
+    const { user } = renderWithUser(
+      <RootProviderMock currentPage="/codeLibrary">
+        <CodeLibrary />
+      </RootProviderMock>,
+    );
+
+    await screen.findByTestId("table-valuesets-manage");
+
+    const fileInput = document.querySelector(
+      'input[type="file"]',
+    ) as HTMLInputElement;
+
+    const file = new File(["value set csv"], "CustomValueSetSample.csv", {
+      type: "text/csv",
+    });
+
+    await user.upload(fileInput, file);
+
+    await waitFor(() => expect(insertCustomValueSet).toHaveBeenCalledTimes(1));
+
+    expect(insertCustomValueSet).toHaveBeenCalledWith(
+      expect.objectContaining({
+        valueSetName: "Cooties Vaccine",
+        dibbsConceptType: "labs",
+        system: "http://loinc.org",
+      }),
+      adminUser.id,
+    );
+
+    await waitFor(() => expect(getAllValueSets).toHaveBeenCalledTimes(2));
+
+    await waitFor(() =>
+      expect(screen.getByText(/1 filter applied/i)).toBeInTheDocument(),
+    );
   });
 });
