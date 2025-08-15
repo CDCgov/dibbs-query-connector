@@ -290,7 +290,7 @@ export const auditLogActionTypeMap: Record<string, auditLogActionTypeMapping> =
       },
     },
     insertCustomValueSet: {
-      label: "Custom value set modified",
+      label: "Custom value set saved",
       format: (log) => {
         const request = parseRequest(log);
         const firstValue = Object.values(request)[0];
