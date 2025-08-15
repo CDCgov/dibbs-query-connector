@@ -3,7 +3,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import SearchForm from "@/app/(pages)/query/components/searchForm/SearchForm";
 
-jest.mock("@/app/backend/fhir-servers", () => ({
+jest.mock("@/app/backend/fhir-servers/service", () => ({
   getFhirServerConfigs: jest.fn().mockResolvedValue([]),
 }));
 
