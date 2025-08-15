@@ -315,7 +315,7 @@ describe("Code library CSV upload", () => {
       id: "vs-1",
     });
 
-    (global as any).fetch = jest.fn().mockResolvedValue({
+    (global as typeof globalThis).fetch = jest.fn().mockResolvedValue({
       ok: true,
       json: async () => ({ rows }),
     });
