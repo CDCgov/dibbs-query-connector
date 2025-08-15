@@ -1,3 +1,4 @@
+import { deleteCustomValueSet } from "@/app/backend/custom-code-service";
 import { getAllUsers } from "@/app/backend/user-management";
 import { Profile, Session } from "next-auth";
 
@@ -57,7 +58,7 @@ function resolveFullName(
   fallback?: string,
 ): string {
   const full = `${first ?? ""} ${last ?? ""}`.trim();
-  return full !== "" ? full : (fallback ?? "");
+  return full !== "" ? full : fallback ?? "";
 }
 
 /**
@@ -286,6 +287,36 @@ export const auditLogActionTypeMap: Record<string, auditLogActionTypeMapping> =
           ? `Query with name ${queryName} and id ${queryId} saved`
           : `Query with name ${queryName} saved`;
 
+        return message;
+      },
+    },
+    insertCustomValueSet: {
+      label: "Custom value set modified",
+      format: (log) => {
+        const request = parseRequest(log);
+        const firstValue = Object.values(request)[0];
+        const valueSetName =
+          typeof firstValue === "object" &&
+          firstValue !== null &&
+          "valueSetName" in firstValue
+            ? (firstValue as { valueSetName: string }).valueSetName
+            : "";
+        const message = `Value set with name ${valueSetName} saved`;
+        return message;
+      },
+    },
+    deleteCustomValueSet: {
+      label: "Custom value set deleted",
+      format: (log) => {
+        const request = parseRequest(log);
+        const firstValue = Object.values(request)[0];
+        const valueSetName =
+          typeof firstValue === "object" &&
+          firstValue !== null &&
+          "valueSetName" in firstValue
+            ? (firstValue as { valueSetName: string }).valueSetName
+            : "";
+        const message = `Value set with name ${valueSetName} deleted`;
         return message;
       },
     },
