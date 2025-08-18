@@ -262,8 +262,8 @@ class QueryService {
     }
 
     try {
-      const patientLink = task.output?.find((output) =>
-        output.valueString?.includes("Patient-Page1"),
+      const patientLink = task.output?.find(
+        (output) => output.valueString?.includes("Patient-Page1"),
       )?.valueString;
 
       if (!patientLink) {
@@ -367,6 +367,10 @@ class QueryService {
 
     const parentTaskId = createdTask.entry?.[0]?.resource?.id;
     if (!parentTaskId) {
+      console.error(
+        "Failed to create parent task. Output for task instead was:",
+      );
+      console.error(createdTask);
       throw new Error("Failed to create parent Task for patient discovery.");
     }
 
@@ -494,8 +498,6 @@ class QueryService {
         statusText: "OK",
         headers: new Headers({ "content-type": "application/json" }),
       });
-
-      console.log("in discovery branch", response);
     } else {
       response = await this.handleStandardDiscovery(fhirClient, patientQuery);
     }
@@ -519,8 +521,6 @@ class QueryService {
         `Patient search failed. Status: ${response.status} \n Body: ${errorText} \n Headers: ${headerText}`,
       );
     }
-
-    console.log("in discovery strategy function", response);
 
     return response;
   }
@@ -683,8 +683,8 @@ class QueryService {
 
     const noCertainMatch =
       jsonBody.resourceType === "OperationOutcome" &&
-      jsonBody.issue?.some((i) =>
-        i.details?.text?.includes("did not find a certain match"),
+      jsonBody.issue?.some(
+        (i) => i.details?.text?.includes("did not find a certain match"),
       );
 
     if (noCertainMatch) {
@@ -767,8 +767,6 @@ class QueryService {
         fhirResponse.headers.get("content-type")?.includes("application/json")
       ) {
         const body = await fhirResponse.clone().json();
-        console.log("fhir response body ", body);
-
         if (body?.uncertainMatchError === true) {
           return { uncertainMatchError: true };
         }
@@ -778,7 +776,6 @@ class QueryService {
     }
 
     const newResponse = await QueryService.parseFhirSearch(fhirResponse);
-    console.log("new response", newResponse);
     return newResponse["Patient"] as Patient[];
   }
 
