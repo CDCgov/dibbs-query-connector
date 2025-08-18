@@ -136,14 +136,18 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(OperationOutcome, { status: 400 });
   }
 
-  const QueryResponse: QueryResponse = await fullPatientQuery(QueryRequest);
+  try {
+    const QueryResponse: QueryResponse = await fullPatientQuery(QueryRequest);
 
-  // Bundle data
-  const bundle: APIQueryResponse = await createBundle(QueryResponse);
+    // Bundle data
+    const bundle: APIQueryResponse = await createBundle(QueryResponse);
 
-  return NextResponse.json(bundle, {
-    status: 200,
-  });
+    return NextResponse.json(bundle, {
+      status: 200,
+    });
+  } catch (error: unknown) {
+    return await handleAndReturnError(error);
+  }
 }
 
 /**
@@ -287,14 +291,18 @@ export async function POST(request: NextRequest) {
     return await handleAndReturnError(INSUFFICIENT_PATIENT_IDENTIFIERS, 400);
   }
 
-  const QueryResponse: QueryResponse = await fullPatientQuery(QueryRequest);
+  try {
+    const QueryResponse: QueryResponse = await fullPatientQuery(QueryRequest);
 
-  // Bundle data
-  const bundle: APIQueryResponse = await createBundle(QueryResponse);
+    // Bundle data
+    const bundle: APIQueryResponse = await createBundle(QueryResponse);
 
-  return NextResponse.json(bundle, {
-    status: 200,
-  });
+    return NextResponse.json(bundle, {
+      status: 200,
+    });
+  } catch (error: unknown) {
+    return await handleAndReturnError(error);
+  }
 }
 
 /**

@@ -51,7 +51,6 @@ describe("FHIR Servers tests", () => {
       {},
       TEST_FHIR_SERVER.disableCertValidation,
       TEST_FHIR_SERVER.defaultServer,
-
       "none",
       null,
       null,
@@ -60,6 +59,7 @@ describe("FHIR Servers tests", () => {
       null,
       null,
       null,
+      false, // mutual_tls parameter
     ]);
     // Has new
     let newFhirServers = await getFhirServerConfigs(true);
@@ -74,13 +74,17 @@ describe("FHIR Servers tests", () => {
     //update works
     const NEW_NAME = "Kongo Jungle Two";
     const NEW_HOSTNAME = "http://welcome-to-the-new-jungle.bananarepublic/fhir";
-    await updateFhirServer(
-      newServer?.id as string,
-      NEW_NAME,
-      NEW_HOSTNAME,
-      false,
-      false,
-    );
+    await updateFhirServer({
+      id: newServer?.id as string,
+      name: NEW_NAME,
+      hostname: NEW_HOSTNAME,
+      disableCertValidation: false,
+      mutualTls: false,
+      defaultServer: false,
+      authData: {
+        authType: "none",
+      },
+    });
     newFhirServers = await getFhirServerConfigs(true);
     const shouldBeUpdated = newFhirServers.find((v) => v.name === NEW_NAME);
     expect(shouldBeUpdated?.name).toBe(NEW_NAME);
@@ -104,6 +108,7 @@ describe("FHIR Servers tests", () => {
       const result = await insertFhirServer(
         "Test Server With Headers",
         "http://test-server.com/fhir",
+        false,
         false,
         false,
         true,
@@ -139,6 +144,7 @@ describe("FHIR Servers tests", () => {
       const result = await insertFhirServer(
         "Test Server Basic Auth",
         "http://test-basic-auth.com/fhir",
+        false,
         false,
         false,
         true,
@@ -177,6 +183,7 @@ describe("FHIR Servers tests", () => {
         "http://test-update.com/fhir",
         false,
         false,
+        false,
         true,
         {
           authType: "none",
@@ -195,18 +202,19 @@ describe("FHIR Servers tests", () => {
         "X-New-Header": "new-value",
       };
 
-      const updateResult = await updateFhirServer(
-        serverId,
-        "Test Server For Update",
-        "http://test-update.com/fhir",
-        false,
-        false,
-        true,
-        {
+      const updateResult = await updateFhirServer({
+        id: serverId,
+        name: "Test Server For Update",
+        hostname: "http://test-update.com/fhir",
+        disableCertValidation: false,
+        mutualTls: false,
+        defaultServer: false,
+        lastConnectionSuccessful: true,
+        authData: {
           authType: "none",
           headers: newHeaders,
         },
-      );
+      });
 
       expect(updateResult.success).toBe(true);
 
@@ -224,6 +232,7 @@ describe("FHIR Servers tests", () => {
       const result = await insertFhirServer(
         "Test Server No Headers",
         "http://test-no-headers.com/fhir",
+        false,
         false,
         false,
         true,
@@ -261,6 +270,7 @@ describe("FHIR Servers tests", () => {
         "http://test-preserve.com/fhir",
         false,
         false,
+        false,
         true,
         {
           authType: "none",
@@ -271,18 +281,19 @@ describe("FHIR Servers tests", () => {
       const serverId = insertResult.server.id;
 
       // Update only the URL, headers should be preserved
-      const updateResult = await updateFhirServer(
-        serverId,
-        "Test Server Preserve Headers",
-        "http://test-preserve-updated.com/fhir",
-        false,
-        false,
-        true,
-        {
+      const updateResult = await updateFhirServer({
+        id: serverId,
+        name: "Test Server Preserve Headers",
+        hostname: "http://test-preserve-updated.com/fhir",
+        disableCertValidation: false,
+        mutualTls: false,
+        defaultServer: false,
+        lastConnectionSuccessful: true,
+        authData: {
           authType: "none",
           headers: customHeaders,
         },
-      );
+      });
 
       expect(updateResult.success).toBe(true);
 
@@ -307,6 +318,7 @@ describe("FHIR Servers tests", () => {
       const result = await insertFhirServer(
         "Test Server Client Creds",
         "http://test-client-creds.com/fhir",
+        false,
         false,
         false,
         true,
@@ -351,6 +363,7 @@ describe("FHIR Servers tests", () => {
         "http://test-smart.com/fhir",
         false,
         false,
+        false,
         true,
         {
           authType: "SMART",
@@ -387,7 +400,8 @@ describe("FHIR Servers tests", () => {
       "http://test-server-match.com/fhir",
       false,
       false,
-      true,
+      false,
+      false,
       {
         authType: "none",
       },

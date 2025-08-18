@@ -408,3 +408,7 @@ fieldset > legend > .usa-accordion__button[aria-expanded="false"] {
 header > .grid-container {
   max-width: $application-wide-max-width;
 }
+
+.usa-hint {
+  color: $text-secondary !important;
+}

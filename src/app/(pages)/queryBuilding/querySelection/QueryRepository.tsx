@@ -149,7 +149,7 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
               {conditionIdToDetailsMap &&
                 queries
                   .sort((a, b) => (a.queryName[0] > b.queryName[0] ? 1 : -1))
-                  .map((query, i) => {
+                  .map((query, _i) => {
                     const hasCustomOnly =
                       query.conditionsList?.includes(
                         CUSTOM_VALUESET_ARRAY_ID,

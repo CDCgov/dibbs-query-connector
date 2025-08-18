@@ -1,13 +1,15 @@
-// Define the type for the FHIR server configurations
+// Add this to your FhirServerConfig interface in models/entities/fhir-servers.ts
+
 export interface FhirServerConfig {
   id: string;
   name: string;
   hostname: string;
-  headers?: Record<string, string>;
-  lastConnectionAttempt?: string;
-  lastConnectionSuccessful?: boolean;
   disableCertValidation: boolean;
+  mutualTls?: boolean; // Add this property
   defaultServer: boolean;
+  lastConnectionSuccessful?: boolean;
+  lastConnectionAttempt?: string;
+  headers?: Record<string, string>;
   authType?: "none" | "basic" | "client_credentials" | "SMART";
   clientId?: string;
   clientSecret?: string;
