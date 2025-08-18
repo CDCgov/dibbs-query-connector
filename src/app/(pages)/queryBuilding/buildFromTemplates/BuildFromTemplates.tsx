@@ -14,7 +14,7 @@ import {
 import {
   getConditionsData,
   getValueSetsAndConceptsByConditionIDs,
-} from "@/app/shared/database-service";
+} from "@/app/backend/seeding/service";
 import {
   ConditionIdToValueSetArrayMap,
   NestedQuery,
@@ -27,13 +27,15 @@ import {
 } from "../utils";
 import { ConditionSelection } from "../components/ConditionSelection";
 import { ValueSetSelection } from "../components/ValueSetSelection";
-import { BuildStep } from "../../../shared/constants";
+import { BuildStep } from "../../../constants";
 import LoadingView from "../../../ui/designSystem/LoadingView";
 import classNames from "classnames";
-import { groupConditionConceptsIntoValueSets } from "@/app/shared/utils";
-import { groupValueSetsByConceptType } from "@/app/utils/valueSetTranslation";
+import {
+  groupConditionConceptsIntoValueSets,
+  groupValueSetsByConceptType,
+} from "@/app/utils/valueSetTranslation";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
-import { DataContext } from "@/app/shared/DataProvider";
+import { DataContext } from "@/app/utils/DataProvider";
 import {
   DibbsConceptType,
   DibbsValueSet,

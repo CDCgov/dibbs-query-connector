@@ -4,8 +4,8 @@ import React, { useContext } from "react";
 import { UserRole } from "@/app/models/entities/users";
 import { useSession } from "next-auth/react";
 import { redirect, usePathname } from "next/navigation";
-import { pagesConfig } from "@/app/shared/page-routes";
-import { DataContext } from "@/app/shared/DataProvider";
+import { pagesConfig } from "@/app/utils/page-routes";
+import { DataContext } from "@/app/utils/DataProvider";
 import { isAuthDisabledClientCheck } from "@/app/utils/auth";
 import { getRole } from "@/app/(pages)/userManagement/utils";
 
