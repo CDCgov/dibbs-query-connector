@@ -384,7 +384,7 @@ const DateRangePicker = forwardRef<DateRangePickerRef, DateRangePickerProps>(
                 styles.datePicker,
               selectedPreset === ABSOLUTE_VALUE && styles.datePicker__wide,
             )}
-            data-testid="date-range-input"
+            data-testid={id}
             name="date-range-input"
             aria-label="Date range input"
             value={displayText}

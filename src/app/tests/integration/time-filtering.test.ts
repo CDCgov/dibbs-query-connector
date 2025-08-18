@@ -33,7 +33,7 @@ describe("time filtering query", () => {
     const startFilter = new Date("2025-12-01");
     const endFilter = new Date("2025-12-05");
 
-    // filter out med resoponses
+    // filter out med responses
     await updateTimeboxSettings(
       customCancerQuery.queryId,
       "medications",
