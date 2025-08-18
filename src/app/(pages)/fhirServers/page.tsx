@@ -77,6 +77,7 @@ const FhirServers: React.FC = () => {
     matchCount: 0,
     supportsMatch: false,
   } as PatientMatchData;
+  const [mutualTls, setMutualTls] = useState(false);
   const [fhirVersion, setFhirVersion] = useState<string | null>(null);
   const [defaultServer, setDefaultServer] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState<
@@ -119,6 +120,7 @@ const FhirServers: React.FC = () => {
     setScopes("");
     setConnectionStatus("idle");
     setDisableCertValidation(false);
+    setMutualTls(false);
     setDefaultServer(false);
     setErrorMessage("");
     setSelectedServer(null);
@@ -134,6 +136,7 @@ const FhirServers: React.FC = () => {
       setServerUrl(server.hostname);
       setConnectionStatus("idle");
       setDisableCertValidation(server.disableCertValidation);
+      setMutualTls(server.mutualTls || false);
       setDefaultServer(server.defaultServer);
       setErrorMessage("");
 
@@ -214,7 +217,7 @@ const FhirServers: React.FC = () => {
       window.removeEventListener("mousedown", clearErrorOnModalClose);
       window.removeEventListener("keyup", clearErrorOnModalClose);
     };
-  }, []);
+  }, [clearErrorOnModalClose]);
 
   const addHeader = () => {
     setHeaders([
@@ -291,6 +294,7 @@ const FhirServers: React.FC = () => {
       const response = await testFhirServerConnection(
         url,
         disableCertValidation,
+        mutualTls,
         authData,
       );
       return response;
@@ -329,6 +333,7 @@ const FhirServers: React.FC = () => {
     const result = await testFhirServerConnection(
       serverUrl,
       disableCertValidation,
+      mutualTls,
       authData,
     );
 
@@ -373,14 +378,15 @@ const FhirServers: React.FC = () => {
         fhirServers
           .filter((srv) => srv.defaultServer && srv.name !== serverName)
           .map((srv) =>
-            updateFhirServer(
-              srv.id,
-              srv.name,
-              srv.hostname,
-              srv.disableCertValidation,
-              false,
-              srv.lastConnectionSuccessful,
-              {
+            updateFhirServer({
+              id: srv.id,
+              name: srv.name,
+              hostname: srv.hostname,
+              disableCertValidation: srv.disableCertValidation,
+              mutualTls: false,
+              defaultServer: srv.defaultServer,
+              lastConnectionSuccessful: srv.lastConnectionSuccessful ?? false,
+              authData: {
                 authType: srv.authType as AuthMethodType,
                 clientId: srv.clientId,
                 clientSecret: srv.clientSecret,
@@ -388,8 +394,9 @@ const FhirServers: React.FC = () => {
                 scopes: srv.scopes,
                 headers: srv.headers ?? {},
               },
-              srv.patientMatchConfiguration ?? DEFAULT_PATIENT_MATCH_DATA,
-            ),
+              patientMatchConfiguration:
+                srv.patientMatchConfiguration ?? DEFAULT_PATIENT_MATCH_DATA,
+            }),
           ),
       );
     }
@@ -399,6 +406,7 @@ const FhirServers: React.FC = () => {
         serverName,
         serverUrl,
         disableCertValidation,
+        mutualTls,
         defaultServer,
         connectionResult.success,
         authData,
@@ -415,16 +423,18 @@ const FhirServers: React.FC = () => {
         setErrorMessage(result.error);
       }
     } else if (selectedServer) {
-      const result = await updateFhirServer(
-        selectedServer.id,
-        serverName,
-        serverUrl,
-        disableCertValidation,
-        defaultServer,
-        connectionResult.success,
-        authData,
-        patientMatchData || DEFAULT_PATIENT_MATCH_DATA,
-      );
+      const result = await updateFhirServer({
+        id: selectedServer.id,
+        name: serverName,
+        hostname: serverUrl,
+        disableCertValidation: disableCertValidation,
+        mutualTls: mutualTls,
+        defaultServer: defaultServer,
+        lastConnectionSuccessful: connectionResult.success,
+        authData: authData,
+        patientMatchConfiguration:
+          patientMatchData || DEFAULT_PATIENT_MATCH_DATA,
+      });
 
       if (result.success) {
         getFhirServerConfigs(true).then((servers) => {
@@ -544,6 +554,7 @@ const FhirServers: React.FC = () => {
             <TextInput
               id="client-id"
               name="client-id"
+              data-testid="client-id"
               type="text"
               value={clientId}
               onChange={(e) => setClientId(e.target.value)}
@@ -792,6 +803,9 @@ const FhirServers: React.FC = () => {
                     {fhirServer.defaultServer ? (
                       <Tag className="margin-left-2">DEFAULT</Tag>
                     ) : null}
+                    {fhirServer.mutualTls ? (
+                      <Tag className="margin-left-2">mTLS</Tag>
+                    ) : null}
                   </td>
                   <td>{fhirServer.hostname}</td>
                   <td>
@@ -981,6 +995,19 @@ const FhirServers: React.FC = () => {
             checked={disableCertValidation}
             onChange={(e) => setDisableCertValidation(e.target.checked)}
           />
+
+          <Checkbox
+            id="mutual-tls"
+            label="Enable Mutual TLS"
+            checked={mutualTls}
+            onChange={(e) => setMutualTls(e.target.checked)}
+          />
+          {mutualTls && (
+            <div className="usa-hint margin-left-4 margin-top-0">
+              Mutual TLS certificates will be loaded from the keys directory or
+              MTLS_CERT and MTLS_KEY environment variables.
+            </div>
+          )}
 
           <Checkbox
             id="default-server"
