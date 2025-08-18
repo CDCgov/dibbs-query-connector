@@ -175,7 +175,7 @@ interface DateRangePickerProps {
   isRelativeRange: boolean;
   onChange: (...args: unknown[]) => void;
   id: string;
-  handleClear?: () => Promise<void>;
+  handleClear?: () => Promise<void> | void;
   popoverSide?: "left" | "right";
   placeholderText?: string;
 }
@@ -186,7 +186,7 @@ export type DateRangePickerRef = {
   getIsRelativeRange: () => boolean | null;
 };
 
-const DEFAULT_DATE_DISPLAY_TEXT = "All dates";
+export const DEFAULT_DATE_DISPLAY_TEXT = "All dates";
 /**
  * A date range picker component with a toggleable modal and quick preset buttons.
  * @param root0 - The component props.
@@ -365,8 +365,6 @@ const DateRangePicker = forwardRef<DateRangePickerRef, DateRangePickerProps>(
     }, [selectedPreset]);
 
     const disableApply = !selectedPreset;
-    console.log(isRelativeRange);
-
     return (
       <div className={styles.datePickerContainer} ref={containerRef}>
         <div className={classNames(styles.textInputContainer)}>
@@ -454,7 +452,10 @@ const DateRangePicker = forwardRef<DateRangePickerRef, DateRangePickerProps>(
                   startDatePickerProps={{
                     id: "log-date-start",
                     name: "log-date-start",
-                    defaultValue: startDate ? startDate.toISOString() : "",
+                    defaultValue:
+                      startDate && isValidDate(startDate)
+                        ? startDate.toISOString()
+                        : "",
                     onChange: (val?: string) => {
                       const rawDate = val ? new Date(val) : null;
                       const date = rawDate;
@@ -466,7 +467,10 @@ const DateRangePicker = forwardRef<DateRangePickerRef, DateRangePickerProps>(
                   endDatePickerProps={{
                     id: "log-date-end",
                     name: "log-date-end",
-                    defaultValue: endDate ? endDate.toISOString() : "",
+                    defaultValue:
+                      endDate && isValidDate(endDate)
+                        ? endDate.toISOString()
+                        : "",
                     onChange: (val?: string) => {
                       const rawDate = val ? new Date(val) : null;
                       const date = rawDate;
@@ -541,4 +545,8 @@ export function formatDateRangeToMMDDYY(
     displayStart && displayEnd ? `${displayStart} - ${displayEnd}` : undefined;
 
   return displayDateRange;
+}
+
+function isValidDate(d: unknown): d is Date {
+  return d instanceof Date && !isNaN(d.getTime());
 }

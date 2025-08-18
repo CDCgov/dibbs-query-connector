@@ -282,6 +282,11 @@ exports[`tests the valueset selection page interactions filter bulk selection up
                                 data-testid="accordionHeader_labs"
                               >
                                 labs
+                                <span
+                                  class="text-normal padding-left-05"
+                                >
+                                   
+                                </span>
                               </div>
                             </div>
                             <div
@@ -340,14 +345,14 @@ exports[`tests the valueset selection page interactions filter bulk selection up
                               </svg>
                               <input
                                 aria-label="Date range input"
-                                class="usa-input dateRangeInput"
+                                class="usa-input dateRangeInput datePicker__narrow"
                                 data-testid="date-range-input"
                                 id="dateRangePicker-labs"
                                 name="date-range-input"
                                 placeholder="All dates"
                                 readonly=""
                                 type="text"
-                                value=""
+                                value="All dates"
                               />
                             </div>
                           </div>

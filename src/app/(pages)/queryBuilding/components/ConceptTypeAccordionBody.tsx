@@ -50,7 +50,7 @@ type ConceptTypeAccordionBodyProps = {
   handleVsIdLevelUpdate: (
     vsId: string,
   ) => (dibbsValueSets: DibbsValueSet) => void;
-  initialTimeboxRange: DateRangeInfo;
+  initialTimeboxRange?: DateRangeInfo;
   updateTimeboxRange: (newTimebox: DateRangeInfo) => void;
   tableSearchFilter?: string;
 };
@@ -356,7 +356,7 @@ const ConceptTypeAccordionBody: React.FC<ConceptTypeAccordionBodyProps> = ({
         <DateRangePicker
           ref={dateRef}
           id={`dateRangePicker-${accordionConceptType}`}
-          isRelativeRange={initialTimeboxRange?.isRelativeRange}
+          isRelativeRange={initialTimeboxRange?.isRelativeRange ?? false}
           startDate={initialTimeboxRange?.startDate}
           endDate={initialTimeboxRange?.endDate}
           onChange={handleTimeboxUpdate}

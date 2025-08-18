@@ -32,6 +32,7 @@ jest.mock("../../../backend/seeding/service", () => ({
 
 jest.mock("../../../backend/query-timefiltering", () => ({
   getTimeboxRanges: jest.fn(),
+  getQueryTimeboxRanges: jest.fn(),
 }));
 
 jest.mock("../../../backend/query-building/service", () => ({

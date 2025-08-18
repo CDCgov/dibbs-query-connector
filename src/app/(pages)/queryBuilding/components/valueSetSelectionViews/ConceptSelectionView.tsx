@@ -21,6 +21,7 @@ import {
 import { getQueryTimeboxRanges } from "@/app/backend/query-timefiltering";
 import { DataContext } from "@/app/utils/DataProvider";
 import { DateRangeInfo } from "@/app/ui/designSystem/timeboxing/DateRangePicker";
+import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 
 type ConceptSelectionViewProps = {
   vsTypeLevelOptions: ConceptTypeToDibbsVsMap;
@@ -81,7 +82,14 @@ export const ConceptSelectionView: React.FC<ConceptSelectionViewProps> = ({
     vsTypeLevelOptions: ConceptTypeToDibbsVsMap,
     searchFilter: string,
   ) => {
-    if (!queryId) return [];
+    if (!queryId) {
+      showToastConfirmation({
+        heading: "Query ID not set",
+        body: "Something went wrong unexpectedly. Please try again or contact us if the issue persists",
+        variant: "error",
+      });
+      return [];
+    }
 
     const accordionDataToDisplay = filterVsTypeOptions(
       vsTypeLevelOptions,
@@ -107,19 +115,16 @@ export const ConceptSelectionView: React.FC<ConceptSelectionViewProps> = ({
           });
 
         const handleVsNameLevelUpdate = handleVsTypeLevelUpdate(vsType);
-        const conceptTimeboxRange = timeboxRanges[vsType];
-        const initialTimeboxRange: DateRangeInfo = conceptTimeboxRange
-          ? {
-              startDate: conceptTimeboxRange.startDate,
-              endDate: conceptTimeboxRange.endDate,
-              isRelativeRange: conceptTimeboxRange.isRelativeRange,
-            }
-          : {
-              startDate: null,
-              endDate: null,
-              isRelativeRange: false,
-            };
+        let initialTimeboxRange = undefined;
+        if (timeboxRanges && timeboxRanges[vsType]) {
+          const conceptTimeboxRange = timeboxRanges[vsType];
 
+          initialTimeboxRange = {
+            startDate: conceptTimeboxRange.startDate,
+            endDate: conceptTimeboxRange.endDate,
+            isRelativeRange: conceptTimeboxRange.isRelativeRange,
+          };
+        }
         const title = (
           <ConceptTypeAccordionHeader
             activeType={vsType}
