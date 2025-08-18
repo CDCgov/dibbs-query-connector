@@ -218,7 +218,6 @@ exports[`tests the valueset selection page interactions filter bulk selection up
                   />
                 </div>
               </div>
-              ;
             </div>
             <div
               class="valueSetTemplate__right"

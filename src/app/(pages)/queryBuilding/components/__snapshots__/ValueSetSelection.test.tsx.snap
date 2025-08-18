@@ -187,7 +187,6 @@ exports[`tests the value set selection page highlights the active tab to the sid
                   />
                 </div>
               </div>
-              ;
             </div>
             <div
               class="valueSetTemplate__right"
@@ -541,7 +540,6 @@ exports[`tests the value set selection page highlights the active tab to the sid
                   />
                 </div>
               </div>
-              ;
             </div>
             <div
               class="valueSetTemplate__right"
@@ -1127,7 +1125,6 @@ exports[`tests the value set selection page highlights the active tab to the sid
                   class="overlay"
                 />
               </div>
-              ;
             </div>
             <div
               class="valueSetTemplate__right"
