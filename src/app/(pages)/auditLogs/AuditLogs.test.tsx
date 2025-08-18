@@ -235,7 +235,7 @@ describe("AuditLogs Component", () => {
   test("selecting a preset radio updates date range and hides custom inputs", async () => {
     await screen.findByText("Audit Log");
 
-    const input = screen.getByTestId("date-range-input");
+    const input = screen.getByTestId("auditLogDatePicker");
     await user.click(input);
 
     const radio = screen.getByTestId("preset-last-7-days");
@@ -252,7 +252,7 @@ describe("AuditLogs Component", () => {
     // The display input should now show a 7-day range (example: "06/10/25 - 06/17/25")
     // Adjust format as needed for your test setup, or just check for a non-empty value:
     const displayInput = screen.getByTestId(
-      "date-range-input",
+      "auditLogDatePicker",
     ) as HTMLInputElement;
     expect(displayInput.value).not.toBe("");
   });

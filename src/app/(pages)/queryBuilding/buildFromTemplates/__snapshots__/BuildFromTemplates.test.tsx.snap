@@ -346,7 +346,7 @@ exports[`tests the valueset selection page interactions filter bulk selection up
                               <input
                                 aria-label="Date range input"
                                 class="usa-input dateRangeInput datePicker__narrow"
-                                data-testid="date-range-input"
+                                data-testid="dateRangePicker-labs"
                                 id="dateRangePicker-labs"
                                 name="date-range-input"
                                 placeholder="All dates"
