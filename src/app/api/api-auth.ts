@@ -19,6 +19,9 @@ interface KeycloakJWTPayload extends JWTPayload {
  * @returns - An object indicating whether the token is valid and the decoded payload if valid, or an error message if invalid.
  */
 export async function validateServiceToken(req: NextRequest) {
+  if (process.env.AUTH_DISABLED?.toLowerCase() === "true")
+    return { valid: true };
+
   const authHeader = req.headers.get("Authorization");
 
   if (!authHeader?.startsWith("Bearer ")) {
