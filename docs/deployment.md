@@ -1,3 +1,0 @@
-## Deploying Query Connector
-
-Coming soon...

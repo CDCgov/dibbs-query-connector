@@ -8,7 +8,7 @@ export interface DibbsValueSet {
   valueSetName: string;
   valueSetExternalId?: string;
   author: string;
-  system: string;
+  system: string | "";
   ersdConceptType?: string;
   dibbsConceptType: DibbsConceptType;
   includeValueSet: boolean;

@@ -2,7 +2,7 @@
 
 import Backlink from "@/app/ui/designSystem/backLink/Backlink";
 import styles from "./conditionTemplateSelection.module.scss";
-import { Label, TextInput, Button } from "@trussworks/react-uswds";
+import { Label, TextInput, Button, Icon } from "@trussworks/react-uswds";
 import {
   Dispatch,
   SetStateAction,
@@ -11,38 +11,43 @@ import {
   useRef,
   useState,
 } from "react";
-
 import {
   getConditionsData,
   getValueSetsAndConceptsByConditionIDs,
-} from "@/app/shared/database-service";
+} from "@/app/backend/seeding/service";
 import {
   ConditionIdToValueSetArrayMap,
   NestedQuery,
   CategoryToConditionArrayMap,
   ConditionsMap,
   EMPTY_CONCEPT_TYPE,
+  EMPTY_QUERY_SELECTION,
+  EMPTY_MEDICAL_RECORD_SECTIONS,
+  MedicalRecordSections,
 } from "../utils";
 import { ConditionSelection } from "../components/ConditionSelection";
 import { ValueSetSelection } from "../components/ValueSetSelection";
-import { BuildStep } from "../../../shared/constants";
+import { BuildStep } from "../../../constants";
 import LoadingView from "../../../ui/designSystem/LoadingView";
 import classNames from "classnames";
-import { groupConditionConceptsIntoValueSets } from "@/app/shared/utils";
-import { SelectedQueryDetails } from "../querySelection/utils";
-
-import { getCustomQueries } from "@/app/backend/query-building";
-import { groupValueSetsByConceptType } from "@/app/utils/valueSetTranslation";
+import {
+  groupConditionConceptsIntoValueSets,
+  groupValueSetsByConceptType,
+} from "@/app/utils/valueSetTranslation";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
-import { DataContext } from "@/app/shared/DataProvider";
+import { DataContext } from "@/app/utils/DataProvider";
 import {
   DibbsConceptType,
   DibbsValueSet,
 } from "@/app/models/entities/valuesets";
 import {
+  getCustomQueries,
   getSavedQueryById,
   saveCustomQuery,
-} from "@/app/backend/dbServices/query-building";
+} from "@/app/backend/query-building/service";
+import { useSession } from "next-auth/react";
+import { ModalRef } from "@/app/ui/designSystem/modal/Modal";
+import WarningModal from "@/app/ui/designSystem/modal/warningModal";
 
 export type FormError = {
   queryName: boolean;
@@ -52,37 +57,50 @@ export type FormError = {
 type BuildFromTemplatesProps = {
   buildStep: BuildStep;
   setBuildStep: Dispatch<SetStateAction<BuildStep>>;
-  selectedQuery: SelectedQueryDetails;
-  setSelectedQuery: Dispatch<SetStateAction<SelectedQueryDetails>>;
 };
 
 /**
  * The query building page
  * @param root0 params
- * @param root0.selectedQuery - the query to edit or the "create" mode if it
  * doesn't previously
  * @param root0.buildStep - the stage in the build process, used to render
  * subsequent steps
  * @param root0.setBuildStep - setter function to move the app forward
- * @param root0.setSelectedQuery - setter function to update / reset the query
  * being built
  * @returns the component for the query building page
  */
 const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
-  selectedQuery,
   buildStep,
   setBuildStep,
-  setSelectedQuery,
 }) => {
+  const queryContext = useContext(DataContext);
+  if (
+    !queryContext ||
+    !queryContext.selectedQuery ||
+    !queryContext.setSelectedQuery
+  ) {
+    throw new Error("BuildFromTemplates must be used within a DataProvider");
+  }
+  const selectedQuery = queryContext.selectedQuery;
+  const setSelectedQuery = queryContext.setSelectedQuery;
+
+  const { data: session } = useSession();
   const focusRef = useRef<HTMLInputElement | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<boolean>(false);
+
   const [queryName, setQueryName] = useState<string | undefined>(
-    selectedQuery.queryName,
+    structuredClone(selectedQuery.queryName),
   );
   const [categoryToConditionMap, setCategoryToConditionMap] =
     useState<CategoryToConditionArrayMap>();
   const [conditionIdToDetailsMap, setConditionsDetailsMap] =
     useState<ConditionsMap>();
+
+  const [medicalRecordSections, setMedicalRecordSections] =
+    useState<MedicalRecordSections>(() =>
+      structuredClone(EMPTY_MEDICAL_RECORD_SECTIONS),
+    );
 
   const [formError, setFormError] = useState<FormError>({
     queryName: false,
@@ -91,13 +109,42 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
 
   const [constructedQuery, setConstructedQuery] = useState<NestedQuery>({});
 
+  const savedQueryRef = useRef<{
+    queryName: string | undefined;
+    constructedQuery: NestedQuery;
+  } | null>(null);
+
+  const warningModalRef = useRef<ModalRef>(null);
+  const pendingNavRef = useRef<() => void>(() => {});
+
+  function hasUnsavedChanges(): boolean {
+    const hasData =
+      queryName?.trim() || Object.keys(constructedQuery).length > 0;
+
+    if (!savedQueryRef.current) {
+      return Boolean(hasData); // user typed or selected something
+    }
+    return (
+      JSON.stringify(savedQueryRef.current.constructedQuery) !==
+        JSON.stringify(constructedQuery) ||
+      savedQueryRef.current.queryName !== queryName
+    );
+  }
+
+  function handleNavAway(callback: () => void) {
+    if (hasUnsavedChanges()) {
+      pendingNavRef.current = callback;
+      warningModalRef.current?.toggleModal();
+    } else {
+      callback();
+    }
+  }
+
   function resetQueryState() {
     setQueryName(undefined);
-    setSelectedQuery({
-      queryId: undefined,
-      queryName: undefined,
-    });
-    setConstructedQuery({});
+    setSelectedQuery(structuredClone(EMPTY_QUERY_SELECTION));
+    setConstructedQuery(structuredClone({}));
+    setMedicalRecordSections(structuredClone(EMPTY_MEDICAL_RECORD_SECTIONS));
   }
 
   function goBack() {
@@ -117,19 +164,17 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
     let isSubscribed = true;
 
     async function setInitialQueryState() {
-      if (selectedQuery.queryId === undefined) {
-        return;
-      }
+      if (!selectedQuery?.queryId) return;
       const savedQuery = await getSavedQueryById(selectedQuery.queryId);
-      if (savedQuery === undefined) {
-        return;
-      }
-      const initialState: NestedQuery = {};
+      if (!savedQuery) return;
 
+      // Set the booleans for medical record sections
+      setMedicalRecordSections(savedQuery.medicalRecordSections);
+
+      const initialState: NestedQuery = {};
       Object.entries(savedQuery.queryData).forEach(
         ([conditionId, valueSetMap]) => {
           initialState[conditionId] = structuredClone(EMPTY_CONCEPT_TYPE);
-
           Object.entries(valueSetMap).forEach(([vsId, dibbsVs]) => {
             initialState[conditionId][dibbsVs.dibbsConceptType][vsId] = dibbsVs;
           });
@@ -137,18 +182,23 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
       );
 
       if (isSubscribed) {
-        setConstructedQuery(initialState);
+        const cloned = structuredClone(initialState);
+        setConstructedQuery(cloned);
+        savedQueryRef.current = {
+          queryName: savedQuery.queryName,
+          constructedQuery: cloned,
+        };
       }
 
-      setFormError((prevError) => {
-        return { ...prevError, selectedConditions: false };
-      });
+      setFormError((prevError) => ({
+        ...prevError,
+        selectedConditions: false,
+      }));
     }
 
     async function fetchInitialConditions() {
       const { categoryToConditionNameArrayMap, conditionIdToNameMap } =
         await getConditionsData();
-
       if (isSubscribed) {
         setConditionsDetailsMap(conditionIdToNameMap);
         setCategoryToConditionMap(categoryToConditionNameArrayMap);
@@ -161,7 +211,7 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
     return () => {
       isSubscribed = false;
     };
-  }, []);
+  }, [selectedQuery.queryId]);
 
   async function handleCreateQueryClick(
     event: React.MouseEvent<HTMLButtonElement>,
@@ -174,6 +224,7 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
       await getValueSetsForSelectedConditions(conditionIdsToFetch);
 
       setBuildStep("valueset");
+      await handleSaveQuery();
       setLoading(false);
     }
   }
@@ -247,6 +298,7 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
         prevState[conditionId] = prevState[conditionId] ?? {};
         prevState[conditionId][vsType] = prevState[conditionId][vsType] ?? {};
         prevState[conditionId][vsType][vsId] = dibbsValueSet;
+
         return structuredClone(prevState);
       });
     };
@@ -254,20 +306,32 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
   const queriesContext = useContext(DataContext);
 
   async function handleSaveQuery() {
-    if (constructedQuery && queryName) {
-      // TODO: get this from the auth session
-      const userName = "DIBBS";
+    if (constructedQuery && queryName && session) {
+      const userName = session?.user?.username as string;
       try {
         const results = await saveCustomQuery(
           constructedQuery,
+          medicalRecordSections,
           queryName,
           userName,
           selectedQuery.queryId,
         );
 
         if (results === undefined) {
-          throw "Result status not returned";
+          showToastConfirmation({
+            body: `Something went wrong saving query`,
+            variant: "error",
+          });
+
+          throw "Results not defined";
         }
+
+        setSelectedQuery(
+          structuredClone({
+            queryId: results[0].id,
+            queryName,
+          }),
+        );
 
         const queries = await getCustomQueries();
         queriesContext?.setData(queries);
@@ -277,6 +341,11 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
         showToastConfirmation({
           body: `${queryName} successfully ${statusMessage}`,
         });
+
+        savedQueryRef.current = {
+          queryName,
+          constructedQuery,
+        };
       } catch {
         showToastConfirmation({
           heading: "Something went wrong",
@@ -289,16 +358,35 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
 
   return (
     <>
+      <WarningModal
+        modalRef={warningModalRef}
+        heading="You have unsaved changes"
+        description="You've made changes to your query. Would you like to save before leaving?"
+        onSave={async () => {
+          await handleSaveQuery();
+          pendingNavRef.current?.();
+        }}
+        onCancel={() => {
+          pendingNavRef.current?.();
+        }}
+      />
       <div className={classNames("main-container__wide", styles.mainContainer)}>
         {buildStep === "valueset" ? (
           <Backlink
             onClick={() => {
-              setBuildStep("condition");
+              handleNavAway(() => {
+                setBuildStep("condition");
+              });
             }}
             label={"Back to condition selection"}
           />
         ) : (
-          <Backlink onClick={goBack} label={"Back to My queries"} />
+          <Backlink
+            onClick={() => {
+              handleNavAway(goBack);
+            }}
+            label={"Back to My queries"}
+          />
         )}
 
         <div className={styles.customQuery__header}>
@@ -306,21 +394,41 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
           <div className={styles.customQuery__controls}>
             <div className={styles.customQuery__name}>
               <Label htmlFor="queryNameInput" className={styles.inputLabel}>
-                Query name <span style={{ color: "#919191" }}>(required)</span>
+                Query name <span className="text-secondary">(required)</span>
               </Label>
               <TextInput
                 inputRef={focusRef}
                 id="queryNameInput"
                 name="queryNameInput"
                 type="text"
-                className={styles.input}
+                className={classNames(
+                  styles.input,
+                  errorMessage ? styles.errorMessage : "",
+                )}
                 defaultValue={queryName ?? ""}
                 required
                 onChange={(event) => {
-                  setQueryName(event.target.value);
+                  const newName = event.target.value;
+                  setQueryName(newName);
+                  setErrorMessage(false);
+                  setSelectedQuery(
+                    structuredClone({
+                      ...selectedQuery,
+                      queryName: newName,
+                    }),
+                  );
                 }}
                 data-testid="queryNameInput"
               />
+              {errorMessage && formError.queryName && (
+                <div className={styles.errorMessage}>
+                  <Icon.Error
+                    aria-label="warning icon indicating an error is present"
+                    className={styles.errorMessage}
+                  />
+                  Enter a name for the query.
+                </div>
+              )}
             </div>
             <div className={styles.customQuery__saveButton}>
               <Button
@@ -359,6 +467,8 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
               setLoading={setLoading}
               constructedQuery={constructedQuery}
               handleConditionUpdate={handleConditionUpdate}
+              renderErrorMessage={setErrorMessage}
+              medicalRecordSections={medicalRecordSections}
             />
           )}
           {/* Step Two: Select ValueSets */}
@@ -371,6 +481,8 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
                 constructedQuery={constructedQuery}
                 handleSelectedValueSetUpdate={handleQueryUpdate}
                 handleUpdateCondition={handleConditionUpdate}
+                medicalRecordSections={medicalRecordSections}
+                setMedicalRecordSections={setMedicalRecordSections}
               />
             )}
         </div>

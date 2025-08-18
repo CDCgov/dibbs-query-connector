@@ -3,7 +3,7 @@ import {
   handleAndReturnError,
   handleRequestError,
 } from "./error-handling-service";
-import { fullPatientQuery } from "../../backend/query-execution";
+import { fullPatientQuery } from "../../backend/query-execution/service";
 import {
   RESPONSE_BODY_IS_NOT_PATIENT_RESOURCE,
   MISSING_PATIENT_IDENTIFIERS,
@@ -11,27 +11,39 @@ import {
   INVALID_FHIR_SERVERS,
   INVALID_QUERY,
   INVALID_MESSAGE_FORMAT,
-} from "@/app/shared/constants";
+  INSUFFICIENT_PATIENT_IDENTIFIERS,
+} from "@/app/constants";
 import {
   mapDeprecatedUseCaseToId,
   parseHL7FromRequestBody,
   parsePatientDemographics,
 } from "./parsers";
 import { Message } from "node-hl7-client";
-import { getFhirServerNames } from "@/app/backend/dbServices/fhir-servers";
-import { getSavedQueryById } from "@/app/backend/dbServices/query-building";
 import { Bundle } from "fhir/r4";
 import {
   FullPatientRequest,
   APIQueryResponse,
   QueryResponse,
+  validatedPatientSearch,
 } from "@/app/models/entities/query";
+import { getFhirServerNames } from "@/app/backend/fhir-servers/service";
+import { getSavedQueryById } from "@/app/backend/query-building/service";
+import { validateServiceToken } from "../api-auth";
 
 /**
  * @param request - A GET request as described by the Swagger docs
  * @returns Response with QueryResponse.
  */
 export async function GET(request: NextRequest) {
+  // Authenticate the request
+  const auth = await validateServiceToken(request);
+  if (!auth.valid) {
+    return NextResponse.json(
+      { error: "Unauthorized", details: auth.error },
+      { status: 401 },
+    );
+  }
+
   // Extract id and fhir_server from nextUrl
   const params = request.nextUrl.searchParams;
   //deprecated, prefer id
@@ -69,9 +81,27 @@ export async function GET(request: NextRequest) {
   const dob = params.get("dob") ?? "";
   const mrn = params.get("mrn") ?? "";
   const phone = params.get("phone") ?? "";
-  const noParamsDefined = [given, family, dob, mrn, phone].every(
-    (e) => e === "",
-  );
+  const street1 = params.get("street1") ?? "";
+  const street2 = params.get("street2") ?? "";
+  const city = params.get("city") ?? "";
+  const state = params.get("state") ?? "";
+  const zip = params.get("zip") ?? "";
+
+  const email = params.get("email") ?? "";
+  const noParamsDefined = [
+    given,
+    family,
+    dob,
+    mrn,
+    phone,
+    street1,
+    street2,
+    city,
+    state,
+    zip,
+    ,
+    email,
+  ].every((e) => e === "");
 
   if (noParamsDefined) {
     const OperationOutcome = await handleRequestError(
@@ -89,7 +119,22 @@ export async function GET(request: NextRequest) {
     dob,
     mrn,
     phone,
+    address: {
+      street1,
+      street2,
+      city,
+      state,
+      zip,
+    },
+    email,
   };
+
+  if (!validatedPatientSearch(QueryRequest)) {
+    const OperationOutcome = await handleRequestError(
+      INSUFFICIENT_PATIENT_IDENTIFIERS,
+    );
+    return NextResponse.json(OperationOutcome, { status: 400 });
+  }
 
   const QueryResponse: QueryResponse = await fullPatientQuery(QueryRequest);
 
@@ -106,6 +151,15 @@ export async function GET(request: NextRequest) {
  * @returns Response with QueryResponse.
  */
 export async function POST(request: NextRequest) {
+  // Authenticate the request
+  const auth = await validateServiceToken(request);
+  if (!auth.valid) {
+    return NextResponse.json(
+      { error: "Unauthorized", details: auth.error },
+      { status: 401 },
+    );
+  }
+
   // Extract id and fhir_server from nextUrl
   const params = request.nextUrl.searchParams;
   //deprecated, prefer id
@@ -146,13 +200,25 @@ export async function POST(request: NextRequest) {
       const lastName = parsedMessage.get("PID.5.1").toString() ?? "";
       const dob = parsedMessage.get("PID.7.1").toString() ?? "";
       const mrn = parsedMessage.get("PID.3.1").toString() ?? "";
+      const street1 = parsedMessage.get("PID.11.1").toString() ?? "";
+      const street2 = parsedMessage.get("PID.11.2").toString() ?? "";
+      const city = parsedMessage.get("PID.11.3").toString() ?? "";
+      const state = parsedMessage.get("PID.11.4").toString() ?? "";
+      const zip = parsedMessage.get("PID.11.5").toString() ?? "";
       const phone = parsedMessage.get("NK1.5.1").toString() ?? "";
+      const email = parsedMessage.get("PID.13.4").toString() ?? ""; //https://hl7-definition.caristix.com/v2/HL7v2.3/Fields/PID.13.4
       const noPatientIdentifierDefined = [
         firstName,
         lastName,
         mrn,
         phone,
         dob,
+        street1,
+        street2,
+        city,
+        state,
+        zip,
+        email,
       ].every((e) => e === "");
 
       if (noPatientIdentifierDefined) {
@@ -166,7 +232,9 @@ export async function POST(request: NextRequest) {
         lastName,
         dob,
         mrn,
+        address: { street1, street2, city, state, zip },
         phone,
+        email,
       };
     } catch (error: unknown) {
       return await handleAndReturnError(error);
@@ -200,11 +268,23 @@ export async function POST(request: NextRequest) {
         lastName: PatientIdentifiers?.last_name,
         dob: PatientIdentifiers?.dob,
         mrn: PatientIdentifiers?.mrn,
+        address: {
+          street1: PatientIdentifiers.street1,
+          street2: PatientIdentifiers.street2,
+          city: PatientIdentifiers.city,
+          state: PatientIdentifiers.state,
+          zip: PatientIdentifiers.zip,
+        },
         phone: PatientIdentifiers?.phone,
+        email: PatientIdentifiers?.email,
       };
     } catch (error: unknown) {
       return await handleAndReturnError(error);
     }
+  }
+
+  if (!validatedPatientSearch(QueryRequest)) {
+    return await handleAndReturnError(INSUFFICIENT_PATIENT_IDENTIFIERS, 400);
   }
 
   const QueryResponse: QueryResponse = await fullPatientQuery(QueryRequest);

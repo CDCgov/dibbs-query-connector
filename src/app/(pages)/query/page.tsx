@@ -5,19 +5,19 @@ import ResultsView from "./components/ResultsView";
 import PatientSearchResults from "./components/PatientSearchResults";
 import SearchForm from "./components/searchForm/SearchForm";
 import SelectQuery from "./components/SelectQuery";
-import { DEFAULT_DEMO_FHIR_SERVER, Mode } from "../../shared/constants";
+import { Mode } from "@/app/constants";
 import StepIndicator, {
   CUSTOMIZE_QUERY_STEPS,
 } from "./components/stepIndicator/StepIndicator";
-import { DataContext } from "@/app/shared/DataProvider";
+import { DataContext } from "@/app/utils/DataProvider";
 import { Patient } from "fhir/r4";
-import { getFhirServerNames } from "@/app/backend/dbServices/fhir-servers";
 import { CustomUserQuery } from "@/app/models/entities/query";
 import WithAuth from "@/app/ui/components/withAuth/WithAuth";
 import {
   PatientDiscoveryResponse,
   PatientRecordsResponse,
-} from "@/app/backend/query-execution";
+} from "@/app/backend/query-execution/service";
+import { getFhirServerNames } from "@/app/backend/fhir-servers/service";
 
 const blankUserQuery = {
   queryId: "",
@@ -36,15 +36,16 @@ const Query: React.FC = () => {
   );
   const [mode, setMode] = useState<Mode>("search");
   const [loading, setLoading] = useState<boolean>(false);
-  const [fhirServer, setFhirServer] = useState<string>(
-    DEFAULT_DEMO_FHIR_SERVER,
-  );
+  const [fhirServer, setFhirServer] = useState<string>("");
   const [fhirServers, setFhirServers] = useState<string[]>([]);
+  const [uncertainMatchError, setUncertainMatchError] =
+    useState<boolean>(false);
   const ctx = useContext(DataContext);
 
   async function fetchFHIRServerNames() {
     const servers = await getFhirServerNames();
     setFhirServers(servers);
+    setFhirServer(servers[0]);
   }
 
   useEffect(() => {
@@ -89,19 +90,25 @@ const Query: React.FC = () => {
             fhirServers={fhirServers}
             selectedFhirServer={fhirServer}
             setFhirServer={setFhirServer}
+            setUncertainMatchError={setUncertainMatchError}
           />
         )}
 
         {/* Step 2 */}
         {mode === "patient-results" && (
           <PatientSearchResults
-            patients={patientDiscoveryQueryResponse ?? []}
+            patients={
+              Array.isArray(patientDiscoveryQueryResponse)
+                ? patientDiscoveryQueryResponse
+                : []
+            }
             goBack={() => {
               setMode("search");
             }}
             setMode={setMode}
             setPatientForQueryResponse={setPatientForQueryResponse}
             loading={loading}
+            uncertainMatchError={uncertainMatchError}
           />
         )}
 

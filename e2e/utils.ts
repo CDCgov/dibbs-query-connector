@@ -1,15 +1,17 @@
 import { Page, expect } from "@playwright/test";
 import { CANCER_FRONTEND_NESTED_INPUT, showSiteAlert } from "./constants";
-import { getDbClient } from "@/app/backend/dbClient";
+import { internal_getDbClient } from "@/app/backend/db/config";
 import {
+  EMPTY_MEDICAL_RECORD_SECTIONS,
   NestedQuery,
   QueryTableResult,
 } from "@/app/(pages)/queryBuilding/utils";
 import {
   saveCustomQueryHelp,
   getSavedQueryByIdHelp,
-} from "@/app/backend/dbServices/queryBuilding/lib";
-import { translateSnakeStringToCamelCase } from "@/app/backend/dbServices/util";
+} from "@/app/backend/query-building/lib";
+import { translateSnakeStringToCamelCase } from "@/app/backend/db/util";
+import AxeBuilder from "@axe-core/playwright";
 
 /**
  *
@@ -29,7 +31,7 @@ export const checkForSiteAlert = async (page: Page, matchText?: string) => {
   }
 };
 
-const dbClient = getDbClient();
+const dbClient = internal_getDbClient();
 
 /**
  * Helper function that creates a custom query and grabs it back in return
@@ -44,6 +46,7 @@ export async function createTestCancerQuery() {
     randomName,
     author,
     dbClient,
+    EMPTY_MEDICAL_RECORD_SECTIONS,
   );
   if (result === undefined) throw Error("Failed to set up test query");
 
@@ -58,4 +61,16 @@ export async function createTestCancerQuery() {
   });
 
   return val as unknown as QueryTableResult;
+}
+
+/**
+ * Helper function that scans the page for any automatic Axe errors
+ * @param page - the page object generated in the test
+ * @returns - runs an Axe sweep to see if there are errors
+ */
+export async function runAxeAccessibilityChecks(page: Page) {
+  const accessiblityChecker = await new AxeBuilder({
+    page,
+  }).analyze();
+  expect(accessiblityChecker.violations).toEqual([]);
 }

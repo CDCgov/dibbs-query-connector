@@ -2,7 +2,7 @@ import React, { RefObject } from "react";
 import { Modal, ModalRef } from "@/app/ui/designSystem/modal/Modal";
 
 interface DeleteModalProps {
-  modalRef: RefObject<ModalRef>;
+  modalRef: RefObject<ModalRef | null>;
   heading: string;
   description: string;
   onDelete: () => void;
@@ -40,7 +40,7 @@ export const DeleteModal: React.FC<DeleteModalProps> = ({
           id: "modal-delete-button",
           text: "Delete",
           type: "button",
-          className: "usa-button--secondary",
+          className: "usa-button--destructive",
           onClick: () => {
             onDelete();
             modalRef.current?.toggleModal();
@@ -50,7 +50,7 @@ export const DeleteModal: React.FC<DeleteModalProps> = ({
           id: "modal-cancel-button",
           text: "Cancel",
           type: "button",
-          className: "usa-button--outline shadow-none",
+          className: "usa-button--secondary shadow-none",
           onClick: () => {
             if (onCancel) onCancel();
             modalRef.current?.toggleModal();

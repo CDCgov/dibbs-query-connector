@@ -3,6 +3,7 @@ import { Icon } from "@trussworks/react-uswds";
 import styles from "./drawer.module.scss";
 import SearchField from "../searchField/SearchField";
 import classNames from "classnames";
+import FocusTrap from "focus-trap-react";
 
 type DrawerProps = {
   title: string | React.ReactNode;
@@ -56,64 +57,92 @@ const Drawer: React.FC<DrawerProps> = ({
     onClose();
   }
 
+  useEffect(() => {
+    const handleEscape = (evt: KeyboardEvent) => {
+      evt = evt || window.event;
+      if (isOpen && (evt.key === "Escape" || evt.key === "Esc")) {
+        handleClose();
+      }
+    };
+    window.addEventListener("keyup", handleEscape);
+    // Cleanup
+    return () => {
+      window.removeEventListener("keyup", handleEscape);
+    };
+  }, []);
+
   return (
-    <>
-      <div
-        className={classNames(
-          styles.drawer,
-          isOpen ? styles.open : styles.closed,
-          drawerWidth === "60%" ? styles.width60 : styles.width35,
-        )}
-        role="dialog"
-        data-testid={`drawer-open-${isOpen}`}
-      >
+    <FocusTrap
+      active={isOpen}
+      focusTrapOptions={{
+        onDeactivate: handleClose,
+        escapeDeactivates: true,
+      }}
+    >
+      <div>
         <div
           className={classNames(
-            styles.drawerContent,
-            isOpen ? "display-block" : "display-none",
+            styles.drawer,
+            isOpen ? styles.open : styles.closed,
+            drawerWidth === "60%" ? styles.width60 : styles.width35,
           )}
+          role="dialog"
+          id="drawer-container"
+          aria-label="drawer-container"
+          data-testid={`drawer-open-${isOpen}`}
         >
-          <div className={styles.drawerHeader}>
-            <button
-              className={styles.closeButton}
-              onClick={handleClose}
-              aria-label="Close drawer"
-              data-testid={"close-drawer"}
-            >
-              <Icon.Close size={3} aria-label="X icon indicating closure" />
-            </button>
-            <h2
-              data-testid={`drawer-title`}
-              className={classNames(
-                "margin-0",
-                subtitle ? "padding-bottom-0" : "padding-bottom-2",
-              )}
-            >
-              {title}
-            </h2>
-            {subtitle ? <h3 className={styles.subtitle}>{subtitle}</h3> : <></>}
+          {isOpen ? (
+            <div className={classNames(styles.drawerContent, "display-block")}>
+              <div className={styles.drawerHeader}>
+                <button
+                  className={styles.closeButton}
+                  onClick={handleClose}
+                  aria-label="Close drawer"
+                  data-testid={"close-drawer"}
+                >
+                  <Icon.Close size={3} aria-label="X icon indicating closure" />
+                </button>
+                <h2
+                  id="drawer-title"
+                  data-testid={`drawer-title`}
+                  className={classNames(
+                    "margin-0",
+                    subtitle ? "padding-bottom-0" : "padding-bottom-2",
+                  )}
+                >
+                  {title}
+                </h2>
+                {subtitle ? (
+                  <h3 className={styles.subtitle}>{subtitle}</h3>
+                ) : (
+                  <></>
+                )}
 
-            {onSearch && (
-              <div>
-                <SearchField
-                  id="searchFieldTemplate"
-                  placeholder={placeholder}
-                  value={searchFilter}
-                  onChange={(e) => {
-                    e.preventDefault();
-                    setSearchFilter(e.target.value);
-                  }}
-                />
+                {onSearch && (
+                  <div>
+                    <SearchField
+                      id="searchFieldTemplate"
+                      placeholder={placeholder}
+                      value={searchFilter}
+                      onChange={(e) => {
+                        e.preventDefault();
+                        setSearchFilter(e.target.value);
+                      }}
+                    />
+                  </div>
+                )}
               </div>
-            )}
-          </div>
 
-          <div className={classNames(styles.drawerBody)}>{toRender}</div>
+              <div className={classNames(styles.drawerBody)}>{toRender}</div>
+            </div>
+          ) : (
+            <div className="display-none"></div>
+          )}
         </div>
-      </div>
 
-      {isOpen && <div className={styles.overlay} onClick={handleClose}></div>}
-    </>
+        {isOpen && <div className={styles.overlay} onClick={handleClose}></div>}
+      </div>
+    </FocusTrap>
   );
 };
 

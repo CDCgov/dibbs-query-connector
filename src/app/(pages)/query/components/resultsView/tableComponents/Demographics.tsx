@@ -9,13 +9,13 @@ import {
   formatIdentifier,
   formatDate,
   formatSex,
-} from "../../../../../shared/format-service";
+} from "../../../../../utils/format-service";
 import Table from "@/app/ui/designSystem/table/Table";
 
 /**
  * Displays the demographic information of a patient.
- * @param {Patient} patient - The patient to display demographic information for.
- * @returns {React.FC} The Demographics component.
+ * @param patient - The patient to display demographic information for.
+ * @returns The Demographics component.
  */
 export interface DemographicsProps {
   patient: Patient;
@@ -42,7 +42,7 @@ const Demographics: React.FC<DemographicsProps> = ({ patient }) => {
       <tbody>
         {demographicData.map((item) => (
           <tr key={item.title}>
-            <td scope="row">
+            <td>
               <strong>{item.title}</strong>
             </td>
             <td> {item.value}</td>
@@ -85,30 +85,38 @@ function formatDemographics(patient: Patient): DataDisplayInfo[] {
     },
     {
       title: "Race",
-      value: evaluate(
-        patient,
-        "Patient.extension.where(url = 'http://hl7.org/fhir/us/core/StructureDefinition/us-core-race').extension.first().valueCoding.display",
+      value: (
+        evaluate(
+          patient,
+          "Patient.extension.where(url = 'http://hl7.org/fhir/us/core/StructureDefinition/us-core-race').extension.first().valueCoding.display",
+        ) as string[]
       )[0],
     },
     {
       title: "Ethnicity",
-      value: evaluate(
-        patient,
-        "Patient.extension.where(url = 'http://hl7.org/fhir/us/core/StructureDefinition/us-core-ethnicity').extension.first().valueCoding.display",
+      value: (
+        evaluate(
+          patient,
+          "Patient.extension.where(url = 'http://hl7.org/fhir/us/core/StructureDefinition/us-core-ethnicity').extension.first().valueCoding.display",
+        ) as string[]
       )[0],
     },
     {
       title: "Tribal Affiliation",
-      value: evaluate(
-        patient,
-        "Patient.extension.where(url='http: //hl7.org/fhir/us/ecr/StructureDefinition/us-ph-tribal-affiliation-extension').extension.where(url='TribeName').value.display",
+      value: (
+        evaluate(
+          patient,
+          "Patient.extension.where(url='http: //hl7.org/fhir/us/ecr/StructureDefinition/us-ph-tribal-affiliation-extension').extension.where(url='TribeName').value.display",
+        ) as string[]
       )[0],
     },
     {
       title: "Preferred Language",
-      value: evaluate(
-        patient,
-        "Patient.communication.first().language.coding.first().display",
+      value: (
+        evaluate(
+          patient,
+          "Patient.communication.first().language.coding.first().display",
+        ) as string[]
       )[0],
     },
     {

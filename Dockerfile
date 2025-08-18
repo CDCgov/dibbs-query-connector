@@ -1,9 +1,9 @@
-FROM node:22-alpine AS base
+FROM node:24-alpine AS base
 
 FROM base AS installer
 
 RUN apk update
-RUN apk add --no-cache libc6-compat bash curl git go
+RUN apk add --no-cache libc6-compat bash curl
 
 WORKDIR /app
 COPY . .
@@ -23,17 +23,11 @@ ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm ci
 RUN npm run build
 
-# Download jwkset tool
-RUN git clone https://github.com/MicahParks/jwkset.git \
-    && cd jwkset/cmd/jwkset \
-    && go build
-
 # Final stage for running the app
 FROM base AS runner
 WORKDIR /app
 
-RUN apk add --no-cache bash openjdk17-jre openssl uuidgen jq
-
+RUN apk add --no-cache bash openjdk17-jre
 # Copy Flyway from the installer stage
 COPY --from=installer /flyway /flyway
 RUN chmod +x /flyway/flyway
@@ -52,19 +46,17 @@ RUN mkdir -p /app /data /logs && \
 ENV HOSTNAME="0.0.0.0"
 
 # Copy necessary app files
-COPY --from=installer /app/next.config.js .
+COPY --from=installer /app/next.config.mjs .
 COPY --from=installer /app/package.json .
 COPY --from=installer /app/flyway/conf/flyway.conf ../flyway/conf/flyway.conf
 COPY --from=installer /app/flyway/sql ../flyway/sql
 COPY --from=installer /app/src/app/assets ./.next/server/app/assets
-COPY --from=installer /app/jwkset/cmd/jwkset/jwkset /usr/local/bin/jwkset
 
 # Automatically leverage output traces to reduce image size
 COPY --from=installer --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=installer --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=installer --chown=nextjs:nodejs /app/public ./public
 COPY --from=installer --chown=nextjs:nodejs /app/start.sh ./start.sh
-COPY --from=installer --chown=nextjs:nodejs /app/keys ./keys
 
 RUN mkdir -p .next/static public && \
     chown -R nextjs:nodejs .next/static public

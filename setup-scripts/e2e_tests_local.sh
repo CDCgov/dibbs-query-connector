@@ -1,8 +1,8 @@
 #!/bin/bash
 set -e  # Exit immediately if a command exits with a non-zero status. Comment this if debugging in CI
 
-chmod +x ./setup-scripts/setup_e2e_vars.sh
-bash ./setup-scripts/setup_e2e_vars.sh
+chmod +x ./setup-scripts/setup_e2e.sh
+bash ./setup-scripts/setup_e2e.sh
 
 echo "AIDBOX_BASE_URL=http://localhost:8080" >> .env.e2e
 echo "APP_HOSTNAME=http://host.docker.internal:3000" >> .env.e2e
@@ -28,7 +28,7 @@ done
 echo -e "\nAidbox seeder finished!"
 
 # Run Next dev without auth to allow the e2e's to work
-npx dotenv -e ./.env.e2e -- next dev &
+npx dotenv -e ./.env.e2e -- next dev --turbopack &
 
 echo "Waiting Next server to be healthy..."
 while ! nc -z localhost 3000; do

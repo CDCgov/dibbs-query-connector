@@ -3,7 +3,7 @@ import { useState } from "react";
 import styles from "./querySelection.module.scss";
 import classNames from "classnames";
 import WorkSpaceSetUpView from "./WorkspaceSetUp";
-import { createDibbsDB } from "@/app/backend/dbCreation/db-creation";
+import { createDibbsDB } from "@/app/backend/db-creation/service";
 
 type EmptyQueryProps = {
   goForward: () => void;
@@ -44,9 +44,14 @@ export const EmptyQueriesDisplay: React.FC<EmptyQueryProps> = ({
 
   return (
     <div data-testid={"empty-state-container"}>
-      <h1 className={styles.queryTitle}>Query Library</h1>
+      <h1 className={styles.queryTitle}>Query repository</h1>
 
-      <div className={classNames("bg-gray-5", styles.emptyStateQueryContainer)}>
+      <div
+        className={classNames(
+          "background-dark",
+          styles.emptyStateQueryContainer,
+        )}
+      >
         <div className="display-flex flex-column flex-align-left">
           <h2 className={styles.emptyQueryTitle}>Start with Query Builder</h2>
           <h3 className={styles.emptyQuerySubtitle}>

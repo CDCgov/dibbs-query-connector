@@ -1,4 +1,5 @@
 @use "../../../../ui/styles/_variables" as *;
+@use "uswds-core" as *;
 
 .accordionInstance {
   margin-bottom: 2rem;
@@ -7,10 +8,10 @@
 .accordionWrapper > h3 {
   font-size: 1.75rem;
   color: white !important;
-  background-color: $table-header;
+  background-color: $background-darker;
 
   &:hover {
-    background-color: $table-header;
+    background-color: $background-darker;
   }
 }
 
@@ -36,8 +37,7 @@
 }
 
 .accordionHeading {
-  font-family: "Source Sans Pro Web", "Helvetica Neue", "Helvetica", "Roboto",
-    "Arial", "sans-serif" !important;
+  @include u-font-family("sans");
   font-size: 1.25rem !important;
   line-height: 1.1 !important;
 }
@@ -46,4 +46,26 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
+
+.resultsDrawerContainer {
+  display: flex;
+  padding: 1rem;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0.625rem;
+  align-self: stretch;
+  border-radius: 0.25rem;
+  background: white;
+}
+
+.resultsDrawerBody {
+  font-size: 1rem;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 1.375rem;
+  align-self: stretch;
+  white-space: pre-wrap;
+  word-break: break-word;
 }

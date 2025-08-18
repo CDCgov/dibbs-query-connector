@@ -1,5 +1,7 @@
 import { DibbsValueSet } from "@/app/models/entities/valuesets";
 import { ConceptTypeToDibbsVsMap } from "../../utils/valueSetTranslation";
+import { DibbsConceptType } from "@/app/models/entities/valuesets";
+import { CUSTOM_CONDITION_ID } from "@/app/constants";
 
 // The structure of the data that's coming from the backend
 export type ConditionsMap = {
@@ -22,6 +24,21 @@ export type ConditionIdToValueSetArrayMap = {
 
 export type NestedQuery = {
   [conditionId: string]: ConceptTypeToDibbsVsMap;
+} & {
+  custom?: {
+    [conceptType in DibbsConceptType]: {
+      [vsId: string]: DibbsValueSet;
+    };
+  };
+};
+
+export const MEDICAL_RECORD_SECTION_KEYS = [
+  "immunizations",
+  "socialDeterminants",
+] as const;
+
+export type MedicalRecordSections = {
+  [K in (typeof MEDICAL_RECORD_SECTION_KEYS)[number]]: boolean;
 };
 
 export type QueryUpdateResult = {
@@ -32,12 +49,21 @@ export type QueryUpdateResult = {
 export type QueryDataColumn = {
   [conditionId: string]: { [valueSetId: string]: DibbsValueSet };
 };
+
+export type TimeWindow = {
+  timeWindowStart: string;
+  timeWindowEnd: string;
+};
+
+export type QueryTableTimebox = Partial<Record<DibbsConceptType, TimeWindow>>;
+
 export type QueryTableResult = {
   queryName: string;
   queryId: string;
   queryData: QueryDataColumn;
   conditionsList: string[];
-  immunization: boolean;
+  medicalRecordSections: MedicalRecordSections;
+  timeboxWindows?: QueryTableTimebox;
 };
 
 export const EMPTY_QUERY_SELECTION = {
@@ -50,6 +76,12 @@ export const EMPTY_CONCEPT_TYPE = {
   conditions: {},
   medications: {},
 };
+
+export const EMPTY_MEDICAL_RECORD_SECTIONS: MedicalRecordSections =
+  MEDICAL_RECORD_SECTION_KEYS.reduce((acc, key) => {
+    acc[key] = false;
+    return acc;
+  }, {} as MedicalRecordSections);
 
 /**
  * Utility method to get a display name for a category (if overridden),
@@ -182,3 +214,27 @@ export const batchToggleConcepts = (input: DibbsValueSet) => {
 
   return input;
 };
+
+/**
+ * Filters out CUSTOM_CONDITION_ID from a CategoryToConditionArrayMap.
+ * Used to prevent rendering the custom condition in UI elements.
+ * @param categoryMap - The map of categories to condition arrays to filter.
+ * @returns A filtered CategoryToConditionArrayMap without CUSTOM_CONDITION_ID.
+ */
+export function formatCategoryToConditionsMap(
+  categoryMap: CategoryToConditionArrayMap,
+): CategoryToConditionArrayMap {
+  const filtered: CategoryToConditionArrayMap = {};
+
+  for (const [category, conditions] of Object.entries(categoryMap)) {
+    const filteredConditions = conditions.filter(
+      (condition) => condition.id !== CUSTOM_CONDITION_ID,
+    );
+
+    if (filteredConditions.length > 0) {
+      filtered[category] = filteredConditions;
+    }
+  }
+
+  return filtered;
+}

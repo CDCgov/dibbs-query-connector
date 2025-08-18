@@ -1,7 +1,7 @@
-@use "../../../ui/styles/_variables" as *;
+@use "../../../ui/styles/variables" as *;
+@use "uswds-core" as *;
 
 // Shared styles
-
 .mainContainer {
   display: flex;
   flex-direction: column;
@@ -9,7 +9,21 @@
   margin-bottom: 0 !important;
   max-width: 70rem !important;
 }
+input.errorMessage {
+  border: 2px solid color("error-dark");
+}
+.errorMessage {
+  display: flex;
+  align-items: center;
+  color: color("error-dark");
+  margin-top: 0.25rem;
+  line-height: 1.25rem;
 
+  svg {
+    margin-right: 0.25rem;
+    margin-bottom: 2.5px;
+  }
+}
 // Condition styles
 
 .templateContainer {
@@ -19,14 +33,24 @@
   min-width: 100%;
 }
 
+.startFromScratchLink {
+  font-weight: 700;
+  text-decoration: none;
+
+  &:active,
+  &:visited {
+    color: $accent-primary;
+  }
+}
+
 .conditionSelectionForm {
-  background-color: #fff;
+  background-color: white;
   padding: 2rem;
   min-height: 25rem;
 }
 
 .querySelectionFormSearch {
-  border: 1px solid #919191;
+  border: 1px solid $border;
   border-radius: 4px;
   height: 1.5rem;
   padding: 0.75rem;
@@ -47,7 +71,7 @@
 }
 
 .displayCol:first-of-type {
-  border-right: 1px solid $table-row-border;
+  border-right: 1px solid $border-light;
 }
 
 .displayCol:nth-of-type(2) {
@@ -61,7 +85,7 @@
 }
 
 .bluePill {
-  background-color: #e8f5ff;
+  background-color: $brand-lighter;
   font-size: 0.875rem;
   border-radius: 0.25rem;
 }
@@ -117,7 +141,7 @@
 }
 
 .valueSetTemplate__right {
-  background-color: #fff;
+  background-color: white;
   width: 50rem;
   min-width: 70%;
   border-radius: 8px;
@@ -134,6 +158,7 @@
   .icon {
     height: 10rem;
     width: 10rem;
+    color: $background-darkest;
   }
 
   .codeLibrary__emptyText {
@@ -153,69 +178,80 @@
 
 .valueSetTemplate__search {
   padding: 1.5rem;
-  border-bottom: 1px #dfe1e2 solid;
-}
-
-.valueSetTemplate__accordion {
   display: flex;
-  justify-content: space-between;
-  word-wrap: break-word;
   align-items: center;
-  width: 100%;
-  box-sizing: border-box;
-  background-color: #f7f9fa;
-  padding: 1rem 1.5rem;
-  border-bottom: 1px #dfe1e2 solid;
+  justify-content: space-between;
 }
 
 .accordionContainer {
   width: 100%;
+  margin-top: 0;
 }
 
-.accordionInnerWrapper > div {
-  padding: 0 !important;
+.accordionInnerWrapper > fieldset {
+  padding: 0;
+  margin: 0;
   overflow: visible;
+  border: none;
 }
 
-.accordionHeaderWrapper {
+.accordionInnerWrapper > fieldset > legend {
+  width: 100%;
+}
+
+.accordionInnerWrapper > fieldset:last-of-type {
+  border-bottom: 1px solid $border;
+}
+
+.accordionHeaderContent {
   background-color: transparent;
   justify-content: space-between;
   align-items: center;
   display: flex;
   width: 100%;
+}
+
+.accordionLabel {
+  text-transform: capitalize;
+  display: flex;
+  align-items: center;
+}
+
+.accordionHeaderCount {
+  font-size: 1rem !important;
+  font-weight: 400 !important;
+  background-color: inherit;
 }
 
 .accordionBodyWrapper {
   background-color: transparent;
 }
 
-.accordionHeaderCount {
-  font-size: 1rem !important;
-  font-weight: 400 !important;
-  background-color: #f7f9fa;
-}
-
-.accordionInnerWrapper > h4 {
+.accordionInnerWrapper > div {
   margin-top: 0 !important;
 }
 
-.accordionInnerWrapper > h4 > button {
+.accordionInnerWrapper > fieldset > legend {
+  border-top: 1px solid #dfe1e2;
+}
+
+.accordionInnerWrapper > legend > button {
   display: flex;
   word-wrap: break-word;
   align-items: center;
   width: 100%;
   box-sizing: border-box;
-  background-color: #f7f9fa;
+  background-color: $background-dark;
   padding: 1rem 1.5rem;
-  border-bottom: 1px #dfe1e2 solid;
-  color: #111111;
+  border-bottom: 1px $border solid;
+  color: black;
 
   // override default accordion hover styles (headers should not change on hover):
   &:hover {
-    background-color: #f7f9fa !important;
+    background-color: $background-dark !important;
 
     .accordionHeaderCount {
-      color: #111111;
+      color: black;
     }
   }
 }
@@ -233,7 +269,6 @@
     flex-direction: column;
     justify-content: space-between;
     padding-top: 0.5rem;
-    gap: 2rem;
 
     .section_templates,
     .section_custom {
@@ -247,14 +282,14 @@
       flex-direction: row;
       justify-content: space-between;
       align-items: center;
-      color: #919191;
+      color: $text-secondary;
       font-size: 1rem;
       line-height: 1.2;
     }
 
     .addCondition {
       font-size: 1rem;
-      color: #005ea2;
+      color: $brand-dark;
       line-height: 18.8px;
       font-weight: 700;
       display: flex;
@@ -267,9 +302,14 @@
   }
 
   .deleteIcon {
-    color: $error;
-    width: 1.5rem;
-    height: 1.5rem;
+    &:hover {
+      cursor: pointer;
+    }
+  }
+  .deleteIconContainer {
+    color: color("error");
+    width: 32px;
+    height: 32px;
     display: none;
   }
 
@@ -278,33 +318,48 @@
     border-radius: 4px;
     padding: 1rem;
     line-height: 22px;
-    color: #111111;
+    color: black;
     cursor: pointer;
     position: relative;
 
-    &:hover .deleteIcon {
+    &:focus-within .deleteIconContainer,
+    &:hover .deleteIconContainer {
       display: inline-block;
       position: absolute;
-      right: 2.5%;
-      top: 25%;
+      right: 3%;
+      top: 20%;
+      height: fit-content;
+      width: fit-content;
+      background-color: inherit;
     }
   }
 
   .active {
-    background: #ffffff;
+    background: white;
   }
+}
+
+.medicalRecordSectionRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  padding-bottom: 1rem;
+}
+
+.medicalRecordSectionRow label {
+  font-weight: 700;
 }
 
 .valueSetTemplate__titleCheckbox {
   text-transform: capitalize;
-  background-color: #f7f9fa;
+  background-color: $background-dark;
 }
 
 .valueSetTemplate__toggleRowHeader {
   display: flex;
   align-items: center;
   margin: 0.5rem 0;
-  width: 406px;
 }
 
 .valueSetTemplate__toggleRowHeader > svg {
@@ -313,50 +368,69 @@
 
 .accordionBodyExpanded {
   padding: 1.5rem 1.5rem 0 3rem;
-  background-color: #fff;
+  background-color: white;
   display: flex;
   justify-content: space-between;
+  cursor: pointer;
+}
+
+.checkboxInfoContainer:focus {
+  outline: none;
+  label::before {
+    outline: 0.25rem solid $focus-outline;
+    outline-offset: 0.25rem;
+    border-radius: 0.05rem;
+  }
+}
+
+.viewCodesBtn {
+  // toggle to block on hover
+  display: none;
+  min-width: 8rem;
+  height: 2rem;
+  font-size: 14px;
+  padding: 0.5rem 1.25rem;
 }
 
 .accordionBodyExpanded {
-  &:hover {
-    background-color: rgba(217, 232, 246, 0.5) !important;
-
-    .valueSetTemplate__checkbox {
-      background-color: unset;
-    }
+  &:hover,
+  &:focus,
+  &:focus-within {
     .viewCodesBtn {
       display: block;
-      text-align: right;
-      width: 4rem;
-      line-height: normal;
-      font-weight: 700;
-      font-size: 14px;
-      color: $text-blue;
-
-      &:hover {
-        cursor: pointer;
-        text-decoration: underline;
-      }
     }
+
     .displayCount {
       display: none;
     }
   }
-}
 
-div.accordionBodyExpanded:last-of-type {
-  border-bottom: 1px #dfe1e2 solid;
+  &:hover {
+    .valueSetTemplate__checkbox {
+      background-color: unset;
+    }
 
-  .accordionExpandedInner {
-    border-bottom: none !important;
+    .viewCodesBtn {
+      &:hover {
+        cursor: pointer;
+      }
+    }
   }
 }
 
 .accordionExpandedInner {
-  border-bottom: solid 1px #dfe1e2;
+  border-bottom: none !important;
+
+  &:last-of-type {
+    border-bottom: 1px $border solid;
+  }
+}
+
+.accordionExpandedInner {
   padding-bottom: 1rem;
   width: 100%;
+  display: flex;
+  justify-content: space-between;
 }
 
 .expandedContent {
@@ -370,20 +444,23 @@ div.accordionBodyExpanded:last-of-type {
 }
 
 .vsName {
-  color: #111111;
+  color: black;
+  max-width: 40rem;
 }
 
 .vsDetails {
-  color: #919191;
+  color: $text-secondary;
   display: flex;
+  padding-left: 1.75rem;
 }
 
 .accordionBodyExpanded__right {
-  padding-bottom: 1rem;
+  padding-bottom: 0.5rem;
   display: flex;
   align-items: center;
-  min-width: 4rem;
+  min-width: 20%;
   justify-content: flex-end;
+  width: fit-content;
 }
 
 .customQuery__header > h1 {
@@ -395,10 +472,6 @@ div.accordionBodyExpanded:last-of-type {
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-}
-
-.viewCodesBtn {
-  display: none;
 }
 
 .conceptSelectionTable {
@@ -439,21 +512,24 @@ $columnGap: 1rem;
 
 .conditionItem {
   display: flex;
-  padding-top: 1rem;
-  padding-bottom: 1rem;
+  padding: 1rem;
   justify-content: space-between;
   align-items: flex-start;
   align-self: stretch;
   border-radius: 0.25rem;
+  width: 100%;
 
-  &:hover {
-    background: $white;
+  &:hover,
+  &:focus-within {
+    background: white;
   }
-  &:hover .addButton {
+  &:hover .addButton,
+  &:focus-within .addButton {
     display: inline-block;
   }
 
-  &:hover .addedStatus {
+  &:hover .addedStatus,
+  &:focus-within .addedStatus {
     display: inline-block;
   }
 }
@@ -467,8 +543,39 @@ $columnGap: 1rem;
 }
 
 .addButton {
-  color: $text-blue;
+  color: $accent-primary;
   text-transform: uppercase;
   font-weight: 700;
   cursor: pointer;
+}
+
+.selectAll {
+  color: #2e6276;
+  font-weight: 700;
+  text-decoration: none;
+  margin-right: 1rem;
+
+  &:hover {
+    text-decoration: none;
+  }
+}
+
+.bulkActionButtons {
+  padding: 1rem 3rem 0.5rem 3rem !important;
+  max-width: fit-content;
+}
+
+.accordionBulkAction {
+  display: flex;
+  justify-content: space-between;
+  padding-right: 1.5rem;
+
+  input {
+    width: 12.5rem;
+  }
+
+  // narrower width if the placeholder "All Dates" is shown
+  input:placeholder-shown {
+    width: 7.5rem;
+  }
 }

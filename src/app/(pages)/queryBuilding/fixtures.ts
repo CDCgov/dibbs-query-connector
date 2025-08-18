@@ -1,5 +1,6 @@
 import { QueryTableResult } from "./utils";
 import { CustomUserQuery } from "@/app/models/entities/query";
+import { DibbsValueSet } from "@/app/models/entities/valuesets";
 
 // Fixture shortened significantly for maintenance purposes
 export const DEFAULT_QUERIES: CustomUserQuery[] = [
@@ -524,6 +525,10 @@ export const conditionIdToNameMap = {
     name: "Gonorrhea (disorder)",
     category: "Sexually Transmitted Diseases",
   },
+  custom_condition: {
+    name: "Custom Code Condition",
+    category: "User-Created",
+  },
 };
 
 export const categoryToConditionNameArrayMap = {
@@ -551,9 +556,10 @@ export const categoryToConditionNameArrayMap = {
       name: "Gonorrhea (disorder)",
     },
   ],
+  "User-Created": [{ id: "custom_condition", name: "Custom Code Condition" }],
 };
 
-export const gonorreheaValueSets = [
+export const gonorrheaValueSets = [
   {
     display: "azithromycin 1000 MG",
     code_system: "http://www.nlm.nih.gov/research/umls/rxnorm",
@@ -612,7 +618,49 @@ export const cancerValueSets = [
   },
 ];
 
-export const gonorreheaSavedQuery: QueryTableResult = {
+export const customValueSets = [
+  {
+    display: "Apple",
+    code_system: "http://snomed.info/sct",
+    code: "1A",
+    valueset_name: "Fruits",
+    valueset_id: "1-test",
+    valueset_external_id: "1-test",
+    version: "1",
+    author: "QC Admin",
+    type: "medications",
+    dibbs_concept_type: "medications",
+    condition_id: "custom_condition",
+  },
+  {
+    display: "Banana",
+    code_system: "http://snomed.info/sct",
+    code: "1B",
+    valueset_name: "Fruits",
+    valueset_id: "1-test",
+    valueset_external_id: "1-test",
+    version: "1",
+    author: "QC Admin",
+    type: "medicaiton",
+    dibbs_concept_type: "medication",
+    condition_id: "custom_condition",
+  },
+  {
+    display: "Coconut",
+    code_system: "http://snomed.info/sct",
+    code: "1C",
+    valueset_name: "Fruits",
+    valueset_id: "1-test",
+    valueset_external_id: "1-test",
+    version: "1",
+    author: "QC Admin",
+    type: "medicaiton",
+    dibbs_concept_type: "medication",
+    condition_id: "custom_condition",
+  },
+];
+
+export const gonorrheaSavedQuery: QueryTableResult = {
   queryId: "73e1a777-49cb-4e19-bc71-8c3fd3ffda64",
   queryName: "Gonorrhea case investigation",
   conditionsList: ["15628003"],
@@ -735,5 +783,24 @@ export const gonorreheaSavedQuery: QueryTableResult = {
       },
     },
   },
-  immunization: false,
+  medicalRecordSections: { immunizations: false, socialDeterminants: false },
 };
+
+export const mockDibbsValueSets: DibbsValueSet[] = [
+  {
+    valueSetId: "1-test",
+    valueSetName: "Fruits",
+    valueSetVersion: "1",
+    valueSetExternalId: "1-test",
+    author: "QC Admin",
+    system: "http://snomed.info/sct",
+    dibbsConceptType: "medications",
+    includeValueSet: true,
+    concepts: [
+      { code: "1A", display: "Apple", include: true },
+      { code: "1B", display: "Bannana", include: true },
+      { code: "1C", display: "Coconut", include: true },
+    ],
+    userCreated: true,
+  },
+];

@@ -7,6 +7,7 @@ export interface FhirServerConfig {
   lastConnectionAttempt?: string;
   lastConnectionSuccessful?: boolean;
   disableCertValidation: boolean;
+  defaultServer: boolean;
   authType?: "none" | "basic" | "client_credentials" | "SMART";
   clientId?: string;
   clientSecret?: string;
@@ -14,4 +15,11 @@ export interface FhirServerConfig {
   scopes?: string;
   accessToken?: string;
   tokenExpiry?: string;
+  patientMatchConfiguration?: {
+    enabled: boolean;
+    onlySingleMatch: boolean;
+    onlyCertainMatches: boolean;
+    matchCount: number;
+    supportsMatch: boolean;
+  };
 }

@@ -10,7 +10,7 @@ import {
   Icon,
 } from "@trussworks/react-uswds";
 import classNames from "classnames";
-import React, { RefObject, ReactNode } from "react";
+import React, { RefObject, ReactNode, JSX } from "react";
 
 export type ModalRef = TrussModalRef;
 
@@ -27,7 +27,7 @@ export type ModalProps = {
   heading: string;
   description?: string;
   children?: ReactNode;
-  modalRef: RefObject<ModalRef>;
+  modalRef: RefObject<ModalRef | null>;
   buttons: ModalButton[];
   isLarge?: boolean;
   errorMessage?: string | null; // New prop for error message
@@ -96,9 +96,8 @@ export const Modal: React.FC<ModalProps> = ({
             <div className="margin-top-4 text-red display-flex">
               <Icon.Close
                 size={3}
-                className="usa-icon"
+                className="usa-icon destructive-primary"
                 aria-label="Error"
-                color="#D54309"
               />
               {errorMessage}
             </div>

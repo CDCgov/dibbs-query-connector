@@ -22,12 +22,13 @@ env:
 jobs:
   lint:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
-      - uses: actions/checkout@v4
-      - name: Run linting
-        run: |
-          npm ci
-          npm run lint
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Run lint
+        uses: ./.github/actions/lint
 
   unit-and-integration-tests:
     runs-on: ubuntu-latest
@@ -45,15 +46,24 @@ jobs:
         run: |
           echo "AIDBOX_LICENSE=${{ secrets.AIDBOX_LICENSE }}" > .env
           echo "AIDBOX_BASE_URL=http://localhost:8080" >> .env
-          echo "APP_HOSTNAME=http://localhost:3000" >> .env
+          echo "APP_HOSTNAME=http://query-connector:3000" >> .env
       - name: Run tests
         run: |
+          sudo mkdir keys
+          sudo chmod -R 755 keys
+          sudo chown -R $USER:$USER keys
           npm run test:ci
         # uncomment these next few lines and the corresponding log import
         # in the setup script you're trying to debug if you're having trouble
         # in CI. All the best, brave engineer (￣^￣ )ゞ
-      #   continue-on-error: true
+        # continue-on-error: true
 
+      # - name: Upload keys directory
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: keys
+      #     path: ./keys
+      #
       # - name: Upload Docker Logs
       #   uses: actions/upload-artifact@v4
       #   with:
@@ -85,6 +95,7 @@ jobs:
       - name: Create .env
         run: |
           echo "AIDBOX_LICENSE=${{ secrets.AIDBOX_LICENSE }}" > .env
+          echo "NEXT_PUBLIC_AUTH_PROVIDER=keycloak" >> .env
       - name: Build Query Connector and Run Playwright Tests
         id: run_tests
         run: |

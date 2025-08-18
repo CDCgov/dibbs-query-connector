@@ -1,37 +1,39 @@
 "use client";
 
 import React, { useContext, useEffect, useRef, useState } from "react";
-import { useSession, signOut } from "next-auth/react";
-import { Icon } from "@trussworks/react-uswds";
+import { Button, Icon } from "@trussworks/react-uswds";
 import styles from "./header.module.scss";
-import { metadata } from "@/app/shared/constants";
+import { metadata } from "@/app/constants";
 import classNames from "classnames";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
-import { getPagesInSettingsMenu, PAGES } from "@/app/shared/page-routes";
+import { getPagesInSettingsMenu, PAGES } from "@/app/utils/page-routes";
 import { UserRole } from "@/app/models/entities/users";
 import { isAuthDisabledClientCheck } from "@/app/utils/auth";
-import { DataContext } from "@/app/shared/DataProvider";
+import { DataContext } from "@/app/utils/DataProvider";
+import { signOut } from "@/app/backend/session-management";
+import { Session } from "next-auth";
 
+interface HeaderProps {
+  session: Session | null;
+}
 /**
  * Produces the header.
- * @param root0 - The properties object
- * @param root0.authDisabled - The server-side read of the auth disabled environment variable.
+ * @param param0 - param
+ * @param param0.session - whether user is logged in
  * @returns The HeaderComponent component.
  */
-const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
-  authDisabled,
-}) => {
+const HeaderComponent: React.FC<HeaderProps> = ({ session }) => {
   const menuRef = useRef<HTMLDivElement>(null);
   const [showMenu, setShowMenu] = useState(false);
   const router = useRouter();
-  const { data: session, status } = useSession();
+  const pathname = usePathname();
   const ctx = useContext(DataContext);
   const isAuthDisabled = isAuthDisabledClientCheck(ctx?.runtimeConfig);
 
-  const isLoggedIn = status === "authenticated" || isAuthDisabled;
+  const isLoggedIn = session !== null || isAuthDisabled;
 
-  const userRole = authDisabled
+  const userRole = isAuthDisabled
     ? UserRole.SUPER_ADMIN
     : session?.user?.role || "";
 
@@ -53,9 +55,10 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
   }, [showMenu]);
 
   const handleSignOut = async () => {
-    if (authDisabled) {
+    if (isAuthDisabled) {
       router.push(PAGES.LANDING);
     } else {
+      setShowMenu(false);
       await signOut({ redirectTo: PAGES.LANDING });
     }
   };
@@ -64,53 +67,59 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
     setShowMenu(!showMenu);
   };
 
-  const landingPage = authDisabled || isLoggedIn ? PAGES.QUERY : PAGES.LANDING;
+  const landingPage =
+    isAuthDisabled || isLoggedIn ? PAGES.QUERY : PAGES.LANDING;
 
   const menuPages = getPagesInSettingsMenu(userRole as UserRole).filter(
     (page) => page.path !== PAGES.QUERY,
   );
 
   return (
-    <div className={styles.headerContainer}>
-      <header className="usa-header usa-header--basic">
-        <div
-          className={classNames(
-            "usa-nav-container",
-            styles.headerContentContainer,
-          )}
-        >
-          <div className={classNames("display-flex", "flex-align-center")}>
-            <div className="usa-logo" style={{ marginLeft: "0" }}>
-              <em className="usa-logo__text text-base-lightest-important">
-                <Link
-                  className="font-mono-lg text-base-lightest-important font-weight-normal-important"
-                  href={landingPage}
-                  title={metadata.title}
-                >
-                  {metadata.title}
-                </Link>
-              </em>
-            </div>
+    <header className="usa-header usa-header--basic">
+      <div
+        className={classNames(
+          "usa-nav-container grid-container",
+          styles.headerContainer,
+        )}
+      >
+        <div className={classNames("grid-row", styles.headerRow)}>
+          <div className="mobile-lg:grid-col-6">
+            <Link
+              className={`display-flex flex-align-center text-white-important text-decoration-none font-weight-normal-important`}
+              href={landingPage}
+              title={metadata.title}
+            >
+              <span className={styles.siteLogoImage}>
+                <svg
+                  className={styles.siteLogoImage}
+                  path="./../../styles/assets/logo.svg"
+                ></svg>
+              </span>
+              <span className={styles.siteLogoText}>{metadata.title}</span>
+            </Link>
           </div>
-          <div
-            className={classNames(
-              "margin-left-auto",
-              "display-flex",
-              "flex-align-center",
-            )}
-          >
+          <div className={classNames("mobile-lg:grid-col-6 ")}>
             {isLoggedIn && (
-              <div className="display-flex flex-align-center">
-                <Link
-                  href={PAGES.QUERY}
+              <div
+                className={classNames(
+                  styles.buttonContainer,
+                  "display-flex flex-align-center flex-justify-end",
+                )}
+                style={{ height: "100%" }}
+              >
+                <Button
+                  secondary
+                  onClick={() => {
+                    router.push(PAGES.QUERY);
+                  }}
                   className={classNames(
                     styles.runQueryBtn,
-                    "usa-button margin-bottom-0 margin-right-2",
+                    "margin-bottom-0 margin-right-2",
                   )}
-                  scroll={false}
+                  type={"button"}
                 >
                   Run a query
-                </Link>
+                </Button>
                 <button
                   onClick={toggleMenuDropdown}
                   className={classNames(
@@ -124,9 +133,8 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
                   data-testid="menu-button"
                 >
                   <Icon.Settings
-                    className="usa-icon qc-settings"
+                    className="usa-icon text-white"
                     size={3}
-                    color="#fff"
                     aria-label="Gear icon indicating settings menu"
                   />
                 </button>
@@ -142,23 +150,30 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
               className={classNames("usa-nav__submenu", styles.menuDropdown)}
             >
               {menuPages.map((page) => (
-                <li key={page.path} className={styles.subMenuItem}>
-                  <Link
-                    className={styles.menuItem}
-                    href={page.path}
-                    scroll={false}
-                  >
-                    {page.name}
-                  </Link>
-                </li>
-              ))}
-              {!authDisabled && (
-                <li className={styles.subMenuItem}>
+                <li key={page.path} className={styles.menuItem}>
                   <button
+                    type="button"
                     className={classNames(
-                      styles.menuItem,
+                      styles.menuItem__button,
                       "usa-button--unstyled",
                     )}
+                    onClick={() => {
+                      if (pathname === page.path) {
+                        location.reload();
+                      } else {
+                        router.push(page.path);
+                      }
+                      setShowMenu(false);
+                    }}
+                  >
+                    {page.name}
+                  </button>
+                </li>
+              ))}
+              {!isAuthDisabled && (
+                <li className={styles.menuItem}>
+                  <button
+                    className={classNames(styles.menuItem__button)}
                     onClick={async () => await handleSignOut()}
                   >
                     Sign out
@@ -168,8 +183,8 @@ const HeaderComponent: React.FC<{ authDisabled: boolean }> = ({
             </ul>
           </div>
         )}
-      </header>
-    </div>
+      </div>
+    </header>
   );
 };
 

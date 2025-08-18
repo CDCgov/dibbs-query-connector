@@ -1,16 +1,14 @@
 "use server";
 import { User, UserGroup, UserGroupMembership } from "../models/entities/users";
-import {
-  getAllUsersWithSingleGroupStatus,
-  getSingleUserWithGroupMemberships,
-} from "./user-management";
+import { getSingleUserWithGroupMemberships } from "./user-management";
 
 import { QCResponse } from "../models/responses/collections";
 import { CustomUserQuery } from "../models/entities/query";
 import { QueryResult } from "pg";
-import { getQueryById } from "./query-building";
-import dbService from "./dbServices/db-service";
-import { adminRequired, transaction } from "./dbServices/decorators";
+import dbService from "./db/service";
+import { adminRequired } from "./db/decorators";
+import { auditable } from "./audit-logs/decorator";
+import { getQueryById } from "./query-building/service";
 
 class UserGroupManagementService {
   /**
@@ -19,6 +17,7 @@ class UserGroupManagementService {
    * @returns The created user group or an error message if it already exists.
    */
   @adminRequired
+  @auditable
   static async createUserGroup(
     groupName: string,
   ): Promise<QCResponse<UserGroup>> {
@@ -28,9 +27,6 @@ class UserGroupManagementService {
       const groupExists =
         existingGroups.items?.some((group) => group.name === groupName) ??
         false;
-
-      console.log(existingGroups);
-      console.log(groupExists);
 
       if (groupExists) {
         throw new Error(`User group '${groupName}' already exists.`);
@@ -64,6 +60,7 @@ class UserGroupManagementService {
    * @returns The updated user group or an error if the update fails.
    */
   @adminRequired
+  @auditable
   static async updateUserGroup(
     id: string,
     newName: string,
@@ -120,6 +117,7 @@ class UserGroupManagementService {
    * @returns The deleted user group or an error if the deletion fails.
    */
   @adminRequired
+  @auditable
   static async deleteUserGroup(id: string): Promise<UserGroup | string> {
     try {
       await dbService.query(
@@ -161,6 +159,7 @@ class UserGroupManagementService {
    * @returns The user IDs of the users added to the group.
    */
   @adminRequired
+  @auditable
   static async addUsersToGroup(
     groupId: string,
     userIds: string[],
@@ -206,6 +205,7 @@ class UserGroupManagementService {
    * @param userIds - The unique identifier(s) of the users to add.
    * @returns The user IDs of the users added to the group.
    */
+  @auditable
   static async removeUsersFromGroup(
     groupId: string,
     userIds: string[],
@@ -238,59 +238,6 @@ class UserGroupManagementService {
     } catch (error) {
       console.error("Error removing user(s) from user group:", error);
       throw error;
-    }
-  }
-
-  /**
-   * Saves the user group membership for a specific user group.
-   * @param groupId - The unique identifier of the user group.
-   * @param selectedUsers - The unique identifiers of the users to add to the group.
-   * @returns A list of user group memberships for the specified group.
-   */
-  @transaction
-  @adminRequired
-  static async saveUserGroupMembership(
-    groupId: string,
-    selectedUsers: string[],
-  ): Promise<{ success: boolean; users: User[] }> {
-    try {
-      const existingMemberships =
-        await getAllUsersWithSingleGroupStatus(groupId);
-      const existingUserIds = new Set(
-        existingMemberships.flatMap(
-          (user) =>
-            user.userGroupMemberships
-              ?.filter((m) => m.isMember)
-              .map(() => user.id) || [],
-        ),
-      );
-
-      const usersToAdd = selectedUsers.filter((id) => !existingUserIds.has(id));
-      const usersToRemove = existingMemberships.flatMap(
-        (user) =>
-          user.userGroupMemberships
-            ?.filter((m) => m.isMember && !selectedUsers.includes(user.id))
-            .map(() => user.id) || [],
-      );
-
-      if (usersToRemove.length > 0)
-        await UserGroupManagementService.removeUsersFromGroup(
-          groupId,
-          usersToRemove,
-        );
-      if (usersToAdd.length > 0) {
-        await UserGroupManagementService.addUsersToGroup(groupId, usersToAdd);
-      }
-
-      const updatedUsers = await getAllUsersWithSingleGroupStatus(groupId);
-      return { success: true, users: updatedUsers };
-    } catch (error) {
-      console.error(
-        "Save for user group membership failed for group ",
-        groupId,
-        error,
-      );
-      return { success: false, users: [] };
     }
   }
 
@@ -330,10 +277,18 @@ class UserGroupManagementService {
           return group;
         }),
       );
+      const groupsWithMembersAndQueries = await Promise.all(
+        groupsWithQueries.map(async (group) => {
+          const groupMembers = await getAllGroupMembers(group.id);
+          group.members = groupMembers.items;
+          await dbService.query("COMMIT");
+          return group;
+        }),
+      );
 
       return {
         totalItems: result.rowCount,
-        items: groupsWithQueries,
+        items: groupsWithMembersAndQueries,
       } as QCResponse<UserGroup>;
     } catch (error) {
       console.error("Error retrieving user groups:", error);
@@ -451,6 +406,7 @@ class UserGroupManagementService {
    * @param queryIds - The unique identifier of the query to add.
    * @returns The IDs of the queries added to the group.
    */
+  @auditable
   static async addQueriesToGroup(
     groupId: string,
     queryIds: string[],
@@ -506,6 +462,7 @@ class UserGroupManagementService {
    * @param queryIds - The unique identifiers of the query to remove.
    * @returns The query with updated groupAssignment data
    */
+  @auditable
   static async removeQueriesFromGroup(
     groupId: string,
     queryIds: string[],
@@ -625,8 +582,6 @@ export const removeQueriesFromGroup =
   UserGroupManagementService.removeQueriesFromGroup;
 export const removeUsersFromGroup =
   UserGroupManagementService.removeUsersFromGroup;
-export const saveUserGroupMembership =
-  UserGroupManagementService.saveUserGroupMembership;
 export const getAllUserGroups = UserGroupManagementService.getAllUserGroups;
 export const getUserGroupById = UserGroupManagementService.getUserGroupById;
 export const getAllGroupQueries = UserGroupManagementService.getAllGroupQueries;

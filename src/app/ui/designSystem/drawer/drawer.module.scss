@@ -8,7 +8,6 @@ $drawerWidthWide: 60%;
   top: 0;
   height: 100%;
   padding: 0rem;
-  display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: 1.5rem;
@@ -16,7 +15,7 @@ $drawerWidthWide: 60%;
   transition: right 0.3s ease;
   z-index: 1050;
   border-left: 1px solid $border;
-  background: $page-background;
+  background: $background;
   max-height: 100%;
   overflow-y: scroll;
 
@@ -36,13 +35,14 @@ $drawerWidthWide: 60%;
     align-items: center;
     gap: 0.5rem;
     border-radius: 0.25rem;
-    border: 1px solid $input-field-border;
-    background-color: $white;
+    border: 1px solid $border;
+    background-color: white;
   }
 }
 
 .drawer.open {
   right: 0;
+  display: flex;
 }
 
 .drawer.closed {
@@ -56,7 +56,6 @@ $drawerWidthWide: 60%;
 
 .drawerHeader {
   max-width: 95%;
-  width: 25rem;
 }
 
 .overlay {
@@ -83,7 +82,7 @@ $drawerWidthWide: 60%;
 }
 
 .subtitle {
-  color: $gray-600;
+  color: $text-secondary;
   display: flex;
   padding-top: 1rem;
   padding-bottom: 1rem;

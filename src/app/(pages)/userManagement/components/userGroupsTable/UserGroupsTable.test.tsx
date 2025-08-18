@@ -16,7 +16,7 @@ jest.mock(
     ({ children }: React.PropsWithChildren) => <div>{children}</div>,
 );
 
-jest.mock("@/app/backend/query-building", () => ({
+jest.mock("@/app/backend/query-building/service", () => ({
   getCustomQueries: jest.fn(),
 }));
 
@@ -36,6 +36,7 @@ describe("User Groups table", () => {
           userGroups={allGroups}
           fetchGroupMembers={jest.fn()}
           fetchGroupQueries={jest.fn()}
+          modalData={""}
         />
       </RootProviderMock>,
     );

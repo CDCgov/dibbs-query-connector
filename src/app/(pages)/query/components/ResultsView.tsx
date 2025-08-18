@@ -1,9 +1,10 @@
-import { PatientRecordsResponse } from "../../../backend/query-execution";
+import { PatientRecordsResponse } from "../../../backend/query-execution/service";
 import ResultsViewSideNav, {
   NavSection,
 } from "./resultsView/ResultsViewSideNav";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import ResultsViewTable from "./resultsView/ResultsViewTable";
+import ResultsViewDrawer from "./resultsView/ResultsViewDrawer";
 import styles from "./resultsView/resultsView.module.scss";
 import ConditionsTable from "./resultsView/tableComponents/ConditionsTable";
 import Demographics from "./resultsView/tableComponents/Demographics";
@@ -17,6 +18,7 @@ import TitleBox from "./stepIndicator/TitleBox";
 import ImmunizationTable from "./resultsView/tableComponents/ImmunizationTable";
 import { CustomUserQuery } from "@/app/models/entities/query";
 import Skeleton from "react-loading-skeleton";
+import { Button } from "@trussworks/react-uswds";
 
 type ResultsViewProps = {
   patientRecordsResponse: PatientRecordsResponse | undefined;
@@ -57,6 +59,8 @@ const ResultsView: React.FC<ResultsViewProps> = ({
     patientRecordsResponse,
   );
 
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
   const sideNavContent =
     accordionItems &&
     (accordionItems
@@ -80,30 +84,45 @@ const ResultsView: React.FC<ResultsViewProps> = ({
               onClick={() => goBack()}
               label={RETURN_LABEL["results"]}
             />
-            <button
-              className="usa-button usa-button--outline"
-              onClick={() => goToBeginning()}
-            >
+            <Button secondary onClick={() => goToBeginning()} type={"button"}>
               New patient search
-            </button>
+            </Button>
           </>
         )}
       </div>
       <TitleBox step="results" />
       <h2 className="page-explainer margin-bottom-3-important margin-top-0-important">
-        <strong>Query: </strong>
-        <span className="text-normal display-inline-block">
-          {selectedQuery.queryName}
-        </span>
+        <div className="display-flex flex-align-center">
+          <strong>Query:&nbsp;</strong>
+          <span className="text-normal display-inline-block">
+            {selectedQuery.queryName}
+          </span>
+          <Button
+            secondary
+            data-testid="view-fhir-response-button"
+            className={`usa-button--unstyled text-no-underline text-bold margin-left-auto padding-right-2`}
+            type="button"
+            onClick={() => setDrawerOpen(true)}
+          >
+            View FHIR response
+          </Button>
+        </div>
       </h2>
 
-      <div className=" grid-container grid-row grid-gap-md padding-0 ">
+      <div className=" grid-container-desktop-lg grid-row grid-gap-md padding-0 ">
         <div className="tablet:grid-col-3">
           <ResultsViewSideNav items={sideNavContent} loading={loading} />
         </div>
         <div className="tablet:grid-col-9 ecr-content">
           <ResultsViewTable accordionItems={accordionItems} loading={loading} />
         </div>
+      </div>
+      <div aria-hidden={!drawerOpen}>
+        <ResultsViewDrawer
+          isOpen={drawerOpen}
+          onClose={() => setDrawerOpen(false)}
+          patientRecordsResponse={patientRecordsResponse}
+        />
       </div>
     </>
   );

@@ -1,0 +1,31 @@
+name: "Run ESLint with autofix"
+description: "Installs dependencies and runs ESLint with --fix"
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ github.head_ref }}
+        token: ${{ github.token }}
+
+    - name: Install dependencies
+      shell: bash
+      run: npm ci
+
+    - name: Run ESLint with autofix
+      shell: bash
+      run: npx eslint --fix .
+
+    - name: Commit and push cfixes
+      shell: bash
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+
+        if [[ -n $(git status --porcelain) ]]; then
+          git add .
+          git commit -m "chore: auto-fix ESLint issues"
+          git push
+        else
+          echo "No changes to commit"
+        fi

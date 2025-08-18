@@ -7,10 +7,10 @@ exports[`tests the query building steps renders the empty state 1`] = `
   <h1
     class="queryTitle"
   >
-    Query Library
+    Query repository
   </h1>
   <div
-    class="bg-gray-5 emptyStateQueryContainer"
+    class="background-dark emptyStateQueryContainer"
   >
     <div
       class="display-flex flex-column flex-align-left"

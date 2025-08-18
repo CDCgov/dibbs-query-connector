@@ -1,10 +1,12 @@
+import "@testing-library/jest-dom";
 import { waitFor, screen, render } from "@testing-library/react";
 import * as UserManagementBackend from "@/app/backend/user-management";
 import * as UserGroupManagementBackend from "@/app/backend/usergroup-management";
-import * as QueryBuildingBackend from "@/app/backend/query-building";
+import * as QueryBuildingBackend from "@/app/backend/query-building/service";
 import { UserRole } from "@/app/models/entities/users";
 import { renderWithUser, RootProviderMock } from "@/app/tests/unit/setup";
-import UsersTable from "./userManagementContainer";
+import UserManagementContainer from "./userManagementContainer";
+
 import {
   mockSuperAdmin,
   mockAdmin,
@@ -20,7 +22,7 @@ jest.mock("@/app/backend/user-management", () => ({
   getUserRole: jest.fn(),
 }));
 
-jest.mock("@/app/backend/query-building", () => ({
+jest.mock("@/app/backend/query-building/service", () => ({
   getCustomQueries: jest.fn().mockResolvedValue([]),
 }));
 
@@ -31,7 +33,7 @@ jest.mock("@/app/backend/usergroup-management", () => ({
     .mockResolvedValue({ items: [], totalItems: 0 }),
 }));
 
-jest.mock("@/app/backend/query-building", () => ({
+jest.mock("@/app/backend/query-building/service", () => ({
   getCustomQueries: jest.fn().mockResolvedValue([]),
 }));
 
@@ -45,20 +47,20 @@ jest.mock(
   "@/app/(pages)/userManagement/components/userModal/userModal",
   () => () => <div>Modal Mock</div>,
 );
+
 describe("Super Admin view of Users Table", () => {
   const role = UserRole.SUPER_ADMIN;
   it("renders error message when no users are found", async () => {
     render(
       <RootProviderMock currentPage="/userManagement">
-        <UsersTable role={role} />
+        <UserManagementContainer role={role} />
       </RootProviderMock>,
     );
 
     await waitFor(() => {
-      expect(screen.queryByText("Loading")).not.toBeInTheDocument();
+      expect(screen.queryByText("No users found")).toBeInTheDocument();
     });
 
-    expect(screen.getByText("No users found")).toBeInTheDocument();
     expect(document.body).toMatchSnapshot();
   });
 
@@ -70,18 +72,19 @@ describe("Super Admin view of Users Table", () => {
 
     render(
       <RootProviderMock currentPage="/userManagement">
-        <UsersTable role={role} />
+        <UserManagementContainer role={role} />
       </RootProviderMock>,
     );
-    await waitFor(() => {
-      expect(screen.queryByText("Loading")).not.toBeInTheDocument();
-    });
 
     expect(document.body).toMatchSnapshot();
 
     if (mockPermissionsTab.renderContent) {
       render(mockPermissionsTab.renderContent());
     }
+
+    await waitFor(() => {
+      expect(screen.queryByText("Loading")).not.toBeInTheDocument();
+    });
 
     expect(document.body).toHaveTextContent("Potter, Harry");
     expect(document.body).toHaveTextContent("Order of the Phoenix");
@@ -108,7 +111,7 @@ describe("Super Admin view of Users Table", () => {
       .mockResolvedValueOnce([mockQueryWithGroups]);
     const { user } = renderWithUser(
       <RootProviderMock currentPage="/userManagement">
-        <UsersTable role={role} />
+        <UserManagementContainer role={role} />
       </RootProviderMock>,
     );
     await waitFor(() => {
@@ -138,7 +141,7 @@ describe("Admin view of Users Table", () => {
   it("renders error message when no user groups are found", async () => {
     render(
       <RootProviderMock currentPage="/userManagement">
-        <UsersTable role={role} />
+        <UserManagementContainer role={role} />
       </RootProviderMock>,
     );
 

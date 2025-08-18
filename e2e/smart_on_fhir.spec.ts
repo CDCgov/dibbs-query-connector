@@ -1,11 +1,8 @@
 import { TEST_URL } from "../playwright-setup";
 import { test, expect } from "@playwright/test";
 import { E2E_SMART_TEST_CLIENT_ID } from "./constants";
-import {
-  createSmartJwt,
-  getOrCreateKeys,
-} from "@/app/backend/dbServices/smartOnFhir/lib";
-import { decodeJwt, decodeProtectedHeader } from "jose";
+
+import { runAxeAccessibilityChecks } from "./utils";
 
 test.describe("SMART on FHIR", () => {
   // NOTE: this E2E doesn't work on local UI mode due to Docker networking issues
@@ -17,8 +14,12 @@ test.describe("SMART on FHIR", () => {
 
     await page.getByRole("button", { name: "New server" }).click();
     await expect(
-      page.getByRole("heading", { name: "New server" }),
+      page.getByRole("heading", {
+        name: "New server",
+      }),
     ).toBeVisible();
+    await runAxeAccessibilityChecks(page);
+
     const serverName = `E2E Smart on FHIR ${Math.random() * 100}`;
     await page.getByTestId("server-name").fill(serverName);
 
@@ -36,39 +37,13 @@ test.describe("SMART on FHIR", () => {
 
     await page.getByRole("button", { name: "Test connection" }).click();
     await expect(page.getByRole("button", { name: "Success" })).toBeVisible();
+    await runAxeAccessibilityChecks(page);
 
     await page.getByRole("button", { name: "Add server" }).click();
 
     await expect(
       page.getByRole("row").filter({ hasText: serverName }),
     ).toHaveText(/Connected/);
-  });
-
-  // This integration test is stuck in the e2e setting because of weird issues running
-  // our JWT signing library in a JSDOM environment. Trying to sign the JWT errors
-  // with type errors complaining about the payload needing to a UTF-8 array,
-  // which after some digging is an issue running the library within JSDOM.
-  // Relevant issue here: https://github.com/vitest-dev/vitest/issues/5685
-  test("JWT creation generates the correct token and signing creates the right request payload", async () => {
-    const tokenEndpoint = `${process.env.AIDBOX_BASE_URL}/auth/token`;
-
-    // make sure key pair exist, and create them if they don't
-    await getOrCreateKeys();
-
-    const outputJWT = await createSmartJwt(
-      E2E_SMART_TEST_CLIENT_ID,
-      tokenEndpoint,
-    );
-
-    const header = decodeProtectedHeader(outputJWT);
-    expect(header.alg).toBe("RS384");
-    expect(header.typ).toBe("JWT");
-    expect(header.jku).toBe(
-      `${process.env.APP_HOSTNAME}/.well-known/jwks.json`,
-    );
-    const claims = decodeJwt(outputJWT);
-    expect(claims.aud).toBe(tokenEndpoint);
-    expect(claims.iss).toBe(E2E_SMART_TEST_CLIENT_ID);
-    expect(claims.sub).toBe(E2E_SMART_TEST_CLIENT_ID);
+    await runAxeAccessibilityChecks(page);
   });
 });

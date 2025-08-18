@@ -5,15 +5,14 @@ import {
   getAllGroupQueries,
   removeUsersFromGroup,
   removeQueriesFromGroup,
-  saveUserGroupMembership,
 } from "@/app/backend/usergroup-management";
 import { getAllUsersWithSingleGroupStatus } from "@/app/backend/user-management";
-import { getDbClient } from "@/app/backend/dbClient";
+import { internal_getDbClient } from "@/app/backend/db/config";
 import { User } from "@/app/models/entities/users";
 import { suppressConsoleLogs } from "./fixtures";
 import { QueryDataColumn } from "@/app/(pages)/queryBuilding/utils";
 
-const dbClient = getDbClient();
+const dbClient = internal_getDbClient();
 
 jest.mock("@/app/utils/auth", () => ({
   superAdminAccessCheck: jest.fn(() => Promise.resolve(true)),
@@ -221,35 +220,6 @@ describe("User Group and Query Membership Tests", () => {
   test("should not remove a user that is not in the group", async () => {
     const result = await removeUsersFromGroup(TEST_GROUP_ID, [TEST_USER_3_ID]);
     expect(result.items).toEqual([]);
-  });
-
-  /**
-   * Tests saving user group memberships.
-   */
-  test("should correctly update user group memberships", async () => {
-    const selectedUsers = [TEST_USER_1_ID];
-
-    // Add and remove users in one call
-    const { users: updatedUsers } = await saveUserGroupMembership(
-      TEST_GROUP_ID,
-      selectedUsers,
-    );
-
-    // Verify membership contains only selected users
-    expect(
-      updatedUsers.some(
-        (user) =>
-          user.id === TEST_USER_1_ID &&
-          user.userGroupMemberships?.some((m) => m.isMember),
-      ),
-    ).toBe(true);
-    expect(
-      updatedUsers.some(
-        (user) =>
-          user.id === TEST_USER_2_ID &&
-          user.userGroupMemberships?.some((m) => m.isMember),
-      ),
-    ).toBe(false);
   });
 
   /**

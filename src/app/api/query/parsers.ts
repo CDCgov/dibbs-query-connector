@@ -1,6 +1,6 @@
 import { Patient } from "fhir/r4";
-import { FormatPhoneAsDigits } from "@/app/shared/format-service";
-import { USE_CASES, USE_CASE_DETAILS } from "@/app/shared/constants";
+import { FormatPhoneAsDigits } from "@/app/utils/format-service";
+import { AddressData, USE_CASES, USE_CASE_DETAILS } from "@/app/constants";
 
 export type PatientIdentifiers = {
   first_name?: string;
@@ -8,6 +8,12 @@ export type PatientIdentifiers = {
   dob?: string;
   mrn?: string;
   phone?: string;
+  street1?: string;
+  street2?: string;
+  city?: string;
+  state?: string;
+  zip?: string;
+  email?: string;
 };
 
 /**
@@ -54,6 +60,25 @@ export function parsePatientDemographics(patient: Patient): PatientIdentifiers {
     }
   }
 
+  const addresses = parseAddresses(patient);
+
+  if (addresses) {
+    identifiers.street1 = addresses.street1;
+    identifiers.street2 = addresses.street2;
+    identifiers.city = addresses.city;
+    identifiers.state = addresses.state;
+    identifiers.zip = addresses.zip;
+  }
+
+  const emailAddresses = parseEmails(patient);
+  if (emailAddresses && emailAddresses.length > 0) {
+    if (emailAddresses.length == 1) {
+      identifiers.email = emailAddresses[0];
+    } else if (emailAddresses.length > 1) {
+      identifiers.email = emailAddresses.join(";");
+    }
+  }
+
   return identifiers;
 }
 
@@ -94,6 +119,91 @@ export function parsePhoneNumbers(
         ["home", "work", "mobile"].includes(contactPoint.use || ""),
     );
     return phoneNumbers.map((contactPoint) => contactPoint.value);
+  }
+}
+
+/**
+ * Helper function that extracts all patient addresses from a patient resource
+ * TODO: maybe utilize the address.period property so we display the current/most recent record?
+ * @param patient A FHIR Patient resource.
+ * @returns An array of address objects, or undefined if the patient has no addresses.
+ */
+export function parseAddresses(patient: Patient): AddressData | undefined {
+  if (patient.address) {
+    const street1: string[] = [];
+    const street2: string[] = [];
+    const city: string[] = [];
+    const state: string[] = [];
+    const zip: string[] = [];
+
+    function addToArr(destination: string[], data: string) {
+      if (data && !destination.includes(data)) {
+        destination.push(data);
+      }
+    }
+
+    patient.address.forEach((address) => {
+      addToArr(zip, address.postalCode || "");
+      addToArr(state, address.state || "");
+      addToArr(city, address.city || "");
+
+      // if we already have city/state/zip, remove it from the address.line array
+      const removeDuplicates = address.line?.map((lineItem) => {
+        if (address.postalCode && lineItem.includes(address.postalCode)) {
+          lineItem = lineItem.replace(address.postalCode, "");
+        }
+        if (address.state && lineItem.includes(address.state)) {
+          lineItem = lineItem.replace(address.state, "");
+        }
+        if (address.city && lineItem.includes(address.city)) {
+          lineItem = lineItem.replace(address.city, "");
+        }
+        return lineItem.trim();
+      });
+
+      const firstLine = removeDuplicates?.shift();
+      firstLine && street1.push(firstLine);
+      street2 &&
+        removeDuplicates?.forEach((lineItem) => street2.push(lineItem)); // everything else left in the array
+    });
+
+    return {
+      street1: street1.length > 1 ? street1.join(";") : street1[0] || "",
+      street2: street2.length > 1 ? street2.join(";") : street2[0] || "",
+      city: city.join(";"),
+      state: state.join(";"),
+      zip: zip.join(";"),
+    };
+  }
+}
+
+/**
+ * Validates an email address using a regular expression.
+ * @param email - The email address to validate.
+ * @returns True if the email is valid, false otherwise.
+ */
+export function validEmail(email: string | undefined): boolean {
+  if (!email) return false;
+  // RFC 5322 Official Standard email regex
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+/**
+ * Helper function that extracts all applicable, valid email addresses from a patient resource
+ * and returns them as a list of strings, without changing the input formatting
+ * of the emails.
+ * @param patient A FHIR Patient resource.
+ * @returns A list of valid emails, or undefined if the patient has no valid email.
+ */
+export function parseEmails(
+  patient: Patient,
+): (string | undefined)[] | undefined {
+  if (patient.telecom) {
+    const emailAddresses = patient.telecom
+      .filter((contactPoint) => contactPoint.system === "email")
+      .map((contactPoint) => contactPoint.value)
+      .filter((email) => validEmail(email));
+    return emailAddresses.length > 0 ? emailAddresses : undefined;
   }
 }
 

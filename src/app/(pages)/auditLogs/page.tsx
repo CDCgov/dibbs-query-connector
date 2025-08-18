@@ -1,18 +1,18 @@
 "use client";
 
-import { useState, useEffect, ChangeEvent, useMemo } from "react";
+import { useState, useEffect, ChangeEvent, useMemo, useRef } from "react";
 import styles from "./auditLogs.module.scss";
 import classNames from "classnames";
 import {
   DateRange,
   DateErrors,
+  DateRangePickerRef,
 } from "@/app/ui/designSystem/timeboxing/DateRangePicker";
 import DateRangePicker from "@/app/ui/designSystem/timeboxing/DateRangePicker";
 import SearchField from "@/app/ui/designSystem/searchField/SearchField";
 import Table from "@/app/ui/designSystem/table/Table";
 import { Button, Select, Pagination } from "@trussworks/react-uswds";
 import WithAuth from "@/app/ui/components/withAuth/WithAuth";
-import { getAuditLogs, LogEntry } from "@/app/backend/dbServices/audit-logs";
 import Skeleton from "react-loading-skeleton";
 import AuditLogDrawer from "./components/auditLogDrawer";
 import {
@@ -21,6 +21,7 @@ import {
   auditLogUserMap,
   initializeAuditLogUserMap,
 } from "./components/auditLogMaps";
+import { getAuditLogs, LogEntry } from "@/app/backend/audit-logs/service";
 
 /**
  * Client component for the Audit Logs page.
@@ -38,6 +39,7 @@ const AuditLogs: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedLog, setSelectedLog] = useState<LogEntry | null>(null);
+  const datePickerRef = useRef<DateRangePickerRef>(null);
 
   useEffect(() => {
     async function fetchAuditLogs() {
@@ -182,11 +184,15 @@ const AuditLogs: React.FC = () => {
             <label htmlFor="dateRange">Custom date range</label>
             <div>
               <DateRangePicker
+                ref={datePickerRef}
+                id={"auditLogDatePicker"}
                 startDate={dateRange.startDate || null}
                 endDate={dateRange.endDate || null}
-                onChange={({ startDate, endDate }) =>
-                  setDateRange({ startDate, endDate })
-                }
+                onChange={() => {
+                  const startDate = datePickerRef.current?.getStartDate();
+                  const endDate = datePickerRef.current?.getEndDate();
+                  setDateRange({ startDate, endDate });
+                }}
               />
             </div>
           </div>
@@ -208,8 +214,6 @@ const AuditLogs: React.FC = () => {
                 <h3>No results found.</h3>
                 <Button
                   type="reset"
-                  outline
-                  className={styles.clearFiltersButton}
                   onClick={() => {
                     setSearch("");
                     setSelectedName("");

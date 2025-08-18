@@ -1,6 +1,6 @@
 import { useSession } from "next-auth/react";
 import { useContext } from "react";
-import { DataContext } from "@/app/shared/DataProvider";
+import { DataContext } from "@/app/utils/DataProvider";
 import { isAuthDisabledClientCheck } from "@/app/utils/auth";
 import { User, UserRole } from "@/app/models/entities/users";
 import { CustomUserQuery } from "@/app/models/entities/query";
@@ -9,11 +9,14 @@ import { CustomUserQuery } from "@/app/models/entities/query";
  * Function that retrieves the role value from the current session object
  * @returns - The UserRole for the current logged-in user
  */
-export function getRole() {
+export function getRole(): UserRole {
   const { data: session } = useSession();
   const ctx = useContext(DataContext);
   const isAuthDisabled = isAuthDisabledClientCheck(ctx?.runtimeConfig);
-  return isAuthDisabled ? UserRole.SUPER_ADMIN : session?.user?.role;
+
+  return isAuthDisabled
+    ? UserRole.SUPER_ADMIN
+    : (session?.user?.role as UserRole);
 }
 
 export const RoleDescriptons = {
@@ -63,13 +66,13 @@ export const ModalStates: ModalMap = {
   },
   "create-group": {
     heading: "Create user group",
-    buttonText: "Next: Assign members",
+    buttonText: "Save user group",
     secondaryBtnText: "Cancel",
     prevStep: "closed",
   },
   "edit-group": {
     heading: "Edit user group",
-    buttonText: "Save & update members",
+    buttonText: "Save changes",
     secondaryBtnText: "Cancel",
     prevStep: "closed",
   },

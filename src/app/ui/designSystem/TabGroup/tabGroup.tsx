@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { JSX, RefObject, useState } from "react";
 import classNames from "classnames";
 import styles from "./tabGroup.module.scss";
 import { User, UserGroup } from "@/app/models/entities/users";
@@ -10,6 +10,7 @@ export type Tab = {
   path?: string;
   onClick?: (e: React.MouseEvent<HTMLElement>) => void;
   renderContent?: (users?: User[], userGroups?: UserGroup[]) => JSX.Element;
+  tabFocusRef?: RefObject<HTMLButtonElement | null>;
   // TODO: rework this so renderContent isn't tied to user management; see
   // https://linear.app/skylight-cdc/issue/QUE-217/rework-tabtabgroup-component-so-its-not-limited-to-user-management
 };
@@ -32,7 +33,6 @@ const TabGroup: React.FC<TabGroupProps> = ({ tabs }) => {
     const active = tabs.find((tab) => tab.label == clickedTab);
     active && active?.onClick && active.onClick(e); // parent component state
   };
-
   return (
     <div
       className={classNames(
@@ -44,6 +44,7 @@ const TabGroup: React.FC<TabGroupProps> = ({ tabs }) => {
       {tabs.map((tab) => {
         return (
           <button
+            ref={tab.tabFocusRef}
             key={tab.label}
             className={classNames(
               "usa-button--unstyled",

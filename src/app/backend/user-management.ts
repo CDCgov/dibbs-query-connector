@@ -8,10 +8,77 @@ import {
   UserGroupMembership,
 } from "../models/entities/users";
 import { QCResponse } from "../models/responses/collections";
-import dbService from "./dbServices/db-service";
-import { adminRequired, superAdminRequired } from "./dbServices/decorators";
+import dbService from "./db/service";
+import { adminRequired, superAdminRequired } from "./db/decorators";
+import { auditable } from "./audit-logs/decorator";
 
-class UserManagementService {
+export interface UserToken {
+  id: string;
+  username: string;
+  firstName: string;
+  lastName: string;
+  qcRole: UserRole;
+  email?: string;
+}
+class UserManagementServiceInternal {
+  protected static async getAllUsers() {
+    try {
+      const selectAllUsersQuery = `
+      SELECT id, username, qc_role, first_name, last_name
+      FROM users
+      ORDER BY last_name, first_name ASC;
+    `;
+
+      const result = await dbService.query(selectAllUsersQuery);
+      const usersWithGroups = await getUserGroupMembershipDetails(result);
+
+      return {
+        totalItems: result.rowCount,
+        items: usersWithGroups,
+      } as QCResponse<User>;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  protected static async getAllUserGroupsForUser(
+    userId: string,
+  ): Promise<QCResponse<UserGroup[]>> {
+    try {
+      const selectAllUsersGroupsQuery = `
+     SELECT  u.id as user_id, ug.name as usergroup_name, ug.id as usergroup_id, 
+      COALESCE(member_count, 0) AS member_size,
+      COALESCE(query_count, 0) AS query_size
+    FROM usergroup_to_users as ugtu
+    LEFT JOIN users as u ON u.id = ugtu.user_id  
+    LEFT JOIN usergroup as ug ON ug.id = ugtu.usergroup_id
+    LEFT JOIN (
+      SELECT usergroup_id, COUNT(*) AS member_count 
+      FROM usergroup_to_users 
+      GROUP BY usergroup_id
+    ) uu ON ug.id = uu.usergroup_id
+    LEFT JOIN (
+      SELECT usergroup_id, COUNT(*) AS query_count 
+      FROM usergroup_to_query 
+      GROUP BY usergroup_id
+    ) uq ON ug.id = uq.usergroup_id
+    WHERE ugtu.user_id = $1
+    `;
+
+      const result = await dbService.query(selectAllUsersGroupsQuery, [userId]);
+
+      return {
+        totalItems: result.rowCount,
+        items: result.rows,
+      } as QCResponse<UserGroup[]>;
+    } catch (error) {
+      console.error("Error retrieving user groups:", error);
+      throw error;
+    }
+  }
+}
+
+class UserManagementService extends UserManagementServiceInternal {
   /**
    * @param username The identifier of the user we want to retrieve
    * @returns A single user result, with any applicable group membership details
@@ -34,29 +101,43 @@ class UserManagementService {
   }
 
   /**
+   * @param userId The identifier of the user we want to retrieve
+   * @returns A single user result, with any applicable group membership details
+   */
+  static async getUserById(userId: string): Promise<QCResponse<User>> {
+    const userQuery = `SELECT * FROM users WHERE id = $1;`;
+    const result = await dbService.query(userQuery, [userId]);
+
+    if (result.rowCount && result.rowCount > 0) {
+      const user = result.rows[0];
+      const userWithGroups =
+        await UserManagementService.getSingleUserWithGroupMemberships(user.id);
+      return {
+        totalItems: userWithGroups.totalItems,
+        items: userWithGroups.items,
+      };
+    } else {
+      return { totalItems: 0, items: [] };
+    }
+  }
+  /**
    * Adds a user to the users table if they do not already exist.
    * Uses data extracted from the JWT token.
-   * @param userToken - The user data from the JWT token.
-   * @param userToken.id - The user ID from the JWT token.
-   * @param userToken.username - The username from the JWT token.
-   * @param userToken.email - The email from the JWT token.
-   * @param userToken.firstName - The first name from the JWT token.
-   * @param userToken.lastName - The last name from the JWT token.
+   * @param userToken - Info from the user to update
+   * @param forceRefreshUser - Whether to force refresh a user if the user exists.
    * @returns The newly added user or an empty result if already exists.
    */
-  static async addUserIfNotExists(userToken: {
-    id: string;
-    username: string;
-    email: string;
-    firstName: string;
-    lastName: string;
-  }) {
+  @auditable
+  static async addUserIfNotExists(
+    userToken: UserToken,
+    forceRefreshUser = false,
+  ) {
     if (!userToken || !userToken.username) {
       console.error("Invalid user token. Cannot add user.");
       return { user: undefined };
     }
 
-    const { username, email, firstName, lastName } = userToken;
+    const { username, email, firstName, lastName, qcRole } = userToken;
     const userIdentifier = username || email;
 
     try {
@@ -67,12 +148,23 @@ class UserManagementService {
       ]);
 
       if (userExists.rows.length > 0) {
-        console.log("User already exists in users:", userExists.rows[0].id);
-        return { msg: "User already exists", user: userExists.rows[0] }; // Return existing user
+        if (forceRefreshUser) {
+          const existingUser = userExists.rows[0];
+          const updatedUser = await updateUserDetails(
+            existingUser.id,
+            username,
+            firstName,
+            lastName,
+            qcRole,
+          );
+          return { msg: "Existing user updated", user: updatedUser }; // Return existing user
+        } else {
+          console.log("User already exists in users:", userExists.rows[0].id);
+          return { msg: "User already exists", user: userExists.rows[0] }; // Return existing user
+        }
       }
 
       // Default role when adding a new user, which includes Super Admin, Admin, and Standard User.
-      let qcRole = UserRole.STANDARD;
       console.log("User not found. Proceeding to insert.");
 
       const insertUserQuery = `
@@ -105,6 +197,7 @@ class UserManagementService {
    * @param updated_role - The role from the JWT token.
    * @returns The newly added user or an empty result if already exists.
    */
+  @auditable
   static async updateUserDetails(
     userId: string,
     updated_userName: string,
@@ -175,7 +268,7 @@ class UserManagementService {
     const users = await Promise.all(
       userList.rows.map(async (user) => {
         try {
-          const userGroups = await getAllUserGroupsForUser(user.id);
+          const userGroups = await super.getAllUserGroupsForUser(user.id);
           user.userGroupMemberships = userGroups.items;
           return user;
         } catch (error) {
@@ -195,6 +288,7 @@ class UserManagementService {
    * @returns The updated user record or an error if the update fails.
    */
   @superAdminRequired
+  @auditable
   static async updateUserRole(
     userId: string,
     newRole: UserRole,
@@ -251,23 +345,7 @@ class UserManagementService {
    */
   @adminRequired
   static async getAllUsers(): Promise<QCResponse<User>> {
-    try {
-      const selectAllUsersQuery = `
-      SELECT id, username, qc_role, first_name, last_name
-      FROM users
-      ORDER BY last_name, first_name ASC;
-    `;
-
-      const result = await dbService.query(selectAllUsersQuery);
-      const usersWithGroups = await getUserGroupMembershipDetails(result);
-
-      return {
-        totalItems: result.rowCount,
-        items: usersWithGroups,
-      } as QCResponse<User>;
-    } catch (error) {
-      throw error;
-    }
+    return await super.getAllUsers();
   }
 
   /**
@@ -279,37 +357,7 @@ class UserManagementService {
   static async getAllUserGroupsForUser(
     userId: string,
   ): Promise<QCResponse<UserGroup[]>> {
-    try {
-      const selectAllUsersGroupsQuery = `
-     SELECT  u.id as user_id, ug.name as usergroup_name, ug.id as usergroup_id, 
-      COALESCE(member_count, 0) AS member_size,
-      COALESCE(query_count, 0) AS query_size
-    FROM usergroup_to_users as ugtu
-    LEFT JOIN users as u ON u.id = ugtu.user_id  
-    LEFT JOIN usergroup as ug ON ug.id = ugtu.usergroup_id
-    LEFT JOIN (
-      SELECT usergroup_id, COUNT(*) AS member_count 
-      FROM usergroup_to_users 
-      GROUP BY usergroup_id
-    ) uu ON ug.id = uu.usergroup_id
-    LEFT JOIN (
-      SELECT usergroup_id, COUNT(*) AS query_count 
-      FROM usergroup_to_query 
-      GROUP BY usergroup_id
-    ) uq ON ug.id = uq.usergroup_id
-    WHERE ugtu.user_id = $1
-    `;
-
-      const result = await dbService.query(selectAllUsersGroupsQuery, [userId]);
-
-      return {
-        totalItems: result.rowCount,
-        items: result.rows,
-      } as QCResponse<UserGroup[]>;
-    } catch (error) {
-      console.error("Error retrieving user groups:", error);
-      throw error;
-    }
+    return await super.getAllUserGroupsForUser(userId);
   }
 
   /**
@@ -317,7 +365,7 @@ class UserManagementService {
    * @param username user's username. Username must be unique.
    * @returns The user's role or empty if the user is not found
    */
-  static async getUserRole(username: string): Promise<string> {
+  static async getUserRole(username: string): Promise<UserRole> {
     try {
       const selectUserRoleQuery = `
       SELECT id, username, qc_role, first_name, last_name
@@ -326,9 +374,12 @@ class UserManagementService {
     `;
 
       const result = await dbService.query(selectUserRoleQuery, [username]);
-      return result?.rowCount && result.rowCount > 0
-        ? result.rows?.[0].qcRole
-        : "";
+      if (result?.rowCount && result.rowCount > 0) {
+        return result.rows?.[0].qcRole;
+      } else {
+        // user is not found, so fall back to least privilege
+        return UserRole.STANDARD;
+      }
     } catch (error) {
       throw error;
     }
@@ -428,9 +479,18 @@ class UserManagementService {
       ],
     }));
   }
+
+  static async getAllAdmins() {
+    const allUsers = await super.getAllUsers();
+
+    return allUsers.items.filter((u) => {
+      return u.qcRole === UserRole.ADMIN || u.qcRole === UserRole.SUPER_ADMIN;
+    });
+  }
 }
 
 export const getUserByUsername = UserManagementService.getUserByUsername;
+export const getUserById = UserManagementService.getUserById;
 export const addUserIfNotExists = UserManagementService.addUserIfNotExists;
 export const updateUserDetails = UserManagementService.updateUserDetails;
 export const updateUserRole = UserManagementService.updateUserRole;
@@ -440,6 +500,7 @@ export const getAllUserGroupsForUser =
   UserManagementService.getAllUserGroupsForUser;
 export const getUserRole = UserManagementService.getUserRole;
 export const getAllUsers = UserManagementService.getAllUsers;
+export const getAllAdmins = UserManagementService.getAllAdmins;
 export const getAllUsersWithSingleGroupStatus =
   UserManagementService.getAllUsersWithSingleGroupStatus;
 export const getSingleUserWithGroupMemberships =

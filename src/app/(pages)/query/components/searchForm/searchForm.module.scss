@@ -1,4 +1,5 @@
 @use "../../../../ui/styles/_variables" as *;
+@use "uswds-core" as *;
 
 .searchCallToActionContainer {
   display: flex;
@@ -14,8 +15,8 @@
 }
 
 .demoQueryFiller {
-  background: $yellow-vivid-5v;
-  border: 1px solid #fee685;
+  background: color("warning-lighter");
+  border: 1px solid $border;
   border-radius: 4px;
   display: flex;
   flex-direction: column;
@@ -36,4 +37,17 @@
   margin-bottom: 0.75rem;
   font-size: 1.25rem;
   font-weight: 700;
+}
+
+.errorMessage {
+  display: flex;
+  align-items: center;
+  color: color("error-dark");
+  margin-top: 0.25rem;
+  line-height: 1.25rem;
+
+  svg {
+    margin-right: 0.25rem;
+    margin-bottom: 2.5px;
+  }
 }

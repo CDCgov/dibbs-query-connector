@@ -2,18 +2,19 @@
 
 import { test, expect } from "@playwright/test";
 import { TEST_URL } from "../playwright-setup";
-import { PAGE_TITLES } from "@/app/(pages)/query/components/stepIndicator/StepIndicator";
+import { PAGE_TITLES } from "../src/app/(pages)/query/components/stepIndicator/StepIndicator";
 import {
   CONTACT_US_DISCLAIMER_EMAIL,
   CONTACT_US_DISCLAIMER_TEXT,
-} from "@/app/ui/designSystem/SiteAlert";
+} from "../src/app/ui/designSystem/SiteAlert";
 import {
   DEFAULT_FHIR_SERVER,
   TEST_PATIENT,
   TEST_PATIENT_NAME,
   showSiteAlert,
 } from "./constants";
-import { checkForSiteAlert } from "./utils";
+import { checkForSiteAlert, runAxeAccessibilityChecks } from "./utils";
+import { INSUFFICIENT_PATIENT_IDENTIFIERS } from "../src/app/constants";
 
 test.describe("querying with the Query Connector", () => {
   test.beforeEach(async ({ page }) => {
@@ -42,8 +43,22 @@ test.describe("querying with the Query Connector", () => {
       page.getByText("No records were found for your search"),
     ).toBeVisible();
     await page
-      .getByRole("link", { name: "Revise your patient search" })
+      .getByRole("button", { name: "Revise your patient search" })
       .click();
+  });
+
+  test("unsuccessful user query: insufficient inputs", async ({ page }) => {
+    await page.getByRole("button", { name: "Fill fields" }).click();
+    // Clear the fields to simulate insufficient inputs
+    await page.getByLabel("First name").clear();
+    await page.getByLabel("Last name").clear();
+
+    await page.getByRole("button", { name: "Search for patient" }).click();
+
+    // Better luck next time, user!
+    await expect(
+      page.getByText(INSUFFICIENT_PATIENT_IDENTIFIERS),
+    ).toBeVisible();
   });
 
   test("successful demo user query", async ({ page }) => {
@@ -65,11 +80,13 @@ test.describe("querying with the Query Connector", () => {
     await page
       .getByLabel("Healthcare Organization (HCO)")
       .selectOption(DEFAULT_FHIR_SERVER);
+    await runAxeAccessibilityChecks(page);
 
     await page.getByRole("button", { name: "Search for patient" }).click();
     await expect(page.getByText("Loading")).toHaveCount(0, { timeout: 10000 });
 
-    await page.getByRole("link", { name: "Select patient" }).click();
+    await runAxeAccessibilityChecks(page);
+    await page.getByRole("button", { name: "Select patient" }).click();
     await expect(
       page.getByRole("heading", { name: "Select a query" }),
     ).toBeVisible();
@@ -77,6 +94,7 @@ test.describe("querying with the Query Connector", () => {
       .getByTestId("Select")
       .selectOption("Chlamydia case investigation");
 
+    await runAxeAccessibilityChecks(page);
     await page.getByRole("button", { name: "Submit" }).click();
     await expect(page.getByText("Loading")).toHaveCount(0, { timeout: 10000 });
 
@@ -143,6 +161,17 @@ test.describe("querying with the Query Connector", () => {
         .getByRole("row")
         .filter({ hasText: "azithromycin 1000 MG" }),
     ).toHaveCount(2);
+    await runAxeAccessibilityChecks(page);
+
+    // Check that the drawer works
+    await page.getByRole("button", { name: "View FHIR response" }).click();
+    const drawer = page.getByText("Full FHIR response");
+    await expect(drawer).toBeVisible();
+    await expect(page.locator("pre")).toContainText("Patient");
+    await runAxeAccessibilityChecks(page);
+
+    await page.getByRole("button", { name: "Close drawer" }).click();
+    await expect(drawer).not.toBeVisible();
 
     // Now let's use the return to search to go back to a blank form
     await page.getByRole("button", { name: "New patient search" }).click();
@@ -167,7 +196,7 @@ test.describe("alternate queries with the Query Connector", () => {
     await page.getByRole("button", { name: "Fill fields" }).click();
 
     // Delete Last name and MRN to force phone number as one of the 3 fields
-    await page.getByLabel("Last name").clear();
+    // await page.getByLabel("Last name").clear();
     await page.getByLabel("Medical Record Number").clear();
 
     // Select FHIR server from drop down
@@ -182,7 +211,7 @@ test.describe("alternate queries with the Query Connector", () => {
     await expect(
       page.getByRole("heading", { name: PAGE_TITLES["patient-results"].title }),
     ).toBeVisible();
-    await page.getByRole("link", { name: "Select patient" }).click();
+    await page.getByRole("button", { name: "Select patient" }).click();
     await expect(
       page.getByRole("heading", { name: PAGE_TITLES["select-query"].title }),
     ).toBeVisible();
@@ -195,9 +224,9 @@ test.describe("alternate queries with the Query Connector", () => {
     await expect(page.getByText("Patient Name")).toBeVisible();
     await expect(page.getByText(TEST_PATIENT_NAME)).toBeVisible();
     await expect(page.getByText("Contact")).toBeVisible();
-    await expect(page.getByText(TEST_PATIENT.Phone)).toBeVisible();
+    await expect(page.getByText(TEST_PATIENT.Phone)).toHaveCount(1);
     await expect(page.getByText("Patient Identifiers")).toBeVisible();
-    await expect(page.getByText(TEST_PATIENT.MRN)).toBeVisible();
+    await expect(page.getByText(TEST_PATIENT.MRN)).toHaveCount(1);
   });
 
   // test("social determinants query with generalized function", async ({
@@ -212,7 +241,7 @@ test.describe("alternate queries with the Query Connector", () => {
     await page.getByRole("button", { name: "Search for patient" }).click();
     await expect(page.getByText("Loading")).toHaveCount(0, { timeout: 10000 });
 
-    await page.getByRole("link", { name: "Select patient" }).click();
+    await page.getByRole("button", { name: "Select patient" }).click();
     await expect(
       page.getByRole("heading", { name: "Select a query" }),
     ).toBeVisible();
@@ -237,7 +266,7 @@ test.describe("alternate queries with the Query Connector", () => {
 
     await page.getByRole("button", { name: "Search for patient" }).click();
     await expect(page.getByText("Loading")).toHaveCount(0, { timeout: 10000 });
-    await page.getByRole("link", { name: "Select patient" }).click();
+    await page.getByRole("button", { name: "Select patient" }).click();
     await page
       .getByTestId("Select")
       .selectOption("Chlamydia case investigation");

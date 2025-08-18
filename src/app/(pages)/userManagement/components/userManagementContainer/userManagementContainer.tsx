@@ -1,6 +1,13 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import {
+  useEffect,
+  useState,
+  useRef,
+  RefObject,
+  SetStateAction,
+  Dispatch,
+} from "react";
 import UserManagementDrawer from "../teamQueryEditSection/TeamQueryEditSection";
 import UserGroupsTable from "../userGroupsTable/UserGroupsTable";
 import TabGroup, { Tab } from "@/app/ui/designSystem/TabGroup/tabGroup";
@@ -8,7 +15,7 @@ import { Button } from "@trussworks/react-uswds";
 import UserPermissionsTable from "../userPermissionsTable/userPermissionsTable";
 import { QCResponse } from "@/app/models/responses/collections";
 import { User, UserGroup, UserRole } from "../../../../models/entities/users";
-import { getCustomQueries } from "@/app/backend/query-building";
+import { getCustomQueries } from "@/app/backend/query-building/service";
 import {
   getAllGroupMembers,
   getAllGroupQueries,
@@ -22,8 +29,9 @@ import type { ModalRef } from "../../../../ui/designSystem/modal/Modal";
 import UserModal from "../userModal/userModal";
 import { CustomUserQuery } from "@/app/models/entities/query";
 import { getAllUsers } from "@/app/backend/user-management";
+import styles from "./userManagementContainer.module.scss";
 
-export type UsersTableProps = {
+export type UserManagementContainerProps = {
   role: string;
 };
 
@@ -35,23 +43,30 @@ export type viewMode =
   | "Update User groups";
 
 /**
- * UsersTable container component
- * @param root0 - UsersTable container props
+ * UserManagementContainer component
+ * @param root0 - UserManagementContainer props
  * @param root0.role - The permissions role of the current logged-in user
- * @returns The UsersTable container component
+ * @returns The UserManagementContainer component
  */
-const UsersTable: React.FC<UsersTableProps> = ({ role }) => {
+const UserManagementContainer: React.FC<UserManagementContainerProps> = ({
+  role,
+}) => {
   const [activeTab, setActiveTab] = useState<Tab>({ label: "" });
   const [users, setUsers] = useState<User[]>([]);
   const [allQueries, setAllQueries] = useState<CustomUserQuery[]>([]);
   const [subjectData, setSubjectData] = useState<User | UserGroup>();
   const [userGroups, setUserGroups] = useState<UserGroup[]>([]);
   const [modalMode, setModalMode] = useState<UserManagementMode>("closed");
+  const [modalData, setModalData] = useState<UserManagementMode | string>("");
+
   const [shouldRefreshView, setShouldRefreshView] = useState<
     boolean | viewMode
   >("Load default");
 
   const modalRef = useRef<ModalRef>(null);
+  const rowFocusRefs = useRef<RefObject<HTMLTableRowElement | null>[]>([]);
+  const groupsTabRef = useRef<HTMLButtonElement>(null);
+  const usersTabRef = useRef<HTMLButtonElement>(null);
 
   const setTab = (e: React.MouseEvent<HTMLElement>) => {
     const clickedTab = e.currentTarget.innerHTML;
@@ -62,6 +77,7 @@ const UsersTable: React.FC<UsersTableProps> = ({ role }) => {
 
   const sections: Tab[] = [
     {
+      tabFocusRef: usersTabRef,
       label: "Users",
       access: [UserRole.SUPER_ADMIN],
       onClick: setTab,
@@ -71,13 +87,9 @@ const UsersTable: React.FC<UsersTableProps> = ({ role }) => {
             <Button
               onClick={() => handleOpenModal("create-user")}
               className={classNames(
-                "styles.createQueryButton",
+                styles.createQueryButton,
                 "margin-bottom-3",
               )}
-              style={{
-                marginLeft: "1px",
-                backgroundColor: "#005EA2",
-              }}
               type="button"
             >
               Add user
@@ -88,6 +100,9 @@ const UsersTable: React.FC<UsersTableProps> = ({ role }) => {
                 fetchGroupMembers={fetchGroupMembers}
                 users={users}
                 setUsers={setUsers}
+                rowFocusRefs={rowFocusRefs}
+                modalData={modalData}
+                setModalData={setModalData}
               />
             ) : (
               <div className="empty-response">No users found</div>
@@ -97,6 +112,7 @@ const UsersTable: React.FC<UsersTableProps> = ({ role }) => {
       },
     },
     {
+      tabFocusRef: groupsTabRef,
       label: "User groups",
       access: [UserRole.SUPER_ADMIN, UserRole.ADMIN],
       onClick: setTab,
@@ -107,13 +123,9 @@ const UsersTable: React.FC<UsersTableProps> = ({ role }) => {
               <Button
                 onClick={() => handleOpenModal("create-group")}
                 className={classNames(
-                  "styles.createQueryButton",
+                  styles.createQueryButton,
                   "margin-bottom-3",
                 )}
-                style={{
-                  marginLeft: "1px",
-                  backgroundColor: "#005EA2",
-                }}
                 type="button"
               >
                 Create group
@@ -124,6 +136,9 @@ const UsersTable: React.FC<UsersTableProps> = ({ role }) => {
               fetchGroupMembers={fetchGroupMembers}
               fetchGroupQueries={fetchGroupQueries}
               userGroups={userGroups}
+              rowFocusRefs={rowFocusRefs}
+              tabFocusRef={groupsTabRef}
+              modalData={modalData}
             />
           </>
         ) : (
@@ -139,7 +154,6 @@ const UsersTable: React.FC<UsersTableProps> = ({ role }) => {
                 style={{
                   marginLeft: "1px",
                   marginTop: "1.5rem",
-                  backgroundColor: "#005EA2",
                 }}
                 type="button"
               >
@@ -259,12 +273,14 @@ const UsersTable: React.FC<UsersTableProps> = ({ role }) => {
     setShouldRefreshView(false);
   }, [shouldRefreshView]);
 
-  const handleOpenModal = (
+  const handleOpenModal = async (
     mode: UserManagementMode,
     data?: UserGroup | User,
+    setModalData?: Dispatch<SetStateAction<UserManagementMode | string>>,
   ) => {
     setModalMode(mode);
     setSubjectData(data);
+    setModalData && setModalData(mode);
     modalRef.current?.toggleModal();
   };
 
@@ -284,6 +300,8 @@ const UsersTable: React.FC<UsersTableProps> = ({ role }) => {
           refreshView={setShouldRefreshView}
           userGroups={userGroups}
           subjectData={subjectData}
+          tabFocusRef={groupsTabRef}
+          setModalData={setModalData}
         />
         <UserManagementDrawer
           users={users}
@@ -300,4 +318,4 @@ const UsersTable: React.FC<UsersTableProps> = ({ role }) => {
   );
 };
 
-export default UsersTable;
+export default UserManagementContainer;

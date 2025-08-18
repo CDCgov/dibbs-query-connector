@@ -4,7 +4,7 @@ import { test, expect } from "@playwright/test";
 import { TEST_URL } from "../playwright-setup";
 
 // consts
-const QUERY_LIBRARY = "Query Library";
+const QUERY_REPOSITORY = "Query repository";
 const CUSTOM_QUERY = "Custom Query";
 const SELECT_TEMPLATES = "Start from template(s)";
 const BACKLINK_MY_QUERIES = "Back to My queries";
@@ -35,7 +35,7 @@ test.describe("building a new query", () => {
     await page.goto(`${TEST_URL}/queryBuilding`);
     await expect(
       page.getByRole("heading", {
-        name: QUERY_LIBRARY,
+        name: QUERY_REPOSITORY,
         exact: true,
       }),
     ).toBeVisible();
@@ -104,30 +104,19 @@ test.describe("building a new query", () => {
 
     // customize value sets:
     await labsHeader.click();
-    const expandedLabValueSet = page.getByText(
-      CLICKED_CONDITION.sampleLabValueSet,
-      { exact: true },
-    );
-    expect(expandedLabValueSet).toBeVisible();
-    expect(expandedLabValueSet).toBeChecked();
 
-    await expandedLabValueSet.click();
-    await expect(expandedLabValueSet).not.toBeChecked();
+    const labLabel = labsHeader.getByText("labs");
+    await labLabel.click();
 
     await medicationsHeader.click();
-    const expandedMedValueSet = page.getByText(
-      CLICKED_CONDITION.sampleMedValueSet,
-      { exact: true },
-    );
-    expect(expandedLabValueSet).not.toBeVisible();
-    expect(expandedMedValueSet).toBeVisible();
-    expect(expandedMedValueSet).toBeChecked();
 
     // customize codes:
     const openDrawer = page.getByTestId("drawer-open-true");
     await expect(openDrawer).not.toBeVisible();
+    await page
+      .getByTestId(`container-${CLICKED_CONDITION.sampleMedValueSetID}`)
+      .hover();
 
-    await expandedMedValueSet.hover();
     await page
       .getByTestId(`viewCodes-${CLICKED_CONDITION.sampleMedValueSetID}`)
       .click();

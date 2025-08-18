@@ -1,9 +1,9 @@
 import { ModalRef } from "@/app/ui/designSystem/modal/Modal";
 import { DeleteModal } from "@/app/ui/designSystem/modal/deleteModal";
-import { RefObject } from "react";
+import { JSX, RefObject } from "react";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
-import { DataContextValue } from "@/app/shared/DataProvider";
-import { deleteQueryById } from "@/app/backend/query-building";
+import { DataContextValue } from "@/app/utils/DataProvider";
+import { deleteQueryById } from "@/app/backend/query-building/service";
 import { CustomUserQuery } from "@/app/models/entities/query";
 
 /**
@@ -18,7 +18,9 @@ export const handleDelete = async (
   queryName: string | undefined,
   queryId: string | undefined,
   queries: CustomUserQuery[],
-  setQueries: React.Dispatch<React.SetStateAction<CustomUserQuery[]>>,
+  setQueries: React.Dispatch<
+    React.SetStateAction<CustomUserQuery[] | undefined>
+  >,
   context: DataContextValue | undefined,
 ) => {
   if (queryId) {
@@ -34,11 +36,16 @@ export const handleDelete = async (
       );
       setQueries(updatedQueries);
 
-      if (context) {
+      if (context?.setData) {
         context.setData(updatedQueries);
       }
     } else {
-      console.error(result.error);
+      showToastConfirmation({
+        heading: `Something went wrong`,
+        body: `${queryName} couldn't be deleted. Please try again or contact us if the error persists`,
+        variant: "error",
+        duration: 2000,
+      });
     }
   } else {
     showToastConfirmation({
@@ -61,7 +68,7 @@ export const confirmDelete = (
   queryName: string,
   queryId: string,
   setSelectedQuery: React.Dispatch<React.SetStateAction<SelectedQueryDetails>>,
-  modalRef: RefObject<ModalRef>,
+  modalRef: RefObject<ModalRef | null>,
 ) => {
   setSelectedQuery({ queryName, queryId });
   modalRef.current?.toggleModal();
@@ -99,17 +106,21 @@ export const handleCopy = (queryName: string, queryId: string) => {
  * @returns The JSX element for the modal.
  */
 export const renderModal = (
-  modalRef: RefObject<ModalRef>,
+  modalRef: RefObject<ModalRef | null>,
   selectedQuery: SelectedQueryDetails | null,
   handleDelete: (
     queryName: string | undefined,
     queryId: string | undefined,
     queries: CustomUserQuery[],
-    setQueries: React.Dispatch<React.SetStateAction<CustomUserQuery[]>>,
-    context: DataContextValue,
+    setQueries: React.Dispatch<
+      React.SetStateAction<CustomUserQuery[] | undefined>
+    >,
+    context: DataContextValue | undefined,
   ) => void,
   queries: CustomUserQuery[],
-  setQueries: React.Dispatch<React.SetStateAction<CustomUserQuery[]>>,
+  setQueries: React.Dispatch<
+    React.SetStateAction<CustomUserQuery[] | undefined>
+  >,
   context: DataContextValue,
   setSelectedQuery: React.Dispatch<React.SetStateAction<SelectedQueryDetails>>,
 ): JSX.Element => {
@@ -129,7 +140,6 @@ export const renderModal = (
             setQueries,
             context,
           );
-
           setSelectedQuery({ queryName: undefined, queryId: undefined });
         }
       }}
@@ -140,5 +150,6 @@ export const renderModal = (
 export type SelectedQueryDetails = {
   queryName?: string;
   queryId?: string;
+  pageMode?: string;
 };
 export type SelectedQueryState = SelectedQueryDetails | null;

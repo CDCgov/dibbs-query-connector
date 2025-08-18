@@ -7,9 +7,10 @@ import {
 } from "@trussworks/react-uswds";
 import Image from "next/image";
 import styles from "./landingPage.module.scss";
-import { signIn } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { signIn } from "@/app/backend/session-management";
 
 interface LandingPageProps {
   isLoggedIn: boolean;
@@ -36,8 +37,10 @@ const LandingPage: React.FC<LandingPageProps> = ({ isLoggedIn }) => {
     }
   }, [isLoggedIn]);
 
-  const handleClick = () => {
-    signIn("keycloak", { redirectTo: "/query" });
+  const handleClick = async () => {
+    await signIn(process.env.NEXT_PUBLIC_AUTH_PROVIDER, {
+      redirectTo: "/query",
+    });
   };
 
   return (
@@ -45,9 +48,11 @@ const LandingPage: React.FC<LandingPageProps> = ({ isLoggedIn }) => {
       {determiningRedirectStatus ? (
         <div className="margin-1">Redirecting...</div>
       ) : (
-        <div className="main-body display-flex flex-column flex-justify-center">
-          <div className="gradient-blue-background flex-1">
-            <div className="container">
+        <div
+          className={`"main-body display-flex flex-column flex-justify-center`}
+        >
+          <div className={styles.heroBackground}>
+            <div className={styles.heroContainer}>
               <div className="text-holder">
                 <h1 className={styles.pageSubtitle}>
                   Data collection made easier
@@ -68,6 +73,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ isLoggedIn }) => {
                   </button>
                 }
               </div>
+
               <Image
                 alt="Graphic illustrating what TEFCA is"
                 src="/tefca-graphic.svg"
@@ -77,7 +83,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ isLoggedIn }) => {
               />
             </div>
           </div>
-          <div className="home flex-1">
+          <div className="home flex-1 padding-bottom-4">
             <h3 className={styles.pageSubtitle} role="heading" aria-level={2}>
               What is it?
             </h3>
@@ -123,6 +129,14 @@ const LandingPage: React.FC<LandingPageProps> = ({ isLoggedIn }) => {
                 </p>
               </ProcessListItem>
             </ProcessList>
+            <p>
+              For more information on how to use the Query Connector, please
+              refer to the{" "}
+              <Link className="usa-link" href="/docs">
+                documentation
+              </Link>
+              .
+            </p>
           </div>
         </div>
       )}

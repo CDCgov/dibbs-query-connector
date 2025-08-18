@@ -2,15 +2,15 @@ import "./ui/styles/styles.scss";
 import "react-toastify/dist/ReactToastify.css";
 import Header from "./ui/components/header/header";
 import Footer from "./ui/components/footer/footer";
-import DataProvider from "./shared/DataProvider";
+import DataProvider from "./utils/DataProvider";
 import { Metadata } from "next";
 import Page from "./ui/components/page/page";
 import { auth } from "@/auth";
-import { isAuthDisabledServerCheck } from "./utils/auth";
 import SessionTimeout, {
   IDLE_TIMEOUT_MSEC,
   PROMPT_TIMEOUT_MSEC,
 } from "./ui/components/sessionTimeout/sessionTimeout";
+import { returnPredefinedSessionObject } from "./utils/auth";
 
 /**
  * Establishes the layout for the application.
@@ -25,7 +25,10 @@ export default async function RootLayout({
 }) {
   // Initializes user session on server side for the first load
   // if session does not exists then session object remains null
-  const session = await auth();
+  const session =
+    process.env.AUTH_DISABLED === "true"
+      ? returnPredefinedSessionObject()
+      : await auth();
 
   const runtimeConfig = {
     AUTH_DISABLED: process.env.AUTH_DISABLED || "false",
@@ -34,19 +37,19 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body>
-        <div className="application-container">
+        <main className="application-container">
           <DataProvider runtimeConfig={runtimeConfig} session={session}>
             <SessionTimeout
               idleTimeMsec={IDLE_TIMEOUT_MSEC}
               promptTimeMsec={PROMPT_TIMEOUT_MSEC}
             />
-            <Header authDisabled={isAuthDisabledServerCheck()} />
+            <Header session={session} />
             <Page showSiteAlert={process.env.DEMO_MODE === "true"}>
               {children}
             </Page>
             <Footer />
           </DataProvider>
-        </div>
+        </main>
       </body>
     </html>
   );

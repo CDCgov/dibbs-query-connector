@@ -2,22 +2,527 @@
   "openapi": "3.0.3",
   "info": {
     "version": "1.0.0",
-    "title": "Query Connector API - OpenAPI 3.0"
+    "title": "Query Connector API - OpenAPI 3.0",
+    "description": "The DIBBs Query Connector API allows authorized systems to query healthcare organizations for patient data. Authentication is required for all query endpoints.\n\n## Authentication\n\nUse the authentication box to the right to obtain an access token by clicking 'Authorize' to apply it to all requests.\n\nSee below for more details about how to manually request an authorization token.\n\n## Patient Search Requirements\n\nAll patient searches must include:\n- **First Name** (given)\n- **Last Name** (family)\n- **Date of Birth** (dob)\n- **At least one of:** Complete address, email, phone number, or MRN\n\nRequests missing any of these required fields will return a 400 Bad Request error.",
+    "x-logo": {
+      "url": "https://queryconnector.dev/DIBBs_logo.png",
+      "altText": "Query Connector API"
+    }
   },
+  "servers": [
+    {
+      "url": "https://queryconnector.dev",
+      "description": "Query Connector Development Server"
+    },
+    {
+      "url": "http://localhost:3000",
+      "description": "Local Development Server"
+    },
+    {
+      "url": "http://localhost:8081",
+      "description": "Local Keycloak Server"
+    }
+  ],
+  "security": [
+    {
+      "oauth2": [
+        "profile",
+        "email"
+      ]
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "oauth2": {
+        "type": "oauth2",
+        "flows": {
+          "clientCredentials": {
+            "tokenUrl": "https://queryconnector.dev/keycloak/realms/master/protocol/openid-connect/token",
+            "scopes": {
+              "profile": "Access to your profile info",
+              "email": "Access to your email address"
+            }
+          }
+        }
+      }
+    },
+    "responses": {
+      "UnauthorizedError": {
+        "description": "Access token is missing, invalid, or expired",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Unauthorized"
+                },
+                "details": {
+                  "type": "string",
+                  "example": "Invalid token or missing api-user role"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Authentication",
+      "description": "Obtain access tokens for API authentication"
+    },
+    {
+      "name": "Health Check",
+      "description": "API health check endpoints"
+    },
+    {
+      "name": "Query",
+      "description": "Query patient data from healthcare organizations"
+    }
+  ],
   "paths": {
     "/api": {
       "get": {
-        "description": "Returns the health status of the API",
+        "tags": [
+          "Health Check"
+        ],
+        "summary": "Health Check",
+        "description": "Returns the health status of the API. This endpoint does not require authentication.",
+        "security": [],
+        "operationId": "healthCheck",
         "responses": {
           "200": {
-            "description": "Health check for Query Connector"
+            "description": "Health check for Query Connector",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "healthy"
+                    },
+                    "version": {
+                      "type": "string",
+                      "example": "1.0.0"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/keycloak/realms/master/protocol/openid-connect/token": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Get Access Token",
+        "description": "Obtain an access token using client credentials. After receiving the token, use it in the Authorization header for subsequent requests.\n\n**Note:** In production, use your actual identity provider's token endpoint.",
+        "security": [],
+        "operationId": "getAccessToken",
+        "x-code-samples": [
+          {
+            "lang": "cURL",
+            "source": "curl -X POST 'https://queryconnector.dev/keycloak/realms/master/protocol/openid-connect/token' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -d 'grant_type=client_credentials&client_id=api-docs-test-client&client_secret=eJOjhpZ2AQ3dSwbmfFpzVzF2S6nU8BuE'"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "grant_type": {
+                    "type": "string",
+                    "required": true,
+                    "enum": [
+                      "client_credentials"
+                    ],
+                    "example": "client_credentials",
+                    "description": "OAuth 2.0 grant type"
+                  },
+                  "client_id": {
+                    "type": "string",
+                    "required": true,
+                    "example": "api-docs-test-client",
+                    "description": "Your application's client ID"
+                  },
+                  "client_secret": {
+                    "type": "string",
+                    "required": true,
+                    "example": "eJOjhpZ2AQ3dSwbmfFpzVzF2S6nU8BuE",
+                    "description": "Your application's client secret"
+                  },
+                  "scope": {
+                    "type": "string",
+                    "required": false,
+                    "example": "api://query-connector-app-id/.default",
+                    "description": "Required for Microsoft Entra ID only"
+                  }
+                },
+                "required": [
+                  "grant_type",
+                  "client_id",
+                  "client_secret"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Access token response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "access_token": {
+                      "type": "string",
+                      "example": "eyJhbGciOiJSUzI1NiIsInR5cCI...",
+                      "description": "JWT access token to use in Authorization header"
+                    },
+                    "token_type": {
+                      "type": "string",
+                      "example": "Bearer",
+                      "description": "Token type (always 'Bearer')"
+                    },
+                    "expires_in": {
+                      "type": "integer",
+                      "example": 3600,
+                      "description": "Token lifetime in seconds"
+                    },
+                    "scope": {
+                      "type": "string",
+                      "example": "profile email",
+                      "description": "Granted scopes"
+                    }
+                  }
+                },
+                "x-auth-response": {
+                  "token-field": "access_token"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "invalid_request"
+                    },
+                    "error_description": {
+                      "type": "string",
+                      "example": "Missing required parameter: client_id"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid client credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "invalid_client"
+                    },
+                    "error_description": {
+                      "type": "string",
+                      "example": "Client authentication failed"
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
     },
     "/api/query": {
+      "get": {
+        "tags": [
+          "Query"
+        ],
+        "summary": "Query with Parameters",
+        "description": "Execute a query by providing patient identifiers as query parameters. **Required fields**: firstName (`given`), lastName (`family`), date of birth (`dob`), and at least one of: address, email, phone number, or MRN. Requires authentication with a valid bearer token.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "operationId": "queryWithParameters",
+        "parameters": [
+          {
+            "name": "fhir_server",
+            "in": "query",
+            "description": "Name of the FHIR server to query. **REQUIRED**",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "Aidbox"
+            }
+          },
+          {
+            "name": "id",
+            "in": "query",
+            "description": "ID of the query to use. **REQUIRED**",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "73e1a777-49cb-4e19-bc71-8c3fd3ffda64"
+            }
+          },
+          {
+            "name": "given",
+            "description": "Patient given/first name. **REQUIRED**",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "Hyper"
+            }
+          },
+          {
+            "name": "family",
+            "in": "query",
+            "description": "Patient family/last name. **REQUIRED**",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "Unlucky"
+            }
+          },
+          {
+            "name": "dob",
+            "in": "query",
+            "description": "Patient date of birth in YYYY-MM-DD format. **REQUIRED**",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "example": "1975-12-06"
+            }
+          },
+          {
+            "name": "mrn",
+            "in": "query",
+            "description": "Patient medical record number. At least one of MRN, phone, email, or address is required.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "8692756"
+            }
+          },
+          {
+            "name": "phone",
+            "in": "query",
+            "description": "Patient phone number. At least one of MRN, phone, email, or address is required.",
+            "schema": {
+              "type": "string",
+              "example": "517-425-1398"
+            }
+          },
+          {
+            "name": "email",
+            "in": "query",
+            "description": "Patient email address. At least one of MRN, phone, email, or address is required.",
+            "schema": {
+              "type": "string",
+              "format": "email",
+              "example": "hyper.unlucky@email.com"
+            }
+          },
+          {
+            "name": "street1",
+            "in": "query",
+            "description": "Patient address street name and number. At least one of the patient identifier params are required",
+            "schema": {
+              "type": "string",
+              "example": "49 Meadow St"
+            }
+          },
+          {
+            "name": "street2",
+            "in": "query",
+            "description": "Additional patient address details. At least one of the patient identifier params are required",
+            "schema": {
+              "type": "string",
+              "example": "Apt #1"
+            }
+          },
+          {
+            "name": "city",
+            "in": "query",
+            "description": "Patient address city. At least one of the patient identifier params are required",
+            "schema": {
+              "type": "string",
+              "example": "Lansing"
+            }
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "description": "Patient address state (two-letter abbreviation). At least one of the patient identifier params are required",
+            "schema": {
+              "type": "string",
+              "example": "MI"
+            }
+          },
+          {
+            "name": "zip",
+            "in": "query",
+            "description": "Patient zip code. At least one of the patient identifier params are required",
+            "schema": {
+              "type": "string",
+              "example": "48864"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The FHIR resources returned that match the information configured in the query referenced",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "resourceType": {
+                      "type": "string",
+                      "example": "Bundle"
+                    },
+                    "type": {
+                      "type": "string",
+                      "example": "searchset"
+                    },
+                    "total": {
+                      "type": "integer",
+                      "example": 2
+                    },
+                    "entry": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Missing required patient identifiers or invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "resourceType": {
+                      "type": "string",
+                      "example": "OperationOutcome"
+                    },
+                    "issue": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "severity": {
+                            "type": "string",
+                            "example": "error"
+                          },
+                          "code": {
+                            "type": "string",
+                            "example": "invalid"
+                          },
+                          "diagnostics": {
+                            "type": "string",
+                            "example": "Insufficient patient identifiers. Required: firstName, lastName, DOB, and at least one of: address, email, phone, or MRN"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "examples": {
+                  "missing_required": {
+                    "summary": "Missing required fields",
+                    "value": {
+                      "resourceType": "OperationOutcome",
+                      "issue": [
+                        {
+                          "severity": "error",
+                          "code": "invalid",
+                          "diagnostics": "Insufficient patient identifiers. Required: firstName, lastName, DOB, and at least one of: address, email, phone, or MRN"
+                        }
+                      ]
+                    }
+                  },
+                  "missing_core_fields": {
+                    "summary": "Missing firstName, lastName, or DOB",
+                    "value": {
+                      "resourceType": "OperationOutcome",
+                      "issue": [
+                        {
+                          "severity": "error",
+                          "code": "invalid",
+                          "diagnostics": "Missing required fields: family, dob"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Internal server error"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
       "post": {
-        "description": "A POST endpoint that accepts a FHIR patient resource or an HL7v2 message in the request body to execute a query within the Query Connector",
+        "tags": [
+          "Query"
+        ],
+        "summary": "Query with Patient Resource",
+        "description": "Execute a query by providing a FHIR Patient resource or HL7v2 message in the request body. Requires authentication with a valid bearer token.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "operationId": "queryWithPatientResource",
         "parameters": [
           {
             "name": "fhir_server",
@@ -26,7 +531,7 @@
             "required": true,
             "schema": {
               "type": "string",
-              "example": "HELIOS Meld: Direct"
+              "example": "Aidbox"
             }
           },
           {
@@ -36,7 +541,7 @@
             "required": true,
             "schema": {
               "type": "string",
-              "example": "cf580d8d-cc7b-4eae-8a0d-96c36f9222e3"
+              "example": "73e1a777-49cb-4e19-bc71-8c3fd3ffda64"
             }
           },
           {
@@ -49,6 +554,7 @@
                 "HL7",
                 "FHIR"
               ],
+              "default": "FHIR",
               "example": "FHIR"
             }
           }
@@ -62,10 +568,10 @@
               },
               "example": {
                 "resourceType": "Patient",
-                "id": "1C",
+                "id": "f288c654-6885-4f48-999c-48d776dc06af",
                 "meta": {
-                  "versionId": "1",
-                  "lastUpdated": "2024-01-16T15:08:24.000+00:00",
+                  "versionId": "6",
+                  "lastUpdated": "2025-02-28T22:38:03.382Z",
                   "source": "#Aolu2ZnQyoelPvRd",
                   "profile": [
                     "http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient"
@@ -109,6 +615,10 @@
                         "valueString": "Hispanic or Latino"
                       }
                     ]
+                  },
+                  {
+                    "url": "http://hl7.org/fhir/us/core/StructureDefinition/us-core-birthsex",
+                    "valueCode": "M"
                   }
                 ],
                 "identifier": [
@@ -131,27 +641,14 @@
                 "active": true,
                 "name": [
                   {
-                    "family": "Shaw",
+                    "family": "Unlucky",
                     "given": [
-                      "Lee",
+                      "Hyper",
                       "A."
                     ],
                     "period": {
                       "start": "1975-12-06",
                       "end": "2020-01-22"
-                    }
-                  },
-                  {
-                    "family": "Shaw",
-                    "given": [
-                      "Lee",
-                      "V."
-                    ],
-                    "suffix": [
-                      "MD"
-                    ],
-                    "period": {
-                      "start": "2020-01-23"
                     }
                   }
                 ],
@@ -163,7 +660,7 @@
                   },
                   {
                     "system": "email",
-                    "value": "lee.shaw@email.com"
+                    "value": "hyper.unlucky@email.com"
                   }
                 ],
                 "gender": "male",
@@ -201,97 +698,135 @@
         },
         "responses": {
           "200": {
-            "description": "The FHIR resources returned that match the information configured in the query referenced"
+            "description": "The FHIR resources returned that match the information configured in the query referenced",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "resourceType": {
+                      "type": "string",
+                      "example": "Bundle"
+                    },
+                    "type": {
+                      "type": "string",
+                      "example": "searchset"
+                    },
+                    "total": {
+                      "type": "integer",
+                      "example": 2
+                    },
+                    "entry": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
           },
           "400": {
-            "description": "Missing patient identifiers"
+            "description": "Missing patient identifiers or invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "resourceType": {
+                      "type": "string",
+                      "example": "OperationOutcome"
+                    },
+                    "issue": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "severity": {
+                            "type": "string",
+                            "example": "error"
+                          },
+                          "code": {
+                            "type": "string",
+                            "example": "invalid"
+                          },
+                          "diagnostics": {
+                            "type": "string",
+                            "example": "Insufficient patient identifiers. Required: firstName, lastName, DOB, and at least one of: address, email, phone, or MRN"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "examples": {
+                  "missing_required": {
+                    "summary": "Missing required fields",
+                    "value": {
+                      "resourceType": "OperationOutcome",
+                      "issue": [
+                        {
+                          "severity": "error",
+                          "code": "invalid",
+                          "diagnostics": "Insufficient patient identifiers. Required: firstName, lastName, DOB, and at least one of: address, email, phone, or MRN"
+                        }
+                      ]
+                    }
+                  },
+                  "no_identifiers": {
+                    "summary": "No patient identifiers",
+                    "value": {
+                      "resourceType": "OperationOutcome",
+                      "issue": [
+                        {
+                          "severity": "error",
+                          "code": "invalid",
+                          "diagnostics": "No patient identifiers found in request"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "500": {
-            "description": "Something went wrong :("
-          }
-        }
-      },
-      "get": {
-        "description": "A GET endpoint that accepts a series of query parameters to execute a query within the Query Connector. At least one of the patient identifier params are required",
-        "parameters": [
-          {
-            "name": "fhir_server",
-            "in": "query",
-            "description": "Name of the FHIR server to query",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "example": "HELIOS Meld: Direct"
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Internal server error"
+                    }
+                  }
+                }
+              }
             }
-          },
-          {
-            "name": "id",
-            "in": "query",
-            "description": "ID of the query to use",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "example": "cf580d8d-cc7b-4eae-8a0d-96c36f9222e3"
-            }
-          },
-          {
-            "name": "given",
-            "description": "Patient given name. At least one of the patient identifier params are required",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "example": "Lee"
-            }
-          },
-          {
-            "name": "family",
-            "in": "query",
-            "description": "Patient family name. At least one of the patient identifier params are required",
-            "schema": {
-              "type": "string",
-              "example": "Shaw"
-            }
-          },
-          {
-            "name": "dob",
-            "in": "query",
-            "description": "Patient date of birth in YYYY-MM-DD format. At least one of the patient identifier params are required",
-            "schema": {
-              "type": "string",
-              "example": "1975-12-06T00:00:00.000Z"
-            }
-          },
-          {
-            "name": "mrn",
-            "in": "query",
-            "description": "Patient medical record number. At least one of the patient identifier params are required",
-            "schema": {
-              "type": "string",
-              "example": 8692756
-            }
-          },
-          {
-            "name": "phone",
-            "in": "query",
-            "description": "Patient phone number. At least one of the patient identifier params are required",
-            "schema": {
-              "type": "string",
-              "example": "517-425-1398"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "The FHIR resources returned that match the information configured in the query referenced"
-          },
-          "400": {
-            "description": "Missing patient identifiers"
-          },
-          "500": {
-            "description": "Something went wrong :("
           }
         }
       }
     }
-  }
+  },
+  "x-tagGroups": [
+    {
+      "name": "Getting Started",
+      "tags": [
+        "Health Check",
+        "Authentication"
+      ]
+    },
+    {
+      "name": "Query Endpoints",
+      "tags": [
+        "Query"
+      ]
+    }
+  ]
 }

@@ -1,32 +1,64 @@
 @use "../../../ui/styles/_variables" as *;
+@use "uswds-core" as *;
+
+@media screen and (min-width: $footer-mobile-breakpoint) {
+  .footerContainer__mobile {
+    display: none !important;
+  }
+  .footerContainer__desktop {
+    display: block !important;
+  }
+}
+
+@media screen and (max-width: $footer-stacked-breakpoint) {
+  .footerContainer__mobile {
+    .stacked p {
+      white-space: wrap;
+      margin-top: 0.5rem;
+    }
+  }
+}
 
 .footerContainer {
-  flex: 0 1 $footer-content-height;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
+  padding: 1.25rem 0;
+  background-color: $brand-darkest;
+
+  &__mobile {
+    display: block;
+
+    .stacked {
+      align-items: center !important;
+
+      img {
+        margin-right: 0.5rem !important;
+      }
+    }
+  }
+
+  &__desktop {
+    display: none;
+    max-width: $application-wide-max-width;
+  }
 }
 
-.cdcLogoContainer {
-  display: flex;
+.textContainer {
   align-items: center;
-  margin-right: 0.5rem;
-}
+  background-color: inherit;
 
-.cdcFooterTextContainer {
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
+  &__left {
+    justify-content: flex-start;
+  }
+
+  &__right {
+    justify-content: flex-end;
+  }
+
+  img {
+    margin-right: 1rem;
+  }
 
   p {
     white-space: nowrap;
     margin: 0;
-  }
-}
-
-@media (max-width: 64em) {
-  .cdcFooterTextContainer {
-    flex-direction: column;
-    justify-content: flex-start;
   }
 }

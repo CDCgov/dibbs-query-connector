@@ -1,6 +1,10 @@
-resource "aws_acm_certificate" "cloudflare_cert" {
-  private_key      = var.qc_tls_key  # Private key from Cloudflare
-  certificate_body = var.qc_tls_cert # Public cert from Cloudflare
+
+
+data "aws_acm_certificate" "acm_cert" {
+  domain      = "queryconnector.dev"
+  statuses    = ["ISSUED"]
+  types       = ["AMAZON_ISSUED"]
+  most_recent = true
 }
 
 data "aws_caller_identity" "current" {}
@@ -48,7 +52,7 @@ module "ecs" {
       max_capacity      = 5,
       app_repo          = "ghcr.io/cdcgov/dibbs-query-connector",
       app_image         = "${terraform.workspace}-query-connector",
-      app_version       = "main",
+      app_version       = "latest",
       container_port    = 3000,
       host_port         = 3000,
       public            = true,
@@ -100,16 +104,20 @@ module "ecs" {
           value = var.auth_secret
         },
         {
-          name  = "AUTH_KEYCLOAK_ID"
-          value = var.keycloak_client_id
+          name  = "NEXT_PUBLIC_AUTH_PROVIDER"
+          value = var.auth_provider
         },
         {
-          name  = "AUTH_KEYCLOAK_SECRET"
-          value = var.keycloak_client_secret
+          name  = "AUTH_CLIENT_ID"
+          value = var.auth_client_id
         },
         {
-          name  = "AUTH_KEYCLOAK_ISSUER"
-          value = var.auth_keycloak_issuer
+          name  = "AUTH_CLIENT_SECRET"
+          value = var.auth_client_secret
+        },
+        {
+          name  = "AUTH_ISSUER"
+          value = var.auth_issuer
         },
         {
           name  = "AUTH_URL"
@@ -262,7 +270,7 @@ module "ecs" {
   internal = var.internal
 
   # If the intent is to enable https and port 443, pass the arn of the cert in AWS certificate manager. This cert will be applied to the load balancer. (default is "")
-  certificate_arn = aws_acm_certificate.cloudflare_cert.arn
+  certificate_arn = data.aws_acm_certificate.acm_cert.arn
 
   # If the intent is to disable authentication, set ecr_viewer_app_env to "test" (default is "prod")
   # ecr_viewer_app_env = "test"

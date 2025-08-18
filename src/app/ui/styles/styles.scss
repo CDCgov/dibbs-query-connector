@@ -1,9 +1,43 @@
 @forward "uswds-settings";
 
-@forward "uswds";
+@forward "usa-accordion/src/styles";
+@forward "usa-alert/src/styles";
+@forward "usa-breadcrumb/src/styles";
+@forward "usa-button/src/styles";
+@forward "usa-button-group/src/styles";
+@forward "usa-checkbox/src/styles";
+@forward "usa-content/src/styles";
+@forward "usa-date-range-picker";
+@forward "usa-fieldset/src/styles";
+@forward "usa-footer/src/styles";
+@forward "usa-form/src/styles";
+@forward "usa-header/src/styles";
+@forward "usa-icon/src/styles";
+@forward "usa-input/src/styles";
+@forward "usa-label/src/styles";
+@forward "usa-layout-grid/src/styles";
+@forward "usa-link/src/styles";
+@forward "usa-modal/src/styles";
+@forward "usa-radio/src/styles";
+@forward "usa-search/src/styles";
+@forward "usa-section/src/styles";
+@forward "usa-skipnav/src/styles";
+@forward "usa-sidenav/src/styles";
+@forward "usa-step-indicator/src/styles";
+@forward "usa-summary-box/src/styles";
+@forward "usa-table/src/styles";
+@forward "usa-pagination/src/styles";
+@forward "usa-prose/src/styles";
+@forward "usa-tag/src/styles";
 
-@forward "layout";
+@forward "uswds-core";
+@forward "uswds-fonts";
+@forward "uswds-helpers";
+@forward "uswds-elements";
+@forward "uswds-form-controls";
+@forward "uswds-global";
+@forward "uswds-typography";
+@forward "uswds-utilities";
 
 @forward "custom-styles";
-
 @forward "design-system";

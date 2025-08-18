@@ -1,73 +1,187 @@
-@use "_variables" as *;
+@use "variables" as *;
+@use "uswds-core" as *;
+@use "uswds-settings" as *;
 
-header {
-  background-image: linear-gradient(to right, $blue-60v, $cyan-50v);
+html,
+body {
+  height: 100%;
+}
+html {
+  scroll-behavior: auto;
+  box-sizing: border-box;
 }
 
+body {
+  @include u-font("sans", 5);
+  line-height: 1.4;
+  background-color: $background;
+}
+
+.application-container {
+  display: flex;
+  flex-flow: column;
+  min-height: 100%;
+}
+
+header,
 footer {
-  background-color: $footer;
+  padding: 1rem 5rem;
+  margin: 0;
+  background-color: $brand-darkest;
+}
+
+h1 {
+  @include u-font("serif", 12);
+}
+h2 {
+  @include u-font("sans", 11);
+}
+h3 {
+  @include u-font("sans", 8);
+}
+h4 {
+  @include u-font("sans", 5);
+}
+
+a,
+a:visited {
+  color: $brand-dark;
+}
+
+.main-body {
+  background-color: $background;
+  display: flex;
+  flex: 1 1 auto;
+}
+
+.usa-button {
+  background-color: $accent-primary;
+  box-shadow: inset 0 0 0 2px $accent-primary;
+
+  &:hover {
+    box-shadow: inset 0 0 0 2px $accent-dark;
+    background-color: $accent-dark !important;
+  }
+
+  &:active {
+    box-shadow: inset 0 0 0 2px $accent-darker;
+    background-color: $accent-darker !important;
+  }
+
+  &--secondary {
+    background-color: white;
+    box-shadow: inset 0 0 0 2px $accent-primary;
+    color: $accent-primary !important;
+  }
+
+  &--secondary:hover {
+    background-color: white !important;
+    box-shadow: inset 0 0 0 2px $accent-dark;
+    color: $accent-dark !important;
+  }
+
+  &--secondary:active {
+    background-color: white !important;
+    box-shadow: inset 0 0 0 2px $accent-darker;
+    color: $accent-darker !important;
+  }
+
+  &:disabled,
+  &:disabled:hover,
+  &:disabled:active {
+    box-shadow: none;
+    cursor: not-allowed;
+    opacity: 1;
+    background-color: color("disabled-light") !important;
+  }
+
+  &--unstyled {
+    box-shadow: none;
+    color: $brand-dark;
+    background-color: transparent !important;
+  }
+
+  &--unstyled:hover {
+    box-shadow: none;
+    color: $brand-darker;
+    background-color: transparent !important;
+  }
+
+  &--unstyled:active {
+    box-shadow: none;
+    color: $brand-darkest;
+    background-color: transparent !important;
+  }
+
+  &--destructive {
+    box-shadow: none;
+    color: white;
+    background-color: $destructive-primary !important;
+  }
+  &--destructive:hover {
+    box-shadow: none;
+    color: white;
+    background-color: $destructive-dark !important;
+  }
+  &--destructive:active {
+    box-shadow: none;
+    color: white;
+    background-color: $destructive-darker !important;
+  }
+}
+
+.usa-alert--success {
+  .usa-alert__body::before {
+    background-color: color("success-dark");
+  }
+}
+
+.usa-alert--info {
+  .usa-alert__body::before {
+    background-color: color("info-dark");
+  }
+}
+
+.usa-alert--warning {
+  .usa-alert__body::before {
+    background-color: color("warning-dark");
+  }
+}
+
+.usa-alert--error {
+  .usa-alert__body::before {
+    background-color: color("error-dark");
+  }
 }
 
 .usa-step-indicator__segment:before {
   box-shadow:
-    0 0 0 0.25rem $white,
+    0 0 0 0.25rem white,
     0 0 0 0 white !important;
 }
 
 .usa-step-indicator__segment-label,
 .usa-step-indicator__segment:before {
-  color: $stepper-inactive-text;
+  color: $text-inactive-dark;
+}
+
+.usa-step-indicator__segment--current .usa-step-indicator__segment-label {
+  color: $brand-primary;
 }
 
 .usa-step-indicator__segment--current::before,
 .usa-step-indicator__segment--current::after {
-  background-color: $primary !important;
-  color: $primary !important;
+  background-color: $brand-primary;
+  color: $brand-primary;
   box-shadow:
-    0 0 0 0.25rem $white,
-    0 0 0 0 $white !important;
-}
-
-.usa-current {
-  color: $primary !important;
-}
-
-.usa-current::after {
-  background-color: $primary !important;
+    0 0 0 0.25rem white,
+    0 0 0 0 white !important;
 }
 
 .usa-accordion__button,
 .usa-accordion__button:hover {
-  background-color: $table-header;
+  background-color: #f7f9fa;
   color: $text-primary;
-}
-
-.usa-button {
-  background-color: $primary;
-  &:hover {
-    background-color: $blue-40v;
-  }
-  &:active {
-    background-color: $blue-400;
-  }
-
-  &--outline {
-    background-color: white;
-
-    &:active,
-    &:hover {
-      background-color: white;
-    }
-  }
-
-  &--unstyled {
-    background-color: transparent;
-
-    &:active,
-    &:hover {
-      background-color: transparent;
-    }
-  }
 }
 
 .usa-modal__close {
@@ -77,4 +191,247 @@ footer {
   &:hover {
     background-color: white;
   }
+}
+
+.usa-checkbox__input:checked + [class*="__label"]::before {
+  background-color: $accent-primary !important;
+  box-shadow: none !important;
+}
+.usa-radio__input:checked + [class*="__label"]::before {
+  background-color: $accent-primary !important;
+  box-shadow:
+    0 0 0 2px $accent-primary,
+    inset 0 0 0 2px #fff;
+}
+
+.usa-checkbox__label {
+  cursor: pointer;
+  display: inherit;
+  font-weight: normal;
+  margin-top: 0rem;
+  padding-left: 2rem;
+  position: relative;
+}
+
+.usa-accordion {
+  border-radius: 4px;
+  padding: 0px;
+}
+
+.usa-step-indicator__segment-label {
+  padding-right: 0;
+}
+
+.usa-sidenav__item a:not(.usa-sidenav__sublist a) {
+  font-weight: bold;
+}
+
+ul.usa-sidenav > li.usa-sidenav__item > ul.usa-sidenav__sublist > li.usa-sidenav__item > a {
+  font-weight: bold;
+}
+
+ul.usa-sidenav > li.usa-sidenav__item > ul.usa-sidenav__sublist > li.usa-sidenav__item > a.usa-current {
+  &::after {
+    background-color: rgb(0, 94, 162);
+    content: "";
+    display: block;
+    position: absolute;
+    bottom: 0.25rem;
+    top: 0.25rem;
+    width: 0.25rem;
+    left: 0rem;
+    border-radius: 99rem;
+  }
+}
+
+.usa-step-indicator__current-step {
+  background-color: $brand-primary;
+  margin-right: 0.5rem;
+  padding: 0;
+  height: 2.75rem;
+  width: 2.75rem;
+}
+
+.usa-step-indicator__total-steps {
+  color: $brand-primary;
+}
+
+.usa-step-indicator__total-steps,
+.usa-step-indicator__current-step {
+  font-size: 2rem;
+}
+
+.usa-pagination .usa-current {
+  background-color: white;
+  border-radius: 0.25rem;
+  border: 1px solid $border-dark !important;
+  color: $accent-dark !important;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 140%;
+  margin: 0;
+  text-decoration: underline;
+}
+
+.usa-pagination__button:hover,
+.usa-pagination__button:focus,
+.usa-pagination__button:active,
+.usa-pagination__link:hover,
+.usa-pagination__link:focus,
+.usa-pagination__link:active {
+  color: $accent-darker !important;
+}
+.usa-pagination__button:hover,
+.usa-pagination__button:focus,
+.usa-pagination__button:active {
+  border: 1px solid $border !important;
+  background-color: $hover-neutral !important;
+}
+
+.usa-pagination__button,
+.usa-pagination__link {
+  color: $accent-primary;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 140%;
+  margin: 0;
+  text-decoration: none;
+}
+
+.usa-pagination__overflow {
+  align-self: center;
+}
+
+.usa-alert__heading {
+  &.h1 {
+    font-size: 2.125rem;
+    font-weight: bold;
+    line-height: 1.5;
+  }
+
+  &.h2 {
+    font-size: 1.875rem;
+    font-weight: bold;
+    line-height: 1.5;
+  }
+
+  &.h3 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    line-height: 1.4;
+  }
+
+  &.h4 {
+    font-size: 1.25rem;
+    font-weight: bold;
+    line-height: 1.3;
+  }
+
+  &.h5 {
+    font-size: 1.125rem;
+    font-weight: bold;
+    line-height: 1.2;
+  }
+
+  &.h6 {
+    font-size: 1rem;
+    font-weight: bold;
+    line-height: 1.2;
+  }
+}
+
+.usa-step-indicator__segment--current:before,
+.usa-step-indicator__segment--complete:before {
+  box-shadow:
+    inset 0 0 0 0 $brand-darkest,
+    0 0 0 0.25rem white !important;
+}
+
+.usa-alert__text {
+  font-size: 0.875rem;
+}
+
+.qc-modal {
+  padding: 0 2rem !important;
+  max-width: 31rem;
+
+  .usa-modal__content {
+    padding-top: 0;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+
+  .usa-modal__main {
+    max-width: 26rem;
+    margin: 0 !important;
+    padding: 0 0 2rem 0 !important;
+    input,
+    select {
+      max-width: 100%;
+    }
+  }
+
+  .usa-modal__heading {
+    @include u-font-family("sans");
+    font-size: 1.219rem !important;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+    margin-bottom: 1rem;
+  }
+
+  .usa-checkbox {
+    background-color: transparent;
+  }
+
+  .usa-button-group {
+    flex-direction: row-reverse;
+    justify-content: space-between;
+
+    .usa-button-group__item:last-child {
+      margin-right: 0.25rem;
+    }
+
+    .usa-button-group__item:last-child:has(> #modal-back-button),
+    .usa-button-group__item:last-child:has(> #modal-cancel-button),
+    .usa-button-group__item:last-child:has(> #modal-delete-button) {
+      flex: 1 1 0%;
+    }
+  }
+
+  .usa-modal__close,
+  .usa-modal__close:hover {
+    background-color: transparent !important;
+    color: $accent-primary;
+    box-shadow: none;
+    padding: 0 !important;
+    width: 1.5rem !important;
+    height: 1.5rem !important;
+    margin: 1rem 0rem 0rem 0rem !important;
+
+    .usa-icon {
+      margin: 0;
+      height: 1.5rem;
+      width: 1.5rem;
+    }
+  }
+}
+
+.qc-modal.usa-modal--lg {
+  max-width: 40rem !important;
+
+  .usa-modal__main {
+    max-width: 35rem;
+
+    input,
+    select {
+      max-width: 100%;
+    }
+  }
+}
+
+.usa-table-container--scrollable {
+  margin: 0;
+  width: 100%;
+  display: inline-flex;
 }

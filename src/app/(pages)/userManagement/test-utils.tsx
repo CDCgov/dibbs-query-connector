@@ -1,4 +1,4 @@
-import React from "react";
+import React, { createRef, RefObject } from "react";
 import { Tab } from "@/app/ui/designSystem/TabGroup/tabGroup";
 import { UserRole, User, UserGroup } from "@/app/models/entities/users";
 import UserPermissionsTable from "./components/userPermissionsTable/userPermissionsTable";
@@ -78,6 +78,9 @@ const mockGroupSingle = {
 
 export const allGroups = [mockGroupMany, mockGroupSingle];
 
+const mockRefs = createRef<RefObject<HTMLTableRowElement | null>[]>();
+mockRefs.current = [];
+
 // TabGroup Mocks
 export const mockPermissionsTab: Tab = {
   label: "Users",
@@ -91,6 +94,8 @@ export const mockPermissionsTab: Tab = {
         users={[mockAdmin, mockSuperAdmin]}
         fetchGroupMembers={jest.fn()}
         openModal={jest.fn()}
+        rowFocusRefs={mockRefs}
+        modalData={""}
       />,
     ),
 };
@@ -106,6 +111,7 @@ export const mockGroupsTab: Tab = {
         fetchGroupMembers={jest.fn().mockReturnValue(mockAdmin)}
         fetchGroupQueries={jest.fn()}
         openModal={jest.fn()}
+        modalData={""}
       />,
     ),
 };

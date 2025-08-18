@@ -80,7 +80,7 @@ variable "db_engine_type" {
 variable "db_engine_version" {
   type        = string
   description = "Engine Version of RDS Instance"
-  default     = "16.3"
+  default     = "16.8"
 }
 
 variable "db_instance_class" {
@@ -121,39 +121,33 @@ variable "ersd_api_key" {
   sensitive   = true
 }
 
-variable "qc_tls_key" {
-  type        = string
-  description = "Key for the Cloudfare cert for domain: queryconnector.dev"
-  sensitive   = true
-}
-
-variable "qc_tls_cert" {
-  type        = string
-  description = "Certificate importing from Cloudfare: queryconnector.dev"
-  sensitive   = true
-}
-
 variable "auth_secret" {
   type        = string
   description = "Secret for the Auth server"
   sensitive   = true
 }
 
-variable "keycloak_client_id" {
+variable "auth_provider" {
+  type        = string
+  description = "Which auth provider to use"
+  sensitive   = true
+}
+
+variable "auth_client_id" {
   type        = string
   description = "Client ID for Keycloak"
   sensitive   = true
 }
 
-variable "keycloak_client_secret" {
+variable "auth_client_secret" {
   type        = string
   description = "Client Secret for Keycloak"
   sensitive   = true
 }
 
-variable "auth_keycloak_issuer" {
+variable "auth_issuer" {
   type        = string
-  description = "URL for Keycloak"
+  description = "URL for the Auth issuer"
   sensitive   = true
 }
 

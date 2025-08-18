@@ -11,6 +11,7 @@ type TableProps = {
   fullWidth?: boolean;
   fixed?: boolean;
   loading?: boolean;
+  scrollable?: boolean;
 };
 
 /**
@@ -23,6 +24,7 @@ type TableProps = {
  * @param root0.className - additional custom class names
  * @param root0.fullWidth - whether to render with fullWidth mode
  * @param root0.fixed - whether to render with a fixed layout. All columns will be enforced to same width.
+ * @param root0.scrollable - whether the contents of the table are scrollable
  * @returns - A UWSDS-styled table
  */
 const Table: React.FC<TableProps> = ({
@@ -33,6 +35,7 @@ const Table: React.FC<TableProps> = ({
   striped,
   fullWidth,
   fixed,
+  scrollable,
 }) => {
   return (
     <div
@@ -49,6 +52,7 @@ const Table: React.FC<TableProps> = ({
         )}
         striped={striped}
         fullWidth={fullWidth}
+        scrollable={scrollable}
       >
         {children}
       </TrussTable>

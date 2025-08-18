@@ -1,9 +1,10 @@
 import QueryBuilding from "./page";
 import { render, screen, waitFor } from "@testing-library/react";
-import { getQueryList } from "@/app/backend/query-building";
+import { getQueryList } from "@/app/backend/query-building/service";
 import { RootProviderMock } from "@/app/tests/unit/setup";
+import { getConditionsData } from "@/app/backend/seeding/service";
 
-jest.mock("@/app/backend/query-building", () => ({
+jest.mock("@/app/backend/query-building/service", () => ({
   getQueryList: jest.fn(),
 }));
 
@@ -12,6 +13,14 @@ jest.mock(
   () =>
     ({ children }: React.PropsWithChildren) => <div>{children}</div>,
 );
+
+jest.mock("@/app/backend/seeding/service", () => ({
+  getConditionsData: jest.fn(),
+}));
+
+(getConditionsData as jest.Mock).mockResolvedValue({
+  conditionIdToNameMap: {},
+});
 
 describe("tests the query building steps", () => {
   const currentPage = "/";

@@ -3,7 +3,7 @@ import { useEffect, useContext } from "react";
 import { ToastContainer } from "react-toastify";
 import { usePathname } from "next/navigation";
 import { AppProgressBar as ProgressBar } from "next-nprogress-bar";
-import { DataContext } from "@/app/shared/DataProvider";
+import { DataContext } from "@/app/utils/DataProvider";
 import SiteAlert from "../../designSystem/SiteAlert";
 import { ToastConfigOptions } from "../../designSystem/toast/Toast";
 import "react-loading-skeleton/dist/skeleton.css";
@@ -55,7 +55,6 @@ const Page: React.FC<PageProps> = ({ children, showSiteAlert }) => {
         />
         <ProgressBar
           height="8px"
-          color="#005EA2"
           options={{
             easing: "ease-in-out",
             showSpinner: false,
