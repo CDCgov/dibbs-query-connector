@@ -39,7 +39,7 @@ describe("Query Execution with Mutual TLS", () => {
   let mockFhirClient: jest.Mocked<FHIRClient>;
 
   beforeEach(() => {
-    suppressConsoleLogs();
+    // suppressConsoleLogs();
     jest.clearAllMocks();
 
     // Mock setTimeout for Jest worker environment
@@ -161,17 +161,12 @@ describe("Query Execution with Mutual TLS", () => {
           }),
         } as Response);
 
-      // Mock the task detail fetch
-      mockFhirClient.get.mockResolvedValueOnce({
-        status: 200,
-        json: async () => mockChildTask,
-      } as Response);
-
-      // Mock the patient results fetch
-      mockFhirClient.get.mockResolvedValueOnce({
+      const patientResult = {
         status: 200,
         json: async () => mockPatient,
-      } as Response);
+      } as Response;
+      // Mock the patient results fetch
+      mockFhirClient.get.mockResolvedValueOnce(patientResult);
 
       const request = {
         fhirServer: "Test mTLS Server",
@@ -209,6 +204,7 @@ describe("Query Execution with Mutual TLS", () => {
         expect.stringContaining("/ndjson/results/Patient-Page1.ndjson"),
       );
 
+      console.log(result);
       // Verify the result
       expect(result).toHaveLength(1);
       expect(result[0]).toEqual(mockPatient);
@@ -256,17 +252,6 @@ describe("Query Execution with Mutual TLS", () => {
           entry: [{ resource: mockChildTask }, { resource: mockChildTask2 }],
         }),
       } as Response);
-
-      // Mock task detail fetches
-      mockFhirClient.get
-        .mockResolvedValueOnce({
-          status: 200,
-          json: async () => mockChildTask,
-        } as Response)
-        .mockResolvedValueOnce({
-          status: 200,
-          json: async () => mockChildTask2,
-        } as Response);
 
       // Mock patient results fetches
       mockFhirClient.get
@@ -325,12 +310,6 @@ describe("Query Execution with Mutual TLS", () => {
         }),
       } as Response);
 
-      // Mock successful task detail
-      mockFhirClient.get.mockResolvedValueOnce({
-        status: 200,
-        json: async () => mockChildTask,
-      } as Response);
-
       // Mock patient results
       mockFhirClient.get.mockResolvedValueOnce({
         status: 200,
@@ -372,12 +351,6 @@ describe("Query Execution with Mutual TLS", () => {
         }),
       } as Response);
 
-      // Mock task detail
-      mockFhirClient.get.mockResolvedValueOnce({
-        status: 200,
-        json: async () => mockChildTask,
-      } as Response);
-
       // Mock patient results - first attempt fails, second succeeds
       mockFhirClient.get
         .mockResolvedValueOnce({
@@ -401,7 +374,7 @@ describe("Query Execution with Mutual TLS", () => {
       // Should eventually return the patient
       expect(result).toHaveLength(1);
       expect(result[0]).toEqual(mockPatient);
-      expect(mockFhirClient.get).toHaveBeenCalledTimes(4); // child tasks + task detail + 2 patient attempts
+      expect(mockFhirClient.get).toHaveBeenCalledTimes(3); // child tasks + 2 patient attempts
     });
 
     it("should handle non-mTLS servers with standard Patient query", async () => {

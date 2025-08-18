@@ -47,6 +47,41 @@ jest.mock("@/app/utils/auth", () => {
   };
 });
 
+const mockPatientGet = {
+  status: 200,
+  json: async () => ({
+    resourceType: "Bundle",
+    type: "searchset",
+    entry: [
+      {
+        resource: {
+          resourceType: "Patient",
+          id: "test-patient-123",
+          name: [{ given: ["John"], family: "Doe" }],
+          birthDate: "1990-01-01",
+          identifier: [
+            {
+              type: {
+                coding: [
+                  {
+                    system: "http://terminology.hl7.org/CodeSystem/v2-0203",
+                    code: "MR",
+                  },
+                ],
+              },
+              system: "http://hospital.org/mrn",
+              value: "MRN-12345",
+            },
+          ],
+        },
+      },
+    ],
+  }),
+  text: async () => "",
+  headers: new Headers({ "content-type": "application/json" }),
+  url: "http://mock-server.com/fhir",
+};
+
 jest.mock("@/app/backend/fhir-servers/fhir-client", () => {
   return {
     __esModule: true,
@@ -83,7 +118,8 @@ jest.mock("@/app/backend/fhir-servers/fhir-client", () => {
           ],
         }),
         text: async () => "",
-        headers: new Headers(),
+        clone: async () => mockPatientGet,
+        headers: new Headers({ "content-type": "application/json" }),
         url: "http://mock-server.com/fhir",
       }),
       post: jest.fn().mockResolvedValue({
@@ -372,12 +408,6 @@ describe("API Query with Mutual TLS", () => {
         }),
       } as Response);
 
-      // Mock task detail fetch
-      mockFhirClient.get.mockResolvedValueOnce({
-        status: 200,
-        json: async () => mockChildTask,
-      } as Response);
-
       // Mock patient results
       mockFhirClient.get.mockResolvedValueOnce({
         status: 200,
@@ -476,17 +506,6 @@ describe("API Query with Mutual TLS", () => {
         }),
       } as Response);
 
-      // Mock task detail fetches
-      mockFhirClient.get
-        .mockResolvedValueOnce({
-          status: 200,
-          json: async () => mockChildTask,
-        } as Response)
-        .mockResolvedValueOnce({
-          status: 200,
-          json: async () => mockChildTask2,
-        } as Response);
-
       // Mock patient results fetches
       mockFhirClient.get
         .mockResolvedValueOnce({
@@ -554,10 +573,6 @@ PV1|1|I|ROOM-123^BED-A^HOSP||||ATTENDING^DOCTOR^A|||||||||||ADM001||||||||||||||
             type: "searchset",
             entry: [{ resource: mockChildTask }],
           }),
-        } as Response)
-        .mockResolvedValueOnce({
-          status: 200,
-          json: async () => mockChildTask,
         } as Response)
         .mockResolvedValueOnce({
           status: 200,
