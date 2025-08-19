@@ -70,7 +70,6 @@
     "@types/fhir": "^0.0.40",
     "@types/jest-axe": "^3.5.9",
     "@types/node": "^22.13.9",
-    "@types/node-fetch": "^2.6.11",
     "@types/pg": "^8.15.5",
     "@types/react": "19.1.6",
     "@types/react-dom": "19.1.5",
