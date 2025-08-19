@@ -47,6 +47,12 @@ jobs:
           echo "AIDBOX_LICENSE=${{ secrets.AIDBOX_LICENSE }}" > .env
           echo "AIDBOX_BASE_URL=http://localhost:8080" >> .env
           echo "APP_HOSTNAME=http://query-connector:3000" >> .env
+
+      # - name: Upload keys directory
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: keys
+      #     path: ./keys
       - name: Run tests
         run: |
           sudo mkdir keys
@@ -56,21 +62,15 @@ jobs:
         # uncomment these next few lines and the corresponding log import
         # in the setup script you're trying to debug if you're having trouble
         # in CI. All the best, brave engineer (￣^￣ )ゞ
-        continue-on-error: true
+      #   continue-on-error: true
 
-      - name: Upload keys directory
-        uses: actions/upload-artifact@v4
-        with:
-          name: keys
-          path: ./keys
-
-      - name: Upload Docker Logs
-        uses: actions/upload-artifact@v4
-        with:
-          name: docker-logs
-          path: |
-            ./test-results/logs-before-tests.txt
-            ./test-results/logs-after-tests.txt
+      # - name: Upload Docker Logs
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: docker-logs
+      #     path: |
+      #       ./test-results/logs-before-tests.txt
+      #       ./test-results/logs-after-tests.txt
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v5
@@ -113,19 +113,19 @@ jobs:
         # in CI. All the best, brave engineer (￣^￣ )ゞ
         continue-on-error: true
 
-      - name: Upload Docker Logs
-        uses: actions/upload-artifact@v4
-        with:
-          name: docker-logs
-          path: |
-            ./test-results/logs-before-tests.txt
-            ./test-results/logs-after-tests.txt
+      # - name: Upload Docker Logs
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: docker-logs
+      #     path: |
+      #       ./test-results/logs-before-tests.txt
+      #       ./test-results/logs-after-tests.txt
 
-      - uses: actions/upload-artifact@v4
-        if: ${{ !cancelled() }}
-        with:
-          name: test-results
-          path: ./test-results/
+      # - uses: actions/upload-artifact@v4
+      #   if: ${{ !cancelled() }}
+      #   with:
+      #     name: test-results
+      #     path: ./test-results/
 
       - name: Exit with proper code
         if: steps.run_tests.outcome == 'failure'
