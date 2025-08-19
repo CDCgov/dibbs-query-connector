@@ -48,11 +48,11 @@ jobs:
           echo "AIDBOX_BASE_URL=http://localhost:8080" >> .env
           echo "APP_HOSTNAME=http://query-connector:3000" >> .env
 
-      # - name: Upload keys directory
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: keys
-      #     path: ./keys
+      - name: Upload keys directory
+        uses: actions/upload-artifact@v4
+        with:
+          name: keys
+          path: ./keys
       - name: Run tests
         run: |
           sudo mkdir keys
