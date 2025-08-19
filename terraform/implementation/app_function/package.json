@@ -2,7 +2,7 @@
   "name": "app-func",
   "version": "1.0.0",
   "type": "module",
-  "main": "dist/src/functions/**/*.js",
+  "main": "dist/src/index.js",
   "scripts": {
     "build": "tsc",
     "start": "npm run build && func start"

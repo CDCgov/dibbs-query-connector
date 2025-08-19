@@ -28,21 +28,21 @@ data "azurerm_application_insights" "qc-function-insight" {
 }
 
 locals {
-  app_files = fileset("${path.module}/function", "**")
-  app_hash  = md5(join("", [for f in local.app_files : filemd5("${path.module}/function/${f}")]))
+  app_files = fileset("${path.module}/src/functions", "**")
+  app_hash  = md5(join("", [for f in local.app_files : filemd5("${path.module}/src/functions/${f}")]))
 }
 
 resource "null_resource" "build" {
   triggers = { app = local.app_hash }
   provisioner "local-exec" {
-    working_dir = "${path.module}/src/functions"
-    command     = "npm ci && npm run build && npm prune --omit=dev"
+    working_dir = "${path.module}"
+    command     = "npm i && npm run build && npm prune --omit=dev"
   }
 }
 
 data "archive_file" "zip" {
   type        = "zip"
-  source_dir  = "${path.module}/src/functions"
+  source_dir  = "${path.module}"
   output_path = "${path.module}/dist/functionapp.zip"
   depends_on  = [null_resource.build]
 }
@@ -75,6 +75,8 @@ resource "azurerm_storage_blob" "pkgzip" {
   type                   = "Block"
   source                 = data.archive_file.zip.output_path #TO DO BY ME
   content_type           = "application/zip"
+
+   depends_on = [null_resource.build]
 }
 
 
@@ -151,7 +153,7 @@ resource "azurerm_linux_function_app" "qc_linux_function_app" {
     AUTH_DISABLED             = "true"
     AUTH_URL                  = local.auth_url
     NEXT_PUBLIC_AUTH_PROVIDER = local.auth_provider
-    # Zip Deploy (Run From Package)
+    # Zip Deploy (Run From Package) Use this option once function has been finalized
     # WEBSITE_RUN_FROM_PACKAGE = "https://${data.azurerm_storage_account.qc_storage_account.name}.blob.core.windows.net/${azurerm_storage_container.pkg.name}/${azurerm_storage_blob.pkgzip.name}${data.azurerm_storage_account_sas.pkg.sas}"
   }
 
@@ -169,11 +171,11 @@ resource "azurerm_function_app_function" "qc_app_function" {
   name            = "${local.project}-${local.environment}-function-app"
   function_app_id = azurerm_linux_function_app.qc_linux_function_app.id
   language        = "TypeScript"
-
+  
   config_json = jsonencode({
     bindings = [
-      { type = "blobTrigger", direction = "in", name = "blobTrigger", connection = "AzureWebJobsStorage", path = "hl7-message/{name}" }, #The name should be the param the typescript code receives
-
-    ]
+      { type = "blobTrigger", direction = "in", name = "content", connection = "AzureWebJobsStorage", path = "hl7-message/{name}" }, #The name should be the param the typescript code receives
+    ],
+    scriptFile = "dist/src/functions/ProcessHL7/process-hl7.js"
   })
 }
