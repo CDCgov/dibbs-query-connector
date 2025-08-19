@@ -105,7 +105,7 @@ jobs:
             echo "MTLS_KEY=$MTLS_KEY_B64"
             echo "NEXT_PUBLIC_AUTH_PROVIDER=keycloak"
             echo "IS_E2E=true"
-          } > .env
+          } > .env.e2e
       - name: Build Query Connector and Run Playwright Tests
         id: run_tests
         run: |
