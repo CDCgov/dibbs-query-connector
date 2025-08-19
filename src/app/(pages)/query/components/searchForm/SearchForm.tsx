@@ -133,7 +133,7 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
     setEmail(hyperUnluckyPatient.Email);
   }, [fhirServers]);
 
-  const nameRegex = "^[A-Za-z\u00C0-\u024F\u1E00-\u1EFF\\-'. ]+$";
+  const nameRegex = "^[A-Za-z0-9\u00C0-\u024F\u1E00-\u1EFF\\-'. ]+$";
   const nameRuleHint =
     "Enter a name using only letters, hyphens, apostrophes, spaces, or periods.";
 
@@ -209,6 +209,8 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
 
     const patientDiscoveryRequest = getPatientDiscoveryRequest();
     try {
+      setMode("patient-results");
+
       const queryResponse = await patientDiscoveryQuery(
         patientDiscoveryRequest,
       );
@@ -224,7 +226,6 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
       if (isUncertainMatch) {
         setPatientDiscoveryQueryResponse([]);
         setUncertainMatchError(true);
-        setMode("patient-results");
         setLoading(false);
         return;
       }
