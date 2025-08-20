@@ -34,7 +34,7 @@ E2E_EXIT_CODE=$?
 docker compose -f docker-compose-e2e.yaml logs > test-results/logs-after-tests.txt
 
 # Teardown containers
-docker compose -f docker-compose-e2e.yaml down
+# docker compose -f docker-compose-e2e.yaml down
 
 exit $E2E_EXIT_CODE
 
