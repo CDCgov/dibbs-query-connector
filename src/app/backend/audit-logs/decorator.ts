@@ -15,7 +15,6 @@ export function auditable(
   key: string,
   descriptor: PropertyDescriptor,
 ) {
-  const dbConnection = internal_getDbClient();
   const method = descriptor.value;
   const argLabels = target[key]
     .toString()
@@ -25,6 +24,7 @@ export function auditable(
     .split(", ");
 
   const writeToAuditTable = async (args: any[]) => {
+    const dbConnection = internal_getDbClient();
     const insertQuery = `INSERT INTO 
           audit_logs (author, action_type, audit_message, created_at, audit_checksum) 
           VALUES ($1, $2, $3, $4, $5)
@@ -99,7 +99,6 @@ export function auditable(
     ? async function (this: unknown, ...args: unknown[]) {
         try {
           writeToAuditTable(args);
-
           return await method.apply(this, args);
         } catch (error) {
           console.error(`Async method ${key} threw error`, error);
@@ -109,7 +108,6 @@ export function auditable(
     : function (this: unknown, ...args: unknown[]) {
         try {
           writeToAuditTable(args);
-
           return method.apply(this, args);
         } catch (error) {
           console.error(`Method ${key} threw error`, error);
