@@ -44,6 +44,9 @@ data "archive_file" "zip" {
   type        = "zip"
   source_dir  = "${path.module}"
   output_path = "${path.module}/dist/functionapp.zip"
+    excludes = [
+    ".git/**", ".vscode/**", ".terraform/**",  "local.settings.json"
+  ]
   depends_on  = [null_resource.build]
 }
 
@@ -140,7 +143,7 @@ resource "azurerm_linux_function_app" "qc_linux_function_app" {
   }
 
   app_settings = {
-    FUNCTIONS_EXTENSION_VERSION = ""
+    FUNCTIONS_EXTENSION_VERSION = "~4"
     FUNCTIONS_WORKER_RUNTIME    = "node"
     AzureWebJobsStorage         = data.azurerm_storage_account.qc_storage_account.primary_connection_string
     APPLICATIONINSIGHTS_CONNECTION_STRING = data.azurerm_application_insights.qc-function-insight.connection_string
@@ -171,7 +174,7 @@ resource "azurerm_function_app_function" "qc_app_function" {
   name            = "${local.project}-${local.environment}-function-app"
   function_app_id = azurerm_linux_function_app.qc_linux_function_app.id
   language        = "TypeScript"
-  
+ 
   config_json = jsonencode({
     bindings = [
       { type = "blobTrigger", direction = "in", name = "content", connection = "AzureWebJobsStorage", path = "hl7-message/{name}" }, #The name should be the param the typescript code receives
