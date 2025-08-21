@@ -36,6 +36,7 @@ services:
       - "3000:3000"
     environment:
       - NODE_ENV=production
+      # - NODE_OPTIONS=--enable-source-maps --trace-uncaught
       - AUTH_DISABLED=false
       - AUTH_SECRET="ido5D/uybeAB3AmMQwn+ubw2zYC4t2h7RJlW2R79598="
       - AUTH_URL=http://localhost:3000
