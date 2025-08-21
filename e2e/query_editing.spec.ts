@@ -275,6 +275,41 @@ test.describe("editing an existing query", () => {
     await actionButton.click();
     await expect(actionButton).toHaveText("Save query");
   });
+
+  test("edit time filters", async ({ page }) => {
+    const query = page.locator("tr", {
+      has: page.getByTitle(subjectQuery.queryName),
+    });
+
+    await expect(query).toBeVisible();
+
+    // click edit
+    await query.hover();
+    const editBtn = query.getByTestId(`edit-query-${subjectQuery.queryId}`);
+    await expect(editBtn).toBeVisible();
+    await editBtn.click();
+
+    //  customize query
+    await expect(
+      page.getByRole("heading", {
+        name: CUSTOM_QUERY,
+      }),
+    ).toBeVisible();
+
+    // apply time filter
+    const medicationsAccordion = page.getByText("Medications");
+    await medicationsAccordion.click();
+
+    const medicationsTimeFilter = page.getByTestId(
+      "dateRangePicker-medications",
+    );
+    await medicationsTimeFilter.click();
+    await page.getByText("Last 24 hours").click();
+    await page.getByText("Apply filter").click();
+
+    // check for filtered medication that shouldn't exist
+    await checkForCancerMedication(page, subjectQuery.queryName, false);
+  });
 });
 
 test.describe("editing an existing query", () => {

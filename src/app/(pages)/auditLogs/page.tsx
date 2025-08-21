@@ -4,9 +4,9 @@ import { useState, useEffect, ChangeEvent, useMemo, useRef } from "react";
 import styles from "./auditLogs.module.scss";
 import classNames from "classnames";
 import {
-  DateRange,
   DateErrors,
   DateRangePickerRef,
+  DateRangeInfo,
 } from "@/app/ui/designSystem/timeboxing/DateRangePicker";
 import DateRangePicker from "@/app/ui/designSystem/timeboxing/DateRangePicker";
 import SearchField from "@/app/ui/designSystem/searchField/SearchField";
@@ -31,7 +31,11 @@ const AuditLogs: React.FC = () => {
   const [search, setSearch] = useState("");
   const [selectedName, setSelectedName] = useState("");
   const [selectedAction, setSelectedAction] = useState("");
-  const [dateRange, setDateRange] = useState<DateRange>({});
+  const [dateRange, setDateRange] = useState<DateRangeInfo>({
+    startDate: null,
+    endDate: null,
+    isRelativeRange: false,
+  });
   const [_, setDateErrors] = useState<DateErrors>({});
   const [currentPage, setCurrentPage] = useState(1);
   const [actionsPerPage, setActionsPerPage] = useState(10);
@@ -181,18 +185,28 @@ const AuditLogs: React.FC = () => {
             </Select>
           </div>
           <div className={classNames(styles.inputGroup)}>
-            <label htmlFor="dateRange">Custom date range</label>
+            <label htmlFor="dateRange">Date range</label>
             <div>
               <DateRangePicker
                 ref={datePickerRef}
                 id={"auditLogDatePicker"}
                 startDate={dateRange.startDate || null}
                 endDate={dateRange.endDate || null}
+                isRelativeRange={false}
                 onChange={() => {
                   const startDate = datePickerRef.current?.getStartDate();
                   const endDate = datePickerRef.current?.getEndDate();
-                  setDateRange({ startDate, endDate });
+                  const isRelativeRange =
+                    datePickerRef.current?.getIsRelativeRange() ?? false;
+                  setDateRange({ startDate, endDate, isRelativeRange });
                 }}
+                handleClear={() =>
+                  setDateRange({
+                    startDate: null,
+                    endDate: null,
+                    isRelativeRange: false,
+                  })
+                }
               />
             </div>
           </div>
@@ -219,7 +233,11 @@ const AuditLogs: React.FC = () => {
                     setSelectedName("");
                     setSelectedAction("");
                     setDateErrors({});
-                    setDateRange({});
+                    setDateRange({
+                      startDate: null,
+                      endDate: null,
+                      isRelativeRange: false,
+                    });
                   }}
                 >
                   Clear filters

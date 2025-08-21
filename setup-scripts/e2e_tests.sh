@@ -13,7 +13,8 @@ docker compose -f docker-compose-e2e.yaml --env-file .env.e2e up -d --build
 
 # uncomment these and the corresponding block in ci.yaml to get logs in CI. Make sure also to comment the set -e command at the top of this file too!
 mkdir test-results
-docker compose -f docker-compose-e2e.yaml logs > test-results/logs-before-tests.txt
+docker compose -f docker-compose-e2e.yaml logs query-connector >> test-results/logs-before-tests.txt
+docker compose -f docker-compose-e2e.yaml logs query-aidbox >> test-results/logs-before-tests.txt
 
 # wait for Aidbox seeder to finish running before...
 docker compose -f docker-compose-e2e.yaml logs -f aidbox-seeder | grep -q "Finished configuring Aidbox and database."
@@ -31,7 +32,8 @@ npx dotenv -e ./.env.e2e -- npx playwright test --reporter=list
 E2E_EXIT_CODE=$?
 
 # uncomment these and the corresponding block in the ci.yaml to get the CI logs
-docker compose -f docker-compose-e2e.yaml logs > test-results/logs-after-tests.txt
+docker compose -f docker-compose-e2e.yaml logs query-connector >> test-results/logs-after-tests.txt
+docker compose -f docker-compose-e2e.yaml logs aidbox >> test-results/logs-after-tests.txt
 
 # Teardown containers
 docker compose -f docker-compose-e2e.yaml down

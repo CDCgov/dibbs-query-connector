@@ -187,7 +187,6 @@ exports[`tests the value set selection page highlights the active tab to the sid
                   />
                 </div>
               </div>
-              ;
             </div>
             <div
               class="valueSetTemplate__right"
@@ -541,7 +540,6 @@ exports[`tests the value set selection page highlights the active tab to the sid
                   />
                 </div>
               </div>
-              ;
             </div>
             <div
               class="valueSetTemplate__right"
@@ -1127,7 +1125,6 @@ exports[`tests the value set selection page highlights the active tab to the sid
                   class="overlay"
                 />
               </div>
-              ;
             </div>
             <div
               class="valueSetTemplate__right"
@@ -1145,227 +1142,6 @@ exports[`tests the value set selection page highlights the active tab to the sid
                     type="search"
                     value=""
                   />
-                </div>
-                <div
-                  class="accordionContainer"
-                  data-testid="accordion-container"
-                >
-                  <div
-                    class="usa-accordion accordionInnerWrapper"
-                    data-testid="accordion"
-                  >
-                    <fieldset>
-                      <legend
-                        class="usa-accordion__heading"
-                      >
-                        <button
-                          aria-controls="medications"
-                          aria-expanded="false"
-                          class="usa-accordion__button foo"
-                          data-testid="accordionButton_medications"
-                          type="button"
-                        >
-                          <div
-                            class="accordionHeaderContent"
-                          >
-                            <div
-                              class="accordionLabel"
-                            >
-                              <svg
-                                aria-label="Arrow indicating collapsed or expanded toggle content"
-                                class="usa-icon usa-icon--size-3"
-                                focusable="false"
-                                height="1em"
-                                role="img"
-                                style="rotate: 90deg;"
-                                viewBox="0 0 24 24"
-                                width="1em"
-                                xmlns="http://www.w3.org/2000/svg"
-                              >
-                                <path
-                                  d="m7 14 5-5 5 5z"
-                                />
-                              </svg>
-                              <div
-                                class="accordionLabel"
-                                data-testid="accordionHeader_medications"
-                              >
-                                medications
-                              </div>
-                            </div>
-                            <div
-                              class="accordionHeaderCount"
-                            >
-                              2 / 2
-                            </div>
-                          </div>
-                        </button>
-                      </legend>
-                      <div
-                        class="usa-prose accordionInnerWrapper"
-                        data-testid="accordionItem_medications"
-                        hidden=""
-                        id="medications"
-                      >
-                        <div
-                          class="accordionBulkAction"
-                        >
-                          <div
-                            class="bulkActionButtons"
-                          >
-                            <button
-                              class="usa-button selectAll usa-button--unstyled"
-                              data-testid="button"
-                              type="button"
-                            >
-                              Deselect  All
-                            </button>
-                          </div>
-                          <div
-                            class="datePickerContainer"
-                          >
-                            <div
-                              class="textInputContainer"
-                            >
-                              <svg
-                                aria-label="date-range-calendar-icon"
-                                class="usa-icon usa-icon--size-3 calendarIcon"
-                                focusable="false"
-                                height="1em"
-                                role="img"
-                                viewBox="0 0 24 24"
-                                width="1em"
-                                xmlns="http://www.w3.org/2000/svg"
-                              >
-                                <path
-                                  d="M20 3h-1V1h-2v2H7V1H5v2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 18H4V8h16v13z"
-                                />
-                              </svg>
-                              <input
-                                aria-label="Date range input"
-                                class="usa-input dateRangeInput"
-                                data-testid="date-range-input"
-                                id="dateRangePicker-medications"
-                                name="date-range-input"
-                                placeholder="All dates"
-                                readonly=""
-                                type="text"
-                                value=""
-                              />
-                            </div>
-                          </div>
-                        </div>
-                        <div
-                          class="accordionContainer"
-                        >
-                          <div
-                            class="accordionBodyExpanded"
-                            data-testid="container-7_20240909"
-                          >
-                            <div
-                              class="accordionExpandedInner"
-                            >
-                              <div
-                                class="valueSetTemplate__checkboxWrapper"
-                              >
-                                <div
-                                  class="valueSetTemplate__checkboxWrapper"
-                                >
-                                  <div
-                                    class="display-flex flex-column"
-                                  >
-                                    <div
-                                      class="checkboxInfoContainer"
-                                      tabindex="-1"
-                                    >
-                                      <div
-                                        class="usa-checkbox valueSetTemplate__checkbox checkbox"
-                                        data-testid="checkbox"
-                                      >
-                                        <input
-                                          checked=""
-                                          class="usa-checkbox__input"
-                                          id="7_20240909"
-                                          name="7_20240909"
-                                          type="checkbox"
-                                        />
-                                        <label
-                                          class="usa-checkbox__label"
-                                          for="7_20240909"
-                                        >
-                                          <div
-                                            class="expandedContent"
-                                          >
-                                            <div
-                                              class="vsName"
-                                            >
-                                              <span>
-                                                <span
-                                                  class=""
-                                                >
-                                                  Gonorrhea Medication
-                                                </span>
-                                              </span>
-                                            </div>
-                                          </div>
-                                        </label>
-                                      </div>
-                                    </div>
-                                    <div
-                                      class="vsDetails"
-                                    >
-                                      <div
-                                        class="padding-right-2"
-                                      >
-                                        Author: DIBBs
-                                      </div>
-                                      <div>
-                                        System: http://www.nlm.nih.gov/research/umls/rxnorm
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                              <div
-                                class="accordionBodyExpanded__right"
-                              >
-                                <div
-                                  class="displayCount"
-                                  data-testid="displayCount-7_20240909"
-                                >
-                                  2
-                                   / 
-                                  2
-                                </div>
-                                <button
-                                  class="usa-button usa-button--secondary viewCodesBtn"
-                                  data-testid="viewCodes-7_20240909"
-                                  role="button"
-                                  tabindex="0"
-                                  type="button"
-                                >
-                                  View codes
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                          <div>
-                            <div
-                              aria-label="drawer-container"
-                              class="drawer closed width35"
-                              data-testid="drawer-open-false"
-                              id="drawer-container"
-                              role="dialog"
-                            >
-                              <div
-                                class="display-none"
-                              />
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </fieldset>
-                  </div>
                 </div>
               </div>
             </div>

@@ -3,12 +3,18 @@ import styles from "../buildFromTemplates/conditionTemplateSelection.module.scss
 
 import { FilterableValueSet } from "./utils";
 import { DibbsConceptType } from "@/app/models/entities/valuesets";
+import {
+  DateRangeInfo,
+  formatDateRangeToMMDDYY,
+  matchTimeRangeToOptionValue,
+} from "@/app/ui/designSystem/timeboxing/DateRangePicker";
 // import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 
 type ConceptTypeAccordionBodyProps = {
   activeType: DibbsConceptType;
   activeTypeValueSets: { [vsId: string]: FilterableValueSet };
   expanded: boolean;
+  initialTimeboxRange?: DateRangeInfo;
   areItemsFiltered?: boolean;
 };
 
@@ -17,6 +23,7 @@ type ConceptTypeAccordionBodyProps = {
  * @param param0 - params
  * @param param0.activeType - DibbsactiveValueSetType (labs, conditions, medications)
  * @param param0.activeTypeValueSets - ValueSets for a given activeValueSetType
+ * @param param0.initialTimeboxRange - Timebox ranges
  * @param param0.expanded - Boolean for managing icon orientation
  * takes a VsName and generatesa ValueSet level update
  * @param param0.areItemsFiltered - whether the activeValueSets are filtered to
@@ -27,6 +34,7 @@ const ConceptTypeAccordionHeader: React.FC<ConceptTypeAccordionBodyProps> = ({
   activeType,
   activeTypeValueSets,
   expanded,
+  initialTimeboxRange,
   areItemsFiltered = false,
 }) => {
   const selectedCount = Object.values(activeTypeValueSets).reduce(
@@ -48,6 +56,22 @@ const ConceptTypeAccordionHeader: React.FC<ConceptTypeAccordionBodyProps> = ({
     0,
   );
 
+  let dateRangeLabel;
+  if (initialTimeboxRange?.endDate && initialTimeboxRange.startDate) {
+    const displayValues = matchTimeRangeToOptionValue(
+      initialTimeboxRange?.startDate,
+      initialTimeboxRange?.endDate,
+      initialTimeboxRange.isRelativeRange,
+    );
+
+    displayValues.isPreset
+      ? (dateRangeLabel = displayValues.label)
+      : (dateRangeLabel = formatDateRangeToMMDDYY(
+          initialTimeboxRange.startDate,
+          initialTimeboxRange.endDate,
+        )); // is an absolute / custom range, so display the dates
+  }
+
   return (
     <>
       <div className={styles.accordionHeaderContent} key={activeType}>
@@ -61,7 +85,10 @@ const ConceptTypeAccordionHeader: React.FC<ConceptTypeAccordionBodyProps> = ({
             data-testid={`accordionHeader_${activeType}`}
             className={styles.accordionLabel}
           >
-            {activeType}
+            {dateRangeLabel ? `${activeType}:` : activeType}
+            <span className="text-normal padding-left-05">
+              {dateRangeLabel ? `${dateRangeLabel}` : " "}
+            </span>
           </div>
         </div>
         <div className={styles.accordionHeaderCount}>

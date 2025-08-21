@@ -20,3 +20,4 @@ fi
 
 npm install ts-node
 npx ts-node ./setup-scripts/gen-keys.ts
+npx playwright install --with-deps

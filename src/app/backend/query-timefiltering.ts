@@ -2,6 +2,7 @@
 
 import { QueryTableTimebox } from "../(pages)/queryBuilding/utils";
 import { DibbsConceptType } from "../models/entities/valuesets";
+import { DateRangeInfo } from "../ui/designSystem/timeboxing/DateRangePicker";
 import { adminRequired } from "./db/decorators";
 import dbService from "./db/service";
 
@@ -50,7 +51,7 @@ class QueryTimefilteringService {
 
   static async getTimeboxRanges(queryId: string, conceptType: string) {
     const timeboxSelectionQuery = `
-        SELECT time_window_start, time_window_end FROM query_timeboxing
+        SELECT time_window_start, time_window_end, is_relative_range FROM query_timeboxing
         WHERE query_id = $1 AND concept_type = $2;
     `;
 
@@ -62,13 +63,38 @@ class QueryTimefilteringService {
     if (result) {
       return result.rows.map((v) => {
         return {
-          timeWindowStart: v.timeWindowStart,
-          timeWindowEnd: v.timeWindowEnd,
+          startDate: v.timeWindowStart,
+          endDate: v.timeWindowEnd,
+          isRelativeRange: v.isRelativeRange,
         };
       })[0];
     }
 
     return undefined;
+  }
+  static async getQueryTimeboxRanges(queryId: string) {
+    const timeboxSelectionQuery = `
+        SELECT time_window_start, time_window_end, concept_type, is_relative_range FROM query_timeboxing
+        WHERE query_id = $1;
+    `;
+
+    const result = await dbService.query(timeboxSelectionQuery, [queryId]);
+
+    const conceptTimebox: Partial<{
+      [conceptType in DibbsConceptType]: DateRangeInfo;
+    }> = {};
+
+    if (result) {
+      result.rows.forEach((v) => {
+        conceptTimebox[v.conceptType as DibbsConceptType] = {
+          startDate: v.timeWindowStart,
+          endDate: v.timeWindowEnd,
+          isRelativeRange: v.isRelativeRange,
+        };
+      });
+    }
+
+    return conceptTimebox;
   }
 
   static async linkTimeboxRangesToQuery(queryId: string) {
@@ -103,6 +129,8 @@ class QueryTimefilteringService {
 }
 
 export const getTimeboxRanges = QueryTimefilteringService.getTimeboxRanges;
+export const getQueryTimeboxRanges =
+  QueryTimefilteringService.getQueryTimeboxRanges;
 export const linkTimeboxRangesToQuery =
   QueryTimefilteringService.linkTimeboxRangesToQuery;
 export const deleteTimeboxSettings =
