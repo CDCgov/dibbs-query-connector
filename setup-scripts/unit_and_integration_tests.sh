@@ -27,7 +27,7 @@ JEST_EXIT_CODE=$?
 #docker compose -f docker-compose-integration.yaml logs > test-results/logs-after-tests.txt
 
 # Teardown containers
-# docker compose -f docker-compose-integration.yaml down
+docker compose -f docker-compose-integration.yaml down
 
 # Exit with the Jest exit code
 exit $JEST_EXIT_CODE

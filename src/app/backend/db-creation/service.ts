@@ -10,6 +10,7 @@ import {
   insertValueSet,
   insertDBStructArray,
   executeCategoryUpdates,
+  generateBatchVsacPromises,
 } from "@/app/backend/seeding/service";
 import * as fs from "fs";
 import path from "path";
@@ -145,7 +146,7 @@ export async function getOidsFromErsd() {
  * each such ID.
  * @param batchSize The number of asynchronous calls to fire at once. Default is 100.
  */
-export async function fetchBatchValueSetsFromVsac(
+export async function seedBatchValueSetsFromVsac(
   oidData: OidData,
   batchSize = 100,
 ) {
@@ -195,7 +196,6 @@ export async function fetchBatchValueSetsFromVsac(
     valueSetPromises = valueSetPromises.filter(
       (vsp): vsp is DibbsValueSet => vsp?.concepts !== undefined,
     );
-    console.log(valueSetPromises);
 
     // Then, we'll insert it into our database instance
     await Promise.all(
@@ -241,80 +241,64 @@ export async function fetchBatchValueSetsFromVsac(
   // Once all the value sets are inserted, we need to do conditions
   // Step one is filtering out duplicates, since we just assembled
   // condition mappings directly from value sets
-  // console.log("Inserting eRSD condition data");
-  // const conditionSet = new Set<string>();
-  // oidData.conditions.forEach((c) => {
-  //   const repString = c.code + "*" + c.system + "*" + c.text;
-  //   conditionSet.add(repString);
-  // });
+  console.log("Inserting eRSD condition data");
+  const conditionSet = new Set<string>();
+  oidData.conditions.forEach((c) => {
+    const repString = c.code + "*" + c.system + "*" + c.text;
+    conditionSet.add(repString);
+  });
 
-  // // Create DB based condition structures
-  // let conditionPromises = await Promise.all(
-  //   Array.from(conditionSet).map(async (cString) => {
-  //     try {
-  //       const c = cString.split("*");
-  //       const vsacCondition: Parameters = (await getVSACValueSet(
-  //         c[0],
-  //         "condition",
-  //         c[1],
-  //       )) as Parameters;
-  //       const versionHolder = (vsacCondition.parameter || []).find(
-  //         (p) => p.name === "version",
-  //       );
-  //       const versionArray = (versionHolder?.valueString || "").split("/");
-  //       const version = versionArray[versionArray.length - 1];
-  //       const finalCondition: ConditionStruct = {
-  //         id: c[0],
-  //         system: c[1],
-  //         name: c[2],
-  //         version: version,
-  //         category: "",
-  //       };
-  //       return finalCondition;
-  //     } catch (error) {
-  //       console.error(error);
-  //     }
-  //   }),
-  // );
-
-  // // Now insert them
-  // await insertDBStructArray(
-  //   conditionPromises as ConditionStruct[],
-  //   "conditions",
-  // );
-
-  // // Finally, take care of mapping inserted value sets to inserted conditions
-  // // For this part, we do want the full list of conditions we obtained
-  // // from the value sets
-  // console.log("Inserting condition-to-valueset mappings");
-  // let ctvStructs = oidData.conditions.map((c) => {
-  //   const ctvID = retiredOids.has(c.valueset_id) ? "NONE" : randomUUID();
-  //   const dbCTV: ConditionToValueSetStruct = {
-  //     id: ctvID,
-  //     condition_id: c.code,
-  //     valueset_id: c.valueset_id + "_" + oidsToVersion.get(c.valueset_id),
-  //     source: c.system,
-  //   };
-  //   return dbCTV;
-  // });
-  // ctvStructs = ctvStructs.filter((ctvs) => ctvs.id !== "NONE");
-  // await insertDBStructArray(ctvStructs, "condition_to_valueset");
-}
-
-async function generateBatchVsacPromises(oidsToFetch: string[]) {
-  let valueSetPromises = Promise.all(
-    oidsToFetch.map(async (oid) => {
-      // First, we'll pull the value set from VSAC and map it to our representation
+  // Create DB based condition structures
+  let conditionPromises = await Promise.all(
+    Array.from(conditionSet).map(async (cString) => {
       try {
-        const vs = await getVSACValueSet(oid);
-        return vs;
+        const c = cString.split("*");
+        const vsacCondition: Parameters = (await getVSACValueSet(
+          c[0],
+          "condition",
+          c[1],
+        )) as Parameters;
+        const versionHolder = (vsacCondition.parameter || []).find(
+          (p) => p.name === "version",
+        );
+        const versionArray = (versionHolder?.valueString || "").split("/");
+        const version = versionArray[versionArray.length - 1];
+        const finalCondition: ConditionStruct = {
+          id: c[0],
+          system: c[1],
+          name: c[2],
+          version: version,
+          category: "",
+        };
+        return finalCondition;
       } catch (error) {
         console.error(error);
       }
     }),
   );
 
-  return valueSetPromises;
+  // Now insert them
+  await insertDBStructArray(
+    conditionPromises as ConditionStruct[],
+    "conditions",
+  );
+
+  // Finally, take care of mapping inserted value sets to inserted conditions
+  // For this part, we do want the full list of conditions we obtained
+  // from the value sets
+  console.log("Inserting condition-to-valueset mappings");
+  let ctvStructs = oidData.conditions.map((c) => {
+    const ctvID = retiredOids.has(c.valueset_id) ? "NONE" : randomUUID();
+    const dbCTV: ConditionToValueSetStruct = {
+      id: ctvID,
+      condition_id: c.code,
+      valueset_id: c.valueset_id + "_" + oidsToVersion.get(c.valueset_id),
+      source: c.system,
+    };
+    return dbCTV;
+  });
+  ctvStructs = ctvStructs.filter((ctvs) => ctvs.id !== "NONE");
+  await insertDBStructArray(ctvStructs, "condition_to_valueset");
 }
 
 /**
@@ -370,7 +354,7 @@ export async function createDibbsDB() {
   if (!dbHasData) {
     const ersdOidData = await getOidsFromErsd();
     if (ersdOidData) {
-      await fetchBatchValueSetsFromVsac(ersdOidData);
+      await seedBatchValueSetsFromVsac(ersdOidData);
     } else {
       console.error("Could not load eRSD, aborting DIBBs DB creation");
     }
