@@ -33,4 +33,14 @@ export const CodeSystemOptions = [
   "http://snomed.info/sct",
 ];
 
+export const CodeSystemOptionsMap: Record<string, string> = {
+  loinc: "http://loinc.org",
+  rxnorm: "http://www.nlm.nih.gov/research/umls/rxnorm",
+  "icd-10-cm": "http://hl7.org/fhir/sid/icd-10-cm",
+  cvx: "http://hl7.org/fhir/sid/cvx",
+  snomed: "http://snomed.info/sct",
+  "snomed ct": "http://snomed.info/sct",
+  "cap ecc": "http://cap.org/eCC",
+};
+
 export type CustomCodeMode = "manage" | "select" | "create" | "edit";
