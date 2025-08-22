@@ -1,5 +1,5 @@
 "use server";
-import { FhirResource, Patient } from "fhir/r4";
+import { Bundle, FhirResource, Patient, Task } from "fhir/r4";
 
 import { isFhirResource } from "../../constants";
 
@@ -13,10 +13,393 @@ import type {
   PatientRecordsRequest,
   FullPatientRequest,
 } from "../../models/entities/query";
-import { prepareFhirClient } from "../fhir-servers/service";
+import {
+  getFhirServerConfigs,
+  prepareFhirClient,
+} from "../fhir-servers/service";
+import type FHIRClient from "@/backend/fhir-servers/fhir-client";
 import { getSavedQueryByName } from "../query-building/service";
 
+interface TaskPollingResult {
+  tasksBundle: Bundle<Task>;
+  parentTaskId: string;
+}
+
+interface PatientSearchParams {
+  firstName?: string;
+  lastName?: string;
+  dob?: string;
+  mrn?: string;
+  phone?: string;
+  address?: {
+    street1?: string;
+    street2?: string;
+    city?: string;
+    state?: string;
+    zip?: string;
+  };
+  email?: string;
+}
+
+// Constants for configuration
+const TASK_POLLING = {
+  MAX_ATTEMPTS: 12,
+  DELAY_MS: 5000,
+  RETRY_DELAY_MS: 5000,
+} as const;
+
+const TASK_TEMPLATE: Partial<Task> = {
+  resourceType: "Task",
+  status: "requested",
+  intent: "order",
+  basedOn: [{ reference: "Task/bundleprofile-fdabest" }],
+  code: {
+    coding: [
+      {
+        system: "http://hl7.org/fhir/us/davinci-cdex/CodeSystem/cdex-temp",
+        code: "data-request-query",
+      },
+    ],
+  },
+  authoredOn: "2025-03-14T02:58:55.179Z",
+  lastModified: "2025-03-14T02:58:55.179Z",
+  requester: {
+    identifier: {
+      system: "http://ehealthexchange.org/hub/internal/hcid",
+      value: "2.16.840.1.113883.3.7204.1.2.1.1.2.1.19631120",
+    },
+  },
+};
+
 class QueryService {
+  /**
+   * Builds a FHIR patient search query string from provided parameters
+   * @param params - Patient search parameters
+   * @returns Promise resolving to a formatted query string
+   */
+  private static async buildPatientSearchQuery(
+    params: PatientSearchParams,
+  ): Promise<string> {
+    const { firstName, lastName, dob, mrn, phone, address, email } = params;
+    let patientQuery = "Patient?";
+
+    if (firstName) patientQuery += `given=${firstName}&`;
+    if (lastName) patientQuery += `family=${lastName}&`;
+    if (dob) patientQuery += `birthdate=${dob}&`;
+    if (mrn) patientQuery += `identifier=${mrn}&`;
+
+    if (phone) {
+      const phonesToSearch = phone.split(";");
+      const phonePossibilities: string[] = [];
+
+      for (const phoneNumber of phonesToSearch) {
+        const possibilities = (await GetPhoneQueryFormats(phoneNumber)).filter(
+          (p) => p !== "",
+        );
+        if (possibilities.length > 0) {
+          phonePossibilities.push(...possibilities);
+        }
+      }
+
+      if (phonePossibilities.length > 0) {
+        patientQuery += `phone=${phonePossibilities.join(",")}&`;
+      }
+    }
+
+    if (address) {
+      if (address.street1 || address.street2) {
+        const addressLine1 = address.street1?.split(";");
+        const addressLine2 = address.street2?.split(";");
+        const addrString = [addressLine1, addressLine2]
+          .flat()
+          .filter((addr) => addr !== "")
+          .join(",");
+
+        patientQuery += `address=${addrString}&`;
+      }
+
+      if (address.city) {
+        const cities = address.city.split(";").join(",");
+        patientQuery += `address-city=${cities}&`;
+      }
+
+      if (address.zip) {
+        const zips = address.zip.split(";").join(",");
+        patientQuery += `address-postalcode=${zips}&`;
+      }
+
+      if (address.state) {
+        const states = address.state.split(";").join(",");
+        patientQuery += `address-state=${states}&`;
+      }
+    }
+
+    if (email) {
+      const emailsToSearch = email.split(";");
+      if (emailsToSearch.length > 0) {
+        patientQuery += `email=${emailsToSearch.join(",")}&`;
+      }
+    }
+
+    return patientQuery.replace(/&$/, ""); // Remove trailing &
+  }
+
+  /**
+   * Creates a FHIR Task for patient discovery using mutual TLS
+   * @param patientQuery - The patient search query string
+   * @returns A FHIR Task resource for patient discovery
+   */
+  private static createPatientDiscoveryTask(patientQuery: string): Task {
+    return {
+      ...TASK_TEMPLATE,
+      input: [
+        {
+          type: {
+            coding: [
+              {
+                system:
+                  "http://hl7.org/fhir/us/davinci-hrex/CodeSystem/hrex-temp",
+                code: "data-query-patient-fhir-fanout",
+              },
+            ],
+          },
+          valueString: patientQuery,
+        },
+        {
+          type: {
+            coding: [
+              {
+                system:
+                  "http://hl7.org/fhir/us/davinci-cdex/CodeSystem/cdex-temp",
+                code: "purpose-of-use",
+              },
+            ],
+          },
+          valueCodeableConcept: {
+            coding: [
+              {
+                system: "2.16.840.1.113883.3.18.7.1",
+                code: "PUBLICHEALTH",
+              },
+            ],
+          },
+        },
+      ],
+    } as Task;
+  }
+
+  /**
+   * Polls for task completion and returns the completed tasks bundle
+   * @param fhirClient - The FHIR client instance
+   * @param parentTaskId - The ID of the parent task to poll
+   * @returns Promise resolving to task polling result
+   */
+  private static async pollTaskCompletion(
+    fhirClient: FHIRClient,
+    parentTaskId: string,
+  ): Promise<TaskPollingResult> {
+    let allTasksComplete = false;
+    let tasksBundle: Bundle<Task> = {
+      resourceType: "Bundle",
+      type: "searchset",
+      entry: [],
+    };
+
+    let attempts = 0;
+    while (!allTasksComplete && attempts < TASK_POLLING.MAX_ATTEMPTS) {
+      attempts++;
+      await new Promise((resolve) =>
+        setTimeout(resolve, TASK_POLLING.DELAY_MS),
+      );
+
+      const childTasksResponse = await fhirClient.get(
+        `/Task?part-of=Task/${parentTaskId}`,
+      );
+      tasksBundle = (await childTasksResponse.json()) as Bundle<Task>;
+
+      console.log(
+        `Fetched child tasks for parent Task ${parentTaskId}. Attempt ${attempts}/${TASK_POLLING.MAX_ATTEMPTS}`,
+      );
+
+      allTasksComplete =
+        tasksBundle.entry?.every(
+          (entry) =>
+            entry.resource?.status === "completed" ||
+            entry.resource?.status === "failed",
+        ) ?? false;
+    }
+
+    if (!allTasksComplete) {
+      console.warn(
+        `Task polling timed out after ${TASK_POLLING.MAX_ATTEMPTS} attempts`,
+      );
+    }
+
+    return { tasksBundle, parentTaskId };
+  }
+
+  /**
+   * Fetches patient data from a completed task
+   * @param fhirClient - The FHIR client instance
+   * @param task - The completed Task resource
+   * @returns Promise resolving to Patient resource or null if failed
+   */
+  private static async fetchPatientFromTask(
+    fhirClient: FHIRClient,
+    task: Task,
+  ): Promise<Patient | null> {
+    console.log(`Processing Task ${task.id} for patient discovery`);
+    console.log(`Task: ${JSON.stringify(task, null, 2)}`);
+    if (task.status !== "completed" || !task.output) {
+      if (task.status === "failed") {
+        console.warn(`Task ${task.id} failed`);
+      } else {
+        console.warn(
+          `Task ${task.id} completed successfully but has no output`,
+        );
+      }
+      return null;
+    }
+
+    try {
+      const patientLink = task.output?.find(
+        (output) => output.valueString?.includes("Patient-Page1"),
+      )?.valueString;
+
+      if (!patientLink) {
+        console.warn(
+          `No patient link found in Task output for task ${task.id}`,
+        );
+        return null;
+      }
+
+      console.log(`Patient link found in Task output: ${patientLink}`);
+
+      const url = new URL(patientLink);
+      const fullPath = url.pathname;
+      const pathParts = fullPath.split("/ndjson");
+      const patientPath = "/ndjson" + pathParts[1];
+
+      // Try to fetch patient data with retry logic
+      let patientResponse = await fhirClient.get(patientPath);
+
+      if (patientResponse.status !== 200) {
+        console.warn(
+          `Patient resource not available at ${patientLink}. Retrying...`,
+        );
+        await new Promise((resolve) =>
+          setTimeout(resolve, TASK_POLLING.RETRY_DELAY_MS),
+        );
+        patientResponse = await fhirClient.get(patientPath);
+      }
+
+      if (patientResponse.status === 200) {
+        const patient = (await patientResponse.json()) as Patient;
+        console.log(`Successfully fetched patient from task ${task.id}`);
+        return patient;
+      } else {
+        console.error(
+          `Failed to fetch patient resource from ${patientLink}. Status: ${patientResponse.status}`,
+        );
+        return null;
+      }
+    } catch (error) {
+      console.error(`Error fetching patient from task ${task.id}:`, error);
+      return null;
+    }
+  }
+
+  /**
+   * Processes completed tasks to extract patient data
+   * @param fhirClient - The FHIR client instance
+   * @param tasksBundle - Bundle containing completed tasks
+   * @returns Promise resolving to a Bundle with patient results
+   */
+  private static async processTaskResults(
+    fhirClient: FHIRClient,
+    tasksBundle: Bundle<Task>,
+  ): Promise<Bundle> {
+    const patientResults = await Promise.all(
+      tasksBundle.entry?.map((entry) =>
+        entry.resource
+          ? this.fetchPatientFromTask(fhirClient, entry.resource)
+          : null,
+      ) || [],
+    );
+
+    const validPatients = patientResults.filter(
+      (result): result is Patient => result !== null,
+    );
+
+    console.log(
+      `Successfully processed ${validPatients.length} patients from ${
+        tasksBundle.entry?.length || 0
+      } tasks`,
+    );
+
+    return {
+      resourceType: "Bundle",
+      type: "searchset",
+      entry: validPatients.map((patient) => ({ resource: patient })),
+    };
+  }
+
+  /**
+   * Handles mutual TLS patient discovery using Task-based workflow
+   * @param fhirClient - The FHIR client instance
+   * @param patientQuery - The patient search query string
+   * @param fhirServer - The name of the FHIR server
+   * @returns Promise resolving to a Bundle with patient discovery results
+   */
+  private static async handleMutualTlsDiscovery(
+    fhirClient: FHIRClient,
+    patientQuery: string,
+    fhirServer: string,
+  ): Promise<Bundle> {
+    console.log(
+      `Mutual TLS enabled for server ${fhirServer}. Using Task resource for patient discovery.`,
+    );
+
+    // Create and submit the task
+    const taskBody = this.createPatientDiscoveryTask(patientQuery);
+    const taskResponse = await fhirClient.postJson("/Task", taskBody);
+    const createdTask = (await taskResponse.json()) as Bundle<Task>;
+
+    const parentTaskId = createdTask.entry?.[0]?.resource?.id;
+    if (!parentTaskId) {
+      console.error(
+        "Failed to create parent task. Output for task instead was:",
+      );
+      console.error(createdTask);
+      throw new Error("Failed to create parent Task for patient discovery.");
+    }
+
+    console.log(`Created Task for patient discovery with ID: ${parentTaskId}`);
+
+    // Poll for completion
+    const { tasksBundle } = await this.pollTaskCompletion(
+      fhirClient,
+      parentTaskId,
+    );
+
+    // Process results
+    return await this.processTaskResults(fhirClient, tasksBundle);
+  }
+
+  /**
+   * Handles standard patient discovery using direct FHIR search
+   * @param fhirClient - The FHIR client instance
+   * @param patientQuery - The patient search query string
+   * @returns Promise resolving to the FHIR search response
+   */
+  private static async handleStandardDiscovery(
+    fhirClient: FHIRClient,
+    patientQuery: string,
+  ): Promise<Response> {
+    const query = "/" + patientQuery;
+    return await fhirClient.get(query);
+  }
+
   /**
    * Method that coordinates user input and relevant DB config information to make
    * an outgoing FHIR query for patient records
@@ -89,86 +472,57 @@ class QueryService {
   @auditable
   private static async makePatientDiscoveryRequest(
     request: PatientDiscoveryRequest,
-  ) {
-    const { fhirServer, firstName, lastName, dob, mrn, phone, address, email } =
-      request;
-
+  ): Promise<Response> {
+    const { fhirServer } = request;
     const fhirClient = await prepareFhirClient(fhirServer);
 
-    // Query for patient
-    let query = "/Patient?";
-    if (firstName) {
-      query += `given=${firstName}&`;
-    }
-    if (lastName) {
-      query += `family=${lastName}&`;
-    }
-    if (dob) {
-      query += `birthdate=${dob}&`;
-    }
-    if (mrn) {
-      query += `identifier=${mrn}&`;
-    }
-    if (phone) {
-      // We might have multiple phone numbers if we're coming from the API
-      // side, since we parse *all* telecom structs
-      const phonesToSearch = phone.split(";");
-      let phonePossibilities: string[] = [];
-      for (const phone of phonesToSearch) {
-        let possibilities = await GetPhoneQueryFormats(phone);
-        possibilities = possibilities.filter((phone) => phone !== "");
-        if (possibilities.length !== 0) {
-          phonePossibilities.push(...possibilities);
-        }
-      }
-      if (phonePossibilities.length > 0) {
-        query += `phone=${phonePossibilities.join(",")}&`;
-      }
-    }
-    if (address?.street1 || address?.street2) {
-      const addressLine1 = address?.street1?.split(";");
-      const addressLine2 = address?.street2?.split(";");
+    // Get the server config to check for mutual TLS
+    const serverConfigs = await getFhirServerConfigs();
+    const serverConfig = serverConfigs.find(
+      (config) => config.name === fhirServer,
+    );
 
-      const addrString = [addressLine1, addressLine2]
-        .flat()
-        .filter((addr) => addr != "")
-        .join(",");
+    // Build patient search query
+    const patientQuery = await this.buildPatientSearchQuery(request);
+    // Handle discovery based on server configuration
+    let response: Response;
+    if (serverConfig?.mutualTls) {
+      const tlsDiscoveryResult = await this.handleMutualTlsDiscovery(
+        fhirClient,
+        patientQuery,
+        fhirServer,
+      );
 
-      query += `address=${addrString}&`;
+      response = new Response(JSON.stringify(tlsDiscoveryResult), {
+        status: 200,
+        statusText: "OK",
+        headers: new Headers({ "content-type": "application/json" }),
+      });
+    } else {
+      response = await this.handleStandardDiscovery(fhirClient, patientQuery);
     }
-    if (address?.city) {
-      const cities = address?.city?.split(";").join(",");
-      query += `address-city=${cities}&`;
-    }
-    if (address?.state) {
-      const states = address?.state.split(";").join(",");
-      query += `address-state=${states}&`;
-    }
-    if (address?.zip) {
-      const zips = address?.zip.split(";").join(",");
-      query += `address-postalcode=${zips}&`;
-    }
-    if (email) {
-      const emailsToSearch = email.split(";");
-      if (emailsToSearch.length > 0) {
-        query += `email=${emailsToSearch.join(",")}&`;
-      }
-    }
-
-    const fhirResponse = await fhirClient.get(query);
 
     // Check for errors
-    if (fhirResponse.status !== 200) {
+    if (response.status !== 200) {
+      let errorText = "Match request failed for unknown reason";
+      let headerText = "Match request failed with unknown headers";
+
+      try {
+        errorText = await response.text();
+      } catch {}
+
+      try {
+        headerText = JSON.stringify(
+          Object.fromEntries(response.headers.entries()),
+        );
+      } catch {}
+
       console.error(
-        `Patient search failed. Status: ${
-          fhirResponse.status
-        } \n Body: ${await fhirResponse.text()} \n Headers: ${JSON.stringify(
-          Object.fromEntries(fhirResponse.headers.entries()),
-        )}`,
+        `Patient search failed. Status: ${response.status} \n Body: ${errorText} \n Headers: ${headerText}`,
       );
     }
 
-    return fhirResponse;
+    return response;
   }
 
   /**
@@ -342,12 +696,21 @@ class QueryService {
     }
 
     if (response.status !== 200) {
+      let errorText = "Match request failed for unknown reason";
+      let headerText = "Match request failed with unknown headers";
+
+      try {
+        errorText = await response.text();
+      } catch {}
+
+      try {
+        headerText = JSON.stringify(
+          Object.fromEntries(response.headers.entries()),
+        );
+      } catch {}
+
       console.error(
-        `FHIR $match query failed. Status: ${response.status}
-      \n Body: ${await response.text()}
-      \n Headers: ${JSON.stringify(
-        Object.fromEntries(response.headers.entries()),
-      )}`,
+        `Patient search failed. Status: ${response.status} \n Body: ${errorText} \n Headers: ${headerText}`,
       );
     }
 
@@ -393,20 +756,23 @@ class QueryService {
     request: PatientDiscoveryRequest,
   ): Promise<QueryResponse["Patient"] | { uncertainMatchError: true }> {
     const matchConfig = request.patientMatchConfiguration;
+    const useDollarMatchStrategy =
+      matchConfig?.supportsMatch && matchConfig.enabled;
 
-    const fhirResponse =
-      matchConfig?.supportsMatch && matchConfig.enabled
-        ? await QueryService.makePatientMatchRequest(request)
-        : await QueryService.makePatientDiscoveryRequest(request);
-
-    if (
-      fhirResponse.status === 200 &&
-      fhirResponse.headers.get("content-type")?.includes("application/json")
-    ) {
-      const body = await fhirResponse.clone().json();
-      if (body?.uncertainMatchError === true) {
-        return { uncertainMatchError: true };
+    let fhirResponse: Response;
+    if (useDollarMatchStrategy) {
+      fhirResponse = await QueryService.makePatientMatchRequest(request);
+      if (
+        fhirResponse.status === 200 &&
+        fhirResponse.headers.get("content-type")?.includes("application/json")
+      ) {
+        const body = await fhirResponse.clone().json();
+        if (body?.uncertainMatchError === true) {
+          return { uncertainMatchError: true };
+        }
       }
+    } else {
+      fhirResponse = await QueryService.makePatientDiscoveryRequest(request);
     }
 
     const newResponse = await QueryService.parseFhirSearch(fhirResponse);
@@ -435,22 +801,55 @@ class QueryService {
   }
 
   /**
+   * Type guard to check if an object is a FHIR Bundle
+   * @param obj - The object to check
+   * @returns True if the object is a Bundle, false otherwise
+   */
+  static isBundle(obj: unknown): obj is Bundle {
+    return (
+      obj !== null &&
+      typeof obj === "object" &&
+      (obj as { resourceType?: string }).resourceType === "Bundle"
+    );
+  }
+
+  /**
    * Parse the response from a FHIR search query. If the response is successful and
    * contains data, return an array of parsed resources.
    * @param response - The response from the FHIR server.
    * @returns - The parsed response.
    */
   static async parseFhirSearch(
-    response: Response | Array<Response>,
+    response: Response | Array<Response> | Bundle,
   ): Promise<QueryResponse> {
     let resourceArray: FhirResource[] = [];
     const resourceIds = new Set<string>();
+    const responders = new Set<string>();
+    const isFanoutSearch = QueryService.isBundle(response);
 
     // Process the responses and flatten them
     if (Array.isArray(response)) {
       resourceArray = (
         await Promise.all(response.map(processFhirResponse))
       ).flat();
+      // if response is a Bundle, extract the resource
+    } else if (isFanoutSearch) {
+      const resources =
+        response.entry
+          ?.map((entry) => {
+            if (entry.resource && isFhirResource(entry.resource)) {
+              return entry.resource;
+            } else {
+              console.error(
+                "Entry in FHIR Bundle response parsing was of unexpected shape",
+              );
+              return null;
+            }
+          })
+          .filter((resource): resource is FhirResource => resource !== null) ||
+        [];
+      // Add resources to the resourceArray
+      resourceArray = resources;
     } else {
       resourceArray = await processFhirResponse(response);
     }
@@ -468,9 +867,22 @@ class QueryService {
       if (resource.id && !resourceIds.has(resource.id)) {
         (runningQueryResponse[resourceType] as FhirResource[]).push(resource);
         resourceIds.add(resource.id);
+      } else if (resource.id && isFanoutSearch) {
+        // If this is a fanout search, we might have multiple resources with the same ID
+        // In this case, we still want to add the resource to the response if it comes from a different server
+        const targetResponderFullUrl = (resource as Patient).identifier?.find(
+          (identifier) => identifier.system?.includes("targetResponderFullUrl"),
+        )?.value;
+        console.log(
+          `Processing resource with ID ${resource.id} and targetResponderFullUrl ${targetResponderFullUrl}`,
+        );
+        // If the targetResponderFullUrl is defined and not already in the responders set, add
+        if (targetResponderFullUrl && !responders.has(targetResponderFullUrl)) {
+          (runningQueryResponse[resourceType] as FhirResource[]).push(resource);
+          responders.add(targetResponderFullUrl);
+        }
       }
     }
-
     return runningQueryResponse;
   }
 
@@ -487,18 +899,19 @@ class QueryService {
     let resourceIds: string[] = [];
 
     if (response.status === 200) {
-      const body = await response.json();
+      const body = (await response.json()) as Bundle;
       if (body.entry) {
         for (const entry of body.entry) {
-          if (!isFhirResource(entry.resource)) {
+          if (entry.resource && isFhirResource(entry.resource)) {
+            // Add the resource only if the ID is unique to the resources being returned for the query
+            if (!resourceIds.includes(entry.resource.id!)) {
+              resourceIds.push(entry.resource.id!);
+              resourceArray.push(entry.resource);
+            }
+          } else {
             console.error(
               "Entry in FHIR resource response parsing was of unexpected shape",
             );
-          }
-          // Add the resource only if the ID is unique to the resources being returned for the query
-          if (!resourceIds.includes(entry.resource.id)) {
-            resourceIds.push(entry.resource.id);
-            resourceArray.push(entry.resource);
           }
         }
       }

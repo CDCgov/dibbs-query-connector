@@ -1,9 +1,12 @@
 import { patientRecordsQuery } from "@/app/backend/query-execution/service";
-import { createTestCancerQuery } from "../../../../e2e/utils";
 import { suppressConsoleLogs } from "./fixtures";
 import { PatientRecordsRequest } from "@/app/models/entities/query";
 import { HYPER_UNLUCKY_DEFAULT_ID } from "@/app/constants";
 import { updateTimeboxSettings } from "@/app/backend/query-timefiltering";
+import { QueryTableResult } from "@/app/(pages)/queryBuilding/utils";
+import { deleteQueryByIdHelp } from "@/app/backend/query-building/lib";
+import { createTestCancerQuery } from "../../../../e2e/utils";
+import { internal_getDbClient } from "@/backend/db/config";
 
 jest.mock("@/app/utils/auth", () => {
   return {
@@ -13,17 +16,27 @@ jest.mock("@/app/utils/auth", () => {
 });
 
 describe("time filtering query", () => {
+  const dbClient = internal_getDbClient();
+
   beforeAll(() => {
     suppressConsoleLogs();
   });
 
-  it("applies time filters to queries", async () => {
-    const customCancerQuery = await createTestCancerQuery();
+  let subjectQuery: QueryTableResult;
+  // Start every test by navigating to the customize query workflow
+  beforeEach(async () => {
+    subjectQuery = await createTestCancerQuery();
+  });
 
+  afterEach(async () => {
+    await deleteQueryByIdHelp(subjectQuery.queryId, dbClient);
+  });
+
+  it("applies time filters to queries", async () => {
     const patientRecordsRequest: PatientRecordsRequest = {
       patientId: HYPER_UNLUCKY_DEFAULT_ID,
       fhirServer: "Aidbox",
-      queryName: customCancerQuery.queryName,
+      queryName: subjectQuery.queryName,
     };
     const response = await patientRecordsQuery(patientRecordsRequest);
     // there should be three resources in the default query: 1 condition, 2 meds
@@ -33,9 +46,9 @@ describe("time filtering query", () => {
     const startFilter = new Date("2025-12-01");
     const endFilter = new Date("2025-12-05");
 
-    // filter out med resoponses
+    // filter out med responses
     await updateTimeboxSettings(
-      customCancerQuery.queryId,
+      subjectQuery.queryId,
       "medications",
       startFilter.toISOString(),
       endFilter.toISOString(),
