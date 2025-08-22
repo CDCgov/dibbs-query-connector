@@ -153,3 +153,16 @@ To View logs for App Service:
 2. Select the App service that was deployed.
 3. Click **Deployment Center** under Deployment on the left panel
 4. Click **Logs**
+
+## Common Errors
+
+1. ```ERROR: extension "uuid-ossp" is not allow-listed for users in Azure Database for PostgreSQL```
+
+   **Fix**:
+      1. Go to ***Azure Database for PostgreSQL flexible server***.
+      2. Select the PostgreSQL flexible server for Query Connector
+      3. Navigate to ***Server Parameters***
+      4. Enter `azure.extensions` in the Search Bar, select the CheckBox beside `UUID-OSSP` (see screenshot below for reference)
+      5. Click **Save**
+![uuid-ossp](uuid-ossp.png "Title")
+     
