@@ -51,11 +51,15 @@ function generateAuditMessage(argLabels: string[], args: unknown[]) {
   // can do more fancy serialization here if needed
   const mappedArgs: { [s: string]: string } = {};
   args.forEach((obj, i) => {
-    if (obj) {
+    // Include undefined as null to ensure all arguments are captured
+    if (obj !== undefined) {
       const val = JSON.stringify(obj);
       if (val !== "{}" && val !== "[]") {
         mappedArgs[argLabels[i]] = sanitizeString(JSON.stringify(obj));
       }
+    } else {
+      // Include undefined values as null in the audit log
+      mappedArgs[argLabels[i]] = "null";
     }
   });
 

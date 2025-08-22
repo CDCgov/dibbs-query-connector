@@ -1,5 +1,12 @@
 "use client";
-import { Dispatch, JSX, SetStateAction, useEffect, useState } from "react";
+import {
+  Dispatch,
+  JSX,
+  SetStateAction,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import styles from "../../buildFromTemplates/conditionTemplateSelection.module.scss";
 import { HeadingLevel } from "@trussworks/react-uswds";
 import ConceptTypeAccordionBody from "../ConceptTypeAccordionBody";
@@ -11,6 +18,10 @@ import {
   DibbsConceptType,
   DibbsValueSet,
 } from "@/app/models/entities/valuesets";
+import { getQueryTimeboxRanges } from "@/app/backend/query-timefiltering";
+import { DataContext } from "@/app/utils/DataProvider";
+import { DateRangeInfo } from "@/app/ui/designSystem/timeboxing/DateRangePicker";
+import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 
 type ConceptSelectionViewProps = {
   vsTypeLevelOptions: ConceptTypeToDibbsVsMap;
@@ -48,21 +59,43 @@ export const ConceptSelectionView: React.FC<ConceptSelectionViewProps> = ({
 }) => {
   const [curExpanded, setCurExpanded] = useState<string>("");
   const [accordionItems, setAccordionItems] = useState<VsTypeAccordion[]>([]);
+  const [timeboxRanges, setTimeboxRanges] = useState<
+    Partial<{
+      [conceptType in DibbsConceptType]: DateRangeInfo | undefined;
+    }>
+  >({});
+
+  const queryContext = useContext(DataContext);
+  const queryId = queryContext?.selectedQuery?.queryId;
 
   useEffect(() => {
-    setAccordionItems(
-      generateTypeLevelAccordionItems(vsTypeLevelOptions, searchFilter),
-    );
-  }, [vsTypeLevelOptions, searchFilter, curExpanded]);
+    async function fetchInitialRanges() {
+      if (!queryId) return;
+      const initialTimeboxes = await getQueryTimeboxRanges(queryId);
+      setTimeboxRanges(initialTimeboxes);
+    }
 
-  const generateTypeLevelAccordionItems = (
+    fetchInitialRanges();
+  }, []);
+
+  const generateTypeLevelAccordions = (
     vsTypeLevelOptions: ConceptTypeToDibbsVsMap,
     searchFilter: string,
   ) => {
+    if (!queryId) {
+      showToastConfirmation({
+        heading: "Query ID not set",
+        body: "Something went wrong unexpectedly. Please try again or contact us if the issue persists",
+        variant: "error",
+      });
+      return [];
+    }
+
     const accordionDataToDisplay = filterVsTypeOptions(
       vsTypeLevelOptions,
       searchFilter,
     );
+
     const areItemsFiltered = searchFilter !== "";
 
     return Object.entries(accordionDataToDisplay).map(
@@ -73,24 +106,44 @@ export const ConceptSelectionView: React.FC<ConceptSelectionViewProps> = ({
           .some(Boolean);
 
         const vsType = k as DibbsConceptType;
-        const handleVsNameLevelUpdate = handleVsTypeLevelUpdate(vsType);
+        const updateConceptTimebox = (newTimebox: DateRangeInfo) =>
+          setTimeboxRanges((prev) => {
+            return {
+              ...prev,
+              [vsType]: newTimebox,
+            };
+          });
 
+        const handleVsNameLevelUpdate = handleVsTypeLevelUpdate(vsType);
+        let initialTimeboxRange = undefined;
+        if (timeboxRanges && timeboxRanges[vsType]) {
+          const conceptTimeboxRange = timeboxRanges[vsType];
+
+          initialTimeboxRange = {
+            startDate: conceptTimeboxRange.startDate,
+            endDate: conceptTimeboxRange.endDate,
+            isRelativeRange: conceptTimeboxRange.isRelativeRange,
+          };
+        }
         const title = (
           <ConceptTypeAccordionHeader
             activeType={vsType}
             activeTypeValueSets={valueSetsInType}
             expanded={curExpanded === vsType}
             areItemsFiltered={areItemsFiltered}
+            initialTimeboxRange={initialTimeboxRange}
           />
         );
 
         const content = (
           <ConceptTypeAccordionBody
+            updateTimeboxRange={updateConceptTimebox}
             accordionConceptType={vsType}
             activeValueSets={valueSetsInType}
             handleVsNameLevelUpdate={handleVsNameLevelUpdate}
             handleVsIdLevelUpdate={handleVsNameLevelUpdate}
             tableSearchFilter={searchFilter}
+            initialTimeboxRange={initialTimeboxRange}
           />
         );
         const level: HeadingLevel = "h2";
@@ -114,6 +167,14 @@ export const ConceptSelectionView: React.FC<ConceptSelectionViewProps> = ({
       },
     );
   };
+
+  useEffect(() => {
+    const accordions = generateTypeLevelAccordions(
+      vsTypeLevelOptions,
+      searchFilter,
+    );
+    setAccordionItems(accordions);
+  }, [vsTypeLevelOptions, searchFilter, curExpanded, timeboxRanges]);
 
   const accordionsToRender = accordionItems.filter(
     (i) => i.atLeastOneRenderedValueSet,
