@@ -1,28 +1,15 @@
+import { app, InvocationContext } from "@azure/functions";
 import { postHL7 } from "../PostHL7/post-hl7";
 
 const queryId = process.env.QUERY_ID!;
 const fhirServer = process.env.FHIR_SERVER!;
 const serviceToken = process.env.SERVICE_TOKEN!;
 const endpoint = process.env.QUERY_CONNECTOR_ENDPOINT;
+const blobPath = process.env.BLOB_PATH!;
 
-interface BlobTriggerContext {
-  log: {
-    (message: string, ...args: unknown[]): void;
-    error: (message: string, ...args: unknown[]) => void;
-  };
-}
-
-interface PostHL7Params {
-  queryId: string;
-  fhirServer: string;
-  serviceToken: string;
-  hl7Message: string;
-  endpoint?: string;
-}
-
-const blobTrigger = async function (
-  context: BlobTriggerContext,
+async function hl7BlobHandler(
   content: Buffer,
+  context: InvocationContext,
 ): Promise<void> {
   const hl7 = content.toString("utf-8");
 
@@ -38,13 +25,17 @@ const blobTrigger = async function (
     const body: string = await res.text();
 
     if (!res.ok) {
-      context.log.error("HL7 POST failed", { status: res.status, body });
+      context.log("HL7 POST failed", { status: res.status, body });
     } else {
       context.log("HL7 POST succeeded");
     }
   } catch (err: unknown) {
-    context.log.error("Exception during HL7 POST:", err);
+    context.log("Exception during HL7 POST:", err);
   }
-};
+}
 
-export default blobTrigger;
+app.storageBlob("hl7BlobTrigger", {
+  path: blobPath,
+  connection: "AzureWebJobsStorage",
+  handler: hl7BlobHandler,
+});
