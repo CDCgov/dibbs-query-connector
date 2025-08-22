@@ -8,7 +8,7 @@ import {
   MISSING_PATIENT_IDENTIFIERS,
   RESPONSE_BODY_IS_NOT_PATIENT_RESOURCE,
   USE_CASE_DETAILS,
-} from "@/app/shared/constants";
+} from "@/app/constants";
 import { NextRequest } from "next/server";
 import { POST } from "@/app/api/query/route";
 import { GET } from "@/app/api/route";
@@ -25,6 +25,39 @@ jest.mock("next-auth/providers/keycloak");
 jest.mock("@/app/api/api-auth", () => ({
   validateServiceToken: jest.fn(),
 }));
+
+// Mock the FHIRClient to prevent real authentication requests
+jest.mock("@/app/backend/fhir-servers/fhir-client", () => {
+  return {
+    __esModule: true,
+    default: jest.fn().mockImplementation(() => ({
+      get: jest.fn().mockResolvedValue({
+        resourceType: "Bundle",
+        entry: [
+          {
+            resource: {
+              resourceType: "Patient",
+              id: "test-patient-123",
+              name: [{ given: ["Test"], family: "Patient" }],
+              identifier: [{ value: "MRN-12345" }],
+            },
+          },
+        ],
+      }),
+      post: jest.fn().mockResolvedValue({
+        status: 200,
+        url: "http://mock-server.com/fhir",
+        text: jest.fn().mockResolvedValue(""),
+        json: jest.fn().mockResolvedValue({
+          resourceType: "Bundle",
+          entry: [],
+        }),
+      }),
+      getAccessToken: jest.fn().mockResolvedValue("mock-token"),
+      ensureValidToken: jest.fn().mockResolvedValue(undefined),
+    })),
+  };
+});
 
 import { validateServiceToken } from "@/app/api/api-auth";
 import { getOrCreateKeys } from "../../../../setup-scripts/gen-keys";
@@ -90,7 +123,7 @@ describe("POST Query FHIR Server - Authentication", () => {
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    jest.clearAllMocks();
   });
 
   const SYPHILIS_QUERY_ID = USE_CASE_DETAILS.syphilis.id;
@@ -188,7 +221,7 @@ describe("POST Query FHIR Server - Authorized Requests", () => {
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    jest.clearAllMocks();
   });
 
   const SYPHILIS_QUERY_ID = USE_CASE_DETAILS.syphilis.id;

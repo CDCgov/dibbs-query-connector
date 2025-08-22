@@ -1,9 +1,42 @@
 import https from "https";
-import { FhirServerConfig } from "../models/entities/fhir-servers";
-import { createSmartJwt } from "../backend/smart-on-fhir";
-import { fetchWithoutSSL } from "./utils";
-import dbService from "../backend/db/service";
-import { AuthData, updateFhirServer } from "../backend/fhir-servers";
+import { FhirServerConfig } from "../../models/entities/fhir-servers";
+import { createSmartJwt } from "../smart-on-fhir";
+import { fetchWithoutSSL } from "../../utils/utils";
+import dbService from "../db/service";
+import { AuthData, updateFhirServer } from "./service";
+import {
+  getOrCreateMtlsCert,
+  getOrCreateMtlsKey,
+} from "../../utils/mtls-utils";
+import { Agent } from "undici";
+
+/**
+ * Custom fetch function that supports mutual TLS
+ * @param cert - The certificate content
+ * @param key - The key content
+ * @param disableCertValidation - Whether to disable SSL certificate validation
+ * @returns A function that fetches a URL with mutual TLS
+ */
+function fetchWithMutualTLS(
+  cert: string,
+  key: string,
+  disableCertValidation: boolean = false,
+) {
+  return async (url: string, options?: RequestInit): Promise<Response> => {
+    return fetch(url, {
+      ...options,
+      // @ts-ignore
+      dispatcher: new Agent({
+        connect: {
+          cert: cert,
+          key: key,
+          rejectUnauthorized: !disableCertValidation,
+        },
+      }),
+    });
+  };
+}
+
 /**
  * A client for querying a FHIR server.
  * @param server The FHIR server to query.
@@ -20,7 +53,24 @@ class FHIRClient {
     this.hostname = config.hostname;
 
     // Set up the appropriate fetch function
-    this.fetch = config.disableCertValidation ? fetchWithoutSSL : fetch;
+    if (config.mutualTls) {
+      try {
+        const cert = getOrCreateMtlsCert();
+        const key = getOrCreateMtlsKey();
+        this.fetch = fetchWithMutualTLS(
+          cert,
+          key,
+          config.disableCertValidation,
+        );
+      } catch (error) {
+        console.error("Failed to set up mutual TLS:", error);
+        throw new Error(
+          "Mutual TLS is enabled but certificates are not available",
+        );
+      }
+    } else {
+      this.fetch = config.disableCertValidation ? fetchWithoutSSL : fetch;
+    }
 
     // Set request initialization parameters
     this.init = {
@@ -37,12 +87,14 @@ class FHIRClient {
    * Creates a temporary client for testing a connection
    * @param url The FHIR server URL
    * @param disableCertValidation Whether to disable SSL validation
+   * @param mutualTls Whether to use mutual TLS
    * @param authData Authentication data
    * @returns A configured FHIRClient instance
    */
   private static createTestClient(
     url: string,
     disableCertValidation: boolean = false,
+    mutualTls: boolean = false,
     authData?: AuthData,
   ): FHIRClient {
     // Create a minimal server config for testing
@@ -51,6 +103,7 @@ class FHIRClient {
       name: "test",
       hostname: url,
       disableCertValidation: disableCertValidation,
+      mutualTls: mutualTls,
       defaultServer: false,
       headers: authData?.headers || {},
     };
@@ -85,18 +138,21 @@ class FHIRClient {
    * Tests a connection to a FHIR server
    * @param url The FHIR server URL
    * @param disableCertValidation Whether to disable SSL validation
+   * @param mutualTls Whether to use mutual TLS
    * @param authData Authentication data
    * @returns Result of the connection test
    */
   static async testConnection(
     url: string,
     disableCertValidation: boolean = false,
+    mutualTls: boolean = false,
     authData?: AuthData,
-  ): Promise<{ success: boolean; error?: string }> {
+  ): Promise<{ success: boolean; message?: string; error?: string }> {
     try {
       const client = FHIRClient.createTestClient(
         url,
         disableCertValidation,
+        mutualTls,
         authData,
       );
 
@@ -116,22 +172,42 @@ class FHIRClient {
         }
       }
 
-      // Test base query
-      const response = await client.get(
-        "/Patient?name=AuthenticatedServerConnectionTest&_summary=count&_count=1",
-      );
+      // Try to fetch the server's metadata
+      let response;
+      if (mutualTls) {
+        response = await client.get("/Task/foo");
+        if (response.status == 404) {
+          // If mutual TLS is enabled, we can only check if the server is reachable
+          return {
+            success: true,
+            message: "Server is reachable with mutual TLS",
+          };
+        }
+      } else {
+        // Test base query
+        const response = await client.get(
+          "/Patient?name=AuthenticatedServerConnectionTest&_summary=count&_count=1",
+        );
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error(`Error testing connection: ${errorText}`);
-        return {
-          success: false,
-          error: `Server returned ${response.status}: ${errorText}`,
-        };
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error(`Error testing connection: ${errorText}`);
+          return {
+            success: false,
+            error: `Server returned ${response.status}: ${errorText}`,
+          };
+        }
+
+        // If we reach here, the connection test succeeded
+        return { success: true };
       }
 
-      // If we reach here, the connection test succeeded
-      return { success: true };
+      const errorText = await response.text();
+      console.error(`Error testing connection: ${errorText}`);
+      return {
+        success: false,
+        error: `Server returned ${response.status}: ${errorText}`,
+      };
     } catch (error) {
       console.error("Error testing FHIR connection:", error);
       return {
@@ -238,12 +314,24 @@ class FHIRClient {
         body: formData,
       };
 
-      // If SSL validation is disabled, add the agent
-      if (this.serverConfig.disableCertValidation) {
+      // If SSL validation is disabled or mutual TLS is enabled, add the agent
+      if (
+        this.serverConfig.disableCertValidation ||
+        this.serverConfig.mutualTls
+      ) {
+        let agentOptions: https.AgentOptions = {
+          rejectUnauthorized: !this.serverConfig.disableCertValidation,
+        };
+
+        if (this.serverConfig.mutualTls) {
+          const cert = getOrCreateMtlsCert();
+          const key = getOrCreateMtlsKey();
+          agentOptions.cert = cert;
+          agentOptions.key = key;
+        }
+
         (requestInit as RequestInit & { agent?: https.Agent }).agent =
-          new https.Agent({
-            rejectUnauthorized: false,
-          });
+          new https.Agent(agentOptions);
       }
 
       // IMPORTANT: Use the formData object for the actual request
@@ -280,14 +368,17 @@ class FHIRClient {
       // Only update database for non-test clients
       if (this.serverConfig.id !== "test") {
         // Save token to database
-        await updateFhirServer(
-          this.serverConfig.id,
-          this.serverConfig.name,
-          this.serverConfig.hostname,
-          this.serverConfig.disableCertValidation,
-          this.serverConfig.defaultServer,
-          this.serverConfig.lastConnectionSuccessful,
-          {
+        await updateFhirServer({
+          id: this.serverConfig.id,
+          name: this.serverConfig.name,
+          hostname: this.serverConfig.hostname,
+          disableCertValidation:
+            this.serverConfig.disableCertValidation ?? false,
+          mutualTls: this.serverConfig.mutualTls ?? false,
+          defaultServer: this.serverConfig.defaultServer ?? false,
+          lastConnectionSuccessful:
+            this.serverConfig.lastConnectionSuccessful ?? true,
+          authData: {
             authType: this.serverConfig.authType as
               | "SMART"
               | "client_credentials"
@@ -301,8 +392,9 @@ class FHIRClient {
             tokenExpiry: expiryIso, // Pass the token expiry
             headers: this.serverConfig.headers,
           },
-          this.serverConfig.patientMatchConfiguration,
-        );
+          patientMatchConfiguration:
+            this.serverConfig.patientMatchConfiguration,
+        });
       }
     } catch (error) {
       console.error("Error getting access token:", error);
@@ -328,12 +420,24 @@ class FHIRClient {
         headers: {},
       };
 
-      // If SSL validation is disabled, add the agent
-      if (this.serverConfig.disableCertValidation) {
+      // If SSL validation is disabled or mutual TLS is enabled, add the agent
+      if (
+        this.serverConfig.disableCertValidation ||
+        this.serverConfig.mutualTls
+      ) {
+        let agentOptions: https.AgentOptions = {
+          rejectUnauthorized: !this.serverConfig.disableCertValidation,
+        };
+
+        if (this.serverConfig.mutualTls) {
+          const cert = getOrCreateMtlsCert();
+          const key = getOrCreateMtlsKey();
+          agentOptions.cert = cert;
+          agentOptions.key = key;
+        }
+
         (requestInit as RequestInit & { agent?: https.Agent }).agent =
-          new https.Agent({
-            rejectUnauthorized: false,
-          });
+          new https.Agent(agentOptions);
       }
 
       const response = await this.fetch(wellKnownUrl, requestInit);
@@ -344,7 +448,7 @@ class FHIRClient {
         );
       }
 
-      const config = await response.json();
+      const config = (await response.json()) as { token_endpoint?: string };
       if (!config.token_endpoint) {
         throw new Error("Token endpoint not found in SMART configuration");
       }
@@ -367,6 +471,7 @@ class FHIRClient {
   async get(path: string): Promise<Response> {
     await this.ensureValidToken();
     const response = await this.fetch(this.hostname + path, this.init);
+
     return response;
   }
 
@@ -388,9 +493,8 @@ class FHIRClient {
    * @param params - The request parameters.
    * @returns The response from the server.
    */
-  async post(path: string, params: Record<string, string>): Promise<Response> {
+  async post(path: string, params: URLSearchParams): Promise<Response> {
     await this.ensureValidToken();
-    const searchParams = new URLSearchParams(params);
 
     const requestOptions: RequestInit = {
       method: "POST",
@@ -398,9 +502,8 @@ class FHIRClient {
         "Content-Type": "application/x-www-form-urlencoded",
         ...this.init.headers,
       },
-      body: searchParams.toString(),
+      body: params.toString(),
     };
-
     return this.fetch(this.hostname + path, requestOptions);
   }
 
@@ -416,9 +519,11 @@ class FHIRClient {
       method: "POST",
       headers: {
         "Content-Type": "application/fhir+json",
-        ...(this.init.headers as Record<string, string>),
+        PREFER: "return=representation",
+        ...this.init.headers,
       },
       body: JSON.stringify(body),
+      ...(this.init.headers as Record<string, string>),
     };
     return this.fetch(this.hostname + path, requestOptions);
   }
@@ -500,7 +605,16 @@ class FHIRClient {
         return { supportsMatch: false, fhirVersion: null };
       }
 
-      const json = await response.json();
+      const json = (await response.json()) as {
+        rest?: Array<{
+          resource?: Array<{
+            type: string;
+            operation?: Array<{ name?: string }>;
+          }>;
+          operation?: Array<{ name?: string }>;
+        }>;
+        fhirVersion?: string;
+      };
       const fhirVersion =
         typeof json?.fhirVersion === "string" ? json.fhirVersion : null;
 

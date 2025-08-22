@@ -10,7 +10,7 @@ import { Button, Icon } from "@trussworks/react-uswds";
 import Table from "@/app/ui/designSystem/table/Table";
 import { ModalRef } from "@/app/ui/designSystem/modal/Modal";
 import styles from "./querySelection.module.scss";
-import { BuildStep } from "@/app/shared/constants";
+import { BuildStep } from "@/app/constants";
 import {
   renderModal,
   handleDelete,
@@ -18,15 +18,15 @@ import {
   confirmDelete,
   handleCopy,
 } from "./utils";
-import { DataContext, DataContextValue } from "@/app/shared/DataProvider";
+import { DataContext, DataContextValue } from "@/app/utils/DataProvider";
 import classNames from "classnames";
-import { getConditionsData } from "@/app/shared/database-service";
+import { getConditionsData } from "@/app/backend/seeding/service";
 import { ConditionsMap, EMPTY_QUERY_SELECTION } from "../utils";
 import { CustomUserQuery } from "@/app/models/entities/query";
 import {
   CUSTOM_CONDITION_NAME,
   CUSTOM_VALUESET_ARRAY_ID,
-} from "@/app/shared/constants";
+} from "@/app/constants";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import LoadingRow from "@/app/ui/components/loading/loadingRow";
 
@@ -149,7 +149,7 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
               {conditionIdToDetailsMap &&
                 queries
                   .sort((a, b) => (a.queryName[0] > b.queryName[0] ? 1 : -1))
-                  .map((query, i) => {
+                  .map((query, _i) => {
                     const hasCustomOnly =
                       query.conditionsList?.includes(
                         CUSTOM_VALUESET_ARRAY_ID,

@@ -10,6 +10,7 @@ import {
   superAdminAccessCheck,
   adminAccessCheck,
 } from "@/app/utils/auth";
+import { getConditionsData } from "../backend/seeding/service";
 
 jest.mock("@/auth", () => ({
   auth: jest.fn(),
@@ -18,6 +19,14 @@ jest.mock("@/auth", () => ({
 jest.mock("@/app/backend/user-management", () => ({
   getUserRole: jest.fn(),
 }));
+
+jest.mock("@/app/backend/seeding/service", () => ({
+  getConditionsData: jest.fn(),
+}));
+
+(getConditionsData as jest.Mock).mockResolvedValue({
+  conditionIdToNameMap: {},
+});
 
 const TEST_USER: User = {
   id: "test-user-id",

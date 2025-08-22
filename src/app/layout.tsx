@@ -2,7 +2,7 @@ import "./ui/styles/styles.scss";
 import "react-toastify/dist/ReactToastify.css";
 import Header from "./ui/components/header/header";
 import Footer from "./ui/components/footer/footer";
-import DataProvider from "./shared/DataProvider";
+import DataProvider from "./utils/DataProvider";
 import { Metadata } from "next";
 import Page from "./ui/components/page/page";
 import { auth } from "@/auth";
@@ -11,6 +11,21 @@ import SessionTimeout, {
   PROMPT_TIMEOUT_MSEC,
 } from "./ui/components/sessionTimeout/sessionTimeout";
 import { returnPredefinedSessionObject } from "./utils/auth";
+import { headers } from "next/headers";
+
+// Intercept mocked requests in e2e tests
+if (
+  process.env.IS_E2E ||
+  (process.env.NEXT_RUNTIME === "nodejs" &&
+    process.env.NODE_ENV !== "production")
+) {
+  const { setupFetchInterceptor } = await import(
+    "request-mocking-protocol/fetch"
+  );
+
+  console.log("Setting up fetch interceptor");
+  setupFetchInterceptor(() => headers());
+}
 
 /**
  * Establishes the layout for the application.

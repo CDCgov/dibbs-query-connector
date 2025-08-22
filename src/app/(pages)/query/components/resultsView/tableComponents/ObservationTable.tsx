@@ -4,7 +4,7 @@ import { Observation } from "fhir/r4";
 import {
   formatCodeableConcept,
   formatDate,
-} from "../../../../../shared/format-service";
+} from "../../../../../utils/format-service";
 import { checkIfSomeElementWithPropertyExists } from "./utils";
 
 /**

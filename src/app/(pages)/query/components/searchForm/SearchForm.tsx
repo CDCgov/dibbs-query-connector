@@ -14,14 +14,14 @@ import {
   hyperUnluckyPatient,
   AddressData,
   INSUFFICIENT_PATIENT_IDENTIFIERS,
-} from "@/app/shared/constants";
+} from "@/app/constants";
 import {
   patientDiscoveryQuery,
   PatientDiscoveryResponse,
-} from "@/app/backend/query-execution";
-import { getFhirServerConfigs } from "@/app/backend/fhir-servers";
+} from "@/app/backend/query-execution/service";
+import { getFhirServerConfigs } from "@/app/backend/fhir-servers/service";
 import styles from "../searchForm/searchForm.module.scss";
-import { FormatPhoneAsDigits } from "@/app/shared/format-service";
+import { FormatPhoneAsDigits } from "@/app/utils/format-service";
 import TitleBox from "../stepIndicator/TitleBox";
 import {
   PatientDiscoveryRequest,
@@ -133,7 +133,7 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
     setEmail(hyperUnluckyPatient.Email);
   }, [fhirServers]);
 
-  const nameRegex = "^[A-Za-z\u00C0-\u024F\u1E00-\u1EFF\\-'. ]+$";
+  const nameRegex = "^[A-Za-z0-9\u00C0-\u024F\u1E00-\u1EFF\\-'. ]+$";
   const nameRuleHint =
     "Enter a name using only letters, hyphens, apostrophes, spaces, or periods.";
 
@@ -209,6 +209,8 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
 
     const patientDiscoveryRequest = getPatientDiscoveryRequest();
     try {
+      setMode("patient-results");
+
       const queryResponse = await patientDiscoveryQuery(
         patientDiscoveryRequest,
       );
@@ -224,7 +226,6 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
       if (isUncertainMatch) {
         setPatientDiscoveryQueryResponse([]);
         setUncertainMatchError(true);
-        setMode("patient-results");
         setLoading(false);
         return;
       }

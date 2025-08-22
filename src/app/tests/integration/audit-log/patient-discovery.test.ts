@@ -1,9 +1,9 @@
 import { auth } from "@/auth";
-import { hyperUnluckyPatient, USE_CASE_DETAILS } from "@/app/shared/constants";
+import { hyperUnluckyPatient, USE_CASE_DETAILS } from "@/app/constants";
 import {
   patientDiscoveryQuery,
   patientRecordsQuery,
-} from "@/app/backend/query-execution";
+} from "@/app/backend/query-execution/service";
 import { suppressConsoleLogs } from "../fixtures";
 import { DEFAULT_CHLAMYDIA_QUERY } from "../../unit/fixtures";
 import {
@@ -20,12 +20,45 @@ import {
   waitForAuditSuccess,
 } from "./utils";
 
-jest.mock("@/app/utils/auth", () => {
+// Mock the FHIRClient to prevent real authentication requests
+jest.mock("@/app/backend/fhir-servers/fhir-client", () => {
   return {
-    superAdminAccessCheck: jest.fn(() => Promise.resolve(true)),
-    adminAccessCheck: jest.fn(() => Promise.resolve(true)),
+    __esModule: true,
+    default: jest.fn().mockImplementation(() => ({
+      get: jest.fn().mockResolvedValue({
+        resourceType: "Bundle",
+        entry: [
+          {
+            resource: {
+              resourceType: "Patient",
+              id: "test-patient-123",
+              name: [{ given: ["Test"], family: "Patient" }],
+              identifier: [{ value: "MRN-12345" }],
+            },
+          },
+        ],
+      }),
+      post: jest.fn().mockResolvedValue({
+        status: 200,
+        url: "http://mock-server.com/fhir",
+        text: jest.fn().mockResolvedValue(""),
+        json: jest.fn().mockResolvedValue({
+          resourceType: "Bundle",
+          entry: [],
+        }),
+      }),
+      getAccessToken: jest.fn().mockResolvedValue("mock-token"),
+      ensureValidToken: jest.fn().mockResolvedValue(undefined),
+    })),
   };
 });
+
+// Mock auth functions
+jest.mock("@/app/utils/auth", () => ({
+  ...jest.requireActual("@/app/utils/auth"),
+  superAdminAccessCheck: jest.fn().mockResolvedValue(true),
+  adminAccessCheck: jest.fn().mockResolvedValue(true),
+}));
 
 jest.mock("@/app/backend/audit-logs/lib", () => {
   return {
@@ -86,7 +119,7 @@ describe("patient queries", () => {
 
     expect(JSON.parse(auditEntry?.fhirServer)).toBe(request.fhirServer);
     expect(JSON.parse(auditEntry?.patientId)).toBe(request.patientId);
-    expect(JSON.parse(auditEntry?.queryData)).toStrictEqual(
+    expect(JSON.parse(auditEntry?.savedQuery).queryData).toStrictEqual(
       DEFAULT_CHLAMYDIA_QUERY.queryData,
     );
   });

@@ -1,7 +1,7 @@
 import { DibbsValueSet } from "@/app/models/entities/valuesets";
 import { ConceptTypeToDibbsVsMap } from "../../utils/valueSetTranslation";
 import { DibbsConceptType } from "@/app/models/entities/valuesets";
-import { CUSTOM_CONDITION_ID } from "@/app/shared/constants";
+import { CUSTOM_CONDITION_ID } from "@/app/constants";
 
 // The structure of the data that's coming from the backend
 export type ConditionsMap = {
@@ -49,15 +49,13 @@ export type QueryUpdateResult = {
 export type QueryDataColumn = {
   [conditionId: string]: { [valueSetId: string]: DibbsValueSet };
 };
-export type QueryTableTimebox = Partial<
-  Record<
-    DibbsConceptType,
-    {
-      timeWindowStart: string;
-      timeWindowEnd: string;
-    }
-  >
->;
+
+export type TimeWindow = {
+  timeWindowStart: string;
+  timeWindowEnd: string;
+};
+
+export type QueryTableTimebox = Partial<Record<DibbsConceptType, TimeWindow>>;
 
 export type QueryTableResult = {
   queryName: string;

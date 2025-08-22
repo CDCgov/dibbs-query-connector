@@ -12,7 +12,7 @@ import {
   insertFhirServer,
   updateFhirServer,
   deleteFhirServer,
-} from "@/app/backend/fhir-servers";
+} from "@/app/backend/fhir-servers/service";
 
 jest.mock("@/app/backend/audit-logs/lib", () => {
   return {
@@ -37,6 +37,7 @@ describe("fhir server", () => {
       headers: null,
       lastConnectionSuccessful: true,
       disableCertValidation: false,
+      mutualTls: false,
       defaultServer: false,
     };
     const oldAuditIds = (await dbService.query(GET_ALL_AUDIT_ROWS)).rows.map(
@@ -48,6 +49,7 @@ describe("fhir server", () => {
       TEST_FHIR_SERVER.name,
       TEST_FHIR_SERVER.hostname,
       TEST_FHIR_SERVER.disableCertValidation,
+      TEST_FHIR_SERVER.mutualTls,
       TEST_FHIR_SERVER.defaultServer,
       TEST_FHIR_SERVER.lastConnectionSuccessful,
     );
@@ -64,13 +66,18 @@ describe("fhir server", () => {
 
     // update
     const updateName = "Dire Dire Docks";
-    await updateFhirServer(
-      result.server.id,
-      updateName,
-      TEST_FHIR_SERVER.hostname,
-      TEST_FHIR_SERVER.disableCertValidation,
-      false,
-    );
+    await updateFhirServer({
+      id: result.server.id,
+      name: updateName,
+      hostname: TEST_FHIR_SERVER.hostname,
+      defaultServer: false,
+      disableCertValidation: TEST_FHIR_SERVER.disableCertValidation,
+      mutualTls: TEST_FHIR_SERVER.mutualTls,
+      lastConnectionSuccessful: false,
+      authData: {
+        authType: "none",
+      },
+    });
     const updateTypeToCheck = "updateFhirServer";
     await waitForAuditSuccess(updateTypeToCheck, auditCompletionSpy);
     const updateAuditEntry = await getAuditEntry(
@@ -78,7 +85,7 @@ describe("fhir server", () => {
       oldAuditIds,
     );
 
-    expect(JSON.parse(updateAuditEntry.name)).toBe(updateName);
+    expect(JSON.parse(updateAuditEntry.updateDetails).name).toBe(updateName);
 
     // delete
     await deleteFhirServer(result.server.id);

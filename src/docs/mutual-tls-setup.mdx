@@ -1,0 +1,169 @@
+# Mutual TLS Testing Setup Guide
+
+## Overview
+
+This guide explains how to set up and test the Mutual TLS (mTLS) functionality in the DIBBs Query Connector.
+
+## Prerequisites
+
+### 1. Obtain mTLS Certificates
+
+You'll need a certificate and private key pair for mTLS authentication. These can be:
+
+- **For Development/Testing**: VAL environment certificates signed by the EMR Direct Certificate Authority
+- **For Production**: PROD environment certificates signed by the EMR Direct Certificate Authority
+
+#### Getting Certificates
+
+Follow the instructions from [EMR Direct](https://www.emrdirect.com/kb/sequoia-initiatives/VAL-EMR-Direct-Cert-Workflow-Documentation) to obtain your mTLS certificates.
+
+````bash
+### 2. Certificate Placement
+
+The application looks for certificates in two places:
+
+1. **File System** (preferred for development):
+
+   - Place certificates in the `keys/` directory at the project root
+   - Files should be named:
+     - `mtls-cert.pem` - Certificate file
+     - `mtls-key.pem` - Private key file
+
+2. **Environment Variables** (preferred for production):
+
+   - For ease of configuration, the env vars are required to be base-64 encoded.
+   - Configure your env vars with the encoding method of your choice according to the below:
+   ```bash
+   export MTLS_CERT="base64Encode(-----BEGIN CERTIFICATE-----
+   [certificate content]
+   -----END CERTIFICATE-----)"
+
+   export MTLS_KEY="base64Encode(-----BEGIN PRIVATE KEY-----
+   [private key content]
+   -----END PRIVATE KEY-----)"
+````
+
+## Running Tests
+
+### Unit Tests
+
+```bash
+# Run all mTLS-related unit tests
+npm run test:unit -- mtls
+
+# Run specific test files
+npm run test:unit -- src/app/shared/mtls-utils.test.ts
+npm run test:unit -- src/app/backend/fhir-servers.test.ts
+npm run test:unit -- src/app/shared/fhirClient.test.ts
+```
+
+### Integration Tests
+
+```bash
+# Run integration tests including mTLS functionality
+npm run test:integration
+```
+
+### End-to-End Tests
+
+```bash
+# Run E2E tests with mTLS servers
+npm run test:playwright -- mtls.spec.ts
+```
+
+## Manual Testing with eHealthExchange
+
+### 1. Configure an mTLS-enabled FHIR Server
+
+1. Navigate to `/fhirServers` in the application
+2. Click "New server"
+3. Fill in server details:
+   - **Server name**: "eHX VAL (mTLS)"
+   - **URL**: https://fhir002val.ehealthexchange.org/ehx/1.0/r4/cdex
+   - **Auth Method**: None
+   - **Enable Mutual TLS**: Check this box
+   - **Custom Headers**: Add any required headers
+4. Click "Test connection" to verify
+5. Click "Add server" to save
+
+### 2. Test Patient Discovery
+
+1. Navigate to the main query page
+2. Fill in patient demographics
+   - **First Name**: Rick943
+   - **Last Name**: Prohaska837
+   - **DOB**: 01-05-1963
+   - **Phone Number**: 555-306-8493
+   - **State**: MA
+3. Click "Advanced" and select your mTLS server
+4. Click "Search for patient"
+5. The application will:
+   - Create a Task resource via POST to `/Task`
+   - Poll for child task completion
+   - Retrieve patient results from completed tasks
+
+## Troubleshooting
+
+### Certificate Not Found Error
+
+If you see "Mutual TLS certificate not found" error:
+
+1. Check that certificates exist in `keys/` directory:
+
+   ```bash
+   ls -la keys/mtls-*
+   ```
+
+2. Verify environment variables are set:
+
+   ```bash
+   echo $MTLS_CERT | head -n 1
+   echo $MTLS_KEY | head -n 1
+   ```
+
+3. Ensure certificates have correct permissions:
+   ```bash
+   chmod 600 keys/mtls-key.pem
+   chmod 644 keys/mtls-cert.pem
+   ```
+
+### Connection Refused
+
+If the mTLS connection is refused:
+
+1. Verify the server actually requires mTLS
+2. Check that your certificate is trusted by the server
+3. Ensure the certificate CN or SAN matches what the server expects
+4. Try disabling certificate validation for testing (not recommended for production)
+
+### Task Polling Timeout
+
+If tasks don't complete:
+
+1. Check the server's Task implementation
+2. Verify the server supports the Task profile being used
+3. Look for error messages in child tasks
+4. Check server logs for processing errors
+
+## Security Considerations
+
+1. **Never commit certificates to version control**
+
+   - The keys dir has been added to `.gitignore` - keep it there!
+   - Use environment variables in production
+
+2. **Certificate Rotation**
+
+   - Plan for certificate expiration
+   - Implement a process for updating certificates
+   - Test certificate updates in a staging environment
+
+## Additional Resources
+
+- [TEFCA Technical Framework](https://www.healthit.gov/topic/interoperability/policy/trusted-exchange-framework-and-common-agreement-tefca)
+- [FHIR Task Resource](https://www.hl7.org/fhir/task.html)
+- [OpenSSL Certificate Management](https://www.openssl.org/docs/man1.1.1/man1/openssl-x509.html)
+
+```
+
+```

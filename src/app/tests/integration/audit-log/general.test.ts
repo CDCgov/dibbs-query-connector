@@ -2,12 +2,14 @@ import {
   AUDIT_LOG_MAX_RETRIES,
   auditable,
 } from "@/app/backend/audit-logs/decorator";
-import { patientDiscoveryQuery } from "@/app/backend/query-execution";
+import { patientDiscoveryQuery } from "@/app/backend/query-execution/service";
 import { PatientDiscoveryRequest } from "@/app/models/entities/query";
-import { hyperUnluckyPatient } from "@/app/shared/constants";
+import { hyperUnluckyPatient } from "@/app/constants";
 import * as DecoratorUtils from "@/app/backend/audit-logs/lib";
 import { internal_getDbClient } from "@/app/backend/db/config";
 import { suppressConsoleLogs } from "../fixtures";
+import { auth } from "@/auth";
+import { TEST_USER } from "./utils";
 
 jest.mock("@/app/backend/audit-logs/lib", () => {
   return {
@@ -15,6 +17,56 @@ jest.mock("@/app/backend/audit-logs/lib", () => {
     ...jest.requireActual("@/app/backend/audit-logs/lib"),
   };
 });
+
+// Mock auth functions
+jest.mock("@/app/utils/auth", () => ({
+  ...jest.requireActual("@/app/utils/auth"),
+  superAdminAccessCheck: jest.fn().mockResolvedValue(true),
+}));
+const mockBody = {
+  resourceType: "Bundle",
+  entry: [
+    {
+      resource: {
+        resourceType: "Patient",
+        id: "test-patient-123",
+        name: [{ given: ["Test"], family: "Patient" }],
+        identifier: [{ value: "MRN-12345" }],
+      },
+    },
+  ],
+};
+const mockResponse = {
+  status: 200,
+  statusText: "OK",
+  headers: new Headers({ "content-type": "application/json" }),
+  clone: () => mockResponse,
+  json: async () => mockBody,
+  ...mockBody,
+};
+
+// Mock the FHIRClient to prevent real authentication requests
+jest.mock("@/app/backend/fhir-servers/fhir-client", () => {
+  return {
+    __esModule: true,
+    default: jest.fn().mockImplementation(() => ({
+      get: jest.fn().mockResolvedValue(mockResponse),
+      post: jest.fn().mockResolvedValue({
+        status: 200,
+        url: "http://mock-server.com/fhir",
+        text: jest.fn().mockResolvedValue(""),
+        json: jest.fn().mockResolvedValue({
+          resourceType: "Bundle",
+          entry: [],
+        }),
+      }),
+      getAccessToken: jest.fn().mockResolvedValue("mock-token"),
+      ensureValidToken: jest.fn().mockResolvedValue(undefined),
+    })),
+  };
+});
+
+(auth as jest.Mock).mockResolvedValue(TEST_USER);
 
 const dbClient = internal_getDbClient();
 describe("checks for generic audit logs", () => {

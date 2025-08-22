@@ -1,12 +1,12 @@
 import {
-  QueryResponse,
   processFhirResponse,
   parseFhirSearch,
-} from "@/app/backend/query-execution";
-import { isFhirResource } from "@/app/shared/constants";
+} from "@/app/backend/query-execution/service";
+import { isFhirResource } from "@/app/constants";
 import { readJsonFile } from "../shared_utils/readJsonFile";
 import { DiagnosticReport, Observation } from "fhir/r4";
-import fetch from "node-fetch";
+import { QueryResponse } from "@/app/models/entities/query";
+import { suppressConsoleLogs } from "../integration/fixtures";
 
 jest.mock("@/app/utils/auth", () => ({
   superAdminAccessCheck: jest.fn().mockReturnValue(true),
@@ -14,6 +14,9 @@ jest.mock("@/app/utils/auth", () => ({
 
 // Test case for processResponse
 describe("process response", () => {
+  beforeAll(() => {
+    suppressConsoleLogs();
+  });
   it("should unpack a response from the server into an array of resources", async () => {
     const patientBundle = readJsonFile(
       "./src/app/tests/assets/BundlePatient.json",
@@ -37,7 +40,7 @@ describe("process response", () => {
     const response = {
       status: 200,
       json: async () => patientBundle,
-    } as unknown as fetch.Response;
+    } as unknown as Response;
     const resourceArray = await processFhirResponse(response);
 
     // Using isFhirResource
@@ -58,6 +61,9 @@ describe("process response", () => {
 
 // Test case for parseFhirSearch
 describe("parse fhir search", () => {
+  beforeAll(() => {
+    suppressConsoleLogs();
+  });
   it("should turn the FHIR server's response into a QueryResponse struct", async () => {
     const patientBundle = readJsonFile(
       "./src/app/tests/assets/BundlePatient.json",
@@ -81,7 +87,7 @@ describe("parse fhir search", () => {
     const response = {
       status: 200,
       json: async () => patientBundle,
-    } as unknown as fetch.Response;
+    } as unknown as Response;
     const queryResponse: QueryResponse = await parseFhirSearch(response);
 
     // Using isFhirResource

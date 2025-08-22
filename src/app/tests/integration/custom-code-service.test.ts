@@ -2,14 +2,11 @@ import {
   insertCustomValueSet,
   insertCustomValuesetsIntoQuery,
   getCustomCodeCondition,
-} from "@/app/shared/custom-code-service";
+} from "@/app/backend/custom-code-service";
 import { internal_getDbClient } from "@/app/backend/db/config";
 import { DibbsValueSet } from "@/app/models/entities/valuesets";
 import { randomUUID } from "crypto";
-import {
-  CUSTOM_CONDITION_ID,
-  CUSTOM_VALUESET_ARRAY_ID,
-} from "@/app/shared/constants";
+import { CUSTOM_CONDITION_ID, CUSTOM_VALUESET_ARRAY_ID } from "@/app/constants";
 
 const dbClient = internal_getDbClient();
 

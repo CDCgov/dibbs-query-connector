@@ -1,4 +1,4 @@
-import { CUSTOM_VALUESET_ARRAY_ID } from "@/app/shared/constants";
+import { CUSTOM_VALUESET_ARRAY_ID } from "@/app/constants";
 import { Icon } from "@trussworks/react-uswds";
 import classNames from "classnames";
 import styles from "../../buildFromTemplates/conditionTemplateSelection.module.scss";
@@ -276,7 +276,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
         }}
         onSearch={handleConditionSearch}
       />
-      ;
     </>
   );
 };
