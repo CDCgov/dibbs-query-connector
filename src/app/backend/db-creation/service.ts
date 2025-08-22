@@ -20,6 +20,7 @@ import {
   dbInsertStruct,
 } from "../seeding/seedSqlStructs";
 import { translateVSACToInternalValueSet } from "./lib";
+import { DibbsValueSet } from "@/app/models/entities/valuesets";
 
 const ERSD_TYPED_RESOURCE_URL = "http://ersd.aimsplatform.org/fhir/ValueSet/";
 
@@ -30,7 +31,7 @@ type ersdCondition = {
   valueset_id: string;
 };
 
-type OidData = {
+export type OidData = {
   oids: Array<string>;
   oidToErsdType: Map<string, string>;
   conditions: Array<ersdCondition>;
@@ -56,7 +57,7 @@ const sleep = (ms: number) => {
  * @returns An OidData object containing the OIDs extracted as well as the
  * clinical service type associated with each.
  */
-async function getOidsFromErsd() {
+export async function getOidsFromErsd() {
   try {
     console.log("Fetching and parsing eRSD.");
     const ersd = await getERSD();
@@ -144,7 +145,10 @@ async function getOidsFromErsd() {
  * each such ID.
  * @param batchSize The number of asynchronous calls to fire at once. Default is 100.
  */
-async function fetchBatchValueSetsFromVsac(oidData: OidData, batchSize = 100) {
+export async function fetchBatchValueSetsFromVsac(
+  oidData: OidData,
+  batchSize = 100,
+) {
   let startIdx = 0;
   let lastIdx = startIdx + batchSize;
 
@@ -164,37 +168,34 @@ async function fetchBatchValueSetsFromVsac(oidData: OidData, batchSize = 100) {
       Math.min(lastIdx, oidData.oids.length),
     );
 
-    let valueSetPromises = await Promise.all(
-      oidsToFetch.map(async (oid) => {
-        // First, we'll pull the value set from VSAC and map it to our representation
-        try {
-          const vs = await getVSACValueSet(oid);
-          const eRSDType: ErsdConceptType = oidData.oidToErsdType.get(
-            oid,
-          ) as ErsdConceptType;
-          const internalValueSet = translateVSACToInternalValueSet(
-            vs as unknown as ValueSet,
-            eRSDType,
-          );
-          oidsToVersion.set(oid, internalValueSet.valueSetVersion);
+    let valueSetPromises = (await generateBatchVsacPromises(oidsToFetch)).map(
+      (vs, i) => {
+        if (!vs) return undefined;
+        const oid = oidsToFetch[i];
+        const eRSDType: ErsdConceptType = oidData.oidToErsdType.get(
+          oid,
+        ) as ErsdConceptType;
+        const internalValueSet = translateVSACToInternalValueSet(
+          vs as unknown as ValueSet,
+          eRSDType,
+        );
+        oidsToVersion.set(oid, internalValueSet.valueSetVersion);
 
-          // Found a retired OID, store it so we don't insert condition mappings on it
-          if (internalValueSet.concepts === undefined) {
-            retiredOids.add(internalValueSet.valueSetExternalId || "");
-          }
-          return internalValueSet;
-        } catch (error) {
-          console.error(error);
+        // Found a retired OID, store it so we don't insert condition mappings on it
+        if (internalValueSet.concepts === undefined) {
+          retiredOids.add(internalValueSet.valueSetExternalId || "");
         }
-      }),
+        return internalValueSet;
+      },
     );
 
     // Next, in case we hit a value set that has a `retired` status and
     // a deprecated concept listing, we'll need to filter for only those
     // with defined Concepts
     valueSetPromises = valueSetPromises.filter(
-      (vsp) => vsp?.concepts !== undefined,
+      (vsp): vsp is DibbsValueSet => vsp?.concepts !== undefined,
     );
+    console.log(valueSetPromises);
 
     // Then, we'll insert it into our database instance
     await Promise.all(
@@ -205,7 +206,7 @@ async function fetchBatchValueSetsFromVsac(oidData: OidData, batchSize = 100) {
       }),
     );
 
-    // // Finally, we verify that the insert was performed correctly
+    // Finally, we verify that the insert was performed correctly
     valueSetPromises.map(async (vs) => {
       if (vs) {
         let missingData = await checkValueSetInsertion(vs);
@@ -240,64 +241,80 @@ async function fetchBatchValueSetsFromVsac(oidData: OidData, batchSize = 100) {
   // Once all the value sets are inserted, we need to do conditions
   // Step one is filtering out duplicates, since we just assembled
   // condition mappings directly from value sets
-  console.log("Inserting eRSD condition data");
-  const conditionSet = new Set<string>();
-  oidData.conditions.forEach((c) => {
-    const repString = c.code + "*" + c.system + "*" + c.text;
-    conditionSet.add(repString);
-  });
+  // console.log("Inserting eRSD condition data");
+  // const conditionSet = new Set<string>();
+  // oidData.conditions.forEach((c) => {
+  //   const repString = c.code + "*" + c.system + "*" + c.text;
+  //   conditionSet.add(repString);
+  // });
 
-  // Create DB based condition structures
-  let conditionPromises = await Promise.all(
-    Array.from(conditionSet).map(async (cString) => {
+  // // Create DB based condition structures
+  // let conditionPromises = await Promise.all(
+  //   Array.from(conditionSet).map(async (cString) => {
+  //     try {
+  //       const c = cString.split("*");
+  //       const vsacCondition: Parameters = (await getVSACValueSet(
+  //         c[0],
+  //         "condition",
+  //         c[1],
+  //       )) as Parameters;
+  //       const versionHolder = (vsacCondition.parameter || []).find(
+  //         (p) => p.name === "version",
+  //       );
+  //       const versionArray = (versionHolder?.valueString || "").split("/");
+  //       const version = versionArray[versionArray.length - 1];
+  //       const finalCondition: ConditionStruct = {
+  //         id: c[0],
+  //         system: c[1],
+  //         name: c[2],
+  //         version: version,
+  //         category: "",
+  //       };
+  //       return finalCondition;
+  //     } catch (error) {
+  //       console.error(error);
+  //     }
+  //   }),
+  // );
+
+  // // Now insert them
+  // await insertDBStructArray(
+  //   conditionPromises as ConditionStruct[],
+  //   "conditions",
+  // );
+
+  // // Finally, take care of mapping inserted value sets to inserted conditions
+  // // For this part, we do want the full list of conditions we obtained
+  // // from the value sets
+  // console.log("Inserting condition-to-valueset mappings");
+  // let ctvStructs = oidData.conditions.map((c) => {
+  //   const ctvID = retiredOids.has(c.valueset_id) ? "NONE" : randomUUID();
+  //   const dbCTV: ConditionToValueSetStruct = {
+  //     id: ctvID,
+  //     condition_id: c.code,
+  //     valueset_id: c.valueset_id + "_" + oidsToVersion.get(c.valueset_id),
+  //     source: c.system,
+  //   };
+  //   return dbCTV;
+  // });
+  // ctvStructs = ctvStructs.filter((ctvs) => ctvs.id !== "NONE");
+  // await insertDBStructArray(ctvStructs, "condition_to_valueset");
+}
+
+async function generateBatchVsacPromises(oidsToFetch: string[]) {
+  let valueSetPromises = Promise.all(
+    oidsToFetch.map(async (oid) => {
+      // First, we'll pull the value set from VSAC and map it to our representation
       try {
-        const c = cString.split("*");
-        const vsacCondition: Parameters = (await getVSACValueSet(
-          c[0],
-          "condition",
-          c[1],
-        )) as Parameters;
-        const versionHolder = (vsacCondition.parameter || []).find(
-          (p) => p.name === "version",
-        );
-        const versionArray = (versionHolder?.valueString || "").split("/");
-        const version = versionArray[versionArray.length - 1];
-        const finalCondition: ConditionStruct = {
-          id: c[0],
-          system: c[1],
-          name: c[2],
-          version: version,
-          category: "",
-        };
-        return finalCondition;
+        const vs = await getVSACValueSet(oid);
+        return vs;
       } catch (error) {
         console.error(error);
       }
     }),
   );
 
-  // Now insert them
-  await insertDBStructArray(
-    conditionPromises as ConditionStruct[],
-    "conditions",
-  );
-
-  // Finally, take care of mapping inserted value sets to inserted conditions
-  // For this part, we do want the full list of conditions we obtained
-  // from the value sets
-  console.log("Inserting condition-to-valueset mappings");
-  let ctvStructs = oidData.conditions.map((c) => {
-    const ctvID = retiredOids.has(c.valueset_id) ? "NONE" : randomUUID();
-    const dbCTV: ConditionToValueSetStruct = {
-      id: ctvID,
-      condition_id: c.code,
-      valueset_id: c.valueset_id + "_" + oidsToVersion.get(c.valueset_id),
-      source: c.system,
-    };
-    return dbCTV;
-  });
-  ctvStructs = ctvStructs.filter((ctvs) => ctvs.id !== "NONE");
-  await insertDBStructArray(ctvStructs, "condition_to_valueset");
+  return valueSetPromises;
 }
 
 /**

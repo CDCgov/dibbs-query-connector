@@ -35,7 +35,6 @@ import { Concept } from "../../models/entities/concepts";
 import { adminRequired, transaction } from "@/app/backend/db/decorators";
 import { auditable } from "@/app/backend/audit-logs/decorator";
 import { QCResponse } from "../../models/responses/collections";
-import { writeFile } from "fs";
 
 type ErsdOrVsacResponse = Bundle | Parameters | OperationOutcome;
 
@@ -235,13 +234,6 @@ class SeedingService {
 
     if (response.status === 200) {
       const data = (await response.json()) as Bundle;
-
-      writeFile("ersdFixtures.json", JSON.stringify(data), (err) => {
-        if (err) {
-          console.error(err);
-          return;
-        }
-      });
 
       return data;
     } else {
