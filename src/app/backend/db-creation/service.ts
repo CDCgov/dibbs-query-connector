@@ -1,7 +1,13 @@
 "use server";
 
 import { ersdToDibbsConceptMap, ErsdConceptType } from "@/app/constants";
-import { Bundle, BundleEntry, Parameters, ValueSet } from "fhir/r4";
+import {
+  Bundle,
+  BundleEntry,
+  FhirResource,
+  Parameters,
+  ValueSet,
+} from "fhir/r4";
 import {
   checkDBForData,
   checkValueSetInsertion,
@@ -66,38 +72,9 @@ export async function getOidsFromErsd() {
       (e) => e.resource?.resourceType === "ValueSet",
     );
 
+    const { nonUmbrellaValueSets, oidToErsdType } = indexErsdByOid(valuesets);
     // Build up a mapping of OIDs to eRSD clinical types
-    const oidToErsdType = new Map<string, string>();
-    Object.keys(ersdToDibbsConceptMap).forEach((k) => {
-      const keyedUrl = ERSD_TYPED_RESOURCE_URL + k;
-      const umbrellaValueSet = valuesets?.find((vs) => vs.fullUrl === keyedUrl);
 
-      // These "bulk" valuesets of service types compose references
-      // to all value sets that fall under their purview
-      const composedValueSets: Array<string> =
-        (umbrellaValueSet as BundleEntry<ValueSet>)?.resource?.compose
-          ?.include[0].valueSet || ([] as Array<string>);
-      composedValueSets.reduce((acc: Map<string, string>, vsUrl: string) => {
-        const vsArray = vsUrl.split("/");
-        const oid = vsArray[vsArray.length - 1];
-        acc.set(oid, k);
-        return acc;
-      }, oidToErsdType);
-    });
-
-    // Condition-valueset linkages are stored in the "usage context" structure of
-    // the value codeable concept of each resource's base level
-    // We can filter out public health informatics contexts to get only the meaningful
-    // conditions
-    const nonUmbrellaEntries = valuesets?.filter(
-      (vs) =>
-        !Object.keys(ersdToDibbsConceptMap).includes(vs.resource?.id || ""),
-    ) as BundleEntry<ValueSet>[];
-    const nonUmbrellaValueSets: Array<ValueSet> = (
-      nonUmbrellaEntries || []
-    ).map((vs) => {
-      return vs.resource || ({} as ValueSet);
-    });
     let conditionExtractor: Array<ersdCondition> = [];
     nonUmbrellaValueSets.reduce((acc: Array<ersdCondition>, vs: ValueSet) => {
       const conditionSchemes = vs.useContext?.filter(
@@ -131,6 +108,53 @@ export async function getOidsFromErsd() {
   } catch (error) {
     console.error("Couldn't query eRSD: ", error);
   }
+}
+
+/**
+ * Mapping function that takes eRSD input and indexes values by OID, as well as
+ * parsing out condotion <> valueset linkages from the ingestion input
+ * @param valuesets - raw valuesets from the eRSD.
+ * @returns oidToErsdType: A map of OID <> eRSD concept types
+ * nonUmbrellaEntries: map of valuesets to conditions as dictated by the eRSD
+ */
+export function indexErsdByOid(
+  valuesets: BundleEntry<FhirResource>[] | undefined,
+) {
+  const oidToErsdType = new Map<string, string>();
+  Object.keys(ersdToDibbsConceptMap).forEach((k) => {
+    const keyedUrl = ERSD_TYPED_RESOURCE_URL + k;
+    const umbrellaValueSet = valuesets?.find((vs) => vs.fullUrl === keyedUrl);
+
+    // These "bulk" valuesets of service types compose references
+    // to all value sets that fall under their purview
+    const composedValueSets: Array<string> =
+      (umbrellaValueSet as BundleEntry<ValueSet>)?.resource?.compose?.include[0]
+        .valueSet || ([] as Array<string>);
+    composedValueSets.reduce((acc: Map<string, string>, vsUrl: string) => {
+      const vsArray = vsUrl.split("/");
+      const oid = vsArray[vsArray.length - 1];
+      acc.set(oid, k);
+      return acc;
+    }, oidToErsdType);
+  });
+
+  // Condition-valueset linkages are stored in the "usage context" structure of
+  // the value codeable concept of each resource's base level
+  // We can filter out public health informatics contexts to get only the meaningful
+  // conditions
+  const nonUmbrellaEntries = valuesets?.filter(
+    (vs) => !Object.keys(ersdToDibbsConceptMap).includes(vs.resource?.id || ""),
+  ) as BundleEntry<ValueSet>[];
+  const nonUmbrellaValueSets: Array<ValueSet> = (nonUmbrellaEntries || []).map(
+    (vs) => {
+      return vs.resource || ({} as ValueSet);
+    },
+  );
+
+  return {
+    oidToErsdType: oidToErsdType,
+    nonUmbrellaValueSets: nonUmbrellaValueSets,
+  };
 }
 
 /**
@@ -196,6 +220,8 @@ export async function seedBatchValueSetsFromVsac(
     valueSetPromises = valueSetPromises.filter(
       (vsp): vsp is DibbsValueSet => vsp?.concepts !== undefined,
     );
+
+    console.log("valueset promises to resolve", valueSetPromises.length);
 
     // Then, we'll insert it into our database instance
     await Promise.all(
