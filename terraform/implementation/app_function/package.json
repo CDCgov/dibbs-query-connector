@@ -2,16 +2,19 @@
   "name": "app-func",
   "version": "1.0.0",
   "type": "module",
-  "main": "dist/src/index.js",
+  "main": "index.js",
   "scripts": {
-    "build": "tsc",
-    "start": "npm run build && func start"
+    "compile": "tsc",
+    "copy:functions": "cp -r src/functions/ProcessHL7/function.json dist/src/functions/ProcessHL7/",
+    "copy:root": "cp host.json dist/ && cp package.json dist/ && cp package-lock.json dist/ && cp src/index.js dist/",
+    "build": "npm run compile && npm run copy:functions && npm run copy:root",
+    "start": "func start"
   },
   "dependencies": {
     "@azure/functions": "^4.0.0"
   },
   "devDependencies": {
-    "typescript": "^5.0.0",
-    "@types/node": "^20.0.0"
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
   }
 }

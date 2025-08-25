@@ -8,8 +8,6 @@
     "skipLibCheck": true
   },
   "include": [
-    "**/*.ts",
-    "../dist/**/*.d.ts",
-    "src/**/*.ts"
+    "src/**/*"
   ]
 }

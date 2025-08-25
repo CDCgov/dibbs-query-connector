@@ -5,11 +5,11 @@ locals {
   project           = "qc"
   environment       = "dev"
   storage_account   = "qcacastorageaccount"
-  auth_provider           = "microsoft-entra-id"                                    # TODO
-  auth_client_id          = "query-connector"                                       # TODO: "Client ID"
-  auth_issuer             = "https://login.microsoftonline.com/your-tenant-id/v2.0" # TODO: URL for the Auth issuer for Entra (https://login.microsoftonline.com/<your-tenant-id>/v2.0 or keycloak)
-  auth_url                = "http://localhost:3000"                                 # TODO: Change to URL for the Auth server
-  entra_tenant_id         = "value"   
+  auth_provider     = "microsoft-entra-id"                                    # TODO
+  auth_client_id    = "query-connector"                                       # TODO: "Client ID"
+  auth_issuer       = "https://login.microsoftonline.com/your-tenant-id/v2.0" # TODO: URL for the Auth issuer for Entra (https://login.microsoftonline.com/<your-tenant-id>/v2.0 or keycloak)
+  auth_url          = "http://localhost:3000"                                 # TODO: Change to URL for the Auth server
+  entra_tenant_id   = "value"
 }
 
 
@@ -30,24 +30,25 @@ data "azurerm_application_insights" "qc-function-insight" {
 locals {
   app_files = fileset("${path.module}/src/functions", "**")
   app_hash  = md5(join("", [for f in local.app_files : filemd5("${path.module}/src/functions/${f}")]))
+  package_url = "https://${data.azurerm_storage_account.qc_storage_account.name}.blob.core.windows.net/${azurerm_storage_container.pkg.name}/${azurerm_storage_blob.pkgzip.name}${data.azurerm_storage_account_sas.pkg.sas}"
 }
 
 resource "null_resource" "build" {
   triggers = { app = local.app_hash }
   provisioner "local-exec" {
-    working_dir = "${path.module}"
+    working_dir = path.module
     command     = "npm i && npm run build && npm prune --omit=dev"
   }
 }
 
 data "archive_file" "zip" {
   type        = "zip"
-  source_dir  = "${path.module}"
+  source_dir  = "${path.module}/dist"
   output_path = "${path.module}/dist/functionapp.zip"
-    excludes = [
-    ".git/**", ".vscode/**", ".terraform/**",  "local.settings.json"
+  excludes = [
+    ".git/**", ".vscode/**", ".terraform/**", "local.settings.json", "functionapp.zip"
   ]
-  depends_on  = [null_resource.build]
+  depends_on = [null_resource.build]
 }
 
 
@@ -79,7 +80,7 @@ resource "azurerm_storage_blob" "pkgzip" {
   source                 = data.archive_file.zip.output_path #TO DO BY ME
   content_type           = "application/zip"
 
-   depends_on = [null_resource.build]
+  depends_on = [null_resource.build]
 }
 
 
@@ -131,8 +132,8 @@ resource "azurerm_linux_function_app" "qc_linux_function_app" {
   storage_account_name        = data.azurerm_storage_account.qc_storage_account.name
   storage_account_access_key  = data.azurerm_storage_account.qc_storage_account.primary_access_key
   functions_extension_version = "~4"
-  
-  https_only                  = true
+
+  https_only = true
   identity {
     type = "SystemAssigned"
   }
@@ -143,13 +144,14 @@ resource "azurerm_linux_function_app" "qc_linux_function_app" {
   }
 
   app_settings = {
-    FUNCTIONS_EXTENSION_VERSION = "~4"
-    FUNCTIONS_WORKER_RUNTIME    = "node"
-    AzureWebJobsStorage         = data.azurerm_storage_account.qc_storage_account.primary_connection_string
+    FUNCTIONS_EXTENSION_VERSION           = "~4"
+    FUNCTION_APP_EDIT_MODE                = "readwrite"
+    FUNCTIONS_WORKER_RUNTIME              = "node"
+    AzureWebJobsStorage                   = data.azurerm_storage_account.qc_storage_account.primary_connection_string
     APPLICATIONINSIGHTS_CONNECTION_STRING = data.azurerm_application_insights.qc-function-insight.connection_string
 
-    QUERY_CONNECTOR_ENDPOINT = "https://queryconnector.dev/api/query"   # <- set target endpoint
-    
+    QUERY_CONNECTOR_ENDPOINT = "https://queryconnector.dev/api/query" # <- set target endpoint
+
     AUTH_CLIENT_ID            = local.auth_client_id
     AUTH_ISSUER               = local.auth_issuer
     ENTRA_TENANT_ID           = local.entra_tenant_id
@@ -157,11 +159,11 @@ resource "azurerm_linux_function_app" "qc_linux_function_app" {
     AUTH_URL                  = local.auth_url
     NEXT_PUBLIC_AUTH_PROVIDER = local.auth_provider
     # Zip Deploy (Run From Package) Use this option once function has been finalized
-    # WEBSITE_RUN_FROM_PACKAGE = "https://${data.azurerm_storage_account.qc_storage_account.name}.blob.core.windows.net/${azurerm_storage_container.pkg.name}/${azurerm_storage_blob.pkgzip.name}${data.azurerm_storage_account_sas.pkg.sas}"
+    WEBSITE_RUN_FROM_PACKAGE = local.package_url
   }
 
   # Deploy code in a writable way so Terraform can add function.json
-  zip_deploy_file = data.archive_file.zip.output_path
+  # zip_deploy_file = data.archive_file.zip.output_path
 
   depends_on = [azurerm_storage_blob.pkgzip]
 }
@@ -170,15 +172,20 @@ resource "azurerm_linux_function_app" "qc_linux_function_app" {
 
 
 
-resource "azurerm_function_app_function" "qc_app_function" {
-  name            = "${local.project}-${local.environment}-function-app"
-  function_app_id = azurerm_linux_function_app.qc_linux_function_app.id
-  language        = "TypeScript"
- 
-  config_json = jsonencode({
-    bindings = [
-      { type = "blobTrigger", direction = "in", name = "content", connection = "AzureWebJobsStorage", path = "hl7-message/{name}" }, #The name should be the param the typescript code receives
-    ],
-    scriptFile = "dist/src/functions/ProcessHL7/process-hl7.js"
-  })
+# resource "azurerm_function_app_function" "qc_app_function" {
+#   name            = "${local.project}-${local.environment}-function-app"
+#   function_app_id = azurerm_linux_function_app.qc_linux_function_app.id
+#   language        = "TypeScript"
+
+#   config_json = jsonencode({
+#     bindings = [
+#       { type = "blobTrigger", direction = "in", name = "content", connection = "AzureWebJobsStorage", path = "hl7-message/{name}" }, #The name should be the param the typescript code receives
+#     ],
+#     scriptFile = "dist/src/functions/ProcessHL7/process-hl7.js"
+#   })
+# }
+
+output "package_sas_url" {
+  value = local.package_url
+  sensitive = true
 }

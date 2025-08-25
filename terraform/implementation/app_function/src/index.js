@@ -1,2 +1,2 @@
-import "./functions/ProcessHL7/process-hl7";
-import "./functions/PostHL7/post-hl7";
+import "./src/functions/ProcessHL7/process-hl7.js";
+import "./src/functions/PostHL7/post-hl7.js";
