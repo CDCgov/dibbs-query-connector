@@ -1,0 +1,7 @@
+value set name, category, code system, code, display
+Value Set 1,Labs,LOINC,12345, Lab 1
+Value Set 1,Labs,LOINC,67890, Lab 2
+Value Set 2,Medications,RxNorm,ABCDE, Medication 1
+Value Set 3,Conditions,SNOMED,11111, Condition 1
+Value Set 3,Conditions,SNOMED,22222, Condition 2
+Value Set 3,Conditions,SNOMED,33333, Condition 3

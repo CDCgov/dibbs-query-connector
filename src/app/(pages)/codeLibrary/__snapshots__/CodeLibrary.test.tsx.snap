@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`Code library interaction renders action buttons for custom value sets only 1`] = `
 <body
@@ -72,13 +72,39 @@ exports[`Code library interaction renders action buttons for custom value sets o
               </button>
             </div>
           </div>
-          <button
-            class="usa-button button"
-            data-testid="button"
-            type="button"
-          >
-            Add value set
-          </button>
+          <div>
+            <input
+              accept=".csv,text/csv"
+              style="display: none;"
+              type="file"
+            />
+            <button
+              class="usa-button usa-button--secondary button"
+              data-testid="button"
+              type="button"
+            >
+              Upload CSV
+            </button>
+            <button
+              class="usa-button button"
+              data-testid="button"
+              type="button"
+            >
+              Add value set
+            </button>
+            <div
+              class="padding-top-1 padding-right-1 display-flex flex-justify-end"
+            >
+              <button
+                aria-label="Download sample CSV."
+                class="usa-button usa-button--unstyled"
+                data-testid="button"
+                type="button"
+              >
+                Download sample CSV
+              </button>
+            </div>
+          </div>
         </div>
         <div
           class="content"
@@ -293,7 +319,7 @@ exports[`Code library interaction renders action buttons for custom value sets o
                           Edit codes
                         </button>
                         <button
-                          class="usa-button usa-button--secondary"
+                          class="usa-button usa-button--unstyled"
                           data-testid="button"
                           type="button"
                         >
@@ -633,13 +659,39 @@ exports[`Code library loading view renders a skeleton loading state when loading
               </button>
             </div>
           </div>
-          <button
-            class="usa-button button"
-            data-testid="button"
-            type="button"
-          >
-            Add value set
-          </button>
+          <div>
+            <input
+              accept=".csv,text/csv"
+              style="display: none;"
+              type="file"
+            />
+            <button
+              class="usa-button usa-button--secondary button"
+              data-testid="button"
+              type="button"
+            >
+              Upload CSV
+            </button>
+            <button
+              class="usa-button button"
+              data-testid="button"
+              type="button"
+            >
+              Add value set
+            </button>
+            <div
+              class="padding-top-1 padding-right-1 display-flex flex-justify-end"
+            >
+              <button
+                aria-label="Download sample CSV."
+                class="usa-button usa-button--unstyled"
+                data-testid="button"
+                type="button"
+              >
+                Download sample CSV
+              </button>
+            </div>
+          </div>
         </div>
         <div
           class="content"
@@ -952,13 +1004,39 @@ exports[`Code library rendered view renders concept codes for the value set when
               </button>
             </div>
           </div>
-          <button
-            class="usa-button button"
-            data-testid="button"
-            type="button"
-          >
-            Add value set
-          </button>
+          <div>
+            <input
+              accept=".csv,text/csv"
+              style="display: none;"
+              type="file"
+            />
+            <button
+              class="usa-button usa-button--secondary button"
+              data-testid="button"
+              type="button"
+            >
+              Upload CSV
+            </button>
+            <button
+              class="usa-button button"
+              data-testid="button"
+              type="button"
+            >
+              Add value set
+            </button>
+            <div
+              class="padding-top-1 padding-right-1 display-flex flex-justify-end"
+            >
+              <button
+                aria-label="Download sample CSV."
+                class="usa-button usa-button--unstyled"
+                data-testid="button"
+                type="button"
+              >
+                Download sample CSV
+              </button>
+            </div>
+          </div>
         </div>
         <div
           class="content"
@@ -1491,13 +1569,39 @@ exports[`Code library rendered view renders the correct content 1`] = `
               </button>
             </div>
           </div>
-          <button
-            class="usa-button button"
-            data-testid="button"
-            type="button"
-          >
-            Add value set
-          </button>
+          <div>
+            <input
+              accept=".csv,text/csv"
+              style="display: none;"
+              type="file"
+            />
+            <button
+              class="usa-button usa-button--secondary button"
+              data-testid="button"
+              type="button"
+            >
+              Upload CSV
+            </button>
+            <button
+              class="usa-button button"
+              data-testid="button"
+              type="button"
+            >
+              Add value set
+            </button>
+            <div
+              class="padding-top-1 padding-right-1 display-flex flex-justify-end"
+            >
+              <button
+                aria-label="Download sample CSV."
+                class="usa-button usa-button--unstyled"
+                data-testid="button"
+                type="button"
+              >
+                Download sample CSV
+              </button>
+            </div>
+          </div>
         </div>
         <div
           class="content"

@@ -36,6 +36,7 @@
     "@uswds/uswds": "^3.13.0",
     "base-64": "^1.0.0",
     "classnames": "^2.5.1",
+    "csv-parse": "^6.1.0",
     "date-fns": "^3.4.0",
     "fhirpath": "^4.4.0",
     "html-react-parser": "^5.2.5",
