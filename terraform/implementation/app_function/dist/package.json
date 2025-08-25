@@ -1,13 +1,10 @@
 {
   "name": "app-func",
   "version": "1.0.0",
-  "type": "module",
-  "main": "index.js",
+  "main": "src/functions/ProcessHL7/process-hl7.js",
   "scripts": {
     "compile": "tsc",
-    "copy:functions": "cp -r src/functions/ProcessHL7/function.json dist/src/functions/ProcessHL7/",
-    "copy:root": "cp host.json dist/ && cp package.json dist/ && cp package-lock.json dist/ && cp src/index.js dist/",
-    "build": "npm run compile && npm run copy:functions && npm run copy:root",
+    "build": "npm run compile",
     "start": "func start"
   },
   "dependencies": {
