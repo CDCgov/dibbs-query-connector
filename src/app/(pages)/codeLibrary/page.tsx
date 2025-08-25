@@ -41,13 +41,20 @@ import dynamic from "next/dynamic";
 import type { ModalProps, ModalRef } from "../../ui/designSystem/modal/Modal";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import { getSavedQueryById } from "@/app/backend/query-building/service";
-import { insertCustomValuesetsIntoQuery } from "@/app/backend/custom-code-service";
+import {
+  insertCustomValuesetsIntoQuery,
+  insertCustomValueSet,
+} from "@/app/backend/custom-code-service";
 import { QueryTableResult } from "../queryBuilding/utils";
 import Checkbox from "@/app/ui/designSystem/checkbox/Checkbox";
 import { useSaveQueryAndRedirect } from "@/app/backend/query-building/useSaveQueryAndRedirect";
 import { EMPTY_CONCEPT_TYPE } from "../queryBuilding/utils";
 import { NestedQuery } from "../queryBuilding/utils";
 import { groupConditionConceptsIntoValueSets } from "@/app/utils/valueSetTranslation";
+import { csvRow } from "@/app/api/csv/route";
+import { DibbsConceptType } from "@/app/models/entities/valuesets";
+import { CodeSystemOptions, CodeSystemOptionsMap } from "./utils";
+import { Concept } from "@/app/models/entities/concepts";
 
 /**
  * Component for Query Building Flow
@@ -575,6 +582,266 @@ const CodeLibrary: React.FC = () => {
         ? "CPHI"
         : activeValueSet?.author;
 
+  // CSV upload handling
+  const csvInputRef = useRef<HTMLInputElement>(null);
+  const [csvError, setCsvError] = useState<string>("");
+
+  function triggerCsvPicker() {
+    csvInputRef.current?.click();
+  }
+
+  type ImportGroupKey = string; // `${vsName}||${category}||${systemLabel}`
+
+  function toTypeStrict(label: string): DibbsConceptType | undefined {
+    const t = (label || "").trim().toLowerCase();
+    if (t === "labs") return "labs";
+    if (t === "conditions") return "conditions";
+    if (t === "medications") return "medications";
+    return undefined;
+  }
+
+  function toSystemUri(label: string): string | null {
+    const t = (label || "").trim().toLowerCase();
+    if (CodeSystemOptionsMap[t]) return CodeSystemOptionsMap[t];
+    const exact = CodeSystemOptions.find((uri) => uri.toLowerCase() === t);
+    return exact ?? null;
+  }
+
+  // exact, strongly-typed CSV row after normalization
+  type NormalizedRow = {
+    "value set name": string;
+    category: string;
+    "code system": string;
+    code: string;
+    display: string;
+  };
+
+  const normalizedConstant = (s: string) => s.trim().toLowerCase();
+  const normStr = (s: string | undefined) => (s ?? "").trim();
+
+  function normalizeCsvRows(
+    rows: csvRow[],
+  ): { ok: true; rows: NormalizedRow[] } | { ok: false; error: string } {
+    if (!rows || rows.length === 0)
+      return { ok: false, error: "CSV contained no rows" };
+
+    const first = rows[0];
+    const keys = Object.keys(first);
+
+    const map: Record<keyof NormalizedRow, string> = {
+      "value set name": "",
+      category: "",
+      "code system": "",
+      code: "",
+      display: "",
+    };
+
+    for (const k of keys) {
+      const kn = normalizedConstant(k);
+      if (kn === "value set name") map["value set name"] = k;
+      else if (kn === "category") map["category"] = k;
+      else if (kn === "code system") map["code system"] = k;
+      else if (kn === "code") map["code"] = k;
+      else if (kn === "display") map["display"] = k;
+    }
+
+    if (
+      !map["value set name"] ||
+      !map["category"] ||
+      !map["code system"] ||
+      !map["code"] ||
+      !map["display"]
+    ) {
+      return {
+        ok: false,
+        error:
+          "CSV headers must include: value set name, category, code system, code, display",
+      };
+    }
+
+    const out: NormalizedRow[] = rows.map((r) => ({
+      "value set name": normStr(r[map["value set name"]]),
+      category: normStr(r[map["category"]]),
+      "code system": normStr(r[map["code system"]]),
+      code: normStr(r[map["code"]]),
+      display: normStr(r[map["display"]]),
+    }));
+
+    return { ok: true, rows: out };
+  }
+
+  function groupNormalizedRows(rows: NormalizedRow[]) {
+    const groups = new Map<
+      ImportGroupKey,
+      { vsName: string; cat: string; sys: string; concepts: Concept[] }
+    >();
+
+    for (const r of rows) {
+      const vsName = r["value set name"];
+      const cat = r["category"];
+      const sys = r["code system"];
+      const code = r["code"];
+      const display = r["display"];
+
+      if (!vsName || !cat || !sys) continue;
+      if (!code && !display) continue;
+
+      const key: ImportGroupKey = `${vsName}||${cat}||${sys}`;
+      const entry = groups.get(key) ?? { vsName, cat, sys, concepts: [] };
+      entry.concepts.push({ code, display, include: true });
+      groups.set(key, entry);
+    }
+
+    const valueSets: DibbsValueSet[] = [];
+    for (const g of groups.values()) {
+      const t = toTypeStrict(g.cat);
+      const sysUri = toSystemUri(g.sys);
+      if (!t || !sysUri || g.concepts.length === 0) {
+        continue;
+      }
+      valueSets.push({
+        ...emptyValueSet,
+        valueSetName: g.vsName,
+        dibbsConceptType: t,
+        system: sysUri,
+        concepts: g.concepts,
+      });
+    }
+    return valueSets;
+  }
+
+  async function importCsvValueSets(rows: csvRow[]) {
+    // 1) Normalize headers/rows into a strict shape
+    const normalized = normalizeCsvRows(rows);
+    if (!normalized.ok) {
+      setCsvError(normalized.error);
+      return;
+    }
+
+    // 2) Group & build value sets (strictly typed)
+    const errors: string[] = [];
+    normalized.rows.forEach((r, i) => {
+      const rowNo = i + 2;
+      if (!toTypeStrict(r.category)) {
+        errors.push(
+          `Row ${rowNo}: unsupported category "${r.category}" (labs, conditions, medications).`,
+        );
+      }
+      if (!toSystemUri(r["code system"])) {
+        errors.push(
+          `Row ${rowNo}: unsupported code system "${r["code system"]}" (use one of: ${Object.keys(
+            CodeSystemOptionsMap,
+          ).join(", ")} or an exact supported URI).`,
+        );
+      }
+      if (!r.code) {
+        errors.push(`Row ${rowNo}: must include "code"`);
+      }
+    });
+
+    if (errors.length) {
+      setCsvError(
+        `Your CSV contains unsupported values:\n- ${errors.join("\n- ")}`,
+      );
+      showToastConfirmation({
+        body: "CSV contains unsupported values. No value sets were imported.",
+        variant: "error",
+      });
+      return;
+    }
+
+    const valueSets = groupNormalizedRows(normalized.rows);
+    if (valueSets.length === 0) {
+      setCsvError("No valid value sets found in CSV");
+      return;
+    }
+
+    // 3) Save each valueset via existing insertCustomValueSet
+    const results: {
+      name: string;
+      ok: boolean;
+      id?: string;
+      error?: string;
+    }[] = [];
+    for (const vs of valueSets) {
+      try {
+        const res = await insertCustomValueSet(
+          vs as DibbsValueSet,
+          currentUser?.id as string,
+        );
+        results.push({
+          name: vs.valueSetName,
+          ok: !!res.success,
+          id: res.id,
+          error: res.success ? undefined : "Failed to save",
+        });
+      } catch (e: unknown) {
+        const message = e instanceof Error ? e.message : String(e);
+        results.push({
+          name: vs.valueSetName,
+          ok: false,
+          error: message,
+        });
+      }
+    }
+
+    const okCount = results.filter((r) => r.ok).length;
+    const failCount = results.length - okCount;
+
+    if (okCount > 0) {
+      showToastConfirmation({
+        body: `Imported ${okCount} of ${results.length} value set(s) successfully.`,
+      });
+
+      await fetchValueSetsAndConditions();
+      const me =
+        currentUser?.firstName && currentUser?.lastName
+          ? `${currentUser.firstName} ${currentUser.lastName}`
+          : `${currentUser?.username ?? ""}`;
+
+      setFilterSearch({
+        ...emptyFilterSearch,
+        creators: me ? { [me]: [me] } : {},
+      });
+    }
+
+    if (failCount > 0) {
+      showToastConfirmation({
+        body: `Failed to import ${failCount} value set(s).`,
+        variant: "error",
+      });
+      console.warn(
+        "Import failures:",
+        results.filter((r) => !r.ok),
+      );
+    }
+
+    // 4) After import, go back to manage view (single-form UI isn't built for multi-preview)
+    const me =
+      currentUser?.firstName && currentUser?.lastName
+        ? `${currentUser.firstName} ${currentUser.lastName}`
+        : `${currentUser?.username ?? ""}`;
+
+    setFilterSearch({
+      ...emptyFilterSearch,
+      creators: me ? { [me]: [me] } : {},
+    });
+    setMode("manage");
+  }
+
+  async function handleCsvFile(file: File) {
+    setCsvError("");
+    const fd = new FormData();
+    fd.append("file", file);
+    const res = await fetch("/api/csv/", { method: "POST", body: fd });
+    const json: { rows?: csvRow[]; error?: string } = await res.json();
+    if (!res.ok || !json.rows) {
+      setCsvError(json.error || "Failed to parse CSV");
+      return;
+    }
+    await importCsvValueSets(json.rows);
+  }
+
   // ------------ render ------------ //
   // -------------------------------- //
   return (
@@ -673,13 +940,60 @@ const CodeLibrary: React.FC = () => {
               </div>
             </div>
             {mode == "manage" && (
-              <Button
-                type="button"
-                className={styles.button}
-                onClick={() => handleChangeMode("create")}
-              >
-                Add value set
-              </Button>
+              <div>
+                <input
+                  ref={csvInputRef}
+                  type="file"
+                  accept=".csv,text/csv"
+                  style={{ display: "none" }}
+                  onChange={(e) => {
+                    const f = e.target.files?.[0];
+                    if (f) {
+                      void handleCsvFile(f);
+                      e.currentTarget.value = "";
+                    }
+                  }}
+                />
+                <Button
+                  type="button"
+                  secondary
+                  className={styles.button}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    triggerCsvPicker();
+                  }}
+                >
+                  Upload CSV
+                </Button>
+                <Button
+                  type="button"
+                  className={styles.button}
+                  onClick={() => handleChangeMode("create")}
+                >
+                  Add value set
+                </Button>
+                <div className="padding-top-1 padding-right-1 display-flex flex-justify-end">
+                  <Button
+                    type="button"
+                    unstyled
+                    aria-label="Download sample CSV."
+                    onClick={() => {
+                      window.open("/CustomValueSetSample.csv", "_blank");
+                    }}
+                  >
+                    Download sample CSV
+                  </Button>
+                </div>
+                {csvError && (
+                  <div className={styles.errorMessage} role="alert">
+                    <Icon.Error
+                      aria-label="warning icon indicating an error is present"
+                      className={styles.errorMessage}
+                    />
+                    {csvError}
+                  </div>
+                )}
+              </div>
             )}
             {mode == "select" && (
               <>
@@ -824,7 +1138,7 @@ const CodeLibrary: React.FC = () => {
                                 </Button>
                                 <Button
                                   type="button"
-                                  secondary
+                                  unstyled
                                   onClick={() =>
                                     modalRef.current?.toggleModal()
                                   }
