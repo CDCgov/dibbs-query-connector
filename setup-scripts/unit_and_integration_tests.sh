@@ -20,7 +20,7 @@ echo NEXT_PUBLIC_AUTH_PROVIDER=keycloak >> .env.integration
 echo APP_HOSTNAME=http://query-connector:3000 >> .env.integration
 echo LOCAL_DB_CLIENT_TIMEOUT="10000" >> .env.integration
 
-BASE_CMD="npx dotenv -e .env.integration jest"
+BASE_CMD="npx dotenv -e .env.integration -- jest"
 
 # running our integration tests
 if [ "$JUST_INTEGRATION" = "true" ]; then 
