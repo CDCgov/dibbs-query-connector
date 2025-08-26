@@ -15,6 +15,7 @@ docker compose -f docker-compose-integration.yaml logs aidbox-seeder | grep -q "
 touch .env.integration
 echo DATABASE_URL="postgresql://postgres:pw@localhost:5432/tefca_db" > .env.integration
 echo DEMO_MODE="true" >> .env.integration
+echo RUN_FETCH_INTERCEPTOR="true" >> .env.integration
 echo TEST_TYPE="integration" >> .env.integration
 echo NEXT_PUBLIC_AUTH_PROVIDER=keycloak >> .env.integration
 echo APP_HOSTNAME=http://query-connector:3000 >> .env.integration

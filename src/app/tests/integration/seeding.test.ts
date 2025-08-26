@@ -3,6 +3,7 @@ import vsacFixtures from "./fixtures/vsacFixtures.json";
 import { createDibbsDB } from "@/app/backend/db-creation/service";
 import { insertValueSet } from "@/app/backend/seeding/service";
 import { ValueSet } from "fhir/r4";
+import { suppressConsoleLogs } from "./fixtures";
 
 jest.mock("@/app/backend/seeding/service", () => {
   const actual = jest.requireActual("@/app/backend/seeding/service");
@@ -18,7 +19,7 @@ jest.mock("@/app/backend/seeding/service", () => {
     }),
 
     // skip the checking process since we're using partial mocks
-    insertValueSet: jest.spyOn(actual.SeedingService, "insertValueSet"),
+    insertValueSet: jest.fn().mockImplementation(actual.insertValueSet),
     checkValueSetInsertion: jest.fn().mockResolvedValue({
       missingValueSet: false,
       missingConcepts: [] as Array<string>,
@@ -34,13 +35,13 @@ const VSAC_FIXTURE_RETIRED_IDS = (vsacFixtures as ValueSet[]).filter((v) => {
 });
 
 describe("runs the eRSD ingestion flow", () => {
+  beforeAll(() => {
+    suppressConsoleLogs();
+  });
   test(
     "stubs out the eRSD response",
     async () => {
-      const infoSpy = jest.spyOn(console, "info").mockImplementation();
-      const errorSpy = jest.spyOn(console, "error").mockImplementation();
       const insertSpy = insertValueSet;
-
       await createDibbsDB();
 
       expect(insertSpy).toHaveBeenCalledTimes(
