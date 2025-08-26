@@ -54,7 +54,7 @@
     "react-toastify": "^10.0.5",
     "request-mocking-protocol": "^0.1.3",
     "sharp": "^0.33.5",
-    "undici": "^7.13.0",
+    "undici": "^7.15.0",
     "unist-util-visit": "^5.0.0"
   },
   "devDependencies": {
