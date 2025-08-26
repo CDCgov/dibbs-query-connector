@@ -36,9 +36,9 @@ import { adminRequired, transaction } from "@/app/backend/db/decorators";
 import { auditable } from "@/app/backend/audit-logs/decorator";
 import { QCResponse } from "../../models/responses/collections";
 
-type ErsdOrVsacResponse = Bundle | Parameters | OperationOutcome;
+export type ErsdOrVsacResponse = Bundle | Parameters | OperationOutcome;
 
-class SeedingService {
+export class SeedingService {
   private static get dbClient() {
     return internal_getDbClient();
   }
@@ -578,6 +578,7 @@ class SeedingService {
         // First, we'll pull the value set from VSAC and map it to our representation
         try {
           const vs = await getVSACValueSet(oid);
+
           return vs;
         } catch (error) {
           console.error(error);

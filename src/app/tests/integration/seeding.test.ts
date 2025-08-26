@@ -1,18 +1,24 @@
-import { internal_getDbClient } from "@/app/backend/db/config";
 import ersdMock from "./fixtures/ersdFixtures.json";
 import vsacFixtures from "./fixtures/vsacFixtures.json";
 import { createDibbsDB } from "@/app/backend/db-creation/service";
 import { insertValueSet } from "@/app/backend/seeding/service";
+import { ValueSet } from "fhir/r4";
 
 jest.mock("@/app/backend/seeding/service", () => {
+  const actual = jest.requireActual("@/app/backend/seeding/service");
+
   return {
     __esModule: true,
-    ...jest.requireActual("@/app/backend/seeding/service"),
+    ...actual,
     checkDBForData: jest.fn().mockReturnValue(false),
-    generateBatchVsacPromises: jest.fn().mockResolvedValue(vsacFixtures),
     getERSD: jest.fn().mockResolvedValue(ersdMock),
-    // assume that the database interface functions do a simple insert correctly
-    insertValueSet: jest.fn(),
+    getVSACValueSet: jest.fn().mockImplementation((oid: string) => {
+      const vs = (vsacFixtures as ValueSet[]).find((v) => v.id === oid);
+      return Promise.resolve(vs);
+    }),
+
+    // skip the checking process since we're using partial mocks
+    insertValueSet: jest.spyOn(actual.SeedingService, "insertValueSet"),
     checkValueSetInsertion: jest.fn().mockResolvedValue({
       missingValueSet: false,
       missingConcepts: [] as Array<string>,
@@ -21,19 +27,25 @@ jest.mock("@/app/backend/seeding/service", () => {
   };
 });
 
-const ERSD_RESOURCE_LENGTH = ersdMock.entry.length;
+const ERSD_FIXTURE_RESOURCE_LENGTH = ersdMock.entry.length;
+// valuesets in the fixture that don't have associated concepts / marked as "retired"
+const VSAC_FIXTURE_RETIRED_IDS = (vsacFixtures as ValueSet[]).filter((v) => {
+  return v?.compose?.include[0]?.concept === undefined;
+});
 
 describe("runs the eRSD ingestion flow", () => {
   test(
     "stubs out the eRSD response",
     async () => {
-      const dbClient = internal_getDbClient();
       const infoSpy = jest.spyOn(console, "info").mockImplementation();
       const errorSpy = jest.spyOn(console, "error").mockImplementation();
+      const insertSpy = insertValueSet;
 
       await createDibbsDB();
 
-      expect(insertValueSet).toHaveBeenCalledTimes(ERSD_RESOURCE_LENGTH);
+      expect(insertSpy).toHaveBeenCalledTimes(
+        ERSD_FIXTURE_RESOURCE_LENGTH - VSAC_FIXTURE_RETIRED_IDS.length,
+      );
     },
     70 * 1000,
   );
