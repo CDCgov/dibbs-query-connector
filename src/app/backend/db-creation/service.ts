@@ -1,6 +1,10 @@
 "use server";
 
-import { ersdToDibbsConceptMap, ErsdConceptType } from "@/app/constants";
+import {
+  ersdToDibbsConceptMap,
+  ErsdConceptType,
+  MISSING_API_KEY_LITERAL,
+} from "@/app/constants";
 import { Bundle, Parameters, ValueSet } from "fhir/r4";
 import {
   checkDBForData,
@@ -57,49 +61,45 @@ const sleep = (ms: number) => {
  * clinical service type associated with each.
  */
 export async function getOidsFromErsd() {
-  try {
-    console.log("Fetching and parsing eRSD.");
-    const ersd = await getERSD();
-    const valuesets = (ersd as unknown as Bundle)["entry"]?.filter(
-      (e) => e.resource?.resourceType === "ValueSet",
+  console.log("Fetching and parsing eRSD.");
+  const ersd = await getERSD();
+  const valuesets = (ersd as unknown as Bundle)["entry"]?.filter(
+    (e) => e.resource?.resourceType === "ValueSet",
+  );
+
+  const { nonUmbrellaValueSets, oidToErsdType } = indexErsdByOid(valuesets);
+  // Build up a mapping of OIDs to eRSD clinical types
+
+  let conditionExtractor: Array<ersdCondition> = [];
+  nonUmbrellaValueSets.reduce((acc: Array<ersdCondition>, vs: ValueSet) => {
+    const conditionSchemes = vs.useContext?.filter(
+      (context) =>
+        !(context.valueCodeableConcept?.coding || [])[0].system?.includes(
+          "us-ph-usage-context",
+        ),
     );
+    (conditionSchemes || []).forEach((usc) => {
+      const ersdCond: ersdCondition = {
+        code: (usc.valueCodeableConcept?.coding || [])[0].code || "",
+        system: (usc.valueCodeableConcept?.coding || [])[0].system || "",
+        text: usc.valueCodeableConcept?.text || "",
+        valueset_id: vs.id || "",
+      };
+      conditionExtractor.push(ersdCond);
+    });
+    return conditionExtractor;
+  }, conditionExtractor);
 
-    const { nonUmbrellaValueSets, oidToErsdType } = indexErsdByOid(valuesets);
-    // Build up a mapping of OIDs to eRSD clinical types
-
-    let conditionExtractor: Array<ersdCondition> = [];
-    nonUmbrellaValueSets.reduce((acc: Array<ersdCondition>, vs: ValueSet) => {
-      const conditionSchemes = vs.useContext?.filter(
-        (context) =>
-          !(context.valueCodeableConcept?.coding || [])[0].system?.includes(
-            "us-ph-usage-context",
-          ),
-      );
-      (conditionSchemes || []).forEach((usc) => {
-        const ersdCond: ersdCondition = {
-          code: (usc.valueCodeableConcept?.coding || [])[0].code || "",
-          system: (usc.valueCodeableConcept?.coding || [])[0].system || "",
-          text: usc.valueCodeableConcept?.text || "",
-          valueset_id: vs.id || "",
-        };
-        conditionExtractor.push(ersdCond);
-      });
-      return conditionExtractor;
-    }, conditionExtractor);
-
-    // Make sure to take out the umbrella value sets from the ones we try to insert
-    let oids = valuesets?.map((vs) => vs.resource?.id);
-    oids = oids?.filter(
-      (oid) => !Object.keys(ersdToDibbsConceptMap).includes(oid || ""),
-    );
-    return {
-      oids: oids,
-      oidToErsdType: oidToErsdType,
-      conditions: conditionExtractor,
-    } as OidData;
-  } catch (error) {
-    console.error("Couldn't query eRSD: ", error);
-  }
+  // Make sure to take out the umbrella value sets from the ones we try to insert
+  let oids = valuesets?.map((vs) => vs.resource?.id);
+  oids = oids?.filter(
+    (oid) => !Object.keys(ersdToDibbsConceptMap).includes(oid || ""),
+  );
+  return {
+    oids: oids,
+    oidToErsdType: oidToErsdType,
+    conditions: conditionExtractor,
+  } as OidData;
 }
 
 /**
@@ -119,6 +119,15 @@ export async function seedBatchValueSetsFromVsac(
   oidData: OidData,
   batchSize = 100,
 ) {
+  const umlsKey = process.env.UMLS_API_KEY;
+  if (!umlsKey) {
+    throw Error(
+      "UMLS API Key not set. Please refer to the documentation below on how to get your UMLS API key before continuing",
+      {
+        cause: MISSING_API_KEY_LITERAL,
+      },
+    );
+  }
   let startIdx = 0;
   let lastIdx = startIdx + batchSize;
 
@@ -324,14 +333,14 @@ export async function createDibbsDB() {
   const dbHasData = await checkDBForData();
 
   if (!dbHasData) {
-    const ersdOidData = await getOidsFromErsd();
-    if (ersdOidData) {
-      await seedBatchValueSetsFromVsac(ersdOidData);
-    } else {
-      console.error("Could not load eRSD, aborting DIBBs DB creation");
-    }
-
     try {
+      const ersdOidData = await getOidsFromErsd();
+      if (ersdOidData) {
+        await seedBatchValueSetsFromVsac(ersdOidData);
+      } else {
+        console.error("Could not load eRSD, aborting DIBBs DB creation");
+      }
+
       // Only run default and custom insertions if we're making the dump
       // file for dev
       // if (process.env.NODE_ENV !== "production") {
@@ -346,9 +355,23 @@ export async function createDibbsDB() {
       return { success: false, reload: false };
 
       // }
-    } catch {
-      console.error("DB reload failed");
-      return { succes: false, reload: false };
+    } catch (e) {
+      if (e instanceof Error) {
+        console.error("DB reload failed");
+        return {
+          success: false,
+          reload: false,
+          message: e.message,
+          cause: e.cause,
+        };
+      }
+
+      return {
+        success: false,
+        reload: false,
+        message:
+          "DB creation failed with an unknown error. Please contact us for help",
+      };
     }
   } else {
     console.log("Database already has data; skipping DIBBs DB creation.");

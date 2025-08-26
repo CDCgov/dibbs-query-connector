@@ -3,6 +3,7 @@ import { Bundle, OperationOutcome, Parameters } from "fhir/r4";
 import {
   INTENTIONAL_EMPTY_STRING_FOR_CONCEPT_VERSION,
   INTENTIONAL_EMPTY_STRING_FOR_GEM_CODE,
+  MISSING_API_KEY_LITERAL,
 } from "../../constants";
 import { encode } from "base-64";
 import {
@@ -38,7 +39,7 @@ import { QCResponse } from "../../models/responses/collections";
 
 export type ErsdOrVsacResponse = Bundle | Parameters | OperationOutcome;
 
-export class SeedingService {
+class SeedingService {
   private static get dbClient() {
     return internal_getDbClient();
   }
@@ -228,6 +229,15 @@ export class SeedingService {
    */
   static async getERSD(eRSDVersion: number = 3): Promise<ErsdOrVsacResponse> {
     const ERSD_API_KEY = process.env.ERSD_API_KEY;
+    if (!ERSD_API_KEY) {
+      throw Error(
+        `ERSD API Key not set. Please refer to the documentation below to get your ERSD key to continue`,
+        {
+          cause: MISSING_API_KEY_LITERAL,
+        },
+      );
+    }
+
     const eRSDUrl = `https://ersd.aimsplatform.org/api/ersd/v${eRSDVersion}specification?format=json&api-key=${ERSD_API_KEY}`;
     const response = await fetch(eRSDUrl);
 
@@ -266,7 +276,17 @@ export class SeedingService {
     codeSystem?: string,
   ): Promise<ErsdOrVsacResponse> {
     const username: string = "apikey";
-    const umlsKey: string = process.env.UMLS_API_KEY || "";
+    const umlsKey = process.env.UMLS_API_KEY;
+
+    if (!umlsKey) {
+      throw Error(
+        "UMLS API Key not set. Please refer to the documentation below on how to get your UMLS API key before continuing",
+        {
+          cause: MISSING_API_KEY_LITERAL,
+        },
+      );
+    }
+
     const vsacUrl: string =
       searchStructType === "valueset"
         ? `https://cts.nlm.nih.gov/fhir/ValueSet/${oid}`

@@ -42,6 +42,7 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({ setBuildStep }) => {
   const queriesContext = useContext(DataContext);
 
   const [userLoading, setUserLoading] = useState(true);
+  const [dbSeeded, setDbSeeded] = useState(false);
   const [queries, setQueries] = useState<CustomUserQuery[] | undefined>(
     queriesContext?.data
       ? (queriesContext?.data as CustomUserQuery[])
@@ -119,12 +120,8 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({ setBuildStep }) => {
 
   return (
     <div className="main-container__wide">
-      {!loading && queries.length === 0 && !unauthorizedError ? (
-        <EmptyQueriesDisplay
-          goForward={() => {
-            setBuildStep("condition");
-          }}
-        />
+      {!dbSeeded || !unauthorizedError ? (
+        <EmptyQueriesDisplay setDbSeeded={setDbSeeded} />
       ) : (
         <MyQueriesDisplay
           loading={loading}

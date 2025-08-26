@@ -94,7 +94,7 @@ For organizations with restrictions on container usage or specific compliance re
 
 6. By default, the script will deploy an application called dibbs-query-connector tagged to the latest stable version available within the VM. Unless you want to change either of these defaults, accept both prompts by pressing Enter.
 
-7. Next, you’ll see a mention of the node environment, NODE_ENV {production} – by default, we assume that you’re deploying to a production environment. If needed, update this name to describe the environment you’re deploying to (e.g., test, development, etc.).
+7. Next, you’ll see a mention of the node environment, NODE_ENV production – by default, we assume that you’re deploying to a production environment. If needed, update this name to describe the environment you’re deploying to (e.g., test, development, etc.).
 
 8. Next, you’ll be asked about the database you’d like to connect to: Do you have a pre-existing database available to connect to Query Connector? You can choose either yes or no – the default response is yes. Our intention is for our users to have their own managed database for any production instance of the VM. If you have a managed database, choose yes.
 
@@ -110,7 +110,7 @@ For organizations with restrictions on container usage or specific compliance re
 
     - The first one is an auth secret key.
     - The next is your authentication endpoint.
-    - Next, enter your ERSD API key. [See here](development.md#obtaining-api-and-license-keys) for instructions for obtaining these keys – there’s no default key, because each user should use their own.
+    - Next, enter your ERSD API key. [See here](development#obtaining-api-and-license-keys) for instructions for obtaining these keys – there’s no default key, because each user should use their own.
     - Finally, enter your UMLS API key.
 
 14. With these variables set, the following containers will be started:
@@ -278,7 +278,7 @@ ERSD_API_KEY=
 UMLS_API_KEY=
 ```
 
-For more information on the ERSD and UMLS API keys, see [this API key documentation](development.md#obtaining-api-and-license-keys).
+For more information on the ERSD and UMLS API keys, see [this API key documentation](development#obtaining-api-and-license-keys).
 
 ### Backup and disaster recovery
 

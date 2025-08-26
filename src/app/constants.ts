@@ -1,6 +1,8 @@
 import { FhirResource } from "fhir/r4";
 import { DibbsConceptType } from "./models/entities/valuesets";
 
+export const MISSING_API_KEY_LITERAL = "MISSING_API_KEY";
+
 export const USE_CASE_DETAILS = {
   "newborn-screening": {
     queryName: "Newborn screening follow-up",

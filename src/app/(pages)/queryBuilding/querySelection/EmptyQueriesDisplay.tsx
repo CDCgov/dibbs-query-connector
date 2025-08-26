@@ -1,21 +1,24 @@
 import { Button } from "@trussworks/react-uswds";
-import { useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import styles from "./querySelection.module.scss";
 import classNames from "classnames";
 import WorkSpaceSetUpView from "./WorkspaceSetUp";
 import { createDibbsDB } from "@/app/backend/db-creation/service";
+import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
+import Link from "next/link";
+import { MISSING_API_KEY_LITERAL } from "@/app/constants";
 
 type EmptyQueryProps = {
-  goForward: () => void;
+  setDbSeeded: Dispatch<SetStateAction<boolean>>;
 };
 /**
  * Empty-state component for query building
  * @param root0 - params
- * @param root0.goForward - navigation function to go to the next page
+ * @param root0.setDbSeeded - callback function to set the seeded state of the DB
  * @returns the EmptyQueriesDisplay to render the empty state status
  */
 export const EmptyQueriesDisplay: React.FC<EmptyQueryProps> = ({
-  goForward,
+  setDbSeeded,
 }) => {
   const [loading, setLoading] = useState(false);
 
@@ -25,16 +28,38 @@ export const EmptyQueriesDisplay: React.FC<EmptyQueryProps> = ({
     // DB Creation Function
     console.log("Creating DB...");
 
-    const { reload } = await createDibbsDB();
+    const { success, message, reload, cause } = await createDibbsDB();
 
+    if (!success) {
+      let body: string | React.ReactNode =
+        `Please try again or contact us for more help: ${message}`;
+
+      if (cause === MISSING_API_KEY_LITERAL) {
+        const docLink = (
+          <Link href="/docs/development#obtaining-api-and-license-keys">
+            API key documentation
+          </Link>
+        );
+        body = (
+          <span>
+            {message}: {docLink}
+          </span>
+        );
+      }
+      showToastConfirmation({
+        heading: "Something went wrong.",
+        body: body,
+        variant: "error",
+        autoClose: false,
+      });
+    }
     // Stop loading and redirect once function is complete
     setLoading(false);
+    setDbSeeded(success);
 
     if (reload) {
       // Refresh query building page to display the now seeded values
       location.reload();
-    } else {
-      goForward();
     }
   };
 
