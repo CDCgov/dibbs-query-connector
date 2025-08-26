@@ -18,8 +18,9 @@ jest.mock("@/app/backend/seeding/service", () => {
       return Promise.resolve(vs);
     }),
 
-    // skip the checking process since we're using partial mocks
+    // put the passthrough into the mock implementation so we can spy
     insertValueSet: jest.fn().mockImplementation(actual.insertValueSet),
+    // skip the checking process since we're using partial mocks
     checkValueSetInsertion: jest.fn().mockResolvedValue({
       missingValueSet: false,
       missingConcepts: [] as Array<string>,

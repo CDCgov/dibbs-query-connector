@@ -28,7 +28,7 @@ if [ "$JUST_INTEGRATION" = "true" ]; then
     JEST_CMD="$BASE_CMD --testPathPatterns=tests/integration/"
 else 
 # assuming that the only reason we'd want to run both the unit and integration tests is in the CI context where we need to gather coverage report info
-    JEST_CMD="$BASE_CMD --testPathIgnorePatterns=[\"/e2e/\"] --coverage"
+    JEST_CMD="$BASE_CMD --testPathIgnorePatterns='/e2e/' --coverage"
 fi
 eval $JEST_CMD
 JEST_EXIT_CODE=$?
