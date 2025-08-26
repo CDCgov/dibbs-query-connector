@@ -9,15 +9,18 @@ import Link from "next/link";
 import { MISSING_API_KEY_LITERAL } from "@/app/constants";
 
 type EmptyQueryProps = {
+  goForward: () => void;
   setDbSeeded: Dispatch<SetStateAction<boolean>>;
 };
 /**
  * Empty-state component for query building
  * @param root0 - params
+ * @param root0.goForward - navigation function to go to the next page
  * @param root0.setDbSeeded - callback function to set the seeded state of the DB
  * @returns the EmptyQueriesDisplay to render the empty state status
  */
 export const EmptyQueriesDisplay: React.FC<EmptyQueryProps> = ({
+  goForward,
   setDbSeeded,
 }) => {
   const [loading, setLoading] = useState(false);
@@ -60,6 +63,8 @@ export const EmptyQueriesDisplay: React.FC<EmptyQueryProps> = ({
     if (reload) {
       // Refresh query building page to display the now seeded values
       location.reload();
+    } else if (success) {
+      goForward();
     }
   };
 

@@ -121,7 +121,12 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({ setBuildStep }) => {
   return (
     <div className="main-container__wide">
       {!dbSeeded || !unauthorizedError ? (
-        <EmptyQueriesDisplay setDbSeeded={setDbSeeded} />
+        <EmptyQueriesDisplay
+          setDbSeeded={setDbSeeded}
+          goForward={() => {
+            setBuildStep("condition");
+          }}
+        />
       ) : (
         <MyQueriesDisplay
           loading={loading}
