@@ -74,11 +74,12 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({ setBuildStep }) => {
         setCurrentUser(currentUser.items[0]);
       } catch (error) {
         if (error == "Error: Unauthorized") {
-          setUnauthorizedError(true);
           showToastConfirmation({
             body: "You are not authorized to see queries.",
             variant: "error",
           });
+          setUnauthorizedError(true);
+          setUnauthorizedError(true);
         }
         console.error(`Failed to fetch current user: ${error}`);
       } finally {
@@ -139,21 +140,21 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({ setBuildStep }) => {
   const loading = userLoading || queries === undefined;
   return (
     <div className="main-container__wide">
-      {!loading && (!dbSeeded || unauthorizedError || queries.length === 0) ? (
+      {!loading && (!dbSeeded || queries.length === 0) && (
         <EmptyQueriesDisplay
           setDbSeeded={setDbSeeded}
           goForward={() => {
             setBuildStep("condition");
           }}
         />
-      ) : (
-        <MyQueriesDisplay
-          loading={loading}
-          queries={queries || []}
-          setBuildStep={setBuildStep}
-          setQueries={setQueries}
-        />
       )}
+
+      <MyQueriesDisplay
+        loading={loading || unauthorizedError}
+        queries={queries || []}
+        setBuildStep={setBuildStep}
+        setQueries={setQueries}
+      />
     </div>
   );
 };

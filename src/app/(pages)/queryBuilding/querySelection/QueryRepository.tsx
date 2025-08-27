@@ -125,6 +125,7 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
             }}
             className={styles.createQueryButton}
             type="button"
+            disabled={loading}
           >
             Create query
           </Button>

@@ -325,9 +325,8 @@ iframe:focus,
     background-color: color("success");
   }
 
-  .Toastify__toast--success,
-  .Toastify__toast--stacked[data-collapsed="true"] {
-    background-color: color("success-lighter");
+  .Toastify__toast--error {
+    background-color: color("error");
   }
 
   .Toastify__progress-bar--success {
