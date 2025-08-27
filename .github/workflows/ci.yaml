@@ -48,6 +48,7 @@ jobs:
           echo "AIDBOX_BASE_URL=http://localhost:8080" >> .env
           echo "APP_HOSTNAME=http://query-connector:3000" >> .env
       - name: Run tests
+        id: run_unit_and_integration_tests
         run: |
           sudo mkdir keys
           sudo chmod -R 755 keys
@@ -65,6 +66,10 @@ jobs:
           path: |
             ./test-results/logs-before-tests.txt
             ./test-results/logs-after-tests.txt
+
+      - name: Exit with proper code
+        if: steps.run_unit_and_integration_tests.outcome == 'failure'
+        run: exit 1 # Force the workflow to fail if tests failed
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v5
@@ -101,7 +106,7 @@ jobs:
             echo "RUN_FETCH_INTERCEPTOR=true"
           } > .env
       - name: Build Query Connector and Run Playwright Tests
-        id: run_tests
+        id: run_e2e_tests
         run: |
           bash ./setup-scripts/e2e_tests.sh
         # uncomment these next few lines and the corresponding log import
@@ -124,5 +129,5 @@ jobs:
           path: ./test-results/
 
       - name: Exit with proper code
-        if: steps.run_tests.outcome == 'failure'
+        if: steps.run_e2e_tests.outcome == 'failure'
         run: exit 1 # Force the workflow to fail if tests failed
