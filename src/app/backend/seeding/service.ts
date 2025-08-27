@@ -592,23 +592,6 @@ class SeedingService {
     }
   }
 
-  static async generateBatchVsacPromises(oidsToFetch: string[]) {
-    let valueSetPromises = Promise.all(
-      oidsToFetch.map(async (oid) => {
-        // First, we'll pull the value set from VSAC and map it to our representation
-        try {
-          const vs = await getVSACValueSet(oid);
-
-          return vs;
-        } catch (error) {
-          console.error(error);
-        }
-      }),
-    );
-
-    return valueSetPromises;
-  }
-
   // -------------------------------- //
   //          Helper Methods
   // -------------------------------- //
@@ -705,5 +688,3 @@ export const getConditionsData = SeedingService.getConditionsData;
 export const getValueSetsAndConceptsByConditionIDs =
   SeedingService.getValueSetsAndConceptsByConditionIDs;
 export const getAllValueSets = SeedingService.getAllValueSets;
-export const generateBatchVsacPromises =
-  SeedingService.generateBatchVsacPromises;

@@ -14,7 +14,6 @@ import {
   insertValueSet,
   insertDBStructArray,
   executeCategoryUpdates,
-  generateBatchVsacPromises,
 } from "@/app/backend/seeding/service";
 import * as fs from "fs";
 import path from "path";
@@ -357,7 +356,7 @@ export async function createDibbsDB() {
       // }
     } catch (e) {
       if (e instanceof Error) {
-        console.error("DB reload failed");
+        console.error("DB reload failed", e.message);
         return {
           success: false,
           reload: false,
@@ -377,4 +376,27 @@ export async function createDibbsDB() {
     console.log("Database already has data; skipping DIBBs DB creation.");
     return { success: true, reload: false };
   }
+}
+
+/**
+ * helper function to generate VSAC promises
+ *
+ * @param oidsToFetch - OIDs from the eRSD to query from VSAC
+ * @returns Promises to resolve that will give you the requested VSAC valuesets
+ */
+export async function generateBatchVsacPromises(oidsToFetch: string[]) {
+  let valueSetPromises = Promise.all(
+    oidsToFetch.map(async (oid) => {
+      // First, we'll pull the value set from VSAC and map it to our representation
+      try {
+        const vs = await getVSACValueSet(oid);
+
+        return vs;
+      } catch (error) {
+        console.error(error);
+      }
+    }),
+  );
+
+  return valueSetPromises;
 }
