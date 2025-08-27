@@ -21,7 +21,7 @@ import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import { getRole } from "@/app/(pages)/userManagement/utils";
 import { getUserByUsername } from "@/app/backend/user-management";
 import { User, UserRole } from "@/app/models/entities/users";
-
+import { checkDBForData } from "@/app/backend/seeding/service";
 import { isAuthDisabledClientCheck } from "@/app/utils/auth";
 
 type QuerySelectionProps = {
@@ -59,7 +59,7 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({ setBuildStep }) => {
     userRole !== UserRole.SUPER_ADMIN &&
     userRole !== UserRole.ADMIN;
 
-  // Retrieve and store current logged-in user's data on page load
+  // Retrieve and store user and db seeded information on page load
   useEffect(() => {
     const fetchCurrentUser = async () => {
       setUserLoading(true);
@@ -82,6 +82,13 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({ setBuildStep }) => {
       }
     };
 
+    const fetchDbSeededState = async () => {
+      const dbSeeded = await checkDBForData();
+      setDbSeeded(dbSeeded);
+      return;
+    };
+
+    fetchDbSeededState();
     if (!authDisabled) {
       fetchCurrentUser();
     } else {
@@ -99,6 +106,7 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({ setBuildStep }) => {
             : await getQueryList();
 
           setQueries(fetchedQueries);
+
           queriesContext?.setData(queries);
         } catch (error) {
           if (error == "Error: Unauthorized") {
@@ -117,10 +125,9 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({ setBuildStep }) => {
   }, [currentUser]);
 
   const loading = userLoading || queries === undefined;
-
   return (
     <div className="main-container__wide">
-      {!dbSeeded || !unauthorizedError ? (
+      {!loading && (!dbSeeded || unauthorizedError || queries.length === 0) ? (
         <EmptyQueriesDisplay
           setDbSeeded={setDbSeeded}
           goForward={() => {
