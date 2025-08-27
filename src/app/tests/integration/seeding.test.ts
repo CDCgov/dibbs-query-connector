@@ -35,7 +35,7 @@ const VSAC_FIXTURE_RETIRED_IDS = (vsacFixtures as ValueSet[]).filter((v) => {
   return v?.compose?.include[0]?.concept === undefined;
 });
 
-const TWENTY_MINS_IN_MILLI = 20 * 1000;
+const TWENTY_SECONDS_IN_MILLI = 20 * 1000;
 describe("runs the eRSD ingestion flow", () => {
   beforeAll(() => {
     suppressConsoleLogs();
@@ -50,6 +50,6 @@ describe("runs the eRSD ingestion flow", () => {
         ERSD_FIXTURE_RESOURCE_LENGTH - VSAC_FIXTURE_RETIRED_IDS.length,
       );
     },
-    TWENTY_MINS_IN_MILLI,
+    TWENTY_SECONDS_IN_MILLI,
   );
 });
