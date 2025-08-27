@@ -34,7 +34,8 @@ eval $JEST_CMD
 JEST_EXIT_CODE=$?
 
 # uncomment these and the corresponding block in ci.yaml to get logs in CI
-#docker compose -f docker-compose-integration.yaml logs > test-results/logs-after-tests.txt
+docker compose -f docker-compose-e2e.yaml logs query-connector >> test-results/logs-after-tests.txt
+docker compose -f docker-compose-e2e.yaml logs aidbox >> test-results/logs-after-tests.txt
 
 # Teardown containers
 docker compose -f docker-compose-integration.yaml down

@@ -10,7 +10,11 @@ import {
 import { useSession } from "next-auth/react";
 import EmptyQueriesDisplay from "./EmptyQueriesDisplay";
 import MyQueriesDisplay from "./QueryRepository";
-import { BuildStep } from "@/app/constants";
+import {
+  BuildStep,
+  GENERIC_ERROR_BODY,
+  GENERIC_ERROR_HEADING,
+} from "@/app/constants";
 import { DataContext } from "@/app/utils/DataProvider";
 import { CustomUserQuery } from "@/app/models/entities/query";
 import {
@@ -109,14 +113,22 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({ setBuildStep }) => {
 
           queriesContext?.setData(queries);
         } catch (error) {
-          if (error == "Error: Unauthorized") {
-            setUnauthorizedError(true);
-            showToastConfirmation({
-              body: "You are not authorized to see queries.",
-              variant: "error",
-            });
+          let heading = GENERIC_ERROR_HEADING;
+          let body = GENERIC_ERROR_BODY;
+          if (error instanceof Error) {
+            if (error.message.includes("permission check")) {
+              body = "You're not authorized to see this page";
+              setUnauthorizedError(true);
+            }
           }
           console.error("Failed to fetch queries:", error);
+
+          showToastConfirmation({
+            heading: heading,
+            body: body,
+            variant: "error",
+            autoClose: false,
+          });
         }
       }
     };
