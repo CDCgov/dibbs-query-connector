@@ -120,6 +120,10 @@
   margin-bottom: 0.5rem;
 }
 
+.no-border {
+  border: none !important;
+}
+
 // Context classes
 .home {
   display: grid;
@@ -215,7 +219,6 @@ iframe:focus,
 }
 
 /* Styles for the customize page */
-
 .button-container {
   display: flex;
   justify-content: flex-start;

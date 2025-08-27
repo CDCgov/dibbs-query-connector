@@ -140,21 +140,21 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({ setBuildStep }) => {
   const loading = userLoading || queries === undefined;
   return (
     <div className="main-container__wide">
-      {!loading && (!dbSeeded || queries.length === 0) && (
+      {!loading && (!dbSeeded || queries.length === 0) ? (
         <EmptyQueriesDisplay
           setDbSeeded={setDbSeeded}
           goForward={() => {
             setBuildStep("condition");
           }}
         />
+      ) : (
+        <MyQueriesDisplay
+          loading={loading || unauthorizedError}
+          queries={queries || []}
+          setBuildStep={setBuildStep}
+          setQueries={setQueries}
+        />
       )}
-
-      <MyQueriesDisplay
-        loading={loading || unauthorizedError}
-        queries={queries || []}
-        setBuildStep={setBuildStep}
-        setQueries={setQueries}
-      />
     </div>
   );
 };

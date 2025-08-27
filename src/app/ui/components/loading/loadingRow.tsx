@@ -15,7 +15,7 @@ export const LoadingRow: React.FC<LoadingRowProps> = ({ numCells }) => {
     <tr>
       {[...Array(numCells).keys()].map((i) => {
         return (
-          <td key={i}>
+          <td className="no-border" key={i}>
             <Skeleton />
           </td>
         );
