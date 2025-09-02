@@ -356,7 +356,7 @@ export async function createDibbsDB() {
       await insertSeedDbStructs("query");
       await insertSeedDbStructs("category");
       await executeCategoryUpdates();
-      return { success: false, reload: false };
+      return { success: true, reload: true };
 
       // }
     } catch (e) {
