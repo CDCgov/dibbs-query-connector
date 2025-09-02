@@ -302,9 +302,13 @@ class SeedingService {
       const data = (await response.json()) as Bundle;
       return data;
     } else {
-      const diagnosticIssue = await response
-        .json()
-        .then((r) => r.issue[0].diagnostics);
+      const diagnosticIssue = await response.json().then((r) => {
+        try {
+          return r?.issue[0]?.diagnostics;
+        } catch {
+          return r;
+        }
+      });
       return {
         resourceType: "OperationOutcome",
         issue: [

@@ -133,6 +133,7 @@ export async function seedBatchValueSetsFromVsac(
   const oidsToVersion: Map<String, String> = new Map<String, String>();
   const retiredOids: Set<String> = new Set<String>();
 
+  odi;
   console.log(
     "Attempting fetches and inserts for",
     oidData.oids.length,
@@ -146,9 +147,14 @@ export async function seedBatchValueSetsFromVsac(
       Math.min(lastIdx, oidData.oids.length),
     );
 
-    let valueSetPromises = (await generateBatchVsacPromises(oidsToFetch)).map(
-      (vs, i) => {
-        const oid = oidsToFetch[i];
+    let valueSetsToInsert = (await generateBatchVsacPromises(oidsToFetch)).map(
+      (r) => {
+        if (r.status === "rejected") {
+          console.error("Valueset fetch rejected: ", r.reason);
+          return;
+        }
+
+        const { vs, oid } = r.value;
         const eRSDType: ErsdConceptType = oidData.oidToErsdType.get(
           oid,
         ) as ErsdConceptType;
@@ -169,13 +175,15 @@ export async function seedBatchValueSetsFromVsac(
     // Next, in case we hit a value set that has a `retired` status and
     // a deprecated concept listing, we'll need to filter for only those
     // with defined Concepts
-    valueSetPromises = valueSetPromises.filter((vsp): vsp is DibbsValueSet => {
-      return vsp?.concepts !== undefined;
-    });
+    valueSetsToInsert = valueSetsToInsert.filter(
+      (vsp): vsp is DibbsValueSet => {
+        return vsp?.concepts !== undefined;
+      },
+    );
 
     // Then, we'll insert it into our database instance
     await Promise.all(
-      valueSetPromises.map(async (vs) => {
+      valueSetsToInsert.map(async (vs) => {
         if (vs) {
           await insertValueSet(vs);
         }
@@ -183,7 +191,7 @@ export async function seedBatchValueSetsFromVsac(
     );
 
     // Finally, we verify that the insert was performed correctly
-    valueSetPromises.map(async (vs) => {
+    valueSetsToInsert.map(async (vs) => {
       if (vs) {
         let missingData = await checkValueSetInsertion(vs);
         // Note: We don't actually have functions for inserting concepts,
@@ -381,15 +389,18 @@ export async function createDibbsDB() {
  * @returns Promises to resolve that will give you the requested VSAC valuesets
  */
 export async function generateBatchVsacPromises(oidsToFetch: string[]) {
-  let valueSetPromises = Promise.all(
+  const valueSetPromises = Promise.allSettled(
     oidsToFetch.map(async (oid) => {
-      // First, we'll pull the value set from VSAC and map it to our representation
       try {
+        // First, we'll pull the value set from VSAC and map it to our representation
         const vs = await getVSACValueSet(oid);
-
-        return vs;
-      } catch (error) {
-        console.error(error);
+        return { vs: vs, oid: oid };
+      } catch (e) {
+        let message = `Fetch for VSAC value set with oid ${oid} failed`;
+        if (e instanceof Error) {
+          message = message + ` with error message: ${e.message}`;
+        }
+        return Promise.reject(new Error(message));
       }
     }),
   );
