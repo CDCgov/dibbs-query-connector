@@ -1,7 +1,11 @@
 "use server";
 
-import { ersdToDibbsConceptMap, ErsdConceptType } from "@/app/constants";
-import { Bundle, BundleEntry, Parameters, ValueSet } from "fhir/r4";
+import {
+  ersdToDibbsConceptMap,
+  ErsdConceptType,
+  MISSING_API_KEY_LITERAL,
+} from "@/app/constants";
+import { Bundle, Parameters, ValueSet } from "fhir/r4";
 import {
   checkDBForData,
   checkValueSetInsertion,
@@ -19,9 +23,8 @@ import {
   ConditionToValueSetStruct,
   dbInsertStruct,
 } from "../seeding/seedSqlStructs";
-import { translateVSACToInternalValueSet } from "./lib";
-
-const ERSD_TYPED_RESOURCE_URL = "http://ersd.aimsplatform.org/fhir/ValueSet/";
+import { indexErsdByOid, translateVSACToInternalValueSet } from "./lib";
+import { DibbsValueSet } from "@/app/models/entities/valuesets";
 
 type ersdCondition = {
   code: string;
@@ -30,7 +33,7 @@ type ersdCondition = {
   valueset_id: string;
 };
 
-type OidData = {
+export type OidData = {
   oids: Array<string>;
   oidToErsdType: Map<string, string>;
   conditions: Array<ersdCondition>;
@@ -56,79 +59,46 @@ const sleep = (ms: number) => {
  * @returns An OidData object containing the OIDs extracted as well as the
  * clinical service type associated with each.
  */
-async function getOidsFromErsd() {
-  try {
-    console.log("Fetching and parsing eRSD.");
-    const ersd = await getERSD();
-    const valuesets = (ersd as unknown as Bundle)["entry"]?.filter(
-      (e) => e.resource?.resourceType === "ValueSet",
+export async function getOidsFromErsd() {
+  console.log("Fetching and parsing eRSD.");
+  const ersd = await getERSD();
+  const valuesets = (ersd as unknown as Bundle)["entry"]?.filter(
+    (e) => e.resource?.resourceType === "ValueSet",
+  );
+
+  const { nonUmbrellaValueSets, oidToErsdType } = indexErsdByOid(valuesets);
+  // Build up a mapping of OIDs to eRSD clinical types
+
+  let conditionExtractor: Array<ersdCondition> = [];
+  nonUmbrellaValueSets.reduce((acc: Array<ersdCondition>, vs: ValueSet) => {
+    const conditionSchemes = vs.useContext?.filter(
+      (context) =>
+        !(context.valueCodeableConcept?.coding || [])[0].system?.includes(
+          "us-ph-usage-context",
+        ),
     );
-
-    // Build up a mapping of OIDs to eRSD clinical types
-    const oidToErsdType = new Map<string, string>();
-    Object.keys(ersdToDibbsConceptMap).forEach((k) => {
-      const keyedUrl = ERSD_TYPED_RESOURCE_URL + k;
-      const umbrellaValueSet = valuesets?.find((vs) => vs.fullUrl === keyedUrl);
-
-      // These "bulk" valuesets of service types compose references
-      // to all value sets that fall under their purview
-      const composedValueSets: Array<string> =
-        (umbrellaValueSet as BundleEntry<ValueSet>)?.resource?.compose
-          ?.include[0].valueSet || ([] as Array<string>);
-      composedValueSets.reduce((acc: Map<string, string>, vsUrl: string) => {
-        const vsArray = vsUrl.split("/");
-        const oid = vsArray[vsArray.length - 1];
-        acc.set(oid, k);
-        return acc;
-      }, oidToErsdType);
+    (conditionSchemes || []).forEach((usc) => {
+      const ersdCond: ersdCondition = {
+        code: (usc.valueCodeableConcept?.coding || [])[0].code || "",
+        system: (usc.valueCodeableConcept?.coding || [])[0].system || "",
+        text: usc.valueCodeableConcept?.text || "",
+        valueset_id: vs.id || "",
+      };
+      conditionExtractor.push(ersdCond);
     });
+    return conditionExtractor;
+  }, conditionExtractor);
 
-    // Condition-valueset linkages are stored in the "usage context" structure of
-    // the value codeable concept of each resource's base level
-    // We can filter out public health informatics contexts to get only the meaningful
-    // conditions
-    const nonUmbrellaEntries = valuesets?.filter(
-      (vs) =>
-        !Object.keys(ersdToDibbsConceptMap).includes(vs.resource?.id || ""),
-    ) as BundleEntry<ValueSet>[];
-    const nonUmbrellaValueSets: Array<ValueSet> = (
-      nonUmbrellaEntries || []
-    ).map((vs) => {
-      return vs.resource || ({} as ValueSet);
-    });
-    let conditionExtractor: Array<ersdCondition> = [];
-    nonUmbrellaValueSets.reduce((acc: Array<ersdCondition>, vs: ValueSet) => {
-      const conditionSchemes = vs.useContext?.filter(
-        (context) =>
-          !(context.valueCodeableConcept?.coding || [])[0].system?.includes(
-            "us-ph-usage-context",
-          ),
-      );
-      (conditionSchemes || []).forEach((usc) => {
-        const ersdCond: ersdCondition = {
-          code: (usc.valueCodeableConcept?.coding || [])[0].code || "",
-          system: (usc.valueCodeableConcept?.coding || [])[0].system || "",
-          text: usc.valueCodeableConcept?.text || "",
-          valueset_id: vs.id || "",
-        };
-        conditionExtractor.push(ersdCond);
-      });
-      return conditionExtractor;
-    }, conditionExtractor);
-
-    // Make sure to take out the umbrella value sets from the ones we try to insert
-    let oids = valuesets?.map((vs) => vs.resource?.id);
-    oids = oids?.filter(
-      (oid) => !Object.keys(ersdToDibbsConceptMap).includes(oid || ""),
-    );
-    return {
-      oids: oids,
-      oidToErsdType: oidToErsdType,
-      conditions: conditionExtractor,
-    } as OidData;
-  } catch (error) {
-    console.error("Couldn't query eRSD: ", error);
-  }
+  // Make sure to take out the umbrella value sets from the ones we try to insert
+  let oids = valuesets?.map((vs) => vs.resource?.id);
+  oids = oids?.filter(
+    (oid) => !Object.keys(ersdToDibbsConceptMap).includes(oid || ""),
+  );
+  return {
+    oids: oids,
+    oidToErsdType: oidToErsdType,
+    conditions: conditionExtractor,
+  } as OidData;
 }
 
 /**
@@ -144,7 +114,19 @@ async function getOidsFromErsd() {
  * each such ID.
  * @param batchSize The number of asynchronous calls to fire at once. Default is 100.
  */
-async function fetchBatchValueSetsFromVsac(oidData: OidData, batchSize = 100) {
+export async function seedBatchValueSetsFromVsac(
+  oidData: OidData,
+  batchSize = 100,
+) {
+  const umlsKey = process.env.UMLS_API_KEY;
+  if (!umlsKey) {
+    throw Error(
+      "UMLS API Key not set. Please refer to the documentation below on how to get your UMLS API key before continuing",
+      {
+        cause: MISSING_API_KEY_LITERAL,
+      },
+    );
+  }
   let startIdx = 0;
   let lastIdx = startIdx + batchSize;
 
@@ -164,49 +146,51 @@ async function fetchBatchValueSetsFromVsac(oidData: OidData, batchSize = 100) {
       Math.min(lastIdx, oidData.oids.length),
     );
 
-    let valueSetPromises = await Promise.all(
-      oidsToFetch.map(async (oid) => {
-        // First, we'll pull the value set from VSAC and map it to our representation
-        try {
-          const vs = await getVSACValueSet(oid);
-          const eRSDType: ErsdConceptType = oidData.oidToErsdType.get(
-            oid,
-          ) as ErsdConceptType;
-          const internalValueSet = translateVSACToInternalValueSet(
-            vs as unknown as ValueSet,
-            eRSDType,
-          );
-          oidsToVersion.set(oid, internalValueSet.valueSetVersion);
-
-          // Found a retired OID, store it so we don't insert condition mappings on it
-          if (internalValueSet.concepts === undefined) {
-            retiredOids.add(internalValueSet.valueSetExternalId || "");
-          }
-          return internalValueSet;
-        } catch (error) {
-          console.error(error);
+    let valueSetsToInsert = (await generateBatchVsacPromises(oidsToFetch)).map(
+      (r) => {
+        if (r.status === "rejected") {
+          console.error("Valueset fetch rejected: ", r.reason);
+          return;
         }
-      }),
+
+        const { vs, oid } = r.value;
+        const eRSDType: ErsdConceptType = oidData.oidToErsdType.get(
+          oid,
+        ) as ErsdConceptType;
+        const internalValueSet = translateVSACToInternalValueSet(
+          vs as unknown as ValueSet,
+          eRSDType,
+        );
+        oidsToVersion.set(oid, internalValueSet.valueSetVersion);
+
+        // Found a retired OID, store it so we don't insert condition mappings on it
+        if (internalValueSet.concepts === undefined) {
+          retiredOids.add(internalValueSet.valueSetExternalId || "");
+        }
+        return internalValueSet;
+      },
     );
 
     // Next, in case we hit a value set that has a `retired` status and
     // a deprecated concept listing, we'll need to filter for only those
     // with defined Concepts
-    valueSetPromises = valueSetPromises.filter(
-      (vsp) => vsp?.concepts !== undefined,
+    valueSetsToInsert = valueSetsToInsert.filter(
+      (vsp): vsp is DibbsValueSet => {
+        return vsp?.concepts !== undefined;
+      },
     );
 
     // Then, we'll insert it into our database instance
     await Promise.all(
-      valueSetPromises.map(async (vs) => {
+      valueSetsToInsert.map(async (vs) => {
         if (vs) {
           await insertValueSet(vs);
         }
       }),
     );
 
-    // // Finally, we verify that the insert was performed correctly
-    valueSetPromises.map(async (vs) => {
+    // Finally, we verify that the insert was performed correctly
+    valueSetsToInsert.map(async (vs) => {
       if (vs) {
         let missingData = await checkValueSetInsertion(vs);
         // Note: We don't actually have functions for inserting concepts,
@@ -351,14 +335,14 @@ export async function createDibbsDB() {
   const dbHasData = await checkDBForData();
 
   if (!dbHasData) {
-    const ersdOidData = await getOidsFromErsd();
-    if (ersdOidData) {
-      await fetchBatchValueSetsFromVsac(ersdOidData);
-    } else {
-      console.error("Could not load eRSD, aborting DIBBs DB creation");
-    }
-
     try {
+      const ersdOidData = await getOidsFromErsd();
+      if (ersdOidData) {
+        await seedBatchValueSetsFromVsac(ersdOidData);
+      } else {
+        console.error("Could not load eRSD, aborting DIBBs DB creation");
+      }
+
       // Only run default and custom insertions if we're making the dump
       // file for dev
       // if (process.env.NODE_ENV !== "production") {
@@ -373,12 +357,52 @@ export async function createDibbsDB() {
       return { success: false, reload: false };
 
       // }
-    } catch {
-      console.error("DB reload failed");
-      return { succes: false, reload: false };
+    } catch (e) {
+      if (e instanceof Error) {
+        console.error("DB reload failed", e.message);
+        return {
+          success: false,
+          reload: false,
+          message: e.message,
+          cause: e.cause,
+        };
+      }
+
+      return {
+        success: false,
+        reload: false,
+        message:
+          "DB creation failed with an unknown error. Please contact us for help",
+      };
     }
   } else {
     console.log("Database already has data; skipping DIBBs DB creation.");
     return { success: true, reload: false };
   }
+}
+
+/**
+ * helper function to generate VSAC promises
+ *
+ * @param oidsToFetch - OIDs from the eRSD to query from VSAC
+ * @returns Promises to resolve that will give you the requested VSAC valuesets
+ */
+export async function generateBatchVsacPromises(oidsToFetch: string[]) {
+  const valueSetPromises = Promise.allSettled(
+    oidsToFetch.map(async (oid) => {
+      try {
+        // First, we'll pull the value set from VSAC and map it to our representation
+        const vs = await getVSACValueSet(oid);
+        return { vs: vs, oid: oid };
+      } catch (e) {
+        let message = `Fetch for VSAC value set with oid ${oid} failed`;
+        if (e instanceof Error) {
+          message = message + ` with error message: ${e.message}`;
+        }
+        return Promise.reject(new Error(message));
+      }
+    }),
+  );
+
+  return valueSetPromises;
 }
