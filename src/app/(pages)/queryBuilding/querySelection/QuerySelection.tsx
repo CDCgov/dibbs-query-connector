@@ -79,7 +79,6 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({ setBuildStep }) => {
             variant: "error",
           });
           setUnauthorizedError(true);
-          setUnauthorizedError(true);
         }
         console.error(`Failed to fetch current user: ${error}`);
       } finally {

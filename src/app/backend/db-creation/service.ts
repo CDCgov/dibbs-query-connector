@@ -148,10 +148,6 @@ export async function seedBatchValueSetsFromVsac(
 
     let valueSetPromises = (await generateBatchVsacPromises(oidsToFetch)).map(
       (vs, i) => {
-        if (!vs) {
-          console.log(oidsToFetch[i]);
-          return undefined;
-        }
         const oid = oidsToFetch[i];
         const eRSDType: ErsdConceptType = oidData.oidToErsdType.get(
           oid,
