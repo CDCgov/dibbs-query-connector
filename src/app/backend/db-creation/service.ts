@@ -133,7 +133,6 @@ export async function seedBatchValueSetsFromVsac(
   const oidsToVersion: Map<String, String> = new Map<String, String>();
   const retiredOids: Set<String> = new Set<String>();
 
-  odi;
   console.log(
     "Attempting fetches and inserts for",
     oidData.oids.length,
