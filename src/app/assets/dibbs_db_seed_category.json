@@ -161,11 +161,6 @@
       "category": "Sexually Transmitted Diseases"
     },
     {
-      "condition_name": "Chemical Pneumonitis",
-      "condition_code": "233733000",
-      "category": "Respiratory Conditions (non-infectious)"
-    },
-    {
       "condition_name": "Chikungunya virus disease",
       "condition_code": "111864006",
       "category": "Vectorborne Diseases"
