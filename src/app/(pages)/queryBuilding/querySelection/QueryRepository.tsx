@@ -29,6 +29,7 @@ import {
 } from "@/app/constants";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import LoadingRow from "@/app/ui/components/loading/loadingRow";
+import Skeleton from "react-loading-skeleton";
 
 interface UserQueriesDisplayProps {
   queries: CustomUserQuery[];
@@ -113,38 +114,50 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
         setDeletedQuery,
       )}
       <div className="display-flex flex-justify-between flex-align-center width-full margin-bottom-4">
-        <h1 className="flex-align-center margin-0">Query repository</h1>
+        <h1 className="flex-align-center margin-0">
+          {loading ? <Skeleton width={250} /> : "Query repository"}
+        </h1>
         <div className="margin-left-auto">
-          <Button
-            onClick={() => {
-              setBuildStep("condition");
-              queryContext?.setSelectedQuery?.(
-                structuredClone(EMPTY_QUERY_SELECTION),
-              );
-              queryContext?.setData?.(null);
-            }}
-            className={styles.createQueryButton}
-            type="button"
-          >
-            Create query
-          </Button>
+          {loading ? (
+            <Skeleton width={200} height={50} />
+          ) : (
+            <Button
+              onClick={() => {
+                setBuildStep("condition");
+                queryContext?.setSelectedQuery?.(
+                  structuredClone(EMPTY_QUERY_SELECTION),
+                );
+                queryContext?.setData?.(null);
+              }}
+              className={styles.createQueryButton}
+              type="button"
+              disabled={loading}
+            >
+              Create query
+            </Button>
+          )}
         </div>
       </div>
       <div className={styles.customQueryWrapper}>
-        <Table className={styles.customQueryTable}>
-          <thead>
-            <tr className={styles.myQueriesRow}>
-              <th scope="col">NAME</th>
-              <th scope="col">CONDITIONS</th>
-            </tr>
-          </thead>
-          {loading ? (
+        {loading ? (
+          <Table className={styles.customQueryTable}>
+            <thead>
+              <LoadingRow numCells={2}></LoadingRow>
+            </thead>
             <tbody data-testid={"repository-loading-skeleton"}>
               <LoadingRow numCells={3} />
               <LoadingRow numCells={3} />
               <LoadingRow numCells={3} />
             </tbody>
-          ) : (
+          </Table>
+        ) : (
+          <Table className={styles.customQueryTable}>
+            <thead>
+              <tr className={styles.myQueriesRow}>
+                <th scope="col">NAME</th>
+                <th scope="col">CONDITIONS</th>
+              </tr>
+            </thead>
             <tbody>
               {conditionIdToDetailsMap &&
                 queries
@@ -249,8 +262,8 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
                     );
                   })}
             </tbody>
-          )}
-        </Table>
+          </Table>
+        )}
       </div>
     </div>
   );

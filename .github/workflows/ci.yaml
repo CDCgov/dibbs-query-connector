@@ -48,6 +48,7 @@ jobs:
           echo "AIDBOX_BASE_URL=http://localhost:8080" >> .env
           echo "APP_HOSTNAME=http://query-connector:3000" >> .env
       - name: Run tests
+        id: run_unit_and_integration_tests
         run: |
           sudo mkdir keys
           sudo chmod -R 755 keys
@@ -56,7 +57,7 @@ jobs:
         # uncomment these next few lines and the corresponding log import
         # in the setup script you're trying to debug if you're having trouble
         # in CI. All the best, brave engineer (￣^￣ )ゞ
-        # continue-on-error: true
+      #   continue-on-error: true
 
       # - name: Upload Docker Logs
       #   uses: actions/upload-artifact@v4
@@ -65,6 +66,10 @@ jobs:
       #     path: |
       #       ./test-results/logs-before-tests.txt
       #       ./test-results/logs-after-tests.txt
+
+      # - name: Exit with proper code
+      #   if: steps.run_unit_and_integration_tests.outcome == 'failure'
+      #   run: exit 1 # Force the workflow to fail if tests failed
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v5
@@ -98,31 +103,31 @@ jobs:
             echo "MTLS_CERT=$MTLS_CERT_B64"
             echo "MTLS_KEY=$MTLS_KEY_B64"
             echo "NEXT_PUBLIC_AUTH_PROVIDER=keycloak"
-            echo "IS_E2E=true"
+            echo "RUN_FETCH_INTERCEPTOR=true"
           } > .env
       - name: Build Query Connector and Run Playwright Tests
-        id: run_tests
+        id: run_e2e_tests
         run: |
           bash ./setup-scripts/e2e_tests.sh
         # uncomment these next few lines and the corresponding log import
         # in the setup script you're trying to debug if you're having trouble
         # in CI. All the best, brave engineer (￣^￣ )ゞ
-        continue-on-error: true
+      #   continue-on-error: true
 
-      - name: Upload Docker Logs
-        uses: actions/upload-artifact@v4
-        with:
-          name: docker-logs
-          path: |
-            ./test-results/logs-before-tests.txt
-            ./test-results/logs-after-tests.txt
+      # - name: Upload Docker Logs
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: docker-logs
+      #     path: |
+      #       ./test-results/logs-before-tests.txt
+      #       ./test-results/logs-after-tests.txt
 
-      - uses: actions/upload-artifact@v4
-        if: ${{ !cancelled() }}
-        with:
-          name: test-results
-          path: ./test-results/
+      # - uses: actions/upload-artifact@v4
+      #   if: ${{ !cancelled() }}
+      #   with:
+      #     name: test-results
+      #     path: ./test-results/
 
-      - name: Exit with proper code
-        if: steps.run_tests.outcome == 'failure'
-        run: exit 1 # Force the workflow to fail if tests failed
+      # - name: Exit with proper code
+      #   if: steps.run_e2e_tests.outcome == 'failure'
+      #   run: exit 1 # Force the workflow to fail if tests failed

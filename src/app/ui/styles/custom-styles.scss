@@ -120,6 +120,10 @@
   margin-bottom: 0.5rem;
 }
 
+.no-border {
+  border: none !important;
+}
+
 // Context classes
 .home {
   display: grid;
@@ -215,7 +219,6 @@ iframe:focus,
 }
 
 /* Styles for the customize page */
-
 .button-container {
   display: flex;
   justify-content: flex-start;
@@ -325,9 +328,8 @@ iframe:focus,
     background-color: color("success");
   }
 
-  .Toastify__toast--success,
-  .Toastify__toast--stacked[data-collapsed="true"] {
-    background-color: color("success-lighter");
+  .Toastify__toast--error {
+    background-color: color("error");
   }
 
   .Toastify__progress-bar--success {

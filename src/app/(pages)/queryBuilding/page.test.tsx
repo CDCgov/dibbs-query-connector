@@ -10,6 +10,7 @@ jest.mock("@/app/backend/seeding/service", () => ({
     // here to prevent a distracting error log from showing up in test
     conditionIdToNameMap: {},
   }),
+  checkDBForData: jest.fn().mockResolvedValue(true),
 }));
 
 jest.mock("../userManagement/utils", () => ({
@@ -72,7 +73,9 @@ describe("tests the query building steps", () => {
     expect(screen.getByText("Query repository")).toBeInTheDocument();
 
     expectedQueryNames.forEach(async (name) => {
-      expect(screen.getByText(name)).toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.getByText(name)).toBeInTheDocument();
+      });
     });
   });
 });

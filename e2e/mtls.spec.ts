@@ -1,16 +1,7 @@
 import { TEST_URL } from "../playwright-setup";
-import { test, expect } from "@playwright/test";
+import { expect } from "@playwright/test";
 import { PAGE_TITLES } from "../src/app/(pages)/query/components/stepIndicator/StepIndicator";
-import { MockClient } from "request-mocking-protocol";
-
-const testWithMock = test.extend<{ mockServerRequest: MockClient }>({
-  mockServerRequest: async ({ context }, use) => {
-    const mockClient = new MockClient();
-    mockClient.onChange = async (headers) =>
-      context.setExtraHTTPHeaders(headers);
-    await use(mockClient);
-  },
-});
+import { testWithMock } from "./utils";
 
 testWithMock.describe("Mutual TLS", () => {
   testWithMock(

@@ -10,7 +10,11 @@ import {
 import { useSession } from "next-auth/react";
 import EmptyQueriesDisplay from "./EmptyQueriesDisplay";
 import MyQueriesDisplay from "./QueryRepository";
-import { BuildStep } from "@/app/constants";
+import {
+  BuildStep,
+  GENERIC_ERROR_BODY,
+  GENERIC_ERROR_HEADING,
+} from "@/app/constants";
 import { DataContext } from "@/app/utils/DataProvider";
 import { CustomUserQuery } from "@/app/models/entities/query";
 import {
@@ -21,7 +25,7 @@ import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import { getRole } from "@/app/(pages)/userManagement/utils";
 import { getUserByUsername } from "@/app/backend/user-management";
 import { User, UserRole } from "@/app/models/entities/users";
-
+import { checkDBForData } from "@/app/backend/seeding/service";
 import { isAuthDisabledClientCheck } from "@/app/utils/auth";
 
 type QuerySelectionProps = {
@@ -42,6 +46,7 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({ setBuildStep }) => {
   const queriesContext = useContext(DataContext);
 
   const [userLoading, setUserLoading] = useState(true);
+  const [dbSeeded, setDbSeeded] = useState(false);
   const [queries, setQueries] = useState<CustomUserQuery[] | undefined>(
     queriesContext?.data
       ? (queriesContext?.data as CustomUserQuery[])
@@ -58,7 +63,7 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({ setBuildStep }) => {
     userRole !== UserRole.SUPER_ADMIN &&
     userRole !== UserRole.ADMIN;
 
-  // Retrieve and store current logged-in user's data on page load
+  // Retrieve and store user and db seeded information on page load
   useEffect(() => {
     const fetchCurrentUser = async () => {
       setUserLoading(true);
@@ -69,11 +74,11 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({ setBuildStep }) => {
         setCurrentUser(currentUser.items[0]);
       } catch (error) {
         if (error == "Error: Unauthorized") {
-          setUnauthorizedError(true);
           showToastConfirmation({
             body: "You are not authorized to see queries.",
             variant: "error",
           });
+          setUnauthorizedError(true);
         }
         console.error(`Failed to fetch current user: ${error}`);
       } finally {
@@ -81,6 +86,13 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({ setBuildStep }) => {
       }
     };
 
+    const fetchDbSeededState = async () => {
+      const dbSeeded = await checkDBForData();
+      setDbSeeded(dbSeeded);
+      return;
+    };
+
+    fetchDbSeededState();
     if (!authDisabled) {
       fetchCurrentUser();
     } else {
@@ -98,16 +110,25 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({ setBuildStep }) => {
             : await getQueryList();
 
           setQueries(fetchedQueries);
+
           queriesContext?.setData(queries);
         } catch (error) {
-          if (error == "Error: Unauthorized") {
-            setUnauthorizedError(true);
-            showToastConfirmation({
-              body: "You are not authorized to see queries.",
-              variant: "error",
-            });
+          let heading = GENERIC_ERROR_HEADING;
+          let body = GENERIC_ERROR_BODY;
+          if (error instanceof Error) {
+            if (error.message.includes("permission check")) {
+              body = "You're not authorized to see this page";
+              setUnauthorizedError(true);
+            }
           }
           console.error("Failed to fetch queries:", error);
+
+          showToastConfirmation({
+            heading: heading,
+            body: body,
+            variant: "error",
+            autoClose: false,
+          });
         }
       }
     };
@@ -116,18 +137,18 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({ setBuildStep }) => {
   }, [currentUser]);
 
   const loading = userLoading || queries === undefined;
-
   return (
     <div className="main-container__wide">
-      {!loading && queries.length === 0 && !unauthorizedError ? (
+      {!loading && (!dbSeeded || queries.length === 0) ? (
         <EmptyQueriesDisplay
+          setDbSeeded={setDbSeeded}
           goForward={() => {
             setBuildStep("condition");
           }}
         />
       ) : (
         <MyQueriesDisplay
-          loading={loading}
+          loading={loading || unauthorizedError}
           queries={queries || []}
           setBuildStep={setBuildStep}
           setQueries={setQueries}

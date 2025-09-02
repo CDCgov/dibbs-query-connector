@@ -184,14 +184,6 @@ jest.mock("@/app/backend/audit-logs/decorator", () => ({
     ),
 }));
 
-jest.mock("@/app/backend/query-building/service", () => ({
-  getSavedQueryById: jest.fn().mockResolvedValue({
-    queryName: "Syphilis",
-    queryData: {},
-    medicalRecordSections: {},
-  }),
-}));
-
 // Mock critical missing dependencies
 jest.mock("@/app/utils/format-service", () => ({
   GetPhoneQueryFormats: jest
@@ -199,8 +191,13 @@ jest.mock("@/app/utils/format-service", () => ({
     .mockResolvedValue(["555-123-4567", "5551234567"]),
 }));
 
-jest.mock("@/app/backend/seeding/service", () => ({
+jest.mock("@/app/backend/query-building/service", () => ({
   getSavedQueryByName: jest.fn().mockResolvedValue({
+    queryName: "Syphilis",
+    queryData: {},
+    medicalRecordSections: {},
+  }),
+  getSavedQueryById: jest.fn().mockResolvedValue({
     queryName: "Syphilis",
     queryData: {},
     medicalRecordSections: {},

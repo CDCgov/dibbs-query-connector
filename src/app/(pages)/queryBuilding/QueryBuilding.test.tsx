@@ -12,6 +12,7 @@ jest.mock("@/app/backend/seeding/service", () => ({
     // here to prevent a distracting error log from showing up in test
     conditionIdToNameMap: {},
   }),
+  checkDBForData: jest.fn().mockResolvedValue(true),
 }));
 
 jest.mock(

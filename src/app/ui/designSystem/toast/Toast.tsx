@@ -8,7 +8,7 @@ export type AlertType = "info" | "success" | "warning" | "error";
 type ToastProps = {
   toastVariant: AlertType;
   heading?: string;
-  body: string;
+  body: string | React.ReactNode;
   headingLevel?: HeadingLevel;
   hideProgressBar?: boolean;
 };
@@ -79,15 +79,17 @@ const options: ToastConfigOptions = {
  * @param content.variant - one of "info", "success", "warning", "error" to
  * render the relevant toast variant
  * @param content.body - body text of the redirect toast
+ * @param content.autoClose - boolean to make toast persist until clicked
  * @param content.headingLevel - h1-6 level of the heading tag associated with
  * content.heading. defaults to h4
  * @param content.hideProgressBar - Whether to hide the rendering of the progress bar
  * @param content.duration - Duration in milliseconds for how long the toast is visible. Defaults to 5000ms.
  */
 export function showToastConfirmation(content: {
-  body: string;
+  body: string | React.ReactNode;
   heading?: string;
   variant?: AlertType;
+  autoClose?: boolean;
   headingLevel?: HeadingLevel;
   duration?: number;
   hideProgressBar?: boolean;
@@ -95,6 +97,7 @@ export function showToastConfirmation(content: {
   const toastVariant = content.variant ?? "success";
   const toastDuration = content.duration ?? 5000; // Default to 5000ms
   const hideProgressBar = content.hideProgressBar ?? false;
+  const autoClose = content.autoClose === false ? false : toastDuration;
 
   toast[toastVariant](
     <Toast
@@ -103,7 +106,7 @@ export function showToastConfirmation(content: {
       headingLevel={content.headingLevel}
       body={content.body ?? ""}
     />,
-    { ...options, autoClose: toastDuration, hideProgressBar: hideProgressBar },
+    { ...options, autoClose: autoClose, hideProgressBar: hideProgressBar },
   );
 }
 

@@ -5,7 +5,6 @@ import { isFhirResource } from "../../constants";
 
 import { CustomQuery } from "./custom-query";
 import { GetPhoneQueryFormats } from "../../utils/format-service";
-import { getSavedQueryByName } from "../seeding/service";
 import { auditable } from "../audit-logs/decorator";
 import type { QueryTableResult } from "../../(pages)/queryBuilding/utils";
 import type {
@@ -19,6 +18,7 @@ import {
   prepareFhirClient,
 } from "../fhir-servers/service";
 import type FHIRClient from "@/backend/fhir-servers/fhir-client";
+import { getSavedQueryByName } from "../query-building/service";
 
 interface TaskPollingResult {
   tasksBundle: Bundle<Task>;
