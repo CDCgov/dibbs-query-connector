@@ -7,6 +7,7 @@ import { AuthData, updateFhirServer } from "./service";
 import {
   getOrCreateMtlsCert,
   getOrCreateMtlsKey,
+  isMtlsAvailable,
 } from "../../utils/mtls-utils";
 import { Agent } from "undici";
 
@@ -175,6 +176,10 @@ class FHIRClient {
       // Try to fetch the server's metadata
       let response;
       if (mutualTls) {
+        if (!isMtlsAvailable()) {
+          return { success: false, message: "mTLS env vars not found" };
+        }
+
         response = await client.get("/Task/foo");
         if (response.status == 404) {
           // If mutual TLS is enabled, we can only check if the server is reachable

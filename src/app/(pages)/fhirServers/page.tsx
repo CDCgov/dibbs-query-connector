@@ -26,6 +26,7 @@ import { FhirServerConfig } from "@/app/models/entities/fhir-servers";
 import {
   testFhirServerConnection,
   checkFhirServerSupportsMatch,
+  validateFhirServerUrl,
 } from "@/app/backend/fhir-servers/test-utils";
 import {
   getFhirServerConfigs,
@@ -43,13 +44,22 @@ const Modal = dynamic<ModalProps>(
 );
 
 type ModalMode = "create" | "edit";
-type AuthMethodType = "none" | "basic" | "client_credentials" | "SMART";
+export type AuthMethodType =
+  | "none"
+  | "basic"
+  | "client_credentials"
+  | "SMART"
+  | "mutual-tls";
 
 interface HeaderPair {
   key: string;
   value: string;
   id: string; // For React key prop
 }
+
+export type FormError = {
+  [tokenField: string]: boolean;
+};
 
 /**
  * Client side parent component for the FHIR servers page. It displays a list of FHIR servers
@@ -84,6 +94,16 @@ const FhirServers: React.FC = () => {
     "idle" | "success" | "error"
   >("idle");
   const [errorMessage, setErrorMessage] = useState<string | undefined>("");
+  const [formError, setFormError] = useState<FormError>({
+    serverName: false,
+    url: false,
+    bearerToken: false,
+    clientId: false,
+    clientSecret: false,
+    tokenEndpoint: false,
+    scopes: false,
+  });
+
   const [selectedServer, setSelectedServer] = useState<FhirServerConfig | null>(
     null,
   );
@@ -329,6 +349,11 @@ const FhirServers: React.FC = () => {
   };
 
   const handleTestConnection = async (authData: AuthData) => {
+    const formHasErrors = await checkFormHasErrors();
+    if (formHasErrors) {
+      console.error("Form isn't valid");
+      return;
+    }
     // 1. Run connection test
     const result = await testFhirServerConnection(
       serverUrl,
@@ -530,67 +555,201 @@ const FhirServers: React.FC = () => {
     return buttons;
   };
 
+  const checkFormHasErrors = async () => {
+    // shared fields
+    const serverNameInvalid = serverName === "";
+    let urlNameInvalid = false;
+    try {
+      await validateFhirServerUrl(serverUrl);
+    } catch (e) {
+      if (e instanceof Error) {
+        setErrorMessage(e.message);
+      }
+      urlNameInvalid = true;
+    }
+
+    setFormError((prev) => {
+      return {
+        ...prev,
+        url: urlNameInvalid,
+        serverName: serverNameInvalid,
+      };
+    });
+
+    if (urlNameInvalid || serverNameInvalid) return true;
+
+    switch (authMethod) {
+      case "basic":
+        let bearerTokenInvalid = bearerToken === "";
+        setFormError((prev) => {
+          return {
+            ...prev,
+            bearerToken: bearerTokenInvalid,
+          };
+        });
+        return bearerTokenInvalid;
+
+      case "client_credentials":
+        let clientIdInvalid = clientId === "";
+        let clientSecretInvalid = clientSecret === "";
+        let scopesInvalid = scopes === "";
+
+        setFormError((prev) => {
+          return {
+            ...prev,
+            clientId: clientIdInvalid,
+            clientSecret: clientSecretInvalid,
+            scopes: scopesInvalid,
+          };
+        });
+        return clientIdInvalid || clientSecretInvalid || scopesInvalid;
+      case "SMART":
+        clientIdInvalid = clientId === "";
+        scopesInvalid = scopes === "";
+
+        setFormError((prev) => {
+          return {
+            ...prev,
+            clientId: clientIdInvalid,
+            scopes: scopesInvalid,
+          };
+        });
+        return clientIdInvalid || scopesInvalid;
+    }
+  };
+
   // Helper to render auth method specific fields
   const renderAuthMethodFields = () => {
     switch (authMethod) {
       case "basic":
         return (
           <>
-            <Label htmlFor="bearer-token">Bearer Token</Label>
+            <Label htmlFor="bearer-token">
+              Bearer Token <span className="text-secondary">(required)</span>
+            </Label>
             <TextInput
               id="bearer-token"
               name="bearer-token"
               type="text"
+              className={classNames(
+                "margin-top-05",
+                formError?.bearerToken ? "error-input" : "",
+              )}
               value={bearerToken}
               onChange={(e) => setBearerToken(e.target.value)}
               required
             />
+
+            {formError?.bearerToken && (
+              <div className={"error-message margin-top-05"}>
+                <Icon.Error
+                  aria-label="warning icon indicating an error is present"
+                  className={"error-message"}
+                />
+                Bearer token needs to be set for basic auth
+              </div>
+            )}
+          </>
+        );
+      case "mutual-tls":
+        return (
+          <>
+            <div className="usa-hint margin-top-05">
+              Mutual TLS certificates will be loaded from the keys directory or
+              MTLS_CERT and MTLS_KEY environment variables.
+            </div>
           </>
         );
       case "client_credentials":
         return (
           <>
-            <Label htmlFor="client-id">Client ID</Label>
+            <Label htmlFor="client-id">
+              Client ID <span className="text-secondary">(required)</span>
+            </Label>
             <TextInput
               id="client-id"
               name="client-id"
+              className={classNames(
+                "margin-top-05",
+                formError?.clientId ? "error-input" : "",
+              )}
               data-testid="client-id"
               type="text"
               value={clientId}
               onChange={(e) => setClientId(e.target.value)}
               required
             />
+            {formError?.clientId && (
+              <div className={"error-message margin-top-05"}>
+                <Icon.Error
+                  aria-label="warning icon indicating an error is present"
+                  className={"error-message"}
+                />
+                Client ID token needs to be set for client auth
+              </div>
+            )}
 
-            <Label htmlFor="client-secret">Client Secret</Label>
+            <Label htmlFor="client-secret">
+              Client Secret <span className="text-secondary">(required)</span>
+            </Label>
             <TextInput
               id="client-secret"
               name="client-secret"
+              className={classNames(
+                "margin-top-05",
+                formError?.clientId ? "error-input" : "",
+              )}
               data-testid="client-secret"
               type="password"
               value={clientSecret}
               onChange={(e) => setClientSecret(e.target.value)}
               required
             />
-
-            <Label htmlFor="token-endpoint">Token Endpoint</Label>
-            <TextInput
-              id="token-endpoint"
-              name="token-endpoint"
-              data-testid="token-endpoint"
-              type="url"
-              value={tokenEndpoint}
-              onChange={(e) => setTokenEndpoint(e.target.value)}
-              required
-            />
-
-            <Label htmlFor="scopes">Scopes (space separated)</Label>
+            {formError?.clientSecret && (
+              <div className={"error-message margin-top-05"}>
+                <Icon.Error
+                  aria-label="warning icon indicating an error is present"
+                  className={"error-message"}
+                />
+                Client secret needs to be set for client auth
+              </div>
+            )}
+            <Label htmlFor="scopes">
+              Scopes (space separated){" "}
+              <span className="text-secondary">(required)</span>
+            </Label>
             <TextInput
               id="scopes"
+              className={classNames(
+                "margin-top-05",
+                formError?.scopes ? "error-input" : "",
+              )}
               name="scopes"
               data-testid="scopes"
               type="text"
               value={scopes}
               onChange={(e) => setScopes(e.target.value)}
+              required
+            />
+            {formError?.scopes && (
+              <div className={"error-message margin-top-05"}>
+                <Icon.Error
+                  aria-label="warning icon indicating an error is present"
+                  className={"error-message"}
+                />
+                Scopes needs to be set for client auth
+              </div>
+            )}
+
+            <Label htmlFor="token-endpoint">Token Endpoint</Label>
+            <TextInput
+              id="token-endpoint"
+              className="margin-top-05"
+              name="token-endpoint"
+              data-testid="token-endpoint"
+              type="url"
+              value={tokenEndpoint}
+              onChange={(e) => setTokenEndpoint(e.target.value)}
               required
             />
           </>
@@ -598,9 +757,15 @@ const FhirServers: React.FC = () => {
       case "SMART":
         return (
           <>
-            <Label htmlFor="client-id">Client ID</Label>
+            <Label htmlFor="client-id">
+              Client ID <span className="text-secondary">(required)</span>
+            </Label>
             <TextInput
               id="client-id"
+              className={classNames(
+                "margin-top-05",
+                formError?.clientId ? "error-input" : "",
+              )}
               name="client-id"
               data-testid="client-id"
               type="text"
@@ -608,36 +773,63 @@ const FhirServers: React.FC = () => {
               onChange={(e) => setClientId(e.target.value)}
               required
             />
+            {formError?.clientId && (
+              <div className={"error-message margin-top-05"}>
+                <Icon.Error
+                  aria-label="warning icon indicating an error is present"
+                  className={"error-message"}
+                />
+                Client ID token needs to be set for client auth
+              </div>
+            )}
 
-            <Label htmlFor="token-endpoint">Token Endpoint</Label>
-            <div className="usa-hint margin-bottom-1">
-              If left empty, will be discovered from the server's
-              .well-known/smart-configuration
-            </div>
-            <TextInput
-              id="token-endpoint"
-              name="token-endpoint"
-              data-testid="token-endpoint"
-              type="url"
-              value={tokenEndpoint}
-              onChange={(e) => setTokenEndpoint(e.target.value)}
-            />
-
-            <Label htmlFor="scopes">Scopes (space separated)</Label>
-            <div className="usa-hint margin-bottom-1">
+            <Label htmlFor="scopes">
+              Scopes (space separated){" "}
+              <span className="text-secondary">(required)</span>
+            </Label>
+            <div className="usa-hint margin-bottom-1 margin-top-05">
               For example: system/Patient.read system/Observation.read
             </div>
             <TextInput
               id="scopes"
               data-testid="scopes"
+              className={classNames(
+                "margin-top-05",
+                formError?.scopes ? "error-input" : "",
+              )}
               name="scopes"
               type="text"
               value={scopes}
               onChange={(e) => setScopes(e.target.value)}
               required
             />
+            {formError?.scopes && (
+              <div className={"error-message margin-top-05"}>
+                <Icon.Error
+                  aria-label="warning icon indicating an error is present"
+                  className={"error-message"}
+                />
+                Scopes needs to be set for client auth
+              </div>
+            )}
+
+            <Label htmlFor="token-endpoint">Token Endpoint</Label>
+            <div className="usa-hint margin-bottom-1 margin-top-05">
+              If left empty, will be discovered from the server's
+              .well-known/smart-configuration
+            </div>
+            <TextInput
+              id="token-endpoint"
+              name="token-endpoint"
+              className="margin-top-05"
+              data-testid="token-endpoint"
+              type="url"
+              value={tokenEndpoint}
+              onChange={(e) => setTokenEndpoint(e.target.value)}
+            />
           </>
         );
+
       case "none":
       default:
         return null;
@@ -827,7 +1019,7 @@ const FhirServers: React.FC = () => {
                         <>
                           <Icon.Close
                             size={3}
-                            className="usa-icon margin-right-05 error-primary"
+                            className="usa-icon margin-right-05 error-message"
                             aria-label="Not connected"
                           />
                           Not connected
@@ -874,29 +1066,62 @@ const FhirServers: React.FC = () => {
           errorMessage={errorMessage}
           isLarge
         >
-          <Label htmlFor="server-name">Server name</Label>
+          <Label htmlFor="server-name">
+            Server name <span className="text-secondary">(required)</span>
+          </Label>
           <TextInput
             id="server-name"
             data-testid="server-name"
+            className={classNames(
+              "margin-top-05",
+              formError?.serverName ? "error-input" : "",
+            )}
             name="server-name"
             type="text"
             value={serverName}
             onChange={(e) => setServerName(e.target.value)}
             required
           />
-          <Label htmlFor="server-url">URL</Label>
+          {formError?.serverName && (
+            <div className={"error-message margin-top-05"}>
+              <Icon.Error
+                aria-label="warning icon indicating an error is present"
+                className={"error-message"}
+              />
+              Enter a server URL to query.
+            </div>
+          )}
+
+          <Label htmlFor="server-url">
+            URL <span className="text-secondary">(required)</span>
+          </Label>
           <TextInput
             id="server-url"
             data-testid="server-url"
             name="server-url"
+            className={classNames(
+              "margin-top-05",
+              formError?.url ? "error-input" : "",
+            )}
             type="url"
             value={serverUrl}
             onChange={(e) => setServerUrl(e.target.value)}
             required
           />
+          {formError?.url && (
+            <div className={"error-message margin-top-05"}>
+              <Icon.Error
+                aria-label="warning icon indicating an error is present"
+                className={"error-message"}
+              />
+              {errorMessage
+                ? `Fix the following server URL error: ${errorMessage}`
+                : `Enter a valid server URL.`}
+            </div>
+          )}
           <Label htmlFor="auth-method">Auth Method</Label>
           <select
-            className="usa-select"
+            className="usa-select margin-top-05"
             id="auth-method"
             data-testid="auth-method"
             name="auth-method"
@@ -913,16 +1138,20 @@ const FhirServers: React.FC = () => {
                 setTokenEndpoint("");
                 setScopes("");
               }
+
+              if (e.target.value === "mutual-tls" || mutualTls) {
+                setMutualTls(!mutualTls);
+              }
             }}
           >
             <option value="none">None</option>
             <option value="basic">Basic auth (bearer token)</option>
             <option value="client_credentials">Client Credentials</option>
             <option value="SMART">SMART on FHIR</option>
+            <option value="mutual-tls">Mutual TLS</option>
           </select>
 
           {renderAuthMethodFields()}
-
           {renderPatientMatchFields()}
 
           <div className="margin-top-3" data-testid="custom-headers">
@@ -995,19 +1224,6 @@ const FhirServers: React.FC = () => {
             checked={disableCertValidation}
             onChange={(e) => setDisableCertValidation(e.target.checked)}
           />
-
-          <Checkbox
-            id="mutual-tls"
-            label="Enable Mutual TLS"
-            checked={mutualTls}
-            onChange={(e) => setMutualTls(e.target.checked)}
-          />
-          {mutualTls && (
-            <div className="usa-hint margin-left-4 margin-top-0">
-              Mutual TLS certificates will be loaded from the keys directory or
-              MTLS_CERT and MTLS_KEY environment variables.
-            </div>
-          )}
 
           <Checkbox
             id="default-server"

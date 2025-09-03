@@ -5,10 +5,11 @@ import FHIRClient from "@/app/backend/fhir-servers/fhir-client";
 import dbService from "../db/service";
 import { transaction } from "../db/decorators";
 import { FHIR_SERVER_INSERT_QUERY } from "../db/util";
+import { AuthMethodType } from "@/app/(pages)/fhirServers/page";
 
 // Define an interface for authentication data
 export interface AuthData {
-  authType: "none" | "basic" | "client_credentials" | "SMART";
+  authType: AuthMethodType;
   bearerToken?: string;
   clientId?: string;
   clientSecret?: string;

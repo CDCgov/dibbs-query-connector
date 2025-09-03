@@ -44,7 +44,11 @@ export async function checkFhirServerSupportsMatch(
   return FHIRClient.checkSupportsMatch(url, disableCertValidation, authData);
 }
 
-function validateFhirServerUrl(urlString: string): void {
+/**
+ * Validation function for whether a FHIR server value is valid
+ * @param urlString - string to validate
+ */
+export async function validateFhirServerUrl(urlString: string): Promise<void> {
   let url: URL;
   try {
     url = new URL(urlString);
