@@ -161,6 +161,7 @@ export async function seedBatchValueSetsFromVsac(
           vs as unknown as ValueSet,
           eRSDType,
         );
+
         oidsToVersion.set(oid, internalValueSet.valueSetVersion);
 
         // Found a retired OID, store it so we don't insert condition mappings on it
@@ -272,6 +273,7 @@ export async function seedBatchValueSetsFromVsac(
   console.log("Inserting condition-to-valueset mappings");
   let ctvStructs = oidData.conditions.map((c) => {
     const ctvID = retiredOids.has(c.valueset_id) ? "NONE" : randomUUID();
+
     const dbCTV: ConditionToValueSetStruct = {
       id: ctvID,
       condition_id: c.code,
@@ -354,7 +356,7 @@ export async function createDibbsDB() {
       await insertSeedDbStructs("query");
       await insertSeedDbStructs("category");
       await executeCategoryUpdates();
-      return { success: false, reload: false };
+      return { success: true, reload: true };
 
       // }
     } catch (e) {
