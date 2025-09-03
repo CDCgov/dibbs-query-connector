@@ -1,5 +1,7 @@
 // Add this to your FhirServerConfig interface in models/entities/fhir-servers.ts
 
+import { AuthMethodType } from "@/app/(pages)/fhirServers/page";
+
 export interface FhirServerConfig {
   id: string;
   name: string;
@@ -10,7 +12,7 @@ export interface FhirServerConfig {
   lastConnectionSuccessful?: boolean;
   lastConnectionAttempt?: string;
   headers?: Record<string, string>;
-  authType?: "none" | "basic" | "client_credentials" | "SMART";
+  authType?: AuthMethodType;
   clientId?: string;
   clientSecret?: string;
   tokenEndpoint?: string;
