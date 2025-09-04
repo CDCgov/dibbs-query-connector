@@ -1,0 +1,261 @@
+Condition Name,Condition Category,Updated in CR14,New in CR14,Initial Date Added to RCKMS,Date Last Updated
+Acanthamoeba,Waterborne (not enteric),,,20210129,20240202
+Acute Flaccid Myelitis (AFM),Neurological Diseases,,,20200110,20240628
+Agricultural Chemicals (Fertilizer) Poisoning,Toxic Effect of Non-Medicinal Substances ,,,20220615,20240628
+Alpha-gal Syndrome,Vectorborne Diseases,,,20220128,20240202
+Amebiasis,Enteric Diseases,,,20220128,20240202
+Anaplasmosis,Vectorborne Diseases,,,20200608,20240202
+Anencephaly,Birth Defects and Infant Disorders,,,20230203,20240628
+Angiostrongyliasis,Zoonotic Diseases,,,20230203,20240202
+Animal Bite Injury,"Injuries, NEC",,,20220128,20240202
+Anophthalmia,Birth Defects and Infant Disorders,,,20250228,20250228
+Anotia,Birth Defects and Infant Disorders,,,20250228,20250228
+Anthrax,Zoonotic Diseases,,,20200608,20250228
+Aortic valve stenosis,Birth Defects and Infant Disorders,,,20250228,20250228
+Arboviral Disease [Other],Vectorborne Diseases,X,,20200608,20250703
+Arsenic Exposure and Toxicity,Toxic Effect of Non-Medicinal Substances ,,,20220128,20240202
+Asbestosis,Respiratory Conditions (non-infectious),,,20220615,20240628
+Atrial septal defect,Birth Defects and Infant Disorders,,,20250228,20250228
+Atrioventricular septal defect (Endocardial cushion defect),Birth Defects and Infant Disorders,,,20240628,20240628
+Babesiosis,Vectorborne Diseases,,,20200608,20250228
+Balamuthia mandrillaris Disease,Waterborne (not enteric),X,,20210129,20250703
+Bartonellosis,Vectorborne Diseases,X,,20230203,20250703
+Baylisascariasis,Zoonotic Diseases,,,20230203,20240202
+Biliary Atresia,Birth Defects and Infant Disorders,,X,20250703,20250703
+Bladder Exstrophy,Birth Defects and Infant Disorders,,,20250228,20250228
+Blastomycosis,Respiratory Conditions (infectious),,,20210129,20240628
+Botulism,Toxic Effect of Non-Medicinal Substances ,,,20200608,20240628
+"Botulism, Infant",Toxic Effect of Non-Medicinal Substances ,,,20220128,20240628
+Brucellosis,Zoonotic Diseases,,,20200608,20250228
+Byssinosis,Respiratory Conditions (non-infectious),,,20220615,20240628
+Cadmium Exposure and Toxicity,Toxic Effect of Non-Medicinal Substances ,,,20220128,20240202
+California Serogroup Virus Disease,Vectorborne Diseases,,,20200608,20240202
+Campylobacteriosis,Enteric Diseases,,,20190630,20240628
+Cancer,Cancer,,,20210609,20240628
+Candida auris infection,Healthcare-Associated Events,,,20200608,20240202
+Candidemia,Healthcare-Associated Events,,X,20250703,20250703
+Carbapenemase-Producing Organisms (CPO) (previously Carbapenemase-producing Carbapenem-resistant Enterobacteriaceae [CP-CRE]) ,Healthcare-Associated Events,,,20200608,20240202
+Carbapenem-resistant Acinetobacter baumannii (CRAB),Healthcare-Associated Events,,,20220615,20240202
+Carbapenem-resistant Enterobacterales (CRE) (previously Carbapenem-resistant Enterobacteriaceae [CRE]),Healthcare-Associated Events,,,20220128,20250228
+Carbapenem-resistant Pseudomonas aeruginosa (CRPA),Healthcare-Associated Events,,,20220615,20240202
+Carbon Monoxide Poisoning,Toxic Effect of Non-Medicinal Substances ,,,20200608,20250228
+Catheter-associated Urinary Tract Infection (CAUTI),Healthcare-Associated Events,,,20220615,20240628
+Central Line-associated Bloodstream Infection (CLABSI),Healthcare-Associated Events,,,20220615,20240628
+Chagas Disease,Vectorborne Diseases,,,20220128,20250228
+Chancroid,Sexually Transmitted Diseases,,,201812,20240202
+Chemical Pneumonitis,Respiratory Conditions (non-infectious),X,,20220615,20250703
+Chikungunya virus disease ,Vectorborne Diseases,,,20200608,20240628
+Chlamydia trachomatis infection,Sexually Transmitted Diseases,,,201812,20250228
+Choanal Atresia,Birth Defects and Infant Disorders,,,20250228,20250228
+Cholera,Enteric Diseases,,,20190630,20240628
+Cleft Lip Alone,Birth Defects and Infant Disorders,,,20230203,20240628
+Cleft Lip with Cleft Palate,Birth Defects and Infant Disorders,,,20230203,20240628
+Cleft Palate Alone,Birth Defects and Infant Disorders,,,20230203,20240628
+Cloacal Exstrophy,Birth Defects and Infant Disorders,,,20250228,20250228
+Clostridioides difficile (C. diff) infection,Enteric Diseases,X,,20220128,20250703
+Clostridium perfringens Infection,Enteric Diseases,,,20220615,20240202
+Clubfoot,Birth Defects and Infant Disorders,,X,20250703,20250703
+Coal Workers’ Pneumoconiosis (CWP),Respiratory Conditions (non-infectious),,,20220615,20240628
+Coarctation of the Aorta,Birth Defects and Infant Disorders,,,20240628,20240628
+Coccidioidomycosis,Respiratory Conditions (infectious),,,20200608,20240628
+Colorado tick fever,Vectorborne Diseases,,,20210609,20240202
+Congenital cytomegalovirus (cCMV) infection and disease,Birth Defects and Infant Disorders,,,20240202,20250228
+Congenital Posterior Urethral Valves,Birth Defects and Infant Disorders,,,20250228,20250228
+Congenital Rubella Syndrome (CRS),Vaccine Preventable Diseases,,,20200110,20240628
+COVID-19 (previously 2019 novel coronavirus [2019 nCov]),Respiratory Conditions (infectious),,,20210721,20250228
+Creutzfeldt-Jakob Disease (CJD) and Variant Creutzfeldt-Jakob Disease (vCJD),Neurological Diseases,,,20210609,20240202
+Cryptococcosis,Respiratory Conditions (infectious),,,20220128,20240202
+Cryptosporidiosis,Enteric Diseases,X,,20190630,20250703
+Cyanobacteria And Cyanotoxin Poisoning,Toxic Effect of Non-Medicinal Substances ,,,20230203,20240202
+Cyclosporiasis,Enteric Diseases,,,20190630,20240628
+Cystic Fibrosis,Birth Defects and Infant Disorders,,X,20250703,20250703
+Cysticercosis,Zoonotic Diseases,,,20220615,20240628
+Dengue Virus Infection,Vectorborne Diseases,,,20200608,20240628
+Diaphragmatic Hernia,Birth Defects and Infant Disorders,,X,20250703,20250703
+Diphtheria,Vaccine Preventable Diseases,,,20200110,20240628
+Diphyllobothriasis,Zoonotic Diseases,,,20230203,20240202
+Double Outlet Right Ventricle (DORV),Birth Defects and Infant Disorders,,,20240628,20240628
+Down Syndrome,Birth Defects and Infant Disorders,,,20230203,20240628
+Drowning and Submersion,"Injuries, NEC",,,20220615,20240202
+"Drug Overdose and Poisoning, Non-opioid","Injuries, NEC",,,20220128,20240202
+Eastern equine encephalitis virus disease,Vectorborne Diseases,,,20200608,20240628
+Ebstein Anomaly,Birth Defects and Infant Disorders,,,20240628,20240628
+Echinococcosis,Parasitic Diseases,,,20230203,20240202
+Ehrlichiosis,Vectorborne Diseases,,,20200608,20240202
+Encephalitis,Neurological Diseases,,,20220615,20250228
+Encephalocele,Birth Defects and Infant Disorders,,,20250228,20250228
+Esophageal Atresia/Tracheoesophageal Fistula,Birth Defects and Infant Disorders,,X,20250703,20250703
+Farmer's Lung,Respiratory Conditions (non-infectious),,,20220615,20240202
+Fetal Alcohol Spectrum Disorders,Birth Defects and Infant Disorders,,X,20250703,20250703
+Firearm-related injury (previously Gunshot Wound),"Injuries, NEC",,,20220615,20250228
+Galactosemia,Birth Defects and Infant Disorders,,,20250228,20250228
+Gastroschisis,Birth Defects and Infant Disorders,,,20230203,20240628
+Genital Warts,Sexually Transmitted Diseases,,,20230203,20240202
+Giardiasis,Enteric Diseases,X,,20190630,20250703
+Glanders,Zoonotic Diseases,,,20220128,20240202
+Gonorrhea,Sexually Transmitted Diseases,,,201812,20250228
+Granuloma Inguinale (Donovanosis),Sexually Transmitted Diseases,,,20220615,20240202
+Guillain-Barré Syndrome,Neurological Diseases,,,20220615,20240628
+Hansen's disease,Respiratory Conditions (infectious),X,,20200608,20250703
+Hantavirus Infection,Zoonotic Diseases,,,20200608,20240628
+Head Injury,"Injuries, NEC",,,20220615,20240202
+Hemolytic uremic syndrome (HUS),Enteric Diseases,,,20200608,20250228
+Hepatitis A Virus infection,Enteric Diseases,X,,20190630,20250703
+Hepatitis B Virus Infection,Bloodborne Diseases,X,,20200608,20250703
+"Hepatitis B Virus Infection, Perinatal (previously Perinatal Hepatitis B Virus Infection)",Bloodborne Diseases,X,,20200608,20250703
+Hepatitis C Virus Infection,Bloodborne Diseases,X,,201812,20250703
+"Hepatitis C Virus Infection, Perinatal",Bloodborne Diseases,,,20230203,20250228
+Hepatitis D Virus Infection,Bloodborne Diseases,X,,20230203,20250703
+Hepatitis E Virus infection,Enteric Diseases,,,20210609,20240202
+Hepatitis G Virus Infection,Bloodborne Diseases,,,20220615,20240202
+"Herpes, Genital",Sexually Transmitted Diseases,X,,20220615,20250703
+"Herpes, Neonatal",Sexually Transmitted Diseases,X,,20220615,20250703
+Histoplasmosis,Respiratory Conditions (infectious),X,,20210129,20250703
+HIV Infection or AIDS,Sexually Transmitted Diseases,X,,20200608,20250703
+Homocystinuria,Birth Defects and Infant Disorders,,X,20250703,20250703
+Hypoplastic Left Heart Syndrome (HLHS),Birth Defects and Infant Disorders,,,20240628,20240628
+Hypospadias,Birth Defects and Infant Disorders,,,20250228,20250228
+Infant Hearing Loss,Birth Defects and Infant Disorders,,,20230203,20240628
+Influenza,Vaccine Preventable Diseases,,,20231006,20250228
+Influenza-Associated Hospitalizations,Vaccine Preventable Diseases,X,,20200110,20250703
+Influenza-Associated Mortality,Vaccine Preventable Diseases,,,20230203,20250228
+Influenza-associated pediatric mortality (previously Pediatric Influenza-Associated Mortality),Vaccine Preventable Diseases,,,20200110,20240628
+Influenza-like Illness (ILI),Respiratory Conditions (infectious),,,20220128,20240628
+Interrupted Aortic Arch,Birth Defects and Infant Disorders,,,20240628,20240628
+Invasive Cronobacter Infection Among Infants,Systemic Conditions,,,20240202,20250228
+Invasive Haemophilus Influenzae Disease,Vaccine Preventable Diseases,,,20200110,20240628
+Invasive Pneumococcal Disease,Vaccine Preventable Diseases,,,20200110,20240628
+Jamestown Canyon virus disease,Vectorborne Diseases,,,20230203,20240202
+Japanese encephalitis virus disease,Vectorborne Diseases,,,20210609,20240628
+Kawasaki Disease,Systemic Conditions,,,20220128,20240202
+Keystone virus disease,Vectorborne Diseases,,,20230203,20240202
+La Crosse virus disease,Vectorborne Diseases,,,20230203,20240202
+Lead in Blood (previously Elevated Blood Lead Level),Toxic Effect of Non-Medicinal Substances ,X,,20200608,20250703
+Legionellosis,Respiratory Conditions (infectious),,,20200608,20240202
+Leishmaniasis,Vectorborne Diseases,,,20220615,20240202
+Leptospirosis,Zoonotic Diseases,,,20200608,20250228
+Limb Reduction,Birth Defects and Infant Disorders,,,20230203,20240628
+Listeriosis,Enteric Diseases,,,20190630,20240628
+Louse-borne relapsing fever (LBRF),Vectorborne Diseases,,,20220615,20250228
+Lyme disease,Vectorborne Diseases,,,20200608,20250228
+Lymphatic Filariasis,Vectorborne Diseases,,,20220615,20240202
+Lymphocytic Choriomeningitis,Zoonotic Diseases,,,20230203,20240202
+Malaria,Vectorborne Diseases,,,20200608,20240202
+Measles,Vaccine Preventable Diseases,,,20200110,20250228
+Medium-chain Acyl-CoA Dehydrogenase Deficiency,Birth Defects and Infant Disorders,,X,20250703,20250703
+Melioidosis,Waterborne (not enteric),,,20210129,20240202
+Meningitis,Neurological Diseases,,,20220128,20250228
+Meningococcal disease,Vaccine Preventable Diseases,,,20200110,20240628
+Mercury Exposure and Toxicity,Toxic Effect of Non-Medicinal Substances ,,,20220128,20240202
+Methemoglobinemia,Systemic Conditions,,,20230203,20240628
+Microphthalmia,Birth Defects and Infant Disorders,,,20250228,20250228
+Microtia,Birth Defects and Infant Disorders,,,20250228,20250228
+Middle East Respiratory Syndrome (MERS),Respiratory Conditions (infectious),X,,20200127,20250703
+Motor Vehicle Injury,"Injuries, NEC",,,20220615,20240202
+Mpox (previously Monkeypox),Zoonotic Diseases,,,20210609,20240628
+Multisystem Inflammatory Syndrome in Adults (MIS-A),Systemic Conditions,,,20230203,20240628
+Multisystem Inflammatory Syndrome in Children (MIS-C),Systemic Conditions,,,20220615,20240628
+Mumps,Vaccine Preventable Diseases,,,20200110,20240202
+Naegleria fowleri Primary Amebic Meningoencephalitis,Waterborne (not enteric),,,20210129,20240202
+Neonatal Abstinence Syndrome,Birth Defects and Infant Disorders,,,20240202,20250228
+Nipah Virus Infection,Zoonotic Diseases,,,20220128,20240202
+Nongonococcal Urethritis,Sexually Transmitted Diseases,,,20230203,20240202
+Non-pestis Yersiniosis,Enteric Diseases,,,20210129,20250228
+Non-Polio Enterovirus Infection,Enteric Diseases,,,20220615,20240202
+Non-Streptococcal Toxic Shock Syndrome,Toxic Effect of Non-Medicinal Substances ,,,20200608,20240628
+"Nontuberculous Mycobacteria Infection, Extrapulmonary (previously Extrapulmonary Nontuberculous Mycobacteria Infection)",Waterborne (not enteric),X,,20210129,20250703
+"Nontuberculous Mycobacteria Infection, Pulmonary",Respiratory Conditions (infectious),X,,20220615,20250703
+Norovirus Infections,Enteric Diseases,,,20220128,20240628
+Novel Influenza A Virus Infection,Vaccine Preventable Diseases,,,20200110,20250228
+Omphalocele,Birth Defects and Infant Disorders,,X,20250703,20250703
+Ophthalmia Neonatorum,Sexually Transmitted Diseases,,,20220615,20240628
+Opioid Overdose and Poisoning,Toxic Effect of Non-Medicinal Substances ,,,20200110,20240628
+Oropouche Virus Disease,Vectorborne Diseases,,X,20250703,20250703
+Orthopoxvirus Disease,Vaccine Preventable Diseases,,,20220615,20240202
+Parkinson's disease,Neurological Diseases,,,20190630,20240628
+Pelvic Inflammatory Disease,Sexually Transmitted Diseases,X,,20230203,20250703
+Pertussis,Vaccine Preventable Diseases,,,201812,20240628
+Pesticide Related Illness or injury,Toxic Effect of Non-Medicinal Substances ,,,20200608,20240628
+Phenylketonuria,Birth Defects and Infant Disorders,,,20230203,20240628
+Plague,Zoonotic Diseases,,,20200608,20240628
+Poliovirus Infection,Vaccine Preventable Diseases,,,20200110,20240202
+Powassan virus disease,Vectorborne Diseases,,,20200608,20240628
+Primary Congenital Hypothyroidism,Birth Defects and Infant Disorders,,,20230203,20240628
+Prion Disease (Human),Neurological Diseases,,,20230203,20240628
+Psittacosis,Respiratory Conditions (infectious),,,20200608,20240202
+Pulmonary Valve Atresia and Stenosis,Birth Defects and Infant Disorders,,,20240628,20240628
+Q fever,Zoonotic Diseases,,,20200608,20240628
+Rabies (Human),Zoonotic Diseases,,,20200608,20240628
+Rectal and Large Intestinal Atresia and Stenosis,Birth Defects and Infant Disorders,,X,20250703,20250703
+Renal Agenesis and Hypoplasia,Birth Defects and Infant Disorders,,,20250228,20250228
+Respiratory Syncytial Virus (RSV),Respiratory Conditions (infectious),,,20231006,20240628
+Respiratory Syncytial Virus (RSV)-Associated Mortality,Respiratory Conditions (infectious),,,20210129,20240628
+Reye's Syndrome,Systemic Conditions,,,20220615,20240202
+Rheumatic Fever,Streptococcal Diseases,,,20220615,20250228
+Ricin Poisoning ,Toxic Effect of Non-Medicinal Substances ,,,20210609,20240202
+Rotavirus Disease,Enteric Diseases,,,20220615,20240202
+Rubella,Vaccine Preventable Diseases,,,20200110,20250228
+S. Paratyphi Infection,Enteric Diseases,,,20190630,20240628
+S. Typhi Infection,Enteric Diseases,,,20190630,20240628
+Salmonellosis,Enteric Diseases,,,201812,20240628
+Scabies,Parasitic Diseases,,,20220615,20240202
+Seafood Poisoning,Toxic Effect of Non-Medicinal Substances ,,,20210609,20240628
+Severe Acute Respiratory Syndrome (SARS),Respiratory Conditions (infectious),,,20200127,20250228
+Severe Combined Immunodeficiency,Birth Defects and Infant Disorders,,X,20250703,20250703
+Shiga toxin-producing Escherichia coli (STEC) infection,Enteric Diseases,,,20190630,20240628
+Shigellosis,Enteric Diseases,,,20190630,20240628
+Sickle Cell Anemia (Hemoglobin SS Disease),Birth Defects and Infant Disorders,,X,20250703,20250703
+Silicosis or pneumoconiosis due to dust containing silica,Respiratory Conditions (non-infectious),,,20200608,20240628
+Single Ventricle,Birth Defects and Infant Disorders,,,20240628,20240628
+Small Intestinal Atresia and Stenosis,Birth Defects and Infant Disorders,,X,20250703,20250703
+Smallpox,Vaccine Preventable Diseases,,,20200110,20240628
+Snowshoe hare virus disease,Vectorborne Diseases,,,20230203,20240202
+Spina Bifida,Birth Defects and Infant Disorders,X,,20230203,20250703
+Spinal Muscular Atrophy,Birth Defects and Infant Disorders,,X,20250703,20250703
+Spotted Fever Rickettsiosis,Vectorborne Diseases,,,20200608,20240628
+St. Louis Encephalitis Virus Infection,Vectorborne Diseases,,,20200608,20240202
+Staphylococcal Enterotoxin B Poisoning,Toxic Effect of Non-Medicinal Substances ,,,20220615,20240202
+Staphylococcus aureus Infection,Healthcare-Associated Events,,,20220128,20240628
+"Streptococcal disease, invasive, Group A (previously Streptococcal disease, invasive)",Streptococcal Diseases,,,20220128,20240628
+"Streptococcal disease, invasive, Group B",Streptococcal Diseases,X,,20230203,20250703
+Streptococcal Toxic Shock Syndrome,Toxic Effect of Non-Medicinal Substances ,,,20200608,20240628
+Strongyloidiasis,Parasitic Diseases,,,20230203,20240202
+Suicide,"Injuries, NEC",,,20220615,20240202
+Surgical Site Infection (SSI),Healthcare-Associated Events,,,20220615,20240628
+Syphilis,Sexually Transmitted Diseases,X,,20200110,20250703
+"Syphilis, Congenital (previously Congenital Syphilis)",Sexually Transmitted Diseases,,,20200110,20250228
+Taeniasis,Zoonotic Diseases,,,20220615,20240202
+Tetanus,Vaccine Preventable Diseases,,,20200110,20240628
+Tetralogy of Fallot (TOF),Birth Defects and Infant Disorders,,,20240628,20240628
+Tick Paralysis,Vectorborne Diseases,,,20230203,20240628
+Tickborne relapsing fever (TBRF),Vectorborne Diseases,,,20200608,20250228
+Total Anomalous Pulmonary Venous Connection (TAPVC),Birth Defects and Infant Disorders,,,20240628,20240628
+Toxoplasmosis,Zoonotic Diseases,,,20220615,20250228
+Transposition of the Great Arteries (TGA),Birth Defects and Infant Disorders,,,20240628,20240628
+Trichinellosis,Zoonotic Diseases,,,20190630,20240202
+Tricuspid Valve Atresia and Stenosis,Birth Defects and Infant Disorders,,,20240628,20240628
+Trisomy 13,Birth Defects and Infant Disorders,X,,20250228,20250703
+Trisomy 18,Birth Defects and Infant Disorders,,,20250228,20250228
+Trivittatus virus disease,Vectorborne Diseases,,,20230203,20240202
+Truncus Arteriosus (Common Truncus),Birth Defects and Infant Disorders,,,20240628,20240628
+Tuberculosis,Respiratory Conditions (infectious),X,,20200608,20250703
+"Tuberculosis, Latent Infection (LTBI) (previously Latent Tuberculosis Infection [LTBI])",Respiratory Conditions (infectious),X,,20210129,20250703
+Tularemia,Vectorborne Diseases,,,20200608,20240202
+Typhus Fever,Vectorborne Diseases,,,20220128,20240202
+Vaccine Adverse Event,Healthcare-Associated Events,,,20220128,20240628
+Vaccinia Disease or Adverse Event,Healthcare-Associated Events,X,,20220128,20250703
+Vancomycin-intermediate Staphylococcus aureus (VISA),Healthcare-Associated Events,,,20200608,20240202
+Vancomycin-resistant Enterococci (VRE) Infection,Healthcare-Associated Events,,,20220128,20240202
+Vancomycin-resistant Staphylococcus aureus (VRSA),Healthcare-Associated Events,,,20200608,20240202
+Varicella,Vaccine Preventable Diseases,X,,20200110,20250703
+Ventilator-associated Event (VAE),Healthcare-Associated Events,,,20220615,20240202
+Ventricular septal defect,Birth Defects and Infant Disorders,,,20250228,20250228
+Vesicular Stomatitis,Zoonotic Diseases,,,20220615,20240202
+Vibriosis,Enteric Diseases,X,,20190630,20250703
+Viral Hemorrhagic Fever (VHF),Zoonotic Diseases,X,,20200608,20250703
+West Nile Virus Infection,Vectorborne Diseases,,,20200608,20240202
+Western equine encephalitis virus disease,Vectorborne Diseases,,,20200608,20240202
+Work-related Asthma (WRA),Respiratory Conditions (non-infectious),,,20210609,20240628
+X-linked Adrenoleukodystrophy,Birth Defects and Infant Disorders,,X,20250703,20250703
+Yellow fever,Vectorborne Diseases,,,20200608,20240628
+Zika Virus Disease,Vectorborne Diseases,,,201812,20250228
