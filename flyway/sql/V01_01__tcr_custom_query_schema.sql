@@ -57,12 +57,12 @@ CREATE TABLE IF NOT EXISTS query (
     query_name VARCHAR(255) UNIQUE,
     query_data JSON,
     conditions_list TEXT[],
-    medical_record_sections JSON DEFAULT NULL,
     author VARCHAR(255),
     date_created TIMESTAMP,
     date_last_modified TIMESTAMP,
     time_window_number INT,
     time_window_unit VARCHAR(80),
+    medical_record_sections JSON DEFAULT NULL,
     PRIMARY KEY (id));
 
 ALTER TABLE query 
