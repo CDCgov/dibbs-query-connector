@@ -219,26 +219,24 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
             }
           : null;
 
-      // const result = await dbService.query(updateQuery, [
-      //   id,
-      //   name,
-      //   hostname,
-      //   lastConnectionSuccessful,
-      //   headers,
-      //   disableCertValidation,
-      //   defaultServer,
-      //   authType,
-      //   authData?.clientId || null,
-      //   authData?.clientSecret || null,
-      //   authData?.tokenEndpoint || null,
-      //   authData?.scopes || null,
-      //   authData?.accessToken || null,
-      //   authData?.tokenExpiry || null,
-      //   patientMatchConfigObject,
-      //   mutualTls,
-      // ]);
-
-      const result = { rows: [] };
+      const result = await dbService.query(updateQuery, [
+        id,
+        name,
+        hostname,
+        lastConnectionSuccessful,
+        headers,
+        disableCertValidation,
+        defaultServer,
+        authType,
+        authData?.clientId || null,
+        authData?.clientSecret || null,
+        authData?.tokenEndpoint || null,
+        authData?.scopes || null,
+        authData?.accessToken || null,
+        authData?.tokenExpiry || null,
+        patientMatchConfigObject,
+        mutualTls,
+      ]);
 
       // Clear the cache so the next getFhirServerConfigs call will fetch fresh data
       FhirServerConfigService.cachedFhirServerConfigs = null;

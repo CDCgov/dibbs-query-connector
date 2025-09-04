@@ -400,9 +400,9 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
         patientMatchData || DEFAULT_PATIENT_MATCH_DATA,
       );
     } else {
-      console.log(selectedServer);
       result = await updateFhirServer({
         ...selectedServer,
+        authData: authData,
         mutualTls: selectedServer?.mutualTls ?? false,
       });
 
