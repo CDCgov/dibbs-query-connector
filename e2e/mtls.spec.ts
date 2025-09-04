@@ -20,33 +20,18 @@ testWithMock.describe("Mutual TLS", () => {
 
       const serverName = `E2E Mutual TLS ${Math.floor(Math.random() * 10000)}`;
       await page.getByTestId("server-name").fill(serverName);
+
       await page
         .getByTestId("server-url")
         .fill(`${process.env.AIDBOX_BASE_URL}/fhir`);
 
-      // Leave auth method as default "none" as requested
-
-      // Enable mutual TLS - scroll modal and use JavaScript click
-      await page.evaluate(() => {
-        const modal = document.querySelector(".usa-modal__content");
-        if (modal) {
-          modal.scrollTop = modal.scrollHeight;
-        }
-      });
-
-      await page.getByText("Enable Mutual TLS").click();
+      await page.getByLabel("Auth Method").selectOption("Mutual TLS");
       // Verify mutual TLS hint text appears
       await expect(
         page.getByText(
           "Mutual TLS certificates will be loaded from the keys directory",
         ),
       ).toBeVisible();
-
-      // Skip connection test for now - just save the server
-      // await page.getByRole("button", { name: "Test connection" }).click();
-      // await expect(page.getByRole("button", { name: "Success" })).toBeVisible({
-      //   timeout: 15000,
-      // });
 
       // Save the server
       await page.getByRole("button", { name: "Add server" }).click();
@@ -180,11 +165,6 @@ testWithMock.describe("Mutual TLS", () => {
       await expect(
         page.getByLabel("Healthcare Organization (HCO)"),
       ).toBeVisible();
-
-      // Select the mutual TLS enabled server
-      // const serverCheckbox = page.getByLabel(serverName);
-      // await expect(serverCheckbox).toBeVisible();
-      // await serverCheckbox.check();
 
       await page
         .getByLabel("Healthcare Organization (HCO)")

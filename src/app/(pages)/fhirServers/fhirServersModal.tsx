@@ -81,6 +81,14 @@ const DEFAULT_PATIENT_MATCH_DATA = {
   supportsMatch: false,
 } as PatientMatchData;
 
+const EMPTY_FHIR_SERVER = {
+  name: "",
+  id: "",
+  hostname: "",
+  disableCertValidation: false,
+  defaultServer: false,
+} as FhirServerConfig;
+
 export const FhirServersModal: React.FC<FhirServersModal> = ({
   setFhirServers,
   fhirServers,
@@ -97,9 +105,9 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
   const [connectionStatus, setConnectionStatus] = useState<
     "idle" | "success" | "error"
   >("idle");
-  const [selectedServer, setSelectedServer] = useState<
-    FhirServerConfig | undefined
-  >();
+  const [selectedServer, setSelectedServer] = useState<FhirServerConfig>(
+    structuredClone(EMPTY_FHIR_SERVER),
+  );
   const [errorMessage, setErrorMessage] = useState<string>();
   const [fhirVersion, setFhirVersion] = useState<string | null>(null);
   const [headers, setHeaders] = useState<HeaderPair[]>([]);
@@ -111,6 +119,11 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
     if (modalMode === "edit" && serverToEdit) {
       setSelectedServer(serverToEdit);
       setConnectionStatus("idle");
+      handlePatientMatchChange(
+        serverToEdit.hostname,
+        serverToEdit.disableCertValidation,
+        getAuthData(),
+      );
 
       // Set headers
       if (serverToEdit.headers) {
@@ -164,12 +177,10 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
     value: FhirServerConfig[T],
   ) {
     setSelectedServer((prev) => {
-      if (prev) {
-        return {
-          ...prev,
-          [key]: value,
-        };
-      }
+      return {
+        ...prev,
+        [key]: value,
+      };
     });
   }
 
@@ -915,7 +926,7 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
   };
 
   const resetModalState = () => {
-    setSelectedServer(undefined);
+    setSelectedServer(structuredClone(EMPTY_FHIR_SERVER));
     setAuthMethod("none");
     setBearerToken("");
     setConnectionStatus("idle");
@@ -935,6 +946,10 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
       window.removeEventListener("keyup", clearErrorOnModalClose);
     };
   }, [clearErrorOnModalClose]);
+
+  console.log(selectedServer);
+  console.log(selectedServer?.name);
+  console.log(selectedServer?.hostname);
 
   return (
     <Modal
