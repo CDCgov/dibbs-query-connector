@@ -72,6 +72,33 @@ export function getOrCreateMtlsKey(): string {
 }
 
 /**
+ * Get or create mutual TLS CA
+ * @returns The CA content
+ */
+export function getOrCreateMtlsCa(): string {
+  const keysDir = ensureKeysDirectory();
+  const caPath = path.join(keysDir, "mtls-ca.pem");
+
+  // Check if CA already exists
+  if (fs.existsSync(caPath)) {
+    return fs.readFileSync(caPath, "utf-8");
+  }
+
+  // If not, try to create from environment variable
+  const caFromEnv = process.env.MTLS_CA;
+  if (!caFromEnv) {
+    return "";
+  }
+  const decodedCa = Buffer.from(caFromEnv, "base64").toString("utf-8");
+
+  // Write CA from environment variable
+  fs.writeFileSync(caPath, decodedCa, { mode: 0o600 });
+  console.info("Mutual TLS CA written from environment variable");
+
+  return caFromEnv;
+}
+
+/**
  * Check if mutual TLS credentials are available
  * @returns true if both cert and key are available, false otherwise
  */
