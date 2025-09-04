@@ -34,6 +34,7 @@ import {
   validateFhirServerUrl,
 } from "@/app/backend/fhir-servers/test-utils";
 import Checkbox from "@/app/ui/designSystem/checkbox/Checkbox";
+import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 
 const Modal = dynamic<ModalProps>(
   () => import("../../ui/designSystem/modal/Modal").then((mod) => mod.Modal),
@@ -89,7 +90,9 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
   setPatientMatchData,
   modalRef,
 }) => {
-  const [authMethod, setAuthMethod] = useState<AuthMethodType>("none");
+  const [authMethod, setAuthMethod] = useState<AuthMethodType>(
+    serverToEdit?.authType ?? "none",
+  );
   const [bearerToken, setBearerToken] = useState("");
   const [connectionStatus, setConnectionStatus] = useState<
     "idle" | "success" | "error"
@@ -104,52 +107,10 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
     structuredClone(INITIAL_FORM_ERRORS),
   );
 
-  function updateServerAttribute<T extends keyof FhirServerConfig>(
-    key: T,
-    value: FhirServerConfig[T],
-  ) {
-    setSelectedServer((prev) => {
-      if (prev) {
-        return {
-          ...prev,
-          [key]: value,
-        };
-      }
-    });
-  }
-
-  const handlePatientMatchChange = async (
-    hostname: string,
-    disableCertValidation: boolean,
-    authData: AuthData,
-  ) => {
-    const { supportsMatch, fhirVersion } = await checkFhirServerSupportsMatch(
-      hostname,
-      disableCertValidation,
-      authData,
-    );
-
-    setFhirVersion(fhirVersion);
-    setPatientMatchData((prev) => ({
-      enabled: prev?.enabled ?? false,
-      onlySingleMatch: false,
-      onlyCertainMatches: fhirVersion?.startsWith("6") ?? true,
-      matchCount: prev?.matchCount ?? 0,
-      supportsMatch: supportsMatch ?? false,
-    }));
-  };
-
-  console.log(modalMode);
-
   useEffect(() => {
     if (modalMode === "edit" && serverToEdit) {
       setSelectedServer(serverToEdit);
       setConnectionStatus("idle");
-      handlePatientMatchChange(
-        serverToEdit.hostname,
-        serverToEdit.disableCertValidation,
-        getAuthData(),
-      );
 
       // Set headers
       if (serverToEdit.headers) {
@@ -198,10 +159,50 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
     }
   }, [serverToEdit]);
 
+  function updateServerAttribute<T extends keyof FhirServerConfig>(
+    key: T,
+    value: FhirServerConfig[T],
+  ) {
+    setSelectedServer((prev) => {
+      if (prev) {
+        return {
+          ...prev,
+          [key]: value,
+        };
+      }
+    });
+  }
+
+  const handlePatientMatchChange = async (
+    hostname: string,
+    disableCertValidation: boolean,
+    authData: AuthData,
+  ) => {
+    const { supportsMatch, fhirVersion } = await checkFhirServerSupportsMatch(
+      hostname,
+      disableCertValidation,
+      authData,
+    );
+
+    setFhirVersion(fhirVersion);
+    setPatientMatchData((prev) => ({
+      enabled: prev?.enabled ?? false,
+      onlySingleMatch: false,
+      onlyCertainMatches: fhirVersion?.startsWith("6") ?? true,
+      matchCount: prev?.matchCount ?? 0,
+      supportsMatch: supportsMatch ?? false,
+    }));
+  };
+
   const testFhirConnection = async (
     url: string,
   ): Promise<ConnectionTestResult> => {
     if (!selectedServer) {
+      showToastConfirmation({
+        heading: "Something went wrong",
+        body: "Couldn't set selected server. Try again, or contact us if the error persists",
+        variant: "error",
+      });
       return { success: false, error: "Selected server not set" };
     }
     try {
@@ -265,7 +266,7 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
 
     switch (authMethod) {
       case "basic":
-        let bearerTokenInvalid = bearerToken === "";
+        const bearerTokenInvalid = bearerToken === "";
         setFormError((prev) => {
           return {
             ...prev,
@@ -275,9 +276,9 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
         return bearerTokenInvalid;
 
       case "client_credentials":
-        let clientIdInvalid = selectedServer.clientId === "";
-        let clientSecretInvalid = selectedServer.clientSecret === "";
-        let scopesInvalid = selectedServer.scopes === "";
+        const clientIdInvalid = !Boolean(selectedServer.clientId);
+        const clientSecretInvalid = !Boolean(selectedServer.clientSecret);
+        const scopesInvalid = !Boolean(selectedServer.scopes);
 
         setFormError((prev) => {
           return {
@@ -288,18 +289,19 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
           };
         });
         return clientIdInvalid || clientSecretInvalid || scopesInvalid;
+
       case "SMART":
-        clientIdInvalid = selectedServer.clientId === "";
-        scopesInvalid = selectedServer.scopes === "";
+        const smartClientIdInvalid = !Boolean(selectedServer.clientId);
+        const smartScopesInvalid = !Boolean(selectedServer.scopes);
 
         setFormError((prev) => {
           return {
             ...prev,
-            clientId: clientIdInvalid,
-            scopes: scopesInvalid,
+            clientId: smartClientIdInvalid,
+            scopes: smartScopesInvalid,
           };
         });
-        return clientIdInvalid || scopesInvalid;
+        return smartClientIdInvalid || smartScopesInvalid;
     }
   };
 
@@ -372,53 +374,22 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
   };
 
   const handleSave = async (authData: AuthData) => {
-    if (
-      selectedServer?.name === undefined ||
-      selectedServer?.hostname === undefined
-    ) {
+    const serverNameInvalid = selectedServer?.name === undefined;
+    const serverHostnameInvalid = selectedServer?.hostname === undefined;
+    if (serverNameInvalid || serverHostnameInvalid) {
       setFormError((prev) => {
         return {
           ...prev,
-          serverName: selectedServer?.name === undefined,
-          url: selectedServer?.hostname === undefined,
+          serverName: serverNameInvalid,
+          url: serverHostnameInvalid,
         };
       });
       return;
     }
     const connectionResult = await testFhirConnection(selectedServer?.hostname);
-
-    if (selectedServer?.defaultServer) {
-      await Promise.all(
-        fhirServers
-          .filter(
-            (srv) => srv.defaultServer && srv.name !== selectedServer.name,
-          )
-          .map((srv) =>
-            updateFhirServer({
-              id: srv.id,
-              name: srv.name,
-              hostname: srv.hostname,
-              disableCertValidation: srv.disableCertValidation,
-              mutualTls: false,
-              defaultServer: srv.defaultServer,
-              lastConnectionSuccessful: srv.lastConnectionSuccessful ?? false,
-              authData: {
-                authType: srv.authType as AuthMethodType,
-                clientId: srv.clientId,
-                clientSecret: srv.clientSecret,
-                tokenEndpoint: srv.tokenEndpoint,
-                scopes: srv.scopes,
-                headers: srv.headers ?? {},
-              },
-              patientMatchConfiguration:
-                srv.patientMatchConfiguration ?? DEFAULT_PATIENT_MATCH_DATA,
-            }),
-          ),
-      );
-    }
-
+    let result;
     if (modalMode === "create") {
-      const result = await insertFhirServer(
+      result = await insertFhirServer(
         selectedServer?.name,
         selectedServer?.hostname,
         selectedServer?.disableCertValidation ?? false,
@@ -428,31 +399,51 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
         authData,
         patientMatchData || DEFAULT_PATIENT_MATCH_DATA,
       );
-
-      if (result.success) {
-        getFhirServerConfigs(true).then((servers) => {
-          setFhirServers(servers);
-        });
-        handleCloseModal();
-      } else {
-        setConnectionStatus("error");
-        setErrorMessage(result.error);
-      }
-    } else if (selectedServer) {
-      const result = await updateFhirServer({
+    } else {
+      console.log(selectedServer);
+      result = await updateFhirServer({
         ...selectedServer,
         mutualTls: selectedServer?.mutualTls ?? false,
       });
 
-      if (result.success) {
-        getFhirServerConfigs(true).then((servers) => {
-          setFhirServers(servers);
-        });
-        handleCloseModal();
-      } else {
-        setConnectionStatus("error");
-        setErrorMessage(result.error);
+      if (selectedServer?.defaultServer) {
+        await Promise.all(
+          fhirServers
+            .filter(
+              (srv) => srv.defaultServer && srv.name !== selectedServer.name,
+            )
+            .map((srv) =>
+              updateFhirServer({
+                id: srv.id,
+                name: srv.name,
+                hostname: srv.hostname,
+                disableCertValidation: srv.disableCertValidation,
+                mutualTls: srv.mutualTls ?? false,
+                defaultServer: srv.defaultServer,
+                lastConnectionSuccessful: srv.lastConnectionSuccessful ?? false,
+                authData: {
+                  authType: srv.authType as AuthMethodType,
+                  clientId: srv.clientId,
+                  clientSecret: srv.clientSecret,
+                  tokenEndpoint: srv.tokenEndpoint,
+                  scopes: srv.scopes,
+                  headers: srv.headers ?? {},
+                },
+                patientMatchConfiguration:
+                  srv.patientMatchConfiguration ?? DEFAULT_PATIENT_MATCH_DATA,
+              }),
+            ),
+        );
       }
+    }
+    if (result.success) {
+      getFhirServerConfigs(true).then((servers) => {
+        setFhirServers(servers);
+      });
+      handleCloseModal();
+    } else {
+      setConnectionStatus("error");
+      setErrorMessage(result.error);
     }
   };
 
@@ -661,7 +652,7 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
               name="scopes"
               data-testid="scopes"
               type="text"
-              value={selectedServer?.scopes}
+              value={selectedServer?.scopes ?? ""}
               onChange={(e) => updateServerAttribute("scopes", e.target.value)}
               required
             />
@@ -682,7 +673,7 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
               name="token-endpoint"
               data-testid="token-endpoint"
               type="url"
-              value={selectedServer?.tokenEndpoint}
+              value={selectedServer?.tokenEndpoint ?? ""}
               onChange={(e) =>
                 updateServerAttribute("tokenEndpoint", e.target.value)
               }
@@ -717,7 +708,7 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
                   aria-label="warning icon indicating an error is present"
                   className={"error-message"}
                 />
-                Client ID token needs to be set for client auth
+                Client ID token needs to be set for SMART auth
               </div>
             )}
 
@@ -747,7 +738,7 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
                   aria-label="warning icon indicating an error is present"
                   className={"error-message"}
                 />
-                Scopes needs to be set for client auth
+                Scopes needs to be set for SMART auth
               </div>
             )}
 

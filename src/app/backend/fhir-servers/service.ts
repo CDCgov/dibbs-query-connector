@@ -146,6 +146,7 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
     authData?: AuthData;
     patientMatchConfiguration?: PatientMatchData;
   }) {
+    console.log(updateDetails);
     const {
       id,
       name,
@@ -218,24 +219,26 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
             }
           : null;
 
-      const result = await dbService.query(updateQuery, [
-        id,
-        name,
-        hostname,
-        lastConnectionSuccessful,
-        headers,
-        disableCertValidation,
-        defaultServer,
-        authType,
-        authData?.clientId || null,
-        authData?.clientSecret || null,
-        authData?.tokenEndpoint || null,
-        authData?.scopes || null,
-        authData?.accessToken || null,
-        authData?.tokenExpiry || null,
-        patientMatchConfigObject,
-        mutualTls,
-      ]);
+      // const result = await dbService.query(updateQuery, [
+      //   id,
+      //   name,
+      //   hostname,
+      //   lastConnectionSuccessful,
+      //   headers,
+      //   disableCertValidation,
+      //   defaultServer,
+      //   authType,
+      //   authData?.clientId || null,
+      //   authData?.clientSecret || null,
+      //   authData?.tokenEndpoint || null,
+      //   authData?.scopes || null,
+      //   authData?.accessToken || null,
+      //   authData?.tokenExpiry || null,
+      //   patientMatchConfigObject,
+      //   mutualTls,
+      // ]);
+
+      const result = { rows: [] };
 
       // Clear the cache so the next getFhirServerConfigs call will fetch fresh data
       FhirServerConfigService.cachedFhirServerConfigs = null;
