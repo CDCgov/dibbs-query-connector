@@ -204,7 +204,6 @@ describe("Query Execution with Mutual TLS", () => {
         expect.stringContaining("/ndjson/results/Patient-Page1.ndjson"),
       );
 
-      console.log(result);
       // Verify the result
       expect(result).toHaveLength(1);
       expect(result[0]).toEqual(mockPatient);

@@ -20,7 +20,6 @@ testWithMock.describe("Mutual TLS", () => {
 
       const serverName = `E2E Mutual TLS ${Math.floor(Math.random() * 10000)}`;
       await page.getByTestId("server-name").fill(serverName);
-
       await page
         .getByTestId("server-url")
         .fill(`${process.env.AIDBOX_BASE_URL}/fhir`);

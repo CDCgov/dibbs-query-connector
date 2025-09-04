@@ -947,10 +947,6 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
     };
   }, [clearErrorOnModalClose]);
 
-  console.log(selectedServer);
-  console.log(selectedServer?.name);
-  console.log(selectedServer?.hostname);
-
   return (
     <Modal
       id="fhir-server"
