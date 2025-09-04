@@ -146,7 +146,6 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
     authData?: AuthData;
     patientMatchConfiguration?: PatientMatchData;
   }) {
-    console.log(updateDetails);
     const {
       id,
       name,

@@ -1,12 +1,30 @@
 import FHIRClient from "@/app/backend/fhir-servers/fhir-client";
 import { FhirServerConfig } from "@/app/models/entities/fhir-servers";
-import * as mtlsUtils from "@/app/utils/mtls-utils";
 import { testFhirServerConnection } from "@/app/backend/fhir-servers/test-utils";
 import https from "https";
 import { Agent } from "undici";
+import * as mtlsUtils from "@/app/utils/mtls-utils";
 
-// Mock the mtls-utils module
-jest.mock("@/app/utils/mtls-utils");
+const mockCert =
+  "-----BEGIN CERTIFICATE-----\nMOCK_CERT\n-----END CERTIFICATE-----";
+const mockKey =
+  "-----BEGIN PRIVATE KEY-----\nMOCK_KEY\n-----END PRIVATE KEY-----";
+
+jest.mock("@/app/utils/mtls-utils", () => {
+  return {
+    isMtlsAvailable: jest.fn().mockReturnValue(true),
+    getOrCreateMtlsCert: jest
+      .fn()
+      .mockReturnValue(
+        "-----BEGIN CERTIFICATE-----\nMOCK_CERT\n-----END CERTIFICATE-----",
+      ),
+    getOrCreateMtlsKey: jest
+      .fn()
+      .mockReturnValue(
+        "-----BEGIN PRIVATE KEY-----\nMOCK_KEY\n-----END PRIVATE KEY-----",
+      ),
+  };
+});
 
 // Mock the smart-on-fhir module
 jest.mock("@/app/backend/smart-on-fhir", () => ({
@@ -17,11 +35,6 @@ global.fetch = jest.fn();
 const mockFetch = global.fetch as jest.Mock;
 
 describe("FHIRClient with Mutual TLS", () => {
-  const mockCert =
-    "-----BEGIN CERTIFICATE-----\nMOCK_CERT\n-----END CERTIFICATE-----";
-  const mockKey =
-    "-----BEGIN PRIVATE KEY-----\nMOCK_KEY\n-----END PRIVATE KEY-----";
-
   beforeEach(() => {
     mockFetch.mockClear();
 
@@ -219,6 +232,7 @@ describe("FHIRClient with Mutual TLS", () => {
   describe("Connection testing with mutual TLS", () => {
     it("should test connection with mTLS enabled server", async () => {
       const mockResponse = {
+        // For mTLS servers, 404 on /Task/foo is considered successful
         status: 404,
         ok: false,
         text: async () => "Not found",
@@ -233,7 +247,6 @@ describe("FHIRClient with Mutual TLS", () => {
         { authType: "none" },
       );
 
-      // For mTLS servers, 404 on /Task/foo is considered successful
       expect(result.success).toBe(true);
       expect(result.message).toBe("Server is reachable with mutual TLS");
     });

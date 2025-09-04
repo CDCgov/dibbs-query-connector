@@ -596,7 +596,7 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
               )}
               data-testid="client-id"
               type="text"
-              value={selectedServer?.clientId}
+              value={selectedServer?.clientId ?? ""}
               onChange={(e) =>
                 updateServerAttribute("clientId", e.target.value)
               }
@@ -624,7 +624,7 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
               )}
               data-testid="client-secret"
               type="password"
-              value={selectedServer?.clientSecret}
+              value={selectedServer?.clientSecret ?? ""}
               onChange={(e) =>
                 updateServerAttribute("clientSecret", e.target.value)
               }
@@ -696,7 +696,7 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
               name="client-id"
               data-testid="client-id"
               type="text"
-              value={selectedServer?.clientId}
+              value={selectedServer?.clientId ?? ""}
               onChange={(e) =>
                 updateServerAttribute("clientId", e.target.value)
               }
@@ -728,7 +728,7 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
               )}
               name="scopes"
               type="text"
-              value={selectedServer?.scopes}
+              value={selectedServer?.scopes ?? ""}
               onChange={(e) => updateServerAttribute("scopes", e.target.value)}
               required
             />
@@ -753,7 +753,7 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
               className="margin-top-05"
               data-testid="token-endpoint"
               type="url"
-              value={selectedServer?.tokenEndpoint}
+              value={selectedServer?.tokenEndpoint ?? ""}
               onChange={(e) =>
                 updateServerAttribute("tokenEndpoint", e.target.value)
               }
@@ -957,7 +957,7 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
         )}
         name="server-name"
         type="text"
-        value={selectedServer?.name}
+        value={selectedServer?.name ?? ""}
         onChange={(e) => updateServerAttribute("name", e.target.value)}
         required
       />
@@ -983,7 +983,7 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
           formError?.url ? "error-input" : "",
         )}
         type="url"
-        value={selectedServer?.hostname}
+        value={selectedServer?.hostname ?? ""}
         onChange={(e) => updateServerAttribute("hostname", e.target.value)}
         required
       />
@@ -1098,7 +1098,7 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
       <Checkbox
         id="disable-cert-validation"
         label="Disable certificate validation"
-        checked={selectedServer?.disableCertValidation}
+        checked={selectedServer?.disableCertValidation ?? false}
         onChange={(e) =>
           updateServerAttribute("disableCertValidation", e.target.checked)
         }
@@ -1107,7 +1107,7 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
       <Checkbox
         id="default-server"
         label="Default server?"
-        checked={selectedServer?.defaultServer}
+        checked={selectedServer?.defaultServer ?? false}
         onChange={(e) =>
           updateServerAttribute("defaultServer", e.target.checked)
         }
