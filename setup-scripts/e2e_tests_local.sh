@@ -28,7 +28,7 @@ done
 echo -e "\nAidbox seeder finished!"
 
 # Run Next dev without auth to allow the e2e's to work
-dotenv -e ./.env.e2e -- next dev --turbopack &
+npx dotenv -e ./.env.e2e -- next dev --turbopack &
 
 echo "Waiting Next server to be healthy..."
 while ! nc -z localhost 3000; do
@@ -36,6 +36,6 @@ while ! nc -z localhost 3000; do
 done
 echo "Next.js server is up!"
 
-dotenv -e ./.env.e2e -- npx playwright test --ui
+npx dotenv -e ./.env.e2e -- npx playwright test --ui
 
 docker compose down --volumes --remove-orphans
