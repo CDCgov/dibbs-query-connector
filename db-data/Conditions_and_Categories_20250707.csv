@@ -1,0 +1,262 @@
+"Condition
+",Condition Category,Code,Code Description,Code System,Code System Version,Planned Update,NNC Code,Content Release
+Acanthamoeba,Waterborne (not enteric),49649001,Infection caused by Acanthamoeba (disorder),SNOMEDCT,2025-03,,50225  Acanthamoeba disease (excluding keratitis),Previously released condition
+Acute Flaccid Myelitis (AFM),Neurological Diseases,897031002,Acute flaccid myelitis (disorder),SNOMEDCT,2025-03,,11120  	Acute flaccid myelitis,Previously released condition
+Agricultural Chemicals (Fertilizer) Poisoning,Toxic Effect of Non-Medicinal Substances ,216809001,Accidental poisoning caused by fertilizers (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Alpha-gal Syndrome,Vectorborne Diseases,788781001,Delayed allergy to red meat (finding),SNOMEDCT,2025-03,,50269  Alpha-gal syndrome ,Previously released condition
+Amebiasis,Enteric Diseases,388759003,Infection caused by Entamoeba histolytica (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Anaplasmosis,Vectorborne Diseases,13906002,Anaplasmosis (disorder),SNOMEDCT,2025-03,,11090  	Anaplasma phagocytophilum,Previously released condition
+Anencephaly,Birth Defects and Infant Disorders,89369001,Anencephalus (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Angiostrongyliasis,Zoonotic Diseases,61750000,Infection caused by Angiostrongylus (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Animal Bite Injury,"Injuries, NEC",399907009,Animal bite wound (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Anophthalmia,Birth Defects and Infant Disorders,7183006,Anophthalmos (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Anotia,Birth Defects and Infant Disorders,57436000,Congenital absence of external ear (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Anthrax,Zoonotic Diseases,409498004,Anthrax (disorder),SNOMEDCT,2025-03,,"10350  Anthrax ;10352  Anthrax, cutaneous ;10353  Anthrax, ingestion ;10354  Anthrax, inhalation ;10355  Anthrax, injection ;10356  Anthrax, welder’s ",Previously released condition
+Aortic valve stenosis,Birth Defects and Infant Disorders,18546004,Congenital stenosis of aortic valve (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Arboviral Disease [Other],Vectorborne Diseases,40610006,Arbovirus infection (disorder),SNOMEDCT,2025-03,,"10072  Other Arboviral diseases, not otherwise specified;50237	  Flavivirus disease, not otherwise specified;10055	  Venezuelan equine encephalitis virus neuroinvasive disease;10067	  Venezuelan equine encephalitis virus non-neuroinvasive disease;10074	  Tick-borne Encephalitis viruses;10058     Cache Valley virus disease, neuroinvasive;10066     Cache Valley virus disease, non-neuroinvasive;50290 Non-congenital Oropouche virus disease ;50291 Congenital Oropouche virus disease ",Previously released condition
+Arsenic Exposure and Toxicity,Toxic Effect of Non-Medicinal Substances ,767146004,Toxic effect of arsenic and/or arsenic compound (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Asbestosis,Respiratory Conditions (non-infectious),22607003,Asbestosis (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Atrial septal defect,Birth Defects and Infant Disorders,405752007,Congenital atrial septal defect (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Atrioventricular septal defect (Endocardial cushion defect),Birth Defects and Infant Disorders,1237074000,Congenital atrioventricular septal defect (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Babesiosis,Vectorborne Diseases,21061004,Babesiosis (disorder),SNOMEDCT,2025-03,,12010	  Babesiosis,Previously released condition
+Balamuthia mandrillaris Disease,Waterborne (not enteric),115635005,Balamuthia mandrillaris (organism),SNOMEDCT,2025-03,,50226  Balamuthia mandrillaris disease,Previously released condition
+Bartonellosis,Vectorborne Diseases,266123003,Bartonellosis (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Baylisascariasis,Zoonotic Diseases,93614002,Infection caused by Baylisascaris procyonis (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Bladder Exstrophy,Birth Defects and Infant Disorders,61758007,Exstrophy of urinary bladder sequence (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Blastomycosis,Respiratory Conditions (infectious),69996000,Blastomycosis (disorder),SNOMEDCT,2025-03,,11910  Blastomycosis,Previously released condition
+Botulism,Toxic Effect of Non-Medicinal Substances ,398565003,Infection caused by Clostridium botulinum (disorder),SNOMEDCT,2025-03,,"10530  Botulism, foodborne;10550  Botulism, other (includes wound);10548  Botulism, other unspecified;10549  Botulism, wound",Previously released condition
+"Botulism, Infant",Toxic Effect of Non-Medicinal Substances ,414488002,Infantile botulism (disorder),SNOMEDCT,2025-03,,"10540 Botulism, infant",Previously released condition
+Brucellosis,Zoonotic Diseases,75702008,Brucellosis (disorder),SNOMEDCT,2025-03,,10020   Brucellosis,Previously released condition
+Byssinosis,Respiratory Conditions (non-infectious),85761009,Byssinosis (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Cadmium Exposure and Toxicity,Toxic Effect of Non-Medicinal Substances ,3398004,Cadmium poisoning (disorder),SNOMEDCT,2025-03,,,Previously released condition
+California Serogroup Virus Disease,Vectorborne Diseases,418182000,Disease caused by California serogroup virus (disorder),SNOMEDCT,2025-03,,"10054	  California serogroup virus diseases, neuroinvasive;10061	  California serogroup virus diseases, non-neuroinvasive;11718	  California encephalitis virus disease",Previously released condition
+Campylobacteriosis,Enteric Diseases,86500004,Campylobacteriosis (disorder),SNOMEDCT,2025-03,,11020	  Campylobacteriosis,Previously released condition
+Cancer,Cancer,363346000,Malignant neoplastic disease (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Candida auris infection,Healthcare-Associated Events,865929003,Infection caused by Candida auris (disorder),SNOMEDCT,2025-03,,"50263	  Candida auris, clinical;50264	  Candida auris, screening",Previously released condition
+Carbapenemase-Producing Organisms (CPO),Healthcare-Associated Events,734350003,Carbapenemase-producing bacteria (organism),SNOMEDCT,2025-03,,"50270	  Carbapenemase-producing organisms (CPO), clinical;50271	  Carbapenemase-producing organisms (CPO), screening",Previously released condition
+Carbapenem-resistant Acinetobacter baumannii (CRAB),Healthcare-Associated Events,715174007,Carbapenem resistant Acinetobacter baumannii (organism),SNOMEDCT,2025-03,,,Previously released condition
+Carbapenem-resistant Enterobacterales (CRE),Healthcare-Associated Events,44591000087104,Carbapenem resistant Enterobacterales (organism),SNOMEDCT,2025-03,,,Previously released condition
+Carbapenem-resistant Pseudomonas aeruginosa (CRPA),Healthcare-Associated Events,726492000,Carbapenem resistant Pseudomonas aeruginosa (organism),SNOMEDCT,2025-03,,,Previously released condition
+Carbon Monoxide Poisoning,Toxic Effect of Non-Medicinal Substances ,17383000,Toxic effect of carbon monoxide (disorder),SNOMEDCT,2025-03,,32016	  Carbon monoxide poisoning,Previously released condition
+Catheter-associated Urinary Tract Infection (CAUTI),Healthcare-Associated Events,700372006,Urinary tract infection associated with catheter (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Central Line-associated Bloodstream Infection (CLABSI),Healthcare-Associated Events,736152001,Infection of bloodstream associated with central venous catheter in situ (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Chagas Disease,Vectorborne Diseases,77506005,Infection caused by Trypanosoma cruzi (disorder),SNOMEDCT,2025-03,,"12041  Chagas disease, acute ;12042  Chagas disease, chronic ;12044  Chagas disease, congenital ",Previously released condition
+Chancroid,Sexually Transmitted Diseases,266143009,Chancroid (disorder),SNOMEDCT,2025-03,,10273	  Chancroid,Previously released condition
+Chemical Pneumonitis,Respiratory Conditions (non-infectious),196021009,Acute pneumonitis caused by chemical fumes (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Chikungunya virus disease,Vectorborne Diseases,111864006,Chikungunya fever (disorder),SNOMEDCT,2025-03,,10073	  Chikungunya virus diseases,Previously released condition
+Chlamydia trachomatis infection,Sexually Transmitted Diseases,240589008,Chlamydia trachomatis infection (disorder),SNOMEDCT,2025-03,,10274	  Chlamydia trachomatis infection,Previously released condition
+Choanal Atresia,Birth Defects and Infant Disorders,204508009,Choanal atresia (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Cholera,Enteric Diseases,63650001,Cholera (disorder),SNOMEDCT,2025-03,,10470	  Cholera (toxigenic Vibrio cholerae O1 or O139),Previously released condition
+Cleft Lip Alone,Birth Defects and Infant Disorders,80281008,Cleft lip (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Cleft Lip with Cleft Palate,Birth Defects and Infant Disorders,66948001,Cleft palate with cleft lip (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Cleft Palate Alone,Birth Defects and Infant Disorders,87979003,Cleft palate (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Cloacal Exstrophy,Birth Defects and Infant Disorders,20815007,Exstrophy of cloaca sequence (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Clostridioides difficile (C. diff) infection,Enteric Diseases,186431008,Infection caused by Clostridioides difficile (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Clostridium perfringens Infection,Enteric Diseases,65154009,Infection caused by Clostridium perfringens (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Coal Workers’ Pneumoconiosis (CWP),Respiratory Conditions (non-infectious),29422001,Coal workers' pneumoconiosis (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Coarctation of the Aorta,Birth Defects and Infant Disorders,7305005,Coarctation of aorta (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Coccidioidomycosis,Respiratory Conditions (infectious),60826002,Coccidioidomycosis (disorder),SNOMEDCT,2025-03,,11900	  Coccidioidomycosis,Previously released condition
+Colorado tick fever,Vectorborne Diseases,6452009,Colorado tick fever (disorder),SNOMEDCT,2025-03,,10093  	Colorado tick fever virus disease,Previously released condition
+Congenital cytomegalovirus (cCMV) infection and disease,Birth Defects and Infant Disorders,59527008,Congenital cytomegalovirus infection (disorder),SNOMEDCT,2025-03,,"13050   Congenital cytomegalovirus, infection;13051   Congenital cytomegalovirus, disease",Previously released condition
+Congenital Posterior Urethral Valves,Birth Defects and Infant Disorders,253900005,Congenital posterior urethral valves (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Congenital Rubella Syndrome (CRS),Vaccine Preventable Diseases,1857005,Congenital rubella syndrome (disorder),SNOMEDCT,2025-03,,"10370	  Rubella, congenital syndrome",Previously released condition
+COVID-19,Respiratory Conditions (infectious),840539006,Disease caused by severe acute respiratory syndrome coronavirus 2 (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Cryptococcosis,Respiratory Conditions (infectious),42386007,Cryptococcosis (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Cryptosporidiosis,Enteric Diseases,240370009,Cryptosporidiosis (disorder),SNOMEDCT,2025-03,,11580	  Cryptosporidiosis,Previously released condition
+Cyanobacteria And Cyanotoxin Poisoning,Toxic Effect of Non-Medicinal Substances ,41439009,Microcystis flos-aquae poisoning (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Cyclosporiasis,Enteric Diseases,240372001,Cyclosporiasis (disorder),SNOMEDCT,2025-03,,11575	  Cyclosporiasis,Previously released condition
+Cysticercosis,Zoonotic Diseases,59051007,Cysticercosis (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Dengue Virus Infection,Vectorborne Diseases,38362002,Dengue (disorder),SNOMEDCT,2025-03,,"10680  	Dengue;11705	  Dengue, severe;11704	  Dengue-like illness",Previously released condition
+Diphtheria,Vaccine Preventable Diseases,276197005,Infection caused by Corynebacterium diphtheriae (disorder),SNOMEDCT,2025-03,,10040	 Diphtheria,Previously released condition
+Diphyllobothriasis,Zoonotic Diseases,187151009,Diphyllobothriasis (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Double Outlet Right Ventricle (DORV),Birth Defects and Infant Disorders,7484005,Double outlet right ventricle (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Down Syndrome,Birth Defects and Infant Disorders,41040004,Complete trisomy 21 syndrome (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Drowning and Submersion,"Injuries, NEC",212962007,Drowning and non-fatal immersion (disorder),SNOMEDCT,2025-03,,,Previously released condition
+"Drug Overdose and Poisoning, Non-opioid","Injuries, NEC",1149222004,Overdose (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Eastern equine encephalitis virus disease,Vectorborne Diseases,416925005,Eastern equine encephalitis virus infection (disorder),SNOMEDCT,2025-03,,"10053	  Eastern equine encephalitis virus disease, neuroinvasive;10062	  Eastern equine encephalitis virus disease, non-neuroinvasive",Previously released condition
+Ebstein Anomaly,Birth Defects and Infant Disorders,204357006,Ebstein's anomaly of tricuspid valve (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Echinococcosis,Parasitic Diseases,74942003,Echinococcosis (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Ehrlichiosis,Vectorborne Diseases,240626005,Human ehrlichiosis (disorder),SNOMEDCT,2025-03,,"11088  Ehrlichia chaffeensis;11089	  Ehrlichia ewingii;11092       Ehrlichia muris eauclairensis infection;11093       Ehrlichia infection, other spp. or unspeciated",Previously released condition
+Encephalitis,Neurological Diseases,45170000,Encephalitis (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Encephalocele,Birth Defects and Infant Disorders,55999004,Encephalocele (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Farmer's Lung,Respiratory Conditions (non-infectious),18690003,Farmers' lung (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Firearm-related injury,"Injuries, NEC",283545005,Gunshot wound (disorder),SNOMEDCT,2025-03,,42070 Firearm-related injury,Previously released condition
+Galactosemia,Birth Defects and Infant Disorders,190745006,Galactosemia (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Gastroschisis,Birth Defects and Infant Disorders,72951007,Gastroschisis (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Genital Warts,Sexually Transmitted Diseases,266113007,Genital warts (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Giardiasis,Enteric Diseases,58265007,Giardiasis (disorder),SNOMEDCT,2025-03,,11570	  Giardiasis,Previously released condition
+Glanders,Zoonotic Diseases,4639008,Glanders (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Gonorrhea,Sexually Transmitted Diseases,15628003,Gonorrhea (disorder),SNOMEDCT,2025-03,,10280	  Gonorrhea,Previously released condition
+Granuloma Inguinale (Donovanosis),Sexually Transmitted Diseases,28867007,Granuloma inguinale (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Guillain-Barré Syndrome,Neurological Diseases,40956001,Guillain-Barré syndrome (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Hansen's disease,Respiratory Conditions (infectious),81004002,Leprosy (disorder),SNOMEDCT,2025-03,,10380	  Hansen's disease (Leprosy),Previously released condition
+Hantavirus Infection,Zoonotic Diseases,359761005,Disease caused by Hantavirus (disorder),SNOMEDCT,2025-03,,"11610	  Hantavirus infection, non-Hantavirus Pulmonary Syndrome;11590	  Hantavirus pulmonary syndrome",Previously released condition
+Head Injury,"Injuries, NEC",82271004,Injury of head (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Hemolytic uremic syndrome (HUS),Enteric Diseases,111407006,Hemolytic uremic syndrome (disorder),SNOMEDCT,2025-03,,11550	  Hemolytic uremic syndrome postdiarrheal,Previously released condition
+Hepatitis A Virus infection,Enteric Diseases,40468003,"Viral hepatitis, type A (disorder)",SNOMEDCT,2025-03,,"10110	  Hepatitis A, acute",Previously released condition
+Hepatitis B Virus Infection,Bloodborne Diseases,66071002,Viral hepatitis type B (disorder),SNOMEDCT,2025-03,,"10100	  Hepatitis B, acute;10105  Hepatitis B virus infection, chronic",Previously released condition
+"Hepatitis B Virus Infection, Perinatal",Bloodborne Diseases,60498001,Congenital viral hepatitis B infection (disorder),SNOMEDCT,2025-03,,"10104	  Hepatitis B, perinatal infection",Previously released condition
+Hepatitis C Virus Infection,Bloodborne Diseases,50711007,Viral hepatitis type C (disorder),SNOMEDCT,2025-03,,"10101	  Hepatitis C, acute;10106  Hepatitis C, Chronic",Previously released condition
+"Hepatitis C Virus Infection, Perinatal",Bloodborne Diseases,551611000124101,Perinatal hepatitis caused by Hepatitis C virus (disorder),SNOMEDCT,2025-03,,"50248	Hepatitis C, perinatal infection",Previously released condition
+Hepatitis D Virus Infection,Bloodborne Diseases,707341005,Viral hepatitis type D (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Hepatitis E Virus infection,Enteric Diseases,7111000119109,Viral hepatitis type E (disorder),SNOMEDCT,2025-03,,"10103  Hepatitis E, acute",Previously released condition
+Hepatitis G Virus Infection,Bloodborne Diseases,397575003,"Viral hepatitis, type G (disorder)",SNOMEDCT,2025-03,,,Previously released condition
+"Herpes, Genital",Sexually Transmitted Diseases,33839006,Genital herpes simplex (disorder),SNOMEDCT,2025-03,,,Previously released condition
+"Herpes, Neonatal",Sexually Transmitted Diseases,91576008,Congenital herpes simplex (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Histoplasmosis,Respiratory Conditions (infectious),12962009,Histoplasmosis (disorder),SNOMEDCT,2025-03,,11915  Histoplasmosis,Previously released condition
+HIV Infection or AIDS,Sexually Transmitted Diseases,86406008,Human immunodeficiency virus infection (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Hypoplastic Left Heart Syndrome (HLHS),Birth Defects and Infant Disorders,62067003,Hypoplastic left heart syndrome (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Hypospadias,Birth Defects and Infant Disorders,416010008,Hypospadias (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Infant Hearing Loss,Birth Defects and Infant Disorders,95821001,Neonatal hearing loss (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Influenza,Vaccine Preventable Diseases,43692000,Influenzal acute upper respiratory infection (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Influenza-Associated Hospitalizations,Vaccine Preventable Diseases,719590007,Influenza caused by seasonal influenza virus (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Influenza-Associated Mortality,Vaccine Preventable Diseases,661761000124109 ,Death associated with influenza (event),SNOMEDCT,2025-03,,,Previously released condition
+Influenza-associated pediatric mortality,Vaccine Preventable Diseases,6142004,Influenza (disorder),SNOMEDCT,2025-03,,11061	  Influenza-associated pediatric mortality,Previously released condition
+Influenza-like Illness (ILI),Respiratory Conditions (infectious),95891005,Influenza-like illness (finding),SNOMEDCT,2025-03,,,Previously released condition
+Interrupted Aortic Arch,Birth Defects and Infant Disorders,218728005,Interrupted aortic arch (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Invasive Cronobacter Infection Among Infants,Systemic Conditions,444664004,Genus Cronobacter (organism),SNOMEDCT,2025-03,,13060   Invasive Cronobacter infection among infants,Previously released condition
+Invasive Haemophilus Influenzae Disease,Vaccine Preventable Diseases,406583002,Invasive Haemophilus influenzae disease (disorder),SNOMEDCT,2025-03,,"10590	  Haemophilus influenzae, invasive disease",Previously released condition
+Invasive Pneumococcal Disease,Vaccine Preventable Diseases,406617004,Invasive Streptococcus pneumoniae disease (disorder),SNOMEDCT,2025-03,,11723	  Invasive pneumococcal disease,Previously released condition
+Jamestown Canyon virus disease,Vectorborne Diseases,41723001,Jamestown Canyon virus disease (disorder),SNOMEDCT,2025-03,,"10078 Jamestown Canyon virus disease, neuroinvasive;10079	Jamestown Canyon virus disease, non-neuroinvasive",Previously released condition
+Japanese encephalitis virus (JEV) disease,Vectorborne Diseases,52947006,Japanese encephalitis virus disease (disorder),SNOMEDCT,2025-03,,"10059  	Japanese encephalitis virus disease, neuroinvasive;10068  	Japanese encephalitis virus disease, non-neuroinvasive",Previously released condition
+Kawasaki Disease,Systemic Conditions,75053002,Acute febrile mucocutaneous lymph node syndrome (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Keystone virus disease,Vectorborne Diseases,404237007,Keystone virus encephalitis (disorder),SNOMEDCT,2025-03,,11712	Keystone virus disease;,Previously released condition
+La Crosse virus disease,Vectorborne Diseases,61094002,La Crosse encephalitis (disorder),SNOMEDCT,2025-03,,"10081 La Crosse virus disease, neuroinvasive;10082	La Crosse virus disease, non-neuroinvasive;",Previously released condition
+Lead in Blood,Toxic Effect of Non-Medicinal Substances ,407152001,Blood lead level above reference range (finding),SNOMEDCT,2025-03,,32010 Lead poisoning,Previously released condition
+Legionellosis,Respiratory Conditions (infectious),26726000,Legionella infection (disorder),SNOMEDCT,2025-03,,10490	  Legionellosis,Previously released condition
+Leishmaniasis,Vectorborne Diseases,80612004,Leishmaniasis (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Leptospirosis,Zoonotic Diseases,77377001,Leptospirosis (disorder),SNOMEDCT,2025-03,,10390	  Leptospirosis,Previously released condition
+Limb Reduction,Birth Defects and Infant Disorders,67341007,Longitudinal deficiency of limb (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Listeriosis,Enteric Diseases,4241002,Listeriosis (disorder),SNOMEDCT,2025-03,,10640	  Listeriosis,Previously released condition
+Louse-borne relapsing fever (LBRF),Vectorborne Diseases,14683004,Relapsing fever caused by Borrelia recurrentis (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Lyme disease,Vectorborne Diseases,23502006,Lyme disease (disorder),SNOMEDCT,2025-03,,11080	  Lyme disease,Previously released condition
+Lymphatic Filariasis,Vectorborne Diseases,240820001,Lymphatic filariasis (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Lymphocytic Choriomeningitis,Zoonotic Diseases,721781004,Infection caused by Lymphocytic choriomeningitis virus (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Malaria,Vectorborne Diseases,61462000,Malaria (disorder),SNOMEDCT,2025-03,,10130	  Malaria,Previously released condition
+Measles,Vaccine Preventable Diseases,14189004,Measles (disorder),SNOMEDCT,2025-03,,10140	  Measles (rubeola),Previously released condition
+Melioidosis,Waterborne (not enteric),428111003,Melioidosis (disorder),SNOMEDCT,2025-03,,11585	  Melioidosis,Previously released condition
+Meningitis,Neurological Diseases,7180009,Meningitis (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Meningococcal disease,Vaccine Preventable Diseases,23511006,Meningococcal infectious disease (disorder),SNOMEDCT,2025-03,,10150	  Meningococcal disease  (Neisseria meningitidis),Previously released condition
+Mercury Exposure and Toxicity,Toxic Effect of Non-Medicinal Substances ,767299002,Toxic effect of mercury and/or mercury compound (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Methemoglobinemia,Systemic Conditions,38959009,Methemoglobinemia (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Microphthalmia,Birth Defects and Infant Disorders,61142002,Microphthalmos (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Microtia,Birth Defects and Infant Disorders,35045004,Microtia (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Middle East Respiratory Syndrome (MERS),Respiratory Conditions (infectious),651000146102,Middle East respiratory syndrome (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Motor Vehicle Injury,"Injuries, NEC",407153006,Injury due to motor vehicle accident (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Mpox,Zoonotic Diseases,359814004,Monkeypox (disorder),SNOMEDCT,2025-03,,11801	  Mpox,Previously released condition
+Multisystem Inflammatory Syndrome in Adults (MIS-A),Systemic Conditions,1119306006,Multisystem inflammatory syndrome in adults (disorder),SNOMEDCT,2025-03,,11066  Multisystem Inflammatory Syndrome (MIS) associated with Coronavirus Disease 2019 (COVID-19),Previously released condition
+Multisystem Inflammatory Syndrome in Children (MIS-C),Systemic Conditions,895448002,Multisystem inflammatory syndrome in children (disorder),SNOMEDCT,2025-03,,11066  Multisystem Inflammatory Syndrome (MIS) associated with Coronavirus Disease 2019 (COVID-19),Previously released condition
+Mumps,Vaccine Preventable Diseases,36989005,Mumps (disorder),SNOMEDCT,2025-03,,10180	  Mumps,Previously released condition
+Naegleria fowleri Primary Amebic Meningoencephalitis,Waterborne (not enteric),428175000,Primary amebic encephalitis caused by Naegleria fowleri (disorder),SNOMEDCT,2025-03,,50227  Naegleria fowleri causing Primary Amebic Meningoencephalitis,Previously released condition
+Neonatal Abstinence Syndrome,Birth Defects and Infant Disorders,414819007,Neonatal abstinence syndrome (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Nipah Virus Infection,Zoonotic Diseases,406597005,Infection caused by Nipah virus (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Nongonococcal Urethritis,Sexually Transmitted Diseases,84619001,Nongonococcal urethritis (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Non-pestis Yersiniosis,Enteric Diseases,83436008,Yersiniosis (disorder),SNOMEDCT,2025-03,,11565  Yersiniosis (non-pestis),Previously released condition
+Non-Polio Enterovirus Infection,Enteric Diseases,53648006,Disease caused by Enterovirus (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Non-Streptococcal Toxic Shock Syndrome,Toxic Effect of Non-Medicinal Substances ,18504008,Toxic shock syndrome (disorder),SNOMEDCT,2025-03,,10520	  Toxic-shock syndrome (other than streptococcal),Previously released condition
+"Nontuberculous Mycobacteria Infection, Extrapulmonary",Waterborne (not enteric),111811007,Mycobacterial infection (excluding tuberculosis AND leprosy) (disorder),SNOMEDCT,2025-03,,no code,Previously released condition
+"Nontuberculous Mycobacteria Infection, Pulmonary",Respiratory Conditions (infectious),1731000119106,Atypical mycobacterial infection of lung (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Norovirus Infections,Enteric Diseases,721763002,Infection caused by Norovirus (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Novel Influenza A Virus Infection,Vaccine Preventable Diseases,541131000124102,Infection caused by novel Influenza A virus variant (disorder),SNOMEDCT,2025-03,,"11062	  Novel influenza A virus infections, initial detections of",Previously released condition
+Ophthalmia Neonatorum,Sexually Transmitted Diseases,34298002,Neonatal conjunctivitis (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Opioid Overdose and Poisoning,Toxic Effect of Non-Medicinal Substances ,242253008,Overdose of opiate (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Orthopoxvirus Disease,Vaccine Preventable Diseases,414015000,Disease caused by Orthopoxvirus (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Parkinson's disease,Neurological Diseases,49049000,Parkinson's disease (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Pelvic Inflammatory Disease,Sexually Transmitted Diseases,198130006,Female pelvic inflammatory disease (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Pertussis,Vaccine Preventable Diseases,27836007,Pertussis (disorder),SNOMEDCT,2025-03,,10190	  Pertussis,Previously released condition
+Pesticide Related Illness or injury,Toxic Effect of Non-Medicinal Substances ,37131007,Pesticide poisoning (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Phenylketonuria,Birth Defects and Infant Disorders,190687004,Phenylketonuria (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Plague,Zoonotic Diseases,58750007,Plague (disorder),SNOMEDCT,2025-03,,10440	  Plague,Previously released condition
+Poliovirus Infection,Vaccine Preventable Diseases,398102009,Acute poliomyelitis (disorder),SNOMEDCT,2025-03,,"10410  	Poliomyelitis, paralytic;10405	  Poliovirus infection, nonparalytic ",Previously released condition - Updated NNC Code
+Powassan virus disease,Vectorborne Diseases,416707008,Powassan encephalitis virus infection (disorder),SNOMEDCT,2025-03,,"10057	  Powassan virus disease, neuroinvasive;10063	  Powassan virus disease, non-neuroinvasive",Previously released condition
+Primary Congenital Hypothyroidism,Birth Defects and Infant Disorders,190268003,Congenital hypothyroidism (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Prion Disease (Human),Neurological Diseases,20484008,Prion disease (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Psittacosis,Respiratory Conditions (infectious),75116005,Ornithosis (disorder),SNOMEDCT,2025-03,,10450  	Psittacosis (Ornithosis),Previously released condition
+Pulmonary Valve Atresia and Stenosis,Birth Defects and Infant Disorders,204339005,Congenital pulmonary valve abnormality (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Q fever,Zoonotic Diseases,186788009,Q fever (disorder),SNOMEDCT,2025-03,,"10257	  Q fever, acute;10258	  Q fever, chronic",Previously released condition
+Rabies (Human),Zoonotic Diseases,14168008,Rabies (disorder),SNOMEDCT,2025-03,,"10460	  Rabies, human",Previously released condition
+Renal Agenesis and Hypoplasia,Birth Defects and Infant Disorders,32659003,Congenital hypoplasia of kidney (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Respiratory Syncytial Virus (RSV),Respiratory Conditions (infectious),6415009,Human respiratory syncytial virus (organism),SNOMEDCT,2025-03,,,Previously released condition
+Respiratory Syncytial Virus (RSV)-Associated Mortality,Respiratory Conditions (infectious),55735004,Respiratory syncytial virus infection (disorder),SNOMEDCT,2025-03,,11646 Respiratory Syncytial Virus-Associated Deaths,Previously released condition
+Reye's Syndrome,Systemic Conditions,74351001,Reye's Syndrome (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Rheumatic Fever,Streptococcal Diseases,58718002,Rheumatic fever (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Ricin Poisoning ,Toxic Effect of Non-Medicinal Substances ,409617000,Ricin poisoning (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Rotavirus Disease,Enteric Diseases,18624000,Disease caused by Rotavirus (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Rubella,Vaccine Preventable Diseases,36653000,Rubella (disorder),SNOMEDCT,2025-03,,10200	  Rubella,Previously released condition
+S. Paratyphi Infection,Enteric Diseases,85904008,Paratyphoid fever (disorder),SNOMEDCT,2025-03,,"50266	  Salmonella enterica serotypes Paratyphi A, B (tartrate negative) and C (S. Paratyphi) infection",Previously released condition
+S. Typhi Infection,Enteric Diseases,4834000,Typhoid fever (disorder),SNOMEDCT,2025-03,,50267	  Salmonella enterica Typhi (S.Typhi) infection,Previously released condition
+Salmonellosis,Enteric Diseases,302231008,Salmonella infection (disorder),SNOMEDCT,2025-03,,50265	  Salmonellosis (excluding S. Typhi infection and S. Paratyphi infection),Previously released condition
+Scabies,Parasitic Diseases,128869009,Infestation caused by Sarcoptes scabiei var hominis (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Seafood Poisoning,Toxic Effect of Non-Medicinal Substances ,269275003,Seafood causing toxic effect (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Severe Acute Respiratory Syndrome (SARS),Respiratory Conditions (infectious),398447004,Severe acute respiratory syndrome (disorder),SNOMEDCT,2025-03,,10575	  Severe Acute Respiratory Syndrome (SARS)-associated Coronavirus disease (SARS-CoV),Previously released condition
+Shiga toxin-producing Escherichia coli (STEC) infection,Enteric Diseases,328291000119103,Infection caused by Shiga toxin producing Escherichia coli (disorder),SNOMEDCT,2025-03,,11563	  Shiga toxin-producing Escherichia coli (STEC),Previously released condition
+Shigellosis,Enteric Diseases,36188001,Shigellosis (disorder),SNOMEDCT,2025-03,,11010	  Shigellosis,Previously released condition
+Silicosis or pneumoconiosis due to dust containing silica,Respiratory Conditions (non-infectious),805002,Pneumoconiosis caused by silica (disorder),SNOMEDCT,2025-03,,,Previously released condition - Updated NNC Code
+Single Ventricle,Birth Defects and Infant Disorders,45503006,Common ventricle (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Smallpox,Vaccine Preventable Diseases,67924001,Smallpox (disorder),SNOMEDCT,2025-03,,11800	  Smallpox,Previously released condition - Updated NNC Code
+Snowshoe hare virus disease,Vectorborne Diseases,404236003,Snowshoe hare virus encephalitis (disorder),SNOMEDCT,2025-03,,11734	Snowshoe hare virus disease,Previously released condition
+Spina Bifida,Birth Defects and Infant Disorders,67531005,Spina bifida (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Spotted Fever Rickettsiosis,Vectorborne Diseases,186771002,Spotted fever group rickettsial disease (disorder),SNOMEDCT,2025-03,,10250	  Spotted Fever Rickettsiosis,Previously released condition
+St. Louis Encephalitis Virus Infection,Vectorborne Diseases,417192005,Saint Louis encephalitis virus infection (disorder),SNOMEDCT,2025-03,,"10051	St. Louis encephalitis virus disease, neuroinvasive;10064  	St. Louis encephalitis virus disease, non-neuroinvasive",Previously released condition
+Staphylococcal Enterotoxin B Poisoning,Toxic Effect of Non-Medicinal Substances ,419488004,Staphylococcus aureus enterotoxin B (substance),SNOMEDCT,2025-03,,,Previously released condition
+Staphylococcus aureus Infection,Healthcare-Associated Events,406602003,Infection caused by Staphylococcus aureus (disorder),SNOMEDCT,2025-03,,,Previously released condition
+"Streptococcal disease, invasive, Group A",Streptococcal Diseases,406614006,Invasive Group A beta-hemolytic streptococcal disease (disorder),SNOMEDCT,2025-03,,"11710	Streptococcal disease, invasive, group A (Streptococcus pyogenes)",Previously released condition
+"Streptococcal disease, invasive, Group B",Streptococcal Diseases,406612005,Invasive Group B beta-hemolytic streptococcal disease (disorder),SNOMEDCT,2025-03,,"11715	Streptococcal disease, invasive, group B (Streptococcus agalactiae)",Previously released condition
+Streptococcal Toxic Shock Syndrome,Toxic Effect of Non-Medicinal Substances ,240451000,Streptococcal toxic shock syndrome (disorder),SNOMEDCT,2025-03,,11700	  Streptococcal toxic shock syndrome,Previously released condition
+Strongyloidiasis,Parasitic Diseases,1214006,Infection caused by Strongyloides (disorder),SNOMEDCT,2025-03,,12036	  Strongyloidiasis,Previously released condition
+Suicide,"Injuries, NEC",44301001,Suicide (event),SNOMEDCT,2025-03,,,Previously released condition
+Surgical Site Infection (SSI),Healthcare-Associated Events,433202001,Surgical site infection (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Syphilis,Sexually Transmitted Diseases,76272004,Syphilis (disorder),SNOMEDCT,2025-03,,"10313    	  Syphilis, early non-primary, non-secondary;10311	  Syphilis, primary;10312	  Syphilis, secondary;10320	  Syphilis, unknown duration or late",Previously released condition
+"Syphilis, Congenital",Sexually Transmitted Diseases,35742006,Congenital syphilis (disorder),SNOMEDCT,2025-03,,"10316	  Syphilis, congenital",Previously released condition
+Taeniasis,Zoonotic Diseases,76172008,Infection caused by Taenia (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Tetanus,Vaccine Preventable Diseases,76902006,Tetanus (disorder),SNOMEDCT,2025-03,,10210	  Tetanus,Previously released condition
+Tetralogy of Fallot (TOF),Birth Defects and Infant Disorders,86299006,Tetralogy of Fallot (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Tick Paralysis,Vectorborne Diseases,74225001,Tick paralysis (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Tickborne relapsing fever (TBRF),Vectorborne Diseases,10301003,Tick-borne relapsing fever (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Total Anomalous Pulmonary Venous Connection (TAPVC),Birth Defects and Infant Disorders,111323005,Total anomalous pulmonary venous return (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Toxoplasmosis,Zoonotic Diseases,187192000,Toxoplasmosis (disorder),SNOMEDCT,2025-03,,"13070   Toxoplasmosis;13071   Congenital toxoplasmosis;13072   Toxoplasmosis, active primary infection;13073   Toxoplasmosis, active reactivation disease;13074   Toxoplasmosis, past infection/unable to classify",Previously released condition
+Transposition of the Great Arteries (TGA),Birth Defects and Infant Disorders,204296002,Discordant ventriculoarterial connection (disorder),SNOMEDCT,2025-03,,"13071   Toxoplasmosis;13071   Congenital toxoplasmosis;13072   Toxoplasmosis, active primary infection;13073   Toxoplasmosis, active reactivation disease;13074   Toxoplasmosis, past infection/unable to classify",Previously released condition
+Trichinellosis,Zoonotic Diseases,709018004,Infection caused by larvae of Trichinella (disorder),SNOMEDCT,2025-03,,"13072   Toxoplasmosis;13071   Congenital toxoplasmosis;13072   Toxoplasmosis, active primary infection;13073   Toxoplasmosis, active reactivation disease;13074   Toxoplasmosis, past infection/unable to classify",Previously released condition
+Tricuspid Valve Atresia and Stenosis,Birth Defects and Infant Disorders,4374004,Congenital anomaly of tricuspid valve (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Trisomy 13,Birth Defects and Infant Disorders,21111006,Complete trisomy 13 syndrome (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Trisomy 18,Birth Defects and Infant Disorders,51500006,Complete trisomy 18 syndrome (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Trivittatus virus disease,Vectorborne Diseases,240507007,Trivittatus fever (disorder),SNOMEDCT,2025-03,,11724	Trivittatus virus disease,Previously released condition
+Truncus Arteriosus (Common Truncus),Birth Defects and Infant Disorders,61959006,Common truncus arteriosus (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Tuberculosis,Respiratory Conditions (infectious),56717001,Tuberculosis (disorder),SNOMEDCT,2025-03,,10220	  Tuberculosis,Previously released condition
+"Tuberculosis, Latent Infection (LTBI)",Respiratory Conditions (infectious),11999007,Inactive tuberculosis (finding),SNOMEDCT,2025-03,,50258  Latent TB infection,Previously released condition
+Tularemia,Vectorborne Diseases,19265001,Tularemia (disorder),SNOMEDCT,2025-03,,10230	  Tularemia,Previously released condition
+Typhus Fever,Vectorborne Diseases,240613006,Typhus group rickettsial disease (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Vaccine Adverse Event,Healthcare-Associated Events,293104008,Adverse reaction to component of vaccine product (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Vaccinia Disease or Adverse Event,Healthcare-Associated Events,409636005,Complication of smallpox vaccination (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Vancomycin-intermediate Staphylococcus aureus (VISA),Healthcare-Associated Events,406604002,Infection caused by vancomycin intermediate Staphylococcus aureus (disorder),SNOMEDCT,2025-03,,11663	  Vancomycin-intermediate Staphylococcus aureus (VISA),Previously released condition
+Vancomycin-resistant Enterococci (VRE) Infection,Healthcare-Associated Events,406575008,Infection caused by vancomycin resistant enterococcus (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Vancomycin-resistant Staphylococcus aureus (VRSA),Healthcare-Associated Events,404681006,Infection caused by vancomycin resistant Staphylococcus aureus (disorder),SNOMEDCT,2025-03,,11665	  Vancomycin-resistant Staphylococcus aureus (VRSA),Previously released condition
+Varicella,Vaccine Preventable Diseases,38907003,Varicella (disorder),SNOMEDCT,2025-03,,10030	  Varicella (Chickenpox),Previously released condition
+Ventilator-associated Event (VAE),Healthcare-Associated Events,71695001,Complication of ventilation therapy (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Ventricular septal defect,Birth Defects and Infant Disorders,768552007,Congenital ventricular septal defect (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Vesicular Stomatitis,Zoonotic Diseases,36921006,Vesicular stomatitis (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Vibriosis,Enteric Diseases,398557001,Infection caused by non-cholerae vibrio (disorder),SNOMEDCT,2025-03,,"11545	  Vibriosis (any species of the family Vibrionaceae, other than toxigenic Vibrio cholera O1 or O139)",Previously released condition
+Viral Hemorrhagic Fever (VHF),Zoonotic Diseases,240523007,Viral hemorrhagic fever (disorder),SNOMEDCT,2025-03,,11640	  Crimean-Congo hemorrhagic fever;11630	  Ebola hemorrhagic fever;11644	  Lujo virus;11637	  Machupo hemorrhagic fever ;11631	  Marburg fever;11639	  Sabia-associated hemorrhagic fever;11638	  Junín hemorrhagic fever;11648	  Guanarito hemorrhagic fever;11632	   Lassa fever;11649     Chapare hemorrhagic fever;11643     Rift Valley fever virus,Previously released condition
+West Nile Virus Infection,Vectorborne Diseases,417093003,Disease caused by West Nile virus (disorder),SNOMEDCT,2025-03,,"10056	  West Nile virus disease, neuroinvasive;10049	  West Nile virus disease, non-neuroinvasive",Previously released condition
+Western equine encephalitis virus disease,Vectorborne Diseases,47523006,Western equine encephalitis (disorder),SNOMEDCT,2025-03,,"10052	  Western equine encephalitis virus disease, neuroinvasive;10065	  Western equine encephalitis virus disease, non-neuroinvasive",Previously released condition
+Work-related Asthma (WRA),Respiratory Conditions (non-infectious),57607007,Occupational asthma (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Yellow fever,Vectorborne Diseases,16541001,Yellow fever (disorder),SNOMEDCT,2025-03,,10660	  Yellow fever ,Previously released condition
+Zika Virus Disease,Vectorborne Diseases,3928002,Zika virus disease (disorder),SNOMEDCT,2025-03,,"50224	  Zika virus disease, congenital;50223	  Zika virus disease, non-congenital",Previously released condition
+Creutzfeldt-Jakob Disease (CJD) and Variant Creutzfeldt-Jakob Disease (vCJD),Neurological Diseases,792004,Jakob-Creutzfeldt disease (disorder),SNOMEDCT,2025-03,,,Previously released condition
+Biliary Atresia,Birth Defects and Infant Disorders,77480004,Congenital biliary atresia (disorder),SNOMEDCT,2025-03,,,New Condition July 2025
+Candidemia,Healthcare-Associated Events,432261003,Candidemia (disorder),SNOMEDCT,2025-03,,,New Condition July 2025
+Clubfoot,Birth Defects and Infant Disorders,397932003,Talipes equinovarus (disorder),SNOMEDCT,2025-03,,,New Condition July 2025
+Cystic Fibrosis,Birth Defects and Infant Disorders,190905008,Cystic fibrosis (disorder),SNOMEDCT,2025-03,,,New Condition July 2025
+Diaphragmatic Hernia,Birth Defects and Infant Disorders,39839004,Diaphragmatic hernia (disorder),SNOMEDCT,2025-03,,,New Condition July 2025
+Esophageal Atresia/Tracheoesophageal Fistula,Birth Defects and Infant Disorders,204659003,Esophageal atresia with tracheoesophageal fistula (disorder),SNOMEDCT,2025-03,,,New Condition July 2025
+Fetal Alcohol Spectrum Disorders,Birth Defects and Infant Disorders,609437000,Fetal Alcohol Spectrum Disorder (disorder),SNOMEDCT,2025-03,,,New Condition July 2025
+Homocystinuria,Birth Defects and Infant Disorders,11282001,Homocystinuria (disorder),SNOMEDCT,2025-03,,,New Condition July 2025
+Medium-chain Acyl-CoA Dehydrogenase Deficiency,Birth Defects and Infant Disorders,128596003,Medium-chain acyl-coenzyme A dehydrogenase deficiency (disorder),SNOMEDCT,2025-03,,,New Condition July 2025
+Omphalocele,Birth Defects and Infant Disorders,18735004,Congenital omphalocele (disorder),SNOMEDCT,2025-03,,,New Condition July 2025
+Oropouche Virus Disease,Vectorborne Diseases,72880002,Oropouche virus disease (disorder),SNOMEDCT,2025-03,,"50290 Oropouche virus disease, non-congenital;50291 Oropouche virus disease, congenital",New Condition July 2025
+Rectal and Large Intestinal Atresia and Stenosis,Birth Defects and Infant Disorders,268205005,"Atresia and stenosis of large intestine, rectum and anal canal (disorder)",SNOMEDCT,2025-03,,,New Condition July 2025
+Severe Combined Immunodeficiency,Birth Defects and Infant Disorders,31323000,Severe combined immunodeficiency disease (disorder),SNOMEDCT,2025-03,,,New Condition July 2025
+Sickle Cell Anemia (Hemoglobin SS Disease),Birth Defects and Infant Disorders,127040003,Sickle cell-hemoglobin SS disease (disorder),SNOMEDCT,2025-03,,,New Condition July 2025
+Small Intestinal Atresia and Stenosis,Birth Defects and Infant Disorders,204691002,Small intestine atresia and stenosis (disorder),SNOMEDCT,2025-03,,,New Condition July 2025
+Spinal Muscular Atrophy,Birth Defects and Infant Disorders,5262007,Spinal muscular atrophy (disorder),SNOMEDCT,2025-03,,,New Condition July 2025
+X-linked Adrenoleukodystrophy,Birth Defects and Infant Disorders,65389002,Adrenoleukodystrophy (disorder),SNOMEDCT,2025-03,,,New Condition July 2025
