@@ -1,5 +1,6 @@
 @use "uswds-core" as *;
 @use "variables" as *;
+@use "uswds-settings" as *;
 
 .page-title {
   margin-bottom: 0.5rem;
@@ -413,4 +414,12 @@ header > .grid-container {
 
 .usa-hint {
   color: $text-secondary !important;
+}
+
+.error-message {
+  color: color($theme-color-error-dark);
+}
+
+.error-input {
+  border: 2px solid color($theme-color-error-dark);
 }

@@ -12,8 +12,6 @@ import {
 } from "@/app/backend/query-building/lib";
 import { translateSnakeStringToCamelCase } from "@/app/backend/db/util";
 import AxeBuilder from "@axe-core/playwright";
-import { MockClient } from "request-mocking-protocol";
-import { test } from "@playwright/test";
 /**
  *
  * @param page The page instance on which to run the test
@@ -75,12 +73,3 @@ export async function runAxeAccessibilityChecks(page: Page) {
   }).analyze();
   expect(accessiblityChecker.violations).toEqual([]);
 }
-
-export const testWithMock = test.extend<{ mockServerRequest: MockClient }>({
-  mockServerRequest: async ({ context }, use) => {
-    const mockClient = new MockClient();
-    mockClient.onChange = async (headers) =>
-      context.setExtraHTTPHeaders(headers);
-    await use(mockClient);
-  },
-});
