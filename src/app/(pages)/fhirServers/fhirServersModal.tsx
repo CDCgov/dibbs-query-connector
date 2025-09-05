@@ -104,6 +104,7 @@ interface UpdateFormAction {
   tokenEndpoint?: string;
   scopes?: string;
   accessToken?: string;
+  initialPayload?: FhirServerConfig;
 }
 
 function formUpdateReducer(server: FhirServerConfig, action: UpdateFormAction) {
@@ -151,39 +152,47 @@ function formUpdateReducer(server: FhirServerConfig, action: UpdateFormAction) {
     }
 
     case "load": {
-      return {
-        authType: action.authType,
-        id: action.id as string,
-        name: action.name as string,
-        hostname: action.hostname as string,
-        disableCertValidation: action.disableCertValidation as boolean,
-        defaultServer: action.defaultServer as boolean,
-        headers: action.headers,
-        clientId: action.clientId,
-        clientSecret: action.clientSecret,
-        tokenEndpoint: action.tokenEndpoint,
-        scopes: action.scopes,
-        accessToken: action.accessToken,
-      };
+      return action.initialPayload ?? server;
     }
 
     default:
       return server;
   }
 }
-
+type KeyOrValue = "key" | "value";
 interface HeaderReducerAction {
-  type: "update" | "delete" | "add";
+  type: "update" | "delete" | "add" | "load" | "reset";
+  id?: string;
+  field?: KeyOrValue;
+  value?: string;
+  initialPayload?: HeaderPair[];
 }
 
-function headerReducer(headers: [], action: HeaderReducerAction) {
+function headerReducer(headers: HeaderPair[], action: HeaderReducerAction) {
   switch (action.type) {
-    case "update":
+    case "update": {
+      if (action.field && action.value) {
+        return headers.map((header) =>
+          header.id === action.id
+            ? { ...header, [action.field as KeyOrValue]: action.value }
+            : header,
+        );
+      }
       return headers;
-    case "delete":
-      return headers;
-    case "add":
-      return headers;
+    }
+    case "delete": {
+      return headers.filter((header) => header.id !== action.id);
+    }
+    case "add": {
+      return [
+        ...headers,
+        { key: "", value: "", id: `${Date.now()}-${Math.random()}` },
+      ];
+    }
+    case "load":
+      return action.initialPayload ?? headers;
+    case "reset":
+      return [];
   }
 }
 
@@ -196,7 +205,11 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
   setPatientMatchData,
   modalRef,
 }) => {
-  const [server, dispatch] = useReducer(formUpdateReducer, EMPTY_FHIR_SERVER);
+  const [server, serverDispatch] = useReducer(
+    formUpdateReducer,
+    EMPTY_FHIR_SERVER,
+  );
+  const [headers, headersDispatch] = useReducer(headerReducer, []);
 
   const [connectionStatus, setConnectionStatus] = useState<
     "idle" | "success" | "error"
@@ -204,7 +217,6 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
 
   const [errorMessage, setErrorMessage] = useState<string>();
   const [fhirVersion, setFhirVersion] = useState<string | null>(null);
-  const [headers, setHeaders] = useState<HeaderPair[]>([]);
 
   const [formError, setFormError] = useState<FormError>(
     structuredClone(INITIAL_FORM_ERRORS),
@@ -219,9 +231,9 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
         getAuthData(),
       );
 
-      dispatch({
+      serverDispatch({
         type: "load",
-        ...serverToEdit,
+        initialPayload: serverToEdit,
       });
 
       // Set headers
@@ -233,9 +245,8 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
             value,
             id: `${Date.now()}-${Math.random()}`,
           }));
-        setHeaders(headerPairs);
-      } else {
-        setHeaders([]);
+
+        headersDispatch({ type: "load", initialPayload: headerPairs });
       }
       // Set patient match data if available
       if (serverToEdit?.patientMatchConfiguration) {
@@ -624,7 +635,7 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
               )}
               value={server.accessToken ?? ""}
               onChange={(e) =>
-                dispatch({
+                serverDispatch({
                   type: "basic",
                   accessToken: e.target.value,
                 })
@@ -669,7 +680,7 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
               type="text"
               value={server?.clientId ?? ""}
               onChange={(e) =>
-                dispatch({
+                serverDispatch({
                   type: "client_credentials",
                   clientId: e.target.value,
                 })
@@ -700,7 +711,7 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
               type="password"
               value={server?.clientSecret ?? ""}
               onChange={(e) =>
-                dispatch({
+                serverDispatch({
                   type: "client_credentials",
                   clientSecret: e.target.value,
                 })
@@ -731,7 +742,7 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
               type="text"
               value={server?.scopes ?? ""}
               onChange={(e) =>
-                dispatch({
+                serverDispatch({
                   type: "client_credentials",
                   scopes: e.target.value,
                 })
@@ -757,7 +768,7 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
               type="url"
               value={server?.tokenEndpoint ?? ""}
               onChange={(e) =>
-                dispatch({
+                serverDispatch({
                   type: "client_credentials",
                   tokenEndpoint: e.target.value,
                 })
@@ -783,7 +794,7 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
               type="text"
               value={server?.clientId ?? ""}
               onChange={(e) =>
-                dispatch({
+                serverDispatch({
                   type: "SMART",
                   clientId: e.target.value,
                 })
@@ -818,7 +829,7 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
               type="text"
               value={server?.scopes ?? ""}
               onChange={(e) =>
-                dispatch({
+                serverDispatch({
                   type: "SMART",
                   scopes: e.target.value,
                 })
@@ -848,7 +859,7 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
               type="url"
               value={server?.tokenEndpoint ?? ""}
               onChange={(e) =>
-                dispatch({
+                serverDispatch({
                   type: "SMART",
                   tokenEndpoint: e.target.value,
                 })
@@ -997,32 +1008,14 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
         : undefined,
   });
 
-  const addHeader = () => {
-    setHeaders([
-      ...headers,
-      { key: "", value: "", id: `${Date.now()}-${Math.random()}` },
-    ]);
-  };
-
-  const updateHeader = (id: string, field: "key" | "value", value: string) => {
-    setHeaders(
-      headers.map((header) =>
-        header.id === id ? { ...header, [field]: value } : header,
-      ),
-    );
-  };
-
-  const removeHeader = (id: string) => {
-    setHeaders(headers.filter((header) => header.id !== id));
-  };
-
   const resetModalState = () => {
-    dispatch({
+    serverDispatch({
       type: "reset",
     });
+    headersDispatch({ type: "reset" });
+
     setConnectionStatus("idle");
     setErrorMessage("");
-    setHeaders([]);
     setPatientMatchData(DEFAULT_PATIENT_MATCH_DATA);
     setFormError(structuredClone(INITIAL_FORM_ERRORS));
   };
@@ -1061,7 +1054,7 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
         type="text"
         value={server.name}
         onChange={(e) =>
-          dispatch({
+          serverDispatch({
             type: "common",
             name: e.target.value,
           })
@@ -1092,7 +1085,7 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
         type="url"
         value={server?.hostname ?? ""}
         onChange={(e) =>
-          dispatch({
+          serverDispatch({
             type: "common",
             hostname: e.target.value,
           })
@@ -1118,7 +1111,7 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
         name="auth-method"
         value={server.authType}
         onChange={(e) => {
-          dispatch({
+          serverDispatch({
             type: "common",
             authType: (e.target.value as AuthMethodType) ?? "none",
           });
@@ -1151,7 +1144,14 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
                 type="text"
                 placeholder="Header name"
                 value={header.key}
-                onChange={(e) => updateHeader(header.id, "key", e.target.value)}
+                onChange={(e) =>
+                  headersDispatch({
+                    type: "update",
+                    id: header.id,
+                    value: e.target.value,
+                    field: "key",
+                  })
+                }
               />
             </div>
             <div className="grid-col-5 margin-left-2">
@@ -1162,7 +1162,12 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
                 placeholder="Header value"
                 value={header.value}
                 onChange={(e) =>
-                  updateHeader(header.id, "value", e.target.value)
+                  headersDispatch({
+                    type: "update",
+                    id: header.id,
+                    value: e.target.value,
+                    field: "value",
+                  })
                 }
               />
             </div>
@@ -1170,7 +1175,12 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
               <button
                 type="button"
                 className="usa-button usa-modal__close margin-top-2"
-                onClick={() => removeHeader(header.id)}
+                onClick={() =>
+                  headersDispatch({
+                    type: "update",
+                    id: header.id,
+                  })
+                }
                 aria-label={`Remove header ${header.key || "row"}`}
               >
                 <Icon.Close
@@ -1186,7 +1196,11 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
         <button
           type="button"
           className="usa-button usa-button--secondary margin-top-1"
-          onClick={addHeader}
+          onClick={() =>
+            headersDispatch({
+              type: "add",
+            })
+          }
         >
           <Icon.Add
             aria-label="Plus button to indicate header addition"
@@ -1201,7 +1215,7 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
         label="Disable certificate validation"
         checked={server?.disableCertValidation ?? false}
         onChange={(e) =>
-          dispatch({
+          serverDispatch({
             type: "common",
             disableCertValidation: e.target.checked,
           })
@@ -1213,7 +1227,7 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
         label="Default server?"
         checked={server?.defaultServer ?? false}
         onChange={(e) =>
-          dispatch({
+          serverDispatch({
             type: "common",
             defaultServer: e.target.checked,
           })
