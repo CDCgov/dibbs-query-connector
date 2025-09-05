@@ -120,7 +120,7 @@ const FhirServers: React.FC = () => {
                     {fhirServer.defaultServer ? (
                       <Tag className="margin-left-2">DEFAULT</Tag>
                     ) : null}
-                    {fhirServer.mutualTls ? (
+                    {fhirServer.authType === "mutual-tls" ? (
                       <Tag className="margin-left-2">mTLS</Tag>
                     ) : null}
                   </td>

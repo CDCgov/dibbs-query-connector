@@ -33,11 +33,10 @@ describe("FHIR Servers Mutual TLS Tests", () => {
         "Test mTLS Server",
         "https://test-mtls.example.com/fhir",
         false,
-        true, // mutualTls enabled
         false,
         true,
         {
-          authType: "none",
+          authType: "mutual-tls",
         },
       );
 
@@ -48,7 +47,7 @@ describe("FHIR Servers Mutual TLS Tests", () => {
       const insertedServer = servers.find((s) => s.name === "Test mTLS Server");
 
       expect(insertedServer).toBeDefined();
-      expect(insertedServer?.mutualTls).toBe(true);
+      expect(insertedServer?.authType).toBe("mutual-tls");
       expect(insertedServer?.hostname).toBe(
         "https://test-mtls.example.com/fhir",
       );
@@ -60,7 +59,6 @@ describe("FHIR Servers Mutual TLS Tests", () => {
         "Test mTLS Update Server",
         "https://test-update.example.com/fhir",
         false,
-        false, // mutualTls disabled
         false,
         true,
         {
@@ -77,11 +75,10 @@ describe("FHIR Servers Mutual TLS Tests", () => {
         name: "Test mTLS Update Server",
         hostname: "https://test-update.example.com/fhir",
         disableCertValidation: false,
-        mutualTls: true, // mutualTls enabled
         defaultServer: false,
         lastConnectionSuccessful: true,
         authData: {
-          authType: "none",
+          authType: "mutual-tls",
         },
       });
 
@@ -90,65 +87,7 @@ describe("FHIR Servers Mutual TLS Tests", () => {
       const servers = await getFhirServerConfigs(true);
       const updatedServer = servers.find((s) => s.id === serverId);
 
-      expect(updatedServer?.mutualTls).toBe(true);
-    });
-
-    it("should handle mutual TLS with client credentials auth", async () => {
-      const result = await insertFhirServer(
-        "Test mTLS OAuth Server",
-        "https://test-mtls-oauth.example.com/fhir",
-        false,
-        true, // mutualTls enabled
-        false,
-        true,
-        {
-          authType: "client_credentials",
-          clientId: "test-client",
-          clientSecret: "test-secret",
-          tokenEndpoint: "https://test-mtls-oauth.example.com/token",
-          scopes: "system/*.read",
-        },
-      );
-
-      expect(result.success).toBe(true);
-
-      const servers = await getFhirServerConfigs(true);
-      const insertedServer = servers.find(
-        (s) => s.name === "Test mTLS OAuth Server",
-      );
-
-      expect(insertedServer).toBeDefined();
-      expect(insertedServer?.mutualTls).toBe(true);
-      expect(insertedServer?.authType).toBe("client_credentials");
-      expect(insertedServer?.clientId).toBe("test-client");
-    });
-
-    it("should handle mutual TLS with SMART auth", async () => {
-      const result = await insertFhirServer(
-        "Test mTLS SMART Server",
-        "https://test-mtls-smart.example.com/fhir",
-        false,
-        true, // mutualTls enabled
-        false,
-        true,
-        {
-          authType: "SMART",
-          clientId: "smart-client",
-          tokenEndpoint: "https://test-mtls-smart.example.com/auth/token",
-          scopes: "patient/*.read",
-        },
-      );
-
-      expect(result.success).toBe(true);
-
-      const servers = await getFhirServerConfigs(true);
-      const insertedServer = servers.find(
-        (s) => s.name === "Test mTLS SMART Server",
-      );
-
-      expect(insertedServer).toBeDefined();
-      expect(insertedServer?.mutualTls).toBe(true);
-      expect(insertedServer?.authType).toBe("SMART");
+      expect(updatedServer?.authType).toBe("mutual-tls");
     });
 
     it("should handle mutual TLS with custom headers", async () => {
@@ -161,7 +100,6 @@ describe("FHIR Servers Mutual TLS Tests", () => {
         "Test mTLS Headers Server",
         "https://test-mtls-headers.example.com/fhir",
         false,
-        true, // mutualTls enabled
         false,
         true,
         {
@@ -178,7 +116,6 @@ describe("FHIR Servers Mutual TLS Tests", () => {
       );
 
       expect(insertedServer).toBeDefined();
-      expect(insertedServer?.mutualTls).toBe(true);
       expect(insertedServer?.headers).toEqual(customHeaders);
     });
 
@@ -188,7 +125,6 @@ describe("FHIR Servers Mutual TLS Tests", () => {
         "Test mTLS Preserve Server",
         "https://test-preserve.example.com/fhir",
         false,
-        true, // mutualTls enabled
         false,
         true,
         {
@@ -204,7 +140,6 @@ describe("FHIR Servers Mutual TLS Tests", () => {
         name: "Test mTLS Update Server",
         hostname: "https://test-preserve-updated.example.com/fhir",
         disableCertValidation: false,
-        mutualTls: true, // mutualTls still enabled
         defaultServer: false,
         lastConnectionSuccessful: true,
         authData: {
@@ -220,7 +155,6 @@ describe("FHIR Servers Mutual TLS Tests", () => {
       expect(updatedServer?.hostname).toBe(
         "https://test-preserve-updated.example.com/fhir",
       );
-      expect(updatedServer?.mutualTls).toBe(true);
     });
 
     it("should handle both SSL disable and mutual TLS together", async () => {
@@ -228,11 +162,10 @@ describe("FHIR Servers Mutual TLS Tests", () => {
         "Test mTLS SSL Disabled Server",
         "https://test-mtls-ssl-disabled.example.com/fhir",
         true, // disableCertValidation
-        true, // mutualTls enabled
         false,
         true,
         {
-          authType: "none",
+          authType: "mutual-tls",
         },
       );
 
@@ -244,7 +177,7 @@ describe("FHIR Servers Mutual TLS Tests", () => {
       );
 
       expect(insertedServer).toBeDefined();
-      expect(insertedServer?.mutualTls).toBe(true);
+      expect(insertedServer?.authType).toBe("mutual-tls");
       expect(insertedServer?.disableCertValidation).toBe(true);
     });
   });

@@ -249,7 +249,6 @@ class QueryService {
     task: Task,
   ): Promise<Patient | null> {
     console.log(`Processing Task ${task.id} for patient discovery`);
-    console.log(`Task: ${JSON.stringify(task, null, 2)}`);
     if (task.status !== "completed" || !task.output) {
       if (task.status === "failed") {
         console.warn(`Task ${task.id} failed`);
@@ -262,8 +261,8 @@ class QueryService {
     }
 
     try {
-      const patientLink = task.output?.find((output) =>
-        output.valueString?.includes("Patient-Page1"),
+      const patientLink = task.output?.find(
+        (output) => output.valueString?.includes("Patient-Page1"),
       )?.valueString;
 
       if (!patientLink) {
@@ -486,7 +485,7 @@ class QueryService {
     const patientQuery = await this.buildPatientSearchQuery(request);
     // Handle discovery based on server configuration
     let response: Response;
-    if (serverConfig?.mutualTls) {
+    if (serverConfig?.authType === "mutual-tls") {
       const tlsDiscoveryResult = await this.handleMutualTlsDiscovery(
         fhirClient,
         patientQuery,
@@ -683,8 +682,8 @@ class QueryService {
 
     const noCertainMatch =
       jsonBody.resourceType === "OperationOutcome" &&
-      jsonBody.issue?.some((i) =>
-        i.details?.text?.includes("did not find a certain match"),
+      jsonBody.issue?.some(
+        (i) => i.details?.text?.includes("did not find a certain match"),
       );
 
     if (noCertainMatch) {

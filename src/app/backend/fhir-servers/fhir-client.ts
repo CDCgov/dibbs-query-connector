@@ -54,7 +54,7 @@ class FHIRClient {
     this.hostname = config.hostname;
 
     // Set up the appropriate fetch function
-    if (config.mutualTls) {
+    if (config.authType === "mutual-tls") {
       try {
         const cert = getOrCreateMtlsCert();
         const key = getOrCreateMtlsKey();
@@ -95,7 +95,6 @@ class FHIRClient {
   private static createTestClient(
     url: string,
     disableCertValidation: boolean = false,
-    mutualTls: boolean = false,
     authData?: AuthData,
   ): FHIRClient {
     // Create a minimal server config for testing
@@ -104,7 +103,6 @@ class FHIRClient {
       name: "test",
       hostname: url,
       disableCertValidation: disableCertValidation,
-      mutualTls: mutualTls,
       defaultServer: false,
       headers: authData?.headers || {},
     };
@@ -146,14 +144,12 @@ class FHIRClient {
   static async testConnection(
     url: string,
     disableCertValidation: boolean = false,
-    mutualTls: boolean = false,
     authData?: AuthData,
   ): Promise<{ success: boolean; message?: string; error?: string }> {
     try {
       const client = FHIRClient.createTestClient(
         url,
         disableCertValidation,
-        mutualTls,
         authData,
       );
 
@@ -175,7 +171,7 @@ class FHIRClient {
 
       // Try to fetch the server's metadata
       let response;
-      if (mutualTls) {
+      if (authData?.authType === "mutual-tls") {
         if (!isMtlsAvailable()) {
           return { success: false, message: "mTLS env vars not found" };
         }
@@ -322,13 +318,13 @@ class FHIRClient {
       // If SSL validation is disabled or mutual TLS is enabled, add the agent
       if (
         this.serverConfig.disableCertValidation ||
-        this.serverConfig.mutualTls
+        this.serverConfig.authType === "mutual-tls"
       ) {
         let agentOptions: https.AgentOptions = {
           rejectUnauthorized: !this.serverConfig.disableCertValidation,
         };
 
-        if (this.serverConfig.mutualTls) {
+        if (this.serverConfig.authType === "mutual-tls") {
           const cert = getOrCreateMtlsCert();
           const key = getOrCreateMtlsKey();
           agentOptions.cert = cert;
@@ -379,7 +375,6 @@ class FHIRClient {
           hostname: this.serverConfig.hostname,
           disableCertValidation:
             this.serverConfig.disableCertValidation ?? false,
-          mutualTls: this.serverConfig.mutualTls ?? false,
           defaultServer: this.serverConfig.defaultServer ?? false,
           lastConnectionSuccessful:
             this.serverConfig.lastConnectionSuccessful ?? true,
@@ -428,13 +423,13 @@ class FHIRClient {
       // If SSL validation is disabled or mutual TLS is enabled, add the agent
       if (
         this.serverConfig.disableCertValidation ||
-        this.serverConfig.mutualTls
+        this.serverConfig.authType === "mutual-tls"
       ) {
         let agentOptions: https.AgentOptions = {
           rejectUnauthorized: !this.serverConfig.disableCertValidation,
         };
 
-        if (this.serverConfig.mutualTls) {
+        if (this.serverConfig.authType === "mutual-tls") {
           const cert = getOrCreateMtlsCert();
           const key = getOrCreateMtlsKey();
           agentOptions.cert = cert;

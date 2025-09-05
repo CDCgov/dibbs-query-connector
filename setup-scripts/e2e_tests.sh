@@ -27,8 +27,7 @@ while kill -0 $command_pid 2>/dev/null; do
 done
 
 echo -e "\nAidbox seeder finished!"
-
-npx dotenv -e ./.env.e2e -- npx playwright test --reporter=list
+dotenv -e ./.env.e2e -- npx playwright test --reporter=list
 E2E_EXIT_CODE=$?
 
 # uncomment these and the corresponding block in the ci.yaml to get the CI logs

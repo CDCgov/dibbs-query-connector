@@ -49,7 +49,7 @@ describe("FHIRClient with Mutual TLS", () => {
         id: "test",
         name: "Test Server",
         hostname: "https://mtls.example.com/fhir",
-        mutualTls: true,
+        authType: "mutual-tls",
         disableCertValidation: false,
         defaultServer: false,
       };
@@ -74,7 +74,7 @@ describe("FHIRClient with Mutual TLS", () => {
         id: "test",
         name: "Test Server",
         hostname: "https://mtls.example.com/fhir",
-        mutualTls: true,
+        authType: "mutual-tls",
         disableCertValidation: false,
         defaultServer: false,
       };
@@ -91,7 +91,7 @@ describe("FHIRClient with Mutual TLS", () => {
         id: "test",
         name: "Test Server",
         hostname: "https://example.com/fhir",
-        mutualTls: false,
+        authType: "none",
         disableCertValidation: false,
         defaultServer: false,
       };
@@ -117,7 +117,7 @@ describe("FHIRClient with Mutual TLS", () => {
         id: "test",
         name: "Test Server",
         hostname: "https://mtls.example.com/fhir",
-        mutualTls: true,
+        authType: "mutual-tls",
         disableCertValidation: false,
         defaultServer: false,
       };
@@ -163,7 +163,7 @@ describe("FHIRClient with Mutual TLS", () => {
         id: "test",
         name: "Test Server",
         hostname: "https://mtls.example.com/fhir",
-        mutualTls: true,
+        authType: "mutual-tls",
         disableCertValidation: false,
         defaultServer: false,
       };
@@ -204,7 +204,7 @@ describe("FHIRClient with Mutual TLS", () => {
         id: "test",
         name: "Test Server",
         hostname: "https://mtls.example.com/fhir",
-        mutualTls: true,
+        authType: "mutual-tls",
         disableCertValidation: true,
         defaultServer: false,
       };
@@ -243,8 +243,7 @@ describe("FHIRClient with Mutual TLS", () => {
       const result = await testFhirServerConnection(
         "https://mtls.example.com/fhir",
         false,
-        true, // mutualTls enabled
-        { authType: "none" },
+        { authType: "mutual-tls" },
       );
 
       expect(result.success).toBe(true);
@@ -263,7 +262,6 @@ describe("FHIRClient with Mutual TLS", () => {
       const result = await testFhirServerConnection(
         "https://example.com/fhir",
         false,
-        false, // mutualTls disabled
         { authType: "none" },
       );
 
@@ -286,7 +284,6 @@ describe("FHIRClient with Mutual TLS", () => {
 
       const result = await testFhirServerConnection(
         "https://mtls.example.com/fhir",
-        false,
         true,
         { authType: "none" },
       );
@@ -338,7 +335,6 @@ describe("FHIRClient with Mutual TLS", () => {
         id: "test",
         name: "Test Server",
         hostname: "https://mtls.example.com/fhir",
-        mutualTls: true,
         disableCertValidation: false,
         defaultServer: false,
         authType: "SMART",

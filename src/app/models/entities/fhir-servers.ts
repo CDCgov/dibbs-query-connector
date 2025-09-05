@@ -7,7 +7,6 @@ export interface FhirServerConfig {
   name: string;
   hostname: string;
   disableCertValidation: boolean;
-  mutualTls?: boolean; // Add this property
   defaultServer: boolean;
   lastConnectionSuccessful?: boolean;
   lastConnectionAttempt?: string;

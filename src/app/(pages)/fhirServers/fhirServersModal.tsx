@@ -112,6 +112,9 @@ function formUpdateReducer(server: FhirServerConfig, action: UpdateFormAction) {
     case "none": {
       return server;
     }
+    case "mutual-tls": {
+      return { ...server };
+    }
     case "basic": {
       return {
         ...server,
@@ -148,7 +151,7 @@ function formUpdateReducer(server: FhirServerConfig, action: UpdateFormAction) {
       };
     }
     case "reset": {
-      return EMPTY_FHIR_SERVER;
+      return structuredClone(EMPTY_FHIR_SERVER);
     }
 
     case "load": {
@@ -310,7 +313,6 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
       const response = await testFhirServerConnection(
         url,
         server.disableCertValidation,
-        server.mutualTls,
         authData,
       );
       return response;
@@ -411,11 +413,11 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
       console.error("Form missing required information");
       return;
     }
+
     // 1. Run connection test
     const result = await testFhirServerConnection(
       server?.hostname,
       server?.disableCertValidation,
-      server?.mutualTls,
       authData,
     );
 
@@ -472,7 +474,6 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
         server?.name,
         server?.hostname,
         server?.disableCertValidation ?? false,
-        server?.mutualTls ?? false,
         server?.defaultServer ?? false,
         connectionResult.success,
         authData,
@@ -482,7 +483,6 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
       result = await updateFhirServer({
         ...server,
         authData: authData,
-        mutualTls: server.authType === "mutual-tls",
       });
 
       if (server?.defaultServer) {
@@ -495,7 +495,6 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
                 name: srv.name,
                 hostname: srv.hostname,
                 disableCertValidation: srv.disableCertValidation,
-                mutualTls: srv.mutualTls ?? false,
                 defaultServer: srv.defaultServer,
                 lastConnectionSuccessful: srv.lastConnectionSuccessful ?? false,
                 authData: {
@@ -1177,7 +1176,7 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
                 className="usa-button usa-modal__close margin-top-2"
                 onClick={() =>
                   headersDispatch({
-                    type: "update",
+                    type: "delete",
                     id: header.id,
                   })
                 }

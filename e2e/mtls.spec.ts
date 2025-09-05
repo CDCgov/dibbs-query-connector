@@ -1,7 +1,17 @@
 import { TEST_URL } from "../playwright-setup";
 import { expect } from "@playwright/test";
 import { PAGE_TITLES } from "../src/app/(pages)/query/components/stepIndicator/StepIndicator";
-import { testWithMock } from "./utils";
+import { MockClient } from "request-mocking-protocol";
+import { test } from "@playwright/test";
+
+const testWithMock = test.extend<{ mockServerRequest: MockClient }>({
+  mockServerRequest: async ({ context }, use) => {
+    const mockClient = new MockClient();
+    mockClient.onChange = async (headers) =>
+      context.setExtraHTTPHeaders(headers);
+    await use(mockClient);
+  },
+});
 
 testWithMock.describe("Mutual TLS", () => {
   testWithMock(
@@ -32,13 +42,18 @@ testWithMock.describe("Mutual TLS", () => {
         ),
       ).toBeVisible();
 
+      await mockServerRequest.GET(new RegExp(".*/Task/foo"), {
+        status: 404,
+        headers: { "content-type": "application/json" },
+      });
+
       // Save the server
       await page.getByRole("button", { name: "Add server" }).click();
 
       // Verify server appears in the list with mTLS tag
       const serverRow = page.getByRole("row").filter({ hasText: serverName });
       await expect(serverRow).toBeVisible({ timeout: 10000 });
-      await expect(serverRow).toHaveText(/mTLS/);
+      await expect(serverRow).toHaveText(/Connected/);
 
       // Step 2: Set up mock responses for FHIR Task endpoints
       const parentTaskId = "parent-task-123";

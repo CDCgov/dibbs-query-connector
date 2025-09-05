@@ -3,6 +3,7 @@ import { patientDiscoveryQuery } from "@/app/backend/query-execution/service";
 import { prepareFhirClient } from "@/app/backend/fhir-servers/service";
 import FHIRClient from "@/app/backend/fhir-servers/fhir-client";
 import { suppressConsoleLogs } from "./fixtures";
+import { FhirServerConfig } from "@/app/models/entities/fhir-servers";
 
 jest.mock("@/app/utils/auth", () => ({
   superAdminAccessCheck: jest.fn().mockReturnValue(true),
@@ -45,7 +46,7 @@ describe("Query Execution with Mutual TLS", () => {
     // Mock setTimeout for Jest worker environment
     global.setTimeout = jest.fn((callback: () => void) => {
       callback();
-      return 0 as NodeJS.Timeout;
+      return 0 as unknown as NodeJS.Timeout;
     });
 
     mockFhirClient = {
@@ -53,7 +54,7 @@ describe("Query Execution with Mutual TLS", () => {
       post: jest.fn(),
       postJson: jest.fn(),
       getBatch: jest.fn(),
-    } as jest.Mocked<FHIRClient>;
+    } as unknown as jest.Mocked<FHIRClient>;
 
     (prepareFhirClient as jest.Mock).mockResolvedValue(mockFhirClient);
   });
@@ -67,10 +68,10 @@ describe("Query Execution with Mutual TLS", () => {
       id: "test-mtls",
       name: "Test mTLS Server",
       hostname: "https://mtls.example.com/fhir",
-      mutualTls: true,
+      authType: "mutual-tls",
       disableCertValidation: false,
       defaultServer: false,
-    };
+    } as FhirServerConfig;
 
     const mockParentTask: Task = {
       resourceType: "Task",
@@ -380,7 +381,7 @@ describe("Query Execution with Mutual TLS", () => {
       // Mock a non-mTLS server config
       const nonMtlsServerConfig = {
         ...mockServerConfig,
-        mutualTls: false,
+        authType: "none",
       };
 
       const {

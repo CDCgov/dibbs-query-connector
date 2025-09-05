@@ -15,16 +15,10 @@ import { isIP } from "net";
 export async function testFhirServerConnection(
   url: string,
   disableCertValidation: boolean = false,
-  mutualTls: boolean = false,
   authData?: AuthData,
 ) {
   validateFhirServerUrl(url);
-  return FHIRClient.testConnection(
-    url,
-    disableCertValidation,
-    mutualTls,
-    authData,
-  );
+  return FHIRClient.testConnection(url, disableCertValidation, authData);
 }
 
 /**
