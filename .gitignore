@@ -82,6 +82,7 @@ build/
 .env
 .local.env 
 .env.e2e
+.env.integration
 
 tmp_remote_image_*
 
