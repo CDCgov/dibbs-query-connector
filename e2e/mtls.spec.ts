@@ -1,7 +1,17 @@
 import { TEST_URL } from "../playwright-setup";
 import { expect } from "@playwright/test";
 import { PAGE_TITLES } from "../src/app/(pages)/query/components/stepIndicator/StepIndicator";
-import { testWithMock } from "./utils";
+import { MockClient } from "request-mocking-protocol";
+import { test } from "@playwright/test";
+
+const testWithMock = test.extend<{ mockServerRequest: MockClient }>({
+  mockServerRequest: async ({ context }, use) => {
+    const mockClient = new MockClient();
+    mockClient.onChange = async (headers) =>
+      context.setExtraHTTPHeaders(headers);
+    await use(mockClient);
+  },
+});
 
 testWithMock.describe("Mutual TLS", () => {
   testWithMock(
@@ -24,17 +34,7 @@ testWithMock.describe("Mutual TLS", () => {
         .getByTestId("server-url")
         .fill(`${process.env.AIDBOX_BASE_URL}/fhir`);
 
-      // Leave auth method as default "none" as requested
-
-      // Enable mutual TLS - scroll modal and use JavaScript click
-      await page.evaluate(() => {
-        const modal = document.querySelector(".usa-modal__content");
-        if (modal) {
-          modal.scrollTop = modal.scrollHeight;
-        }
-      });
-
-      await page.getByText("Enable Mutual TLS").click();
+      await page.getByLabel("Auth Method").selectOption("Mutual TLS");
       // Verify mutual TLS hint text appears
       await expect(
         page.getByText(
@@ -42,11 +42,10 @@ testWithMock.describe("Mutual TLS", () => {
         ),
       ).toBeVisible();
 
-      // Skip connection test for now - just save the server
-      // await page.getByRole("button", { name: "Test connection" }).click();
-      // await expect(page.getByRole("button", { name: "Success" })).toBeVisible({
-      //   timeout: 15000,
-      // });
+      await mockServerRequest.GET(new RegExp(".*/Task/foo"), {
+        status: 404,
+        headers: { "content-type": "application/json" },
+      });
 
       // Save the server
       await page.getByRole("button", { name: "Add server" }).click();
@@ -54,7 +53,7 @@ testWithMock.describe("Mutual TLS", () => {
       // Verify server appears in the list with mTLS tag
       const serverRow = page.getByRole("row").filter({ hasText: serverName });
       await expect(serverRow).toBeVisible({ timeout: 10000 });
-      await expect(serverRow).toHaveText(/mTLS/);
+      await expect(serverRow).toHaveText(/Connected/);
 
       // Step 2: Set up mock responses for FHIR Task endpoints
       const parentTaskId = "parent-task-123";
@@ -180,11 +179,6 @@ testWithMock.describe("Mutual TLS", () => {
       await expect(
         page.getByLabel("Healthcare Organization (HCO)"),
       ).toBeVisible();
-
-      // Select the mutual TLS enabled server
-      // const serverCheckbox = page.getByLabel(serverName);
-      // await expect(serverCheckbox).toBeVisible();
-      // await serverCheckbox.check();
 
       await page
         .getByLabel("Healthcare Organization (HCO)")

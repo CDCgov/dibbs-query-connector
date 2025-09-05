@@ -16,7 +16,16 @@ test.describe("Custom Headers", () => {
       page.getByRole("heading", { name: "New server" }),
     ).toBeVisible();
 
-    const serverName = `E2E Custom Headers ${Math.floor(Math.random() * 10000)}`;
+    await page.evaluate(() => {
+      const modal = document.querySelector(".usa-modal__content");
+      if (modal) {
+        modal.scrollTop = modal.scrollHeight;
+      }
+    });
+
+    const serverName = `E2E Custom Headers ${Math.floor(
+      Math.random() * 10000,
+    )}`;
     await page.getByTestId("server-name").fill(serverName);
     await page
       .getByTestId("server-url")
@@ -121,7 +130,9 @@ test.describe("Custom Headers", () => {
 
     // Create a server with headers
     await page.getByRole("button", { name: "New server" }).click();
-    const serverName = `E2E Remove Headers ${Math.floor(Math.random() * 10000)}`;
+    const serverName = `E2E Remove Headers ${Math.floor(
+      Math.random() * 10000,
+    )}`;
     await page.getByTestId("server-name").fill(serverName);
     await page
       .getByTestId("server-url")
@@ -191,7 +202,9 @@ test.describe("Custom Headers", () => {
     await page.goto(`${TEST_URL}/fhirServers`);
 
     await page.getByRole("button", { name: "New server" }).click();
-    const serverName = `E2E Headers SMART Auth ${Math.floor(Math.random() * 10000)}`;
+    const serverName = `E2E Headers SMART Auth ${Math.floor(
+      Math.random() * 10000,
+    )}`;
     await page.getByTestId("server-name").fill(serverName);
     await page
       .getByTestId("server-url")
@@ -266,7 +279,9 @@ test.describe("Custom Headers", () => {
 
     // Create server with headers
     await page.getByRole("button", { name: "New server" }).click();
-    const serverName = `E2E Preserve Headers ${Math.floor(Math.random() * 10000)}`;
+    const serverName = `E2E Preserve Headers ${Math.floor(
+      Math.random() * 10000,
+    )}`;
     await page.getByTestId("server-name").fill(serverName);
     await page
       .getByTestId("server-url")

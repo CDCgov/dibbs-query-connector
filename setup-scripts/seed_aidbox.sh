@@ -135,6 +135,7 @@ INSERT INTO fhir_servers (
   disable_cert_validation,
   auth_type,
   client_id,
+  scopes,
   default_server
 ) VALUES (
   'Aidbox',
@@ -144,6 +145,7 @@ INSERT INTO fhir_servers (
   false,  
   'SMART',
   'query-connector',
+  'system/*.read',
   true
 )
 ON CONFLICT(name)

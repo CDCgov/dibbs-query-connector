@@ -75,7 +75,7 @@ export function getOrCreateMtlsKey(): string {
  * Check if mutual TLS credentials are available
  * @returns true if both cert and key are available, false otherwise
  */
-export function isMtlsAvailable(): boolean {
+export function isMtlsAvailable() {
   const keysDir = ensureKeysDirectory();
   const certPath = path.join(keysDir, "mtls-cert.pem");
   const keyPath = path.join(keysDir, "mtls-key.pem");

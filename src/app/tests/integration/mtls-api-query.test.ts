@@ -262,6 +262,7 @@ jest.mock("node-hl7-client", () => ({
 }));
 
 import { validateServiceToken } from "@/app/api/api-auth";
+import { FhirServerConfig } from "@/app/models/entities/fhir-servers";
 
 describe("API Query with Mutual TLS", () => {
   let mockFhirClient: jest.Mocked<FHIRClient>;
@@ -346,7 +347,7 @@ describe("API Query with Mutual TLS", () => {
       } else if (typeof callback === "function") {
         callback();
       }
-      return 0 as NodeJS.Timeout;
+      return 0 as unknown as NodeJS.Timeout;
     });
 
     mockFhirClient = {
@@ -354,7 +355,7 @@ describe("API Query with Mutual TLS", () => {
       post: jest.fn(),
       postJson: jest.fn(),
       getBatch: jest.fn(),
-    } as jest.Mocked<FHIRClient>;
+    } as unknown as jest.Mocked<FHIRClient>;
 
     (prepareFhirClient as jest.Mock).mockResolvedValue(mockFhirClient);
   });
@@ -369,10 +370,10 @@ describe("API Query with Mutual TLS", () => {
         id: "test-mtls",
         name: "mTLS QHIN Server",
         hostname: "https://mtls.example.com/fhir",
-        mutualTls: true, // Enable mTLS for proper testing
         disableCertValidation: false,
         defaultServer: false,
-      };
+        authType: "mutual-tls",
+      } as FhirServerConfig;
 
       const {
         getFhirServerConfigs,
@@ -607,10 +608,10 @@ PV1|1|I|ROOM-123^BED-A^HOSP||||ATTENDING^DOCTOR^A|||||||||||ADM001||||||||||||||
         id: "test-regular",
         name: "Regular FHIR Server",
         hostname: "https://regular.example.com/fhir",
-        mutualTls: false,
+        authType: "none",
         disableCertValidation: false,
         defaultServer: false,
-      };
+      } as FhirServerConfig;
 
       const {
         getFhirServerConfigs,

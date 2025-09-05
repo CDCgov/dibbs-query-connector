@@ -13,6 +13,7 @@ import {
   updateFhirServer,
   deleteFhirServer,
 } from "@/app/backend/fhir-servers/service";
+import { FhirServerConfig } from "@/app/models/entities/fhir-servers";
 
 jest.mock("@/app/backend/audit-logs/lib", () => {
   return {
@@ -32,14 +33,16 @@ describe("fhir server", () => {
   });
   it("fhir server addition / deletion / update", async () => {
     const TEST_FHIR_SERVER = {
+      id: "jolly-roger-bay",
       name: "Jolly Roger Bay",
       hostname: "http://sunken-ship.boats/fhir",
-      headers: null,
+      headers: undefined,
       lastConnectionSuccessful: true,
       disableCertValidation: false,
-      mutualTls: false,
       defaultServer: false,
-    };
+      authType: "none",
+    } as FhirServerConfig;
+
     const oldAuditIds = (await dbService.query(GET_ALL_AUDIT_ROWS)).rows.map(
       (r) => r.id,
     );
@@ -49,7 +52,6 @@ describe("fhir server", () => {
       TEST_FHIR_SERVER.name,
       TEST_FHIR_SERVER.hostname,
       TEST_FHIR_SERVER.disableCertValidation,
-      TEST_FHIR_SERVER.mutualTls,
       TEST_FHIR_SERVER.defaultServer,
       TEST_FHIR_SERVER.lastConnectionSuccessful,
     );
@@ -72,7 +74,6 @@ describe("fhir server", () => {
       hostname: TEST_FHIR_SERVER.hostname,
       defaultServer: false,
       disableCertValidation: TEST_FHIR_SERVER.disableCertValidation,
-      mutualTls: TEST_FHIR_SERVER.mutualTls,
       lastConnectionSuccessful: false,
       authData: {
         authType: "none",
