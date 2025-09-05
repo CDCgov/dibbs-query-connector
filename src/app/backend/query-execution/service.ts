@@ -249,7 +249,6 @@ class QueryService {
     task: Task,
   ): Promise<Patient | null> {
     console.log(`Processing Task ${task.id} for patient discovery`);
-    console.log(`Task: ${JSON.stringify(task, null, 2)}`);
     if (task.status !== "completed" || !task.output) {
       if (task.status === "failed") {
         console.warn(`Task ${task.id} failed`);
@@ -486,7 +485,7 @@ class QueryService {
     const patientQuery = await this.buildPatientSearchQuery(request);
     // Handle discovery based on server configuration
     let response: Response;
-    if (serverConfig?.mutualTls) {
+    if (serverConfig?.authType === "mutual-tls") {
       const tlsDiscoveryResult = await this.handleMutualTlsDiscovery(
         fhirClient,
         patientQuery,
