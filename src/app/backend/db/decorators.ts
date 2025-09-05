@@ -2,6 +2,7 @@ import { adminAccessCheck, superAdminAccessCheck } from "@/app/utils/auth";
 import { internal_getDbClient } from "./config";
 import { QueryResult } from "pg";
 import { translateNestedObjectKeysIntoCamelCase } from "./util";
+import { UNAUTHORIZED_LITERAL } from "@/app/constants";
 
 /**
  * Annotation to make a db query into a transaction. Requires all return branches
@@ -100,7 +101,9 @@ export function adminRequired(
   descriptor.value = async function (...args: any[]) {
     const methodAllowed = await adminAccessCheck();
     if (!methodAllowed) {
-      throw Error(`Admin permission check for ${key} failed`);
+      throw Error(`Admin permission check for ${key} failed`, {
+        cause: UNAUTHORIZED_LITERAL,
+      });
     }
 
     const result = method && (await method.apply(this, args));

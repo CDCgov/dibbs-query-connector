@@ -7,10 +7,14 @@ import { internal_getDbClient } from "@/app/backend/db/config";
 import { DibbsValueSet } from "@/app/models/entities/valuesets";
 import { randomUUID } from "crypto";
 import { CUSTOM_CONDITION_ID, CUSTOM_VALUESET_ARRAY_ID } from "@/app/constants";
+import { suppressConsoleLogs } from "./fixtures";
 
 const dbClient = internal_getDbClient();
 
 describe("UserCreatedValuesetService Integration", () => {
+  beforeAll(() => {
+    suppressConsoleLogs();
+  });
   const testUUID = "mock-vsid-0001";
   const vsVersion = "1.0.0";
   const vsName = "Cooties test";
