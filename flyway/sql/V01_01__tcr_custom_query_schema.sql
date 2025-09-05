@@ -84,9 +84,8 @@ CREATE TABLE IF NOT EXISTS fhir_servers (
     access_token TEXT,
     token_expiry TIMESTAMP WITH TIME ZONE,
     default_server BOOLEAN NOT NULL DEFAULT FALSE,
-    patient_match_configuration JSON DEFAULT NULL,
-    mutual_tls BOOLEAN DEFAULT FALSE
-);
+    patient_match_configuration JSON DEFAULT NULL
+    );
 
 -- Add comments for documentation
 COMMENT ON COLUMN fhir_servers.auth_type IS 'Authentication method: none, basic, client_credentials, or SMART';
