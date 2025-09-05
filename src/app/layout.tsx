@@ -14,12 +14,7 @@ import { returnPredefinedSessionObject } from "./utils/auth";
 import { headers } from "next/headers";
 
 // Intercept mocked requests in e2e tests
-if (
-  process.env.RUN_FETCH_INTERCEPTOR === "true"
-  // ||
-  // (process.env.NEXT_RUNTIME === "nodejs" &&
-  //   process.env.NODE_ENV !== "production")
-) {
+if (process.env.RUN_FETCH_INTERCEPTOR === "true") {
   const { setupFetchInterceptor } = await import(
     "request-mocking-protocol/fetch"
   );
