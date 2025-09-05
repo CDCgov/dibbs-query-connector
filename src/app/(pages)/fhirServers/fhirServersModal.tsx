@@ -15,6 +15,7 @@ import {
   SetStateAction,
   useCallback,
   useEffect,
+  useReducer,
   useState,
 } from "react";
 import { AuthMethodType, FormError, ModalMode } from "./page";
@@ -51,6 +52,23 @@ const INITIAL_FORM_ERRORS = {
   scopes: false,
 };
 
+const DEFAULT_PATIENT_MATCH_DATA = {
+  enabled: false,
+  onlySingleMatch: false,
+  onlyCertainMatches: false,
+  // If 0, the server decides how many matches to return.
+  matchCount: 0,
+  supportsMatch: false,
+} as PatientMatchData;
+
+const EMPTY_FHIR_SERVER = {
+  name: "",
+  id: "",
+  hostname: "",
+  disableCertValidation: false,
+  defaultServer: false,
+} as FhirServerConfig;
+
 type FhirServersModal = {
   fhirServers: FhirServerConfig[];
   setFhirServers: Dispatch<SetStateAction<FhirServerConfig[]>>;
@@ -72,22 +90,102 @@ interface HeaderPair {
   id: string; // For React key prop
 }
 
-const DEFAULT_PATIENT_MATCH_DATA = {
-  enabled: false,
-  onlySingleMatch: false,
-  onlyCertainMatches: false,
-  // If 0, the server decides how many matches to return.
-  matchCount: 0,
-  supportsMatch: false,
-} as PatientMatchData;
+interface UpdateFormAction {
+  type: AuthMethodType | "common" | "reset" | "load";
+  id?: string;
+  authType?: AuthMethodType;
+  name?: string;
+  disableCertValidation?: boolean;
+  defaultServer?: boolean;
+  hostname?: string;
+  headers?: Record<string, string>;
+  clientId?: string;
+  clientSecret?: string;
+  tokenEndpoint?: string;
+  scopes?: string;
+  accessToken?: string;
+}
 
-const EMPTY_FHIR_SERVER = {
-  name: "",
-  id: "",
-  hostname: "",
-  disableCertValidation: false,
-  defaultServer: false,
-} as FhirServerConfig;
+function formUpdateReducer(server: FhirServerConfig, action: UpdateFormAction) {
+  switch (action.type) {
+    case "none": {
+      return server;
+    }
+    case "basic": {
+      return {
+        ...server,
+        accessToken: action.accessToken ?? server.accessToken,
+      };
+    }
+    case "client_credentials": {
+      return {
+        ...server,
+        clientId: action.clientId ?? server.clientId,
+        clientSecret: action.clientSecret ?? server.clientSecret,
+        accessToken: action.accessToken ?? server.accessToken,
+        scopes: action.scopes ?? server.scopes,
+        tokenEndpoint: action.tokenEndpoint ?? server.tokenEndpoint,
+      };
+    }
+    case "SMART": {
+      return {
+        ...server,
+        clientId: action.clientId ?? server.clientId,
+        scopes: action.scopes ?? server.scopes,
+        tokenEndpoint: action.tokenEndpoint ?? server.tokenEndpoint,
+      };
+    }
+    case "common": {
+      return {
+        ...server,
+        name: action.name ?? server.name,
+        hostname: action.hostname ?? server.hostname,
+        disableCertValidation:
+          action.disableCertValidation ?? server.disableCertValidation,
+        authType: action.authType ?? server.authType,
+        defaultServer: action.defaultServer ?? server.defaultServer,
+      };
+    }
+    case "reset": {
+      return EMPTY_FHIR_SERVER;
+    }
+
+    case "load": {
+      return {
+        authType: action.authType,
+        id: action.id as string,
+        name: action.name as string,
+        hostname: action.hostname as string,
+        disableCertValidation: action.disableCertValidation as boolean,
+        defaultServer: action.defaultServer as boolean,
+        headers: action.headers,
+        clientId: action.clientId,
+        clientSecret: action.clientSecret,
+        tokenEndpoint: action.tokenEndpoint,
+        scopes: action.scopes,
+        accessToken: action.accessToken,
+      };
+    }
+
+    default:
+      return server;
+  }
+}
+
+interface HeaderReducerAction {
+  type: "update" | "delete" | "add";
+}
+
+function headerReducer(headers: [], action: HeaderReducerAction) {
+  switch (action.type) {
+    case "update":
+      return headers;
+    case "delete":
+      return headers;
+    case "add":
+      return headers;
+  }
+}
 
 export const FhirServersModal: React.FC<FhirServersModal> = ({
   setFhirServers,
@@ -98,32 +196,33 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
   setPatientMatchData,
   modalRef,
 }) => {
-  const [authMethod, setAuthMethod] = useState<AuthMethodType>(
-    serverToEdit?.authType ?? "none",
-  );
-  const [bearerToken, setBearerToken] = useState("");
+  const [server, dispatch] = useReducer(formUpdateReducer, EMPTY_FHIR_SERVER);
+
   const [connectionStatus, setConnectionStatus] = useState<
     "idle" | "success" | "error"
   >("idle");
-  const [selectedServer, setSelectedServer] = useState<FhirServerConfig>(
-    structuredClone(EMPTY_FHIR_SERVER),
-  );
+
   const [errorMessage, setErrorMessage] = useState<string>();
   const [fhirVersion, setFhirVersion] = useState<string | null>(null);
   const [headers, setHeaders] = useState<HeaderPair[]>([]);
+
   const [formError, setFormError] = useState<FormError>(
     structuredClone(INITIAL_FORM_ERRORS),
   );
 
   useEffect(() => {
     if (modalMode === "edit" && serverToEdit) {
-      setSelectedServer(serverToEdit);
       setConnectionStatus("idle");
       handlePatientMatchChange(
         serverToEdit.hostname,
         serverToEdit.disableCertValidation,
         getAuthData(),
       );
+
+      dispatch({
+        type: "load",
+        ...serverToEdit,
+      });
 
       // Set headers
       if (serverToEdit.headers) {
@@ -144,45 +243,8 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
       } else {
         setPatientMatchData(DEFAULT_PATIENT_MATCH_DATA);
       }
-
-      // Set auth method and corresponding fields based on server data
-      if (serverToEdit.authType) {
-        setAuthMethod(serverToEdit.authType as AuthMethodType);
-
-        // For backward compatibility with basic auth
-        if (
-          serverToEdit.authType === "basic" &&
-          serverToEdit.headers?.Authorization
-        ) {
-          setBearerToken(
-            serverToEdit.headers.Authorization.replace("Bearer ", ""),
-          );
-        }
-      } else if (serverToEdit.headers?.Authorization?.startsWith("Bearer ")) {
-        // Legacy support for servers without auth_type but with bearer token
-        setAuthMethod("basic");
-        setBearerToken(
-          serverToEdit.headers.Authorization.replace("Bearer ", ""),
-        );
-      } else {
-        setAuthMethod("none");
-      }
-    } else {
-      resetModalState();
     }
   }, [serverToEdit]);
-
-  function updateServerAttribute<T extends keyof FhirServerConfig>(
-    key: T,
-    value: FhirServerConfig[T],
-  ) {
-    setSelectedServer((prev) => {
-      return {
-        ...prev,
-        [key]: value,
-      };
-    });
-  }
 
   const handlePatientMatchChange = async (
     hostname: string,
@@ -208,7 +270,7 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
   const testFhirConnection = async (
     url: string,
   ): Promise<ConnectionTestResult> => {
-    if (!selectedServer) {
+    if (!server) {
       showToastConfirmation({
         heading: "Something went wrong",
         body: "Couldn't set selected server. Try again, or contact us if the error persists",
@@ -221,23 +283,23 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
       const authData = getAuthData();
 
       // Add auth-method specific properties
-      if (authMethod === "basic") {
-        authData.bearerToken = bearerToken;
-      } else if (authMethod === "client_credentials") {
-        authData.clientId = selectedServer.clientId;
-        authData.clientSecret = selectedServer.clientSecret;
-        authData.tokenEndpoint = selectedServer.tokenEndpoint;
-        authData.scopes = selectedServer.scopes;
-      } else if (authMethod === "SMART") {
-        authData.clientId = selectedServer.clientId;
-        authData.tokenEndpoint = selectedServer.tokenEndpoint;
-        authData.scopes = selectedServer.scopes;
+      if (server.authType === "basic") {
+        authData.bearerToken = server.accessToken;
+      } else if (server.authType === "client_credentials") {
+        authData.clientId = server.clientId;
+        authData.clientSecret = server.clientSecret;
+        authData.tokenEndpoint = server.tokenEndpoint;
+        authData.scopes = server.scopes;
+      } else if (server.authType === "SMART") {
+        authData.clientId = server.clientId;
+        authData.tokenEndpoint = server.tokenEndpoint;
+        authData.scopes = server.scopes;
       }
 
       const response = await testFhirServerConnection(
         url,
-        selectedServer.disableCertValidation,
-        selectedServer.mutualTls,
+        server.disableCertValidation,
+        server.mutualTls,
         authData,
       );
       return response;
@@ -251,13 +313,11 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
   };
 
   const checkFormHasErrors = async () => {
-    if (!selectedServer) return true;
-
     // shared fields
-    const serverNameInvalid = selectedServer.name === "";
+    const serverNameInvalid = server.name === "";
     let urlNameInvalid = false;
     try {
-      await validateFhirServerUrl(selectedServer.hostname);
+      await validateFhirServerUrl(server.hostname);
     } catch (e) {
       if (e instanceof Error) {
         setErrorMessage(e.message);
@@ -275,9 +335,9 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
 
     if (urlNameInvalid || serverNameInvalid) return true;
 
-    switch (authMethod) {
+    switch (server.authType) {
       case "basic":
-        const bearerTokenInvalid = bearerToken === "";
+        const bearerTokenInvalid = server.accessToken === "";
         setFormError((prev) => {
           return {
             ...prev,
@@ -287,9 +347,9 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
         return bearerTokenInvalid;
 
       case "client_credentials":
-        const clientIdInvalid = !Boolean(selectedServer.clientId);
-        const clientSecretInvalid = !Boolean(selectedServer.clientSecret);
-        const scopesInvalid = !Boolean(selectedServer.scopes);
+        const clientIdInvalid = !Boolean(server.clientId);
+        const clientSecretInvalid = !Boolean(server.clientSecret);
+        const scopesInvalid = !Boolean(server.scopes);
 
         setFormError((prev) => {
           return {
@@ -302,8 +362,8 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
         return clientIdInvalid || clientSecretInvalid || scopesInvalid;
 
       case "SMART":
-        const smartClientIdInvalid = !Boolean(selectedServer.clientId);
-        const smartScopesInvalid = !Boolean(selectedServer.scopes);
+        const smartClientIdInvalid = !Boolean(server.clientId);
+        const smartScopesInvalid = !Boolean(server.scopes);
 
         setFormError((prev) => {
           return {
@@ -334,10 +394,7 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
 
   const handleTestConnection = async (authData: AuthData) => {
     setConnectionStatus("idle");
-    const formHasErrors =
-      (await checkFormHasErrors()) ||
-      selectedServer?.hostname === undefined ||
-      selectedServer?.name === undefined;
+    const formHasErrors = await checkFormHasErrors();
 
     if (formHasErrors) {
       console.error("Form missing required information");
@@ -345,22 +402,22 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
     }
     // 1. Run connection test
     const result = await testFhirServerConnection(
-      selectedServer?.hostname,
-      selectedServer?.disableCertValidation,
-      selectedServer?.mutualTls,
+      server?.hostname,
+      server?.disableCertValidation,
+      server?.mutualTls,
       authData,
     );
 
     // 2. Independently check $match support
     const supportsMatch = await checkFhirServerSupportsMatch(
-      selectedServer?.hostname,
-      selectedServer?.disableCertValidation,
+      server?.hostname,
+      server?.disableCertValidation,
       authData,
     );
 
     // 3. Update connection status in DB
     const updateResult = await updateFhirServerConnectionStatus(
-      selectedServer?.name,
+      server?.name,
       result.success,
     );
 
@@ -385,8 +442,8 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
   };
 
   const handleSave = async (authData: AuthData) => {
-    const serverNameInvalid = selectedServer?.name === undefined;
-    const serverHostnameInvalid = selectedServer?.hostname === undefined;
+    const serverNameInvalid = server?.name === undefined;
+    const serverHostnameInvalid = server?.hostname === undefined;
     if (serverNameInvalid || serverHostnameInvalid) {
       setFormError((prev) => {
         return {
@@ -397,32 +454,30 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
       });
       return;
     }
-    const connectionResult = await testFhirConnection(selectedServer?.hostname);
+    const connectionResult = await testFhirConnection(server?.hostname);
     let result;
     if (modalMode === "create") {
       result = await insertFhirServer(
-        selectedServer?.name,
-        selectedServer?.hostname,
-        selectedServer?.disableCertValidation ?? false,
-        selectedServer?.mutualTls ?? false,
-        selectedServer?.defaultServer ?? false,
+        server?.name,
+        server?.hostname,
+        server?.disableCertValidation ?? false,
+        server?.mutualTls ?? false,
+        server?.defaultServer ?? false,
         connectionResult.success,
         authData,
         patientMatchData || DEFAULT_PATIENT_MATCH_DATA,
       );
     } else {
       result = await updateFhirServer({
-        ...selectedServer,
+        ...server,
         authData: authData,
-        mutualTls: selectedServer?.mutualTls ?? false,
+        mutualTls: server.authType === "mutual-tls",
       });
 
-      if (selectedServer?.defaultServer) {
+      if (server?.defaultServer) {
         await Promise.all(
           fhirServers
-            .filter(
-              (srv) => srv.defaultServer && srv.name !== selectedServer.name,
-            )
+            .filter((srv) => srv.defaultServer && srv.name !== server.name)
             .map((srv) =>
               updateFhirServer({
                 id: srv.id,
@@ -459,11 +514,11 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
   };
 
   const handleDeleteServer = async () => {
-    if (!selectedServer) {
+    if (!server) {
       return;
     }
 
-    const result = await deleteFhirServer(selectedServer.id);
+    const result = await deleteFhirServer(server.id);
 
     if (result.success) {
       getFhirServerConfigs(true).then((servers) => {
@@ -552,7 +607,7 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
 
   // Helper to render auth method specific fields
   const renderAuthMethodFields = () => {
-    switch (authMethod) {
+    switch (server.authType) {
       case "basic":
         return (
           <>
@@ -567,8 +622,13 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
                 "margin-top-05",
                 formError?.bearerToken ? "error-input" : "",
               )}
-              value={bearerToken}
-              onChange={(e) => setBearerToken(e.target.value)}
+              value={server.accessToken ?? ""}
+              onChange={(e) =>
+                dispatch({
+                  type: "basic",
+                  accessToken: e.target.value,
+                })
+              }
               required
             />
 
@@ -607,9 +667,12 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
               )}
               data-testid="client-id"
               type="text"
-              value={selectedServer?.clientId ?? ""}
+              value={server?.clientId ?? ""}
               onChange={(e) =>
-                updateServerAttribute("clientId", e.target.value)
+                dispatch({
+                  type: "client_credentials",
+                  clientId: e.target.value,
+                })
               }
               required
             />
@@ -635,9 +698,12 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
               )}
               data-testid="client-secret"
               type="password"
-              value={selectedServer?.clientSecret ?? ""}
+              value={server?.clientSecret ?? ""}
               onChange={(e) =>
-                updateServerAttribute("clientSecret", e.target.value)
+                dispatch({
+                  type: "client_credentials",
+                  clientSecret: e.target.value,
+                })
               }
               required
             />
@@ -663,8 +729,13 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
               name="scopes"
               data-testid="scopes"
               type="text"
-              value={selectedServer?.scopes ?? ""}
-              onChange={(e) => updateServerAttribute("scopes", e.target.value)}
+              value={server?.scopes ?? ""}
+              onChange={(e) =>
+                dispatch({
+                  type: "client_credentials",
+                  scopes: e.target.value,
+                })
+              }
               required
             />
             {formError?.scopes && (
@@ -684,9 +755,12 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
               name="token-endpoint"
               data-testid="token-endpoint"
               type="url"
-              value={selectedServer?.tokenEndpoint ?? ""}
+              value={server?.tokenEndpoint ?? ""}
               onChange={(e) =>
-                updateServerAttribute("tokenEndpoint", e.target.value)
+                dispatch({
+                  type: "client_credentials",
+                  tokenEndpoint: e.target.value,
+                })
               }
               required
             />
@@ -707,9 +781,12 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
               name="client-id"
               data-testid="client-id"
               type="text"
-              value={selectedServer?.clientId ?? ""}
+              value={server?.clientId ?? ""}
               onChange={(e) =>
-                updateServerAttribute("clientId", e.target.value)
+                dispatch({
+                  type: "SMART",
+                  clientId: e.target.value,
+                })
               }
               required
             />
@@ -739,8 +816,13 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
               )}
               name="scopes"
               type="text"
-              value={selectedServer?.scopes ?? ""}
-              onChange={(e) => updateServerAttribute("scopes", e.target.value)}
+              value={server?.scopes ?? ""}
+              onChange={(e) =>
+                dispatch({
+                  type: "SMART",
+                  scopes: e.target.value,
+                })
+              }
               required
             />
             {formError?.scopes && (
@@ -764,9 +846,12 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
               className="margin-top-05"
               data-testid="token-endpoint"
               type="url"
-              value={selectedServer?.tokenEndpoint ?? ""}
+              value={server?.tokenEndpoint ?? ""}
               onChange={(e) =>
-                updateServerAttribute("tokenEndpoint", e.target.value)
+                dispatch({
+                  type: "SMART",
+                  tokenEndpoint: e.target.value,
+                })
               }
             />
           </>
@@ -888,22 +973,28 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
   };
 
   const getAuthData = (): AuthData => ({
-    authType: authMethod,
+    authType: server.authType ?? "none",
     headers: convertHeadersToObject(),
-    bearerToken: authMethod === "basic" ? bearerToken : undefined,
-    clientId: ["client_credentials", "SMART"].includes(authMethod)
-      ? selectedServer?.clientId
-      : undefined,
-    clientSecret:
-      authMethod === "client_credentials"
-        ? selectedServer?.clientSecret
+    bearerToken: server.authType === "basic" ? server.accessToken : undefined,
+    clientId:
+      server.authType &&
+      ["client_credentials", "SMART"].includes(server.authType)
+        ? server?.clientId
         : undefined,
-    tokenEndpoint: ["client_credentials", "SMART"].includes(authMethod)
-      ? selectedServer?.tokenEndpoint
-      : undefined,
-    scopes: ["client_credentials", "SMART"].includes(authMethod)
-      ? selectedServer?.scopes
-      : undefined,
+    clientSecret:
+      server.authType === "client_credentials"
+        ? server?.clientSecret
+        : undefined,
+    tokenEndpoint:
+      server.authType &&
+      ["client_credentials", "SMART"].includes(server.authType)
+        ? server?.tokenEndpoint
+        : undefined,
+    scopes:
+      server.authType &&
+      ["client_credentials", "SMART"].includes(server.authType)
+        ? server?.scopes
+        : undefined,
   });
 
   const addHeader = () => {
@@ -926,9 +1017,9 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
   };
 
   const resetModalState = () => {
-    setSelectedServer(structuredClone(EMPTY_FHIR_SERVER));
-    setAuthMethod("none");
-    setBearerToken("");
+    dispatch({
+      type: "reset",
+    });
     setConnectionStatus("idle");
     setErrorMessage("");
     setHeaders([]);
@@ -968,8 +1059,13 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
         )}
         name="server-name"
         type="text"
-        value={selectedServer?.name ?? ""}
-        onChange={(e) => updateServerAttribute("name", e.target.value)}
+        value={server.name}
+        onChange={(e) =>
+          dispatch({
+            type: "common",
+            name: e.target.value,
+          })
+        }
         required
       />
       {formError?.serverName && (
@@ -994,8 +1090,13 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
           formError?.url ? "error-input" : "",
         )}
         type="url"
-        value={selectedServer?.hostname ?? ""}
-        onChange={(e) => updateServerAttribute("hostname", e.target.value)}
+        value={server?.hostname ?? ""}
+        onChange={(e) =>
+          dispatch({
+            type: "common",
+            hostname: e.target.value,
+          })
+        }
         required
       />
       {formError?.url && (
@@ -1015,23 +1116,12 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
         id="auth-method"
         data-testid="auth-method"
         name="auth-method"
-        value={authMethod}
+        value={server.authType}
         onChange={(e) => {
-          setAuthMethod(e.target.value as AuthMethodType);
-          // Reset fields when changing auth method
-          if (e.target.value !== "basic") {
-            setBearerToken("");
-          }
-          if (!["client_credentials", "SMART"].includes(e.target.value)) {
-            updateServerAttribute("clientId", "");
-            updateServerAttribute("clientSecret", "");
-            updateServerAttribute("tokenEndpoint", "");
-            updateServerAttribute("scopes", "");
-          }
-
-          if (e.target.value === "mutual-tls" || selectedServer?.mutualTls) {
-            updateServerAttribute("mutualTls", !selectedServer?.mutualTls);
-          }
+          dispatch({
+            type: "common",
+            authType: (e.target.value as AuthMethodType) ?? "none",
+          });
         }}
       >
         <option value="none">None</option>
@@ -1109,18 +1199,24 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
       <Checkbox
         id="disable-cert-validation"
         label="Disable certificate validation"
-        checked={selectedServer?.disableCertValidation ?? false}
+        checked={server?.disableCertValidation ?? false}
         onChange={(e) =>
-          updateServerAttribute("disableCertValidation", e.target.checked)
+          dispatch({
+            type: "common",
+            disableCertValidation: e.target.checked,
+          })
         }
       />
 
       <Checkbox
         id="default-server"
         label="Default server?"
-        checked={selectedServer?.defaultServer ?? false}
+        checked={server?.defaultServer ?? false}
         onChange={(e) =>
-          updateServerAttribute("defaultServer", e.target.checked)
+          dispatch({
+            type: "common",
+            defaultServer: e.target.checked,
+          })
         }
       />
     </Modal>
