@@ -2,6 +2,7 @@ import { Task, Bundle, Patient } from "fhir/r4";
 import { patientDiscoveryQuery } from "@/app/backend/query-execution/service";
 import { prepareFhirClient } from "@/app/backend/fhir-servers/service";
 import FHIRClient from "@/app/backend/fhir-servers/fhir-client";
+import { suppressConsoleLogs } from "./fixtures";
 
 jest.mock("@/app/utils/auth", () => ({
   superAdminAccessCheck: jest.fn().mockReturnValue(true),
@@ -38,7 +39,7 @@ describe("Query Execution with Mutual TLS", () => {
   let mockFhirClient: jest.Mocked<FHIRClient>;
 
   beforeEach(() => {
-    // suppressConsoleLogs();
+    suppressConsoleLogs();
     jest.clearAllMocks();
 
     // Mock setTimeout for Jest worker environment

@@ -3,6 +3,7 @@
 import type {
   MedicalRecordSections,
   NestedQuery,
+  QueryTableResult,
 } from "@/app/(pages)/queryBuilding/utils";
 import { adminRequired, transaction } from "../db/decorators";
 import {
@@ -16,6 +17,7 @@ import { User } from "@/app/models/entities/users";
 import { CustomUserQuery } from "@/app/models/entities/query";
 import { DibbsValueSet } from "@/app/models/entities/valuesets";
 import { auditable } from "../audit-logs/decorator";
+import { linkTimeboxRangesToQuery } from "../query-timefiltering";
 
 class QueryBuildingService {
   /**
@@ -53,6 +55,42 @@ class QueryBuildingService {
    */
   static async getSavedQueryById(queryId: string) {
     return getSavedQueryByIdHelp(queryId, dbService);
+  }
+
+  /**
+   * Executes a search for a CustomQuery against the query-loaded Postgres
+   * Database, using the saved name associated with the query as the unique
+   * identifier by which to load the result.
+   * @param name The name given to a stored query in the DB.
+   * @returns One or more rows from the DB matching the requested saved query,
+   * or an error if no results can be found.
+   */
+  static async getSavedQueryByName(name: string) {
+    const values = [name];
+
+    const getQuerybyNameSQL = `
+    select q.query_name, q.id, q.query_data, q.conditions_list, q.medical_record_sections
+    from query q 
+    where q.query_name = $1;
+  `;
+
+    try {
+      const result = await dbService.query(getQuerybyNameSQL, values);
+      if (result.rows.length === 0) {
+        console.error("No results found for query named:", name);
+        return undefined;
+      }
+
+      const foundQuery = result.rows[0];
+      const timeboxInfo = await linkTimeboxRangesToQuery(foundQuery.id);
+      // followup to get timeboxing information
+
+      foundQuery.timeboxWindows = timeboxInfo;
+      return foundQuery as unknown as QueryTableResult;
+    } catch (error) {
+      console.error("Error retrieving query:", error);
+      throw error;
+    }
   }
 
   /**
@@ -196,6 +234,7 @@ class QueryBuildingService {
   }
 }
 
+export const getSavedQueryByName = QueryBuildingService.getSavedQueryByName;
 export const saveCustomQuery = QueryBuildingService.saveCustomQuery;
 export const getSavedQueryById = QueryBuildingService.getSavedQueryById;
 export const deleteQueryById = QueryBuildingService.deleteQueryById;
