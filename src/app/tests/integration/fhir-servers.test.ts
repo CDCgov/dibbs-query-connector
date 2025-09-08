@@ -1,7 +1,5 @@
-import dbService from "@/app/backend/db/service";
 import { suppressConsoleLogs } from "./fixtures";
 
-import { FHIR_SERVER_INSERT_QUERY } from "@/app/backend/db/util";
 import {
   getFhirServerConfigs,
   updateFhirServer,
@@ -43,24 +41,12 @@ describe("FHIR Servers tests", () => {
   });
 
   it("refresh, update, and deletion functions work", async () => {
-    await dbService.query(FHIR_SERVER_INSERT_QUERY, [
+    await insertFhirServer(
       TEST_FHIR_SERVER.name,
       TEST_FHIR_SERVER.hostname,
-      new Date(),
-      TEST_FHIR_SERVER.lastConnectionSuccessful,
-      {},
-      TEST_FHIR_SERVER.disableCertValidation,
-      TEST_FHIR_SERVER.defaultServer,
-      "none",
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      false, // mutual_tls parameter
-    ]);
+      false,
+      false,
+    );
     // Has new
     let newFhirServers = await getFhirServerConfigs(true);
     expect(newFhirServers.length).toBe(DEFAULT_FHIR_SERVER_LENGTH + 1);
@@ -79,7 +65,6 @@ describe("FHIR Servers tests", () => {
       name: NEW_NAME,
       hostname: NEW_HOSTNAME,
       disableCertValidation: false,
-      mutualTls: false,
       defaultServer: false,
       authData: {
         authType: "none",
@@ -108,7 +93,6 @@ describe("FHIR Servers tests", () => {
       const result = await insertFhirServer(
         "Test Server With Headers",
         "http://test-server.com/fhir",
-        false,
         false,
         false,
         true,
@@ -144,7 +128,6 @@ describe("FHIR Servers tests", () => {
       const result = await insertFhirServer(
         "Test Server Basic Auth",
         "http://test-basic-auth.com/fhir",
-        false,
         false,
         false,
         true,
@@ -183,7 +166,6 @@ describe("FHIR Servers tests", () => {
         "http://test-update.com/fhir",
         false,
         false,
-        false,
         true,
         {
           authType: "none",
@@ -207,7 +189,6 @@ describe("FHIR Servers tests", () => {
         name: "Test Server For Update",
         hostname: "http://test-update.com/fhir",
         disableCertValidation: false,
-        mutualTls: false,
         defaultServer: false,
         lastConnectionSuccessful: true,
         authData: {
@@ -232,7 +213,6 @@ describe("FHIR Servers tests", () => {
       const result = await insertFhirServer(
         "Test Server No Headers",
         "http://test-no-headers.com/fhir",
-        false,
         false,
         false,
         true,
@@ -270,7 +250,6 @@ describe("FHIR Servers tests", () => {
         "http://test-preserve.com/fhir",
         false,
         false,
-        false,
         true,
         {
           authType: "none",
@@ -286,7 +265,6 @@ describe("FHIR Servers tests", () => {
         name: "Test Server Preserve Headers",
         hostname: "http://test-preserve-updated.com/fhir",
         disableCertValidation: false,
-        mutualTls: false,
         defaultServer: false,
         lastConnectionSuccessful: true,
         authData: {
@@ -318,7 +296,6 @@ describe("FHIR Servers tests", () => {
       const result = await insertFhirServer(
         "Test Server Client Creds",
         "http://test-client-creds.com/fhir",
-        false,
         false,
         false,
         true,
@@ -363,7 +340,6 @@ describe("FHIR Servers tests", () => {
         "http://test-smart.com/fhir",
         false,
         false,
-        false,
         true,
         {
           authType: "SMART",
@@ -398,7 +374,6 @@ describe("FHIR Servers tests", () => {
     const result = await insertFhirServer(
       matchableServerName,
       "http://test-server-match.com/fhir",
-      false,
       false,
       false,
       false,

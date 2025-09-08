@@ -15,16 +15,10 @@ import { isIP } from "net";
 export async function testFhirServerConnection(
   url: string,
   disableCertValidation: boolean = false,
-  mutualTls: boolean = false,
   authData?: AuthData,
 ) {
   validateFhirServerUrl(url);
-  return FHIRClient.testConnection(
-    url,
-    disableCertValidation,
-    mutualTls,
-    authData,
-  );
+  return FHIRClient.testConnection(url, disableCertValidation, authData);
 }
 
 /**
@@ -44,7 +38,11 @@ export async function checkFhirServerSupportsMatch(
   return FHIRClient.checkSupportsMatch(url, disableCertValidation, authData);
 }
 
-function validateFhirServerUrl(urlString: string): void {
+/**
+ * Validation function for whether a FHIR server value is valid
+ * @param urlString - string to validate
+ */
+export async function validateFhirServerUrl(urlString: string): Promise<void> {
   let url: URL;
   try {
     url = new URL(urlString);
