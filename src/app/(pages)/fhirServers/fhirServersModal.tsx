@@ -669,7 +669,8 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
               the CA certificate of the server here.
             </div>
             <Label htmlFor="ca-cert">
-              CA Certificate <span className="text-secondary">(required)</span>
+              Server CA Certificate{" "}
+              <span className="text-secondary">(required)</span>
             </Label>
             <Textarea
               id="ca-cert"

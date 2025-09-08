@@ -45,11 +45,14 @@ describe("FHIRClient with Mutual TLS", () => {
 
   describe("FHIRClient initialization", () => {
     it("should initialize with mutual TLS when enabled", () => {
+      const testCaCert =
+        "-----BEGIN CERTIFICATE-----\nTEST_CA_CERT\n-----END CERTIFICATE-----";
       const config: FhirServerConfig = {
         id: "test",
         name: "Test Server",
         hostname: "https://mtls.example.com/fhir",
         authType: "mutual-tls",
+        caCert: testCaCert,
         disableCertValidation: false,
         defaultServer: false,
       };
@@ -145,6 +148,7 @@ describe("FHIRClient with Mutual TLS", () => {
         connect: {
           cert: mockCert,
           key: mockKey,
+          ca: "",
           rejectUnauthorized: true,
         },
       });
@@ -223,7 +227,58 @@ describe("FHIRClient with Mutual TLS", () => {
         connect: {
           cert: mockCert,
           key: mockKey,
+          ca: "",
           rejectUnauthorized: false,
+        },
+      });
+    });
+
+    it("should include CA certificate when provided", async () => {
+      const mockResponse = {
+        status: 200,
+        ok: true,
+        json: async () => ({ resourceType: "Bundle" }),
+      };
+
+      mockFetch.mockResolvedValue(mockResponse as never);
+
+      const testCaCert =
+        "-----BEGIN CERTIFICATE-----\nTEST_CA_CERT\n-----END CERTIFICATE-----";
+      const config: FhirServerConfig = {
+        id: "test",
+        name: "Test Server",
+        hostname: "https://mtls.example.com/fhir",
+        authType: "mutual-tls",
+        caCert: testCaCert,
+        disableCertValidation: false,
+        defaultServer: false,
+      };
+
+      const client = new FHIRClient(config);
+      await client.get("/Patient");
+
+      expect(fetch).toHaveBeenCalledWith(
+        "https://mtls.example.com/fhir/Patient",
+        expect.objectContaining({
+          method: "GET",
+          headers: {},
+          dispatcher: expect.any(Agent),
+        }),
+      );
+
+      // Verify the agent has the CA certificate
+      const dispatcher: Agent = mockFetch.mock.calls[0][1].dispatcher;
+      const constructOptions = Object.getOwnPropertySymbols(dispatcher).find(
+        (s) => s.description === "options",
+      ) as keyof Agent;
+      const dispatcherOptions = dispatcher[constructOptions];
+
+      expect(dispatcherOptions).toStrictEqual({
+        connect: {
+          cert: mockCert,
+          key: mockKey,
+          ca: testCaCert,
+          rejectUnauthorized: true,
         },
       });
     });
