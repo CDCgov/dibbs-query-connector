@@ -161,11 +161,7 @@ test.describe("Custom Headers", () => {
 
     // Verify only one header remains
     const headersSection = page.getByTestId("custom-headers");
-    // Check that X-Header-One inputs are gone
-    const headerInputs = await headersSection
-      .getByPlaceholder("Header name")
-      .all();
-    expect(headerInputs).toHaveLength(1);
+    await expect(headersSection.getByPlaceholder("Header name")).toHaveCount(1);
 
     // Verify the remaining header
     await expect(
@@ -182,10 +178,9 @@ test.describe("Custom Headers", () => {
     await serverRow.getByRole("button", { name: `Edit ${serverName}` }).click();
 
     const headersSection2 = page.getByTestId("custom-headers");
-    const headerInputsAfterSave = await headersSection2
-      .getByPlaceholder("Header name")
-      .all();
-    expect(headerInputsAfterSave).toHaveLength(1);
+    await expect(headersSection2.getByPlaceholder("Header name")).toHaveCount(
+      1,
+    );
     await expect(
       headersSection2.getByPlaceholder("Header name").first(),
     ).toHaveValue("X-Header-Two");
@@ -241,15 +236,24 @@ test.describe("Custom Headers", () => {
     await serverRow.hover();
     await serverRow.getByRole("button", { name: `Edit ${serverName}` }).click();
 
+    await expect(
+      page.getByRole("heading", { name: "Edit server" }),
+    ).toBeVisible();
+
+    await page.evaluate(() => {
+      const modal = document.querySelector(".usa-modal__content");
+      if (modal) {
+        modal.scrollTop = (modal as HTMLElement).scrollHeight;
+      }
+    });
+
     // Custom header should be there
     const headersSection = page.getByTestId("custom-headers");
     await expect(headersSection).toBeVisible();
 
     // Check that only the X-Request-Id header remains (Authorization should be filtered out)
-    const headerNameInputs = await headersSection
-      .getByPlaceholder("Header name")
-      .all();
-    expect(headerNameInputs).toHaveLength(1);
+    const headerNameInputs = headersSection.getByPlaceholder("Header name");
+    await expect(headerNameInputs).toHaveCount(1);
 
     await expect(
       headersSection.getByPlaceholder("Header name").first(),
@@ -259,8 +263,8 @@ test.describe("Custom Headers", () => {
     ).toHaveValue("req-12345");
 
     // Verify Authorization header is not in the custom headers
-    for (const input of headerNameInputs) {
-      const value = await input.inputValue();
+    for (let i = 0; i < (await headerNameInputs.count()); i++) {
+      const value = await headerNameInputs.nth(i).inputValue();
       expect(value).not.toBe("Authorization");
     }
 
