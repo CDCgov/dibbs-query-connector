@@ -184,6 +184,7 @@ const FhirServers: React.FC = () => {
         <FhirServersModal
           modalRef={modalRef}
           setFhirServers={setFhirServers}
+          setSelectedFhirServer={setSelectedFhirServer}
           fhirServers={fhirServers}
           modalMode={modalMode}
           serverToEdit={selectedFhirServer}

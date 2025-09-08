@@ -74,6 +74,7 @@ type FhirServersModal = {
   setFhirServers: Dispatch<SetStateAction<FhirServerConfig[]>>;
   modalMode: ModalMode;
   serverToEdit: FhirServerConfig | undefined;
+  setSelectedFhirServer: Dispatch<SetStateAction<FhirServerConfig | undefined>>;
   patientMatchData?: PatientMatchData;
   setPatientMatchData: Dispatch<SetStateAction<PatientMatchData | undefined>>;
   modalRef: RefObject<ModalRef | null>;
@@ -204,6 +205,7 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
   fhirServers,
   modalMode,
   serverToEdit,
+  setSelectedFhirServer,
   patientMatchData,
   setPatientMatchData,
   modalRef,
@@ -1012,11 +1014,11 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
       type: "reset",
     });
     headersDispatch({ type: "reset" });
-
     setConnectionStatus("idle");
     setErrorMessage("");
     setPatientMatchData(DEFAULT_PATIENT_MATCH_DATA);
     setFormError(structuredClone(INITIAL_FORM_ERRORS));
+    setSelectedFhirServer(undefined);
   };
 
   useEffect(() => {
