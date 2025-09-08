@@ -18,6 +18,7 @@ export interface AuthData {
   accessToken?: string;
   tokenExpiry?: string;
   headers?: Record<string, string>;
+  caCert?: string;
 }
 
 // Define an interface for patient match configuration
@@ -172,7 +173,8 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
       scopes = $12,
       access_token = $13,
       token_expiry = $14,
-      patient_match_configuration = $15
+      ca_cert = $15,
+      patient_match_configuration = $16
     WHERE id = $1
     RETURNING *;
   `;
@@ -229,6 +231,7 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
         authData?.scopes || null,
         authData?.accessToken || null,
         authData?.tokenExpiry || null,
+        authData?.caCert || null,
         patientMatchConfigObject,
       ]);
 
@@ -330,6 +333,7 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
         authData?.scopes || null,
         authData?.accessToken || null,
         authData?.tokenExpiry || null,
+        authData?.caCert || null,
         patientMatchConfigObject,
       ]);
 

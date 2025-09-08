@@ -5,6 +5,7 @@ import {
   Icon,
   Fieldset,
   Radio,
+  Textarea,
 } from "@trussworks/react-uswds";
 import classNames from "classnames";
 import dynamic from "next/dynamic";
@@ -106,6 +107,7 @@ interface UpdateFormAction {
   scopes?: string;
   accessToken?: string;
   initialPayload?: FhirServerConfig;
+  caCert?: string;
 }
 
 function formUpdateReducer(server: FhirServerConfig, action: UpdateFormAction) {
@@ -114,7 +116,10 @@ function formUpdateReducer(server: FhirServerConfig, action: UpdateFormAction) {
       return server;
     }
     case "mutual-tls": {
-      return { ...server };
+      return {
+        ...server,
+        caCert: action.caCert ?? server.caCert,
+      };
     }
     case "basic": {
       return {
@@ -659,9 +664,40 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
         return (
           <>
             <div className="usa-hint margin-top-05">
-              Mutual TLS certificates will be loaded from the keys directory or
-              MTLS_CERT and MTLS_KEY environment variables.
+              Mutual TLS client certificates will be loaded from the keys
+              directory or MTLS_CERT and MTLS_KEY environment variables. Provide
+              the CA certificate of the server here.
             </div>
+            <Label htmlFor="ca-cert">
+              CA Certificate <span className="text-secondary">(required)</span>
+            </Label>
+            <Textarea
+              id="ca-cert"
+              name="ca-cert"
+              className={classNames(
+                "margin-top-05",
+                "maxw-none",
+                formError?.caCert ? "error-input" : "",
+              )}
+              data-testid="ca-cert"
+              value={server?.caCert ?? ""}
+              onChange={(e) =>
+                serverDispatch({
+                  type: "mutual-tls",
+                  caCert: e.target.value,
+                })
+              }
+              required
+            />
+            {formError?.caCert && (
+              <div className={"error-message margin-top-05"}>
+                <Icon.Error
+                  aria-label="warning icon indicating an error is present"
+                  className={"error-message"}
+                />
+                CA Certificate needs to be set for mutual TLS auth
+              </div>
+            )}
           </>
         );
       case "client_credentials":
@@ -1007,6 +1043,7 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
       ["client_credentials", "SMART"].includes(server.authType)
         ? server?.scopes
         : undefined,
+    caCert: server.authType === "mutual-tls" ? server?.caCert : undefined,
   });
 
   const resetModalState = () => {

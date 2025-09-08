@@ -5,7 +5,6 @@ import { fetchWithoutSSL } from "../../utils/utils";
 import dbService from "../db/service";
 import { AuthData, updateFhirServer } from "./service";
 import {
-  getOrCreateMtlsCa,
   getOrCreateMtlsCert,
   getOrCreateMtlsKey,
   isMtlsAvailable,
@@ -62,7 +61,8 @@ class FHIRClient {
       try {
         const cert = getOrCreateMtlsCert();
         const key = getOrCreateMtlsKey();
-        const ca = getOrCreateMtlsCa();
+        const ca = config.caCert || "";
+        console.log(`CA cert length: ${ca.length}`);
         this.fetch = fetchWithMutualTLS(
           cert,
           key,
@@ -131,6 +131,11 @@ class FHIRClient {
         if (authData.authType === "client_credentials") {
           testConfig.clientSecret = authData.clientSecret;
         }
+      } else if (authData.authType === "mutual-tls") {
+        if (!isMtlsAvailable()) {
+          throw new Error("mTLS env vars not found");
+        }
+        testConfig.caCert = authData.caCert;
       }
     }
 
