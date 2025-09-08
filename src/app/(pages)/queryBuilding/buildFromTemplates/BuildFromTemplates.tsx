@@ -403,7 +403,7 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
                 type="text"
                 className={classNames(
                   styles.input,
-                  errorMessage ? styles.errorMessage : "",
+                  errorMessage ? "error-input" : "",
                 )}
                 defaultValue={queryName ?? ""}
                 required
@@ -421,10 +421,10 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
                 data-testid="queryNameInput"
               />
               {errorMessage && formError.queryName && (
-                <div className={styles.errorMessage}>
+                <div className={"error-message"}>
                   <Icon.Error
                     aria-label="warning icon indicating an error is present"
-                    className={styles.errorMessage}
+                    className={"error-message"}
                   />
                   Enter a name for the query.
                 </div>
