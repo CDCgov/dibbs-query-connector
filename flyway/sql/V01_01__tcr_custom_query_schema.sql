@@ -85,7 +85,7 @@ CREATE TABLE IF NOT EXISTS fhir_servers (
     token_expiry TIMESTAMP WITH TIME ZONE,
     default_server BOOLEAN NOT NULL DEFAULT FALSE,
     patient_match_configuration JSON DEFAULT NULL,
-    ca_cert TEXT DEFAULT NULL,
+    ca_cert TEXT DEFAULT NULL
     );
 
 -- Add comments for documentation
