@@ -170,7 +170,7 @@ CREATE INDEX IF NOT EXISTS query_id_index ON query (id);
 CREATE INDEX IF NOT EXISTS query_name_index ON query (query_name);
 
 CREATE INDEX IF NOT EXISTS fhir_servers_id_index ON fhir_servers (id);
-CREATE INDEX IF NOT EXISTS fhir_servers_name_index ON fhir_servers (name);
+CREATE UNIQUE INDEX IF NOT EXISTS fhir_servers_name_index ON fhir_servers (name);
 CREATE INDEX idx_fhir_servers_auth_type ON fhir_servers(auth_type);
 
 CREATE INDEX IF NOT EXISTS user_id_index ON users (id);

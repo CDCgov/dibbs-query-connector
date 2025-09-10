@@ -127,42 +127,32 @@ echo "Database is available"
 # Insert into fhir_servers table directly
 echo "Inserting data into fhir_servers table..."
 PGPASSWORD="${DB_PASSWORD}" psql -h "${DB_ADDRESS}" -p "${DB_PORT}" -U "${DB_USERNAME}" -d "${DB_NAME}" <<EOF
-BEGIN;
-
--- 1) Try to update the existing row
-WITH upd AS (
-  UPDATE fhir_servers
-  SET hostname = '${BASE_URL}/fhir',
-      headers  = jsonb_build_object('Authorization', 'Bearer ${TOKEN}'),
-      last_connection_attempt     = '${CURRENT_DATETIME}'::timestamptz,
-      last_connection_successful  = true,
-      disable_cert_validation     = false,
-      auth_type = 'SMART',
-      client_id = 'query-connector',
-      scopes    = 'system/*.read',
-      default_server = true
-  WHERE name = 'Aidbox'
-  RETURNING 1
-)
--- 2) If no row was updated, insert it
 INSERT INTO fhir_servers (
-  name, hostname, last_connection_attempt, last_connection_successful,
-  disable_cert_validation, auth_type, client_id, scopes, default_server, headers
-)
-SELECT
+  name,
+  hostname,
+  last_connection_attempt,
+  last_connection_successful,
+  disable_cert_validation,
+  auth_type,
+  client_id,
+  scopes,
+  default_server
+) VALUES (
   'Aidbox',
   '${BASE_URL}/fhir',
-  '${CURRENT_DATETIME}'::timestamptz,
+  '${CURRENT_DATETIME}'::timestamp,
   true,
-  false,
+  false,  
   'SMART',
   'query-connector',
   'system/*.read',
-  true,
-  jsonb_build_object('Authorization', 'Bearer ${TOKEN}')
-WHERE NOT EXISTS (SELECT 1 FROM upd);
-
-COMMIT;
+  true
+)
+ON CONFLICT(name)
+DO UPDATE SET
+  hostname = '${BASE_URL}/fhir',
+  headers = '{"Authorization": "Bearer ${TOKEN}"}'::jsonb
+;
 EOF
 
 echo "Finished configuring Aidbox and database."
