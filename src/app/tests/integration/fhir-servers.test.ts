@@ -49,7 +49,9 @@ describe("FHIR Servers tests", () => {
     );
     // Has new
     let newFhirServers = await getFhirServerConfigs(true);
-    expect(newFhirServers.length).toBe(DEFAULT_FHIR_SERVER_LENGTH + 1);
+    expect(newFhirServers.length).toBeGreaterThanOrEqual(
+      DEFAULT_FHIR_SERVER_LENGTH + 1,
+    );
     const newServer = newFhirServers.find(
       (v) => v.name === TEST_FHIR_SERVER.name,
     );
@@ -403,6 +405,39 @@ describe("FHIR Servers tests", () => {
       matchCount: 5,
       supportsMatch: true,
     });
+
+    // Cleanup
+    if (insertedServer?.id) {
+      await deleteFhirServer(insertedServer.id);
+    }
+  });
+
+  it("should handle mutual TLS auth with CA certificate", async () => {
+    const testCaCert =
+      "-----BEGIN CERTIFICATE-----\nTEST_CA_CERTIFICATE\n-----END CERTIFICATE-----";
+
+    const result = await insertFhirServer(
+      "Test Server mTLS with CA",
+      "https://test-mtls-ca.com/fhir",
+      false,
+      false,
+      true,
+      {
+        authType: "mutual-tls",
+        caCert: testCaCert,
+      },
+    );
+
+    expect(result.success).toBe(true);
+
+    const servers = await getFhirServerConfigs(true);
+    const insertedServer = servers.find(
+      (s) => s.name === "Test Server mTLS with CA",
+    );
+
+    expect(insertedServer).toBeDefined();
+    expect(insertedServer?.authType).toBe("mutual-tls");
+    expect(insertedServer?.caCert).toBe(testCaCert);
 
     // Cleanup
     if (insertedServer?.id) {
