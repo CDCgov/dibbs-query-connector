@@ -15,12 +15,14 @@ import { Agent } from "undici";
  * Custom fetch function that supports mutual TLS
  * @param cert - The certificate content
  * @param key - The key content
+ * @param ca - The CA content
  * @param disableCertValidation - Whether to disable SSL certificate validation
  * @returns A function that fetches a URL with mutual TLS
  */
 function fetchWithMutualTLS(
   cert: string,
   key: string,
+  ca: string,
   disableCertValidation: boolean = false,
 ) {
   return async (url: string, options?: RequestInit): Promise<Response> => {
@@ -31,6 +33,7 @@ function fetchWithMutualTLS(
         connect: {
           cert: cert,
           key: key,
+          ca: ca,
           rejectUnauthorized: !disableCertValidation,
         },
       }),
@@ -58,9 +61,11 @@ class FHIRClient {
       try {
         const cert = getOrCreateMtlsCert();
         const key = getOrCreateMtlsKey();
+        const ca = config.caCert || "";
         this.fetch = fetchWithMutualTLS(
           cert,
           key,
+          ca,
           config.disableCertValidation,
         );
       } catch (error) {
@@ -125,6 +130,11 @@ class FHIRClient {
         if (authData.authType === "client_credentials") {
           testConfig.clientSecret = authData.clientSecret;
         }
+      } else if (authData.authType === "mutual-tls") {
+        if (!isMtlsAvailable()) {
+          throw new Error("mTLS env vars not found");
+        }
+        testConfig.caCert = authData.caCert;
       }
     }
 

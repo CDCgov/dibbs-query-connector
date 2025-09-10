@@ -25,4 +25,5 @@ export interface FhirServerConfig {
     matchCount: number;
     supportsMatch: boolean;
   };
+  caCert?: string;
 }

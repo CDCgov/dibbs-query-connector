@@ -5,6 +5,7 @@ import {
   Icon,
   Fieldset,
   Radio,
+  Textarea,
 } from "@trussworks/react-uswds";
 import classNames from "classnames";
 import dynamic from "next/dynamic";
@@ -50,6 +51,7 @@ const INITIAL_FORM_ERRORS = {
   clientSecret: false,
   tokenEndpoint: false,
   scopes: false,
+  caCert: false,
 };
 
 const DEFAULT_PATIENT_MATCH_DATA = {
@@ -106,6 +108,7 @@ interface UpdateFormAction {
   scopes?: string;
   accessToken?: string;
   initialPayload?: FhirServerConfig;
+  caCert?: string;
 }
 
 function formUpdateReducer(server: FhirServerConfig, action: UpdateFormAction) {
@@ -114,7 +117,10 @@ function formUpdateReducer(server: FhirServerConfig, action: UpdateFormAction) {
       return server;
     }
     case "mutual-tls": {
-      return { ...server };
+      return {
+        ...server,
+        caCert: action.caCert ?? server.caCert,
+      };
     }
     case "basic": {
       return {
@@ -141,14 +147,17 @@ function formUpdateReducer(server: FhirServerConfig, action: UpdateFormAction) {
       };
     }
     case "common": {
+      const newAuthType = action.authType ?? server.authType;
       return {
         ...server,
         name: action.name ?? server.name,
         hostname: action.hostname ?? server.hostname,
         disableCertValidation:
           action.disableCertValidation ?? server.disableCertValidation,
-        authType: action.authType ?? server.authType,
+        authType: newAuthType,
         defaultServer: action.defaultServer ?? server.defaultServer,
+        // Clear caCert when switching away from mutual-tls
+        caCert: newAuthType === "mutual-tls" ? server.caCert : undefined,
       };
     }
     case "reset": {
@@ -388,6 +397,10 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
           };
         });
         return smartClientIdInvalid || smartScopesInvalid;
+
+      case "mutual-tls":
+        // CA certificate is optional for mutual TLS
+        return false;
     }
   };
 
@@ -457,16 +470,9 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
   };
 
   const handleSave = async (authData: AuthData) => {
-    const serverNameInvalid = server?.name === undefined;
-    const serverHostnameInvalid = server?.hostname === undefined;
-    if (serverNameInvalid || serverHostnameInvalid) {
-      setFormError((prev) => {
-        return {
-          ...prev,
-          serverName: serverNameInvalid,
-          url: serverHostnameInvalid,
-        };
-      });
+    const formHasErrors = await checkFormHasErrors();
+    if (formHasErrors) {
+      console.error("Form has validation errors");
       return;
     }
     const connectionResult = await testFhirConnection(server?.hostname);
@@ -659,9 +665,32 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
         return (
           <>
             <div className="usa-hint margin-top-05">
-              Mutual TLS certificates will be loaded from the keys directory or
-              MTLS_CERT and MTLS_KEY environment variables.
+              Mutual TLS client certificates will be loaded from the keys
+              directory or MTLS_CERT and MTLS_KEY environment variables.
+              Optionally provide the CA certificate of the server here if it's
+              not trusted by default.
             </div>
+            <Label htmlFor="ca-cert">
+              Server CA Certificate{" "}
+              <span className="text-secondary">(optional)</span>
+            </Label>
+            <Textarea
+              id="ca-cert"
+              name="ca-cert"
+              className={classNames(
+                "margin-top-05",
+                "maxw-none",
+                formError?.caCert ? "error-input" : "",
+              )}
+              data-testid="ca-cert"
+              value={server?.caCert ?? ""}
+              onChange={(e) =>
+                serverDispatch({
+                  type: "mutual-tls",
+                  caCert: e.target.value,
+                })
+              }
+            />
           </>
         );
       case "client_credentials":
@@ -1007,6 +1036,7 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
       ["client_credentials", "SMART"].includes(server.authType)
         ? server?.scopes
         : undefined,
+    caCert: server.authType === "mutual-tls" ? server?.caCert : undefined,
   });
 
   const resetModalState = () => {

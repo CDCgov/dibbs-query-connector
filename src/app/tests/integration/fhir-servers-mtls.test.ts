@@ -29,6 +29,9 @@ describe("FHIR Servers Mutual TLS Tests", () => {
 
   describe("Mutual TLS configuration", () => {
     it("should insert a FHIR server with mutual TLS enabled", async () => {
+      const testCaCert =
+        "-----BEGIN CERTIFICATE-----\nTEST_CA_CERT_DATA\n-----END CERTIFICATE-----";
+
       const result = await insertFhirServer(
         "Test mTLS Server",
         "https://test-mtls.example.com/fhir",
@@ -37,6 +40,7 @@ describe("FHIR Servers Mutual TLS Tests", () => {
         true,
         {
           authType: "mutual-tls",
+          caCert: testCaCert,
         },
       );
 
@@ -48,6 +52,7 @@ describe("FHIR Servers Mutual TLS Tests", () => {
 
       expect(insertedServer).toBeDefined();
       expect(insertedServer?.authType).toBe("mutual-tls");
+      expect(insertedServer?.caCert).toBe(testCaCert);
       expect(insertedServer?.hostname).toBe(
         "https://test-mtls.example.com/fhir",
       );
@@ -69,6 +74,9 @@ describe("FHIR Servers Mutual TLS Tests", () => {
       expect(insertResult.success).toBe(true);
       const serverId = insertResult.server.id;
 
+      const testCaCert =
+        "-----BEGIN CERTIFICATE-----\nUPDATED_CA_CERT\n-----END CERTIFICATE-----";
+
       // Update to enable mTLS
       const updateResult = await updateFhirServer({
         id: serverId,
@@ -79,6 +87,7 @@ describe("FHIR Servers Mutual TLS Tests", () => {
         lastConnectionSuccessful: true,
         authData: {
           authType: "mutual-tls",
+          caCert: testCaCert,
         },
       });
 
@@ -88,6 +97,7 @@ describe("FHIR Servers Mutual TLS Tests", () => {
       const updatedServer = servers.find((s) => s.id === serverId);
 
       expect(updatedServer?.authType).toBe("mutual-tls");
+      expect(updatedServer?.caCert).toBe(testCaCert);
     });
 
     it("should handle mutual TLS with custom headers", async () => {
@@ -179,6 +189,98 @@ describe("FHIR Servers Mutual TLS Tests", () => {
       expect(insertedServer).toBeDefined();
       expect(insertedServer?.authType).toBe("mutual-tls");
       expect(insertedServer?.disableCertValidation).toBe(true);
+    });
+
+    it("should handle CA certificate persistence and updates", async () => {
+      const originalCaCert =
+        "-----BEGIN CERTIFICATE-----\nORIGINAL_CA_CERT\n-----END CERTIFICATE-----";
+
+      // Insert server with CA cert
+      const insertResult = await insertFhirServer(
+        "Test mTLS CA Cert Server",
+        "https://test-ca-cert.example.com/fhir",
+        false,
+        false,
+        true,
+        {
+          authType: "mutual-tls",
+          caCert: originalCaCert,
+        },
+      );
+
+      expect(insertResult.success).toBe(true);
+      const serverId = insertResult.server.id;
+
+      // Verify CA cert is stored
+      let servers = await getFhirServerConfigs(true);
+      let insertedServer = servers.find((s) => s.id === serverId);
+      expect(insertedServer?.caCert).toBe(originalCaCert);
+
+      // Update CA cert
+      const updatedCaCert =
+        "-----BEGIN CERTIFICATE-----\nUPDATED_CA_CERT\n-----END CERTIFICATE-----";
+      const updateResult = await updateFhirServer({
+        id: serverId,
+        name: "Test mTLS CA Cert Server",
+        hostname: "https://test-ca-cert.example.com/fhir",
+        disableCertValidation: false,
+        defaultServer: false,
+        lastConnectionSuccessful: true,
+        authData: {
+          authType: "mutual-tls",
+          caCert: updatedCaCert,
+        },
+      });
+
+      expect(updateResult.success).toBe(true);
+
+      // Verify CA cert is updated
+      servers = await getFhirServerConfigs(true);
+      const updatedServer = servers.find((s) => s.id === serverId);
+      expect(updatedServer?.caCert).toBe(updatedCaCert);
+      expect(updatedServer?.authType).toBe("mutual-tls");
+    });
+
+    it("should clear CA certificate when switching away from mutual TLS", async () => {
+      const testCaCert =
+        "-----BEGIN CERTIFICATE-----\nTEST_CA_CERT\n-----END CERTIFICATE-----";
+
+      // Insert server with mutual TLS and CA cert
+      const insertResult = await insertFhirServer(
+        "Test mTLS Clear CA Cert Server",
+        "https://test-clear-ca.example.com/fhir",
+        false,
+        false,
+        true,
+        {
+          authType: "mutual-tls",
+          caCert: testCaCert,
+        },
+      );
+
+      const serverId = insertResult.server.id;
+
+      // Update to use basic auth (should clear CA cert)
+      const updateResult = await updateFhirServer({
+        id: serverId,
+        name: "Test mTLS Clear CA Cert Server",
+        hostname: "https://test-clear-ca.example.com/fhir",
+        disableCertValidation: false,
+        defaultServer: false,
+        lastConnectionSuccessful: true,
+        authData: {
+          authType: "basic",
+          bearerToken: "test-token",
+        },
+      });
+
+      expect(updateResult.success).toBe(true);
+
+      // Verify CA cert is cleared
+      const servers = await getFhirServerConfigs(true);
+      const updatedServer = servers.find((s) => s.id === serverId);
+      expect(updatedServer?.authType).toBe("basic");
+      expect(updatedServer?.caCert).toBeNull();
     });
   });
 });

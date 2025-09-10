@@ -38,9 +38,18 @@ testWithMock.describe("Mutual TLS", () => {
       // Verify mutual TLS hint text appears
       await expect(
         page.getByText(
-          "Mutual TLS certificates will be loaded from the keys directory",
+          "Mutual TLS client certificates will be loaded from the keys directory",
         ),
       ).toBeVisible();
+
+      // Verify CA certificate field appears
+      await expect(page.getByTestId("ca-cert")).toBeVisible();
+      await expect(page.getByText("Server CA Certificate")).toBeVisible();
+
+      // Fill in CA certificate
+      const testCaCert =
+        "-----BEGIN CERTIFICATE-----\nE2E_TEST_CA_CERT\n-----END CERTIFICATE-----";
+      await page.getByTestId("ca-cert").fill(testCaCert);
 
       await mockServerRequest.GET(new RegExp(".*/Task/foo"), {
         status: 404,
