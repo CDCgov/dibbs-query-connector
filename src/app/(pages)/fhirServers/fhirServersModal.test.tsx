@@ -10,7 +10,7 @@ jest.mock("@/app/backend/fhir-servers/service", () => ({
   insertFhirServer: jest.fn(),
   updateFhirServer: jest.fn(),
   deleteFhirServer: jest.fn(),
-  getFhirServerConfigs: jest.fn(),
+  getFhirServerConfigs: jest.fn().mockResolvedValue([]),
   updateFhirServerConnectionStatus: jest.fn(),
 }));
 
@@ -20,7 +20,7 @@ jest.mock("@/app/backend/fhir-servers/test-utils", () => ({
   checkFhirServerSupportsMatch: jest
     .fn()
     .mockResolvedValue({ supportsMatch: false, fhirVersion: "4.0.1" }),
-  validateFhirServerUrl: jest.fn().mockReturnValue(true),
+  validateFhirServerUrl: jest.fn().mockResolvedValue(undefined),
 }));
 
 // Mock the toast component
@@ -32,11 +32,38 @@ jest.mock("@/app/ui/designSystem/toast/Toast", () => ({
 jest.mock("next/dynamic", () => () => {
   return function MockModal({
     children,
+    buttons,
+    heading,
     ...props
-  }: React.PropsWithChildren<Record<string, unknown>>) {
+  }: React.PropsWithChildren<{
+    buttons?: Array<{
+      text: string | React.JSX.Element;
+      type: string;
+      id?: string;
+      className?: string;
+      onClick: () => void;
+    }>;
+    heading?: string;
+  }>) {
     return (
-      <div data-testid="modal" {...props}>
+      <div data-testid="modal">
+        <h1>{heading}</h1>
         {children}
+        {buttons && (
+          <div data-testid="modal-footer">
+            {buttons.map((button, index) => (
+              <button
+                key={index}
+                type={button.type as "button" | "submit" | "reset"}
+                id={button.id}
+                className={button.className}
+                onClick={button.onClick}
+              >
+                {button.text}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
     );
   };
@@ -63,7 +90,7 @@ const mockFhirServers: FhirServerConfig[] = [
 const defaultProps = {
   fhirServers: mockFhirServers,
   setFhirServers: jest.fn(),
-  modalMode: "add" as ModalMode,
+  modalMode: "create" as ModalMode,
   serverToEdit: undefined,
   setSelectedFhirServer: jest.fn(),
   patientMatchData: undefined,
@@ -83,8 +110,8 @@ describe("FhirServersModal", () => {
       render(<FhirServersModal {...defaultProps} />);
 
       // Select Mutual TLS auth method
-      const mutualTlsRadio = screen.getByLabelText("Mutual TLS");
-      await user.click(mutualTlsRadio);
+      const authMethodSelect = screen.getByTestId("auth-method");
+      await user.selectOptions(authMethodSelect, "mutual-tls");
 
       // Check if CA certificate field appears
       expect(
@@ -98,12 +125,18 @@ describe("FhirServersModal", () => {
 
       render(<FhirServersModal {...defaultProps} />);
 
-      const mutualTlsRadio = screen.getByLabelText("Mutual TLS");
-      await user.click(mutualTlsRadio);
+      const authMethodSelect = screen.getByTestId("auth-method");
+      await user.selectOptions(authMethodSelect, "mutual-tls");
 
       const caCertLabel = screen.getByLabelText(/Server CA Certificate/);
       expect(caCertLabel).toBeInTheDocument();
-      expect(screen.getByText("(required)")).toBeInTheDocument();
+
+      // Check that the CA cert label contains "(required)"
+      expect(screen.getByText("Server CA Certificate")).toBeInTheDocument();
+      const caCertContainer = screen
+        .getByText("Server CA Certificate")
+        .closest("label");
+      expect(caCertContainer).toHaveTextContent("(required)");
     });
 
     it("should update CA certificate value when user types", async () => {
@@ -111,8 +144,8 @@ describe("FhirServersModal", () => {
 
       render(<FhirServersModal {...defaultProps} />);
 
-      const mutualTlsRadio = screen.getByLabelText("Mutual TLS");
-      await user.click(mutualTlsRadio);
+      const authMethodSelect = screen.getByTestId("auth-method");
+      await user.selectOptions(authMethodSelect, "mutual-tls");
 
       const caCertTextarea = screen.getByTestId("ca-cert");
       const testCert =
@@ -136,8 +169,8 @@ describe("FhirServersModal", () => {
       );
 
       // Select Mutual TLS without providing CA cert
-      const mutualTlsRadio = screen.getByLabelText("Mutual TLS");
-      await user.click(mutualTlsRadio);
+      const authMethodSelect = screen.getByTestId("auth-method");
+      await user.selectOptions(authMethodSelect, "mutual-tls");
 
       // Try to submit without CA cert
       const addButton = screen.getByRole("button", {
@@ -164,9 +197,18 @@ describe("FhirServersModal", () => {
         "SMART on FHIR",
       ];
 
+      const authMethodSelect = screen.getByTestId("auth-method");
+
       for (const authMethod of authMethods) {
-        const radio = screen.getByLabelText(authMethod);
-        await user.click(radio);
+        const optionValue =
+          authMethod === "None"
+            ? "none"
+            : authMethod === "Basic"
+              ? "basic"
+              : authMethod === "Client credentials"
+                ? "client_credentials"
+                : "SMART";
+        await user.selectOptions(authMethodSelect, optionValue);
 
         expect(screen.queryByTestId("ca-cert")).not.toBeInTheDocument();
       }
@@ -191,8 +233,8 @@ describe("FhirServersModal", () => {
         "https://mtls.example.com/fhir",
       );
 
-      const mutualTlsRadio = screen.getByLabelText("Mutual TLS");
-      await user.click(mutualTlsRadio);
+      const authMethodSelect = screen.getByTestId("auth-method");
+      await user.selectOptions(authMethodSelect, "mutual-tls");
 
       const testCert =
         "-----BEGIN CERTIFICATE-----\nTEST_CA_CERT\n-----END CERTIFICATE-----";
@@ -208,7 +250,7 @@ describe("FhirServersModal", () => {
           "https://mtls.example.com/fhir",
           false,
           false,
-          false,
+          true, // connection success should be true based on our mock
           expect.objectContaining({
             authType: "mutual-tls",
             caCert: testCert,
@@ -248,7 +290,7 @@ describe("FhirServersModal", () => {
 
       // CA certificate field should be populated
       expect(screen.getByTestId("ca-cert")).toHaveValue(existingCert);
-      expect(screen.getByLabelText("Mutual TLS")).toBeChecked();
+      expect(screen.getByTestId("auth-method")).toHaveValue("mutual-tls");
     });
 
     it("should show mutual TLS hint text", async () => {
@@ -256,8 +298,8 @@ describe("FhirServersModal", () => {
 
       render(<FhirServersModal {...defaultProps} />);
 
-      const mutualTlsRadio = screen.getByLabelText("Mutual TLS");
-      await user.click(mutualTlsRadio);
+      const authMethodSelect = screen.getByTestId("auth-method");
+      await user.selectOptions(authMethodSelect, "mutual-tls");
 
       expect(
         screen.getByText(
@@ -275,18 +317,17 @@ describe("FhirServersModal", () => {
       render(<FhirServersModal {...defaultProps} />);
 
       // Select Mutual TLS and add CA cert
-      const mutualTlsRadio = screen.getByLabelText("Mutual TLS");
-      await user.click(mutualTlsRadio);
+      const authMethodSelect = screen.getByTestId("auth-method");
+      await user.selectOptions(authMethodSelect, "mutual-tls");
 
       const caCertTextarea = screen.getByTestId("ca-cert");
       await user.type(caCertTextarea, "test cert");
 
       // Switch to different auth method
-      const noneRadio = screen.getByLabelText("None");
-      await user.click(noneRadio);
+      await user.selectOptions(authMethodSelect, "none");
 
       // Switch back to mutual TLS
-      await user.click(mutualTlsRadio);
+      await user.selectOptions(authMethodSelect, "mutual-tls");
 
       // Field should be cleared (this tests the form state management)
       expect(screen.getByTestId("ca-cert")).toHaveValue("");
@@ -305,8 +346,8 @@ describe("FhirServersModal", () => {
         "https://test.example.com/fhir",
       );
 
-      const mutualTlsRadio = screen.getByLabelText("Mutual TLS");
-      await user.click(mutualTlsRadio);
+      const authMethodSelect = screen.getByTestId("auth-method");
+      await user.selectOptions(authMethodSelect, "mutual-tls");
 
       const addButton = screen.getByRole("button", { name: /Add server/i });
       await user.click(addButton);
@@ -326,8 +367,8 @@ describe("FhirServersModal", () => {
         "https://test.example.com/fhir",
       );
 
-      const mutualTlsRadio = screen.getByLabelText("Mutual TLS");
-      await user.click(mutualTlsRadio);
+      const authMethodSelect = screen.getByTestId("auth-method");
+      await user.selectOptions(authMethodSelect, "mutual-tls");
 
       const addButton = screen.getByRole("button", { name: /Add server/i });
       await user.click(addButton);
@@ -390,8 +431,8 @@ describe("FhirServersModal", () => {
       );
 
       // Change to mutual TLS
-      const mutualTlsRadio = screen.getByLabelText("Mutual TLS");
-      await user.click(mutualTlsRadio);
+      const authMethodSelect = screen.getByTestId("auth-method");
+      await user.selectOptions(authMethodSelect, "mutual-tls");
 
       // Add CA certificate
       const testCert =

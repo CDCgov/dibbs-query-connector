@@ -51,6 +51,7 @@ const INITIAL_FORM_ERRORS = {
   clientSecret: false,
   tokenEndpoint: false,
   scopes: false,
+  caCert: false,
 };
 
 const DEFAULT_PATIENT_MATCH_DATA = {
@@ -146,14 +147,17 @@ function formUpdateReducer(server: FhirServerConfig, action: UpdateFormAction) {
       };
     }
     case "common": {
+      const newAuthType = action.authType ?? server.authType;
       return {
         ...server,
         name: action.name ?? server.name,
         hostname: action.hostname ?? server.hostname,
         disableCertValidation:
           action.disableCertValidation ?? server.disableCertValidation,
-        authType: action.authType ?? server.authType,
+        authType: newAuthType,
         defaultServer: action.defaultServer ?? server.defaultServer,
+        // Clear caCert when switching away from mutual-tls
+        caCert: newAuthType === "mutual-tls" ? server.caCert : undefined,
       };
     }
     case "reset": {
@@ -393,6 +397,17 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
           };
         });
         return smartClientIdInvalid || smartScopesInvalid;
+
+      case "mutual-tls":
+        const caCertInvalid = !Boolean(server.caCert);
+
+        setFormError((prev) => {
+          return {
+            ...prev,
+            caCert: caCertInvalid,
+          };
+        });
+        return caCertInvalid;
     }
   };
 
@@ -462,16 +477,9 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
   };
 
   const handleSave = async (authData: AuthData) => {
-    const serverNameInvalid = server?.name === undefined;
-    const serverHostnameInvalid = server?.hostname === undefined;
-    if (serverNameInvalid || serverHostnameInvalid) {
-      setFormError((prev) => {
-        return {
-          ...prev,
-          serverName: serverNameInvalid,
-          url: serverHostnameInvalid,
-        };
-      });
+    const formHasErrors = await checkFormHasErrors();
+    if (formHasErrors) {
+      console.error("Form has validation errors");
       return;
     }
     const connectionResult = await testFhirConnection(server?.hostname);
