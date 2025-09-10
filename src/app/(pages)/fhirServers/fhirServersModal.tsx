@@ -399,15 +399,8 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
         return smartClientIdInvalid || smartScopesInvalid;
 
       case "mutual-tls":
-        const caCertInvalid = !Boolean(server.caCert);
-
-        setFormError((prev) => {
-          return {
-            ...prev,
-            caCert: caCertInvalid,
-          };
-        });
-        return caCertInvalid;
+        // CA certificate is optional for mutual TLS
+        return false;
     }
   };
 
@@ -673,12 +666,13 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
           <>
             <div className="usa-hint margin-top-05">
               Mutual TLS client certificates will be loaded from the keys
-              directory or MTLS_CERT and MTLS_KEY environment variables. Provide
-              the CA certificate of the server here.
+              directory or MTLS_CERT and MTLS_KEY environment variables.
+              Optionally provide the CA certificate of the server here if it's
+              not trusted by default.
             </div>
             <Label htmlFor="ca-cert">
               Server CA Certificate{" "}
-              <span className="text-secondary">(required)</span>
+              <span className="text-secondary">(optional)</span>
             </Label>
             <Textarea
               id="ca-cert"
@@ -696,17 +690,7 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
                   caCert: e.target.value,
                 })
               }
-              required
             />
-            {formError?.caCert && (
-              <div className={"error-message margin-top-05"}>
-                <Icon.Error
-                  aria-label="warning icon indicating an error is present"
-                  className={"error-message"}
-                />
-                CA Certificate needs to be set for mutual TLS auth
-              </div>
-            )}
           </>
         );
       case "client_credentials":

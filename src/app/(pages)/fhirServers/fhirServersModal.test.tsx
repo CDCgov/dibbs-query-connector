@@ -120,7 +120,7 @@ describe("FhirServersModal", () => {
       expect(screen.getByTestId("ca-cert")).toBeInTheDocument();
     });
 
-    it("should show required indicator for CA certificate field", async () => {
+    it("should show optional indicator for CA certificate field", async () => {
       const user = userEvent.setup();
 
       render(<FhirServersModal {...defaultProps} />);
@@ -131,12 +131,12 @@ describe("FhirServersModal", () => {
       const caCertLabel = screen.getByLabelText(/Server CA Certificate/);
       expect(caCertLabel).toBeInTheDocument();
 
-      // Check that the CA cert label contains "(required)"
+      // Check that the CA cert label contains "(optional)"
       expect(screen.getByText("Server CA Certificate")).toBeInTheDocument();
       const caCertContainer = screen
         .getByText("Server CA Certificate")
         .closest("label");
-      expect(caCertContainer).toHaveTextContent("(required)");
+      expect(caCertContainer).toHaveTextContent("(optional)");
     });
 
     it("should update CA certificate value when user types", async () => {
@@ -156,7 +156,14 @@ describe("FhirServersModal", () => {
       expect(caCertTextarea).toHaveValue(testCert);
     });
 
-    it("should show validation error when CA certificate is empty for mutual TLS", async () => {
+    it("should allow submission when CA certificate is empty for mutual TLS", async () => {
+      const mockInsertFhirServer =
+        require("@/app/backend/fhir-servers/service").insertFhirServer;
+      mockInsertFhirServer.mockResolvedValue({
+        success: true,
+        server: { id: "new-id" },
+      });
+
       const user = userEvent.setup();
 
       render(<FhirServersModal {...defaultProps} />);
@@ -172,16 +179,27 @@ describe("FhirServersModal", () => {
       const authMethodSelect = screen.getByTestId("auth-method");
       await user.selectOptions(authMethodSelect, "mutual-tls");
 
-      // Try to submit without CA cert
+      // Submit without CA cert should succeed
       const addButton = screen.getByRole("button", {
         name: /Add server|Save changes/i,
       });
       await user.click(addButton);
 
-      // Should show validation error
-      expect(
-        screen.getByText("CA Certificate needs to be set for mutual TLS auth"),
-      ).toBeInTheDocument();
+      // Should successfully call insertFhirServer with empty caCert
+      await waitFor(() => {
+        expect(mockInsertFhirServer).toHaveBeenCalledWith(
+          "Test mTLS Server",
+          "https://test-mtls.example.com/fhir",
+          false,
+          false,
+          true, // connection success
+          expect.objectContaining({
+            authType: "mutual-tls",
+            caCert: undefined, // Should be undefined when not provided
+          }),
+          expect.any(Object),
+        );
+      });
     });
 
     it("should not show CA certificate field for other auth methods", async () => {
@@ -307,7 +325,9 @@ describe("FhirServersModal", () => {
         ),
       ).toBeInTheDocument();
       expect(
-        screen.getByText(/Provide the CA certificate of the server here/),
+        screen.getByText(
+          /Optionally provide the CA certificate of the server here if it's not trusted by default/,
+        ),
       ).toBeInTheDocument();
     });
 
@@ -334,69 +354,7 @@ describe("FhirServersModal", () => {
     });
   });
 
-  describe("Form validation", () => {
-    it("should show error styling when CA certificate validation fails", async () => {
-      const user = userEvent.setup();
-
-      render(<FhirServersModal {...defaultProps} />);
-
-      await user.type(screen.getByTestId("server-name"), "Test Server");
-      await user.type(
-        screen.getByTestId("server-url"),
-        "https://test.example.com/fhir",
-      );
-
-      const authMethodSelect = screen.getByTestId("auth-method");
-      await user.selectOptions(authMethodSelect, "mutual-tls");
-
-      const addButton = screen.getByRole("button", { name: /Add server/i });
-      await user.click(addButton);
-
-      const caCertTextarea = screen.getByTestId("ca-cert");
-      expect(caCertTextarea).toHaveClass("error-input");
-    });
-
-    it("should clear CA certificate validation error when value is provided", async () => {
-      const user = userEvent.setup();
-
-      render(<FhirServersModal {...defaultProps} />);
-
-      await user.type(screen.getByTestId("server-name"), "Test Server");
-      await user.type(
-        screen.getByTestId("server-url"),
-        "https://test.example.com/fhir",
-      );
-
-      const authMethodSelect = screen.getByTestId("auth-method");
-      await user.selectOptions(authMethodSelect, "mutual-tls");
-
-      const addButton = screen.getByRole("button", { name: /Add server/i });
-      await user.click(addButton);
-
-      // Should show error
-      expect(
-        screen.getByText("CA Certificate needs to be set for mutual TLS auth"),
-      ).toBeInTheDocument();
-
-      // Add CA certificate
-      const caCertTextarea = screen.getByTestId("ca-cert");
-      await user.type(
-        caCertTextarea,
-        "-----BEGIN CERTIFICATE-----\nTEST\n-----END CERTIFICATE-----",
-      );
-
-      // Error should be cleared (this might require another form submission attempt)
-      await user.click(addButton);
-
-      await waitFor(() => {
-        expect(
-          screen.queryByText(
-            "CA Certificate needs to be set for mutual TLS auth",
-          ),
-        ).not.toBeInTheDocument();
-      });
-    });
-  });
+  describe("Form validation", () => {});
 
   describe("Server updates", () => {
     it("should update existing server with CA certificate", async () => {
