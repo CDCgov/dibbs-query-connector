@@ -62,7 +62,6 @@ class FHIRClient {
         const cert = getOrCreateMtlsCert();
         const key = getOrCreateMtlsKey();
         const ca = config.caCert || "";
-        console.log(`CA cert length: ${ca.length}`);
         this.fetch = fetchWithMutualTLS(
           cert,
           key,
