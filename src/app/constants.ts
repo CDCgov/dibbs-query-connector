@@ -13,32 +13,27 @@ export const USE_CASE_DETAILS = {
     queryName: "Newborn screening follow-up",
     condition: "Newborn Screening",
     // These are the ID's defined in the vs_dump.sql file
-    id: "c025a247-0129-4f0c-a2c6-7f3af08e06b4",
+    id: "7e39ee18-2c84-4e6d-8ed2-8810e893d7c5",
   },
   syphilis: {
     queryName: "Syphilis case investigation",
     condition: "Congenital syphilis (disorder)",
-    id: "facfefc1-dd39-4f84-9d91-e924e860ad1c",
+    id: "f153dbdd-ec28-4caa-b5fd-9a7dd18a2817",
   },
   gonorrhea: {
     queryName: "Gonorrhea case investigation",
     condition: "Gonorrhea (disorder)",
-    id: "73e1a777-49cb-4e19-bc71-8c3fd3ffda64",
+    id: "da9b4798-53f3-4743-bca3-ea1453036c54",
   },
   chlamydia: {
     queryName: "Chlamydia case investigation",
     condition: "Chlamydia trachomatis infection (disorder)",
-    id: "6edd14a2-ef78-4d8e-8509-0f87a7228d67",
+    id: "2ea84eb6-32bd-406a-8295-ddd3b96e964d",
   },
   cancer: {
     queryName: "Cancer case investigation",
     condition: "Cancer (Leukemia)",
-    id: "cf580d8d-cc7b-4eae-8a0d-96c36f9222e3",
-  },
-  immunization: {
-    queryName: "Immunization query",
-    condition: "",
-    id: "e858cba3-59f6-4bc8-9a1e-28fac21c5813",
+    id: "9c6b8c86-6b8f-431e-83b6-96f2d8a6310c",
   },
 } as const;
 
