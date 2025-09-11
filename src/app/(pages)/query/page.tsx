@@ -1,5 +1,5 @@
 "use client";
-import React, { useContext, useEffect, useState } from "react";
+import React, { Suspense, useContext, useEffect, useState } from "react";
 
 import ResultsView from "./components/ResultsView";
 import PatientSearchResults from "./components/PatientSearchResults";
@@ -18,6 +18,7 @@ import {
   PatientRecordsResponse,
 } from "@/app/backend/query-execution/service";
 import { getFhirServerNames } from "@/app/backend/fhir-servers/service";
+import Skeleton from "react-loading-skeleton";
 
 const blankUserQuery = {
   queryId: "",
@@ -83,15 +84,19 @@ const Query: React.FC = () => {
       <div className={modeToCssContainerMap[mode]}>
         {/* Step 1 */}
         {mode === "search" && (
-          <SearchForm
-            setMode={setMode}
-            setLoading={setLoading}
-            setPatientDiscoveryQueryResponse={setPatientDiscoveryQueryResponse}
-            fhirServers={fhirServers}
-            selectedFhirServer={fhirServer}
-            setFhirServer={setFhirServer}
-            setUncertainMatchError={setUncertainMatchError}
-          />
+          <Suspense fallback={<Skeleton />}>
+            <SearchForm
+              setMode={setMode}
+              setLoading={setLoading}
+              setPatientDiscoveryQueryResponse={
+                setPatientDiscoveryQueryResponse
+              }
+              fhirServers={fhirServers}
+              selectedFhirServer={fhirServer}
+              setFhirServer={setFhirServer}
+              setUncertainMatchError={setUncertainMatchError}
+            />
+          </Suspense>
         )}
 
         {/* Step 2 */}
