@@ -34,7 +34,6 @@ jest.mock("next/dynamic", () => () => {
     children,
     buttons,
     heading,
-    ...props
   }: React.PropsWithChildren<{
     buttons?: Array<{
       text: string | React.JSX.Element;

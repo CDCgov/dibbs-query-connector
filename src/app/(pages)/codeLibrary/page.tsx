@@ -729,9 +729,11 @@ const CodeLibrary: React.FC = () => {
       }
       if (!toSystemUri(r["code system"])) {
         errors.push(
-          `Row ${rowNo}: unsupported code system "${r["code system"]}" (use one of: ${Object.keys(
-            CodeSystemOptionsMap,
-          ).join(", ")} or an exact supported URI).`,
+          `Row ${rowNo}: unsupported code system "${
+            r["code system"]
+          }" (use one of: ${Object.keys(CodeSystemOptionsMap).join(
+            ", ",
+          )} or an exact supported URI).`,
         );
       }
       if (!r.code) {
