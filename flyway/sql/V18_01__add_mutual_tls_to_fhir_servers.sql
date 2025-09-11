@@ -1,2 +1,0 @@
-ALTER TABLE fhir_servers
-ADD COLUMN mutual_tls BOOLEAN DEFAULT FALSE;
