@@ -18,6 +18,7 @@ import { UserRole } from "@/app/models/entities/users";
 import { randomUUID } from "crypto";
 import { getQueryList } from "@/app/backend/query-building/service";
 import { suppressConsoleLogs } from "../fixtures";
+import { waitFor } from "@testing-library/dom";
 
 jest.mock("@/app/utils/auth", () => {
   return {
@@ -40,6 +41,7 @@ describe("user management tests", () => {
     suppressConsoleLogs();
   });
   it("user group creation, update, deletion", async () => {
+    const consoleInfoSpy = jest.spyOn(console, "info");
     const oldAuditIds = (await dbService.query(GET_ALL_AUDIT_ROWS)).rows.map(
       (r) => r.id,
     );
@@ -47,18 +49,38 @@ describe("user management tests", () => {
     const TEST_GROUP_NAME = "Koopalings" + Math.random() * 1000;
 
     const { items } = await createUserGroup(TEST_GROUP_NAME);
+
+    await waitFor(() => {
+      expect(consoleInfoSpy).toHaveBeenLastCalledWith(
+        expect.stringContaining(`${actionTypeToCheck} audit action with`),
+      );
+    });
+
     const auditEntry = await getAuditEntry(actionTypeToCheck, oldAuditIds);
     expect(JSON.parse(auditEntry?.groupName)).toBe(TEST_GROUP_NAME);
 
     const NEW_GROUP_NAME = "Koopa Troopas";
     await updateUserGroup(items[0].id, NEW_GROUP_NAME);
     const updateGroupAction = "updateUserGroup";
+
+    await waitFor(() => {
+      expect(consoleInfoSpy).toHaveBeenLastCalledWith(
+        expect.stringContaining(`${updateGroupAction} audit action with`),
+      );
+    });
+
     const updateEntry = await getAuditEntry(updateGroupAction, oldAuditIds);
     expect(JSON.parse(updateEntry?.id)).toBe(items[0].id);
     expect(JSON.parse(updateEntry?.newName)).toBe(NEW_GROUP_NAME);
 
     await deleteUserGroup(items[0].id);
     const deletionAction = "deleteUserGroup";
+
+    await waitFor(() => {
+      expect(consoleInfoSpy).toHaveBeenLastCalledWith(
+        expect.stringContaining(`${deletionAction} audit action with`),
+      );
+    });
     const deleteEntry = await getAuditEntry(deletionAction, oldAuditIds);
     expect(JSON.parse(deleteEntry?.id)).toBe(items[0].id);
   });
