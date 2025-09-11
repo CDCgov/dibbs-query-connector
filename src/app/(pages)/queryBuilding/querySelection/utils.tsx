@@ -124,6 +124,11 @@ export const renderModal = (
   context: DataContextValue,
   setSelectedQuery: React.Dispatch<React.SetStateAction<SelectedQueryDetails>>,
 ): JSX.Element => {
+  // here to fix static build errors when we're not in a browser context
+  if (typeof window === "undefined") {
+    return <></>;
+  }
+
   return (
     <DeleteModal
       modalRef={modalRef}
