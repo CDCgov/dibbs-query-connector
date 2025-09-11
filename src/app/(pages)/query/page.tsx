@@ -84,7 +84,7 @@ const Query: React.FC = () => {
       <div className={modeToCssContainerMap[mode]}>
         {/* Step 1 */}
         {mode === "search" && (
-          <Suspense fallback={<Skeleton />}>
+          <Suspense fallback={<SearchFormFallback />}>
             <SearchForm
               setMode={setMode}
               setLoading={setLoading}
@@ -155,3 +155,14 @@ const Query: React.FC = () => {
 };
 
 export default Query;
+
+const SearchFormFallback = () => {
+  return (
+    <>
+      <Skeleton className="margin-bottom-1" width={720} height={50} />
+      <Skeleton className="margin-bottom-1" width={720} height={50} />
+      <Skeleton className="margin-bottom-1" width={720} height={150} />
+      <Skeleton width={720} height={750} />
+    </>
+  );
+};
