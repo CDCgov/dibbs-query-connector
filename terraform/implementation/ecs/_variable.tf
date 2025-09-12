@@ -198,3 +198,14 @@ variable "aidbox_license" {
   description = "License for Aidbox"
   sensitive   = true
 }
+
+variable "mtls_cert" {
+  type        = string
+  description = "MTLS Certificate"
+}
+
+variable "mtls_key" {
+  type        = string
+  description = "MTLS Private Key"
+  sensitive   = true
+}

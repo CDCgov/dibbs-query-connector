@@ -122,6 +122,14 @@ module "ecs" {
         {
           name  = "AUTH_URL"
           value = var.auth_url
+        },
+        {
+          name  = "MTLS_CERT"
+          value = var.mtls_cert
+        },
+        {
+          name  = "MTLS_KEY"
+          value = var.mtls_key
         }
       ]
     },
