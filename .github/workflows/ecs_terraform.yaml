@@ -135,6 +135,8 @@ jobs:
           TF_VAR_bastion_public_key: ${{ secrets.BASTION_PUBLIC_KEY }}
           TF_VAR_bastion_private_key: ${{ secrets.BASTION_PRIVATE_KEY }}
           TF_VAR_bastion_allowed_ips: ${{ secrets.BASTION_ALLOWED_IPS }}
+          TF_VAR_mtls_cert: ${{ secrets.MTLS_CERT }}
+          TF_VAR_mtls_key: ${{ secrets.MTLS_KEY }}
         shell: bash
         run: |
           rm -rf .terraform .terraform.lock.hcl
