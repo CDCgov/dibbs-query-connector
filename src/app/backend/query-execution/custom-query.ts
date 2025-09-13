@@ -39,6 +39,9 @@ export class CustomQuery {
     [key: string]: {
       basePath: string;
       params: URLSearchParams;
+      // flag to filter out this resource from the final POST compilation, used
+      // for the medical records sections
+      excludeFromPost?: boolean;
     };
   } = {};
 
@@ -139,8 +142,10 @@ export class CustomQuery {
       this.fhirResourceQueries["immunization"] = {
         basePath: `/Immunization`,
         params: formattedParams,
+        excludeFromPost: true,
       };
     }
+
     if (medicalRecordSections && medicalRecordSections.serviceRequests) {
       const formattedParams = new URLSearchParams();
       formattedParams.append("subject", `Patient/${patientId}`);
@@ -149,14 +154,17 @@ export class CustomQuery {
 
       // todo: should we assume all the code related to service requests are labs?
       formattedParams.append("code", labsFilter);
-      // if (labsTimeFilter) {
-      //   formattedParams.append("occurrence", labsTimeFilter.startDate);
-      //   formattedParams.append("occurrence", labsTimeFilter.endDate);
-      // }
+
+      // todo: what's the date field that we should be filtering on?
+      if (labsTimeFilter) {
+        formattedParams.append("authored", labsTimeFilter.startDate);
+        formattedParams.append("authored", labsTimeFilter.endDate);
+      }
 
       this.fhirResourceQueries["serviceRequest"] = {
         basePath: `/ServiceRequest`,
         params: formattedParams,
+        excludeFromPost: true,
       };
     }
 
@@ -243,7 +251,9 @@ export class CustomQuery {
   compileAllPostRequests() {
     return Object.values(this.fhirResourceQueries)
       .map((q) => {
-        return this.compilePostRequest(q);
+        return q.excludeFromPost
+          ? { path: "", params: new URLSearchParams() }
+          : this.compilePostRequest(q);
       })
       .filter((v) => v.path !== "");
   }
