@@ -261,8 +261,8 @@ class QueryService {
     }
 
     try {
-      const patientLink = task.output?.find((output) =>
-        output.valueString?.includes("Patient-Page1"),
+      const patientLink = task.output?.find(
+        (output) => output.valueString?.includes("Patient-Page1"),
       )?.valueString;
 
       if (!patientLink) {
@@ -432,6 +432,15 @@ class QueryService {
     if (medicalRecordSections && medicalRecordSections.socialDeterminants) {
       const { basePath, params } = builtQuery.getQuery("socialHistory");
       medicalRecordSectionResults.push(await fhirClient.post(basePath, params));
+    }
+
+    if (medicalRecordSections && medicalRecordSections.serviceRequests) {
+      const { basePath, params } = builtQuery.getQuery("serviceRequest");
+
+      let fetchString = `${basePath}?${params}`;
+
+      // todo: see if we can get this to work with post requests
+      medicalRecordSectionResults.push(await fhirClient.get(fetchString));
     }
 
     const postPromises = builtQuery.compileAllPostRequests().map((req) => {
@@ -682,8 +691,8 @@ class QueryService {
 
     const noCertainMatch =
       jsonBody.resourceType === "OperationOutcome" &&
-      jsonBody.issue?.some((i) =>
-        i.details?.text?.includes("did not find a certain match"),
+      jsonBody.issue?.some(
+        (i) => i.details?.text?.includes("did not find a certain match"),
       );
 
     if (noCertainMatch) {
@@ -741,6 +750,7 @@ class QueryService {
       );
 
     const queryResponse = await QueryService.parseFhirSearch(response);
+
     return queryResponse;
   }
 

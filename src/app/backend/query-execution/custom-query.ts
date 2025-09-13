@@ -141,6 +141,24 @@ export class CustomQuery {
         params: formattedParams,
       };
     }
+    if (medicalRecordSections && medicalRecordSections.serviceRequests) {
+      const formattedParams = new URLSearchParams();
+      formattedParams.append("subject", `Patient/${patientId}`);
+      formattedParams.append("_include", "ServiceRequest:requester");
+      formattedParams.append("_include", "ServiceRequest:specimen");
+
+      // todo: should we assume all the code related to service requests are labs?
+      formattedParams.append("code", labsFilter);
+      // if (labsTimeFilter) {
+      //   formattedParams.append("occurrence", labsTimeFilter.startDate);
+      //   formattedParams.append("occurrence", labsTimeFilter.endDate);
+      // }
+
+      this.fhirResourceQueries["serviceRequest"] = {
+        basePath: `/ServiceRequest`,
+        params: formattedParams,
+      };
+    }
 
     if (labsFilter !== "") {
       const formattedParams = new URLSearchParams();

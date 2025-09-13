@@ -480,6 +480,7 @@ class FHIRClient {
    */
   async get(path: string): Promise<Response> {
     await this.ensureValidToken();
+    console.log(this.hostname + path);
     const response = await this.fetch(this.hostname + path, this.init);
 
     return response;
@@ -514,6 +515,7 @@ class FHIRClient {
       },
       body: params.toString(),
     };
+
     return this.fetch(this.hostname + path, requestOptions);
   }
 
