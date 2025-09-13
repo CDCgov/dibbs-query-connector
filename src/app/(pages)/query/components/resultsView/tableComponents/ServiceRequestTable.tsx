@@ -18,6 +18,7 @@ export interface ServiceRequestTableProps {
  * Displays a table of data from array of ServiceRequests resources.
  * @param root0 - ServiceRequest table props.
  * @param root0.ServiceRequests - The array of ServiceRequest resources.
+ * @param root0.serviceRequests
  * @returns - The ServiceRequestTable component.
  */
 const ServiceRequestTable: React.FC<ServiceRequestTableProps> = ({
