@@ -514,6 +514,7 @@ class FHIRClient {
       },
       body: params.toString(),
     };
+
     return this.fetch(this.hostname + path, requestOptions);
   }
 

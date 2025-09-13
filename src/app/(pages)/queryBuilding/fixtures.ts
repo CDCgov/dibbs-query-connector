@@ -1,4 +1,4 @@
-import { QueryTableResult } from "./utils";
+import { EMPTY_MEDICAL_RECORD_SECTIONS, QueryTableResult } from "./utils";
 import { CustomUserQuery } from "@/app/models/entities/query";
 import { DibbsValueSet } from "@/app/models/entities/valuesets";
 
@@ -783,7 +783,7 @@ export const gonorrheaSavedQuery: QueryTableResult = {
       },
     },
   },
-  medicalRecordSections: { immunizations: false, socialDeterminants: false },
+  medicalRecordSections: structuredClone(EMPTY_MEDICAL_RECORD_SECTIONS),
 };
 
 export const mockDibbsValueSets: DibbsValueSet[] = [
