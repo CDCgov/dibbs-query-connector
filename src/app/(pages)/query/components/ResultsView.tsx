@@ -19,6 +19,7 @@ import ImmunizationTable from "./resultsView/tableComponents/ImmunizationTable";
 import { CustomUserQuery } from "@/app/models/entities/query";
 import Skeleton from "react-loading-skeleton";
 import { Button } from "@trussworks/react-uswds";
+import ServiceRequestTable from "./resultsView/tableComponents/ServiceRequestTable";
 
 type ResultsViewProps = {
   patientRecordsResponse: PatientRecordsResponse | undefined;
@@ -140,6 +141,9 @@ function mapQueryResponseToAccordionDataStructure(
   const observations = resultsQueryResponse.Observation
     ? resultsQueryResponse.Observation
     : null;
+  const serviceRequests = resultsQueryResponse.ServiceRequest
+    ? resultsQueryResponse.ServiceRequest
+    : null;
   const encounters = resultsQueryResponse.Encounter
     ? resultsQueryResponse.Encounter
     : null;
@@ -166,6 +170,12 @@ function mapQueryResponseToAccordionDataStructure(
       title: "Observations",
       content: observations ? (
         <ObservationTable observations={observations} />
+      ) : null,
+    },
+    {
+      title: "Service Requests",
+      content: serviceRequests ? (
+        <ServiceRequestTable serviceRequests={serviceRequests} />
       ) : null,
     },
     {

@@ -190,6 +190,7 @@ const CodeLibrary: React.FC = () => {
   };
 
   const handleAddToQuery = async () => {
+    // TODO: add toasts here to make the redirect better for users
     if (!ctx?.selectedQuery?.queryId || !currentUser) return null;
     const setsToAdd = Object.values(customCodeIds).filter(
       (vs) => vs.includeValueSet, // don't add if we've checked and then un-checked

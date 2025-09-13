@@ -35,6 +35,7 @@ export type NestedQuery = {
 export const MEDICAL_RECORD_SECTION_KEYS = [
   "immunizations",
   "socialDeterminants",
+  "serviceRequests",
 ] as const;
 
 export type MedicalRecordSections = {

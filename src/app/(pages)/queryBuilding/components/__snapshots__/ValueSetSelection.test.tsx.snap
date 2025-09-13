@@ -602,6 +602,32 @@ exports[`tests the value set selection page highlights the active tab to the sid
                       </div>
                     </div>
                   </div>
+                  <div
+                    class="medicalRecordSectionRow"
+                  >
+                    <div
+                      data-testid="container-medical-record-section-checkbox-serviceRequests"
+                    >
+                      <div
+                        class="usa-checkbox"
+                        data-testid="checkbox"
+                      >
+                        <input
+                          aria-label="Select medical recored section serviceRequests"
+                          class="usa-checkbox__input"
+                          id="medical-record-section-checkbox-serviceRequests"
+                          name="medical-record-section-checkbox-serviceRequests"
+                          type="checkbox"
+                        />
+                        <label
+                          class="usa-checkbox__label"
+                          for="medical-record-section-checkbox-serviceRequests"
+                        >
+                          Include service requests
+                        </label>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

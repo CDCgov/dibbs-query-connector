@@ -434,6 +434,15 @@ class QueryService {
       medicalRecordSectionResults.push(await fhirClient.post(basePath, params));
     }
 
+    if (medicalRecordSections && medicalRecordSections.serviceRequests) {
+      const { basePath, params } = builtQuery.getQuery("serviceRequest");
+
+      let fetchString = `${basePath}?${params}`;
+
+      // todo: see if we can get this to work with post requests
+      medicalRecordSectionResults.push(await fhirClient.get(fetchString));
+    }
+
     const postPromises = builtQuery.compileAllPostRequests().map((req) => {
       return fhirClient.post(req.path, req.params);
     });
@@ -741,6 +750,7 @@ class QueryService {
       );
 
     const queryResponse = await QueryService.parseFhirSearch(response);
+
     return queryResponse;
   }
 
