@@ -2,7 +2,6 @@
 
 import { transaction } from "@/app/backend/db/decorators";
 import { auditable } from "@/app/backend/audit-logs/decorator";
-import { internal_getDbClient } from "./db/config";
 import {
   insertValueSetSql,
   insertConceptSql,
@@ -10,10 +9,6 @@ import {
   insertConditionSql,
   insertConditionToValuesetSql,
 } from "./seeding/seedSqlStructs";
-import {
-  INTENTIONAL_EMPTY_STRING_FOR_CONCEPT_VERSION,
-  INTENTIONAL_EMPTY_STRING_FOR_GEM_CODE,
-} from "../constants";
 import type { DibbsValueSet } from "../models/entities/valuesets";
 import type { Concept } from "../models/entities/concepts";
 import { QCResponse } from "../models/responses/collections";
@@ -26,10 +21,6 @@ import { CUSTOM_CONDITION_ID, CUSTOM_VALUESET_ARRAY_ID } from "@/app/constants";
 import dbService from "./db/service";
 
 class CustomCodeService {
-  private static get dbClient() {
-    return internal_getDbClient();
-  }
-
   // This may not be needed since these are user-created valuesets
   private static getSystemPrefix(system: string) {
     const match = system?.match(/https?:\/\/([^\.]+)/);
@@ -67,10 +58,7 @@ class CustomCodeService {
           ORDER BY name ASC;
         `;
 
-      const result = await CustomCodeService.dbClient.query(
-        selectValueSetQuery,
-        [id],
-      );
+      const result = await dbService.query(selectValueSetQuery, [id]);
 
       const vsWithAuthor = result.rows.map((item) => {
         if (item.user_created == true) {
@@ -142,8 +130,6 @@ class CustomCodeService {
           concept.code,
           vs.system,
           concept.display,
-          INTENTIONAL_EMPTY_STRING_FOR_GEM_CODE,
-          INTENTIONAL_EMPTY_STRING_FOR_CONCEPT_VERSION,
         ]);
       } catch (e) {
         console.error("Insert failed for concept:", e);

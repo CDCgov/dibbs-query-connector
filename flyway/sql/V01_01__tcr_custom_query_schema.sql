@@ -30,9 +30,7 @@ CREATE TABLE IF NOT EXISTS concepts (
     id TEXT PRIMARY KEY,
     code TEXT,
     code_system TEXT,
-    display TEXT,
-    gem_formatted_code TEXT,
-    version TEXT
+    display TEXT
 );
 
 CREATE TABLE IF NOT EXISTS condition_to_valueset (
@@ -60,8 +58,6 @@ CREATE TABLE IF NOT EXISTS query (
     author VARCHAR(255),
     date_created TIMESTAMP,
     date_last_modified TIMESTAMP,
-    time_window_number INT,
-    time_window_unit VARCHAR(80),
     medical_record_sections JSON DEFAULT NULL,
     PRIMARY KEY (id));
 

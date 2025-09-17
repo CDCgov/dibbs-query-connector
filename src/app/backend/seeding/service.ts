@@ -1,10 +1,6 @@
 "use server";
 import { Bundle, OperationOutcome, Parameters } from "fhir/r4";
-import {
-  INTENTIONAL_EMPTY_STRING_FOR_CONCEPT_VERSION,
-  INTENTIONAL_EMPTY_STRING_FOR_GEM_CODE,
-  MISSING_API_KEY_LITERAL,
-} from "../../constants";
+import { MISSING_API_KEY_LITERAL } from "../../constants";
 import { encode } from "base-64";
 import {
   CategoryToConditionArrayMap,
@@ -30,20 +26,16 @@ import {
   ValuesetStruct,
   ValuesetToConceptStruct,
 } from "./seedSqlStructs";
-import { internal_getDbClient } from "../db/config";
 import type { DibbsValueSet } from "../../models/entities/valuesets";
 import { Concept } from "../../models/entities/concepts";
 import { adminRequired, transaction } from "@/app/backend/db/decorators";
 import { auditable } from "@/app/backend/audit-logs/decorator";
 import { QCResponse } from "../../models/responses/collections";
+import dbService from "../db/service";
+import type { PoolClient } from "pg";
 
 export type ErsdOrVsacResponse = Bundle | Parameters | OperationOutcome;
-
 class SeedingService {
-  private static get dbClient() {
-    return internal_getDbClient();
-  }
-
   private static getValueSetsByConditionIds = `
     SELECT c.display, c.code_system, c.code, vs.name as valueset_name, vs.id as valueset_id, vs.oid as valueset_external_id, vs.version, vs.author as author, vs.type, vs.dibbs_concept_type as dibbs_concept_type, vs.user_created as user_created, ctvs.condition_id
     FROM valuesets vs 
@@ -65,7 +57,7 @@ class SeedingService {
       FROM pg_class
       WHERE relname = 'valuesets';
     `;
-    const result = await SeedingService.dbClient.query(query);
+    const result = await dbService.query(query);
 
     // Return true if the estimated count > 0, otherwise false
     return (
@@ -94,10 +86,9 @@ class SeedingService {
     // Check that the value set itself was inserted
     const vsSql = `SELECT * FROM valuesets WHERE oid = $1;`;
     try {
-      const result = await SeedingService.dbClient.query(vsSql, [
-        vs.valueSetExternalId,
-      ]);
+      const result = await dbService.query(vsSql, [vs.valueSetExternalId]);
       const foundVS = result.rows[0];
+
       if (
         foundVS.version !== vs.valueSetVersion ||
         foundVS.name !== vs.valueSetName ||
@@ -123,9 +114,7 @@ class SeedingService {
         const conceptSql = `SELECT * FROM concepts WHERE id = $1;`;
 
         try {
-          const result = await SeedingService.dbClient.query(conceptSql, [
-            conceptId,
-          ]);
+          const result = await dbService.query(conceptSql, [conceptId]);
           const foundConcept: Concept = result.rows[0];
 
           // We accumulate the unique DIBBs concept IDs of anything that's missing
@@ -156,9 +145,7 @@ class SeedingService {
     // Confirm that valueset_to_concepts contains all relevant FK mappings
     const mappingSql = `SELECT * FROM valueset_to_concept WHERE valueset_id = $1;`;
     try {
-      const result = await SeedingService.dbClient.query(mappingSql, [
-        vs.valueSetId,
-      ]);
+      const result = await dbService.query(mappingSql, [vs.valueSetId]);
       const rows = result.rows;
       const missingConceptsFromMappings = vs.concepts.map((c) => {
         const systemPrefix = vs.system
@@ -167,7 +154,7 @@ class SeedingService {
         const conceptUniqueId = `${systemPrefix}_${c.code}`;
 
         // Accumulate unique IDs of any concept we can't find among query rows
-        const fIdx = rows.findIndex((r) => r["concept_id"] === conceptUniqueId);
+        const fIdx = rows.findIndex((r) => r["conceptId"] === conceptUniqueId);
         if (fIdx === -1) {
           console.error(
             "Couldn't locate concept " +
@@ -206,10 +193,10 @@ class SeedingService {
   static async executeCategoryUpdates(): Promise<{ success: boolean }> {
     try {
       console.log("Executing category data updates on inserted conditions");
-      await SeedingService.dbClient.query(updateErsdCategorySql);
-      await SeedingService.dbClient.query(updateNewbornScreeningCategorySql);
-      await SeedingService.dbClient.query(updatedCancerCategorySql);
-      await SeedingService.dbClient.query(`DROP TABLE category_data`);
+      await dbService.query(updateErsdCategorySql);
+      await dbService.query(updateNewbornScreeningCategorySql);
+      await dbService.query(updatedCancerCategorySql);
+      await dbService.query(`DROP TABLE category_data`);
       console.log("All inserted queries cross-referenced with category data");
       return { success: true };
     } catch (error) {
@@ -351,8 +338,8 @@ class SeedingService {
             (struct as ValuesetStruct).name,
             (struct as ValuesetStruct).author,
             (struct as ValuesetStruct).type,
-            (struct as ValuesetStruct).dibbs_concept_type,
-            (struct as ValuesetStruct).user_created,
+            (struct as ValuesetStruct).dibbsConceptType,
+            (struct as ValuesetStruct).userCreated,
           ];
           break;
         case "concepts":
@@ -360,18 +347,16 @@ class SeedingService {
           values = [
             (struct as ConceptStruct).id,
             (struct as ConceptStruct).code,
-            (struct as ConceptStruct).code_system,
+            (struct as ConceptStruct).codeSystem,
             (struct as ConceptStruct).display,
-            INTENTIONAL_EMPTY_STRING_FOR_GEM_CODE,
-            (struct as ConceptStruct).version,
           ];
           break;
         case "valueset_to_concept":
           insertSql = insertValuesetToConceptSql;
           values = [
             (struct as ValuesetToConceptStruct).id,
-            (struct as ValuesetToConceptStruct).valueset_id,
-            (struct as ValuesetToConceptStruct).concept_id,
+            (struct as ValuesetToConceptStruct).valuesetId,
+            (struct as ValuesetToConceptStruct).conceptId,
           ];
           break;
         case "conditions":
@@ -388,36 +373,34 @@ class SeedingService {
           insertSql = insertConditionToValuesetSql;
           values = [
             (struct as ConditionToValueSetStruct).id,
-            (struct as ConditionToValueSetStruct).condition_id,
-            (struct as ConditionToValueSetStruct).valueset_id,
+            (struct as ConditionToValueSetStruct).conditionId,
+            (struct as ConditionToValueSetStruct).valuesetId,
             (struct as ConditionToValueSetStruct).source,
           ];
           break;
         case "category":
           insertSql = insertCategorySql;
           values = [
-            (struct as CategoryStruct).condition_name,
-            (struct as CategoryStruct).condition_code,
+            (struct as CategoryStruct).conditionName,
+            (struct as CategoryStruct).conditionCode,
             (struct as CategoryStruct).category,
           ];
           break;
         case "query":
           insertSql = insertDemoQueryLogicSql;
           values = [
-            (struct as QueryDataStruct).query_name,
-            (struct as QueryDataStruct).query_data,
-            (struct as QueryDataStruct).conditions_list,
+            (struct as QueryDataStruct).queryName,
+            (struct as QueryDataStruct).queryData,
+            (struct as QueryDataStruct).conditionsList,
             (struct as QueryDataStruct).author,
-            (struct as QueryDataStruct).date_created,
-            (struct as QueryDataStruct).date_last_modified,
-            (struct as QueryDataStruct).time_window_number,
-            (struct as QueryDataStruct).time_window_unit,
+            (struct as QueryDataStruct).dateCreated,
+            (struct as QueryDataStruct).dateLastModified,
           ];
           break;
       }
 
       try {
-        await SeedingService.dbClient.query(insertSql, values);
+        await dbService.query(insertSql, values);
       } catch (e) {
         console.error(`Insert failed for ${insertType}:`, e);
         errors.push(
@@ -439,12 +422,13 @@ class SeedingService {
   @auditable
   static async insertValueSet(
     vs: DibbsValueSet,
+    dbClient: PoolClient,
   ): Promise<{ success: boolean; error?: string }> {
     const errorArray: string[] = [];
 
     // Insert the value set
     try {
-      await SeedingService.generateValueSetSqlPromise(vs);
+      await SeedingService.generateValueSetSqlPromise(vs, dbClient);
     } catch (e) {
       console.error(
         `ValueSet insertion failed for ${vs.valueSetId}_${vs.valueSetVersion}`,
@@ -454,7 +438,10 @@ class SeedingService {
     }
 
     // Insert concepts (sequentially)
-    const conceptInserts = SeedingService.generateConceptSqlPromises(vs);
+    const conceptInserts = SeedingService.generateConceptSqlPromises(
+      vs,
+      dbClient,
+    );
     for (const insert of conceptInserts) {
       try {
         await insert;
@@ -463,16 +450,18 @@ class SeedingService {
         errorArray.push("Error during concept insertion");
       }
     }
-
     // Insert concept-to-valueset joins (sequentially)
-    const joinInserts =
-      SeedingService.generateValuesetConceptJoinSqlPromises(vs);
+    const joinInserts = SeedingService.generateValuesetConceptJoinSqlPromises(
+      vs,
+      dbClient,
+    );
     for (const join of joinInserts) {
       try {
         await join;
       } catch (e) {
         console.error("Error inserting ValueSet <-> Concept mapping:", e);
         errorArray.push("Error during ValueSet-Concept join");
+        throw Error("Join failed");
       }
     }
 
@@ -497,7 +486,7 @@ class SeedingService {
    */
   static async getConditionsData() {
     const query = "SELECT * FROM conditions";
-    const result = await SeedingService.dbClient.query(query);
+    const result = await dbService.query(query);
     const rows = result.rows;
 
     // 1. Grouped by category with id:name pairs
@@ -540,7 +529,7 @@ class SeedingService {
       const queryString =
         SeedingService.getValueSetsByConditionIds + escapedValues;
 
-      const result = await SeedingService.dbClient.query(queryString, ids);
+      const result = await dbService.query(queryString, ids);
       if (result.rows.length === 0) {
         console.error("No results found for given condition ids", ids);
         return [];
@@ -573,13 +562,13 @@ class SeedingService {
       ORDER BY name ASC;
     `;
 
-      const result = await SeedingService.dbClient.query(selectAllVSQuery);
+      const result = await dbService.query(selectAllVSQuery);
 
       const itemsWithAuthor = result.rows.map((item) => {
-        if (item.user_created == true) {
+        if (item.userCreated == true) {
           item.author =
-            item.first_name && item.last_name
-              ? `${item.first_name} ${item.last_name}`
+            item.firstName && item.lastName
+              ? `${item.firstName} ${item.lastName}`
               : item.username;
           return item;
         }
@@ -607,9 +596,13 @@ class SeedingService {
   /**
    * Helper function that execute the category data updates for inserted conditions.
    * @param vs - The ValueSet in of the shape of our internal data model to insert
+   * @param dbClient - Specific managed DbClient to prevent transaction errors
    * @returns The SQL statement array for the value set for insertion
    */
-  private static generateValueSetSqlPromise(vs: DibbsValueSet) {
+  private static generateValueSetSqlPromise(
+    vs: DibbsValueSet,
+    dbClient: PoolClient,
+  ) {
     const valueSetOid = vs.valueSetExternalId;
 
     // TODO: based on how non-VSAC valuests are shaped in the future, we may need
@@ -631,7 +624,7 @@ class SeedingService {
       vs.dibbsConceptType,
       vs.userCreated ?? false,
     ];
-    return SeedingService.dbClient.query(insertValueSetSql, valuesArray);
+    return dbClient.query(insertValueSetSql, valuesArray);
   }
 
   /**
@@ -640,19 +633,21 @@ class SeedingService {
    * @param vs - The ValueSet in of the shape of our internal data model to insert
    * @returns The SQL statement array for all concepts for insertion
    */
-  private static generateConceptSqlPromises(vs: DibbsValueSet) {
+  private static generateConceptSqlPromises(
+    vs: DibbsValueSet,
+    dbClient: PoolClient,
+  ) {
     return vs.concepts.map((concept) => {
       const systemPrefix = vs.system
         ? SeedingService.stripProtocolAndTLDFromSystemUrl(vs.system)
         : "";
       const conceptUniqueId = `${systemPrefix}_${concept.code}`;
-      return SeedingService.dbClient.query(insertConceptSql, [
+
+      return dbClient.query(insertConceptSql, [
         conceptUniqueId,
         concept.code,
         vs.system,
         concept.display,
-        INTENTIONAL_EMPTY_STRING_FOR_GEM_CODE,
-        INTENTIONAL_EMPTY_STRING_FOR_CONCEPT_VERSION,
       ]);
     });
   }
@@ -662,13 +657,17 @@ class SeedingService {
    * @param vs - The ValueSet in of the shape of our internal data model to insert
    * @returns The SQL statement array for join rows
    */
-  private static generateValuesetConceptJoinSqlPromises(vs: DibbsValueSet) {
+  private static generateValuesetConceptJoinSqlPromises(
+    vs: DibbsValueSet,
+    dbClient: PoolClient,
+  ) {
     return vs.concepts.map((concept) => {
       const systemPrefix = vs.system
         ? SeedingService.stripProtocolAndTLDFromSystemUrl(vs.system)
         : "";
       const conceptUniqueId = `${systemPrefix}_${concept.code}`;
-      return SeedingService.dbClient.query(insertValuesetToConceptSql, [
+
+      return dbClient.query(insertValuesetToConceptSql, [
         `${vs.valueSetId}_${conceptUniqueId}`,
         vs.valueSetId,
         conceptUniqueId,

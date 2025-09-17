@@ -12,7 +12,7 @@ import {
   getSavedQueryByIdHelp,
   saveCustomQueryHelp,
 } from "../src/app/backend/query-building/lib";
-import { internal_getDbClient } from "../src/app/backend/db/config";
+import { dontUseOutsideConfigOrTests_getDbClient } from "../src/app/backend/db/config";
 import { translateSnakeStringToCamelCase } from "../src/app/backend/db/util";
 import { runAxeAccessibilityChecks } from "./utils";
 import { PAGE_TITLES } from "../src/app/(pages)/query/components/stepIndicator/StepIndicator";
@@ -378,7 +378,7 @@ const ADDED_CONDITION = {
   condition_id: "840539006",
 };
 const CANCER_CONDITION_ID = "2";
-const dbClient = internal_getDbClient();
+const dbClient = dontUseOutsideConfigOrTests_getDbClient();
 
 async function createTestQuery() {
   const queryInputFixture = CANCER_FRONTEND_NESTED_INPUT as NestedQuery;

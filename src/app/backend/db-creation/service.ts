@@ -25,6 +25,7 @@ import {
 } from "../seeding/seedSqlStructs";
 import { indexErsdByOid, translateVSACToInternalValueSet } from "./lib";
 import { DibbsValueSet } from "@/app/models/entities/valuesets";
+import dbService from "../db/service";
 
 type ersdCondition = {
   code: string;
@@ -116,7 +117,7 @@ export async function getOidsFromErsd() {
  */
 export async function seedBatchValueSetsFromVsac(
   oidData: OidData,
-  batchSize = 100,
+  batchSize = 5,
 ) {
   const umlsKey = process.env.UMLS_API_KEY;
   if (!umlsKey) {
@@ -138,6 +139,8 @@ export async function seedBatchValueSetsFromVsac(
     oidData.oids.length,
     "value sets.",
   );
+  const dbClient = await dbService.connect();
+  dbClient.query("BEGIN");
 
   while (startIdx < oidData.oids.length) {
     console.log("Batching IDs", startIdx, "to", lastIdx);
@@ -185,7 +188,7 @@ export async function seedBatchValueSetsFromVsac(
     await Promise.all(
       valueSetsToInsert.map(async (vs) => {
         if (vs) {
-          await insertValueSet(vs);
+          await insertValueSet(vs, dbClient);
         }
       }),
     );
@@ -206,7 +209,7 @@ export async function seedBatchValueSetsFromVsac(
             "Resolving missing values or errors for valueset",
             vs.valueSetId,
           );
-          await insertValueSet(vs);
+          await insertValueSet(vs, dbClient);
           missingData = await checkValueSetInsertion(vs);
         }
       }
@@ -221,6 +224,8 @@ export async function seedBatchValueSetsFromVsac(
     // free to ensure the pool itself doesn't time out
     await sleep(2000);
   }
+
+  dbClient.query("COMMIT");
 
   // Once all the value sets are inserted, we need to do conditions
   // Step one is filtering out duplicates, since we just assembled
@@ -276,8 +281,8 @@ export async function seedBatchValueSetsFromVsac(
 
     const dbCTV: ConditionToValueSetStruct = {
       id: ctvID,
-      condition_id: c.code,
-      valueset_id: c.valueset_id + "_" + oidsToVersion.get(c.valueset_id),
+      conditionId: c.code,
+      valuesetId: c.valueset_id + "_" + oidsToVersion.get(c.valueset_id),
       source: c.system,
     };
     return dbCTV;
@@ -327,63 +332,6 @@ async function insertSeedDbStructs(structType: string) {
 }
 
 /**
- * Overall orchestration function that performs the scripted process of querying
- * the eRSD, extracting OIDs, then inserting valuesets into the DB.
- * @returns a { success: true/false reload: true/false } status dictionary for
- * whether the creation failed / needs a reload on the frontend for display
- */
-export async function createDibbsDB() {
-  // Check if the DB already contains valuesets
-  const dbHasData = await checkDBForData();
-
-  if (!dbHasData) {
-    try {
-      const ersdOidData = await getOidsFromErsd();
-      if (ersdOidData) {
-        await seedBatchValueSetsFromVsac(ersdOidData);
-      } else {
-        console.error("Could not load eRSD, aborting DIBBs DB creation");
-      }
-
-      // Only run default and custom insertions if we're making the dump
-      // file for dev
-      // if (process.env.NODE_ENV !== "production") {
-      await insertSeedDbStructs("valuesets");
-      await insertSeedDbStructs("concepts");
-      await insertSeedDbStructs("valueset_to_concept");
-      await insertSeedDbStructs("conditions");
-      await insertSeedDbStructs("condition_to_valueset");
-      await insertSeedDbStructs("query");
-      await insertSeedDbStructs("category");
-      await executeCategoryUpdates();
-      return { success: true, reload: true };
-
-      // }
-    } catch (e) {
-      if (e instanceof Error) {
-        console.error("DB reload failed", e.message);
-        return {
-          success: false,
-          reload: false,
-          message: e.message,
-          cause: e.cause,
-        };
-      }
-
-      return {
-        success: false,
-        reload: false,
-        message:
-          "DB creation failed with an unknown error. Please contact us for help",
-      };
-    }
-  } else {
-    console.log("Database already has data; skipping DIBBs DB creation.");
-    return { success: true, reload: false };
-  }
-}
-
-/**
  * helper function to generate VSAC promises
  *
  * @param oidsToFetch - OIDs from the eRSD to query from VSAC
@@ -408,3 +356,59 @@ export async function generateBatchVsacPromises(oidsToFetch: string[]) {
 
   return valueSetPromises;
 }
+
+class SeedingService {
+  static async createDibbsDB() {
+    // Check if the DB already contains valuesets
+    const dbHasData = await checkDBForData();
+
+    if (!dbHasData) {
+      try {
+        const ersdOidData = await getOidsFromErsd();
+        if (ersdOidData) {
+          await seedBatchValueSetsFromVsac(ersdOidData);
+        } else {
+          console.error("Could not load eRSD, aborting DIBBs DB creation");
+        }
+
+        // Only run default and custom insertions if we're making the dump
+        // file for dev
+        // if (process.env.NODE_ENV !== "production") {
+        await insertSeedDbStructs("valuesets");
+        await insertSeedDbStructs("concepts");
+        await insertSeedDbStructs("valueset_to_concept");
+        await insertSeedDbStructs("conditions");
+        await insertSeedDbStructs("condition_to_valueset");
+        await insertSeedDbStructs("query");
+        await insertSeedDbStructs("category");
+        await executeCategoryUpdates();
+
+        return { success: true, reload: true };
+
+        // }
+      } catch (e) {
+        if (e instanceof Error) {
+          console.error("DB reload failed", e.message);
+          return {
+            success: false,
+            reload: false,
+            message: e.message,
+            cause: e.cause,
+          };
+        }
+
+        return {
+          success: false,
+          reload: false,
+          message:
+            "DB creation failed with an unknown error. Please contact us for help",
+        };
+      }
+    } else {
+      console.log("Database already has data; skipping DIBBs DB creation.");
+      return { success: true, reload: false };
+    }
+  }
+}
+
+export const createDibbsDB = SeedingService.createDibbsDB;

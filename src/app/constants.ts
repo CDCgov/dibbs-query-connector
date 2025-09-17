@@ -205,21 +205,6 @@ export function isFhirResource(resource: unknown): resource is FhirResource {
   );
 }
 
-// The value for "concept version" (sometimes) exists under "expansion" in the VSAC FHIR
-// response. This is similar, but different in some subtle ways from the "compose.include"
-// path that we're currently using to grab concept information. Although we could
-// grab and parse this information from the FHIR response, it would involve
-// changing our data model to store information that we think is a "nice to
-// have", which is only available sometimes. As a result, we're purposefully
-// leaving this blank until we can clean up the migration schema to drop these columns
-export const INTENTIONAL_EMPTY_STRING_FOR_CONCEPT_VERSION = "";
-
-// Originally, the column in the concept table was set up to maintain backwards e
-//compatibility with the ICD-9 codes that the team is deciding not to support after
-// we clean up the DB migration. Leaving these in until we can clean these up
-// in the migration schema
-export const INTENTIONAL_EMPTY_STRING_FOR_GEM_CODE = "";
-
 export const INVALID_QUERY = `Query identified in the id param not found in the set of saved queries. Please provide an ID that exists in the saved set of queries.`;
 export const INVALID_FHIR_SERVERS = `Invalid fhir_server. Please provide a valid fhir_server.`;
 export const RESPONSE_BODY_IS_NOT_PATIENT_RESOURCE =

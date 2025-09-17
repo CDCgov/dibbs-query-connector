@@ -261,8 +261,8 @@ class QueryService {
     }
 
     try {
-      const patientLink = task.output?.find((output) =>
-        output.valueString?.includes("Patient-Page1"),
+      const patientLink = task.output?.find(
+        (output) => output.valueString?.includes("Patient-Page"),
       )?.valueString;
 
       if (!patientLink) {
@@ -691,8 +691,8 @@ class QueryService {
 
     const noCertainMatch =
       jsonBody.resourceType === "OperationOutcome" &&
-      jsonBody.issue?.some((i) =>
-        i.details?.text?.includes("did not find a certain match"),
+      jsonBody.issue?.some(
+        (i) => i.details?.text?.includes("did not find a certain match"),
       );
 
     if (noCertainMatch) {
