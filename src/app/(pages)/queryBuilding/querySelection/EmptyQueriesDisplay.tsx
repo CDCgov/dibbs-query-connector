@@ -55,17 +55,17 @@ export const EmptyQueriesDisplay: React.FC<EmptyQueryProps> = ({
         variant: "error",
         autoClose: false,
       });
+    } else {
+      setDbSeeded(success);
+      showToastConfirmation({
+        heading: "Database seeding finished",
+        body: "Seed data successfully inserted into the database. Refresh the page to begin building your first query",
+        autoClose: false,
+      });
     }
+
     // Stop loading and redirect once function is complete
     setLoading(false);
-    setDbSeeded(success);
-
-    showToastConfirmation({
-      heading: "Database seeding finished",
-      body: "Seed data successfully inserted into the database. Refresh the page to begin building your first query",
-      autoClose: false,
-    });
-
     if (reload) {
       // Refresh query building page to display the now seeded values
       location.reload();

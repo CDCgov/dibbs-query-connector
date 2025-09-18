@@ -363,10 +363,11 @@ class SeedingService {
     const dbHasData = await checkDBForData();
 
     if (!dbHasData) {
+      const dbClient = await dbService.connect();
+      dbClient.query("BEGIN");
       try {
         const ersdOidData = await getOidsFromErsd();
-        const dbClient = await dbService.connect();
-        dbClient.query("BEGIN");
+
         if (ersdOidData) {
           await SeedingService.seedBatchValueSetsFromVsac(
             ersdOidData,
@@ -396,11 +397,12 @@ class SeedingService {
         await SeedingService.executeCategoryUpdates(dbClient);
         dbClient.query("COMMIT");
         dbService.disconnect();
-
         return { success: true, reload: true };
 
         // }
       } catch (e) {
+        dbClient.query("ROLLBACK");
+        dbService.disconnect();
         if (e instanceof Error) {
           console.error("DB reload failed", e.message);
           return {
