@@ -174,10 +174,7 @@ class SeedingService {
       // Finally, we verify that the insert was performed correctly
       valueSetsToInsert.map(async (vs) => {
         if (vs) {
-          let missingData = await SeedingService.checkValueSetInsertion(
-            vs,
-            dbClient,
-          );
+          let missingData = await SeedingService.checkValueSetInsertion(vs);
           // Note: We don't actually have functions for inserting concepts,
           // so if anything is missing just try re-inserting the whole VS.
           // This ensures that all reference data and FKs are also updated.
@@ -191,10 +188,7 @@ class SeedingService {
               vs.valueSetId,
             );
             await SeedingService.insertValueSet(vs, dbClient);
-            missingData = await SeedingService.checkValueSetInsertion(
-              vs,
-              dbClient,
-            );
+            missingData = await SeedingService.checkValueSetInsertion(vs);
           }
         }
       });
@@ -448,7 +442,7 @@ class SeedingService {
    
    * @returns A data structure reporting on missing concepts or value set links.
    */
-  static async checkValueSetInsertion(vs: DibbsValueSet, dbClient: PoolClient) {
+  static async checkValueSetInsertion(vs: DibbsValueSet) {
     const missingData = {
       missingValueSet: false,
       missingConcepts: [] as Array<string>,
@@ -458,7 +452,7 @@ class SeedingService {
     // Check that the value set itself was inserted
     const vsSql = `SELECT * FROM valuesets WHERE oid = $1;`;
     try {
-      const result = await dbClient.query(vsSql, [vs.valueSetExternalId]);
+      const result = await dbService.query(vsSql, [vs.valueSetExternalId]);
       const foundVS = result.rows[0];
 
       if (
@@ -517,7 +511,7 @@ class SeedingService {
     // Confirm that valueset_to_concepts contains all relevant FK mappings
     const mappingSql = `SELECT * FROM valueset_to_concept WHERE valueset_id = $1;`;
     try {
-      const result = await dbClient.query(mappingSql, [vs.valueSetId]);
+      const result = await dbService.query(mappingSql, [vs.valueSetId]);
       const rows = result.rows;
       const missingConceptsFromMappings = vs.concepts.map((c) => {
         const systemPrefix = vs.system
