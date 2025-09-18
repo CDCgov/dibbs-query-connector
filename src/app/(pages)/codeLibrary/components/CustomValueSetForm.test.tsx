@@ -12,10 +12,10 @@ import { getAllGroupMembers } from "@/app/backend/usergroup-management";
 import { mockAdmin } from "../../userManagement/test-utils";
 import { emptyValueSet } from "../utils";
 import {
+  getAllValueSets,
   getCustomValueSetById,
   insertCustomValueSet,
 } from "@/app/backend/custom-code-service";
-import { getAllValueSets } from "@/app/backend/seeding/service";
 
 jest.mock("next-auth/react");
 
@@ -34,16 +34,13 @@ jest.mock("@/app/backend/user-management", () => ({
   getUserByUsername: jest.fn(),
 }));
 
-jest.mock("@/app/backend/seeding/service", () => ({
-  getAllValueSets: jest.fn().mockReturnValue({ items: [] }),
-}));
-
 jest.mock("@/app/backend/usergroup-management", () => ({
   getAllUserGroups: jest.fn(),
   getAllGroupMembers: jest.fn(),
 }));
 
 jest.mock("@/app/backend/custom-code-service", () => ({
+  getAllValueSets: jest.fn().mockReturnValue({ items: [] }),
   getCustomValueSetById: jest.fn(),
   insertCustomValueSet: jest.fn(),
 }));

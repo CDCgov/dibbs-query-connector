@@ -126,6 +126,15 @@ INSERT INTO condition_to_valueset
   RETURNING id;
 `;
 
+export const getValueSetsByConditionIdsSql = `
+    SELECT c.display, c.code_system, c.code, vs.name as valueset_name, vs.id as valueset_id, vs.oid as valueset_external_id, vs.version, vs.author as author, vs.type, vs.dibbs_concept_type as dibbs_concept_type, vs.user_created as user_created, ctvs.condition_id
+    FROM valuesets vs 
+    LEFT JOIN condition_to_valueset ctvs on vs.id = ctvs.valueset_id 
+    LEFT JOIN valueset_to_concept vstc on vs.id = vstc.valueset_id
+    LEFT JOIN concepts c on vstc.concept_id = c.id
+    WHERE ctvs.condition_id IN (
+  `;
+
 export const insertCategorySql = `
 INSERT INTO category_data
   VALUES($1,$2,$3)

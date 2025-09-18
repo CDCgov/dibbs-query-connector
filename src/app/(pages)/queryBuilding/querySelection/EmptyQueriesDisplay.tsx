@@ -60,6 +60,12 @@ export const EmptyQueriesDisplay: React.FC<EmptyQueryProps> = ({
     setLoading(false);
     setDbSeeded(success);
 
+    showToastConfirmation({
+      heading: "Database seeding finished",
+      body: "Seed data successfully inserted into the database. Refresh the page to begin building your first query",
+      autoClose: false,
+    });
+
     if (reload) {
       // Refresh query building page to display the now seeded values
       location.reload();

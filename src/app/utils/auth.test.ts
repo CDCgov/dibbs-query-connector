@@ -10,7 +10,7 @@ import {
   superAdminAccessCheck,
   adminAccessCheck,
 } from "@/app/utils/auth";
-import { getConditionsData } from "../backend/seeding/service";
+import { getConditionsData } from "../backend/query-building/service";
 
 jest.mock("@/auth", () => ({
   auth: jest.fn(),
@@ -20,7 +20,7 @@ jest.mock("@/app/backend/user-management", () => ({
   getUserRole: jest.fn(),
 }));
 
-jest.mock("@/app/backend/seeding/service", () => ({
+jest.mock("@/app/backend/query-building/service", () => ({
   getConditionsData: jest.fn(),
 }));
 

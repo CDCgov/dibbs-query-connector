@@ -1,6 +1,8 @@
 "use server";
 
 import type {
+  CategoryToConditionArrayMap,
+  ConditionsMap,
   MedicalRecordSections,
   NestedQuery,
   QueryTableResult,
@@ -232,6 +234,45 @@ class QueryBuildingService {
       return assignedQueries.flat();
     }
   }
+
+  /**
+   * Retrieves all records from the conditions table in the database.
+   * This function queries the database to fetch condition data, including
+   * condition name, code, and category.
+   * @returns An object containing:
+   * - `conditionCatergories`: a JSON object grouped by category with id:name pairs,
+   * to display on build-query page
+   * - `conditionLookup`: a JSON object with id as the key and name as the value in
+   * order to make a call to the DB with the necessary ID(s) to get the valuesets
+   * on subsequent pages.
+   */
+  static async getConditionsData() {
+    const query = "SELECT * FROM conditions";
+    const result = await dbService.query(query);
+    const rows = result.rows;
+
+    // 1. Grouped by category with id:name pairs
+    const categoryToConditionNameArrayMap: CategoryToConditionArrayMap =
+      rows.reduce((acc, row) => {
+        const { category, id, name } = row;
+        if (!acc[category]) {
+          acc[category] = [];
+        }
+        acc[category].push({ id: id, name: name });
+        return acc;
+      }, {} as CategoryToConditionArrayMap);
+
+    // 2. ID-Name mapping
+    const conditionIdToNameMap: ConditionsMap = rows.reduce((acc, row) => {
+      acc[row.id] = { name: row.name, category: row.category };
+      return acc;
+    }, {} as ConditionsMap);
+
+    return {
+      categoryToConditionNameArrayMap,
+      conditionIdToNameMap,
+    } as const;
+  }
 }
 
 export const getSavedQueryByName = QueryBuildingService.getSavedQueryByName;
@@ -242,3 +283,4 @@ export const getCustomQueries = QueryBuildingService.getCustomQueries;
 export const getQueryList = QueryBuildingService.getQueryList;
 export const getQueryById = QueryBuildingService.getQueryById;
 export const getQueriesForUser = QueryBuildingService.getQueriesForUser;
+export const getConditionsData = QueryBuildingService.getConditionsData;

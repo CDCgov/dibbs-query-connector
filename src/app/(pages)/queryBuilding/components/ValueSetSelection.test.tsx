@@ -2,27 +2,27 @@ import { renderWithUser, RootProviderMock } from "@/app/tests/unit/setup";
 import BuildFromTemplates from "../buildFromTemplates/BuildFromTemplates";
 import { screen, waitFor } from "@testing-library/dom";
 import { VALUESET_SELECTION_SEARCH_PLACEHOLDER } from "./utils";
-import { getSavedQueryById } from "@/app/backend/query-building/service";
 import {
   getConditionsData,
-  getValueSetsAndConceptsByConditionIDs,
-} from "@/app/backend/seeding/service";
+  getSavedQueryById,
+} from "@/app/backend/query-building/service";
 import {
   conditionIdToNameMap,
   categoryToConditionNameArrayMap,
   gonorrheaValueSets,
   gonorrheaSavedQuery,
 } from "../fixtures";
+import { getValueSetsAndConceptsByConditionIDs } from "@/app/backend/db-creation/service";
 
 const currentPage = "/";
-jest.mock("../../../backend/seeding/service", () => ({
-  getCustomQueries: jest.fn(),
-  getConditionsData: jest.fn(),
+jest.mock("../../../backend/db-creation/service", () => ({
   getValueSetsAndConceptsByConditionIDs: jest.fn(),
 }));
 
 jest.mock("../../../backend/query-building/service", () => ({
+  getCustomQueries: jest.fn(),
   getSavedQueryById: jest.fn(),
+  getConditionsData: jest.fn(),
 }));
 
 const mockPush = jest.fn();

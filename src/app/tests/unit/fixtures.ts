@@ -10,7 +10,7 @@ export const CATEGORY_TO_CONDITION_ARRAY_MAP =
   categoryToConditionArrayMap as unknown as CategoryToConditionArrayMap;
 
 export const CHLAMYDIA_DB_VALUES = queryTableDefaults.query.find((v) =>
-  v.query_name.includes("Chlamydia case investigation"),
+  v.queryName.includes("Chlamydia case investigation"),
 ) as unknown as Record<string, string>;
 
 const emptyChlamydiaDict: { [k: string]: string } = {};

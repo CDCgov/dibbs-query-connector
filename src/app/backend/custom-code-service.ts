@@ -1,6 +1,6 @@
 "use server";
 
-import { transaction } from "@/app/backend/db/decorators";
+import { adminRequired, transaction } from "@/app/backend/db/decorators";
 import { auditable } from "@/app/backend/audit-logs/decorator";
 import {
   insertValueSetSql,
@@ -8,7 +8,7 @@ import {
   insertValuesetToConceptSql,
   insertConditionSql,
   insertConditionToValuesetSql,
-} from "./seeding/seedSqlStructs";
+} from "./db-creation/seedSqlStructs";
 import type { DibbsValueSet } from "../models/entities/valuesets";
 import type { Concept } from "../models/entities/concepts";
 import { QCResponse } from "../models/responses/collections";
@@ -314,6 +314,47 @@ class CustomCodeService {
       return { success: false, error: String(e) };
     }
   }
+
+  /**
+   * Retrieves all available value sets in Query Connector.
+   * @returns A list of value sets registered in the query connector.
+   */
+  @adminRequired
+  static async getAllValueSets(): Promise<QCResponse<DibbsValueSet>> {
+    try {
+      const selectAllVSQuery = `
+      SELECT c.display, c.code_system, c.code, c.id as internal_id, vs.name as valueset_name, vs.id as valueset_id, vs.oid as valueset_external_id, vs.version, vs.author as author, 
+        vs.type, vs.dibbs_concept_type as dibbs_concept_type, vs.user_created, ctvs.condition_id, u.first_name, u.last_name, u.username
+      FROM valuesets vs 
+      LEFT JOIN condition_to_valueset ctvs on vs.id = ctvs.valueset_id 
+      LEFT JOIN valueset_to_concept vstc on vs.id = vstc.valueset_id
+      LEFT JOIN concepts c on vstc.concept_id = c.id
+      LEFT JOIN users u on vs.author = u.id::text
+      ORDER BY name ASC;
+    `;
+
+      const result = await dbService.query(selectAllVSQuery);
+
+      const itemsWithAuthor = result.rows.map((item) => {
+        if (item.userCreated == true) {
+          item.author =
+            item.firstName && item.lastName
+              ? `${item.firstName} ${item.lastName}`
+              : item.username;
+          return item;
+        }
+        return item;
+      });
+
+      return {
+        totalItems: result.rowCount,
+        items: itemsWithAuthor,
+      } as QCResponse<DibbsValueSet>;
+    } catch (error) {
+      console.error("Error retrieving user groups:", error);
+      throw error;
+    }
+  }
 }
 
 export const getCustomCodeCondition = CustomCodeService.addCustomCodeCondition;
@@ -323,3 +364,4 @@ export const insertCustomValuesetsIntoQuery =
   CustomCodeService.insertCustomValuesetsIntoQuery;
 export const deleteCustomConcept = CustomCodeService.deleteCustomConcept;
 export const getCustomValueSetById = CustomCodeService.getCustomValueSetById;
+export const getAllValueSets = CustomCodeService.getAllValueSets;

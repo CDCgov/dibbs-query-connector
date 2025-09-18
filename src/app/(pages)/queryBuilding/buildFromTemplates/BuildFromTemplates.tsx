@@ -12,10 +12,6 @@ import {
   useState,
 } from "react";
 import {
-  getConditionsData,
-  getValueSetsAndConceptsByConditionIDs,
-} from "@/app/backend/seeding/service";
-import {
   ConditionIdToValueSetArrayMap,
   NestedQuery,
   CategoryToConditionArrayMap,
@@ -41,6 +37,7 @@ import {
   DibbsValueSet,
 } from "@/app/models/entities/valuesets";
 import {
+  getConditionsData,
   getCustomQueries,
   getSavedQueryById,
   saveCustomQuery,
@@ -48,6 +45,7 @@ import {
 import { useSession } from "next-auth/react";
 import { ModalRef } from "@/app/ui/designSystem/modal/Modal";
 import WarningModal from "@/app/ui/designSystem/modal/warningModal";
+import { getValueSetsAndConceptsByConditionIDs } from "@/app/backend/db-creation/service";
 
 export type FormError = {
   queryName: boolean;

@@ -20,7 +20,6 @@ import {
 } from "./utils";
 import { DataContext, DataContextValue } from "@/app/utils/DataProvider";
 import classNames from "classnames";
-import { getConditionsData } from "@/app/backend/seeding/service";
 import { ConditionsMap, EMPTY_QUERY_SELECTION } from "../utils";
 import { CustomUserQuery } from "@/app/models/entities/query";
 import {
@@ -30,6 +29,7 @@ import {
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import LoadingRow from "@/app/ui/components/loading/loadingRow";
 import Skeleton from "react-loading-skeleton";
+import { getConditionsData } from "@/app/backend/query-building/service";
 
 interface UserQueriesDisplayProps {
   queries: CustomUserQuery[];

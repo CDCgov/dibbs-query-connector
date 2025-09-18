@@ -8,19 +8,19 @@ import {
   categoryToConditionNameArrayMap,
 } from "../queryBuilding/fixtures";
 import CodeLibrary from "./page";
-import {
-  getAllValueSets,
-  getConditionsData,
-} from "@/app/backend/seeding/service";
 import { getAllUsers, getUserByUsername } from "@/app/backend/user-management";
 import {
   getAllGroupMembers,
   getAllUserGroups,
 } from "@/app/backend/usergroup-management";
 import { mockAdmin } from "../userManagement/test-utils";
-import { getCustomValueSetById } from "@/app/backend/custom-code-service";
+import {
+  getAllValueSets,
+  getCustomValueSetById,
+} from "@/app/backend/custom-code-service";
 import { renderWithUser } from "@/app/tests/unit/setup";
 import { insertCustomValueSet } from "@/app/backend/custom-code-service";
+import { getConditionsData } from "@/app/backend/query-building/service";
 
 jest.mock("next-auth/react");
 
@@ -41,9 +41,11 @@ jest.mock(
     ({ children }: React.PropsWithChildren) => <div>{children}</div>,
 );
 
-jest.mock("@/app/backend/seeding/service", () => ({
-  getAllValueSets: jest.fn().mockReturnValue({ items: [] }),
+jest.mock("@/app/backend/db-creation/service", () => ({
   groupConditionConceptsIntoValueSets: jest.fn().mockReturnValue([]),
+}));
+
+jest.mock("@/app/backend/query-building/service", () => ({
   getConditionsData: jest.fn(),
 }));
 
@@ -58,6 +60,7 @@ jest.mock("@/app/backend/user-management", () => ({
 }));
 
 jest.mock("@/app/backend/custom-code-service", () => ({
+  getAllValueSets: jest.fn().mockReturnValue({ items: [] }),
   getCustomValueSetById: jest.fn(),
   insertCustomValueSet: jest.fn(),
   insertCustomValuesetsIntoQuery: jest.fn(),

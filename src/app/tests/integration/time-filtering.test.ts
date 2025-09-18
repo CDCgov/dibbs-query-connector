@@ -6,7 +6,7 @@ import { updateTimeboxSettings } from "@/app/backend/query-timefiltering";
 import { QueryTableResult } from "@/app/(pages)/queryBuilding/utils";
 import { deleteQueryByIdHelp } from "@/app/backend/query-building/lib";
 import { createTestCancerQuery } from "../../../../e2e/utils";
-import { dontUseOutsideConfigOrTests_getDbClient } from "@/backend/db/config";
+import { dontUseOutsideConfigOrTests_getDbClient } from "@/app/backend/db/config";
 
 jest.mock("@/app/utils/auth", () => {
   return {

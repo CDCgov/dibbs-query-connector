@@ -18,6 +18,11 @@ export class DbService {
     this.dbClient = client;
     return this.dbClient;
   }
+
+  async disconnect() {
+    this.dbClient?.release(true);
+    return (this.dbClient = undefined);
+  }
 }
 
 const dbService = new DbService();

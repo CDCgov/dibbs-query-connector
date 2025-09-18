@@ -1,12 +1,15 @@
 import ersdMock from "./fixtures/ersdFixtures.json";
 import vsacFixtures from "./fixtures/vsacFixtures.json";
-import { createDibbsDB } from "@/app/backend/db-creation/service";
-import { insertValueSet } from "@/app/backend/seeding/service";
+import {
+  createDibbsDB,
+  insertValueSet,
+} from "@/app/backend/db-creation/service";
+import {} from "@/app/backend/code-systems/service";
 import { ValueSet } from "fhir/r4";
 import { suppressConsoleLogs } from "./fixtures";
 
-jest.mock("@/app/backend/seeding/service", () => {
-  const actual = jest.requireActual("@/app/backend/seeding/service");
+jest.mock("@/app/backend/db-creation/service", () => {
+  const actual = jest.requireActual("@/app/backend/db-creation/service");
 
   return {
     __esModule: true,

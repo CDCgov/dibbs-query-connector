@@ -6,9 +6,9 @@
       "version": "20240909",
       "name": "Newborn Screening",
       "author": "DIBBs",
-      "user_created": false,
+      "userCreated": false,
       "type": "lotc",
-      "dibbs_concept_type": "labs"
+      "dibbsConceptType": "labs"
     },
     {
       "id": "2_20240909",
@@ -16,9 +16,9 @@
       "version": "20240909",
       "name": "Cancer (Leukemia) Diagnosis Problem",
       "author": "DIBBs",
-      "user_created": false,
+      "userCreated": false,
       "type": "dxtc",
-      "dibbs_concept_type": "conditions"
+      "dibbsConceptType": "conditions"
     },
     {
       "id": "3_20240909",
@@ -26,9 +26,9 @@
       "version": "20240909",
       "name": "Cancer (Leukemia) Medication",
       "author": "DIBBs",
-      "user_created": false,
+      "userCreated": false,
       "type": "mrtc",
-      "dibbs_concept_type": "medications"
+      "dibbsConceptType": "medications"
     },
     {
       "id": "4_20240909",
@@ -36,9 +36,9 @@
       "version": "20240909",
       "name": "Syphilis Medication",
       "author": "DIBBs",
-      "user_created": false,
+      "userCreated": false,
       "type": "mrtc",
-      "dibbs_concept_type": "medications"
+      "dibbsConceptType": "medications"
     },
     {
       "id": "5_20240909",
@@ -46,9 +46,9 @@
       "version": "20240909",
       "name": "Syphilis Diagnosis Problem",
       "author": "DIBBs",
-      "user_created": false,
+      "userCreated": false,
       "type": "dxtc",
-      "dibbs_concept_type": "conditions"
+      "dibbsConceptType": "conditions"
     },
     {
       "id": "6_20240909",
@@ -56,9 +56,9 @@
       "version": "20240909",
       "name": "Suspected Syphilis Disorder",
       "author": "DIBBs",
-      "user_created": false,
+      "userCreated": false,
       "type": "sdtc",
-      "dibbs_concept_type": "conditions"
+      "dibbsConceptType": "conditions"
     },
     {
       "id": "7_20240909",
@@ -66,9 +66,9 @@
       "version": "20240909",
       "name": "Gonorrhea Medication",
       "author": "DIBBs",
-      "user_created": false,
+      "userCreated": false,
       "type": "mrtc",
-      "dibbs_concept_type": "medications"
+      "dibbsConceptType": "medications"
     },
     {
       "id": "8_20240909",
@@ -76,9 +76,9 @@
       "version": "20240909",
       "name": "Gonorrhea Diagnosis Problem",
       "author": "DIBBs",
-      "user_created": false,
+      "userCreated": false,
       "type": "dxtc",
-      "dibbs_concept_type": "conditions"
+      "dibbsConceptType": "conditions"
     },
     {
       "id": "9_20240909",
@@ -86,9 +86,9 @@
       "version": "20240909",
       "name": "Gonorrhea Lab Organism",
       "author": "DIBBs",
-      "user_created": false,
+      "userCreated": false,
       "type": "lotc",
-      "dibbs_concept_type": "labs"
+      "dibbsConceptType": "labs"
     },
     {
       "id": "10_20240909",
@@ -96,9 +96,9 @@
       "version": "20240909",
       "name": "Gonorrhea Lab Result",
       "author": "DIBBs",
-      "user_created": false,
+      "userCreated": false,
       "type": "lrtc",
-      "dibbs_concept_type": "labs"
+      "dibbsConceptType": "labs"
     },
     {
       "id": "11_20240910",
@@ -106,9 +106,9 @@
       "version": "20240910",
       "name": "Chlamydia Medication",
       "author": "DIBBs",
-      "user_created": false,
+      "userCreated": false,
       "type": "mrtc",
-      "dibbs_concept_type": "medications"
+      "dibbsConceptType": "medications"
     },
     {
       "id": "12_20240910",
@@ -116,9 +116,9 @@
       "version": "20240910",
       "name": "Chlamydia Lab Result",
       "author": "DIBBs",
-      "user_created": false,
+      "userCreated": false,
       "type": "lrtc",
-      "dibbs_concept_type": "labs"
+      "dibbsConceptType": "labs"
     },
     {
       "id": "13_20240910",
@@ -126,9 +126,9 @@
       "version": "20240910",
       "name": "Suspected Chlamydia Diagnosis",
       "author": "DIBBs",
-      "user_created": false,
+      "userCreated": false,
       "type": "sdtc",
-      "dibbs_concept_type": "conditions"
+      "dibbsConceptType": "conditions"
     },
     {
       "id": "14_20240923",
@@ -136,9 +136,9 @@
       "version": "20240923",
       "name": "Cancer (Leukemia) Lab Result",
       "author": "DIBBs",
-      "user_created": false,
+      "userCreated": false,
       "type": "lrtc",
-      "dibbs_concept_type": "labs"
+      "dibbsConceptType": "labs"
     },
     {
       "id": "15_20240923",
@@ -146,9 +146,9 @@
       "version": "20240923",
       "name": "Suspected Cancer (Leukemia) Diagnosis",
       "author": "DIBBs",
-      "user_created": false,
+      "userCreated": false,
       "type": "sdtc",
-      "dibbs_concept_type": "conditions"
+      "dibbsConceptType": "conditions"
     },
     {
       "id": "16_20241015",
@@ -156,9 +156,9 @@
       "version": "20241015",
       "name": "Newborn Screening Metabolic Disorder Confirmatory Labs",
       "author": "Center for Public Health Innovation",
-      "user_created": false,
+      "userCreated": false,
       "type": "lrtc",
-      "dibbs_concept_type": "labs"
+      "dibbsConceptType": "labs"
     }
   ]
 }

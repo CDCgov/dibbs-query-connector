@@ -25,8 +25,8 @@ import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import { getRole } from "@/app/(pages)/userManagement/utils";
 import { getUserByUsername } from "@/app/backend/user-management";
 import { User, UserRole } from "@/app/models/entities/users";
-import { checkDBForData } from "@/app/backend/seeding/service";
 import { isAuthDisabledClientCheck } from "@/app/utils/auth";
+import { checkDBForData } from "@/app/backend/db-creation/service";
 
 type QuerySelectionProps = {
   setBuildStep: Dispatch<SetStateAction<BuildStep>>;
@@ -134,7 +134,7 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({ setBuildStep }) => {
     };
 
     fetchQueries();
-  }, [currentUser]);
+  }, [currentUser, dbSeeded]);
 
   const loading = userLoading || queries === undefined;
   return (
