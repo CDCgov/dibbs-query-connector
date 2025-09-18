@@ -26,6 +26,7 @@ import {
 import { indexErsdByOid, translateVSACToInternalValueSet } from "./lib";
 import { DibbsValueSet } from "@/app/models/entities/valuesets";
 import dbService from "../db/service";
+import { PoolClient } from "pg";
 
 type ersdCondition = {
   code: string;
@@ -117,7 +118,8 @@ export async function getOidsFromErsd() {
  */
 export async function seedBatchValueSetsFromVsac(
   oidData: OidData,
-  batchSize = 5,
+  batchSize = 50,
+  dbClient: PoolClient,
 ) {
   const umlsKey = process.env.UMLS_API_KEY;
   if (!umlsKey) {
@@ -139,8 +141,6 @@ export async function seedBatchValueSetsFromVsac(
     oidData.oids.length,
     "value sets.",
   );
-  const dbClient = await dbService.connect();
-  dbClient.query("BEGIN");
 
   while (startIdx < oidData.oids.length) {
     console.log("Batching IDs", startIdx, "to", lastIdx);
@@ -225,8 +225,6 @@ export async function seedBatchValueSetsFromVsac(
     await sleep(2000);
   }
 
-  dbClient.query("COMMIT");
-
   // Once all the value sets are inserted, we need to do conditions
   // Step one is filtering out duplicates, since we just assembled
   // condition mappings directly from value sets
@@ -270,6 +268,7 @@ export async function seedBatchValueSetsFromVsac(
   await insertDBStructArray(
     conditionPromises as ConditionStruct[],
     "conditions",
+    dbClient,
   );
 
   // Finally, take care of mapping inserted value sets to inserted conditions
@@ -288,7 +287,7 @@ export async function seedBatchValueSetsFromVsac(
     return dbCTV;
   });
   ctvStructs = ctvStructs.filter((ctvs) => ctvs.id !== "NONE");
-  await insertDBStructArray(ctvStructs, "condition_to_valueset");
+  await insertDBStructArray(ctvStructs, "condition_to_valueset", dbClient);
 }
 
 /**
@@ -317,7 +316,7 @@ function readJsonFromRelativePath(filename: string) {
  * @param structType The type of structure to be inserted (e.g. valueset,
  * concept, etc.).
  */
-async function insertSeedDbStructs(structType: string) {
+async function insertSeedDbStructs(structType: string, dbClient: PoolClient) {
   const data: string | undefined = readJsonFromRelativePath(
     "dibbs_db_seed_" + structType + ".json",
   );
@@ -325,7 +324,7 @@ async function insertSeedDbStructs(structType: string) {
     const parsed: {
       [key: string]: Array<dbInsertStruct>;
     } = JSON.parse(data);
-    await insertDBStructArray(parsed[structType], structType);
+    await insertDBStructArray(parsed[structType], structType, dbClient);
   } else {
     console.error("Could not load JSON data for", structType);
   }
@@ -365,8 +364,10 @@ class SeedingService {
     if (!dbHasData) {
       try {
         const ersdOidData = await getOidsFromErsd();
+        const dbClient = await dbService.connect();
+        dbClient.query("BEGIN");
         if (ersdOidData) {
-          await seedBatchValueSetsFromVsac(ersdOidData);
+          await seedBatchValueSetsFromVsac(ersdOidData, 100, dbClient);
         } else {
           console.error("Could not load eRSD, aborting DIBBs DB creation");
         }
@@ -374,14 +375,18 @@ class SeedingService {
         // Only run default and custom insertions if we're making the dump
         // file for dev
         // if (process.env.NODE_ENV !== "production") {
-        await insertSeedDbStructs("valuesets");
-        await insertSeedDbStructs("concepts");
-        await insertSeedDbStructs("valueset_to_concept");
-        await insertSeedDbStructs("conditions");
-        await insertSeedDbStructs("condition_to_valueset");
-        await insertSeedDbStructs("query");
-        await insertSeedDbStructs("category");
-        await executeCategoryUpdates();
+        await insertSeedDbStructs("valuesets", dbClient);
+        await insertSeedDbStructs("concepts", dbClient);
+        await insertSeedDbStructs("valueset_to_concept", dbClient);
+        await insertSeedDbStructs("conditions", dbClient);
+        await insertSeedDbStructs("condition_to_valueset", dbClient);
+        await insertSeedDbStructs("query", dbClient);
+        await insertSeedDbStructs("category", dbClient);
+
+        throw Error("try");
+
+        await executeCategoryUpdates(dbClient);
+        dbClient.query("COMMIT");
 
         return { success: true, reload: true };
 

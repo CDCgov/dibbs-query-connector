@@ -190,13 +190,15 @@ class SeedingService {
    */
   @transaction
   @auditable
-  static async executeCategoryUpdates(): Promise<{ success: boolean }> {
+  static async executeCategoryUpdates(
+    dbClient: PoolClient,
+  ): Promise<{ success: boolean }> {
     try {
       console.log("Executing category data updates on inserted conditions");
-      await dbService.query(updateErsdCategorySql);
-      await dbService.query(updateNewbornScreeningCategorySql);
-      await dbService.query(updatedCancerCategorySql);
-      await dbService.query(`DROP TABLE category_data`);
+      await dbClient.query(updateErsdCategorySql);
+      await dbClient.query(updateNewbornScreeningCategorySql);
+      await dbClient.query(updatedCancerCategorySql);
+      await dbClient.query(`DROP TABLE category_data`);
       console.log("All inserted queries cross-referenced with category data");
       return { success: true };
     } catch (error) {
@@ -316,11 +318,10 @@ class SeedingService {
    * @param insertType The type of structure being inserted.
    * @returns A promise that resolves to an object indicating success or failure.
    */
-  @transaction
-  @auditable
   static async insertDBStructArray(
     structs: dbInsertStruct[],
     insertType: string,
+    dbClient: PoolClient,
   ): Promise<{ success: boolean }> {
     let insertSql = "";
     const errors: string[] = [];
@@ -400,7 +401,7 @@ class SeedingService {
       }
 
       try {
-        await dbService.query(insertSql, values);
+        await dbClient.query(insertSql, values);
       } catch (e) {
         console.error(`Insert failed for ${insertType}:`, e);
         errors.push(
@@ -419,7 +420,6 @@ class SeedingService {
    * @param vs - a ValueSet in of the shape of our internal data model to insert
    * @returns success / failure information, as well as errors as appropriate
    */
-  @auditable
   static async insertValueSet(
     vs: DibbsValueSet,
     dbClient: PoolClient,
