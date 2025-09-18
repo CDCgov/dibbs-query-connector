@@ -626,7 +626,7 @@ class SeedingService {
 
     // Return true if the estimated count > 0, otherwise false
     return (
-      result.rows.length > 0 && parseFloat(result.rows[0].estimated_count) > 0
+      result.rows.length > 0 && parseFloat(result.rows[0].estimatedCount) > 0
     );
   }
 
