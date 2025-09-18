@@ -377,9 +377,6 @@ class SeedingService {
           console.error("Could not load eRSD, aborting DIBBs DB creation");
         }
 
-        // Only run default and custom insertions if we're making the dump
-        // file for dev
-        // if (process.env.NODE_ENV !== "production") {
         const insertionTypes = [
           "valuesets",
           "concepts",
@@ -393,13 +390,11 @@ class SeedingService {
         for (const type of insertionTypes) {
           await SeedingService.insertSeedDbStructs(type, dbClient);
         }
-
         await SeedingService.executeCategoryUpdates(dbClient);
+
         dbClient.query("COMMIT");
         dbService.disconnect();
         return { success: true, reload: true };
-
-        // }
       } catch (e) {
         dbClient.query("ROLLBACK");
         dbService.disconnect();
