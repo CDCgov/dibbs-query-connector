@@ -20,7 +20,7 @@ export class DbService {
   }
 
   async disconnect() {
-    this.dbClient?.release(true);
+    this.dbClient?.release();
     return (this.dbClient = undefined);
   }
 }
