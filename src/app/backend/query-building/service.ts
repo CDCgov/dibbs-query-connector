@@ -231,6 +231,7 @@ class QueryBuildingService {
           return groupQueries.items;
         }),
       );
+
       return assignedQueries.flat();
     }
   }
