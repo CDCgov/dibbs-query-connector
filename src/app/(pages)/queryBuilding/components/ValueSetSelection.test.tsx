@@ -5,6 +5,7 @@ import { VALUESET_SELECTION_SEARCH_PLACEHOLDER } from "./utils";
 import {
   getConditionsData,
   getSavedQueryById,
+  getValueSetsAndConceptsByConditionIDs,
 } from "@/app/backend/query-building/service";
 import {
   conditionIdToNameMap,
@@ -12,17 +13,14 @@ import {
   gonorrheaValueSets,
   gonorrheaSavedQuery,
 } from "../fixtures";
-import { getValueSetsAndConceptsByConditionIDs } from "@/app/backend/db-creation/service";
 
 const currentPage = "/";
-jest.mock("../../../backend/db-creation/service", () => ({
-  getValueSetsAndConceptsByConditionIDs: jest.fn(),
-}));
 
 jest.mock("../../../backend/query-building/service", () => ({
   getCustomQueries: jest.fn(),
   getSavedQueryById: jest.fn(),
   getConditionsData: jest.fn(),
+  getValueSetsAndConceptsByConditionIDs: jest.fn(),
 }));
 
 const mockPush = jest.fn();

@@ -26,7 +26,7 @@ import { getRole } from "@/app/(pages)/userManagement/utils";
 import { getUserByUsername } from "@/app/backend/user-management";
 import { User, UserRole } from "@/app/models/entities/users";
 import { isAuthDisabledClientCheck } from "@/app/utils/auth";
-import { checkDBForData } from "@/app/backend/db-creation/service";
+import { checkDBForData } from "@/app/backend/db-creation/lib";
 
 type QuerySelectionProps = {
   setBuildStep: Dispatch<SetStateAction<BuildStep>>;

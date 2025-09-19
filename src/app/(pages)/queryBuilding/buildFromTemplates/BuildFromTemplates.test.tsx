@@ -20,13 +20,12 @@ import { render } from "@testing-library/react";
 import {
   getConditionsData,
   getSavedQueryById,
+  getValueSetsAndConceptsByConditionIDs,
 } from "@/app/backend/query-building/service";
 import { getTimeboxRanges } from "@/app/backend/query-timefiltering";
-import { getValueSetsAndConceptsByConditionIDs } from "@/app/backend/db-creation/service";
 
 jest.mock("../../../backend/db-creation/service", () => ({
   getCustomQueries: jest.fn(),
-  getValueSetsAndConceptsByConditionIDs: jest.fn(),
 }));
 
 jest.mock("../../../backend/query-timefiltering", () => ({
@@ -37,6 +36,7 @@ jest.mock("../../../backend/query-timefiltering", () => ({
 jest.mock("../../../backend/query-building/service", () => ({
   getSavedQueryById: jest.fn(),
   getConditionsData: jest.fn(),
+  getValueSetsAndConceptsByConditionIDs: jest.fn(),
 }));
 
 const mockPush = jest.fn();

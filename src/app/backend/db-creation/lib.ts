@@ -1,14 +1,8 @@
-// Lib file for any code that doesn't need to be async, which is a requirement
-// to export out the db-creation server component file
+"use server";
+
 import { Concept } from "@/app/models/entities/concepts";
-import { ErsdConceptType, ersdToDibbsConceptMap } from "../../constants";
-import {
-  Bundle,
-  BundleEntry,
-  FhirResource,
-  ValueSet as FhirValueSet,
-  ValueSet,
-} from "fhir/r4";
+import { ersdToDibbsConceptMap } from "../../constants";
+import { Bundle, ValueSet } from "fhir/r4";
 import { DibbsValueSet } from "@/app/models/entities/valuesets";
 import { PoolClient } from "pg";
 import {
@@ -17,7 +11,6 @@ import {
   ConditionStruct,
   ConditionToValueSetStruct,
   dbInsertStruct,
-  getValueSetsByConditionIdsSql,
   insertCategorySql,
   insertConceptSql,
   insertConditionSql,
@@ -29,10 +22,15 @@ import {
   ValuesetStruct,
   ValuesetToConceptStruct,
 } from "./seedSqlStructs";
-import path from "path";
-import * as fs from "fs";
 import dbService from "../db/service";
 import { getERSD, getVSACValueSet, OidData } from "../code-systems/service";
+import {
+  generateConceptSqlPromises,
+  generateValuesetConceptJoinSqlPromises,
+  indexErsdByOid,
+  stripProtocolAndTLDFromSystemUrl,
+} from "./utils";
+import { readJsonFromRelativePath } from "./service";
 
 /**
  * helper function to generate VSAC promises
@@ -58,93 +56,6 @@ export async function generateBatchVsacPromises(oidsToFetch: string[]) {
   );
 
   return valueSetPromises;
-}
-
-/**
- * Translates a VSAC FHIR bundle to our internal ValueSet struct
- * @param fhirValueset - The FHIR ValueSet response from VSAC
- * @param ersdConceptType - The associated clinical concept type from ERSD
- * @returns An object of type InternalValueSet
- */
-export function translateVSACToInternalValueSet(
-  fhirValueset: FhirValueSet,
-  ersdConceptType: ErsdConceptType,
-) {
-  const oid = fhirValueset.id;
-  const version = fhirValueset.version;
-
-  const name = fhirValueset.title;
-  const author = fhirValueset.publisher;
-
-  const bundleConceptData = fhirValueset?.compose?.include[0];
-  const system = bundleConceptData?.system;
-
-  const concepts = bundleConceptData?.concept?.map((fhirConcept) => {
-    return { ...fhirConcept, include: false } as Concept;
-  });
-
-  return {
-    valueSetId: `${oid}_${version}`,
-    valueSetVersion: version,
-    valueSetName: name,
-    valueSetExternalId: oid,
-    author: author,
-    system: system,
-    ersdConceptType: ersdConceptType,
-    dibbsConceptType: ersdToDibbsConceptMap[ersdConceptType],
-    includeValueSet: false,
-    concepts: concepts,
-    userCreated: false,
-  } as DibbsValueSet;
-}
-
-const ERSD_TYPED_RESOURCE_URL = "http://ersd.aimsplatform.org/fhir/ValueSet/";
-
-/**
- * Mapping function that takes eRSD input and indexes values by OID, as well as
- * parsing out condotion <> valueset linkages from the ingestion input
- * @param valuesets - raw valuesets from the eRSD.
- * @returns oidToErsdType: A map of OID <> eRSD concept types
- * nonUmbrellaEntries: map of valuesets to conditions as dictated by the eRSD
- */
-export function indexErsdByOid(
-  valuesets: BundleEntry<FhirResource>[] | undefined,
-) {
-  const oidToErsdType = new Map<string, string>();
-  Object.keys(ersdToDibbsConceptMap).forEach((k) => {
-    const keyedUrl = ERSD_TYPED_RESOURCE_URL + k;
-    const umbrellaValueSet = valuesets?.find((vs) => vs.fullUrl === keyedUrl);
-
-    // These "bulk" valuesets of service types compose references
-    // to all value sets that fall under their purview
-    const composedValueSets: Array<string> =
-      (umbrellaValueSet as BundleEntry<ValueSet>)?.resource?.compose?.include[0]
-        .valueSet || ([] as Array<string>);
-    composedValueSets.reduce((acc: Map<string, string>, vsUrl: string) => {
-      const vsArray = vsUrl.split("/");
-      const oid = vsArray[vsArray.length - 1];
-      acc.set(oid, k);
-      return acc;
-    }, oidToErsdType);
-  });
-
-  // Condition-valueset linkages are stored in the "usage context" structure of
-  // the value codeable concept of each resource's base level
-  // We can filter out public health informatics contexts to get only the meaningful
-  // conditions
-  const nonUmbrellaEntries = valuesets?.filter(
-    (vs) => !Object.keys(ersdToDibbsConceptMap).includes(vs.resource?.id || ""),
-  ) as BundleEntry<ValueSet>[];
-  const nonUmbrellaValueSets: Array<ValueSet> = (nonUmbrellaEntries || []).map(
-    (vs) => {
-      return vs.resource || ({} as ValueSet);
-    },
-  );
-
-  return {
-    oidToErsdType: oidToErsdType,
-    nonUmbrellaValueSets: nonUmbrellaValueSets,
-  };
 }
 
 /**
@@ -335,7 +246,7 @@ export async function insertSeedDbStructs(
   structType: string,
   dbClient: PoolClient,
 ) {
-  const data: string | undefined = readJsonFromRelativePath(
+  const data: string | undefined = await readJsonFromRelativePath(
     "dibbs_db_seed_" + structType + ".json",
   );
   if (data) {
@@ -345,37 +256,6 @@ export async function insertSeedDbStructs(
     await insertDBStructArray(parsed[structType], structType, dbClient);
   } else {
     console.error("Could not load JSON data for", structType);
-  }
-}
-
-/**
- * Executes a search for a ValueSets and Concepts against the Postgres
- * Database, using the ID of the condition associated with any such data.
- * @param ids Array of ids for entries in the conditions table
- * @returns One or more rows from the DB matching the requested saved query,
- * or an error if no results can be found.
- */
-export async function getValueSetsAndConceptsByConditionIDs(ids: string[]) {
-  try {
-    if (ids.length === 0) {
-      throw Error("No condition ids passed in to query by");
-    }
-
-    const escapedValues = ids.map((_, i) => `$${i + 1}`).join() + ")";
-    const queryString = getValueSetsByConditionIdsSql + escapedValues;
-
-    const result = await dbService.query(queryString, ids);
-    if (result.rows.length === 0) {
-      console.error("No results found for given condition ids", ids);
-      return [];
-    }
-    return result.rows;
-  } catch (error) {
-    console.error(
-      "Error retrieving value sets and concepts for condition",
-      error,
-    );
-    throw error;
   }
 }
 
@@ -397,32 +277,6 @@ export async function checkDBForData() {
   return (
     result.rows.length > 0 && parseFloat(result.rows[0].estimatedCount) > 0
   );
-}
-
-/**
- * Helper function to generate the SQL needed for valueset-to-concept join insertion.
- * @param vs - The ValueSet in of the shape of our internal data model to insert
- * @param dbClient - The client to be used to allow seeding to be transactional. We
- * neeed to manually manage the client connection rather than delegating it to the
- * pool because of the cross-relationships in the seeding data.
- * @returns The SQL statement array for join rows
- */
-export function generateValuesetConceptJoinSqlPromises(
-  vs: DibbsValueSet,
-  dbClient: PoolClient,
-) {
-  return vs.concepts.map((concept) => {
-    const systemPrefix = vs.system
-      ? stripProtocolAndTLDFromSystemUrl(vs.system)
-      : "";
-    const conceptUniqueId = `${systemPrefix}_${concept.code}`;
-
-    return dbClient.query(insertValuesetToConceptSql, [
-      `${vs.valueSetId}_${conceptUniqueId}`,
-      vs.valueSetId,
-      conceptUniqueId,
-    ]);
-  });
 }
 
 /**
@@ -524,33 +378,6 @@ export async function insertDBStructArray(
 }
 
 /**
- * Helper function to generate the SQL needed for concept insertion
- * needed during valueset creation.
- * @param vs - The ValueSet in of the shape of our internal data model to insert
- * @returns The SQL statement array for all concepts for insertion
- * @param dbClient - The client to be used to allow seeding to be transactional. We
- * neeed to manually manage the client connection rather than delegating it to the
- * pool because of the cross-relationships in the seeding data.
- */
-export function generateConceptSqlPromises(
-  vs: DibbsValueSet,
-  dbClient: PoolClient,
-) {
-  return vs.concepts.map((concept) => {
-    const systemPrefix = vs.system
-      ? stripProtocolAndTLDFromSystemUrl(vs.system)
-      : "";
-    const conceptUniqueId = `${systemPrefix}_${concept.code}`;
-
-    return dbClient.query(insertConceptSql, [
-      conceptUniqueId,
-      concept.code,
-      vs.system,
-      concept.display,
-    ]);
-  });
-}
-/**
  * Helper function that execute the category data updates for inserted conditions.
  * @param vs - The ValueSet in of the shape of our internal data model to insert
  * @param dbClient - Specific managed DbClient to prevent transaction errors
@@ -589,28 +416,6 @@ export async function generateValueSetSqlPromise(
  * @param systemURL - system to clean
  * @returns the slug of the URL that includes only the system information
  */
-function stripProtocolAndTLDFromSystemUrl(systemURL: string) {
-  const match = systemURL.match(/https?:\/\/([^\.]+)/);
-  return match ? match[1] : systemURL;
-}
-
-/**
- * Helper utility to resolve the relative path of a file in the docker filesystem.
- * @param filename The file to read from. Must be located in the assets folder.
- * @returns Either the stringified data, or null.
- */
-function readJsonFromRelativePath(filename: string) {
-  try {
-    // Re-scope file system reads to make sure we use the relative
-    // path via node directory resolution
-    const runtimeServerPath = path.join(__dirname, "../../assets/", filename);
-    const data = fs.readFileSync(runtimeServerPath, "utf-8");
-    return data;
-  } catch (error) {
-    console.error("Error reading JSON file:", error);
-    return;
-  }
-}
 
 type ersdCondition = {
   code: string;

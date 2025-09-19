@@ -19,12 +19,14 @@ import {
   insertDBStructArray,
   insertSeedDbStructs,
   insertValueSet,
-  translateVSACToInternalValueSet,
 } from "./lib";
 import { DibbsValueSet } from "@/app/models/entities/valuesets";
 import dbService from "../db/service";
 import { PoolClient } from "pg";
 import { auditable } from "../audit-logs/decorator";
+import { translateVSACToInternalValueSet } from "./utils";
+import path from "path";
+import { readFileSync } from "fs";
 
 /**
  * Simple helper function to cause script-running functions to pause for a
@@ -35,6 +37,24 @@ import { auditable } from "../audit-logs/decorator";
 const sleep = (ms: number) => {
   return new Promise((resolve) => setTimeout(resolve, ms));
 };
+
+/**
+ * Helper utility to resolve the relative path of a file in the docker filesystem.
+ * @param filename The file to read from. Must be located in the assets folder.
+ * @returns Either the stringified data, or null.
+ */
+export async function readJsonFromRelativePath(filename: string) {
+  try {
+    // Re-scope file system reads to make sure we use the relative
+    // path via node directory resolution
+    const runtimeServerPath = path.join(__dirname, "../../assets/", filename);
+    const data = readFileSync(runtimeServerPath, "utf-8");
+    return data;
+  } catch (error) {
+    console.error("Error reading JSON file:", error);
+    return;
+  }
+}
 
 class SeedingService {
   /**
