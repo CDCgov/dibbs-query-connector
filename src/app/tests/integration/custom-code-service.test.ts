@@ -100,7 +100,7 @@ describe("UserCreatedValuesetService Integration", () => {
     );
 
     expect(result.rowCount).toBe(1);
-    const queryData = result.rows[0].query_data;
+    const queryData = result.rows[0].queryData;
     expect(queryData).toHaveProperty(CUSTOM_VALUESET_ARRAY_ID);
     expect(queryData[CUSTOM_VALUESET_ARRAY_ID][testUUID]).toMatchObject({
       valueSetName: vsName,
@@ -135,8 +135,8 @@ describe("UserCreatedValuesetService Integration", () => {
     await dbClient.query(
       `INSERT INTO query (
         id, query_name, query_data, conditions_list, author,
-        date_created, date_last_modified, time_window_number, time_window_unit
-      ) VALUES ($1, $2, $3, $4, $5, NOW(), NOW(), 0, '')`,
+        date_created, date_last_modified
+      ) VALUES ($1, $2, $3, $4, $5, NOW(), NOW())`,
       [baseQueryId, baseQueryName, dummyQueryData, [], authorId],
     );
 

@@ -1,26 +1,31 @@
 import ersdMock from "./fixtures/ersdFixtures.json";
 import vsacFixtures from "./fixtures/vsacFixtures.json";
-import {
-  createDibbsDB,
-  insertValueSet,
-} from "@/app/backend/db-creation/service";
-import {} from "@/app/backend/code-systems/service";
+import { createDibbsDB } from "@/app/backend/db-creation/service";
 import { ValueSet } from "fhir/r4";
 import { suppressConsoleLogs } from "./fixtures";
+import { insertValueSet } from "@/app/backend/db-creation/lib";
 
-jest.mock("@/app/backend/db-creation/service", () => {
-  const actual = jest.requireActual("@/app/backend/db-creation/service");
+jest.mock("@/app/backend/code-systems/service", () => {
+  const actual = jest.requireActual("@/app/backend/code-systems/service");
 
   return {
     __esModule: true,
     ...actual,
-    checkDBForData: jest.fn().mockReturnValue(false),
-    getERSD: jest.fn().mockResolvedValue(ersdMock),
+    getERSD: jest.fn().mockImplementation(() => ersdMock),
     getVSACValueSet: jest.fn().mockImplementation((oid: string) => {
       const vs = (vsacFixtures as ValueSet[]).find((v) => v.id === oid);
       return Promise.resolve(vs);
     }),
+  };
+});
 
+jest.mock("@/app/backend/db-creation/lib", () => {
+  const actual = jest.requireActual("@/app/backend/db-creation/lib");
+
+  return {
+    __esModule: true,
+    ...actual,
+    checkDBForData: jest.fn().mockResolvedValue(false),
     // put the passthrough into the mock implementation so we can spy
     insertValueSet: jest.fn().mockImplementation(actual.insertValueSet),
     // skip the checking process since we're using partial mocks
@@ -44,7 +49,7 @@ describe("runs the eRSD ingestion flow", () => {
     suppressConsoleLogs();
   });
   test(
-    "stubs out the eRSD response",
+    "Inserts the number of valuesets we'd expect from the eRSD fixtures",
     async () => {
       const insertSpy = insertValueSet;
       await createDibbsDB();

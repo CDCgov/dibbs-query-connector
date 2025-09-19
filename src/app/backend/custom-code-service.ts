@@ -8,6 +8,7 @@ import {
   insertValuesetToConceptSql,
   insertConditionSql,
   insertConditionToValuesetSql,
+  insertDemoQueryLogicSql,
 } from "./db-creation/seedSqlStructs";
 import type { DibbsValueSet } from "../models/entities/valuesets";
 import type { Concept } from "../models/entities/concepts";
@@ -278,8 +279,7 @@ class CustomCodeService {
         return { success: true, queryId };
       } else {
         // create a new query with custom only
-        const newId = crypto.randomUUID();
-        const name = `Custom Query ${newId}`;
+        const name = `Custom Query ${Math.random()}`;
         const queryData: QueryDataColumn = {
           [CUSTOM_VALUESET_ARRAY_ID]: {},
         };
@@ -287,24 +287,21 @@ class CustomCodeService {
         for (const vs of customValuesets) {
           queryData[CUSTOM_VALUESET_ARRAY_ID][vs.valueSetId] = vs;
         }
-
-        const insertSql = `
-      INSERT INTO query (
-        id, query_name, query_data, conditions_list, author,
-        date_created, date_last_modified, time_window_number, time_window_unit
-      )
-      VALUES ($1, $2, $3, $4, $5, NOW(), NOW(), $6, $7)
-    `;
-        await dbService.query(insertSql, [
-          newId,
+        const NOW_ISO = new Date().toISOString();
+        const result = await dbService.query(insertDemoQueryLogicSql, [
           name,
           queryData,
           [],
           userId,
-          0,
-          "",
+          NOW_ISO,
+          NOW_ISO,
         ]);
-        return { success: true, queryId: newId };
+        const newId = result.rows[0].id;
+        if (newId) {
+          return { success: true, queryId: newId };
+        } else {
+          throw Error("No ID returned in query insertion");
+        }
       }
     } catch (e) {
       console.error(

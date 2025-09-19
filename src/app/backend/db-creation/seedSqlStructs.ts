@@ -148,7 +148,8 @@ INSERT INTO category_data
 export const insertDemoQueryLogicSql = `
 -- Insert data into the query table
 INSERT INTO query (query_name, query_data, conditions_list, author, date_created, date_last_modified)
-VALUES ($1, $2, $3,$4, $5, $6);
+VALUES ($1, $2, $3,$4, $5, $6)
+RETURNING id;
 `;
 
 export const updateErsdCategorySql = `

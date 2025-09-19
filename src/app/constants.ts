@@ -13,27 +13,27 @@ export const USE_CASE_DETAILS = {
     queryName: "Newborn screening follow-up",
     condition: "Newborn Screening",
     // These are the ID's defined in the vs_dump.sql file
-    id: "7e39ee18-2c84-4e6d-8ed2-8810e893d7c5",
+    id: "f4a3a11c-6d04-4e61-9b56-0c372a673ff5",
   },
   syphilis: {
     queryName: "Syphilis case investigation",
     condition: "Congenital syphilis (disorder)",
-    id: "f153dbdd-ec28-4caa-b5fd-9a7dd18a2817",
+    id: "392eccef-bac2-4e52-a7f1-e25c7751ddae",
   },
   gonorrhea: {
     queryName: "Gonorrhea case investigation",
     condition: "Gonorrhea (disorder)",
-    id: "da9b4798-53f3-4743-bca3-ea1453036c54",
+    id: "5cb1b270-5f4f-47ca-ad42-bb32a56770da",
   },
   chlamydia: {
     queryName: "Chlamydia case investigation",
     condition: "Chlamydia trachomatis infection (disorder)",
-    id: "2ea84eb6-32bd-406a-8295-ddd3b96e964d",
+    id: "df25cc45-1d63-4bb7-831f-a681cbc7989e",
   },
   cancer: {
     queryName: "Cancer case investigation",
     condition: "Cancer (Leukemia)",
-    id: "9c6b8c86-6b8f-431e-83b6-96f2d8a6310c",
+    id: "3389540d-1cca-4253-aa75-c1684dc5430f",
   },
 } as const;
 
