@@ -503,6 +503,8 @@ async function getValueSetsForSelectedConditions(conditionIds: string[]) {
   const formattedResults =
     results && groupConditionConceptsIntoValueSets(results);
 
+  console.log(formattedResults);
+
   // group by Condition ID:
   return Object.values(formattedResults).reduce((acc, resultObj) => {
     if (resultObj.conditionId) {
