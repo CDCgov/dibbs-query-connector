@@ -35,13 +35,13 @@ jest.mock("@/app/backend/audit-logs/lib", () => {
 });
 
 (auth as jest.Mock).mockResolvedValue(TEST_USER);
+const consoleInfoSpy = jest.spyOn(console, "info");
 
 describe("user management tests", () => {
   beforeAll(() => {
     suppressConsoleLogs();
   });
   it("user group creation, update, deletion", async () => {
-    const consoleInfoSpy = jest.spyOn(console, "info");
     const oldAuditIds = (await dbService.query(GET_ALL_AUDIT_ROWS)).rows.map(
       (r) => r.id,
     );
@@ -164,6 +164,11 @@ describe("user management tests", () => {
     const { user } = await addUserIfNotExists(randomUserToken);
     await addUsersToGroup(CREATED_GROUP_ID, [user.id]);
     const additionActionType = "addUsersToGroup";
+
+    expect(consoleInfoSpy).toHaveBeenLastCalledWith(
+      expect.stringContaining(`${additionActionType} audit action with`),
+    );
+
     const additionAuditEntry = await getAuditEntry(
       additionActionType,
       oldAuditIds,
