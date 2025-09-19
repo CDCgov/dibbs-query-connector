@@ -9,6 +9,7 @@ import Link from "next/link";
 import { MISSING_API_KEY_LITERAL } from "@/app/constants";
 
 type EmptyQueryProps = {
+  dbSeeded: boolean;
   goForward: () => void;
   setDbSeeded: Dispatch<SetStateAction<boolean>>;
 };
@@ -20,57 +21,56 @@ type EmptyQueryProps = {
  * @returns the EmptyQueriesDisplay to render the empty state status
  */
 export const EmptyQueriesDisplay: React.FC<EmptyQueryProps> = ({
+  dbSeeded,
   goForward,
   setDbSeeded,
 }) => {
   const [loading, setLoading] = useState(false);
 
   const handleClick = async () => {
-    setLoading(true);
-
-    // DB Creation Function
-    console.log("Creating DB...");
-
-    const { success, message, reload, cause } = await createDibbsDB();
-
-    if (!success) {
-      let body: string | React.ReactNode =
-        `Please try again or contact us for more help: ${message}`;
-
-      if (cause === MISSING_API_KEY_LITERAL) {
-        const docLink = (
-          <Link href="/docs/development#obtaining-api-and-license-keys">
-            API key documentation
-          </Link>
-        );
-        body = (
-          <span>
-            {message}: {docLink}
-          </span>
-        );
-      }
-      showToastConfirmation({
-        heading: "Something went wrong.",
-        body: body,
-        variant: "error",
-        autoClose: false,
-      });
-    } else {
-      setDbSeeded(success);
-      showToastConfirmation({
-        heading: "Database seeding finished",
-        body: "Seed data successfully inserted into the database. Refresh the page to begin building your first query",
-        autoClose: false,
-      });
-    }
-
-    // Stop loading and redirect once function is complete
-    setLoading(false);
-    if (reload) {
-      // Refresh query building page to display the now seeded values
-      location.reload();
-    } else if (success) {
+    if (dbSeeded) {
       goForward();
+    } else {
+      setLoading(true);
+
+      // DB Creation Function
+      console.log("Creating DB...");
+
+      const { success, message, cause } = await createDibbsDB();
+
+      if (!success) {
+        let body: string | React.ReactNode =
+          `Please try again or contact us for more help: ${message}`;
+
+        if (cause === MISSING_API_KEY_LITERAL) {
+          const docLink = (
+            <Link href="/docs/development#obtaining-api-and-license-keys">
+              API key documentation
+            </Link>
+          );
+          body = (
+            <span>
+              {message}: {docLink}
+            </span>
+          );
+        }
+        showToastConfirmation({
+          heading: "Something went wrong.",
+          body: body,
+          variant: "error",
+          autoClose: false,
+        });
+      } else {
+        setDbSeeded(success);
+        showToastConfirmation({
+          heading: "Database seeding finished",
+          body: "Seed data successfully inserted into the database. We've loaded some queries for you out of the box, but continue onwards to build your first query",
+          autoClose: false,
+        });
+      }
+
+      // Stop loading and redirect once function is complete
+      setLoading(false);
     }
   };
 

@@ -46,6 +46,8 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({ setBuildStep }) => {
   const queriesContext = useContext(DataContext);
 
   const [userLoading, setUserLoading] = useState(true);
+  const [queriesLoading, setQueriesLoading] = useState(true);
+
   const [dbSeeded, setDbSeeded] = useState(false);
   const [queries, setQueries] = useState<CustomUserQuery[] | undefined>(
     queriesContext?.data
@@ -103,44 +105,45 @@ const QuerySelection: React.FC<QuerySelectionProps> = ({ setBuildStep }) => {
   // Check whether custom queries exist in DB
   useEffect(() => {
     const fetchQueries = async () => {
-      if (queries === undefined) {
-        try {
-          const fetchedQueries = restrictedQueryList
-            ? await getQueriesForUser(currentUser as User)
-            : await getQueryList();
+      try {
+        setQueriesLoading(true);
+        const fetchedQueries = restrictedQueryList
+          ? await getQueriesForUser(currentUser as User)
+          : await getQueryList();
 
-          setQueries(fetchedQueries);
+        setQueries(fetchedQueries);
 
-          queriesContext?.setData(queries);
-        } catch (error) {
-          let heading = GENERIC_ERROR_HEADING;
-          let body = GENERIC_ERROR_BODY;
-          if (error instanceof Error) {
-            if (error.message.includes("permission check")) {
-              body = "You're not authorized to see this page";
-              setUnauthorizedError(true);
-            }
+        queriesContext?.setData(queries);
+        setQueriesLoading(false);
+      } catch (error) {
+        let heading = GENERIC_ERROR_HEADING;
+        let body = GENERIC_ERROR_BODY;
+        if (error instanceof Error) {
+          if (error.message.includes("permission check")) {
+            body = "You're not authorized to see this page";
+            setUnauthorizedError(true);
           }
-          console.error("Failed to fetch queries:", error);
-
-          showToastConfirmation({
-            heading: heading,
-            body: body,
-            variant: "error",
-            autoClose: false,
-          });
         }
+        console.error("Failed to fetch queries:", error);
+
+        showToastConfirmation({
+          heading: heading,
+          body: body,
+          variant: "error",
+          autoClose: false,
+        });
       }
     };
 
     fetchQueries();
   }, [currentUser, dbSeeded]);
 
-  const loading = userLoading || queries === undefined;
+  const loading = userLoading || queriesLoading;
   return (
     <div className="main-container__wide">
-      {!loading && (!dbSeeded || queries.length === 0) ? (
+      {!loading && (!dbSeeded || queries?.length === 0) ? (
         <EmptyQueriesDisplay
+          dbSeeded={dbSeeded}
           setDbSeeded={setDbSeeded}
           goForward={() => {
             setBuildStep("condition");

@@ -394,7 +394,13 @@ class SeedingService {
 
         dbClient.query("COMMIT");
         dbService.disconnect();
+<<<<<<< HEAD
         return { success: true, reload: true };
+=======
+
+        console.log("DB successfully seeded");
+        return { success: true };
+>>>>>>> bob/seeding-transactional-success
       } catch (e) {
         dbClient.query("ROLLBACK");
         dbService.disconnect();
@@ -402,7 +408,6 @@ class SeedingService {
           console.error("DB reload failed", e.message);
           return {
             success: false,
-            reload: false,
             message: e.message,
             cause: e.cause,
           };
@@ -410,14 +415,13 @@ class SeedingService {
 
         return {
           success: false,
-          reload: false,
           message:
             "DB creation failed with an unknown error. Please contact us for help",
         };
       }
     } else {
       console.log("Database already has data; skipping DIBBs DB creation.");
-      return { success: true, reload: false };
+      return { success: true };
     }
   }
 
@@ -745,16 +749,7 @@ class SeedingService {
           break;
       }
 
-      try {
-        await dbClient.query(insertSql, values);
-      } catch (e) {
-        console.error(`Insert failed for ${insertType}:`, e);
-        errors.push(
-          `Insert failed for ${insertType}: ${
-            e instanceof Error ? e.message : String(e)
-          }`,
-        );
-      }
+      await dbClient.query(insertSql, values);
     }
 
     return errors.length === 0 ? { success: true } : { success: false };
