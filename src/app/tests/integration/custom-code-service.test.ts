@@ -3,13 +3,11 @@ import {
   insertCustomValuesetsIntoQuery,
   getCustomCodeCondition,
 } from "@/app/backend/custom-code-service";
-import { dontUseOutsideConfigOrTests_getDbClient } from "@/app/backend/db/config";
 import { DibbsValueSet } from "@/app/models/entities/valuesets";
 import { randomUUID } from "crypto";
 import { CUSTOM_CONDITION_ID, CUSTOM_VALUESET_ARRAY_ID } from "@/app/constants";
 import { suppressConsoleLogs } from "./fixtures";
-
-const dbClient = dontUseOutsideConfigOrTests_getDbClient();
+import dbService from "@/app/backend/db/service";
 
 describe("UserCreatedValuesetService Integration", () => {
   beforeAll(() => {
@@ -39,7 +37,7 @@ describe("UserCreatedValuesetService Integration", () => {
     const result = await insertCustomValueSet(testVS, authorId);
     expect(result.success).toBe(true);
 
-    const vsRes = await dbClient.query(
+    const vsRes = await dbService.query(
       `SELECT * FROM valuesets WHERE name = $1`,
       [vsName],
     );
@@ -47,40 +45,41 @@ describe("UserCreatedValuesetService Integration", () => {
 
     const vsId = vsRes.rows[0].id;
 
-    const conceptRes = await dbClient.query(
+    const conceptRes = await dbService.query(
       `SELECT * FROM concepts WHERE code IN ('1234-5', '5678-9')`,
     );
     expect(conceptRes.rowCount).toBe(2);
 
-    const joinRes = await dbClient.query(
+    const joinRes = await dbService.query(
       `SELECT * FROM valueset_to_concept WHERE valueset_id = $1`,
       [vsId],
     );
     expect(joinRes.rowCount).toBe(2);
 
-    const ctvsRes = await dbClient.query(
+    const ctvsRes = await dbService.query(
       `SELECT * FROM condition_to_valueset WHERE valueset_id = $1`,
       [vsId],
     );
     expect(ctvsRes.rowCount).toBe(1);
-    expect(ctvsRes.rows[0].condition_id).toBe(CUSTOM_CONDITION_ID);
+    expect(ctvsRes.rows[0].conditionId).toBe(CUSTOM_CONDITION_ID);
   });
 
   it("should create the Custom Code Condition if missing", async () => {
-    await dbClient.query(
+    await dbService.query(
       `DELETE FROM condition_to_valueset WHERE condition_id = $1`,
       [CUSTOM_CONDITION_ID],
     );
-    await dbClient.query(`DELETE FROM conditions WHERE id = $1`, [
+    await dbService.query(`DELETE FROM conditions WHERE id = $1`, [
       CUSTOM_CONDITION_ID,
     ]);
 
     const result = await getCustomCodeCondition("http://loinc.org");
     expect(result).toBe(CUSTOM_CONDITION_ID);
 
-    const res = await dbClient.query(`SELECT * FROM conditions WHERE id = $1`, [
-      CUSTOM_CONDITION_ID,
-    ]);
+    const res = await dbService.query(
+      `SELECT * FROM conditions WHERE id = $1`,
+      [CUSTOM_CONDITION_ID],
+    );
     expect(res.rowCount).toBe(1);
     expect(res.rows[0].name).toBe("Custom Code Condition");
   });
@@ -94,7 +93,7 @@ describe("UserCreatedValuesetService Integration", () => {
     expect(success).toBe(true);
     expect(queryId).toBeDefined();
 
-    const result = await dbClient.query(
+    const result = await dbService.query(
       `SELECT query_data FROM query WHERE id = $1`,
       [queryId],
     );
@@ -132,7 +131,7 @@ describe("UserCreatedValuesetService Integration", () => {
       },
     };
 
-    await dbClient.query(
+    await dbService.query(
       `INSERT INTO query (
         id, query_name, query_data, conditions_list, author,
         date_created, date_last_modified
@@ -147,14 +146,13 @@ describe("UserCreatedValuesetService Integration", () => {
     );
     expect(success).toBe(true);
 
-    const result = await dbClient.query(
+    const result = await dbService.query(
       `SELECT query_data FROM query WHERE id = $1`,
       [baseQueryId],
     );
     expect(result.rowCount).toBe(1);
-    const queryData = result.rows[0].query_data;
+    const queryData = result.rows[0].queryData;
 
-    // expect(queryData).toHaveProperty(baseConditionId);
     expect(queryData).toHaveProperty(CUSTOM_VALUESET_ARRAY_ID);
     expect(queryData[CUSTOM_VALUESET_ARRAY_ID][testUUID].valueSetName).toBe(
       vsName,
