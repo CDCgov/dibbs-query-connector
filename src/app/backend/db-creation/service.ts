@@ -239,7 +239,7 @@ class SeedingService {
       const dbCTV: ConditionToValueSetStruct = {
         id: ctvID,
         conditionId: c.code,
-        valuesetId: c.valueset_id + "_" + oidsToVersion.get(c.valueset_id),
+        valueSetId: c.valueset_id + "_" + oidsToVersion.get(c.valueset_id),
         source: c.system,
       };
       return dbCTV;

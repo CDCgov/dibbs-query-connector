@@ -137,13 +137,13 @@ describe("Code library rendered view", () => {
 
     const tableBody = screen.getByTestId("table-valuesets-manage");
     expect(tableBody.childNodes[0]).toHaveTextContent(
-      cancerValueSets[1].valueset_name,
+      cancerValueSets[1].valueSetName,
     );
     expect(tableBody.childNodes[1]).toHaveTextContent(
-      gonorrheaValueSets[1].valueset_name,
+      gonorrheaValueSets[1].valueSetName,
     );
     expect(tableBody.childNodes[2]).toHaveTextContent(
-      customValueSets[1].valueset_name,
+      customValueSets[1].valueSetName,
     );
     expect(document.body).toMatchSnapshot();
   });
@@ -220,8 +220,8 @@ describe("Code library interaction", () => {
       "valueSetTable__tableBody_row_details",
     )[2];
 
-    expect(cancerVsRow.textContent).toContain(cancerValueSets[0].valueset_name);
-    expect(customVsRow.textContent).toContain(customValueSets[0].valueset_name);
+    expect(cancerVsRow.textContent).toContain(cancerValueSets[0].valueSetName);
+    expect(customVsRow.textContent).toContain(customValueSets[0].valueSetName);
 
     expect(cancerVsRow.textContent).not.toContain(cancerValueSets[0].author);
     expect(customVsRow.textContent).toContain(customValueSets[0].author);
@@ -263,18 +263,15 @@ describe("Code library interaction", () => {
 
     await waitFor(async () => {
       (customVsRow as HTMLElement).click();
-      const customCodesPanel = screen.getByTestId("table-codes").parentElement;
-
-      const deleteButton = (customCodesPanel as Element).getElementsByClassName(
-        "usa-button",
-      )[1];
-
+      const deleteButton = screen.getAllByRole("button", {
+        name: /delete value set/i,
+      })[1];
       (deleteButton as HTMLElement).click();
 
       const modal = screen.getByTestId("modalWindow");
       expect(modal).toBeVisible();
       expect(modal).toHaveTextContent(
-        `Are you sure you want to delete the value set "${customValueSets[0].valueset_name}?"`,
+        `Are you sure you want to delete the value set "${customValueSets[0].valueSetName}?"`,
       );
     });
   });

@@ -27,9 +27,11 @@ RETURNING *;
  * @returns a camel cased string
  */
 export function translateSnakeStringToCamelCase(str: string) {
-  return str.replace(/_+([a-z])/g, function (_, letter) {
-    return letter.toUpperCase();
-  });
+  return str
+    .replace(/valueset/g, "valueSet") // special case
+    .replace(/_+([a-z])/g, function (_, letter) {
+      return letter.toUpperCase();
+    });
 }
 
 /**

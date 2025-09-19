@@ -327,7 +327,7 @@ export async function insertDBStructArray(
         insertSql = insertValuesetToConceptSql;
         values = [
           (struct as ValuesetToConceptStruct).id,
-          (struct as ValuesetToConceptStruct).valuesetId,
+          (struct as ValuesetToConceptStruct).valueSetId,
           (struct as ValuesetToConceptStruct).conceptId,
         ];
         break;
@@ -346,7 +346,7 @@ export async function insertDBStructArray(
         values = [
           (struct as ConditionToValueSetStruct).id,
           (struct as ConditionToValueSetStruct).conditionId,
-          (struct as ConditionToValueSetStruct).valuesetId,
+          (struct as ConditionToValueSetStruct).valueSetId,
           (struct as ConditionToValueSetStruct).source,
         ];
         break;

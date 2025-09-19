@@ -19,7 +19,7 @@ export type ConceptStruct = {
 
 export type ValuesetToConceptStruct = {
   id: string;
-  valuesetId: string;
+  valueSetId: string;
   conceptId: string;
 };
 
@@ -34,7 +34,7 @@ export type ConditionStruct = {
 export type ConditionToValueSetStruct = {
   id: string;
   conditionId: string;
-  valuesetId: string;
+  valueSetId: string;
   source: string;
 };
 
