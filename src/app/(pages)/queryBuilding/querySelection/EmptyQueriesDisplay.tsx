@@ -16,6 +16,7 @@ type EmptyQueryProps = {
 /**
  * Empty-state component for query building
  * @param root0 - params
+ * @param root0.dbSeeded - whether the db was seeded
  * @param root0.goForward - navigation function to go to the next page
  * @param root0.setDbSeeded - callback function to set the seeded state of the DB
  * @returns the EmptyQueriesDisplay to render the empty state status

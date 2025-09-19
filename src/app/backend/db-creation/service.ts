@@ -394,13 +394,9 @@ class SeedingService {
 
         dbClient.query("COMMIT");
         dbService.disconnect();
-<<<<<<< HEAD
-        return { success: true, reload: true };
-=======
 
         console.log("DB successfully seeded");
         return { success: true };
->>>>>>> bob/seeding-transactional-success
       } catch (e) {
         dbClient.query("ROLLBACK");
         dbService.disconnect();
