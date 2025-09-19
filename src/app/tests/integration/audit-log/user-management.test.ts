@@ -41,6 +41,11 @@ describe("user management tests", () => {
   beforeAll(() => {
     suppressConsoleLogs();
   });
+
+  afterEach(() => {
+    consoleInfoSpy.mockReset();
+  });
+
   it("user group creation, update, deletion", async () => {
     const oldAuditIds = (await dbService.query(GET_ALL_AUDIT_ROWS)).rows.map(
       (r) => r.id,
