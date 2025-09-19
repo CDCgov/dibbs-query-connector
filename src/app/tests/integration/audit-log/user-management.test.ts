@@ -100,11 +100,17 @@ describe("user management tests", () => {
     };
     const actionTypeToCheck = "addUserIfNotExists";
     const { user } = await addUserIfNotExists(randomUserToken);
+
+    expect(consoleInfoSpy).toHaveBeenLastCalledWith(
+      expect.stringContaining(`${actionTypeToCheck} audit action with`),
+    );
+
     const auditEntry = await getAuditEntry(actionTypeToCheck, oldAuditIds);
     expect(JSON.parse(auditEntry?.userToken)).toStrictEqual(randomUserToken);
     const CREATED_USER_ID = user.id;
 
     const updateActionType = "updateUserDetails";
+
     const UPDATED_USER_NAME = "Bowser Jr. III";
     await updateUserDetails(
       CREATED_USER_ID,
@@ -113,6 +119,11 @@ describe("user management tests", () => {
       "Jr. III",
       UserRole.SUPER_ADMIN,
     );
+
+    expect(consoleInfoSpy).toHaveBeenLastCalledWith(
+      expect.stringContaining(`${updateActionType} audit action with`),
+    );
+
     const updateUserDetailsEntry = await getAuditEntry(
       updateActionType,
       oldAuditIds,
