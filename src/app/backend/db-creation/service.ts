@@ -291,7 +291,9 @@ class SeedingService {
       await SeedingService.generateValueSetSqlPromise(vs, dbClient);
     } catch (e) {
       console.error(
-        `ValueSet insertion failed for ${vs.valueSetId}_${vs.valueSetVersion}`,
+        "ValueSet insertion failed for %s_%s",
+        vs.valueSetId,
+        vs.valueSetVersion,
         e,
       );
       errorArray.push("Error during value set insertion");
