@@ -182,8 +182,7 @@ export async function checkValueSetInsertion(vs: DibbsValueSet) {
         }
       } catch (error) {
         console.error(
-          "Couldn't fetch concept with ID " + conceptId + ": ",
-          error,
+          "Couldn't fetch concept with ID %s: ", conceptId, error,
         );
         return conceptId;
       }
