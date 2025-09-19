@@ -14,7 +14,6 @@ services:
       # obtained from the ERSD API at https://ersd.aimsplatform.org/#/api-keys
     volumes:
       - ./vs_dump.sql:/docker-entrypoint-initdb.d/vs_dump.sql
-      - db-data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 2s
