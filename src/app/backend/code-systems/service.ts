@@ -28,6 +28,20 @@ export type OidData = {
 export async function getERSD(
   eRSDVersion: number = 3,
 ): Promise<ErsdOrVsacResponse> {
+  // Only allow specific, known-safe version numbers
+  const allowedVersions = [1, 2, 3];
+  if (!allowedVersions.includes(Number(eRSDVersion))) {
+    return {
+      resourceType: "OperationOutcome",
+      issue: [
+        {
+          severity: "error",
+          code: "invalid",
+          diagnostics: `Invalid eRSDVersion provided: ${eRSDVersion}`,
+        },
+      ],
+    } as OperationOutcome;
+  }
   const ERSD_API_KEY = process.env.ERSD_API_KEY;
   if (!ERSD_API_KEY) {
     throw Error(
@@ -38,7 +52,7 @@ export async function getERSD(
     );
   }
 
-  const eRSDUrl = `https://ersd.aimsplatform.org/api/ersd/v${eRSDVersion}specification?format=json&api-key=${ERSD_API_KEY}`;
+  const eRSDUrl = `https://ersd.aimsplatform.org/api/ersd/v${Number(eRSDVersion)}specification?format=json&api-key=${ERSD_API_KEY}`;
   const response = await fetch(eRSDUrl);
 
   if (response.status === 200) {
