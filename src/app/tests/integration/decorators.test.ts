@@ -1,8 +1,8 @@
-import { internal_getDbClient } from "@/app/backend/db/config";
 import { suppressConsoleLogs } from "./fixtures";
 import { insertFhirServer } from "@/app/backend/fhir-servers/service";
+import dbService from "@/app/backend/db/service";
 
-const dbClientQuery = jest.spyOn(internal_getDbClient(), "query");
+const dbClientQuery = jest.spyOn(dbService, "query");
 suppressConsoleLogs();
 
 describe("transaction decorator", () => {

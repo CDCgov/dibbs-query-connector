@@ -6,7 +6,7 @@ import { patientDiscoveryQuery } from "@/app/backend/query-execution/service";
 import { PatientDiscoveryRequest } from "@/app/models/entities/query";
 import { hyperUnluckyPatient } from "@/app/constants";
 import * as DecoratorUtils from "@/app/backend/audit-logs/lib";
-import { internal_getDbClient } from "@/app/backend/db/config";
+import { dontUseOutsideConfigOrTests_getDbClient } from "@/app/backend/db/config";
 import { suppressConsoleLogs } from "../fixtures";
 import { auth } from "@/auth";
 import { TEST_USER } from "./utils";
@@ -68,7 +68,7 @@ jest.mock("@/app/backend/fhir-servers/fhir-client", () => {
 
 (auth as jest.Mock).mockResolvedValue(TEST_USER);
 
-const dbClient = internal_getDbClient();
+const dbClient = dontUseOutsideConfigOrTests_getDbClient();
 describe("checks for generic audit logs", () => {
   beforeAll(() => {
     suppressConsoleLogs();

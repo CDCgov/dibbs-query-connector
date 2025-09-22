@@ -2,98 +2,98 @@
   "condition_to_valueset": [
     {
       "id": "1514",
-      "condition_id": "1",
-      "valueset_id": "1_20240909",
+      "conditionId": "1",
+      "valueSetId": "1_20240909",
       "source": "DIBBs"
     },
     {
       "id": "1515",
-      "condition_id": "2",
-      "valueset_id": "2_20240909",
+      "conditionId": "2",
+      "valueSetId": "2_20240909",
       "source": "DIBBs"
     },
     {
       "id": "1516",
-      "condition_id": "2",
-      "valueset_id": "3_20240909",
+      "conditionId": "2",
+      "valueSetId": "3_20240909",
       "source": "DIBBs"
     },
     {
       "id": "1517",
-      "condition_id": "35742006",
-      "valueset_id": "4_20240909",
+      "conditionId": "35742006",
+      "valueSetId": "4_20240909",
       "source": "DIBBs"
     },
     {
       "id": "1518",
-      "condition_id": "35742006",
-      "valueset_id": "5_20240909",
+      "conditionId": "35742006",
+      "valueSetId": "5_20240909",
       "source": "DIBBs"
     },
     {
       "id": "1519",
-      "condition_id": "35742006",
-      "valueset_id": "6_20240909",
+      "conditionId": "35742006",
+      "valueSetId": "6_20240909",
       "source": "DIBBs"
     },
     {
       "id": "1520",
-      "condition_id": "15628003",
-      "valueset_id": "7_20240909",
+      "conditionId": "15628003",
+      "valueSetId": "7_20240909",
       "source": "DIBBs"
     },
     {
       "id": "1521",
-      "condition_id": "15628003",
-      "valueset_id": "8_20240909",
+      "conditionId": "15628003",
+      "valueSetId": "8_20240909",
       "source": "DIBBs"
     },
     {
       "id": "1522",
-      "condition_id": "15628003",
-      "valueset_id": "9_20240909",
+      "conditionId": "15628003",
+      "valueSetId": "9_20240909",
       "source": "DIBBs"
     },
     {
       "id": "1523",
-      "condition_id": "15628003",
-      "valueset_id": "10_20240909",
+      "conditionId": "15628003",
+      "valueSetId": "10_20240909",
       "source": "DIBBs"
     },
     {
       "id": "1524",
-      "condition_id": "240589008",
-      "valueset_id": "11_20240910",
+      "conditionId": "240589008",
+      "valueSetId": "11_20240910",
       "source": "DIBBs"
     },
     {
       "id": "1525",
-      "condition_id": "240589008",
-      "valueset_id": "12_20240910",
+      "conditionId": "240589008",
+      "valueSetId": "12_20240910",
       "source": "DIBBs"
     },
     {
       "id": "1526",
-      "condition_id": "240589008",
-      "valueset_id": "13_20240910",
+      "conditionId": "240589008",
+      "valueSetId": "13_20240910",
       "source": "DIBBs"
     },
     {
       "id": "1527",
-      "condition_id": "2",
-      "valueset_id": "14_20240923",
+      "conditionId": "2",
+      "valueSetId": "14_20240923",
       "source": "DIBBs"
     },
     {
       "id": "1528",
-      "condition_id": "2",
-      "valueset_id": "15_20240923",
+      "conditionId": "2",
+      "valueSetId": "15_20240923",
       "source": "DIBBs"
     },
     {
       "id": "1529",
-      "condition_id": "1",
-      "valueset_id": "16_20241015",
+      "conditionId": "1",
+      "valueSetId": "16_20241015",
       "source": "Center for Public Health Innovation"
     }
   ]

@@ -1,1303 +1,1303 @@
 {
   "category": [
     {
-      "condition_name": "Acanthamoeba",
-      "condition_code": "49649001",
+      "conditionName": "Acanthamoeba",
+      "conditionCode": "49649001",
       "category": "Waterborne (not enteric)"
     },
     {
-      "condition_name": "Acute Flaccid Myelitis (AFM)",
-      "condition_code": "897031002",
+      "conditionName": "Acute Flaccid Myelitis (AFM)",
+      "conditionCode": "897031002",
       "category": "Neurological Diseases"
     },
     {
-      "condition_name": "Agricultural Chemicals (Fertilizer) Poisoning",
-      "condition_code": "216809001",
+      "conditionName": "Agricultural Chemicals (Fertilizer) Poisoning",
+      "conditionCode": "216809001",
       "category": "Toxic Effect of Non-Medicinal Substances"
     },
     {
-      "condition_name": "Alpha-gal Syndrome",
-      "condition_code": "788781001",
+      "conditionName": "Alpha-gal Syndrome",
+      "conditionCode": "788781001",
       "category": "Vectorborne Diseases"
     },
     {
-      "condition_name": "Amebiasis",
-      "condition_code": "388759003",
+      "conditionName": "Amebiasis",
+      "conditionCode": "388759003",
       "category": "Enteric Diseases"
     },
     {
-      "condition_name": "Anaplasmosis",
-      "condition_code": "13906002",
+      "conditionName": "Anaplasmosis",
+      "conditionCode": "13906002",
       "category": "Vectorborne Diseases"
     },
     {
-      "condition_name": "Anencephaly",
-      "condition_code": "89369001",
+      "conditionName": "Anencephaly",
+      "conditionCode": "89369001",
       "category": "Birth Defects and Infant Disorders"
     },
     {
-      "condition_name": "Angiostrongyliasis",
-      "condition_code": "61750000",
+      "conditionName": "Angiostrongyliasis",
+      "conditionCode": "61750000",
       "category": "Zoonotic Diseases"
     },
     {
-      "condition_name": "Animal Bite Injury",
-      "condition_code": "399907009",
+      "conditionName": "Animal Bite Injury",
+      "conditionCode": "399907009",
       "category": "Injuries, NEC"
     },
     {
-      "condition_name": "Anophthalmia",
-      "condition_code": "7183006",
+      "conditionName": "Anophthalmia",
+      "conditionCode": "7183006",
       "category": "Birth Defects and Infant Disorders"
     },
     {
-      "condition_name": "Anotia",
-      "condition_code": "57436000",
+      "conditionName": "Anotia",
+      "conditionCode": "57436000",
       "category": "Birth Defects and Infant Disorders"
     },
     {
-      "condition_name": "Anthrax",
-      "condition_code": "409498004",
+      "conditionName": "Anthrax",
+      "conditionCode": "409498004",
       "category": "Zoonotic Diseases"
     },
     {
-      "condition_name": "Aortic valve stenosis",
-      "condition_code": "18546004",
+      "conditionName": "Aortic valve stenosis",
+      "conditionCode": "18546004",
       "category": "Birth Defects and Infant Disorders"
     },
     {
-      "condition_name": "Arboviral Disease [Other]",
-      "condition_code": "40610006",
+      "conditionName": "Arboviral Disease [Other]",
+      "conditionCode": "40610006",
       "category": "Vectorborne Diseases"
     },
     {
-      "condition_name": "Arsenic Exposure and Toxicity",
-      "condition_code": "767146004",
+      "conditionName": "Arsenic Exposure and Toxicity",
+      "conditionCode": "767146004",
       "category": "Toxic Effect of Non-Medicinal Substances"
     },
     {
-      "condition_name": "Asbestosis",
-      "condition_code": "22607003",
+      "conditionName": "Asbestosis",
+      "conditionCode": "22607003",
       "category": "Respiratory Conditions (non-infectious)"
     },
     {
-      "condition_name": "Atrial septal defect",
-      "condition_code": "405752007",
+      "conditionName": "Atrial septal defect",
+      "conditionCode": "405752007",
       "category": "Birth Defects and Infant Disorders"
     },
     {
-      "condition_name": "Atrioventricular septal defect (Endocardial cushion defect)",
-      "condition_code": "1237074000",
+      "conditionName": "Atrioventricular septal defect (Endocardial cushion defect)",
+      "conditionCode": "1237074000",
       "category": "Birth Defects and Infant Disorders"
     },
     {
-      "condition_name": "Babesiosis",
-      "condition_code": "21061004",
+      "conditionName": "Babesiosis",
+      "conditionCode": "21061004",
       "category": "Vectorborne Diseases"
     },
     {
-      "condition_name": "Balamuthia mandrillaris Disease",
-      "condition_code": "115635005",
+      "conditionName": "Balamuthia mandrillaris Disease",
+      "conditionCode": "115635005",
       "category": "Waterborne (not enteric)"
     },
     {
-      "condition_name": "Bartonellosis",
-      "condition_code": "266123003",
+      "conditionName": "Bartonellosis",
+      "conditionCode": "266123003",
       "category": "Vectorborne Diseases"
     },
     {
-      "condition_name": "Baylisascariasis",
-      "condition_code": "93614002",
+      "conditionName": "Baylisascariasis",
+      "conditionCode": "93614002",
       "category": "Zoonotic Diseases"
     },
     {
-      "condition_name": "Bladder Exstrophy",
-      "condition_code": "61758007",
+      "conditionName": "Bladder Exstrophy",
+      "conditionCode": "61758007",
       "category": "Birth Defects and Infant Disorders"
     },
     {
-      "condition_name": "Blastomycosis",
-      "condition_code": "69996000",
+      "conditionName": "Blastomycosis",
+      "conditionCode": "69996000",
       "category": "Respiratory Conditions (infectious)"
     },
     {
-      "condition_name": "Botulism",
-      "condition_code": "398565003",
+      "conditionName": "Botulism",
+      "conditionCode": "398565003",
       "category": "Toxic Effect of Non-Medicinal Substances"
     },
     {
-      "condition_name": "Botulism, Infant",
-      "condition_code": "414488002",
+      "conditionName": "Botulism, Infant",
+      "conditionCode": "414488002",
       "category": "Toxic Effect of Non-Medicinal Substances"
     },
     {
-      "condition_name": "Brucellosis",
-      "condition_code": "75702008",
+      "conditionName": "Brucellosis",
+      "conditionCode": "75702008",
       "category": "Zoonotic Diseases"
     },
     {
-      "condition_name": "Byssinosis",
-      "condition_code": "85761009",
+      "conditionName": "Byssinosis",
+      "conditionCode": "85761009",
       "category": "Respiratory Conditions (non-infectious)"
     },
     {
-      "condition_name": "Cadmium Exposure and Toxicity",
-      "condition_code": "3398004",
+      "conditionName": "Cadmium Exposure and Toxicity",
+      "conditionCode": "3398004",
       "category": "Toxic Effect of Non-Medicinal Substances"
     },
     {
-      "condition_name": "California Serogroup Virus Disease",
-      "condition_code": "418182000",
+      "conditionName": "California Serogroup Virus Disease",
+      "conditionCode": "418182000",
       "category": "Vectorborne Diseases"
     },
     {
-      "condition_name": "Campylobacteriosis",
-      "condition_code": "86500004",
+      "conditionName": "Campylobacteriosis",
+      "conditionCode": "86500004",
       "category": "Enteric Diseases"
     },
     {
-      "condition_name": "Cancer",
-      "condition_code": "363346000",
+      "conditionName": "Cancer",
+      "conditionCode": "363346000",
       "category": "Cancer"
     },
     {
-      "condition_name": "Candida auris infection",
-      "condition_code": "865929003",
+      "conditionName": "Candida auris infection",
+      "conditionCode": "865929003",
       "category": "Healthcare-Associated Events"
     },
     {
-      "condition_name": "Carbapenemase-Producing Organisms (CPO)",
-      "condition_code": "734350003",
+      "conditionName": "Carbapenemase-Producing Organisms (CPO)",
+      "conditionCode": "734350003",
       "category": "Healthcare-Associated Events"
     },
     {
-      "condition_name": "Carbapenem-resistant Acinetobacter baumannii (CRAB)",
-      "condition_code": "715174007",
+      "conditionName": "Carbapenem-resistant Acinetobacter baumannii (CRAB)",
+      "conditionCode": "715174007",
       "category": "Healthcare-Associated Events"
     },
     {
-      "condition_name": "Carbapenem-resistant Enterobacterales (CRE)",
-      "condition_code": "44591000087104",
+      "conditionName": "Carbapenem-resistant Enterobacterales (CRE)",
+      "conditionCode": "44591000087104",
       "category": "Healthcare-Associated Events"
     },
     {
-      "condition_name": "Carbapenem-resistant Pseudomonas aeruginosa (CRPA)",
-      "condition_code": "726492000",
+      "conditionName": "Carbapenem-resistant Pseudomonas aeruginosa (CRPA)",
+      "conditionCode": "726492000",
       "category": "Healthcare-Associated Events"
     },
     {
-      "condition_name": "Carbon Monoxide Poisoning",
-      "condition_code": "17383000",
+      "conditionName": "Carbon Monoxide Poisoning",
+      "conditionCode": "17383000",
       "category": "Toxic Effect of Non-Medicinal Substances"
     },
     {
-      "condition_name": "Catheter-associated Urinary Tract Infection (CAUTI)",
-      "condition_code": "700372006",
+      "conditionName": "Catheter-associated Urinary Tract Infection (CAUTI)",
+      "conditionCode": "700372006",
       "category": "Healthcare-Associated Events"
     },
     {
-      "condition_name": "Central Line-associated Bloodstream Infection (CLABSI)",
-      "condition_code": "736152001",
+      "conditionName": "Central Line-associated Bloodstream Infection (CLABSI)",
+      "conditionCode": "736152001",
       "category": "Healthcare-Associated Events"
     },
     {
-      "condition_name": "Chagas Disease",
-      "condition_code": "77506005",
+      "conditionName": "Chagas Disease",
+      "conditionCode": "77506005",
       "category": "Vectorborne Diseases"
     },
     {
-      "condition_name": "Chancroid",
-      "condition_code": "266143009",
+      "conditionName": "Chancroid",
+      "conditionCode": "266143009",
       "category": "Sexually Transmitted Diseases"
     },
     {
-      "condition_name": "Chemical Pneumonitis",
-      "condition_code": "196021009",
+      "conditionName": "Chemical Pneumonitis",
+      "conditionCode": "196021009",
       "category": "Respiratory Conditions (non-infectious)"
     },
     {
-      "condition_name": "Chikungunya virus disease",
-      "condition_code": "111864006",
+      "conditionName": "Chikungunya virus disease",
+      "conditionCode": "111864006",
       "category": "Vectorborne Diseases"
     },
     {
-      "condition_name": "Chlamydia trachomatis infection",
-      "condition_code": "240589008",
+      "conditionName": "Chlamydia trachomatis infection",
+      "conditionCode": "240589008",
       "category": "Sexually Transmitted Diseases"
     },
     {
-      "condition_name": "Choanal Atresia",
-      "condition_code": "204508009",
+      "conditionName": "Choanal Atresia",
+      "conditionCode": "204508009",
       "category": "Birth Defects and Infant Disorders"
     },
     {
-      "condition_name": "Cholera",
-      "condition_code": "63650001",
+      "conditionName": "Cholera",
+      "conditionCode": "63650001",
       "category": "Enteric Diseases"
     },
     {
-      "condition_name": "Cleft Lip Alone",
-      "condition_code": "80281008",
+      "conditionName": "Cleft Lip Alone",
+      "conditionCode": "80281008",
       "category": "Birth Defects and Infant Disorders"
     },
     {
-      "condition_name": "Cleft Lip with Cleft Palate",
-      "condition_code": "66948001",
+      "conditionName": "Cleft Lip with Cleft Palate",
+      "conditionCode": "66948001",
       "category": "Birth Defects and Infant Disorders"
     },
     {
-      "condition_name": "Cleft Palate Alone",
-      "condition_code": "87979003",
+      "conditionName": "Cleft Palate Alone",
+      "conditionCode": "87979003",
       "category": "Birth Defects and Infant Disorders"
     },
     {
-      "condition_name": "Cloacal Exstrophy",
-      "condition_code": "20815007",
+      "conditionName": "Cloacal Exstrophy",
+      "conditionCode": "20815007",
       "category": "Birth Defects and Infant Disorders"
     },
     {
-      "condition_name": "Clostridioides difficile (C. diff) infection",
-      "condition_code": "186431008",
+      "conditionName": "Clostridioides difficile (C. diff) infection",
+      "conditionCode": "186431008",
       "category": "Enteric Diseases"
     },
     {
-      "condition_name": "Clostridium perfringens Infection",
-      "condition_code": "65154009",
+      "conditionName": "Clostridium perfringens Infection",
+      "conditionCode": "65154009",
       "category": "Enteric Diseases"
     },
     {
-      "condition_name": "Coal Workers\u2019 Pneumoconiosis (CWP)",
-      "condition_code": "29422001",
+      "conditionName": "Coal Workers\u2019 Pneumoconiosis (CWP)",
+      "conditionCode": "29422001",
       "category": "Respiratory Conditions (non-infectious)"
     },
     {
-      "condition_name": "Coarctation of the Aorta",
-      "condition_code": "7305005",
+      "conditionName": "Coarctation of the Aorta",
+      "conditionCode": "7305005",
       "category": "Birth Defects and Infant Disorders"
     },
     {
-      "condition_name": "Coccidioidomycosis",
-      "condition_code": "60826002",
+      "conditionName": "Coccidioidomycosis",
+      "conditionCode": "60826002",
       "category": "Respiratory Conditions (infectious)"
     },
     {
-      "condition_name": "Colorado tick fever",
-      "condition_code": "6452009",
+      "conditionName": "Colorado tick fever",
+      "conditionCode": "6452009",
       "category": "Vectorborne Diseases"
     },
     {
-      "condition_name": "Congenital cytomegalovirus (cCMV) infection and disease",
-      "condition_code": "59527008",
+      "conditionName": "Congenital cytomegalovirus (cCMV) infection and disease",
+      "conditionCode": "59527008",
       "category": "Birth Defects and Infant Disorders"
     },
     {
-      "condition_name": "Congenital Posterior Urethral Valves",
-      "condition_code": "253900005",
+      "conditionName": "Congenital Posterior Urethral Valves",
+      "conditionCode": "253900005",
       "category": "Birth Defects and Infant Disorders"
     },
     {
-      "condition_name": "Congenital Rubella Syndrome (CRS)",
-      "condition_code": "1857005",
+      "conditionName": "Congenital Rubella Syndrome (CRS)",
+      "conditionCode": "1857005",
       "category": "Vaccine Preventable Diseases"
     },
     {
-      "condition_name": "COVID-19",
-      "condition_code": "840539006",
+      "conditionName": "COVID-19",
+      "conditionCode": "840539006",
       "category": "Respiratory Conditions (infectious)"
     },
     {
-      "condition_name": "Cryptococcosis",
-      "condition_code": "42386007",
+      "conditionName": "Cryptococcosis",
+      "conditionCode": "42386007",
       "category": "Respiratory Conditions (infectious)"
     },
     {
-      "condition_name": "Cryptosporidiosis",
-      "condition_code": "240370009",
+      "conditionName": "Cryptosporidiosis",
+      "conditionCode": "240370009",
       "category": "Enteric Diseases"
     },
     {
-      "condition_name": "Cyanobacteria And Cyanotoxin Poisoning",
-      "condition_code": "41439009",
+      "conditionName": "Cyanobacteria And Cyanotoxin Poisoning",
+      "conditionCode": "41439009",
       "category": "Toxic Effect of Non-Medicinal Substances"
     },
     {
-      "condition_name": "Cyclosporiasis",
-      "condition_code": "240372001",
+      "conditionName": "Cyclosporiasis",
+      "conditionCode": "240372001",
       "category": "Enteric Diseases"
     },
     {
-      "condition_name": "Cysticercosis",
-      "condition_code": "59051007",
+      "conditionName": "Cysticercosis",
+      "conditionCode": "59051007",
       "category": "Zoonotic Diseases"
     },
     {
-      "condition_name": "Dengue Virus Infection",
-      "condition_code": "38362002",
+      "conditionName": "Dengue Virus Infection",
+      "conditionCode": "38362002",
       "category": "Vectorborne Diseases"
     },
     {
-      "condition_name": "Diphtheria",
-      "condition_code": "276197005",
+      "conditionName": "Diphtheria",
+      "conditionCode": "276197005",
       "category": "Vaccine Preventable Diseases"
     },
     {
-      "condition_name": "Diphyllobothriasis",
-      "condition_code": "187151009",
+      "conditionName": "Diphyllobothriasis",
+      "conditionCode": "187151009",
       "category": "Zoonotic Diseases"
     },
     {
-      "condition_name": "Double Outlet Right Ventricle (DORV)",
-      "condition_code": "7484005",
+      "conditionName": "Double Outlet Right Ventricle (DORV)",
+      "conditionCode": "7484005",
       "category": "Birth Defects and Infant Disorders"
     },
     {
-      "condition_name": "Down Syndrome",
-      "condition_code": "41040004",
+      "conditionName": "Down Syndrome",
+      "conditionCode": "41040004",
       "category": "Birth Defects and Infant Disorders"
     },
     {
-      "condition_name": "Drowning and Submersion",
-      "condition_code": "212962007",
+      "conditionName": "Drowning and Submersion",
+      "conditionCode": "212962007",
       "category": "Injuries, NEC"
     },
     {
-      "condition_name": "Drug Overdose and Poisoning, Non-opioid",
-      "condition_code": "1149222004",
+      "conditionName": "Drug Overdose and Poisoning, Non-opioid",
+      "conditionCode": "1149222004",
       "category": "Injuries, NEC"
     },
     {
-      "condition_name": "Eastern equine encephalitis virus disease",
-      "condition_code": "416925005",
+      "conditionName": "Eastern equine encephalitis virus disease",
+      "conditionCode": "416925005",
       "category": "Vectorborne Diseases"
     },
     {
-      "condition_name": "Ebstein Anomaly",
-      "condition_code": "204357006",
+      "conditionName": "Ebstein Anomaly",
+      "conditionCode": "204357006",
       "category": "Birth Defects and Infant Disorders"
     },
     {
-      "condition_name": "Echinococcosis",
-      "condition_code": "74942003",
+      "conditionName": "Echinococcosis",
+      "conditionCode": "74942003",
       "category": "Parasitic Diseases"
     },
     {
-      "condition_name": "Ehrlichiosis",
-      "condition_code": "240626005",
+      "conditionName": "Ehrlichiosis",
+      "conditionCode": "240626005",
       "category": "Vectorborne Diseases"
     },
     {
-      "condition_name": "Encephalitis",
-      "condition_code": "45170000",
+      "conditionName": "Encephalitis",
+      "conditionCode": "45170000",
       "category": "Neurological Diseases"
     },
     {
-      "condition_name": "Encephalocele",
-      "condition_code": "55999004",
+      "conditionName": "Encephalocele",
+      "conditionCode": "55999004",
       "category": "Birth Defects and Infant Disorders"
     },
     {
-      "condition_name": "Farmer's Lung",
-      "condition_code": "18690003",
+      "conditionName": "Farmer's Lung",
+      "conditionCode": "18690003",
       "category": "Respiratory Conditions (non-infectious)"
     },
     {
-      "condition_name": "Firearm-related injury",
-      "condition_code": "283545005",
+      "conditionName": "Firearm-related injury",
+      "conditionCode": "283545005",
       "category": "Injuries, NEC"
     },
     {
-      "condition_name": "Galactosemia",
-      "condition_code": "190745006",
+      "conditionName": "Galactosemia",
+      "conditionCode": "190745006",
       "category": "Birth Defects and Infant Disorders"
     },
     {
-      "condition_name": "Gastroschisis",
-      "condition_code": "72951007",
+      "conditionName": "Gastroschisis",
+      "conditionCode": "72951007",
       "category": "Birth Defects and Infant Disorders"
     },
     {
-      "condition_name": "Genital Warts",
-      "condition_code": "266113007",
+      "conditionName": "Genital Warts",
+      "conditionCode": "266113007",
       "category": "Sexually Transmitted Diseases"
     },
     {
-      "condition_name": "Giardiasis",
-      "condition_code": "58265007",
+      "conditionName": "Giardiasis",
+      "conditionCode": "58265007",
       "category": "Enteric Diseases"
     },
     {
-      "condition_name": "Glanders",
-      "condition_code": "4639008",
+      "conditionName": "Glanders",
+      "conditionCode": "4639008",
       "category": "Zoonotic Diseases"
     },
     {
-      "condition_name": "Gonorrhea",
-      "condition_code": "15628003",
+      "conditionName": "Gonorrhea",
+      "conditionCode": "15628003",
       "category": "Sexually Transmitted Diseases"
     },
     {
-      "condition_name": "Granuloma Inguinale (Donovanosis)",
-      "condition_code": "28867007",
+      "conditionName": "Granuloma Inguinale (Donovanosis)",
+      "conditionCode": "28867007",
       "category": "Sexually Transmitted Diseases"
     },
     {
-      "condition_name": "Guillain-Barr\u00e9 Syndrome",
-      "condition_code": "40956001",
+      "conditionName": "Guillain-Barr\u00e9 Syndrome",
+      "conditionCode": "40956001",
       "category": "Neurological Diseases"
     },
     {
-      "condition_name": "Hansen's disease",
-      "condition_code": "81004002",
+      "conditionName": "Hansen's disease",
+      "conditionCode": "81004002",
       "category": "Respiratory Conditions (infectious)"
     },
     {
-      "condition_name": "Hantavirus Infection",
-      "condition_code": "359761005",
+      "conditionName": "Hantavirus Infection",
+      "conditionCode": "359761005",
       "category": "Zoonotic Diseases"
     },
     {
-      "condition_name": "Head Injury",
-      "condition_code": "82271004",
+      "conditionName": "Head Injury",
+      "conditionCode": "82271004",
       "category": "Injuries, NEC"
     },
     {
-      "condition_name": "Hemolytic uremic syndrome (HUS)",
-      "condition_code": "111407006",
+      "conditionName": "Hemolytic uremic syndrome (HUS)",
+      "conditionCode": "111407006",
       "category": "Enteric Diseases"
     },
     {
-      "condition_name": "Hepatitis A Virus infection",
-      "condition_code": "40468003",
+      "conditionName": "Hepatitis A Virus infection",
+      "conditionCode": "40468003",
       "category": "Enteric Diseases"
     },
     {
-      "condition_name": "Hepatitis B Virus Infection",
-      "condition_code": "66071002",
+      "conditionName": "Hepatitis B Virus Infection",
+      "conditionCode": "66071002",
       "category": "Bloodborne Diseases"
     },
     {
-      "condition_name": "Hepatitis B Virus Infection, Perinatal",
-      "condition_code": "60498001",
+      "conditionName": "Hepatitis B Virus Infection, Perinatal",
+      "conditionCode": "60498001",
       "category": "Bloodborne Diseases"
     },
     {
-      "condition_name": "Hepatitis C Virus Infection",
-      "condition_code": "50711007",
+      "conditionName": "Hepatitis C Virus Infection",
+      "conditionCode": "50711007",
       "category": "Bloodborne Diseases"
     },
     {
-      "condition_name": "Hepatitis C Virus Infection, Perinatal",
-      "condition_code": "551611000124101",
+      "conditionName": "Hepatitis C Virus Infection, Perinatal",
+      "conditionCode": "551611000124101",
       "category": "Bloodborne Diseases"
     },
     {
-      "condition_name": "Hepatitis D Virus Infection",
-      "condition_code": "707341005",
+      "conditionName": "Hepatitis D Virus Infection",
+      "conditionCode": "707341005",
       "category": "Bloodborne Diseases"
     },
     {
-      "condition_name": "Hepatitis E Virus infection",
-      "condition_code": "7111000119109",
+      "conditionName": "Hepatitis E Virus infection",
+      "conditionCode": "7111000119109",
       "category": "Enteric Diseases"
     },
     {
-      "condition_name": "Hepatitis G Virus Infection",
-      "condition_code": "397575003",
+      "conditionName": "Hepatitis G Virus Infection",
+      "conditionCode": "397575003",
       "category": "Bloodborne Diseases"
     },
     {
-      "condition_name": "Herpes, Genital",
-      "condition_code": "33839006",
+      "conditionName": "Herpes, Genital",
+      "conditionCode": "33839006",
       "category": "Sexually Transmitted Diseases"
     },
     {
-      "condition_name": "Herpes, Neonatal",
-      "condition_code": "91576008",
+      "conditionName": "Herpes, Neonatal",
+      "conditionCode": "91576008",
       "category": "Sexually Transmitted Diseases"
     },
     {
-      "condition_name": "Histoplasmosis",
-      "condition_code": "12962009",
+      "conditionName": "Histoplasmosis",
+      "conditionCode": "12962009",
       "category": "Respiratory Conditions (infectious)"
     },
     {
-      "condition_name": "HIV Infection or AIDS",
-      "condition_code": "86406008",
+      "conditionName": "HIV Infection or AIDS",
+      "conditionCode": "86406008",
       "category": "Sexually Transmitted Diseases"
     },
     {
-      "condition_name": "Hypoplastic Left Heart Syndrome (HLHS)",
-      "condition_code": "62067003",
+      "conditionName": "Hypoplastic Left Heart Syndrome (HLHS)",
+      "conditionCode": "62067003",
       "category": "Birth Defects and Infant Disorders"
     },
     {
-      "condition_name": "Hypospadias",
-      "condition_code": "416010008",
+      "conditionName": "Hypospadias",
+      "conditionCode": "416010008",
       "category": "Birth Defects and Infant Disorders"
     },
     {
-      "condition_name": "Infant Hearing Loss",
-      "condition_code": "95821001",
+      "conditionName": "Infant Hearing Loss",
+      "conditionCode": "95821001",
       "category": "Birth Defects and Infant Disorders"
     },
     {
-      "condition_name": "Influenza",
-      "condition_code": "43692000",
+      "conditionName": "Influenza",
+      "conditionCode": "43692000",
       "category": "Vaccine Preventable Diseases"
     },
     {
-      "condition_name": "Influenza-Associated Hospitalizations",
-      "condition_code": "719590007",
+      "conditionName": "Influenza-Associated Hospitalizations",
+      "conditionCode": "719590007",
       "category": "Vaccine Preventable Diseases"
     },
     {
-      "condition_name": "Influenza-Associated Mortality",
-      "condition_code": "661761000124109",
+      "conditionName": "Influenza-Associated Mortality",
+      "conditionCode": "661761000124109",
       "category": "Vaccine Preventable Diseases"
     },
     {
-      "condition_name": "Influenza-associated pediatric mortality",
-      "condition_code": "6142004",
+      "conditionName": "Influenza-associated pediatric mortality",
+      "conditionCode": "6142004",
       "category": "Vaccine Preventable Diseases"
     },
     {
-      "condition_name": "Influenza-like Illness (ILI)",
-      "condition_code": "95891005",
+      "conditionName": "Influenza-like Illness (ILI)",
+      "conditionCode": "95891005",
       "category": "Respiratory Conditions (infectious)"
     },
     {
-      "condition_name": "Interrupted Aortic Arch",
-      "condition_code": "218728005",
+      "conditionName": "Interrupted Aortic Arch",
+      "conditionCode": "218728005",
       "category": "Birth Defects and Infant Disorders"
     },
     {
-      "condition_name": "Invasive Cronobacter Infection Among Infants",
-      "condition_code": "444664004",
+      "conditionName": "Invasive Cronobacter Infection Among Infants",
+      "conditionCode": "444664004",
       "category": "Systemic Conditions"
     },
     {
-      "condition_name": "Invasive Haemophilus Influenzae Disease",
-      "condition_code": "406583002",
+      "conditionName": "Invasive Haemophilus Influenzae Disease",
+      "conditionCode": "406583002",
       "category": "Vaccine Preventable Diseases"
     },
     {
-      "condition_name": "Invasive Pneumococcal Disease",
-      "condition_code": "406617004",
+      "conditionName": "Invasive Pneumococcal Disease",
+      "conditionCode": "406617004",
       "category": "Vaccine Preventable Diseases"
     },
     {
-      "condition_name": "Jamestown Canyon virus disease",
-      "condition_code": "41723001",
+      "conditionName": "Jamestown Canyon virus disease",
+      "conditionCode": "41723001",
       "category": "Vectorborne Diseases"
     },
     {
-      "condition_name": "Japanese encephalitis virus (JEV) disease",
-      "condition_code": "52947006",
+      "conditionName": "Japanese encephalitis virus (JEV) disease",
+      "conditionCode": "52947006",
       "category": "Vectorborne Diseases"
     },
     {
-      "condition_name": "Kawasaki Disease",
-      "condition_code": "75053002",
+      "conditionName": "Kawasaki Disease",
+      "conditionCode": "75053002",
       "category": "Systemic Conditions"
     },
     {
-      "condition_name": "Keystone virus disease",
-      "condition_code": "404237007",
+      "conditionName": "Keystone virus disease",
+      "conditionCode": "404237007",
       "category": "Vectorborne Diseases"
     },
     {
-      "condition_name": "La Crosse virus disease",
-      "condition_code": "61094002",
+      "conditionName": "La Crosse virus disease",
+      "conditionCode": "61094002",
       "category": "Vectorborne Diseases"
     },
     {
-      "condition_name": "Lead in Blood",
-      "condition_code": "407152001",
+      "conditionName": "Lead in Blood",
+      "conditionCode": "407152001",
       "category": "Toxic Effect of Non-Medicinal Substances"
     },
     {
-      "condition_name": "Legionellosis",
-      "condition_code": "26726000",
+      "conditionName": "Legionellosis",
+      "conditionCode": "26726000",
       "category": "Respiratory Conditions (infectious)"
     },
     {
-      "condition_name": "Leishmaniasis",
-      "condition_code": "80612004",
+      "conditionName": "Leishmaniasis",
+      "conditionCode": "80612004",
       "category": "Vectorborne Diseases"
     },
     {
-      "condition_name": "Leptospirosis",
-      "condition_code": "77377001",
+      "conditionName": "Leptospirosis",
+      "conditionCode": "77377001",
       "category": "Zoonotic Diseases"
     },
     {
-      "condition_name": "Limb Reduction",
-      "condition_code": "67341007",
+      "conditionName": "Limb Reduction",
+      "conditionCode": "67341007",
       "category": "Birth Defects and Infant Disorders"
     },
     {
-      "condition_name": "Listeriosis",
-      "condition_code": "4241002",
+      "conditionName": "Listeriosis",
+      "conditionCode": "4241002",
       "category": "Enteric Diseases"
     },
     {
-      "condition_name": "Louse-borne relapsing fever (LBRF)",
-      "condition_code": "14683004",
+      "conditionName": "Louse-borne relapsing fever (LBRF)",
+      "conditionCode": "14683004",
       "category": "Vectorborne Diseases"
     },
     {
-      "condition_name": "Lyme disease",
-      "condition_code": "23502006",
+      "conditionName": "Lyme disease",
+      "conditionCode": "23502006",
       "category": "Vectorborne Diseases"
     },
     {
-      "condition_name": "Lymphatic Filariasis",
-      "condition_code": "240820001",
+      "conditionName": "Lymphatic Filariasis",
+      "conditionCode": "240820001",
       "category": "Vectorborne Diseases"
     },
     {
-      "condition_name": "Lymphocytic Choriomeningitis",
-      "condition_code": "721781004",
+      "conditionName": "Lymphocytic Choriomeningitis",
+      "conditionCode": "721781004",
       "category": "Zoonotic Diseases"
     },
     {
-      "condition_name": "Malaria",
-      "condition_code": "61462000",
+      "conditionName": "Malaria",
+      "conditionCode": "61462000",
       "category": "Vectorborne Diseases"
     },
     {
-      "condition_name": "Measles",
-      "condition_code": "14189004",
+      "conditionName": "Measles",
+      "conditionCode": "14189004",
       "category": "Vaccine Preventable Diseases"
     },
     {
-      "condition_name": "Melioidosis",
-      "condition_code": "428111003",
+      "conditionName": "Melioidosis",
+      "conditionCode": "428111003",
       "category": "Waterborne (not enteric)"
     },
     {
-      "condition_name": "Meningitis",
-      "condition_code": "7180009",
+      "conditionName": "Meningitis",
+      "conditionCode": "7180009",
       "category": "Neurological Diseases"
     },
     {
-      "condition_name": "Meningococcal disease",
-      "condition_code": "23511006",
+      "conditionName": "Meningococcal disease",
+      "conditionCode": "23511006",
       "category": "Vaccine Preventable Diseases"
     },
     {
-      "condition_name": "Mercury Exposure and Toxicity",
-      "condition_code": "767299002",
+      "conditionName": "Mercury Exposure and Toxicity",
+      "conditionCode": "767299002",
       "category": "Toxic Effect of Non-Medicinal Substances"
     },
     {
-      "condition_name": "Methemoglobinemia",
-      "condition_code": "38959009",
+      "conditionName": "Methemoglobinemia",
+      "conditionCode": "38959009",
       "category": "Systemic Conditions"
     },
     {
-      "condition_name": "Microphthalmia",
-      "condition_code": "61142002",
+      "conditionName": "Microphthalmia",
+      "conditionCode": "61142002",
       "category": "Birth Defects and Infant Disorders"
     },
     {
-      "condition_name": "Microtia",
-      "condition_code": "35045004",
+      "conditionName": "Microtia",
+      "conditionCode": "35045004",
       "category": "Birth Defects and Infant Disorders"
     },
     {
-      "condition_name": "Middle East Respiratory Syndrome (MERS)",
-      "condition_code": "651000146102",
+      "conditionName": "Middle East Respiratory Syndrome (MERS)",
+      "conditionCode": "651000146102",
       "category": "Respiratory Conditions (infectious)"
     },
     {
-      "condition_name": "Motor Vehicle Injury",
-      "condition_code": "407153006",
+      "conditionName": "Motor Vehicle Injury",
+      "conditionCode": "407153006",
       "category": "Injuries, NEC"
     },
     {
-      "condition_name": "Mpox",
-      "condition_code": "359814004",
+      "conditionName": "Mpox",
+      "conditionCode": "359814004",
       "category": "Zoonotic Diseases"
     },
     {
-      "condition_name": "Multisystem Inflammatory Syndrome in Adults (MIS-A)",
-      "condition_code": "1119306006",
+      "conditionName": "Multisystem Inflammatory Syndrome in Adults (MIS-A)",
+      "conditionCode": "1119306006",
       "category": "Systemic Conditions"
     },
     {
-      "condition_name": "Multisystem Inflammatory Syndrome in Children (MIS-C)",
-      "condition_code": "895448002",
+      "conditionName": "Multisystem Inflammatory Syndrome in Children (MIS-C)",
+      "conditionCode": "895448002",
       "category": "Systemic Conditions"
     },
     {
-      "condition_name": "Mumps",
-      "condition_code": "36989005",
+      "conditionName": "Mumps",
+      "conditionCode": "36989005",
       "category": "Vaccine Preventable Diseases"
     },
     {
-      "condition_name": "Naegleria fowleri Primary Amebic Meningoencephalitis",
-      "condition_code": "428175000",
+      "conditionName": "Naegleria fowleri Primary Amebic Meningoencephalitis",
+      "conditionCode": "428175000",
       "category": "Waterborne (not enteric)"
     },
     {
-      "condition_name": "Neonatal Abstinence Syndrome",
-      "condition_code": "414819007",
+      "conditionName": "Neonatal Abstinence Syndrome",
+      "conditionCode": "414819007",
       "category": "Birth Defects and Infant Disorders"
     },
     {
-      "condition_name": "Nipah Virus Infection",
-      "condition_code": "406597005",
+      "conditionName": "Nipah Virus Infection",
+      "conditionCode": "406597005",
       "category": "Zoonotic Diseases"
     },
     {
-      "condition_name": "Nongonococcal Urethritis",
-      "condition_code": "84619001",
+      "conditionName": "Nongonococcal Urethritis",
+      "conditionCode": "84619001",
       "category": "Sexually Transmitted Diseases"
     },
     {
-      "condition_name": "Non-pestis Yersiniosis",
-      "condition_code": "83436008",
+      "conditionName": "Non-pestis Yersiniosis",
+      "conditionCode": "83436008",
       "category": "Enteric Diseases"
     },
     {
-      "condition_name": "Non-Polio Enterovirus Infection",
-      "condition_code": "53648006",
+      "conditionName": "Non-Polio Enterovirus Infection",
+      "conditionCode": "53648006",
       "category": "Enteric Diseases"
     },
     {
-      "condition_name": "Non-Streptococcal Toxic\u202fShock Syndrome",
-      "condition_code": "18504008",
+      "conditionName": "Non-Streptococcal Toxic\u202fShock Syndrome",
+      "conditionCode": "18504008",
       "category": "Toxic Effect of Non-Medicinal Substances"
     },
     {
-      "condition_name": "Nontuberculous Mycobacteria Infection, Extrapulmonary",
-      "condition_code": "111811007",
+      "conditionName": "Nontuberculous Mycobacteria Infection, Extrapulmonary",
+      "conditionCode": "111811007",
       "category": "Waterborne (not enteric)"
     },
     {
-      "condition_name": "Nontuberculous Mycobacteria Infection, Pulmonary",
-      "condition_code": "1731000119106",
+      "conditionName": "Nontuberculous Mycobacteria Infection, Pulmonary",
+      "conditionCode": "1731000119106",
       "category": "Respiratory Conditions (infectious)"
     },
     {
-      "condition_name": "Norovirus Infections",
-      "condition_code": "721763002",
+      "conditionName": "Norovirus Infections",
+      "conditionCode": "721763002",
       "category": "Enteric Diseases"
     },
     {
-      "condition_name": "Novel Influenza A Virus Infection",
-      "condition_code": "541131000124102",
+      "conditionName": "Novel Influenza A Virus Infection",
+      "conditionCode": "541131000124102",
       "category": "Vaccine Preventable Diseases"
     },
     {
-      "condition_name": "Ophthalmia Neonatorum",
-      "condition_code": "34298002",
+      "conditionName": "Ophthalmia Neonatorum",
+      "conditionCode": "34298002",
       "category": "Sexually Transmitted Diseases"
     },
     {
-      "condition_name": "Opioid Overdose and Poisoning",
-      "condition_code": "242253008",
+      "conditionName": "Opioid Overdose and Poisoning",
+      "conditionCode": "242253008",
       "category": "Toxic Effect of Non-Medicinal Substances"
     },
     {
-      "condition_name": "Orthopoxvirus Disease",
-      "condition_code": "414015000",
+      "conditionName": "Orthopoxvirus Disease",
+      "conditionCode": "414015000",
       "category": "Vaccine Preventable Diseases"
     },
     {
-      "condition_name": "Parkinson's disease",
-      "condition_code": "49049000",
+      "conditionName": "Parkinson's disease",
+      "conditionCode": "49049000",
       "category": "Neurological Diseases"
     },
     {
-      "condition_name": "Pelvic Inflammatory Disease",
-      "condition_code": "198130006",
+      "conditionName": "Pelvic Inflammatory Disease",
+      "conditionCode": "198130006",
       "category": "Sexually Transmitted Diseases"
     },
     {
-      "condition_name": "Pertussis",
-      "condition_code": "27836007",
+      "conditionName": "Pertussis",
+      "conditionCode": "27836007",
       "category": "Vaccine Preventable Diseases"
     },
     {
-      "condition_name": "Pesticide Related Illness or injury",
-      "condition_code": "37131007",
+      "conditionName": "Pesticide Related Illness or injury",
+      "conditionCode": "37131007",
       "category": "Toxic Effect of Non-Medicinal Substances"
     },
     {
-      "condition_name": "Phenylketonuria",
-      "condition_code": "190687004",
+      "conditionName": "Phenylketonuria",
+      "conditionCode": "190687004",
       "category": "Birth Defects and Infant Disorders"
     },
     {
-      "condition_name": "Plague",
-      "condition_code": "58750007",
+      "conditionName": "Plague",
+      "conditionCode": "58750007",
       "category": "Zoonotic Diseases"
     },
     {
-      "condition_name": "Poliovirus Infection",
-      "condition_code": "398102009",
+      "conditionName": "Poliovirus Infection",
+      "conditionCode": "398102009",
       "category": "Vaccine Preventable Diseases"
     },
     {
-      "condition_name": "Powassan virus disease",
-      "condition_code": "416707008",
+      "conditionName": "Powassan virus disease",
+      "conditionCode": "416707008",
       "category": "Vectorborne Diseases"
     },
     {
-      "condition_name": "Primary Congenital Hypothyroidism",
-      "condition_code": "190268003",
+      "conditionName": "Primary Congenital Hypothyroidism",
+      "conditionCode": "190268003",
       "category": "Birth Defects and Infant Disorders"
     },
     {
-      "condition_name": "Prion Disease (Human)",
-      "condition_code": "20484008",
+      "conditionName": "Prion Disease (Human)",
+      "conditionCode": "20484008",
       "category": "Neurological Diseases"
     },
     {
-      "condition_name": "Psittacosis",
-      "condition_code": "75116005",
+      "conditionName": "Psittacosis",
+      "conditionCode": "75116005",
       "category": "Respiratory Conditions (infectious)"
     },
     {
-      "condition_name": "Pulmonary Valve Atresia and Stenosis",
-      "condition_code": "204339005",
+      "conditionName": "Pulmonary Valve Atresia and Stenosis",
+      "conditionCode": "204339005",
       "category": "Birth Defects and Infant Disorders"
     },
     {
-      "condition_name": "Q fever",
-      "condition_code": "186788009",
+      "conditionName": "Q fever",
+      "conditionCode": "186788009",
       "category": "Zoonotic Diseases"
     },
     {
-      "condition_name": "Rabies (Human)",
-      "condition_code": "14168008",
+      "conditionName": "Rabies (Human)",
+      "conditionCode": "14168008",
       "category": "Zoonotic Diseases"
     },
     {
-      "condition_name": "Renal Agenesis and Hypoplasia",
-      "condition_code": "32659003",
+      "conditionName": "Renal Agenesis and Hypoplasia",
+      "conditionCode": "32659003",
       "category": "Birth Defects and Infant Disorders"
     },
     {
-      "condition_name": "Respiratory Syncytial Virus (RSV)",
-      "condition_code": "6415009",
+      "conditionName": "Respiratory Syncytial Virus (RSV)",
+      "conditionCode": "6415009",
       "category": "Respiratory Conditions (infectious)"
     },
     {
-      "condition_name": "Respiratory Syncytial Virus (RSV)-Associated Mortality",
-      "condition_code": "55735004",
+      "conditionName": "Respiratory Syncytial Virus (RSV)-Associated Mortality",
+      "conditionCode": "55735004",
       "category": "Respiratory Conditions (infectious)"
     },
     {
-      "condition_name": "Reye's Syndrome",
-      "condition_code": "74351001",
+      "conditionName": "Reye's Syndrome",
+      "conditionCode": "74351001",
       "category": "Systemic Conditions"
     },
     {
-      "condition_name": "Rheumatic Fever",
-      "condition_code": "58718002",
+      "conditionName": "Rheumatic Fever",
+      "conditionCode": "58718002",
       "category": "Streptococcal Diseases"
     },
     {
-      "condition_name": "Ricin Poisoning",
-      "condition_code": "409617000",
+      "conditionName": "Ricin Poisoning",
+      "conditionCode": "409617000",
       "category": "Toxic Effect of Non-Medicinal Substances"
     },
     {
-      "condition_name": "Rotavirus Disease",
-      "condition_code": "18624000",
+      "conditionName": "Rotavirus Disease",
+      "conditionCode": "18624000",
       "category": "Enteric Diseases"
     },
     {
-      "condition_name": "Rubella",
-      "condition_code": "36653000",
+      "conditionName": "Rubella",
+      "conditionCode": "36653000",
       "category": "Vaccine Preventable Diseases"
     },
     {
-      "condition_name": "S. Paratyphi Infection",
-      "condition_code": "85904008",
+      "conditionName": "S. Paratyphi Infection",
+      "conditionCode": "85904008",
       "category": "Enteric Diseases"
     },
     {
-      "condition_name": "S. Typhi Infection",
-      "condition_code": "4834000",
+      "conditionName": "S. Typhi Infection",
+      "conditionCode": "4834000",
       "category": "Enteric Diseases"
     },
     {
-      "condition_name": "Salmonellosis",
-      "condition_code": "302231008",
+      "conditionName": "Salmonellosis",
+      "conditionCode": "302231008",
       "category": "Enteric Diseases"
     },
     {
-      "condition_name": "Scabies",
-      "condition_code": "128869009",
+      "conditionName": "Scabies",
+      "conditionCode": "128869009",
       "category": "Parasitic Diseases"
     },
     {
-      "condition_name": "Seafood Poisoning",
-      "condition_code": "269275003",
+      "conditionName": "Seafood Poisoning",
+      "conditionCode": "269275003",
       "category": "Toxic Effect of Non-Medicinal Substances"
     },
     {
-      "condition_name": "Severe Acute Respiratory Syndrome (SARS)",
-      "condition_code": "398447004",
+      "conditionName": "Severe Acute Respiratory Syndrome (SARS)",
+      "conditionCode": "398447004",
       "category": "Respiratory Conditions (infectious)"
     },
     {
-      "condition_name": "Shiga toxin-producing Escherichia coli (STEC) infection",
-      "condition_code": "328291000119103",
+      "conditionName": "Shiga toxin-producing Escherichia coli (STEC) infection",
+      "conditionCode": "328291000119103",
       "category": "Enteric Diseases"
     },
     {
-      "condition_name": "Shigellosis",
-      "condition_code": "36188001",
+      "conditionName": "Shigellosis",
+      "conditionCode": "36188001",
       "category": "Enteric Diseases"
     },
     {
-      "condition_name": "Silicosis or pneumoconiosis due to dust containing silica",
-      "condition_code": "805002",
+      "conditionName": "Silicosis or pneumoconiosis due to dust containing silica",
+      "conditionCode": "805002",
       "category": "Respiratory Conditions (non-infectious)"
     },
     {
-      "condition_name": "Single Ventricle",
-      "condition_code": "45503006",
+      "conditionName": "Single Ventricle",
+      "conditionCode": "45503006",
       "category": "Birth Defects and Infant Disorders"
     },
     {
-      "condition_name": "Smallpox",
-      "condition_code": "67924001",
+      "conditionName": "Smallpox",
+      "conditionCode": "67924001",
       "category": "Vaccine Preventable Diseases"
     },
     {
-      "condition_name": "Snowshoe hare virus disease",
-      "condition_code": "404236003",
+      "conditionName": "Snowshoe hare virus disease",
+      "conditionCode": "404236003",
       "category": "Vectorborne Diseases"
     },
     {
-      "condition_name": "Spina Bifida",
-      "condition_code": "67531005",
+      "conditionName": "Spina Bifida",
+      "conditionCode": "67531005",
       "category": "Birth Defects and Infant Disorders"
     },
     {
-      "condition_name": "Spotted Fever Rickettsiosis",
-      "condition_code": "186771002",
+      "conditionName": "Spotted Fever Rickettsiosis",
+      "conditionCode": "186771002",
       "category": "Vectorborne Diseases"
     },
     {
-      "condition_name": "St. Louis Encephalitis Virus Infection",
-      "condition_code": "417192005",
+      "conditionName": "St. Louis Encephalitis Virus Infection",
+      "conditionCode": "417192005",
       "category": "Vectorborne Diseases"
     },
     {
-      "condition_name": "Staphylococcal Enterotoxin B Poisoning",
-      "condition_code": "419488004",
+      "conditionName": "Staphylococcal Enterotoxin B Poisoning",
+      "conditionCode": "419488004",
       "category": "Toxic Effect of Non-Medicinal Substances"
     },
     {
-      "condition_name": "Staphylococcus aureus Infection",
-      "condition_code": "406602003",
+      "conditionName": "Staphylococcus aureus Infection",
+      "conditionCode": "406602003",
       "category": "Healthcare-Associated Events"
     },
     {
-      "condition_name": "Streptococcal disease, invasive, Group A",
-      "condition_code": "406614006",
+      "conditionName": "Streptococcal disease, invasive, Group A",
+      "conditionCode": "406614006",
       "category": "Streptococcal Diseases"
     },
     {
-      "condition_name": "Streptococcal disease, invasive, Group B",
-      "condition_code": "406612005",
+      "conditionName": "Streptococcal disease, invasive, Group B",
+      "conditionCode": "406612005",
       "category": "Streptococcal Diseases"
     },
     {
-      "condition_name": "Streptococcal Toxic Shock Syndrome",
-      "condition_code": "240451000",
+      "conditionName": "Streptococcal Toxic Shock Syndrome",
+      "conditionCode": "240451000",
       "category": "Toxic Effect of Non-Medicinal Substances"
     },
     {
-      "condition_name": "Strongyloidiasis",
-      "condition_code": "1214006",
+      "conditionName": "Strongyloidiasis",
+      "conditionCode": "1214006",
       "category": "Parasitic Diseases"
     },
     {
-      "condition_name": "Suicide",
-      "condition_code": "44301001",
+      "conditionName": "Suicide",
+      "conditionCode": "44301001",
       "category": "Injuries, NEC"
     },
     {
-      "condition_name": "Surgical Site Infection (SSI)",
-      "condition_code": "433202001",
+      "conditionName": "Surgical Site Infection (SSI)",
+      "conditionCode": "433202001",
       "category": "Healthcare-Associated Events"
     },
     {
-      "condition_name": "Syphilis",
-      "condition_code": "76272004",
+      "conditionName": "Syphilis",
+      "conditionCode": "76272004",
       "category": "Sexually Transmitted Diseases"
     },
     {
-      "condition_name": "Syphilis, Congenital",
-      "condition_code": "35742006",
+      "conditionName": "Syphilis, Congenital",
+      "conditionCode": "35742006",
       "category": "Sexually Transmitted Diseases"
     },
     {
-      "condition_name": "Taeniasis",
-      "condition_code": "76172008",
+      "conditionName": "Taeniasis",
+      "conditionCode": "76172008",
       "category": "Zoonotic Diseases"
     },
     {
-      "condition_name": "Tetanus",
-      "condition_code": "76902006",
+      "conditionName": "Tetanus",
+      "conditionCode": "76902006",
       "category": "Vaccine Preventable Diseases"
     },
     {
-      "condition_name": "Tetralogy of Fallot (TOF)",
-      "condition_code": "86299006",
+      "conditionName": "Tetralogy of Fallot (TOF)",
+      "conditionCode": "86299006",
       "category": "Birth Defects and Infant Disorders"
     },
     {
-      "condition_name": "Tick Paralysis",
-      "condition_code": "74225001",
+      "conditionName": "Tick Paralysis",
+      "conditionCode": "74225001",
       "category": "Vectorborne Diseases"
     },
     {
-      "condition_name": "Tickborne relapsing fever\u00a0(TBRF)",
-      "condition_code": "10301003",
+      "conditionName": "Tickborne relapsing fever\u00a0(TBRF)",
+      "conditionCode": "10301003",
       "category": "Vectorborne Diseases"
     },
     {
-      "condition_name": "Total Anomalous Pulmonary Venous Connection (TAPVC)",
-      "condition_code": "111323005",
+      "conditionName": "Total Anomalous Pulmonary Venous Connection (TAPVC)",
+      "conditionCode": "111323005",
       "category": "Birth Defects and Infant Disorders"
     },
     {
-      "condition_name": "Toxoplasmosis",
-      "condition_code": "187192000",
+      "conditionName": "Toxoplasmosis",
+      "conditionCode": "187192000",
       "category": "Zoonotic Diseases"
     },
     {
-      "condition_name": "Transposition of the Great Arteries (TGA)",
-      "condition_code": "204296002",
+      "conditionName": "Transposition of the Great Arteries (TGA)",
+      "conditionCode": "204296002",
       "category": "Birth Defects and Infant Disorders"
     },
     {
-      "condition_name": "Trichinellosis",
-      "condition_code": "709018004",
+      "conditionName": "Trichinellosis",
+      "conditionCode": "709018004",
       "category": "Zoonotic Diseases"
     },
     {
-      "condition_name": "Tricuspid Valve Atresia and Stenosis",
-      "condition_code": "4374004",
+      "conditionName": "Tricuspid Valve Atresia and Stenosis",
+      "conditionCode": "4374004",
       "category": "Birth Defects and Infant Disorders"
     },
     {
-      "condition_name": "Trisomy 13",
-      "condition_code": "21111006",
+      "conditionName": "Trisomy 13",
+      "conditionCode": "21111006",
       "category": "Birth Defects and Infant Disorders"
     },
     {
-      "condition_name": "Trisomy 18",
-      "condition_code": "51500006",
+      "conditionName": "Trisomy 18",
+      "conditionCode": "51500006",
       "category": "Birth Defects and Infant Disorders"
     },
     {
-      "condition_name": "Trivittatus virus disease",
-      "condition_code": "240507007",
+      "conditionName": "Trivittatus virus disease",
+      "conditionCode": "240507007",
       "category": "Vectorborne Diseases"
     },
     {
-      "condition_name": "Truncus Arteriosus (Common Truncus)",
-      "condition_code": "61959006",
+      "conditionName": "Truncus Arteriosus (Common Truncus)",
+      "conditionCode": "61959006",
       "category": "Birth Defects and Infant Disorders"
     },
     {
-      "condition_name": "Tuberculosis",
-      "condition_code": "56717001",
+      "conditionName": "Tuberculosis",
+      "conditionCode": "56717001",
       "category": "Respiratory Conditions (infectious)"
     },
     {
-      "condition_name": "Tuberculosis, Latent Infection (LTBI)",
-      "condition_code": "11999007",
+      "conditionName": "Tuberculosis, Latent Infection (LTBI)",
+      "conditionCode": "11999007",
       "category": "Respiratory Conditions (infectious)"
     },
     {
-      "condition_name": "Tularemia",
-      "condition_code": "19265001",
+      "conditionName": "Tularemia",
+      "conditionCode": "19265001",
       "category": "Vectorborne Diseases"
     },
     {
-      "condition_name": "Typhus Fever",
-      "condition_code": "240613006",
+      "conditionName": "Typhus Fever",
+      "conditionCode": "240613006",
       "category": "Vectorborne Diseases"
     },
     {
-      "condition_name": "Vaccine Adverse Event",
-      "condition_code": "293104008",
+      "conditionName": "Vaccine Adverse Event",
+      "conditionCode": "293104008",
       "category": "Healthcare-Associated Events"
     },
     {
-      "condition_name": "Vaccinia Disease or Adverse Event",
-      "condition_code": "409636005",
+      "conditionName": "Vaccinia Disease or Adverse Event",
+      "conditionCode": "409636005",
       "category": "Healthcare-Associated Events"
     },
     {
-      "condition_name": "Vancomycin-intermediate Staphylococcus aureus (VISA)",
-      "condition_code": "406604002",
+      "conditionName": "Vancomycin-intermediate Staphylococcus aureus (VISA)",
+      "conditionCode": "406604002",
       "category": "Healthcare-Associated Events"
     },
     {
-      "condition_name": "Vancomycin-resistant Enterococci (VRE) Infection",
-      "condition_code": "406575008",
+      "conditionName": "Vancomycin-resistant Enterococci (VRE) Infection",
+      "conditionCode": "406575008",
       "category": "Healthcare-Associated Events"
     },
     {
-      "condition_name": "Vancomycin-resistant Staphylococcus aureus (VRSA)",
-      "condition_code": "404681006",
+      "conditionName": "Vancomycin-resistant Staphylococcus aureus (VRSA)",
+      "conditionCode": "404681006",
       "category": "Healthcare-Associated Events"
     },
     {
-      "condition_name": "Varicella",
-      "condition_code": "38907003",
+      "conditionName": "Varicella",
+      "conditionCode": "38907003",
       "category": "Vaccine Preventable Diseases"
     },
     {
-      "condition_name": "Ventilator-associated Event (VAE)",
-      "condition_code": "71695001",
+      "conditionName": "Ventilator-associated Event (VAE)",
+      "conditionCode": "71695001",
       "category": "Healthcare-Associated Events"
     },
     {
-      "condition_name": "Ventricular septal defect",
-      "condition_code": "768552007",
+      "conditionName": "Ventricular septal defect",
+      "conditionCode": "768552007",
       "category": "Birth Defects and Infant Disorders"
     },
     {
-      "condition_name": "Vesicular Stomatitis",
-      "condition_code": "36921006",
+      "conditionName": "Vesicular Stomatitis",
+      "conditionCode": "36921006",
       "category": "Zoonotic Diseases"
     },
     {
-      "condition_name": "Vibriosis",
-      "condition_code": "398557001",
+      "conditionName": "Vibriosis",
+      "conditionCode": "398557001",
       "category": "Enteric Diseases"
     },
     {
-      "condition_name": "Viral Hemorrhagic Fever (VHF)",
-      "condition_code": "240523007",
+      "conditionName": "Viral Hemorrhagic Fever (VHF)",
+      "conditionCode": "240523007",
       "category": "Zoonotic Diseases"
     },
     {
-      "condition_name": "West Nile Virus Infection",
-      "condition_code": "417093003",
+      "conditionName": "West Nile Virus Infection",
+      "conditionCode": "417093003",
       "category": "Vectorborne Diseases"
     },
     {
-      "condition_name": "Western equine encephalitis virus disease",
-      "condition_code": "47523006",
+      "conditionName": "Western equine encephalitis virus disease",
+      "conditionCode": "47523006",
       "category": "Vectorborne Diseases"
     },
     {
-      "condition_name": "Work-related Asthma (WRA)",
-      "condition_code": "57607007",
+      "conditionName": "Work-related Asthma (WRA)",
+      "conditionCode": "57607007",
       "category": "Respiratory Conditions (non-infectious)"
     },
     {
-      "condition_name": "Yellow fever",
-      "condition_code": "16541001",
+      "conditionName": "Yellow fever",
+      "conditionCode": "16541001",
       "category": "Vectorborne Diseases"
     },
     {
-      "condition_name": "Zika Virus Disease",
-      "condition_code": "3928002",
+      "conditionName": "Zika Virus Disease",
+      "conditionCode": "3928002",
       "category": "Vectorborne Diseases"
     },
     {
-      "condition_name": "Creutzfeldt-Jakob Disease (CJD) and Variant Creutzfeldt-Jakob Disease (vCJD)",
-      "condition_code": "792004",
+      "conditionName": "Creutzfeldt-Jakob Disease (CJD) and Variant Creutzfeldt-Jakob Disease (vCJD)",
+      "conditionCode": "792004",
       "category": "Neurological Diseases"
     },
     {
-      "condition_name": "Biliary Atresia",
-      "condition_code": "77480004",
+      "conditionName": "Biliary Atresia",
+      "conditionCode": "77480004",
       "category": "Birth Defects and Infant Disorders"
     },
     {
-      "condition_name": "Candidemia",
-      "condition_code": "432261003",
+      "conditionName": "Candidemia",
+      "conditionCode": "432261003",
       "category": "Healthcare-Associated Events"
     },
     {
-      "condition_name": "Clubfoot",
-      "condition_code": "397932003",
+      "conditionName": "Clubfoot",
+      "conditionCode": "397932003",
       "category": "Birth Defects and Infant Disorders"
     },
     {
-      "condition_name": "Cystic Fibrosis",
-      "condition_code": "190905008",
+      "conditionName": "Cystic Fibrosis",
+      "conditionCode": "190905008",
       "category": "Birth Defects and Infant Disorders"
     },
     {
-      "condition_name": "Diaphragmatic Hernia",
-      "condition_code": "39839004",
+      "conditionName": "Diaphragmatic Hernia",
+      "conditionCode": "39839004",
       "category": "Birth Defects and Infant Disorders"
     },
     {
-      "condition_name": "Esophageal Atresia/Tracheoesophageal Fistula",
-      "condition_code": "204659003",
+      "conditionName": "Esophageal Atresia/Tracheoesophageal Fistula",
+      "conditionCode": "204659003",
       "category": "Birth Defects and Infant Disorders"
     },
     {
-      "condition_name": "Fetal Alcohol Spectrum Disorders",
-      "condition_code": "609437000",
+      "conditionName": "Fetal Alcohol Spectrum Disorders",
+      "conditionCode": "609437000",
       "category": "Birth Defects and Infant Disorders"
     },
     {
-      "condition_name": "Homocystinuria",
-      "condition_code": "11282001",
+      "conditionName": "Homocystinuria",
+      "conditionCode": "11282001",
       "category": "Birth Defects and Infant Disorders"
     },
     {
-      "condition_name": "Medium-chain Acyl-CoA Dehydrogenase Deficiency",
-      "condition_code": "128596003",
+      "conditionName": "Medium-chain Acyl-CoA Dehydrogenase Deficiency",
+      "conditionCode": "128596003",
       "category": "Birth Defects and Infant Disorders"
     },
     {
-      "condition_name": "Omphalocele",
-      "condition_code": "18735004",
+      "conditionName": "Omphalocele",
+      "conditionCode": "18735004",
       "category": "Birth Defects and Infant Disorders"
     },
     {
-      "condition_name": "Oropouche Virus Disease",
-      "condition_code": "72880002",
+      "conditionName": "Oropouche Virus Disease",
+      "conditionCode": "72880002",
       "category": "Vectorborne Diseases"
     },
     {
-      "condition_name": "Rectal and Large Intestinal Atresia and Stenosis",
-      "condition_code": "268205005",
+      "conditionName": "Rectal and Large Intestinal Atresia and Stenosis",
+      "conditionCode": "268205005",
       "category": "Birth Defects and Infant Disorders"
     },
     {
-      "condition_name": "Severe Combined Immunodeficiency",
-      "condition_code": "31323000",
+      "conditionName": "Severe Combined Immunodeficiency",
+      "conditionCode": "31323000",
       "category": "Birth Defects and Infant Disorders"
     },
     {
-      "condition_name": "Sickle Cell Anemia (Hemoglobin SS Disease)",
-      "condition_code": "127040003",
+      "conditionName": "Sickle Cell Anemia (Hemoglobin SS Disease)",
+      "conditionCode": "127040003",
       "category": "Birth Defects and Infant Disorders"
     },
     {
-      "condition_name": "Small Intestinal Atresia and Stenosis",
-      "condition_code": "204691002",
+      "conditionName": "Small Intestinal Atresia and Stenosis",
+      "conditionCode": "204691002",
       "category": "Birth Defects and Infant Disorders"
     },
     {
-      "condition_name": "Spinal Muscular Atrophy",
-      "condition_code": "5262007",
+      "conditionName": "Spinal Muscular Atrophy",
+      "conditionCode": "5262007",
       "category": "Birth Defects and Infant Disorders"
     },
     {
-      "condition_name": "X-linked Adrenoleukodystrophy",
-      "condition_code": "65389002",
+      "conditionName": "X-linked Adrenoleukodystrophy",
+      "conditionCode": "65389002",
       "category": "Birth Defects and Infant Disorders"
     }
   ]

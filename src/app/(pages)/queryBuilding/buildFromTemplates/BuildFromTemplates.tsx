@@ -12,10 +12,6 @@ import {
   useState,
 } from "react";
 import {
-  getConditionsData,
-  getValueSetsAndConceptsByConditionIDs,
-} from "@/app/backend/seeding/service";
-import {
   ConditionIdToValueSetArrayMap,
   NestedQuery,
   CategoryToConditionArrayMap,
@@ -41,8 +37,10 @@ import {
   DibbsValueSet,
 } from "@/app/models/entities/valuesets";
 import {
+  getConditionsData,
   getCustomQueries,
   getSavedQueryById,
+  getValueSetsAndConceptsByConditionIDs,
   saveCustomQuery,
 } from "@/app/backend/query-building/service";
 import { useSession } from "next-auth/react";

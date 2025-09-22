@@ -8,10 +8,6 @@ import {
 } from "@/app/(pages)/queryBuilding/fixtures";
 import { formatDiseaseDisplay } from "@/app/(pages)/queryBuilding/utils";
 import { USE_CASE_DETAILS } from "@/app/constants";
-import {
-  getConditionsData,
-  getValueSetsAndConceptsByConditionIDs,
-} from "@/app/backend/seeding/service";
 import { renderWithUser, RootProviderMock } from "@/app/tests/unit/setup";
 import { screen, waitFor, within } from "@testing-library/dom";
 import {
@@ -21,13 +17,15 @@ import {
 } from "../components/utils";
 import { userEvent } from "@testing-library/user-event";
 import { render } from "@testing-library/react";
-import { getSavedQueryById } from "@/app/backend/query-building/service";
+import {
+  getConditionsData,
+  getSavedQueryById,
+  getValueSetsAndConceptsByConditionIDs,
+} from "@/app/backend/query-building/service";
 import { getTimeboxRanges } from "@/app/backend/query-timefiltering";
 
-jest.mock("../../../backend/seeding/service", () => ({
+jest.mock("../../../backend/db-creation/service", () => ({
   getCustomQueries: jest.fn(),
-  getConditionsData: jest.fn(),
-  getValueSetsAndConceptsByConditionIDs: jest.fn(),
 }));
 
 jest.mock("../../../backend/query-timefiltering", () => ({
@@ -37,6 +35,8 @@ jest.mock("../../../backend/query-timefiltering", () => ({
 
 jest.mock("../../../backend/query-building/service", () => ({
   getSavedQueryById: jest.fn(),
+  getConditionsData: jest.fn(),
+  getValueSetsAndConceptsByConditionIDs: jest.fn(),
 }));
 
 const mockPush = jest.fn();

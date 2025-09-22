@@ -1,8 +1,8 @@
-import { internal_getDbClient } from "@/backend/db/config";
 import "@testing-library/jest-dom";
 import { toHaveNoViolations } from "jest-axe";
 import * as matchers from "jest-extended";
 import { Pool } from "pg";
+import { dontUseOutsideConfigOrTests_getDbClient } from "./src/app/backend/db/config";
 
 expect.extend(toHaveNoViolations);
 expect.extend(matchers);
@@ -11,7 +11,7 @@ global.MessagePort = require("node:worker_threads").MessagePort;
 if (process.env.TEST_TYPE === "integration") {
   let dbClient: Pool | null = null;
   beforeAll(() => {
-    dbClient = internal_getDbClient();
+    dbClient = dontUseOutsideConfigOrTests_getDbClient();
   });
 
   afterAll(async () => {

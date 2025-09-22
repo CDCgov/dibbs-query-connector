@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { internal_getDbClient } from "../db/config";
+import dbService from "../db/service";
 import { generateAuditSuccessMessage, generateAuditValues } from "./lib";
 
 export const AUDIT_LOG_MAX_RETRIES = 3;
@@ -15,7 +15,6 @@ export function auditable(
   key: string,
   descriptor: PropertyDescriptor,
 ) {
-  // const dbConnection = internal_getDbClient();
   const method = descriptor.value;
   const argLabels = target[key]
     .toString()
@@ -25,7 +24,6 @@ export function auditable(
     .split(", ");
 
   const writeToAuditTable = async (args: any[]) => {
-    const dbConnection = internal_getDbClient();
     const insertQuery = `INSERT INTO 
           audit_logs (author, action_type, audit_message, created_at, audit_checksum) 
           VALUES ($1, $2, $3, $4, $5)
@@ -43,7 +41,7 @@ export function auditable(
             timestamp,
             auditChecksum,
           ]) => {
-            const result = await dbConnection.query(insertQuery, [
+            const result = await dbService.query(insertQuery, [
               author,
               methodName,
               auditMessage,
@@ -53,7 +51,7 @@ export function auditable(
 
             const insertedRow = result.rows[0];
             const successMessage = generateAuditSuccessMessage(
-              insertedRow.action_type,
+              insertedRow?.actionType ?? insertedRow?.action_type,
               insertedRow.id,
               auditChecksum as string,
             );
