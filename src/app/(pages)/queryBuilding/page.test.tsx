@@ -1,15 +1,13 @@
 import QueryBuilding from "./page";
 import { render, screen, waitFor } from "@testing-library/react";
-import { getConditionsData } from "../../backend/seeding/service";
 import { conditionIdToNameMap, DEFAULT_QUERIES } from "./fixtures";
 import { RootProviderMock } from "@/app/tests/unit/setup";
-import { getQueryList } from "@/app/backend/query-building/service";
+import {
+  getConditionsData,
+  getQueryList,
+} from "@/app/backend/query-building/service";
 
-jest.mock("@/app/backend/seeding/service", () => ({
-  getConditionsData: jest.fn().mockResolvedValue({
-    // here to prevent a distracting error log from showing up in test
-    conditionIdToNameMap: {},
-  }),
+jest.mock("@/app/backend/db-creation/service", () => ({
   checkDBForData: jest.fn().mockResolvedValue(true),
 }));
 
@@ -20,6 +18,10 @@ jest.mock("../userManagement/utils", () => ({
 jest.mock("@/app/backend/query-building/service", () => ({
   getQueryList: jest.fn(),
   getCustomQueries: jest.fn(),
+  getConditionsData: jest.fn().mockResolvedValue({
+    // here to prevent a distracting error log from showing up in test
+    conditionIdToNameMap: {},
+  }),
 }));
 
 jest.mock(

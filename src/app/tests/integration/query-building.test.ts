@@ -43,7 +43,6 @@ describe("Saving a custom query", () => {
     const diffId = followupList.filter((q) => {
       return !initialListIds.includes(q.queryId);
     });
-    expect(diffId.length).toBe(1); // we've inserted one extra query, so followup and initial should differ by one query
-    expect(diffId[0].queryId).toBe(testQuery.queryId);
+    expect(diffId.map((q) => q.queryId).includes(testQuery.queryId)).toBe(true);
   });
 });

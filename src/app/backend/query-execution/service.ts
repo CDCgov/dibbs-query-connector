@@ -262,7 +262,7 @@ class QueryService {
 
     try {
       const patientLink = task.output?.find((output) =>
-        output.valueString?.includes("Patient-Page1"),
+        output.valueString?.includes("Patient-Page"),
       )?.valueString;
 
       if (!patientLink) {

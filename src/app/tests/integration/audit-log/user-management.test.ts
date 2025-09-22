@@ -35,13 +35,18 @@ jest.mock("@/app/backend/audit-logs/lib", () => {
 });
 
 (auth as jest.Mock).mockResolvedValue(TEST_USER);
+const consoleInfoSpy = jest.spyOn(console, "info");
 
 describe("user management tests", () => {
   beforeAll(() => {
     suppressConsoleLogs();
   });
+
+  afterEach(() => {
+    consoleInfoSpy.mockReset();
+  });
+
   it("user group creation, update, deletion", async () => {
-    const consoleInfoSpy = jest.spyOn(console, "info");
     const oldAuditIds = (await dbService.query(GET_ALL_AUDIT_ROWS)).rows.map(
       (r) => r.id,
     );
@@ -100,11 +105,17 @@ describe("user management tests", () => {
     };
     const actionTypeToCheck = "addUserIfNotExists";
     const { user } = await addUserIfNotExists(randomUserToken);
+
+    expect(consoleInfoSpy).toHaveBeenLastCalledWith(
+      expect.stringContaining(`${actionTypeToCheck} audit action with`),
+    );
+
     const auditEntry = await getAuditEntry(actionTypeToCheck, oldAuditIds);
     expect(JSON.parse(auditEntry?.userToken)).toStrictEqual(randomUserToken);
     const CREATED_USER_ID = user.id;
 
     const updateActionType = "updateUserDetails";
+
     const UPDATED_USER_NAME = "Bowser Jr. III";
     await updateUserDetails(
       CREATED_USER_ID,
@@ -113,6 +124,11 @@ describe("user management tests", () => {
       "Jr. III",
       UserRole.SUPER_ADMIN,
     );
+
+    expect(consoleInfoSpy).toHaveBeenLastCalledWith(
+      expect.stringContaining(`${updateActionType} audit action with`),
+    );
+
     const updateUserDetailsEntry = await getAuditEntry(
       updateActionType,
       oldAuditIds,
@@ -164,6 +180,11 @@ describe("user management tests", () => {
     const { user } = await addUserIfNotExists(randomUserToken);
     await addUsersToGroup(CREATED_GROUP_ID, [user.id]);
     const additionActionType = "addUsersToGroup";
+
+    expect(consoleInfoSpy).toHaveBeenLastCalledWith(
+      expect.stringContaining(`${additionActionType} audit action with`),
+    );
+
     const additionAuditEntry = await getAuditEntry(
       additionActionType,
       oldAuditIds,

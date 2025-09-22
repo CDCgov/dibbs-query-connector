@@ -1,8 +1,8 @@
 import { adminAccessCheck, superAdminAccessCheck } from "@/app/utils/auth";
-import { internal_getDbClient } from "./config";
 import { QueryResult } from "pg";
 import { translateNestedObjectKeysIntoCamelCase } from "./util";
 import { UNAUTHORIZED_LITERAL } from "@/app/constants";
+import dbService from "./service";
 
 /**
  * Annotation to make a db query into a transaction. Requires all return branches
@@ -22,22 +22,21 @@ export function transaction<T extends { success: boolean }>(
   descriptor: TypedPropertyDescriptor<(...args: any[]) => Promise<T>>,
 ) {
   const method = descriptor.value;
-  const dbClient = internal_getDbClient();
 
   // eslint-disable-next-line  @typescript-eslint/no-explicit-any
   descriptor.value = async function (...args: any[]): Promise<T> {
     try {
-      await dbClient.query("BEGIN");
+      await dbService.query("BEGIN");
       const result = method && (await method.apply(this, args));
       if (result === undefined || result.success === false) {
         throw Error("Transaction failed");
       }
-      await dbClient.query("COMMIT");
+      await dbService.query("COMMIT");
 
       return result;
     } catch (error) {
-      await dbClient.query("ROLLBACK");
-      console.error(`Database transaction ${key} failed`);
+      console.error(`Database transaction ${key} failed. Rolling back...`);
+      await dbService.query("ROLLBACK");
 
       type ErrorResult<T extends { success: boolean }> = T & {
         error?: string;

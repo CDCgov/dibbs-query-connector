@@ -1,6 +1,8 @@
 "use server";
 
 import type {
+  CategoryToConditionArrayMap,
+  ConditionsMap,
   MedicalRecordSections,
   NestedQuery,
   QueryTableResult,
@@ -18,6 +20,7 @@ import { CustomUserQuery } from "@/app/models/entities/query";
 import { DibbsValueSet } from "@/app/models/entities/valuesets";
 import { auditable } from "../audit-logs/decorator";
 import { linkTimeboxRangesToQuery } from "../query-timefiltering";
+import { getValueSetsByConditionIdsSql } from "../db-creation/seedSqlStructs";
 
 class QueryBuildingService {
   /**
@@ -229,8 +232,79 @@ class QueryBuildingService {
           return groupQueries.items;
         }),
       );
+
       return assignedQueries.flat();
     }
+  }
+
+  /**
+   * Executes a search for a ValueSets and Concepts against the Postgres
+   * Database, using the ID of the condition associated with any such data.
+   * @param ids Array of ids for entries in the conditions table
+   * @returns One or more rows from the DB matching the requested saved query,
+   * or an error if no results can be found.
+   */
+  static async getValueSetsAndConceptsByConditionIDs(ids: string[]) {
+    try {
+      if (ids.length === 0) {
+        throw Error("No condition ids passed in to query by");
+      }
+
+      const escapedValues = ids.map((_, i) => `$${i + 1}`).join() + ")";
+      const queryString = getValueSetsByConditionIdsSql + escapedValues;
+
+      const result = await dbService.query(queryString, ids);
+      if (result.rows.length === 0) {
+        console.error("No results found for given condition ids", ids);
+        return [];
+      }
+      return result.rows;
+    } catch (error) {
+      console.error(
+        "Error retrieving value sets and concepts for condition",
+        error,
+      );
+      throw error;
+    }
+  }
+
+  /**
+   * Retrieves all records from the conditions table in the database.
+   * This function queries the database to fetch condition data, including
+   * condition name, code, and category.
+   * @returns An object containing:
+   * - `conditionCatergories`: a JSON object grouped by category with id:name pairs,
+   * to display on build-query page
+   * - `conditionLookup`: a JSON object with id as the key and name as the value in
+   * order to make a call to the DB with the necessary ID(s) to get the valuesets
+   * on subsequent pages.
+   */
+  static async getConditionsData() {
+    const query = "SELECT * FROM conditions";
+    const result = await dbService.query(query);
+    const rows = result.rows;
+
+    // 1. Grouped by category with id:name pairs
+    const categoryToConditionNameArrayMap: CategoryToConditionArrayMap =
+      rows.reduce((acc, row) => {
+        const { category, id, name } = row;
+        if (!acc[category]) {
+          acc[category] = [];
+        }
+        acc[category].push({ id: id, name: name });
+        return acc;
+      }, {} as CategoryToConditionArrayMap);
+
+    // 2. ID-Name mapping
+    const conditionIdToNameMap: ConditionsMap = rows.reduce((acc, row) => {
+      acc[row.id] = { name: row.name, category: row.category };
+      return acc;
+    }, {} as ConditionsMap);
+
+    return {
+      categoryToConditionNameArrayMap,
+      conditionIdToNameMap,
+    } as const;
   }
 }
 
@@ -242,3 +316,6 @@ export const getCustomQueries = QueryBuildingService.getCustomQueries;
 export const getQueryList = QueryBuildingService.getQueryList;
 export const getQueryById = QueryBuildingService.getQueryById;
 export const getQueriesForUser = QueryBuildingService.getQueriesForUser;
+export const getConditionsData = QueryBuildingService.getConditionsData;
+export const getValueSetsAndConceptsByConditionIDs =
+  QueryBuildingService.getValueSetsAndConceptsByConditionIDs;

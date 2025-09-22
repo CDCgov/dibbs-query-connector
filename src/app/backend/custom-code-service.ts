@@ -1,19 +1,15 @@
 "use server";
 
-import { transaction } from "@/app/backend/db/decorators";
+import { adminRequired, transaction } from "@/app/backend/db/decorators";
 import { auditable } from "@/app/backend/audit-logs/decorator";
-import { internal_getDbClient } from "./db/config";
 import {
   insertValueSetSql,
   insertConceptSql,
   insertValuesetToConceptSql,
   insertConditionSql,
   insertConditionToValuesetSql,
-} from "./seeding/seedSqlStructs";
-import {
-  INTENTIONAL_EMPTY_STRING_FOR_CONCEPT_VERSION,
-  INTENTIONAL_EMPTY_STRING_FOR_GEM_CODE,
-} from "../constants";
+  insertDemoQueryLogicSql,
+} from "./db-creation/seedSqlStructs";
 import type { DibbsValueSet } from "../models/entities/valuesets";
 import type { Concept } from "../models/entities/concepts";
 import { QCResponse } from "../models/responses/collections";
@@ -26,10 +22,6 @@ import { CUSTOM_CONDITION_ID, CUSTOM_VALUESET_ARRAY_ID } from "@/app/constants";
 import dbService from "./db/service";
 
 class CustomCodeService {
-  private static get dbClient() {
-    return internal_getDbClient();
-  }
-
   // This may not be needed since these are user-created valuesets
   private static getSystemPrefix(system: string) {
     const match = system?.match(/https?:\/\/([^\.]+)/);
@@ -67,10 +59,7 @@ class CustomCodeService {
           ORDER BY name ASC;
         `;
 
-      const result = await CustomCodeService.dbClient.query(
-        selectValueSetQuery,
-        [id],
-      );
+      const result = await dbService.query(selectValueSetQuery, [id]);
 
       const vsWithAuthor = result.rows.map((item) => {
         if (item.user_created == true) {
@@ -142,8 +131,6 @@ class CustomCodeService {
           concept.code,
           vs.system,
           concept.display,
-          INTENTIONAL_EMPTY_STRING_FOR_GEM_CODE,
-          INTENTIONAL_EMPTY_STRING_FOR_CONCEPT_VERSION,
         ]);
       } catch (e) {
         console.error("Insert failed for concept:", e);
@@ -292,8 +279,7 @@ class CustomCodeService {
         return { success: true, queryId };
       } else {
         // create a new query with custom only
-        const newId = crypto.randomUUID();
-        const name = `Custom Query ${newId}`;
+        const name = `Custom Query ${Math.random()}`;
         const queryData: QueryDataColumn = {
           [CUSTOM_VALUESET_ARRAY_ID]: {},
         };
@@ -301,24 +287,21 @@ class CustomCodeService {
         for (const vs of customValuesets) {
           queryData[CUSTOM_VALUESET_ARRAY_ID][vs.valueSetId] = vs;
         }
-
-        const insertSql = `
-      INSERT INTO query (
-        id, query_name, query_data, conditions_list, author,
-        date_created, date_last_modified, time_window_number, time_window_unit
-      )
-      VALUES ($1, $2, $3, $4, $5, NOW(), NOW(), $6, $7)
-    `;
-        await dbService.query(insertSql, [
-          newId,
+        const NOW_ISO = new Date().toISOString();
+        const result = await dbService.query(insertDemoQueryLogicSql, [
           name,
           queryData,
           [],
           userId,
-          0,
-          "",
+          NOW_ISO,
+          NOW_ISO,
         ]);
-        return { success: true, queryId: newId };
+        const newId = result.rows[0].id;
+        if (newId) {
+          return { success: true, queryId: newId };
+        } else {
+          throw Error("No ID returned in query insertion");
+        }
       }
     } catch (e) {
       console.error(
@@ -326,6 +309,47 @@ class CustomCodeService {
         e,
       );
       return { success: false, error: String(e) };
+    }
+  }
+
+  /**
+   * Retrieves all available value sets in Query Connector.
+   * @returns A list of value sets registered in the query connector.
+   */
+  @adminRequired
+  static async getAllValueSets(): Promise<QCResponse<DibbsValueSet>> {
+    try {
+      const selectAllVSQuery = `
+      SELECT c.display, c.code_system, c.code, c.id as internal_id, vs.name as valueset_name, vs.id as valueset_id, vs.oid as valueset_external_id, vs.version, vs.author as author, 
+        vs.type, vs.dibbs_concept_type as dibbs_concept_type, vs.user_created, ctvs.condition_id, u.first_name, u.last_name, u.username
+      FROM valuesets vs 
+      LEFT JOIN condition_to_valueset ctvs on vs.id = ctvs.valueset_id 
+      LEFT JOIN valueset_to_concept vstc on vs.id = vstc.valueset_id
+      LEFT JOIN concepts c on vstc.concept_id = c.id
+      LEFT JOIN users u on vs.author = u.id::text
+      ORDER BY name ASC;
+    `;
+
+      const result = await dbService.query(selectAllVSQuery);
+
+      const itemsWithAuthor = result.rows.map((item) => {
+        if (item.userCreated == true) {
+          item.author =
+            item.firstName && item.lastName
+              ? `${item.firstName} ${item.lastName}`
+              : item.username;
+          return item;
+        }
+        return item;
+      });
+
+      return {
+        totalItems: result.rowCount,
+        items: itemsWithAuthor,
+      } as QCResponse<DibbsValueSet>;
+    } catch (error) {
+      console.error("Error retrieving user groups:", error);
+      throw error;
     }
   }
 }
@@ -337,3 +361,4 @@ export const insertCustomValuesetsIntoQuery =
   CustomCodeService.insertCustomValuesetsIntoQuery;
 export const deleteCustomConcept = CustomCodeService.deleteCustomConcept;
 export const getCustomValueSetById = CustomCodeService.getCustomValueSetById;
+export const getAllValueSets = CustomCodeService.getAllValueSets;

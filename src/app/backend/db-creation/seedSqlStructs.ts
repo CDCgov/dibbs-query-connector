@@ -5,22 +5,22 @@ export type ValuesetStruct = {
   name: string;
   author: string;
   type: string;
-  dibbs_concept_type: string;
-  user_created: string;
+  dibbsConceptType: string;
+  userCreated: string;
 };
 
 export type ConceptStruct = {
   id: string;
   code: string;
-  code_system: string;
+  codeSystem: string;
   display: string;
   version: string;
 };
 
 export type ValuesetToConceptStruct = {
   id: string;
-  valueset_id: string;
-  concept_id: string;
+  valueSetId: string;
+  conceptId: string;
 };
 
 export type ConditionStruct = {
@@ -33,26 +33,24 @@ export type ConditionStruct = {
 
 export type ConditionToValueSetStruct = {
   id: string;
-  condition_id: string;
-  valueset_id: string;
+  conditionId: string;
+  valueSetId: string;
   source: string;
 };
 
 export type CategoryStruct = {
-  condition_name: string;
-  condition_code: string;
+  conditionName: string;
+  conditionCode: string;
   category: string;
 };
 
 export type QueryDataStruct = {
-  query_name: string;
-  query_data: string;
-  conditions_list: string;
+  queryName: string;
+  queryData: string;
+  conditionsList: string;
   author: string;
-  date_created: string;
-  date_last_modified: string;
-  time_window_number: string;
-  time_window_unit: string;
+  dateCreated: string;
+  dateLastModified: string;
 };
 
 export type dbInsertStruct =
@@ -82,15 +80,13 @@ INSERT INTO valuesets
 
 export const insertConceptSql = `
 INSERT INTO concepts
-  VALUES($1,$2,$3,$4,$5,$6)
+  VALUES($1,$2,$3,$4)
   ON CONFLICT(id)
   DO UPDATE SET
     id = EXCLUDED.id,
     code = EXCLUDED.code,
     code_system = EXCLUDED.code_system,
-    display = EXCLUDED.display,
-    gem_formatted_code = EXCLUDED.gem_formatted_code,
-    version = EXCLUDED.version
+    display = EXCLUDED.display
   RETURNING id;
 `;
 
@@ -130,6 +126,15 @@ INSERT INTO condition_to_valueset
   RETURNING id;
 `;
 
+export const getValueSetsByConditionIdsSql = `
+    SELECT c.display, c.code_system, c.code, vs.name as valueset_name, vs.id as valueset_id, vs.oid as valueset_external_id, vs.version, vs.author as author, vs.type, vs.dibbs_concept_type as dibbs_concept_type, vs.user_created as user_created, ctvs.condition_id
+    FROM valuesets vs 
+    LEFT JOIN condition_to_valueset ctvs on vs.id = ctvs.valueset_id 
+    LEFT JOIN valueset_to_concept vstc on vs.id = vstc.valueset_id
+    LEFT JOIN concepts c on vstc.concept_id = c.id
+    WHERE ctvs.condition_id IN (
+  `;
+
 export const insertCategorySql = `
 INSERT INTO category_data
   VALUES($1,$2,$3)
@@ -142,8 +147,9 @@ INSERT INTO category_data
 `;
 export const insertDemoQueryLogicSql = `
 -- Insert data into the query table
-INSERT INTO query (query_name, query_data, conditions_list, author, date_created, date_last_modified, time_window_number, time_window_unit)
-VALUES ($1, $2, $3,$4, $5, $6, $7, $8);
+INSERT INTO query (query_name, query_data, conditions_list, author, date_created, date_last_modified)
+VALUES ($1, $2, $3,$4, $5, $6)
+RETURNING id;
 `;
 
 export const updateErsdCategorySql = `

@@ -14,10 +14,6 @@ import WithAuth from "@/app/ui/components/withAuth/WithAuth";
 import Backlink from "@/app/ui/designSystem/backLink/Backlink";
 import SearchField from "@/app/ui/designSystem/searchField/SearchField";
 import Table from "@/app/ui/designSystem/table/Table";
-import {
-  getAllValueSets,
-  getConditionsData,
-} from "@/app/backend/seeding/service";
 import { DibbsValueSet } from "@/app/models/entities/valuesets";
 import { CustomCodeMode, emptyFilterSearch, emptyValueSet } from "./utils";
 import {
@@ -36,11 +32,17 @@ import CustomValueSetForm from "./components/CustomValueSetForm";
 import { User } from "@/app/models/entities/users";
 import { useSession } from "next-auth/react";
 import { getUserByUsername } from "@/app/backend/user-management";
-import { deleteCustomValueSet } from "@/app/backend/custom-code-service";
+import {
+  deleteCustomValueSet,
+  getAllValueSets,
+} from "@/app/backend/custom-code-service";
 import dynamic from "next/dynamic";
 import type { ModalProps, ModalRef } from "../../ui/designSystem/modal/Modal";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
-import { getSavedQueryById } from "@/app/backend/query-building/service";
+import {
+  getConditionsData,
+  getSavedQueryById,
+} from "@/app/backend/query-building/service";
 import {
   insertCustomValuesetsIntoQuery,
   insertCustomValueSet,

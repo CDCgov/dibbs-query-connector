@@ -5,13 +5,13 @@ import { RootProviderMock } from "@/app/tests/unit/setup";
 
 jest.mock("@/app/backend/query-building/service", () => ({
   getQueryList: jest.fn(),
-}));
-
-jest.mock("@/app/backend/seeding/service", () => ({
   getConditionsData: jest.fn().mockResolvedValue({
     // here to prevent a distracting error log from showing up in test
     conditionIdToNameMap: {},
   }),
+}));
+
+jest.mock("@/app/backend/db-creation/service", () => ({
   checkDBForData: jest.fn().mockResolvedValue(true),
 }));
 

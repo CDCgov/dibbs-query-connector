@@ -3,7 +3,7 @@ import { screen } from "@testing-library/react";
 import SearchForm from "./SearchForm";
 import { useSearchParams } from "next/navigation";
 import { getFhirServerConfigs } from "@/app/backend/fhir-servers/service";
-import { getConditionsData } from "@/app/backend/seeding/service";
+import { getConditionsData } from "@/app/backend/query-building/service";
 
 jest.mock("next/navigation");
 
@@ -24,7 +24,7 @@ jest.mock("@/app/backend/fhir-servers/service", () => ({
   ]),
 }));
 
-jest.mock("@/app/backend/seeding/service", () => ({
+jest.mock("@/app/backend/query-building/service", () => ({
   getConditionsData: jest.fn(),
 }));
 

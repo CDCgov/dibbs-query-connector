@@ -35,7 +35,7 @@ export async function saveCustomQueryHelp(
 ) {
   const queryString = `
     INSERT INTO query
-      values($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+      values($1, $2, $3, $4, $5, $6, $7, $8)
       ON CONFLICT(id)
       DO UPDATE SET
         query_name = EXCLUDED.query_name,
@@ -49,11 +49,6 @@ export async function saveCustomQueryHelp(
   const { queryDataInsert, conditionInsert } =
     formatQueryDataForDatabase(queryInput);
 
-  const DEFAULT_TIME_WINDOW = {
-    timeWindowNumber: 1,
-    timeWindowUnit: "day",
-  };
-
   const NOW = new Date().toISOString();
   try {
     const dataToWrite = [
@@ -64,8 +59,6 @@ export async function saveCustomQueryHelp(
       author,
       NOW,
       NOW,
-      DEFAULT_TIME_WINDOW.timeWindowNumber,
-      DEFAULT_TIME_WINDOW.timeWindowUnit,
       medicalRecordSections,
     ];
     const result = await dbClient.query(queryString, dataToWrite);

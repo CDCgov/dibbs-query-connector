@@ -1,7 +1,7 @@
 import { DibbsValueSet } from "@/app/models/entities/valuesets";
 import ExampleVsacValueSet from "../../tests/assets/VSACValueSet.json";
 import { ValueSet as FhirValueSet } from "fhir/r4";
-import { translateVSACToInternalValueSet } from "./lib";
+import { translateVSACToInternalValueSet } from "./utils";
 
 const EXPECTED_INTERNAL_VALUESET: DibbsValueSet = {
   valueSetId: `${ExampleVsacValueSet.id}_${ExampleVsacValueSet.version}`,

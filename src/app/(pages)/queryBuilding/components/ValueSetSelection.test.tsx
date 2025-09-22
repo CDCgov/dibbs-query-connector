@@ -2,11 +2,11 @@ import { renderWithUser, RootProviderMock } from "@/app/tests/unit/setup";
 import BuildFromTemplates from "../buildFromTemplates/BuildFromTemplates";
 import { screen, waitFor } from "@testing-library/dom";
 import { VALUESET_SELECTION_SEARCH_PLACEHOLDER } from "./utils";
-import { getSavedQueryById } from "@/app/backend/query-building/service";
 import {
   getConditionsData,
+  getSavedQueryById,
   getValueSetsAndConceptsByConditionIDs,
-} from "@/app/backend/seeding/service";
+} from "@/app/backend/query-building/service";
 import {
   conditionIdToNameMap,
   categoryToConditionNameArrayMap,
@@ -15,14 +15,12 @@ import {
 } from "../fixtures";
 
 const currentPage = "/";
-jest.mock("../../../backend/seeding/service", () => ({
-  getCustomQueries: jest.fn(),
-  getConditionsData: jest.fn(),
-  getValueSetsAndConceptsByConditionIDs: jest.fn(),
-}));
 
 jest.mock("../../../backend/query-building/service", () => ({
+  getCustomQueries: jest.fn(),
   getSavedQueryById: jest.fn(),
+  getConditionsData: jest.fn(),
+  getValueSetsAndConceptsByConditionIDs: jest.fn(),
 }));
 
 const mockPush = jest.fn();

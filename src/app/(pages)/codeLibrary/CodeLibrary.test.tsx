@@ -8,19 +8,19 @@ import {
   categoryToConditionNameArrayMap,
 } from "../queryBuilding/fixtures";
 import CodeLibrary from "./page";
-import {
-  getAllValueSets,
-  getConditionsData,
-} from "@/app/backend/seeding/service";
 import { getAllUsers, getUserByUsername } from "@/app/backend/user-management";
 import {
   getAllGroupMembers,
   getAllUserGroups,
 } from "@/app/backend/usergroup-management";
 import { mockAdmin } from "../userManagement/test-utils";
-import { getCustomValueSetById } from "@/app/backend/custom-code-service";
+import {
+  getAllValueSets,
+  getCustomValueSetById,
+} from "@/app/backend/custom-code-service";
 import { renderWithUser } from "@/app/tests/unit/setup";
 import { insertCustomValueSet } from "@/app/backend/custom-code-service";
+import { getConditionsData } from "@/app/backend/query-building/service";
 
 jest.mock("next-auth/react");
 
@@ -41,9 +41,11 @@ jest.mock(
     ({ children }: React.PropsWithChildren) => <div>{children}</div>,
 );
 
-jest.mock("@/app/backend/seeding/service", () => ({
-  getAllValueSets: jest.fn().mockReturnValue({ items: [] }),
+jest.mock("@/app/backend/db-creation/service", () => ({
   groupConditionConceptsIntoValueSets: jest.fn().mockReturnValue([]),
+}));
+
+jest.mock("@/app/backend/query-building/service", () => ({
   getConditionsData: jest.fn(),
 }));
 
@@ -58,6 +60,7 @@ jest.mock("@/app/backend/user-management", () => ({
 }));
 
 jest.mock("@/app/backend/custom-code-service", () => ({
+  getAllValueSets: jest.fn().mockReturnValue({ items: [] }),
   getCustomValueSetById: jest.fn(),
   insertCustomValueSet: jest.fn(),
   insertCustomValuesetsIntoQuery: jest.fn(),
@@ -134,13 +137,13 @@ describe("Code library rendered view", () => {
 
     const tableBody = screen.getByTestId("table-valuesets-manage");
     expect(tableBody.childNodes[0]).toHaveTextContent(
-      cancerValueSets[1].valueset_name,
+      cancerValueSets[1].valueSetName,
     );
     expect(tableBody.childNodes[1]).toHaveTextContent(
-      gonorrheaValueSets[1].valueset_name,
+      gonorrheaValueSets[1].valueSetName,
     );
     expect(tableBody.childNodes[2]).toHaveTextContent(
-      customValueSets[1].valueset_name,
+      customValueSets[1].valueSetName,
     );
     expect(document.body).toMatchSnapshot();
   });
@@ -217,8 +220,8 @@ describe("Code library interaction", () => {
       "valueSetTable__tableBody_row_details",
     )[2];
 
-    expect(cancerVsRow.textContent).toContain(cancerValueSets[0].valueset_name);
-    expect(customVsRow.textContent).toContain(customValueSets[0].valueset_name);
+    expect(cancerVsRow.textContent).toContain(cancerValueSets[0].valueSetName);
+    expect(customVsRow.textContent).toContain(customValueSets[0].valueSetName);
 
     expect(cancerVsRow.textContent).not.toContain(cancerValueSets[0].author);
     expect(customVsRow.textContent).toContain(customValueSets[0].author);
@@ -260,18 +263,15 @@ describe("Code library interaction", () => {
 
     await waitFor(async () => {
       (customVsRow as HTMLElement).click();
-      const customCodesPanel = screen.getByTestId("table-codes").parentElement;
-
-      const deleteButton = (customCodesPanel as Element).getElementsByClassName(
-        "usa-button",
-      )[1];
-
+      const deleteButton = screen.getAllByRole("button", {
+        name: /delete value set/i,
+      })[1];
       (deleteButton as HTMLElement).click();
 
       const modal = screen.getByTestId("modalWindow");
       expect(modal).toBeVisible();
       expect(modal).toHaveTextContent(
-        `Are you sure you want to delete the value set "${customValueSets[0].valueset_name}?"`,
+        `Are you sure you want to delete the value set "${customValueSets[0].valueSetName}?"`,
       );
     });
   });

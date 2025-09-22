@@ -141,8 +141,8 @@ export const groupValueSetsByConceptType = (
 export const groupConditionConceptsIntoValueSets = (rows: QueryResultRow[]) => {
   // Create groupings of rows (each of which is a single Concept) by their ValueSet ID
   const vsIdGroupedRows = rows.reduce((conceptsByVSId, r) => {
-    if (!(r["valueset_id"] in conceptsByVSId)) {
-      conceptsByVSId[r["valueset_id"]] = [];
+    if (!(r["valueSetId"] in conceptsByVSId)) {
+      conceptsByVSId[r["valueSetId"]] = [];
     }
 
     // if we already added the concept, don't add it again
@@ -151,11 +151,11 @@ export const groupConditionConceptsIntoValueSets = (rows: QueryResultRow[]) => {
     // conditions. For query building, we call this on an already-filtered
     // list of value sets for a single condition, so that behavior stays the same.
     if (
-      !conceptsByVSId[r["valueset_id"]].some(
+      !conceptsByVSId[r["valueSetId"]].some(
         (item: Concept) => item.code == r.code,
       )
     ) {
-      conceptsByVSId[r["valueset_id"]].push(r);
+      conceptsByVSId[r["valueSetId"]].push(r);
     }
 
     return conceptsByVSId;
@@ -187,17 +187,17 @@ function mapStoredValueSetIntoInternalValueset(
   const nonEmptyConcepts = conceptGroup.filter((c) => c["code"] !== null);
 
   const valueSet: DibbsValueSet = {
-    valueSetId: storedConcept["valueset_id"],
+    valueSetId: storedConcept["valueSetId"],
     valueSetVersion: storedConcept["version"],
-    valueSetName: storedConcept["valueset_name"],
+    valueSetName: storedConcept["valueSetName"],
     // External ID might not be defined for user-defined valuesets
-    valueSetExternalId: storedConcept["valueset_external_id"]
-      ? storedConcept["valueset_external_id"]
+    valueSetExternalId: storedConcept["valueSetExternalId"]
+      ? storedConcept["valueSetExternalId"]
       : undefined,
     author: storedConcept["author"],
-    system: storedConcept["code_system"],
+    system: storedConcept["codeSystem"],
     ersdConceptType: storedConcept["type"] ? storedConcept["type"] : undefined,
-    dibbsConceptType: storedConcept["dibbs_concept_type"],
+    dibbsConceptType: storedConcept["dibbsConceptType"],
     includeValueSet: conceptGroup
       .map((c) => c["include"])
       // if every concept is explicitly set to false, don't include this valueset.
@@ -211,17 +211,17 @@ function mapStoredValueSetIntoInternalValueset(
         code: c["code"],
         display: c["display"],
         include: c["include"] ?? true,
-        internalId: c["internal_id"],
+        internalId: c["internalId"],
       };
     }),
-    userCreated: storedConcept["user_created"] ?? false,
+    userCreated: storedConcept["userCreated"] ?? false,
   };
 
-  const conditionId = storedConcept["condition_id"];
+  const conditionId = storedConcept["conditionId"];
   if (conditionId) {
     valueSet["conditionId"] = conditionId;
   }
-  if (conditionId == "custom_condition") {
+  if (conditionId == "customCondition") {
     valueSet["userCreated"] = true;
   }
 
