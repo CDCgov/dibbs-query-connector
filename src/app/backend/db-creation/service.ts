@@ -44,16 +44,11 @@ const sleep = (ms: number) => {
  * @returns Either the stringified data, or null.
  */
 export async function readJsonFromRelativePath(filename: string) {
-  try {
-    // Re-scope file system reads to make sure we use the relative
-    // path via node directory resolution
-    const runtimeServerPath = path.join(__dirname, "../../assets/", filename);
-    const data = readFileSync(runtimeServerPath, "utf-8");
-    return data;
-  } catch (error) {
-    console.error("Error reading JSON file:", error);
-    return;
-  }
+  // Re-scope file system reads to make sure we use the relative
+  // path via node directory resolution
+  const runtimeServerPath = path.join(__dirname, "../../assets/", filename);
+  const data = readFileSync(runtimeServerPath, "utf-8");
+  return data;
 }
 
 class SeedingService {
@@ -312,6 +307,7 @@ class SeedingService {
           console.log(`Seeding ${type}`);
           await insertSeedDbStructs(type, dbClient);
         }
+        console.log("Seeding static files completed successfully.");
         await SeedingService.executeCategoryUpdates(dbClient);
 
         dbClient.query("COMMIT");
