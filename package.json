@@ -82,7 +82,7 @@
     "autoprefixer": "^10.4.21",
     "dotenv": "^17.2.1",
     "dotenv-cli": "^8.0.0",
-    "eslint": "^9.29.0",
+    "eslint": "^9.36.0",
     "eslint-config-next": "^15.5.2",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-import": "^2.31.0",
