@@ -128,7 +128,7 @@ class SeedingService {
       for (const vs of valueSetsToInsert) {
         if (vs) {
           await insertValueSet(vs, dbClient);
-          let missingData = await checkValueSetInsertion(vs);
+          let missingData = await checkValueSetInsertion(vs, dbClient);
           // Note: We don't actually have functions for inserting concepts,
           // so if anything is missing just try re-inserting the whole VS.
           // This ensures that all reference data and FKs are also updated.
@@ -142,7 +142,7 @@ class SeedingService {
               vs.valueSetId,
             );
             await insertValueSet(vs, dbClient);
-            missingData = await checkValueSetInsertion(vs);
+            missingData = await checkValueSetInsertion(vs, dbClient);
           }
         }
       }

@@ -90,7 +90,10 @@ export async function insertValueSet(vs: DibbsValueSet, dbClient: DbClient) {
    
    * @returns A data structure reporting on missing concepts or value set links.
    */
-export async function checkValueSetInsertion(vs: DibbsValueSet) {
+export async function checkValueSetInsertion(
+  vs: DibbsValueSet,
+  dbClient: DbClient,
+) {
   const missingData = {
     missingValueSet: false,
     missingConcepts: [] as Array<string>,
@@ -99,7 +102,7 @@ export async function checkValueSetInsertion(vs: DibbsValueSet) {
   // Check that the value set itself was inserted
   const vsSql = `SELECT * FROM valuesets WHERE oid = $1;`;
   try {
-    const result = await dbService.query(vsSql, [vs.valueSetExternalId]);
+    const result = await dbClient.query(vsSql, [vs.valueSetExternalId]);
     const foundVS = result.rows[0];
 
     if (
@@ -128,7 +131,7 @@ export async function checkValueSetInsertion(vs: DibbsValueSet) {
     const conceptSql = `SELECT * FROM concepts WHERE id = $1;`;
 
     try {
-      const result = await dbService.query(conceptSql, [conceptId]);
+      const result = await dbClient.query(conceptSql, [conceptId]);
       const foundConcept: Concept = result.rows[0];
 
       // We accumulate the unique DIBBs concept IDs of anything that's missing
@@ -153,7 +156,7 @@ export async function checkValueSetInsertion(vs: DibbsValueSet) {
   // Confirm that valueset_to_concepts contains all relevant FK mappings
   const mappingSql = `SELECT * FROM valueset_to_concept WHERE valueset_id = $1;`;
   try {
-    const result = await dbService.query(mappingSql, [vs.valueSetId]);
+    const result = await dbClient.query(mappingSql, [vs.valueSetId]);
     const rows = result.rows;
     const missingConceptsFromMappings = vs.concepts.map((c) => {
       const systemPrefix = vs.system
