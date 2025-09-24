@@ -150,15 +150,6 @@ class SeedingService {
 
       startIdx += batchSize;
       lastIdx += batchSize;
-
-      if (startIdx > 200) {
-        throw Error("should fail without inserts");
-      }
-
-      // Note: leave this time at 2000ms; our DB new connection timeout
-      // is also configured to 2s, so this allows all the async requests
-      // to successfully fire off and grab pooled connections as they're
-      // free to ensure the pool itself doesn't time out
     }
 
     // Once all the value sets are inserted, we need to do conditions
