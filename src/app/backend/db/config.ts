@@ -22,7 +22,7 @@ let cachedDbClient: Pool | null = null;
  * ! to the transaction and audibility decorators that won't work otherwise
  * @returns a cached version of the DB client
  */
-export const dontUseOutsideConfigOrTests_getDbClient = () => {
+export const dontUseOutsideConfigOrTests_getDbPool = () => {
   if (!cachedDbClient) {
     cachedDbClient = new Pool(dbConfig);
   }

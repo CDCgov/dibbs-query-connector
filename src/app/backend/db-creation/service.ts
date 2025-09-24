@@ -21,22 +21,11 @@ import {
   insertValueSet,
 } from "./lib";
 import { DibbsValueSet } from "@/app/models/entities/valuesets";
-import dbService from "../db/service";
-import { PoolClient } from "pg";
+import { DbClient } from "../db/service";
 import { auditable } from "../audit-logs/decorator";
 import { translateVSACToInternalValueSet } from "./utils";
 import path from "path";
 import { readFileSync } from "fs";
-
-/**
- * Simple helper function to cause script-running functions to pause for a
- * specified amount of time.
- * @param ms The time in miliseconds.
- * @returns void
- */
-const sleep = (ms: number) => {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-};
 
 /**
  * Helper utility to resolve the relative path of a file in the docker filesystem.
@@ -70,7 +59,7 @@ class SeedingService {
    */
   static async seedBatchValueSetsFromVsac(
     oidData: OidData,
-    dbClient: PoolClient,
+    dbClient: DbClient,
     batchSize = 100,
   ) {
     const umlsKey = process.env.UMLS_API_KEY;
@@ -170,7 +159,6 @@ class SeedingService {
       // is also configured to 2s, so this allows all the async requests
       // to successfully fire off and grab pooled connections as they're
       // free to ensure the pool itself doesn't time out
-      // await sleep(2000);
     }
 
     // Once all the value sets are inserted, we need to do conditions
@@ -243,7 +231,7 @@ class SeedingService {
    * @returns A promise that resolves to an object indicating success or failure.
    */
   static async executeCategoryUpdates(
-    dbClient: PoolClient,
+    dbClient: DbClient,
   ): Promise<{ success: boolean }> {
     console.log("Executing category data updates on inserted conditions");
     await dbClient.query(updateErsdCategorySql);
@@ -260,7 +248,8 @@ class SeedingService {
     const dbHasData = await checkDBForData();
 
     if (!dbHasData) {
-      const dbClient = await dbService.connect();
+      const dbClient = new DbClient();
+      await dbClient.connect();
       await dbClient.query("BEGIN");
       try {
         const ersdOidData = await indexErsdResponseByOid();
@@ -318,7 +307,7 @@ class SeedingService {
             "DB creation failed with an unknown error. Please contact us for help",
         };
       } finally {
-        dbService.disconnect();
+        dbClient.disconnect();
       }
     } else {
       console.log("Database already has data; skipping DIBBs DB creation.");

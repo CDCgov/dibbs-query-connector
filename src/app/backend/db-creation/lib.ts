@@ -4,7 +4,6 @@ import { Concept } from "@/app/models/entities/concepts";
 import { ersdToDibbsConceptMap } from "../../constants";
 import { Bundle, ValueSet } from "fhir/r4";
 import { DibbsValueSet } from "@/app/models/entities/valuesets";
-import { PoolClient } from "pg";
 import {
   CategoryStruct,
   ConceptStruct,
@@ -22,7 +21,7 @@ import {
   ValuesetStruct,
   ValuesetToConceptStruct,
 } from "./seedSqlStructs";
-import dbService from "../db/service";
+import dbService, { DbClient } from "../db/service";
 import { getERSD, getVSACValueSet, OidData } from "../code-systems/service";
 import {
   generateConceptSqlPromises,
@@ -58,7 +57,7 @@ export async function generateBatchVsacPromises(oidsToFetch: string[]) {
  * pool because of the cross-relationships in the seeding data.
  * @returns success / failure information, as well as errors as appropriate
  */
-export async function insertValueSet(vs: DibbsValueSet, dbClient: PoolClient) {
+export async function insertValueSet(vs: DibbsValueSet, dbClient: DbClient) {
   // Insert the value set
   const insertedId = await generateValueSetSqlPromise(vs, dbClient);
 
@@ -100,9 +99,7 @@ export async function checkValueSetInsertion(vs: DibbsValueSet) {
   // Check that the value set itself was inserted
   const vsSql = `SELECT * FROM valuesets WHERE oid = $1;`;
   try {
-    const result = await dbService.queryWithDbClient(vsSql, [
-      vs.valueSetExternalId,
-    ]);
+    const result = await dbService.query(vsSql, [vs.valueSetExternalId]);
     const foundVS = result.rows[0];
 
     if (
@@ -131,7 +128,7 @@ export async function checkValueSetInsertion(vs: DibbsValueSet) {
     const conceptSql = `SELECT * FROM concepts WHERE id = $1;`;
 
     try {
-      const result = await dbService.queryWithDbClient(conceptSql, [conceptId]);
+      const result = await dbService.query(conceptSql, [conceptId]);
       const foundConcept: Concept = result.rows[0];
 
       // We accumulate the unique DIBBs concept IDs of anything that's missing
@@ -156,9 +153,7 @@ export async function checkValueSetInsertion(vs: DibbsValueSet) {
   // Confirm that valueset_to_concepts contains all relevant FK mappings
   const mappingSql = `SELECT * FROM valueset_to_concept WHERE valueset_id = $1;`;
   try {
-    const result = await dbService.queryWithDbClient(mappingSql, [
-      vs.valueSetId,
-    ]);
+    const result = await dbService.query(mappingSql, [vs.valueSetId]);
     const rows = result.rows;
     const missingConceptsFromMappings = vs.concepts.map((c) => {
       const systemPrefix = vs.system
@@ -208,7 +203,7 @@ export async function checkValueSetInsertion(vs: DibbsValueSet) {
  */
 export async function insertSeedDbStructs(
   structType: string,
-  dbClient: PoolClient,
+  dbClient: DbClient,
 ) {
   const data: string | undefined = await readJsonFromRelativePath(
     "dibbs_db_seed_" + structType + ".json",
@@ -256,7 +251,7 @@ export async function checkDBForData() {
 export async function insertDBStructArray(
   structs: dbInsertStruct[],
   insertType: string,
-  dbClient: PoolClient,
+  dbClient: DbClient,
 ): Promise<{ success: boolean }> {
   let insertSql = "";
   const errors: string[] = [];
@@ -349,7 +344,7 @@ export async function insertDBStructArray(
  */
 export async function generateValueSetSqlPromise(
   vs: DibbsValueSet,
-  dbClient: PoolClient,
+  dbClient: DbClient,
 ) {
   const valueSetOid = vs.valueSetExternalId;
 

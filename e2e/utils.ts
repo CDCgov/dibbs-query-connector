@@ -1,6 +1,6 @@
 import { Page, expect } from "@playwright/test";
 import { CANCER_FRONTEND_NESTED_INPUT, showSiteAlert } from "./constants";
-import { dontUseOutsideConfigOrTests_getDbClient } from "@/app/backend/db/config";
+import { dontUseOutsideConfigOrTests_getDbPool } from "@/app/backend/db/config";
 import {
   EMPTY_MEDICAL_RECORD_SECTIONS,
   NestedQuery,
@@ -30,7 +30,7 @@ export const checkForSiteAlert = async (page: Page, matchText?: string) => {
   }
 };
 
-const dbClient = dontUseOutsideConfigOrTests_getDbClient();
+const dbClient = dontUseOutsideConfigOrTests_getDbPool();
 
 /**
  * Helper function that creates a custom query and grabs it back in return
