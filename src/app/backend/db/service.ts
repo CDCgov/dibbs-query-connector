@@ -8,9 +8,16 @@ export class DbService {
 
   @camelCaseDbColumnNames
   async query(querySql: string, values?: unknown[]) {
-    return this.dbClient
-      ? await this.dbClient.query(querySql, values)
-      : await this.dbPool.query(querySql, values);
+    return await this.dbPool.query(querySql, values);
+  }
+
+  @camelCaseDbColumnNames
+  async queryWithDbClient(querySql: string, values?: unknown[]) {
+    let client = this.dbClient;
+    if (!client) {
+      client = await this.connect();
+    }
+    return await client.query(querySql, values);
   }
 
   async connect() {
