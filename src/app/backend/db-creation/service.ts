@@ -150,10 +150,6 @@ class SeedingService {
 
       startIdx += batchSize;
       lastIdx += batchSize;
-
-      if (startIdx > 200) {
-        throw Error("should fail without inserts");
-      }
     }
 
     // Once all the value sets are inserted, we need to do conditions
