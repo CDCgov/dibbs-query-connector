@@ -153,6 +153,9 @@ Currently, Query Connector requires a PostgreSQL database to store information o
 4. **Database connection**:
    Update the `DATABASE_URL` environment variable in your Query Connector configuration to point to your production database.
 
+5. **Database seeding**
+   For production Docker deployments, the database needs to ingest valuset information from external valueset API's (eg. VSAC, UMLS) in order for the Query Connector to build useful queries. In order to do so, navigate to `/queryBuilding` as an admin user. There, you should see a screen prompting you to build your first query, which will kick off the valueset ingestion process. This process will take several minutes, so stay on the page until the process completes. Contact us for help if you run into issues!
+
 ## Identity provider
 
 Query Connector currently supports the following identity providers:

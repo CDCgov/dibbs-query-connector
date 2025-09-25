@@ -15,11 +15,11 @@ import {
   deleteUserGroup,
 } from "@/app/backend/usergroup-management";
 
-import { dontUseOutsideConfigOrTests_getDbClient } from "@/app/backend/db/config";
+import { dontUseOutsideConfigOrTests_getDbPool } from "@/app/backend/db/config";
 import { UserRole } from "@/app/models/entities/users";
 import { suppressConsoleLogs } from "./fixtures";
 
-const dbClient = dontUseOutsideConfigOrTests_getDbClient();
+const dbClient = dontUseOutsideConfigOrTests_getDbPool();
 
 jest.mock("@/app/utils/auth", () => {
   return {

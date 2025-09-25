@@ -14,7 +14,7 @@ let cachedDbClient: Pool | null = null;
 
 //
 /**
- * Getter function to retrieve the DB client from a naive cache and create a new one
+ * Getter function for a DB pool from a naive cache. Creates a new one
  * if one doesn't exist
  * ! This client export is meant to be consumed only by the one in service.ts,
  * ! except for in tests because of some config issues. If you're using it in
@@ -22,7 +22,7 @@ let cachedDbClient: Pool | null = null;
  * ! to the transaction and audibility decorators that won't work otherwise
  * @returns a cached version of the DB client
  */
-export const dontUseOutsideConfigOrTests_getDbClient = () => {
+export const dontUseOutsideConfigOrTests_getDbPool = () => {
   if (!cachedDbClient) {
     cachedDbClient = new Pool(dbConfig);
   }
