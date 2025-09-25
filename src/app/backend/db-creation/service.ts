@@ -21,22 +21,11 @@ import {
   insertValueSet,
 } from "./lib";
 import { DibbsValueSet } from "@/app/models/entities/valuesets";
-import dbService from "../db/service";
-import { PoolClient } from "pg";
+import { DbClient } from "../db/service";
 import { auditable } from "../audit-logs/decorator";
 import { translateVSACToInternalValueSet } from "./utils";
 import path from "path";
 import { readFileSync } from "fs";
-
-/**
- * Simple helper function to cause script-running functions to pause for a
- * specified amount of time.
- * @param ms The time in miliseconds.
- * @returns void
- */
-const sleep = (ms: number) => {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-};
 
 /**
  * Helper utility to resolve the relative path of a file in the docker filesystem.
@@ -70,7 +59,7 @@ class SeedingService {
    */
   static async seedBatchValueSetsFromVsac(
     oidData: OidData,
-    dbClient: PoolClient,
+    dbClient: DbClient,
     batchSize = 100,
   ) {
     const umlsKey = process.env.UMLS_API_KEY;
@@ -136,19 +125,10 @@ class SeedingService {
         },
       );
 
-      // Then, we'll insert it into our database instance
-      await Promise.all(
-        valueSetsToInsert.map(async (vs) => {
-          if (vs) {
-            await insertValueSet(vs, dbClient);
-          }
-        }),
-      );
-
-      // Finally, we verify that the insert was performed correctly
-      valueSetsToInsert.map(async (vs) => {
+      for (const vs of valueSetsToInsert) {
         if (vs) {
-          let missingData = await checkValueSetInsertion(vs);
+          await insertValueSet(vs, dbClient);
+          let missingData = await checkValueSetInsertion(vs, dbClient);
           // Note: We don't actually have functions for inserting concepts,
           // so if anything is missing just try re-inserting the whole VS.
           // This ensures that all reference data and FKs are also updated.
@@ -162,19 +142,14 @@ class SeedingService {
               vs.valueSetId,
             );
             await insertValueSet(vs, dbClient);
-            missingData = await checkValueSetInsertion(vs);
+            missingData = await checkValueSetInsertion(vs, dbClient);
           }
         }
-      });
+      }
+      // Finally, we verify that the insert was performed correctly
 
       startIdx += batchSize;
       lastIdx += batchSize;
-
-      // Note: leave this time at 2000ms; our DB new connection timeout
-      // is also configured to 2s, so this allows all the async requests
-      // to successfully fire off and grab pooled connections as they're
-      // free to ensure the pool itself doesn't time out
-      await sleep(2000);
     }
 
     // Once all the value sets are inserted, we need to do conditions
@@ -190,30 +165,26 @@ class SeedingService {
     // Create DB based condition structures
     let conditionPromises = await Promise.all(
       Array.from(conditionSet).map(async (cString) => {
-        try {
-          const c = cString.split("*");
-          const vsacCondition: Parameters = (await getVSACValueSet(
-            c[0],
-            "condition",
-            c[1],
-          )) as Parameters;
+        const c = cString.split("*");
+        const vsacCondition: Parameters = (await getVSACValueSet(
+          c[0],
+          "condition",
+          c[1],
+        )) as Parameters;
 
-          const versionHolder = (vsacCondition.parameter || []).find(
-            (p) => p.name === "version",
-          );
-          const versionArray = (versionHolder?.valueString || "").split("/");
-          const version = versionArray[versionArray.length - 1];
-          const finalCondition: ConditionStruct = {
-            id: c[0],
-            system: c[1],
-            name: c[2],
-            version: version,
-            category: "",
-          };
-          return finalCondition;
-        } catch (error) {
-          console.error(error);
-        }
+        const versionHolder = (vsacCondition.parameter || []).find(
+          (p) => p.name === "version",
+        );
+        const versionArray = (versionHolder?.valueString || "").split("/");
+        const version = versionArray[versionArray.length - 1];
+        const finalCondition: ConditionStruct = {
+          id: c[0],
+          system: c[1],
+          name: c[2],
+          version: version,
+          category: "",
+        };
+        return finalCondition;
       }),
     );
 
@@ -251,23 +222,15 @@ class SeedingService {
    * @returns A promise that resolves to an object indicating success or failure.
    */
   static async executeCategoryUpdates(
-    dbClient: PoolClient,
+    dbClient: DbClient,
   ): Promise<{ success: boolean }> {
-    try {
-      console.log("Executing category data updates on inserted conditions");
-      await dbClient.query(updateErsdCategorySql);
-      await dbClient.query(updateNewbornScreeningCategorySql);
-      await dbClient.query(updatedCancerCategorySql);
-      await dbClient.query(`DROP TABLE category_data`);
-      console.log("All inserted queries cross-referenced with category data");
-      return { success: true };
-    } catch (error) {
-      console.error(
-        "Could not update categories for inserted conditions",
-        error,
-      );
-      return { success: false };
-    }
+    console.log("Executing category data updates on inserted conditions");
+    await dbClient.query(updateErsdCategorySql);
+    await dbClient.query(updateNewbornScreeningCategorySql);
+    await dbClient.query(updatedCancerCategorySql);
+    await dbClient.query(`DROP TABLE category_data`);
+    console.log("All inserted queries cross-referenced with category data");
+    return { success: true };
   }
 
   @auditable
@@ -276,8 +239,9 @@ class SeedingService {
     const dbHasData = await checkDBForData();
 
     if (!dbHasData) {
-      const dbClient = await dbService.connect();
-      dbClient.query("BEGIN");
+      const dbClient = new DbClient();
+      await dbClient.connect();
+      await dbClient.query("BEGIN");
       try {
         const ersdOidData = await indexErsdResponseByOid();
 
@@ -293,6 +257,7 @@ class SeedingService {
         console.log(
           "Valuesets and relationships seeded successfully. Proceeding to seed static custom data.",
         );
+
         const insertionTypes = [
           "valuesets",
           "concepts",
@@ -310,14 +275,14 @@ class SeedingService {
         console.log("Seeding static files completed successfully.");
         await SeedingService.executeCategoryUpdates(dbClient);
 
-        dbClient.query("COMMIT");
-        dbService.disconnect();
+        await dbClient.query("COMMIT");
 
         console.log("DB successfully seeded");
         return { success: true };
       } catch (e) {
-        dbClient.query("ROLLBACK");
-        dbService.disconnect();
+        console.log("Rolling back DB creation insert");
+
+        await dbClient.query("ROLLBACK");
         if (e instanceof Error) {
           console.error("DB reload failed", e.message);
           return {
@@ -332,6 +297,8 @@ class SeedingService {
           message:
             "DB creation failed with an unknown error. Please contact us for help",
         };
+      } finally {
+        dbClient.disconnect();
       }
     } else {
       console.log("Database already has data; skipping DIBBs DB creation.");

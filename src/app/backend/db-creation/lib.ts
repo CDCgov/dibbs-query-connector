@@ -4,7 +4,6 @@ import { Concept } from "@/app/models/entities/concepts";
 import { ersdToDibbsConceptMap } from "../../constants";
 import { Bundle, ValueSet } from "fhir/r4";
 import { DibbsValueSet } from "@/app/models/entities/valuesets";
-import { PoolClient } from "pg";
 import {
   CategoryStruct,
   ConceptStruct,
@@ -22,7 +21,7 @@ import {
   ValuesetStruct,
   ValuesetToConceptStruct,
 } from "./seedSqlStructs";
-import dbService from "../db/service";
+import dbService, { DbClient } from "../db/service";
 import { getERSD, getVSACValueSet, OidData } from "../code-systems/service";
 import {
   generateConceptSqlPromises,
@@ -41,17 +40,9 @@ import { readJsonFromRelativePath } from "./service";
 export async function generateBatchVsacPromises(oidsToFetch: string[]) {
   const valueSetPromises = Promise.allSettled(
     oidsToFetch.map(async (oid) => {
-      try {
-        // First, we'll pull the value set from VSAC and map it to our representation
-        const vs = await getVSACValueSet(oid);
-        return { vs: vs, oid: oid };
-      } catch (e) {
-        let message = `Fetch for VSAC value set with oid ${oid} failed`;
-        if (e instanceof Error) {
-          message = message + ` with error message: ${e.message}`;
-        }
-        return Promise.reject(new Error(message));
-      }
+      // First, we'll pull the value set from VSAC and map it to our representation
+      const vs = await getVSACValueSet(oid);
+      return { vs: vs, oid: oid };
     }),
   );
 
@@ -66,50 +57,22 @@ export async function generateBatchVsacPromises(oidsToFetch: string[]) {
  * pool because of the cross-relationships in the seeding data.
  * @returns success / failure information, as well as errors as appropriate
  */
-export async function insertValueSet(
-  vs: DibbsValueSet,
-  dbClient: PoolClient,
-): Promise<{ success: boolean; error?: string }> {
-  const errorArray: string[] = [];
-
+export async function insertValueSet(vs: DibbsValueSet, dbClient: DbClient) {
   // Insert the value set
-  try {
-    await generateValueSetSqlPromise(vs, dbClient);
-  } catch (e) {
-    console.error(
-      "ValueSet insertion failed for %s_%s",
-      vs.valueSetId,
-      vs.valueSetVersion,
-      e,
-    );
-    errorArray.push("Error during value set insertion");
-  }
+  const insertedId = await generateValueSetSqlPromise(vs, dbClient);
 
   // Insert concepts (sequentially)
   const conceptInserts = generateConceptSqlPromises(vs, dbClient);
   for (const insert of conceptInserts) {
-    try {
-      await insert;
-    } catch (e) {
-      console.error("Error inserting concept:", e);
-      errorArray.push("Error during concept insertion");
-    }
+    await insert;
   }
   // Insert concept-to-valueset joins (sequentially)
   const joinInserts = generateValuesetConceptJoinSqlPromises(vs, dbClient);
   for (const join of joinInserts) {
-    try {
-      await join;
-    } catch (e) {
-      console.error("Error inserting ValueSet <-> Concept mapping:", e);
-      errorArray.push("Error during ValueSet-Concept join");
-      throw Error("Join failed");
-    }
+    await join;
   }
 
-  return errorArray.length === 0
-    ? { success: true }
-    : { success: false, error: errorArray.join(", ") };
+  return insertedId;
 }
 
 /**
@@ -127,17 +90,19 @@ export async function insertValueSet(
    
    * @returns A data structure reporting on missing concepts or value set links.
    */
-export async function checkValueSetInsertion(vs: DibbsValueSet) {
+export async function checkValueSetInsertion(
+  vs: DibbsValueSet,
+  dbClient: DbClient,
+) {
   const missingData = {
     missingValueSet: false,
     missingConcepts: [] as Array<string>,
     missingMappings: [] as Array<string>,
   };
-
   // Check that the value set itself was inserted
   const vsSql = `SELECT * FROM valuesets WHERE oid = $1;`;
   try {
-    const result = await dbService.query(vsSql, [vs.valueSetExternalId]);
+    const result = await dbClient.query(vsSql, [vs.valueSetExternalId]);
     const foundVS = result.rows[0];
 
     if (
@@ -156,42 +121,42 @@ export async function checkValueSetInsertion(vs: DibbsValueSet) {
   }
 
   // Check that all concepts under the value set's umbrella were inserted
-  const brokenConcepts = await Promise.all(
-    vs.concepts.map(async (c) => {
-      const systemPrefix = vs.system
-        ? stripProtocolAndTLDFromSystemUrl(vs.system)
-        : "";
-      const conceptId = `${systemPrefix}_${c?.code}`;
-      const conceptSql = `SELECT * FROM concepts WHERE id = $1;`;
+  const brokenConcepts: string[] = [];
 
-      try {
-        const result = await dbService.query(conceptSql, [conceptId]);
-        const foundConcept: Concept = result.rows[0];
+  for (const c of vs.concepts) {
+    const systemPrefix = vs.system
+      ? stripProtocolAndTLDFromSystemUrl(vs.system)
+      : "";
+    const conceptId = `${systemPrefix}_${c?.code}`;
+    const conceptSql = `SELECT * FROM concepts WHERE id = $1;`;
 
-        // We accumulate the unique DIBBs concept IDs of anything that's missing
-        if (
-          foundConcept?.code !== c?.code ||
-          foundConcept?.display !== c?.display
-        ) {
-          console.error(
-            "Retrieved concept " +
-              conceptId +
-              " has different values than given concept",
-          );
-          return conceptId;
-        }
-      } catch (error) {
-        console.error("Couldn't fetch concept with ID %s: ", conceptId, error);
-        return conceptId;
+    try {
+      const result = await dbClient.query(conceptSql, [conceptId]);
+      const foundConcept: Concept = result.rows[0];
+
+      // We accumulate the unique DIBBs concept IDs of anything that's missing
+      if (
+        foundConcept?.code !== c?.code ||
+        foundConcept?.display !== c?.display
+      ) {
+        console.error(
+          "Retrieved concept " +
+            conceptId +
+            " has different values than given concept",
+        );
+        brokenConcepts.push(conceptId);
       }
-    }),
-  );
+    } catch (error) {
+      console.error("Couldn't fetch concept with ID %s: ", conceptId, error);
+      brokenConcepts.push(conceptId);
+    }
+  }
   missingData.missingConcepts = brokenConcepts.filter((bc) => bc !== undefined);
 
   // Confirm that valueset_to_concepts contains all relevant FK mappings
   const mappingSql = `SELECT * FROM valueset_to_concept WHERE valueset_id = $1;`;
   try {
-    const result = await dbService.query(mappingSql, [vs.valueSetId]);
+    const result = await dbClient.query(mappingSql, [vs.valueSetId]);
     const rows = result.rows;
     const missingConceptsFromMappings = vs.concepts.map((c) => {
       const systemPrefix = vs.system
@@ -241,7 +206,7 @@ export async function checkValueSetInsertion(vs: DibbsValueSet) {
  */
 export async function insertSeedDbStructs(
   structType: string,
-  dbClient: PoolClient,
+  dbClient: DbClient,
 ) {
   const data: string | undefined = await readJsonFromRelativePath(
     "dibbs_db_seed_" + structType + ".json",
@@ -289,7 +254,7 @@ export async function checkDBForData() {
 export async function insertDBStructArray(
   structs: dbInsertStruct[],
   insertType: string,
-  dbClient: PoolClient,
+  dbClient: DbClient,
 ): Promise<{ success: boolean }> {
   let insertSql = "";
   const errors: string[] = [];
@@ -382,7 +347,7 @@ export async function insertDBStructArray(
  */
 export async function generateValueSetSqlPromise(
   vs: DibbsValueSet,
-  dbClient: PoolClient,
+  dbClient: DbClient,
 ) {
   const valueSetOid = vs.valueSetExternalId;
 

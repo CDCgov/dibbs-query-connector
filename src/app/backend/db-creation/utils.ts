@@ -3,7 +3,6 @@
 
 import { Concept } from "@/app/models/entities/concepts";
 import { DibbsValueSet } from "@/app/models/entities/valuesets";
-import { PoolClient } from "pg";
 import { ErsdConceptType, ersdToDibbsConceptMap } from "../../constants";
 import {
   BundleEntry,
@@ -12,6 +11,7 @@ import {
   ValueSet,
 } from "fhir/r4";
 import { insertValuesetToConceptSql, insertConceptSql } from "./seedSqlStructs";
+import { DbClient } from "../db/service";
 const ERSD_TYPED_RESOURCE_URL = "http://ersd.aimsplatform.org/fhir/ValueSet/";
 
 /**
@@ -109,7 +109,7 @@ export function indexErsdByOid(
  */
 export function generateValuesetConceptJoinSqlPromises(
   vs: DibbsValueSet,
-  dbClient: PoolClient,
+  dbClient: DbClient,
 ) {
   return vs.concepts.map((concept) => {
     const systemPrefix = vs.system
@@ -136,7 +136,7 @@ export function generateValuesetConceptJoinSqlPromises(
  */
 export function generateConceptSqlPromises(
   vs: DibbsValueSet,
-  dbClient: PoolClient,
+  dbClient: DbClient,
 ) {
   return vs.concepts.map((concept) => {
     const systemPrefix = vs.system

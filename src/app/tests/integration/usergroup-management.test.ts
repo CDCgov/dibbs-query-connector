@@ -7,12 +7,12 @@ import {
   removeQueriesFromGroup,
 } from "@/app/backend/usergroup-management";
 import { getAllUsersWithSingleGroupStatus } from "@/app/backend/user-management";
-import { dontUseOutsideConfigOrTests_getDbClient } from "@/app/backend/db/config";
+import { dontUseOutsideConfigOrTests_getDbPool } from "@/app/backend/db/config";
 import { User } from "@/app/models/entities/users";
 import { suppressConsoleLogs } from "./fixtures";
 import { QueryDataColumn } from "@/app/(pages)/queryBuilding/utils";
 
-const dbClient = dontUseOutsideConfigOrTests_getDbClient();
+const dbClient = dontUseOutsideConfigOrTests_getDbPool();
 
 jest.mock("@/app/utils/auth", () => ({
   superAdminAccessCheck: jest.fn(() => Promise.resolve(true)),
