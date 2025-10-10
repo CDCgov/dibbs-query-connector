@@ -82,15 +82,6 @@ export const ConceptSelectionView: React.FC<ConceptSelectionViewProps> = ({
     vsTypeLevelOptions: ConceptTypeToDibbsVsMap,
     searchFilter: string,
   ) => {
-    if (!queryId) {
-      showToastConfirmation({
-        heading: "Query ID not set",
-        body: "Something went wrong unexpectedly. Please try again or contact us if the issue persists",
-        variant: "error",
-      });
-      return [];
-    }
-
     const accordionDataToDisplay = filterVsTypeOptions(
       vsTypeLevelOptions,
       searchFilter,
