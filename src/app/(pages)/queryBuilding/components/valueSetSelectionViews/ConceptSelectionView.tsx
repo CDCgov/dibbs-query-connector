@@ -169,6 +169,7 @@ export const ConceptSelectionView: React.FC<ConceptSelectionViewProps> = ({
   };
 
   useEffect(() => {
+    if (!queryId) return;
     const accordions = generateTypeLevelAccordions(
       vsTypeLevelOptions,
       searchFilter,
