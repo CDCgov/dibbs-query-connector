@@ -130,6 +130,10 @@ module "ecs" {
         {
           name  = "MTLS_KEY"
           value = var.mtls_key
+        },
+        {
+          name  = "APP_HOSTNAME"
+          value = "https://queryconnector.dev"
         }
       ]
     },
