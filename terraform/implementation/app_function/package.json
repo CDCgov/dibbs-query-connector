@@ -1,0 +1,17 @@
+{
+  "name": "app-func",
+  "version": "1.0.0",
+  "main": "src/functions/ProcessHL7/process-hl7.js",
+  "scripts": {
+    "compile": "tsc",
+    "build": "npm run compile",
+    "start": "func start"
+  },
+  "dependencies": {
+    "@azure/functions": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  }
+}

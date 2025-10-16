@@ -25,6 +25,7 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.515.0",
     "@axe-core/playwright": "^4.10.2",
+    "@azure/functions": "^4.7.2-preview",
     "@mdx-js/loader": "^3.1.0",
     "@mdx-js/react": "^3.1.0",
     "@next/mdx": "^15.3.5",
@@ -43,6 +44,7 @@
     "next": "^15.3.5",
     "next-auth": "^5.0.0-beta.29",
     "next-nprogress-bar": "^2.4.4",
+    "node-fetch": "^2.7.0",
     "node-hl7-client": "^3.0.0",
     "pg": "^8.16.3",
     "pg-promise": "^11.15.0",
@@ -72,6 +74,7 @@
     "@types/fhir": "^0.0.40",
     "@types/jest-axe": "^3.5.9",
     "@types/node": "^22.13.9",
+    "@types/node-fetch": "^2.6.13",
     "@types/pg": "^8.15.5",
     "@types/react": "19.1.6",
     "@types/react-dom": "19.1.9",
