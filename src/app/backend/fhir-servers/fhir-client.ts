@@ -508,11 +508,16 @@ class FHIRClient {
     const requestOptions: RequestInit = {
       method: "POST",
       headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
         ...this.init.headers,
+        "Content-Type": "application/x-www-form-urlencoded",
       },
       body: params.toString(),
     };
+
+    // Print out the request details for debugging
+    console.log("POST Request URL:", this.hostname + path);
+    console.log("POST Request Headers:", requestOptions.headers);
+    console.log("POST Request Body:", requestOptions.body);
 
     return this.fetch(this.hostname + path, requestOptions);
   }
