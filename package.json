@@ -25,7 +25,7 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.515.0",
     "@axe-core/playwright": "^4.10.2",
-    "@mdx-js/loader": "^3.1.0",
+    "@mdx-js/loader": "^3.1.1",
     "@mdx-js/react": "^3.1.0",
     "@next/mdx": "^15.3.5",
     "@scalar/nextjs-api-reference": "^0.8.4",
