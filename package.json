@@ -40,7 +40,7 @@
     "fhirpath": "^4.4.0",
     "html-react-parser": "^5.2.5",
     "jose": "^5.2.2",
-    "next": "^15.3.5",
+    "next": "^15.3.6",
     "next-auth": "^5.0.0-beta.29",
     "next-nprogress-bar": "^2.4.4",
     "node-hl7-client": "^3.0.0",
