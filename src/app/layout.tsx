@@ -15,9 +15,8 @@ import { headers } from "next/headers";
 
 // Intercept mocked requests in e2e tests
 if (process.env.RUN_FETCH_INTERCEPTOR === "true") {
-  const { setupFetchInterceptor } = await import(
-    "request-mocking-protocol/fetch"
-  );
+  const { setupFetchInterceptor } =
+    await import("request-mocking-protocol/fetch");
 
   console.log("Setting up fetch interceptor");
   setupFetchInterceptor(() => headers());
