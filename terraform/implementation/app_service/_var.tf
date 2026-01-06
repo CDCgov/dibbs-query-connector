@@ -1,4 +1,5 @@
 variable "app_version" {
   type    = string
-  default = "0.9.1"
+  default = "1.0.0"
 }
+
