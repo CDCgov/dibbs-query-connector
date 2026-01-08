@@ -63,15 +63,22 @@ const LandingPage: React.FC<LandingPageProps> = ({ isLoggedIn }) => {
                   agreements, giving you access to more complete and timely
                   data.
                 </p>
-                {
-                  <button
-                    className="usa-button next-button margin-bottom-2"
-                    id="next-button"
-                    onClick={handleClick}
-                  >
-                    Sign in
-                  </button>
-                }
+
+                <button
+                  className="usa-button next-button margin-bottom-2"
+                  id="next-button"
+                  onClick={handleClick}
+                >
+                  Sign in
+                </button>
+                {window?.location.hostname === "connector.dibbs.tools" && (
+                  <p className={styles.pageContent}>
+                    <b>Demo credentials:</b> <br />
+                    Username: <code>mario@dibbs.tools</code>
+                    <br />
+                    Password: <code>Nye6KpjgkHWT</code>
+                  </p>
+                )}
               </div>
 
               <Image
