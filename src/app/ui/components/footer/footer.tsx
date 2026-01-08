@@ -53,6 +53,10 @@ export default function FooterComponent() {
               For more information about this solution, send us an email at{" "}
               <a className="brand-lightest" href="mailto:dibbs@cdc.gov">
                 dibbs@cdc.gov
+              </a>{" "}
+              or visit{" "}
+              <a className="brand-lightest" href="https://dibbs.tools">
+                dibbs.tools
               </a>
             </p>
           </div>
@@ -90,6 +94,10 @@ export default function FooterComponent() {
               For more information about this solution, send us an email at{" "}
               <a className="brand-lightest" href="mailto:dibbs@cdc.gov">
                 dibbs@cdc.gov
+              </a>{" "}
+              or visit{" "}
+              <a className="brand-lightest" href="https://dibbs.tools">
+                dibbs.tools
               </a>
             </p>
           </div>
