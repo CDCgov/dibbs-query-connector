@@ -24,6 +24,7 @@ interface LandingPageProps {
  */
 const LandingPage: React.FC<LandingPageProps> = ({ isLoggedIn }) => {
   const router = useRouter();
+  const [isDemo, setIsDemo] = useState(false);
 
   const [determiningRedirectStatus, setDeterminingRedirectStatus] =
     useState(isLoggedIn);
@@ -35,6 +36,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ isLoggedIn }) => {
     } else {
       setDeterminingRedirectStatus(false);
     }
+    setIsDemo(window.location.hostname === "connector.dibbs.tools");
   }, [isLoggedIn]);
 
   const handleClick = async () => {
@@ -71,7 +73,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ isLoggedIn }) => {
                 >
                   Sign in
                 </button>
-                {window?.location.hostname === "connector.dibbs.tools" && (
+                {isDemo && (
                   <p className={styles.pageContent}>
                     <b>Demo credentials:</b> <br />
                     Username: <code>mario@dibbs.tools</code>
