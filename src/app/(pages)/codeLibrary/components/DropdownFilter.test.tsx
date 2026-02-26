@@ -1,6 +1,5 @@
 import { render, screen } from "@testing-library/react";
 import { RootProviderMock } from "@/app/tests/unit/setup";
-import { mockDibbsValueSets } from "../../queryBuilding/fixtures";
 import DropdownFilter from "./DropdownFilter";
 import {
   mockAdmin,
@@ -53,7 +52,7 @@ describe("DropdownFilter", () => {
           }}
           setFilterSearch={jest.fn()}
           setShowFilters={jest.fn()}
-          valueSets={mockDibbsValueSets}
+          allCreators={["DIBBs", "QC Admin"]}
           loading={false}
           filterCount={0}
           setTriggerFocus={jest.fn()}
@@ -87,7 +86,7 @@ describe("DropdownFilter", () => {
           }}
           setFilterSearch={jest.fn()}
           setShowFilters={jest.fn()}
-          valueSets={mockDibbsValueSets}
+          allCreators={["DIBBs", "QC Admin"]}
           loading={false}
           filterCount={1}
           setTriggerFocus={jest.fn()}

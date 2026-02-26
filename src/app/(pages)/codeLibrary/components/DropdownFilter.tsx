@@ -7,15 +7,12 @@ import {
 } from "react";
 import { Button, Select } from "@trussworks/react-uswds";
 import styles from "../codeLibrary.module.scss";
-import {
-  DibbsConceptType,
-  DibbsValueSet,
-} from "@/app/models/entities/valuesets";
+import { DibbsConceptType } from "@/app/models/entities/valuesets";
 import {
   formatCodeSystemPrefix,
   formatStringToSentenceCase,
 } from "@/app/utils/format-service";
-import { emptyFilterSearch } from "../utils";
+import { CodeSystemOptions, emptyFilterSearch } from "../utils";
 import { User } from "@/app/models/entities/users";
 import {
   getAllGroupMembers,
@@ -32,7 +29,7 @@ export type FilterCategories = {
 type DropdownFilterProps = {
   setFilterSearch: Dispatch<SetStateAction<FilterCategories>>;
   filterSearch: FilterCategories;
-  valueSets: DibbsValueSet[];
+  allCreators: string[];
   setShowFilters: Dispatch<SetStateAction<boolean>>;
   loading: boolean;
   filterCount: number;
@@ -49,7 +46,7 @@ export type vsAuthorMap = {
  * @param root0.filterSearch the filter criteria
  * @param root0.setFilterSearch state function to update filter criteria
  * @param root0.setShowFilters state function to toggle showing/hiding the dropdown filters
- * @param root0.valueSets the value sets to apply the filter(s) to
+ * @param root0.allCreators distinct creator names for the creator filter dropdown
  * @param root0.loading the loading state of the parent's value set data
  * @param root0.filterCount the number of filters currently applied to the result set
  * @param root0.currentUser the User object for the currently active user
@@ -60,7 +57,7 @@ export type vsAuthorMap = {
 const DropdownFilter: React.FC<DropdownFilterProps> = ({
   filterSearch,
   setFilterSearch,
-  valueSets,
+  allCreators,
   setShowFilters,
   loading,
   filterCount,
@@ -68,12 +65,6 @@ const DropdownFilter: React.FC<DropdownFilterProps> = ({
   setTriggerFocus,
   focusRef,
 }) => {
-  const valueSetCodeSystems = valueSets
-    .map((vs) => vs.system)
-    .filter((item, index, array) => {
-      return !!item && array.indexOf(item) === index;
-    });
-
   const [myTeamMembers, setMyTeamMembers] = useState<vsAuthorMap>();
 
   const [groupAuthors, setGroupAuthors] = useState<vsAuthorMap>({});
@@ -130,8 +121,8 @@ const DropdownFilter: React.FC<DropdownFilterProps> = ({
   useEffect(() => {
     if (groupAuthors) {
       const valueSetAuthors: vsAuthorMap = {};
-      valueSets.map((vs) => {
-        valueSetAuthors[vs.author] = [vs.author];
+      allCreators.forEach((author) => {
+        valueSetAuthors[author] = [author];
       });
 
       Object.entries(groupAuthors).forEach(([key, val]) => {
@@ -142,7 +133,7 @@ const DropdownFilter: React.FC<DropdownFilterProps> = ({
         (myTeamMembers && Object.values(myTeamMembers).flat()) || [];
       setValueSetCreators(valueSetAuthors);
     }
-  }, [groupAuthors]);
+  }, [groupAuthors, allCreators]);
 
   const getFocusableElements = (focusRef: RefObject<HTMLElement>) => {
     const focusableElements =
@@ -250,10 +241,10 @@ const DropdownFilter: React.FC<DropdownFilterProps> = ({
             disabled={!!loading}
           >
             {<option value=""></option>}
-            {valueSetCodeSystems.map((codeSystem) => {
+            {CodeSystemOptions.map((codeSystem) => {
               return (
                 <option key={codeSystem} value={codeSystem}>
-                  {formatCodeSystemPrefix(codeSystem || "")}
+                  {formatCodeSystemPrefix(codeSystem)}
                 </option>
               );
             })}

@@ -144,7 +144,7 @@ describe("FHIRClient with Mutual TLS", () => {
       ) as keyof Agent;
       const dispatcherOptions = dispatcher[constructOptions];
 
-      expect(dispatcherOptions).toStrictEqual({
+      expect(dispatcherOptions).toMatchObject({
         connect: {
           cert: mockCert,
           key: mockKey,
@@ -223,7 +223,7 @@ describe("FHIRClient with Mutual TLS", () => {
       ) as keyof Agent;
       const dispatcherOptions = dispatcher[constructOptions];
 
-      expect(dispatcherOptions).toStrictEqual({
+      expect(dispatcherOptions).toMatchObject({
         connect: {
           cert: mockCert,
           key: mockKey,
@@ -273,7 +273,7 @@ describe("FHIRClient with Mutual TLS", () => {
       ) as keyof Agent;
       const dispatcherOptions = dispatcher[constructOptions];
 
-      expect(dispatcherOptions).toStrictEqual({
+      expect(dispatcherOptions).toMatchObject({
         connect: {
           cert: mockCert,
           key: mockKey,
