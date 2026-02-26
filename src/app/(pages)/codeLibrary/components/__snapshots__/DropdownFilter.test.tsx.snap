@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`DropdownFilter renders a 'clear filters' button when filters are applied 1`] = `
 <body>
@@ -61,6 +61,31 @@ exports[`DropdownFilter renders a 'clear filters' button when filters are applie
               value=""
             />
             <option
+              value="http://hl7.org/fhir/sid/icd-10-cm"
+            >
+              ICD-10
+            </option>
+            <option
+              value="http://hl7.org/fhir/sid/cvx"
+            >
+              CVX
+            </option>
+            <option
+              value="http://www.nlm.nih.gov/research/umls/rxnorm"
+            >
+              RXNORM
+            </option>
+            <option
+              value="http://loinc.org"
+            >
+              LOINC
+            </option>
+            <option
+              value="http://cap.org/eCC"
+            >
+              ECC
+            </option>
+            <option
               value="http://snomed.info/sct"
             >
               SNOMED
@@ -84,6 +109,11 @@ exports[`DropdownFilter renders a 'clear filters' button when filters are applie
             <option
               value=""
             />
+            <option
+              value="DIBBs"
+            >
+              DIBBs
+            </option>
             <option
               value="QC Admin"
             >
@@ -196,6 +226,31 @@ exports[`DropdownFilter renders correctly 1`] = `
               value=""
             />
             <option
+              value="http://hl7.org/fhir/sid/icd-10-cm"
+            >
+              ICD-10
+            </option>
+            <option
+              value="http://hl7.org/fhir/sid/cvx"
+            >
+              CVX
+            </option>
+            <option
+              value="http://www.nlm.nih.gov/research/umls/rxnorm"
+            >
+              RXNORM
+            </option>
+            <option
+              value="http://loinc.org"
+            >
+              LOINC
+            </option>
+            <option
+              value="http://cap.org/eCC"
+            >
+              ECC
+            </option>
+            <option
               value="http://snomed.info/sct"
             >
               SNOMED
@@ -219,6 +274,11 @@ exports[`DropdownFilter renders correctly 1`] = `
             <option
               value=""
             />
+            <option
+              value="DIBBs"
+            >
+              DIBBs
+            </option>
             <option
               value="QC Admin"
             >

@@ -1,5 +1,5 @@
 "use client";
-import { useContext, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import classNames from "classnames";
 import {
   Alert,
@@ -34,7 +34,9 @@ import { useSession } from "next-auth/react";
 import { getUserByUsername } from "@/app/backend/user-management";
 import {
   deleteCustomValueSet,
-  getAllValueSets,
+  getValueSetsPaginated,
+  getConceptsByValueSetId,
+  getValueSetCreators,
 } from "@/app/backend/custom-code-service";
 import dynamic from "next/dynamic";
 import type { ModalProps, ModalRef } from "../../ui/designSystem/modal/Modal";
@@ -52,7 +54,7 @@ import Checkbox from "@/app/ui/designSystem/checkbox/Checkbox";
 import { useSaveQueryAndRedirect } from "@/app/backend/query-building/useSaveQueryAndRedirect";
 import { EMPTY_CONCEPT_TYPE } from "../queryBuilding/utils";
 import { NestedQuery } from "../queryBuilding/utils";
-import { groupConditionConceptsIntoValueSets } from "@/app/utils/valueSetTranslation";
+import { QCPagedResponse } from "@/app/models/responses/collections";
 import { csvRow } from "@/app/api/csv/route";
 import { DibbsConceptType } from "@/app/models/entities/valuesets";
 import { CodeSystemOptions, CodeSystemOptionsMap } from "./utils";
@@ -95,10 +97,16 @@ const CodeLibrary: React.FC = () => {
 
   const [conditionDetailsMap, setConditionsDetailsMap] =
     useState<ConditionsMap>();
-  const [valueSets, setValueSets] = useState<DibbsValueSet[]>([]);
-  const [filteredValueSets, setFilteredValueSets] = useState(valueSets);
+  const [pagedResult, setPagedResult] =
+    useState<QCPagedResponse<DibbsValueSet> | null>(null);
+  const [allCreators, setAllCreators] = useState<string[]>([]);
   const [activeValueSet, setActiveValueSet] =
     useState<DibbsValueSet>(emptyValueSet);
+  const [activeValueSetConcepts, setActiveValueSetConcepts] = useState<
+    Concept[]
+  >([]);
+  const [conceptsLoading, setConceptsLoading] = useState(false);
+  const [debouncedSearch, setDebouncedSearch] = useState<string>("");
 
   const modalRef = useRef<ModalRef>(null);
   const filterButtonRef = useRef<HTMLButtonElement>(null);
@@ -137,14 +145,23 @@ const CodeLibrary: React.FC = () => {
   const handleValueSetToggle = (vsId: string, checked: boolean) => {
     setCustomCodeIds((prev) => {
       const valueSet =
-        prev[vsId] ?? valueSets.find((vs) => vs.valueSetId === vsId);
+        prev[vsId] ??
+        (activeValueSet?.valueSetId === vsId
+          ? { ...activeValueSet, concepts: activeValueSetConcepts }
+          : pagedResult?.items.find((vs) => vs.valueSetId === vsId));
       if (!valueSet) return prev;
+      const concepts =
+        valueSet.concepts.length > 0
+          ? valueSet.concepts
+          : activeValueSet?.valueSetId === vsId
+            ? activeValueSetConcepts
+            : [];
       return {
         ...prev,
         [vsId]: {
           ...valueSet,
           includeValueSet: checked,
-          concepts: valueSet.concepts.map((c) => ({ ...c, include: checked })),
+          concepts: concepts.map((c) => ({ ...c, include: checked })),
         },
       };
     });
@@ -159,14 +176,19 @@ const CodeLibrary: React.FC = () => {
       const vs = prev[vsId];
       if (!vs) {
         // Seed only the toggled concept
-        const valueSet = valueSets.find((vs) => vs.valueSetId === vsId);
-        if (!valueSet) return prev;
+        const concepts =
+          activeValueSet?.valueSetId === vsId ? activeValueSetConcepts : [];
+        const baseVs =
+          activeValueSet?.valueSetId === vsId
+            ? activeValueSet
+            : pagedResult?.items.find((v) => v.valueSetId === vsId);
+        if (!baseVs) return prev;
         return {
           ...prev,
           [vsId]: {
-            ...valueSet,
+            ...baseVs,
             includeValueSet: checked,
-            concepts: valueSet.concepts.map((c) =>
+            concepts: concepts.map((c) =>
               c.code === code
                 ? { ...c, include: checked }
                 : { ...c, include: false },
@@ -240,31 +262,47 @@ const CodeLibrary: React.FC = () => {
     }
   };
 
-  let totalPages = Math.ceil(filteredValueSets.length / itemsPerPage);
+  const totalPages = pagedResult?.totalPages ?? 0;
 
-  async function fetchValueSetsAndConditions() {
+  const buildFilterParams = useCallback(() => {
+    const creatorKey = Object.keys(filterSearch.creators)[0];
+    const creatorNames =
+      creatorKey && creatorKey !== ""
+        ? Object.values(filterSearch.creators).flat().filter(Boolean)
+        : undefined;
+
+    return {
+      pageIndex: currentPage - 1,
+      pageSize: itemsPerPage,
+      textSearch: debouncedSearch || undefined,
+      category: filterSearch.category || undefined,
+      codeSystem: filterSearch.codeSystem || undefined,
+      creatorNames:
+        creatorNames && creatorNames.length > 0 ? creatorNames : undefined,
+    };
+  }, [currentPage, itemsPerPage, debouncedSearch, filterSearch]);
+
+  const fetchPage = useCallback(async () => {
     try {
-      const { conditionIdToNameMap } = await getConditionsData();
-
-      const vs = await getAllValueSets();
-      const formattedVs =
-        vs.items && groupConditionConceptsIntoValueSets(vs.items);
-
-      setValueSets(formattedVs);
-      setConditionsDetailsMap(conditionIdToNameMap);
+      const result = await getValueSetsPaginated(buildFilterParams());
+      setPagedResult(result);
+      if (result.items.length > 0) {
+        setActiveValueSet(result.items[0]);
+      } else {
+        setActiveValueSet(emptyValueSet);
+        setActiveValueSetConcepts([]);
+      }
     } catch (error) {
-      console.error(`Failed to fetch: ${error}`);
+      console.error(`Failed to fetch paginated value sets: ${error}`);
     }
-  }
+  }, [buildFilterParams]);
 
-  async function handleChangeMode(mode: CustomCodeMode) {
-    if (mode == "manage" || mode == "select") {
-      // fetch fresh value set details if we are changing TO manage/select mode
-      await fetchValueSetsAndConditions().then(() => {
-        setMode(mode);
-      });
+  async function handleChangeMode(newMode: CustomCodeMode) {
+    if (newMode == "manage" || newMode == "select") {
+      await fetchPage();
+      setMode(newMode);
     } else {
-      setMode(mode);
+      setMode(newMode);
     }
   }
 
@@ -274,9 +312,36 @@ const CodeLibrary: React.FC = () => {
   // update the current page details when switching between build steps
   useEffect(() => {
     setPrevPage(ctx?.currentPage || "");
-    setMode(mode);
-    applyFilters();
   }, [mode]);
+
+  // debounce text search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(textSearch);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [textSearch]);
+
+  // reset to page 1 when filters or search change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [debouncedSearch, filterSearch]);
+
+  // fetch paginated value sets when page/filters change
+  useEffect(() => {
+    fetchPage();
+  }, [fetchPage]);
+
+  // update isFiltered flag
+  useEffect(() => {
+    const filtered = Object.entries(filterSearch).some(([key, val]) => {
+      if (key == "creators") {
+        return !!val && Object.values(val).flat().length > 0;
+      }
+      return val !== "";
+    });
+    setIsFiltered(debouncedSearch !== "" || filtered);
+  }, [debouncedSearch, filterSearch]);
 
   // fetch value sets on page load
   useEffect(() => {
@@ -286,86 +351,55 @@ const CodeLibrary: React.FC = () => {
       hideProgressBar: true,
     });
 
-    async function fetchCurrentUser() {
+    async function fetchInitialData() {
       try {
-        const currentUser = await getUserByUsername(username);
-        setCurrentUser(currentUser.items[0]);
+        const [currentUserResult, conditionsResult, creators] =
+          await Promise.all([
+            getUserByUsername(username),
+            getConditionsData(),
+            getValueSetCreators(),
+          ]);
+        setCurrentUser(currentUserResult.items[0]);
+        setConditionsDetailsMap(conditionsResult.conditionIdToNameMap);
+        setAllCreators(creators);
+        setLoading(false);
       } catch (error) {
-        console.error(`Failed to fetch current user: ${error}`);
+        console.error(`Failed to fetch initial data: ${error}`);
       }
     }
 
-    fetchCurrentUser();
-    fetchValueSetsAndConditions();
+    fetchInitialData();
   }, []);
 
-  // organize valuesets once they've loaded
+  // load concepts on-demand when active value set changes
   useEffect(() => {
-    applyFilters();
-    setActiveValueSet(paginatedValueSets[0]);
-
-    if (
-      filteredValueSets.length >= 0 &&
-      conditionDetailsMap &&
-      Object.keys(conditionDetailsMap).length > 0
-    ) {
-      setLoading(false);
+    if (!activeValueSet?.valueSetId) {
+      setActiveValueSetConcepts([]);
+      return;
     }
-  }, [valueSets, conditionDetailsMap]);
 
-  const applyFilters = async () => {
-    const matchCategory = (vs: DibbsValueSet) => {
-      return filterSearch.category
-        ? vs.dibbsConceptType === filterSearch.category
-        : vs;
+    let cancelled = false;
+    setConceptsLoading(true);
+
+    getConceptsByValueSetId(activeValueSet.valueSetId)
+      .then((concepts) => {
+        if (!cancelled) {
+          setActiveValueSetConcepts(concepts);
+          setConceptsLoading(false);
+        }
+      })
+      .catch((error) => {
+        if (!cancelled) {
+          console.error(`Failed to fetch concepts: ${error}`);
+          setActiveValueSetConcepts([]);
+          setConceptsLoading(false);
+        }
+      });
+
+    return () => {
+      cancelled = true;
     };
-
-    const matchCodeSystem = (vs: DibbsValueSet) =>
-      filterSearch.codeSystem ? vs.system == filterSearch.codeSystem : vs;
-
-    const matchCreators = (vs: DibbsValueSet) => {
-      const creatorKey = Object.keys(filterSearch.creators)[0];
-      return Object.values(filterSearch.creators).length > 0 &&
-        creatorKey !== ""
-        ? Object.values(filterSearch.creators).flat().includes(vs.author)
-        : vs;
-    };
-    setFilteredValueSets(
-      valueSets
-        .filter(handleTextSearch)
-        .filter(matchCategory)
-        .filter(matchCodeSystem)
-        .filter(matchCreators),
-    );
-
-    const isFiltered = Object.entries(filterSearch).some(([key, val]) => {
-      let filterApplied = false;
-
-      if (key == "creators") {
-        filterApplied = !!val && Object.values(val).flat().length > 0;
-      } else {
-        filterApplied = val !== "";
-      }
-
-      return filterApplied;
-    });
-
-    textSearch !== "" || !!isFiltered
-      ? setIsFiltered(true)
-      : setIsFiltered(false);
-  };
-
-  // update display based on text search and filters
-  useEffect(() => {
-    applyFilters();
-    setCurrentPage(1);
-
-    if (textSearch == "") {
-      return setActiveValueSet(valueSets?.[0]);
-    } else {
-      return setActiveValueSet(paginatedValueSets?.[0]);
-    }
-  }, [textSearch, filterSearch]);
+  }, [activeValueSet?.valueSetId]);
 
   // ---- page interaction/display ---- //
   // --------------------------------- //
@@ -383,29 +417,6 @@ const CodeLibrary: React.FC = () => {
         prevPage,
       );
   }
-
-  const handleTextSearch = (vs: DibbsValueSet) => {
-    const matchesName = vs.valueSetName
-      .toLocaleLowerCase()
-      .includes(textSearch.toLocaleLowerCase());
-    const conditionName =
-      vs.conditionId && conditionDetailsMap?.[vs.conditionId].name;
-    const matchesConditionName =
-      conditionName &&
-      conditionName
-        .toLocaleLowerCase()
-        .includes(textSearch.toLocaleLowerCase());
-    const matchesConceptType = vs.dibbsConceptType
-      .toLocaleLowerCase()
-      .includes(textSearch.toLocaleLowerCase());
-    const matchesSystem =
-      vs.system &&
-      vs.system.toLocaleLowerCase().includes(textSearch.toLocaleLowerCase());
-
-    return (
-      matchesName || matchesConditionName || matchesConceptType || matchesSystem
-    );
-  };
 
   const formatConditionDisplay = (conditionId: string) => {
     const conditionDetails =
@@ -439,11 +450,11 @@ const CodeLibrary: React.FC = () => {
     function handleKeyPress(event: KeyboardEvent) {
       if (event.key == "Enter" || event.code == "Space") {
         const targetRow = event.target as HTMLElement;
-        const targetVS = valueSets.filter(
+        const targetVS = pagedResult?.items.find(
           (vs) => vs.valueSetId == targetRow.id.replace("vsTableRow--", ""),
-        )[0];
+        );
 
-        setActiveValueSet(targetVS);
+        if (targetVS) setActiveValueSet(targetVS);
       }
     }
 
@@ -460,7 +471,7 @@ const CodeLibrary: React.FC = () => {
   };
 
   const renderValueSetRows = () => {
-    return paginatedValueSets.map((vs, _i) => {
+    return (pagedResult?.items ?? []).map((vs, _i) => {
       const vsState = customCodeIds[vs.valueSetId];
       const concepts = vsState?.concepts || [];
       const checkedCount = concepts.filter((c) => c.include).length;
@@ -542,7 +553,9 @@ const CodeLibrary: React.FC = () => {
       const result = await deleteCustomValueSet(activeValueSet);
 
       if (result.success) {
-        await fetchValueSetsAndConditions();
+        await fetchPage();
+        const creators = await getValueSetCreators();
+        setAllCreators(creators);
         showToastConfirmation({
           body: `Value set "${activeValueSet.valueSetName}" successfully deleted.`,
         });
@@ -564,19 +577,13 @@ const CodeLibrary: React.FC = () => {
     }
   };
 
-  const paginatedValueSets = useMemo(() => {
-    setActiveValueSet(filteredValueSets[0]);
-    return filteredValueSets.slice(
-      (currentPage - 1) * itemsPerPage,
-      currentPage * itemsPerPage,
-    );
-  }, [valueSets, filteredValueSets, currentPage, itemsPerPage]);
+  const totalItems = pagedResult?.totalItems ?? 0;
 
   const paginationText = `Showing ${
     totalPages === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1
   } -
-  ${Math.min(currentPage * itemsPerPage, filteredValueSets.length)} of 
-  ${filteredValueSets.length} value sets ${isFiltered ? `(filtered)` : ""}`;
+  ${Math.min(currentPage * itemsPerPage, totalItems)} of
+  ${totalItems} value sets ${isFiltered ? `(filtered)` : ""}`;
 
   const valueSetSource =
     activeValueSet?.author == "CSTE Steward"
@@ -798,7 +805,8 @@ const CodeLibrary: React.FC = () => {
         body: `Imported ${okCount} of ${results.length} value set(s) successfully.`,
       });
 
-      await fetchValueSetsAndConditions();
+      const creators = await getValueSetCreators();
+      setAllCreators(creators);
       const me =
         currentUser?.firstName && currentUser?.lastName
           ? `${currentUser.firstName} ${currentUser.lastName}`
@@ -929,11 +937,11 @@ const CodeLibrary: React.FC = () => {
                   <DropdownFilter
                     focusRef={dropdownRef}
                     filterCount={filterCount}
-                    loading={valueSets.length <= 0}
+                    loading={loading}
                     setShowFilters={setShowFilters}
                     filterSearch={filterSearch}
                     setFilterSearch={setFilterSearch}
-                    valueSets={valueSets}
+                    allCreators={allCreators}
                     currentUser={currentUser as User}
                     setTriggerFocus={() => {
                       if (filterButtonRef.current) {
@@ -1070,7 +1078,7 @@ const CodeLibrary: React.FC = () => {
                         : "table-valuesets-select"
                     }
                   >
-                    {loading && paginatedValueSets.length <= 0 ? (
+                    {loading && !pagedResult ? (
                       <tr
                         className={styles.valueSetTable__tableBody_row}
                         data-testid={"loading-skeleton"}
@@ -1083,7 +1091,7 @@ const CodeLibrary: React.FC = () => {
                           />
                         </td>
                       </tr>
-                    ) : !loading && filteredValueSets.length === 0 ? (
+                    ) : !loading && totalItems === 0 ? (
                       <tr
                         className={
                           styles.valueSetTable__tableBody_row_noResults
@@ -1137,7 +1145,7 @@ const CodeLibrary: React.FC = () => {
                                   secondary
                                   onClick={() => handleChangeMode("edit")}
                                 >
-                                  {activeValueSet.concepts?.length <= 0
+                                  {activeValueSetConcepts.length <= 0
                                     ? "Add codes"
                                     : "Edit codes"}
                                 </Button>
@@ -1162,7 +1170,13 @@ const CodeLibrary: React.FC = () => {
                           <th>{"Codes".toLocaleUpperCase()}</th>
                         </tr>
                       )}
-                      {activeValueSet.concepts.length == 0 ? (
+                      {conceptsLoading ? (
+                        <tr className={styles.noCodesAvailable}>
+                          <th>
+                            <Skeleton count={3} />
+                          </th>
+                        </tr>
+                      ) : activeValueSetConcepts.length == 0 ? (
                         <tr className={styles.noCodesAvailable}>
                           <th>There are no codes available.</th>
                         </tr>
@@ -1183,10 +1197,11 @@ const CodeLibrary: React.FC = () => {
                       data-testid="table-codes"
                     >
                       {mode == "manage" &&
-                        activeValueSet?.concepts.map((vs) => (
+                        !conceptsLoading &&
+                        activeValueSetConcepts.map((concept) => (
                           <tr
                             tabIndex={0}
-                            key={vs.code}
+                            key={concept.code}
                             className={classNames(
                               styles.conceptsTable__tableBody_row,
                             )}
@@ -1196,7 +1211,7 @@ const CodeLibrary: React.FC = () => {
                                 highlightClassName="searchHighlight"
                                 searchWords={[textSearch]}
                                 autoEscape={true}
-                                textToHighlight={vs.code}
+                                textToHighlight={concept.code}
                               />
                             </td>
                             <td>
@@ -1204,13 +1219,14 @@ const CodeLibrary: React.FC = () => {
                                 highlightClassName="searchHighlight"
                                 searchWords={[textSearch]}
                                 autoEscape={true}
-                                textToHighlight={vs.display}
+                                textToHighlight={concept.display}
                               />
                             </td>
                           </tr>
                         ))}
                       {mode == "select" &&
-                        activeValueSet.concepts.map((concept) => {
+                        !conceptsLoading &&
+                        activeValueSetConcepts.map((concept) => {
                           const checked = !!customCodeIds[
                             activeValueSet.valueSetId
                           ]?.concepts?.find(
@@ -1309,7 +1325,9 @@ const CodeLibrary: React.FC = () => {
           mode={mode}
           setMode={handleChangeMode}
           activeValueSet={
-            activeValueSet?.userCreated ? activeValueSet : emptyValueSet
+            activeValueSet?.userCreated
+              ? { ...activeValueSet, concepts: activeValueSetConcepts }
+              : emptyValueSet
           }
         />
       )}

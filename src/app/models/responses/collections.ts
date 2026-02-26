@@ -10,3 +10,12 @@ export interface QCPagedResponse<T> extends QCResponse<T> {
   prevPage: number;
   nextPage: number;
 }
+
+export interface ValueSetFilterParams {
+  pageIndex: number;
+  pageSize: number;
+  textSearch?: string;
+  category?: string;
+  codeSystem?: string;
+  creatorNames?: string[];
+}
