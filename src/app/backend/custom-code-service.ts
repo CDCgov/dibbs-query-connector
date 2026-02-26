@@ -368,7 +368,7 @@ class CustomCodeService {
   ): Promise<QCPagedResponse<DibbsValueSet>> {
     try {
       const conditions: string[] = [];
-      const values: (string | number)[] = [];
+      const values: (string | number | string[])[] = [];
       let paramIndex = 1;
 
       if (params.textSearch) {
@@ -394,14 +394,11 @@ class CustomCodeService {
       }
 
       if (params.creatorNames && params.creatorNames.length > 0) {
-        const creatorPlaceholders = params.creatorNames.map(
-          (_, i) => `$${paramIndex + i}`,
-        );
         conditions.push(
-          `(CASE WHEN vs.user_created = true AND u.first_name IS NOT NULL AND u.last_name IS NOT NULL THEN u.first_name || ' ' || u.last_name WHEN vs.user_created = true THEN u.username ELSE vs.author END) IN (${creatorPlaceholders.join(", ")})`,
+          `(CASE WHEN vs.user_created = true AND u.first_name IS NOT NULL AND u.last_name IS NOT NULL THEN u.first_name || ' ' || u.last_name WHEN vs.user_created = true THEN u.username ELSE vs.author END) = ANY($${paramIndex}::text[])`,
         );
-        values.push(...params.creatorNames);
-        paramIndex += params.creatorNames.length;
+        values.push(params.creatorNames);
+        paramIndex++;
       }
 
       const whereClause =
