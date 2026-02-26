@@ -454,26 +454,26 @@ class CustomCodeService {
 
       const items: DibbsValueSet[] = dataResult.rows.map((row) => {
         let author = row.author;
-        if (row.user_created === true) {
+        if (row.userCreated === true) {
           author =
-            row.first_name && row.last_name
-              ? `${row.first_name} ${row.last_name}`
+            row.firstName && row.lastName
+              ? `${row.firstName} ${row.lastName}`
               : row.username || row.author;
         }
 
         return {
-          valueSetId: row.valueset_id,
-          valueSetName: row.valueset_name,
-          valueSetExternalId: row.valueset_external_id,
+          valueSetId: row.valueSetId,
+          valueSetName: row.valueSetName,
+          valueSetExternalId: row.valueSetExternalId,
           valueSetVersion: row.version || "",
           author,
-          system: row.code_system || "",
+          system: row.codeSystem || "",
           ersdConceptType: row.type || undefined,
-          dibbsConceptType: row.dibbs_concept_type,
+          dibbsConceptType: row.dibbsConceptType,
           includeValueSet: true,
           concepts: [],
-          conditionId: row.condition_id,
-          userCreated: row.user_created ?? false,
+          conditionId: row.conditionId,
+          userCreated: row.userCreated ?? false,
         };
       });
 
@@ -516,7 +516,7 @@ class CustomCodeService {
         code: row.code,
         display: row.display,
         include: true,
-        internalId: row.internal_id,
+        internalId: row.internalId,
       }));
     } catch (error) {
       console.error("Error retrieving concepts for value set:", error);
@@ -545,7 +545,7 @@ class CustomCodeService {
 
       const result = await dbService.query(sql);
       return result.rows
-        .map((row) => row.author_name)
+        .map((row) => row.authorName)
         .filter((name): name is string => !!name);
     } catch (error) {
       console.error("Error retrieving value set creators:", error);
