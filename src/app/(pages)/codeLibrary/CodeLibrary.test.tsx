@@ -1,9 +1,6 @@
 import { screen, render, act, waitFor } from "@testing-library/react";
 import { RootProviderMock } from "@/app/tests/unit/setup";
 import {
-  gonorrheaValueSets,
-  cancerValueSets,
-  customValueSets,
   conditionIdToNameMap,
   categoryToConditionNameArrayMap,
 } from "../queryBuilding/fixtures";
@@ -15,12 +12,14 @@ import {
 } from "@/app/backend/usergroup-management";
 import { mockAdmin } from "../userManagement/test-utils";
 import {
-  getAllValueSets,
-  getCustomValueSetById,
+  getValueSetsPaginated,
+  getConceptsByValueSetId,
+  getValueSetCreators,
 } from "@/app/backend/custom-code-service";
 import { renderWithUser } from "@/app/tests/unit/setup";
 import { insertCustomValueSet } from "@/app/backend/custom-code-service";
 import { getConditionsData } from "@/app/backend/query-building/service";
+import { DibbsValueSet } from "@/app/models/entities/valuesets";
 
 jest.mock("next-auth/react");
 
@@ -41,10 +40,6 @@ jest.mock(
     ({ children }: React.PropsWithChildren) => <div>{children}</div>,
 );
 
-jest.mock("@/app/backend/db-creation/service", () => ({
-  groupConditionConceptsIntoValueSets: jest.fn().mockReturnValue([]),
-}));
-
 jest.mock("@/app/backend/query-building/service", () => ({
   getConditionsData: jest.fn(),
 }));
@@ -60,21 +55,94 @@ jest.mock("@/app/backend/user-management", () => ({
 }));
 
 jest.mock("@/app/backend/custom-code-service", () => ({
-  getAllValueSets: jest.fn().mockReturnValue({ items: [] }),
+  getValueSetsPaginated: jest.fn().mockResolvedValue({
+    items: [],
+    totalItems: 0,
+    pageIndex: 0,
+    pageSize: 10,
+    totalPages: 0,
+    prevPage: 0,
+    nextPage: 0,
+  }),
+  getConceptsByValueSetId: jest.fn().mockResolvedValue([]),
+  getValueSetCreators: jest.fn().mockResolvedValue([]),
   getCustomValueSetById: jest.fn(),
   insertCustomValueSet: jest.fn(),
   insertCustomValuesetsIntoQuery: jest.fn(),
   deleteCustomValueSet: jest.fn(),
 }));
 
+const cancerValueSet: DibbsValueSet = {
+  valueSetId: "14_20240923",
+  valueSetName: "Cancer (Leukemia) Lab Result",
+  valueSetExternalId: "14",
+  valueSetVersion: "20240923",
+  author: "DIBBs",
+  system: "http://cap.org/eCC",
+  ersdConceptType: "lrtc",
+  dibbsConceptType: "labs",
+  includeValueSet: true,
+  concepts: [],
+  conditionId: "2",
+  userCreated: false,
+};
+
+const gonorrheaValueSet: DibbsValueSet = {
+  valueSetId: "7_20240909",
+  valueSetName: "Gonorrhea Medication",
+  valueSetExternalId: "7",
+  valueSetVersion: "20240909",
+  author: "DIBBs",
+  system: "http://www.nlm.nih.gov/research/umls/rxnorm",
+  ersdConceptType: "mrtc",
+  dibbsConceptType: "medications",
+  includeValueSet: true,
+  concepts: [],
+  conditionId: "15628003",
+  userCreated: false,
+};
+
+const customValueSet: DibbsValueSet = {
+  valueSetId: "1-test",
+  valueSetName: "Fruits",
+  valueSetExternalId: "1-test",
+  valueSetVersion: "1",
+  author: "QC Admin",
+  system: "http://snomed.info/sct",
+  ersdConceptType: "medications",
+  dibbsConceptType: "medications",
+  includeValueSet: true,
+  concepts: [],
+  conditionId: "custom_condition",
+  userCreated: true,
+};
+
+const allValueSets = [cancerValueSet, gonorrheaValueSet, customValueSet];
+
+const mockPagedResponse = {
+  items: allValueSets,
+  totalItems: 3,
+  pageIndex: 0,
+  pageSize: 10,
+  totalPages: 1,
+  prevPage: 0,
+  nextPage: 0,
+};
+
+const mockConcepts = [
+  { code: "1A", display: "Apple", include: true, internalId: "c1" },
+  { code: "1B", display: "Banana", include: true, internalId: "c2" },
+  { code: "1C", display: "Coconut", include: true, internalId: "c3" },
+];
+
 describe("Code library loading view", () => {
-  beforeAll(() => {
-    (getUserByUsername as jest.Mock).mockResolvedValue({ items: [mockAdmin] });
-    (getConditionsData as jest.Mock).mockResolvedValue({
-      conditionIdToNameMap: {},
-    });
-  });
   it("renders a skeleton loading state when loading is true", async () => {
+    // Keep getValueSetsPaginated as a never-resolving promise so pagedResult stays null
+    (getValueSetsPaginated as jest.Mock).mockReturnValue(new Promise(() => {}));
+    (getUserByUsername as jest.Mock).mockReturnValue(new Promise(() => {}));
+    (getConditionsData as jest.Mock).mockReturnValue(new Promise(() => {}));
+    (getValueSetCreators as jest.Mock).mockReturnValue(new Promise(() => {}));
+
     await act(async () =>
       render(
         <RootProviderMock currentPage="/codeLibrary">
@@ -89,12 +157,6 @@ describe("Code library loading view", () => {
 });
 
 describe("Code library rendered view", () => {
-  const valueSets = [
-    cancerValueSets,
-    gonorrheaValueSets,
-    customValueSets,
-  ].flat();
-
   beforeAll(() => {
     (getAllUsers as jest.Mock).mockResolvedValue({ items: [], totalItems: 0 });
     (getAllGroupMembers as jest.Mock).mockResolvedValue({
@@ -108,11 +170,9 @@ describe("Code library rendered view", () => {
       categoryToConditionNameArrayMap,
     });
 
-    (getAllValueSets as jest.Mock).mockReturnValue({ items: valueSets });
-
-    (getCustomValueSetById as jest.Mock).mockReturnValue({
-      items: customValueSets[0],
-    });
+    (getValueSetsPaginated as jest.Mock).mockResolvedValue(mockPagedResponse);
+    (getConceptsByValueSetId as jest.Mock).mockResolvedValue([]);
+    (getValueSetCreators as jest.Mock).mockResolvedValue(["DIBBs", "QC Admin"]);
   });
 
   it("renders the correct content", async () => {
@@ -137,13 +197,13 @@ describe("Code library rendered view", () => {
 
     const tableBody = screen.getByTestId("table-valuesets-manage");
     expect(tableBody.childNodes[0]).toHaveTextContent(
-      cancerValueSets[1].valueSetName,
+      cancerValueSet.valueSetName,
     );
     expect(tableBody.childNodes[1]).toHaveTextContent(
-      gonorrheaValueSets[1].valueSetName,
+      gonorrheaValueSet.valueSetName,
     );
     expect(tableBody.childNodes[2]).toHaveTextContent(
-      customValueSets[1].valueSetName,
+      customValueSet.valueSetName,
     );
     expect(document.body).toMatchSnapshot();
   });
@@ -173,11 +233,6 @@ describe("Code library rendered view", () => {
 });
 
 describe("Code library interaction", () => {
-  const valueSets = [
-    cancerValueSets,
-    gonorrheaValueSets,
-    customValueSets,
-  ].flat();
   beforeAll(() => {
     (getAllUsers as jest.Mock).mockResolvedValue({ items: [], totalItems: 0 });
     (getAllUserGroups as jest.Mock).mockResolvedValue({
@@ -196,11 +251,9 @@ describe("Code library interaction", () => {
       categoryToConditionNameArrayMap,
     });
 
-    (getAllValueSets as jest.Mock).mockReturnValue({ items: valueSets });
-
-    (getCustomValueSetById as jest.Mock).mockReturnValue({
-      items: customValueSets[0],
-    });
+    (getValueSetsPaginated as jest.Mock).mockResolvedValue(mockPagedResponse);
+    (getConceptsByValueSetId as jest.Mock).mockResolvedValue(mockConcepts);
+    (getValueSetCreators as jest.Mock).mockResolvedValue(["DIBBs", "QC Admin"]);
   });
   it("renders action buttons for custom value sets only", async () => {
     await act(async () =>
@@ -220,11 +273,11 @@ describe("Code library interaction", () => {
       "valueSetTable__tableBody_row_details",
     )[2];
 
-    expect(cancerVsRow.textContent).toContain(cancerValueSets[0].valueSetName);
-    expect(customVsRow.textContent).toContain(customValueSets[0].valueSetName);
+    expect(cancerVsRow.textContent).toContain(cancerValueSet.valueSetName);
+    expect(customVsRow.textContent).toContain(customValueSet.valueSetName);
 
-    expect(cancerVsRow.textContent).not.toContain(cancerValueSets[0].author);
-    expect(customVsRow.textContent).toContain(customValueSets[0].author);
+    expect(cancerVsRow.textContent).not.toContain(cancerValueSet.author);
+    expect(customVsRow.textContent).toContain(customValueSet.author);
 
     await waitFor(async () => {
       (cancerVsRow as HTMLElement).click();
@@ -271,7 +324,7 @@ describe("Code library interaction", () => {
       const modal = screen.getByTestId("modalWindow");
       expect(modal).toBeVisible();
       expect(modal).toHaveTextContent(
-        `Are you sure you want to delete the value set "${customValueSets[0].valueSetName}?"`,
+        `Are you sure you want to delete the value set "${customValueSet.valueSetName}?"`,
       );
     });
   });
@@ -309,7 +362,17 @@ describe("Code library CSV upload", () => {
     (getConditionsData as jest.Mock).mockResolvedValue({
       conditionIdToNameMap: {},
     });
-    (getAllValueSets as jest.Mock).mockResolvedValue({ items: [] });
+    (getValueSetsPaginated as jest.Mock).mockResolvedValue({
+      items: [],
+      totalItems: 0,
+      pageIndex: 0,
+      pageSize: 10,
+      totalPages: 0,
+      prevPage: 0,
+      nextPage: 0,
+    });
+    (getConceptsByValueSetId as jest.Mock).mockResolvedValue([]);
+    (getValueSetCreators as jest.Mock).mockResolvedValue([]);
     (insertCustomValueSet as jest.Mock).mockResolvedValue({
       success: true,
       id: "vs-1",
@@ -323,7 +386,7 @@ describe("Code library CSV upload", () => {
   afterEach(() => {
     (global.fetch as jest.Mock).mockReset();
     (insertCustomValueSet as jest.Mock).mockReset();
-    (getAllValueSets as jest.Mock).mockReset();
+    (getValueSetsPaginated as jest.Mock).mockReset();
   });
 
   it("uploads CSV, saves value set(s), refetches, and applies Created by me filter", async () => {
@@ -356,7 +419,7 @@ describe("Code library CSV upload", () => {
       adminUser.id,
     );
 
-    await waitFor(() => expect(getAllValueSets).toHaveBeenCalledTimes(2));
+    await waitFor(() => expect(getValueSetCreators).toHaveBeenCalled());
 
     await waitFor(() =>
       expect(screen.getByText(/1 filter applied/i)).toBeInTheDocument(),
