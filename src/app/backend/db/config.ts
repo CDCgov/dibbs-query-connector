@@ -21,9 +21,8 @@ export async function fetchDbPassword(): Promise<string> {
     return cachedPassword;
   }
 
-  const { SecretsManagerClient, GetSecretValueCommand } = await import(
-    "@aws-sdk/client-secrets-manager"
-  );
+  const { SecretsManagerClient, GetSecretValueCommand } =
+    await import("@aws-sdk/client-secrets-manager");
   const client = new SecretsManagerClient({});
   const resp = await client.send(
     new GetSecretValueCommand({ SecretId: process.env.DB_SECRET_ARN }),
