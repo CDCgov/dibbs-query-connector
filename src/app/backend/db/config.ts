@@ -7,6 +7,12 @@ const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 /**
  * Fetches the database password from AWS Secrets Manager, with a 5-minute cache.
  * Used as the `password` option in pg Pool when DB_SECRET_ARN is set.
+ *
+ * Credentials are resolved via the AWS SDK default provider chain — no explicit
+ * config is needed when running in ECS, where the task IAM role is picked up
+ * automatically via the container metadata endpoint. The task role must have
+ * `secretsmanager:GetSecretValue` permission on the secret ARN.
+ *
  * @returns the database password string
  */
 export async function fetchDbPassword(): Promise<string> {
