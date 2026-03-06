@@ -1,5 +1,50 @@
 import { PoolConfig, Pool } from "pg";
 
+let cachedPassword: string | null = null;
+let cacheTimestamp = 0;
+const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
+
+/**
+ * Fetches the database password from AWS Secrets Manager, with a 5-minute cache.
+ * Used as the `password` option in pg Pool when DB_SECRET_ARN is set.
+ * @returns the database password string
+ */
+export async function fetchDbPassword(): Promise<string> {
+  const now = Date.now();
+  if (cachedPassword && now - cacheTimestamp < CACHE_TTL_MS) {
+    return cachedPassword;
+  }
+
+  const { SecretsManagerClient, GetSecretValueCommand } = await import(
+    "@aws-sdk/client-secrets-manager"
+  );
+  const client = new SecretsManagerClient({});
+  const resp = await client.send(
+    new GetSecretValueCommand({ SecretId: process.env.DB_SECRET_ARN }),
+  );
+
+  if (!resp.SecretString) {
+    throw new Error("AWS Secrets Manager returned empty SecretString");
+  }
+
+  const secret = JSON.parse(resp.SecretString);
+  if (!secret.password) {
+    throw new Error("Secret JSON does not contain a 'password' field");
+  }
+
+  cachedPassword = secret.password;
+  cacheTimestamp = now;
+  return cachedPassword as string;
+}
+
+/**
+ * Resets the internal password cache. Exported only for testing.
+ */
+export function _resetCacheForTesting(): void {
+  cachedPassword = null;
+  cacheTimestamp = 0;
+}
+
 // Load environment variables from .env and establish a Pool configuration
 const dbConfig: PoolConfig = {
   connectionString: process.env.DATABASE_URL,
@@ -8,6 +53,7 @@ const dbConfig: PoolConfig = {
   connectionTimeoutMillis: process.env.LOCAL_DB_CLIENT_TIMEOUT
     ? Number(process.env.LOCAL_DB_CLIENT_TIMEOUT)
     : 3000, // Wait this long before timing out when connecting new client
+  ...(process.env.DB_SECRET_ARN ? { password: fetchDbPassword } : {}),
 };
 
 let cachedDbClient: Pool | null = null;

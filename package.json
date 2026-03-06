@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.515.0",
+    "@aws-sdk/client-secrets-manager": "^3.1004.0",
     "@axe-core/playwright": "^4.10.2",
     "@mdx-js/loader": "^3.1.0",
     "@mdx-js/react": "^3.1.0",
