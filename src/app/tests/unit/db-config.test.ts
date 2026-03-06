@@ -15,6 +15,9 @@ beforeEach(() => {
   mockSend.mockReset();
 });
 
+afterEach(() => {
+  delete process.env.DB_SECRET_ARN;
+});
 describe("fetchDbPassword", () => {
   it("fetches and returns the password from Secrets Manager", async () => {
     process.env.DB_SECRET_ARN = "arn:aws:secretsmanager:us-east-1:123:secret:x";
