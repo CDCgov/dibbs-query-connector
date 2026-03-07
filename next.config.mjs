@@ -16,6 +16,7 @@ const nextConfig = {
     silenceDeprecations: ["global-builtin", "mixed-decls", "legacy-js-api"],
   },
   transpilePackages: ["yaml"],
+  serverExternalPackages: ["@aws-sdk/client-secrets-manager"],
   output: "standalone",
   basePath: "",
   pageExtensions: ["js", "jsx", "md", "mdx", "ts", "tsx"],
