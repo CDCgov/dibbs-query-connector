@@ -4,6 +4,12 @@ let cachedPassword: string | null = null;
 let cacheTimestamp = 0;
 const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 
+// Lazily initialized — reused across all fetchDbPassword calls to avoid
+// re-running credential resolution (ECS metadata HTTP call) on every cache miss.
+let secretsManagerClient:
+  | import("@aws-sdk/client-secrets-manager").SecretsManagerClient
+  | null = null;
+
 /**
  * Fetches the database password from AWS Secrets Manager, with a 5-minute cache.
  * Used as the `password` option in pg Pool when DB_SECRET_ARN is set.
@@ -23,8 +29,10 @@ export async function fetchDbPassword(): Promise<string> {
 
   const { SecretsManagerClient, GetSecretValueCommand } =
     await import("@aws-sdk/client-secrets-manager");
-  const client = new SecretsManagerClient({});
-  const resp = await client.send(
+  if (!secretsManagerClient) {
+    secretsManagerClient = new SecretsManagerClient({});
+  }
+  const resp = await secretsManagerClient.send(
     new GetSecretValueCommand({ SecretId: process.env.DB_SECRET_ARN }),
   );
 
@@ -48,6 +56,7 @@ export async function fetchDbPassword(): Promise<string> {
 export function _resetCacheForTesting(): void {
   cachedPassword = null;
   cacheTimestamp = 0;
+  secretsManagerClient = null;
 }
 
 // Load environment variables from .env and establish a Pool configuration
