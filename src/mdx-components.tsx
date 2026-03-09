@@ -26,16 +26,25 @@ function MdxLink(props: AnchorHTMLAttributes<HTMLAnchorElement>) {
  */
 export function useMDXComponents(components: MDXComponents): MDXComponents {
   return {
-    img: (props) => (
-      <Image
-        sizes="100vw"
-        style={{ width: "100%", height: "auto" }}
-        width={1000}
-        height={1000}
-        alt-label={"Image diagram to illustrate documentation concept"}
-        {...(props as ImageProps)}
-      />
-    ),
+    img: (props) => {
+      const imgProps = { ...props } as ImageProps;
+      if (
+        typeof imgProps.src === "string" &&
+        imgProps.src.startsWith("../../public/")
+      ) {
+        imgProps.src = imgProps.src.replace("../../public", "");
+      }
+      return (
+        <Image
+          sizes="100vw"
+          style={{ width: "100%", height: "auto" }}
+          width={1000}
+          height={1000}
+          alt-label={"Image diagram to illustrate documentation concept"}
+          {...imgProps}
+        />
+      );
+    },
     a: MdxLink,
     ...components,
   };
