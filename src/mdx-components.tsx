@@ -7,6 +7,7 @@ import { AnchorHTMLAttributes } from "react";
  * Rewrites relative `.mdx` links (e.g. `./user-guide.mdx`) to site paths
  * (`/docs/user-guide`) so that links work both on the rendered site and on
  * GitHub where the raw MDX files live side-by-side.
+ * @param props
  */
 function MdxLink(props: AnchorHTMLAttributes<HTMLAnchorElement>) {
   const { href, ...rest } = props;
