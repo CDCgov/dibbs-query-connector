@@ -142,6 +142,7 @@ data "aws_iam_policy_document" "scoped_one" {
 }
 
 # Scoped policies
+# trivy:ignore:AVD-AWS-0342
 data "aws_iam_policy_document" "scoped_two" {
   statement {
     actions = [
