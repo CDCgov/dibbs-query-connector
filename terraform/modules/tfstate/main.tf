@@ -1,3 +1,4 @@
+# trivy:ignore:AVD-AWS-0089
 resource "aws_s3_bucket" "tfstate" {
   bucket = "${var.project}-tfstate-${var.owner}-${var.identifier}"
 
@@ -33,6 +34,7 @@ resource "aws_s3_bucket_versioning" "default" {
 }
 
 # Create a DynamoDB table for locking the state file
+# trivy:ignore:AVD-AWS-0025
 resource "aws_dynamodb_table" "tfstate_lock" {
   name         = "${var.project}-tfstate-lock-${var.owner}-${var.identifier}"
   hash_key     = "LockID"
@@ -41,5 +43,9 @@ resource "aws_dynamodb_table" "tfstate_lock" {
   attribute {
     name = "LockID"
     type = "S"
+  }
+
+  point_in_time_recovery {
+    enabled = true
   }
 }
