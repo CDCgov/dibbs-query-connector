@@ -209,3 +209,9 @@ variable "mtls_key" {
   description = "MTLS Private Key"
   sensitive   = true
 }
+
+variable "rds_force_ssl" {
+  type        = string
+  description = "Whether to force SSL connections to RDS (0 = off, 1 = on)"
+  default     = "1"
+}

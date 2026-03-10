@@ -1,3 +1,4 @@
+import { readFileSync } from "fs";
 import { PoolConfig, Pool } from "pg";
 
 let cachedPassword: string | null = null;
@@ -59,7 +60,22 @@ export function _resetCacheForTesting(): void {
   secretsManagerClient = null;
 }
 
+/**
+ * Builds the SSL config for the pg Pool based on the DB_SSL_CA_PATH env var.
+ * When set, returns an ssl object with certificate verification enabled.
+ * When unset, returns undefined (no SSL).
+ * @returns the ssl config object, or undefined if DB_SSL_CA_PATH is not set
+ */
+export function buildSslConfig():
+  | { rejectUnauthorized: boolean; ca: string }
+  | undefined {
+  const caPath = process.env.DB_SSL_CA_PATH;
+  if (!caPath) return undefined;
+  return { rejectUnauthorized: true, ca: readFileSync(caPath, "utf8") };
+}
+
 // Load environment variables from .env and establish a Pool configuration
+const sslConfig = buildSslConfig();
 const dbConfig: PoolConfig = {
   connectionString: process.env.DATABASE_URL,
   max: 10, // Maximum # of connections in the pool
@@ -68,6 +84,7 @@ const dbConfig: PoolConfig = {
     ? Number(process.env.LOCAL_DB_CLIENT_TIMEOUT)
     : 3000, // Wait this long before timing out when connecting new client
   ...(process.env.DB_SECRET_ARN ? { password: fetchDbPassword } : {}),
+  ...(sslConfig ? { ssl: sslConfig } : {}),
 };
 
 let cachedDbClient: Pool | null = null;
