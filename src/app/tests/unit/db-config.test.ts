@@ -1,7 +1,10 @@
 import {
   fetchDbPassword,
+  buildSslConfig,
   _resetCacheForTesting,
 } from "@/app/backend/db/config";
+
+import fs from "fs";
 
 const mockSend = jest.fn();
 
@@ -17,6 +20,7 @@ beforeEach(() => {
 
 afterEach(() => {
   delete process.env.DB_SECRET_ARN;
+  delete process.env.DB_SSL_CA_PATH;
 });
 describe("fetchDbPassword", () => {
   it("fetches and returns the password from Secrets Manager", async () => {
@@ -81,6 +85,42 @@ describe("fetchDbPassword", () => {
 
     await expect(fetchDbPassword()).rejects.toThrow(
       "Secret JSON does not contain a 'password' field",
+    );
+  });
+});
+
+describe("buildSslConfig", () => {
+  it("returns undefined when DB_SSL_CA_PATH is not set", () => {
+    delete process.env.DB_SSL_CA_PATH;
+    expect(buildSslConfig()).toBeUndefined();
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  it("returns ssl config with CA cert when DB_SSL_CA_PATH is set", () => {
+    const fakeCert =
+      "-----BEGIN CERTIFICATE-----\nfake\n-----END CERTIFICATE-----";
+    jest.spyOn(fs, "readFileSync").mockReturnValue(fakeCert);
+
+    process.env.DB_SSL_CA_PATH = "/app/certs/rds-global-bundle.pem";
+    const result = buildSslConfig();
+
+    expect(result).toEqual({
+      rejectUnauthorized: true,
+      ca: fakeCert,
+    });
+    expect(fs.readFileSync).toHaveBeenCalledWith(
+      "/app/certs/rds-global-bundle.pem",
+      "utf8",
+    );
+  });
+
+  it("throws when DB_SSL_CA_PATH points to a nonexistent file", () => {
+    process.env.DB_SSL_CA_PATH = "/nonexistent/path.pem";
+    expect(() => buildSslConfig()).toThrow(
+      'Failed to read SSL CA certificate from DB_SSL_CA_PATH="/nonexistent/path.pem"',
     );
   });
 });

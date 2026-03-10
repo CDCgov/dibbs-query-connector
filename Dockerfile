@@ -8,6 +8,10 @@ RUN apk add --no-cache libc6-compat bash curl
 WORKDIR /app
 COPY . .
 
+# Download AWS RDS global CA bundle for SSL database connections
+RUN curl --fail --show-error -L https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem \
+    -o /rds-global-bundle.pem
+
 # Install Flyway and remove JRE directory to force flyway to use the openjdk11 version in the runner
 ENV FLYWAY_VERSION=10.19.0
 RUN curl -L https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/${FLYWAY_VERSION}/flyway-commandline-${FLYWAY_VERSION}-linux-x64.tar.gz -o flyway.tar.gz \
@@ -28,6 +32,8 @@ FROM base AS runner
 WORKDIR /app
 
 RUN apk add --no-cache bash openjdk17-jre
+# Copy RDS CA bundle for SSL database connections
+COPY --from=installer /rds-global-bundle.pem /app/certs/rds-global-bundle.pem
 # Copy Flyway from the installer stage
 COPY --from=installer /flyway /flyway
 RUN chmod +x /flyway/flyway

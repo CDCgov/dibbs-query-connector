@@ -134,6 +134,10 @@ module "ecs" {
         {
           name  = "APP_HOSTNAME"
           value = "https://queryconnector.dev"
+        },
+        {
+          name  = "DB_SSL_CA_PATH"
+          value = var.rds_force_ssl == "1" ? "/app/certs/rds-global-bundle.pem" : ""
         }
       ]
     },
@@ -344,7 +348,7 @@ resource "aws_db_parameter_group" "this" {
   }
   parameter {
     name  = "rds.force_ssl"
-    value = "0"
+    value = var.rds_force_ssl
   }
 }
 
