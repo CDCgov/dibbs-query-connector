@@ -13,7 +13,7 @@ const nextConfig = {
     includePaths: [
       path.join(__dirname, "./", "node_modules", "@uswds", "uswds", "packages"),
     ],
-    silenceDeprecations: ["global-builtin", "mixed-decls", "legacy-js-api"],
+    silenceDeprecations: ["global-builtin", "legacy-js-api", "if-function"],
   },
   transpilePackages: ["yaml"],
   serverExternalPackages: ["@aws-sdk/client-secrets-manager"],
