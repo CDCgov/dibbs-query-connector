@@ -9,7 +9,7 @@ WORKDIR /app
 COPY . .
 
 # Download AWS RDS global CA bundle for SSL database connections
-RUN curl -L https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem \
+RUN curl --fail --show-error -L https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem \
     -o /rds-global-bundle.pem
 
 # Install Flyway and remove JRE directory to force flyway to use the openjdk11 version in the runner

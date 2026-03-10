@@ -214,4 +214,9 @@ variable "rds_force_ssl" {
   type        = string
   description = "Whether to force SSL connections to RDS (0 = off, 1 = on)"
   default     = "1"
+
+  validation {
+    condition     = contains(["0", "1"], var.rds_force_ssl)
+    error_message = "rds_force_ssl must be either \"0\" (off) or \"1\" (on)."
+  }
 }

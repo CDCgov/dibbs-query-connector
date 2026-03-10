@@ -95,6 +95,10 @@ describe("buildSslConfig", () => {
     expect(buildSslConfig()).toBeUndefined();
   });
 
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
   it("returns ssl config with CA cert when DB_SSL_CA_PATH is set", () => {
     const fakeCert =
       "-----BEGIN CERTIFICATE-----\nfake\n-----END CERTIFICATE-----";
@@ -111,12 +115,12 @@ describe("buildSslConfig", () => {
       "/app/certs/rds-global-bundle.pem",
       "utf8",
     );
-
-    jest.restoreAllMocks();
   });
 
   it("throws when DB_SSL_CA_PATH points to a nonexistent file", () => {
     process.env.DB_SSL_CA_PATH = "/nonexistent/path.pem";
-    expect(() => buildSslConfig()).toThrow();
+    expect(() => buildSslConfig()).toThrow(
+      'Failed to read SSL CA certificate from DB_SSL_CA_PATH="/nonexistent/path.pem"',
+    );
   });
 });

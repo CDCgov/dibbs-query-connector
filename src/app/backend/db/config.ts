@@ -71,7 +71,13 @@ export function buildSslConfig():
   | undefined {
   const caPath = process.env.DB_SSL_CA_PATH;
   if (!caPath) return undefined;
-  return { rejectUnauthorized: true, ca: readFileSync(caPath, "utf8") };
+  try {
+    return { rejectUnauthorized: true, ca: readFileSync(caPath, "utf8") };
+  } catch (err) {
+    throw new Error(
+      `Failed to read SSL CA certificate from DB_SSL_CA_PATH="${caPath}": ${err instanceof Error ? err.message : err}`,
+    );
+  }
 }
 
 // Load environment variables from .env and establish a Pool configuration
