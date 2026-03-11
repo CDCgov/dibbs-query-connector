@@ -257,7 +257,6 @@ export async function insertDBStructArray(
   dbClient: DbClient,
 ): Promise<{ success: boolean }> {
   let insertSql = "";
-  const errors: string[] = [];
 
   for (const struct of structs) {
     let values: string[] = [];
@@ -285,14 +284,37 @@ export async function insertDBStructArray(
           (struct as ConceptStruct).display,
         ];
         break;
-      case "valueset_to_concept":
+      case "valueset_to_concept": {
         insertSql = insertValuesetToConceptSql;
-        values = [
-          (struct as ValuesetToConceptStruct).id,
-          (struct as ValuesetToConceptStruct).valueSetId,
-          (struct as ValuesetToConceptStruct).conceptId,
-        ];
+        const vtcStruct = struct as ValuesetToConceptStruct;
+        let resolvedValueSetId = vtcStruct.valueSetId;
+
+        // The seed data may reference a VSAC valueset with a hardcoded version
+        // that no longer matches what VSAC currently serves. Resolve the actual
+        // valueset ID by OID from the database if the exact ID isn't found.
+        const existsResult = await dbClient.query(
+          `SELECT id FROM valuesets WHERE id = $1`,
+          [resolvedValueSetId],
+        );
+        if (existsResult.rows.length === 0) {
+          const oid = resolvedValueSetId.replace(/_[^_]+$/, "");
+          const oidResult = await dbClient.query(
+            `SELECT id FROM valuesets WHERE oid = $1 LIMIT 1`,
+            [oid],
+          );
+          if (oidResult.rows.length > 0) {
+            resolvedValueSetId = oidResult.rows[0].id;
+          } else {
+            console.warn(
+              `Skipping valueset_to_concept entry ${vtcStruct.id}: valueset OID ${oid} not found in database`,
+            );
+            continue;
+          }
+        }
+
+        values = [vtcStruct.id, resolvedValueSetId, vtcStruct.conceptId];
         break;
+      }
       case "conditions":
         insertSql = insertConditionSql;
         values = [
@@ -333,10 +355,19 @@ export async function insertDBStructArray(
         break;
     }
 
-    await dbClient.query(insertSql, values);
+    const result = await dbClient.query(insertSql, values);
+
+    // The camelCaseDbColumnNames decorator swallows query errors and returns
+    // an empty result with command: "". Detect this and fail fast to avoid
+    // flooding logs with "current transaction is aborted" errors.
+    if (result.command === "") {
+      throw new Error(
+        `Failed to insert ${insertType} record (query returned error)`,
+      );
+    }
   }
 
-  return errors.length === 0 ? { success: true } : { success: false };
+  return { success: true };
 }
 
 /**
