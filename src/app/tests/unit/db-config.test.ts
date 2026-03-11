@@ -1,8 +1,4 @@
-import {
-  fetchDbPassword,
-  buildSslConfig,
-  _resetCacheForTesting,
-} from "@/app/backend/db/config";
+import { fetchDbPassword, buildSslConfig } from "@/app/backend/db/config";
 
 import fs from "fs";
 
@@ -14,23 +10,29 @@ jest.mock("@aws-sdk/client-secrets-manager", () => ({
 }));
 
 beforeEach(() => {
-  _resetCacheForTesting();
   mockSend.mockReset();
+  delete process.env._DB_PASSWORD;
 });
 
 afterEach(() => {
   delete process.env.DB_SECRET_ARN;
   delete process.env.DB_SSL_CA_PATH;
+  delete process.env._DB_PASSWORD;
 });
+
 describe("fetchDbPassword", () => {
-  it("fetches and returns the password from Secrets Manager", async () => {
+  beforeEach(() => {
     process.env.DB_SECRET_ARN = "arn:aws:secretsmanager:us-east-1:123:secret:x";
+  });
+
+  it("fetches and returns the password from Secrets Manager", async () => {
     mockSend.mockResolvedValue({
       SecretString: JSON.stringify({ password: "my-secret-pw" }),
     });
 
     const pw = await fetchDbPassword();
     expect(pw).toBe("my-secret-pw");
+    expect(process.env._DB_PASSWORD).toBe("my-secret-pw");
     expect(mockSend).toHaveBeenCalledTimes(1);
   });
 
