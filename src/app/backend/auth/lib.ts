@@ -6,6 +6,7 @@ import { UserRole } from "@/app/models/entities/users";
 import { isAuthDisabledServerCheck } from "@/app/utils/auth";
 import KeycloakProvider from "next-auth/providers/keycloak";
 import MicrosoftEntraID from "next-auth/providers/microsoft-entra-id";
+import PingId from "next-auth/providers/ping-id";
 import { Provider } from "@auth/core/providers";
 
 export interface AuthStrategy {
@@ -180,6 +181,59 @@ export class MicrosoftEntraAuthStrategy implements AuthStrategy {
               roles: { essential: true },
             },
           },
+        },
+      },
+    });
+  }
+}
+
+export class PingFederateAuthStrategy implements AuthStrategy {
+  public parseIdpResponseForUserToken(
+    token: JWT,
+    account: Account,
+    profile: Profile,
+  ) {
+    let role: UserRole = UserRole.STANDARD;
+
+    if (account?.access_token) {
+      const decodedToken = decodeJwt(account.access_token);
+      const roleClaim = process.env.PING_ROLE_CLAIM || "roles";
+      const tokenRoles = decodedToken[roleClaim] as string[] | undefined;
+      const profileRoles = (profile as Profile & { roles?: string[] }).roles;
+      const roles = tokenRoles ?? profileRoles;
+
+      if (roles && roles[0] && ROLE_TO_ENUM_MAP[roles[0]]) {
+        role = ROLE_TO_ENUM_MAP[roles[0]];
+      } else {
+        console.warn(
+          "No recognized role found in Ping Federate token. Falling back to standard access",
+        );
+      }
+    } else {
+      console.warn(
+        "No access token found in Ping Federate response. Falling back to standard access",
+      );
+    }
+
+    const userToken = {
+      id: profile.sub || "",
+      username: profile.preferred_username || "",
+      email: profile.email || "",
+      firstName: profile.given_name || "",
+      lastName: profile.family_name || "",
+      qcRole: role,
+    };
+    return userToken;
+  }
+
+  public setUpNextAuthProvider() {
+    return PingId({
+      clientId: process.env.AUTH_CLIENT_ID,
+      clientSecret: process.env.AUTH_CLIENT_SECRET,
+      issuer: process.env.AUTH_ISSUER,
+      authorization: {
+        params: {
+          scope: "openid email profile",
         },
       },
     });

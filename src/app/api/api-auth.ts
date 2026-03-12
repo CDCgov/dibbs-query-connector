@@ -13,6 +13,10 @@ interface KeycloakJWTPayload extends JWTPayload {
   };
 }
 
+interface PingJWTPayload extends JWTPayload {
+  [key: string]: unknown;
+}
+
 /**
  * Validates the service token from the Authorization header of the request.
  * @param req - The NextRequest object containing the Authorization header
@@ -33,9 +37,9 @@ export async function validateServiceToken(req: NextRequest) {
   try {
     let keySetUrl: URL;
     let issuer: string | undefined;
-    let isKeycloak = false;
+    const provider = process.env.NEXT_PUBLIC_AUTH_PROVIDER;
 
-    switch (process.env.NEXT_PUBLIC_AUTH_PROVIDER) {
+    switch (provider) {
       case "microsoft-entra-id":
         keySetUrl = new URL(
           "https://login.microsoftonline.com/common/discovery/keys",
@@ -47,7 +51,10 @@ export async function validateServiceToken(req: NextRequest) {
           `${process.env.AUTH_ISSUER}/protocol/openid-connect/certs`,
         );
         issuer = process.env.AUTH_ISSUER;
-        isKeycloak = true;
+        break;
+      case "ping-id":
+        keySetUrl = new URL(`${process.env.AUTH_ISSUER}/jwks`);
+        issuer = process.env.AUTH_ISSUER;
         break;
       default:
         return { valid: false, error: "Unsupported authentication provider" };
@@ -60,7 +67,7 @@ export async function validateServiceToken(req: NextRequest) {
     });
 
     // Check roles based on provider
-    if (isKeycloak) {
+    if (provider === "keycloak") {
       const keycloakPayload = payload as KeycloakJWTPayload;
       if (
         process.env.AUTH_CLIENT_ID &&
@@ -71,13 +78,24 @@ export async function validateServiceToken(req: NextRequest) {
       ) {
         return { valid: true, payload };
       }
-    } else {
+    } else if (provider === "microsoft-entra-id") {
       const entraPayload = payload as EntraJWTPayload;
       if (
         process.env.AUTH_CLIENT_ID &&
         (entraPayload.aud === process.env.AUTH_CLIENT_ID ||
           entraPayload.aud === `api://${process.env.AUTH_CLIENT_ID}`) &&
         entraPayload.roles?.includes("api-user")
+      ) {
+        return { valid: true, payload };
+      }
+    } else if (provider === "ping-id") {
+      const pingPayload = payload as PingJWTPayload;
+      const roleClaim = process.env.PING_ROLE_CLAIM || "roles";
+      const roles = pingPayload[roleClaim] as string[] | undefined;
+      if (
+        process.env.AUTH_CLIENT_ID &&
+        pingPayload.aud?.includes(process.env.AUTH_CLIENT_ID) &&
+        roles?.includes("api-user")
       ) {
         return { valid: true, payload };
       }
