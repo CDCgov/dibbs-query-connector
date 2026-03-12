@@ -2,7 +2,6 @@ import { readFileSync } from "fs";
 import { PoolConfig, Pool } from "pg";
 
 const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
-let cacheTimestamp = 0;
 
 /**
  * Fetches the database password from AWS Secrets Manager, caches it in
@@ -22,13 +21,20 @@ let cacheTimestamp = 0;
  */
 export async function fetchDbPassword(): Promise<string> {
   const now = Date.now();
-  if (process.env._DB_PASSWORD && now - cacheTimestamp < CACHE_TTL_MS) {
+  const cachedTs = Number(process.env._DB_PASSWORD_TS || 0);
+  if (process.env._DB_PASSWORD && now - cachedTs < CACHE_TTL_MS) {
     return process.env._DB_PASSWORD;
   }
 
   const { SecretsManagerClient, GetSecretValueCommand } =
     await import("@aws-sdk/client-secrets-manager");
-  const client = new SecretsManagerClient({});
+  const g = globalThis as Record<string, unknown>;
+  if (!g._secretsManagerClient) {
+    g._secretsManagerClient = new SecretsManagerClient({});
+  }
+  const client = g._secretsManagerClient as InstanceType<
+    typeof SecretsManagerClient
+  >;
   const resp = await client.send(
     new GetSecretValueCommand({ SecretId: process.env.DB_SECRET_ARN }),
   );
@@ -38,12 +44,14 @@ export async function fetchDbPassword(): Promise<string> {
   }
 
   const secret = JSON.parse(resp.SecretString);
-  if (!secret.password) {
-    throw new Error("Secret JSON does not contain a 'password' field");
+  if (typeof secret.password !== "string" || !secret.password) {
+    throw new Error(
+      "Secret JSON does not contain a valid 'password' string field",
+    );
   }
 
   process.env._DB_PASSWORD = secret.password;
-  cacheTimestamp = now;
+  process.env._DB_PASSWORD_TS = String(now);
   return secret.password;
 }
 
@@ -83,13 +91,18 @@ function parseDbUrl(): {
 } {
   const dbUrl = process.env.DATABASE_URL;
   if (!dbUrl) {
-    return {
-      host: "localhost",
-      port: 5432,
-      user: "",
-      database: "",
-      password: undefined,
-    };
+    if (process.env.NEXT_PHASE === "phase-production-build") {
+      return {
+        host: "localhost",
+        port: 5432,
+        user: "",
+        database: "",
+        password: undefined,
+      };
+    }
+    throw new Error(
+      "DATABASE_URL is not set. The database connection cannot be configured without it.",
+    );
   }
   const url = new URL(dbUrl);
   return {

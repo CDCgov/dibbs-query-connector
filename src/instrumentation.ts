@@ -5,7 +5,14 @@
  */
 export async function register() {
   if (process.env.DB_SECRET_ARN) {
-    const { fetchDbPassword } = await import("@/app/backend/db/config");
-    await fetchDbPassword();
+    try {
+      const { fetchDbPassword } = await import("@/app/backend/db/config");
+      await fetchDbPassword();
+    } catch (error) {
+      console.error(
+        "Failed to pre-warm DB password from Secrets Manager; will retry on first use.",
+        error,
+      );
+    }
   }
 }

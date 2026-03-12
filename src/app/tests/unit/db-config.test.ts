@@ -12,12 +12,16 @@ jest.mock("@aws-sdk/client-secrets-manager", () => ({
 beforeEach(() => {
   mockSend.mockReset();
   delete process.env._DB_PASSWORD;
+  delete process.env._DB_PASSWORD_TS;
+  delete (globalThis as Record<string, unknown>)._secretsManagerClient;
 });
 
 afterEach(() => {
   delete process.env.DB_SECRET_ARN;
   delete process.env.DB_SSL_CA_PATH;
   delete process.env._DB_PASSWORD;
+  delete process.env._DB_PASSWORD_TS;
+  delete (globalThis as Record<string, unknown>)._secretsManagerClient;
 });
 
 describe("fetchDbPassword", () => {
@@ -86,7 +90,17 @@ describe("fetchDbPassword", () => {
     });
 
     await expect(fetchDbPassword()).rejects.toThrow(
-      "Secret JSON does not contain a 'password' field",
+      "Secret JSON does not contain a valid 'password' string field",
+    );
+  });
+
+  it("throws when password field is not a string", async () => {
+    mockSend.mockResolvedValue({
+      SecretString: JSON.stringify({ password: 12345 }),
+    });
+
+    await expect(fetchDbPassword()).rejects.toThrow(
+      "Secret JSON does not contain a valid 'password' string field",
     );
   });
 });
