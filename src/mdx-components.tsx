@@ -4,9 +4,9 @@ import Link from "next/link";
 import { AnchorHTMLAttributes } from "react";
 
 /**
- * Rewrites relative `.mdx` links (e.g. `./user-guide.mdx`) to site paths
- * (`/docs/user-guide`) so that links work both on the rendered site and on
- * GitHub where the raw MDX files live side-by-side.
+ * Rewrites links so they work both on the rendered Next.js site and on GitHub:
+ * - Relative `.mdx` links (e.g. `./user-guide.mdx`) become site paths (`/docs/user-guide`)
+ * - Absolute `https://queryconnector.dev/...` links become relative paths (`/...`)
  * @param props
  */
 function MdxLink(props: AnchorHTMLAttributes<HTMLAnchorElement>) {
@@ -15,6 +15,10 @@ function MdxLink(props: AnchorHTMLAttributes<HTMLAnchorElement>) {
     const slug = href.replace(/^\.\//, "").replace(/\.mdx$/, "");
     const resolved = slug === "table-of-contents" ? "/docs" : `/docs/${slug}`;
     return <Link {...rest} href={resolved} />;
+  }
+  if (href && href.startsWith("https://queryconnector.dev/")) {
+    const path = href.replace("https://queryconnector.dev", "");
+    return <Link {...rest} href={path} />;
   }
   return <a {...rest} href={href} />;
 }
