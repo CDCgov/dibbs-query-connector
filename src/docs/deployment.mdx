@@ -162,7 +162,7 @@ Query Connector currently supports the following identity providers:
 
 - [Keycloak](https://www.keycloak.org/)
 - [Microsoft Entra ID (formerly Active Directory)](https://www.microsoft.com/en-us/security/business/identity-access/microsoft-entra-id)
-- [(Coming soon) PingFederate](https://www.pingidentity.com/en/solutions/pingfederate.html)
+- [PingFederate](https://www.pingidentity.com/en/solutions/pingfederate.html)
 
 ### Keycloak configuration
 
@@ -221,6 +221,37 @@ If using Microsoft Entra ID:
    AUTH_ISSUER=https://login.microsoftonline.com/your-tenant-id/v2.0
    ```
 
+### PingFederate configuration
+
+If using PingFederate:
+
+1. **Create an OIDC Web App** in PingFederate:
+
+   - Navigate to your PingFederate admin console.
+   - Create a new OAuth client / OIDC Web App.
+   - Set the redirect URI to: `https://your-query-connector-url/api/auth/callback/ping-id`.
+   - Grant the following scopes: `openid`, `email`, `profile`.
+
+2. **Get client credentials**:
+
+   - Note the Client ID and Client Secret from your PingFederate client configuration.
+
+3. **Configure role claims** (optional):
+
+   - If your PingFederate instance provides user roles in the access token, note the claim name (default: `roles`).
+   - Expected role values for interactive users: `standard`, `admin`, `super-admin`.
+   - If using API service tokens, ensure the same claim also includes `api-user` for those tokens, as Query Connector uses `PING_ROLE_CLAIM` when authorizing API requests.
+
+4. **Configure environment variables**:
+
+   ```
+   NEXT_PUBLIC_AUTH_PROVIDER=ping-id
+   AUTH_CLIENT_ID=your-client-id
+   AUTH_CLIENT_SECRET=your-client-secret
+   AUTH_ISSUER=https://your-ping-host/as
+   PING_ROLE_CLAIM=roles  # Optional: custom claim name for roles (default: "roles")
+   ```
+
 ## FHIR server
 
 The Query Connector needs to connect to a FHIR server to fetch patient data. This server is typically provided by your data provider (like a healthcare organization) or a QHIN if connecting through TEFCA.
@@ -270,7 +301,8 @@ AUTH_SECRET="anysecretyoulike"
 
 # Keycloak - set NEXT_PUBLIC_AUTH_PROVIDER to "keycloak"
 # Entra ID - set NEXT_PUBLIC_AUTH_PROVIDER to "microsoft-entra-id" and AUTH_ISSUER to:
-# "https://login.microsoftonline.com/your-tenant-id/v2.0""
+# "https://login.microsoftonline.com/your-tenant-id/v2.0"
+# Ping Federate - set NEXT_PUBLIC_AUTH_PROVIDER to "ping-id" and AUTH_ISSUER to your PingFederate AS URL
 NEXT_PUBLIC_AUTH_PROVIDER=keycloak
 AUTH_CLIENT_ID=my-client-id
 AUTH_CLIENT_SECRET=my-client-secret
