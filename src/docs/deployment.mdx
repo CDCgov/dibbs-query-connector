@@ -239,7 +239,8 @@ If using PingFederate:
 3. **Configure role claims** (optional):
 
    - If your PingFederate instance provides user roles in the access token, note the claim name (default: `roles`).
-   - Expected role values: `standard`, `admin`, `super-admin`.
+   - Expected role values for interactive users: `standard`, `admin`, `super-admin`.
+   - If using API service tokens, ensure the same claim also includes `api-user` for those tokens, as Query Connector uses `PING_ROLE_CLAIM` when authorizing API requests.
 
 4. **Configure environment variables**:
 

@@ -17,6 +17,14 @@ interface PingJWTPayload extends JWTPayload {
   [key: string]: unknown;
 }
 
+function audienceMatches(
+  aud: string | string[] | undefined,
+  clientId: string,
+): boolean {
+  if (Array.isArray(aud)) return aud.includes(clientId);
+  return aud === clientId;
+}
+
 /**
  * Validates the service token from the Authorization header of the request.
  * @param req - The NextRequest object containing the Authorization header
@@ -71,7 +79,7 @@ export async function validateServiceToken(req: NextRequest) {
       const keycloakPayload = payload as KeycloakJWTPayload;
       if (
         process.env.AUTH_CLIENT_ID &&
-        keycloakPayload.aud?.includes(process.env.AUTH_CLIENT_ID) &&
+        audienceMatches(keycloakPayload.aud, process.env.AUTH_CLIENT_ID) &&
         keycloakPayload.resource_access?.[
           process.env.AUTH_CLIENT_ID
         ]?.roles?.includes("api-user")
@@ -94,7 +102,7 @@ export async function validateServiceToken(req: NextRequest) {
       const roles = pingPayload[roleClaim] as string[] | undefined;
       if (
         process.env.AUTH_CLIENT_ID &&
-        pingPayload.aud?.includes(process.env.AUTH_CLIENT_ID) &&
+        audienceMatches(pingPayload.aud, process.env.AUTH_CLIENT_ID) &&
         roles?.includes("api-user")
       ) {
         return { valid: true, payload };

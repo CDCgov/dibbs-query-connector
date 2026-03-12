@@ -196,9 +196,17 @@ export class PingFederateAuthStrategy implements AuthStrategy {
     let role: UserRole = UserRole.STANDARD;
 
     if (account?.access_token) {
-      const decodedToken = decodeJwt(account.access_token);
-      const roleClaim = process.env.PING_ROLE_CLAIM || "roles";
-      const tokenRoles = decodedToken[roleClaim] as string[] | undefined;
+      let tokenRoles: string[] | undefined;
+      try {
+        const decodedToken = decodeJwt(account.access_token);
+        const roleClaim = process.env.PING_ROLE_CLAIM || "roles";
+        tokenRoles = decodedToken[roleClaim] as string[] | undefined;
+      } catch (error) {
+        console.warn(
+          "Failed to decode Ping Federate access token. Falling back to profile roles or standard access",
+          error,
+        );
+      }
       const profileRoles = (profile as Profile & { roles?: string[] }).roles;
       const roles = tokenRoles ?? profileRoles;
 
