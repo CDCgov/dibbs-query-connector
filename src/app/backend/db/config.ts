@@ -71,19 +71,33 @@ export function buildSslConfig():
  * Parses DATABASE_URL into individual pg connection fields. Using individual
  * fields (instead of connectionString) lets us supply `password` as an async
  * function for Secrets Manager rotation support.
+ *
+ * Returns safe defaults when DATABASE_URL is not set (e.g. during next build).
  */
 function parseDbUrl(): {
   host: string;
   port: number;
   user: string;
   database: string;
+  password: string | undefined;
 } {
-  const url = new URL(process.env.DATABASE_URL!);
+  const dbUrl = process.env.DATABASE_URL;
+  if (!dbUrl) {
+    return {
+      host: "localhost",
+      port: 5432,
+      user: "",
+      database: "",
+      password: undefined,
+    };
+  }
+  const url = new URL(dbUrl);
   return {
     host: url.hostname,
     port: Number(url.port) || 5432,
     user: decodeURIComponent(url.username),
     database: url.pathname.replace(/^\//, ""),
+    password: url.password ? decodeURIComponent(url.password) : undefined,
   };
 }
 
@@ -97,7 +111,7 @@ function parseDbUrl(): {
  */
 function buildDbConfig(): PoolConfig {
   const sslConfig = buildSslConfig();
-  const { host, port, user, database } = parseDbUrl();
+  const { host, port, user, database, password } = parseDbUrl();
   return {
     host,
     port,
@@ -108,7 +122,11 @@ function buildDbConfig(): PoolConfig {
     connectionTimeoutMillis: process.env.LOCAL_DB_CLIENT_TIMEOUT
       ? Number(process.env.LOCAL_DB_CLIENT_TIMEOUT)
       : 3000,
-    ...(process.env.DB_SECRET_ARN ? { password: () => fetchDbPassword() } : {}),
+    ...(process.env.DB_SECRET_ARN
+      ? { password: () => fetchDbPassword() }
+      : password
+        ? { password }
+        : {}),
     ...(sslConfig ? { ssl: sslConfig } : {}),
   };
 }
