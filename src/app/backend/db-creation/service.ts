@@ -36,22 +36,26 @@ import { readFileSync } from "fs";
  * @returns The stringified file data.
  */
 export async function readJsonFromRelativePath(filename: string) {
-  const candidates = [
-    path.join(__dirname, "../../assets/", filename),
-    path.join(process.cwd(), "src/app/assets/", filename),
-    path.join(process.cwd(), ".next/server/app/assets/", filename),
+  const allowedDirs = [
+    path.resolve(__dirname, "../../assets"),
+    path.resolve(process.cwd(), "src/app/assets"),
+    path.resolve(process.cwd(), ".next/server/app/assets"),
   ];
 
-  for (const candidate of candidates) {
+  for (const dir of allowedDirs) {
+    const resolved = path.resolve(dir, filename);
+    if (!resolved.startsWith(dir + path.sep)) {
+      continue;
+    }
     try {
-      return readFileSync(candidate, "utf-8");
+      return readFileSync(resolved, "utf-8");
     } catch {
       // Try next candidate
     }
   }
 
   throw new Error(
-    `Could not find asset file ${filename}. Tried: ${candidates.join(", ")}`,
+    `Could not find asset file ${filename}. Tried: ${allowedDirs.map((d) => path.join(d, filename)).join(", ")}`,
   );
 }
 
