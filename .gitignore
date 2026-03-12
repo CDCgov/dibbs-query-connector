@@ -104,3 +104,4 @@ certificates
 /coverage
 .tool-versions
 keys/
+*.tsbuildinfo
