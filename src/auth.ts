@@ -6,6 +6,7 @@ import {
   AuthStrategy,
   KeycloakAuthStrategy,
   MicrosoftEntraAuthStrategy,
+  PingFederateAuthStrategy,
 } from "./app/backend/auth/lib";
 import { UserRole } from "./app/models/entities/users";
 import { returnPredefinedSessionObject } from "./app/utils/auth";
@@ -23,6 +24,11 @@ switch (process.env.NEXT_PUBLIC_AUTH_PROVIDER) {
     authStrategy = new MicrosoftEntraAuthStrategy();
     const microsoftProvider = authStrategy.setUpNextAuthProvider();
     providers.push(microsoftProvider);
+    break;
+  case "ping-id":
+    authStrategy = new PingFederateAuthStrategy();
+    const pingProvider = authStrategy.setUpNextAuthProvider();
+    providers.push(pingProvider);
     break;
   default:
     console.warn(
