@@ -54,9 +54,10 @@ export async function readJsonFromRelativePath(filename: string) {
     }
   }
 
-  throw new Error(
+  console.error(
     `Could not find asset file ${filename}. Tried: ${allowedDirs.map((d) => path.join(d, filename)).join(", ")}`,
   );
+  throw new Error(`Could not load asset file "${filename}".`);
 }
 
 class SeedingService {
@@ -147,14 +148,7 @@ class SeedingService {
       const MAX_RETRIES = 3;
       for (const vs of valueSetsToInsert) {
         if (vs) {
-          await dbClient.query("SAVEPOINT vs_insert");
-          try {
-            await insertValueSet(vs, dbClient);
-          } catch (err) {
-            await dbClient.query("ROLLBACK TO SAVEPOINT vs_insert");
-            throw err;
-          }
-          await dbClient.query("RELEASE SAVEPOINT vs_insert");
+          await insertValueSet(vs, dbClient);
 
           let missingData = await checkValueSetInsertion(vs, dbClient);
           // Note: We don't actually have functions for inserting concepts,
@@ -171,14 +165,7 @@ class SeedingService {
             console.log(
               `Resolving missing values or errors for valueset ${vs.valueSetId} (attempt ${retries}/${MAX_RETRIES})`,
             );
-            await dbClient.query("SAVEPOINT vs_retry");
-            try {
-              await insertValueSet(vs, dbClient);
-            } catch (err) {
-              await dbClient.query("ROLLBACK TO SAVEPOINT vs_retry");
-              throw err;
-            }
-            await dbClient.query("RELEASE SAVEPOINT vs_retry");
+            await insertValueSet(vs, dbClient);
             missingData = await checkValueSetInsertion(vs, dbClient);
           }
           if (
@@ -247,11 +234,17 @@ class SeedingService {
     console.log("Inserting condition-to-valueset mappings");
     let ctvStructs = oidData.conditions.map((c) => {
       const version = oidsToVersion.get(c.valueset_id);
-      const ctvID =
-        retiredOids.has(c.valueset_id) || !version ? "NONE" : randomUUID();
+      if (retiredOids.has(c.valueset_id) || !version) {
+        return {
+          id: "NONE",
+          conditionId: c.code,
+          valueSetId: "",
+          source: c.system,
+        } as ConditionToValueSetStruct;
+      }
 
       const dbCTV: ConditionToValueSetStruct = {
-        id: ctvID,
+        id: randomUUID(),
         conditionId: c.code,
         valueSetId: c.valueset_id + "_" + version,
         source: c.system,

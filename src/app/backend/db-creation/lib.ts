@@ -258,6 +258,9 @@ export async function insertDBStructArray(
 ): Promise<{ success: boolean }> {
   let insertSql = "";
 
+  // Cache valueset existence checks to avoid redundant queries
+  const valuesetIdCache = new Map<string, string | null>();
+
   for (const struct of structs) {
     let values: string[] = [];
 
@@ -292,25 +295,36 @@ export async function insertDBStructArray(
         // The seed data may reference a VSAC valueset with a hardcoded version
         // that no longer matches what VSAC currently serves. Resolve the actual
         // valueset ID by OID from the database if the exact ID isn't found.
-        const existsResult = await dbClient.query(
-          `SELECT id FROM valuesets WHERE id = $1`,
-          [resolvedValueSetId],
-        );
-        if (existsResult.rows.length === 0) {
-          const oid = resolvedValueSetId.replace(/_[^_]+$/, "");
-          const oidResult = await dbClient.query(
-            `SELECT id FROM valuesets WHERE oid = $1 LIMIT 1`,
-            [oid],
+        if (!valuesetIdCache.has(resolvedValueSetId)) {
+          const existsResult = await dbClient.query(
+            `SELECT id FROM valuesets WHERE id = $1`,
+            [resolvedValueSetId],
           );
-          if (oidResult.rows.length > 0) {
-            resolvedValueSetId = oidResult.rows[0].id;
+          if (existsResult.rows.length > 0) {
+            valuesetIdCache.set(resolvedValueSetId, resolvedValueSetId);
           } else {
-            console.warn(
-              `Skipping valueset_to_concept entry ${vtcStruct.id}: valueset OID ${oid} not found in database`,
+            const oid = resolvedValueSetId.replace(/_[^_]+$/, "");
+            const oidResult = await dbClient.query(
+              `SELECT id FROM valuesets WHERE oid = $1 ORDER BY version DESC LIMIT 1`,
+              [oid],
             );
-            continue;
+            if (oidResult.rows.length > 0) {
+              valuesetIdCache.set(resolvedValueSetId, oidResult.rows[0].id);
+            } else {
+              valuesetIdCache.set(resolvedValueSetId, null);
+            }
           }
         }
+
+        const cachedId = valuesetIdCache.get(resolvedValueSetId);
+        if (cachedId === null) {
+          const oid = resolvedValueSetId.replace(/_[^_]+$/, "");
+          console.warn(
+            `Skipping valueset_to_concept entry ${vtcStruct.id}: valueset OID ${oid} not found in database`,
+          );
+          continue;
+        }
+        resolvedValueSetId = cachedId!;
 
         values = [vtcStruct.id, resolvedValueSetId, vtcStruct.conceptId];
         break;
