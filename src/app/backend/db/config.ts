@@ -1,19 +1,16 @@
 import { readFileSync } from "fs";
 import { PoolConfig, Pool } from "pg";
 
-let cachedPassword: string | null = null;
-let cacheTimestamp = 0;
 const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 
-// Lazily initialized — reused across all fetchDbPassword calls to avoid
-// re-running credential resolution (ECS metadata HTTP call) on every cache miss.
-let secretsManagerClient:
-  | import("@aws-sdk/client-secrets-manager").SecretsManagerClient
-  | null = null;
-
 /**
- * Fetches the database password from AWS Secrets Manager, with a 5-minute cache.
- * Used as the `password` option in pg Pool when DB_SECRET_ARN is set.
+ * Fetches the database password from AWS Secrets Manager, caches it in
+ * process.env._DB_PASSWORD, and returns it. Uses a 5-minute TTL so that
+ * password rotations are picked up without restarting the container.
+ *
+ * process.env is used for the cache (rather than a module-level variable)
+ * because Next.js standalone builds can duplicate module-level state across
+ * webpack bundle chunks, while process.env is process-global.
  *
  * Credentials are resolved via the AWS SDK default provider chain — no explicit
  * config is needed when running in ECS, where the task IAM role is picked up
@@ -24,16 +21,21 @@ let secretsManagerClient:
  */
 export async function fetchDbPassword(): Promise<string> {
   const now = Date.now();
-  if (cachedPassword && now - cacheTimestamp < CACHE_TTL_MS) {
-    return cachedPassword;
+  const cachedTs = Number(process.env._DB_PASSWORD_TS || 0);
+  if (process.env._DB_PASSWORD && now - cachedTs < CACHE_TTL_MS) {
+    return process.env._DB_PASSWORD;
   }
 
   const { SecretsManagerClient, GetSecretValueCommand } =
     await import("@aws-sdk/client-secrets-manager");
-  if (!secretsManagerClient) {
-    secretsManagerClient = new SecretsManagerClient({});
+  const g = globalThis as Record<string, unknown>;
+  if (!g._secretsManagerClient) {
+    g._secretsManagerClient = new SecretsManagerClient({});
   }
-  const resp = await secretsManagerClient.send(
+  const client = g._secretsManagerClient as InstanceType<
+    typeof SecretsManagerClient
+  >;
+  const resp = await client.send(
     new GetSecretValueCommand({ SecretId: process.env.DB_SECRET_ARN }),
   );
 
@@ -42,22 +44,15 @@ export async function fetchDbPassword(): Promise<string> {
   }
 
   const secret = JSON.parse(resp.SecretString);
-  if (!secret.password) {
-    throw new Error("Secret JSON does not contain a 'password' field");
+  if (typeof secret.password !== "string" || !secret.password) {
+    throw new Error(
+      "Secret JSON does not contain a valid 'password' string field",
+    );
   }
 
-  cachedPassword = secret.password;
-  cacheTimestamp = now;
-  return cachedPassword as string;
-}
-
-/**
- * Resets the internal password cache. Exported only for testing.
- */
-export function _resetCacheForTesting(): void {
-  cachedPassword = null;
-  cacheTimestamp = 0;
-  secretsManagerClient = null;
+  process.env._DB_PASSWORD = secret.password;
+  process.env._DB_PASSWORD_TS = String(now);
+  return secret.password;
 }
 
 /**
@@ -80,18 +75,74 @@ export function buildSslConfig():
   }
 }
 
-// Load environment variables from .env and establish a Pool configuration
-const sslConfig = buildSslConfig();
-const dbConfig: PoolConfig = {
-  connectionString: process.env.DATABASE_URL,
-  max: 10, // Maximum # of connections in the pool
-  idleTimeoutMillis: 30000, // A client must sit idle this long before being released
-  connectionTimeoutMillis: process.env.LOCAL_DB_CLIENT_TIMEOUT
-    ? Number(process.env.LOCAL_DB_CLIENT_TIMEOUT)
-    : 3000, // Wait this long before timing out when connecting new client
-  ...(process.env.DB_SECRET_ARN ? { password: fetchDbPassword } : {}),
-  ...(sslConfig ? { ssl: sslConfig } : {}),
-};
+/**
+ * Parses DATABASE_URL into individual pg connection fields. Using individual
+ * fields (instead of connectionString) lets us supply `password` as an async
+ * function for Secrets Manager rotation support.
+ *
+ * Returns safe defaults when DATABASE_URL is not set (e.g. during next build).
+ */
+function parseDbUrl(): {
+  host: string;
+  port: number;
+  user: string;
+  database: string;
+  password: string | undefined;
+} {
+  const dbUrl = process.env.DATABASE_URL;
+  if (!dbUrl) {
+    if (process.env.NEXT_PHASE === "phase-production-build") {
+      return {
+        host: "localhost",
+        port: 5432,
+        user: "",
+        database: "",
+        password: undefined,
+      };
+    }
+    throw new Error(
+      "DATABASE_URL is not set. The database connection cannot be configured without it.",
+    );
+  }
+  const url = new URL(dbUrl);
+  return {
+    host: url.hostname,
+    port: Number(url.port) || 5432,
+    user: decodeURIComponent(url.username),
+    database: url.pathname.replace(/^\//, ""),
+    password: url.password ? decodeURIComponent(url.password) : undefined,
+  };
+}
+
+/**
+ * Builds the full PoolConfig at call time so that environment variables
+ * are read at runtime rather than at module-initialization / bundle time.
+ *
+ * When DB_SECRET_ARN is set, the password is supplied as an async function
+ * that fetches from Secrets Manager with a 5-minute cache. pg resolves this
+ * via _checkPgPass() before SCRAM auth runs.
+ */
+function buildDbConfig(): PoolConfig {
+  const sslConfig = buildSslConfig();
+  const { host, port, user, database, password } = parseDbUrl();
+  return {
+    host,
+    port,
+    user,
+    database,
+    max: 10,
+    idleTimeoutMillis: 30000,
+    connectionTimeoutMillis: process.env.LOCAL_DB_CLIENT_TIMEOUT
+      ? Number(process.env.LOCAL_DB_CLIENT_TIMEOUT)
+      : 3000,
+    ...(process.env.DB_SECRET_ARN
+      ? { password: () => fetchDbPassword() }
+      : password
+        ? { password }
+        : {}),
+    ...(sslConfig ? { ssl: sslConfig } : {}),
+  };
+}
 
 let cachedDbClient: Pool | null = null;
 
@@ -107,7 +158,7 @@ let cachedDbClient: Pool | null = null;
  */
 export const dontUseOutsideConfigOrTests_getDbPool = () => {
   if (!cachedDbClient) {
-    cachedDbClient = new Pool(dbConfig);
+    cachedDbClient = new Pool(buildDbConfig());
   }
   return cachedDbClient;
 };
