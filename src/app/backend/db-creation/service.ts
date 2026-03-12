@@ -28,16 +28,36 @@ import path from "path";
 import { readFileSync } from "fs";
 
 /**
- * Helper utility to resolve the relative path of a file in the docker filesystem.
+ * Helper utility to resolve the path of a JSON asset file across environments.
+ * In production (standalone build), __dirname resolves relative to the bundled
+ * output. In dev (Turbopack), __dirname may resolve to a virtual path, so we
+ * fall back to process.cwd()-based resolution.
  * @param filename The file to read from. Must be located in the assets folder.
- * @returns Either the stringified data, or null.
+ * @returns The stringified file data.
  */
 export async function readJsonFromRelativePath(filename: string) {
-  // Re-scope file system reads to make sure we use the relative
-  // path via node directory resolution
-  const runtimeServerPath = path.join(__dirname, "../../assets/", filename);
-  const data = readFileSync(runtimeServerPath, "utf-8");
-  return data;
+  const allowedDirs = [
+    path.resolve(__dirname, "../../assets"),
+    path.resolve(process.cwd(), "src/app/assets"),
+    path.resolve(process.cwd(), ".next/server/app/assets"),
+  ];
+
+  for (const dir of allowedDirs) {
+    const resolved = path.resolve(dir, filename);
+    if (!resolved.startsWith(dir + path.sep)) {
+      continue;
+    }
+    try {
+      return readFileSync(resolved, "utf-8");
+    } catch {
+      // Try next candidate
+    }
+  }
+
+  console.error(
+    `Could not find asset file ${filename}. Tried: ${allowedDirs.map((d) => path.join(d, filename)).join(", ")}`,
+  );
+  throw new Error(`Could not load asset file "${filename}".`);
 }
 
 class SeedingService {
@@ -125,24 +145,37 @@ class SeedingService {
         },
       );
 
+      const MAX_RETRIES = 3;
       for (const vs of valueSetsToInsert) {
         if (vs) {
           await insertValueSet(vs, dbClient);
+
           let missingData = await checkValueSetInsertion(vs, dbClient);
           // Note: We don't actually have functions for inserting concepts,
           // so if anything is missing just try re-inserting the whole VS.
           // This ensures that all reference data and FKs are also updated.
+          let retries = 0;
           while (
+            (missingData.missingValueSet ||
+              missingData.missingConcepts.length > 0 ||
+              missingData.missingMappings.length > 0) &&
+            retries < MAX_RETRIES
+          ) {
+            retries++;
+            console.log(
+              `Resolving missing values or errors for valueset ${vs.valueSetId} (attempt ${retries}/${MAX_RETRIES})`,
+            );
+            await insertValueSet(vs, dbClient);
+            missingData = await checkValueSetInsertion(vs, dbClient);
+          }
+          if (
             missingData.missingValueSet ||
             missingData.missingConcepts.length > 0 ||
             missingData.missingMappings.length > 0
           ) {
-            console.log(
-              "Resolving missing values or errors for valueset",
-              vs.valueSetId,
+            throw new Error(
+              `Failed to fully insert valueset ${vs.valueSetId} after ${MAX_RETRIES} retries`,
             );
-            await insertValueSet(vs, dbClient);
-            missingData = await checkValueSetInsertion(vs, dbClient);
           }
         }
       }
@@ -200,12 +233,20 @@ class SeedingService {
     // from the value sets
     console.log("Inserting condition-to-valueset mappings");
     let ctvStructs = oidData.conditions.map((c) => {
-      const ctvID = retiredOids.has(c.valueset_id) ? "NONE" : randomUUID();
+      const version = oidsToVersion.get(c.valueset_id);
+      if (retiredOids.has(c.valueset_id) || !version) {
+        return {
+          id: "NONE",
+          conditionId: c.code,
+          valueSetId: "",
+          source: c.system,
+        } as ConditionToValueSetStruct;
+      }
 
       const dbCTV: ConditionToValueSetStruct = {
-        id: ctvID,
+        id: randomUUID(),
         conditionId: c.code,
-        valueSetId: c.valueset_id + "_" + oidsToVersion.get(c.valueset_id),
+        valueSetId: c.valueset_id + "_" + version,
         source: c.system,
       };
       return dbCTV;
