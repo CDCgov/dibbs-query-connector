@@ -1,4 +1,4 @@
-[← Back to Documentation](/docs)
+[← Back to Documentation](./table-of-contents.mdx)
 
 # Deploying Query Connector
 
@@ -88,7 +88,7 @@ For organizations with restrictions on container usage or specific compliance re
    - For production: 4+ vCPUs, 8+ GB RAM, 50+ GB storage
    - For testing: 2+ vCPUs, 4+ GB RAM, 20+ GB storage
 
-4. Begin by initiating the bash setup script, which is called [dibbs-query-connector-wizard.sh](http://dibbs-query-connector-wizard.sh).
+4. Begin by initiating the bash setup script, which is called [dibbs-query-connector-wizard.sh](https://github.com/CDCgov/dibbs-vm/blob/main/dibbs-query-connector/dibbs-query-connector-wizard.sh.home).
 
 5. Once you initiate the script, you’ll see a warning message pop up. This warning lets you know that, if you don’t have a database you’re connecting to Query Connector, there’s a development database you can deploy instead.
 
@@ -110,7 +110,7 @@ For organizations with restrictions on container usage or specific compliance re
 
     - The first one is an auth secret key.
     - The next is your authentication endpoint.
-    - Next, enter your ERSD API key. [See here](development#obtaining-api-and-license-keys) for instructions for obtaining these keys – there’s no default key, because each user should use their own.
+    - Next, enter your ERSD API key. [See here](./development.mdx#obtaining-api-and-license-keys) for instructions for obtaining these keys – there’s no default key, because each user should use their own.
     - Finally, enter your UMLS API key.
 
 14. With these variables set, the following containers will be started:
@@ -162,7 +162,7 @@ Query Connector currently supports the following identity providers:
 
 - [Keycloak](https://www.keycloak.org/)
 - [Microsoft Entra ID (formerly Active Directory)](https://www.microsoft.com/en-us/security/business/identity-access/microsoft-entra-id)
-- [PingFederate](https://www.pingidentity.com/en/solutions/pingfederate.html)
+- [PingFederate](https://www.pingidentity.com/en/product/pingfederate.html)
 
 ### Keycloak configuration
 
@@ -313,7 +313,7 @@ ERSD_API_KEY=
 UMLS_API_KEY=
 ```
 
-For more information on the ERSD and UMLS API keys, see [this API key documentation](development#obtaining-api-and-license-keys).
+For more information on the ERSD and UMLS API keys, see [this API key documentation](./development.mdx#obtaining-api-and-license-keys).
 
 ### Backup and disaster recovery
 
@@ -378,4 +378,4 @@ If you encounter issues during deployment or operation of Query Connector, you c
 
 ## Feedback
 
-Share your feedback [here](https://docs.google.com/forms/d/e/1FAIpQLSelXP4MFzezJpn4IlRYTSuRHV4KeM5tNhIfpkGNY1kbhTUc_w/viewform?usp=sharing&ouid=110784663264830241248) to help us improve this documentation. If you have other questions, feel free to contact our team at dibbs@cdc.gov.
+If you have feedback or questions, feel free to contact our team at dibbs@cdc.gov.
