@@ -11,10 +11,13 @@ import { AnchorHTMLAttributes } from "react";
  */
 function MdxLink(props: AnchorHTMLAttributes<HTMLAnchorElement>) {
   const { href, ...rest } = props;
-  if (href && /^\.\/.*\.mdx$/.test(href)) {
-    const slug = href.replace(/^\.\//, "").replace(/\.mdx$/, "");
+  if (href && /^\.\/.*\.mdx(#.*)?$/.test(href)) {
+    const [path, fragment] = href.split("#");
+    const slug = path.replace(/^\.\//, "").replace(/\.mdx$/, "");
     const resolved = slug === "table-of-contents" ? "/docs" : `/docs/${slug}`;
-    return <Link {...rest} href={resolved} />;
+    return (
+      <Link {...rest} href={fragment ? `${resolved}#${fragment}` : resolved} />
+    );
   }
   if (href && href.startsWith("https://queryconnector.dev/")) {
     const path = href.replace("https://queryconnector.dev", "");
