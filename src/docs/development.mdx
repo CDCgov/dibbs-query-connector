@@ -40,11 +40,11 @@ Add your API keys as an environment variables called `ERSD_API_KEY`, `UMLS_API_K
 
 #### Database
 
-The default `DATABASE_URL` value in `.env.sample` assumes you will use the database container spun up by Docker Compose. It is also possible to run a PostgreSQL server on your local machine, which may lead to some modest speed increases, especially when seeding from the eRSD and UMLS APIs. If you'd like to run a local PostgreSQL server, adjust your `DATABASE_URL` as needed, e.g. `DATABASE_URL=postgresql://myuser@localhost:5432/tefca_db`. To run Flyway migrations against a local PostgreSQL server, you'll also need to adjust [flyway.conf](../flyway/conf/flyway.conf) accordingly.
+The default `DATABASE_URL` value in `.env.sample` assumes you will use the database container spun up by Docker Compose. It is also possible to run a PostgreSQL server on your local machine, which may lead to some modest speed increases, especially when seeding from the eRSD and UMLS APIs. If you'd like to run a local PostgreSQL server, adjust your `DATABASE_URL` as needed, e.g. `DATABASE_URL=postgresql://myuser@localhost:5432/tefca_db`. To run Flyway migrations against a local PostgreSQL server, you'll also need to adjust [flyway.conf](../../flyway/conf/flyway.conf) accordingly.
 
 #### Running with Docker Compose and Node
 
-We provide a [Docker Compose file](../docker-compose-dev.yaml) that spins up all of the necessary services for Query Connector, and a simple npm script for invoking both Docker Compose and running the Next.js application.
+We provide a [Docker Compose file](../../docker-compose-dev.yaml) that spins up all of the necessary services for Query Connector, and a simple npm script for invoking both Docker Compose and running the Next.js application.
 
 1. Ensure that both [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) and [Node 22.x or higher](https://nodejs.org/en/download) are installed.
 2. Clone the Query Connector repository with `git clone git@github.com:CDCgov/dibbs-query-connector.git`.
@@ -66,7 +66,7 @@ Password: QcDev2024!
 1. Download a copy of the Docker image from the Query Connector repository by running `docker pull ghcr.io/cdcgov/dibbs-query-connector/query-connector:latest`.
    1. If you're using an M1 Mac, you'll need to tell Docker to pull the non-Apple Silicon image using `docker pull --platform linux/amd64 ghcr.io/cdcgov/dibbs-query-connector/query-connector:latest` since we don't have a image for Apple Silicon. If you're using this setup, there might be some issues with architecture incompatability that the team hasn't run into, so please flag if you run into something!
 2. Run the service with `docker run -p 3000:3000 query-connector:latest`. If you're on a Windows machine, you may need to run `docker run -p 3000:3000 ghcr.io/cdcgov/phdi/query-connector:latest` instead.
-3. You will need to run the supporting services with our [Docker Compose file](../docker-compose-dev.yaml) by running `docker compose -f docker-compose-dev.yaml up`.
+3. You will need to run the supporting services with our [Docker Compose file](../../docker-compose-dev.yaml) by running `docker compose -f docker-compose-dev.yaml up`.
 
 ### Building the Docker Image
 
@@ -155,7 +155,7 @@ integration tests ran through `npm run test:ci`.
 
 ### Architecture
 
-For more info, see [architecture.md](architecture.mdx).
+For more info, see [architecture](./architecture.mdx).
 
 ### Design System
 
