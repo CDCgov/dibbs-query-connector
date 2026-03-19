@@ -41,7 +41,7 @@
     "fhirpath": "^4.4.0",
     "html-react-parser": "^5.2.5",
     "jose": "^5.2.2",
-    "next": "^15.5.12",
+    "next": "^15.5.14",
     "next-auth": "^5.0.0-beta.30",
     "next-nprogress-bar": "^2.4.4",
     "node-hl7-client": "^3.0.0",
@@ -57,6 +57,9 @@
     "sharp": "^0.34.5",
     "undici": "^7.24.4",
     "unist-util-visit": "^5.0.0"
+  },
+  "overrides": {
+    "fast-xml-parser": "^5.5.6"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
