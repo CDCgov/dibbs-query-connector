@@ -20,7 +20,12 @@ RUN curl -L https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/${FLY
     && ln -s /flyway/flyway /usr/local/bin/flyway \
     && rm flyway.tar.gz \
     && rm -rf /flyway/jre \
-    && chmod +x /flyway/flyway
+    && chmod +x /flyway/flyway \
+    && rm -rf /flyway/drivers/databricks-jdbc-*.jar \
+              /flyway/drivers/mssql-jdbc-*.jar \
+              /flyway/drivers/snowflake-jdbc-*.jar \
+              /flyway/drivers/cassandra/ \
+              /flyway/drivers/gcp/
 
 # Build the project
 ENV NEXT_TELEMETRY_DISABLED=1
@@ -31,7 +36,7 @@ RUN npm run build
 FROM base AS runner
 WORKDIR /app
 
-RUN apk add --no-cache bash openjdk17-jre
+RUN apk update && apk upgrade && apk add --no-cache bash openjdk17-jre
 # Copy RDS CA bundle for SSL database connections
 COPY --from=installer /rds-global-bundle.pem /app/certs/rds-global-bundle.pem
 # Copy Flyway from the installer stage
