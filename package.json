@@ -67,7 +67,7 @@
     "@next/bundle-analyzer": "^15.4.4",
     "@next/eslint-plugin-next": "^15.3.4",
     "@playwright/test": "^1.58.2",
-    "@smithy/util-stream": "^2.1.2",
+    "@smithy/util-stream": "^4.5.20",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.2.0",
