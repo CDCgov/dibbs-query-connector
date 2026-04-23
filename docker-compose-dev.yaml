@@ -14,7 +14,7 @@ services:
       # obtained from the ERSD API at https://ersd.aimsplatform.org/#/api-keys
     volumes:
       - ./vs_dump.sql:/docker-entrypoint-initdb.d/vs_dump.sql
-      - db-data:/var/lib/postgresql/data
+      - db-data:/var/lib/postgresql
 
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
@@ -27,7 +27,8 @@ services:
     image: flyway/flyway:11-alpine
     environment:
       - JAVA_OPTS_APPEND="-XX:UseSVE=0"
-    command: -configFiles=/flyway/conf/flyway.conf -schemas=public -connectRetries=60 migrate
+    command: -configFiles=/flyway/conf/flyway.conf -schemas=public
+      -connectRetries=60 migrate
     volumes:
       - ./flyway/sql:/flyway/sql
       - ./flyway/conf/flyway.conf:/flyway/conf/flyway.conf

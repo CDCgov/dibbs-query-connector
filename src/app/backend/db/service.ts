@@ -1,9 +1,34 @@
-import { dontUseOutsideConfigOrTests_getDbPool } from "./config";
+import {
+  dontUseOutsideConfigOrTests_getDbPool,
+  isDbAuthError,
+  rotateDbCredentialsOnAuthFailure,
+} from "./config";
 import { camelCaseDbColumnNames } from "./decorators";
 import { Pool, PoolClient } from "pg";
 
+/**
+ * Runs `fn` and, if it throws a pg auth error (e.g. 28P01) while
+ * DB_SECRET_ARN is set, invalidates the cached password, resets the pool,
+ * and retries once with a freshly-fetched password from Secrets Manager.
+ * @param fn the function to run
+ * @returns the result of `fn`, possibly after one retry
+ */
+async function withAuthRetry<T>(fn: () => Promise<T>): Promise<T> {
+  try {
+    return await fn();
+  } catch (err) {
+    if (process.env.DB_SECRET_ARN && isDbAuthError(err)) {
+      await rotateDbCredentialsOnAuthFailure();
+      return await fn();
+    }
+    throw err;
+  }
+}
+
 export class DbClient {
-  private dbPool: Pool = dontUseOutsideConfigOrTests_getDbPool();
+  private get dbPool(): Pool {
+    return dontUseOutsideConfigOrTests_getDbPool();
+  }
   private dbClient: PoolClient | undefined;
 
   @camelCaseDbColumnNames
@@ -23,18 +48,19 @@ export class DbClient {
   }
 
   async connect() {
-    const client = await this.dbPool.connect();
-    this.dbClient = client;
+    this.dbClient = await withAuthRetry(() => this.dbPool.connect());
     return;
   }
 }
 
 export class DbService {
-  private dbPool: Pool = dontUseOutsideConfigOrTests_getDbPool();
+  private get dbPool(): Pool {
+    return dontUseOutsideConfigOrTests_getDbPool();
+  }
 
   @camelCaseDbColumnNames
   async query(querySql: string, values?: unknown[]) {
-    return await this.dbPool.query(querySql, values);
+    return await withAuthRetry(() => this.dbPool.query(querySql, values));
   }
 }
 

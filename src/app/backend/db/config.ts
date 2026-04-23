@@ -76,13 +76,43 @@ export function buildSslConfig():
 }
 
 /**
+ * Strips the password portion from a postgres connection URL. Used when
+ * DB_SECRET_ARN is set so that an unencoded password in DATABASE_URL (which
+ * would otherwise break `new URL()`) is discarded before parsing — we're going
+ * to fetch the real password from Secrets Manager anyway.
+ *
+ * Handles passwords containing `@` by splitting on the LAST `@` in the
+ * authority section. Assumes the password does not contain `/` (a structural
+ * URL delimiter that would be ambiguous).
+ * @param dbUrl the raw DATABASE_URL string
+ * @returns the URL with the password portion removed
+ */
+function stripPasswordFromUrl(dbUrl: string): string {
+  const m = dbUrl.match(/^([a-z]+:\/\/)([^/]*)(\/.*)?$/i);
+  if (!m) return dbUrl;
+  const [, scheme, authority, rest = ""] = m;
+  const atIdx = authority.lastIndexOf("@");
+  if (atIdx === -1) return dbUrl;
+  const userinfo = authority.slice(0, atIdx);
+  const hostport = authority.slice(atIdx + 1);
+  const colonIdx = userinfo.indexOf(":");
+  const user = colonIdx === -1 ? userinfo : userinfo.slice(0, colonIdx);
+  return `${scheme}${user}@${hostport}${rest}`;
+}
+
+/**
  * Parses DATABASE_URL into individual pg connection fields. Using individual
  * fields (instead of connectionString) lets us supply `password` as an async
  * function for Secrets Manager rotation support.
  *
+ * When DB_SECRET_ARN is set, the password portion of the URL is stripped
+ * before parsing so unencoded special characters (`#`, `:`, `>`, etc.) don't
+ * crash `new URL()` — the password will be fetched from Secrets Manager.
+ *
  * Returns safe defaults when DATABASE_URL is not set (e.g. during next build).
+ * @returns the parsed pg connection fields (host, port, user, database, password)
  */
-function parseDbUrl(): {
+export function parseDbUrl(): {
   host: string;
   port: number;
   user: string;
@@ -104,7 +134,20 @@ function parseDbUrl(): {
       "DATABASE_URL is not set. The database connection cannot be configured without it.",
     );
   }
-  const url = new URL(dbUrl);
+  const urlToParse = process.env.DB_SECRET_ARN
+    ? stripPasswordFromUrl(dbUrl)
+    : dbUrl;
+  let url: URL;
+  try {
+    url = new URL(urlToParse);
+  } catch (err) {
+    throw new Error(
+      `Failed to parse DATABASE_URL. If the password contains special ` +
+        `characters (e.g. #, :, >, @, ?, /), percent-encode them, or set ` +
+        `DB_SECRET_ARN to source the password from AWS Secrets Manager ` +
+        `instead. Underlying error: ${err instanceof Error ? err.message : err}`,
+    );
+  }
   return {
     host: url.hostname,
     port: Number(url.port) || 5432,
@@ -162,3 +205,50 @@ export const dontUseOutsideConfigOrTests_getDbPool = () => {
   }
   return cachedDbClient;
 };
+
+const AUTH_ERROR_CODES = new Set(["28P01", "28000"]);
+
+/**
+ * Returns true when `err` is a pg auth error (invalid_password /
+ * invalid_authorization_specification), which typically means the cached
+ * password is stale relative to a rotation that just happened upstream.
+ * @param err the error thrown by pg
+ * @returns true if the error indicates a DB auth failure
+ */
+export function isDbAuthError(err: unknown): boolean {
+  if (typeof err !== "object" || err === null) return false;
+  const code = (err as { code?: unknown }).code;
+  return typeof code === "string" && AUTH_ERROR_CODES.has(code);
+}
+
+let rotationInFlight: Promise<void> | null = null;
+
+/**
+ * Invalidates the cached DB password and ends the current pool so that the
+ * next call to `dontUseOutsideConfigOrTests_getDbPool()` creates a fresh pool
+ * that fetches a newly-rotated password from Secrets Manager. Concurrent
+ * callers share the same in-flight rotation — only one pool reset occurs.
+ * @returns a promise that resolves once the pool has been ended
+ */
+export function rotateDbCredentialsOnAuthFailure(): Promise<void> {
+  if (rotationInFlight) return rotationInFlight;
+  console.warn(
+    "DB auth failed; invalidating password cache and resetting pool",
+  );
+  rotationInFlight = (async () => {
+    delete process.env._DB_PASSWORD;
+    delete process.env._DB_PASSWORD_TS;
+    const old = cachedDbClient;
+    cachedDbClient = null;
+    if (old) {
+      try {
+        await old.end();
+      } catch {
+        // pool may already be broken; ignore
+      }
+    }
+  })().finally(() => {
+    rotationInFlight = null;
+  });
+  return rotationInFlight;
+}
