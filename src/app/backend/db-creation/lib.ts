@@ -261,6 +261,10 @@ export async function insertDBStructArray(
   // Cache valueset existence checks to avoid redundant queries
   const valuesetIdCache = new Map<string, string | null>();
 
+  // Lazily-loaded set of condition IDs already present in the DB; used to
+  // skip category rows whose condition wasn't inserted (e.g. eRSD drift).
+  let conditionIdSet: Set<string> | null = null;
+
   for (const struct of structs) {
     let values: string[] = [];
 
@@ -348,14 +352,26 @@ export async function insertDBStructArray(
           (struct as ConditionToValueSetStruct).source,
         ];
         break;
-      case "category":
+      case "category": {
+        if (conditionIdSet === null) {
+          const result = await dbClient.query(`SELECT id FROM conditions`);
+          conditionIdSet = new Set(result.rows.map((r) => r.id));
+        }
+        const catStruct = struct as CategoryStruct;
+        if (!conditionIdSet.has(catStruct.conditionCode)) {
+          console.warn(
+            `Skipping category entry ${catStruct.conditionCode} (${catStruct.conditionName}): condition not present in database`,
+          );
+          continue;
+        }
         insertSql = insertCategorySql;
         values = [
-          (struct as CategoryStruct).conditionName,
-          (struct as CategoryStruct).conditionCode,
-          (struct as CategoryStruct).category,
+          catStruct.conditionName,
+          catStruct.conditionCode,
+          catStruct.category,
         ];
         break;
+      }
       case "query":
         insertSql = insertDemoQueryLogicSql;
         values = [
