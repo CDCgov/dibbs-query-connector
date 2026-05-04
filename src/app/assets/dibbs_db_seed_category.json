@@ -156,11 +156,6 @@
       "category": "Enteric Diseases"
     },
     {
-      "conditionName": "Cancer",
-      "conditionCode": "363346000",
-      "category": "Cancer"
-    },
-    {
       "conditionName": "Candida auris infection",
       "conditionCode": "865929003",
       "category": "Healthcare-Associated Events"
@@ -416,11 +411,6 @@
       "category": "Birth Defects and Infant Disorders"
     },
     {
-      "conditionName": "Genital Warts",
-      "conditionCode": "266113007",
-      "category": "Sexually Transmitted Diseases"
-    },
-    {
       "conditionName": "Giardiasis",
       "conditionCode": "58265007",
       "category": "Enteric Diseases"
@@ -454,11 +444,6 @@
       "conditionName": "Hantavirus Infection",
       "conditionCode": "359761005",
       "category": "Zoonotic Diseases"
-    },
-    {
-      "conditionName": "Head Injury",
-      "conditionCode": "82271004",
-      "category": "Injuries, NEC"
     },
     {
       "conditionName": "Hemolytic uremic syndrome (HUS)",
@@ -691,11 +676,6 @@
       "category": "Toxic Effect of Non-Medicinal Substances"
     },
     {
-      "conditionName": "Methemoglobinemia",
-      "conditionCode": "38959009",
-      "category": "Systemic Conditions"
-    },
-    {
       "conditionName": "Microphthalmia",
       "conditionCode": "61142002",
       "category": "Birth Defects and Infant Disorders"
@@ -709,11 +689,6 @@
       "conditionName": "Middle East Respiratory Syndrome (MERS)",
       "conditionCode": "651000146102",
       "category": "Respiratory Conditions (infectious)"
-    },
-    {
-      "conditionName": "Motor Vehicle Injury",
-      "conditionCode": "407153006",
-      "category": "Injuries, NEC"
     },
     {
       "conditionName": "Mpox",
