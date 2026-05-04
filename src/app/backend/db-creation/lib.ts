@@ -1,7 +1,6 @@
 "use server";
 
 import { Concept } from "@/app/models/entities/concepts";
-import { ersdToDibbsConceptMap } from "../../constants";
 import { Bundle, ValueSet } from "fhir/r4";
 import { DibbsValueSet } from "@/app/models/entities/valuesets";
 import {
@@ -27,6 +26,8 @@ import {
   generateConceptSqlPromises,
   generateValuesetConceptJoinSqlPromises,
   indexErsdByOid,
+  isUmbrellaErsdId,
+  stripErsdVersionSuffix,
   stripProtocolAndTLDFromSystemUrl,
 } from "./utils";
 import { readJsonFromRelativePath } from "./service";
@@ -480,18 +481,21 @@ export async function indexErsdResponseByOid() {
         code: (usc.valueCodeableConcept?.coding || [])[0].code || "",
         system: (usc.valueCodeableConcept?.coding || [])[0].system || "",
         text: usc.valueCodeableConcept?.text || "",
-        valueset_id: vs.id || "",
+        valueset_id: stripErsdVersionSuffix(vs.id || ""),
       };
       conditionExtractor.push(ersdCond);
     });
     return conditionExtractor;
   }, conditionExtractor);
 
-  // Make sure to take out the umbrella value sets from the ones we try to insert
-  let oids = valuesets?.map((vs) => vs.resource?.id);
-  oids = oids?.filter(
-    (oid) => !Object.keys(ersdToDibbsConceptMap).includes(oid || ""),
-  );
+  // Take out the umbrella value sets from the ones we try to insert, then
+  // strip the `-YYYYMMDD` version suffix that eRSD v3 appends to non-umbrella
+  // ids so we send bare OIDs to VSAC and key the DB on bare OIDs (matches the
+  // static seed's `WHERE oid = $1` lookups).
+  let oids = valuesets
+    ?.map((vs) => vs.resource?.id)
+    .filter((oid) => !isUmbrellaErsdId(oid))
+    .map((oid) => (oid ? stripErsdVersionSuffix(oid) : oid));
   return {
     oids: oids,
     oidToErsdType: oidToErsdType,

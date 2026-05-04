@@ -1,7 +1,7 @@
 "use server";
 
 import { ErsdConceptType, MISSING_API_KEY_LITERAL } from "@/app/constants";
-import { Parameters, ValueSet } from "fhir/r4";
+import { OperationOutcome, Parameters, ValueSet } from "fhir/r4";
 import { getVSACValueSet, OidData } from "@/app/backend/code-systems/service";
 import { randomUUID } from "crypto";
 import {
@@ -110,6 +110,7 @@ class SeedingService {
         Math.min(lastIdx, oidData.oids.length),
       );
 
+      const vsacErrors: { oid: string; diagnostics: string }[] = [];
       let valueSetsToInsert = (
         await generateBatchVsacPromises(oidsToFetch)
       ).map((r) => {
@@ -119,6 +120,22 @@ class SeedingService {
         }
 
         const { vs, oid } = r.value;
+
+        // VSAC returns an OperationOutcome on any non-200 (auth failure,
+        // not-found, etc.). Without this guard, the error response gets
+        // translated into a DibbsValueSet with `concepts: undefined`, which
+        // is indistinguishable from a legitimately retired valueset and gets
+        // silently filtered out below. Track these so we can fail the seed
+        // instead of committing an empty DB.
+        if ((vs as { resourceType?: string })?.resourceType !== "ValueSet") {
+          const diagnostics =
+            (vs as OperationOutcome).issue?.[0]?.diagnostics ??
+            "unknown VSAC error";
+          console.error(`VSAC fetch failed for OID ${oid}: ${diagnostics}`);
+          vsacErrors.push({ oid, diagnostics });
+          return;
+        }
+
         const eRSDType: ErsdConceptType = oidData.oidToErsdType.get(
           oid,
         ) as ErsdConceptType;
@@ -135,6 +152,17 @@ class SeedingService {
         }
         return internalValueSet;
       });
+
+      if (vsacErrors.length > 0) {
+        const sample = vsacErrors
+          .slice(0, 3)
+          .map((e) => `${e.oid} (${e.diagnostics})`)
+          .join("; ");
+        throw new Error(
+          `VSAC returned errors for ${vsacErrors.length}/${oidsToFetch.length} OID(s) in this batch. ` +
+            `Verify UMLS_API_KEY is valid and not expired. Sample: ${sample}`,
+        );
+      }
 
       // Next, in case we hit a value set that has a `retired` status and
       // a deprecated concept listing, we'll need to filter for only those
