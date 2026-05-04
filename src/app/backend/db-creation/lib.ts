@@ -1,7 +1,6 @@
 "use server";
 
 import { Concept } from "@/app/models/entities/concepts";
-import { ersdToDibbsConceptMap } from "../../constants";
 import { Bundle, ValueSet } from "fhir/r4";
 import { DibbsValueSet } from "@/app/models/entities/valuesets";
 import {
@@ -27,6 +26,7 @@ import {
   generateConceptSqlPromises,
   generateValuesetConceptJoinSqlPromises,
   indexErsdByOid,
+  isUmbrellaErsdId,
   stripErsdVersionSuffix,
   stripProtocolAndTLDFromSystemUrl,
 } from "./utils";
@@ -488,19 +488,13 @@ export async function indexErsdResponseByOid() {
     return conditionExtractor;
   }, conditionExtractor);
 
-  // Make sure to take out the umbrella value sets from the ones we try to insert.
-  // eRSD v3 versions umbrella IDs as `<prefix>-<version>` (e.g. `dxtc-3.1.2`);
-  // earlier eRSD versions used bare prefixes. Accept both shapes.
-  // Non-umbrella ids carry a `-YYYYMMDD` version suffix in v3 — strip it so
-  // we send bare OIDs to VSAC and key the DB on bare OIDs (matches the
+  // Take out the umbrella value sets from the ones we try to insert, then
+  // strip the `-YYYYMMDD` version suffix that eRSD v3 appends to non-umbrella
+  // ids so we send bare OIDs to VSAC and key the DB on bare OIDs (matches the
   // static seed's `WHERE oid = $1` lookups).
-  const umbrellaPrefixes = Object.keys(ersdToDibbsConceptMap);
   let oids = valuesets
     ?.map((vs) => vs.resource?.id)
-    .filter(
-      (oid) =>
-        !umbrellaPrefixes.some((p) => oid === p || oid?.startsWith(p + "-")),
-    )
+    .filter((oid) => !isUmbrellaErsdId(oid))
     .map((oid) => (oid ? stripErsdVersionSuffix(oid) : oid));
   return {
     oids: oids,

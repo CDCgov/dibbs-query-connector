@@ -13,9 +13,14 @@ import {
 import { insertValuesetToConceptSql, insertConceptSql } from "./seedSqlStructs";
 import { DbClient } from "../db/service";
 
-// eRSD v3 versions umbrella valueset IDs as `<prefix>-<version>` (e.g.
-// `dxtc-3.1.2`). v1/v2 used bare prefixes. Accept both shapes.
-function isUmbrellaErsdId(id: string | undefined): boolean {
+/**
+ * Returns true if the given resource id is an eRSD umbrella valueset id.
+ * eRSD v3 versions umbrella ids as `<prefix>-<version>` (e.g. `dxtc-3.1.2`);
+ * v1/v2 used bare prefixes. Accepts both shapes.
+ * @param id Resource id from an eRSD bundle entry.
+ * @returns Whether the id matches one of the umbrella prefixes.
+ */
+export function isUmbrellaErsdId(id: string | undefined): boolean {
   if (!id) return false;
   return Object.keys(ersdToDibbsConceptMap).some(
     (prefix) => id === prefix || id.startsWith(prefix + "-"),
