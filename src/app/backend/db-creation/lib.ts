@@ -27,6 +27,7 @@ import {
   generateConceptSqlPromises,
   generateValuesetConceptJoinSqlPromises,
   indexErsdByOid,
+  stripErsdVersionSuffix,
   stripProtocolAndTLDFromSystemUrl,
 } from "./utils";
 import { readJsonFromRelativePath } from "./service";
@@ -480,18 +481,27 @@ export async function indexErsdResponseByOid() {
         code: (usc.valueCodeableConcept?.coding || [])[0].code || "",
         system: (usc.valueCodeableConcept?.coding || [])[0].system || "",
         text: usc.valueCodeableConcept?.text || "",
-        valueset_id: vs.id || "",
+        valueset_id: stripErsdVersionSuffix(vs.id || ""),
       };
       conditionExtractor.push(ersdCond);
     });
     return conditionExtractor;
   }, conditionExtractor);
 
-  // Make sure to take out the umbrella value sets from the ones we try to insert
-  let oids = valuesets?.map((vs) => vs.resource?.id);
-  oids = oids?.filter(
-    (oid) => !Object.keys(ersdToDibbsConceptMap).includes(oid || ""),
-  );
+  // Make sure to take out the umbrella value sets from the ones we try to insert.
+  // eRSD v3 versions umbrella IDs as `<prefix>-<version>` (e.g. `dxtc-3.1.2`);
+  // earlier eRSD versions used bare prefixes. Accept both shapes.
+  // Non-umbrella ids carry a `-YYYYMMDD` version suffix in v3 — strip it so
+  // we send bare OIDs to VSAC and key the DB on bare OIDs (matches the
+  // static seed's `WHERE oid = $1` lookups).
+  const umbrellaPrefixes = Object.keys(ersdToDibbsConceptMap);
+  let oids = valuesets
+    ?.map((vs) => vs.resource?.id)
+    .filter(
+      (oid) =>
+        !umbrellaPrefixes.some((p) => oid === p || oid?.startsWith(p + "-")),
+    )
+    .map((oid) => (oid ? stripErsdVersionSuffix(oid) : oid));
   return {
     oids: oids,
     oidToErsdType: oidToErsdType,

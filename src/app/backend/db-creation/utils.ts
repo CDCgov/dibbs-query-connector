@@ -12,7 +12,28 @@ import {
 } from "fhir/r4";
 import { insertValuesetToConceptSql, insertConceptSql } from "./seedSqlStructs";
 import { DbClient } from "../db/service";
-const ERSD_TYPED_RESOURCE_URL = "http://ersd.aimsplatform.org/fhir/ValueSet/";
+
+// eRSD v3 versions umbrella valueset IDs as `<prefix>-<version>` (e.g.
+// `dxtc-3.1.2`). v1/v2 used bare prefixes. Accept both shapes.
+function isUmbrellaErsdId(id: string | undefined): boolean {
+  if (!id) return false;
+  return Object.keys(ersdToDibbsConceptMap).some(
+    (prefix) => id === prefix || id.startsWith(prefix + "-"),
+  );
+}
+
+/**
+ * Strips the `-YYYYMMDD` version suffix that eRSD v3 appends to
+ * non-umbrella valueset resource ids (e.g. `<oid>-20240619`). VSAC
+ * accepts the versioned form, but the static seed and condition-to-
+ * valueset linkage key off bare OIDs, so we normalize at ingest. v1/v2
+ * ids have no suffix and pass through unchanged.
+ * @param id Resource id from an eRSD bundle entry.
+ * @returns The id with any trailing 8-digit date suffix removed.
+ */
+export function stripErsdVersionSuffix(id: string): string {
+  return id.replace(/-\d{8}$/, "");
+}
 
 /**
  * Translates a VSAC FHIR bundle to our internal ValueSet struct
@@ -64,20 +85,28 @@ export function indexErsdByOid(
 ) {
   const oidToErsdType = new Map<string, string>();
   Object.keys(ersdToDibbsConceptMap).forEach((k) => {
-    const keyedUrl = ERSD_TYPED_RESOURCE_URL + k;
-    const umbrellaValueSet = valuesets?.find((vs) => vs.fullUrl === keyedUrl);
+    const umbrellaValueSet = valuesets?.find((vs) => {
+      const id = vs.resource?.id;
+      return id === k || id?.startsWith(k + "-");
+    });
 
-    // These "bulk" valuesets of service types compose references
-    // to all value sets that fall under their purview
-    const composedValueSets: Array<string> =
-      (umbrellaValueSet as BundleEntry<ValueSet>)?.resource?.compose?.include[0]
-        .valueSet || ([] as Array<string>);
-    composedValueSets.reduce((acc: Map<string, string>, vsUrl: string) => {
-      const vsArray = vsUrl.split("/");
-      const oid = vsArray[vsArray.length - 1];
-      acc.set(oid, k);
-      return acc;
-    }, oidToErsdType);
+    // These "bulk" valuesets of service types compose references to all
+    // value sets that fall under their purview. eRSD v2 packed all refs into
+    // a single `include[0]`; v3 emits one `include` entry per ref, so we
+    // walk every entry's `valueSet` array.
+    const includes =
+      (umbrellaValueSet as BundleEntry<ValueSet>)?.resource?.compose?.include ||
+      [];
+    for (const inc of includes) {
+      for (const vsUrl of inc.valueSet || []) {
+        // eRSD v3 includes a `|version` suffix on the canonical URL
+        // (e.g. `.../ValueSet/<oid>|20230602`). Strip it so we key on raw OID.
+        const noVersion = vsUrl.split("|")[0];
+        const vsArray = noVersion.split("/");
+        const oid = vsArray[vsArray.length - 1];
+        oidToErsdType.set(oid, k);
+      }
+    }
   });
 
   // Condition-valueset linkages are stored in the "usage context" structure of
@@ -85,7 +114,7 @@ export function indexErsdByOid(
   // We can filter out public health informatics contexts to get only the meaningful
   // conditions
   const nonUmbrellaEntries = valuesets?.filter(
-    (vs) => !Object.keys(ersdToDibbsConceptMap).includes(vs.resource?.id || ""),
+    (vs) => !isUmbrellaErsdId(vs.resource?.id),
   ) as BundleEntry<ValueSet>[];
   const nonUmbrellaValueSets: Array<ValueSet> = (nonUmbrellaEntries || []).map(
     (vs) => {
