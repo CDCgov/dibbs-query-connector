@@ -16,9 +16,9 @@ RUN curl --fail --show-error -L https://truststore.pki.rds.amazonaws.com/global/
 # DigiCert Global Root G2, Microsoft RSA Root CA 2017) and concatenate to one PEM.
 RUN mkdir -p /tmp/azure-certs \
     && curl --fail --show-error -L -o /tmp/azure-certs/digicert-global-root.pem \
-         https://dl.cacerts.digicert.com/DigiCertGlobalRootCA.crt.pem \
+         https://cacerts.digicert.com/DigiCertGlobalRootCA.crt.pem \
     && curl --fail --show-error -L -o /tmp/azure-certs/digicert-global-root-g2.pem \
-         https://dl.cacerts.digicert.com/DigiCertGlobalRootG2.crt.pem \
+         https://cacerts.digicert.com/DigiCertGlobalRootG2.crt.pem \
     && curl --fail --show-error -L -o /tmp/azure-certs/ms-rsa-root-2017.der \
          "https://www.microsoft.com/pkiops/certs/Microsoft%20RSA%20Root%20Certificate%20Authority%202017.crt" \
     && openssl x509 -inform DER -in /tmp/azure-certs/ms-rsa-root-2017.der \
