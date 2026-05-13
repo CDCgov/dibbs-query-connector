@@ -10,7 +10,7 @@
 
 ## Overview
 
-This repository is a part of the CDC [DIBBs project](https://cdcgov.github.io/dibbs-site/) and seeks to build the DIBBs Query Connector.
+This repository is a part of the CDC [DIBBs project](https://dibbs.tools/) and seeks to build the DIBBs Query Connector.
 
 The DIBBs Query Connector app offers a REST API and comprehensive UI for public health staff to query a wide network of healthcare organizations (HCOs), providing access to more complete and timely data.
 
@@ -18,15 +18,9 @@ The Query Connector is a tool for public health practitioners to quickly retriev
 
 ### Problem Scope
 
-Current public health systems that digest, analyze, and respond to data are siloed. Lacking access to actionable data, our national, as well as state, local, and territorial infrastructure, isn’t pandemic-ready. Our objective is to help the CDC best support PHAs in moving towards a modern public health data infrastructure. See our [public website](https://cdcgov.github.io/dibbs-site/) for more details.
+Current public health systems that digest, analyze, and respond to data are siloed. Lacking access to actionable data, our national, as well as state, local, and territorial infrastructure, isn’t pandemic-ready. Our objective is to help the CDC best support PHAs in moving towards a modern public health data infrastructure. See our [public website](https://dibbs.tools/) for more details.
 
 The current methods that public health jurisdictions use to collect data from HCOs can be time-consuming and cumbersome, often involving manual interventions like phone calls and faxes. The Query Connector aims to streamline the collection of health data using an intuitive querying process that can leverage QHINs within TEFCA or direct connections, thereby enabling data exchange from multiple HCOs for a variety of public health use cases such as newborn screening or STI case investigation.
-
-DIBBs Query Connector is a sibling project to
-
-- [DIBBs ECR Viewer](https://github.com/CDCgov/dibbs-ecr-viewer/) to further help display, access, and interpret public health data;
-- [PRIME ReportStream](https://reportstream.cdc.gov), which focuses on improving the delivery of COVID-19 test data to public health departments; and
-- [PRIME SimpleReport](https://simplereport.gov), which provides a better way for organizations and testing facilities to report COVID-19 rapid tests to public health departments.
 
 ## Documentation
 
@@ -87,8 +81,8 @@ unless pursuant to an existing contract or agreement.
 
 This repository contains only non-sensitive, publicly available data and
 information. All material and community participation is covered by the
-[Disclaimer](docs/disclaimer.mdx)
-and [Code of Conduct](https://github.com/CDCgov/template/blob/master/code-of-conduct.mdx).
+[Disclaimer](https://github.com/CDCgov/template/blob/main/DISCLAIMER.md)
+and [Code of Conduct](https://github.com/CDCgov/template/blob/main/code-of-conduct.md).
 For more information about CDC's privacy policy, please visit [http://www.cdc.gov/other/privacy.html](https://www.cdc.gov/other/privacy.html).
 
 ### Contributing Standard Notice
@@ -124,4 +118,4 @@ for more information about [contributing to this repository](https://github.com/
 [public domain notices and disclaimers](https://github.com/CDCgov/template/blob/master/DISCLAIMER.md),
 and [code of conduct](https://github.com/CDCgov/template/blob/master/code-of-conduct.md).
 
-**General disclaimer** This repository was created for use by CDC programs to collaborate on public health related projects in support of the [CDC mission](https://www.cdc.gov/about/organization/mission.htm). GitHub is not hosted by the CDC, but is a third party website used by CDC and its partners to share information and collaborate on software. CDC use of GitHub does not imply an endorsement of any one particular service, product, or enterprise.
+**General disclaimer** This repository was created for use by CDC programs to collaborate on public health related projects in support of the CDC mission. GitHub is not hosted by the CDC, but is a third party website used by CDC and its partners to share information and collaborate on software. CDC use of GitHub does not imply an endorsement of any one particular service, product, or enterprise.
