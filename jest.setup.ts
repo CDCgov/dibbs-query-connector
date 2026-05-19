@@ -1,10 +1,8 @@
 import "@testing-library/jest-dom";
-import { toHaveNoViolations } from "jest-axe";
 import * as matchers from "jest-extended";
 import { Pool } from "pg";
 import { dontUseOutsideConfigOrTests_getDbPool } from "./src/app/backend/db/config";
 
-expect.extend(toHaveNoViolations);
 expect.extend(matchers);
 global.MessagePort = require("node:worker_threads").MessagePort;
 
