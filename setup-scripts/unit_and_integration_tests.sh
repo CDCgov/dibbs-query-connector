@@ -1,6 +1,21 @@
 #!/bin/bash
 
 set -e # Exit immediately if a command exits with a non-zero status. Comment this if debugging in CI
+
+# On any error before tests run (most commonly: aidbox-seeder failing to come up),
+# dump compose logs so the actual failure is visible in CI output instead of just
+# the cryptic `service "aidbox-seeder" didn't complete successfully: exit 1`.
+dump_logs_on_failure() {
+  local code=$?
+  if [ $code -ne 0 ]; then
+    echo "=== docker compose logs (failure dump) ==="
+    docker compose -f docker-compose-integration.yaml logs --no-color || true
+    echo "=== end docker compose logs ==="
+  fi
+  return $code
+}
+trap dump_logs_on_failure ERR
+
 docker compose down --volumes --remove-orphans
 docker compose -f docker-compose-integration.yaml up -d
 
