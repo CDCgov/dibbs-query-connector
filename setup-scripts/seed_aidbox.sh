@@ -1,4 +1,5 @@
 #!/bin/bash
+set -o pipefail
 
 # Environment variables set by docker-compose
 BASE_URL=$1
@@ -11,31 +12,36 @@ DB_USERNAME="postgres"
 DB_PASSWORD="pw"
 DB_NAME="tefca_db"
 
-# Wait for Aidbox to be healthy
-echo "Waiting for Aidbox to become healthy..."
-max_retries=15
+# All curl invocations time-bound: --max-time caps each request so the seeder
+# can never hang silently in CI when aidbox is slow to respond.
+CURL_OPTS=(--silent --show-error --location --max-time 30)
+
+# Compose already gates this service on `aidbox: service_healthy`, so by the
+# time we run, /health should already be passing. The retry loop below is a
+# belt-and-suspenders safety net for cases where the healthcheck and the
+# seeder race (e.g. aidbox flapping immediately after first /health success).
+echo "Verifying Aidbox is healthy..."
+max_retries=30
 attempt=0
-while [ $attempt -le $max_retries ]; do
-  health_status=$(curl -v -L -o /dev/null -w "%{http_code}" ${NETWORK_URL}/health || echo "000")
+while [ $attempt -lt $max_retries ]; do
+  health_status=$(curl "${CURL_OPTS[@]}" -o /dev/null -w "%{http_code}" "${NETWORK_URL}/health" || echo "000")
   if [[ "$health_status" -ge 200 && "$health_status" -lt 300 ]]; then
     echo "Aidbox is healthy!"
     break
-  else
-    echo "Waiting for Aidbox health check to pass (status: $health_status)... Attempt $attempt/$max_retries"
-
-    if [ $attempt -eq $max_retries ]; then
-      echo "Maximum retry attempts reached. Exiting."
-      exit 1
-    fi
-
-    attempt=$((attempt + 1))
-    sleep 10
   fi
+  attempt=$((attempt + 1))
+  echo "Aidbox not ready yet (status: $health_status); attempt $attempt/$max_retries"
+  if [ $attempt -eq $max_retries ]; then
+    echo "Aidbox never became healthy. Dumping last response for debugging:"
+    curl "${CURL_OPTS[@]}" -v "${NETWORK_URL}/health" || true
+    exit 1
+  fi
+  sleep 5
 done
 
 # Get the access token
 echo "Getting access token..."
-TOKEN_RESPONSE=$(curl -L -X POST \
+TOKEN_RESPONSE=$(curl "${CURL_OPTS[@]}" -X POST \
   -H "Content-Type: application/json" \
   -d '{
     "client_id": "root",
@@ -57,7 +63,7 @@ echo "Access token obtained."
 
 # Post the GoldenSickPatient data to Aidbox
 echo "Loading GoldenSickPatient data into Aidbox..."
-curl -L -X POST \
+curl "${CURL_OPTS[@]}" -X POST \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer ${TOKEN}" \
   -d @"/data/GoldenSickPatient.json" \
@@ -67,7 +73,7 @@ echo "GoldenSickPatient data loaded successfully."
 
 # Client information for the SMART on FHIR test
 echo "Loading client information into Aidbox..."
-curl -L -X PUT \
+curl "${CURL_OPTS[@]}" -X PUT \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer ${TOKEN}" \
   -d '{
@@ -96,7 +102,7 @@ echo "Client information data loaded successfully."
 
 # Access policy information for the SMART on FHIR test
 echo "Loading access policy information into Aidbox.."
-curl -L -X PUT \
+curl "${CURL_OPTS[@]}" -X PUT \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer ${TOKEN}" \
   -d '{
