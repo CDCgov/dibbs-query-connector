@@ -37,7 +37,7 @@
     "csv-parse": "^6.1.0",
     "date-fns": "^4.1.0",
     "fhirpath": "^4.4.0",
-    "jose": "^5.2.2",
+    "jose": "^6.2.3",
     "next": "^15.5.18",
     "next-auth": "^5.0.0-beta.30",
     "next-nprogress-bar": "^2.4.4",
