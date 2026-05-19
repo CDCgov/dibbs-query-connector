@@ -1,6 +1,19 @@
 #!/bin/bash
 set -e  # Exit immediately if a command exits with a non-zero status. Comment this if debugging in CI
 
+# Surface compose logs on any startup failure so CI shows the real cause
+# (otherwise we only get `service "X" didn't complete successfully: exit 1`).
+dump_logs_on_failure() {
+  local code=$?
+  if [ $code -ne 0 ]; then
+    echo "=== docker compose logs (failure dump) ==="
+    docker compose -f docker-compose-e2e.yaml logs --no-color || true
+    echo "=== end docker compose logs ==="
+  fi
+  return $code
+}
+trap dump_logs_on_failure ERR
+
 chmod +x ./setup-scripts/setup_e2e.sh
 bash ./setup-scripts/setup_e2e.sh
 
@@ -9,7 +22,7 @@ echo "APP_HOSTNAME=http://query-connector:3000" >> .env.e2e
 echo "NEXT_PUBLIC_AUTH_PROVIDER=keycloak" >> .env.e2e
 
 docker compose down --volumes --remove-orphans
-docker compose -f docker-compose-e2e.yaml --env-file .env.e2e up -d --build 
+docker compose -f docker-compose-e2e.yaml --env-file .env.e2e up -d --build
 
 # uncomment these and the corresponding block in ci.yaml to get logs in CI. Make sure also to comment the set -e command at the top of this file too!
 # mkdir test-results

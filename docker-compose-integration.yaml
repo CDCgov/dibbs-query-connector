@@ -69,6 +69,17 @@ services:
       PGPASSWORD: gOxAmiyiz4
       PGPORT: "5432"
       BOX_SEARCH_INCLUDE_CONFORMANT: true
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          'wget -qO- http://localhost:8080/health | grep -q ''"status":"pass"'' || exit 1',
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 60
+      start_period: 30s
+
   aidbox-seeder:
     build:
       context: .
@@ -83,7 +94,7 @@ services:
       db:
         condition: service_healthy
       aidbox:
-        condition: service_started
+        condition: service_healthy
       flyway:
         condition: service_completed_successfully
 
