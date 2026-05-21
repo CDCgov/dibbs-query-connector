@@ -61,7 +61,25 @@ Username: qc-admin
 Password: QcDev2024!
 ```
 
-#### Running with Docker only
+#### Running the full stack in Docker
+
+The [docker-compose.complete.yaml](../../docker-compose.complete.yaml) file runs Keycloak, Aidbox, PostgreSQL, Flyway, and the Query Connector app entirely in containers. It reuses [docker-compose-dev.yaml](../../docker-compose-dev.yaml) for backends and layers app wiring from the e2e compose file.
+
+1. Complete the [Obtaining API and License Keys](#obtaining-api-and-license-keys) steps and create `.env` from `.env.sample` with `AUTH_DISABLED=false`.
+2. Start the stack: `docker compose -f docker-compose.complete.yaml up -d --build`
+3. Wait for Aidbox seeding: `docker compose -f docker-compose.complete.yaml logs -f aidbox-seeder` until you see `Finished configuring Aidbox and database.`
+4. Open the app at `http://localhost:3000`. Aidbox is at `http://localhost:8080`; Keycloak is at `http://localhost:8081`.
+
+| Service | Host port |
+|---------|-----------|
+| query-connector | 3000 |
+| Aidbox | 8080 |
+| Keycloak | 8081 |
+| PostgreSQL | 5432 |
+
+On first run, the database is pre-seeded from `vs_dump.sql`. To reload that dump on a fresh database, remove volumes first: `docker compose -f docker-compose.complete.yaml down -v`.
+
+#### Running with Docker only (app image + dev backends)
 
 1. Download a copy of the Docker image from the Query Connector repository by running `docker pull ghcr.io/cdcgov/dibbs-query-connector/query-connector:latest`.
    1. If you're using an M1 Mac, you'll need to tell Docker to pull the non-Apple Silicon image using `docker pull --platform linux/amd64 ghcr.io/cdcgov/dibbs-query-connector/query-connector:latest` since we don't have a image for Apple Silicon. If you're using this setup, there might be some issues with architecture incompatability that the team hasn't run into, so please flag if you run into something!

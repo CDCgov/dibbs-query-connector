@@ -1,0 +1,75 @@
+# Full stack in Docker: Keycloak, Aidbox, and query-connector.
+#
+# Prerequisites:
+#   cp .env.sample .env
+#   Set ERSD_API_KEY, UMLS_API_KEY, AIDBOX_LICENSE, and AUTH_DISABLED=false in .env
+#
+# Start:
+#   docker compose -f docker-compose.complete.yaml up -d --build
+#
+# Equivalent (without include):
+#   docker compose -f docker-compose-dev.yaml -f docker-compose.complete.yaml up -d --build
+#
+# Reset DB so vs_dump.sql runs on first init:
+#   docker compose -f docker-compose.complete.yaml down -v
+#
+# Wait for seeding:
+#   docker compose -f docker-compose.complete.yaml logs -f aidbox-seeder
+#   # until: "Finished configuring Aidbox and database."
+
+include:
+  - docker-compose-dev.yaml
+
+services:
+  db:
+    volumes:
+      - ./vs_dump.sql:/docker-entrypoint-initdb.d/vs_dump.sql
+      - db-data:/var/lib/postgresql
+
+  aidbox:
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          'wget -qO- http://localhost:8080/health | grep -q ''"status":"pass"'' || exit 1',
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 60
+      start_period: 30s
+
+  aidbox-seeder:
+    environment:
+      - AIDBOX_BASE_URL=http://aidbox:8080
+      - APP_HOSTNAME=http://query-connector:3000
+    depends_on:
+      db:
+        condition: service_healthy
+      aidbox:
+        condition: service_healthy
+      flyway:
+        condition: service_completed_successfully
+
+  query-connector:
+    extends:
+      file: docker-compose-e2e.yaml
+      service: query-connector
+    env_file: !override
+      - .env
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgres://postgres:pw@db:5432/tefca_db
+      - AUTH_URL=http://localhost:3000
+      - AUTH_DISABLED=false
+      - LOCAL_KEYCLOAK=http://localhost:8081/realms/master
+      - AUTH_ISSUER=http://localhost:8081/realms/master
+      - NAMED_KEYCLOAK=http://keycloak:8080/realms/master
+    volumes:
+      - ./keys:/app/keys
+    depends_on:
+      db:
+        condition: service_healthy
+      keycloak:
+        condition: service_started
+      aidbox-seeder:
+        condition: service_completed_successfully
