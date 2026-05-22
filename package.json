@@ -67,7 +67,7 @@
     "@smithy/util-stream": "^4.5.20",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
-    "@testing-library/react": "^16.2.0",
+    "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",
     "@types/base-64": "^1.0.2",
     "@types/fhir": "^0.0.40",
