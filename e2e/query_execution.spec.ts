@@ -122,7 +122,7 @@ test.describe("querying with the Query Connector", () => {
       page.getByRole("button", { name: "Observations", expanded: true }),
     ).toBeVisible();
     await expect(
-      page.getByRole("button", { name: "Medication Requests", expanded: true }),
+      page.getByRole("button", { name: "Medications", expanded: true }),
     ).toBeVisible();
 
     // We can also just directly ask the page to find us the number of rows

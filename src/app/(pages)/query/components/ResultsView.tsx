@@ -11,6 +11,7 @@ import Demographics from "./resultsView/tableComponents/Demographics";
 import DiagnosticReportTable from "./resultsView/tableComponents/DiagnosticReportTable";
 import EncounterTable from "./resultsView/tableComponents/EncounterTable";
 import MedicationRequestTable from "./resultsView/tableComponents/MedicationRequestTable";
+import MedicationStatementTable from "./resultsView/tableComponents/MedicationStatementTable";
 import ObservationTable from "./resultsView/tableComponents/ObservationTable";
 import Backlink from "../../../ui/designSystem/backLink/Backlink";
 import { RETURN_LABEL } from "@/app/(pages)/query/components/stepIndicator/StepIndicator";
@@ -156,6 +157,9 @@ function mapQueryResponseToAccordionDataStructure(
   const medicationRequests = resultsQueryResponse.MedicationRequest
     ? resultsQueryResponse.MedicationRequest
     : null;
+  const medicationStatements = resultsQueryResponse.MedicationStatement
+    ? resultsQueryResponse.MedicationStatement
+    : null;
   const immunizations = resultsQueryResponse.Immunization
     ? resultsQueryResponse.Immunization
     : null;
@@ -193,10 +197,36 @@ function mapQueryResponseToAccordionDataStructure(
       ) : null,
     },
     {
-      title: "Medication Requests",
-      content: medicationRequests ? (
-        <MedicationRequestTable medicationRequests={medicationRequests} />
-      ) : null,
+      title: "Medications",
+      content:
+        medicationRequests || medicationStatements ? (
+          <>
+            {medicationRequests && (
+              <>
+                <h4
+                  className={`${styles.accordionHeading} ${styles.subTableHeading}`}
+                >
+                  Medication Requests
+                </h4>
+                <MedicationRequestTable
+                  medicationRequests={medicationRequests}
+                />
+              </>
+            )}
+            {medicationStatements && (
+              <>
+                <h4
+                  className={`${styles.accordionHeading} ${styles.subTableHeading}`}
+                >
+                  Medication Statements
+                </h4>
+                <MedicationStatementTable
+                  medicationStatements={medicationStatements}
+                />
+              </>
+            )}
+          </>
+        ) : null,
     },
     {
       title: "Immunizations",

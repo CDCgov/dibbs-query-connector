@@ -4,6 +4,7 @@ import {
   formatContact,
   formatCoding,
   formatCodeableConcept,
+  formatCodeSystemPrefix,
   formatDate,
   formatIdentifier,
   formatName,
@@ -422,22 +423,24 @@ describe("formatCodeableConcept", () => {
     expect(getByText("Example Text")).toBeInTheDocument();
   });
 
-  it("should return the display, code, and system of the first coding object", () => {
+  it("should render the display and code of the first coding, with a friendly system label and no raw url", () => {
     const concept: CodeableConcept = {
       text: "Example Text",
       coding: [
         {
           display: "Example Display",
-          code: "Example Code",
-          system: "Example System",
+          code: "1665005",
+          system: "http://www.nlm.nih.gov/research/umls/rxnorm",
         },
       ],
     };
 
-    const { getByText } = render(formatCodeableConcept(concept));
+    const { getByText, queryByText } = render(formatCodeableConcept(concept));
     expect(getByText(/Example Display/)).toBeInTheDocument();
-    expect(getByText(/Example Code/)).toBeInTheDocument();
-    expect(getByText(/Example System/)).toBeInTheDocument();
+    // code is shown, prefixed by a friendly system label
+    expect(getByText(/RXNORM 1665005/)).toBeInTheDocument();
+    // the raw system url is not rendered
+    expect(queryByText(/http/)).not.toBeInTheDocument();
   });
 });
 
@@ -513,28 +516,53 @@ describe("formatCoding", () => {
     expect(result).toBe("");
   });
 
-  it("should return the display, code, and system", () => {
+  it("should render the display and code with a friendly system label and no raw url", () => {
     const coding: Coding = {
       display: "Example Display",
-      code: "Example Code",
-      system: "Example System",
+      code: "15628003",
+      system: "http://snomed.info/sct",
     };
 
-    const { getByText } = render(formatCoding(coding));
+    const { getByText, queryByText } = render(formatCoding(coding));
     expect(getByText(/Example Display/)).toBeInTheDocument();
-    expect(getByText(/Example Code/)).toBeInTheDocument();
-    expect(getByText(/Example System/)).toBeInTheDocument();
+    expect(getByText(/SNOMED 15628003/)).toBeInTheDocument();
+    expect(queryByText(/http/)).not.toBeInTheDocument();
   });
 
-  it("should return the parts of the display, code, and system", () => {
+  it("should render only the display name when the coding has no code", () => {
     const coding: Coding = {
       display: "Example Display",
-      system: "Example System",
+      system: "http://snomed.info/sct",
     };
 
     const { queryByText } = render(formatCoding(coding));
     expect(queryByText(/Example Display/)).toBeInTheDocument();
-    expect(queryByText(/Example Code/)).not.toBeInTheDocument();
-    expect(queryByText(/Example System/)).toBeInTheDocument();
+    // without a code there is no secondary line, and the raw url is never shown
+    expect(queryByText(/SNOMED/)).not.toBeInTheDocument();
+    expect(queryByText(/http/)).not.toBeInTheDocument();
+  });
+});
+
+describe("formatCodeSystemPrefix", () => {
+  it("returns friendly labels for well-known code systems", () => {
+    expect(
+      formatCodeSystemPrefix("http://www.nlm.nih.gov/research/umls/rxnorm"),
+    ).toBe("RXNORM");
+    expect(formatCodeSystemPrefix("http://snomed.info/sct")).toBe("SNOMED");
+    expect(formatCodeSystemPrefix("http://loinc.org")).toBe("LOINC");
+  });
+
+  it("strips the codesystem- prefix and .html suffix from hl7 doc-page systems", () => {
+    expect(
+      formatCodeSystemPrefix(
+        "http://hl7.org/fhir/codesystem-service-type.html",
+      ),
+    ).toBe("SERVICE-TYPE");
+  });
+
+  it("preserves the ICD-10 label", () => {
+    expect(formatCodeSystemPrefix("http://hl7.org/fhir/sid/icd-10-cm")).toBe(
+      "ICD-10",
+    );
   });
 });
