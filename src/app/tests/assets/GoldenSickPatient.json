@@ -10556,6 +10556,63 @@
         "method": "PUT",
         "url": "Encounter/22b3486d-269e-43b0-bfa9-2aaac9d92050"
       }
+    },
+    {
+      "fullUrl": "MedicationStatement/b7d3c2a1-4e5f-4a6b-8c9d-0e1f2a3b4c5d",
+      "resource": {
+        "resourceType": "MedicationStatement",
+        "id": "b7d3c2a1-4e5f-4a6b-8c9d-0e1f2a3b4c5d",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2024-04-23T11:06:48.000+00:00",
+          "source": "#UsEE2f93mG3wMjbq"
+        },
+        "status": "active",
+        "medicationCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+              "code": "1665005",
+              "display": "ceftriaxone 500 MG Injection"
+            }
+          ],
+          "text": "ceftriaxone 500 MG Injection"
+        },
+        "subject": {
+          "reference": "Patient/f288c654-6885-4f48-999c-48d776dc06af"
+        },
+        "effectiveDateTime": "2000-04-05",
+        "dateAsserted": "2000-04-06",
+        "reasonCode": [
+          {
+            "coding": [
+              {
+                "system": "http://id.who.int/icd/release/10/2019",
+                "code": "A54.9",
+                "display": "Gonococcal infection, unspecified"
+              },
+              {
+                "system": "http://snomed.info/sct",
+                "code": "15628003",
+                "display": "Gonorrhea (disorder)"
+              }
+            ],
+            "text": "Gonorrhea infection"
+          }
+        ],
+        "dosage": [
+          {
+            "text": "Ceftriaxone 500 mg injection as a single dose"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      },
+      "request": {
+        "method": "PUT",
+        "url": "MedicationStatement/b7d3c2a1-4e5f-4a6b-8c9d-0e1f2a3b4c5d"
+      }
     }
   ]
 }

@@ -441,7 +441,7 @@ async function checkForCancerMedication(
 
   if (medicationShouldExist) {
     await expect(
-      page.getByRole("button", { name: "Medication Requests", expanded: true }),
+      page.getByRole("button", { name: "Medications", expanded: true }),
     ).toBeVisible();
 
     await expect(
@@ -452,7 +452,7 @@ async function checkForCancerMedication(
     ).toHaveCount(1);
   } else {
     await expect(
-      page.getByRole("button", { name: "Medication Requests", expanded: true }),
+      page.getByRole("button", { name: "Medications", expanded: true }),
     ).not.toBeVisible();
   }
 }

@@ -238,6 +238,24 @@ export class CustomQuery {
         basePath: `/MedicationRequest/_search`,
         params: formattedParams,
       };
+
+      // MedicationStatement is a separate resource recording medications a
+      // patient is (or was) taking. Query it with the same RXNorm codes; its
+      // date search param is "effective" (not "authoredon").
+      const statementParams = new URLSearchParams();
+      statementParams.append("subject", `Patient/${patientId}`);
+      statementParams.append("code", medicationsFilter);
+      statementParams.append("_include", "MedicationStatement:medication");
+
+      if (medicationsTimeFilter) {
+        statementParams.append("effective", medicationsTimeFilter.startDate);
+        statementParams.append("effective", medicationsTimeFilter.endDate);
+      }
+
+      this.fhirResourceQueries["medicationStatement"] = {
+        basePath: `/MedicationStatement/_search`,
+        params: statementParams,
+      };
     }
   }
 
