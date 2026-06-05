@@ -10,6 +10,35 @@ import {
 } from "fhir/r4";
 
 /**
+ * Renders a single FHIR Coding for display: the human-readable name on the
+ * first line, with the code (prefixed by a friendly system label, e.g.
+ * "RXNORM 1665005") shown as muted secondary text. The raw system URL is
+ * omitted to keep result tables readable.
+ * @param coding - The Coding to render.
+ * @param fallbackText - Text to use as the primary name when the coding has
+ * no display value (e.g. the parent CodeableConcept's text).
+ * @returns The Coding formatted for display.
+ */
+function renderCoding(coding: Coding, fallbackText?: string) {
+  const primary = coding.display || fallbackText || coding.code || "";
+  const systemLabel = coding.system
+    ? formatCodeSystemPrefix(coding.system)
+    : undefined;
+  const codeLabel = [systemLabel, coding.code].filter(Boolean).join(" ");
+
+  return (
+    <>
+      {primary}
+      {coding.code && codeLabel !== primary && (
+        <span className="display-block font-body-2xs text-base-dark">
+          {codeLabel}
+        </span>
+      )}
+    </>
+  );
+}
+
+/**
  * Formats a CodeableConcept object for display. If the object has a coding array,
  * the first coding object is used.
  * @param concept - The CodeableConcept object.
@@ -23,13 +52,7 @@ export function formatCodeableConcept(concept: CodeableConcept | undefined) {
   if (!concept.coding || concept.coding.length === 0) {
     return concept.text || "";
   }
-  const coding = concept.coding[0];
-  return (
-    <>
-      {" "}
-      {coding.display} <br /> {coding.code} <br /> {coding.system}{" "}
-    </>
-  );
+  return renderCoding(concept.coding[0], concept.text);
 }
 
 /**
@@ -265,12 +288,7 @@ export function formatCoding(coding: Coding | undefined) {
   if (!coding) {
     return "";
   }
-  return (
-    <>
-      {" "}
-      {coding?.display} <br /> {coding?.code} <br /> {coding?.system}{" "}
-    </>
-  );
+  return renderCoding(coding);
 }
 
 /**
