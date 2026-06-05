@@ -336,6 +336,11 @@ export const formatCodeSystemPrefix = (system: string) => {
     case "hl7":
       const hl7Arr = system.split("/");
       result = hl7Arr[hl7Arr.length - 1];
+      // Some hl7 systems point at a documentation page (e.g.
+      // ".../codesystem-service-type.html"). Strip the file extension and the
+      // "codesystem-" prefix so it reads as "SERVICE-TYPE" instead of
+      // "CODESYSTEM-SERVICE-TYPE.HTML".
+      result = result.replace(/\.html?$/i, "").replace(/^codesystem-/i, "");
       if (result == "icd-10-cm") {
         result = result.slice(0, result.indexOf("-cm"));
       }

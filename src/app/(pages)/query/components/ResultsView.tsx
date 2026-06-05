@@ -203,7 +203,11 @@ function mapQueryResponseToAccordionDataStructure(
           <>
             {medicationRequests && (
               <>
-                <h4 className={styles.accordionHeading}>Medication Requests</h4>
+                <h4
+                  className={`${styles.accordionHeading} ${styles.subTableHeading}`}
+                >
+                  Medication Requests
+                </h4>
                 <MedicationRequestTable
                   medicationRequests={medicationRequests}
                 />
@@ -211,7 +215,9 @@ function mapQueryResponseToAccordionDataStructure(
             )}
             {medicationStatements && (
               <>
-                <h4 className={styles.accordionHeading}>
+                <h4
+                  className={`${styles.accordionHeading} ${styles.subTableHeading}`}
+                >
                   Medication Statements
                 </h4>
                 <MedicationStatementTable

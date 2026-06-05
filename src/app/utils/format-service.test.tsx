@@ -4,6 +4,7 @@ import {
   formatContact,
   formatCoding,
   formatCodeableConcept,
+  formatCodeSystemPrefix,
   formatDate,
   formatIdentifier,
   formatName,
@@ -539,5 +540,29 @@ describe("formatCoding", () => {
     // without a code there is no secondary line, and the raw url is never shown
     expect(queryByText(/SNOMED/)).not.toBeInTheDocument();
     expect(queryByText(/http/)).not.toBeInTheDocument();
+  });
+});
+
+describe("formatCodeSystemPrefix", () => {
+  it("returns friendly labels for well-known code systems", () => {
+    expect(
+      formatCodeSystemPrefix("http://www.nlm.nih.gov/research/umls/rxnorm"),
+    ).toBe("RXNORM");
+    expect(formatCodeSystemPrefix("http://snomed.info/sct")).toBe("SNOMED");
+    expect(formatCodeSystemPrefix("http://loinc.org")).toBe("LOINC");
+  });
+
+  it("strips the codesystem- prefix and .html suffix from hl7 doc-page systems", () => {
+    expect(
+      formatCodeSystemPrefix(
+        "http://hl7.org/fhir/codesystem-service-type.html",
+      ),
+    ).toBe("SERVICE-TYPE");
+  });
+
+  it("preserves the ICD-10 label", () => {
+    expect(formatCodeSystemPrefix("http://hl7.org/fhir/sid/icd-10-cm")).toBe(
+      "ICD-10",
+    );
   });
 });
