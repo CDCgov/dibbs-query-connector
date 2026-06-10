@@ -18,8 +18,9 @@ import {
   ConditionsMap,
   EMPTY_CONCEPT_TYPE,
   EMPTY_QUERY_SELECTION,
-  EMPTY_MEDICAL_RECORD_SECTIONS,
+  DEFAULT_MEDICAL_RECORD_SECTIONS,
   MedicalRecordSections,
+  normalizeMedicalRecordSections,
 } from "../utils";
 import { ConditionSelection } from "../components/ConditionSelection";
 import { ValueSetSelection } from "../components/ValueSetSelection";
@@ -97,7 +98,7 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
 
   const [medicalRecordSections, setMedicalRecordSections] =
     useState<MedicalRecordSections>(() =>
-      structuredClone(EMPTY_MEDICAL_RECORD_SECTIONS),
+      structuredClone(DEFAULT_MEDICAL_RECORD_SECTIONS),
     );
 
   const [formError, setFormError] = useState<FormError>({
@@ -142,7 +143,7 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
     setQueryName(undefined);
     setSelectedQuery(structuredClone(EMPTY_QUERY_SELECTION));
     setConstructedQuery(structuredClone({}));
-    setMedicalRecordSections(structuredClone(EMPTY_MEDICAL_RECORD_SECTIONS));
+    setMedicalRecordSections(structuredClone(DEFAULT_MEDICAL_RECORD_SECTIONS));
   }
 
   function goBack() {
@@ -167,7 +168,9 @@ const BuildFromTemplates: React.FC<BuildFromTemplatesProps> = ({
       if (!savedQuery) return;
 
       // Set the booleans for medical record sections
-      setMedicalRecordSections(savedQuery.medicalRecordSections);
+      setMedicalRecordSections(
+        normalizeMedicalRecordSections(savedQuery.medicalRecordSections),
+      );
 
       const initialState: NestedQuery = {};
       Object.entries(savedQuery.queryData).forEach(

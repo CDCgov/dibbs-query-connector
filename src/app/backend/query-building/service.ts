@@ -7,6 +7,7 @@ import type {
   NestedQuery,
   QueryTableResult,
 } from "@/app/(pages)/queryBuilding/utils";
+import { normalizeMedicalRecordSections } from "@/app/(pages)/queryBuilding/utils";
 import { adminRequired, transaction } from "../db/decorators";
 import {
   deleteQueryByIdHelp,
@@ -89,6 +90,9 @@ class QueryBuildingService {
       // followup to get timeboxing information
 
       foundQuery.timeboxWindows = timeboxInfo;
+      foundQuery.medicalRecordSections = normalizeMedicalRecordSections(
+        foundQuery.medicalRecordSections as Partial<MedicalRecordSections>,
+      );
       return foundQuery as unknown as QueryTableResult;
     } catch (error) {
       console.error("Error retrieving query:", error);
@@ -147,7 +151,9 @@ class QueryBuildingService {
         formattedData[queryId] = {
           queryId,
           queryName,
-          medicalRecordSections,
+          medicalRecordSections: normalizeMedicalRecordSections(
+            medicalRecordSections,
+          ),
           conditionsList,
           valuesets: [],
         };
@@ -207,7 +213,9 @@ class QueryBuildingService {
         queryId,
         queryName,
         queryData,
-        medicalRecordSections,
+        medicalRecordSections: normalizeMedicalRecordSections(
+          medicalRecordSections,
+        ),
         conditionsList,
         valuesets: [],
       };

@@ -1,6 +1,7 @@
 import {
   MedicalRecordSections,
   NestedQuery,
+  normalizeMedicalRecordSections,
   QueryTableResult,
   QueryUpdateResult,
 } from "@/app/(pages)/queryBuilding/utils";
@@ -95,7 +96,15 @@ export async function getSavedQueryByIdHelp(
       console.info("No results found for query id:", id);
       return undefined;
     }
-    return result.rows[0] as unknown as QueryTableResult;
+    // DbService camelCases row keys but a raw Pool (used in Playwright setup)
+    // returns snake_case, so check both before normalizing
+    const row = result.rows[0] as unknown as QueryTableResult & {
+      medical_record_sections?: Partial<MedicalRecordSections>;
+    };
+    row.medicalRecordSections = normalizeMedicalRecordSections(
+      row.medicalRecordSections ?? row.medical_record_sections,
+    );
+    return row as QueryTableResult;
   } catch (error) {
     console.error("Error retrieving query", error);
     throw error;

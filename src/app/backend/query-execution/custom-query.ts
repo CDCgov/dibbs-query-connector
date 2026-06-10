@@ -1,5 +1,6 @@
 import {
   MedicalRecordSections,
+  normalizeMedicalRecordSections,
   QueryDataColumn,
   QueryTableResult,
   QueryTableTimebox,
@@ -59,7 +60,9 @@ export class CustomQuery {
     try {
       this.patientId = patientId;
       const queryData = savedQuery.queryData;
-      const medicalRecordSection = savedQuery.medicalRecordSections;
+      const medicalRecordSection = normalizeMedicalRecordSections(
+        savedQuery.medicalRecordSections,
+      );
       const timeboxInfo = savedQuery.timeboxWindows;
 
       this.initializeQueryConceptTypes(queryData);
@@ -106,9 +109,10 @@ export class CustomQuery {
    * the provided spec (e.g. a Newborn Screening case will have no rxnorm codes),
    * any query built using those codes' filter will be left as the empty string.
    * @param patientId The ID of the patient to query for.
-   * @param medicalRecordSections Object containing booleans for each section (e.g. immunization, socialDeterminants)
-   * @param medicalRecordSections.immunization Boolean indicating if immunization section is included
-   * @param medicalRecordSections.socialDeterminants Boolean indicating if socialDeterminants section is included
+   * @param medicalRecordSections Object containing a boolean for each medical
+   * record section. Core sections (labs, encounters, conditions, medications)
+   * gate the code-driven resource queries; additive sections (immunizations,
+   * socialDeterminants, serviceRequests) opt into extra resource queries.
    * @param timeboxInfo Time filtering information
    */
   compileFhirResourceQueries(
@@ -168,7 +172,7 @@ export class CustomQuery {
       };
     }
 
-    if (labsFilter !== "") {
+    if (medicalRecordSections.labs && labsFilter !== "") {
       const formattedParams = new URLSearchParams();
       formattedParams.append("subject", `Patient/${patientId}`);
       formattedParams.append("code", labsFilter);
@@ -189,7 +193,7 @@ export class CustomQuery {
       };
     }
 
-    if (conditionsFilter !== "") {
+    if (medicalRecordSections.encounters && conditionsFilter !== "") {
       const encounterParams = new URLSearchParams();
       encounterParams.append("subject", `Patient/${patientId}`);
       encounterParams.append("reason-code", conditionsFilter);
@@ -203,7 +207,9 @@ export class CustomQuery {
         basePath: `/Encounter/_search`,
         params: encounterParams,
       };
+    }
 
+    if (medicalRecordSections.conditions && conditionsFilter !== "") {
       const conditionParams = new URLSearchParams();
       conditionParams.append("subject", `Patient/${patientId}`);
       conditionParams.append("code", conditionsFilter);
@@ -218,7 +224,7 @@ export class CustomQuery {
       };
     }
 
-    if (medicationsFilter !== "") {
+    if (medicalRecordSections.medications && medicationsFilter !== "") {
       // Medications are representations of drugs independent of patient resources.
       // Sometimes we need the extra info from the medication to display in the
       // UI: that's what the ":medication" is doing and similarly for revinclude
