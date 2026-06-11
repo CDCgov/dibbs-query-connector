@@ -4,7 +4,7 @@
 
 Thank you for your interest in contributing to the DIBBs Query Connector project, part of the CDC's Office of Public Health Data, Surveillance, and Technology (OPDHST) Data Modernization Initiative. This is a multi-year effort to improve data quality and information technology systems in state and local health departments. There are many ways to contribute, including writing tutorials or blog posts, improving the documentation, submitting bug reports and feature requests, and writing code for the project itself.
 
-Before contributing, we encourage you to also read our [LICENSE](https://github.com/CDCgov/dibbs-query-connector/blob/main/LICENSE.md) and
+Before contributing, we encourage you to read our [LICENSE](https://github.com/CDCgov/dibbs-query-connector/blob/main/LICENSE.md) and
 [README](https://github.com/CDCgov/dibbs-query-connector/blob/main/README.md),
 also found in this repository. If you have any questions that aren't
 answered in this repository, feel free to [contact us](mailto:dibbs@cdc.gov).
@@ -41,7 +41,7 @@ If you want to contribute a new feature or a bug fix, we ask that you follow a f
 ### Fork and clone the repository
 
 You need to fork the main code or documentation repository and clone it to your local machine. See
-[github help page](https://help.github.com/articles/fork-a-repo) for help.
+[GitHub help page](https://help.github.com/articles/fork-a-repo) for help.
 
 Create a branch for your work.
 
@@ -73,7 +73,7 @@ Supported hardware for PHDI tools includes:
 
 - Linux
 - Windows 10/11
-- Mac (Intel or Apple silicone)
+- Mac (Intel or Apple silicon)
 
 ##### Code coverage guidelines
 
@@ -81,13 +81,13 @@ We recognize there's a lot of human judgment when it comes to writing test cases
 
 1. **We strive for 85% repository coverage at all times.** There's no magic number when it comes to assessing coverage quality. A high coverage percentage doesn't actually guarantee high-quality testing, and focusing too much on getting a coverage number as close to 100% as possible could lead to a false sense of security as well as wasted time and effort. At the same time, it's important we ensure that our tools are tested in a robust way. A coverage statistic of 85% strikes a balance between fixating on the coverage percent and keeping tests robust and accountable.
 
-2. **Any public-facing functions should include at least one test case.** If a user can call function, we want that function to have documented test coverage. Ideally, functions should have multiple tests (see below), but at a minimum, any public function should have at least one. For private or helper functions, discretion is given to the developer, but the principles below might suggest test cases for those, too.
+2. **Any public-facing functions should include at least one test case.** If a user can call a function, we want that function to have documented test coverage. Ideally, functions should have multiple tests (see below), but at a minimum, any public function should have at least one. For private or helper functions, discretion is given to the developer, but the principles below might suggest test cases for those, too.
 
 3. **Broadly speaking, tests should address, at a minimum, three areas: the most-likely scenarios, the most complex scenarios, and the most painful failure scenarios.** It's not practical to write tests for every permutation of inputs and results, but we can anticipate the types of use cases that are most likely to come up. Ideally, a function should have one or more tests that demonstrate success and/or failure in its most common use-case(s). Additionally, functions that have complex interactions—whether with their parameters, internal logic, dependencies, etc.—should have tests addressing the robustness of that logic in the face of multiple settings or interactions (for example, a function which accepts 6 configurable parameters might have tests of that function with 4 or even 5 permutations of parameter settings). Finally, if a piece of code could generate a particularly painful result for a user if it were to break, that code should have tests in place around how those issues are handled.
 
 The points above are our goals when it comes to testing and code coverage; they're principles we're always striving to uphold. Below, we've listed some of the more practical, actionable kinds of tests that stem from these principles. We believe that **specific tests should exist to cover, as much as possible, the following cases:**
 
-- _Sucess and failure cases:_ Functions should have one or more tests showing that the function performs its intended job successfully, as well as one or more tests showing how the function handles a failure case or a case where processing isn't possible.
+- _Success and failure cases:_ Functions should have one or more tests showing that the function performs its intended job successfully, as well as one or more tests showing how the function handles a failure case or a case where processing isn't possible.
 - _All input and output data types:_ Functions should have one or more tests showing, for each possible input or output data type, how the function performs when it receives or creates that data type.
 - _Explicitly raised exceptions:_ If an exception is raised in the body code of a function, even if it's a conditional exception, one or more tests should exist showing that exception being raised.
 - _Edge cases (within reason):_ If a function might deal with edge cases in its processing (an empty list or dictionary parameter, for example), one or more tests should exist showing how the function behaves under those conditions.
