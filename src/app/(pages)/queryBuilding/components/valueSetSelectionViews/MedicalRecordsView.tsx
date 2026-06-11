@@ -1,9 +1,20 @@
 import { Checkbox } from "@trussworks/react-uswds";
 import styles from "../../buildFromTemplates/conditionTemplateSelection.module.scss";
 import {
-  EMPTY_MEDICAL_RECORD_SECTIONS,
+  MEDICAL_RECORD_SECTION_KEYS,
+  MedicalRecordSectionKey,
   MedicalRecordSections,
 } from "../../utils";
+
+const sectionLabels: Record<MedicalRecordSectionKey, string> = {
+  labs: "Include lab results (observations & diagnostic reports)",
+  encounters: "Include encounters",
+  conditions: "Include conditions",
+  medications: "Include medications (requests & statements)",
+  immunizations: "Include immunizations",
+  socialDeterminants: "Include social determinants",
+  serviceRequests: "Include service requests",
+};
 
 type MedicalRecordsViewProps = {
   medicalRecordSections: MedicalRecordSections;
@@ -19,7 +30,7 @@ export const MedicalRecordsView: React.FC<MedicalRecordsViewProps> = ({
   return (
     <div className={styles.medicalRecordSectionControls}>
       <div className={(styles.medicalRecordSectionControls, "padding-4")}>
-        {Object.keys(EMPTY_MEDICAL_RECORD_SECTIONS).map((key) => (
+        {MEDICAL_RECORD_SECTION_KEYS.map((key) => (
           <div key={key} className={styles.medicalRecordSectionRow}>
             <div
               data-testid={`container-medical-record-section-checkbox-${key}`}
@@ -27,16 +38,11 @@ export const MedicalRecordsView: React.FC<MedicalRecordsViewProps> = ({
               <Checkbox
                 id={`medical-record-section-checkbox-${key}`}
                 name={`medical-record-section-checkbox-${key}`}
-                label={`Include ${key
-                  .replace(/([A-Z])/g, " $1")
-                  .toLowerCase()}`}
+                label={sectionLabels[key]}
                 checked={
-                  !!(
-                    medicalRecordSections &&
-                    medicalRecordSections[key as keyof MedicalRecordSections]
-                  )
+                  !!(medicalRecordSections && medicalRecordSections[key])
                 }
-                aria-label={`Select medical recored section ${key}`}
+                aria-label={`Select medical record section ${key}`}
                 onChange={(e) =>
                   setMedicalRecordSections((prev) => ({
                     ...prev,

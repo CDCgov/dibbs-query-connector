@@ -18,8 +18,8 @@ import { DibbsValueSet } from "@/app/models/entities/valuesets";
 import { CustomCodeMode, emptyFilterSearch, emptyValueSet } from "./utils";
 import {
   ConditionsMap,
-  EMPTY_MEDICAL_RECORD_SECTIONS,
   formatDiseaseDisplay,
+  normalizeMedicalRecordSections,
 } from "../queryBuilding/utils";
 import Highlighter from "react-highlight-words";
 import Skeleton from "react-loading-skeleton";
@@ -233,8 +233,9 @@ const CodeLibrary: React.FC = () => {
     // even if we didn't insert new valuesets, we still need to shape and return the existing query
     if (result.success) {
       const updatedQuery = await getSavedQueryById(ctx.selectedQuery.queryId);
-      const medicalRecordSections =
-        updatedQuery?.medicalRecordSections || EMPTY_MEDICAL_RECORD_SECTIONS;
+      const medicalRecordSections = normalizeMedicalRecordSections(
+        updatedQuery?.medicalRecordSections,
+      );
       let constructedQuery: NestedQuery = {};
       if (updatedQuery?.queryData) {
         Object.entries(

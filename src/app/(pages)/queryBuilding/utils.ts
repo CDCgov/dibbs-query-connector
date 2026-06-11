@@ -32,14 +32,40 @@ export type NestedQuery = {
   };
 };
 
-export const MEDICAL_RECORD_SECTION_KEYS = [
+/**
+ * Sections that add data beyond the query's selected codes. Default OFF.
+ */
+export const ADDITIVE_MEDICAL_RECORD_SECTION_KEYS = [
   "immunizations",
   "socialDeterminants",
   "serviceRequests",
 ] as const;
 
+/**
+ * Sections gating the code-driven resource queries (labs -> Observation /
+ * DiagnosticReport, encounters -> Encounter, conditions -> Condition,
+ * medications -> MedicationRequest / MedicationStatement). Default ON.
+ */
+export const CORE_MEDICAL_RECORD_SECTION_KEYS = [
+  "labs",
+  "encounters",
+  "conditions",
+  "medications",
+] as const;
+
+/**
+ * All medical record section keys; array order is the UI checkbox order.
+ */
+export const MEDICAL_RECORD_SECTION_KEYS = [
+  ...CORE_MEDICAL_RECORD_SECTION_KEYS,
+  ...ADDITIVE_MEDICAL_RECORD_SECTION_KEYS,
+] as const;
+
+export type MedicalRecordSectionKey =
+  (typeof MEDICAL_RECORD_SECTION_KEYS)[number];
+
 export type MedicalRecordSections = {
-  [K in (typeof MEDICAL_RECORD_SECTION_KEYS)[number]]: boolean;
+  [K in MedicalRecordSectionKey]: boolean;
 };
 
 export type QueryUpdateResult = {
@@ -83,6 +109,37 @@ export const EMPTY_MEDICAL_RECORD_SECTIONS: MedicalRecordSections =
     acc[key] = false;
     return acc;
   }, {} as MedicalRecordSections);
+
+/**
+ * Default section selections for a query: core (code-driven) sections on,
+ * additive sections off — matching execution behavior before sections were
+ * user-selectable.
+ */
+export const DEFAULT_MEDICAL_RECORD_SECTIONS: MedicalRecordSections =
+  MEDICAL_RECORD_SECTION_KEYS.reduce((acc, key) => {
+    acc[key] = (
+      CORE_MEDICAL_RECORD_SECTION_KEYS as readonly MedicalRecordSectionKey[]
+    ).includes(key);
+    return acc;
+  }, {} as MedicalRecordSections);
+
+/**
+ * Fills in any missing section keys with their defaults so that queries saved
+ * before a section existed (or with a NULL medical_record_sections column)
+ * keep their original execution behavior. Explicitly saved false values are
+ * preserved.
+ * @param sections - a possibly partial or missing sections object, e.g. from
+ * a saved query row
+ * @returns a complete MedicalRecordSections object
+ */
+export function normalizeMedicalRecordSections(
+  sections: Partial<MedicalRecordSections> | null | undefined,
+): MedicalRecordSections {
+  return MEDICAL_RECORD_SECTION_KEYS.reduce((acc, key) => {
+    acc[key] = sections?.[key] ?? DEFAULT_MEDICAL_RECORD_SECTIONS[key];
+    return acc;
+  }, {} as MedicalRecordSections);
+}
 
 /**
  * Utility method to get a display name for a category (if overridden),
