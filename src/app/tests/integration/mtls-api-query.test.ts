@@ -373,6 +373,7 @@ describe("API Query with Mutual TLS", () => {
         disableCertValidation: false,
         defaultServer: false,
         authType: "mutual-tls",
+        endpointType: "fanout",
       } as FhirServerConfig;
 
       const {

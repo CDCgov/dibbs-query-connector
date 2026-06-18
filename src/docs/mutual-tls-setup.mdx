@@ -80,11 +80,29 @@ npm run test:playwright -- mtls.spec.ts
 3. Fill in server details:
    - **Server name**: "eHX VAL (mTLS)"
    - **URL**: https://fhir002val.ehealthexchange.org/ehx/1.0/r4/cdex
-   - **Auth Method**: None
-   - **Enable Mutual TLS**: Check this box
-   - **Custom Headers**: Add any required headers
+   - **Endpoint Type**: Choose how the server is queried (see below)
+   - **Auth Method**: Mutual TLS
+   - **Custom Headers**: Add any required headers (e.g. `X-POU`, `X-DESTINATION`)
 4. Click "Test connection" to verify
 5. Click "Add server" to save
+
+### Endpoint Type
+
+The **Endpoint Type** controls which resource the connection check probes and how
+patient discovery is routed. It is independent of the auth method, so a mutual-TLS
+server can be any of the three types:
+
+- **Standard FHIR** – probes `/Patient` and uses a direct `/Patient` search for
+  patient discovery.
+- **Immunization Gateway** – probes `/Immunization`. Patient discovery still uses
+  the standard `/Patient` path, then immunization records are pulled with
+  `/Immunization?subject=Patient/{id}`. Choose this for an eHealth Exchange
+  immunization gateway (e.g. `IZGUAT`).
+- **Fanout (Task)** – probes `/Task` and performs TEFCA-style fanout discovery by
+  POSTing a `/Task` resource and polling for child tasks.
+
+> Existing mutual-TLS servers were automatically migrated to **Fanout (Task)** to
+> preserve their prior behavior. New servers default to **Standard FHIR**.
 
 ### 2. Test Patient Discovery
 

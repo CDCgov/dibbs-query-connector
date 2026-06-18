@@ -69,6 +69,7 @@ describe("Query Execution with Mutual TLS", () => {
       name: "Test mTLS Server",
       hostname: "https://mtls.example.com/fhir",
       authType: "mutual-tls",
+      endpointType: "fanout",
       disableCertValidation: false,
       defaultServer: false,
     } as FhirServerConfig;
@@ -382,6 +383,7 @@ describe("Query Execution with Mutual TLS", () => {
       const nonMtlsServerConfig = {
         ...mockServerConfig,
         authType: "none",
+        endpointType: "standard",
       };
 
       const {
