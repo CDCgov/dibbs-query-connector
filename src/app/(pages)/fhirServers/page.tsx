@@ -24,6 +24,23 @@ export type AuthMethodType =
   | "SMART"
   | "mutual-tls";
 
+/**
+ * The kind of FHIR endpoint a server exposes. Drives which resource the
+ * connection check probes and how patient discovery is routed:
+ * - "standard": direct /Patient search and clinical record queries
+ * - "immunization": an Immunization Gateway (probes /Immunization), discovery
+ *   still uses the standard /Patient path
+ * - "fanout": TEFCA-style fanout via /Task resources (POST + polling)
+ */
+export type EndpointType = "standard" | "immunization" | "fanout";
+
+/** Human-readable labels for each endpoint type, shown in the server list. */
+const ENDPOINT_TYPE_LABELS: Record<EndpointType, string> = {
+  standard: "Standard FHIR",
+  immunization: "Immunization Gateway",
+  fanout: "Fanout (Task)",
+};
+
 export type FormError = {
   [tokenField: string]: boolean;
 };
@@ -92,6 +109,7 @@ const FhirServers: React.FC = () => {
               <th>FHIR server</th>
               <th>URL</th>
               <th>Auth Method</th>
+              <th>Endpoint Type</th>
               <th>Status</th>
             </tr>
           </thead>
@@ -128,6 +146,13 @@ const FhirServers: React.FC = () => {
                   <td>
                     {fhirServer.authType ||
                       (fhirServer.headers?.Authorization ? "basic" : "none")}
+                  </td>
+                  <td>
+                    {
+                      ENDPOINT_TYPE_LABELS[
+                        fhirServer.endpointType ?? "standard"
+                      ]
+                    }
                   </td>
                   <td width={480}>
                     <div className="grid-container grid-row padding-0 display-flex flex-align-center">

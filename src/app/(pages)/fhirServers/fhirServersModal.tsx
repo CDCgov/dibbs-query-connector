@@ -19,7 +19,7 @@ import {
   useReducer,
   useState,
 } from "react";
-import { AuthMethodType, FormError, ModalMode } from "./page";
+import { AuthMethodType, EndpointType, FormError, ModalMode } from "./page";
 import { FhirServerConfig } from "@/app/models/entities/fhir-servers";
 import {
   AuthData,
@@ -69,6 +69,7 @@ const EMPTY_FHIR_SERVER = {
   hostname: "",
   disableCertValidation: false,
   defaultServer: false,
+  endpointType: "standard",
 } as FhirServerConfig;
 
 type FhirServersModal = {
@@ -100,6 +101,7 @@ interface UpdateFormAction {
   name?: string;
   disableCertValidation?: boolean;
   defaultServer?: boolean;
+  endpointType?: EndpointType;
   hostname?: string;
   headers?: Record<string, string>;
   clientId?: string;
@@ -154,6 +156,7 @@ function formUpdateReducer(server: FhirServerConfig, action: UpdateFormAction) {
         hostname: action.hostname ?? server.hostname,
         disableCertValidation:
           action.disableCertValidation ?? server.disableCertValidation,
+        endpointType: action.endpointType ?? server.endpointType,
         authType: newAuthType,
         defaultServer: action.defaultServer ?? server.defaultServer,
         // Clear caCert when switching away from mutual-tls
@@ -1037,6 +1040,7 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
         ? server?.scopes
         : undefined,
     caCert: server.authType === "mutual-tls" ? server?.caCert : undefined,
+    endpointType: server.endpointType ?? "standard",
   });
 
   const resetModalState = () => {
@@ -1134,6 +1138,30 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
             : `Enter a valid server URL.`}
         </div>
       )}
+      <Label htmlFor="endpoint-type">Endpoint Type</Label>
+      <div className="usa-hint margin-bottom-1 margin-top-05">
+        Determines which resource is queried: Standard FHIR uses /Patient,
+        Immunization Gateway uses /Immunization, and Fanout uses /Task-based
+        discovery.
+      </div>
+      <select
+        className="usa-select margin-top-05"
+        id="endpoint-type"
+        data-testid="endpoint-type"
+        name="endpoint-type"
+        value={server.endpointType ?? "standard"}
+        onChange={(e) => {
+          serverDispatch({
+            type: "common",
+            endpointType: (e.target.value as EndpointType) ?? "standard",
+          });
+        }}
+      >
+        <option value="standard">Standard FHIR</option>
+        <option value="immunization">Immunization Gateway</option>
+        <option value="fanout">Fanout (Task)</option>
+      </select>
+
       <Label htmlFor="auth-method">Auth Method</Label>
       <select
         className="usa-select margin-top-05"

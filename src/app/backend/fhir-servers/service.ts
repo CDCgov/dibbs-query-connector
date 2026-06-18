@@ -5,7 +5,7 @@ import FHIRClient from "@/app/backend/fhir-servers/fhir-client";
 import dbService from "../db/service";
 import { transaction } from "../db/decorators";
 import { FHIR_SERVER_INSERT_QUERY } from "../db/util";
-import { AuthMethodType } from "@/app/(pages)/fhirServers/page";
+import { AuthMethodType, EndpointType } from "@/app/(pages)/fhirServers/page";
 
 // Define an interface for authentication data
 export interface AuthData {
@@ -19,6 +19,7 @@ export interface AuthData {
   tokenExpiry?: string;
   headers?: Record<string, string>;
   caCert?: string;
+  endpointType?: EndpointType;
 }
 
 // Define an interface for patient match configuration
@@ -174,7 +175,8 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
       access_token = $13,
       token_expiry = $14,
       ca_cert = $15,
-      patient_match_configuration = $16
+      patient_match_configuration = $16,
+      endpoint_type = $17
     WHERE id = $1
     RETURNING *;
   `;
@@ -233,6 +235,7 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
         authData?.tokenExpiry || null,
         authData?.caCert || null,
         patientMatchConfigObject,
+        authData?.endpointType || "standard",
       ]);
 
       // Clear the cache so the next getFhirServerConfigs call will fetch fresh data
@@ -335,6 +338,7 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
         authData?.tokenExpiry || null,
         authData?.caCert || null,
         patientMatchConfigObject,
+        authData?.endpointType || "standard",
       ]);
 
       // Clear the cache so the next getFhirServerConfigs call will fetch fresh data

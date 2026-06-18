@@ -353,6 +353,89 @@ describe("FhirServersModal", () => {
     });
   });
 
+  describe("Endpoint Type", () => {
+    it("defaults to Standard FHIR and can be changed", async () => {
+      const user = userEvent.setup();
+
+      render(<FhirServersModal {...defaultProps} />);
+
+      const endpointTypeSelect = screen.getByTestId("endpoint-type");
+      expect(endpointTypeSelect).toHaveValue("standard");
+
+      await user.selectOptions(endpointTypeSelect, "immunization");
+      expect(endpointTypeSelect).toHaveValue("immunization");
+    });
+
+    it("includes the selected endpoint type in the submit payload", async () => {
+      const mockInsertFhirServer =
+        require("@/app/backend/fhir-servers/service").insertFhirServer;
+      mockInsertFhirServer.mockResolvedValue({
+        success: true,
+        server: { id: "new-id" },
+      });
+
+      const user = userEvent.setup();
+
+      render(<FhirServersModal {...defaultProps} />);
+
+      await user.type(screen.getByTestId("server-name"), "IZ Gateway");
+      await user.type(
+        screen.getByTestId("server-url"),
+        "https://iz.example.com/fhir",
+      );
+      await user.selectOptions(
+        screen.getByTestId("endpoint-type"),
+        "immunization",
+      );
+
+      const addButton = screen.getByRole("button", { name: /Add server/i });
+      await user.click(addButton);
+
+      await waitFor(() => {
+        expect(mockInsertFhirServer).toHaveBeenCalledWith(
+          "IZ Gateway",
+          "https://iz.example.com/fhir",
+          false,
+          false,
+          true,
+          expect.objectContaining({
+            endpointType: "immunization",
+          }),
+          expect.any(Object),
+        );
+      });
+    });
+
+    it("populates endpoint type when editing an existing server", async () => {
+      const fanoutServer: FhirServerConfig = {
+        id: "fanout-1",
+        name: "Fanout Server",
+        hostname: "https://fanout.example.com/fhir",
+        authType: "mutual-tls",
+        endpointType: "fanout",
+        disableCertValidation: false,
+        defaultServer: false,
+        patientMatchConfiguration: {
+          enabled: false,
+          onlySingleMatch: false,
+          onlyCertainMatches: false,
+          matchCount: 0,
+          supportsMatch: false,
+        },
+      };
+
+      render(
+        <FhirServersModal
+          {...defaultProps}
+          modalMode="edit"
+          serverToEdit={fanoutServer}
+        />,
+      );
+
+      expect(screen.getByTestId("endpoint-type")).toHaveValue("fanout");
+    });
+  });
+
   describe("Form validation", () => {});
 
   describe("Server updates", () => {
