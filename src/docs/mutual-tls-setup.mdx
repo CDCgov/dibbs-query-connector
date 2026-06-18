@@ -17,7 +17,6 @@ You'll need a certificate and private key pair for mTLS authentication. These ca
 
 Follow the instructions from [EMR Direct](https://www.emrdirect.com/kb/sequoia-initiatives/VAL-EMR-Direct-Cert-Workflow-Documentation) to obtain your mTLS certificates.
 
-````bash
 ### 2. Certificate Placement
 
 The application looks for certificates in two places:
@@ -31,17 +30,15 @@ The application looks for certificates in two places:
 
 2. **Environment Variables** (preferred for production):
 
-   - For ease of configuration, the env vars are required to be base-64 encoded.
-   - Configure your env vars with the encoding method of your choice according to the below:
-   ```bash
-   export MTLS_CERT="base64Encode(-----BEGIN CERTIFICATE-----
-   [certificate content]
-   -----END CERTIFICATE-----)"
+   - `MTLS_CERT` and `MTLS_KEY` must hold the **base64-encoded PEM contents** —
+     not a file path. On first use they are decoded and written to the `keys/`
+     directory.
+   - Encode each PEM file and set the variables, for example:
 
-   export MTLS_KEY="base64Encode(-----BEGIN PRIVATE KEY-----
-   [private key content]
-   -----END PRIVATE KEY-----)"
-````
+   ```bash
+   export MTLS_CERT="$(base64 -w0 mtls-cert.pem)"
+   export MTLS_KEY="$(base64 -w0 mtls-key.pem)"
+   ```
 
 ## Running Tests
 
@@ -49,12 +46,11 @@ The application looks for certificates in two places:
 
 ```bash
 # Run all mTLS-related unit tests
-npm run test:unit -- mtls
+npm run test:unit:file -- mtls
 
-# Run specific test files
-npm run test:unit -- src/app/shared/mtls-utils.test.ts
-npm run test:unit -- src/app/backend/fhir-servers.test.ts
-npm run test:unit -- src/app/shared/fhirClient.test.ts
+# Run specific test files (by path pattern)
+npm run test:unit:file -- mtls-utils
+npm run test:unit:file -- fhir-client-mtls
 ```
 
 ### Integration Tests
@@ -67,8 +63,8 @@ npm run test:integration
 ### End-to-End Tests
 
 ```bash
-# Run E2E tests with mTLS servers
-npm run test:playwright -- mtls.spec.ts
+# Run the Playwright E2E suite (includes the mTLS scenarios in e2e/mtls.spec.ts)
+npm run test:playwright
 ```
 
 ## Manual Testing with eHealthExchange
@@ -115,10 +111,12 @@ server can be any of the three types:
    - **State**: MA
 3. Click "Advanced" and select your mTLS server
 4. Click "Search for patient"
-5. The application will:
-   - Create a Task resource via POST to `/Task`
-   - Poll for child task completion
-   - Retrieve patient results from completed tasks
+5. What happens next depends on the server's **Endpoint Type**:
+   - **Standard FHIR / Immunization Gateway** — a direct `/Patient` search is
+     issued, then clinical records (e.g. `/Immunization`) are queried for the
+     matched patient.
+   - **Fanout (Task)** — a `/Task` resource is POSTed, child tasks are polled to
+     completion, and patient results are retrieved from the completed tasks.
 
 ## Troubleshooting
 
@@ -181,7 +179,3 @@ If tasks don't complete:
 - [TEFCA Technical Framework](https://www.healthit.gov/topic/interoperability/policy/trusted-exchange-framework-and-common-agreement-tefca)
 - [FHIR Task Resource](https://www.hl7.org/fhir/task.html)
 - [OpenSSL Certificate Management](https://www.openssl.org/docs/man1.1.1/man1/openssl-x509.html)
-
-```
-
-```
