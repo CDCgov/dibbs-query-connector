@@ -484,7 +484,7 @@ class QueryService {
     const { fhirServer } = request;
     const fhirClient = await prepareFhirClient(fhirServer);
 
-    // Get the server config to check for mutual TLS
+    // Get the server config to determine how patient discovery is routed
     const serverConfigs = await getFhirServerConfigs();
     const serverConfig = serverConfigs.find(
       (config) => config.name === fhirServer,
@@ -492,9 +492,11 @@ class QueryService {
 
     // Build patient search query
     const patientQuery = await this.buildPatientSearchQuery(request);
-    // Handle discovery based on server configuration
+    // Handle discovery based on the server's endpoint type. Only fanout servers
+    // use the Task-based workflow; standard and immunization-gateway servers use
+    // a direct /Patient search.
     let response: Response;
-    if (serverConfig?.authType === "mutual-tls") {
+    if (serverConfig?.endpointType === "fanout") {
       const tlsDiscoveryResult = await this.handleMutualTlsDiscovery(
         fhirClient,
         patientQuery,
