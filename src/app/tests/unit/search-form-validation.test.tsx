@@ -28,6 +28,8 @@ const mockSetPatientDiscoveryQueryResponse = jest.fn();
 const mockSetMode = jest.fn();
 const mockSetLoading = jest.fn();
 const mockSetFhirServer = jest.fn();
+const mockSetUncertainMatchError = jest.fn();
+const mockSetSearchFormValues = jest.fn();
 const mockFhirServer = "Test Server";
 const mockFhirServers = ["Test Server", "mTLS Server"];
 
@@ -57,6 +59,8 @@ describe("Search Form Name Validation", () => {
         fhirServers={mockFhirServers}
         selectedFhirServer={mockFhirServer}
         setFhirServer={mockSetFhirServer}
+        setUncertainMatchError={mockSetUncertainMatchError}
+        setSearchFormValues={mockSetSearchFormValues}
       />,
     );
 
@@ -95,6 +99,8 @@ describe("Search Form Name Validation", () => {
         fhirServers={mockFhirServers}
         selectedFhirServer={mockFhirServer}
         setFhirServer={mockSetFhirServer}
+        setUncertainMatchError={mockSetUncertainMatchError}
+        setSearchFormValues={mockSetSearchFormValues}
       />,
     );
 
@@ -133,6 +139,8 @@ describe("Search Form Name Validation", () => {
         fhirServers={mockFhirServers}
         selectedFhirServer={mockFhirServer}
         setFhirServer={mockSetFhirServer}
+        setUncertainMatchError={mockSetUncertainMatchError}
+        setSearchFormValues={mockSetSearchFormValues}
       />,
     );
 
@@ -171,6 +179,8 @@ describe("Search Form Name Validation", () => {
         fhirServers={mockFhirServers}
         selectedFhirServer={mockFhirServer}
         setFhirServer={mockSetFhirServer}
+        setUncertainMatchError={mockSetUncertainMatchError}
+        setSearchFormValues={mockSetSearchFormValues}
       />,
     );
 
@@ -209,6 +219,8 @@ describe("Search Form Name Validation", () => {
         fhirServers={mockFhirServers}
         selectedFhirServer={mockFhirServer}
         setFhirServer={mockSetFhirServer}
+        setUncertainMatchError={mockSetUncertainMatchError}
+        setSearchFormValues={mockSetSearchFormValues}
       />,
     );
 
@@ -244,6 +256,8 @@ describe("Search Form Name Validation", () => {
         fhirServers={mockFhirServers}
         selectedFhirServer={mockFhirServer}
         setFhirServer={mockSetFhirServer}
+        setUncertainMatchError={mockSetUncertainMatchError}
+        setSearchFormValues={mockSetSearchFormValues}
       />,
     );
 
@@ -285,6 +299,8 @@ describe("Search Form mTLS Server Selection", () => {
         fhirServers={mockFhirServers}
         selectedFhirServer={mockFhirServer}
         setFhirServer={mockSetFhirServer}
+        setUncertainMatchError={mockSetUncertainMatchError}
+        setSearchFormValues={mockSetSearchFormValues}
       />,
     );
 
