@@ -51,8 +51,15 @@ jobs:
           VERSION: ${{ steps.detect.outputs.version }}
         run: |
           set -euo pipefail
-          REMOTE_LINE=$(git ls-remote --tags origin "refs/tags/${VERSION}" || true)
-          REMOTE_SHA=$(echo "$REMOTE_LINE" | awk '{print $1}')
+          # Resolve the existing tag (if any) to the COMMIT it points at so we
+          # can compare against GITHUB_SHA. For an annotated tag the plain ref
+          # resolves to the tag-object SHA, so dereference with ^{} to get the
+          # commit; fall back to the plain ref for lightweight tags. An empty
+          # result means the tag does not exist yet.
+          REMOTE_SHA=$(git ls-remote origin "refs/tags/${VERSION}^{}" | awk '{print $1}')
+          if [ -z "$REMOTE_SHA" ]; then
+            REMOTE_SHA=$(git ls-remote origin "refs/tags/${VERSION}" | awk '{print $1}')
+          fi
           if [ -z "$REMOTE_SHA" ]; then
             echo "Creating tag ${VERSION} at ${GITHUB_SHA}"
             git config user.name "github-actions[bot]"

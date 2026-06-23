@@ -65,10 +65,15 @@ release's version following the pattern of MAJOR.MINOR.PATCH.
    - pushes `vX.Y.Z`, `vX.Y`, `vX`, and `latest` tags to GHCR
    - publishes a GitHub Release named `vX.Y.Z` with auto-generated notes
    - posts the release link to Slack (if configured)
-   - triggers the Terraform deploy workflow to deploy to the dev environment
 
 On GHCR, the `vX.Y` and `vX` tags float to the latest release within that line;
 the `vX.Y.Z` tag is immutable.
+
+The `Release` workflow does **not** deploy. The dev environment
+(https://queryconnector.dev) tracks the `main` image tag, which is built and
+pushed by the `CD` workflow on every merge to `main` (see below), so dev is
+already up to date by the time a release is cut. Versioned (`vX.Y.Z`) images
+are published to GHCR for downstream consumers to deploy intentionally.
 
 ### Hotfix
 
@@ -79,8 +84,9 @@ merge.
 
 Pushes to `main` that do **not** bump the `version` field are handled by the
 `CD` workflow, which builds and pushes the Docker image tagged with `main`
-only. No git tag or GitHub Release is created. This is the normal dev build
-flow.
+only. No git tag or GitHub Release is created. The `CD` workflow then triggers
+the Terraform deploy workflow, which redeploys the `main` image to the dev
+environment. This is the normal dev build and deploy flow.
 
 ## Verification
 

@@ -23,9 +23,14 @@ except ImportError:
 
 
 def read_version(text: str) -> str:
-    """Return the `version` field from an app_version.yml document."""
+    """Return the `version` field from an app_version.yml document.
+
+    Coerced to a string so a two-component value like `1.1` (which YAML parses
+    as a float) still flows through the strict `X.Y.Z` check below and produces
+    a clean error rather than a TypeError.
+    """
     data = yaml.safe_load(text)
-    return data["version"]
+    return str(data["version"])
 
 
 def main() -> None:
