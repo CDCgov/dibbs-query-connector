@@ -5,7 +5,7 @@ import ResultsView from "./components/ResultsView";
 import PatientSearchResults from "./components/PatientSearchResults";
 import SearchForm from "./components/searchForm/SearchForm";
 import SelectQuery from "./components/SelectQuery";
-import { Mode } from "@/app/constants";
+import { Mode, PatientSearchFormValues } from "@/app/constants";
 import StepIndicator, {
   CUSTOMIZE_QUERY_STEPS,
 } from "./components/stepIndicator/StepIndicator";
@@ -59,6 +59,8 @@ const Query: React.FC = () => {
     ctx?.setCurrentPage(mode);
   }, [mode]);
 
+  const [searchFormValues, setSearchFormValues] =
+    useState<PatientSearchFormValues>();
   const [patientDiscoveryQueryResponse, setPatientDiscoveryQueryResponse] =
     useState<PatientDiscoveryResponse>();
   const [patientForQuery, setPatientForQueryResponse] = useState<Patient>();
@@ -95,6 +97,8 @@ const Query: React.FC = () => {
               selectedFhirServer={fhirServer}
               setFhirServer={setFhirServer}
               setUncertainMatchError={setUncertainMatchError}
+              initialValues={searchFormValues}
+              setSearchFormValues={setSearchFormValues}
             />
           </Suspense>
         )}
@@ -144,6 +148,7 @@ const Query: React.FC = () => {
               setMode("select-query");
             }}
             goToBeginning={() => {
+              setSearchFormValues(undefined);
               setMode("search");
             }}
             loading={loading}

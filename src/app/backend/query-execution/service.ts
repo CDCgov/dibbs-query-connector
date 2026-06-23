@@ -18,10 +18,11 @@ import {
   prepareFhirClient,
 } from "../fhir-servers/service";
 import type FHIRClient from "@/backend/fhir-servers/fhir-client";
+import type { FhirRequestRecord } from "@/backend/fhir-servers/fhir-client";
 import { getSavedQueryByName } from "../query-building/service";
 
 interface TaskPollingResult {
-  tasksBundle: Bundle<Task>;
+  tasksBundle: Bundle;
   parentTaskId: string;
 }
 
@@ -199,7 +200,7 @@ class QueryService {
     parentTaskId: string,
   ): Promise<TaskPollingResult> {
     let allTasksComplete = false;
-    let tasksBundle: Bundle<Task> = {
+    let tasksBundle: Bundle = {
       resourceType: "Bundle",
       type: "searchset",
       entry: [],
@@ -215,7 +216,7 @@ class QueryService {
       const childTasksResponse = await fhirClient.get(
         `/Task?part-of=Task/${parentTaskId}`,
       );
-      tasksBundle = (await childTasksResponse.json()) as Bundle<Task>;
+      tasksBundle = (await childTasksResponse.json()) as Bundle;
 
       console.log(
         `Fetched child tasks for parent Task ${parentTaskId}. Attempt ${attempts}/${TASK_POLLING.MAX_ATTEMPTS}`,
@@ -224,8 +225,8 @@ class QueryService {
       allTasksComplete =
         tasksBundle.entry?.every(
           (entry) =>
-            entry.resource?.status === "completed" ||
-            entry.resource?.status === "failed",
+            (entry.resource as Task)?.status === "completed" ||
+            (entry.resource as Task)?.status === "failed",
         ) ?? false;
     }
 
@@ -316,12 +317,12 @@ class QueryService {
    */
   private static async processTaskResults(
     fhirClient: FHIRClient,
-    tasksBundle: Bundle<Task>,
+    tasksBundle: Bundle,
   ): Promise<Bundle> {
     const patientResults = await Promise.all(
       tasksBundle.entry?.map((entry) =>
         entry.resource
-          ? this.fetchPatientFromTask(fhirClient, entry.resource)
+          ? this.fetchPatientFromTask(fhirClient, entry.resource as Task)
           : null,
       ) || [],
     );
@@ -362,7 +363,7 @@ class QueryService {
     // Create and submit the task
     const taskBody = this.createPatientDiscoveryTask(patientQuery);
     const taskResponse = await fhirClient.postJson("/Task", taskBody);
-    const createdTask = (await taskResponse.json()) as Bundle<Task>;
+    const createdTask = (await taskResponse.json()) as Bundle;
 
     const parentTaskId = createdTask.entry?.[0]?.resource?.id;
     if (!parentTaskId) {
@@ -464,7 +465,7 @@ class QueryService {
         if (response.status !== 200) {
           response.text().then((reason) => {
             console.error(
-              `FHIR query failed from ${response.url}. 
+              `FHIR query failed from ${response.url}.
               Status: ${response.status} \n Response: ${reason}`,
             );
           });
@@ -474,7 +475,10 @@ class QueryService {
       })
       .filter((v): v is Response => !!v);
 
-    return successfulResults;
+    return {
+      responses: successfulResults,
+      requests: fhirClient.getRequestLog(),
+    };
   }
 
   @auditable
@@ -484,7 +488,7 @@ class QueryService {
     const { fhirServer } = request;
     const fhirClient = await prepareFhirClient(fhirServer);
 
-    // Get the server config to check for mutual TLS
+    // Get the server config to determine how patient discovery is routed
     const serverConfigs = await getFhirServerConfigs();
     const serverConfig = serverConfigs.find(
       (config) => config.name === fhirServer,
@@ -492,9 +496,11 @@ class QueryService {
 
     // Build patient search query
     const patientQuery = await this.buildPatientSearchQuery(request);
-    // Handle discovery based on server configuration
+    // Handle discovery based on the server's endpoint type. Only fanout servers
+    // use the Task-based workflow; standard and immunization-gateway servers use
+    // a direct /Patient search.
     let response: Response;
-    if (serverConfig?.authType === "mutual-tls") {
+    if (serverConfig?.endpointType === "fanout") {
       const tlsDiscoveryResult = await this.handleMutualTlsDiscovery(
         fhirClient,
         patientQuery,
@@ -735,23 +741,23 @@ class QueryService {
    */
   static async patientRecordsQuery(
     request: PatientRecordsRequest,
-  ): Promise<QueryResponse> {
+  ): Promise<QueryResponse & { fhirRequests: FhirRequestRecord[] }> {
     const savedQuery = await getSavedQueryByName(request.queryName as string);
 
     if (!savedQuery) {
       throw new Error(`Unable to query of name ${request?.queryName}`);
     }
 
-    let response: Response | Response[] =
+    const { responses, requests } =
       await QueryService.makePatientRecordsRequest(
         savedQuery,
         request.patientId,
         request.fhirServer,
       );
 
-    const queryResponse = await QueryService.parseFhirSearch(response);
+    const queryResponse = await QueryService.parseFhirSearch(responses);
 
-    return queryResponse;
+    return { ...queryResponse, fhirRequests: requests };
   }
 
   /**
@@ -799,10 +805,13 @@ class QueryService {
 
     // TODO: First patient is assumed to be the correct one.
     // This should be handled by the UI, where the user can select the correct patient, but what about the API?
-    const patientRecords = await patientRecordsQuery({
-      patientId: patient[0].id as string,
-      ...queryRequest,
-    });
+    // Drop fhirRequests here so the captured requests stay UI-only and never
+    // leak into the public /api/query Bundle output.
+    const { fhirRequests: _fhirRequests, ...patientRecords } =
+      await patientRecordsQuery({
+        patientId: patient[0].id as string,
+        ...queryRequest,
+      });
     return {
       Patient: patient,
       ...patientRecords,

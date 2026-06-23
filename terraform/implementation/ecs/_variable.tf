@@ -80,7 +80,12 @@ variable "db_engine_type" {
 variable "db_engine_version" {
   type        = string
   description = "Engine Version of RDS Instance"
-  default     = "16.8"
+  # Pin the major version only. RDS auto-applies minor version upgrades during
+  # maintenance windows (auto_minor_version_upgrade defaults to true), so pinning
+  # a full minor version (e.g. 16.8) causes apply to fail once AWS bumps the minor
+  # version, since RDS cannot downgrade. The AWS provider treats this as a prefix
+  # and matches whatever 16.x is actually running.
+  default = "16"
 }
 
 variable "db_instance_class" {

@@ -54,6 +54,7 @@ describe("Query Execution with Mutual TLS", () => {
       post: jest.fn(),
       postJson: jest.fn(),
       getBatch: jest.fn(),
+      getRequestLog: jest.fn().mockReturnValue([]),
     } as unknown as jest.Mocked<FHIRClient>;
 
     (prepareFhirClient as jest.Mock).mockResolvedValue(mockFhirClient);
@@ -69,6 +70,7 @@ describe("Query Execution with Mutual TLS", () => {
       name: "Test mTLS Server",
       hostname: "https://mtls.example.com/fhir",
       authType: "mutual-tls",
+      endpointType: "fanout",
       disableCertValidation: false,
       defaultServer: false,
     } as FhirServerConfig;
@@ -102,7 +104,7 @@ describe("Query Execution with Mutual TLS", () => {
       birthDate: "1990-01-01",
     };
 
-    const mockPatientBundle: Bundle<Patient> = {
+    const mockPatientBundle: Bundle = {
       resourceType: "Bundle",
       type: "searchset",
       entry: [
@@ -382,6 +384,7 @@ describe("Query Execution with Mutual TLS", () => {
       const nonMtlsServerConfig = {
         ...mockServerConfig,
         authType: "none",
+        endpointType: "standard",
       };
 
       const {

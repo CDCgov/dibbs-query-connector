@@ -106,7 +106,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({
             type="button"
             onClick={() => setDrawerOpen(true)}
           >
-            View FHIR response
+            View FHIR request &amp; response
           </Button>
         </div>
       </h2>
