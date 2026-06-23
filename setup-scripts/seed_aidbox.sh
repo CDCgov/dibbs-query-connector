@@ -16,6 +16,31 @@ DB_NAME="tefca_db"
 # can never hang silently in CI when aidbox is slow to respond.
 CURL_OPTS=(--silent --show-error --location --max-time 30)
 
+# Loads a resource into Aidbox and aborts the seed if the write fails, instead
+# of silently continuing. Aidbox validates every write against the external
+# terminology service (tx.fhir.org); when that service is unreachable the write
+# fails — the request either times out or returns a non-2xx OperationOutcome.
+# Previously the seeder ignored both and reported "loaded successfully" anyway,
+# leaving Aidbox empty and surfacing much later as confusing "0 resources" test
+# failures. Capturing the status here turns that into an obvious seed-time error.
+# Usage: load_or_fail "<description>" <curl args...>
+load_or_fail() {
+  local description=$1
+  shift
+  local response exit_code status body
+  response=$(curl "${CURL_OPTS[@]}" -w $'\n%{http_code}' "$@")
+  exit_code=$?
+  status=$(printf '%s' "$response" | tail -n1)
+  body=$(printf '%s' "$response" | sed '$d')
+  if [ $exit_code -ne 0 ] || ! [[ "$status" =~ ^2[0-9][0-9]$ ]]; then
+    echo "ERROR: ${description} failed (curl exit: ${exit_code}, HTTP status: ${status:-none})."
+    echo "An empty/000 status or a validator/terminology error in the body usually means"
+    echo "Aidbox's terminology service (tx.fhir.org) is unreachable. Verify it is up."
+    echo "Response body: ${body}"
+    exit 1
+  fi
+}
+
 # Compose already gates this service on `aidbox: service_healthy`, so by the
 # time we run, /health should already be passing. The retry loop below is a
 # belt-and-suspenders safety net for cases where the healthcheck and the
@@ -63,7 +88,7 @@ echo "Access token obtained."
 
 # Post the GoldenSickPatient data to Aidbox
 echo "Loading GoldenSickPatient data into Aidbox..."
-curl "${CURL_OPTS[@]}" -X POST \
+load_or_fail "Loading GoldenSickPatient data" -X POST \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer ${TOKEN}" \
   -d @"/data/GoldenSickPatient.json" \
@@ -73,7 +98,7 @@ echo "GoldenSickPatient data loaded successfully."
 
 # Client information for the SMART on FHIR test
 echo "Loading client information into Aidbox..."
-curl "${CURL_OPTS[@]}" -X PUT \
+load_or_fail "Loading client information" -X PUT \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer ${TOKEN}" \
   -d '{
@@ -102,7 +127,7 @@ echo "Client information data loaded successfully."
 
 # Access policy information for the SMART on FHIR test
 echo "Loading access policy information into Aidbox.."
-curl "${CURL_OPTS[@]}" -X PUT \
+load_or_fail "Loading access policy information" -X PUT \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer ${TOKEN}" \
   -d '{
