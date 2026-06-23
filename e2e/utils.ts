@@ -2,7 +2,7 @@ import { Page, expect } from "@playwright/test";
 import { CANCER_FRONTEND_NESTED_INPUT, showSiteAlert } from "./constants";
 import { dontUseOutsideConfigOrTests_getDbPool } from "@/app/backend/db/config";
 import {
-  EMPTY_MEDICAL_RECORD_SECTIONS,
+  DEFAULT_MEDICAL_RECORD_SECTIONS,
   NestedQuery,
   QueryTableResult,
 } from "@/app/(pages)/queryBuilding/utils";
@@ -45,7 +45,7 @@ export async function createTestCancerQuery() {
     randomName,
     author,
     dbClient,
-    EMPTY_MEDICAL_RECORD_SECTIONS,
+    DEFAULT_MEDICAL_RECORD_SECTIONS,
   );
   if (result === undefined) throw Error("Failed to set up test query");
 

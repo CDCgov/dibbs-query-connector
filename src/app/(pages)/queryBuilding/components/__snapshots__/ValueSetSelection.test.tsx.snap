@@ -554,6 +554,114 @@ exports[`tests the value set selection page highlights the active tab to the sid
                     class="medicalRecordSectionRow"
                   >
                     <div
+                      data-testid="container-medical-record-section-checkbox-labs"
+                    >
+                      <div
+                        class="usa-checkbox"
+                        data-testid="checkbox"
+                      >
+                        <input
+                          aria-label="Select medical record section labs"
+                          checked=""
+                          class="usa-checkbox__input"
+                          id="medical-record-section-checkbox-labs"
+                          name="medical-record-section-checkbox-labs"
+                          type="checkbox"
+                        />
+                        <label
+                          class="usa-checkbox__label"
+                          for="medical-record-section-checkbox-labs"
+                        >
+                          Include lab results (observations & diagnostic reports)
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                  <div
+                    class="medicalRecordSectionRow"
+                  >
+                    <div
+                      data-testid="container-medical-record-section-checkbox-encounters"
+                    >
+                      <div
+                        class="usa-checkbox"
+                        data-testid="checkbox"
+                      >
+                        <input
+                          aria-label="Select medical record section encounters"
+                          checked=""
+                          class="usa-checkbox__input"
+                          id="medical-record-section-checkbox-encounters"
+                          name="medical-record-section-checkbox-encounters"
+                          type="checkbox"
+                        />
+                        <label
+                          class="usa-checkbox__label"
+                          for="medical-record-section-checkbox-encounters"
+                        >
+                          Include encounters
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                  <div
+                    class="medicalRecordSectionRow"
+                  >
+                    <div
+                      data-testid="container-medical-record-section-checkbox-conditions"
+                    >
+                      <div
+                        class="usa-checkbox"
+                        data-testid="checkbox"
+                      >
+                        <input
+                          aria-label="Select medical record section conditions"
+                          checked=""
+                          class="usa-checkbox__input"
+                          id="medical-record-section-checkbox-conditions"
+                          name="medical-record-section-checkbox-conditions"
+                          type="checkbox"
+                        />
+                        <label
+                          class="usa-checkbox__label"
+                          for="medical-record-section-checkbox-conditions"
+                        >
+                          Include conditions
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                  <div
+                    class="medicalRecordSectionRow"
+                  >
+                    <div
+                      data-testid="container-medical-record-section-checkbox-medications"
+                    >
+                      <div
+                        class="usa-checkbox"
+                        data-testid="checkbox"
+                      >
+                        <input
+                          aria-label="Select medical record section medications"
+                          checked=""
+                          class="usa-checkbox__input"
+                          id="medical-record-section-checkbox-medications"
+                          name="medical-record-section-checkbox-medications"
+                          type="checkbox"
+                        />
+                        <label
+                          class="usa-checkbox__label"
+                          for="medical-record-section-checkbox-medications"
+                        >
+                          Include medications (requests & statements)
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                  <div
+                    class="medicalRecordSectionRow"
+                  >
+                    <div
                       data-testid="container-medical-record-section-checkbox-immunizations"
                     >
                       <div
@@ -561,7 +669,7 @@ exports[`tests the value set selection page highlights the active tab to the sid
                         data-testid="checkbox"
                       >
                         <input
-                          aria-label="Select medical recored section immunizations"
+                          aria-label="Select medical record section immunizations"
                           class="usa-checkbox__input"
                           id="medical-record-section-checkbox-immunizations"
                           name="medical-record-section-checkbox-immunizations"
@@ -587,7 +695,7 @@ exports[`tests the value set selection page highlights the active tab to the sid
                         data-testid="checkbox"
                       >
                         <input
-                          aria-label="Select medical recored section socialDeterminants"
+                          aria-label="Select medical record section socialDeterminants"
                           class="usa-checkbox__input"
                           id="medical-record-section-checkbox-socialDeterminants"
                           name="medical-record-section-checkbox-socialDeterminants"
@@ -613,7 +721,7 @@ exports[`tests the value set selection page highlights the active tab to the sid
                         data-testid="checkbox"
                       >
                         <input
-                          aria-label="Select medical recored section serviceRequests"
+                          aria-label="Select medical record section serviceRequests"
                           class="usa-checkbox__input"
                           id="medical-record-section-checkbox-serviceRequests"
                           name="medical-record-section-checkbox-serviceRequests"

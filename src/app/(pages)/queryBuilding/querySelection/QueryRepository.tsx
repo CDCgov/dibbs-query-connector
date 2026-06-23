@@ -20,7 +20,11 @@ import {
 } from "./utils";
 import { DataContext, DataContextValue } from "@/app/utils/DataProvider";
 import classNames from "classnames";
-import { ConditionsMap, EMPTY_QUERY_SELECTION } from "../utils";
+import {
+  ADDITIVE_MEDICAL_RECORD_SECTION_KEYS,
+  ConditionsMap,
+  EMPTY_QUERY_SELECTION,
+} from "../utils";
 import { CustomUserQuery } from "@/app/models/entities/query";
 import {
   CUSTOM_CONDITION_NAME,
@@ -168,9 +172,12 @@ export const MyQueriesDisplay: React.FC<UserQueriesDisplayProps> = ({
                         CUSTOM_VALUESET_ARRAY_ID,
                       ) && query.conditionsList.length === 1;
 
+                    // only additive sections count as "custom fields" — the
+                    // core sections (labs, encounters, etc.) are on by default
                     const hasMedicalSection =
-                      query.medicalRecordSections &&
-                      Object.values(query.medicalRecordSections).some(Boolean);
+                      ADDITIVE_MEDICAL_RECORD_SECTION_KEYS.some(
+                        (key) => query.medicalRecordSections?.[key],
+                      );
 
                     const conditionNames = hasCustomOnly
                       ? [CUSTOM_CONDITION_NAME]

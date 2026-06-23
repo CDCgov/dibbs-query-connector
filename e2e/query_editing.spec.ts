@@ -2,7 +2,7 @@ import { test, expect, Page } from "@playwright/test";
 import { TEST_URL } from "../playwright-setup";
 import { CONDITION_DRAWER_SEARCH_PLACEHOLDER } from "../src/app/(pages)/queryBuilding/components/utils";
 import {
-  EMPTY_MEDICAL_RECORD_SECTIONS,
+  DEFAULT_MEDICAL_RECORD_SECTIONS,
   NestedQuery,
   QueryTableResult,
 } from "../src/app/(pages)/queryBuilding/utils";
@@ -390,7 +390,7 @@ async function createTestQuery() {
     randomName,
     author,
     dbClient,
-    EMPTY_MEDICAL_RECORD_SECTIONS,
+    DEFAULT_MEDICAL_RECORD_SECTIONS,
   );
   if (result === undefined) throw Error("Failed to set up test query");
 
