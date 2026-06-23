@@ -55,6 +55,7 @@ jest.mock("@/app/backend/fhir-servers/fhir-client", () => {
       }),
       getAccessToken: jest.fn().mockResolvedValue("mock-token"),
       ensureValidToken: jest.fn().mockResolvedValue(undefined),
+      getRequestLog: jest.fn().mockReturnValue([]),
     })),
   };
 });

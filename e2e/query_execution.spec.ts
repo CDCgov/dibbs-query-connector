@@ -164,9 +164,14 @@ test.describe("querying with the Query Connector", () => {
     await runAxeAccessibilityChecks(page);
 
     // Check that the drawer works
-    await page.getByRole("button", { name: "View FHIR response" }).click();
-    const drawer = page.getByText("Full FHIR response");
+    await page
+      .getByRole("button", { name: "View FHIR request & response" })
+      .click();
+    const drawer = page.getByRole("heading", {
+      name: "FHIR request & response",
+    });
     await expect(drawer).toBeVisible();
+    // The Response tab is shown by default and contains the FHIR payload
     await expect(page.locator("pre")).toContainText("Patient");
     await runAxeAccessibilityChecks(page);
 

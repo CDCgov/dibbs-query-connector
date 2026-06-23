@@ -54,6 +54,7 @@ describe("Query Execution with Mutual TLS", () => {
       post: jest.fn(),
       postJson: jest.fn(),
       getBatch: jest.fn(),
+      getRequestLog: jest.fn().mockReturnValue([]),
     } as unknown as jest.Mocked<FHIRClient>;
 
     (prepareFhirClient as jest.Mock).mockResolvedValue(mockFhirClient);
