@@ -103,7 +103,7 @@ describe("Query Execution with Mutual TLS", () => {
       birthDate: "1990-01-01",
     };
 
-    const mockPatientBundle: Bundle<Patient> = {
+    const mockPatientBundle: Bundle = {
       resourceType: "Bundle",
       type: "searchset",
       entry: [

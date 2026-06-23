@@ -21,7 +21,7 @@ import type FHIRClient from "@/backend/fhir-servers/fhir-client";
 import { getSavedQueryByName } from "../query-building/service";
 
 interface TaskPollingResult {
-  tasksBundle: Bundle<Task>;
+  tasksBundle: Bundle;
   parentTaskId: string;
 }
 
@@ -199,7 +199,7 @@ class QueryService {
     parentTaskId: string,
   ): Promise<TaskPollingResult> {
     let allTasksComplete = false;
-    let tasksBundle: Bundle<Task> = {
+    let tasksBundle: Bundle = {
       resourceType: "Bundle",
       type: "searchset",
       entry: [],
@@ -215,7 +215,7 @@ class QueryService {
       const childTasksResponse = await fhirClient.get(
         `/Task?part-of=Task/${parentTaskId}`,
       );
-      tasksBundle = (await childTasksResponse.json()) as Bundle<Task>;
+      tasksBundle = (await childTasksResponse.json()) as Bundle;
 
       console.log(
         `Fetched child tasks for parent Task ${parentTaskId}. Attempt ${attempts}/${TASK_POLLING.MAX_ATTEMPTS}`,
@@ -224,8 +224,8 @@ class QueryService {
       allTasksComplete =
         tasksBundle.entry?.every(
           (entry) =>
-            entry.resource?.status === "completed" ||
-            entry.resource?.status === "failed",
+            (entry.resource as Task)?.status === "completed" ||
+            (entry.resource as Task)?.status === "failed",
         ) ?? false;
     }
 
@@ -316,12 +316,12 @@ class QueryService {
    */
   private static async processTaskResults(
     fhirClient: FHIRClient,
-    tasksBundle: Bundle<Task>,
+    tasksBundle: Bundle,
   ): Promise<Bundle> {
     const patientResults = await Promise.all(
       tasksBundle.entry?.map((entry) =>
         entry.resource
-          ? this.fetchPatientFromTask(fhirClient, entry.resource)
+          ? this.fetchPatientFromTask(fhirClient, entry.resource as Task)
           : null,
       ) || [],
     );
@@ -362,7 +362,7 @@ class QueryService {
     // Create and submit the task
     const taskBody = this.createPatientDiscoveryTask(patientQuery);
     const taskResponse = await fhirClient.postJson("/Task", taskBody);
-    const createdTask = (await taskResponse.json()) as Bundle<Task>;
+    const createdTask = (await taskResponse.json()) as Bundle;
 
     const parentTaskId = createdTask.entry?.[0]?.resource?.id;
     if (!parentTaskId) {

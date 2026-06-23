@@ -312,7 +312,7 @@ describe("API Query with Mutual TLS", () => {
     ],
   };
 
-  const mockPatientBundle: Bundle<Patient> = {
+  const mockPatientBundle: Bundle = {
     resourceType: "Bundle",
     type: "searchset",
     entry: [
