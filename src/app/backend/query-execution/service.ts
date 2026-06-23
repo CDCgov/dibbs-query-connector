@@ -18,6 +18,7 @@ import {
   prepareFhirClient,
 } from "../fhir-servers/service";
 import type FHIRClient from "@/backend/fhir-servers/fhir-client";
+import type { FhirRequestRecord } from "@/backend/fhir-servers/fhir-client";
 import { getSavedQueryByName } from "../query-building/service";
 
 interface TaskPollingResult {
@@ -464,7 +465,7 @@ class QueryService {
         if (response.status !== 200) {
           response.text().then((reason) => {
             console.error(
-              `FHIR query failed from ${response.url}. 
+              `FHIR query failed from ${response.url}.
               Status: ${response.status} \n Response: ${reason}`,
             );
           });
@@ -474,7 +475,10 @@ class QueryService {
       })
       .filter((v): v is Response => !!v);
 
-    return successfulResults;
+    return {
+      responses: successfulResults,
+      requests: fhirClient.getRequestLog(),
+    };
   }
 
   @auditable
@@ -737,23 +741,23 @@ class QueryService {
    */
   static async patientRecordsQuery(
     request: PatientRecordsRequest,
-  ): Promise<QueryResponse> {
+  ): Promise<QueryResponse & { fhirRequests: FhirRequestRecord[] }> {
     const savedQuery = await getSavedQueryByName(request.queryName as string);
 
     if (!savedQuery) {
       throw new Error(`Unable to query of name ${request?.queryName}`);
     }
 
-    let response: Response | Response[] =
+    const { responses, requests } =
       await QueryService.makePatientRecordsRequest(
         savedQuery,
         request.patientId,
         request.fhirServer,
       );
 
-    const queryResponse = await QueryService.parseFhirSearch(response);
+    const queryResponse = await QueryService.parseFhirSearch(responses);
 
-    return queryResponse;
+    return { ...queryResponse, fhirRequests: requests };
   }
 
   /**
@@ -801,10 +805,13 @@ class QueryService {
 
     // TODO: First patient is assumed to be the correct one.
     // This should be handled by the UI, where the user can select the correct patient, but what about the API?
-    const patientRecords = await patientRecordsQuery({
-      patientId: patient[0].id as string,
-      ...queryRequest,
-    });
+    // Drop fhirRequests here so the captured requests stay UI-only and never
+    // leak into the public /api/query Bundle output.
+    const { fhirRequests: _fhirRequests, ...patientRecords } =
+      await patientRecordsQuery({
+        patientId: patient[0].id as string,
+        ...queryRequest,
+      });
     return {
       Patient: patient,
       ...patientRecords,

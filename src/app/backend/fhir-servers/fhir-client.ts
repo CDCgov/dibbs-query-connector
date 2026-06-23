@@ -55,6 +55,16 @@ function fetchWithMutualTLS(
 }
 
 /**
+ * A captured outgoing FHIR request. Headers are intentionally omitted so the
+ * auth/bearer token is never recorded or surfaced to the client.
+ */
+export type FhirRequestRecord = {
+  method: string; // "GET" | "POST"
+  url: string; // hostname + path (includes the query string for GET requests)
+  body?: string; // form-encoded body for POST _search; undefined for GET
+};
+
+/**
  * A client for querying a FHIR server.
  * @param server The FHIR server to query.
  * @returns The client instance.
@@ -64,6 +74,7 @@ class FHIRClient {
   private init: RequestInit;
   private serverConfig: FhirServerConfig;
   private fetch: (url: string, options?: RequestInit) => Promise<Response>;
+  private requestLog: FhirRequestRecord[] = [];
 
   constructor(config: FhirServerConfig) {
     this.serverConfig = config;
@@ -484,8 +495,18 @@ class FHIRClient {
    */
   async get(path: string): Promise<Response> {
     await this.ensureValidToken();
+    this.requestLog.push({ method: "GET", url: this.hostname + path });
     const response = await this.fetch(this.hostname + path, this.init);
     return response;
+  }
+
+  /**
+   * Returns the log of FHIR requests this client has issued via get()/post().
+   * Used to surface the raw outgoing requests in the UI.
+   * @returns The list of captured requests.
+   */
+  getRequestLog(): FhirRequestRecord[] {
+    return this.requestLog;
   }
 
   /**
@@ -518,10 +539,11 @@ class FHIRClient {
       body: params.toString(),
     };
 
-    // Print out the request details for debugging
-    console.log("POST Request URL:", this.hostname + path);
-    console.log("POST Request Headers:", requestOptions.headers);
-    console.log("POST Request Body:", requestOptions.body);
+    this.requestLog.push({
+      method: "POST",
+      url: this.hostname + path,
+      body: params.toString(),
+    });
 
     return this.fetch(this.hostname + path, requestOptions);
   }
