@@ -17,15 +17,17 @@ export type Tab = {
 
 export interface TabGroupProps {
   tabs: Tab[];
+  initialTab?: string;
 }
 
 /**
  * @param root0 - TabGroup compoennt props
  * @param root0.tabs - an array of Tab objects
+ * @param root0.initialTab - label of the tab to show as active initially (defaults to the first tab)
  * @returns A tab group component
  */
-const TabGroup: React.FC<TabGroupProps> = ({ tabs }) => {
-  const [activeTab, setActiveTab] = useState(tabs[0].label);
+const TabGroup: React.FC<TabGroupProps> = ({ tabs, initialTab }) => {
+  const [activeTab, setActiveTab] = useState(initialTab ?? tabs[0].label);
 
   const handleTabClick = (e: React.MouseEvent<HTMLElement>) => {
     const clickedTab = e.currentTarget.innerHTML;

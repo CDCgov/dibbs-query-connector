@@ -1,7 +1,8 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Drawer from "@/app/ui/designSystem/drawer/Drawer";
+import TabGroup from "@/app/ui/designSystem/TabGroup/tabGroup";
 import styles from "./resultsView.module.scss";
 import { PatientRecordsResponse } from "../../../../backend/query-execution/service";
 import { Icon, Button } from "@trussworks/react-uswds";
@@ -39,11 +40,12 @@ function parseNestedJSON(value: unknown): unknown {
 }
 
 /**
- * PatientRecordsDrawer component to display patientRecordsResponse in JSON format.
+ * PatientRecordsDrawer component to display the outgoing FHIR requests and the
+ * patientRecordsResponse payload in JSON format, under Request/Response tabs.
  * @param root0 - The props object.
  * @param root0.isOpen - Controls drawer visibility
  * @param root0.onClose - Closes the drawer
- * @param root0.patientRecordsResponse - FHIR response data to render as JSON
+ * @param root0.patientRecordsResponse - FHIR response data (with captured requests) to render
  * @returns The PatientRecordsDrawer component
  */
 const ResultsViewDrawer: React.FC<ResultsViewDrawerProps> = ({
@@ -51,14 +53,34 @@ const ResultsViewDrawer: React.FC<ResultsViewDrawerProps> = ({
   onClose,
   patientRecordsResponse,
 }) => {
-  const jsonStr = patientRecordsResponse
-    ? JSON.stringify(parseNestedJSON(patientRecordsResponse), null, 2)
-    : "";
+  const [activeTab, setActiveTab] = useState<"request" | "response">(
+    "response",
+  );
+
+  const fhirRequests = patientRecordsResponse?.fhirRequests;
+
+  // The Response tab shows the FHIR payload without the captured requests.
+  let responseStr = "";
+  if (patientRecordsResponse) {
+    const { fhirRequests: _omit, ...response } = patientRecordsResponse;
+    responseStr = JSON.stringify(parseNestedJSON(response), null, 2);
+  }
+
+  // The Request tab lists each outgoing request as method + URL, with the
+  // POST form body (when present) indented on the next line.
+  const requestStr =
+    fhirRequests && fhirRequests.length > 0
+      ? fhirRequests
+          .map((r) => `${r.method} ${r.url}${r.body ? `\n    ${r.body}` : ""}`)
+          .join("\n\n")
+      : "No FHIR requests recorded.";
+
+  const activeStr = activeTab === "request" ? requestStr : responseStr;
 
   function handleCopy() {
-    if (!jsonStr) return;
-    navigator.clipboard.writeText(jsonStr);
-    showToastConfirmation({ body: "Response copied to clipboard" });
+    if (!activeStr) return;
+    navigator.clipboard.writeText(activeStr);
+    showToastConfirmation({ body: "Copied to clipboard" });
   }
 
   return (
@@ -67,20 +89,20 @@ const ResultsViewDrawer: React.FC<ResultsViewDrawerProps> = ({
       onClose={onClose}
       title={
         <div className="display-flex flex-align-center flex-justify">
-          <span>Full FHIR response</span>
+          <span>FHIR request &amp; response</span>
           <Button
             type="button"
             unstyled
             className="usa-button--unstyled text-bold text-no-underline margin-left-auto"
             onClick={handleCopy}
-            aria-label="Copy FHIR response"
+            aria-label="Copy to clipboard"
           >
             <span className="icon-text display-flex flex-align-center">
               <Icon.ContentCopy
                 aria-label="Icon indicating content is able to be copied to the clipboard"
                 className="height-3 width-3"
               />
-              <span className="padding-left-05">Copy response</span>
+              <span className="padding-left-05">Copy</span>
             </span>
           </Button>
         </div>
@@ -89,8 +111,22 @@ const ResultsViewDrawer: React.FC<ResultsViewDrawerProps> = ({
       toRender={
         patientRecordsResponse ? (
           <div className={styles.resultsDrawerContainer}>
-            <div className="display-flex flex-justify-end width-full"></div>
-            <pre className={styles.resultsDrawerBody}>{jsonStr}</pre>
+            <div className="width-full">
+              <TabGroup
+                initialTab="Response"
+                tabs={[
+                  {
+                    label: "Request",
+                    onClick: () => setActiveTab("request"),
+                  },
+                  {
+                    label: "Response",
+                    onClick: () => setActiveTab("response"),
+                  },
+                ]}
+              />
+            </div>
+            <pre className={styles.resultsDrawerBody}>{activeStr}</pre>
           </div>
         ) : (
           <div className={styles.resultsDrawerContainer}>
