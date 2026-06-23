@@ -116,6 +116,18 @@ The HCO configures their Epic environment so the QC client can access the APIs y
 - User and security setup (e.g., associating the app with an Epic user/service account)
 - Any required application and access control configuration within Epic
 
+For reference, QC queries the following FHIR R4 resources, so at minimum the search/read APIs for these resources must be enabled for the QC client:
+
+- Patient (including `$match` for patient discovery)
+- Observation
+- DiagnosticReport
+- Condition
+- Encounter
+- MedicationRequest (and related Medication and MedicationAdministration resources)
+- MedicationStatement
+- Immunization
+- ServiceRequest (and related Practitioner and Specimen resources)
+
 ### Collect HCO connection details
 
 To complete QC setup for a specific HCO, ask the HCO's IT team to provide the details below to point QC at the right FHIR endpoint and align on any HCO-specific values:

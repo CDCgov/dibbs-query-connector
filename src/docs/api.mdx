@@ -7,6 +7,22 @@ The DIBBs Query Connector API is a RESTful API that allows public health staff t
 - Interactive API documentation is available [here](https://queryconnector.dev/apiDocs).
 - A Postman collection demonstrating use of the API can be found [here](https://github.com/CDCgov/dibbs-query-connector/blob/main/src/app/assets/DIBBs_Query_Connector_API.postman_collection.json).
 
+## Queried FHIR Resources
+
+Query results are returned as a FHIR Bundle containing the patient's records. Depending on the contents of the query being run, the bundle can include the following resource types:
+
+- `Patient`
+- `Observation` (lab results, plus social determinants of health if enabled for the query)
+- `DiagnosticReport`
+- `Condition`
+- `Encounter`
+- `MedicationRequest`
+- `MedicationStatement`
+- `Immunization`
+- `ServiceRequest`
+
+Lab, condition, and medication resources are filtered to the value set codes configured in the query. `Immunization`, social determinants `Observation`, and `ServiceRequest` resources are returned when the corresponding medical record sections are enabled for the query. Medication and service request queries may also return related resources (such as `Medication`, `MedicationAdministration`, `Practitioner`, and `Specimen`) via `_include`/`_revinclude` search parameters.
+
 ## Authentication
 
 The Query Connector API uses OAuth 2.0 Client Credentials flow for authentication. API requests must include a valid access token in the Authorization header.
