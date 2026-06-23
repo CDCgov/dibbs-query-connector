@@ -56,6 +56,7 @@ describe("SearchForm", () => {
           setFhirServer={jest.fn()}
           fhirServers={[]}
           setUncertainMatchError={jest.fn()}
+          setSearchFormValues={jest.fn()}
         ></SearchForm>
       </RootProviderMock>,
     );
@@ -74,6 +75,7 @@ describe("SearchForm", () => {
           setFhirServer={jest.fn()}
           fhirServers={[]}
           setUncertainMatchError={jest.fn()}
+          setSearchFormValues={jest.fn()}
         ></SearchForm>
       </RootProviderMock>,
     );
@@ -104,6 +106,7 @@ describe("SearchForm", () => {
           setFhirServer={jest.fn()}
           fhirServers={[]}
           setUncertainMatchError={jest.fn()}
+          setSearchFormValues={jest.fn()}
         ></SearchForm>
       </RootProviderMock>,
     );
@@ -130,6 +133,71 @@ describe("SearchForm", () => {
     expect(mrn).toHaveValue("1234");
   });
 
+  it("repopulates fields from initialValues when revising a search", () => {
+    // Even with URL params present, persisted initialValues take precedence so
+    // the revised search keeps what the user previously entered.
+    (useSearchParams as jest.Mock).mockReturnValue(
+      new URLSearchParams("last=fromurl"),
+    );
+
+    const initialValues = {
+      firstName: "Jane",
+      lastName: "Doe",
+      dob: "1990-01-15",
+      mrn: "9876",
+      phone: "555-123-4567",
+      email: "jane@example.com",
+      address: {
+        street1: "123 Main St",
+        street2: "Apt 4",
+        city: "Anytown",
+        state: "MA",
+        zip: "02101",
+      },
+    };
+
+    renderWithUser(
+      <RootProviderMock currentPage="/query">
+        <SearchForm
+          setMode={jest.fn()}
+          setLoading={jest.fn()}
+          setPatientDiscoveryQueryResponse={jest.fn()}
+          selectedFhirServer="Default server"
+          setFhirServer={jest.fn()}
+          fhirServers={[]}
+          setUncertainMatchError={jest.fn()}
+          setSearchFormValues={jest.fn()}
+          initialValues={initialValues}
+        />
+      </RootProviderMock>,
+    );
+
+    expect(screen.getByRole("textbox", { name: "First name" })).toHaveValue(
+      "Jane",
+    );
+    expect(screen.getByRole("textbox", { name: "Last name" })).toHaveValue(
+      "Doe",
+    );
+    expect(screen.getByRole("textbox", { name: "Phone number" })).toHaveValue(
+      "555-123-4567",
+    );
+    expect(screen.getByRole("textbox", { name: "Email address" })).toHaveValue(
+      "jane@example.com",
+    );
+    expect(
+      screen.getByRole("textbox", { name: "Medical Record Number" }),
+    ).toHaveValue("9876");
+    expect(screen.getByRole("textbox", { name: "Street address" })).toHaveValue(
+      "123 Main St",
+    );
+    expect(screen.getByRole("textbox", { name: "City" })).toHaveValue(
+      "Anytown",
+    );
+    expect(screen.getByRole("textbox", { name: "Zip code" })).toHaveValue(
+      "02101",
+    );
+  });
+
   it("does not prefill fhir server with bad data", async () => {
     const badServerName = "Fake FHIR";
     const defaultServerName = "Default FHIR";
@@ -148,6 +216,7 @@ describe("SearchForm", () => {
           setFhirServer={jest.fn()}
           fhirServers={[defaultServerName, "Some other server name"]}
           setUncertainMatchError={jest.fn()}
+          setSearchFormValues={jest.fn()}
         ></SearchForm>
       </RootProviderMock>,
     );
@@ -184,6 +253,7 @@ describe("SearchForm", () => {
           setFhirServer={jest.fn()}
           fhirServers={["Default server"]}
           setUncertainMatchError={jest.fn()}
+          setSearchFormValues={jest.fn()}
         ></SearchForm>
       </RootProviderMock>,
     );
@@ -242,6 +312,7 @@ describe("SearchForm", () => {
           setFhirServer={jest.fn()}
           fhirServers={["Matching Server"]}
           setUncertainMatchError={jest.fn()}
+          setSearchFormValues={jest.fn()}
         />
       </RootProviderMock>,
     );

@@ -15,6 +15,7 @@ import {
   Mode,
   hyperUnluckyPatient,
   AddressData,
+  PatientSearchFormValues,
   INSUFFICIENT_PATIENT_IDENTIFIERS,
 } from "@/app/constants";
 import {
@@ -42,6 +43,8 @@ interface SearchFormProps {
   selectedFhirServer: string;
   setFhirServer: React.Dispatch<React.SetStateAction<string>>;
   setUncertainMatchError: React.Dispatch<React.SetStateAction<boolean>>;
+  initialValues?: PatientSearchFormValues;
+  setSearchFormValues: (values: PatientSearchFormValues) => void;
 }
 
 const SearchForm: React.FC<SearchFormProps> = function SearchForm({
@@ -52,21 +55,29 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
   selectedFhirServer: fhirServer,
   setFhirServer,
   setUncertainMatchError,
+  initialValues,
+  setSearchFormValues,
 }) {
   //Set the patient options based on the demoOption
-  const [firstName, setFirstName] = useState<string>("");
-  const [lastName, setLastName] = useState<string>("");
-  const [phone, setPhone] = useState<string>("");
-  const [email, setEmail] = useState<string>("");
-  const [dob, setDOB] = useState<string>("");
-  const [mrn, setMRN] = useState<string>("");
-  const [address, setAddress] = useState<AddressData>({
-    street1: "",
-    street2: "",
-    city: "",
-    state: "",
-    zip: "",
-  });
+  const [firstName, setFirstName] = useState<string>(
+    initialValues?.firstName ?? "",
+  );
+  const [lastName, setLastName] = useState<string>(
+    initialValues?.lastName ?? "",
+  );
+  const [phone, setPhone] = useState<string>(initialValues?.phone ?? "");
+  const [email, setEmail] = useState<string>(initialValues?.email ?? "");
+  const [dob, setDOB] = useState<string>(initialValues?.dob ?? "");
+  const [mrn, setMRN] = useState<string>(initialValues?.mrn ?? "");
+  const [address, setAddress] = useState<AddressData>(
+    initialValues?.address ?? {
+      street1: "",
+      street2: "",
+      city: "",
+      state: "",
+      zip: "",
+    },
+  );
 
   const [fhirServerConfig, setFhirServerConfig] =
     useState<FhirServerConfig | null>(null);
@@ -209,6 +220,19 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
     }
     setLoading(true);
 
+    // Persist the raw field values so the form can be repopulated if the user
+    // revises the search. Stored before the async query so they survive any
+    // outcome (no matches, error, etc.).
+    setSearchFormValues({
+      firstName,
+      lastName,
+      dob,
+      mrn,
+      phone,
+      email,
+      address,
+    });
+
     const patientDiscoveryRequest = getPatientDiscoveryRequest();
     try {
       setMode("patient-results");
@@ -247,7 +271,11 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    prefillFromQueryParams();
+    // Skip URL prefill when we already have persisted values (e.g. the user is
+    // revising a prior search), so we don't clobber the repopulated fields.
+    if (!initialValues) {
+      prefillFromQueryParams();
+    }
   }, []);
 
   return (
