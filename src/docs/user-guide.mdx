@@ -84,16 +84,36 @@ Once you’ve chosen the query you need, click `Submit.`
 
 ### Step 4: View patient records
 
-The `Patient Record` page contains your patient’s medical record. The page is divided into four sections:
+The `Patient Record` page contains your patient’s medical record. Depending on the data returned by your query, the page can include the following sections:
 
-* Patient Demographic Information
+* Patient Info (demographics)
 * Observations
+* Service Requests
 * Encounters
 * Conditions
+* Diagnostic Reports
+* Medications (medication requests and medication statements)
+* Immunizations
 
 Use the left navigation to skip ahead to a given section, and browse the content on this page until you find the information you need.
 
 To protect patient privacy, Query Connector doesn’t allow you to download or export patient records.
+
+### What data does a query retrieve?
+
+Query Connector retrieves patient data in the form of FHIR resources – the standard format healthcare systems use to exchange health data. Depending on how a query is built, results can include the following resource types:
+
+* **Patient** – demographic information used to identify the patient, like name, date of birth, and contact information
+* **Observation** – lab test results, as well as social determinants of health if they’re included in the query
+* **DiagnosticReport** – lab reports and their associated findings
+* **Condition** – diagnoses and other health concerns
+* **Encounter** – healthcare visits related to the conditions included in the query
+* **MedicationRequest** – medications ordered or prescribed for the patient
+* **MedicationStatement** – medications the patient is (or was) taking, as reported by the patient or a clinician
+* **Immunization** – the patient’s vaccination history
+* **ServiceRequest** – lab orders and other requested services
+
+Lab, condition, and medication results are filtered to the value sets and codes selected when the query was built, so you’ll see only the records relevant to the query’s purpose.
 
 ## Advanced features (for admins and super admins)
 
