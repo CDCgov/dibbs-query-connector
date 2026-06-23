@@ -106,9 +106,11 @@ describe("user management tests", () => {
     const actionTypeToCheck = "addUserIfNotExists";
     const { user } = await addUserIfNotExists(randomUserToken);
 
-    expect(consoleInfoSpy).toHaveBeenLastCalledWith(
-      expect.stringContaining(`${actionTypeToCheck} audit action with`),
-    );
+    await waitFor(() => {
+      expect(consoleInfoSpy).toHaveBeenLastCalledWith(
+        expect.stringContaining(`${actionTypeToCheck} audit action with`),
+      );
+    });
 
     const auditEntry = await getAuditEntry(actionTypeToCheck, oldAuditIds);
     expect(JSON.parse(auditEntry?.userToken)).toStrictEqual(randomUserToken);
@@ -125,9 +127,11 @@ describe("user management tests", () => {
       UserRole.SUPER_ADMIN,
     );
 
-    expect(consoleInfoSpy).toHaveBeenLastCalledWith(
-      expect.stringContaining(`${updateActionType} audit action with`),
-    );
+    await waitFor(() => {
+      expect(consoleInfoSpy).toHaveBeenLastCalledWith(
+        expect.stringContaining(`${updateActionType} audit action with`),
+      );
+    });
 
     const updateUserDetailsEntry = await getAuditEntry(
       updateActionType,
@@ -181,9 +185,11 @@ describe("user management tests", () => {
     await addUsersToGroup(CREATED_GROUP_ID, [user.id]);
     const additionActionType = "addUsersToGroup";
 
-    expect(consoleInfoSpy).toHaveBeenLastCalledWith(
-      expect.stringContaining(`${additionActionType} audit action with`),
-    );
+    await waitFor(() => {
+      expect(consoleInfoSpy).toHaveBeenLastCalledWith(
+        expect.stringContaining(`${additionActionType} audit action with`),
+      );
+    });
 
     const additionAuditEntry = await getAuditEntry(
       additionActionType,
