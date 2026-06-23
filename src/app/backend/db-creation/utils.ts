@@ -4,12 +4,7 @@
 import { Concept } from "@/app/models/entities/concepts";
 import { DibbsValueSet } from "@/app/models/entities/valuesets";
 import { ErsdConceptType, ersdToDibbsConceptMap } from "../../constants";
-import {
-  BundleEntry,
-  FhirResource,
-  ValueSet as FhirValueSet,
-  ValueSet,
-} from "fhir/r4";
+import { BundleEntry, ValueSet as FhirValueSet, ValueSet } from "fhir/r4";
 import { insertValuesetToConceptSql, insertConceptSql } from "./seedSqlStructs";
 import { DbClient } from "../db/service";
 
@@ -85,9 +80,7 @@ export function translateVSACToInternalValueSet(
  * @returns oidToErsdType: A map of OID <> eRSD concept types
  * nonUmbrellaEntries: map of valuesets to conditions as dictated by the eRSD
  */
-export function indexErsdByOid(
-  valuesets: BundleEntry<FhirResource>[] | undefined,
-) {
+export function indexErsdByOid(valuesets: BundleEntry[] | undefined) {
   const oidToErsdType = new Map<string, string>();
   Object.keys(ersdToDibbsConceptMap).forEach((k) => {
     const umbrellaValueSet = valuesets?.find((vs) => {
@@ -100,8 +93,7 @@ export function indexErsdByOid(
     // a single `include[0]`; v3 emits one `include` entry per ref, so we
     // walk every entry's `valueSet` array.
     const includes =
-      (umbrellaValueSet as BundleEntry<ValueSet>)?.resource?.compose?.include ||
-      [];
+      (umbrellaValueSet?.resource as ValueSet)?.compose?.include || [];
     for (const inc of includes) {
       for (const vsUrl of inc.valueSet || []) {
         // eRSD v3 includes a `|version` suffix on the canonical URL
@@ -120,10 +112,10 @@ export function indexErsdByOid(
   // conditions
   const nonUmbrellaEntries = valuesets?.filter(
     (vs) => !isUmbrellaErsdId(vs.resource?.id),
-  ) as BundleEntry<ValueSet>[];
+  ) as BundleEntry[];
   const nonUmbrellaValueSets: Array<ValueSet> = (nonUmbrellaEntries || []).map(
     (vs) => {
-      return vs.resource || ({} as ValueSet);
+      return (vs.resource as ValueSet) || ({} as ValueSet);
     },
   );
 
