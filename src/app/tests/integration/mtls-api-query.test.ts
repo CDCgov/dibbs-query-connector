@@ -153,6 +153,7 @@ jest.mock("@/app/backend/fhir-servers/fhir-client", () => {
         url: "http://mock-server.com/fhir",
       }),
       getBatch: jest.fn(),
+      getRequestLog: jest.fn().mockReturnValue([]),
     })),
   };
 });
@@ -355,6 +356,7 @@ describe("API Query with Mutual TLS", () => {
       post: jest.fn(),
       postJson: jest.fn(),
       getBatch: jest.fn(),
+      getRequestLog: jest.fn().mockReturnValue([]),
     } as unknown as jest.Mocked<FHIRClient>;
 
     (prepareFhirClient as jest.Mock).mockResolvedValue(mockFhirClient);
