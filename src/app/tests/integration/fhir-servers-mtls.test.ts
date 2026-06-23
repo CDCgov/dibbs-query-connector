@@ -58,6 +58,69 @@ describe("FHIR Servers Mutual TLS Tests", () => {
       );
     });
 
+    it("should round-trip the endpoint type through insert and update", async () => {
+      const insertResult = await insertFhirServer(
+        "Test mTLS Immunization Gateway",
+        "https://test-iz.example.com/fhir",
+        false,
+        false,
+        true,
+        {
+          authType: "mutual-tls",
+          endpointType: "immunization",
+        },
+      );
+
+      expect(insertResult.success).toBe(true);
+      const serverId = insertResult.server.id;
+
+      let servers = await getFhirServerConfigs(true);
+      let server = servers.find((s) => s.id === serverId);
+      expect(server?.endpointType).toBe("immunization");
+
+      // Switching to a fanout endpoint should persist
+      const updateResult = await updateFhirServer({
+        id: serverId,
+        name: "Test mTLS Immunization Gateway",
+        hostname: "https://test-iz.example.com/fhir",
+        disableCertValidation: false,
+        defaultServer: false,
+        lastConnectionSuccessful: true,
+        authData: {
+          authType: "mutual-tls",
+          endpointType: "fanout",
+        },
+      });
+      expect(updateResult.success).toBe(true);
+
+      servers = await getFhirServerConfigs(true);
+      server = servers.find((s) => s.id === serverId);
+      expect(server?.endpointType).toBe("fanout");
+
+      await deleteFhirServer(serverId);
+    });
+
+    it("should default the endpoint type to standard when not provided", async () => {
+      const insertResult = await insertFhirServer(
+        "Test mTLS Default Endpoint",
+        "https://test-default.example.com/fhir",
+        false,
+        false,
+        true,
+        {
+          authType: "mutual-tls",
+        },
+      );
+
+      expect(insertResult.success).toBe(true);
+
+      const servers = await getFhirServerConfigs(true);
+      const server = servers.find(
+        (s) => s.name === "Test mTLS Default Endpoint",
+      );
+      expect(server?.endpointType).toBe("standard");
+    });
+
     it("should update a server to enable mutual TLS", async () => {
       // First insert without mTLS
       const insertResult = await insertFhirServer(

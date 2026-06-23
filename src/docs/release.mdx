@@ -4,11 +4,11 @@
 
 ## Release Methodology: Semantic Versioning
 
-API documentation is published automatically with Sphinx and hosted via GitHub pages. Query Connector updates are released to the GitHub Container Registry (GHCR) according to the guidelines set out in [Semantic Versioning 2.0.0](https://semver.org/) with each release's version following the pattern of MAJOR.MINOR.PATCH. The following core tenets describe when each element of a release's version would be updated.
+API documentation is published automatically with Sphinx and hosted via GitHub Pages. Query Connector updates are released to the GitHub Container Registry (GHCR) according to the guidelines set out in [Semantic Versioning 2.0.0](https://semver.org/) with each release's version following the pattern of MAJOR.MINOR.PATCH. The following core tenets describe when each element of a release's version would be updated.
 
 - **MAJOR** versions introduce breaking changes.
 
-  A breaking change breaks backwards-compatibility with previous released versions. In other words, a breaking change is something that may cause a client's implementation to stop working when upgrading from a previous version. Common examples of breaking changes include:
+  A breaking change breaks backwards compatibility with previously released versions. In other words, a breaking change is something that may cause a client's implementation to stop working when upgrading from a previous version. Common examples of breaking changes include:
 
   - Deleting a package or public functions/methods
   - Deleting public function parameters
@@ -52,7 +52,7 @@ Any time a new release needs to go out, you should check with the broader team t
 
 ### Create a Release Branch
 
-Once the new version number is defined and all desired functionality is merged into the `main` branch of the github repository, you can safely begin executing the release process. First, create a new branch off of `main` called `release-MAJOR.MINOR.PATCH` (replace each of the SemVer components with the appropriate number in the new release version).
+Once the new version number is defined and all desired functionality is merged into the `main` branch of the GitHub repository, you can safely begin executing the release process. First, create a new branch off of `main` called `release-MAJOR.MINOR.PATCH` (replace each of the SemVer components with the appropriate number in the new release version).
 
 ### Update Versioning Files
 

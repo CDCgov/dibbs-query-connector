@@ -1,5 +1,6 @@
 import https from "https";
 import { FhirServerConfig } from "../../models/entities/fhir-servers";
+import { EndpointType } from "@/app/(pages)/fhirServers/page";
 import { createSmartJwt } from "../smart-on-fhir";
 import { fetchWithoutSSL } from "../../utils/utils";
 import dbService from "../db/service";
@@ -10,6 +11,18 @@ import {
   isMtlsAvailable,
 } from "../../utils/mtls-utils";
 import { Agent } from "undici";
+
+/**
+ * Lightweight resource each endpoint type probes during a connection test.
+ * The resource differs because a Standard FHIR server, an Immunization Gateway,
+ * and a fanout (/Task) server expose different entry points.
+ */
+const TEST_CONNECTION_PROBES: Record<EndpointType, string> = {
+  standard:
+    "/Patient?name=AuthenticatedServerConnectionTest&_summary=count&_count=1",
+  immunization: "/Immunization?_count=1",
+  fanout: "/Task/foo",
+};
 
 /**
  * Custom fetch function that supports mutual TLS
@@ -42,6 +55,16 @@ function fetchWithMutualTLS(
 }
 
 /**
+ * A captured outgoing FHIR request. Headers are intentionally omitted so the
+ * auth/bearer token is never recorded or surfaced to the client.
+ */
+export type FhirRequestRecord = {
+  method: string; // "GET" | "POST"
+  url: string; // hostname + path (includes the query string for GET requests)
+  body?: string; // form-encoded body for POST _search; undefined for GET
+};
+
+/**
  * A client for querying a FHIR server.
  * @param server The FHIR server to query.
  * @returns The client instance.
@@ -51,6 +74,7 @@ class FHIRClient {
   private init: RequestInit;
   private serverConfig: FhirServerConfig;
   private fetch: (url: string, options?: RequestInit) => Promise<Response>;
+  private requestLog: FhirRequestRecord[] = [];
 
   constructor(config: FhirServerConfig) {
     this.serverConfig = config;
@@ -110,6 +134,7 @@ class FHIRClient {
       disableCertValidation: disableCertValidation,
       defaultServer: false,
       headers: authData?.headers || {},
+      endpointType: authData?.endpointType ?? "standard",
     };
 
     // Add auth-related properties if auth data is provided
@@ -179,42 +204,32 @@ class FHIRClient {
         }
       }
 
-      // Try to fetch the server's metadata
-      let response;
-      if (authData?.authType === "mutual-tls") {
-        if (!isMtlsAvailable()) {
-          return { success: false, message: "mTLS env vars not found" };
-        }
+      // For mutual TLS, ensure the client certificate/key are available before
+      // we attempt the handshake.
+      if (authData?.authType === "mutual-tls" && !isMtlsAvailable()) {
+        return { success: false, error: "mTLS certificates not found" };
+      }
 
-        response = await client.get("/Task/foo");
-        if (response.status == 404) {
-          // If mutual TLS is enabled, we can only check if the server is reachable
-          return {
-            success: true,
-            message: "Server is reachable with mutual TLS",
-          };
-        }
-      } else {
-        // Test base query
-        const response = await client.get(
-          "/Patient?name=AuthenticatedServerConnectionTest&_summary=count&_count=1",
-        );
+      // Probe a lightweight resource appropriate to the server's endpoint type
+      // (Standard FHIR -> /Patient, Immunization Gateway -> /Immunization,
+      // fanout -> /Task).
+      const endpointType = authData?.endpointType ?? "standard";
+      const response = await client.get(TEST_CONNECTION_PROBES[endpointType]);
 
-        if (!response.ok) {
-          const errorText = await response.text();
-          console.error(`Error testing connection: ${errorText}`);
-          return {
-            success: false,
-            error: `Server returned ${response.status}: ${errorText}`,
-          };
-        }
+      // A fanout (/Task) server returns 404 for the dummy task id, but that
+      // still proves the server is reachable (and, for mTLS, that the handshake
+      // succeeded). Any 2xx is a success for the other endpoint types.
+      const reachable =
+        response.ok || (endpointType === "fanout" && response.status === 404);
 
-        // If we reach here, the connection test succeeded
+      if (reachable) {
         return { success: true };
       }
 
       const errorText = await response.text();
-      console.error(`Error testing connection: ${errorText}`);
+      console.error(
+        `Error testing connection: ${response.status} ${errorText}`,
+      );
       return {
         success: false,
         error: `Server returned ${response.status}: ${errorText}`,
@@ -480,8 +495,18 @@ class FHIRClient {
    */
   async get(path: string): Promise<Response> {
     await this.ensureValidToken();
+    this.requestLog.push({ method: "GET", url: this.hostname + path });
     const response = await this.fetch(this.hostname + path, this.init);
     return response;
+  }
+
+  /**
+   * Returns the log of FHIR requests this client has issued via get()/post().
+   * Used to surface the raw outgoing requests in the UI.
+   * @returns The list of captured requests.
+   */
+  getRequestLog(): FhirRequestRecord[] {
+    return this.requestLog;
   }
 
   /**
@@ -514,10 +539,11 @@ class FHIRClient {
       body: params.toString(),
     };
 
-    // Print out the request details for debugging
-    console.log("POST Request URL:", this.hostname + path);
-    console.log("POST Request Headers:", requestOptions.headers);
-    console.log("POST Request Body:", requestOptions.body);
+    this.requestLog.push({
+      method: "POST",
+      url: this.hostname + path,
+      body: params.toString(),
+    });
 
     return this.fetch(this.hostname + path, requestOptions);
   }

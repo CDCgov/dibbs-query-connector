@@ -34,6 +34,10 @@ testWithMock.describe("Mutual TLS", () => {
         .getByTestId("server-url")
         .fill(`${process.env.AIDBOX_BASE_URL}/fhir`);
 
+      // This server uses the fanout (/Task) flow, which is no longer implied by
+      // the mutual-TLS auth method and must be selected explicitly.
+      await page.getByLabel("Endpoint Type").selectOption("Fanout (Task)");
+
       await page.getByLabel("Auth Method").selectOption("Mutual TLS");
       // Verify mutual TLS hint text appears
       await expect(

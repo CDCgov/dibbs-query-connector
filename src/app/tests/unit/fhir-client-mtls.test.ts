@@ -284,10 +284,10 @@ describe("FHIRClient with Mutual TLS", () => {
     });
   });
 
-  describe("Connection testing with mutual TLS", () => {
-    it("should test connection with mTLS enabled server", async () => {
+  describe("Connection testing by endpoint type", () => {
+    it("treats a 404 on /Task as reachable for a fanout mTLS server", async () => {
       const mockResponse = {
-        // For mTLS servers, 404 on /Task/foo is considered successful
+        // A fanout server returns 404 for the dummy task id but is reachable.
         status: 404,
         ok: false,
         text: async () => "Not found",
@@ -298,14 +298,39 @@ describe("FHIRClient with Mutual TLS", () => {
       const result = await testFhirServerConnection(
         "https://mtls.example.com/fhir",
         false,
-        { authType: "mutual-tls" },
+        { authType: "mutual-tls", endpointType: "fanout" },
       );
 
       expect(result.success).toBe(true);
-      expect(result.message).toBe("Server is reachable with mutual TLS");
+      expect(fetch).toHaveBeenCalledWith(
+        expect.stringContaining("/Task/foo"),
+        expect.any(Object),
+      );
     });
 
-    it("should test connection with non-mTLS server", async () => {
+    it("probes /Immunization for an immunization gateway", async () => {
+      const mockResponse = {
+        status: 200,
+        ok: true,
+        json: async () => ({ resourceType: "Bundle", total: 0 }),
+      };
+
+      mockFetch.mockResolvedValue(mockResponse as never);
+
+      const result = await testFhirServerConnection(
+        "https://mtls.example.com/fhir",
+        false,
+        { authType: "mutual-tls", endpointType: "immunization" },
+      );
+
+      expect(result.success).toBe(true);
+      expect(fetch).toHaveBeenCalledWith(
+        expect.stringContaining("/Immunization"),
+        expect.any(Object),
+      );
+    });
+
+    it("probes /Patient for a standard (non-mTLS) server", async () => {
       const mockResponse = {
         status: 200,
         ok: true,
@@ -329,7 +354,33 @@ describe("FHIRClient with Mutual TLS", () => {
       );
     });
 
-    it("should handle connection test failure for mTLS server", async () => {
+    it("surfaces the HTTP status when the server returns 401", async () => {
+      // Suppress console.error for this test
+      const consoleSpy = jest
+        .spyOn(console, "error")
+        .mockImplementation(() => {});
+
+      const mockResponse = {
+        status: 401,
+        ok: false,
+        text: async () => "Unauthorized",
+      };
+
+      mockFetch.mockResolvedValue(mockResponse as never);
+
+      const result = await testFhirServerConnection(
+        "https://mtls.example.com/fhir",
+        false,
+        { authType: "mutual-tls", endpointType: "immunization" },
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.error).toContain("401");
+
+      consoleSpy.mockRestore();
+    });
+
+    it("should handle connection test failure when the request throws", async () => {
       // Suppress console.error for this test
       const consoleSpy = jest
         .spyOn(console, "error")

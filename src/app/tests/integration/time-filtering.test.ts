@@ -38,11 +38,14 @@ describe("time filtering query", () => {
       fhirServer: "Aidbox",
       queryName: subjectQuery.queryName,
     };
-    const response = await patientRecordsQuery(patientRecordsRequest);
+    // Drop the captured fhirRequests so we count only FHIR resource types.
+    const { fhirRequests: _requests, ...resources } = await patientRecordsQuery(
+      patientRecordsRequest,
+    );
     // there should be three resources in the default query: 1 condition, 2 meds
-    expect(Object.keys(response).length).toBe(3);
+    expect(Object.keys(resources).length).toBe(3);
 
-    const expectedConditionResponse = response["Condition"];
+    const expectedConditionResponse = resources["Condition"];
     const startFilter = new Date("2025-12-01");
     const endFilter = new Date("2025-12-05");
 
@@ -54,10 +57,11 @@ describe("time filtering query", () => {
       endFilter.toISOString(),
     );
 
-    const newResponse = await patientRecordsQuery(patientRecordsRequest);
+    const { fhirRequests: _newRequests, ...newResources } =
+      await patientRecordsQuery(patientRecordsRequest);
     // should just have conditions left
-    expect(Object.keys(newResponse).length).toBe(1);
+    expect(Object.keys(newResources).length).toBe(1);
 
-    expect(newResponse["Condition"]).toStrictEqual(expectedConditionResponse);
+    expect(newResources["Condition"]).toStrictEqual(expectedConditionResponse);
   });
 });

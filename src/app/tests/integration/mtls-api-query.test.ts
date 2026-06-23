@@ -153,6 +153,7 @@ jest.mock("@/app/backend/fhir-servers/fhir-client", () => {
         url: "http://mock-server.com/fhir",
       }),
       getBatch: jest.fn(),
+      getRequestLog: jest.fn().mockReturnValue([]),
     })),
   };
 });
@@ -312,7 +313,7 @@ describe("API Query with Mutual TLS", () => {
     ],
   };
 
-  const mockPatientBundle: Bundle<Patient> = {
+  const mockPatientBundle: Bundle = {
     resourceType: "Bundle",
     type: "searchset",
     entry: [
@@ -355,6 +356,7 @@ describe("API Query with Mutual TLS", () => {
       post: jest.fn(),
       postJson: jest.fn(),
       getBatch: jest.fn(),
+      getRequestLog: jest.fn().mockReturnValue([]),
     } as unknown as jest.Mocked<FHIRClient>;
 
     (prepareFhirClient as jest.Mock).mockResolvedValue(mockFhirClient);
@@ -373,6 +375,7 @@ describe("API Query with Mutual TLS", () => {
         disableCertValidation: false,
         defaultServer: false,
         authType: "mutual-tls",
+        endpointType: "fanout",
       } as FhirServerConfig;
 
       const {

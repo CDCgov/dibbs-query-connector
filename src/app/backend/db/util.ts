@@ -15,9 +15,10 @@ INSERT INTO fhir_servers (
   access_token,
   token_expiry,
   ca_cert,
-  patient_match_configuration
+  patient_match_configuration,
+  endpoint_type
 )
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
 RETURNING *;
 `;
 
