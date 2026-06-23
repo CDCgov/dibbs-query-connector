@@ -47,6 +47,18 @@ export type AddressData = {
   zip: string;
 };
 
+// Raw patient search form field values, persisted across the search flow so the
+// form can be repopulated when a user revises a search that returned no matches.
+export type PatientSearchFormValues = {
+  firstName: string;
+  lastName: string;
+  dob: string;
+  mrn: string;
+  phone: string;
+  email: string;
+  address: AddressData;
+};
+
 //Create type to specify the demographic data fields for a patient
 export type DemoDataFields = {
   Id: string;
