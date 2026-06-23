@@ -167,10 +167,12 @@ test.describe("querying with the Query Connector", () => {
     await page
       .getByRole("button", { name: "View FHIR request & response" })
       .click();
-    const drawer = page.getByRole("heading", {
-      name: "FHIR request & response",
-    });
+    // Use the drawer-title testid rather than a heading-name match: the trigger
+    // button text ("View FHIR request & response") lives inside the page's
+    // "Query:" heading, so a name match would resolve to two headings.
+    const drawer = page.getByTestId("drawer-title");
     await expect(drawer).toBeVisible();
+    await expect(drawer).toContainText("FHIR request & response");
     // The Response tab is shown by default and contains the FHIR payload
     await expect(page.locator("pre")).toContainText("Patient");
     await runAxeAccessibilityChecks(page);
