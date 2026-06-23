@@ -462,7 +462,8 @@ export async function indexErsdResponseByOid() {
   const ersd = await getERSD();
 
   const valuesets = (ersd as unknown as Bundle)["entry"]?.filter(
-    (e) => e.resource?.resourceType === "ValueSet",
+    (e) =>
+      (e.resource as { resourceType?: string })?.resourceType === "ValueSet",
   );
 
   const { nonUmbrellaValueSets, oidToErsdType } = indexErsdByOid(valuesets);
