@@ -421,27 +421,44 @@ class QueryService {
     const builtQuery = new CustomQuery(savedQuery, patientId);
 
     const medicalRecordSectionResults: Response[] = [];
+    // Each medical-record-section request is isolated in its own try/catch so a
+    // network-level failure (e.g. an unsupported endpoint that resets the
+    // connection) on one section can't abort the whole patient record. Non-OK
+    // HTTP responses are filtered out further down.
     if (medicalRecordSections && medicalRecordSections.immunizations) {
-      const { basePath, params } = builtQuery.getQuery("immunization");
-      let fetchString = basePath;
-      Object.entries(params).forEach(([k, v]) => {
-        fetchString += `?${k}=${v}`;
-      });
-      medicalRecordSectionResults.push(await fhirClient.get(fetchString));
+      try {
+        const { basePath, params } = builtQuery.getQuery("immunization");
+        // params is a URLSearchParams; stringify it directly. Object.entries()
+        // on a URLSearchParams returns [] and would drop the patient filter.
+        const fetchString = `${basePath}?${params}`;
+        medicalRecordSectionResults.push(await fhirClient.get(fetchString));
+      } catch (error) {
+        console.error("Immunization FHIR query failed: ", error);
+      }
     }
 
     if (medicalRecordSections && medicalRecordSections.socialDeterminants) {
-      const { basePath, params } = builtQuery.getQuery("socialHistory");
-      medicalRecordSectionResults.push(await fhirClient.post(basePath, params));
+      try {
+        const { basePath, params } = builtQuery.getQuery("socialHistory");
+        medicalRecordSectionResults.push(
+          await fhirClient.post(basePath, params),
+        );
+      } catch (error) {
+        console.error("Social history FHIR query failed: ", error);
+      }
     }
 
     if (medicalRecordSections && medicalRecordSections.serviceRequests) {
-      const { basePath, params } = builtQuery.getQuery("serviceRequest");
+      try {
+        const { basePath, params } = builtQuery.getQuery("serviceRequest");
 
-      let fetchString = `${basePath}?${params}`;
+        const fetchString = `${basePath}?${params}`;
 
-      // todo: see if we can get this to work with post requests
-      medicalRecordSectionResults.push(await fhirClient.get(fetchString));
+        // todo: see if we can get this to work with post requests
+        medicalRecordSectionResults.push(await fhirClient.get(fetchString));
+      } catch (error) {
+        console.error("Service request FHIR query failed: ", error);
+      }
     }
 
     const postPromises = builtQuery.compileAllPostRequests().map((req) => {
@@ -463,12 +480,20 @@ class QueryService {
     const successfulResults = allResults
       .map((response) => {
         if (response.status !== 200) {
-          response.text().then((reason) => {
-            console.error(
-              `FHIR query failed from ${response.url}.
+          response
+            .text()
+            .then((reason) => {
+              console.error(
+                `FHIR query failed from ${response.url}.
               Status: ${response.status} \n Response: ${reason}`,
-            );
-          });
+              );
+            })
+            .catch((error) => {
+              console.error(
+                `FHIR query failed from ${response.url} with status ${response.status}; reading the error body also failed: `,
+                error,
+              );
+            });
         } else {
           return response;
         }
@@ -847,9 +872,21 @@ class QueryService {
 
     // Process the responses and flatten them
     if (Array.isArray(response)) {
-      resourceArray = (
-        await Promise.all(response.map(processFhirResponse))
-      ).flat();
+      // Parse each response independently so one unparseable response can't
+      // abort the others (allSettled instead of all). processFhirResponse is
+      // already guarded, so rejections here are defense-in-depth.
+      const settled = await Promise.allSettled(
+        response.map(processFhirResponse),
+      );
+      resourceArray = settled
+        .map((r) => {
+          if (r.status === "fulfilled") {
+            return r.value;
+          }
+          console.error("Parsing a FHIR response failed: ", r.reason);
+          return [];
+        })
+        .flat();
       // if response is a Bundle, extract the resource
     } else if (isFanoutSearch) {
       const resources =
@@ -917,7 +954,18 @@ class QueryService {
     let resourceIds: string[] = [];
 
     if (response.status === 200) {
-      const body = (await response.json()) as Bundle;
+      let body: Bundle;
+      try {
+        body = (await response.json()) as Bundle;
+      } catch (error) {
+        // A 200 with a malformed/non-JSON body shouldn't abort parsing of the
+        // other resources — log and treat this response as empty.
+        console.error(
+          `Failed to parse FHIR response body from ${response.url}: `,
+          error,
+        );
+        return resourceArray;
+      }
       if (body.entry) {
         for (const entry of body.entry) {
           if (entry.resource && isFhirResource(entry.resource)) {

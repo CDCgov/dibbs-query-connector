@@ -137,7 +137,10 @@ export class CustomQuery {
 
     if (medicalRecordSections && medicalRecordSections.immunizations) {
       const formattedParams = new URLSearchParams();
-      formattedParams.append("subject", `Patient/${patientId}`);
+      // FHIR R4 Immunization has no "subject" search param; the patient-scoping
+      // param is "patient". Using "subject" leaves the query unscoped and the IZ
+      // Gateway rejects it ("must contain patient.identifier or name+birthDate").
+      formattedParams.append("patient", `Patient/${patientId}`);
 
       this.fhirResourceQueries["immunization"] = {
         basePath: `/Immunization`,
