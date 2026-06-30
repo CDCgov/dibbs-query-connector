@@ -167,12 +167,7 @@ export type BuildStep = "selection" | "condition" | "valueset";
 
 /* Mode that all pages can be in; used to set page data in context */
 export type PageType =
-  | "/"
-  | "queryBuilding"
-  | "fhir-servers"
-  | "userManagement"
-  | BuildStep
-  | Mode;
+  "/" | "queryBuilding" | "fhir-servers" | "userManagement" | BuildStep | Mode;
 
 export const metadata = {
   title: "Query Connector",
@@ -182,12 +177,7 @@ export const metadata = {
 export const DEFAULT_ERSD_VERSION = "3";
 
 export type ErsdConceptType =
-  | "ostc"
-  | "lotc"
-  | "lrtc"
-  | "mrtc"
-  | "dxtc"
-  | "sdtc";
+  "ostc" | "lotc" | "lrtc" | "mrtc" | "dxtc" | "sdtc";
 
 export const ersdToDibbsConceptMap: {
   [k in ErsdConceptType]: DibbsConceptType;
