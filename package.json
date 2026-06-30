@@ -1,7 +1,7 @@
 {
   "name": "query-connector",
-  "description": "The DIBBs TryTEFCA Viewer is a FHIR client for public health specific queries.",
-  "version": "1.0.1",
+  "description": "DIBBs Query Connector: a Next.js full-stack application for public health staff to query healthcare organizations for patient records via FHIR and TEFCA networks.",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "dev": "docker compose -f docker-compose-dev.yaml up -d && next dev --turbopack; docker compose -f docker-compose-dev.yaml down --remove-orphans",

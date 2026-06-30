@@ -1,5 +1,13 @@
 name: CD
 
+# Dev build workflow. Triggers on every push to `main` (including merge
+# groups) and on manual dispatch. Builds the Query Connector Docker image
+# and pushes it to GHCR tagged with `main`.
+#
+# When the push is a release (i.e. `app_version.yml` was bumped — handled
+# by the `release.yml` workflow), this workflow skips the build to avoid
+# duplicate image pushes.
+
 on:
   merge_group:
     types:
@@ -14,7 +22,31 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  detect-release:
+    runs-on: ubuntu-latest
+    outputs:
+      is_release: ${{ steps.detect.outputs.is_release }}
+    steps:
+      - name: Check Out Changes
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install dependencies
+        run: pip install pyyaml
+
+      - name: Detect version bump
+        id: detect
+        run: python3 .github/scripts/detect_version_bump.py
+
   build:
+    needs: detect-release
+    if: needs.detect-release.outputs.is_release != 'true'
     name: Build Query Connector Image
     runs-on: ubuntu-latest
     permissions:
@@ -41,43 +73,13 @@ jobs:
         run: |
           echo "REPO=${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV
 
-      - name: Set up Python (for yq)
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.13"
-
-      - name: Install yq
-        run: pip install yq semver
-
-      - name: Get current qc version
-        id: current-version
-        run: |
-          CURRENT_VERSION=$(yq '.version' app_version.yml)
-          echo "Current Query Connector Version: $CURRENT_VERSION"
-          echo "current_version=$CURRENT_VERSION" >> $GITHUB_ENV
-
-      - name: Increment qc version
-        id: increment-version
-        run: |
-          VERSION_PART=${{ github.event.inputs.bump_patch || 'patch' }}
-          echo "Debug: env.current_version=${{ env.current_version }}"  # Debug log
-          NEW_VERSION=$(python -c "from semver import VersionInfo as V; print(V.parse('${{ env.current_version }}').bump_${VERSION_PART}())")
-          echo "New Query Connector Version: $NEW_VERSION"
-          echo "new_version=$NEW_VERSION" >> $GITHUB_ENV
-
-      - name: Update app_version.yaml
-        id: new-version
-        run: |
-          yq -i -y ".version = \"${{ env.new_version }}\"" app_version.yml
-          cat app_version.yml
-
       - name: Extract metadata (tags, labels) for Docker
         id: meta
         uses: docker/metadata-action@v5
         with:
           images: ghcr.io/${{ env.REPO }}/query-connector
           tags: |
-            type=semver,pattern={{version}},value=${{ env.new_version }}
+            type=raw,value=main
 
       - name: Build and push
         uses: docker/build-push-action@v6
