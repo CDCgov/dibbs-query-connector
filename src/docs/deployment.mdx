@@ -14,6 +14,10 @@ Query Connector has a simple architecture with just a few pieces:
 
 As the person or team deploying Query Connector, you're only responsible for deploying and managing the app, database, and potentially an identity provider, unless your organization already has one. Your data provider will provide the FHIR server, which will likely need to register your Query Connector instance as a client.
 
+The diagram below shows how these pieces fit together. Query Connector and its PostgreSQL database run in your own infrastructure—any cloud provider or on-premises—while the identity provider and FHIR servers are typically existing services you connect to.
+
+![Query Connector deployment architecture: the Query Connector app and a managed PostgreSQL database run in the jurisdiction's own infrastructure (any cloud or on-premises), connecting to the jurisdiction's existing identity provider for authentication and to external FHIR servers owned by healthcare providers and HIEs](../../public/query-connector-reference-architecture.png)
+
 ## Query Connector app
 
 There are two main ways to deploy the app:
