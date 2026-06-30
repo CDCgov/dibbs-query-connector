@@ -91,3 +91,25 @@ describe("CustomQuery medication queries", () => {
     expect(customQuery.getQuery("medicationStatement").basePath).toBe("");
   });
 });
+
+describe("CustomQuery immunization queries", () => {
+  it("scopes Immunization with the FHIR R4 'patient' search param, not 'subject'", () => {
+    const savedQuery: QueryTableResult = {
+      queryName: "Immunization Query",
+      queryId: "query-imm",
+      queryData: {},
+      conditionsList: [],
+      medicalRecordSections: {
+        ...EMPTY_MEDICAL_RECORD_SECTIONS,
+        immunizations: true,
+      },
+    };
+
+    const customQuery = new CustomQuery(savedQuery, PATIENT_ID);
+    const immunization = customQuery.getQuery("immunization");
+
+    expect(immunization.basePath).toBe("/Immunization");
+    expect(immunization.params.get("patient")).toBe(`Patient/${PATIENT_ID}`);
+    expect(immunization.params.get("subject")).toBeNull();
+  });
+});
