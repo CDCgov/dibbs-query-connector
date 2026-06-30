@@ -405,10 +405,7 @@ class FHIRClient {
             this.serverConfig.lastConnectionSuccessful ?? true,
           authData: {
             authType: this.serverConfig.authType as
-              | "SMART"
-              | "client_credentials"
-              | "basic"
-              | "none",
+              "SMART" | "client_credentials" | "basic" | "none",
             clientId: this.serverConfig.clientId,
             clientSecret: this.serverConfig.clientSecret,
             tokenEndpoint: this.serverConfig.tokenEndpoint,
