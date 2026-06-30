@@ -250,7 +250,7 @@ class SeedingService {
     // seed. Batch the lookups (matching the value set path's concurrency) and retry
     // transient failures so the seed survives intermittent network issues.
     const conditionStrings = Array.from(conditionSet);
-    const conditionPromises: ConditionStruct[] = [];
+    const conditionStructs: ConditionStruct[] = [];
 
     for (
       let startIdx = 0;
@@ -263,7 +263,7 @@ class SeedingService {
       const batchResults = await Promise.all(
         batch.map((cString) => SeedingService.fetchConditionWithRetry(cString)),
       );
-      conditionPromises.push(...batchResults);
+      conditionStructs.push(...batchResults);
 
       // Courtesy pause between batches so we don't overwhelm VSAC's API.
       if (endIdx < conditionStrings.length) {
@@ -272,7 +272,7 @@ class SeedingService {
     }
 
     // Now insert them
-    await insertDBStructArray(conditionPromises, "conditions", dbClient);
+    await insertDBStructArray(conditionStructs, "conditions", dbClient);
 
     // Finally, take care of mapping inserted value sets to inserted conditions
     // For this part, we do want the full list of conditions we obtained
@@ -307,8 +307,11 @@ class SeedingService {
    * and on a constrained egress path (e.g. ECS behind a NAT gateway) the underlying
    * fetch can reject with a transport-level "fetch failed" error (connection reset,
    * timeout, TLS). We retry those with exponential backoff rather than letting a
-   * single network blip abort the entire seed. Non-transport failures (e.g. a
-   * missing API key) are re-thrown immediately since retrying won't help.
+   * single network blip abort the entire seed. A non-200 from VSAC (which
+   * getVSACValueSet resolves to an OperationOutcome rather than throwing) is
+   * retried the same way, falling back to the prior best-effort struct on the
+   * final attempt. Non-transport failures (e.g. a missing API key) are re-thrown
+   * immediately since retrying won't help.
    * @param cString The "code*system*text" representation of the condition.
    * @returns The assembled ConditionStruct ready for DB insertion.
    */
@@ -320,13 +323,26 @@ class SeedingService {
 
     for (let attempt = 0; attempt <= VSAC_MAX_FETCH_RETRIES; attempt++) {
       try {
-        const vsacCondition: Parameters = (await getVSACValueSet(
-          c[0],
-          "condition",
-          c[1],
-        )) as Parameters;
+        const vsacCondition = await getVSACValueSet(c[0], "condition", c[1]);
 
-        const versionHolder = (vsacCondition.parameter || []).find(
+        // getVSACValueSet doesn't throw on a non-200 from VSAC; it resolves to
+        // an OperationOutcome instead. A 5xx/429 is usually a transient blip on
+        // the same constrained egress path, so retry it like a transport
+        // failure. On the final attempt we fall through and build the struct
+        // from whatever we got (an empty version), preserving the prior
+        // tolerate-and-continue behavior rather than aborting the whole seed on
+        // a persistently failing condition lookup.
+        if (
+          vsacCondition.resourceType === "OperationOutcome" &&
+          attempt < VSAC_MAX_FETCH_RETRIES
+        ) {
+          const diagnostics =
+            vsacCondition.issue?.[0]?.diagnostics ?? "unknown VSAC error";
+          throw new Error(`VSAC returned an error response: ${diagnostics}`);
+        }
+
+        const params = vsacCondition as Parameters;
+        const versionHolder = (params.parameter || []).find(
           (p) => p.name === "version",
         );
         const versionArray = (versionHolder?.valueString || "").split("/");
@@ -466,3 +482,6 @@ class SeedingService {
 }
 
 export const createDibbsDB = SeedingService.createDibbsDB;
+
+// Exported so the condition-lookup retry/backoff behavior can be unit tested.
+export const fetchConditionWithRetry = SeedingService.fetchConditionWithRetry;

@@ -39,6 +39,24 @@ load_or_fail() {
     echo "Response body: ${body}"
     exit 1
   fi
+
+  # A FHIR batch returns HTTP 200 even when individual entries fail, so the
+  # overall status above isn't enough for a batch load (e.g. GoldenSickPatient).
+  # Inspect each entry's response.status and fail if any is non-2xx so a
+  # partially-applied batch (the other way a tx.fhir.org outage shows up) is
+  # caught at seed time instead of surfacing later as "0 resources". Single
+  # resource responses aren't Bundles, so this yields nothing for them.
+  local failed_entries
+  failed_entries=$(printf '%s' "$body" | jq -r '
+    if .resourceType == "Bundle" then
+      [.entry[]? | .response.status // empty | select(test("^2[0-9][0-9]") | not)]
+    else [] end | join(", ")' 2>/dev/null)
+  if [ -n "$failed_entries" ]; then
+    echo "ERROR: ${description} returned a batch response with failed entries (statuses: ${failed_entries})."
+    echo "This usually means Aidbox's terminology service (tx.fhir.org) rejected one or more resources."
+    echo "Response body: ${body}"
+    exit 1
+  fi
 }
 
 # Compose already gates this service on `aidbox: service_healthy`, so by the
