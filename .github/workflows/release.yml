@@ -1,0 +1,188 @@
+name: Release
+
+# Triggered on every push to `main`. Detects whether the merge commit bumps
+# the `version` field in `app_version.yml`. If yes, tags the merge commit,
+# builds the Query Connector Docker image, pushes it to GHCR with
+# vX.Y.Z / vX.Y / vX / latest tags, publishes a GitHub Release with
+# auto-generated PR notes, and posts the link to Slack.
+#
+# The full release happens in a single workflow run; we do not rely on the
+# tag-push trigger (GITHUB_TOKEN-created tags do not fan out to other
+# workflows).
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  detect-release:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    outputs:
+      is_release: ${{ steps.detect.outputs.is_release }}
+      version: ${{ steps.detect.outputs.version }}
+      minor: ${{ steps.detect.outputs.minor }}
+      major: ${{ steps.detect.outputs.major }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install dependencies
+        run: pip install pyyaml
+
+      - name: Detect version bump
+        id: detect
+        run: python3 .github/scripts/detect_version_bump.py
+
+      - name: Tag merge commit (idempotent)
+        if: steps.detect.outputs.is_release == 'true'
+        env:
+          VERSION: ${{ steps.detect.outputs.version }}
+        run: |
+          set -euo pipefail
+          # Resolve the existing tag (if any) to the COMMIT it points at so we
+          # can compare against GITHUB_SHA. For an annotated tag the plain ref
+          # resolves to the tag-object SHA, so dereference with ^{} to get the
+          # commit; fall back to the plain ref for lightweight tags. An empty
+          # result means the tag does not exist yet.
+          REMOTE_SHA=$(git ls-remote origin "refs/tags/${VERSION}^{}" | awk '{print $1}')
+          if [ -z "$REMOTE_SHA" ]; then
+            REMOTE_SHA=$(git ls-remote origin "refs/tags/${VERSION}" | awk '{print $1}')
+          fi
+          if [ -z "$REMOTE_SHA" ]; then
+            echo "Creating tag ${VERSION} at ${GITHUB_SHA}"
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git tag -a "${VERSION}" -m "Release ${VERSION}" "${GITHUB_SHA}"
+            git push origin "${VERSION}"
+          elif [ "$REMOTE_SHA" = "$GITHUB_SHA" ]; then
+            echo "Tag ${VERSION} already exists at ${GITHUB_SHA}; continuing (re-run)."
+          else
+            echo "::error::Tag ${VERSION} already exists at ${REMOTE_SHA}, not ${GITHUB_SHA}. Refusing to overwrite."
+            exit 1
+          fi
+
+  build:
+    needs: detect-release
+    if: needs.detect-release.outputs.is_release == 'true'
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      id-token: write
+      packages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: lowercase repo name
+        env:
+          REPO: ${{ github.repository }}
+        run: |
+          echo "REPO=${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV
+
+      - name: Extract metadata for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ env.REPO }}/query-connector
+          tags: |
+            type=raw,value=${{ needs.detect-release.outputs.version }}
+            type=raw,value=${{ needs.detect-release.outputs.minor }}
+            type=raw,value=${{ needs.detect-release.outputs.major }}
+            type=raw,value=latest
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          no-cache: true
+
+  release:
+    needs: [detect-release, build]
+    if: needs.detect-release.outputs.is_release == 'true'
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Create or fetch GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ needs.detect-release.outputs.version }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          # Try to create the release. If it already exists (e.g. on a re-run),
+          # fall back to fetching the existing release's URL so the workflow
+          # remains idempotent.
+          response=$(curl --silent --show-error \
+            -X POST \
+            -H "Authorization: token ${GH_TOKEN}" \
+            -H "Accept: application/vnd.github+json" \
+            -d @- "https://api.github.com/repos/${REPO}/releases" <<EOF
+          {
+            "tag_name": "${VERSION}",
+            "target_commitish": "main",
+            "name": "${VERSION}",
+            "generate_release_notes": true,
+            "draft": false
+          }
+          EOF
+          )
+          html_url=$(echo "$response" | jq -r '.html_url // empty')
+          if [ -z "$html_url" ] || [ "$html_url" = "null" ]; then
+            echo "Release creation did not return an html_url; checking for existing release."
+            existing=$(curl --silent --show-error --fail \
+              -H "Authorization: token ${GH_TOKEN}" \
+              -H "Accept: application/vnd.github+json" \
+              "https://api.github.com/repos/${REPO}/releases/tags/${VERSION}")
+            html_url=$(echo "$existing" | jq -r '.html_url')
+          fi
+          echo "Release URL: $html_url"
+          echo "RELEASE_URL=$html_url" >> "$GITHUB_ENV"
+
+      - name: Post release to Slack
+        continue-on-error: true
+        uses: slackapi/slack-github-action@v2
+        with:
+          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
+          webhook-type: incoming-webhook
+          payload: |
+            text: ":package: A new release has been created: <${{ env.RELEASE_URL }}|${{ needs.detect-release.outputs.version }}>"
+            blocks:
+              - type: "section"
+                text:
+                  type: "mrkdwn"
+                  text: ":package: A new release has been created: <${{ env.RELEASE_URL }}|${{ needs.detect-release.outputs.version }}>"

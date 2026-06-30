@@ -52,7 +52,7 @@ module "ecs" {
       max_capacity      = 5,
       app_repo          = "ghcr.io/cdcgov/dibbs-query-connector",
       app_image         = "${terraform.workspace}-query-connector",
-      app_version       = "latest",
+      app_version       = "main",
       container_port    = 3000,
       host_port         = 3000,
       public            = true,

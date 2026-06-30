@@ -6,6 +6,8 @@ changelog:
       exclude:
         labels:
           - dependencies
+          - tech debt
+          - chore
     - title: 👒 Dependencies
       labels:
         - dependencies
