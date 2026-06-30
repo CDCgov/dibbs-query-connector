@@ -62,8 +62,7 @@ export async function fetchDbPassword(): Promise<string> {
  * @returns the ssl config object, or undefined if DB_SSL_CA_PATH is not set
  */
 export function buildSslConfig():
-  | { rejectUnauthorized: boolean; ca: string }
-  | undefined {
+  { rejectUnauthorized: boolean; ca: string } | undefined {
   const caPath = process.env.DB_SSL_CA_PATH;
   if (!caPath) return undefined;
   try {
