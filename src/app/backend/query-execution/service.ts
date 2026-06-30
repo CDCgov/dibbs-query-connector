@@ -483,14 +483,21 @@ class QueryService {
           response
             .text()
             .then((reason) => {
+              // Externally-controlled values (URL, status, response body) are
+              // passed as %s args rather than interpolated into the format
+              // string so they can't inject format specifiers.
               console.error(
-                `FHIR query failed from ${response.url}.
-              Status: ${response.status} \n Response: ${reason}`,
+                "FHIR query failed from %s.\n              Status: %s \n Response: %s",
+                response.url,
+                response.status,
+                reason,
               );
             })
             .catch((error) => {
               console.error(
-                `FHIR query failed from ${response.url} with status ${response.status}; reading the error body also failed: `,
+                "FHIR query failed from %s with status %s; reading the error body also failed: ",
+                response.url,
+                response.status,
                 error,
               );
             });
@@ -954,19 +961,25 @@ class QueryService {
     let resourceIds: string[] = [];
 
     if (response.status === 200) {
-      let body: Bundle;
+      let body: Bundle | null;
       try {
-        body = (await response.json()) as Bundle;
+        body = (await response.json()) as Bundle | null;
       } catch (error) {
         // A 200 with a malformed/non-JSON body shouldn't abort parsing of the
-        // other resources — log and treat this response as empty.
+        // other resources — log and treat this response as empty. response.url
+        // is passed as a %s arg (not interpolated into the format string) so an
+        // externally-controlled URL can't smuggle in format specifiers.
         console.error(
-          `Failed to parse FHIR response body from ${response.url}: `,
+          "Failed to parse FHIR response body from %s: ",
+          response.url,
           error,
         );
         return resourceArray;
       }
-      if (body.entry) {
+      // A body that parses to JSON null or a non-object is still valid JSON (so
+      // it slips past the catch above) but has no entries; optional chaining
+      // keeps the body.entry access from throwing on those values.
+      if (body?.entry) {
         for (const entry of body.entry) {
           if (entry.resource && isFhirResource(entry.resource)) {
             // Add the resource only if the ID is unique to the resources being returned for the query

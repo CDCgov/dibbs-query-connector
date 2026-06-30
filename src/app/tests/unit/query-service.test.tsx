@@ -69,6 +69,16 @@ describe("process response", () => {
 
     await expect(processFhirResponse(response)).resolves.toEqual([]);
   });
+
+  it("returns an empty array when a 200 response body parses to JSON null", async () => {
+    const response = {
+      status: 200,
+      url: "https://example.com/fhir/MedicationStatement",
+      json: async () => null,
+    } as unknown as Response;
+
+    await expect(processFhirResponse(response)).resolves.toEqual([]);
+  });
 });
 
 // Test case for parseFhirSearch
