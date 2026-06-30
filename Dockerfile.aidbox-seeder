@@ -1,7 +1,7 @@
 FROM alpine:latest
 
-# Install curl and PostgreSQL client
-RUN apk add --no-cache curl postgresql-client bash
+# Install curl, PostgreSQL client, and jq (used to inspect FHIR batch responses)
+RUN apk add --no-cache curl postgresql-client bash jq
 
 # Copy the script
 COPY ./setup-scripts/seed_aidbox.sh /seed_aidbox.sh

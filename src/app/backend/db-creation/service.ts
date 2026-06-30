@@ -27,6 +27,24 @@ import { translateVSACToInternalValueSet } from "./utils";
 import path from "path";
 import { readFileSync } from "fs";
 
+// Number of retry attempts for a single VSAC condition lookup that fails with a
+// transient transport error (e.g. undici "fetch failed" from a connection reset
+// or timeout). Total attempts = retries + 1.
+const VSAC_MAX_FETCH_RETRIES = 3;
+// Base delay for exponential backoff between condition-lookup retries.
+const VSAC_RETRY_BASE_DELAY_MS = 1000;
+// Courtesy pause between batches of condition lookups so we don't overwhelm VSAC.
+const VSAC_BATCH_DELAY_MS = 1000;
+
+/**
+ * Sleeps for the given number of milliseconds.
+ * @param ms Milliseconds to wait.
+ * @returns A promise that resolves once the delay elapses.
+ */
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 /**
  * Helper utility to resolve the path of a JSON asset file across environments.
  * In production (standalone build), __dirname resolves relative to the bundled
@@ -223,38 +241,38 @@ class SeedingService {
       conditionSet.add(repString);
     });
 
-    // Create DB based condition structures
-    let conditionPromises = await Promise.all(
-      Array.from(conditionSet).map(async (cString) => {
-        const c = cString.split("*");
-        const vsacCondition: Parameters = (await getVSACValueSet(
-          c[0],
-          "condition",
-          c[1],
-        )) as Parameters;
+    // Create DB based condition structures. These VSAC lookups used to fire all
+    // at once via Promise.all with no batching, throttling, or retry. On a
+    // constrained egress path (e.g. ECS behind a NAT gateway) a burst of hundreds
+    // of simultaneous TLS connections to VSAC regularly triggers a transient
+    // "fetch failed" (connection reset / timeout), and because Promise.all rejects
+    // on the first failure a single network blip aborted and rolled back the whole
+    // seed. Batch the lookups (matching the value set path's concurrency) and retry
+    // transient failures so the seed survives intermittent network issues.
+    const conditionStrings = Array.from(conditionSet);
+    const conditionStructs: ConditionStruct[] = [];
 
-        const versionHolder = (vsacCondition.parameter || []).find(
-          (p) => p.name === "version",
-        );
-        const versionArray = (versionHolder?.valueString || "").split("/");
-        const version = versionArray[versionArray.length - 1];
-        const finalCondition: ConditionStruct = {
-          id: c[0],
-          system: c[1],
-          name: c[2],
-          version: version,
-          category: "",
-        };
-        return finalCondition;
-      }),
-    );
+    for (
+      let startIdx = 0;
+      startIdx < conditionStrings.length;
+      startIdx += batchSize
+    ) {
+      const endIdx = Math.min(startIdx + batchSize, conditionStrings.length);
+      console.log("Fetching condition versions", startIdx, "to", endIdx);
+      const batch = conditionStrings.slice(startIdx, endIdx);
+      const batchResults = await Promise.all(
+        batch.map((cString) => SeedingService.fetchConditionWithRetry(cString)),
+      );
+      conditionStructs.push(...batchResults);
+
+      // Courtesy pause between batches so we don't overwhelm VSAC's API.
+      if (endIdx < conditionStrings.length) {
+        await sleep(VSAC_BATCH_DELAY_MS);
+      }
+    }
 
     // Now insert them
-    await insertDBStructArray(
-      conditionPromises as ConditionStruct[],
-      "conditions",
-      dbClient,
-    );
+    await insertDBStructArray(conditionStructs, "conditions", dbClient);
 
     // Finally, take care of mapping inserted value sets to inserted conditions
     // For this part, we do want the full list of conditions we obtained
@@ -281,6 +299,87 @@ class SeedingService {
     });
     ctvStructs = ctvStructs.filter((ctvs) => ctvs.id !== "NONE");
     await insertDBStructArray(ctvStructs, "condition_to_valueset", dbClient);
+  }
+
+  /**
+   * Fetches version metadata for a single eRSD condition from VSAC, retrying on
+   * transient network failures. Condition lookups go out in a burst while seeding,
+   * and on a constrained egress path (e.g. ECS behind a NAT gateway) the underlying
+   * fetch can reject with a transport-level "fetch failed" error (connection reset,
+   * timeout, TLS). We retry those with exponential backoff rather than letting a
+   * single network blip abort the entire seed. A non-200 from VSAC (which
+   * getVSACValueSet resolves to an OperationOutcome rather than throwing) is
+   * retried the same way, falling back to the prior best-effort struct on the
+   * final attempt. Non-transport failures (e.g. a missing API key) are re-thrown
+   * immediately since retrying won't help.
+   * @param cString The "code*system*text" representation of the condition.
+   * @returns The assembled ConditionStruct ready for DB insertion.
+   */
+  static async fetchConditionWithRetry(
+    cString: string,
+  ): Promise<ConditionStruct> {
+    const c = cString.split("*");
+    let lastError: unknown;
+
+    for (let attempt = 0; attempt <= VSAC_MAX_FETCH_RETRIES; attempt++) {
+      try {
+        const vsacCondition = await getVSACValueSet(c[0], "condition", c[1]);
+
+        // getVSACValueSet doesn't throw on a non-200 from VSAC; it resolves to
+        // an OperationOutcome instead. A 5xx/429 is usually a transient blip on
+        // the same constrained egress path, so retry it like a transport
+        // failure. On the final attempt we fall through and build the struct
+        // from whatever we got (an empty version), preserving the prior
+        // tolerate-and-continue behavior rather than aborting the whole seed on
+        // a persistently failing condition lookup.
+        if (
+          vsacCondition.resourceType === "OperationOutcome" &&
+          attempt < VSAC_MAX_FETCH_RETRIES
+        ) {
+          const diagnostics =
+            vsacCondition.issue?.[0]?.diagnostics ?? "unknown VSAC error";
+          throw new Error(`VSAC returned an error response: ${diagnostics}`);
+        }
+
+        const params = vsacCondition as Parameters;
+        const versionHolder = (params.parameter || []).find(
+          (p) => p.name === "version",
+        );
+        const versionArray = (versionHolder?.valueString || "").split("/");
+        const version = versionArray[versionArray.length - 1];
+        return {
+          id: c[0],
+          system: c[1],
+          name: c[2],
+          version: version,
+          category: "",
+        };
+      } catch (e) {
+        // A missing API key (or any non-transport failure) won't be fixed by
+        // retrying, so surface it immediately.
+        if (e instanceof Error && e.cause === MISSING_API_KEY_LITERAL) {
+          throw e;
+        }
+        lastError = e;
+        if (attempt < VSAC_MAX_FETCH_RETRIES) {
+          const backoffMs = VSAC_RETRY_BASE_DELAY_MS * Math.pow(2, attempt);
+          console.warn(
+            `VSAC condition lookup for ${c[0]} failed ` +
+              `(attempt ${attempt + 1}/${VSAC_MAX_FETCH_RETRIES + 1}): ` +
+              `${e instanceof Error ? e.message : String(e)}. ` +
+              `Retrying in ${backoffMs}ms.`,
+          );
+          await sleep(backoffMs);
+        }
+      }
+    }
+
+    throw new Error(
+      `VSAC condition lookup for ${c[0]} failed after ` +
+        `${VSAC_MAX_FETCH_RETRIES + 1} attempts: ` +
+        `${lastError instanceof Error ? lastError.message : String(lastError)}`,
+      { cause: lastError },
+    );
   }
 
   /**
@@ -354,6 +453,12 @@ class SeedingService {
         await dbClient.query("ROLLBACK");
         if (e instanceof Error) {
           console.error("DB reload failed", e.message);
+          // undici surfaces network failures as a generic "fetch failed" and
+          // tucks the real reason (ECONNRESET, timeout, TLS, DNS) into `cause`.
+          // Log it so deploy-time failures are diagnosable.
+          if (e.cause) {
+            console.error("Underlying cause:", e.cause);
+          }
           return {
             success: false,
             message: e.message,
@@ -377,3 +482,6 @@ class SeedingService {
 }
 
 export const createDibbsDB = SeedingService.createDibbsDB;
+
+// Exported so the condition-lookup retry/backoff behavior can be unit tested.
+export const fetchConditionWithRetry = SeedingService.fetchConditionWithRetry;
