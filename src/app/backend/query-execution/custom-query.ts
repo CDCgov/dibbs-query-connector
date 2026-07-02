@@ -5,6 +5,28 @@ import {
   QueryTableTimebox,
   TimeWindow,
 } from "../../(pages)/queryBuilding/utils";
+import { QueryStrategy } from "../../(pages)/fhirServers/page";
+
+// Epic-mode Condition and Encounter queries go out as GETs, so long code /
+// reference lists are chunked across multiple requests to keep URLs well under
+// common proxy limits. Overlapping results are safe: parseFhirSearch dedupes
+// resources by id.
+const EPIC_CONDITION_CODE_CHUNK_SIZE = 50;
+const EPIC_ENCOUNTER_DIAGNOSIS_CHUNK_SIZE = 25;
+
+// Epic-mode medication searches can't filter by code server-side, so they
+// return every medication in the patient's record. We don't follow bundle
+// next-links, so ask for a large page to avoid truncation (servers cap this
+// at their own maximum per the FHIR spec).
+const EPIC_MEDICATION_PAGE_SIZE = "1000";
+
+function chunkArray<T>(items: T[], chunkSize: number): T[][] {
+  const chunks: T[][] = [];
+  for (let i = 0; i < items.length; i += chunkSize) {
+    chunks.push(items.slice(i, i + chunkSize));
+  }
+  return chunks;
+}
 
 function formatTimeFilter(timeWindow: TimeWindow | undefined) {
   if (!timeWindow) return undefined;
@@ -27,6 +49,8 @@ function formatTimeFilter(timeWindow: TimeWindow | undefined) {
  */
 export class CustomQuery {
   patientId: string = "";
+  queryStrategy: QueryStrategy = "default";
+  private timeboxInfo?: QueryTableTimebox;
 
   // Store four types of input codes
   labCodes: string[] = [];
@@ -54,13 +78,22 @@ export class CustomQuery {
    * that has nested information about the conditions / valuesets / concepts
    * relevant to the query
    * @param patientId The ID of the patient to build into query strings.
+   * @param queryStrategy How the target server supports search: "default"
+   * uses spec-standard POST _search queries; "epic" adapts to Epic's
+   * supported search parameters (see QueryStrategy).
    */
-  constructor(savedQuery: QueryTableResult, patientId: string) {
+  constructor(
+    savedQuery: QueryTableResult,
+    patientId: string,
+    queryStrategy: QueryStrategy = "default",
+  ) {
     try {
       this.patientId = patientId;
+      this.queryStrategy = queryStrategy;
       const queryData = savedQuery.queryData;
       const medicalRecordSection = savedQuery.medicalRecordSections;
       const timeboxInfo = savedQuery.timeboxWindows;
+      this.timeboxInfo = timeboxInfo;
 
       this.initializeQueryConceptTypes(queryData);
       this.compileFhirResourceQueries(
@@ -192,7 +225,7 @@ export class CustomQuery {
       };
     }
 
-    if (conditionsFilter !== "") {
+    if (conditionsFilter !== "" && this.queryStrategy !== "epic") {
       const encounterParams = new URLSearchParams();
       encounterParams.append("subject", `Patient/${patientId}`);
       encounterParams.append("reason-code", conditionsFilter);
@@ -220,15 +253,31 @@ export class CustomQuery {
         params: conditionParams,
       };
     }
+    // In Epic mode, Condition and Encounter queries aren't compiled here.
+    // Epic's Encounter reason-code search matches text (not SNOMED codes), so
+    // Encounters are instead found via references to the patient's matching
+    // Conditions — a two-step flow the service layer drives with
+    // compileEpicConditionQueries() and compileEpicEncounterQueries().
 
     if (medicationsFilter !== "") {
+      const isEpic = this.queryStrategy === "epic";
+
       // Medications are representations of drugs independent of patient resources.
       // Sometimes we need the extra info from the medication to display in the
       // UI: that's what the ":medication" is doing and similarly for revinclude
       // for the request <> admin relationship
       const formattedParams = new URLSearchParams();
-      formattedParams.append("subject", `Patient/${patientId}`);
-      formattedParams.append("code", medicationsFilter);
+      if (isEpic) {
+        // Epic only supports GET searches for MedicationRequest with a fixed
+        // parameter set (patient, category, status, authoredon, date, intent)
+        // — no "code". Fetch all of the patient's medication requests; the
+        // service layer filters them to the query's RxNorm codes client-side.
+        formattedParams.append("patient", `Patient/${patientId}`);
+        formattedParams.append("_count", EPIC_MEDICATION_PAGE_SIZE);
+      } else {
+        formattedParams.append("subject", `Patient/${patientId}`);
+        formattedParams.append("code", medicationsFilter);
+      }
       formattedParams.append("_include", "MedicationRequest:medication");
       formattedParams.append("_revinclude", "MedicationAdministration:request");
 
@@ -238,16 +287,24 @@ export class CustomQuery {
       }
 
       this.fhirResourceQueries["medicationRequest"] = {
-        basePath: `/MedicationRequest/_search`,
+        basePath: isEpic ? `/MedicationRequest` : `/MedicationRequest/_search`,
         params: formattedParams,
+        excludeFromPost: isEpic,
       };
 
       // MedicationStatement is a separate resource recording medications a
       // patient is (or was) taking. Query it with the same RXNorm codes; its
       // date search param is "effective" (not "authoredon").
       const statementParams = new URLSearchParams();
-      statementParams.append("subject", `Patient/${patientId}`);
-      statementParams.append("code", medicationsFilter);
+      if (isEpic) {
+        // Epic returns 404 for POST /MedicationStatement/_search and doesn't
+        // support "code" filtering; GET by patient and filter client-side.
+        statementParams.append("patient", `Patient/${patientId}`);
+        statementParams.append("_count", EPIC_MEDICATION_PAGE_SIZE);
+      } else {
+        statementParams.append("subject", `Patient/${patientId}`);
+        statementParams.append("code", medicationsFilter);
+      }
       statementParams.append("_include", "MedicationStatement:medication");
 
       if (medicationsTimeFilter) {
@@ -256,10 +313,72 @@ export class CustomQuery {
       }
 
       this.fhirResourceQueries["medicationStatement"] = {
-        basePath: `/MedicationStatement/_search`,
+        basePath: isEpic
+          ? `/MedicationStatement`
+          : `/MedicationStatement/_search`,
         params: statementParams,
+        excludeFromPost: isEpic,
       };
     }
+  }
+
+  /**
+   * Epic-mode Condition GET queries. Epic's POST _search support is limited
+   * to Observation/DiagnosticReport, so Conditions are searched via GET with
+   * the query's condition codes, chunked to keep URLs bounded.
+   * @returns One GET query spec per chunk of condition codes; empty when the
+   * query has no condition codes.
+   */
+  compileEpicConditionQueries(): {
+    basePath: string;
+    params: URLSearchParams;
+  }[] {
+    const conditionsTimeFilter = formatTimeFilter(this.timeboxInfo?.conditions);
+
+    return chunkArray(this.conditionCodes, EPIC_CONDITION_CODE_CHUNK_SIZE).map(
+      (codes) => {
+        const params = new URLSearchParams();
+        params.append("patient", `Patient/${this.patientId}`);
+        params.append("code", codes.join(","));
+        if (conditionsTimeFilter) {
+          params.append("onset-date", conditionsTimeFilter.startDate);
+          params.append("onset-date", conditionsTimeFilter.endDate);
+        }
+        return { basePath: `/Condition`, params };
+      },
+    );
+  }
+
+  /**
+   * Epic-mode Encounter GET queries, built from the ids of the patient's
+   * Conditions that matched the query codes. Epic recommends searching
+   * Encounters by diagnosis (Condition references) rather than reason-code,
+   * whose Epic search semantics are text matching rather than code matching.
+   * @param conditionIds ids of matching Condition resources returned by the
+   * Epic-mode Condition queries
+   * @returns One GET query spec per chunk of Condition references; empty when
+   * no Condition ids are provided.
+   */
+  compileEpicEncounterQueries(
+    conditionIds: string[],
+  ): { basePath: string; params: URLSearchParams }[] {
+    const conditionsTimeFilter = formatTimeFilter(this.timeboxInfo?.conditions);
+
+    return chunkArray(conditionIds, EPIC_ENCOUNTER_DIAGNOSIS_CHUNK_SIZE).map(
+      (ids) => {
+        const params = new URLSearchParams();
+        params.append("patient", `Patient/${this.patientId}`);
+        params.append(
+          "diagnosis",
+          ids.map((id) => `Condition/${id}`).join(","),
+        );
+        if (conditionsTimeFilter) {
+          params.append("date", conditionsTimeFilter.startDate);
+          params.append("date", conditionsTimeFilter.endDate);
+        }
+        return { basePath: `/Encounter`, params };
+      },
+    );
   }
 
   compilePostRequest(resource: { basePath: string; params: URLSearchParams }) {

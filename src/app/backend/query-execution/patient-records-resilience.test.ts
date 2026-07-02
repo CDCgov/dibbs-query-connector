@@ -1,5 +1,8 @@
 import { patientRecordsQuery } from "./service";
-import { prepareFhirClient } from "@/app/backend/fhir-servers/service";
+import {
+  getFhirServerConfigs,
+  prepareFhirClient,
+} from "@/app/backend/fhir-servers/service";
 import { getSavedQueryByName } from "@/app/backend/query-building/service";
 import FHIRClient from "@/app/backend/fhir-servers/fhir-client";
 import {
@@ -100,6 +103,9 @@ describe("patientRecordsQuery fault isolation", () => {
     } as unknown as jest.Mocked<FHIRClient>;
 
     (prepareFhirClient as jest.Mock).mockResolvedValue(mockFhirClient);
+    (getFhirServerConfigs as jest.Mock).mockResolvedValue([
+      { name: "Test Server", queryStrategy: "default" },
+    ]);
     (getSavedQueryByName as jest.Mock).mockResolvedValue(buildSavedQuery());
   });
 
