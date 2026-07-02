@@ -19,7 +19,13 @@ import {
   useReducer,
   useState,
 } from "react";
-import { AuthMethodType, EndpointType, FormError, ModalMode } from "./page";
+import {
+  AuthMethodType,
+  EndpointType,
+  FormError,
+  ModalMode,
+  QueryStrategy,
+} from "./page";
 import { FhirServerConfig } from "@/app/models/entities/fhir-servers";
 import {
   AuthData,
@@ -70,6 +76,7 @@ const EMPTY_FHIR_SERVER = {
   disableCertValidation: false,
   defaultServer: false,
   endpointType: "standard",
+  queryStrategy: "default",
 } as FhirServerConfig;
 
 type FhirServersModal = {
@@ -102,6 +109,7 @@ interface UpdateFormAction {
   disableCertValidation?: boolean;
   defaultServer?: boolean;
   endpointType?: EndpointType;
+  queryStrategy?: QueryStrategy;
   hostname?: string;
   headers?: Record<string, string>;
   clientId?: string;
@@ -157,6 +165,7 @@ function formUpdateReducer(server: FhirServerConfig, action: UpdateFormAction) {
         disableCertValidation:
           action.disableCertValidation ?? server.disableCertValidation,
         endpointType: action.endpointType ?? server.endpointType,
+        queryStrategy: action.queryStrategy ?? server.queryStrategy,
         authType: newAuthType,
         defaultServer: action.defaultServer ?? server.defaultServer,
         // Clear caCert when switching away from mutual-tls
@@ -1041,6 +1050,7 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
         : undefined,
     caCert: server.authType === "mutual-tls" ? server?.caCert : undefined,
     endpointType: server.endpointType ?? "standard",
+    queryStrategy: server.queryStrategy ?? "default",
   });
 
   const resetModalState = () => {
@@ -1160,6 +1170,29 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
         <option value="standard">Standard FHIR</option>
         <option value="immunization">Immunization Gateway</option>
         <option value="fanout">Fanout (Task)</option>
+      </select>
+
+      <Label htmlFor="query-strategy">Query Strategy</Label>
+      <div className="usa-hint margin-bottom-1 margin-top-05">
+        Adapts patient record queries to vendor-specific FHIR search support.
+        Choose Epic for Epic-based servers, including those reached through a
+        proxy such as eHealthExchange.
+      </div>
+      <select
+        className="usa-select margin-top-05"
+        id="query-strategy"
+        data-testid="query-strategy"
+        name="query-strategy"
+        value={server.queryStrategy ?? "default"}
+        onChange={(e) => {
+          serverDispatch({
+            type: "common",
+            queryStrategy: (e.target.value as QueryStrategy) ?? "default",
+          });
+        }}
+      >
+        <option value="default">Standard (default)</option>
+        <option value="epic">Epic</option>
       </select>
 
       <Label htmlFor="auth-method">Auth Method</Label>
