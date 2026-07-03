@@ -38,7 +38,7 @@
     "date-fns": "^4.1.0",
     "fhirpath": "^4.11.0",
     "jose": "^5.2.2",
-    "next": "^15.5.18",
+    "next": "^16.2.10",
     "next-auth": "^5.0.0-beta.30",
     "next-nprogress-bar": "^2.4.4",
     "node-hl7-client": "^3.0.0",
