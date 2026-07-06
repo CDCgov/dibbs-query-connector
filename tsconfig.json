@@ -17,7 +17,7 @@
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "incremental": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
@@ -44,7 +44,8 @@
     "src/**/*.tsx",
     ".next/types/**/*.ts",
     "src/lib/remark-image-transform.mjs",
-    "setup-scripts/gen-keys.mjs"
+    "setup-scripts/gen-keys.mjs",
+    ".next/dev/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"

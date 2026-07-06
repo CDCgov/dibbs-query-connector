@@ -8,9 +8,18 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const nextConfig = {
+  // Pin the workspace root so Turbopack doesn't infer a parent directory
+  // (e.g. when building from a nested git worktree)
+  turbopack: {
+    root: __dirname,
+  },
   sassOptions: {
     implementation: "sass-embedded",
     includePaths: [
+      path.join(__dirname, "./", "node_modules", "@uswds", "uswds", "packages"),
+    ],
+    // The modern Sass API (used by Turbopack builds) calls this loadPaths
+    loadPaths: [
       path.join(__dirname, "./", "node_modules", "@uswds", "uswds", "packages"),
     ],
     silenceDeprecations: ["global-builtin", "legacy-js-api", "if-function"],
