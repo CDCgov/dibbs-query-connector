@@ -279,7 +279,18 @@ export class CustomQuery {
         formattedParams.append("code", medicationsFilter);
       }
       formattedParams.append("_include", "MedicationRequest:medication");
-      formattedParams.append("_revinclude", "MedicationAdministration:request");
+      if (!isEpic) {
+        // Epic's MedicationRequest GET doesn't document _revinclude support
+        // and unrecognized search parameters can fail the whole request, which
+        // would lose every medication. Forgo MedicationAdministration in Epic
+        // mode rather than risk that. The _include above is kept because the
+        // client-side code filter needs the referenced Medications (and fails
+        // open if the server ignores it).
+        formattedParams.append(
+          "_revinclude",
+          "MedicationAdministration:request",
+        );
+      }
 
       if (medicationsTimeFilter) {
         formattedParams.append("authoredon", medicationsTimeFilter.startDate);

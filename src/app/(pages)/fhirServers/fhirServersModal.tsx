@@ -524,6 +524,11 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
                   tokenEndpoint: srv.tokenEndpoint,
                   scopes: srv.scopes,
                   headers: srv.headers ?? {},
+                  caCert: srv.caCert,
+                  // updateFhirServer rewrites the full row, so these must be
+                  // passed through or they reset to their defaults
+                  endpointType: srv.endpointType,
+                  queryStrategy: srv.queryStrategy,
                 },
                 patientMatchConfiguration:
                   srv.patientMatchConfiguration ?? DEFAULT_PATIENT_MATCH_DATA,

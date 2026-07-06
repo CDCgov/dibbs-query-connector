@@ -572,8 +572,10 @@ class QueryService {
       .filter((v): v is Response => !!v);
 
     // Pull matching Condition ids out of the successful responses. Bodies are
-    // cloned because parseFhirSearch reads them again downstream.
-    const conditionIds: string[] = [];
+    // cloned because parseFhirSearch reads them again downstream. A Set
+    // dedupes Conditions returned by more than one chunked code query (a
+    // Condition with several codings can match codes in different chunks).
+    const conditionIds = new Set<string>();
     for (const response of conditionResponses) {
       if (response.status !== 200) continue;
       try {
@@ -581,7 +583,7 @@ class QueryService {
         bundle.entry?.forEach((entry) => {
           const resource = entry.resource as FhirResource | undefined;
           if (resource?.resourceType === "Condition" && resource.id) {
-            conditionIds.push(resource.id);
+            conditionIds.add(resource.id);
           }
         });
       } catch (error) {
@@ -592,7 +594,7 @@ class QueryService {
       }
     }
 
-    if (conditionIds.length === 0) {
+    if (conditionIds.size === 0) {
       console.log(
         "Epic query strategy: no Conditions matched the query codes; skipping the Encounter search",
       );
@@ -601,7 +603,7 @@ class QueryService {
 
     const encounterResults = await Promise.allSettled(
       builtQuery
-        .compileEpicEncounterQueries(conditionIds)
+        .compileEpicEncounterQueries([...conditionIds])
         .map(({ basePath, params }) => fhirClient.get(`${basePath}?${params}`)),
     );
     const encounterResponses = encounterResults

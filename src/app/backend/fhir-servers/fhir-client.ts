@@ -4,7 +4,7 @@ import { EndpointType } from "@/app/(pages)/fhirServers/page";
 import { createSmartJwt } from "../smart-on-fhir";
 import { fetchWithoutSSL } from "../../utils/utils";
 import dbService from "../db/service";
-import { AuthData, updateFhirServer } from "./service";
+import { AuthData, updateFhirServerAccessToken } from "./service";
 import {
   getOrCreateMtlsCert,
   getOrCreateMtlsKey,
@@ -393,30 +393,15 @@ class FHIRClient {
 
       // Only update database for non-test clients
       if (this.serverConfig.id !== "test") {
-        // Save token to database
-        await updateFhirServer({
-          id: this.serverConfig.id,
-          name: this.serverConfig.name,
-          hostname: this.serverConfig.hostname,
-          disableCertValidation:
-            this.serverConfig.disableCertValidation ?? false,
-          defaultServer: this.serverConfig.defaultServer ?? false,
-          lastConnectionSuccessful:
-            this.serverConfig.lastConnectionSuccessful ?? true,
-          authData: {
-            authType: this.serverConfig.authType as
-              "SMART" | "client_credentials" | "basic" | "none",
-            clientId: this.serverConfig.clientId,
-            clientSecret: this.serverConfig.clientSecret,
-            tokenEndpoint: this.serverConfig.tokenEndpoint,
-            scopes: this.serverConfig.scopes,
-            accessToken: tokenData.access_token, // Pass the access token
-            tokenExpiry: expiryIso, // Pass the token expiry
-            headers: this.serverConfig.headers,
-          },
-          patientMatchConfiguration:
-            this.serverConfig.patientMatchConfiguration,
-        });
+        // Save the token via the narrow token-only update. Going through
+        // updateFhirServer here would rewrite the full row from a partial
+        // authData, silently resetting configuration such as query_strategy
+        // and endpoint_type to their defaults on every token refresh.
+        await updateFhirServerAccessToken(
+          this.serverConfig.id,
+          tokenData.access_token,
+          expiryIso,
+        );
       }
     } catch (error) {
       console.error("Error getting access token:", error);

@@ -152,7 +152,14 @@ describe("CustomQuery epic strategy", () => {
     expect(request.params.get("subject")).toBeNull();
     expect(request.params.get("code")).toBeNull();
     expect(request.params.get("_include")).toBe("MedicationRequest:medication");
-    expect(request.params.get("_revinclude")).toBe(
+    // No _revinclude in epic mode: Epic doesn't document support for it on
+    // MedicationRequest GETs and an unrecognized param could fail the search.
+    expect(request.params.get("_revinclude")).toBeNull();
+
+    const defaultRequest = buildMedicationQuery(undefined, "default").getQuery(
+      "medicationRequest",
+    );
+    expect(defaultRequest.params.get("_revinclude")).toBe(
       "MedicationAdministration:request",
     );
 
