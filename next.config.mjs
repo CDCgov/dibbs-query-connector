@@ -50,11 +50,4 @@ const withMDX = createMDX({
 // 3. in a separate terminal, running next internal turbo-trace-server .next/trace-turbopack
 // and opening the generated file at trace.nextjs.org
 
-// import createBundleAnalyzer from "@next/mdx";
-// const withBundleAnalyzer = createBundleAnalyzer({
-//   enabled: process.env.ANALYZE === "true",
-// });
-//
-// export default withBundleAnalyzer(withMDX(nextConfig));
-
 export default withMDX(nextConfig);
