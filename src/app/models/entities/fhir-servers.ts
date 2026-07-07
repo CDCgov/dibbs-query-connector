@@ -1,6 +1,10 @@
 // Add this to your FhirServerConfig interface in models/entities/fhir-servers.ts
 
-import { AuthMethodType, EndpointType } from "@/app/(pages)/fhirServers/page";
+import {
+  AuthMethodType,
+  EndpointType,
+  QueryStrategy,
+} from "@/app/(pages)/fhirServers/page";
 
 export interface FhirServerConfig {
   id: string;
@@ -9,6 +13,7 @@ export interface FhirServerConfig {
   disableCertValidation: boolean;
   defaultServer: boolean;
   endpointType?: EndpointType;
+  queryStrategy?: QueryStrategy;
   lastConnectionSuccessful?: boolean;
   lastConnectionAttempt?: string;
   headers?: Record<string, string>;

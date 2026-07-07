@@ -37,6 +37,19 @@ const ENDPOINT_TYPE_LABELS: Record<EndpointType, string> = {
   fanout: "Fanout (Task)",
 };
 
+/**
+ * How patient record searches are built for a server. Orthogonal to
+ * EndpointType, which routes patient discovery:
+ * - "default": spec-standard searches (POST /{Resource}/_search with code
+ *   filters, Encounter searched by reason-code)
+ * - "epic": Epic-compatible searches — GET-based Condition/Encounter/
+ *   MedicationRequest/MedicationStatement queries, medications fetched
+ *   patient-wide and filtered to the query's codes client-side, and
+ *   Encounters found via references to the patient's matching Conditions
+ *   (Epic's reason-code search matches text, not codes)
+ */
+export type QueryStrategy = "default" | "epic";
+
 export type FormError = {
   [tokenField: string]: boolean;
 };
