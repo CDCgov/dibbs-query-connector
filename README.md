@@ -12,7 +12,7 @@
 
 This repository is a part of the CDC [DIBBs project](https://dibbs.tools/) and seeks to build the DIBBs Query Connector.
 
-The DIBBs Query Connector app offers a REST API and comprehensive UI for public health staff to query a wide network of healthcare organizations (HCOs), providing access to more complete and timely data. It's built with Next.js 15 (App Router), React 19, and TypeScript, backed by PostgreSQL with Flyway migrations, and uses NextAuth for authentication and the U.S. Web Design System (USWDS) for its UI.
+The DIBBs Query Connector app offers a REST API and comprehensive UI for public health staff to query a wide network of healthcare organizations (HCOs), providing access to more complete and timely data. It's built with Next.js 16 (App Router), React 19, and TypeScript, backed by PostgreSQL with Flyway migrations, and uses NextAuth for authentication and the U.S. Web Design System (USWDS) for its UI.
 
 The Query Connector is a tool for public health practitioners to quickly retrieve patient records and relevant case information from HCOs. The tool works either by making direct FHIR queries or by connecting to Qualified Health Information Networks (QHINs) within the Trusted Exchange Framework and Common Agreement (TEFCA), ensuring immediate access to essential health data and facilitating timely public health decisions and interventions. Public health staff can interact with the Query Connector manually by entering simple patient details — such as name, date of birth, or medical identifiers — into a web-based search form. The tool also allows for automated queries via integration engines like Rhapsody and Mirth.
 
