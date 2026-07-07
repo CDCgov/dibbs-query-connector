@@ -7,12 +7,25 @@ import createMDX from "@next/mdx";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+const uswdsPackagesPath = path.join(
+  __dirname,
+  "node_modules",
+  "@uswds",
+  "uswds",
+  "packages",
+);
+
 const nextConfig = {
+  // Pin the workspace root so Turbopack doesn't infer a parent directory
+  // (e.g. when building from a nested git worktree)
+  turbopack: {
+    root: __dirname,
+  },
   sassOptions: {
     implementation: "sass-embedded",
-    includePaths: [
-      path.join(__dirname, "./", "node_modules", "@uswds", "uswds", "packages"),
-    ],
+    includePaths: [uswdsPackagesPath],
+    // The modern Sass API (used by Turbopack builds) calls this loadPaths
+    loadPaths: [uswdsPackagesPath],
     silenceDeprecations: ["global-builtin", "legacy-js-api", "if-function"],
   },
   transpilePackages: ["yaml"],
@@ -36,12 +49,5 @@ const withMDX = createMDX({
 // 2. clicking around the problematic pages
 // 3. in a separate terminal, running next internal turbo-trace-server .next/trace-turbopack
 // and opening the generated file at trace.nextjs.org
-
-// import createBundleAnalyzer from "@next/mdx";
-// const withBundleAnalyzer = createBundleAnalyzer({
-//   enabled: process.env.ANALYZE === "true",
-// });
-//
-// export default withBundleAnalyzer(withMDX(nextConfig));
 
 export default withMDX(nextConfig);

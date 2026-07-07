@@ -22,7 +22,7 @@ export default defineConfig([
   {
     files: ["src/**/*.{ts,tsx}"],
 
-    extends: compat.extends("prettier", "plugin:@next/next/recommended"),
+    extends: [...compat.extends("prettier"), nextPlugin.configs.recommended],
 
     plugins: {
       "@typescript-eslint": typescriptEslint,

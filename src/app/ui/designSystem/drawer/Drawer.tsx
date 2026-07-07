@@ -3,7 +3,7 @@ import { Icon } from "@trussworks/react-uswds";
 import styles from "./drawer.module.scss";
 import SearchField from "../searchField/SearchField";
 import classNames from "classnames";
-import FocusTrap from "focus-trap-react";
+import { FocusTrap } from "focus-trap-react";
 
 type DrawerProps = {
   title: string | React.ReactNode;

@@ -442,8 +442,8 @@ exports[`Code library interaction renders action buttons for custom value sets o
                 >
                   <button
                     aria-current="page"
-                    aria-label="Page 1"
-                    class="usa-button usa-button--unstyled usa-pagination__button usa-current"
+                    aria-label="Last page, page 1"
+                    class="usa-pagination__button usa-current bg-transparent cursor-pointer text-underline"
                     data-testid="pagination-page-number"
                     type="button"
                   >
@@ -1341,8 +1341,8 @@ exports[`Code library rendered view renders concept codes for the value set when
                 >
                   <button
                     aria-current="page"
-                    aria-label="Page 1"
-                    class="usa-button usa-button--unstyled usa-pagination__button usa-current"
+                    aria-label="Last page, page 1"
+                    class="usa-pagination__button usa-current bg-transparent cursor-pointer text-underline"
                     data-testid="pagination-page-number"
                     type="button"
                   >
@@ -1852,8 +1852,8 @@ exports[`Code library rendered view renders the correct content 1`] = `
                 >
                   <button
                     aria-current="page"
-                    aria-label="Page 1"
-                    class="usa-button usa-button--unstyled usa-pagination__button usa-current"
+                    aria-label="Last page, page 1"
+                    class="usa-pagination__button usa-current bg-transparent cursor-pointer text-underline"
                     data-testid="pagination-page-number"
                     type="button"
                   >
