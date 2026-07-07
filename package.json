@@ -74,7 +74,7 @@
     "@types/base-64": "^1.0.2",
     "@types/fhir": "^0.0.42",
     "@types/jest": "^30.0.0",
-    "@types/node": "^22.13.9",
+    "@types/node": "^26.1.0",
     "@types/pg": "^8.15.5",
     "@types/react": "19.2.17",
     "@types/react-dom": "19.2.3",
