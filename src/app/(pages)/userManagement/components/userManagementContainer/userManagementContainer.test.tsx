@@ -31,10 +31,16 @@ jest.mock("@/app/backend/usergroup-management", () => ({
   getSingleQueryGroupAssignments: jest
     .fn()
     .mockResolvedValue({ items: [], totalItems: 0 }),
+  getAllGroupMembers: jest.fn().mockResolvedValue({ items: [], totalItems: 0 }),
+  getAllGroupQueries: jest.fn().mockResolvedValue({ items: [], totalItems: 0 }),
 }));
 
 jest.mock("@/app/backend/query-building/service", () => ({
   getCustomQueries: jest.fn().mockResolvedValue([]),
+}));
+
+jest.mock("@/app/ui/designSystem/toast/Toast", () => ({
+  showToastConfirmation: jest.fn(),
 }));
 
 jest.mock(
@@ -131,6 +137,74 @@ describe("Super Admin view of Users Table", () => {
 
     expect(document.body).toHaveTextContent("Create group");
     expect(document.body).toMatchSnapshot();
+
+    jest.restoreAllMocks();
+  });
+
+  it("opens modals and fetches group members/queries when switching tabs", async () => {
+    jest.spyOn(UserManagementBackend, "getAllUsers").mockResolvedValue({
+      items: [mockAdmin, mockSuperAdmin],
+      totalItems: 2,
+    });
+    jest
+      .spyOn(UserGroupManagementBackend, "getAllUserGroups")
+      .mockResolvedValue({
+        items: [mockGroupBasic],
+        totalItems: 1,
+      });
+    const getMembersSpy = jest
+      .spyOn(UserGroupManagementBackend, "getAllGroupMembers")
+      .mockResolvedValue({ items: [mockAdmin], totalItems: 1 });
+    const getQueriesSpy = jest
+      .spyOn(UserGroupManagementBackend, "getAllGroupQueries")
+      .mockResolvedValue({ items: [mockQueryWithGroups], totalItems: 1 });
+
+    const { user } = renderWithUser(
+      <RootProviderMock currentPage="/userManagement">
+        <UserManagementContainer role={role} />
+      </RootProviderMock>,
+    );
+
+    await waitFor(() => {
+      expect(screen.queryByText("Loading")).not.toBeInTheDocument();
+    });
+
+    // Users tab renders the "Add user" button, which opens the create-user modal
+    const addUserBtn = screen.getByRole("button", { name: "Add user" });
+    await user.click(addUserBtn);
+
+    // switch to the groups tab
+    await user.click(screen.getByRole("button", { name: "User groups" }));
+    await waitFor(() => {
+      expect(
+        screen.getByRole("button", { name: "Create group" }),
+      ).toBeInTheDocument();
+    });
+
+    // opening the create-group modal
+    await user.click(screen.getByRole("button", { name: "Create group" }));
+
+    // the members button triggers fetchGroupMembers
+    const memberBtn = await screen.findByTestId("edit-member-list-0");
+    await user.click(memberBtn);
+    await waitFor(() =>
+      expect(getMembersSpy).toHaveBeenCalledWith(mockGroupBasic.id),
+    );
+
+    // the queries button triggers fetchGroupQueries
+    const queryBtn = await screen.findByTestId("edit-query-list-0");
+    await user.click(queryBtn);
+    await waitFor(() =>
+      expect(getQueriesSpy).toHaveBeenCalledWith(mockGroupBasic.id),
+    );
+
+    // switching back to the Users tab re-fetches and re-renders the users table
+    await user.click(screen.getByRole("button", { name: "Users" }));
+    await waitFor(() => {
+      expect(
+        screen.getByRole("button", { name: "Add user" }),
+      ).toBeInTheDocument();
+    });
 
     jest.restoreAllMocks();
   });

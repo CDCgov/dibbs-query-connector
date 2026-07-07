@@ -3,6 +3,7 @@ import * as UserManagementBackend from "@/app/backend/user-management";
 import { UserRole } from "@/app/models/entities/users";
 import { renderWithUser, RootProviderMock } from "@/app/tests/unit/setup";
 import UserPermissionsTable from "./userPermissionsTable";
+import { UserManagementContext, SubjectType } from "../UserManagementProvider";
 import {
   mockAdmin,
   mockSuperAdmin,
@@ -11,6 +12,10 @@ import {
 import { createRef, RefObject } from "react";
 
 jest.mock("next-auth/react");
+
+jest.mock("@/app/ui/designSystem/toast/Toast", () => ({
+  showToastConfirmation: jest.fn(),
+}));
 
 jest.mock(
   "@/app/ui/components/withAuth/WithAuth",
@@ -109,5 +114,78 @@ describe("User Management: User tab", () => {
     await user.selectOptions(adminDropdown, ["Super Admin"]);
     expect(adminDropdown).toHaveValue("Super Admin");
     expect(updateRoleFnSpy).toHaveBeenCalledWith(mockAdmin.id, "Super Admin");
+  });
+
+  it("opens the edit section when a user group button is clicked", async () => {
+    const openEditSection = jest.fn();
+    const fetchGroupMembers = jest.fn().mockResolvedValue([mockAdmin]);
+
+    const contextValue = {
+      teamQueryEditSection: {
+        isOpen: false,
+        title: "",
+        subtitle: "",
+        placeholder: "Search",
+        groupId: "",
+        subjectType: null as SubjectType,
+        subjectData: [],
+      },
+      openEditSection,
+      closeEditSection: jest.fn(),
+    };
+
+    const { user } = renderWithUser(
+      <RootProviderMock currentPage="/userManagement">
+        <UserManagementContext.Provider value={contextValue}>
+          <UserPermissionsTable
+            openModal={jest.fn()}
+            setUsers={jest.fn()}
+            users={[mockAdmin, mockSuperAdmin]}
+            fetchGroupMembers={fetchGroupMembers}
+            rowFocusRefs={mockRefs}
+            modalData={""}
+          />
+        </UserManagementContext.Provider>
+      </RootProviderMock>,
+    );
+
+    const groupButton = screen
+      .getByText("Order of the Phoenix")
+      .closest("button") as HTMLButtonElement;
+    await user.click(groupButton);
+
+    await waitFor(() => expect(openEditSection).toHaveBeenCalled());
+    expect(fetchGroupMembers).toHaveBeenCalledWith("876");
+    expect(openEditSection).toHaveBeenCalledWith(
+      "Order of the Phoenix",
+      "Members",
+      "Members",
+      "876",
+      [mockAdmin],
+    );
+  });
+
+  it("focuses the row and opens the edit modal when Rename is clicked", async () => {
+    const openModal = jest.fn();
+
+    const { user } = renderWithUser(
+      <RootProviderMock currentPage="/userManagement">
+        <UserPermissionsTable
+          openModal={openModal}
+          setUsers={jest.fn()}
+          users={[mockAdmin, mockSuperAdmin]}
+          fetchGroupMembers={jest.fn()}
+          rowFocusRefs={mockRefs}
+          modalData={""}
+        />
+      </RootProviderMock>,
+    );
+
+    const renameButton = screen
+      .getByTestId(`edit-group-${mockAdmin.id}`)
+      .closest("button") as HTMLButtonElement;
+    await user.click(renameButton);
+
+    expect(openModal).toHaveBeenCalledWith("edit-user", mockAdmin);
   });
 });

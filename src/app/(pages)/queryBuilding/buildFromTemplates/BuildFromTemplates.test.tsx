@@ -21,8 +21,11 @@ import {
   getConditionsData,
   getSavedQueryById,
   getValueSetsAndConceptsByConditionIDs,
+  saveCustomQuery,
+  getCustomQueries,
 } from "@/app/backend/query-building/service";
 import { getTimeboxRanges } from "@/app/backend/query-timefiltering";
+import { useSession } from "next-auth/react";
 
 jest.mock("../../../backend/db-creation/service", () => ({
   getCustomQueries: jest.fn(),
@@ -37,6 +40,8 @@ jest.mock("../../../backend/query-building/service", () => ({
   getSavedQueryById: jest.fn(),
   getConditionsData: jest.fn(),
   getValueSetsAndConceptsByConditionIDs: jest.fn(),
+  saveCustomQuery: jest.fn(),
+  getCustomQueries: jest.fn(),
 }));
 
 const mockPush = jest.fn();
@@ -65,6 +70,19 @@ const GONORRHEA_NAME = formatDiseaseDisplay(GONORRHEA_DETAILS.name);
 (getSavedQueryById as jest.Mock).mockResolvedValue(gonorrheaSavedQuery);
 
 (getTimeboxRanges as jest.Mock).mockResolvedValue(undefined);
+
+(saveCustomQuery as jest.Mock).mockResolvedValue([
+  { id: "new-query-id", operation: "INSERT" },
+]);
+
+(getCustomQueries as jest.Mock).mockResolvedValue([]);
+
+// The default next-auth mock returns an undefined session; provide a signed-in
+// user so that handleSaveQuery can run.
+(useSession as jest.Mock).mockReturnValue({
+  data: { user: { username: "tester" } },
+  status: "authenticated",
+});
 
 it("customize query button is disabled unless name and individual condition are defined", async () => {
   const { user } = renderWithUser(
@@ -572,5 +590,152 @@ describe("custom value set behavior", () => {
         /This is a space for you to pull in individual value sets/i,
       ),
     ).not.toBeInTheDocument();
+  });
+});
+
+describe("save + navigation behavior", () => {
+  it("throws when rendered outside of a DataProvider", () => {
+    const spy = jest.spyOn(console, "error").mockImplementation(() => {});
+    expect(() =>
+      render(
+        <BuildFromTemplates buildStep="condition" setBuildStep={jest.fn()} />,
+      ),
+    ).toThrow(/must be used within a DataProvider/);
+    spy.mockRestore();
+  });
+
+  it("Customize query fetches value sets, advances to the valueset step, and saves", async () => {
+    const setBuildStep = jest.fn();
+    const { user } = renderWithUser(
+      <RootProviderMock
+        currentPage={currentPage}
+        initialQuery={{ queryName: undefined, queryId: undefined }}
+      >
+        <BuildFromTemplates buildStep="condition" setBuildStep={setBuildStep} />
+      </RootProviderMock>,
+    );
+
+    await user.type(screen.getByTestId("queryNameInput"), "My new query");
+    await user.click(await screen.findByLabelText(GONORRHEA_NAME));
+
+    const createBtn = screen.getByText("Customize query");
+    await waitFor(() => expect(createBtn).not.toBeDisabled());
+    await user.click(createBtn);
+
+    await waitFor(() => expect(setBuildStep).toHaveBeenCalledWith("valueset"));
+    await waitFor(() => expect(saveCustomQuery).toHaveBeenCalled());
+  });
+
+  it("Save query in the valueset step persists the query and refreshes the list", async () => {
+    const setData = jest.fn();
+    (getCustomQueries as jest.Mock).mockResolvedValueOnce([]);
+    const { user } = renderWithUser(
+      <RootProviderMock
+        currentPage={currentPage}
+        setData={setData}
+        initialQuery={{
+          queryName: gonorrheaSavedQuery.queryName,
+          queryId: gonorrheaSavedQuery.queryId,
+        }}
+      >
+        <BuildFromTemplates buildStep="valueset" setBuildStep={jest.fn()} />
+      </RootProviderMock>,
+    );
+
+    const saveBtn = await screen.findByTestId("createSaveQueryBtn");
+    await waitFor(() => expect(saveBtn).not.toBeDisabled());
+    await user.click(saveBtn);
+
+    await waitFor(() => expect(saveCustomQuery).toHaveBeenCalled());
+    await waitFor(() => expect(getCustomQueries).toHaveBeenCalled());
+    await waitFor(() => expect(setData).toHaveBeenCalledWith([]));
+  });
+
+  it("shows an error toast and does not select a condition when its value sets fail to load", async () => {
+    (getValueSetsAndConceptsByConditionIDs as jest.Mock).mockResolvedValueOnce(
+      [],
+    );
+    const { user } = renderWithUser(
+      <RootProviderMock
+        currentPage={currentPage}
+        initialQuery={{ queryName: undefined, queryId: undefined }}
+      >
+        <BuildFromTemplates buildStep="condition" setBuildStep={jest.fn()} />
+      </RootProviderMock>,
+    );
+
+    await user.type(screen.getByTestId("queryNameInput"), "My query");
+    await user.click(await screen.findByLabelText(GONORRHEA_NAME));
+
+    // constructedQuery stays empty, so the Customize button remains disabled
+    await waitFor(() =>
+      expect(screen.getByText("Customize query")).toBeDisabled(),
+    );
+  });
+
+  it("navigates back without a warning when there are no unsaved changes", async () => {
+    const setBuildStep = jest.fn();
+    (saveCustomQuery as jest.Mock).mockClear();
+    const { user } = renderWithUser(
+      <RootProviderMock
+        currentPage={currentPage}
+        initialQuery={{ queryName: undefined, queryId: undefined }}
+      >
+        <BuildFromTemplates buildStep="condition" setBuildStep={setBuildStep} />
+      </RootProviderMock>,
+    );
+
+    await screen.findByText("Customize query");
+    await user.click(screen.getByTestId("backArrowLink"));
+
+    await waitFor(() => expect(setBuildStep).toHaveBeenCalledWith("selection"));
+    expect(saveCustomQuery).not.toHaveBeenCalled();
+  });
+
+  it("prompts before navigating away with unsaved changes and saves on confirm", async () => {
+    const setBuildStep = jest.fn();
+    (saveCustomQuery as jest.Mock).mockClear();
+    const { user } = renderWithUser(
+      <RootProviderMock
+        currentPage={currentPage}
+        initialQuery={{ queryName: undefined, queryId: undefined }}
+      >
+        <BuildFromTemplates buildStep="condition" setBuildStep={setBuildStep} />
+      </RootProviderMock>,
+    );
+
+    await screen.findByText("Customize query");
+    await user.type(screen.getByTestId("queryNameInput"), "Draft name");
+
+    await user.click(screen.getByTestId("backArrowLink"));
+    // With unsaved changes, navigation is deferred until the modal is resolved
+    expect(setBuildStep).not.toHaveBeenCalledWith("selection");
+
+    await user.click(screen.getByRole("button", { name: "Save" }));
+
+    await waitFor(() => expect(saveCustomQuery).toHaveBeenCalled());
+    await waitFor(() => expect(setBuildStep).toHaveBeenCalledWith("selection"));
+  });
+
+  it("dismisses the unsaved-changes modal and navigates without saving", async () => {
+    const setBuildStep = jest.fn();
+    (saveCustomQuery as jest.Mock).mockClear();
+    const { user } = renderWithUser(
+      <RootProviderMock
+        currentPage={currentPage}
+        initialQuery={{ queryName: undefined, queryId: undefined }}
+      >
+        <BuildFromTemplates buildStep="condition" setBuildStep={setBuildStep} />
+      </RootProviderMock>,
+    );
+
+    await screen.findByText("Customize query");
+    await user.type(screen.getByTestId("queryNameInput"), "Draft name");
+
+    await user.click(screen.getByTestId("backArrowLink"));
+    await user.click(screen.getByRole("button", { name: "Dismiss" }));
+
+    await waitFor(() => expect(setBuildStep).toHaveBeenCalledWith("selection"));
+    expect(saveCustomQuery).not.toHaveBeenCalled();
   });
 });
