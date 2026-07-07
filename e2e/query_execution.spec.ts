@@ -161,6 +161,18 @@ test.describe("querying with the Query Connector", () => {
         .getByRole("row")
         .filter({ hasText: "azithromycin 1000 MG" }),
     ).toHaveCount(2);
+    // The "Medications" section renders both a "Medication Requests" and a
+    // "Medication Statements" sub-table (#951). The Chlamydia query's RxNorm
+    // codes include ceftriaxone (1665005), which the demo patient carries as a
+    // MedicationStatement, so the statements sub-table renders that row.
+    await expect(page.getByText("Medication Statements")).toBeVisible();
+    await expect(
+      page
+        .getByRole("table")
+        .getByRole("row")
+        .filter({ hasText: "ceftriaxone 500 MG Injection" })
+        .first(),
+    ).toBeVisible();
     await runAxeAccessibilityChecks(page);
 
     // Check that the drawer works
@@ -177,6 +189,17 @@ test.describe("querying with the Query Connector", () => {
     await expect(page.locator("pre")).toContainText("Patient");
     await runAxeAccessibilityChecks(page);
 
+    // The Request tab (#959) lists the outgoing FHIR requests as "METHOD url".
+    await page.getByRole("button", { name: "Request", exact: true }).click();
+    await expect(page.locator("pre")).not.toContainText(
+      "No FHIR requests recorded.",
+    );
+    await expect(page.locator("pre")).toContainText(/GET|POST/);
+    await expect(page.locator("pre")).toContainText("Patient");
+    // Toggling back to Response restores the payload view.
+    await page.getByRole("button", { name: "Response", exact: true }).click();
+    await expect(page.locator("pre")).toContainText("Patient");
+
     await page.getByRole("button", { name: "Close drawer" }).click();
     await expect(drawer).not.toBeVisible();
 
@@ -188,6 +211,33 @@ test.describe("querying with the Query Connector", () => {
         exact: true,
       }),
     ).toBeVisible();
+    // "New patient search" clears the form (contrast with "Revise", below).
+    await expect(page.getByLabel("First name")).toHaveValue("");
+  });
+
+  test("preserves patient search inputs when revising a search", async ({
+    page,
+  }) => {
+    // Prefill the demo values, then override the name with something that
+    // matches no patient so we land on the "No Records Found" page.
+    await page.getByRole("button", { name: "Fill fields" }).click();
+    const firstName = "Nomatch";
+    const lastName = "Persistedname";
+    await page.getByLabel("First name").fill(firstName);
+    await page.getByLabel("Last name").fill(lastName);
+
+    await page.getByRole("button", { name: "Search for patient" }).click();
+    await expect(
+      page.getByRole("heading", { name: "No Records Found" }),
+    ).toBeVisible();
+
+    // Revise should repopulate the form with the previously entered values
+    // rather than resetting to a blank form (#958).
+    await page
+      .getByRole("button", { name: "Revise your patient search" })
+      .click();
+    await expect(page.getByLabel("First name")).toHaveValue(firstName);
+    await expect(page.getByLabel("Last name")).toHaveValue(lastName);
   });
 });
 
