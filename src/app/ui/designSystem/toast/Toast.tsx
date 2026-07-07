@@ -1,6 +1,6 @@
 import { Alert, HeadingLevel } from "@trussworks/react-uswds";
 import { toast, ToastPosition } from "react-toastify";
-import type { ToastIcon } from "../../../../../node_modules/react-toastify/dist/types";
+import type { ToastIcon } from "react-toastify";
 import classNames from "classnames";
 
 export type AlertType = "info" | "success" | "warning" | "error";
