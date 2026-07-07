@@ -7,6 +7,14 @@ import createMDX from "@next/mdx";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+const uswdsPackagesPath = path.join(
+  __dirname,
+  "node_modules",
+  "@uswds",
+  "uswds",
+  "packages",
+);
+
 const nextConfig = {
   // Pin the workspace root so Turbopack doesn't infer a parent directory
   // (e.g. when building from a nested git worktree)
@@ -15,13 +23,9 @@ const nextConfig = {
   },
   sassOptions: {
     implementation: "sass-embedded",
-    includePaths: [
-      path.join(__dirname, "./", "node_modules", "@uswds", "uswds", "packages"),
-    ],
+    includePaths: [uswdsPackagesPath],
     // The modern Sass API (used by Turbopack builds) calls this loadPaths
-    loadPaths: [
-      path.join(__dirname, "./", "node_modules", "@uswds", "uswds", "packages"),
-    ],
+    loadPaths: [uswdsPackagesPath],
     silenceDeprecations: ["global-builtin", "legacy-js-api", "if-function"],
   },
   transpilePackages: ["yaml"],
