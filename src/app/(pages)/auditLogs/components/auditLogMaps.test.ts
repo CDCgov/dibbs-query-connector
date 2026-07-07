@@ -12,7 +12,11 @@ import {
 
 const mockGetAllUsers = getAllUsers as jest.Mock;
 
-/** Convenience helper to run a formatter by action type. */
+/**
+ * Convenience helper to run a formatter by action type.
+ * @param actionType
+ * @param log
+ */
 function format(actionType: string, log: Record<string, unknown>): string {
   return auditLogActionTypeMap[actionType].format(log);
 }

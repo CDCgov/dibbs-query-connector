@@ -28,7 +28,7 @@ jest.mock("next-auth/providers/ping-id", () => ({
 
 type LibModule = typeof import("./lib");
 // Required (not imported) so it evaluates after AUTH_CLIENT_ID is set above.
-// eslint-disable-next-line @typescript-eslint/no-require-imports
+ 
 const {
   AuthContext,
   KeycloakAuthStrategy,
@@ -36,7 +36,10 @@ const {
   PingFederateAuthStrategy,
 } = require("./lib") as LibModule;
 
-/** Builds an unsigned JWT string that jose's decodeJwt can decode. */
+/**
+ * Builds an unsigned JWT string that jose's decodeJwt can decode.
+ * @param payload
+ */
 function makeJwt(payload: Record<string, unknown>): string {
   const b64 = (o: unknown) =>
     Buffer.from(JSON.stringify(o)).toString("base64url");

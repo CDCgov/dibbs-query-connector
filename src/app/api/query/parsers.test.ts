@@ -13,7 +13,10 @@ import { USE_CASE_DETAILS, USE_CASES } from "@/app/constants";
 
 const MR_SYSTEM = "http://terminology.hl7.org/CodeSystem/v2-0203";
 
-/** Small factory so each test only sets the fields it cares about. */
+/**
+ * Small factory so each test only sets the fields it cares about.
+ * @param overrides
+ */
 const makePatient = (overrides: Partial<Patient> = {}): Patient => ({
   resourceType: "Patient",
   ...overrides,
