@@ -58,6 +58,7 @@ describe("FHIR Servers tests", () => {
     expect(newServer?.name).toBe(TEST_FHIR_SERVER.name);
     expect(newServer?.hostname).toBe(TEST_FHIR_SERVER.hostname);
     expect(newServer?.authType).toBe("none");
+    expect(newServer?.queryStrategy).toBe("default");
 
     //update works
     const NEW_NAME = "Kongo Jungle Two";
@@ -70,12 +71,14 @@ describe("FHIR Servers tests", () => {
       defaultServer: false,
       authData: {
         authType: "none",
+        queryStrategy: "epic",
       },
     });
     newFhirServers = await getFhirServerConfigs(true);
     const shouldBeUpdated = newFhirServers.find((v) => v.name === NEW_NAME);
     expect(shouldBeUpdated?.name).toBe(NEW_NAME);
     expect(shouldBeUpdated?.hostname).toBe(NEW_HOSTNAME);
+    expect(shouldBeUpdated?.queryStrategy).toBe("epic");
 
     // deletion works
     await deleteFhirServer(newServer?.id as string);

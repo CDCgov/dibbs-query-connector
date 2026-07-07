@@ -5,7 +5,11 @@ import FHIRClient from "@/app/backend/fhir-servers/fhir-client";
 import dbService from "../db/service";
 import { transaction } from "../db/decorators";
 import { FHIR_SERVER_INSERT_QUERY } from "../db/util";
-import { AuthMethodType, EndpointType } from "@/app/(pages)/fhirServers/page";
+import {
+  AuthMethodType,
+  EndpointType,
+  QueryStrategy,
+} from "@/app/(pages)/fhirServers/page";
 
 // Define an interface for authentication data
 export interface AuthData {
@@ -20,6 +24,7 @@ export interface AuthData {
   headers?: Record<string, string>;
   caCert?: string;
   endpointType?: EndpointType;
+  queryStrategy?: QueryStrategy;
 }
 
 // Define an interface for patient match configuration
@@ -176,7 +181,8 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
       token_expiry = $14,
       ca_cert = $15,
       patient_match_configuration = $16,
-      endpoint_type = $17
+      endpoint_type = $17,
+      query_strategy = $18
     WHERE id = $1
     RETURNING *;
   `;
@@ -236,6 +242,7 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
         authData?.caCert || null,
         patientMatchConfigObject,
         authData?.endpointType || "standard",
+        authData?.queryStrategy || "default",
       ]);
 
       // Clear the cache so the next getFhirServerConfigs call will fetch fresh data
@@ -257,6 +264,62 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
       return {
         success: false,
         error: "Failed to update the server configuration.",
+      };
+    }
+  }
+
+  /**
+   * Persists a refreshed access token for a FHIR server. Deliberately narrow:
+   * token refresh runs in the background, so it must not rewrite configuration
+   * columns the way updateFhirServer does (a partial authData there would
+   * silently reset fields like query_strategy and endpoint_type to their
+   * defaults).
+   * @param id - The ID of the FHIR server
+   * @param accessToken - The new access token
+   * @param tokenExpiry - ISO timestamp when the token expires
+   * @returns An object indicating success or failure with optional error message
+   */
+  @transaction
+  static async updateFhirServerAccessToken(
+    id: string,
+    accessToken: string,
+    tokenExpiry: string,
+  ) {
+    const updateQuery = `
+    UPDATE fhir_servers
+    SET
+      access_token = $2,
+      token_expiry = $3
+    WHERE id = $1
+    RETURNING *;
+  `;
+
+    try {
+      const result = await dbService.query(updateQuery, [
+        id,
+        accessToken,
+        tokenExpiry,
+      ]);
+
+      // Clear the cache so the next getFhirServerConfigs call will fetch fresh data
+      FhirServerConfigService.cachedFhirServerConfigs = null;
+
+      if (result.rows.length === 0) {
+        return {
+          success: false,
+          error: "Server not found",
+        };
+      }
+
+      return {
+        success: true,
+        server: result.rows[0],
+      };
+    } catch (error) {
+      console.error("Failed to update FHIR server access token:", error);
+      return {
+        success: false,
+        error: "Failed to update the server access token.",
       };
     }
   }
@@ -339,6 +402,7 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
         authData?.caCert || null,
         patientMatchConfigObject,
         authData?.endpointType || "standard",
+        authData?.queryStrategy || "default",
       ]);
 
       // Clear the cache so the next getFhirServerConfigs call will fetch fresh data
@@ -423,6 +487,8 @@ export const getFhirServerNames = FhirServerConfigService.getFhirServerNames;
 export const updateFhirServerConnectionStatus =
   FhirServerConfigService.updateFhirServerConnectionStatus;
 export const updateFhirServer = FhirServerConfigService.updateFhirServer;
+export const updateFhirServerAccessToken =
+  FhirServerConfigService.updateFhirServerAccessToken;
 export const insertFhirServer = FhirServerConfigService.insertFhirServer;
 export const deleteFhirServer = FhirServerConfigService.deleteFhirServer;
 export const prepareFhirClient = FhirServerConfigService.prepareFhirClient;

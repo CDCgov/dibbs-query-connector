@@ -160,10 +160,35 @@ On the "New server" page, complete the following fields:
 
 1. Server name: a clear label (e.g., Stanford (Non-Prod) or Cedars (Prod)).
 2. URL: the HCO's Epic FHIR base URL for the correct environment
-3. Auth Method: SMART on FHIR
-4. Custom Headers:
+3. Query Strategy: Epic (see below)
+4. Auth Method: SMART on FHIR
+5. Custom Headers:
    - Accept: application/fhir+json
    - Content-Type: application/fhir+json; charset=UTF-8
+
+#### Query Strategy: Epic
+
+Set Query Strategy to "Epic" for any Epic-based FHIR server, whether QC
+connects to it directly or through a proxy such as eHealthExchange. Epic's
+FHIR search API differs from the FHIR specification defaults in a few ways
+that would otherwise cause queries to silently return incomplete records:
+
+- Epic does not support `POST /MedicationStatement/_search` (it returns
+  404), and its MedicationRequest/MedicationStatement searches can't filter
+  by medication code. With the Epic strategy, QC retrieves all of the
+  patient's medication records via GET and filters them to the query's
+  RxNorm codes within QC itself. If Epic doesn't return the referenced
+  Medication resources needed to determine a record's code, QC keeps the
+  record rather than dropping it (over-inclusion is safer than silently
+  missing medications).
+- Epic's Encounter `reason-code` search matches display text rather than
+  SNOMED codes. With the Epic strategy, QC instead searches the patient's
+  Conditions for the query's codes, then finds Encounters whose diagnosis
+  references those Conditions. If no Conditions match, the Encounter search
+  is skipped.
+
+Observation and DiagnosticReport queries are unaffected — Epic supports
+code-filtered searches for those natively.
 
 Optional settings:
 

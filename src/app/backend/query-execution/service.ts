@@ -4,6 +4,7 @@ import { Bundle, FhirResource, Patient, Task } from "fhir/r4";
 import { isFhirResource } from "../../constants";
 
 import { CustomQuery } from "./custom-query";
+import { filterMedicationResourcesByCode } from "./medication-filter";
 import { GetPhoneQueryFormats } from "../../utils/format-service";
 import { auditable } from "../audit-logs/decorator";
 import type { QueryTableResult } from "../../(pages)/queryBuilding/utils";
@@ -417,8 +418,13 @@ class QueryService {
     fhirServer: string,
   ) {
     const fhirClient = await prepareFhirClient(fhirServer);
+    const serverConfigs = await getFhirServerConfigs();
+    const serverConfig = serverConfigs.find(
+      (config) => config.name === fhirServer,
+    );
+    const queryStrategy = serverConfig?.queryStrategy ?? "default";
     const medicalRecordSections = savedQuery.medicalRecordSections;
-    const builtQuery = new CustomQuery(savedQuery, patientId);
+    const builtQuery = new CustomQuery(savedQuery, patientId, queryStrategy);
 
     const medicalRecordSectionResults: Response[] = [];
     // Each medical-record-section request is isolated in its own try/catch so a
@@ -461,17 +467,35 @@ class QueryService {
       }
     }
 
-    const postPromises = builtQuery.compileAllPostRequests().map((req) => {
-      return fhirClient.post(req.path, req.params);
-    });
+    const postPromises: Promise<Response | Response[]>[] = builtQuery
+      .compileAllPostRequests()
+      .map((req) => {
+        return fhirClient.post(req.path, req.params);
+      });
+
+    if (queryStrategy === "epic") {
+      // Epic doesn't support POST _search (or server-side code filtering) for
+      // these resources, so they're issued as GETs alongside the POST batch.
+      // Medication results are filtered to the query's codes downstream.
+      for (const key of ["medicationRequest", "medicationStatement"]) {
+        const { basePath, params } = builtQuery.getQuery(key);
+        if (basePath !== "") {
+          postPromises.push(fhirClient.get(`${basePath}?${params}`));
+        }
+      }
+      postPromises.push(
+        QueryService.runEpicConditionEncounterChain(fhirClient, builtQuery),
+      );
+    }
 
     const postResults = await Promise.allSettled(postPromises);
     const fulfilledResults = postResults
-      .map((r) => {
+      .flatMap((r) => {
         if (r.status === "fulfilled") {
-          return r.value;
+          return Array.isArray(r.value) ? r.value : [r.value];
         } else {
-          console.error("POST to FHIR query promise rejected: ", r.reason);
+          console.error("FHIR query promise rejected: ", r.reason);
+          return [];
         }
       })
       .filter((v): v is Response => !!v);
@@ -510,7 +534,86 @@ class QueryService {
     return {
       responses: successfulResults,
       requests: fhirClient.getRequestLog(),
+      medicationFilterCodes:
+        queryStrategy === "epic" ? builtQuery.medicationCodes : undefined,
     };
+  }
+
+  /**
+   * Epic-mode two-step Encounter retrieval. Epic's Encounter reason-code
+   * search matches text rather than SNOMED codes, so Encounters are found by
+   * first fetching the patient's Conditions that match the query codes, then
+   * searching Encounters whose diagnosis references those Conditions. The
+   * Condition responses are returned alongside the Encounter responses (they
+   * replace the default-mode Condition POST _search).
+   * @param fhirClient - client for the FHIR server being queried
+   * @param builtQuery - the compiled CustomQuery
+   * @returns the Condition and Encounter responses that succeeded
+   */
+  private static async runEpicConditionEncounterChain(
+    fhirClient: FHIRClient,
+    builtQuery: CustomQuery,
+  ): Promise<Response[]> {
+    const conditionQueries = builtQuery.compileEpicConditionQueries();
+    if (conditionQueries.length === 0) {
+      return [];
+    }
+
+    const conditionResults = await Promise.allSettled(
+      conditionQueries.map(({ basePath, params }) =>
+        fhirClient.get(`${basePath}?${params}`),
+      ),
+    );
+    const conditionResponses = conditionResults
+      .map((r) => {
+        if (r.status === "fulfilled") return r.value;
+        console.error("Epic Condition FHIR query rejected: ", r.reason);
+      })
+      .filter((v): v is Response => !!v);
+
+    // Pull matching Condition ids out of the successful responses. Bodies are
+    // cloned because parseFhirSearch reads them again downstream. A Set
+    // dedupes Conditions returned by more than one chunked code query (a
+    // Condition with several codings can match codes in different chunks).
+    const conditionIds = new Set<string>();
+    for (const response of conditionResponses) {
+      if (response.status !== 200) continue;
+      try {
+        const bundle = (await response.clone().json()) as Bundle;
+        bundle.entry?.forEach((entry) => {
+          const resource = entry.resource as FhirResource | undefined;
+          if (resource?.resourceType === "Condition" && resource.id) {
+            conditionIds.add(resource.id);
+          }
+        });
+      } catch (error) {
+        console.error(
+          "Failed to parse Epic Condition response for Encounter chaining: ",
+          error,
+        );
+      }
+    }
+
+    if (conditionIds.size === 0) {
+      console.log(
+        "Epic query strategy: no Conditions matched the query codes; skipping the Encounter search",
+      );
+      return conditionResponses;
+    }
+
+    const encounterResults = await Promise.allSettled(
+      builtQuery
+        .compileEpicEncounterQueries([...conditionIds])
+        .map(({ basePath, params }) => fhirClient.get(`${basePath}?${params}`)),
+    );
+    const encounterResponses = encounterResults
+      .map((r) => {
+        if (r.status === "fulfilled") return r.value;
+        console.error("Epic Encounter FHIR query rejected: ", r.reason);
+      })
+      .filter((v): v is Response => !!v);
+
+    return [...conditionResponses, ...encounterResponses];
   }
 
   @auditable
@@ -780,14 +883,23 @@ class QueryService {
       throw new Error(`Unable to query of name ${request?.queryName}`);
     }
 
-    const { responses, requests } =
+    const { responses, requests, medicationFilterCodes } =
       await QueryService.makePatientRecordsRequest(
         savedQuery,
         request.patientId,
         request.fhirServer,
       );
 
-    const queryResponse = await QueryService.parseFhirSearch(responses);
+    let queryResponse = await QueryService.parseFhirSearch(responses);
+
+    // Set when the server's search API couldn't filter medications by code
+    // (Epic); apply the query's medication codes client-side instead.
+    if (medicationFilterCodes && medicationFilterCodes.length > 0) {
+      queryResponse = filterMedicationResourcesByCode(
+        queryResponse,
+        medicationFilterCodes,
+      );
+    }
 
     return { ...queryResponse, fhirRequests: requests };
   }
