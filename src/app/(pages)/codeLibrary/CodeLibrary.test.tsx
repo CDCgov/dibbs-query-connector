@@ -17,8 +17,15 @@ import {
   getValueSetCreators,
 } from "@/app/backend/custom-code-service";
 import { renderWithUser } from "@/app/tests/unit/setup";
-import { insertCustomValueSet } from "@/app/backend/custom-code-service";
-import { getConditionsData } from "@/app/backend/query-building/service";
+import {
+  insertCustomValueSet,
+  insertCustomValuesetsIntoQuery,
+  deleteCustomValueSet,
+} from "@/app/backend/custom-code-service";
+import {
+  getConditionsData,
+  getSavedQueryById,
+} from "@/app/backend/query-building/service";
 import { DibbsValueSet } from "@/app/models/entities/valuesets";
 
 jest.mock("next-auth/react");
@@ -42,6 +49,21 @@ jest.mock(
 
 jest.mock("@/app/backend/query-building/service", () => ({
   getConditionsData: jest.fn(),
+  getSavedQueryById: jest.fn(),
+  saveCustomQuery: jest.fn(),
+  getCustomQueries: jest.fn(),
+}));
+
+const mockSaveQueryAndRedirect = jest.fn();
+jest.mock("@/app/backend/query-building/useSaveQueryAndRedirect", () => ({
+  useSaveQueryAndRedirect: () => mockSaveQueryAndRedirect,
+}));
+
+const mockShowToast = jest.fn();
+jest.mock("@/app/ui/designSystem/toast/Toast", () => ({
+  __esModule: true,
+  showToastConfirmation: (...args: unknown[]) => mockShowToast(...args),
+  default: () => null,
 }));
 
 jest.mock("@/app/backend/usergroup-management", () => ({
@@ -70,6 +92,7 @@ jest.mock("@/app/backend/custom-code-service", () => ({
   insertCustomValueSet: jest.fn(),
   insertCustomValuesetsIntoQuery: jest.fn(),
   deleteCustomValueSet: jest.fn(),
+  deleteCustomConcept: jest.fn(),
 }));
 
 const cancerValueSet: DibbsValueSet = {
@@ -423,6 +446,467 @@ describe("Code library CSV upload", () => {
 
     await waitFor(() =>
       expect(screen.getByText(/1 filter applied/i)).toBeInTheDocument(),
+    );
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Additional coverage: select mode, delete flow, filters, search/pagination,
+// create/edit form navigation, and CSV error handling.
+// ---------------------------------------------------------------------------
+
+const adminUser = {
+  id: "user-1",
+  username: "qcadmin",
+  firstName: "QC",
+  lastName: "Admin",
+};
+
+function setupDefaultMocks(
+  paged: typeof mockPagedResponse = mockPagedResponse,
+  concepts = mockConcepts,
+) {
+  jest.clearAllMocks();
+  (getAllUsers as jest.Mock).mockResolvedValue({ items: [], totalItems: 0 });
+  (getAllUserGroups as jest.Mock).mockResolvedValue({
+    items: [],
+    totalItems: 0,
+  });
+  (getAllGroupMembers as jest.Mock).mockResolvedValue({
+    items: [],
+    totalItems: 0,
+  });
+  (getUserByUsername as jest.Mock).mockResolvedValue({ items: [adminUser] });
+  (getConditionsData as jest.Mock).mockResolvedValue({
+    conditionIdToNameMap,
+    categoryToConditionNameArrayMap,
+  });
+  (getValueSetsPaginated as jest.Mock).mockResolvedValue(paged);
+  (getConceptsByValueSetId as jest.Mock).mockResolvedValue(concepts);
+  (getValueSetCreators as jest.Mock).mockResolvedValue(["DIBBs", "QC Admin"]);
+  (getSavedQueryById as jest.Mock).mockResolvedValue({
+    queryData: { custom: {} },
+  });
+  (insertCustomValuesetsIntoQuery as jest.Mock).mockResolvedValue({
+    success: true,
+  });
+  (deleteCustomValueSet as jest.Mock).mockResolvedValue({ success: true });
+}
+
+describe("Code library select mode", () => {
+  beforeEach(() => {
+    setupDefaultMocks();
+  });
+
+  const renderSelect = () =>
+    renderWithUser(
+      <RootProviderMock
+        currentPage="/codeLibrary"
+        initialQuery={{
+          queryId: "query-1",
+          queryName: "My Test Query",
+          pageMode: "select",
+        }}
+      >
+        <CodeLibrary />
+      </RootProviderMock>,
+    );
+
+  it("renders select-specific UI (subtitle, checkboxes, Next button)", async () => {
+    renderSelect();
+
+    expect(
+      await screen.findByTestId("table-valuesets-select"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        /Check the box to add the value set or code to the query/i,
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /Next: Update query/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /Manage codes/i }),
+    ).toBeInTheDocument();
+    // value-set-level checkboxes are only rendered in select mode
+    expect(
+      document.getElementById(`valueset-checkbox-${cancerValueSet.valueSetId}`),
+    ).toBeInTheDocument();
+  });
+
+  it("toggles a value set and saves it to the query via Next", async () => {
+    const { user } = renderSelect();
+    await screen.findByTestId("table-valuesets-select");
+
+    const vsCheckbox = document.getElementById(
+      `valueset-checkbox-${cancerValueSet.valueSetId}`,
+    ) as HTMLElement;
+    await user.click(vsCheckbox);
+
+    await user.click(
+      screen.getByRole("button", { name: /Next: Update query/i }),
+    );
+
+    await waitFor(() =>
+      expect(insertCustomValuesetsIntoQuery).toHaveBeenCalled(),
+    );
+    await waitFor(() => expect(mockSaveQueryAndRedirect).toHaveBeenCalled());
+  });
+
+  it("toggles an individual concept in the active value set", async () => {
+    const { user } = renderSelect();
+    await screen.findByTestId("table-valuesets-select");
+
+    // load concepts for the first value set
+    const row = screen.getByText(cancerValueSet.valueSetName).closest("tr")!;
+    await user.click(row);
+
+    const conceptCheckbox = (await waitFor(() => {
+      const el = document.getElementById(
+        `concept-checkbox-${cancerValueSet.valueSetId}-${mockConcepts[0].code}`,
+      );
+      expect(el).toBeInTheDocument();
+      return el;
+    })) as HTMLElement;
+    await user.click(conceptCheckbox);
+    expect(conceptCheckbox).toBeChecked();
+  });
+
+  it("navigates back to manage view via the Manage codes link", async () => {
+    const { user } = renderSelect();
+    await screen.findByTestId("table-valuesets-select");
+
+    await user.click(screen.getByRole("button", { name: /Manage codes/i }));
+
+    expect(
+      await screen.findByTestId("table-valuesets-manage"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /Upload CSV/i }),
+    ).toBeInTheDocument();
+  });
+});
+
+describe("Code library delete flow", () => {
+  beforeEach(() => {
+    setupDefaultMocks();
+  });
+
+  const openDeleteModal = async (
+    user: ReturnType<typeof renderWithUser>["user"],
+  ) => {
+    await screen.findByTestId("table-valuesets-manage");
+    const customRow = screen
+      .getByText(customValueSet.valueSetName)
+      .closest("tr")!;
+    await user.click(customRow);
+    const deleteBtn = screen.getAllByRole("button", {
+      name: /delete value set/i,
+    })[0];
+    await user.click(deleteBtn);
+    return document.getElementById("delete-vs-confirm") as HTMLElement;
+  };
+
+  it("deletes a value set and shows a success toast", async () => {
+    (deleteCustomValueSet as jest.Mock).mockResolvedValue({ success: true });
+    const { user } = renderWithUser(
+      <RootProviderMock currentPage="/codeLibrary">
+        <CodeLibrary />
+      </RootProviderMock>,
+    );
+
+    const confirm = await openDeleteModal(user);
+    await user.click(confirm);
+
+    await waitFor(() =>
+      expect(deleteCustomValueSet).toHaveBeenCalledWith(
+        expect.objectContaining({ valueSetName: customValueSet.valueSetName }),
+      ),
+    );
+    await waitFor(() =>
+      expect(mockShowToast).toHaveBeenCalledWith(
+        expect.objectContaining({
+          body: expect.stringContaining("successfully deleted"),
+        }),
+      ),
+    );
+  });
+
+  it("shows an error toast when delete fails", async () => {
+    (deleteCustomValueSet as jest.Mock).mockResolvedValue({ success: false });
+    const { user } = renderWithUser(
+      <RootProviderMock currentPage="/codeLibrary">
+        <CodeLibrary />
+      </RootProviderMock>,
+    );
+
+    const confirm = await openDeleteModal(user);
+    await user.click(confirm);
+
+    await waitFor(() =>
+      expect(mockShowToast).toHaveBeenCalledWith(
+        expect.objectContaining({
+          variant: "error",
+          body: expect.stringContaining("Could not remove value set"),
+        }),
+      ),
+    );
+  });
+
+  it("shows an error toast when delete throws", async () => {
+    (deleteCustomValueSet as jest.Mock).mockRejectedValue(new Error("boom"));
+    const { user } = renderWithUser(
+      <RootProviderMock currentPage="/codeLibrary">
+        <CodeLibrary />
+      </RootProviderMock>,
+    );
+
+    const confirm = await openDeleteModal(user);
+    await user.click(confirm);
+
+    await waitFor(() =>
+      expect(mockShowToast).toHaveBeenCalledWith(
+        expect.objectContaining({ variant: "error" }),
+      ),
+    );
+  });
+});
+
+describe("Code library filters", () => {
+  beforeEach(() => {
+    setupDefaultMocks();
+  });
+
+  it("opens the filter dropdown and applies a category filter", async () => {
+    const { user } = renderWithUser(
+      <RootProviderMock currentPage="/codeLibrary">
+        <CodeLibrary />
+      </RootProviderMock>,
+    );
+    await screen.findByTestId("table-valuesets-manage");
+
+    await user.click(screen.getByRole("button", { name: /^Filters$/i }));
+
+    const categorySelect = await screen.findByLabelText("Category");
+    await user.selectOptions(categorySelect, "labs");
+
+    await waitFor(() =>
+      expect(getValueSetsPaginated).toHaveBeenCalledWith(
+        expect.objectContaining({ category: "labs" }),
+      ),
+    );
+    await waitFor(() =>
+      expect(screen.getByText(/1 filter applied/i)).toBeInTheDocument(),
+    );
+  });
+
+  it("closes the filter dropdown via the Close button", async () => {
+    const { user } = renderWithUser(
+      <RootProviderMock currentPage="/codeLibrary">
+        <CodeLibrary />
+      </RootProviderMock>,
+    );
+    await screen.findByTestId("table-valuesets-manage");
+
+    await user.click(screen.getByRole("button", { name: /^Filters$/i }));
+    expect(await screen.findByLabelText("Category")).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: /^Close$/i }));
+    await waitFor(() =>
+      expect(screen.queryByLabelText("Category")).not.toBeInTheDocument(),
+    );
+  });
+});
+
+describe("Code library search and pagination", () => {
+  beforeEach(() => {
+    setupDefaultMocks();
+  });
+
+  it("debounces the search field and refetches with the text query", async () => {
+    const { user } = renderWithUser(
+      <RootProviderMock currentPage="/codeLibrary">
+        <CodeLibrary />
+      </RootProviderMock>,
+    );
+    await screen.findByTestId("table-valuesets-manage");
+
+    await user.type(screen.getByPlaceholderText("Search"), "cancer");
+
+    await waitFor(() =>
+      expect(getValueSetsPaginated).toHaveBeenCalledWith(
+        expect.objectContaining({ textSearch: "cancer" }),
+      ),
+    );
+  });
+
+  it("changes the number of items per page", async () => {
+    const { user } = renderWithUser(
+      <RootProviderMock currentPage="/codeLibrary">
+        <CodeLibrary />
+      </RootProviderMock>,
+    );
+    await screen.findByTestId("table-valuesets-manage");
+
+    await user.selectOptions(
+      screen.getByLabelText(/Value sets per page/i),
+      "25",
+    );
+
+    await waitFor(() =>
+      expect(getValueSetsPaginated).toHaveBeenCalledWith(
+        expect.objectContaining({ pageSize: 25 }),
+      ),
+    );
+  });
+
+  it("advances to the next page using pagination", async () => {
+    setupDefaultMocks({
+      ...mockPagedResponse,
+      totalItems: 30,
+      totalPages: 3,
+    });
+    const { user } = renderWithUser(
+      <RootProviderMock currentPage="/codeLibrary">
+        <CodeLibrary />
+      </RootProviderMock>,
+    );
+    await screen.findByTestId("table-valuesets-manage");
+
+    const nextButton = await screen.findByLabelText(/next page/i);
+    await user.click(nextButton);
+
+    await waitFor(() =>
+      expect(getValueSetsPaginated).toHaveBeenCalledWith(
+        expect.objectContaining({ pageIndex: 1 }),
+      ),
+    );
+  });
+});
+
+describe("Code library create/edit navigation", () => {
+  beforeEach(() => {
+    setupDefaultMocks();
+  });
+
+  it("renders the create form when Add value set is clicked", async () => {
+    const { user } = renderWithUser(
+      <RootProviderMock currentPage="/codeLibrary">
+        <CodeLibrary />
+      </RootProviderMock>,
+    );
+    await screen.findByTestId("table-valuesets-manage");
+
+    await user.click(screen.getByRole("button", { name: /Add value set/i }));
+
+    expect(
+      await screen.findByRole("heading", { name: /New value set/i }),
+    ).toBeInTheDocument();
+  });
+
+  it("renders the edit form when editing a custom value set", async () => {
+    const { user } = renderWithUser(
+      <RootProviderMock currentPage="/codeLibrary">
+        <CodeLibrary />
+      </RootProviderMock>,
+    );
+    await screen.findByTestId("table-valuesets-manage");
+
+    const customRow = screen
+      .getByText(customValueSet.valueSetName)
+      .closest("tr")!;
+    await user.click(customRow);
+
+    const editBtn = await screen.findByRole("button", { name: /Edit codes/i });
+    await user.click(editBtn);
+
+    expect(
+      await screen.findByRole("heading", { name: /Edit value set/i }),
+    ).toBeInTheDocument();
+  });
+});
+
+describe("Code library CSV error handling", () => {
+  beforeEach(() => {
+    setupDefaultMocks({
+      ...mockPagedResponse,
+      items: [],
+      totalItems: 0,
+      totalPages: 0,
+    });
+  });
+  afterEach(() => {
+    if ((global.fetch as jest.Mock)?.mockReset) {
+      (global.fetch as jest.Mock).mockReset();
+    }
+  });
+
+  it("surfaces an error when the CSV has an unsupported category", async () => {
+    (global as typeof globalThis).fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        rows: [
+          {
+            "value set name": "Bad Set",
+            category: "not-a-category",
+            "code system": "LOINC",
+            code: "111",
+            display: "Nope",
+          },
+        ],
+      }),
+    });
+
+    const { user } = renderWithUser(
+      <RootProviderMock currentPage="/codeLibrary">
+        <CodeLibrary />
+      </RootProviderMock>,
+    );
+    await screen.findByTestId("table-valuesets-manage");
+
+    const fileInput = document.querySelector(
+      'input[type="file"]',
+    ) as HTMLInputElement;
+    await user.upload(
+      fileInput,
+      new File(["x"], "bad.csv", { type: "text/csv" }),
+    );
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      /unsupported values/i,
+    );
+    await waitFor(() =>
+      expect(mockShowToast).toHaveBeenCalledWith(
+        expect.objectContaining({ variant: "error" }),
+      ),
+    );
+    expect(insertCustomValueSet).not.toHaveBeenCalled();
+  });
+
+  it("surfaces an error when the CSV fails to parse", async () => {
+    (global as typeof globalThis).fetch = jest.fn().mockResolvedValue({
+      ok: false,
+      json: async () => ({ error: "Failed to parse CSV" }),
+    });
+
+    const { user } = renderWithUser(
+      <RootProviderMock currentPage="/codeLibrary">
+        <CodeLibrary />
+      </RootProviderMock>,
+    );
+    await screen.findByTestId("table-valuesets-manage");
+
+    const fileInput = document.querySelector(
+      'input[type="file"]',
+    ) as HTMLInputElement;
+    await user.upload(
+      fileInput,
+      new File(["x"], "bad.csv", { type: "text/csv" }),
+    );
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      /Failed to parse CSV/i,
     );
   });
 });
