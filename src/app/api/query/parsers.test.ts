@@ -15,7 +15,8 @@ const MR_SYSTEM = "http://terminology.hl7.org/CodeSystem/v2-0203";
 
 /**
  * Small factory so each test only sets the fields it cares about.
- * @param overrides
+ * @param overrides - Patient fields to set on the base resource.
+ * @returns A FHIR Patient resource with the given overrides applied.
  */
 const makePatient = (overrides: Partial<Patient> = {}): Patient => ({
   resourceType: "Patient",

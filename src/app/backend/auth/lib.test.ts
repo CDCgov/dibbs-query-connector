@@ -28,7 +28,7 @@ jest.mock("next-auth/providers/ping-id", () => ({
 
 type LibModule = typeof import("./lib");
 // Required (not imported) so it evaluates after AUTH_CLIENT_ID is set above.
- 
+
 const {
   AuthContext,
   KeycloakAuthStrategy,
@@ -38,7 +38,8 @@ const {
 
 /**
  * Builds an unsigned JWT string that jose's decodeJwt can decode.
- * @param payload
+ * @param payload - The JWT claims to encode.
+ * @returns An unsigned JWT string (header.payload. with an empty signature).
  */
 function makeJwt(payload: Record<string, unknown>): string {
   const b64 = (o: unknown) =>

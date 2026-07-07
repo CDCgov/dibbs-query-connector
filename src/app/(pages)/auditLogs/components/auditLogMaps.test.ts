@@ -14,8 +14,9 @@ const mockGetAllUsers = getAllUsers as jest.Mock;
 
 /**
  * Convenience helper to run a formatter by action type.
- * @param actionType
- * @param log
+ * @param actionType - The audit-log action type key to look up.
+ * @param log - The audit-log message object passed to the formatter.
+ * @returns The formatted, human-readable audit-log string.
  */
 function format(actionType: string, log: Record<string, unknown>): string {
   return auditLogActionTypeMap[actionType].format(log);
