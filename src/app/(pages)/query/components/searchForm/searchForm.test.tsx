@@ -1,9 +1,11 @@
 import { renderWithUser, RootProviderMock } from "@/app/tests/unit/setup";
-import { screen } from "@testing-library/react";
+import { screen, waitFor } from "@testing-library/react";
 import SearchForm from "./SearchForm";
 import { useSearchParams } from "next/navigation";
 import { getFhirServerConfigs } from "@/app/backend/fhir-servers/service";
 import { getConditionsData } from "@/app/backend/query-building/service";
+import { patientDiscoveryQuery } from "@/app/backend/query-execution/service";
+import { hyperUnluckyPatient } from "@/app/constants";
 
 jest.mock("next/navigation");
 
@@ -22,6 +24,10 @@ jest.mock("@/app/backend/fhir-servers/service", () => ({
       },
     },
   ]),
+}));
+
+jest.mock("@/app/backend/query-execution/service", () => ({
+  patientDiscoveryQuery: jest.fn(),
 }));
 
 jest.mock("@/app/backend/query-building/service", () => ({
@@ -331,5 +337,288 @@ describe("SearchForm", () => {
 
     await user.click(checkbox);
     expect(checkbox).not.toBeChecked();
+  });
+
+  it("fills demo fields and submits a valid patient discovery query", async () => {
+    (useSearchParams as jest.Mock).mockReturnValue(new URLSearchParams(""));
+    (patientDiscoveryQuery as jest.Mock).mockResolvedValue([
+      { resourceType: "Patient", id: "p1" },
+    ]);
+
+    const setMode = jest.fn();
+    const setLoading = jest.fn();
+    const setResponse = jest.fn();
+    const setUncertainMatchError = jest.fn();
+    const setSearchFormValues = jest.fn();
+
+    const { user } = renderWithUser(
+      <RootProviderMock currentPage="/query">
+        <SearchForm
+          setMode={setMode}
+          setLoading={setLoading}
+          setPatientDiscoveryQueryResponse={setResponse}
+          selectedFhirServer="Default server"
+          setFhirServer={jest.fn()}
+          fhirServers={["Default server"]}
+          setUncertainMatchError={setUncertainMatchError}
+          setSearchFormValues={setSearchFormValues}
+        />
+      </RootProviderMock>,
+    );
+
+    await user.click(screen.getByRole("button", { name: "Fill fields" }));
+
+    // Fill fields populates from the hyper-unlucky demo patient.
+    expect(screen.getByRole("textbox", { name: "First name" })).toHaveValue(
+      hyperUnluckyPatient.FirstName,
+    );
+    expect(
+      screen.getByRole("textbox", { name: "Medical Record Number" }),
+    ).toHaveValue(hyperUnluckyPatient.MRN);
+
+    await user.click(
+      screen.getByRole("button", { name: "Search for patient" }),
+    );
+
+    // Raw form values are persisted before the async query fires.
+    expect(setSearchFormValues).toHaveBeenCalledWith(
+      expect.objectContaining({
+        firstName: hyperUnluckyPatient.FirstName,
+        lastName: hyperUnluckyPatient.LastName,
+        mrn: hyperUnluckyPatient.MRN,
+      }),
+    );
+    expect(setLoading).toHaveBeenCalledWith(true);
+    expect(patientDiscoveryQuery).toHaveBeenCalledTimes(1);
+
+    await waitFor(() =>
+      expect(setResponse).toHaveBeenCalledWith([
+        { resourceType: "Patient", id: "p1" },
+      ]),
+    );
+    expect(setMode).toHaveBeenCalledWith("patient-results");
+    expect(setUncertainMatchError).toHaveBeenCalledWith(false);
+    expect(setLoading).toHaveBeenLastCalledWith(false);
+  });
+
+  it("shows validation errors and does not query when required fields are missing", async () => {
+    (useSearchParams as jest.Mock).mockReturnValue(new URLSearchParams(""));
+    (patientDiscoveryQuery as jest.Mock).mockClear();
+
+    const setLoading = jest.fn();
+
+    const { user } = renderWithUser(
+      <RootProviderMock currentPage="/query">
+        <SearchForm
+          setMode={jest.fn()}
+          setLoading={setLoading}
+          setPatientDiscoveryQueryResponse={jest.fn()}
+          selectedFhirServer="Default server"
+          setFhirServer={jest.fn()}
+          fhirServers={["Default server"]}
+          setUncertainMatchError={jest.fn()}
+          setSearchFormValues={jest.fn()}
+        />
+      </RootProviderMock>,
+    );
+
+    await user.click(
+      screen.getByRole("button", { name: "Search for patient" }),
+    );
+
+    // Insufficient identifiers message plus per-field "required" hints appear.
+    expect(
+      screen.getByText(
+        /first name, last name, and date of birth are required/i,
+      ),
+    ).toBeInTheDocument();
+    expect(screen.getAllByText("Field is required.").length).toBeGreaterThan(0);
+    expect(patientDiscoveryQuery).not.toHaveBeenCalled();
+    expect(setLoading).not.toHaveBeenCalled();
+  });
+
+  it("handles an uncertain-match response by flagging the error and clearing results", async () => {
+    (useSearchParams as jest.Mock).mockReturnValue(new URLSearchParams(""));
+    (patientDiscoveryQuery as jest.Mock).mockResolvedValue({
+      uncertainMatchError: true,
+    });
+
+    const setResponse = jest.fn();
+    const setUncertainMatchError = jest.fn();
+    const setLoading = jest.fn();
+
+    const { user } = renderWithUser(
+      <RootProviderMock currentPage="/query">
+        <SearchForm
+          setMode={jest.fn()}
+          setLoading={setLoading}
+          setPatientDiscoveryQueryResponse={setResponse}
+          selectedFhirServer="Default server"
+          setFhirServer={jest.fn()}
+          fhirServers={["Default server"]}
+          setUncertainMatchError={setUncertainMatchError}
+          setSearchFormValues={jest.fn()}
+        />
+      </RootProviderMock>,
+    );
+
+    await user.click(screen.getByRole("button", { name: "Fill fields" }));
+    await user.click(
+      screen.getByRole("button", { name: "Search for patient" }),
+    );
+
+    await waitFor(() =>
+      expect(setUncertainMatchError).toHaveBeenCalledWith(true),
+    );
+    expect(setResponse).toHaveBeenCalledWith([]);
+    expect(setLoading).toHaveBeenLastCalledWith(false);
+  });
+
+  it("handles a failed patient discovery query by clearing results", async () => {
+    (useSearchParams as jest.Mock).mockReturnValue(new URLSearchParams(""));
+    (patientDiscoveryQuery as jest.Mock).mockRejectedValue(
+      new Error("network down"),
+    );
+    const consoleError = jest
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
+
+    const setResponse = jest.fn();
+    const setUncertainMatchError = jest.fn();
+    const setMode = jest.fn();
+
+    const { user } = renderWithUser(
+      <RootProviderMock currentPage="/query">
+        <SearchForm
+          setMode={setMode}
+          setLoading={jest.fn()}
+          setPatientDiscoveryQueryResponse={setResponse}
+          selectedFhirServer="Default server"
+          setFhirServer={jest.fn()}
+          fhirServers={["Default server"]}
+          setUncertainMatchError={setUncertainMatchError}
+          setSearchFormValues={jest.fn()}
+        />
+      </RootProviderMock>,
+    );
+
+    await user.click(screen.getByRole("button", { name: "Fill fields" }));
+    await user.click(
+      screen.getByRole("button", { name: "Search for patient" }),
+    );
+
+    await waitFor(() => expect(setResponse).toHaveBeenCalledWith([]));
+    expect(setUncertainMatchError).toHaveBeenCalledWith(false);
+    expect(setMode).toHaveBeenLastCalledWith("patient-results");
+
+    consoleError.mockRestore();
+  });
+
+  it("updates address and contact fields as the user types", async () => {
+    (useSearchParams as jest.Mock).mockReturnValue(new URLSearchParams(""));
+
+    const { user } = renderWithUser(
+      <RootProviderMock currentPage="/query">
+        <SearchForm
+          setMode={jest.fn()}
+          setLoading={jest.fn()}
+          setPatientDiscoveryQueryResponse={jest.fn()}
+          selectedFhirServer="Default server"
+          setFhirServer={jest.fn()}
+          fhirServers={["Default server"]}
+          setUncertainMatchError={jest.fn()}
+          setSearchFormValues={jest.fn()}
+        />
+      </RootProviderMock>,
+    );
+
+    await user.type(
+      screen.getByRole("textbox", { name: "First name" }),
+      "Jane",
+    );
+    await user.type(screen.getByRole("textbox", { name: "Last name" }), "Doe");
+    await user.type(
+      screen.getByRole("textbox", { name: "Phone number" }),
+      "5551234567",
+    );
+    await user.type(
+      screen.getByRole("textbox", { name: "Email address" }),
+      "test@example.com",
+    );
+    await user.type(
+      screen.getByRole("textbox", { name: "Street address" }),
+      "1 Main St",
+    );
+    await user.type(
+      screen.getByRole("textbox", { name: "Address line 2" }),
+      "Suite 5",
+    );
+    await user.type(screen.getByRole("textbox", { name: "City" }), "Boston");
+    await user.selectOptions(
+      screen.getByRole("combobox", { name: "State" }),
+      "MA",
+    );
+    await user.type(screen.getByRole("textbox", { name: "Zip code" }), "02101");
+    await user.type(
+      screen.getByRole("textbox", { name: "Medical Record Number" }),
+      "12345",
+    );
+
+    expect(screen.getByRole("textbox", { name: "First name" })).toHaveValue(
+      "Jane",
+    );
+    expect(screen.getByRole("textbox", { name: "Last name" })).toHaveValue(
+      "Doe",
+    );
+    expect(screen.getByRole("textbox", { name: "Phone number" })).toHaveValue(
+      "5551234567",
+    );
+    expect(screen.getByRole("textbox", { name: "Email address" })).toHaveValue(
+      "test@example.com",
+    );
+    expect(screen.getByRole("textbox", { name: "Street address" })).toHaveValue(
+      "1 Main St",
+    );
+    expect(screen.getByRole("textbox", { name: "Address line 2" })).toHaveValue(
+      "Suite 5",
+    );
+    expect(screen.getByRole("textbox", { name: "City" })).toHaveValue("Boston");
+    expect(screen.getByRole("combobox", { name: "State" })).toHaveValue("MA");
+    expect(screen.getByRole("textbox", { name: "Zip code" })).toHaveValue(
+      "02101",
+    );
+    expect(
+      screen.getByRole("textbox", { name: "Medical Record Number" }),
+    ).toHaveValue("12345");
+  });
+
+  it("changes the selected FHIR server from the advanced dropdown", async () => {
+    (useSearchParams as jest.Mock).mockReturnValue(new URLSearchParams(""));
+    const setFhirServer = jest.fn();
+
+    const { user } = renderWithUser(
+      <RootProviderMock currentPage="/query">
+        <SearchForm
+          setMode={jest.fn()}
+          setLoading={jest.fn()}
+          setPatientDiscoveryQueryResponse={jest.fn()}
+          selectedFhirServer="Server A"
+          setFhirServer={setFhirServer}
+          fhirServers={["Server A", "Server B"]}
+          setUncertainMatchError={jest.fn()}
+          setSearchFormValues={jest.fn()}
+        />
+      </RootProviderMock>,
+    );
+
+    await user.click(screen.getByRole("button", { name: "Advanced" }));
+    await user.selectOptions(
+      await screen.findByRole("combobox", {
+        name: "Healthcare Organization (HCO)",
+      }),
+      "Server B",
+    );
+
+    expect(setFhirServer).toHaveBeenCalledWith("Server B");
   });
 });

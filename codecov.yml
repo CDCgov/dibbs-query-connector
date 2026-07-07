@@ -1,0 +1,31 @@
+# Codecov configuration for the DIBBs Query Connector.
+# Coverage is uploaded from CI (`npm run test:ci`, unit + integration combined).
+#
+# The `patch` gate is the real ratchet: all NEW code on a PR must be >=80%
+# covered. The `project` gate is currently `informational` (report-only) while
+# we climb from ~65% to 80%; remove `informational: true` to make it blocking
+# once the overall project coverage is comfortably above the target.
+coverage:
+  status:
+    project:
+      default:
+        target: 80%
+        threshold: 1%
+        informational: true
+    patch:
+      default:
+        target: 80%
+
+# Files that are test-only or non-instrumentable and should not count toward
+# coverage. Mirrors `coveragePathIgnorePatterns` in jest.config.js.
+ignore:
+  - "src/app/tests"
+  - "**/*.d.ts"
+  - "e2e"
+  - "**/*.test.ts"
+  - "**/*.test.tsx"
+
+comment:
+  layout: "reach, diff, flags, files"
+  behavior: default
+  require_changes: false
