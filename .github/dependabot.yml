@@ -7,6 +7,12 @@ updates:
     ignore:
       - dependency-name: "jose"
         update-types: ["version-update:semver-major"]
+      # @trussworks/react-uswds requires peer focus-trap-react@^11; drop when it supports v12
+      - dependency-name: "focus-trap-react"
+        update-types: ["version-update:semver-major"]
+      # keep @types/node on the major matching the node:24 Docker runtime
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: "docker"
     directory: "/"
