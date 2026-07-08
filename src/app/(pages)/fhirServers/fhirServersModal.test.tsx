@@ -436,7 +436,710 @@ describe("FhirServersModal", () => {
     });
   });
 
-  describe("Form validation", () => {});
+  describe("Form validation", () => {
+    it("shows a required error and blocks submit when server name is empty", async () => {
+      const mockInsertFhirServer =
+        require("@/app/backend/fhir-servers/service").insertFhirServer;
+
+      const user = userEvent.setup();
+      render(<FhirServersModal {...defaultProps} />);
+
+      // Provide a URL but leave the name blank.
+      await user.type(
+        screen.getByTestId("server-url"),
+        "https://noname.example.com/fhir",
+      );
+
+      const addButton = screen.getByRole("button", { name: /Add server/i });
+      await user.click(addButton);
+
+      await waitFor(() => {
+        expect(
+          screen.getByText("Enter a server URL to query."),
+        ).toBeInTheDocument();
+      });
+      expect(mockInsertFhirServer).not.toHaveBeenCalled();
+    });
+
+    it("shows a URL error when validateFhirServerUrl rejects", async () => {
+      const testUtils = require("@/app/backend/fhir-servers/test-utils");
+      testUtils.validateFhirServerUrl.mockRejectedValueOnce(
+        new Error("Invalid host"),
+      );
+      const mockInsertFhirServer =
+        require("@/app/backend/fhir-servers/service").insertFhirServer;
+
+      const user = userEvent.setup();
+      render(<FhirServersModal {...defaultProps} />);
+
+      await user.type(screen.getByTestId("server-name"), "Bad URL Server");
+      await user.type(screen.getByTestId("server-url"), "not-a-url");
+
+      const addButton = screen.getByRole("button", { name: /Add server/i });
+      await user.click(addButton);
+
+      await waitFor(() => {
+        expect(
+          screen.getByText(/Fix the following server URL error: Invalid host/),
+        ).toBeInTheDocument();
+      });
+      expect(mockInsertFhirServer).not.toHaveBeenCalled();
+    });
+
+    it("requires a bearer token for basic auth", async () => {
+      const mockInsertFhirServer =
+        require("@/app/backend/fhir-servers/service").insertFhirServer;
+
+      const user = userEvent.setup();
+      render(<FhirServersModal {...defaultProps} />);
+
+      await user.type(screen.getByTestId("server-name"), "Basic Server");
+      await user.type(
+        screen.getByTestId("server-url"),
+        "https://basic.example.com/fhir",
+      );
+      await user.selectOptions(screen.getByTestId("auth-method"), "basic");
+      // Type then clear so accessToken is "" (the empty-string the validator checks).
+      const bearerInput = screen.getByLabelText(/Bearer Token/);
+      await user.type(bearerInput, "x");
+      await user.clear(bearerInput);
+
+      const addButton = screen.getByRole("button", { name: /Add server/i });
+      await user.click(addButton);
+
+      await waitFor(() => {
+        expect(
+          screen.getByText("Bearer token needs to be set for basic auth"),
+        ).toBeInTheDocument();
+      });
+      expect(mockInsertFhirServer).not.toHaveBeenCalled();
+    });
+
+    it("requires client id, secret and scopes for client credentials", async () => {
+      const mockInsertFhirServer =
+        require("@/app/backend/fhir-servers/service").insertFhirServer;
+
+      const user = userEvent.setup();
+      render(<FhirServersModal {...defaultProps} />);
+
+      await user.type(screen.getByTestId("server-name"), "CC Server");
+      await user.type(
+        screen.getByTestId("server-url"),
+        "https://cc.example.com/fhir",
+      );
+      await user.selectOptions(
+        screen.getByTestId("auth-method"),
+        "client_credentials",
+      );
+
+      const addButton = screen.getByRole("button", { name: /Add server/i });
+      await user.click(addButton);
+
+      await waitFor(() => {
+        expect(
+          screen.getByText("Client ID token needs to be set for client auth"),
+        ).toBeInTheDocument();
+      });
+      expect(
+        screen.getByText("Client secret needs to be set for client auth"),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText("Scopes needs to be set for client auth"),
+      ).toBeInTheDocument();
+      expect(mockInsertFhirServer).not.toHaveBeenCalled();
+    });
+
+    it("requires client id and scopes for SMART auth", async () => {
+      const mockInsertFhirServer =
+        require("@/app/backend/fhir-servers/service").insertFhirServer;
+
+      const user = userEvent.setup();
+      render(<FhirServersModal {...defaultProps} />);
+
+      await user.type(screen.getByTestId("server-name"), "SMART Server");
+      await user.type(
+        screen.getByTestId("server-url"),
+        "https://smart.example.com/fhir",
+      );
+      await user.selectOptions(screen.getByTestId("auth-method"), "SMART");
+
+      const addButton = screen.getByRole("button", { name: /Add server/i });
+      await user.click(addButton);
+
+      await waitFor(() => {
+        expect(
+          screen.getByText("Client ID token needs to be set for SMART auth"),
+        ).toBeInTheDocument();
+      });
+      expect(
+        screen.getByText("Scopes needs to be set for SMART auth"),
+      ).toBeInTheDocument();
+      expect(mockInsertFhirServer).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("Basic authentication", () => {
+    it("reveals the bearer token field and submits it", async () => {
+      const mockInsertFhirServer =
+        require("@/app/backend/fhir-servers/service").insertFhirServer;
+      mockInsertFhirServer.mockResolvedValue({
+        success: true,
+        server: { id: "basic-id" },
+      });
+
+      const user = userEvent.setup();
+      render(<FhirServersModal {...defaultProps} />);
+
+      await user.selectOptions(screen.getByTestId("auth-method"), "basic");
+      expect(screen.getByLabelText(/Bearer Token/)).toBeInTheDocument();
+
+      await user.type(screen.getByTestId("server-name"), "Basic Server");
+      await user.type(
+        screen.getByTestId("server-url"),
+        "https://basic.example.com/fhir",
+      );
+      await user.type(screen.getByLabelText(/Bearer Token/), "my-token");
+
+      await user.click(screen.getByRole("button", { name: /Add server/i }));
+
+      await waitFor(() => {
+        expect(mockInsertFhirServer).toHaveBeenCalledWith(
+          "Basic Server",
+          "https://basic.example.com/fhir",
+          false,
+          false,
+          true,
+          expect.objectContaining({
+            authType: "basic",
+            bearerToken: "my-token",
+          }),
+          expect.any(Object),
+        );
+      });
+    });
+  });
+
+  describe("Client credentials authentication", () => {
+    it("reveals the client credential fields and submits them", async () => {
+      const mockInsertFhirServer =
+        require("@/app/backend/fhir-servers/service").insertFhirServer;
+      mockInsertFhirServer.mockResolvedValue({
+        success: true,
+        server: { id: "cc-id" },
+      });
+
+      const user = userEvent.setup();
+      render(<FhirServersModal {...defaultProps} />);
+
+      await user.selectOptions(
+        screen.getByTestId("auth-method"),
+        "client_credentials",
+      );
+
+      await user.type(screen.getByTestId("server-name"), "CC Server");
+      await user.type(
+        screen.getByTestId("server-url"),
+        "https://cc.example.com/fhir",
+      );
+      await user.type(screen.getByTestId("client-id"), "client-abc");
+      await user.type(screen.getByTestId("client-secret"), "secret-xyz");
+      await user.type(screen.getByTestId("scopes"), "system/*.read");
+      await user.type(
+        screen.getByTestId("token-endpoint"),
+        "https://cc.example.com/token",
+      );
+
+      await user.click(screen.getByRole("button", { name: /Add server/i }));
+
+      await waitFor(() => {
+        expect(mockInsertFhirServer).toHaveBeenCalledWith(
+          "CC Server",
+          "https://cc.example.com/fhir",
+          false,
+          false,
+          true,
+          expect.objectContaining({
+            authType: "client_credentials",
+            clientId: "client-abc",
+            clientSecret: "secret-xyz",
+            scopes: "system/*.read",
+            tokenEndpoint: "https://cc.example.com/token",
+          }),
+          expect.any(Object),
+        );
+      });
+    });
+  });
+
+  describe("SMART on FHIR authentication", () => {
+    it("reveals the SMART fields and submits them", async () => {
+      const mockInsertFhirServer =
+        require("@/app/backend/fhir-servers/service").insertFhirServer;
+      mockInsertFhirServer.mockResolvedValue({
+        success: true,
+        server: { id: "smart-id" },
+      });
+
+      const user = userEvent.setup();
+      render(<FhirServersModal {...defaultProps} />);
+
+      await user.selectOptions(screen.getByTestId("auth-method"), "SMART");
+      expect(
+        screen.getByText(/system\/Patient.read system\/Observation.read/),
+      ).toBeInTheDocument();
+
+      await user.type(screen.getByTestId("server-name"), "SMART Server");
+      await user.type(
+        screen.getByTestId("server-url"),
+        "https://smart.example.com/fhir",
+      );
+      await user.type(screen.getByTestId("client-id"), "smart-client");
+      await user.type(screen.getByTestId("scopes"), "system/Patient.read");
+
+      await user.click(screen.getByRole("button", { name: /Add server/i }));
+
+      await waitFor(() => {
+        expect(mockInsertFhirServer).toHaveBeenCalledWith(
+          "SMART Server",
+          "https://smart.example.com/fhir",
+          false,
+          false,
+          true,
+          expect.objectContaining({
+            authType: "SMART",
+            clientId: "smart-client",
+            scopes: "system/Patient.read",
+          }),
+          expect.any(Object),
+        );
+      });
+    });
+  });
+
+  describe("Test connection", () => {
+    it("marks the button as Success when the connection test passes", async () => {
+      const service = require("@/app/backend/fhir-servers/service");
+      const testUtils = require("@/app/backend/fhir-servers/test-utils");
+      service.updateFhirServerConnectionStatus.mockResolvedValue({});
+      testUtils.testFhirServerConnection.mockResolvedValue({ success: true });
+
+      const user = userEvent.setup();
+      render(<FhirServersModal {...defaultProps} />);
+
+      await user.type(screen.getByTestId("server-name"), "Conn Server");
+      await user.type(
+        screen.getByTestId("server-url"),
+        "https://conn.example.com/fhir",
+      );
+
+      await user.click(
+        screen.getByRole("button", { name: /Test connection/i }),
+      );
+
+      await waitFor(() => {
+        expect(
+          screen.getByRole("button", { name: /Success/i }),
+        ).toBeInTheDocument();
+      });
+    });
+
+    it("updates the server list when the status DB update returns a server", async () => {
+      const service = require("@/app/backend/fhir-servers/service");
+      const testUtils = require("@/app/backend/fhir-servers/test-utils");
+      testUtils.testFhirServerConnection.mockResolvedValue({ success: true });
+      service.updateFhirServerConnectionStatus.mockResolvedValue({
+        server: { id: "1", name: "Test Server" },
+      });
+      const setFhirServers = jest.fn();
+
+      const user = userEvent.setup();
+      render(
+        <FhirServersModal {...defaultProps} setFhirServers={setFhirServers} />,
+      );
+
+      await user.type(screen.getByTestId("server-name"), "Conn Server");
+      await user.type(
+        screen.getByTestId("server-url"),
+        "https://conn.example.com/fhir",
+      );
+
+      await user.click(
+        screen.getByRole("button", { name: /Test connection/i }),
+      );
+
+      await waitFor(() => {
+        expect(setFhirServers).toHaveBeenCalled();
+      });
+    });
+
+    it("does not run the connection test when the form is invalid", async () => {
+      const testUtils = require("@/app/backend/fhir-servers/test-utils");
+      testUtils.testFhirServerConnection.mockClear();
+
+      const user = userEvent.setup();
+      render(<FhirServersModal {...defaultProps} />);
+
+      // No name/url filled in.
+      await user.click(
+        screen.getByRole("button", { name: /Test connection/i }),
+      );
+
+      await waitFor(() => {
+        expect(
+          screen.getByText("Enter a server URL to query."),
+        ).toBeInTheDocument();
+      });
+      expect(testUtils.testFhirServerConnection).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("Save error handling", () => {
+    it("surfaces a connection error status when insert fails", async () => {
+      const service = require("@/app/backend/fhir-servers/service");
+      service.insertFhirServer.mockResolvedValue({
+        success: false,
+        error: "Insert failed",
+      });
+
+      const user = userEvent.setup();
+      render(<FhirServersModal {...defaultProps} />);
+
+      await user.type(screen.getByTestId("server-name"), "Fail Server");
+      await user.type(
+        screen.getByTestId("server-url"),
+        "https://fail.example.com/fhir",
+      );
+
+      await user.click(screen.getByRole("button", { name: /Add server/i }));
+
+      await waitFor(() => {
+        expect(service.insertFhirServer).toHaveBeenCalled();
+      });
+      // Modal should stay open (not closed) - the save button remains present.
+      expect(
+        screen.getByRole("button", { name: /Add server/i }),
+      ).toBeInTheDocument();
+    });
+  });
+
+  describe("Delete server", () => {
+    const existingServer: FhirServerConfig = {
+      id: "del-1",
+      name: "Deletable Server",
+      hostname: "https://del.example.com/fhir",
+      authType: "none",
+      disableCertValidation: false,
+      defaultServer: false,
+      patientMatchConfiguration: {
+        enabled: false,
+        onlySingleMatch: false,
+        onlyCertainMatches: false,
+        matchCount: 0,
+        supportsMatch: false,
+      },
+    };
+
+    it("renders a Delete button only in edit mode", async () => {
+      const { rerender } = render(<FhirServersModal {...defaultProps} />);
+      expect(
+        screen.queryByRole("button", { name: /^Delete$/i }),
+      ).not.toBeInTheDocument();
+
+      rerender(
+        <FhirServersModal
+          {...defaultProps}
+          modalMode="edit"
+          serverToEdit={existingServer}
+        />,
+      );
+      expect(
+        screen.getByRole("button", { name: /^Delete$/i }),
+      ).toBeInTheDocument();
+    });
+
+    it("calls deleteFhirServer with the server id on delete", async () => {
+      const service = require("@/app/backend/fhir-servers/service");
+      service.deleteFhirServer.mockResolvedValue({ success: true });
+
+      const user = userEvent.setup();
+      render(
+        <FhirServersModal
+          {...defaultProps}
+          modalMode="edit"
+          serverToEdit={existingServer}
+        />,
+      );
+
+      await user.click(screen.getByRole("button", { name: /^Delete$/i }));
+
+      await waitFor(() => {
+        expect(service.deleteFhirServer).toHaveBeenCalledWith("del-1");
+      });
+    });
+
+    it("keeps the modal open when delete fails", async () => {
+      const service = require("@/app/backend/fhir-servers/service");
+      service.deleteFhirServer.mockResolvedValue({
+        success: false,
+        error: "Delete failed",
+      });
+
+      const user = userEvent.setup();
+      render(
+        <FhirServersModal
+          {...defaultProps}
+          modalMode="edit"
+          serverToEdit={existingServer}
+        />,
+      );
+
+      await user.click(screen.getByRole("button", { name: /^Delete$/i }));
+
+      await waitFor(() => {
+        expect(service.deleteFhirServer).toHaveBeenCalled();
+      });
+      expect(
+        screen.getByRole("button", { name: /Save changes/i }),
+      ).toBeInTheDocument();
+    });
+  });
+
+  describe("Custom headers", () => {
+    it("adds, edits, and submits a custom header", async () => {
+      const service = require("@/app/backend/fhir-servers/service");
+      service.insertFhirServer.mockResolvedValue({
+        success: true,
+        server: { id: "hdr-id" },
+      });
+
+      const user = userEvent.setup();
+      render(<FhirServersModal {...defaultProps} />);
+
+      await user.type(screen.getByTestId("server-name"), "Header Server");
+      await user.type(
+        screen.getByTestId("server-url"),
+        "https://hdr.example.com/fhir",
+      );
+
+      await user.click(screen.getByRole("button", { name: /Add header/i }));
+
+      await user.type(screen.getByPlaceholderText("Header name"), "X-Custom");
+      await user.type(screen.getByPlaceholderText("Header value"), "abc123");
+
+      await user.click(screen.getByRole("button", { name: /Add server/i }));
+
+      await waitFor(() => {
+        expect(service.insertFhirServer).toHaveBeenCalledWith(
+          "Header Server",
+          "https://hdr.example.com/fhir",
+          false,
+          false,
+          true,
+          expect.objectContaining({
+            headers: { "X-Custom": "abc123" },
+          }),
+          expect.any(Object),
+        );
+      });
+    });
+
+    it("removes a custom header row", async () => {
+      const user = userEvent.setup();
+      render(<FhirServersModal {...defaultProps} />);
+
+      await user.click(screen.getByRole("button", { name: /Add header/i }));
+      expect(screen.getByPlaceholderText("Header name")).toBeInTheDocument();
+
+      await user.click(
+        screen.getByRole("button", { name: /Remove header row/i }),
+      );
+      expect(
+        screen.queryByPlaceholderText("Header name"),
+      ).not.toBeInTheDocument();
+    });
+  });
+
+  describe("Common toggles", () => {
+    it("submits disableCertValidation and defaultServer when checked", async () => {
+      const service = require("@/app/backend/fhir-servers/service");
+      service.insertFhirServer.mockResolvedValue({
+        success: true,
+        server: { id: "toggle-id" },
+      });
+
+      const user = userEvent.setup();
+      render(<FhirServersModal {...defaultProps} />);
+
+      await user.type(screen.getByTestId("server-name"), "Toggle Server");
+      await user.type(
+        screen.getByTestId("server-url"),
+        "https://toggle.example.com/fhir",
+      );
+      await user.click(screen.getByLabelText("Disable certificate validation"));
+      await user.click(screen.getByLabelText("Default server?"));
+
+      await user.click(screen.getByRole("button", { name: /Add server/i }));
+
+      await waitFor(() => {
+        expect(service.insertFhirServer).toHaveBeenCalledWith(
+          "Toggle Server",
+          "https://toggle.example.com/fhir",
+          true, // disableCertValidation
+          true, // defaultServer
+          true,
+          expect.any(Object),
+          expect.any(Object),
+        );
+      });
+    });
+
+    it("selects a non-default query strategy", async () => {
+      const user = userEvent.setup();
+      render(<FhirServersModal {...defaultProps} />);
+
+      const strategySelect = screen.getByTestId("query-strategy");
+      expect(strategySelect).toHaveValue("default");
+      await user.selectOptions(strategySelect, "epic");
+      expect(strategySelect).toHaveValue("epic");
+    });
+  });
+
+  describe("Default server propagation on edit", () => {
+    it("clears the default flag on other default servers", async () => {
+      const service = require("@/app/backend/fhir-servers/service");
+      service.updateFhirServer.mockResolvedValue({ success: true });
+
+      const otherDefault: FhirServerConfig = {
+        id: "other-default",
+        name: "Other Default",
+        hostname: "https://other.example.com/fhir",
+        authType: "none",
+        disableCertValidation: false,
+        defaultServer: true,
+        patientMatchConfiguration: {
+          enabled: false,
+          onlySingleMatch: false,
+          onlyCertainMatches: false,
+          matchCount: 0,
+          supportsMatch: false,
+        },
+      };
+      const editing: FhirServerConfig = {
+        id: "editing-1",
+        name: "Editing Server",
+        hostname: "https://editing.example.com/fhir",
+        authType: "none",
+        disableCertValidation: false,
+        defaultServer: false,
+        patientMatchConfiguration: {
+          enabled: false,
+          onlySingleMatch: false,
+          onlyCertainMatches: false,
+          matchCount: 0,
+          supportsMatch: false,
+        },
+      };
+
+      const user = userEvent.setup();
+      render(
+        <FhirServersModal
+          {...defaultProps}
+          fhirServers={[otherDefault, editing]}
+          modalMode="edit"
+          serverToEdit={editing}
+        />,
+      );
+
+      // Mark the edited server as default so the propagation loop runs.
+      await user.click(screen.getByLabelText("Default server?"));
+      await user.click(screen.getByRole("button", { name: /Save changes/i }));
+
+      await waitFor(() => {
+        // Once for the edited server, once for the other default server.
+        expect(service.updateFhirServer).toHaveBeenCalledTimes(2);
+      });
+      expect(service.updateFhirServer).toHaveBeenCalledWith(
+        expect.objectContaining({ id: "other-default" }),
+      );
+    });
+  });
+
+  describe("Patient $match settings", () => {
+    it("renders match settings and toggles when the server supports match", async () => {
+      const user = userEvent.setup();
+      render(
+        <FhirServersModal
+          {...defaultProps}
+          patientMatchData={{
+            enabled: true,
+            onlySingleMatch: false,
+            onlyCertainMatches: false,
+            matchCount: 0,
+            supportsMatch: true,
+          }}
+        />,
+      );
+
+      expect(screen.getByText("Patient $match settings")).toBeInTheDocument();
+
+      const matchCount = screen.getByTestId("match-count");
+      await user.clear(matchCount);
+      await user.type(matchCount, "5");
+      expect(defaultProps.setPatientMatchData).toHaveBeenCalled();
+
+      await user.click(screen.getByLabelText("Enable patient matching"));
+      expect(defaultProps.setPatientMatchData).toHaveBeenCalled();
+    });
+
+    it("shows FHIR 6 radio options in edit mode when supported", async () => {
+      const testUtils = require("@/app/backend/fhir-servers/test-utils");
+      testUtils.checkFhirServerSupportsMatch.mockResolvedValue({
+        supportsMatch: true,
+        fhirVersion: "6.0.0",
+      });
+
+      const matchServer: FhirServerConfig = {
+        id: "match-1",
+        name: "Match Server",
+        hostname: "https://match.example.com/fhir",
+        authType: "none",
+        disableCertValidation: false,
+        defaultServer: false,
+        patientMatchConfiguration: {
+          enabled: true,
+          onlySingleMatch: false,
+          onlyCertainMatches: true,
+          matchCount: 0,
+          supportsMatch: true,
+        },
+      };
+
+      render(
+        <FhirServersModal
+          {...defaultProps}
+          modalMode="edit"
+          serverToEdit={matchServer}
+          patientMatchData={{
+            enabled: true,
+            onlySingleMatch: false,
+            onlyCertainMatches: true,
+            matchCount: 0,
+            supportsMatch: true,
+          }}
+        />,
+      );
+
+      await waitFor(() => {
+        expect(
+          screen.getByLabelText("Only include single matches"),
+        ).toBeInTheDocument();
+      });
+      expect(
+        screen.getByLabelText("Only include certain matches"),
+      ).toBeInTheDocument();
+      expect(screen.getByLabelText("Include all matches")).toBeInTheDocument();
+    });
+  });
 
   describe("Server updates", () => {
     it("should update existing server with CA certificate", async () => {
