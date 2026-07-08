@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, ChangeEvent, useMemo, useRef } from "react";
+import { useState, useEffect, useCallback, ChangeEvent, useRef } from "react";
 import styles from "./auditLogs.module.scss";
 import classNames from "classnames";
 import {
@@ -17,11 +17,19 @@ import Skeleton from "react-loading-skeleton";
 import AuditLogDrawer from "./components/auditLogDrawer";
 import {
   auditLogActionTypeMap,
-  labelToActionType,
   auditLogUserMap,
   initializeAuditLogUserMap,
 } from "./components/auditLogMaps";
-import { getAuditLogs, LogEntry } from "@/app/backend/audit-logs/service";
+import {
+  getAuditLogsPaginated,
+  getAuditLogAuthors,
+  getAuditLogActionTypes,
+  LogEntry,
+} from "@/app/backend/audit-logs/service";
+import {
+  AuditLogFilterParams,
+  QCPagedResponse,
+} from "@/app/models/responses/collections";
 
 /**
  * Client component for the Audit Logs page.
@@ -29,6 +37,7 @@ import { getAuditLogs, LogEntry } from "@/app/backend/audit-logs/service";
  */
 const AuditLogs: React.FC = () => {
   const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [selectedName, setSelectedName] = useState("");
   const [selectedAction, setSelectedAction] = useState("");
   const [dateRange, setDateRange] = useState<DateRangeInfo>({
@@ -39,103 +48,93 @@ const AuditLogs: React.FC = () => {
   const [_, setDateErrors] = useState<DateErrors>({});
   const [currentPage, setCurrentPage] = useState(1);
   const [actionsPerPage, setActionsPerPage] = useState(10);
-  const [logs, setLogs] = useState<LogEntry[]>([]);
+  const [pagedResult, setPagedResult] =
+    useState<QCPagedResponse<LogEntry> | null>(null);
+  const [authors, setAuthors] = useState<string[]>([]);
+  const [actionTypes, setActionTypes] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedLog, setSelectedLog] = useState<LogEntry | null>(null);
   const datePickerRef = useRef<DateRangePickerRef>(null);
 
-  useEffect(() => {
-    async function fetchAuditLogs() {
-      const logs = await getAuditLogs();
-      return logs.map((log) => {
-        // Convert createdAt to Date object that works in all browsers in correct timezone
-        let str = String(log.createdAt).trim();
+  const buildFilterParams = useCallback((): AuditLogFilterParams => {
+    // action types whose human-readable label matches the search term, so
+    // label searches (e.g. "sign in") still match rows server-side
+    const searchedActionTypes = debouncedSearch
+      ? Object.entries(auditLogActionTypeMap)
+          .filter(([, config]) =>
+            config.label.toLowerCase().includes(debouncedSearch.toLowerCase()),
+          )
+          .map(([actionType]) => actionType)
+      : [];
 
-        if (!str.includes("T")) str = str.replace(" ", "T");
-        if (!str.endsWith("Z")) str += "Z";
+    return {
+      pageIndex: currentPage - 1,
+      pageSize: actionsPerPage,
+      author: selectedName || undefined,
+      actionType: selectedAction || undefined,
+      textSearch: debouncedSearch || undefined,
+      searchedActionTypes:
+        searchedActionTypes.length > 0 ? searchedActionTypes : undefined,
+      startDate: dateRange.startDate?.toISOString(),
+      endDate: dateRange.endDate?.toISOString(),
+    };
+  }, [
+    currentPage,
+    actionsPerPage,
+    selectedName,
+    selectedAction,
+    debouncedSearch,
+    dateRange,
+  ]);
 
-        return {
-          ...log,
-          createdAt: new Date(str),
-        };
-      });
-    }
-
-    initializeAuditLogUserMap();
-    setLoading(true);
-
-    fetchAuditLogs().then((v) => {
-      setLogs(v);
+  const fetchPage = useCallback(async () => {
+    try {
+      const result = await getAuditLogsPaginated(buildFilterParams());
+      setPagedResult(result);
+    } catch (error) {
+      console.error(`Failed to fetch audit logs: ${error}`);
+    } finally {
       setLoading(false);
-    });
+    }
+  }, [buildFilterParams]);
+
+  // load filter dropdown options and the username -> full name map once
+  useEffect(() => {
+    initializeAuditLogUserMap();
+    getAuditLogAuthors()
+      .then(setAuthors)
+      .catch((error) =>
+        console.error(`Failed to fetch audit log authors: ${error}`),
+      );
+    getAuditLogActionTypes()
+      .then(setActionTypes)
+      .catch((error) =>
+        console.error(`Failed to fetch audit log action types: ${error}`),
+      );
   }, []);
 
-  const [filteredLogs, setFilteredLogs] = useState(logs);
-
-  const uniqueNames = useMemo(
-    () =>
-      Array.from(
-        new Set(logs.map((log) => auditLogUserMap(log.author))),
-      ).sort(),
-    [logs],
-  );
-
-  const uniqueActions = useMemo(
-    () =>
-      Array.from(
-        new Set(
-          logs.map(
-            (log) =>
-              auditLogActionTypeMap[log.actionType]?.label || log.actionType,
-          ),
-        ),
-      ).sort(),
-    [logs],
-  );
-
+  // debounce text search
   useEffect(() => {
-    setFilteredLogs(
-      logs.filter((log) => {
-        const matchesName = selectedName
-          ? auditLogUserMap(log.author) === selectedName
-          : true;
-        const matchesAction = selectedAction
-          ? log.actionType === labelToActionType[selectedAction]
-          : true;
-        const actionLabel =
-          auditLogActionTypeMap[log.actionType]?.label?.toLowerCase() || "";
-        const formattedAction =
-          auditLogActionTypeMap[log.actionType]?.format(log)?.toLowerCase() ||
-          "";
-        const fullName = auditLogUserMap(log.author).toLowerCase();
-        const matchesSearch =
-          search.length === 0 ||
-          log.author.toLowerCase().includes(search.toLowerCase()) ||
-          fullName.includes(search.toLowerCase()) ||
-          log.actionType.toLowerCase().includes(search.toLowerCase()) ||
-          actionLabel.includes(search.toLowerCase()) ||
-          formattedAction.includes(search.toLowerCase()) ||
-          JSON.stringify(log.auditMessage)
-            .toLowerCase()
-            .includes(search.toLowerCase());
-        const matchesDate =
-          (!dateRange.startDate || log.createdAt >= dateRange.startDate) &&
-          (!dateRange.endDate || log.createdAt <= dateRange.endDate);
-        return matchesName && matchesAction && matchesSearch && matchesDate;
-      }),
-    );
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [search]);
+
+  // reset to page 1 when filters or search change
+  useEffect(() => {
     setCurrentPage(1);
-  }, [selectedName, selectedAction, dateRange, search, logs]);
+  }, [selectedName, selectedAction, dateRange, debouncedSearch]);
 
-  const paginatedLogs = useMemo(() => {
-    return filteredLogs.slice(
-      (currentPage - 1) * actionsPerPage,
-      currentPage * actionsPerPage,
-    );
-  }, [filteredLogs, currentPage, actionsPerPage]);
+  // fetch a page of logs whenever page or filters change
+  useEffect(() => {
+    fetchPage();
+  }, [fetchPage]);
 
-  const totalPages = Math.ceil(filteredLogs.length / actionsPerPage);
+  const logs = pagedResult?.items ?? [];
+  const totalItems = pagedResult?.totalItems ?? 0;
+  const totalPages = pagedResult?.totalPages ?? 0;
 
   return (
     <WithAuth>
@@ -161,9 +160,9 @@ const AuditLogs: React.FC = () => {
               onChange={(e) => setSelectedName(e.target.value)}
             >
               <option value=""></option>
-              {uniqueNames.map((name) => (
-                <option key={name} value={name}>
-                  {name}
+              {authors.map((author) => (
+                <option key={author} value={author}>
+                  {auditLogUserMap(author)}
                 </option>
               ))}
             </Select>
@@ -177,9 +176,9 @@ const AuditLogs: React.FC = () => {
               onChange={(e) => setSelectedAction(e.target.value)}
             >
               <option value=""></option>
-              {uniqueActions.map((action) => (
-                <option key={action} value={action}>
-                  {action}
+              {actionTypes.map((actionType) => (
+                <option key={actionType} value={actionType}>
+                  {auditLogActionTypeMap[actionType]?.label || actionType}
                 </option>
               ))}
             </Select>
@@ -222,7 +221,7 @@ const AuditLogs: React.FC = () => {
         </div>
 
         <>
-          {!loading && filteredLogs.length === 0 ? (
+          {!loading && totalItems === 0 ? (
             <div className={styles.noResultsContainer}>
               <div className={styles.noResultsBackground}>
                 <h3>No results found.</h3>
@@ -259,7 +258,7 @@ const AuditLogs: React.FC = () => {
                   <tbody>{LoadingTable}</tbody>
                 ) : (
                   <tbody>
-                    {paginatedLogs.map((log, index) => (
+                    {logs.map((log, index) => (
                       <tr
                         className={styles.tableRows}
                         key={index}
@@ -283,12 +282,12 @@ const AuditLogs: React.FC = () => {
             </div>
           )}
 
-          {!loading && filteredLogs.length > 0 && (
+          {!loading && totalItems > 0 && (
             <div className={classNames(styles.paginationContainer)}>
               <span>
                 {`Showing ${(currentPage - 1) * actionsPerPage + 1} -
-        ${Math.min(currentPage * actionsPerPage, filteredLogs.length)} of 
-        ${filteredLogs.length} actions`}
+        ${Math.min(currentPage * actionsPerPage, totalItems)} of
+        ${totalItems} actions`}
               </span>
 
               <Pagination

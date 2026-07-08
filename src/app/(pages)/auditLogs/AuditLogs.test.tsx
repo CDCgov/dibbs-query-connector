@@ -2,8 +2,13 @@ import { screen, within, waitFor } from "@testing-library/react";
 import AuditLogs from "./page";
 import { renderWithUser, RootProviderMock } from "@/app/tests/unit/setup";
 import userEvent from "@testing-library/user-event";
-import { auditLogActionTypeMap } from "./components/auditLogMaps";
-import { getAuditLogs, LogEntry } from "@/app/backend/audit-logs/service";
+import {
+  getAuditLogsPaginated,
+  getAuditLogAuthors,
+  getAuditLogActionTypes,
+  LogEntry,
+} from "@/app/backend/audit-logs/service";
+import { AuditLogFilterParams } from "@/app/models/responses/collections";
 import { DEFAULT_DATE_DISPLAY_TEXT } from "@/app/ui/designSystem/timeboxing/DateRangePicker";
 
 jest.mock(
@@ -19,7 +24,6 @@ jest.mock("@/app/backend/user-management", () => ({
 
 const TEST_NAME = "Mario Mario";
 const TEST_ACTION = "makePatientRecordsRequest";
-const TEST_REPORT = auditLogActionTypeMap[TEST_ACTION].label;
 const TEST_REPORT_RENDERED = "Viewed patient record for";
 const NUM_ROWS = 26;
 const CHECKSUM_INPUT = "It's-a-me. Mario!";
@@ -65,19 +69,51 @@ const BASE_TEST_DATA: LogEntry[] = [
 const testData = Array.from({ length: 50 }, (_, index) =>
   BASE_TEST_DATA.map((entry) => ({
     ...entry,
-    date: new Date(entry.createdAt.getTime() + index * 86400000),
+    createdAt: new Date(entry.createdAt.getTime() + index * 86400000),
   })),
 )
   .flat()
-  .sort((a, b) => b.date.getTime() - a.date.getTime());
+  .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 
-jest.mock("@/app/backend/audit-logs/service", () => {
+jest.mock("@/app/backend/audit-logs/service", () => ({
+  __esModule: true,
+  getAuditLogsPaginated: jest.fn(),
+  getAuditLogAuthors: jest.fn(),
+  getAuditLogActionTypes: jest.fn(),
+}));
+
+// emulates the server-side filtering/pagination against the in-memory testData
+async function mockPaginatedResponse(params: AuditLogFilterParams) {
+  const term = params.textSearch?.toLowerCase();
+  const filtered = testData.filter((log) => {
+    const matchesAuthor = params.author ? log.author === params.author : true;
+    const matchesAction = params.actionType
+      ? log.actionType === params.actionType
+      : true;
+    const matchesSearch =
+      !term ||
+      log.author.toLowerCase().includes(term) ||
+      log.actionType.toLowerCase().includes(term) ||
+      JSON.stringify(log.auditMessage).toLowerCase().includes(term) ||
+      (params.searchedActionTypes ?? []).includes(log.actionType);
+    const matchesDate =
+      (!params.startDate || log.createdAt >= new Date(params.startDate)) &&
+      (!params.endDate || log.createdAt <= new Date(params.endDate));
+    return matchesAuthor && matchesAction && matchesSearch && matchesDate;
+  });
+
+  const start = params.pageIndex * params.pageSize;
+  const totalPages = Math.ceil(filtered.length / params.pageSize);
   return {
-    __esModule: true,
-    ...jest.requireActual("@/app/backend/audit-logs/service"),
-    getAuditLogs: jest.fn(),
+    items: filtered.slice(start, start + params.pageSize),
+    totalItems: filtered.length,
+    pageIndex: params.pageIndex,
+    pageSize: params.pageSize,
+    totalPages,
+    prevPage: Math.max(0, params.pageIndex - 1),
+    nextPage: Math.min(totalPages - 1, params.pageIndex + 1),
   };
-});
+}
 
 /**
  * Creates an enhanced user event with custom helper methods.
@@ -110,7 +146,15 @@ const createUserWithHelpers = (user: ReturnType<typeof userEvent.setup>) => ({
 
 describe("AuditLogs Component", () => {
   let user: ReturnType<typeof createUserWithHelpers>;
-  (getAuditLogs as jest.Mock).mockResolvedValue(testData);
+  (getAuditLogsPaginated as jest.Mock).mockImplementation(
+    mockPaginatedResponse,
+  );
+  (getAuditLogAuthors as jest.Mock).mockResolvedValue(
+    Array.from(new Set(testData.map((log) => log.author))).sort(),
+  );
+  (getAuditLogActionTypes as jest.Mock).mockResolvedValue(
+    Array.from(new Set(testData.map((log) => log.actionType))).sort(),
+  );
 
   beforeEach(async () => {
     const renderResult = renderWithUser(
@@ -134,26 +178,38 @@ describe("AuditLogs Component", () => {
   test("filters by name and clears filter", async () => {
     await user.selectDropdownOption("Name(s)", TEST_NAME);
 
-    const rows = await screen.findAllByRole("row");
-    expect(rows.length).toBeGreaterThan(1);
-    rows.slice(1).forEach((row) => {
-      expect(within(row).getByText(TEST_NAME)).toBeInTheDocument();
+    await waitFor(() => {
+      const rows = screen.getAllByRole("row");
+      expect(rows.length).toBeGreaterThan(1);
+      rows.slice(1).forEach((row) => {
+        expect(within(row).getByText(TEST_NAME)).toBeInTheDocument();
+      });
     });
+
+    expect(getAuditLogsPaginated).toHaveBeenLastCalledWith(
+      expect.objectContaining({ author: TEST_NAME, pageIndex: 0 }),
+    );
 
     await user.selectDropdownOption("Name(s)", "");
   });
 
   test("filters by action and clears filter", async () => {
-    await user.selectDropdownOption("Action(s)", TEST_REPORT);
+    await user.selectDropdownOption("Action(s)", TEST_ACTION);
 
-    const rows = await screen.findAllByRole("row");
-    expect(rows.length).toBeGreaterThan(1);
-    rows.slice(1).forEach((row) => {
-      const matches = within(row).queryAllByText(
-        (_, node) => !!node?.textContent?.includes(TEST_REPORT_RENDERED),
-      );
-      expect(matches.length).toBeGreaterThan(0);
+    await waitFor(() => {
+      const rows = screen.getAllByRole("row");
+      expect(rows.length).toBeGreaterThan(1);
+      rows.slice(1).forEach((row) => {
+        const matches = within(row).queryAllByText(
+          (_, node) => !!node?.textContent?.includes(TEST_REPORT_RENDERED),
+        );
+        expect(matches.length).toBeGreaterThan(0);
+      });
     });
+
+    expect(getAuditLogsPaginated).toHaveBeenLastCalledWith(
+      expect.objectContaining({ actionType: TEST_ACTION, pageIndex: 0 }),
+    );
 
     await user.selectDropdownOption("Action(s)", "");
   });
@@ -161,11 +217,16 @@ describe("AuditLogs Component", () => {
   test("filters by partial search", async () => {
     await user.typeInField(PLACEHOLDER_TEXT, "Mario");
 
-    const rows = await screen.findAllByRole("row");
-    expect(rows.length).toBeGreaterThan(1);
-    rows.slice(1).forEach((row) => {
-      const matches = within(row).queryAllByText(/Mario/i);
-      expect(matches.length).toBeGreaterThan(0);
+    await waitFor(() => {
+      expect(getAuditLogsPaginated).toHaveBeenLastCalledWith(
+        expect.objectContaining({ textSearch: "Mario", pageIndex: 0 }),
+      );
+      const rows = screen.getAllByRole("row");
+      expect(rows.length).toBeGreaterThan(1);
+      rows.slice(1).forEach((row) => {
+        const matches = within(row).queryAllByText(/Mario/i);
+        expect(matches.length).toBeGreaterThan(0);
+      });
     });
   });
 
@@ -178,6 +239,10 @@ describe("AuditLogs Component", () => {
       const pageNumbers = screen.getAllByRole("button", { name: /Page/ });
       expect(pageNumbers[1]).toHaveAttribute("aria-current", "page");
     });
+
+    expect(getAuditLogsPaginated).toHaveBeenLastCalledWith(
+      expect.objectContaining({ pageIndex: 1 }),
+    );
   });
 
   test("pagination allows clicking previous only if it exists", async () => {
@@ -210,11 +275,15 @@ describe("AuditLogs Component", () => {
       const rows = screen.getAllByRole("row");
       expect(rows.length).toBe(NUM_ROWS);
     });
+
+    expect(getAuditLogsPaginated).toHaveBeenLastCalledWith(
+      expect.objectContaining({ pageIndex: 0, pageSize: 25 }),
+    );
   });
 
   test("clear filters resets empty state", async () => {
     await user.selectDropdownOption("Name(s)", "Luigi Mario");
-    await user.selectDropdownOption("Action(s)", TEST_REPORT);
+    await user.selectDropdownOption("Action(s)", TEST_ACTION);
 
     await waitFor(() => {
       expect(
@@ -255,6 +324,17 @@ describe("AuditLogs Component", () => {
       "auditLogDatePicker",
     ) as HTMLInputElement;
     expect(displayInput.value).not.toBe("");
+
+    // The date range should round-trip to the server as ISO strings
+    await waitFor(() => {
+      expect(getAuditLogsPaginated).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          pageIndex: 0,
+          startDate: expect.any(String),
+          endDate: expect.any(String),
+        }),
+      );
+    });
   });
 
   test("updates start and end date inputs", async () => {
