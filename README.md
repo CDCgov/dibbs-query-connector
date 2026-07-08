@@ -4,7 +4,7 @@
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
 [![Test github badge](https://img.shields.io/github/actions/workflow/status/CDCgov/dibbs-query-connector/ci.yaml)](https://github.com/CDCgov/dibbs-query-connector/actions/workflows/ci.yaml)
 [![Dev site](https://img.shields.io/website?url=https%3A%2F%2Fqueryconnector.dev&label=queryconnector.dev)](https://queryconnector.dev)
-[![Demo site](https://img.shields.io/website?url=https%3A%2F%2Fdemo.queryconnector.dev&label=demo.queryconnector.dev)](https://demo.queryconnector.dev)
+[![Demo site](https://img.shields.io/website?url=https%3A%2F%2Fconnector.dibbs.tools&label=connector.dibbs.tools)](https://connector.dibbs.tools)
 
 ![Query Connector Screenshot](./public/query-connector-screenshot.png)
 
@@ -12,7 +12,7 @@
 
 This repository is a part of the CDC [DIBBs project](https://dibbs.tools/) and seeks to build the DIBBs Query Connector.
 
-The DIBBs Query Connector app offers a REST API and comprehensive UI for public health staff to query a wide network of healthcare organizations (HCOs), providing access to more complete and timely data.
+The DIBBs Query Connector app offers a REST API and comprehensive UI for public health staff to query a wide network of healthcare organizations (HCOs), providing access to more complete and timely data. It's built with Next.js 16 (App Router), React 19, and TypeScript, backed by PostgreSQL with Flyway migrations, and uses NextAuth for authentication and the U.S. Web Design System (USWDS) for its UI.
 
 The Query Connector is a tool for public health practitioners to quickly retrieve patient records and relevant case information from HCOs. The tool works either by making direct FHIR queries or by connecting to Qualified Health Information Networks (QHINs) within the Trusted Exchange Framework and Common Agreement (TEFCA), ensuring immediate access to essential health data and facilitating timely public health decisions and interventions. Public health staff can interact with the Query Connector manually by entering simple patient details — such as name, date of birth, or medical identifiers — into a web-based search form. The tool also allows for automated queries via integration engines like Rhapsody and Mirth.
 
@@ -32,9 +32,11 @@ You can find more detailed documentation, guides, and tutorials here:
 
 - For public health IT staff:
 
-  - [Architecture](src/docs/architecture.mdx)
   - [Deploying Query Connector](src/docs/deployment.mdx)
+  - [Configuring your Identity Provider](src/docs/idp-setup.mdx)
   - [API Docs](src/docs/api.mdx)
+  - [Mutual TLS Setup](src/docs/mutual-tls-setup.mdx)
+  - [FHIR Connection Guide (Epic)](src/docs/fhir-connection-guide.mdx)
   - [ONC audit log compliance](src/docs/audit-log.mdx)
 
 - For developers:
@@ -45,9 +47,23 @@ You can find more detailed documentation, guides, and tutorials here:
 
 ## Try it out!
 
-Access to the demo instance of the latest official release DIBBs Query Connector is available at [https://demo.queryconnector.dev](https://demo.queryconnector.dev).
+Access to the demo instance of the latest official release of DIBBs Query Connector is available at [https://connector.dibbs.tools](https://connector.dibbs.tools).
 
 Access to the dev instance of the main branch of DIBBs Query Connector is available at [https://queryconnector.dev](https://queryconnector.dev).
+
+## Getting started
+
+To run the Query Connector locally, you'll need [Node.js](https://nodejs.org/) and [Docker](https://www.docker.com/) installed:
+
+```bash
+git clone https://github.com/CDCgov/dibbs-query-connector
+cd dibbs-query-connector
+npm install
+npm run setup-local-env  # generates .env from .env.sample
+npm run dev              # starts Docker services + Next.js dev server
+```
+
+The app will be available at [http://localhost:3000](http://localhost:3000). See the [local development guide](src/docs/development.mdx) for the full setup, including test commands and optional services.
 
 ## Additional Acknowledgments
 
@@ -98,7 +114,7 @@ later.
 All comments, messages, pull requests, and other submissions received through
 CDC including this GitHub page may be subject to applicable federal law, including but not limited to the Federal Records Act, and may be archived. Learn more at [http://www.cdc.gov/other/privacy.html](http://www.cdc.gov/other/privacy.html).
 
-See [CONTRIBUTING.md](src/docs/contributing.mdx) for more information.
+See the [contributing guide](src/docs/contributing.mdx) for more information.
 
 ### Records Management Standard Notice
 
