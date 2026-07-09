@@ -19,3 +19,16 @@ export interface ValueSetFilterParams {
   codeSystem?: string;
   creatorNames?: string[];
 }
+
+export interface AuditLogFilterParams {
+  pageIndex: number;
+  pageSize: number;
+  author?: string;
+  actionType?: string;
+  textSearch?: string;
+  // action types whose UI label matches textSearch, so searches on
+  // human-readable action labels still hit the raw action_type column
+  searchedActionTypes?: string[];
+  startDate?: string;
+  endDate?: string;
+}
