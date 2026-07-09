@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getOrCreateKeys } from "../../../../../setup-scripts/gen-keys";
+import { getSigningJwks } from "@/app/backend/signing-keys";
 
 /**
  * API endpoint for the SMART on FHIR auth flow
@@ -8,7 +8,7 @@ import { getOrCreateKeys } from "../../../../../setup-scripts/gen-keys";
 export async function GET() {
   try {
     // Get or create JWKS
-    const jwks = await getOrCreateKeys();
+    const jwks = await getSigningJwks();
 
     // Return the JWKS as JSON with appropriate headers
     return NextResponse.json(jwks, {
