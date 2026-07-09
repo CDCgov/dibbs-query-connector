@@ -53,6 +53,10 @@ class FhirServerConfigServiceInternal {
 
 class FhirServerConfigService extends FhirServerConfigServiceInternal {
   private static cachedFhirServerConfigs: FhirServerConfig[] | null = null;
+  private static cacheFetchedAt = 0;
+  // Mutations clear the cache in-process, but other instances in a
+  // multi-instance deployment won't see them; the TTL bounds that staleness
+  private static readonly CACHE_TTL_MS = 60_000;
 
   /**
    * Fetches the configuration for a FHIR server from the database.
@@ -61,23 +65,29 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
    */
   // @superAdminRequired
   static async getFhirServerConfigs(forceRefresh = false) {
+    const cacheExpired =
+      Date.now() - FhirServerConfigService.cacheFetchedAt >
+      FhirServerConfigService.CACHE_TTL_MS;
     if (
       forceRefresh ||
+      cacheExpired ||
       FhirServerConfigService.cachedFhirServerConfigs === null
     ) {
       const newServerConfigs = await super.getFhirServerConfigs();
       FhirServerConfigService.cachedFhirServerConfigs = newServerConfigs;
+      FhirServerConfigService.cacheFetchedAt = Date.now();
     }
     return FhirServerConfigService.cachedFhirServerConfigs;
   }
 
   static async getFhirServerNames(): Promise<string[]> {
-    const configs = await super.getFhirServerConfigs();
-    // Sort so that the default server is always first
-    configs.sort((a, b) =>
+    const configs = await FhirServerConfigService.getFhirServerConfigs();
+    // Sort a copy so that the default server is always first, without
+    // mutating the cached config array
+    const sortedConfigs = [...configs].sort((a, b) =>
       b.defaultServer === true ? 1 : a.defaultServer === true ? -1 : 0,
     );
-    return configs.map((config) => config.name);
+    return sortedConfigs.map((config) => config.name);
   }
 
   /**

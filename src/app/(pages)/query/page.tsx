@@ -132,6 +132,7 @@ const Query: React.FC = () => {
             patientDiscoveryResponse={patientDiscoveryQueryResponse}
             setResultsQueryResponse={setResultsQueryResponse}
             fhirServer={fhirServer}
+            fhirServers={fhirServers}
             setFhirServer={setFhirServer}
             setLoading={setLoading}
             selectedQuery={selectedQuery}

@@ -4,6 +4,15 @@ import { DibbsValueSet } from "./valuesets";
 import { MedicalRecordSections } from "@/app/(pages)/queryBuilding/utils";
 import { PatientMatchData } from "@/app/backend/fhir-servers/service";
 
+/**
+ * Minimal saved-query representation for list/dropdown rendering, where the
+ * full nested valueset data isn't needed.
+ */
+export interface QuerySummary {
+  queryId: string;
+  queryName: string;
+}
+
 export interface CustomUserQuery {
   queryId: string;
   queryName: string;

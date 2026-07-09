@@ -15,8 +15,10 @@ import {
 } from "./lib";
 import dbService from "../db/service";
 import { getAllGroupQueries } from "../usergroup-management";
-import { User } from "@/app/models/entities/users";
-import { CustomUserQuery } from "@/app/models/entities/query";
+import { getUserRole } from "../user-management";
+import { User, UserRole } from "@/app/models/entities/users";
+import { CustomUserQuery, QuerySummary } from "@/app/models/entities/query";
+import { getLoggedInUser, isAuthDisabledServerCheck } from "@/app/utils/auth";
 import { DibbsValueSet } from "@/app/models/entities/valuesets";
 import { auditable } from "../audit-logs/decorator";
 import { linkTimeboxRangesToQuery } from "../query-timefiltering";
@@ -220,6 +222,43 @@ class QueryBuildingService {
   }
 
   /**
+   * Retrieves lightweight summaries of the saved queries available to the
+   * currently logged-in user, for rendering query lists/dropdowns without
+   * shipping the full nested valueset data. Admins and super admins (or
+   * auth-disabled mode) see all queries; standard users see only queries
+   * assigned to a user group they belong to, resolved in a single SQL query.
+   * @returns An array of QuerySummary objects sorted by query name
+   */
+  static async getSavedQuerySummaries(): Promise<QuerySummary[]> {
+    let unrestricted = true;
+    let username = "";
+
+    if (!isAuthDisabledServerCheck()) {
+      const user = await getLoggedInUser();
+      username = user?.username ?? "";
+      const role = await getUserRole(username);
+      unrestricted = role === UserRole.SUPER_ADMIN || role === UserRole.ADMIN;
+    }
+
+    const query = `
+      SELECT DISTINCT q.id AS query_id, q.query_name
+      FROM query q
+      WHERE $2 = TRUE
+        OR EXISTS (
+          SELECT 1
+          FROM usergroup_to_query ugtq
+          JOIN usergroup_to_users ugtu ON ugtu.usergroup_id = ugtq.usergroup_id
+          JOIN users u ON u.id = ugtu.user_id
+          WHERE ugtq.query_id = q.id AND u.username = $1
+        )
+      ORDER BY q.query_name ASC;
+    `;
+
+    const result = await dbService.query(query, [username, unrestricted]);
+    return result.rows as QuerySummary[];
+  }
+
+  /**
    * @param currentUser - Method to retrieve all queries assigned to groups that
    * the given user is a member of
    * @returns an array of CustomUserQuery objects
@@ -316,6 +355,8 @@ export const getCustomQueries = QueryBuildingService.getCustomQueries;
 export const getQueryList = QueryBuildingService.getQueryList;
 export const getQueryById = QueryBuildingService.getQueryById;
 export const getQueriesForUser = QueryBuildingService.getQueriesForUser;
+export const getSavedQuerySummaries =
+  QueryBuildingService.getSavedQuerySummaries;
 export const getConditionsData = QueryBuildingService.getConditionsData;
 export const getValueSetsAndConceptsByConditionIDs =
   QueryBuildingService.getValueSetsAndConceptsByConditionIDs;

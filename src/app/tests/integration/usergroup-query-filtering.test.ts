@@ -1,5 +1,6 @@
 import {
   addQueriesToGroup,
+  addUsersToGroup,
   getAllGroupQueries,
 } from "@/app/backend/usergroup-management";
 import { getAllUsersWithSingleGroupStatus } from "@/app/backend/user-management";
@@ -7,14 +8,21 @@ import { dontUseOutsideConfigOrTests_getDbPool } from "@/app/backend/db/config";
 import { User } from "@/app/models/entities/users";
 import { suppressConsoleLogs } from "./fixtures";
 import { QueryDataColumn } from "@/app/(pages)/queryBuilding/utils";
-import { getQueriesForUser } from "@/app/backend/query-building/service";
+import {
+  getQueriesForUser,
+  getSavedQuerySummaries,
+} from "@/app/backend/query-building/service";
 import { CustomUserQuery } from "@/app/models/entities/query";
 
 const dbClient = dontUseOutsideConfigOrTests_getDbPool();
 
+const mockGetLoggedInUser = jest.fn();
+
 jest.mock("@/app/utils/auth", () => ({
   superAdminAccessCheck: jest.fn(() => Promise.resolve(true)),
   adminAccessCheck: jest.fn(() => Promise.resolve(true)),
+  isAuthDisabledServerCheck: jest.fn(() => false),
+  getLoggedInUser: () => mockGetLoggedInUser(),
 }));
 
 const TEST_GROUP_ID = "00000000-0000-0000-0000-000000000007";
@@ -163,6 +171,39 @@ describe("User Group and Query Membership Tests", () => {
     ).toBe(true);
   });
 
-  //tests for superAdmins and them seeing evertyhing
-  //tests for other logged in users to make sure they do NOT see everything
+  /**
+   * Tests that query summaries for a standard user only include queries
+   * assigned to a group the user belongs to.
+   */
+  test("should restrict query summaries for a standard user to their group's queries", async () => {
+    // mamaTroi is a Standard user; add them to the test group, which has
+    // queries 2 and 3 assigned by the previous test
+    await addUsersToGroup(TEST_GROUP_ID, [TEST_USER_2_ID]);
+    await dbClient.query("COMMIT");
+
+    mockGetLoggedInUser.mockResolvedValue({ username: "mamaTroi" });
+
+    const summaries = await getSavedQuerySummaries();
+
+    expect(summaries.length).toBe(2);
+    expect(summaries.map((s) => s.queryId).sort()).toEqual(
+      [TEST_QUERY_2_ID, TEST_QUERY_3_ID].sort(),
+    );
+    // summaries are lightweight: no valuesets / query data included
+    expect(Object.keys(summaries[0]).sort()).toEqual(["queryId", "queryName"]);
+  });
+
+  /**
+   * Tests that super admins see all queries in their summaries.
+   */
+  test("should return all queries in summaries for a super admin", async () => {
+    mockGetLoggedInUser.mockResolvedValue({ username: "QtheMagnificent" });
+
+    const summaries = await getSavedQuerySummaries();
+
+    const summaryIds = summaries.map((s) => s.queryId);
+    [TEST_QUERY_1_ID, TEST_QUERY_2_ID, TEST_QUERY_3_ID].forEach((queryId) => {
+      expect(summaryIds).toContain(queryId);
+    });
+  });
 });

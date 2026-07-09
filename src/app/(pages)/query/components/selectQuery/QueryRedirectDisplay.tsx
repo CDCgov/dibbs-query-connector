@@ -22,8 +22,12 @@ const QueryRedirectInfo: React.FC<QueryRedirectInfoProps> = ({ userRole }) => {
       const adminNames = admins.map((a) => `${a.firstName} ${a.lastName}`);
       setAdminNames(adminNames);
     }
-    fetchAdminNames();
-  }, []);
+    // the admin contact list is only shown to standard users; re-run if the
+    // role resolves after mount (e.g. the session was still loading)
+    if (userRole === UserRole.STANDARD) {
+      fetchAdminNames();
+    }
+  }, [userRole]);
   return (
     <div className="padding-3 bg-info display-flex flex-align-start">
       <Icon.Info
