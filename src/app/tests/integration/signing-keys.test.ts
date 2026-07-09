@@ -104,6 +104,42 @@ describe("signing key persistence", () => {
     expect(rows.rows[0].kid).toBe(kid);
   });
 
+  it("generates a fresh key instead of importing a mismatched on-disk pair", async () => {
+    // jwks.json and rsa-private.pem from two different key pairs, as could
+    // result from a partial volume restore or hand-edited keys dir
+    const keysDir = fs.mkdtempSync(
+      path.join(os.tmpdir(), "signing-keys-mismatch-"),
+    );
+    const { publicKey } = await generateKeyPair("RS384", {
+      modulusLength: 2048,
+      extractable: true,
+    });
+    const { privateKey: unrelatedPrivateKey } = await generateKeyPair("RS384", {
+      modulusLength: 2048,
+      extractable: true,
+    });
+    const kid = crypto.randomUUID();
+    const publicJwk = await exportJWK(publicKey);
+    publicJwk.kid = kid;
+    publicJwk.alg = "RS384";
+    publicJwk.use = "sig";
+    fs.writeFileSync(
+      path.join(keysDir, "jwks.json"),
+      JSON.stringify({ keys: [publicJwk] }),
+    );
+    fs.writeFileSync(
+      path.join(keysDir, "rsa-private.pem"),
+      await exportPKCS8(unrelatedPrivateKey),
+    );
+
+    const key = await getOrCreateSigningKey(keysDir);
+    expect(key.kid).not.toBe(kid);
+
+    const rows = await dbService.query("SELECT kid FROM signing_keys;");
+    expect(rows.rows).toHaveLength(1);
+    expect(rows.rows[0].kid).not.toBe(kid);
+  });
+
   it("serves the persisted public key as a JWKS that verifies SMART JWTs", async () => {
     const jwt = await createSmartJwt(
       "test-client-id",
