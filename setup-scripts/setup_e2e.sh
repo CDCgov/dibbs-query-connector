@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e  # Fail loudly instead of letting setup errors slip through
 
 # setup needed .env values
 > .env.e2e
@@ -8,7 +9,7 @@ echo "AUTH_SECRET=UbYPIMJwuiUrb+kK7gO6+aSb46iYf1rKgWcOTIve9EplWV8YU45vufLQTB8=" 
 echo "DEMO_MODE=true" >> .env.e2e
 echo "RUN_FETCH_INTERCEPTOR=true" >> .env.e2e
 
-value=$(grep "^AIDBOX_LICENSE=" .env | cut -d '=' -f2)
+value=$(grep "^AIDBOX_LICENSE=" .env | cut -d '=' -f2 || true)
 
 # Check if the value was found
 if [ -n "$value" ]; then
@@ -18,6 +19,7 @@ else
   echo "Aidbox license key not found in local env file"
 fi
 
-npm install ts-node
-npx ts-node ./setup-scripts/gen-keys.ts
+# Node >= 22.18 runs TypeScript directly via type stripping (ts-node 10 is
+# incompatible with TypeScript 6 and fails to resolve @types/node).
+node ./setup-scripts/gen-keys.ts
 npx playwright install --with-deps

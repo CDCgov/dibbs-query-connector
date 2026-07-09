@@ -44,7 +44,7 @@
     "src/**/*.tsx",
     ".next/types/**/*.ts",
     "src/lib/remark-image-transform.mjs",
-    "setup-scripts/gen-keys.mjs",
+    "setup-scripts/gen-keys.ts",
     ".next/dev/types/**/*.ts"
   ],
   "exclude": [
