@@ -1,9 +1,16 @@
 import FHIRClient from "@/app/backend/fhir-servers/fhir-client";
 import { FhirServerConfig } from "@/app/models/entities/fhir-servers";
 import { testFhirServerConnection } from "@/app/backend/fhir-servers/test-utils";
-import https from "https";
-import { Agent } from "undici";
+import { Agent, fetch as undiciFetch } from "undici";
 import * as mtlsUtils from "@/app/utils/mtls-utils";
+
+// Mutual-TLS requests must go through undici's own fetch (a dispatcher is
+// only compatible with the fetch from the same undici package), so mock that
+// fetch while keeping the real Agent for dispatcher-option assertions.
+jest.mock("undici", () => ({
+  ...jest.requireActual("undici"),
+  fetch: jest.fn(),
+}));
 
 const mockCert =
   "-----BEGIN CERTIFICATE-----\nMOCK_CERT\n-----END CERTIFICATE-----";
@@ -33,6 +40,7 @@ jest.mock("@/app/backend/smart-on-fhir", () => ({
 
 global.fetch = jest.fn();
 const mockFetch = global.fetch as jest.Mock;
+const mockUndiciFetch = undiciFetch as jest.Mock;
 
 describe("FHIRClient with Mutual TLS", () => {
   beforeEach(() => {
@@ -114,7 +122,7 @@ describe("FHIRClient with Mutual TLS", () => {
         json: async () => ({ resourceType: "Bundle" }),
       };
 
-      mockFetch.mockResolvedValue(mockResponse as never);
+      mockUndiciFetch.mockResolvedValue(mockResponse as never);
 
       const config: FhirServerConfig = {
         id: "test",
@@ -128,7 +136,7 @@ describe("FHIRClient with Mutual TLS", () => {
       const client = new FHIRClient(config);
       const _response = await client.get("/Patient");
 
-      expect(fetch).toHaveBeenCalledWith(
+      expect(mockUndiciFetch).toHaveBeenCalledWith(
         "https://mtls.example.com/fhir/Patient",
         expect.objectContaining({
           method: "GET",
@@ -138,7 +146,7 @@ describe("FHIRClient with Mutual TLS", () => {
       );
 
       // Verify the agent has the correct properties
-      const dispatcher: Agent = mockFetch.mock.calls[0][1].dispatcher;
+      const dispatcher: Agent = mockUndiciFetch.mock.calls[0][1].dispatcher;
       const constructOptions = Object.getOwnPropertySymbols(dispatcher).find(
         (s) => s.description === "options",
       ) as keyof Agent;
@@ -154,6 +162,48 @@ describe("FHIRClient with Mutual TLS", () => {
       });
     });
 
+    it("should use the global fetch when the e2e fetch interceptor is applied", async () => {
+      // E2E tests stub outbound requests by patching the global fetch, which
+      // undici's fetch would bypass (see fetchWithMutualTLS in fhir-client.ts).
+      // request-mocking-protocol marks the patched global fetch with this
+      // symbol.
+      const interceptorSymbol = Symbol.for(
+        "request-mocking-protocol.fetchInterceptorApplied",
+      );
+      Object.defineProperty(globalThis, interceptorSymbol, {
+        value: true,
+        configurable: true,
+      });
+      try {
+        const mockResponse = {
+          status: 200,
+          ok: true,
+          json: async () => ({ resourceType: "Bundle" }),
+        };
+        mockFetch.mockResolvedValue(mockResponse as never);
+
+        const config: FhirServerConfig = {
+          id: "test",
+          name: "Test Server",
+          hostname: "https://mtls.example.com/fhir",
+          authType: "mutual-tls",
+          disableCertValidation: false,
+          defaultServer: false,
+        };
+
+        const client = new FHIRClient(config);
+        await client.get("/Patient");
+
+        expect(mockFetch).toHaveBeenCalledWith(
+          "https://mtls.example.com/fhir/Patient",
+          expect.objectContaining({ method: "GET" }),
+        );
+        expect(mockUndiciFetch).not.toHaveBeenCalled();
+      } finally {
+        Reflect.deleteProperty(globalThis, interceptorSymbol);
+      }
+    });
+
     it("should make POST JSON request with mTLS certificates", async () => {
       const mockResponse = {
         status: 201,
@@ -161,7 +211,7 @@ describe("FHIRClient with Mutual TLS", () => {
         json: async () => ({ resourceType: "Task", id: "123" }),
       };
 
-      mockFetch.mockResolvedValue(mockResponse as never);
+      mockUndiciFetch.mockResolvedValue(mockResponse as never);
 
       const config: FhirServerConfig = {
         id: "test",
@@ -181,7 +231,7 @@ describe("FHIRClient with Mutual TLS", () => {
 
       const _response = await client.postJson("/Task", taskData);
 
-      expect(fetch).toHaveBeenCalledWith(
+      expect(mockUndiciFetch).toHaveBeenCalledWith(
         "https://mtls.example.com/fhir/Task",
         expect.objectContaining({
           method: "POST",
@@ -202,7 +252,7 @@ describe("FHIRClient with Mutual TLS", () => {
         json: async () => ({ resourceType: "Bundle" }),
       };
 
-      mockFetch.mockResolvedValue(mockResponse as never);
+      mockUndiciFetch.mockResolvedValue(mockResponse as never);
 
       const config: FhirServerConfig = {
         id: "test",
@@ -217,7 +267,7 @@ describe("FHIRClient with Mutual TLS", () => {
       await client.get("/Patient");
 
       // Verify the agent has the correct properties
-      const dispatcher: Agent = mockFetch.mock.calls[0][1].dispatcher;
+      const dispatcher: Agent = mockUndiciFetch.mock.calls[0][1].dispatcher;
       const constructOptions = Object.getOwnPropertySymbols(dispatcher).find(
         (s) => s.description === "options",
       ) as keyof Agent;
@@ -240,7 +290,7 @@ describe("FHIRClient with Mutual TLS", () => {
         json: async () => ({ resourceType: "Bundle" }),
       };
 
-      mockFetch.mockResolvedValue(mockResponse as never);
+      mockUndiciFetch.mockResolvedValue(mockResponse as never);
 
       const testCaCert =
         "-----BEGIN CERTIFICATE-----\nTEST_CA_CERT\n-----END CERTIFICATE-----";
@@ -257,7 +307,7 @@ describe("FHIRClient with Mutual TLS", () => {
       const client = new FHIRClient(config);
       await client.get("/Patient");
 
-      expect(fetch).toHaveBeenCalledWith(
+      expect(mockUndiciFetch).toHaveBeenCalledWith(
         "https://mtls.example.com/fhir/Patient",
         expect.objectContaining({
           method: "GET",
@@ -267,7 +317,7 @@ describe("FHIRClient with Mutual TLS", () => {
       );
 
       // Verify the agent has the CA certificate
-      const dispatcher: Agent = mockFetch.mock.calls[0][1].dispatcher;
+      const dispatcher: Agent = mockUndiciFetch.mock.calls[0][1].dispatcher;
       const constructOptions = Object.getOwnPropertySymbols(dispatcher).find(
         (s) => s.description === "options",
       ) as keyof Agent;
@@ -293,7 +343,7 @@ describe("FHIRClient with Mutual TLS", () => {
         text: async () => "Not found",
       };
 
-      mockFetch.mockResolvedValue(mockResponse as never);
+      mockUndiciFetch.mockResolvedValue(mockResponse as never);
 
       const result = await testFhirServerConnection(
         "https://mtls.example.com/fhir",
@@ -302,7 +352,7 @@ describe("FHIRClient with Mutual TLS", () => {
       );
 
       expect(result.success).toBe(true);
-      expect(fetch).toHaveBeenCalledWith(
+      expect(mockUndiciFetch).toHaveBeenCalledWith(
         expect.stringContaining("/Task/foo"),
         expect.any(Object),
       );
@@ -315,7 +365,7 @@ describe("FHIRClient with Mutual TLS", () => {
         json: async () => ({ resourceType: "Bundle", total: 0 }),
       };
 
-      mockFetch.mockResolvedValue(mockResponse as never);
+      mockUndiciFetch.mockResolvedValue(mockResponse as never);
 
       const result = await testFhirServerConnection(
         "https://mtls.example.com/fhir",
@@ -324,7 +374,7 @@ describe("FHIRClient with Mutual TLS", () => {
       );
 
       expect(result.success).toBe(true);
-      expect(fetch).toHaveBeenCalledWith(
+      expect(mockUndiciFetch).toHaveBeenCalledWith(
         expect.stringContaining("/Immunization"),
         expect.any(Object),
       );
@@ -366,7 +416,7 @@ describe("FHIRClient with Mutual TLS", () => {
         text: async () => "Unauthorized",
       };
 
-      mockFetch.mockResolvedValue(mockResponse as never);
+      mockUndiciFetch.mockResolvedValue(mockResponse as never);
 
       const result = await testFhirServerConnection(
         "https://mtls.example.com/fhir",
@@ -450,29 +500,20 @@ describe("FHIRClient with Mutual TLS", () => {
 
       const client = new FHIRClient(config);
 
-      try {
-        // This should trigger token endpoint discovery
-        await client.get("/Patient");
+      // This should trigger token endpoint discovery
+      await client.get("/Patient");
 
-        // Verify well-known endpoint was called with mTLS
-        expect(mockFetch).toHaveBeenCalledWith(
-          "https://mtls.example.com/fhir/.well-known/smart-configuration",
-          expect.objectContaining({
-            agent: expect.any(https.Agent),
-          }),
-        );
-
-        const wellKnownCall = mockFetch.mock.calls[0];
-        const agent = (wellKnownCall[1] as { agent: https.Agent }).agent;
-        expect(agent.options.cert).toBe(mockCert);
-        expect(agent.options.key).toBe(mockKey);
-      } catch {
-        // This test may fail due to JWT creation issues, which is acceptable
-        // as we're mainly testing the mTLS certificate configuration
-        console.log(
-          "OAuth test failed as expected due to JWT mocking limitations",
-        );
-      }
+      // Verify the well-known endpoint was queried to discover the token
+      // endpoint, and the discovered endpoint was then used for the token
+      // request.
+      expect(mockFetch).toHaveBeenCalledWith(
+        "https://mtls.example.com/fhir/.well-known/smart-configuration",
+        expect.objectContaining({ method: "GET" }),
+      );
+      expect(mockFetch).toHaveBeenCalledWith(
+        "https://mtls.example.com/auth/token",
+        expect.objectContaining({ method: "POST" }),
+      );
 
       consoleSpy.mockRestore();
     });

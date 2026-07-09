@@ -1,4 +1,3 @@
-import https from "https";
 import { FhirServerConfig } from "../../models/entities/fhir-servers";
 import { EndpointType } from "@/app/(pages)/fhirServers/page";
 import { createSmartJwt } from "../smart-on-fhir";
@@ -10,7 +9,11 @@ import {
   getOrCreateMtlsKey,
   isMtlsAvailable,
 } from "../../utils/mtls-utils";
-import { Agent } from "undici";
+import {
+  Agent,
+  fetch as undiciFetch,
+  RequestInit as UndiciRequestInit,
+} from "undici";
 
 /**
  * Lightweight resource each endpoint type probes during a connection test.
@@ -38,19 +41,39 @@ function fetchWithMutualTLS(
   ca: string,
   disableCertValidation: boolean = false,
 ) {
+  // The Agent must be dispatched by the fetch from the same undici package.
+  // Node's built-in fetch is backed by its own bundled undici, and a version
+  // mismatch between the two dispatch-handler interfaces makes every request
+  // fail with UND_ERR_INVALID_ARG ("invalid onRequestStart method").
+  // One Agent per client also reuses pooled TLS connections across requests
+  // instead of paying the mTLS handshake on each one.
+  const agent = new Agent({
+    connect: {
+      cert: cert,
+      key: key,
+      ca: ca,
+      rejectUnauthorized: !disableCertValidation,
+    },
+  });
+
   return async (url: string, options?: RequestInit): Promise<Response> => {
-    return fetch(url, {
-      ...options,
-      // @ts-ignore
-      dispatcher: new Agent({
-        connect: {
-          cert: cert,
-          key: key,
-          ca: ca,
-          rejectUnauthorized: !disableCertValidation,
-        },
-      }),
-    });
+    // E2E tests stub outbound requests with an interceptor patched onto the
+    // global fetch (see RUN_FETCH_INTERCEPTOR in layout.tsx), which undici's
+    // fetch bypasses. request-mocking-protocol marks the global fetch with
+    // this symbol when it patches it; route through the global fetch then so
+    // the stubs apply. The e2e "mTLS" endpoint is plain HTTP, so the
+    // dispatcher isn't needed there.
+    const e2eInterceptorApplied = Reflect.get(
+      globalThis,
+      Symbol.for("request-mocking-protocol.fetchInterceptorApplied"),
+    );
+    if (e2eInterceptorApplied) {
+      return fetch(url, options);
+    }
+    return undiciFetch(url, {
+      ...(options as UndiciRequestInit),
+      dispatcher: agent,
+    }) as unknown as Promise<Response>;
   };
 }
 
@@ -340,25 +363,9 @@ class FHIRClient {
         body: formData,
       };
 
-      // If SSL validation is disabled or mutual TLS is enabled, add the agent
-      if (
-        this.serverConfig.disableCertValidation ||
-        this.serverConfig.authType === "mutual-tls"
-      ) {
-        let agentOptions: https.AgentOptions = {
-          rejectUnauthorized: !this.serverConfig.disableCertValidation,
-        };
-
-        if (this.serverConfig.authType === "mutual-tls") {
-          const cert = getOrCreateMtlsCert();
-          const key = getOrCreateMtlsKey();
-          agentOptions.cert = cert;
-          agentOptions.key = key;
-        }
-
-        (requestInit as RequestInit & { agent?: https.Agent }).agent =
-          new https.Agent(agentOptions);
-      }
+      // TLS configuration (mTLS certs / disabled cert validation) is handled
+      // by this.fetch, which the constructor set up for this server's auth
+      // type. fetch() has no "agent" option, so there's nothing to add here.
 
       // IMPORTANT: Use the formData object for the actual request
       const response = await this.fetch(tokenEndpoint, requestInit);
@@ -427,25 +434,9 @@ class FHIRClient {
         headers: {},
       };
 
-      // If SSL validation is disabled or mutual TLS is enabled, add the agent
-      if (
-        this.serverConfig.disableCertValidation ||
-        this.serverConfig.authType === "mutual-tls"
-      ) {
-        let agentOptions: https.AgentOptions = {
-          rejectUnauthorized: !this.serverConfig.disableCertValidation,
-        };
-
-        if (this.serverConfig.authType === "mutual-tls") {
-          const cert = getOrCreateMtlsCert();
-          const key = getOrCreateMtlsKey();
-          agentOptions.cert = cert;
-          agentOptions.key = key;
-        }
-
-        (requestInit as RequestInit & { agent?: https.Agent }).agent =
-          new https.Agent(agentOptions);
-      }
+      // TLS configuration (mTLS certs / disabled cert validation) is handled
+      // by this.fetch, which the constructor set up for this server's auth
+      // type. fetch() has no "agent" option, so there's nothing to add here.
 
       const response = await this.fetch(wellKnownUrl, requestInit);
 
