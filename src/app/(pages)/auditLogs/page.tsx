@@ -56,6 +56,7 @@ const AuditLogs: React.FC = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedLog, setSelectedLog] = useState<LogEntry | null>(null);
   const datePickerRef = useRef<DateRangePickerRef>(null);
+  const fetchIdRef = useRef(0);
 
   const buildFilterParams = useCallback((): AuditLogFilterParams => {
     // action types whose human-readable label matches the search term, so
@@ -89,21 +90,36 @@ const AuditLogs: React.FC = () => {
   ]);
 
   const fetchPage = useCallback(async () => {
+    // ignore out-of-order responses: only the latest request may update state
+    const fetchId = ++fetchIdRef.current;
+    setLoading(true);
     try {
       const result = await getAuditLogsPaginated(buildFilterParams());
-      setPagedResult(result);
+      if (fetchId === fetchIdRef.current) {
+        setPagedResult(result);
+      }
     } catch (error) {
       console.error(`Failed to fetch audit logs: ${error}`);
     } finally {
-      setLoading(false);
+      if (fetchId === fetchIdRef.current) {
+        setLoading(false);
+      }
     }
   }, [buildFilterParams]);
 
-  // load filter dropdown options and the username -> full name map once
+  // load filter dropdown options and the username -> full name map once;
+  // the user map loads first so author options can be sorted by the full
+  // names they render as, not by raw username
   useEffect(() => {
-    initializeAuditLogUserMap();
-    getAuditLogAuthors()
-      .then(setAuthors)
+    initializeAuditLogUserMap()
+      .then(() => getAuditLogAuthors())
+      .then((fetchedAuthors) =>
+        setAuthors(
+          fetchedAuthors.sort((a, b) =>
+            auditLogUserMap(a).localeCompare(auditLogUserMap(b)),
+          ),
+        ),
+      )
       .catch((error) =>
         console.error(`Failed to fetch audit log authors: ${error}`),
       );

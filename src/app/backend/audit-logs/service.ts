@@ -16,16 +16,15 @@ export type LogEntry = {
 };
 
 /**
- * Converts a naive-UTC timestamp from the DB into a Date that parses
- * consistently across browsers and timezones.
+ * Converts a naive-UTC timestamp string from the DB into a UTC Date.
+ * The query selects created_at::text (rather than letting pg parse the
+ * TIMESTAMP column into a Date in the server's local timezone) so the
+ * naive value can be tagged as UTC here regardless of server timezone.
  * @param createdAt - The raw created_at value from the DB.
  * @returns The value as a UTC Date.
  */
 function normalizeCreatedAt(createdAt: unknown): Date {
   let str = String(createdAt).trim();
-  if (createdAt instanceof Date) {
-    str = createdAt.toISOString();
-  }
 
   if (!str.includes("T")) str = str.replace(" ", "T");
   if (!str.endsWith("Z")) str += "Z";
@@ -75,7 +74,7 @@ class AuditLogService {
       if (params.textSearch) {
         const searchClauses = [
           `al.author ILIKE $${paramIndex}`,
-          `u.first_name || ' ' || u.last_name ILIKE $${paramIndex}`,
+          `concat_ws(' ', u.first_name, u.last_name) ILIKE $${paramIndex}`,
           `al.action_type ILIKE $${paramIndex}`,
           `al.audit_message::text ILIKE $${paramIndex}`,
         ];
@@ -108,7 +107,7 @@ class AuditLogService {
       const offset = params.pageIndex * params.pageSize;
       const dataSql = `
         SELECT al.id, al.author, al.action_type, al.audit_checksum,
-          al.audit_message, al.created_at
+          al.audit_message, al.created_at::text AS created_at
         ${fromClause}
         ${whereClause}
         ORDER BY al.created_at DESC
