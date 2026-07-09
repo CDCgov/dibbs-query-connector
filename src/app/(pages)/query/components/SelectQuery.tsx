@@ -22,6 +22,7 @@ interface SelectQueryProps {
     React.SetStateAction<PatientRecordsResponse | undefined>
   >;
   fhirServer: string;
+  fhirServers: string[];
   setFhirServer: React.Dispatch<React.SetStateAction<string>>;
   setLoading: (isLoading: boolean) => void;
   selectedQuery: CustomUserQuery;
@@ -38,6 +39,7 @@ interface SelectQueryProps {
  * @param root0.setResultsQueryResponse - Callback function to update selected
  * query
  * @param root0.fhirServer - the FHIR server that we're running the query against
+ * @param root0.fhirServers - list of available FHIR server names
  * @param root0.setFhirServer - callback function to update the FHIR server
  * @param root0.setLoading - callback to set the loading state
  * @returns - The selectQuery component.
@@ -45,6 +47,7 @@ interface SelectQueryProps {
 const SelectQuery: React.FC<SelectQueryProps> = ({
   patientForQuery,
   fhirServer,
+  fhirServers,
   goForward,
   goBack,
   setResultsQueryResponse,
@@ -97,6 +100,7 @@ const SelectQuery: React.FC<SelectQueryProps> = ({
       <SelectSavedQuery
         selectedQuery={selectedQuery}
         fhirServer={fhirServer}
+        fhirServers={fhirServers}
         goBack={goBack}
         setSelectedQuery={setSelectedQuery}
         handleSubmit={onSubmit}

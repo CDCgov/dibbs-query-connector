@@ -4,7 +4,6 @@ import { getSingleUserWithGroupMemberships } from "./user-management";
 
 import { QCResponse } from "../models/responses/collections";
 import { CustomUserQuery } from "../models/entities/query";
-import { QueryResult } from "pg";
 import dbService from "./db/service";
 import { adminRequired } from "./db/decorators";
 import { auditable } from "./audit-logs/decorator";
@@ -370,26 +369,46 @@ class UserGroupManagementService {
         groupId,
       ]);
 
-      const groupQueries = await Promise.all(
-        result.rows.map(async (row) => {
-          const groupAssignments =
-            await UserGroupManagementService.fetchQueryGroupAssignmentDetails(
-              result,
-            );
-          const { queryId, queryName, queryData, conditionsList } = row;
+      const queryIds = result.rows.map((row) => row.queryId);
+      const assignmentsByQueryId: Record<string, UserGroupMembership[]> = {};
 
-          const formattedQuery: CustomUserQuery = {
-            queryId,
-            queryName,
-            valuesets: queryData,
-            conditionsList,
-            groupAssignments: groupAssignments,
-          };
+      if (queryIds.length > 0) {
+        const selectAssignmentsQuery = `
+      SELECT ugtq.query_id, ugtq.id AS membership_id, ug.name AS usergroup_name, ug.id AS usergroup_id
+      FROM usergroup_to_query ugtq
+      JOIN usergroup ug ON ug.id = ugtq.usergroup_id
+      WHERE ugtq.query_id = ANY($1::uuid[]);
+      `;
+        const assignmentResults = await dbService.query(
+          selectAssignmentsQuery,
+          [queryIds],
+        );
 
-          await dbService.query("COMMIT");
-          return formattedQuery;
-        }),
-      );
+        assignmentResults.rows.forEach((row) => {
+          const { queryId, membershipId, usergroupName, usergroupId } = row;
+          assignmentsByQueryId[queryId] ??= [];
+          assignmentsByQueryId[queryId].push({
+            membershipId,
+            usergroupName,
+            usergroupId,
+            isMember: true,
+          });
+        });
+      }
+
+      const groupQueries = result.rows.map((row) => {
+        const { queryId, queryName, queryData, conditionsList } = row;
+
+        const formattedQuery: CustomUserQuery = {
+          queryId,
+          queryName,
+          valuesets: queryData,
+          conditionsList,
+          groupAssignments: assignmentsByQueryId[queryId] ?? [],
+        };
+
+        return formattedQuery;
+      });
 
       return {
         totalItems: result.rowCount,
@@ -547,29 +566,6 @@ class UserGroupManagementService {
       console.error("Error fetching groups for query:", error);
       throw error;
     }
-  }
-
-  /**
-   * Retrieves group assignment data for the given queries and formats it on the CustomUserQuery object
-   * @param queryList - The queries whose group assignments we are retrieving
-   * @returns The updated query record list or an error if the update fails.
-   */
-  static async fetchQueryGroupAssignmentDetails(queryList: QueryResult) {
-    const queries = await Promise.all(
-      queryList.rows.map(async (query) => {
-        try {
-          const groupWithQuery = await getSingleQueryGroupAssignments(
-            query.queryId,
-          );
-          return groupWithQuery.items[0];
-        } catch (error) {
-          console.error(error);
-          throw error;
-        }
-      }),
-    );
-
-    return queries;
   }
 }
 
