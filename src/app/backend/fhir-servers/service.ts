@@ -53,6 +53,10 @@ class FhirServerConfigServiceInternal {
 
 class FhirServerConfigService extends FhirServerConfigServiceInternal {
   private static cachedFhirServerConfigs: FhirServerConfig[] | null = null;
+  private static cacheFetchedAt = 0;
+  // Mutations clear the cache in-process, but other instances in a
+  // multi-instance deployment won't see them; the TTL bounds that staleness
+  private static readonly CACHE_TTL_MS = 60_000;
 
   /**
    * Fetches the configuration for a FHIR server from the database.
@@ -61,12 +65,17 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
    */
   // @superAdminRequired
   static async getFhirServerConfigs(forceRefresh = false) {
+    const cacheExpired =
+      Date.now() - FhirServerConfigService.cacheFetchedAt >
+      FhirServerConfigService.CACHE_TTL_MS;
     if (
       forceRefresh ||
+      cacheExpired ||
       FhirServerConfigService.cachedFhirServerConfigs === null
     ) {
       const newServerConfigs = await super.getFhirServerConfigs();
       FhirServerConfigService.cachedFhirServerConfigs = newServerConfigs;
+      FhirServerConfigService.cacheFetchedAt = Date.now();
     }
     return FhirServerConfigService.cachedFhirServerConfigs;
   }
