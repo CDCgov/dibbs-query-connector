@@ -162,6 +162,40 @@ describe("FHIRClient with Mutual TLS", () => {
       });
     });
 
+    it("should use the global fetch when the e2e fetch interceptor is enabled", async () => {
+      // E2E tests stub outbound requests by patching the global fetch, which
+      // undici's fetch would bypass (see fetchWithMutualTLS in fhir-client.ts).
+      process.env.RUN_FETCH_INTERCEPTOR = "true";
+      try {
+        const mockResponse = {
+          status: 200,
+          ok: true,
+          json: async () => ({ resourceType: "Bundle" }),
+        };
+        mockFetch.mockResolvedValue(mockResponse as never);
+
+        const config: FhirServerConfig = {
+          id: "test",
+          name: "Test Server",
+          hostname: "https://mtls.example.com/fhir",
+          authType: "mutual-tls",
+          disableCertValidation: false,
+          defaultServer: false,
+        };
+
+        const client = new FHIRClient(config);
+        await client.get("/Patient");
+
+        expect(mockFetch).toHaveBeenCalledWith(
+          "https://mtls.example.com/fhir/Patient",
+          expect.objectContaining({ method: "GET" }),
+        );
+        expect(mockUndiciFetch).not.toHaveBeenCalled();
+      } finally {
+        delete process.env.RUN_FETCH_INTERCEPTOR;
+      }
+    });
+
     it("should make POST JSON request with mTLS certificates", async () => {
       const mockResponse = {
         status: 201,

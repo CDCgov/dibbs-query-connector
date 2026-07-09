@@ -57,6 +57,13 @@ function fetchWithMutualTLS(
   });
 
   return async (url: string, options?: RequestInit): Promise<Response> => {
+    // E2E tests stub outbound requests with an interceptor patched onto the
+    // global fetch (see RUN_FETCH_INTERCEPTOR in layout.tsx), which undici's
+    // fetch bypasses. Route through the global fetch there so the stubs apply;
+    // the e2e "mTLS" endpoint is plain HTTP, so the dispatcher isn't needed.
+    if (process.env.RUN_FETCH_INTERCEPTOR === "true") {
+      return fetch(url, options);
+    }
     return undiciFetch(url, {
       ...(options as UndiciRequestInit),
       dispatcher: agent,
