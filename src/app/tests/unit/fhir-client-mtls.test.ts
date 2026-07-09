@@ -162,10 +162,18 @@ describe("FHIRClient with Mutual TLS", () => {
       });
     });
 
-    it("should use the global fetch when the e2e fetch interceptor is enabled", async () => {
+    it("should use the global fetch when the e2e fetch interceptor is applied", async () => {
       // E2E tests stub outbound requests by patching the global fetch, which
       // undici's fetch would bypass (see fetchWithMutualTLS in fhir-client.ts).
-      process.env.RUN_FETCH_INTERCEPTOR = "true";
+      // request-mocking-protocol marks the patched global fetch with this
+      // symbol.
+      const interceptorSymbol = Symbol.for(
+        "request-mocking-protocol.fetchInterceptorApplied",
+      );
+      Object.defineProperty(globalThis, interceptorSymbol, {
+        value: true,
+        configurable: true,
+      });
       try {
         const mockResponse = {
           status: 200,
@@ -192,7 +200,7 @@ describe("FHIRClient with Mutual TLS", () => {
         );
         expect(mockUndiciFetch).not.toHaveBeenCalled();
       } finally {
-        delete process.env.RUN_FETCH_INTERCEPTOR;
+        Reflect.deleteProperty(globalThis, interceptorSymbol);
       }
     });
 
