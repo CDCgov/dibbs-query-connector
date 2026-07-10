@@ -1,4 +1,4 @@
-FROM quay.io/keycloak/keycloak:26.6
+FROM quay.io/keycloak/keycloak:26.7
 USER root
 
 # Copy all keycloak files to /opt/keycloak
