@@ -175,24 +175,31 @@ describe("patientRecordsQuery with the epic query strategy", () => {
     const getPaths = mockFhirClient.get.mock.calls.map((c) => c[0] as string);
     const postPaths = mockFhirClient.post.mock.calls.map((c) => c[0] as string);
 
-    // Epic-incompatible resources go out as GETs...
+    // Epic-incompatible resources go out as GETs, scoped by a bare patient id
+    // (Epic doesn't match Patient/-prefixed reference values)...
     expect(getPaths.find((p) => p.startsWith("/MedicationRequest?"))).toContain(
-      `patient=Patient%2F${PATIENT_ID}`,
+      `patient=${PATIENT_ID}`,
     );
     expect(
-      getPaths.find((p) => p.startsWith("/MedicationStatement?")),
-    ).toContain(`patient=Patient%2F${PATIENT_ID}`);
+      getPaths.find((p) => p.startsWith("/MedicationRequest?")),
+    ).not.toContain("patient=Patient%2F");
     expect(getPaths.find((p) => p.startsWith("/Condition?"))).toContain(
-      `code=${SNOMED_CODE}`,
+      `patient=${PATIENT_ID}&code=${SNOMED_CODE}`,
     );
-    // ...with no code filter on the medication searches.
+    // ...with no code filter on the medication search.
     expect(
       getPaths.find((p) => p.startsWith("/MedicationRequest?")),
     ).not.toContain("code=");
 
+    // Epic has no R4 MedicationStatement endpoint, so it's never queried.
+    expect(getPaths.some((p) => p.includes("MedicationStatement"))).toBe(false);
+
     // The Encounter GET is driven by the returned Condition id.
     expect(getPaths.find((p) => p.startsWith("/Encounter?"))).toContain(
       "diagnosis=Condition%2Fcond-1",
+    );
+    expect(getPaths.find((p) => p.startsWith("/Encounter?"))).toContain(
+      `patient=${PATIENT_ID}`,
     );
 
     // None of these resources are POSTed in epic mode; Observation and
@@ -300,6 +307,114 @@ describe("patientRecordsQuery with the epic query strategy", () => {
 
     expect(result.MedicationRequest?.map((r) => r.id)).toEqual(["mr-match"]);
     expect(result.Medication?.map((m) => m.id)).toEqual(["med-match"]);
+
+    // The searched bundle already included the Medications, so no follow-up
+    // reads were needed.
+    const medicationReads = mockFhirClient.get.mock.calls
+      .map((c) => c[0] as string)
+      .filter((p) => p.startsWith("/Medication/"));
+    expect(medicationReads).toEqual([]);
+  });
+
+  it("reads referenced Medications the search didn't include (Epic ignores _include)", async () => {
+    const medicationRequest = (id: string, medicationId: string) => ({
+      resource: {
+        resourceType: "MedicationRequest",
+        id,
+        status: "active",
+        intent: "order",
+        subject: { reference: `Patient/${PATIENT_ID}` },
+        medicationReference: { reference: `Medication/${medicationId}` },
+      },
+    });
+    const medicationBundle = {
+      resourceType: "Bundle",
+      type: "searchset",
+      entry: [
+        medicationRequest("mr-match", "med-match"),
+        medicationRequest("mr-other", "med-other"),
+        // Second request for the same drug: the Medication is read only once.
+        medicationRequest("mr-match-2", "med-match"),
+      ],
+    };
+    mockFhirClient.get.mockImplementation(async (path: string) => {
+      if (path.startsWith("/MedicationRequest")) {
+        return mockBundleResponse(path, medicationBundle);
+      }
+      // Reads return the bare resource, not a searchset Bundle.
+      if (path === "/Medication/med-match") {
+        return mockBundleResponse(path, {
+          resourceType: "Medication",
+          id: "med-match",
+          code: { coding: [{ code: RXNORM_CODE }] },
+        });
+      }
+      if (path === "/Medication/med-other") {
+        return mockBundleResponse(path, {
+          resourceType: "Medication",
+          id: "med-other",
+          code: { coding: [{ code: OTHER_RXNORM_CODE }] },
+        });
+      }
+      return mockBundleResponse(path, EMPTY_BUNDLE);
+    });
+
+    const result = await runQuery();
+
+    // Each distinct referenced Medication is read exactly once...
+    const medicationReads = mockFhirClient.get.mock.calls
+      .map((c) => c[0] as string)
+      .filter((p) => p.startsWith("/Medication/"));
+    expect(medicationReads.sort()).toEqual([
+      "/Medication/med-match",
+      "/Medication/med-other",
+    ]);
+
+    // ...which lets the client-side code filter evaluate every request and
+    // surfaces the matching Medication (with its name) in the response.
+    expect(result.MedicationRequest?.map((r) => r.id).sort()).toEqual([
+      "mr-match",
+      "mr-match-2",
+    ]);
+    expect(result.Medication?.map((m) => m.id)).toEqual(["med-match"]);
+  });
+
+  it("keeps medication requests whose Medication read fails (fail open)", async () => {
+    const medicationBundle = {
+      resourceType: "Bundle",
+      type: "searchset",
+      entry: [
+        {
+          resource: {
+            resourceType: "MedicationRequest",
+            id: "mr-unresolved",
+            status: "active",
+            intent: "order",
+            subject: { reference: `Patient/${PATIENT_ID}` },
+            medicationReference: { reference: "Medication/med-gone" },
+          },
+        },
+      ],
+    };
+    mockFhirClient.get.mockImplementation(async (path: string) => {
+      if (path.startsWith("/MedicationRequest")) {
+        return mockBundleResponse(path, medicationBundle);
+      }
+      if (path === "/Medication/med-gone") {
+        return {
+          status: 404,
+          url: `https://example.com/fhir${path}`,
+          text: async () => "Not found",
+        } as unknown as Response;
+      }
+      return mockBundleResponse(path, EMPTY_BUNDLE);
+    });
+
+    const result = await runQuery();
+
+    expect(result.MedicationRequest?.map((r) => r.id)).toEqual([
+      "mr-unresolved",
+    ]);
   });
 
   it("keeps the default POST _search behavior for default-strategy servers", async () => {
