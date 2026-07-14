@@ -311,7 +311,9 @@ describe("resolveMedicationConcept", () => {
 
   it("prefers a named concept over one carrying only bare codes", () => {
     // The resolved Medication has an RxNorm code but no display text; the
-    // reference display is the only human-readable name available.
+    // reference display is the only human-readable name available. The
+    // Medication's codings ride along so the code still renders under the
+    // name.
     const request = makeRequest("r1", {
       medicationReference: {
         reference: "Medication/med-1",
@@ -323,7 +325,31 @@ describe("resolveMedicationConcept", () => {
       request,
       buildMedicationIndex([makeMedication("med-1", MATCHING_CODE)]),
     );
-    expect(concept).toEqual({ text: "Truvada" });
+    expect(concept).toEqual({
+      text: "Truvada",
+      coding: [
+        {
+          system: "http://www.nlm.nih.gov/research/umls/rxnorm",
+          code: MATCHING_CODE,
+        },
+      ],
+    });
+  });
+
+  it("doesn't count a display on a later coding as a name", () => {
+    // formatCodeableConcept renders text or the first coding's display, so a
+    // name buried in a later coding would still show as a bare code — the
+    // reference display should win instead.
+    const request = makeRequest("r1", {
+      medicationCodeableConcept: {
+        coding: [{ code: "123" }, { code: "456", display: "buried name" }],
+      },
+      medicationReference: { display: "Truvada" },
+    });
+
+    expect(resolveMedicationConcept(request, emptyIndex)).toEqual({
+      text: "Truvada",
+    });
   });
 
   it("ignores an empty inline concept in favor of the reference display", () => {

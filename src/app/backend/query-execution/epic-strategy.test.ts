@@ -335,6 +335,18 @@ describe("patientRecordsQuery with the epic query strategy", () => {
         medicationRequest("mr-other", "med-other"),
         // Second request for the same drug: the Medication is read only once.
         medicationRequest("mr-match-2", "med-match"),
+        // A schemed reference (urn:, absolute URL) may not resolve against
+        // this server, so it's never read; the request fails open instead.
+        {
+          resource: {
+            resourceType: "MedicationRequest",
+            id: "mr-urn",
+            status: "active",
+            intent: "order",
+            subject: { reference: `Patient/${PATIENT_ID}` },
+            medicationReference: { reference: "urn:uuid:not-a-local-id" },
+          },
+        },
       ],
     };
     mockFhirClient.get.mockImplementation(async (path: string) => {
@@ -371,12 +383,61 @@ describe("patientRecordsQuery with the epic query strategy", () => {
     ]);
 
     // ...which lets the client-side code filter evaluate every request and
-    // surfaces the matching Medication (with its name) in the response.
+    // surfaces the matching Medication (with its name) in the response. The
+    // urn-referenced request couldn't be evaluated, so it's kept (fail open).
     expect(result.MedicationRequest?.map((r) => r.id).sort()).toEqual([
       "mr-match",
       "mr-match-2",
+      "mr-urn",
     ]);
     expect(result.Medication?.map((m) => m.id)).toEqual(["med-match"]);
+  });
+
+  it("caps follow-up Medication reads and keeps capped-out requests unfiltered", async () => {
+    // 250 distinct references against EPIC_MEDICATION_READ_LIMIT = 200.
+    const requestCount = 250;
+    const medicationBundle = {
+      resourceType: "Bundle",
+      type: "searchset",
+      entry: Array.from({ length: requestCount }, (_, i) => ({
+        resource: {
+          resourceType: "MedicationRequest",
+          id: `mr-${i}`,
+          status: "active",
+          intent: "order",
+          subject: { reference: `Patient/${PATIENT_ID}` },
+          medicationReference: { reference: `Medication/med-${i}` },
+        },
+      })),
+    };
+    mockFhirClient.get.mockImplementation(async (path: string) => {
+      if (path.startsWith("/MedicationRequest")) {
+        return mockBundleResponse(path, medicationBundle);
+      }
+      if (path.startsWith("/Medication/")) {
+        // Every resolved Medication carries a non-matching code, so resolved
+        // requests get filtered out and only the capped-out ones survive.
+        return mockBundleResponse(path, {
+          resourceType: "Medication",
+          id: path.replace("/Medication/", ""),
+          code: { coding: [{ code: OTHER_RXNORM_CODE }] },
+        });
+      }
+      return mockBundleResponse(path, EMPTY_BUNDLE);
+    });
+
+    const result = await runQuery();
+
+    // Reads stop at the cap...
+    const medicationReads = mockFhirClient.get.mock.calls
+      .map((c) => c[0] as string)
+      .filter((p) => p.startsWith("/Medication/"));
+    expect(medicationReads).toHaveLength(200);
+
+    // ...and the 50 requests whose Medications went unread are kept
+    // unfiltered (fail open) while the resolved non-matching ones drop.
+    expect(result.MedicationRequest).toHaveLength(50);
+    expect(result.Medication).toBeUndefined();
   });
 
   it("keeps medication requests whose Medication read fails (fail open)", async () => {

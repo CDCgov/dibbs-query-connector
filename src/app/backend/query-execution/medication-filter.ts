@@ -102,7 +102,10 @@ function medicationOrderMatches(
 }
 
 function conceptHasName(concept: CodeableConcept | undefined): boolean {
-  return !!(concept?.text || concept?.coding?.some((c) => c.display));
+  // Mirrors what formatCodeableConcept actually renders — the text, falling
+  // back to the first coding's display. A display on a later coding never
+  // reaches the screen, so it doesn't count as a name here.
+  return !!(concept?.text || concept?.coding?.[0]?.display);
 }
 
 function conceptHasContent(concept: CodeableConcept | undefined): boolean {
@@ -115,7 +118,9 @@ function conceptHasContent(concept: CodeableConcept | undefined): boolean {
  * the referenced or contained Medication's code, then the reference's display
  * text (Epic populates the drug name there even though its searches don't
  * return the Medication resources) — preferring the first with a
- * human-readable name over one carrying only bare codes.
+ * human-readable name over one carrying only bare codes. When the reference
+ * display wins, the resolved Medication's codings are carried along so the
+ * code still renders beneath the name.
  * @param order the MedicationRequest or MedicationStatement to name
  * @param medicationIndex Medication resources returned with the query,
  * indexed by id (see buildMedicationIndex)
@@ -126,11 +131,12 @@ export function resolveMedicationConcept(
   order: MedicationOrder,
   medicationIndex: Map<string, Medication>,
 ): CodeableConcept | undefined {
+  const medicationCode = resolveMedication(order, medicationIndex)?.code;
   const display = order.medicationReference?.display;
   const candidates = [
     order.medicationCodeableConcept,
-    resolveMedication(order, medicationIndex)?.code,
-    display ? { text: display } : undefined,
+    medicationCode,
+    display ? { text: display, coding: medicationCode?.coding } : undefined,
   ];
 
   return candidates.find(conceptHasName) ?? candidates.find(conceptHasContent);

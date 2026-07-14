@@ -672,12 +672,14 @@ class QueryService {
         includedMedicationIds.add(resource.id);
       }
       if (resource?.resourceType === "MedicationRequest") {
-        // Contained (#id) references resolve locally, and an absolute-URL
-        // reference may point at a different server — reading its id against
-        // this server could fetch an unrelated resource, so only relative
-        // references are read (unresolved orders fail open downstream).
+        // Contained (#id) references resolve locally, and a reference with a
+        // scheme (an absolute URL, urn:uuid:, urn:oid:) may not resolve
+        // against this server — reading it here could fetch an unrelated
+        // resource or just burn a guaranteed-404 request — so only scheme-less
+        // relative references are read (unresolved orders fail open
+        // downstream).
         const reference = resource.medicationReference?.reference;
-        if (reference && !/^https?:\/\//i.test(reference)) {
+        if (reference && !reference.includes(":")) {
           const id = referencedMedicationKey(resource);
           if (id) referencedMedicationIds.add(id);
         }
