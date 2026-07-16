@@ -5,7 +5,8 @@ import {
   QueryTableTimebox,
   TimeWindow,
 } from "../../(pages)/queryBuilding/utils";
-import { QueryStrategy } from "../../(pages)/fhirServers/page";
+import { EndpointType, QueryStrategy } from "../../(pages)/fhirServers/page";
+import { HumanName, Patient } from "fhir/r4";
 
 // Epic-mode Condition and Encounter queries go out as GETs, so long code /
 // reference lists are chunked across multiple requests to keep URLs well under
@@ -34,6 +35,50 @@ export function chunkArray<T>(items: T[], chunkSize: number): T[][] {
   return chunks;
 }
 
+export type ChainedPatientDemographics = {
+  given: string;
+  family: string;
+  birthDate: string;
+};
+
+/**
+ * Extracts the demographics an Immunization Gateway's chained Immunization
+ * search (patient.given / patient.family / patient.birthdate) needs from a
+ * Patient resource. Prefers the "official" name; falls back to the first name
+ * entry with both a given and family name. Only the first given name is used
+ * (the gateway maps it to the HL7v2 PID-5 name).
+ * @param patient the discovered Patient resource
+ * @returns the demographics, or undefined when a usable name or a full
+ * YYYY-MM-DD birthDate is missing (partial FHIR dates can't be translated to
+ * a v2 DOB), in which case the caller falls back to a patient={id} search.
+ */
+export function extractChainedPatientDemographics(
+  patient: Patient,
+): ChainedPatientDemographics | undefined {
+  const names = patient.name ?? [];
+  const usable = (n: HumanName) => Boolean(n.given?.[0] && n.family);
+  const name =
+    names.find((n) => n.use === "official" && usable(n)) ?? names.find(usable);
+  const birthDate = patient.birthDate;
+  if (!name || !birthDate || !/^\d{4}-\d{2}-\d{2}$/.test(birthDate)) {
+    return undefined;
+  }
+  return { given: name.given![0], family: name.family!, birthDate };
+}
+
+export type CustomQueryOptions = {
+  /**
+   * The kind of endpoint being queried; Immunization Gateways get chained
+   * patient-demographic Immunization searches.
+   */
+  endpointType?: EndpointType;
+  /**
+   * Demographics from the discovered Patient, extracted with
+   * extractChainedPatientDemographics.
+   */
+  patientDemographics?: ChainedPatientDemographics;
+};
+
 function formatTimeFilter(timeWindow: TimeWindow | undefined) {
   if (!timeWindow) return undefined;
   const startString = timeWindow.timeWindowStart.substring(0, 10);
@@ -56,6 +101,8 @@ function formatTimeFilter(timeWindow: TimeWindow | undefined) {
 export class CustomQuery {
   patientId: string = "";
   queryStrategy: QueryStrategy = "default";
+  endpointType: EndpointType = "standard";
+  patientDemographics?: ChainedPatientDemographics;
   private timeboxInfo?: QueryTableTimebox;
 
   // Store four types of input codes
@@ -87,15 +134,21 @@ export class CustomQuery {
    * @param queryStrategy How the target server supports search: "default"
    * uses spec-standard POST _search queries; "epic" adapts to Epic's
    * supported search parameters (see QueryStrategy).
+   * @param options Endpoint-specific inputs: the server's endpointType and,
+   * for Immunization Gateways, the discovered patient's demographics used to
+   * build the chained Immunization search.
    */
   constructor(
     savedQuery: QueryTableResult,
     patientId: string,
     queryStrategy: QueryStrategy = "default",
+    options: CustomQueryOptions = {},
   ) {
     try {
       this.patientId = patientId;
       this.queryStrategy = queryStrategy;
+      this.endpointType = options.endpointType ?? "standard";
+      this.patientDemographics = options.patientDemographics;
       const queryData = savedQuery.queryData;
       const medicalRecordSection = savedQuery.medicalRecordSections;
       const timeboxInfo = savedQuery.timeboxWindows;
@@ -176,14 +229,31 @@ export class CustomQuery {
 
     if (medicalRecordSections && medicalRecordSections.immunizations) {
       const formattedParams = new URLSearchParams();
-      // FHIR R4 Immunization has no "subject" search param; the patient-scoping
-      // param is "patient". Using "subject" leaves the query unscoped and the IZ
-      // Gateway rejects it ("must contain patient.identifier or name+birthDate").
-      // Epic's search expects a bare patient id, not a Patient/ reference.
-      formattedParams.append(
-        "patient",
-        this.queryStrategy === "epic" ? patientId : `Patient/${patientId}`,
-      );
+      if (this.endpointType === "immunization" && this.patientDemographics) {
+        // Immunization Gateways (e.g. eHealth Exchange's fhirproxy) translate
+        // the FHIR search into an HL7v2 QBP Z34 query, which identifies the
+        // patient by demographics ("must contain patient.identifier or
+        // name+birthDate") — a patient={id} search returns nothing. Use
+        // chained demographic params from the discovered Patient instead.
+        formattedParams.append("patient.given", this.patientDemographics.given);
+        formattedParams.append(
+          "patient.family",
+          this.patientDemographics.family,
+        );
+        formattedParams.append(
+          "patient.birthdate",
+          this.patientDemographics.birthDate,
+        );
+      } else {
+        // FHIR R4 Immunization has no "subject" search param; the patient-scoping
+        // param is "patient". Using "subject" leaves the query unscoped and the IZ
+        // Gateway rejects it ("must contain patient.identifier or name+birthDate").
+        // Epic's search expects a bare patient id, not a Patient/ reference.
+        formattedParams.append(
+          "patient",
+          this.queryStrategy === "epic" ? patientId : `Patient/${patientId}`,
+        );
+      }
 
       this.fhirResourceQueries["immunization"] = {
         basePath: `/Immunization`,

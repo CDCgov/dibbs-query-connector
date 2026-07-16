@@ -1,4 +1,4 @@
-import { Bundle, FhirResource } from "fhir/r4";
+import { Bundle, FhirResource, Patient } from "fhir/r4";
 import { UserGroupMembership } from "./users";
 import { DibbsValueSet } from "./valuesets";
 import { MedicalRecordSections } from "@/app/(pages)/queryBuilding/utils";
@@ -55,10 +55,17 @@ export type PatientRecordsRequest = {
   patientId: string;
   fhirServer: string;
   queryName: string;
+  /**
+   * The discovered Patient resource the records query is for. Immunization
+   * Gateway servers translate FHIR searches into HL7v2 QBP queries, which
+   * identify the patient by demographics rather than FHIR id, so the
+   * Immunization search is built from this resource's name and birthDate.
+   */
+  patient?: Patient;
 };
 
 export type FullPatientRequest = PatientDiscoveryRequest &
-  Omit<PatientRecordsRequest, "patientId">;
+  Omit<PatientRecordsRequest, "patientId" | "patient">;
 
 /**
  * Validates the patient search criteria for a discovery request.
