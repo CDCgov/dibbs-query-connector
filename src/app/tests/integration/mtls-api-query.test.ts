@@ -227,6 +227,9 @@ jest.mock("@/app/models/entities/query", () => ({
 }));
 
 jest.mock("@/app/backend/query-execution/custom-query", () => ({
+  // Keep the real module's helpers (extractChainedPatientDemographics,
+  // chunkArray) — patientRecordsQuery calls them outside CustomQuery.
+  ...jest.requireActual("@/app/backend/query-execution/custom-query"),
   CustomQuery: jest.fn().mockImplementation(() => ({
     getQuery: jest.fn().mockReturnValue({
       basePath: "/Observation",
