@@ -1,10 +1,14 @@
-import React from "react";
+import React, { useMemo } from "react";
 import Table from "@/app/ui/designSystem/table/Table";
-import { MedicationStatement } from "fhir/r4";
+import { Medication, MedicationStatement } from "fhir/r4";
 import {
   formatCodeableConcept,
   formatDate,
 } from "../../../../../utils/format-service";
+import {
+  buildMedicationIndex,
+  resolveMedicationConcept,
+} from "@/backend/query-execution/medication-filter";
 import styles from "./resultsTables.module.scss";
 import { checkIfSomeElementWithPropertyExists } from "./utils";
 import classNames from "classnames";
@@ -14,20 +18,28 @@ import classNames from "classnames";
  */
 export interface MedicationStatementTableProps {
   medicationStatements: MedicationStatement[];
+  medications?: Medication[];
 }
 
 /**
  * Displays a table of data from array of MedicationStatement resources.
  * @param props - MedicationStatement table props.
  * @param props.medicationStatements - The array of MedicationStatement resources.
+ * @param props.medications - Medication resources returned with the query,
+ * used to name statements that only reference their medication.
  * @returns - The MedicationStatementTable component.
  */
 const MedicationStatementTable: React.FC<MedicationStatementTableProps> = ({
   medicationStatements,
+  medications = [],
 }) => {
   const availableElements = checkIfSomeElementWithPropertyExists(
     medicationStatements,
     ["reasonCode"],
+  );
+  const medicationIndex = useMemo(
+    () => buildMedicationIndex(medications),
+    [medications],
   );
 
   return (
@@ -56,7 +68,7 @@ const MedicationStatementTable: React.FC<MedicationStatementTableProps> = ({
             </td>
             <td>
               {formatCodeableConcept(
-                medicationStatement.medicationCodeableConcept,
+                resolveMedicationConcept(medicationStatement, medicationIndex),
               )}
             </td>
             {availableElements.reasonCode && (

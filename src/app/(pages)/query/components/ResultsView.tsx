@@ -160,6 +160,7 @@ function mapQueryResponseToAccordionDataStructure(
   const medicationStatements = resultsQueryResponse.MedicationStatement
     ? resultsQueryResponse.MedicationStatement
     : null;
+  const medications = resultsQueryResponse.Medication ?? [];
   const immunizations = resultsQueryResponse.Immunization
     ? resultsQueryResponse.Immunization
     : null;
@@ -210,6 +211,7 @@ function mapQueryResponseToAccordionDataStructure(
                 </h4>
                 <MedicationRequestTable
                   medicationRequests={medicationRequests}
+                  medications={medications}
                 />
               </>
             )}
@@ -222,6 +224,7 @@ function mapQueryResponseToAccordionDataStructure(
                 </h4>
                 <MedicationStatementTable
                   medicationStatements={medicationStatements}
+                  medications={medications}
                 />
               </>
             )}

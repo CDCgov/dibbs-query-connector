@@ -1,10 +1,13 @@
 "use server";
-import { Bundle, FhirResource, Patient, Task } from "fhir/r4";
+import { Bundle, FhirResource, Medication, Patient, Task } from "fhir/r4";
 
 import { isFhirResource } from "../../constants";
 
-import { CustomQuery } from "./custom-query";
-import { filterMedicationResourcesByCode } from "./medication-filter";
+import { chunkArray, CustomQuery } from "./custom-query";
+import {
+  filterMedicationResourcesByCode,
+  referencedMedicationKey,
+} from "./medication-filter";
 import { GetPhoneQueryFormats } from "../../utils/format-service";
 import { auditable } from "../audit-logs/decorator";
 import type { QueryTableResult } from "../../(pages)/queryBuilding/utils";
@@ -49,6 +52,15 @@ const TASK_POLLING = {
   DELAY_MS: 5000,
   RETRY_DELAY_MS: 5000,
 } as const;
+
+// Epic-mode Medication reads (see runEpicMedicationRequestChain) are capped so
+// a patient with an enormous medication history can't fan out into an
+// unbounded number of requests, and are issued in small concurrent batches to
+// avoid hammering the server. Unresolved medications are kept unfiltered by
+// the downstream code filter (fail open), so hitting the cap over-includes
+// rather than drops records.
+const EPIC_MEDICATION_READ_LIMIT = 200;
+const EPIC_MEDICATION_READ_BATCH_SIZE = 10;
 
 const TASK_TEMPLATE: Partial<Task> = {
   resourceType: "Task",
@@ -475,13 +487,19 @@ class QueryService {
 
     if (queryStrategy === "epic") {
       // Epic doesn't support POST _search (or server-side code filtering) for
-      // these resources, so they're issued as GETs alongside the POST batch.
-      // Medication results are filtered to the query's codes downstream.
-      for (const key of ["medicationRequest", "medicationStatement"]) {
-        const { basePath, params } = builtQuery.getQuery(key);
-        if (basePath !== "") {
-          postPromises.push(fhirClient.get(`${basePath}?${params}`));
-        }
+      // MedicationRequest, so it goes out as a GET alongside the POST batch,
+      // followed by reads of any referenced Medications the search didn't
+      // include (Epic ignores _include). Medication results are filtered to
+      // the query's codes downstream. MedicationStatement isn't queried in
+      // Epic mode at all — Epic has no R4 endpoint for it.
+      const { basePath, params } = builtQuery.getQuery("medicationRequest");
+      if (basePath !== "") {
+        postPromises.push(
+          QueryService.runEpicMedicationRequestChain(
+            fhirClient,
+            `${basePath}?${params}`,
+          ),
+        );
       }
       postPromises.push(
         QueryService.runEpicConditionEncounterChain(fhirClient, builtQuery),
@@ -564,12 +582,10 @@ class QueryService {
         fhirClient.get(`${basePath}?${params}`),
       ),
     );
-    const conditionResponses = conditionResults
-      .map((r) => {
-        if (r.status === "fulfilled") return r.value;
-        console.error("Epic Condition FHIR query rejected: ", r.reason);
-      })
-      .filter((v): v is Response => !!v);
+    const conditionResponses = QueryService.collectSettledResponses(
+      conditionResults,
+      "Epic Condition FHIR query rejected: ",
+    );
 
     // Pull matching Condition ids out of the successful responses. Bodies are
     // cloned because parseFhirSearch reads them again downstream. A Set
@@ -606,14 +622,150 @@ class QueryService {
         .compileEpicEncounterQueries([...conditionIds])
         .map(({ basePath, params }) => fhirClient.get(`${basePath}?${params}`)),
     );
-    const encounterResponses = encounterResults
-      .map((r) => {
-        if (r.status === "fulfilled") return r.value;
-        console.error("Epic Encounter FHIR query rejected: ", r.reason);
-      })
-      .filter((v): v is Response => !!v);
+    const encounterResponses = QueryService.collectSettledResponses(
+      encounterResults,
+      "Epic Encounter FHIR query rejected: ",
+    );
 
     return [...conditionResponses, ...encounterResponses];
+  }
+
+  /**
+   * Epic-mode MedicationRequest retrieval. Epic's MedicationRequest search
+   * ignores `_include=MedicationRequest:medication`, so the Medication
+   * resources carrying the drug names and RxNorm codes never accompany the
+   * search results — medication names render blank in the UI and the
+   * client-side code filter can't evaluate anything. Resolve that here by
+   * reading each distinct referenced Medication the search response didn't
+   * include. The fetched Medications are returned wrapped in a synthetic
+   * Bundle response so the shared search parsing downstream handles them
+   * without needing to accept bare read bodies.
+   * @param fhirClient - client for the FHIR server being queried
+   * @param fetchString - the compiled MedicationRequest GET query
+   * @returns the search response, followed by a synthetic Bundle response
+   * carrying any Medications the follow-up reads resolved
+   */
+  private static async runEpicMedicationRequestChain(
+    fhirClient: FHIRClient,
+    fetchString: string,
+  ): Promise<Response[]> {
+    const searchResponse = await fhirClient.get(fetchString);
+    if (searchResponse.status !== 200) return [searchResponse];
+
+    // Cloned because parseFhirSearch reads the body again downstream.
+    let bundle: Bundle;
+    try {
+      bundle = (await searchResponse.clone().json()) as Bundle;
+    } catch (error) {
+      console.error(
+        "Failed to parse Epic MedicationRequest response for Medication resolution: ",
+        error,
+      );
+      return [searchResponse];
+    }
+
+    const includedMedicationIds = new Set<string>();
+    const referencedMedicationIds = new Set<string>();
+    bundle?.entry?.forEach((entry) => {
+      const resource = entry.resource as FhirResource | undefined;
+      if (resource?.resourceType === "Medication" && resource.id) {
+        includedMedicationIds.add(resource.id);
+      }
+      if (resource?.resourceType === "MedicationRequest") {
+        // Contained (#id) references resolve locally, and a reference with a
+        // scheme (an absolute URL, urn:uuid:, urn:oid:) may not resolve
+        // against this server — reading it here could fetch an unrelated
+        // resource or just burn a guaranteed-404 request — so only scheme-less
+        // relative references are read (unresolved orders fail open
+        // downstream).
+        const reference = resource.medicationReference?.reference;
+        if (reference && !reference.includes(":")) {
+          const id = referencedMedicationKey(resource);
+          if (id) referencedMedicationIds.add(id);
+        }
+      }
+    });
+
+    let idsToRead = [...referencedMedicationIds].filter(
+      (id) => !includedMedicationIds.has(id),
+    );
+    if (idsToRead.length > EPIC_MEDICATION_READ_LIMIT) {
+      console.warn(
+        "Epic query strategy: %s distinct Medication references exceed the read cap of %s; the excess are kept unfiltered rather than resolved",
+        idsToRead.length,
+        EPIC_MEDICATION_READ_LIMIT,
+      );
+      idsToRead = idsToRead.slice(0, EPIC_MEDICATION_READ_LIMIT);
+    }
+
+    const medications: Medication[] = [];
+    for (const batch of chunkArray(
+      idsToRead,
+      EPIC_MEDICATION_READ_BATCH_SIZE,
+    )) {
+      const results = await Promise.allSettled(
+        batch.map((id) => fhirClient.get(`/Medication/${id}`)),
+      );
+      const responses = QueryService.collectSettledResponses(
+        results,
+        "Epic Medication read rejected: ",
+      );
+      for (const response of responses) {
+        if (response.status !== 200) {
+          console.error(
+            "Epic Medication read failed from %s with status %s",
+            response.url,
+            response.status,
+          );
+          continue;
+        }
+        try {
+          const body = (await response.json()) as FhirResource | null;
+          // Only genuine Medication bodies are surfaced; anything else a
+          // server returns with a 200 (an error payload, a misrouted
+          // resource) is dropped rather than injected into query results.
+          if (body?.resourceType === "Medication") {
+            medications.push(body);
+          }
+        } catch (error) {
+          console.error("Failed to parse Epic Medication read body: ", error);
+        }
+      }
+    }
+
+    if (medications.length === 0) return [searchResponse];
+
+    const medicationBundle: Bundle = {
+      resourceType: "Bundle",
+      type: "collection",
+      entry: medications.map((medication) => ({ resource: medication })),
+    };
+    return [
+      searchResponse,
+      new Response(JSON.stringify(medicationBundle), {
+        status: 200,
+        headers: { "content-type": "application/fhir+json" },
+      }),
+    ];
+  }
+
+  /**
+   * Collects the fulfilled Responses from settled FHIR request promises,
+   * logging each rejection under the given message prefix.
+   * @param results - settled promises for FHIR requests
+   * @param rejectionMessage - log prefix for rejected requests
+   * @returns the fulfilled Responses, in order
+   */
+  private static collectSettledResponses(
+    results: PromiseSettledResult<Response>[],
+    rejectionMessage: string,
+  ): Response[] {
+    return results
+      .map((r) => {
+        if (r.status === "fulfilled") return r.value;
+        console.error(rejectionMessage, r.reason);
+      })
+      .filter((v): v is Response => !!v);
   }
 
   @auditable
@@ -1037,10 +1189,13 @@ class QueryService {
       if (!(resourceType in runningQueryResponse)) {
         runningQueryResponse[resourceType] = [];
       }
+      // Dedupe on type-qualified ids: FHIR ids are only unique per resource
+      // type, so two different resources can legitimately share a bare id.
+      const resourceKey = `${resourceType}/${resource.id}`;
       // Check if the resourceID has already been seen & only added resources that haven't been seen before
-      if (resource.id && !resourceIds.has(resource.id)) {
+      if (resource.id && !resourceIds.has(resourceKey)) {
         (runningQueryResponse[resourceType] as FhirResource[]).push(resource);
-        resourceIds.add(resource.id);
+        resourceIds.add(resourceKey);
       } else if (resource.id && isFanoutSearch) {
         // If this is a fanout search, we might have multiple resources with the same ID
         // In this case, we still want to add the resource to the response if it comes from a different server
@@ -1094,9 +1249,12 @@ class QueryService {
       if (body?.entry) {
         for (const entry of body.entry) {
           if (entry.resource && isFhirResource(entry.resource)) {
-            // Add the resource only if the ID is unique to the resources being returned for the query
-            if (!resourceIds.includes(entry.resource.id!)) {
-              resourceIds.push(entry.resource.id!);
+            // Add the resource only if the ID is unique to the resources being
+            // returned for the query. Ids are type-qualified: FHIR ids are
+            // only unique per resource type.
+            const resourceKey = `${entry.resource.resourceType}/${entry.resource.id}`;
+            if (!resourceIds.includes(resourceKey)) {
+              resourceIds.push(resourceKey);
               resourceArray.push(entry.resource);
             }
           } else {

@@ -143,12 +143,13 @@ describe("CustomQuery epic strategy", () => {
     expect(customQuery.compileEpicConditionQueries()).toHaveLength(1);
   });
 
-  it("builds GET-based medication queries without code filters", () => {
+  it("builds a GET-based MedicationRequest query without a code filter", () => {
     const customQuery = buildMedicationQuery(undefined, "epic");
 
     const request = customQuery.getQuery("medicationRequest");
     expect(request.basePath).toBe("/MedicationRequest");
-    expect(request.params.get("patient")).toBe(`Patient/${PATIENT_ID}`);
+    // Epic's search expects a bare patient id, not a Patient/ reference.
+    expect(request.params.get("patient")).toBe(PATIENT_ID);
     expect(request.params.get("subject")).toBeNull();
     expect(request.params.get("code")).toBeNull();
     expect(request.params.get("_include")).toBe("MedicationRequest:medication");
@@ -162,13 +163,19 @@ describe("CustomQuery epic strategy", () => {
     expect(defaultRequest.params.get("_revinclude")).toBe(
       "MedicationAdministration:request",
     );
+  });
 
-    const statement = customQuery.getQuery("medicationStatement");
-    expect(statement.basePath).toBe("/MedicationStatement");
-    expect(statement.params.get("patient")).toBe(`Patient/${PATIENT_ID}`);
-    expect(statement.params.get("code")).toBeNull();
-    expect(statement.params.get("_include")).toBe(
-      "MedicationStatement:medication",
+  it("does not compile a MedicationStatement query (Epic has no R4 endpoint)", () => {
+    const customQuery = buildMedicationQuery(undefined, "epic");
+    expect(customQuery.getQuery("medicationStatement").basePath).toBe("");
+
+    const defaultStatement = buildMedicationQuery(
+      undefined,
+      "default",
+    ).getQuery("medicationStatement");
+    expect(defaultStatement.basePath).toBe("/MedicationStatement/_search");
+    expect(defaultStatement.params.get("subject")).toBe(
+      `Patient/${PATIENT_ID}`,
     );
   });
 
@@ -200,9 +207,6 @@ describe("CustomQuery epic strategy", () => {
     expect(
       customQuery.getQuery("medicationRequest").params.getAll("authoredon"),
     ).toEqual(["ge2024-01-01", "le2024-12-31"]);
-    expect(
-      customQuery.getQuery("medicationStatement").params.getAll("effective"),
-    ).toEqual(["ge2024-01-01", "le2024-12-31"]);
   });
 
   it("does not compile condition or encounter queries into the resource dictionary", () => {
@@ -220,9 +224,8 @@ describe("CustomQuery epic strategy", () => {
 
     expect(conditionQueries).toHaveLength(1);
     expect(conditionQueries[0].basePath).toBe("/Condition");
-    expect(conditionQueries[0].params.get("patient")).toBe(
-      `Patient/${PATIENT_ID}`,
-    );
+    // Epic's search expects a bare patient id, not a Patient/ reference.
+    expect(conditionQueries[0].params.get("patient")).toBe(PATIENT_ID);
     expect(conditionQueries[0].params.get("code")).toBe(SNOMED_CODE);
   });
 
@@ -252,9 +255,8 @@ describe("CustomQuery epic strategy", () => {
     ]);
     expect(encounterQueries).toHaveLength(1);
     expect(encounterQueries[0].basePath).toBe("/Encounter");
-    expect(encounterQueries[0].params.get("patient")).toBe(
-      `Patient/${PATIENT_ID}`,
-    );
+    // Epic's search expects a bare patient id, not a Patient/ reference.
+    expect(encounterQueries[0].params.get("patient")).toBe(PATIENT_ID);
     expect(encounterQueries[0].params.get("diagnosis")).toBe(
       "Condition/cond-1,Condition/cond-2",
     );
@@ -288,5 +290,13 @@ describe("CustomQuery immunization queries", () => {
     expect(immunization.basePath).toBe("/Immunization");
     expect(immunization.params.get("patient")).toBe(`Patient/${PATIENT_ID}`);
     expect(immunization.params.get("subject")).toBeNull();
+
+    // Epic's search expects a bare patient id, not a Patient/ reference.
+    const epicImmunization = new CustomQuery(
+      savedQuery,
+      PATIENT_ID,
+      "epic",
+    ).getQuery("immunization");
+    expect(epicImmunization.params.get("patient")).toBe(PATIENT_ID);
   });
 });
