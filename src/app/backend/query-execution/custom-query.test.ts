@@ -1,10 +1,11 @@
-import { CustomQuery } from "./custom-query";
+import { CustomQuery, extractChainedPatientDemographics } from "./custom-query";
 import {
   EMPTY_MEDICAL_RECORD_SECTIONS,
   QueryDataColumn,
   QueryTableResult,
 } from "../../(pages)/queryBuilding/utils";
 import { DibbsValueSet } from "@/app/models/entities/valuesets";
+import { Patient } from "fhir/r4";
 
 const PATIENT_ID = "patient-123";
 const RXNORM_CODE = "1665005";
@@ -272,19 +273,24 @@ describe("CustomQuery epic strategy", () => {
 });
 
 describe("CustomQuery immunization queries", () => {
-  it("scopes Immunization with the FHIR R4 'patient' search param, not 'subject'", () => {
-    const savedQuery: QueryTableResult = {
-      queryName: "Immunization Query",
-      queryId: "query-imm",
-      queryData: {},
-      conditionsList: [],
-      medicalRecordSections: {
-        ...EMPTY_MEDICAL_RECORD_SECTIONS,
-        immunizations: true,
-      },
-    };
+  const immunizationSavedQuery: QueryTableResult = {
+    queryName: "Immunization Query",
+    queryId: "query-imm",
+    queryData: {},
+    conditionsList: [],
+    medicalRecordSections: {
+      ...EMPTY_MEDICAL_RECORD_SECTIONS,
+      immunizations: true,
+    },
+  };
+  const DEMOGRAPHICS = {
+    given: "WayneTWOIZG",
+    family: "WatersSNHDIZGTWO",
+    birthDate: "2018-02-19",
+  };
 
-    const customQuery = new CustomQuery(savedQuery, PATIENT_ID);
+  it("scopes Immunization with the FHIR R4 'patient' search param, not 'subject'", () => {
+    const customQuery = new CustomQuery(immunizationSavedQuery, PATIENT_ID);
     const immunization = customQuery.getQuery("immunization");
 
     expect(immunization.basePath).toBe("/Immunization");
@@ -293,10 +299,125 @@ describe("CustomQuery immunization queries", () => {
 
     // Epic's search expects a bare patient id, not a Patient/ reference.
     const epicImmunization = new CustomQuery(
-      savedQuery,
+      immunizationSavedQuery,
       PATIENT_ID,
       "epic",
     ).getQuery("immunization");
     expect(epicImmunization.params.get("patient")).toBe(PATIENT_ID);
+  });
+
+  it("uses chained demographic params for immunization endpoints", () => {
+    const immunization = new CustomQuery(
+      immunizationSavedQuery,
+      PATIENT_ID,
+      "default",
+      { endpointType: "immunization", patientDemographics: DEMOGRAPHICS },
+    ).getQuery("immunization");
+
+    expect(immunization.basePath).toBe("/Immunization");
+    expect(immunization.params.get("patient.given")).toBe("WayneTWOIZG");
+    expect(immunization.params.get("patient.family")).toBe("WatersSNHDIZGTWO");
+    expect(immunization.params.get("patient.birthdate")).toBe("2018-02-19");
+    expect(immunization.params.get("patient")).toBeNull();
+
+    // Still a GET-only query.
+    const postPaths = new CustomQuery(
+      immunizationSavedQuery,
+      PATIENT_ID,
+      "default",
+      { endpointType: "immunization", patientDemographics: DEMOGRAPHICS },
+    )
+      .compileAllPostRequests()
+      .map((r) => r.path);
+    expect(postPaths).not.toContain("/Immunization");
+  });
+
+  it("falls back to the patient param on immunization endpoints without demographics", () => {
+    const immunization = new CustomQuery(
+      immunizationSavedQuery,
+      PATIENT_ID,
+      "default",
+      { endpointType: "immunization" },
+    ).getQuery("immunization");
+    expect(immunization.params.get("patient")).toBe(`Patient/${PATIENT_ID}`);
+    expect(immunization.params.get("patient.given")).toBeNull();
+
+    const epicImmunization = new CustomQuery(
+      immunizationSavedQuery,
+      PATIENT_ID,
+      "epic",
+      { endpointType: "immunization" },
+    ).getQuery("immunization");
+    expect(epicImmunization.params.get("patient")).toBe(PATIENT_ID);
+  });
+
+  it("ignores demographics on standard endpoints", () => {
+    const immunization = new CustomQuery(
+      immunizationSavedQuery,
+      PATIENT_ID,
+      "default",
+      { endpointType: "standard", patientDemographics: DEMOGRAPHICS },
+    ).getQuery("immunization");
+    expect(immunization.params.get("patient")).toBe(`Patient/${PATIENT_ID}`);
+    expect(immunization.params.get("patient.given")).toBeNull();
+  });
+});
+
+describe("extractChainedPatientDemographics", () => {
+  const basePatient: Patient = {
+    resourceType: "Patient",
+    id: "patient-123",
+    name: [{ given: ["Wayne", "Bruce"], family: "Waters" }],
+    birthDate: "2018-02-19",
+  };
+
+  it("uses the first given name, the family name, and the birth date", () => {
+    expect(extractChainedPatientDemographics(basePatient)).toEqual({
+      given: "Wayne",
+      family: "Waters",
+      birthDate: "2018-02-19",
+    });
+  });
+
+  it("prefers the official name over other name entries", () => {
+    const patient: Patient = {
+      ...basePatient,
+      name: [
+        { use: "nickname", given: ["Bats"], family: "Man" },
+        { use: "official", given: ["Wayne"], family: "Waters" },
+      ],
+    };
+    expect(extractChainedPatientDemographics(patient)).toEqual({
+      given: "Wayne",
+      family: "Waters",
+      birthDate: "2018-02-19",
+    });
+  });
+
+  it("falls back to the first usable name when none is official", () => {
+    const patient: Patient = {
+      ...basePatient,
+      name: [
+        { use: "official", family: "TextOnly" }, // no given name — not usable
+        { given: ["Wayne"], family: "Waters" },
+      ],
+    };
+    expect(extractChainedPatientDemographics(patient)).toEqual({
+      given: "Wayne",
+      family: "Waters",
+      birthDate: "2018-02-19",
+    });
+  });
+
+  it.each([
+    ["missing name", { ...basePatient, name: undefined }],
+    ["empty name list", { ...basePatient, name: [] }],
+    ["name without family", { ...basePatient, name: [{ given: ["Wayne"] }] }],
+    ["name without given", { ...basePatient, name: [{ family: "Waters" }] }],
+    ["missing birthDate", { ...basePatient, birthDate: undefined }],
+    ["year-only birthDate", { ...basePatient, birthDate: "2018" }],
+    ["year-month birthDate", { ...basePatient, birthDate: "2018-02" }],
+  ] as [string, Patient][])("returns undefined for %s", (_label, patient) => {
+    expect(extractChainedPatientDemographics(patient)).toBeUndefined();
   });
 });

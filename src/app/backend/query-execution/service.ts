@@ -3,7 +3,12 @@ import { Bundle, FhirResource, Medication, Patient, Task } from "fhir/r4";
 
 import { isFhirResource } from "../../constants";
 
-import { chunkArray, CustomQuery } from "./custom-query";
+import {
+  ChainedPatientDemographics,
+  chunkArray,
+  CustomQuery,
+  extractChainedPatientDemographics,
+} from "./custom-query";
 import {
   filterMedicationResourcesByCode,
   referencedMedicationKey,
@@ -420,7 +425,8 @@ class QueryService {
    * @param savedQuery - Table row from the query database
    * @param patientId - ID of the referenced patient
    * @param fhirServer - name of the FHIR server
-   * @param  medicalRecordSections - whether to include medical record sections
+   * @param patientDemographics - demographics from the discovered Patient,
+   * used to build chained Immunization searches against Immunization Gateways
    * @returns a Response with FHIR information for further processing.
    */
   @auditable
@@ -428,6 +434,7 @@ class QueryService {
     savedQuery: QueryTableResult,
     patientId: string,
     fhirServer: string,
+    patientDemographics?: ChainedPatientDemographics,
   ) {
     const fhirClient = await prepareFhirClient(fhirServer);
     const serverConfigs = await getFhirServerConfigs();
@@ -435,8 +442,20 @@ class QueryService {
       (config) => config.name === fhirServer,
     );
     const queryStrategy = serverConfig?.queryStrategy ?? "default";
+    const endpointType = serverConfig?.endpointType ?? "standard";
+    if (endpointType === "immunization" && !patientDemographics) {
+      // The gateway can't resolve a FHIR patient id, so the fallback
+      // patient={id} search below will most likely return nothing.
+      console.warn(
+        "Immunization Gateway query for server %s has no patient demographics; falling back to a patient-id Immunization search.",
+        fhirServer,
+      );
+    }
     const medicalRecordSections = savedQuery.medicalRecordSections;
-    const builtQuery = new CustomQuery(savedQuery, patientId, queryStrategy);
+    const builtQuery = new CustomQuery(savedQuery, patientId, queryStrategy, {
+      endpointType,
+      patientDemographics,
+    });
 
     const medicalRecordSectionResults: Response[] = [];
     // Each medical-record-section request is isolated in its own try/catch so a
@@ -1035,11 +1054,19 @@ class QueryService {
       throw new Error(`Unable to query of name ${request?.queryName}`);
     }
 
+    // Only the slim demographics cross into the @auditable records request —
+    // the same PHI level makePatientDiscoveryRequest already audits — so the
+    // full Patient resource never lands in the audit log.
+    const patientDemographics = request.patient
+      ? extractChainedPatientDemographics(request.patient)
+      : undefined;
+
     const { responses, requests, medicationFilterCodes } =
       await QueryService.makePatientRecordsRequest(
         savedQuery,
         request.patientId,
         request.fhirServer,
+        patientDemographics,
       );
 
     let queryResponse = await QueryService.parseFhirSearch(responses);
@@ -1107,6 +1134,7 @@ class QueryService {
       await patientRecordsQuery({
         patientId: patient[0].id as string,
         ...queryRequest,
+        patient: patient[0],
       });
     return {
       Patient: patient,
