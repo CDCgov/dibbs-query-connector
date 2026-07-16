@@ -212,13 +212,39 @@ describe("patientRecordsQuery against an Immunization Gateway", () => {
     );
   });
 
-  it("returns the gateway's Immunizations from the parsed response", async () => {
+  it("returns the gateway's Immunizations and drops its search-outcome entries", async () => {
+    // Shape observed from the real gateway: id-bearing OperationOutcome
+    // entries with search.mode=outcome alongside the Immunization matches.
     const gatewayBundle = {
       resourceType: "Bundle",
       type: "searchset",
       entry: [
         {
-          resource: { resourceType: "Immunization", id: "imm-1" },
+          resource: {
+            resourceType: "OperationOutcome",
+            id: "outcome-1",
+            issue: [{ severity: "information", code: "informational" }],
+          },
+          search: { mode: "outcome" },
+        },
+        {
+          resource: { resourceType: "OperationOutcome", id: "outcome-2" },
+          search: { mode: "outcome" },
+        },
+        {
+          resource: {
+            resourceType: "Immunization",
+            id: "imm-1",
+            vaccineCode: {
+              coding: [
+                {
+                  system: "http://hl7.org/fhir/sid/cvx",
+                  code: "03",
+                  display: "MMR",
+                },
+              ],
+            },
+          },
           search: { mode: "match" },
         },
         {
@@ -236,5 +262,6 @@ describe("patientRecordsQuery against an Immunization Gateway", () => {
     const result = await runQuery("IZ Gateway", PATIENT);
 
     expect(result.Immunization?.map((i) => i.id)).toEqual(["imm-1", "imm-2"]);
+    expect(result.OperationOutcome).toBeUndefined();
   });
 });

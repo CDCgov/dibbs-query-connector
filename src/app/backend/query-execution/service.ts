@@ -1,5 +1,12 @@
 "use server";
-import { Bundle, FhirResource, Medication, Patient, Task } from "fhir/r4";
+import {
+  Bundle,
+  FhirResource,
+  Medication,
+  OperationOutcome,
+  Patient,
+  Task,
+} from "fhir/r4";
 
 import { isFhirResource } from "../../constants";
 
@@ -1210,6 +1217,11 @@ class QueryService {
       const resources =
         response.entry
           ?.map((entry) => {
+            if (entry.resource?.resourceType === "OperationOutcome") {
+              // Search-infrastructure entries, not patient records — see
+              // processFhirResponse.
+              return null;
+            }
             if (entry.resource && isFhirResource(entry.resource)) {
               return entry.resource;
             } else {
@@ -1295,6 +1307,23 @@ class QueryService {
       // keeps the body.entry access from throwing on those values.
       if (body?.entry) {
         for (const entry of body.entry) {
+          if (
+            entry.search?.mode === "outcome" ||
+            entry.resource?.resourceType === "OperationOutcome"
+          ) {
+            // Search-infrastructure entries (e.g. the IZ Gateway returns
+            // per-query OperationOutcomes with ids and search.mode=outcome)
+            // aren't patient records; log their diagnostics and keep them out
+            // of the QueryResponse.
+            console.log(
+              "Skipping search-outcome entry from %s: %s",
+              response.url,
+              JSON.stringify(
+                (entry.resource as OperationOutcome | undefined)?.issue ?? [],
+              ),
+            );
+            continue;
+          }
           if (entry.resource && isFhirResource(entry.resource)) {
             // Add the resource only if the ID is unique to the resources being
             // returned for the query. Ids are type-qualified: FHIR ids are
