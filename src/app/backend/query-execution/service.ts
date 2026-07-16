@@ -457,6 +457,17 @@ class QueryService {
       patientDemographics,
     });
 
+    // Immunization Gateways only serve immunization history — every other
+    // record-section search is a wasted round trip through the HL7v2
+    // translation layer that returns nothing, so skip them entirely.
+    const isImmunizationGateway = endpointType === "immunization";
+    if (isImmunizationGateway) {
+      console.log(
+        "Immunization Gateway server %s: skipping non-immunization record sections.",
+        fhirServer,
+      );
+    }
+
     const medicalRecordSectionResults: Response[] = [];
     // Each medical-record-section request is isolated in its own try/catch so a
     // network-level failure (e.g. an unsupported endpoint that resets the
@@ -474,7 +485,11 @@ class QueryService {
       }
     }
 
-    if (medicalRecordSections && medicalRecordSections.socialDeterminants) {
+    if (
+      !isImmunizationGateway &&
+      medicalRecordSections &&
+      medicalRecordSections.socialDeterminants
+    ) {
       try {
         const { basePath, params } = builtQuery.getQuery("socialHistory");
         medicalRecordSectionResults.push(
@@ -485,7 +500,11 @@ class QueryService {
       }
     }
 
-    if (medicalRecordSections && medicalRecordSections.serviceRequests) {
+    if (
+      !isImmunizationGateway &&
+      medicalRecordSections &&
+      medicalRecordSections.serviceRequests
+    ) {
       try {
         const { basePath, params } = builtQuery.getQuery("serviceRequest");
 
@@ -498,13 +517,13 @@ class QueryService {
       }
     }
 
-    const postPromises: Promise<Response | Response[]>[] = builtQuery
-      .compileAllPostRequests()
-      .map((req) => {
-        return fhirClient.post(req.path, req.params);
-      });
+    const postPromises: Promise<Response | Response[]>[] = isImmunizationGateway
+      ? []
+      : builtQuery.compileAllPostRequests().map((req) => {
+          return fhirClient.post(req.path, req.params);
+        });
 
-    if (queryStrategy === "epic") {
+    if (queryStrategy === "epic" && !isImmunizationGateway) {
       // Epic doesn't support POST _search (or server-side code filtering) for
       // MedicationRequest, so it goes out as a GET alongside the POST batch,
       // followed by reads of any referenced Medications the search didn't

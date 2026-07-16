@@ -174,6 +174,22 @@ describe("patientRecordsQuery against an Immunization Gateway", () => {
     },
   );
 
+  it.each(["IZ Gateway", "Epic IZ Gateway"])(
+    "sends only the Immunization search to %s, skipping other record sections",
+    async (server) => {
+      await runQuery(server, PATIENT);
+
+      // The gateway only serves immunization history, so the other sections
+      // in the saved query (social history, service requests, labs POST
+      // batch, and the epic medication/condition chains) never fire.
+      const getPaths = mockFhirClient.get.mock.calls.map((c) => c[0] as string);
+      expect(getPaths).toHaveLength(1);
+      expect(getPaths[0]).toMatch(/^\/Immunization\?/);
+      expect(mockFhirClient.post).not.toHaveBeenCalled();
+      expect(mockFhirClient.postJson).not.toHaveBeenCalled();
+    },
+  );
+
   it("falls back to the patient param when no Patient resource is provided", async () => {
     await runQuery("IZ Gateway");
 
